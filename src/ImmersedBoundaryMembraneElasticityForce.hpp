@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef IMMERSEDBOUNDARYELASTICITYFORCE_HPP_
-#define IMMERSEDBOUNDARYELASTICITYFORCE_HPP_
+#ifndef IMMERSEDBOUNDARYMEMBRANEELASTICITYFORCE_HPP_
+#define IMMERSEDBOUNDARYMEMBRANEELASTICITYFORCE_HPP_
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
@@ -52,7 +52,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 template<unsigned DIM>
-class ImmersedBoundaryElasticityForce : public AbstractImmersedBoundaryForce<DIM>
+class ImmersedBoundaryMembraneElasticityForce : public AbstractImmersedBoundaryForce<DIM>
 {
 //friend class TestForces;
 
@@ -91,12 +91,12 @@ public:
     /**
      * Constructor.
      */
-    ImmersedBoundaryElasticityForce();
+    ImmersedBoundaryMembraneElasticityForce();
 
     /**
      * Destructor.
      */
-    virtual ~ImmersedBoundaryElasticityForce();
+    virtual ~ImmersedBoundaryMembraneElasticityForce();
 
     /**
      * Overridden AddForceContribution() method.
@@ -117,6 +117,6 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(ImmersedBoundaryElasticityForce)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(ImmersedBoundaryMembraneElasticityForce)
 
-#endif /*IMMERSEDBOUNDARYELASTICITYFORCE_HPP_*/
+#endif /*IMMERSEDBOUNDARYMEMBRANEELASTICITYFORCE_HPP_*/

@@ -177,6 +177,11 @@ private:
     void ClearForces();
 
     /**
+     * Loops over each immersed boundary force and invokes AddForceContribution()
+     */
+    void AddForceContributions();
+
+    /**
      * Helper method for UpdateFluidVelocityGrids()
      * Calculates elastic forces around perimeter of each element
      */

@@ -99,7 +99,7 @@ public:
 
         // Verify one candidate is correct, and set member variable accordingly
         struct stat sb;
-        for (unsigned idx = 0 ; idx < candidate_directories.size() ; idx++)
+        for (unsigned idx = 0; idx < candidate_directories.size(); idx++)
         {
             if (stat(candidate_directories[idx].c_str(), &sb) == 0 && S_ISDIR(sb.st_mode))
             {
@@ -136,10 +136,10 @@ public:
          * 6: Include membrane
          */
         ImmersedBoundaryPalisadeMeshGenerator gen(11, 200, 0.2, 2.0, 1.0, true);
-        ImmersedBoundaryMesh<2,2>* p_mesh = gen.GetMesh();
+        ImmersedBoundaryMesh<2, 2> *p_mesh = gen.GetMesh();
 
         p_mesh->GetMembraneElement()->SetMembraneSpringConstant(400000.0);
-        p_mesh->GetMembraneElement()->SetMembraneRestLength(0.4/100.0);
+        p_mesh->GetMembraneElement()->SetMembraneRestLength(0.4 / 100.0);
 
         p_mesh->SetNumGridPtsXAndY(256);
 
@@ -153,7 +153,7 @@ public:
         OffLatticeSimulation<2> simulator(cell_population);
 
         // Add main immersed boundary simulation modifier
-        MAKE_PTR(ImmersedBoundarySimulationModifier<2>, p_main_modifier);
+        MAKE_PTR(ImmersedBoundarySimulationModifier < 2 >, p_main_modifier);
         simulator.AddSimulationModifier(p_main_modifier);
 
         // Set simulation properties
@@ -191,7 +191,7 @@ public:
         unsigned num_nodes = initial_num_nodes;
         unsigned max_sim_idx = 40;
 
-        for (unsigned sim_idx = 1 ; sim_idx < max_sim_idx ; sim_idx++)
+        for (unsigned sim_idx = 1; sim_idx < max_sim_idx; sim_idx++)
         {
             SimulationTime::Instance()->Destroy();
             SimulationTime::Instance()->SetStartTime(0.0);
@@ -206,22 +206,22 @@ public:
              * 5: Bottom-left x
              * 6: Botton-left y
              */
-            SuperellipseGenerator* p_gen = new SuperellipseGenerator(num_nodes, 1.0, 0.4, 0.4, 0.3, 0.3);
+            SuperellipseGenerator *p_gen = new SuperellipseGenerator(num_nodes, 1.0, 0.4, 0.4, 0.3, 0.3);
 
             // Generate a mesh using this superellipse
             std::vector<c_vector<double, 2> > locations = p_gen->GetPointsAsVectors();
             delete p_gen;
 
-            std::vector<Node<2>* > nodes;
-            for (unsigned node_idx = 0 ; node_idx < locations.size() ; node_idx++)
+            std::vector<Node<2> *> nodes;
+            for (unsigned node_idx = 0; node_idx < locations.size(); node_idx++)
             {
                 nodes.push_back(new Node<2>(node_idx, locations[node_idx], true));
             }
 
-            std::vector<ImmersedBoundaryElement<2,2>* > elements;
-            elements.push_back(new ImmersedBoundaryElement<2,2>(0, nodes));
+            std::vector<ImmersedBoundaryElement < 2, 2>* > elements;
+            elements.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
 
-            ImmersedBoundaryMesh<2,2> mesh(nodes, elements, 128, 128);
+            ImmersedBoundaryMesh<2, 2> mesh(nodes, elements, 128, 128);
 
             double mesh_spacing = mesh.GetCharacteristicNodeSpacing();
 
@@ -233,21 +233,22 @@ public:
             CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
             cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
 
-            ImmersedBoundaryCellPopulation <2> cell_population(mesh, cells);
+            ImmersedBoundaryCellPopulation<2> cell_population(mesh, cells);
 
 
-            ImmersedBoundaryElement <2, 2> *p_elem = mesh.GetElement(0u);
+            ImmersedBoundaryElement<2, 2> *p_elem = mesh.GetElement(0u);
             p_elem->SetMembraneRestLength(0.1 * mesh.GetCharacteristicNodeSpacing());
-            p_elem->SetMembraneSpringConstant(1e4);
+            p_elem->SetMembraneSpringConstant(1e6);
 
             double vol_at_t0 = mesh.GetVolumeOfElement(0);
-            double node_spacing = mesh.GetSurfaceAreaOfElement(0) / p_elem->GetNumNodes();
 
             OffLatticeSimulation<2> *p_simulator = new OffLatticeSimulation<2>(cell_population);
 
             // Add main immersed boundary simulation modifier
             MAKE_PTR(ImmersedBoundarySimulationModifier < 2 >, p_main_modifier);
             p_simulator->AddSimulationModifier(p_main_modifier);
+
+            p_main_modifier->SetReynoldsNumber(1e-4);
 
             std::string output_dir = "ImmersedBoundaryNumerics/TestSingleCellVolumeChangeWithNodeSpacing";
             output_dir += boost::lexical_cast<std::string>(num_nodes);
@@ -266,18 +267,20 @@ public:
             double vol_at_t1 = mesh.GetVolumeOfElement(0);
 
             num_nodes_vec.push_back(num_nodes);
-            node_spacing_ratio.push_back(node_spacing / mesh_spacing);
+            node_spacing_ratio.push_back(mesh.GetSpacingRatio());
             volume_change.push_back(fabs(vol_at_t0 - vol_at_t1) / vol_at_t0);
 
 
             mesh.GetSurfaceAreaOfElement(0);
 
-            unsigned new_num_nodes = unsigned(ceil(double(initial_num_nodes) / (1.0 - (1.0 / double(max_sim_idx)) * double(sim_idx))));
+            unsigned new_num_nodes = unsigned(
+                    ceil(double(initial_num_nodes) / (1.0 - (1.0 / double(max_sim_idx)) * double(sim_idx))));
 
             while (new_num_nodes == num_nodes)
             {
                 sim_idx++;
-                new_num_nodes = unsigned(ceil(double(initial_num_nodes) / (1.0 - (1.0 / double(max_sim_idx)) * double(sim_idx))));
+                new_num_nodes = unsigned(
+                        ceil(double(initial_num_nodes) / (1.0 - (1.0 / double(max_sim_idx)) * double(sim_idx))));
             }
 
             num_nodes = new_num_nodes;
@@ -338,16 +341,16 @@ public:
         std::vector<c_vector<double, 2> > locations = p_gen->GetPointsAsVectors();
         delete p_gen;
 
-        std::vector<Node<2>* > nodes;
-        for (unsigned node_idx = 0 ; node_idx < locations.size() ; node_idx++)
+        std::vector<Node<2> *> nodes;
+        for (unsigned node_idx = 0; node_idx < locations.size(); node_idx++)
         {
             nodes.push_back(new Node<2>(node_idx, locations[node_idx], true));
         }
 
-        std::vector<ImmersedBoundaryElement<2,2>* > elements;
-        elements.push_back(new ImmersedBoundaryElement<2,2>(0, nodes));
+        std::vector<ImmersedBoundaryElement < 2, 2>* > elements;
+        elements.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
 
-        ImmersedBoundaryMesh<2,2> mesh(nodes, elements, 128, 128);
+        ImmersedBoundaryMesh<2, 2> mesh(nodes, elements, 128, 128);
 
 //        double mesh_spacing = mesh.GetCharacteristicNodeSpacing();
 
@@ -359,10 +362,10 @@ public:
         CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
 
-        ImmersedBoundaryCellPopulation <2> cell_population(mesh, cells);
+        ImmersedBoundaryCellPopulation<2> cell_population(mesh, cells);
 
 
-        ImmersedBoundaryElement <2, 2> *p_elem = mesh.GetElement(0u);
+        ImmersedBoundaryElement<2, 2> *p_elem = mesh.GetElement(0u);
         p_elem->SetMembraneRestLength(0.1 * mesh.GetCharacteristicNodeSpacing());
         p_elem->SetMembraneSpringConstant(1e4);
 
@@ -382,7 +385,7 @@ public:
         p_simulator->SetDt(0.01);
         p_simulator->SetSamplingTimestepMultiple(1000);
 
-        for (unsigned sim_idx = 1 ; sim_idx < max_sim_idx ; sim_idx++)
+        for (unsigned sim_idx = 1; sim_idx < max_sim_idx; sim_idx++)
         {
             // Set changing simulation properties
 
@@ -442,7 +445,7 @@ public:
         unsigned num_sim_timepoints = 30;
 
         // Spring constant of the reference cell
-        double ref_spring_const = 1e4;
+        double ref_spring_const = 1e8;
 
         // Perform the first simulation
         {
@@ -525,7 +528,7 @@ public:
         unsigned num_springs = 3;
         obs_elongation_shape_factor.resize(num_springs);
 
-        for (unsigned sc_idx = 0 ; sc_idx < num_springs ; sc_idx++)
+        for (unsigned sc_idx = 0; sc_idx < num_springs; sc_idx++)
         {
             /*
              * Create an Immersed Boundary Mesh using a SuperellipseGenerator
@@ -546,26 +549,26 @@ public:
             // Generate a mesh using this superellipse
             std::vector<c_vector<double, 2> > locations = gen.GetPointsAsVectors();
 
-            std::vector<Node<2>* > nodes;
-            for (unsigned node_idx = 0 ; node_idx < locations.size() ; node_idx++)
+            std::vector<Node<2> *> nodes;
+            for (unsigned node_idx = 0; node_idx < locations.size(); node_idx++)
             {
                 nodes.push_back(new Node<2>(node_idx, locations[node_idx], true));
             }
 
-            std::vector<ImmersedBoundaryElement<2,2>* > elements;
-            elements.push_back(new ImmersedBoundaryElement<2,2>(0, nodes));
+            std::vector<ImmersedBoundaryElement < 2, 2>* > elements;
+            elements.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
 
-            ImmersedBoundaryMesh<2,2> mesh(nodes, elements, 64, 64);
+            ImmersedBoundaryMesh<2, 2> mesh(nodes, elements, 64, 64);
 
             // Set up cell population
             std::vector<CellPtr> cells;
             MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
             CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
             cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
-            ImmersedBoundaryCellPopulation <2> cell_population(mesh, cells);
+            ImmersedBoundaryCellPopulation<2> cell_population(mesh, cells);
 
             // Set element properties
-            ImmersedBoundaryElement<2, 2>* p_elem = mesh.GetElement(0u);
+            ImmersedBoundaryElement<2, 2> *p_elem = mesh.GetElement(0u);
 
             p_elem->SetMembraneRestLength(0.1 * mesh.GetCharacteristicNodeSpacing());
             p_elem->SetMembraneSpringConstant(2.0 * double(sc_idx + 1) * ref_spring_const);
@@ -588,7 +591,7 @@ public:
             // Write initial elongation shape factor to output vector
             obs_elongation_shape_factor[sc_idx].push_back(mesh.GetElongationShapeFactorOfElement(0));
 
-            for (unsigned sim_time_idx = 1 ; sim_time_idx <= num_sim_timepoints ; sim_time_idx++)
+            for (unsigned sim_time_idx = 1; sim_time_idx <= num_sim_timepoints; sim_time_idx++)
             {
                 // Calculate new end time and run simulation
                 double new_end_time = 0.1 * double(sim_time_idx);
@@ -605,7 +608,7 @@ public:
         csv_writer.AddData(simulation_time);
         csv_writer.AddData(ref_elongation_shape_factor);
 
-        for (unsigned sc_idx = 0 ; sc_idx < num_springs ; sc_idx++)
+        for (unsigned sc_idx = 0; sc_idx < num_springs; sc_idx++)
         {
             csv_writer.AddData(obs_elongation_shape_factor[sc_idx]);
         }
@@ -614,7 +617,7 @@ public:
         header_names.push_back("Simulation time");
         header_names.push_back("Ref elongation shape factor");
 
-        for (unsigned sc_idx = 0 ; sc_idx < num_springs ; sc_idx++)
+        for (unsigned sc_idx = 0; sc_idx < num_springs; sc_idx++)
         {
             std::string header = "Obs elongation shape factor ";
 
@@ -654,10 +657,12 @@ public:
         std::vector<std::vector<double> > obs_elongation_shape_factor;
 
         // Number of timepoints at which we sample the cell shapes
-        unsigned num_sim_timepoints = 20;
+        unsigned num_sim_timepoints = 30;
 
         // Spring constant of the reference cell
-        double ref_spring_const = 4e4;
+        double ref_spring_const = 1e8;
+
+        double reynolds = 1e-4;
 
         // Perform the first simulation
         {
@@ -712,6 +717,8 @@ public:
             MAKE_PTR(ImmersedBoundarySimulationModifier < 2 >, p_main_modifier);
             sim.AddSimulationModifier(p_main_modifier);
 
+            p_main_modifier->SetReynoldsNumber(reynolds);
+
             std::string output_dir = "ImmersedBoundaryNumerics/TestCellSizeVsSpringConsantRef";
             output_dir += boost::lexical_cast<std::string>(p_elem->GetMembraneSpringConstant() / ref_spring_const);
 
@@ -745,9 +752,9 @@ public:
         obs_elongation_shape_factor.resize(num_springs);
 
 
-        for (unsigned sc_idx = 0 ; sc_idx < num_springs ; sc_idx++)
+        for (unsigned sc_idx = 0; sc_idx < num_springs; sc_idx++)
         {
-            double scaling_factor = double(sc_idx + 1);
+            double scaling_factor = 2.0;
 
             /*
              * Create an Immersed Boundary Mesh using a SuperellipseGenerator
@@ -759,7 +766,7 @@ public:
              * 5: Bottom-left x
              * 6: Botton-left y
              */
-            SuperellipseGenerator gen(unsigned(256.0/scaling_factor), 1.0, 0.3/scaling_factor, 0.6/scaling_factor, 0.0, 0.0);
+            SuperellipseGenerator gen(256, 1.0, 0.3 / scaling_factor, 0.6 / scaling_factor, 0.0, 0.0);
 
             // Because we have already run a simulation in this test, we must destroy the SimulationTime singleton
             SimulationTime::Instance()->Destroy();
@@ -768,16 +775,16 @@ public:
             // Generate a mesh using this superellipse
             std::vector<c_vector<double, 2> > locations = gen.GetPointsAsVectors();
 
-            std::vector<Node<2>* > nodes;
-            for (unsigned node_idx = 0 ; node_idx < locations.size() ; node_idx++)
+            std::vector<Node<2> *> nodes;
+            for (unsigned node_idx = 0; node_idx < locations.size(); node_idx++)
             {
                 nodes.push_back(new Node<2>(node_idx, locations[node_idx], true));
             }
 
-            std::vector<ImmersedBoundaryElement<2,2>* > elements;
-            elements.push_back(new ImmersedBoundaryElement<2,2>(0, nodes));
+            std::vector<ImmersedBoundaryElement < 2, 2>* > elements;
+            elements.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
 
-            ImmersedBoundaryMesh<2,2> mesh(nodes, elements, 128, 128);
+            ImmersedBoundaryMesh<2, 2> mesh(nodes, elements, 128, 128);
 
             PRINT_VARIABLE(mesh.GetCharacteristicNodeSpacing());
 
@@ -786,16 +793,13 @@ public:
             MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
             CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
             cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
-            ImmersedBoundaryCellPopulation <2> cell_population(mesh, cells);
+            ImmersedBoundaryCellPopulation<2> cell_population(mesh, cells);
 
             // Set element properties
-            ImmersedBoundaryElement<2, 2>* p_elem = mesh.GetElement(0u);
+            ImmersedBoundaryElement<2, 2> *p_elem = mesh.GetElement(0u);
 
             p_elem->SetMembraneRestLength(0.1 * mesh.GetCharacteristicNodeSpacing());
-            p_elem->SetMembraneSpringConstant( (1.0/scaling_factor) * ref_spring_const);
-
-            PRINT_VARIABLE(mesh.GetSurfaceAreaOfElement(0u));
-            PRINT_VARIABLE(mesh.GetVolumeOfElement(0u));
+            p_elem->SetMembraneSpringConstant(ref_spring_const / (double(sc_idx+1)*double(sc_idx+1)));
 
             // Create simulation
             OffLatticeSimulation<2> sim(cell_population);
@@ -803,6 +807,8 @@ public:
             // Add main immersed boundary simulation modifier
             MAKE_PTR(ImmersedBoundarySimulationModifier < 2 >, p_main_modifier);
             sim.AddSimulationModifier(p_main_modifier);
+
+            p_main_modifier->SetReynoldsNumber(reynolds * double(sc_idx + 1));
 
             std::string output_dir = "ImmersedBoundaryNumerics/TestCellSizeVsSpringConsant";
             output_dir += boost::lexical_cast<std::string>(p_elem->GetMembraneSpringConstant() / ref_spring_const);
@@ -815,10 +821,10 @@ public:
             // Write initial elongation shape factor to output vector
             obs_elongation_shape_factor[sc_idx].push_back(mesh.GetElongationShapeFactorOfElement(0));
 
-            for (unsigned sim_time_idx = 1 ; sim_time_idx <= num_sim_timepoints ; sim_time_idx++)
+            for (unsigned sim_time_idx = 1; sim_time_idx <= num_sim_timepoints; sim_time_idx++)
             {
                 // Calculate new end time and run simulation
-                double new_end_time = 0.1 * double(sim_time_idx);
+                double new_end_time = 0.1 * double(sc_idx + 1) * double(sim_time_idx);
                 sim.SetEndTime(new_end_time);
                 sim.Solve();
 
@@ -832,7 +838,7 @@ public:
         csv_writer.AddData(simulation_time);
         csv_writer.AddData(ref_elongation_shape_factor);
 
-        for (unsigned sc_idx = 0 ; sc_idx < num_springs ; sc_idx++)
+        for (unsigned sc_idx = 0; sc_idx < num_springs; sc_idx++)
         {
             csv_writer.AddData(obs_elongation_shape_factor[sc_idx]);
         }
@@ -841,7 +847,7 @@ public:
         header_names.push_back("Simulation time");
         header_names.push_back("Ref elongation shape factor");
 
-        for (unsigned sc_idx = 0 ; sc_idx < num_springs ; sc_idx++)
+        for (unsigned sc_idx = 0; sc_idx < num_springs; sc_idx++)
         {
             std::string header = "Obs elongation shape factor ";
 
@@ -876,7 +882,7 @@ public:
         std::vector<double> computation_time;
         std::vector<double> shape_change;
 
-        for (unsigned num_gridpts = 128 ; num_gridpts < 513 ; num_gridpts += 64)
+        for (unsigned num_gridpts = 128; num_gridpts < 513; num_gridpts += 64)
         {
             SimulationTime::Instance()->Destroy();
             SimulationTime::Instance()->SetStartTime(0.0);
@@ -897,16 +903,16 @@ public:
             std::vector<c_vector<double, 2> > locations = p_gen->GetPointsAsVectors();
             delete p_gen;
 
-            std::vector<Node<2>* > nodes;
-            for (unsigned node_idx = 0 ; node_idx < locations.size() ; node_idx++)
+            std::vector<Node<2> *> nodes;
+            for (unsigned node_idx = 0; node_idx < locations.size(); node_idx++)
             {
                 nodes.push_back(new Node<2>(node_idx, locations[node_idx], true));
             }
 
-            std::vector<ImmersedBoundaryElement<2,2>* > elements;
-            elements.push_back(new ImmersedBoundaryElement<2,2>(0, nodes));
+            std::vector<ImmersedBoundaryElement < 2, 2>* > elements;
+            elements.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
 
-            ImmersedBoundaryMesh<2,2> mesh(nodes, elements, num_gridpts, num_gridpts);
+            ImmersedBoundaryMesh<2, 2> mesh(nodes, elements, num_gridpts, num_gridpts);
 
             /*
              * Set up cell population
@@ -916,10 +922,10 @@ public:
             CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
             cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
 
-            ImmersedBoundaryCellPopulation <2> cell_population(mesh, cells);
+            ImmersedBoundaryCellPopulation<2> cell_population(mesh, cells);
 
 
-            ImmersedBoundaryElement <2, 2> *p_elem = mesh.GetElement(0u);
+            ImmersedBoundaryElement<2, 2> *p_elem = mesh.GetElement(0u);
 
             p_elem->SetMembraneRestLength(0.1 * mesh.GetCharacteristicNodeSpacing());
             p_elem->SetMembraneSpringConstant(1e4);
@@ -970,53 +976,584 @@ public:
         csv_writer.WriteDataToFile();
     }
 
-    void TestPalisadeSimulation() throw(Exception)
+    void xTestSingleCellOutputFluidGrid() throw(Exception)
     {
-        /*
-         * 1: Num cells
-         * 2: Num nodes per cell
-         * 3: Superellipse exponent
-         * 4: Superellipse aspect ratio
-         * 5: Random y-variation
-         * 6: Include membrane
+        /**
+         * This test outputs the fluid velocity grid at certain times for visualisation purposes.
          */
-        ImmersedBoundaryPalisadeMeshGenerator gen(9, 50, 0.2, 2.0, 0.0, false);
-        ImmersedBoundaryMesh<2,2>* p_mesh = gen.GetMesh();
 
-        p_mesh->SetNumGridPtsXAndY(128);
+        SimulationTime::Instance()->Destroy();
+        SimulationTime::Instance()->SetStartTime(0.0);
 
-        double spacing = p_mesh->GetCharacteristicNodeSpacing();
+        /*
+         * Create an Immersed Boundary Mesh using a SuperellipseGenerator
+         *
+         * 1: Num nodes
+         * 2: Superellipse exponent
+         * 3: Width
+         * 4: Height
+         * 5: Bottom-left x
+         * 6: Botton-left y
+         */
+        SuperellipseGenerator *p_gen = new SuperellipseGenerator(64, 1.0, 0.3, 0.6, 0.35, 0.2);
 
-        for (unsigned elem_idx = 0 ; elem_idx < p_mesh->GetNumElements() ; elem_idx++)
+        // Generate a mesh using this superellipse
+        std::vector<c_vector<double, 2> > locations = p_gen->GetPointsAsVectors();
+        delete p_gen;
+
+        std::vector<Node<2> *> nodes;
+        for (unsigned node_idx = 0; node_idx < locations.size(); node_idx++)
         {
-            p_mesh->GetElement(elem_idx)->SetMembraneRestLength(0.1 * spacing);
-            p_mesh->GetElement(elem_idx)->SetMembraneSpringConstant(1e8);
+            nodes.push_back(new Node<2>(node_idx, locations[node_idx], true));
         }
 
-//        p_mesh->GetMembraneElement()->SetMembraneSpringConstant(1e8);
-//        p_mesh->GetMembraneElement()->SetMembraneRestLength(0.0);
+        std::vector<ImmersedBoundaryElement < 2, 2>* > elements;
+        elements.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
 
+        ImmersedBoundaryMesh<2, 2> mesh(nodes, elements, 32, 32);
+
+        // Set up element properties
+        ImmersedBoundaryElement<2, 2> *p_elem = mesh.GetElement(0u);
+        p_elem->SetMembraneRestLength(0.1 * mesh.GetCharacteristicNodeSpacing());
+        p_elem->SetMembraneSpringConstant(1e8);
+
+        // Set up cell population and simulation
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
-
-        ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
-
+        cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
+        ImmersedBoundaryCellPopulation<2> cell_population(mesh, cells);
         OffLatticeSimulation<2> simulator(cell_population);
 
         // Add main immersed boundary simulation modifier
-        MAKE_PTR(ImmersedBoundarySimulationModifier<2>, p_main_modifier);
+        MAKE_PTR(ImmersedBoundarySimulationModifier < 2 >, p_main_modifier);
         simulator.AddSimulationModifier(p_main_modifier);
 
-        // Set simulation properties
-        simulator.SetOutputDirectory("ImmersedBoundaryNumerics/TestPalisadeSimulation");
+        // Set up simulation properties
+        simulator.SetOutputDirectory("ImmersedBoundaryNumerics/TestSingleCellOutputFluidGrid");
         simulator.SetDt(0.01);
-        simulator.SetSamplingTimestepMultiple(10);
-        simulator.SetEndTime(10.0);
-
-        // Run the simulation
+        simulator.SetSamplingTimestepMultiple(1);
+        simulator.SetEndTime(0.05);
         simulator.Solve();
+
+        // Write the state of the vertex mesh to file, for use as an initial condition in the next test
+        {
+            ImmersedBoundaryMeshWriter<2, 2> mesh_writer("ImmersedBoundaryNumerics", "time_0_05");
+            ImmersedBoundaryMesh<2, 2> *p_static_mesh = static_cast<ImmersedBoundaryMesh<2, 2> *>(&simulator.rGetCellPopulation().rGetMesh());
+            mesh_writer.WriteFilesUsingMesh(*p_static_mesh);
+        }
+
+        // Advance the simulation and output again
+        simulator.SetEndTime(1.0);
+        simulator.Solve();
+        {
+            ImmersedBoundaryMeshWriter<2, 2> mesh_writer("ImmersedBoundaryNumerics", "time_1_0");
+            ImmersedBoundaryMesh<2, 2> *p_static_mesh = static_cast<ImmersedBoundaryMesh<2, 2> *>(&simulator.rGetCellPopulation().rGetMesh());
+            mesh_writer.WriteFilesUsingMesh(*p_static_mesh);
+        }
+    }
+
+    void xTestConvergenceWithTimestep() throw(Exception)
+    {
+        /**
+         * This test tracks the change in computation time of a single cell relaxing for a fixed simulation time.
+         *
+         * All parameters are fixed, and the following are exported to a csv file:
+         *  * Number of nodes in the fluid grid
+         *  * Computation time of each simulation
+         *  * Change in elongation shape factor, a measure of how the simulation is progressing
+         */
+
+        std::vector<double> timestep;
+        std::vector<double> shape_change;
+
+        unsigned num_halvings = 10;
+        double delta_t = 0.125;
+        unsigned sampling_mult = 10;
+
+        for (unsigned halving = 0 ; halving < num_halvings ; halving++)
+        {
+            SimulationTime::Instance()->Destroy();
+            SimulationTime::Instance()->SetStartTime(0.0);
+
+            /*
+             * Create an Immersed Boundary Mesh using a SuperellipseGenerator
+             *
+             * 1: Num nodes
+             * 2: Superellipse exponent
+             * 3: Width
+             * 4: Height
+             * 5: Bottom-left x
+             * 6: Botton-left y
+             */
+            SuperellipseGenerator *p_gen = new SuperellipseGenerator(128, 1.0, 0.3, 0.6, 0.35, 0.2);
+
+            // Generate a mesh using this superellipse
+            std::vector<c_vector<double, 2> > locations = p_gen->GetPointsAsVectors();
+            delete p_gen;
+
+            std::vector<Node<2>* > nodes;
+            for (unsigned node_idx = 0 ; node_idx < locations.size() ; node_idx++)
+            {
+                nodes.push_back(new Node<2>(node_idx, locations[node_idx], true));
+            }
+
+            std::vector<ImmersedBoundaryElement<2,2>* > elements;
+            elements.push_back(new ImmersedBoundaryElement<2,2>(0, nodes));
+
+            ImmersedBoundaryMesh<2,2> mesh(nodes, elements, 64, 64);
+
+            /*
+             * Set up cell population
+             */
+            std::vector<CellPtr> cells;
+            MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+            CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
+
+            ImmersedBoundaryCellPopulation <2> cell_population(mesh, cells);
+
+
+            ImmersedBoundaryElement <2, 2> *p_elem = mesh.GetElement(0u);
+
+            p_elem->SetMembraneRestLength(0.1 * mesh.GetCharacteristicNodeSpacing());
+            p_elem->SetMembraneSpringConstant(1e8);
+
+//            double elongation_change = mesh.GetElongationShapeFactorOfElement(0);
+
+            OffLatticeSimulation<2> simulator(cell_population);
+
+            // Add main immersed boundary simulation modifier
+            MAKE_PTR(ImmersedBoundarySimulationModifier < 2 >, p_main_modifier);
+            simulator.AddSimulationModifier(p_main_modifier);
+
+            std::string output_dir = "ImmersedBoundaryNumerics/TestConvergenceWithTimestep";
+            output_dir += boost::lexical_cast<std::string>(halving);
+
+            simulator.SetOutputDirectory(output_dir);
+            simulator.SetDt(delta_t);
+            simulator.SetSamplingTimestepMultiple(sampling_mult);
+            simulator.SetEndTime(1.0);
+            simulator.Solve();
+
+
+            timestep.push_back(log(delta_t)/log(2.0));
+            shape_change.push_back(mesh.GetElongationShapeFactorOfElement(0));
+
+            delta_t /= 2.0;
+            sampling_mult *= 2;
+        }
+
+        CsvWriter csv_writer;
+        csv_writer.AddData(timestep);
+        csv_writer.AddData(shape_change);
+
+        std::vector<std::string> header_names;
+        header_names.push_back("Timestep");
+        header_names.push_back("Shape change");
+        csv_writer.AddHeaders(header_names);
+
+        csv_writer.SetDirectoryName(mOutputDirectory);
+        csv_writer.SetFileName("TestConvergenceWithTimestep");
+
+        csv_writer.WriteDataToFile();
+    }
+
+    void xTestConvergenceWithFluidGrid() throw(Exception)
+    {
+        /**
+         * This test tracks the change in computation time of a single cell relaxing for a fixed simulation time.
+         *
+         * All parameters are fixed, and the following are exported to a csv file:
+         *  * Number of nodes in the fluid grid
+         *  * Computation time of each simulation
+         *  * Change in elongation shape factor, a measure of how the simulation is progressing
+         */
+
+        std::vector<unsigned> grid_pts_vec;
+        std::vector<double> shape_change;
+
+        unsigned num_doublings = 7;
+        unsigned grid_pts = 32;
+
+        for (unsigned doubling = 0 ; doubling < num_doublings ; doubling++)
+        {
+            SimulationTime::Instance()->Destroy();
+            SimulationTime::Instance()->SetStartTime(0.0);
+
+            /*
+             * Create an Immersed Boundary Mesh using a SuperellipseGenerator
+             *
+             * 1: Num nodes
+             * 2: Superellipse exponent
+             * 3: Width
+             * 4: Height
+             * 5: Bottom-left x
+             * 6: Botton-left y
+             */
+            SuperellipseGenerator *p_gen = new SuperellipseGenerator(2048, 1.0, 0.3, 0.6, 0.35, 0.2);
+
+            // Generate a mesh using this superellipse
+            std::vector<c_vector<double, 2> > locations = p_gen->GetPointsAsVectors();
+            delete p_gen;
+
+            std::vector<Node<2>* > nodes;
+            for (unsigned node_idx = 0 ; node_idx < locations.size() ; node_idx++)
+            {
+                nodes.push_back(new Node<2>(node_idx, locations[node_idx], true));
+            }
+
+            std::vector<ImmersedBoundaryElement<2,2>* > elements;
+            elements.push_back(new ImmersedBoundaryElement<2,2>(0, nodes));
+
+            ImmersedBoundaryMesh<2,2> mesh(nodes, elements, grid_pts, grid_pts);
+
+            /*
+             * Set up cell population
+             */
+            std::vector<CellPtr> cells;
+            MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+            CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
+
+            ImmersedBoundaryCellPopulation <2> cell_population(mesh, cells);
+
+
+            ImmersedBoundaryElement <2, 2> *p_elem = mesh.GetElement(0u);
+
+            p_elem->SetMembraneRestLength(0.1 * mesh.GetCharacteristicNodeSpacing());
+            p_elem->SetMembraneSpringConstant(1e8);
+
+            OffLatticeSimulation<2> simulator(cell_population);
+
+            // Add main immersed boundary simulation modifier
+            MAKE_PTR(ImmersedBoundarySimulationModifier < 2 >, p_main_modifier);
+            simulator.AddSimulationModifier(p_main_modifier);
+
+            std::string output_dir = "ImmersedBoundaryNumerics/TestConvergenceWithFluidGrid";
+            output_dir += boost::lexical_cast<std::string>(doubling);
+
+            simulator.SetOutputDirectory(output_dir);
+            simulator.SetDt(0.01);
+            simulator.SetSamplingTimestepMultiple(100);
+            simulator.SetEndTime(1.0);
+            simulator.Solve();
+
+
+            grid_pts_vec.push_back(log(grid_pts)/log(2.0));
+            shape_change.push_back(mesh.GetElongationShapeFactorOfElement(0));
+
+            grid_pts *= 2;
+        }
+
+        CsvWriter csv_writer;
+        csv_writer.AddData(grid_pts_vec);
+        csv_writer.AddData(shape_change);
+
+        std::vector<std::string> header_names;
+        header_names.push_back("Num Grid Pts");
+        header_names.push_back("Shape change");
+        csv_writer.AddHeaders(header_names);
+
+        csv_writer.SetDirectoryName(mOutputDirectory);
+        csv_writer.SetFileName("TestConvergenceWithFluidGrid");
+
+        csv_writer.WriteDataToFile();
+    }
+
+    void xTestConvergenceWithIBGrid() throw(Exception)
+    {
+        /**
+         * This test tracks the change in computation time of a single cell relaxing for a fixed simulation time.
+         *
+         * All parameters are fixed, and the following are exported to a csv file:
+         *  * Number of nodes in the fluid grid
+         *  * Computation time of each simulation
+         *  * Change in elongation shape factor, a measure of how the simulation is progressing
+         */
+
+        std::vector<unsigned> num_ib_nodes_vec;
+        std::vector<double> shape_change;
+
+        unsigned num_doublings = 6;
+        unsigned num_ib_nodes = 128;
+        double kappa_int = 1e7;
+
+        for (unsigned doubling = 0 ; doubling < num_doublings ; doubling++)
+        {
+            SimulationTime::Instance()->Destroy();
+            SimulationTime::Instance()->SetStartTime(0.0);
+
+            /*
+             * Create an Immersed Boundary Mesh using a SuperellipseGenerator
+             *
+             * 1: Num nodes
+             * 2: Superellipse exponent
+             * 3: Width
+             * 4: Height
+             * 5: Bottom-left x
+             * 6: Botton-left y
+             */
+            SuperellipseGenerator *p_gen = new SuperellipseGenerator(num_ib_nodes, 1.0, 0.3, 0.6, 0.35, 0.2);
+
+            // Generate a mesh using this superellipse
+            std::vector<c_vector<double, 2> > locations = p_gen->GetPointsAsVectors();
+            delete p_gen;
+
+            std::vector<Node<2>* > nodes;
+            for (unsigned node_idx = 0 ; node_idx < locations.size() ; node_idx++)
+            {
+                nodes.push_back(new Node<2>(node_idx, locations[node_idx], true));
+            }
+
+            std::vector<ImmersedBoundaryElement<2,2>* > elements;
+            elements.push_back(new ImmersedBoundaryElement<2,2>(0, nodes));
+
+            ImmersedBoundaryMesh<2,2> mesh(nodes, elements, 64, 64);
+
+            /*
+             * Set up cell population
+             */
+            std::vector<CellPtr> cells;
+            MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+            CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
+
+            ImmersedBoundaryCellPopulation <2> cell_population(mesh, cells);
+
+
+            ImmersedBoundaryElement <2, 2> *p_elem = mesh.GetElement(0u);
+
+            p_elem->SetMembraneRestLength(0.1 * mesh.GetCharacteristicNodeSpacing());
+            p_elem->SetMembraneSpringConstant(kappa_int);
+
+            OffLatticeSimulation<2> simulator(cell_population);
+
+            // Add main immersed boundary simulation modifier
+            MAKE_PTR(ImmersedBoundarySimulationModifier < 2 >, p_main_modifier);
+            simulator.AddSimulationModifier(p_main_modifier);
+
+            std::string output_dir = "ImmersedBoundaryNumerics/TestConvergenceWithIBGrid";
+            output_dir += boost::lexical_cast<std::string>(doubling);
+
+            simulator.SetOutputDirectory(output_dir);
+            simulator.SetDt(0.01);
+            simulator.SetSamplingTimestepMultiple(100);
+            simulator.SetEndTime(1.0);
+            simulator.Solve();
+
+
+            num_ib_nodes_vec.push_back(log(num_ib_nodes)/log(2.0));
+            shape_change.push_back(mesh.GetElongationShapeFactorOfElement(0));
+
+            num_ib_nodes *= 2;
+            kappa_int *= 4;
+        }
+
+        CsvWriter csv_writer;
+        csv_writer.AddData(num_ib_nodes_vec);
+        csv_writer.AddData(shape_change);
+
+        std::vector<std::string> header_names;
+        header_names.push_back("Num IB Nodes");
+        header_names.push_back("Shape change");
+        csv_writer.AddHeaders(header_names);
+
+        csv_writer.SetDirectoryName(mOutputDirectory);
+        csv_writer.SetFileName("TestConvergenceWithIBGrid");
+
+        csv_writer.WriteDataToFile();
+    }
+
+    void xTestTwoCellsInteracting() throw(Exception)
+    {
+        // Output vectors
+        std::vector<double> simulation_time;
+        std::vector<double> ref_elongation_shape_factor;
+        std::vector<std::vector<double> > obs_elongation_shape_factor;
+
+        // Number of timepoints at which we sample the cell shapes
+        unsigned num_sim_timepoints = 30;
+
+        // Spring constant of the reference cell
+        double ref_spring_const = 1e8;
+        double cell_cell_const  = 1e6;
+        double reynolds = 1e-4;
+        double interaction_dist = 0.05;
+
+        {
+            /*
+             * 1: Num cells
+             * 2: Num nodes per cell
+             * 3: Superellipse exponent
+             * 4: Superellipse aspect ratio
+             * 5: Random y-variation
+             * 6: Include membrane
+             */
+            ImmersedBoundaryPalisadeMeshGenerator gen(2, 200, 1.0, 2.0, 0.0, false);
+            ImmersedBoundaryMesh<2, 2> *p_mesh = gen.GetMesh();
+
+            p_mesh->SetNumGridPtsXAndY(128);
+
+            double spacing = p_mesh->GetCharacteristicNodeSpacing();
+
+            PRINT_VARIABLE(spacing);
+
+            for (unsigned elem_idx = 0; elem_idx < p_mesh->GetNumElements(); elem_idx++)
+            {
+                p_mesh->GetElement(elem_idx)->SetMembraneRestLength(0.1 * spacing);
+                p_mesh->GetElement(elem_idx)->SetMembraneSpringConstant(ref_spring_const);
+
+                p_mesh->GetElement(elem_idx)->SetCellCellRestLength(2.0 * spacing);
+                p_mesh->GetElement(elem_idx)->SetCellCellSpringConstant(cell_cell_const);
+            }
+
+            std::vector<CellPtr> cells;
+            MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+            CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
+
+            ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
+
+            cell_population.SetInteractionDistance(interaction_dist);
+
+            OffLatticeSimulation<2> simulator(cell_population);
+
+            // Add main immersed boundary simulation modifier
+            MAKE_PTR(ImmersedBoundarySimulationModifier < 2 >, p_main_modifier);
+            simulator.AddSimulationModifier(p_main_modifier);
+
+            // Set simulation properties
+            simulator.SetOutputDirectory("ImmersedBoundaryNumerics/TestTwoCellsInteractingRef");
+            simulator.SetDt(0.01);
+            simulator.SetSamplingTimestepMultiple(10);
+
+
+            // Write initial elongation shape factor to output vector
+            ref_elongation_shape_factor.push_back(p_mesh->GetElongationShapeFactorOfElement(0));
+            simulation_time.push_back(0.0);
+
+
+            for (unsigned sim_time_idx = 1; sim_time_idx <= num_sim_timepoints; sim_time_idx++)
+            {
+                // Calculate new end time and run simulation
+                double new_end_time = 0.3 * double(sim_time_idx);
+                simulator.SetEndTime(new_end_time);
+                simulator.Solve();
+
+                // Add elongation shape factor to output vector
+                ref_elongation_shape_factor.push_back(p_mesh->GetElongationShapeFactorOfElement(0));
+                simulation_time.push_back(new_end_time);
+            }
+
+        }
+
+        /*
+         * Now do the same again in a loop where we change the spring constant (2, 4 and 6 times the reference)
+         */
+
+        unsigned num_springs = 3;
+        obs_elongation_shape_factor.resize(num_springs);
+
+        for (unsigned sc_idx = 0 ; sc_idx < num_springs ; sc_idx++)
+        {
+            SimulationTime::Instance()->Destroy();
+            SimulationTime::Instance()->SetStartTime(0.0);
+
+            /*
+             * 1: Num cells
+             * 2: Num nodes per cell
+             * 3: Superellipse exponent
+             * 4: Superellipse aspect ratio
+             * 5: Random y-variation
+             * 6: Include membrane
+             */
+            ImmersedBoundaryPalisadeMeshGenerator gen(2, 400, 1.0, 2.0, 0.0, false);
+            ImmersedBoundaryMesh<2, 2> *p_mesh = gen.GetMesh();
+
+            p_mesh->SetNumGridPtsXAndY(128);
+
+            double spacing = p_mesh->GetCharacteristicNodeSpacing();
+
+            PRINT_VARIABLE(spacing);
+
+            for (unsigned elem_idx = 0; elem_idx < p_mesh->GetNumElements(); elem_idx++)
+            {
+                p_mesh->GetElement(elem_idx)->SetMembraneRestLength(0.1 * spacing);
+                p_mesh->GetElement(elem_idx)->SetMembraneSpringConstant(4.0 * ref_spring_const);
+
+                p_mesh->GetElement(elem_idx)->SetCellCellRestLength(4.0 * spacing);
+                p_mesh->GetElement(elem_idx)->SetCellCellSpringConstant(cell_cell_const / double(sc_idx + 1));
+            }
+
+            std::vector<CellPtr> cells;
+            MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+            CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
+
+            ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
+
+            cell_population.SetInteractionDistance(interaction_dist);
+
+            OffLatticeSimulation<2> simulator(cell_population);
+
+            // Add main immersed boundary simulation modifier
+            MAKE_PTR(ImmersedBoundarySimulationModifier < 2 >, p_main_modifier);
+            simulator.AddSimulationModifier(p_main_modifier);
+
+            // Set simulation properties
+            std::string output_directory = "ImmersedBoundaryNumerics/TestTwoCellsInteracting";
+            output_directory += boost::lexical_cast<std::string>(sc_idx);
+
+            simulator.SetOutputDirectory(output_directory);
+            simulator.SetDt(0.01);
+            simulator.SetSamplingTimestepMultiple(10);
+            simulator.SetEndTime(10.0);
+
+            // Write initial elongation shape factor to output vector
+            obs_elongation_shape_factor[sc_idx].push_back(p_mesh->GetElongationShapeFactorOfElement(0));
+
+            for (unsigned sim_time_idx = 1; sim_time_idx <= num_sim_timepoints; sim_time_idx++)
+            {
+                // Calculate new end time and run simulation
+                double new_end_time = 0.3 * double(sim_time_idx);
+                simulator.SetEndTime(new_end_time);
+                simulator.Solve();
+
+                // Add elongation shape factor to output vector
+                obs_elongation_shape_factor[sc_idx].push_back(p_mesh->GetElongationShapeFactorOfElement(0));
+            }
+        }
+
+        // Add data to a csv_writer
+        CsvWriter csv_writer;
+        csv_writer.AddData(simulation_time);
+        csv_writer.AddData(ref_elongation_shape_factor);
+
+        for (unsigned sc_idx = 0 ; sc_idx < num_springs ; sc_idx++)
+        {
+            csv_writer.AddData(obs_elongation_shape_factor[sc_idx]);
+        }
+
+        std::vector<std::string> header_names;
+        header_names.push_back("Simulation time");
+        header_names.push_back("Ref elongation shape factor");
+
+        for (unsigned sc_idx = 0 ; sc_idx < num_springs ; sc_idx++)
+        {
+            std::string header = "Obs elongation shape factor ";
+            header += boost::lexical_cast<std::string>(sc_idx);
+
+            header_names.push_back(header);
+        }
+
+        csv_writer.AddHeaders(header_names);
+
+        csv_writer.SetDirectoryName(mOutputDirectory);
+        csv_writer.SetFileName("TestTwoCellsInteracting");
+
+        csv_writer.WriteDataToFile();
+
     }
 
     double delta_1(double r)

@@ -174,7 +174,7 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetCharacteristicNodeSpacin
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetSpacingRatio() const
 {
-    ///todo If we ever permit mNumGridPtsX != mNumGridPtsX, need to decide how SpacingRatio is defined
+    ///todo If we ever permit mNumGridPtsX != mNumGridPtsY, need to decide how SpacingRatio is defined
     return mCharacteristicNodeSpacing / (1.0 / double(mNumGridPtsX));
 }
 

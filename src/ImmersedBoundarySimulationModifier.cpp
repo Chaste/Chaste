@@ -97,7 +97,7 @@ template<unsigned DIM>
 void ImmersedBoundarySimulationModifier<DIM>::UpdateFluidVelocityGrids(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
     this->ClearForces();
-    this->CalculatePerimeterElasticForces();
+    this->AddForceContributions();
     this->CalculateCellCellInteractionElasticForces();
     this->PropagateForcesToFluidGrid();
     this->SolveNavierStokesSpectral();
@@ -275,52 +275,15 @@ void ImmersedBoundarySimulationModifier<DIM>::ClearForces()
     }
 }
 
-
 template<unsigned DIM>
-void ImmersedBoundarySimulationModifier<DIM>::CalculatePerimeterElasticForces()
+void ImmersedBoundarySimulationModifier<DIM>::AddForceContributions()
 {
-    for (typename ImmersedBoundaryMesh<DIM, DIM>::ImmersedBoundaryElementIterator elem_iter = mpMesh->GetElementIteratorBegin();
-            elem_iter != mpMesh->GetElementIteratorEnd();
-            ++elem_iter)
+    // Add contributions from each immersed boundary force
+    for (typename std::vector<boost::shared_ptr<AbstractImmersedBoundaryForce<DIM> > >::iterator iter = mForceCollection.begin();
+            iter != mForceCollection.end();
+            ++iter)
     {
-        // Get number of nodes in current element
-        unsigned num_nodes = elem_iter->GetNumNodes();
-        assert(num_nodes > 0);
-
-        // Get spring parameters (owned by the elements as they may differ within the element population)
-        double spring_constant = elem_iter->GetMembraneSpringConstant();
-        double rest_length = elem_iter->GetMembraneRestLength();
-
-        // Helper variables
-        double normed_dist;
-        c_vector<double, DIM> aggregate_force;
-
-        // Make a vector to store the force on node i+1 from node i
-        std::vector<c_vector<double, DIM> > elastic_force_to_next_node(num_nodes);
-
-        // Loop over nodes and calculate the force exerted on node i+1 by node i
-        for (unsigned node_idx = 0 ; node_idx < num_nodes ; node_idx++)
-        {
-            // Index of the next node, calculated modulo number of nodes in this element
-            unsigned next_idx = (node_idx + 1) % num_nodes;
-
-            // Hooke's law linear spring force
-            elastic_force_to_next_node[node_idx] = mpMesh->GetVectorFromAtoB(elem_iter->GetNodeLocation(next_idx), elem_iter->GetNodeLocation(node_idx));
-            normed_dist = norm_2(elastic_force_to_next_node[node_idx]);
-            elastic_force_to_next_node[node_idx] *= spring_constant * (normed_dist - rest_length) / normed_dist;
-        }
-
-        // Add the contributions of springs springs adjacent to each node
-        for (unsigned node_idx = 0 ; node_idx < num_nodes ; node_idx++)
-        {
-            // Index of previous node, but -1%n doesn't work, so we add num_nodes when calculating
-            unsigned prev_idx = (node_idx + num_nodes - 1) % num_nodes;
-
-            aggregate_force = elastic_force_to_next_node[prev_idx] - elastic_force_to_next_node[node_idx];
-
-            // Add the aggregate force contribution to the node
-            elem_iter->GetNode(node_idx)->AddAppliedForceContribution(aggregate_force);
-        }
+        (*iter)->AddForceContribution(*(this->mpCellPopulation));
     }
 }
 
@@ -406,14 +369,6 @@ void ImmersedBoundarySimulationModifier<DIM>::CalculateCellCellInteractionElasti
             }
         }
     }
-
-//    // Now add force contributions from each AbstractForce
-//    for (typename std::vector<boost::shared_ptr<AbstractImmersedBoundaryForce<DIM> > >::iterator iter = mForceCollection.begin();
-//            iter != mForceCollection.end();
-//            ++iter)
-//    {
-//        (*iter)->AddForceContribution(*(this->mpCellPopulation));
-//    }
 }
 
 template<unsigned DIM>

@@ -56,6 +56,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ImmersedBoundarySimulationModifier.hpp"
 #include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
 #include "SuperellipseGenerator.hpp"
+#include "ImmersedBoundaryMembraneElasticityForce.hpp"
 
 #include "Debug.hpp"
 
@@ -104,16 +105,16 @@ public:
         MAKE_PTR(ImmersedBoundarySimulationModifier<2>, p_mod);
         simulator.AddSimulationModifier(p_mod);
 
-        // Calculate the perimeter elastic forces and ensure they match with by-hand calculations
-        p_mod->SetupConstantMemberVariables(cell_population);
-        p_mod->ClearForces();
+        // Add force laws
+        MAKE_PTR(ImmersedBoundaryMembraneElasticityForce<2>, p_boundary_force);
+        p_mod->AddImmersedBoundaryForce(p_boundary_force);
 
         /*
-         * We first test that the forces are calculated correctly. We do this by invoking
-         * ImmersedBoundarySimulationModifier::CalculatePerimeterElasticForces() and checking
+         * We first test that the perimeter elasticity forces are calculated correctly. We do this by invoking
+         * ImmersedBoundarySimulationModifier::AddForceContributions() and checking
          * against hand-calculated values.
          */
-        p_mod->CalculatePerimeterElasticForces();
+        p_mod->AddForceContributions();
         c_vector<double,2> force_on_node;
 
         force_on_node = nodes[0]->rGetAppliedForce();
