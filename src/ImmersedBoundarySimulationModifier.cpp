@@ -71,7 +71,6 @@ void ImmersedBoundarySimulationModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCell
     // We need to update cell neighbours occasionally, but not at every timestep
     if(SimulationTime::Instance()->GetTimeStepsElapsed() % mNodeNeighbourUpdateFrequency == 0)
     {
-        this->UpdateCellNeighbours();
         mpBoxCollection->CalculateNodePairs(mpMesh->rGetNodes(), mNodePairs, mNodeNeighbours);
     }
 
@@ -85,7 +84,7 @@ void ImmersedBoundarySimulationModifier<DIM>::SetupSolve(AbstractCellPopulation<
     // We can set up some helper variables here which need only be set up once for the entire simulation
     this->SetupConstantMemberVariables(rCellPopulation);
     this->SetupTransmembraneProteinLevels();
-    this->UpdateCellNeighbours();
+    mpBoxCollection->CalculateNodePairs(mpMesh->rGetNodes(), mNodePairs, mNodeNeighbours);
 
     // This will solve the fluid problem based on the initial mesh setup
     this->UpdateFluidVelocityGrids(rCellPopulation);
@@ -216,55 +215,6 @@ template<unsigned DIM>
 void ImmersedBoundarySimulationModifier<DIM>::UpdateTransmembraneProteinLevels()
 {
     //\todo decide how protein levels should be updated each timestep.  This can be overridden in derived classes
-}
-
-template<unsigned DIM>
-void ImmersedBoundarySimulationModifier<DIM>::UpdateCellNeighbours()
-{
-    // This method needs to be called first, as centroids are not calculated each timestep
-    mpCellPopulation->UpdateCellCentroids();
-
-    // Get the neighbouring indices for each cell
-    for (typename ImmersedBoundaryCellPopulation<DIM>::Iterator cell_iter = mpCellPopulation->Begin();
-         cell_iter != mpCellPopulation->End();
-         ++cell_iter)
-    {
-        //\todo: when cells divide etc, may need to call this method directly
-        mCellNeighbours[*cell_iter] = mpCellPopulation->GetNeighbouringLocationIndices(*cell_iter);
-    }
-
-    /**
-     * Next, we can prune the set so we're not duplicating work calculating cell-cell interactions.
-     *
-     * First, loop over each cell.  For each cell, see which cells are neighbours to it.  For each of these cells,
-     * check their entry in mCellNeighbours for the key of the current cell in the outer loop.  If it's there,
-     * we can remove it.
-     */
-    for (typename ImmersedBoundaryCellPopulation<DIM>::Iterator cell_iter = mpCellPopulation->Begin();
-         cell_iter != mpCellPopulation->End();
-         ++cell_iter)
-    {
-        // Get the location index of our reference cell
-        unsigned location_index = mpCellPopulation->GetLocationIndexUsingCell(*cell_iter);
-
-        // Loop over each neighbour
-        for (typename std::set<unsigned>::iterator set_iter = mCellNeighbours[*cell_iter].begin();
-             set_iter != mCellNeighbours[*cell_iter].end();
-             ++set_iter)
-        {
-            // Grab a pointer to the cell, which can be used as a key in the map mCellNeighbours
-            CellPtr p_cell = mpCellPopulation->GetCellUsingLocationIndex(*set_iter);
-
-            // Erase the element of the set which coincides with location index of our reference cell
-            // If no such index is found, it should still be fine.
-            std::set<unsigned>::iterator it_to_erase = mCellNeighbours[p_cell].find(location_index);
-
-            if (*it_to_erase < mCellNeighbours[p_cell].size())
-            {
-                mCellNeighbours[p_cell].erase(mCellNeighbours[p_cell].find(location_index));
-            }
-        }
-    }
 }
 
 template<unsigned DIM>

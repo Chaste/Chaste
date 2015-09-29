@@ -108,9 +108,6 @@ private:
     /** Vector of sin(2pi y / Ny) needed for FFT, but constant after grid size is known */
     std::vector<double> mSin2Y;
 
-    /** A map between pointers to cells and sets of their neighbours' indices, for calculating cell-cell interactions */
-    std::map<CellPtr, std::set<unsigned> > mCellNeighbours;
-
     /** A vector of pairs of pointers to nodes, representing all possible node-node interactions */
     std::vector<std::pair<Node<DIM>*, Node<DIM>*> > mNodePairs;
 
@@ -169,12 +166,6 @@ private:
      *
      */
     virtual void UpdateTransmembraneProteinLevels();
-
-    /**
-     * Update the vector of cell-neighbour sets.  This should be called once per
-     * mNodeNeighbourUpdateFrequency number of timesteps.
-     */
-    void UpdateCellNeighbours();
 
     /**
      * Helper method for UpdateFluidVelocityGrids()
@@ -332,12 +323,12 @@ public:
     void OutputSimulationModifierParameters(out_stream& rParamsFile);
 
     /**
-     * @param newFrequency the new number of time steps after which cell neighbours are re-calculated
+     * @param newFrequency the new number of time steps after which node neighbours are re-calculated
      */
     void SetNodeNeighbourUpdateFrequency(unsigned newFrequency);
 
     /**
-     * @return the current number of time steps after which cell neighbours are re-calculated
+     * @return the current number of time steps after which node neighbours are re-calculated
      */
     unsigned GetNodeNeighbourUpdateFrequency();
 
