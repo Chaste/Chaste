@@ -281,7 +281,7 @@ public:
     /**
      * @return reference to the vector of nodes
      */
-    const std::vector<Node<SPACE_DIM>*>& rGetNodes() const;
+    std::vector<Node<SPACE_DIM>*>& rGetNodes();
 
     /**
      * @param the new number of fluid mesh points in the x direction.

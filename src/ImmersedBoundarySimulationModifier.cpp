@@ -45,7 +45,7 @@ ImmersedBoundarySimulationModifier<DIM>::ImmersedBoundarySimulationModifier()
     : AbstractCellBasedSimulationModifier<DIM>(),
       mpMesh(NULL),
       mpCellPopulation(NULL),
-      mCellNeighbourUpdateFrequency(10u),
+      mNodeNeighbourUpdateFrequency(1u),
       mNumGridPtsX(0u),
       mNumGridPtsY(0u),
       mGridSpacingX(0.0),
@@ -59,15 +59,20 @@ ImmersedBoundarySimulationModifier<DIM>::ImmersedBoundarySimulationModifier()
 template<unsigned DIM>
 ImmersedBoundarySimulationModifier<DIM>::~ImmersedBoundarySimulationModifier()
 {
+    if (mpBoxCollection)
+    {
+        delete(mpBoxCollection);
+    }
 }
 
 template<unsigned DIM>
 void ImmersedBoundarySimulationModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
     // We need to update cell neighbours occasionally, but not at every timestep
-    if(SimulationTime::Instance()->GetTimeStepsElapsed() % mCellNeighbourUpdateFrequency == 0)
+    if(SimulationTime::Instance()->GetTimeStepsElapsed() % mNodeNeighbourUpdateFrequency == 0)
     {
         this->UpdateCellNeighbours();
+        mpBoxCollection->CalculateNodePairs(mpMesh->rGetNodes(), mNodePairs, mNodeNeighbours);
     }
 
     // This will solve the fluid problem for all timesteps after the first, which is handled in SetupSolve()
@@ -145,7 +150,14 @@ void ImmersedBoundarySimulationModifier<DIM>::SetupConstantMemberVariables(Abstr
         mSin2Y[y] = sin(2 * M_PI * (double) y * mGridSpacingY);
     }
 
-    mInteractionDistance = mpCellPopulation->GetInteractionDistance();
+    // Set up the box collection
+    c_vector<double, 2 * 2> domain_size;
+    domain_size(0) = 0.0;
+    domain_size(1) = 1.0;
+    domain_size(2) = 0.0;
+    domain_size(3) = 1.0;
+    mpBoxCollection = new BoxCollection<DIM>(mpCellPopulation->GetInteractionDistance(), domain_size, true, true);
+    mpBoxCollection->SetupLocalBoxesHalfOnly();
 
     // Set up threads for fftw
     int potential_thread_errors = fftw_init_threads();
@@ -290,82 +302,51 @@ void ImmersedBoundarySimulationModifier<DIM>::AddForceContributions()
 template<unsigned DIM>
 void ImmersedBoundarySimulationModifier<DIM>::CalculateCellCellInteractionElasticForces()
 {
-    /**
-     * We iterate over each cell, and then over each neighbour, by using the map mCellNeighbours.
-     * For each neighbour, we iterate over each node in the current cell and then each node in the
-     * neighbouring cell.
-     */
-
     // Helper variables for loops
     double normed_dist;
     c_vector<double, DIM> vector_between_nodes;
     c_vector<double, DIM> force_a_b;
     c_vector<double, DIM> force_b_a;
     double protein_mult;
-    Node<DIM>* p_curr_node;
-    Node<DIM>* p_comp_node;
+    Node<DIM>* p_node_a;
+    Node<DIM>* p_node_b;
+
+    double spring_constant = 1e5;
+    double rest_length = 0.1 * mpCellPopulation->GetInteractionDistance();
 
     // Transmembrane protein levels
     const std::vector<double>& r_ecad_levels = mpCellPopulation->rGetECadherinLevels();
     const std::vector<double>& r_pcad_levels = mpCellPopulation->rGetPCadherinLevels();
     const std::vector<double>& r_integrin_levels = mpCellPopulation->rGetIntegrinLevels();
 
-    for (typename std::map<CellPtr, std::set<unsigned> >::iterator cell_iter = mCellNeighbours.begin();
-         cell_iter != mCellNeighbours.end();
-         ++cell_iter)
+    // Loop over all pairs of nodes that might be interacting
+    for (unsigned pair = 0 ; pair < mNodePairs.size() ; pair++)
     {
-        // cell_iter->first  (key value) is a CellPtr
-        // cell_iter->second (mapped value) is a std::set<unsigned>; indices of cells which neighbour the CellPtr
-
-        // Get the current element and associated information
-        ImmersedBoundaryElement<DIM,DIM>* p_curr_elem = mpCellPopulation->GetElementCorrespondingToCell(cell_iter->first);
-        double spring_constant = p_curr_elem->GetCellCellSpringConstant();
-        double rest_length = p_curr_elem->GetCellCellRestLength();
-        unsigned curr_num_nodes = p_curr_elem->GetNumNodes();
-
-        // Iterate over neighbours, by using the mapped value from mCellNeighbours
-        for (typename std::set<unsigned>::iterator set_iter = (cell_iter->second).begin();
-             set_iter != (cell_iter->second).end();
-             ++set_iter)
+        /*
+         * Interactions only occur between different cells.  Since each node is only ever in a single cell, we can test
+         * equality of the first ContainingElement.
+         */
+        if ( *(mNodePairs[pair].first->ContainingElementsBegin()) !=
+             *(mNodePairs[pair].second->ContainingElementsBegin()) )
         {
-            // *set_iter is an unsigned int; index of current cell neighbouring CellPtr
+            p_node_a = mNodePairs[pair].first;
+            p_node_b = mNodePairs[pair].second;
 
-            // Get the comparison-element and its number of nodes
-            ImmersedBoundaryElement<DIM,DIM>* p_comp_elem = mpCellPopulation->GetElementCorrespondingToCell(mpCellPopulation->GetCellUsingLocationIndex(*set_iter));
-            unsigned comp_num_nodes = p_comp_elem->GetNumNodes();
-            double comp_s_c = p_comp_elem->GetCellCellSpringConstant();
-            double comp_r_l = p_comp_elem->GetCellCellRestLength();
+            vector_between_nodes = mpMesh->GetVectorFromAtoB(p_node_a->rGetLocation(), p_node_b->rGetLocation());
+            normed_dist = norm_2(vector_between_nodes);
 
-            // Loop over nodes in current element, then over nodes in comparison element
-            for (unsigned curr_idx = 0 ; curr_idx < curr_num_nodes ; curr_idx++)
+            if (normed_dist < mpCellPopulation->GetInteractionDistance())
             {
-                p_curr_node = p_curr_elem->GetNode(curr_idx);
+                // The protein multiplier is a function of the levels of each protein in the current and comparison nodes
+                protein_mult = std::min(r_ecad_levels[p_node_a->GetIndex()], r_ecad_levels[p_node_b->GetIndex()]) +
+                               std::min(r_pcad_levels[p_node_a->GetIndex()], r_pcad_levels[p_node_b->GetIndex()]) +
+                               std::max(r_integrin_levels[p_node_a->GetIndex()], r_integrin_levels[p_node_b->GetIndex()]);
 
-                // Pre-define current node location so we're not grabbing it more times than necessary
-                c_vector<double, DIM> curr_location = p_curr_node->rGetLocation();
+                force_a_b = vector_between_nodes * spring_constant * protein_mult * (normed_dist - rest_length) / normed_dist;
+                p_node_a->AddAppliedForceContribution(force_a_b);
 
-                for (unsigned comp_idx = 0 ; comp_idx < comp_num_nodes ; comp_idx++)
-                {
-                    p_comp_node = p_comp_elem->GetNode(comp_idx);
-
-                    vector_between_nodes = mpMesh->GetVectorFromAtoB(curr_location, p_comp_node->rGetLocation());
-                    normed_dist = norm_2(vector_between_nodes);
-
-                    // Apply linear spring cell-cell interaction if dist is smaller than the pre-defined interaction distance
-                    if (normed_dist < mInteractionDistance)
-                    {
-                        // The protein multiplier is a function of the levels of each protein in the current and comparison nodes
-                        protein_mult = std::min(r_ecad_levels[p_curr_node->GetIndex()], r_ecad_levels[p_comp_node->GetIndex()]) +
-                                       std::min(r_pcad_levels[p_curr_node->GetIndex()], r_pcad_levels[p_comp_node->GetIndex()]) +
-                                       std::max(r_integrin_levels[p_curr_node->GetIndex()], r_integrin_levels[p_comp_node->GetIndex()]);
-
-                        force_a_b = vector_between_nodes * spring_constant * protein_mult * (normed_dist - rest_length) / normed_dist;
-                        p_curr_node->AddAppliedForceContribution(force_a_b);
-
-                        force_b_a = -1.0 * vector_between_nodes * comp_s_c * protein_mult * (normed_dist - comp_r_l) / normed_dist;
-                        p_comp_node->AddAppliedForceContribution(force_b_a);
-                    }
-                }
+                force_b_a = -1.0 * force_a_b;
+                p_node_b->AddAppliedForceContribution(force_b_a);
             }
         }
     }
@@ -717,16 +698,16 @@ void ImmersedBoundarySimulationModifier<DIM>::SetMemberVariablesForTesting(unsig
 }
 
 template<unsigned DIM>
-void ImmersedBoundarySimulationModifier<DIM>::SetCellNeighbourUpdateFrequency(unsigned newFrequency)
+void ImmersedBoundarySimulationModifier<DIM>::SetNodeNeighbourUpdateFrequency(unsigned newFrequency)
 {
     assert(newFrequency > 0);
-    mCellNeighbourUpdateFrequency = newFrequency;
+    mNodeNeighbourUpdateFrequency = newFrequency;
 }
 
 template<unsigned DIM>
-unsigned ImmersedBoundarySimulationModifier<DIM>::GetCellNeighbourUpdateFrequency()
+unsigned ImmersedBoundarySimulationModifier<DIM>::GetNodeNeighbourUpdateFrequency()
 {
-    return mCellNeighbourUpdateFrequency;
+    return mNodeNeighbourUpdateFrequency;
 }
 
 template<unsigned DIM>

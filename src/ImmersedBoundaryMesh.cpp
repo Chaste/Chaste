@@ -256,7 +256,7 @@ const std::vector<std::vector<double> >& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-const std::vector<Node<SPACE_DIM>*>& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::rGetNodes() const
+std::vector<Node<SPACE_DIM>*>& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::rGetNodes()
 {
     return AbstractMesh<ELEMENT_DIM, SPACE_DIM>::mNodes;
 }

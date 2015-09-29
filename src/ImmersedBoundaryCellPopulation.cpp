@@ -60,7 +60,7 @@ ImmersedBoundaryCellPopulation<DIM>::ImmersedBoundaryCellPopulation(ImmersedBoun
     mpImmersedBoundaryMesh = static_cast<ImmersedBoundaryMesh<DIM, DIM>* >(&(this->mrMesh));
     mpVertexBasedDivisionRule.reset(new ShortAxisVertexBasedDivisionRule<DIM>());
 
-    mInteractionDistance = 5 * mpImmersedBoundaryMesh->GetCharacteristicNodeSpacing();
+    mInteractionDistance = 2 * mpImmersedBoundaryMesh->GetCharacteristicNodeSpacing();
 
     // If no location indices are specified, associate with elements from the mesh (assumed to be sequentially ordered).
     std::list<CellPtr>::iterator it = this->mCells.begin();

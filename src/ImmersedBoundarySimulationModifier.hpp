@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define IMMERSEDBOUNDARYSIMULATIONMODIFIER_HPP_
 
 #include "ChasteSerialization.hpp"
+#include "BoxCollection.hpp"
 #include "ImmersedBoundaryMesh.hpp"
 #include "ImmersedBoundaryCellPopulation.hpp"
 #include "AbstractImmersedBoundaryForce.hpp"
@@ -78,7 +79,7 @@ private:
     ImmersedBoundaryCellPopulation<DIM>* mpCellPopulation;
 
     /** How often we calculate which cells are neighbours */
-    unsigned mCellNeighbourUpdateFrequency;
+    unsigned mNodeNeighbourUpdateFrequency;
 
     /** Number of grid points in the x direction */
     unsigned mNumGridPtsX;
@@ -110,6 +111,15 @@ private:
     /** A map between pointers to cells and sets of their neighbours' indices, for calculating cell-cell interactions */
     std::map<CellPtr, std::set<unsigned> > mCellNeighbours;
 
+    /** A vector of pairs of pointers to nodes, representing all possible node-node interactions */
+    std::vector<std::pair<Node<DIM>*, Node<DIM>*> > mNodePairs;
+
+    /** A box collection to efficiently keep track of node neighbours */
+    BoxCollection<DIM>* mpBoxCollection;
+
+    /** A map between node indices and a set of their possible neighbours, used calculating cell-cell interactions */
+    std::map<unsigned, std::set<unsigned> > mNodeNeighbours;
+
     /** Grid to store force x-component propagated to fluid by elastic interactions */
     std::vector<std::vector<double> > mFluidForceGridX;
 
@@ -118,9 +128,6 @@ private:
 
     /** The fluid Reynolds number */
     double mReynolds;
-
-    /** The cell-cell interaction distance */
-    double mInteractionDistance;
 
     /** Imaginary unit */
     std::complex<double> mI;
@@ -165,7 +172,7 @@ private:
 
     /**
      * Update the vector of cell-neighbour sets.  This should be called once per
-     * mCellNeighbourUpdateFrequency number of timesteps.
+     * mNodeNeighbourUpdateFrequency number of timesteps.
      */
     void UpdateCellNeighbours();
 
@@ -327,12 +334,12 @@ public:
     /**
      * @param newFrequency the new number of time steps after which cell neighbours are re-calculated
      */
-    void SetCellNeighbourUpdateFrequency(unsigned newFrequency);
+    void SetNodeNeighbourUpdateFrequency(unsigned newFrequency);
 
     /**
      * @return the current number of time steps after which cell neighbours are re-calculated
      */
-    unsigned GetCellNeighbourUpdateFrequency();
+    unsigned GetNodeNeighbourUpdateFrequency();
 
     /**
      * Add an immersed boundary force to be used in this modifier.
