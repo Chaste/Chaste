@@ -279,6 +279,11 @@ public:
     std::vector<std::vector<double> >& rGetModifiableFluidVelocityGridY();
 
     /**
+     * @return reference to the vector of nodes
+     */
+    const std::vector<Node<SPACE_DIM>*>& rGetNodes() const;
+
+    /**
      * @param the new number of fluid mesh points in the x direction.
      */
     void SetNumGridPtsX(unsigned mesh_points_x);
