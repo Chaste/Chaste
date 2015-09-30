@@ -56,7 +56,7 @@ ImmersedBoundaryMembraneElasticityForce<DIM>::~ImmersedBoundaryMembraneElasticit
 }
 
 template<unsigned DIM>
-void ImmersedBoundaryMembraneElasticityForce<DIM>::AddForceContribution()
+void ImmersedBoundaryMembraneElasticityForce<DIM>::AddForceContribution(std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs)
 {
     ImmersedBoundaryMesh<DIM,DIM>* p_mesh = &(mpCellPopulation->rGetMesh());
 

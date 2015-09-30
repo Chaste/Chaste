@@ -149,25 +149,6 @@ private:
     void SetupConstantMemberVariables(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
 
     /**
-     * Helper method for SetupSolve()
-     * Sets initial configuration for transmembrane protein levels, which are used
-     * to calculate strength of cell-cell interactions.  Method is virtual to allow
-     * derived simulation modifiers to alter this behaviour.
-     *
-     * @param rCellPopulation reference to the cell population
-     */
-    virtual void SetupTransmembraneProteinLevels();
-
-    /**
-     * Helper method for SetupSolve()
-     * Sets initial configuration for transmembrane protein levels, which are used
-     * to calculate strength of cell-cell interactions.  Method is virtual to allow
-     * derived simulation modifiers to alter this behaviour.
-     *
-     */
-    virtual void UpdateTransmembraneProteinLevels();
-
-    /**
      * Helper method for UpdateFluidVelocityGrids()
      * Ensures force applied to each node is reset to zero
      * Ensures fluid force grids are reset

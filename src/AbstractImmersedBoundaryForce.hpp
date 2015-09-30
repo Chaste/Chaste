@@ -79,7 +79,7 @@ public:
      *
      * @param rCellPopulation reference to the cell population
      */
-    virtual void AddForceContribution()=0;
+    virtual void AddForceContribution(std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs)=0;
 
     /**
      * Outputs force used in the simulation to file and then calls OutputForceParameters to output all relevant parameters.

@@ -42,6 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractImmersedBoundaryForce.hpp"
 #include "ImmersedBoundaryCellPopulation.hpp"
+#include "ImmersedBoundaryMesh.hpp"
 
 #include <iostream>
 
@@ -76,7 +77,23 @@ private:
 
 protected:
 
+    /** The immersed boundary cell population */
     ImmersedBoundaryCellPopulation<DIM>* mpCellPopulation;
+
+    /** The immersed boundary mesh */
+    ImmersedBoundaryMesh<DIM,DIM>* mpMesh;
+
+    /** The cell-cell spring constant */
+    double mSpringConst;
+
+    /** The cell-cell rest length */
+    double mRestLength;
+
+    /** The number of transmembrane proteins represented in this force class */
+    unsigned mNumProteins;
+
+    /** A vector storing in which position of the node attributes vector each protein is represented */
+    std::vector<unsigned> mProteinNodeAttributeLocations;
 
 public:
 
@@ -98,12 +115,25 @@ public:
     /**
      * Overridden AddForceContribution() method.
      *
-     * Calculates the force on each node in the vertex-based cell population based on the energy function
-     * Farhadifar's model.
+     * Calculates the force on each node in the immersed boundary cell population as a result of cell-cell interactions.
      *
      * @param rCellPopulation reference to the cell population
      */
-    virtual void AddForceContribution();
+    virtual void AddForceContribution(std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs);
+
+    /**
+     * Helper method for the constructor.
+     *
+     * Initializes the levels of each protein.
+     */
+    void InitializeProteinLevels();
+
+    /**
+     * Helper method for AddForceContribution().
+     *
+     * Updates the levels of each protein at each timestep.
+     */
+    void UpdateProteinLevels();
 
     /**
      * Overridden OutputForceParameters() method.
