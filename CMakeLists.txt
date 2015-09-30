@@ -33,6 +33,10 @@ else()
     option(Chaste_USE_XERCES "Compile Chaste with XERCES and XSD support" OFF)
 endif()
 
+option(Chaste_MEMORY_TESTING "Run tests using valgrind for memory testing" OFF)
+if (Chaste_MEMORY_TESTING AND NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
+    message(SEND_ERROR "CMAKE_BUILD_TYPE must be \"Debug\" to build Chaste with memory testing (Chaste_MEMORY_TESTING=ON)")
+endif()
 option(Chaste_USE_PETSC_PARMETIS "Prefer to compile Chaste with PARMETIS library used by PETSc" ON)
 option(Chaste_USE_PETSC_HDF5 "Prefer to compile Chaste with HDF5 library used by PETSc" ON)
 option(Chaste_COVERAGE "Build Chaste with coverage information" OFF)
@@ -107,13 +111,21 @@ endif(WIN32 OR CYGWIN)
 set(CHASTE_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR})
 set(CHASTE_LINK_LIBRARIES "")
 
+#Valgrind
+if (Chaste_MEMORY_TESTING)
+    find_package(Valgrind REQUIRED)
+    if(NOT (${Chaste_NUM_CPUS_TEST} EQUAL 1))
+        message(WARNING "Memory testing is turned on (Chaste_MEMORY_TESTING=ON) but you are trying to setup testing in parallel. Please set Chaste_NUM_CPUS_TEST to 1 for memory testing. Configuration and generation of tests will continue, but all tests will be run in serial")
+    endif()
+endif()
+
 #Locate Python
 find_package(PythonInterp REQUIRED)
 
 if (ENABLE_CHASTE_TESTING)
-    if (NOT (WIN32 OR CYGWIN))
-        #Locate TextTest
-        find_package(TextTest REQUIRED)
+    find_package(TextTest)
+    if (NOT TEXTTEST_FOUND)
+        message(WARNING "Texttest not found, turning off acceptance tests")
     endif()
 endif()
 

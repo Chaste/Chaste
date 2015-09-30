@@ -92,25 +92,33 @@ endmacro()
             add_executable(${exeTargetName} "${_test_real_output_filename}" ${ARGN})
         endif()
 
-
-        if(${parallel} OR NOT (${Chaste_NUM_CPUS_TEST} EQUAL 1))
-            #Note: "${MPIEXEC} /np 1 master : subordinate" means that we run one master process and n subordinate processes
-            # on the local host with n+1 cores.
-            # Here we are using the form ${MPIEXEC} /np 2 ${test}.
-            # A figure-it-out-yourselfnstalled libvtk-java and libvtk5-qt4-dev form would be ${MPIEXEC} /np * ${test} which runs on all available cores
-            # See http://technet.microsoft.com/en-us/library/cc947675%28v=ws.10%29.aspx
-            # Note the underscore appended to the test name, to match with the RUN_TESTS block above, and ensure we don't
-            # run more tests than intended!
-            if (${Chaste_NUM_CPUS_TEST} EQUAL 1)
-                set(num_cpus 2)
-            else()
-                set(num_cpus ${Chaste_NUM_CPUS_TEST})
-            endif()
-            add_test(NAME ${_testTargetName} WORKING_DIRECTORY "${Chaste_SOURCE_DIR}/" COMMAND  ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${num_cpus} ${MPIEXEC_PREFLAGS}  $<TARGET_FILE:${exeTargetName}> ${MPIEXEC_POSTFLAGS})
-            set_property(TEST ${testTargetName} PROPERTY PROCESSORS ${num_cpus})
-        else()
-            add_test(NAME ${_testTargetName} WORKING_DIRECTORY "${Chaste_SOURCE_DIR}/" COMMAND $<TARGET_FILE:${exeTargetName}>)
+        if (Chaste_MEMORY_TESTING)
+            add_test(NAME ${_testTargetName} WORKING_DIRECTORY "${Chaste_SOURCE_DIR}/" 
+                COMMAND ${VALGRIND_COMMAND}  --tool=memcheck --xml=yes --xml-file=test_summary/${_testname}_valgrind.xml --gen-suppressions=all
+                                            --track-fds=yes --leak-check=yes --num-callers=50 --suppressions=chaste.supp
+                                            $<TARGET_FILE:${exeTargetName}> 
+                                            -malloc_debug -malloc_dump -memory_info)
             set_property(TEST ${testTargetName} PROPERTY PROCESSORS 1)
+        else()
+            if(${parallel} OR NOT (${Chaste_NUM_CPUS_TEST} EQUAL 1))
+                #Note: "${MPIEXEC} /np 1 master : subordinate" means that we run one master process and n subordinate processes
+                # on the local host with n+1 cores.
+                # Here we are using the form ${MPIEXEC} /np 2 ${test}.
+                # A figure-it-out-yourselfnstalled libvtk-java and libvtk5-qt4-dev form would be ${MPIEXEC} /np * ${test} which runs on all available cores
+                # See http://technet.microsoft.com/en-us/library/cc947675%28v=ws.10%29.aspx
+                # Note the underscore appended to the test name, to match with the RUN_TESTS block above, and ensure we don't
+                # run more tests than intended!
+                if (${Chaste_NUM_CPUS_TEST} EQUAL 1)
+                    set(num_cpus 2)
+                else()
+                    set(num_cpus ${Chaste_NUM_CPUS_TEST})
+                endif()
+                add_test(NAME ${_testTargetName} WORKING_DIRECTORY "${Chaste_SOURCE_DIR}/" COMMAND  ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${num_cpus} ${MPIEXEC_PREFLAGS}  $<TARGET_FILE:${exeTargetName}> ${MPIEXEC_POSTFLAGS})
+                set_property(TEST ${testTargetName} PROPERTY PROCESSORS ${num_cpus})
+            else()
+                add_test(NAME ${_testTargetName} WORKING_DIRECTORY "${Chaste_SOURCE_DIR}/" COMMAND $<TARGET_FILE:${exeTargetName}>)
+                set_property(TEST ${testTargetName} PROPERTY PROCESSORS 1)
+            endif()
         endif()
     endmacro(CHASTE_ADD_TEST)
 
@@ -246,7 +254,7 @@ endmacro()
             set_target_properties(${appName} PROPERTIES LINK_FLAGS "/NODEFAULTLIB:LIBCMT /IGNORE:4217 /IGNORE:4049")
         endif()
     endforeach(app)
-    if (ENABLE_CHASTE_TESTING)
+    if (ENABLE_CHASTE_TESTING AND TEXTTEST_FOUND)
         configure_file(texttest/chaste/wrapper.cmake.in texttest/chaste/wrapper)
         file(COPY ${Chaste_SOURCE_DIR}/python/infra/RoundResultsFiles.py DESTINATION ${Chaste_BINARY_DIR}/python/infra)
         file(GLOB test_directories texttest/*)
