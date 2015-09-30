@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef IMMERSEDBOUNDARYMEMBRANEELASTICITYFORCE_HPP_
-#define IMMERSEDBOUNDARYMEMBRANEELASTICITYFORCE_HPP_
+#ifndef IMMERSEDBOUNDARYCELLCELLINTERACTIONFORCE_HPP_
+#define IMMERSEDBOUNDARYCELLCELLINTERACTIONFORCE_HPP_
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
@@ -52,7 +52,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 template<unsigned DIM>
-class ImmersedBoundaryMembraneElasticityForce : public AbstractImmersedBoundaryForce<DIM>
+class ImmersedBoundaryCellCellInteractionForce : public AbstractImmersedBoundaryForce<DIM>
 {
 //friend class TestForces;
 
@@ -70,6 +70,8 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & boost::serialization::base_object<AbstractImmersedBoundaryForce<DIM> >(*this);
+//        archive & mRestLength;
+//        archive & mSpringConstant;
     }
 
 protected:
@@ -81,17 +83,17 @@ public:
     /**
      * Constructor.
      */
-    ImmersedBoundaryMembraneElasticityForce(ImmersedBoundaryCellPopulation<DIM>& rCellPopulation);
+    ImmersedBoundaryCellCellInteractionForce(ImmersedBoundaryCellPopulation<DIM>& rCellPopulation);
 
     /**
      * For serialization.
      */
-    ImmersedBoundaryMembraneElasticityForce();
+    ImmersedBoundaryCellCellInteractionForce();
 
     /**
      * Destructor.
      */
-    virtual ~ImmersedBoundaryMembraneElasticityForce();
+    virtual ~ImmersedBoundaryCellCellInteractionForce();
 
     /**
      * Overridden AddForceContribution() method.
@@ -112,6 +114,6 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(ImmersedBoundaryMembraneElasticityForce)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(ImmersedBoundaryCellCellInteractionForce)
 
-#endif /*IMMERSEDBOUNDARYMEMBRANEELASTICITYFORCE_HPP_*/
+#endif /*IMMERSEDBOUNDARYCELLCELLINTERACTIONFORCE_HPP_*/

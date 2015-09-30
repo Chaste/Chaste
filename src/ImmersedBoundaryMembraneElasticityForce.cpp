@@ -39,10 +39,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ImmersedBoundaryElement.hpp"
 
 template<unsigned DIM>
+ImmersedBoundaryMembraneElasticityForce<DIM>::ImmersedBoundaryMembraneElasticityForce(ImmersedBoundaryCellPopulation<DIM>& rCellPopulation)
+        : AbstractImmersedBoundaryForce<DIM>(),
+          mpCellPopulation(&rCellPopulation)
+{
+}
+
+template<unsigned DIM>
 ImmersedBoundaryMembraneElasticityForce<DIM>::ImmersedBoundaryMembraneElasticityForce()
-   : AbstractImmersedBoundaryForce<DIM>(),
-     mRestLength(0.01),
-     mSpringConstant(0.04)
 {
 }
 
@@ -52,9 +56,9 @@ ImmersedBoundaryMembraneElasticityForce<DIM>::~ImmersedBoundaryMembraneElasticit
 }
 
 template<unsigned DIM>
-void ImmersedBoundaryMembraneElasticityForce<DIM>::AddForceContribution(ImmersedBoundaryCellPopulation<DIM>& rCellPopulation)
+void ImmersedBoundaryMembraneElasticityForce<DIM>::AddForceContribution()
 {
-    ImmersedBoundaryMesh<DIM,DIM>* p_mesh = &(rCellPopulation.rGetMesh());
+    ImmersedBoundaryMesh<DIM,DIM>* p_mesh = &(mpCellPopulation->rGetMesh());
 
     for (typename ImmersedBoundaryMesh<DIM, DIM>::ImmersedBoundaryElementIterator elem_iter = p_mesh->GetElementIteratorBegin();
          elem_iter != p_mesh->GetElementIteratorEnd();
@@ -104,8 +108,8 @@ void ImmersedBoundaryMembraneElasticityForce<DIM>::AddForceContribution(Immersed
 template<unsigned DIM>
 void ImmersedBoundaryMembraneElasticityForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<RestLength>" << mRestLength << "</RestLength>\n";
-    *rParamsFile << "\t\t\t<SpringConstant>" << mSpringConstant << "</SpringConstant>\n";
+//    *rParamsFile << "\t\t\t<RestLength>" << mRestLength << "</RestLength>\n";
+//    *rParamsFile << "\t\t\t<SpringConstant>" << mSpringConstant << "</SpringConstant>\n";
 
     // Call method on direct parent class
     AbstractImmersedBoundaryForce<DIM>::OutputForceParameters(rParamsFile);
