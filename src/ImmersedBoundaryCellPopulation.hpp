@@ -85,21 +85,6 @@ private:
      */
     boost::shared_ptr<AbstractVertexBasedDivisionRule<DIM> > mpVertexBasedDivisionRule;
 
-    /**
-     * Vectors representing the level of certain transmembrane proteins for use in
-     * calculating the strength of cell-cell interactions
-     */
-    std::vector<double> mECadherinLevels;
-    std::vector<double> mPCadherinLevels;
-    std::vector<double> mIntegrinLevels;
-
-    /** To keep track of cell centroids */
-    std::map<CellPtr, c_vector<double, DIM> > mCellCentroids;
-
-    /** To keep track of max centroid distances */
-    double mCentroidXDist;
-    double mCentroidYDist;
-
     /** The distance over which cell-cell interactions occur */
     double mInteractionDistance;
 
@@ -213,36 +198,6 @@ public:
     unsigned GetNumNodes();
 
     /**
-     * @return the modifiable vector representing E-cadherin levels at each node.
-     */
-    std::vector<double>& rGetModifiableECadherinLevels();
-
-    /**
-     * @return the modifiable vector representing P-cadherin levels at each node.
-     */
-    std::vector<double>& rGetModifiablePCadherinLevels();
-
-    /**
-     * @return the modifiable vector representing integrin levels at each node.
-     */
-    std::vector<double>& rGetModifiableIntegrinLevels();
-
-    /**
-     * @return the vector representing E-cadherin levels at each node.
-     */
-    const std::vector<double>& rGetECadherinLevels() const;
-
-    /**
-     * @return the vector representing P-cadherin levels at each node.
-     */
-    const std::vector<double>& rGetPCadherinLevels() const;
-
-    /**
-     * @return the vector representing integrin levels at each node.
-     */
-    const std::vector<double>& rGetIntegrinLevels() const;
-
-    /**
      * @param the new cell-cell interaction distance.
      */
     void SetInteractionDistance(double new_distance);
@@ -286,12 +241,6 @@ public:
      */
     std::set<unsigned> GetNeighbouringLocationIndices(CellPtr pCell);
 
-    /**
-     * Update map between CellPtrs and c_vectors of cell centroids.
-     *
-     * This method should be called before GetNeighbouringLocationIndices()
-     */
-    void UpdateCellCentroids();
 
     /**
      * Overridden AddNode() method.

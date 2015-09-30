@@ -137,42 +137,6 @@ Node<DIM>* ImmersedBoundaryCellPopulation<DIM>::GetNode(unsigned index)
 }
 
 template<unsigned DIM>
-std::vector<double>& ImmersedBoundaryCellPopulation<DIM>::rGetModifiableECadherinLevels()
-{
-    return mECadherinLevels;
-}
-
-template<unsigned DIM>
-std::vector<double>& ImmersedBoundaryCellPopulation<DIM>::rGetModifiablePCadherinLevels()
-{
-    return mPCadherinLevels;
-}
-
-template<unsigned DIM>
-std::vector<double>& ImmersedBoundaryCellPopulation<DIM>::rGetModifiableIntegrinLevels()
-{
-    return mIntegrinLevels;
-}
-
-template<unsigned DIM>
-const std::vector<double>& ImmersedBoundaryCellPopulation<DIM>::rGetECadherinLevels() const
-{
-    return mECadherinLevels;
-}
-
-template<unsigned DIM>
-const std::vector<double>& ImmersedBoundaryCellPopulation<DIM>::rGetPCadherinLevels() const
-{
-    return mPCadherinLevels;
-}
-
-template<unsigned DIM>
-const std::vector<double>& ImmersedBoundaryCellPopulation<DIM>::rGetIntegrinLevels() const
-{
-    return mIntegrinLevels;
-}
-
-template<unsigned DIM>
 void ImmersedBoundaryCellPopulation<DIM>::SetInteractionDistance(double new_distance)
 {
     assert(new_distance >= 0.0);
@@ -191,101 +155,7 @@ std::set<unsigned> ImmersedBoundaryCellPopulation<DIM>::GetNeighbouringLocationI
 {
     // The set to return
     std::set<unsigned> neighbouring_indices;
-
-    // Check if this cell represents the membrane
-    bool membrane_element = ( this->GetLocationIndexUsingCell(pCell) == mpImmersedBoundaryMesh->GetMembraneIndex() );
-
-    // We wish to consider the membrane as being a neighbour to every cell, as we treat it differently
-    if( membrane_element )
-    {
-        // List every cell as a neighbour
-        for (std::list<CellPtr>::iterator cell_it = this->mCells.begin() ; cell_it != this->mCells.end() ; ++cell_it)
-        {
-            if (pCell != *cell_it)
-            {
-                neighbouring_indices.insert(this->GetLocationIndexUsingCell(*cell_it));
-            }
-        }
-    }
-    else
-    {
-        // Decide, based on the centroid distances already calculated, whether the other cells are neighbours
-        double  centroid_dist = 1.5 * std::max(mCentroidXDist, mCentroidYDist);
-
-        c_vector<double, DIM> current_centroid = mCellCentroids[pCell];
-
-        //\todo: THIS ISN'T FOOLPROOF - may need to re-implement later
-        for (std::list<CellPtr>::iterator cell_it = this->mCells.begin() ; cell_it != this->mCells.end() ; ++cell_it)
-        {
-            // Ensure cells are not considered neighbours of themselves or of the membrane if present
-            if ( (pCell != *cell_it) && (!membrane_element) )
-            {
-                // Get distance from current_centroid to the centroid of this comparison cell
-                double distance = norm_2(mpImmersedBoundaryMesh->GetVectorFromAtoB(mCellCentroids[*cell_it], current_centroid));
-
-                // If the distance is smaller than the max dist between consecutive centroids, add it to the set
-                if ( distance < centroid_dist )
-                {
-                    neighbouring_indices.insert(this->GetLocationIndexUsingCell(*cell_it));
-                }
-            }
-        }
-        // All cells are neighbours of the membrane element
-        if (membrane_element)
-        {
-            neighbouring_indices.insert(mpImmersedBoundaryMesh->GetMembraneIndex());
-        }
-    }
     return neighbouring_indices;
-}
-
-template<unsigned DIM>
-void ImmersedBoundaryCellPopulation<DIM>::UpdateCellCentroids()
-{
-    // Clear the container first, so we don't need to worry about whether cells have been created or destroyed
-    mCellCentroids.clear();
-
-    std::vector<double> x_cent;
-    std::vector<double> y_cent;
-
-    // Get the centroid of each cell
-    for (std::list<CellPtr>::iterator cell_it = this->mCells.begin();
-         cell_it != this->mCells.end();
-         ++cell_it)
-    {
-        // Get the centroid of this cell and store it in the map
-        c_vector<double, DIM> centre = this->GetLocationOfCellCentre(*cell_it);
-        mCellCentroids[*cell_it] = centre;
-
-        // We ignore the centroid of the membrane when calculating cell-cell interactions
-        if(this->GetLocationIndexUsingCell(*cell_it) == mpImmersedBoundaryMesh->GetMembraneIndex())
-        {
-            continue;
-        }
-
-        // For the non-membrane cells, we find the x and y centres
-        x_cent.push_back(centre[0]);
-        y_cent.push_back(centre[1]);
-    }
-
-    std::sort(x_cent.begin(), x_cent.end());
-    std::sort(y_cent.begin(), y_cent.end());
-
-    // Calculate the biggest difference between cell-centres
-    double diff_x = x_cent.back() - x_cent[0];
-    double diff_y = y_cent.back() - y_cent[0];
-
-    mCentroidXDist = diff_x < 0.5 ? diff_x : 1.0 - diff_x;
-    mCentroidYDist = diff_y < 0.5 ? diff_y : 1.0 - diff_y;
-
-    for (unsigned cell_idx = 1 ; cell_idx < x_cent.size() ; cell_idx++)
-    {
-        diff_x = x_cent[cell_idx] - x_cent[cell_idx - 1];
-        diff_y = y_cent[cell_idx] - y_cent[cell_idx - 1];
-
-        mCentroidXDist = diff_x > mCentroidXDist ? diff_x : mCentroidXDist;
-        mCentroidXDist = diff_y > mCentroidYDist ? diff_y : mCentroidXDist;
-    }
 }
 
 template<unsigned DIM>
