@@ -84,6 +84,13 @@ protected:
 
     double mLengthScaling; /**< This solver is designed to be used with SI units, but meshes in mm are common. This scaling allows this to be handled.*/
 
+    /**< Use dynamic (flux related) resistance and a nonlinear solver */
+    bool mDynamicResistance;
+
+    /**< False by default (conical pipes with radius defined at nodes).  When true pipes are cylindrical.*/
+    bool mRadiusOnEdge;
+
+
 public:
     /** Main constructor
      * Loads a mesh from file(s)
@@ -139,6 +146,28 @@ public:
      * Overridden so we can scale other quantities in subclasses when working in SI units.
      */
     virtual void SetMeshInMilliMetres();
+
+    /**
+     * Used to set mRadiusOnEdge flag.
+     * This is false by default in the constructor (conic pipes with radius defined at nodes).  When true pipes are cylindrical.
+     * @param isOnEdges  The new value of mRadiusOnEdge
+     *
+     */
+    void SetRadiusOnEdge(bool isOnEdges=true);
+
+    /**
+     * @return  reference to the mesh
+     */
+    TetrahedralMesh<1,3>& rGetMesh();
+
+    /**
+     * @param dynamicResistance
+     **/
+    void SetDynamicResistance(bool dynamicResistance = true)
+    {
+        mDynamicResistance = dynamicResistance;
+    }
+
 
 
  };

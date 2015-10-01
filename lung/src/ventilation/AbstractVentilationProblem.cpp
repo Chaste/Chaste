@@ -40,7 +40,9 @@ AbstractVentilationProblem::AbstractVentilationProblem(const std::string& rMeshD
     : mOutletNodeIndex(rootIndex),
       mViscosity(1.92e-5),
       mDensity(1.15),
-      mLengthScaling(1.0)
+      mLengthScaling(1.0),
+      mDynamicResistance(false),
+      mRadiusOnEdge(false)
 {
     TrianglesMeshReader<1,3> mesh_reader(rMeshDirFilePath);
     mMesh.ConstructFromMeshReader(mesh_reader);
@@ -56,3 +58,15 @@ AbstractVentilationProblem::SetMeshInMilliMetres()
 {
     mLengthScaling = 1e-3;
 }
+
+void AbstractVentilationProblem::SetRadiusOnEdge(bool isOnEdges)
+{
+    mRadiusOnEdge = isOnEdges;
+}
+
+TetrahedralMesh<1, 3>&
+AbstractVentilationProblem::rGetMesh()
+{
+    return mMesh;
+}
+

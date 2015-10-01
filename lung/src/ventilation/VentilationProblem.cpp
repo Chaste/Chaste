@@ -40,8 +40,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //#include "Timer.hpp"
 VentilationProblem::VentilationProblem(const std::string& rMeshDirFilePath, unsigned rootIndex)
     : AbstractVentilationProblem(rMeshDirFilePath, rootIndex),
-      mDynamicResistance(false),
-      mRadiusOnEdge(false),
       mFluxGivenAtInflow(false),
       mTerminalInteractionMatrix(NULL),
       mNumNonZeroesPerRow(25u), //See note in header definition
@@ -495,16 +493,6 @@ void VentilationProblem::GetSolutionAsFluxesAndPressures(std::vector<double>& rF
     rPressuresOnNodes = mPressure;
 }
 
-
-void VentilationProblem::SetRadiusOnEdge(bool isOnEdges)
-{
-    mRadiusOnEdge = isOnEdges;
-}
-
-TetrahedralMesh<1, 3>& VentilationProblem::rGetMesh()
-{
-    return mMesh;
-}
 
 
 #ifdef CHASTE_VTK

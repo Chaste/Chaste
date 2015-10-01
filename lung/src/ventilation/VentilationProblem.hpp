@@ -61,13 +61,6 @@ class VentilationProblem : public AbstractVentilationProblem
 private:
     friend class TestVentilationProblem;
 
-    /**< Use dynamic (flux related) resistance and a nonlinear solver */
-    bool mDynamicResistance;
-
-    /**< False by default (conical pipes with radius defined at nodes).  When true pipes are cylindrical.*/
-    bool mRadiusOnEdge;
-
- 
     /**< Used to hold the flux solution (and boundary conditions) in edge index ordering */
     std::vector<double> mFlux;
 
@@ -300,18 +293,6 @@ public:
 
 #endif // CHASTE_VTK
 
-    /**
-     * Used to set mRadiusOnEdge flag.
-     * This is false by default in the constructor (conic pipes with radius defined at nodes).  When true pipes are cylindrical.
-     * @param isOnEdges  The new value of mRadiusOnEdge
-     *
-     */
-    void SetRadiusOnEdge(bool isOnEdges=true);
-
-    /**
-     * @return  reference to the mesh
-     */
-    TetrahedralMesh<1,3>& rGetMesh();
 
     /** Assemble the linear system by writing in
      *  * flux balance at the nodes
@@ -333,16 +314,6 @@ public:
      * @param rOutFileName  Name for VTK output
      */
     void SolveProblemFromFile(const std::string& rInFilePath, const std::string& rOutFileDir,const std::string& rOutFileName);
-
-    /**
-     * @param dynamicResistance
-     **/
-    void SetDynamicResistance(bool dynamicResistance = true)
-    {
-        mDynamicResistance = dynamicResistance;
-    }
-
-
 };
 
 #endif /* VENTILATIONPROBLEM_HPP_ */

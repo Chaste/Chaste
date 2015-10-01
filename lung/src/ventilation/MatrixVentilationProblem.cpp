@@ -42,8 +42,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 MatrixVentilationProblem::MatrixVentilationProblem(const std::string& rMeshDirFilePath, unsigned rootIndex)
     : AbstractVentilationProblem(rMeshDirFilePath, rootIndex),
       mpLinearSystem(NULL),
-      mDynamicResistance(false),
-      mRadiusOnEdge(false),
       mSolution(NULL)
 {
 
@@ -371,15 +369,6 @@ void MatrixVentilationProblem::GetSolutionAsFluxesAndPressures(std::vector<doubl
 }
 
 
-void MatrixVentilationProblem::SetRadiusOnEdge(bool isOnEdges)
-{
-    mRadiusOnEdge = isOnEdges;
-}
-
-TetrahedralMesh<1, 3>& MatrixVentilationProblem::rGetMesh()
-{
-    return mMesh;
-}
 
 
 #ifdef CHASTE_VTK

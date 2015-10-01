@@ -59,9 +59,6 @@ class MatrixVentilationProblem : public AbstractVentilationProblem
 {
 private:
     LinearSystem* mpLinearSystem; /**< Linear system for pressure (at nodes) and flux (in edges).  Allocated by constructor */
-    bool mDynamicResistance; /**< Use dynamic (flux related) resistance and a nonlinear solver */
-    bool mRadiusOnEdge; /**< False by default (conical pipes with radius defined at nodes).  When true pipes are cylindrical.*/
-
 
     double mFluxScaling;  /**< In order to keep the pressure and flux solution at a comparable magnitude, so solve for mFluxScaling * flux.  This should be the same scale as Poiseuille resistance (comparable to viscosity).*/
     Vec mSolution; /**< Allow access to the solution of the linear system and use as a guess later */
@@ -201,18 +198,6 @@ public:
 
 #endif // CHASTE_VTK
 
-    /**
-     * Used to set mRadiusOnEdge flag.
-     * This is false by default in the constructor (conic pipes with radius defined at nodes).  When true pipes are cylindrical.
-     * @param isOnEdges  The new value of mRadiusOnEdge
-     *
-     */
-    void SetRadiusOnEdge(bool isOnEdges=true);
-
-    /**
-     * @return  reference to the mesh
-     */
-    TetrahedralMesh<1,3>& rGetMesh();
 
     /** Assemble the linear system by writing in
      *  * flux balance at the nodes
@@ -234,15 +219,6 @@ public:
      * @param rOutFileName  Name for VTK output
      */
     void SolveProblemFromFile(const std::string& rInFilePath, const std::string& rOutFileDir,const std::string& rOutFileName);
-
-    /**
-     * @param dynamicResistance
-     **/
-    void SetDynamicResistance(bool dynamicResistance = true)
-    {
-        mDynamicResistance = dynamicResistance;
-    }
-
 };
 
 #endif /* MATRIXVENTILATIONPROBLEM_HPP_ */
