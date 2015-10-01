@@ -420,6 +420,24 @@ public:
         problem.GetSolutionAsFluxesAndPressures(flux, pressure);
     }
 
+    ///\todo 2300 small unit test and/or exception
+    void TestTopOfAirwaysPatientDataOutflowFlux() throw (Exception)
+    {
+        MatrixVentilationProblem problem("continuum_mechanics/test/data/top_of_tree", 0u);
+        PetscOptionsSetValue("-ksp_monitor", "");
+        problem.SetOutflowFlux(0.001);
+        problem.SetConstantInflowPressures(50.0);
+        //problem.SetConstantInflowFluxes(100.0);
+        TetrahedralMesh<1, 3>& r_mesh=problem.rGetMesh();
+        TS_ASSERT_EQUALS(r_mesh.GetNumNodes(), 31u);
+        TS_ASSERT_EQUALS(r_mesh.GetNumElements(), 30u);
+        problem.Solve();
+        problem.Solve();
+        // For debugging...
+        std::vector<double> flux, pressure;
+        problem.GetSolutionAsFluxesAndPressures(flux, pressure);
+    }
+
     void OnlyWorksWithUMFPACKTestPatientData() throw (Exception)
     {
         MatrixVentilationProblem problem("notforrelease_lung/test/data/Novartis002", 0u);

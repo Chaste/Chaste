@@ -98,6 +98,11 @@ void MatrixVentilationProblem::SetOutflowPressure(double pressure)
     SetPressureAtBoundaryNode(*(mMesh.GetNode(mOutletNodeIndex)), pressure);
 }
 
+void MatrixVentilationProblem::SetOutflowFlux(double flux)
+{
+    SetFluxAtBoundaryNode(*(mMesh.GetNode(mOutletNodeIndex)), flux);
+}
+
 void MatrixVentilationProblem::SetConstantInflowPressures(double pressure)
 {
     for (AbstractTetrahedralMesh<1,3>::BoundaryNodeIterator iter =mMesh.GetBoundaryNodeIteratorBegin();
