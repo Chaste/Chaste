@@ -130,11 +130,6 @@ public:
      */
     virtual double GetVolume() = 0;
 
-    /**
-     * @param v0 The undeformed volume
-     */
-    virtual void SetUndeformedVolume(double v0) = 0;
-
 };
 
 
