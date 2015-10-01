@@ -73,9 +73,6 @@ protected:
     /** Whether the current process owns this element. */
     bool mOwnership;
 
-    /** A flag for the use of higher level algorithms. */
-    bool mFlag;
-
 public:
 
     /**
@@ -204,21 +201,6 @@ public:
      * @param ownership whether the current process now owns this element
      */
     void SetOwnership(bool ownership);
-
-    /**
-     * Mark the element as flagged.
-     */
-    void Flag();
-
-    /**
-     * Mark the element as not flagged.
-     */
-    void Unflag();
-
-    /**
-     * @return whether the element is flagged.
-     */
-    bool IsFlagged() const;
 
     /**
      * Set an attribute (a value associated with the element)

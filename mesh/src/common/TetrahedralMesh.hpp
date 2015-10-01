@@ -273,11 +273,6 @@ public:
     virtual void Clear();
 
     /**
-     * @return the set of nodes which are on the boundary of the flagged region(s).
-     */
-    std::set<unsigned> CalculateBoundaryOfFlaggedRegion();
-
-    /**
      * @return calculated the angle between the node at indexB and the x axis about
      * the node at indexA. The angle returned is in the range (-pi,pi].
      *
@@ -285,18 +280,6 @@ public:
      * @param indexB a node index
      */
     double GetAngleBetweenNodes(unsigned indexA, unsigned indexB);
-
-    /**
-     * Unflag all elements in the mesh.
-     */
-    void UnflagAllElements();
-
-    /**
-     * Flag all elements not containing ANY of the given nodes
-     *
-     * @param rNodes  set of nodes to check for
-     */
-    void FlagElementsNotContainingNodes(const std::set<unsigned>& rNodes);
 
     /** Update mElementJacobians, mElementWeightedDirections and mBoundaryElementWeightedDirections. */
     virtual void RefreshJacobianCachedData();

@@ -373,28 +373,6 @@ public:
     bool IsInternal() const;
 
     /**
-     * @return true if a node lives within a flagged element.
-     *
-     * @param rMesh the mesh containing the nodes and elements
-     */
-    template <unsigned ELEMENT_DIM>
-    bool IsFlagged(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>& rMesh)
-    {
-        bool in_flagged_element = false;
-        for (ContainingElementIterator it = ContainingElementsBegin();
-             it != ContainingElementsEnd();
-             ++it)
-        {
-            if (rMesh.GetElement(*it)->IsFlagged())
-            {
-                in_flagged_element = true;
-                break;
-            }
-        }
-        return in_flagged_element;
-    }
-
-    /**
      * Set the node's region ID.
      *
      * @param region the new region ID

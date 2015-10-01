@@ -479,73 +479,6 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::Clear()
     this->mBoundaryNodes.clear();
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-std::set<unsigned> TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateBoundaryOfFlaggedRegion()
-{
-    // A set of nodes which lie on the face, size 3 in 2D, size 4 in 3D
-    typedef std::set<unsigned> FaceNodes;
-
-    /*
-     * Face maps to true the first time it is encountered, and false subsequent
-     * times. Thus, faces mapping to true at the end are boundary faces.
-     */
-    std::map<FaceNodes,bool> face_on_boundary;
-
-    // Loop over all elements
-    for (typename AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ElementIterator iter = this->GetElementIteratorBegin();
-         iter != this->GetElementIteratorEnd();
-         ++iter)
-    {
-        if (iter->IsFlagged())
-        {
-            // To get faces, initially start with all nodes
-            std::set<unsigned> all_nodes;
-            for (unsigned i=0; i<ELEMENT_DIM+1; i++)
-            {
-                all_nodes.insert(iter->GetNodeGlobalIndex(i));
-            }
-
-            // Remove one node in turn to obtain each face
-            for (unsigned i=0; i<ELEMENT_DIM+1; i++)
-            {
-                FaceNodes face_nodes = all_nodes;
-                face_nodes.erase(iter->GetNodeGlobalIndex(i));
-
-                // Search the map of faces to see if it contains this face
-                std::map<FaceNodes,bool>::iterator it = face_on_boundary.find(face_nodes);
-
-                if (it == face_on_boundary.end())
-                {
-                    // Face not found, add and assume on boundary
-                    face_on_boundary[face_nodes]=true;
-                }
-                else
-                {
-                    // Face found in map, so not on boundary
-                    it->second = false;
-                }
-            }
-        }
-    }
-
-    // Boundary nodes to be returned
-    std::set<unsigned> boundary_of_flagged_region;
-
-    // Get all faces in the map
-    std::map<FaceNodes,bool>::iterator it=face_on_boundary.begin();
-    while (it!=face_on_boundary.end())
-    {
-        // If the face maps to true it is on the boundary
-        if (it->second==true)
-        {
-            // Get all nodes in the face and put in set to be returned
-            boundary_of_flagged_region.insert(it->first.begin(),it->first.end());
-        }
-        it++;
-    }
-
-    return boundary_of_flagged_region;
-}
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetAngleBetweenNodes(unsigned indexA, unsigned indexB)
@@ -574,44 +507,6 @@ double TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetAngleBetweenNodes(unsigned in
 
     double angle = atan2(y_difference,x_difference);
     return angle;
-}
-
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::UnflagAllElements()
-{
-    for (typename AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ElementIterator iter = this->GetElementIteratorBegin();
-         iter != this->GetElementIteratorEnd();
-         ++iter)
-    {
-        iter->Unflag();
-    }
-}
-
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::FlagElementsNotContainingNodes(const std::set<unsigned>& rNodes)
-{
-    for (typename AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ElementIterator iter = this->GetElementIteratorBegin();
-         iter != this->GetElementIteratorEnd();
-         ++iter)
-    {
-        bool found_node = false;
-
-        for (unsigned i=0; i<iter->GetNumNodes(); i++)
-        {
-            unsigned node_index = iter->GetNodeGlobalIndex(i);
-
-            std::set<unsigned>::iterator set_iter = rNodes.find(node_index);
-            if (set_iter != rNodes.end())
-            {
-                found_node = true;
-            }
-        }
-
-        if (!found_node)
-        {
-            iter->Flag();
-        }
-    }
 }
 
 //////////////////////////////////////////////////////////////////////////////

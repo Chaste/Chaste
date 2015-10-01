@@ -202,38 +202,6 @@ public:
         TS_ASSERT_THROWS_THIS(node.RemoveBoundaryElement(256),"Tried to remove an index which was not in the set");
     }
 
-    void TestFlagging()
-    {
-        TetrahedralMesh<2,2> mesh;
-        mesh.ConstructRectangularMesh(1, 1);
-        unsigned num_nodes = 4;
-
-        for (unsigned i=0; i<num_nodes; i++)
-        {
-            TS_ASSERT_EQUALS(mesh.GetNode(i)->IsFlagged(mesh), false);
-        }
-
-        mesh.GetElement(0)->Flag();
-
-        TS_ASSERT_EQUALS(mesh.GetNode(0)->IsFlagged(mesh), false);
-        TS_ASSERT_EQUALS(mesh.GetNode(1)->IsFlagged(mesh), true);
-        TS_ASSERT_EQUALS(mesh.GetNode(2)->IsFlagged(mesh), true);
-        TS_ASSERT_EQUALS(mesh.GetNode(3)->IsFlagged(mesh), true);
-
-        mesh.GetElement(0)->Unflag();
-
-        for (unsigned i=0; i<num_nodes; i++)
-        {
-            TS_ASSERT_EQUALS(mesh.GetNode(i)->IsFlagged(mesh), false);
-        }
-
-        mesh.GetElement(1)->Flag();
-        TS_ASSERT_EQUALS(mesh.GetNode(0)->IsFlagged(mesh), true);
-        TS_ASSERT_EQUALS(mesh.GetNode(1)->IsFlagged(mesh), true);
-        TS_ASSERT_EQUALS(mesh.GetNode(2)->IsFlagged(mesh), true);
-        TS_ASSERT_EQUALS(mesh.GetNode(3)->IsFlagged(mesh), false);
-    }
-
     void TestNodeWithAttributes() throw (Exception)
     {
         Node<3> node(0, false, 0.0, 1.0, 2.0);

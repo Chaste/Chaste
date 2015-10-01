@@ -738,29 +738,6 @@ public:
         }
     }
 
-    void TestFlagging()
-    {
-        std::vector<Node<3>*> nodes;
-        nodes.push_back(new Node<3>(0, false, 0.0, 0.0, 0.0));
-        nodes.push_back(new Node<3>(1, false, 1.0, 0.0, 0.0));
-        nodes.push_back(new Node<3>(2, false, 0.0, 1.0, 0.0));
-        nodes.push_back(new Node<3>(3, false, 0.0, 0.0, 1.0));
-        Element<3,3> element(INDEX_IS_NOT_USED, nodes);
-
-        TS_ASSERT_EQUALS(element.IsFlagged(), false);
-
-        element.Flag();
-        TS_ASSERT_EQUALS(element.IsFlagged(), true);
-
-        element.Unflag();
-        TS_ASSERT_EQUALS(element.IsFlagged(), false);
-
-        for (unsigned i=0; i<nodes.size(); i++)
-        {
-            delete nodes[i];
-        }
-    }
-
     void Test1DRefineElement() throw (Exception)
     {
         TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");

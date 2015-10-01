@@ -50,13 +50,10 @@ AbstractElement<ELEMENT_DIM, SPACE_DIM>::AbstractElement(unsigned index, const s
       mIndex(index),
       mAttribute(0.0),
       mIsDeleted(false),
-      mOwnership(true),
-      mFlag(false)
+      mOwnership(true)
 {
     // Sanity checking
     assert(ELEMENT_DIM <= SPACE_DIM);
-
-    // Flags must be initialised before the Jacobian calculations, or assertions trip
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -64,8 +61,7 @@ AbstractElement<ELEMENT_DIM, SPACE_DIM>::AbstractElement(unsigned index)
     : mIndex(index),
       mAttribute(0.0),
       mIsDeleted(false),
-      mOwnership(true),
-      mFlag(false)
+      mOwnership(true)
 {}
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -157,24 +153,6 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractElement<ELEMENT_DIM, SPACE_DIM>::SetOwnership(bool ownership)
 {
     mOwnership = ownership;
-}
-
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractElement<ELEMENT_DIM, SPACE_DIM>::Flag()
-{
-    mFlag = true;
-}
-
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractElement<ELEMENT_DIM, SPACE_DIM>::Unflag()
-{
-    mFlag = false;
-}
-
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-bool AbstractElement<ELEMENT_DIM, SPACE_DIM>::IsFlagged() const
-{
-    return mFlag;
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
