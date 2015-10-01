@@ -34,6 +34,8 @@ else()
 endif()
 
 option(Chaste_MEMORY_TESTING "Run tests using valgrind for memory testing" OFF)
+set(Chaste_MEMORY_TESTING_OUTPUT_DIR ${Chaste_BINARY_DIR}/memtest)
+file(MAKE_DIRECTORY ${Chaste_MEMORY_TESTING_OUTPUT_DIR})
 if (Chaste_MEMORY_TESTING AND NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
     message(SEND_ERROR "CMAKE_BUILD_TYPE must be \"Debug\" to build Chaste with memory testing (Chaste_MEMORY_TESTING=ON)")
 endif()
@@ -203,12 +205,29 @@ list(APPEND CHASTE_INCLUDES "${PETSC_INCLUDES}")
 
 #Locate MPI 
 set(MPI_CXX_COMPILER ${PETSC_COMPILER})
-set(MPIEXEC ${PETSC_MPIEXEC})
+if (IS_ABSOLUTE ${PETSC_MPIEXEC})
+    set(MPIEXEC ${PETSC_MPIEXEC})
+else()
+    find_program(MPIEXEC ${PETSC_MPIEXEC})
+endif()
 find_package(MPI REQUIRED)
 SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${MPI_CXX_COMPILE_FLAGS}" )
 SET( CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} ${MPI_C_COMPILE_FLAGS}" )
 SET( CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} ${MPI_CXX_LINK_FLAGS}" )
 list(APPEND CHASTE_INCLUDES "${MPI_CXX_INCLUDE_PATH}")
+
+if (Chaste_MEMORY_TESTING)
+    get_filename_component(openmpi_supp_path ${MPIEXEC} DIRECTORY)
+    get_filename_component(openmpi_supp_path ${openmpi_supp_path} DIRECTORY)
+    set(openmpi_supp_path "${openmpi_supp_path}/share/openmpi/openmpi-valgrind.supp")
+    set(Chaste_MEMORY_TESTING_SUPPS "--suppressions=${Chaste_SOURCE_DIR}/chaste.supp"
+                                    "--suppressions=${Chaste_SOURCE_DIR}/chaste-lucid.supp")
+    if (EXISTS ${openmpi_supp_path})
+        list(APPEND Chaste_MEMORY_TESTING_SUPPS "--suppressions=${openmpi_supp_path}")
+    endif()
+endif()
+
+
 
 #find ParMETIS and METIS
 if (Chaste_USE_PETSC_PARMETIS)
@@ -430,6 +449,19 @@ if (Chaste_COVERAGE)
     setup_target_for_coverage(coverage "${Chaste_SOURCE_DIR}/cmake/coverage_script.sh" coverage)
 endif()
 
+####################
+#  MEMORY TESTING  #
+####################
+
+if (Chaste_MEMORY_TESTING)
+    set(CTEST_COMMAND ctest)
+    add_custom_target(memtest
+        COMMAND ${CTEST_COMMAND} "-L" Continuous 
+        COMMAND ${PYTHON_EXECUTABLE} "${Chaste_SOURCE_DIR}/cmake/process_valgrind_output.py" "${Chaste_MEMORY_TESTING_OUTPUT_DIR}" > "${Chaste_MEMORY_TESTING_OUTPUT_DIR}/index.html"
+        WORKING_DIRECTORY ${Chaste_BINARY_DIR}
+        VERBATIM
+        )
+endif()
 
 ####################
 #    PACKAGING     #

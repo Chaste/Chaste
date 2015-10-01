@@ -149,23 +149,19 @@
    writev(vector[...])
    fun:writev
    ...
-   obj:*/libmpi.so*
-   fun:PMPI_Init
+   obj:*/lib*mpi*.so*
+   fun:PMPI_Init*
    fun:*PetscInitialize*
+   ...
    fun:_ZN10PetscSetup10setUpWorldEv
-   fun:_ZN7CxxTest20RealWorldDescription5setUpEv
-   fun:_ZN7CxxTest10TestRunner8runWorldEv
-   fun:_ZN7CxxTest10TestRunner11runAllTestsERNS_12TestListenerE
-   fun:_ZN7CxxTest14ErrorFormatter3runEv
-   fun:main
 }
 {
    mpi_init (malloc)
    Memcheck:Leak
    fun:malloc
    ...
-   obj:*/libmpi.so*
-   fun:PMPI_Init
+   obj:*/lib*mpi*.so*
+   fun:PMPI_Init*
    fun:*PetscInitialize*
 # Oneiric doesn't have the line above
 #  fun:_ZN10PetscSetup10setUpWorldEv
@@ -175,8 +171,8 @@
    Memcheck:Leak
    fun:realloc
    ...
-   obj:*/libmpi.so*
-   fun:PMPI_Init
+   obj:*/lib*mpi*.so*
+   fun:PMPI_Init*
    fun:*PetscInitialize*
 }
 {
@@ -193,8 +189,8 @@
    Memcheck:Param
    sched_setaffinity(mask)
    ...
-   obj:*/libmpi.so*
-   fun:PMPI_Init
+   obj:*/lib*mpi*.so*
+   fun:PMPI_Init*
    fun:*PetscInitialize*
 }
 
@@ -203,7 +199,7 @@
    Memcheck:Leak
    fun:malloc
    ...
-   obj:*/libmpi.so*
+   obj:*/lib*mpi*.so*
    ...
 #  fun:PMPI_Finalize
    fun:*PetscFinalize*
@@ -220,8 +216,8 @@
    obj:*/libopen-pal*
    ...
    fun:orte_init
-   obj:*/libmpi.so*
-   fun:PMPI_Init
+   obj:*/lib*mpi*.so*
+   fun:PMPI_Init*
    fun:*PetscInitialize*
 }
 
@@ -232,8 +228,8 @@
    fun:orte_session_dir
    ...
    fun:orte_init
-   obj:*/libmpi.so*
-   fun:PMPI_Init
+   obj:*/lib*mpi*.so*
+   fun:PMPI_Init*
    fun:*PetscInitialize*
 }
 

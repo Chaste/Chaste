@@ -20,6 +20,7 @@ macro(HEADER_DIRS base_dir return_list)
     set(${return_list} ${dir_list})
 endmacro()
 
+
 macro(CHASTE_DO_CELLML output_sources cellml_file dynamic)
     get_filename_component(cellml_file_name ${cellml_file} NAME_WE)
     get_filename_component(cellml_dir ${cellml_file} DIRECTORY)
@@ -94,11 +95,14 @@ endmacro()
 
         if (Chaste_MEMORY_TESTING)
             add_test(NAME ${_testTargetName} WORKING_DIRECTORY "${Chaste_SOURCE_DIR}/" 
-                COMMAND ${VALGRIND_COMMAND}  --tool=memcheck --xml=yes --xml-file=test_summary/${_testname}_valgrind.xml --gen-suppressions=all
-                                            --track-fds=yes --leak-check=yes --num-callers=50 --suppressions=chaste.supp
+                COMMAND ${VALGRIND_COMMAND} --tool=memcheck --log-file=${Chaste_MEMORY_TESTING_OUTPUT_DIR}/${_testname}_valgrind.out 
+                --track-fds=yes --leak-check=yes --num-callers=50 ${Chaste_MEMORY_TESTING_SUPPS} 
+                --gen-suppressions=all
                                             $<TARGET_FILE:${exeTargetName}> 
-                                            -malloc_debug -malloc_dump -memory_info)
-            set_property(TEST ${testTargetName} PROPERTY PROCESSORS 1)
+                                            -malloc_debug -malloc_dump -memory_info
+                )
+            
+            set_property(TEST ${_testTargetName} PROPERTY PROCESSORS 1)
         else()
             if(${parallel} OR NOT (${Chaste_NUM_CPUS_TEST} EQUAL 1))
                 #Note: "${MPIEXEC} /np 1 master : subordinate" means that we run one master process and n subordinate processes
