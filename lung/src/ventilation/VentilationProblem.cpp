@@ -385,11 +385,7 @@ double VentilationProblem::CalculateResistance(Element<1,3>& rElement, bool useP
         // Pedley's method will only increase the resistance
         if (z > 1.0)
         {
-///\todo #2300 A small reduction in density (1.51 -> 1.15) has stopped unit test from triggering
-/// Pedley correction.
-#define COVERAGE_IGNORE            
             resistance *= z;
-#undef COVERAGE_IGNORE
         }
     }
     return resistance;

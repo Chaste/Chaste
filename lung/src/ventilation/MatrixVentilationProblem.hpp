@@ -116,13 +116,6 @@ public:
      */
     void SetOutflowPressure(double pressure);
 
-    /**
-     * Sets the flux at each inflow/leaf-edge of the tree
-     * Flux is "volumetric flow rate"
-     * @param flux  The flux value in (m^3)/s
-     */
-    void SetOutflowFlux(double flux);
-
     /** Sets the pressure at each inflow/leaf of the tree
      * @param pressure  The pressure value in Pascals
      */
@@ -209,7 +202,7 @@ public:
      *  @param rDirName A directory name relative to CHASTE_TEST_OUTPUT.
      *  @param rFileBaseName The base name of the new VTK file.
      */
-    void Solve(TimeStepper& rTimeStepper, void (*pBoundaryConditionFunction)(MatrixVentilationProblem*, double, const Node<3>&), const std::string& rDirName, const std::string& rFileBaseName);
+    void Solve(TimeStepper& rTimeStepper, void (*pBoundaryConditionFunction)(MatrixVentilationProblem*, TimeStepper& rTimeStepper, const Node<3>&), const std::string& rDirName, const std::string& rFileBaseName);
 
     /**
      * Read a problem definition from a file and use then solve that problem

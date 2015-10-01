@@ -36,7 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef VENTILATIONPROBLEM_HPP_
 #define VENTILATIONPROBLEM_HPP_
 
-#include <map>
 #include "AbstractVentilationProblem.hpp"
 #include "LinearSystem.hpp"
 #include "TimeStepper.hpp"
@@ -67,7 +66,7 @@ private:
     /**< Used to hold the pressure solution (and outlet boundary pressure) in node index ordering). */
     std::vector<double> mPressure;
 
-    /**< Pressure boundary conditions at terminal nodes. \todo This could be a vector and/or share a map with the acinar units. */
+    /**< Pressure boundary conditions at terminal nodes.*/
     std::map<unsigned, double> mPressureCondition;
 
     /**< Used to switch solution methods.  If the flux is given at the boundary then the entire system can be solved directly by back substitution. */
@@ -220,7 +219,7 @@ public:
 
     /** Sets the flux at each inflow/leaf-edge of the tree
      * Flux is "volumetric flow rate"
-     * @param flux  The flux value in (mm^3)/s
+     * @param flux  The flux value in (m^3)/s
      */
     void SetConstantInflowFluxes(double flux);
 
@@ -257,7 +256,7 @@ public:
      * time unless overwritten.
      *
      * @param rNode The node to set the boundary condition for
-     * @param flux The flux boundary condition in (mm^3)/s
+     * @param flux The flux boundary condition in (m^3)/s
      */
     void SetFluxAtBoundaryNode(const Node<3>& rNode, double flux);
 

@@ -78,10 +78,6 @@ MatrixVentilationProblem::~MatrixVentilationProblem()
     {
         PetscTools::Destroy(mSolution);
     }
-//    for (unsigned i=0; i<mAcinarUnits.size(); i++)
-//    {
-//        delete mAcinarUnits[i];
-//    }
 }
 
 void MatrixVentilationProblem::SetMeshInMilliMetres()
@@ -100,11 +96,6 @@ void MatrixVentilationProblem::SetMeshInMilliMetres()
 void MatrixVentilationProblem::SetOutflowPressure(double pressure)
 {
     SetPressureAtBoundaryNode(*(mMesh.GetNode(mOutletNodeIndex)), pressure);
-}
-
-void MatrixVentilationProblem::SetOutflowFlux(double flux)
-{
-    SetFluxAtBoundaryNode(*(mMesh.GetNode(mOutletNodeIndex)), flux);
 }
 
 void MatrixVentilationProblem::SetConstantInflowPressures(double pressure)
@@ -395,7 +386,7 @@ void MatrixVentilationProblem::AddDataToVtk(VtkMeshWriter<1, 3>& rVtkWriter,
 
 
 void MatrixVentilationProblem::Solve(TimeStepper& rTimeStepper,
-        void (*pBoundaryConditionFunction)(MatrixVentilationProblem*, double, const Node<3>&),
+        void (*pBoundaryConditionFunction)(MatrixVentilationProblem*, TimeStepper& rTimeStepper, const Node<3>&),
         const std::string& rDirName, const std::string& rFileBaseName)
 {
 #ifdef CHASTE_VTK
@@ -421,7 +412,7 @@ void MatrixVentilationProblem::Solve(TimeStepper& rTimeStepper,
             if ((*iter)->GetIndex() != mOutletNodeIndex)
             {
                 //Boundary conditions at each boundary/leaf node
-                pBoundaryConditionFunction(this, rTimeStepper.GetTime(), *(*iter));
+                pBoundaryConditionFunction(this, rTimeStepper, *(*iter));
             }
         }
 

@@ -39,14 +39,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 #include <queue>
 
-#include "AbstractAcinarUnitFactory.hpp"
 #include "TetrahedralMesh.hpp"
 #include "TrianglesMeshReader.hpp"
 #include "LinearSystem.hpp"
 #include "PetscSetupAndFinalize.hpp"
 #include "VentilationProblem.hpp"
 
-#include "Debug.hpp"
 
 // Pressures read from file.  Pressures labelled P10, P20, P21, P30, P31, P32, P33 map to the mesh
 // nodes 1, 2, 3, 4, 5, 6, 7 (respectively).

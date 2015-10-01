@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef _TESTMatrixVentilationProblem_HPP_
-#define _TESTMatrixVentilationProblem_HPP_
+#ifndef _TESTMATRIXVENTILATIONPROBLEM_HPP_
+#define _TESTMATRIXVENTILATIONPROBLEM_HPP_
 
 #include <cxxtest/TestSuite.h>
 #include <queue>
@@ -55,23 +55,27 @@ std::vector<double> pressureAt5;
 std::vector<double> pressureAt6;
 std::vector<double> pressureAt7;
 
-void LinearTimeBCs(MatrixVentilationProblem* pProblem, double time, const Node<3>& rNode)
+void LinearTimeBCs(MatrixVentilationProblem* pProblem, TimeStepper& rTimeStepper, const Node<3>& rNode)
 {
+    double time = rTimeStepper.GetTime();
     pProblem->SetPressureAtBoundaryNode(rNode, 15*time);
 }
 
-void SineBCs(MatrixVentilationProblem* pProblem, double time, const Node<3>& rNode)
+void SineBCs(MatrixVentilationProblem* pProblem, TimeStepper& rTimeStepper, const Node<3>& rNode)
 {
+    double time = rTimeStepper.GetTime();
     pProblem->SetPressureAtBoundaryNode(rNode, 15.0*sin(time*5.0/(2.0*M_PI)));
 }
 
-void FileBCs(MatrixVentilationProblem* pProblem, double time, const Node<3>& rNode)
+void FileBCs(MatrixVentilationProblem* pProblem, TimeStepper& rTimeStepper, const Node<3>& rNode)
 {
+    double time = rTimeStepper.GetTime();
+
     unsigned timestep= (unsigned) floor(time*100.0+0.5);
     pProblem->SetPressureAtBoundaryNode(rNode, pressureAt7[timestep]);
 }
 
-void GravitationalBCs(MatrixVentilationProblem* pProblem, double time, const Node<3>& rNode)
+void GravitationalBCs(MatrixVentilationProblem* pProblem, TimeStepper& rTimeStepper, const Node<3>& rNode)
 {
     double x_max =  6.0;
     double x_min = -6.0;
@@ -416,23 +420,6 @@ public:
         problem.GetSolutionAsFluxesAndPressures(flux, pressure);
     }
 
-    void TestTopOfAirwaysPatientDataOutflowFlux() throw (Exception)
-    {
-        MatrixVentilationProblem problem("continuum_mechanics/test/data/top_of_tree", 0u);
-        PetscOptionsSetValue("-ksp_monitor", "");
-        problem.SetOutflowFlux(0.001);
-        problem.SetConstantInflowPressures(50.0);
-        //problem.SetConstantInflowFluxes(100.0);
-        TetrahedralMesh<1, 3>& r_mesh=problem.rGetMesh();
-        TS_ASSERT_EQUALS(r_mesh.GetNumNodes(), 31u);
-        TS_ASSERT_EQUALS(r_mesh.GetNumElements(), 30u);
-        problem.Solve();
-        problem.Solve();
-        // For debugging...
-        std::vector<double> flux, pressure;
-        problem.GetSolutionAsFluxesAndPressures(flux, pressure);
-    }
-
     void OnlyWorksWithUMFPACKTestPatientData() throw (Exception)
     {
         MatrixVentilationProblem problem("notforrelease_lung/test/data/Novartis002", 0u);
@@ -481,4 +468,4 @@ public:
     }
 };
 
-#endif /*_TESTMatrixVentilationProblem_HPP_*/
+#endif /*_TESTMATRIXVENTILATIONPROBLEM_HPP_*/
