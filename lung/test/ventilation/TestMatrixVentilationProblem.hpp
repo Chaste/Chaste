@@ -41,19 +41,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "TetrahedralMesh.hpp"
 #include "TrianglesMeshReader.hpp"
-#include "LinearSystem.hpp"
 #include "PetscSetupAndFinalize.hpp"
 #include "MatrixVentilationProblem.hpp"
 
-// Pressures read from file.  Pressures labelled P10, P20, P21, P30, P31, P32, P33 map to the mesh
-// nodes 1, 2, 3, 4, 5, 6, 7 (respectively).
-std::vector<double> pressureAt1;
-std::vector<double> pressureAt2;
-std::vector<double> pressureAt3;
-std::vector<double> pressureAt4;
-std::vector<double> pressureAt5;
-std::vector<double> pressureAt6;
-std::vector<double> pressureAt7;
+
 
 void LinearTimeBCs(MatrixVentilationProblem* pProblem, TimeStepper& rTimeStepper, const Node<3>& rNode)
 {
@@ -67,13 +58,6 @@ void SineBCs(MatrixVentilationProblem* pProblem, TimeStepper& rTimeStepper, cons
     pProblem->SetPressureAtBoundaryNode(rNode, 15.0*sin(time*5.0/(2.0*M_PI)));
 }
 
-void FileBCs(MatrixVentilationProblem* pProblem, TimeStepper& rTimeStepper, const Node<3>& rNode)
-{
-    double time = rTimeStepper.GetTime();
-
-    unsigned timestep= (unsigned) floor(time*100.0+0.5);
-    pProblem->SetPressureAtBoundaryNode(rNode, pressureAt7[timestep]);
-}
 
 void GravitationalBCs(MatrixVentilationProblem* pProblem, TimeStepper& rTimeStepper, const Node<3>& rNode)
 {
@@ -92,47 +76,6 @@ class TestMatrixVentilationProblem : public CxxTest::TestSuite
 {
 private:
 
-    void ReadDataFromFile(const std::string& filePath)
-    {
-        pressureAt1.clear();
-        pressureAt2.clear();
-        pressureAt3.clear();
-        pressureAt4.clear();
-        pressureAt5.clear();
-        pressureAt6.clear();
-        pressureAt7.clear();
-        std::ifstream filestream(filePath.c_str());
-        TS_ASSERT(filestream.is_open());
-        //Skip header line
-        std::string line;
-        getline(filestream, line);
-        while (filestream.good())
-        {
-            double data;
-            filestream >> data; //Time
-            if (filestream.eof())
-            {
-                break;
-            }
-            filestream >> data; //Pressure at root
-            TS_ASSERT_DELTA(data, 0.0, 1e-15);
-            filestream >> data;
-            pressureAt1.push_back(data);
-            filestream >> data;
-            pressureAt2.push_back(data);
-            filestream >> data;
-            pressureAt3.push_back(data);
-            filestream >> data;
-            pressureAt4.push_back(data);
-            filestream >> data;
-            pressureAt5.push_back(data);
-            filestream >> data;
-            pressureAt6.push_back(data);
-            filestream >> data;
-            pressureAt7.push_back(data);
-        }
-        filestream.close();
-    }
 public:
     void TestMatrixVentilationProblemOnBranch() throw(Exception)
     {
@@ -188,7 +131,7 @@ public:
 
     void TestThreeBifurcationsWithRadiusOnEdgeFile() throw (Exception)
     {
-        MatrixVentilationProblem problem("continuum_mechanics/test/data/three_bifurcations", 0u);
+        MatrixVentilationProblem problem("lung/test/data/three_bifurcations", 0u);
         problem.SetMeshInMilliMetres();
         problem.SetRadiusOnEdge();
         problem.SetOutflowPressure(0.0);
@@ -215,7 +158,7 @@ public:
 
     void TestThreeBifurcationsWithRadiusOnNodeFile() throw (Exception)
     {
-        MatrixVentilationProblem problem("continuum_mechanics/test/data/three_bifurcations", 0u);
+        MatrixVentilationProblem problem("lung/test/data/three_bifurcations", 0u);
         problem.SetMeshInMilliMetres();
         problem.SetOutflowPressure(0.0);
         problem.SetConstantInflowPressures(15.0);
@@ -240,7 +183,7 @@ public:
 
     void TestThreeBifurcationsExtraLinkWithRadiusOnNodeFile() throw (Exception)
     {
-        MatrixVentilationProblem problem("continuum_mechanics/test/data/three_bifurcations_extra_links", 0u);
+        MatrixVentilationProblem problem("lung/test/data/three_bifurcations_extra_links", 0u);
         problem.SetMeshInMilliMetres();
         problem.SetOutflowPressure(0.0 + 1.0);
         problem.SetConstantInflowPressures(15.0 + 1.0);
@@ -271,7 +214,7 @@ public:
 
     void TestThreeBifurcationsWithRadiusOnNodeFileFluxBoundaries() throw (Exception)
     {
-        MatrixVentilationProblem problem("continuum_mechanics/test/data/three_bifurcations", 0u);
+        MatrixVentilationProblem problem("lung/test/data/three_bifurcations", 0u);
         problem.SetMeshInMilliMetres();
         problem.SetOutflowPressure(0.0);
         problem.SetConstantInflowFluxes(-7.10176e-11);
@@ -305,7 +248,7 @@ public:
          * There is no coupled acinus compliance model in this version.
          */
         EXIT_IF_PARALLEL; ///\todo #2300 There is a problem with the Windows parallel implementation
-        MatrixVentilationProblem problem("continuum_mechanics/test/data/three_bifurcations", 0u);
+        MatrixVentilationProblem problem("lung/test/data/three_bifurcations", 0u);
         problem.SetMeshInMilliMetres();
         problem.SetOutflowPressure(0.0);
         problem.SetConstantInflowPressures(150000); //Needed to increase the resistance in these artificial airways
@@ -329,7 +272,7 @@ public:
 
     void TestTimeVaryingThreeBifurcations() throw (Exception)
     {
-        MatrixVentilationProblem problem("continuum_mechanics/test/data/three_bifurcations", 0u);
+        MatrixVentilationProblem problem("lung/test/data/three_bifurcations", 0u);
         problem.SetRadiusOnEdge();
         problem.SetOutflowPressure(0.0);
         TimeStepper stepper(0.0, 1.0, 0.1);
@@ -338,16 +281,24 @@ public:
 
     void TestSineThreeBifurcations() throw (Exception)
     {
-        MatrixVentilationProblem problem("continuum_mechanics/test/data/three_bifurcations", 0u);
+        MatrixVentilationProblem problem("lung/test/data/three_bifurcations", 0u);
         problem.SetRadiusOnEdge();
         problem.SetOutflowPressure(0.0);
         TimeStepper stepper(0.0, 25.0, 0.1);
         problem.Solve(stepper, &SineBCs, "TestVentilation", "three_bifurcations_sine");
+        std::vector<double> flux, pressure;
+        problem.GetSolutionAsFluxesAndPressures(flux, pressure); //check pressure at end time @ 25
+        TS_ASSERT_DELTA(pressure[0], 0.0,     1e-8); //BC
+        TS_ASSERT_DELTA(pressure[1], 5.7655,  1e-4);
+        TS_ASSERT_DELTA(pressure[2], 10.5701, 1e-4);
+        TS_ASSERT_DELTA(pressure[3], 10.5701, 1e-4);
+        TS_ASSERT_DELTA(pressure[4], 12.972452, 1e-5); //BC
+        TS_ASSERT_DELTA(pressure[5], 12.972452, 1e-5); //BC
     }
 
     void TestGravitationalVaryingThreeBifurcations() throw (Exception)
     {
-        MatrixVentilationProblem problem("continuum_mechanics/test/data/three_bifurcations", 0u);
+        MatrixVentilationProblem problem("lung/test/data/three_bifurcations", 0u);
         problem.SetRadiusOnEdge();
         problem.SetOutflowPressure(0.0);
         TimeStepper stepper(0.0, 1.0, 0.1);
@@ -366,46 +317,13 @@ public:
      */
     void TestSolveProblemDefinedInFile() throw (Exception)
     {
-        MatrixVentilationProblem problem("continuum_mechanics/test/data/three_bifurcations");
-        problem.SolveProblemFromFile("continuum_mechanics/test/data/ChasteVentilationInput.txt", "VentilationOutput", "3_bifurcations");
+        MatrixVentilationProblem problem("lung/test/data/three_bifurcations");
+        problem.SolveProblemFromFile("lung/test/data/ChasteVentilationInput.txt", "VentilationOutput", "3_bifurcations");
     }
-    void TestReadFile()  throw (Exception)
-    {
-        ReadDataFromFile("continuum_mechanics/test/data/Pdata-Normal.txt");
-        TS_ASSERT_EQUALS(pressureAt1.size(), 2501u);
-        TS_ASSERT_DELTA(pressureAt1[2500], 0.703592, 1e-6);
-        TS_ASSERT_DELTA(pressureAt2[2500], 1.05539, 1e-5);
-        TS_ASSERT_DELTA(pressureAt4[2500], 1.23129, 1e-5);
-    }
-    void TestNormalAgainstFile() throw (Exception)
-    {
-        ReadDataFromFile("continuum_mechanics/test/data/Pdata-Normal.txt");
-        TS_ASSERT_EQUALS(pressureAt1.size(), 2501u);
-        TS_ASSERT_DELTA(pressureAt1[2500], 0.703592, 1e-6);
-        TS_ASSERT_DELTA(pressureAt2[2500], 1.05539, 1e-5);
-        TS_ASSERT_DELTA(pressureAt4[2500], 1.23129, 1e-5);
-        TS_ASSERT_DELTA(pressureAt7[2500], 1.23129, 1e-5);
-        MatrixVentilationProblem problem("continuum_mechanics/test/data/three_bifurcations", 0u);
-        problem.SetRadiusOnEdge();
-        problem.SetOutflowPressure(0.0);
-        TimeStepper stepper(0.0, 25.0, 0.01);
-        problem.Solve(stepper, &FileBCs, "TestVentilation", "three_bifurcations_normal");
-        std::vector<double> flux, pressure;
-        problem.GetSolutionAsFluxesAndPressures(flux, pressure); //check pressure at time @ 25
-        TS_ASSERT_DELTA(pressure[0], 0.0, 1e-8); //BC
-        //Note: the two implementations are using different resistance models, so are not yet the same
-        TS_ASSERT_DELTA(pressure[1], pressureAt1[2500], 0.2); ///\todo #2300
-        TS_ASSERT_DELTA(pressure[2], pressureAt2[2500], 0.1); ///\todo #2300
-        TS_ASSERT_DELTA(pressure[3], pressureAt3[2500], 0.1); ///\todo #2300
-        TS_ASSERT_DELTA(pressure[4], pressureAt4[2500], 1e-8); //BC
-        TS_ASSERT_DELTA(pressure[5], pressureAt5[2500], 1e-8); //BC
-        TS_ASSERT_DELTA(pressure[6], pressureAt6[2500], 1e-8); //BC
-        TS_ASSERT_DELTA(pressure[7], pressureAt7[2500], 1e-8); //BC
-    }
-
+ 
     void TestTopOfAirwaysPatientData() throw (Exception)
     {
-        MatrixVentilationProblem problem("continuum_mechanics/test/data/top_of_tree", 0u);
+        MatrixVentilationProblem problem("lung/test/data/top_of_tree", 0u);
         PetscOptionsSetValue("-ksp_monitor", "");
         problem.SetOutflowPressure(0.0);
         problem.SetConstantInflowPressures(50.0);
@@ -415,15 +333,17 @@ public:
         TS_ASSERT_EQUALS(r_mesh.GetNumElements(), 30u);
         problem.Solve();
         problem.Solve();
-        // For debugging...
+
         std::vector<double> flux, pressure;
         problem.GetSolutionAsFluxesAndPressures(flux, pressure);
+        TS_ASSERT_DELTA(pressure[27], 43.7415, 1e-4);
+        TS_ASSERT_DELTA(pressure[28], 50.0,    1e-4); //BC
     }
 
     ///\todo 2300 small unit test and/or exception
     void TestTopOfAirwaysPatientDataOutflowFlux() throw (Exception)
     {
-        MatrixVentilationProblem problem("continuum_mechanics/test/data/top_of_tree", 0u);
+        MatrixVentilationProblem problem("lung/test/data/top_of_tree", 0u);
         PetscOptionsSetValue("-ksp_monitor", "");
         problem.SetOutflowFlux(0.001);
         problem.SetConstantInflowPressures(50.0);
@@ -477,7 +397,7 @@ public:
         TS_ASSERT_THROWS_THIS(MatrixVentilationProblem bad_problem("mesh/test/data/y_branch_3d_mesh", 1u),
                 "Outlet node is not a boundary node");
 
-        MatrixVentilationProblem problem("continuum_mechanics/test/data/three_bifurcations");
+        MatrixVentilationProblem problem("lung/test/data/three_bifurcations");
         TS_ASSERT_THROWS_THIS(problem.SolveProblemFromFile("DoesNotExist.txt", "out", "out"), "Could not open file DoesNotExist.txt");
 
         TS_ASSERT_THROWS_THIS(problem.SetPressureAtBoundaryNode(3u, 0.0), "Boundary conditions cannot be set at internal nodes");

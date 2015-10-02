@@ -140,7 +140,7 @@ public:
 
     void TestColemanDynamicVentilationThreeBifurcations() throw(Exception)
     {
-        FileFinder mesh_finder("continuum_mechanics/test/data/three_bifurcations", RelativeTo::ChasteSourceRoot);
+        FileFinder mesh_finder("lung/test/data/three_bifurcations", RelativeTo::ChasteSourceRoot);
 
         //The three bifurcation mesh defines a fully symmetric three bifurcation airway tree.
         //The composite ventilation problem is then equivalent to a trumpet problem connected
