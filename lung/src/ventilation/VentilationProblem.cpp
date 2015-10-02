@@ -343,32 +343,6 @@ void VentilationProblem::SetOutflowPressure(double pressure)
     mPressure[mOutletNodeIndex] = pressure;
 }
 
-void VentilationProblem::SetConstantInflowPressures(double pressure)
-{
-    for (AbstractTetrahedralMesh<1,3>::BoundaryNodeIterator iter =mMesh.GetBoundaryNodeIteratorBegin();
-          iter != mMesh.GetBoundaryNodeIteratorEnd();
-          ++iter)
-     {
-         if ((*iter)->GetIndex() != mOutletNodeIndex)
-         {
-             //Boundary conditions at each boundary/leaf node
-             SetPressureAtBoundaryNode(*(*iter), pressure);
-         }
-     }
-}
-
-void VentilationProblem::SetConstantInflowFluxes(double flux)
-{
-    for (AbstractTetrahedralMesh<1,3>::BoundaryNodeIterator iter =mMesh.GetBoundaryNodeIteratorBegin();
-          iter != mMesh.GetBoundaryNodeIteratorEnd();
-          ++iter)
-     {
-         if ((*iter)->GetIndex() != mOutletNodeIndex)
-         {
-             SetFluxAtBoundaryNode(*(*iter), flux);
-         }
-     }
-}
 
 void VentilationProblem::SetPressureAtBoundaryNode(const Node<3>& rNode, double pressure)
 {
@@ -381,15 +355,10 @@ void VentilationProblem::SetPressureAtBoundaryNode(const Node<3>& rNode, double 
     // Store the requirement in a map for the direct solver
     mPressureCondition[rNode.GetIndex()] = pressure;
 }
-
-double VentilationProblem::GetPressureAtBoundaryNode(const Node<3>& rNode)
+void VentilationProblem::SetOutflowFlux(double flux)
 {
-// //This doesn't actually present any problems -- we could call it GetPressureAtNode
-//    if (rNode.IsBoundaryNode() == false)
-//    {
-//        EXCEPTION("Boundary conditions cannot be got at internal nodes");
-//    }
-    return mPressure[rNode.GetIndex()];
+    ///\todo #2300
+    EXCEPTION("This functionality is not implemented yet");
 }
 
 double VentilationProblem::GetFluxAtOutflow()
@@ -435,119 +404,6 @@ void VentilationProblem::GetSolutionAsFluxesAndPressures(std::vector<double>& rF
     rPressuresOnNodes = mPressure;
 }
 
-
-
-#ifdef CHASTE_VTK
-
-void VentilationProblem::WriteVtk(const std::string& rDirName, const std::string& rFileBaseName)
-{
-    VtkMeshWriter<1, 3> vtk_writer(rDirName, rFileBaseName, false);
-    AddDataToVtk(vtk_writer, "");
-    vtk_writer.WriteFilesUsingMesh(mMesh);
-
-}
-
-void VentilationProblem::AddDataToVtk(VtkMeshWriter<1, 3>& rVtkWriter,
-                                      const std::string& rSuffix)
-{
-    std::vector<double> pressures;
-    std::vector<double> fluxes;
-    GetSolutionAsFluxesAndPressures(fluxes, pressures);
-    rVtkWriter.AddCellData("Flux"+rSuffix, fluxes);
-    rVtkWriter.AddPointData("Pressure"+rSuffix, pressures);
-}
-
-#endif // CHASTE_VTK
-
-
-void VentilationProblem::Solve(TimeStepper& rTimeStepper,
-        void (*pBoundaryConditionFunction)(VentilationProblem*, TimeStepper& rTimeStepper, const Node<3>&),
-        const std::string& rDirName, const std::string& rFileBaseName)
-{
-#ifdef CHASTE_VTK
-    VtkMeshWriter<1, 3> vtk_writer(rDirName, rFileBaseName, false);
-#endif
-
-    bool first_step=true;
-    while (!rTimeStepper.IsTimeAtEnd())
-    {
-        if (first_step)
-        {
-            // Do a solve at t=0 before advancing time.
-            first_step = false;
-        }
-        else
-        {
-            rTimeStepper.AdvanceOneTimeStep();
-        }
-        for (AbstractTetrahedralMesh<1,3>::BoundaryNodeIterator iter = mMesh.GetBoundaryNodeIteratorBegin();
-                 iter != mMesh.GetBoundaryNodeIteratorEnd();
-                 ++iter )
-        {
-            if ((*iter)->GetIndex() != mOutletNodeIndex)
-            {
-                //Boundary conditions at each boundary/leaf node
-                pBoundaryConditionFunction(this, rTimeStepper, *(*iter));
-            }
-        }
-
-        // Regular solve
-        Solve();
-
-        std::ostringstream suffix_name;
-        suffix_name <<  "_" << std::setw(6) << std::setfill('0') << rTimeStepper.GetTotalTimeStepsTaken();
-#ifdef CHASTE_VTK
-        AddDataToVtk(vtk_writer, suffix_name.str());
-#endif
-    }
-
-#ifdef CHASTE_VTK
-    vtk_writer.WriteFilesUsingMesh(mMesh);
-#endif
-}
-
-void VentilationProblem::SolveProblemFromFile(const std::string& rInFilePath, const std::string& rOutFileDir, const std::string& rOutFileName)
-{
-    std::ifstream file(FileFinder(rInFilePath).GetAbsolutePath().c_str(), std::ios::binary);
-    if (!file.is_open())
-    {
-        EXCEPTION("Could not open file "+rInFilePath);
-    }
-    std::string key, unit;
-    double value;
-    while (!file.eof())
-    {
-        file >> key >> value >> unit;
-        if (file.fail())
-        {
-            break;
-        }
-        if (key == "RHO_AIR")
-        {
-            SetDensity(value);
-        }
-        else if (key == "MU_AIR")
-        {
-            SetViscosity(value);
-        }
-        else if (key == "PRESSURE_OUT")
-        {
-            SetOutflowPressure(value);
-        }
-        else if (key == "PRESSURE_IN")
-        {
-            SetConstantInflowPressures(value);
-        }
-        else
-        {
-            WARNING("The key "+ key+ " is not recognised yet");
-        }
-    }
-    Solve();
-#ifdef CHASTE_VTK
-    WriteVtk(rOutFileDir, rOutFileName);
-#endif
-}
 
 
 

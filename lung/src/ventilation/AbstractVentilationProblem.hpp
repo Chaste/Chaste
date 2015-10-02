@@ -36,6 +36,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define ABSTRACTVENTILATIONPROBLEM_HPP_
 
 #include "TetrahedralMesh.hpp"
+#include "TimeStepper.hpp"
+#include "VtkMeshWriter.hpp"
 
 /**
  * A class for solving one-dimensional flow in pipe problems on branching trees.
@@ -179,8 +181,93 @@ public:
         mDynamicResistance = dynamicResistance;
     }
 
+    /**
+     * Sets a Dirichlet flux boundary condition for a given node.
+     *
+     * The given boundary condition will be applied at the next time step and persist through
+     * time unless overwritten.
+     *
+     * @param rNode The node to set the boundary condition for
+     * @param flux The flux boundary condition in (m^3)/s
+     */
+    virtual void SetFluxAtBoundaryNode(const Node<3>& rNode, double flux)=0;
+
+    /**
+     * Sets a Dirichlet pressure boundary condition for a given node.
+     *
+     * The given boundary condition will be applied at the next time step and persist through
+     * time unless overwritten.
+     *
+     * @param rNode The node to set the boundary condition for
+     * @param pressure The pressure boundary condition in Pascals
+     */
+    virtual void SetPressureAtBoundaryNode(const Node<3>& rNode, double pressure)=0;
+
+    /** Sets the pressure at each inflow/leaf of the tree
+     * @param pressure  The pressure value in Pascals
+     */
+    void SetConstantInflowPressures(double pressure);
+
+    /** Sets the flux at each inflow/leaf-edge of the tree
+     * Flux is "volumetric flow rate"
+     * @param flux  The flux value in (m^3)/s
+     */
+    void SetConstantInflowFluxes(double flux);
+
+    /** Sets the pressure at the outflow/root of the tree
+     *
+     * @param pressure  The pressure value in Pascals
+     */
+    virtual void SetOutflowPressure(double pressure);
 
 
- };
+    /**
+     * @param rFluxesOnEdges The fluxes ordered by edge index (this vector is resized)
+     * @param rPressuresOnNodes The pressures ordered by node index  (this vector is resized)
+     */
+    virtual void GetSolutionAsFluxesAndPressures(std::vector<double>& rFluxesOnEdges, std::vector<double>& rPressuresOnNodes)=0;
+
+    /**
+     * Read a problem definition from a file and use then solve that problem
+     *
+     * @param rInFilePath  Path to file which contains the problem definition
+     * @param rOutFileDir  Path to folder for output (relative to CHASTE_TEST_OUTPUT)
+     * @param rOutFileName  Name for VTK output
+     */
+    void SolveProblemFromFile(const std::string& rInFilePath, const std::string& rOutFileDir,const std::string& rOutFileName);
+
+    /**
+     *  Solve linear system using
+     *  * flux balance at the nodes
+     *  * Poiseuille flow in the edges
+     *
+     *  Solve the system repeatedly
+     *  @param rTimeStepper  The start, end and time-step
+     *  @param pBoundaryConditionFunction setter
+     *  @param rDirName A directory name relative to CHASTE_TEST_OUTPUT.
+     *  @param rFileBaseName The base name of the new VTK file.
+     */
+    void SolveOverTime(TimeStepper& rTimeStepper, void (*pBoundaryConditionFunction)(AbstractVentilationProblem*, TimeStepper& rTimeStepper, const Node<3>&), const std::string& rDirName, const std::string& rFileBaseName);
+    /**
+     *  Solve the system at one time-point.  (Implementation dependent on the concrete class.)
+     */
+    virtual void Solve()=0;
+
+#ifdef CHASTE_VTK
+    /**
+     * Add flux and pressure data to a VtkMeshWriter.
+     * @param rVtkWriter  the mesh writer ready for the data
+     * @param rSuffix  Suffix with which to annotate e.g. pressure_001
+     */
+    void AddDataToVtk(VtkMeshWriter<1, 3>& rVtkWriter, const std::string& rSuffix);
+
+    /**
+     * Output the solution to a Vtk file
+     * @param rDirName A directory name relative to CHASTE_TEST_OUTPUT.
+     * @param rFileBaseName The base name of the new VTK file.
+     */
+    void WriteVtk(const std::string& rDirName, const std::string& rFileBaseName);
+#endif // CHASTE_VTK
+};
 
 #endif /* ABSTRACTVENTILATIONPROBLEM_HPP_ */

@@ -174,11 +174,12 @@ public:
      * Attempts to read all parameters from a hard-coded file
      * Loads a mesh from file(s)
      * Identifies the outlet node (a.k.a root of tree or the mouth end)
+     *   A check is made that it is a boundary node.
      * Creates a linear system of the appropriate size to match the mesh
      */
     VentilationProblem();
 
-    /** Main constructor
+    /** Constructor
      * Loads a mesh from file(s)
      * Identifies the outlet node (a.k.a root of tree or the mouth end)
      *   A check is made that it is a boundary node.
@@ -199,18 +200,13 @@ public:
      * @param pressure  The pressure value in Pascals
      */
     void SetOutflowPressure(double pressure);
-
-    /** Sets the pressure at each inflow/leaf of the tree
-     * @param pressure  The pressure value in Pascals
-     */
-    void SetConstantInflowPressures(double pressure);
-
-    /** Sets the flux at each inflow/leaf-edge of the tree
+    
+    /**
+     * Sets the flux at outflow/trachea/top of the tree
      * Flux is "volumetric flow rate"
      * @param flux  The flux value in (m^3)/s
      */
-    void SetConstantInflowFluxes(double flux);
-
+    void SetOutflowFlux(double flux);
 
     /**
      * Sets a Dirichlet pressure boundary condition for a given node.
@@ -222,14 +218,6 @@ public:
      * @param pressure The pressure boundary condition in Pascals
      */
     void SetPressureAtBoundaryNode(const Node<3>& rNode, double pressure);
-
-    /**
-     * Gets the most recent pressure at a boundary node
-     *
-     * @param rNode The node to get the pressure for.
-     * @return The pressure at the node.
-     */
-    double GetPressureAtBoundaryNode(const Node<3>& rNode);
 
     /**
      * Gets the most recent flux at the outflow/outlet (mouth)
@@ -249,7 +237,7 @@ public:
     void SetFluxAtBoundaryNode(const Node<3>& rNode, double flux);
 
     /**
-     *  Solve the linear system either
+     *  Solve the system either
      *   * directly from fluxes
      *   * iteratively from pressures
      */
@@ -261,46 +249,6 @@ public:
      * @param rPressuresOnNodes The pressures ordered by node index  (this vector is resized)
      */
     void GetSolutionAsFluxesAndPressures(std::vector<double>& rFluxesOnEdges, std::vector<double>& rPressuresOnNodes);
-
-#ifdef CHASTE_VTK
-
-    /**
-     * Add flux and pressure data to a VtkMeshWriter.
-     * @param rVtkWriter  the mesh writer ready for the data
-     * @param rSuffix  Suffix with which to annotate e.g. pressure_001
-     */
-    void AddDataToVtk(VtkMeshWriter<1, 3>& rVtkWriter, const std::string& rSuffix);
-
-    /**
-     * Output the solution to a Vtk file
-     * @param rDirName A directory name relative to CHASTE_TEST_OUTPUT.
-     * @param rFileBaseName The base name of the new VTK file.
-     */
-    void WriteVtk(const std::string& rDirName, const std::string& rFileBaseName);
-
-#endif // CHASTE_VTK
-
-
-    /** Assemble the linear system by writing in
-     *  * flux balance at the nodes
-     *  * Poiseuille flow in the edges
-     *
-     *  Solve the linear system repeatedly
-     *  @param rTimeStepper  The start, end and time-step
-     *  @param pBoundaryConditionFunction setter
-     *  @param rDirName A directory name relative to CHASTE_TEST_OUTPUT.
-     *  @param rFileBaseName The base name of the new VTK file.
-     */
-    void Solve(TimeStepper& rTimeStepper, void (*pBoundaryConditionFunction)(VentilationProblem*, TimeStepper& rTimeStepper, const Node<3>&), const std::string& rDirName, const std::string& rFileBaseName);
-
-    /**
-     * Read a problem definition from a file and use then solve that problem
-     *
-     * @param rInFilePath  Path to file which contains the problem definition
-     * @param rOutFileDir  Path to folder for output (relative to CHASTE_TEST_OUTPUT)
-     * @param rOutFileName  Name for VTK output
-     */
-    void SolveProblemFromFile(const std::string& rInFilePath, const std::string& rOutFileDir,const std::string& rOutFileName);
 };
 
 #endif /* VENTILATIONPROBLEM_HPP_ */

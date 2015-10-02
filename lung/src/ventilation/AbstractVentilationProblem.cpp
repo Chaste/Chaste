@@ -34,8 +34,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "AbstractVentilationProblem.hpp"
-#include "TrianglesMeshReader.hpp"
 #include "MathsCustomFunctions.hpp"
+#include "Warnings.hpp"
 
 AbstractVentilationProblem::AbstractVentilationProblem(const std::string& rMeshDirFilePath, unsigned rootIndex)
     : mOutletNodeIndex(rootIndex),
@@ -124,3 +124,142 @@ double AbstractVentilationProblem::CalculateResistance(Element<1,3>& rElement, b
     }
     return resistance;
 }
+void AbstractVentilationProblem::SetConstantInflowPressures(double pressure)
+{
+    for (AbstractTetrahedralMesh<1,3>::BoundaryNodeIterator iter =mMesh.GetBoundaryNodeIteratorBegin();
+          iter != mMesh.GetBoundaryNodeIteratorEnd();
+          ++iter)
+     {
+         if ((*iter)->GetIndex() != mOutletNodeIndex)
+         {
+             //Boundary conditions at each boundary/leaf node
+             SetPressureAtBoundaryNode(*(*iter), pressure);
+         }
+     }
+}
+
+void AbstractVentilationProblem::SetConstantInflowFluxes(double flux)
+{
+    for (AbstractTetrahedralMesh<1,3>::BoundaryNodeIterator iter =mMesh.GetBoundaryNodeIteratorBegin();
+          iter != mMesh.GetBoundaryNodeIteratorEnd();
+          ++iter)
+     {
+         if ((*iter)->GetIndex() != mOutletNodeIndex)
+         {
+             SetFluxAtBoundaryNode(*(*iter), flux);
+         }
+     }
+}
+void AbstractVentilationProblem::SetOutflowPressure(double pressure)
+{
+    SetPressureAtBoundaryNode(*(mMesh.GetNode(mOutletNodeIndex)), pressure);
+}
+
+void AbstractVentilationProblem::SolveOverTime(TimeStepper& rTimeStepper,
+        void (*pBoundaryConditionFunction)(AbstractVentilationProblem*, TimeStepper& rTimeStepper, const Node<3>&),
+        const std::string& rDirName, const std::string& rFileBaseName)
+{
+#ifdef CHASTE_VTK
+    VtkMeshWriter<1, 3> vtk_writer(rDirName, rFileBaseName, false);
+#endif
+
+    bool first_step=true;
+    while (!rTimeStepper.IsTimeAtEnd())
+    {
+        if (first_step)
+        {
+            // Do a solve at t=0 before advancing time.
+            first_step = false;
+        }
+        else
+        {
+            rTimeStepper.AdvanceOneTimeStep();
+        }
+        for (AbstractTetrahedralMesh<1,3>::BoundaryNodeIterator iter = mMesh.GetBoundaryNodeIteratorBegin();
+                 iter != mMesh.GetBoundaryNodeIteratorEnd();
+                 ++iter )
+        {
+            if ((*iter)->GetIndex() != mOutletNodeIndex)
+            {
+                //Boundary conditions at each boundary/leaf node
+                pBoundaryConditionFunction(this, rTimeStepper, *(*iter));
+            }
+        }
+
+        // Regular solve
+        Solve();
+
+        std::ostringstream suffix_name;
+        suffix_name <<  "_" << std::setw(6) << std::setfill('0') << rTimeStepper.GetTotalTimeStepsTaken();
+#ifdef CHASTE_VTK
+        AddDataToVtk(vtk_writer, suffix_name.str());
+#endif
+    }
+
+#ifdef CHASTE_VTK
+    vtk_writer.WriteFilesUsingMesh(mMesh);
+#endif
+}
+
+void AbstractVentilationProblem::SolveProblemFromFile(const std::string& rInFilePath, const std::string& rOutFileDir, const std::string& rOutFileName)
+{
+    std::ifstream file(FileFinder(rInFilePath).GetAbsolutePath().c_str(), std::ios::binary);
+    if (!file.is_open())
+    {
+        EXCEPTION("Could not open file "+rInFilePath);
+    }
+    std::string key, unit;
+    double value;
+    while (!file.eof())
+    {
+        file >> key >> value >> unit;
+        if (file.fail())
+        {
+            break;
+        }
+        if (key == "RHO_AIR")
+        {
+            SetDensity(value);
+        }
+        else if (key == "MU_AIR")
+        {
+            SetViscosity(value);
+        }
+        else if (key == "PRESSURE_OUT")
+        {
+            SetOutflowPressure(value);
+        }
+        else if (key == "PRESSURE_IN")
+        {
+            SetConstantInflowPressures(value);
+        }
+        else
+        {
+            WARNING("The key "+ key+ " is not recognised yet");
+        }
+    }
+    Solve();
+#ifdef CHASTE_VTK
+    WriteVtk(rOutFileDir, rOutFileName);
+#endif
+}
+
+#ifdef CHASTE_VTK
+void AbstractVentilationProblem::WriteVtk(const std::string& rDirName, const std::string& rFileBaseName)
+{
+    VtkMeshWriter<1, 3> vtk_writer(rDirName, rFileBaseName, false);
+    AddDataToVtk(vtk_writer, "");
+    vtk_writer.WriteFilesUsingMesh(mMesh);
+
+}
+
+void AbstractVentilationProblem::AddDataToVtk(VtkMeshWriter<1, 3>& rVtkWriter,
+        const std::string& rSuffix)
+{
+    std::vector<double> pressures;
+    std::vector<double> fluxes;
+    GetSolutionAsFluxesAndPressures(fluxes, pressures);
+    rVtkWriter.AddCellData("Flux"+rSuffix, fluxes);
+    rVtkWriter.AddPointData("Pressure"+rSuffix, pressures);
+}
+#endif // CHASTE_VTK

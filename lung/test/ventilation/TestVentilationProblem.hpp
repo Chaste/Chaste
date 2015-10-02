@@ -46,20 +46,20 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 
-void LinearTimeBCs(VentilationProblem* pProblem, TimeStepper& rTimeStepper, const Node<3>& rNode)
+void LinearTimeBCs(AbstractVentilationProblem* pProblem, TimeStepper& rTimeStepper, const Node<3>& rNode)
 {
     double time = rTimeStepper.GetTime();
     pProblem->SetPressureAtBoundaryNode(rNode, 15*time);
 }
 
-void SineBCs(VentilationProblem* pProblem, TimeStepper& rTimeStepper, const Node<3>& rNode)
+void SineBCs(AbstractVentilationProblem* pProblem, TimeStepper& rTimeStepper, const Node<3>& rNode)
 {
     double time = rTimeStepper.GetTime();
     pProblem->SetPressureAtBoundaryNode(rNode, 15.0*sin(time*5.0/(2.0*M_PI)));
 }
 
 
-void GravitationalBCs(VentilationProblem* pProblem, TimeStepper& rTimeStepper, const Node<3>& rNode)
+void GravitationalBCs(AbstractVentilationProblem* pProblem, TimeStepper& rTimeStepper, const Node<3>& rNode)
 {
     double x_max =  6.0;
     double x_min = -6.0;
@@ -155,6 +155,7 @@ public:
         // Total flux
         // TS_ASSERT_DELTA(flux[0], -2.8143e-5, 1e-8); // Mesh in meters
         TS_ASSERT_DELTA(flux[0], -2.8143e-14, 1e-15); //Mesh in millimeters
+		TS_ASSERT_DELTA(problem.GetFluxAtOutflow(), -2.8143e-14, 1e-15);
     }
 
     void TestThreeBifurcationsWithRadiusOnNodeFile() throw (Exception)
@@ -276,7 +277,7 @@ public:
         problem.SetRadiusOnEdge();
         problem.SetOutflowPressure(0.0);
         TimeStepper stepper(0.0, 1.0, 0.1);
-        problem.Solve(stepper, &LinearTimeBCs, "TestVentilation", "three_bifurcations_time");
+        problem.SolveOverTime(stepper, &LinearTimeBCs, "TestVentilation", "three_bifurcations_time");
     }
 
     void TestSineThreeBifurcations() throw (Exception)
@@ -285,7 +286,7 @@ public:
         problem.SetRadiusOnEdge();
         problem.SetOutflowPressure(0.0);
         TimeStepper stepper(0.0, 25.0, 0.1);
-        problem.Solve(stepper, &SineBCs, "TestVentilation", "three_bifurcations_sine");
+        problem.SolveOverTime(stepper, &SineBCs, "TestVentilation", "three_bifurcations_sine");
         std::vector<double> flux, pressure;
         problem.GetSolutionAsFluxesAndPressures(flux, pressure); //check pressure at end time @ 25
         TS_ASSERT_DELTA(pressure[0], 0.0,     1e-8); //BC
@@ -302,7 +303,7 @@ public:
         problem.SetRadiusOnEdge();
         problem.SetOutflowPressure(0.0);
         TimeStepper stepper(0.0, 1.0, 0.1);
-        problem.Solve(stepper, &GravitationalBCs, "TestVentilation", "three_bifurcations_gravity");
+        problem.SolveOverTime(stepper, &GravitationalBCs, "TestVentilation", "three_bifurcations_gravity");
     }
 
     /*
@@ -409,7 +410,8 @@ public:
 
         TS_ASSERT_THROWS_THIS(problem.SetPressureAtBoundaryNode(3u, 0.0), "Boundary conditions cannot be set at internal nodes");
         TS_ASSERT_THROWS_THIS(problem.SetFluxAtBoundaryNode(3u, 0.0), "Boundary conditions cannot be set at internal nodes");
-
+        ///\todo #2300 small unit test for both classes
+        TS_ASSERT_THROWS_THIS(problem.SetOutflowFlux(0.0), "This functionality is not implemented yet");
     }
 };
 
