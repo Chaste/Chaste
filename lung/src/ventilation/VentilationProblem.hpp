@@ -163,18 +163,6 @@ private:
     void SolveIterativelyFromPressure();
 
     /**
-     * Get the resistance of an edge.  This defaults to Poiseuille resistance (in which only the geometry is used.
-     * Otherwise, Pedley's correction is calculated, which requires a flux to be given.
-     *
-     * @param rElement  The edge on which to perform this calculation
-     * @param usePedley  Whether to add Pedley's increasing correction term.  Here the resistance increases
-     * which the sqrt of Reynold's number (dependent on flux).
-     * @param flux  The flux in the edge (used for Pedley correction).
-     * @return the resistance of this element/edge
-     */
-    double CalculateResistance(Element<1,3>& rElement, bool usePedley=false, double flux=DBL_MAX);
-
-    /**
      * Common code from constructors
      *
      * @param rMeshDirFilePath the path and root name of the .node and .edge files for the mesh
