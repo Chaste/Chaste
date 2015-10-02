@@ -459,7 +459,7 @@ if (Chaste_MEMORY_TESTING)
     set(CTEST_COMMAND ctest)
     add_custom_target(memtest
         COMMAND ${CTEST_COMMAND} "-L" Continuous 
-        COMMAND ${PYTHON_EXECUTABLE} "${Chaste_SOURCE_DIR}/cmake/process_valgrind_output.py" "${Chaste_MEMORY_TESTING_OUTPUT_DIR}" > "${Chaste_MEMORY_TESTING_OUTPUT_DIR}/index.html"
+        COMMAND ${PYTHON_EXECUTABLE} "${Chaste_SOURCE_DIR}/cmake/process_valgrind_output.py" "${Chaste_MEMORY_TESTING_OUTPUT_DIR}"
         WORKING_DIRECTORY ${Chaste_BINARY_DIR}
         VERBATIM
         )

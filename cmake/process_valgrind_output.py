@@ -33,6 +33,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os, sys, inspect
 import glob
+import re
 
 class ProcessValgrind:
 
@@ -60,8 +61,6 @@ class ProcessValgrind:
             return 'Test exceeded time limit (RED)'
         else:
             return 'Memory leaks found (RED)'
-
-
 
 
     def EncodeStatus(self, logFile, outputLines=None):
@@ -160,28 +159,19 @@ class ProcessValgrind:
             m = regexp.match(outputLines[lineno])
         return result
 
-    def TestName(self, logFile):
-        """
-        Return the name of the test that generated the test file
-        """
-        import re
-        match = re.match('test_summary/(.*)_valgrind.out',logFile)
-        if match:
-            return match.group(1)
-        else:
-            return 'unknown test name!'
-
-
 if __name__ == "__main__":
     files = glob.glob(sys.argv[1]+'/*_valgrind.out')
+    index_file = open(sys.argv[1]+'/index.html','w')
     procVal = ProcessValgrind()
-    print '<!DOCTYPE html>'
-    print '<html>'
-    print '<body>'
+    index_file.write('<!DOCTYPE html>\n')
+    index_file.write('<html>\n')
+    index_file.write('<body>\n')
     for file in files:
+        filename = os.path.basename(file)
+        testname = re.match('(.*)_valgrind.out',filename).group(1)
         status = procVal.EncodeStatus(open(file,'r'))
-        print '<p> <font color="',procVal.StatusColour(status),'">',procVal.TestName(file),': ',procVal.DisplayStatus(status),'<a href="',file,'">(test output)</a>'
-    print '</body>'
-    print '</html>'
+        index_file.write('<p> <font color="%s">%s: %s <a href="%s">(test output)</a>\n'%(procVal.StatusColour(status),testname,procVal.DisplayStatus(status),filename))
+    index_file.write('</body>\n')
+    index_file.write('</html>\n')
 
 
