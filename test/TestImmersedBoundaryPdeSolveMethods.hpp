@@ -38,7 +38,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellBasedTestSuite.hpp"
 
 // Needed for Immersed Boundary simulations
+#include <complex>
 #include <fftw3.h>
+#include "Timer.hpp"
+
+#include "boost/multi_array.hpp"
 
 // Includes from trunk
 #include "CellsGenerator.hpp"
@@ -192,7 +196,7 @@ public:
 
     }
 
-    void TestUpwindSchemeImplementation() throw(Exception)
+    void xTestUpwindSchemeImplementation() throw(Exception)
     {
         MAKE_PTR(ImmersedBoundarySimulationModifier < 2 > , p_mod);
 
@@ -284,7 +288,7 @@ public:
         }
     }
 
-    void TestFourierTransformMethods() throw(Exception)
+    void xTestFourierTransformMethods() throw(Exception)
     {
         MAKE_PTR(ImmersedBoundarySimulationModifier<2>, p_mod);
 
@@ -415,7 +419,129 @@ public:
         }
     }
 
-    void TestFluidSolve() throw(Exception)
+    void xTestGenerateFftwWisdom() throw(Exception)
+    {
+        /*
+         * This test generates an fftw wisdom file telling fftw how to efficiently compute fourier transforms of a
+         * given size.  We generate wisdom for:
+         *    * 2d forward and backward complex-to-complex transforms (16x16 --> 4096x4096)
+         *    * 3d forward and backward complex-to-complex transforms (16x16x16 --> 256x256x256)
+         *
+         * This test takes a LONG time to run if there is currently no wisdom (around 4 hours).
+         */
+
+        std::string filename = "./projects/ImmersedBoundary/src/fftw.wisdom";
+        int wisdom_flag = fftw_import_wisdom_from_filename(filename.c_str());
+
+        // 1 means it's read correctly, 0 indicates a failure
+        TS_ASSERT_EQUALS(wisdom_flag, 1);
+
+        // Create a 3D array that is 64 x 64 x 64
+        typedef boost::multi_array<std::complex<double>, 2> complex_array_2d;
+        typedef boost::multi_array<std::complex<double>, 3> complex_array_3d;
+
+        // Create 2D wisdom
+        for (unsigned i = 16 ; i < 5000 ; i*=2)
+        {
+            complex_array_2d input(boost::extents[i][i]);
+            complex_array_2d output(boost::extents[i][i]);
+
+            fftw_complex* fftw_input = reinterpret_cast<fftw_complex*>(input.data());
+            fftw_complex* fftw_output = reinterpret_cast<fftw_complex*>(output.data());
+
+            fftw_plan plan_f;
+            plan_f = fftw_plan_dft_2d(i, i, fftw_input, fftw_output, FFTW_FORWARD, FFTW_EXHAUSTIVE);
+
+            fftw_plan plan_b;
+            plan_b = fftw_plan_dft_2d(i, i, fftw_input, fftw_output, FFTW_BACKWARD, FFTW_EXHAUSTIVE);
+
+            PRINT_VARIABLE(i);
+        }
+
+        // Create 3D wisdom
+        for (unsigned i = 16 ; i < 257 ; i*=2)
+        {
+            complex_array_3d input(boost::extents[i][i][i]);
+            complex_array_3d output(boost::extents[i][i][i]);
+
+            fftw_complex* fftw_input = reinterpret_cast<fftw_complex*>(input.data());
+            fftw_complex* fftw_output = reinterpret_cast<fftw_complex*>(output.data());
+
+            fftw_plan plan_f;
+            plan_f = fftw_plan_dft_3d(i, i, i, fftw_input, fftw_output, FFTW_FORWARD, FFTW_EXHAUSTIVE);
+
+            fftw_plan plan_b;
+            plan_b = fftw_plan_dft_3d(i, i, i, fftw_input, fftw_output, FFTW_BACKWARD, FFTW_EXHAUSTIVE);
+
+            PRINT_VARIABLE(i);
+        }
+
+        fftw_export_wisdom_to_filename(filename.c_str());
+    }
+
+    void TestBoostMultiarray() throw(Exception)
+    {
+        std::string filename = "./projects/ImmersedBoundary/src/fftw.wisdom";
+        int wisdom_flag = fftw_import_wisdom_from_filename(filename.c_str());
+
+        // 1 means it's read correctly, 0 indicates a failure
+        TS_ASSERT_EQUALS(wisdom_flag, 1);
+
+        // Create a 3D array that is 64 x 64 x 64
+        typedef boost::multi_array<std::complex<double>, 2> complex_array;
+
+        complex_array input(boost::extents[1024][1024]);
+        complex_array output1(boost::extents[1024][1024]);
+        complex_array output2(boost::extents[1024][1024]);
+
+        for(std::complex<double>* i = input.origin(); i < (input.origin() + input.num_elements()); ++i)
+        {
+            *i = RandomNumberGenerator::Instance()->ranf() + 1i * RandomNumberGenerator::Instance()->ranf();
+        }
+
+        fftw_complex* fftw_input = reinterpret_cast<fftw_complex*>(input.data());
+        fftw_complex* fftw_output1 = reinterpret_cast<fftw_complex*>(output1.data());
+        fftw_complex* fftw_output2 = reinterpret_cast<fftw_complex*>(output2.data());
+
+        Timer timer;
+        timer.Reset();
+
+        fftw_plan plan_1;
+        plan_1 = fftw_plan_dft_2d(1024, 1024, fftw_input, fftw_output1, FFTW_FORWARD, FFTW_EXHAUSTIVE);
+
+        fftw_plan plan_2;
+        plan_2 = fftw_plan_dft_2d(1024, 1024, fftw_input, fftw_output1, FFTW_BACKWARD, FFTW_EXHAUSTIVE);
+
+        double plan_time = timer.GetElapsedTime();
+
+        for (unsigned trial = 0 ; trial < 1 ; trial++)
+        {
+            fftw_execute(plan_1);
+            fftw_execute(plan_2);
+        }
+
+        double fft_time = timer.GetElapsedTime() - plan_time;
+
+        fftw_destroy_plan(plan_1);
+        fftw_destroy_plan(plan_2);
+
+        PRINT_2_VARIABLES(plan_time, fft_time);
+
+//        for (unsigned i = 0 ; i < 64 ; i++)
+//        {
+//            for (unsigned j = 0 ; j < 64 ; j++)
+//            {
+//                for (unsigned k = 0 ; k < 64 ; k++)
+//                {
+//                    TS_ASSERT_DELTA(262144 * input[i][j][k].imag(), output2[i][j][k].imag(), 1e-6);
+//                    TS_ASSERT_DELTA(262144 * input[i][j][k].real(), output2[i][j][k].real(), 1e-6);
+//                }
+//            }
+//        }
+
+    }
+
+    void xTestFluidSolve() throw(Exception)
     {
         // Create a vector of nodes forming a rectangle in (0,1)x(0,1)
         double irrational = 0.01 * sqrt(2); // ensure our point of interest isn't on a gird point

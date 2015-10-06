@@ -33,12 +33,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "ImmersedBoundarySimulationModifier.hpp"
-#include "ImmersedBoundaryCellPopulation.hpp"
+// Chaste includes
 #include "Exception.hpp"
-#include <complex>
-#include <fftw3.h>
+#include "Warnings.hpp"
 #include "Debug.hpp"
+
+// Immersed boundary includes
+#include "ImmersedBoundarySimulationModifier.hpp"
+
 
 template<unsigned DIM>
 ImmersedBoundarySimulationModifier<DIM>::ImmersedBoundarySimulationModifier()
@@ -124,11 +126,60 @@ void ImmersedBoundarySimulationModifier<DIM>::SetupConstantMemberVariables(Abstr
     mGridSpacingY = 1.0 / (double) mNumGridPtsY;
 
     // Set up force grids
+    switch (DIM)
+    {
+        case 2:
+        {
+            mForceGridX = boost_array(boost::extents[mNumGridPtsX][mNumGridPtsY]);
+            mForceGridY = boost_array(boost::extents[mNumGridPtsX][mNumGridPtsY]);
+
+            break;
+        }
+        case 3:
+        {
+            EXCEPTION("Not yet implemented in 3D");
+            break;
+        }
+        default:
+        {
+            NEVER_REACHED;
+        }
+    }
     SetupGrid(mFluidForceGridX);
     SetupGrid(mFluidForceGridY);
 
-    // FFT norm
-    mFftNorm = sqrt((double) mNumGridPtsX * (double) mNumGridPtsY);
+
+    // Set up various FFT variables
+    std::string filename = "./projects/ImmersedBoundary/src/fftw.wisdom";
+    int wisdom_flag = fftw_import_wisdom_from_filename(filename.c_str());
+
+    // 1 means it's read correctly, 0 indicates a failure
+    if (wisdom_flag != 1)
+    {
+        WARNING("FFTW Wisdom not loaded correctly - the FFTW plans could be taking a long time to set up.");
+    }
+
+    switch (DIM)
+    {
+        case 2:
+        {
+            mFftNorm = sqrt((double) mNumGridPtsX * (double) mNumGridPtsY);
+
+            mFftwForwardPlan = fftw_plan_dft_2d(mNumGridPtsX, mNumGridPtsY, mFftwIn, mFftwOut, FFTW_FORWARD, FFTW_EXHAUSTIVE);
+            mFftwInversePlan = fftw_plan_dft_2d(mNumGridPtsX, mNumGridPtsY, mFftwIn, mFftwOut, FFTW_BACKWARD, FFTW_EXHAUSTIVE);
+
+            break;
+        }
+        case 3:
+        {
+            EXCEPTION("Not yet implemented in 3D");
+            break;
+        }
+        default:
+        {
+            NEVER_REACHED;
+        }
+    }
 
     // Create sine variables
     mSinX.resize(mNumGridPtsX);
@@ -156,15 +207,15 @@ void ImmersedBoundarySimulationModifier<DIM>::SetupConstantMemberVariables(Abstr
     mpBoxCollection->SetupLocalBoxesHalfOnly();
     mpBoxCollection->CalculateNodePairs(mpMesh->rGetNodes(), mNodePairs, mNodeNeighbours);
 
-    // Set up threads for fftw
-    int potential_thread_errors = fftw_init_threads();
-
-    if (potential_thread_errors == 0)
-    {
-        EXCEPTION("fftw thread error");
-    }
-
-    fftw_plan_with_nthreads(2);
+//    // Set up threads for fftw
+//    int potential_thread_errors = fftw_init_threads();
+//
+//    if (potential_thread_errors == 0)
+//    {
+//        EXCEPTION("fftw thread error");
+//    }
+//
+//    fftw_plan_with_nthreads(2);
 }
 
 template<unsigned DIM>

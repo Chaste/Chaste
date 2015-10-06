@@ -36,14 +36,24 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef IMMERSEDBOUNDARYSIMULATIONMODIFIER_HPP_
 #define IMMERSEDBOUNDARYSIMULATIONMODIFIER_HPP_
 
-#include "ChasteSerialization.hpp"
-#include "BoxCollection.hpp"
-#include "ImmersedBoundaryMesh.hpp"
-#include "ImmersedBoundaryCellPopulation.hpp"
-#include "AbstractImmersedBoundaryForce.hpp"
-#include <boost/serialization/base_object.hpp>
 
+// Chaste includes
 #include "AbstractCellBasedSimulationModifier.hpp"
+#include "BoxCollection.hpp"
+#include "ChasteSerialization.hpp"
+
+// Immersed boundary includes
+#include "AbstractImmersedBoundaryForce.hpp"
+#include "ImmersedBoundaryCellPopulation.hpp"
+#include "ImmersedBoundaryMesh.hpp"
+
+// Other includes
+#include <complex>
+#include <fftw3.h>
+#include <boost/serialization/base_object.hpp>
+#include <boost/multi_array.hpp>
+
+typedef boost::multi_array<std::complex<double>, 2> boost_array;
 
 /**
  * A modifier class which at each simulation time step implements the immersed boundary algorithm similar to
@@ -123,6 +133,12 @@ private:
     /** Grid to store force x-component propagated to fluid by elastic interactions */
     std::vector<std::vector<double> > mFluidForceGridY;
 
+    /** Array to store force x-component propagated to fluid by elastic interactions */
+    boost_array mForceGridX;
+
+    /** Array to store force y-component propagated to fluid by elastic interactions */
+    boost_array mForceGridY;
+
     /** The fluid Reynolds number */
     double mReynolds;
 
@@ -131,6 +147,18 @@ private:
 
     /** A list of force laws to determine the force applied to each node */
     std::vector<boost::shared_ptr<AbstractImmersedBoundaryForce<DIM> > > mForceCollection;
+
+    /** The fftw plan for a forward transform */
+    fftw_plan mFftwForwardPlan;
+
+    /** The fftw plan for an inverse transform */
+    fftw_plan mFftwInversePlan;
+
+    /** Pointer to fftw input array */
+    fftw_complex* mFftwIn;
+
+    /** Pointer to fftw input array */
+    fftw_complex* mFftwOut;
 
     /**
      * Helper method to calculate elastic forces, propagate these to the fluid grid

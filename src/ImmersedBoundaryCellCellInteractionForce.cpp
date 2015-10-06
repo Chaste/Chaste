@@ -43,7 +43,7 @@ ImmersedBoundaryCellCellInteractionForce<DIM>::ImmersedBoundaryCellCellInteracti
         : AbstractImmersedBoundaryForce<DIM>(),
           mpCellPopulation(&rCellPopulation),
           mpMesh(&(rCellPopulation.rGetMesh())),
-          mSpringConst(1e5),
+          mSpringConst(1e2),
           mRestLength(0.1 * rCellPopulation.GetInteractionDistance())
 {
     /*

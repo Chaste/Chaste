@@ -48,18 +48,26 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
 #include "ImmersedBoundaryMembraneElasticityForce.hpp"
 #include "ImmersedBoundaryCellCellInteractionForce.hpp"
+#include "Timer.hpp"
 
 #include "Debug.hpp"
 
 // Simulation does not run in parallel
 #include "FakePetscSetup.hpp"
 
-class TestShortTwoCellSimulation : public AbstractCellBasedTestSuite
+class TestShortMultiCellSimulation : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestShortTwoCellSim() throw(Exception)
+    void TestShortMultiCellSim() throw(Exception)
     {
+        Timer timer;
+
+        double setup_duration = 0.0;
+        double simulation_duration = 0.0;
+
+        timer.Reset();
+
         /*
          * 1: Num cells
          * 2: Num nodes per cell
@@ -68,15 +76,19 @@ public:
          * 5: Random y-variation
          * 6: Include membrane
          */
-        ImmersedBoundaryPalisadeMeshGenerator gen(2, 64, 0.2, 1.5, 0.0, true);
+        ImmersedBoundaryPalisadeMeshGenerator gen(7, 64, 0.2, 2.5, 0.0, false);
         ImmersedBoundaryMesh<2, 2>* p_mesh = gen.GetMesh();
 
-        p_mesh->SetNumGridPtsXAndY(32);
+        p_mesh->SetNumGridPtsXAndY(64);
 
-        p_mesh->GetElement(0)->SetMembraneSpringConstant(1e6);
-        p_mesh->GetElement(0)->SetMembraneRestLength(0.25 * p_mesh->GetCharacteristicNodeSpacing());
-        p_mesh->GetElement(1)->SetMembraneSpringConstant(5e5);
-        p_mesh->GetElement(1)->SetMembraneRestLength(0.25 * p_mesh->GetCharacteristicNodeSpacing());
+//        p_mesh->GetElement(0)->SetMembraneSpringConstant(1e9);
+//        p_mesh->GetElement(0)->SetMembraneRestLength(0.001 * p_mesh->GetCharacteristicNodeSpacing());
+
+        for (unsigned elem_idx = 0; elem_idx < p_mesh->GetNumElements() ; elem_idx++)
+        {
+            p_mesh->GetElement(elem_idx)->SetMembraneSpringConstant(1e8);
+            p_mesh->GetElement(elem_idx)->SetMembraneRestLength(0.25 * p_mesh->GetCharacteristicNodeSpacing());
+        }
 
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
@@ -100,10 +112,17 @@ public:
 
 
         // Set simulation properties
-        simulator.SetOutputDirectory("TestShortTwoCellSimulation");
-        simulator.SetDt(0.005);
-        simulator.SetSamplingTimestepMultiple(100);
-        simulator.SetEndTime(10.01);
+        simulator.SetOutputDirectory("TestShortMultiCellSimulation");
+        simulator.SetDt(0.0005);
+        simulator.SetSamplingTimestepMultiple(20000);
+        simulator.SetEndTime(10.0);
+
+        setup_duration = timer.GetElapsedTime();
+
         simulator.Solve();
+
+        simulation_duration = timer.GetElapsedTime() - setup_duration;
+
+        PRINT_2_VARIABLES(setup_duration, simulation_duration);
     }
 };
