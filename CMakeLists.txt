@@ -452,6 +452,22 @@ if (Chaste_COVERAGE)
 endif()
 
 ####################
+#     Doxygen      #
+####################
+
+add_custom_target(doxygen
+    COMMAND ${PYTHON_EXECUTABLE} "${Chaste_SOURCE_DIR}/cmake/run-doxygen.py" "${Chaste_SOURCE_DIR}" 
+                                "${Chaste_BINARY_DIR}/doxygen" "${Chaste_REVISION}"
+    WORKING_DIRECTORY ${Chaste_BINARY_DIR}
+    VERBATIM)
+
+add_custom_target(doxygen_coverage
+    COMMAND ${PYTHON_EXECUTABLE} "${Chaste_SOURCE_DIR}/cmake/run-doxygen.py" "${Chaste_SOURCE_DIR}" 
+                                "${Chaste_BINARY_DIR}/doxygen_coverage" "${Chaste_REVISION}" "True"
+    WORKING_DIRECTORY ${Chaste_BINARY_DIR}
+    VERBATIM)
+
+####################
 #  MEMORY TESTING  #
 ####################
 
@@ -461,8 +477,7 @@ if (Chaste_MEMORY_TESTING)
         COMMAND ${CTEST_COMMAND} "-L" Continuous 
         COMMAND ${PYTHON_EXECUTABLE} "${Chaste_SOURCE_DIR}/cmake/process_valgrind_output.py" "${Chaste_MEMORY_TESTING_OUTPUT_DIR}"
         WORKING_DIRECTORY ${Chaste_BINARY_DIR}
-        VERBATIM
-        )
+        VERBATIM)
 endif()
 
 ####################

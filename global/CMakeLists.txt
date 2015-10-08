@@ -49,6 +49,8 @@ else()
     endif()
 endif()
 
+set(Chaste_REVISION ${chaste_revision} CACHE STRING "Current Chaste Git Revision" FORCE)
+
 #The generated timekeeper.cpp code below keeps track of build timestamp.
 #It is built and executed prior to starting a build and prints the timestamp
 #in a given format. This timestamp is used by Version.cpp, which is also auto-generated.
