@@ -459,12 +459,14 @@ add_custom_target(doxygen
     COMMAND ${PYTHON_EXECUTABLE} "${Chaste_SOURCE_DIR}/cmake/run-doxygen.py" "${Chaste_SOURCE_DIR}" 
                                 "${Chaste_BINARY_DIR}/doxygen" "${Chaste_REVISION}"
     WORKING_DIRECTORY ${Chaste_BINARY_DIR}
+    COMMENT "Generating Doxygen documentation"
     VERBATIM)
 
 add_custom_target(doxygen_coverage
     COMMAND ${PYTHON_EXECUTABLE} "${Chaste_SOURCE_DIR}/cmake/run-doxygen.py" "${Chaste_SOURCE_DIR}" 
                                 "${Chaste_BINARY_DIR}/doxygen_coverage" "${Chaste_REVISION}" "True"
     WORKING_DIRECTORY ${Chaste_BINARY_DIR}
+    COMMENT "Checking Doxygen coverage"
     VERBATIM)
 
 ####################
