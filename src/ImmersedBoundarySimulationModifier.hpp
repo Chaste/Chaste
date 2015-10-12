@@ -53,7 +53,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 #include <boost/multi_array.hpp>
 
-typedef boost::multi_array<std::complex<double>, 2> boost_array;
+//typedef boost::multi_array<std::complex<double>, 2> boost_complex_array;
+//typedef boost::multi_array<double, 2> boost_real_array;
 
 /**
  * A modifier class which at each simulation time step implements the immersed boundary algorithm similar to
@@ -105,6 +106,12 @@ private:
 
     /** Normalising constant needed for FFT */
     double mFftNorm;
+//
+//    /** Array of sine values for spectral solution of N-S */
+//    boost_real_array mSineGrid;
+//
+//    /** Array of sine values for spectral solution of N-S */
+//    boost_real_array mSin2Grid;
 
     /** Vector of sin(pi x / Nx) needed for FFT, but constant after grid size is known */
     std::vector<double> mSinX;
@@ -133,11 +140,11 @@ private:
     /** Grid to store force x-component propagated to fluid by elastic interactions */
     std::vector<std::vector<double> > mFluidForceGridY;
 
-    /** Array to store force x-component propagated to fluid by elastic interactions */
-    boost_array mForceGridX;
-
-    /** Array to store force y-component propagated to fluid by elastic interactions */
-    boost_array mForceGridY;
+//    /** Array to store force x-component propagated to fluid by elastic interactions */
+//    boost_real_array mForceGridX;
+//
+//    /** Array to store force y-component propagated to fluid by elastic interactions */
+//    boost_real_array mForceGridY;
 
     /** The fluid Reynolds number */
     double mReynolds;

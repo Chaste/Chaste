@@ -48,7 +48,7 @@ class TestGenerateFftwWisdom : public CxxTest::TestSuite
 {
 public:
 
-    void TestGenerateWisdom() throw(Exception)
+    void TestGenerateC2CWisdom() throw(Exception)
     {
         /*
          * This test generates an fftw wisdom file telling fftw how to efficiently compute fourier transforms of a
@@ -99,6 +99,65 @@ public:
 
             fftw_plan plan_b;
             plan_b = fftw_plan_dft_3d(i, i, i, fftw_input, fftw_output, FFTW_BACKWARD, FFTW_EXHAUSTIVE);
+        }
+
+        fftw_export_wisdom_to_filename(filename.c_str());
+    }
+
+    void TestGenerateR2CWisdom() throw(Exception)
+    {
+        /*
+         * This test generates an fftw wisdom file telling fftw how to efficiently compute fourier transforms of a
+         * given size.  We generate wisdom for:
+         *    * 2d forward R2C and backward C2R transforms (16x16 --> 4096x4096)
+         *    * 3d forward R2C and backward C2R transforms (16x16x16 --> 256x256x256)
+         *
+         * This test takes a LONG time to run if there is currently no wisdom (around 4 hours).
+         */
+
+        std::string filename = "./projects/ImmersedBoundary/src/fftw.wisdom";
+        int wisdom_flag = fftw_import_wisdom_from_filename(filename.c_str());
+
+        // 1 means it's read correctly, 0 indicates a failure
+        TS_ASSERT_EQUALS(wisdom_flag, 1);
+
+        // Create a 3D array that is 64 x 64 x 64
+        typedef boost::multi_array<std::complex<double>, 2> complex_array_2d;
+        typedef boost::multi_array<std::complex<double>, 3> complex_array_3d;
+
+        typedef boost::multi_array<double, 2> real_array_2d;
+        typedef boost::multi_array<double, 3> real_array_3d;
+
+        // Create 2D wisdom
+        for (unsigned i = 16 ; i < 5000 ; i*=2)
+        {
+            real_array_2d input(boost::extents[i][i]);
+            complex_array_2d output(boost::extents[i][(i/2) + 1]);
+
+            double* fftw_input = input.origin();
+            fftw_complex* fftw_output = reinterpret_cast<fftw_complex*>(output.data());
+
+            fftw_plan plan_f;
+            plan_f = fftw_plan_dft_r2c_2d(i, i, fftw_input, fftw_output, FFTW_EXHAUSTIVE);
+
+            fftw_plan plan_b;
+            plan_b = fftw_plan_dft_c2r_2d(i, i, fftw_output, fftw_input, FFTW_EXHAUSTIVE);
+        }
+
+        // Create 3D wisdom
+        for (unsigned i = 16 ; i < 257 ; i*=2)
+        {
+            real_array_3d input(boost::extents[i][i][i]);
+            complex_array_3d output(boost::extents[i][i][(i/2) + 1]);
+
+            double* fftw_input = input.origin();
+            fftw_complex* fftw_output = reinterpret_cast<fftw_complex*>(output.data());
+
+            fftw_plan plan_f;
+            plan_f = fftw_plan_dft_r2c_3d(i, i, i, fftw_input, fftw_output, FFTW_EXHAUSTIVE);
+
+            fftw_plan plan_b;
+            plan_b = fftw_plan_dft_c2r_3d(i, i, i, fftw_output, fftw_input, FFTW_EXHAUSTIVE);
         }
 
         fftw_export_wisdom_to_filename(filename.c_str());

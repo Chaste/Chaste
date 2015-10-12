@@ -42,6 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fftw3.h>
 #include "Timer.hpp"
 
+#define BOOST_DISABLE_ASSERTS
 #include "boost/multi_array.hpp"
 
 // Includes from trunk
@@ -419,66 +420,6 @@ public:
         }
     }
 
-    void xTestGenerateFftwWisdom() throw(Exception)
-    {
-        /*
-         * This test generates an fftw wisdom file telling fftw how to efficiently compute fourier transforms of a
-         * given size.  We generate wisdom for:
-         *    * 2d forward and backward complex-to-complex transforms (16x16 --> 4096x4096)
-         *    * 3d forward and backward complex-to-complex transforms (16x16x16 --> 256x256x256)
-         *
-         * This test takes a LONG time to run if there is currently no wisdom (around 4 hours).
-         */
-
-        std::string filename = "./projects/ImmersedBoundary/src/fftw.wisdom";
-        int wisdom_flag = fftw_import_wisdom_from_filename(filename.c_str());
-
-        // 1 means it's read correctly, 0 indicates a failure
-        TS_ASSERT_EQUALS(wisdom_flag, 1);
-
-        // Create a 3D array that is 64 x 64 x 64
-        typedef boost::multi_array<std::complex<double>, 2> complex_array_2d;
-        typedef boost::multi_array<std::complex<double>, 3> complex_array_3d;
-
-        // Create 2D wisdom
-        for (unsigned i = 16 ; i < 5000 ; i*=2)
-        {
-            complex_array_2d input(boost::extents[i][i]);
-            complex_array_2d output(boost::extents[i][i]);
-
-            fftw_complex* fftw_input = reinterpret_cast<fftw_complex*>(input.data());
-            fftw_complex* fftw_output = reinterpret_cast<fftw_complex*>(output.data());
-
-            fftw_plan plan_f;
-            plan_f = fftw_plan_dft_2d(i, i, fftw_input, fftw_output, FFTW_FORWARD, FFTW_EXHAUSTIVE);
-
-            fftw_plan plan_b;
-            plan_b = fftw_plan_dft_2d(i, i, fftw_input, fftw_output, FFTW_BACKWARD, FFTW_EXHAUSTIVE);
-
-            PRINT_VARIABLE(i);
-        }
-
-        // Create 3D wisdom
-        for (unsigned i = 16 ; i < 257 ; i*=2)
-        {
-            complex_array_3d input(boost::extents[i][i][i]);
-            complex_array_3d output(boost::extents[i][i][i]);
-
-            fftw_complex* fftw_input = reinterpret_cast<fftw_complex*>(input.data());
-            fftw_complex* fftw_output = reinterpret_cast<fftw_complex*>(output.data());
-
-            fftw_plan plan_f;
-            plan_f = fftw_plan_dft_3d(i, i, i, fftw_input, fftw_output, FFTW_FORWARD, FFTW_EXHAUSTIVE);
-
-            fftw_plan plan_b;
-            plan_b = fftw_plan_dft_3d(i, i, i, fftw_input, fftw_output, FFTW_BACKWARD, FFTW_EXHAUSTIVE);
-
-            PRINT_VARIABLE(i);
-        }
-
-        fftw_export_wisdom_to_filename(filename.c_str());
-    }
-
     void TestBoostMultiarray() throw(Exception)
     {
         std::string filename = "./projects/ImmersedBoundary/src/fftw.wisdom";
@@ -489,55 +430,56 @@ public:
 
         // Create a 3D array that is 64 x 64 x 64
         typedef boost::multi_array<std::complex<double>, 2> complex_array;
+        typedef boost::multi_array<double, 2> real_array;
 
-        complex_array input(boost::extents[1024][1024]);
-        complex_array output1(boost::extents[1024][1024]);
-        complex_array output2(boost::extents[1024][1024]);
+        complex_array complex_input(boost::extents[4096][4096]);
+        complex_array complex_output_1(boost::extents[4096][4096]);
+        complex_array complex_output_2(boost::extents[4096][4096]);
+        real_array real_input(boost::extents[4096][4096]);
 
-        for(std::complex<double>* i = input.origin(); i < (input.origin() + input.num_elements()); ++i)
+
+        std::complex<double>* c_it = complex_input.origin();
+        double*               r_it = real_input.origin();
+        for( ; c_it < (complex_input.origin() + complex_input.num_elements()) ; ++c_it, ++r_it)
         {
-            *i = RandomNumberGenerator::Instance()->ranf() + 1i * RandomNumberGenerator::Instance()->ranf();
+            *c_it = RandomNumberGenerator::Instance()->ranf() + 1i * RandomNumberGenerator::Instance()->ranf();
+            *r_it = RandomNumberGenerator::Instance()->ranf();
         }
-
-        fftw_complex* fftw_input = reinterpret_cast<fftw_complex*>(input.data());
-        fftw_complex* fftw_output1 = reinterpret_cast<fftw_complex*>(output1.data());
-        fftw_complex* fftw_output2 = reinterpret_cast<fftw_complex*>(output2.data());
 
         Timer timer;
         timer.Reset();
 
-        fftw_plan plan_1;
-        plan_1 = fftw_plan_dft_2d(1024, 1024, fftw_input, fftw_output1, FFTW_FORWARD, FFTW_EXHAUSTIVE);
-
-        fftw_plan plan_2;
-        plan_2 = fftw_plan_dft_2d(1024, 1024, fftw_input, fftw_output1, FFTW_BACKWARD, FFTW_EXHAUSTIVE);
-
-        double plan_time = timer.GetElapsedTime();
-
-        for (unsigned trial = 0 ; trial < 1 ; trial++)
+        c_it = complex_input.origin();
+        r_it = real_input.origin();
+        std::complex<double>* out_it = complex_output_1.origin();
+        for( ; out_it < (complex_output_1.origin() + complex_output_1.num_elements()) ; ++c_it, ++r_it, ++out_it)
         {
-            fftw_execute(plan_1);
-            fftw_execute(plan_2);
+            *out_it = (*r_it) * (*c_it);
         }
 
-        double fft_time = timer.GetElapsedTime() - plan_time;
+        double it_time = timer.GetElapsedTime();
 
-        fftw_destroy_plan(plan_1);
-        fftw_destroy_plan(plan_2);
+        for (unsigned i=0 ; i < 4096 ; i++)
+        {
+            for (unsigned j=0 ; j < 4096 ; j++)
+            {
+                complex_output_2[i][j] = real_input[i][j] * complex_input[i][j];
+            }
+        }
 
-        PRINT_2_VARIABLES(plan_time, fft_time);
+        double loop_time = timer.GetElapsedTime() - it_time;
 
-//        for (unsigned i = 0 ; i < 64 ; i++)
-//        {
-//            for (unsigned j = 0 ; j < 64 ; j++)
-//            {
-//                for (unsigned k = 0 ; k < 64 ; k++)
-//                {
-//                    TS_ASSERT_DELTA(262144 * input[i][j][k].imag(), output2[i][j][k].imag(), 1e-6);
-//                    TS_ASSERT_DELTA(262144 * input[i][j][k].real(), output2[i][j][k].real(), 1e-6);
-//                }
-//            }
-//        }
+
+        for (unsigned i=0 ; i < 4096 ; i++)
+        {
+            for (unsigned j=0 ; j < 4096 ; j++)
+            {
+                TS_ASSERT_DELTA(complex_output_1[i][j].real(), complex_output_2[i][j].real(),  1e-10);
+                TS_ASSERT_DELTA(complex_output_1[i][j].imag(), complex_output_2[i][j].imag(),  1e-10);
+            }
+        }
+
+        PRINT_2_VARIABLES(it_time, loop_time);
 
     }
 
