@@ -36,6 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef VENTILATIONPROBLEM_HPP_
 #define VENTILATIONPROBLEM_HPP_
 
+#include <map> 
 #include "AbstractVentilationProblem.hpp"
 #include "LinearSystem.hpp"
 #include "TimeStepper.hpp"
