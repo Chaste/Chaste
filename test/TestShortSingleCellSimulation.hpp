@@ -84,7 +84,7 @@ public:
         std::vector<ImmersedBoundaryElement<2,2>* > elements;
         elements.push_back(new ImmersedBoundaryElement<2,2>(0, nodes));
 
-        ImmersedBoundaryMesh<2,2> mesh(nodes, elements, 64, 64);
+        ImmersedBoundaryMesh<2,2> mesh(nodes, elements, 2048, 2048);
 
         mesh.GetElement(0)->SetMembraneSpringConstant(1e7);
         mesh.GetElement(0)->SetMembraneRestLength(0.25 * mesh.GetCharacteristicNodeSpacing());
@@ -109,9 +109,9 @@ public:
 
         // Set simulation properties
         simulator.SetOutputDirectory("TestShortSingleCellSimulation");
-        simulator.SetDt(0.005);
-        simulator.SetSamplingTimestepMultiple(100);
-        simulator.SetEndTime(10.0);
+        simulator.SetDt(0.05);
+        simulator.SetSamplingTimestepMultiple(1);
+        simulator.SetEndTime(0.1);
         simulator.Solve();
     }
 };

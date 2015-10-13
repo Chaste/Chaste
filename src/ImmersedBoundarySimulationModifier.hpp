@@ -134,17 +134,17 @@ private:
     /** A map between node indices and a set of their possible neighbours, used calculating cell-cell interactions */
     std::map<unsigned, std::set<unsigned> > mNodeNeighbours;
 
+    /** Grid to store force propagated to fluid by elastic interactions, in 2D simulations */
+    multi_array<double, 3> m2dForceGrids;
+
+    /** Grid to store force propagated to fluid by elastic interactions, in 2D simulations */
+    multi_array<double, 4> m3dForceGrids;
+
     /** Grid to store force x-component propagated to fluid by elastic interactions */
     std::vector<std::vector<double> > mFluidForceGridX;
 
     /** Grid to store force x-component propagated to fluid by elastic interactions */
     std::vector<std::vector<double> > mFluidForceGridY;
-
-//    /** Array to store force x-component propagated to fluid by elastic interactions */
-//    boost_real_array mForceGridX;
-//
-//    /** Array to store force y-component propagated to fluid by elastic interactions */
-//    boost_real_array mForceGridY;
 
     /** The fluid Reynolds number */
     double mReynolds;
@@ -245,6 +245,14 @@ private:
      * @param reference to output grid
      */
     void UpwindScheme(const std::vector<std::vector<double> >& in_x, const std::vector<std::vector<double> >& in_y, std::vector<std::vector<double> >& out_x, std::vector<std::vector<double> >& out_y);
+
+    /**
+     * Calculates upwind difference
+     *
+     * @param const reference to input grids
+     * @param reference to output grids
+     */
+    void Upwind2d(const multi_array<double, 3>& input, multi_array<double, 3>& output);
 
     /**
      * Calculates the forward 2D discrete fourier transform of an array of real data

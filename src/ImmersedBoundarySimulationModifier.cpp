@@ -36,9 +36,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ImmersedBoundarySimulationModifier.hpp"
 #include "ImmersedBoundaryCellPopulation.hpp"
 #include "Exception.hpp"
+#include "Warnings.hpp"
 #include <complex>
 #include <fftw3.h>
 #include "Debug.hpp"
+#include "Timer.hpp"
 
 template<unsigned DIM>
 ImmersedBoundarySimulationModifier<DIM>::ImmersedBoundarySimulationModifier()
@@ -127,8 +129,22 @@ void ImmersedBoundarySimulationModifier<DIM>::SetupConstantMemberVariables(Abstr
     SetupGrid(mFluidForceGridX);
     SetupGrid(mFluidForceGridY);
 
-    // FFT norm
-    mFftNorm = sqrt((double) mNumGridPtsX * (double) mNumGridPtsY);
+    // Set up dimension-dependent variables
+    switch (DIM)
+    {
+        case 2:
+            m2dForceGrids.resize(extents[2][mNumGridPtsX][mNumGridPtsY]);
+
+            mFftNorm = sqrt((double) mNumGridPtsX * (double) mNumGridPtsY);
+            break;
+
+        case 3:
+            EXCEPTION("Not implemented yet in 3D");
+            break;
+
+        default:
+            NEVER_REACHED;
+    }
 
     // Create sine variables
     mSinX.resize(mNumGridPtsX);
@@ -156,15 +172,24 @@ void ImmersedBoundarySimulationModifier<DIM>::SetupConstantMemberVariables(Abstr
     mpBoxCollection->SetupLocalBoxesHalfOnly();
     mpBoxCollection->CalculateNodePairs(mpMesh->rGetNodes(), mNodePairs, mNodeNeighbours);
 
-    // Set up threads for fftw
-    int potential_thread_errors = fftw_init_threads();
+    std::string filename = "./projects/ImmersedBoundary/src/fftw.wisdom";
+    int wisdom_flag = fftw_import_wisdom_from_filename(filename.c_str());
 
-    if (potential_thread_errors == 0)
+    // 1 means it's read correctly, 0 indicates a failure
+    if (wisdom_flag != 1)
     {
-        EXCEPTION("fftw thread error");
+        WARNING("FFTW wisdom file not imported correctly; DFT may take much longer than usual.");
     }
 
-    fftw_plan_with_nthreads(2);
+//    // Set up threads for fftw
+//    int potential_thread_errors = fftw_init_threads();
+//
+//    if (potential_thread_errors == 0)
+//    {
+//        EXCEPTION("fftw thread error");
+//    }
+//
+//    fftw_plan_with_nthreads(2);
 }
 
 template<unsigned DIM>
@@ -183,6 +208,21 @@ void ImmersedBoundarySimulationModifier<DIM>::ClearForces()
         {
             mFluidForceGridX[y][x] = 0.0;
             mFluidForceGridY[y][x] = 0.0;
+        }
+    }
+
+    for (unsigned x = 0; x < mNumGridPtsX; x++)
+    {
+        for (unsigned y = 0; y < mNumGridPtsY; y++)
+        {
+            m2dForceGrids[0][x][y] = 0.0;
+        }
+    }
+    for (unsigned x = 0; x < mNumGridPtsX; x++)
+    {
+        for (unsigned y = 0; y < mNumGridPtsY; y++)
+        {
+            m2dForceGrids[1][x][y] = 0.0;
         }
     }
 }
@@ -251,6 +291,9 @@ void ImmersedBoundarySimulationModifier<DIM>::PropagateForcesToFluidGrid()
 
                 mFluidForceGridX[(first_idx_y + y_idx) % mNumGridPtsY][(first_idx_x + x_idx) % mNumGridPtsX] += force_x;
                 mFluidForceGridY[(first_idx_y + y_idx) % mNumGridPtsY][(first_idx_x + x_idx) % mNumGridPtsX] += force_y;
+
+                m2dForceGrids[0][(first_idx_y + y_idx) % mNumGridPtsY][(first_idx_x + x_idx) % mNumGridPtsX] += force_x;
+                m2dForceGrids[1][(first_idx_y + y_idx) % mNumGridPtsY][(first_idx_x + x_idx) % mNumGridPtsX] += force_y;
             }
         }
     }
@@ -265,14 +308,32 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
     const std::vector<std::vector<double> >& VelX = mpMesh->rGetFluidVelocityGridX();
     const std::vector<std::vector<double> >& VelY = mpMesh->rGetFluidVelocityGridY();
 
+    multi_array<double, 3>& vel_grids = mpMesh->rGetModifiable2dVelocityGrids();
+
+    for(unsigned y = 0 ; y < mNumGridPtsY ; y++)
+    {
+        for (unsigned x = 0; x < mNumGridPtsX; x++)
+        {
+            vel_grids[0][x][y] = VelX[y][x];
+            vel_grids[1][x][y] = VelY[y][x];
+        }
+    }
+
     // Create upwind variables
     std::vector<std::vector<double> > Upwind_x;
     std::vector<std::vector<double> > Upwind_y;
+
+    multi_array<double, 3> upwind_grids(extents[2][mNumGridPtsX][mNumGridPtsY]);
+
     UpwindScheme(VelX, VelY, Upwind_x, Upwind_y);
+    Upwind2d(vel_grids, upwind_grids);
 
     // Create RHS of linear system
     std::vector<std::vector<double> > rhsX; SetupGrid(rhsX);
     std::vector<std::vector<double> > rhsY; SetupGrid(rhsY);
+
+    multi_array<double, 3> rhs(extents[2][mNumGridPtsX][mNumGridPtsY]);
+
 
     for(unsigned y = 0 ; y < mNumGridPtsY ; y++)
     {
@@ -282,6 +343,39 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
             rhsY[y][x] = VelY[y][x] + dt * (mFluidForceGridY[y][x] - Upwind_y[y][x]);
         }
     }
+
+    for (unsigned dim = 0 ; dim < 2 ; dim++)
+    {
+        for(unsigned x = 0 ; x < mNumGridPtsX ; x++)
+        {
+            for (unsigned y = 0; y < mNumGridPtsY; y++)
+            {
+                rhs[dim][x][y] = vel_grids[dim][x][y] + dt * (m2dForceGrids[dim][x][y] - upwind_grids[dim][x][y]);
+            }
+        }
+    }
+
+    Timer timer;
+    timer.Reset();
+
+    multi_array<std::complex<double>, 3> vel_hat(extents[2][4096][4096]);
+
+    double init_time = timer.GetElapsedTime();
+
+    for (unsigned dim = 0 ; dim < 2 ; dim++)
+    {
+        for(unsigned x = 0 ; x < 4096 ; x++)
+        {
+            for (unsigned y = 0; y < 4096; y++)
+            {
+                vel_hat[dim][x][y] = 1.0 + mI;
+            }
+        }
+    }
+
+    double assign_time = timer.GetElapsedTime() - init_time;
+
+    PRINT_2_VARIABLES(init_time, assign_time);
 
     // Perform fft on rhsX
     std::vector<std::vector<std::complex<double> > > VelX_hat;
@@ -406,6 +500,52 @@ void ImmersedBoundarySimulationModifier<DIM>::UpwindScheme(const std::vector<std
 }
 
 template<unsigned DIM>
+void ImmersedBoundarySimulationModifier<DIM>::Upwind2d(const multi_array<double, 3>& input, multi_array<double, 3>& output)
+{
+    unsigned prev_x = mNumGridPtsX - 1;
+    unsigned prev_y = mNumGridPtsY - 1;
+
+    unsigned next_x = 1;
+    unsigned next_y = 1;
+
+    for(unsigned x = 0 ; x < mNumGridPtsX ; x++)
+    {
+        for (unsigned y = 0 ; y < mNumGridPtsY ; y++)
+        {
+            // Set values for output from conditional on x grid
+            if(input[0][x][y] > 0)
+            {
+                output[0][x][y] = input[0][x][y] * (input[0][x][y] - input[0][prev_x][y]) / mGridSpacingX;
+                output[1][x][y] = input[0][x][y] * (input[1][x][y] - input[1][prev_x][y]) / mGridSpacingX;
+            }
+            else
+            {
+                output[0][x][y] = input[0][x][y] * (input[0][next_x][y] - input[0][x][y]) / mGridSpacingX;
+                output[1][x][y] = input[0][x][y] * (input[1][next_x][y] - input[1][x][y]) / mGridSpacingX;
+            }
+
+            // Then add values from conditional on y grid
+            if(input[1][x][y] > 0)
+            {
+                output[0][x][y] += input[1][x][y] * (input[0][x][y] - input[0][x][prev_y]) / mGridSpacingY;
+                output[1][x][y] += input[1][x][y] * (input[1][x][y] - input[1][x][prev_y]) / mGridSpacingY;
+            }
+            else
+            {
+                output[0][x][y] += input[1][x][y] * (input[0][x][next_y] - input[0][x][y]) / mGridSpacingY;
+                output[1][x][y] += input[1][x][y] * (input[1][x][next_y] - input[1][x][y]) / mGridSpacingY;
+            }
+
+            prev_y = (prev_y + 1) % mNumGridPtsY;
+            next_y = (next_y + 1) % mNumGridPtsY;
+        }
+
+        prev_x = (prev_x + 1) % mNumGridPtsX;
+        next_x = (next_x + 1) % mNumGridPtsX;
+    }
+}
+
+template<unsigned DIM>
 void ImmersedBoundarySimulationModifier<DIM>::Fft2DForwardRealToComplex(std::vector<std::vector<double> >& input, std::vector<std::vector<std::complex<double> > >& output)
 {
     // Ensure output grid is set up correctly
@@ -520,7 +660,7 @@ void ImmersedBoundarySimulationModifier<DIM>::PrintGrid(const std::vector<std::v
 }
 
 template<unsigned DIM>
-void ImmersedBoundarySimulationModifier<DIM>::PrintGrid(const std::vector<std::vector<std::complex<double>  > >& grid)
+void ImmersedBoundarySimulationModifier<DIM>::PrintGrid(const std::vector<std::vector<std::complex<double> > > & grid)
 {
     for (unsigned y = 0; y < mNumGridPtsY; y++)
     {

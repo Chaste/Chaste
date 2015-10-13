@@ -53,6 +53,7 @@ class ImmersedBoundaryMeshWriter;
 #include "ImmersedBoundaryMeshReader.hpp"
 #include "ImmersedBoundaryMeshWriter.hpp"
 #include "ImmersedBoundaryElement.hpp"
+#include "ImmersedBoundaryArray.hpp"
 
 /**
  * An immersed boundary mesh class, in which elements may contain different numbers of nodes.
@@ -81,6 +82,12 @@ protected:
 
     /** Characteristic node spacing */
     double mCharacteristicNodeSpacing;
+
+    /** 2D grid for fluid x velocity */
+    multi_array<double, 3> m2dVelocityGrids;
+
+    /** 3D grid for fluid x velocity */
+    multi_array<double, 4> m3dVelocityGrids;
 
     /** 2D grid for fluid x velocity */
     std::vector<std::vector<double> > mFluidVelocityGridX;
@@ -269,6 +276,16 @@ public:
     const std::vector<std::vector<double> >& rGetFluidVelocityGridY() const;
 
     /**
+     * @return reference to non-modifiable 2d fluid velocity grids.
+     */
+    const multi_array<double, 3>& rGet2dVelocityGrids() const;
+
+    /**
+     * @return reference to non-modifiable 3d fluid velocity grids.
+     */
+    const multi_array<double, 4>& rGet3dVelocityGrids() const;
+
+    /**
      * @return reference to modifiable fluid x-velocity grid.
      */
     std::vector<std::vector<double> >& rGetModifiableFluidVelocityGridX();
@@ -277,6 +294,16 @@ public:
      * @return reference to modifiable fluid y-velocity grid.
      */
     std::vector<std::vector<double> >& rGetModifiableFluidVelocityGridY();
+
+    /**
+     * @return reference to modifiable 2d fluid velocity grids.
+     */
+    multi_array<double, 3>& rGetModifiable2dVelocityGrids();
+
+    /**
+     * @return reference to modifiable 3d fluid velocity grids.
+     */
+    multi_array<double, 4>& rGetModifiable3dVelocityGrids();
 
     /**
      * @return reference to the vector of nodes

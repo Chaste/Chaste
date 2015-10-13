@@ -37,6 +37,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "RandomNumberGenerator.hpp"
 #include "UblasCustomFunctions.hpp"
 
+#include "Debug.hpp"
+
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryMesh(std::vector<Node<SPACE_DIM>*> nodes,
                                                                    std::vector<ImmersedBoundaryElement<ELEMENT_DIM,SPACE_DIM>*> elements,
@@ -51,6 +53,20 @@ ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryMesh(std::vector<N
     Clear();
 
     this->SetupFluidVelocityGrids();
+
+    switch (SPACE_DIM)
+    {
+        case 2:
+            m2dVelocityGrids.resize(extents[2][mNumGridPtsX][mNumGridPtsY]);
+            break;
+
+        case 3:
+            EXCEPTION("Not implemented yet in 3D");
+            break;
+
+        default:
+            NEVER_REACHED;
+    }
 
     // If the membrane index is UINT_MAX, there is no membrane; if not, there is
     mMeshHasMembrane = mMembraneIndex != UINT_MAX;
@@ -256,9 +272,15 @@ const std::vector<std::vector<double> >& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-std::vector<Node<SPACE_DIM>*>& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::rGetNodes()
+const multi_array<double, 3>& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::rGet2dVelocityGrids() const
 {
-    return AbstractMesh<ELEMENT_DIM, SPACE_DIM>::mNodes;
+    return m2dVelocityGrids;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+const multi_array<double, 4>& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::rGet3dVelocityGrids() const
+{
+    return m3dVelocityGrids;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -271,6 +293,24 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::vector<std::vector<double> >& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::rGetModifiableFluidVelocityGridY()
 {
     return mFluidVelocityGridY;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+multi_array<double, 3>& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::rGetModifiable2dVelocityGrids()
+{
+    return m2dVelocityGrids;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+multi_array<double, 4>& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::rGetModifiable3dVelocityGrids()
+{
+    return m3dVelocityGrids;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+std::vector<Node<SPACE_DIM>*>& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::rGetNodes()
+{
+    return AbstractMesh<ELEMENT_DIM, SPACE_DIM>::mNodes;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
