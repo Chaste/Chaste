@@ -69,7 +69,10 @@ function (petsc_get_version)
 endfunction ()
 
 find_path (PETSC_DIR include/petsc.h
-  HINTS $ENV{PETSC_DIR}
+  HINTS 
+  $ENV{PETSC_DIR}
+  # Homebrew
+  /usr/local/Cellar/petsc/3.3-p5
   PATHS
   # Debian paths
   /usr/lib/petscdir/3.5.1 /usr/lib/petscdir/3.5
@@ -118,7 +121,7 @@ find_package_multipass (PETSc petsc_config_current
   STATES DIR ARCH
   DEPENDENTS INCLUDES LIBRARIES COMPILER MPIEXEC ${petsc_slaves})
 
-if (PETSC_DIR AND PETSC_ARCH)
+if (PETSC_DIR)
     petsc_get_version()
 	#search for config file in ${PETSC_DIR}/${PETSC_ARCH}. if exists use this
 	if (EXISTS "${PETSC_DIR}/${PETSC_ARCH}/PETScConfig.cmake")
@@ -145,8 +148,6 @@ elseif (EXISTS "${PETSC_DIR}/bmake/${PETSC_ARCH}/petscconf.h") # <= 2.3.3
 elseif (PETSC_DIR)
   message (SEND_ERROR "The pair PETSC_DIR=${PETSC_DIR} PETSC_ARCH=${PETSC_ARCH} do not specify a valid PETSc installation")
 endif ()
-
-
 
 
 if (petsc_conf_rules AND petsc_conf_variables AND NOT petsc_config_current)

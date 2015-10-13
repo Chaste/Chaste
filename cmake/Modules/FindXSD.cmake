@@ -27,6 +27,7 @@ IF( XSD_EXECUTABLE )
   FIND_PATH( XSD_INCLUDE_DIR xsd/cxx/version.hxx
       HINTS  "${XSD_ROOT_DIR}/libxsd"
       PATHS /usr/include
+	    /usr/local/opt/libxsd
       )
 
 ENDIF( XSD_EXECUTABLE )
@@ -72,7 +73,7 @@ MACRO( XSD_SCHEMA NAME FILE )
   GET_FILENAME_COMPONENT( xs_FILE "${FILE}" NAME_WE )
   file(RELATIVE_PATH xs_FILE_REL "${CMAKE_SOURCE_DIR}" "${FILE}" )
   set(xs_OUT_TMP "${CMAKE_BINARY_DIR}/${xs_FILE_REL}")
-  GET_FILENAME_COMPONENT( xs_OUT_DIR "${xs_OUT_TMP}" DIRECTORY )
+  GET_FILENAME_COMPONENT( xs_OUT_DIR "${xs_OUT_TMP}" PATH)
   SET( xs_CPP "${xs_OUT_DIR}/${xs_FILE}.cpp" )
   SET( xs_HPP "${xs_OUT_DIR}/${xs_FILE}.hpp" )
   #SET( xs_IPP "${xs_FILE_DIR}/${xs_FILE}.ipp" )

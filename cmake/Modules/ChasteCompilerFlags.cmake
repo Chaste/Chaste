@@ -3,7 +3,13 @@ message("* Adding compiler flags...")
 # default flags added to all compilers except MSVC
 set(default_flags "-Wall")
 set(default_exe_linker_flags "")
-set(default_shared_link_flags "-Wl,--no-undefined")
+if (UNIX)
+    if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+        set(default_shared_link_flags "-Wl,-undefined,error")
+    else()
+        set(default_shared_link_flags "-Wl,--no-undefined")
+    endif()
+endif()
 
 if (Chaste_COVERAGE)
     #--coverage seems to be the preferred flag
