@@ -83,6 +83,12 @@ public:
 
             fftw_plan plan_b;
             plan_b = fftw_plan_dft_2d(i, i, fftw_input, fftw_output, FFTW_BACKWARD, FFTW_EXHAUSTIVE);
+
+            fftw_plan plan_in_place_f;
+            plan_in_place_f = fftw_plan_dft_2d(i, i, fftw_input, fftw_input, FFTW_FORWARD, FFTW_EXHAUSTIVE);
+
+            fftw_plan plan_in_place_b;
+            plan_in_place_b = fftw_plan_dft_2d(i, i, fftw_output, fftw_output, FFTW_BACKWARD, FFTW_EXHAUSTIVE);
         }
 
         // Create 3D wisdom

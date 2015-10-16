@@ -46,6 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractImmersedBoundaryForce.hpp"
 #include "ImmersedBoundaryCellPopulation.hpp"
 #include "ImmersedBoundaryMesh.hpp"
+#include "ImmersedBoundary2dArrays.hpp"
 
 // Other includes
 #include <complex>
@@ -134,12 +135,6 @@ private:
     /** A map between node indices and a set of their possible neighbours, used calculating cell-cell interactions */
     std::map<unsigned, std::set<unsigned> > mNodeNeighbours;
 
-    /** Grid to store force propagated to fluid by elastic interactions, in 2D simulations */
-    multi_array<double, 3> m2dForceGrids;
-
-    /** Grid to store force propagated to fluid by elastic interactions, in 2D simulations */
-    multi_array<double, 4> m3dForceGrids;
-
     /** Grid to store force x-component propagated to fluid by elastic interactions */
     std::vector<std::vector<double> > mFluidForceGridX;
 
@@ -155,17 +150,38 @@ private:
     /** A list of force laws to determine the force applied to each node */
     std::vector<boost::shared_ptr<AbstractImmersedBoundaryForce<DIM> > > mForceCollection;
 
-    /** The fftw plan for a forward transform */
-    fftw_plan mFftwForwardPlan;
+    /** The fftw plan for forward transforms in X */
+    fftw_plan mFftwForwardPlanX;
 
-    /** The fftw plan for an inverse transform */
-    fftw_plan mFftwInversePlan;
+    /** The fftw plan for forward transforms in Y */
+    fftw_plan mFftwForwardPlanY;
 
-    /** Pointer to fftw input array */
-    fftw_complex* mFftwIn;
+    /** The fftw plan for inverse transforms in X */
+    fftw_plan mFftwInversePlanX;
 
-    /** Pointer to fftw input array */
-    fftw_complex* mFftwOut;
+    /** The fftw plan for inverse transforms in Y */
+    fftw_plan mFftwInversePlanY;
+
+    /** Pointer to fftw forward input X array */
+    double* mpFftwForwardInX;
+
+    /** Pointer to fftw forward input Y array */
+    double* mpFftwForwardInY;
+
+    /** Pointer to fftw forward output X array */
+    fftw_complex* mpFftwForwardOutX;
+
+    /** Pointer to fftw forward output Y array */
+    fftw_complex* mpFftwForwardOutY;
+
+    /** Pointer to fftw backward input/output X array */
+    fftw_complex* mpFftwBackwardInOutX;
+
+    /** Pointer to fftw backward input/output Y array */
+    fftw_complex* mpFftwBackwardInOutY;
+
+    /** Pointer to structure storing all necessary arrays */
+    ImmersedBoundary2dArrays* mpArrays;
 
     /**
      * Helper method to calculate elastic forces, propagate these to the fluid grid

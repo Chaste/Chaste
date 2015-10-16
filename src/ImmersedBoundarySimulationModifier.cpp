@@ -54,7 +54,8 @@ ImmersedBoundarySimulationModifier<DIM>::ImmersedBoundarySimulationModifier()
       mGridSpacingY(0.0),
       mFftNorm(0.0),
       mReynolds(1e-4),
-      mI(0.0 + 1.0 * 1i)
+      mI(0.0 + 1.0 * 1i),
+      mpArrays(NULL)
 {
 }
 
@@ -65,6 +66,16 @@ ImmersedBoundarySimulationModifier<DIM>::~ImmersedBoundarySimulationModifier()
     {
         delete(mpBoxCollection);
     }
+    if (mpArrays)
+    {
+        delete(mpArrays);
+    }
+
+    fftw_destroy_plan(mFftwForwardPlanX);
+    fftw_destroy_plan(mFftwForwardPlanY);
+
+    fftw_destroy_plan(mFftwInversePlanX);
+    fftw_destroy_plan(mFftwInversePlanY);
 }
 
 template<unsigned DIM>
@@ -133,7 +144,7 @@ void ImmersedBoundarySimulationModifier<DIM>::SetupConstantMemberVariables(Abstr
     switch (DIM)
     {
         case 2:
-            m2dForceGrids.resize(extents[2][mNumGridPtsX][mNumGridPtsY]);
+            mpArrays = new ImmersedBoundary2dArrays(mNumGridPtsX, mNumGridPtsY);
 
             mFftNorm = sqrt((double) mNumGridPtsX * (double) mNumGridPtsY);
             break;
@@ -181,6 +192,31 @@ void ImmersedBoundarySimulationModifier<DIM>::SetupConstantMemberVariables(Abstr
         WARNING("FFTW wisdom file not imported correctly; DFT may take much longer than usual.");
     }
 
+    /*
+     * Plan the discrete Fourier transforms:
+     *
+     *  * Forward are real-to-complex and out-of-place
+     *  * Backward are complex-to-complex and-in-place
+     */
+
+    // We first set the pointers to arrays that have already been assigned space, as the planning procedure may
+    // overwrite data
+    mpFftwForwardInX = &(mpArrays->rGetModifiableRightHandSideGrids()[0][0][0]);
+    mpFftwForwardInY = &(mpArrays->rGetModifiableRightHandSideGrids()[1][0][0]);
+
+    mpFftwForwardOutX = reinterpret_cast<fftw_complex*>(&(mpArrays->rGetModifiableFourierGrids()[0][0][0]));
+    mpFftwForwardOutY = reinterpret_cast<fftw_complex*>(&(mpArrays->rGetModifiableFourierGrids()[1][0][0]));
+
+    mpFftwBackwardInOutX = reinterpret_cast<fftw_complex*>(&(mpArrays->rGetModifiableNewVelocityGrids()[0][0][0]));
+    mpFftwBackwardInOutY = reinterpret_cast<fftw_complex*>(&(mpArrays->rGetModifiableNewVelocityGrids()[1][0][0]));
+
+    mFftwForwardPlanX = fftw_plan_dft_r2c_2d(mNumGridPtsX, mNumGridPtsY, mpFftwForwardInX, mpFftwForwardOutX, FFTW_EXHAUSTIVE);
+    mFftwForwardPlanY = fftw_plan_dft_r2c_2d(mNumGridPtsX, mNumGridPtsY, mpFftwForwardInY, mpFftwForwardOutY, FFTW_EXHAUSTIVE);
+
+    mFftwInversePlanX = fftw_plan_dft_2d(mNumGridPtsX, mNumGridPtsY, mpFftwBackwardInOutX, mpFftwBackwardInOutX, FFTW_BACKWARD, FFTW_EXHAUSTIVE);
+    mFftwInversePlanY = fftw_plan_dft_2d(mNumGridPtsX, mNumGridPtsY, mpFftwBackwardInOutY, mpFftwBackwardInOutY, FFTW_BACKWARD, FFTW_EXHAUSTIVE);
+
+
 //    // Set up threads for fftw
 //    int potential_thread_errors = fftw_init_threads();
 //
@@ -211,18 +247,20 @@ void ImmersedBoundarySimulationModifier<DIM>::ClearForces()
         }
     }
 
+    multi_array<double, 3>& r_force_grids = mpArrays->rGetModifiableForceGrids();
+
     for (unsigned x = 0; x < mNumGridPtsX; x++)
     {
         for (unsigned y = 0; y < mNumGridPtsY; y++)
         {
-            m2dForceGrids[0][x][y] = 0.0;
+            r_force_grids[0][x][y] = 0.0;
         }
     }
     for (unsigned x = 0; x < mNumGridPtsX; x++)
     {
         for (unsigned y = 0; y < mNumGridPtsY; y++)
         {
-            m2dForceGrids[1][x][y] = 0.0;
+            r_force_grids[1][x][y] = 0.0;
         }
     }
 }
@@ -250,6 +288,8 @@ void ImmersedBoundarySimulationModifier<DIM>::PropagateForcesToFluidGrid()
     double force_y;
     int first_idx_x;
     int first_idx_y;
+
+    multi_array<double, 3>& force_grids = mpArrays->rGetModifiableForceGrids();
 
     // Iterate over all nodes and grab their position
     for (typename ImmersedBoundaryMesh<DIM, DIM>::NodeIterator node_iter = mpMesh->GetNodeIteratorBegin(false);
@@ -292,8 +332,8 @@ void ImmersedBoundarySimulationModifier<DIM>::PropagateForcesToFluidGrid()
                 mFluidForceGridX[(first_idx_y + y_idx) % mNumGridPtsY][(first_idx_x + x_idx) % mNumGridPtsX] += force_x;
                 mFluidForceGridY[(first_idx_y + y_idx) % mNumGridPtsY][(first_idx_x + x_idx) % mNumGridPtsX] += force_y;
 
-                m2dForceGrids[0][(first_idx_y + y_idx) % mNumGridPtsY][(first_idx_x + x_idx) % mNumGridPtsX] += force_x;
-                m2dForceGrids[1][(first_idx_y + y_idx) % mNumGridPtsY][(first_idx_x + x_idx) % mNumGridPtsX] += force_y;
+                force_grids[0][(first_idx_y + y_idx) % mNumGridPtsY][(first_idx_x + x_idx) % mNumGridPtsX] += force_x;
+                force_grids[1][(first_idx_y + y_idx) % mNumGridPtsY][(first_idx_x + x_idx) % mNumGridPtsX] += force_y;
             }
         }
     }
@@ -303,44 +343,91 @@ template<unsigned DIM>
 void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
 {
     double dt = SimulationTime::Instance()->GetTimeStep();
+    unsigned reduced_size = 1 + (mNumGridPtsY/2);
 
     // Get non modifiable fluid grids
     const std::vector<std::vector<double> >& VelX = mpMesh->rGetFluidVelocityGridX();
     const std::vector<std::vector<double> >& VelY = mpMesh->rGetFluidVelocityGridY();
 
-    multi_array<double, 3>& vel_grids = mpMesh->rGetModifiable2dVelocityGrids();
+    // Get references to all the necessary grids
+    multi_array<double, 3>& vel_grids   = mpMesh->rGetModifiable2dVelocityGrids();
+    multi_array<double, 3>& force_grids = mpArrays->rGetModifiableForceGrids();
+    multi_array<double, 3>& rhs_grids   = mpArrays->rGetModifiableRightHandSideGrids();
 
-    for(unsigned y = 0 ; y < mNumGridPtsY ; y++)
+    multi_array<std::complex<double>, 3>& fourier_grids = mpArrays->rGetModifiableFourierGrids();
+    multi_array<std::complex<double>, 2>& pressure_grid = mpArrays->rGetModifiablePressureGrid();
+    multi_array<std::complex<double>, 3>& new_vel_grids  = mpArrays->rGetModifiableNewVelocityGrids();
+
+    for(unsigned x = 0 ; x < mNumGridPtsX ; x++)
     {
-        for (unsigned x = 0; x < mNumGridPtsX; x++)
+        for (unsigned y = 0; y < mNumGridPtsY; y++)
         {
             vel_grids[0][x][y] = VelX[y][x];
             vel_grids[1][x][y] = VelY[y][x];
         }
     }
 
+//    for (unsigned x = 0; x < mNumGridPtsX; x++)
+//    {
+//        for (unsigned y = 0; y < mNumGridPtsY; y++)
+//        {
+//            std::cout << std::setprecision(4) << std::setw(12) << VelX[y][x];
+//        }
+//        std::cout << std::endl;
+//    }
+//
+//    std::cout << std::endl;
+//
+//    for (unsigned x = 0; x < mNumGridPtsX; x++)
+//    {
+//        for (unsigned y = 0; y < mNumGridPtsY; y++)
+//        {
+//            std::cout << std::setprecision(4) << std::setw(12) << vel_grids[0][x][y];
+//        }
+//        std::cout << std::endl;
+//    }
+
+    std::cout << std::endl;
+
     // Create upwind variables
     std::vector<std::vector<double> > Upwind_x;
     std::vector<std::vector<double> > Upwind_y;
 
-    multi_array<double, 3> upwind_grids(extents[2][mNumGridPtsX][mNumGridPtsY]);
-
     UpwindScheme(VelX, VelY, Upwind_x, Upwind_y);
-    Upwind2d(vel_grids, upwind_grids);
+    Upwind2d(vel_grids, rhs_grids);
+
+    double large_number = 4294967296.0;
+
+    for (unsigned x = 0; x < mNumGridPtsX; x++)
+    {
+        for (unsigned y = 0; y < mNumGridPtsY; y++)
+        {
+            std::cout << std::setprecision(4) << std::setw(12) << Upwind_x[y][x];
+        }
+        std::cout << std::endl;
+    }
+
+    std::cout << std::endl;
+
+    for (unsigned x = 0; x < mNumGridPtsX; x++)
+    {
+        for (unsigned y = 0; y < mNumGridPtsY; y++)
+        {
+            std::cout << std::setprecision(4) << std::setw(12) << rhs_grids[0][x][y];
+        }
+        std::cout << std::endl;
+    }
 
     // Create RHS of linear system
     std::vector<std::vector<double> > rhsX; SetupGrid(rhsX);
     std::vector<std::vector<double> > rhsY; SetupGrid(rhsY);
 
-    multi_array<double, 3> rhs(extents[2][mNumGridPtsX][mNumGridPtsY]);
-
-
     for(unsigned y = 0 ; y < mNumGridPtsY ; y++)
     {
         for(unsigned x = 0 ; x < mNumGridPtsX ; x++)
         {
-            rhsX[y][x] = VelX[y][x] + dt * (mFluidForceGridX[y][x] - Upwind_x[y][x]);
-            rhsY[y][x] = VelY[y][x] + dt * (mFluidForceGridY[y][x] - Upwind_y[y][x]);
+            rhsX[y][x] = large_number * (VelX[y][x] + dt * (mFluidForceGridX[y][x] - Upwind_x[y][x]));
+            rhsY[y][x] = large_number * (VelY[y][x] + dt * (mFluidForceGridY[y][x] - Upwind_y[y][x]));
         }
     }
 
@@ -350,32 +437,30 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
         {
             for (unsigned y = 0; y < mNumGridPtsY; y++)
             {
-                rhs[dim][x][y] = vel_grids[dim][x][y] + dt * (m2dForceGrids[dim][x][y] - upwind_grids[dim][x][y]);
+                rhs_grids[dim][x][y] = large_number * (vel_grids[dim][x][y] + dt * (force_grids[dim][x][y] - rhs_grids[dim][x][y]));
             }
         }
     }
 
-    Timer timer;
-    timer.Reset();
-
-    multi_array<std::complex<double>, 3> vel_hat(extents[2][4096][4096]);
-
-    double init_time = timer.GetElapsedTime();
-
-    for (unsigned dim = 0 ; dim < 2 ; dim++)
-    {
-        for(unsigned x = 0 ; x < 4096 ; x++)
-        {
-            for (unsigned y = 0; y < 4096; y++)
-            {
-                vel_hat[dim][x][y] = 1.0 + mI;
-            }
-        }
-    }
-
-    double assign_time = timer.GetElapsedTime() - init_time;
-
-    PRINT_2_VARIABLES(init_time, assign_time);
+//    for (unsigned x = 0; x < mNumGridPtsX; x++)
+//    {
+//        for (unsigned y = 0; y < mNumGridPtsY; y++)
+//        {
+//            std::cout << std::setprecision(4) << std::setw(12) << rhsX[y][x];
+//        }
+//        std::cout << std::endl;
+//    }
+//
+//    std::cout << std::endl;
+//
+//    for (unsigned x = 0; x < mNumGridPtsX; x++)
+//    {
+//        for (unsigned y = 0; y < mNumGridPtsY; y++)
+//        {
+//            std::cout << std::setprecision(4) << std::setw(12) << rhs_grids[0][x][y];
+//        }
+//        std::cout << std::endl;
+//    }
 
     // Perform fft on rhsX
     std::vector<std::vector<std::complex<double> > > VelX_hat;
@@ -384,6 +469,32 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
     // Perform fft on rhsY
     std::vector<std::vector<std::complex<double> > > VelY_hat;
     Fft2DForwardRealToComplex(rhsY, VelY_hat);
+
+    // Perform fft on rhs_grids; results go to fourier_grids
+    fftw_execute(mFftwForwardPlanX);
+    fftw_execute(mFftwForwardPlanY);
+
+//    for (unsigned x = 0; x < mNumGridPtsX; x++)
+//    {
+//        for (unsigned y = 0; y < mNumGridPtsY; y++)
+//        {
+//            std::cout << std::setprecision(4) << std::setw(12) << VelX_hat[y][x].real();
+//        }
+//        std::cout << std::endl;
+//    }
+//
+//    std::cout << std::endl;
+//
+//    for (unsigned x = 0; x < mNumGridPtsX; x++)
+//    {
+//        for (unsigned y = 0; y < reduced_size; y++)
+//        {
+//            std::cout << std::setprecision(4) << std::setw(12) << fourier_grids[0][x][y].real();
+//        }
+//        std::cout << std::endl;
+//    }
+//
+//    std::cout << std::endl;
 
     std::vector<std::vector<std::complex<double> > > p_hat; SetupGrid(p_hat);
 
@@ -401,15 +512,74 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
         }
     }
 
+    /*
+     * The result of a DFT of n real datapoints is n/2 + 1 complex values, due to redundancy: element n-1 is conj(2),
+     * etc.  Calculation of the pressure grid preserves this property, and so the final pressure grid will take up
+     * the first half of the pressure_grids array.
+     */
+
+    for (unsigned x = 0 ; x < mNumGridPtsX ; x++)
+    {
+        for (unsigned y = 0 ; y < reduced_size ; y++)
+        {
+            std::complex<double> numerator = -mI * (mSin2X[y] * fourier_grids[0][x][y] / mGridSpacingX + mSin2Y[x] * fourier_grids[1][x][y] / mGridSpacingY);
+
+            double denominator = (mSin2X[y] * mSin2X[y] / (mGridSpacingX * mGridSpacingX)) + (mSin2Y[x] * mSin2Y[x] / (mGridSpacingY * mGridSpacingY));
+            denominator *= (dt / mReynolds);
+
+            pressure_grid[x][y] = numerator * large_number / denominator;
+        }
+
+        for (unsigned y = reduced_size ; y < mNumGridPtsY ; y++)
+        {
+            unsigned z = mNumGridPtsY - y;
+            std::complex<double> numerator = -mI * (mSin2X[y] * conj(fourier_grids[0][x][z]) / mGridSpacingX + mSin2Y[x] * conj(fourier_grids[1][x][z]) / mGridSpacingY);
+
+            double denominator = (mSin2X[y] * mSin2X[y] / (mGridSpacingX * mGridSpacingX)) + (mSin2Y[x] * mSin2Y[x] / (mGridSpacingY * mGridSpacingY));
+            denominator *= (dt / mReynolds);
+
+            pressure_grid[x][y] = numerator / denominator;
+        }
+    }
+
+//    for (unsigned x = 0; x < mNumGridPtsX; x++)
+//    {
+//        for (unsigned y = 0; y < mNumGridPtsY; y++)
+//        {
+//            std::cout << std::setprecision(4) << std::setw(12) << p_hat[y][x].imag();
+//        }
+//        std::cout << std::endl;
+//    }
+//
+//    std::cout << std::endl;
+//
+//    for (unsigned x = 0; x < mNumGridPtsX; x++)
+//    {
+//        for (unsigned y = 0; y < mNumGridPtsY; y++)
+//        {
+//            std::cout << std::setprecision(4) << std::setw(12) << pressure_grid[x][y].imag();
+//        }
+//        std::cout << std::endl;
+//    }
+//
+//    std::cout << std::endl;
+
+
     // Set some values to zero
     p_hat[0][0] = 0.0;
     p_hat[0][mNumGridPtsX/2] = 0.0;
     p_hat[mNumGridPtsY/2][mNumGridPtsX/2] = 0.0;
     p_hat[mNumGridPtsY/2][0] = 0.0;
 
+    pressure_grid[0][0] = 0.0;
+    pressure_grid[mNumGridPtsX/2][0] = 0.0;
+    pressure_grid[mNumGridPtsX/2][mNumGridPtsY/2] = 0.0;
+    pressure_grid[0][mNumGridPtsY/2] = 0.0;
+
     // Do final stage of computation before inverse FFT
     std::vector<std::vector<std::complex<double> > > pre_inverse_X; SetupGrid(pre_inverse_X);
     std::vector<std::vector<std::complex<double> > > pre_inverse_Y; SetupGrid(pre_inverse_Y);
+
 
     for( unsigned y = 0 ; y < mNumGridPtsY ; y++ )
     {
@@ -420,6 +590,54 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
             pre_inverse_Y[y][x] = (VelY_hat[y][x] - (mI * dt / (mReynolds * mGridSpacingY)) * mSin2Y[y] * p_hat[y][x]) / op;
         }
     }
+    for (unsigned x = 0 ; x < mNumGridPtsX ; x++)
+    {
+        for (unsigned y = 0 ; y < reduced_size ; y++)
+        {
+            double op = 1 + (4 * dt / mReynolds) * ( (mSinX[y] * mSinX[y] / (mGridSpacingX * mGridSpacingX)) + (mSinY[x] * mSinY[x] / (mGridSpacingY * mGridSpacingY)));
+            new_vel_grids[0][x][y] = (fourier_grids[0][x][y] - (mI * dt / (mReynolds * mGridSpacingX)) * mSin2X[y] * pressure_grid[x][y]) / op;
+            new_vel_grids[1][x][y] = (fourier_grids[1][x][y] - (mI * dt / (mReynolds * mGridSpacingY)) * mSin2X[y] * pressure_grid[x][y]) / op;
+        }
+
+        for (unsigned y = reduced_size ; y < mNumGridPtsY ; y++)
+        {
+            unsigned z = mNumGridPtsY - y;
+            double op = 1 + (4 * dt / mReynolds) * ( (mSinX[y] * mSinX[y] / (mGridSpacingX * mGridSpacingX)) + (mSinY[x] * mSinY[x] / (mGridSpacingY * mGridSpacingY)));
+
+            new_vel_grids[0][x][y] = (conj(fourier_grids[0][x][z]) - (mI * dt / (mReynolds * mGridSpacingX)) * mSin2X[y] * conj(pressure_grid[x][z])) / op;
+            new_vel_grids[1][x][y] = (conj(fourier_grids[1][x][z]) - (mI * dt / (mReynolds * mGridSpacingY)) * mSin2X[y] * conj(pressure_grid[x][z])) / op;
+        }
+    }
+
+//    for (unsigned x = 0; x < mNumGridPtsX; x++)
+//    {
+//        for (unsigned y = 0; y < mNumGridPtsY; y++)
+//        {
+//            std::cout << std::setprecision(4) << std::setw(12) << pre_inverse_X[y][x].real();
+//        }
+//        std::cout << std::endl;
+//    }
+//
+//    std::cout << std::endl;
+//
+//    for (unsigned x = 0; x < mNumGridPtsX; x++)
+//    {
+//        for (unsigned y = 0; y < mNumGridPtsY; y++)
+//        {
+//            std::cout << std::setprecision(4) << std::setw(12) << new_vel_grids[0][x][y].real();
+//        }
+//        std::cout << std::endl;
+//    }
+//
+//    std::cout << std::endl;
+
+
+
+
+
+
+
+
 
     // Perform inverse FFT on x data
     std::vector<std::vector<double> > new_velocity_x;
@@ -429,6 +647,33 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
     std::vector<std::vector<double> > new_velocity_y;
     Fft2DInverseComplexToReal(pre_inverse_Y, new_velocity_y);
 
+    // Perform inverse fft on new_vel_grids; results are in-place
+    fftw_execute(mFftwInversePlanX);
+    fftw_execute(mFftwInversePlanY);
+
+//    for (unsigned x = 0; x < mNumGridPtsX; x++)
+//    {
+//        for (unsigned y = 0; y < mNumGridPtsY; y++)
+//        {
+//            std::cout << std::setprecision(4) << std::setw(12) << new_velocity_y[y][x];
+//        }
+//        std::cout << std::endl;
+//    }
+//
+//    std::cout << std::endl;
+//
+//    for (unsigned x = 0; x < mNumGridPtsX; x++)
+//    {
+//        for (unsigned y = 0; y < mNumGridPtsY; y++)
+//        {
+//            std::cout << std::setprecision(4) << std::setw(12) << new_vel_grids[1][x][y].real() / 64.0;
+//        }
+//        std::cout << std::endl;
+//    }
+//
+//    std::cout << std::endl;
+
+
     // Get modifiable fluid grids
     std::vector<std::vector<double> >& modifiable_vel_x = mpMesh->rGetModifiableFluidVelocityGridX();
     std::vector<std::vector<double> >& modifiable_vel_y = mpMesh->rGetModifiableFluidVelocityGridY();
@@ -437,10 +682,43 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
     {
         for(unsigned x = 0 ; x < mNumGridPtsX ; x++)
         {
-            modifiable_vel_x[y][x] = new_velocity_x[y][x];
-            modifiable_vel_y[y][x] = new_velocity_y[y][x];
+            modifiable_vel_x[y][x] = new_velocity_x[y][x] / large_number;
+            modifiable_vel_y[y][x] = new_velocity_y[y][x] / large_number;
         }
     }
+
+    for (unsigned dim = 0 ; dim < 2 ; dim++)
+    {
+        for (unsigned x = 0; x < mNumGridPtsX; x++)
+        {
+            for (unsigned y = 0; y < reduced_size; y++)
+            {
+                vel_grids[dim][x][y] = new_vel_grids[dim][x][y].real() / large_number;;// / (double(mNumGridPtsX) * double(mNumGridPtsY));
+            }
+        }
+    }
+
+//    for (unsigned x = 0; x < mNumGridPtsX; x++)
+//    {
+//        for (unsigned y = 0; y < mNumGridPtsY; y++)
+//        {
+//            std::cout << std::setprecision(4) << std::setw(12) << modifiable_vel_x[y][x];
+//        }
+//        std::cout << std::endl;
+//    }
+//
+//    std::cout << std::endl;
+//
+//    for (unsigned x = 0; x < mNumGridPtsX; x++)
+//    {
+//        for (unsigned y = 0; y < mNumGridPtsY; y++)
+//        {
+//            std::cout << std::setprecision(4) << std::setw(12) << vel_grids[0][x][y];
+//        }
+//        std::cout << std::endl;
+//    }
+//
+//    std::cout << std::endl;
 }
 
 template<unsigned DIM>
