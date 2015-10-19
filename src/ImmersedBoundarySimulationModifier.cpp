@@ -345,6 +345,9 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
     double dt = SimulationTime::Instance()->GetTimeStep();
     unsigned reduced_size = 1 + (mNumGridPtsY/2);
 
+
+    std::string match;
+
     // Get non modifiable fluid grids
     const std::vector<std::vector<double> >& VelX = mpMesh->rGetFluidVelocityGridX();
     const std::vector<std::vector<double> >& VelY = mpMesh->rGetFluidVelocityGridY();
@@ -367,27 +370,33 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
         }
     }
 
-//    for (unsigned x = 0; x < mNumGridPtsX; x++)
-//    {
-//        for (unsigned y = 0; y < mNumGridPtsY; y++)
+//    {//DEBUG
+//        for (unsigned x = 0; x < mNumGridPtsX; x++)
 //        {
-//            std::cout << std::setprecision(4) << std::setw(12) << VelX[y][x];
+//            for (unsigned y = 0; y < mNumGridPtsY; y++)
+//            {
+//                std::cout << std::setprecision(4) << std::setw(12) << VelX[y][x];
+//            }
+//            std::cout << std::endl;
 //        }
 //        std::cout << std::endl;
-//    }
-//
-//    std::cout << std::endl;
-//
-//    for (unsigned x = 0; x < mNumGridPtsX; x++)
-//    {
-//        for (unsigned y = 0; y < mNumGridPtsY; y++)
+//        for (unsigned x = 0; x < mNumGridPtsX; x++)
 //        {
-//            std::cout << std::setprecision(4) << std::setw(12) << vel_grids[0][x][y];
+//            for (unsigned y = 0; y < mNumGridPtsY; y++)
+//            {
+//                std::cout << std::setprecision(4) << std::setw(12) << vel_grids[0][x][y];
+//            }
+//            std::cout << std::endl;
 //        }
 //        std::cout << std::endl;
+//        match = "true";
+//        for (unsigned x = 0; x < mNumGridPtsX; x++)
+//            for (unsigned y = 0; y < mNumGridPtsY; y++)
+//                if (fabs(vel_grids[0][x][y] - VelX[y][x]) > 1e-10)
+//                    match = "false";
+//        PRINT_VARIABLE(match);
+//        std::cout << std::endl;
 //    }
-
-    std::cout << std::endl;
 
     // Create upwind variables
     std::vector<std::vector<double> > Upwind_x;
@@ -398,25 +407,34 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
 
     double large_number = 4294967296.0;
 
-    for (unsigned x = 0; x < mNumGridPtsX; x++)
-    {
-        for (unsigned y = 0; y < mNumGridPtsY; y++)
-        {
-            std::cout << std::setprecision(4) << std::setw(12) << Upwind_x[y][x];
-        }
-        std::cout << std::endl;
-    }
+//    {//DEBUG
+//        for (unsigned x = 0; x < mNumGridPtsX; x++)
+//        {
+//            for (unsigned y = 0; y < mNumGridPtsY; y++)
+//            {
+//                std::cout << std::setprecision(4) << std::setw(12) << Upwind_x[y][x];
+//            }
+//            std::cout << std::endl;
+//        }
+//        std::cout << std::endl;
+//        for (unsigned x = 0; x < mNumGridPtsX; x++)
+//        {
+//            for (unsigned y = 0; y < mNumGridPtsY; y++)
+//            {
+//                std::cout << std::setprecision(4) << std::setw(12) << rhs_grids[0][x][y];
+//            }
+//            std::cout << std::endl;
+//        }
+//        std::cout << std::endl;
+//        match = "true";
+//        for (unsigned x = 0; x < mNumGridPtsX; x++)
+//            for (unsigned y = 0; y < mNumGridPtsY; y++)
+//                if (fabs(rhs_grids[0][x][y] - Upwind_x[y][x]) > 1e-10)
+//                    match = "false";
+//        PRINT_VARIABLE(match);
+//        std::cout << std::endl;
+//    }
 
-    std::cout << std::endl;
-
-    for (unsigned x = 0; x < mNumGridPtsX; x++)
-    {
-        for (unsigned y = 0; y < mNumGridPtsY; y++)
-        {
-            std::cout << std::setprecision(4) << std::setw(12) << rhs_grids[0][x][y];
-        }
-        std::cout << std::endl;
-    }
 
     // Create RHS of linear system
     std::vector<std::vector<double> > rhsX; SetupGrid(rhsX);
@@ -442,25 +460,33 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
         }
     }
 
-//    for (unsigned x = 0; x < mNumGridPtsX; x++)
-//    {
-//        for (unsigned y = 0; y < mNumGridPtsY; y++)
-//        {
-//            std::cout << std::setprecision(4) << std::setw(12) << rhsX[y][x];
-//        }
-//        std::cout << std::endl;
-//    }
-//
-//    std::cout << std::endl;
-//
-//    for (unsigned x = 0; x < mNumGridPtsX; x++)
-//    {
-//        for (unsigned y = 0; y < mNumGridPtsY; y++)
-//        {
-//            std::cout << std::setprecision(4) << std::setw(12) << rhs_grids[0][x][y];
-//        }
-//        std::cout << std::endl;
-//    }
+    {//DEBUG
+        for (unsigned x = 0; x < mNumGridPtsX; x++)
+        {
+            for (unsigned y = 0; y < mNumGridPtsY; y++)
+            {
+                std::cout << std::setprecision(4) << std::setw(12) << rhsX[y][x];
+            }
+            std::cout << std::endl;
+        }
+        std::cout << std::endl;
+        for (unsigned x = 0; x < mNumGridPtsX; x++)
+        {
+            for (unsigned y = 0; y < mNumGridPtsY; y++)
+            {
+                std::cout << std::setprecision(4) << std::setw(12) << rhs_grids[0][x][y];
+            }
+            std::cout << std::endl;
+        }
+        std::cout << std::endl;
+        match = "true";
+        for (unsigned x = 0; x < mNumGridPtsX; x++)
+            for (unsigned y = 0; y < mNumGridPtsY; y++)
+                if (fabs(rhs_grids[0][x][y] - rhsX[y][x]) > 1e-10)
+                    match = "false";
+        PRINT_VARIABLE(match);
+        std::cout << std::endl;
+    }
 
     // Perform fft on rhsX
     std::vector<std::vector<std::complex<double> > > VelX_hat;
