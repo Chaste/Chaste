@@ -510,15 +510,20 @@ void ImmersedBoundaryMesh<2,2>::ConstructFromMeshReader(AbstractMeshReader<2,2>&
     this->mNumGridPtsY = rIBMeshReader.GetNumGridPtsY();
     m2dVelocityGrids.resize(extents[2][mNumGridPtsX][mNumGridPtsY]);
 
-//    for (unsigned grid_row = 0 ; grid_row < mNumGridPtsY ; grid_row ++)
-//    {
-//        mFluidVelocityGridX[grid_row] = rIBMeshReader.GetNextGridRow();
-//    }
-//
-//    for (unsigned grid_row = 0 ; grid_row < mNumGridPtsY ; grid_row ++)
-//    {
-//        mFluidVelocityGridY[grid_row] = rIBMeshReader.GetNextGridRow();
-//    }
+    // Construct the velocity grids from mesh reader
+    for (unsigned dim = 0 ; dim < 2 ; dim++)
+    {
+        for (unsigned grid_row = 0; grid_row < mNumGridPtsY; grid_row++)
+        {
+            std::vector<double> next_row = rIBMeshReader.GetNextGridRow();
+            assert(next_row.size() == mNumGridPtsX);
+
+            for (unsigned i = 0; i < mNumGridPtsX; i++)
+            {
+                m2dVelocityGrids[dim][i][grid_row] = next_row[i];
+            }
+        }
+    }
 }
 
 /// \cond Get Doxygen to ignore, since it's confused by these templates

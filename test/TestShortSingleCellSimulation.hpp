@@ -49,6 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ImmersedBoundaryMembraneElasticityForce.hpp"
 
 #include "Debug.hpp"
+#include "Timer.hpp"
 
 // Simulation does not run in parallel
 #include "FakePetscSetup.hpp"
@@ -59,6 +60,9 @@ public:
 
     void TestShortSingleCellSim() throw(Exception)
     {
+        Timer timer;
+        timer.Reset();
+
         /*
          * Create an Immersed Boundary Mesh using a SuperellipseGenerator
          *
@@ -112,6 +116,13 @@ public:
         simulator.SetDt(0.05);
         simulator.SetSamplingTimestepMultiple(10);
         simulator.SetEndTime(40.0);
+
+        double setup_time = timer.GetElapsedTime();
+
         simulator.Solve();
+
+        double sim_time = timer.GetElapsedTime() - setup_time;
+
+        PRINT_2_VARIABLES(setup_time, sim_time);
     }
 };
