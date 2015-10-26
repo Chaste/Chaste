@@ -52,7 +52,7 @@ ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryMesh(std::vector<N
     // Clear mNodes and mElements
     Clear();
 
-    this->SetupFluidVelocityGrids();
+    m2dVelocityGrids.resize(extents[2][mNumGridPtsX][mNumGridPtsY]);
 
     switch (SPACE_DIM)
     {
@@ -210,14 +210,14 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::SetNumGridPtsX(unsigned mesh_points_x)
 {
     mNumGridPtsX = mesh_points_x;
-    this->SetupFluidVelocityGrids();
+    m2dVelocityGrids.resize(extents[2][mNumGridPtsX][mNumGridPtsY]);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::SetNumGridPtsY(unsigned mesh_points_y)
 {
     mNumGridPtsY = mesh_points_y;
-    this->SetupFluidVelocityGrids();
+    m2dVelocityGrids.resize(extents[2][mNumGridPtsX][mNumGridPtsY]);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -225,7 +225,7 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::SetNumGridPtsXAndY(unsigned n
 {
     mNumGridPtsX = numGridPts;
     mNumGridPtsY = numGridPts;
-    this->SetupFluidVelocityGrids();
+    m2dVelocityGrids.resize(extents[2][mNumGridPtsX][mNumGridPtsY]);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -260,18 +260,6 @@ unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetMembraneIndex()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-const std::vector<std::vector<double> >& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::rGetFluidVelocityGridX() const
-{
-    return mFluidVelocityGridX;
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-const std::vector<std::vector<double> >& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::rGetFluidVelocityGridY() const
-{
-    return mFluidVelocityGridY;
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 const multi_array<double, 3>& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::rGet2dVelocityGrids() const
 {
     return m2dVelocityGrids;
@@ -281,18 +269,6 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 const multi_array<double, 4>& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::rGet3dVelocityGrids() const
 {
     return m3dVelocityGrids;
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-std::vector<std::vector<double> >& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::rGetModifiableFluidVelocityGridX()
-{
-    return mFluidVelocityGridX;
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-std::vector<std::vector<double> >& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::rGetModifiableFluidVelocityGridY()
-{
-    return mFluidVelocityGridY;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -311,19 +287,6 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::vector<Node<SPACE_DIM>*>& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::rGetNodes()
 {
     return AbstractMesh<ELEMENT_DIM, SPACE_DIM>::mNodes;
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::SetupFluidVelocityGrids(void)
-{
-    mFluidVelocityGridX.resize(mNumGridPtsY);
-    mFluidVelocityGridY.resize(mNumGridPtsY);
-
-    for (unsigned grid_y = 0; grid_y < mNumGridPtsY; grid_y++)
-    {
-        mFluidVelocityGridX[grid_y].resize(mNumGridPtsX);
-        mFluidVelocityGridY[grid_y].resize(mNumGridPtsX);
-    }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -545,17 +508,17 @@ void ImmersedBoundaryMesh<2,2>::ConstructFromMeshReader(AbstractMeshReader<2,2>&
     // Get grid dimensions from grid file and set up grids accordingly
     this->mNumGridPtsX = rIBMeshReader.GetNumGridPtsX();
     this->mNumGridPtsY = rIBMeshReader.GetNumGridPtsY();
-    this->SetupFluidVelocityGrids();
+    m2dVelocityGrids.resize(extents[2][mNumGridPtsX][mNumGridPtsY]);
 
-    for (unsigned grid_row = 0 ; grid_row < mNumGridPtsY ; grid_row ++)
-    {
-        mFluidVelocityGridX[grid_row] = rIBMeshReader.GetNextGridRow();
-    }
-
-    for (unsigned grid_row = 0 ; grid_row < mNumGridPtsY ; grid_row ++)
-    {
-        mFluidVelocityGridY[grid_row] = rIBMeshReader.GetNextGridRow();
-    }
+//    for (unsigned grid_row = 0 ; grid_row < mNumGridPtsY ; grid_row ++)
+//    {
+//        mFluidVelocityGridX[grid_row] = rIBMeshReader.GetNextGridRow();
+//    }
+//
+//    for (unsigned grid_row = 0 ; grid_row < mNumGridPtsY ; grid_row ++)
+//    {
+//        mFluidVelocityGridY[grid_row] = rIBMeshReader.GetNextGridRow();
+//    }
 }
 
 /// \cond Get Doxygen to ignore, since it's confused by these templates

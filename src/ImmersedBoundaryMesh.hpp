@@ -89,12 +89,6 @@ protected:
     /** 3D grid for fluid x velocity */
     multi_array<double, 4> m3dVelocityGrids;
 
-    /** 2D grid for fluid x velocity */
-    std::vector<std::vector<double> > mFluidVelocityGridX;
-
-    /** 2D grid for fluid y velocity */
-    std::vector<std::vector<double> > mFluidVelocityGridY;
-
     /** Vector of pointers to ImmersedBoundaryElements. */
     std::vector<ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>*> mElements;
 
@@ -124,11 +118,6 @@ protected:
      * @return local index
      */
     unsigned SolveBoundaryElementMapping(unsigned index) const;
-
-    /**
-     * Reset the fluid velocity grids based on number of grid points
-     */
-    void SetupFluidVelocityGrids();
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
@@ -266,16 +255,6 @@ public:
     void SetNode(unsigned nodeIndex, ChastePoint<SPACE_DIM> point);
 
     /**
-     * @return reference to non-modifiable fluid x-velocity grid.
-     */
-    const std::vector<std::vector<double> >& rGetFluidVelocityGridX() const;
-
-    /**
-     * @return reference to non-modifiable fluid y-velocity grid.
-     */
-    const std::vector<std::vector<double> >& rGetFluidVelocityGridY() const;
-
-    /**
      * @return reference to non-modifiable 2d fluid velocity grids.
      */
     const multi_array<double, 3>& rGet2dVelocityGrids() const;
@@ -284,16 +263,6 @@ public:
      * @return reference to non-modifiable 3d fluid velocity grids.
      */
     const multi_array<double, 4>& rGet3dVelocityGrids() const;
-
-    /**
-     * @return reference to modifiable fluid x-velocity grid.
-     */
-    std::vector<std::vector<double> >& rGetModifiableFluidVelocityGridX();
-
-    /**
-     * @return reference to modifiable fluid y-velocity grid.
-     */
-    std::vector<std::vector<double> >& rGetModifiableFluidVelocityGridY();
 
     /**
      * @return reference to modifiable 2d fluid velocity grids.

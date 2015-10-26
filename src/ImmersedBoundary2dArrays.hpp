@@ -61,9 +61,6 @@ protected:
     /** Grid to store the calculated pressure grid */
     multi_array<std::complex<double>, 2> mPressureGrid;
 
-    /** Grid to calculate new (spectral) velocity field and calculate C2C fft */
-    multi_array<std::complex<double>, 3> mNewVelocityGrids;
-
 public:
 
     /**
@@ -105,12 +102,6 @@ public:
      * @return reference to modifiable pressure grid.
      */
     multi_array<std::complex<double>, 2>& rGetModifiablePressureGrid();
-
-    /**
-     * @return reference to modifiable new-velocity grids.
-     */
-    multi_array<std::complex<double>, 3>& rGetModifiableNewVelocityGrids();
-
 
 };
 

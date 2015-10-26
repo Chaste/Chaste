@@ -571,14 +571,6 @@ public:
         }
 
 
-        p_mod->SolveNavierStokesSpectral();
-
-        const std::vector<std::vector<double> > vel_grid_x = p_mesh->rGetFluidVelocityGridX();
-        const std::vector<std::vector<double> > vel_grid_y = p_mesh->rGetFluidVelocityGridY();
-
-
-        cell_population.UpdateNodeLocations(SimulationTime::Instance()->GetTimeStep());
-
 
     }
 };

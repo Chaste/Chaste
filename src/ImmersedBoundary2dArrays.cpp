@@ -39,6 +39,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ImmersedBoundary2dArrays::ImmersedBoundary2dArrays(unsigned numGridPtsX, unsigned numGridPtsY)
 {
+    // The complex grids are reduced in size due to redundancy in the fourier domain
+    unsigned reduced_y = 1 + (numGridPtsY/2);
+
     // We require an even number of grid points
     assert(numGridPtsY % 2 == 0);
 
@@ -49,13 +52,10 @@ ImmersedBoundary2dArrays::ImmersedBoundary2dArrays(unsigned numGridPtsX, unsigne
     mRightHandSideGrids.resize(extents[2][numGridPtsX][numGridPtsY]);
 
     // 2 X by Y grids, one for each dimension, but some redundancy due to FFT of real data
-    mFourierGrids.resize(extents[2][numGridPtsX][1 + (numGridPtsY/2)]);
+    mFourierGrids.resize(extents[2][numGridPtsX][reduced_y]);
 
     // 1 X by Y grid
-    mPressureGrid.resize(extents[numGridPtsX][numGridPtsY]);
-
-    // 2 X by Y grids, one for each dimension
-    mNewVelocityGrids.resize(extents[2][numGridPtsX][numGridPtsY]);
+    mPressureGrid.resize(extents[numGridPtsX][reduced_y]);
 }
 
 ImmersedBoundary2dArrays::~ImmersedBoundary2dArrays()
@@ -80,9 +80,4 @@ multi_array<std::complex<double>, 3>& ImmersedBoundary2dArrays::rGetModifiableFo
 multi_array<std::complex<double>, 2>& ImmersedBoundary2dArrays::rGetModifiablePressureGrid()
 {
     return mPressureGrid;
-}
-
-multi_array<std::complex<double>, 3>& ImmersedBoundary2dArrays::rGetModifiableNewVelocityGrids()
-{
-    return mNewVelocityGrids;
 }

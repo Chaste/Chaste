@@ -39,6 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Needed for Immersed Boundary simulations
 #include <fftw3.h>
+#include <boost/multi_array.hpp>
 
 // Includes from trunk
 #include "CellsGenerator.hpp"
@@ -102,8 +103,8 @@ public:
         ImmersedBoundaryMesh<2,2>* p_mesh = new ImmersedBoundaryMesh<2,2>(nodes, ib_element, 32, 64);
 
         // Modify the fluid grid in one place to help test mesh writer and reader
-        std::vector<std::vector<double> >& modifiable_fluid_grid = p_mesh->rGetModifiableFluidVelocityGridX();
-        modifiable_fluid_grid[5][3] = 12.0;
+        multi_array<double, 3>& vel_grids = p_mesh->rGetModifiable2dVelocityGrids();
+        modifiable_fluid_grid[0][5][3] = 12.0;
 
         // Write the state of the immersed boundary mesh to file
         ImmersedBoundaryMeshWriter<2,2> mesh_writer("IBMeshOneSquareElement", "ib_mesh_one_square_element");
@@ -120,7 +121,7 @@ public:
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Test the point that was set to 12 before mesh was written
-        TS_ASSERT_DELTA(mesh.rGetFluidVelocityGridX()[5][3], 12.0, 1e-6);
+        TS_ASSERT_DELTA(mesh.rGet2dVelocityGrids()[0][5][3], 12.0, 1e-6);
     }
 
     void xTestRetrieveElementProperties() throw(Exception)

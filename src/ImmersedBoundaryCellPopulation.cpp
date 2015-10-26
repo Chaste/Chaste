@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteSyscalls.hpp"
 #include "IsNan.hpp"
 #include "ShortAxisVertexBasedDivisionRule.hpp"
+#include <boost/multi_array.hpp>
 
 
 // Cell population writers
@@ -250,12 +251,11 @@ template<unsigned DIM>
 void ImmersedBoundaryCellPopulation<DIM>::UpdateNodeLocations(double dt)
 {
     // Get references to the fluid velocity grid
-    const std::vector<std::vector<double> >& velocity_grid_x = this->rGetMesh().rGetFluidVelocityGridX();
-    const std::vector<std::vector<double> >& velocity_grid_y = this->rGetMesh().rGetFluidVelocityGridY();
+    const multi_array<double, 3>& vel_grids = this->rGetMesh().rGet2dVelocityGrids();
 
     /**
-    * Set up all necessary variables before loop for efficiency
-    */
+     * Set up all necessary variables before loop for efficiency
+     */
 
     // Vectors for displacement and location of node
     c_vector<double, DIM> displacement;
@@ -306,8 +306,8 @@ void ImmersedBoundaryCellPopulation<DIM>::UpdateNodeLocations(double dt)
                 }
 
                 // The applied velocity is weighted by the delta function
-                displacement[0] += velocity_grid_x[(first_idx_y + y_idx) % num_grid_pts_y][(first_idx_x + x_idx) % num_grid_pts_x] * Delta1D(dist_x, step_size_x) * Delta1D(dist_y, step_size_y);
-                displacement[1] += velocity_grid_y[(first_idx_y + y_idx) % num_grid_pts_y][(first_idx_x + x_idx) % num_grid_pts_x] * Delta1D(dist_x, step_size_x) * Delta1D(dist_y, step_size_y);
+                displacement[0] += vel_grids[0][(first_idx_x + x_idx) % num_grid_pts_x][(first_idx_y + y_idx) % num_grid_pts_y] * Delta1D(dist_x, step_size_x) * Delta1D(dist_y, step_size_y);
+                displacement[1] += vel_grids[1][(first_idx_x + x_idx) % num_grid_pts_x][(first_idx_y + y_idx) % num_grid_pts_y] * Delta1D(dist_x, step_size_x) * Delta1D(dist_y, step_size_y);
             }
         }
 

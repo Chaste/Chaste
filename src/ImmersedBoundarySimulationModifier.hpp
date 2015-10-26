@@ -168,17 +168,17 @@ private:
     /** Pointer to fftw forward input Y array */
     double* mpFftwForwardInY;
 
+    /** Pointer to fftw inverse output X array */
+    double* mpFftwInverseOutX;
+
+    /** Pointer to fftw inverse output Y array */
+    double* mpFftwInverseOutY;
+
     /** Pointer to fftw forward output X array */
     fftw_complex* mpFftwForwardOutX;
 
     /** Pointer to fftw forward output Y array */
     fftw_complex* mpFftwForwardOutY;
-
-    /** Pointer to fftw backward input/output X array */
-    fftw_complex* mpFftwBackwardInOutX;
-
-    /** Pointer to fftw backward input/output Y array */
-    fftw_complex* mpFftwBackwardInOutY;
 
     /** Pointer to structure storing all necessary arrays */
     ImmersedBoundary2dArrays* mpArrays;

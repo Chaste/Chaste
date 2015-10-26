@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Version.hpp"
 #include "Cylindrical2dVertexMesh.hpp"
 #include "Toroidal2dVertexMesh.hpp"
+#include <boost/multi_array.hpp>
 #include "Debug.hpp"
 
 /**
@@ -471,14 +472,13 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
     *p_grid_file << num_gridpts_x << "\t" << num_gridpts_y << "\n";
 
     // Write grid data
-    std::vector<std::vector<double> > fluid_velocity_x = mpMesh->rGetFluidVelocityGridX();
-    std::vector<std::vector<double> > fluid_velocity_y = mpMesh->rGetFluidVelocityGridY();
+    const multi_array<double, 3>& vel_grids = mpMesh->rGet2dVelocityGrids();
 
     for( unsigned y_idx = 0 ; y_idx < num_gridpts_y ; y_idx ++ )
     {
         for( unsigned x_idx = 0 ; x_idx < num_gridpts_x ; x_idx ++ )
             {
-                *p_grid_file << fluid_velocity_x[y_idx][x_idx] << "\t";
+                *p_grid_file << vel_grids[0][x_idx][y_idx] << "\t";
             }
         *p_grid_file << "\n";
     }
@@ -487,7 +487,7 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
     {
         for( unsigned x_idx = 0 ; x_idx < num_gridpts_x ; x_idx ++ )
         {
-            *p_grid_file << fluid_velocity_y[y_idx][x_idx] << "\t";
+            *p_grid_file << vel_grids[1][x_idx][y_idx] << "\t";
         }
         *p_grid_file << "\n";
     }
