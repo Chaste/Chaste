@@ -83,7 +83,7 @@ public:
         // Create a cell
         CellPtr p_cell(new Cell(p_state, p_model));
 
-        // Coverage
+        // Test coverage
         TS_ASSERT_THROWS_THIS(p_cell->SetCellProliferativeType(p_state), "Attempting to give cell a cell proliferative type that is not a subtype of AbstractCellProliferativeType");
 
         p_cell->SetCellProliferativeType(p_type);
