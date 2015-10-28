@@ -235,7 +235,8 @@ protected:
     /** The vector of cells. Distributed. */
     std::vector< AbstractCardiacCellInterface* > mCellsDistributed;
 
-    /** The vector of the purkinje cells. Distributed. Empty unless a AbstractPurkinjeCellFactory is given to the constructor. */
+    /** The vector of the purkinje cells. Distributed.
+     * Empty unless a AbstractPurkinjeCellFactory is given to the constructor. */
     std::vector< AbstractCardiacCellInterface* > mPurkinjeCellsDistributed;
 
     /**

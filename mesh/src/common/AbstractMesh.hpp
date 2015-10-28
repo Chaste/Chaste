@@ -98,10 +98,15 @@ protected:  // Give access of these variables to subclasses
     /** Vector of pointers to boundary nodes in the mesh. */
     std::vector<Node<SPACE_DIM> *> mBoundaryNodes;
 
-    /** DistributedVectorFactory capable of reproducing the given number of nodes owned by each processor. */
+    /**
+     * DistributedVectorFactory capable of reproducing the
+     * given number of nodes owned by each processor.
+     */
     DistributedVectorFactory* mpDistributedVectorFactory;
 
-    /** Vector containing node permutation information.
+    /**
+     * Vector containing node permutation information.
+     *
      *  When empty (most meshes) there is no node permutation
      *  When non-empty (parallel distributed meshes) then for a given original_index
      *  #mNodePermutation[original_index] holds the new assigned index of that node in memory

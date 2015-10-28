@@ -152,7 +152,8 @@ public:
      * @param size  total size of vectors
      * @param numProcs  the number of processes expected (defaults to the current number)
      */
-    DistributedVectorFactory(unsigned lo, unsigned hi, unsigned size, unsigned numProcs=PetscTools::GetNumProcs());
+    DistributedVectorFactory(unsigned lo, unsigned hi, unsigned size,
+                             unsigned numProcs=PetscTools::GetNumProcs());
 
     /** Destructor deletes #mpOriginalFactory if it exists. */
     ~DistributedVectorFactory();
