@@ -41,6 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "IsNan.hpp"
 #include "ShortAxisVertexBasedDivisionRule.hpp"
 #include <boost/multi_array.hpp>
+#include "Debug.hpp"
 
 
 // Cell population writers
@@ -250,9 +251,14 @@ unsigned ImmersedBoundaryCellPopulation<DIM>::RemoveDeadCells()
 template<unsigned DIM>
 void ImmersedBoundaryCellPopulation<DIM>::UpdateNodeLocations(double dt)
 {
+    MARK;PRINT_VECTOR(this->rGetMesh().GetNode(0)->rGetLocation());
+
     // Get references to the fluid velocity grid
     const multi_array<double, 3>& vel_grids = this->rGetMesh().rGet2dVelocityGrids();
 
+    PRINT_VARIABLE(vel_grids[0][0][0]);
+
+    MARK;PRINT_VECTOR(this->rGetMesh().GetNode(0)->rGetLocation());
     /**
      * Set up all necessary variables before loop for efficiency
      */
@@ -260,11 +266,11 @@ void ImmersedBoundaryCellPopulation<DIM>::UpdateNodeLocations(double dt)
     // Vectors for displacement and location of node
     c_vector<double, DIM> displacement;
     c_vector<double, DIM> node_location;
-
+    MARK;PRINT_VECTOR(this->rGetMesh().GetNode(0)->rGetLocation());
     // Get the size of the mesh and set up force grids
     unsigned num_grid_pts_x = this->rGetMesh().GetNumGridPtsX();
     unsigned num_grid_pts_y = this->rGetMesh().GetNumGridPtsY();
-
+    MARK;PRINT_VECTOR(this->rGetMesh().GetNode(0)->rGetLocation());
     // Helper variables
     double characteristic_spacing = mpImmersedBoundaryMesh->GetCharacteristicNodeSpacing();
     double step_size_x = 1.0 / (double)num_grid_pts_x;
@@ -273,7 +279,7 @@ void ImmersedBoundaryCellPopulation<DIM>::UpdateNodeLocations(double dt)
     double dist_y;
     int first_idx_x;
     int first_idx_y;
-
+    MARK;PRINT_VECTOR(this->rGetMesh().GetNode(0)->rGetLocation());
     // Iterate over all nodes
     for (typename ImmersedBoundaryMesh<DIM, DIM>::NodeIterator node_iter = this->rGetMesh().GetNodeIteratorBegin(false);
             node_iter != this->rGetMesh().GetNodeIteratorEnd();
@@ -336,6 +342,7 @@ void ImmersedBoundaryCellPopulation<DIM>::UpdateNodeLocations(double dt)
         // Move the node
         this->SetNode(node_iter->GetIndex(), new_point);
     }
+    MARK;PRINT_VECTOR(this->rGetMesh().GetNode(0)->rGetLocation());
 }
 
 template<unsigned DIM>

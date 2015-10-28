@@ -55,11 +55,23 @@ protected:
     /** Grid to calculate upwind scheme and store RHS of system */
     multi_array<double, 3> mRightHandSideGrids;
 
+    /** Grid to store the first of two operators needed for the fft algorithm */
+    multi_array<double, 2> mOperator1;
+
+    /** Grid to store the second of two operators needed for the fft algorithm */
+    multi_array<double, 2> mOperator2;
+
     /** Grid to store results of R2C fft */
     multi_array<std::complex<double>, 3> mFourierGrids;
 
     /** Grid to store the calculated pressure grid */
     multi_array<std::complex<double>, 2> mPressureGrid;
+
+    /** Vector of sin values in x, constant once grid size is known */
+    std::vector<double> mSin2x;
+
+    /** Vector of sin values in x, constant once grid size is known */
+    std::vector<double> mSin2y;
 
 public:
 
@@ -69,7 +81,7 @@ public:
      * @param numGridPtsX The number of grid points in the X direction
      * @param numGridPtsY The number of grid points in the X direction
      */
-    ImmersedBoundary2dArrays(unsigned numGridPtsX, unsigned numGridPtsY);
+    ImmersedBoundary2dArrays(unsigned numGridPtsX, unsigned numGridPtsY, double reynoldsNumber, double dt);
 
     /**
      * Empty constructor
@@ -83,25 +95,29 @@ public:
      */
     virtual ~ImmersedBoundary2dArrays();
 
-    /**
-     * @return reference to modifiable force grids.
-     */
+    /** @return reference to modifiable force grids. */
     multi_array<double, 3>& rGetModifiableForceGrids();
 
-    /**
-     * @return reference to modifiable right-hand-side grids.
-     */
+    /** @return reference to modifiable right-hand-side grids. */
     multi_array<double, 3>& rGetModifiableRightHandSideGrids();
 
-    /**
-     * @return reference to modifiable Fourier grids.
-     */
+    /** @return reference to modifiable Fourier grids. */
     multi_array<std::complex<double>, 3>& rGetModifiableFourierGrids();
 
-    /**
-     * @return reference to modifiable pressure grid.
-     */
+    /** @return reference to modifiable pressure grid. */
     multi_array<std::complex<double>, 2>& rGetModifiablePressureGrid();
+
+    /** @return reference to the first operator. */
+    const multi_array<double, 2>& rGetOperator1() const;
+
+    /** @return reference to the second operator. */
+    const multi_array<double, 2>& rGetOperator2() const;
+
+    /** @return reference to the vector of sine values in x. */
+    const std::vector<double>& rGetSin2x() const;
+
+    /** @return reference to the vector of sine values in y. */
+    const std::vector<double>& rGetSin2y() const;
 
 };
 

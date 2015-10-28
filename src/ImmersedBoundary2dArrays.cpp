@@ -37,25 +37,55 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ImmersedBoundary2dArrays.hpp"
 #include <assert.h>
 
-ImmersedBoundary2dArrays::ImmersedBoundary2dArrays(unsigned numGridPtsX, unsigned numGridPtsY)
-{
-    // The complex grids are reduced in size due to redundancy in the fourier domain
-    unsigned reduced_y = 1 + (numGridPtsY/2);
+#include "Debug.hpp"
 
+ImmersedBoundary2dArrays::ImmersedBoundary2dArrays(unsigned numGridPtsX, unsigned numGridPtsY, double reynoldsNumber, double dt)
+{
     // We require an even number of grid points
     assert(numGridPtsY % 2 == 0);
 
-    // 2 X by Y grids, one for each dimension
+    // The complex grids are reduced in size due to redundancy in the fourier domain
+    unsigned reduced_y = 1 + (numGridPtsY/2);
+
+    // Resize all arrays
     mForceGrids.resize(extents[2][numGridPtsX][numGridPtsY]);
-
-    // 2 X by Y grids, one for each dimension
     mRightHandSideGrids.resize(extents[2][numGridPtsX][numGridPtsY]);
-
-    // 2 X by Y grids, one for each dimension, but some redundancy due to FFT of real data
+    mOperator1.resize(extents[numGridPtsX][reduced_y]);
+    mOperator2.resize(extents[numGridPtsX][reduced_y]);
     mFourierGrids.resize(extents[2][numGridPtsX][reduced_y]);
-
-    // 1 X by Y grid
     mPressureGrid.resize(extents[numGridPtsX][reduced_y]);
+    mSin2x.resize(numGridPtsX);
+    mSin2y.resize(reduced_y);
+
+    // Calculate constants needed when solving the fluid problem
+    double x_spacing = 1.0 / (double) numGridPtsX;
+    double y_spacing = 1.0 / (double) numGridPtsY;
+
+    for (unsigned x = 0 ; x < numGridPtsX ; x++)
+    {
+        mSin2x[x] = sin(2 * M_PI * (double) x * x_spacing);
+    }
+
+    for (unsigned y = 0 ; y < reduced_y ; y++)
+    {
+        mSin2y[y] = sin(2 * M_PI * (double) y * y_spacing);
+    }
+
+    for (unsigned x = 0 ; x < numGridPtsX ; x++)
+    {
+        for (unsigned y = 0 ; y < reduced_y ; y++)
+        {
+            mOperator1[x][y] = (mSin2x[x] * mSin2x[x] / (x_spacing * x_spacing)) + (mSin2y[y] * mSin2y[y] / (y_spacing * y_spacing));
+            mOperator1[x][y] *= dt / reynoldsNumber;
+
+            double sin_x = sin(M_PI * (double) x * x_spacing);
+            double sin_y = sin(M_PI * (double) y * y_spacing);
+
+            mOperator2[x][y] = (sin_x * sin_x / (x_spacing * x_spacing)) + (sin_y * sin_y / (y_spacing * y_spacing));
+            mOperator2[x][y] *= 4.0 * dt / reynoldsNumber;
+            mOperator2[x][y] += 1.0;
+        }
+    }
 }
 
 ImmersedBoundary2dArrays::~ImmersedBoundary2dArrays()
@@ -80,4 +110,24 @@ multi_array<std::complex<double>, 3>& ImmersedBoundary2dArrays::rGetModifiableFo
 multi_array<std::complex<double>, 2>& ImmersedBoundary2dArrays::rGetModifiablePressureGrid()
 {
     return mPressureGrid;
+}
+
+const multi_array<double, 2>& ImmersedBoundary2dArrays::rGetOperator1() const
+{
+    return mOperator1;
+}
+
+const multi_array<double, 2>& ImmersedBoundary2dArrays::rGetOperator2() const
+{
+    return mOperator2;
+}
+
+const std::vector<double>& ImmersedBoundary2dArrays::rGetSin2x() const
+{
+    return mSin2x;
+}
+
+const std::vector<double>& ImmersedBoundary2dArrays::rGetSin2y() const
+{
+    return mSin2y;
 }

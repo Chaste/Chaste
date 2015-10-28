@@ -107,12 +107,6 @@ private:
 
     /** Normalising constant needed for FFT */
     double mFftNorm;
-//
-//    /** Array of sine values for spectral solution of N-S */
-//    boost_real_array mSineGrid;
-//
-//    /** Array of sine values for spectral solution of N-S */
-//    boost_real_array mSin2Grid;
 
     /** Vector of sin(pi x / Nx) needed for FFT, but constant after grid size is known */
     std::vector<double> mSinX;
@@ -135,12 +129,6 @@ private:
     /** A map between node indices and a set of their possible neighbours, used calculating cell-cell interactions */
     std::map<unsigned, std::set<unsigned> > mNodeNeighbours;
 
-    /** Grid to store force x-component propagated to fluid by elastic interactions */
-    std::vector<std::vector<double> > mFluidForceGridX;
-
-    /** Grid to store force x-component propagated to fluid by elastic interactions */
-    std::vector<std::vector<double> > mFluidForceGridY;
-
     /** The fluid Reynolds number */
     double mReynolds;
 
@@ -161,24 +149,6 @@ private:
 
     /** The fftw plan for inverse transforms in Y */
     fftw_plan mFftwInversePlanY;
-
-    /** Pointer to fftw forward input X array */
-    double* mpFftwForwardInX;
-
-    /** Pointer to fftw forward input Y array */
-    double* mpFftwForwardInY;
-
-    /** Pointer to fftw inverse output X array */
-    double* mpFftwInverseOutX;
-
-    /** Pointer to fftw inverse output Y array */
-    double* mpFftwInverseOutY;
-
-    /** Pointer to fftw forward output X array */
-    fftw_complex* mpFftwForwardOutX;
-
-    /** Pointer to fftw forward output Y array */
-    fftw_complex* mpFftwForwardOutY;
 
     /** Pointer to structure storing all necessary arrays */
     ImmersedBoundary2dArrays* mpArrays;
@@ -213,18 +183,6 @@ private:
 
     /**
      * Helper method for UpdateFluidVelocityGrids()
-     * Calculates elastic forces around perimeter of each element
-     */
-    void CalculatePerimeterElasticForces();
-
-    /**
-     * Helper method for UpdateFluidVelocityGrids()
-     * Calculates elastic forces due to cell-cell interactions
-     */
-    void CalculateCellCellInteractionElasticForces();
-
-    /**
-     * Helper method for UpdateFluidVelocityGrids()
      * Propagates elastic forces to fluid grid
      */
     void PropagateForcesToFluidGrid();
@@ -245,74 +203,12 @@ private:
     double Delta1D(double dist, double spacing);
 
     /**
-     * Set up the FFT operator
-     *
-     * @param reference to the grid to populate
-     * @param dt the simulation time step
-     */
-    void CreateFftOperator(std::vector<std::vector<double> >& fft_operator, double dt);
-
-    /**
-     * Sets up output grids and calculates upwind difference
-     *
-     * @param const reference x input grid
-     * @param const reference y input grid
-     * @param reference to output grid
-     * @param reference to output grid
-     */
-    void UpwindScheme(const std::vector<std::vector<double> >& in_x, const std::vector<std::vector<double> >& in_y, std::vector<std::vector<double> >& out_x, std::vector<std::vector<double> >& out_y);
-
-    /**
      * Calculates upwind difference
      *
      * @param const reference to input grids
      * @param reference to output grids
      */
     void Upwind2d(const multi_array<double, 3>& input, multi_array<double, 3>& output);
-
-    /**
-     * Calculates the forward 2D discrete fourier transform of an array of real data
-     *
-     * @param reference to the input grid
-     * @return a 2D array of complex numbers
-     */
-    void Fft2DForwardRealToComplex(std::vector<std::vector<double> >& input, std::vector<std::vector<std::complex<double> > >& output);
-
-    /**
-     * Calculates the inverse 2D discrete fourier transform of an array of complex data, outputting real data
-     *
-     * @param reference to the input grid
-     * @return a 2D array of real numbers
-     */
-    void Fft2DInverseComplexToReal(std::vector<std::vector<std::complex<double> > >& input, std::vector<std::vector<double> >& output);
-
-    /**
-     * Helper method: set up grids to be the correct size
-     *
-     * @param reference to 2D vector of doubles
-     */
-    void SetupGrid(std::vector<std::vector<double> >&);
-
-    /**
-     * Helper method: set up grids to be the correct size
-     *
-     * @param reference to 2D vector of complex numbers
-     */
-    void SetupGrid(std::vector<std::vector<std::complex<double> > >& grid);
-
-    /**
-     * Debug method: print whole grid
-     *
-     * @param const reference to 2D grid
-     */
-    void PrintGrid(const std::vector<std::vector<double> >& grid);
-
-    /**
-     * Debug method: print whole grid
-     *
-     * @param const reference to 2D grid
-     */
-    void PrintGrid(const std::vector<std::vector<std::complex<double> > >& grid);
 
     /**
      * Helper method to set member variables for testing purposes

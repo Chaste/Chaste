@@ -73,7 +73,7 @@ public:
          * 5: Bottom-left x
          * 6: Botton-left y
          */
-        SuperellipseGenerator *p_gen = new SuperellipseGenerator(128, 0.2, 0.3, 0.6, 0.35, 0.2);
+        SuperellipseGenerator *p_gen = new SuperellipseGenerator(512, 0.2, 0.3, 0.6, 0.35, 0.2);
 
         // Generate a mesh using this superellipse
         std::vector<c_vector<double, 2> > locations = p_gen->GetPointsAsVectors();
@@ -88,9 +88,9 @@ public:
         std::vector<ImmersedBoundaryElement<2,2>* > elements;
         elements.push_back(new ImmersedBoundaryElement<2,2>(0, nodes));
 
-        ImmersedBoundaryMesh<2,2> mesh(nodes, elements, 64, 64);
+        ImmersedBoundaryMesh<2,2> mesh(nodes, elements, 512, 512);
 
-        mesh.GetElement(0)->SetMembraneSpringConstant(1e7);
+        mesh.GetElement(0)->SetMembraneSpringConstant(1e8);
         mesh.GetElement(0)->SetMembraneRestLength(0.25 * mesh.GetCharacteristicNodeSpacing());
 
         std::vector<CellPtr> cells;
@@ -118,9 +118,9 @@ public:
         simulator.SetEndTime(40.0);
 
         double setup_time = timer.GetElapsedTime();
-
+MARK;
         simulator.Solve();
-
+MARK;
         double sim_time = timer.GetElapsedTime() - setup_time;
 
         PRINT_2_VARIABLES(setup_time, sim_time);

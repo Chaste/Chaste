@@ -81,6 +81,8 @@ ImmersedBoundarySimulationModifier<DIM>::~ImmersedBoundarySimulationModifier()
 template<unsigned DIM>
 void ImmersedBoundarySimulationModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
+    MARK;PRINT_VECTOR(mpMesh->GetNode(0)->rGetLocation());PRINT_VARIABLE(mpMesh->GetNumNodes());
+
     // We need to update node neighbours occasionally, but not necessarily each timestep
     if(SimulationTime::Instance()->GetTimeStepsElapsed() % mNodeNeighbourUpdateFrequency == 0)
     {
@@ -99,6 +101,7 @@ void ImmersedBoundarySimulationModifier<DIM>::SetupSolve(AbstractCellPopulation<
 
     // This will solve the fluid problem based on the initial mesh setup
     this->UpdateFluidVelocityGrids(rCellPopulation);
+    MARK;PRINT_VECTOR(mpMesh->GetNode(0)->rGetLocation());PRINT_VARIABLE(mpMesh->GetNumNodes());
 }
 
 template<unsigned DIM>
@@ -136,15 +139,11 @@ void ImmersedBoundarySimulationModifier<DIM>::SetupConstantMemberVariables(Abstr
     mGridSpacingX = 1.0 / (double) mNumGridPtsX;
     mGridSpacingY = 1.0 / (double) mNumGridPtsY;
 
-    // Set up force grids
-    SetupGrid(mFluidForceGridX);
-    SetupGrid(mFluidForceGridY);
-
     // Set up dimension-dependent variables
     switch (DIM)
     {
         case 2:
-            mpArrays = new ImmersedBoundary2dArrays(mNumGridPtsX, mNumGridPtsY);
+            mpArrays = new ImmersedBoundary2dArrays(mNumGridPtsX, mNumGridPtsY, mReynolds, SimulationTime::Instance()->GetTimeStep());
 
             mFftNorm = (double) mNumGridPtsX * (double) mNumGridPtsY;
             break;
@@ -196,25 +195,24 @@ void ImmersedBoundarySimulationModifier<DIM>::SetupConstantMemberVariables(Abstr
      * Plan the discrete Fourier transforms:
      *
      *  * Forward are real-to-complex and out-of-place
-     *  * Backward are complex-to-complex and-in-place
+     *  * Backward are complex-to-real and out-of-place
      */
 
-    // We first set the pointers to arrays that have already been assigned space, as the planning procedure may
-    // overwrite data
-    mpFftwForwardInX = &(mpArrays->rGetModifiableRightHandSideGrids()[0][0][0]);
-    mpFftwForwardInY = &(mpArrays->rGetModifiableRightHandSideGrids()[1][0][0]);
+    // We first set the pointers to arrays where the data will be stored
+    double* p_in_x = &(mpArrays->rGetModifiableRightHandSideGrids()[0][0][0]);
+    double* p_in_y = &(mpArrays->rGetModifiableRightHandSideGrids()[1][0][0]);
 
-    mpFftwForwardOutX = reinterpret_cast<fftw_complex*>(&(mpArrays->rGetModifiableFourierGrids()[0][0][0]));
-    mpFftwForwardOutY = reinterpret_cast<fftw_complex*>(&(mpArrays->rGetModifiableFourierGrids()[1][0][0]));
+    fftw_complex* p_complex_x = reinterpret_cast<fftw_complex*>(&(mpArrays->rGetModifiableFourierGrids()[0][0][0]));
+    fftw_complex* p_complex_y = reinterpret_cast<fftw_complex*>(&(mpArrays->rGetModifiableFourierGrids()[1][0][0]));
 
-    mpFftwInverseOutX = &(mpMesh->rGetModifiable2dVelocityGrids()[0][0][0]);
-    mpFftwInverseOutY = &(mpMesh->rGetModifiable2dVelocityGrids()[1][0][0]);
+    double* p_out_x = &(mpMesh->rGetModifiable2dVelocityGrids()[0][0][0]);
+    double* p_out_y = &(mpMesh->rGetModifiable2dVelocityGrids()[1][0][0]);
 
-    mFftwForwardPlanX = fftw_plan_dft_r2c_2d(mNumGridPtsX, mNumGridPtsY, mpFftwForwardInX, mpFftwForwardOutX, FFTW_EXHAUSTIVE);
-    mFftwForwardPlanY = fftw_plan_dft_r2c_2d(mNumGridPtsX, mNumGridPtsY, mpFftwForwardInY, mpFftwForwardOutY, FFTW_EXHAUSTIVE);
+    mFftwForwardPlanX = fftw_plan_dft_r2c_2d(mNumGridPtsX, mNumGridPtsY, p_in_x, p_complex_x, FFTW_EXHAUSTIVE);
+    mFftwForwardPlanY = fftw_plan_dft_r2c_2d(mNumGridPtsX, mNumGridPtsY, p_in_y, p_complex_y, FFTW_EXHAUSTIVE);
 
-    mFftwInversePlanX = fftw_plan_dft_c2r_2d(mNumGridPtsX, mNumGridPtsY, mpFftwForwardOutX, mpFftwInverseOutX, FFTW_EXHAUSTIVE);
-    mFftwInversePlanY = fftw_plan_dft_c2r_2d(mNumGridPtsX, mNumGridPtsY, mpFftwForwardOutY, mpFftwInverseOutY, FFTW_EXHAUSTIVE);
+    mFftwInversePlanX = fftw_plan_dft_c2r_2d(mNumGridPtsX, mNumGridPtsY, p_complex_x, p_out_x, FFTW_EXHAUSTIVE);
+    mFftwInversePlanY = fftw_plan_dft_c2r_2d(mNumGridPtsX, mNumGridPtsY, p_complex_y, p_out_y, FFTW_EXHAUSTIVE);
 
 
 //    // Set up threads for fftw
@@ -238,29 +236,16 @@ void ImmersedBoundarySimulationModifier<DIM>::ClearForces()
         node_iter->ClearAppliedForce();
     }
 
-    for (unsigned y = 0; y < mNumGridPtsY; y++)
+    multi_array<double, 3>& r_force_grids = mpArrays->rGetModifiableForceGrids();
+
+    for (unsigned dim = 0 ; dim < 2 ; dim++)
     {
         for (unsigned x = 0; x < mNumGridPtsX; x++)
         {
-            mFluidForceGridX[y][x] = 0.0;
-            mFluidForceGridY[y][x] = 0.0;
-        }
-    }
-
-    multi_array<double, 3>& r_force_grids = mpArrays->rGetModifiableForceGrids();
-
-    for (unsigned x = 0; x < mNumGridPtsX; x++)
-    {
-        for (unsigned y = 0; y < mNumGridPtsY; y++)
-        {
-            r_force_grids[0][x][y] = 0.0;
-        }
-    }
-    for (unsigned x = 0; x < mNumGridPtsX; x++)
-    {
-        for (unsigned y = 0; y < mNumGridPtsY; y++)
-        {
-            r_force_grids[1][x][y] = 0.0;
+            for (unsigned y = 0; y < mNumGridPtsY; y++)
+            {
+                r_force_grids[dim][x][y] = 0.0;
+            }
         }
     }
 }
@@ -329,9 +314,6 @@ void ImmersedBoundarySimulationModifier<DIM>::PropagateForcesToFluidGrid()
                 force_x = applied_force[0] * Delta1D(dist_x, mGridSpacingX) * Delta1D(dist_y, mGridSpacingY) * dl;
                 force_y = applied_force[1] * Delta1D(dist_x, mGridSpacingX) * Delta1D(dist_y, mGridSpacingY) * dl;
 
-                mFluidForceGridX[(first_idx_y + y_idx) % mNumGridPtsY][(first_idx_x + x_idx) % mNumGridPtsX] += force_x;
-                mFluidForceGridY[(first_idx_y + y_idx) % mNumGridPtsY][(first_idx_x + x_idx) % mNumGridPtsX] += force_y;
-
                 force_grids[0][(first_idx_x + x_idx) % mNumGridPtsX][(first_idx_y + y_idx) % mNumGridPtsY] += force_x;
                 force_grids[1][(first_idx_x + x_idx) % mNumGridPtsX][(first_idx_y + y_idx) % mNumGridPtsY] += force_y;
             }
@@ -350,6 +332,11 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
     multi_array<double, 3>& vel_grids   = mpMesh->rGetModifiable2dVelocityGrids();
     multi_array<double, 3>& force_grids = mpArrays->rGetModifiableForceGrids();
     multi_array<double, 3>& rhs_grids   = mpArrays->rGetModifiableRightHandSideGrids();
+
+    const multi_array<double, 2>& op_1  = mpArrays->rGetOperator1();
+    const multi_array<double, 2>& op_2  = mpArrays->rGetOperator1();
+    const std::vector<double>& sin_2x   = mpArrays->rGetSin2x();
+    const std::vector<double>& sin_2y   = mpArrays->rGetSin2y();
 
     multi_array<std::complex<double>, 3>& fourier_grids = mpArrays->rGetModifiableFourierGrids();
     multi_array<std::complex<double>, 2>& pressure_grid = mpArrays->rGetModifiablePressureGrid();
@@ -383,12 +370,7 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
     {
         for (unsigned y = 0 ; y < reduced_size ; y++)
         {
-            std::complex<double> numerator = -mI * (mSin2X[x] * fourier_grids[0][x][y] / mGridSpacingX + mSin2Y[y] * fourier_grids[1][x][y] / mGridSpacingY);
-
-            double denominator = (mSin2X[x] * mSin2X[x] / (mGridSpacingX * mGridSpacingX)) + (mSin2Y[y] * mSin2Y[y] / (mGridSpacingY * mGridSpacingY));
-            denominator *= (dt / mReynolds);
-
-            pressure_grid[x][y] = numerator / denominator;
+            pressure_grid[x][y] = -mI * (sin_2x[x] * fourier_grids[0][x][y] / mGridSpacingX + sin_2y[y] * fourier_grids[1][x][y] / mGridSpacingY) / op_1[x][y];
         }
     }
 
@@ -406,9 +388,8 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
     {
         for (unsigned y = 0 ; y < reduced_size ; y++)
         {
-            double op = 1 + (4 * dt / mReynolds) * ( (mSinX[x] * mSinX[x] / (mGridSpacingX * mGridSpacingX)) + (mSinY[y] * mSinY[y] / (mGridSpacingY * mGridSpacingY)));
-            fourier_grids[0][x][y] = (fourier_grids[0][x][y] - (mI * dt / (mReynolds * mGridSpacingX)) * mSin2X[x] * pressure_grid[x][y]) / (op * large_number * mFftNorm);
-            fourier_grids[1][x][y] = (fourier_grids[1][x][y] - (mI * dt / (mReynolds * mGridSpacingY)) * mSin2Y[y] * pressure_grid[x][y]) / (op * large_number * mFftNorm);
+            fourier_grids[0][x][y] = (fourier_grids[0][x][y] - (mI * dt / (mReynolds * mGridSpacingX)) * sin_2x[x] * pressure_grid[x][y]) / (op_2[x][y] * large_number * mFftNorm);
+            fourier_grids[1][x][y] = (fourier_grids[1][x][y] - (mI * dt / (mReynolds * mGridSpacingY)) * sin_2y[y] * pressure_grid[x][y]) / (op_2[x][y] * large_number * mFftNorm);
         }
     }
 
@@ -421,56 +402,6 @@ template<unsigned DIM>
 double ImmersedBoundarySimulationModifier<DIM>::Delta1D(double dist, double spacing)
 {
     return (0.25 * (1.0 + cos(M_PI * dist / (2 * spacing)))) / spacing;
-}
-
-template<unsigned DIM>
-void ImmersedBoundarySimulationModifier<DIM>::UpwindScheme(const std::vector<std::vector<double> >& in_x, const std::vector<std::vector<double> >& in_y, std::vector<std::vector<double> >& out_x, std::vector<std::vector<double> >& out_y)
-{
-    // Ensure the derivative grid is set up to the correct size
-    SetupGrid(out_x);
-    SetupGrid(out_y);
-
-    unsigned prev_x = mNumGridPtsX - 1;
-    unsigned prev_y = mNumGridPtsY - 1;
-
-    unsigned next_x = 1;
-    unsigned next_y = 1;
-
-    for(unsigned y = 0 ; y < mNumGridPtsY ; y++)
-    {
-        for(unsigned x = 0 ; x < mNumGridPtsX ; x++)
-        {
-            // Set values for output from conditional on x grid
-            if(in_x[y][x] > 0)
-            {
-                out_x[y][x] = in_x[y][x] * (in_x[y][x] - in_x[y][prev_x]) / mGridSpacingX;
-                out_y[y][x] = in_x[y][x] * (in_y[y][x] - in_y[y][prev_x]) / mGridSpacingX;
-            }
-            else
-            {
-                out_x[y][x] = in_x[y][x] * (in_x[y][next_x] - in_x[y][x]) / mGridSpacingX;
-                out_y[y][x] = in_x[y][x] * (in_y[y][next_x] - in_y[y][x]) / mGridSpacingX;
-            }
-
-            // Then add values from conditional on y grid
-            if(in_y[y][x] > 0)
-            {
-                out_x[y][x] += in_y[y][x] * (in_x[y][x] - in_x[prev_y][x]) / mGridSpacingY;
-                out_y[y][x] += in_y[y][x] * (in_y[y][x] - in_y[prev_y][x]) / mGridSpacingY;
-            }
-            else
-            {
-                out_x[y][x] += in_y[y][x] * (in_x[next_y][x] - in_x[y][x]) / mGridSpacingY;
-                out_y[y][x] += in_y[y][x] * (in_y[next_y][x] - in_y[y][x]) / mGridSpacingY;
-            }
-
-            prev_x = (prev_x + 1) % mNumGridPtsX;
-            next_x = (next_x + 1) % mNumGridPtsX;
-        }
-
-        prev_y = (prev_y + 1) % mNumGridPtsY;
-        next_y = (next_y + 1) % mNumGridPtsY;
-    }
 }
 
 template<unsigned DIM>
@@ -517,133 +448,6 @@ void ImmersedBoundarySimulationModifier<DIM>::Upwind2d(const multi_array<double,
         prev_x = (prev_x + 1) % mNumGridPtsX;
         next_x = (next_x + 1) % mNumGridPtsX;
     }
-}
-
-template<unsigned DIM>
-void ImmersedBoundarySimulationModifier<DIM>::Fft2DForwardRealToComplex(std::vector<std::vector<double> >& input, std::vector<std::vector<std::complex<double> > >& output)
-{
-    // Ensure output grid is set up correctly
-    SetupGrid(output);
-
-    // Set up some variables needed for fftw
-    fftw_complex *complex_in_out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * mNumGridPtsY * mNumGridPtsX);
-    fftw_plan plan;
-
-    // Rearrange input array into 1D vector of fftw_complexs
-    unsigned count = 0;
-    for(unsigned y = 0 ; y < mNumGridPtsY ; y++)
-    {
-        for(unsigned x = 0 ; x < mNumGridPtsX ; x++)
-        {
-            complex_in_out[count][0] = input[y][x];
-            complex_in_out[count][1] = 0.0; // maybe don't need to do this
-            count++;
-        }
-    }
-
-    // Plan and perform in-place fft using fftw
-    plan = fftw_plan_dft_2d(mNumGridPtsY, mNumGridPtsX, complex_in_out, complex_in_out, FFTW_FORWARD, FFTW_ESTIMATE);
-    fftw_execute(plan);
-    fftw_destroy_plan(plan);
-
-    // Rearrange 1D output into 2D vector of complex numbers, and normalise
-    for( unsigned y = 0 ; y < mNumGridPtsY ; y++ )
-    {
-        for( unsigned x = 0 ; x < mNumGridPtsX ; x++ )
-        {
-            output[y][x] = (complex_in_out[y * mNumGridPtsX + x][0] + mI * complex_in_out[y * mNumGridPtsX + x][1]);
-        }
-    }
-
-    // Free memory used for fft array
-    fftw_free(complex_in_out);
-}
-
-template<unsigned DIM>
-void ImmersedBoundarySimulationModifier<DIM>::Fft2DInverseComplexToReal(std::vector<std::vector<std::complex<double> > >& input, std::vector<std::vector<double> >& output)
-{
-    // Ensure output grid is set up correctly
-    SetupGrid(output);
-
-    // Set up some variables needed for fftw
-    fftw_complex *complex_in_out;
-    complex_in_out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * mNumGridPtsY * mNumGridPtsX);
-    fftw_plan plan;
-
-    // Rearrange input array into 1D vector of fftw_complexs
-    unsigned count = 0;
-    for(unsigned y = 0 ; y < mNumGridPtsY ; y++)
-    {
-        for(unsigned x = 0 ; x < mNumGridPtsX ; x++)
-        {
-            complex_in_out[count][0] = input[y][x].real();
-            complex_in_out[count][1] = input[y][x].imag();
-            count++;
-        }
-    }
-
-    // Plan and perform in-place inverse FFT using FFTW
-    plan = fftw_plan_dft_2d(mNumGridPtsY, mNumGridPtsX, complex_in_out, complex_in_out, FFTW_BACKWARD, FFTW_ESTIMATE);
-    fftw_execute(plan);
-    fftw_destroy_plan(plan);
-
-    // Rearrange 1D output into 2D vector of real doubles
-    for( unsigned y = 0 ; y < mNumGridPtsY ; y++ )
-    {
-        for( unsigned x = 0 ; x < mNumGridPtsX ; x++ )
-        {
-            output[y][x] = complex_in_out[y * mNumGridPtsX + x][0] /(mFftNorm * mFftNorm);
-        }
-    }
-
-    fftw_free(complex_in_out);
-}
-
-template<unsigned DIM>
-void ImmersedBoundarySimulationModifier<DIM>::SetupGrid(std::vector<std::vector<std::complex<double> > >& grid)
-{
-    grid.resize(mNumGridPtsY);
-    for (unsigned grid_y = 0; grid_y < mNumGridPtsY; grid_y++)
-    {
-        grid[grid_y].resize(mNumGridPtsX);
-    }
-}
-
-template<unsigned DIM>
-void ImmersedBoundarySimulationModifier<DIM>::SetupGrid(std::vector<std::vector<double> >& grid)
-{
-    grid.resize(mNumGridPtsY);
-    for (unsigned grid_y = 0; grid_y < mNumGridPtsY; grid_y++)
-    {
-        grid[grid_y].resize(mNumGridPtsX);
-    }
-}
-
-template<unsigned DIM>
-void ImmersedBoundarySimulationModifier<DIM>::PrintGrid(const std::vector<std::vector<double> >& grid)
-{
-    for (unsigned y = 0; y < mNumGridPtsY; y++)
-    {
-        for (unsigned x = 0; x < mNumGridPtsX; x++)
-        {
-            std::cout << std::setprecision(5) << grid[y][x] << " ";
-        }
-        std::cout << "\n";
-    }
-    std::cout << "\n";
-}
-
-template<unsigned DIM>
-void ImmersedBoundarySimulationModifier<DIM>::PrintGrid(const std::vector<std::vector<std::complex<double> > > & grid)
-{
-    for (unsigned y = 0; y < mNumGridPtsY; y++)
-    {
-        for (unsigned x = 0; x < mNumGridPtsX; x++)
-        {
-            std::cout << std::setprecision(10) << grid[y][x].real() << "+" << grid[y][x].imag() << "i ";
-        }
-    }
-    std::cout << "\n";
 }
 
 template<unsigned DIM>
