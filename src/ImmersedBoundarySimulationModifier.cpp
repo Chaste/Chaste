@@ -42,6 +42,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Debug.hpp"
 #include "Timer.hpp"
 
+#include <boost/thread.hpp>
+
 template<unsigned DIM>
 ImmersedBoundarySimulationModifier<DIM>::ImmersedBoundarySimulationModifier()
     : AbstractCellBasedSimulationModifier<DIM>(),
@@ -120,6 +122,8 @@ void ImmersedBoundarySimulationModifier<DIM>::UpdateFluidVelocityGrids(AbstractC
 template<unsigned DIM>
 void ImmersedBoundarySimulationModifier<DIM>::SetupConstantMemberVariables(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
+    mNumThreadsForFftw = 1;
+
     if (dynamic_cast<ImmersedBoundaryCellPopulation<DIM> *>(&rCellPopulation) == NULL)
     {
         EXCEPTION("Cell population must be Immersed Boundary");
@@ -179,14 +183,31 @@ void ImmersedBoundarySimulationModifier<DIM>::SetupConstantMemberVariables(Abstr
     mpBoxCollection->SetupLocalBoxesHalfOnly();
     mpBoxCollection->CalculateNodePairs(mpMesh->rGetNodes(), mNodePairs, mNodeNeighbours);
 
-    std::string filename = "./projects/ImmersedBoundary/src/fftw.wisdom";
-    int wisdom_flag = fftw_import_wisdom_from_filename(filename.c_str());
 
-    // 1 means it's read correctly, 0 indicates a failure
-    if (wisdom_flag != 1)
+    if (mNumThreadsForFftw > 1)
     {
-        WARNING("FFTW wisdom file not imported correctly; DFT may take much longer than usual.");
+        // Set up threads for fftw
+        int potential_thread_errors = fftw_init_threads();
+
+        if (potential_thread_errors == 0)
+        {
+            EXCEPTION("fftw thread error");
+        }
+
+        fftw_plan_with_nthreads(2);
     }
+    else
+    {
+        std::string filename = "./projects/ImmersedBoundary/src/fftw.wisdom";
+        int wisdom_flag = fftw_import_wisdom_from_filename(filename.c_str());
+
+        // 1 means it's read correctly, 0 indicates a failure
+        if (wisdom_flag != 1)
+        {
+            WARNING("FFTW wisdom file not imported correctly; DFT may take much longer than usual.");
+        }
+    }
+
 
     /*
      * Plan the discrete Fourier transforms:
@@ -211,16 +232,13 @@ void ImmersedBoundarySimulationModifier<DIM>::SetupConstantMemberVariables(Abstr
     mFftwInversePlanX = fftw_plan_dft_c2r_2d(mNumGridPtsX, mNumGridPtsY, p_complex_x, p_out_x, FFTW_EXHAUSTIVE);
     mFftwInversePlanY = fftw_plan_dft_c2r_2d(mNumGridPtsX, mNumGridPtsY, p_complex_y, p_out_y, FFTW_EXHAUSTIVE);
 
-
-//    // Set up threads for fftw
-//    int potential_thread_errors = fftw_init_threads();
-//
-//    if (potential_thread_errors == 0)
-//    {
-//        EXCEPTION("fftw thread error");
-//    }
-//
-//    fftw_plan_with_nthreads(2);
+    t_total_time = 0.0;
+    t_upwind = 0.0;
+    t_rhs = 0.0;
+    t_fftw_forward = 0.0;
+    t_pressure = 0.0;
+    t_final = 0.0;
+    t_fftw_inverse = 0.0;
 }
 
 template<unsigned DIM>
@@ -338,8 +356,14 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
     multi_array<std::complex<double>, 3>& fourier_grids = mpArrays->rGetModifiableFourierGrids();
     multi_array<std::complex<double>, 2>& pressure_grid = mpArrays->rGetModifiablePressureGrid();
 
+    Timer timer;
+    timer.Reset();
+
     // Perform upwind differencing and create RHS of linear system
     Upwind2d(vel_grids, rhs_grids);
+
+    t_upwind += timer.GetElapsedTime(); timer.Reset();
+
     for (unsigned dim = 0 ; dim < 2 ; dim++)
     {
         for(unsigned x = 0 ; x < mNumGridPtsX ; x++)
@@ -351,8 +375,16 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
         }
     }
 
+    t_rhs += timer.GetElapsedTime(); timer.Reset();
+
     // Perform fft on rhs_grids; results go to fourier_grids
-    FftwForward();
+    boost::thread x_forward_thread(boost::bind(&ImmersedBoundarySimulationModifier<DIM>::FftwForwardX, this));
+    boost::thread y_forward_thread(boost::bind(&ImmersedBoundarySimulationModifier<DIM>::FftwForwardY, this));
+
+    x_forward_thread.join();
+    y_forward_thread.join();
+
+    t_fftw_forward += timer.GetElapsedTime(); timer.Reset();
 
     /*
      * The result of a DFT of n real datapoints is n/2 + 1 complex values, due to redundancy: element n-1 is conj(2),
@@ -375,6 +407,8 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
     pressure_grid[mNumGridPtsX/2][mNumGridPtsY/2] = 0.0;
     pressure_grid[0][mNumGridPtsY/2] = 0.0;
 
+    t_pressure += timer.GetElapsedTime(); timer.Reset();
+
     /*
      * Do final stage of computation before inverse FFT.  We do the necessary DFT scaling at this stage so the output
      * from the inverse DFT is correct.
@@ -388,21 +422,53 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
         }
     }
 
+    t_final += timer.GetElapsedTime(); timer.Reset();
+
     // Perform inverse fft on fourier_grids; results are in vel_grids
-    FftwInverse();
+    boost::thread x_inverse_thread(boost::bind(&ImmersedBoundarySimulationModifier<DIM>::FftwInverseX, this));
+    boost::thread y_inverse_thread(boost::bind(&ImmersedBoundarySimulationModifier<DIM>::FftwInverseY, this));
+
+    x_inverse_thread.join();
+    y_inverse_thread.join();
+
+    t_fftw_inverse += timer.GetElapsedTime(); timer.Reset();
+
+    if (SimulationTime::Instance()->GetTimeStepsElapsed() == 100)
+    {
+        t_total_time = t_upwind + t_rhs + t_fftw_forward + t_pressure + t_final + t_fftw_inverse;
+
+        std::cout << std::endl;
+        std::cout << "Upwind:         " << 100 * t_upwind       / t_total_time << endl
+                  << "RHS:            " << 100 * t_rhs          / t_total_time << endl
+                  << "FFTW forward:   " << 100 * t_fftw_forward / t_total_time << endl
+                  << "Pressure:       " << 100 * t_pressure     / t_total_time << endl
+                  << "Final step:     " << 100 * t_final        / t_total_time << endl
+                  << "FFTW inverse:   " << 100 * t_fftw_inverse / t_total_time << endl;
+        std::cout << std::endl;
+    }
 }
 
 template<unsigned DIM>
-void ImmersedBoundarySimulationModifier<DIM>::FftwForward()
+void ImmersedBoundarySimulationModifier<DIM>::FftwForwardX()
 {
     fftw_execute(mFftwForwardPlanX);
+}
+
+template<unsigned DIM>
+void ImmersedBoundarySimulationModifier<DIM>::FftwForwardY()
+{
     fftw_execute(mFftwForwardPlanY);
 }
 
 template<unsigned DIM>
-void ImmersedBoundarySimulationModifier<DIM>::FftwInverse()
+void ImmersedBoundarySimulationModifier<DIM>::FftwInverseX()
 {
     fftw_execute(mFftwInversePlanX);
+}
+
+template<unsigned DIM>
+void ImmersedBoundarySimulationModifier<DIM>::FftwInverseY()
+{
     fftw_execute(mFftwInversePlanY);
 }
 

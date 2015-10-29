@@ -153,6 +153,17 @@ private:
     /** Pointer to structure storing all necessary arrays */
     ImmersedBoundary2dArrays* mpArrays;
 
+    /** Max number of threads for fftw */
+    unsigned mNumThreadsForFftw;
+
+    double t_total_time;
+    double t_upwind;
+    double t_rhs;
+    double t_fftw_forward;
+    double t_pressure;
+    double t_final;
+    double t_fftw_inverse;
+
     /**
      * Helper method to calculate elastic forces, propagate these to the fluid grid
      * and solve Navier-Stokes to update the fluid velocity grids
@@ -195,15 +206,27 @@ private:
 
     /**
      * Helper method for SolveNavierStokesSpectral()
-     * Performs forward fourier transforms.  In separate method only for profiling
+     * Performs forward fourier transform in X.  In separate method for multi-threading
      */
-    void FftwForward();
+    void FftwForwardX();
 
     /**
      * Helper method for SolveNavierStokesSpectral()
-     * Performs inverse fourier transforms.  In separate method only for profiling
+     * Performs forward fourier transform in Y.  In separate method for multi-threading
      */
-    void FftwInverse();
+    void FftwForwardY();
+
+    /**
+     * Helper method for SolveNavierStokesSpectral()
+     * Performs inverse fourier transform in X.  In separate method for multi-threading
+     */
+    void FftwInverseX();
+
+    /**
+     * Helper method for SolveNavierStokesSpectral()
+     * Performs inverse fourier transform in Y.  In separate method for multi-threading
+     */
+    void FftwInverseY();
 
     /**
      * Helper method for PropagateForcesToFluidGrid()

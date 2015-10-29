@@ -112,10 +112,11 @@ public:
 
 
         // Set simulation properties
+        double dt = 0.0005;
         simulator.SetOutputDirectory("TestShortMultiCellSimulation");
-        simulator.SetDt(0.0005);
+        simulator.SetDt(dt);
         simulator.SetSamplingTimestepMultiple(10);
-        simulator.SetEndTime(10.0);
+        simulator.SetEndTime(100.0 * dt);
 
         setup_duration = timer.GetElapsedTime();
 
@@ -123,6 +124,6 @@ public:
 
         simulation_duration = timer.GetElapsedTime() - setup_duration;
 
-        PRINT_2_VARIABLES(setup_duration, simulation_duration);
+//        PRINT_2_VARIABLES(setup_duration, simulation_duration);
     }
 };
