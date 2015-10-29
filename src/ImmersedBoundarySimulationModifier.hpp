@@ -194,6 +194,18 @@ private:
     void SolveNavierStokesSpectral();
 
     /**
+     * Helper method for SolveNavierStokesSpectral()
+     * Performs forward fourier transforms.  In separate method only for profiling
+     */
+    void FftwForward();
+
+    /**
+     * Helper method for SolveNavierStokesSpectral()
+     * Performs inverse fourier transforms.  In separate method only for profiling
+     */
+    void FftwInverse();
+
+    /**
      * Helper method for PropagateForcesToFluidGrid()
      * Calculates the discrete delta approximation based on distance and grid spacing
      *

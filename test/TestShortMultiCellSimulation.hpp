@@ -76,17 +76,17 @@ public:
          * 5: Random y-variation
          * 6: Include membrane
          */
-        ImmersedBoundaryPalisadeMeshGenerator gen(7, 64, 0.2, 2.5, 0.0, false);
+        ImmersedBoundaryPalisadeMeshGenerator gen(7, 256, 0.2, 2.5, 0.0, false);
         ImmersedBoundaryMesh<2, 2>* p_mesh = gen.GetMesh();
 
-        p_mesh->SetNumGridPtsXAndY(64);
+        p_mesh->SetNumGridPtsXAndY(512);
 
 //        p_mesh->GetElement(0)->SetMembraneSpringConstant(1e9);
 //        p_mesh->GetElement(0)->SetMembraneRestLength(0.001 * p_mesh->GetCharacteristicNodeSpacing());
 
         for (unsigned elem_idx = 0; elem_idx < p_mesh->GetNumElements() ; elem_idx++)
         {
-            p_mesh->GetElement(elem_idx)->SetMembraneSpringConstant(1e8);
+            p_mesh->GetElement(elem_idx)->SetMembraneSpringConstant(1e9);
             p_mesh->GetElement(elem_idx)->SetMembraneRestLength(0.25 * p_mesh->GetCharacteristicNodeSpacing());
         }
 
@@ -114,7 +114,7 @@ public:
         // Set simulation properties
         simulator.SetOutputDirectory("TestShortMultiCellSimulation");
         simulator.SetDt(0.0005);
-        simulator.SetSamplingTimestepMultiple(20000);
+        simulator.SetSamplingTimestepMultiple(10);
         simulator.SetEndTime(10.0);
 
         setup_duration = timer.GetElapsedTime();

@@ -81,8 +81,6 @@ ImmersedBoundarySimulationModifier<DIM>::~ImmersedBoundarySimulationModifier()
 template<unsigned DIM>
 void ImmersedBoundarySimulationModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
-    MARK;PRINT_VECTOR(mpMesh->GetNode(0)->rGetLocation());PRINT_VARIABLE(mpMesh->GetNumNodes());
-
     // We need to update node neighbours occasionally, but not necessarily each timestep
     if(SimulationTime::Instance()->GetTimeStepsElapsed() % mNodeNeighbourUpdateFrequency == 0)
     {
@@ -101,7 +99,6 @@ void ImmersedBoundarySimulationModifier<DIM>::SetupSolve(AbstractCellPopulation<
 
     // This will solve the fluid problem based on the initial mesh setup
     this->UpdateFluidVelocityGrids(rCellPopulation);
-    MARK;PRINT_VECTOR(mpMesh->GetNode(0)->rGetLocation());PRINT_VARIABLE(mpMesh->GetNumNodes());
 }
 
 template<unsigned DIM>
@@ -334,13 +331,12 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
     multi_array<double, 3>& rhs_grids   = mpArrays->rGetModifiableRightHandSideGrids();
 
     const multi_array<double, 2>& op_1  = mpArrays->rGetOperator1();
-    const multi_array<double, 2>& op_2  = mpArrays->rGetOperator1();
+    const multi_array<double, 2>& op_2  = mpArrays->rGetOperator2();
     const std::vector<double>& sin_2x   = mpArrays->rGetSin2x();
     const std::vector<double>& sin_2y   = mpArrays->rGetSin2y();
 
     multi_array<std::complex<double>, 3>& fourier_grids = mpArrays->rGetModifiableFourierGrids();
     multi_array<std::complex<double>, 2>& pressure_grid = mpArrays->rGetModifiablePressureGrid();
-
 
     // Perform upwind differencing and create RHS of linear system
     Upwind2d(vel_grids, rhs_grids);
@@ -356,8 +352,7 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
     }
 
     // Perform fft on rhs_grids; results go to fourier_grids
-    fftw_execute(mFftwForwardPlanX);
-    fftw_execute(mFftwForwardPlanY);
+    FftwForward();
 
     /*
      * The result of a DFT of n real datapoints is n/2 + 1 complex values, due to redundancy: element n-1 is conj(2),
@@ -394,6 +389,19 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
     }
 
     // Perform inverse fft on fourier_grids; results are in vel_grids
+    FftwInverse();
+}
+
+template<unsigned DIM>
+void ImmersedBoundarySimulationModifier<DIM>::FftwForward()
+{
+    fftw_execute(mFftwForwardPlanX);
+    fftw_execute(mFftwForwardPlanY);
+}
+
+template<unsigned DIM>
+void ImmersedBoundarySimulationModifier<DIM>::FftwInverse()
+{
     fftw_execute(mFftwInversePlanX);
     fftw_execute(mFftwInversePlanY);
 }
