@@ -138,6 +138,11 @@ if __name__ == "__main__":
     #Reading in command line arguments
     input_name = sys.argv[1]
     output_name = sys.argv[2]
+    
+    if input_name == output_name:
+        print >> sys.stderr, "Error: input and output files should be different."
+        sys.exit(1)
+    
     pvtu_mode = False
     if (input_name[-5:] == '.pvtu'):
         pvtu_mode = True
