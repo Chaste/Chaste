@@ -12,6 +12,7 @@ if (UNIX)
 endif()
 
 if (Chaste_COVERAGE)
+    message("adding --coverage to CXX flags for coverage checking")
     #--coverage seems to be the preferred flag
     #set(default_flags "${default_flags} -fprofile-arcs -ftest-coverage")
     #set(default_exe_linker_flags "${default_exe_linker_flags} -fprofile-arcs -ftest-coverage")
@@ -20,6 +21,18 @@ if (Chaste_COVERAGE)
     set(default_exe_linker_flags "${default_exe_linker_flags} --coverage")
 endif()
 
+if (Chaste_PROFILE_GPROF)
+    message("adding -O2 and -pg to CXX flags for Gprof profiling")
+    set(default_flags "${default_flags} -O2 -pg -Wno-array-bounds")
+    set(default_shared_link_flags "${default_shared_link_flags} -pg")
+    set(default_exe_linker_flags "${default_exe_linker_flags} -pg")
+endif()
+
+
+if (Chaste_PROFILE_GPERFTOOLS)
+    message("adding -O3 to CXX flags for Gperftools profiling")
+    set(default_flags "${default_flags} -O3")
+endif()
 
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
     message("\t...for GNU compiler")

@@ -48,7 +48,7 @@ class BuildType(object):
     Base class for all objects representing a build type.
     Also gives the default build options.
     """
-  
+
     def __init__(self, buildType):
         """
         Do any setup.
@@ -107,7 +107,7 @@ class BuildType(object):
         print "Extra LD flags:", self.LinkFlags()
         print "Test packs:", self.TestPacks()
         print "Library preferences:", self.GetPreferedVersions()
-    
+
     def _get_cpu_flags(self):
         """Get the optional extensions supported by this system's CPUs."""
         flags = []
@@ -128,14 +128,14 @@ class BuildType(object):
         Currently recognised strings are 'gcc' and 'intel'.
         """
         return self._compiler_type
-    
+
     def CcFlags(self):
         """
         Return the CC flags to use, as a string.
         Note that this does not cover include paths or library search paths.
         """
         return ' '.join(self._cc_flags)
-    
+
     def LinkFlags(self):
         """
         Return the linker flags to use, as a string.
@@ -162,7 +162,7 @@ class BuildType(object):
         for pack in packs:
             if not pack in self._test_packs:
                 self._test_packs.append(pack)
-    
+
     def ClearTestPacks(self):
         "Empty the list of test packs to be run."
         self._test_packs = []
@@ -179,7 +179,7 @@ class BuildType(object):
             return 'orange'
         else:
             return 'red'
-        
+
     def DisplayStatus(self, status):
         """
         Return a (more) human readable version of the given status string.
@@ -199,7 +199,7 @@ class BuildType(object):
 
     def EncodeStatus(self, exitCode, logFile):
         """Encode the output from a test program as a status string.
-        
+
         Parses the output looking for a line 'Failed (\d+) of (\d+) tests?';
         if one is found then the testsuite failed and the status string is '\1_\2'.
         Otherwise if the output contains as many 'OK!' lines as the number of processes
@@ -208,7 +208,7 @@ class BuildType(object):
         then the status is 'Unknown'.
         """
         status = 'Unknown'
-        
+
         import re
         failed_tests = re.compile('Failed (\d+) of (\d+) tests?')
         ok, ok_count = re.compile('OK!'), 0
@@ -239,7 +239,7 @@ class BuildType(object):
             if line.startswith(setup_failed):
                 status = 'Setup'
                 break
-        
+
         if ok_count > 0 and status == 'Unknown':
             # All tests passed on all processes
             status = 'OK'
@@ -251,7 +251,7 @@ class BuildType(object):
         revision will be '' if we don't know or don't care.
         """
         self._revision = revision
-    
+
     def GetTestReportDir(self):
         """
         Return the base directory in which to store the output from all
@@ -267,17 +267,17 @@ class BuildType(object):
         """Set the number of parallel processes to run."""
         assert np > 0, 'Cannot run fewer than 1 process!'
         self._num_processes = np
-    
+
     def GetNumProcesses(self):
         """Get the number of parallel processes to run."""
         return self._num_processes
-    
+
     def GetTestRunnerCommand(self, exefile, exeflags=''):
         """Return the command to be used to run a test suite.
-        
+
         exefile is the filename of the test executable.
         exeflags are any flags to be passed to the executable.
-        
+
         The default behaviour is just to run the given exectuable.
         If self._num_processes > 1, then mpirun is used to run the
         executable in parallel.
@@ -287,7 +287,7 @@ class BuildType(object):
             cmd = ' '.join([self.tools['mpirun'], '-np',
                             str(self._num_processes), cmd])
         return cmd
-        
+
     def ResultsFileName(self, dir, testsuite, status, runtime):
         """
         Return the path to a results file.
@@ -301,7 +301,7 @@ class BuildType(object):
             leafname = leafname + '.' + str(int(runtime))
         pathname = os.path.join(dir, leafname)
         return pathname
-    
+
     def GetInfoFromResultsFileName(self, leafname):
         """
         Extract the metadata held within the name of a results file.
@@ -325,7 +325,7 @@ class BuildType(object):
 
     def UseDealii(self, use_dealii):
         """Set whether this build should link against Deal.II.
-        
+
         Several things need to change if we do:
          * The build_dir - alter this directly
          * The libraries linked against, and search paths for them
@@ -339,7 +339,7 @@ class BuildType(object):
 
     def GetDealiiLibraries(self, dealii_basepath):
         """Return a list of Deal.II libraries to link against.
-        
+
         This method is provided so that optimised builds can use
         the optimised libraries.
         """
@@ -362,14 +362,14 @@ class BuildType(object):
 
     def SetHostConfig(self, configString):
         """Parse hostconfig settings from a build type option string.
-        
+
         This method extracts prefered versions of libraries from a string
         with format "libraryName1=version1,libraryName2=version2", where
         version numbers are given as "1-2-3".  Currently recognised library
         names are 'petsc', 'boost', 'hdf5' and 'xsd', but support from the
         machine-specific hostconfig file is needed too.  Prefered versions
         can be retrieved using GetPreferedVersions.
-        
+
         Whether to use optional libraries can also be specified, with keys
         of the form "use-lib".  Again support from the machine-specific
         hostconfig is needed to make this work.  Possible libraries include
@@ -385,12 +385,12 @@ class BuildType(object):
 
     def GetPreferedVersions(self):
         """Get the prefered versions of libraries parsed with SetHostConfig.
-        
+
         Returns a dictionary mapping library name to version string, e.g.
         {'petsc': '2.3', 'boost': '1.34'}
         """
         return self._hostConfigSettings
-    
+
 
 class Gcc(BuildType):
     """gcc compiler with default options."""
@@ -497,7 +497,7 @@ class DoxygenCoverage(GccDebug):
     def __init__(self, *args, **kwargs):
         super(DoxygenCoverage, self).__init__(*args, **kwargs)
         self._do_macro_expansion = False
-        
+
     def DisplayStatus(self, status):
         """
         Return a (more) human readable version of the given status string.
@@ -513,14 +513,14 @@ class DoxygenCoverage(GccDebug):
             else:
                 s = s + status.split('_')[0] + ' Doxygen errors (RED)'
         return s
-    
+
     def GetTestRunnerCommand(self, exefile, exeflags=''):
         "We don't actually run any tests in this build..."
         return ''
-    
+
     def DoMacroExpansion(self):
         self._do_macro_expansion = True
-    
+
     def ExtendDoxygenConfig(self, doxyConfig):
         """Add extra Doxygen config options if desired."""
         if self._do_macro_expansion:
@@ -563,7 +563,7 @@ class Profile(GccDebug):
     """
     def __init__(self, *args, **kwargs):
         GccDebug.__init__(self, *args, **kwargs)
-        self._cc_flags.extend(['-O2', '-pg']) 
+        self._cc_flags.extend(['-O2', '-pg'])
         # Array bounds checking is available in -O2 optimization and above
         # Tetgen code produces a couple of issues, but g++ sometimes gives false negatives.
         self._cc_flags.append('-Wno-array-bounds')
@@ -572,7 +572,7 @@ class Profile(GccDebug):
         self.build_dir = 'profile'
         self.is_profile = True
         self.needs_static = True
-    
+
     def GetTestRunnerCommand(self, exefile, exeflags=''):
         """Run test then run profiler."""
         return exefile + ' ' + exeflags + ' ; ' + self.tools['gprof'] + ' ' + exefile
@@ -604,7 +604,7 @@ class GoogleProfile(GccDebug):
         self._test_packs = ['Profile']
         self.build_dir = 'google_profile'
         self.is_profile = True
-    
+
     def ParseGraphFilename(self, filename):
         "Remove the string 'Runner.gif' from the end of a filename, thus returning test_suite name"
         return filename[:-10]
@@ -617,11 +617,11 @@ class GoogleProfile(GccDebug):
                                '--nodefraction=0.0001', '--edgefraction=0.0001',
                                exefile, profile_file,
                                '>', os.path.join(self.output_dir, base+'.gif')])
-        import socket 
-        if socket.getfqdn().startswith('scoop'): 
-            preload_hack = 'LD_PRELOAD=/usr/lib/libprofiler.so ' 
-        else: 
-            preload_hack = '' 
+        import socket
+        if socket.getfqdn().startswith('scoop'):
+            preload_hack = 'LD_PRELOAD=/usr/lib/libprofiler.so '
+        else:
+            preload_hack = ''
 
         commands = ['export HOME="."',
                     'export CPUPROFILE="%s"' % profile_file,
@@ -629,7 +629,7 @@ class GoogleProfile(GccDebug):
                     self.tools['pprof'] + ' ' + pprof_args,
                     self.tools['rm'] + ' ' + profile_file]
         return '; '.join(commands)
-    
+
     def SetNumProcesses(self, np):
         """Can't run profiling in parallel (yet)."""
         raise ValueError("The profiling builds cannot be run in parallel.")
@@ -648,7 +648,7 @@ class GoogleProfile(GccDebug):
             return 'orange'
         else:
             return base_col
-        
+
     def DisplayStatus(self, status):
         """
         Return a (more) human readable version of the given status string.
@@ -681,7 +681,7 @@ class Parallel(GccDebug):
         GccDebug.__init__(self, *args, **kwargs)
         self._test_packs = ['Parallel']
         self._num_processes = 2
-    
+
     def GetTestRunnerCommand(self, exefile, exeflags=''):
         "Run test with a two processor environment"
         return self.tools['mpirun'] + ' -np ' + str(self._num_processes) \
@@ -710,7 +710,7 @@ class Parallel10(Parallel):
     def __init__(self, *args, **kwargs):
         Parallel.__init__(self, *args, **kwargs)
         self._num_processes = 10
-        
+
 
 class MemoryTesting(GccDebug):
     """
@@ -748,11 +748,11 @@ class MemoryTesting(GccDebug):
                                         ';', self.tools['cat'], log_prefix + '*',
                                         ';', self.tools['rm'], log_prefix + '*'])
         return cmd
-    
+
     def SetNumProcesses(self, np):
         """Can't run normal memory testing in parallel (yet)."""
         raise ValueError("Use ParallelMemoryTesting to run memory tests in parallel.")
-    
+
     def StatusColour(self, status):
         """
         Return a colour string indicating whether the given status string
@@ -786,7 +786,7 @@ class MemoryTesting(GccDebug):
         Return the encoded status.
         """
         status = 'Unknown'
-        
+
         # Regexps to check for
         import re
         invalid = re.compile(r'==\d+== Invalid ')
@@ -798,7 +798,7 @@ class MemoryTesting(GccDebug):
         open_files = re.compile(r'==(\d+)== Open (?:file descriptor|AF_UNIX socket) (?![012])(\d+): (?!(?:/home/bob/eclipse/lockfile|/dev/urandom))(.*)')
         orte_init = re.compile(r'==(\d+)==    (?:by|at) .*(: orte_init)?.*')
         test_killed = 'Test killed due to exceeding time limit'
-        
+
         if outputLines is None:
             outputLines = logFile.readlines()
         for lineno in range(len(outputLines)):
@@ -810,13 +810,13 @@ class MemoryTesting(GccDebug):
                 # PETSc Vec or Mat allocated and not destroyed
                 status = 'Leaky'
                 break
-                
+
             m = uninit.match(outputLines[lineno])
             if m:
                 # Uninitialised values problem
                 status = 'Uninit'
                 break
-        
+
             m = invalid.match(outputLines[lineno])
             if m:
                 # Invalid read/write/free()/etc. found. This is bad, unless it's glibc's fault.
@@ -824,7 +824,7 @@ class MemoryTesting(GccDebug):
                 if not match:
                     status = 'Leaky'
                     break
-                    
+
             m = leaks.match(outputLines[lineno])
             if m:
                 # Check we have really lost some memory
@@ -845,7 +845,7 @@ class MemoryTesting(GccDebug):
                     lineno += 1
                     match = lost.match(outputLines[lineno])
                 break
-                
+
             m = open_files.match(outputLines[lineno])
             if m:
                 # There's a file open that shouldn't be.
@@ -859,7 +859,7 @@ class MemoryTesting(GccDebug):
         if status == 'Unknown':
             status = 'OK'
         return status
-    
+
     def _CheckOpenmpiFile(self, outputLines, lineno, regexp):
         """Check whether a purported open file is actually something from OpenMPI."""
         result = False
@@ -915,7 +915,7 @@ class ParallelMemoryTesting(MemoryTesting, Parallel):
 
         output_lines = logFile.readlines()
         output_lines.sort(cmp)
-        
+
         # Now use the parsing from the superclass
         return MemoryTesting.EncodeStatus(self, exitCode, logFile, outputLines=output_lines)
 
@@ -949,17 +949,17 @@ class GccOptNative(GccOpt):
                        (4,3): ['sse4a', 'abm', 'popcnt', 'ssse3', 'sse4'],
                        (4,2): ['sse3'],
                        (3,1): ['mmx', 'sse', 'sse2', '3dnow']}
-    
+
     def GetGccVersion(self):
         version_str = os.popen(self.tools['mpicxx'] + ' -dumpversion').readline().strip()
         version = map(int, version_str.split('.')[0:2])
         return tuple(version)
-    
+
     def __init__(self, *args, **kwargs):
         super(GccOptNative, self).__init__(*args, **kwargs)
         self.build_dir = 'optimised_native'
         self._checked_version = False
-    
+
     def CcFlags(self):
         if not self._checked_version:
             cpu_flags = self._get_cpu_flags()
@@ -967,7 +967,7 @@ class GccOptNative(GccOpt):
             if gcc_version >= (4,2):
                 self._cc_flags.append('-march=native')
             if gcc_version >= (4,7):
-                # The 'fma' flag causes a compiler bug which leads 
+                # The 'fma' flag causes a compiler bug which leads
                 # to hanging tests. See Chaste issue #2693.
                 self._cc_flags.append('-mno-fma')
             if gcc_version >= (3,1):
@@ -990,7 +990,7 @@ class Intel(BuildType):
         self.build_dir = 'intel'
         # Intel compiler uses optimisation by default
         self.is_optimised = True
-    
+
     def CcFlags(self):
         if not self._checked_version:
             # Turn off some warnings, and report warnings as errors.
@@ -1007,13 +1007,13 @@ class Intel(BuildType):
                                        '-we810', #810: conversion from "double" to "unsigned int" may lose significant bits
                                        ])
             elif (version == 10 or version == 11):
-                self._cc_flags.extend([# This is where the statement is unreachable in a particular instatiation of the template.  e.g. "if (SPACE_DIM<3){return;}" will complain that the SPACE_DIM=3 specific code is unreachable. 
+                self._cc_flags.extend([# This is where the statement is unreachable in a particular instatiation of the template.  e.g. "if (SPACE_DIM<3){return;}" will complain that the SPACE_DIM=3 specific code is unreachable.
                                        '-wd111', #111: statement is unreachable (DUE TO INSTANTIATED TEMPLATES)
                                        # This is where the statement is unreachable in a particular instatiation of the template.  e.g. "if (ELEMENT_DIM<SPACE_DIM){return;}" will complain that the ELEMENT_DIM == SPACE_DIM dynamic initialization is unreachable.
                                        '-wd185', #185: dynamic initialization in unreachable code (DUE TO INSTANTIATED TEMPLATES)
                                        # This happens when a switch is based on an unsigned template parameter
                                        '-wd280', #280: selector expression is constant
-                                       # This is seen when used templates to access the is_abstract base class definition 
+                                       # This is seen when used templates to access the is_abstract base class definition
                                        '-wd304', #304: access control not specified ("public" by default)
                                        # This is when we pass an explict string to a std::string reference: e.g. FileFinder save_bidomain_dir("some_directory", RelativeTo::ChasteSourceRoot);
                                        '-wd383', #383: value copied to temporary, reference to temporary used
@@ -1032,7 +1032,7 @@ class Intel(BuildType):
                                        ])
             self._checked_version = True
         return super(Intel, self).CcFlags()
-    
+
     def GetCompilerVersion(self):
         """Get the major version number of the compiler being used."""
         version_str = os.popen(self.tools['mpicxx'] + ' -dumpversion').readline().strip()
@@ -1043,7 +1043,7 @@ class Intel(BuildType):
 
     def SetReporting(self, vec=1):
         """Set the reporting level.
-        
+
         vec controls the vectoriser report, and is the number to put after
             -vec_report. Default is 1 to indicate vectorised loops; use 3 to
             find out why loops aren't vectorised.
@@ -1096,7 +1096,7 @@ class CrayGcc(Gcc):
         self.build_dir = 'craygcc'
 
 class Pgi(BuildType):
-    "Portland compiler." 
+    "Portland compiler."
     def __init__(self, *args, **kwargs):
         BuildType.__init__(self, *args, **kwargs)
         self.build_dir = 'pgi'
@@ -1107,7 +1107,7 @@ class Pgi(BuildType):
         self.build_dir = 'pgi'
 
 class PgiCray(Pgi):
-    "Portland compiler on Cray." 
+    "Portland compiler on Cray."
     def __init__(self, *args, **kwargs):
         Pgi.__init__(self, *args, **kwargs)
         self.tools['mpicxx'] = 'CC'
@@ -1123,7 +1123,7 @@ class PgiCrayOpt(PgiCray):
         self.build_dir = 'pgicrayopt'
 
 class Pathscale(BuildType):
-    "Pathscale compiler." 
+    "Pathscale compiler."
     def __init__(self, *args, **kwargs):
         BuildType.__init__(self, *args, **kwargs)
         self._include_flag = ['-I']
@@ -1227,11 +1227,11 @@ class FleMemoryTesting(FleDebug):
                                         ';', self.tools['cat'], log_prefix + '*',
                                         ';', self.tools['rm'], log_prefix + '*'])
         return cmd
-    
+
     def SetNumProcesses(self, np):
         """Can't run profiling in parallel (yet)."""
         raise ValueError("Use ParallelMemoryTesting to run memory tests in parallel.")
-    
+
     def StatusColour(self, status):
         """
         Return a colour string indicating whether the given status string
@@ -1243,7 +1243,7 @@ class FleMemoryTesting(FleDebug):
             return 'orange'
         else:
             return 'red'
-        
+
     def DisplayStatus(self, status):
         "Return a (more) human readable version of the given status string."
         if status == 'OK':
@@ -1263,7 +1263,7 @@ class FleMemoryTesting(FleDebug):
         Return the encoded status.
         """
         status = 'Unknown'
-        
+
         # Regexps to check for
         import re
         invalid = re.compile('==\d+== Invalid ')
@@ -1273,7 +1273,7 @@ class FleMemoryTesting(FleDebug):
         petsc = re.compile('\[0]Total space allocated (\d+) bytes')
         uninit = re.compile('==\d+== (Conditional jump or move depends on uninitialised value\(s\)|Use of uninitialised value)')
         open_files = re.compile('==(\d+)== Open (?:file descriptor|AF_UNIX socket) (?![012])(\d+): (?!(?:/home/bob/eclipse/lockfile|/dev/urandom))(.*)')
-        
+
         if outputLines is None:
             outputLines = logFile.readlines()
         for lineno in range(len(outputLines)):
@@ -1282,13 +1282,13 @@ class FleMemoryTesting(FleDebug):
                 # PETSc Vec or Mat allocated and not destroyed
                 status = 'Leaky'
                 break
-                
+
             m = uninit.match(outputLines[lineno])
             if m:
                 # Uninitialised values problem
                 status = 'Uninit'
                 break
-        
+
             m = invalid.match(outputLines[lineno])
             if m:
                 # Invalid read/write/free()/etc. found. This is bad, unless it's glibc's fault.
@@ -1296,7 +1296,7 @@ class FleMemoryTesting(FleDebug):
                 if not match:
                     status = 'Leaky'
                     break
-                    
+
             m = leaks.match(outputLines[lineno])
             if m:
                 # Check we have really lost some memory
@@ -1319,7 +1319,7 @@ class FleMemoryTesting(FleDebug):
                     lineno += 1
                     match = lost.match(outputLines[lineno])
                 break
-                
+
             m = open_files.match(outputLines[lineno])
             if m:
                 # There's a file open that shouldn't be.
@@ -1354,9 +1354,9 @@ class IntelP3(Intel):
 
 class IntelP4(Intel):
     """Intel compilers optimised for Pentium 4 onwards.
-    
+
     Figures out from /proc/cpuinfo which of the following options to use.
-    
+
     -x<codes>  generate specialized code to run exclusively on processors
            indicated by <codes> as described below
     W  Intel Pentium 4 and compatible Intel processors
@@ -1370,7 +1370,7 @@ class IntelP4(Intel):
         Intel.__init__(self, *args, **kwargs)
         cpu_flags = self._get_cpu_flags()
         opt = '-xHost'
-        # We used to switch on each optimisation in turn but -xHost 
+        # We used to switch on each optimisation in turn but -xHost
         # will effectively do a "native" build for all the available cpu instructions.
         #if 'ssse3' in cpu_flags:
         #    opt = '-xT'
@@ -1428,7 +1428,7 @@ class StyleCheck(GccDebug):
         self._cc_flags = ['-Weffc++']
         self.build_dir = 'style_check'
         self._test_packs.extend(['Failing', 'Profile', 'Nightly'])
-        
+
     def GetTestRunnerCommand(self, exefile, exeflags=''):
         """This build shouldn't be used to run tests."""
         return ""
@@ -1446,7 +1446,7 @@ def GetBuildType(buildType):
     parts = buildType.split('_')
     classname = parts[0]
     extras = parts[1:]
-    
+
     if classname in ['', 'default', 'release', 'acceptance', 'longacceptance']:
         # Default build type
         classname = 'GccDebug'
@@ -1458,7 +1458,7 @@ def GetBuildType(buildType):
         obj = globals()[classname](buildType)
     except Exception, e:
         raise ValueError("Invalid build type '%s': %s" % (buildType, str(e)))
-    
+
     for extra in extras:
         if extra == 'report':
             if isinstance(obj, Intel):
@@ -1511,5 +1511,5 @@ def GetBuildType(buildType):
             except ValueError:
                 # Assume it's a test pack
                 obj.AddTestPacks(extra)
-    
+
     return obj

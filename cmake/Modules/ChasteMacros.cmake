@@ -93,37 +93,69 @@ endmacro()
             add_executable(${exeTargetName} "${_test_real_output_filename}" ${ARGN})
         endif()
 
+        if(${parallel} OR NOT (${Chaste_NUM_CPUS_TEST} EQUAL 1))
+            #Note: "${MPIEXEC} /np 1 master : subordinate" means that we run one master process and n subordinate processes
+            # on the local host with n+1 cores.
+            # Here we are using the form ${MPIEXEC} /np 2 ${test}.
+            # A figure-it-out-yourselfnstalled libvtk-java and libvtk5-qt4-dev form would be ${MPIEXEC} /np * ${test} which runs on all available cores
+            # See http://technet.microsoft.com/en-us/library/cc947675%28v=ws.10%29.aspx
+            # Note the underscore appended to the test name, to match with the RUN_TESTS block above, and ensure we don't
+            # run more tests than intended!
+            if (${Chaste_NUM_CPUS_TEST} EQUAL 1)
+                set(num_cpus 2)
+            else()
+                set(num_cpus ${Chaste_NUM_CPUS_TEST})
+            endif()
+            set(test_command ${MPIEXEC})
+            set(test_args "${MPIEXEC_NUMPROC_FLAG} ${num_cpus} ${MPIEXEC_PREFLAGS}  $<TARGET_FILE:${exeTargetName}> ${MPIEXEC_POSTFLAGS}")
+        else()
+            set(num_cpus 1)
+            set(test_command $<TARGET_FILE:${exeTargetName}>)
+            set(test_args "")
+        endif()
+
+
         if (Chaste_MEMORY_TESTING)
-            add_test(NAME ${_testTargetName} WORKING_DIRECTORY "${Chaste_SOURCE_DIR}/" 
-                COMMAND ${VALGRIND_COMMAND} --tool=memcheck --log-file=${Chaste_MEMORY_TESTING_OUTPUT_DIR}/${_testname}_valgrind.out 
+            set(test_command ${VALGRIND_COMMAND})
+            set(test_args "--tool=memcheck --log-file=${Chaste_MEMORY_TESTING_OUTPUT_DIR}/${_testname}_valgrind.out 
                 --track-fds=yes --leak-check=yes --num-callers=50 ${Chaste_MEMORY_TESTING_SUPPS} 
                 --gen-suppressions=all
-                                            $<TARGET_FILE:${exeTargetName}> 
-                                            -malloc_debug -malloc_dump -memory_info
+                $<TARGET_FILE:${exeTargetName}> 
+                -malloc_debug -malloc_dump -memory_info"
                 )
-            
-            set_property(TEST ${_testTargetName} PROPERTY PROCESSORS 1)
-        else()
-            if(${parallel} OR NOT (${Chaste_NUM_CPUS_TEST} EQUAL 1))
-                #Note: "${MPIEXEC} /np 1 master : subordinate" means that we run one master process and n subordinate processes
-                # on the local host with n+1 cores.
-                # Here we are using the form ${MPIEXEC} /np 2 ${test}.
-                # A figure-it-out-yourselfnstalled libvtk-java and libvtk5-qt4-dev form would be ${MPIEXEC} /np * ${test} which runs on all available cores
-                # See http://technet.microsoft.com/en-us/library/cc947675%28v=ws.10%29.aspx
-                # Note the underscore appended to the test name, to match with the RUN_TESTS block above, and ensure we don't
-                # run more tests than intended!
-                if (${Chaste_NUM_CPUS_TEST} EQUAL 1)
-                    set(num_cpus 2)
-                else()
-                    set(num_cpus ${Chaste_NUM_CPUS_TEST})
-                endif()
-                add_test(NAME ${_testTargetName} WORKING_DIRECTORY "${Chaste_SOURCE_DIR}/" COMMAND  ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${num_cpus} ${MPIEXEC_PREFLAGS}  $<TARGET_FILE:${exeTargetName}> ${MPIEXEC_POSTFLAGS})
-                set_property(TEST ${testTargetName} PROPERTY PROCESSORS ${num_cpus})
+            set(num_cpus 1)
+        elseif (Chaste_PROFILE_GPROF OR Chaste_PROFILE_GPERFTOOLS)
+            if (Chaste_PROFILE_GPERFTOOLS)
+                set(profile_file ${Chaste_PROFILE_OUTPUT_DIR}/${_testname}.prof)
+                set(post_command ${GPERFTOOLS_PPROF_EXE})
+                set(post_args "--gif --nodefraction=0.0001 --edgefraction=0.0001 $<TARGET_FILE:${exeTargetName}> ${profile_file}")
+                set(output_file ${Chaste_PROFILE_OUTPUT_DIR}/${_testname}.gif)
+                set(env_var CPUPROFILE)
+                set(env_var_value ${profile_file})
             else()
-                add_test(NAME ${_testTargetName} WORKING_DIRECTORY "${Chaste_SOURCE_DIR}/" COMMAND $<TARGET_FILE:${exeTargetName}>)
-                set_property(TEST ${testTargetName} PROPERTY PROCESSORS 1)
+                set(output_file ${Chaste_PROFILE_OUTPUT_DIR}/${_testname}.gmon)
+                set(post_command ${GPROF_EXECUTABLE})
+                set(post_args $<TARGET_FILE:${exeTargetName}>)
             endif()
         endif()
+
+        if (post_command)
+            add_test(NAME ${_testTargetName} WORKING_DIRECTORY "${Chaste_SOURCE_DIR}/" 
+                COMMAND ${CMAKE_COMMAND}
+                    -Denv_var=${env_var}
+                    -Denv_var_value=${env_var_value}
+                    -Dtest_cmd=${test_command}
+                    -Dtest_args:string=${test_args}
+                    -Dpost_cmd=${post_command}
+                    -Dpost_args:string=${post_args}
+                    -Doutput_file=${output_file}
+                    -P ${Chaste_SOURCE_DIR}/cmake/Modules/ChasteRunTestAndPostProcess.cmake)
+        else()
+            add_test(NAME ${_testTargetName} WORKING_DIRECTORY "${Chaste_SOURCE_DIR}/" 
+                COMMAND ${test_command} ${test_args})
+        endif()
+        set_property(TEST ${testTargetName} PROPERTY PROCESSORS ${num_cpus})
+            
     endmacro(CHASTE_ADD_TEST)
 
   macro(CHASTE_GENERATE_TEST_NAME test outTestName)

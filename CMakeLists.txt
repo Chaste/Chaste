@@ -33,19 +33,29 @@ else()
     option(Chaste_USE_XERCES "Compile Chaste with XERCES and XSD support" OFF)
 endif()
 
-option(Chaste_MEMORY_TESTING "Run tests using valgrind for memory testing" OFF)
-set(Chaste_MEMORY_TESTING_OUTPUT_DIR ${Chaste_BINARY_DIR}/memtest)
-file(MAKE_DIRECTORY ${Chaste_MEMORY_TESTING_OUTPUT_DIR})
-if (Chaste_MEMORY_TESTING AND NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
-    message(SEND_ERROR "CMAKE_BUILD_TYPE must be \"Debug\" to build Chaste with memory testing (Chaste_MEMORY_TESTING=ON)")
-endif()
 option(Chaste_USE_PETSC_PARMETIS "Prefer to compile Chaste with PARMETIS library used by PETSc" ON)
 option(Chaste_USE_PETSC_HDF5 "Prefer to compile Chaste with HDF5 library used by PETSc" ON)
-option(Chaste_COVERAGE "Build Chaste with coverage information" OFF)
-if (Chaste_COVERAGE AND NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
-    message(SEND_ERROR "CMAKE_BUILD_TYPE must be \"Debug\" to build Chaste with coverage (Chaste_COVERAGE=ON)")
+if (UNIX)
+    option(Chaste_MEMORY_TESTING "Run tests using valgrind for memory testing" OFF)
+    set(Chaste_MEMORY_TESTING_OUTPUT_DIR ${Chaste_BINARY_DIR}/memtest)
+    if (Chaste_MEMORY_TESTING)
+        file(MAKE_DIRECTORY ${Chaste_MEMORY_TESTING_OUTPUT_DIR})
+    endif()
+    option(Chaste_COVERAGE "Build Chaste with coverage information" OFF)
+    option(Chaste_PROFILE_GPERFTOOLS "Compile Chaste with gperftools profiling support" OFF)
+    option(Chaste_PROFILE_GPROF "Compile Chaste with gprof profiling support" OFF)
+    if (Chaste_PROFILE_GPROF AND Chaste_PROFILE_GPERFTOOLS)
+        message(WARNING "Both Chaste_PROFILE_GROF and Chaste_PROFILE_GPERFTOOLS = ON, using latter by default")
+        set(Chaste_PROFILE_GROF OFF)
+    endif()
+    if (Chaste_PROFILE_GPROF OR Chaste_PROFILE_GPERFTOOLS)
+        set(Chaste_PROFILE_OUTPUT_DIR ${Chaste_BINARY_DIR}/profile)
+        file(MAKE_DIRECTORY ${Chaste_PROFILE_OUTPUT_DIR})
+    endif()
+    if (Chaste_COVERAGE OR Chaste_MEMORY_TESTING OR Chaste_PROFILE_GROF OR Chaste_PROFILE_GPERFTOOLS)
+        set(CMAKE_BUILD_TYPE "Debug")
+    endif()
 endif()
-
 option(Chaste_UPDATE_PROVENANCE "Update build timestamp. Disable to prevent re-linking of all Chaste libraries" ON)
 
 option(RUN_TESTS OFF "This option simply runs Chaste tests. You should also set the test family.")
@@ -112,6 +122,22 @@ endif(WIN32 OR CYGWIN)
 
 set(CHASTE_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR})
 set(CHASTE_LINK_LIBRARIES "")
+
+#Gperftools profiling
+if (Chaste_PROFILE_GPERFTOOLS)
+    find_package(Gperftools REQUIRED)
+    list(APPEND CHASTE_LINK_LIBRARIES "${GPERFTOOLS_PROFILER}")
+endif()
+
+#Gprof executable
+if (Chaste_PROFILE_GPROF)
+    find_file(GPROF_EXECUTABLE gprof DOC "Gprof code profiler")
+    if (GPROF_EXECUTABLE)
+        message("Found GPROF_EXECUTABLE = ${GPROF_EXECUTABLE}")
+    else()
+        message(FATAL_ERROR "Cannot find Gprof executable for profiling")
+    endif()
+endif()
 
 #Valgrind
 if (Chaste_MEMORY_TESTING)
@@ -484,6 +510,26 @@ if (Chaste_MEMORY_TESTING)
         WORKING_DIRECTORY ${Chaste_BINARY_DIR}
         VERBATIM)
 endif()
+
+####################
+#     Profiling    #
+####################
+
+if (Chaste_PROFILE_GPROF OR Chaste_PROFILE_GPERFTOOLS)
+    if (Chaste_PROFILE_GPERFTOOLS)
+        set(extension gif)
+    else()
+        set(extension gmon)
+    endif()
+    
+    set(CTEST_COMMAND ctest)
+    add_custom_target(profile
+        COMMAND ${CTEST_COMMAND} "-L" "Profile|ProfileAssembly"
+        COMMAND ${PYTHON_EXECUTABLE} "${Chaste_SOURCE_DIR}/cmake/process_profile.py" "${Chaste_PROFILE_OUTPUT_DIR}" ${extension}
+        WORKING_DIRECTORY ${Chaste_BINARY_DIR}
+        VERBATIM)
+endif()
+
 
 ####################
 #    PACKAGING     #
