@@ -72,6 +72,8 @@ def tsp(*args):
 
 # Should provide a whole-build global lock, if needed
 _lock = threading.Lock()
+# We also need per-object locks to reduce contention for parallel builds
+_object_locks = {}
 
 # Possible extensions for source files in Chaste
 chaste_source_exts = ['.cpp', '.xsd', '.cellml']
@@ -248,11 +250,11 @@ def BuildTest(target, source, env):
             time.sleep(0.01) # 10 ms
         # Ensure scons' dependencies are set up, in a thread-safe fashion
         _lock.acquire()
-        o._chaste_lock = getattr(o, '_chaste_lock', threading.Lock())
+        obj_lock = _object_locks.setdefault(id(o), threading.Lock())
         _lock.release()
-        o._chaste_lock.acquire()
+        obj_lock.acquire()
         o.scan()
-        o._chaste_lock.release()
+        obj_lock.release()
         #tsp(tid, source[0], "state post scan", o, S[o.state], os.path.exists(str(o)), map(str, o.sources), map(str, o.depends), map(str, o.implicit))
         # Now process the dependencies
         for d in o.implicit:
