@@ -42,6 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SimplePoissonEquation.hpp"
 #include "LinearPdeWithZeroSource.hpp"
 #include "EllipticPdeWithLinearSource.hpp"
+#include "EllipticPdeWithLinearSourceCylindrical.hpp"
 #include "EllipticPdeWithRadialLinearSource.hpp"
 #include "SimpleLinearEllipticSolver.hpp"
 #include <vector>
@@ -749,6 +750,154 @@ public:
         }
 
         PetscTools::Destroy(result);
+    }
+
+    /*
+     * Solve Del^2(u) = -4 in cylindrical polar co-ordinates
+     * r in [0, 1], z in [0, Z], axisymmetric, so 2D.
+     *
+     *
+     * BCs
+     * u(1) = 0
+     * du(0)/dR = 0
+     * du(Z)/dz = 0
+     * du(0)/dz = 1 - r^2
+     *
+     * u(R) => u(r,z) = 1-r^2
+     *
+     * We've done this here by simply hacking the PDE,
+     * compare EllipticPdeWithLinearSource.hpp with
+     * EllipticPdeWithLinearSourceCylindrical.hpp to see
+     * how 'r' enters the terms that the finite element integrals see.
+     */
+    void TestCylinderAxisymmetricWithConstantSourceTerm()
+    {
+        std::cout << "Space step\tMax error\tTotal error\n";
+        double max_error;
+        double total_error;
+        RunAnalyticProblemWithSpaceStep(0.025, max_error, total_error);
+        TS_ASSERT_LESS_THAN(max_error, 1e-6);
+        TS_ASSERT_LESS_THAN(total_error, 1e-4);
+    }
+
+    /*
+     * Code to run a convergence analysis on the above problem.
+     *
+     * Not running every time as it takes a while...
+     */
+    void dontTestConvergenceOfCylinderAxisymmetricWithConstantSourceTerm()
+    {
+        std::cout << "Space step\tMax error\tTotal error\n";
+
+        double max_error;
+        double total_error; // Integrated up over small volume, so smaller than max error!
+
+        for (unsigned i=0; i<7u; i++)
+        {
+            double node_spacing_in_mesh = 0.1/(double)(SmallPow(2u,i));
+
+            RunAnalyticProblemWithSpaceStep(node_spacing_in_mesh, max_error, total_error);
+        }
+    }
+
+private:
+    /*
+     * Method used by the tests:
+     * TestCylinderAxisymmetricWithConstantSourceTerm
+     * and
+     * TestConvergenceOfCylinderAxisymmetricWithConstantSourceTerm
+     */
+    void RunAnalyticProblemWithSpaceStep(double node_spacing_in_mesh,
+                                         double& rMaxError,
+                                         double& rTotalError)
+    {
+        DistributedTetrahedralMesh<2,2> mesh;
+        double R = 1.0;
+        double Z = 1.0;
+        mesh.ConstructRegularSlabMesh(node_spacing_in_mesh, R /*length*/, Z /*width*/);
+
+        // Instantiate PDE object
+        EllipticPdeWithLinearSourceCylindrical pde(0.0, 4.0);
+
+        // Boundary conditions
+        // (default is
+        BoundaryConditionsContainer<2,2,1> bcc;
+        for (TetrahedralMesh<2u,2u>::BoundaryNodeIterator node_iter = mesh.GetBoundaryNodeIteratorBegin();
+             node_iter != mesh.GetBoundaryNodeIteratorEnd();
+             ++node_iter)
+        {
+            double r = (*node_iter)->rGetLocation()[0];
+            double z = (*node_iter)->rGetLocation()[1];
+
+            if( fabs(r-R) < 1e-6)
+            {
+                //std::cout << "Applying R=0 BC" << std::endl;
+                ConstBoundaryCondition<2>* p_boundary_condition = new ConstBoundaryCondition<2>(0.0);
+                bcc.AddDirichletBoundaryCondition(*node_iter, p_boundary_condition);
+            }
+
+            if( fabs(z) < 1e-6 )
+            {
+                //std::cout << "Applying 1-r^2 BC" << std::endl;
+                ConstBoundaryCondition<2>* p_boundary_condition = new ConstBoundaryCondition<2>(1 - r*r);
+                bcc.AddDirichletBoundaryCondition(*node_iter, p_boundary_condition);
+            }
+        }
+
+        // Solver
+        SimpleLinearEllipticSolver<2,2> solver(&mesh,&pde,&bcc);
+
+        /// \todo #2748
+        //solver.SetOutputDirectoryAndPrefix("CylindricalAxisymmetricTestProblem","results");
+        //solver.SetOutputToVtk(true);
+
+        Vec result = solver.Solve();
+        ReplicatableVector result_repl(result);
+
+        // Solution should be u(r,z) = 1 - r^2 (for all z)
+        rMaxError = 0.0;
+        rTotalError = 0.0;
+
+        for (TetrahedralMesh<2u,2u>::ElementIterator elem_iter = mesh.GetElementIteratorBegin();
+                elem_iter != mesh.GetElementIteratorEnd();
+                ++elem_iter)
+        {
+            // Get analytic result at the centroid
+            c_vector<double, 2u> location = elem_iter->CalculateCentroid();
+            double analytic_result = 1.0 - (location[0]*location[0]);
+
+            // Get simulation result interpolated to centroid too.
+            unsigned node_0 = elem_iter->GetNodeGlobalIndex(0u);
+            unsigned node_1 = elem_iter->GetNodeGlobalIndex(1u);
+            unsigned node_2 = elem_iter->GetNodeGlobalIndex(2u);
+            double sim_result = (result_repl[node_0] + result_repl[node_1] + result_repl[node_2])/3.0;
+
+            // Error integrated over triangle (roughly)
+            double error = 0.5*node_spacing_in_mesh*node_spacing_in_mesh*
+                    sqrt((sim_result - analytic_result)*(sim_result - analytic_result));
+
+            if (error > rMaxError)
+            {
+                rMaxError = error;
+            }
+            rTotalError += error;
+        }
+
+        PetscTools::Destroy(result);
+
+//        // Output to file for visualizing somewhere
+//        OutputFileHandler handler("CylindricalAxisymmetric", false);
+//        out_stream results_file = handler.OpenOutputFile("results.dat");
+//
+//        for (TetrahedralMesh<2u,2u>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
+//                     node_iter != mesh.GetNodeIteratorEnd();
+//                     ++node_iter)
+//        {
+//            *results_file << node_iter->rGetLocation()[0] << "\t" << node_iter->rGetLocation()[1] << "\t" <<  result_repl[node_iter->GetIndex()] << std::endl;
+//        }
+//        results_file->close();
+
+        std::cout << node_spacing_in_mesh << "\t" << rMaxError << "\t" << rTotalError << std::endl << std::flush;
     }
 };
 
