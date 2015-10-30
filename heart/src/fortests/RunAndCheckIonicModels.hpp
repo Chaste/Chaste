@@ -57,7 +57,8 @@ void RunOdeSolverWithIonicModel(AbstractCardiacCellInterface* pOdeSystem,
 
 void CheckCellModelResults(const std::string& rBaseResultsFilename,
                            std::string validResultsBasename = "",
-                           double tolerance = 1e-3);
+                           double tolerance = 1e-3,
+                           std::string referenceFolder = "heart/test/data/ionicmodels");
 
 std::vector<double> GetVoltages(ColumnDataReader& rReader);
 
@@ -192,7 +193,8 @@ std::vector<double> GetHGate(ColumnDataReader& rReader)
  */
 void CheckCellModelResults(const std::string& rBaseResultsFilename,
                            std::string validResultsBasename,
-                           double tolerance)
+                           double tolerance,
+                           std::string referenceFolder)
 {
     // read data entries for the new file
     ColumnDataReader data_reader("TestIonicModels", rBaseResultsFilename);
@@ -204,7 +206,7 @@ void CheckCellModelResults(const std::string& rBaseResultsFilename,
         validResultsBasename = rBaseResultsFilename;
     }
 
-    ColumnDataReader valid_reader("heart/test/data/ionicmodels", validResultsBasename + "ValidData",
+    ColumnDataReader valid_reader(referenceFolder, validResultsBasename + "ValidData",
                                   false);
     std::vector<double> valid_times = valid_reader.GetValues("Time");
     std::vector<double> valid_voltages = GetVoltages(valid_reader);
