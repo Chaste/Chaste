@@ -138,20 +138,8 @@ private:
     /** A list of force laws to determine the force applied to each node */
     std::vector<boost::shared_ptr<AbstractImmersedBoundaryForce<DIM> > > mForceCollection;
 
-    /** The fftw plan for forward transforms in X */
-    fftw_plan mFftwForwardPlanX;
-
-    /** The fftw plan for forward transforms in Y */
-    fftw_plan mFftwForwardPlanY;
-
-    /** The fftw plan for inverse transforms in X */
-    fftw_plan mFftwInversePlanX;
-
-    /** The fftw plan for inverse transforms in Y */
-    fftw_plan mFftwInversePlanY;
-
     /** Pointer to structure storing all necessary arrays */
-    ImmersedBoundary2dArrays* mpArrays;
+    ImmersedBoundary2dArrays<DIM>* mpArrays;
 
     /** Max number of threads for fftw */
     unsigned mNumThreadsForFftw;
@@ -203,30 +191,6 @@ private:
      * Updates fluid velocity grids by solving Navier-Stokes
      */
     void SolveNavierStokesSpectral();
-
-    /**
-     * Helper method for SolveNavierStokesSpectral()
-     * Performs forward fourier transform in X.  In separate method for multi-threading
-     */
-    void FftwForwardX();
-
-    /**
-     * Helper method for SolveNavierStokesSpectral()
-     * Performs forward fourier transform in Y.  In separate method for multi-threading
-     */
-    void FftwForwardY();
-
-    /**
-     * Helper method for SolveNavierStokesSpectral()
-     * Performs inverse fourier transform in X.  In separate method for multi-threading
-     */
-    void FftwInverseX();
-
-    /**
-     * Helper method for SolveNavierStokesSpectral()
-     * Performs inverse fourier transform in Y.  In separate method for multi-threading
-     */
-    void FftwInverseY();
 
     /**
      * Helper method for PropagateForcesToFluidGrid()

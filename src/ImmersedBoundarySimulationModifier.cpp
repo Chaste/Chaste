@@ -72,12 +72,6 @@ ImmersedBoundarySimulationModifier<DIM>::~ImmersedBoundarySimulationModifier()
     {
         delete(mpArrays);
     }
-
-    fftw_destroy_plan(mFftwForwardPlanX);
-    fftw_destroy_plan(mFftwForwardPlanY);
-
-    fftw_destroy_plan(mFftwInversePlanX);
-    fftw_destroy_plan(mFftwInversePlanY);
 }
 
 template<unsigned DIM>
@@ -122,7 +116,7 @@ void ImmersedBoundarySimulationModifier<DIM>::UpdateFluidVelocityGrids(AbstractC
 template<unsigned DIM>
 void ImmersedBoundarySimulationModifier<DIM>::SetupConstantMemberVariables(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
-    mNumThreadsForFftw = 1;
+
 
     if (dynamic_cast<ImmersedBoundaryCellPopulation<DIM> *>(&rCellPopulation) == NULL)
     {
@@ -139,23 +133,6 @@ void ImmersedBoundarySimulationModifier<DIM>::SetupConstantMemberVariables(Abstr
     // Get the grid spacing
     mGridSpacingX = 1.0 / (double) mNumGridPtsX;
     mGridSpacingY = 1.0 / (double) mNumGridPtsY;
-
-    // Set up dimension-dependent variables
-    switch (DIM)
-    {
-        case 2:
-            mpArrays = new ImmersedBoundary2dArrays(mNumGridPtsX, mNumGridPtsY, mReynolds, SimulationTime::Instance()->GetTimeStep());
-
-            mFftNorm = (double) mNumGridPtsX * (double) mNumGridPtsY;
-            break;
-
-        case 3:
-            EXCEPTION("Not implemented yet in 3D");
-            break;
-
-        default:
-            NEVER_REACHED;
-    }
 
     // Create sine variables
     mSinX.resize(mNumGridPtsX);
@@ -183,55 +160,63 @@ void ImmersedBoundarySimulationModifier<DIM>::SetupConstantMemberVariables(Abstr
     mpBoxCollection->SetupLocalBoxesHalfOnly();
     mpBoxCollection->CalculateNodePairs(mpMesh->rGetNodes(), mNodePairs, mNodeNeighbours);
 
+    /*
+     * Set up fftw routines.
+     */
 
+    // Set  the (max) number of threads used by Fftw
+    mNumThreadsForFftw = 2;
+
+    // Forget all wisdom; the correct wisdom for the number of threads used will be loaded from file
+    void fftw_forget_wisdom(void);
+
+    // Path to the wisdom file
+    std::string wisdom_filename = "./projects/ImmersedBoundary/src/fftw.wisdom";
+
+    // Extra setup required if more than 1 thread is to be used for fftw
     if (mNumThreadsForFftw > 1)
     {
-        // Set up threads for fftw
         int potential_thread_errors = fftw_init_threads();
 
-        if (potential_thread_errors == 0)
+        // 1 means success, 0 indicates a failure
+        if (potential_thread_errors != 1)
         {
             EXCEPTION("fftw thread error");
         }
 
-        fftw_plan_with_nthreads(2);
+        fftw_plan_with_nthreads(mNumThreadsForFftw);
+
+        // Change the wisdom path to the threads wisdom file
+        wisdom_filename = "./projects/ImmersedBoundary/src/fftw_threads.wisdom";
     }
-    else
+
+    int wisdom_flag = fftw_import_wisdom_from_filename(wisdom_filename.c_str());
+
+    // 1 means it's read correctly, 0 indicates a failure
+    if (wisdom_flag != 1)
     {
-        std::string filename = "./projects/ImmersedBoundary/src/fftw.wisdom";
-        int wisdom_flag = fftw_import_wisdom_from_filename(filename.c_str());
-
-        // 1 means it's read correctly, 0 indicates a failure
-        if (wisdom_flag != 1)
-        {
-            WARNING("FFTW wisdom file not imported correctly; DFT may take much longer than usual.");
-        }
+        PRINT_VARIABLE(wisdom_flag);
+        EXCEPTION("FFTW wisdom file not imported correctly; DFT may take much longer than usual.");
     }
 
+    // Set up dimension-dependent variables
+    switch (DIM)
+    {
+        case 2:
+            mpArrays = new ImmersedBoundary2dArrays<DIM>(mpMesh, SimulationTime::Instance()->GetTimeStep(), mReynolds);
 
-    /*
-     * Plan the discrete Fourier transforms:
-     *
-     *  * Forward are real-to-complex and out-of-place
-     *  * Backward are complex-to-real and out-of-place
-     */
+            mFftNorm = (double) mNumGridPtsX * (double) mNumGridPtsY;
+            break;
 
-    // We first set the pointers to arrays where the data will be stored
-    double* p_in_x = &(mpArrays->rGetModifiableRightHandSideGrids()[0][0][0]);
-    double* p_in_y = &(mpArrays->rGetModifiableRightHandSideGrids()[1][0][0]);
+        case 3:
+            EXCEPTION("Not implemented yet in 3D");
+            break;
 
-    fftw_complex* p_complex_x = reinterpret_cast<fftw_complex*>(&(mpArrays->rGetModifiableFourierGrids()[0][0][0]));
-    fftw_complex* p_complex_y = reinterpret_cast<fftw_complex*>(&(mpArrays->rGetModifiableFourierGrids()[1][0][0]));
+        default:
+            NEVER_REACHED;
+    }
 
-    double* p_out_x = &(mpMesh->rGetModifiable2dVelocityGrids()[0][0][0]);
-    double* p_out_y = &(mpMesh->rGetModifiable2dVelocityGrids()[1][0][0]);
-
-    mFftwForwardPlanX = fftw_plan_dft_r2c_2d(mNumGridPtsX, mNumGridPtsY, p_in_x, p_complex_x, FFTW_EXHAUSTIVE);
-    mFftwForwardPlanY = fftw_plan_dft_r2c_2d(mNumGridPtsX, mNumGridPtsY, p_in_y, p_complex_y, FFTW_EXHAUSTIVE);
-
-    mFftwInversePlanX = fftw_plan_dft_c2r_2d(mNumGridPtsX, mNumGridPtsY, p_complex_x, p_out_x, FFTW_EXHAUSTIVE);
-    mFftwInversePlanY = fftw_plan_dft_c2r_2d(mNumGridPtsX, mNumGridPtsY, p_complex_y, p_out_y, FFTW_EXHAUSTIVE);
-
+    // For debugging
     t_total_time = 0.0;
     t_upwind = 0.0;
     t_rhs = 0.0;
@@ -378,11 +363,7 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
     t_rhs += timer.GetElapsedTime(); timer.Reset();
 
     // Perform fft on rhs_grids; results go to fourier_grids
-    boost::thread x_forward_thread(boost::bind(&ImmersedBoundarySimulationModifier<DIM>::FftwForwardX, this));
-    boost::thread y_forward_thread(boost::bind(&ImmersedBoundarySimulationModifier<DIM>::FftwForwardY, this));
-
-    x_forward_thread.join();
-    y_forward_thread.join();
+    mpArrays->FftwExecuteForward();
 
     t_fftw_forward += timer.GetElapsedTime(); timer.Reset();
 
@@ -425,15 +406,11 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
     t_final += timer.GetElapsedTime(); timer.Reset();
 
     // Perform inverse fft on fourier_grids; results are in vel_grids
-    boost::thread x_inverse_thread(boost::bind(&ImmersedBoundarySimulationModifier<DIM>::FftwInverseX, this));
-    boost::thread y_inverse_thread(boost::bind(&ImmersedBoundarySimulationModifier<DIM>::FftwInverseY, this));
-
-    x_inverse_thread.join();
-    y_inverse_thread.join();
+    mpArrays->FftwExecuteInverse();
 
     t_fftw_inverse += timer.GetElapsedTime(); timer.Reset();
 
-    if (SimulationTime::Instance()->GetTimeStepsElapsed() == 100)
+    if (SimulationTime::Instance()->GetTimeStepsElapsed() == 50)
     {
         t_total_time = t_upwind + t_rhs + t_fftw_forward + t_pressure + t_final + t_fftw_inverse;
 
@@ -446,30 +423,6 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
                   << "FFTW inverse:   " << 100 * t_fftw_inverse / t_total_time << endl;
         std::cout << std::endl;
     }
-}
-
-template<unsigned DIM>
-void ImmersedBoundarySimulationModifier<DIM>::FftwForwardX()
-{
-    fftw_execute(mFftwForwardPlanX);
-}
-
-template<unsigned DIM>
-void ImmersedBoundarySimulationModifier<DIM>::FftwForwardY()
-{
-    fftw_execute(mFftwForwardPlanY);
-}
-
-template<unsigned DIM>
-void ImmersedBoundarySimulationModifier<DIM>::FftwInverseX()
-{
-    fftw_execute(mFftwInversePlanX);
-}
-
-template<unsigned DIM>
-void ImmersedBoundarySimulationModifier<DIM>::FftwInverseY()
-{
-    fftw_execute(mFftwInversePlanY);
 }
 
 template<unsigned DIM>

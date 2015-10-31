@@ -39,29 +39,43 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Debug.hpp"
 
-ImmersedBoundary2dArrays::ImmersedBoundary2dArrays(unsigned numGridPtsX, unsigned numGridPtsY, double reynoldsNumber, double dt)
+template<unsigned DIM>
+ImmersedBoundary2dArrays<DIM>::ImmersedBoundary2dArrays(ImmersedBoundaryMesh<DIM,DIM>* p_mesh, double dt, double reynoldsNumber)
+        : mpMesh(p_mesh)
 {
+    unsigned num_gridpts_x = mpMesh->GetNumGridPtsX();
+    unsigned num_gridpts_y = mpMesh->GetNumGridPtsY();
+
     // We require an even number of grid points
-    assert(numGridPtsY % 2 == 0);
+    assert(num_gridpts_y % 2 == 0);
 
-    // The complex grids are reduced in size due to redundancy in the fourier domain
-    unsigned reduced_y = 1 + (numGridPtsY/2);
+    /*
+     * Resize the grids.  All complex grids are half-sized in the y-coordinate due to redundancy inherent in the
+     * fast-Fourier method for solving Navier-Stokes.
+     */
+    unsigned reduced_y = 1 + (num_gridpts_y/2);
 
-    // Resize all arrays
-    mForceGrids.resize(extents[2][numGridPtsX][numGridPtsY]);
-    mRightHandSideGrids.resize(extents[2][numGridPtsX][numGridPtsY]);
-    mOperator1.resize(extents[numGridPtsX][reduced_y]);
-    mOperator2.resize(extents[numGridPtsX][reduced_y]);
-    mFourierGrids.resize(extents[2][numGridPtsX][reduced_y]);
-    mPressureGrid.resize(extents[numGridPtsX][reduced_y]);
-    mSin2x.resize(numGridPtsX);
+    // Resize real arrays to X by Y
+    mForceGrids.resize(extents[2][num_gridpts_x][num_gridpts_y]);
+    mRightHandSideGrids.resize(extents[2][num_gridpts_x][num_gridpts_y]);
+
+    // Resize Fourier-domain arrays
+    mOperator1.resize(extents[num_gridpts_x][reduced_y]);
+    mOperator2.resize(extents[num_gridpts_x][reduced_y]);
+    mFourierGrids.resize(extents[2][num_gridpts_x][reduced_y]);
+    mPressureGrid.resize(extents[num_gridpts_x][reduced_y]);
+
+    mSin2x.resize(num_gridpts_x);
     mSin2y.resize(reduced_y);
 
-    // Calculate constants needed when solving the fluid problem
-    double x_spacing = 1.0 / (double) numGridPtsX;
-    double y_spacing = 1.0 / (double) numGridPtsY;
+    /*
+     * There are several constants used in the Fourier-domain as part of the Navier-Stokes solution which are constant
+     * once grid sizes are known.  We pre-calculate these to eliminate re-calculation at every timestep.
+     */
+    double x_spacing = 1.0 / (double) num_gridpts_x;
+    double y_spacing = 1.0 / (double) num_gridpts_y;
 
-    for (unsigned x = 0 ; x < numGridPtsX ; x++)
+    for (unsigned x = 0 ; x < num_gridpts_x ; x++)
     {
         mSin2x[x] = sin(2 * M_PI * (double) x * x_spacing);
     }
@@ -71,7 +85,7 @@ ImmersedBoundary2dArrays::ImmersedBoundary2dArrays(unsigned numGridPtsX, unsigne
         mSin2y[y] = sin(2 * M_PI * (double) y * y_spacing);
     }
 
-    for (unsigned x = 0 ; x < numGridPtsX ; x++)
+    for (unsigned x = 0 ; x < num_gridpts_x ; x++)
     {
         for (unsigned y = 0 ; y < reduced_y ; y++)
         {
@@ -86,48 +100,114 @@ ImmersedBoundary2dArrays::ImmersedBoundary2dArrays(unsigned numGridPtsX, unsigne
             mOperator2[x][y] += 1.0;
         }
     }
+
+    /*
+     * Finally, plan the discrete Fourier transforms:
+     *
+     *  * Forward are real-to-complex and out-of-place
+     *  * Backward are complex-to-real and out-of-place
+     *
+     * Because the above arrays are created once and stay in the same place in memory throughout the simulation, we may
+     * plan the transforms with references to locations in these arrays, and execute the plans as necessary each
+     * timestep of the simulation.
+     */
+
+    // We first set the pointers to arrays where the data will be stored
+    double* p_in = &(mRightHandSideGrids[0][0][0]);
+    fftw_complex* p_complex = reinterpret_cast<fftw_complex*>(&(mFourierGrids[0][0][0]));
+    double* p_out = &(mpMesh->rGetModifiable2dVelocityGrids()[0][0][0]);
+
+    // Plan variables
+    int rank = 2;                                       // Number of dimensions for each array
+    int real_dims[] = {num_gridpts_x, num_gridpts_y};   // Dimensions of each real array
+    int comp_dims[] = {num_gridpts_x, reduced_y};       // Dimensions of each complex array
+    int how_many = 2;                                   // Number of transforms
+    int real_sep = num_gridpts_x * num_gridpts_y;       // How many doubles between start of first array and start of second
+    int comp_sep = num_gridpts_x * reduced_y;           // How many fftw_complex between start of first array and start of second
+    int real_stride = 1;                                // Each real array is contiguous in memory
+    int comp_stride = 1;                                // Each complex array is contiguous in memory
+    int* real_nembed = real_dims;
+    int* comp_nembed = comp_dims;
+
+    mFftwForwardPlan = fftw_plan_many_dft_r2c(rank, real_dims, how_many,
+                                              p_in,      real_nembed, real_stride, real_sep,
+                                              p_complex, comp_nembed, comp_stride, comp_sep,
+                                              FFTW_EXHAUSTIVE);
+
+    mFftwInversePlan = fftw_plan_many_dft_c2r(rank, real_dims, how_many,
+                                              p_complex, comp_nembed, comp_stride, comp_sep,
+                                              p_out,     real_nembed, real_stride, real_sep,
+                                              FFTW_EXHAUSTIVE);
 }
 
-ImmersedBoundary2dArrays::~ImmersedBoundary2dArrays()
+template<unsigned DIM>
+ImmersedBoundary2dArrays<DIM>::~ImmersedBoundary2dArrays()
 {
+    fftw_destroy_plan(mFftwForwardPlan);
+    fftw_destroy_plan(mFftwInversePlan);
 }
 
-multi_array<double, 3>& ImmersedBoundary2dArrays::rGetModifiableForceGrids()
+template<unsigned DIM>
+multi_array<double, 3>& ImmersedBoundary2dArrays<DIM>::rGetModifiableForceGrids()
 {
     return mForceGrids;
 }
 
-multi_array<double, 3>& ImmersedBoundary2dArrays::rGetModifiableRightHandSideGrids()
+template<unsigned DIM>
+multi_array<double, 3>& ImmersedBoundary2dArrays<DIM>::rGetModifiableRightHandSideGrids()
 {
     return mRightHandSideGrids;
 }
 
-multi_array<std::complex<double>, 3>& ImmersedBoundary2dArrays::rGetModifiableFourierGrids()
+template<unsigned DIM>
+multi_array<std::complex<double>, 3>& ImmersedBoundary2dArrays<DIM>::rGetModifiableFourierGrids()
 {
     return mFourierGrids;
 }
 
-multi_array<std::complex<double>, 2>& ImmersedBoundary2dArrays::rGetModifiablePressureGrid()
+template<unsigned DIM>
+multi_array<std::complex<double>, 2>& ImmersedBoundary2dArrays<DIM>::rGetModifiablePressureGrid()
 {
     return mPressureGrid;
 }
 
-const multi_array<double, 2>& ImmersedBoundary2dArrays::rGetOperator1() const
+template<unsigned DIM>
+const multi_array<double, 2>& ImmersedBoundary2dArrays<DIM>::rGetOperator1() const
 {
     return mOperator1;
 }
 
-const multi_array<double, 2>& ImmersedBoundary2dArrays::rGetOperator2() const
+template<unsigned DIM>
+const multi_array<double, 2>& ImmersedBoundary2dArrays<DIM>::rGetOperator2() const
 {
     return mOperator2;
 }
 
-const std::vector<double>& ImmersedBoundary2dArrays::rGetSin2x() const
+template<unsigned DIM>
+const std::vector<double>& ImmersedBoundary2dArrays<DIM>::rGetSin2x() const
 {
     return mSin2x;
 }
 
-const std::vector<double>& ImmersedBoundary2dArrays::rGetSin2y() const
+template<unsigned DIM>
+const std::vector<double>& ImmersedBoundary2dArrays<DIM>::rGetSin2y() const
 {
     return mSin2y;
 }
+
+template<unsigned DIM>
+void ImmersedBoundary2dArrays<DIM>::FftwExecuteForward()
+{
+    fftw_execute(mFftwForwardPlan);
+}
+
+template<unsigned DIM>
+void ImmersedBoundary2dArrays<DIM>::FftwExecuteInverse()
+{
+    fftw_execute(mFftwInversePlan);
+}
+
+// Explicit instantiation
+template class ImmersedBoundary2dArrays<1>;
+template class ImmersedBoundary2dArrays<2>;
+template class ImmersedBoundary2dArrays<3>;
