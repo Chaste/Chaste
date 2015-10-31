@@ -52,7 +52,7 @@ class TestGenerateFftwWisdom : public CxxTest::TestSuite
 {
 public:
 
-    void xTestGenerateManyR2CWisdomOneThread() throw(Exception)
+    void TestGenerateManyR2CWisdomOneThread() throw(Exception)
     {
         // We first forget all wisdom and re-load, as threaded wisdom doesn't play well with un-threaded
         void fftw_forget_wisdom(void);
@@ -142,11 +142,9 @@ public:
             fftw_export_wisdom_to_filename(filename.c_str());
             std::cout << "Exported 1-thread wisdom for two contiguous arrays of size " << i << " by " << i << std::endl;
         }
-
-        fftw_export_wisdom_to_filename(filename.c_str());
     }
 
-    void xTestGenerateManyR2CWisdomTwoThreads() throw(Exception)
+    void TestGenerateManyR2CWisdomTwoThreads() throw(Exception)
     {
         // We first forget all wisdom and re-load, as threaded wisdom doesn't play well with un-threaded
         void fftw_forget_wisdom(void);
@@ -243,8 +241,6 @@ public:
             fftw_export_wisdom_to_filename(filename.c_str());
             std::cout << "Exported 2-thread wisdom for two contiguous arrays of size " << i << " by " << i << std::endl;
         }
-
-        fftw_export_wisdom_to_filename(filename.c_str());
     }
 
     void TestGenerateManyR2CWisdomFourThreads() throw(Exception)
@@ -280,7 +276,7 @@ public:
         typedef boost::multi_array<double, 3> real_array_2d;
 
         // Create 2D wisdom
-        for (unsigned i = 512 ; i < 513 ; i*=2)
+        for (unsigned i = 16 ; i < 5000 ; i*=2)
         {
             real_array_2d input(boost::extents[2][i][i]);
             complex_array_2d output(boost::extents[2][i][(i/2) + 1]);
@@ -344,9 +340,5 @@ public:
             fftw_export_wisdom_to_filename(filename.c_str());
             std::cout << "Exported 4-thread wisdom for two contiguous arrays of size " << i << " by " << i << std::endl;
         }
-
-        fftw_export_wisdom_to_filename(filename.c_str());
     }
-
-
 };
