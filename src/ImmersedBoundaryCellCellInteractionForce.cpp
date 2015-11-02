@@ -43,8 +43,8 @@ ImmersedBoundaryCellCellInteractionForce<DIM>::ImmersedBoundaryCellCellInteracti
         : AbstractImmersedBoundaryForce<DIM>(),
           mpCellPopulation(&rCellPopulation),
           mpMesh(&(rCellPopulation.rGetMesh())),
-          mSpringConst(1e2),
-          mRestLength(0.1 * rCellPopulation.GetInteractionDistance())
+          mSpringConst(1e3),
+          mRestLength(0.25 * rCellPopulation.GetInteractionDistance())
 {
     /*
      * This force class calculates the force between pairs of nodes in different immersed boundaries.  Each node must
@@ -164,7 +164,7 @@ void ImmersedBoundaryCellCellInteractionForce<DIM>::InitializeProteinLevels()
 
         if (mpMesh->GetElement(elem_idx) == mpMesh->GetMembraneElement())
         {
-            integrin = 5.0;
+            integrin = 100.0;
         }
         else
         {

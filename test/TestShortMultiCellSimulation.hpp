@@ -76,19 +76,20 @@ public:
          * 5: Random y-variation
          * 6: Include membrane
          */
-        ImmersedBoundaryPalisadeMeshGenerator gen(7, 256, 0.2, 2.5, 0.0, false);
+        ImmersedBoundaryPalisadeMeshGenerator gen(7, 256, 0.2, 2.5, 0.1, true);
         ImmersedBoundaryMesh<2, 2>* p_mesh = gen.GetMesh();
 
         p_mesh->SetNumGridPtsXAndY(512);
 
-//        p_mesh->GetElement(0)->SetMembraneSpringConstant(1e9);
-//        p_mesh->GetElement(0)->SetMembraneRestLength(0.001 * p_mesh->GetCharacteristicNodeSpacing());
 
         for (unsigned elem_idx = 0; elem_idx < p_mesh->GetNumElements() ; elem_idx++)
         {
             p_mesh->GetElement(elem_idx)->SetMembraneSpringConstant(1e9);
             p_mesh->GetElement(elem_idx)->SetMembraneRestLength(0.25 * p_mesh->GetCharacteristicNodeSpacing());
         }
+
+        p_mesh->GetElement(0)->SetMembraneSpringConstant(2e9);
+//        p_mesh->GetElement(0)->SetMembraneRestLength(0.001 * p_mesh->GetCharacteristicNodeSpacing());
 
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
@@ -112,11 +113,11 @@ public:
 
 
         // Set simulation properties
-        double dt = 0.0005;
+        double dt = 0.005;
         simulator.SetOutputDirectory("TestShortMultiCellSimulation");
         simulator.SetDt(dt);
-        simulator.SetSamplingTimestepMultiple(10);
-        simulator.SetEndTime(50.0 * dt);
+        simulator.SetSamplingTimestepMultiple(40);
+        simulator.SetEndTime(4000.0 * dt);
 
         setup_duration = timer.GetElapsedTime();
 
@@ -124,6 +125,6 @@ public:
 
         simulation_duration = timer.GetElapsedTime() - setup_duration;
 
-//        PRINT_2_VARIABLES(setup_duration, simulation_duration);
+        PRINT_2_VARIABLES(setup_duration, simulation_duration);
     }
 };

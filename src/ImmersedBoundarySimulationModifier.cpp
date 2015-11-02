@@ -165,7 +165,7 @@ void ImmersedBoundarySimulationModifier<DIM>::SetupConstantMemberVariables(Abstr
      */
 
     // Set  the (max) number of threads used by Fftw
-    mNumThreadsForFftw = 2;
+    mNumThreadsForFftw = 1;
 
     // Forget all wisdom; the correct wisdom for the number of threads used will be loaded from file
     void fftw_forget_wisdom(void);
@@ -192,13 +192,6 @@ void ImmersedBoundarySimulationModifier<DIM>::SetupConstantMemberVariables(Abstr
 
     int wisdom_flag = fftw_import_wisdom_from_filename(wisdom_filename.c_str());
 
-    // 1 means it's read correctly, 0 indicates a failure
-    if (wisdom_flag != 1)
-    {
-        PRINT_VARIABLE(wisdom_flag);
-        EXCEPTION("FFTW wisdom file not imported correctly; DFT may take much longer than usual.");
-    }
-
     // Set up dimension-dependent variables
     switch (DIM)
     {
@@ -214,6 +207,14 @@ void ImmersedBoundarySimulationModifier<DIM>::SetupConstantMemberVariables(Abstr
 
         default:
             NEVER_REACHED;
+    }
+
+    // 1 means it's read correctly, 0 indicates a failure
+    if (wisdom_flag != 1)
+    {
+        // Now that the plans have been created, we will re-export the wisdom to file so we can use it next time
+        WARNING("FFTW wisdom file not imported correctly; DFT may have taken a long time to plan.");
+        fftw_export_wisdom_to_filename(wisdom_filename.c_str());
     }
 
     // For debugging
@@ -341,13 +342,13 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
     multi_array<std::complex<double>, 3>& fourier_grids = mpArrays->rGetModifiableFourierGrids();
     multi_array<std::complex<double>, 2>& pressure_grid = mpArrays->rGetModifiablePressureGrid();
 
-    Timer timer;
-    timer.Reset();
+//    Timer timer;
+//    timer.Reset();
 
     // Perform upwind differencing and create RHS of linear system
     Upwind2d(vel_grids, rhs_grids);
 
-    t_upwind += timer.GetElapsedTime(); timer.Reset();
+//    t_upwind += timer.GetElapsedTime(); timer.Reset();
 
     for (unsigned dim = 0 ; dim < 2 ; dim++)
     {
@@ -360,12 +361,12 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
         }
     }
 
-    t_rhs += timer.GetElapsedTime(); timer.Reset();
+//    t_rhs += timer.GetElapsedTime(); timer.Reset();
 
     // Perform fft on rhs_grids; results go to fourier_grids
     mpArrays->FftwExecuteForward();
 
-    t_fftw_forward += timer.GetElapsedTime(); timer.Reset();
+//    t_fftw_forward += timer.GetElapsedTime(); timer.Reset();
 
     /*
      * The result of a DFT of n real datapoints is n/2 + 1 complex values, due to redundancy: element n-1 is conj(2),
@@ -388,7 +389,7 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
     pressure_grid[mNumGridPtsX/2][mNumGridPtsY/2] = 0.0;
     pressure_grid[0][mNumGridPtsY/2] = 0.0;
 
-    t_pressure += timer.GetElapsedTime(); timer.Reset();
+//    t_pressure += timer.GetElapsedTime(); timer.Reset();
 
     /*
      * Do final stage of computation before inverse FFT.  We do the necessary DFT scaling at this stage so the output
@@ -403,26 +404,26 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
         }
     }
 
-    t_final += timer.GetElapsedTime(); timer.Reset();
+//    t_final += timer.GetElapsedTime(); timer.Reset();
 
     // Perform inverse fft on fourier_grids; results are in vel_grids
     mpArrays->FftwExecuteInverse();
 
-    t_fftw_inverse += timer.GetElapsedTime(); timer.Reset();
+//    t_fftw_inverse += timer.GetElapsedTime(); timer.Reset();
 
-    if (SimulationTime::Instance()->GetTimeStepsElapsed() == 50)
-    {
-        t_total_time = t_upwind + t_rhs + t_fftw_forward + t_pressure + t_final + t_fftw_inverse;
-
-        std::cout << std::endl;
-        std::cout << "Upwind:         " << 100 * t_upwind       / t_total_time << endl
-                  << "RHS:            " << 100 * t_rhs          / t_total_time << endl
-                  << "FFTW forward:   " << 100 * t_fftw_forward / t_total_time << endl
-                  << "Pressure:       " << 100 * t_pressure     / t_total_time << endl
-                  << "Final step:     " << 100 * t_final        / t_total_time << endl
-                  << "FFTW inverse:   " << 100 * t_fftw_inverse / t_total_time << endl;
-        std::cout << std::endl;
-    }
+//    if (SimulationTime::Instance()->GetTimeStepsElapsed() == 50)
+//    {
+//        t_total_time = t_upwind + t_rhs + t_fftw_forward + t_pressure + t_final + t_fftw_inverse;
+//
+//        std::cout << std::endl;
+//        std::cout << "Upwind:         " << 100 * t_upwind       / t_total_time << endl
+//                  << "RHS:            " << 100 * t_rhs          / t_total_time << endl
+//                  << "FFTW forward:   " << 100 * t_fftw_forward / t_total_time << endl
+//                  << "Pressure:       " << 100 * t_pressure     / t_total_time << endl
+//                  << "Final step:     " << 100 * t_final        / t_total_time << endl
+//                  << "FFTW inverse:   " << 100 * t_fftw_inverse / t_total_time << endl;
+//        std::cout << std::endl;
+//    }
 }
 
 template<unsigned DIM>
