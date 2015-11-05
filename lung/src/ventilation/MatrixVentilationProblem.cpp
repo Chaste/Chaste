@@ -58,6 +58,12 @@ MatrixVentilationProblem::MatrixVentilationProblem(const std::string& rMeshDirFi
     PetscOptionsSetValue("-pc_factor_mat_solver_package", "umfpack");
     mpLinearSystem->SetKspType("gmres");
 #undef COVERAGE_IGNORE
+#elif LUNG_USE_KLU
+#define COVERAGE_IGNORE
+    mpLinearSystem->SetPcType("lu");
+    PetscOptionsSetValue("-pc_factor_mat_solver_package", "klu");
+    mpLinearSystem->SetKspType("gmres");
+#undef COVERAGE_IGNORE
 #else
     mpLinearSystem->SetPcType("jacobi");
     PetscOptionsSetValue("-ksp_diagonal_scale","");
