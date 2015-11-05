@@ -207,7 +207,10 @@ void CellMLToSharedLibraryConverter::ConvertCellmlToSo(const std::string& rCellm
                                       "chaste_do_cellml(sources " << cellml_file.GetAbsolutePath() << " " << "ON)\n" <<
                                       "set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})\n" <<
                                       "include_directories(${Chaste_THIRD_PARTY_INCLUDE_DIRS} ${Chaste_INCLUDE_DIRS})\n" <<
-                                      "add_library(" << cellml_leaf_name << " SHARED " << "${sources})\n"
+                                      "add_library(" << cellml_leaf_name << " SHARED " << "${sources})\n" <<
+                                      "if (${CMAKE_SYSTEM_NAME} MATCHES \"Darwin\")\n" <<
+                                      "   target_link_libraries(" << cellml_leaf_name << " \"-Wl,-undefined,dynamic_lookup\")\n" <<
+                                      "endif()\n"
                                       //"target_link_libraries(" << cellml_leaf_name << " ${Chaste_LIBRARIES})\n"
                                       ;
             cmake_lists_filestream.close();
