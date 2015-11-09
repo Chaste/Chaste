@@ -57,8 +57,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *  F^{n} the vector of (chi*Iionic + Istim) at each node, and c_surf a vector
  *  arising from any surface stimuli (usually zero).
  *
- *  This solver uses two assemblers, one to assemble the LHS matrix, (chi*C/dt) M  + K,
- *  and also to compute c_surf, and one to assemble the mass matrix M.
+ *  This solver uses two assemblers, MonodomainAssembler to assemble the LHS matrix, [(chi*C/dt) M  + K],
+ *  and also to compute c_surf, and MassMatrixAssembler to assemble the mass matrix M used on the RHS.
+ *  Note that MonodomainAssembler itself calls:
+ *  MassMatrixAssembler for M (as this class does directly for RHS),
+ *  and MonodomainStiffnessMatrixAssembler for K.
  *
  *  Also allows state variable interpolation (SVI) to be used on elements for which it
  *  will be needed, if the appropriate HeartConfig boolean is set.
