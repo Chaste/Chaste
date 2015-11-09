@@ -53,6 +53,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM = ELEMENT_DIM>
 class MonodomainProblem : public AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, 1>
 {
+private:
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
@@ -79,7 +80,6 @@ public:
     /** @return Created suitable solver for monodomain problems. */
     AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, 1>* CreateSolver();
 
-public:
     /**
      * Constructor
      * @param pCellFactory User defined cell factory which shows how the pde should
