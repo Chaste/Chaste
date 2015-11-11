@@ -505,7 +505,7 @@ add_custom_target(doxygen_coverage
 if (Chaste_MEMORY_TESTING)
     set(CTEST_COMMAND ctest)
     add_custom_target(memtest
-        COMMAND ${CTEST_COMMAND} "-L" Continuous 
+        COMMAND ${CTEST_COMMAND} "-L" Continuous "--output-on-failure" 
         COMMAND ${PYTHON_EXECUTABLE} "${Chaste_SOURCE_DIR}/cmake/process_valgrind_output.py" "${Chaste_MEMORY_TESTING_OUTPUT_DIR}"
         WORKING_DIRECTORY ${Chaste_BINARY_DIR}
         VERBATIM)
@@ -524,7 +524,7 @@ if (Chaste_PROFILE_GPROF OR Chaste_PROFILE_GPERFTOOLS)
     
     set(CTEST_COMMAND ctest)
     add_custom_target(profile
-        COMMAND ${CTEST_COMMAND} "-L" "Profile|ProfileAssembly"
+        COMMAND ${CTEST_COMMAND} "-L" "Profile|ProfileAssembly" "--output-on-failure"
         COMMAND ${PYTHON_EXECUTABLE} "${Chaste_SOURCE_DIR}/cmake/process_profile.py" "${Chaste_PROFILE_OUTPUT_DIR}" ${extension}
         WORKING_DIRECTORY ${Chaste_BINARY_DIR}
         VERBATIM)
