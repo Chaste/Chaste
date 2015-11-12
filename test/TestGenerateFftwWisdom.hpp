@@ -43,6 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ImmersedBoundaryArray.hpp"
 #include "RandomNumberGenerator.hpp"
+#include "FileFinder.hpp"
 #include "Debug.hpp"
 
 // This test is never run in parallel
@@ -50,7 +51,51 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class TestGenerateFftwWisdom : public CxxTest::TestSuite
 {
+private:
+    std::string mWisdomFilename;
+    std::string mWisdomThreadsFilename;
+
 public:
+
+    void TestSetupWisdomFiles() throw(Exception)
+    {
+        std::string single_thread_file_name = "fftw.wisdom";
+        std::string multi_thread_file_name  = "fftw_threads.wisdom";
+
+        // Set up the file finder and get the absolute path
+        FileFinder file_finder(single_thread_file_name, RelativeTo::ChasteTestOutput);
+        mWisdomFilename = file_finder.GetAbsolutePath();
+
+        // Find if the file exists
+        bool wisdom_exists = file_finder.IsFile();
+
+        // If it doesn't exists, create it with blank wisdom file
+        if (!wisdom_exists)
+        {
+            void fftw_forget_wisdom(void);
+            fftw_export_wisdom_to_filename(mWisdomFilename.c_str());
+        }
+
+        // The file should now definitely exist
+        TS_ASSERT(file_finder.IsFile());
+
+
+        file_finder.SetPath(multi_thread_file_name, RelativeTo::ChasteTestOutput);
+        mWisdomThreadsFilename = file_finder.GetAbsolutePath();
+
+        // Find if the file exists
+        bool wisdom_threads_exists = file_finder.IsFile();
+
+        // If it doesn't exists, create it with blank wisdom file
+        if (!wisdom_threads_exists)
+        {
+            void fftw_forget_wisdom(void);
+            fftw_export_wisdom_to_filename(mWisdomThreadsFilename.c_str());
+        }
+
+        // The file should now definitely exist
+        TS_ASSERT(file_finder.IsFile());
+    }
 
     void TestGenerateManyR2CWisdomOneThread() throw(Exception)
     {
@@ -66,8 +111,7 @@ public:
          * This test takes a LONG time to run if there is currently no wisdom (around 4 hours).
          */
 
-        std::string filename = "./projects/ImmersedBoundary/src/fftw.wisdom";
-        int wisdom_flag = fftw_import_wisdom_from_filename(filename.c_str());
+        int wisdom_flag = fftw_import_wisdom_from_filename(mWisdomFilename.c_str());
 
         // 1 means it's read correctly, 0 indicates a failure
         TS_ASSERT_EQUALS(wisdom_flag, 1);
@@ -78,7 +122,7 @@ public:
         typedef boost::multi_array<double, 3> real_array_2d;
 
         // Create 2D wisdom
-        for (unsigned i = 16 ; i < 5000 ; i*=2)
+        for (unsigned i = 16 ; i < 1025 ; i*=2)
         {
             real_array_2d input(boost::extents[2][i][i]);
             complex_array_2d output(boost::extents[2][i][(i/2) + 1]);
@@ -104,13 +148,13 @@ public:
             plan_f = fftw_plan_many_dft_r2c(rank, real_dims, how_many,
                                             fftw_input,  real_nembed, real_stride, real_sep,
                                             fftw_output, comp_nembed, comp_stride, comp_sep,
-                                            FFTW_EXHAUSTIVE);
+                                            FFTW_PATIENT);
 
             fftw_plan plan_b;
             plan_b = fftw_plan_many_dft_c2r(rank, real_dims, how_many,
                                             fftw_output, comp_nembed, comp_stride, comp_sep,
                                             fftw_check,  real_nembed, real_stride, real_sep,
-                                            FFTW_EXHAUSTIVE);
+                                            FFTW_PATIENT);
 
             // We now verify that the forward followed by inverse transform produces the correct result
             for (unsigned dim = 0 ; dim < 2 ; dim++)
@@ -139,7 +183,7 @@ public:
             }
 
             // Export each step of the loop so if the test is stopped progress is kept
-            fftw_export_wisdom_to_filename(filename.c_str());
+            fftw_export_wisdom_to_filename(mWisdomFilename.c_str());
             std::cout << "Exported 1-thread wisdom for two contiguous arrays of size " << i << " by " << i << std::endl;
         }
     }
@@ -165,8 +209,7 @@ public:
 
         fftw_plan_with_nthreads(2);
 
-        std::string filename = "./projects/ImmersedBoundary/src/fftw_threads.wisdom";
-        int wisdom_flag = fftw_import_wisdom_from_filename(filename.c_str());
+        int wisdom_flag = fftw_import_wisdom_from_filename(mWisdomThreadsFilename.c_str());
 
         // 1 means it's read correctly, 0 indicates a failure
         TS_ASSERT_EQUALS(wisdom_flag, 1);
@@ -177,7 +220,7 @@ public:
         typedef boost::multi_array<double, 3> real_array_2d;
 
         // Create 2D wisdom
-        for (unsigned i = 16 ; i < 5000 ; i*=2)
+        for (unsigned i = 16 ; i < 129 ; i*=2)
         {
             real_array_2d input(boost::extents[2][i][i]);
             complex_array_2d output(boost::extents[2][i][(i/2) + 1]);
@@ -203,13 +246,13 @@ public:
             plan_f = fftw_plan_many_dft_r2c(rank, real_dims, how_many,
                                             fftw_input,  real_nembed, real_stride, real_sep,
                                             fftw_output, comp_nembed, comp_stride, comp_sep,
-                                            FFTW_EXHAUSTIVE);
+                                            FFTW_PATIENT);
 
             fftw_plan plan_b;
             plan_b = fftw_plan_many_dft_c2r(rank, real_dims, how_many,
                                             fftw_output, comp_nembed, comp_stride, comp_sep,
                                             fftw_check,  real_nembed, real_stride, real_sep,
-                                            FFTW_EXHAUSTIVE);
+                                            FFTW_PATIENT);
 
             // We now verify that the forward followed by inverse transform produces the correct result
             for (unsigned dim = 0 ; dim < 2 ; dim++)
@@ -238,12 +281,12 @@ public:
             }
 
             // Export each step of the loop so if the test is stopped progress is kept
-            fftw_export_wisdom_to_filename(filename.c_str());
+            fftw_export_wisdom_to_filename(mWisdomThreadsFilename.c_str());
             std::cout << "Exported 2-thread wisdom for two contiguous arrays of size " << i << " by " << i << std::endl;
         }
     }
 
-    void TestGenerateManyR2CWisdomFourThreads() throw(Exception)
+    void xTestGenerateManyR2CWisdomFourThreads() throw(Exception)
     {
         // We first forget all wisdom and re-load, as threaded wisdom doesn't play well with un-threaded
         void fftw_forget_wisdom(void);
@@ -302,13 +345,13 @@ public:
             plan_f = fftw_plan_many_dft_r2c(rank, real_dims, how_many,
                                             fftw_input,  real_nembed, real_stride, real_sep,
                                             fftw_output, comp_nembed, comp_stride, comp_sep,
-                                            FFTW_EXHAUSTIVE);
+                                            FFTW_PATIENT);
 
             fftw_plan plan_b;
             plan_b = fftw_plan_many_dft_c2r(rank, real_dims, how_many,
                                             fftw_output, comp_nembed, comp_stride, comp_sep,
                                             fftw_check,  real_nembed, real_stride, real_sep,
-                                            FFTW_EXHAUSTIVE);
+                                            FFTW_PATIENT);
 
             // We now verify that the forward followed by inverse transform produces the correct result
             for (unsigned dim = 0 ; dim < 2 ; dim++)
