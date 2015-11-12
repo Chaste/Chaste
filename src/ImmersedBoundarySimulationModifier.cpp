@@ -41,6 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fftw3.h>
 #include "Debug.hpp"
 #include "Timer.hpp"
+#include "FileFinder.hpp"
 
 #include <boost/thread.hpp>
 
@@ -167,13 +168,7 @@ void ImmersedBoundarySimulationModifier<DIM>::SetupConstantMemberVariables(Abstr
     // Set  the (max) number of threads used by Fftw
     mNumThreadsForFftw = 1;
 
-    // Forget all wisdom; the correct wisdom for the number of threads used will be loaded from file
-    void fftw_forget_wisdom(void);
-
-    // Path to the wisdom file
-    std::string wisdom_filename = "./projects/ImmersedBoundary/src/fftw.wisdom";
-
-    // Extra setup required if more than 1 thread is to be used for fftw
+    // If more than one thread, the following must happen before any other fftw routines
     if (mNumThreadsForFftw > 1)
     {
         int potential_thread_errors = fftw_init_threads();
@@ -185,12 +180,41 @@ void ImmersedBoundarySimulationModifier<DIM>::SetupConstantMemberVariables(Abstr
         }
 
         fftw_plan_with_nthreads(mNumThreadsForFftw);
-
-        // Change the wisdom path to the threads wisdom file
-        wisdom_filename = "./projects/ImmersedBoundary/src/fftw_threads.wisdom";
     }
 
-    int wisdom_flag = fftw_import_wisdom_from_filename(wisdom_filename.c_str());
+    // Forget all wisdom; the correct wisdom for the number of threads used will be loaded from file
+    void fftw_forget_wisdom(void);
+
+    // Path to the wisdom file
+    std::string wisdom_path;
+    std::string wisdom_filename;
+
+    if (mNumThreadsForFftw == 1)
+    {
+        wisdom_filename = "fftw.wisdom";
+    }
+    else
+    {
+        wisdom_filename = "fftw_threads.wisdom";
+    }
+
+    FileFinder file_finder(wisdom_filename, RelativeTo::ChasteTestOutput);
+
+    if (!file_finder.IsFile())
+    {
+        WARNING("It is strongly recommended to generate wisdom using TestGenerateFftwWisdom before using this code.");
+    }
+
+    wisdom_path = file_finder.GetAbsolutePath();
+    PRINT_VARIABLE(wisdom_path);
+
+    int wisdom_flag = fftw_import_wisdom_from_filename(wisdom_path.c_str());
+
+    // 1 means success, 0 indicates a failure
+    if (wisdom_flag != 1)
+    {
+        WARNING("fftw wisdom not imported correctly");
+    }
 
     // Set up dimension-dependent variables
     switch (DIM)
@@ -207,14 +231,6 @@ void ImmersedBoundarySimulationModifier<DIM>::SetupConstantMemberVariables(Abstr
 
         default:
             NEVER_REACHED;
-    }
-
-    // 1 means it's read correctly, 0 indicates a failure
-    if (wisdom_flag != 1)
-    {
-        // Now that the plans have been created, we will re-export the wisdom to file so we can use it next time
-        WARNING("FFTW wisdom file not imported correctly; DFT may have taken a long time to plan.");
-        fftw_export_wisdom_to_filename(wisdom_filename.c_str());
     }
 
     // For debugging
@@ -411,7 +427,7 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
 
 //    t_fftw_inverse += timer.GetElapsedTime(); timer.Reset();
 
-//    if (SimulationTime::Instance()->GetTimeStepsElapsed() == 50)
+//    if (SimulationTime::Instance()->GetTimeStepsElapsed() == 120)
 //    {
 //        t_total_time = t_upwind + t_rhs + t_fftw_forward + t_pressure + t_final + t_fftw_inverse;
 //
@@ -422,6 +438,15 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
 //                  << "Pressure:       " << 100 * t_pressure     / t_total_time << endl
 //                  << "Final step:     " << 100 * t_final        / t_total_time << endl
 //                  << "FFTW inverse:   " << 100 * t_fftw_inverse / t_total_time << endl;
+//        std::cout << std::endl;
+//
+//        std::cout << std::endl;
+//        std::cout << "Upwind:         " << t_upwind        << endl
+//                  << "RHS:            " << t_rhs           << endl
+//                  << "FFTW forward:   " << t_fftw_forward  << endl
+//                  << "Pressure:       " << t_pressure      << endl
+//                  << "Final step:     " << t_final         << endl
+//                  << "FFTW inverse:   " << t_fftw_inverse  << endl;
 //        std::cout << std::endl;
 //    }
 }

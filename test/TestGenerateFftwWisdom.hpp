@@ -97,11 +97,8 @@ public:
         TS_ASSERT(file_finder.IsFile());
     }
 
-    void TestGenerateManyR2CWisdomOneThread() throw(Exception)
+    void xTestGenerateManyR2CWisdomOneThread() throw(Exception)
     {
-        // We first forget all wisdom and re-load, as threaded wisdom doesn't play well with un-threaded
-        void fftw_forget_wisdom(void);
-
         /*
          * This test generates an fftw wisdom file telling fftw how to efficiently compute fourier transforms of a
          * given size, using two threads.  We generate wisdom for two DFTs on data contiguous in memory:
@@ -111,207 +108,9 @@ public:
          * This test takes a LONG time to run if there is currently no wisdom (around 4 hours).
          */
 
+        // We first forget all wisdom and re-load, as threaded wisdom doesn't play well with un-threaded
+        void fftw_forget_wisdom(void);
         int wisdom_flag = fftw_import_wisdom_from_filename(mWisdomFilename.c_str());
-
-        // 1 means it's read correctly, 0 indicates a failure
-        TS_ASSERT_EQUALS(wisdom_flag, 1);
-
-        // Create 3D arrays that will represent two 2D arrays
-        typedef boost::multi_array<std::complex<double>, 3> complex_array_2d;
-
-        typedef boost::multi_array<double, 3> real_array_2d;
-
-        // Create 2D wisdom
-        for (unsigned i = 16 ; i < 1025 ; i*=2)
-        {
-            real_array_2d input(boost::extents[2][i][i]);
-            complex_array_2d output(boost::extents[2][i][(i/2) + 1]);
-            real_array_2d check(boost::extents[2][i][i]);
-
-            double* fftw_input = &input[0][0][0];
-            fftw_complex* fftw_output = reinterpret_cast<fftw_complex*>(&output[0][0][0]);
-            double* fftw_check = &check[0][0][0];
-
-            // Plan variables
-            int rank = 2;                   // Number of dimensions for each array
-            int real_dims[] = {i, i};       // Dimensions of each real array
-            int comp_dims[] = {i, 1 + i/2}; // Dimensions of each complex array
-            int how_many = 2;               // Number of transforms
-            int real_sep = i * i;           // How many doubles between start of first array and start of second
-            int comp_sep = i * (1 + i/2);   // How many fftw_complex between start of first array and start of second
-            int real_stride = 1;            // Each real array is contiguous in memory
-            int comp_stride = 1;            // Each complex array is contiguous in memory
-            int* real_nembed = real_dims;
-            int* comp_nembed = comp_dims;
-
-            fftw_plan plan_f;
-            plan_f = fftw_plan_many_dft_r2c(rank, real_dims, how_many,
-                                            fftw_input,  real_nembed, real_stride, real_sep,
-                                            fftw_output, comp_nembed, comp_stride, comp_sep,
-                                            FFTW_PATIENT);
-
-            fftw_plan plan_b;
-            plan_b = fftw_plan_many_dft_c2r(rank, real_dims, how_many,
-                                            fftw_output, comp_nembed, comp_stride, comp_sep,
-                                            fftw_check,  real_nembed, real_stride, real_sep,
-                                            FFTW_PATIENT);
-
-            // We now verify that the forward followed by inverse transform produces the correct result
-            for (unsigned dim = 0 ; dim < 2 ; dim++)
-            {
-                for (unsigned x = 0 ; x < i ; x++)
-                {
-                    for (unsigned y = 0 ; y < i ; y++)
-                    {
-                        input[dim][x][y] = RandomNumberGenerator::Instance()->ranf();
-                    }
-                }
-            }
-
-            fftw_execute(plan_f);
-            fftw_execute(plan_b);
-
-            for (unsigned dim = 0 ; dim < 2 ; dim++)
-            {
-                for (unsigned x = 0 ; x < i ; x++)
-                {
-                    for (unsigned y = 0 ; y < i ; y++)
-                    {
-                        TS_ASSERT_DELTA(input[dim][x][y], check[dim][x][y]/(i*i), 1e-10);
-                    }
-                }
-            }
-
-            // Export each step of the loop so if the test is stopped progress is kept
-            fftw_export_wisdom_to_filename(mWisdomFilename.c_str());
-            std::cout << "Exported 1-thread wisdom for two contiguous arrays of size " << i << " by " << i << std::endl;
-        }
-    }
-
-    void TestGenerateManyR2CWisdomTwoThreads() throw(Exception)
-    {
-        // We first forget all wisdom and re-load, as threaded wisdom doesn't play well with un-threaded
-        void fftw_forget_wisdom(void);
-
-        /*
-         * This test generates an fftw wisdom file telling fftw how to efficiently compute fourier transforms of a
-         * given size, using two threads.  We generate wisdom for two DFTs on data contiguous in memory:
-         *    * 2d forward R2C and backward C2R transforms (16x16 --> 4096x4096)
-         *    * 3d forward R2C and backward C2R transforms (16x16x16 --> 256x256x256)
-         *
-         * This test takes a LONG time to run if there is currently no wisdom (around 4 hours).
-         */
-
-        int thread_flag = fftw_init_threads();
-
-        // 1 means it's read correctly, 0 indicates a failure
-        TS_ASSERT_EQUALS(thread_flag, 1);
-
-        fftw_plan_with_nthreads(2);
-
-        int wisdom_flag = fftw_import_wisdom_from_filename(mWisdomThreadsFilename.c_str());
-
-        // 1 means it's read correctly, 0 indicates a failure
-        TS_ASSERT_EQUALS(wisdom_flag, 1);
-
-        // Create 3D arrays that will represent two 2D arrays
-        typedef boost::multi_array<std::complex<double>, 3> complex_array_2d;
-
-        typedef boost::multi_array<double, 3> real_array_2d;
-
-        // Create 2D wisdom
-        for (unsigned i = 16 ; i < 129 ; i*=2)
-        {
-            real_array_2d input(boost::extents[2][i][i]);
-            complex_array_2d output(boost::extents[2][i][(i/2) + 1]);
-            real_array_2d check(boost::extents[2][i][i]);
-
-            double* fftw_input = &input[0][0][0];
-            fftw_complex* fftw_output = reinterpret_cast<fftw_complex*>(&output[0][0][0]);
-            double* fftw_check = &check[0][0][0];
-
-            // Plan variables
-            int rank = 2;                   // Number of dimensions for each array
-            int real_dims[] = {i, i};       // Dimensions of each real array
-            int comp_dims[] = {i, 1 + i/2}; // Dimensions of each complex array
-            int how_many = 2;               // Number of transforms
-            int real_sep = i * i;           // How many doubles between start of first array and start of second
-            int comp_sep = i * (1 + i/2);   // How many fftw_complex between start of first array and start of second
-            int real_stride = 1;            // Each real array is contiguous in memory
-            int comp_stride = 1;            // Each complex array is contiguous in memory
-            int* real_nembed = real_dims;
-            int* comp_nembed = comp_dims;
-
-            fftw_plan plan_f;
-            plan_f = fftw_plan_many_dft_r2c(rank, real_dims, how_many,
-                                            fftw_input,  real_nembed, real_stride, real_sep,
-                                            fftw_output, comp_nembed, comp_stride, comp_sep,
-                                            FFTW_PATIENT);
-
-            fftw_plan plan_b;
-            plan_b = fftw_plan_many_dft_c2r(rank, real_dims, how_many,
-                                            fftw_output, comp_nembed, comp_stride, comp_sep,
-                                            fftw_check,  real_nembed, real_stride, real_sep,
-                                            FFTW_PATIENT);
-
-            // We now verify that the forward followed by inverse transform produces the correct result
-            for (unsigned dim = 0 ; dim < 2 ; dim++)
-            {
-                for (unsigned x = 0 ; x < i ; x++)
-                {
-                    for (unsigned y = 0 ; y < i ; y++)
-                    {
-                        input[dim][x][y] = RandomNumberGenerator::Instance()->ranf();
-                    }
-                }
-            }
-
-            fftw_execute(plan_f);
-            fftw_execute(plan_b);
-
-            for (unsigned dim = 0 ; dim < 2 ; dim++)
-            {
-                for (unsigned x = 0 ; x < i ; x++)
-                {
-                    for (unsigned y = 0 ; y < i ; y++)
-                    {
-                        TS_ASSERT_DELTA(input[dim][x][y], check[dim][x][y]/(i*i), 1e-10);
-                    }
-                }
-            }
-
-            // Export each step of the loop so if the test is stopped progress is kept
-            fftw_export_wisdom_to_filename(mWisdomThreadsFilename.c_str());
-            std::cout << "Exported 2-thread wisdom for two contiguous arrays of size " << i << " by " << i << std::endl;
-        }
-    }
-
-    void xTestGenerateManyR2CWisdomFourThreads() throw(Exception)
-    {
-        // We first forget all wisdom and re-load, as threaded wisdom doesn't play well with un-threaded
-        void fftw_forget_wisdom(void);
-
-        /*
-         * This test generates an fftw wisdom file telling fftw how to efficiently compute fourier transforms of a
-         * given size, using two threads.  We generate wisdom for two DFTs on data contiguous in memory:
-         *    * 2d forward R2C and backward C2R transforms (16x16 --> 4096x4096)
-         *    * 3d forward R2C and backward C2R transforms (16x16x16 --> 256x256x256)
-         *
-         * This test takes a LONG time to run if there is currently no wisdom (around 4 hours).
-         */
-
-        int thread_flag = fftw_init_threads();
-
-        // 1 means it's read correctly, 0 indicates a failure
-        TS_ASSERT_EQUALS(thread_flag, 1);
-
-        fftw_plan_with_nthreads(4);
-
-        std::string filename = "./projects/ImmersedBoundary/src/fftw_threads.wisdom";
-        int wisdom_flag = fftw_import_wisdom_from_filename(filename.c_str());
-
-        // 1 means it's read correctly, 0 indicates a failure
-        TS_ASSERT_EQUALS(wisdom_flag, 1);
 
         // Create 3D arrays that will represent two 2D arrays
         typedef boost::multi_array<std::complex<double>, 3> complex_array_2d;
@@ -380,7 +179,195 @@ public:
             }
 
             // Export each step of the loop so if the test is stopped progress is kept
-            fftw_export_wisdom_to_filename(filename.c_str());
+            fftw_export_wisdom_to_filename(mWisdomFilename.c_str());
+            std::cout << "Exported 1-thread wisdom for two contiguous arrays of size " << i << " by " << i << std::endl;
+        }
+    }
+
+    void TestGenerateManyR2CWisdomTwoThreads() throw(Exception)
+    {
+        /*
+         * This test generates an fftw wisdom file telling fftw how to efficiently compute fourier transforms of a
+         * given size, using two threads.  We generate wisdom for two DFTs on data contiguous in memory:
+         *    * 2d forward R2C and backward C2R transforms (16x16 --> 4096x4096)
+         *    * 3d forward R2C and backward C2R transforms (16x16x16 --> 256x256x256)
+         *
+         * This test takes a LONG time to run if there is currently no wisdom (around 4 hours).
+         */
+
+        int thread_flag = fftw_init_threads();
+
+        // 1 means it's read correctly, 0 indicates a failure
+        TS_ASSERT_EQUALS(thread_flag, 1);
+
+        fftw_plan_with_nthreads(2);
+
+        // We first forget all wisdom and re-load, as threaded wisdom doesn't play well with un-threaded
+        void fftw_forget_wisdom(void);
+        int wisdom_flag = fftw_import_wisdom_from_filename(mWisdomThreadsFilename.c_str());
+
+        // Create 3D arrays that will represent two 2D arrays
+        typedef boost::multi_array<std::complex<double>, 3> complex_array_2d;
+
+        typedef boost::multi_array<double, 3> real_array_2d;
+
+        // Create 2D wisdom
+        for (unsigned i = 16 ; i < 513     ; i*=2)
+        {
+            real_array_2d input(boost::extents[2][i][i]);
+            complex_array_2d output(boost::extents[2][i][(i/2) + 1]);
+            real_array_2d check(boost::extents[2][i][i]);
+
+            double* fftw_input = &input[0][0][0];
+            fftw_complex* fftw_output = reinterpret_cast<fftw_complex*>(&output[0][0][0]);
+            double* fftw_check = &check[0][0][0];
+
+            // Plan variables
+            int rank = 2;                   // Number of dimensions for each array
+            int real_dims[] = {i, i};       // Dimensions of each real array
+            int comp_dims[] = {i, 1 + i/2}; // Dimensions of each complex array
+            int how_many = 2;               // Number of transforms
+            int real_sep = i * i;           // How many doubles between start of first array and start of second
+            int comp_sep = i * (1 + i/2);   // How many fftw_complex between start of first array and start of second
+            int real_stride = 1;            // Each real array is contiguous in memory
+            int comp_stride = 1;            // Each complex array is contiguous in memory
+            int* real_nembed = real_dims;
+            int* comp_nembed = comp_dims;
+
+            fftw_plan plan_f;
+            plan_f = fftw_plan_many_dft_r2c(rank, real_dims, how_many,
+                                            fftw_input,  real_nembed, real_stride, real_sep,
+                                            fftw_output, comp_nembed, comp_stride, comp_sep,
+                                            FFTW_PATIENT);
+
+            fftw_plan plan_b;
+            plan_b = fftw_plan_many_dft_c2r(rank, real_dims, how_many,
+                                            fftw_output, comp_nembed, comp_stride, comp_sep,
+                                            fftw_check,  real_nembed, real_stride, real_sep,
+                                            FFTW_PATIENT);
+
+            // We now verify that the forward followed by inverse transform produces the correct result
+            for (unsigned dim = 0 ; dim < 2 ; dim++)
+            {
+                for (unsigned x = 0 ; x < i ; x++)
+                {
+                    for (unsigned y = 0 ; y < i ; y++)
+                    {
+                        input[dim][x][y] = RandomNumberGenerator::Instance()->ranf();
+                    }
+                }
+            }
+
+            fftw_execute(plan_f);
+            fftw_execute(plan_b);
+
+            for (unsigned dim = 0 ; dim < 2 ; dim++)
+            {
+                for (unsigned x = 0 ; x < i ; x++)
+                {
+                    for (unsigned y = 0 ; y < i ; y++)
+                    {
+                        TS_ASSERT_DELTA(input[dim][x][y], check[dim][x][y]/(i*i), 1e-10);
+                    }
+                }
+            }
+
+            // Export each step of the loop so if the test is stopped progress is kept
+            fftw_export_wisdom_to_filename(mWisdomThreadsFilename.c_str());
+            std::cout << "Exported 2-thread wisdom for two contiguous arrays of size " << i << " by " << i << std::endl;
+        }
+    }
+
+    void TestGenerateManyR2CWisdomFourThreads() throw(Exception)
+    {
+        /*
+         * This test generates an fftw wisdom file telling fftw how to efficiently compute fourier transforms of a
+         * given size, using two threads.  We generate wisdom for two DFTs on data contiguous in memory:
+         *    * 2d forward R2C and backward C2R transforms (16x16 --> 4096x4096)
+         *    * 3d forward R2C and backward C2R transforms (16x16x16 --> 256x256x256)
+         *
+         * This test takes a LONG time to run if there is currently no wisdom (around 4 hours).
+         */
+
+        int thread_flag = fftw_init_threads();
+
+        // 1 means it's read correctly, 0 indicates a failure
+        TS_ASSERT_EQUALS(thread_flag, 1);
+
+        fftw_plan_with_nthreads(4);
+
+        // We first forget all wisdom and re-load, as threaded wisdom doesn't play well with un-threaded
+        void fftw_forget_wisdom(void);
+        int wisdom_flag = fftw_import_wisdom_from_filename(mWisdomThreadsFilename.c_str());
+
+        // Create 3D arrays that will represent two 2D arrays
+        typedef boost::multi_array<std::complex<double>, 3> complex_array_2d;
+
+        typedef boost::multi_array<double, 3> real_array_2d;
+
+        // Create 2D wisdom
+        for (unsigned i = 512 ; i < 513 ; i*=2)
+        {
+            real_array_2d input(boost::extents[2][i][i]);
+            complex_array_2d output(boost::extents[2][i][(i/2) + 1]);
+            real_array_2d check(boost::extents[2][i][i]);
+
+            double* fftw_input = &input[0][0][0];
+            fftw_complex* fftw_output = reinterpret_cast<fftw_complex*>(&output[0][0][0]);
+            double* fftw_check = &check[0][0][0];
+
+            // Plan variables
+            int rank = 2;                   // Number of dimensions for each array
+            int real_dims[] = {i, i};       // Dimensions of each real array
+            int comp_dims[] = {i, 1 + i/2}; // Dimensions of each complex array
+            int how_many = 2;               // Number of transforms
+            int real_sep = i * i;           // How many doubles between start of first array and start of second
+            int comp_sep = i * (1 + i/2);   // How many fftw_complex between start of first array and start of second
+            int real_stride = 1;            // Each real array is contiguous in memory
+            int comp_stride = 1;            // Each complex array is contiguous in memory
+            int* real_nembed = real_dims;
+            int* comp_nembed = comp_dims;
+
+            fftw_plan plan_f;
+            plan_f = fftw_plan_many_dft_r2c(rank, real_dims, how_many,
+                                            fftw_input,  real_nembed, real_stride, real_sep,
+                                            fftw_output, comp_nembed, comp_stride, comp_sep,
+                                            FFTW_PATIENT);
+
+            fftw_plan plan_b;
+            plan_b = fftw_plan_many_dft_c2r(rank, real_dims, how_many,
+                                            fftw_output, comp_nembed, comp_stride, comp_sep,
+                                            fftw_check,  real_nembed, real_stride, real_sep,
+                                            FFTW_PATIENT);
+
+            // We now verify that the forward followed by inverse transform produces the correct result
+            for (unsigned dim = 0 ; dim < 2 ; dim++)
+            {
+                for (unsigned x = 0 ; x < i ; x++)
+                {
+                    for (unsigned y = 0 ; y < i ; y++)
+                    {
+                        input[dim][x][y] = RandomNumberGenerator::Instance()->ranf();
+                    }
+                }
+            }
+
+            fftw_execute(plan_f);
+            fftw_execute(plan_b);
+
+            for (unsigned dim = 0 ; dim < 2 ; dim++)
+            {
+                for (unsigned x = 0 ; x < i ; x++)
+                {
+                    for (unsigned y = 0 ; y < i ; y++)
+                    {
+                        TS_ASSERT_DELTA(input[dim][x][y], check[dim][x][y]/(i*i), 1e-10);
+                    }
+                }
+            }
+
+            // Export each step of the loop so if the test is stopped progress is kept
+            fftw_export_wisdom_to_filename(mWisdomThreadsFilename.c_str());
             std::cout << "Exported 4-thread wisdom for two contiguous arrays of size " << i << " by " << i << std::endl;
         }
     }

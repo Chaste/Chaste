@@ -132,12 +132,12 @@ ImmersedBoundary2dArrays<DIM>::ImmersedBoundary2dArrays(ImmersedBoundaryMesh<DIM
     mFftwForwardPlan = fftw_plan_many_dft_r2c(rank, real_dims, how_many,
                                               p_in,      real_nembed, real_stride, real_sep,
                                               p_complex, comp_nembed, comp_stride, comp_sep,
-                                              FFTW_EXHAUSTIVE);
+                                              FFTW_PATIENT);
 
     mFftwInversePlan = fftw_plan_many_dft_c2r(rank, real_dims, how_many,
                                               p_complex, comp_nembed, comp_stride, comp_sep,
                                               p_out,     real_nembed, real_stride, real_sep,
-                                              FFTW_EXHAUSTIVE);
+                                              FFTW_PATIENT);
 }
 
 template<unsigned DIM>
