@@ -1577,7 +1577,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
         # #1464 Create a set of metadata variables that will have modifiers
         # We want to avoid writing out metadata for stimulus current as it is used once and then discarded.
         # \todo - use protocol information to put only the required modifiers into this list.
-        self.modifier_vars = [v for v in self.metadata_vars if v.oxmeta_name not in cellml_metadata.STIMULUS_NAMES]
+        self.modifier_vars = [v for v in self.metadata_vars if v.oxmeta_name not in cellml_metadata.STIMULUS_NAMES and v.oxmeta_name != 'membrane_capacitance']
         self.modifier_vars.sort(key=self.var_display_name)
 
         # Generate member variable declarations
@@ -1774,11 +1774,15 @@ class CellMLToChasteTranslator(CellMLTranslator):
         nodeset = set(low_range_vars + high_range_vars)
         
         # If not, don't bother writing the method, an empty implementation is in the abstract classes.
-        if nodeset:        
+        if nodeset:
+            # It's not appropriate to apply modifiers here - we want to check the actual values of the state
+            use_modifiers = self.use_modifiers
+            self.use_modifiers = False
+        
             self.output_method_start('VerifyStateVariables', [], 'void')
-            self.open_block()    
+            self.open_block()
             
-            using_cvode = (self.TYPE_VECTOR_REF == CellMLToCvodeTranslator.TYPE_VECTOR_REF)        
+            using_cvode = (self.TYPE_VECTOR_REF == CellMLToCvodeTranslator.TYPE_VECTOR_REF)
             if using_cvode:
                 self.writeln('/* We only expect CVODE to keep state variables to within its tolerances,')
                 self.writeln(' * not exactly the bounds prescribed to each variable that are checked here.')
@@ -1810,6 +1814,8 @@ class CellMLToChasteTranslator(CellMLTranslator):
                 self.writeln(error_template.format(self.var_display_name(var)))
                 self.close_block(False)
             self.close_block(True)
+            
+            self.use_modifiers = use_modifiers
   
     def output_constructor(self, params, base_class_params):
         """Output a cell constructor.
