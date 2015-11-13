@@ -96,6 +96,12 @@ public:
 
         SimpleStimulus initial(magnitude_of_stimulus, duration_of_stimulus, when);
         TS_ASSERT_EQUALS(initial.GetStimulus(0.062),  magnitude_of_stimulus);
+
+        initial.SetStartTime(0.07);
+        TS_ASSERT_EQUALS(initial.GetStimulus(0.062),  0.0);
+        TS_ASSERT_EQUALS(initial.GetStimulus(0.072),  magnitude_of_stimulus);
+        TS_ASSERT_EQUALS(initial.GetStimulus(0.073),  0.0);
+
     }
 
     void TestRegularStimulus()

@@ -75,6 +75,10 @@ double SimpleStimulus::GetStimulus(double time)
     }
 }
 
+void SimpleStimulus::SetStartTime(double startTime)
+{
+	mTimeOfStimulus = startTime;
+}
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"

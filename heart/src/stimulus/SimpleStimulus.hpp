@@ -101,6 +101,13 @@ public:
      * @param time  time at which to return the stimulus
      */
     double GetStimulus(double time);
+
+    /**
+     * Replace the time that was specified in the constructor with a new start time.
+     *
+     * @param startTime
+     */
+    void SetStartTime(double startTime);
 };
 
 
