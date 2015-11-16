@@ -1,0 +1,25 @@
+This file contains information on how to run Immersed Boundary simulations
+using the Chaste user project `ImmersedBoundary`.
+
+The following changes to the Chaste source need to be made:
+
+ (1) `BoxCollection` needs to be patched (see #2725)
+ (2) A "NEVER_REACHED" needs to be commented out of `OffLatticeSimulation.cpp`
+     to allow `ImmersedBoundaryCellPopulation` to be used
+ (3) fftw must be linked by adding it to your hostconfig file
+
+These three changes can be implemented in the following way:
+
+ (1) & (2) "patch -p0 < projects/ImmersedBoundary/ImmersedBoundary.patch"
+           from the Chaste directory
+ (3) Adding 'fftw3' and 'fftw3_threads' to the `other_libraries` variable in
+     your `python/hostconfig/machines/<NAME>.py` file
+
+Finally, before running any simulations, it is strongly advised to first run the
+test `TestGenerateFftwWisdom.hpp`.  This will generate two plaintext files in
+your CHASTE_TEST_OUTPUT folder that help fftw optimize discrete Fourier
+transforms for your hardware.  This test can take a long time (2-6 hours) if
+being run from scratch, so if you know that you will not be using arrays larger
+than a certain size, you can edit the private member variable `mMaxArraySize`
+accordingly.  The default is 4096x4096, and all powers of 2 up to that size will
+be generated.

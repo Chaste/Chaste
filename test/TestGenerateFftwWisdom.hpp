@@ -52,25 +52,28 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestGenerateFftwWisdom : public CxxTest::TestSuite
 {
 private:
+    /** Name of wisdom file when using a single thread */
     std::string mWisdomFilename;
+
+    /** Name of wisdom file when using multiple threads */
     std::string mWisdomThreadsFilename;
+
+    /** The max array size N for N by N arrays. Must be a multiple of 2 */
+    static const unsigned mMaxArraySize = 64;
+
 
 public:
 
-    void TestSetupWisdomFiles() throw(Exception)
+    void TestSetupWisdomFileOneThread() throw(Exception)
     {
         std::string single_thread_file_name = "fftw.wisdom";
-        std::string multi_thread_file_name  = "fftw_threads.wisdom";
 
         // Set up the file finder and get the absolute path
         FileFinder file_finder(single_thread_file_name, RelativeTo::ChasteTestOutput);
         mWisdomFilename = file_finder.GetAbsolutePath();
 
-        // Find if the file exists
-        bool wisdom_exists = file_finder.IsFile();
-
         // If it doesn't exists, create it with blank wisdom file
-        if (!wisdom_exists)
+        if (!file_finder.IsFile())
         {
             void fftw_forget_wisdom(void);
             fftw_export_wisdom_to_filename(mWisdomFilename.c_str());
@@ -78,26 +81,9 @@ public:
 
         // The file should now definitely exist
         TS_ASSERT(file_finder.IsFile());
-
-
-        file_finder.SetPath(multi_thread_file_name, RelativeTo::ChasteTestOutput);
-        mWisdomThreadsFilename = file_finder.GetAbsolutePath();
-
-        // Find if the file exists
-        bool wisdom_threads_exists = file_finder.IsFile();
-
-        // If it doesn't exists, create it with blank wisdom file
-        if (!wisdom_threads_exists)
-        {
-            void fftw_forget_wisdom(void);
-            fftw_export_wisdom_to_filename(mWisdomThreadsFilename.c_str());
-        }
-
-        // The file should now definitely exist
-        TS_ASSERT(file_finder.IsFile());
     }
 
-    void xTestGenerateManyR2CWisdomOneThread() throw(Exception)
+    void TestGenerateManyR2CWisdomOneThread() throw(Exception)
     {
         /*
          * This test generates an fftw wisdom file telling fftw how to efficiently compute fourier transforms of a
@@ -112,13 +98,16 @@ public:
         void fftw_forget_wisdom(void);
         int wisdom_flag = fftw_import_wisdom_from_filename(mWisdomFilename.c_str());
 
+        // 1 means it's read correctly, 0 indicates a failure
+        TS_ASSERT_EQUALS(wisdom_flag, 1);
+
         // Create 3D arrays that will represent two 2D arrays
         typedef boost::multi_array<std::complex<double>, 3> complex_array_2d;
 
         typedef boost::multi_array<double, 3> real_array_2d;
 
         // Create 2D wisdom
-        for (unsigned i = 16 ; i < 5000 ; i*=2)
+        for (unsigned i = 16 ; i <= mMaxArraySize ; i*=2)
         {
             real_array_2d input(boost::extents[2][i][i]);
             complex_array_2d output(boost::extents[2][i][(i/2) + 1]);
@@ -184,6 +173,32 @@ public:
         }
     }
 
+    void TestSetupWisdomFileMultiThread() throw(Exception)
+    {
+        // Must be called before other fftw routines to let fftw know to set up threaded environment
+        int thread_flag = fftw_init_threads();
+        TS_ASSERT_EQUALS(thread_flag, 1);
+
+        std::string multi_thread_file_name  = "fftw_threads.wisdom";
+
+        // Set up the file finder and get the absolute path
+        FileFinder file_finder(multi_thread_file_name, RelativeTo::ChasteTestOutput);
+        mWisdomThreadsFilename = file_finder.GetAbsolutePath();
+
+        // Find if the file exists
+        bool wisdom_exists = file_finder.IsFile();
+
+        // If it doesn't exists, create it with blank wisdom file
+        if (!wisdom_exists)
+        {
+            void fftw_forget_wisdom(void);
+            fftw_export_wisdom_to_filename(mWisdomThreadsFilename.c_str());
+        }
+
+        // The file should now definitely exist
+        TS_ASSERT(file_finder.IsFile());
+    }
+
     void TestGenerateManyR2CWisdomTwoThreads() throw(Exception)
     {
         /*
@@ -197,7 +212,7 @@ public:
 
         int thread_flag = fftw_init_threads();
 
-        // 1 means it's read correctly, 0 indicates a failure
+        // 1 means it has set up threading correctly, 0 indicates a failure
         TS_ASSERT_EQUALS(thread_flag, 1);
 
         fftw_plan_with_nthreads(2);
@@ -206,13 +221,16 @@ public:
         void fftw_forget_wisdom(void);
         int wisdom_flag = fftw_import_wisdom_from_filename(mWisdomThreadsFilename.c_str());
 
+        // 1 means it's read correctly, 0 indicates a failure
+        TS_ASSERT_EQUALS(wisdom_flag, 1);
+
         // Create 3D arrays that will represent two 2D arrays
         typedef boost::multi_array<std::complex<double>, 3> complex_array_2d;
 
         typedef boost::multi_array<double, 3> real_array_2d;
 
         // Create 2D wisdom
-        for (unsigned i = 16 ; i < 513     ; i*=2)
+        for (unsigned i = 16 ; i <= mMaxArraySize ; i*=2)
         {
             real_array_2d input(boost::extents[2][i][i]);
             complex_array_2d output(boost::extents[2][i][(i/2) + 1]);
@@ -300,13 +318,16 @@ public:
         void fftw_forget_wisdom(void);
         int wisdom_flag = fftw_import_wisdom_from_filename(mWisdomThreadsFilename.c_str());
 
+        // 1 means it's read correctly, 0 indicates a failure
+        TS_ASSERT_EQUALS(wisdom_flag, 1);
+
         // Create 3D arrays that will represent two 2D arrays
         typedef boost::multi_array<std::complex<double>, 3> complex_array_2d;
 
         typedef boost::multi_array<double, 3> real_array_2d;
 
         // Create 2D wisdom
-        for (unsigned i = 512 ; i < 513 ; i*=2)
+        for (unsigned i = 16 ; i <= mMaxArraySize ; i*=2)
         {
             real_array_2d input(boost::extents[2][i][i]);
             complex_array_2d output(boost::extents[2][i][(i/2) + 1]);
