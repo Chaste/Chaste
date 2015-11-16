@@ -59,7 +59,7 @@ private:
     std::string mWisdomThreadsFilename;
 
     /** The max array size N for N by N arrays. Must be a multiple of 2 */
-    static const unsigned mMaxArraySize = 64;
+    static const unsigned mMaxArraySize = 4096;
 
 
 public:
