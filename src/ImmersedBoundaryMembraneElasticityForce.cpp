@@ -43,6 +43,32 @@ ImmersedBoundaryMembraneElasticityForce<DIM>::ImmersedBoundaryMembraneElasticity
         : AbstractImmersedBoundaryForce<DIM>(),
           mpCellPopulation(&rCellPopulation)
 {
+    /*
+     * We split the nodes into three categories: basal, apical, and lateral.  We keep this information in the attribute
+     * called region, with 0, 1, and 2 representing basal, apical, and lateral respectively.
+     */
+    ImmersedBoundaryMesh<DIM,DIM>* p_mesh = &(mpCellPopulation->rGetMesh());
+
+    for (unsigned elem_idx = 0 ; elem_idx < p_mesh->GetNumElements() ; elem_idx++)
+    {
+        ImmersedBoundaryElement<DIM,DIM>* p_this_elem = p_mesh->GetElement(elem_idx);
+
+        // Basement lamina nodes are all basal
+        if (p_mesh->GetMembraneIndex() == p_this_elem->GetIndex())
+        {
+            for (unsigned node_idx = 0 ; node_idx < p_this_elem->GetNumNodes() ; node_idx++)
+            {
+                p_this_elem->GetNode(node_idx)->SetRegion(0);
+            }
+        }
+        else // not the basal lamina
+        {
+            for (unsigned node_idx = 0 ; node_idx < p_this_elem->GetNumNodes() ; node_idx++)
+            {
+                p_this_elem->GetNode(node_idx)->SetRegion(0);
+            }
+        }
+    }
 }
 
 template<unsigned DIM>
