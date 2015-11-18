@@ -39,7 +39,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //Airway generation alpha0 data, generation 0 -> generation 16
 const double LambertAirwayWallFactory::mAlpha0[] = {0.882,0.882,0.686,0.546,0.450,0.370,0.310,0.255,0.213,0.184,0.153,0.125,0.100,0.075,0.057,0.045,0.039};
 
-const double LambertAirwayWallFactory::mAlpha0Prime[] = {0.011,0.011,0.051,0.080,0.100,0.125,0.142,0.159,0.174,0.184,0.194,0.206,0.218,0.226,0.233,0.239,0.243};
+//The below are in Pascals^-1
+const double LambertAirwayWallFactory::mAlpha0Prime[] = {0.011/98.0665,0.011/98.0665,0.051/98.0665,0.080/98.0665,0.100/98.0665,0.125/98.0665,0.142/98.0665,0.159/98.0665,0.174/98.0665,0.184/98.0665,0.194/98.0665,0.206/98.0665,0.218/98.0665,0.226/98.0665,0.233/98.0665,0.239/98.0665,0.243/98.0665};
 
 const double LambertAirwayWallFactory::mN1[] = {0.5,0.5,0.6,0.6,0.7,0.8,0.9,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0};
 

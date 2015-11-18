@@ -101,19 +101,19 @@ private:
     /** The largest order in the airway tree*/
     double mMaxOrder;
 
-    /** alpha_0 values by generation */
+    /** alpha_0 values by generation dimensionless */
     static const double mAlpha0[17];
 
-    /** alpha_0_prime values by generation */
+    /** alpha_0_prime values by generation in Pascals^-1 */
     static const double mAlpha0Prime[17];
 
-    /** n1 values by generation */
+    /** n1 values by generation dimensionless */
     static const double mN1[17];
 
-    /** n2 values by generation */
+    /** n2 values by generation dimensionless  */
     static const double mN2[17];
 
-    /** The number of generations in the Lambert data. Nb generation start numbered at 0! */
+    /** The number of generations in the Lambert data. Nb generation number starts at 0! */
     static const double mMaxGeneration;
 };
 
