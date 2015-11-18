@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AirwayTreeWalker.hpp"
 
-AirwayTreeWalker::AirwayTreeWalker(TetrahedralMesh<1,3>& rAirwaysMesh,
+AirwayTreeWalker::AirwayTreeWalker(AbstractTetrahedralMesh<1,3>& rAirwaysMesh,
                                    unsigned rootIndex=0u) :
                                        mMesh(rAirwaysMesh),
                                        mOutletNodeIndex(rootIndex)

@@ -57,7 +57,7 @@ public:
      * @param rAirwaysMesh A mesh containing the airway tree to analyze
      * @param rootIndex The index of the inlet node (trachea entrance)
      */
-    AirwayTreeWalker(TetrahedralMesh<1,3>& rAirwaysMesh,
+    AirwayTreeWalker(AbstractTetrahedralMesh<1,3>& rAirwaysMesh,
                      unsigned rootIndex);
 
     /**
@@ -238,7 +238,7 @@ public:
 private:
 
     /** A mesh containing the airways tree.  */
-    TetrahedralMesh<1,3>& mMesh;
+    AbstractTetrahedralMesh<1,3>& mMesh;
 
     unsigned mOutletNodeIndex; /**< The outlet node is the root of the branching tree structure */
 
