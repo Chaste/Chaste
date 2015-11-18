@@ -126,7 +126,7 @@ set(CHASTE_LINK_LIBRARIES "")
 #Gperftools profiling
 if (Chaste_PROFILE_GPERFTOOLS)
     find_package(Gperftools REQUIRED)
-    list(APPEND CHASTE_LINK_LIBRARIES "${GPERFTOOLS_PROFILER}")
+    list(APPEND CHASTE_LINK_LIBRARIES "-Wl,--no-as-needed ${GPERFTOOLS_PROFILER} -Wl,--as-needed")
 endif()
 
 #Gprof executable
