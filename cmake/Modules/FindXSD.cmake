@@ -25,7 +25,7 @@ IF( XSD_EXECUTABLE )
   # access the xsd include files.
   #
   FIND_PATH( XSD_INCLUDE_DIR xsd/cxx/version.hxx
-      HINTS  "${XSD_ROOT_DIR}/libxsd"
+      HINTS  "$ENV{XSD_ROOT}/libxsd"
       PATHS /usr/include
 	    /usr/local/opt/libxsd
       )

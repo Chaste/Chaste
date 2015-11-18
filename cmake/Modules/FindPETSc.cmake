@@ -223,7 +223,7 @@ show :
     else (WIN32)
       set (libname ${name})
     endif (WIN32)
-    find_library (PETSC_LIBRARY_${suffix} NAMES ${libname} HINTS ${petsc_lib_dir} NO_DEFAULT_PATH)
+    find_library (PETSC_LIBRARY_${suffix} NAMES ${libname} cray${libname}_cray_real HINTS ${petsc_lib_dir} NO_DEFAULT_PATH)
     if (NOT PETSC_LIBRARY_${suffix})
         set (libname ${name})
 		find_library (PETSC_LIBRARY_${suffix} NAMES ${libname} HINTS ${petsc_lib_dir} NO_DEFAULT_PATH)
