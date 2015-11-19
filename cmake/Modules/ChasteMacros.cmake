@@ -117,12 +117,9 @@ endmacro()
 
         if (Chaste_MEMORY_TESTING)
             set(test_command ${VALGRIND_COMMAND})
-            set(test_args "--tool=memcheck --log-file=${Chaste_MEMORY_TESTING_OUTPUT_DIR}/${_testname}_valgrind.out 
-                --track-fds=yes --leak-check=yes --num-callers=50 ${Chaste_MEMORY_TESTING_SUPPS} 
-                --gen-suppressions=all
-                $<TARGET_FILE:${exeTargetName}> 
-                -malloc_debug -malloc_dump -memory_info"
-                )
+            set(test_args "--tool=memcheck --log-file=${Chaste_MEMORY_TESTING_OUTPUT_DIR}/${_testname}_valgrind.out") 
+            set(test_args "${test_args} --track-fds=yes --leak-check=yes --num-callers=50 ${Chaste_MEMORY_TESTING_SUPPS}")
+            set(test_args "${test_args} --gen-suppressions=all $<TARGET_FILE:${exeTargetName}> -malloc_debug -malloc_dump -memory_info")
             set(num_cpus 1)
         elseif (Chaste_PROFILE_GPROF OR Chaste_PROFILE_GPERFTOOLS)
             if (Chaste_PROFILE_GPERFTOOLS)
