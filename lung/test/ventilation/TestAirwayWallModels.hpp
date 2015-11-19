@@ -66,30 +66,34 @@ public:
                 TS_ASSERT_DELTA(p_wall->mRiMax, 0.05, 1e-6);
                 TS_ASSERT_DELTA(p_wall->mN1, 0.5, 1e-6);
                 TS_ASSERT_DELTA(p_wall->mN2, 10.0, 1e-6);
+                delete p_wall;
             }
 
-            { //generation 2
+            { //generation 8
                 LambertAirwayWall* p_wall = factory.CreateAirwayWallForElement(mesh.GetElement(2u));
                 double alpha0 = p_wall->mRi*p_wall->mRi/p_wall->mRiMax/p_wall->mRiMax;
                 TS_ASSERT_DELTA(alpha0, 0.213, 1e-3);
                 TS_ASSERT_DELTA(p_wall->mRiMax, 0.05, 1e-6);
                 TS_ASSERT_DELTA(p_wall->mN1, 1.0, 1e-6);
                 TS_ASSERT_DELTA(p_wall->mN2, 10.0, 1e-6);
+                delete p_wall;
             }
 
-            { //generation 4
+            { //generation 16
                 LambertAirwayWall* p_wall = factory.CreateAirwayWallForElement(mesh.GetElement(4u));
                 double alpha0 = p_wall->mRi*p_wall->mRi/p_wall->mRiMax/p_wall->mRiMax;
                 TS_ASSERT_DELTA(alpha0, 0.039, 1e-6);
                 TS_ASSERT_DELTA(p_wall->mRiMax, 0.05, 1e-6);
                 TS_ASSERT_DELTA(p_wall->mN1, 1.0, 1e-6);
                 TS_ASSERT_DELTA(p_wall->mN2, 7.0, 1e-6);
+                delete p_wall;
             }
 
             for(unsigned element_index = 0; element_index < mesh.GetNumElements(); ++element_index)
             {
                 LambertAirwayWall* p_wall = factory.CreateAirwayWallForElement(mesh.GetElement(element_index));
 
+                p_wall->SetTimestep(0.0); //For coverage, Lambert is a quasi-static model
                 p_wall->SetAirwayPressure(0.0);
                 p_wall->SetPleuralPressure(0.0);
 
@@ -103,6 +107,8 @@ public:
                 p_wall->SetPleuralPressure(50000000000);
                 p_wall->SolveAndUpdateState(0.0, 0.0);
                 TS_ASSERT_DELTA(p_wall->GetLumenRadius(), 0.0, 1e-3);
+
+                delete p_wall;
             }
         }
 
@@ -119,6 +125,7 @@ public:
                 TS_ASSERT_DELTA(p_wall->mRiMax, 0.05, 1e-6);
                 TS_ASSERT_DELTA(p_wall->mN1, 0.5, 1e-6);
                 TS_ASSERT_DELTA(p_wall->mN2, 10.0, 1e-6);
+                delete p_wall;
             }
 
             { //generation 2
@@ -128,6 +135,7 @@ public:
                 TS_ASSERT_DELTA(p_wall->mRiMax, 0.05, 1e-6);
                 TS_ASSERT_DELTA(p_wall->mN1, 1.0, 1e-6);
                 TS_ASSERT_DELTA(p_wall->mN2, 10.0, 1e-6);
+                delete p_wall;
             }
 
             { //generation 4
@@ -137,6 +145,7 @@ public:
                 TS_ASSERT_DELTA(p_wall->mRiMax, 0.05, 1e-6);
                 TS_ASSERT_DELTA(p_wall->mN1, 1.0, 1e-6);
                 TS_ASSERT_DELTA(p_wall->mN2, 7.0, 1e-6);
+                delete p_wall;
             }
 
             for(unsigned element_index = 0; element_index < mesh.GetNumElements(); ++element_index)
@@ -156,6 +165,8 @@ public:
                 p_wall->SetPleuralPressure(50000000000);
                 p_wall->SolveAndUpdateState(0.0, 0.0);
                 TS_ASSERT_DELTA(p_wall->GetLumenRadius(), 0.0, 1e-3);
+
+                delete p_wall;
             }
         }
     }
