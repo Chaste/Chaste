@@ -151,6 +151,7 @@ endmacro()
                     -Doutput_file=${output_file}
                     -P ${Chaste_SOURCE_DIR}/cmake/Modules/ChasteRunTestAndPostProcess.cmake)
         else()
+            separate_arguments(test_args)
             add_test(NAME ${_testTargetName} WORKING_DIRECTORY "${Chaste_SOURCE_DIR}/" 
                 COMMAND ${test_command} ${test_args})
         endif()
