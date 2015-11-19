@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 VentilationProblem::VentilationProblem(const std::string& rMeshDirFilePath, unsigned rootIndex)
     : AbstractVentilationProblem(rMeshDirFilePath, rootIndex),
       mFluxGivenAtInflow(false),
+      mFluxGivenAtOutflow(false),
       mTerminalInteractionMatrix(NULL),
       mNumNonZeroesPerRow(25u), //See note in header definition
       mTerminalFluxChangeVector(NULL),
@@ -272,16 +273,16 @@ void VentilationProblem::SolveIterativelyFromPressure()
 
         VecCopy(mTerminalPressureChangeVector, old_terminal_pressure_change);
         KSPSolve(mTerminalKspSolver, mTerminalPressureChangeVector, mTerminalFluxChangeVector);
-        double* p_mTerminalFluxChangeVector;
-        VecGetArray(mTerminalFluxChangeVector, &p_mTerminalFluxChangeVector);
+        double* p_terminal_flux_change_vector;
+        VecGetArray(mTerminalFluxChangeVector, &p_terminal_flux_change_vector);
 
 
 
         for (unsigned terminal=0; terminal<num_terminals; terminal++)
         {
-            double estimated_mTerminalFluxChangeVector=p_mTerminalFluxChangeVector[terminal];
+            double estimated_terminal_flux_change=p_terminal_flux_change_vector[terminal];
             unsigned edge_index = mTerminalToEdgeIndex[terminal];
-            mFlux[edge_index] +=  estimated_mTerminalFluxChangeVector;
+            mFlux[edge_index] +=  estimated_terminal_flux_change;
         }
         SolveDirectFromFlux();
         /* Look at the magnitude of the response */
@@ -320,9 +321,9 @@ void VentilationProblem::SolveIterativelyFromPressure()
 //            }
             for (unsigned terminal=0; terminal<num_terminals; terminal++)
             {
-                double estimated_mTerminalFluxChangeVector=p_mTerminalFluxChangeVector[terminal];
+                double estimated_terminal_flux_change=p_terminal_flux_change_vector[terminal];
                 unsigned edge_index = mTerminalToEdgeIndex[terminal];
-                mFlux[edge_index] +=  terminal_flux_correction*estimated_mTerminalFluxChangeVector;
+                mFlux[edge_index] +=  terminal_flux_correction*estimated_terminal_flux_change;
             }
             SolveDirectFromFlux();
         }
@@ -385,7 +386,7 @@ void VentilationProblem::SetFluxAtBoundaryNode(const Node<3>& rNode, double flux
 
 void VentilationProblem::Solve()
 {
-    if (mFluxGivenAtInflow)
+    if (mFluxGivenAtInflow && !mFluxGivenAtOutflow)
     {
         SolveDirectFromFlux();
     }

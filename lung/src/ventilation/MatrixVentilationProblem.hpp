@@ -107,14 +107,6 @@ public:
      */
     void SetMeshInMilliMetres();
 
-
-    /**
-     * Sets the flux at outflow/trachea/top of the tree
-     * Flux is "volumetric flow rate"
-     * @param flux  The flux value in (m^3)/s
-     */
-    void SetOutflowFlux(double flux);
-
     /**
      * Sets a Dirichlet pressure boundary condition for a given node.
      *

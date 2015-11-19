@@ -341,7 +341,7 @@ public:
         TS_ASSERT_DELTA(pressure[28], 50.0,    1e-4); //BC
     }
 
-    ///\todo #2300 small unit test for both classes
+
     void TestTopOfAirwaysPatientDataOutflowFlux() throw (Exception)
     {
         MatrixVentilationProblem problem("lung/test/data/top_of_tree", 0u);
@@ -353,10 +353,10 @@ public:
         TS_ASSERT_EQUALS(r_mesh.GetNumNodes(), 31u);
         TS_ASSERT_EQUALS(r_mesh.GetNumElements(), 30u);
         problem.Solve();
-        problem.Solve();
-        // For debugging...
+        
         std::vector<double> flux, pressure;
         problem.GetSolutionAsFluxesAndPressures(flux, pressure);
+        TS_ASSERT_DELTA(flux[0], 0.001, 1e-5);
     }
 
     void OnlyWorksWithUMFPACKTestPatientData() throw (Exception)

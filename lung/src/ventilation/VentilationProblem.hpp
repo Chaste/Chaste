@@ -73,6 +73,9 @@ private:
     /**< Used to switch solution methods.  If the flux is given at the boundary then the entire system can be solved directly by back substitution. */
     bool mFluxGivenAtInflow;
 
+    /**< \todo #2300 Used to switch solution methods.  If the flux is given at the top of the tree then we can no longer reflect off a known pressure condition and need to adjust the top pressure to match flux. */
+    bool mFluxGivenAtOutflow;
+
     /**
      * The symmetric matrix is an estimate of the dense matrix system which determines how flux changes at terminal
      * nodes are reflected in pressure changes at terminals in the form
@@ -201,7 +204,7 @@ public:
      * @param pressure  The pressure value in Pascals
      */
     void SetOutflowPressure(double pressure);
-    
+
     /**
      * Sets the flux at outflow/trachea/top of the tree
      * Flux is "volumetric flow rate"

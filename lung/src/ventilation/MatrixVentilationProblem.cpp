@@ -98,14 +98,6 @@ void MatrixVentilationProblem::SetMeshInMilliMetres()
     mFluxScaling = 1e10; // 1e9 would be enough to put the fluxes in mm^3/s rather than m^3/s we may scale further to account for small airways
 }
 
-
-
-void MatrixVentilationProblem::SetOutflowFlux(double flux)
-{
-    SetFluxAtBoundaryNode(*(mMesh.GetNode(mOutletNodeIndex)), flux);
-}
-
-
 void MatrixVentilationProblem::SetPressureAtBoundaryNode(const Node<3>& rNode, double pressure)
 {
     if (rNode.IsBoundaryNode() == false)

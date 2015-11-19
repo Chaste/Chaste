@@ -340,6 +340,24 @@ public:
         TS_ASSERT_DELTA(pressure[28], 50.0,    1e-4); //BC
     }
 
+    ///\todo #2300
+    void not_implemented_TestTopOfAirwaysPatientDataOutflowFlux() throw (Exception)
+    {
+        VentilationProblem problem("lung/test/data/top_of_tree", 0u);
+
+        problem.SetOutflowFlux(0.001);
+        problem.SetConstantInflowPressures(50.0);
+        //problem.SetConstantInflowFluxes(100.0);
+        TetrahedralMesh<1, 3>& r_mesh=problem.rGetMesh();
+        TS_ASSERT_EQUALS(r_mesh.GetNumNodes(), 31u);
+        TS_ASSERT_EQUALS(r_mesh.GetNumElements(), 30u);
+        problem.Solve();
+
+        std::vector<double> flux, pressure;
+        problem.GetSolutionAsFluxesAndPressures(flux, pressure);
+        TS_ASSERT_DELTA(flux[0], 0.001, 1e-5);
+    }
+
     void TestPatientData() throw (Exception)
     {
         VentilationProblem problem("lung/test/data/all_of_tree", 0u);

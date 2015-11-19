@@ -155,6 +155,12 @@ void AbstractVentilationProblem::SetOutflowPressure(double pressure)
     SetPressureAtBoundaryNode(*(mMesh.GetNode(mOutletNodeIndex)), pressure);
 }
 
+void AbstractVentilationProblem::SetOutflowFlux(double flux)
+{
+    SetFluxAtBoundaryNode(*(mMesh.GetNode(mOutletNodeIndex)), flux);
+}
+
+
 void AbstractVentilationProblem::SolveOverTime(TimeStepper& rTimeStepper,
         void (*pBoundaryConditionFunction)(AbstractVentilationProblem*, TimeStepper& rTimeStepper, const Node<3>&),
         const std::string& rDirName, const std::string& rFileBaseName)

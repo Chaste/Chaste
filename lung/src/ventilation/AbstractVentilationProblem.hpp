@@ -220,6 +220,13 @@ public:
      */
     virtual void SetOutflowPressure(double pressure);
 
+    /**
+     * Sets the flux at outflow/trachea/top of the tree
+     * Flux is "volumetric flow rate"
+     * @param flux  The flux value in (m^3)/s
+     */
+    virtual void SetOutflowFlux(double flux);
+
 
     /**
      * @param rFluxesOnEdges The fluxes ordered by edge index (this vector is resized)
