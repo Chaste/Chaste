@@ -251,10 +251,10 @@ if (Chaste_MEMORY_TESTING)
     get_filename_component(openmpi_supp_path ${MPIEXEC} DIRECTORY)
     get_filename_component(openmpi_supp_path ${openmpi_supp_path} DIRECTORY)
     set(openmpi_supp_path "${openmpi_supp_path}/share/openmpi/openmpi-valgrind.supp")
-    set(Chaste_MEMORY_TESTING_SUPPS "--suppressions=${Chaste_SOURCE_DIR}/chaste.supp"
-                                    "--suppressions=${Chaste_SOURCE_DIR}/chaste-lucid.supp")
+    set(Chaste_MEMORY_TESTING_SUPPS "--suppressions=${Chaste_SOURCE_DIR}/chaste.supp 
+                                     --suppressions=${Chaste_SOURCE_DIR}/chaste-lucid.supp")
     if (EXISTS ${openmpi_supp_path})
-        list(APPEND Chaste_MEMORY_TESTING_SUPPS "--suppressions=${openmpi_supp_path}")
+        set(Chaste_MEMORY_TESTING_SUPPS "${Chaste_MEMORY_TESTING_SUPPS} --suppressions=${openmpi_supp_path}")
     endif()
 endif()
 
