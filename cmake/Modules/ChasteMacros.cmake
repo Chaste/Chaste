@@ -123,8 +123,6 @@ endmacro()
                 $<TARGET_FILE:${exeTargetName}> 
                 -malloc_debug -malloc_dump -memory_info"
                 )
-            message("test command = ${test_command}")
-            message("test args = ${test_args}")
             set(num_cpus 1)
         elseif (Chaste_PROFILE_GPROF OR Chaste_PROFILE_GPERFTOOLS)
             if (Chaste_PROFILE_GPERFTOOLS)
