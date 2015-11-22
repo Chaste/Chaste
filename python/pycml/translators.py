@@ -455,17 +455,23 @@ class CellMLTranslator(object):
     def var_display_name(self, var):
         """Return a display name for the given variable.
         
-        If it has an oxmeta name, uses that.  Otherwise uses the cmeta:id if present, or the name
-        attribute if not.  If there is an interface component, strip the name of it out of the
-        display name.
+        If it has an oxmeta name, uses that.  Otherwise, looks first for a bqbiol:is annotation,
+        or uses the cmeta:id if present, or the name attribute if not.  If there is an interface
+        component, strip the name of it out of the display name.
         """
-        # TODO: support other ontologies too?
         if var.oxmeta_name:
             name = var.oxmeta_name
-        elif hasattr(var, u'id') and var.id:
-            name = var.id
         else:
-            name = var.name
+            for uri in var.get_rdf_annotations(('bqbiol:is', NSS['bqbiol'])):
+                import urlparse
+                _, name = urlparse.urldefrag(uri)
+                if name:
+                    break
+            else:
+                if hasattr(var, u'id') and var.id:
+                    name = var.id
+                else:
+                    name = var.name
         iface = getattr(self.model, 'interface_component_name', '#N/A#')
         if name.startswith(iface):
             name = name[len(iface)+2:]
