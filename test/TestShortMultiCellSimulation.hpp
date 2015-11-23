@@ -76,7 +76,7 @@ public:
          * 5: Random y-variation
          * 6: Include membrane
          */
-        ImmersedBoundaryPalisadeMeshGenerator gen(7, 256, 0.2, 2.5, 0.1, true);
+        ImmersedBoundaryPalisadeMeshGenerator gen(7, 256, 0.1, 2.5, 0.1, true);
         ImmersedBoundaryMesh<2, 2>* p_mesh = gen.GetMesh();
 
         p_mesh->SetNumGridPtsXAndY(512);
@@ -117,7 +117,7 @@ public:
         simulator.SetOutputDirectory("TestShortMultiCellSimulation");
         simulator.SetDt(dt);
         simulator.SetSamplingTimestepMultiple(40);
-        simulator.SetEndTime(10.0 * dt);
+        simulator.SetEndTime(1000.0 * dt);
 
         setup_duration = timer.GetElapsedTime();
 

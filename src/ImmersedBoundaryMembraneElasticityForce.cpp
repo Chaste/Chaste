@@ -58,14 +58,60 @@ ImmersedBoundaryMembraneElasticityForce<DIM>::ImmersedBoundaryMembraneElasticity
         {
             for (unsigned node_idx = 0 ; node_idx < p_this_elem->GetNumNodes() ; node_idx++)
             {
-                p_this_elem->GetNode(node_idx)->SetRegion(0);
+                p_this_elem->GetNode(node_idx)->SetRegion(2);
             }
         }
         else // not the basal lamina
         {
+            /*
+             * Because cells are initialised as roughly rectangular structures with equally spaced nodes, the correct
+             * number of basal (or apical) nodes will be (roughly) 0.5 * num_nodes / (1 + aspect ratio).
+             *
+             * We identify which cells will be apical and basal by sorting the locations of each node and calculating
+             * the correct threshold values, which we then compare against when assigning the region.
+             */
+            unsigned num_nodes = p_this_elem->GetNumNodes();
+            double aspect_ratio = p_mesh->GetElongationShapeFactorOfElement(elem_idx);
+
+            unsigned num_basal_nodes = std::floor(0.5 * ( double(num_nodes) / (1.0 + aspect_ratio) ));
+
+            // Check we have more than one, and fewer than half, of the nodes to be marked as basal
+            assert(num_basal_nodes > 1);
+            assert(num_basal_nodes < std::floor(double(num_nodes) / 2.0) );
+
+            std::vector<double> node_y_locations;
+
             for (unsigned node_idx = 0 ; node_idx < p_this_elem->GetNumNodes() ; node_idx++)
             {
-                p_this_elem->GetNode(node_idx)->SetRegion(0);
+                node_y_locations.push_back(p_this_elem->GetNode(node_idx)->rGetLocation()[1]);
+            }
+
+            std::sort(node_y_locations.begin(), node_y_locations.end());
+
+            double low_threshold  = 0.5 * (node_y_locations[num_basal_nodes - 1] + node_y_locations[num_basal_nodes]);
+            double high_threshold = 0.5 * (node_y_locations[num_nodes - num_basal_nodes] + node_y_locations[num_nodes - num_basal_nodes - 1]);
+
+            assert(low_threshold < high_threshold);
+
+            for (unsigned node_idx = 0 ; node_idx < p_this_elem->GetNumNodes() ; node_idx++)
+            {
+                double node_y_location = p_this_elem->GetNode(node_idx)->rGetLocation()[1];
+
+                if (node_y_location < low_threshold)
+                {
+                    // Node will be basal (region 0)
+                    p_this_elem->GetNode(node_idx)->SetRegion(0);
+                }
+                else if (node_y_location > high_threshold)
+                {
+                    // Node will be apical (region 1)
+                    p_this_elem->GetNode(node_idx)->SetRegion(1);
+                }
+                else
+                {
+                    // Node will be lateral (region 2)
+                    p_this_elem->GetNode(node_idx)->SetRegion(2);
+                }
             }
         }
     }
@@ -111,10 +157,20 @@ void ImmersedBoundaryMembraneElasticityForce<DIM>::AddForceContribution(std::vec
             // Index of the next node, calculated modulo number of nodes in this element
             unsigned next_idx = (node_idx + 1) % num_nodes;
 
+            double modified_spring_constant = spring_constant;
+            double modified_rest_length = rest_length;
+
+            // If the node is apical or basal, increase the spring constant
+            if (elem_iter->GetNode(node_idx)->GetRegion() < 2)
+            {
+                modified_spring_constant *= 10.0;
+                modified_rest_length *= 4.0;
+            }
+
             // Hooke's law linear spring force
             elastic_force_to_next_node[node_idx] = p_mesh->GetVectorFromAtoB(elem_iter->GetNodeLocation(next_idx), elem_iter->GetNodeLocation(node_idx));
             normed_dist = norm_2(elastic_force_to_next_node[node_idx]);
-            elastic_force_to_next_node[node_idx] *= spring_constant * (normed_dist - rest_length) / normed_dist;
+            elastic_force_to_next_node[node_idx] *= modified_spring_constant * (normed_dist - modified_rest_length) / normed_dist;
         }
 
         // Add the contributions of springs adjacent to each node
