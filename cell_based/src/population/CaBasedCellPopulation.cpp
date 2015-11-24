@@ -579,7 +579,7 @@ void CaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirec
     time << num_timesteps;
 
     // Store the number of cells for which to output data to VTK
-    unsigned num_cells = this->GetNumRealCells();
+    unsigned num_cells = this->GetNumAllCells();
 
     // When outputting any CellData, we assume that the first cell is representative of all cells
     unsigned num_cell_data_items = 0u;

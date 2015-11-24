@@ -60,6 +60,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DiffusionCaUpdateRule.hpp"
 #include "RandomCaSwitchingUpdateRule.hpp"
 #include "CellIdWriter.hpp"
+#include "ApoptoticCellKiller.hpp"
+#include "ApoptoticCellProperty.hpp"
+
+#include "CellProliferativeTypesWriter.hpp"
+#include "CellProliferativePhasesWriter.hpp"
+#include "CellMutationStatesWriter.hpp"
+#include "CellLabelWriter.hpp"
+#include "CellProliferativePhasesCountWriter.hpp"
+
 
 class TestOnLatticeSimulationWithCaBasedCellPopulation : public AbstractCellBasedWithTimingsTestSuite
 {
@@ -322,6 +331,74 @@ public:
                     "Location index input argument does not correspond to a Cell");
             }
         }
+    }
+
+    void  TestCaMonolayerWithApoptoticCellKiller() throw (Exception)
+    {
+        EXIT_IF_PARALLEL;
+
+        // Reset the maximum cell ID to zero (to account for previous tests)
+        CellId::ResetMaxCellId();
+
+        // Create a simple 2D PottsMesh
+        PottsMeshGenerator<2> generator(10, 0, 0, 10, 0, 0);
+        PottsMesh<2>* p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), p_diff_type);
+
+        // Specify where cells lie
+        std::vector<unsigned> location_indices;
+        for (unsigned index=0; index<p_mesh->GetNumNodes(); index++)
+        {
+            location_indices.push_back(index);
+        }
+        TS_ASSERT_EQUALS(location_indices.size(),p_mesh->GetNumNodes());
+
+        // Create cell population
+        CaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
+        cell_population.SetOutputResultsForChasteVisualizer(false);
+        cell_population.AddCellWriter<CellLabelWriter>();
+        cell_population.AddCellWriter<CellMutationStatesWriter>();
+        cell_population.AddCellWriter<CellProliferativeTypesWriter>();
+        cell_population.AddCellWriter<CellProliferativePhasesWriter>();
+
+        // update all cells in population to prescribe an initial oxygen concentration and apoptosis time
+        std::list<CellPtr> cells2 = cell_population.rGetCells();
+        std::list<CellPtr>::iterator it;
+        RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
+        for (it = cells2.begin(); it != cells2.end(); ++it)
+        {
+            (*it)->SetApoptosisTime(3);
+            double random_number = p_gen->ranf();
+            if (random_number < 0.5)
+            {
+                (*it)->AddCellProperty(CellPropertyRegistry::Instance()->Get<ApoptoticCellProperty>());
+            }
+        }
+
+        // Set up cell-based simulation
+        OnLatticeSimulation<2> simulator(cell_population);
+        simulator.SetOutputDirectory("TestCaMonolayerWithApoptoticCellKiller");
+        simulator.SetDt(1);
+        simulator.SetEndTime(5); // only one step as we only care about cells being killed
+
+        // No movement rule as only care about cell death
+
+        // Add a cell killer that will kill all apoptotic cells
+        MAKE_PTR_ARGS(ApoptoticCellKiller<2>, p_killer, (&cell_population)); // v>4.5
+        simulator.AddCellKiller(p_killer);
+
+        // Run simulation
+        simulator.Solve();
+
+        // Test no deaths and some births
+        TS_ASSERT_EQUALS(simulator.GetNumBirths(), 0u);
+        TS_ASSERT(simulator.GetNumDeaths() > 0);
+
     }
 
     void TestCaMonolayerWithRandomSwitching() throw (Exception)
