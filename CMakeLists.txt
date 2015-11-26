@@ -60,7 +60,7 @@ option(Chaste_UPDATE_PROVENANCE "Update build timestamp. Disable to prevent re-l
 
 option(RUN_TESTS OFF "This option simply runs Chaste tests. You should also set the test family.")
 set(TEST_FAMILY "Continuous" CACHE STRING "The name of the test family, e.g, Continuous, Failing, Nightly, Parallel etc.")
-set(TestPackTypes "Continuous;Failing;Nightly;Parallel;Production;Weekly;Profile")
+set(TestPackTypes "Continuous;Failing;Nightly;Parallel;Production;Weekly;Profile;ProfileAssembly")
 
 if(RUN_TESTS)
 	list(FIND TestPackTypes ${TEST_FAMILY} found)
