@@ -86,7 +86,7 @@ if(RUN_TESTS)
 endif(RUN_TESTS)
 
 if (WIN32 OR CYGWIN)
-	option(CHASTE_AUTO_INSTALL_DEPS
+	option(Chaste_AUTO_INSTALL_DEPS
 		"Set whether we will automatically download and install Chaste dependences (windows-only option). ON by default"
 		ON)
 endif()
@@ -104,7 +104,6 @@ option(BUILD_SHARED_LIBS
 endif()
 
 option(Chaste_ENABLE_TESTING "Enable Chaste Testing" ON)
-option(Chaste_ENABLE_PROJECT_TESTING "Enable Chaste Project Testing" ON)
 
 #Some Chaste-specific #defines
 add_definitions(-DCHASTE_CMAKE)
@@ -120,13 +119,13 @@ endif(WIN32 OR CYGWIN)
 #  FIND THIRD PARTY LIBRARIES  #
 ################################
 
-set(CHASTE_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR})
-set(CHASTE_LINK_LIBRARIES "")
+set(Chaste_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR})
+set(Chaste_LINK_LIBRARIES "")
 
 #Gperftools profiling
 if (Chaste_PROFILE_GPERFTOOLS)
     find_package(Gperftools REQUIRED)
-    list(APPEND CHASTE_LINK_LIBRARIES "-Wl,--no-as-needed ${GPERFTOOLS_PROFILER} -Wl,--as-needed")
+    list(APPEND Chaste_LINK_LIBRARIES "-Wl,--no-as-needed ${GPERFTOOLS_PROFILER} -Wl,--as-needed")
 endif()
 
 #Gprof executable
@@ -157,22 +156,22 @@ if (Chaste_ENABLE_TESTING)
     endif()
 endif()
 
-if(CHASTE_AUTO_INSTALL_DEPS)
-	set(CHASTE_DEPS_ROOT_DIR "${Chaste_BINARY_DIR}/../install/third_party_libs" CACHE PATH "Root directory for installed third party libraries")
-	  FILE(GLOB children RELATIVE ${CHASTE_DEPS_ROOT_DIR} ${CHASTE_DEPS_ROOT_DIR}/*)
+if(Chaste_AUTO_INSTALL_DEPS)
+	set(Chaste_DEPS_ROOT_DIR "${Chaste_BINARY_DIR}/../install/third_party_libs" CACHE PATH "Root directory for installed third party libraries")
+	  FILE(GLOB children RELATIVE ${Chaste_DEPS_ROOT_DIR} ${Chaste_DEPS_ROOT_DIR}/*)
 	foreach(subdir ${children})
-		if(IS_DIRECTORY ${CHASTE_DEPS_ROOT_DIR}/${subdir})
+		if(IS_DIRECTORY ${Chaste_DEPS_ROOT_DIR}/${subdir})
 			if (${subdir} MATCHES ".*boost.*" AND NOT BOOST_ROOT)
-				set(BOOST_ROOT "${CHASTE_DEPS_ROOT_DIR}/${subdir}")
+				set(BOOST_ROOT "${Chaste_DEPS_ROOT_DIR}/${subdir}")
 			#elseif (${subdir} MATCHES ".*petsc.*" AND NOT ENV{PETSC_DIR})
-			#	set(ENV{PETSC_DIR} "${CHASTE_DEPS_ROOT_DIR}/${subdir}")
+			#	set(ENV{PETSC_DIR} "${Chaste_DEPS_ROOT_DIR}/${subdir}")
 			#	set(PETSC_ARCH "")
 			elseif (${subdir} MATCHES ".*vtk.*" AND NOT VTK_DIR)
-				set(VTK_DIR "${CHASTE_DEPS_ROOT_DIR}/${subdir}/lib/vtk-5.8")
+				set(VTK_DIR "${Chaste_DEPS_ROOT_DIR}/${subdir}/lib/vtk-5.8")
 			elseif (${subdir} MATCHES ".*sundials.*" AND NOT ENV{SUNDIALS_ROOT})
-				set(ENV{SUNDIALS_ROOT} "${CHASTE_DEPS_ROOT_DIR}/${subdir}")
+				set(ENV{SUNDIALS_ROOT} "${Chaste_DEPS_ROOT_DIR}/${subdir}")
 			elseif (${subdir} MATCHES ".*hdf5.*" AND NOT ENV{HDF5_ROOT})
-				set(ENV{HDF5_ROOT} "${CHASTE_DEPS_ROOT_DIR}/${subdir}")
+				set(ENV{HDF5_ROOT} "${Chaste_DEPS_ROOT_DIR}/${subdir}")
 			endif()
 		endif()
 	endforeach()
@@ -182,8 +181,8 @@ endif()
 if (Chaste_USE_VTK)
     #set(VTK_FIND_QUIETLY ON)
     find_package(VTK REQUIRED)
-    list(APPEND CHASTE_INCLUDES "${VTK_INCLUDE_DIRS}")
-    list(APPEND CHASTE_LINK_LIBRARIES "${VTK_LIBRARIES}")
+    list(APPEND Chaste_INCLUDES "${VTK_INCLUDE_DIRS}")
+    list(APPEND Chaste_LINK_LIBRARIES "${VTK_LIBRARIES}")
     add_definitions(-DCHASTE_VTK)
 endif()
 
@@ -196,13 +195,13 @@ else()
 	set( Boost_USE_STATIC_LIBS ON) 
 endif()
 find_package(Boost COMPONENTS filesystem system serialization REQUIRED)
-list(APPEND CHASTE_INCLUDES "${Boost_INCLUDE_DIR}")
-list(APPEND CHASTE_LINK_LIBRARIES "${Boost_LIBRARIES}")
+list(APPEND Chaste_INCLUDES "${Boost_INCLUDE_DIR}")
+list(APPEND Chaste_LINK_LIBRARIES "${Boost_LIBRARIES}")
 
 
 #find PETSc
 find_package(PETSc REQUIRED COMPONENTS CXX)
-list(APPEND CHASTE_LINK_LIBRARIES "${PETSC_LIBRARIES}")
+list(APPEND Chaste_LINK_LIBRARIES "${PETSC_LIBRARIES}")
 
 #find HDF5
 if (Chaste_USE_PETSC_HDF5)
@@ -221,12 +220,12 @@ find_program( HDF5_CXX_COMPILER_EXECUTABLE
     NO_DEFAULT_PATH
     DOC "HDF5 C++ Wrapper compiler.  Used only to detect HDF5 compile flags." )
 find_package(HDF5 MODULE REQUIRED)
-list(APPEND CHASTE_INCLUDES "${HDF5_INCLUDE_DIRS}")
-list(APPEND CHASTE_LINK_LIBRARIES "${HDF5_LIBRARIES}")
+list(APPEND Chaste_INCLUDES "${HDF5_INCLUDE_DIRS}")
+list(APPEND Chaste_LINK_LIBRARIES "${HDF5_LIBRARIES}")
 
 # put petsc includes after hdf5 includes or else the hdf5 headers 
 # in the petsc include dir will clobber those chosen on FindHdf5.cmake
-list(APPEND CHASTE_INCLUDES "${PETSC_INCLUDES}")
+list(APPEND Chaste_INCLUDES "${PETSC_INCLUDES}")
 
 
 #Locate MPI 
@@ -245,7 +244,7 @@ find_package(MPI REQUIRED)
 SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${MPI_CXX_COMPILE_FLAGS}" )
 SET( CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} ${MPI_C_COMPILE_FLAGS}" )
 SET( CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} ${MPI_CXX_LINK_FLAGS}" )
-list(APPEND CHASTE_INCLUDES "${MPI_CXX_INCLUDE_PATH}")
+list(APPEND Chaste_INCLUDES "${MPI_CXX_INCLUDE_PATH}")
 
 if (Chaste_MEMORY_TESTING)
     get_filename_component(openmpi_supp_path ${MPIEXEC} DIRECTORY)
@@ -267,7 +266,7 @@ if (Chaste_USE_PETSC_PARMETIS)
                       )
 endif()
 find_package(ParMETIS REQUIRED)
-list(APPEND CHASTE_LINK_LIBRARIES "${PARMETIS_LIBRARIES}")
+list(APPEND Chaste_LINK_LIBRARIES "${PARMETIS_LIBRARIES}")
 
 #Locate Sundials
 if (Chaste_USE_CVODE)
@@ -277,9 +276,9 @@ if (Chaste_USE_CVODE)
 	    set(SUNDIALS_USE_STATIC_LIBRARIES ON)
     endif()
     find_package(SUNDIALS COMPONENTS sundials_cvode sundials_nvecserial REQUIRED)
-    list(APPEND CHASTE_INCLUDES "${SUNDIALS_INCLUDE_DIRS}")
-    #chaste_add_libraries(CHASTE_LINK_LIBRARIES Chaste_THIRD_PARTY_STATIC_LIBRARIES CHASTE_LINK_LIBRARIES)
-    list(APPEND CHASTE_LINK_LIBRARIES "${SUNDIALS_LIBRARIES}")
+    list(APPEND Chaste_INCLUDES "${SUNDIALS_INCLUDE_DIRS}")
+    #chaste_add_libraries(Chaste_LINK_LIBRARIES Chaste_THIRD_PARTY_STATIC_LIBRARIES Chaste_LINK_LIBRARIES)
+    list(APPEND Chaste_LINK_LIBRARIES "${SUNDIALS_LIBRARIES}")
     add_definitions(-DCHASTE_CVODE)
     math(EXPR Chaste_SUNDIALS_VERSION "${SUNDIALS_VERSION_MAJOR}*10000 + ${SUNDIALS_VERSION_MINOR}*100 + ${SUNDIALS_VERSION_SUBMINOR}")
     add_definitions(-DCHASTE_SUNDIALS_VERSION=${Chaste_SUNDIALS_VERSION})
@@ -287,16 +286,16 @@ endif()
 
 
 # ParMETIS and Sundials might need MPI, so add MPI libraries after these
-#chaste_add_libraries(MPI_CXX_LIBRARIES Chaste_THIRD_PARTY_STATIC_LIBRARIES CHASTE_LINK_LIBRARIES)
-list(APPEND CHASTE_LINK_LIBRARIES "${MPI_CXX_LIBRARIES}")
+#chaste_add_libraries(MPI_CXX_LIBRARIES Chaste_THIRD_PARTY_STATIC_LIBRARIES Chaste_LINK_LIBRARIES)
+list(APPEND Chaste_LINK_LIBRARIES "${MPI_CXX_LIBRARIES}")
 
 
 #Locate Xerces and XSD
 if (Chaste_USE_XERCES)
 	find_package(Xerces REQUIRED)
 	find_package(XSD REQUIRED)
-	list(APPEND CHASTE_INCLUDES "${XERCESC_INCLUDE}" "${XSD_INCLUDE_DIRS}")
-    list(APPEND CHASTE_LINK_LIBRARIES "${XERCESC_LIBRARY}")
+	list(APPEND Chaste_INCLUDES "${XERCESC_INCLUDE}" "${XSD_INCLUDE_DIRS}")
+    list(APPEND Chaste_LINK_LIBRARIES "${XERCESC_LIBRARY}")
     add_definitions(-DCHASTE_XERCES)
 endif()
 
@@ -320,7 +319,7 @@ if (WIN32 OR CYGWIN)
 	set(VS_INCLUDES "${VS_10_INCLUDES}")
 endif(MSVC10)
 
-list(APPEND CHASTE_INCLUDES "${WINDOWS_SDK}" "${VS_INCLUDES}" "${MS_MPI_INCLUDES}")
+list(APPEND Chaste_INCLUDES "${WINDOWS_SDK}" "${VS_INCLUDES}" "${MS_MPI_INCLUDES}")
 
 endif(WIN32 OR CYGWIN)
 
@@ -335,9 +334,9 @@ endif()
 ###########################################
 
 # List the available Chaste components
-set(CHASTE_COMPONENTS global io linalg mesh ode pde continuum_mechanics cell_based crypt)
+set(Chaste_COMPONENTS global io linalg mesh ode pde continuum_mechanics cell_based crypt)
 if (NOT (WIN32 OR CYGWIN))
-    set(CHASTE_COMPONENTS ${CHASTE_COMPONENTS} lung heart)
+    set(Chaste_COMPONENTS ${Chaste_COMPONENTS} lung heart)
 endif()
 
 # Find any projects
@@ -360,28 +359,51 @@ endforeach(potential_dir ${potential_dirs})
 
 add_custom_target(tutorials)
 
+#################################################
+# setup test pack and component testing targets #
+#################################################
+
+if (Chaste_ENABLE_TESTING) 
+    foreach(type ${TestPackTypes})
+        add_custom_target(${type})
+    endforeach()
+
+    foreach(component ${Chaste_COMPONENTS})
+        if (Chaste_ENABLE_${component}_TESTING)
+            add_custom_target(${component}_tests)
+        endif()
+    endforeach()
+
+    foreach(project ${Chaste_PROJECTS})
+        if (Chaste_ENABLE_project_${project}_TESTING)
+            add_custom_target(project_${project}_tests)
+        endif()
+    endforeach()
+
+endif()
+
 #######################################################
 # SETUP COMPONENT DEPENDANCIES AND HEADER DIRECTORIES #
 #######################################################
 
 # Specify which other components each depends on.
 # This information is used to set up CMake dependencies, include search paths and libraries to link against.
-set(CHASTE_DEPENDS_global "")
-set(CHASTE_DEPENDS_io global)
-set(CHASTE_DEPENDS_linalg global)
-set(CHASTE_DEPENDS_mesh linalg global)
-set(CHASTE_DEPENDS_ode linalg io global)
-set(CHASTE_DEPENDS_pde ode mesh linalg io global)
-set(CHASTE_DEPENDS_cell_based pde ode mesh linalg io global)
-set(CHASTE_DEPENDS_crypt cell_based pde ode mesh linalg io global)
-set(CHASTE_DEPENDS_continuum_mechanics pde ode mesh linalg io global)
-set(CHASTE_DEPENDS_heart ${CHASTE_DEPENDS_continuum_mechanics} continuum_mechanics)
-set(CHASTE_DEPENDS_lung ${CHASTE_DEPENDS_continuum_mechanics} continuum_mechanics)
-set(CHASTE_DEPENDS_core global io linalg mesh ode pde continuum_mechanics)
+set(Chaste_DEPENDS_global "")
+set(Chaste_DEPENDS_io global)
+set(Chaste_DEPENDS_linalg global)
+set(Chaste_DEPENDS_mesh linalg global)
+set(Chaste_DEPENDS_ode linalg io global)
+set(Chaste_DEPENDS_pde ode mesh linalg io global)
+set(Chaste_DEPENDS_cell_based pde ode mesh linalg io global)
+set(Chaste_DEPENDS_crypt cell_based pde ode mesh linalg io global)
+set(Chaste_DEPENDS_continuum_mechanics pde ode mesh linalg io global)
+set(Chaste_DEPENDS_heart ${Chaste_DEPENDS_continuum_mechanics} continuum_mechanics)
+set(Chaste_DEPENDS_lung ${Chaste_DEPENDS_continuum_mechanics} continuum_mechanics)
+set(Chaste_DEPENDS_core global io linalg mesh ode pde continuum_mechanics)
 
-foreach(component ${CHASTE_COMPONENTS})
-    set(CHASTE_${component}_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/${component}/src")
-    header_dirs(${CHASTE_${component}_SOURCE_DIR} CHASTE_${component}_INCLUDE_DIRS)
+foreach(component ${Chaste_COMPONENTS})
+    set(Chaste_${component}_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/${component}/src")
+    header_dirs(${Chaste_${component}_SOURCE_DIR} Chaste_${component}_INCLUDE_DIRS)
 endforeach(component)
 
 set(Chaste_PYTHON_DIR "${Chaste_SOURCE_DIR}/python")
@@ -399,7 +421,7 @@ set(Chaste_DIR ${Chaste_BINARY_DIR})
 # BUILD COMPONENTS #
 ####################
 
-foreach(component ${CHASTE_COMPONENTS})
+foreach(component ${Chaste_COMPONENTS})
     # Build each component as a project
     add_subdirectory(${component})
 endforeach(component)
@@ -427,18 +449,18 @@ endforeach(projectName)
 
 export(PACKAGE Chaste)
 
-export(TARGETS ${CHASTE_COMPONENTS} 
+export(TARGETS ${Chaste_COMPONENTS} 
     FILE "${Chaste_BINARY_DIR}/ChasteTargets.cmake"
     #added in 2.8.12, need this?    EXPORT_LINK_INTERFACE_LIBRARIES 
     )
 
 # Configure file for install dir
 set(EXPORT_Chaste_PYTHON_DIR "\${Chaste_CMAKE_DIR}/python")
-foreach(component ${CHASTE_COMPONENTS})
-    set(EXPORT_CHASTE_${component}_INCLUDE_DIRS "")
-    foreach(dir ${CHASTE_${component}_INCLUDE_DIRS})
+foreach(component ${Chaste_COMPONENTS})
+    set(EXPORT_Chaste_${component}_INCLUDE_DIRS "")
+    foreach(dir ${Chaste_${component}_INCLUDE_DIRS})
         file(RELATIVE_PATH rel_dir "${Chaste_SOURCE_DIR}" "${dir}")
-        list(APPEND EXPORT_CHASTE_${component}_INCLUDE_DIRS "\${Chaste_CMAKE_DIR}/include/${rel_dir}")
+        list(APPEND EXPORT_Chaste_${component}_INCLUDE_DIRS "\${Chaste_CMAKE_DIR}/include/${rel_dir}")
     endforeach()
 endforeach(component)
 
@@ -447,8 +469,8 @@ configure_file(${Chaste_SOURCE_DIR}/cmake/Config/ChasteConfig.cmake.in
 
 # Configure file for build dir
 set(EXPORT_Chaste_PYTHON_DIR "${Chaste_PYTHON_DIR}")
-foreach(component ${CHASTE_COMPONENTS})
-    set(EXPORT_CHASTE_${component}_INCLUDE_DIRS ${CHASTE_${component}_INCLUDE_DIRS})
+foreach(component ${Chaste_COMPONENTS})
+    set(EXPORT_Chaste_${component}_INCLUDE_DIRS ${Chaste_${component}_INCLUDE_DIRS})
 endforeach(component)
 
 configure_file(${Chaste_SOURCE_DIR}/cmake/Config/ChasteConfig.cmake.in
@@ -557,7 +579,7 @@ SET(CPACK_PACKAGE_VERSION_MINOR "${Chaste_VERSION_MINOR}")
 SET(CPACK_PACKAGE_VERSION_PATCH "${chaste_revision}")
 
 
-foreach(component ${CHASTE_COMPONENTS})
+foreach(component ${Chaste_COMPONENTS})
     set(CPACK_COMPONENT_${component}_libraries_GROUP "libraries")
     set(CPACK_COMPONENT_${component}_headers_GROUP "headers")
     set(CPACK_COMPONENT_${component}_tests_GROUP "tests")
@@ -580,13 +602,13 @@ foreach(component ${CHASTE_COMPONENTS})
     set(CPACK_COMPONENT_${component}_headers_DISPLAY_NAME "C++ Headers")
     set(CPACK_COMPONENT_${component}_tests_DISPLAY_NAME "C++ Test Suite")
 
-    foreach(depend_component CHASTE_DEPENDS_${component})
+    foreach(depend_component Chaste_DEPENDS_${component})
         set(CPACK_COMPONENT_${component}_headers_DEPENDS ${CPACK_COMPONENT_${component}_headers_DEPENDS} ${depend_component}_headers)
         set(CPACK_COMPONENT_${component}_libraries_DEPENDS ${CPACK_COMPONENT_${component}_libraries_DEPENDS} ${depend_component}_libraries)
         #set(CPACK_COMPONENT_${component}_tests_DEPENDS ${CPACK_COMPONENT_${component}_tests_DEPENDS} ${depend_component}_tests)
-    endforeach(depend_component CHASTE_DEPENDS_${component})
+    endforeach(depend_component Chaste_DEPENDS_${component})
 
-endforeach(component ${CHASTE_COMPONENTS})
+endforeach(component ${Chaste_COMPONENTS})
 
 
 

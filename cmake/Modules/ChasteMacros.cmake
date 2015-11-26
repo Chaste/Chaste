@@ -21,7 +21,7 @@ macro(HEADER_DIRS base_dir return_list)
 endmacro()
 
 
-macro(CHASTE_DO_CELLML output_sources cellml_file dynamic)
+macro(Chaste_DO_CELLML output_sources cellml_file dynamic)
     get_filename_component(cellml_file_name ${cellml_file} NAME_WE)
     get_filename_component(cellml_dir ${cellml_file} PATH)
     file(RELATIVE_PATH cellml_file_rel "${CMAKE_SOURCE_DIR}" "${cellml_file}")
@@ -68,7 +68,7 @@ endmacro()
 
     #Chaste Testing Macro. The predefined cxxtest_add_test is not suitable because of little control over
     #the test's working directory
-    macro(CHASTE_ADD_TEST _testTargetName )
+    macro(Chaste_ADD_TEST _testTargetName )
         string(REGEX MATCH "^.*Parallel$" foundParallel ${_testTargetName})
         if (foundParallel)
             set(parallel ON)
@@ -154,9 +154,9 @@ endmacro()
         endif()
         set_property(TEST ${testTargetName} PROPERTY PROCESSORS ${num_cpus})
             
-    endmacro(CHASTE_ADD_TEST)
+    endmacro(Chaste_ADD_TEST)
 
-  macro(CHASTE_GENERATE_TEST_NAME test outTestName)
+  macro(Chaste_GENERATE_TEST_NAME test outTestName)
       string(REGEX REPLACE "([a-zA-Z0-9_/]+)[.]hpp" "\\1" testName "${test}")
       string(REPLACE "/" ";" testPath "${testName}")
       list(LENGTH testPath pathLength)
@@ -172,43 +172,43 @@ endmacro()
         string(REPLACE ";" "/" testPath "${testPath}")
         set(${outTestName} "${testName}_${_testPath_}_")
       endif()
-  endmacro(CHASTE_GENERATE_TEST_NAME test outTestName)
+  endmacro(Chaste_GENERATE_TEST_NAME test outTestName)
 
 
-  macro(CHASTE_DO_COMMON component)
+  macro(Chaste_DO_COMMON component)
     
 
     # Figure out include path
-    #if (NOT CHASTE_${component}_INCLUDE_DIRS)
-    #    set(CHASTE_${component}_INCLUDE_DIRS 
+    #if (NOT Chaste_${component}_INCLUDE_DIRS)
+    #    set(Chaste_${component}_INCLUDE_DIRS 
     #        "${CMAKE_CURRENT_SOURCE_DIR}/src" 
     #        "${CMAKE_CURRENT_SOURCE_DIR}/test" 
     #        "${CMAKE_CURRENT_SOURCE_DIR}/apps/src"
     #        )
-    #endif (NOT CHASTE_${component}_INCLUDE_DIRS)
+    #endif (NOT Chaste_${component}_INCLUDE_DIRS)
 
-    if (NOT CHASTE_${component}_INCLUDE_DIRS)
-        set(CHASTE_${component}_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
-        header_dirs(${CHASTE_${component}_SOURCE_DIR} CHASTE_${component}_INCLUDE_DIRS)
+    if (NOT Chaste_${component}_INCLUDE_DIRS)
+        set(Chaste_${component}_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
+        header_dirs(${Chaste_${component}_SOURCE_DIR} Chaste_${component}_INCLUDE_DIRS)
     endif()
 
     if (Chaste_THIRD_PARTY_INCLUDE_DIRS)
         include_directories(SYSTEM "${Chaste_THIRD_PARTY_INCLUDE_DIRS}")
     endif()
-    if (CHASTE_${component}_INCLUDE_DIRS)
-        include_directories("${CHASTE_${component}_INCLUDE_DIRS}")
+    if (Chaste_${component}_INCLUDE_DIRS)
+        include_directories("${Chaste_${component}_INCLUDE_DIRS}")
     endif()
     if (Chaste_INCLUDE_DIRS)
         include_directories("${Chaste_INCLUDE_DIRS}")
     endif()
     
     # Make component library
-    file(GLOB_RECURSE CHASTE_${component}_SOURCES 
+    file(GLOB_RECURSE Chaste_${component}_SOURCES 
 			RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 
 			${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp 
 			${CMAKE_CURRENT_SOURCE_DIR}/src/*.hpp)
 
-    add_library(${component} ${CHASTE_${component}_SOURCES} ${ARGN})
+    add_library(${component} ${Chaste_${component}_SOURCES} ${ARGN})
     if (BUILD_SHARED_LIBS)
         target_link_libraries(${component} LINK_PUBLIC ${Chaste_LIBRARIES})
         set(static_extension "a")
@@ -259,23 +259,23 @@ endmacro()
 	if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/apps")
         add_subdirectory(apps)
     endif()
-  endmacro(CHASTE_DO_COMMON)
+  endmacro(Chaste_DO_COMMON)
 
 
-  macro(CHASTE_DO_COMPONENT component)
+  macro(Chaste_DO_COMPONENT component)
     message("Configuring component ${component}")
-    CHASTE_DO_COMMON(${component} ${ARGN})
-  endmacro(CHASTE_DO_COMPONENT)
+    Chaste_DO_COMMON(${component} ${ARGN})
+  endmacro(Chaste_DO_COMPONENT)
 
-  macro(CHASTE_DO_PROJECT projectName)
+  macro(Chaste_DO_PROJECT projectName)
     message("Configuring project ${projectName}")
-    CHASTE_DO_COMMON(project_${projectName})
-  endmacro(CHASTE_DO_PROJECT)
+    Chaste_DO_COMMON(project_${projectName})
+  endmacro(Chaste_DO_PROJECT)
 
-  macro(CHASTE_DO_APPS_COMMON component)
+  macro(Chaste_DO_APPS_COMMON component)
     include_directories("${Chaste_THIRD_PARTY_INCLUDE_DIRS}" "${Chaste_INCLUDE_DIRS}" "${CXXTEST_INCLUDES}")
-    file(GLOB CHASTE_${component}_APPS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} src/*.cpp)
-    foreach(app ${CHASTE_${component}_APPS})
+    file(GLOB Chaste_${component}_APPS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} src/*.cpp)
+    foreach(app ${Chaste_${component}_APPS})
         string(REGEX REPLACE ".*/([a-zA-Z0-9_]+)[.]cpp" "\\1" appName "${app}")
         if (component)
             message("Configuring ${appName} app for ${component}")
@@ -330,26 +330,26 @@ endmacro()
 
         endforeach()
     endif()
-  endmacro(CHASTE_DO_APPS_COMMON)
+  endmacro(Chaste_DO_APPS_COMMON)
 
-  macro(CHASTE_DO_APPS_PROJECT projectName)
+  macro(Chaste_DO_APPS_PROJECT projectName)
     message("Configuring apps for project ${projectName}")
-    CHASTE_DO_APPS_COMMON(project_${projectName})
-  endmacro(CHASTE_DO_APPS_PROJECT)
+    Chaste_DO_APPS_COMMON(project_${projectName})
+  endmacro(Chaste_DO_APPS_PROJECT)
 
-  macro(CHASTE_DO_APPS_MAIN)
+  macro(Chaste_DO_APPS_MAIN)
     message("Configuring main Chaste apps")
-    CHASTE_DO_APPS_COMMON("")
-  endmacro(CHASTE_DO_APPS_MAIN)
+    Chaste_DO_APPS_COMMON("")
+  endmacro(Chaste_DO_APPS_MAIN)
 
-  macro(CHASTE_DO_TEST_COMMON component)
+  macro(Chaste_DO_TEST_COMMON component)
         # make tutorial directories
         file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html/UserTutorials)
         file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html/PaperTutorials)
 
         # Figure out include path for tests
-        header_dirs("${CMAKE_CURRENT_SOURCE_DIR}" CHASTE_${component}_TEST_DIRS)
-        include_directories("${CHASTE_${component}_TEST_DIRS}" "${CXXTEST_INCLUDES}")
+        header_dirs("${CMAKE_CURRENT_SOURCE_DIR}" Chaste_${component}_TEST_DIRS)
+        include_directories("${Chaste_${component}_TEST_DIRS}" "${CXXTEST_INCLUDES}")
 
         # Make test library if sources exist
         set(COMPONENT_LIBRARIES ${component})
@@ -360,7 +360,7 @@ endmacro()
         endif()
 
 
-        #set(COMPONENT_LIBRARIES ${COMPONENT_LIBRARIES} ${CHASTE_DEPENDS_${component}})
+        #set(COMPONENT_LIBRARIES ${COMPONENT_LIBRARIES} ${Chaste_DEPENDS_${component}})
         # Generate test suites
 
         if(MSVC)
@@ -397,6 +397,9 @@ endmacro()
                     endif()
                     set_target_properties(${exeTargetName} PROPERTIES LINK_FLAGS "${LINKER_FLAGS}")
                     set_property(TEST ${testTargetName} PROPERTY LABELS ${component} ${type})
+                    add_dependencies(${component}_tests ${exeTargetName})
+                    add_dependencies(${type} ${exeTargetName})
+
                     if(NOT(${component} MATCHES "^project"))
                         install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${testName}.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/${filename}"
                             DESTINATION test/${component} COMPONENT  ${component}_tests)
@@ -432,14 +435,14 @@ endmacro()
             endforeach(filename ${testpack})
             endif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${type}TestPack.txt")
         endforeach(type ${TestPackTypes})
-  endmacro(CHASTE_DO_TEST_COMMON)
+  endmacro(Chaste_DO_TEST_COMMON)
 
-  macro(CHASTE_DO_TEST_COMPONENT component)
+  macro(Chaste_DO_TEST_COMPONENT component)
     message("Configuring tests for ${component}")
-    CHASTE_DO_TEST_COMMON(${component})
-  endmacro(CHASTE_DO_TEST_COMPONENT)
+    Chaste_DO_TEST_COMMON(${component})
+  endmacro(Chaste_DO_TEST_COMPONENT)
 
-  macro(CHASTE_DO_TEST_PROJECT projectName)
+  macro(Chaste_DO_TEST_PROJECT projectName)
     message("Configuring tests for project ${projectName}")
-    CHASTE_DO_TEST_COMMON(project_${projectName})
-  endmacro(CHASTE_DO_TEST_PROJECT)
+    Chaste_DO_TEST_COMMON(project_${projectName})
+  endmacro(Chaste_DO_TEST_PROJECT)

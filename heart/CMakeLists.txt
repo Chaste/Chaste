@@ -1,4 +1,4 @@
-find_package(Chaste COMPONENTS ${CHASTE_DEPENDS_heart})
+find_package(Chaste COMPONENTS ${Chaste_DEPENDS_heart})
 
 set(Chaste_heart_SOURCES "")
 
@@ -16,16 +16,16 @@ foreach(xsd_config ${xsd_config_files})
 
 endforeach()
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/src/io)
-set(CHASTE_heart_INCLUDE_DIRS ${CHASTE_heart_INCLUDE_DIRS} ${CMAKE_CURRENT_BINARY_DIR}/src/io PARENT_SCOPE)
-set(CHASTE_heart_INCLUDE_DIRS ${CHASTE_heart_INCLUDE_DIRS} ${CMAKE_CURRENT_BINARY_DIR}/src/io)
+set(Chaste_heart_INCLUDE_DIRS ${Chaste_heart_INCLUDE_DIRS} ${CMAKE_CURRENT_BINARY_DIR}/src/io PARENT_SCOPE)
+set(Chaste_heart_INCLUDE_DIRS ${Chaste_heart_INCLUDE_DIRS} ${CMAKE_CURRENT_BINARY_DIR}/src/io)
 
 file(GLOB cellml_files src/odes/cellml/*.cellml)
 foreach(cellml_file ${cellml_files})
     chaste_do_cellml(Chaste_heart_SOURCES ${cellml_file} OFF  "--output-dir" "${CMAKE_CURRENT_BINARY_DIR}/src/odes/cellml")
 endforeach()
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/src/odes/cellml)
-set(CHASTE_heart_INCLUDE_DIRS ${CHASTE_heart_INCLUDE_DIRS} ${CMAKE_CURRENT_BINARY_DIR}/src/odes/cellml PARENT_SCOPE)
-set(CHASTE_heart_INCLUDE_DIRS ${CHASTE_heart_INCLUDE_DIRS} ${CMAKE_CURRENT_BINARY_DIR}/src/odes/cellml)
+set(Chaste_heart_INCLUDE_DIRS ${Chaste_heart_INCLUDE_DIRS} ${CMAKE_CURRENT_BINARY_DIR}/src/odes/cellml PARENT_SCOPE)
+set(Chaste_heart_INCLUDE_DIRS ${Chaste_heart_INCLUDE_DIRS} ${CMAKE_CURRENT_BINARY_DIR}/src/odes/cellml)
 
 # Make dynamic directory for dynamic cellml compilation
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/dynamic)

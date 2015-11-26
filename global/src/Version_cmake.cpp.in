@@ -76,12 +76,12 @@ unsigned ChasteBuildInfo::GetMinorReleaseNumber()
 
 unsigned ChasteBuildInfo::GetRevisionNumber()
 {
-    return 0x${chaste_revision};
+    return 0x${Chaste_revision};
 }
 
 bool ChasteBuildInfo::IsWorkingCopyModified()
 {
-    return ${chaste_WC_MODIFIED};
+    return ${Chaste_WC_MODIFIED};
 }
 
 const char* ChasteBuildInfo::GetBuildTime()

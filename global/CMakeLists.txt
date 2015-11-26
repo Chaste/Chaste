@@ -6,7 +6,7 @@ set(generate_dir ${CMAKE_CURRENT_BINARY_DIR}/src)
 #   Generate Version.cpp  #
 ###########################
 
-set(CHASTE_WC_MODIFIED "false")
+set(Chaste_WC_MODIFIED "false")
 set(version_file "${CMAKE_CURRENT_BINARY_DIR}/ReleaseVersion.txt")
 if(EXISTS "${version_file}")
     file(STRINGS "${version_file}" v_data)
@@ -14,8 +14,8 @@ if(EXISTS "${version_file}")
     string(REPLACE "." ";" full_version_list "${full_version}")
     list(LENGTH full_version_list len)
     math(EXPR length ${len}-1)
-    list(GET full_version_list ${length} chaste_revision)
-    message("Chaste Release Full Version = ${full_version}, Revision = ${chaste_revision}")
+    list(GET full_version_list ${length} Chaste_revision)
+    message("Chaste Release Full Version = ${full_version}, Revision = ${Chaste_revision}")
 else()
     # ReleaseVersion file not found, obtain revision information from SVN
 	# The following requires a proper command-line svn client to be installed, not
@@ -30,26 +30,26 @@ else()
             OUTPUT_STRIP_TRAILING_WHITESPACE)
 
        if(${Subversion_svn_info_result} EQUAL 0)
-          Subversion_WC_INFO("${Chaste_SOURCE_DIR}" chaste)
-	      set(chaste_revision "${chaste_WC_REVISION}")
-	      message("Current Chaste SVN Revision = ${chaste_WC_REVISION}. Chaste Last Changed Revision = ${chaste_WC_LAST_CHANGED_REV}")
-	      if(${chaste_WC_REVISION} EQUAL ${chaste_WC_LAST_CHANGED_REV})
-	         set(chaste_WC_MODIFIED "false")
+          Subversion_WC_INFO("${Chaste_SOURCE_DIR}" Chaste)
+	      set(Chaste_revision "${Chaste_WC_REVISION}")
+	      message("Current Chaste SVN Revision = ${Chaste_WC_REVISION}. Chaste Last Changed Revision = ${Chaste_WC_LAST_CHANGED_REV}")
+	      if(${Chaste_WC_REVISION} EQUAL ${Chaste_WC_LAST_CHANGED_REV})
+	         set(Chaste_WC_MODIFIED "false")
 	      else()
-	         set(chaste_WC_MODIFIED "true")
+	         set(Chaste_WC_MODIFIED "true")
 	      endif()
        endif()
     endif(SUBVERSION_FOUND)
     if (NOT (SUBVERSION_FOUND AND (${Subversion_svn_info_result} EQUAL 0)))
        # assume its a git repo 
        find_package(Git REQUIRED)
-       Git_WC_INFO("${Chaste_SOURCE_DIR}" chaste)
-       set(chaste_revision "${chaste_WC_REVISION}")
-       message("Current Chaste Git Revision = ${chaste_WC_REVISION}. Chaste Modified = ${chaste_WC_MODIFIED}")
+       Git_WC_INFO("${Chaste_SOURCE_DIR}" Chaste)
+       set(Chaste_revision "${Chaste_WC_REVISION}")
+       message("Current Chaste Git Revision = ${Chaste_WC_REVISION}. Chaste Modified = ${Chaste_WC_MODIFIED}")
     endif()
 endif()
 
-set(Chaste_REVISION ${chaste_revision} CACHE STRING "Current Chaste Git Revision" FORCE)
+set(Chaste_REVISION ${Chaste_revision} CACHE STRING "Current Chaste Git Revision" FORCE)
 
 #The generated timekeeper.cpp code below keeps track of build timestamp.
 #It is built and executed prior to starting a build and prints the timestamp

@@ -1,4 +1,4 @@
-find_package(Chaste COMPONENTS ${CHASTE_DEPENDS_mesh})
+find_package(Chaste COMPONENTS ${Chaste_DEPENDS_mesh})
 #Define TETLIBRARY: prevents Tetgen from including main() method
 add_definitions(-DTETLIBRARY)
 add_definitions(-DANSI_DECLARATORS -DTRILIBRARY)

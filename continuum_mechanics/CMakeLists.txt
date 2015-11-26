@@ -1,2 +1,2 @@
-find_package(Chaste COMPONENTS ${CHASTE_DEPENDS_continuum_mechanics})
+find_package(Chaste COMPONENTS ${Chaste_DEPENDS_continuum_mechanics})
 chaste_do_component(continuum_mechanics)
