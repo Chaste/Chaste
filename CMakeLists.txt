@@ -369,17 +369,12 @@ if (Chaste_ENABLE_TESTING)
     endforeach()
 
     foreach(component ${Chaste_COMPONENTS})
-        if (Chaste_ENABLE_${component}_TESTING)
-            add_custom_target(${component}_tests)
-        endif()
+        add_custom_target(${component}_tests)
     endforeach()
 
     foreach(project ${Chaste_PROJECTS})
-        if (Chaste_ENABLE_project_${project}_TESTING)
-            add_custom_target(project_${project}_tests)
-        endif()
+        add_custom_target(project_${project}_tests)
     endforeach()
-
 endif()
 
 #######################################################
