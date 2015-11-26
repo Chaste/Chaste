@@ -1,3 +1,5 @@
+#
+# Acknowledgement: This file is based on the FindXerces.cmake file http://wiki.codesynthesis.com/uploads/8/86/FindXSD.cmake.gz
 # 
 # Attempt to find the xsd application in various places. If found, the full
 # path will be in XSD_EXECUTABLE. Look in the usual locations, as well as in

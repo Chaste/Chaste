@@ -1,5 +1,7 @@
 # Module that checks whether ParMETIS is available.
 #
+# Acknowledgement: This file is based on the FindParMETIS.cmake file from the GitHub repo https://github.com/dune-project/dune-common.git (GNU GPL license version 2)
+#
 # Accepts the following variables:
 #
 # PARMETIS_ROOT: Prefix where ParMETIS is installed.
@@ -85,7 +87,7 @@ find_package_handle_standard_args(
   HAVE_PARMETIS
 )
 
-mark_as_advanced(PARMETIS_INCLUDE_DIR METIS_LIBRARY PARMETIS_LIBRARY METIS_LIB_NAME PARMETIS_LIB_NAME)
+mark_as_advanced(PARMETIS_INCLUDE_DIR METIS_LIBRARY PARMETIS_LIBRARY METIS_LIB_NAME PARMETIS_LIB_NAME PARMETIS_LINK_FLAGS)
 
 #restore old values
 cmake_pop_check_state()

@@ -103,8 +103,8 @@ option(BUILD_SHARED_LIBS
     ON)
 endif()
 
-option(ENABLE_CHASTE_TESTING "Enable Chaste Testing" ON)
-option(ENABLE_CHASTE_PROJECT_TESTING "Enable Chaste Project Testing" ON)
+option(Chaste_ENABLE_TESTING "Enable Chaste Testing" ON)
+option(Chaste_ENABLE_PROJECT_TESTING "Enable Chaste Project Testing" ON)
 
 #Some Chaste-specific #defines
 add_definitions(-DCHASTE_CMAKE)
@@ -150,7 +150,7 @@ endif()
 #Locate Python
 find_package(PythonInterp REQUIRED)
 
-if (ENABLE_CHASTE_TESTING)
+if (Chaste_ENABLE_TESTING)
     find_package(TextTest)
     if (NOT TEXTTEST_FOUND)
         message(WARNING "Texttest not found, turning off acceptance tests")
@@ -324,7 +324,7 @@ list(APPEND CHASTE_INCLUDES "${WINDOWS_SDK}" "${VS_INCLUDES}" "${MS_MPI_INCLUDES
 
 endif(WIN32 OR CYGWIN)
 
-if(ENABLE_CHASTE_TESTING)
+if(Chaste_ENABLE_TESTING)
     enable_testing()
     list(APPEND CMAKE_INCLUDE_PATH "${Chaste_SOURCE_DIR}/cxxtest")
     find_package(CxxTest)

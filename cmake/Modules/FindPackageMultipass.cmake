@@ -1,3 +1,5 @@
+# Acknowledgement: This file is based on the FindPETSc.cmake file from the GitHub repo https://github.com/jedbrown/cmake-modules.git (BSD-2 License)
+# 
 # PackageMultipass - this module defines two macros
 #
 # FIND_PACKAGE_MULTIPASS (Name CURRENT

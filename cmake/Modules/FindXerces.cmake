@@ -1,6 +1,8 @@
 # - Try to find Xerces-C
 # Once done this will define
 #
+# Acknowledgement: This file is based on the FindXerces.cmake file from the GitHub repo https://github.com/jklimke/libcitygml.git (GNU LGPL license version 2.1)
+#
 #  XERCESC_FOUND - system has Xerces-C
 #  XERCESC_INCLUDE - the Xerces-C include directory
 #  XERCESC_LIBRARY - Link these to use Xerces-C
@@ -110,4 +112,4 @@ ELSE(XERCESC_FOUND)
 MESSAGE(FATAL_ERROR "Could not find Xerces-C !")
 ENDIF(XERCESC_FOUND)
 
-MARK_AS_ADVANCED(XERCESC_INCLUDE XERCESC_LIBRARY)
+MARK_AS_ADVANCED(XERCESC_LIBRARY_DEBUG XERCESC_STATIC XERCESC_XVERHPPPATH)

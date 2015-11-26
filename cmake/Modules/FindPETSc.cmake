@@ -1,4 +1,5 @@
 # - Try to find PETSc
+# Acknowledgement: This file is based on the FindPETSc.cmake file from the GitHub repo https://github.com/jedbrown/cmake-modules.git (BSD-2 License)
 # Once done this will define
 #
 #  PETSC_FOUND        - system has PETSc
