@@ -122,6 +122,28 @@ endif(WIN32 OR CYGWIN)
 set(Chaste_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR})
 set(Chaste_LINK_LIBRARIES "")
 
+# Check prereqs
+if (Chaste_COVERAGE)
+    FIND_PROGRAM( GCOV_PATH gcov )
+    FIND_PROGRAM( LCOV_PATH lcov )
+    FIND_PROGRAM( GENHTML_PATH genhtml )
+    FIND_PROGRAM( GCOVR_PATH gcovr PATHS ${CMAKE_SOURCE_DIR}/tests)
+
+    IF(NOT GCOV_PATH)
+        MESSAGE(FATAL_ERROR "gcov not found! Aborting...")
+    ENDIF() # NOT GCOV_PATH
+
+    IF(NOT LCOV_PATH)
+		MESSAGE(FATAL_ERROR "lcov not found! Aborting...")
+	ENDIF() # NOT LCOV_PATH
+
+	IF(NOT GENHTML_PATH)
+		MESSAGE(FATAL_ERROR "genhtml not found! Aborting...")
+	ENDIF() # NOT GENHTML_PATH
+endif()
+
+
+
 #Gperftools profiling
 if (Chaste_PROFILE_GPERFTOOLS)
     find_package(Gperftools REQUIRED)
@@ -493,8 +515,30 @@ install(DIRECTORY ${Chaste_SOURCE_DIR}/python
 
 
 if (Chaste_COVERAGE)
-    include(CodeCoverage)
-    setup_target_for_coverage(coverage "${Chaste_SOURCE_DIR}/cmake/coverage_script.sh" coverage)
+	ADD_CUSTOM_TARGET(coverage
+
+		# Cleanup lcov
+		${LCOV_PATH} --directory . --zerocounters
+
+		# Run tests
+        COMMAND ${CTEST_COMMAND} "-L" "Continuous|Parallel" "--output-on-failure" 
+
+		# Capturing lcov counters and generating report
+		COMMAND ${LCOV_PATH} --directory . --capture --output-file ${_outputname}.info
+        COMMAND ${LCOV_PATH} --remove ${_outputname}.info '*/fortests/*' '*/3rdparty/*' 'Debug/*' 'cxxtest/*' '/usr/*' '/home/*' --output-file ${_outputname}.info.cleaned
+		COMMAND ${GENHTML_PATH} --no-function-coverage -o ${_outputname} ${_outputname}.info.cleaned
+		COMMAND ${CMAKE_COMMAND} -E remove ${_outputname}.info ${_outputname}.info.cleaned
+
+        DEPENDS Continuous Parallel
+        WORKING_DIRECTORY ${Chaste_BINARY_DIR}
+		COMMENT "Resetting code coverage counters to zero.\nProcessing code coverage counters and generating report."
+	)
+
+	# Show info where to find the report
+	ADD_CUSTOM_COMMAND(TARGET coverage POST_BUILD
+		COMMAND ;
+		COMMENT "Open ./${_outputname}/index.html in your browser to view the coverage report."
+	)
 endif()
 
 ####################
@@ -524,6 +568,7 @@ if (Chaste_MEMORY_TESTING)
     add_custom_target(memtest
         COMMAND ${CTEST_COMMAND} "-L" Continuous "--output-on-failure" 
         COMMAND ${PYTHON_EXECUTABLE} "${Chaste_SOURCE_DIR}/cmake/process_valgrind_output.py" "${Chaste_MEMORY_TESTING_OUTPUT_DIR}"
+        DEPENDS Continuous
         WORKING_DIRECTORY ${Chaste_BINARY_DIR}
         VERBATIM)
 endif()
@@ -543,6 +588,7 @@ if (Chaste_PROFILE_GPROF OR Chaste_PROFILE_GPERFTOOLS)
     add_custom_target(profile
         COMMAND ${CTEST_COMMAND} "-L" "Profile|ProfileAssembly" "--output-on-failure"
         COMMAND ${PYTHON_EXECUTABLE} "${Chaste_SOURCE_DIR}/cmake/process_profile.py" "${Chaste_PROFILE_OUTPUT_DIR}" ${extension}
+        DEPENDS Profile ProfileAssembly
         WORKING_DIRECTORY ${Chaste_BINARY_DIR}
         VERBATIM)
 endif()
