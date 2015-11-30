@@ -24,10 +24,14 @@ message("\t${test_cmd} ${test_args}")
 execute_process(
     COMMAND ${test_cmd} ${test_args}
     RESULT_VARIABLE test_not_successful
+    OUTPUT_VARIABLE std_out
+    ERROR_VARIABLE std_err
     )
 
 if( test_not_successful )
     message( SEND_ERROR "test ${test_cmd} failed")
+    message( "standard output was ${std_out}")
+    message( "standard error was ${std_err}")
 else()
     message("executing post-processing command:")
     message("\t${post_cmd} ${post_args}")
