@@ -532,6 +532,7 @@ if (Chaste_COVERAGE)
         DEPENDS Continuous Parallel
         WORKING_DIRECTORY ${Chaste_BINARY_DIR}
 		COMMENT "Resetting code coverage counters to zero.\nProcessing code coverage counters and generating report."
+        VERBATIM
 	)
 
 	# Show info where to find the report
