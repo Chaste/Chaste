@@ -216,9 +216,8 @@ void CellMLToSharedLibraryConverter::ConvertCellmlToSo(const std::string& rCellm
             cmake_lists_filestream.close();
             std::string cmake_args = " -DCMAKE_PREFIX_PATH=" + chaste_root.GetAbsolutePath() +
                                      " -DCMAKE_BUILD_TYPE=" + ChasteBuildType() +
-                                     " -DBUILD_SHARED_LIBS=ON" +
-                                     " -DENABLE_CHASTE_TESTING=OFF" +
-                                     " -DChaste_USE_SHARED_LIBS=ON";
+                                     " -DChaste_ENABLE_TESTING=OFF" +
+                                     " -DBUILD_SHARED_LIBS=ON";
             EXPECT0(chdir, tmp_folder.GetAbsolutePath());
             EXPECT0(system, "cmake" + cmake_args + " .");
             EXPECT0(system, "cmake --build . --config " + ChasteBuildType());
