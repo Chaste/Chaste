@@ -117,7 +117,7 @@ public:
         simulator.SetOutputDirectory("TestShortMultiCellSimulation");
         simulator.SetDt(dt);
         simulator.SetSamplingTimestepMultiple(40);
-        simulator.SetEndTime(1000.0 * dt);
+        simulator.SetEndTime(100.0 * dt);
 
         setup_duration = timer.GetElapsedTime();
 

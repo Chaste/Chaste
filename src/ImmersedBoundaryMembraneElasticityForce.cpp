@@ -47,6 +47,100 @@ ImmersedBoundaryMembraneElasticityForce<DIM>::ImmersedBoundaryMembraneElasticity
      * We split the nodes into three categories: basal, apical, and lateral.  We keep this information in the attribute
      * called region, with 0, 1, and 2 representing basal, apical, and lateral respectively.
      */
+    TagNodeRegions();
+
+    /*
+     * We calculate the 'corners' of each element, in order to alter behaviour on apical, lateral, and basal regions
+     * separately.
+     *
+     * Corners are represented as follows, and stored as four consecutive element attributes:
+     *
+     *     Apical
+     *     0-----1
+     *     |     |
+     *     |     |
+     *     |     |
+     *     |     |
+     *     |     |
+     *     3-----2
+     *      Basal
+     */
+    TagElementCorners();
+}
+
+template<unsigned DIM>
+ImmersedBoundaryMembraneElasticityForce<DIM>::ImmersedBoundaryMembraneElasticityForce()
+{
+}
+
+template<unsigned DIM>
+ImmersedBoundaryMembraneElasticityForce<DIM>::~ImmersedBoundaryMembraneElasticityForce()
+{
+}
+
+template<unsigned DIM>
+void ImmersedBoundaryMembraneElasticityForce<DIM>::AddForceContribution(std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs)
+{
+    ImmersedBoundaryMesh<DIM,DIM>* p_mesh = &(mpCellPopulation->rGetMesh());
+
+    for (typename ImmersedBoundaryMesh<DIM, DIM>::ImmersedBoundaryElementIterator elem_iter = p_mesh->GetElementIteratorBegin();
+         elem_iter != p_mesh->GetElementIteratorEnd();
+         ++elem_iter)
+    {
+        // Get number of nodes in current element
+        unsigned num_nodes = elem_iter->GetNumNodes();
+        assert(num_nodes > 0);
+
+        // Get spring parameters (owned by the elements as they may differ within the element population)
+        double spring_constant = elem_iter->GetMembraneSpringConstant();
+        double rest_length = elem_iter->GetMembraneRestLength();
+
+        // Helper variables
+        double normed_dist;
+        c_vector<double, DIM> aggregate_force;
+
+        // Make a vector to store the force on node i+1 from node i
+        std::vector<c_vector<double, DIM> > elastic_force_to_next_node(num_nodes);
+
+        // Loop over nodes and calculate the force exerted on node i+1 by node i
+        for (unsigned node_idx = 0 ; node_idx < num_nodes ; node_idx++)
+        {
+            // Index of the next node, calculated modulo number of nodes in this element
+            unsigned next_idx = (node_idx + 1) % num_nodes;
+
+            double modified_spring_constant = spring_constant;
+            double modified_rest_length = rest_length;
+
+            // If the node is apical or basal, increase the spring constant
+            if (elem_iter->GetNode(node_idx)->GetRegion() < 2)
+            {
+                modified_spring_constant *= 10.0;
+                modified_rest_length *= 4.0;
+            }
+
+            // Hooke's law linear spring force
+            elastic_force_to_next_node[node_idx] = p_mesh->GetVectorFromAtoB(elem_iter->GetNodeLocation(next_idx), elem_iter->GetNodeLocation(node_idx));
+            normed_dist = norm_2(elastic_force_to_next_node[node_idx]);
+            elastic_force_to_next_node[node_idx] *= modified_spring_constant * (normed_dist - modified_rest_length) / normed_dist;
+        }
+
+        // Add the contributions of springs adjacent to each node
+        for (unsigned node_idx = 0 ; node_idx < num_nodes ; node_idx++)
+        {
+            // Index of previous node, but -1%n doesn't work, so we add num_nodes when calculating
+            unsigned prev_idx = (node_idx + num_nodes - 1) % num_nodes;
+
+            aggregate_force = elastic_force_to_next_node[prev_idx] - elastic_force_to_next_node[node_idx];
+
+            // Add the aggregate force contribution to the node
+            elem_iter->GetNode(node_idx)->AddAppliedForceContribution(aggregate_force);
+        }
+    }
+}
+
+template<unsigned DIM>
+void ImmersedBoundaryMembraneElasticityForce<DIM>::TagNodeRegions()
+{
     ImmersedBoundaryMesh<DIM,DIM>* p_mesh = &(mpCellPopulation->rGetMesh());
 
     for (unsigned elem_idx = 0 ; elem_idx < p_mesh->GetNumElements() ; elem_idx++)
@@ -118,71 +212,54 @@ ImmersedBoundaryMembraneElasticityForce<DIM>::ImmersedBoundaryMembraneElasticity
 }
 
 template<unsigned DIM>
-ImmersedBoundaryMembraneElasticityForce<DIM>::ImmersedBoundaryMembraneElasticityForce()
-{
-}
-
-template<unsigned DIM>
-ImmersedBoundaryMembraneElasticityForce<DIM>::~ImmersedBoundaryMembraneElasticityForce()
-{
-}
-
-template<unsigned DIM>
-void ImmersedBoundaryMembraneElasticityForce<DIM>::AddForceContribution(std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs)
+void ImmersedBoundaryMembraneElasticityForce<DIM>::TagElementCorners()
 {
     ImmersedBoundaryMesh<DIM,DIM>* p_mesh = &(mpCellPopulation->rGetMesh());
 
-    for (typename ImmersedBoundaryMesh<DIM, DIM>::ImmersedBoundaryElementIterator elem_iter = p_mesh->GetElementIteratorBegin();
-         elem_iter != p_mesh->GetElementIteratorEnd();
-         ++elem_iter)
+    // First loop through all elements to check they have the same number of attributes
+    assert(p_mesh->GetNumElements() > 0);
+    unsigned num_elem_attributes = p_mesh->GetElement(0)->GetNumElementAttributes();
+
+    for (unsigned elem_idx = 1 ; elem_idx < p_mesh->GetNumElements() ; elem_idx++)
     {
-        // Get number of nodes in current element
-        unsigned num_nodes = elem_iter->GetNumNodes();
-        assert(num_nodes > 0);
-
-        // Get spring parameters (owned by the elements as they may differ within the element population)
-        double spring_constant = elem_iter->GetMembraneSpringConstant();
-        double rest_length = elem_iter->GetMembraneRestLength();
-
-        // Helper variables
-        double normed_dist;
-        c_vector<double, DIM> aggregate_force;
-
-        // Make a vector to store the force on node i+1 from node i
-        std::vector<c_vector<double, DIM> > elastic_force_to_next_node(num_nodes);
-
-        // Loop over nodes and calculate the force exerted on node i+1 by node i
-        for (unsigned node_idx = 0 ; node_idx < num_nodes ; node_idx++)
+        if (p_mesh->GetElement(elem_idx)->GetNumElementAttributes() != num_elem_attributes)
         {
-            // Index of the next node, calculated modulo number of nodes in this element
-            unsigned next_idx = (node_idx + 1) % num_nodes;
-
-            double modified_spring_constant = spring_constant;
-            double modified_rest_length = rest_length;
-
-            // If the node is apical or basal, increase the spring constant
-            if (elem_iter->GetNode(node_idx)->GetRegion() < 2)
-            {
-                modified_spring_constant *= 10.0;
-                modified_rest_length *= 4.0;
-            }
-
-            // Hooke's law linear spring force
-            elastic_force_to_next_node[node_idx] = p_mesh->GetVectorFromAtoB(elem_iter->GetNodeLocation(next_idx), elem_iter->GetNodeLocation(node_idx));
-            normed_dist = norm_2(elastic_force_to_next_node[node_idx]);
-            elastic_force_to_next_node[node_idx] *= modified_spring_constant * (normed_dist - modified_rest_length) / normed_dist;
+            EXCEPTION("This class requires each element to have the same number of attributes");
         }
+    }
 
-        // Add the contributions of springs adjacent to each node
-        for (unsigned node_idx = 0 ; node_idx < num_nodes ; node_idx++)
+    // Set up corner locations in the attribute vector, so AddForceContribution knows where to look
+    mCornerLocationsInAttributeVector.push_back(num_elem_attributes);
+    mCornerLocationsInAttributeVector.push_back(num_elem_attributes + 1);
+    mCornerLocationsInAttributeVector.push_back(num_elem_attributes + 2);
+    mCornerLocationsInAttributeVector.push_back(num_elem_attributes + 3);
+
+    /*
+     * Loop through elements and set corner locations.
+     *
+     * Corner 0 will be the left-most  apical node.
+     * Corner 1 will be the right-most apical node.
+     * Corner 2 will be the right-most basal node.
+     * Corner 3 will be the left-most  basal node.
+     */
+    for (unsigned elem_idx = 0 ; elem_idx < p_mesh->GetNumElements() ; elem_idx++)
+    {
+        ImmersedBoundaryElement<DIM,DIM>* p_this_elem = p_mesh->GetElement(elem_idx);
+
+        // Basement lamina will have no corners, so we set each corner to 0
+        if (p_mesh->GetMembraneIndex() == p_this_elem->GetIndex())
         {
-            // Index of previous node, but -1%n doesn't work, so we add num_nodes when calculating
-            unsigned prev_idx = (node_idx + num_nodes - 1) % num_nodes;
+            for (unsigned node_idx = 0 ; node_idx < p_this_elem->GetNumNodes() ; node_idx++)
+            {
+                p_this_elem->AddElementAttribute(0.0);
+                p_this_elem->AddElementAttribute(0.0);
+                p_this_elem->AddElementAttribute(0.0);
+                p_this_elem->AddElementAttribute(0.0);
+            }
+        }
+        else // not the basal lamina
+        {
 
-            aggregate_force = elastic_force_to_next_node[prev_idx] - elastic_force_to_next_node[node_idx];
-
-            // Add the aggregate force contribution to the node
-            elem_iter->GetNode(node_idx)->AddAppliedForceContribution(aggregate_force);
         }
     }
 }

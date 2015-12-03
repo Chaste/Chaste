@@ -74,7 +74,13 @@ private:
 
 protected:
 
+    /** Pointer to the cell population */
     ImmersedBoundaryCellPopulation<DIM>* mpCellPopulation;
+
+    /**
+     * Vector containing locations of corner-node-indices in the element attribute vectors
+     */
+    std::vector<unsigned> mCornerLocationsInAttributeVector;
 
 public:
 
@@ -102,6 +108,19 @@ public:
      * @param rCellPopulation reference to the cell population
      */
     virtual void AddForceContribution(std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs);
+
+    /**
+     * Splits the nodes into three categories: basal, apical, and lateral.  We keep this information in the node
+     * attribute called region, with 0, 1, and 2 representing basal, apical, and lateral respectively.
+     */
+    void TagNodeRegions();
+
+    /*
+     * We calculate the 'corners' of each element, in order to alter behaviour on apical, lateral, and basal regions
+     * separately. Corners are stored as four consecutive element attributes, numbered sequentially clockwise from the
+     * apical left-hand corner.
+     */
+    void TagElementCorners();
 
     /**
      * Overridden OutputForceParameters() method.
