@@ -77,10 +77,11 @@ protected:
     /** Pointer to the cell population */
     ImmersedBoundaryCellPopulation<DIM>* mpCellPopulation;
 
-    /**
-     * Vector containing locations of corner-node-indices in the element attribute vectors
-     */
+    /** Vector containing locations of corner-node-indices in the element attribute vectors */
     std::vector<unsigned> mCornerLocationsInAttributeVector;
+
+    /** Vector containing locations of apical and basal rest-lengths in the element attribute vectors */
+    std::vector<unsigned> mRestLengthLocationsInAttributeVector;
 
 public:
 
