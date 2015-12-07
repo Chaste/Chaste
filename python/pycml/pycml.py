@@ -2355,7 +2355,10 @@ class UnitsSet(set):
       dimensionally_equivalent - compare 2 sets of units for dimensional equivalence
       description - describe the units in this set
 
-    All units in the set must be dimensionally equivalent.
+    All units in the set (normally) must be dimensionally equivalent.  The exception is when dealing with
+    Functional Curation protocols which can defined units conversion rules for non-scaling cases.  We can
+    then have sets of alternative units in different dimensions, and the get_consistent_set method helps
+    with selecting from these.
     """
     def __new__(cls, iterable=[], expression=None):
         """
@@ -2381,6 +2384,32 @@ class UnitsSet(set):
             new_set._sources[units] = copy.copy(src_list)
         return new_set
     
+    def get_consistent_set(self, desired_units):
+        """Extract a subset of the units in this set that are dimensionally equivalent.
+        
+        When dealing with potential non-scaling conversions, an expression may have potential units that are
+        not within the same dimension.  However, when deciding on the units for the expression most operations
+        need to handle a set of options that *are* within the same dimension, and this operation supports that.
+
+        Given a cellml_units object for the desired units of the expression, this method first tries to create
+        a UnitsSet containing just our members in the same dimension.  If we have no members in the desired
+        dimension, then we check that all members of this set are in the same dimension, and return the set
+        itself - there should never be more than 2 different dimensions to choose from (I hope!).
+        """
+        new_set = UnitsSet([], expression=self._expression)
+        for units in self:
+            if units.dimensionally_equivalent(desired_units):
+                new_set.add(units)
+                new_set._sources[units] = copy.copy(self._sources[units])
+        if not new_set:
+            rep_u = self.extract()
+            for units in self:
+                if not units.dimensionally_equivalent(rep_u):
+                    raise ValueError("Unexpected dimensional variation in UnitsSet; " + rep_u.description() + " and " + units.description()
+                                     + " do not match.")
+            new_set = self
+        return new_set
+
     def equals(self, other):
         """Test whether the units in the set are equal to those in another set."""
         try:
@@ -2392,11 +2421,9 @@ class UnitsSet(set):
     def extract(self, check_equality=False):
         """Extract a representative element from this set.
 
-        This is intended to be used to get the cellml_units object from a
-        singleton set.
+        This is intended to be used to get the cellml_units object from a singleton set.
         
-        If check_equality is True, check that all members of this set have
-        the same multiplicative factor.
+        If check_equality is True, check that all members of this set have the same multiplicative factor.
         """
         representative = iter(self).next()
         if check_equality:
@@ -2410,7 +2437,7 @@ class UnitsSet(set):
                                                          1e-6):
                     raise ValueError("UnitsSet equality check failed")
         return representative
-
+    
     def set_expression(self, expr):
         """Store a reference to the expression that has these units."""
         self._expression = expr
@@ -2664,8 +2691,7 @@ class cellml_units(Colourable, element_base):
             for unit in self.unit:
                 if unit.get_units_element() is dimensionless:
                     continue
-                desc = [getattr(unit, u'prefix_', u''),
-                        unit.get_units_element().name]
+                desc = [getattr(unit, u'prefix_', u''), unit.get_units_element().name]
                 e = unit.get_exponent()
                 if int(e) == e:
                     # Cast to integer so name looks nicer.
@@ -3448,6 +3474,24 @@ class mathml_units_mixin(object):
         Wraps expr in the expression
         m[to_units/defn_units]*(expr-o1[defn_units]) + o2[to_units].
         """
+#         print '_add_units_conv for', element_xpath(expr), 'from', defn_units.description(), 'to', to_units.description()
+        if hasattr(expr.model, '_cml_special_units_converter') and not defn_units.dimensionally_equivalent(to_units):
+            # This may be a special conversion case defined by a functional curation protocol
+            if no_act:
+                model._cml_conversions_needed = True
+                return
+            else:
+                expr = expr.model._cml_special_units_converter(expr, defn_units, to_units)
+#             print 'post special, expr units=', expr.get_units().description(), 'm=', expr.get_units().extract().expand().simplify().get_multiplicative_factor()
+#             print 'orig defn_units=', defn_units.description(), 'm=', defn_units.expand().simplify().get_multiplicative_factor()
+#             print 'orig to_units=', to_units.description(), 'm=', to_units.expand().simplify().get_multiplicative_factor()
+            try:
+                defn_units = expr.get_units().extract(check_equality=True)
+            except:
+                print 'ouch', expr.xml()
+                for u in expr.get_units():
+                    print u.description(), u.get_multiplier(), expr.get_units()._get_sources(u)
+                raise
         defn_units_exp = defn_units.expand().simplify()
         to_units_exp = to_units.expand().simplify()
         # Conversion factor
@@ -3514,8 +3558,7 @@ class mathml_units_mixin_tokens(mathml_units_mixin):
     def _set_in_units(self, units, no_act=False):
         """Set the units this element should be expressed in.
 
-        Where these aren't the units it's defined in, replace self by
-        suitable units conversion mathematics.
+        Where these aren't the units it's defined in, replace self by suitable units conversion mathematics.
         """
         defn_units = self.get_units(return_set=False)
         if defn_units != units:
@@ -3529,11 +3572,9 @@ class mathml_units_mixin_set_operands(mathml_units_mixin):
     def _set_in_units(self, units, no_act=False):
         """Set the units of the application of this operator.
 
-        The default behaviour for many operators is to simply set all
-        operands to have the given units.
+        The default behaviour for many operators is to simply set all operands to have the given units.
         """
-        # TODO: Do the conversion at this level sometimes rather than
-        # pushing it down the tree?
+        # TODO: Do the conversion at this level sometimes rather than pushing it down the tree?
         app = self.xml_parent
         # We need to convert the operands to a list, because the tree
         # may be modified if a conversion is thought to be needed
@@ -3594,7 +3635,8 @@ class mathml_units_mixin_choose_nearest(mathml_units_mixin):
         desired_factor = desired_units.expand().get_multiplicative_factor()
         DEBUG('validator', '>',self.localName,':',desired_factor,
               desired_units.description())
-        for possible_units in app.get_units():
+        units_set = app.get_units().get_consistent_set(desired_units)
+        for possible_units in units_set:
             f = possible_units.expand().get_multiplicative_factor()
             if min_factor is None or f<min_factor:
                 least_units, min_factor = possible_units, f
@@ -4488,8 +4530,7 @@ class mathml_apply(Colourable, mathml_constructor, mathml_units_mixin):
         current_units = self.get_units()
         if units is current_units:
             return
-        # Next, check if the required units can be achieved by suitable
-        # choices for operand units
+        # Next, check if the required units can be achieved by suitable choices for operand units
         done = False
         if units in current_units:
             # They can!
@@ -4540,11 +4581,10 @@ class mathml_apply(Colourable, mathml_constructor, mathml_units_mixin):
             # Operands mustn't be booleans
             if boolean in our_units:
                 raise UnitsError(self, u' '.join([
-                    u'Operator',op,u'has boolean operands,'
-                    u'which does not make sense.']))
+                    u'Operator',op,u'has boolean operands, which does not make sense.']))
             # Operand units must be 'equivalent' (perhaps dimensionally)
             for u in operand_units:
-                if not our_units.dimensionally_equivalent(u):
+                if not hasattr(self.model, '_cml_special_units_converter') and not our_units.dimensionally_equivalent(u):
                     raise UnitsError(self, u' '.join([
                         u'Operator',op,u'requires its operands to have',
                         u'dimensionally equivalent units;',u.description(),
@@ -4567,8 +4607,7 @@ class mathml_apply(Colourable, mathml_constructor, mathml_units_mixin):
             for u, i in operand_units_idx:
                 if not u.dimensionally_equivalent(dimensionless):
                     raise UnitsError(self, u' '.join([
-                        u'Operator',op,
-                        u'requires operands to be dimensionless;',
+                        u'Operator',op,u'requires operands to be dimensionless;',
                         u'operand',str(i),u'has units',u.description()]))
             if op == 'log':
                 # <logbase> qualifier must have units dimensionless
@@ -4624,8 +4663,7 @@ class mathml_apply(Colourable, mathml_constructor, mathml_units_mixin):
                 u = self._get_element_units(degree)
                 if not u.dimensionally_equivalent(dimensionless):
                     raise UnitsError(self, u' '.join([
-                        u'The degree qualifier must have dimensionless',
-                        u'units, not',u.description()]))
+                        u'The degree qualifier must have dimensionless units, not',u.description()]))
             else:
                 degree = 2.0 # Default is square root
             # Result has units that are the units on the (first) operand
@@ -4642,9 +4680,7 @@ class mathml_apply(Colourable, mathml_constructor, mathml_units_mixin):
                 try:
                     degree = self.eval(degree)
                 except EvaluationError, e:
-                    raise UnitsError(self, u' '.join([
-                        u'Unable to evaluate the degree of a root element:',
-                        unicode(e)]),
+                    raise UnitsError(self, u' '.join([u'Unable to evaluate the degree of a root element:', unicode(e)]),
                                      warn=True,
                                      level=logging.WARNING_TRANSLATE_ERROR)
             our_units = dimensionless.simplify(arg_units, 1/degree)
@@ -4659,8 +4695,7 @@ class mathml_apply(Colourable, mathml_constructor, mathml_units_mixin):
                     u = self._get_element_units(degree)
                     if not u.dimensionally_equivalent(dimensionless):
                         raise UnitsError(self, u' '.join([
-                            u'The degree qualifier must have dimensionless',
-                            u'units, not',u.description()]))
+                            u'The degree qualifier must have dimensionless units, not',u.description()]))
                 else:
                     degree = 1.0 # Default is first derivative
             else:
@@ -4677,9 +4712,7 @@ class mathml_apply(Colourable, mathml_constructor, mathml_units_mixin):
                 try:
                     degree = self.eval(degree)
                 except EvaluationError, e:
-                    raise UnitsError(self, u' '.join([
-                        u'Unable to evaluate the degree of a diff element:',
-                        unicode(e)]),
+                    raise UnitsError(self, u' '.join([u'Unable to evaluate the degree of a diff element:', unicode(e)]),
                                      warn=True,
                                      level=logging.WARNING_TRANSLATE_ERROR)
             for e in self.xml_element_children(self.bvar):
@@ -4687,16 +4720,14 @@ class mathml_apply(Colourable, mathml_constructor, mathml_units_mixin):
                     bvar_units = self._get_element_units(e)
                     break
             else:
-                raise UnitsError(self,
-                                 u'diff element does not have a valid bvar')
+                raise UnitsError(self, u'diff element does not have a valid bvar')
             our_units = arg_units.simplify(bvar_units, -degree)
         elif op in self.OPS.absRound | self.OPS.timesDivide:
             # No restrictions on operand units, except that they shouldn't be boolean
             for u in self._get_operand_units():
                 if boolean in u:
                     raise UnitsError(self, u' '.join([
-                        u'Operator',op,u'has boolean operands,'
-                        u'which does not make sense.']))
+                        u'Operator',op,u'has boolean operands, which does not make sense.']))
             if op == 'times':
                 # Result has units that are the product of the operand units
                 our_units = operand_units.next().copy()
@@ -4706,15 +4737,13 @@ class mathml_apply(Colourable, mathml_constructor, mathml_units_mixin):
                 # Result has units that are the quotient of the units
                 # on the first and second operands
                 our_units = operand_units.next()
-                our_units = our_units.simplify(
-                    other_units=operand_units.next(), other_exponent=-1)
+                our_units = our_units.simplify(other_units=operand_units.next(), other_exponent=-1)
             else:
                 # Result has same units as operands
                 our_units = operand_units.next().copy()
         else:
             # Warning: unsupported operator!
-            raise UnitsError(self, u' '.join([
-                u'Unsupported operator for units checking:', op]),
+            raise UnitsError(self, u' '.join([u'Unsupported operator for units checking:', op]),
                              warn=True,
                              level=logging.WARNING_TRANSLATE_ERROR)
 

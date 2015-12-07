@@ -789,6 +789,22 @@ class UnitsConverter(ModelModifier):
                 e.level = logging.WARNING
             logging.getLogger('units-converter').log(e.level, unicode(e).encode('UTF-8'))
 
+    def _apply_special_conversion_for_nested_expr(self, expr, defn_units, desired_units):
+        """Apply a special conversion to the given (sub-)expression.
+        
+        This will get called by mathml_units_mixin._add_units_conversion if a special conversion is required by a nested sub-expression.
+        """
+        for from_units, to_units in self.special_conversions.iterkeys():
+            if (from_units.dimensionally_equivalent(defn_units)
+                and to_units.dimensionally_equivalent(desired_units)):
+                # We can apply this conversion
+                expr = self.special_conversions[(from_units, to_units)](expr)
+                DEBUG('units-converter', "Used nested special conversion from", repr(from_units), "to", repr(to_units))#, "giving", expr.xml())
+                break
+#         else:
+#             print "No on nested conv from", repr(from_units), "to", repr(to_units)
+        return expr
+
     def _check_special_conversion(self, expr):
         """Check whether a special conversion applies to the given assignment.
         
@@ -805,10 +821,11 @@ class UnitsConverter(ModelModifier):
                 and to_units.dimensionally_equivalent(lhs_units)):
                 # We can apply this conversion
                 self.special_conversions[(from_units, to_units)](expr)
-                DEBUG('units-converter', "Used special conversion from", repr(from_units), "to",
-                      repr(to_units), "giving", expr.xml())
+                DEBUG('units-converter', "Used special conversion from", repr(from_units), "to", repr(to_units))#, "giving", expr.xml())
                 break
-    
+#         else:
+#             print "No on conv from", repr(from_units), "to", repr(to_units)
+
     def add_special_conversion(self, from_units, to_units, converter):
         """Add a new special conversion to the list available.
         
@@ -849,8 +866,7 @@ class UnitsConverter(ModelModifier):
     def times_rhs_by(self, expr, var):
         """Helper method of use to special units conversions.
         
-        Will modify the given expr in-place, post-multiplying the RHS by a reference to the given variable
-        object.
+        Will modify the given expr in-place, post-multiplying the RHS by a reference to the given variable object.
         Connections and variables will be added to ensure that the given variable is available in the
         component in which expr appears.
         
@@ -875,6 +891,7 @@ class UnitsConverter(ModelModifier):
         boolean = self.model.get_units_by_name('cellml:boolean')
         for expr in exprs:
             if isinstance(expr, mathml_apply):
+#                 print 'Converting? assignment', element_xpath(expr)
                 if self.special_conversions:
                     self.try_convert(self._check_special_conversion, expr)
                 self.try_convert(expr._set_in_units, boolean)
@@ -974,8 +991,12 @@ class UnitsConverter(ModelModifier):
         by an InterfaceGenerator.
         """
         model = self.model
+        if self.special_conversions:
+            self.model._cml_special_units_converter = self._apply_special_conversion_for_nested_expr
         assignments = model.search_for_assignments(comp)
         self.convert_assignments(assignments)
+        if self.special_conversions:
+            del self.model._cml_special_units_converter
         for conn in getattr(model, u'connection', []):
             cname1 = conn.map_components.component_1
             cname2 = conn.map_components.component_2

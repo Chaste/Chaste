@@ -534,7 +534,7 @@ class Protocol(processors.ModelModifier):
             else:
                 print >>sys.stderr, "  From", from_units.description(), "to", to_units.description(), "via", conv_expr.xml()
             return
-        func = lambda assignment: self._apply_conversion_rule(assignment, body_expr, bvar_name)
+        func = lambda expr: self._apply_conversion_rule(expr, body_expr, bvar_name)
         converter.add_special_conversion(from_units, to_units, func)
     
     def add_protocol_namespaces(self, mapping):
@@ -982,34 +982,40 @@ class Protocol(processors.ModelModifier):
 #         print 'Looked up', prefixed_name, 'as', vars
         return vars
     
-    def _apply_conversion_rule(self, assignment, conv_template, placeholder_name):
+    def _apply_conversion_rule(self, expr, conv_template, placeholder_name):
         """Apply a units conversion rule defined by self.add_units_conversion_rule.
         
-        Modify the given assignment in-place, replacing the RHS by a copy of conv_template, except
-        ci references to placeholder_name are replaced by (a copy of) the original RHS.
+        Modify the given expr in-place, replacing the RHS/expr itself by a copy of conv_template, except
+        ci references to placeholder_name are replaced by (a copy of) the original RHS/expr.
+        If the expression is a top-level assignment, only the RHS is modified.
+        Returns the modified RHS/expression.
         """
-        rhs = assignment.eq.rhs
-        assignment.safe_remove_child(rhs)
-        new_rhs = mathml.clone(conv_template)
-        copy_rhs = False
-        for ci_elt in self._find_ci_elts(new_rhs):
+#         print '_apply_conv_rule to', element_xpath(expr), 'top-level =', isinstance(expr, mathml_apply) and expr.is_top_level()
+        if isinstance(expr, mathml_apply) and expr.is_top_level():
+            expr = expr.eq.rhs
+        parent = expr.xml_parent
+        parent.safe_remove_child(expr)
+        new_expr = mathml.clone(conv_template)
+        copy_expr = False
+        for ci_elt in self._find_ci_elts(new_expr):
             vname = unicode(ci_elt).strip()
             if vname == placeholder_name:
                 # Copy the original RHS here, except if it's the first use don't bother copying
-                if copy_rhs:
-                    rhs = mathml.clone(rhs)
+                if copy_expr:
+                    expr = mathml.clone(expr)
                 else:
-                    copy_rhs = True
-                ci_elt.xml_parent.replace_child(ci_elt, rhs)
+                    copy_expr = True
+                ci_elt.xml_parent.replace_child(ci_elt, expr)
             else:
                 # Ensure we have connections needed to get the variable in this component
                 cname, local_name = vname.split(',')
-                our_cname = assignment.component.name
+                our_cname = parent.component.name
                 if cname != our_cname:
                     local_var = self.connect_variables((cname, local_name), (our_cname, local_name))
                     local_name = local_var.name
                 ci_elt._rename(local_name)
-        assignment.xml_append(new_rhs)
+        parent.xml_append(new_expr)
+        return new_expr
 
     def _add_units_conversions(self):
         """Apply units conversions, in particular 'special' ones, to the protocol component.

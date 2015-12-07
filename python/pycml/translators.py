@@ -463,9 +463,8 @@ class CellMLTranslator(object):
             name = var.oxmeta_name
         else:
             for uri in var.get_rdf_annotations(('bqbiol:is', NSS['bqbiol'])):
-                import urlparse
-                _, name = urlparse.urldefrag(uri)
-                if name:
+                if '#' in uri:
+                    name = uri[1 + uri.rfind('#'):]
                     break
             else:
                 if hasattr(var, u'id') and var.id:
@@ -6554,8 +6553,7 @@ def load_model(model_file, options):
         logging.getLogger().addHandler(handler)
         logging.getLogger().setLevel(logging.DEBUG)
 
-    # We can't translate if some warnings occur, as well as if the
-    # model is invalid
+    # We can't translate if some warnings occur, as well as if the model is invalid
     notifier = NotifyHandler(level=logging.WARNING_TRANSLATE_ERROR)
     logging.getLogger('validator').addHandler(notifier)
     v = validator.CellMLValidator(create_relaxng_validator=not options.assume_valid)
@@ -6571,7 +6569,7 @@ def load_model(model_file, options):
         if not valid:
             print >>sys.stderr, "is not a valid CellML file"
         else:
-            print >>sys.stderr, "contains untranslatable constructs"
+            print >>sys.stderr, "contains untranslatable constructs (see warnings above for details)"
         sys.exit(1)
     
     return doc
