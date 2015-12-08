@@ -1401,52 +1401,39 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformNodeMerge(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB)
 {
-    // Sort the nodes by index
-    unsigned nodeA_index = pNodeA->GetIndex();
-    unsigned nodeB_index = pNodeB->GetIndex();
-
-    unsigned lo_node_index = (nodeA_index < nodeB_index) ? nodeA_index : nodeB_index; // low index
-    unsigned hi_node_index = (nodeA_index < nodeB_index) ? nodeB_index : nodeA_index; // high index
-
-    // Get pointers to the nodes, sorted by index
-    Node<SPACE_DIM>* p_lo_node = this->GetNode(lo_node_index);
-    Node<SPACE_DIM>* p_hi_node = this->GetNode(hi_node_index);
-
     // Find the sets of elements containing each of the nodes, sorted by index
-    std::set<unsigned> lo_node_elem_indices = p_lo_node->rGetContainingElementIndices();
-    std::set<unsigned> hi_node_elem_indices = p_hi_node->rGetContainingElementIndices();
+    std::set<unsigned> nodeA_elem_indices = pNodeA->rGetContainingElementIndices();
+    std::set<unsigned> nodeB_elem_indices = pNodeB->rGetContainingElementIndices();
 
-    // Move the low-index node to the mid-point
-    c_vector<double, SPACE_DIM> node_midpoint = p_lo_node->rGetLocation() + 0.5*this->GetVectorFromAtoB(p_lo_node->rGetLocation(), p_hi_node->rGetLocation());
-    c_vector<double, SPACE_DIM>& r_lo_node_location = p_lo_node->rGetModifiableLocation();
-    r_lo_node_location = node_midpoint;
+    // Move node A to the mid-point
+    pNodeA->rGetModifiableLocation() += 0.5 * this->GetVectorFromAtoB(pNodeA->rGetLocation(), pNodeB->rGetLocation());
 
-    // Update the elements previously containing the high-index node to contain the low-index node
-    for (std::set<unsigned>::const_iterator it = hi_node_elem_indices.begin();
-         it != hi_node_elem_indices.end();
-         ++it)
+    // Update the elements previously containing node B to contain node A
+    unsigned node_B_index = pNodeB->GetIndex();
+    for (std::set<unsigned>::const_iterator it = nodeB_elem_indices.begin(); it != nodeB_elem_indices.end(); ++it)
     {
-        // Find the local index of the high-index node in this element
-        unsigned hi_node_local_index = this->mElements[*it]->GetNodeLocalIndex(hi_node_index);
-        assert(hi_node_local_index < UINT_MAX); // this element should contain the high-index node
+        // Find the local index of node B in this element
+        unsigned node_B_local_index = this->mElements[*it]->GetNodeLocalIndex(node_B_index);
+        assert(node_B_local_index < UINT_MAX); // this element contains node B
 
         /*
-         * If this element already contains the low-index node, then just remove the high-index node.
-         * Otherwise replace it with the low-index node in the element and remove it from mNodes.
+         * If this element already contains node A, then just remove node B.
+         * Otherwise replace it with node A in the element and remove it from mNodes.
          */
-        if (lo_node_elem_indices.count(*it) > 0)
+        if (nodeA_elem_indices.count(*it) != 0)
         {
-            this->mElements[*it]->DeleteNode(hi_node_local_index); // think this method removes the high-index node from mNodes
+            this->mElements[*it]->DeleteNode(node_B_local_index);
         }
         else
         {
-            // Replace the high-index node with the low-index node in this element
-            this->mElements[*it]->UpdateNode(hi_node_local_index, p_lo_node);
+            // Replace node B with node A in this element
+            this->mElements[*it]->UpdateNode(node_B_local_index, pNodeA);
         }
     }
-    assert(!(this->mNodes[hi_node_index]->IsDeleted()));
-    this->mNodes[hi_node_index]->MarkAsDeleted();
-    mDeletedNodeIndices.push_back(hi_node_index);
+
+    assert(!(this->mNodes[node_B_index]->IsDeleted()));
+    this->mNodes[node_B_index]->MarkAsDeleted();
+    mDeletedNodeIndices.push_back(node_B_index);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -2538,24 +2525,36 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformVoidRemoval(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB, Node<SPACE_DIM>* pNodeC)
 {
-    unsigned nodeA_index = pNodeA->GetIndex();
-    unsigned nodeB_index = pNodeB->GetIndex();
-    unsigned nodeC_index = pNodeC->GetIndex();
+    // Calculate void centroid
+    c_vector<double, SPACE_DIM> nodes_midpoint = pNodeA->rGetLocation()
+            + this->GetVectorFromAtoB(pNodeA->rGetLocation(), pNodeB->rGetLocation()) / 3.0
+            + this->GetVectorFromAtoB(pNodeA->rGetLocation(), pNodeC->rGetLocation()) / 3.0;
 
-    c_vector<double, SPACE_DIM> nodes_midpoint = pNodeA->rGetLocation() + this->GetVectorFromAtoB(pNodeA->rGetLocation(), pNodeB->rGetLocation())/3.0
-            + this->GetVectorFromAtoB(pNodeA->rGetLocation(), pNodeC->rGetLocation())/3.0;
-
-    Node<SPACE_DIM>* p_low_node_A_B = (nodeA_index < nodeB_index) ? pNodeA : pNodeB; // Node with the lowest index out of A and B
-    Node<SPACE_DIM>* p_low_node = (p_low_node_A_B->GetIndex() < nodeC_index) ? p_low_node_A_B : pNodeC; // Node with the lowest index out of A, B and C
+    /*
+     * In two steps, merge nodes A, B and C into a single node.  This is implemented in such a way that
+     * the ordering of their indices does not matter.
+     */
 
     PerformNodeMerge(pNodeA, pNodeB);
-    PerformNodeMerge(p_low_node_A_B, pNodeC);
 
-    c_vector<double, SPACE_DIM>& r_low_node_location = p_low_node->rGetModifiableLocation();
-    r_low_node_location = nodes_midpoint;
+    Node<SPACE_DIM>* p_merged_node = pNodeA;
 
-    // Sort out boundary nodes
-    p_low_node->SetAsBoundaryNode(false);
+    if (pNodeA->IsDeleted())
+    {
+        p_merged_node = pNodeB;
+    }
+
+    PerformNodeMerge(p_merged_node, pNodeC);
+
+    if (p_merged_node->IsDeleted())
+    {
+        p_merged_node = pNodeC;
+    }
+
+    p_merged_node->rGetModifiableLocation() = nodes_midpoint;
+
+    // Tag remaining node as non-boundary
+    p_merged_node->SetAsBoundaryNode(false);
 
     // Remove the deleted nodes and re-index
     RemoveDeletedNodes();
