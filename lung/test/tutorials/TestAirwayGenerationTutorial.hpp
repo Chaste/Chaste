@@ -79,6 +79,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* MultiLobeAirwayGenerator is the class that does most of the work in generating a complete airway tree */
 #include "MultiLobeAirwayGenerator.hpp"
 
+/* All test suites should include either 'PetscSetupAndFinalize' or 'FakePetscSetup'.  This code does not currently use
+ *  any parallel functionality so it might include either.*/
+#include "PetscSetupAndFinalize.hpp"
 
 /* Define the test */
 class TestAirwayGenerationTutorial : public CxxTest::TestSuite
