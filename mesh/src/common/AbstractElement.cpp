@@ -48,7 +48,6 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractElement<ELEMENT_DIM, SPACE_DIM>::AbstractElement(unsigned index, const std::vector<Node<SPACE_DIM>*>& rNodes)
     : mNodes(rNodes),
       mIndex(index),
-      mAttribute(0.0),
       mIsDeleted(false),
       mOwnership(true),
       mpElementAttributes(NULL)
@@ -60,7 +59,6 @@ AbstractElement<ELEMENT_DIM, SPACE_DIM>::AbstractElement(unsigned index, const s
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractElement<ELEMENT_DIM, SPACE_DIM>::AbstractElement(unsigned index)
     : mIndex(index),
-      mAttribute(0.0),
       mIsDeleted(false),
       mOwnership(true),
       mpElementAttributes(NULL)
@@ -160,13 +158,17 @@ void AbstractElement<ELEMENT_DIM, SPACE_DIM>::SetOwnership(bool ownership)
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractElement<ELEMENT_DIM, SPACE_DIM>::SetAttribute(double attribute)
 {
-    mAttribute = attribute;
+    ConstructElementAttributes();
+
+    mpElementAttributes->SetFirstAttribute(attribute);
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetAttribute()
 {
-    return mAttribute;
+    ConstructElementAttributes();
+
+    return mpElementAttributes->GetFirstAttribute();
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>

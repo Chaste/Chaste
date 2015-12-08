@@ -62,9 +62,6 @@ protected:
     /** The index of this element within the mesh */
     unsigned mIndex;
 
-    /** An attribute (a value associated with the element) */
-    double mAttribute;
-
     /**
      * Whether this element has been deleted, and hence
      * whether its location in the mesh can be re-used.

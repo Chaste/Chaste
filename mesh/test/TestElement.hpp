@@ -493,7 +493,14 @@ public:
             delete nodes_the_same[i];
         }
 
-        // Test attribute setting and conversion to unsigned intergers
+        // Test attribute when none is set
+
+//        TS_ASSERT_THROWS_THIS(element.GetAttribute(),
+//                              "Attempting to get element attribute when there are none defined");
+        TS_ASSERT_DELTA(element.GetAttribute(), 0.00, 1e-9);
+
+
+        // Test attribute setting and conversion to unsigned integers
 
         element.SetAttribute(3);
         TS_ASSERT_DELTA(element.GetAttribute(), 3.00, 1e-9);

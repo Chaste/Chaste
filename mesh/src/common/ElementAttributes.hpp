@@ -38,6 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "UblasVectorInclude.hpp"
 #include "ChasteSerialization.hpp"
+#include "Exception.hpp"
 #include <boost/serialization/vector.hpp>
 
 /**
@@ -84,6 +85,18 @@ public:
      * @param attribute the value of the attribute.
      */
     void AddAttribute(double attribute);
-};
 
+    /**
+     * Either push the first attribute onto the vector or replace its value if it already exists.
+     * This method gives back-compatibility to use-cases where there was only one attribute
+     * @param attribute the value of the first attribute.
+     */
+    void SetFirstAttribute(double attribute);
+
+    /**
+     * @return the first (zero-indexed) attribute value or zero if none exist
+     * \todo #2739 This should throw an exception if there are no attributes
+     */
+    double GetFirstAttribute();
+};
 #endif //_ELEMENTATTRIBUTES_HPP_

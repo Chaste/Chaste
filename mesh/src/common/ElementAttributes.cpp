@@ -53,6 +53,29 @@ void ElementAttributes<ELEMENT_DIM, SPACE_DIM>::AddAttribute(double attribute)
     mAttributes.push_back(attribute);
 }
 
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void ElementAttributes<ELEMENT_DIM, SPACE_DIM>::SetFirstAttribute(double attribute)
+{
+    // Make sure that the first entry exists
+    if (mAttributes.empty())
+    {
+        mAttributes.resize(1u);
+    }
+
+    mAttributes[0] = attribute;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+double ElementAttributes<ELEMENT_DIM, SPACE_DIM>::GetFirstAttribute()
+{
+    if (mAttributes.empty())
+    {
+        ///\todo #2739 This should throw: EXCEPTION("Attempting to get element attribute when there are none defined");
+        return 0.0;
+    }
+    // Otherwise
+    return(mAttributes[0]);
+}
 
 //////////////////////////////////////////////////////////////////////////
 // Explicit instantiation

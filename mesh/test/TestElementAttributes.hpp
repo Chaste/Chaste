@@ -65,6 +65,18 @@ public:
         TS_ASSERT_EQUALS(element_attributes.rGetAttributes().size(), 2u);
         TS_ASSERT_DELTA(element_attributes.rGetAttributes()[0], 1.23, 1e-10);
         TS_ASSERT_DELTA(element_attributes.rGetAttributes()[1], 4.56, 1e-10);
+
+        element_attributes.SetFirstAttribute(42.0);
+        TS_ASSERT_DELTA(element_attributes.GetFirstAttribute(), 42.0, 1e-10);
+        TS_ASSERT_DELTA(element_attributes.rGetAttributes()[0], 42.0, 1e-10);
+
+        // Now make a fresh attribute class with a size zero vector in it
+        ElementAttributes<2,2> element_attributes2;
+        // TS_ASSERT_THROWS_THIS(element_attributes2.GetFirstAttribute(), "Attempting to get element attribute when there are none defined");
+        TS_ASSERT_DELTA(element_attributes2.GetFirstAttribute(), 0.0, 1e-10); ///\todo #2739 Currently defaults to zero
+        element_attributes2.SetFirstAttribute(42.0);
+        TS_ASSERT_DELTA(element_attributes2.GetFirstAttribute(), 42.0, 1e-10);
+        TS_ASSERT_DELTA(element_attributes2.rGetAttributes()[0], 42.0, 1e-10);
     }
 
     void TestArchiving() throw (Exception)
