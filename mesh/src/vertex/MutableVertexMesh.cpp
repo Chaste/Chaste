@@ -1767,38 +1767,34 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT2Swap(VertexElement<ELEM
     unsigned new_node_global_index = this->AddNode(new Node<SPACE_DIM>(GetNumNodes(), new_node_location, is_node_on_boundary));
     Node<SPACE_DIM>* p_new_node = this->GetNode(new_node_global_index);
 
+    // Loop over each of the three nodes contained in rElement
     for (unsigned i=0; i<3; i++)
     {
-        Node<SPACE_DIM>* p_node_a = rElement.GetNode((i+1)%3);
-        Node<SPACE_DIM>* p_node_b = rElement.GetNode((i+2)%3);
+        // For each node, find the set of other elements containing it
+        Node<SPACE_DIM>* p_node = rElement.GetNode(i);
+        std::set<unsigned> containing_elements = p_node->rGetContainingElementIndices();
+        containing_elements.erase(rElement.GetIndex());
 
-        std::set<unsigned> elements_of_node_a = p_node_a->rGetContainingElementIndices();
-        std::set<unsigned> elements_of_node_b = p_node_b->rGetContainingElementIndices();
-
-        std::set<unsigned> common_elements;
-
-        std::set_intersection(elements_of_node_a.begin(), elements_of_node_a.end(),
-                              elements_of_node_b.begin(), elements_of_node_b.end(),
-                              std::inserter(common_elements, common_elements.begin()));
-
-        assert(common_elements.size() <= 2);
-        common_elements.erase(rElement.GetIndex());
-
-        if (common_elements.size() == 1) // there is a neighbouring element
+        // For each of these elements...
+        for (std::set<unsigned>::iterator elem_iter = containing_elements.begin(); elem_iter != containing_elements.end(); ++elem_iter)
         {
-            VertexElement<ELEMENT_DIM,SPACE_DIM>* p_neighbouring_element = this->GetElement(*(common_elements.begin()));
+            VertexElement<ELEMENT_DIM,SPACE_DIM>* p_this_elem = this->GetElement(*elem_iter);
 
-            if (p_neighbouring_element->GetNumNodes() < 4)
+            // ...throw an exception if the element is triangular...
+            if (p_this_elem->GetNumNodes() < 4)
             {
                 EXCEPTION("One of the neighbours of a small triangular element is also a triangle - dealing with this has not been implemented yet");
             }
 
-            p_neighbouring_element->ReplaceNode(p_node_a, p_new_node);
-            p_neighbouring_element->DeleteNode(p_neighbouring_element->GetNodeLocalIndex(p_node_b->GetIndex()));
-        }
-        else
-        {
-            assert((p_node_a->IsBoundaryNode()) && (p_node_b->IsBoundaryNode()));
+            // ...otherwise, replace p_node with p_new_node unless this has already happened (in which case, delete p_node from the element)
+            if (p_this_elem->GetNodeLocalIndex(new_node_global_index) == UINT_MAX)
+            {
+                p_this_elem->ReplaceNode(p_node, p_new_node);
+            }
+            else
+            {
+                p_this_elem->DeleteNode(p_this_elem->GetNodeLocalIndex(p_node->GetIndex()));
+            }
         }
     }
 

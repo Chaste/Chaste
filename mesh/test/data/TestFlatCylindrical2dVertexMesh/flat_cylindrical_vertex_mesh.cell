@@ -1,8 +1,8 @@
 16	1
-0	5	0	1	5	8	4	0
-1	5	1	2	6	9	5	0
-2	5	2	3	7	10	6	0
-3	5	3	0	4	11	7	0
+0	5	1	5	8	4	0	0
+1	5	2	6	9	5	1	0
+2	5	3	7	10	6	2	0
+3	5	0	4	11	7	3	0
 4	6	5	9	13	17	12	8	0
 5	6	6	10	14	18	13	9	0
 6	6	7	11	15	19	14	10	0
@@ -16,4 +16,5 @@
 14	6	23	27	31	35	30	26	0
 15	6	20	24	28	32	31	27	0
 # Created by Chaste version 3.1.20215 (with uncommitted modifications) on Thu, 03 Oct 2013 10:27:39 +0000.  Chaste was built on Mon, 23 Sep 2013 13:49:33 +0000 by machine (uname) 'Linux scoop 3.2.0-32-generic #51-Ubuntu SMP Wed Sep 26 21:33:09 UTC 2012 x86_64' using settings: default, shared libraries.  Checked-out project versions: Eikonal=66M; papers=18344M.
+
 

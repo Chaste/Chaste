@@ -75,7 +75,7 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh)
     // Populate mNodes
     GenerateVerticesFromElementCircumcentres(rMesh);
 
-    // loop over all generated nodes and check they're not outside [0,mWidth]
+    // Loop over all generated nodes and check they're not outside [0,mWidth]
     for (unsigned i=0; i<num_nodes; i++)
     {
         double x_location = mNodes[i]->rGetLocation()[0];
@@ -102,7 +102,6 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh)
 
             mElements[elem_index]->AddNode(this->mNodes[i], end_index);
         }
-
     }
 
     // Reorder mNodes anticlockwise
@@ -136,7 +135,6 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh)
         {
             unsigned local_index = count>1 ? count-1 : 0;
             p_new_element->AddNode(mNodes[index_angle_list[count].second], local_index);
-
         }
 
         // Replace the relevant member of mElements with this Voronoi element
@@ -145,8 +143,6 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh)
     }
 
     this->mMeshChangesDuringSimulation = false;
-
-
 }
 
 Cylindrical2dVertexMesh::Cylindrical2dVertexMesh()

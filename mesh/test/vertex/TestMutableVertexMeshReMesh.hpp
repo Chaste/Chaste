@@ -843,7 +843,6 @@ public:
         // Test the tracking of the T2 swap location:
         TS_ASSERT_DELTA(vertex_mesh.GetLastT2SwapLocation()[0], centroid_of_element_0_before_swap[0], 1e-10);
         TS_ASSERT_DELTA(vertex_mesh.GetLastT2SwapLocation()[1], centroid_of_element_0_before_swap[1], 1e-10);
-
     }
 
     void TestPerformT2SwapWithBoundaryNodes() throw(Exception)
@@ -1027,6 +1026,108 @@ public:
         TS_ASSERT_THROWS_THIS( vertex_mesh.PerformT2Swap(*p_element_0),
                 "One of the neighbours of a small triangular element is also a triangle - "
                 "dealing with this has not been implemented yet" );
+    }
+
+    void TestPerformT2SwapWithRosettes() throw(Exception)
+    {
+        /* Create a mesh containing a smaller triangular element, each of whose nodes are
+         * 'rosette' nodes. Test that a T2 swap correctly removes the triangular element
+         * from the mesh.
+         *  _________
+         *  |\      |
+         *  | \     |
+         *  | |_\___|
+         *  | / |   |
+         *  |/__|___|
+         */
+
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true,  0.0,  0.0));
+        nodes.push_back(new Node<2>(1, true,  1.0,  0.0));
+        nodes.push_back(new Node<2>(2, true,  2.0,  0.0));
+        nodes.push_back(new Node<2>(3, false, 0.99, 1.0));
+        nodes.push_back(new Node<2>(4, false, 1.0,  1.0));
+        nodes.push_back(new Node<2>(5, false, 2.0,  1.0));
+        nodes.push_back(new Node<2>(6, false, 0.99, 1.01));
+        nodes.push_back(new Node<2>(7, false, 0.0,  2.0));
+        nodes.push_back(new Node<2>(8, false, 2.0,  2.0));
+
+        std::vector<Node<2>*> nodes_elem_0;
+        nodes_elem_0.push_back(nodes[0]);
+        nodes_elem_0.push_back(nodes[1]);
+        nodes_elem_0.push_back(nodes[4]);
+        nodes_elem_0.push_back(nodes[3]);
+
+        std::vector<Node<2>*> nodes_elem_1;
+        nodes_elem_1.push_back(nodes[1]);
+        nodes_elem_1.push_back(nodes[2]);
+        nodes_elem_1.push_back(nodes[5]);
+        nodes_elem_1.push_back(nodes[4]);
+
+        std::vector<Node<2>*> nodes_elem_2;
+        nodes_elem_2.push_back(nodes[0]);
+        nodes_elem_2.push_back(nodes[3]);
+        nodes_elem_2.push_back(nodes[6]);
+        nodes_elem_2.push_back(nodes[7]);
+
+        std::vector<Node<2>*> nodes_elem_3;
+        nodes_elem_3.push_back(nodes[3]);
+        nodes_elem_3.push_back(nodes[4]);
+        nodes_elem_3.push_back(nodes[6]);
+
+        std::vector<Node<2>*> nodes_elem_4;
+        nodes_elem_4.push_back(nodes[4]);
+        nodes_elem_4.push_back(nodes[5]);
+        nodes_elem_4.push_back(nodes[8]);
+        nodes_elem_4.push_back(nodes[7]);
+        nodes_elem_4.push_back(nodes[6]);
+
+        std::vector<VertexElement<2,2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2,2>(2, nodes_elem_2));
+        vertex_elements.push_back(new VertexElement<2,2>(3, nodes_elem_3));
+        vertex_elements.push_back(new VertexElement<2,2>(4, nodes_elem_4));
+
+        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+
+        // Perform a T2 swap on the central triangle element
+        VertexElement<2,2>* p_element_3 = vertex_mesh.GetElement(3);
+        c_vector<double, 2> centroid_of_element_0_before_swap = vertex_mesh.GetCentroidOfElement(3);
+        vertex_mesh.PerformT2Swap(*p_element_3);
+
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 4u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 7u);
+
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumAllElements(), 5u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumAllNodes(), 10u);
+
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 3u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(0), 0u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(1), 1u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(2), 9u);
+
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 4u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(0), 1u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(1), 2u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(2), 5u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(3), 9u);
+
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNumNodes(), 3u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(0), 0u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(1), 9u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(2), 7u);
+
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNumNodes(), 3u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNodeGlobalIndex(0), 3u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNodeGlobalIndex(1), 4u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNodeGlobalIndex(2), 6u);
+
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(4)->GetNumNodes(), 4u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(4)->GetNodeGlobalIndex(0), 9u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(4)->GetNodeGlobalIndex(1), 5u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(4)->GetNodeGlobalIndex(2), 8u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(4)->GetNodeGlobalIndex(3), 7u);
     }
 
     void TestReMeshForT1Swaps() throw(Exception)
