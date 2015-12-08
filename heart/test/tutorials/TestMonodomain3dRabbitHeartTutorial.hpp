@@ -161,6 +161,12 @@ public:
         monodomain_problem.Initialise();
         monodomain_problem.Solve();
 
+        /* We can access nodes in the mesh using a `NodeIterator`. Here, we check that each node
+         * has not been assigned to bath, and throw an error if it has. This is not a particularly useful test,
+         * but it does demonstrate the principle.
+         * */
+
+        AbstractTetrahedralMesh<3,3>* p_mesh = &(monodomain_problem.rGetMesh());
 
         /** \todo #2739
         double before_init = GetMemoryUsage();
