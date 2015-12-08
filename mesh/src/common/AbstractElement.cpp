@@ -50,7 +50,8 @@ AbstractElement<ELEMENT_DIM, SPACE_DIM>::AbstractElement(unsigned index, const s
       mIndex(index),
       mAttribute(0.0),
       mIsDeleted(false),
-      mOwnership(true)
+      mOwnership(true),
+      mpElementAttributes(NULL)
 {
     // Sanity checking
     assert(ELEMENT_DIM <= SPACE_DIM);
@@ -61,7 +62,8 @@ AbstractElement<ELEMENT_DIM, SPACE_DIM>::AbstractElement(unsigned index)
     : mIndex(index),
       mAttribute(0.0),
       mIsDeleted(false),
-      mOwnership(true)
+      mOwnership(true),
+      mpElementAttributes(NULL)
 {}
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -178,6 +180,40 @@ unsigned AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetUnsignedAttribute()
         EXCEPTION("Element attribute '"<< double_attr <<"' cannot be converted to an unsigned.");
     }
     return unsigned_attr;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractElement<ELEMENT_DIM, SPACE_DIM>::ConstructElementAttributes()
+{
+    if (mpElementAttributes == NULL)
+    {
+        mpElementAttributes = new ElementAttributes<ELEMENT_DIM, SPACE_DIM>();
+    }
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractElement<ELEMENT_DIM, SPACE_DIM>::AddElementAttribute(double attribute)
+{
+    ConstructElementAttributes();
+
+    mpElementAttributes->AddAttribute(attribute);
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+std::vector<double>& AbstractElement<ELEMENT_DIM, SPACE_DIM>::rGetElementAttributes()
+{
+    if (mpElementAttributes == NULL)
+    {
+        EXCEPTION("Element has no attributes associated with it. Construct attributes first");
+    }
+
+    return mpElementAttributes->rGetAttributes();
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetNumElementAttributes()
+{
+    return mpElementAttributes == NULL ? 0 : mpElementAttributes->rGetAttributes().size();
 }
 
 

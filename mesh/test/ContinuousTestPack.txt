@@ -3,6 +3,7 @@ TestChasteRegions.hpp
 TestDistributedQuadraticMesh.hpp
 TestDistributedTetrahedralMesh.hpp
 TestElement.hpp
+TestElementAttributes.hpp
 TestMixedDimensionMesh.hpp
 TestMutableMesh.hpp
 TestMutableMeshRemesh.hpp

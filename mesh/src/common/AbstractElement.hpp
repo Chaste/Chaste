@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "UblasVectorInclude.hpp"
 #include "Node.hpp"
+#include "ElementAttributes.hpp"
 
 /*
  * When creating an element within a mesh one needs to specify its global index.
@@ -72,6 +73,14 @@ protected:
 
     /** Whether the current process owns this element. */
     bool mOwnership;
+
+    /** A pointer to an ElementAttributes object associated with this element. */
+    ElementAttributes<ELEMENT_DIM, SPACE_DIM>* mpElementAttributes;
+
+    /**
+     * Construct an empty ElementAttributes container.
+     */
+    void ConstructElementAttributes();
 
 public:
 
@@ -221,6 +230,23 @@ public:
      * @return an unsigned attribute value.
      */
     unsigned GetUnsignedAttribute();
+
+    /**
+     * Add an attribute to the list of element attributes.
+     *
+     * @param attribute the value of the attribute to be added
+     */
+    void AddElementAttribute(double attribute);
+
+    /**
+     * @return reference to a vector containing the element attributes.
+     */
+    std::vector<double>& rGetElementAttributes();
+
+    /**
+     * @return the number of node attributes associated with this node.
+     */
+    unsigned GetNumElementAttributes();
 };
 
 #endif /*ABSTRACTELEMENT_HPP_*/

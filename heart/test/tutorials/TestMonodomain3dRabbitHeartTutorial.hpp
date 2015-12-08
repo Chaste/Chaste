@@ -60,6 +60,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DistributedTetrahedralMesh.hpp"
 #include "PetscSetupAndFinalize.hpp"
 
+/** TEMPORARY FOR DEBUGGING */
+///\todo #2739
+#include <unistd.h>
+#include <sys/resource.h>
+//#include "Debug.hpp"
+
 /* Here we define a cell factory that gives stimuli to all cells
  * below height z = 0.042... this corresponds to the apex of the heart.
  */
@@ -94,6 +100,14 @@ public:
 class TestMonodomain3dRabbitHeartTutorial : public CxxTest::TestSuite
 {
 public:
+    double GetMemoryUsage()
+    {
+       struct rusage rusage;
+       getrusage( RUSAGE_SELF, &rusage );
+
+       return (double)(rusage.ru_maxrss)/(1024);// Convert KB to MB
+    }
+
     void TestMonodomain3dRabbitHeart() throw(Exception)
     {
         /*
@@ -102,6 +116,10 @@ public:
          */
         HeartConfig::Instance()->SetMeshFileName("apps/texttest/weekly/Propagation3d/OxfordRabbitHeart_482um",
                                                  cp::media_type::Axisymmetric);
+
+//        HeartConfig::Instance()->SetMeshFileName("OxfordRabbitHeart_ascii",
+//                                                         cp::media_type::Axisymmetric);
+
 
         /*
          * Specify the conductivity vector to use in the simulation. Since this is going to be
@@ -144,13 +162,12 @@ public:
         monodomain_problem.Solve();
 
 
-        /* We can access nodes in the mesh using a `NodeIterator`. Here, we check that each node
-         * has not been assigned to bath, and throw an error if it has. This is not a particularly useful test,
-         * but it does demonstrate the principle.
-         * */
-
-        AbstractTetrahedralMesh<3,3>* p_mesh = &(monodomain_problem.rGetMesh());
-
+        /** \todo #2739
+        double before_init = GetMemoryUsage();
+        monodomain_problem.Initialise();
+        double after_init = GetMemoryUsage();
+        PRINT_VARIABLE(after_init - before_init);
+        */
         for (AbstractTetrahedralMesh<3,3>::NodeIterator iter = p_mesh->GetNodeIteratorBegin();
                          iter != p_mesh->GetNodeIteratorEnd(); ++iter)
         {
