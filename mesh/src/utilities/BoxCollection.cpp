@@ -1,39 +1,40 @@
 /*
 
-Copyright (c) 2005-2015, University of Oxford.
-All rights reserved.
+ Copyright (c) 2005-2015, University of Oxford.
+ All rights reserved.
 
-University of Oxford means the Chancellor, Masters and Scholars of the
-University of Oxford, having an administrative office at Wellington
-Square, Oxford OX1 2JD, UK.
+ University of Oxford means the Chancellor, Masters and Scholars of the
+ University of Oxford, having an administrative office at Wellington
+ Square, Oxford OX1 2JD, UK.
 
-This file is part of Chaste.
+ This file is part of Chaste.
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions are met:
  * Redistributions of source code must retain the above copyright notice,
-   this list of conditions and the following disclaimer.
+ this list of conditions and the following disclaimer.
  * Redistributions in binary form must reproduce the above copyright notice,
-   this list of conditions and the following disclaimer in the documentation
-   and/or other materials provided with the distribution.
+ this list of conditions and the following disclaimer in the documentation
+ and/or other materials provided with the distribution.
  * Neither the name of the University of Oxford nor the names of its
-   contributors may be used to endorse or promote products derived from this
-   software without specific prior written permission.
+ contributors may be used to endorse or promote products derived from this
+ software without specific prior written permission.
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
-GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
-OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-*/
+ */
 #include "BoxCollection.hpp"
 #include "Exception.hpp"
+#include "Debug.hpp"
 
 /////////////////////////////////////////////////////////////////////////////
 // BoxCollection methods
@@ -44,15 +45,36 @@ template<unsigned DIM>
 const double BoxCollection<DIM>::msFudge = 5e-14;
 
 template<unsigned DIM>
-BoxCollection<DIM>::BoxCollection(double boxWidth, c_vector<double, 2*DIM> domainSize, bool isPeriodicInX)
-    : mDomainSize(domainSize),
-      mBoxWidth(boxWidth),
-      mIsPeriodicInX(isPeriodicInX)
+BoxCollection<DIM>::BoxCollection(double boxWidth, c_vector<double, 2 * DIM> domainSize, bool isPeriodicInX,
+                                  bool isPeriodicInY, bool isPeriodicInZ)
+        : mDomainSize(domainSize),
+          mBoxWidth(boxWidth)
 {
-    // Periodicity only works in 2d
-    if (isPeriodicInX)
+    // Populate mIsDomainPeriodic
+    switch (DIM)
     {
-        assert(DIM==2);
+        case 1:
+        {
+            mIsDomainPeriodic[0] = isPeriodicInX;
+            break;
+        }
+        case 2:
+        {
+            mIsDomainPeriodic[0] = isPeriodicInX;
+            mIsDomainPeriodic[1] = isPeriodicInY;
+            break;
+        }
+        case 3:
+        {
+            mIsDomainPeriodic[0] = isPeriodicInX;
+            mIsDomainPeriodic[1] = isPeriodicInY;
+            mIsDomainPeriodic[2] = isPeriodicInZ;
+            break;
+        }
+        default:
+        {
+            NEVER_REACHED;
+        }
     }
 
     /*
@@ -66,14 +88,15 @@ BoxCollection<DIM>::BoxCollection(double boxWidth, c_vector<double, 2*DIM> domai
     std::vector<unsigned> coefficients;
     coefficients.push_back(1);
 
-    for (unsigned i=0; i<DIM; i++)
+    for (unsigned i = 0; i < DIM; i++)
     {
-        mNumBoxesEachDirection(i) = (unsigned) floor((domainSize(2*i+1) - domainSize(2*i))/boxWidth + msFudge) + 1;
+        ///\todo #2725 example: domain width of 1.0 and box width of 0.25, the following line will create 5 boxes not 4
+        mNumBoxesEachDirection(i) = (unsigned) floor((domainSize(2 * i + 1) - domainSize(2 * i)) / boxWidth + msFudge) + 1;
         num_boxes *= mNumBoxesEachDirection(i);
-        coefficients.push_back(coefficients[i]*mNumBoxesEachDirection(i));
+        coefficients.push_back(coefficients[i] * mNumBoxesEachDirection(i));
     }
 
-    for (unsigned box_index=0; box_index<num_boxes; box_index++)
+    for (unsigned box_index = 0 ; box_index < num_boxes ; box_index++)
     {
         /*
          * The code block below computes how many boxes along in each dimension the
@@ -93,28 +116,28 @@ BoxCollection<DIM>::BoxCollection(double boxWidth, c_vector<double, 2*DIM> domai
          *
          * and in 1D we simply have box_index = i.
          */
-        c_vector<unsigned, DIM+1> current_box_indices;
+        c_vector<unsigned, DIM + 1> current_box_indices;
         current_box_indices[0] = 0;
 
-        for (unsigned i=0; i<DIM; i++)
+        for (unsigned i = 0; i < DIM; i++)
         {
             unsigned temp = 0;
-            for (unsigned j=1; j<i; j++)
+            for (unsigned j = 1; j < i; j++)
             {
-                temp += coefficients[j]*current_box_indices[j-1];
+                temp += coefficients[j] * current_box_indices[j - 1];
             }
-            current_box_indices[i+1] = (box_index%coefficients[i+1] - temp)/coefficients[i];
+            current_box_indices[i + 1] = (box_index % coefficients[i + 1] - temp) / coefficients[i];
         }
 
         /*
          * We now use the information stores in current_box_indices to construct the
          * Box, which we add to mBoxes.
          */
-        c_vector<double, 2*DIM> box_coords;
-        for (unsigned l=0; l<DIM; l++)
+        c_vector<double, 2 * DIM> box_coords;
+        for (unsigned l = 0; l < DIM; l++)
         {
-            box_coords(2*l) = domainSize(2*l) + current_box_indices(l+1)*boxWidth;
-            box_coords(2*l+1) = domainSize(2*l) + (current_box_indices(l+1)+1)*boxWidth;
+            box_coords(2 * l) = domainSize(2 * l) + current_box_indices(l + 1) * boxWidth;
+            box_coords(2 * l + 1) = domainSize(2 * l) + (current_box_indices(l + 1) + 1) * boxWidth;
         }
 
         Box<DIM> new_box(box_coords);
@@ -128,7 +151,7 @@ BoxCollection<DIM>::BoxCollection(double boxWidth, c_vector<double, 2*DIM> domai
 template<unsigned DIM>
 void BoxCollection<DIM>::EmptyBoxes()
 {
-    for (unsigned i=0; i<mBoxes.size(); i++)
+    for (unsigned i = 0; i < mBoxes.size(); i++)
     {
         mBoxes[i].ClearNodes();
     }
@@ -142,42 +165,22 @@ unsigned BoxCollection<DIM>::CalculateContainingBox(Node<DIM>* pNode)
     return CalculateContainingBox(location);
 }
 
-
 template<unsigned DIM>
 unsigned BoxCollection<DIM>::CalculateContainingBox(c_vector<double, DIM>& rLocation)
 {
-    // The node must lie inside the boundary of the box collection
-    for (unsigned i=0; i<DIM; i++)
-    {
-        if ( (rLocation[i] < mDomainSize(2*i)) || (rLocation[i] > mDomainSize(2*i+1)) )
-        {
-            EXCEPTION("The point provided is outside all of the boxes");
-        }
-    }
-
     // Compute the containing box index in each dimension
-    c_vector<unsigned, DIM> containing_box_indices;
-    for (unsigned i=0; i<DIM; i++)
+    c_vector<int, DIM> containing_box_indices;
+    for (unsigned i = 0; i < DIM; i++)
     {
-        containing_box_indices[i] = (unsigned) floor((rLocation[i] - mDomainSize(2*i) + msFudge)/mBoxWidth);
+        containing_box_indices[i] = (int) floor((rLocation[i] - mDomainSize(2 * i) + msFudge) / mBoxWidth);
     }
 
-    // Use these to compute the index of the containing box
-    unsigned containing_box_index = 0;
-    for (unsigned i=0; i<DIM; i++)
+    if(!IsBoxInDomain(containing_box_indices))
     {
-        unsigned temp = 1;
-        for (unsigned j=0; j<i; j++)
-        {
-            temp *= mNumBoxesEachDirection(j);
-        }
-        containing_box_index += temp*containing_box_indices[i];
+        EXCEPTION("Location does not correspond to any box.");
     }
 
-    // This index must be less than the number of boxes
-    assert(containing_box_index < mBoxes.size());
-
-    return containing_box_index;
+    return GetLinearIndex(containing_box_indices);
 }
 
 template<unsigned DIM>
@@ -194,501 +197,467 @@ unsigned BoxCollection<DIM>::GetNumBoxes()
 }
 
 template<unsigned DIM>
-void BoxCollection<DIM>::SetupLocalBoxesHalfOnly()
+unsigned BoxCollection<DIM>::GetLinearIndex(c_vector<int, DIM> gridIndices)
 {
+    /*
+     * This function may be passed values outside the range in one or more
+     * dimensions in the case of a periodic domain.  We therefore assume that
+     * these values represent a situation with periodicity and adjust them
+     * accordingly before calculating the linear index.
+     */
+
+    // Adjust for periodicity if necessary
+    for (unsigned dim = 0; dim < DIM; dim++)
+    {
+        // Check for values too large
+        if (gridIndices(dim) >= (int)mNumBoxesEachDirection(dim))
+        {
+            assert(mIsDomainPeriodic(dim));
+            gridIndices(dim) -= (int)mNumBoxesEachDirection(dim);
+        }
+
+        // Check for negative values
+        else if (gridIndices(dim) < 0)
+        {
+            assert(mIsDomainPeriodic(dim));
+            gridIndices(dim) += (int)mNumBoxesEachDirection(dim);
+        }
+    }
+
+    // Calculate linear index
+    unsigned linear_index;
+
     switch (DIM)
     {
         case 1:
         {
-            // We only need to look for neighbours in the current and successive boxes
-            mLocalBoxes.clear();
-            for (unsigned box_index=0; box_index<mBoxes.size(); box_index++)
-            {
-                std::set<unsigned> local_boxes;
-
-                // Insert the current box
-                local_boxes.insert(box_index);
-
-                // If we're not at the right-most box, then insert the box to the right
-                if (box_index < mNumBoxesEachDirection(0)-1)
-                {
-                    local_boxes.insert(box_index+1);
-                }
-                mLocalBoxes.push_back(local_boxes);
-            }
+            linear_index = gridIndices(0);
             break;
         }
         case 2:
         {
-            // We only need to look for neighbours in the current box and half the neighbouring boxes
-            mLocalBoxes.clear();
-            for (unsigned box_index=0; box_index<mBoxes.size(); box_index++)
-            {
-                std::set<unsigned> local_boxes;
-
-                // Insert the current box
-                local_boxes.insert(box_index);
-
-                // If we're not on the top-most row, then insert the box above
-                if (box_index < mBoxes.size() - mNumBoxesEachDirection(0))
-                {
-                    local_boxes.insert(box_index + mNumBoxesEachDirection(0));
-
-                    // If we're also not on the left-most column, then insert the box above-left
-                    if (box_index % mNumBoxesEachDirection(0) != 0)
-                    {
-                        local_boxes.insert(box_index + mNumBoxesEachDirection(0) - 1);
-                    }
-                    // If we're on the left edge but its periodic include the box on the far right
-                    else if ( (box_index % mNumBoxesEachDirection(0) == 0) && (mIsPeriodicInX) )
-                    {
-                        local_boxes.insert(box_index + 2* mNumBoxesEachDirection(0) - 1);
-                    }
-
-                }
-                // If we're not on the right-most column, then insert the box to the right
-                if (box_index % mNumBoxesEachDirection(0) != mNumBoxesEachDirection(0)-1)
-                {
-                    local_boxes.insert(box_index + 1);
-
-                    // If we're also not on the top-most row, then insert the box above-right
-                    if (box_index < mBoxes.size() - mNumBoxesEachDirection(0))
-                    {
-                        local_boxes.insert(box_index + mNumBoxesEachDirection(0) + 1);
-                    }
-                }
-                // If we're on the right edge but it's periodic include the box on the far left of the domain
-                else if ( (box_index % mNumBoxesEachDirection(0) == mNumBoxesEachDirection(0)-1) && (mIsPeriodicInX) )
-                {
-                    local_boxes.insert(box_index - mNumBoxesEachDirection(0) + 1);
-                    // If we're also not on the top-most row, then insert the box above- on the far left of the domain
-                    if (box_index < mBoxes.size() - mNumBoxesEachDirection(0))
-                    {
-                        local_boxes.insert(box_index + 1);
-                    }
-                }
-
-                mLocalBoxes.push_back(local_boxes);
-            }
+            linear_index = gridIndices(0) +
+                           gridIndices(1) * mNumBoxesEachDirection(0);
             break;
         }
         case 3:
         {
-            // We only need to look for neighbours in the current box and half the neighbouring boxes
-            mLocalBoxes.clear();
-            unsigned num_boxes_xy = mNumBoxesEachDirection(0)*mNumBoxesEachDirection(1);
-
-            for (unsigned box_index=0; box_index<mBoxes.size(); box_index++)
-            {
-                std::set<unsigned> local_boxes;
-
-                // Insert the current box
-                local_boxes.insert(box_index);
-
-                // If we're not on the far face (y max), then insert the far box
-                if (box_index % num_boxes_xy < num_boxes_xy - mNumBoxesEachDirection(0))
-                {
-                    local_boxes.insert(box_index + mNumBoxesEachDirection(0));
-
-                    // If we're also not on the left face (x min), then insert the box to the left
-                    if (box_index % mNumBoxesEachDirection(0) != 0)
-                    {
-                        local_boxes.insert(box_index + mNumBoxesEachDirection(0) - 1);
-                    }
-                }
-                // If we're not on the right face (x max), then insert the box to the right
-                if (box_index % mNumBoxesEachDirection(0) != mNumBoxesEachDirection(0)-1)
-                {
-                    local_boxes.insert(box_index + 1);
-
-                    // If we're also not on the far face (y max) row, then insert the box to the far-right
-                    if (box_index % num_boxes_xy < num_boxes_xy - mNumBoxesEachDirection(0))
-                    {
-                        local_boxes.insert(box_index + mNumBoxesEachDirection(0) + 1);
-                    }
-                }
-                // If we're not on the top face (z max), then insert the box above
-                if (box_index < mBoxes.size() - num_boxes_xy)
-                {
-                    local_boxes.insert(box_index + num_boxes_xy);
-
-                    // If we're also not on the far face (y max), then insert the above-far box
-                    if (box_index % num_boxes_xy < num_boxes_xy - mNumBoxesEachDirection(0))
-                    {
-                        local_boxes.insert(box_index + num_boxes_xy + mNumBoxesEachDirection(0));
-
-                        // If we're also not on the left face (x min), then insert the box to the above-left
-                        if (box_index % mNumBoxesEachDirection(0) != 0)
-                        {
-                            local_boxes.insert(box_index + num_boxes_xy + mNumBoxesEachDirection(0) - 1);
-                        }
-                    }
-                    // If we're also not on the right face (x max), then insert the box to the above-right
-                    if (box_index % mNumBoxesEachDirection(0) != mNumBoxesEachDirection(0)-1)
-                    {
-                        local_boxes.insert(box_index + num_boxes_xy + 1);
-
-                        // If we're also not on the far face (y max) row, then insert the box to the above-far-right
-                        if (box_index % num_boxes_xy < num_boxes_xy - mNumBoxesEachDirection(0))
-                        {
-                            local_boxes.insert(box_index + num_boxes_xy + mNumBoxesEachDirection(0) + 1);
-                        }
-                    }
-                }
-                // If we're not on the bottom face (z min), then DON'T insert the box above - this will lead to duplicate pairs.
-                if (box_index >= num_boxes_xy)
-                {
-                    // If we're also not on the far face (y max), then insert the below-far box
-                    if (box_index % num_boxes_xy < num_boxes_xy - mNumBoxesEachDirection(0))
-                    {
-                        local_boxes.insert(box_index - num_boxes_xy + mNumBoxesEachDirection(0));
-
-                        // If we're also not on the left face (x min), then insert the box to the below-left
-                        if (box_index % mNumBoxesEachDirection(0) != 0)
-                        {
-                            local_boxes.insert(box_index - num_boxes_xy + mNumBoxesEachDirection(0) - 1);
-                        }
-                    }
-                    // If we're also not on the right face (x max), then insert the box to the below-right
-                    if (box_index % mNumBoxesEachDirection(0) != mNumBoxesEachDirection(0)-1)
-                    {
-                        local_boxes.insert(box_index - num_boxes_xy + 1);
-
-                        // If we're also not on the far face (y max) row, then insert the box to the below-far-right
-                        if (box_index % num_boxes_xy < num_boxes_xy - mNumBoxesEachDirection(0))
-                        {
-                            local_boxes.insert(box_index - num_boxes_xy + mNumBoxesEachDirection(0) + 1);
-                        }
-                    }
-                }
-                mLocalBoxes.push_back(local_boxes);
-            }
+            linear_index = gridIndices(0) +
+                           gridIndices(1) * mNumBoxesEachDirection(0) +
+                           gridIndices(2) * mNumBoxesEachDirection(0) * mNumBoxesEachDirection(1);
             break;
         }
         default:
+        {
             NEVER_REACHED;
+        }
     }
+
+    return linear_index;
 }
 
+template<unsigned DIM>
+c_vector<int,DIM> BoxCollection<DIM>::GetGridIndices(unsigned linearIndex)
+{
+    c_vector<int,DIM> grid_indices;
 
+    switch (DIM)
+    {
+        case 1:
+        {
+            grid_indices(0) = linearIndex;
+            break;
+        }
+        case 2:
+        {
+            unsigned num_x = mNumBoxesEachDirection(0);
+            grid_indices(0) = linearIndex % num_x;
+            grid_indices(1) = (linearIndex - grid_indices(0)) / num_x;
+            break;
+        }
+        case 3:
+        {
+            unsigned num_x = mNumBoxesEachDirection(0);
+            unsigned num_xy = mNumBoxesEachDirection(0)*mNumBoxesEachDirection(1);
+            grid_indices(0) = linearIndex % num_x;
+            grid_indices(1) = (linearIndex % num_xy - grid_indices(0)) / num_x;
+            grid_indices(2) = linearIndex / num_xy;
+            break;
+        }
+        default:
+        {
+            NEVER_REACHED;
+        }
+    }
+
+    return grid_indices;
+}
+
+template<unsigned DIM>
+bool BoxCollection<DIM>::IsBoxInDomain(c_vector<int, DIM> gridIndices)
+{
+    /*
+     * We assume that, for a given dimension, any location is in the domain
+     * if the domain is periodic in that dimension.
+     *
+     * This method can only return false in the case of one or more
+     * dimensions being aperiodic and a location in one of those dimensions
+     * being outside the range.
+     */
+
+    bool is_in_domain = true;
+
+    for (unsigned dim = 0; dim < DIM; dim++)
+    {
+        if (!mIsDomainPeriodic(dim))
+        {
+            if (gridIndices(dim) < 0 || gridIndices(dim) >= mNumBoxesEachDirection(dim))
+            {
+                is_in_domain = false;
+            }
+        }
+    }
+
+    return is_in_domain;
+}
+
+template<unsigned DIM>
+c_vector<bool,DIM> BoxCollection<DIM>::IsIndexPenultimate(c_vector<int,DIM> gridIndices)
+{
+    c_vector<bool,DIM> is_penultimate;
+
+    for (unsigned dim = 0 ; dim < DIM ; dim++)
+    {
+        is_penultimate(dim) = (gridIndices(dim) == mNumBoxesEachDirection(dim) - 2);
+    }
+
+    return is_penultimate;
+}
+
+template<unsigned DIM>
+void BoxCollection<DIM>::SetupLocalBoxesHalfOnly()
+{
+    // Populate a list of half the neighbours in this number of dimensions
+    std::vector<c_vector<int,DIM> > neighbours;
+
+    switch (DIM)
+    {
+        case 1:
+        {
+            // Just one neighbour, plus the current box (zero vector)
+            neighbours = std::vector<c_vector<int,DIM> >(2);
+
+            neighbours[0](0) = 0; // current box
+            neighbours[1](0) = 1; // right
+
+            break;
+        }
+        case 2:
+        {
+            // Four neighbours, plus the current box (zero vector)
+            neighbours = std::vector<c_vector<int,DIM> >(5);
+
+            neighbours[0](0) = 0; neighbours[0](1) = 1; // up
+            neighbours[1](0) = 1; neighbours[1](1) = 1; // up right
+            neighbours[2](0) = 1; neighbours[2](1) = 0; // right
+            neighbours[3](0) = 1; neighbours[3](1) =-1; // down right
+            neighbours[4](0) = 0; neighbours[4](1) = 0; // current box
+
+            break;
+        }
+        case 3:
+        {
+            /*
+             * We need to pick 13 neighbours in such a way as to ensure all interactions are captured,
+             * in addition to the current box.
+             *
+             * The 26 cubes on the outside of a 3x3 arrangement either adjacent to a whole face of
+             * the central cube, only an edge of the central cube, or only a vertex of the central
+             * cube:
+             *
+             *    6 contact faces, and come in the following 3 pairs:
+             *        +x        -x                  (1, 0, 0)
+             *        +y        -y                  (0, 1, 0)
+             *        +z        -z                  (0, 0, 1)
+             *
+             *    12 contact edges, and come in the following 6 pairs:
+             *        +x+y      -x-y                (1, 1, 0)
+             *        +x+z      -x-z                (1, 0, 1)
+             *        +x-y      -x+y                (1,-1, 0)
+             *        +x-z      -x+z                (1, 0,-1)
+             *        +y+z      -y-z                (0, 1, 1)
+             *        +y-z      -y+z                (0, 1,-1)
+             *
+             *    8 contact vertices, and come in the following 4 pairs:
+             *        +x+y+z    -x-y-z              (1, 1, 1)
+             *        +x+y-z    -x-y+z              (1, 1,-1)
+             *        +x-y+z    -x+y-z              (1,-1, 1)
+             *        +x-y-z    -x+y+z              (1,-1,-1)
+             *
+             * We will simply pick the 13 from the left-hand column above, which can be represented
+             * as an integer offset in three dimensions from the middle cube, as shown in the third
+             * column above.
+             */
+
+            neighbours = std::vector<c_vector<int,DIM> >(14);
+
+            neighbours[0](0)  = 1; neighbours[0](1)  = 0; neighbours[0](2)  = 0;
+            neighbours[1](0)  = 0; neighbours[1](1)  = 1; neighbours[1](2)  = 0;
+            neighbours[2](0)  = 0; neighbours[2](1)  = 0; neighbours[2](2)  = 1;
+            neighbours[3](0)  = 1; neighbours[3](1)  = 1; neighbours[3](2)  = 0;
+            neighbours[4](0)  = 1; neighbours[4](1)  = 0; neighbours[4](2)  = 1;
+            neighbours[5](0)  = 1; neighbours[5](1)  =-1; neighbours[5](2)  = 0;
+            neighbours[6](0)  = 1; neighbours[6](1)  = 0; neighbours[6](2)  =-1;
+            neighbours[7](0)  = 0; neighbours[7](1)  = 1; neighbours[7](2)  = 1;
+            neighbours[8](0)  = 0; neighbours[8](1)  = 1; neighbours[8](2)  =-1;
+            neighbours[9](0)  = 1; neighbours[9](1)  = 1; neighbours[9](2)  = 1;
+            neighbours[10](0) = 1; neighbours[10](1) = 1; neighbours[10](2) =-1;
+            neighbours[11](0) = 1; neighbours[11](1) =-1; neighbours[11](2) = 1;
+            neighbours[12](0) = 1; neighbours[12](1) =-1; neighbours[12](2) =-1;
+
+            neighbours[13](0) = 0; neighbours[13](1) = 0; neighbours[13](2) = 0; // current box
+
+            break;
+        }
+        default:
+        {
+            NEVER_REACHED;
+        }
+    }
+
+    // Pass the list of possible neighbours to SetupLocalBoxes()
+    SetupLocalBoxes(neighbours);
+}
 
 template<unsigned DIM>
 void BoxCollection<DIM>::SetupAllLocalBoxes()
 {
+    // Populate a list of all neighbours in this number of dimensions
+    std::vector<c_vector<int,DIM> > neighbours;
+
     switch (DIM)
     {
         case 1:
         {
-            for (unsigned i=0; i<mBoxes.size(); i++)
+            // 3 neighbours
+            neighbours.clear();
+
+            for (int x_dim = -1 ; x_dim < 2 ; x_dim++)
             {
-                std::set<unsigned> local_boxes;
+                c_vector<int,DIM> neighbour;
+                neighbour(0) = x_dim;
 
-                local_boxes.insert(i);
-
-                // add the two neighbours
-                if (i!=0)
-                {
-                    local_boxes.insert(i-1);
-                }
-                if (i+1 != mNumBoxesEachDirection(0))
-                {
-                    local_boxes.insert(i+1);
-                }
-
-                mLocalBoxes.push_back(local_boxes);
+                neighbours.push_back(neighbour);
             }
+
             break;
         }
         case 2:
         {
-            mLocalBoxes.clear();
+            // 3x3 neighbours
+            neighbours.clear();
 
-            unsigned M = mNumBoxesEachDirection(0);
-            unsigned N = mNumBoxesEachDirection(1);
-
-            std::vector<bool> is_xmin(N*M); // far left
-            std::vector<bool> is_xmax(N*M); // far right
-            std::vector<bool> is_ymin(N*M); // bottom
-            std::vector<bool> is_ymax(N*M); // top
-
-            for (unsigned i=0; i<M*N; i++)
+            for (int x_dim = -1 ; x_dim < 2 ; x_dim++)
             {
-                is_xmin[i] = (i%M==0);
-                is_xmax[i] = ((i+1)%M==0);
-                is_ymin[i] = (i%(M*N)<M);
-                is_ymax[i] = (i%(M*N)>=(N-1)*M);
+                for (int y_dim = -1 ; y_dim < 2 ; y_dim++)
+                {
+                    c_vector<int,DIM> neighbour;
+                    neighbour(0) = x_dim;
+                    neighbour(1) = y_dim;
+
+                    neighbours.push_back(neighbour);
+                }
             }
 
-            for (unsigned i=0; i<mBoxes.size(); i++)
-            {
-                std::set<unsigned> local_boxes;
-
-                local_boxes.insert(i);
-
-                // add the box to the left
-                if (!is_xmin[i])
-                {
-                    local_boxes.insert(i-1);
-                }
-                else // Add Periodic Box if needed
-                {
-                    if(mIsPeriodicInX)
-                    {
-                        local_boxes.insert(i+M-1);
-                    }
-                }
-
-                // add the box to the right
-                if (!is_xmax[i])
-                {
-                    local_boxes.insert(i+1);
-                }
-                else // Add Periodic Box if needed
-                {
-                    if(mIsPeriodicInX)
-                    {
-                        local_boxes.insert(i-M+1);
-                    }
-                }
-
-                // add the one below
-                if (!is_ymin[i])
-                {
-                    local_boxes.insert(i-M);
-                }
-
-                // add the one above
-                if (!is_ymax[i])
-                {
-                    local_boxes.insert(i+M);
-                }
-
-                // add the four corner boxes
-
-                if ( (!is_xmin[i]) && (!is_ymin[i]) )
-                {
-                    local_boxes.insert(i-1-M);
-                }
-                if ( (!is_xmin[i]) && (!is_ymax[i]) )
-                {
-                    local_boxes.insert(i-1+M);
-                }
-                if ( (!is_xmax[i]) && (!is_ymin[i]) )
-                {
-                    local_boxes.insert(i+1-M);
-                }
-                if ( (!is_xmax[i]) && (!is_ymax[i]) )
-                {
-                    local_boxes.insert(i+1+M);
-                }
-
-                // Add Periodic Corner Boxes if needed
-                if(mIsPeriodicInX)
-                {
-                    if( (is_xmin[i]) && (!is_ymin[i]) )
-                    {
-                        local_boxes.insert(i-1);
-                    }
-                    if ( (is_xmin[i]) && (!is_ymax[i]) )
-                    {
-                        local_boxes.insert(i-1+2*M);
-                    }
-                    if ( (is_xmax[i]) && (!is_ymin[i]) )
-                    {
-                        local_boxes.insert(i+1-2*M);
-                    }
-                    if ( (is_xmax[i]) && (!is_ymax[i]) )
-                    {
-                        local_boxes.insert(i+1);
-                    }
-                }
-
-                mLocalBoxes.push_back(local_boxes);
-            }
             break;
         }
         case 3:
         {
-            mLocalBoxes.clear();
+            // 3x3x3 neighbours
+            neighbours.clear();
 
-            unsigned M = mNumBoxesEachDirection(0);
-            unsigned N = mNumBoxesEachDirection(1);
-            unsigned P = mNumBoxesEachDirection(2);
-
-            std::vector<bool> is_xmin(N*M*P); // far left
-            std::vector<bool> is_xmax(N*M*P); // far right
-            std::vector<bool> is_ymin(N*M*P); // nearest
-            std::vector<bool> is_ymax(N*M*P); // furthest
-            std::vector<bool> is_zmin(N*M*P); // bottom layer
-            std::vector<bool> is_zmax(N*M*P); // top layer
-
-            for (unsigned i=0; i<M*N*P; i++)
+            for (int x_dim = -1 ; x_dim < 2 ; x_dim++)
             {
-                is_xmin[i] = (i%M==0);
-                is_xmax[i] = ((i+1)%M==0);
-                is_ymin[i] = (i%(M*N)<M);
-                is_ymax[i] = (i%(M*N)>=(N-1)*M);
-                is_zmin[i] = (i<M*N);
-                is_zmax[i] = (i>=M*N*(P-1));
+                for (int y_dim = -1 ; y_dim < 2 ; y_dim++)
+                {
+                    for (int z_dim = -1 ; z_dim < 2 ; z_dim++)
+                    {
+                        c_vector<int,DIM> neighbour;
+                        neighbour(0) = x_dim;
+                        neighbour(1) = y_dim;
+                        neighbour(2) = z_dim;
+
+                        neighbours.push_back(neighbour);
+                    }
+                }
             }
 
-            for (unsigned i=0; i<mBoxes.size(); i++)
-            {
-                std::set<unsigned> local_boxes;
-
-                // add itself as a local box
-                local_boxes.insert(i);
-
-                // now add all 26 other neighbours.....
-
-                // add the box left
-                if (!is_xmin[i])
-                {
-                    local_boxes.insert(i-1);
-
-                    // plus some others towards the left
-                    if (!is_ymin[i])
-                    {
-                        local_boxes.insert(i-1-M);
-                    }
-
-                    if (!is_ymax[i])
-                    {
-                        local_boxes.insert(i-1+M);
-                    }
-
-                    if (!is_zmin[i])
-                    {
-                        local_boxes.insert(i-1-M*N);
-                    }
-
-                    if (!is_zmax[i])
-                    {
-                        local_boxes.insert(i-1+M*N);
-                    }
-                }
-
-                // add the box to the right
-                if (!is_xmax[i])
-                {
-                    local_boxes.insert(i+1);
-
-                    // plus some others towards the right
-                    if (!is_ymin[i])
-                    {
-                        local_boxes.insert(i+1-M);
-                    }
-
-                    if (!is_ymax[i])
-                    {
-                        local_boxes.insert(i+1+M);
-                    }
-
-                    if (!is_zmin[i])
-                    {
-                        local_boxes.insert(i+1-M*N);
-                    }
-
-                    if (!is_zmax[i])
-                    {
-                        local_boxes.insert(i+1+M*N);
-                    }
-                }
-
-                // add the boxes next along the y axis
-                if (!is_ymin[i])
-                {
-                    local_boxes.insert(i-M);
-
-                    // and more in this plane
-                    if (!is_zmin[i])
-                    {
-                        local_boxes.insert(i-M-M*N);
-                    }
-
-                    if (!is_zmax[i])
-                    {
-                        local_boxes.insert(i-M+M*N);
-                    }
-                }
-
-                // add the boxes next along the y axis
-                if (!is_ymax[i])
-                {
-                    local_boxes.insert(i+M);
-
-                    // and more in this plane
-                    if (!is_zmin[i])
-                    {
-                        local_boxes.insert(i+M-M*N);
-                    }
-
-                    if (!is_zmax[i])
-                    {
-                        local_boxes.insert(i+M+M*N);
-                    }
-                }
-
-                // add the box directly above
-                if (!is_zmin[i])
-                {
-                    local_boxes.insert(i-N*M);
-                }
-
-                // add the box directly below
-                if (!is_zmax[i])
-                {
-                    local_boxes.insert(i+N*M);
-                }
-
-                // finally, the 8 corners are left
-
-                if ( (!is_xmin[i]) && (!is_ymin[i]) && (!is_zmin[i]) )
-                {
-                    local_boxes.insert(i-1-M-M*N);
-                }
-
-                if ( (!is_xmin[i]) && (!is_ymin[i]) && (!is_zmax[i]) )
-                {
-                    local_boxes.insert(i-1-M+M*N);
-                }
-
-                if ( (!is_xmin[i]) && (!is_ymax[i]) && (!is_zmin[i]) )
-                {
-                    local_boxes.insert(i-1+M-M*N);
-                }
-
-                if ( (!is_xmin[i]) && (!is_ymax[i]) && (!is_zmax[i]) )
-                {
-                    local_boxes.insert(i-1+M+M*N);
-                }
-
-                if ( (!is_xmax[i]) && (!is_ymin[i]) && (!is_zmin[i]) )
-                {
-                    local_boxes.insert(i+1-M-M*N);
-                }
-
-                if ( (!is_xmax[i]) && (!is_ymin[i]) && (!is_zmax[i]) )
-                {
-                    local_boxes.insert(i+1-M+M*N);
-                }
-
-                if ( (!is_xmax[i]) && (!is_ymax[i]) && (!is_zmin[i]) )
-                {
-                    local_boxes.insert(i+1+M-M*N);
-                }
-
-                if ( (!is_xmax[i]) && (!is_ymax[i]) && (!is_zmax[i]) )
-                {
-                    local_boxes.insert(i+1+M+M*N);
-                }
-
-                mLocalBoxes.push_back(local_boxes);
-            }
             break;
         }
         default:
+        {
             NEVER_REACHED;
+        }
+    }
+
+    // Pass the list of possible neighbours to SetupLocalBoxes()
+    SetupLocalBoxes(neighbours);
+}
+
+template<unsigned DIM>
+void BoxCollection<DIM>::SetupLocalBoxes(std::vector<c_vector<int, DIM> > neighbours)
+{
+    mLocalBoxes.clear();
+
+    // Loop over all boxes and add all necessary local boxes
+    for (unsigned box_idx = 0 ; box_idx < mBoxes.size() ; box_idx++)
+    {
+        std::set<unsigned> local_boxes;
+
+        // The grid indices (i), (i,j) or (i,j,k) depending on DIM, corresponding to box_idx
+        c_vector<int, DIM> grid_indices = GetGridIndices(box_idx);
+
+        // Check all neighbours (1 or 2 in 1D, 4 or 8 in 2D, 13 or 26 in 3D) and add them as local
+        // boxes if they are in the domain
+        for (unsigned neighbour = 0 ; neighbour < neighbours.size() ; neighbour++)
+        {
+            if (IsBoxInDomain(grid_indices + neighbours[neighbour]))
+            {
+                local_boxes.insert(GetLinearIndex(grid_indices + neighbours[neighbour]));
+            }
+        }
+
+        /*
+         * If we are in a periodic domain, we need to add additional boxes if the
+         * current box is in the penultimate position of any dimension.
+         *
+         * The additional boxes we need to add are just all the neighbours of the box
+         * in the final position in that dimension.  Because we use set::insert, it
+         * doesn't matter if we try and add the same box multiple times (only one
+         * copy of the index will be included).
+         */
+
+        // Find if the current indices are penultimate in any dimension in which collection is periodic
+        c_vector<bool,DIM> is_penultimate_periodic = IsIndexPenultimate(grid_indices);
+        unsigned num_penultimate_periodic_dimensions = 0;
+
+        for (unsigned dim = 0 ; dim < DIM ; dim++)
+        {
+            is_penultimate_periodic(dim) = is_penultimate_periodic(dim) && mIsDomainPeriodic(dim);
+            if (is_penultimate_periodic(dim))
+            {
+                num_penultimate_periodic_dimensions++;
+            }
+        }
+
+        // First, deal with at least one penultimate dimension
+        if (num_penultimate_periodic_dimensions > 0)
+        {
+            // Loop over each dimension.  If penultimate in dimension DIM move one box and add all neighbours
+            for (unsigned dim = 0 ; dim < DIM ; dim++)
+            {
+                if (is_penultimate_periodic(dim))
+                {
+                    // If we're penultimate in dimension dim, move to the final location and add each neighbour as before.
+                    // The call to IsBoxInDomain() will handle periodicity.
+                    c_vector<int,DIM> ultimate_indices = grid_indices;
+                    ultimate_indices(dim) ++;
+
+                    for (unsigned neighbour = 0 ; neighbour < neighbours.size() ; neighbour++)
+                    {
+                        if (IsBoxInDomain(ultimate_indices + neighbours[neighbour]))
+                        {
+                            local_boxes.insert(GetLinearIndex(ultimate_indices + neighbours[neighbour]));
+                        }
+                    }
+                }
+            }
+        }
+
+        // The final consideration is cases of multiple dimensions of periodicity.
+        if (num_penultimate_periodic_dimensions > 1)
+        {
+            switch (DIM)
+            {
+                case 2:
+                {
+                    // Must have x and y periodicity - just have to add one extra box
+                    assert(mIsDomainPeriodic(0) && mIsDomainPeriodic(1));
+
+                    local_boxes.insert(0);
+
+                    break;
+                }
+                case 3:
+                {
+                    // Could have X and Y, X and Z, Y and Z, or X, Y and Z periodicity
+
+                    // X and Y
+                    if (is_penultimate_periodic(0) && is_penultimate_periodic(1))
+                    {
+                        c_vector<int,DIM> ultimate_indices = grid_indices;
+                        ultimate_indices(0) ++;
+                        ultimate_indices(1) ++;
+
+                        for (unsigned neighbour = 0 ; neighbour < neighbours.size() ; neighbour++)
+                        {
+                            if (IsBoxInDomain(ultimate_indices + neighbours[neighbour]))
+                            {
+                                local_boxes.insert(GetLinearIndex(ultimate_indices + neighbours[neighbour]));
+                            }
+                        }
+                    }
+
+                    // X and Z
+                    if (is_penultimate_periodic(0) && is_penultimate_periodic(2))
+                    {
+                        c_vector<int,DIM> ultimate_indices = grid_indices;
+                        ultimate_indices(0) ++;
+                        ultimate_indices(2) ++;
+
+                        for (unsigned neighbour = 0 ; neighbour < neighbours.size() ; neighbour++)
+                        {
+                            if (IsBoxInDomain(ultimate_indices + neighbours[neighbour]))
+                            {
+                                local_boxes.insert(GetLinearIndex(ultimate_indices + neighbours[neighbour]));
+                            }
+                        }
+                    }
+
+                    // Y and Z
+                    if (is_penultimate_periodic(1) && is_penultimate_periodic(2))
+                    {
+                        c_vector<int,DIM> ultimate_indices = grid_indices;
+                        ultimate_indices(1) ++;
+                        ultimate_indices(2) ++;
+
+                        for (unsigned neighbour = 0 ; neighbour < neighbours.size() ; neighbour++)
+                        {
+                            if (IsBoxInDomain(ultimate_indices + neighbours[neighbour]))
+                            {
+                                local_boxes.insert(GetLinearIndex(ultimate_indices + neighbours[neighbour]));
+                            }
+                        }
+                    }
+
+                    // X Y and Z
+                    if (num_penultimate_periodic_dimensions == 3)
+                    {
+                        assert(mIsDomainPeriodic(0) && mIsDomainPeriodic(1) && mIsDomainPeriodic(1));
+                        local_boxes.insert(0);
+                    }
+
+                    break;
+                }
+                default:
+                {
+                    NEVER_REACHED;
+                }
+            }
+        }
+
+        // Add the local boxes to the member vector
+        mLocalBoxes.push_back(local_boxes);
     }
 }
 
@@ -700,62 +669,69 @@ std::set<unsigned> BoxCollection<DIM>::GetLocalBoxes(unsigned boxIndex)
 }
 
 template<unsigned DIM>
-const c_vector<double, 2*DIM>& BoxCollection<DIM>::rGetDomainSize() const
+const c_vector<double, 2 * DIM>& BoxCollection<DIM>::rGetDomainSize() const
 {
     return mDomainSize;
 }
 
 template<unsigned DIM>
-void BoxCollection<DIM>::CalculateNodePairs(std::vector<Node<DIM>*>& rNodes, std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours)
+void BoxCollection<DIM>::CalculateNodePairs(std::vector<Node<DIM>*>& rNodes,
+                                            std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs,
+                                            std::map<unsigned, std::set<unsigned> >& rNodeNeighbours)
 {
     rNodePairs.clear();
     rNodeNeighbours.clear();
 
-    // Create an empty set of neighbours for each node
-    for (unsigned node_index=0; node_index<rNodes.size(); node_index++)
+    // Ensure all boxes are empty
+    EmptyBoxes();
+
+    // Create an empty set of neighbours for each node, and add each node to its correct box
+    for (unsigned node_index = 0; node_index < rNodes.size(); node_index++)
     {
         rNodeNeighbours[node_index] = std::set<unsigned>();
+
+        unsigned box_index = CalculateContainingBox(rNodes[node_index]);
+        mBoxes[box_index].AddNode(rNodes[node_index]);
     }
 
-    for (unsigned i=0; i<rNodes.size(); i++)
+    for (unsigned i = 0; i < rNodes.size(); i++)
     {
-        unsigned node_index = rNodes[i]->GetIndex();
+        Node<DIM>* this_node = rNodes[i];
+        unsigned node_index = this_node->GetIndex();
 
         // Get the box containing this node
-        unsigned box_index = CalculateContainingBox(rNodes[i]);
+        unsigned this_node_box_index = CalculateContainingBox(this_node);
 
         // Get the local boxes to this node
-        std::set<unsigned> local_boxes_indices = GetLocalBoxes(box_index);
+        std::set<unsigned> local_boxes_indices = GetLocalBoxes(this_node_box_index);
 
         // Loop over all the local boxes
-        for (std::set<unsigned>::iterator box_iter = local_boxes_indices.begin();
-             box_iter != local_boxes_indices.end();
-             box_iter++)
+        for (std::set<unsigned>::iterator box_iter = local_boxes_indices.begin(); box_iter != local_boxes_indices.end();
+                box_iter++)
         {
             // Get the set of nodes contained in this box
-            std::set< Node<DIM>* >& r_contained_nodes = mBoxes[*box_iter].rGetNodesContained();
+            std::set<Node<DIM>*>& r_contained_nodes = mBoxes[*box_iter].rGetNodesContained();
 
             // Loop over these nodes
             for (typename std::set<Node<DIM>*>::iterator node_iter = r_contained_nodes.begin();
-                 node_iter != r_contained_nodes.end();
-                 ++node_iter)
+                    node_iter != r_contained_nodes.end(); ++node_iter)
             {
                 // Get the index of the other node
                 unsigned other_node_index = (*node_iter)->GetIndex();
 
                 // If we're in the same box, then take care not to store the node pair twice
-                if (*box_iter == box_index)
+                if (*box_iter == this_node_box_index)
                 {
-                    if (other_node_index > rNodes[i]->GetIndex())
+                    if (other_node_index > this_node->GetIndex())
                     {
-                        rNodePairs.push_back(std::pair<Node<DIM>*, Node<DIM>*>(rNodes[i], (*node_iter)));
+                        rNodePairs.push_back(std::pair<Node<DIM>*, Node<DIM>*>(this_node, (*node_iter)));
                         rNodeNeighbours[node_index].insert(other_node_index);
                         rNodeNeighbours[other_node_index].insert(node_index);
                     }
                 }
                 else
                 {
-                    rNodePairs.push_back(std::pair<Node<DIM>*, Node<DIM>*>(rNodes[i], (*node_iter)));
+                    rNodePairs.push_back(std::pair<Node<DIM>*, Node<DIM>*>(this_node, (*node_iter)));
                     rNodeNeighbours[node_index].insert(other_node_index);
                     rNodeNeighbours[other_node_index].insert(node_index);
                 }

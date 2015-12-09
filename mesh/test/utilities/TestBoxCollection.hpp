@@ -36,6 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTBOXCOLLECTION_HPP_
 
 #include <cxxtest/TestSuite.h>
+#include <RandomNumberGenerator.hpp>
 
 #include "CheckpointArchiveTypes.hpp"
 
@@ -44,6 +45,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TrianglesMeshReader.hpp"
 
 #include "PetscSetupAndFinalize.hpp"
+
+#include "Timer.hpp"
+#include "Debug.hpp"
 
 class TestBoxCollection : public CxxTest::TestSuite
 {
@@ -78,6 +82,56 @@ public:
         test_box.RemoveNode(&test_node);
         std::set< Node<2>* > nodes_contained_after = test_box.rGetNodesContained();
         TS_ASSERT(nodes_contained_after.empty());
+    }
+
+    void TestIndexing() throw (Exception)
+    {
+        // 1D
+        {
+            c_vector<double, 2> domain_size;
+            domain_size(0) = 0.0; // min x
+            domain_size(1) = 1.0; // max x
+
+            BoxCollection<1> box_collection(0.123, domain_size);
+
+            TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 9u);
+
+            for (unsigned i = 0 ; i < box_collection.GetNumBoxes() ; i++)
+            {
+                c_vector<int, 1> grid_indices = box_collection.GetGridIndices(i);
+
+                TS_ASSERT_EQUALS(grid_indices(0), i);
+                TS_ASSERT_EQUALS(box_collection.GetLinearIndex(grid_indices), i);
+            }
+        }
+
+        // 2D
+        {
+            c_vector<double, 4> domain_size;
+            domain_size(0) = 0.0; // min x
+            domain_size(1) = 1.0; // max x
+            domain_size(2) = 0.0; // min y
+            domain_size(3) = 1.0; // max y
+
+            BoxCollection<2> box_collection(0.123, domain_size);
+
+            TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 81u);
+        }
+
+        // 3D
+        {
+            c_vector<double, 6> domain_size;
+            domain_size(0) = 0.0; // min x
+            domain_size(1) = 1.0; // max x
+            domain_size(2) = 0.0; // min y
+            domain_size(3) = 1.0; // max y
+            domain_size(4) = 0.0; // min z
+            domain_size(5) = 1.0; // max z
+
+            BoxCollection<3> box_collection(0.123, domain_size);
+
+            TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 729u);
+        }
     }
 
 
@@ -144,7 +198,7 @@ public:
 
         c_vector<double,1> miles_away;
         miles_away(0) = 47323854;
-        TS_ASSERT_THROWS_CONTAINS(box_collection.CalculateContainingBox(miles_away), "The point provided is outside all of the boxes");
+        TS_ASSERT_THROWS_CONTAINS(box_collection.CalculateContainingBox(miles_away), "Location does not correspond to any box.");
     }
 
 
@@ -278,9 +332,11 @@ public:
 
         std::set<unsigned> local_boxes_to_box_10 = box_collection.GetLocalBoxes(10);
         std::set<unsigned> correct_answer_10;
+        correct_answer_10.insert(4);
         correct_answer_10.insert(5);
         correct_answer_10.insert(6);
         correct_answer_10.insert(7);
+        correct_answer_10.insert(8);
         correct_answer_10.insert(9);
         correct_answer_10.insert(10);
         correct_answer_10.insert(11);
@@ -295,6 +351,108 @@ public:
         correct_answer_11.insert(10);
         correct_answer_11.insert(11);
         TS_ASSERT_EQUALS(local_boxes_to_box_11, correct_answer_11);
+    }
+
+    void TestConvertBetweenLinearAndGridIndices() throw(Exception)
+    {
+        // 1D
+        {
+            c_vector<double, 2 * 1> domain_size;
+            domain_size(0) = 0.0;
+            domain_size(1) = 0.6;
+
+            // This interaction distance will force 6 boxes one with nearly no overlap
+            double interaction_distance = 0.1001;
+
+            BoxCollection<1> box_collection(interaction_distance, domain_size);
+
+            TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 6);
+
+            // Test GetLinearIndex(GetGridIndices()) returns the same value
+            for (unsigned box_idx = 0 ; box_idx < box_collection.GetNumBoxes() ; box_idx++)
+            {
+                TS_ASSERT_EQUALS(box_collection.GetLinearIndex(box_collection.GetGridIndices(box_idx)), box_idx);
+            }
+        }
+
+        // 2D
+        {
+            c_vector<double, 2 * 2> domain_size;
+            domain_size(0) = 0.0;
+            domain_size(1) = 0.6;
+            domain_size(2) = 0.0;
+            domain_size(3) = 0.6;
+
+            // This interaction distance will force 6 boxes in each dim, one with nearly no overlap
+            double interaction_distance = 0.1001;
+
+            BoxCollection<2> box_collection(interaction_distance, domain_size);
+
+            TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 36);
+
+            // Test GetLinearIndex(GetGridIndices()) returns the same value
+            for (unsigned box_idx = 0 ; box_idx < box_collection.GetNumBoxes() ; box_idx++)
+            {
+                TS_ASSERT_EQUALS(box_collection.GetLinearIndex(box_collection.GetGridIndices(box_idx)), box_idx);
+            }
+        }
+
+        // 3D
+        {
+            c_vector<double, 2 * 3> domain_size;
+            domain_size(0) = 0.0;
+            domain_size(1) = 0.4;
+            domain_size(2) = 0.0;
+            domain_size(3) = 0.3;
+            domain_size(4) = 0.0;
+            domain_size(5) = 0.2;
+
+            // This interaction distance will force 6 boxes in each dim, one with nearly no overlap
+            double interaction_distance = 0.1001;
+
+            BoxCollection<3> box_collection(interaction_distance, domain_size);
+
+            TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 24);
+
+            // Test GetLinearIndex(GetGridIndices()) returns the same value
+            for (unsigned box_idx = 0 ; box_idx < box_collection.GetNumBoxes() ; box_idx++)
+            {
+                TS_ASSERT_EQUALS(box_collection.GetLinearIndex(box_collection.GetGridIndices(box_idx)), box_idx);
+            }
+        }
+    }
+
+    void TestIsBoxInDomain() throw(Exception)
+    {
+        c_vector<double, 2 * 3> domain_size;
+        domain_size(0) = 0.0;
+        domain_size(1) = 0.4;
+        domain_size(2) = 0.0;
+        domain_size(3) = 0.3;
+        domain_size(4) = 0.0;
+        domain_size(5) = 0.2;
+
+        double interaction_distance = 0.1001;
+
+        BoxCollection<3> box_collection(interaction_distance, domain_size);
+
+        TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 24);
+
+        // Test that some boxes are indeed in the domain
+        TS_ASSERT(box_collection.IsBoxInDomain(box_collection.GetGridIndices(19)));
+        TS_ASSERT(box_collection.IsBoxInDomain(box_collection.GetGridIndices(11)));
+
+        // Test that the method correctly states a 'box' is not in the domain
+        c_vector<int, 3> test_point_0;
+        test_point_0(0) = 0;
+        test_point_0(1) = 1;
+        test_point_0(2) = -1;
+
+        TS_ASSERT(!box_collection.IsBoxInDomain(test_point_0));
+
+        TS_ASSERT(box_collection.IsBoxInDomain(box_collection.GetGridIndices(19) + test_point_0));
+
+
     }
 
 
@@ -448,6 +606,7 @@ public:
         {
             pairs_returned.insert(pairs_returned_vector[i]);
         }
+
         std::map<unsigned, std::set<unsigned> > neighbours_should_be;
         neighbours_should_be[0].insert(1);
         neighbours_should_be[0].insert(2);
@@ -531,39 +690,6 @@ public:
                 TS_ASSERT_LESS_THAN(y_position, box_min_max_values(3)+epsilon);
             }
         }
-
-        // Have checked that all the local boxes are calculated correctly on a 5 by 6 grid - here we
-        // hardcode a few checks on the 7 by 7 grid.
-        std::set<unsigned> local_boxes_to_box_0 = box_collection.GetLocalBoxes(0);
-        std::set<unsigned> correct_answer_0;
-        correct_answer_0.insert(0);
-        correct_answer_0.insert(1);
-        correct_answer_0.insert(7);
-        correct_answer_0.insert(8);
-        TS_ASSERT_EQUALS(local_boxes_to_box_0, correct_answer_0);
-
-        std::set<unsigned> local_boxes_to_box_4 = box_collection.GetLocalBoxes(4);
-        std::set<unsigned> correct_answer_4;
-        correct_answer_4.insert(4);
-        correct_answer_4.insert(5);
-        correct_answer_4.insert(10);
-        correct_answer_4.insert(11);
-        correct_answer_4.insert(12);
-        TS_ASSERT_EQUALS(local_boxes_to_box_4, correct_answer_4);
-
-        std::set<unsigned> local_boxes_to_box_10 = box_collection.GetLocalBoxes(10);
-        std::set<unsigned> correct_answer_10;
-        correct_answer_10.insert(10);
-        correct_answer_10.insert(11);
-        correct_answer_10.insert(16);
-        correct_answer_10.insert(17);
-        correct_answer_10.insert(18);
-        TS_ASSERT_EQUALS(local_boxes_to_box_10, correct_answer_10);
-
-        std::set<unsigned> local_boxes_to_box_48 = box_collection.GetLocalBoxes(48);
-        std::set<unsigned> correct_answer_48;
-        correct_answer_48.insert(48);
-        TS_ASSERT_EQUALS(local_boxes_to_box_48, correct_answer_48);
     }
 
     /* This test insert to verify repeatability of BoxCollection floating point
@@ -632,7 +758,6 @@ public:
 
         box_collection.SetupLocalBoxesHalfOnly();
 
-
         for (unsigned i=0; i<nodes.size(); i++)
         {
             unsigned box_index = box_collection.CalculateContainingBox(nodes[i]);
@@ -695,25 +820,26 @@ public:
 
         std::set< std::pair<Node<2>*, Node<2>* > > pairs_should_be;
         pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[0],nodes[1]));
+        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[2],nodes[5]));
         pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[2],nodes[7]));
         pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[2],nodes[8]));
+        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[3],nodes[2]));
         pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[3],nodes[4]));
         pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[3],nodes[5]));
         pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[3],nodes[7]));
         pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[3],nodes[8]));
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[3],nodes[2]));
+        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[4],nodes[2]));
         pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[4],nodes[5]));
         pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[4],nodes[7]));
         pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[4],nodes[8]));
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[4],nodes[2]));
         pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[5],nodes[6]));
         pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[5],nodes[7]));
         pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[5],nodes[8]));
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[5],nodes[2]));
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[6],nodes[7]));
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[6],nodes[8]));
+        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[7],nodes[6]));
         pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[7],nodes[8]));
+        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[8],nodes[6]));
 
+        TS_ASSERT_EQUALS(pairs_should_be.size(), pairs_returned.size());
         TS_ASSERT_EQUALS(pairs_should_be, pairs_returned);
 
         for (unsigned i=0; i<points.size(); i++)
@@ -757,19 +883,19 @@ public:
             box_collection.rGetBox(box_index).AddNode(nodes[i]);
         }
 
-        // Make sure there is exactly one node in each box.
+        // Make sure there is exactly one node in each box
         for (unsigned i=0; i<box_collection.GetNumBoxes(); i++)
         {
             TS_ASSERT_EQUALS(box_collection.rGetBox(i).rGetNodesContained().size(), 1u);
         }
 
-        // Calculate which pairs of node should be pairs
+        // Calculate which pairs of nodes should be pairs
         std::map<unsigned, std::set<unsigned> > neighbours_should_be;
         for (unsigned i=0; i<nodes.size(); i++)
         {
             for (unsigned j=0; j<nodes.size(); j++)
             {
-                if((i < j) && norm_2(nodes[i]->rGetLocation() - nodes[j]->rGetLocation()) < 2.6)    // sqrt ( 1.5^2 + 1.5^2 + 1.5^2) rounded up.
+                if ((i < j) && norm_2(nodes[i]->rGetLocation() - nodes[j]->rGetLocation()) < 2.6)    // sqrt ( 1.5^2 + 1.5^2 + 1.5^2) rounded up.
                 {
                     neighbours_should_be[i].insert(j);
                     neighbours_should_be[j].insert(i);
@@ -777,36 +903,41 @@ public:
             }
         }
 
-        std::vector< std::pair<Node<3>*, Node<3>* > > pairs_returned_vector;
+        std::vector< std::pair<Node<3>*, Node<3>*> > pairs_returned_vector;
         std::map<unsigned, std::set<unsigned> > neighbours_returned;
 
-        box_collection.CalculateNodePairs(nodes,pairs_returned_vector, neighbours_returned);
+        box_collection.CalculateNodePairs(nodes, pairs_returned_vector, neighbours_returned);
 
-        std::set< std::pair<Node<3>*, Node<3>* > > pairs_returned;
+        std::set< std::pair<unsigned, unsigned> > pairs_returned;
         for (unsigned i=0; i<pairs_returned_vector.size(); i++)
         {
-            pairs_returned.insert(pairs_returned_vector[i]);
+            std::pair<Node<3>*, Node<3>* > this_pair = pairs_returned_vector[i];
+            unsigned this_pair_first = (this_pair.first)->GetIndex();
+            unsigned this_pair_second = (this_pair.second)->GetIndex();
+            std::pair<unsigned, unsigned> this_pair_indices(this_pair_first, this_pair_second);
+
+            pairs_returned.insert(this_pair_indices);
         }
 
         // Check that the correct pairs of node 13 (central node) are in the pairs
         std::vector<unsigned> pairs_of_13;
+        pairs_of_13.push_back(2);
         pairs_of_13.push_back(5);
-        pairs_of_13.push_back(6);
         pairs_of_13.push_back(7);
         pairs_of_13.push_back(8);
+        pairs_of_13.push_back(11);
         pairs_of_13.push_back(14);
-        pairs_of_13.push_back(15);
         pairs_of_13.push_back(16);
         pairs_of_13.push_back(17);
+        pairs_of_13.push_back(20);
         pairs_of_13.push_back(22);
         pairs_of_13.push_back(23);
-        pairs_of_13.push_back(24);
         pairs_of_13.push_back(25);
         pairs_of_13.push_back(26);
 
         for (unsigned i=0; i<pairs_of_13.size(); i++)
         {
-            std::pair<Node<3>*, Node<3>* > pair(nodes[13], nodes[pairs_of_13[i]]);
+            std::pair<unsigned, unsigned> pair(nodes[13]->GetIndex(), nodes[pairs_of_13[i]]->GetIndex());
             TS_ASSERT(pairs_returned.find(pair) != pairs_returned.end());
         }
 
@@ -814,21 +945,22 @@ public:
         std::vector<unsigned> not_pairs_of_13;
         not_pairs_of_13.push_back(0);
         not_pairs_of_13.push_back(1);
-        not_pairs_of_13.push_back(2);
         not_pairs_of_13.push_back(3);
         not_pairs_of_13.push_back(4);
+        not_pairs_of_13.push_back(6);
         not_pairs_of_13.push_back(9);
         not_pairs_of_13.push_back(10);
-        not_pairs_of_13.push_back(11);
+        not_pairs_of_13.push_back(12);
         not_pairs_of_13.push_back(13);
+        not_pairs_of_13.push_back(15);
         not_pairs_of_13.push_back(18);
         not_pairs_of_13.push_back(19);
-        not_pairs_of_13.push_back(20);
         not_pairs_of_13.push_back(21);
+        not_pairs_of_13.push_back(24);
 
         for (unsigned i=0; i<not_pairs_of_13.size(); i++)
         {
-            std::pair<Node<3>*, Node<3>* > pair(nodes[13], nodes[not_pairs_of_13[i]]);
+            std::pair<unsigned, unsigned> pair(nodes[13]->GetIndex(), nodes[not_pairs_of_13[i]]->GetIndex());
             TS_ASSERT(pairs_returned.find(pair) == pairs_returned.end());
         }
 
@@ -845,254 +977,552 @@ public:
         }
     }
 
-    void TestPairsReturned2dPeriodic() throw (Exception)
+    void TestLocalBoxesHalfOnly2D() throw (Exception)
     {
-        std::vector< ChastePoint<2>* > points(10);
-        points[0] = new ChastePoint<2>(0.2, 3.7);
-        points[1] = new ChastePoint<2>(0.5, 3.2);
-        points[2] = new ChastePoint<2>(1.1, 1.99);
-        points[3] = new ChastePoint<2>(1.3, 0.8);
-        points[4] = new ChastePoint<2>(1.3, 0.3);
-        points[5] = new ChastePoint<2>(2.2, 0.6);
-        points[6] = new ChastePoint<2>(3.5, 0.2);
-        points[7] = new ChastePoint<2>(2.6, 1.4);
-        points[8] = new ChastePoint<2>(2.4, 1.5);
-        points[9] = new ChastePoint<2>(3.3, 3.6);
-
-        std::vector<Node<2>* > nodes;
-        for (unsigned i=0; i<points.size(); i++)
-        {
-            nodes.push_back(new Node<2>(i, *(points[i]), false));
-        }
-
-        double cut_off_length = 1.0;
-
-        c_vector<double, 2*2> domain_size;
+        // Define parameters for the box collection
+        c_vector<double, 2 * 2> domain_size;
         domain_size(0) = 0.0;
-        domain_size(1) = 4.0-0.01;
+        domain_size(1) = 1.0;
         domain_size(2) = 0.0;
-        domain_size(3) = 4.0-0.01;// so 4*4 boxes
+        domain_size(3) = 1.0;
 
-        BoxCollection<2> box_collection(cut_off_length, domain_size, true); // Periodic in X
+        // This interaction distance will force 10 boxes in each dim, one with nearly no overlap
+        double interaction_distance = 0.1001;
 
-        box_collection.SetupLocalBoxesHalfOnly();
-
-
-        for (unsigned i=0; i<nodes.size(); i++)
+        /**
+         * Create box collection with no periodicity
+         */
         {
-            unsigned box_index = box_collection.CalculateContainingBox(nodes[i]);
-            box_collection.rGetBox(box_index).AddNode(nodes[i]);
+            BoxCollection<2> box_collection(interaction_distance, domain_size, false, false);
+            box_collection.SetupLocalBoxesHalfOnly();
+
+            TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 100);
+
+            std::set<unsigned> calculated_neighbours;
+            std::set<unsigned> correct_neighbours;
+
+            // Test box 0
+            calculated_neighbours = box_collection.GetLocalBoxes(0);
+            correct_neighbours.clear();
+            correct_neighbours.insert(0);
+            correct_neighbours.insert(10);
+            correct_neighbours.insert(11);
+            correct_neighbours.insert(1);
+            TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours);
+
+            // Test representative box
+            calculated_neighbours = box_collection.GetLocalBoxes(54);
+            correct_neighbours.clear();
+            correct_neighbours.insert(54);
+            correct_neighbours.insert(64);
+            correct_neighbours.insert(65);
+            correct_neighbours.insert(55);
+            correct_neighbours.insert(45);
+            TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours);
+
+            // Test top-edge box
+            calculated_neighbours = box_collection.GetLocalBoxes(92);
+            correct_neighbours.clear();
+            correct_neighbours.insert(92);
+            correct_neighbours.insert(93);
+            correct_neighbours.insert(83);
+            TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours);
+
+            // Test penultimate-top box
+            calculated_neighbours = box_collection.GetLocalBoxes(81);
+            correct_neighbours.clear();
+            correct_neighbours.insert(81);
+            correct_neighbours.insert(91);
+            correct_neighbours.insert(92);
+            correct_neighbours.insert(82);
+            correct_neighbours.insert(72);
+            TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours);
+
+            // Test right-edge box
+            calculated_neighbours = box_collection.GetLocalBoxes(49);
+            correct_neighbours.clear();
+            correct_neighbours.insert(49);
+            correct_neighbours.insert(59);
+            TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours);
+
+            // Test penultimate-right box
+            calculated_neighbours = box_collection.GetLocalBoxes(58);
+            correct_neighbours.clear();
+            correct_neighbours.insert(58);
+            correct_neighbours.insert(68);
+            correct_neighbours.insert(69);
+            correct_neighbours.insert(59);
+            correct_neighbours.insert(49);
+            TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours);
+
+            // Test top-right box
+            calculated_neighbours = box_collection.GetLocalBoxes(99);
+            correct_neighbours.clear();
+            correct_neighbours.insert(99);
+            TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours);
+
+            // Test penultimate-top penultimate-right box
+            calculated_neighbours = box_collection.GetLocalBoxes(88);
+            correct_neighbours.clear();
+            correct_neighbours.insert(88);
+            correct_neighbours.insert(98);
+            correct_neighbours.insert(99);
+            correct_neighbours.insert(89);
+            correct_neighbours.insert(79);
+            TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours);
         }
 
-        std::vector< std::pair<Node<2>*, Node<2>* > > pairs_returned_vector;
-        std::map<unsigned, std::set<unsigned> > neighbours_returned;
-
-        box_collection.CalculateNodePairs(nodes, pairs_returned_vector, neighbours_returned);
-
-        std::set< std::pair<Node<2>*, Node<2>* > > pairs_returned;
-        for (unsigned i=0; i<pairs_returned_vector.size(); i++)
+        /**
+         * Create box collection with periodicity in x
+         */
         {
-            pairs_returned.insert(pairs_returned_vector[i]);
+            BoxCollection<2> box_collection(interaction_distance, domain_size, true, false);
+            box_collection.SetupLocalBoxesHalfOnly();
+
+            TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 100);
+
+            std::set<unsigned> calculated_neighbours;
+            std::set<unsigned> correct_neighbours;
+
+            // Test box 0
+            calculated_neighbours = box_collection.GetLocalBoxes(0);
+            correct_neighbours.clear();
+            correct_neighbours.insert(0);
+            correct_neighbours.insert(10);
+            correct_neighbours.insert(11);
+            correct_neighbours.insert(1);
+            TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours);
+
+            // Test representative box
+            calculated_neighbours = box_collection.GetLocalBoxes(54);
+            correct_neighbours.clear();
+            correct_neighbours.insert(54);
+            correct_neighbours.insert(64);
+            correct_neighbours.insert(65);
+            correct_neighbours.insert(55);
+            correct_neighbours.insert(45);
+            TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours);
+
+            // Test top-edge box
+            calculated_neighbours = box_collection.GetLocalBoxes(92);
+            correct_neighbours.clear();
+            correct_neighbours.insert(92);
+            correct_neighbours.insert(93);
+            correct_neighbours.insert(83);
+            TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours);
+
+            // Test penultimate-top box
+            calculated_neighbours = box_collection.GetLocalBoxes(81);
+            correct_neighbours.clear();
+            correct_neighbours.insert(81);
+            correct_neighbours.insert(91);
+            correct_neighbours.insert(92);
+            correct_neighbours.insert(82);
+            correct_neighbours.insert(72);
+            TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours);
+
+            // Test right-edge box
+            calculated_neighbours = box_collection.GetLocalBoxes(49);
+            correct_neighbours.clear();
+            correct_neighbours.insert(49);
+            correct_neighbours.insert(59);
+            correct_neighbours.insert(50);
+            correct_neighbours.insert(40);
+            correct_neighbours.insert(30);
+            TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours);
+
+            // Test penultimate-right box
+            calculated_neighbours = box_collection.GetLocalBoxes(58);
+            correct_neighbours.clear();
+            correct_neighbours.insert(58);
+            correct_neighbours.insert(68);
+            correct_neighbours.insert(69);
+            correct_neighbours.insert(59);
+            correct_neighbours.insert(49);
+            correct_neighbours.insert(60);
+            correct_neighbours.insert(50);
+            correct_neighbours.insert(40);
+            TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours);
+
+            // Test top-right box
+            calculated_neighbours = box_collection.GetLocalBoxes(99);
+            correct_neighbours.clear();
+            correct_neighbours.insert(99);
+            correct_neighbours.insert(90);
+            correct_neighbours.insert(80);
+            TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours);
+
+            // Test penultimate-top penultimate-right box
+            calculated_neighbours = box_collection.GetLocalBoxes(88);
+            correct_neighbours.clear();
+            correct_neighbours.insert(88);
+            correct_neighbours.insert(98);
+            correct_neighbours.insert(99);
+            correct_neighbours.insert(89);
+            correct_neighbours.insert(79);
+            correct_neighbours.insert(90);
+            correct_neighbours.insert(80);
+            correct_neighbours.insert(70);
+            TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours);
         }
 
-        std::map<unsigned, std::set<unsigned> > neighbours_should_be;
-
-        neighbours_should_be[0].insert(1);
-        neighbours_should_be[0].insert(9);
-
-        neighbours_should_be[1].insert(0);
-        neighbours_should_be[1].insert(9);
-
-        neighbours_should_be[2].insert(3);
-        neighbours_should_be[2].insert(4);
-        neighbours_should_be[2].insert(5);
-        neighbours_should_be[2].insert(7);
-        neighbours_should_be[2].insert(8);
-
-        neighbours_should_be[3].insert(2);
-        neighbours_should_be[3].insert(4);
-        neighbours_should_be[3].insert(5);
-        neighbours_should_be[3].insert(7);
-        neighbours_should_be[3].insert(8);
-
-        neighbours_should_be[4].insert(2);
-        neighbours_should_be[4].insert(3);
-        neighbours_should_be[4].insert(5);
-        neighbours_should_be[4].insert(7);
-        neighbours_should_be[4].insert(8);
-
-        neighbours_should_be[5].insert(2);
-        neighbours_should_be[5].insert(3);
-        neighbours_should_be[5].insert(4);
-        neighbours_should_be[5].insert(6);
-        neighbours_should_be[5].insert(7);
-        neighbours_should_be[5].insert(8);
-
-        neighbours_should_be[6].insert(5);
-        neighbours_should_be[6].insert(7);
-        neighbours_should_be[6].insert(8);
-
-        neighbours_should_be[7].insert(2);
-        neighbours_should_be[7].insert(3);
-        neighbours_should_be[7].insert(4);
-        neighbours_should_be[7].insert(5);
-        neighbours_should_be[7].insert(6);
-        neighbours_should_be[7].insert(8);
-
-        neighbours_should_be[8].insert(2);
-        neighbours_should_be[8].insert(3);
-        neighbours_should_be[8].insert(4);
-        neighbours_should_be[8].insert(5);
-        neighbours_should_be[8].insert(6);
-        neighbours_should_be[8].insert(7);
-
-        neighbours_should_be[9].insert(0);
-        neighbours_should_be[9].insert(1);
-
-        TS_ASSERT_EQUALS(neighbours_should_be, neighbours_returned);
-
-        std::set< std::pair<Node<2>*, Node<2>* > > pairs_should_be;
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[0],nodes[1]));
-
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[2],nodes[7]));
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[2],nodes[8]));
-
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[3],nodes[4]));
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[3],nodes[5]));
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[3],nodes[7]));
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[3],nodes[8]));
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[3],nodes[2]));
-
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[4],nodes[5]));
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[4],nodes[7]));
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[4],nodes[8]));
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[4],nodes[2]));
-
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[5],nodes[6]));
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[5],nodes[7]));
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[5],nodes[8]));
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[5],nodes[2]));
-
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[6],nodes[7]));
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[6],nodes[8]));
-
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[7],nodes[8]));
-
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[9],nodes[0]));
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[9],nodes[1]));
-
-        TS_ASSERT_EQUALS(pairs_should_be.size(), pairs_returned.size());
-        TS_ASSERT_EQUALS(pairs_should_be, pairs_returned);
-
-        for (unsigned i=0; i<points.size(); i++)
+        /**
+         * Create box collection with periodicity in y
+         */
         {
-            delete nodes[i];
-            delete points[i];
+            BoxCollection<2> box_collection(interaction_distance, domain_size, false, true);
+            box_collection.SetupLocalBoxesHalfOnly();
+
+            TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 100);
+
+            std::set<unsigned> calculated_neighbours;
+            std::set<unsigned> correct_neighbours;
+
+            // Test box 0
+            calculated_neighbours = box_collection.GetLocalBoxes(0);
+            correct_neighbours.clear();
+            correct_neighbours.insert(0);
+            correct_neighbours.insert(10);
+            correct_neighbours.insert(11);
+            correct_neighbours.insert(1);
+            correct_neighbours.insert(91);
+            TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours);
+
+
+            // Test representative box
+            calculated_neighbours = box_collection.GetLocalBoxes(54);
+            correct_neighbours.clear();
+            correct_neighbours.insert(54);
+            correct_neighbours.insert(64);
+            correct_neighbours.insert(65);
+            correct_neighbours.insert(55);
+            correct_neighbours.insert(45);
+            TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours);
+
+            // Test top-edge box
+            calculated_neighbours = box_collection.GetLocalBoxes(92);
+            correct_neighbours.clear();
+            correct_neighbours.insert(92);
+            correct_neighbours.insert(2);
+            correct_neighbours.insert(3);
+            correct_neighbours.insert(93);
+            correct_neighbours.insert(83);
+            TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours);
+
+            // Test penultimate-top box
+            calculated_neighbours = box_collection.GetLocalBoxes(81);
+            correct_neighbours.clear();
+            correct_neighbours.insert(81);
+            correct_neighbours.insert(91);
+            correct_neighbours.insert(92);
+            correct_neighbours.insert(82);
+            correct_neighbours.insert(72);
+            correct_neighbours.insert(1);
+            correct_neighbours.insert(2);
+            TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours);
+
+            // Test right-edge box
+            calculated_neighbours = box_collection.GetLocalBoxes(49);
+            correct_neighbours.clear();
+            correct_neighbours.insert(49);
+            correct_neighbours.insert(59);
+            TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours);
+
+            // Test penultimate-right box
+            calculated_neighbours = box_collection.GetLocalBoxes(58);
+            correct_neighbours.clear();
+            correct_neighbours.insert(58);
+            correct_neighbours.insert(68);
+            correct_neighbours.insert(69);
+            correct_neighbours.insert(59);
+            correct_neighbours.insert(49);
+            TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours);
+
+            // Test top-right box
+            calculated_neighbours = box_collection.GetLocalBoxes(99);
+            correct_neighbours.clear();
+            correct_neighbours.insert(99);
+            correct_neighbours.insert(9);
+            TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours);
+
+            // Test penultimate-top penultimate-right box
+            calculated_neighbours = box_collection.GetLocalBoxes(88);
+            correct_neighbours.clear();
+            correct_neighbours.insert(88);
+            correct_neighbours.insert(98);
+            correct_neighbours.insert(99);
+            correct_neighbours.insert(89);
+            correct_neighbours.insert(79);
+            correct_neighbours.insert(8);
+            correct_neighbours.insert(9);
+            TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours);
+        }
+
+        /**
+         * Create box collection with periodicity in x and y
+         */
+        {
+            BoxCollection<2> box_collection(interaction_distance, domain_size, true, true);
+            box_collection.SetupLocalBoxesHalfOnly();
+
+            TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 100);
+
+            std::set<unsigned> calculated_neighbours;
+            std::set<unsigned> correct_neighbours;
+
+            // Test box 0
+            calculated_neighbours = box_collection.GetLocalBoxes(0);
+            correct_neighbours.clear();
+            correct_neighbours.insert(0);
+            correct_neighbours.insert(10);
+            correct_neighbours.insert(11);
+            correct_neighbours.insert(1);
+            correct_neighbours.insert(91);
+            TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours);
+
+
+            // Test representative box
+            calculated_neighbours = box_collection.GetLocalBoxes(54);
+            correct_neighbours.clear();
+            correct_neighbours.insert(54);
+            correct_neighbours.insert(64);
+            correct_neighbours.insert(65);
+            correct_neighbours.insert(55);
+            correct_neighbours.insert(45);
+            TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours);
+
+            // Test top-edge box
+            calculated_neighbours = box_collection.GetLocalBoxes(92);
+            correct_neighbours.clear();
+            correct_neighbours.insert(92);
+            correct_neighbours.insert(2);
+            correct_neighbours.insert(3);
+            correct_neighbours.insert(93);
+            correct_neighbours.insert(83);
+            TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours);
+
+            // Test penultimate-top box
+            calculated_neighbours = box_collection.GetLocalBoxes(81);
+            correct_neighbours.clear();
+            correct_neighbours.insert(81);
+            correct_neighbours.insert(91);
+            correct_neighbours.insert(92);
+            correct_neighbours.insert(82);
+            correct_neighbours.insert(72);
+            correct_neighbours.insert(1);
+            correct_neighbours.insert(2);
+            TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours);
+
+            // Test right-edge box
+            calculated_neighbours = box_collection.GetLocalBoxes(49);
+            correct_neighbours.clear();
+            correct_neighbours.insert(49);
+            correct_neighbours.insert(59);
+            correct_neighbours.insert(50);
+            correct_neighbours.insert(40);
+            correct_neighbours.insert(30);
+            TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours);
+
+            // Test penultimate-right box
+            calculated_neighbours = box_collection.GetLocalBoxes(58);
+            correct_neighbours.clear();
+            correct_neighbours.insert(58);
+            correct_neighbours.insert(68);
+            correct_neighbours.insert(69);
+            correct_neighbours.insert(59);
+            correct_neighbours.insert(49);
+            correct_neighbours.insert(60);
+            correct_neighbours.insert(50);
+            correct_neighbours.insert(40);
+            TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours);
+
+            // Test top-right box
+            calculated_neighbours = box_collection.GetLocalBoxes(99);
+            correct_neighbours.clear();
+            correct_neighbours.insert(99);
+            correct_neighbours.insert(9);
+            correct_neighbours.insert(0);
+            correct_neighbours.insert(90);
+            correct_neighbours.insert(80);
+            TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours);
+
+            // Test penultimate-top penultimate-right box
+            calculated_neighbours = box_collection.GetLocalBoxes(88);
+            correct_neighbours.clear();
+            correct_neighbours.insert(88);
+            correct_neighbours.insert(98);
+            correct_neighbours.insert(99);
+            correct_neighbours.insert(89);
+            correct_neighbours.insert(79);
+            correct_neighbours.insert(8);
+            correct_neighbours.insert(9);
+            correct_neighbours.insert(90);
+            correct_neighbours.insert(80);
+            correct_neighbours.insert(70);
+            correct_neighbours.insert(0);
+            TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours);
         }
     }
 
-
-    void TestBoxGeneration3d() throw (Exception)
+    void TestNodesPairs2DWithPeriodicity() throw (Exception)
     {
-        // Create a mesh
-        TetrahedralMesh<3,3> mesh;
-        mesh.ConstructCuboid(4,5,6);
+        /*
+         * Set up a box collection
+         */
+        c_vector<double, 2 * 2> domain_size;
+        domain_size(0) = 0.0;
+        domain_size(1) = 0.4;
+        domain_size(2) = 0.0;
+        domain_size(3) = 0.4;
 
-        double cut_off_length = 2.0;
+        double delta = 1e-10;
+        double box_size = 0.1 + delta; // this will force 4 boxes in each dim, one with nearly no overlap
 
-        c_vector<double, 2*3> domain_size;
-        domain_size(0) = -0.1;
-        domain_size(1) = 4.15;
-        domain_size(2) = -0.1;
-        domain_size(3) = 5.15;
-        domain_size(4) = -0.1;
-        domain_size(5) = 6.15;
-
-        BoxCollection<3> box_collection(cut_off_length, domain_size);
-
+        BoxCollection<2> box_collection(box_size, domain_size, true, true);
         box_collection.SetupLocalBoxesHalfOnly();
 
-        // Check the GetDomainSize method is working.
-        const c_vector<double, 2*3> returned_domain_size = box_collection.rGetDomainSize();
-        for (unsigned i=0; i < 2*3; i++)
+        TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 16);
+
+        /*
+         * For each test point in the domain, we place another point within the interaction distance
+         */
+        unsigned num_offsets_to_test = 20;
+        std::vector<c_vector<double, 2> > offsets_to_test(num_offsets_to_test, zero_vector<double>(2));
+        for (unsigned offset = 0 ; offset < num_offsets_to_test ; offset++)
         {
-            TS_ASSERT_DELTA(returned_domain_size[i], domain_size[i], 1e-10);
+            double theta = 2.0 * M_PI * double(offset) / double(num_offsets_to_test);
+
+            offsets_to_test[offset](0) = cos(theta);
+            offsets_to_test[offset](1) = sin(theta);
         }
 
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        /*
+         * Systematically test points in the domain at twice the box resolution, and for each
+         * point test each of the offsets calculated above, placed at the interaction distance.
+         * In each case, the nodes should be considered neighbours.
+         *
+         * This checks 8 * 8 * 20 = 1280 node-pairs
+         */
+        for (unsigned pos_x = 0 ; pos_x < 8 ; pos_x++)
         {
-            unsigned box_index = box_collection.CalculateContainingBox(mesh.GetNode(i));
-            box_collection.rGetBox(box_index).AddNode(mesh.GetNode(i));
-        }
-
-        TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 36u);
-
-        for (unsigned i=0; i<box_collection.GetNumBoxes(); i++)
-        {
-            std::set< Node<3>* > nodes_in_box = box_collection.rGetBox(i).rGetNodesContained();
-            c_vector<double, 2*3> box_min_max_values = box_collection.rGetBox(i).rGetMinAndMaxValues();
-
-            for (std::set< Node<3>* >::iterator it_nodes_in_box = nodes_in_box.begin();
-                 it_nodes_in_box != nodes_in_box.end();
-                 it_nodes_in_box++)
+            for (unsigned pos_y = 0 ; pos_y < 8 ; pos_y++)
             {
-                Node<3>* current_node = *it_nodes_in_box;
-                double x_position = current_node->rGetLocation()[0];
-                double y_position = current_node->rGetLocation()[1];
-                double z_position = current_node->rGetLocation()[2];
+                // Random first location
+                c_vector<double, 2> node_a_location;
+                node_a_location(0) = (0.25 + 0.5 * double(pos_x)) * box_size;
+                node_a_location(1) = (0.25 + 0.5 * double(pos_y)) * box_size;
 
-                double epsilon = 1e-12;
+                for (unsigned offset = 0 ; offset < num_offsets_to_test ; offset++)
+                {
+                    // Offset a second position within the interaction distance
+                    c_vector<double, 2> node_b_location = node_a_location + (box_size - delta) * offsets_to_test[offset];
 
-                TS_ASSERT_LESS_THAN(box_min_max_values(0)-epsilon, x_position);
-                TS_ASSERT_LESS_THAN(x_position, box_min_max_values(1)+epsilon);
-                TS_ASSERT_LESS_THAN(box_min_max_values(2)-epsilon, y_position);
-                TS_ASSERT_LESS_THAN(y_position, box_min_max_values(3)+epsilon);
-                TS_ASSERT_LESS_THAN(box_min_max_values(4)-epsilon, z_position);
-                TS_ASSERT_LESS_THAN(z_position, box_min_max_values(5)+epsilon);
+                    // Account for periodicity
+                    node_b_location[0] = fmod(node_b_location[0] + 1.0, 1.0);
+                    node_b_location[1] = fmod(node_b_location[1] + 1.0, 1.0);
+
+                    std::vector<Node<2>* > nodes;
+                    nodes.push_back(new Node<2>(0, node_a_location, false));
+                    nodes.push_back(new Node<2>(1, node_b_location, false));
+
+                    std::vector< std::pair<Node<2>*, Node<2>* > > pairs_returned_vector;
+                    std::map<unsigned, std::set<unsigned> > neighbours_returned;
+
+                    box_collection.CalculateNodePairs(nodes, pairs_returned_vector, neighbours_returned);
+
+                    TS_ASSERT(pairs_returned_vector.size() == 1);
+                }
+            }
+        }
+    }
+
+    void TestNodesPairs3DWithPeriodicity() throw (Exception)
+    {
+        /*
+         * Set up a box collection
+         */
+        c_vector<double, 2 * 3> domain_size;
+        domain_size(0) = 0.0;
+        domain_size(1) = 0.4;
+        domain_size(2) = 0.0;
+        domain_size(3) = 0.4;
+        domain_size(4) = 0.0;
+        domain_size(5) = 0.4;
+
+        double delta = 1e-10;
+        double box_size = 0.1 + delta; // this will force 10 boxes in each dim, one with nearly no overlap
+
+        BoxCollection<3> box_collection(box_size, domain_size, true, true, true);
+        box_collection.SetupLocalBoxesHalfOnly();
+
+        TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 64);
+
+        /*
+         * For each test point in the domain, we place another point within the interaction distance
+         */
+        unsigned num_offsets_theta = 16;
+        unsigned num_offsets_phi = 8;
+        std::vector<c_vector<double, 3> > offsets_to_test(num_offsets_theta * num_offsets_phi, zero_vector<double>(3));
+
+        for (unsigned offset_phi = 0 ; offset_phi < num_offsets_phi ; offset_phi++)
+        {
+            double phi = M_PI * double(offset_phi) / double(num_offsets_phi);
+
+            for (unsigned offset_theta = 0 ; offset_theta < num_offsets_theta ; offset_theta++)
+            {
+                double theta = 2.0 * M_PI * double(offset_theta) / double(num_offsets_theta);
+
+                unsigned index = offset_phi * num_offsets_theta + offset_theta;
+
+                offsets_to_test[index](0) = cos(theta);
+                offsets_to_test[index](1) = cos(phi) * sin(theta);
+                offsets_to_test[index](2) = -sin(phi) * sin(theta);
             }
         }
 
-        std::set<unsigned> local_boxes_to_box_0 = box_collection.GetLocalBoxes(0);
-        std::set<unsigned> correct_answer_0;
-        correct_answer_0.insert(0);
-        correct_answer_0.insert(1);
-        correct_answer_0.insert(3);
-        correct_answer_0.insert(4);
-        correct_answer_0.insert(9);
-        correct_answer_0.insert(10);
-        correct_answer_0.insert(12);
-        correct_answer_0.insert(13);
-        TS_ASSERT_EQUALS(local_boxes_to_box_0, correct_answer_0);
+        /*
+         * Systematically test points in the domain at twice the box resolution, and for each
+         * point test each of the offsets calculated above, placed at the interaction distance.
+         * In each case, the nodes should be considered neighbours.
+         *
+         * This checks 8 * 8 * 8 * 16 * 8 = 65536 node-pairs
+         */
+        for (unsigned pos_x = 0 ; pos_x < 12 ; pos_x++)
+        {
+            for (unsigned pos_y = 0 ; pos_y < 12 ; pos_y++)
+            {
+                for (unsigned pos_z = 0 ; pos_z < 12 ; pos_z++)
+                {
+                    // First location
+                    c_vector<double, 3> node_a_location;
+                    node_a_location(0) = (0.25 + 0.5 * double(pos_x)) * box_size;
+                    node_a_location(1) = (0.25 + 0.5 * double(pos_y)) * box_size;
+                    node_a_location(2) = (0.25 + 0.5 * double(pos_z)) * box_size;
 
-        std::set<unsigned> local_boxes_to_box_13 = box_collection.GetLocalBoxes(13);
-        std::set<unsigned> correct_answer_13;
-        correct_answer_13.insert(5);
-        correct_answer_13.insert(6);
-        correct_answer_13.insert(7);
-        correct_answer_13.insert(8);
-        correct_answer_13.insert(13);
-        correct_answer_13.insert(14);
-        correct_answer_13.insert(15);
-        correct_answer_13.insert(16);
-        correct_answer_13.insert(17);
-        correct_answer_13.insert(22);
-        correct_answer_13.insert(23);
-        correct_answer_13.insert(24);
-        correct_answer_13.insert(25);
-        correct_answer_13.insert(26);
-        TS_ASSERT_EQUALS(local_boxes_to_box_13, correct_answer_13);
+                    for (unsigned offset = 0 ; offset < offsets_to_test.size() ; offset++)
+                    {
+                        // Offset a second position within the interaction distance
+                        c_vector<double, 3> node_b_location = node_a_location + (box_size - delta) * offsets_to_test[offset];
 
-        std::set<unsigned> local_boxes_to_box_34 = box_collection.GetLocalBoxes(34);
-        std::set<unsigned> correct_answer_34;
-        correct_answer_34.insert(26);
-        correct_answer_34.insert(34);
-        correct_answer_34.insert(35);
-        TS_ASSERT_EQUALS(local_boxes_to_box_34, correct_answer_34);
+                        // Account for periodicity
+                        node_b_location[0] = fmod(node_b_location[0] + 1.0, 1.0);
+                        node_b_location[1] = fmod(node_b_location[1] + 1.0, 1.0);
+                        node_b_location[2] = fmod(node_b_location[2] + 1.0, 1.0);
 
-        std::set<unsigned> local_boxes_to_box_35 = box_collection.GetLocalBoxes(35);
-        std::set<unsigned> correct_answer_35;
-        correct_answer_35.insert(35);
-        TS_ASSERT_EQUALS(local_boxes_to_box_35, correct_answer_35);
+                        std::vector<Node<3>* > nodes;
+                        nodes.push_back(new Node<3>(0, node_a_location, false));
+                        nodes.push_back(new Node<3>(1, node_b_location, false));
+
+                        std::vector< std::pair<Node<3>*, Node<3>* > > pairs_returned_vector;
+                        std::map<unsigned, std::set<unsigned> > neighbours_returned;
+
+                        box_collection.CalculateNodePairs(nodes, pairs_returned_vector, neighbours_returned);
+
+                        ///\todo Add a test here #2725
+                    }
+                }
+            }
+        }
     }
 };
 

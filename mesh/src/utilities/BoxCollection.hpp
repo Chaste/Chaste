@@ -40,7 +40,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Box.hpp"
 #include <map>
 
-
 /**
  * A collection of 'boxes' partitioning the domain with information on which nodes are located in which box
  * Not archived - in cell_based constructed in NodeBasedCellPopulation constructor.
@@ -66,22 +65,67 @@ private:
     /** The boxes local (itself and nearest neighbour) to a given box. */
     std::vector< std::set<unsigned> > mLocalBoxes;
 
-    /** Whether the domain is periodic in the X dimension Note this currently only works for DIM=2.*/
-    bool mIsPeriodicInX;
+    /** Whether the domain is periodic */
+    c_vector<bool, DIM> mIsDomainPeriodic;
 
     /** A fudge (box swelling) factor to deal with 32-bit floating point issues. */
     static const double msFudge;
 
+    /**
+     * @param the grid indices (i), (i,j), or (i,j,k) depending on DIM
+     * @return the linear index in row-major form
+     */
+    unsigned GetLinearIndex(c_vector<int,DIM> gridIndices);
+
+    /**
+     * @param linearIndex the linear index in row-major form
+     * @return the grid indices (i), (i,j), or (i,j,k) depending on DIM
+     */
+    c_vector<int,DIM> GetGridIndices(unsigned linearIndex);
+
+    /**
+     * @param gridIndices the coordinates (i), (i,j), or (i,j,k) depending on DIM
+     * @return whether the box is in the domain
+     */
+    bool IsBoxInDomain(c_vector<int,DIM> gridIndices);
+
+    /**
+     * This method is used for periodicity.  It is necessary to consider additional
+     * boxes as being local to a candidate box if and only if the candidate box is
+     * in the penultimate location of any dimension.
+     *
+     * @param gridIndices the coordinates (i), (i,j), or (i,j,k) depending on DIM
+     * @return whether the box is in the penultimate location in each dimension
+     */
+    c_vector<bool,DIM> IsIndexPenultimate(c_vector<int,DIM> gridIndices);
+
+    /**
+     * Helper function for SetupLocalBoxesHalfOnly() and SetupAllLocalBoxes().
+     *
+     * Accepts a vector of neighbours that should be considered for each box and populates
+     * mLocalBoxes based on these neighbours.  The set of neighbours is either half or all
+     * of the neighbours, depending on the function calling this method.
+     *
+     * @param neighbours a vector of neighbours
+     */
+    void SetupLocalBoxes(std::vector<c_vector<int, DIM> > neighbours);
+
 public:
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param boxWidth the width of each box (cut-off length in NodeBasedCellPopulation simulations)
      * @param domainSize the size of the domain, in the form (xmin, xmax, ymin, ymax) (etc)
-     * @param isPeriodicInX whether the domain is peiodic in the x direction
+     * @param isPeriodicInX whether the domain is periodic in the x direction
+     * @param isPeriodicInY whether the domain is periodic in the y direction
+     * @param isPeriodicInZ whether the domain is periodic in the z direction
      */
-    BoxCollection(double boxWidth, c_vector<double, 2*DIM> domainSize, bool isPeriodicInX = false);
+    BoxCollection(double boxWidth,
+                  c_vector<double, 2*DIM> domainSize,
+                  bool isPeriodicInX = false,
+                  bool isPeriodicInY = false,
+                  bool isPeriodicInZ = false);
 
     /**
      * Remove the list of nodes stored in each box.
@@ -106,16 +150,22 @@ public:
      */
     Box<DIM>& rGetBox(unsigned boxIndex);
 
-    /** @return the number of boxes. */
+    /**
+     * @return the number of boxes.
+     */
     unsigned GetNumBoxes();
 
-    /** Set up the local boxes (ie itself and its nearest-neighbours) for each of the boxes.
-     *  Just set up half of the local boxes (for example, in 1D, local boxes for box0 = {1}
-     *  local boxes for box1 = {2} not {0,2}, and so on. Similar to 2d, 3d.
+    /**
+     * Generates a list of vectors representing half the possible neighbour locations
+     * in DIM-dimensions ({0} and {1} in 1D, rather than {-1}, {0}, {1}), and similar
+     * in higher dimensions, and calls SetupLocalBoxes().
      */
     void SetupLocalBoxesHalfOnly();
 
-    /** Set up the local boxes (ie itself and its nearest-neighbours) for each of the boxes. */
+    /**
+     * Generates a list of vectors representing all the possible neighbour locations
+     * in DIM-dimensions, and calls SetupLocalBoxes().
+     */
     void SetupAllLocalBoxes();
 
     /**
@@ -132,17 +182,18 @@ public:
     const c_vector<double, 2*DIM>& rGetDomainSize() const;
 
     /**
-     *  Compute all the pairs of (potentially) connected nodes for cell_based simulations, ie nodes which are in a
-     *  local box to the box containing the first node. **Note: the user still has to check that the node
-     *  pairs are less than the cut-off distance apart.** The pairs are checked so that index1 < index2,
-     *  so each connected pair of nodes is only in the set once.
+     * Compute all the pairs of (potentially) connected nodes for cell_based simulations, ie nodes which are in a
+     * local box to the box containing the first node. **Note: the user still has to check that the node
+     * pairs are less than the cut-off distance apart.** The pairs are checked so that index1 < index2,
+     * so each connected pair of nodes is only in the set once.
      *
-     *  @param rNodes all the nodes to be consider
-     *  @param rNodePairs the return value, a set of pairs of nodes
-     *  @param rNodeNeighbours the other return value, the neighbours of each node.
+     * @param rNodes all the nodes to be considered
+     * @param rNodePairs the return value, a set of pairs of nodes
+     * @param rNodeNeighbours the other return value, the neighbours of each node.
      */
-    void CalculateNodePairs(std::vector<Node<DIM>*>& rNodes, std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours);
+    void CalculateNodePairs(std::vector<Node<DIM>*>& rNodes,
+                            std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs,
+                            std::map<unsigned, std::set<unsigned> >& rNodeNeighbours);
 };
-
 
 #endif /*BOXCOLLECTION_HPP_*/
