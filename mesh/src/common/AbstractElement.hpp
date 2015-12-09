@@ -98,10 +98,9 @@ public:
 
     /**
      * Virtual destructor, since this class has virtual methods.
-     * Does nothing special.
+     * Deletes added attributes (when they exist)
      */
-    virtual ~AbstractElement()
-    {}
+    virtual ~AbstractElement();
 
     /**
      * Update node at the given index.
