@@ -32,6 +32,7 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
+
 #ifndef TESTBOXCOLLECTION_HPP_
 #define TESTBOXCOLLECTION_HPP_
 
@@ -1371,9 +1372,9 @@ public:
          */
         c_vector<double, 2 * 2> domain_size;
         domain_size(0) = 0.0;
-        domain_size(1) = 0.4;
+        domain_size(1) = 1.0;
         domain_size(2) = 0.0;
-        domain_size(3) = 0.4;
+        domain_size(3) = 1.0;
 
         double delta = 1e-10;
         double box_size = 0.1 + delta; // this will force 4 boxes in each dim, one with nearly no overlap
@@ -1381,12 +1382,12 @@ public:
         BoxCollection<2> box_collection(box_size, domain_size, true, true);
         box_collection.SetupLocalBoxesHalfOnly();
 
-        TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 16);
+        TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 100);
 
         /*
          * For each test point in the domain, we place another point within the interaction distance
          */
-        unsigned num_offsets_to_test = 20;
+        unsigned num_offsets_to_test = 16;
         std::vector<c_vector<double, 2> > offsets_to_test(num_offsets_to_test, zero_vector<double>(2));
         for (unsigned offset = 0 ; offset < num_offsets_to_test ; offset++)
         {
@@ -1401,11 +1402,11 @@ public:
          * point test each of the offsets calculated above, placed at the interaction distance.
          * In each case, the nodes should be considered neighbours.
          *
-         * This checks 8 * 8 * 20 = 1280 node-pairs
+         * This checks 10 * 10 * 16 = 12800 node-pairs
          */
-        for (unsigned pos_x = 0 ; pos_x < 8 ; pos_x++)
+        for (unsigned pos_x = 0 ; pos_x < 20 ; pos_x++)
         {
-            for (unsigned pos_y = 0 ; pos_y < 8 ; pos_y++)
+            for (unsigned pos_y = 0 ; pos_y < 20 ; pos_y++)
             {
                 // Random first location
                 c_vector<double, 2> node_a_location;
@@ -1460,7 +1461,7 @@ public:
         /*
          * For each test point in the domain, we place another point within the interaction distance
          */
-        unsigned num_offsets_theta = 16;
+        unsigned num_offsets_theta = 8;
         unsigned num_offsets_phi = 8;
         std::vector<c_vector<double, 3> > offsets_to_test(num_offsets_theta * num_offsets_phi, zero_vector<double>(3));
 
@@ -1487,11 +1488,11 @@ public:
          *
          * This checks 8 * 8 * 8 * 16 * 8 = 65536 node-pairs
          */
-        for (unsigned pos_x = 0 ; pos_x < 12 ; pos_x++)
+        for (unsigned pos_x = 0 ; pos_x < 6 ; pos_x++)
         {
-            for (unsigned pos_y = 0 ; pos_y < 12 ; pos_y++)
+            for (unsigned pos_y = 0 ; pos_y < 6 ; pos_y++)
             {
-                for (unsigned pos_z = 0 ; pos_z < 12 ; pos_z++)
+                for (unsigned pos_z = 0 ; pos_z < 6 ; pos_z++)
                 {
                     // First location
                     c_vector<double, 3> node_a_location;
@@ -1516,7 +1517,7 @@ public:
                         std::vector< std::pair<Node<3>*, Node<3>* > > pairs_returned_vector;
                         std::map<unsigned, std::set<unsigned> > neighbours_returned;
 
-                        box_collection.CalculateNodePairs(nodes, pairs_returned_vector, neighbours_returned);
+//                        box_collection.CalculateNodePairs(nodes, pairs_returned_vector, neighbours_returned);
 
                         ///\todo Add a test here #2725
                     }
