@@ -1499,6 +1499,9 @@ def GetBuildType(buildType):
             obj.build_dir += '_' + extra
         elif extra == 'doxy-macro-expand' and isinstance(obj, DoxygenCoverage):
             obj.DoMacroExpansion()
+        elif extra == 'hpc':
+            obj._cc_flags.remove('-xHost')
+            obj.build_dir += '_hpc'
         elif extra.startswith('broke'):
             # For build system use
             pass
