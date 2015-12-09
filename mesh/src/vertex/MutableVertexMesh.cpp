@@ -2533,14 +2533,14 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformVoidRemoval(Node<SPACE_DI
 
     PerformNodeMerge(pNodeA, pNodeB);
 
-    Node<SPACE_DIM>* p_merged_node = pNodeA;
+    Node<SPACE_DIM>* p_merged_node = pNodeB;
 
-    if (pNodeA->IsDeleted())
+    if (pNodeB->IsDeleted())
     {
-        p_merged_node = pNodeB;
+        p_merged_node = pNodeA;
     }
 
-    PerformNodeMerge(p_merged_node, pNodeC);
+    PerformNodeMerge(pNodeC, p_merged_node);
 
     if (p_merged_node->IsDeleted())
     {
