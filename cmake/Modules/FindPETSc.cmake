@@ -69,17 +69,19 @@ function (petsc_get_version)
   endif ()
 endfunction ()
 
+set(homebrew_dir /usr/local/Cellar/petsc)
+file(GLOB homebrew_dirs ${homebrew_dir}/*)
+set(debian_dir /usr/lib/petscdir)
+file(GLOB debian_dirs ${debian_dir}/*)
+
 find_path (PETSC_DIR include/petsc.h
   HINTS 
   $ENV{PETSC_DIR}
   # Homebrew
-  /usr/local/Cellar/petsc/3.3-p5
+  ${homebrew_dirs}
   PATHS
   # Debian paths
-  /usr/lib/petscdir/3.5.1 /usr/lib/petscdir/3.5
-  /usr/lib/petscdir/3.4.2 /usr/lib/petscdir/3.4
-  /usr/lib/petscdir/3.3 /usr/lib/petscdir/3.2 /usr/lib/petscdir/3.1
-  /usr/lib/petscdir/3.0.0 /usr/lib/petscdir/2.3.3 /usr/lib/petscdir/2.3.2
+  ${debian_dirs}
   # MacPorts path
   /opt/local/lib/petsc
   # PETSc for Windows
