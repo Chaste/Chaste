@@ -529,7 +529,7 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
 
         // Output current results to file
         CellBasedEventHandler::BeginEvent(CellBasedEventHandler::OUTPUT);
-        if (p_simulation_time->GetTimeStepsElapsed()%mSamplingTimestepMultiple == 0)
+        if (p_simulation_time->GetTimeStepsElapsed()%mSamplingTimestepMultiple == 0)// should be at_sampling_timestep !
         {
             mrCellPopulation.WriteResultsToFiles(results_directory+"/");
 

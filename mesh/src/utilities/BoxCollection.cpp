@@ -312,7 +312,7 @@ bool BoxCollection<DIM>::IsBoxInDomain(c_vector<int, DIM> gridIndices)
     {
         if (!mIsDomainPeriodic(dim))
         {
-            if (gridIndices(dim) < 0 || gridIndices(dim) >= mNumBoxesEachDirection(dim))
+            if (gridIndices(dim) < 0 || gridIndices(dim) >= (int)mNumBoxesEachDirection(dim))
             {
                 is_in_domain = false;
             }
@@ -329,7 +329,7 @@ c_vector<bool,DIM> BoxCollection<DIM>::IsIndexPenultimate(c_vector<int,DIM> grid
 
     for (unsigned dim = 0 ; dim < DIM ; dim++)
     {
-        is_penultimate(dim) = (gridIndices(dim) == mNumBoxesEachDirection(dim) - 2);
+        is_penultimate(dim) = (gridIndices(dim) == (int)mNumBoxesEachDirection(dim) - 2);
     }
 
     return is_penultimate;
