@@ -38,7 +38,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 #include "Warnings.hpp"
 #include <complex>
-#include <fftw3.h>
 #include "Debug.hpp"
 #include "Timer.hpp"
 #include "FileFinder.hpp"
@@ -161,66 +160,17 @@ void ImmersedBoundarySimulationModifier<DIM>::SetupConstantMemberVariables(Abstr
     mpBoxCollection->SetupLocalBoxesHalfOnly();
     mpBoxCollection->CalculateNodePairs(mpMesh->rGetNodes(), mNodePairs, mNodeNeighbours);
 
-    /*
-     * Set up fftw routines.
-     */
-
-    // Set  the (max) number of threads used by Fftw
-    mNumThreadsForFftw = 1;
-
-    // If more than one thread, the following must happen before any other fftw routines
-    if (mNumThreadsForFftw > 1)
-    {
-        int potential_thread_errors = fftw_init_threads();
-
-        // 1 means success, 0 indicates a failure
-        if (potential_thread_errors != 1)
-        {
-            EXCEPTION("fftw thread error");
-        }
-
-        fftw_plan_with_nthreads(mNumThreadsForFftw);
-    }
-
-    // Forget all wisdom; the correct wisdom for the number of threads used will be loaded from file
-    void fftw_forget_wisdom(void);
-
-    // Path to the wisdom file
-    std::string wisdom_path;
-    std::string wisdom_filename;
-
-    if (mNumThreadsForFftw == 1)
-    {
-        wisdom_filename = "fftw.wisdom";
-    }
-    else
-    {
-        wisdom_filename = "fftw_threads.wisdom";
-    }
-
-    FileFinder file_finder(wisdom_filename, RelativeTo::ChasteTestOutput);
-
-    if (!file_finder.IsFile())
-    {
-        WARNING("It is strongly recommended to generate wisdom using TestGenerateFftwWisdom before using this code.");
-    }
-
-    wisdom_path = file_finder.GetAbsolutePath();
-    PRINT_VARIABLE(wisdom_path);
-
-    int wisdom_flag = fftw_import_wisdom_from_filename(wisdom_path.c_str());
-
-    // 1 means success, 0 indicates a failure
-    if (wisdom_flag != 1)
-    {
-        WARNING("fftw wisdom not imported correctly");
-    }
 
     // Set up dimension-dependent variables
     switch (DIM)
     {
         case 2:
             mpArrays = new ImmersedBoundary2dArrays<DIM>(mpMesh, SimulationTime::Instance()->GetTimeStep(), mReynolds);
+            mpFftInterface = new ImmersedBoundaryFftInterface<DIM>(mpMesh,
+                                                                   &(mpArrays->rGetModifiableRightHandSideGrids()[0][0][0]),
+                                                                   &(mpArrays->rGetModifiableFourierGrids()[0][0][0]),
+                                                                   &(mpMesh->rGetModifiable2dVelocityGrids()[0][0][0]),
+                                                                   2);
 
             mFftNorm = (double) mNumGridPtsX * (double) mNumGridPtsY;
             break;
@@ -232,15 +182,6 @@ void ImmersedBoundarySimulationModifier<DIM>::SetupConstantMemberVariables(Abstr
         default:
             NEVER_REACHED;
     }
-
-    // For debugging
-    t_total_time = 0.0;
-    t_upwind = 0.0;
-    t_rhs = 0.0;
-    t_fftw_forward = 0.0;
-    t_pressure = 0.0;
-    t_final = 0.0;
-    t_fftw_inverse = 0.0;
 }
 
 template<unsigned DIM>
@@ -358,13 +299,8 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
     multi_array<std::complex<double>, 3>& fourier_grids = mpArrays->rGetModifiableFourierGrids();
     multi_array<std::complex<double>, 2>& pressure_grid = mpArrays->rGetModifiablePressureGrid();
 
-//    Timer timer;
-//    timer.Reset();
-
     // Perform upwind differencing and create RHS of linear system
     Upwind2d(vel_grids, rhs_grids);
-
-//    t_upwind += timer.GetElapsedTime(); timer.Reset();
 
     for (unsigned dim = 0 ; dim < 2 ; dim++)
     {
@@ -377,12 +313,8 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
         }
     }
 
-//    t_rhs += timer.GetElapsedTime(); timer.Reset();
-
     // Perform fft on rhs_grids; results go to fourier_grids
-    mpArrays->FftwExecuteForward();
-
-//    t_fftw_forward += timer.GetElapsedTime(); timer.Reset();
+    mpFftInterface->FftExecuteForward();
 
     /*
      * The result of a DFT of n real datapoints is n/2 + 1 complex values, due to redundancy: element n-1 is conj(2),
@@ -405,8 +337,6 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
     pressure_grid[mNumGridPtsX/2][mNumGridPtsY/2] = 0.0;
     pressure_grid[0][mNumGridPtsY/2] = 0.0;
 
-//    t_pressure += timer.GetElapsedTime(); timer.Reset();
-
     /*
      * Do final stage of computation before inverse FFT.  We do the necessary DFT scaling at this stage so the output
      * from the inverse DFT is correct.
@@ -420,35 +350,8 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
         }
     }
 
-//    t_final += timer.GetElapsedTime(); timer.Reset();
-
     // Perform inverse fft on fourier_grids; results are in vel_grids
-    mpArrays->FftwExecuteInverse();
-
-//    t_fftw_inverse += timer.GetElapsedTime(); timer.Reset();
-
-//    if (SimulationTime::Instance()->GetTimeStepsElapsed() == 120)
-//    {
-//        t_total_time = t_upwind + t_rhs + t_fftw_forward + t_pressure + t_final + t_fftw_inverse;
-//
-//        std::cout << std::endl;
-//        std::cout << "Upwind:         " << 100 * t_upwind       / t_total_time << endl
-//                  << "RHS:            " << 100 * t_rhs          / t_total_time << endl
-//                  << "FFTW forward:   " << 100 * t_fftw_forward / t_total_time << endl
-//                  << "Pressure:       " << 100 * t_pressure     / t_total_time << endl
-//                  << "Final step:     " << 100 * t_final        / t_total_time << endl
-//                  << "FFTW inverse:   " << 100 * t_fftw_inverse / t_total_time << endl;
-//        std::cout << std::endl;
-//
-//        std::cout << std::endl;
-//        std::cout << "Upwind:         " << t_upwind        << endl
-//                  << "RHS:            " << t_rhs           << endl
-//                  << "FFTW forward:   " << t_fftw_forward  << endl
-//                  << "Pressure:       " << t_pressure      << endl
-//                  << "Final step:     " << t_final         << endl
-//                  << "FFTW inverse:   " << t_fftw_inverse  << endl;
-//        std::cout << std::endl;
-//    }
+    mpFftInterface->FftExecuteInverse();
 }
 
 template<unsigned DIM>

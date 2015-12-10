@@ -37,7 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define IMMERSEDBOUNDARY2DARRAYS_HPP_
 
 #include <complex>
-#include <fftw3.h>
 #include "ImmersedBoundaryArray.hpp"
 #include "ImmersedBoundaryMesh.hpp"
 
@@ -79,22 +78,16 @@ protected:
     /** Vector of sin values in x, constant once grid size is known */
     std::vector<double> mSin2y;
 
-    /** The fftw plan for the forward transforms */
-    fftw_plan mFftwForwardPlan;
-
-     /** The fftw plan for the forward transforms */
-    fftw_plan mFftwInversePlan;
-
 public:
 
     /**
      * Default constructor.
      *
-     * @param p_mesh the Immersed Boundary mesh
+     * @param pMesh the Immersed Boundary mesh
      * @param dt the simulation timestep
      * @param reynoldsNumber the Reynolds Number of the fluid
      */
-    ImmersedBoundary2dArrays(ImmersedBoundaryMesh<DIM,DIM>* p_mesh, double dt, double reynoldsNumber);
+    ImmersedBoundary2dArrays(ImmersedBoundaryMesh<DIM,DIM>* pMesh, double dt, double reynoldsNumber);
 
     /**
      * Empty constructor
@@ -131,12 +124,6 @@ public:
 
     /** @return reference to the vector of sine values in y. */
     const std::vector<double>& rGetSin2y() const;
-
-    /** Performs inverse fourier transforms */
-    void FftwExecuteForward();
-
-    /** Performs inverse fourier transforms */
-    void FftwExecuteInverse();
 
 };
 

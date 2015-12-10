@@ -40,8 +40,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Debug.hpp"
 
 template<unsigned DIM>
-ImmersedBoundary2dArrays<DIM>::ImmersedBoundary2dArrays(ImmersedBoundaryMesh<DIM,DIM>* p_mesh, double dt, double reynoldsNumber)
-        : mpMesh(p_mesh)
+ImmersedBoundary2dArrays<DIM>::ImmersedBoundary2dArrays(ImmersedBoundaryMesh<DIM,DIM>* pMesh, double dt, double reynoldsNumber)
+        : mpMesh(pMesh)
 {
     unsigned num_gridpts_x = mpMesh->GetNumGridPtsX();
     unsigned num_gridpts_y = mpMesh->GetNumGridPtsY();
@@ -100,51 +100,11 @@ ImmersedBoundary2dArrays<DIM>::ImmersedBoundary2dArrays(ImmersedBoundaryMesh<DIM
             mOperator2[x][y] += 1.0;
         }
     }
-
-    /*
-     * Finally, plan the discrete Fourier transforms:
-     *
-     *  * Forward are real-to-complex and out-of-place
-     *  * Backward are complex-to-real and out-of-place
-     *
-     * Because the above arrays are created once and stay in the same place in memory throughout the simulation, we may
-     * plan the transforms with references to locations in these arrays, and execute the plans as necessary each
-     * timestep of the simulation.
-     */
-
-    // We first set the pointers to arrays where the data will be stored
-    double* p_in = &(mRightHandSideGrids[0][0][0]);
-    fftw_complex* p_complex = reinterpret_cast<fftw_complex*>(&(mFourierGrids[0][0][0]));
-    double* p_out = &(mpMesh->rGetModifiable2dVelocityGrids()[0][0][0]);
-
-    // Plan variables
-    int rank = 2;                                       // Number of dimensions for each array
-    int real_dims[] = {num_gridpts_x, num_gridpts_y};   // Dimensions of each real array
-    int comp_dims[] = {num_gridpts_x, reduced_y};       // Dimensions of each complex array
-    int how_many = 2;                                   // Number of transforms
-    int real_sep = num_gridpts_x * num_gridpts_y;       // How many doubles between start of first array and start of second
-    int comp_sep = num_gridpts_x * reduced_y;           // How many fftw_complex between start of first array and start of second
-    int real_stride = 1;                                // Each real array is contiguous in memory
-    int comp_stride = 1;                                // Each complex array is contiguous in memory
-    int* real_nembed = real_dims;
-    int* comp_nembed = comp_dims;
-
-    mFftwForwardPlan = fftw_plan_many_dft_r2c(rank, real_dims, how_many,
-                                              p_in,      real_nembed, real_stride, real_sep,
-                                              p_complex, comp_nembed, comp_stride, comp_sep,
-                                              FFTW_PATIENT);
-
-    mFftwInversePlan = fftw_plan_many_dft_c2r(rank, real_dims, how_many,
-                                              p_complex, comp_nembed, comp_stride, comp_sep,
-                                              p_out,     real_nembed, real_stride, real_sep,
-                                              FFTW_PATIENT);
 }
 
 template<unsigned DIM>
 ImmersedBoundary2dArrays<DIM>::~ImmersedBoundary2dArrays()
 {
-    fftw_destroy_plan(mFftwForwardPlan);
-    fftw_destroy_plan(mFftwInversePlan);
 }
 
 template<unsigned DIM>
@@ -193,18 +153,6 @@ template<unsigned DIM>
 const std::vector<double>& ImmersedBoundary2dArrays<DIM>::rGetSin2y() const
 {
     return mSin2y;
-}
-
-template<unsigned DIM>
-void ImmersedBoundary2dArrays<DIM>::FftwExecuteForward()
-{
-    fftw_execute(mFftwForwardPlan);
-}
-
-template<unsigned DIM>
-void ImmersedBoundary2dArrays<DIM>::FftwExecuteInverse()
-{
-    fftw_execute(mFftwInversePlan);
 }
 
 // Explicit instantiation

@@ -67,7 +67,7 @@ ImmersedBoundaryMembraneElasticityForce<DIM>::ImmersedBoundaryMembraneElasticity
      *
      * The following two element attributes will represent the apical and basal rest lengths, respectively.
      */
-    TagElementCorners();
+//    TagElementCorners();
 }
 
 template<unsigned DIM>
@@ -216,132 +216,132 @@ void ImmersedBoundaryMembraneElasticityForce<DIM>::TagNodeRegions()
 template<unsigned DIM>
 void ImmersedBoundaryMembraneElasticityForce<DIM>::TagElementCorners()
 {
-    ImmersedBoundaryMesh<DIM,DIM>* p_mesh = &(mpCellPopulation->rGetMesh());
-
-    // First loop through all elements to check they have the same number of attributes
-    assert(p_mesh->GetNumElements() > 0);
-    unsigned num_elem_attributes = p_mesh->GetElement(0)->GetNumElementAttributes();
-
-    for (unsigned elem_idx = 1 ; elem_idx < p_mesh->GetNumElements() ; elem_idx++)
-    {
-        if (p_mesh->GetElement(elem_idx)->GetNumElementAttributes() != num_elem_attributes)
-        {
-            EXCEPTION("This class requires each element to have the same number of attributes");
-        }
-    }
-
-    // Set up corner locations in the attribute vector, so AddForceContribution knows where to look
-    mCornerLocationsInAttributeVector.push_back(num_elem_attributes);
-    mCornerLocationsInAttributeVector.push_back(num_elem_attributes + 1);
-    mCornerLocationsInAttributeVector.push_back(num_elem_attributes + 2);
-    mCornerLocationsInAttributeVector.push_back(num_elem_attributes + 3);
-
-    // Set up rest-length locations in the attribute vector, so AddForceContribution knows where to look
-    mRestLengthLocationsInAttributeVector.push_back(num_elem_attributes + 4);
-    mRestLengthLocationsInAttributeVector.push_back(num_elem_attributes + 5);
-
-    /*
-     * Loop through elements and set corner locations.
-     *
-     * Corner 0 will be the left-most  apical node.
-     * Corner 1 will be the right-most apical node.
-     * Corner 2 will be the right-most basal node.
-     * Corner 3 will be the left-most  basal node.
-     */
-    for (unsigned elem_idx = 0 ; elem_idx < p_mesh->GetNumElements() ; elem_idx++)
-    {
-        ImmersedBoundaryElement<DIM,DIM>* p_this_elem = p_mesh->GetElement(elem_idx);
-
-        if (p_mesh->GetMembraneIndex() == p_this_elem->GetIndex())
-        {
-            /*
-             * The basement lamina need not have any attributes associated with it, as it is treated differently when
-             * calculating forces.  However, we require each element to have the same number of attributes, so we add
-             * arbitrary attributes (with no meaning) to the vector.
-             */
-
-            // Basement lamina will have no corners, so we set each corner to 0
-            p_this_elem->AddElementAttribute(0.0);
-            p_this_elem->AddElementAttribute(0.0);
-            p_this_elem->AddElementAttribute(0.0);
-            p_this_elem->AddElementAttribute(0.0);
-
-            // Basement lamina will have rest-length attributes set to 1.0
-            p_this_elem->AddElementAttribute(1.0);
-            p_this_elem->AddElementAttribute(1.0);
-        }
-        else // not the basal lamina
-        {
-            double left_most_apical  = DBL_MAX;
-            double right_most_apical = -DBL_MAX;
-            double left_most_basal   = DBL_MAX;
-            double right_most_basal  = -DBL_MAX;
-
-            unsigned left_apical_idx;
-            unsigned right_apical_idx;
-            unsigned left_basal_idx;
-            unsigned right_basal_idx;
-
-            c_vector<double, DIM> origin = zero_vector<double>(DIM);
-
-            // Calculate the node indices corresponding to the left-most and right-most apical and basal nodes in the
-            // current element
-            for (unsigned node_idx = 0 ; node_idx < p_this_elem->GetNumNodes() ; node_idx++)
-            {
-                Node<DIM>* p_this_node = p_this_elem->GetNode(node_idx);
-
-                if (p_this_node->GetRegion() == 1) //apical
-                {
-                    // Get the deviation of the current location from the origin, taking into account periodicity
-                    double x_deviation = p_mesh->GetVectorFromAtoB(origin, p_this_elem->GetNode(node_idx)->rGetLocation())[0];
-
-                    if(x_deviation < left_most_apical)
-                    {
-                        left_most_apical = x_deviation;
-                        left_apical_idx = node_idx;
-                    }
-                    if(x_deviation > right_most_apical)
-                    {
-                        right_most_apical = x_deviation;
-                        right_apical_idx = node_idx;
-                    }
-                }
-                else if (p_this_node->GetRegion() == 0) //basal
-                {
-                    // Get the deviation of the current location from the origin, taking into account periodicity
-                    double x_deviation = p_mesh->GetVectorFromAtoB(origin, p_this_elem->GetNode(node_idx)->rGetLocation())[0];
-
-                    if(x_deviation < left_most_basal)
-                    {
-                        left_most_basal = x_deviation;
-                        left_basal_idx = node_idx;
-                    }
-                    if(x_deviation > right_most_basal)
-                    {
-                        right_most_basal = x_deviation;
-                        right_basal_idx = node_idx;
-                    }
-                }
-                else
-                {
-                    // Lateral - nothing to do
-                }
-            }
-
-            double apical_rest_length = norm_2(p_mesh->GetVectorFromAtoB(p_this_elem->GetNode(left_apical_idx)->rGetLocation()),
-                                               p_mesh->GetVectorFromAtoB(p_this_elem->GetNode(right_apical_idx)->rGetLocation()));
-
-            // Basement lamina will have no corners, so we set each corner to 0
-            p_this_elem->AddElementAttribute(left_apical_idx);
-            p_this_elem->AddElementAttribute(0.0);
-            p_this_elem->AddElementAttribute(0.0);
-            p_this_elem->AddElementAttribute(0.0);
-
-            // Basement lamina will have rest-length attributes set to 1.0
-            p_this_elem->AddElementAttribute(1.0);
-            p_this_elem->AddElementAttribute(1.0);
-        }
-    }
+//    ImmersedBoundaryMesh<DIM,DIM>* p_mesh = &(mpCellPopulation->rGetMesh());
+//
+//    // First loop through all elements to check they have the same number of attributes
+//    assert(p_mesh->GetNumElements() > 0);
+//    unsigned num_elem_attributes = p_mesh->GetElement(0)->GetNumElementAttributes();
+//
+//    for (unsigned elem_idx = 1 ; elem_idx < p_mesh->GetNumElements() ; elem_idx++)
+//    {
+//        if (p_mesh->GetElement(elem_idx)->GetNumElementAttributes() != num_elem_attributes)
+//        {
+//            EXCEPTION("This class requires each element to have the same number of attributes");
+//        }
+//    }
+//
+//    // Set up corner locations in the attribute vector, so AddForceContribution knows where to look
+//    mCornerLocationsInAttributeVector.push_back(num_elem_attributes);
+//    mCornerLocationsInAttributeVector.push_back(num_elem_attributes + 1);
+//    mCornerLocationsInAttributeVector.push_back(num_elem_attributes + 2);
+//    mCornerLocationsInAttributeVector.push_back(num_elem_attributes + 3);
+//
+//    // Set up rest-length locations in the attribute vector, so AddForceContribution knows where to look
+//    mRestLengthLocationsInAttributeVector.push_back(num_elem_attributes + 4);
+//    mRestLengthLocationsInAttributeVector.push_back(num_elem_attributes + 5);
+//
+//    /*
+//     * Loop through elements and set corner locations.
+//     *
+//     * Corner 0 will be the left-most  apical node.
+//     * Corner 1 will be the right-most apical node.
+//     * Corner 2 will be the right-most basal node.
+//     * Corner 3 will be the left-most  basal node.
+//     */
+//    for (unsigned elem_idx = 0 ; elem_idx < p_mesh->GetNumElements() ; elem_idx++)
+//    {
+//        ImmersedBoundaryElement<DIM,DIM>* p_this_elem = p_mesh->GetElement(elem_idx);
+//
+//        if (p_mesh->GetMembraneIndex() == p_this_elem->GetIndex())
+//        {
+//            /*
+//             * The basement lamina need not have any attributes associated with it, as it is treated differently when
+//             * calculating forces.  However, we require each element to have the same number of attributes, so we add
+//             * arbitrary attributes (with no meaning) to the vector.
+//             */
+//
+//            // Basement lamina will have no corners, so we set each corner to 0
+//            p_this_elem->AddElementAttribute(0.0);
+//            p_this_elem->AddElementAttribute(0.0);
+//            p_this_elem->AddElementAttribute(0.0);
+//            p_this_elem->AddElementAttribute(0.0);
+//
+//            // Basement lamina will have rest-length attributes set to 1.0
+//            p_this_elem->AddElementAttribute(1.0);
+//            p_this_elem->AddElementAttribute(1.0);
+//        }
+//        else // not the basal lamina
+//        {
+//            double left_most_apical  = DBL_MAX;
+//            double right_most_apical = -DBL_MAX;
+//            double left_most_basal   = DBL_MAX;
+//            double right_most_basal  = -DBL_MAX;
+//
+//            unsigned left_apical_idx;
+//            unsigned right_apical_idx;
+//            unsigned left_basal_idx;
+//            unsigned right_basal_idx;
+//
+//            c_vector<double, DIM> origin = zero_vector<double>(DIM);
+//
+//            // Calculate the node indices corresponding to the left-most and right-most apical and basal nodes in the
+//            // current element
+//            for (unsigned node_idx = 0 ; node_idx < p_this_elem->GetNumNodes() ; node_idx++)
+//            {
+//                Node<DIM>* p_this_node = p_this_elem->GetNode(node_idx);
+//
+//                if (p_this_node->GetRegion() == 1) //apical
+//                {
+//                    // Get the deviation of the current location from the origin, taking into account periodicity
+//                    double x_deviation = p_mesh->GetVectorFromAtoB(origin, p_this_elem->GetNode(node_idx)->rGetLocation())[0];
+//
+//                    if(x_deviation < left_most_apical)
+//                    {
+//                        left_most_apical = x_deviation;
+//                        left_apical_idx = node_idx;
+//                    }
+//                    if(x_deviation > right_most_apical)
+//                    {
+//                        right_most_apical = x_deviation;
+//                        right_apical_idx = node_idx;
+//                    }
+//                }
+//                else if (p_this_node->GetRegion() == 0) //basal
+//                {
+//                    // Get the deviation of the current location from the origin, taking into account periodicity
+//                    double x_deviation = p_mesh->GetVectorFromAtoB(origin, p_this_elem->GetNode(node_idx)->rGetLocation())[0];
+//
+//                    if(x_deviation < left_most_basal)
+//                    {
+//                        left_most_basal = x_deviation;
+//                        left_basal_idx = node_idx;
+//                    }
+//                    if(x_deviation > right_most_basal)
+//                    {
+//                        right_most_basal = x_deviation;
+//                        right_basal_idx = node_idx;
+//                    }
+//                }
+//                else
+//                {
+//                    // Lateral - nothing to do
+//                }
+//            }
+//
+//            double apical_rest_length = norm_2(p_mesh->GetVectorFromAtoB(p_this_elem->GetNode(left_apical_idx)->rGetLocation()),
+//                                               p_mesh->GetVectorFromAtoB(p_this_elem->GetNode(right_apical_idx)->rGetLocation()));
+//
+//            // Basement lamina will have no corners, so we set each corner to 0
+//            p_this_elem->AddElementAttribute(left_apical_idx);
+//            p_this_elem->AddElementAttribute(0.0);
+//            p_this_elem->AddElementAttribute(0.0);
+//            p_this_elem->AddElementAttribute(0.0);
+//
+//            // Basement lamina will have rest-length attributes set to 1.0
+//            p_this_elem->AddElementAttribute(1.0);
+//            p_this_elem->AddElementAttribute(1.0);
+//        }
+//    }
 }
 
 template<unsigned DIM>

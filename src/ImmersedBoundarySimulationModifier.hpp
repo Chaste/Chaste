@@ -47,15 +47,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ImmersedBoundaryCellPopulation.hpp"
 #include "ImmersedBoundaryMesh.hpp"
 #include "ImmersedBoundary2dArrays.hpp"
+#include "ImmersedBoundaryFftInterface.hpp"
 
 // Other includes
 #include <complex>
-#include <fftw3.h>
 #include <boost/serialization/base_object.hpp>
 #include <boost/multi_array.hpp>
-
-//typedef boost::multi_array<std::complex<double>, 2> boost_complex_array;
-//typedef boost::multi_array<double, 2> boost_real_array;
 
 /**
  * A modifier class which at each simulation time step implements the immersed boundary algorithm similar to
@@ -141,16 +138,7 @@ private:
     /** Pointer to structure storing all necessary arrays */
     ImmersedBoundary2dArrays<DIM>* mpArrays;
 
-    /** Max number of threads for fftw */
-    unsigned mNumThreadsForFftw;
-
-    double t_total_time;
-    double t_upwind;
-    double t_rhs;
-    double t_fftw_forward;
-    double t_pressure;
-    double t_final;
-    double t_fftw_inverse;
+    ImmersedBoundaryFftInterface<DIM>* mpFftInterface;
 
     /**
      * Helper method to calculate elastic forces, propagate these to the fluid grid
