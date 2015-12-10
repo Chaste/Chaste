@@ -94,7 +94,7 @@ public:
 
             TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 9u);
 
-            for (unsigned i = 0 ; i < box_collection.GetNumBoxes() ; i++)
+            for (int i = 0 ; i < box_collection.GetNumBoxes() ; i++)
             {
                 c_vector<int, 1> grid_indices = box_collection.GetGridIndices(i);
                 TS_ASSERT_EQUALS(grid_indices(0), i);
