@@ -64,6 +64,9 @@ private:
     /** Spring rest length associated with cell-cell interactions from this element. */
     double mCellCellRestLength;
 
+    /** Node representing a fluid source associated with this element. */
+    Node<SPACE_DIM>* mpSourceNode;
+
     /** Needed for serialization. */
     friend class boost::serialization::access;
 
@@ -158,6 +161,13 @@ public:
      * @return the current rest length
      */
     double GetCellCellRestLength(void);
+
+    /**
+     * Get the source node
+     *
+     * @return pointer to the source node
+     */
+    Node<SPACE_DIM>* GetSourceNode(void);
 
 };
 

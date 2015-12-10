@@ -46,6 +46,8 @@ ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryElement(unsigne
     // Ensure number of nodes is at least 2
     assert(rNodes.size() > 2);
 
+    mpSourceNode = new Node<SPACE_DIM>(0);
+
     /*
      * Set default parameter values:
      *   Assuming the nodes are roughly uniformly spaced, the default rest length is 25% of the distance between
@@ -61,6 +63,10 @@ ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryElement(unsigne
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::~ImmersedBoundaryElement()
 {
+    if (mpSourceNode)
+    {
+        delete mpSourceNode;
+    }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -129,6 +135,13 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::GetCellCellRestLength(void)
 {
     return mCellCellRestLength;
+}
+
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+Node<SPACE_DIM>* ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::GetSourceNode(void)
+{
+    return mpSourceNode;
 }
 
 
