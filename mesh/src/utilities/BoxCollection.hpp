@@ -72,7 +72,7 @@ private:
     static const double msFudge;
 
     /**
-     * @param the grid indices (i), (i,j), or (i,j,k) depending on DIM
+     * @param gridIndices the grid indices (i), (i,j), or (i,j,k) depending on DIM
      * @return the linear index in row-major form
      */
     unsigned GetLinearIndex(c_vector<int,DIM> gridIndices);
