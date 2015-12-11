@@ -60,11 +60,19 @@ public:
         ImmersedBoundaryElement<2,2> element(0, nodes);
 
         // Check default parameters
-        TS_ASSERT_DELTA(element.GetMembraneSpringConstant(), 1000.0, 1e-6);
-        TS_ASSERT_DELTA(element.GetMembraneRestLength(), 0.05, 1e-6);
+        TS_ASSERT_DELTA(element.GetMembraneSpringConstant(), 100000.0, 1e-6);
+        TS_ASSERT_DELTA(element.GetMembraneRestLength(), 0.25, 1e-6);
 
         TS_ASSERT_DELTA(element.GetCellCellSpringConstant(), 50.0, 1e-6);
         TS_ASSERT_DELTA(element.GetCellCellRestLength(), 0.01, 1e-6);
+
+        // Test source node
+        TS_ASSERT(element.GetSourceNode() != NULL);
+        Node<2>* source_node = element.GetSourceNode();
+
+        TS_ASSERT_DELTA(source_node->rGetLocation()[0], 0.0, 1e-10);
+        TS_ASSERT_DELTA(source_node->rGetLocation()[1], 0.0, 1e-10);
+        TS_ASSERT_DELTA(source_node->GetRadius(), 0.0, 1e-10);
     }
 
     void TestSetAndGetMethods() throw(Exception)

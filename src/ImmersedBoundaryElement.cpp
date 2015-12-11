@@ -47,6 +47,7 @@ ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryElement(unsigne
     assert(rNodes.size() > 2);
 
     mpSourceNode = new Node<SPACE_DIM>(0);
+    mpSourceNode->SetRadius(0.0);
 
     /*
      * Set default parameter values:
@@ -203,6 +204,12 @@ void ImmersedBoundaryElement<1, SPACE_DIM>::SetCellCellSpringConstant(double spr
 template<unsigned SPACE_DIM>
 void ImmersedBoundaryElement<1, SPACE_DIM>::SetCellCellRestLength(double restLength)
 {
+}
+
+template<unsigned SPACE_DIM>
+Node<SPACE_DIM>* ImmersedBoundaryElement<1, SPACE_DIM>::GetSourceNode(void)
+{
+    return NULL;
 }
 
 

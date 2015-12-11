@@ -72,6 +72,10 @@ ImmersedBoundarySimulationModifier<DIM>::~ImmersedBoundarySimulationModifier()
     {
         delete(mpArrays);
     }
+    if (mpFftInterface)
+    {
+        delete(mpFftInterface);
+    }
 }
 
 template<unsigned DIM>

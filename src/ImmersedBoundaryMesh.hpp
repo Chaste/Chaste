@@ -93,6 +93,11 @@ protected:
     std::vector<ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>*> mElements;
 
     /**
+     * Vector of sink nodes
+     */
+    std::vector<Node<SPACE_DIM>*> mSinkNodes;
+
+    /**
      * Solve node mapping method. This overridden method is required
      * as it is pure virtual in the base class.
      *
@@ -313,6 +318,11 @@ public:
      * @return the global index of the membrane element (UINT_MAX if no membrane element)
      */
     unsigned GetMembraneIndex();
+
+    /**
+     * @return reference to vector of sink nodes
+     */
+    std::vector<Node<SPACE_DIM>*>& rGetSinkNodes();
 
     /**
      * @param index  the global index of a specified immersed boundary element.

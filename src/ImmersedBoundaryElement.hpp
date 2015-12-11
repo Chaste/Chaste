@@ -251,6 +251,13 @@ public:
      */
     double GetCellCellRestLength(void);
 
+    /**
+     * Get the source node
+     *
+     * @return pointer to the source node
+     */
+    Node<SPACE_DIM>* GetSourceNode(void);
+
 };
 
 #endif /*IMMERSEDBOUNDARYELEMENT_HPP_*/

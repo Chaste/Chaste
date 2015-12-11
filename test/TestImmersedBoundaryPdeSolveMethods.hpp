@@ -72,7 +72,7 @@ class TestImmersedBoundaryPdeSolveMethods : public AbstractCellBasedTestSuite
 {
 public:
 
-    void xTestForcePropagation() throw(Exception)
+    void TestForcePropagation() throw(Exception)
     {
         // Create a vector of nodes forming a rectangle in (0,1)x(0,1)
         std::vector<Node<2>*> nodes;

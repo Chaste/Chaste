@@ -102,8 +102,8 @@ ImmersedBoundaryFftInterface<DIM>::ImmersedBoundaryFftInterface(ImmersedBoundary
         WARNING("fftw wisdom not imported correctly");
     }
 
-    unsigned num_gridpts_x = mpMesh->GetNumGridPtsX();
-    unsigned num_gridpts_y = mpMesh->GetNumGridPtsY();
+    int num_gridpts_x = (int)mpMesh->GetNumGridPtsX();
+    int num_gridpts_y = (int)mpMesh->GetNumGridPtsY();
 
     // We require an even number of grid points
     assert(num_gridpts_y % 2 == 0);
@@ -112,7 +112,7 @@ ImmersedBoundaryFftInterface<DIM>::ImmersedBoundaryFftInterface(ImmersedBoundary
      * Resize the grids.  All complex grids are half-sized in the y-coordinate due to redundancy inherent in the
      * fast-Fourier method for solving Navier-Stokes.
      */
-    unsigned reduced_y = 1 + (num_gridpts_y/2);
+    int reduced_y = 1 + (num_gridpts_y/2);
 
     /*
      * Plan the discrete Fourier transforms:

@@ -110,6 +110,28 @@ ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryMesh(std::vector<N
     }
     mCharacteristicNodeSpacing = total_perimeter / double(total_nodes);
 
+    // Position source nodes at centroid of each cell, and set 'radius' (strength) to zero
+    for (unsigned elem_index = 0 ; elem_index < elements.size() ; elem_index++)
+    {
+        if (elem_index != mMembraneIndex)
+        {
+            mElements[elem_index]->GetSourceNode()->rGetModifiableLocation() = this->GetCentroidOfElement(elem_index);
+            mElements[elem_index]->GetSourceNode()->SetRadius(0.0);
+        }
+    }
+
+    /*
+     * Set up a number of sink nodes to balance any active sources inside elements
+     */
+    double sink_node_spacing = 4.0 / (double)numGridPtsX;
+    double current_location = sink_node_spacing / 8.0;
+    while (current_location < 1.0)
+    {
+        mSinkNodes.push_back(new Node<SPACE_DIM>(0, false, current_location));
+        current_location += sink_node_spacing;
+        mSinkNodes.back()->SetRadius(0.0);
+    }
+
     this->mMeshChangesDuringSimulation = true;
 }
 
@@ -257,6 +279,12 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetMembraneIndex()
 {
     return mMembraneIndex;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+std::vector<Node<SPACE_DIM>*>& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::rGetSinkNodes()
+{
+    return mSinkNodes;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
