@@ -920,7 +920,7 @@ public:
             BoxCollection<2> box_collection(interaction_distance, domain_size, true, false);
             box_collection.SetupLocalBoxesHalfOnly();
 
-            TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 100);
+            TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 100u);
 
             std::set<unsigned> calculated_neighbours;
 
