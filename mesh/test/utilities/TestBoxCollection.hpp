@@ -98,7 +98,7 @@ public:
             {
                 c_vector<int, 1> grid_indices = box_collection.GetGridIndices(i);
                 TS_ASSERT_EQUALS(grid_indices(0), i);
-                TS_ASSERT_EQUALS(box_collection.GetLinearIndex(grid_indices), i);
+                TS_ASSERT_EQUALS(box_collection.GetLinearIndex(grid_indices), (unsigned)i);
             }
         }
 
