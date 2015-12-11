@@ -97,6 +97,7 @@ public:
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
         ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
+        cell_population.SetIfPopulationHasActiveSources(true);
 
         OffLatticeSimulation<2> simulator(cell_population);
 

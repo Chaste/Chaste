@@ -88,6 +88,9 @@ private:
     /** The distance over which cell-cell interactions occur */
     double mInteractionDistance;
 
+    /** Whether the simulation has active fluid sources */
+    bool mPopulationHasActiveSources;
+
     /**
      * Overridden WriteVtkResultsToFile() method.
      *
@@ -401,6 +404,16 @@ public:
      * @param pVertexBasedDivisionRule  pointer to the new division rule
      */
     void SetVertexBasedDivisionRule(boost::shared_ptr<AbstractVertexBasedDivisionRule<DIM> > pVertexBasedDivisionRule);
+
+    /**
+     * @return mPopulationHasActiveSources whether the population has active fluid sources
+     */
+    bool DoesPopulationHaveActiveSources();
+
+    /**
+     * Set whether the population has active sources
+     */
+    void SetIfPopulationHasActiveSources(bool hasActiveSources);
 };
 
 #include "SerializationExportWrapper.hpp"

@@ -40,8 +40,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Debug.hpp"
 
 template<unsigned DIM>
-ImmersedBoundary2dArrays<DIM>::ImmersedBoundary2dArrays(ImmersedBoundaryMesh<DIM,DIM>* pMesh, double dt, double reynoldsNumber)
-        : mpMesh(pMesh)
+ImmersedBoundary2dArrays<DIM>::ImmersedBoundary2dArrays(ImmersedBoundaryMesh<DIM,DIM>* pMesh, double dt, double reynoldsNumber, bool activeSources)
+        : mpMesh(pMesh),
+          mActiveSources(activeSources)
 {
     unsigned num_gridpts_x = mpMesh->GetNumGridPtsX();
     unsigned num_gridpts_y = mpMesh->GetNumGridPtsY();
@@ -56,13 +57,15 @@ ImmersedBoundary2dArrays<DIM>::ImmersedBoundary2dArrays(ImmersedBoundaryMesh<DIM
     unsigned reduced_y = 1 + (num_gridpts_y/2);
 
     // Resize real arrays to X by Y
+    // There are three such RightHandSide arrays if sources are active
     mForceGrids.resize(extents[2][num_gridpts_x][num_gridpts_y]);
-    mRightHandSideGrids.resize(extents[2][num_gridpts_x][num_gridpts_y]);
+    mRightHandSideGrids.resize(extents[2 + (int)mActiveSources][num_gridpts_x][num_gridpts_y]);
 
     // Resize Fourier-domain arrays
+    // There are three such FourierGrid arrays if sources are active
     mOperator1.resize(extents[num_gridpts_x][reduced_y]);
     mOperator2.resize(extents[num_gridpts_x][reduced_y]);
-    mFourierGrids.resize(extents[2][num_gridpts_x][reduced_y]);
+    mFourierGrids.resize(extents[2 + (int)mActiveSources][num_gridpts_x][reduced_y]);
     mPressureGrid.resize(extents[num_gridpts_x][reduced_y]);
 
     mSin2x.resize(num_gridpts_x);

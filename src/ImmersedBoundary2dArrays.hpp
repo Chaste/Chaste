@@ -54,6 +54,9 @@ protected:
     /** The Immersed Boundary Mesh */
     ImmersedBoundaryMesh<DIM,DIM>* mpMesh;
 
+    /** Whether the population has active fluid sources */
+    bool mActiveSources;
+
     /** Grid to store force acting on fluid */
     multi_array<double, 3> mForceGrids;
 
@@ -86,8 +89,9 @@ public:
      * @param pMesh the Immersed Boundary mesh
      * @param dt the simulation timestep
      * @param reynoldsNumber the Reynolds Number of the fluid
+     * @param activeSources whether the population has active fluid sources
      */
-    ImmersedBoundary2dArrays(ImmersedBoundaryMesh<DIM,DIM>* pMesh, double dt, double reynoldsNumber);
+    ImmersedBoundary2dArrays(ImmersedBoundaryMesh<DIM,DIM>* pMesh, double dt, double reynoldsNumber, bool activeSources);
 
     /**
      * Empty constructor

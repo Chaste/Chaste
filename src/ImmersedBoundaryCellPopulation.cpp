@@ -77,6 +77,9 @@ PRINT_VARIABLE(mInteractionDistance);
     {
         Validate();
     }
+
+    // Default active sources to true (safer - simulation will always work with sources set to zero, just a bit slower)
+    mPopulationHasActiveSources = true;
 }
 
 template<unsigned DIM>
@@ -563,6 +566,18 @@ template<unsigned DIM>
 void ImmersedBoundaryCellPopulation<DIM>::SetVertexBasedDivisionRule(boost::shared_ptr<AbstractVertexBasedDivisionRule<DIM> > pVertexBasedDivisionRule)
 {
     mpVertexBasedDivisionRule = pVertexBasedDivisionRule;
+}
+
+template<unsigned DIM>
+bool ImmersedBoundaryCellPopulation<DIM>::DoesPopulationHaveActiveSources()
+{
+    return mPopulationHasActiveSources;
+}
+
+template<unsigned DIM>
+void ImmersedBoundaryCellPopulation<DIM>::SetIfPopulationHasActiveSources(bool hasActiveSources)
+{
+    mPopulationHasActiveSources = hasActiveSources;
 }
 
 // Explicit instantiation

@@ -44,29 +44,32 @@ ImmersedBoundaryFftInterface<DIM>::ImmersedBoundaryFftInterface(ImmersedBoundary
                                                                 double* pIn,
                                                                 std::complex<double>* pComplex,
                                                                 double* pOut,
-                                                                unsigned maxNumThreads)
-        : mpMesh(pMesh),
+                                                                bool multiThread,
+                                                                bool activeSources)
+        : mThreadErrors(multiThread ? fftw_init_threads() : 1),
+          mpMesh(pMesh),
           mpInputArray(pIn),
           mpComplexArray(reinterpret_cast<fftw_complex*>(pComplex)),
           mpOutputArray(pOut),
-          mMaxNumThreads(maxNumThreads)
+          mMultiThread(multiThread)
 {
     /*
      * Set up fftw routines
      */
 
     // If more than one thread, the following must happen before any other fftw routines
-    if (mMaxNumThreads > 1)
+    if (mMultiThread)
     {
-        int potential_thread_errors = fftw_init_threads();
+//        int potential_thread_errors = fftw_init_threads();
 
         // 1 means success, 0 indicates a failure
-        if (potential_thread_errors != 1)
+        if (mThreadErrors != 1)
         {
             EXCEPTION("fftw thread error");
         }
 
-        fftw_plan_with_nthreads(mMaxNumThreads);
+        // Plan with number of threads equal to the max number of arrays to transform
+        fftw_plan_with_nthreads(2 + (int)activeSources);
     }
 
     // Forget all wisdom; the correct wisdom for the number of threads used will be loaded from file
@@ -76,7 +79,7 @@ ImmersedBoundaryFftInterface<DIM>::ImmersedBoundaryFftInterface(ImmersedBoundary
     std::string wisdom_path;
     std::string wisdom_filename;
 
-    if (mMaxNumThreads == 1)
+    if (!mMultiThread)
     {
         wisdom_filename = "fftw.wisdom";
     }
@@ -129,7 +132,8 @@ ImmersedBoundaryFftInterface<DIM>::ImmersedBoundaryFftInterface(ImmersedBoundary
     int rank = 2;                                       // Number of dimensions for each array
     int real_dims[] = {num_gridpts_x, num_gridpts_y};   // Dimensions of each real array
     int comp_dims[] = {num_gridpts_x, reduced_y};       // Dimensions of each complex array
-    int how_many = 2;                                   // Number of transforms
+    int how_many_forward = 2 + (int)activeSources;      // Number of forward transforms (one more if sources are active)
+    int how_many_inverse = 2;                           // Number of inverse transforms (always 2)
     int real_sep = num_gridpts_x * num_gridpts_y;       // How many doubles between start of first array and start of second
     int comp_sep = num_gridpts_x * reduced_y;           // How many fftw_complex between start of first array and start of second
     int real_stride = 1;                                // Each real array is contiguous in memory
@@ -137,12 +141,12 @@ ImmersedBoundaryFftInterface<DIM>::ImmersedBoundaryFftInterface(ImmersedBoundary
     int* real_nembed = real_dims;
     int* comp_nembed = comp_dims;
 
-    mFftwForwardPlan = fftw_plan_many_dft_r2c(rank, real_dims, how_many,
+    mFftwForwardPlan = fftw_plan_many_dft_r2c(rank, real_dims, how_many_forward,
                                               mpInputArray,   real_nembed, real_stride, real_sep,
                                               mpComplexArray, comp_nembed, comp_stride, comp_sep,
                                               FFTW_PATIENT);
 
-    mFftwInversePlan = fftw_plan_many_dft_c2r(rank, real_dims, how_many,
+    mFftwInversePlan = fftw_plan_many_dft_c2r(rank, real_dims, how_many_inverse,
                                               mpComplexArray, comp_nembed, comp_stride, comp_sep,
                                               mpOutputArray,  real_nembed, real_stride, real_sep,
                                               FFTW_PATIENT);
