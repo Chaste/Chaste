@@ -64,37 +64,51 @@ private:
 
 public:
 
-    void TestSetupWisdomFileOneThread() throw(Exception)
+    void TestSetupWisdomFileMultiThread() throw(Exception)
     {
-        std::string single_thread_file_name = "fftw.wisdom";
+        // Must be called before other fftw routines to let fftw know to set up threaded environment
+        int thread_flag = fftw_init_threads();
+        TS_ASSERT_EQUALS(thread_flag, 1);
+
+        std::string multi_thread_file_name  = "fftw_threads.wisdom";
 
         // Set up the file finder and get the absolute path
-        FileFinder file_finder(single_thread_file_name, RelativeTo::ChasteTestOutput);
-        mWisdomFilename = file_finder.GetAbsolutePath();
+        FileFinder file_finder(multi_thread_file_name, RelativeTo::ChasteTestOutput);
+        mWisdomThreadsFilename = file_finder.GetAbsolutePath();
+
+        // Find if the file exists
+        bool wisdom_exists = file_finder.IsFile();
 
         // If it doesn't exists, create it with blank wisdom file
-        if (!file_finder.IsFile())
+        if (!wisdom_exists)
         {
             void fftw_forget_wisdom(void);
-            fftw_export_wisdom_to_filename(mWisdomFilename.c_str());
+            fftw_export_wisdom_to_filename(mWisdomThreadsFilename.c_str());
         }
 
         // The file should now definitely exist
         TS_ASSERT(file_finder.IsFile());
     }
 
-    void TestGenerateManyR2CWisdomOneThread() throw(Exception)
+    void TestGenerateManyR2CWisdomMultiThreads() throw(Exception)
     {
         /*
          * This test generates an fftw wisdom file telling fftw how to efficiently compute fourier transforms of a
-         * given size, using two threads.  We generate wisdom for two and three DFTs of data contiguous in memory:
+         * given size, using two threads.  We generate wisdom for two DFTs of data contiguous in memory:
          *
          *    * 2d forward R2C and backward C2R transforms (16x16 --> 4096x4096)
          */
 
+        int thread_flag = fftw_init_threads();
+
+        // 1 means it has set up threading correctly, 0 indicates a failure
+        TS_ASSERT_EQUALS(thread_flag, 1);
+
+        fftw_plan_with_nthreads(2);
+
         // We first forget all wisdom and re-load, as threaded wisdom doesn't play well with un-threaded
         void fftw_forget_wisdom(void);
-        int wisdom_flag = fftw_import_wisdom_from_filename(mWisdomFilename.c_str());
+        int wisdom_flag = fftw_import_wisdom_from_filename(mWisdomThreadsFilename.c_str());
 
         // 1 means it's read correctly, 0 indicates a failure
         TS_ASSERT_EQUALS(wisdom_flag, 1);
@@ -103,7 +117,7 @@ public:
         typedef boost::multi_array<std::complex<double>, 3> complex_array_2d;
         typedef boost::multi_array<double, 3> real_array_2d;
 
-        // Create 2D wisdom with 2 transforms
+        // Create 2D wisdom
         for (unsigned i = 16 ; i <= mMaxArraySize ; i*=2)
         {
             real_array_2d input(boost::extents[2][i][i]);
@@ -165,11 +179,25 @@ public:
             }
 
             // Export each step of the loop so if the test is stopped progress is kept
-            fftw_export_wisdom_to_filename(mWisdomFilename.c_str());
-            std::cout << "Exported 1-thread wisdom for two contiguous arrays of size " << i << " by " << i << std::endl;
+            fftw_export_wisdom_to_filename(mWisdomThreadsFilename.c_str());
+            std::cout << "Exported 2-thread wisdom for two contiguous arrays of size " << i << " by " << i << std::endl;
         }
 
-        // Create 2D wisdom with 3 transforms
+        /*
+         * Same again, but with three threads and three contiguous arrays
+         */
+        fftw_plan_with_nthreads(3);
+
+        wisdom_flag = fftw_import_wisdom_from_filename(mWisdomThreadsFilename.c_str());
+
+        // 1 means it's read correctly, 0 indicates a failure
+        TS_ASSERT_EQUALS(wisdom_flag, 1);
+
+        // Create 3D arrays that will represent two 2D arrays
+        typedef boost::multi_array<std::complex<double>, 3> complex_array_2d;
+        typedef boost::multi_array<double, 3> real_array_2d;
+
+        // Create 2D wisdom
         for (unsigned i = 16 ; i <= mMaxArraySize ; i*=2)
         {
             real_array_2d input(boost::extents[3][i][i]);
@@ -231,8 +259,8 @@ public:
             }
 
             // Export each step of the loop so if the test is stopped progress is kept
-            fftw_export_wisdom_to_filename(mWisdomFilename.c_str());
-            std::cout << "Exported 1-thread wisdom for three contiguous arrays of size " << i << " by " << i << std::endl;
+            fftw_export_wisdom_to_filename(mWisdomThreadsFilename.c_str());
+            std::cout << "Exported 3-thread wisdom for three contiguous arrays of size " << i << " by " << i << std::endl;
         }
     }
 };
