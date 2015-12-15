@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef SIMPLEBALLOONACINARUNIT_HPP_
-#define SIMPLEBALLOONACINARUNIT_HPP_
+#ifndef SIMPLEBALLOONEXPLICITACINARUNIT_HPP_
+#define SIMPLEBALLOONEXPLICITACINARUNIT_HPP_
 
 #include "AbstractAcinarUnit.hpp"
 
@@ -43,20 +43,22 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * See "Lung Mechanics: an inverse modelling approach" by Bates CUP 2009.
  *
- * Nb. This implementation uses the exponential integration flow predictor
- * described in Coleman JAP 1977 to improve stability of the coupled problem.
+ * Nb. This implementation uses an explicit solution scheme that requires
+ * very small timesteps for stability (dt < 2*compliance*airways resistance).
+ * This class is principally for convergence testing against the more stable
+ * version found in SimpleBalloonAcinarUnit.
  */
-class SimpleBalloonAcinarUnit : public AbstractAcinarUnit
+class SimpleBalloonExplicitAcinarUnit : public AbstractAcinarUnit
 {
 friend class TestAcinarUnitModels;
 
 public:
     /** Create a new acinar unit.
      */
-    SimpleBalloonAcinarUnit();
+    SimpleBalloonExplicitAcinarUnit();
 
     /** Virtual destructor */
-    virtual ~SimpleBalloonAcinarUnit();
+    virtual ~SimpleBalloonExplicitAcinarUnit();
 
     /**
      * Set the timestep to use for simulating this acinus.
@@ -168,4 +170,4 @@ private:
 };
 
 
-#endif /*SIMPLEBALLOONACINARUNIT*/
+#endif /*SIMPLEBALLOONEXPLICITACINARUNIT*/

@@ -39,6 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 
 #include "SimpleBalloonAcinarUnit.hpp"
+#include "SimpleBalloonExplicitAcinarUnit.hpp"
 #include "SigmoidalAcinarUnit.hpp"
 #include "Swan2012AcinarUnit.hpp"
 #include "TimeStepper.hpp"
@@ -107,6 +108,7 @@ public:
         acinus.SetFlow(0.0);
         acinus.SetUndeformedVolume(0.0);
         double compliance = 0.1/98.0665/1e3;  //in m^3 / pa. Converted from 0.1 L/cmH2O per lung.
+
         acinus.SetCompliance(compliance);
         acinus.SetTerminalBronchioleResistance(terminal_airway_resistance);
 
@@ -154,6 +156,69 @@ public:
         TS_ASSERT_DELTA(acinus.GetVolume(), -compliance*pleural_pressure, 1e-8);
         TS_ASSERT_DELTA(flow_integral, -compliance*pleural_pressure, 1e-8);
     }
+
+    void TestSimpleBalloonExplicitAcinarUnitInspiration() throw (Exception)
+   {
+       double viscosity = 1.92e-5;               //Pa s
+       double terminal_airway_radius = 0.05;   //m
+       double terminal_airway_length  = 0.02;   //m
+       double terminal_airway_resistance = 8*viscosity*terminal_airway_length/(M_PI*SmallPow(terminal_airway_radius, 4));
+
+       SimpleBalloonExplicitAcinarUnit acinus;
+       acinus.SetAirwayPressure(0.0);
+       acinus.SetPleuralPressure(0.0);
+       acinus.SetFlow(0.0);
+       acinus.SetUndeformedVolume(0.0);
+       double compliance = 0.1/98.0665/1e3;  //in m^3 / pa. Converted from 0.1 L/cmH2O per lung.
+
+       acinus.SetCompliance(compliance);
+       acinus.SetTerminalBronchioleResistance(terminal_airway_resistance);
+
+       acinus.SolveAndUpdateState(0.0, 0.2);
+       TS_ASSERT_DELTA(acinus.GetFlow(), 0.0, 1e-6);   //With no pressure change we expect no flow
+       TS_ASSERT_DELTA(acinus.GetVolume(), 0.0, 1e-2); //With no pressure change we expect no volume change
+
+       //Uncomment below to find time step bound
+       //std::cout << 2*terminal_airway_radius*compliance << std::endl; abort();
+
+       TimeStepper time_stepper(0.0, 0.01, 0.0000001); //Only solve for a very short time due to dt restriction, this test is mostly for coverage
+       acinus.SetAirwayPressure(0.0);
+       double pleural_pressure = 0.0;
+
+       double ode_volume = 0.0;
+       double flow_integral = 0.0;
+
+       while (!time_stepper.IsTimeAtEnd())
+       {
+           pleural_pressure = - 2400*(sin((M_PI)*(time_stepper.GetNextTime())));
+
+           //Solve the acinar problem coupled to a single bronchiole
+           acinus.SetPleuralPressure(pleural_pressure);
+
+           //acinus.SolveAndUpdateState(time_stepper.GetTime(), time_stepper.GetNextTime());
+           acinus.ComputeExceptFlow(time_stepper.GetTime(), time_stepper.GetNextTime());
+
+           double airway_pressure = acinus.GetAirwayPressure();
+           double flow = -airway_pressure/terminal_airway_resistance;
+
+           flow_integral += (time_stepper.GetNextTime() - time_stepper.GetTime())*flow;
+
+           acinus.SetFlow(flow);
+           acinus.UpdateFlow(time_stepper.GetTime(), time_stepper.GetNextTime());
+
+           //Solve the corresponding ODE problem using backward Euler for testing
+           // dv/dt = -1/R*(V/C - (Paw - Ppl))
+           // Discretise using backward euler and rearrange to obtain the below
+           double dt = time_stepper.GetNextTimeStep();
+           ode_volume = (ode_volume - dt*pleural_pressure/terminal_airway_resistance)/(1 + dt/(terminal_airway_resistance*compliance));
+
+           TS_ASSERT_DELTA(acinus.GetVolume(), ode_volume, 1e-8);
+
+           time_stepper.AdvanceOneTimeStep();
+       }
+   }
+
+
 
     void TestSigmoidalAcinarUnitInspiration() throw (Exception)
     {
@@ -212,7 +277,6 @@ public:
             time_stepper.AdvanceOneTimeStep();
         }
     }
-
 
 
     void TestSwan2012AcinarUnitCalculateMethods() throw(Exception)

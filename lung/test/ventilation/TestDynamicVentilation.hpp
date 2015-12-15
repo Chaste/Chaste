@@ -47,6 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TetrahedralMesh.hpp"
 #include "FileFinder.hpp"
 #include "SimpleBalloonAcinarUnit.hpp"
+#include "SimpleBalloonExplicitAcinarUnit.hpp"
 
 #include "boost/numeric/ublas/io.hpp"
 
@@ -58,7 +59,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscSetupAndFinalize.hpp"
 
 
-class SimpleAcinarUnitFactory : public AbstractAcinarUnitFactory
+template <typename ACINAR_UNIT = SimpleBalloonAcinarUnit> class SimpleAcinarUnitFactory : public AbstractAcinarUnitFactory
 {
 public:
     SimpleAcinarUnitFactory(double acinarCompliance,
@@ -70,7 +71,7 @@ public:
 
     virtual AbstractAcinarUnit* CreateAcinarUnitForNode(Node<3>* pNode)
     {
-        SimpleBalloonAcinarUnit* p_acinus = new SimpleBalloonAcinarUnit;
+        ACINAR_UNIT* p_acinus = new ACINAR_UNIT;
 
         p_acinus->SetCompliance(mAcinarCompliance);
 
@@ -95,12 +96,12 @@ public:
 
     void TestColemanDynamicVentilationSingleAirway() throw(Exception)
     {
-#ifdef LUNG_USE_UMFPACK
+#if defined(LUNG_USE_UMFPACK) || defined(LUNG_USE_KLU)
         FileFinder mesh_finder("lung/test/data/single_branch", RelativeTo::ChasteSourceRoot);
 
         double compliance = 0.1/98.0665/1e3;  //in m^3 / pa. Converted from 0.1 L/cmH2O per lung.
 
-        SimpleAcinarUnitFactory factory(compliance, 2400.0);
+        SimpleAcinarUnitFactory<> factory(compliance, 2400.0);
 
         double viscosity = 1.92e-5;               //Pa s
         double terminal_airway_radius = 0.0005;   //m
@@ -134,7 +135,7 @@ public:
             time_stepper.AdvanceOneTimeStep();
         }
 #else
-        std::cout << "Warning: This test needs UMFPACK to execute correctly." << std::endl;
+        std::cout << "Warning: This test needs a direct solver (UMFPACK or KLU) to execute correctly." << std::endl;
 #endif
     }
 
@@ -148,7 +149,7 @@ public:
         double total_compliance = 0.1/98.0665/1e3;  //in m^3 / pa. Converted from 0.1 L/cmH2O per lung to four acinar compartments
         double acinar_compliance = total_compliance/4.0;
 
-        SimpleAcinarUnitFactory factory(acinar_compliance, 2400.0);
+        SimpleAcinarUnitFactory<> factory(acinar_compliance, 2400.0);
         TS_ASSERT_THROWS_CONTAINS(factory.GetMesh(), "The mesh object has not been set in the acinar unit factory");
 
         double viscosity = 1.92e-5;               //Pa s
@@ -205,7 +206,7 @@ public:
 
     void TestColemanDynamicVentilationOtisBifurcations() throw(Exception)
     {
-#ifdef LUNG_USE_UMFPACK
+#if defined(LUNG_USE_UMFPACK) || defined(LUNG_USE_KLU)
        FileFinder mesh_finder("lung/test/data/otis_bifurcation", RelativeTo::ChasteSourceRoot);
 
        //The otis bifurcation mesh defines two branches of unequal radii leading to two acini
@@ -240,7 +241,7 @@ public:
 
        double delta_p = 500;
 
-       SimpleAcinarUnitFactory factory(C1, delta_p/2.0, frequency);
+       SimpleAcinarUnitFactory<> factory(C1, delta_p/2.0, frequency);
 
        DynamicVentilationProblem problem(&factory, mesh_finder.GetAbsolutePath(), 0u);
        problem.rGetMatrixVentilationProblem().SetMeshInMilliMetres();
@@ -283,9 +284,76 @@ public:
 
        TS_ASSERT_DELTA(expected_tidal_volume, max_total_volume - min_total_volume, 1e-7);
 #else
-        std::cout << "Warning: This test needs UMFPACK to execute correctly." << std::endl;
+        std::cout << "Warning: This test needs a direct solver (UMFPACK or KLU) to execute correctly." << std::endl;
 #endif
     }
+
+    void TestColemanVsExplicitWithPedley() throw(Exception)
+    {
+#if defined(LUNG_USE_UMFPACK) || defined(LUNG_USE_KLU)
+        //This test compares an acinar unit using an explicit coupling scheme against an
+        //acinar unit using the Coleman coupling scheme. Both use dynamic (Pedley) airway
+        //resistance. Compliance & resistance are chosen to obtain similar dt bounds for
+        //the explicit scheme as commonly found for full simulations
+
+        FileFinder mesh_finder("lung/test/data/single_branch_no_intermediate", RelativeTo::ChasteSourceRoot);
+
+        double compliance = 0.1/98.0665/1e3/30000;  //in m^3 / pa. Converted from 0.1 L/cmH2O per lung.
+
+        //Theory says that dt < 2*R*C gives stability in the explicit scheme when using Poiseuille flow.
+        //As R_poiseuille < R_pedley, this acts as a lower bound for stability here.
+        //Nb, we use radius = 2 mm, which results in a very tight dt bound, to ensure that Pedley resistance is
+        //used.
+        double dt = 1e-6;
+        double end_time = 0.15;
+
+        double viscosity = 1.92e-5;               //Pa s
+        double terminal_airway_radius = 0.002;   //m
+        double terminal_airway_length  = 0.005;   //m
+        double terminal_airway_resistance = 8*viscosity*terminal_airway_length/(M_PI*SmallPow(terminal_airway_radius, 4));
+        TS_ASSERT_LESS_THAN(dt, 2*terminal_airway_resistance*compliance);
+
+        double coleman_end_volume;
+        double explicit_end_volume;
+
+        {
+            SimpleAcinarUnitFactory<SimpleBalloonExplicitAcinarUnit> factory(compliance, 2400.0);
+
+            DynamicVentilationProblem problem(&factory, mesh_finder.GetAbsolutePath(), 0u);
+            problem.rGetMatrixVentilationProblem().SetOutflowPressure(0.0);
+            problem.rGetMatrixVentilationProblem().SetMeshInMilliMetres();
+            problem.rGetMatrixVentilationProblem().SetDynamicResistance();
+            problem.SetTimeStep(dt);
+            problem.SetEndTime(end_time);
+
+            problem.Solve();
+
+            std::map<unsigned, AbstractAcinarUnit*>& r_acinar_map = problem.rGetAcinarUnitMap();
+            explicit_end_volume = r_acinar_map[1]->GetVolume();
+        }
+
+        {
+            SimpleAcinarUnitFactory<> factory(compliance, 2400.0);
+
+            DynamicVentilationProblem problem(&factory, mesh_finder.GetAbsolutePath(), 0u);
+            problem.rGetMatrixVentilationProblem().SetOutflowPressure(0.0);
+            problem.rGetMatrixVentilationProblem().SetMeshInMilliMetres();
+            problem.rGetMatrixVentilationProblem().SetDynamicResistance();
+            problem.SetTimeStep(dt);
+            problem.SetEndTime(end_time);
+
+            problem.Solve();
+
+            std::map<unsigned, AbstractAcinarUnit*>& r_acinar_map = problem.rGetAcinarUnitMap();
+            coleman_end_volume = r_acinar_map[1]->GetVolume();
+        }
+
+        TS_ASSERT_DELTA(explicit_end_volume, coleman_end_volume, 1e-12);
+#else
+        std::cout << "Warning: This test needs a direct solver (UMFPACK or KLU) to execute correctly." << std::endl;
+#endif
+    }
+
 };
 
 
