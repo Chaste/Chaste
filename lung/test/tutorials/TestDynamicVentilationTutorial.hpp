@@ -56,7 +56,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * by an oscillating pleural pressure. Simulation results are written to a VTK unstructured grid file
  * for visualisation.
  *
- * NB. UMFPACK is required for this test to execute. The test has a reasonably long run time (~6 minutes on a quad core i7).
+ * NB. UMFPACK or KLU is required for this test to execute. The test has a reasonably long run time (~6 minutes on a quad core i7).
  * Progress can be followed by watching the file $CHASTE_TEST_OUTPUT/TestDynamicVentilationTutorial/progress_status.txt
  */
 
@@ -70,7 +70,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* A number of acinar models could be used. Here we include the simplest possible model: a linear elastic balloon. */
 #include "SimpleBalloonAcinarUnit.hpp"
 
-/* Note that this tutorial only works with UMFPACK -- we need to warn the user if it's not installed. */
+/* Note that this tutorial only works with UMFPACK or KLU -- we need to warn the user if it's not installed. */
 #include "Warnings.hpp"
 
 /* !DynamicVentilationProblem uses the Petsc solver library. This setups up Petsc ready for use. */
@@ -142,16 +142,15 @@ public: // Tests should be public!
     void TestSimulateTidalBreathing() throw (Exception)
     {
         /*
-         * !DynamicVentilationProblem is not (yet) parallel. However, most of the execution time is
-         * spent doing matrix solves and UMFPACK will exploit multiple cores where possible
+         * !DynamicVentilationProblem is not (yet) parallel.
          */
         EXIT_IF_PARALLEL;
 
         /*
          * == IMPORTANT ==
-         * See the note below about use of UMFPACK. This tutorial cannot be run without UMFPACK.
+         * See the note below about use of direct solvers. This tutorial cannot be run without a direct solver.
          */
-#ifdef LUNG_USE_UMFPACK
+#if defined(LUNG_USE_UMFPACK) || defined(LUNG_USE_KLU)
 
         /* First we need to create an acinar unit factory object from the class we specified earlier.
          * An acinar compliance is specified in Pa/m^3^. The given value is roughly equal to a lung compliance
@@ -224,24 +223,25 @@ public: // Tests should be public!
 
         std::cout << "The total lung volume at the end of the simulation is " << lung_volume*1e3 << " L. " << std::endl;
 #else
-        WARNING("Not compiled with UMFPACK. Test not executed.");
+        WARNING("Not compiled with a direct solver. Test not executed.");
 #endif
     }
 
     /*
      *
-     * == IMPORTANT: Using UMFPACK ==
+     * == IMPORTANT: Using UMFPACK/KLU ==
      *
      * Ventilation problems lead to very badly conditioned matrices. Iterative solvers such as GMRES can stall on these
      * matrices. When running problems on large airway trees it is vital that to change the linear solver to a direct
-     * solver such as UMFPACK. UMFPACK is not a pre-requisite for installing Chaste, hence this is not (currently)
+     * solver such as UMFPACK or KLU. UMFPACK and KLU are not pre-requisites for installing Chaste, hence this is not (currently)
      * the default linear solver for ventilation problems.
      *
-     * ''UMFPACK should be considered a pre-requisite for large ventilation problems''
+     * ''UMFPACK or KLU should be considered pre-requisites for large ventilation problems''
      *
-     * To use UMFPACK, you need to have PETSc installed with UMFPACK.
+     * To use UMFPACK or KLU, you need to have PETSc installed with UMFPACK/KLU.
      *
-     * To switch on UMFPACK on within chaste, set "ccflags='-DLUNG_USE_UMFPACK'" in your local.py or
+     * To switch on UMFPACK or KLU on within chaste, set "ccflags='-DLUNG_USE_UMFPACK'" or
+     * "ccflags='-DLUNG_USE_KLU'" in your local.py or
      * open the file `lung/src/ventilation/MatrixVentilationProblem.hpp` and uncomment the line
      * #define LUNG_USE_UMFPACK near the top of the file.
      *

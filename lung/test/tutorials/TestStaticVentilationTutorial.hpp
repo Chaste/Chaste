@@ -64,7 +64,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* !MatrixVentilationProblem does most of the work in calculating a ventilation distribution. */
 #include "MatrixVentilationProblem.hpp"
 
-/* Note that this tutorial only works with UMFPACK -- we need to warn the user if it's not installed */
+/* Note that this tutorial only works with UMFPACK or KLU -- we need to warn the user if it's not installed */
 #include "Warnings.hpp"
 
 /* !MatrixVentilationProblem uses the Petsc solver library. This setups up Petsc ready for use. */
@@ -86,13 +86,13 @@ public: // Tests should be public!
          * using the !AirwayRemesher class.
          *
          * == IMPORTANT ==
-         * See the note below about use of UMFPACK. If UMFPACK is not available we use a different (not realistic) airways
+         * See the note below about use of UMFPACK or KLU. If UMFPACK or KLU are not available we use a different (not realistic) airways
          * mesh.
          */
-#ifdef LUNG_USE_UMFPACK
+#if defined(LUNG_USE_UMFPACK) || defined(LUNG_USE_KLU)
         MatrixVentilationProblem problem("lung/test/data/simplified_airways", 0u);
 #else
-        WARNING("Not compiled with UMFPACK.  Using non-realistic airway tree.");
+        WARNING("Not compiled with UMFPACK or KLU.  Using non-realistic airway tree.");
         MatrixVentilationProblem problem("mesh/test/data/y_branch_3d_mesh", 0u);
 #endif
 
@@ -145,18 +145,19 @@ public: // Tests should be public!
 
     /*
      *
-     * == IMPORTANT: Using UMFPACK ==
+     * == IMPORTANT: Using UMFPACK/KLU ==
      *
      * Ventilation problems lead to very badly conditioned matrices. Iterative solvers such as GMRES can stall on these
      * matrices. When running problems on large airway trees it is vital that to change the linear solver to a direct
-     * solver such as UMFPACK. UMFPACK is not a pre-requisite for installing Chaste, hence this is not (currently)
+     * solver such as UMFPACK or KLU. UMFPACK and KLU are not pre-requisites for installing Chaste, hence this is not (currently)
      * the default linear solver for ventilation problems.
      *
-     * ''UMFPACK should be considered a pre-requisite for large ventilation problems''
+     * ''UMFPACK or KLU should be considered pre-requisites for large ventilation problems''
      *
-     * To use UMFPACK, you need to have PETSc installed with UMFPACK.
+     * To use UMFPACK or KLU, you need to have PETSc installed with UMFPACK/KLU.
      *
-     * To switch on UMFPACK on within chaste, set "ccflags='-DLUNG_USE_UMFPACK'" in your local.py or
+     * To switch on UMFPACK or KLU on within chaste, set "ccflags='-DLUNG_USE_UMFPACK'" or
+     * "ccflags='-DLUNG_USE_KLU'" in your local.py or
      * open the file `lung/src/ventilation/MatrixVentilationProblem.hpp` and uncomment the line
      * #define LUNG_USE_UMFPACK near the top of the file.
      *
