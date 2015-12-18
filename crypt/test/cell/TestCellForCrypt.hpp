@@ -340,7 +340,7 @@ public:
         p_cell_cycle_model4->SetDimension(2);
         CellPropertyCollection collection;
         collection.AddProperty(p_label);
-        CellPtr p_wnt_cell4(new Cell(p_wt_state, p_cell_cycle_model4, false, collection));
+        CellPtr p_wnt_cell4(new Cell(p_wt_state, p_cell_cycle_model4, NULL, false, collection));
         p_wnt_cell4->SetCellProliferativeType(p_transit_type);
         p_wnt_cell4->InitialiseCellCycleModel();
 

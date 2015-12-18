@@ -33,30 +33,25 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef CELLDELTANOTCHWRITER_HPP_
-#define CELLDELTANOTCHWRITER_HPP_
+#ifndef GOLDBETER1991ODESYSTEM_HPP_
+#define GOLDBETER1991ODESYSTEM_HPP_
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
-#include "AbstractCellWriter.hpp"
+#include <boost/serialization/shared_ptr.hpp>
+
+#include <cmath>
+#include <iostream>
+
+#include "AbstractOdeSystem.hpp"
 
 /**
- * A class written using the visitor pattern for writing to file, for each cell,
- * the level of delta, notch and mean level of delta among neighbouring cells.
- *
- * The output file is called celldeltanotch.dat by default. If VTK is switched on,
- * then the writer also specifies the VTK output for each cell, which is stored in
- * the VTK cell data "Cell delta" by default.
- *
- * Note: if you use a DeltaNotchSrnModel then the delta and notch levels are
- * stored in CellData, and thus (if VTK is switched on) will be output as VTK cell
- * data already.
+ * Goldbeter 1991 System
  */
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-class CellDeltaNotchWriter : public AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>
+class Goldbeter1991OdeSystem : public AbstractOdeSystem
 {
 private:
-    /** Needed for serialization. */
+
     friend class boost::serialization::access;
     /**
      * Serialize the object and its member variables.
@@ -67,48 +62,73 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractOdeSystem>(*this);
     }
+
+    ///\todo extract model parameters as member variables
 
 public:
 
     /**
      * Default constructor.
+     *
+     * @param stateVariables optional initial conditions for state variables (only used in archiving)
      */
-    CellDeltaNotchWriter();
+    Goldbeter1991OdeSystem(std::vector<double> stateVariables=std::vector<double>());
 
     /**
-     * Overridden GetCellDataForVtkOutput() method.
-     *
-     * Get a double associated with a cell. This method reduces duplication
-     * of code between the methods VisitCell() and AddVtkData().
-     *
-     * @param pCell a cell
-     * @param pCellPopulation a pointer to the cell population owning the cell
-     *
-     * @return data associated with the cell
+     * Destructor.
      */
-    double GetCellDataForVtkOutput(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
+    ~Goldbeter1991OdeSystem();
 
     /**
-     * Overridden VisitCell() method.
+     * Compute the RHS of the  Collier et al. system of ODEs.
      *
-     * Visit a cell and write its delta and notch data.
+     * Returns a vector representing the RHS of the ODEs at each time step, y' = [y1' ... yn'].
+     * An ODE solver will call this function repeatedly to solve for y = [y1 ... yn].
      *
-     * Outputs a line of space-separated values of the form:
-     * ...[location index] [cell id] [x-pos] [y-pos] [z-pos] [delta] [notch] [mean neighbouring delta]...
-     * with [y-pos] and [z-pos] included for 2 and 3 dimensional simulations, respectively.
-     *
-     * This is appended to the output written by AbstractCellBasedWriter, which is a single
-     * value [present simulation time], followed by a tab.
-     *
-     * @param pCell a cell
-     * @param pCellPopulation a pointer to the cell population owning the cell
+     * @param time used to evaluate the RHS.
+     * @param rY value of the solution vector used to evaluate the RHS.
+     * @param rDY filled in with the resulting derivatives (using  Collier et al. system of equations).
      */
-    virtual void VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
+    void EvaluateYDerivatives(double time, const std::vector<double>& rY, std::vector<double>& rDY);
 };
 
+// Declare identifier for the serializer
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_ALL_DIMS(CellDeltaNotchWriter)
+CHASTE_CLASS_EXPORT(Goldbeter1991OdeSystem)
 
-#endif /* CELLDELTANOTCHWRITER_HPP_ */
+namespace boost
+{
+namespace serialization
+{
+/**
+ * Serialize information required to construct a Goldbeter1991OdeSystem.
+ */
+template<class Archive>
+inline void save_construct_data(
+    Archive & ar, const Goldbeter1991OdeSystem * t, const BOOST_PFTO unsigned int file_version)
+{
+    const std::vector<double> state_variables = t->rGetConstStateVariables();
+    ar & state_variables;
+}
+
+/**
+ * De-serialize constructor parameters and initialise a Goldbeter1991OdeSystem.
+ */
+template<class Archive>
+inline void load_construct_data(
+    Archive & ar, Goldbeter1991OdeSystem * t, const unsigned int file_version)
+{
+    std::vector<double> state_variables;
+    ar & state_variables;
+
+    // Invoke inplace constructor to initialise instance
+    ::new(t)Goldbeter1991OdeSystem(state_variables);
+}
+}
+} // namespace ...
+
+
+
+#endif /* GOLDBETER1991ODESYSTEM_HPP_ */

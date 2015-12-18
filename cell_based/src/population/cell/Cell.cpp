@@ -35,6 +35,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Cell.hpp"
 
+// Included here rather than the .hpp to avoid a circular include.
+#include "NullSrnModel.hpp"
+
 /**
  * null_deleter means "doesn't delete" rather than "deletes nulls".
  *
@@ -57,11 +60,13 @@ struct null_deleter
 
 Cell::Cell(boost::shared_ptr<AbstractCellProperty> pMutationState,
            AbstractCellCycleModel* pCellCycleModel,
+           AbstractSrnModel* pSrnModel,
            bool archiving,
            CellPropertyCollection cellPropertyCollection)
     : mCanDivide(false),
       mCellPropertyCollection(cellPropertyCollection),
       mpCellCycleModel(pCellCycleModel),
+      mpSrnModel(pSrnModel),
       mDeathTime(DBL_MAX), // This has to be initialised for archiving
       mStartOfApoptosisTime(DBL_MAX),
       mApoptosisTime(0.25), // cell takes 15 min to fully undergo apoptosis
@@ -80,6 +85,15 @@ Cell::Cell(boost::shared_ptr<AbstractCellProperty> pMutationState,
     }
 
     mpCellCycleModel->SetCell(CellPtr(this, null_deleter()));
+
+    // Create a null srn model if none given
+    if (pSrnModel == NULL)
+    {
+        pSrnModel = new NullSrnModel;
+        mpSrnModel = pSrnModel;
+    }
+
+    mpSrnModel->SetCell(CellPtr(this, null_deleter()));
 
     if (!mCellPropertyCollection.HasPropertyType<CellId>())
     {
@@ -138,6 +152,7 @@ Cell::~Cell()
         Kill();
     }
     delete mpCellCycleModel;
+    delete mpSrnModel;
 }
 
 void Cell::SetCellProliferativeType(boost::shared_ptr<AbstractCellProperty> pProliferativeType)
@@ -188,6 +203,26 @@ AbstractCellCycleModel* Cell::GetCellCycleModel() const
 void Cell::InitialiseCellCycleModel()
 {
     mpCellCycleModel->Initialise();
+}
+
+void Cell::SetSrnModel(AbstractSrnModel* pSrnModel)
+{
+    if (mpSrnModel != pSrnModel)
+    {
+        delete mpSrnModel;
+    }
+    mpSrnModel = pSrnModel;
+    mpSrnModel->SetCell(CellPtr(this, null_deleter()));
+}
+
+AbstractSrnModel* Cell::GetSrnModel() const
+{
+    return mpSrnModel;
+}
+
+void Cell::InitialiseSrnModel()
+{
+    mpSrnModel->Initialise();
 }
 
 double Cell::GetAge() const
@@ -429,6 +464,9 @@ bool Cell::ReadyToDivide()
         return false;
     }
 
+    // NOTE - we run the SRN model here first before the CCM
+    mpSrnModel->SimulateToCurrentTime();
+	// This in turn runs any simulations within the CCM thru UpdateCellCyclePhases()
     mCanDivide = mpCellCycleModel->ReadyToDivide();
 
     return mCanDivide;
@@ -443,6 +481,7 @@ CellPtr Cell::Divide()
 
     // Reset properties of parent cell
     mpCellCycleModel->ResetForDivision();
+    mpSrnModel->ResetForDivision();
 
     // Create copy of cell property collection to modify for daughter cell
     CellPropertyCollection daughter_property_collection = mCellPropertyCollection;
@@ -474,10 +513,11 @@ CellPtr Cell::Divide()
     }
 
     // Create daughter cell with modified cell property collection
-    CellPtr p_new_cell(new Cell(GetMutationState(), mpCellCycleModel->CreateCellCycleModel(), false, daughter_property_collection));
+    CellPtr p_new_cell(new Cell(GetMutationState(), mpCellCycleModel->CreateCellCycleModel(), mpSrnModel->CreateSrnModel(), false, daughter_property_collection));
 
     // Initialise properties of daughter cell
     p_new_cell->GetCellCycleModel()->InitialiseDaughterCell();
+    p_new_cell->GetSrnModel()->InitialiseDaughterCell();
 
     // Set the daughter cell to inherit the apoptosis time of the parent cell
     p_new_cell->SetApoptosisTime(mApoptosisTime);

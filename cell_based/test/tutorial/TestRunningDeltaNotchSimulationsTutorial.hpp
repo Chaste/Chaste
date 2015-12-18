@@ -96,21 +96,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellProliferativeTypesCountWriter.hpp"
 #include "SmartPointers.hpp"
 #include "PetscSetupAndFinalize.hpp"
+#include "StochasticDurationCellCycleModel.hpp"
 /*
- * The next header file defines a simple stochastic cell-cycle model that includes the functionality
+ * The next header file defines a simple subcellular reaction network model that includes the functionality
  * for solving each cell's Delta/Notch signalling ODE system at each time step, using information about neighbouring
- * cells through the {{{CellData}}} class. We note that in this simple cell-cycle model, the
- * proliferative status of each cell is unaffected by its Delta/Notch activity; such dependence could
- * easily be introduced given an appropriate model of this coupling.
+ * cells through the {{{CellData}}} class.
  */
-#include "DeltaNotchCellCycleModel.hpp"
+#include "DeltaNotchSrnModel.hpp"
 /*
- * The next header file defines the class that simulates the evolution of a {{{CellPopulation}}},
- * specialized to deal with updating of the {{{CellData}}} class to deal with Delta-Notch
- * signalling between cells.
- */
-/*
- * The next header defines the simulation class modifier corresponding to the Delta-Notch cell-cycle model.
+ * The next header defines the simulation class modifier corresponding to the Delta-Notch SRN model.
  * This modifier leads to the {{{CellData}}} cell property being updated at each timestep to deal with Delta-Notch signalling.
  */
 #include "DeltaNotchTrackingModifier.hpp"
@@ -140,8 +134,10 @@ public:
         HoneycombVertexMeshGenerator generator(5, 5);
         MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
 
-        /* We then create some cells, each with a cell-cycle model, {{{DeltaNotchCellCycleModel}}}, which
-         * incorporates a Delta/Notch ODE system. In this example we choose to make each cell differentiated,
+        /* We then create some cells, each with a cell-cycle model, {{{StochasticDurationCellCycleModel}}} and a subcellular reaction network model
+         * {{{DeltaNotchSrnModel}}}, which
+         * incorporates a Delta/Notch ODE system, here we use the hard coded initial conditions of 1.0 and 1.0.
+         * In this example we choose to make each cell differentiated,
          * so that no cell division occurs. */
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
@@ -149,10 +145,17 @@ public:
 
         for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
         {
-            DeltaNotchCellCycleModel* p_model = new DeltaNotchCellCycleModel();
-            p_model->SetDimension(2);
+            StochasticDurationCellCycleModel* p_cc_model = new StochasticDurationCellCycleModel();
+            p_cc_model->SetDimension(2);
 
-            CellPtr p_cell(new Cell(p_state, p_model));
+            /* We choose to initialise the concentrations to random levels in each cell. */
+            std::vector<double> initial_conditions;
+            initial_conditions.push_back(RandomNumberGenerator::Instance()->ranf());
+            initial_conditions.push_back(RandomNumberGenerator::Instance()->ranf());
+            DeltaNotchSrnModel* p_srn_model = new DeltaNotchSrnModel();
+            p_srn_model->SetInitialConditions(initial_conditions);
+
+            CellPtr p_cell(new Cell(p_state, p_cc_model, p_srn_model));
             p_cell->SetCellProliferativeType(p_diff_type);
             double birth_time = -RandomNumberGenerator::Instance()->ranf()*12.0;
             p_cell->SetBirthTime(birth_time);
@@ -168,25 +171,6 @@ public:
         cell_population.AddCellWriter<CellProliferativePhasesWriter>();
         cell_population.AddCellWriter<CellAgesWriter>();
         cell_population.AddCellWriter<CellVolumesWriter>();
-
-        /* As we are using the {{{CellData}}} class to store the information about each cell required to
-         * solve the Delta/Notch ODE system, we must first instantiate this singleton and associate it with the
-         * cell population. Note that we set the number of variables to 3. This is because each cell's ODE system
-         * comprises two ODEs describing Delta/Notch activity, and an additional 'dummy' ODE with zero reaction term
-         * that describes how the mean concentration of Delta among neighbouring cells changes. This latter quantity
-         * remains constant for the purposes of solving the ODE system over each time step, but is updated at the
-         * end of the time step by a method on {{{DeltaNotchOffLatticeSimulation}}}.
-         */
-
-        /* We choose to initialise the concentrations to random levels in each cell. */
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
-        {
-            cell_iter->GetCellData()->SetItem("notch", RandomNumberGenerator::Instance()->ranf());
-            cell_iter->GetCellData()->SetItem("delta", RandomNumberGenerator::Instance()->ranf());
-            cell_iter->GetCellData()->SetItem("mean delta", RandomNumberGenerator::Instance()->ranf());
-        }
 
         /* We are now in a position to create and configure the cell-based simulation object, pass a force law to it,
          * and run the simulation. We can make the simulation run for longer to see more patterning by increasing the end time. */
@@ -248,10 +232,17 @@ public:
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            DeltaNotchCellCycleModel* p_model = new DeltaNotchCellCycleModel();
-            p_model->SetDimension(2);
+            StochasticDurationCellCycleModel* p_cc_model = new StochasticDurationCellCycleModel();
+            p_cc_model->SetDimension(2);
 
-            CellPtr p_cell(new Cell(p_state, p_model));
+            /* We choose to initialise the concentrations to random levels in each cell. */
+            std::vector<double> initial_conditions;
+            initial_conditions.push_back(RandomNumberGenerator::Instance()->ranf());
+            initial_conditions.push_back(RandomNumberGenerator::Instance()->ranf());
+            DeltaNotchSrnModel* p_srn_model = new DeltaNotchSrnModel();
+            p_srn_model->SetInitialConditions(initial_conditions);
+
+            CellPtr p_cell(new Cell(p_state, p_cc_model, p_srn_model));
             p_cell->SetCellProliferativeType(p_diff_type);
             double birth_time = -RandomNumberGenerator::Instance()->ranf()*12.0;
             p_cell->SetBirthTime(birth_time);
@@ -264,16 +255,6 @@ public:
         cell_population.AddCellWriter<CellIdWriter>();
         cell_population.AddCellPopulationCountWriter<CellProliferativePhasesCountWriter>();
         cell_population.AddCellWriter<CellAgesWriter>();
-
-        /* We choose to initialise the concentrations to random levels in each cell. */
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
-        {
-            cell_iter->GetCellData()->SetItem("notch", RandomNumberGenerator::Instance()->ranf());
-            cell_iter->GetCellData()->SetItem("delta", RandomNumberGenerator::Instance()->ranf());
-            cell_iter->GetCellData()->SetItem("mean delta", RandomNumberGenerator::Instance()->ranf());
-        }
 
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestNodeBasedMonolayerWithDeltaNotch");

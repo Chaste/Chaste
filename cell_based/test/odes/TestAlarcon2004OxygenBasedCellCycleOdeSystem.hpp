@@ -207,11 +207,14 @@ public:
             TS_ASSERT_DELTA(ode_system.GetOxygenConcentration(), 0.70, 1e-6);
             TS_ASSERT_EQUALS(ode_system.IsLabelled(), true);
 
+
+            ode_system.SetDefaultInitialCondition(2, 3.25);
+
             std::vector<double> initial_conditions = ode_system.GetInitialConditions();
             TS_ASSERT_EQUALS(initial_conditions.size(), 6u);
             TS_ASSERT_DELTA(initial_conditions[0], 0.90, 1e-6);
             TS_ASSERT_DELTA(initial_conditions[1], 0.01, 1e-6);
-            TS_ASSERT_DELTA(initial_conditions[2], 0.00, 1e-6);
+            TS_ASSERT_DELTA(initial_conditions[2], 3.25, 1e-6);
             TS_ASSERT_DELTA(initial_conditions[3], 5.00, 1e-6);
             TS_ASSERT_DELTA(initial_conditions[4], 1.00, 1e-6);
             TS_ASSERT_DELTA(initial_conditions[5], 0.70, 1e-6);
@@ -243,7 +246,7 @@ public:
             TS_ASSERT_EQUALS(initial_conditions.size(), 6u);
             TS_ASSERT_DELTA(initial_conditions[0], 0.90, 1e-6);
             TS_ASSERT_DELTA(initial_conditions[1], 0.01, 1e-6);
-            TS_ASSERT_DELTA(initial_conditions[2], 0.00, 1e-6);
+            TS_ASSERT_DELTA(initial_conditions[2], 0.0, 1e-6);
             TS_ASSERT_DELTA(initial_conditions[3], 5.00, 1e-6);
             TS_ASSERT_DELTA(initial_conditions[4], 1.00, 1e-6);
             TS_ASSERT_DELTA(initial_conditions[5], 0.70, 1e-6);

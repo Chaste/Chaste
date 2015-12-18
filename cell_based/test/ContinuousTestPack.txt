@@ -1,5 +1,6 @@
 cell/TestArchiveCell.hpp
 cell/TestCell.hpp
+cell/TestCellSrn.hpp
 cell/TestCellBasedCellProperties.hpp
 cell/TestCellCycleModelOdeSolver.hpp
 cell/TestCellDataMaps.hpp
@@ -8,8 +9,8 @@ cell/TestCellProliferativeTypes.hpp
 cell/TestCellPropertyCollection.hpp
 cell/TestCellPropertyRegistry.hpp
 cell/TestCellsGenerator.hpp
-cell/TestDeltaNotchCellCycleModel.hpp
 cell/TestOdeBasedCellCycleModels.hpp
+cell/TestOdeBasedSrnModels.hpp
 cell/TestParallelCellsGenerator.hpp
 cell/TestSimpleCellCycleModels.hpp
 common/TestOdeLinearSystemSolver.hpp
@@ -21,6 +22,7 @@ mesh/TestPottsMeshReader.hpp
 mesh/TestPottsMeshWriter.hpp
 odes/TestAlarcon2004OxygenBasedCellCycleOdeSystem.hpp
 odes/TestDeltaNotchOdeSystem.hpp
+odes/TestGoldbeter1991OdeSystem.hpp
 odes/TestTysonNovak2001OdeSystem.hpp
 population/TestBuskeForces.hpp
 population/TestCaBasedCellPopulation.hpp

@@ -147,10 +147,12 @@ VECTOR AbstractParameterisedSystem<VECTOR>::GetStateVariables()
 template<typename VECTOR>
 void AbstractParameterisedSystem<VECTOR>::SetStateVariables(const VECTOR& rStateVariables)
 {
+
     if ( mNumberOfStateVariables != GetVectorSize(rStateVariables) )
     {
         EXCEPTION("The size of the passed in vector must be that of the number of state variables.");
     }
+
     CreateVectorIfEmpty(mStateVariables, mNumberOfStateVariables);
     for (unsigned i=0; i<mNumberOfStateVariables; i++)
     {

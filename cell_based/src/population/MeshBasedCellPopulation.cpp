@@ -473,6 +473,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::DivideLongSprings(double sp
 
         CellPtr p_new_cell(new Cell(p_neighbour_cell->GetMutationState(),
                                     p_neighbour_cell->GetCellCycleModel()->CreateCellCycleModel(),
+                                    p_neighbour_cell->GetSrnModel()->CreateSrnModel(),
                                     false,
                                     daughter_property_collection));
 

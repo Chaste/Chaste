@@ -104,12 +104,14 @@ public:
 
             DeltaNotchOdeSystem ode_system(state_variables);
 
+            ode_system.SetDefaultInitialCondition(1, 3.25);
+
             std::vector<double> initial_conditions = ode_system.GetInitialConditions();
 
             // These are the initial conditions hard-coded in the constructor.
             TS_ASSERT_EQUALS(initial_conditions.size(), 2u);
             TS_ASSERT_DELTA(initial_conditions[0], 1.0, 1e-6);
-            TS_ASSERT_DELTA(initial_conditions[1], 1.0, 1e-6);
+            TS_ASSERT_DELTA(initial_conditions[1], 3.25, 1e-6);
 
             ode_system.SetParameter("Mean Delta", 10.0);
 

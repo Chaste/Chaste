@@ -70,7 +70,6 @@ AbstractElement<ELEMENT_DIM, SPACE_DIM>::~AbstractElement()
     delete mpElementAttributes;
 }
 
-
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractElement<ELEMENT_DIM, SPACE_DIM>::ReplaceNode(Node<SPACE_DIM>* pOldNode, Node<SPACE_DIM>* pNewNode)
 {

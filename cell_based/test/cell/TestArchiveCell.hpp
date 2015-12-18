@@ -48,6 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellBasedTestSuite.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "Goldbeter1991SrnModel.hpp"
 #include "CellPropertyRegistry.hpp"
 #include "CellLabel.hpp"
 #include "CellId.hpp"
@@ -87,15 +88,19 @@ public:
             // Create cell-cycle model
             FixedDurationGenerationBasedCellCycleModel* p_cell_model = new FixedDurationGenerationBasedCellCycleModel();
 
+            // Create SRN
+            Goldbeter1991SrnModel* p_srn_model = new Goldbeter1991SrnModel();
+
             // Create cell property collection
             CellPropertyCollection collection;
             MAKE_PTR(CellLabel, p_label);
             collection.AddProperty(p_label);
 
             // Create cell
-            CellPtr p_cell(new Cell(p_healthy_state, p_cell_model, false, collection));
+            CellPtr p_cell(new Cell(p_healthy_state, p_cell_model, p_srn_model,  false, collection));
             p_cell->SetCellProliferativeType(p_type);
             p_cell->InitialiseCellCycleModel();
+            p_cell->InitialiseSrnModel();
             p_simulation_time->IncrementTimeOneStep();
 
             TS_ASSERT_EQUALS(p_cell->GetAge(), 0.5);
@@ -144,7 +149,8 @@ public:
             // Create another cell
             boost::shared_ptr<AbstractCellProperty> p_another_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
             FixedDurationGenerationBasedCellCycleModel* p_another_cell_model = new FixedDurationGenerationBasedCellCycleModel();
-            CellPtr p_another_cell(new Cell(p_another_healthy_state, p_another_cell_model, false, collection));
+            Goldbeter1991SrnModel* p_another_srn_model = new Goldbeter1991SrnModel();
+            CellPtr p_another_cell(new Cell(p_another_healthy_state, p_another_cell_model, p_another_srn_model, false, collection));
             boost::shared_ptr<AbstractCellProperty> p_another_vec_data(new CellVecData);
             p_another_cell->AddCellProperty(p_another_vec_data);
             TS_ASSERT_EQUALS(p_cell->GetCellVecData()->GetNumItems(), 1u);
@@ -196,10 +202,14 @@ public:
 
             TS_ASSERT_EQUALS(p_cell->GetAge(), 0.5);
             TS_ASSERT_EQUALS(static_cast<FixedDurationGenerationBasedCellCycleModel*>(p_cell->GetCellCycleModel())->GetGeneration(), 0u);
+            TS_ASSERT(dynamic_cast<Goldbeter1991SrnModel*>(p_cell->GetSrnModel()));
             TS_ASSERT_EQUALS(p_cell->GetCellProliferativeType()->IsType<StemCellProliferativeType>(), true);
 
-            AbstractCellCycleModel* p_model = p_cell->GetCellCycleModel();
-            TS_ASSERT_EQUALS(p_model->GetCell(), p_cell);
+            AbstractCellCycleModel* p_cc_model = p_cell->GetCellCycleModel();
+            TS_ASSERT_EQUALS(p_cc_model->GetCell(), p_cell);
+
+            AbstractSrnModel* p_srn_model = p_cell->GetSrnModel();
+            TS_ASSERT_EQUALS(p_srn_model->GetCell(), p_cell);
 
             CellPropertyCollection& collection = p_cell->rGetCellPropertyCollection();
             TS_ASSERT_EQUALS(collection.GetSize(), 7u);

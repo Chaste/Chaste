@@ -47,10 +47,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Cell.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "BetaCateninOneHitCellMutationState.hpp"
+#include "StochasticDurationGenerationBasedCellCycleModel.hpp"
 #include "StemCellProliferativeType.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "TysonNovakCellCycleModel.hpp"
-#include "DeltaNotchCellCycleModel.hpp"
+#include "DeltaNotchSrnModel.hpp"
 #include "BackwardEulerIvpOdeSolver.hpp"
 #include "NodeBasedCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
@@ -305,10 +306,14 @@ public:
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
         {
-            DeltaNotchCellCycleModel* p_model = new DeltaNotchCellCycleModel();
-            p_model->SetDimension(2);
+            DeltaNotchSrnModel* p_srn_model = new DeltaNotchSrnModel();
 
-            CellPtr p_cell(new Cell(p_state, p_model));
+            StochasticDurationGenerationBasedCellCycleModel* p_cc_model = new StochasticDurationGenerationBasedCellCycleModel();
+
+            MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
+            MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+
+            CellPtr p_cell(new Cell(p_healthy_state, p_cc_model, p_srn_model));
             p_cell->SetCellProliferativeType(p_diff_type);
             double birth_time = 0.0;
             p_cell->SetBirthTime(birth_time);

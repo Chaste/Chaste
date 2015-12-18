@@ -219,7 +219,7 @@ public:
 
     /**
      * Set the cell's time of birth (usually not required as it should be inside
-     * the indivdual cell-cycle-model-constructor, but useful for tests).
+     * the individual cell-cycle-model-constructor, but useful for tests).
      *
      * @param birthTime the simulation time at this cell's birth.
      *

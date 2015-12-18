@@ -149,7 +149,7 @@ void TysonNovak2001OdeSystem::EvaluateYDerivatives(double time, const std::vecto
 
     dx6 = mMu*x6*(1.0-x6/mMstar);
 
-    // Multiply by 60 beacuase the Tyson and Noval 2001 paper has time in minutes, not hours
+    // Multiply by 60 beacuase the Tyson and Novak 2001 paper has time in minutes, not hours
     rDY[0] = dx1*60.0;
     rDY[1] = dx2*60.0;
     rDY[2] = dx3*60.0;
@@ -278,7 +278,7 @@ void OdeSystemInformation<TysonNovak2001OdeSystem>::Initialise()
     this->mVariableNames.push_back("Cdc20A");
     this->mVariableUnits.push_back("nM");
 //    this->mInitialConditions.push_back(1.2924e+00);
-    this->mInitialConditions.push_back(1.421110920135839);
+    this->mInitialConditions.push_back(1.421110920155839);
 
     this->mVariableNames.push_back("IEP");
     this->mVariableUnits.push_back("nM");

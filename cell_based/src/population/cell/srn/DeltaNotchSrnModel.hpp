@@ -33,26 +33,21 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef DELTANOTCHCELLCYCLEMODEL_HPP_
-#define DELTANOTCHCELLCYCLEMODEL_HPP_
+#ifndef DELTANOTCHSRNMODEL_HPP_
+#define DELTANOTCHSRNMODEL_HPP_
+
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
-#include "StochasticDurationGenerationBasedCellCycleModel.hpp"
 #include "DeltaNotchOdeSystem.hpp"
-#include "AbstractCellCycleModelOdeSolver.hpp"
-#include "CellCycleModelOdeHandler.hpp"
+#include "AbstractOdeSrnModel.hpp"
 
 /**
- * A subclass of StochasticDurationGenerationBasedCellCycleModel
- * that includes a Delta-Notch ODE system.
- *
- * For another example of a cell cycle model that is not *based on*
- * an ODE system, but that includes an ODE system, see
- * SingleOdeWntCellCycleModel (in Crypt).
+ * A subclass of AbstractOdeSrnModel
+ * that includes a Delta-Notch ODE system in the SRN.
  */
-class DeltaNotchCellCycleModel : public StochasticDurationGenerationBasedCellCycleModel, public CellCycleModelOdeHandler
+class DeltaNotchSrnModel : public AbstractOdeSrnModel
 {
 private:
 
@@ -67,14 +62,8 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<StochasticDurationGenerationBasedCellCycleModel>(*this);
-        archive & boost::serialization::base_object<CellCycleModelOdeHandler>(*this);
+        archive & boost::serialization::base_object<AbstractOdeSrnModel>(*this);
     }
-
-    /**
-     * The initial condition for delta, notch, mean_delta
-     */
-    std::vector<double> mInitialConditions;
 
 public:
 
@@ -83,33 +72,29 @@ public:
      *
      * @param pOdeSolver An optional pointer to a cell-cycle model ODE solver object (allows the use of different ODE solvers)
      */
-    DeltaNotchCellCycleModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver = boost::shared_ptr<AbstractCellCycleModelOdeSolver>());
+    DeltaNotchSrnModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver = boost::shared_ptr<AbstractCellCycleModelOdeSolver>());
+
 
     /**
      * Overridden builder method to create new copies of
-     * this cell-cycle model.
+     * this srn model.
      *
-     * @return Returns a copy of the current cell cycle model.
+     * @return Returns a copy of the current srn model.
      */
-    AbstractCellCycleModel* CreateCellCycleModel();
+    AbstractSrnModel* CreateSrnModel();
 
     /**
      * Initialise the cell-cycle model at the start of a simulation.
      *
      * This overridden method sets up a new Delta-Notch ODE system.
      */
-    void Initialise();
+    void Initialise(); // override
 
     /**
-     * Set the initial conditions for delta, notch, mean_delta.
-     * @param initialConditions are the initial conditions
+     * Overridden SimulateToTime() method for custom behaviour
      */
-    void SetInitialConditions(std::vector<double> initialConditions);
+    void SimulateToCurrentTime();
 
-    /**
-     * Overridden UpdateCellCyclePhase() method.
-     */
-    void UpdateCellCyclePhase();
 
     /**
      * Update the current levels of Delta and Notch in the cell.
@@ -136,13 +121,15 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile);
+    void OutputSrnModelParameters(out_stream& rParamsFile);
 };
 
 // Declare identifier for the serializer
 #include "SerializationExportWrapper.hpp"
-CHASTE_CLASS_EXPORT(DeltaNotchCellCycleModel)
+CHASTE_CLASS_EXPORT(DeltaNotchSrnModel)
 #include "CellCycleModelOdeSolverExportWrapper.hpp"
-EXPORT_CELL_CYCLE_MODEL_ODE_SOLVER(DeltaNotchCellCycleModel)
+EXPORT_CELL_CYCLE_MODEL_ODE_SOLVER(DeltaNotchSrnModel)
 
-#endif /*DELTANOTCHCELLCYCLEMODEL_HPP_*/
+
+
+#endif /* DELTANOTCHSRNMODEL_HPP_ */

@@ -112,6 +112,7 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::InitialiseCells()
          ++cell_iter)
     {
         cell_iter->InitialiseCellCycleModel();
+        cell_iter->InitialiseSrnModel();
     }
 }
 
@@ -681,8 +682,39 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulationInfo(ou
         // Output cell-cycle model details
         first_cell_with_unique_CCM[i]->GetCellCycleModel()->OutputCellCycleModelInfo(rParamsFile);
     }
-
     *rParamsFile << "\t</CellCycleModels>\n";
+
+    *rParamsFile << "\n";
+    *rParamsFile << "\t<SrnModels>\n";
+
+    /**
+     * Loop over cells and generate a set of SRN model classes
+     * that are present in the population.
+     *
+     * \todo this currently ignores different parameter regimes (#1453)
+     */
+    std::set<std::string> unique_srn_models;
+    std::vector<CellPtr> first_cell_with_unique_SRN;
+    for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter = this->Begin();
+         cell_iter != this->End();
+         ++cell_iter)
+    {
+        std::string identifier = cell_iter->GetSrnModel()->GetIdentifier();
+        if (unique_srn_models.count(identifier) == 0)
+        {
+            unique_srn_models.insert(identifier);
+            first_cell_with_unique_SRN.push_back((*cell_iter));
+        }
+    }
+
+    // Loop over unique SRN models
+    for (unsigned i=0; i<first_cell_with_unique_SRN.size(); i++)
+    {
+        // Output SRN model details
+        first_cell_with_unique_SRN[i]->GetSrnModel()->OutputSrnModelInfo(rParamsFile);
+    }
+
+    *rParamsFile << "\t</SrnModels>\n";
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

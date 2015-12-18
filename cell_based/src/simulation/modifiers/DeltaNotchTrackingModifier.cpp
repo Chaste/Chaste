@@ -34,7 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "DeltaNotchTrackingModifier.hpp"
-#include "DeltaNotchCellCycleModel.hpp"
+#include "DeltaNotchSrnModel.hpp"
 
 template<unsigned DIM>
 DeltaNotchTrackingModifier<DIM>::DeltaNotchTrackingModifier()
@@ -74,7 +74,7 @@ void DeltaNotchTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM,
          cell_iter != rCellPopulation.End();
          ++cell_iter)
     {
-        DeltaNotchCellCycleModel* p_model = static_cast<DeltaNotchCellCycleModel*>(cell_iter->GetCellCycleModel());
+        DeltaNotchSrnModel* p_model = static_cast<DeltaNotchSrnModel*>(cell_iter->GetSrnModel());
         double this_delta = p_model->GetDelta();
         double this_notch = p_model->GetNotch();
 

@@ -41,7 +41,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Must be included before other cell_based headers
 #include "CellBasedSimulationArchiver.hpp"
 
-#include "DeltaNotchCellCycleModel.hpp"
+#include "DeltaNotchSrnModel.hpp"
+#include "StochasticDurationCellCycleModel.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "NodeBasedCellPopulation.hpp"
@@ -91,11 +92,12 @@ public:
 
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            DeltaNotchCellCycleModel* p_model = new DeltaNotchCellCycleModel();
-            p_model->SetInitialConditions(initial_conditions);
-            p_model->SetDimension(2);
-            p_model->SetMaxTransitGenerations(UINT_MAX);
-            CellPtr p_cell(new Cell(p_state, p_model));
+            StochasticDurationCellCycleModel* p_cc_model = new StochasticDurationCellCycleModel();
+            p_cc_model->SetDimension(2);
+
+            DeltaNotchSrnModel* p_srn_model = new DeltaNotchSrnModel();
+            p_srn_model->SetInitialConditions(initial_conditions);
+            CellPtr p_cell(new Cell(p_state, p_cc_model, p_srn_model));
             p_cell->SetCellProliferativeType(p_diff_type);
             double birth_time = 0.0;
             p_cell->SetBirthTime(birth_time);
@@ -127,11 +129,11 @@ public:
 
         // Check levels in cell 0
         CellPtr cell0 = cell_population.rGetCells().front();
-        double notch = dynamic_cast<DeltaNotchCellCycleModel*>(cell0->GetCellCycleModel())->GetNotch();
+        double notch = dynamic_cast<DeltaNotchSrnModel*>(cell0->GetSrnModel())->GetNotch();
         TS_ASSERT_DELTA(notch, 0.9999, 1e-04);
-        double delta = dynamic_cast<DeltaNotchCellCycleModel*>(cell0->GetCellCycleModel())->GetDelta();
+        double delta = dynamic_cast<DeltaNotchSrnModel*>(cell0->GetSrnModel())->GetDelta();
         TS_ASSERT_DELTA(delta, 0.9901, 1e-04);
-        double mean_delta = dynamic_cast<DeltaNotchCellCycleModel*>(cell0->GetCellCycleModel())->GetMeanNeighbouringDelta();
+        double mean_delta = dynamic_cast<DeltaNotchSrnModel*>(cell0->GetSrnModel())->GetMeanNeighbouringDelta();
         TS_ASSERT_DELTA(mean_delta, 1.0000, 1e-04);
 
 
@@ -162,15 +164,17 @@ public:
         starter_conditions.push_back(0.9);
         starter_conditions.push_back(0.5);
 
-        // Establish a DNCCM for each of the cells
-        DeltaNotchCellCycleModel* p_model = new DeltaNotchCellCycleModel();
-        p_model->SetDimension(2);
-        p_model->SetInitialConditions(starter_conditions);
+        // Establish a Stochastic CCM and a DN SRN for each of the cells
+        StochasticDurationCellCycleModel* p_cc_model = new StochasticDurationCellCycleModel();
+        p_cc_model->SetDimension(2);
+
+        DeltaNotchSrnModel* p_srn_model = new DeltaNotchSrnModel();
+        p_srn_model->SetInitialConditions(starter_conditions);
+        CellPtr p_cell(new Cell(p_state, p_cc_model, p_srn_model));
 
         // Ensure that all cells have birth time of zero in order to avoid
         // problems during the ODE solve of the ReadyToDivide() call, prior to
         // entering the main simulation timeloop
-        CellPtr p_cell(new Cell(p_state, p_model));
         p_cell->SetCellProliferativeType(p_diff_type);
         p_cell->SetBirthTime(0.0);
         cells.push_back(p_cell);
@@ -182,15 +186,17 @@ public:
         starter_conditions_2.push_back(0.19);
         starter_conditions_2.push_back(0.5);
 
-        // Establish a DNCCM for each of the cells
-        DeltaNotchCellCycleModel* p_model_2= new DeltaNotchCellCycleModel();
-        p_model_2->SetDimension(2);
-        p_model_2->SetInitialConditions(starter_conditions_2);
+        // Establish a Stochastic CCM and a DN SRN for each of the cells
+        StochasticDurationCellCycleModel* p_cc_model_2 = new StochasticDurationCellCycleModel();
+        p_cc_model_2->SetDimension(2);
+
+        DeltaNotchSrnModel* p_srn_model_2 = new DeltaNotchSrnModel();
+        p_srn_model_2->SetInitialConditions(starter_conditions_2);
+        CellPtr p_cell_2(new Cell(p_state, p_cc_model_2, p_srn_model_2));
 
         // Ensure that all cells have birth time of zero in order to avoid
         // problems during the ODE solve of the ReadyToDivide() call, prior to
         // entering the main simulation timeloop
-        CellPtr p_cell_2(new Cell(p_state, p_model_2));
         p_cell_2->SetCellProliferativeType(p_diff_type);
         p_cell_2->SetBirthTime(0.0);
         cells.push_back(p_cell_2);
@@ -218,13 +224,13 @@ public:
         CellPtr p_cell_1b = cell_population.GetCellUsingLocationIndex(1);
 
         // Check that the simulation converges on the expected values
-        double notch_0b = dynamic_cast<DeltaNotchCellCycleModel*>(p_cell_0b->GetCellCycleModel())->GetNotch();
+        double notch_0b = dynamic_cast<DeltaNotchSrnModel*>(p_cell_0b->GetSrnModel())->GetNotch();
         TS_ASSERT_DELTA(notch_0b, 0.9640326, 1e-02);  //Default solution at t=10
-        double delta_0b = dynamic_cast<DeltaNotchCellCycleModel*>(p_cell_0b->GetCellCycleModel())->GetDelta();
+        double delta_0b = dynamic_cast<DeltaNotchSrnModel*>(p_cell_0b->GetSrnModel())->GetDelta();
         TS_ASSERT_DELTA(delta_0b, 0.0122205, 1e-04);  //Default solution at t=10
-        double notch_1b = dynamic_cast<DeltaNotchCellCycleModel*>(p_cell_1b->GetCellCycleModel())->GetNotch();
+        double notch_1b = dynamic_cast<DeltaNotchSrnModel*>(p_cell_1b->GetSrnModel())->GetNotch();
         TS_ASSERT_DELTA(notch_1b, 0.0261745, 1e-03);  //Default solution at t=10
-        double delta_1b = dynamic_cast<DeltaNotchCellCycleModel*>(p_cell_1b->GetCellCycleModel())->GetDelta();
+        double delta_1b = dynamic_cast<DeltaNotchSrnModel*>(p_cell_1b->GetSrnModel())->GetDelta();
         TS_ASSERT_DELTA(delta_1b, 0.8151536, 1e-02);  //Default solution at t=10
 
 
@@ -240,13 +246,13 @@ public:
         simulator.Solve();
 
         // Check that the simulation converges on the expected values
-        notch_0b = dynamic_cast<DeltaNotchCellCycleModel*>(p_cell_0b->GetCellCycleModel())->GetNotch();
+        notch_0b = dynamic_cast<DeltaNotchSrnModel*>(p_cell_0b->GetSrnModel())->GetNotch();
         TS_ASSERT_DELTA(notch_0b, 0.0, 1e-03);  //Default solution at t=20 for mean delta=0
-        delta_0b = dynamic_cast<DeltaNotchCellCycleModel*>(p_cell_0b->GetCellCycleModel())->GetDelta();
+        delta_0b = dynamic_cast<DeltaNotchSrnModel*>(p_cell_0b->GetSrnModel())->GetDelta();
         TS_ASSERT_DELTA(delta_0b, 1.0, 1e-03);  //Default solution at t=20 for mean delta=0
-        notch_1b = dynamic_cast<DeltaNotchCellCycleModel*>(p_cell_1b->GetCellCycleModel())->GetNotch();
+        notch_1b = dynamic_cast<DeltaNotchSrnModel*>(p_cell_1b->GetSrnModel())->GetNotch();
         TS_ASSERT_DELTA(notch_1b, 0.0, 1e-03);  //Default solution at t=20 for mean delta=0
-        delta_1b = dynamic_cast<DeltaNotchCellCycleModel*>(p_cell_1b->GetCellCycleModel())->GetDelta();
+        delta_1b = dynamic_cast<DeltaNotchSrnModel*>(p_cell_1b->GetSrnModel())->GetDelta();
         TS_ASSERT_DELTA(delta_1b, 1.0, 1e-03);  //Default solution at t=20 for mean delta=0
 
 
@@ -281,15 +287,17 @@ public:
         starter_conditions.push_back(0.9);
         starter_conditions.push_back(0.5);
 
-        // Establish a DNCCM for each of the cells
-        DeltaNotchCellCycleModel* p_model = new DeltaNotchCellCycleModel();
-        p_model->SetDimension(2);
-        p_model->SetInitialConditions(starter_conditions);
+        // Establish a Stochastic CCM and a DN SRN for each of the cells
+        StochasticDurationCellCycleModel* p_cc_model = new StochasticDurationCellCycleModel();
+        p_cc_model->SetDimension(2);
+
+        DeltaNotchSrnModel* p_srn_model = new DeltaNotchSrnModel();
+        p_srn_model->SetInitialConditions(starter_conditions);
+        CellPtr p_cell(new Cell(p_state, p_cc_model, p_srn_model));
 
         // Ensure that all cells have birth time of zero in order to avoid
         // problems during the ODE solve of the ReadyToDivide() call, prior to
         // entering the main simulation timeloop
-        CellPtr p_cell(new Cell(p_state, p_model));
         p_cell->SetCellProliferativeType(p_diff_type);
         p_cell->SetBirthTime(0.0);
         cells.push_back(p_cell);
@@ -301,18 +309,21 @@ public:
         starter_conditions_2.push_back(0.9);
         starter_conditions_2.push_back(0.5);
 
-        // Establish a DNCCM for each of the cells
-        DeltaNotchCellCycleModel* p_model_2 = new DeltaNotchCellCycleModel();
-        p_model_2->SetDimension(2);
-        p_model_2->SetInitialConditions(starter_conditions_2);
+        // Establish a Stochastic CCM and a DN SRN for each of the cells
+        StochasticDurationCellCycleModel* p_cc_model_2 = new StochasticDurationCellCycleModel();
+        p_cc_model_2->SetDimension(2);
+
+        DeltaNotchSrnModel* p_srn_model_2 = new DeltaNotchSrnModel();
+        p_srn_model_2->SetInitialConditions(starter_conditions_2);
+        CellPtr p_cell_2(new Cell(p_state, p_cc_model_2, p_srn_model_2));
 
         // Ensure that all cells have birth time of zero in order to avoid
         // problems during the ODE solve of the ReadyToDivide() call, prior to
         // entering the main simulation timeloop
-        CellPtr p_cell_2(new Cell(p_state, p_model_2));
         p_cell_2->SetCellProliferativeType(p_diff_type);
         p_cell_2->SetBirthTime(0.0);
         cells.push_back(p_cell_2);
+
 
         // Create the cell population
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
@@ -339,13 +350,13 @@ public:
         CellPtr p_cell_1b = cell_population.GetCellUsingLocationIndex(1);
 
         // Check that the simulation converges on the expected values
-        double notch_0b = dynamic_cast<DeltaNotchCellCycleModel*>(p_cell_0b->GetCellCycleModel())->GetNotch();
+        double notch_0b = dynamic_cast<DeltaNotchSrnModel*>(p_cell_0b->GetSrnModel())->GetNotch();
         TS_ASSERT_DELTA(notch_0b, 0.3538417, 1e-04);  //Default solution at t=10
-        double delta_0b = dynamic_cast<DeltaNotchCellCycleModel*>(p_cell_0b->GetCellCycleModel())->GetDelta();
+        double delta_0b = dynamic_cast<DeltaNotchSrnModel*>(p_cell_0b->GetSrnModel())->GetDelta();
         TS_ASSERT_DELTA(delta_0b, 0.0740040, 1e-04);  //Default solution at t=10
-        double notch_1b = dynamic_cast<DeltaNotchCellCycleModel*>(p_cell_1b->GetCellCycleModel())->GetNotch();
+        double notch_1b = dynamic_cast<DeltaNotchSrnModel*>(p_cell_1b->GetSrnModel())->GetNotch();
         TS_ASSERT_DELTA(notch_1b, 0.3538417, 1e-04);  //Default solution at t=10
-        double delta_1b = dynamic_cast<DeltaNotchCellCycleModel*>(p_cell_1b->GetCellCycleModel())->GetDelta();
+        double delta_1b = dynamic_cast<DeltaNotchSrnModel*>(p_cell_1b->GetSrnModel())->GetDelta();
         TS_ASSERT_DELTA(delta_1b, 0.0740040, 1e-04);  //Default solution at t=10
 
         // Avoid memory leaks
@@ -363,16 +374,24 @@ public:
         HoneycombVertexMeshGenerator generator(2, 2);
         MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
 
-        // Create some cells, each with a cell-cycle model that incorporates a delta-notch ODE system
+
+        // Initial condition for delta, notch
+        std::vector<double> initial_conditions;
+        initial_conditions.push_back(1.0);
+        initial_conditions.push_back(1.0);
+
+        // Create some cells, each with a cell-cycle model and srn that incorporates a delta-notch ODE system
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
         {
-            DeltaNotchCellCycleModel* p_model = new DeltaNotchCellCycleModel();
-            p_model->SetDimension(2);
+            StochasticDurationCellCycleModel* p_cc_model = new StochasticDurationCellCycleModel();
+            p_cc_model->SetDimension(2);
 
-            CellPtr p_cell(new Cell(p_state, p_model));
+            DeltaNotchSrnModel* p_srn_model = new DeltaNotchSrnModel();
+            p_srn_model->SetInitialConditions(initial_conditions);
+            CellPtr p_cell(new Cell(p_state, p_cc_model, p_srn_model));
             p_cell->SetCellProliferativeType(p_diff_type);
             double birth_time = 0.0;
             p_cell->SetBirthTime(birth_time);
@@ -403,11 +422,11 @@ public:
 
         // Check levels in cell 0
         CellPtr cell0 = cell_population.rGetCells().front();
-        double notch = dynamic_cast<DeltaNotchCellCycleModel*>(cell0->GetCellCycleModel())->GetNotch();
+        double notch = dynamic_cast<DeltaNotchSrnModel*>(cell0->GetSrnModel())->GetNotch();
         TS_ASSERT_DELTA(notch, 0.9999, 1e-04);
-        double delta = dynamic_cast<DeltaNotchCellCycleModel*>(cell0->GetCellCycleModel())->GetDelta();
+        double delta = dynamic_cast<DeltaNotchSrnModel*>(cell0->GetSrnModel())->GetDelta();
         TS_ASSERT_DELTA(delta, 0.9901, 1e-04);
-        double mean_delta = dynamic_cast<DeltaNotchCellCycleModel*>(cell0->GetCellCycleModel())->GetMeanNeighbouringDelta();
+        double mean_delta = dynamic_cast<DeltaNotchSrnModel*>(cell0->GetSrnModel())->GetMeanNeighbouringDelta();
         TS_ASSERT_DELTA(mean_delta, 0.9921, 1e-04);
     }
 
@@ -420,16 +439,23 @@ public:
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();//**Changed**//
 
-        // Create some cells, each with a cell-cycle model that incorporates a Delta-Notch ODE system
+        // Initial condition for delta, notch
+        std::vector<double> initial_conditions;
+        initial_conditions.push_back(1.0);
+        initial_conditions.push_back(1.0);
+
+        // Create some cells, each with a cell-cycle model and srn that incorporates a delta-notch ODE system
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         for (unsigned i=0; i<location_indices.size(); i++)
         {
-            DeltaNotchCellCycleModel* p_model = new DeltaNotchCellCycleModel();
-            p_model->SetDimension(2);
+            StochasticDurationCellCycleModel* p_cc_model = new StochasticDurationCellCycleModel();
+            p_cc_model->SetDimension(2);
 
-            CellPtr p_cell(new Cell(p_state, p_model));
+            DeltaNotchSrnModel* p_srn_model = new DeltaNotchSrnModel();
+            p_srn_model->SetInitialConditions(initial_conditions);
+            CellPtr p_cell(new Cell(p_state, p_cc_model, p_srn_model));
             p_cell->SetCellProliferativeType(p_diff_type);
             double birth_time = 0.0;
             p_cell->SetBirthTime(birth_time);
@@ -459,11 +485,11 @@ public:
 
         // Check levels in cell 0
         CellPtr cell0 = cell_population.rGetCells().front();
-        double notch = dynamic_cast<DeltaNotchCellCycleModel*>(cell0->GetCellCycleModel())->GetNotch();
+        double notch = dynamic_cast<DeltaNotchSrnModel*>(cell0->GetSrnModel())->GetNotch();
         TS_ASSERT_DELTA(notch, 0.9999, 1e-04);
-        double delta = dynamic_cast<DeltaNotchCellCycleModel*>(cell0->GetCellCycleModel())->GetDelta();
+        double delta = dynamic_cast<DeltaNotchSrnModel*>(cell0->GetSrnModel())->GetDelta();
         TS_ASSERT_DELTA(delta, 0.9901, 1e-04);
-        double mean_delta = dynamic_cast<DeltaNotchCellCycleModel*>(cell0->GetCellCycleModel())->GetMeanNeighbouringDelta();
+        double mean_delta = dynamic_cast<DeltaNotchSrnModel*>(cell0->GetSrnModel())->GetMeanNeighbouringDelta();
         TS_ASSERT_DELTA(mean_delta, 1.0000, 1e-04);
     }
 
@@ -475,16 +501,23 @@ public:
         PottsMeshGenerator<2> generator(6, 2, 2, 6, 2, 2);
         PottsMesh<2>* p_mesh = generator.GetMesh();
 
-        // Create some cells, each with a cell-cycle model that incorporates a Delta-Notch ODE system
+        // Initial condition for delta, notch
+        std::vector<double> initial_conditions;
+        initial_conditions.push_back(1.0);
+        initial_conditions.push_back(1.0);
+
+        // Create some cells, each with a cell-cycle model and srn that incorporates a delta-notch ODE system
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         for (unsigned i=0; i<p_mesh->GetNumElements(); i++)
         {
-            DeltaNotchCellCycleModel* p_model = new DeltaNotchCellCycleModel();
-            p_model->SetDimension(2);
+            StochasticDurationCellCycleModel* p_cc_model = new StochasticDurationCellCycleModel();
+            p_cc_model->SetDimension(2);
 
-            CellPtr p_cell(new Cell(p_state, p_model));
+            DeltaNotchSrnModel* p_srn_model = new DeltaNotchSrnModel();
+            p_srn_model->SetInitialConditions(initial_conditions);
+            CellPtr p_cell(new Cell(p_state, p_cc_model, p_srn_model));
             p_cell->SetCellProliferativeType(p_diff_type);
             double birth_time = 0.0;
             p_cell->SetBirthTime(birth_time);
@@ -510,11 +543,11 @@ public:
 
         // Check levels in cell 0
         CellPtr cell0 = cell_population.rGetCells().front();
-        double notch = dynamic_cast<DeltaNotchCellCycleModel*>(cell0->GetCellCycleModel())->GetNotch();
+        double notch = dynamic_cast<DeltaNotchSrnModel*>(cell0->GetSrnModel())->GetNotch();
         TS_ASSERT_DELTA(notch, 0.9999, 1e-04);
-        double delta = dynamic_cast<DeltaNotchCellCycleModel*>(cell0->GetCellCycleModel())->GetDelta();
+        double delta = dynamic_cast<DeltaNotchSrnModel*>(cell0->GetSrnModel())->GetDelta();
         TS_ASSERT_DELTA(delta, 0.9901, 1e-04);
-        double mean_delta = dynamic_cast<DeltaNotchCellCycleModel*>(cell0->GetCellCycleModel())->GetMeanNeighbouringDelta();
+        double mean_delta = dynamic_cast<DeltaNotchSrnModel*>(cell0->GetSrnModel())->GetMeanNeighbouringDelta();
         TS_ASSERT_DELTA(mean_delta, 1.0000, 1e-04);
     }
 
@@ -539,16 +572,23 @@ public:
         location_indices.push_back(18);
         location_indices.push_back(19);
 
-        // Create some cells, each with a cell-cycle model that incorporates a Delta-Notch ODE system
+        // Initial condition for delta, notch
+        std::vector<double> initial_conditions;
+        initial_conditions.push_back(1.0);
+        initial_conditions.push_back(1.0);
+
+        // Create some cells, each with a cell-cycle model and srn that incorporates a delta-notch ODE system
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         for (unsigned i=0; i<location_indices.size(); i++)
         {
-            DeltaNotchCellCycleModel* p_model = new DeltaNotchCellCycleModel();
-            p_model->SetDimension(2);
+            StochasticDurationCellCycleModel* p_cc_model = new StochasticDurationCellCycleModel();
+            p_cc_model->SetDimension(2);
 
-            CellPtr p_cell(new Cell(p_state, p_model));
+            DeltaNotchSrnModel* p_srn_model = new DeltaNotchSrnModel();
+            p_srn_model->SetInitialConditions(initial_conditions);
+            CellPtr p_cell(new Cell(p_state, p_cc_model, p_srn_model));
             p_cell->SetCellProliferativeType(p_diff_type);
             double birth_time = 0.0;
             p_cell->SetBirthTime(birth_time);
@@ -574,11 +614,11 @@ public:
 
         // Check levels in cell 0 (this should be the same as for the Potts test, considering the configuration)
         CellPtr cell0 = cell_population.rGetCells().front();
-        double notch = dynamic_cast<DeltaNotchCellCycleModel*>(cell0->GetCellCycleModel())->GetNotch();
+        double notch = dynamic_cast<DeltaNotchSrnModel*>(cell0->GetSrnModel())->GetNotch();
         TS_ASSERT_DELTA(notch, 0.9999, 1e-04);
-        double delta = dynamic_cast<DeltaNotchCellCycleModel*>(cell0->GetCellCycleModel())->GetDelta();
+        double delta = dynamic_cast<DeltaNotchSrnModel*>(cell0->GetSrnModel())->GetDelta();
         TS_ASSERT_DELTA(delta, 0.9901, 1e-04);
-        double mean_delta = dynamic_cast<DeltaNotchCellCycleModel*>(cell0->GetCellCycleModel())->GetMeanNeighbouringDelta();
+        double mean_delta = dynamic_cast<DeltaNotchSrnModel*>(cell0->GetSrnModel())->GetMeanNeighbouringDelta();
         TS_ASSERT_DELTA(mean_delta, 1.0000, 1e-04);
     }
 
@@ -590,16 +630,23 @@ public:
         HoneycombVertexMeshGenerator generator(2, 2);
         MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
 
-        // Associate each cell with a cell-cycle model that incorporates a delta-notch ODE system
+        // Initial condition for delta, notch
+        std::vector<double> initial_conditions;
+        initial_conditions.push_back(1.0);
+        initial_conditions.push_back(1.0);
+
+        // Create some cells, each with a cell-cycle model and srn that incorporates a delta-notch ODE system
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
         {
-            DeltaNotchCellCycleModel* p_model = new DeltaNotchCellCycleModel();
-            p_model->SetDimension(2);
+            StochasticDurationCellCycleModel* p_cc_model = new StochasticDurationCellCycleModel();
+            p_cc_model->SetDimension(2);
 
-            CellPtr p_cell(new Cell(p_state, p_model));
+            DeltaNotchSrnModel* p_srn_model = new DeltaNotchSrnModel();
+            p_srn_model->SetInitialConditions(initial_conditions);
+            CellPtr p_cell(new Cell(p_state, p_cc_model, p_srn_model));
             p_cell->SetCellProliferativeType(p_diff_type);
             double birth_time = -1.0;
             p_cell->SetBirthTime(birth_time);
@@ -611,7 +658,7 @@ public:
 
         // Create and configure cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("TestDeltaNotchOffLatticeSimulationSaveAndLoad");
+        simulator.SetOutputDirectory("TestDeltaNotchTrackingModifierSaveAndLoad");
         double end_time = 0.01;
         simulator.SetEndTime(end_time);
 
@@ -645,7 +692,7 @@ public:
 
         // Load simulation
         OffLatticeSimulation<2>* p_simulator
-            = CellBasedSimulationArchiver<2, OffLatticeSimulation<2> >::Load("TestDeltaNotchOffLatticeSimulationSaveAndLoad", end_time);
+            = CellBasedSimulationArchiver<2, OffLatticeSimulation<2> >::Load("TestDeltaNotchTrackingModifierSaveAndLoad", end_time);
 
         p_simulator->SetEndTime(0.2);
 

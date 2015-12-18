@@ -254,7 +254,7 @@ public:
                 collection.AddProperty(p_label);
             }
 
-            CellPtr p_cell(new Cell(p_state, p_model, false, collection));
+            CellPtr p_cell(new Cell(p_state, p_model, NULL, false, collection));
             p_cell->SetCellProliferativeType(p_diff_type);
 
             double birth_time = - RandomNumberGenerator::Instance()->ranf() *

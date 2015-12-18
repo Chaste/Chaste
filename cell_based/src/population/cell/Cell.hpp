@@ -54,13 +54,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ApoptoticCellProperty.hpp"
 #include "AbstractCellCycleModel.hpp"
+#include "AbstractSrnModel.hpp"
 #include "SimulationTime.hpp"
 #include "CellPropertyRegistry.hpp"
 #include "CellPropertyCollection.hpp"
 #include "SmartPointers.hpp"
 
 class AbstractCellCycleModel; // Circular definition (cells need to know about cycle models and vice-versa).
-
+class AbstractSrnModel; // Circular definition (cells need to know about subcellular reaction network models and vice-versa).
 class Cell;
 
 /** Cells shouldn't be copied - it doesn't make sense.  So all access is via this pointer type. */
@@ -94,6 +95,7 @@ private:
         // These first four are also dealt with by {load,save}_construct_data
         archive & mCanDivide;
         archive & mpCellCycleModel;
+        archive & mpSrnModel;
         archive & mUndergoingApoptosis;
         archive & mDeathTime;
         archive & mStartOfApoptosisTime;
@@ -109,6 +111,9 @@ protected:
 
     /** The cell's cell-cycle model. */
     AbstractCellCycleModel* mpCellCycleModel;
+
+    /** The cell's sub-cellular reaction network (SRN) model. */
+    AbstractSrnModel* mpSrnModel;
 
     /** When the cell will/did die. */
     double mDeathTime;
@@ -139,11 +144,15 @@ public:
      * @param pMutationState the mutation state of the cell
      * @param pCellCycleModel  the cell-cycle model to use to decide when the cell divides.
      *      This MUST be allocated using new, and will be deleted when the cell is destroyed.
+     * @param pSrnModel  the sub-cellular reaction network model.
+     *      This MUST be allocated using new, and will be deleted when the cell is destroyed.
+     *      (Defaults to NULL and is replcaed by a new NullSrnModel in the constructr)
      * @param archiving  whether this constructor is being called by the archiver - do things slightly differently! (defaults to false)
      * @param cellPropertyCollection the cell property collection (defaults to NULL)
      */
     Cell(boost::shared_ptr<AbstractCellProperty> pMutationState,
          AbstractCellCycleModel* pCellCycleModel,
+         AbstractSrnModel* pSrnModel=NULL,
          bool archiving=false,
          CellPropertyCollection cellPropertyCollection=CellPropertyCollection());
 
@@ -187,6 +196,23 @@ public:
      * Calls Initialise on the cell-cycle model associated with this cell.
      */
     void InitialiseCellCycleModel();
+
+    /**
+     * Change the SRN model used. This takes effect immediately.
+     *
+     * @param pSrnModel pointer to the SRN model to use
+     */
+    void SetSrnModel(AbstractSrnModel* pSrnModel);
+
+    /**
+     * @return a pointer to the Cell's SRN model.
+     */
+    AbstractSrnModel* GetSrnModel() const;
+
+    /**
+     * Calls Initialise on the SRN model associated with this cell.
+     */
+    void InitialiseSrnModel();
 
     /**
      * @return the cell's age from its cell-cycle model.
@@ -402,6 +428,9 @@ inline void save_construct_data(
     const AbstractCellCycleModel* const p_cell_cycle_model = t->GetCellCycleModel();
     ar & p_cell_cycle_model;
 
+    const AbstractSrnModel* const p_srn_model = t->GetSrnModel();
+    ar & p_srn_model;
+
     const CellPropertyCollection& r_cell_property_collection = t->rGetCellPropertyCollection();
     ar & r_cell_property_collection;
 }
@@ -420,13 +449,16 @@ inline void load_construct_data(
     AbstractCellCycleModel* p_cell_cycle_model;
     ar & p_cell_cycle_model;
 
+    AbstractSrnModel* p_srn_model;
+    ar & p_srn_model;
+
     bool archiving = true;
 
     CellPropertyCollection cell_property_collection;
     ar & cell_property_collection;
 
     // Invoke inplace constructor to initialize instance
-    ::new(t)Cell(p_mutation_state, p_cell_cycle_model, archiving, cell_property_collection);
+    ::new(t)Cell(p_mutation_state, p_cell_cycle_model, p_srn_model, archiving, cell_property_collection);
 }
 }
 } // namespace ...
