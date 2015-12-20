@@ -36,6 +36,11 @@
 		</SimpleWntCellCycleModel>
 	</CellCycleModels>
 
+	<SrnModels>
+		<NullSrnModel>
+		</NullSrnModel>
+	</SrnModels>
+
 	<CellKillers>
 		<SloughingCellKiller-2>
 			<SloughLength>16.4545</SloughLength>
