@@ -36,6 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ImmersedBoundary2dArrays.hpp"
 #include <assert.h>
+#include "Exception.hpp"
 
 #include "Debug.hpp"
 

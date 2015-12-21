@@ -63,6 +63,9 @@ protected:
     /** Grid to calculate upwind scheme and store RHS of system */
     multi_array<double, 3> mRightHandSideGrids;
 
+    /** The fluid source grid */
+    multi_array<double, 2> mSourceGrid;
+
     /** Grid to store the first of two operators needed for the fft algorithm */
     multi_array<double, 2> mOperator1;
 

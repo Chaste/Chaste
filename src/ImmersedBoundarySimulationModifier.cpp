@@ -113,9 +113,16 @@ void ImmersedBoundarySimulationModifier<DIM>::OutputSimulationModifierParameters
 template<unsigned DIM>
 void ImmersedBoundarySimulationModifier<DIM>::UpdateFluidVelocityGrids(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
-    this->ClearForces();
+    this->ClearForcesAndSources();
     this->AddForceContributions();
     this->PropagateForcesToFluidGrid();
+
+    // If sources are active, we must propagate them from their nodes to the grid
+    if (mpCellPopulation->DoesPopulationHaveActiveSources())
+    {
+        this->PropagateFluidSourcesToGrid();
+    }
+
     this->SolveNavierStokesSpectral();
 }
 
@@ -193,8 +200,9 @@ void ImmersedBoundarySimulationModifier<DIM>::SetupConstantMemberVariables(Abstr
 }
 
 template<unsigned DIM>
-void ImmersedBoundarySimulationModifier<DIM>::ClearForces()
+void ImmersedBoundarySimulationModifier<DIM>::ClearForcesAndSources()
 {
+    // Clear applied forces on each node
     for (typename ImmersedBoundaryMesh<DIM, DIM>::NodeIterator node_iter = mpMesh->GetNodeIteratorBegin(false);
             node_iter != mpMesh->GetNodeIteratorEnd();
             ++node_iter)
@@ -202,6 +210,7 @@ void ImmersedBoundarySimulationModifier<DIM>::ClearForces()
         node_iter->ClearAppliedForce();
     }
 
+    // Reset force grids to 0 everywhere
     multi_array<double, 3>& r_force_grids = mpArrays->rGetModifiableForceGrids();
 
     for (unsigned dim = 0 ; dim < 2 ; dim++)
@@ -211,6 +220,20 @@ void ImmersedBoundarySimulationModifier<DIM>::ClearForces()
             for (unsigned y = 0; y < mNumGridPtsY; y++)
             {
                 r_force_grids[dim][x][y] = 0.0;
+            }
+        }
+    }
+
+    // If there are active sources, the relevant grid needs to be reset to zero everywhere
+    if (mpCellPopulation->DoesPopulationHaveActiveSources())
+    {
+        multi_array<double, 3> &r_rhs_grid = mpArrays->rGetModifiableRightHandSideGrids();
+
+        for (unsigned x = 0; x < mNumGridPtsX; x++)
+        {
+            for (unsigned y = 0; y < mNumGridPtsY; y++)
+            {
+                r_rhs_grid[2][x][y] = 0.0;
             }
         }
     }
@@ -235,8 +258,7 @@ void ImmersedBoundarySimulationModifier<DIM>::PropagateForcesToFluidGrid()
     double dl = mpMesh->GetCharacteristicNodeSpacing();
     double dist_x;
     double dist_y;
-    double force_x;
-    double force_y;
+    double weight;
     int first_idx_x;
     int first_idx_y;
 
@@ -277,11 +299,86 @@ void ImmersedBoundarySimulationModifier<DIM>::PropagateForcesToFluidGrid()
                 }
 
                 // The applied force is weighted by the delta function
-                force_x = applied_force[0] * Delta1D(dist_x, mGridSpacingX) * Delta1D(dist_y, mGridSpacingY) * dl;
-                force_y = applied_force[1] * Delta1D(dist_x, mGridSpacingX) * Delta1D(dist_y, mGridSpacingY) * dl;
+                weight = Delta1D(dist_x, mGridSpacingX) * Delta1D(dist_y, mGridSpacingY) * dl / (mGridSpacingX * mGridSpacingY);
 
-                force_grids[0][(first_idx_x + x_idx) % mNumGridPtsX][(first_idx_y + y_idx) % mNumGridPtsY] += force_x;
-                force_grids[1][(first_idx_x + x_idx) % mNumGridPtsX][(first_idx_y + y_idx) % mNumGridPtsY] += force_y;
+                force_grids[0][(first_idx_x + x_idx) % mNumGridPtsX][(first_idx_y + y_idx) % mNumGridPtsY] += applied_force[0] * weight;
+                force_grids[1][(first_idx_x + x_idx) % mNumGridPtsX][(first_idx_y + y_idx) % mNumGridPtsY] += applied_force[1] * weight;
+            }
+        }
+    }
+}
+
+template<unsigned DIM>
+void ImmersedBoundarySimulationModifier<DIM>::PropagateFluidSourcesToGrid()
+{
+    // Helper variables
+    double dl = mpMesh->GetCharacteristicNodeSpacing();
+    double dist_x;
+    double dist_y;
+    double source;
+    int first_idx_x;
+    int first_idx_y;
+
+    // Currently the fluid source grid is the final part of the right hand side grid, as having all three grids
+    // contiguous helps improve the Fourier transform performance.
+    //\todo could make this nicer by using boost multiarray 'slice'?
+    multi_array<double, 3>& rhs_grids = mpArrays->rGetModifiableRightHandSideGrids();
+
+    // Collect together all source and sink nodes
+    //\todo could make this more efficient?
+    double cumulative_strength = 0.0;
+    std::vector<Node<DIM>*> sources_and_sinks;
+    for (unsigned elem_idx = 0 ; elem_idx < mpMesh->GetNumElements() ; elem_idx++)
+    {
+        sources_and_sinks.push_back(mpMesh->GetElement(elem_idx)->GetSourceNode());
+        cumulative_strength += sources_and_sinks.back()->GetRadius();
+    }
+
+    double balance_strength = - cumulative_strength / (double)mpMesh->rGetSinkNodes().size();
+    for (unsigned source_idx = 0 ; source_idx < mpMesh->rGetSinkNodes().size() ; source_idx++)
+    {
+        mpMesh->rGetSinkNodes()[source_idx]->SetRadius(balance_strength);
+        sources_and_sinks.push_back(mpMesh->rGetSinkNodes()[source_idx]);
+    }
+
+//    sources_and_sinks.insert(sources_and_sinks.end(), mpMesh->rGetSinkNodes().begin(), mpMesh->rGetSinkNodes().end());
+
+    // Iterate over all nodes and grab their position
+    for (unsigned source_idx = 0 ; source_idx < sources_and_sinks.size() ; source_idx++)
+    {
+        Node<DIM>* this_source = sources_and_sinks[source_idx];
+
+        // Get location and strength of this source
+        c_vector<double, DIM> node_location = this_source->rGetLocation();
+        double source_strength = this_source->GetRadius();
+
+        // Get index of grid positions ignoring possible wrap-around
+        first_idx_x = (int)floor(node_location[0] / mGridSpacingX) - 1;
+        first_idx_y = (int)floor(node_location[1] / mGridSpacingY) - 1;
+
+        // Loop over the 4x4 grid used to spread the force on the nodes to the fluid grid
+        for (unsigned x_idx = 0 ; x_idx < 4 ; x_idx ++)
+        {
+            // Calculate distance between current x index and node, then account for possible wrap-around
+            dist_x = fabs((double)(first_idx_x + x_idx) * mGridSpacingX - node_location[0]);
+            if(first_idx_x == -1)
+            {
+                first_idx_x += mNumGridPtsX;
+            }
+
+            for (unsigned y_idx = 0 ; y_idx < 4 ; y_idx ++)
+            {
+                // Calculate distance between current x index and node, then account for possible wrap-around
+                dist_y = fabs((double)(first_idx_y + y_idx) * mGridSpacingY - node_location[1]);
+                if(first_idx_y == -1)
+                {
+                    first_idx_y += mNumGridPtsY;
+                }
+
+                // The source is weighted by the delta function
+                source = source_strength * Delta1D(dist_x, mGridSpacingX) * Delta1D(dist_y, mGridSpacingY);
+
+                rhs_grids[2][(first_idx_x + x_idx) % mNumGridPtsX][(first_idx_y + y_idx) % mNumGridPtsY] += source;
             }
         }
     }
@@ -335,7 +432,7 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
     {
         for (unsigned y = 0 ; y < reduced_size ; y++)
         {
-            pressure_grid[x][y] = -mI * (sin_2x[x] * fourier_grids[0][x][y] / mGridSpacingX + sin_2y[y] * fourier_grids[1][x][y] / mGridSpacingY) / op_1[x][y];
+            pressure_grid[x][y] = (op_2[x][y] * fourier_grids[2][x][y] - mI * (sin_2x[x] * fourier_grids[0][x][y] / mGridSpacingX + sin_2y[y] * fourier_grids[1][x][y] / mGridSpacingY) ) / op_1[x][y];
         }
     }
 
@@ -365,7 +462,7 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
 template<unsigned DIM>
 double ImmersedBoundarySimulationModifier<DIM>::Delta1D(double dist, double spacing)
 {
-    return (0.25 * (1.0 + cos(M_PI * dist / (2 * spacing)))) / spacing;
+    return (0.25 * (1.0 + cos(M_PI * dist / (2 * spacing))));
 }
 
 template<unsigned DIM>

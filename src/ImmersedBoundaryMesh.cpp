@@ -116,7 +116,7 @@ ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryMesh(std::vector<N
         if (elem_index != mMembraneIndex)
         {
             mElements[elem_index]->GetSourceNode()->rGetModifiableLocation() = this->GetCentroidOfElement(elem_index);
-            mElements[elem_index]->GetSourceNode()->SetRadius(0.0);
+            mElements[elem_index]->GetSourceNode()->SetRadius(1e6);
         }
     }
 

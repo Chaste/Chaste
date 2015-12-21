@@ -159,9 +159,9 @@ private:
     /**
      * Helper method for UpdateFluidVelocityGrids()
      * Ensures force applied to each node is reset to zero
-     * Ensures fluid force grids are reset
+     * Ensures fluid force grids and source grid are reset
      */
-    void ClearForces();
+    void ClearForcesAndSources();
 
     /**
      * Loops over each immersed boundary force and invokes AddForceContribution()
@@ -173,6 +173,12 @@ private:
      * Propagates elastic forces to fluid grid
      */
     void PropagateForcesToFluidGrid();
+
+    /**
+     * Helper method for UpdateFluidVelocityGrids()
+     * Propagates fluid sources to grid
+     */
+    void PropagateFluidSourcesToGrid();
 
     /**
      * Helper method for UpdateFluidVelocityGrids()
