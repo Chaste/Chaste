@@ -1,1 +1,6 @@
+TestGenerateFftwThreadsWisdom.hpp
+TestGenerateFftwWisdom.hpp
 TestImmersedBoundaryDemoTutorial.hpp
+TestShortMultiCellSimulation.hpp
+TestShortSingleCellSimulation.hpp
+TestShortTwoCellSimulation.hpp
