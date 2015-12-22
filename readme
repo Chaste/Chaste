@@ -3,10 +3,9 @@ using the Chaste user project `ImmersedBoundary`.
 
 The following changes to the Chaste source need to be made:
 
- (1a) `BoxCollection` needs to be patched (see #2725)
- (1b) `ElementAttributes` must be patched (see #2739)
- (2) A "NEVER_REACHED" needs to be commented out of `OffLatticeSimulation.cpp`
+ (1) A "NEVER_REACHED" needs to be commented out of `OffLatticeSimulation.cpp`
      to allow `ImmersedBoundaryCellPopulation` to be used
+ (2) An exception needs to be removed (temporarily) from `NodeAttributes.cpp`
  (3) fftw must be linked by adding it to your hostconfig file
 
 These three changes can be implemented in the following way:
