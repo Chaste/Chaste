@@ -89,7 +89,7 @@ double AbstractSrnModel::GetSimulatedToTime()
 }
 
 /*
-// TODO - make abstract?
+///\todo - make abstract? (#2752)
 void AbstractSrnModel::SimulateToCurrentTime()
 {
 	// this should be overridden
@@ -108,5 +108,5 @@ void AbstractSrnModel::OutputSrnModelInfo(out_stream& rParamsFile)
 
 void AbstractSrnModel::OutputSrnModelParameters(out_stream& rParamsFile)
 {
-	// No Model Parameters
+	// No model parameters
 }
