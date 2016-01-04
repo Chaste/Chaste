@@ -98,8 +98,8 @@ void ParabolicGrowingDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellP
 template<unsigned DIM>
 void ParabolicGrowingDomainPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)
 {
-    // Temporarily cache the variable name until we create a ParaolicPdeAndBcs object and move it to the abstract class
-    ///\todo this comment doesn't quite make sense (#2687)
+    // Temporarily cache the variable name until we create an AbstractPdeAndBcs object
+    // and move mpPdeAndBcs to the abstract class. See #2767
     this->mCachedDependentVariableName = mpPdeAndBcs->rGetDependentVariableName();
 
     // Cache the output directory

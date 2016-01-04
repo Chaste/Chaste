@@ -92,8 +92,8 @@ void EllipticGrowingDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPo
 template<unsigned DIM>
 void EllipticGrowingDomainPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)
 {
-    // Temporarily cache the variable name until we create a a ParaolicPdeAndBcs object
-    // and move to the abstract class.
+    // Temporarily cache the variable name until we create an AbstractPdeAndBcs object
+    // and move mpPdeAndBcs to the abstract class. See #2767
     this->mCachedDependentVariableName = mpPdeAndBcs->rGetDependentVariableName();
 
     // Cache the output directory

@@ -48,59 +48,24 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned DIM>
 AbstractGrowingDomainPdeModifier<DIM>::AbstractGrowingDomainPdeModifier()
-    : AbstractCellBasedSimulationModifier<DIM>(),
-      mDeleteMesh(false),
-      mSolution(NULL),
-      mpFeMesh(NULL),
-      mOutputDirectory(""),
-      mCachedDependentVariableName("")
+
+: AbstractPdeModifier<DIM>()
 {
-    assert(DIM==2);
 }
 
 template<unsigned DIM>
 AbstractGrowingDomainPdeModifier<DIM>::~AbstractGrowingDomainPdeModifier()
 {
-    if (this->mDeleteMesh)
-    {
-        delete mpFeMesh;
-    }
-}
-
-template<unsigned DIM>
-void AbstractGrowingDomainPdeModifier<DIM>::UpdateAtEndOfOutputTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
-{
-#ifdef CHASTE_VTK
-    if (DIM>1)
-    {
-        std::ostringstream time_string;
-        time_string << SimulationTime::Instance()->GetTimeStepsElapsed();
-        std::string results_file = "pde_results_"+time_string.str();
-        VtkMeshWriter<DIM,DIM>* p_vtk_mesh_writer = new VtkMeshWriter<DIM,DIM>(mOutputDirectory, results_file, false);
-
-        ReplicatableVector solution_repl(mSolution);
-        std::vector<double> pde_solution;
-        for (unsigned i=0; i<mpFeMesh->GetNumNodes(); i++)
-        {
-           pde_solution.push_back(solution_repl[i]);
-        }
-
-        p_vtk_mesh_writer->AddPointData(mCachedDependentVariableName,pde_solution);
-
-        p_vtk_mesh_writer->WriteFilesUsingMesh(*mpFeMesh);
-        delete p_vtk_mesh_writer;
-    }
-#endif //CHASTE_VTK
 }
 
 template<unsigned DIM>
 void AbstractGrowingDomainPdeModifier<DIM>::GenerateFeMesh(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
-    if (mDeleteMesh)
+    if (this->mDeleteMesh)
     {
         // If a mesh has been created on a previous time-step then we need to tidy it up
-        assert (mpFeMesh != NULL);
-        delete mpFeMesh;
+        assert (this->mpFeMesh != NULL);
+        delete this->mpFeMesh;
     }
 
     // Get FE mesh from Cell Population different for each type of Cell Population
@@ -112,7 +77,7 @@ void AbstractGrowingDomainPdeModifier<DIM>::GenerateFeMesh(AbstractCellPopulatio
         }
         else
         {
-            mpFeMesh = &(static_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation)->rGetMesh());
+            this->mpFeMesh = &(static_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation)->rGetMesh());
         }
     }
     else if (dynamic_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL)
@@ -127,16 +92,16 @@ void AbstractGrowingDomainPdeModifier<DIM>::GenerateFeMesh(AbstractCellPopulatio
                 nodes.push_back(new Node<DIM>(node_iter->GetIndex(), node_iter->rGetLocation()));
         }
 
-        mDeleteMesh = true;
-        mpFeMesh = new MutableMesh<DIM,DIM>(nodes);
-        assert(mpFeMesh->GetNumNodes() == rCellPopulation.GetNumRealCells());
+        this->mDeleteMesh = true;
+        this->mpFeMesh = new MutableMesh<DIM,DIM>(nodes);
+        assert(this->mpFeMesh->GetNumNodes() == rCellPopulation.GetNumRealCells());
 
     }
     else if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL)
     {
         // GetTetrahedralMeshUsingVertexMesh will '''make''' a new mesh so we better be sure to delete it
-        mDeleteMesh = true;
-        mpFeMesh = static_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation)->GetTetrahedralMeshUsingVertexMesh();
+        this->mDeleteMesh = true;
+        this->mpFeMesh = static_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation)->GetTetrahedralMeshUsingVertexMesh();
     }
     else if (dynamic_cast<PottsBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL)
     {
@@ -150,9 +115,9 @@ void AbstractGrowingDomainPdeModifier<DIM>::GenerateFeMesh(AbstractCellPopulatio
             nodes.push_back(new Node<DIM>(rCellPopulation.GetLocationIndexUsingCell(*cell_iter), rCellPopulation.GetLocationOfCellCentre(*cell_iter)));
         }
 
-        mDeleteMesh=true;
-        mpFeMesh = new MutableMesh<DIM,DIM>(nodes);
-        assert(mpFeMesh->GetNumNodes() == rCellPopulation.GetNumRealCells());
+        this->mDeleteMesh=true;
+        this->mpFeMesh = new MutableMesh<DIM,DIM>(nodes);
+        assert(this->mpFeMesh->GetNumNodes() == rCellPopulation.GetNumRealCells());
     }
     else if (dynamic_cast<CaBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL)
     {
@@ -168,9 +133,9 @@ void AbstractGrowingDomainPdeModifier<DIM>::GenerateFeMesh(AbstractCellPopulatio
             cell_index++;
         }
 
-        mDeleteMesh=true;
-        mpFeMesh = new MutableMesh<DIM,DIM>(nodes);
-        assert(mpFeMesh->GetNumNodes() == rCellPopulation.GetNumRealCells());
+        this->mDeleteMesh=true;
+        this->mpFeMesh = new MutableMesh<DIM,DIM>(nodes);
+        assert(this->mpFeMesh->GetNumNodes() == rCellPopulation.GetNumRealCells());
     }
     else
     {
@@ -180,45 +145,10 @@ void AbstractGrowingDomainPdeModifier<DIM>::GenerateFeMesh(AbstractCellPopulatio
 
 
 template<unsigned DIM>
-void AbstractGrowingDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
-{
-    // Store the PDE solution in an accessible form
-    ReplicatableVector solution_repl(this->mSolution);
-
-    // local cell index used by the CA simulation
-    unsigned cell_index = 0;
-
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
-                 cell_iter != rCellPopulation.End();
-                 ++cell_iter)
-    {
-        unsigned tet_node_index = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);
-
-        if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL)
-        {
-            // Offset to relate elements in vertex mesh to nodes in tetrahedral mesh.
-            tet_node_index += rCellPopulation.GetNumNodes();
-        }
-
-        if (dynamic_cast<CaBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL)
-        {
-            // here local cell index corresponds to tet node
-            tet_node_index = cell_index;
-            cell_index++;
-        }
-
-        double solution_at_node = solution_repl[tet_node_index];
-
-        cell_iter->GetCellData()->SetItem(mCachedDependentVariableName, solution_at_node);
-    }
-}
-
-
-template<unsigned DIM>
 void AbstractGrowingDomainPdeModifier<DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
 {
     // No parameters to output, so just call method on direct parent class
-    AbstractCellBasedSimulationModifier<DIM>::OutputSimulationModifierParameters(rParamsFile);
+    AbstractPdeModifier<DIM>::OutputSimulationModifierParameters(rParamsFile);
 }
 
 /////////////////////////////////////////////////////////////////////////////

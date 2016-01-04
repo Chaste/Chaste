@@ -33,26 +33,24 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef ABSTRACTGROWINGDOMAINPDEMODIFIER_HPP_
-#define ABSTRACTGROWINGDOMAINPDEMODIFIER_HPP_
+#ifndef ABSTRACTPDEMODIFIER_HPP_
+#define ABSTRACTPDEMODIFIER_HPP_
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
-#include "AbstractPdeModifier.hpp"
+#include "AbstractCellBasedSimulationModifier.hpp"
 #include "TetrahedralMesh.hpp"
 #include "BoundaryConditionsContainer.hpp"
 #include "PdeAndBoundaryConditions.hpp"
 
 /**
- * A modifier class in which has the common functionality of solving a PDE on a Mesh defined by the tissue.
- * A growing spheroid or monolayer for example.
+ * A modifier class in which has the common functionality of solving a PDE on an arbitrary Mesh.
  * The results are stored in CellData.
  */
 template<unsigned DIM>
-class AbstractGrowingDomainPdeModifier : public AbstractPdeModifier<DIM>
+class AbstractPdeModifier : public AbstractCellBasedSimulationModifier<DIM,DIM>
 {
-    friend class TestGrowingDomainPdeModifiers;
 
 private:
 
@@ -68,20 +66,45 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractPdeModifier<DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractCellBasedSimulationModifier<DIM,DIM> >(*this);
+
+        // Note that archiving of mSolution is ~~~handled by the methods save/load_construct_data~~~ NOT YET DONE
+        // archive & mpFeMesh;
+        archive & mOutputDirectory;
+        archive & mCachedDependentVariableName;
     }
+
+protected:
+    /**
+     * Whether to delete the mesh when we are destroyed.
+     * Needed if to free memory if creating meshes.
+     */
+    bool mDeleteMesh;
+
+
+    /** The solution to the PDE problem at the current timestep. */
+    Vec mSolution; ///\todo NEED TO ARCHIVE THIS see PdeandBoundaryCondidtion (#2687)
+
+    /** Pointer to the finite element mesh on which to solve the PDE. **/
+    TetrahedralMesh<DIM,DIM>* mpFeMesh;  ///\todo #2687 NEED TO ARCHIVE THIS
+
+    /** Store the output directory name. */
+    std::string mOutputDirectory;
+
+    /** Caching the variable name. */
+    std::string mCachedDependentVariableName;
 
 public:
 
     /**
      * Constructor.
      */
-    AbstractGrowingDomainPdeModifier();
+    AbstractPdeModifier();
 
     /**
      * Destructor.
      */
-    virtual ~AbstractGrowingDomainPdeModifier();
+    virtual ~AbstractPdeModifier();
 
     /**
      * Overridden UpdateAtEndOfTimeStep() method. Needs overwriting in child classes.
@@ -91,6 +114,15 @@ public:
      * @param rCellPopulation reference to the cell population
      */
     virtual void UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)=0;
+
+    /**
+     * Overridden UpdateAtEndOfOutputTimeStep() method.
+     *
+     * Specifies what to do in the simulation at the end of each output timestep.
+     *
+     * @param rCellPopulation reference to the cell population
+     */
+    virtual void UpdateAtEndOfOutputTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
 
     /**
      * Overridden SetupSolve() method.
@@ -103,12 +135,11 @@ public:
     virtual void SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)=0;
 
     /**
-     * Helper method to generate the mesh from the Cell population.
+     * Helper method to copy the PDE solution to CellData
      *
      * @param rCellPopulation reference to the cell population
      */
-    void GenerateFeMesh(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
-
+    void UpdateCellData(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
 
     /**
      * Overridden OutputSimulationModifierParameters() method.
@@ -120,6 +151,6 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-TEMPLATED_CLASS_IS_ABSTRACT_1_UNSIGNED(AbstractGrowingDomainPdeModifier)
+TEMPLATED_CLASS_IS_ABSTRACT_1_UNSIGNED(AbstractPdeModifier)
 
-#endif /*ABSTRACTGROWINGDOMAINPDEMODIFIER_HPP_*/
+#endif /*ABSTRACTPDEMODIFIER_HPP_*/

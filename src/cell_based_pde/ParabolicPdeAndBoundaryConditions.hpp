@@ -46,8 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * A helper class for use in cell-based simulations with PDEs. The class
- * contains a pointer to a linear parabolic PDE, which is to be solved
- * on the domain defined by the cell population. The class also contains
+ * contains a pointer to a linear parabolic PDE. The class also contains
  * information describing the boundary condition that is to be imposed
  * when solving the PDE. Currently we allow Neumann (imposed flux) or
  * Dirichlet (imposed value) boundary conditions. The boundary condition

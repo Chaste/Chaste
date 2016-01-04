@@ -80,7 +80,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 static const double M_TIME_FOR_SIMULATION = 1.0;
 
-static const double M_NUM_CELLS_ACROSS = 3; // this 3^2 initialcells
+static const double M_NUM_CELLS_ACROSS = 3; // this is 3^2 initial cells
 
 class TestSimulationWithEllipticGrowingDomainPdeModifier : public AbstractCellBasedWithTimingsTestSuite
 {
@@ -127,7 +127,7 @@ public:
         simulator.SetOutputDirectory("EllipticGrowingMonolayers/Vertex");
         simulator.SetDt(1.0/200.0);
         simulator.SetSamplingTimestepMultiple(200);
-        simulator.SetEndTime(M_TIME_FOR_SIMULATION);//20
+        simulator.SetEndTime(M_TIME_FOR_SIMULATION);
 
         // Create Forces and pass to simulation NOTE: PARAMETERS CHOSEN TO GET CIRCULAR MONOLAYER
         MAKE_PTR(NagaiHondaForce<2>, p_force);
