@@ -107,7 +107,7 @@ namespace serialization
  */
 template<class Archive>
 inline void save_construct_data(
-    Archive & ar, const Goldbeter1991OdeSystem * t, const BOOST_PFTO unsigned int file_version)
+    Archive & ar, const Goldbeter1991OdeSystem * t, const unsigned int file_version)
 {
     const std::vector<double> state_variables = t->rGetConstStateVariables();
     ar & state_variables;
