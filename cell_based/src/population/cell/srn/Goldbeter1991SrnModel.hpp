@@ -108,9 +108,19 @@ public:
      */
     void OutputSrnModelParameters(out_stream& rParamsFile);
 
-    // accessors for state variables
+    /**
+     * @return the value of the state variable C in the ODE system.
+     */
     double GetC();
+
+    /**
+     * @return the value of the state variable M in the ODE system.
+     */
     double GetM();
+
+    /**
+     * @return the value of the state variable X in the ODE system.
+     */
     double GetX();
 
 };

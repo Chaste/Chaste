@@ -81,16 +81,41 @@ protected:
     bool mFinishedRunningOdes;
 
     /**
-     * The initial condition for delta, notch
+     * The initial condition for the ODE state variables.
      */
     std::vector<double> mInitialConditions;
 
+    /**
+     * The number of state variables
+     */
     unsigned mStateSize;
 
-    // bring virtual funcs from AbstractSrnModel into derived namespace so overloading virtual works
+    /*
+     * Overridden Initialise method which here ets up the ODE system.
+     *
+     *Note we bring virtual funcs from AbstractSrnModel into derived namespace so overloading virtual works.
+     */
     using AbstractSrnModel::Initialise;
     void Initialise(AbstractOdeSystem* pOdeSystem);
 
+    /*
+     * Overridden CreateSrnModel method.
+     *
+     * Builder method to create new instances of the SRN model.
+     * Each concrete subclass must implement this method to create an
+     * instance of that subclass.
+     *
+     * This method is called by Cell::Divide() to create a SRN
+     * model for the daughter cell.  Note that the parent SRN
+     * model will have had ResetForDivision() called just before
+     * CreateSrnModel() is called, so performing an exact copy of the
+     * parent is suitable behaviour. Any daughter-cell-specific initialisation
+     * can be done in InitialiseDaughterCell().
+     *
+     * @return new SRN model
+     *
+     * Note bring virtual funcs from AbstractSrnModel into derived namespace so overloading virtual works.
+     */
     using AbstractSrnModel::CreateSrnModel;
     AbstractSrnModel* CreateSrnModel(AbstractOdeSrnModel* pModel);
 
@@ -99,6 +124,8 @@ public:
     /**
      * Creates an AbstractOdeSrnModel
      *
+     * @param stateSize The number of state variables in the ODE system.
+     * @param pOdeSolver An optional pointer to a cell-cycle model ODE solver object (allows the use of different ODE solvers).
      */
     AbstractOdeSrnModel(unsigned stateSize,
     					boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver = boost::shared_ptr<AbstractCellCycleModelOdeSolver>());
@@ -110,8 +137,6 @@ public:
 
     /**
      * Here we solve the ODEs associated with the SRN.
-     *
-     * @param simulateToTime time to run the SRN simulation to.
      */
     virtual void SimulateToCurrentTime();
 
@@ -138,7 +163,7 @@ public:
 
 
     /**
-	 * @param reference to the ODE system state values
+	 * @return reference to the ODE system state values.
 	 */
 	const std::vector<double>& GetStateVariables();
 

@@ -84,8 +84,6 @@ private:
     }
 
 protected:
-    // other possilble mVars (with get/set)
-    // mDimension, mBirthTime;
 
     /** The cell that this model is associated with. */
     CellPtr mpCell;
@@ -165,9 +163,9 @@ public:
     double GetSimulatedToTime();
 
     /**
-     * This should be overridden for each SRN type
+     * Method to simulate the SRN to the current time
      *
-     * @param simulateToTime time to run the SRN simulation to.
+     * This should be overridden for each SRN type i.e. ODE based.
      */
     virtual void SimulateToCurrentTime()=0;
 

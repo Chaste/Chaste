@@ -57,10 +57,9 @@ void AbstractSrnModel::InitialiseDaughterCell()
 
 void AbstractSrnModel::ResetForDivision()
 {
-	// make sure we're at cur time
+	// make sure we're at current time
 	SimulateToCurrentTime();
-	double current_time = SimulationTime::Instance()->GetTime();
-	assert(mSimulatedToTime == current_time);
+	assert(mSimulatedToTime == SimulationTime::Instance()->GetTime());
 }
 
 

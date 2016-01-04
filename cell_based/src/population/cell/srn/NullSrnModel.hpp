@@ -86,11 +86,29 @@ public:
      */
     virtual ~NullSrnModel();
 
+    /*
+     * Overridden  SimulateToCurrentTime method. Here we dont do anything as this is a
+     * Null model.
+     */
     void SimulateToCurrentTime();
 
-    // NOTE - all other functions (e.g. ResetForDivision, Initialise, etc.) are handled in AbstractSrnModel
+    /*
+     * Overridden CreateSrnModel method.
+     *
+     * Builder method to create new instances of the SRN model.
+     * Each concrete subclass must implement this method to create an
+     * instance of that subclass.
+     *
+     * This method is called by Cell::Divide() to create a SRN
+     * model for the daughter cell.  Note that the parent SRN
+     * model will have had ResetForDivision() called just before
+     * CreateSrnModel() is called, so performing an exact copy of the
+     * parent is suitable behaviour. Any daughter-cell-specific initialisation
+     * can be done in InitialiseDaughterCell().
+     *
+     * @return new SRN model
+     */
     AbstractSrnModel* CreateSrnModel();
-
 };
 
 // Declare identifier for the serializer
