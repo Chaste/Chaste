@@ -130,6 +130,11 @@ public:
         TS_ASSERT_DELTA(bounding_box.rGetUpperCorner()[1],10,1e-5);
         TS_ASSERT_DELTA(bounding_box.rGetLowerCorner()[0],-10,1e-5);
         TS_ASSERT_DELTA(bounding_box.rGetLowerCorner()[1],-10,1e-5);
+
+        //Coverage
+        TS_ASSERT_EQUALS(p_pde_modifier->GetOutputGradient(),false); //Defaults to false
+        p_pde_modifier->SetOutputGradient(true);
+        TS_ASSERT_EQUALS(p_pde_modifier->GetOutputGradient(),true);
     }
 
 //    void TestParabolicConstructor() throw(Exception)

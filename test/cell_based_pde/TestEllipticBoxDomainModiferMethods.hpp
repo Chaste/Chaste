@@ -116,7 +116,11 @@ public:
 
         // Create a PDE Modifier object using this pde and bcs object
         MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc,cuboid));
+        // For coverage output the Solution Gradient
+        p_pde_modifier->SetOutputGradient(true);
+
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseBoxEllipticPdeWithMeshOnSquare");
+
 
 
         // Test the solution at some fixed points to compare with other cell populations
@@ -124,6 +128,9 @@ public:
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_0)[0], 0, .01e-4);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_0)[1], 0.0, 1e-4);
         TS_ASSERT_DELTA( p_cell_0->GetCellData()->GetItem("variable"), 0.8605, 1e-4);
+
+        TS_ASSERT_DELTA( p_cell_0->GetCellData()->GetItem("variable_grad_x"), -0.0323, 1e-4);
+        TS_ASSERT_DELTA( p_cell_0->GetCellData()->GetItem("variable_grad_y"), -0.0179, 1e-4);
     }
 
     void TestNodeBasedSquareMonolayer() throw (Exception)

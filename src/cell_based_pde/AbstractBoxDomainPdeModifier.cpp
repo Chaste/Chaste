@@ -130,6 +130,50 @@ void AbstractBoxDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulation<DI
         }
 
         cell_iter->GetCellData()->SetItem(this->mCachedDependentVariableName, solution_at_cell);
+
+        if (this->mOutputGradient)
+        {
+            // Now calculate the gradient of the solution and store this in CellVecData
+            c_vector<double, DIM> solution_gradient = zero_vector<double>(DIM);
+            // Calculate the basis functions at any point (eg zero) in the element
+            c_matrix<double, DIM, DIM> jacobian, inverse_jacobian;
+            double jacobian_det;
+            this->mpFeMesh->GetInverseJacobianForElement(elem_index, jacobian, jacobian_det, inverse_jacobian);
+            const ChastePoint<DIM> zero_point;
+            c_matrix<double, DIM, DIM+1> grad_phi;
+            LinearBasisFunction<DIM>::ComputeTransformedBasisFunctionDerivatives(zero_point, inverse_jacobian, grad_phi);
+
+            for (unsigned node_index=0; node_index<DIM+1; node_index++)
+            {
+
+                double nodal_value = solution_repl[p_element->GetNodeGlobalIndex(node_index)];
+
+                for (unsigned j=0; j<DIM; j++)
+                {
+                    solution_gradient(j) += nodal_value* grad_phi(j, node_index);
+                }
+            }
+
+            switch (DIM)
+            {
+    //            case 1:
+    //                cell_iter->GetCellData()->SetItem(this->mCachedDependentVariableName+"_grad_x", solution_gradient(0));
+    //                break;
+                case 2:
+                    cell_iter->GetCellData()->SetItem(this->mCachedDependentVariableName+"_grad_x", solution_gradient(0));
+                    cell_iter->GetCellData()->SetItem(this->mCachedDependentVariableName+"_grad_y", solution_gradient(1));
+                    break;
+    //            case 3:
+    //                cell_iter->GetCellData()->SetItem(this->mCachedDependentVariableName+"_grad_x", solution_gradient(0));
+    //                cell_iter->GetCellData()->SetItem(this->mCachedDependentVariableName+"_grad_y", solution_gradient(1));
+    //                cell_iter->GetCellData()->SetItem(this->mCachedDependentVariableName+"_grad_z", solution_gradient(2));
+    //                break;
+                default:
+                    NEVER_REACHED;
+            }
+        }
+
+
     }
 }
 

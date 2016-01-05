@@ -72,6 +72,7 @@ private:
         // archive & mpFeMesh;
         archive & mOutputDirectory;
         archive & mCachedDependentVariableName;
+        archive & mOutputGradient;
     }
 
 protected:
@@ -93,6 +94,9 @@ protected:
 
     /** Caching the variable name. */
     std::string mCachedDependentVariableName;
+
+    /** Whether or not to calculate and output the gradient of the solution. */
+    bool mOutputGradient;
 
 public:
 
@@ -141,6 +145,21 @@ public:
      * @param rParamsFile the file stream to which the parameters are output
      */
     void OutputSimulationModifierParameters(out_stream& rParamsFile);
+
+
+    /**
+     * Whether to calculate and save the gradient of the solution to CellData.
+     *
+     * @return mOutputGradient
+     */
+    bool GetOutputGradient();
+
+    /**
+     *  To set whether to calculate and save the gradient of the solution to CellData.
+     *
+     * @param outputGradient whether to output or not
+     */
+    void SetOutputGradient(bool outputGradient);
 };
 
 #include "SerializationExportWrapper.hpp"

@@ -53,7 +53,8 @@ AbstractPdeModifier<DIM>::AbstractPdeModifier()
       mSolution(NULL),
       mpFeMesh(NULL),
       mOutputDirectory(""),
-      mCachedDependentVariableName("")
+      mCachedDependentVariableName(""),
+      mOutputGradient(false)
 {
     assert(DIM==2);
 }
@@ -93,7 +94,17 @@ void AbstractPdeModifier<DIM>::UpdateAtEndOfOutputTimeStep(AbstractCellPopulatio
 #endif //CHASTE_VTK
 }
 
+template<unsigned DIM>
+bool AbstractPdeModifier<DIM>::GetOutputGradient()
+{
+    return mOutputGradient;
+}
 
+template<unsigned DIM>
+void AbstractPdeModifier<DIM>::SetOutputGradient(bool outputGradient)
+{
+    mOutputGradient = outputGradient;
+}
 
 template<unsigned DIM>
 void AbstractPdeModifier<DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
