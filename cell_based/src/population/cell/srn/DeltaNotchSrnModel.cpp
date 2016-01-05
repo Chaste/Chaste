@@ -33,14 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-//#include "UblasIncludes.hpp"
 #include "DeltaNotchSrnModel.hpp"
-//#include "CellCycleModelOdeSolver.hpp"
 #include "AbstractOdeSrnModel.hpp"
-//#include "CvodeAdaptor.hpp"
-//#include "Exception.hpp"
-
-
 
 DeltaNotchSrnModel::DeltaNotchSrnModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
     : AbstractOdeSrnModel(2, pOdeSolver)
@@ -64,28 +58,27 @@ AbstractSrnModel* DeltaNotchSrnModel::CreateSrnModel()
 {
     // Create a new srn model
     DeltaNotchSrnModel* p_model = new DeltaNotchSrnModel(this->mpOdeSolver);
+
     // Create the new srn model's ODE system
     p_model->SetOdeSystem(new DeltaNotchOdeSystem);
+
     // Call super to set current values of the state variables in mpOdeSystem as an initial condition for the new srn model's ODE system
     return AbstractOdeSrnModel::CreateSrnModel(p_model);
 }
 
-
 void DeltaNotchSrnModel::SimulateToCurrentTime()
 {
-	// Custom behaviour
-	UpdateDeltaNotch();
+    // Custom behaviour
+    UpdateDeltaNotch();
 
     // Run the ODE simulation as needed
     AbstractOdeSrnModel::SimulateToCurrentTime();
 }
 
-
 void DeltaNotchSrnModel::Initialise()
 {
     AbstractOdeSrnModel::Initialise(new DeltaNotchOdeSystem);
 }
-
 
 void DeltaNotchSrnModel::UpdateDeltaNotch()
 {
@@ -119,9 +112,7 @@ double DeltaNotchSrnModel::GetMeanNeighbouringDelta()
 
 void DeltaNotchSrnModel::OutputSrnModelParameters(out_stream& rParamsFile)
 {
-    // No new parameters to output.
-
-    // Call direct parent class
+    // No new parameters to output, so just call method on direct parent class
     AbstractOdeSrnModel::OutputSrnModelParameters(rParamsFile);
 }
 
@@ -130,6 +121,3 @@ void DeltaNotchSrnModel::OutputSrnModelParameters(out_stream& rParamsFile)
 CHASTE_CLASS_EXPORT(DeltaNotchSrnModel)
 #include "CellCycleModelOdeSolverExportWrapper.hpp"
 EXPORT_CELL_CYCLE_MODEL_ODE_SOLVER(DeltaNotchSrnModel)
-
-
-

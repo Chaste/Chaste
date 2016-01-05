@@ -33,14 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-//#include "UblasIncludes.hpp"
 #include "Goldbeter1991SrnModel.hpp"
-//#include "CellCycleModelOdeSolver.hpp"
 #include "AbstractOdeSrnModel.hpp"
-//#include "CvodeAdaptor.hpp"
-//#include "Exception.hpp"
-
-
 
 Goldbeter1991SrnModel::Goldbeter1991SrnModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
     : AbstractOdeSrnModel(3, pOdeSolver)
@@ -56,33 +50,30 @@ Goldbeter1991SrnModel::Goldbeter1991SrnModel(boost::shared_ptr<AbstractCellCycle
 
 AbstractSrnModel* Goldbeter1991SrnModel::CreateSrnModel()
 {
-	//return new Goldbeter1991SrnModel(*this);
     // Create a new cell-cycle model
     Goldbeter1991SrnModel* p_model = new Goldbeter1991SrnModel(this->mpOdeSolver);
-    // Create the new srn model's ODE system
+
+    // Create the new SRN model's ODE system
     p_model->SetOdeSystem(new Goldbeter1991OdeSystem);
+
     // call super to set current values of the state variables in mpOdeSystem as an initial condition for the new srn model's ODE system
     return AbstractOdeSrnModel::CreateSrnModel(p_model);
 }
 
-
 void Goldbeter1991SrnModel::SimulateToCurrentTime()
 {
-	// custom behaviour
-    // run the ODE simulation as needed
+    // Custom behaviour: run the ODE simulation as needed
     AbstractOdeSrnModel::SimulateToCurrentTime();
 }
 
 void Goldbeter1991SrnModel::Initialise()
 {
-	AbstractOdeSrnModel::Initialise(new Goldbeter1991OdeSystem);
+    AbstractOdeSrnModel::Initialise(new Goldbeter1991OdeSystem);
 }
 
 void Goldbeter1991SrnModel::OutputSrnModelParameters(out_stream& rParamsFile)
 {
-    // No new parameters to output.
-
-    // Call direct parent class
+    // No new parameters to output, so just call method on direct parent class
     AbstractOdeSrnModel::OutputSrnModelParameters(rParamsFile);
 }
 
@@ -107,12 +98,8 @@ double Goldbeter1991SrnModel::GetX()
     return val;
 }
 
-
 // Declare identifier for the serializer
 #include "SerializationExportWrapperForCpp.hpp"
 CHASTE_CLASS_EXPORT(Goldbeter1991SrnModel)
 #include "CellCycleModelOdeSolverExportWrapper.hpp"
 EXPORT_CELL_CYCLE_MODEL_ODE_SOLVER(Goldbeter1991SrnModel)
-
-
-

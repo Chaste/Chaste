@@ -36,8 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef GOLDBETER1991SRNMODEL_HPP_
 #define GOLDBETER1991SRNMODEL_HPP_
 
-
-
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
@@ -48,9 +46,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * A subclass of StochasticDurationGenerationBasedCellCycleModel
  * that includes a Goldbeter1991 ODE system in the SRN.
  *
+ * \todo #2752 give reference for this ODE system
+ *
  * For another example of a cell cycle model that is not *based on*
  * an ODE system, but that includes an ODE system, see
- * SingleOdeWntCellCycleModel (in Crypt).
+ * SingleOdeWntCellCycleModel in the crypt folder.
  */
 class Goldbeter1991SrnModel : public AbstractOdeSrnModel
 {
@@ -70,7 +70,6 @@ private:
         archive & boost::serialization::base_object<AbstractOdeSrnModel>(*this);
     }
 
-
 public:
 
     /**
@@ -80,12 +79,11 @@ public:
      */
     Goldbeter1991SrnModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver = boost::shared_ptr<AbstractCellCycleModelOdeSolver>());
 
-
     /**
      * Overridden builder method to create new copies of
-     * this srn model.
+     * this SRN model.
      *
-     * @return Returns a copy of the current srn model.
+     * @return Returns a copy of the current SRN model.
      */
     AbstractSrnModel* CreateSrnModel();
 
@@ -94,15 +92,17 @@ public:
      *
      * This overridden method sets up a new Delta-Notch ODE system.
      */
-    void Initialise(); // override
+    void Initialise();
 
     /**
-     * Overridden SimulateToTime() method for custom behaviour
+     * Overridden SimulateToTime() method for custom behaviour.
+     *
+     * \todo #2752 say what it does in this class
      */
     void SimulateToCurrentTime();
 
     /**
-     * Outputs cell-cycle model parameters to file.
+     * Output cell-cycle model parameters to file.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
@@ -122,7 +122,6 @@ public:
      * @return the value of the state variable X in the ODE system.
      */
     double GetX();
-
 };
 
 // Declare identifier for the serializer
@@ -130,7 +129,5 @@ public:
 CHASTE_CLASS_EXPORT(Goldbeter1991SrnModel)
 #include "CellCycleModelOdeSolverExportWrapper.hpp"
 EXPORT_CELL_CYCLE_MODEL_ODE_SOLVER(Goldbeter1991SrnModel)
-
-
 
 #endif /* GOLDBETER1991SRNMODEL_HPP_ */

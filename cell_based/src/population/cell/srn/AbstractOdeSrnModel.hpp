@@ -37,21 +37,20 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define ABSTRACTODESRN_HPP_
 
 #include <vector>
-
 #include "ChasteSerialization.hpp"
 #include "ClassIsAbstract.hpp"
 #include <boost/serialization/base_object.hpp>
-
 #include "AbstractSrnModel.hpp"
 #include "CellCycleModelOdeHandler.hpp"
 #include "SimulationTime.hpp"
 
-//class AbstractSrnModel;
+//class AbstractSrnModel; ///\todo #2752 remove this commented code
 
 /**
  * This class contains the abstract code for an ODE SRN model
  *  - based on AbstractOdeBasedCellCycleModel
  *
+ * \todo #2752 Thoroughly document this class
  */
 class AbstractOdeSrnModel : public AbstractSrnModel, public CellCycleModelOdeHandler
 {
@@ -77,7 +76,9 @@ private:
 
 protected:
 
-    /** Whether the SRN model is currently in a delay (not solving ODEs). */
+    /**
+     * Whether the SRN model is currently in a delay (not solving ODEs).
+     */
     bool mFinishedRunningOdes;
 
     /**
@@ -86,7 +87,7 @@ protected:
     std::vector<double> mInitialConditions;
 
     /**
-     * The number of state variables
+     * The number of state variables.
      */
     unsigned mStateSize;
 
@@ -99,7 +100,7 @@ protected:
     void Initialise(AbstractOdeSystem* pOdeSystem);
 
     /*
-     * Overridden CreateSrnModel method.
+     * Overridden CreateSrnModel() method.
      *
      * Builder method to create new instances of the SRN model.
      * Each concrete subclass must implement this method to create an
@@ -114,21 +115,20 @@ protected:
      *
      * @return new SRN model
      *
-     * Note bring virtual funcs from AbstractSrnModel into derived namespace so overloading virtual works.
+     * Note bring virtual functions from AbstractSrnModel into derived namespace so overloading virtual works.
      */
     using AbstractSrnModel::CreateSrnModel;
     AbstractSrnModel* CreateSrnModel(AbstractOdeSrnModel* pModel);
 
-
 public:
     /**
-     * Creates an AbstractOdeSrnModel
+     * Create an AbstractOdeSrnModel.
      *
      * @param stateSize The number of state variables in the ODE system.
      * @param pOdeSolver An optional pointer to a cell-cycle model ODE solver object (allows the use of different ODE solvers).
      */
     AbstractOdeSrnModel(unsigned stateSize,
-    					boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver = boost::shared_ptr<AbstractCellCycleModelOdeSolver>());
+                        boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver = boost::shared_ptr<AbstractCellCycleModelOdeSolver>());
 
     /**
      * Destructor.
@@ -161,12 +161,10 @@ public:
      */
     void SetInitialConditions(std::vector<double> initialConditions);
 
-
     /**
-	 * @return reference to the ODE system state values.
-	 */
-	const std::vector<double>& GetStateVariables();
-
+     * @return reference to the ODE system state values.
+     */
+    const std::vector<double>& GetStateVariables();
 
     /**
      * Outputs cell cycle model parameters to file.
@@ -174,8 +172,6 @@ public:
      * @param rParamsFile the file stream to which the parameters are output
      */
     virtual void OutputSrnModelParameters(out_stream& rParamsFile);
-
-
 };
 
 CLASS_IS_ABSTRACT(AbstractOdeSrnModel)

@@ -44,25 +44,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Cell.hpp"
 #include "WildTypeCellMutationState.hpp"
-#include "StemCellProliferativeType.hpp"
 #include "TransitCellProliferativeType.hpp"
-#include "DifferentiatedCellProliferativeType.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
-#include "CellPropertyRegistry.hpp"
-#include "CellLabel.hpp"
-#include "CellData.hpp"
-#include "ApcTwoHitCellMutationState.hpp"
-#include "ApcOneHitCellMutationState.hpp"
-#include "StochasticDurationGenerationBasedCellCycleModel.hpp"
-#include "TysonNovakCellCycleModel.hpp"
 #include "Goldbeter1991SrnModel.hpp"
-#include "NullSrnModel.hpp"
-#include "DefaultCellProliferativeType.hpp"
 #include "SmartPointers.hpp"
 #include "TransitCellProliferativeType.hpp"
-#include "StemCellProliferativeType.hpp"
-#include "DifferentiatedCellProliferativeType.hpp"
-
 #include "AbstractCellBasedTestSuite.hpp"
 #include "FakePetscSetup.hpp"
 
@@ -72,8 +58,9 @@ public:
 
     void TestGoldbeter1991OdeSteadyState()
     {
-        // Keep running until we reach steady-state
+        // Keep running until we reach steady state
         SimulationTime* p_simulation_time = SimulationTime::Instance();
+
         // run until 100, with dt=0.01
         double t1=100;
         double dt=0.01;
@@ -91,39 +78,38 @@ public:
         p_tn_cell->InitialiseCellCycleModel();
         p_tn_cell->InitialiseSrnModel();
 
-		// run the cell simulation until t1
+        // Run the cell simulation until t1
         while (!p_simulation_time->IsFinished())
         {
-			p_simulation_time->IncrementTimeOneStep();
+            p_simulation_time->IncrementTimeOneStep();
             if (p_tn_cell->ReadyToDivide())
             {
                 p_tn_cell->Divide();
             }
         }
 
-        // get final state variables
-    	double current_time = SimulationTime::Instance()->GetTime();
-    	std::cout << "Finished ODE - " << "mSimulatedToTime : " << p_srn_model->GetSimulatedToTime() << ", current_time : " << current_time << std::endl;
+        // Get final state variables
+        double current_time = SimulationTime::Instance()->GetTime();
+        std::cout << "Finished ODE - " << "mSimulatedToTime : " << p_srn_model->GetSimulatedToTime() << ", current_time : " << current_time << std::endl;
 
-    	// direct access to state vals
-    	double C = dynamic_cast<Goldbeter1991SrnModel*>(p_tn_cell->GetSrnModel())->GetC();
-		TS_ASSERT_DELTA(C, 0.5470, 1e-4);
+        // Direct access to state variables
+        double C = dynamic_cast<Goldbeter1991SrnModel*>(p_tn_cell->GetSrnModel())->GetC();
+        TS_ASSERT_DELTA(C, 0.5470, 1e-4);
         double M = dynamic_cast<Goldbeter1991SrnModel*>(p_tn_cell->GetSrnModel())->GetM();
-		TS_ASSERT_DELTA(M, 0.2936, 1e-4);
+        TS_ASSERT_DELTA(M, 0.2936, 1e-4);
         double X = dynamic_cast<Goldbeter1991SrnModel*>(p_tn_cell->GetSrnModel())->GetX();
-		TS_ASSERT_DELTA(X, 0.0067, 1e-4);
-		// indirect access to state vector
-    	C = dynamic_cast<Goldbeter1991SrnModel*>(p_tn_cell->GetSrnModel())->GetStateVariables()[0];
-		TS_ASSERT_DELTA(C, 0.5470, 1e-4);
+        TS_ASSERT_DELTA(X, 0.0067, 1e-4);
+
+        // Indirect access to state vector
+        C = dynamic_cast<Goldbeter1991SrnModel*>(p_tn_cell->GetSrnModel())->GetStateVariables()[0];
+        TS_ASSERT_DELTA(C, 0.5470, 1e-4);
         M = dynamic_cast<Goldbeter1991SrnModel*>(p_tn_cell->GetSrnModel())->GetStateVariables()[1];
-		TS_ASSERT_DELTA(M, 0.2936, 1e-4);
+        TS_ASSERT_DELTA(M, 0.2936, 1e-4);
         X = dynamic_cast<Goldbeter1991SrnModel*>(p_tn_cell->GetSrnModel())->GetStateVariables()[2];
-		TS_ASSERT_DELTA(X, 0.0067, 1e-4);
+        TS_ASSERT_DELTA(X, 0.0067, 1e-4);
 
-		std::cout << "Finished ODE - " << "C : " << C << ", M : " << M  << ", X : " << X << std::endl;
+        std::cout << "Finished ODE - " << "C : " << C << ", M : " << M  << ", X : " << X << std::endl;
     }
-
 };
-
 
 #endif /* TESTCELLSRN_HPP_ */

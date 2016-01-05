@@ -44,9 +44,6 @@ AbstractSrnModel::~AbstractSrnModel()
 {
 }
 
-///////////////////////////////////////////////////////////////////////
-// Initialisation and Division Methods
-///////////////////////////////////////////////////////////////////////
 void AbstractSrnModel::Initialise()
 {
 }
@@ -57,16 +54,11 @@ void AbstractSrnModel::InitialiseDaughterCell()
 
 void AbstractSrnModel::ResetForDivision()
 {
-	// make sure we're at current time
-	SimulateToCurrentTime();
-	assert(mSimulatedToTime == SimulationTime::Instance()->GetTime());
+    // Make sure we're at the current time
+    SimulateToCurrentTime();
+    assert(mSimulatedToTime == SimulationTime::Instance()->GetTime());
 }
 
-
-
-///////////////////////////////////////////////////////////////////////
-// Getters and Setters
-///////////////////////////////////////////////////////////////////////
 void AbstractSrnModel::SetCell(CellPtr pCell)
 {
     mpCell = pCell;
@@ -92,8 +84,8 @@ double AbstractSrnModel::GetSimulatedToTime()
 ///\todo - make abstract? (#2752)
 void AbstractSrnModel::SimulateToCurrentTime()
 {
-	// this should be overridden
-	SetSimulatedToTime(SimulationTime::Instance()->GetTime());
+    // This should be overridden
+    SetSimulatedToTime(SimulationTime::Instance()->GetTime());
 }
 */
 
@@ -108,5 +100,4 @@ void AbstractSrnModel::OutputSrnModelInfo(out_stream& rParamsFile)
 
 void AbstractSrnModel::OutputSrnModelParameters(out_stream& rParamsFile)
 {
-	// No model parameters
 }

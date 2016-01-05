@@ -32,6 +32,7 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
+
 #ifndef TESTODEBASEDSRNMODELS_HPP_
 #define TESTODEBASEDSRNMODELS_HPP_
 
@@ -46,19 +47,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NullSrnModel.hpp"
 #include "DeltaNotchSrnModel.hpp"
 #include "Goldbeter1991SrnModel.hpp"
-
 #include "StochasticDurationGenerationBasedCellCycleModel.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "OutputFileHandler.hpp"
-#include "CheckReadyToDivideAndPhaseIsUpdated.hpp"
-
 #include "StochasticDurationCellCycleModel.hpp"
 #include "WildTypeCellMutationState.hpp"
-#include "StemCellProliferativeType.hpp"
 #include "TransitCellProliferativeType.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
 #include "SmartPointers.hpp"
 #include "FileComparison.hpp"
-//This test is always run sequentially (never in parallel)
+
+// This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
 class TestOdeBasedSrnModels : public AbstractCellBasedTestSuite
@@ -77,7 +76,6 @@ public:
         starter_conditions.push_back(0.5);
         p_srn_model->SetInitialConditions(starter_conditions);
 
-
         StochasticDurationGenerationBasedCellCycleModel* p_cc_model = new StochasticDurationGenerationBasedCellCycleModel();
 
         MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
@@ -92,7 +90,6 @@ public:
         // Now updated to initial conditions
         TS_ASSERT_DELTA(p_srn_model->GetNotch(), 0.5, 1e-4);
         TS_ASSERT_DELTA(p_srn_model->GetDelta(), 0.5, 1e-4);
-
 
         // Now update the SRN
         SimulationTime* p_simulation_time = SimulationTime::Instance();
@@ -121,7 +118,6 @@ public:
         state_variables.push_back(2.0);
         state_variables.push_back(3.0);
         p_model->SetOdeSystem(new DeltaNotchOdeSystem(state_variables));
-
 
         p_model->SetInitialConditions(state_variables);
 
@@ -154,7 +150,6 @@ public:
 
             MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
             MAKE_PTR(TransitCellProliferativeType, p_transit_type);
-
 
             // We must create a cell to be able to initialise the cell srn model's ODE system
             CellPtr p_cell(new Cell(p_healthy_state, p_cc_model, p_srn_model));
@@ -222,7 +217,6 @@ public:
         TS_ASSERT_DELTA(p_srn_model->GetC(), 0.5, 1e-4);
         TS_ASSERT_DELTA(p_srn_model->GetM(), 0.6, 1e-4);
         TS_ASSERT_DELTA(p_srn_model->GetX(), 0.7, 1e-4);
-
 
         // Now update the SRN
         SimulationTime* p_simulation_time = SimulationTime::Instance();
@@ -355,7 +349,7 @@ public:
                 // Compare the generated file in test output with a reference copy in the source code.
                 FileFinder generated = output_file_handler.FindFile("null_srn_results.parameters");
                 FileFinder reference("cell_based/test/data/TestSrnModels/null_srn_results.parameters",
-                        RelativeTo::ChasteSourceRoot);
+                                     RelativeTo::ChasteSourceRoot);
                 FileComparison comparer(generated, reference);
                 TS_ASSERT(comparer.CompareFiles());
             }
@@ -375,7 +369,7 @@ public:
                 // Compare the generated file in test output with a reference copy in the source code.
                 FileFinder generated = output_file_handler.FindFile("delta_notch_srn_results.parameters");
                 FileFinder reference("cell_based/test/data/TestSrnModels/delta_notch_srn_results.parameters",
-                        RelativeTo::ChasteSourceRoot);
+                                     RelativeTo::ChasteSourceRoot);
                 FileComparison comparer(generated, reference);
                 TS_ASSERT(comparer.CompareFiles());
             }
@@ -395,12 +389,11 @@ public:
                 // Compare the generated file in test output with a reference copy in the source code.
                 FileFinder generated = output_file_handler.FindFile("gb_1991_srn_results.parameters");
                 FileFinder reference("cell_based/test/data/TestSrnModels/gb_1991_srn_results.parameters",
-                        RelativeTo::ChasteSourceRoot);
+                                     RelativeTo::ChasteSourceRoot);
                 FileComparison comparer(generated, reference);
                 TS_ASSERT(comparer.CompareFiles());
             }
         }
-
     }
 };
 

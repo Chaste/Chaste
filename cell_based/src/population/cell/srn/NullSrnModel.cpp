@@ -40,7 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 NullSrnModel::NullSrnModel()
-	: AbstractSrnModel()
+    : AbstractSrnModel()
 {
 }
 
@@ -50,16 +50,16 @@ NullSrnModel::~NullSrnModel()
 
 void NullSrnModel::SimulateToCurrentTime()
 {
-	// does nothing but updates time
-	double current_time = SimulationTime::Instance()->GetTime();
-	SetSimulatedToTime(current_time);
+    // does nothing but updates time
+    double current_time = SimulationTime::Instance()->GetTime();
+    SetSimulatedToTime(current_time);
 }
 
 
 AbstractSrnModel* NullSrnModel::CreateSrnModel()
 {
     // Create a new srn model
-	NullSrnModel* p_model = new NullSrnModel();
+    NullSrnModel* p_model = new NullSrnModel();
 
     /*
      * Set each member variable of the new SRN model that inherits
@@ -72,7 +72,7 @@ AbstractSrnModel* NullSrnModel::CreateSrnModel()
      * may be set/overwritten as soon as InitialiseDaughterCell() is called on
      * the new SRN model.
      */
-	p_model->SetSimulatedToTime(mSimulatedToTime);
+    p_model->SetSimulatedToTime(mSimulatedToTime);
     return p_model;
 }
 

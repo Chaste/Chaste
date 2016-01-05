@@ -48,7 +48,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SimulationTime.hpp"
 #include "Cell.hpp"
 
-
 class Cell; // Circular definition (cells need to know about SRN models and vice-versa)
 typedef boost::shared_ptr<Cell> CellPtr;
 
@@ -57,6 +56,8 @@ typedef boost::shared_ptr<Cell> CellPtr;
  * It handles assignment of a Cell.
  *
  * SRN models are noncopyable since cells are noncopyable.
+ *
+ * \todo #2752 Thoroughly document this class (including, for example, what SRN stands for!)
  */
 class AbstractSrnModel : public Identifiable, boost::noncopyable
 {
@@ -85,7 +86,9 @@ private:
 
 protected:
 
-    /** The cell that this model is associated with. */
+    /**
+     * The cell that this model is associated with.
+     */
     CellPtr mpCell;
 
     /**
@@ -115,7 +118,7 @@ public:
      */
     void SetCell(CellPtr pCell);
 
-    // TODO - remove in favour of copy-constructors
+    ///\todo #2752 remove in favour of copy-constructors
     /**
      * Initialise the SRN model at the start of a simulation.
      *
@@ -148,12 +151,10 @@ public:
      */
     CellPtr GetCell();
 
-
     /**
-     * Set the time the SRN simulation has run to
+     * Set the time that the SRN simulation has run to.
      *
      * @param simulatedToTime the current simulation time of the SRN.
-     *
      */
     void SetSimulatedToTime(double simulatedToTime);
 
@@ -163,7 +164,7 @@ public:
     double GetSimulatedToTime();
 
     /**
-     * Method to simulate the SRN to the current time
+     * Simulate the SRN to the current time.
      *
      * This should be overridden for each SRN type i.e. ODE based.
      */
@@ -192,21 +193,19 @@ public:
      * can be done in InitialiseDaughterCell().
      *
      * @return new SRN model
-     *
      */
     virtual AbstractSrnModel* CreateSrnModel()=0;
 
-
     /**
-     * Outputs SRN model used in the simulation to file and then calls
-     * OutputSrnParameters to output all relevant parameters.
+     * Output SRN model used in the simulation to file and then call
+     * OutputSrnParameters() to output all relevant parameters.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
     void OutputSrnModelInfo(out_stream& rParamsFile);
 
     /**
-     * Outputs SRN model parameters to file.
+     * Output SRN model parameters to file.
      *
      * As this method is pure virtual, it must be overridden
      * in subclasses.
@@ -214,10 +213,7 @@ public:
      * @param rParamsFile the file stream to which the parameters are output
      */
     virtual void OutputSrnModelParameters(out_stream& rParamsFile);
-
-
 };
-
 
 CLASS_IS_ABSTRACT(AbstractSrnModel)
 

@@ -33,25 +33,22 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef NULLSRN_HPP_
-#define NULLSRN_HPP_
+#ifndef NULLSRNMODEL_HPP_
+#define NULLSRNMODEL_HPP_
 
 #include <vector>
-
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
-
 #include "AbstractSrnModel.hpp"
 #include "SimulationTime.hpp"
 
 class AbstractSrnModel;
 
 /**
- * This class contains a dummy/null SRN model that can be used for any cell models
+ * This class contains a dummy/null SRN model that can be used for any cell-cycle models
  * that do not have an SRN, or where the SRN is combined with the main cell-cycle
  * model.
  */
-
 class NullSrnModel : public AbstractSrnModel
 {
 private:
@@ -70,14 +67,14 @@ private:
         archive & boost::serialization::base_object<AbstractSrnModel>(*this);
     }
 
-protected:
-
 public:
+
     /**
-     * Creates an NullSrnModel, calls SetBirthTime on the
+     * Default constructor.
+     *
+     * Creates an NullSrnModel and calls SetBirthTime() on the
      * AbstractSrnModel to make sure that can be set 'back in time' for
      * cells which did not divide at the current time.
-     *
      */
     NullSrnModel();
 
@@ -87,13 +84,14 @@ public:
     virtual ~NullSrnModel();
 
     /*
-     * Overridden  SimulateToCurrentTime method. Here we dont do anything as this is a
-     * Null model.
+     * Overridden SimulateToCurrentTime() method.
+     *
+     * Here we don't do anything as this is a null SRN model.
      */
     void SimulateToCurrentTime();
 
     /*
-     * Overridden CreateSrnModel method.
+     * Overridden CreateSrnModel() method.
      *
      * Builder method to create new instances of the SRN model.
      * Each concrete subclass must implement this method to create an
@@ -115,4 +113,4 @@ public:
 #include "SerializationExportWrapper.hpp"
 CHASTE_CLASS_EXPORT(NullSrnModel)
 
-#endif /* NULLSRN_HPP_ */
+#endif /* NULLSRNMODEL_HPP_ */

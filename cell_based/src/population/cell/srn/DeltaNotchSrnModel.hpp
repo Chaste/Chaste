@@ -36,7 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef DELTANOTCHSRNMODEL_HPP_
 #define DELTANOTCHSRNMODEL_HPP_
 
-
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
@@ -46,6 +45,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * A subclass of AbstractOdeSrnModel
  * that includes a Delta-Notch ODE system in the SRN.
+ *
+ * \todo #2752 document this class more thoroughly here
  */
 class DeltaNotchSrnModel : public AbstractOdeSrnModel
 {
@@ -74,12 +75,11 @@ public:
      */
     DeltaNotchSrnModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver = boost::shared_ptr<AbstractCellCycleModelOdeSolver>());
 
-
     /**
      * Overridden builder method to create new copies of
-     * this srn model.
+     * this SRN model.
      *
-     * @return Returns a copy of the current srn model.
+     * @return a copy of the current SRN model.
      */
     AbstractSrnModel* CreateSrnModel();
 
@@ -91,10 +91,11 @@ public:
     void Initialise(); // override
 
     /**
-     * Overridden SimulateToTime() method for custom behaviour
+     * Overridden SimulateToTime() method for custom behaviour.
+     *
+     * \todo #2752 say what it does in this class
      */
     void SimulateToCurrentTime();
-
 
     /**
      * Update the current levels of Delta and Notch in the cell.
@@ -102,22 +103,22 @@ public:
     void UpdateDeltaNotch();
 
     /**
-     * @return Returns the current Notch level in this cell.
+     * @return the current Notch level in this cell.
      */
     double GetNotch();
 
     /**
-     * @return Returns the current Delta level in this cell.
+     * @return the current Delta level in this cell.
      */
     double GetDelta();
 
     /**
-     * @return Get the current level of Delta neighbouring the cell.
+     * @return the current level of Delta neighbouring the cell.
      */
     double GetMeanNeighbouringDelta();
 
     /**
-     * Outputs cell-cycle model parameters to file.
+     * Output cell-cycle model parameters to file.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
@@ -129,7 +130,5 @@ public:
 CHASTE_CLASS_EXPORT(DeltaNotchSrnModel)
 #include "CellCycleModelOdeSolverExportWrapper.hpp"
 EXPORT_CELL_CYCLE_MODEL_ODE_SOLVER(DeltaNotchSrnModel)
-
-
 
 #endif /* DELTANOTCHSRNMODEL_HPP_ */

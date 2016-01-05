@@ -38,12 +38,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cassert>
 #include "Exception.hpp"
 
-AbstractOdeSrnModel::AbstractOdeSrnModel(unsigned stateSize,
-										 boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
-	: AbstractSrnModel(),
-	  CellCycleModelOdeHandler(SimulationTime::Instance()->GetTime(), pOdeSolver),
-	  mFinishedRunningOdes(false),
-	  mStateSize(stateSize)
+AbstractOdeSrnModel::AbstractOdeSrnModel(unsigned stateSize, boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
+    : AbstractSrnModel(),
+      CellCycleModelOdeHandler(SimulationTime::Instance()->GetTime(), pOdeSolver),
+      mFinishedRunningOdes(false),
+      mStateSize(stateSize)
 {
 }
 
@@ -55,11 +54,11 @@ AbstractOdeSrnModel::~AbstractOdeSrnModel()
 void AbstractOdeSrnModel::SimulateToCurrentTime()
 {
     assert(mpOdeSystem != NULL);
-	assert(SimulationTime::Instance()->IsStartTimeSetUp());
+    assert(SimulationTime::Instance()->IsStartTimeSetUp());
 
-	double current_time = SimulationTime::Instance()->GetTime();
+    double current_time = SimulationTime::Instance()->GetTime();
 
-	// run ODEs if needed
+    // Run ODEs if needed
     if (current_time > mLastTime)
     {
         if (!mFinishedRunningOdes)
@@ -67,9 +66,9 @@ void AbstractOdeSrnModel::SimulateToCurrentTime()
             // Update whether a stopping event has occurred
             mFinishedRunningOdes = SolveOdeToTime(current_time);
 
-            if (mFinishedRunningOdes)
+            if (mFinishedRunningOdes) ///\todo #752 remove this pointless if statement
             {
-				// do nothing for now...
+                // Do nothing for now...
             }
         }
         else
@@ -78,12 +77,13 @@ void AbstractOdeSrnModel::SimulateToCurrentTime()
         }
     }
 
-    // update the SimulatedToTime value
+    // Update the SimulatedToTime value
     mLastTime = current_time;
     SetSimulatedToTime(current_time);
 }
 
-void AbstractOdeSrnModel::Initialise(AbstractOdeSystem* pOdeSystem) {
+void AbstractOdeSrnModel::Initialise(AbstractOdeSystem* pOdeSystem)
+{
     assert(mpOdeSystem == NULL);
     assert(mpCell != NULL);
 
@@ -98,8 +98,6 @@ void AbstractOdeSrnModel::Initialise(AbstractOdeSystem* pOdeSystem) {
     }
 
     SetLastTime(mSimulatedToTime);
-
-
 }
 
 AbstractSrnModel* AbstractOdeSrnModel::CreateSrnModel(AbstractOdeSrnModel* p_model)
@@ -126,18 +124,15 @@ AbstractSrnModel* AbstractOdeSrnModel::CreateSrnModel(AbstractOdeSrnModel* p_mod
     p_model->mStateSize = mStateSize;
     if (mInitialConditions != std::vector<double>())
     {
-    	p_model->SetInitialConditions(mInitialConditions);
+        p_model->SetInitialConditions(mInitialConditions);
     }
     return p_model;
 }
 
 void AbstractOdeSrnModel::ResetForDivision()
 {
-    // assert(mFinishedRunningOdes);
-
     AbstractSrnModel::ResetForDivision();
-	assert(mLastTime == mSimulatedToTime);
-    //mLastTime = current_time;
+    assert(mLastTime == mSimulatedToTime);
     mFinishedRunningOdes = false;
 }
 
@@ -146,13 +141,11 @@ void AbstractOdeSrnModel::SetFinishedRunningOdes(bool finishedRunningOdes)
     mFinishedRunningOdes = finishedRunningOdes;
 }
 
-
 void AbstractOdeSrnModel::SetInitialConditions(std::vector<double> initialConditions)
 {
-	assert(initialConditions.size() == mStateSize);
+assert(initialConditions.size() == mStateSize);
     mInitialConditions = initialConditions;
 }
-
 
 const std::vector<double>& AbstractOdeSrnModel::GetStateVariables()
 {
@@ -161,16 +154,12 @@ const std::vector<double>& AbstractOdeSrnModel::GetStateVariables()
     return mpOdeSystem->rGetStateVariables();
 }
 
-
 void AbstractOdeSrnModel::OutputSrnModelParameters(out_stream& rParamsFile)
 {
-    // No new parameters to output
-    // Call method on direct parent class
+    // No new parameters to output, so just call method on direct parent class
     AbstractSrnModel::OutputSrnModelParameters(rParamsFile);
 }
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
 CHASTE_CLASS_EXPORT(AbstractOdeSrnModel)
-
-
