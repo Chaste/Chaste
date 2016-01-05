@@ -91,14 +91,17 @@ protected:
      */
     unsigned mStateSize;
 
-    /*
-     * Overridden Initialise method which here ets up the ODE system.
-     *
-     *Note we bring virtual funcs from AbstractSrnModel into derived namespace so overloading virtual works.
-     */
     using AbstractSrnModel::Initialise;
+    /*
+     * Overridden Initialise() method, which here sets up the ODE system.
+     *
+     * Note we bring virtual functions from AbstractSrnModel into derived namespace so overloading virtual works.
+     *
+     * @param pOdeSystem pointer to an ODE system
+     */
     void Initialise(AbstractOdeSystem* pOdeSystem);
 
+    using AbstractSrnModel::CreateSrnModel;
     /*
      * Overridden CreateSrnModel() method.
      *
@@ -113,11 +116,12 @@ protected:
      * parent is suitable behaviour. Any daughter-cell-specific initialisation
      * can be done in InitialiseDaughterCell().
      *
-     * @return new SRN model
-     *
      * Note bring virtual functions from AbstractSrnModel into derived namespace so overloading virtual works.
+     *
+     * @param pModel pointer to an ODE SRN model
+     *
+     * @return new SRN model
      */
-    using AbstractSrnModel::CreateSrnModel;
     AbstractSrnModel* CreateSrnModel(AbstractOdeSrnModel* pModel);
 
 public:
