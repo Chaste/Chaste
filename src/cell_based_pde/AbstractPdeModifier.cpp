@@ -93,39 +93,6 @@ void AbstractPdeModifier<DIM>::UpdateAtEndOfOutputTimeStep(AbstractCellPopulatio
 #endif //CHASTE_VTK
 }
 
-template<unsigned DIM>
-void AbstractPdeModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
-{
-    // Store the PDE solution in an accessible form
-    ReplicatableVector solution_repl(this->mSolution);
-
-    // local cell index used by the CA simulation
-    unsigned cell_index = 0;
-
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
-                 cell_iter != rCellPopulation.End();
-                 ++cell_iter)
-    {
-        unsigned tet_node_index = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);
-
-        if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL)
-        {
-            // Offset to relate elements in vertex mesh to nodes in tetrahedral mesh.
-            tet_node_index += rCellPopulation.GetNumNodes();
-        }
-
-        if (dynamic_cast<CaBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL)
-        {
-            // here local cell index corresponds to tet node
-            tet_node_index = cell_index;
-            cell_index++;
-        }
-
-        double solution_at_node = solution_repl[tet_node_index];
-
-        cell_iter->GetCellData()->SetItem(mCachedDependentVariableName, solution_at_node);
-    }
-}
 
 
 template<unsigned DIM>

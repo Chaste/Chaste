@@ -84,30 +84,20 @@ public:
     virtual ~AbstractGrowingDomainPdeModifier();
 
     /**
-     * Overridden UpdateAtEndOfTimeStep() method. Needs overwriting in child classes.
-     *
-     * Specifies what to do in the simulation at the end of each time step.
-     *
-     * @param rCellPopulation reference to the cell population
-     */
-    virtual void UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)=0;
-
-    /**
-     * Overridden SetupSolve() method.
-     *
-     * Specifies what to do in the simulation before the start of the time loop. Needs overwriting in child classes
-     *
-     * @param rCellPopulation reference to the cell population
-     * @param outputDirectory the output directory, relative to where Chaste output is stored
-     */
-    virtual void SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)=0;
-
-    /**
      * Helper method to generate the mesh from the Cell population.
      *
      * @param rCellPopulation reference to the cell population
      */
     void GenerateFeMesh(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
+
+    /**
+     * Helper method to copy the PDE solution to CellData
+     *
+     * Here there is a 1-1 correspondence between cells and nodes in the FE mesh
+     *
+     * @param rCellPopulation reference to the cell population
+     */
+    void UpdateCellData(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
 
 
     /**

@@ -33,7 +33,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "EllipticGrowingDomainPdeModifier.hpp"
+#include "EllipticBoxDomainPdeModifier.hpp"
 #include "NodeBasedCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
 #include "MeshBasedCellPopulation.hpp"
@@ -46,22 +46,29 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SimpleLinearEllipticSolver.hpp"
 #include "AveragedSourcePde.hpp"
 
+
 template<unsigned DIM>
-EllipticGrowingDomainPdeModifier<DIM>::EllipticGrowingDomainPdeModifier()
-    : AbstractGrowingDomainPdeModifier<DIM>()
+EllipticBoxDomainPdeModifier<DIM>::EllipticBoxDomainPdeModifier()
+    : AbstractBoxDomainPdeModifier<DIM>()
 {
 }
 
 template<unsigned DIM>
-EllipticGrowingDomainPdeModifier<DIM>::EllipticGrowingDomainPdeModifier(PdeAndBoundaryConditions<DIM>* pPdeAndBcs)
-    : AbstractGrowingDomainPdeModifier<DIM>(),
+EllipticBoxDomainPdeModifier<DIM>::EllipticBoxDomainPdeModifier(PdeAndBoundaryConditions<DIM>* pPdeAndBcs,
+                                                                ChasteCuboid<DIM> meshCuboid,
+                                                                double stepSize)
+    : AbstractBoxDomainPdeModifier<DIM>(),
       mpPdeAndBcs(pPdeAndBcs)
 {
     assert(DIM==2);
+
+    //Generate mesh and add BCS to BSC container. Note only need to do this ones as the mesh is fixed.
+    this->GenerateFeMesh(meshCuboid, stepSize);
+    mpBcc = this->ConstructBoundaryConditionsContainer();
 }
 
 template<unsigned DIM>
-EllipticGrowingDomainPdeModifier<DIM>::~EllipticGrowingDomainPdeModifier()
+EllipticBoxDomainPdeModifier<DIM>::~EllipticBoxDomainPdeModifier()
 {
     // Destroy the most recent solution vector
     if (this->mSolution != NULL)
@@ -71,19 +78,21 @@ EllipticGrowingDomainPdeModifier<DIM>::~EllipticGrowingDomainPdeModifier()
 }
 
 template<unsigned DIM>
-void EllipticGrowingDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
+void EllipticBoxDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
-    this->GenerateFeMesh(rCellPopulation);
+    this->UpdateCellPdeElementMap(rCellPopulation);
 
-    // Add the BCs to the BCs container
-    std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc = this->ConstructBoundaryConditionsContainer();
+    // When using a PDE mesh which doesnt coincide with the cells, we must set up the source terms before solving the PDE.
+    // Pass in already updated CellPdeElementMap to speed up finding cells.
+    mpPdeAndBcs->SetUpSourceTermsForAveragedSourcePde(this->mpFeMesh, &this->mCellPdeElementMap);
 
-    // Use CellBasedPdeSolver as cell wise PDE
-    CellBasedPdeSolver<DIM> solver(this->mpFeMesh, mpPdeAndBcs->GetPde(), p_bcc.get());
+    // Use SimpleLinearEllipticSolver as Averaged Source PDE
+    SimpleLinearEllipticSolver<DIM,DIM> solver(this->mpFeMesh, mpPdeAndBcs->GetPde(), mpBcc.get());
 
     ///\todo Use initial guess when solving the system (#2687)
     Vec old_solution_copy = this->mSolution;
     this->mSolution = solver.Solve();
+
     // Note that the linear solver creates a vector, so we have to keep a handle on the old one
     // in order to destroy it.
     ///\todo #2687 This will change when initial guess is used.
@@ -96,7 +105,7 @@ void EllipticGrowingDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPo
 }
 
 template<unsigned DIM>
-void EllipticGrowingDomainPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)
+void EllipticBoxDomainPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)
 {
     // Temporarily cache the variable name until we create an AbstractPdeAndBcs object
     // and move mpPdeAndBcs to the abstract class. See #2767
@@ -111,11 +120,11 @@ void EllipticGrowingDomainPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<DI
 }
 
 template<unsigned DIM>
-std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > EllipticGrowingDomainPdeModifier<DIM>::ConstructBoundaryConditionsContainer()
+std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > EllipticBoxDomainPdeModifier<DIM>::ConstructBoundaryConditionsContainer()
 {
     std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc(new BoundaryConditionsContainer<DIM,DIM,1>(false));
 
-    // To be well-defined, elliptic PDE problems on growing domains require Dirichlet boundary conditions
+    // To be well-defined, elliptic PDE problems on Box domains require at least some Dirichlet boundary conditions
     assert(!(mpPdeAndBcs->IsNeumannBoundaryCondition()));
 
     for (typename TetrahedralMesh<DIM,DIM>::BoundaryNodeIterator node_iter = this->mpFeMesh->GetBoundaryNodeIteratorBegin();
@@ -129,18 +138,18 @@ std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > EllipticGrowingDomainPdeM
 }
 
 template<unsigned DIM>
-void EllipticGrowingDomainPdeModifier<DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
+void EllipticBoxDomainPdeModifier<DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
 {
     // No parameters to output, so just call method on direct parent class
-    AbstractGrowingDomainPdeModifier<DIM>::OutputSimulationModifierParameters(rParamsFile);
+    AbstractBoxDomainPdeModifier<DIM>::OutputSimulationModifierParameters(rParamsFile);
 }
 
 // Explicit instantiation
-template class EllipticGrowingDomainPdeModifier<1>;
-template class EllipticGrowingDomainPdeModifier<2>;
-template class EllipticGrowingDomainPdeModifier<3>;
+template class EllipticBoxDomainPdeModifier<1>;
+template class EllipticBoxDomainPdeModifier<2>;
+template class EllipticBoxDomainPdeModifier<3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(EllipticGrowingDomainPdeModifier)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(EllipticBoxDomainPdeModifier)
 

@@ -45,6 +45,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SimpleLinearParabolicSolver.hpp"
 #include "AveragedSourcePde.hpp"
 
+
+template<unsigned DIM>
+ParabolicGrowingDomainPdeModifier<DIM>::ParabolicGrowingDomainPdeModifier()
+    : AbstractGrowingDomainPdeModifier<DIM>()
+{
+}
+
 template<unsigned DIM>
 ParabolicGrowingDomainPdeModifier<DIM>::ParabolicGrowingDomainPdeModifier(ParabolicPdeAndBoundaryConditions<DIM>* pPdeAndBcs)
     : AbstractGrowingDomainPdeModifier<DIM>(),

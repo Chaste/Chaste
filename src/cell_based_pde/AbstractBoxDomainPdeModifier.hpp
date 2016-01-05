@@ -33,24 +33,26 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef ELLIPTICGROWINGDOMAINPDEMODIFIER_HPP_
-#define ELLIPTICGROWINGDOMAINPDEMODIFIER_HPP_
+#ifndef ABSTRACTBOXDOMAINPDEMODIFIER_HPP_
+#define ABSTRACTBOXDOMAINPDEMODIFIER_HPP_
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
-#include "AbstractGrowingDomainPdeModifier.hpp"
+#include "AbstractPdeModifier.hpp"
 #include "TetrahedralMesh.hpp"
 #include "BoundaryConditionsContainer.hpp"
 #include "PdeAndBoundaryConditions.hpp"
 
 /**
- * A modifier class in which an elliptic PDE is solved on a growing domain and the results are stored in CellData.
+ * A modifier class in which has the common functionality of solving a PDE on a Mesh defined by a Box larger than the tissue.
+ * A growing spheroid or monolayer in a flow chamber for example.
+ * The results are stored in CellData.
  */
 template<unsigned DIM>
-class EllipticGrowingDomainPdeModifier : public AbstractGrowingDomainPdeModifier<DIM>
+class AbstractBoxDomainPdeModifier : public AbstractPdeModifier<DIM>
 {
-    friend class TestGrowingDomainPdeModifiers;
+    friend class TestBoxDomainPdeModifiers;
 
 private:
 
@@ -66,61 +68,72 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractGrowingDomainPdeModifier<DIM> >(*this);
-
-        archive & mpPdeAndBcs;
+        archive & boost::serialization::base_object<AbstractPdeModifier<DIM> >(*this);
     }
 
-    /** Pointer to a linear elliptic PDE object with associated boundary conditions. */
-    ///\todo #2687 Memory-management of mpPdeAndBcs is not enabled. Suggest using a shared-pointer.
-    PdeAndBoundaryConditions<DIM>* mpPdeAndBcs;
+protected:
+
+    /** Map between cells and the elements of the FE mesh containing them. */
+    std::map<CellPtr, unsigned> mCellPdeElementMap;
 
 public:
 
     /**
-     * Default Constructor.
-     *
-     * Only used in Archiving
-     */
-    EllipticGrowingDomainPdeModifier();
-
-    /**
      * Constructor.
-     *
-     * @param pPdeAndBcs an optional pointer to a linear elliptic PDE object with associated boundary conditions.
      */
-    EllipticGrowingDomainPdeModifier(PdeAndBoundaryConditions<DIM>* pPdeAndBcs);
+    AbstractBoxDomainPdeModifier();
 
     /**
      * Destructor.
      */
-    virtual ~EllipticGrowingDomainPdeModifier();
-
-    /**
-     * Overridden UpdateAtEndOfTimeStep() method.
-     *
-     * Specifies what to do in the simulation at the end of each time step.
-     *
-     * @param rCellPopulation reference to the cell population
-     */
-    virtual void UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
+    virtual ~AbstractBoxDomainPdeModifier();
 
     /**
      * Overridden SetupSolve() method.
      *
      * Specifies what to do in the simulation before the start of the time loop.
      *
+     * Here we just initialize the Cell PDE element map
+     *
      * @param rCellPopulation reference to the cell population
      * @param outputDirectory the output directory, relative to where Chaste output is stored
      */
     virtual void SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory);
 
+
     /**
-     * Helper method to construct the boundary conditions container for the PDE.
+     * Helper method to generate the mesh.
      *
-     * @return the full boundary conditions container
+     * @param meshCuboid the outer boundary for the FEM mesh.
+     * @param stepSize the step size to be used in the FEM mesh.
      */
-    virtual std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ConstructBoundaryConditionsContainer();
+    void GenerateFeMesh(ChasteCuboid<DIM> meshCuboid, double stepSize);
+
+    /**
+     * Helper method to copy the PDE solution to CellData
+     *
+     * Here we need to interpolate from the FE mesh onto the cells.
+     *
+     * @param rCellPopulation reference to the cell population
+     */
+    void UpdateCellData(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
+
+    /**
+     * Initialise mCellPdeElementMap.
+     *
+     * @param rCellPopulation reference to the cell population
+     */
+    void InitialiseCellPdeElementMap(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
+
+    /**
+     * Update the mCellPdeElementMap
+     *
+     * This method should be called before sending the element map to a PDE class
+     * to ensure map is up to date.
+     *
+     * @param rCellPopulation reference to the cell population
+     */
+    void UpdateCellPdeElementMap(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
 
     /**
      * Overridden OutputSimulationModifierParameters() method.
@@ -132,6 +145,6 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(EllipticGrowingDomainPdeModifier)
+TEMPLATED_CLASS_IS_ABSTRACT_1_UNSIGNED(AbstractBoxDomainPdeModifier)
 
-#endif /*ELLIPTICGROWINGDOMAINPDEMODIFIER_HPP_*/
+#endif /*ABSTRACTBOXDOMAINPDEMODIFIER_HPP_*/

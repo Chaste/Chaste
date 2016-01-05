@@ -33,24 +33,24 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef ELLIPTICGROWINGDOMAINPDEMODIFIER_HPP_
-#define ELLIPTICGROWINGDOMAINPDEMODIFIER_HPP_
+#ifndef ELLIPTICBOXDOMAINPDEMODIFIER_HPP_
+#define ELLIPTICBOXDOMAINPDEMODIFIER_HPP_
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
-#include "AbstractGrowingDomainPdeModifier.hpp"
+#include "AbstractBoxDomainPdeModifier.hpp"
 #include "TetrahedralMesh.hpp"
 #include "BoundaryConditionsContainer.hpp"
 #include "PdeAndBoundaryConditions.hpp"
 
 /**
- * A modifier class in which an elliptic PDE is solved on a growing domain and the results are stored in CellData.
+ * A modifier class in which an elliptic PDE is solved on a box domain and the results are stored in CellData.
  */
 template<unsigned DIM>
-class EllipticGrowingDomainPdeModifier : public AbstractGrowingDomainPdeModifier<DIM>
+class EllipticBoxDomainPdeModifier : public AbstractBoxDomainPdeModifier<DIM>
 {
-    friend class TestGrowingDomainPdeModifiers;
+    friend class TestBoxDomainPdeModifiers;
 
 private:
 
@@ -66,14 +66,21 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractGrowingDomainPdeModifier<DIM> >(*this);
-
+        archive & boost::serialization::base_object<AbstractBoxDomainPdeModifier<DIM> >(*this);
         archive & mpPdeAndBcs;
+        //archive & mpBcc;
     }
 
     /** Pointer to a linear elliptic PDE object with associated boundary conditions. */
     ///\todo #2687 Memory-management of mpPdeAndBcs is not enabled. Suggest using a shared-pointer.
     PdeAndBoundaryConditions<DIM>* mpPdeAndBcs;
+
+    /*
+     * Pointer to the boundary conditions container. Here this is defined in the constructor.
+     */
+    std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > mpBcc;
+
+
 
 public:
 
@@ -82,19 +89,21 @@ public:
      *
      * Only used in Archiving
      */
-    EllipticGrowingDomainPdeModifier();
+    EllipticBoxDomainPdeModifier();
 
     /**
      * Constructor.
      *
-     * @param pPdeAndBcs an optional pointer to a linear elliptic PDE object with associated boundary conditions.
+     * @param pPdeAndBcs an optional pointer to a linear elliptic PDE object with associated boundary conditions
+     * @param meshCuboid the outer boundary for the FEM mesh
+     * @param stepSize the step size to be used in the FEM mesh (defaults to 1, i.e. the default cell size)
      */
-    EllipticGrowingDomainPdeModifier(PdeAndBoundaryConditions<DIM>* pPdeAndBcs);
+    EllipticBoxDomainPdeModifier(PdeAndBoundaryConditions<DIM>* pPdeAndBcs, ChasteCuboid<DIM> meshCuboid, double stepSize = 1.0);
 
     /**
      * Destructor.
      */
-    virtual ~EllipticGrowingDomainPdeModifier();
+    virtual ~EllipticBoxDomainPdeModifier();
 
     /**
      * Overridden UpdateAtEndOfTimeStep() method.
@@ -132,6 +141,6 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(EllipticGrowingDomainPdeModifier)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(EllipticBoxDomainPdeModifier)
 
-#endif /*ELLIPTICGROWINGDOMAINPDEMODIFIER_HPP_*/
+#endif /*ELLIPTICBOXDOMAINPDEMODIFIER_HPP_*/

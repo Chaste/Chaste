@@ -78,13 +78,19 @@ private:
 public:
 
     /**
+     * Default Constructor.
+     *
+     * Only used in Archiving
+     */
+    ParabolicGrowingDomainPdeModifier();
+
+
+    /**
      * Constructor.
      *
-     * @param pPdeAndBcs an optional pointer to a linear elliptic PDE object with associated boundary conditions (defaults to NULL)
-     *
-     * \todo Why is this argument optional? (#2687)
+     * @param pPdeAndBcs an optional pointer to a linear elliptic PDE object with associated boundary conditions
      */
-    ParabolicGrowingDomainPdeModifier(ParabolicPdeAndBoundaryConditions<DIM>* pPdeAndBcs=NULL);
+    ParabolicGrowingDomainPdeModifier(ParabolicPdeAndBoundaryConditions<DIM>* pPdeAndBcs);
 
     /**
      * Destructor.

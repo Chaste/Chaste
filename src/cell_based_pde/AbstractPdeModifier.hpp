@@ -135,13 +135,6 @@ public:
     virtual void SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)=0;
 
     /**
-     * Helper method to copy the PDE solution to CellData
-     *
-     * @param rCellPopulation reference to the cell population
-     */
-    void UpdateCellData(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
-
-    /**
      * Overridden OutputSimulationModifierParameters() method.
      * Output any simulation modifier parameters to file.
      *
