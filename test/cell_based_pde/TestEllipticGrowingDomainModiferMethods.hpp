@@ -105,6 +105,9 @@ public:
 
         // Create a PDE Modifier object using this pde and bcs object
         MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc));
+        // For coverage output the Solution Gradient
+        p_pde_modifier->SetOutputGradient(true);
+
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseEllipticPdeWithMeshOnDisk");
 
         /*
@@ -119,6 +122,12 @@ public:
             double u_exact = boost::math::cyl_bessel_j(0,r) / boost::math::cyl_bessel_j(0,1);
 
             TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("variable"), u_exact, 1e-3);
+
+            double ux_exact = -cell_location(0) / r * boost::math::cyl_bessel_j(1,r) / boost::math::cyl_bessel_j(0,1);
+            double uy_exact = -cell_location(1) / r * boost::math::cyl_bessel_j(1,r) / boost::math::cyl_bessel_j(0,1);
+
+            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("variable_grad_x"), ux_exact, 1e-1);
+            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("variable_grad_y"), uy_exact, 1e-1);
         }
     }
 
