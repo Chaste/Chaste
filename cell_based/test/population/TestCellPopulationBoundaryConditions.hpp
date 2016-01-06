@@ -68,6 +68,42 @@ class TestCellPopulationBoundaryConditions : public AbstractCellBasedTestSuite
 {
 public:
 
+    void TestPlaneBoundaryConditionConstructor() throw(Exception)
+    {
+        // Note we dont pass a cell population in as we are just checking that the objects are created properly.
+        {
+            // Set up cell population boundary condition in 2D
+            c_vector<double,2> point = zero_vector<double>(2);
+            point(0) = 2.0;
+            c_vector<double,2> normal = zero_vector<double>(2);
+            normal(0) = -1.0;
+            PlaneBoundaryCondition<2> boundary_condition(NULL, point, normal);
+
+            TS_ASSERT_EQUALS(boundary_condition.GetIdentifier(), "PlaneBoundaryCondition-2-2");
+        }
+        {
+            // Set up cell population boundary condition in 3D
+            c_vector<double,3> point = zero_vector<double>(3);
+            point(0) = 2.0;
+            c_vector<double,3> normal = zero_vector<double>(3);
+            normal(0) = -1.0;
+            PlaneBoundaryCondition<3> boundary_condition(NULL, point, normal);
+
+            TS_ASSERT_EQUALS(boundary_condition.GetIdentifier(), "PlaneBoundaryCondition-3-3");
+        }
+        {
+            // Set up cell population boundary condition on a surface
+            c_vector<double,3> point = zero_vector<double>(3);
+            point(0) = 2.0;
+            c_vector<double,3> normal = zero_vector<double>(3);
+            normal(0) = -1.0;
+            PlaneBoundaryCondition<2,3> boundary_condition(NULL, point, normal);
+
+            TS_ASSERT_EQUALS(boundary_condition.GetIdentifier(), "PlaneBoundaryCondition-2-3");
+        }
+
+    }
+
     void TestPlaneBoundaryConditionWithNodeBasedCellPopulation() throw(Exception)
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
@@ -95,7 +131,7 @@ public:
         normal(0) = -1.0;
         PlaneBoundaryCondition<2> boundary_condition(&cell_population, point, normal);
 
-        TS_ASSERT_EQUALS(boundary_condition.GetIdentifier(), "PlaneBoundaryCondition-2");
+        TS_ASSERT_EQUALS(boundary_condition.GetIdentifier(), "PlaneBoundaryCondition-2-2");
 
         // Impose boundary condition
         std::map<Node<2>*, c_vector<double,2> > old_locations;
@@ -222,7 +258,7 @@ public:
         normal(0) = -1.0;
         PlaneBoundaryCondition<2> boundary_condition(&cell_population, point, normal);
 
-        TS_ASSERT_EQUALS(boundary_condition.GetIdentifier(), "PlaneBoundaryCondition-2");
+        TS_ASSERT_EQUALS(boundary_condition.GetIdentifier(), "PlaneBoundaryCondition-2-2");
 
         // Impose boundary condition
         std::map<Node<2>*, c_vector<double,2> > old_locations;
@@ -292,6 +328,7 @@ public:
         }
 
     }
+
 
     void TestPlaneBoundaryConditionExceptions() throw(Exception)
     {
@@ -454,7 +491,7 @@ public:
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
 
-            AbstractCellPopulationBoundaryCondition<2>* p_boundary_condition;
+            AbstractCellPopulationBoundaryCondition<2,2>* p_boundary_condition;
 
             // Restore from the archive
             input_arch >> p_boundary_condition;
@@ -539,7 +576,7 @@ public:
 
         // Test with PlaneBoundaryCondition
         PlaneBoundaryCondition<2> plane_boundary_condition(NULL, zero_vector<double>(2), unit_vector<double>(2,1));
-        TS_ASSERT_EQUALS(plane_boundary_condition.GetIdentifier(), "PlaneBoundaryCondition-2");
+        TS_ASSERT_EQUALS(plane_boundary_condition.GetIdentifier(), "PlaneBoundaryCondition-2-2");
 
         out_stream plane_boundary_condition_parameter_file = output_file_handler.OpenOutputFile("plane_results.parameters");
         plane_boundary_condition.OutputCellPopulationBoundaryConditionParameters(plane_boundary_condition_parameter_file);

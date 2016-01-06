@@ -38,11 +38,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexBasedCellPopulation.hpp"
 #include "RandomNumberGenerator.hpp"
 
-template<unsigned DIM>
-PlaneBoundaryCondition<DIM>::PlaneBoundaryCondition(AbstractCellPopulation<DIM>* pCellPopulation,
-                                                    c_vector<double, DIM> point,
-                                                    c_vector<double, DIM> normal)
-        : AbstractCellPopulationBoundaryCondition<DIM>(pCellPopulation),
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+PlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::PlaneBoundaryCondition(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>* pCellPopulation,
+                                                    c_vector<double, SPACE_DIM> point,
+                                                    c_vector<double, SPACE_DIM> normal)
+        : AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM>(pCellPopulation),
           mPointOnPlane(point),
           mUseJiggledNodesOnPlane(false)
 {
@@ -50,64 +50,64 @@ PlaneBoundaryCondition<DIM>::PlaneBoundaryCondition(AbstractCellPopulation<DIM>*
     mNormalToPlane = normal/norm_2(normal);
 }
 
-template<unsigned DIM>
-const c_vector<double, DIM>& PlaneBoundaryCondition<DIM>::rGetPointOnPlane() const
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+const c_vector<double, SPACE_DIM>& PlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::rGetPointOnPlane() const
 {
     return mPointOnPlane;
 }
 
-template<unsigned DIM>
-const c_vector<double, DIM>& PlaneBoundaryCondition<DIM>::rGetNormalToPlane() const
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+const c_vector<double, SPACE_DIM>& PlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::rGetNormalToPlane() const
 {
     return mNormalToPlane;
 }
 
 
-template<unsigned DIM>
-void PlaneBoundaryCondition<DIM>::SetUseJiggledNodesOnPlane(bool useJiggledNodesOnPlane)
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void PlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::SetUseJiggledNodesOnPlane(bool useJiggledNodesOnPlane)
 {
     mUseJiggledNodesOnPlane = useJiggledNodesOnPlane;
 }
 
-template<unsigned DIM>
-bool PlaneBoundaryCondition<DIM>::GetUseJiggledNodesOnPlane()
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool PlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::GetUseJiggledNodesOnPlane()
 {
     return mUseJiggledNodesOnPlane;
 }
 
-template<unsigned DIM>
-void PlaneBoundaryCondition<DIM>::ImposeBoundaryCondition(const std::map<Node<DIM>*, c_vector<double, DIM> >& rOldLocations)
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void PlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::ImposeBoundaryCondition(const std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> >& rOldLocations)
 {
     ///\todo Move this to constructor. If this is in the constructor then Exception always throws.
-    if (dynamic_cast<AbstractOffLatticeCellPopulation<DIM>*>(this->mpCellPopulation)==NULL)
+    if (dynamic_cast<AbstractOffLatticeCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(this->mpCellPopulation)==NULL)
     {
         EXCEPTION("PlaneBoundaryCondition requires a subclass of AbstractOffLatticeCellPopulation.");
     }
 
-    assert((dynamic_cast<AbstractCentreBasedCellPopulation<DIM>*>(this->mpCellPopulation))
-            || (dynamic_cast<VertexBasedCellPopulation<DIM>*>(this->mpCellPopulation)) );
+    assert((dynamic_cast<AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(this->mpCellPopulation))
+            || (SPACE_DIM==ELEMENT_DIM && (dynamic_cast<VertexBasedCellPopulation<SPACE_DIM>*>(this->mpCellPopulation))) );
 
     // THis is a magic number.
     double max_jiggle = 1e-4;
 
-    if (DIM != 1)
+    if (SPACE_DIM != 1)
     {
-        if (dynamic_cast<AbstractCentreBasedCellPopulation<DIM>*>(this->mpCellPopulation))
+        if (dynamic_cast<AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(this->mpCellPopulation))
         {
-            for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->mpCellPopulation->Begin();
+            for (typename AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>::Iterator cell_iter = this->mpCellPopulation->Begin();
                  cell_iter != this->mpCellPopulation->End();
                  ++cell_iter)
             {
                 unsigned node_index = this->mpCellPopulation->GetLocationIndexUsingCell(*cell_iter);
-                Node<DIM>* p_node = this->mpCellPopulation->GetNode(node_index);
+                Node<SPACE_DIM>* p_node = this->mpCellPopulation->GetNode(node_index);
 
-                c_vector<double, DIM> node_location = p_node->rGetLocation();
+                c_vector<double, SPACE_DIM> node_location = p_node->rGetLocation();
 
                 double signed_distance = inner_prod(node_location - mPointOnPlane, mNormalToPlane);
                 if (signed_distance > 0.0)
                 {
                     // For the closest point on the plane we travel from node_location the signed_distance in the direction of -mNormalToPlane
-                    c_vector<double, DIM> nearest_point;
+                    c_vector<double, SPACE_DIM> nearest_point;
                     if (mUseJiggledNodesOnPlane)
                     {
                         nearest_point = node_location - (signed_distance+max_jiggle*RandomNumberGenerator::Instance()->ranf())*mNormalToPlane;
@@ -122,22 +122,21 @@ void PlaneBoundaryCondition<DIM>::ImposeBoundaryCondition(const std::map<Node<DI
         }
         else
         {
-            assert(dynamic_cast<VertexBasedCellPopulation<DIM>*>(this->mpCellPopulation));
-
-            VertexBasedCellPopulation<DIM>* pStaticCastCellPopulation = static_cast<VertexBasedCellPopulation<DIM>*>(this->mpCellPopulation);
+            assert(SPACE_DIM==ELEMENT_DIM);
+            assert(dynamic_cast<VertexBasedCellPopulation<SPACE_DIM>*>(this->mpCellPopulation));
 
             // Iterate over all nodes and update their positions according to the boundary conditions
-            unsigned num_nodes = pStaticCastCellPopulation->GetNumNodes();
+            unsigned num_nodes = this->mpCellPopulation->GetNumNodes();
             for (unsigned node_index=0; node_index<num_nodes; node_index++)
             {
-                Node<DIM>* p_node = pStaticCastCellPopulation->GetNode(node_index);
-                c_vector<double, DIM> node_location = p_node->rGetLocation();
+                Node<SPACE_DIM>* p_node = this->mpCellPopulation->GetNode(node_index);
+                c_vector<double, SPACE_DIM> node_location = p_node->rGetLocation();
 
                 double signed_distance = inner_prod(node_location - mPointOnPlane, mNormalToPlane);
                 if (signed_distance > 0.0)
                 {
                     // For the closest point on the plane we travel from node_location the signed_distance in the direction of -mNormalToPlane
-                    c_vector<double, DIM> nearest_point;
+                    c_vector<double, SPACE_DIM> nearest_point;
                     if (mUseJiggledNodesOnPlane)
                     {
                         nearest_point = node_location - (signed_distance+max_jiggle*RandomNumberGenerator::Instance()->ranf())*mNormalToPlane;
@@ -159,22 +158,22 @@ void PlaneBoundaryCondition<DIM>::ImposeBoundaryCondition(const std::map<Node<DI
     }
 }
 
-template<unsigned DIM>
-bool PlaneBoundaryCondition<DIM>::VerifyBoundaryCondition()
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool PlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::VerifyBoundaryCondition()
 {
     bool condition_satisfied = true;
 
-    if (DIM == 1)
+    if (SPACE_DIM == 1)
     {
         EXCEPTION("PlaneBoundaryCondition is not implemented in 1D");
     }
     else
     {
-        for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->mpCellPopulation->Begin();
+        for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter = this->mpCellPopulation->Begin();
              cell_iter != this->mpCellPopulation->End();
              ++cell_iter)
         {
-            c_vector<double, DIM> cell_location = this->mpCellPopulation->GetLocationOfCellCentre(*cell_iter);
+            c_vector<double, SPACE_DIM> cell_location = this->mpCellPopulation->GetLocationOfCellCentre(*cell_iter);
 
             if (inner_prod(cell_location - mPointOnPlane, mNormalToPlane) > 0.0)
             {
@@ -187,33 +186,36 @@ bool PlaneBoundaryCondition<DIM>::VerifyBoundaryCondition()
     return condition_satisfied;
 }
 
-template<unsigned DIM>
-void PlaneBoundaryCondition<DIM>::OutputCellPopulationBoundaryConditionParameters(out_stream& rParamsFile)
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void PlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::OutputCellPopulationBoundaryConditionParameters(out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<PointOnPlane>";
-    for (unsigned index=0; index != DIM-1U; index++) // Note: inequality avoids testing index < 0U when DIM=1
+    for (unsigned index=0; index != SPACE_DIM-1U; index++) // Note: inequality avoids testing index < 0U when DIM=1
     {
         *rParamsFile << mPointOnPlane[index] << ",";
     }
-    *rParamsFile << mPointOnPlane[DIM-1] << "</PointOnPlane>\n";
+    *rParamsFile << mPointOnPlane[SPACE_DIM-1] << "</PointOnPlane>\n";
 
     *rParamsFile << "\t\t\t<NormalToPlane>";
-    for (unsigned index=0; index != DIM-1U; index++) // Note: inequality avoids testing index < 0U when DIM=1
+    for (unsigned index=0; index != SPACE_DIM-1U; index++) // Note: inequality avoids testing index < 0U when DIM=1
     {
         *rParamsFile << mNormalToPlane[index] << ",";
     }
-    *rParamsFile << mNormalToPlane[DIM-1] << "</NormalToPlane>\n";
+    *rParamsFile << mNormalToPlane[SPACE_DIM-1] << "</NormalToPlane>\n";
     *rParamsFile << "\t\t\t<UseJiggledNodesOnPlane>" << mUseJiggledNodesOnPlane << "</UseJiggledNodesOnPlane>\n";
 
     // Call method on direct parent class
-    AbstractCellPopulationBoundaryCondition<DIM>::OutputCellPopulationBoundaryConditionParameters(rParamsFile);
+    AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::OutputCellPopulationBoundaryConditionParameters(rParamsFile);
 }
 
 // Explicit instantiation
-template class PlaneBoundaryCondition<1>;
-template class PlaneBoundaryCondition<2>;
-template class PlaneBoundaryCondition<3>;
+template class PlaneBoundaryCondition<1,1>;
+template class PlaneBoundaryCondition<1,2>;
+template class PlaneBoundaryCondition<2,2>;
+template class PlaneBoundaryCondition<1,3>;
+template class PlaneBoundaryCondition<2,3>;
+template class PlaneBoundaryCondition<3,3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(PlaneBoundaryCondition)
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(PlaneBoundaryCondition)

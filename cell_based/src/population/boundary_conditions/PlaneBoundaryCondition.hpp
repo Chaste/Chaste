@@ -38,6 +38,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractCellPopulationBoundaryCondition.hpp"
 
+#include "Debug.hpp"
+
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/vector.hpp>
@@ -45,23 +47,23 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * A plane cell population boundary condition class, which stops nodes moving through
  * a specified plane in the domain. Although the name of this class suggests it is
- * specific to 3D, it is actually also implemented for 1D and 2D, for which it is
- * really a 'point' and 'line' boundary condition respectively.
+ * specific to 3D, it is actually also implemented in 2D, for which it is
+ * really a 'line' boundary condition. It's not currently implemented in 1D
  */
-template<unsigned DIM>
-class PlaneBoundaryCondition : public AbstractCellPopulationBoundaryCondition<DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
+class PlaneBoundaryCondition : public AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM>
 {
 private:
 
     /**
      * A point on the boundary plane.
      */
-    c_vector<double, DIM> mPointOnPlane;
+    c_vector<double, SPACE_DIM> mPointOnPlane;
 
     /**
      * The outward-facing unit normal vector to the boundary plane.
      */
-    c_vector<double, DIM> mNormalToPlane;
+    c_vector<double, SPACE_DIM> mNormalToPlane;
 
     /**
      * Whether to jiggle the cells on the bottom surface, initialised to false
@@ -80,8 +82,8 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractCellPopulationBoundaryCondition<DIM> >(*this);
-        archive & mUseJiggledNodesOnPlane;
+        archive & boost::serialization::base_object<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM, SPACE_DIM> >(*this);
+        //archive & mUseJiggledNodesOnPlane;
     }
 
 public:
@@ -93,19 +95,19 @@ public:
      * @param point a point on the boundary plane
      * @param normal the outward-facing unit normal vector to the boundary plane
      */
-    PlaneBoundaryCondition(AbstractCellPopulation<DIM>* pCellPopulation,
-                           c_vector<double, DIM> point,
-                           c_vector<double, DIM> normal);
+    PlaneBoundaryCondition(AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation,
+                           c_vector<double, SPACE_DIM> point,
+                           c_vector<double, SPACE_DIM> normal);
 
     /**
      * @return #mPointOnPlane.
      */
-    const c_vector<double, DIM>& rGetPointOnPlane() const;
+    const c_vector<double, SPACE_DIM>& rGetPointOnPlane() const;
 
     /**
      * @return #mNormalToPlane.
      */
-    const c_vector<double, DIM>& rGetNormalToPlane() const;
+    const c_vector<double, SPACE_DIM>& rGetNormalToPlane() const;
 
     /**
      * Set method for mUseJiggledNodesOnPlane
@@ -124,7 +126,7 @@ public:
      *
      * @param rOldLocations the node locations before any boundary conditions are applied
      */
-    void ImposeBoundaryCondition(const std::map<Node<DIM>*, c_vector<double, DIM> >& rOldLocations);
+    void ImposeBoundaryCondition(const std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> >& rOldLocations);
 
     /**
      * Overridden VerifyBoundaryCondition() method.
@@ -145,7 +147,7 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(PlaneBoundaryCondition)
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(PlaneBoundaryCondition)
 
 namespace boost
 {
@@ -154,22 +156,22 @@ namespace serialization
 /**
  * Serialize information required to construct a PlaneBoundaryCondition.
  */
-template<class Archive, unsigned DIM>
+template<class Archive, unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 inline void save_construct_data(
-    Archive & ar, const PlaneBoundaryCondition<DIM>* t, const unsigned int file_version)
+    Archive & ar, const PlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>* t, const unsigned int file_version)
 {
     // Save data required to construct instance
-    const AbstractCellPopulation<DIM>* const p_cell_population = t->GetCellPopulation();
+    const AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* const p_cell_population = t->GetCellPopulation();
     ar << p_cell_population;
 
     // Archive c_vectors one component at a time
-    c_vector<double, DIM> point = t->rGetPointOnPlane();
-    for (unsigned i=0; i<DIM; i++)
+    c_vector<double, SPACE_DIM> point = t->rGetPointOnPlane();
+    for (unsigned i=0; i<SPACE_DIM; i++)
     {
         ar << point[i];
     }
-    c_vector<double, DIM> normal = t->rGetNormalToPlane();
-    for (unsigned i=0; i<DIM; i++)
+    c_vector<double, SPACE_DIM> normal = t->rGetNormalToPlane();
+    for (unsigned i=0; i<SPACE_DIM; i++)
     {
         ar << normal[i];
     }
@@ -178,28 +180,28 @@ inline void save_construct_data(
 /**
  * De-serialize constructor parameters and initialize a PlaneBoundaryCondition.
  */
-template<class Archive, unsigned DIM>
+template<class Archive, unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 inline void load_construct_data(
-    Archive & ar, PlaneBoundaryCondition<DIM>* t, const unsigned int file_version)
+    Archive & ar, PlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>* t, const unsigned int file_version)
 {
     // Retrieve data from archive required to construct new instance
-    AbstractCellPopulation<DIM>* p_cell_population;
+    AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* p_cell_population;
     ar >> p_cell_population;
 
     // Archive c_vectors one component at a time
-    c_vector<double, DIM> point;
-    for (unsigned i=0; i<DIM; i++)
+    c_vector<double, SPACE_DIM> point;
+    for (unsigned i=0; i<SPACE_DIM; i++)
     {
         ar >> point[i];
     }
-    c_vector<double, DIM> normal;
-    for (unsigned i=0; i<DIM; i++)
+    c_vector<double, SPACE_DIM> normal;
+    for (unsigned i=0; i<SPACE_DIM; i++)
     {
         ar >> normal[i];
     }
 
     // Invoke inplace constructor to initialise instance
-    ::new(t)PlaneBoundaryCondition<DIM>(p_cell_population, point, normal);
+    ::new(t)PlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>(p_cell_population, point, normal);
 }
 }
 } // namespace ...

@@ -1,5 +1,5 @@
-		<PlaneBoundaryCondition-2>
+		<PlaneBoundaryCondition-2-2>
 			<PointOnPlane>0,0</PointOnPlane>
 			<NormalToPlane>0,1</NormalToPlane>
 			<UseJiggledNodesOnPlane>0</UseJiggledNodesOnPlane>
-		</PlaneBoundaryCondition-2>
+		</PlaneBoundaryCondition-2-2>
