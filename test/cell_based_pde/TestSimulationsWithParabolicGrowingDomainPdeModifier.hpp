@@ -432,7 +432,7 @@ public:
         simulator.Solve();
 
         // Test some simulation stats
-		TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumAllCells(), 9u); // No births yet
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumAllCells(), 9u); // No births yet
 
         // Test nothing's changed
         AbstractCellPopulation<2, 2>::Iterator cell_iter=simulator.rGetCellPopulation().Begin();
