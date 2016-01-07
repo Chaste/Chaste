@@ -76,7 +76,7 @@ void AbstractPdeModifier<DIM>::UpdateAtEndOfOutputTimeStep(AbstractCellPopulatio
     {
         std::ostringstream time_string;
         time_string << SimulationTime::Instance()->GetTimeStepsElapsed();
-        std::string results_file = "pde_results_"+time_string.str();
+        std::string results_file = "pde_results_" + mCachedDependentVariableName + "_" + time_string.str();
         VtkMeshWriter<DIM,DIM>* p_vtk_mesh_writer = new VtkMeshWriter<DIM,DIM>(mOutputDirectory, results_file, false);
 
         ReplicatableVector solution_repl(mSolution);
