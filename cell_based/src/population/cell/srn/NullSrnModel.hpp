@@ -45,8 +45,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class AbstractSrnModel;
 
 /**
- * This class contains a dummy/null SRN model that can be used for any cell-cycle models
- * that do not have an SRN, or where the SRN is combined with the main cell-cycle
+ * This class contains a dummy/null sub-cellular reaction network (SRN) model that can be used for
+ * any cell-cycle models that do not have an SRN, or where the SRN is combined with the main cell-cycle
  * model.
  */
 class NullSrnModel : public AbstractSrnModel

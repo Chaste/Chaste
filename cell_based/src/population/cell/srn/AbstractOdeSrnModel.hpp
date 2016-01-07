@@ -47,7 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //class AbstractSrnModel; ///\todo #2752 remove this commented code
 
 /**
- * This class contains the abstract code for an ODE SRN model
+ * This class contains the abstract code for an ODE sub-cellular reaction network (SRN) model
  *  - based on AbstractOdeBasedCellCycleModel
  *
  * \todo #2752 Thoroughly document this class
@@ -92,7 +92,7 @@ protected:
     unsigned mStateSize;
 
     using AbstractSrnModel::Initialise;
-    /*
+    /**
      * Overridden Initialise() method, which here sets up the ODE system.
      *
      * Note we bring virtual functions from AbstractSrnModel into derived namespace so overloading virtual works.
@@ -102,7 +102,7 @@ protected:
     void Initialise(AbstractOdeSystem* pOdeSystem);
 
     using AbstractSrnModel::CreateSrnModel;
-    /*
+    /**
      * Overridden CreateSrnModel() method.
      *
      * Builder method to create new instances of the SRN model.

@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * A subclass of StochasticDurationGenerationBasedCellCycleModel
- * that includes a Goldbeter1991 ODE system in the SRN.
+ * that includes a Goldbeter1991 ODE system in the sub-cellular reaction network.
  *
  * \todo #2752 give reference for this ODE system
  *

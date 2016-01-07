@@ -52,7 +52,7 @@ class Cell; // Circular definition (cells need to know about SRN models and vice
 typedef boost::shared_ptr<Cell> CellPtr;
 
 /**
- * The AbstractSrnModel contains basic information to all SRN models.
+ * The AbstractSrnModel contains basic information to all sub-cellular reaction network (SRN) models.
  * It handles assignment of a Cell.
  *
  * SRN models are noncopyable since cells are noncopyable.
