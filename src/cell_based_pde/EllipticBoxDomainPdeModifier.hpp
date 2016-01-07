@@ -75,8 +75,8 @@ private:
     ///\todo #2687 Memory-management of mpPdeAndBcs is not enabled. Suggest using a shared-pointer.
     PdeAndBoundaryConditions<DIM>* mpPdeAndBcs;
 
-    /*
-     * Pointer to the boundary conditions container. Here this is defined in the constructor.
+    /**
+     * Pointer to the boundary conditions container. This is set in the constructor.
      */
     std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > mpBcc;
 
@@ -94,7 +94,7 @@ public:
     /**
      * Constructor.
      *
-     * @param pPdeAndBcs an optional pointer to a linear elliptic PDE object with associated boundary conditions
+     * @param pPdeAndBcs a pointer to a linear elliptic PDE object with associated boundary conditions
      * @param meshCuboid the outer boundary for the FEM mesh
      * @param stepSize the step size to be used in the FEM mesh (defaults to 1, i.e. the default cell size)
      */
