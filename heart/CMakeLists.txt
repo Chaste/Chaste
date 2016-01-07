@@ -48,4 +48,8 @@ foreach(dyn_source ${dyn_sources})
         #target_link_libraries(${dyn_source_name} LINK_PRIVATE "-Wl,--undefined")
         set_target_properties(${dyn_source_name} PROPERTIES LINK_FLAGS "-Wl,--undefined")
     endif()
+
+    # add dynamic models to the heart_tests and Continuous targets
+    add_dependencies(heart_tests ${dyn_source_name})
+    add_dependencies(Continuous ${dyn_source_name})
 endforeach(dyn_source)
