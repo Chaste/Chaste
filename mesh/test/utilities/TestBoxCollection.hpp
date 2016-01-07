@@ -1153,6 +1153,10 @@ public:
                     box_collection.CalculateNodePairs(nodes, pairs_returned_vector, neighbours_returned);
 
                     TS_ASSERT(pairs_returned_vector.size() == 1);
+
+                    // clean up memory
+                    delete nodes[0];
+                    delete nodes[1];
                 }
             }
         }
@@ -1237,6 +1241,10 @@ public:
 //                        box_collection.CalculateNodePairs(nodes, pairs_returned_vector, neighbours_returned);
 
                         ///\todo Add a test here #2725
+
+                        // Free memory
+                        delete nodes[0];
+                        delete nodes[1];
                     }
                 }
             }
