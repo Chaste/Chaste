@@ -117,14 +117,20 @@ configure_file (
 ##################################
 
 set(additional "")
+if(MSVC)
+    set(additional
+    "
+    //This has been put here to satisfy an MSVC linker issue 
+    int __cdecl _purecall(void){return 0;}
+    ")
+endif()
 
 configure_file (
   "src/ChasteBuildInfo_cmake.cpp.in"
   ${generate_dir}/ChasteBuildInfo.cpp
   )
 
-if (Chaste_UPDATE_PROVENANCE)
-add_custom_target(generateTimestamp ALL
+add_custom_target(generateTimestamp 
     COMMAND "$<TARGET_FILE:timekeeper>"
     COMMAND ${CMAKE_COMMAND}
         "-P" "${Chaste_SOURCE_DIR}/cmake/Modules/ChasteUpdateBuildTime.cmake"
@@ -139,25 +145,29 @@ add_custom_target(generateTimestamp ALL
     DEPENDS timekeeper
     COMMENT "Generating Build Config and Updating Provenance"
     VERBATIM
-)
-else()
-add_custom_target(generateTimestamp ALL
-    COMMAND ${CMAKE_COMMAND} 
-        "-DChaste_SOURCE_DIR=${Chaste_SOURCE_DIR}"
-        "-DChaste_BINARY_DIR=${Chaste_BINARY_DIR}"
-        "-DChaste_BUILD_DIR_NAME=${CMAKE_CFG_INTDIR}"
-        "-DChaste_BUILD_TYPE=$<CONFIGURATION>"
-        "-DMSVC=${MSVC}"
-        "-P" "${Chaste_SOURCE_DIR}/cmake/Modules/ChasteGenerateChasteBuildInfo.cmake"
-    WORKING_DIRECTORY "${generate_dir}"
-    DEPENDS timekeeper
-    COMMENT "Generating Build Config"
-    VERBATIM
-)
-endif()
+    )
+#else()
+#    if (NOT old_configuration OR NOT (old_configuration STREQUAL $<CONFIGURATION>))
+#        add_custom_target(generateTimestamp ALL
+#            COMMAND ${CMAKE_COMMAND} 
+#                "-DChaste_SOURCE_DIR=${Chaste_SOURCE_DIR}"
+#                "-DChaste_BINARY_DIR=${Chaste_BINARY_DIR}"
+#                "-DChaste_BUILD_DIR_NAME=${CMAKE_CFG_INTDIR}"
+#                "-DChaste_BUILD_TYPE=$<CONFIGURATION>"
+#                "-DMSVC=${MSVC}"
+#                "-P" "${Chaste_SOURCE_DIR}/cmake/Modules/ChasteGenerateChasteBuildInfo.cmake"
+#            WORKING_DIRECTORY "${generate_dir}"
+#            DEPENDS timekeeper
+#            COMMENT "Generating Build Config"
+#            VERBATIM
+#        )
+#        set(old_configuration $<CONFIGURATION>)
+#    endif()
 
 
 # compile global component
 chaste_do_component(global ${generate_dir}/Version.cpp ${generate_dir}/ChasteBuildInfo.cpp)
 
-add_dependencies(global generateTimestamp)
+if (Chaste_UPDATE_PROVENANCE)
+    add_dependencies(global generateTimestamp)
+endif()
