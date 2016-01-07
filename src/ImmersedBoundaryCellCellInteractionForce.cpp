@@ -98,8 +98,6 @@ void ImmersedBoundaryCellCellInteractionForce<DIM>::AddForceContribution(std::ve
 {
     UpdateProteinLevels();
 
-    std::cout << "Timesteps elapsed: " << SimulationTime::Instance()->GetTimeStepsElapsed() << std::endl;
-
     // Helper variables for loop
     unsigned e_cad_idx = mProteinNodeAttributeLocations[0];
     unsigned p_cad_idx = mProteinNodeAttributeLocations[1];

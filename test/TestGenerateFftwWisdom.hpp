@@ -55,12 +55,11 @@ private:
     /** Name of wisdom file when using a single thread */
     std::string mWisdomFilename;
 
-    /** Name of wisdom file when using multiple threads */
-    std::string mWisdomThreadsFilename;
-
     /** The max array size N for N by N arrays. Must be a multiple of 2 */
     static const unsigned mMaxArraySize = 4096;
 
+    /** Flag to determine length of time to be taken testing potentially faster algorithms */
+    unsigned mFftwFlag;
 
 public:
 
@@ -75,12 +74,15 @@ public:
         // If it doesn't exists, create it with blank wisdom file
         if (!file_finder.IsFile())
         {
-            void fftw_forget_wisdom(void);
+            fftw_forget_wisdom(void);
             fftw_export_wisdom_to_filename(mWisdomFilename.c_str());
         }
 
         // The file should now definitely exist
         TS_ASSERT(file_finder.IsFile());
+
+        mFftwFlag = FFTW_PATIENT;    // Faster, slightly less thorough
+        //mFftwFlag = FFTW_EXHAUSTIVE; // Much slower, but guaranteed to produce fastest transforms
     }
 
     void TestGenerateManyR2CWisdomOneThread() throw(Exception)
@@ -114,13 +116,16 @@ public:
             fftw_complex* fftw_output = reinterpret_cast<fftw_complex*>(&output[0][0][0]);
             double* fftw_check = &check[0][0][0];
 
+            // Cast i as int (stop compiler warnings)
+            int j = int(i);
+
             // Plan variables
             int rank = 2;                   // Number of dimensions for each array
-            int real_dims[] = {i, i};       // Dimensions of each real array
-            int comp_dims[] = {i, 1 + i/2}; // Dimensions of each complex array
+            int real_dims[] = {j, j};       // Dimensions of each real array
+            int comp_dims[] = {j, 1 + j/2}; // Dimensions of each complex array
             int how_many = 2;               // Number of transforms
-            int real_sep = i * i;           // How many doubles between start of first array and start of second
-            int comp_sep = i * (1 + i/2);   // How many fftw_complex between start of first array and start of second
+            int real_sep = j * j;           // How many doubles between start of first array and start of second
+            int comp_sep = j * (1 + j/2);   // How many fftw_complex between start of first array and start of second
             int real_stride = 1;            // Each real array is contiguous in memory
             int comp_stride = 1;            // Each complex array is contiguous in memory
             int* real_nembed = real_dims;
@@ -130,13 +135,13 @@ public:
             plan_f = fftw_plan_many_dft_r2c(rank, real_dims, how_many,
                                             fftw_input,  real_nembed, real_stride, real_sep,
                                             fftw_output, comp_nembed, comp_stride, comp_sep,
-                                            FFTW_PATIENT);
+                                            mFftwFlag);
 
             fftw_plan plan_b;
             plan_b = fftw_plan_many_dft_c2r(rank, real_dims, how_many,
                                             fftw_output, comp_nembed, comp_stride, comp_sep,
                                             fftw_check,  real_nembed, real_stride, real_sep,
-                                            FFTW_PATIENT);
+                                            mFftwFlag);
 
             // We now verify that the forward followed by inverse transform produces the correct result
             for (unsigned dim = 0 ; dim < 2 ; dim++)
@@ -180,13 +185,16 @@ public:
             fftw_complex* fftw_output = reinterpret_cast<fftw_complex*>(&output[0][0][0]);
             double* fftw_check = &check[0][0][0];
 
+            // Cast i as int (stop compiler warnings)
+            int j = int(i);
+
             // Plan variables
             int rank = 2;                   // Number of dimensions for each array
-            int real_dims[] = {i, i};       // Dimensions of each real array
-            int comp_dims[] = {i, 1 + i/2}; // Dimensions of each complex array
+            int real_dims[] = {j, j};       // Dimensions of each real array
+            int comp_dims[] = {j, 1 + j/2}; // Dimensions of each complex array
             int how_many = 3;               // Number of transforms
-            int real_sep = i * i;           // How many doubles between start of first array and start of second
-            int comp_sep = i * (1 + i/2);   // How many fftw_complex between start of first array and start of second
+            int real_sep = j * j;           // How many doubles between start of first array and start of second
+            int comp_sep = j * (1 + j/2);   // How many fftw_complex between start of first array and start of second
             int real_stride = 1;            // Each real array is contiguous in memory
             int comp_stride = 1;            // Each complex array is contiguous in memory
             int* real_nembed = real_dims;
@@ -196,13 +204,13 @@ public:
             plan_f = fftw_plan_many_dft_r2c(rank, real_dims, how_many,
                                             fftw_input,  real_nembed, real_stride, real_sep,
                                             fftw_output, comp_nembed, comp_stride, comp_sep,
-                                            FFTW_PATIENT);
+                                            mFftwFlag);
 
             fftw_plan plan_b;
             plan_b = fftw_plan_many_dft_c2r(rank, real_dims, how_many,
                                             fftw_output, comp_nembed, comp_stride, comp_sep,
                                             fftw_check,  real_nembed, real_stride, real_sep,
-                                            FFTW_PATIENT);
+                                            mFftwFlag);
 
             // We now verify that the forward followed by inverse transform produces the correct result
             for (unsigned dim = 0 ; dim < 3 ; dim++)

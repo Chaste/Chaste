@@ -105,23 +105,11 @@ private:
     /** Normalising constant needed for FFT */
     double mFftNorm;
 
-    /** Vector of sin(pi x / Nx) needed for FFT, but constant after grid size is known */
-    std::vector<double> mSinX;
-
-    /** Vector of sin(2pi x / Nx) needed for FFT, but constant after grid size is known */
-    std::vector<double> mSin2X;
-
-    /** Vector of sin(pi y / Ny) needed for FFT, but constant after grid size is known */
-    std::vector<double> mSinY;
-
-    /** Vector of sin(2pi y / Ny) needed for FFT, but constant after grid size is known */
-    std::vector<double> mSin2Y;
+    /** A box collection to efficiently keep track of node neighbours */
+    BoxCollection<DIM>* mpBoxCollection;
 
     /** A vector of pairs of pointers to nodes, representing all possible node-node interactions */
     std::vector<std::pair<Node<DIM>*, Node<DIM>*> > mNodePairs;
-
-    /** A box collection to efficiently keep track of node neighbours */
-    BoxCollection<DIM>* mpBoxCollection;
 
     /** A map between node indices and a set of their possible neighbours, used calculating cell-cell interactions */
     std::map<unsigned, std::set<unsigned> > mNodeNeighbours;

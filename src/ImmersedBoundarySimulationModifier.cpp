@@ -147,22 +147,6 @@ void ImmersedBoundarySimulationModifier<DIM>::SetupConstantMemberVariables(Abstr
     mGridSpacingX = 1.0 / (double) mNumGridPtsX;
     mGridSpacingY = 1.0 / (double) mNumGridPtsY;
 
-    // Create sine variables
-    mSinX.resize(mNumGridPtsX);
-    mSin2X.resize(mNumGridPtsX);
-    mSinY.resize(mNumGridPtsY);
-    mSin2Y.resize(mNumGridPtsY);
-    for (unsigned x = 0; x < mNumGridPtsX; x++)
-    {
-        mSinX[x] = sin(M_PI * (double) x * mGridSpacingX);
-        mSin2X[x] = sin(2 * M_PI * (double) x * mGridSpacingX);
-    }
-    for (unsigned y = 0; y < mNumGridPtsY; y++)
-    {
-        mSinY[y] = sin(M_PI * (double) y * mGridSpacingY);
-        mSin2Y[y] = sin(2 * M_PI * (double) y * mGridSpacingY);
-    }
-
     // Set up the box collection
     c_vector<double, 2 * 2> domain_size;
     domain_size(0) = 0.0;
@@ -312,10 +296,9 @@ template<unsigned DIM>
 void ImmersedBoundarySimulationModifier<DIM>::PropagateFluidSourcesToGrid()
 {
     // Helper variables
-    double dl = mpMesh->GetCharacteristicNodeSpacing();
     double dist_x;
     double dist_y;
-    double source;
+    double weight;
     int first_idx_x;
     int first_idx_y;
 
@@ -375,10 +358,10 @@ void ImmersedBoundarySimulationModifier<DIM>::PropagateFluidSourcesToGrid()
                     first_idx_y += mNumGridPtsY;
                 }
 
-                // The source is weighted by the delta function
-                source = source_strength * Delta1D(dist_x, mGridSpacingX) * Delta1D(dist_y, mGridSpacingY);
+                // The applied force is weighted by the delta function
+                weight = Delta1D(dist_x, mGridSpacingX) * Delta1D(dist_y, mGridSpacingY) / (mGridSpacingX * mGridSpacingY);
 
-                rhs_grids[2][(first_idx_x + x_idx) % mNumGridPtsX][(first_idx_y + y_idx) % mNumGridPtsY] += source;
+                rhs_grids[2][(first_idx_x + x_idx) % mNumGridPtsX][(first_idx_y + y_idx) % mNumGridPtsY] += source_strength * weight;
             }
         }
     }
