@@ -77,7 +77,7 @@ double SimpleStimulus::GetStimulus(double time)
 
 void SimpleStimulus::SetStartTime(double startTime)
 {
-	mTimeOfStimulus = startTime;
+    mTimeOfStimulus = startTime;
 }
 
 // Serialization for Boost >= 1.36

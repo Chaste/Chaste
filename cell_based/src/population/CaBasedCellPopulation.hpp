@@ -441,16 +441,16 @@ public:
 
 
     /**
-	 * @return The Ca division rule that is currently being used.
-	 */
-	boost::shared_ptr<AbstractCaBasedDivisionRule<DIM> > GetCaBasedDivisionRule();
+     * @return The Ca division rule that is currently being used.
+     */
+    boost::shared_ptr<AbstractCaBasedDivisionRule<DIM> > GetCaBasedDivisionRule();
 
-	/**
-	 * Set the division rule for this population.
-	 *
-	 * @param pCaBasedDivisionRule  pointer to the new division rule
-	 */
-	void SetCaBasedDivisionRule(boost::shared_ptr<AbstractCaBasedDivisionRule<DIM> > pCaBasedDivisionRule);
+    /**
+     * Set the division rule for this population.
+     *
+     * @param pCaBasedDivisionRule  pointer to the new division rule
+     */
+    void SetCaBasedDivisionRule(boost::shared_ptr<AbstractCaBasedDivisionRule<DIM> > pCaBasedDivisionRule);
 
 
 };

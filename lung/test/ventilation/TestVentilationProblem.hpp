@@ -155,7 +155,7 @@ public:
         // Total flux
         // TS_ASSERT_DELTA(flux[0], -2.8143e-5, 1e-8); // Mesh in meters
         TS_ASSERT_DELTA(flux[0], -2.8143e-14, 1e-15); //Mesh in millimeters
-		TS_ASSERT_DELTA(problem.GetFluxAtOutflow(), -2.8143e-14, 1e-15);
+        TS_ASSERT_DELTA(problem.GetFluxAtOutflow(), -2.8143e-14, 1e-15);
     }
 
     void TestThreeBifurcationsWithRadiusOnNodeFile() throw (Exception)

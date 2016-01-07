@@ -66,7 +66,7 @@ Goldbeter1991OdeSystem::~Goldbeter1991OdeSystem()
 void Goldbeter1991OdeSystem::EvaluateYDerivatives(double time, const std::vector<double>& rY, std::vector<double>& rDY)
 {
     // state values
-	double C = rY[0]; // cyclin
+    double C = rY[0]; // cyclin
     double M = rY[1]; // kinase
     double X = rY[2]; // protease
 

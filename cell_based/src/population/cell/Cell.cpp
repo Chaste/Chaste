@@ -466,7 +466,7 @@ bool Cell::ReadyToDivide()
 
     // NOTE - we run the SRN model here first before the CCM
     mpSrnModel->SimulateToCurrentTime();
-	// This in turn runs any simulations within the CCM thru UpdateCellCyclePhases()
+    // This in turn runs any simulations within the CCM thru UpdateCellCyclePhases()
     mCanDivide = mpCellCycleModel->ReadyToDivide();
 
     return mCanDivide;

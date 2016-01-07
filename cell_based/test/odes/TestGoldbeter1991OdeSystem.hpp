@@ -75,7 +75,7 @@ public:
     {
         Goldbeter1991OdeSystem ode_system;
 
-    	double time = 0.0;
+        double time = 0.0;
         std::vector<double> initial_conditions;
         initial_conditions.push_back(0.01);
         initial_conditions.push_back(0.01);
@@ -91,42 +91,42 @@ public:
     }
 
 
-	void TestGoldbeter1991OSolver() throw(Exception)
-	{
-		Goldbeter1991OdeSystem ode_system;
+    void TestGoldbeter1991OSolver() throw(Exception)
+    {
+        Goldbeter1991OdeSystem ode_system;
 
         RungeKutta4IvpOdeSolver ode_solver;
 
-		OdeSolution solutions;
+        OdeSolution solutions;
 
-		std::vector<double> initial_conditions = ode_system.GetInitialConditions();
+        std::vector<double> initial_conditions = ode_system.GetInitialConditions();
         double start_time = 0.0;
         double end_time = 100.0;
         double h_value = 0.01; // 1.0 // maximum tolerance
 
         //Test the hard coded ics
-		TS_ASSERT_DELTA(initial_conditions[0], 0.01, 1e-6);
-		TS_ASSERT_DELTA(initial_conditions[1], 0.01, 1e-6);
-		TS_ASSERT_DELTA(initial_conditions[2], 0.01, 1e-6);
+        TS_ASSERT_DELTA(initial_conditions[0], 0.01, 1e-6);
+        TS_ASSERT_DELTA(initial_conditions[1], 0.01, 1e-6);
+        TS_ASSERT_DELTA(initial_conditions[2], 0.01, 1e-6);
 
-		double cpu_start_time = (double) std::clock();
-		solutions = ode_solver.Solve(&ode_system, initial_conditions, start_time, end_time, h_value, h_value);
-		double cpu_end_time = (double) std::clock();
-		double cpu_elapsed_time = (cpu_end_time - cpu_start_time)/(CLOCKS_PER_SEC);
-		std::cout <<  "1. Solver Elapsed time = " << cpu_elapsed_time << "\n";
+        double cpu_start_time = (double) std::clock();
+        solutions = ode_solver.Solve(&ode_system, initial_conditions, start_time, end_time, h_value, h_value);
+        double cpu_end_time = (double) std::clock();
+        double cpu_elapsed_time = (cpu_end_time - cpu_start_time)/(CLOCKS_PER_SEC);
+        std::cout <<  "1. Solver Elapsed time = " << cpu_elapsed_time << "\n";
 
-		// Test solutions are OK for a small time increase...
-		int end = solutions.rGetSolutions().size() - 1;
-		// Tests the simulation is ending at the right time...(going into S phase at 7.8 hours)
-		TS_ASSERT_DELTA(solutions.rGetTimes()[end], end_time, 1e-2);
-		//std::cout <<  "End time = " << solutions.rGetTimes()[end] << "\n";
-		// Decent results - checked with numpy # [ 0.54706214  0.29369527  0.00678837]
-		TS_ASSERT_DELTA(solutions.rGetSolutions()[end][0], 0.5470, 1e-4);
-		TS_ASSERT_DELTA(solutions.rGetSolutions()[end][1], 0.2936, 1e-4);
-		TS_ASSERT_DELTA(solutions.rGetSolutions()[end][2], 0.0067, 1e-4);
-	}
+        // Test solutions are OK for a small time increase...
+        int end = solutions.rGetSolutions().size() - 1;
+        // Tests the simulation is ending at the right time...(going into S phase at 7.8 hours)
+        TS_ASSERT_DELTA(solutions.rGetTimes()[end], end_time, 1e-2);
+        //std::cout <<  "End time = " << solutions.rGetTimes()[end] << "\n";
+        // Decent results - checked with numpy # [ 0.54706214  0.29369527  0.00678837]
+        TS_ASSERT_DELTA(solutions.rGetSolutions()[end][0], 0.5470, 1e-4);
+        TS_ASSERT_DELTA(solutions.rGetSolutions()[end][1], 0.2936, 1e-4);
+        TS_ASSERT_DELTA(solutions.rGetSolutions()[end][2], 0.0067, 1e-4);
+    }
 
-	void TestArchiving()
+    void TestArchiving()
     {
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "gb1991_ode.arch";
