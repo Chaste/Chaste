@@ -561,7 +561,9 @@ void BoxCollection<DIM>::SetupLocalBoxes(std::vector<c_vector<int, DIM> > neighb
                 {
                     // If we're penultimate in dimension dim, move to the final location and add each neighbour as before.
                     // The call to IsBoxInDomain() will handle periodicity.
-                    c_vector<int,DIM> ultimate_indices = grid_indices;
+                    // Note that we define this vector before setting it as otherwise the profiling build will break (see #2367)
+                    c_vector<int, DIM> ultimate_indices; // Initialisation on next line for profile compiler
+                    ultimate_indices = grid_indices;
                     ultimate_indices(dim) ++;
 
                     for (unsigned neighbour = 0 ; neighbour < neighbours.size() ; neighbour++)
