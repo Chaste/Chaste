@@ -74,7 +74,7 @@ public:
         // If it doesn't exists, create it with blank wisdom file
         if (!file_finder.IsFile())
         {
-            fftw_forget_wisdom(void);
+            void fftw_forget_wisdom(void);
             fftw_export_wisdom_to_filename(mWisdomFilename.c_str());
         }
 
