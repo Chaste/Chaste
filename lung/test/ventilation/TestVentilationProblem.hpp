@@ -375,7 +375,7 @@ public:
         problem.GetSolutionAsFluxesAndPressures(flux, pressure);
         double top_radius = r_mesh.GetNode(0)->rGetNodeAttributes()[0];
         TS_ASSERT_DELTA(top_radius, 8.0517, 1e-4); //mm
-        top_radius *= 1e-3;  
+        top_radius *= 1e-3;
         TS_ASSERT_DELTA(top_radius, 8.0517e-3, 1e-7); //m
 
         double top_reynolds_number = fabs( 2.0 * problem.GetDensity() * flux[0] / (problem.GetViscosity() * M_PI * top_radius) );

@@ -823,7 +823,7 @@ private:
         // (default is
         BoundaryConditionsContainer<2,2,1> bcc;
         ConstBoundaryCondition<2>* p_boundary_condition_1 = new ConstBoundaryCondition<2>(0.0);
-        
+
         for (TetrahedralMesh<2u,2u>::BoundaryNodeIterator node_iter = mesh.GetBoundaryNodeIteratorBegin();
              node_iter != mesh.GetBoundaryNodeIteratorEnd();
              ++node_iter)
@@ -833,14 +833,14 @@ private:
 
             if( fabs(r-R) < 1e-6)
             {
-                //std::cout << "Applying R=0 BC" << std::endl;                
+                //std::cout << "Applying R=0 BC" << std::endl;
                 bcc.AddDirichletBoundaryCondition(*node_iter, p_boundary_condition_1);
             }
 
             if( fabs(z) < 1e-6 )
             {
-                //std::cout << "Applying 1-r^2 BC" << std::endl;        
-                ConstBoundaryCondition<2>* p_boundary_condition_2 = new ConstBoundaryCondition<2>(1 - r*r);        
+                //std::cout << "Applying 1-r^2 BC" << std::endl;
+                ConstBoundaryCondition<2>* p_boundary_condition_2 = new ConstBoundaryCondition<2>(1 - r*r);
                 bcc.AddDirichletBoundaryCondition(*node_iter, p_boundary_condition_2);
             }
         }
