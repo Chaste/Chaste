@@ -47,8 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * \todo NOTE THAT THIS IS THE PARABOLIC EQUIVALENT OF CellBasedParabolicPdeSolver and they should be refactored (#2687)
  */
 template<unsigned DIM>
-class CellBasedParabolicPdeSolver
-    : public SimpleLinearParabolicSolver<DIM, DIM>
+class CellBasedParabolicPdeSolver : public SimpleLinearParabolicSolver<DIM, DIM>
 {
 private:
 
@@ -124,8 +123,8 @@ public:
      * @param pBoundaryConditions pointer to the boundary conditions
      */
     CellBasedParabolicPdeSolver(TetrahedralMesh<DIM,DIM>* pMesh,
-                                       AbstractLinearParabolicPde<DIM,DIM>* pPde,
-                                       BoundaryConditionsContainer<DIM,DIM,1>* pBoundaryConditions);
+                                AbstractLinearParabolicPde<DIM,DIM>* pPde,
+                                BoundaryConditionsContainer<DIM,DIM,1>* pBoundaryConditions);
 
     /**
      * Destructor.

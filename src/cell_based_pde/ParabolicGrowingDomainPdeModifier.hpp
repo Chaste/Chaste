@@ -43,10 +43,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ParabolicPdeAndBoundaryConditions.hpp"
 #include "TetrahedralMesh.hpp"
 #include "BoundaryConditionsContainer.hpp"
-#include "ConstBoundaryCondition.hpp"
 
 /**
  * A modifier class in which a parabolic PDE is solved on a growing domain and the results are stored in CellData.
+ *
+ * \todo #2766 How is the domain growing? More detail needed in this documentation.
  */
 template<unsigned DIM>
 class ParabolicGrowingDomainPdeModifier : public AbstractGrowingDomainPdeModifier<DIM>
@@ -78,12 +79,11 @@ private:
 public:
 
     /**
-     * Default Constructor.
+     * Default constructor.
      *
-     * Only used in Archiving
+     * Only used in archiving.
      */
     ParabolicGrowingDomainPdeModifier();
-
 
     /**
      * Constructor.

@@ -39,8 +39,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteSerialization.hpp"
 #include "AbstractBoundaryCondition.hpp"
 #include "ArchiveLocationInfo.hpp"
+#include "TetrahedralMesh.hpp"
+#include "Cell.hpp"
 #include "AbstractLinearParabolicPde.hpp"
-#include "AveragedSourcePde.hpp"
 #include "PetscTools.hpp"
 #include "FileFinder.hpp"
 
@@ -171,10 +172,9 @@ public:
      * using the information in the given mesh.
      *
      * @param pMesh Pointer to a tetrahedral mesh
-     * @param pCellPdeElementMap map between cells and elements, from Parabolic PDE Modifiers
+     * @param pCellPdeElementMap map between cells and elements, from parabolic PDE modifiers
      */
-    void SetUpSourceTermsForAveragedSourcePde(TetrahedralMesh<DIM,DIM>* pMesh, std::map< CellPtr, unsigned >* pCellPdeElementMap=NULL);
-
+    void SetUpSourceTermsForAveragedSourcePde(TetrahedralMesh<DIM,DIM>* pMesh, std::map<CellPtr, unsigned>* pCellPdeElementMap=NULL);
 
     /**
      * Set the name of the dependent variable.

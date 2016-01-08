@@ -34,17 +34,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "ParabolicGrowingDomainPdeModifier.hpp"
-#include "NodeBasedCellPopulation.hpp"
+#include "AbstractCentreBasedCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
-#include "MeshBasedCellPopulation.hpp"
 #include "PottsBasedCellPopulation.hpp"
 #include "CaBasedCellPopulation.hpp"
 #include "TetrahedralMesh.hpp"
-#include "VtkMeshWriter.hpp"
 #include "CellBasedParabolicPdeSolver.hpp"
-#include "SimpleLinearParabolicSolver.hpp"
-#include "AveragedSourcePde.hpp"
-
 
 template<unsigned DIM>
 ParabolicGrowingDomainPdeModifier<DIM>::ParabolicGrowingDomainPdeModifier()
@@ -96,7 +91,7 @@ void ParabolicGrowingDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellP
     solver.SetInitialCondition(previous_solution);
 
     // Note that the linear solver creates a vector, so we have to keep a handle on the old one
-    // in order to destroy it.
+    // in order to destroy it
     this->mSolution = solver.Solve();
     PetscTools::Destroy(previous_solution);
     this->UpdateCellData(rCellPopulation);
@@ -141,8 +136,8 @@ std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ParabolicGrowingDomainPde
     {
         // Impose any Dirichlet boundary conditions
         for (typename TetrahedralMesh<DIM,DIM>::BoundaryNodeIterator node_iter = this->mpFeMesh->GetBoundaryNodeIteratorBegin();
-                         node_iter != this->mpFeMesh->GetBoundaryNodeIteratorEnd();
-                         ++node_iter)
+             node_iter != this->mpFeMesh->GetBoundaryNodeIteratorEnd();
+             ++node_iter)
         {
             p_bcc->AddDirichletBoundaryCondition(*node_iter, mpPdeAndBcs->GetBoundaryCondition());
         }
@@ -165,17 +160,16 @@ void ParabolicGrowingDomainPdeModifier<DIM>::UpdateSolutionVector(AbstractCellPo
     {
         // Loop over nodes and get appropriate solution value from CellData
         for (typename TetrahedralMesh<DIM,DIM>::NodeIterator node_iter = this->mpFeMesh->GetNodeIteratorBegin();
-        node_iter != this->mpFeMesh->GetNodeIteratorEnd();
-        ++node_iter)
+             node_iter != this->mpFeMesh->GetNodeIteratorEnd();
+             ++node_iter)
         {
             unsigned node_index = node_iter->GetIndex();
             double solution_at_node;
 
             if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL)
             {
-                // Cells correspond to nodes in the Center of the vertex element
+                // Cells correspond to nodes in the centre of the vertex element
                 // nodes on vertices have averaged values from containing cells
-
                 unsigned num_vertex_nodes = rCellPopulation.GetNumNodes();
                 if (node_index >= num_vertex_nodes)
                 {
@@ -216,7 +210,7 @@ void ParabolicGrowingDomainPdeModifier<DIM>::UpdateSolutionVector(AbstractCellPo
                 }
             }
             else if (dynamic_cast<AbstractCentreBasedCellPopulation<DIM>*>(&rCellPopulation)||
-            dynamic_cast<PottsBasedCellPopulation<DIM>*>(&rCellPopulation))
+                     dynamic_cast<PottsBasedCellPopulation<DIM>*>(&rCellPopulation))
             {
                 // Simple 1-1 correspondence between cells and nodes in the finite element mesh
                 CellPtr p_cell = rCellPopulation.GetCellUsingLocationIndex(node_index);

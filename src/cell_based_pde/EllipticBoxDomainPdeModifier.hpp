@@ -40,7 +40,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 
 #include "AbstractBoxDomainPdeModifier.hpp"
-#include "TetrahedralMesh.hpp"
 #include "BoundaryConditionsContainer.hpp"
 #include "PdeAndBoundaryConditions.hpp"
 
@@ -77,9 +76,9 @@ private:
 public:
 
     /**
-     * Default Constructor.
+     * Default constructor.
      *
-     * Only used in Archiving
+     * Only used in archiving.
      */
     EllipticBoxDomainPdeModifier();
 

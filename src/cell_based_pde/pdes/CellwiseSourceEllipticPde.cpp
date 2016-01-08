@@ -34,13 +34,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "CellwiseSourceEllipticPde.hpp"
-
 #include "AbstractCentreBasedCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
 #include "PottsBasedCellPopulation.hpp"
 #include "CaBasedCellPopulation.hpp"
 #include "ApoptoticCellProperty.hpp"
-
 #include "Exception.hpp"
 
 template<unsigned DIM>
@@ -79,9 +77,7 @@ template<unsigned DIM>
 double CellwiseSourceEllipticPde<DIM>::ComputeLinearInUCoeffInSourceTermAtNode(const Node<DIM>& rNode)
 {
     double coefficient = 0.0;
-
     unsigned tet_node_index = rNode.GetIndex();
-
     bool is_cell_apoptotic = false;
 
     if (dynamic_cast<AbstractCentreBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)) != NULL ||
@@ -89,13 +85,17 @@ double CellwiseSourceEllipticPde<DIM>::ComputeLinearInUCoeffInSourceTermAtNode(c
     {
         if (this->mrCellPopulation.IsCellAttachedToLocationIndex(tet_node_index))
         {
-            // For centre based this tet node is the same as the node in the population and attached to the cell
-            // For Potts this tet node corresponds to the element attached to the cell
+            /*
+             * For a centre-based cell population, this node of the tetrahedral finite element mesh
+             * is the same as the node in the population and associated with a cell; for a cellular
+             * Potts cell population, this node corresponds to the Potts element associated with
+             * a cell.
+             */
             is_cell_apoptotic = this->mrCellPopulation.GetCellUsingLocationIndex(tet_node_index)->template HasCellProperty<ApoptoticCellProperty>();
         }
         else
         {
-            // no cell at node
+            // There is no cell associated with this node
             return 0.0;
         }
     }
@@ -108,8 +108,8 @@ double CellwiseSourceEllipticPde<DIM>::ComputeLinearInUCoeffInSourceTermAtNode(c
             std::set<unsigned> containing_element_indices = static_cast_cell_population->GetNode(tet_node_index)->rGetContainingElementIndices();
 
             for (std::set<unsigned>::iterator iter = containing_element_indices.begin();
-                     iter != containing_element_indices.end();
-                     iter++)
+                 iter != containing_element_indices.end();
+                 iter++)
             {
                 if (static_cast_cell_population->GetCellUsingLocationIndex(*iter)->template HasCellProperty<ApoptoticCellProperty>() )
                 {
@@ -120,13 +120,19 @@ double CellwiseSourceEllipticPde<DIM>::ComputeLinearInUCoeffInSourceTermAtNode(c
         }
         else
         {
-            // tet node is in the centre of element so can use offset to calculate the cell
+            /*
+             * This node of the tetrahedral finite element mesh is in the centre of the element of the
+             * vertex based cell population, so we can use an offset to compute which cell to interrogate.
+             */
             is_cell_apoptotic = this->mrCellPopulation.GetCellUsingLocationIndex(rNode.GetIndex()-static_cast_cell_population->GetNumNodes())->template HasCellProperty<ApoptoticCellProperty>();
         }
     }
     else if (dynamic_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)) != NULL)  // Intel compiler wants the "!= NULL"
     {
-        // Here tet_node_index corresponds to position of the cell in the vector of cells
+        /*
+         * For a CA-based cell population, the index of this node in the tetrahedral finite element mesh
+         * corresponds to the 'position' of the cell to interrogate in the vector of cells.
+         */
         typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->mrCellPopulation.Begin();
 
         assert(tet_node_index < this->mrCellPopulation.GetNumRealCells());
@@ -155,10 +161,7 @@ c_matrix<double,DIM,DIM> CellwiseSourceEllipticPde<DIM>::ComputeDiffusionTerm(co
     return identity_matrix<double>(DIM);
 }
 
-/////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
 template class CellwiseSourceEllipticPde<1>;
 template class CellwiseSourceEllipticPde<2>;
 template class CellwiseSourceEllipticPde<3>;

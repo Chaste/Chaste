@@ -40,12 +40,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 
 #include "AbstractGrowingDomainPdeModifier.hpp"
-#include "TetrahedralMesh.hpp"
 #include "BoundaryConditionsContainer.hpp"
 #include "PdeAndBoundaryConditions.hpp"
 
 /**
  * A modifier class in which an elliptic PDE is solved on a growing domain and the results are stored in CellData.
+ *
+ * \todo #2760 How is the domain growing? More detail needed in this documentation.
  */
 template<unsigned DIM>
 class EllipticGrowingDomainPdeModifier : public AbstractGrowingDomainPdeModifier<DIM>
@@ -78,9 +79,9 @@ private:
 public:
 
     /**
-     * Default Constructor.
+     * Default constructor.
      *
-     * Only used in Archiving
+     * Only used in archiving.
      */
     EllipticGrowingDomainPdeModifier();
 

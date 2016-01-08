@@ -43,7 +43,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ArchiveOpener.hpp"
 #include "ArchiveLocationInfo.hpp"
-#include "OutputFileHandler.hpp"
 #include "UniformSourceParabolicPde.hpp"
 #include "CellwiseSourceParabolicPde.hpp"
 #include "AveragedSourceParabolicPde.hpp"
@@ -51,8 +50,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellsGenerator.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "MeshBasedCellPopulation.hpp"
-#include "NodeBasedCellPopulation.hpp"
-#include "OutputFileHandler.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 
 // This test is always run sequentially (never in parallel)
@@ -164,14 +161,11 @@ public:
                 }
             }
 
-
-
             // Avoid memory leaks
             delete &(p_static_cast_pde->mrCellPopulation);
             delete p_pde;
         }
     }
-
 
     void TestUniformSourceParabolicPdeMethods() throw(Exception)
     {
@@ -373,8 +367,6 @@ public:
                     TS_ASSERT_DELTA(diffusion_matrix(i,j), value, 1e-6);
                 }
             }
-
-
 
             // Avoid memory leaks
             delete &(p_static_cast_pde->mrCellPopulation);

@@ -34,13 +34,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "CellwiseSourceParabolicPde.hpp"
-
 #include "AbstractCentreBasedCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
 #include "PottsBasedCellPopulation.hpp"
 #include "CaBasedCellPopulation.hpp"
 #include "ApoptoticCellProperty.hpp"
-
 #include "Exception.hpp"
 
 template<unsigned DIM>
@@ -90,13 +88,17 @@ double CellwiseSourceParabolicPde<DIM>::ComputeSourceTermAtNode(const Node<DIM>&
     {
         if (this->mrCellPopulation.IsCellAttachedToLocationIndex(tet_node_index))
         {
-            // For centre based this tet node is the same as the node in the population and attached to the cell
-            // For Potts this tet node corresponds to the element attached to the cell
+            /*
+             * For a centre-based cell population, this node of the tetrahedral finite element mesh
+             * is the same as the node in the population and associated with a cell; for a cellular
+             * Potts cell population, this node corresponds to the Potts element associated with
+             * a cell.
+             */
             is_cell_apoptotic = this->mrCellPopulation.GetCellUsingLocationIndex(tet_node_index)->template HasCellProperty<ApoptoticCellProperty>();
         }
         else
         {
-            // No cell at node
+            // There is no cell associated with this node
             return 0.0;
         }
     }
@@ -121,13 +123,19 @@ double CellwiseSourceParabolicPde<DIM>::ComputeSourceTermAtNode(const Node<DIM>&
         }
         else
         {
-            // tet node is in the centre of element so can use offset to calculate the cell
+            /*
+             * This node of the tetrahedral finite element mesh is in the centre of the element of the
+             * vertex based cell population, so we can use an offset to compute which cell to interrogate.
+             */
             is_cell_apoptotic = this->mrCellPopulation.GetCellUsingLocationIndex(rNode.GetIndex()-static_cast_cell_population->GetNumNodes())->template HasCellProperty<ApoptoticCellProperty>();
         }
     }
     else if (dynamic_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)) != NULL)
     {
-        // Here tet_node_index corresponds to position of the cell in the vector of cells
+        /*
+         * For a CA-based cell population, the index of this node in the tetrahedral finite element mesh
+         * corresponds to the 'position' of the cell to interrogate in the vector of cells.
+         */
         typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->mrCellPopulation.Begin();
 
         assert(tet_node_index < this->mrCellPopulation.GetNumRealCells());
@@ -157,10 +165,7 @@ c_matrix<double,DIM,DIM> CellwiseSourceParabolicPde<DIM>::ComputeDiffusionTerm(c
     return mDiffusionCoefficient*identity_matrix<double>(DIM);
 }
 
-/////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
 template class CellwiseSourceParabolicPde<1>;
 template class CellwiseSourceParabolicPde<2>;
 template class CellwiseSourceParabolicPde<3>;

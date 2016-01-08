@@ -37,21 +37,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTELLIPTICGROWINGDOMAINMODIFIERMETHODS_HPP_
 
 #include <cxxtest/TestSuite.h>
-
 #include <boost/math/special_functions/bessel.hpp>
 
 #include "SmartPointers.hpp"
 #include "AbstractCellBasedWithTimingsTestSuite.hpp"
-
 #include "EllipticGrowingDomainPdeModifier.hpp"
 #include "CellwiseSourceEllipticPde.hpp"
-
 #include "StochasticDurationCellCycleModel.hpp"
 #include "ApoptoticCellProperty.hpp"
 #include "CellsGenerator.hpp"
-
-#include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "HoneycombMeshGenerator.hpp"
+#include "MeshBasedCellPopulation.hpp"
 #include "NodeBasedCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
@@ -62,13 +58,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
-
 /*
- * In this test suite we check the solution of the CellwisePdes
- * against exact solutions.
- *
- * In each case we are solving Laplacian U = f where f is constant in different regions
- *
+ * In this test suite we check the solution of the CellwisePdes against exact solutions.
+ * In each case we are solving Laplacian U = f where f is constant in different regions.
  * We solve unit disc where the solutions are Bessels functions and logs.
  */
 class TestEllipticGrowingDomainModiferMethods : public AbstractCellBasedWithTimingsTestSuite
@@ -103,9 +95,10 @@ public:
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("variable");
 
-        // Create a PDE Modifier object using this pde and bcs object
+        // Create a PDE modifier object using this PDE and BCs object
         MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc));
-        // For coverage output the Solution Gradient
+
+        // For coverage output the solution gradient
         p_pde_modifier->SetOutputGradient(true);
 
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseEllipticPdeWithMeshOnDisk");
@@ -206,7 +199,7 @@ public:
         }
     }
 
-    // Now test on a square with half appoptotic cells to compare all the population types
+    // Now test on a square with half apoptotic cells to compare all the population types
     void TestMeshBasedSquareMonolayer() throw (Exception)
     {
         HoneycombMeshGenerator generator(20,20,0);
@@ -241,10 +234,9 @@ public:
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("variable");
 
-        // Create a PDE Modifier object using this pde and bcs object
+        // Create a PDE modifier object using this PDE and BCs object
         MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc));
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseEllipticPdeWithMeshOnSquare");
-
 
         // Test the solution at some fixed points to compare with other cell populations
         CellPtr p_cell_210 = cell_population.GetCellUsingLocationIndex(210);
@@ -289,7 +281,7 @@ public:
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("variable");
 
-        // Create a PDE Modifier object using this pde and bcs object
+        // Create a PDE modifier object using this PDE and BCs object
         MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc));
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseEllipticPdeWithNodeOnSquare");
 
@@ -298,10 +290,11 @@ public:
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[0], 10, 1e-4);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[1], 5.0*sqrt(3.0), 1e-4);
         TS_ASSERT_DELTA( p_cell_210->GetCellData()->GetItem("variable"), 0.4542, 1e-2);// Lower tolerance as slightly different meshes
-        //Checking it doesn't change for this cell population
+
+        // Checking it doesn't change for this cell population
         TS_ASSERT_DELTA(p_cell_210->GetCellData()->GetItem("variable"), 0.4476, 1e-4);
 
-        // Clear Memory
+        // Clear memory
         delete p_mesh;
     }
 
@@ -368,7 +361,7 @@ public:
         CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_differentiated_type);
 
-        // Make cells with x<10.0 appoptotic (so no source term)
+        // Make cells with x<10.0 apoptotic (so no source term)
         boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
                 cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
         for (unsigned i =0; i<cells.size(); i++)
@@ -401,7 +394,8 @@ public:
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[0], 10, 1e-4);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[1], 5.0*sqrt(3.0), 1e-4);
         TS_ASSERT_DELTA( p_cell_210->GetCellData()->GetItem("variable"), 0.4542, 2e-1);//low error as mesh is slightly larger than for centre based models.
-        //Checking it doesn't change for this cell population
+
+        // Check it doesn't change for this cell population
         TS_ASSERT_DELTA(p_cell_210->GetCellData()->GetItem("variable"), 0.4338, 1e-4);
     }
 
@@ -449,7 +443,7 @@ public:
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("variable");
 
-        // Create a PDE Modifier object using this pde and bcs object
+        // Create a PDE Modifier object using this PDE and BCs object
         MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc));
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseEllipticPdeWithCaOnSquare");
 
@@ -458,7 +452,8 @@ public:
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[0], 10, 1e-4);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[1], 5.0*sqrt(3.0), 1e-4);
         TS_ASSERT_DELTA( p_cell_210->GetCellData()->GetItem("variable"), 0.4542, 2e-1);//low error as mesh is slightlty larger than for centre based models.
-        //Checking it doesn't change for this cell population
+
+        // Check it doesn't change for this cell population
         TS_ASSERT_DELTA(p_cell_210->GetCellData()->GetItem("variable"), 0.4338, 1e-3); // Not lower as slightly different answer with intel compiler.
     }
 };

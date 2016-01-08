@@ -34,17 +34,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "AbstractBoxDomainPdeModifier.hpp"
-#include "NodeBasedCellPopulation.hpp"
-#include "VertexBasedCellPopulation.hpp"
-#include "MeshBasedCellPopulation.hpp"
-#include "MeshBasedCellPopulationWithGhostNodes.hpp"
-#include "PottsBasedCellPopulation.hpp"
-#include "CaBasedCellPopulation.hpp"
+#include "AbstractCellPopulation.hpp"
 #include "TetrahedralMesh.hpp"
-#include "VtkMeshWriter.hpp"
-#include "CellBasedPdeSolver.hpp"
-#include "SimpleLinearEllipticSolver.hpp"
-#include "AveragedSourcePde.hpp"
+#include "ReplicatableVector.hpp"
+#include "LinearBasisFunction.hpp"
 
 template<unsigned DIM>
 AbstractBoxDomainPdeModifier<DIM>::AbstractBoxDomainPdeModifier()
@@ -67,7 +60,6 @@ void AbstractBoxDomainPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DI
 {
     InitialiseCellPdeElementMap(rCellPopulation);
 }
-
 
 template<unsigned DIM>
 void AbstractBoxDomainPdeModifier<DIM>::GenerateFeMesh(ChasteCuboid<DIM> meshCuboid, double stepSize)
@@ -113,8 +105,8 @@ void AbstractBoxDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulation<DI
     ReplicatableVector solution_repl(this->mSolution);
 
     for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
-                     cell_iter != rCellPopulation.End();
-                     ++cell_iter)
+         cell_iter != rCellPopulation.End();
+         ++cell_iter)
     {
         // The cells are not nodes of the mesh, so we must interpolate
         double solution_at_cell = 0.0;
@@ -139,6 +131,7 @@ void AbstractBoxDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulation<DI
         {
             // Now calculate the gradient of the solution and store this in CellVecData
             c_vector<double, DIM> solution_gradient = zero_vector<double>(DIM);
+
             // Calculate the basis functions at any point (eg zero) in the element
             c_matrix<double, DIM, DIM> jacobian, inverse_jacobian;
             double jacobian_det;
@@ -149,7 +142,6 @@ void AbstractBoxDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulation<DI
 
             for (unsigned node_index=0; node_index<DIM+1; node_index++)
             {
-
                 double nodal_value = solution_repl[p_element->GetNodeGlobalIndex(node_index)];
 
                 for (unsigned j=0; j<DIM; j++)
@@ -176,11 +168,8 @@ void AbstractBoxDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulation<DI
                     NEVER_REACHED;
             }
         }
-
-
     }
 }
-
 
 template<unsigned DIM>
 void AbstractBoxDomainPdeModifier<DIM>::InitialiseCellPdeElementMap(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
@@ -212,7 +201,6 @@ void AbstractBoxDomainPdeModifier<DIM>::UpdateCellPdeElementMap(AbstractCellPopu
     }
 }
 
-
 template<unsigned DIM>
 void AbstractBoxDomainPdeModifier<DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
 {
@@ -220,10 +208,7 @@ void AbstractBoxDomainPdeModifier<DIM>::OutputSimulationModifierParameters(out_s
     AbstractPdeModifier<DIM>::OutputSimulationModifierParameters(rParamsFile);
 }
 
-/////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
 template class AbstractBoxDomainPdeModifier<1>;
 template class AbstractBoxDomainPdeModifier<2>;
 template class AbstractBoxDomainPdeModifier<3>;

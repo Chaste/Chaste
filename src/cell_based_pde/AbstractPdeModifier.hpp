@@ -41,8 +41,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractCellBasedSimulationModifier.hpp"
 #include "TetrahedralMesh.hpp"
-#include "BoundaryConditionsContainer.hpp"
-#include "PdeAndBoundaryConditions.hpp"
 
 /**
  * A modifier class in which has the common functionality of solving a PDE on an arbitrary Mesh.
@@ -51,7 +49,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned DIM>
 class AbstractPdeModifier : public AbstractCellBasedSimulationModifier<DIM,DIM>
 {
-
 private:
 
     /** Needed for serialization. */
@@ -76,12 +73,12 @@ private:
     }
 
 protected:
+
     /**
      * Whether to delete the mesh when we are destroyed.
      * Needed if to free memory if creating meshes.
      */
     bool mDeleteMesh;
-
 
     /** The solution to the PDE problem at the current timestep. */
     Vec mSolution; ///\todo NEED TO ARCHIVE THIS see PdeandBoundaryCondidtion (#2687)
@@ -146,7 +143,6 @@ public:
      */
     void OutputSimulationModifierParameters(out_stream& rParamsFile);
 
-
     /**
      * Whether to calculate and save the gradient of the solution to CellData.
      *
@@ -155,9 +151,9 @@ public:
     bool GetOutputGradient();
 
     /**
-     *  To set whether to calculate and save the gradient of the solution to CellData.
+     * To set whether to calculate and save the gradient of the solution to CellData.
      *
-     * @param outputGradient whether to output or not
+     * @param outputGradient whether to output the gradient
      */
     void SetOutputGradient(bool outputGradient);
 };

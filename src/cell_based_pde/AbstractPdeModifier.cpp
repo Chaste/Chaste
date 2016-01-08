@@ -34,17 +34,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "AbstractPdeModifier.hpp"
-#include "NodeBasedCellPopulation.hpp"
-#include "VertexBasedCellPopulation.hpp"
-#include "MeshBasedCellPopulation.hpp"
-#include "MeshBasedCellPopulationWithGhostNodes.hpp"
-#include "PottsBasedCellPopulation.hpp"
-#include "CaBasedCellPopulation.hpp"
-#include "TetrahedralMesh.hpp"
 #include "VtkMeshWriter.hpp"
-#include "CellBasedPdeSolver.hpp"
-#include "SimpleLinearEllipticSolver.hpp"
-#include "AveragedSourcePde.hpp"
+#include "ReplicatableVector.hpp"
 
 template<unsigned DIM>
 AbstractPdeModifier<DIM>::AbstractPdeModifier()
@@ -56,7 +47,7 @@ AbstractPdeModifier<DIM>::AbstractPdeModifier()
       mCachedDependentVariableName(""),
       mOutputGradient(false)
 {
-    assert(DIM==2);
+    assert(DIM == 2);
 }
 
 template<unsigned DIM>
@@ -72,7 +63,7 @@ template<unsigned DIM>
 void AbstractPdeModifier<DIM>::UpdateAtEndOfOutputTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
 #ifdef CHASTE_VTK
-    if (DIM>1)
+    if (DIM > 1)
     {
         std::ostringstream time_string;
         time_string << SimulationTime::Instance()->GetTimeStepsElapsed();
@@ -113,11 +104,7 @@ void AbstractPdeModifier<DIM>::OutputSimulationModifierParameters(out_stream& rP
     AbstractCellBasedSimulationModifier<DIM>::OutputSimulationModifierParameters(rParamsFile);
 }
 
-/////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
 template class AbstractPdeModifier<1>;
 template class AbstractPdeModifier<2>;
 template class AbstractPdeModifier<3>;
-

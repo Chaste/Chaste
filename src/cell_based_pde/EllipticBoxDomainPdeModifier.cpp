@@ -34,18 +34,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "EllipticBoxDomainPdeModifier.hpp"
-#include "NodeBasedCellPopulation.hpp"
-#include "VertexBasedCellPopulation.hpp"
-#include "MeshBasedCellPopulation.hpp"
-#include "MeshBasedCellPopulationWithGhostNodes.hpp"
-#include "PottsBasedCellPopulation.hpp"
-#include "CaBasedCellPopulation.hpp"
 #include "TetrahedralMesh.hpp"
-#include "VtkMeshWriter.hpp"
-#include "CellBasedPdeSolver.hpp"
 #include "SimpleLinearEllipticSolver.hpp"
-#include "AveragedSourcePde.hpp"
-
 
 template<unsigned DIM>
 EllipticBoxDomainPdeModifier<DIM>::EllipticBoxDomainPdeModifier()
@@ -60,9 +50,9 @@ EllipticBoxDomainPdeModifier<DIM>::EllipticBoxDomainPdeModifier(PdeAndBoundaryCo
     : AbstractBoxDomainPdeModifier<DIM>(),
       mpPdeAndBcs(pPdeAndBcs)
 {
-    assert(DIM==2);
+    assert(DIM == 2);
 
-    //Generate mesh. Note only need to do this ones as the mesh is fixed.
+    // Generate mesh. Note only need to do this ones as the mesh is fixed.
     this->GenerateFeMesh(meshCuboid, stepSize);
 }
 

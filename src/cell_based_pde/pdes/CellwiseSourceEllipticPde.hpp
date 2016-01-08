@@ -42,11 +42,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellPopulation.hpp"
 #include "AbstractLinearEllipticPde.hpp"
 
-
-// NOTE #2687 this should replace CellwiseSourcePde in the trunk.
+///\todo #2687 this should replace CellwiseSourcePde in the trunk.
 
 /**
- *  A PDE which has a source at each non-apoptotic cell.
+ * A PDE which has a source at each non-apoptotic cell.
  */
 template<unsigned DIM>
 class CellwiseSourceEllipticPde : public AbstractLinearEllipticPde<DIM,DIM>
@@ -119,7 +118,6 @@ public:
      *  Div(D Grad u)  +  f(x)u + g(x) = 0.
      */
     virtual double ComputeLinearInUCoeffInSourceTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement);
-
 
     /**
      * Overridden ComputeLinearInUCoeffInSourceTermAtNode() method.

@@ -42,15 +42,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "SmartPointers.hpp"
 #include "AbstractCellBasedWithTimingsTestSuite.hpp"
-
 #include "EllipticBoxDomainPdeModifier.hpp"
 #include "AveragedSourcePde.hpp"
-
 #include "StochasticDurationCellCycleModel.hpp"
 #include "ApoptoticCellProperty.hpp"
 #include "CellsGenerator.hpp"
-
-#include "MeshBasedCellPopulationWithGhostNodes.hpp"
+#include "MeshBasedCellPopulation.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "NodeBasedCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
@@ -62,17 +59,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
-
 /*
  * In this test suite we check the solution of the AveragedPdes for each population type.
- *
- * In each case we are solving Laplacian U = f where f is constant in different regions
- *
- * We test on a square with half appoptotic cells and the PDE mesh is twice the size
+ * In each case we are solving Laplacian U = f where f is constant in different regions.
+ * We test on a square with half appoptotic cells and the PDE mesh is twice the size.
  */
 class TestEllipticBoxDomainModiferMethods : public AbstractCellBasedWithTimingsTestSuite
 {
-
 public:
 
     void TestMeshBasedSquareMonolayer() throw (Exception)
@@ -109,19 +102,18 @@ public:
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("variable");
 
-        // Make domain
+        // Create domain
         ChastePoint<2> lower(-5.0, -5.0);
         ChastePoint<2> upper(15.0, 15.0);
         ChasteCuboid<2> cuboid(lower, upper);
 
-        // Create a PDE Modifier object using this pde and bcs object
+        // Create a PDE modifier object using this PDE and BCs object
         MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc,cuboid));
-        // For coverage output the Solution Gradient
+
+        // For coverage output the solution gradient
         p_pde_modifier->SetOutputGradient(true);
 
         p_pde_modifier->SetupSolve(cell_population,"TestAveragedBoxEllipticPdeWithMeshOnSquare");
-
-
 
         // Test the solution at some fixed points to compare with other cell populations
         CellPtr p_cell_0 = cell_population.GetCellUsingLocationIndex(0);

@@ -86,10 +86,10 @@ void AbstractGrowingDomainPdeModifier<DIM>::GenerateFeMesh(AbstractCellPopulatio
 
         // Get the nodes of the NodesOnlyMesh
         for (typename AbstractMesh<DIM,DIM>::NodeIterator node_iter = rCellPopulation.rGetMesh().GetNodeIteratorBegin();
-                 node_iter != rCellPopulation.rGetMesh().GetNodeIteratorEnd();
-                 ++node_iter)
+             node_iter != rCellPopulation.rGetMesh().GetNodeIteratorEnd();
+             ++node_iter)
         {
-                nodes.push_back(new Node<DIM>(node_iter->GetIndex(), node_iter->rGetLocation()));
+            nodes.push_back(new Node<DIM>(node_iter->GetIndex(), node_iter->rGetLocation()));
         }
 
         this->mDeleteMesh = true;
@@ -105,7 +105,7 @@ void AbstractGrowingDomainPdeModifier<DIM>::GenerateFeMesh(AbstractCellPopulatio
     }
     else if (dynamic_cast<PottsBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL)
     {
-        std::vector<Node<DIM> *> nodes;
+        std::vector<Node<DIM>*> nodes;
 
         // Create nodes at the centre of the cells
         for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
@@ -115,7 +115,7 @@ void AbstractGrowingDomainPdeModifier<DIM>::GenerateFeMesh(AbstractCellPopulatio
             nodes.push_back(new Node<DIM>(rCellPopulation.GetLocationIndexUsingCell(*cell_iter), rCellPopulation.GetLocationOfCellCentre(*cell_iter)));
         }
 
-        this->mDeleteMesh=true;
+        this->mDeleteMesh = true;
         this->mpFeMesh = new MutableMesh<DIM,DIM>(nodes);
         assert(this->mpFeMesh->GetNumNodes() == rCellPopulation.GetNumRealCells());
     }
@@ -133,7 +133,7 @@ void AbstractGrowingDomainPdeModifier<DIM>::GenerateFeMesh(AbstractCellPopulatio
             cell_index++;
         }
 
-        this->mDeleteMesh=true;
+        this->mDeleteMesh = true;
         this->mpFeMesh = new MutableMesh<DIM,DIM>(nodes);
         assert(this->mpFeMesh->GetNumNodes() == rCellPopulation.GetNumRealCells());
     }
@@ -149,24 +149,24 @@ void AbstractGrowingDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulatio
     // Store the PDE solution in an accessible form
     ReplicatableVector solution_repl(this->mSolution);
 
-    // local cell index used by the CA simulation
+    // Local cell index used by the CA simulation
     unsigned cell_index = 0;
 
     for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
-                 cell_iter != rCellPopulation.End();
-                 ++cell_iter)
+         cell_iter != rCellPopulation.End();
+         ++cell_iter)
     {
         unsigned tet_node_index = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);
 
         if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL)
         {
-            // Offset to relate elements in vertex mesh to nodes in tetrahedral mesh.
+            // Offset to relate elements in vertex mesh to nodes in tetrahedral mesh
             tet_node_index += rCellPopulation.GetNumNodes();
         }
 
         if (dynamic_cast<CaBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL)
         {
-            // here local cell index corresponds to tet node
+            // Here local cell index corresponds to tet node
             tet_node_index = cell_index;
             cell_index++;
         }
@@ -182,7 +182,6 @@ void AbstractGrowingDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulatio
 
             Node<DIM>* p_tet_node = this->mpFeMesh->GetNode(tet_node_index);
 
-
             // Get the containing elements and average the contribution from each one
             for (typename Node<DIM>::ContainingElementIterator element_iter = p_tet_node->ContainingElementsBegin();
                  element_iter != p_tet_node->ContainingElementsEnd();
@@ -196,7 +195,7 @@ void AbstractGrowingDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulatio
                 c_matrix<double, DIM, DIM+1> grad_phi;
                 LinearBasisFunction<DIM>::ComputeTransformedBasisFunctionDerivatives(zero_point, inverse_jacobian, grad_phi);
 
-                // Add the contribution from this element.
+                // Add the contribution from this element
                 for (unsigned node_index=0; node_index<DIM+1; node_index++)
                 {
                     double nodal_value = solution_repl[this->mpFeMesh->GetElement(*element_iter)->GetNodeGlobalIndex(node_index)];
@@ -208,7 +207,7 @@ void AbstractGrowingDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulatio
                 }
             }
 
-            //Divide by number of containing elements.
+            // Divide by number of containing elements
             solution_gradient /= p_tet_node->GetNumContainingElements();
 
             switch (DIM)
@@ -229,7 +228,6 @@ void AbstractGrowingDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulatio
                     NEVER_REACHED;
             }
         }
-
     }
 }
 
@@ -240,10 +238,7 @@ void AbstractGrowingDomainPdeModifier<DIM>::OutputSimulationModifierParameters(o
     AbstractPdeModifier<DIM>::OutputSimulationModifierParameters(rParamsFile);
 }
 
-/////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
 template class AbstractGrowingDomainPdeModifier<1>;
 template class AbstractGrowingDomainPdeModifier<2>;
 template class AbstractGrowingDomainPdeModifier<3>;

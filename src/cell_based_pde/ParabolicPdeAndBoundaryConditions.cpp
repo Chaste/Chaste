@@ -120,7 +120,7 @@ void ParabolicPdeAndBoundaryConditions<DIM>::DestroySolution()
 }
 
 template<unsigned DIM>
-void ParabolicPdeAndBoundaryConditions<DIM>::SetUpSourceTermsForAveragedSourcePde(TetrahedralMesh<DIM,DIM>* pMesh, std::map< CellPtr, unsigned >* pCellPdeElementMap)
+void ParabolicPdeAndBoundaryConditions<DIM>::SetUpSourceTermsForAveragedSourcePde(TetrahedralMesh<DIM,DIM>* pMesh, std::map<CellPtr, unsigned>* pCellPdeElementMap)
 {
     assert(HasAveragedSourcePde());
     static_cast<AveragedSourceParabolicPde<DIM>*>(mpPde)->SetupSourceTerms(*pMesh, pCellPdeElementMap);

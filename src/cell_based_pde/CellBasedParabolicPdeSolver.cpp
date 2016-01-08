@@ -34,8 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "CellBasedParabolicPdeSolver.hpp"
-#include "TetrahedralMesh.hpp"
-#include "SimpleLinearParabolicSolver.hpp"
 
 template<unsigned DIM>
 CellBasedParabolicPdeSolver<DIM>::CellBasedParabolicPdeSolver(TetrahedralMesh<DIM,DIM>* pMesh,
@@ -77,9 +75,6 @@ c_matrix<double, 1*(DIM+1), 1*(DIM+1)> CellBasedParabolicPdeSolver<DIM>::Compute
 
      return    prod( trans(rGradPhi), c_matrix<double, DIM, DIM+1>(prod(pde_diffusion_term, rGradPhi)) )
                 + PdeSimulationTime::GetPdeTimeStepInverse() * this->mpParabolicPde->ComputeDuDtCoefficientFunction(rX) * outer_prod(rPhi, rPhi);
-
-
-
 }
 
 template<unsigned DIM>
@@ -91,17 +86,13 @@ void CellBasedParabolicPdeSolver<DIM>::ResetInterpolatedQuantities()
 template<unsigned DIM>
 void CellBasedParabolicPdeSolver<DIM>::IncrementInterpolatedQuantities(double phiI, const Node<DIM>* pNode)
 {
-
     unsigned index_of_unknown = 0;
     double u_at_node = this->GetCurrentSolutionOrGuessValue(pNode->GetIndex(), index_of_unknown);
 
     mInterpolatedSourceTerm += phiI*this->mpParabolicPde->ComputeSourceTermAtNode(*pNode,u_at_node);
 }
 
-//////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-//////////////////////////////////////////////////////////////////////
-
 template class CellBasedParabolicPdeSolver<1>;
 template class CellBasedParabolicPdeSolver<2>;
 template class CellBasedParabolicPdeSolver<3>;

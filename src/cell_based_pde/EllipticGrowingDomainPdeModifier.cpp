@@ -34,17 +34,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "EllipticGrowingDomainPdeModifier.hpp"
-#include "NodeBasedCellPopulation.hpp"
-#include "VertexBasedCellPopulation.hpp"
-#include "MeshBasedCellPopulation.hpp"
-#include "MeshBasedCellPopulationWithGhostNodes.hpp"
-#include "PottsBasedCellPopulation.hpp"
-#include "CaBasedCellPopulation.hpp"
 #include "TetrahedralMesh.hpp"
-#include "VtkMeshWriter.hpp"
 #include "CellBasedPdeSolver.hpp"
-#include "SimpleLinearEllipticSolver.hpp"
-#include "AveragedSourcePde.hpp"
 
 template<unsigned DIM>
 EllipticGrowingDomainPdeModifier<DIM>::EllipticGrowingDomainPdeModifier()
@@ -57,7 +48,7 @@ EllipticGrowingDomainPdeModifier<DIM>::EllipticGrowingDomainPdeModifier(PdeAndBo
     : AbstractGrowingDomainPdeModifier<DIM>(),
       mpPdeAndBcs(pPdeAndBcs)
 {
-    assert(DIM==2);
+    assert(DIM == 2);
 }
 
 template<unsigned DIM>

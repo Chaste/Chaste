@@ -40,9 +40,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 
 #include "AbstractPdeModifier.hpp"
-#include "TetrahedralMesh.hpp"
-#include "BoundaryConditionsContainer.hpp"
-#include "PdeAndBoundaryConditions.hpp"
 
 /**
  * A modifier class in which has the common functionality of solving a PDE on a Mesh defined by a Box larger than the tissue.
@@ -99,7 +96,6 @@ public:
      * @param outputDirectory the output directory, relative to where Chaste output is stored
      */
     virtual void SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory);
-
 
     /**
      * Helper method to generate the mesh.
