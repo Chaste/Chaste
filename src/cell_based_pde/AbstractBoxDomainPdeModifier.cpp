@@ -48,7 +48,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned DIM>
 AbstractBoxDomainPdeModifier<DIM>::AbstractBoxDomainPdeModifier()
-
 : AbstractPdeModifier<DIM>()
 {
 }
@@ -56,6 +55,11 @@ AbstractBoxDomainPdeModifier<DIM>::AbstractBoxDomainPdeModifier()
 template<unsigned DIM>
 AbstractBoxDomainPdeModifier<DIM>::~AbstractBoxDomainPdeModifier()
 {
+    // Avoid memory leaks
+    if (this->mpFeMesh != NULL)
+    {
+        delete this->mpFeMesh;
+    }
 }
 
 template<unsigned DIM>
