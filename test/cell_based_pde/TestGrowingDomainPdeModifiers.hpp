@@ -77,26 +77,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
-
-class SimplePdeForTesting : public AbstractLinearEllipticPde<2,2>
-{
-public:
-    double ComputeConstantInUSourceTerm(const ChastePoint<2>&, Element<2,2>* pElement)
-    {
-        return -1.0;
-    }
-
-    double ComputeLinearInUCoeffInSourceTerm(const ChastePoint<2>&, Element<2,2>*)
-    {
-        return 0.0;
-    }
-
-    c_matrix<double,2,2> ComputeDiffusionTerm(const ChastePoint<2>& )
-    {
-        return identity_matrix<double>(2);
-    }
-};
-
 class TestGrowingDomainPdeModifiers : public AbstractCellBasedWithTimingsTestSuite
 {
 public:

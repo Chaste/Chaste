@@ -33,25 +33,25 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef PARABOLICGROWINGDOMAINPDEMODIFIER_HPP_
-#define PARABOLICGROWINGDOMAINPDEMODIFIER_HPP_
+#ifndef PARABOLICBOXDOMAINPDEMODIFIER_HPP_
+#define PARABOLICBOXDOMAINPDEMODIFIER_HPP_
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
-#include "AbstractGrowingDomainPdeModifier.hpp"
+#include "AbstractBoxDomainPdeModifier.hpp"
 #include "ParabolicPdeAndBoundaryConditions.hpp"
 #include "TetrahedralMesh.hpp"
 #include "BoundaryConditionsContainer.hpp"
 #include "ConstBoundaryCondition.hpp"
 
 /**
- * A modifier class in which a parabolic PDE is solved on a growing domain and the results are stored in CellData.
+ * A modifier class in which a parabolic PDE is solved on a box domain and the results are stored in CellData.
  */
 template<unsigned DIM>
-class ParabolicGrowingDomainPdeModifier : public AbstractGrowingDomainPdeModifier<DIM>
+class ParabolicBoxDomainPdeModifier : public AbstractBoxDomainPdeModifier<DIM>
 {
-    friend class TestGrowingDomainPdeModifiers;
+    friend class TestBoxDomainPdeModifiers;
 
 private:
 
@@ -67,7 +67,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractGrowingDomainPdeModifier<DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractBoxDomainPdeModifier<DIM> >(*this);
         archive & mpPdeAndBcs;
     }
 
@@ -82,20 +82,22 @@ public:
      *
      * Only used in Archiving
      */
-    ParabolicGrowingDomainPdeModifier();
+    ParabolicBoxDomainPdeModifier();
 
 
     /**
      * Constructor.
      *
      * @param pPdeAndBcs an optional pointer to a linear elliptic PDE object with associated boundary conditions
+     * @param meshCuboid the outer boundary for the FEM mesh
+     * @param stepSize the step size to be used in the FEM mesh (defaults to 1, i.e. the default cell size)
      */
-    ParabolicGrowingDomainPdeModifier(ParabolicPdeAndBoundaryConditions<DIM>* pPdeAndBcs);
+    ParabolicBoxDomainPdeModifier(ParabolicPdeAndBoundaryConditions<DIM>* pPdeAndBcs, ChasteCuboid<DIM> meshCuboid, double stepSize = 1.0);
 
     /**
      * Destructor.
      */
-    virtual ~ParabolicGrowingDomainPdeModifier();
+    virtual ~ParabolicBoxDomainPdeModifier();
 
     /**
      * Overridden UpdateAtEndOfTimeStep() method.
@@ -124,11 +126,13 @@ public:
     virtual std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ConstructBoundaryConditionsContainer();
 
     /**
-     * Helper method to copy the CellData to the PDE solution
+     * Helper method to initialise the PDE solution using the CellData.
+     *
+     * Here we assume a homogeneous initial consition.
      *
      * @param rCellPopulation reference to the cell population
      */
-    void UpdateSolutionVector(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
+    void SetupInitialSolutionVector(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
 
     /**
      * Overridden OutputSimulationModifierParameters() method.
@@ -140,6 +144,6 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(ParabolicGrowingDomainPdeModifier)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(ParabolicBoxDomainPdeModifier)
 
-#endif /*PARABOLICGROWINGDOMAINPDEMODIFIER_HPP_*/
+#endif /*PARABOLICBOXDOMAINPDEMODIFIER_HPP_*/

@@ -157,9 +157,24 @@ public:
     bool IsNeumannBoundaryCondition();
 
     /**
+     * @return whether the PDE is of type AveragedSourceParabolicPde
+     */
+    bool HasAveragedSourcePde();
+
+    /**
      * Call PetscTools::Destroy on mSolution.
      */
     void DestroySolution();
+
+    /**
+     * In the case where mpPde is of type AveragedSourceParabolicPde, set the source terms
+     * using the information in the given mesh.
+     *
+     * @param pMesh Pointer to a tetrahedral mesh
+     * @param pCellPdeElementMap map between cells and elements, from Parabolic PDE Modifiers
+     */
+    void SetUpSourceTermsForAveragedSourcePde(TetrahedralMesh<DIM,DIM>* pMesh, std::map< CellPtr, unsigned >* pCellPdeElementMap=NULL);
+
 
     /**
      * Set the name of the dependent variable.

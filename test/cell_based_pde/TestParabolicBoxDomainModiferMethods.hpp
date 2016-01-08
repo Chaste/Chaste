@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef TESTELLIPTICBOXDOMAINMODIFIERMETHODS_HPP_
-#define TESTELLIPTICBOXDOMAINMODIFIERMETHODS_HPP_
+#ifndef TESTPARABOLICBOXDOMAINMODIFIERMETHODS_HPP_
+#define TESTPARABOLICBOXDOMAINMODIFIERMETHODS_HPP_
 
 #include <cxxtest/TestSuite.h>
 
@@ -43,8 +43,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SmartPointers.hpp"
 #include "AbstractCellBasedWithTimingsTestSuite.hpp"
 
-#include "EllipticBoxDomainPdeModifier.hpp"
-#include "AveragedSourcePde.hpp"
+#include "ParabolicBoxDomainPdeModifier.hpp"
+#include "AveragedSourceParabolicPde.hpp"
 
 #include "StochasticDurationCellCycleModel.hpp"
 #include "ApoptoticCellProperty.hpp"
@@ -62,15 +62,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
-
 /*
- * In this test suite we check the solution of the AveragedPdes for each population type.
+ * In this test suite we check the solution of the AveragedParabolicPdes for each population type.
  *
  * In each case we are solving Laplacian U = f where f is constant in different regions
  *
  * We test on a square with half appoptotic cells and the PDE mesh is twice the size
+ *
+ * Note all OffLattice results are the same, and all OnLattice ones are also the same as each other.
  */
-class TestEllipticBoxDomainModiferMethods : public AbstractCellBasedWithTimingsTestSuite
+class TestParabolicBoxDomainModiferMethods : public AbstractCellBasedWithTimingsTestSuite
 {
 
 public:
@@ -87,26 +88,28 @@ public:
 
         // Make cells with x<5.0 appoptotic (so no source term)
         boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
-                cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
+                       cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
         for (unsigned i =0; i<cells.size(); i++)
         {
-            c_vector<double,2> cell_location = p_mesh->GetNode(i)->rGetLocation();
-            if (cell_location(0)<5.0)
-            {
-                cells[i]->AddCellProperty(p_apoptotic_property);
-            }
+           c_vector<double,2> cell_location = p_mesh->GetNode(i)->rGetLocation();
+        if (cell_location(0)<5.0)
+        {
+            cells[i]->AddCellProperty(p_apoptotic_property);
         }
-        TS_ASSERT_EQUALS(p_apoptotic_property->GetCellCount(),50u);
+        // Set initial condition for pde
+        cells[i]->GetCellData()->SetItem("variable",1.0);
+        }
+        TS_ASSERT_EQUALS(p_apoptotic_property->GetCellCount(), 50u);
 
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Set up simulation time for file output
-        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 10);
 
         // Make the PDE and BCs
-        AveragedSourcePde<2> pde(cell_population, -0.1);
+        AveragedSourceParabolicPde<2> pde(cell_population, 0.1, 1.0, -1.0);
         ConstBoundaryCondition<2> bc(1.0);
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("variable");
 
         // Make domain
@@ -115,26 +118,98 @@ public:
         ChasteCuboid<2> cuboid(lower, upper);
 
         // Create a PDE Modifier object using this pde and bcs object
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc,cuboid));
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc,cuboid));
         // For coverage output the Solution Gradient
         p_pde_modifier->SetOutputGradient(true);
+        p_pde_modifier->SetupSolve(cell_population,"TestAveragedParabolicPdeWithMeshOnSquare");
 
-        p_pde_modifier->SetupSolve(cell_population,"TestAveragedBoxEllipticPdeWithMeshOnSquare");
-
-
+        // Run for 10 timesteps
+        for (unsigned i=0; i<10; i++)
+           {
+            SimulationTime::Instance()->IncrementTimeOneStep();
+               p_pde_modifier->UpdateAtEndOfTimeStep(cell_population);
+               p_pde_modifier->UpdateAtEndOfOutputTimeStep(cell_population);
+        }
 
         // Test the solution at some fixed points to compare with other cell populations
         CellPtr p_cell_0 = cell_population.GetCellUsingLocationIndex(0);
-        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_0)[0], 0, .01e-4);
+        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_0)[0], 0, 1e-4);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_0)[1], 0.0, 1e-4);
-        TS_ASSERT_DELTA( p_cell_0->GetCellData()->GetItem("variable"), 0.8605, 1e-4);
+        TS_ASSERT_DELTA( p_cell_0->GetCellData()->GetItem("variable"), 0.8513, 1e-4);
 
-        TS_ASSERT_DELTA( p_cell_0->GetCellData()->GetItem("variable_grad_x"), -0.0323, 1e-4);
-        TS_ASSERT_DELTA( p_cell_0->GetCellData()->GetItem("variable_grad_y"), -0.0179, 1e-4);
+        TS_ASSERT_DELTA( p_cell_0->GetCellData()->GetItem("variable_grad_x"), -0.0505, 1e-4);
+        TS_ASSERT_DELTA( p_cell_0->GetCellData()->GetItem("variable_grad_y"), -0.0175, 1e-4);
     }
+
+    void TestMeshBasedSquareMonolayerWithNeumanBcs() throw (Exception)
+    {
+        HoneycombMeshGenerator generator(10,10,0);
+        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+
+        std::vector<CellPtr> cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_differentiated_type);
+        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), p_differentiated_type);
+
+        // Make cells with x<5.0 appoptotic (so no source term)
+        boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
+                       cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
+        for (unsigned i =0; i<cells.size(); i++)
+        {
+           c_vector<double,2> cell_location = p_mesh->GetNode(i)->rGetLocation();
+        if (cell_location(0)<5.0)
+        {
+            cells[i]->AddCellProperty(p_apoptotic_property);
+        }
+        // Set initial condition for pde
+        cells[i]->GetCellData()->SetItem("variable",1.0);
+        }
+        TS_ASSERT_EQUALS(p_apoptotic_property->GetCellCount(), 50u);
+
+        MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+        // Set up simulation time for file output
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 10);
+
+        // Make the PDE and BCs
+        AveragedSourceParabolicPde<2> pde(cell_population, 0.1, 1.0, -1.0);
+        ConstBoundaryCondition<2> bc(1.0);
+        ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, true); // Only differnece from above test is the use of Neuman BCS here
+        pde_and_bc.SetDependentVariableName("variable");
+
+        // Make domain
+        ChastePoint<2> lower(-5.0, -5.0);
+        ChastePoint<2> upper(15.0, 15.0);
+        ChasteCuboid<2> cuboid(lower, upper);
+
+        // Create a PDE Modifier object using this pde and bcs object
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc,cuboid));
+        // For coverage output the Solution Gradient
+        p_pde_modifier->SetOutputGradient(true);
+        p_pde_modifier->SetupSolve(cell_population,"TestAveragedParabolicPdeWithNeumannWithMeshOnSquare");
+
+        // Run for 10 timesteps
+        for (unsigned i=0; i<10; i++)
+           {
+            SimulationTime::Instance()->IncrementTimeOneStep();
+               p_pde_modifier->UpdateAtEndOfTimeStep(cell_population);
+               p_pde_modifier->UpdateAtEndOfOutputTimeStep(cell_population);
+        }
+
+        // Test the solution at some fixed points to compare with other cell populations
+        CellPtr p_cell_0 = cell_population.GetCellUsingLocationIndex(0);
+        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_0)[0], 0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_0)[1], 0.0, 1e-4);
+        TS_ASSERT_DELTA( p_cell_0->GetCellData()->GetItem("variable"), 2.0029, 1e-4);
+
+        TS_ASSERT_DELTA( p_cell_0->GetCellData()->GetItem("variable_grad_x"), -0.3783, 1e-4);
+        TS_ASSERT_DELTA( p_cell_0->GetCellData()->GetItem("variable_grad_y"), -0.2981, 1e-4);
+    }
+
 
     void TestNodeBasedSquareMonolayer() throw (Exception)
     {
+
         HoneycombMeshGenerator generator(10,10,0);
         MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
@@ -147,7 +222,7 @@ public:
 
         // Make cells with x<5.0 appoptotic (so no source term)
         boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
-                cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
+                        cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
         for (unsigned i =0; i<cells.size(); i++)
         {
             c_vector<double,2> cell_location = p_mesh->GetNode(i)->rGetLocation();
@@ -155,18 +230,20 @@ public:
             {
                 cells[i]->AddCellProperty(p_apoptotic_property);
             }
+            // Set initial condition for pde
+            cells[i]->GetCellData()->SetItem("variable",1.0);
         }
-        TS_ASSERT_EQUALS(p_apoptotic_property->GetCellCount(),50u);
+        TS_ASSERT_EQUALS(p_apoptotic_property->GetCellCount(), 50u);
 
         NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Set up simulation time for file output
-        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 10);
 
         // Make the PDE and BCs
-        AveragedSourcePde<2> pde(cell_population, -0.1);
+        AveragedSourceParabolicPde<2> pde(cell_population, 0.1, 1.0, -1.0);
         ConstBoundaryCondition<2> bc(1.0);
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("variable");
 
         // Make domain
@@ -175,14 +252,24 @@ public:
         ChasteCuboid<2> cuboid(lower, upper);
 
         // Create a PDE Modifier object using this pde and bcs object
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc,cuboid));
-        p_pde_modifier->SetupSolve(cell_population,"TestAveragedBoxEllipticPdeWithNodeOnSquare");
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc,cuboid));
+        // For coverage output the Solution Gradient
+        p_pde_modifier->SetOutputGradient(true);
+        p_pde_modifier->SetupSolve(cell_population,"TestAveragedParabolicPdeWithNodeOnSquare");
+
+        // Run for 10 timesteps
+        for (unsigned i=0; i<10; i++)
+           {
+            SimulationTime::Instance()->IncrementTimeOneStep();
+               p_pde_modifier->UpdateAtEndOfTimeStep(cell_population);
+               p_pde_modifier->UpdateAtEndOfOutputTimeStep(cell_population);
+        }
 
         // Test the solution at some fixed points to compare with other cell populations
         CellPtr p_cell_0 = cell_population.GetCellUsingLocationIndex(0);
-        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_0)[0], 0.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_0)[0], 0, 1e-4);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_0)[1], 0.0, 1e-4);
-        TS_ASSERT_DELTA(p_cell_0->GetCellData()->GetItem("variable"), 0.8605, 1e-4);
+        TS_ASSERT_DELTA( p_cell_0->GetCellData()->GetItem("variable"), 0.8513, 1e-4);
 
         // Clear Memory
         delete p_mesh;
@@ -202,26 +289,28 @@ public:
 
         // Make cells with x<5.0 appoptotic (so no source term)
         boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
-                cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
+                        cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
         for (unsigned i =0; i<cells.size(); i++)
         {
-            c_vector<double,2> cell_location = p_mesh->GetCentroidOfElement(i);
-            if (cell_location(0)<5.0)
-            {
+              c_vector<double,2> cell_location = p_mesh->GetCentroidOfElement(i);
+              if (cell_location(0)<5.0)
+              {
                 cells[i]->AddCellProperty(p_apoptotic_property);
-            }
+              }
+            // Set initial condition for pde
+            cells[i]->GetCellData()->SetItem("variable",1.0);
         }
-        TS_ASSERT_EQUALS(p_apoptotic_property->GetCellCount(),50u);
+        TS_ASSERT_EQUALS(p_apoptotic_property->GetCellCount(), 50u);
 
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Set up simulation time for file output
-        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 10);
 
         // Make the PDE and BCs
-        AveragedSourcePde<2> pde(cell_population, -0.1);
+        AveragedSourceParabolicPde<2> pde(cell_population, 0.1, 1.0, -1.0);
         ConstBoundaryCondition<2> bc(1.0);
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("variable");
 
         // Make domain
@@ -230,23 +319,33 @@ public:
         ChasteCuboid<2> cuboid(lower, upper);
 
         // Create a PDE Modifier object using this pde and bcs object
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc,cuboid));
-        p_pde_modifier->SetupSolve(cell_population,"TestAveragedBoxEllipticPdeWithVertexOnSquare");
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc,cuboid));
+        // For coverage output the Solution Gradient
+        p_pde_modifier->SetOutputGradient(true);
+        p_pde_modifier->SetupSolve(cell_population,"TestAveragedParabolicPdeWithNodeOnSquare");
+
+        // Run for 10 timesteps
+        for (unsigned i=0; i<10; i++)
+           {
+            SimulationTime::Instance()->IncrementTimeOneStep();
+               p_pde_modifier->UpdateAtEndOfTimeStep(cell_population);
+               p_pde_modifier->UpdateAtEndOfOutputTimeStep(cell_population);
+        }
 
         // Test the solution at some fixed points to compare with other cell populations
         CellPtr p_cell_0 = cell_population.GetCellUsingLocationIndex(0);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_0)[0], 0, 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_0)[1], 0, 1e-4);
-        TS_ASSERT_DELTA(p_cell_0->GetCellData()->GetItem("variable"), 0.8605, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_0)[1], 0.0, 1e-4);
+        TS_ASSERT_DELTA( p_cell_0->GetCellData()->GetItem("variable"), 0.8513, 1e-4);
     }
 
     void TestPottsBasedSquareMonolayer() throw (Exception)
     {
-        PottsMeshGenerator<2> generator(50, 10, 4, 50, 10, 4);
+        PottsMeshGenerator<2> generator(100, 10, 4, 100, 10, 4);
         PottsMesh<2>* p_mesh = generator.GetMesh();
 
         // Translate and scale so cells are on top of those in the above centre based tests.
-        p_mesh->Translate(-6.5,-6.5);
+        p_mesh->Translate(-31.5,-31.5);
         p_mesh->Scale(0.25,0.25 *sqrt(3.0)*0.5);
 
         std::vector<CellPtr> cells;
@@ -256,7 +355,7 @@ public:
 
         // Make cells with x<5.0 appoptotic (so no source term)
         boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
-                cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
+                        cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
         for (unsigned i =0; i<cells.size(); i++)
         {
             c_vector<double,2> cell_location = p_mesh->GetCentroidOfElement(i);
@@ -264,18 +363,20 @@ public:
             {
                 cells[i]->AddCellProperty(p_apoptotic_property);
             }
+            // Set initial condition for pde
+            cells[i]->GetCellData()->SetItem("variable",1.0);
         }
-        TS_ASSERT_EQUALS(p_apoptotic_property->GetCellCount(),50u);
+        TS_ASSERT_EQUALS(p_apoptotic_property->GetCellCount(), 50u);
 
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Set up simulation time for file output
-        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 10);
 
         // Make the PDE and BCs
-        AveragedSourcePde<2> pde(cell_population, -0.1);
+        AveragedSourceParabolicPde<2> pde(cell_population, 0.1, 1.0, -1.0);
         ConstBoundaryCondition<2> bc(1.0);
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("variable");
 
         // Make domain
@@ -284,16 +385,26 @@ public:
         ChasteCuboid<2> cuboid(lower, upper);
 
         // Create a PDE Modifier object using this pde and bcs object
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc,cuboid));
-        p_pde_modifier->SetupSolve(cell_population,"TestAveragedBoxEllipticPdeWithPottsOnSquare");
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc,cuboid));
+        // For coverage output the Solution Gradient
+        p_pde_modifier->SetOutputGradient(true);
+        p_pde_modifier->SetupSolve(cell_population,"TestAveragedParabolicPdeWithNodeOnSquare");
+
+        // Run for 10 timesteps
+        for (unsigned i=0; i<10; i++)
+           {
+            SimulationTime::Instance()->IncrementTimeOneStep();
+               p_pde_modifier->UpdateAtEndOfTimeStep(cell_population);
+               p_pde_modifier->UpdateAtEndOfOutputTimeStep(cell_population);
+        }
 
         // Test the solution at some fixed points to compare with other cell populations
         CellPtr p_cell_0 = cell_population.GetCellUsingLocationIndex(0);
-        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_0)[0], 0.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_0)[0], 0, 1e-4);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_0)[1], 0.0, 1e-4);
-        TS_ASSERT_DELTA(p_cell_0->GetCellData()->GetItem("variable"), 0.8605, 1e-1); // Testing against off lattice models
-
-        TS_ASSERT_DELTA(p_cell_0->GetCellData()->GetItem("variable"), 0.8513, 1e-4); // Testing against on lattice models
+        TS_ASSERT_DELTA( p_cell_0->GetCellData()->GetItem("variable"), 0.8513, 2e-2);//low error as mesh is slightly larger than for off lattice based models.
+        //Checking it doesn't change for this cell population
+        TS_ASSERT_DELTA(p_cell_0->GetCellData()->GetItem("variable"), 0.8343, 1e-4);
     }
 
     void TestCaBasedSquareMonolayer() throw (Exception)
@@ -326,18 +437,20 @@ public:
             {
                 cells[i]->AddCellProperty(p_apoptotic_property);
             }
+            // Set initial condition for pde
+            cells[i]->GetCellData()->SetItem("variable",1.0);
         }
-        TS_ASSERT_EQUALS(p_apoptotic_property->GetCellCount(),50u);
+        TS_ASSERT_EQUALS(p_apoptotic_property->GetCellCount(), 50u);
 
         CaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
 
         // Set up simulation time for file output
-        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 10);
 
         // Make the PDE and BCs
-        AveragedSourcePde<2> pde(cell_population, -0.1);
+        AveragedSourceParabolicPde<2> pde(cell_population, 0.1, 1.0, -1.0);
         ConstBoundaryCondition<2> bc(1.0);
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("variable");
 
         // Make domain
@@ -346,17 +459,28 @@ public:
         ChasteCuboid<2> cuboid(lower, upper);
 
         // Create a PDE Modifier object using this pde and bcs object
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc,cuboid));
-        p_pde_modifier->SetupSolve(cell_population,"TestAveragedBoxEllipticPdeWithCaOnSquare");
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc,cuboid));
+        // For coverage output the Solution Gradient
+        p_pde_modifier->SetOutputGradient(true);
+        p_pde_modifier->SetupSolve(cell_population,"TestAveragedParabolicPdeWithNodeOnSquare");
+
+        // Run for 10 timesteps
+        for (unsigned i=0; i<10; i++)
+           {
+            SimulationTime::Instance()->IncrementTimeOneStep();
+               p_pde_modifier->UpdateAtEndOfTimeStep(cell_population);
+               p_pde_modifier->UpdateAtEndOfOutputTimeStep(cell_population);
+        }
 
         // Test the solution at some fixed points to compare with other cell populations
         CellPtr p_cell_0 = cell_population.GetCellUsingLocationIndex(0);
-        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_0)[0], 0.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_0)[0], 0, 1e-4);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_0)[1], 0.0, 1e-4);
-        TS_ASSERT_DELTA(p_cell_0->GetCellData()->GetItem("variable"), 0.8605, 1e-1); // Testing against off lattice models
-
-        TS_ASSERT_DELTA(p_cell_0->GetCellData()->GetItem("variable"), 0.8513, 1e-4); // Testing against on lattice models
+        TS_ASSERT_DELTA( p_cell_0->GetCellData()->GetItem("variable"), 0.8513, 2e-2);//low error as mesh is slightly larger than for off lattice based models.
+        //Checking it doesn't change for this cell population
+        TS_ASSERT_DELTA(p_cell_0->GetCellData()->GetItem("variable"), 0.8343, 1e-4);
     }
+
 };
 
-#endif /*TESTELLIPTICBOXDOMAINMODIFIERMETHODS_HPP_*/
+#endif /*TESTPARABOLICBOXDOMAINMODIFIERMETHODS_HPP_*/

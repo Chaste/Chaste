@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "ParabolicPdeAndBoundaryConditions.hpp"
+#include "AveragedSourceParabolicPde.hpp"
 
 template<unsigned DIM>
 ParabolicPdeAndBoundaryConditions<DIM>::ParabolicPdeAndBoundaryConditions(AbstractLinearParabolicPde<DIM,DIM>* pPde,
@@ -104,12 +105,25 @@ bool ParabolicPdeAndBoundaryConditions<DIM>::IsNeumannBoundaryCondition()
 }
 
 template<unsigned DIM>
+bool ParabolicPdeAndBoundaryConditions<DIM>::HasAveragedSourcePde()
+{
+    return (dynamic_cast<AveragedSourceParabolicPde<DIM>*>(mpPde) != NULL);
+}
+
+template<unsigned DIM>
 void ParabolicPdeAndBoundaryConditions<DIM>::DestroySolution()
 {
     if (mSolution)
     {
         PetscTools::Destroy(mSolution);
     }
+}
+
+template<unsigned DIM>
+void ParabolicPdeAndBoundaryConditions<DIM>::SetUpSourceTermsForAveragedSourcePde(TetrahedralMesh<DIM,DIM>* pMesh, std::map< CellPtr, unsigned >* pCellPdeElementMap)
+{
+    assert(HasAveragedSourcePde());
+    static_cast<AveragedSourceParabolicPde<DIM>*>(mpPde)->SetupSourceTerms(*pMesh, pCellPdeElementMap);
 }
 
 template<unsigned DIM>

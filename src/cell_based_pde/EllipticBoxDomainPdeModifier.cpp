@@ -62,9 +62,8 @@ EllipticBoxDomainPdeModifier<DIM>::EllipticBoxDomainPdeModifier(PdeAndBoundaryCo
 {
     assert(DIM==2);
 
-    //Generate mesh and add BCS to BSC container. Note only need to do this ones as the mesh is fixed.
+    //Generate mesh. Note only need to do this ones as the mesh is fixed.
     this->GenerateFeMesh(meshCuboid, stepSize);
-    mpBcc = this->ConstructBoundaryConditionsContainer();
 }
 
 template<unsigned DIM>
@@ -80,6 +79,9 @@ EllipticBoxDomainPdeModifier<DIM>::~EllipticBoxDomainPdeModifier()
 template<unsigned DIM>
 void EllipticBoxDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
+    // Set up boundary conditions
+    std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc = ConstructBoundaryConditionsContainer();
+
     this->UpdateCellPdeElementMap(rCellPopulation);
 
     // When using a PDE mesh which doesnt coincide with the cells, we must set up the source terms before solving the PDE.
@@ -87,7 +89,7 @@ void EllipticBoxDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopula
     mpPdeAndBcs->SetUpSourceTermsForAveragedSourcePde(this->mpFeMesh, &this->mCellPdeElementMap);
 
     // Use SimpleLinearEllipticSolver as Averaged Source PDE
-    SimpleLinearEllipticSolver<DIM,DIM> solver(this->mpFeMesh, mpPdeAndBcs->GetPde(), mpBcc.get());
+    SimpleLinearEllipticSolver<DIM,DIM> solver(this->mpFeMesh, mpPdeAndBcs->GetPde(), p_bcc.get());
 
     ///\todo Use initial guess when solving the system (#2687)
     Vec old_solution_copy = this->mSolution;
