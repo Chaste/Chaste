@@ -230,18 +230,19 @@ if (Chaste_USE_PETSC_HDF5)
     set(ENV{HDF5_ROOT} "${PETSC_DIR}/${PETSC_ARCH}:${PETSC_DIR}/externalpackages:$ENV{HDF5_ROOT}")
 endif()
 find_program( HDF5_C_COMPILER_EXECUTABLE
-    NAMES h5cc h5pcc
-    PATHS ENV HDF5_ROOT
+    NAMES h5pcc h5cc
+    HINTS ENV HDF5_ROOT
     PATH_SUFFIXES bin Bin
-    NO_DEFAULT_PATH
     DOC "HDF5 Wrapper compiler.  Used only to detect HDF5 compile flags." )
 find_program( HDF5_CXX_COMPILER_EXECUTABLE
-    NAMES h5c++ h5pc++
-    PATHS ENV HDF5_ROOT
+    NAMES h5pc++ h5c++ 
+    HINTS ENV HDF5_ROOT
     PATH_SUFFIXES bin Bin
-    NO_DEFAULT_PATH
     DOC "HDF5 C++ Wrapper compiler.  Used only to detect HDF5 compile flags." )
 find_package(HDF5 MODULE REQUIRED)
+if (NOT HDF5_IS_PARALLEL)
+    message(SEND_ERROR "Hdf5 library found was not build with --enable-parallel, use the HDF5_ROOT environment variable to specify a parallel hdf5 library. Note: include dirs are ${HDF5_INCLUDE_DIRS} and libraries are ${HDF5_LIBRARIES}")
+endif()
 list(APPEND Chaste_INCLUDES "${HDF5_INCLUDE_DIRS}")
 list(APPEND Chaste_LINK_LIBRARIES "${HDF5_LIBRARIES}")
 
