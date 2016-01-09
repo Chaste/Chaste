@@ -34,17 +34,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "ImmersedBoundarySimulationModifier.hpp"
-#include "ImmersedBoundaryCellPopulation.hpp"
-#include "Exception.hpp"
-#include "Warnings.hpp"
-#include <complex>
-#include "Debug.hpp"
-#include "Timer.hpp"
-#include "FileFinder.hpp"
 
-#include <fftw3.h>
+//#include "Exception.hpp"
+//#include "Warnings.hpp"
+//#include <complex>
+//#include "Debug.hpp"
+//#include "Timer.hpp"
+//#include "FileFinder.hpp"
+//
+//#include <fftw3.h>
+//
+//#include <boost/thread.hpp>
 
-#include <boost/thread.hpp>
+#include "FluidSource.hpp"
 
 template<unsigned DIM>
 ImmersedBoundarySimulationModifier<DIM>::ImmersedBoundarySimulationModifier()
@@ -238,55 +240,59 @@ void ImmersedBoundarySimulationModifier<DIM>::AddForceContributions()
 template<unsigned DIM>
 void ImmersedBoundarySimulationModifier<DIM>::PropagateForcesToFluidGrid()
 {
-    // Helper variables
+    // Helper variables, pre-defined for efficiency
     double dl = mpMesh->GetCharacteristicNodeSpacing();
-    double dist_x;
-    double dist_y;
     double weight;
-    int first_idx_x;
-    int first_idx_y;
 
+    unsigned first_idx_x;
+    unsigned first_idx_y;
+
+    std::vector<unsigned> x_indices(4);
+    std::vector<unsigned> y_indices(4);
+
+    std::vector<double> x_deltas(4);
+    std::vector<double> y_deltas(4);
+
+    c_vector<double, DIM> node_location;
+    c_vector<double, DIM> applied_force;
+
+    // Get a reference to the force grids which we spread the applied forces to
     multi_array<double, 3>& force_grids = mpArrays->rGetModifiableForceGrids();
 
-    // Iterate over all nodes and grab their position
+    // Iterate over all nodes and propagate their forces to the grids
     for (typename ImmersedBoundaryMesh<DIM, DIM>::NodeIterator node_iter = mpMesh->GetNodeIteratorBegin(false);
             node_iter != mpMesh->GetNodeIteratorEnd();
             ++node_iter)
     {
 
         // Get location and applied force contribution of current node
-        c_vector<double, DIM> node_location = node_iter->rGetLocation();
-        c_vector<double, DIM> applied_force = node_iter->rGetAppliedForce();
+        node_location = node_iter->rGetLocation();
+        applied_force = node_iter->rGetAppliedForce();
 
+        // Get first grid index in each dimension, taking account of possible wrap-around
+        first_idx_x = unsigned(floor(node_location[0] / mGridSpacingX)) + mNumGridPtsX - 1;
+        first_idx_y = unsigned(floor(node_location[1] / mGridSpacingY)) + mNumGridPtsY - 1;
 
-        // Get index of grid positions ignoring possible wrap-around
-        first_idx_x = (int)floor(node_location[0] / mGridSpacingX) - 1;
-        first_idx_y = (int)floor(node_location[1] / mGridSpacingY) - 1;
+        // Calculate all four indices and deltas in each dimension
+        for (unsigned i = 0 ; i < 4 ; i ++)
+        {
+            x_indices[i] = (first_idx_x + i) % mNumGridPtsX;
+            y_indices[i] = (first_idx_y + i) % mNumGridPtsY;
+
+            x_deltas[i] = Delta1D(fabs(x_indices[i] * mGridSpacingX - node_location[0]), mGridSpacingX);
+            y_deltas[i] = Delta1D(fabs(y_indices[i] * mGridSpacingY - node_location[1]), mGridSpacingY);
+        }
 
         // Loop over the 4x4 grid used to spread the force on the nodes to the fluid grid
         for (unsigned x_idx = 0 ; x_idx < 4 ; x_idx ++)
         {
-            // Calculate distance between current x index and node, then account for possible wrap-around
-            dist_x = fabs((double)(first_idx_x + x_idx) * mGridSpacingX - node_location[0]);
-            if(first_idx_x == -1)
-            {
-                first_idx_x += mNumGridPtsX;
-            }
-
             for (unsigned y_idx = 0 ; y_idx < 4 ; y_idx ++)
             {
-                // Calculate distance between current x index and node, then account for possible wrap-around
-                dist_y = fabs((double)(first_idx_y + y_idx) * mGridSpacingY - node_location[1]);
-                if(first_idx_y == -1)
-                {
-                    first_idx_y += mNumGridPtsY;
-                }
-
                 // The applied force is weighted by the delta function
-                weight = Delta1D(dist_x, mGridSpacingX) * Delta1D(dist_y, mGridSpacingY) * dl / (mGridSpacingX * mGridSpacingY);
+                weight = x_deltas[x_idx] * y_deltas[y_idx] * dl / (mGridSpacingX * mGridSpacingY);
 
-                force_grids[0][(first_idx_x + x_idx) % mNumGridPtsX][(first_idx_y + y_idx) % mNumGridPtsY] += applied_force[0] * weight;
-                force_grids[1][(first_idx_x + x_idx) % mNumGridPtsX][(first_idx_y + y_idx) % mNumGridPtsY] += applied_force[1] * weight;
+                force_grids[0][x_indices[x_idx]][y_indices[y_idx]] += applied_force[0] * weight;
+                force_grids[1][x_indices[x_idx]][y_indices[y_idx]] += applied_force[1] * weight;
             }
         }
     }
@@ -295,73 +301,77 @@ void ImmersedBoundarySimulationModifier<DIM>::PropagateForcesToFluidGrid()
 template<unsigned DIM>
 void ImmersedBoundarySimulationModifier<DIM>::PropagateFluidSourcesToGrid()
 {
-    // Helper variables
-    double dist_x;
-    double dist_y;
+    // Helper variables, pre-defined for efficiency
     double weight;
-    int first_idx_x;
-    int first_idx_y;
+
+    unsigned first_idx_x;
+    unsigned first_idx_y;
+
+    std::vector<unsigned> x_indices(4);
+    std::vector<unsigned> y_indices(4);
+
+    std::vector<double> x_deltas(4);
+    std::vector<double> y_deltas(4);
 
     // Currently the fluid source grid is the final part of the right hand side grid, as having all three grids
     // contiguous helps improve the Fourier transform performance.
     //\todo could make this nicer by using boost multiarray 'slice'?
     multi_array<double, 3>& rhs_grids = mpArrays->rGetModifiableRightHandSideGrids();
 
-    // Collect together all source and sink nodes
-    //\todo could make this more efficient?
+    std::vector<FluidSource<DIM>*>& r_element_sources = mpMesh->rGetElementFluidSources();
+    std::vector<FluidSource<DIM>*>& r_balance_sources = mpMesh->rGetBalancingFluidSources();
+
+    // Construct a vector of all sources combined
+    std::vector<FluidSource<DIM>*> combined_sources;
+    combined_sources.insert(combined_sources.end(), r_element_sources.begin(), r_element_sources.end());
+    combined_sources.insert(combined_sources.end(), r_balance_sources.begin(), r_balance_sources.end());
+
+    // Find the combined element source strength
     double cumulative_strength = 0.0;
-    std::vector<Node<DIM>*> sources_and_sinks;
-    for (unsigned elem_idx = 0 ; elem_idx < mpMesh->GetNumElements() ; elem_idx++)
+    for (unsigned source_idx = 0 ; source_idx < r_element_sources.size() ; source_idx++)
     {
-        sources_and_sinks.push_back(mpMesh->GetElement(elem_idx)->GetSourceNode());
-        cumulative_strength += sources_and_sinks.back()->GetRadius();
+        cumulative_strength += r_element_sources[source_idx]->GetStrength();
     }
 
-    double balance_strength = - cumulative_strength / (double)mpMesh->rGetSinkNodes().size();
-    for (unsigned source_idx = 0 ; source_idx < mpMesh->rGetSinkNodes().size() ; source_idx++)
+    // Calculate the required balancing strength, and apply it to all balancing sources
+    double balance_strength = -1.0 * cumulative_strength / (double)r_balance_sources.size();
+    for (unsigned source_idx = 0 ; source_idx < r_balance_sources.size() ; source_idx++)
     {
-        mpMesh->rGetSinkNodes()[source_idx]->SetRadius(balance_strength);
-        sources_and_sinks.push_back(mpMesh->rGetSinkNodes()[source_idx]);
+        r_balance_sources[source_idx]->SetStrength(balance_strength);
     }
 
-//    sources_and_sinks.insert(sources_and_sinks.end(), mpMesh->rGetSinkNodes().begin(), mpMesh->rGetSinkNodes().end());
-
-    // Iterate over all nodes and grab their position
-    for (unsigned source_idx = 0 ; source_idx < sources_and_sinks.size() ; source_idx++)
+    // Iterate over all sources and propagate their effects to the source grid
+    for (unsigned source_idx = 0 ; source_idx < combined_sources.size() ; source_idx++)
     {
-        Node<DIM>* this_source = sources_and_sinks[source_idx];
+        FluidSource<DIM>* this_source = combined_sources[source_idx];
 
         // Get location and strength of this source
-        c_vector<double, DIM> node_location = this_source->rGetLocation();
-        double source_strength = this_source->GetRadius();
+        c_vector<double, DIM> source_location = this_source->rGetLocation();
+        double source_strength = this_source->GetStrength();
 
-        // Get index of grid positions ignoring possible wrap-around
-        first_idx_x = (int)floor(node_location[0] / mGridSpacingX) - 1;
-        first_idx_y = (int)floor(node_location[1] / mGridSpacingY) - 1;
+        // Get first grid index in each dimension, taking account of possible wrap-around
+        first_idx_x = unsigned(floor(source_location[0] / mGridSpacingX)) + mNumGridPtsX - 1;
+        first_idx_y = unsigned(floor(source_location[1] / mGridSpacingY)) + mNumGridPtsY - 1;
 
-        // Loop over the 4x4 grid used to spread the force on the nodes to the fluid grid
+        // Calculate all four indices and deltas in each dimension
+        for (unsigned i = 0 ; i < 4 ; i ++)
+        {
+            x_indices[i] = (first_idx_x + i) % mNumGridPtsX;
+            y_indices[i] = (first_idx_y + i) % mNumGridPtsY;
+
+            x_deltas[i] = Delta1D(fabs(x_indices[i] * mGridSpacingX - source_location[0]), mGridSpacingX);
+            y_deltas[i] = Delta1D(fabs(y_indices[i] * mGridSpacingY - source_location[1]), mGridSpacingY);
+        }
+
+        // Loop over the 4x4 grid needed to spread the source strength to the source grid
         for (unsigned x_idx = 0 ; x_idx < 4 ; x_idx ++)
         {
-            // Calculate distance between current x index and node, then account for possible wrap-around
-            dist_x = fabs((double)(first_idx_x + x_idx) * mGridSpacingX - node_location[0]);
-            if(first_idx_x == -1)
-            {
-                first_idx_x += mNumGridPtsX;
-            }
-
             for (unsigned y_idx = 0 ; y_idx < 4 ; y_idx ++)
             {
-                // Calculate distance between current x index and node, then account for possible wrap-around
-                dist_y = fabs((double)(first_idx_y + y_idx) * mGridSpacingY - node_location[1]);
-                if(first_idx_y == -1)
-                {
-                    first_idx_y += mNumGridPtsY;
-                }
+                // The strength is weighted by the delta function
+                weight = x_deltas[x_idx] * y_deltas[y_idx] / (mGridSpacingX * mGridSpacingY);
 
-                // The applied force is weighted by the delta function
-                weight = Delta1D(dist_x, mGridSpacingX) * Delta1D(dist_y, mGridSpacingY) / (mGridSpacingX * mGridSpacingY);
-
-                rhs_grids[2][(first_idx_x + x_idx) % mNumGridPtsX][(first_idx_y + y_idx) % mNumGridPtsY] += source_strength * weight;
+                rhs_grids[2][x_indices[x_idx]][y_indices[y_idx]] += source_strength * weight;
             }
         }
     }

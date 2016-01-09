@@ -111,25 +111,43 @@ ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryMesh(std::vector<N
     mCharacteristicNodeSpacing = total_perimeter / double(total_nodes);
 
     // Position source nodes at centroid of each cell, and set 'radius' (strength) to zero
-    for (unsigned elem_index = 0 ; elem_index < elements.size() ; elem_index++)
+    for (unsigned elem_it = 0 ; elem_it < elements.size() ; elem_it++)
     {
-        if (elem_index != mMembraneIndex)
+        unsigned this_elem_idx = mElements[elem_it]->GetIndex();
+
+        // Each element other than the membrane element will have a source associated with it
+        if (this_elem_idx != mMembraneIndex)
         {
-            mElements[elem_index]->GetSourceNode()->rGetModifiableLocation() = this->GetCentroidOfElement(elem_index);
-            mElements[elem_index]->GetSourceNode()->SetRadius(1e6);
+            unsigned source_idx = mElementFluidSources.size();
+            c_vector<double, SPACE_DIM> source_location = this->GetCentroidOfElement(this_elem_idx);
+
+            mElementFluidSources.push_back(new FluidSource<SPACE_DIM>(source_idx, source_location));
+
+            // Set source parameters
+            mElementFluidSources.back()->SetAssociatedElementIndex(this_elem_idx);
+
+            mElementFluidSources.back()->SetStrength(0.0);
         }
     }
 
+    mElementFluidSources[2]->SetStrength(5.0 * 1e6);
+
     /*
-     * Set up a number of sink nodes to balance any active sources inside elements
+     * Set up a number of sources to balance any active sources associated with elements
      */
-    double sink_node_spacing = 4.0 / (double)numGridPtsX;
-    double current_location = sink_node_spacing / 8.0;
+    double balancing_source_spacing = 4.0 / (double)numGridPtsX;
+
+    // We start 1/2 a grid-spacing in from the left-hand end, and place a source every 4-grid-spacings
+    double current_location = balancing_source_spacing / 8.0;
+
     while (current_location < 1.0)
     {
-        mSinkNodes.push_back(new Node<SPACE_DIM>(0, false, current_location));
-        current_location += sink_node_spacing;
-        mSinkNodes.back()->SetRadius(0.0);
+        // Create a new fluid source at the current x-location and zero y-location
+        unsigned source_idx = mBalancingFluidSources.size();
+        mBalancingFluidSources.push_back(new FluidSource<SPACE_DIM>(source_idx, current_location));
+
+        // Increment the current location
+        current_location += balancing_source_spacing;
     }
 
     this->mMeshChangesDuringSimulation = true;
@@ -282,9 +300,15 @@ unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetMembraneIndex()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-std::vector<Node<SPACE_DIM>*>& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::rGetSinkNodes()
+std::vector<FluidSource<SPACE_DIM>*>& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::rGetElementFluidSources()
 {
-    return mSinkNodes;
+    return mElementFluidSources;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+std::vector<FluidSource<SPACE_DIM>*>& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::rGetBalancingFluidSources()
+{
+    return mBalancingFluidSources;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

@@ -54,6 +54,7 @@ class ImmersedBoundaryMeshWriter;
 #include "ImmersedBoundaryMeshWriter.hpp"
 #include "ImmersedBoundaryElement.hpp"
 #include "ImmersedBoundaryArray.hpp"
+#include "FluidSource.hpp"
 
 /**
  * An immersed boundary mesh class, in which elements may contain different numbers of nodes.
@@ -92,10 +93,11 @@ protected:
     /** Vector of pointers to ImmersedBoundaryElements. */
     std::vector<ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>*> mElements;
 
-    /**
-     * Vector of sink nodes
-     */
-    std::vector<Node<SPACE_DIM>*> mSinkNodes;
+    /** Vector of fluid sources related to elements. */
+    std::vector<FluidSource<SPACE_DIM>*> mElementFluidSources;
+
+    /** Vector of fluid sources used to balance those of the elements. */
+    std::vector<FluidSource<SPACE_DIM>*> mBalancingFluidSources;
 
     /**
      * Solve node mapping method. This overridden method is required
@@ -320,9 +322,14 @@ public:
     unsigned GetMembraneIndex();
 
     /**
-     * @return reference to vector of sink nodes
+     * @return reference to vector of element-associated fluid sources
      */
-    std::vector<Node<SPACE_DIM>*>& rGetSinkNodes();
+    std::vector<FluidSource<SPACE_DIM>*>& rGetElementFluidSources();
+
+    /**
+     * @return reference to vector of balancing fluid sources
+     */
+    std::vector<FluidSource<SPACE_DIM>*>& rGetBalancingFluidSources();
 
     /**
      * @param index  the global index of a specified immersed boundary element.

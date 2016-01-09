@@ -254,29 +254,30 @@ unsigned ImmersedBoundaryCellPopulation<DIM>::RemoveDeadCells()
 template<unsigned DIM>
 void ImmersedBoundaryCellPopulation<DIM>::UpdateNodeLocations(double dt)
 {
-    // Get references to the fluid velocity grid
-    const multi_array<double, 3>& vel_grids = this->rGetMesh().rGet2dVelocityGrids();
-
-    /**
-     * Set up all necessary variables before loop for efficiency
-     */
-
-    // Vectors for displacement and location of node
-    c_vector<double, DIM> displacement;
-    c_vector<double, DIM> node_location;
-
-    // Get the size of the mesh and set up force grids
+    // Helper variables, pre-declared for efficiency
     unsigned num_grid_pts_x = this->rGetMesh().GetNumGridPtsX();
     unsigned num_grid_pts_y = this->rGetMesh().GetNumGridPtsY();
 
-    // Helper variables
-    double characteristic_spacing = mpImmersedBoundaryMesh->GetCharacteristicNodeSpacing();
-    double step_size_x = 1.0 / (double)num_grid_pts_x;
-    double step_size_y = 1.0 / (double)num_grid_pts_y;
-    double dist_x;
-    double dist_y;
-    int first_idx_x;
-    int first_idx_y;
+    double characteristic_spacing = this->rGetMesh().GetCharacteristicNodeSpacing();
+    double grid_spacing_x = 1.0 / (double)num_grid_pts_x;
+    double grid_spacing_y = 1.0 / (double)num_grid_pts_y;
+
+    unsigned first_idx_x;
+    unsigned first_idx_y;
+
+    std::vector<unsigned> x_indices(4);
+    std::vector<unsigned> y_indices(4);
+
+    std::vector<double> x_deltas(4);
+    std::vector<double> y_deltas(4);
+
+    double delta;
+
+    c_vector<double, DIM> node_location;
+    c_vector<double, DIM> displacement;
+
+    // Get references to the fluid velocity grid
+    const multi_array<double, 3>& vel_grids = this->rGetMesh().rGet2dVelocityGrids();
 
     // Iterate over all nodes
     for (typename ImmersedBoundaryMesh<DIM, DIM>::NodeIterator node_iter = this->rGetMesh().GetNodeIteratorBegin(false);
@@ -286,32 +287,29 @@ void ImmersedBoundaryCellPopulation<DIM>::UpdateNodeLocations(double dt)
         // Get location of current node
         node_location = node_iter->rGetLocation();
 
-        // Get first index in fluid velocity grid grid (x and y)
-        first_idx_x = (int) floor(node_location[0] / step_size_x) - 1;
-        first_idx_y = (int) floor(node_location[1] / step_size_y) - 1;
+        // Get first grid index in each dimension, taking account of possible wrap-around
+        first_idx_x = unsigned(floor(node_location[0] / grid_spacing_x)) + num_grid_pts_x - 1;
+        first_idx_y = unsigned(floor(node_location[1] / grid_spacing_y)) + num_grid_pts_y - 1;
+
+        // Calculate all four indices and deltas in each dimension
+        for (unsigned i = 0 ; i < 4 ; i ++)
+        {
+            x_indices[i] = (first_idx_x + i) % num_grid_pts_x;
+            y_indices[i] = (first_idx_y + i) % num_grid_pts_y;
+
+            x_deltas[i] = Delta1D(fabs(x_indices[i] * grid_spacing_x - node_location[0]), grid_spacing_x);
+            y_deltas[i] = Delta1D(fabs(y_indices[i] * grid_spacing_x - node_location[1]), grid_spacing_y);
+        }
 
         // Loop over the 4x4 grid which will influence the displacement of the current node
         for (unsigned x_idx = 0; x_idx < 4; x_idx++)
         {
-            // Calculate distance between current x index and node, then account for possible wrap-around
-            dist_x = fabs((double) (first_idx_x + x_idx) * step_size_x - node_location[0]);
-            if (first_idx_x == -1)
-            {
-                first_idx_x += num_grid_pts_x;
-            }
-
             for (unsigned y_idx = 0; y_idx < 4; y_idx++)
             {
-                // Calculate distance between current y index and node, then account for possible wrap-around
-                dist_y = fabs((double) (first_idx_y + y_idx) * step_size_y - node_location[1]);
-                if (first_idx_y == -1)
-                {
-                    first_idx_y += num_grid_pts_y;
-                }
-
                 // The applied velocity is weighted by the delta function
-                displacement[0] += vel_grids[0][(first_idx_x + x_idx) % num_grid_pts_x][(first_idx_y + y_idx) % num_grid_pts_y] * Delta1D(dist_x, step_size_x) * Delta1D(dist_y, step_size_y);
-                displacement[1] += vel_grids[1][(first_idx_x + x_idx) % num_grid_pts_x][(first_idx_y + y_idx) % num_grid_pts_y] * Delta1D(dist_x, step_size_x) * Delta1D(dist_y, step_size_y);
+                delta = x_deltas[x_idx] * y_deltas[y_idx];
+                displacement[0] += vel_grids[0][x_indices[x_idx]][y_indices[y_idx]] * delta;
+                displacement[1] += vel_grids[1][x_indices[x_idx]][y_indices[y_idx]] * delta;
             }
         }
 
