@@ -1,6 +1,6 @@
 Index: cell_based/src/simulation/OffLatticeSimulation.cpp
 ===================================================================
---- cell_based/src/simulation/OffLatticeSimulation.cpp	(revision 25767)
+--- cell_based/src/simulation/OffLatticeSimulation.cpp	(revision 25840)
 +++ cell_based/src/simulation/OffLatticeSimulation.cpp	(working copy)
 @@ -77,7 +77,7 @@
          // All classes derived from AbstractOffLatticeCellPopulation are covered by the above (except user-derived classes),
@@ -11,22 +11,54 @@ Index: cell_based/src/simulation/OffLatticeSimulation.cpp
      }
  }
  
-Index: mesh/src/common/NodeAttributes.cpp
+Index: mesh/src/utilities/BoxCollection.cpp
 ===================================================================
---- mesh/src/common/NodeAttributes.cpp	(revision 25767)
-+++ mesh/src/common/NodeAttributes.cpp	(working copy)
-@@ -115,10 +115,10 @@
- template<unsigned SPACE_DIM>
- void NodeAttributes<SPACE_DIM>::SetRadius(double radius)
+--- mesh/src/utilities/BoxCollection.cpp	(revision 25840)
++++ mesh/src/utilities/BoxCollection.cpp	(working copy)
+@@ -683,7 +683,7 @@
+                                             std::map<unsigned, std::set<unsigned> >& rNodeNeighbours)
  {
--    if (radius < 0.0)
--    {
--        EXCEPTION("Trying to set node attributes mRadius to a negative value.");
--    }
-+//    if (radius < 0.0)
-+//    {
-+//        EXCEPTION("Trying to set node attributes mRadius to a negative value.");
-+//    }
+     rNodePairs.clear();
+-    rNodeNeighbours.clear();
++//    rNodeNeighbours.clear();
  
-     mRadius = radius;
- }
+     // Ensure all boxes are empty
+     EmptyBoxes();
+@@ -691,7 +691,7 @@
+     // Create an empty set of neighbours for each node, and add each node to its correct box
+     for (unsigned node_index = 0; node_index < rNodes.size(); node_index++)
+     {
+-        rNodeNeighbours[node_index] = std::set<unsigned>();
++//        rNodeNeighbours[node_index] = std::set<unsigned>();
+ 
+         unsigned box_index = CalculateContainingBox(rNodes[node_index]);
+         mBoxes[box_index].AddNode(rNodes[node_index]);
+@@ -700,7 +700,7 @@
+     for (unsigned i = 0; i < rNodes.size(); i++)
+     {
+         Node<DIM>* this_node = rNodes[i];
+-        unsigned node_index = this_node->GetIndex();
++//        unsigned node_index = this_node->GetIndex();
+ 
+         // Get the box containing this node
+         unsigned this_node_box_index = CalculateContainingBox(this_node);
+@@ -728,15 +728,15 @@
+                     if (other_node_index > this_node->GetIndex())
+                     {
+                         rNodePairs.push_back(std::pair<Node<DIM>*, Node<DIM>*>(this_node, (*node_iter)));
+-                        rNodeNeighbours[node_index].insert(other_node_index);
+-                        rNodeNeighbours[other_node_index].insert(node_index);
++//                        rNodeNeighbours[node_index].insert(other_node_index);
++//                        rNodeNeighbours[other_node_index].insert(node_index);
+                     }
+                 }
+                 else
+                 {
+                     rNodePairs.push_back(std::pair<Node<DIM>*, Node<DIM>*>(this_node, (*node_iter)));
+-                    rNodeNeighbours[node_index].insert(other_node_index);
+-                    rNodeNeighbours[other_node_index].insert(node_index);
++//                    rNodeNeighbours[node_index].insert(other_node_index);
++//                    rNodeNeighbours[other_node_index].insert(node_index);
+                 }
+             }
+         }

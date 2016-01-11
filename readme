@@ -5,15 +5,20 @@ The following changes to the Chaste source need to be made:
 
  (1) A "NEVER_REACHED" needs to be commented out of `OffLatticeSimulation.cpp`
      to allow `ImmersedBoundaryCellPopulation` to be used
- (2) An exception needs to be removed (temporarily) from `NodeAttributes.cpp`
- (3) fftw must be linked by adding it to your hostconfig file
+ (2) For a large efficiency saving, certain lines need to be removed from
+     BoxCollection.cpp
+ (3) fftw must be linked by adding it to your hostconfig file or by including
+     extra lines in your project CMakeLists.txt
 
 These three changes can be implemented in the following way:
 
  (1) & (2) "patch -p0 < projects/ImmersedBoundary/ImmersedBoundary.patch"
            from the Chaste directory
  (3) Adding 'fftw3' and 'fftw3_threads' to the `other_libraries` variable in
-     your `python/hostconfig/machines/<NAME>.py` file
+     your `python/hostconfig/machines/<NAME>.py` file, or by adding the
+     following to the CMakeLists.txt for the project:
+         list(APPEND Chaste_LINK_LIBRARIES "fftw3")
+         list(APPEND Chaste_LINK_LIBRARIES "fftw3_threads")
 
 Finally, before running any simulations, it is strongly advised to first run the
 test `TestGenerateFftwWisdom.hpp`.  This will generate two plaintext files in
