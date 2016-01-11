@@ -158,7 +158,7 @@ std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ParabolicBoxDomainPdeModi
 template<unsigned DIM>
 void ParabolicBoxDomainPdeModifier<DIM>::SetupInitialSolutionVector(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
-    // Specify Homogeneous initial conditons based upon the values stored in CellData.
+    // Specify Homogeneous initial conditions based upon the values stored in CellData.
     // Note need all the CellDataValues to be the same.
 
     double initial_condition = rCellPopulation.Begin()->GetCellData()->GetItem(mpPdeAndBcs->rGetDependentVariableName());
@@ -168,6 +168,7 @@ void ParabolicBoxDomainPdeModifier<DIM>::SetupInitialSolutionVector(AbstractCell
          ++cell_iter)
     {
         double initial_condition_at_cell = cell_iter->GetCellData()->GetItem(mpPdeAndBcs->rGetDependentVariableName());
+        UNUSED_OPT(initial_condition_at_cell);
         assert(fabs(initial_condition_at_cell - initial_condition)<1e-12);
     }
 
