@@ -36,6 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define IMMERSEDBOUNDARYELEMENT_HPP_
 
 #include "MutableElement.hpp"
+#include "FluidSource.hpp"
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
@@ -64,8 +65,8 @@ private:
     /** Spring rest length associated with cell-cell interactions from this element. */
     double mCellCellRestLength;
 
-    /** Node representing a fluid source associated with this element. */
-    Node<SPACE_DIM>* mpSourceNode;
+    /** Fluid source associated with this element. */
+    FluidSource<SPACE_DIM>* mpFluidSource;
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
@@ -135,6 +136,13 @@ public:
     void SetCellCellRestLength(double restLength);
 
     /**
+     * Set mpFluidSource
+     *
+     * @param the fluid source associated with this element
+     */
+    void SetFluidSource(FluidSource<SPACE_DIM>* fluidSource);
+
+    /**
      * Get mMembraneSpringConstant
      *
      * @return the current spring constant
@@ -163,11 +171,11 @@ public:
     double GetCellCellRestLength(void);
 
     /**
-     * Get the source node
+     * Get the fluid source associated with this element
      *
-     * @return pointer to the source node
+     * @return pointer to the fluid source
      */
-    Node<SPACE_DIM>* GetSourceNode(void);
+    FluidSource<SPACE_DIM>* GetFluidSource(void);
 
 };
 
@@ -224,6 +232,13 @@ public:
     void SetCellCellRestLength(double restLength);
 
     /**
+     * Set mpFluidSource
+     *
+     * @param the fluid source associated with this element
+     */
+    void SetFluidSource(FluidSource<SPACE_DIM>* fluidSource);
+
+    /**
      * Get mMembraneSpringConstant
      *
      * @return the current spring constant
@@ -252,11 +267,11 @@ public:
     double GetCellCellRestLength(void);
 
     /**
-     * Get the source node
+     * Get the fluid source associated with this element
      *
-     * @return pointer to the source node
+     * @return pointer to the fluiod source
      */
-    Node<SPACE_DIM>* GetSourceNode(void);
+    FluidSource<SPACE_DIM>* GetFluidSource(void);
 
 };
 

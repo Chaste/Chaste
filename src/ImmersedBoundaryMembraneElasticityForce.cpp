@@ -41,8 +41,20 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned DIM>
 ImmersedBoundaryMembraneElasticityForce<DIM>::ImmersedBoundaryMembraneElasticityForce(ImmersedBoundaryCellPopulation<DIM>& rCellPopulation)
         : AbstractImmersedBoundaryForce<DIM>(),
-          mpCellPopulation(&rCellPopulation)
+          mpCellPopulation(&rCellPopulation),
+          mpMesh(&(rCellPopulation.rGetMesh())),
+mSpringConstant()
 {
+    // First verify that all elements have the same number of attributes
+    unsigned num_elem_attributes = mpMesh->GetElement(0)->GetNumElementAttributes();
+    for (unsigned elem_idx = 0 ; elem_idx < mpMesh->GetNumElements() ; elem_idx++)
+    {
+        if (num_elem_attributes != mpMesh->GetElement(elem_idx)->GetNumElementAttributes())
+        {
+            EXCEPTION("All elements must have the same number of attributes to use this force class.");
+        }
+    }
+
     /*
      * We split the nodes into three categories: basal, apical, and lateral.  We keep this information in the attribute
      * called region, with 0, 1, and 2 representing basal, apical, and lateral respectively.
@@ -65,7 +77,6 @@ ImmersedBoundaryMembraneElasticityForce<DIM>::ImmersedBoundaryMembraneElasticity
      *     3-----2
      *      Basal
      *
-     * The following two element attributes will represent the apical and basal rest lengths, respectively.
      */
 //    TagElementCorners();
 }

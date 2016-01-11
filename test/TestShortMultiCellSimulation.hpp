@@ -113,18 +113,25 @@ public:
         p_main_modifier->AddImmersedBoundaryForce(p_cell_cell_force);
 
 
+        double volume_before = p_mesh->GetVolumeOfElement(3);
+
+
         // Set simulation properties
         double dt = 0.005;
         simulator.SetOutputDirectory("TestShortMultiCellSimulation");
         simulator.SetDt(dt);
         simulator.SetSamplingTimestepMultiple(10);
-        simulator.SetEndTime(1000.0 * dt);
+        simulator.SetEndTime(500.0 * dt);
 
         setup_duration = timer.GetElapsedTime();
 
         simulator.Solve();
 
         simulation_duration = timer.GetElapsedTime() - setup_duration;
+
+        double volume_after = p_mesh->GetVolumeOfElement(3);
+
+        PRINT_VARIABLE(volume_after/volume_before);
 
         PRINT_2_VARIABLES(setup_duration, simulation_duration);
     }

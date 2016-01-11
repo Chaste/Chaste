@@ -110,7 +110,7 @@ ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryMesh(std::vector<N
     }
     mCharacteristicNodeSpacing = total_perimeter / double(total_nodes);
 
-    // Position source nodes at centroid of each cell, and set 'radius' (strength) to zero
+    // Position fluid sources at the centroid of each cell, and set strength to zero
     for (unsigned elem_it = 0 ; elem_it < elements.size() ; elem_it++)
     {
         unsigned this_elem_idx = mElements[elem_it]->GetIndex();
@@ -118,15 +118,17 @@ ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryMesh(std::vector<N
         // Each element other than the membrane element will have a source associated with it
         if (this_elem_idx != mMembraneIndex)
         {
+            // Create a new fluid source at the correct location for each element
             unsigned source_idx = mElementFluidSources.size();
             c_vector<double, SPACE_DIM> source_location = this->GetCentroidOfElement(this_elem_idx);
-
             mElementFluidSources.push_back(new FluidSource<SPACE_DIM>(source_idx, source_location));
 
             // Set source parameters
             mElementFluidSources.back()->SetAssociatedElementIndex(this_elem_idx);
-
             mElementFluidSources.back()->SetStrength(0.0);
+
+            // Associate source with element
+            mElements[elem_it]->SetFluidSource(mElementFluidSources.back());
         }
     }
 

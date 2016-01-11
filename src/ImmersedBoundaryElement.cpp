@@ -39,15 +39,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryElement(unsigned index,
                                                                          const std::vector<Node<SPACE_DIM>*>& rNodes)
-        : MutableElement<ELEMENT_DIM, SPACE_DIM>(index, rNodes)
+        : MutableElement<ELEMENT_DIM, SPACE_DIM>(index, rNodes),
+          mpFluidSource(NULL)
 {
     assert(ELEMENT_DIM == SPACE_DIM);
 
     // Ensure number of nodes is at least 2
     assert(rNodes.size() > 2);
-
-    mpSourceNode = new Node<SPACE_DIM>(0);
-    mpSourceNode->SetRadius(0.0);
 
     /*
      * Set default parameter values:
@@ -64,10 +62,7 @@ ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryElement(unsigne
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::~ImmersedBoundaryElement()
 {
-    if (mpSourceNode)
-    {
-        delete mpSourceNode;
-    }
+    // Do not delete fluid source - that is taken care of in the mesh (which owns the sources)
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -115,6 +110,12 @@ void ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::SetCellCellRestLength(doub
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::SetFluidSource(FluidSource<SPACE_DIM>* fluidSource)
+{
+    mpFluidSource = fluidSource;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::GetMembraneSpringConstant(void)
 {
     return mMembraneSpringConstant;
@@ -138,11 +139,10 @@ double ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::GetCellCellRestLength(vo
     return mCellCellRestLength;
 }
 
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-Node<SPACE_DIM>* ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::GetSourceNode(void)
+FluidSource<SPACE_DIM>* ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::GetFluidSource(void)
 {
-    return mpSourceNode;
+    return mpFluidSource;
 }
 
 
@@ -207,7 +207,12 @@ void ImmersedBoundaryElement<1, SPACE_DIM>::SetCellCellRestLength(double restLen
 }
 
 template<unsigned SPACE_DIM>
-Node<SPACE_DIM>* ImmersedBoundaryElement<1, SPACE_DIM>::GetSourceNode(void)
+void ImmersedBoundaryElement<1, SPACE_DIM>::SetFluidSource(FluidSource<SPACE_DIM>* fluidSource)
+{
+}
+
+template<unsigned SPACE_DIM>
+FluidSource<SPACE_DIM>* ImmersedBoundaryElement<1, SPACE_DIM>::GetFluidSource(void)
 {
     return NULL;
 }

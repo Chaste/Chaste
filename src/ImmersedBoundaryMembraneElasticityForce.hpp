@@ -42,6 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractImmersedBoundaryForce.hpp"
 #include "ImmersedBoundaryCellPopulation.hpp"
+#include "ImmersedBoundaryMesh.hpp"
 
 #include <iostream>
 
@@ -74,8 +75,17 @@ private:
 
 protected:
 
-    /** Pointer to the cell population */
+    /** The cell population */
     ImmersedBoundaryCellPopulation<DIM>* mpCellPopulation;
+
+    /** The immersed boundary mesh */
+    ImmersedBoundaryMesh<DIM,DIM>* mpMesh;
+
+    /** The membrane spring constant associated with each element */
+    double mSpringConst;
+
+    /** The membrane rest length associated with each element */
+    double mRestLength;
 
     /** Vector containing locations of corner-node-indices in the element attribute vectors */
     std::vector<unsigned> mCornerLocationsInAttributeVector;

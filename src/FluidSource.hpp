@@ -37,7 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _FLUIDSOURCE_HPP_
 
 #include "ChastePoint.hpp"
-#include "ImmersedBoundaryElement.hpp"
 
 /**
  * A fluid source in an Immersed Boundary Mesh, used in ImmersedBoundary simulations.

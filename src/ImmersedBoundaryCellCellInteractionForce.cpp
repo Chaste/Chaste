@@ -59,7 +59,7 @@ ImmersedBoundaryCellCellInteractionForce<DIM>::ImmersedBoundaryCellCellInteracti
     {
         if (num_node_attributes != mpMesh->GetNode(node_idx)->GetNumNodeAttributes())
         {
-            EXCEPTION("All nodes must have teh same number of attributes to use this force class.");
+            EXCEPTION("All nodes must have the same number of attributes to use this force class.");
         }
     }
 
