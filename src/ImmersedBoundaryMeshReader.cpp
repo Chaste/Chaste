@@ -193,8 +193,6 @@ ImmersedBoundaryElementData ImmersedBoundaryMeshReader<ELEMENT_DIM, SPACE_DIM>::
         element_data.AttributeValue = 0;
     }
 
-    buffer_stream >> element_data.SpringConstant;
-    buffer_stream >> element_data.RestLength;
     buffer_stream >> element_data.MembraneElement;
 
     mElementsRead++;

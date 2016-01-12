@@ -81,17 +81,62 @@ protected:
     /** The immersed boundary mesh */
     ImmersedBoundaryMesh<DIM,DIM>* mpMesh;
 
+    /** How far through the element attributes vector we are when this constructor is called */
+    unsigned mCurrentLocationInElementAttributesVector;
+
     /** The membrane spring constant associated with each element */
     double mSpringConst;
 
     /** The membrane rest length associated with each element */
     double mRestLength;
 
+    /** The multiplicative quantity by which we alter the spring constant of the basement lamina, if present */
+    double mBasementSpringConstantModifier;
+
+    /** The multiplicative quantity by which we alter the rest length of the basement lamina, if present */
+    double mBasementRestLengthModifier;
+
     /** Vector containing locations of corner-node-indices in the element attribute vectors */
     std::vector<unsigned> mCornerLocationsInAttributeVector;
 
     /** Vector containing locations of apical and basal rest-lengths in the element attribute vectors */
     std::vector<unsigned> mRestLengthLocationsInAttributeVector;
+
+    /**
+     * @param elemIndex index of the element to retrieve corner node index of
+     * @return corner node index of the specified element
+     */
+    unsigned GetLeftApicalCornerNodeIndexForElement(unsigned elemIndex);
+
+    /**
+     * @param elemIndex index of the element to retrieve corner node index of
+     * @return corner node index of the specified element
+     */
+    unsigned GetRightApicalCornerNodeIndexForElement(unsigned elemIndex);
+
+    /**
+     * @param elemIndex index of the element to retrieve corner node index of
+     * @return corner node index of the specified element
+     */
+    unsigned GetRightBasalCornerNodeIndexForElement(unsigned elemIndex);
+
+    /**
+     * @param elemIndex index of the element to retrieve corner node index of
+     * @return corner node index of the specified element
+     */
+    unsigned GetLeftBasalCornerNodeIndexForElement(unsigned elemIndex);
+
+    /**
+     * @param elemIndex index of the element to retrieve apical length of
+     * @return apical length of the specified element
+     */
+    double GetApicalLengthForElement(unsigned elemIndex);
+
+    /**
+     * @param elemIndex index of the element to retrieve basal length of
+     * @return basal length of the specified element
+     */
+    double GetBasalLengthForElement(unsigned elemIndex);
 
 public:
 

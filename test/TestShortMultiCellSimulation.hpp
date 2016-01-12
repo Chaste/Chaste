@@ -81,16 +81,6 @@ public:
 
         p_mesh->SetNumGridPtsXAndY(512);
 
-
-        for (unsigned elem_idx = 0; elem_idx < p_mesh->GetNumElements() ; elem_idx++)
-        {
-            p_mesh->GetElement(elem_idx)->SetMembraneSpringConstant(1e9);
-            p_mesh->GetElement(elem_idx)->SetMembraneRestLength(0.25 * p_mesh->GetCharacteristicNodeSpacing());
-        }
-
-        p_mesh->GetElement(0)->SetMembraneSpringConstant(2e9);
-//        p_mesh->GetElement(0)->SetMembraneRestLength(0.001 * p_mesh->GetCharacteristicNodeSpacing());
-
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
@@ -115,13 +105,12 @@ public:
 
         double volume_before = p_mesh->GetVolumeOfElement(3);
 
-
         // Set simulation properties
         double dt = 0.005;
         simulator.SetOutputDirectory("TestShortMultiCellSimulation");
         simulator.SetDt(dt);
-        simulator.SetSamplingTimestepMultiple(10);
-        simulator.SetEndTime(500.0 * dt);
+        simulator.SetSamplingTimestepMultiple(1);
+        simulator.SetEndTime(50.0 * dt);
 
         setup_duration = timer.GetElapsedTime();
 

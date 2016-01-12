@@ -137,9 +137,6 @@ ImmersedBoundaryElementData ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::
     // Set attribute
     elem_data.AttributeValue = (*(mpIters->pElemIter))->GetAttribute();
 
-
-    elem_data.SpringConstant = (*(mpIters->pElemIter))->GetMembraneSpringConstant();
-    elem_data.RestLength = (*(mpIters->pElemIter))->GetMembraneRestLength();
     elem_data.MembraneElement = bool( (*(mpIters->pElemIter))->GetIndex() == mMembraneIndex );
 
     ++(*(mpIters->pElemIter));

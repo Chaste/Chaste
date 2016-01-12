@@ -53,18 +53,6 @@ class ImmersedBoundaryElement : public MutableElement<ELEMENT_DIM, SPACE_DIM>
 {
 private:
 
-    /** Spring constant associated with the immersed boundary element membrane. */
-    double mMembraneSpringConstant;
-
-    /** Spring rest length associated with the immersed boundary element membrane. */
-    double mMembraneRestLength;
-
-    /** Spring constant associated cell-cell interactions from this element. */
-    double mCellCellSpringConstant;
-
-    /** Spring rest length associated with cell-cell interactions from this element. */
-    double mCellCellRestLength;
-
     /** Fluid source associated with this element. */
     FluidSource<SPACE_DIM>* mpFluidSource;
 
@@ -86,8 +74,6 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         // This needs to be first so that MeshBasedCellPopulation::Validate() doesn't go mental.
-        archive & mMembraneSpringConstant;
-        archive & mMembraneRestLength;
         archive & boost::serialization::base_object<MutableElement<ELEMENT_DIM, SPACE_DIM> >(*this);
     }
 
@@ -108,67 +94,11 @@ public:
     ~ImmersedBoundaryElement();
 
     /**
-     * Set mMembraneSpringConstant
-     *
-     * @param the new spring constant
-     */
-    void SetMembraneSpringConstant(double springConstant);
-
-    /**
-     * Set mRestLength
-     *
-     * @param the new rest length
-     */
-    void SetMembraneRestLength(double restLength);
-
-    /**
-     * Set mCellCellSpringConstant
-     *
-     * @param the new spring constant
-     */
-    void SetCellCellSpringConstant(double springConstant);
-
-    /**
-     * Set mRestLength
-     *
-     * @param the new rest length
-     */
-    void SetCellCellRestLength(double restLength);
-
-    /**
      * Set mpFluidSource
      *
      * @param the fluid source associated with this element
      */
     void SetFluidSource(FluidSource<SPACE_DIM>* fluidSource);
-
-    /**
-     * Get mMembraneSpringConstant
-     *
-     * @return the current spring constant
-     */
-    double GetMembraneSpringConstant(void);
-
-    /**
-     * Get mRestLength
-     *
-     * @return the current rest length
-     */
-    double GetMembraneRestLength(void);
-
-    /**
-     * Get mCellCellSpringConstant
-     *
-     * @return the current spring constant
-     */
-    double GetCellCellSpringConstant(void);
-
-    /**
-     * Get mCellCellRestLength
-     *
-     * @return the current rest length
-     */
-    double GetCellCellRestLength(void);
 
     /**
      * Get the fluid source associated with this element
@@ -204,67 +134,11 @@ public:
     ImmersedBoundaryElement(unsigned index, const std::vector<Node<SPACE_DIM>*>& rNodes);
 
     /**
-     * Set mMembraneSpringConstant
-     *
-     * @param the new spring constant
-     */
-    void SetMembraneSpringConstant(double springConstant);
-
-    /**
-     * Set mRestLength
-     *
-     * @param the new rest length
-     */
-    void SetMembraneRestLength(double restLength);
-
-    /**
-     * Set mCellCellSpringConstant
-     *
-     * @param the new spring constant
-     */
-    void SetCellCellSpringConstant(double springConstant);
-
-    /**
-     * Set mRestLength
-     *
-     * @param the new rest length
-     */
-    void SetCellCellRestLength(double restLength);
-
-    /**
      * Set mpFluidSource
      *
      * @param the fluid source associated with this element
      */
     void SetFluidSource(FluidSource<SPACE_DIM>* fluidSource);
-
-    /**
-     * Get mMembraneSpringConstant
-     *
-     * @return the current spring constant
-     */
-    double GetMembraneSpringConstant(void);
-
-    /**
-     * Get mMembraneRestLength
-     *
-     * @return the current rest length
-     */
-    double GetMembraneRestLength(void);
-
-    /**
-     * Get mCellCellSpringConstant
-     *
-     * @return the current spring constant
-     */
-    double GetCellCellSpringConstant(void);
-
-    /**
-     * Get mCellCellRestLength
-     *
-     * @return the current rest length
-     */
-    double GetCellCellRestLength(void);
 
     /**
      * Get the fluid source associated with this element

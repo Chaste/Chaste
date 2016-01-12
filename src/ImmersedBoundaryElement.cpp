@@ -46,17 +46,6 @@ ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryElement(unsigne
 
     // Ensure number of nodes is at least 2
     assert(rNodes.size() > 2);
-
-    /*
-     * Set default parameter values:
-     *   Assuming the nodes are roughly uniformly spaced, the default rest length is 25% of the distance between
-     *   the first two nodes.
-     */
-    mMembraneSpringConstant = 1e5;
-    mMembraneRestLength = 0.25 * norm_2(rNodes[0]->rGetLocation() - rNodes[1]->rGetLocation());
-
-    mCellCellSpringConstant = 50.0;
-    mCellCellRestLength = 0.01;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -66,77 +55,9 @@ ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::~ImmersedBoundaryElement()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::SetMembraneSpringConstant(double springConstant)
-{
-    if (springConstant < 0.0)
-    {
-        EXCEPTION("This parameter must be non-negative");
-    }
-
-    mMembraneSpringConstant = springConstant;
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::SetMembraneRestLength(double restLength)
-{
-    if (restLength < 0.0)
-    {
-        EXCEPTION("This parameter must be non-negative");
-    }
-
-    mMembraneRestLength = restLength;
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::SetCellCellSpringConstant(double springConstant)
-{
-    if (springConstant < 0.0)
-    {
-        EXCEPTION("This parameter must be non-negative");
-    }
-
-    mCellCellSpringConstant = springConstant;
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::SetCellCellRestLength(double restLength)
-{
-    if (restLength < 0.0)
-    {
-        EXCEPTION("This parameter must be non-negative");
-    }
-
-    mCellCellRestLength = restLength;
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::SetFluidSource(FluidSource<SPACE_DIM>* fluidSource)
 {
     mpFluidSource = fluidSource;
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::GetMembraneSpringConstant(void)
-{
-    return mMembraneSpringConstant;
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::GetMembraneRestLength(void)
-{
-    return mMembraneRestLength;
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::GetCellCellSpringConstant(void)
-{
-    return mCellCellSpringConstant;
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::GetCellCellRestLength(void)
-{
-    return mCellCellRestLength;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -159,50 +80,6 @@ FluidSource<SPACE_DIM>* ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::GetFlui
 template<unsigned SPACE_DIM>
 ImmersedBoundaryElement<1, SPACE_DIM>::ImmersedBoundaryElement(unsigned index, const std::vector<Node<SPACE_DIM>*>& rNodes)
     : MutableElement<1, SPACE_DIM>(index, rNodes)
-{
-}
-
-template<unsigned SPACE_DIM>
-double ImmersedBoundaryElement<1, SPACE_DIM>::GetMembraneSpringConstant(void)
-{
-    return 0.0;
-}
-
-template<unsigned SPACE_DIM>
-double ImmersedBoundaryElement<1, SPACE_DIM>::GetMembraneRestLength(void)
-{
-    return 0.0;
-}
-
-template<unsigned SPACE_DIM>
-double ImmersedBoundaryElement<1, SPACE_DIM>::GetCellCellSpringConstant(void)
-{
-    return 0.0;
-}
-
-template<unsigned SPACE_DIM>
-double ImmersedBoundaryElement<1, SPACE_DIM>::GetCellCellRestLength(void)
-{
-    return 0.0;
-}
-
-template<unsigned SPACE_DIM>
-void ImmersedBoundaryElement<1, SPACE_DIM>::SetMembraneSpringConstant(double springConstant)
-{
-}
-
-template<unsigned SPACE_DIM>
-void ImmersedBoundaryElement<1, SPACE_DIM>::SetMembraneRestLength(double restLength)
-{
-}
-
-template<unsigned SPACE_DIM>
-void ImmersedBoundaryElement<1, SPACE_DIM>::SetCellCellSpringConstant(double springConstant)
-{
-}
-
-template<unsigned SPACE_DIM>
-void ImmersedBoundaryElement<1, SPACE_DIM>::SetCellCellRestLength(double restLength)
 {
 }
 

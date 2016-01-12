@@ -34,22 +34,23 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "ImmersedBoundaryMembraneElasticityForce.hpp"
-
-#include "ImmersedBoundaryMesh.hpp"
-#include "ImmersedBoundaryElement.hpp"
+#include "Debug.hpp"
 
 template<unsigned DIM>
 ImmersedBoundaryMembraneElasticityForce<DIM>::ImmersedBoundaryMembraneElasticityForce(ImmersedBoundaryCellPopulation<DIM>& rCellPopulation)
         : AbstractImmersedBoundaryForce<DIM>(),
           mpCellPopulation(&rCellPopulation),
           mpMesh(&(rCellPopulation.rGetMesh())),
-mSpringConstant()
+          mSpringConst(1e9),
+          mRestLength(0.25 * mpMesh->GetCharacteristicNodeSpacing()),
+          mBasementSpringConstantModifier(2.0),
+          mBasementRestLengthModifier(0.5)
 {
     // First verify that all elements have the same number of attributes
-    unsigned num_elem_attributes = mpMesh->GetElement(0)->GetNumElementAttributes();
-    for (unsigned elem_idx = 0 ; elem_idx < mpMesh->GetNumElements() ; elem_idx++)
+    mCurrentLocationInElementAttributesVector = mpMesh->GetElement(0)->GetNumElementAttributes();
+    for (unsigned elem_idx = 1 ; elem_idx < mpMesh->GetNumElements() ; elem_idx++)
     {
-        if (num_elem_attributes != mpMesh->GetElement(elem_idx)->GetNumElementAttributes())
+        if (mCurrentLocationInElementAttributesVector != mpMesh->GetElement(elem_idx)->GetNumElementAttributes())
         {
             EXCEPTION("All elements must have the same number of attributes to use this force class.");
         }
@@ -77,8 +78,17 @@ mSpringConstant()
      *     3-----2
      *      Basal
      *
+     * The next two element attributes store the starting distance between the apical corners and basal corners, giving
+     * us:
+     *
+     * Attribute i:   Left-apical-corner node index
+     *           i+1: Right-apical-corner node index
+     *           i+2: Right-basal-corner node index
+     *           i+3: Left-basal-corner node index
+     *           i+4: Initial distance between apical corners
+     *           i+5: Initial distance between basal corners
      */
-//    TagElementCorners();
+    TagElementCorners();
 }
 
 template<unsigned DIM>
@@ -89,6 +99,66 @@ ImmersedBoundaryMembraneElasticityForce<DIM>::ImmersedBoundaryMembraneElasticity
 template<unsigned DIM>
 ImmersedBoundaryMembraneElasticityForce<DIM>::~ImmersedBoundaryMembraneElasticityForce()
 {
+}
+
+template<unsigned DIM>
+unsigned ImmersedBoundaryMembraneElasticityForce<DIM>::GetLeftApicalCornerNodeIndexForElement(unsigned elemIndex)
+{
+    // Calculate correct location in attributes vector and check it's valid
+    unsigned attribute_location = mCurrentLocationInElementAttributesVector;
+    assert(attribute_location < mpMesh->GetElement(elemIndex)->GetNumElementAttributes());
+
+    return unsigned(mpMesh->GetElement(elemIndex)->rGetElementAttributes()[attribute_location]);
+}
+
+template<unsigned DIM>
+unsigned ImmersedBoundaryMembraneElasticityForce<DIM>::GetRightApicalCornerNodeIndexForElement(unsigned elemIndex)
+{
+    // Calculate correct location in attributes vector and check it's valid
+    unsigned attribute_location = mCurrentLocationInElementAttributesVector + 1;
+    assert(attribute_location < mpMesh->GetElement(elemIndex)->GetNumElementAttributes());
+
+    return unsigned(mpMesh->GetElement(elemIndex)->rGetElementAttributes()[attribute_location]);
+}
+
+template<unsigned DIM>
+unsigned ImmersedBoundaryMembraneElasticityForce<DIM>::GetRightBasalCornerNodeIndexForElement(unsigned elemIndex)
+{
+    // Calculate correct location in attributes vector and check it's valid
+    unsigned attribute_location = mCurrentLocationInElementAttributesVector + 2;
+    assert(attribute_location < mpMesh->GetElement(elemIndex)->GetNumElementAttributes());
+
+    return unsigned(mpMesh->GetElement(elemIndex)->rGetElementAttributes()[attribute_location]);
+}
+
+template<unsigned DIM>
+unsigned ImmersedBoundaryMembraneElasticityForce<DIM>::GetLeftBasalCornerNodeIndexForElement(unsigned elemIndex)
+{
+    // Calculate correct location in attributes vector and check it's valid
+    unsigned attribute_location = mCurrentLocationInElementAttributesVector + 3;
+    assert(attribute_location < mpMesh->GetElement(elemIndex)->GetNumElementAttributes());
+
+    return unsigned(mpMesh->GetElement(elemIndex)->rGetElementAttributes()[attribute_location]);
+}
+
+template<unsigned DIM>
+double ImmersedBoundaryMembraneElasticityForce<DIM>::GetApicalLengthForElement(unsigned elemIndex)
+{
+    // Calculate correct location in attributes vector and check it's valid
+    unsigned attribute_location = mCurrentLocationInElementAttributesVector + 4;
+    assert(attribute_location < mpMesh->GetElement(elemIndex)->GetNumElementAttributes());
+
+    return mpMesh->GetElement(elemIndex)->rGetElementAttributes()[attribute_location];
+}
+
+template<unsigned DIM>
+double ImmersedBoundaryMembraneElasticityForce<DIM>::GetBasalLengthForElement(unsigned elemIndex)
+{
+    // Calculate correct location in attributes vector and check it's valid
+    unsigned attribute_location = mCurrentLocationInElementAttributesVector + 5;
+    assert(attribute_location < mpMesh->GetElement(elemIndex)->GetNumElementAttributes());
+
+    return mpMesh->GetElement(elemIndex)->rGetElementAttributes()[attribute_location];
 }
 
 template<unsigned DIM>
@@ -104,16 +174,26 @@ void ImmersedBoundaryMembraneElasticityForce<DIM>::AddForceContribution(std::vec
         unsigned num_nodes = elem_iter->GetNumNodes();
         assert(num_nodes > 0);
 
-        // Get spring parameters (owned by the elements as they may differ within the element population)
-        double spring_constant = elem_iter->GetMembraneSpringConstant();
-        double rest_length = elem_iter->GetMembraneRestLength();
-
         // Helper variables
         double normed_dist;
         c_vector<double, DIM> aggregate_force;
 
         // Make a vector to store the force on node i+1 from node i
         std::vector<c_vector<double, DIM> > elastic_force_to_next_node(num_nodes);
+
+        double spring_constant = mSpringConst;
+        double rest_length = mRestLength;
+
+        /*
+         * Here we make any necessary modifications to the spring properties
+         */
+
+        // The basement lamina, if present, will have different properties
+        if (elem_iter->GetIndex() == mpMesh->GetMembraneIndex())
+        {
+            spring_constant *= mBasementSpringConstantModifier;
+            rest_length *= mBasementRestLengthModifier;
+        }
 
         // Loop over nodes and calculate the force exerted on node i+1 by node i
         for (unsigned node_idx = 0 ; node_idx < num_nodes ; node_idx++)
@@ -123,13 +203,6 @@ void ImmersedBoundaryMembraneElasticityForce<DIM>::AddForceContribution(std::vec
 
             double modified_spring_constant = spring_constant;
             double modified_rest_length = rest_length;
-
-            // If the node is apical or basal, increase the spring constant
-            if (elem_iter->GetNode(node_idx)->GetRegion() < 2)
-            {
-                modified_spring_constant *= 10.0;
-                modified_rest_length *= 4.0;
-            }
 
             // Hooke's law linear spring force
             elastic_force_to_next_node[node_idx] = p_mesh->GetVectorFromAtoB(elem_iter->GetNodeLocation(next_idx), elem_iter->GetNodeLocation(node_idx));
@@ -147,6 +220,42 @@ void ImmersedBoundaryMembraneElasticityForce<DIM>::AddForceContribution(std::vec
 
             // Add the aggregate force contribution to the node
             elem_iter->GetNode(node_idx)->AddAppliedForceContribution(aggregate_force);
+        }
+
+        // Add force contributions from apical and basal parts
+        if (elem_iter->GetIndex() != mpMesh->GetMembraneIndex())
+        {
+            // Apical nodes
+            Node<DIM> *p_apical_left = elem_iter->GetNode(GetLeftApicalCornerNodeIndexForElement(elem_iter->GetIndex()));
+            Node<DIM> *p_apical_right = elem_iter->GetNode(GetRightApicalCornerNodeIndexForElement(elem_iter->GetIndex()));
+
+            c_vector<double, DIM> apical_force = p_mesh->GetVectorFromAtoB(p_apical_left->rGetLocation(),
+                                                                           p_apical_right->rGetLocation());
+            normed_dist = norm_2(apical_force);
+            apical_force *=
+                    0.1 * mSpringConst * (normed_dist - GetApicalLengthForElement(elem_iter->GetIndex())) / normed_dist;
+
+            p_apical_left->AddAppliedForceContribution(apical_force);
+            apical_force *= -1.0;
+            p_apical_right->AddAppliedForceContribution(apical_force);
+
+
+            // Basal nodes
+            Node<DIM> *p_basal_left = elem_iter->GetNode(GetLeftBasalCornerNodeIndexForElement(elem_iter->GetIndex()));
+            Node<DIM> *p_basal_right = elem_iter->GetNode(GetRightBasalCornerNodeIndexForElement(elem_iter->GetIndex()));
+
+            c_vector<double, DIM> basal_force = p_mesh->GetVectorFromAtoB(p_basal_left->rGetLocation(),
+                                                                          p_basal_right->rGetLocation());
+            PRINT_VECTOR(basal_force);
+            PRINT_VECTOR(p_basal_left->rGetLocation());
+            PRINT_VECTOR(p_basal_right->rGetLocation());
+            normed_dist = norm_2(basal_force);
+            basal_force *=
+                    0.0 * mSpringConst * (normed_dist - GetBasalLengthForElement(elem_iter->GetIndex())) / normed_dist;
+
+            p_basal_left->AddAppliedForceContribution(basal_force);
+            basal_force *= -1.0;
+            p_basal_right->AddAppliedForceContribution(basal_force);
         }
     }
 }
@@ -227,132 +336,97 @@ void ImmersedBoundaryMembraneElasticityForce<DIM>::TagNodeRegions()
 template<unsigned DIM>
 void ImmersedBoundaryMembraneElasticityForce<DIM>::TagElementCorners()
 {
-//    ImmersedBoundaryMesh<DIM,DIM>* p_mesh = &(mpCellPopulation->rGetMesh());
-//
-//    // First loop through all elements to check they have the same number of attributes
-//    assert(p_mesh->GetNumElements() > 0);
-//    unsigned num_elem_attributes = p_mesh->GetElement(0)->GetNumElementAttributes();
-//
-//    for (unsigned elem_idx = 1 ; elem_idx < p_mesh->GetNumElements() ; elem_idx++)
-//    {
-//        if (p_mesh->GetElement(elem_idx)->GetNumElementAttributes() != num_elem_attributes)
-//        {
-//            EXCEPTION("This class requires each element to have the same number of attributes");
-//        }
-//    }
-//
-//    // Set up corner locations in the attribute vector, so AddForceContribution knows where to look
-//    mCornerLocationsInAttributeVector.push_back(num_elem_attributes);
-//    mCornerLocationsInAttributeVector.push_back(num_elem_attributes + 1);
-//    mCornerLocationsInAttributeVector.push_back(num_elem_attributes + 2);
-//    mCornerLocationsInAttributeVector.push_back(num_elem_attributes + 3);
-//
-//    // Set up rest-length locations in the attribute vector, so AddForceContribution knows where to look
-//    mRestLengthLocationsInAttributeVector.push_back(num_elem_attributes + 4);
-//    mRestLengthLocationsInAttributeVector.push_back(num_elem_attributes + 5);
-//
-//    /*
-//     * Loop through elements and set corner locations.
-//     *
-//     * Corner 0 will be the left-most  apical node.
-//     * Corner 1 will be the right-most apical node.
-//     * Corner 2 will be the right-most basal node.
-//     * Corner 3 will be the left-most  basal node.
-//     */
-//    for (unsigned elem_idx = 0 ; elem_idx < p_mesh->GetNumElements() ; elem_idx++)
-//    {
-//        ImmersedBoundaryElement<DIM,DIM>* p_this_elem = p_mesh->GetElement(elem_idx);
-//
-//        if (p_mesh->GetMembraneIndex() == p_this_elem->GetIndex())
-//        {
-//            /*
-//             * The basement lamina need not have any attributes associated with it, as it is treated differently when
-//             * calculating forces.  However, we require each element to have the same number of attributes, so we add
-//             * arbitrary attributes (with no meaning) to the vector.
-//             */
-//
-//            // Basement lamina will have no corners, so we set each corner to 0
-//            p_this_elem->AddElementAttribute(0.0);
-//            p_this_elem->AddElementAttribute(0.0);
-//            p_this_elem->AddElementAttribute(0.0);
-//            p_this_elem->AddElementAttribute(0.0);
-//
-//            // Basement lamina will have rest-length attributes set to 1.0
-//            p_this_elem->AddElementAttribute(1.0);
-//            p_this_elem->AddElementAttribute(1.0);
-//        }
-//        else // not the basal lamina
-//        {
-//            double left_most_apical  = DBL_MAX;
-//            double right_most_apical = -DBL_MAX;
-//            double left_most_basal   = DBL_MAX;
-//            double right_most_basal  = -DBL_MAX;
-//
-//            unsigned left_apical_idx;
-//            unsigned right_apical_idx;
-//            unsigned left_basal_idx;
-//            unsigned right_basal_idx;
-//
-//            c_vector<double, DIM> origin = zero_vector<double>(DIM);
-//
-//            // Calculate the node indices corresponding to the left-most and right-most apical and basal nodes in the
-//            // current element
-//            for (unsigned node_idx = 0 ; node_idx < p_this_elem->GetNumNodes() ; node_idx++)
-//            {
-//                Node<DIM>* p_this_node = p_this_elem->GetNode(node_idx);
-//
-//                if (p_this_node->GetRegion() == 1) //apical
-//                {
-//                    // Get the deviation of the current location from the origin, taking into account periodicity
-//                    double x_deviation = p_mesh->GetVectorFromAtoB(origin, p_this_elem->GetNode(node_idx)->rGetLocation())[0];
-//
-//                    if(x_deviation < left_most_apical)
-//                    {
-//                        left_most_apical = x_deviation;
-//                        left_apical_idx = node_idx;
-//                    }
-//                    if(x_deviation > right_most_apical)
-//                    {
-//                        right_most_apical = x_deviation;
-//                        right_apical_idx = node_idx;
-//                    }
-//                }
-//                else if (p_this_node->GetRegion() == 0) //basal
-//                {
-//                    // Get the deviation of the current location from the origin, taking into account periodicity
-//                    double x_deviation = p_mesh->GetVectorFromAtoB(origin, p_this_elem->GetNode(node_idx)->rGetLocation())[0];
-//
-//                    if(x_deviation < left_most_basal)
-//                    {
-//                        left_most_basal = x_deviation;
-//                        left_basal_idx = node_idx;
-//                    }
-//                    if(x_deviation > right_most_basal)
-//                    {
-//                        right_most_basal = x_deviation;
-//                        right_basal_idx = node_idx;
-//                    }
-//                }
-//                else
-//                {
-//                    // Lateral - nothing to do
-//                }
-//            }
-//
-//            double apical_rest_length = norm_2(p_mesh->GetVectorFromAtoB(p_this_elem->GetNode(left_apical_idx)->rGetLocation()),
-//                                               p_mesh->GetVectorFromAtoB(p_this_elem->GetNode(right_apical_idx)->rGetLocation()));
-//
-//            // Basement lamina will have no corners, so we set each corner to 0
-//            p_this_elem->AddElementAttribute(left_apical_idx);
-//            p_this_elem->AddElementAttribute(0.0);
-//            p_this_elem->AddElementAttribute(0.0);
-//            p_this_elem->AddElementAttribute(0.0);
-//
-//            // Basement lamina will have rest-length attributes set to 1.0
-//            p_this_elem->AddElementAttribute(1.0);
-//            p_this_elem->AddElementAttribute(1.0);
-//        }
-//    }
+    /*
+     * Loop through elements and set corner locations.
+     *
+     * Corner 0 will be the left-most  apical node.
+     * Corner 1 will be the right-most apical node.
+     * Corner 2 will be the right-most basal node.
+     * Corner 3 will be the left-most  basal node.
+     */
+    for (unsigned elem_idx = 0 ; elem_idx < mpMesh->GetNumElements() ; elem_idx++)
+    {
+        if (elem_idx == mpMesh->GetMembraneIndex())
+        {
+            // Corners are irrelevant for the basement lamina, so set all six attributes to zero
+            mpMesh->GetElement(elem_idx)->AddElementAttribute(0.0); //L-A
+            mpMesh->GetElement(elem_idx)->AddElementAttribute(0.0); //R-A
+            mpMesh->GetElement(elem_idx)->AddElementAttribute(0.0); //R-B
+            mpMesh->GetElement(elem_idx)->AddElementAttribute(0.0); //L-B
+            mpMesh->GetElement(elem_idx)->AddElementAttribute(0.0); //A-length
+            mpMesh->GetElement(elem_idx)->AddElementAttribute(0.0); //B-length
+        }
+        else
+        {
+            /*
+             * Due to the pay elements are created using the palisade mesh generator, node 0 should be lateral, and
+             * proceeding anticlockwise we should first come to a contiguous set of apical nodes, then lateral, then
+             * basal.
+             */
+
+            if (mpMesh->GetElement(elem_idx)->GetNode(0)->GetRegion() != 2)
+            {
+                EXCEPTION("This class is intended only for use with the ImmersedBoundaryPalisadeMeshGenerator class");
+            }
+
+            unsigned apical_left = UINT_MAX;
+            unsigned apical_right = UINT_MAX;
+            unsigned basal_right = UINT_MAX;
+            unsigned basal_left = UINT_MAX;
+
+            unsigned num_nodes = mpMesh->GetElement(elem_idx)->GetNumNodes();
+
+            unsigned last_region = 2; //lateral
+
+            for (unsigned node_idx = 1 ; node_idx < num_nodes ; node_idx++)
+            {
+                unsigned this_region = mpMesh->GetElement(elem_idx)->GetNode(node_idx)->GetRegion();
+
+                if (this_region == 1 && last_region == 2)  //lateral -> apical transition
+                {
+                    apical_right = node_idx;
+                }
+                else if (this_region == 2 && last_region == 1) // apical -> lateral transition
+                {
+                    apical_left = node_idx - 1;
+                }
+                else if (this_region == 0 && last_region == 2) // lateral -> basal transition
+                {
+                    basal_left = node_idx;
+                }
+                else if (this_region == 2 && last_region == 0) // basal -> lateral transition
+                {
+                    basal_right = node_idx - 1;
+                }
+
+                last_region = this_region;
+            }
+
+            if (apical_left == UINT_MAX || apical_right == UINT_MAX || basal_right == UINT_MAX || basal_left == UINT_MAX)
+            {
+                EXCEPTION("Some corner nodes not tagged.");
+            }
+
+            if (apical_right >= apical_left || apical_left >= basal_left || basal_left >= basal_right)
+            {
+                EXCEPTION("Corner nodes have not been tagged correctly.");
+            }
+
+            mpMesh->GetElement(elem_idx)->AddElementAttribute(double(apical_left));
+            mpMesh->GetElement(elem_idx)->AddElementAttribute(double(apical_right));
+            mpMesh->GetElement(elem_idx)->AddElementAttribute(double(basal_right));
+            mpMesh->GetElement(elem_idx)->AddElementAttribute(double(basal_left));
+
+            double apical_length = norm_2(mpMesh->GetElement(elem_idx)->GetNode(apical_left)->rGetLocation() -
+                                          mpMesh->GetElement(elem_idx)->GetNode(apical_right)->rGetLocation());
+
+            double basal_length  = norm_2(mpMesh->GetElement(elem_idx)->GetNode(basal_left)->rGetLocation() -
+                                          mpMesh->GetElement(elem_idx)->GetNode(basal_right)->rGetLocation());
+
+            mpMesh->GetElement(elem_idx)->AddElementAttribute(apical_length);
+            mpMesh->GetElement(elem_idx)->AddElementAttribute(basal_length);
+        }
+    }
 }
 
 template<unsigned DIM>
