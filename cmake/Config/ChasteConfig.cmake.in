@@ -67,6 +67,8 @@ if(NOT TARGET global AND NOT Chaste_BINARY_DIR)
     set(Chaste_INCLUDES @Chaste_INCLUDES@)
     set(Chaste_LINK_LIBRARIES @Chaste_LINK_LIBRARIES@)
 
+    set(Chaste_ALL_LIBRARIES @Chaste_ALL_LIBRARIES@)
+
     set(TestPackTypes @TestPackTypes@)
 
     # Our library dependencies (contains definitions for IMPORTED targets)
@@ -107,16 +109,16 @@ foreach(component ${Chaste_FIND_COMPONENTS_AND_DEPS})
     # Set up the component include directories
     list(APPEND Chaste_INCLUDE_DIRS "${Chaste_${component}_INCLUDE_DIRS}")
 
-    if (NOT TARGET ${component})
+    if (NOT TARGET chaste_${component})
         message(SEND_ERROR "Cannot find component ${component}")
     elseif(Chaste_USE_SHARED_LIBS)
-        get_target_property(is_shared ${component} POSITION_INDEPENDENT_CODE)
+        get_target_property(is_shared chaste_${component} POSITION_INDEPENDENT_CODE)
         if (NOT is_shared)
             message(SEND_ERROR "Requesting shared libraries but ${component} is not a shared library!")
         endif()
     endif()
 
     # These are IMPORTED targets created by ChasteTargets.cmake
-    list(APPEND Chaste_LIBRARIES ${component})
+    list(APPEND Chaste_LIBRARIES chaste_${component})
 endforeach(component)
 

@@ -33,7 +33,7 @@ file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/dynamic)
 chaste_do_component(heart ${Chaste_heart_SOURCES})
 
 # make sure to link dl libraries
-target_link_libraries(heart LINK_PUBLIC ${CMAKE_DL_LIBS})
+target_link_libraries(chaste_heart LINK_PUBLIC ${CMAKE_DL_LIBS})
 
 # Compile dynamic models
 set(dyn_sources dynamic/DynamicallyLoadableLr91.cpp dynamic/NotACellModel.cpp)
@@ -50,6 +50,6 @@ foreach(dyn_source ${dyn_sources})
     endif()
 
     # add dynamic models to the heart_tests and Continuous targets
-    add_dependencies(heart_tests ${dyn_source_name})
+    add_dependencies(heart ${dyn_source_name})
     add_dependencies(Continuous ${dyn_source_name})
 endforeach(dyn_source)

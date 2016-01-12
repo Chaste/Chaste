@@ -392,11 +392,11 @@ if (Chaste_ENABLE_TESTING)
     endforeach()
 
     foreach(component ${Chaste_COMPONENTS})
-        add_custom_target(${component}_tests)
+        add_custom_target(${component})
     endforeach()
 
     foreach(project ${Chaste_PROJECTS})
-        add_custom_target(project_${project}_tests)
+        add_custom_target(project_${project})
     endforeach()
 endif()
 
@@ -418,6 +418,11 @@ set(Chaste_DEPENDS_continuum_mechanics pde ode mesh linalg io global)
 set(Chaste_DEPENDS_heart ${Chaste_DEPENDS_continuum_mechanics} continuum_mechanics)
 set(Chaste_DEPENDS_lung ${Chaste_DEPENDS_continuum_mechanics} continuum_mechanics)
 set(Chaste_DEPENDS_core global io linalg mesh ode pde continuum_mechanics)
+
+set(Chaste_ALL_LIBRARIES "")
+foreach(component ${Chaste_COMPONENTS})
+    list(APPEND Chaste_ALL_LIBRARIES chaste_${component})
+endforeach()
 
 foreach(component ${Chaste_COMPONENTS})
     set(Chaste_${component}_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/${component}/src")
@@ -467,7 +472,7 @@ endforeach(projectName)
 
 export(PACKAGE Chaste)
 
-export(TARGETS ${Chaste_COMPONENTS} 
+export(TARGETS ${Chaste_ALL_LIBRARIES} 
     FILE "${Chaste_BINARY_DIR}/ChasteTargets.cmake"
     #added in 2.8.12, need this?    EXPORT_LINK_INTERFACE_LIBRARIES 
     )
