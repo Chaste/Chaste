@@ -48,11 +48,6 @@ SimpleImpedanceProblem::SimpleImpedanceProblem(TetrahedralMesh<1,3>& rAirwaysMes
       mH(5.8*98.0665*1e3),            //Tissue elastance in Pa/m^3 (5.8 cmH2O/L)
       mLengthScaling(1.0)
 {
-    if (mrMesh.GetNode(mOutletNodeIndex)->IsBoundaryNode() == false)
-    {
-        EXCEPTION("Outlet node is not a boundary node");
-    }
-
     mAcinarH = mH*(mrMesh.GetNumBoundaryNodes() - 1);
 
     mFrequencies.push_back(1.0);

@@ -54,6 +54,8 @@ public:
 
         AirwayTreeWalker walker(mesh, 0u);
 
+        TS_ASSERT_EQUALS(walker.GetOutletElementIndex(), 0u);
+
         TS_ASSERT_EQUALS(walker.GetParentElement(mesh.GetElement(2u)), mesh.GetElement(1u));
         TS_ASSERT_EQUALS(walker.GetParentElementIndex(mesh.GetElement(2u)), 1u);
         TS_ASSERT_EQUALS(walker.GetParentElement(2u), mesh.GetElement(1u));

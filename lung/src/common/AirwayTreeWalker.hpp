@@ -60,8 +60,15 @@ public:
     AirwayTreeWalker(AbstractTetrahedralMesh<1,3>& rAirwaysMesh,
                      unsigned rootIndex);
 
-    /**
-     * Gets the parent element of a given element.
+    /*
+     * @return the outlet element index (i.e. the element associated with the root of the tree)
+     */
+    unsigned GetOutletElementIndex()
+    {
+        return mOutletElementIndex;
+    }
+
+    /* Gets the parent element of a given element.
      *
      * Returns a null pointer if the parent is the root of the tree
      *
@@ -241,6 +248,7 @@ private:
     AbstractTetrahedralMesh<1,3>& mMesh;
 
     unsigned mOutletNodeIndex; /**< The outlet node is the root of the branching tree structure */
+    unsigned mOutletElementIndex; /**< The outlet element is associated to the outlet node and is at the root */
 
     /** A map to facilitate finding the parent element of an element */
     std::map<unsigned, unsigned> mParentElementMap;

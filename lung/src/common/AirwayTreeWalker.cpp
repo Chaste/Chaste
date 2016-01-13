@@ -37,15 +37,22 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AirwayTreeWalker.hpp"
 
 AirwayTreeWalker::AirwayTreeWalker(AbstractTetrahedralMesh<1,3>& rAirwaysMesh,
-                                   unsigned rootIndex=0u) :
-                                       mMesh(rAirwaysMesh),
-                                       mOutletNodeIndex(rootIndex)
+                                    unsigned rootIndex=0u) :
+                                    mMesh(rAirwaysMesh),
+                                    mOutletNodeIndex(rootIndex)
 {
-    //Get the head element & process
+    if (mMesh.GetNode(mOutletNodeIndex)->IsBoundaryNode() == false)
+    {
+        EXCEPTION("Outlet node is not a boundary node");
+    }
     Node<3>* p_node = mMesh.GetNode(mOutletNodeIndex);
-    Element<1,3>* p_element = mMesh.GetElement(*(p_node->ContainingElementsBegin()));
-    ProcessElement(p_element, p_node);
-    CalculateElementProperties(p_element);
+    assert(p_node->GetNumContainingElements() == 1u);
+
+    //Get the head element & process
+    Element<1,3>* p_root_element = mMesh.GetElement(*(p_node->ContainingElementsBegin()));
+    mOutletElementIndex = p_root_element->GetIndex();
+    ProcessElement(p_root_element, p_node);
+    CalculateElementProperties(p_root_element);
 }
 
 Element<1,3>* AirwayTreeWalker::GetParentElement(Element<1,3>* pElement)
