@@ -38,7 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Warnings.hpp"
 #include "AirwayTreeWalker.hpp"
 #include "AirwayPropertiesCalculator.hpp"
-#include "Debug.hpp"
+//#include "Debug.hpp"
 
 AbstractVentilationProblem::AbstractVentilationProblem(const std::string& rMeshDirFilePath, unsigned rootIndex)
     : mOutletNodeIndex(rootIndex),
@@ -187,7 +187,7 @@ double AbstractVentilationProblem::CalculateResistance(Element<1,3>& rElement, b
         {
             resistance *= z;
         }
-        if (rElement.GetIndex() == 0) PRINT_3_VARIABLES(reynolds_number, z, resistance);
+        //if (rElement.GetIndex() == 0) PRINT_3_VARIABLES(reynolds_number, z, resistance);
     }
     return resistance;
 }

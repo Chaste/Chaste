@@ -38,14 +38,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TetrahedralMesh.hpp"
 #include "TimeStepper.hpp"
 #include "VtkMeshWriter.hpp"
-/**
- * A helper enumeration used to keep track of the order in which things get added to edge attributes
- */
-enum
-{
-    RADIUS,         //!< Radius of edge (where given in file)
-    SEGMENT_LENGTH  //!< Length of segment when several edges are linked by non-bifurcating intermediate nodes
-};
 
 /**
  * A class for solving one-dimensional flow in pipe problems on branching trees.
@@ -65,7 +57,17 @@ enum
  */
 class AbstractVentilationProblem
 {
+
 protected:
+    /**
+     * A helper enumeration used to keep track of the order in which things get added to edge attributes
+     */
+    enum
+    {
+        RADIUS,         //!< Radius of edge (where given in file)
+        SEGMENT_LENGTH  //!< Length of segment when several edges are linked by non-bifurcating intermediate nodes
+    };
+
     TetrahedralMesh<1,3> mMesh; /**< The 1d in 3d branching tree mesh */
     unsigned mOutletNodeIndex; /**< The outlet node is the root of the branching tree structure */
     /** (Dynamic) viscosity in kg/(mm*second).
