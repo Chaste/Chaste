@@ -142,7 +142,7 @@ output:from revision number
 errors:{INTERNAL writedir}{REPLACE <texttest_dir>}
 # Handle source code line numbers
 errors:Chaste error: ([a-zA-Z./]+):([0-9]+):{REPLACE Chaste error: \1:line:}
-#\todo #2656 errors:scons: warning: Using dynamically loaded cell models MAY NOT WORK with chaste_libs=0.{LINES 3}
+errors:scons: warning: Using dynamically loaded cell models MAY NOT WORK with chaste_libs=0.{LINES 3}
 
 # Ignore warnings about rounded results
 results_phi_e_dat:Warning: These have been
