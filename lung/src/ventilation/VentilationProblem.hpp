@@ -167,11 +167,10 @@ private:
     void SolveIterativelyFromPressure();
 
     /**
-     * Common code from constructors
+     * Common code used by constructors
      *
-     * @param rMeshDirFilePath the path and root name of the .node and .edge files for the mesh
      */
-    void Initialise(const std::string& rMeshDirFilePath);
+    void Initialise();
 
 public:
     /** Default constructor

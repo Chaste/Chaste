@@ -270,6 +270,32 @@ public:
         problem.WriteVtk("TestVentilation", "three_bifurcations_pedley");
 #endif
     }
+   void TestThreeBifurcationsExtraLinksWithDynamicResistance() throw (Exception)
+    {
+        /*
+         * As previous but with every segment divided into two segments
+         */
+        MatrixVentilationProblem problem("lung/test/data/three_bifurcations_extra_links", 0u);
+        problem.SetMeshInMilliMetres();
+        problem.SetOutflowPressure(0.0);
+        problem.SetConstantInflowPressures(150000); //Needed to increase the resistance in these artificial airways
+        problem.SetDynamicResistance();
+        problem.Solve();
+        std::vector<double> flux, pressure;
+        problem.GetSolutionAsFluxesAndPressures(flux, pressure);
+        TS_ASSERT_DELTA(pressure[0], 0.0, 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[1], 91108.7409,   1e-1);
+        TS_ASSERT_DELTA(pressure[2], 132694.0014, 1e-2);
+        TS_ASSERT_DELTA(pressure[3], 132694.0014, 1e-2);
+        TS_ASSERT_DELTA(pressure[4], 1.5e5, 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[5], 1.5e5, 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[6], 1.5e5, 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[7], 1.5e5, 1e-8); //BC
+        TS_ASSERT_DELTA(flux[6], -4.424511e-7, 1e-11);
+#ifdef CHASTE_VTK
+        problem.WriteVtk("TestVentilation", "three_bifurcations_pedley");
+#endif
+    }
 
     void TestTimeVaryingThreeBifurcations() throw (Exception)
     {

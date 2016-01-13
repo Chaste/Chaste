@@ -36,6 +36,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractVentilationProblem.hpp"
 #include "MathsCustomFunctions.hpp"
 #include "Warnings.hpp"
+#include "AirwayTreeWalker.hpp"
+#include "AirwayPropertiesCalculator.hpp"
+#include "Debug.hpp"
 
 AbstractVentilationProblem::AbstractVentilationProblem(const std::string& rMeshDirFilePath, unsigned rootIndex)
     : mOutletNodeIndex(rootIndex),
@@ -51,6 +54,68 @@ AbstractVentilationProblem::AbstractVentilationProblem(const std::string& rMeshD
     if (mMesh.GetNode(mOutletNodeIndex)->IsBoundaryNode() == false)
     {
         EXCEPTION("Outlet node is not a boundary node");
+    }
+    Initialise();
+}
+void
+AbstractVentilationProblem::Initialise()
+{
+    /// We might want to make the tree walker a member of this class
+    AirwayTreeWalker walker(mMesh, mOutletNodeIndex);
+
+    // Reset edge attributes
+    bool intermediate_nodes = false;
+    for (AbstractTetrahedralMesh<1,3>::ElementIterator iter = mMesh.GetElementIteratorBegin();
+         iter != mMesh.GetElementIteratorEnd();
+         ++iter)
+    {
+        // Add a place holder for radius if necessary
+        if (iter->GetNumElementAttributes() == 0u)
+        {
+            // Radius on edge is not going to be used but we'll put in a placeholder
+            iter->AddElementAttribute(DOUBLE_UNSET);
+            assert( iter->rGetElementAttributes()[RADIUS] == DOUBLE_UNSET);
+        }
+
+        // Add a length attribute
+        assert (iter->GetNumElementAttributes() == 1u); // Only radius used so far
+        // Set the segment length to be the actual length
+        c_vector<double, 3> dummy;
+        double length;
+        unsigned element_index = iter->GetIndex();
+        mMesh.GetWeightedDirectionForElement(element_index, dummy, length);
+        iter->AddElementAttribute(length);
+        assert( iter->rGetElementAttributes()[SEGMENT_LENGTH] == length);
+
+        // Check for intermediate nodes
+        if ( walker.GetChildElementIndices(&*iter).size() == 1u)
+        {
+            intermediate_nodes = true;
+        }
+    }
+    if (intermediate_nodes)
+    {
+        ///\todo #2300 There's redundancy here because there are now two walkers
+        AirwayPropertiesCalculator properties_calculator(mMesh, mOutletNodeIndex);
+        std::vector<AirwayBranch*> branches = properties_calculator.GetBranches();
+        for (std::vector<AirwayBranch*>::iterator branch_it=branches.begin(); branch_it != branches.end(); branch_it++)
+        {
+            std::list<Element<1,3>* > branch_elements = (*branch_it)->GetElements();
+            if ( branch_elements.size() > 1u)
+            {
+                double branch_length = (*branch_it)->GetLength();
+
+                for (std::list<Element<1,3>* >::const_iterator element_iterator=branch_elements.begin();
+                        element_iterator != branch_elements.end(); ++element_iterator)
+                {
+                    (*element_iterator)->rGetElementAttributes()[SEGMENT_LENGTH] = branch_length;
+                }
+            }
+//            else
+//            {
+//                assert( (*branch_it)->GetLength() == branch_elements.front()->rGetElementAttributes()[SEGMENT_LENGTH]);
+//            }
+        }
     }
 }
 
@@ -113,14 +178,16 @@ double AbstractVentilationProblem::CalculateResistance(Element<1,3>& rElement, b
          *
          * The upshot of this calculation is that the resistance is scaled with sqrt(Q)
          */
+        double segment_length = rElement.rGetElementAttributes()[SEGMENT_LENGTH] * mLengthScaling;
         double reynolds_number = fabs( 2.0 * mDensity * flux / (mViscosity * M_PI * radius) );
         double c = 1.85;
-        double z = (c/4.0) * sqrt(reynolds_number * radius / length);
+        double z = (c/4.0) * sqrt(reynolds_number * radius / segment_length);
         // Pedley's method will only increase the resistance
         if (z > 1.0)
         {
             resistance *= z;
         }
+        if (rElement.GetIndex() == 0) PRINT_3_VARIABLES(reynolds_number, z, resistance);
     }
     return resistance;
 }

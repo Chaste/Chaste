@@ -47,13 +47,13 @@ VentilationProblem::VentilationProblem(const std::string& rMeshDirFilePath, unsi
       mTerminalPressureChangeVector(NULL),
       mTerminalKspSolver(NULL)
 {
-    Initialise(rMeshDirFilePath);
+    Initialise();
 }
 
 
 
 
-void VentilationProblem::Initialise(const std::string& rMeshDirFilePath)
+void VentilationProblem::Initialise()
 {
     mFlux.resize(mMesh.GetNumElements());
     mPressure.resize(mMesh.GetNumNodes());
