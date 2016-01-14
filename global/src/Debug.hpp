@@ -51,13 +51,43 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * @note Use of these should be removed from source code when committing.
  */
 
+/** Can be set as approximate memory footprint in Mb at marker using the macro MARK_MEMORY */
+extern double eMemoryAtMarker;
+
 /** @return a 'header' which can be printed in each debug output line */
 std::string FormDebugHead();
+
 /**
  * In extremis, print enough of the stack to see how we got to this point (e.g. at EXCEPTION time).
  * This is used with the macro STACK
  */
 void PrintTheStack();
+
+/**
+ * Allows use of PRINT_MEMORY to give results relative to the footprint at this call.
+ *
+ * Set sMemoryAtMarker to the current approximate memory footprint.  This value is subtracted
+ * from the memory footprint if the macro PRINT_MEMORY is called.
+ *
+ * This is used with the macro MARK_MEMORY
+ */
+void MarkMemory();
+
+/**
+ * Set sMemoryAtMarker to zero meaning subsequent use of PRINT_MEMORY will give an
+ * absolute memory footprint, rather than relative to a fixed value.
+ *
+ * This is used with the macro UNMARK_MEMORY
+ */
+void UnmarkMemory();
+
+/**
+ * Print the approximate memory footprint.  This is the current memory footprint minus
+ * sMemoryAtMarker, which will be zero if the MARK_MEMORY macro has not been used.
+ *
+ * This is used with the macro PRINT_MEMORY
+ */
+void PrintMemory();
 
 /**
  * Print a debug message.
@@ -150,5 +180,25 @@ void PrintTheStack();
  * In extremis, print enough of the stack to see how we got to this point (e.g. at EXCEPTION time)
  */
 #define STACK PrintTheStack();
+
+/**
+ * Allows use of PRINT_MEMORY to give results relative to the footprint at this call.
+ *
+ * Set sMemoryAtMarker to the current approximate memory footprint.  This value is subtracted
+ * from the memory footprint if the macro PRINT_MEMORY is called.
+ */
+#define MARK_MEMORY MarkMemory();
+
+/**
+ * Set sMemoryAtMarker to zero meaning subsequent use of PRINT_MEMORY will give an
+ * absolute memory footprint, rather than relative to a fixed value.
+ */
+#define UNMARK_MEMORY UnmarkMemory();
+
+/**
+ * Print the approximate memory footprint.  This is the current memory footprint minus
+ * sMemoryAtMarker, which will be zero if the MARK_MEMORY macro has not been used.
+ */
+#define PRINT_MEMORY PrintMemory();
 
 #endif /*DEBUG_HPP_*/

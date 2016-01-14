@@ -36,9 +36,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Debug.hpp"
 // If you ever need backtrace in Windows then the RTFM begins at "CaptureStackBackTrace"
 #ifndef _MSC_VER
-#include <execinfo.h> //For backtrace
+#include <execinfo.h>     //For backtrace
+#include <unistd.h>       // For memory profiling
+#include <sys/resource.h> // For memory profiling
 #endif//_MSC_VER
 //#include <cxxabi.h> // For demangling C++ C-style names
+
+double eMemoryAtMarker = 0.0;
 
 std::string FormDebugHead()
 {
@@ -75,3 +79,53 @@ void PrintTheStack()
     free(symbol_list);
 #endif //_MSC_VER
 }
+
+void MarkMemory()
+{
+    TRACE("PRINT_MEMORY will now be relative to here");
+
+#ifndef _MSC_VER
+    struct rusage rusage;
+    getrusage( RUSAGE_SELF, &rusage );
+
+    // Store current memory footprint in Mb to allow calculations relative to this point
+    eMemoryAtMarker = double(rusage.ru_maxrss)/1024.0;
+#endif //_MSC_VER
+}
+
+void UnmarkMemory()
+{
+    TRACE("PRINT_MEMORY will now be absolute footprint");
+
+#ifndef _MSC_VER
+    eMemoryAtMarker = 0.0;
+#endif //_MSC_VER
+}
+
+void PrintMemory()
+{
+#ifndef _MSC_VER
+    struct rusage rusage;
+    getrusage( RUSAGE_SELF, &rusage );
+
+    // Memory as difference between now and the marker
+    double memory = double(rusage.ru_maxrss)/1024.0 - eMemoryAtMarker;
+
+    if (fabs(eMemoryAtMarker) < 1e-6) // If marker is zero, this is the total memory footprint
+    {
+        std::cout << FormDebugHead() << "Total memory footprint: " << memory << " Mb" << std::endl << std::flush;
+    }
+    else // If marker non-zero, this is a change in memory
+    {
+        std::cout << FormDebugHead() << "Memory change from marker: " << memory << " Mb" << std::endl << std::flush;
+    }
+#endif //_MSC_VER
+}
+
+
+
+
+
+
+
+

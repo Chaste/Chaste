@@ -117,6 +117,18 @@ public:
         PetscTools::IsolateProcesses(false);
 
         AnotherFunctionOnTheStack();
+
+        MARK_MEMORY;   // Should print that PRINT_MEMORY will now be relative to here
+        PRINT_MEMORY;  // Should be 0 Mb
+        UNMARK_MEMORY; // Should print that PRINT_MEMORY will now be the absolute footprint
+        PRINT_MEMORY;  // Should be > 0 Mb
+
+        MARK_MEMORY;
+        std::vector<double> poinless_vector;
+        poinless_vector.resize(100000);
+        PRINT_MEMORY;                        // Should be x Mb
+        poinless_vector.resize(200000);
+        PRINT_MEMORY;                        // Should be at least 2x Mb
     }
 };
 
