@@ -750,7 +750,7 @@ public:
         TS_ASSERT_THROWS_THIS(node_based_cell_population.GetNeighbouringNodeIndices(0), "mpNodesOnlyMesh::mMaxInteractionDistance is smaller than the sum of radius of cell 0 (0.1) and cell 4 (0.55). Make the cut-off larger to avoid errors.");
 
         mesh.Clear();
-        mesh.ConstructNodesWithoutMesh(generating_mesh, 1.2);
+        mesh.ConstructNodesWithoutMesh(generating_mesh, 1.1);
 
         // Re set the radii
         for (AbstractMesh<2,2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();

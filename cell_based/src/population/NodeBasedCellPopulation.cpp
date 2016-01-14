@@ -432,8 +432,8 @@ std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsi
     c_vector<double, DIM> node_i_location = p_node_i->rGetLocation();
     double radius_of_cell_i = p_node_i->GetRadius();
 
-    // Make sure that the max_interaction distance is smaller than the box collection size
-    if (!(radius_of_cell_i * 2.0 < mpNodesOnlyMesh->GetMaximumInteractionDistance()))
+    // Make sure that the max_interaction distance is smaller than or equal to the box collection size
+    if (!(radius_of_cell_i * 2.0 <= mpNodesOnlyMesh->GetMaximumInteractionDistance()))
     {
         EXCEPTION("mpNodesOnlyMesh::mMaxInteractionDistance is smaller than twice the radius of cell " << index << " (" << radius_of_cell_i << ") so interactions may be missed. Make the cut-off larger to avoid errors.");
     }
@@ -466,8 +466,8 @@ std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsi
             // If the cells are close enough to exert a force on each other...
             double max_interaction_distance = radius_of_cell_i + radius_of_cell_j;
 
-            // Make sure that the max_interaction distance is smaller than the box collection size
-            if (!(max_interaction_distance < mpNodesOnlyMesh->GetMaximumInteractionDistance()))
+            // Make sure that the max_interaction distance is smaller than or equal to the box collection size
+            if (!(max_interaction_distance <= mpNodesOnlyMesh->GetMaximumInteractionDistance()))
             {
                 EXCEPTION("mpNodesOnlyMesh::mMaxInteractionDistance is smaller than the sum of radius of cell " << index << " (" << radius_of_cell_i << ") and cell " << (*iter) << " (" << radius_of_cell_j <<"). Make the cut-off larger to avoid errors.");
             }
