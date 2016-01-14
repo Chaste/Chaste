@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractLinearEllipticPde.hpp"
 
 /**
- *  A PDE which calculates the source term by adding the number of cells
+ *  An Elliptic PDE which calculates the source term by adding the number of cells
  *  in the element containing that point and scaling by the element area.
  */
 template<unsigned DIM>
@@ -98,7 +98,7 @@ public:
     const AbstractCellPopulation<DIM>& rGetCellPopulation() const;
 
     /**
-     * @return mCoefficient (used in archiving).
+     * @return mCoefficient
      */
     double GetCoefficient() const;
 
