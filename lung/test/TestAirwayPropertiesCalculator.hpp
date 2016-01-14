@@ -140,7 +140,7 @@ public:
         AirwayPropertiesCalculator properties_calculator(mesh, 0u);
         properties_calculator.CalculateSubtreeProperties();
 
-        std::vector<double> branch_lengths = properties_calculator.GetSubtreeBranchLenghts();
+        std::vector<double> branch_lengths = properties_calculator.GetSubtreeBranchLengths();
         std::vector<double> branch_volumes = properties_calculator.GetSubtreeBranchVolumes();
         std::vector<double> branch_areas = properties_calculator.GetSubtreeBranchLateralSurfaceAreas();
         std::vector<double> branch_resistances = properties_calculator.GetSubtreePoiseuilleResistances();
@@ -195,7 +195,7 @@ public:
         AirwayPropertiesCalculator properties_calculator(mesh, 0u);
         properties_calculator.CalculateUpstreamProperties();
 
-        std::vector<double> branch_lengths = properties_calculator.GetUpstreamBranchLenghts();
+        std::vector<double> branch_lengths = properties_calculator.GetUpstreamBranchLengths();
         std::vector<double> branch_volumes = properties_calculator.GetUpstreamBranchVolumes();
         std::vector<double> branch_areas = properties_calculator.GetUpstreamBranchLateralSurfaceAreas();
         std::vector<double> branch_resistances = properties_calculator.GetUpstreamPoiseuilleResistances();

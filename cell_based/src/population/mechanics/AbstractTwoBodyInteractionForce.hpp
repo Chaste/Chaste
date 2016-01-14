@@ -96,7 +96,7 @@ public:
     /**
      * Get the cutoff length.
      *
-     * @return mCutOffLenght
+     * @return mCutOffLength
      */
     double GetCutOffLength();
 

@@ -233,9 +233,9 @@ unsigned AirwayPropertiesCalculator::GetBranchStrahlerOrder(AirwayBranch* pBranc
     return mWalker.GetElementStrahlerOrder(pBranch->GetElements().front());
 }
 
-std::vector<double> AirwayPropertiesCalculator::GetSubtreeBranchLenghts()
+std::vector<double> AirwayPropertiesCalculator::GetSubtreeBranchLengths()
 {
-    return mTotalSubtreeBranchLenght;
+    return mTotalSubtreeBranchLength;
 }
 
 std::vector<double> AirwayPropertiesCalculator::GetSubtreeBranchVolumes()
@@ -258,9 +258,9 @@ std::vector<c_vector<double, 3> > AirwayPropertiesCalculator::GetSubtreeCentroid
     return mTotalSubtreeCentroid;
 }
 
-std::vector<double> AirwayPropertiesCalculator::GetUpstreamBranchLenghts()
+std::vector<double> AirwayPropertiesCalculator::GetUpstreamBranchLengths()
 {
-    return mUpstreamPathBranchLenghts;
+    return mUpstreamPathBranchLengths;
 }
 
 std::vector<double> AirwayPropertiesCalculator::GetUpstreamBranchVolumes()
@@ -529,7 +529,7 @@ void AirwayPropertiesCalculator::CalculateSubtreeProperties()
 {
     // Lengthen vectors to store a value for each branch
     unsigned num_branches = mBranches.size();
-    mTotalSubtreeBranchLenght.resize(num_branches);
+    mTotalSubtreeBranchLength.resize(num_branches);
     mTotalSubtreeBranchVolume.resize(num_branches);
     mTotalSubtreeBranchLateralSurfaceArea.resize(num_branches);
     mTotalSubtreePoiseuilleResistance.resize(num_branches);
@@ -541,7 +541,7 @@ void AirwayPropertiesCalculator::CalculateSubtreeProperties()
 
     // Begin the recursions, sanity checking results
     double total_tree_length = RecursivelyCalculateSubtreeLength(trachea);
-    assert(fabs(total_tree_length - mTotalSubtreeBranchLenght[trachea->GetIndex()]) < 1e-6);
+    assert(fabs(total_tree_length - mTotalSubtreeBranchLength[trachea->GetIndex()]) < 1e-6);
     UNUSED_OPT(total_tree_length);
 
     double total_tree_volume = RecursivelyCalculateSubtreeVolume(trachea);
@@ -573,7 +573,7 @@ void AirwayPropertiesCalculator::CalculateUpstreamProperties()
 {
     // Lengthen vectors to store a value for each branch
     unsigned num_branches = mBranches.size();
-    mUpstreamPathBranchLenghts.resize(num_branches);
+    mUpstreamPathBranchLengths.resize(num_branches);
     mUpstreamPathBranchVolumes.resize(num_branches);
     mUpstreamPathBranchLateralSurfaceAreas.resize(num_branches);
     mUpstreamPathPoiseuilleResistances.resize(num_branches);
@@ -591,18 +591,18 @@ void AirwayPropertiesCalculator::CalculateUpstreamProperties()
 
 double AirwayPropertiesCalculator::RecursivelyCalculateSubtreeLength(AirwayBranch* pBranch)
 {
-    mTotalSubtreeBranchLenght[pBranch->GetIndex()] = pBranch->GetLength();
+    mTotalSubtreeBranchLength[pBranch->GetIndex()] = pBranch->GetLength();
 
     std::vector<AirwayBranch*> all_children = pBranch->GetAllChildren();
 
     // Loop over all children.  If there are no children, the loop will not be executed.
     for(unsigned child_branch_idx = 0 ; child_branch_idx < all_children.size() ; child_branch_idx++)
     {
-        mTotalSubtreeBranchLenght[pBranch->GetIndex()] += RecursivelyCalculateSubtreeLength(all_children[child_branch_idx]);
+        mTotalSubtreeBranchLength[pBranch->GetIndex()] += RecursivelyCalculateSubtreeLength(all_children[child_branch_idx]);
     }
 
     // Return the total below, including current branch length
-    return mTotalSubtreeBranchLenght[pBranch->GetIndex()];
+    return mTotalSubtreeBranchLength[pBranch->GetIndex()];
 }
 
 double AirwayPropertiesCalculator::RecursivelyCalculateSubtreeVolume(AirwayBranch* pBranch)
@@ -684,12 +684,12 @@ void AirwayPropertiesCalculator::RecursivelyCalculateUpstreamLengths(AirwayBranc
     // If current branch is trachea, there is nothing upstream, so just need current branch data
     if( pBranch->GetParent() == NULL )
     {
-        mUpstreamPathBranchLenghts[current_index] = pBranch->GetLength();
+        mUpstreamPathBranchLengths[current_index] = pBranch->GetLength();
     }
     // Otherwise, simply add current branch data to parent branch data
     else
     {
-        mUpstreamPathBranchLenghts[current_index] = pBranch->GetLength() + mUpstreamPathBranchLenghts[pBranch->GetParent()->GetIndex()];
+        mUpstreamPathBranchLengths[current_index] = pBranch->GetLength() + mUpstreamPathBranchLengths[pBranch->GetParent()->GetIndex()];
     }
 
     // Recursively calculate correct value for each child branch

@@ -147,7 +147,7 @@ public:
     std::vector<AirwayBranch*> GetBranches();
 
     /** @return A vector of total subtree lengths, defined for each branch of the tree */
-    std::vector<double> GetSubtreeBranchLenghts();
+    std::vector<double> GetSubtreeBranchLengths();
 
     /** @return A vector of total subtree volumes, defined for each branch of the tree */
     std::vector<double> GetSubtreeBranchVolumes();
@@ -162,7 +162,7 @@ public:
     std::vector<c_vector<double, 3> > GetSubtreeCentroids();
 
     /** @return A vector of upstream lengths, defined for each branch of the tree */
-    std::vector<double> GetUpstreamBranchLenghts();
+    std::vector<double> GetUpstreamBranchLengths();
 
     /** @return A vector of upstream volumes, defined for each branch of the tree */
     std::vector<double> GetUpstreamBranchVolumes();
@@ -308,7 +308,7 @@ private:
     double mLengthOneOverLengthTwoSpread;
 
     /** For each branch, the total length of all branches in the distal direction */
-    std::vector<double> mTotalSubtreeBranchLenght;
+    std::vector<double> mTotalSubtreeBranchLength;
 
     /** For each branch, the total volume of all branches in the distal direction */
     std::vector<double> mTotalSubtreeBranchVolume;
@@ -323,7 +323,7 @@ private:
     std::vector<c_vector<double, 3> > mTotalSubtreeCentroid;
 
     /** For each branch, the total length of all branches in the proximal (tracheal) direction */
-    std::vector<double> mUpstreamPathBranchLenghts;
+    std::vector<double> mUpstreamPathBranchLengths;
 
     /** For each branch, the total volume of all branches in the proximal (tracheal) direction */
     std::vector<double> mUpstreamPathBranchVolumes;
