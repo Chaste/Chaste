@@ -62,6 +62,10 @@ AbstractVentilationProblem::Initialise()
 {
     /// We might want to make the tree walker a member of this class
     AirwayTreeWalker walker(mMesh, mOutletNodeIndex);
+    if (walker.GetNodesAreGraphOrdered() == false)
+    {
+        WARNING("Nodes in this mesh do not appear in graph order.  Some solvers may be inefficient.");
+    }
 
     // Reset edge attributes
     bool intermediate_nodes = false;

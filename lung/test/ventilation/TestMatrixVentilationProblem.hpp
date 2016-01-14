@@ -43,6 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TrianglesMeshReader.hpp"
 #include "PetscSetupAndFinalize.hpp"
 #include "MatrixVentilationProblem.hpp"
+#include "Warnings.hpp"
 
 
 
@@ -77,7 +78,7 @@ class TestMatrixVentilationProblem : public CxxTest::TestSuite
 private:
 
 public:
-    void TestMatrixVentilationProblemOnBranch() throw(Exception)
+    void TestOnBranch() throw(Exception)
     {
         MatrixVentilationProblem problem("mesh/test/data/y_branch_3d_mesh", 0u);
         problem.SetMeshInMilliMetres();
@@ -100,7 +101,7 @@ public:
         problem.WriteVtk("TestVentilation", "small_conical");
 #endif
     }
-    void TestMatrixVentilationProblemCylindrical() throw(Exception)
+    void TestOnBranchCylindrical() throw(Exception)
     {
         MatrixVentilationProblem problem("mesh/test/data/y_branch_3d_mesh");
         problem.SetMeshInMilliMetres();
@@ -157,7 +158,7 @@ public:
         TS_ASSERT_DELTA(problem.GetFluxAtOutflow(), -2.8143e-14, 1e-15);
     }
 
-    void TestThreeBifurcationsWithRadiusOnNodeFile() throw (Exception)
+    void TestThreeBifurcations() throw (Exception)
     {
         MatrixVentilationProblem problem("lung/test/data/three_bifurcations", 0u);
         problem.SetMeshInMilliMetres();
@@ -182,7 +183,37 @@ public:
         TS_ASSERT_DELTA(flux[6], -7.102e-11, 1e-13); // (Inflow flux)
     }
 
-    void TestThreeBifurcationsExtraLinkWithRadiusOnNodeFile() throw (Exception)
+    void TestThreeBifurcationsExtraLinksDirect() throw (Exception)
+    {
+        TS_ASSERT(Warnings::Instance()->GetNumWarnings() == 0u);
+        MatrixVentilationProblem problem("lung/test/data/three_bifurcations_extra_links", 0u);
+        TS_ASSERT(Warnings::Instance()->GetNumWarnings() == 1u);  // Warning that the nodes are not in graph order
+        problem.SetMeshInMilliMetres();
+        problem.SetOutflowPressure(0.0 + 1.0);
+        problem.SetConstantInflowFluxes(-7.102e-11);
+        problem.Solve();
+
+        std::vector<double> flux, pressure;
+        problem.GetSolutionAsFluxesAndPressures(flux, pressure);
+        TS_ASSERT_DELTA(pressure[0], 0.0 + 1.0, 1e-8); // BC
+        TS_ASSERT_DELTA(flux[10], -7.102e-11, 1e-20); // BC
+        TS_ASSERT_DELTA(flux[11], -7.102e-11, 1e-20); // BC
+        TS_ASSERT_DELTA(flux[12], -7.102e-11, 1e-20); // BC
+        TS_ASSERT_DELTA(flux[13], -7.102e-11, 1e-20); // BC
+        TS_ASSERT_DELTA(pressure[1], 6.66666 + 1.0,   1e-3);
+        TS_ASSERT_DELTA(pressure[2], 12.22223 + 1.0, 1e-3);
+        TS_ASSERT_DELTA(pressure[3], 12.22223 + 1.0, 1e-3);
+        TS_ASSERT_DELTA(pressure[4], 15 + 1.0, 1e-3);
+        TS_ASSERT_DELTA(pressure[5], 15 + 1.0, 1e-3);
+        TS_ASSERT_DELTA(pressure[6], 15 + 1.0, 1e-3);
+        TS_ASSERT_DELTA(pressure[7], 15 + 1.0, 1e-3);
+        TS_ASSERT_DELTA(flux[0], 2.8407e-10, 1e-4); // (Outflow flux)
+        //This is the extra node at the Trachea
+        TS_ASSERT_DELTA(pressure[8], 3.33335 + 1.0, 1e-4); //Between root and first bifurcation
+
+    }
+
+    void TestThreeBifurcationsExtraLinks() throw (Exception)
     {
         MatrixVentilationProblem problem("lung/test/data/three_bifurcations_extra_links", 0u);
         problem.SetMeshInMilliMetres();
@@ -206,14 +237,14 @@ public:
         TS_ASSERT_DELTA(flux[12], -7.102e-11, 1e-13); // (Inflow flux)
         TS_ASSERT_DELTA(flux[13], -7.102e-11, 1e-13); // (Inflow flux)
         //This is the extra node at the Trachea
-        TS_ASSERT_DELTA(pressure[8], 2.22225 + 1.0, 1e-4); //Between root and first bifurcation
+        TS_ASSERT_DELTA(pressure[8], 3.33335 + 1.0, 1e-4); //Between root and first bifurcation
 
 #ifdef CHASTE_VTK
         problem.WriteVtk("TestVentilation", "three_bifurcations_extra_links");
 #endif
     }
 
-    void TestThreeBifurcationsWithRadiusOnNodeFileFluxBoundaries() throw (Exception)
+    void TestThreeBifurcationsFluxBoundaries() throw (Exception)
     {
         MatrixVentilationProblem problem("lung/test/data/three_bifurcations", 0u);
         problem.SetMeshInMilliMetres();

@@ -68,6 +68,14 @@ public:
         return mOutletElementIndex;
     }
 
+    /*
+     * @return true if nodes appear in graph/topological order (a parent should have a lower index than its children)
+     */
+    bool GetNodesAreGraphOrdered()
+    {
+        return mNodesAreGraphOrdered;
+    }
+
     /* Gets the parent element of a given element.
      *
      * Returns a null pointer if the parent is the root of the tree
@@ -249,6 +257,8 @@ private:
 
     unsigned mOutletNodeIndex; /**< The outlet node is the root of the branching tree structure */
     unsigned mOutletElementIndex; /**< The outlet element is associated to the outlet node and is at the root */
+    /** A check that nodes appear in graph/topological order (a parent should have a lower index than its children) */
+    bool mNodesAreGraphOrdered;
 
     /** A map to facilitate finding the parent element of an element */
     std::map<unsigned, unsigned> mParentElementMap;

@@ -81,24 +81,40 @@ void VentilationProblem::SolveDirectFromFlux()
      * Note that we can't iterate all the way back to the root node, but that's okay
      * because the root is not a bifurcation.  Also note that we can't use a NodeIterator
      * because it does not have operator--
+     *
+     * The extra do/while loop is only required when the nodes do not appear in graph order
+     * In this case we need to scan the tree more than once (up to depth of tree times) before the fluces are correctly propagated
+     *
      */
-    for (unsigned node_index = mMesh.GetNumNodes() - 1; node_index > 0; --node_index)
+    bool some_flux_zero;
+    do
     {
-        Node<3>* p_node = mMesh.GetNode(node_index);
-        if (p_node->IsBoundaryNode() == false)
+        some_flux_zero = false;
+        for (unsigned node_index = mMesh.GetNumNodes() - 1; node_index > 0; --node_index)
         {
-            Node<3>::ContainingElementIterator element_iterator = p_node->ContainingElementsBegin();
-            // This assertion will trip if a node is not actually in the airway tree and will prevent operator++ from hanging
-            assert(element_iterator != p_node->ContainingElementsEnd());
-            unsigned parent_index = *element_iterator;
-            ++element_iterator;
-
-            for (mFlux[parent_index]=0.0; element_iterator != p_node->ContainingElementsEnd(); ++element_iterator)
+            Node<3>* p_node = mMesh.GetNode(node_index);
+            if (p_node->IsBoundaryNode() == false)
             {
-                mFlux[parent_index] += mFlux[*element_iterator];
+                Node<3>::ContainingElementIterator element_iterator = p_node->ContainingElementsBegin();
+                // This assertion will trip if a node is not actually in the airway tree and will prevent operator++ from hanging
+                assert(element_iterator != p_node->ContainingElementsEnd());
+                unsigned parent_index = *element_iterator;
+                ++element_iterator;
+
+                for (mFlux[parent_index]=0.0; element_iterator != p_node->ContainingElementsEnd(); ++element_iterator)
+                {
+                    mFlux[parent_index] += mFlux[*element_iterator];
+                }
+
+                if (mFlux[parent_index] == 0.0)
+                {
+                    some_flux_zero = true;
+                }
             }
         }
     }
+    while (some_flux_zero);
+
     // Poiseuille flow at each edge
     for (AbstractTetrahedralMesh<1,3>::ElementIterator iter = mMesh.GetElementIteratorBegin();
          iter != mMesh.GetElementIteratorEnd();
@@ -142,8 +158,11 @@ void VentilationProblem::SetupIterativeSolver()
             mEdgeDescendantNodes[parent_index].insert(terminal_index++);
         }
     }
-    // The outer loop here is for special cases where we find an internal node before its descendants
-    // In this case we need to scan the tree more than once (up to log(N)) before the sets are correctly propagated
+    /*
+     *  The outer loop here is for special cases where we find an internal node before its descendants - i.e. nodes
+     *  are not in graph order.
+     *  In this case we need to scan the tree more than once (up to depth of tree times) before the sets are correctly propagated
+     */
     while (mEdgeDescendantNodes[mOutletNodeIndex].size() != terminal_index)
     {
         //Work back up the tree making the unions of the sets of descendants

@@ -39,7 +39,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 AirwayTreeWalker::AirwayTreeWalker(AbstractTetrahedralMesh<1,3>& rAirwaysMesh,
                                     unsigned rootIndex=0u) :
                                     mMesh(rAirwaysMesh),
-                                    mOutletNodeIndex(rootIndex)
+                                    mOutletNodeIndex(rootIndex),
+                                    mNodesAreGraphOrdered(true)
 {
     if (mMesh.GetNode(mOutletNodeIndex)->IsBoundaryNode() == false)
     {
@@ -133,7 +134,10 @@ void AirwayTreeWalker::ProcessElement(Element<1,3>* pElement, Node<3>* pParentNo
         if(p_current_node != pParentNode) //Prevent moving back up the tree
         {
             mDistalNodeMap[pElement->GetIndex()] = p_current_node->GetIndex();
-
+            if( pParentNode->GetIndex() > p_current_node->GetIndex() )
+            {
+                mNodesAreGraphOrdered = false;
+            }
             for(Node<3>::ContainingElementIterator ele_iter = p_current_node->ContainingElementsBegin();
                 ele_iter != p_current_node->ContainingElementsEnd();
                 ++ele_iter)
