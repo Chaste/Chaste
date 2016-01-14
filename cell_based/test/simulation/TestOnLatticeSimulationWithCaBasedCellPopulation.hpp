@@ -409,22 +409,21 @@ public:
         CellId::ResetMaxCellId();
 
         // Create a simple 2D PottsMesh
-        PottsMeshGenerator<2> generator(5, 0, 0, 5, 0, 0);
+        PottsMeshGenerator<2> generator(4, 0, 0, 4, 0, 0);
         PottsMesh<2>* p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), p_diff_type);
+        cells_generator.GenerateBasicRandom(cells, 8, p_diff_type);
 
-        // Specify where cells lie
+        // Specify some cells on the bottom row
         std::vector<unsigned> location_indices;
-        for (unsigned index=0; index<p_mesh->GetNumNodes(); index++)
+        for (unsigned index=0; index<8u; index++)
         {
             location_indices.push_back(index);
         }
-        TS_ASSERT_EQUALS(location_indices.size(),p_mesh->GetNumNodes());
 
         // Create cell population
         CaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
@@ -437,11 +436,11 @@ public:
         OnLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestCaMonolayerWithRandomSwitching");
         simulator.SetDt(0.1);
-        simulator.SetEndTime(0.2); // 2 steps so only 1 switch happens (cells 5 and 11)
+        simulator.SetEndTime(0.4); // 4 steps so only 7 switches happens (nodes 7-10, 2-5,1-6,5-9,9-14,11-14,10-6)
 
         // Add switching Update Rule
         MAKE_PTR(RandomCaSwitchingUpdateRule<2u>, p_switching_update_rule);
-        p_switching_update_rule->SetSwitchingParameter(0.5);
+        p_switching_update_rule->SetSwitchingParameter(1.0);
         simulator.AddCaSwitchingUpdateRule(p_switching_update_rule);
 
         // Coverage of remove method
@@ -452,31 +451,22 @@ public:
         simulator.Solve();
 
         // Check the number of cells is still the same
-        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 25u);
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 8u);
 
         // Test no deaths and some births
         TS_ASSERT_EQUALS(simulator.GetNumBirths(), 0u);
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
 
         // Loop over the cells and check their new positions
-        unsigned node_index = 0;
+        unsigned cell_locations[8]= {0u, 10u, 11u, 3u, 4u, 2u, 1u, 6u};
+        unsigned index = 0;
         for (AbstractCellPopulation<2>::Iterator cell_iter = simulator.rGetCellPopulation().Begin();
              cell_iter != simulator.rGetCellPopulation().End();
              ++cell_iter)
         {
-            if (node_index == 5)
-            {
-                TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetLocationIndexUsingCell(*cell_iter), 11u);
-            }
-            else if (node_index == 11)
-            {
-                TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetLocationIndexUsingCell(*cell_iter), 5u);
-            }
-            else
-            {
-                TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetLocationIndexUsingCell(*cell_iter), node_index);
-            }
-            node_index++;
+            TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetLocationIndexUsingCell(*cell_iter), cell_locations[index]);
+
+            index++;
         }
     }
 

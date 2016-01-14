@@ -364,7 +364,9 @@ void CaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
     }
 
     /*
-     * Here we loop over the nodes and select a neighbour to test if the cells (associated with the cells) should swap locations
+     * Here we loop over the nodes and select a neighbour to test if
+     * the cells (associated with the nodes) should swap locations
+     * or if a cell should move to an empty node
      * Note this currently only works for latticeCarryingCapacity = 1
      */
     if (!(mSwitchingUpdateRuleCollection.empty()))
@@ -415,7 +417,7 @@ void CaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
                 bool is_cell_on_node_index = mAvailableSpaces[node_index] == 0 ? true : false;
                 bool is_cell_on_neighbour_location_index = mAvailableSpaces[neighbour_location_index] == 0 ? true : false;
 
-                if (is_cell_on_node_index && is_cell_on_neighbour_location_index)
+                if (is_cell_on_node_index || is_cell_on_neighbour_location_index)
                 {
                     double probability_of_switch = 0.0;
 
@@ -434,17 +436,39 @@ void CaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
 
                     if (random_number < probability_of_switch)
                     {
-                        // Swap the cells associated with the node and the neighbour node
-                        CellPtr p_cell = this->GetCellUsingLocationIndex(node_index);
-                        CellPtr p_neighbour_cell = this->GetCellUsingLocationIndex(neighbour_location_index);
+                        if (is_cell_on_node_index && is_cell_on_neighbour_location_index)
+                        {
+                            // Swap the cells associated with the node and the neighbour node
+                            CellPtr p_cell = this->GetCellUsingLocationIndex(node_index);
+                            CellPtr p_neighbour_cell = this->GetCellUsingLocationIndex(neighbour_location_index);
 
-                        // Remove the cells from their current location
-                        RemoveCellUsingLocationIndex(node_index, p_cell);
-                        RemoveCellUsingLocationIndex(neighbour_location_index, p_neighbour_cell);
+                            // Remove the cells from their current location
+                            RemoveCellUsingLocationIndex(node_index, p_cell);
+                            RemoveCellUsingLocationIndex(neighbour_location_index, p_neighbour_cell);
 
-                        // Add cells to their new locations
-                        AddCellUsingLocationIndex(node_index, p_neighbour_cell);
-                        AddCellUsingLocationIndex(neighbour_location_index, p_cell);
+                            // Add cells to their new locations
+                            AddCellUsingLocationIndex(node_index, p_neighbour_cell);
+                            AddCellUsingLocationIndex(neighbour_location_index, p_cell);
+                        }
+                        else if (is_cell_on_node_index && !is_cell_on_neighbour_location_index)
+                        {
+                            // Nove the cells associated with the node to the neighbour node
+                            CellPtr p_cell = this->GetCellUsingLocationIndex(node_index);
+                            RemoveCellUsingLocationIndex(node_index, p_cell);
+                            AddCellUsingLocationIndex(neighbour_location_index, p_cell);
+                        }
+                        else if (!is_cell_on_node_index && is_cell_on_neighbour_location_index)
+                        {
+                            // Move the cell associated with the neighbour node onto the node
+                            CellPtr p_neighbour_cell = this->GetCellUsingLocationIndex(neighbour_location_index);
+                            RemoveCellUsingLocationIndex(neighbour_location_index, p_neighbour_cell);
+                            AddCellUsingLocationIndex(node_index, p_neighbour_cell);
+                        }
+                        else
+                        {
+                            NEVER_REACHED;
+                        }
+
                     }
                 }
             }
