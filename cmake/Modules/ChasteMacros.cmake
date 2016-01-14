@@ -396,8 +396,8 @@ endmacro(Chaste_DO_APPS_MAIN)
 ##########################################################
 macro(Chaste_DO_TEST_COMMON component)
     # make tutorial directories
-    file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html/UserTutorials)
-    file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html/PaperTutorials)
+    file(MAKE_DIRECTORY ${Chaste_BINARY_DIR}/tutorials/UserTutorials)
+    file(MAKE_DIRECTORY ${Chaste_BINARY_DIR}/tutorials/PaperTutorials)
 
     # Figure out include path for tests
     header_dirs("${CMAKE_CURRENT_SOURCE_DIR}" Chaste_${component}_TEST_DIRS)
@@ -459,7 +459,7 @@ macro(Chaste_DO_TEST_COMMON component)
 
                     # filename is a user tutorial
                     if(filename MATCHES "Test(.*)Tutorial.(hpp|py)") 
-                        set(out_filename  ${CMAKE_CURRENT_BINARY_DIR}/html/UserTutorials/${CMAKE_MATCH_1})
+                        set(out_filename  ${Chaste_BINARY_DIR}/tutorials/UserTutorials/${CMAKE_MATCH_1})
                         add_custom_command(OUTPUT ${out_filename}
                             COMMAND ${PYTHON_EXECUTABLE} ARGS ${Chaste_SOURCE_DIR}/python/utils/CreateTutorial.py ${CMAKE_CURRENT_SOURCE_DIR}/${filename} ${out_filename}
                             DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${filename}
@@ -470,7 +470,7 @@ macro(Chaste_DO_TEST_COMMON component)
 
                     # filename is a paper tutorial
                     if(filename MATCHES "Test(.*)LiteratePaper.(hpp|py)") 
-                        set(out_filename  ${CMAKE_CURRENT_BINARY_DIR}/html/PaperTutorials/${CMAKE_MATCH_1})
+                        set(out_filename  ${Chaste_BINARY_DIR}/tutorials/PaperTutorials/${CMAKE_MATCH_1})
                         add_custom_command(OUTPUT ${out_filename}
                             COMMAND ${PYTHON_EXECUTABLE} ARGS ${Chaste_SOURCE_DIR}/python/utils/CreateTutorial.py ${CMAKE_CURRENT_SOURCE_DIR}/${filename} ${out_filename} 
                             DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${filename}
