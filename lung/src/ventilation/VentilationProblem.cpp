@@ -37,6 +37,24 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Warnings.hpp"
 //#include "Debug.hpp"
 //#include "Timer.hpp"
+
+/**
+ * Helper function for varying terminal fluxes in order to match terminal pressure boundary conditions
+ * Uses a pre-computed (approximate when not dense) mTerminalInteractionMatrix as the Jacobian for a non-linear
+ * search.
+ *  * If the system is small and Poiseuille flow is used then mTerminalInteractionMatrix is exact and the SNES should converge immediately
+ *  * If the system is large then only the near-diagonal interactions are retained, the Jacobian is approximate but the system is linear
+ *  * If Pedley is used then the resistances are all under-estimates and the system is non-linear (used with the linear Jacobian)
+ * This function is written in the require form for PETSc SNES:
+ * @param snes The PETSc SNES object
+ * @param solution_guess The terminal input fluxes
+ * @param residual The difference between the terminal pressures and the required pressure boundary conditions
+ * @param pContext A pointer to the VentilationProblem which called the SNES
+ * @return 0 error code
+ */
+PetscErrorCode ComputeSnesResidual(SNES snes, Vec solution_guess, Vec residual, void* pContext);
+
+
 VentilationProblem::VentilationProblem(const std::string& rMeshDirFilePath, unsigned rootIndex)
     : AbstractVentilationProblem(rMeshDirFilePath, rootIndex),
       mFluxGivenAtInflow(false),
@@ -87,9 +105,11 @@ void VentilationProblem::SolveDirectFromFlux()
      *
      */
     bool some_flux_zero;
+    bool all_flux_zero;
     do
     {
         some_flux_zero = false;
+        all_flux_zero = true;
         for (unsigned node_index = mMesh.GetNumNodes() - 1; node_index > 0; --node_index)
         {
             Node<3>* p_node = mMesh.GetNode(node_index);
@@ -110,10 +130,14 @@ void VentilationProblem::SolveDirectFromFlux()
                 {
                     some_flux_zero = true;
                 }
+                else if (all_flux_zero)
+                {
+                    all_flux_zero = false;
+                }
             }
         }
     }
-    while (some_flux_zero);
+    while (some_flux_zero && !all_flux_zero);
 
     // Poiseuille flow at each edge
     for (AbstractTetrahedralMesh<1,3>::ElementIterator iter = mMesh.GetElementIteratorBegin();
@@ -241,6 +265,101 @@ void VentilationProblem::FillInteractionMatrix(bool redoExisting)
         }
     }
     PetscMatTools::Finalise(mTerminalInteractionMatrix);
+}
+
+PetscErrorCode
+ComputeSnesResidual(SNES snes, Vec terminal_flux_solution, Vec terminal_pressure_difference, void* pContext)
+{
+    // Gain access to the ventilation problem
+    VentilationProblem* p_original_ventilation_problem =  (VentilationProblem*) pContext;
+
+    /* Copy the  fluxes given in the initial guess into the problem */
+    double* p_terminal_flux_vector;
+    VecGetArray(terminal_flux_solution, &p_terminal_flux_vector);
+
+    unsigned num_terminals = p_original_ventilation_problem->mMesh.GetNumBoundaryNodes()-1u;
+
+    for (unsigned terminal=0; terminal<num_terminals; terminal++)
+    {
+        unsigned edge_index = p_original_ventilation_problem->mTerminalToEdgeIndex[terminal];
+        p_original_ventilation_problem->mFlux[edge_index] =  p_terminal_flux_vector[terminal];
+        //if (terminal == 0) PRINT_2_VARIABLES(edge_index, p_terminal_flux_vector[terminal]);
+    }
+
+
+    /* Solve the direct problem */
+    p_original_ventilation_problem->SolveDirectFromFlux();
+
+    /* Form a residual from the new pressures */
+    for (unsigned terminal=0; terminal<num_terminals; terminal++)
+    {
+        unsigned node_index = p_original_ventilation_problem->mTerminalToNodeIndex[terminal];
+        // How far we are away from matching this boundary condition.
+        double delta_pressure = p_original_ventilation_problem->mPressureCondition[node_index] - p_original_ventilation_problem->mPressure[node_index];
+        VecSetValue(terminal_pressure_difference, terminal, delta_pressure, INSERT_VALUES);
+        //if (terminal == 0) PRINT_4_VARIABLES(node_index, p_original_ventilation_problem->mPressureCondition[node_index], p_original_ventilation_problem->mPressure[node_index], delta_pressure);
+    }
+    return 0;
+}
+
+void VentilationProblem::SolveFromPressureWithSnes()
+{
+    assert( !mFluxGivenAtInflow );  // It's not a direct solve
+    if (mTerminalInteractionMatrix == NULL)
+    {
+        SetupIterativeSolver();
+    }
+
+    SNES snes;
+    SNESCreate(PETSC_COMM_WORLD, &snes);
+
+    // Set the residual creation function (direct solve flux->pressure followed by pressure matching)
+    SNESSetFunction(snes, mTerminalPressureChangeVector /*residual*/ , &ComputeSnesResidual, this);
+    // The approximate Jacobian has been precomputed so we are going to wing it
+    SNESSetJacobian(snes, mTerminalInteractionMatrix, mTerminalInteractionMatrix, /*&ComputeSnesJacobian*/ NULL, this);
+
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 4) //PETSc 3.4 or later
+    SNESSetType(snes, SNESNEWTONLS);
+#else
+    SNESSetType(snes, SNESLS);
+#endif
+    // Set the relative tolerance on the residual
+    // Also set the absolute tolerance - useful for when the solver is started from the correct answer
+    SNESSetTolerances(snes, 1.0e-16/*abs_tol*/, 1e-15/*r_tol*/, PETSC_DEFAULT/*step_tol*/, PETSC_DEFAULT, PETSC_DEFAULT);
+
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR == 3) //PETSc 3.3
+    SNESLineSearch linesearch;
+    SNESGetSNESLineSearch(snes, &linesearch);
+    SNESLineSearchSetType(linesearch, "bt"); //Use backtracking search as default
+#elif (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 4) //PETSc 3.4 or later
+    SNESLineSearch linesearch;
+    SNESGetLineSearch(snes, &linesearch);
+    SNESLineSearchSetType(linesearch, "bt"); //Use backtracking search as default
+#endif
+
+    SNESSetFromOptions(snes);
+
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 5)
+    // Seems to want the preconditioner to be explicitly set to none now
+    // Copied this from the similar PETSc example at:
+    // http://www.mcs.anl.gov/petsc/petsc-current/src/snes/examples/tutorials/ex1.c
+    // Which got it to work...
+    KSP ksp;
+    SNESGetKSP(snes,&ksp);
+    PC pc;
+    KSPGetPC(ksp,&pc);
+    PCSetType(pc,PCNONE);
+#endif
+
+#if (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 2) //PETSc 2.2
+    SNESSolve(snes, mTerminalFluxChangeVector);
+#else
+    SNESSolve(snes, PETSC_NULL, mTerminalFluxChangeVector);
+#endif
+
+    ///\todo #2300 If used with time-stepping we should maintain a permanent SNES object
+    SNESDestroy(PETSC_DESTROY_PARAM(snes));
+
 }
 
 void VentilationProblem::SolveIterativelyFromPressure()
@@ -412,6 +531,7 @@ void VentilationProblem::Solve()
     else
     {
         SolveIterativelyFromPressure();
+        //SolveFromPressureWithSnes();
     }
 
 }

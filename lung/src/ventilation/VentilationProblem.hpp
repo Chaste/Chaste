@@ -37,11 +37,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VENTILATIONPROBLEM_HPP_
 
 #include <map>
+#include <petscsnes.h>
 #include "AbstractVentilationProblem.hpp"
 #include "LinearSystem.hpp"
 #include "TimeStepper.hpp"
 #include "VtkMeshWriter.hpp"
-
 /**
  * A class for solving one-dimensional flow in pipe problems on branching trees.
  *
@@ -60,6 +60,7 @@ class VentilationProblem : public AbstractVentilationProblem
 {
 private:
     friend class TestVentilationProblem;
+    friend PetscErrorCode ComputeSnesResidual(SNES snes, Vec terminal_flux_solution, Vec terminal_pressure_difference, void* pContext);
 
     /**< Used to hold the flux solution (and boundary conditions) in edge index ordering */
     std::vector<double> mFlux;
@@ -172,6 +173,13 @@ private:
      */
     void Initialise();
 
+
+public: ///\todo #2300
+    /** Experimental code
+     *  See SolveIterativelyFromPressure() documentation
+     */
+    void SolveFromPressureWithSnes();
+
 public:
     /** Default constructor
      * Attempts to read all parameters from a hard-coded file
@@ -254,4 +262,6 @@ public:
     void GetSolutionAsFluxesAndPressures(std::vector<double>& rFluxesOnEdges, std::vector<double>& rPressuresOnNodes);
 };
 
+
 #endif /* VENTILATIONPROBLEM_HPP_ */
+

@@ -184,6 +184,31 @@ public:
         TS_ASSERT_DELTA(flux[6], -7.102e-11, 1e-13); // (Inflow flux)
     }
 
+    void TestThreeBifurcationsSnes() throw (Exception)
+    {
+        VentilationProblem problem("lung/test/data/three_bifurcations", 0u);
+        problem.SetMeshInMilliMetres();
+        problem.SetOutflowPressure(0.0);
+        problem.SetConstantInflowPressures(15.0);
+        problem.SolveFromPressureWithSnes();
+
+        std::vector<double> flux, pressure;
+        problem.GetSolutionAsFluxesAndPressures(flux, pressure);
+        TS_ASSERT_DELTA(pressure[0], 0.0, 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[1], 6.66666,   1e-4);
+        TS_ASSERT_DELTA(pressure[2], 12.22223, 1e-4);
+        TS_ASSERT_DELTA(pressure[3], 12.22222, 1e-4);
+        TS_ASSERT_DELTA(pressure[4], 15.0, 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[5], 15.0, 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[6], 15.0, 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[7], 15.0, 1e-8); //BC
+        TS_ASSERT_DELTA(flux[0], -2.8407e-10 , 1e-13); // (Outflow flux)
+        TS_ASSERT_DELTA(flux[3], -7.102e-11, 1e-13); // (Inflow flux)
+        TS_ASSERT_DELTA(flux[4], -7.102e-11, 1e-13); // (Inflow flux)
+        TS_ASSERT_DELTA(flux[5], -7.102e-11, 1e-13); // (Inflow flux)
+        TS_ASSERT_DELTA(flux[6], -7.102e-11, 1e-13); // (Inflow flux)
+    }
+
     void TestThreeBifurcationsExtraLinksDirect() throw (Exception)
     {
         TS_ASSERT(Warnings::Instance()->GetNumWarnings() == 0u);
