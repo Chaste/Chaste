@@ -170,7 +170,8 @@ void ImmersedBoundaryMembraneElasticityForce<DIM>::AddForceContribution(std::vec
          elem_iter != p_mesh->GetElementIteratorEnd();
          ++elem_iter)
     {
-        // Get number of nodes in current element
+        // Get index and number of nodes of current element
+        unsigned elem_idx = elem_iter->GetIndex();
         unsigned num_nodes = elem_iter->GetNumNodes();
         assert(num_nodes > 0);
 
@@ -189,7 +190,7 @@ void ImmersedBoundaryMembraneElasticityForce<DIM>::AddForceContribution(std::vec
          */
 
         // The basement lamina, if present, will have different properties
-        if (elem_iter->GetIndex() == mpMesh->GetMembraneIndex())
+        if (elem_idx == mpMesh->GetMembraneIndex())
         {
             spring_constant *= mBasementSpringConstantModifier;
             rest_length *= mBasementRestLengthModifier;
@@ -222,18 +223,23 @@ void ImmersedBoundaryMembraneElasticityForce<DIM>::AddForceContribution(std::vec
             elem_iter->GetNode(node_idx)->AddAppliedForceContribution(aggregate_force);
         }
 
-        // Add force contributions from apical and basal parts
-        if (elem_iter->GetIndex() != mpMesh->GetMembraneIndex())
+        // Add force contributions from apical and basal surfaces
+        if (elem_idx != mpMesh->GetMembraneIndex())
         {
             // Apical nodes
-            Node<DIM> *p_apical_left = elem_iter->GetNode(GetLeftApicalCornerNodeIndexForElement(elem_iter->GetIndex()));
-            Node<DIM> *p_apical_right = elem_iter->GetNode(GetRightApicalCornerNodeIndexForElement(elem_iter->GetIndex()));
+            Node<DIM> *p_apical_left = elem_iter->GetNode(GetLeftApicalCornerNodeIndexForElement(elem_idx));
+            Node<DIM> *p_apical_right = elem_iter->GetNode(GetRightApicalCornerNodeIndexForElement(elem_idx));
 
             c_vector<double, DIM> apical_force = p_mesh->GetVectorFromAtoB(p_apical_left->rGetLocation(),
                                                                            p_apical_right->rGetLocation());
             normed_dist = norm_2(apical_force);
             apical_force *=
-                    0.1 * mSpringConst * (normed_dist - GetApicalLengthForElement(elem_iter->GetIndex())) / normed_dist;
+                    0.1 * mSpringConst * (normed_dist - GetApicalLengthForElement(elem_idx)) / normed_dist;
+
+            PRINT_VECTOR(apical_force);
+            PRINT_VECTOR(p_apical_left->rGetLocation());
+            PRINT_VECTOR(p_apical_right->rGetLocation());
+            TRACE("\n");
 
             p_apical_left->AddAppliedForceContribution(apical_force);
             apical_force *= -1.0;
@@ -241,17 +247,15 @@ void ImmersedBoundaryMembraneElasticityForce<DIM>::AddForceContribution(std::vec
 
 
             // Basal nodes
-            Node<DIM> *p_basal_left = elem_iter->GetNode(GetLeftBasalCornerNodeIndexForElement(elem_iter->GetIndex()));
-            Node<DIM> *p_basal_right = elem_iter->GetNode(GetRightBasalCornerNodeIndexForElement(elem_iter->GetIndex()));
+            Node<DIM> *p_basal_left = elem_iter->GetNode(GetLeftBasalCornerNodeIndexForElement(elem_idx));
+            Node<DIM> *p_basal_right = elem_iter->GetNode(GetRightBasalCornerNodeIndexForElement(elem_idx));
 
             c_vector<double, DIM> basal_force = p_mesh->GetVectorFromAtoB(p_basal_left->rGetLocation(),
                                                                           p_basal_right->rGetLocation());
-            PRINT_VECTOR(basal_force);
-            PRINT_VECTOR(p_basal_left->rGetLocation());
-            PRINT_VECTOR(p_basal_right->rGetLocation());
+
             normed_dist = norm_2(basal_force);
             basal_force *=
-                    0.0 * mSpringConst * (normed_dist - GetBasalLengthForElement(elem_iter->GetIndex())) / normed_dist;
+                    0.0 * mSpringConst * (normed_dist - GetBasalLengthForElement(elem_idx)) / normed_dist;
 
             p_basal_left->AddAppliedForceContribution(basal_force);
             basal_force *= -1.0;
