@@ -275,7 +275,12 @@ ComputeSnesResidual(SNES snes, Vec terminal_flux_solution, Vec terminal_pressure
 
     /* Copy the  fluxes given in the initial guess into the problem */
     double* p_terminal_flux_vector;
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
+    // Request read-only access properly
+    VecGetArrayRead(terminal_flux_solution, (const PetscScalar**) &p_terminal_flux_vector);
+#else
     VecGetArray(terminal_flux_solution, &p_terminal_flux_vector);
+#endif
 
     unsigned num_terminals = p_original_ventilation_problem->mMesh.GetNumBoundaryNodes()-1u;
 
@@ -317,6 +322,11 @@ void VentilationProblem::SolveFromPressureWithSnes()
     SNESSetFunction(snes, mTerminalPressureChangeVector /*residual*/ , &ComputeSnesResidual, this);
     // The approximate Jacobian has been precomputed so we are going to wing it
     SNESSetJacobian(snes, mTerminalInteractionMatrix, mTerminalInteractionMatrix, /*&ComputeSnesJacobian*/ NULL, this);
+#if (PETSC_VERSION_MAJOR == 3) //PETSc 3.x
+    SNESSetLagJacobian(snes, -1 /*Never rebuild Jacobian*/);
+#else
+    SNESSetType(snes, SNESLS);
+#endif
 
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 4) //PETSc 3.4 or later
     SNESSetType(snes, SNESNEWTONLS);

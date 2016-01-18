@@ -190,9 +190,6 @@ public:
         problem.SetMeshInMilliMetres();
         problem.SetOutflowPressure(0.0);
         problem.SetConstantInflowPressures(15.0);
-#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 3) //PETSc 3.3 or later
-        ///\todo Fix "object is in wrong state"
-#else
         problem.SolveFromPressureWithSnes();
 
         std::vector<double> flux, pressure;
@@ -210,7 +207,6 @@ public:
         TS_ASSERT_DELTA(flux[4], -7.102e-11, 1e-13); // (Inflow flux)
         TS_ASSERT_DELTA(flux[5], -7.102e-11, 1e-13); // (Inflow flux)
         TS_ASSERT_DELTA(flux[6], -7.102e-11, 1e-13); // (Inflow flux)
-#endif
     }
 
     void TestThreeBifurcationsExtraLinksDirect() throw (Exception)
