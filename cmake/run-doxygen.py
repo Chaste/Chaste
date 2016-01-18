@@ -31,7 +31,7 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-import os, sys
+import os, sys,shutil
 
 error_log = 'doxygen-error.log'
 output_log = 'doxygen-output.log'
@@ -64,17 +64,17 @@ if __name__ == "__main__":
     CWD = os.getcwd()
     os.chdir(SOURCE_DIR)
 
-
     # Run Doxygen
     RunDoxygen(build_version, hide_undoc_classes=check_coverage)
 
     # Copy the files to DOCS_DIR
-    os.system('rm -rf ' + DOCS_DIR)
-    os.system('cp -r doxygen/html ' + DOCS_DIR)
+    if os.path.exists(DOCS_DIR):
+       shutil.rmtree(DOCS_DIR)
+    shutil.copytree('doxygen/html',DOCS_DIR)
 
     if check_coverage:
         sys.path.insert(0,SOURCE_DIR+'/python/infra')
         from ParseDoxygen import parse_doxygen
-        parse_doxygen(DOCS_DIR+'/'+output_log,DOCS_DIR+'/'+error_log,DOCS_DIR)
+        parse_doxygen(SOURCE_DIR+'/'+output_log,SOURCE_DIR+'/'+error_log,DOCS_DIR)
 
     os.chdir(CWD)
