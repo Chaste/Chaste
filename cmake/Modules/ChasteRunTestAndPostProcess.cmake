@@ -29,9 +29,9 @@ execute_process(
     )
 
 if( test_not_successful )
-    message( SEND_ERROR "test ${test_cmd} failed")
-    message( "standard output was ${std_out}")
-    message( "standard error was ${std_err}")
+    message( SEND_ERROR "${test_cmd} failed")
+    message( SEND_ERROR "standard output was ${std_out}")
+    message( SEND_ERROR "standard error was ${std_err}")
 else()
     message("executing post-processing command:")
     message("\t${post_cmd} ${post_args}")
