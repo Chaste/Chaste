@@ -3,6 +3,7 @@
 #---------------------------------------------------------------------------
 # Project related configuration options
 #----------------------------------------------------------------------------
+MARKDOWN_SUPPORT       = NO
 PROJECT_NAME           = Chaste
 PROJECT_NUMBER         = 
 PROJECT_LOGO           = docs/chaste-logo-60x60.jpg

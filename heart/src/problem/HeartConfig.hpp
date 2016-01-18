@@ -373,10 +373,10 @@ public:
 
     /**
      * Return a number of stimulated regions (Axis-aligned boxes)
-     * \todo - do we assume the vectors are initially empty?
      * The returned std::vectors are all of the same length
      * @param rStimuliApplied  rStimuliApplied[0] is stimulus for the first region
      * @param rStimulatedAreas  rStimulatedAreas[0] is the first region to be stimulated
+     * \todo - do we assume the vectors are initially empty?
      *
      * \todo There is no set method
      */
@@ -389,7 +389,6 @@ public:
      * or a transmural-type of hetrogeneities. In the latter case, it stores the percentage values of Epi and Endo layers
      * in two member variables, accessible via get methods. It also checks if the user-supplied numbers are consistent (i.e., positive and add up to less than 1)
      * Return a number of heterogeneous regions for special gating variable changes
-     * \todo - do we assume the vectors are initially empty?
      * The returned std::vectors are all of the same length
      * @param rCellHeterogeneityRegions  cellHeterogeneityAreas[0] is the first region
      * @param rScaleFactorGks  scaleFactorGks[0] is a scaling factor for the first region
@@ -397,6 +396,7 @@ public:
      * @param rScaleFactorGkr  scaleFactorGkr[0] is a scaling factor for the first region
      * @param pParameterSettings  specification of named parameters to set on the cell models; each entry is a map
      *     from parameter name to value.
+     * \todo - do we assume the vectors are initially empty?
      * \todo There is no set method
      */
     template<unsigned DIM>
@@ -446,11 +446,11 @@ public:
 
     /**
      * Return a number of heterogeneous regions (Axis-aligned boxes)
-     * \todo - do we assume the vectors are initially empty?
      * The returned std::vectors are all of the same length
      * @param conductivitiesHeterogeneityAreas  conductivitiesHeterogeneityAreas[0] is the first region
      * @param intraConductivities  intraConductivities[0] is conductivity vector for the first region
      * @param extraConductivities  extraConductivities[0] is conductivity vector for the first region
+     * \todo - do we assume the vectors are initially empty?
      */
     template<unsigned DIM>
     void GetConductivityHeterogeneities(std::vector<boost::shared_ptr<AbstractChasteRegion<DIM> > >& conductivitiesHeterogeneityAreas,

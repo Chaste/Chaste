@@ -527,8 +527,8 @@ public:
      * This is virtual so BidomainProblem can overwrite V to zero for bath nodes, if
      * there are any.
      *
-     * \todo Perhaps this should be a method of AbstractCardiacTissue??
      * @return the newly created intial conditions vector
+     * \todo Perhaps this should be a method of AbstractCardiacTissue??
      */
     virtual Vec CreateInitialCondition();
 

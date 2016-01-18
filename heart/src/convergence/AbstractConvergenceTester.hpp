@@ -239,8 +239,9 @@ class AbstractConvergenceTester : public AbstractUntemplatedConvergenceTester
 {
 public:
     /**
-     * \todo This is a scarily long method; could do with some parts extracted?
+     * Run the same test at different levels of refinement until some convergence criterion is met.
      * @param nameOfTest The name of the convergence test (typically the name in the suite) for use in naming files.
+     * \todo This is a scarily long method; could do with some parts extracted?
      */
     void Converge(std::string nameOfTest)
     {

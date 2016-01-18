@@ -150,13 +150,14 @@ protected:
      *   - triangulateio (for triangle remesher in 2D)
      *   - tetgenio (for tetgen remesher in 3D)
      * Since conditional compilation is not allowed, care must be taken to only use
-     * common data members in this method (or add arguments \todo #1545 ...)
+     * common data members in this method 
      * @param mesherOutput is a triangulateio or tetgenio class (decided at compile time)
      * @param numberOfElements is a copy of either mesherOutput.numberoftriangles or mesherOutput.numberoftetrahedra
      * @param elementList is a pointer to either mesherOutput.trianglelist or mesherOutput.tetrahedronlist
      * @param numberOfFaces is a copy of either mesherOutput.edges or mesherOutput.numberoftrifaces
      * @param faceList is a pointer to either mesherOutput.edgelist or mesherOutput.trifacelist
      * @param edgeMarkerList is a pointer to either mesherOutput.edgemarkerlist or NULL
+     * \todo #1545: (or add arguments ...)
      *
      */
     template <class MESHER_IO>

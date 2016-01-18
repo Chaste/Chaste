@@ -408,8 +408,8 @@ public:
      * This takes a mesh of a given concrete class and produces a deep copy.
      *
      * Use with caution when copying between subclasses.
-     * \todo Can we make this const?
      * @param rOtherMesh the mesh to copy
+     * \todo Can we make this const?
      */
     void ConstructFromMesh(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>& rOtherMesh);
 
