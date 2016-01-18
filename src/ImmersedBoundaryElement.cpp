@@ -66,6 +66,12 @@ FluidSource<SPACE_DIM>* ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::GetFlui
     return mpFluidSource;
 }
 
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+std::vector<Node<SPACE_DIM>*>& ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::rGetCornerNodes(void)
+{
+    return mCornerNodes;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 //                  Specialization for 1d elements                  //
@@ -92,6 +98,11 @@ template<unsigned SPACE_DIM>
 FluidSource<SPACE_DIM>* ImmersedBoundaryElement<1, SPACE_DIM>::GetFluidSource(void)
 {
     return NULL;
+}
+
+template<unsigned SPACE_DIM>
+std::vector<Node<SPACE_DIM>*>& ImmersedBoundaryElement<1, SPACE_DIM>::rGetCornerNodes(void)
+{
 }
 
 

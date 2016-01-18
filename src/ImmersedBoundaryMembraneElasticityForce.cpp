@@ -236,10 +236,10 @@ void ImmersedBoundaryMembraneElasticityForce<DIM>::AddForceContribution(std::vec
             apical_force *=
                     0.1 * mSpringConst * (normed_dist - GetApicalLengthForElement(elem_idx)) / normed_dist;
 
-            PRINT_VECTOR(apical_force);
-            PRINT_VECTOR(p_apical_left->rGetLocation());
-            PRINT_VECTOR(p_apical_right->rGetLocation());
-            TRACE("\n");
+//            PRINT_VECTOR(apical_force);
+//            PRINT_VECTOR(p_apical_left->rGetLocation());
+//            PRINT_VECTOR(p_apical_right->rGetLocation());
+//            TRACE("\n");
 
             p_apical_left->AddAppliedForceContribution(apical_force);
             apical_force *= -1.0;

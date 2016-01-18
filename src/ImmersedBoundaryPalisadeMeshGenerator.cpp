@@ -35,8 +35,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
-#include "ImmersedBoundaryElement.hpp"
 #include "RandomNumberGenerator.hpp"
+
+#include "Debug.hpp"
 
 ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(unsigned numCellsWide, unsigned numNodesPerCell, double ellipseExponent, double cellAspectRatio, double randomYMult, bool membrane)
   : mpMesh(NULL),
@@ -72,6 +73,56 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
     SuperellipseGenerator* p_gen = new SuperellipseGenerator(mNumNodesPerCell, mEllipseExponent, cell_width, cell_height, 0.0, 0.0);
     std::vector<c_vector<double, 2> > locations = p_gen->GetPointsAsVectors();
 
+    // Calculate which locations will be the element corners
+    double top_height = p_gen->GetHeightOfTopSurface();
+    double bot_height = cell_height - top_height;
+
+    if (top_height < 0.5 * cell_height || top_height > cell_height)
+    {
+        EXCEPTION("Something went wrong calculating the height of top surface of the cell.");
+    }
+
+    // Corner 0 is left-apical, 1 is right-apical, 2 is right-basal, 3 is left-basal
+    std::vector<unsigned> corner_indices(4, 0);
+    for(unsigned location = 0 ; location < locations.size() ; location++)
+    {
+        if (locations[location][1] > top_height)
+        {
+            corner_indices[1] = location;
+        }
+
+        if (locations == unsigned(0.25 * mNumNodesPerCell))
+        {
+            EXCEPTION("Something went wrong identifying right-apical corner");
+        }
+    }
+    for(unsigned location = unsigned(0.25 * mNumNodesPerCell) ; location < locations.size() ; location++)
+    {
+        if (locations[location][1] < top_height)
+        {
+            corner_indices[0] = location - 1;
+        }
+
+        if (locations == unsigned(0.5 * mNumNodesPerCell))
+        {
+            EXCEPTION("Something went wrong identifying left-apical corner");
+        }
+    }
+    for(unsigned location = unsigned(0.5 * mNumNodesPerCell) ; location < locations.size() ; location++)
+    {
+        if (locations[location][1] < bot_height)
+        {
+            corner_indices[0] = location - 1;
+        }
+
+        if (locations == unsigned(0.5 * mNumNodesPerCell))
+        {
+            EXCEPTION("Something went wrong identifying left-apical corner");
+        }
+    }
+
+
+
     // Create a vector of immersed boundary elements and vector of nodes
     std::vector<ImmersedBoundaryElement<2,2>*> ib_elements;
     std::vector<Node<2>*> nodes;
@@ -99,8 +150,6 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
     }
 
     RandomNumberGenerator* p_rand_gen = RandomNumberGenerator::Instance();
-
-
 
     for (unsigned cell_idx = 0 ; cell_idx < mNumCellsWide ; cell_idx++)
     {

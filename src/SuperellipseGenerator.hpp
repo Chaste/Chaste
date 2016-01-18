@@ -54,6 +54,9 @@ private:
     /** The target node spacing */
     double mTargetNodeSpacing;
 
+    /** The height at which the point of maximal curvature is achieved in the top right hand corner */
+    double mHeightOfTopSurface;
+
     /** Vector to store the points */
     std::vector<c_vector<double, 2> > mPoints;
 
@@ -87,6 +90,13 @@ public:
      * @return the target node spacing
      */
     double GetTargetNodeSpacing();
+
+    /**
+     * @return the height of the top surface.
+     *
+     * This is defined as the height at which the point of maximal curvature is achieved in the top right hand corner.
+     */
+    double GetHeightOfTopSurface();
 
     /**
      * @return vector of c_vector objects

@@ -135,6 +135,39 @@ SuperellipseGenerator::SuperellipseGenerator(unsigned numPoints,
     }
 
     /*
+     * Calculate the height of the top surface.  We loop through the points looking at the change in x and change in y
+     * from the previous point.  The first difference in which the absolute change in x is greater than the absolute
+     * change in y will be the point with maximal curvature.
+     */
+    double delta_x = fabs(mPoints[0][0] - mPoints[1][0]);
+    double delta_y = fabs(mPoints[0][1] - mPoints[1][1]);
+
+    // The following should always hold, for an exponent less than 1.0
+    if (delta_x > delta_y)
+    {
+        NEVER_REACHED;
+    }
+
+    for (unsigned i = 1 ; i < numPoints ; i++)
+    {
+        delta_x = fabs(mPoints[i][0] - mPoints[i-1][0]);
+        delta_y = fabs(mPoints[i][1] - mPoints[i-1][1]);
+
+        if (delta_x > delta_y)
+        {
+            mHeightOfTopSurface = 0.5 * (mPoints[i][1] + mPoints[i-1][1]);
+
+            break;
+        }
+
+        // We should meet this condition before being half way through the list
+        if (i == unsigned(numPoints / 2.0))
+        {
+            NEVER_REACHED;
+        }
+    }
+
+    /*
      * Rescale all points to match parameters
      */
 
@@ -142,6 +175,9 @@ SuperellipseGenerator::SuperellipseGenerator(unsigned numPoints,
     c_vector<double, 2> offset;
     offset[0] = width * 0.5 + botLeftX;
     offset[1] = height * 0.5 + botLeftY;
+
+    // Reposition the height of the top surface
+    mHeightOfTopSurface += offset[1];
 
     for(unsigned point = 0 ; point < numPoints ; point++)
     {
@@ -162,6 +198,11 @@ SuperellipseGenerator::~SuperellipseGenerator()
 double SuperellipseGenerator::GetTargetNodeSpacing()
 {
     return mTargetNodeSpacing;
+}
+
+double SuperellipseGenerator::GetHeightOfTopSurface()
+{
+    return mHeightOfTopSurface;
 }
 
 

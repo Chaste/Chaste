@@ -56,6 +56,9 @@ private:
     /** Fluid source associated with this element. */
     FluidSource<SPACE_DIM>* mpFluidSource;
 
+    /** Corner nodes associated with this element. */
+    std::vector<Node<SPACE_DIM>*> mCornerNodes;
+
     /** Needed for serialization. */
     friend class boost::serialization::access;
 
@@ -107,6 +110,13 @@ public:
      */
     FluidSource<SPACE_DIM>* GetFluidSource(void);
 
+    /**
+     * @return the vector of corner nodes.
+     *
+     * Don't forget to assign the result of this call to a reference!
+     */
+    std::vector<Node<SPACE_DIM>*>& rGetCornerNodes();
+
 };
 
 
@@ -146,6 +156,13 @@ public:
      * @return pointer to the fluiod source
      */
     FluidSource<SPACE_DIM>* GetFluidSource(void);
+
+    /**
+     * @return the vector of corner nodes.
+     *
+     * Don't forget to assign the result of this call to a reference!
+     */
+    std::vector<Node<SPACE_DIM>*>& rGetCornerNodes();
 
 };
 
