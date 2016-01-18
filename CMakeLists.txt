@@ -522,6 +522,7 @@ install(DIRECTORY ${Chaste_SOURCE_DIR}/python
 
 if (Chaste_COVERAGE)
     set(CTEST_COMMAND ctest)
+    set(_outputname coverage)
 	ADD_CUSTOM_TARGET(coverage
 
 		# Cleanup lcov

@@ -75,6 +75,6 @@ if __name__ == "__main__":
     if check_coverage:
         sys.path.insert(0,SOURCE_DIR+'/python/infra')
         from ParseDoxygen import parse_doxygen
-        parse_doxygen(SOURCE_DIR+'/'+output_log,SOURCE_DIR+'/'+error_log,DOCS_DIR)
+        parse_doxygen(DOCS_DIR+'/'+output_log,DOCS_DIR+'/'+error_log,DOCS_DIR)
 
     os.chdir(CWD)
