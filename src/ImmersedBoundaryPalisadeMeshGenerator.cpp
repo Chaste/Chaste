@@ -83,45 +83,67 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
     }
 
     // Corner 0 is left-apical, 1 is right-apical, 2 is right-basal, 3 is left-basal
-    std::vector<unsigned> corner_indices(4, 0);
+    std::vector<unsigned> corner_indices(4, UINT_MAX);
+
+    // First anticlockwise corner is corner 1
     for(unsigned location = 0 ; location < locations.size() ; location++)
     {
         if (locations[location][1] > top_height)
         {
             corner_indices[1] = location;
-        }
-
-        if (locations == unsigned(0.25 * mNumNodesPerCell))
-        {
-            EXCEPTION("Something went wrong identifying right-apical corner");
+            break;
         }
     }
+
+    // Second anticlockwise corner is corner 0
     for(unsigned location = unsigned(0.25 * mNumNodesPerCell) ; location < locations.size() ; location++)
     {
         if (locations[location][1] < top_height)
         {
             corner_indices[0] = location - 1;
-        }
-
-        if (locations == unsigned(0.5 * mNumNodesPerCell))
-        {
-            EXCEPTION("Something went wrong identifying left-apical corner");
+            break;
         }
     }
+
+    // Third anticlockwise corner is corner 3
     for(unsigned location = unsigned(0.5 * mNumNodesPerCell) ; location < locations.size() ; location++)
     {
         if (locations[location][1] < bot_height)
         {
-            corner_indices[0] = location - 1;
-        }
-
-        if (locations == unsigned(0.5 * mNumNodesPerCell))
-        {
-            EXCEPTION("Something went wrong identifying left-apical corner");
+            corner_indices[3] = location;
+            break;
         }
     }
 
+    // Fourth anticlockwise corner is corner 2
+    for(unsigned location = unsigned(0.75 * mNumNodesPerCell) ; location < locations.size() ; location++)
+    {
+        if (locations[location][1] > bot_height)
+        {
+            corner_indices[2] = location - 1;
+            break;
+        }
+    }
 
+    if ( (corner_indices[0] == UINT_MAX) ||
+         (corner_indices[1] == UINT_MAX) ||
+         (corner_indices[2] == UINT_MAX) ||
+         (corner_indices[3] == UINT_MAX) )
+    {
+        EXCEPTION("At least one corner not tagged properly");
+    }
+
+    if ( (corner_indices[0] < corner_indices[1]) ||
+         (corner_indices[3] < corner_indices[0]) ||
+         (corner_indices[2] < corner_indices[3]) )
+    {
+        EXCEPTION("Something went wrong when tagging corner locations");
+    }
+
+    if ( corner_indices[0] - corner_indices[1] != corner_indices[2] - corner_indices[3] )
+    {
+        EXCEPTION("Apical and basal surfaces are different sizes");
+    }
 
     // Create a vector of immersed boundary elements and vector of nodes
     std::vector<ImmersedBoundaryElement<2,2>*> ib_elements;
@@ -175,6 +197,13 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
         }
 
         ib_elements.push_back(new ImmersedBoundaryElement<2,2>(ib_elements.size(), nodes_this_elem));
+
+        // Pass in the correct corners
+        std::vector<Node<2>*>& r_elem_corners = ib_elements.back()->rGetCornerNodes();
+        for (unsigned corner = 0 ; corner < 4 ; corner++)
+        {
+            r_elem_corners.push_back(ib_elements.back()->GetNode(corner_indices[corner]));
+        }
     }
 
     // Create a mesh with the nodes and elements vectors
