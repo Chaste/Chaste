@@ -84,8 +84,8 @@ if os.path.isdir('/opt/intel'):
     blas_lapack_production = ['mkl_intel_lp64', 'mkl_core', 'mkl_sequential']
     if os.path.isdir('/opt/intel/composerxe'):
         intel_path = '/opt/intel/composerxe'
-    if os.path.isdir(intel_path + '/mkl/lib/intel64'):
-        other_libpaths.append(intel_path + '/mkl/lib/intel64')
+        if os.path.isdir(intel_path + '/mkl/lib/intel64'):
+            other_libpaths.append(intel_path + '/mkl/lib/intel64')
     else:
         options = glob.glob('/opt/intel/compilers_and_libraries_*/linux')
         options.sort()
