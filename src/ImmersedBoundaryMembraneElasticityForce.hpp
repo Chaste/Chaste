@@ -82,7 +82,16 @@ protected:
     ImmersedBoundaryMesh<DIM,DIM>* mpMesh;
 
     /** How far through the element attributes vector we are when this constructor is called */
-    unsigned mCurrentLocationInElementAttributesVector;
+    unsigned mReferenceLocationInAttributesVector;
+
+    /** Node region code for basal, used only by this class */
+    const static unsigned msBas = 0;
+
+    /** Node region code for apical, used only by this class */
+    const static unsigned msApi = 1;
+
+    /** Node region code for lateral, used only by this class */
+    const static unsigned msLat = 2;
 
     /** The membrane spring constant associated with each element */
     double mSpringConst;
@@ -96,35 +105,8 @@ protected:
     /** The multiplicative quantity by which we alter the rest length of the basement lamina, if present */
     double mBasementRestLengthModifier;
 
-    /** Vector containing locations of corner-node-indices in the element attribute vectors */
-    std::vector<unsigned> mCornerLocationsInAttributeVector;
-
     /** Vector containing locations of apical and basal rest-lengths in the element attribute vectors */
     std::vector<unsigned> mRestLengthLocationsInAttributeVector;
-
-    /**
-     * @param elemIndex index of the element to retrieve corner node index of
-     * @return corner node index of the specified element
-     */
-    unsigned GetLeftApicalCornerNodeIndexForElement(unsigned elemIndex);
-
-    /**
-     * @param elemIndex index of the element to retrieve corner node index of
-     * @return corner node index of the specified element
-     */
-    unsigned GetRightApicalCornerNodeIndexForElement(unsigned elemIndex);
-
-    /**
-     * @param elemIndex index of the element to retrieve corner node index of
-     * @return corner node index of the specified element
-     */
-    unsigned GetRightBasalCornerNodeIndexForElement(unsigned elemIndex);
-
-    /**
-     * @param elemIndex index of the element to retrieve corner node index of
-     * @return corner node index of the specified element
-     */
-    unsigned GetLeftBasalCornerNodeIndexForElement(unsigned elemIndex);
 
     /**
      * @param elemIndex index of the element to retrieve apical length of
@@ -137,6 +119,19 @@ protected:
      * @return basal length of the specified element
      */
     double GetBasalLengthForElement(unsigned elemIndex);
+
+    /**
+     * Splits the nodes into three categories: basal, apical, and lateral.  We keep this information in the node
+     * attribute called region, with 0, 1, and 2 representing basal, apical, and lateral respectively.
+     */
+    void TagNodeRegions();
+
+    /*
+     * We calculate the 'corners' of each element, in order to alter behaviour on apical, lateral, and basal regions
+     * separately. Corners are stored as four consecutive element attributes, numbered sequentially clockwise from the
+     * apical left-hand corner.
+     */
+    void TagApicalAndBasalLengths();
 
 public:
 
@@ -164,19 +159,6 @@ public:
      * @param rCellPopulation reference to the cell population
      */
     virtual void AddForceContribution(std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs);
-
-    /**
-     * Splits the nodes into three categories: basal, apical, and lateral.  We keep this information in the node
-     * attribute called region, with 0, 1, and 2 representing basal, apical, and lateral respectively.
-     */
-    void TagNodeRegions();
-
-    /*
-     * We calculate the 'corners' of each element, in order to alter behaviour on apical, lateral, and basal regions
-     * separately. Corners are stored as four consecutive element attributes, numbered sequentially clockwise from the
-     * apical left-hand corner.
-     */
-    void TagElementCorners();
 
     /**
      * Overridden OutputForceParameters() method.

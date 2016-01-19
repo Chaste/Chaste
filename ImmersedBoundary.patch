@@ -1,8 +1,17 @@
 Index: cell_based/src/simulation/OffLatticeSimulation.cpp
 ===================================================================
---- cell_based/src/simulation/OffLatticeSimulation.cpp	(revision 25840)
+--- cell_based/src/simulation/OffLatticeSimulation.cpp	(revision 25917)
 +++ cell_based/src/simulation/OffLatticeSimulation.cpp	(working copy)
 @@ -77,7 +77,7 @@
+         // All classes derived from AbstractOffLatticeCellPopulation are covered by the above (except user-derived classes),
+         // i.e. if you want to use this method with your own subclass of AbstractOffLatticeCellPopulation, then simply
+         // comment out the line below
+-        NEVER_REACHED;
++//        NEVER_REACHED;
+     }
+ }
+ 
+@@ -223,7 +223,7 @@
          // All classes derived from AbstractOffLatticeCellPopulation are covered by the above (except user-derived classes),
          // i.e. if you want to use this class with your own subclass of AbstractOffLatticeCellPopulation, then simply
          // comment out the line below
@@ -13,7 +22,7 @@ Index: cell_based/src/simulation/OffLatticeSimulation.cpp
  
 Index: mesh/src/utilities/BoxCollection.cpp
 ===================================================================
---- mesh/src/utilities/BoxCollection.cpp	(revision 25840)
+--- mesh/src/utilities/BoxCollection.cpp	(revision 25913)
 +++ mesh/src/utilities/BoxCollection.cpp	(working copy)
 @@ -683,7 +683,7 @@
                                              std::map<unsigned, std::set<unsigned> >& rNodeNeighbours)

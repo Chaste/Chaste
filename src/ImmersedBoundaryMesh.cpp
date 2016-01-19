@@ -132,7 +132,7 @@ ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryMesh(std::vector<N
         }
     }
 
-    mElementFluidSources[2]->SetStrength(5.0 * 1e6);
+    mElementFluidSources[2]->SetStrength(0.0 * 1e6);
 
     /*
      * Set up a number of sources to balance any active sources associated with elements

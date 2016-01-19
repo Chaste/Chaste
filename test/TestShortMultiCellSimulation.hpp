@@ -54,6 +54,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Simulation does not run in parallel
 #include "FakePetscSetup.hpp"
+#include "../../../cell_based/src/population/cell/cycle/CellCyclePhases.hpp"
 
 class TestShortMultiCellSimulation : public AbstractCellBasedTestSuite
 {
@@ -61,13 +62,6 @@ public:
 
     void TestShortMultiCellSim() throw(Exception)
     {
-        Timer timer;
-
-        double setup_duration = 0.0;
-        double simulation_duration = 0.0;
-
-        timer.Reset();
-
         /*
          * 1: Num cells
          * 2: Num nodes per cell
@@ -76,7 +70,7 @@ public:
          * 5: Random y-variation
          * 6: Include membrane
          */
-        ImmersedBoundaryPalisadeMeshGenerator gen(7, 256, 0.1, 2.5, 0.1, true);
+        ImmersedBoundaryPalisadeMeshGenerator gen(9, 256, 0.1, 3.0, 0.1, true);
         ImmersedBoundaryMesh<2, 2>* p_mesh = gen.GetMesh();
 
         p_mesh->SetNumGridPtsXAndY(512);
@@ -99,29 +93,16 @@ public:
         MAKE_PTR_ARGS(ImmersedBoundaryMembraneElasticityForce<2>, p_boundary_force, (cell_population));
         p_main_modifier->AddImmersedBoundaryForce(p_boundary_force);
 
-        MAKE_PTR_ARGS(ImmersedBoundaryCellCellInteractionForce<2>, p_cell_cell_force, (cell_population));
-        p_main_modifier->AddImmersedBoundaryForce(p_cell_cell_force);
+//        MAKE_PTR_ARGS(ImmersedBoundaryCellCellInteractionForce<2>, p_cell_cell_force, (cell_population));
+//        p_main_modifier->AddImmersedBoundaryForce(p_cell_cell_force);
 
-
-        double volume_before = p_mesh->GetVolumeOfElement(3);
 
         // Set simulation properties
         double dt = 0.005;
         simulator.SetOutputDirectory("TestShortMultiCellSimulation");
         simulator.SetDt(dt);
-        simulator.SetSamplingTimestepMultiple(1);
-        simulator.SetEndTime(2.0 * dt);
-
-        setup_duration = timer.GetElapsedTime();
-
+        simulator.SetSamplingTimestepMultiple(5);
+        simulator.SetEndTime(1415.0 * dt);
         simulator.Solve();
-
-        simulation_duration = timer.GetElapsedTime() - setup_duration;
-
-        double volume_after = p_mesh->GetVolumeOfElement(3);
-
-        PRINT_VARIABLE(volume_after/volume_before);
-
-        PRINT_2_VARIABLES(setup_duration, simulation_duration);
     }
 };
