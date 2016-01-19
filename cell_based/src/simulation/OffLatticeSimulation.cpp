@@ -75,7 +75,7 @@ OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::OffLatticeSimulation(AbstractCellPo
     else
     {
         // All classes derived from AbstractOffLatticeCellPopulation are covered by the above (except user-derived classes),
-        // i.e. if you want to use this class with your own subclass of AbstractOffLatticeCellPopulation, then simply
+        // i.e. if you want to use this method with your own subclass of AbstractOffLatticeCellPopulation, then simply
         // comment out the line below
         NEVER_REACHED;
     }
@@ -211,15 +211,19 @@ c_vector<double, SPACE_DIM> OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::Calcula
 
         return daughter_coords;
     }
-    else
+    else if (bool(dynamic_cast<VertexBasedCellPopulation<SPACE_DIM>*>(&(this->mrCellPopulation))))
     {
-        // Check this is a Vertex based cell population (in case new types are added later!).
-        assert(bool(dynamic_cast<VertexBasedCellPopulation<SPACE_DIM>*>(&(this->mrCellPopulation))));
-
         VertexBasedCellPopulation<SPACE_DIM>* p_vertex_population = dynamic_cast<VertexBasedCellPopulation<SPACE_DIM>*>(&(this->mrCellPopulation));
         boost::shared_ptr<AbstractVertexBasedDivisionRule<SPACE_DIM> > p_division_rule = p_vertex_population->GetVertexBasedDivisionRule();
 
         return p_division_rule->CalculateCellDivisionVector(pParentCell, *p_vertex_population);
+    }
+    else
+    {
+        // All classes derived from AbstractOffLatticeCellPopulation are covered by the above (except user-derived classes),
+        // i.e. if you want to use this class with your own subclass of AbstractOffLatticeCellPopulation, then simply
+        // comment out the line below
+        NEVER_REACHED;
     }
 }
 
