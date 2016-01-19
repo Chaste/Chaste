@@ -1005,6 +1005,7 @@ class Intel(BuildType):
                                        '-we271', #271: trailing comma is nonstandard
                                        #Following doesn't seem to play
                                        '-we810', #810: conversion from "double" to "unsigned int" may lose significant bits
+                                       '-wr11021', # ipo warning unresolved symbols in third party libraries (usually!)
                                        ])
             elif (version == 10 or version == 11):
                 self._cc_flags.extend([# This is where the statement is unreachable in a particular instatiation of the template.  e.g. "if (SPACE_DIM<3){return;}" will complain that the SPACE_DIM=3 specific code is unreachable.

@@ -74,11 +74,27 @@ petsc_build_name_profile = petsc_build_name
 petsc_build_name_optimized = 'linux-gnu-c-opt'
 
 dealii_path = None
-intel_path = None
-icpc = 'icpc'
 
 other_includepaths = ['/usr/include/metis/']
 other_libpaths = []
+
+# Figure out if Intel compilers are available, here we assume they are installed under the 
+# default location of /opt/intel, if not you will need to change some hardcoded paths below.
+if os.path.isdir('/opt/intel'):
+    blas_lapack_production = ['mkl_intel_lp64', 'mkl_core', 'mkl_sequential']
+    if os.path.isdir('/opt/intel/composerxe'):
+        intel_path = '/opt/intel/composerxe'
+    if os.path.isdir(intel_path + '/mkl/lib/intel64'):
+        other_libpaths.append(intel_path + '/mkl/lib/intel64')
+    else:
+        options = glob.glob('/opt/intel/compilers_and_libraries_*/linux')
+        options.sort()
+        if options:
+            intel_path = options[-1]
+        else:
+            intel_path = None
+else:
+    intel_path = None
 
 if ubuntu_ver >= [15,04]:
     hdf5_lib = 'hdf5_openmpi'
@@ -146,7 +162,11 @@ def Configure(prefs, build):
     """
     global use_cvode
     global use_vtk
-    
+
+    # Whether to use the Intel compiler
+    if build.CompilerType() == 'intel':
+        tools['mpicxx'] = 'OMPI_CXX=icpc ' + tools['mpicxx']
+
     # Extra libraries for VTK output
     vtk_include_path = filter(os.path.isdir, glob.glob('/usr/include/vtk-5*'))
     use_vtk = int(prefs.get('use-vtk', True))
