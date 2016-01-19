@@ -316,7 +316,7 @@ void VentilationProblem::SolveFromPressureWithSnes()
     }
 
     SNES snes;
-    SNESCreate(PETSC_COMM_WORLD, &snes);
+    SNESCreate(PETSC_COMM_SELF, &snes);
 
     // Set the residual creation function (direct solve flux->pressure followed by pressure matching)
     SNESSetFunction(snes, mTerminalPressureChangeVector /*residual*/ , &ComputeSnesResidual, this);
