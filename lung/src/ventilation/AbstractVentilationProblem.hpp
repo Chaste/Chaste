@@ -96,11 +96,16 @@ protected:
 
     double mLengthScaling; /**< This solver is designed to be used with SI units, but meshes in mm are common. This scaling allows this to be handled.*/
 
-    /**< Use dynamic (flux related) resistance and a nonlinear solver */
+    /** Use dynamic (flux related) resistance and a nonlinear solver */
     bool mDynamicResistance;
 
-    /**< False by default (conical pipes with radius defined at nodes).  When true pipes are cylindrical.*/
+    /** False by default (conical pipes with radius defined at nodes).  When true pipes are cylindrical.*/
     bool mRadiusOnEdge;
+
+    /** True by default.  Nodes should be ordered so that parents have a lower index than there children.
+     * When false this will trigger warnings in the direct-solving subclass.
+     */
+    bool mNodesInGraphOrder;
 
     /**
      * Get the resistance of an edge.  This defaults to Poiseuille resistance (in which only the geometry is used.

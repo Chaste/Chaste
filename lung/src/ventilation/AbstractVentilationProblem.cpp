@@ -46,7 +46,8 @@ AbstractVentilationProblem::AbstractVentilationProblem(const std::string& rMeshD
       mDensity(1.15),
       mLengthScaling(1.0),
       mDynamicResistance(false),
-      mRadiusOnEdge(false)
+      mRadiusOnEdge(false),
+      mNodesInGraphOrder(true)
 {
     TrianglesMeshReader<1,3> mesh_reader(rMeshDirFilePath);
     mMesh.ConstructFromMeshReader(mesh_reader);
@@ -62,10 +63,7 @@ AbstractVentilationProblem::Initialise()
 {
     /// We might want to make the tree walker a member of this class
     AirwayTreeWalker walker(mMesh, mOutletNodeIndex);
-    if (walker.GetNodesAreGraphOrdered() == false)
-    {
-        WARNING("Nodes in this mesh do not appear in graph order.  Some solvers may be inefficient.");
-    }
+    mNodesInGraphOrder = walker.GetNodesAreGraphOrdered();
 
     // Reset edge attributes
     bool intermediate_nodes = false;

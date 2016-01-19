@@ -75,6 +75,10 @@ void VentilationProblem::Initialise()
 {
     mFlux.resize(mMesh.GetNumElements());
     mPressure.resize(mMesh.GetNumNodes());
+    if (mNodesInGraphOrder == false)
+    {
+        WARNING("Nodes in this mesh do not appear in graph order.  Some solvers may be inefficient.");
+    }
 }
 
 
@@ -104,6 +108,21 @@ void VentilationProblem::SolveDirectFromFlux()
      * In this case we need to scan the tree more than once (up to depth of tree times) before the fluces are correctly propagated
      *
      */
+    if (!mNodesInGraphOrder)
+    {
+        // Unset internal fluxes
+        for (AbstractTetrahedralMesh<1,3>::ElementIterator iter = mMesh.GetElementIteratorBegin();
+                  iter != mMesh.GetElementIteratorEnd();
+                  ++iter)
+        {
+            // Note that this won't reset the root
+            if ( !((*iter).GetNode(0)->IsBoundaryNode()) && !((*iter).GetNode(1)->IsBoundaryNode()) )
+            {
+                mFlux[ (*iter).GetIndex() ] = 0.0;
+            }
+        }
+
+    }
     bool some_flux_zero;
     bool all_flux_zero;
     do
@@ -126,18 +145,21 @@ void VentilationProblem::SolveDirectFromFlux()
                     mFlux[parent_index] += mFlux[*element_iterator];
                 }
 
-                if (mFlux[parent_index] == 0.0)
+                if (!mNodesInGraphOrder)
                 {
-                    some_flux_zero = true;
-                }
-                else if (all_flux_zero)
-                {
-                    all_flux_zero = false;
+                    if (mFlux[parent_index] == 0.0)
+                    {
+                        some_flux_zero = true;
+                    }
+                    else if (all_flux_zero)
+                    {
+                        all_flux_zero = false;
+                    }
                 }
             }
         }
     }
-    while (some_flux_zero && !all_flux_zero);
+    while (!mNodesInGraphOrder && some_flux_zero && !all_flux_zero);
 
     // Poiseuille flow at each edge
     for (AbstractTetrahedralMesh<1,3>::ElementIterator iter = mMesh.GetElementIteratorBegin();

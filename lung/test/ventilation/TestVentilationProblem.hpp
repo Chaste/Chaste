@@ -326,7 +326,7 @@ public:
         problem.WriteVtk("TestVentilation", "three_bifurcations_pedley");
 #endif
     }
-    void todoTestThreeBifurcationsExtraLinksWithDynamicResistance() throw (Exception)
+    void TestThreeBifurcationsExtraLinksWithDynamicResistance() throw (Exception)
     {
         /*
          * As previous but with every segment divided into two segments
