@@ -185,9 +185,7 @@ public:
 
     void TestThreeBifurcationsExtraLinksDirect() throw (Exception)
     {
-        TS_ASSERT(Warnings::Instance()->GetNumWarnings() == 0u);
         MatrixVentilationProblem problem("lung/test/data/three_bifurcations_extra_links", 0u);
-        TS_ASSERT(Warnings::Instance()->GetNumWarnings() == 1u);  // Warning that the nodes are not in graph order
         problem.SetMeshInMilliMetres();
         problem.SetOutflowPressure(0.0 + 1.0);
         problem.SetConstantInflowFluxes(-7.102e-11);
