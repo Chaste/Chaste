@@ -4,15 +4,17 @@ create_catalogues:true
 
 # Note that texttest checks some binary results by 
 # 1. converting from binary to text using h5dump from HDF5
-#  * (we currently use version 1.8.9, 1.8.11 or 1.8.13)
+#  * (we currently use version 1.8.11 of the h5dump binary for regular acceptance)
 #  * (h5dump 1.8.4--1.8.8 has a variation in whitespace indentation in H5T_STRING definitions)
 # 2. rounding the results to a certain number of decimal places with python/infra/RoundResultsFiles.py
 #  * (we currently round to 8 places) 
 
-# On failure, check your version of HDF5 with 
+# On h5dump failure, check your version of HDF5 with 
 # $ h5dump -V
 # h5dump: Version 1.8.11    (<-- this is the 14.04 LTS one, provided by the repository)
-
+# On the regression machine (lofty.cs) there is an h5dump script at $HOME/bin/h5dump which calls /usr/bin/h5dump
+# after first overwriting the LD_LIBRARY_PATH because it has been mangled to include a different HDF5 library.
+# See #2657
 
 # Files needed by running tests
 link_test_path:ChasteParameters.xml
