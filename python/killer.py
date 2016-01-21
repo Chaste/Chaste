@@ -34,13 +34,20 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
 
-# Kill off any processes run by our user in this directory
-# (except us, of course)
+# Kill off any processes run by our user in this directory (except us, of course).
+# Will use psutil if available, direct reads of /proc if not.
+# Note that the latter method only works on Linux.
 
 import os
 import signal
 import sys
 import time
+
+try:
+    import psutil
+except ImportError:
+    psutil = None
+
 
 sim = '-s' in sys.argv
 if '-d' in sys.argv:
@@ -54,38 +61,79 @@ our_pid = os.getpid()
 
 print "Killing processes owned by", our_uid, "in", kill_dir
 
-def check_pid(pid):
-    """Get information about the given process (pid is a string).
+if psutil:
+    Process = psutil.Process
+    get_procs = psutil.process_iter
+else:
+    # Define minimal psutil functionality implemented with /proc reads
+    class Process(object):
+        """A simple class representing a running process."""
+        def __init__(self, pid):
+            self._pid = str(pid)
+            self.pid = int(pid)
+
+        def cmdline(self):
+            try:
+                f = open('/proc/' + self._pid + '/cmdline')
+                cmdline = f.read().split('\x00')[:-1]
+                f.close()
+            except OSError:
+                cmdline = None
+            return cmdline
+
+        def uids(self):
+            try:
+                s = os.stat('/proc/' + self._pid)
+                return (s.st_uid,)
+            except OSError:
+                return (None,)
+
+        def send_signal(self, sig):
+            try:
+                os.kill(int(self._pid), sig)
+            except OSError:
+                pass
+
+        def terminate(self):
+            self.send_signal(signal.SIGTERM)
+
+        def kill(self):
+            self.send_signal(signal.SIGKILL)
+
+        def getcwd(self):
+            return os.path.realpath('/proc/' + self._pid + '/cwd')
+
+    def get_procs():
+        """Return an iterator over running processes, yielding a Process instance for each."""
+        for pid in filter(lambda pid: pid[0] in "0123456789", os.listdir('/proc')):
+            yield Process(pid)
+
+
+def check_pid(proc):
+    """Get key information about the given process.
 
     Returns a list with the command line elements if it's
     running as our_uid in the kill_dir, or None otherwise.
     """
     result = None
     try:
-        s = os.stat('/proc/' + pid)
-        if s.st_uid == our_uid:
-            cwd = os.path.realpath('/proc/' + pid + '/cwd')
-            if cwd == kill_dir and int(pid) != our_pid:
-                f = open('/proc/' + pid + '/cmdline')
-                cmdline = f.read().split('\x00')[:-1]
-                f.close()
-                result = cmdline
-    except OSError:
+        if proc.uids()[0] == our_uid:
+            if proc.getcwd() == kill_dir and proc.pid != our_pid:
+                result = proc.cmdline()
+    except:
         # We can't read all our processes; that's ok
         pass
     return result
 
-def try_kill(pid, sig):
+def try_kill(proc, sig):
     """Try to kill a process, but ignore errors (e.g. because a process is already dead)."""
     try:
-        os.kill(int(pid), sig)
-    except OSError:
+        proc.send_signal(sig)
+    except:
         pass
 
-test_pids = filter(lambda pid: pid[0] in "0123456789", os.listdir('/proc'))
-
 # First, try killing off scons
-for pid in test_pids:
+for pid in get_procs():
     cmdline = check_pid(pid)
     if cmdline is not None:
         if len(cmdline) > 1 and 'scons' in cmdline[1]:
@@ -95,12 +143,10 @@ for pid in test_pids:
                 print "  ** Killing (sent SIGTERM)"
                 # Now sleep for a bit to let it die
                 time.sleep(10) # seconds
-                # Then re-check running processes
-                test_pids = filter(lambda pid: pid[0] in "0123456789", os.listdir('/proc'))
                 break
 
 # Next, try to make the builder script save any results folders to the right place
-for pid in test_pids:
+for pid in get_procs():
     cmdline = check_pid(pid)
     if cmdline is not None:
         if len(cmdline) > 2 and 'builder' in cmdline[1] and 'no-lock' in cmdline[2]:
@@ -110,12 +156,10 @@ for pid in test_pids:
                 print "  ** Poking (sent SIGUSR1)"
                 # Now sleep for a bit to let it move files
                 time.sleep(5) # seconds
-                # Re-check running processes, just in case
-                test_pids = filter(lambda pid: pid[0] in "0123456789", os.listdir('/proc'))
                 break
 
 # Next, try killing everything still running
-for pid in test_pids:
+for pid in get_procs():
     cmdline = check_pid(pid)
     if cmdline is not None:
         print pid, "is running from our dir as", cmdline[0:3]
