@@ -251,6 +251,26 @@ void PottsMesh<DIM>::DeleteElement(unsigned index)
 }
 
 template<unsigned DIM>
+void PottsMesh<DIM>::RemoveDeletedElements()
+{
+    // Remove any elements that have been removed and re-order the remaining ones
+    unsigned num_deleted_elements = mDeletedElementIndices.size();
+
+    for (unsigned index = num_deleted_elements; index>0; index--)
+    {
+        unsigned deleted_elem_index = mDeletedElementIndices[index-1];
+        delete mElements[deleted_elem_index];
+        mElements.erase(mElements.begin()+deleted_elem_index);
+        for (unsigned elem_index=deleted_elem_index; elem_index<mElements.size(); elem_index++)
+        {
+            mElements[elem_index]->ResetIndex(elem_index);
+        }
+    }
+    mDeletedElementIndices.clear();
+}
+
+
+template<unsigned DIM>
 void PottsMesh<DIM>::DeleteNode(unsigned index)
 {
     //Mark node as deleted so we don't consider it when iterating over nodes

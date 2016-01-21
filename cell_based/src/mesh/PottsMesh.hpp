@@ -300,6 +300,12 @@ public:
     void DeleteElement(unsigned index);
 
     /**
+     * Remove deleted elements and reorder them appropriately
+     *
+     */
+    void RemoveDeletedElements();
+
+    /**
      * Divide an element by assigning half the nodes to each new element in numerical order.
      * If an odd number of nodes then the existing element has one more node than the new element.
      *
@@ -328,6 +334,9 @@ public:
      * @return its neighbouring element indices
      */
     std::set<unsigned> GetNeighbouringElementIndices(unsigned elementIndex);
+
+
+
 
     //////////////////////////////////////////////////////////////////////
     //                         Nested classes                           //

@@ -1664,6 +1664,9 @@ public:
         // Delete element 0
         basic_potts_mesh.DeleteElement(0);
 
+        TS_ASSERT_EQUALS(basic_potts_mesh.GetElement(1)->GetNodeGlobalIndex(0), 3u);
+        TS_ASSERT_EQUALS(basic_potts_mesh.GetElement(1)->GetNodeGlobalIndex(1), 1u);
+
         // Divide remaining element
         unsigned new_element_index = basic_potts_mesh.DivideElement(basic_potts_mesh.GetElement(1));
 
@@ -1674,10 +1677,26 @@ public:
 
         // Test elements have correct nodes
         TS_ASSERT_EQUALS(basic_potts_mesh.GetElement(0)->GetNumNodes(), 1u);
-        //TS_ASSERT_EQUALS(basic_potts_mesh.GetElement(0)->GetNodeGlobalIndex(0), 2u);
+        TS_ASSERT_EQUALS(basic_potts_mesh.GetElement(0)->GetNodeGlobalIndex(0), 1u);
 
         TS_ASSERT_EQUALS(basic_potts_mesh.GetElement(1)->GetNumNodes(), 1u);
-        //TS_ASSERT_EQUALS(basic_potts_mesh.GetElement(1)->GetNodeGlobalIndex(0), 3u);
+        TS_ASSERT_EQUALS(basic_potts_mesh.GetElement(1)->GetNodeGlobalIndex(0), 3u);
+
+        //Now check deleteing a node and reordering the elements
+        basic_potts_mesh.DeleteElement(0);
+
+        TS_ASSERT_EQUALS(basic_potts_mesh.GetNumElements(),1u);
+        TS_ASSERT_EQUALS(basic_potts_mesh.GetNumAllElements(),2u);
+
+        TS_ASSERT_EQUALS(basic_potts_mesh.GetElement(1)->GetNumNodes(), 1u);
+        TS_ASSERT_EQUALS(basic_potts_mesh.GetElement(1)->GetNodeGlobalIndex(0), 3u);
+
+        basic_potts_mesh.RemoveDeletedElements();
+        TS_ASSERT_EQUALS(basic_potts_mesh.GetNumElements(),1u);
+        TS_ASSERT_EQUALS(basic_potts_mesh.GetNumAllElements(),1u);
+
+        TS_ASSERT_EQUALS(basic_potts_mesh.GetElement(0)->GetNumNodes(), 1u);
+        TS_ASSERT_EQUALS(basic_potts_mesh.GetElement(0)->GetNodeGlobalIndex(0), 3u);
     }
 
     void TestDeleteNode() throw(Exception)
