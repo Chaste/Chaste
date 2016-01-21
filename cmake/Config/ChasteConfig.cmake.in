@@ -6,6 +6,9 @@
 # Compute paths
 get_filename_component(Chaste_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
 
+set(Chaste_VERSION_MAJOR @Chaste_VERSION_MAJOR@)
+set(Chaste_VERSION_MINOR @Chaste_VERSION_MINOR@)
+
 # If not in a build tree set required variables
 if(NOT TARGET global AND NOT Chaste_BINARY_DIR)
     add_definitions(-DCHASTE_CMAKE)

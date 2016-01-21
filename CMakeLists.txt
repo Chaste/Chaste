@@ -13,8 +13,8 @@ include(ChasteBuildTypes)
 include(ChasteCompilerFlags)
 include(ChasteMacros)
 
-set (Chaste_VERSION_MAJOR 3)
-set (Chaste_VERSION_MINOR 3)
+set (Chaste_VERSION_MAJOR 3 CACHE STRING "Chaste major version number")
+set (Chaste_VERSION_MINOR 3 CACHE STRING "Chaste minor version number")
 
 set(Chaste_NUM_CPUS_TEST 1 CACHE STRING  "Number of cpus to use when running tests.")
 
@@ -533,7 +533,7 @@ if (Chaste_COVERAGE)
 
 		# Capturing lcov counters and generating report
 		COMMAND ${LCOV_PATH} --directory . --capture --output-file ${_outputname}.info
-        COMMAND ${LCOV_PATH} --remove ${_outputname}.info '*/fortests/*' '*/3rdparty/*' 'Debug/*' 'cxxtest/*' '/usr/*' '/home/*' --output-file ${_outputname}.info.cleaned
+        COMMAND ${LCOV_PATH} --remove ${_outputname}.info /usr/* */fortests/* */3rdparty/* Debug/* cxxtest/* --output-file ${_outputname}.info.cleaned
 		COMMAND ${GENHTML_PATH} --no-function-coverage -o ${_outputname} ${_outputname}.info.cleaned
 		COMMAND ${CMAKE_COMMAND} -E remove ${_outputname}.info ${_outputname}.info.cleaned
 
