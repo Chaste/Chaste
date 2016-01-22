@@ -5901,8 +5901,7 @@ class ConfigurationStore(object):
             if match and remove_match:
                 units_list.remove(match)
             if match and keep_only_match:
-                units_list[:] = []
-                units_list.append(match)
+                units_list[:] = [match]
             return match
 
         def clear_values(expr, process_definitions=False):
@@ -5986,6 +5985,9 @@ class ConfigurationStore(object):
             if depth == 0 and maxdepth > 0:
                 dvdt_units = exprs[0].xml_parent.eq.lhs.get_units()
                 A_per_F = find_units_match(dvdt_units, current_units, remove_match=True)
+#                 # We could do this check, but actually it doesn't catch much and later checks will pick up on the problem
+#                 if A_per_F is None and not self.i_stim_var:
+#                     raise ConfigurationError('Units ' + dvdt_units.description() + ' of dV/dt are not equivalent to V/s - unable to continue.')
             # Process all expressions at this depth
             vars_found = []
             for expr in exprs:
@@ -5993,8 +5995,8 @@ class ConfigurationStore(object):
             if not ionic_vars and depth != maxdepth:
                 # Process the definitions of expressions at this depth
                 bfs(find_currents, vars_found, depth+1, maxdepth)
-            # If we reached maxdepth unsuccessfully, try again with A_per_F included
-            if not ionic_vars and depth == 0 and maxdepth > 0:
+            # If we reached maxdepth unsuccessfully, try again with A_per_F included (if it was an option)
+            if not ionic_vars and depth == 0 and maxdepth > 0 and A_per_F:
                 current_units.append(A_per_F)
                 find_currents(exprs, depth, maxdepth=-1)
 
@@ -6036,6 +6038,9 @@ class ConfigurationStore(object):
             if dep_var.get_source_variable(recurse=True) is self.V_variable:
                 # Recursively search for ionic currents
                 find_currents([expr.eq.rhs])
+                if not ionic_vars:
+                    # The sign checks below will be nonsense in this case. An error will be raised later.
+                    break
                 # Check the sign of the RHS
                 self.i_ionic_negated = expr.eq.rhs.evaluate() > 0.0
                 clear_values(expr.eq.rhs, process_definitions=True)
