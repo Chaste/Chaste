@@ -15,7 +15,7 @@ def execute_command(cmd):
     return subprocess.call(cmd, shell=True)
 
 # use `count' no of processes 
-count = 3 # use multiprocessing.cpu_count() for the number of cores on your machine
+count = multiprocessing.cpu_count()
 
 # generate a pool of workers
 pool = multiprocessing.Pool(processes=count)
