@@ -182,7 +182,7 @@ def make_xml_binder():
                        'leq', 'geq', 'lt', 'gt', 'eq', 'neq',
                        'rem',
                        'ci', 'cn', 'apply', 'piecewise', 'piece',
-                       'sin', 'cos', 'tan']:
+                       'sin', 'cos', 'tan', 'arcsin', 'arccos', 'arctan']:
         exec "binder.set_binding_class(NSS[u'm'], '%s', mathml_%s)" % (mathml_elt, mathml_elt)
     binder.set_binding_class(NSS[u'm'], "and_", mathml_and)
     binder.set_binding_class(NSS[u'm'], "or_", mathml_or)
@@ -6137,6 +6137,35 @@ class mathml_tan(mathml_operator, mathml_units_mixin_set_operands):
             self.wrong_number_of_operands(len(ops), [1])
         return math.tan(self.eval(ops[0]))
 
+class mathml_arcsin(mathml_operator, mathml_units_mixin_set_operands):
+    """Class representing the MathML <arcsin> operator."""
+    def evaluate(self):
+        """Return the arc sine of the single operand, in radians."""
+        app = self.xml_parent
+        ops = list(app.operands())
+        if len(ops) != 1:
+            self.wrong_number_of_operands(len(ops), [1])
+        return math.asin(self.eval(ops[0]))
+
+class mathml_arccos(mathml_operator, mathml_units_mixin_set_operands):
+    """Class representing the MathML <arccos> operator."""
+    def evaluate(self):
+        """Return the arc cosine of the single operand, in radians."""
+        app = self.xml_parent
+        ops = list(app.operands())
+        if len(ops) != 1:
+            self.wrong_number_of_operands(len(ops), [1])
+        return math.acos(self.eval(ops[0]))
+
+class mathml_arctan(mathml_operator, mathml_units_mixin_set_operands):
+    """Class representing the MathML <arctan> operator."""
+    def evaluate(self):
+        """Return the arc tangent of the single operand, in radians."""
+        app = self.xml_parent
+        ops = list(app.operands())
+        if len(ops) != 1:
+            self.wrong_number_of_operands(len(ops), [1])
+        return math.atan(self.eval(ops[0]))
 
 
 ## Don't export module imports to people who do "from pycml import *"
