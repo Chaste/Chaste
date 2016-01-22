@@ -6,8 +6,10 @@ import subprocess
 command_list = []
 
 # ... and populate it with calls to a Chaste executable
-for simulation_id in range(100):
-    command = "./ExampleCellBasedExecutable --ID " + str(simulation_id)
+for simulation_id in range(10):
+    command = "../../../../chaste_build/projects/ImmersedBoundary/apps/Exe_VaryReynoldsNumber"\
+              + " --ID " + str(simulation_id)\
+              +  " --R " + str(1e-4 * (1 + simulation_id))
     command_list.append(command)
     
 # This is a helper function that allows to run a bash command in a separate process
