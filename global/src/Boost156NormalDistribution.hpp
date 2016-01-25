@@ -457,13 +457,6 @@ public:
         BOOST_ASSERT(_sigma >= RealType(0));
     }
 
-    /**
-     * Constructs a @c normal_distribution_v156 object from its parameters.
-     */
-    explicit normal_distribution_v156(const param_type& parm)
-      : _mean(parm.mean()), _sigma(parm.sigma())
-    {}
-
     /**  Returns the mean of the distribution. */
     RealType mean() const { return _mean; }
     /** Returns the standard deviation of the distribution. */
@@ -503,13 +496,6 @@ public:
 #endif
     }
 
-    /** Returns a normal variate with parameters specified by @c param. */
-    template<class URNG>
-    result_type operator()(URNG& urng, const param_type& parm)
-    {
-        return normal_distribution_v156(parm)(urng);
-    }
-
     /** Writes a @c normal_distribution_v156 to a @c std::ostream. */
     BOOST_RANDOM_DETAIL_OSTREAM_OPERATOR(os, normal_distribution_v156, nd)
     {
@@ -542,7 +528,6 @@ public:
 private:
     RealType _mean, _sigma;
     boost::mt19937& _engine;
-
 };
 
 } // namespace random
