@@ -1096,6 +1096,32 @@ class CrayGcc(Gcc):
         self._cc_flags.append('-ffast-math -funroll-loops -O3')
         self.build_dir = 'craygcc'
 
+class IntelHpc(BuildType):
+    "Intel compiler on systems with compiler wrappers, modules, etc."
+    def __init__(self, *args, **kwargs):
+        BuildType.__init__(self, *args, **kwargs)
+        self._include_flag = ['-I']
+        self.rdynamic_link_flag = '-dynamic'
+        self.tools['mpicxx'] = 'CC'
+        self.build_dir = 'intelhpc'
+        self._cc_flags = ['-O2'] # Or try -O3 -no-prec-div for more.
+        self.is_optimised = True
+
+class CrayHpc(BuildType):
+    "Cray compiler on systems with compiler wrappers, modules, etc."
+    def __init__(self, *args, **kwargs):
+        BuildType.__init__(self, *args, **kwargs)
+        self._include_flag = ['-I']
+        self.rdynamic_link_flag = '-dynamic'
+        self.tools['mpicxx'] = 'CC'
+        self.build_dir = 'crayhpc'
+        self._cc_flags = [
+            #'-O3', # Default is similar to -O2. Or try -O3 for more.
+            '-h nomessage=940', #940: A "return" statement is missing from the end of a non-void function.
+            '-h nomessage=1254', #1254: The environment variable "CPATH" is not supported.
+        ]
+        self.is_optimised = True
+
 class Pgi(BuildType):
     "Portland compiler."
     def __init__(self, *args, **kwargs):
