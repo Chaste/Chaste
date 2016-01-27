@@ -419,9 +419,9 @@ public:
         unsigned new_num_elements = (static_cast<VertexBasedCellPopulation<2>*>(&(simulator.rGetCellPopulation())))->GetNumElements();
         unsigned new_num_cells = simulator.rGetCellPopulation().GetNumRealCells();
 
-        TS_ASSERT_EQUALS(new_num_nodes, old_num_nodes-7);    // Due to the cells on the boundary that get killed and the apoptotic cell that does a T2 swap
-        TS_ASSERT_EQUALS(new_num_elements, old_num_elements-5);
-        TS_ASSERT_EQUALS(new_num_cells, old_num_cells-5);
+        TS_ASSERT_EQUALS(new_num_nodes, old_num_nodes-5);    // Due to the cells on the boundary that get killed and the apoptotic cell that does a T2 swap
+        TS_ASSERT_EQUALS(new_num_elements, old_num_elements-4);
+        TS_ASSERT_EQUALS(new_num_cells, old_num_cells-4);
         TS_ASSERT_EQUALS(new_num_cells, new_num_elements);
 
         // Test Warnings

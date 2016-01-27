@@ -1040,17 +1040,17 @@ public:
         // Test get/set methods
         TS_ASSERT_DELTA(force.GetNagaiHondaDeformationEnergyParameter(), 100.0, 1e-12);
         TS_ASSERT_DELTA(force.GetNagaiHondaMembraneSurfaceEnergyParameter(), 10.0, 1e-12);
-        TS_ASSERT_DELTA(force.GetNagaiHondaCellCellAdhesionEnergyParameter(), 1.0, 1e-12);
+        TS_ASSERT_DELTA(force.GetNagaiHondaCellCellAdhesionEnergyParameter(), 0.5, 1e-12);
         TS_ASSERT_DELTA(force.GetNagaiHondaCellBoundaryAdhesionEnergyParameter(), 1.0, 1e-12);
 
         force.SetNagaiHondaDeformationEnergyParameter(5.8);
         force.SetNagaiHondaMembraneSurfaceEnergyParameter(17.9);
-        force.SetNagaiHondaCellCellAdhesionEnergyParameter(0.5);
+        force.SetNagaiHondaCellCellAdhesionEnergyParameter(0.3);
         force.SetNagaiHondaCellBoundaryAdhesionEnergyParameter(0.6);
 
         TS_ASSERT_DELTA(force.GetNagaiHondaDeformationEnergyParameter(), 5.8, 1e-12);
         TS_ASSERT_DELTA(force.GetNagaiHondaMembraneSurfaceEnergyParameter(), 17.9, 1e-12);
-        TS_ASSERT_DELTA(force.GetNagaiHondaCellCellAdhesionEnergyParameter(), 0.5, 1e-12);
+        TS_ASSERT_DELTA(force.GetNagaiHondaCellCellAdhesionEnergyParameter(), 0.3, 1e-12);
         TS_ASSERT_DELTA(force.GetNagaiHondaCellBoundaryAdhesionEnergyParameter(), 0.6, 1e-12);
 
         force.SetNagaiHondaDeformationEnergyParameter(100.0);
