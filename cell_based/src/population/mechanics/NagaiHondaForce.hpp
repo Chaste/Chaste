@@ -96,7 +96,7 @@ protected:
 
     /**
      * Cell-cell adhesion energy parameter. Has has units of kg (cell size at equilibrium rest length)^2 s^-2.
-     * This parameter corresponds to 1/2 of the Lambda parameter in forces proposed by Farhadifar et al (2007).
+     * This parameter corresponds to 1/2 of the sigma parameter introduced in the original paper.
      * This slight difference comes from the fact that when we apply the forces to a particular node, each
      * edge is visited twice - and hence the force originating from that edge is applied twice.
      */
@@ -176,8 +176,8 @@ public:
     void SetNagaiHondaMembraneSurfaceEnergyParameter(double nagaiHondaMembraneSurfaceEnergyParameter);
 
     /**
-     * Set mNagaiHondaCellCellAdhesionEnergyParameter. This parameter corresponds to 1/2 of the Lambda parameter in the forces by
-     * Farhadifar et al (2007).
+     * Set mNagaiHondaCellCellAdhesionEnergyParameter. This parameter corresponds to 1/2 of the sigma parameter in the forces by
+     * Nagai et al. (2007).
      *
      * @param nagaiHondaCellCellAdhesionEnergyEnergyParameter the new value of mNagaiHondaCellCellAdhesionEnergyParameter
      */

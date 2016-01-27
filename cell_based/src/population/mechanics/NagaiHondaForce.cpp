@@ -38,10 +38,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned DIM>
 NagaiHondaForce<DIM>::NagaiHondaForce()
    : AbstractForce<DIM>(),
-     mNagaiHondaDeformationEnergyParameter(100.0), // This is 1.0 in the Nagai & Honda paper
-     mNagaiHondaMembraneSurfaceEnergyParameter(10.0), // This is 0.1 in the Nagai & Honda paper
-     mNagaiHondaCellCellAdhesionEnergyParameter(1.0), // This is 0.01 in the Nagai & Honda paper
-     mNagaiHondaCellBoundaryAdhesionEnergyParameter(1.0) // This is 0.01 in the Nagai & Honda paper
+     mNagaiHondaDeformationEnergyParameter(100.0), // This is 1.0 in the Nagai & Honda paper.
+     mNagaiHondaMembraneSurfaceEnergyParameter(10.0), // This is 0.1 in the Nagai & Honda paper.
+     mNagaiHondaCellCellAdhesionEnergyParameter(0.5), // This corresponds to a value of 1.0 for
+	                                                  // the sigma parameter in the Nagai & Honda
+	                                                  // paper. In the paper, the sigma value is
+	                                                  // set to 0.01.
+     mNagaiHondaCellBoundaryAdhesionEnergyParameter(1.0) // This is 0.01 in the Nagai & Honda paper.
 {
 }
 
