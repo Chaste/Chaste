@@ -42,6 +42,9 @@ class TestUtilsFunctionality(unittest.TestCase):
         #without suffices (input and output file names)
         original_vtu1 = 'python/test/data/input/Monodomain2d_before_annotations'
         output_vtu1 = os.path.join(CHASTE_TEST_OUTPUT, 'MonodomainAddingAnnotationsTest')
+        # Exceptional behaviour - do not wipe out the original file
+        rc = os.system('python/utils/AddVtuTimeAnnotations.py ' + original_vtu1 + ' ' + original_vtu1)
+        self.assertNotEqual(rc, 0) # No success: Error happened
         rc = os.system('python/utils/AddVtuTimeAnnotations.py ' + original_vtu1 + ' ' + output_vtu1)
         self.assertEqual(rc, 0)
         self.assertTrue(filecmp.cmp(output_vtu1+'.vtu','python/test/data/output/Monodomain2d_after_annotations.vtu'))
