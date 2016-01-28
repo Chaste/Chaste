@@ -189,6 +189,12 @@ void ImmersedBoundaryCellCellInteractionForce<DIM>::UpdateProteinLevels()
 }
 
 template<unsigned DIM>
+void ImmersedBoundaryCellCellInteractionForce<DIM>::SetSpringConstant(double springConst)
+{
+    mSpringConst = springConst;
+}
+
+template<unsigned DIM>
 void ImmersedBoundaryCellCellInteractionForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
 {
 //    *rParamsFile << "\t\t\t<RestLength>" << mRestLength << "</RestLength>\n";

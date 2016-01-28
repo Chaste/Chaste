@@ -56,7 +56,7 @@ private:
     std::string mWisdomFilename;
 
     /** The max array size N for N by N arrays. Must be a multiple of 2 */
-    static const unsigned mMaxArraySize = 4096;
+    static const unsigned mMaxArraySize = 512;
 
     /** Flag to determine length of time to be taken testing potentially faster algorithms */
     unsigned mFftwFlag;

@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "CsvWriter.hpp"
+#include "FileFinder.hpp"
 #include "Debug.hpp"
 
 CsvWriter::CsvWriter()
@@ -106,7 +107,7 @@ void CsvWriter::WriteDataToFile()
 
     // Open file for writing
     std::ofstream output;
-    output.open( (mDirectoryName + mFileName).c_str() );
+    output.open( mDirectoryName.c_str() );
     assert(output.is_open());
 
     // Output header, if present
@@ -206,22 +207,26 @@ const std::string& CsvWriter::GetFileName() const
 
 void CsvWriter::SetDirectoryName(std::string directoryName)
 {
-    // Append "/" if necessary as later this will be concatenated with file name
-    if (*(directoryName.rbegin()) != char('/'))
-    {
-        directoryName += "/";
-    }
+    FileFinder file_finder(directoryName, RelativeTo::ChasteTestOutput);
 
-    // Validate directory name by checking it exists
-    struct stat sb;
-    if (stat(directoryName.c_str(), &sb) == 0 && S_ISDIR(sb.st_mode))
-    {
-        mDirectoryName = directoryName;
-    }
-    else
-    {
-        EXCEPTION("Invalid directory provided");
-    }
+    mDirectoryName = file_finder.GetAbsolutePath();
+
+//    // Append "/" if necessary as later this will be concatenated with file name
+//    if (*(directoryName.rbegin()) != char('/'))
+//    {
+//        directoryName += "/";
+//    }
+//
+//    // Validate directory name by checking it exists
+//    struct stat sb;
+//    if (stat(directoryName.c_str(), &sb) == 0 && S_ISDIR(sb.st_mode))
+//    {
+//        mDirectoryName = directoryName;
+//    }
+//    else
+//    {
+//        EXCEPTION("Invalid directory provided");
+//    }
 }
 
 void CsvWriter::SetFileName(std::string fileName)

@@ -36,8 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 #include "CheckpointArchiveTypes.hpp"
 
-#include <boost/lexical_cast.hpp>
-
 #include "SimulationTime.hpp"
 #include "RandomNumberGenerator.hpp"
 
@@ -157,7 +155,7 @@ void SetupAndRunSimulation(unsigned simulation_id, double reynolds_number)
     cell_population.SetIfPopulationHasActiveSources(true);
 
     OffLatticeSimulation<2> simulator(cell_population);
-    simulator.SetConsoleProgressOutput(false);
+//    simulator.SetConsoleProgressOutput(false);
 
     // Add main immersed boundary simulation modifier
     MAKE_PTR(ImmersedBoundarySimulationModifier<2>, p_main_modifier);

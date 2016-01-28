@@ -92,7 +92,7 @@ ImmersedBoundaryFftInterface<DIM>::ImmersedBoundaryFftInterface(ImmersedBoundary
 
     if (!file_finder.IsFile())
     {
-        WARNING("It is strongly recommended to generate wisdom using TestGenerateFftwWisdom before using this code.");
+//        WARNING("It is strongly recommended to generate wisdom using TestGenerateFftwWisdom before using this code.");
     }
 
     wisdom_path = file_finder.GetAbsolutePath();
@@ -102,7 +102,7 @@ ImmersedBoundaryFftInterface<DIM>::ImmersedBoundaryFftInterface(ImmersedBoundary
     // 1 means success, 0 indicates a failure
     if (wisdom_flag != 1)
     {
-        WARNING("fftw wisdom not imported correctly");
+//        WARNING("fftw wisdom not imported correctly");
     }
 
     int num_gridpts_x = (int)mpMesh->GetNumGridPtsX();
@@ -144,12 +144,12 @@ ImmersedBoundaryFftInterface<DIM>::ImmersedBoundaryFftInterface(ImmersedBoundary
     mFftwForwardPlan = fftw_plan_many_dft_r2c(rank, real_dims, how_many_forward,
                                               mpInputArray,   real_nembed, real_stride, real_sep,
                                               mpComplexArray, comp_nembed, comp_stride, comp_sep,
-                                              FFTW_PATIENT);
+                                              FFTW_ESTIMATE);
 
     mFftwInversePlan = fftw_plan_many_dft_c2r(rank, real_dims, how_many_inverse,
                                               mpComplexArray, comp_nembed, comp_stride, comp_sep,
                                               mpOutputArray,  real_nembed, real_stride, real_sep,
-                                              FFTW_PATIENT);
+                                              FFTW_ESTIMATE);
 }
 
 template<unsigned DIM>

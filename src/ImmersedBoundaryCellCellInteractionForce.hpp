@@ -136,6 +136,11 @@ public:
     void UpdateProteinLevels();
 
     /**
+     * Set the spring constant.
+     */
+    void SetSpringConstant(double springConst);
+
+    /**
      * Overridden OutputForceParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
