@@ -36,16 +36,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 #include "CheckpointArchiveTypes.hpp"
 
-#include <boost/lexical_cast.hpp>
-
 #include "SimulationTime.hpp"
 #include "RandomNumberGenerator.hpp"
-
 #include "ExecutableSupport.hpp"
 
 #include "Debug.hpp"
-
-#include "CsvWriter.hpp"
 
 /*
  * These headers handle passing parameters to the executable.
@@ -64,10 +59,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ImmersedBoundaryMembraneElasticityForce.hpp"
 #include "ImmersedBoundaryCellCellInteractionForce.hpp"
 
-#include "HoneycombVertexMeshGenerator.hpp"
-#include "MutableVertexMesh.hpp"
-
-
+/*
+ * Prototype functions
+ */
 void SetupSingletons(unsigned simulationId);
 void DestroySingletons();
 void SetupAndRunSimulation(unsigned simulation_id, unsigned spring_const);
@@ -186,14 +180,25 @@ void SetupAndRunSimulation(unsigned simulation_id, unsigned spring_const)
     simulator.SetEndTime(50.0 * dt);
     simulator.Solve();
 
+
+    // Get height of basement lamina
+    double lamina_height = 0.0;
+    for (unsigned node_idx = 0 ; node_idx < p_mesh->GetElement(0)->GetNumNodes() ; node_idx++)
+    {
+        lamina_height += p_mesh->GetElement(0)->GetNode(node_idx)->rGetModifiableLocation()[1];
+    }
+    lamina_height /= p_mesh->GetElement(0)->GetNumNodes();
+
     // Kick
     for (unsigned elem_idx = 1 ; elem_idx < p_mesh->GetNumElements() ; elem_idx++)
     {
-        double kick = 0.005 - 0.01 * RandomNumberGenerator::Instance()->ranf();
+        double kick = 1.1 - 0.2 * RandomNumberGenerator::Instance()->ranf();
 
         for (unsigned node_idx = 0 ; node_idx < p_mesh->GetElement(elem_idx)->GetNumNodes() ; node_idx++)
         {
-            p_mesh->GetElement(elem_idx)->GetNode(node_idx)->rGetModifiableLocation()[1] += kick;
+            double new_height = lamina_height + kick * (p_mesh->GetElement(elem_idx)->GetNode(node_idx)->rGetLocation()[1] - lamina_height);
+
+            p_mesh->GetElement(elem_idx)->GetNode(node_idx)->rGetModifiableLocation()[1] = new_height;
         }
     }
 
@@ -227,7 +232,7 @@ void SetupAndRunSimulation(unsigned simulation_id, unsigned spring_const)
 
 
     // Output summary statistics to results file
-    (*results_file)<< fp_spring_const << ", " << tortuosity;
+    (*results_file)<< fp_spring_const << "," << tortuosity;
 
     // Tidy up
     results_file->close();
