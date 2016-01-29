@@ -68,15 +68,10 @@ public:
          * 5: Random y-variation
          * 6: Include membrane
          */
-        ImmersedBoundaryPalisadeMeshGenerator gen(2, 64, 0.2, 1.5, 0.0, true);
+        ImmersedBoundaryPalisadeMeshGenerator gen(4, 64, 0.1, 2.5, 0.2, false);
         ImmersedBoundaryMesh<2, 2>* p_mesh = gen.GetMesh();
 
-        p_mesh->SetNumGridPtsXAndY(32);
-
-        p_mesh->GetElement(0)->SetMembraneSpringConstant(1e6);
-        p_mesh->GetElement(0)->SetMembraneRestLength(0.25 * p_mesh->GetCharacteristicNodeSpacing());
-        p_mesh->GetElement(1)->SetMembraneSpringConstant(5e5);
-        p_mesh->GetElement(1)->SetMembraneRestLength(0.25 * p_mesh->GetCharacteristicNodeSpacing());
+        p_mesh->SetNumGridPtsXAndY(64);
 
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
@@ -84,6 +79,7 @@ public:
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
         ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
+        cell_population.SetIfPopulationHasActiveSources(true);
 
         OffLatticeSimulation<2> simulator(cell_population);
 
@@ -94,16 +90,18 @@ public:
         // Add force laws
         MAKE_PTR_ARGS(ImmersedBoundaryMembraneElasticityForce<2>, p_boundary_force, (cell_population));
         p_main_modifier->AddImmersedBoundaryForce(p_boundary_force);
+        p_boundary_force->SetSpringConstant(0.5 * 1e7);
 
-        MAKE_PTR_ARGS(ImmersedBoundaryCellCellInteractionForce<2>, p_cell_cell_force, (cell_population));
-        p_main_modifier->AddImmersedBoundaryForce(p_cell_cell_force);
+//        MAKE_PTR_ARGS(ImmersedBoundaryCellCellInteractionForce<2>, p_cell_cell_force, (cell_population));
+//        p_main_modifier->AddImmersedBoundaryForce(p_cell_cell_force);
 
 
         // Set simulation properties
+        double dt = 0.005;
         simulator.SetOutputDirectory("TestShortTwoCellSimulation");
-        simulator.SetDt(0.005);
+        simulator.SetDt(dt);
         simulator.SetSamplingTimestepMultiple(100);
-        simulator.SetEndTime(10.01);
+        simulator.SetEndTime(20000.0 * dt);
         simulator.Solve();
     }
 };

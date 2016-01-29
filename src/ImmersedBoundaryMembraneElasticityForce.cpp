@@ -289,13 +289,25 @@ void ImmersedBoundaryMembraneElasticityForce<DIM>::TagApicalAndBasalLengths()
 }
 
 template<unsigned DIM>
+void ImmersedBoundaryMembraneElasticityForce<DIM>::SetSpringConstant(double springConstant)
+{
+    mSpringConst = springConstant;
+}
+
+template<unsigned DIM>
+void ImmersedBoundaryMembraneElasticityForce<DIM>::SetRestLength(double restLength)
+{
+    mRestLength = restLength;
+}
+
+template<unsigned DIM>
 void ImmersedBoundaryMembraneElasticityForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
 {
 //    *rParamsFile << "\t\t\t<RestLength>" << mRestLength << "</RestLength>\n";
 //    *rParamsFile << "\t\t\t<SpringConstant>" << mSpringConstant << "</SpringConstant>\n";
 
-    // Call method on direct parent class
-    AbstractImmersedBoundaryForce<DIM>::OutputForceParameters(rParamsFile);
+// Call method on direct parent class
+AbstractImmersedBoundaryForce<DIM>::OutputForceParameters(rParamsFile);
 }
 
 // Explicit instantiation

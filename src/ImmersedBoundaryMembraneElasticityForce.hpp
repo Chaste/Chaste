@@ -161,11 +161,26 @@ public:
     virtual void AddForceContribution(std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs);
 
     /**
+     * Set mSpringConst
+     *
+     * @param new value of the spring constant
+     */
+    void SetSpringConstant(double springConstant);
+
+    /**
+     * Set mRestLength
+     *
+     * @param new value of the rest length
+     */
+    void SetRestLength(double restLength);
+
+    /**
      * Overridden OutputForceParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
     void OutputForceParameters(out_stream& rParamsFile);
+
 };
 
 #include "SerializationExportWrapper.hpp"
