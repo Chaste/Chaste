@@ -51,6 +51,7 @@ add_custom_command(OUTPUT
         "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
         "-DCMAKE_CXX_COMPILER_VERSION=${CMAKE_CXX_COMPILER_VERSION}"
         "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}"
+        "-DCMAKE_MODULE_PATH=${CMAKE_MODULE_PATH}"
         "-DMSVC=${MSVC}"
         "-P" "${Chaste_SOURCE_DIR}/cmake/Modules/ChasteGenerateVersionAndBuildInfo.cmake"
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
