@@ -160,7 +160,7 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
         for (unsigned mem_node_idx = 0 ; mem_node_idx < 128 ; mem_node_idx++)
         {
             // Calculate location of node
-            c_vector<double, 2> location = (1.0 - 0.05 * cell_height) * y_offset + ( 1.0 / 256.0 + double(mem_node_idx) / 128.0 ) * x_unit;
+            c_vector<double, 2> location = 0.97 * y_offset + ( 1.0 / 256.0 + double(mem_node_idx) / 128.0 ) * x_unit;
 
             // Create the new node
             nodes.push_back(new Node<2>(mem_node_idx, location, true));

@@ -79,9 +79,9 @@ int main(int argc, char *argv[])
     general_options.add_options()
                     ("help", "produce help message")
                     ("ID", boost::program_options::value<unsigned>()->default_value(0),"ID of the simulation (for output)")
-                    ("R", boost::program_options::value<double>()->default_value(1e-4),"Reynolds number for the simulation");
+                    ("D", boost::program_options::value<double>()->default_value(0.0),"Double precision number to feed to the simulation");
 
-    // define parse command line into variables_map
+    // Pass command line into variables_map
     boost::program_options::variables_map variables_map;
     boost::program_options::store(parse_command_line(argc, argv, general_options), variables_map);
 
@@ -94,11 +94,11 @@ int main(int argc, char *argv[])
     }
 
     // get id and name from command line
-    unsigned simulation_id=variables_map["ID"].as<unsigned>();
-    double reynolds_number=variables_map["R"].as<double>();
+    unsigned simulation_id = variables_map["ID"].as<unsigned>();
+    double generic_double = variables_map["D"].as<double>();
 
     SetupSingletons();
-    SetupAndRunSimulation(simulation_id, reynolds_number);
+    SetupAndRunSimulation(simulation_id, generic_double);
     DestroySingletons();
     OutputOnCompletion(simulation_id);
 }
@@ -172,12 +172,14 @@ void SetupAndRunSimulation(unsigned simulation_id, double reynolds_number)
 //        p_main_modifier->AddImmersedBoundaryForce(p_cell_cell_force);
 
     // Create and set an output directory that is different for each
-    std::stringstream output_durectory;
-    output_durectory << "Exe_VaryReynoldsNumber_" << simulation_id;
-    simulator.SetOutputDirectory(output_durectory.str());
+    std::stringstream output_directory;
+    output_directory << "Exe_VaryReynoldsNumber/"
+                     << "Id=" << setfill('0') << setw(3) << simulation_id
+                     << "_Re=" << reynolds_number;
+    simulator.SetOutputDirectory(output_directory.str());
 
     // Set simulation properties
-    double dt = 0.005;
+    double dt = 0.01;
     simulator.SetDt(dt);
     simulator.SetSamplingTimestepMultiple(1);
     simulator.SetEndTime(100.0 * dt);
