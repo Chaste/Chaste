@@ -41,8 +41,8 @@ ImmersedBoundaryMembraneElasticityForce<DIM>::ImmersedBoundaryMembraneElasticity
         : AbstractImmersedBoundaryForce<DIM>(),
           mpCellPopulation(&rCellPopulation),
           mpMesh(&(rCellPopulation.rGetMesh())),
-          mSpringConst(1e8),
-          mRestLength(0.25 * mpMesh->GetCharacteristicNodeSpacing()),
+          mSpringConst(1e6),
+          mRestLengthMultiplier(0.25),
           mBasementSpringConstantModifier(2.0),
           mBasementRestLengthModifier(0.5)
 {
@@ -120,6 +120,9 @@ double ImmersedBoundaryMembraneElasticityForce<DIM>::GetBasalLengthForElement(un
 template<unsigned DIM>
 void ImmersedBoundaryMembraneElasticityForce<DIM>::AddForceContribution(std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs)
 {
+    // Used in the calculation of the spring constant
+    double intrinsic_spacing_squared = mpCellPopulation->GetIntrinsicSpacing() * mpCellPopulation->GetIntrinsicSpacing();
+
     for (typename ImmersedBoundaryMesh<DIM, DIM>::ImmersedBoundaryElementIterator elem_it = mpMesh->GetElementIteratorBegin();
          elem_it != mpMesh->GetElementIteratorEnd();
          ++elem_it)
@@ -135,8 +138,21 @@ void ImmersedBoundaryMembraneElasticityForce<DIM>::AddForceContribution(std::vec
         // Make a vector to store the force on node i+1 from node i
         std::vector<c_vector<double, DIM> > elastic_force_to_next_node(num_nodes);
 
-        double spring_constant = mSpringConst;
-        double rest_length = mRestLength;
+        /*
+         * Get the node spacing ratio for this element.  The rest length and spring constant are derived from this
+         * characteristic length.
+         *
+         * The spring constant is derived with reference to the intrinsic spacing, so that with different node spacings
+         * the user-defined parameters do not have to be updated.
+         *
+         * The correct factor to increase the spring constant by is (intrinsic spacing / spacing_ratio)^2.  One factor
+         * takes into account the energy considerations of the elastic springs, and the other takes account of the
+         * factor of spacing_ratio used in discretising the force relation.
+         */
+        double spacing_ratio = mpMesh->GetAverageNodeSpacingOfElement(elem_idx);
+
+        double spring_constant = mSpringConst * intrinsic_spacing_squared / (spacing_ratio * spacing_ratio);
+        double rest_length = mRestLengthMultiplier * spacing_ratio;
 
         /*
          * Here we make any necessary modifications to the spring properties
@@ -295,15 +311,15 @@ void ImmersedBoundaryMembraneElasticityForce<DIM>::SetSpringConstant(double spri
 }
 
 template<unsigned DIM>
-void ImmersedBoundaryMembraneElasticityForce<DIM>::SetRestLength(double restLength)
+void ImmersedBoundaryMembraneElasticityForce<DIM>::SetRestLengthMultiplier(double restLengthMultiplier)
 {
-    mRestLength = restLength;
+    mRestLengthMultiplier = restLengthMultiplier;
 }
 
 template<unsigned DIM>
 void ImmersedBoundaryMembraneElasticityForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
 {
-//    *rParamsFile << "\t\t\t<RestLength>" << mRestLength << "</RestLength>\n";
+//    *rParamsFile << "\t\t\t<RestLength>" << mRestLengthMultiplier << "</RestLength>\n";
 //    *rParamsFile << "\t\t\t<SpringConstant>" << mSpringConstant << "</SpringConstant>\n";
 
 // Call method on direct parent class

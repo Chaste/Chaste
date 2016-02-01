@@ -54,7 +54,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Simulation does not run in parallel
 #include "FakePetscSetup.hpp"
-#include "../../../cell_based/src/population/cell/cycle/CellCyclePhases.hpp"
 
 class TestShortMultiCellSimulation : public AbstractCellBasedTestSuite
 {
@@ -70,10 +69,10 @@ public:
          * 5: Random y-variation
          * 6: Include membrane
          */
-        ImmersedBoundaryPalisadeMeshGenerator gen(9, 256, 0.1, 3.0, 0.1, true);
+        ImmersedBoundaryPalisadeMeshGenerator gen(9, 360, 0.1, 3.0, 0.1, true);
         ImmersedBoundaryMesh<2, 2>* p_mesh = gen.GetMesh();
 
-        p_mesh->SetNumGridPtsXAndY(512);
+        p_mesh->SetNumGridPtsXAndY(256);
 
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
@@ -92,17 +91,18 @@ public:
         // Add force laws
         MAKE_PTR_ARGS(ImmersedBoundaryMembraneElasticityForce<2>, p_boundary_force, (cell_population));
         p_main_modifier->AddImmersedBoundaryForce(p_boundary_force);
+        p_boundary_force->SetSpringConstant(1e6);
 
-        MAKE_PTR_ARGS(ImmersedBoundaryCellCellInteractionForce<2>, p_cell_cell_force, (cell_population));
-        p_main_modifier->AddImmersedBoundaryForce(p_cell_cell_force);
+//        MAKE_PTR_ARGS(ImmersedBoundaryCellCellInteractionForce<2>, p_cell_cell_force, (cell_population));
+//        p_main_modifier->AddImmersedBoundaryForce(p_cell_cell_force);
 
 
         // Set simulation properties
-        double dt = 0.005;
+        double dt = 0.05;
         simulator.SetOutputDirectory("TestShortMultiCellSimulation");
         simulator.SetDt(dt);
-        simulator.SetSamplingTimestepMultiple(5);
-        simulator.SetEndTime(1415.0 * dt);
+        simulator.SetSamplingTimestepMultiple(1);
+        simulator.SetEndTime(200.0 * dt);
         simulator.Solve();
     }
 };

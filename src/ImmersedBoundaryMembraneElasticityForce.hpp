@@ -97,7 +97,7 @@ protected:
     double mSpringConst;
 
     /** The membrane rest length associated with each element */
-    double mRestLength;
+    double mRestLengthMultiplier;
 
     /** The multiplicative quantity by which we alter the spring constant of the basement lamina, if present */
     double mBasementSpringConstantModifier;
@@ -172,7 +172,7 @@ public:
      *
      * @param new value of the rest length
      */
-    void SetRestLength(double restLength);
+    void SetRestLengthMultiplier(double restLengthMultiplier);
 
     /**
      * Overridden OutputForceParameters() method.

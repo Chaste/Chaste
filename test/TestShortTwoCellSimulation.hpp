@@ -101,7 +101,7 @@ public:
         simulator.SetOutputDirectory("TestShortTwoCellSimulation");
         simulator.SetDt(dt);
         simulator.SetSamplingTimestepMultiple(100);
-        simulator.SetEndTime(20000.0 * dt);
+        simulator.SetEndTime(100.0 * dt);
         simulator.Solve();
     }
 };

@@ -80,6 +80,10 @@ ImmersedBoundaryCellPopulation<DIM>::ImmersedBoundaryCellPopulation(ImmersedBoun
 
     // Default active sources to true (safer - simulation will always work with sources set to zero, just a bit slower)
     mPopulationHasActiveSources = true;
+
+    // Set the intrinsic spacing to a default 0.01
+    //\todo should this be static?
+    mIntrinsicSpacing = 0.01;
 }
 
 template<unsigned DIM>
@@ -153,6 +157,13 @@ double ImmersedBoundaryCellPopulation<DIM>::GetInteractionDistance()
 {
     return mInteractionDistance;
 }
+
+template<unsigned DIM>
+double ImmersedBoundaryCellPopulation<DIM>::GetIntrinsicSpacing()
+{
+    return mIntrinsicSpacing;
+}
+
 
 //\todo: implement this method. Decide what "neighbouring" should be for IB cells
 template<unsigned DIM>

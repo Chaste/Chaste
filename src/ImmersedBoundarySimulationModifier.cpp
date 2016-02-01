@@ -38,7 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //#include "Exception.hpp"
 //#include "Warnings.hpp"
 //#include <complex>
-//#include "Debug.hpp"
+#include "Debug.hpp"
 //#include "Timer.hpp"
 //#include "FileFinder.hpp"
 //
@@ -241,7 +241,7 @@ template<unsigned DIM>
 void ImmersedBoundarySimulationModifier<DIM>::PropagateForcesToFluidGrid()
 {
     // Helper variables, pre-defined for efficiency
-    double dl = mpMesh->GetCharacteristicNodeSpacing();
+    double dl;
     double weight;
 
     unsigned first_idx_x;
@@ -259,43 +259,73 @@ void ImmersedBoundarySimulationModifier<DIM>::PropagateForcesToFluidGrid()
     // Get a reference to the force grids which we spread the applied forces to
     multi_array<double, 3>& force_grids = mpArrays->rGetModifiableForceGrids();
 
-    // Iterate over all nodes and propagate their forces to the grids
-    for (typename ImmersedBoundaryMesh<DIM, DIM>::NodeIterator node_iter = mpMesh->GetNodeIteratorBegin(false);
-            node_iter != mpMesh->GetNodeIteratorEnd();
-            ++node_iter)
+    // Here, we loop over elements and then nodes as the length scale dl varies per element
+    for (typename ImmersedBoundaryMesh<DIM, DIM>::ImmersedBoundaryElementIterator elem_iter = mpMesh->GetElementIteratorBegin(false);
+         elem_iter != mpMesh->GetElementIteratorEnd();
+         ++elem_iter)
     {
+        dl = mpMesh->GetAverageNodeSpacingOfElement(elem_iter->GetIndex());
 
-        // Get location and applied force contribution of current node
-        node_location = node_iter->rGetLocation();
-        applied_force = node_iter->rGetAppliedForce();
-
-        // Get first grid index in each dimension, taking account of possible wrap-around
-        first_idx_x = unsigned(floor(node_location[0] / mGridSpacingX)) + mNumGridPtsX - 1;
-        first_idx_y = unsigned(floor(node_location[1] / mGridSpacingY)) + mNumGridPtsY - 1;
-
-        // Calculate all four indices and deltas in each dimension
-        for (unsigned i = 0 ; i < 4 ; i ++)
+        for (unsigned node_idx = 0; node_idx < elem_iter->GetNumNodes(); node_idx++)
         {
-            x_indices[i] = (first_idx_x + i) % mNumGridPtsX;
-            y_indices[i] = (first_idx_y + i) % mNumGridPtsY;
+            Node<DIM> *p_node = elem_iter->GetNode(node_idx);
 
-            x_deltas[i] = Delta1D(fabs(x_indices[i] * mGridSpacingX - node_location[0]), mGridSpacingX);
-            y_deltas[i] = Delta1D(fabs(y_indices[i] * mGridSpacingY - node_location[1]), mGridSpacingY);
-        }
+            // Get location and applied force contribution of current node
+            node_location = p_node->rGetLocation();
+            applied_force = p_node->rGetAppliedForce();
 
-        // Loop over the 4x4 grid used to spread the force on the nodes to the fluid grid
-        for (unsigned x_idx = 0 ; x_idx < 4 ; x_idx ++)
-        {
-            for (unsigned y_idx = 0 ; y_idx < 4 ; y_idx ++)
+            // Get first grid index in each dimension, taking account of possible wrap-around
+            first_idx_x = unsigned(floor(node_location[0] / mGridSpacingX)) + mNumGridPtsX - 1;
+            first_idx_y = unsigned(floor(node_location[1] / mGridSpacingY)) + mNumGridPtsY - 1;
+
+            // Calculate all four indices and deltas in each dimension
+            for (unsigned i = 0; i < 4; i++)
             {
-                // The applied force is weighted by the delta function
-                weight = x_deltas[x_idx] * y_deltas[y_idx] * dl / (mGridSpacingX * mGridSpacingY);
+                x_indices[i] = (first_idx_x + i) % mNumGridPtsX;
+                y_indices[i] = (first_idx_y + i) % mNumGridPtsY;
 
-                force_grids[0][x_indices[x_idx]][y_indices[y_idx]] += applied_force[0] * weight;
-                force_grids[1][x_indices[x_idx]][y_indices[y_idx]] += applied_force[1] * weight;
+                x_deltas[i] = Delta1D(fabs(x_indices[i] * mGridSpacingX - node_location[0]), mGridSpacingX);
+                y_deltas[i] = Delta1D(fabs(y_indices[i] * mGridSpacingY - node_location[1]), mGridSpacingY);
+            }
+
+            // Loop over the 4x4 grid used to spread the force on the nodes to the fluid grid
+            for (unsigned x_idx = 0; x_idx < 4; x_idx++)
+            {
+                for (unsigned y_idx = 0; y_idx < 4; y_idx++)
+                {
+                    // The applied force is weighted by the delta function
+                    weight = x_deltas[x_idx] * y_deltas[y_idx] * dl / (mGridSpacingX * mGridSpacingY);
+
+                    force_grids[0][x_indices[x_idx]][y_indices[y_idx]] += applied_force[0] * weight;
+                    force_grids[1][x_indices[x_idx]][y_indices[y_idx]] += applied_force[1] * weight;
+                }
             }
         }
     }
+
+    double x_total = 0.0;
+    double y_total = 0.0;
+
+    double x_average = 0.0;
+    double y_average = 0.0;
+
+    for (unsigned x = 0 ; x < mNumGridPtsX ; x++)
+    {
+        for (unsigned y = 0 ; y < mNumGridPtsX ; y++)
+        {
+            x_total += force_grids[0][x][y];
+            y_total += force_grids[1][x][y];
+
+            x_average += fabs(force_grids[0][x][y]);
+            y_average += fabs(force_grids[1][x][y]);
+        }
+    }
+
+    x_average /= double(mNumGridPtsX * mNumGridPtsY);
+    y_average /= double(mNumGridPtsX * mNumGridPtsY);
+
+    PRINT_2_VARIABLES(x_total, y_total);
+    PRINT_2_VARIABLES(x_average, y_average);
 }
 
 template<unsigned DIM>

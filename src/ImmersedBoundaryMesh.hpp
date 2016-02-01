@@ -390,6 +390,14 @@ public:
     virtual double GetSurfaceAreaOfElement(unsigned index);
 
     /**
+     * Compute the average node spacing of an element.
+     *
+     * @param index  the global index of a specified immersed boundary element
+     * @return the surface area of the element
+     */
+    double GetAverageNodeSpacingOfElement(unsigned index);
+
+    /**
      * Compute the second moments and product moment of area for a given 2D element
      * about its centroid. These are:
      *

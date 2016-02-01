@@ -88,6 +88,9 @@ private:
     /** The distance over which cell-cell interactions occur */
     double mInteractionDistance;
 
+    /** The intrinsic node spacing, relative to which various parameters must be calculated */
+    double mIntrinsicSpacing;
+
     /** Whether the simulation has active fluid sources */
     bool mPopulationHasActiveSources;
 
@@ -209,6 +212,11 @@ public:
      * @return the cell-cell interaction distance.
      */
     double GetInteractionDistance();
+
+    /**
+     * @return the intrinsic node spacing
+     */
+    double GetIntrinsicSpacing();
 
     /**
      * Overridden GetLocationOfCellCentre() method.

@@ -106,7 +106,18 @@ void ImmersedBoundaryCellCellInteractionForce<DIM>::AddForceContribution(std::ve
     double normed_dist;
     double protein_mult;
 
+    // The spring constant will be scaled by an amount determined by the intrinsic spacing
+    double intrinsic_spacing = mpCellPopulation->GetIntrinsicSpacing();
+    double node_a_elem_spacing;
+    double node_b_elem_spacing;
+    double elem_spacing;
+
+    // The effective spring constant will be a scaled version of mSpringConst
+    double effective_spring_const;
+
     c_vector<double, DIM> vector_between_nodes;
+    c_vector<double, DIM> force_a_to_b;
+    c_vector<double, DIM> force_b_to_a;
 
     Node<DIM>* p_node_a;
     Node<DIM>* p_node_b;
@@ -132,16 +143,30 @@ void ImmersedBoundaryCellCellInteractionForce<DIM>::AddForceContribution(std::ve
 
             if (normed_dist < mpCellPopulation->GetInteractionDistance())
             {
+                // Get the element spacing for each of the nodes concerned and calculate the effective spring constant
+                node_a_elem_spacing = mpMesh->GetAverageNodeSpacingOfElement(*(p_node_a->rGetContainingBoundaryElementIndices().begin()));
+                node_b_elem_spacing = mpMesh->GetAverageNodeSpacingOfElement(*(p_node_b->rGetContainingBoundaryElementIndices().begin()));
+
+                elem_spacing = 0.5 * (node_a_elem_spacing + node_b_elem_spacing);
+
+                effective_spring_const = mSpringConst * elem_spacing / intrinsic_spacing;
+
                 // The protein multiplier is a function of the levels of each protein in the current and comparison nodes
                 protein_mult = std::min(r_a_attribs[e_cad_idx], r_b_attribs[e_cad_idx]) +
                                std::min(r_a_attribs[p_cad_idx], r_b_attribs[p_cad_idx]) +
                                std::max(r_a_attribs[integrin_idx], r_b_attribs[integrin_idx]);
 
-                vector_between_nodes *= mSpringConst * protein_mult * (normed_dist - mRestLength) / normed_dist;
-                p_node_a->AddAppliedForceContribution(vector_between_nodes);
+                /*
+                 * We must scale each applied force by a factor of the intrinsic spacing / elem_spacing, so that forces
+                 * balance when spread to the grid later
+                 */
+                vector_between_nodes *= effective_spring_const * protein_mult * (normed_dist - mRestLength) / normed_dist;
 
-                vector_between_nodes *= -1.0;
-                p_node_b->AddAppliedForceContribution(vector_between_nodes);
+                force_a_to_b = vector_between_nodes * node_a_elem_spacing / intrinsic_spacing;
+                p_node_a->AddAppliedForceContribution(force_a_to_b);
+
+                force_b_to_a = -1.0 * vector_between_nodes * node_b_elem_spacing / intrinsic_spacing;
+                p_node_b->AddAppliedForceContribution(force_b_to_a);
             }
         }
     }

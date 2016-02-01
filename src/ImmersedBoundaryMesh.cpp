@@ -674,6 +674,13 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetSurfaceAreaOfElement(uns
 }
 
 
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetAverageNodeSpacingOfElement(unsigned index)
+{
+    return this->GetSurfaceAreaOfElement(index) / this->GetElement(index)->GetNumNodes();
+}
+
+
 //////////////////////////////////////////////////////////////////////
 //                        2D-specific methods                       //
 //////////////////////////////////////////////////////////////////////
