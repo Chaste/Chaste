@@ -1104,7 +1104,7 @@ class IntelHpc(BuildType):
         self.rdynamic_link_flag = '-dynamic'
         self.tools['mpicxx'] = 'CC'
         self.build_dir = 'intelhpc'
-        self._cc_flags = ['-O2'] # Or try -O3 -no-prec-div for more.
+        self._cc_flags = ['-DNDEBUG','-O3','-no-prec-div']
         self.is_optimised = True
 
 class CrayHpc(BuildType):
