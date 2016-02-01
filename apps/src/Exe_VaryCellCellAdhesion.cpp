@@ -131,7 +131,7 @@ void OutputOnCompletion(unsigned simulation_id, unsigned springConst)
 }
 void SetupAndRunSimulation(unsigned simulation_id, unsigned spring_const)
 {
-    double fp_spring_const = 0.01 * (double)spring_const * 1e4;
+    double fp_spring_const = (double)spring_const * 1e2;
     /*
      * 1: Num cells
      * 2: Num nodes per cell
@@ -140,10 +140,10 @@ void SetupAndRunSimulation(unsigned simulation_id, unsigned spring_const)
      * 5: Random y-variation
      * 6: Include membrane
      */
-    ImmersedBoundaryPalisadeMeshGenerator gen(9, 256, 0.1, 3.0, 0.0, true);
+    ImmersedBoundaryPalisadeMeshGenerator gen(9, 128, 0.1, 2.5, 0.0, true);
     ImmersedBoundaryMesh<2, 2>* p_mesh = gen.GetMesh();
 
-    p_mesh->SetNumGridPtsXAndY(512);
+    p_mesh->SetNumGridPtsXAndY(256);
 
     std::vector<CellPtr> cells;
     MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
@@ -154,7 +154,7 @@ void SetupAndRunSimulation(unsigned simulation_id, unsigned spring_const)
     cell_population.SetIfPopulationHasActiveSources(true);
 
     OffLatticeSimulation<2> simulator(cell_population);
-//    simulator.SetConsoleProgressOutput(false);
+    simulator.SetConsoleProgressOutput(false);
 
     // Add main immersed boundary simulation modifier
     MAKE_PTR(ImmersedBoundarySimulationModifier<2>, p_main_modifier);
@@ -163,6 +163,7 @@ void SetupAndRunSimulation(unsigned simulation_id, unsigned spring_const)
     // Add force laws
     MAKE_PTR_ARGS(ImmersedBoundaryMembraneElasticityForce<2>, p_boundary_force, (cell_population));
     p_main_modifier->AddImmersedBoundaryForce(p_boundary_force);
+    p_boundary_force->SetSpringConstant(1e8);
 
     MAKE_PTR_ARGS(ImmersedBoundaryCellCellInteractionForce<2>, p_cell_cell_force, (cell_population));
     p_main_modifier->AddImmersedBoundaryForce(p_cell_cell_force);
@@ -176,8 +177,8 @@ void SetupAndRunSimulation(unsigned simulation_id, unsigned spring_const)
     // Set simulation properties
     double dt = 0.005;
     simulator.SetDt(dt);
-    simulator.SetSamplingTimestepMultiple(5);
-    simulator.SetEndTime(50.0 * dt);
+    simulator.SetSamplingTimestepMultiple(50);
+    simulator.SetEndTime(200.0 * dt);
     simulator.Solve();
 
 
@@ -192,7 +193,7 @@ void SetupAndRunSimulation(unsigned simulation_id, unsigned spring_const)
     // Kick
     for (unsigned elem_idx = 1 ; elem_idx < p_mesh->GetNumElements() ; elem_idx++)
     {
-        double kick = 1.1 - 0.2 * RandomNumberGenerator::Instance()->ranf();
+        double kick = 1.15 - 0.3 * RandomNumberGenerator::Instance()->ranf();
 
         for (unsigned node_idx = 0 ; node_idx < p_mesh->GetElement(elem_idx)->GetNumNodes() ; node_idx++)
         {
@@ -202,37 +203,19 @@ void SetupAndRunSimulation(unsigned simulation_id, unsigned spring_const)
         }
     }
 
-    simulator.SetEndTime(500.0 * dt);
+    double tortuosity_before = p_mesh->GetTortuosityOfMesh();
+
+    simulator.SetDt(2.0 * dt);
+    simulator.SetEndTime(10200.0 * dt);
     simulator.Solve();
 
-    // Compute tortuosity (defined as ratio of total length to straight-line length) of piecewise linear curve through centroids of successive elements
-    double total_length = 0.0;
-
-    c_vector<double, 2> previous_centroid = p_mesh->GetCentroidOfElement(1);
-
-    for (unsigned elem_idx = 2 ; elem_idx < p_mesh->GetNumElements() ; elem_idx++)
-    {
-        c_vector<double, 2> this_centroid = p_mesh->GetCentroidOfElement(elem_idx);
-        total_length += norm_2(p_mesh->GetVectorFromAtoB(previous_centroid, this_centroid));
-        previous_centroid = this_centroid;
-    }
-
-    c_vector<double, 2> first_centroid = p_mesh->GetCentroidOfElement(1);
-    c_vector<double, 2> last_centroid = p_mesh->GetCentroidOfElement(p_mesh->GetNumElements()-1);
-    double straight_line_length = norm_2(p_mesh->GetVectorFromAtoB(first_centroid, last_centroid));
-    straight_line_length = std::max(straight_line_length, 1.0-straight_line_length);
-    double tortuosity = total_length / straight_line_length;
-
-    std::vector<double> output_stuff;
-    output_stuff.push_back(fp_spring_const);
-    output_stuff.push_back(tortuosity);
+    double tortuosity_after = p_mesh->GetTortuosityOfMesh();
 
     OutputFileHandler results_handler(output_directory.str(), false);
     out_stream results_file = results_handler.OpenOutputFile("results.dat");
 
-
     // Output summary statistics to results file
-    (*results_file)<< fp_spring_const << "," << tortuosity;
+    (*results_file) << fp_spring_const << "," << tortuosity_after - tortuosity_before;
 
     // Tidy up
     results_file->close();

@@ -432,6 +432,11 @@ public:
      */
     double GetElongationShapeFactorOfElement(unsigned elementIndex);
 
+    /**
+     * @return the tortuosity of the mesh
+     */
+    double GetTortuosityOfMesh();
+
 
     /**
      * Compute the direction of the shortest principal axis passing through the centroid,

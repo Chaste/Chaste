@@ -173,6 +173,35 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetElongationShapeFactorOfE
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetTortuosityOfMesh()
+{
+    assert(SPACE_DIM == 2);
+
+    // Compute tortuosity (defined as ratio of total length to straight-line length) of piecewise linear curve through centroids of successive elements
+    double total_length = 0.0;
+
+    // We assume that if there is a membrane present, it has index 0
+    unsigned first_elem_idx = this->mMeshHasMembrane ? 1 : 0;
+
+    c_vector<double, SPACE_DIM> previous_centroid = this->GetCentroidOfElement(first_elem_idx);
+
+    for (unsigned elem_idx = first_elem_idx ; elem_idx < this->GetNumElements() ; elem_idx++)
+    {
+        c_vector<double, 2> this_centroid = this->GetCentroidOfElement(elem_idx);
+        total_length += norm_2(this->GetVectorFromAtoB(previous_centroid, this_centroid));
+        previous_centroid = this_centroid;
+    }
+
+    c_vector<double, 2> first_centroid = this->GetCentroidOfElement(first_elem_idx);
+    c_vector<double, 2> last_centroid = this->GetCentroidOfElement(this->GetNumElements()-1);
+
+    double straight_line_length = norm_2(this->GetVectorFromAtoB(first_centroid, last_centroid));
+    straight_line_length = std::max(straight_line_length, 1.0-straight_line_length);
+
+    return total_length / straight_line_length;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryMesh()
 {
     this->mMeshChangesDuringSimulation = false;

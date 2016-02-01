@@ -164,7 +164,7 @@ void ImmersedBoundaryCellCellInteractionForce<DIM>::InitializeProteinLevels()
 
         if (mpMesh->GetElement(elem_idx) == mpMesh->GetMembraneElement())
         {
-            integrin = 100.0;
+            e_cad = 1.0;
         }
         else
         {

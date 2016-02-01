@@ -186,7 +186,7 @@ void ImmersedBoundaryMembraneElasticityForce<DIM>::AddForceContribution(std::vec
                                                                            r_corners[1]->rGetLocation());
             normed_dist = norm_2(apical_force);
             apical_force *=
-                    1.0 * mSpringConst * (normed_dist - GetApicalLengthForElement(elem_idx)) / normed_dist;
+                    0.2 * mSpringConst * (normed_dist - GetApicalLengthForElement(elem_idx)) / normed_dist;
 
             r_corners[0]->AddAppliedForceContribution(apical_force);
             apical_force *= -1.0;
@@ -198,7 +198,7 @@ void ImmersedBoundaryMembraneElasticityForce<DIM>::AddForceContribution(std::vec
 
             normed_dist = norm_2(basal_force);
             basal_force *=
-                    1.0 * mSpringConst * (normed_dist - GetBasalLengthForElement(elem_idx)) / normed_dist;
+                    0.0 * mSpringConst * (normed_dist - GetBasalLengthForElement(elem_idx)) / normed_dist;
 
             r_corners[3]->AddAppliedForceContribution(basal_force);
             basal_force *= -1.0;
