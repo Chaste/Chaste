@@ -69,7 +69,7 @@ public:
          * 5: Random y-variation
          * 6: Include membrane
          */
-        ImmersedBoundaryPalisadeMeshGenerator gen(7, 128, 0.1, 2.5, 0.1, true);
+        ImmersedBoundaryPalisadeMeshGenerator gen(7, 128, 0.1, 2.5, 0.0, true);
         ImmersedBoundaryMesh<2, 2>* p_mesh = gen.GetMesh();
 
         p_mesh->SetNumGridPtsXAndY(256);
@@ -94,17 +94,42 @@ public:
         p_main_modifier->AddImmersedBoundaryForce(p_boundary_force);
         p_boundary_force->SetSpringConstant(5.0 * 1e6);
 
-//        MAKE_PTR_ARGS(ImmersedBoundaryCellCellInteractionForce<2>, p_cell_cell_force, (cell_population));
-//        p_main_modifier->AddImmersedBoundaryForce(p_cell_cell_force);
-//        p_cell_cell_force->SetSpringConstant(5.0 * 1e6);
-
-
         // Set simulation properties
         double dt = 0.075;
         simulator.SetOutputDirectory("TestShortMultiCellSimulation");
         simulator.SetDt(dt);
+        simulator.SetSamplingTimestepMultiple(100);
+        simulator.SetEndTime(100.0 * dt);
+        simulator.Solve();
+
+        // Add a cell-cell interaction force with the same intrinsic strength as the membrane force
+        MAKE_PTR_ARGS(ImmersedBoundaryCellCellInteractionForce<2>, p_cell_cell_force, (cell_population));
+        p_main_modifier->AddImmersedBoundaryForce(p_cell_cell_force);
+        p_cell_cell_force->SetSpringConstant(5.0 * 1e6);
+
+        // Get height of basement lamina
+        double lamina_height = 0.0;
+        for (unsigned node_idx = 0 ; node_idx < p_mesh->GetElement(0)->GetNumNodes() ; node_idx++)
+        {
+            lamina_height += p_mesh->GetElement(0)->GetNode(node_idx)->rGetModifiableLocation()[1];
+        }
+        lamina_height /= p_mesh->GetElement(0)->GetNumNodes();
+
+        // Kick the second cell in from the left and set its E-cad level
+        double kick = 1.0;
+        unsigned e_cad_location = p_cell_cell_force->rGetProteinNodeAttributeLocations()[0];
+
+        for (unsigned node_idx = 0 ; node_idx < p_mesh->GetElement(3)->GetNumNodes() ; node_idx++)
+        {
+            double new_height = lamina_height + kick * (p_mesh->GetElement(3)->GetNode(node_idx)->rGetLocation()[1] - lamina_height);
+
+            p_mesh->GetElement(3)->GetNode(node_idx)->rGetModifiableLocation()[1] = new_height;
+
+            p_mesh->GetElement(3)->GetNode(node_idx)->rGetNodeAttributes()[e_cad_location] = 0.0;
+        }
+
         simulator.SetSamplingTimestepMultiple(40);
-        simulator.SetEndTime(10000.0 * dt);
+        simulator.SetEndTime(10100.0 * dt);
         simulator.Solve();
     }
 };

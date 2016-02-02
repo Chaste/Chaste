@@ -171,6 +171,13 @@ void ImmersedBoundaryCellCellInteractionForce<DIM>::AddForceContribution(std::ve
     }
 }
 
+
+template<unsigned DIM>
+const std::vector<unsigned>& ImmersedBoundaryCellCellInteractionForce<DIM>::rGetProteinNodeAttributeLocations() const
+{
+    return mProteinNodeAttributeLocations;
+}
+
 template<unsigned DIM>
 void ImmersedBoundaryCellCellInteractionForce<DIM>::InitializeProteinLevels()
 {

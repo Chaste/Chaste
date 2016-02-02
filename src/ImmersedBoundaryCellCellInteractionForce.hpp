@@ -122,6 +122,11 @@ public:
     virtual void AddForceContribution(std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs);
 
     /**
+     * @return mProteinNodeAttributeLocations
+     */
+    const std::vector<unsigned>& rGetProteinNodeAttributeLocations() const;
+
+    /**
      * Helper method for the constructor.
      *
      * Initializes the levels of each protein.

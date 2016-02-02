@@ -161,7 +161,6 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
         double node_spacing = perimeter / (double)mNumNodesPerCell;
 
         unsigned num_membrane_nodes = (unsigned)floor(1.0 / node_spacing);
-        PRINT_VARIABLE(num_membrane_nodes)
 
         std::vector<Node<2>*> nodes_this_elem;
 
@@ -185,11 +184,6 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
     {
         std::vector<Node<2>*> nodes_this_elem;
         double temp_rand = p_rand_gen->ranf();
-
-        if (cell_idx == 2)
-        {
-            temp_rand = 3.0;
-        }
 
         for(unsigned location = 0 ; location < locations.size() ; location++)
         {
