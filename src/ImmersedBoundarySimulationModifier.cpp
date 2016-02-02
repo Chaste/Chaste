@@ -302,30 +302,6 @@ void ImmersedBoundarySimulationModifier<DIM>::PropagateForcesToFluidGrid()
             }
         }
     }
-
-    double x_total = 0.0;
-    double y_total = 0.0;
-
-    double x_average = 0.0;
-    double y_average = 0.0;
-
-    for (unsigned x = 0 ; x < mNumGridPtsX ; x++)
-    {
-        for (unsigned y = 0 ; y < mNumGridPtsX ; y++)
-        {
-            x_total += force_grids[0][x][y];
-            y_total += force_grids[1][x][y];
-
-            x_average += fabs(force_grids[0][x][y]);
-            y_average += fabs(force_grids[1][x][y]);
-        }
-    }
-
-    x_average /= double(mNumGridPtsX * mNumGridPtsY);
-    y_average /= double(mNumGridPtsX * mNumGridPtsY);
-
-    PRINT_2_VARIABLES(x_total, y_total);
-    PRINT_2_VARIABLES(x_average, y_average);
 }
 
 template<unsigned DIM>
@@ -450,12 +426,27 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
      * redundancy, and so all calculations need only be done on reduced-size arrays, saving memory and computation.
      */
 
-    // Calculate the pressure grid
-    for (unsigned x = 0 ; x < mNumGridPtsX ; x++)
+    // If the population has active fluid sources, the computation is slightly more complicated
+    if (mpCellPopulation->DoesPopulationHaveActiveSources())
     {
-        for (unsigned y = 0 ; y < reduced_size ; y++)
+        for (unsigned x = 0; x < mNumGridPtsX; x++)
         {
-            pressure_grid[x][y] = (op_2[x][y] * fourier_grids[2][x][y] - mI * (sin_2x[x] * fourier_grids[0][x][y] / mGridSpacingX + sin_2y[y] * fourier_grids[1][x][y] / mGridSpacingY) ) / op_1[x][y];
+            for (unsigned y = 0; y < reduced_size; y++)
+            {
+                pressure_grid[x][y] = (op_2[x][y] * fourier_grids[2][x][y] - mI * (sin_2x[x] * fourier_grids[0][x][y] / mGridSpacingX +
+                                                                                   sin_2y[y] * fourier_grids[1][x][y] / mGridSpacingY)) / op_1[x][y];
+            }
+        }
+    }
+    else // no active fluid sources
+    {
+        for (unsigned x = 0; x < mNumGridPtsX; x++)
+        {
+            for (unsigned y = 0; y < reduced_size; y++)
+            {
+                pressure_grid[x][y] = -mI * (sin_2x[x] * fourier_grids[0][x][y] / mGridSpacingX +
+                                             sin_2y[y] * fourier_grids[1][x][y] / mGridSpacingY) / op_1[x][y];
+            }
         }
     }
 

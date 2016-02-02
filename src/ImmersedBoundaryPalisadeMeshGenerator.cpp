@@ -153,14 +153,22 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
     c_vector<double, 2> x_offset = x_unit * cell_width;
     c_vector<double, 2> y_offset = y_unit * (1.0 - cell_height) / 2.0;
 
+    // Add the membrane element, if there is one
     if (mMembrane)
     {
+        // Aim to give the membrane roughly the same node-spacing as the other cells
+        double perimeter = 2.0 * (cell_height + cell_width);
+        double node_spacing = perimeter / (double)mNumNodesPerCell;
+
+        unsigned num_membrane_nodes = (unsigned)floor(1.0 / node_spacing);
+        PRINT_VARIABLE(num_membrane_nodes)
+
         std::vector<Node<2>*> nodes_this_elem;
 
-        for (unsigned mem_node_idx = 0 ; mem_node_idx < 128 ; mem_node_idx++)
+        for (unsigned mem_node_idx = 0 ; mem_node_idx < num_membrane_nodes ; mem_node_idx++)
         {
             // Calculate location of node
-            c_vector<double, 2> location = 0.97 * y_offset + ( 1.0 / 256.0 + double(mem_node_idx) / 128.0 ) * x_unit;
+            c_vector<double, 2> location = 0.97 * y_offset + ( 0.5 / num_membrane_nodes + double(mem_node_idx) / num_membrane_nodes ) * x_unit;
 
             // Create the new node
             nodes.push_back(new Node<2>(mem_node_idx, location, true));
@@ -180,7 +188,7 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
 
         if (cell_idx == 2)
         {
-            temp_rand = 2.0;
+            temp_rand = 3.0;
         }
 
         for(unsigned location = 0 ; location < locations.size() ; location++)

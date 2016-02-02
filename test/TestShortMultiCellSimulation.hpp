@@ -69,7 +69,7 @@ public:
          * 5: Random y-variation
          * 6: Include membrane
          */
-        ImmersedBoundaryPalisadeMeshGenerator gen(9, 180, 0.1, 3.0, 0.1, true);
+        ImmersedBoundaryPalisadeMeshGenerator gen(7, 128, 0.1, 2.5, 0.1, true);
         ImmersedBoundaryMesh<2, 2>* p_mesh = gen.GetMesh();
 
         p_mesh->SetNumGridPtsXAndY(256);
@@ -80,9 +80,10 @@ public:
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
         ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.SetIfPopulationHasActiveSources(true);
+        cell_population.SetIfPopulationHasActiveSources(false);
 
         OffLatticeSimulation<2> simulator(cell_population);
+        simulator.SetConsoleProgressOutput(true);
 
         // Add main immersed boundary simulation modifier
         MAKE_PTR(ImmersedBoundarySimulationModifier<2>, p_main_modifier);
@@ -91,19 +92,19 @@ public:
         // Add force laws
         MAKE_PTR_ARGS(ImmersedBoundaryMembraneElasticityForce<2>, p_boundary_force, (cell_population));
         p_main_modifier->AddImmersedBoundaryForce(p_boundary_force);
-        p_boundary_force->SetSpringConstant(1e6);
+        p_boundary_force->SetSpringConstant(5.0 * 1e6);
 
-        MAKE_PTR_ARGS(ImmersedBoundaryCellCellInteractionForce<2>, p_cell_cell_force, (cell_population));
-        p_main_modifier->AddImmersedBoundaryForce(p_cell_cell_force);
-        p_cell_cell_force->SetSpringConstant(1e1);
+//        MAKE_PTR_ARGS(ImmersedBoundaryCellCellInteractionForce<2>, p_cell_cell_force, (cell_population));
+//        p_main_modifier->AddImmersedBoundaryForce(p_cell_cell_force);
+//        p_cell_cell_force->SetSpringConstant(5.0 * 1e6);
 
 
         // Set simulation properties
-        double dt = 0.05;
+        double dt = 0.075;
         simulator.SetOutputDirectory("TestShortMultiCellSimulation");
         simulator.SetDt(dt);
-        simulator.SetSamplingTimestepMultiple(1);
-        simulator.SetEndTime(200.0 * dt);
+        simulator.SetSamplingTimestepMultiple(40);
+        simulator.SetEndTime(10000.0 * dt);
         simulator.Solve();
     }
 };

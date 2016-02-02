@@ -62,7 +62,7 @@ ImmersedBoundaryCellPopulation<DIM>::ImmersedBoundaryCellPopulation(ImmersedBoun
     mpImmersedBoundaryMesh = static_cast<ImmersedBoundaryMesh<DIM, DIM>* >(&(this->mrMesh));
     mpVertexBasedDivisionRule.reset(new ShortAxisVertexBasedDivisionRule<DIM>());
 
-    mInteractionDistance = 0.2 * sqrt(mpImmersedBoundaryMesh->GetVolumeOfElement(mpImmersedBoundaryMesh->GetNumElements()-1));
+    mInteractionDistance = 0.05 * sqrt(mpImmersedBoundaryMesh->GetVolumeOfElement(mpImmersedBoundaryMesh->GetNumElements()-1));
 
     PRINT_VARIABLE(mInteractionDistance);
 
