@@ -62,7 +62,9 @@ ImmersedBoundaryCellPopulation<DIM>::ImmersedBoundaryCellPopulation(ImmersedBoun
     mpImmersedBoundaryMesh = static_cast<ImmersedBoundaryMesh<DIM, DIM>* >(&(this->mrMesh));
     mpVertexBasedDivisionRule.reset(new ShortAxisVertexBasedDivisionRule<DIM>());
 
-    mInteractionDistance = 0.4 * sqrt(mpImmersedBoundaryMesh->GetVolumeOfElement(mpImmersedBoundaryMesh->GetNumElements()-1));
+    mInteractionDistance = 0.2 * sqrt(mpImmersedBoundaryMesh->GetVolumeOfElement(mpImmersedBoundaryMesh->GetNumElements()-1));
+
+    PRINT_VARIABLE(mInteractionDistance);
 
     // If no location indices are specified, associate with elements from the mesh (assumed to be sequentially ordered).
     std::list<CellPtr>::iterator it = this->mCells.begin();

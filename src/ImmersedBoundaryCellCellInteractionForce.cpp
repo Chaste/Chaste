@@ -144,9 +144,8 @@ void ImmersedBoundaryCellCellInteractionForce<DIM>::AddForceContribution(std::ve
             if (normed_dist < mpCellPopulation->GetInteractionDistance())
             {
                 // Get the element spacing for each of the nodes concerned and calculate the effective spring constant
-                node_a_elem_spacing = mpMesh->GetAverageNodeSpacingOfElement(*(p_node_a->rGetContainingBoundaryElementIndices().begin()));
-                node_b_elem_spacing = mpMesh->GetAverageNodeSpacingOfElement(*(p_node_b->rGetContainingBoundaryElementIndices().begin()));
-
+                node_a_elem_spacing = mpMesh->GetAverageNodeSpacingOfElement(*(p_node_a->rGetContainingElementIndices().begin()));
+                node_b_elem_spacing = mpMesh->GetAverageNodeSpacingOfElement(*(p_node_b->rGetContainingElementIndices().begin()));
                 elem_spacing = 0.5 * (node_a_elem_spacing + node_b_elem_spacing);
 
                 effective_spring_const = mSpringConst * elem_spacing / intrinsic_spacing;
@@ -157,15 +156,15 @@ void ImmersedBoundaryCellCellInteractionForce<DIM>::AddForceContribution(std::ve
                                std::max(r_a_attribs[integrin_idx], r_b_attribs[integrin_idx]);
 
                 /*
-                 * We must scale each applied force by a factor of the intrinsic spacing / elem_spacing, so that forces
-                 * balance when spread to the grid later
+                 * We must scale each applied force by a factor of elem_spacing / local spacing, so that forces
+                 * balance when spread to the grid later (where the multiplicative factor is the local spacing)
                  */
                 vector_between_nodes *= effective_spring_const * protein_mult * (normed_dist - mRestLength) / normed_dist;
 
-                force_a_to_b = vector_between_nodes * node_a_elem_spacing / intrinsic_spacing;
+                force_a_to_b = vector_between_nodes * elem_spacing / node_a_elem_spacing;
                 p_node_a->AddAppliedForceContribution(force_a_to_b);
 
-                force_b_to_a = -1.0 * vector_between_nodes * node_b_elem_spacing / intrinsic_spacing;
+                force_b_to_a = -1.0 * vector_between_nodes * elem_spacing / node_b_elem_spacing;
                 p_node_b->AddAppliedForceContribution(force_b_to_a);
             }
         }

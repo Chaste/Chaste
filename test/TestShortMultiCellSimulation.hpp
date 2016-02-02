@@ -69,7 +69,7 @@ public:
          * 5: Random y-variation
          * 6: Include membrane
          */
-        ImmersedBoundaryPalisadeMeshGenerator gen(9, 360, 0.1, 3.0, 0.1, true);
+        ImmersedBoundaryPalisadeMeshGenerator gen(9, 180, 0.1, 3.0, 0.1, true);
         ImmersedBoundaryMesh<2, 2>* p_mesh = gen.GetMesh();
 
         p_mesh->SetNumGridPtsXAndY(256);
@@ -93,8 +93,9 @@ public:
         p_main_modifier->AddImmersedBoundaryForce(p_boundary_force);
         p_boundary_force->SetSpringConstant(1e6);
 
-//        MAKE_PTR_ARGS(ImmersedBoundaryCellCellInteractionForce<2>, p_cell_cell_force, (cell_population));
-//        p_main_modifier->AddImmersedBoundaryForce(p_cell_cell_force);
+        MAKE_PTR_ARGS(ImmersedBoundaryCellCellInteractionForce<2>, p_cell_cell_force, (cell_population));
+        p_main_modifier->AddImmersedBoundaryForce(p_cell_cell_force);
+        p_cell_cell_force->SetSpringConstant(1e1);
 
 
         // Set simulation properties
