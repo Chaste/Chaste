@@ -472,5 +472,16 @@ bool PetscTools::HasParMetis()
     // Note that this method probably leaks memory inside PETSc because if MatPartitioningCreate fails
     // then there isn't a proper handle to destroy.
     MatPartitioningDestroy(PETSC_DESTROY_PARAM(part));
+
+    // Get out of jail free card for Windows where the latest configuration of the integration machine shows that our implementation doesn't work as expected.
+#ifdef _MSC_VER
+//\todo #2016 (or similar ticket).  The method NodePartitioner::PetscMatrixPartitioning is not working in parallel
+    if (parmetis_installed_error == 0)
+    {
+        WARN_ONCE_ONLY("The PETSc/parMETIS interface is correctly installed but does not yet work in Windows so matrix-based partitioning will be turned off.");
+    }
+    return false;
+#endif
+
     return (parmetis_installed_error == 0);
 }
