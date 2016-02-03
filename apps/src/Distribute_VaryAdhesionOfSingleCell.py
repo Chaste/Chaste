@@ -2,13 +2,12 @@ import multiprocessing
 import subprocess
 import os
 import shutil
-import numpy as np
-import matplotlib.pyplot as plt
 
 # Globally accessible directory paths and names
 path_to_exec   = os.environ.get('CHASTE_BUILD_DIR') + '/projects/ImmersedBoundary/apps/'
 path_to_output = os.environ.get('CHASTE_TEST_OUTPUT') + '/'
-exec_name = 'Exe_VaryAdhesionOfSingleCell'
+sim_name = 'VaryAdhesionOfSingleCell'
+exec_name = 'Exe_' + sim_name
 
 # Range for two simulation parameters
 num_global_consts = 5
@@ -16,8 +15,8 @@ num_local_consts  = 11
 num_kicks_per_sim = 11
 
 def main():
-    run_simulations()
-    combine_output()
+    #run_simulations()
+    #combine_output()
     plot_results()
 
 
@@ -86,16 +85,52 @@ def combine_output():
 
 def plot_results():
 
-    print("Py: Plotting results coming soon")
+    print("Py: Plotting results")
 
-    from numpy import genfromtxt
-    my_data = genfromtxt(path_to_output + exec_name + '/combined_results.dat', delimiter=',', skip_header=1)
+    import numpy as np
+    import matplotlib.pyplot as plt
 
-    # x_vals = my_data[:,0]
-    # y_vals = my_data[:,1]
-    #
-    # plt.scatter(x_vals, y_vals)
-    # plt.savefig(path_to_output + exec_name + '/figure.pdf')
+    # Set LaTeX font rendering
+    plt.rc('text', usetex=True)
+    plt.rc('font', family='serif')
+
+    my_data = np.genfromtxt(path_to_output + exec_name + '/combined_results.dat', delimiter=',', skip_header=1)
+
+    x_vals = my_data[:,1] # local const
+    y_vals = my_data[:,3] # summary statistic
+
+    x_min, x_max = min(x_vals), max(x_vals)
+    y_min, y_max = min(y_vals), max(y_vals)
+
+    x_range, y_range = x_max - x_min, y_max - y_min
+    margin = 0.05;
+
+    x_lims = [x_min - margin * x_range, x_max + margin * x_range]
+    y_lims = [y_min - margin * y_range, y_max + margin * y_range]
+
+    num_sims_per_plot = num_local_consts * num_kicks_per_sim
+
+    for plot in range(num_global_consts):
+
+        plt.clf()
+
+        plt.xlabel(r'Local spring constant multiple', fontsize=12)
+        plt.ylabel(r'Change in height of cell centroid', fontsize=12)
+
+        title = 'Global cell-cell spring constant scaled by ' + str(0.25 * (1+plot))
+
+        plt.title(title, fontsize=12)
+
+        highlight_x_vals = my_data[plot * num_sims_per_plot : (plot+1) * num_sims_per_plot,1]
+        highlight_y_vals = my_data[plot * num_sims_per_plot : (plot+1) * num_sims_per_plot,3]
+
+        plt.scatter(x_vals, y_vals, color = '0.75')
+        plt.scatter(highlight_x_vals, highlight_y_vals, color = '#F39200')
+
+        plt.xlim(x_lims)
+        plt.ylim(y_lims)
+
+        plt.savefig(path_to_output + exec_name + '/Fig_' + exec_name + str(plot) + '.pdf')
 
 if __name__ == "__main__":
     main()

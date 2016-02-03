@@ -64,7 +64,7 @@ ImmersedBoundaryMembraneElasticityForce<DIM>::ImmersedBoundaryMembraneElasticity
 
     /*
      * We keep track of the initial size of the apical and basal sides.  This will be the initial distance between the
-     * corners, which are storred by the element.
+     * corners, which are stored by the element.
      *
      * Corners are represented as follows, and stored as four consecutive element attributes:
      *
@@ -202,7 +202,7 @@ void ImmersedBoundaryMembraneElasticityForce<DIM>::AddForceContribution(std::vec
                                                                            r_corners[1]->rGetLocation());
             normed_dist = norm_2(apical_force);
             apical_force *=
-                    0.4 * mSpringConst * (normed_dist - GetApicalLengthForElement(elem_idx)) / normed_dist;
+                    0.0 * mSpringConst * (normed_dist - GetApicalLengthForElement(elem_idx)) / normed_dist;
 
             r_corners[0]->AddAppliedForceContribution(apical_force);
             apical_force *= -1.0;
@@ -214,7 +214,7 @@ void ImmersedBoundaryMembraneElasticityForce<DIM>::AddForceContribution(std::vec
 
             normed_dist = norm_2(basal_force);
             basal_force *=
-                    0.05 * mSpringConst * (normed_dist - GetBasalLengthForElement(elem_idx)) / normed_dist;
+                    0.0 * mSpringConst * (normed_dist - GetBasalLengthForElement(elem_idx)) / normed_dist;
 
             r_corners[3]->AddAppliedForceContribution(basal_force);
             basal_force *= -1.0;

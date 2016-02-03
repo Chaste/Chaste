@@ -105,7 +105,7 @@ public:
         // Add a cell-cell interaction force with the same intrinsic strength as the membrane force
         MAKE_PTR_ARGS(ImmersedBoundaryCellCellInteractionForce<2>, p_cell_cell_force, (cell_population));
         p_main_modifier->AddImmersedBoundaryForce(p_cell_cell_force);
-        p_cell_cell_force->SetSpringConstant(5.0 * 1e6);
+        p_cell_cell_force->SetSpringConstant(1.0 * 1e6);
 
         // Get height of basement lamina
         double lamina_height = 0.0;
@@ -116,8 +116,11 @@ public:
         lamina_height /= p_mesh->GetElement(0)->GetNumNodes();
 
         // Kick the second cell in from the left and set its E-cad level
-        double kick = 1.0;
+        double kick = 1.1;
         unsigned e_cad_location = p_cell_cell_force->rGetProteinNodeAttributeLocations()[0];
+        unsigned p_cad_location = p_cell_cell_force->rGetProteinNodeAttributeLocations()[1];
+
+        double centroid_x = p_mesh->GetCentroidOfElement(3)[0];
 
         for (unsigned node_idx = 0 ; node_idx < p_mesh->GetElement(3)->GetNumNodes() ; node_idx++)
         {
@@ -125,11 +128,31 @@ public:
 
             p_mesh->GetElement(3)->GetNode(node_idx)->rGetModifiableLocation()[1] = new_height;
 
+//            if (p_mesh->GetElement(3)->GetNode(node_idx)->GetRegion() == 2 && p_mesh->GetElement(3)->GetNode(node_idx)->rGetLocation()[0] > centroid_x)
+//            {
+//                p_mesh->GetElement(3)->GetNode(node_idx)->rGetNodeAttributes()[e_cad_location] = 0.0;
+//            }
+//            else
+//            {
+//                p_mesh->GetElement(3)->GetNode(node_idx)->rGetNodeAttributes()[e_cad_location] = 0.0;
+//            }
+
             p_mesh->GetElement(3)->GetNode(node_idx)->rGetNodeAttributes()[e_cad_location] = 0.0;
+
+            p_mesh->GetElement(3)->GetNode(node_idx)->rGetNodeAttributes()[p_cad_location] = 2.0;
+
         }
 
-        simulator.SetSamplingTimestepMultiple(40);
-        simulator.SetEndTime(10100.0 * dt);
+        for (unsigned node_idx = 0 ; node_idx < p_mesh->GetElement(4)->GetNumNodes() ; node_idx++)
+        {
+            if (p_mesh->GetElement(4)->GetNode(node_idx)->GetRegion() == 1)
+            {
+                p_mesh->GetElement(4)->GetNode(node_idx)->rGetNodeAttributes()[p_cad_location] = 2.0;
+            }
+        }
+
+        simulator.SetSamplingTimestepMultiple(100);
+        simulator.SetEndTime(20100.0 * dt);
         simulator.Solve();
     }
 };
