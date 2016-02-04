@@ -41,9 +41,9 @@ NagaiHondaForce<DIM>::NagaiHondaForce()
      mNagaiHondaDeformationEnergyParameter(100.0), // This is 1.0 in the Nagai & Honda paper.
      mNagaiHondaMembraneSurfaceEnergyParameter(10.0), // This is 0.1 in the Nagai & Honda paper.
      mNagaiHondaCellCellAdhesionEnergyParameter(0.5), // This corresponds to a value of 1.0 for
-	                                                  // the sigma parameter in the Nagai & Honda
-	                                                  // paper. In the paper, the sigma value is
-	                                                  // set to 0.01.
+                                                      // the sigma parameter in the Nagai & Honda
+                                                      // paper. In the paper, the sigma value is
+                                                      // set to 0.01.
      mNagaiHondaCellBoundaryAdhesionEnergyParameter(1.0) // This is 0.01 in the Nagai & Honda paper.
 {
 }

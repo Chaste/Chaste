@@ -93,27 +93,27 @@ public:
     /**
      * @param RIn The parameter RIn
      */
-	void SetRIn(double);
-	
-	 /**
+    void SetRIn(double);
+
+     /**
      * @param ROut The parameter ROut
      */
-	void SetROut(double);
-	
-	 /**
+    void SetROut(double);
+
+     /**
      * @param k1 The parameter k1
      */
-	void Setk1(double);
-	
-	/**
+    void Setk1(double);
+
+    /**
      * @param k2 The parameter k2
      */
-	void Setk2(double);
-	
-	/**
+    void Setk2(double);
+
+    /**
      * @param k3 The parameter k3
      */
-	void Setk3(double);
+    void Setk3(double);
 
 private:
     /** The airway radius at zero transpulmonary pressure */
@@ -132,22 +132,22 @@ private:
     double mDeformedAirwayRadius;
 
     /** The outward pointing pressure applied to the airway wall*/
-	double mTargetPressure;
-	
-	/** The airway inner radius pre deformation*/
-	double mRIn;
-	
-	/** The airway outer radius pre deformation*/
-	double mROut;
-	
-	/** The parameter k1 from LaPrad et al. 2013 PLoS Comp Biol*/
-	double mk1;
-	
-	/** The parameter k2 from LaPrad et al. 2013 PLoS Comp Biol*/
-	double mk2;
-	
-	/** The parameter k3 from LaPrad et al. 2013 PLoS Comp Biol*/
-	double mk3;
+    double mTargetPressure;
+
+    /** The airway inner radius pre deformation*/
+    double mRIn;
+
+    /** The airway outer radius pre deformation*/
+    double mROut;
+
+    /** The parameter k1 from LaPrad et al. 2013 PLoS Comp Biol*/
+    double mk1;
+
+    /** The parameter k2 from LaPrad et al. 2013 PLoS Comp Biol*/
+    double mk2;
+
+    /** The parameter k3 from LaPrad et al. 2013 PLoS Comp Biol*/
+    double mk3;
 
 };
 

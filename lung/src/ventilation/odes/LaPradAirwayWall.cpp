@@ -60,12 +60,12 @@ void LaPradAirwayWall::SolveAndUpdateState(double tStart, double tEnd)
     double pressure = 10000.; // initial guess at pressure val -- NOT the target pressure
     double epsilon = 0.0000001;
     double lowerBoundr = initialLowerBoundr;
-    double upperBoundr = initialUpperBoundr;  
+    double upperBoundr = initialUpperBoundr;
     int maxIterations = 5000;
     int iteration = 0;
     double rin = -1;
 
-    while (((mTargetPressure - pressure)*(mTargetPressure - pressure) > epsilon*epsilon) && (iteration < maxIterations)) 
+    while (((mTargetPressure - pressure)*(mTargetPressure - pressure) > epsilon*epsilon) && (iteration < maxIterations))
     {
             rin = lowerBoundr + (upperBoundr - lowerBoundr)/2.;
 
@@ -76,8 +76,8 @@ void LaPradAirwayWall::SolveAndUpdateState(double tStart, double tEnd)
             double rout = sqrt(rin*rin + areaOfAirwayWall/M_PI);
             long double functionValues[10000];
             double rValues[10000];
-            
-            for (int i = 0; i < 10000; i++) 
+
+            for (int i = 0; i < 10000; i++)
             {
 
                 double RVal = mRIn + (double)i*(mROut - mRIn)/(10000. - 1.);
@@ -87,20 +87,20 @@ void LaPradAirwayWall::SolveAndUpdateState(double tStart, double tEnd)
             }
 
             pressure = (0.5*(functionValues[0] + functionValues[10000 - 1]));
-            for (int i = 1; i < (10000 - 1); i++) 
+            for (int i = 1; i < (10000 - 1); i++)
             {
                 pressure = pressure + functionValues[i];
             }
             pressure = pressure*(rValues[1] - rValues[0]);
-            
-            if (pressure < mTargetPressure) 
+
+            if (pressure < mTargetPressure)
             {
                 lowerBoundr = rin;
-            } else 
+            } else
             {
                 upperBoundr = rin;
             }
-                        
+
             iteration++;
         }
 
@@ -109,34 +109,34 @@ void LaPradAirwayWall::SolveAndUpdateState(double tStart, double tEnd)
             EXCEPTION("LaPrad airway wall maximum iterations reached.");
         } else
         {
-            mDeformedAirwayRadius = rin;  
+            mDeformedAirwayRadius = rin;
         }
 
 }
 
-void LaPradAirwayWall::SetRIn(double RIn) 
+void LaPradAirwayWall::SetRIn(double RIn)
 {
-	mRIn = RIn;
+    mRIn = RIn;
 }
 
-void LaPradAirwayWall::SetROut(double ROut) 
+void LaPradAirwayWall::SetROut(double ROut)
 {
-	mROut = ROut;
+    mROut = ROut;
 }
 
-void LaPradAirwayWall::Setk1(double k1) 
+void LaPradAirwayWall::Setk1(double k1)
 {
-	mk1 = k1;
+    mk1 = k1;
 }
 
-void LaPradAirwayWall::Setk2(double k2) 
+void LaPradAirwayWall::Setk2(double k2)
 {
-	mk2 = k2;
+    mk2 = k2;
 }
 
-void LaPradAirwayWall::Setk3(double k3) 
+void LaPradAirwayWall::Setk3(double k3)
 {
-	mk3 = k3;
+    mk3 = k3;
 }
 
 double LaPradAirwayWall::GetLumenRadius()

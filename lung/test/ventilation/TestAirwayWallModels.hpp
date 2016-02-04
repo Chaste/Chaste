@@ -175,44 +175,44 @@ public:
             }
         }
     }
-    
+
     void TestLaPradAirwayWallAndFactory() throw (Exception)
-    {       
+    {
         LaPradAirwayWall airway_wall;
         airway_wall.SetTimestep(1.0); //Not used, for coverage only
-        
-        //Parameters estimated from figure 2 in LaPrad's paper
-    	double targetPressure = 3.;
-	    double RIn = 2.;
-	    double ROut = 2.5;        
-	    double k1 = 1.8;
-	    double k2 = 0.5;
-	    double k3 = 10.;
 
-    	airway_wall.SetAirwayPressure(0.0);
-    	airway_wall.SetPleuralPressure(targetPressure);
-    	airway_wall.SetRIn(RIn);
-    	airway_wall.SetROut(ROut);
-    	airway_wall.Setk1(k1);
-    	airway_wall.Setk2(k2);
-    	airway_wall.Setk3(k3);	      
-	
-	    //Validated against Matlab implementation, consistent with plots in paper
-	    airway_wall.SolveAndUpdateState(0.0, 0.0);
-	    TS_ASSERT_DELTA(airway_wall.GetLumenRadius(), 3.02842, 1e-3)
+        //Parameters estimated from figure 2 in LaPrad's paper
+        double targetPressure = 3.;
+        double RIn = 2.;
+        double ROut = 2.5;
+        double k1 = 1.8;
+        double k2 = 0.5;
+        double k3 = 10.;
+
+        airway_wall.SetAirwayPressure(0.0);
+        airway_wall.SetPleuralPressure(targetPressure);
+        airway_wall.SetRIn(RIn);
+        airway_wall.SetROut(ROut);
+        airway_wall.Setk1(k1);
+        airway_wall.Setk2(k2);
+        airway_wall.Setk3(k3);
+
+        //Validated against Matlab implementation, consistent with plots in paper
+        airway_wall.SolveAndUpdateState(0.0, 0.0);
+        TS_ASSERT_DELTA(airway_wall.GetLumenRadius(), 3.02842, 1e-3)
 
         airway_wall.SetPleuralPressure(1000000);
         airway_wall.SolveAndUpdateState(0.0, 0.0);
-	    TS_ASSERT_DELTA(airway_wall.GetLumenRadius(), 3.4917, 1e-3)
-	    
-	    airway_wall.SetPleuralPressure(0.0);
-	    airway_wall.SolveAndUpdateState(0.0, 0.0);
-	    TS_ASSERT_DELTA(airway_wall.GetLumenRadius(), RIn, 1e-3)
-	    
-	    airway_wall.Setk2(-1);  //Break convergence
-	    airway_wall.SetPleuralPressure(3.); 
+        TS_ASSERT_DELTA(airway_wall.GetLumenRadius(), 3.4917, 1e-3)
+
+        airway_wall.SetPleuralPressure(0.0);
+        airway_wall.SolveAndUpdateState(0.0, 0.0);
+        TS_ASSERT_DELTA(airway_wall.GetLumenRadius(), RIn, 1e-3)
+
+        airway_wall.Setk2(-1);  //Break convergence
+        airway_wall.SetPleuralPressure(3.);
         TS_ASSERT_THROWS_CONTAINS(airway_wall.SolveAndUpdateState(0.0, 0.0), "LaPrad airway wall maximum iterations reached.");
-	    
+
     }
 };
 #endif /*_TESTAIRWAYWALLMODELS_HPP_*/
