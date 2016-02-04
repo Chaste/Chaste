@@ -105,7 +105,7 @@ public:
         // Add a cell-cell interaction force with the same intrinsic strength as the membrane force
         MAKE_PTR_ARGS(ImmersedBoundaryCellCellInteractionForce<2>, p_cell_cell_force, (cell_population));
         p_main_modifier->AddImmersedBoundaryForce(p_cell_cell_force);
-        p_cell_cell_force->SetSpringConstant(1.0 * 1e6);
+        p_cell_cell_force->SetSpringConstant(2.0 * 1e6);
 
         // Get height of basement lamina
         double lamina_height = 0.0;
@@ -145,7 +145,7 @@ public:
 
         for (unsigned node_idx = 0 ; node_idx < p_mesh->GetElement(4)->GetNumNodes() ; node_idx++)
         {
-            if (p_mesh->GetElement(4)->GetNode(node_idx)->GetRegion() == 1)
+            if (p_mesh->GetElement(4)->GetNode(node_idx)->rGetLocation()[1] > 0.6)
             {
                 p_mesh->GetElement(4)->GetNode(node_idx)->rGetNodeAttributes()[p_cad_location] = 2.0;
             }
