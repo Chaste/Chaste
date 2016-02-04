@@ -40,6 +40,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 #include "Warnings.hpp"
 
+#ifdef TRACE_KSP
+#include "Timer.hpp"
+#endif
+
 PCBlockDiagonal::PCBlockDiagonal(KSP& rKspObject)
 {
 #ifdef TRACE_KSP
