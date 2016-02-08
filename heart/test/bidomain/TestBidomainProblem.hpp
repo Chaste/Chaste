@@ -587,7 +587,11 @@ public:
         nodes_to_be_output.push_back(10);
         p_bidomain_problem->SetOutputNodes(nodes_to_be_output);
 
-        // Duplicate this with a single trace at node 5
+        /* HOW_TO_TAG Cardiac/Output
+         * Output data using a light-weight output modifier.  This can be used in addition to regular HDF5
+         * output or can replace it.
+         */
+         // Duplicate this with a single trace at node 5
         boost::shared_ptr<SingleTraceOutputModifier> trace_5(new SingleTraceOutputModifier("trace_5.txt", 5, 0.1));
         p_bidomain_problem->AddOutputModifier(trace_5);
 

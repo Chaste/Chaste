@@ -2354,7 +2354,11 @@ public:
             TS_ASSERT(any_local);
         }
     }
-
+    /* HOW_TO_TAG Mesh
+     * Construct a distributed regular mesh (rectangle in 2D or cuboid in 3D) which is no does not have a
+     * regular split.  The default is for parallel code to split 2-D meshes into slices in the y-dimension
+     * and 3-D meshes in the z-dimension.
+     */
     void TestConstructSlabMeshWithDimensionSplit() throw (Exception)
     {
         double step = 1.0;
@@ -2370,10 +2374,13 @@ public:
          }
 
         {
+            // Splitting dimension is not specified
             DistributedTetrahedralMesh<2,2> mesh;
             mesh.ConstructRegularSlabMesh(step, width, height);
+            // Splitting dimension is y-dimension (the default)
             DistributedTetrahedralMesh<2,2> mesh_with_default_split;
             mesh_with_default_split.ConstructRegularSlabMeshWithDimensionSplit(1, step, width, height);
+            // Splitting dimension is x-dimension
             DistributedTetrahedralMesh<2,2> mesh_with_x_split;
             mesh_with_x_split.ConstructRegularSlabMeshWithDimensionSplit(0, step, width, height);
 
