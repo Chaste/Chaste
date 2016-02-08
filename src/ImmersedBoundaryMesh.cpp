@@ -202,6 +202,52 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetTortuosityOfMesh()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+ChasteCuboid<SPACE_DIM> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::CalculateBoundingBoxOfElement(unsigned index)
+{
+    ImmersedBoundaryElement<ELEMENT_DIM,SPACE_DIM>* p_elem = this->GetElement(index);
+
+    // Get the zero vector for comparing with node locations
+    c_vector<double, SPACE_DIM> zero = zero_vector<double>(SPACE_DIM);
+
+    // Vector to represent the n-dimensional 'bottom left'-most node
+    c_vector<double, SPACE_DIM> bottom_left;
+    for (unsigned dim = 0 ; dim < SPACE_DIM ; dim++)
+    {
+        bottom_left[dim] = DBL_MAX;
+    }
+
+    // Vector to represent the n-dimensional 'top right'-most node
+    c_vector<double, SPACE_DIM> top_right;
+    for (unsigned dim = 0 ; dim < SPACE_DIM ; dim++)
+    {
+        top_right[dim] = -DBL_MAX;
+    }
+
+    // Loop over all nodes in the element and update bottom_left and top_right
+    for (unsigned node_idx = 0 ; node_idx < p_elem->GetNumNodes() ; node_idx++)
+    {
+        c_vector<double, SPACE_DIM> vec_to_node = this->GetVectorFromAtoB(zero, p_elem->GetNode(node_idx)->rGetLocation());
+
+        for (unsigned dim = 0 ; dim < SPACE_DIM ; dim++)
+        {
+            if (vec_to_node[dim] < bottom_left[dim])
+            {
+                bottom_left[dim] = vec_to_node[dim];
+            }
+            else if (vec_to_node[dim] > top_right[dim])
+            {
+                top_right[dim] = vec_to_node[dim];
+            }
+        }
+    }
+
+    ChastePoint<SPACE_DIM> min(bottom_left);
+    ChastePoint<SPACE_DIM> max(top_right);
+
+    return ChasteCuboid<SPACE_DIM>(min, max);
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryMesh()
 {
     this->mMeshChangesDuringSimulation = false;
@@ -375,23 +421,21 @@ std::vector<Node<SPACE_DIM>*>& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::rGe
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetVectorFromAtoB(const c_vector<double, SPACE_DIM>& rLocation1, const c_vector<double, SPACE_DIM>& rLocation2)
 {
-    assert(SPACE_DIM == 2);
-
     // This code currently assumes the grid is precisely [0,1)x[0,1)
     c_vector<double, SPACE_DIM> vector = rLocation2 - rLocation1;
 
     /*
      * Handle the periodic condition here: if the points are more
-     * than 0.5 apart in either direction, choose -(1.0-dist).
+     * than 0.5 apart in any direction, choose -(1.0-dist).
      */
-    if (fabs(vector[0]) > 0.5)
+    for (unsigned dim = 0 ; dim < SPACE_DIM ; dim++)
     {
-        vector[0] = copysign(fabs(vector[0]) - 1.0, -vector[0]);
+        if (fabs(vector[dim]) > 0.5)
+        {
+            vector[dim] = copysign(fabs(vector[dim]) - 1.0, -vector[dim]);
+        }
     }
-    if (fabs(vector[1]) > 0.5)
-    {
-        vector[1] = copysign(fabs(vector[1]) - 1.0, -vector[1]);
-    }
+
     return vector;
 }
 

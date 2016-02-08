@@ -445,6 +445,14 @@ public:
      */
     double GetTortuosityOfMesh();
 
+    /**
+     * Calculate the bounding box of an element specified by its index.
+     *
+     * @param index the index of the element
+     * @return a Chaste cuboid representing the element bounding box
+     */
+    ChasteCuboid<SPACE_DIM> CalculateBoundingBoxOfElement(unsigned index);
+
 
     /**
      * Compute the direction of the shortest principal axis passing through the centroid,

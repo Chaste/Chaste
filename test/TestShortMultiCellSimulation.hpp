@@ -120,39 +120,48 @@ public:
         unsigned e_cad_location = p_cell_cell_force->rGetProteinNodeAttributeLocations()[0];
         unsigned p_cad_location = p_cell_cell_force->rGetProteinNodeAttributeLocations()[1];
 
-        double centroid_x = p_mesh->GetCentroidOfElement(3)[0];
-
-        for (unsigned node_idx = 0 ; node_idx < p_mesh->GetElement(3)->GetNumNodes() ; node_idx++)
-        {
-            double new_height = lamina_height + kick * (p_mesh->GetElement(3)->GetNode(node_idx)->rGetLocation()[1] - lamina_height);
-
-            p_mesh->GetElement(3)->GetNode(node_idx)->rGetModifiableLocation()[1] = new_height;
-
-//            if (p_mesh->GetElement(3)->GetNode(node_idx)->GetRegion() == 2 && p_mesh->GetElement(3)->GetNode(node_idx)->rGetLocation()[0] > centroid_x)
+//        double centroid_x = p_mesh->GetCentroidOfElement(3)[0];
+//
+//        for (unsigned node_idx = 0 ; node_idx < p_mesh->GetElement(3)->GetNumNodes() ; node_idx++)
+//        {
+//            double new_height = lamina_height + kick * (p_mesh->GetElement(3)->GetNode(node_idx)->rGetLocation()[1] - lamina_height);
+//
+//            p_mesh->GetElement(3)->GetNode(node_idx)->rGetModifiableLocation()[1] = new_height;
+//
+////            if (p_mesh->GetElement(3)->GetNode(node_idx)->GetRegion() == 2 && p_mesh->GetElement(3)->GetNode(node_idx)->rGetLocation()[0] > centroid_x)
+////            {
+////                p_mesh->GetElement(3)->GetNode(node_idx)->rGetNodeAttributes()[e_cad_location] = 0.0;
+////            }
+////            else
+////            {
+////                p_mesh->GetElement(3)->GetNode(node_idx)->rGetNodeAttributes()[e_cad_location] = 0.0;
+////            }
+//
+//            p_mesh->GetElement(3)->GetNode(node_idx)->rGetNodeAttributes()[e_cad_location] = 0.0;
+//
+//            p_mesh->GetElement(3)->GetNode(node_idx)->rGetNodeAttributes()[p_cad_location] = 2.0;
+//
+//        }
+//
+//        for (unsigned node_idx = 0 ; node_idx < p_mesh->GetElement(4)->GetNumNodes() ; node_idx++)
+//        {
+//            if (p_mesh->GetElement(4)->GetNode(node_idx)->rGetLocation()[1] > 0.6)
 //            {
-//                p_mesh->GetElement(3)->GetNode(node_idx)->rGetNodeAttributes()[e_cad_location] = 0.0;
+//                p_mesh->GetElement(4)->GetNode(node_idx)->rGetNodeAttributes()[p_cad_location] = 2.0;
 //            }
-//            else
-//            {
-//                p_mesh->GetElement(3)->GetNode(node_idx)->rGetNodeAttributes()[e_cad_location] = 0.0;
-//            }
+//        }
 
-            p_mesh->GetElement(3)->GetNode(node_idx)->rGetNodeAttributes()[e_cad_location] = 0.0;
+        ChasteCuboid<2> bb_1 = p_mesh->CalculateBoundingBoxOfElement(1);
+        ChasteCuboid<2> bb_2 = p_mesh->CalculateBoundingBoxOfElement(2);
 
-            p_mesh->GetElement(3)->GetNode(node_idx)->rGetNodeAttributes()[p_cad_location] = 2.0;
+        PRINT_VECTOR(bb_1.rGetLowerCorner().rGetLocation());
+        PRINT_VECTOR(bb_1.rGetUpperCorner().rGetLocation());
 
-        }
-
-        for (unsigned node_idx = 0 ; node_idx < p_mesh->GetElement(4)->GetNumNodes() ; node_idx++)
-        {
-            if (p_mesh->GetElement(4)->GetNode(node_idx)->rGetLocation()[1] > 0.6)
-            {
-                p_mesh->GetElement(4)->GetNode(node_idx)->rGetNodeAttributes()[p_cad_location] = 2.0;
-            }
-        }
+        PRINT_VECTOR(bb_2.rGetLowerCorner().rGetLocation());
+        PRINT_VECTOR(bb_2.rGetUpperCorner().rGetLocation());
 
         simulator.SetSamplingTimestepMultiple(100);
-        simulator.SetEndTime(20100.0 * dt);
+        simulator.SetEndTime(200.0 * dt);
         simulator.Solve();
     }
 };
