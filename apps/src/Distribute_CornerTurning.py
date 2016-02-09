@@ -68,7 +68,7 @@ def combine_output():
     for global_const in range(num_global_consts):
         for local_const in range(num_local_consts):
             for kick in range(num_kicks_per_sim):
-                file_name = path_to_output + exec_name + '/' \
+                file_name = path_to_output + exec_name + '/sim/' \
                                            + str(global_const) + '_' \
                                            + str(local_const) + '_' \
                                            + str(kick) + '/results.dat'
