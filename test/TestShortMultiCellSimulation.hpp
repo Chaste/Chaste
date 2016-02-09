@@ -151,11 +151,7 @@ public:
 //            }
 //        }
 
-        ChasteCuboid<2> bb_1 = p_mesh->CalculateBoundingBoxOfElement(1);
-        ChasteCuboid<2> bb_2 = p_mesh->CalculateBoundingBoxOfElement(2);
-
-        PRINT_VECTOR(bb_1.rGetLowerCorner().rGetLocation());
-        PRINT_VECTOR(bb_1.rGetUpperCorner().rGetLocation());
+        ChasteCuboid<2> bb_2 = p_mesh->CalculateBoundingBoxOfElement(7);
 
         PRINT_VECTOR(bb_2.rGetLowerCorner().rGetLocation());
         PRINT_VECTOR(bb_2.rGetUpperCorner().rGetLocation());

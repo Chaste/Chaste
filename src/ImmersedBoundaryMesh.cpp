@@ -206,27 +206,19 @@ ChasteCuboid<SPACE_DIM> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::CalculateB
 {
     ImmersedBoundaryElement<ELEMENT_DIM,SPACE_DIM>* p_elem = this->GetElement(index);
 
-    // Get the zero vector for comparing with node locations
-    c_vector<double, SPACE_DIM> zero = zero_vector<double>(SPACE_DIM);
+    // Get the location of node zero as a reference point
+    c_vector<double, SPACE_DIM> ref_point = p_elem->GetNode(0)->rGetLocation();
 
     // Vector to represent the n-dimensional 'bottom left'-most node
-    c_vector<double, SPACE_DIM> bottom_left;
-    for (unsigned dim = 0 ; dim < SPACE_DIM ; dim++)
-    {
-        bottom_left[dim] = DBL_MAX;
-    }
+    c_vector<double, SPACE_DIM> bottom_left = zero_vector<double>(SPACE_DIM);
 
     // Vector to represent the n-dimensional 'top right'-most node
-    c_vector<double, SPACE_DIM> top_right;
-    for (unsigned dim = 0 ; dim < SPACE_DIM ; dim++)
-    {
-        top_right[dim] = -DBL_MAX;
-    }
+    c_vector<double, SPACE_DIM> top_right = zero_vector<double>(SPACE_DIM);
 
-    // Loop over all nodes in the element and update bottom_left and top_right
+    // Loop over all nodes in the element and update bottom_left and top_right, relative to node zero to account for periodicity
     for (unsigned node_idx = 0 ; node_idx < p_elem->GetNumNodes() ; node_idx++)
     {
-        c_vector<double, SPACE_DIM> vec_to_node = this->GetVectorFromAtoB(zero, p_elem->GetNode(node_idx)->rGetLocation());
+        c_vector<double, SPACE_DIM> vec_to_node = this->GetVectorFromAtoB(ref_point, p_elem->GetNode(node_idx)->rGetLocation());
 
         for (unsigned dim = 0 ; dim < SPACE_DIM ; dim++)
         {
@@ -241,8 +233,9 @@ ChasteCuboid<SPACE_DIM> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::CalculateB
         }
     }
 
-    ChastePoint<SPACE_DIM> min(bottom_left);
-    ChastePoint<SPACE_DIM> max(top_right);
+    // Create Chaste points, rescaled by the location of node zero
+    ChastePoint<SPACE_DIM> min(bottom_left + ref_point);
+    ChastePoint<SPACE_DIM> max(top_right + ref_point);
 
     return ChasteCuboid<SPACE_DIM>(min, max);
 }

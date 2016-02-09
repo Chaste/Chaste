@@ -212,18 +212,27 @@ void SetupAndRunSimulation(unsigned kick, unsigned localSpringConst, unsigned gl
     }
 
     double y_centroid_before = p_mesh->GetCentroidOfElement(3)[1];
+    ChasteCuboid<2> bounding_box_before = p_mesh->CalculateBoundingBoxOfElement(3);
 
     simulator.SetSamplingTimestepMultiple(100);
-    simulator.SetEndTime(10100.0 * dt);
+    simulator.SetEndTime(12100.0 * dt);
     simulator.Solve();
 
     double y_centroid_after = p_mesh->GetCentroidOfElement(3)[1];
+    ChasteCuboid<2> bounding_box_after = p_mesh->CalculateBoundingBoxOfElement(3);
 
     OutputFileHandler results_handler(output_directory.str(), false);
     out_stream results_file = results_handler.OpenOutputFile("results.dat");
 
+    // Calculate summary statistics
+
+    double ss_centroid = y_centroid_after - y_centroid_before;
+    double ss_top = bounding_box_after.rGetUpperCorner()[1] - bounding_box_before.rGetUpperCorner()[1];
+    double ss_bottom = bounding_box_after.rGetLowerCorner()[1] - bounding_box_before.rGetLowerCorner()[1];
+
     // Output summary statistics to results file
-    (*results_file) << fp_global_sc << "," << fp_local_sc << "," << fp_sim_kick << "," << y_centroid_after - y_centroid_before;
+    (*results_file) << fp_global_sc << "," << fp_local_sc << "," << fp_sim_kick << ","
+                    << ss_centroid << "," << ss_top << "," << ss_bottom;
 
     // Tidy up
     results_file->close();

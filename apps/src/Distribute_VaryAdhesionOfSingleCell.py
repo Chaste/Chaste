@@ -15,9 +15,9 @@ num_local_consts  = 11
 num_kicks_per_sim = 11
 
 def main():
-    #run_simulations()
-    #combine_output()
-    plot_results()
+    run_simulations()
+    combine_output()
+    #plot_results()
 
 
 # Create a list of commands and pass them to separate processes
@@ -27,14 +27,12 @@ def run_simulations():
     #     print("Py: Deleting previous output")
     #     shutil.rmtree(path_to_output + exec_name)
 
-    print("Py: Starting simulations")
-
     # Make a list of calls to a Chaste executable
     command_list = []
     for global_const in range(num_global_consts):
         for local_const in range(num_local_consts):
             for kick in range(num_kicks_per_sim):
-                command = path_to_exec + exec_name \
+                command = 'nice -n 19 ' + path_to_exec + exec_name \
                           + ' --G ' + str(global_const) \
                           + ' --L ' + str(local_const) \
                           + ' --K ' + str(kick)
@@ -42,6 +40,8 @@ def run_simulations():
 
     # Use processes equal to the number of cpus available
     count = multiprocessing.cpu_count()
+
+    print("Py: Starting simulations with " + str(count) + " processes")
 
     # Generate a pool of workers
     pool = multiprocessing.Pool(processes=count)
