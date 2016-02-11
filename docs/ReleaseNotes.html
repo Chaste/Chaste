@@ -7,6 +7,71 @@
 
 <h1>Chaste Release Notes</h1>
 
+<h2>Release 3.4 (changes since Release 3.3)</h2>
+
+<h3>Headline features</h3>
+
+<h4>General</h4>
+<ul><li>Support for Ubuntu [up to] 15.10 added. We aim to ensure compatibility for any Ubuntu that has not reached 'end of life'.
+</li><li>Support for Boost up to 1.60 added.
+</li><li>See <a href="https://chaste.cs.ox.ac.uk/trac/wiki/InstallGuides/DependencyVersions">InstallGuides/DependencyVersions</a> for all supported versions of dependencies.
+</li><li>The CMake builder has been extended to support compilation on Windows, Linux and Mac OS X with a range of compilers.  This is part of a planned migration to a unified build system on all platforms. 
+</li></ul>
+
+<h4 id="Cardiac">Cardiac</h4>
+<ul><li>A new class <tt>AbstractCvodeCellWithDataClamp</tt> allows the 'data clamp' proposed by <a href="http://www.ncbi.nlm.nih.gov/pubmed/15142755">Dokos &amp; Lovell (2004)</a> to be applied to any CellML model. Models inheriting from this class can be generated with <tt>ConvertCellModel.py --cvode-data-clamp</tt>.
+</li><li>This is the last release of Chaste for which a pre-built cardiac <em>standalone executable</em> can be bundled.
+</li></ul><h4 id="Cell-based">Cell-based</h4>
+<ul><li>We have improved functionality for outputting results of cellular automaton (CA) and cellular Potts model simulations, as well as cell-based simulations on periodic domains, to VTK.
+</li><li>We have extended functionality for CA simulations, including a new location "switching" rule and division rule class hierarchies.
+</li><li>Each cell now contains a "subcellular reaction network model" as well as a cell-cycle model.  This mainly affects users of the <tt>DeltaNotchCellCycleModel</tt> class, which is now implemented using the <tt>DeltaNotchSrnModel</tt>, allowing the model to be coupled with any of the cell cycle models (see <a href="https://chaste.cs.ox.ac.uk/trac/wiki/UserTutorials/CreatingAndUsingANewSrnModel">UserTutorials/CreatingAndUsingANewSrnModel</a> for details).
+</li><li>Much of the vertex model code has been refactored to improve efficiency. In addition, two new classes, <tt>MutableVertexMeshWithRosettes</tt> and <tt>CellRosetteRankWriter</tt>, have been added to implement the necessary functionality for simulating multicellular 'rosettes' (where more than three cells meet at a point).
+</li></ul>
+
+<h4>Lung</h4>
+<ul><li>A new package for investigating ventilation in the lung using reduced dimensional models has been introduced.
+</li><li>Key classes are 
+<ol><li><tt>MultiLobeAirwayGenerator</tt> allows anatomical models of the conducting airways to be created. 
+</li><li><tt>AbstractVentilationProblem</tt> and related subclasses allow simulation of airflow on the conducting airway models using a Poiseuille flow model model with Pedley correction.
+</li><li><tt>DynamicVentilationProblem</tt> couples nonlinear elastic models of the acini (gas exchange area) to the ventilation model, allowing simulation of the full breathing cycle
+</li></ol></li><li>Tutorials for this functionality are available on the tutorials page <a href="https://chaste.cs.ox.ac.uk/trac/wiki/UserTutorials#LungChaste">UserTutorials#LungChaste</a>.
+</li></ul>
+
+<h3>New functionality &amp; code changes</h3>
+<p>
+New functionality and code changes, which may require changes to user code.
+</p>
+
+<h4>General</h4>
+<ul><li>An element argument has been added to <tt>AbstractLinearParabolicPde::ComputeSourceTerm()</tt>. If you have your own PDEs inheriting from <tt>AbstractLinearParabolicPde</tt> this argument will need adding to the method (it can be ignored), see e.g. <a href="https://chaste.cs.ox.ac.uk/trac/changeset?new=23885%40trunk%2Fpde%2Ftest%2Fpdes%2FHeatEquationWithSourceTerm.hpp&amp;old=23343%40trunk%2Fpde%2Ftest%2Fpdes%2FHeatEquationWithSourceTerm.hpp">relevant change to the heat equation</a>. 
+</li></ul
+
+><h4>Cardiac</h4>
+<ul><li>Classes inheriting from <tt>AbstractCardiacCellWithModifiers</tt> can now be archived/checkpointed.
+</li><li>We have renamed the CellML metadata <tt>leakage_current</tt> to <tt>membrane_leakage_current</tt> as there is also an SR one sometimes... <strong>This may break user projects using this metadata</strong>. There have also been other updates to the metadata which will enable more advanced features in future versions.
+</li><li>A light-weight output modifier allows the user to output specific traces during a simulation rather than at post-process time.  See <a href="https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides/HowTo#Output">ChasteGuides/HowTo#Output</a>.
+</li><li>A bug has been found in one method for partitioning of meshes in parallel code (Windows only).  This method has been switched off while we investigate further. 
+</li></ul>
+
+<h4>Cell-based</h4>
+<ul><li>A new tutorial (<a href="https://chaste.cs.ox.ac.uk/trac/wiki/UserTutorials/CreatingAndUsingANewCellBasedSimulationModifier">UserTutorials/CreatingAndUsingANewCellBasedSimulationModifier</a>) shows how to create and use cell-based simulation modifiers.
+</li><li>The new class <tt>VoronoiVertexMeshGenerator</tt> uses Lloyd's Relaxation steps to generate random initial conditions for vertex model simulations.
+</li><li>The <tt>PlaneBasedBoundaryCondition</tt> class can be used in a simulation where <tt>ELEMENT_DIM != SPACE_DIM</tt>.
+</li><li>Two new force classes, <tt>DiffusionForce</tt> and <tt>DifferentialAdhesionGeneralisedLinearSpringForce</tt>, have been added.
+</li><li>The new class <tt>CellVecData</tt> enables a vector (e.g. the solution to an intracellular PDE problem) to be associated with each cell.
+</li><li>The default parameter values in <tt>NagaiHondaForce</tt> match those in the original publication.
+</li><li>Two new writer classes, <tt>CellDeltaNotchWriter</tt> and <tt>CellPopulationAdjacencyMatrixWriter</tt>, have been added.
+</li></ul>
+
+<h3>Future Plans</h3>
+<ul><li>This is the last release of Chaste that will:
+<ul><li>support Ubuntu 10.04 LTS;
+</li><li>support versions of PETSc &lt; 3.0, or boost &lt; 1.48;
+</li><li>bundle a pre-built cardiac <em>standalone executable</em> (the executable is dependent on third-party libraries which are to be deprecated).
+</li></ul></li><li>Work is progressing on switching the build infrastructure to use CMake and code repository to use Git.
+<ul><li>The CMake build is available to test in this release; see <a href="https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides/CmakeBuildGuide">ChasteGuides/CmakeBuildGuide</a> for more details. (SCons will be deprecated at a later date.)
+</li><li>The switch of the code repository from Subversion to Git will happen after this release.  For information on migrating please see <a href="https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides/GitMigration">GitMigration</a>.
+</li></ul></li></ul>
 
 
 <h2>Release 3.3 (changes since Release 3.2)</h2>
