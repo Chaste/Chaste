@@ -1191,6 +1191,70 @@ public:
         TS_ASSERT(h5_file.Exists());
     }
 
+    void TestBidomainProblemWithWriterCache() throw (Exception)
+    {
+        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.01);
+        HeartConfig::Instance()->SetSimulationDuration(1.0);
+        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1mm_10_elements");
+        HeartConfig::Instance()->SetOutputDirectory("BidomainWithWriterCache");
+        HeartConfig::Instance()->SetOutputFilenamePrefix("BidomainLR91_1d_with_cache");
+
+        PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> cell_factory;
+        BidomainProblem<1> bidomain_problem( &cell_factory );
+        bidomain_problem.SetUseHdf5DataWriterCache(true); // cache on
+
+        bidomain_problem.Initialise();
+        bidomain_problem.Solve();
+
+        // Doesn't really test that the cache was used (since this test would pass with cache turned off too)...
+        TS_ASSERT(CompareFilesViaHdf5DataReader("BidomainWithWriterCache", "BidomainLR91_1d_with_cache", true,
+                                                "heart/test/data/BidomainWithWriterCache", "BidomainLR91_1d_with_cache", false));
+    }
+
+    void TestBidomainProblemWithWriterCacheIncomplete() throw (Exception)
+    {
+        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1mm_10_elements");
+        HeartConfig::Instance()->SetOutputDirectory("BidomainWithWriterCacheIncomplete");
+        HeartConfig::Instance()->SetOutputFilenamePrefix("BidomainLR91_1d_with_cache_incomplete");
+        HeartConfig::Instance()->SetSimulationDuration(1.0);
+
+        PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> cell_factory;
+        BidomainProblem<1> bidomain_problem( &cell_factory );
+        bidomain_problem.SetUseHdf5DataWriterCache(true); // cache on
+
+        std::vector<unsigned> nodes_to_be_output;
+        nodes_to_be_output.push_back(0);
+        nodes_to_be_output.push_back(5);
+        nodes_to_be_output.push_back(10);
+        bidomain_problem.SetOutputNodes(nodes_to_be_output);
+
+        bidomain_problem.Initialise();
+        bidomain_problem.Solve();
+
+        TS_ASSERT(CompareFilesViaHdf5DataReader("BidomainWithWriterCacheIncomplete", "BidomainLR91_1d_with_cache_incomplete", true,
+                                                "heart/test/data/BidomainWithWriterCache", "BidomainLR91_1d_with_cache_incomplete", false));
+    }
+
+    /* Disabled this one for now as it passes in an ugly way */
+    void louieTestBidomainProblemWithWriterCacheExtraVarsException() throw (Exception)
+    {
+        HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/MultipleVariablesBidomain.xml");
+
+        std::vector<std::string> output_variables;
+        output_variables.push_back("calcium_dynamics__Ca_NSR");
+        output_variables.push_back("ionic_concentrations__Nai");
+        output_variables.push_back("fast_sodium_current_j_gate__j");
+        output_variables.push_back("ionic_concentrations__Ki");
+        HeartConfig::Instance()->SetOutputVariables( output_variables );
+
+        PlaneStimulusCellFactory<CellFaberRudy2000FromCellML, 1> cell_factory;
+        BidomainProblem<1> bidomain_problem( &cell_factory );
+        bidomain_problem.SetUseHdf5DataWriterCache();
+
+        bidomain_problem.Initialise();
+        TS_ASSERT_THROWS_THIS(bidomain_problem.Solve(), "Cached writes must write all variables at once.");
+    }
+
     /**
      * Not a very thorough test yet - just checks we can load a problem, simulate it, and
      * get expected results.

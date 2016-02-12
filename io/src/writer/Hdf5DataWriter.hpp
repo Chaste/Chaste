@@ -90,6 +90,9 @@ private:
     hsize_t mNumberOfChunks;                  /**< The total number of chunks in the dataset */
     hsize_t mFixedChunkSize[DATASET_DIMS];          /**< User-provided chunk size */
 
+    bool mUseCache;                                 /**< Whether to use a cache */
+    long unsigned mCacheFirstTimeStep;              /**< Coordinate to keep track of cache writes */
+    std::vector<double> mDataCache;                 /**< Cache results here before writing */
 
     /**
      * Check name of variable is allowed, i.e. contains only alphanumeric & _, and isn't blank.
@@ -152,6 +155,7 @@ public:
      * @param cleanDirectory  whether to clean the directory (defaults to true)
      * @param extendData  whether to try opening an existing file and appending to it.
      * @param datasetName The name of the HDF5 dataset to write, defaults to "Data".
+     * @param useCache  *EXPERIMENTAL* Whether to cache writes.
      *
      * The extendData parameter allows us to add to an existing dataset.  It only really makes
      * sense if the existing file has an unlimited dimension which we can extend.  It also only
@@ -162,7 +166,8 @@ public:
                    const std::string& rBaseName,
                    bool cleanDirectory=true,
                    bool extendData=false,
-                   std::string datasetName="Data");
+                   std::string datasetName="Data",
+                   bool useCache=false);
 
     /**
      * Destructor.
@@ -254,6 +259,16 @@ public:
      * @param petscVector the data
      */
     void PutStripedVector(std::vector<int> variableIDs, Vec petscVector);
+
+    /**
+     * Whether we're caching writes
+     */
+    bool GetUsingCache();
+
+    /**
+     * Write the cache to disk.
+     */
+    void WriteCache();
 
     /**
      * Write a single value for the unlimited variable (e.g. time) to the dataset.

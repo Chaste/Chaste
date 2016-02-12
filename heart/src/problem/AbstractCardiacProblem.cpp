@@ -64,7 +64,8 @@ AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::AbstractCardiacProble
       mSolution(NULL),
       mCurrentTime(0.0),
       mpTimeAdaptivityController(NULL),
-      mpWriter(NULL)
+      mpWriter(NULL),
+      mUseHdf5DataWriterCache(false)
 {
     assert(mNodesToOutput.empty());
     if (!mpCellFactory)
@@ -92,7 +93,8 @@ AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::AbstractCardiacProble
       mSolution(NULL),
       mCurrentTime(0.0),
       mpTimeAdaptivityController(NULL),
-      mpWriter(NULL)
+      mpWriter(NULL),
+      mUseHdf5DataWriterCache(false)
 {
 }
 
@@ -833,7 +835,9 @@ bool AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::InitialiseWriter
                                   HeartConfig::Instance()->GetOutputDirectory(),
                                   HeartConfig::Instance()->GetOutputFilenamePrefix(),
                                   !extend_file, // don't clear directory if extension requested
-                                  extend_file);
+                                  extend_file,
+                                  "Data",
+                                  mUseHdf5DataWriterCache);
 
 
     // Define columns, or get the variable IDs from the writer
@@ -856,6 +860,12 @@ bool AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::InitialiseWriter
     }
 
     return extend_file;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::SetUseHdf5DataWriterCache(bool useCache)
+{
+    mUseHdf5DataWriterCache = useCache;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>

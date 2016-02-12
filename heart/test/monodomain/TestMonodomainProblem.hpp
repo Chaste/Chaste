@@ -1583,6 +1583,50 @@ public:
         NumericFileComparison comp_meshalyzer_original_order(file1, file2);
         TS_ASSERT(comp_meshalyzer_original_order.CompareFiles(1e-3));
     }
+
+    void TestMonodomainProblemWithWriterCache() throw (Exception)
+    {
+        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.01);
+        HeartConfig::Instance()->SetSimulationDuration(1.0);
+        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1mm_10_elements");
+        HeartConfig::Instance()->SetOutputDirectory("MonodomainWithWriterCache");
+        HeartConfig::Instance()->SetOutputFilenamePrefix("MonodomainLR91_1d_with_cache");
+
+        PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> cell_factory;
+        MonodomainProblem<1> monodomain_problem( &cell_factory );
+        monodomain_problem.SetUseHdf5DataWriterCache(true); // cache on
+
+        monodomain_problem.Initialise();
+        monodomain_problem.Solve();
+
+        // Doesn't really test that the cache was used (since this test would pass with cache turned off too)...
+        TS_ASSERT(CompareFilesViaHdf5DataReader("MonodomainWithWriterCache", "MonodomainLR91_1d_with_cache", true,
+                                                "heart/test/data/MonodomainWithWriterCache", "MonodomainLR91_1d_with_cache", false));
+    }
+
+    void TestMonodomainProblemWithWriterCacheIncomplete() throw (Exception)
+    {
+        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1mm_10_elements");
+        HeartConfig::Instance()->SetOutputDirectory("MonodomainWithWriterCacheIncomplete");
+        HeartConfig::Instance()->SetOutputFilenamePrefix("MonodomainLR91_1d_with_cache_incomplete");
+        HeartConfig::Instance()->SetSimulationDuration(1.0);
+
+        PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> cell_factory;
+        MonodomainProblem<1> monodomain_problem( &cell_factory );
+        monodomain_problem.SetUseHdf5DataWriterCache(true); // cache on
+
+        std::vector<unsigned> nodes_to_be_output;
+        nodes_to_be_output.push_back(0);
+        nodes_to_be_output.push_back(5);
+        nodes_to_be_output.push_back(10);
+        monodomain_problem.SetOutputNodes(nodes_to_be_output);
+
+        monodomain_problem.Initialise();
+        monodomain_problem.Solve();
+
+        TS_ASSERT(CompareFilesViaHdf5DataReader("MonodomainWithWriterCacheIncomplete", "MonodomainLR91_1d_with_cache_incomplete", true,
+                                                "heart/test/data/MonodomainWithWriterCache", "MonodomainLR91_1d_with_cache_incomplete", false));
+    }
 };
 
 #endif //_TESTMONODOMAINPROBLEM_HPP_

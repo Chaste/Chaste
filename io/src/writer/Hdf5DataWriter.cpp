@@ -54,7 +54,8 @@ Hdf5DataWriter::Hdf5DataWriter(DistributedVectorFactory& rVectorFactory,
                                const std::string& rBaseName,
                                bool cleanDirectory,
                                bool extendData,
-                               std::string datasetName)
+                               std::string datasetName,
+                               bool useCache)
     : AbstractHdf5Access(rDirectory, rBaseName, datasetName),
       mrVectorFactory(rVectorFactory),
       mCleanDirectory(cleanDirectory),
@@ -76,7 +77,9 @@ Hdf5DataWriter::Hdf5DataWriter(DistributedVectorFactory& rVectorFactory,
       mSingleIncompleteOutputMatrix(NULL),
       mDoubleIncompleteOutputMatrix(NULL),
       mUseOptimalChunkSizeAlgorithm(true),
-      mNumberOfChunks(0u)
+      mNumberOfChunks(0u),
+      mUseCache(useCache),
+      mCacheFirstTimeStep(0u)
 {
     mChunkSize[0] = 0;
     mChunkSize[1] = 0;
@@ -98,6 +101,10 @@ Hdf5DataWriter::Hdf5DataWriter(DistributedVectorFactory& rVectorFactory,
 
     if (mUseExistingFile)
     {
+        if (mUseCache)
+        {
+            EXCEPTION("Extending and writer cache not supported."); ///TODO coverage
+        }
         // Variables should already be defined if we are extending.
         mIsInDefineMode = false;
 
@@ -598,6 +605,12 @@ void Hdf5DataWriter::EndDefineMode()
         SetChunkSize();
     }
 
+    if (mUseCache)
+    {
+        // Reserve space. One chunk worth (in time) for now
+        mDataCache.reserve(mChunkSize[0]*mNumberOwned*mDatasetDims[2]);
+    }
+
     // Create chunked dataset and clean up
     hid_t cparms = H5Pcreate (H5P_DATASET_CREATE);
     H5Pset_chunk( cparms, DATASET_DIMS, mChunkSize);
@@ -758,6 +771,20 @@ void Hdf5DataWriter::PutVector(int variableID, Vec petscVector)
         EXCEPTION("Vector size doesn't match fixed dimension");
     }
 
+    if ( mUseCache )
+    {
+        if (mDatasetDims[2] != 1 )
+        {
+            //Covered by TestHdf5DataWriterMultipleColumnsCachedFails
+            EXCEPTION("Cached writes must write all variables at once.");
+        }
+        if ( ! mIsUnlimitedDimensionSet )
+        {
+            //Covered by TestHdf5DataWriterSingleColumnsCachedFails
+            EXCEPTION("Cached writes require an unlimited dimension.");
+        }
+    }
+
     // Make sure that everything is actually extended to the correct dimension.
     PossiblyExtend();
 
@@ -803,7 +830,15 @@ void Hdf5DataWriter::PutVector(int variableID, Vec petscVector)
 
     if (mIsDataComplete)
     {
-        H5Dwrite(mVariablesDatasetId, H5T_NATIVE_DOUBLE, memspace, file_dataspace, property_list_id, p_petsc_vector);
+        if ( mUseCache )
+        {
+            //Covered by TestHdf5DataWriterSingleColumnsCached
+            mDataCache.insert(mDataCache.end(), p_petsc_vector, p_petsc_vector+mNumberOwned);
+        }
+        else
+        {
+            H5Dwrite(mVariablesDatasetId, H5T_NATIVE_DOUBLE, memspace, file_dataspace, property_list_id, p_petsc_vector);
+        }
     }
     else
     {
@@ -817,7 +852,16 @@ void Hdf5DataWriter::PutVector(int variableID, Vec petscVector)
 
             double* p_petsc_vector_incomplete;
             VecGetArray(output_petsc_vector, &p_petsc_vector_incomplete);
-            H5Dwrite(mVariablesDatasetId, H5T_NATIVE_DOUBLE, memspace, file_dataspace, property_list_id, p_petsc_vector_incomplete);
+
+            if ( mUseCache )
+            {
+                //Covered by TestHdf5DataWriterSingleIncompleteUsingMatrixCached
+                mDataCache.insert(mDataCache.end(), p_petsc_vector_incomplete, p_petsc_vector_incomplete+mNumberOwned);
+            }
+            else
+            {
+                H5Dwrite(mVariablesDatasetId, H5T_NATIVE_DOUBLE, memspace, file_dataspace, property_list_id, p_petsc_vector_incomplete);
+            }
         }
         else
         {
@@ -828,7 +872,15 @@ void Hdf5DataWriter::PutVector(int variableID, Vec petscVector)
                 local_data[i] = p_petsc_vector[ mIncompleteNodeIndices[mOffset+i]-mLo ];
 
             }
-            H5Dwrite(mVariablesDatasetId, H5T_NATIVE_DOUBLE, memspace, file_dataspace, property_list_id, local_data.get());
+            if ( mUseCache )
+            {
+                //Covered by TestHdf5DataWriterFullFormatIncompleteCached
+                mDataCache.insert(mDataCache.end(), local_data.get(), local_data.get()+mNumberOwned);
+            }
+            else
+            {
+                H5Dwrite(mVariablesDatasetId, H5T_NATIVE_DOUBLE, memspace, file_dataspace, property_list_id, local_data.get());
+            }
         }
     }
 
@@ -861,6 +913,20 @@ void Hdf5DataWriter::PutStripedVector(std::vector<int> variableIDs, Vec petscVec
     }
 
     const unsigned NUM_STRIPES=variableIDs.size();
+
+    if ( mUseCache )
+    {
+        if ( NUM_STRIPES != mDatasetDims[2] )
+        {
+            //Covered by TestHdf5DataWriterFullFormatStripedIncompleteCached
+            EXCEPTION("Cached writes must write all variables at once.");
+        }
+        if ( ! mIsUnlimitedDimensionSet )
+        {
+            //Covered by TestHdf5DataWriterStripedNoTimeCachedFails
+            EXCEPTION("Cached writes require an unlimited dimension.");
+        }
+    }
 
     int firstVariableID=variableIDs[0];
 
@@ -927,7 +993,15 @@ void Hdf5DataWriter::PutStripedVector(std::vector<int> variableIDs, Vec petscVec
 
     if (mIsDataComplete)
     {
-        H5Dwrite(mVariablesDatasetId, H5T_NATIVE_DOUBLE, memspace, hyperslab_space, property_list_id, p_petsc_vector);
+        if ( mUseCache )
+        {
+            // Covered by TestHdf5DataWriterStripedCached
+            mDataCache.insert(mDataCache.end(), p_petsc_vector, p_petsc_vector+mNumberOwned*NUM_STRIPES);
+        }
+        else
+        {
+            H5Dwrite(mVariablesDatasetId, H5T_NATIVE_DOUBLE, memspace, hyperslab_space, property_list_id, p_petsc_vector);
+        }
     }
     else
     {
@@ -944,7 +1018,15 @@ void Hdf5DataWriter::PutStripedVector(std::vector<int> variableIDs, Vec petscVec
                 double* p_petsc_vector_incomplete;
                 VecGetArray(output_petsc_vector, &p_petsc_vector_incomplete);
 
-                H5Dwrite(mVariablesDatasetId, H5T_NATIVE_DOUBLE, memspace, hyperslab_space, property_list_id, p_petsc_vector_incomplete);
+                if ( mUseCache )
+                {
+                    //Covered by TestHdf5DataWriterFullFormatStripedIncompleteUsingMatrixCached
+                    mDataCache.insert(mDataCache.end(), p_petsc_vector_incomplete, p_petsc_vector_incomplete+2*mNumberOwned);
+                }
+                else
+                {
+                    H5Dwrite(mVariablesDatasetId, H5T_NATIVE_DOUBLE, memspace, hyperslab_space, property_list_id, p_petsc_vector_incomplete);
+                }
             }
             else
             {
@@ -957,7 +1039,15 @@ void Hdf5DataWriter::PutStripedVector(std::vector<int> variableIDs, Vec petscVec
                     local_data[NUM_STRIPES*i+1] = p_petsc_vector[ local_node_number*NUM_STRIPES + 1];
                 }
 
-                H5Dwrite(mVariablesDatasetId, H5T_NATIVE_DOUBLE, memspace, hyperslab_space, property_list_id, local_data.get());
+                if ( mUseCache )
+                {
+                    //Covered by TestHdf5DataWriterFullFormatStripedIncompleteCached
+                    mDataCache.insert(mDataCache.end(), local_data.get(), local_data.get()+2*mNumberOwned);
+                }
+                else
+                {
+                    H5Dwrite(mVariablesDatasetId, H5T_NATIVE_DOUBLE, memspace, hyperslab_space, property_list_id, local_data.get());
+                }
             }
         }
         else
@@ -982,6 +1072,55 @@ void Hdf5DataWriter::PutStripedVector(std::vector<int> variableIDs, Vec petscVec
     }
 }
 
+bool Hdf5DataWriter::GetUsingCache()
+{
+    return mUseCache;
+}
+
+void Hdf5DataWriter::WriteCache()
+{
+    ///TODO How to include this in timers?
+
+    if ( mDataCache.empty() )
+    {
+        // Nothing to do.
+        return;
+    }
+    // Define a dataset in memory for this process
+    hid_t memspace=0;
+    if (mNumberOwned !=0)
+    {
+        hsize_t v_size[1] = {mDataCache.size()};
+        memspace = H5Screate_simple(1, v_size, NULL);
+    }
+
+    // Select hyperslab in the file
+    //PRINT_3_VARIABLES(mCacheFirstTimeStep, mOffset, 0)
+    //PRINT_3_VARIABLES(mCurrentTimeStep-mCacheFirstTimeStep, mNumberOwned, mDatasetDims[2])
+    hsize_t start[DATASET_DIMS] = {mCacheFirstTimeStep, mOffset, 0};
+    hsize_t count[DATASET_DIMS] = {mCurrentTimeStep-mCacheFirstTimeStep, mNumberOwned, mDatasetDims[2]};
+    assert((mCurrentTimeStep-mCacheFirstTimeStep)*mNumberOwned*mDatasetDims[2] == mDataCache.size()); // Got size right?
+
+    hid_t hyperslab_space = H5Dget_space(mVariablesDatasetId);
+    H5Sselect_hyperslab(hyperslab_space, H5S_SELECT_SET, start, NULL, count, NULL);
+
+    // Create property list for collective dataset write, and write! Finally.
+    hid_t property_list_id = H5Pcreate(H5P_DATASET_XFER);
+    H5Pset_dxpl_mpio(property_list_id, H5FD_MPIO_COLLECTIVE);
+
+    H5Dwrite(mVariablesDatasetId, H5T_NATIVE_DOUBLE, memspace, hyperslab_space, property_list_id, &mDataCache[0]);
+
+    H5Sclose(hyperslab_space);
+    if (mNumberOwned != 0)
+    {
+        H5Sclose(memspace);
+    }
+    H5Pclose(property_list_id);
+
+    mCacheFirstTimeStep = mCurrentTimeStep; // Update where we got to
+    mDataCache.clear(); // Clear out cache
+}
+
 void Hdf5DataWriter::PutUnlimitedVariable(double value)
 {
     if (mIsInDefineMode)
@@ -997,7 +1136,7 @@ void Hdf5DataWriter::PutUnlimitedVariable(double value)
     // Make sure that everything is actually extended to the correct dimension.
     PossiblyExtend();
 
-    // This data is only written by the master
+    // This datum is only written by the master
     if (!PetscTools::AmMaster())
     {
         return;
@@ -1023,6 +1162,11 @@ void Hdf5DataWriter::Close()
     if (mIsInDefineMode)
     {
         return; // Nothing to do...
+    }
+
+    if ( mUseCache )
+    {
+        WriteCache();
     }
 
     H5Dclose(mVariablesDatasetId);
@@ -1064,6 +1208,12 @@ void Hdf5DataWriter::AdvanceAlongUnlimitedDimension()
     }
 
     mCurrentTimeStep++;
+
+    // Write whole chunks
+    if ( mUseCache && (mCurrentTimeStep-mCacheFirstTimeStep == mChunkSize[0]))
+    {
+        WriteCache();
+    }
 
     /*
      * Extend the dataset (only reached when adding to an existing dataset,

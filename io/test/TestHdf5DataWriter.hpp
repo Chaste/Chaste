@@ -329,6 +329,77 @@ public:
         PetscTools::Destroy(petsc_data_2);
     }
 
+    void TestHdf5DataWriterSingleColumnNoTimeCachedFails() throw(Exception)
+    {
+        int number_nodes = 100;
+
+        DistributedVectorFactory factory(number_nodes);
+
+        Hdf5DataWriter writer(factory,
+                              "TestHdf5DataWriter",
+                              "hdf5_test_single_column_cached",
+                              false,
+                              false,
+                              "Data",
+                              true); // cache
+        writer.DefineFixedDimension(number_nodes);
+
+        int node_id = writer.DefineVariable("Node","dimensionless");
+
+        writer.EndDefineMode();
+
+        Vec petsc_data_1 = factory.CreateVec();
+        DistributedVector distributed_vector_1 = factory.CreateDistributedVector(petsc_data_1);
+
+        for (DistributedVector::Iterator index = distributed_vector_1.Begin();
+             index!= distributed_vector_1.End();
+             ++index)
+        {
+            distributed_vector_1[index] =  index.Global;
+        }
+        distributed_vector_1.Restore();
+
+        TS_ASSERT_THROWS_THIS(writer.PutVector(node_id, petsc_data_1),
+                              "Cached writes require an unlimited dimension.");
+    }
+
+    void TestHdf5DataWriterMultipleColumnsCachedFails() throw(Exception)
+    {
+        int number_nodes = 100;
+
+        DistributedVectorFactory factory(number_nodes);
+
+        Hdf5DataWriter writer(factory,
+                              "TestHdf5DataWriter",
+                              "hdf5_test_multi_column_cached",
+                              false,
+                              false,
+                              "Data",
+                              true); // cache
+        writer.DefineFixedDimension(number_nodes);
+
+        // Define TWO variables
+        int node_id = writer.DefineVariable("Node","dimensionless");
+        writer.DefineVariable("I_K","milliamperes");
+
+        writer.EndDefineMode();
+
+        Vec petsc_data_1 = factory.CreateVec();
+        DistributedVector distributed_vector_1 = factory.CreateDistributedVector(petsc_data_1);
+
+        for (DistributedVector::Iterator index = distributed_vector_1.Begin();
+             index!= distributed_vector_1.End();
+             ++index)
+        {
+            distributed_vector_1[index] =  index.Global;
+        }
+        distributed_vector_1.Restore();
+
+        // Try and write ONE -> exception
+        TS_ASSERT_THROWS_THIS(writer.PutVector(node_id, petsc_data_1),
+                              "Cached writes must write all variables at once.");
+    }
+
     void TestHdf5DataWriterNonEvenRowDistribution() throw(Exception)
     {
         int number_nodes = 100;
@@ -483,6 +554,60 @@ public:
         PetscTools::Destroy(petsc_data_1);
         PetscTools::Destroy(petsc_data_2);
         PetscTools::Destroy(petsc_data_3);
+    }
+
+    void TestHdf5DataWriterFullFormatIncompleteCached() throw(Exception)
+    {
+        int number_nodes = 100;
+
+        DistributedVectorFactory factory(number_nodes);
+
+        Hdf5DataWriter writer(factory,
+                              "TestHdf5DataWriter",
+                              "hdf5_test_full_format_incomplete_cached",
+                              false,
+                              false,
+                              "Data",
+                              true); // cache
+
+        int node_id = writer.DefineVariable("Node","dimensionless");
+        writer.DefineUnlimitedDimension("Time", "msec");
+
+        std::vector<unsigned> node_numbers;
+        node_numbers.push_back(21);
+        node_numbers.push_back(47);
+        node_numbers.push_back(60);
+        writer.DefineFixedDimension(node_numbers, number_nodes);
+
+        writer.EndDefineMode();
+
+        Vec petsc_data_1 = factory.CreateVec();
+        DistributedVector distributed_vector_1 = factory.CreateDistributedVector(petsc_data_1);
+
+        for (unsigned time_step=0; time_step<10; time_step++)
+        {
+            // Write some values
+            for (DistributedVector::Iterator index = distributed_vector_1.Begin();
+                 index!= distributed_vector_1.End();
+                 ++index)
+            {
+                distributed_vector_1[index] =  index.Global;
+            }
+            distributed_vector_1.Restore();
+
+            // Write the vector
+
+            writer.PutVector(node_id, petsc_data_1);
+            writer.PutUnlimitedVariable(time_step);
+            writer.AdvanceAlongUnlimitedDimension();
+        }
+
+        writer.Close();
+
+        TS_ASSERT(CompareFilesViaHdf5DataReader("TestHdf5DataWriter", "hdf5_test_full_format_incomplete_cached", true,
+                                                "io/test/data", "hdf5_test_full_format_incomplete_cached", false));
+
+        PetscTools::Destroy(petsc_data_1);
     }
 
     void TestHdf5DataWriterFullFormat() throw(Exception)
@@ -646,6 +771,113 @@ public:
         PetscTools::Destroy(petsc_data_short);
     }
 
+    void TestHdf5DataWriterStripedCached() throw(Exception)
+    {
+        int number_nodes = 100;
+        DistributedVectorFactory vec_factory(number_nodes);
+
+        Hdf5DataWriter writer(vec_factory,
+                              "TestHdf5DataWriter",
+                              "hdf5_test_striped_with_cache",
+                              false,
+                              false,
+                              "Data",
+                              true); // use cache
+        writer.DefineFixedDimension(number_nodes);
+
+        /* For coverage: test cached writer can cope with chunking (see note below) */
+        writer.SetFixedChunkSize(3, 10, 2);
+
+        int vm_id = writer.DefineVariable("V_m", "millivolts");
+        int phi_e_id = writer.DefineVariable("Phi_e", "millivolts");
+
+        std::vector<int> striped_variable_IDs;
+        striped_variable_IDs.push_back(vm_id);
+        striped_variable_IDs.push_back(phi_e_id);
+
+        writer.DefineUnlimitedDimension("Time", "msec");
+
+        writer.EndDefineMode();
+
+        DistributedVectorFactory factory(number_nodes);
+
+        Vec petsc_data_long = factory.CreateVec(2);
+        DistributedVector distributed_vector_long = factory.CreateDistributedVector(petsc_data_long);
+        DistributedVector::Stripe vm_stripe(distributed_vector_long, 0);
+        DistributedVector::Stripe phi_e_stripe(distributed_vector_long, 1);
+
+        for (unsigned time_step=0; time_step<10; time_step++)
+        {
+            for (DistributedVector::Iterator index = distributed_vector_long.Begin();
+                 index!= distributed_vector_long.End();
+                 ++index)
+            {
+                vm_stripe[index] =  time_step*1000 + index.Global*2;
+                phi_e_stripe[index] =  time_step*1000 + index.Global*2+1;
+            }
+            distributed_vector_long.Restore();
+
+            writer.PutStripedVector(striped_variable_IDs, petsc_data_long);
+            writer.PutUnlimitedVariable(time_step);
+            writer.AdvanceAlongUnlimitedDimension();
+        }
+
+        /* NOTE: The writer will flush whole chunks (every 3 steps in this
+         * case) automatically, but we have 10 entries, so Close() is
+         * responsible for the final flush. */
+        writer.Close();
+
+        TS_ASSERT(CompareFilesViaHdf5DataReader("TestHdf5DataWriter", "hdf5_test_striped_with_cache", true,
+                                                "io/test/data", "hdf5_test_striped_with_cache", false));
+
+        PetscTools::Destroy(petsc_data_long);
+    }
+
+    void TestHdf5DataWriterStripedNoTimeCachedFails() throw(Exception)
+    {
+        int number_nodes = 100;
+        DistributedVectorFactory vec_factory(number_nodes);
+
+        Hdf5DataWriter writer(vec_factory,
+                              "TestHdf5DataWriter",
+                              "hdf5_test_striped_no_time_cache",
+                              false,
+                              false,
+                              "Data",
+                              true); // use cache
+        writer.DefineFixedDimension(number_nodes);
+
+        int vm_id = writer.DefineVariable("V_m", "millivolts");
+        int phi_e_id = writer.DefineVariable("Phi_e", "millivolts");
+
+        std::vector<int> striped_variable_IDs;
+        striped_variable_IDs.push_back(vm_id);
+        striped_variable_IDs.push_back(phi_e_id);
+
+        writer.EndDefineMode();
+
+        DistributedVectorFactory factory(number_nodes);
+
+        Vec petsc_data_long = factory.CreateVec(2);
+        DistributedVector distributed_vector_long = factory.CreateDistributedVector(petsc_data_long);
+        DistributedVector::Stripe vm_stripe(distributed_vector_long, 0);
+        DistributedVector::Stripe phi_e_stripe(distributed_vector_long, 1);
+
+        for (DistributedVector::Iterator index = distributed_vector_long.Begin();
+             index!= distributed_vector_long.End();
+             ++index)
+        {
+            vm_stripe[index] =  1000 + index.Global*2;
+            phi_e_stripe[index] =  1000 + index.Global*2+1;
+        }
+        distributed_vector_long.Restore();
+
+        TS_ASSERT_THROWS_THIS(writer.PutStripedVector(striped_variable_IDs, petsc_data_long),
+                              "Cached writes require an unlimited dimension.")
+
+        PetscTools::Destroy(petsc_data_long);
+    }
+
     void TestHdf5DataWriterFullFormatStripedWith3Variables() throw(Exception)
     {
         int number_nodes = 100;
@@ -698,12 +930,18 @@ public:
         PetscTools::Destroy(petsc_data);
     }
 
-    void TestHdf5DataWriterFullFormatStripedIncomplete() throw(Exception)
+    void Hdf5DataWriterFullFormatStripedIncomplete(bool useCache, std::string outputFile, std::string expectedException) throw(Exception)
     {
         int number_nodes = 100;
         DistributedVectorFactory vec_factory(number_nodes);
 
-        Hdf5DataWriter writer(vec_factory, "TestHdf5DataWriter", "hdf5_test_full_format_striped_incomplete", false);
+        Hdf5DataWriter writer(vec_factory,
+                              "TestHdf5DataWriter",
+                              outputFile,
+                              false,
+                              false,
+                              "Data",
+                              useCache);
 
         std::vector<unsigned> node_numbers;
         node_numbers.push_back(21);
@@ -763,7 +1001,7 @@ public:
 //            TS_ASSERT(comparer.CompareFiles());
 //        }
 
-        TS_ASSERT(CompareFilesViaHdf5DataReader("TestHdf5DataWriter", "hdf5_test_full_format_striped_incomplete", true,
+        TS_ASSERT(CompareFilesViaHdf5DataReader("TestHdf5DataWriter", outputFile, true,
                                                 "io/test/data", "hdf5_test_full_format_striped_incomplete", false));
 
         PetscTools::Destroy(petsc_data_long);
@@ -781,8 +1019,7 @@ public:
         writer.EndDefineMode();
 
         Vec petsc_data_3vars = factory.CreateVec(3);
-        TS_ASSERT_THROWS_THIS(writer.PutStripedVector(three_variable_IDs, petsc_data_3vars),
-                                "The PutStripedVector functionality for incomplete data is supported for only 2 stripes");
+        TS_ASSERT_THROWS_THIS(writer.PutStripedVector(three_variable_IDs, petsc_data_3vars), expectedException);
 
         PetscTools::Destroy(petsc_data_3vars);
         writer.Close();
@@ -796,6 +1033,20 @@ public:
         TS_ASSERT_THROWS_THIS(writer.PutStripedVector(one_ID, petsc_data_1var),
                                 "The PutStripedVector method requires at least two variables ID. If only one is needed, use PutVector method instead");
         PetscTools::Destroy(petsc_data_1var);
+    }
+
+    void TestHdf5DataWriterFullFormatStripedIncomplete() throw(Exception)
+    {
+        Hdf5DataWriterFullFormatStripedIncomplete(false,
+                                                  "hdf5_test_full_format_striped_incomplete",
+                                                  "The PutStripedVector functionality for incomplete data is supported for only 2 stripes");
+    }
+
+    void TestHdf5DataWriterFullFormatStripedIncompleteCached() throw(Exception)
+    {
+        Hdf5DataWriterFullFormatStripedIncomplete(true,
+                                                  "hdf5_test_full_format_striped_incomplete_cached",
+                                                  "Cached writes must write all variables at once.");
     }
 
     void TestNonImplementedFeatures()
@@ -1574,12 +1825,71 @@ public:
         PetscTools::Destroy(petsc_data_3);
     }
 
-    void TestHdf5DataWriterFullFormatStripedIncompleteUsingMatrix() throw(Exception)
+    void TestHdf5DataWriterSingleIncompleteUsingMatrixCached() throw(Exception)
     {
+        int number_nodes = 100;
+
+        DistributedVectorFactory factory(number_nodes);
+
+        Hdf5DataWriter writer(factory,
+                              "TestHdf5DataWriter",
+                              "hdf5_test_single_incomplete_using_matrix_cached",
+                              false,
+                              false,
+                              "Data",
+                              true); // cache
+
+        int node_id = writer.DefineVariable("Node","dimensionless");
+        writer.DefineUnlimitedDimension("Time", "msec");
+
+        std::vector<unsigned> node_numbers;
+        node_numbers.push_back(21);
+        node_numbers.push_back(47);
+        node_numbers.push_back(60);
+        writer.DefineFixedDimensionUsingMatrix(node_numbers, number_nodes);
+
+        writer.EndDefineMode();
+
+        Vec petsc_data_1 = factory.CreateVec();
+        DistributedVector distributed_vector_1 = factory.CreateDistributedVector(petsc_data_1);
+
+        for (unsigned time_step=0; time_step<10; time_step++)
+        {
+            // Write some values
+            for (DistributedVector::Iterator index = distributed_vector_1.Begin();
+                 index!= distributed_vector_1.End();
+                 ++index)
+            {
+                distributed_vector_1[index] =  index.Global;
+            }
+            distributed_vector_1.Restore();
+
+            writer.PutVector(node_id, petsc_data_1);
+            writer.PutUnlimitedVariable(time_step);
+            writer.AdvanceAlongUnlimitedDimension();
+        }
+
+        writer.Close();
+
+        TS_ASSERT(CompareFilesViaHdf5DataReader("TestHdf5DataWriter", "hdf5_test_single_incomplete_using_matrix_cached", true,
+                                                "io/test/data", "hdf5_test_single_incomplete_using_matrix_cached", false));
+
+        PetscTools::Destroy(petsc_data_1);
+    }
+
+    void Hdf5DataWriterFullFormatStripedIncompleteUsingMatrix(bool useCache, std::string outputFile) throw(Exception)
+    {
+        /* This test doesn't get run directly, see following two blocks */
         int number_nodes = 100;
         DistributedVectorFactory vec_factory(number_nodes);
 
-        Hdf5DataWriter writer(vec_factory, "TestHdf5DataWriter", "hdf5_test_full_format_striped_incomplete_using_matrix", false);
+        Hdf5DataWriter writer(vec_factory,
+                              "TestHdf5DataWriter",
+                              outputFile,
+                              false,
+                              false,
+                              "Data",
+                              useCache);
 
         std::vector<unsigned> node_numbers;
         node_numbers.push_back(21);
@@ -1627,11 +1937,24 @@ public:
         writer.Close();
 
 
-        TS_ASSERT(CompareFilesViaHdf5DataReader("TestHdf5DataWriter", "hdf5_test_full_format_striped_incomplete_using_matrix", true,
+        TS_ASSERT(CompareFilesViaHdf5DataReader("TestHdf5DataWriter", outputFile, true,
                                                 "io/test/data", "hdf5_test_full_format_striped_incomplete", false));
 
         PetscTools::Destroy(petsc_data_long);
     }
+
+    void TestHdf5DataWriterFullFormatStripedIncompleteUsingMatrix() throw(Exception)
+    {
+        // Without caching
+        Hdf5DataWriterFullFormatStripedIncompleteUsingMatrix(false, "hdf5_test_full_format_striped_incomplete_using_matrix");
+    }
+
+    void TestHdf5DataWriterFullFormatStripedIncompleteUsingMatrixCached() throw(Exception)
+    {
+        // With caching
+        Hdf5DataWriterFullFormatStripedIncompleteUsingMatrix(true, "hdf5_test_full_format_striped_incomplete_using_matrix_cached");
+    }
+
 };
 
 #endif /*TESTHDF5DATAWRITER_HPP_*/

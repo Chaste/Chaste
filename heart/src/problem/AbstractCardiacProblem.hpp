@@ -464,6 +464,11 @@ protected:
     Hdf5DataWriter* mpWriter;
 
     /**
+     * Whether to instruct the writer to cache writes.
+     */
+    bool mUseHdf5DataWriterCache;
+
+    /**
      * A vector of user-defined output modifiers which may be used to produce lightweight on the fly output
      */
     std::vector<boost::shared_ptr<AbstractOutputModifier> > mOutputModifiers;
@@ -652,6 +657,13 @@ public:
      * @return whether the writer is outputting to an existing file.
      */
     bool InitialiseWriter();
+
+    /**
+     * *EXPERIMENTAL*
+     * Set whether to use caching in the Hdf5DataWriter.
+     * @param useCache Whether to use the cache
+     */
+    void SetUseHdf5DataWriterCache(bool useCache=true);
 
     /**
      * Specifies which nodes in the mesh to output. This method must be called before InitialiseWriter,
