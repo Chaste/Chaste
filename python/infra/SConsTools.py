@@ -545,13 +545,14 @@ def GetPathRevision(path, asInt):
             revision = 'UINT_MAX'
     return (revision, modified)
 
-def GetProjectVersions(projectsRoot):
+def GetProjectVersions(projectsRoot, revision=None):
     """Return C++ code filling in the project versions map."""
     code = ""
     for entry in sorted(os.listdir(projectsRoot)):
         entry_path = os.path.join(projectsRoot, entry)
         if entry[0] != '.' and os.path.isdir(entry_path):
-            revision, _ = GetPathRevision(entry_path, False)
+            if revision is None:
+                revision, _ = GetPathRevision(entry_path, False)
             code += '%sversions["%s"] = "%s";\n' % (' '*8, entry, revision)
     return code
 
@@ -564,8 +565,10 @@ def GetVersionCpp(templateFilePath, env):
         # Extract just the revision number from the file.
         full_version = open(version_file).read().strip()
         chaste_revision = int(full_version[1+full_version.rfind('.'):])
+        project_revisions = str(chaste_revision)
     else:
         chaste_revision, wc_modified = GetPathRevision(chaste_root, True)
+        project_revisions = None
     time_format = "%a, %d %b %Y %H:%M:%S +0000"
     build_time = time.strftime(time_format, time.gmtime())
     compiler_type = env['build'].CompilerType()
@@ -591,7 +594,7 @@ def GetVersionCpp(templateFilePath, env):
              'chaste_root': chaste_root,
              'revision': chaste_revision,
              'wc_modified': str(wc_modified).lower(),
-             'project_versions': GetProjectVersions(os.path.join(chaste_root, 'projects')),
+             'project_versions': GetProjectVersions(os.path.join(chaste_root, 'projects'), project_revisions),
              'licence': licence,
              'time_format': time_format,
              'time_size': len(build_time)+1,
