@@ -46,6 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _BACKWARD_BACKWARD_WARNING_H 1 //Cut out the strstream deprecated warning for now (gcc4.3)
 #include "vtkVersion.h"
 #include "vtkAppendFilter.h"
+#include "vtkSTLReader.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkXMLUnstructuredGridWriter.h"
 #include "vtkXMLUnstructuredGridReader.h"
@@ -77,6 +78,14 @@ MultiLobeAirwayGenerator::~MultiLobeAirwayGenerator()
     }
 }
 
+void MultiLobeAirwayGenerator::AddLobe(const std::string& rFileName, LungLocation lungLocation)
+{
+    vtkSmartPointer<vtkSTLReader> reader = vtkSmartPointer<vtkSTLReader>::New();
+    reader->SetFileName(rFileName.c_str());
+    reader->Update();
+
+    AddLobe(reader->GetOutput(), lungLocation);
+}
 
 void MultiLobeAirwayGenerator::AddLobe(vtkSmartPointer<vtkPolyData> pLobeSurface, LungLocation lungLocation)
 {

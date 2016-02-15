@@ -81,6 +81,8 @@ public:
         TS_ASSERT_EQUALS(generator.GetNumLobes(LEFT), 2u);
         TS_ASSERT_EQUALS(generator.GetNumLobes(RIGHT), 1u);
 
+        generator.AddLobe("lung/test/data/rll.stl", RIGHT);
+        TS_ASSERT_EQUALS(generator.GetNumLobes(RIGHT), 2u);
 #endif
     }
 
