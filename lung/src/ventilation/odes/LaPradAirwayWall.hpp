@@ -114,6 +114,11 @@ public:
      * @param k3 The parameter k3
      */
     void Setk3(double);
+	
+	/**
+	* Works out the difference between the pressure and the pressure needed to produce a particular radius
+	*/
+	double CalculatePressureRadiusResidual(double radius);
 
 private:
     /** The airway radius at zero transpulmonary pressure */
