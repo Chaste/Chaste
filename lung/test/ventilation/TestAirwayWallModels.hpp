@@ -44,10 +44,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "LaPradAirwayWall.hpp"
 #include "LaPradAirwayWallFactory.hpp"
 
-//#include "HiornsAirwayWall.hpp"
-//#include "HiornsAirwayWallFactory.hpp"
-
-using namespace std;
+#include "HiornsAirwayWall.hpp"
+#include "HiornsAirwayWallFactory.hpp"
 
 //#include "PetscSetupAndFinalize.hpp"
 
@@ -311,8 +309,8 @@ public:
         
     }
     
-  /*  
-    void xxTestHiornsAirwayWall() throw (Exception)
+   
+    void TestHiornsAirwayWall() throw (Exception)
     {
            
         HiornsAirwayWall airway_wall;
@@ -352,7 +350,7 @@ public:
     }
 
     
-    void xxTestHiornsAirwayWallAndFactory() throw (Exception)
+    void TestHiornsAirwayWallAndFactory() throw (Exception)
     {       
         
          //Get a simple mesh here
@@ -444,7 +442,7 @@ public:
             }
         }
         
-    }*/
+    }
     
 };
 #endif /*_TESTAIRWAYWALLMODELS_HPP_*/
