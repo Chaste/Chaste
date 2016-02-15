@@ -333,7 +333,8 @@ public:
             /* Solve the SRN. */
             p_srn_model->SimulateToCurrentTime();
 
-            TS_ASSERT_DELTA(p_cell->GetCellData()->GetItem("x"), 0.7316, 1e-4);
+            double current_time = 1.5;
+            TS_ASSERT_DELTA(p_cell->GetCellData()->GetItem("x"), cos(0.5*current_time), 1e-4);
 
             /* Now archive the cell-cycle model through its cell. */
             CellPtr const p_const_cell = p_cell;
@@ -345,13 +346,15 @@ public:
 
         /* Now create an input archive. Begin by again destroying the current
          * instance of {{{SimulationTime}}} and creating another instance. Set
-         * the start time, end time and number of time steps.
+         * the start time, end time and number of time steps. note that this is
+         * overwritten when you load the archive.
          */
         {
             SimulationTime::Destroy();
             SimulationTime* p_simulation_time = SimulationTime::Instance();
             p_simulation_time->SetStartTime(0.0);
             p_simulation_time->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
+            TS_ASSERT_DELTA(p_simulation_time->GetTime(), 0.0, 1e-4);
 
             /* Create a pointer to a cell. */
             CellPtr p_cell;
@@ -362,15 +365,20 @@ public:
             input_arch >> p_cell;
 
             /* Test that the state of the ODES has been restored correctly. */
-            TS_ASSERT_DELTA(p_cell->GetCellData()->GetItem("x"), 0.7316, 1e-4);
+            double current_time = 1.5;
+            TS_ASSERT_DELTA(p_simulation_time->GetTime(), current_time, 1e-4);
+            TS_ASSERT_DELTA(p_cell->GetCellData()->GetItem("x"), cos(0.5*current_time), 1e-4);
 
             /* Move forward two more time steps. */
             p_simulation_time->IncrementTimeOneStep();
             p_simulation_time->IncrementTimeOneStep();
             /* Solve the SRN. */
             p_cell->GetSrnModel()->SimulateToCurrentTime();
+
             /* Check it's moved on OK */
-//            TS_ASSERT_DELTA(p_cell->GetCellData()->GetItem("x"), 0.0, 1e-4); ///\todo wrong result!
+            current_time = 3.0;
+            TS_ASSERT_DELTA(p_simulation_time->GetTime(), current_time, 1e-4);
+            TS_ASSERT_DELTA(p_cell->GetCellData()->GetItem("x"), cos(0.5*current_time), 1e-4);
         }
     }
 
