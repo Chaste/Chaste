@@ -33,39 +33,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-
-
-#include "LaPradAirwayWall.hpp"
-#include "MathsCustomFunctions.hpp"
-#include "Exception.hpp"
 #include <cmath>
 #include <iostream>
 #include <boost/math/tools/roots.hpp>
 #include <boost/bind.hpp>
 
-/**
- * Small auxilliary class for use with Boost nonlinear solvers.
- */
-class Tolerance {
-public:
-    /**
-     * @param eps The tolerance to solve within
-     */
-    Tolerance(double eps) :
-        _eps(eps) {
-    }
-    /** 
-     * Checks if two values are within tolerance
-     *
-     * @param a First value
-     * @param b Second value
-     */
-    bool operator()(double a, double b) {
-        return (fabs(b - a) <= _eps);
-    }
-private:
-    double _eps;
-};
+#include "BoostTolerance.hpp"
+#include "LaPradAirwayWall.hpp"
+#include "MathsCustomFunctions.hpp"
+#include "Exception.hpp"
 
 LaPradAirwayWall::LaPradAirwayWall() : mTargetPressure(0),
                                        mRIn(0),
