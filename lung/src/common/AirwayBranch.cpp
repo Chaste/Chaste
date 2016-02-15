@@ -38,11 +38,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 #include "UblasCustomFunctions.hpp"
 
-AirwayBranch::AirwayBranch() : mpChildOne(NULL),
-                               mpChildTwo(NULL),
-                               mpParent(NULL),
-                               mpSibling(NULL),
-                               mIndex(UINT_MAX)
+AirwayBranch::AirwayBranch(bool radiusOnEdge) : mpChildOne(NULL),
+                                                mpChildTwo(NULL),
+                                                mpParent(NULL),
+                                                mpSibling(NULL),
+                                                mIndex(UINT_MAX),
+                                                mRadiusOnEdge(radiusOnEdge)
 {}
 
 void AirwayBranch::AddElement(Element<1,3>* pElement)
@@ -88,7 +89,15 @@ double AirwayBranch::GetAverageRadius()
     {
         (*iter)->CalculateJacobian(jacobian, element_length);
         length += element_length;
-        radius += element_length*((*iter)->GetNode(0)->rGetNodeAttributes()[0] + (*iter)->GetNode(1)->rGetNodeAttributes()[0])/2.0;
+
+        if(mRadiusOnEdge)
+        {
+            radius += element_length*((*iter)->GetAttribute());
+        }
+        else
+        {
+            radius += element_length*((*iter)->GetNode(0)->rGetNodeAttributes()[0] + (*iter)->GetNode(1)->rGetNodeAttributes()[0])/2.0;
+        }
     }
 
     return radius/length;
@@ -106,7 +115,18 @@ double AirwayBranch::GetPoiseuilleResistance()
         ++iter)
     {
         (*iter)->CalculateJacobian(jacobian, element_length);
-        resistance += element_length/SmallPow(((*iter)->GetNode(0)->rGetNodeAttributes()[0] + (*iter)->GetNode(1)->rGetNodeAttributes()[0])/2.0, 4);
+
+        double radius = 0.0;
+        if(mRadiusOnEdge)
+        {
+            radius = (*iter)->GetAttribute();
+        }
+        else
+        {
+            radius = ((*iter)->GetNode(0)->rGetNodeAttributes()[0] + (*iter)->GetNode(1)->rGetNodeAttributes()[0])/2.0;
+        }
+
+        resistance += element_length/SmallPow(radius, 4);
     }
 
     return resistance;
@@ -153,7 +173,18 @@ double AirwayBranch::GetRotationAngle()
     c_vector<double, 3> n1 = VectorProduct(GetDirection(), GetSibling()->GetDirection());
     c_vector<double, 3> n2 = VectorProduct(GetParent()->GetDirection(), GetParent()->GetSibling()->GetDirection());
 
-    return std::acos(inner_prod(n1,n2)/(norm_2(n1)*norm_2(n2)));
+    double rotation_factor = inner_prod(n1,n2)/(norm_2(n1)*norm_2(n2));
+
+    //Sometimes the bifurcations are co-planar, which leads to an undefined angle (0.0 or pi radians are valid).
+    //For our purposes we consider this angle to be zero.
+    if(abs(rotation_factor) == 1.0)
+    {
+        return 0.0;
+    }
+    else
+    {
+        return std::acos(rotation_factor);
+    }
 }
 
 std::vector<AirwayBranch*> AirwayBranch::GetAllChildren()
@@ -322,6 +353,8 @@ Node<3>* AirwayBranch::GetDistalNode()
 
 double AirwayBranch::GetBranchVolume()
 {
+    assert(!mRadiusOnEdge);
+
     double volume = 0.0;
 
     for(std::list<Element<1,3>* >::iterator iter = mElements.begin();
@@ -344,6 +377,8 @@ double AirwayBranch::GetBranchVolume()
 
 double AirwayBranch::GetBranchLateralSurfaceArea()
 {
+    assert(!mRadiusOnEdge);
+
     double lateralSurfaceArea = 0.0;
 
 

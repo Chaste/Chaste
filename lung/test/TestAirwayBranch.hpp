@@ -95,6 +95,18 @@ public:
         TS_ASSERT_EQUALS(branch_two.IsMajor(), false);
 
         TS_ASSERT_EQUALS(branch_one.IsMajor(), true);
+
+        //Check radius on edge calculations
+        AirwayBranch branch_three(true);
+        mesh.GetElement(0)->SetAttribute(0.5);
+        mesh.GetElement(1)->SetAttribute(0.5);
+        mesh.GetElement(2)->SetAttribute(0.5);
+        branch_three.AddElement(mesh.GetElement(0));
+        branch_three.AddElement(mesh.GetElement(1));
+        branch_three.AddElement(mesh.GetElement(2));
+
+        TS_ASSERT_DELTA(branch_three.GetAverageRadius(), 0.5, 1e-3);
+        TS_ASSERT_DELTA(branch_three.GetPoiseuilleResistance(), 2.7313, 1e-3);
     }
 
     void TestAngleCalculations() throw(Exception)
@@ -131,6 +143,14 @@ public:
         TS_ASSERT(!branch_one.IsTerminal());
         TS_ASSERT(branch_two.IsTerminal());
         TS_ASSERT(branch_three.IsTerminal());
+
+        //Check special case of a zero rotation angle.
+        branch_one.SetChildOne(&branch_two);
+        branch_one.SetChildTwo(&branch_one);
+        branch_one.SetSibling(&branch_two);
+        branch_two.SetSibling(&branch_one);
+
+        TS_ASSERT_DELTA(branch_two.GetRotationAngle(), 0.0, 1e-6);
     }
 
     void TestBranchIndexing() throw(Exception)

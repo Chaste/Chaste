@@ -50,8 +50,10 @@ public:
 
     /**
      * Constructor
+     *
+     * @param radiusOnEdge Specifies whether radii are specified on nodes or on elements
      */
-    AirwayBranch();
+    AirwayBranch(bool radiusOnEdge = false);
 
     /**
      * Adds an element to the branch list
@@ -234,6 +236,9 @@ private:
 
     /** Branch index.  Currently optional and set in AirwayPropertiesCalculator. \todo: add index into constructors */
     unsigned mIndex;
+
+    /** Flag to indicate whether airway radii are specified on nodes or edges */
+    bool mRadiusOnEdge;
 };
 
 

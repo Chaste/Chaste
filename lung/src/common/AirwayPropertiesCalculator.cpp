@@ -38,16 +38,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Debug.hpp"
 
 AirwayPropertiesCalculator::AirwayPropertiesCalculator(TetrahedralMesh<1,3>& rAirwaysMesh,
-                                                       unsigned rootIndex) :
+                                                       unsigned rootIndex,
+                                                       bool radiusOnEdge) :
                                                            mAirwaysMesh(rAirwaysMesh),
                                                            mOutletNodeIndex(rootIndex),
-                                                           mWalker(mAirwaysMesh, mOutletNodeIndex)
+                                                           mWalker(mAirwaysMesh, mOutletNodeIndex),
+                                                           mRadiusOnEdge(radiusOnEdge)
 {
     //Get the head element & process
     Node<3>* p_node = mAirwaysMesh.GetNode(mOutletNodeIndex);
     Element<1,3>* p_element = mAirwaysMesh.GetElement(*(p_node->ContainingElementsBegin()));
 
-    AirwayBranch* p_head_branch = new AirwayBranch;
+    AirwayBranch* p_head_branch = new AirwayBranch(mRadiusOnEdge);
 
     // Set index to zero for head branch
     p_head_branch->SetIndex(0);
@@ -81,8 +83,8 @@ void AirwayPropertiesCalculator::SetupBranches(Element<1,3>* pElement, AirwayBra
     }
     else //if(mWalker.GetNumberOfChildElements(pElement) >= 2u)
     {
-        AirwayBranch* p_child_branch_one = new AirwayBranch;
-        AirwayBranch* p_child_branch_two = new AirwayBranch;
+        AirwayBranch* p_child_branch_one = new AirwayBranch(mRadiusOnEdge);
+        AirwayBranch* p_child_branch_two = new AirwayBranch(mRadiusOnEdge);
         p_child_branch_one->SetSibling(p_child_branch_two);
         p_child_branch_two->SetSibling(p_child_branch_one);
         p_child_branch_one->SetParent(pBranch);
@@ -105,11 +107,11 @@ void AirwayPropertiesCalculator::SetupBranches(Element<1,3>* pElement, AirwayBra
 
     if(mWalker.GetNumberOfChildElements(pElement) >= 3u)
     {
-        std::cout << "Warning: Trifurcation detected. Third (and higher) branch will be ignored when calculating statistics. " << std::endl;
+        //std::cout << "Warning: Trifurcation detected. Third (and higher) branch will be ignored when calculating statistics. " << std::endl;
 
         for(unsigned extra_branch = 2; extra_branch < mWalker.GetNumberOfChildElements(pElement); ++extra_branch)
         {
-            AirwayBranch* p_child_branch = new AirwayBranch;
+            AirwayBranch* p_child_branch = new AirwayBranch(mRadiusOnEdge);
             p_child_branch->SetParent(pBranch);
             pBranch->AddChild(p_child_branch);
 
