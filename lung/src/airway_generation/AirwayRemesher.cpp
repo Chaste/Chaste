@@ -44,6 +44,12 @@ AirwayRemesher::AirwayRemesher(TetrahedralMesh<1,3>& rMesh,
 
 }
 
+void AirwayRemesher::Remesh(MutableMesh<1,3>& rOutputMesh)
+{
+    Remesh(rOutputMesh, DBL_MAX);
+}
+
+
 void AirwayRemesher::Remesh(MutableMesh<1,3>& outputMesh, double maximumResistance)
 {
   std::vector<AirwayBranch*> branches = mCalculator.GetBranches();

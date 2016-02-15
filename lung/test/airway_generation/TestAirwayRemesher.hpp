@@ -94,6 +94,12 @@ public:
         TS_ASSERT_DELTA(output_mesh_three.GetElement(0)->GetAttribute(), 0.05, 1e-6);
         TS_ASSERT_DELTA(output_mesh_three.GetElement(5)->GetAttribute(), 0.05, 1e-6);
 
+        MutableMesh<1,3> output_mesh_four;
+        remesher.Remesh(output_mesh_four); //Utility method to remove all intermediate nodes
+
+        TS_ASSERT_EQUALS(output_mesh_one.GetNumNodes(), 2u);
+        TS_ASSERT_EQUALS(output_mesh_one.GetNumElements(), 1u);
+        TS_ASSERT_DELTA(output_mesh_one.GetElement(0)->GetAttribute(), 0.05, 1e-6);
 
         //To visualise
         //VtkMeshWriter<1,3> writer("TestAirwayRemesher", "1D_remeshed");

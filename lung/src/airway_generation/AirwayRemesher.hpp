@@ -59,10 +59,25 @@ public:
     /**
      * Creates a remeshed version of the underlying mesh.
      *
+     * This version attempts to balance the mesh in such a way as to minimise the
+     * condition number matrices resulting from Poiseuille based network flow problems.
+     *
      * @param rOutputMesh The mesh object to be written to.
      * @param maximumResistance The maximum allowed resistance of an element
      */
     void Remesh(MutableMesh<1,3>& rOutputMesh, double maximumResistance);
+
+
+    /**
+     * Creates a remeshed version of the underlying mesh.
+     *
+     * This version simply removes all intermediate, non bifurcation, nodes.
+     *
+     * @param rOutputMesh The mesh object to be written to.
+     * @param maximumResistance The maximum allowed resistance of an element
+     */
+
+    void Remesh(MutableMesh<1,3>& rOutputMesh);
 
 private:
     /**
