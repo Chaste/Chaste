@@ -75,15 +75,47 @@ public:
      */
     virtual HiornsAirwayWall* CreateAirwayWallForElement(Element<1,3>* pElement);
     
+    /**
+     * @param generation The generation number to get the parameter for
+     * @return The parameter mu for the given generation
+     */
+    double GetmuForGeneration(unsigned generation);
     
-      
-double GetmuForGeneration(unsigned generation);
-double Getphi1ForGeneration(unsigned generation);
-double Getphi2ForGeneration(unsigned generation);
-double GetC1ForGeneration(unsigned generation);
-double GetC2ForGeneration(unsigned generation);
-double GetAForGeneration(unsigned generation);
-double GetAlpha0ForGeneration(unsigned generation);
+    /**
+     * @param generation The generation number to get the parameter for
+     * @return The parameter phi1 for the given generation
+     */
+    double Getphi1ForGeneration(unsigned generation);
+
+    /**
+     * @param generation The generation number to get the parameter for
+     * @return The parameter phi2 for the given generation
+     */
+    double Getphi2ForGeneration(unsigned generation);
+
+    /**
+     * @param generation The generation number to get the parameter for
+     * @return The parameter C1 for the given generation
+     */
+    double GetC1ForGeneration(unsigned generation);
+
+    /**
+     * @param generation The generation number to get the parameter for
+     * @return The parameter C2 for the given generation
+     */
+    double GetC2ForGeneration(unsigned generation);
+
+    /**
+     * @param generation The generation number to get the parameter for
+     * @return The parameter A for the given generation
+     */
+    double GetAForGeneration(unsigned generation);
+
+    /**
+     * @param generation The generation number to get the parameter for
+     * @return The parameter alpha0 for the given generation
+     */
+    double GetAlpha0ForGeneration(unsigned generation);
     
 
     /**
@@ -139,9 +171,6 @@ private:
     
     /** C2 values by generation dimensionless  */
     static const double mC2[17];
-    
-    /** A values by generation dimensionless  */
-    static const double mA[17];
 };
 
 #endif /*HIORNSAIRWAYWALLFACTORY_HPP_*/
