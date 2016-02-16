@@ -98,7 +98,7 @@ void LaPradAirwayWall::SolveAndUpdateState(double tStart, double tEnd)
     double factor = 2.;
 
     Tolerance tol = 0.000001;
-    uintmax_t maxIterations = 500u;
+    boost::uintmax_t maxIterations = 500u;
     
     std::pair<double, double> found = boost::math::tools::bracket_and_solve_root(boost::bind(&LaPradAirwayWall::CalculatePressureRadiusResidual, this, _1), guess, factor, false, tol, maxIterations);
     mDeformedAirwayRadius = found.first;
