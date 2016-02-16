@@ -63,7 +63,7 @@ void HiornsAirwayWall::SetTimestep(double dt) {}
 double HiornsAirwayWall::CalculatePressureRadiusResidual(double radius)
 {
 
-    mTargetPressure = mPleuralPressure - mAirwayPressure;
+    mTargetPressure = mAirwayPressure - mPleuralPressure;
 
     double rin = radius;
     

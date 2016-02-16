@@ -38,7 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 /**
- * This is the base class for ode-based airway wall models
+ * This is the base class for airway wall model mechanics models
  */
 class AbstractAirwayWall
 {

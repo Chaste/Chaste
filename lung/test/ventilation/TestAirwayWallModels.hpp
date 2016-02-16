@@ -182,7 +182,7 @@ public:
         LaPradAirwayWall airway_wall;
         airway_wall.SetTimestep(1.0); //Not used, for coverage only
 
-        double targetPressure = 3.;
+        double targetPressure = -3.;
         double RIn = 2.;
         double ROut = 2.5;
         double k1 = 1.8;
@@ -205,7 +205,7 @@ public:
         airway_wall.SolveAndUpdateState(0.0, 0.0);
         TS_ASSERT_DELTA(airway_wall.GetLumenRadius(), 3.02842, 1e-3)
 
-        airway_wall.SetPleuralPressure(1000000);
+        airway_wall.SetPleuralPressure(-1000000);
         airway_wall.SolveAndUpdateState(0.0, 0.0);
 
 	    TS_ASSERT_DELTA(airway_wall.GetLumenRadius(), 3.4917, 1e-3)
@@ -316,7 +316,7 @@ public:
         HiornsAirwayWall airway_wall;
         airway_wall.SetTimestep(1.0); //Not used, for coverage only
         
-        double targetPressure = 2.;
+        double targetPressure = -2.;
         double RIn = 1.;
         double ROut = 1.5;        
         double mu = 5.;

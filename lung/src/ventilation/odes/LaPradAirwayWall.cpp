@@ -59,7 +59,7 @@ void LaPradAirwayWall::SetTimestep(double dt) {}
 double LaPradAirwayWall::CalculatePressureRadiusResidual(double radius)
 {
 
-    mTargetPressure = mPleuralPressure - mAirwayPressure;
+    mTargetPressure = mAirwayPressure - mPleuralPressure;
     
     double rin = radius;
     
