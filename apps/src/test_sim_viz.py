@@ -1,5 +1,12 @@
 from paraview.simple import *
 import os
+import platform
+
+test_output = os.environ.get('CHASTE_TEST_OUTPUT')
+if test_output[-1] != '/':
+    test_output = test_output + '/'
+
+dir_name = test_output + 'Exe_VaryAdhesionOfSingleCell/sim/0_0_0/'
 
 # get active view
 renderView1 = GetActiveViewOrCreate('RenderView')
@@ -24,7 +31,7 @@ box1Display = Show(box1, renderView1)
 box1Display.DiffuseColor = [0.0, 0.0, 0.0]
 
 # create a new 'PVD Reader'
-resultspvd = PVDReader(FileName='/scratch/Cooper/chaste_test_output/Exe_VaryAdhesionOfSingleCell/sim/0_0_0/results_from_time_7.5/results.pvd')
+resultspvd = PVDReader(FileName=dir_name + '/results_from_time_7.5/results.pvd')
 
 
 # show data in view
@@ -37,7 +44,7 @@ renderView1.InteractionMode = '2D'
 renderView1.CameraPosition = [0.5, 0.5, 1.0]
 renderView1.CameraFocalPoint = [0.5, 0.5, 0.0]
 renderView1.ResetCamera()
-renderView1.CameraParallelScale = 0.6
+renderView1.CameraParallelScale = 0.5
 
 
 time_step_info = resultspvd.TimestepValues
@@ -49,9 +56,18 @@ scene.StartTime = time_step_info[0]
 scene.EndTime = time_step_info[-1]
 
 # save animation images/movie
-output_directory = '/scratch/Cooper/chaste_test_output/Exe_VaryAdhesionOfSingleCell/sim/0_0_0/animation_from_time_7.5/'
+output_directory = dir_name + '/animation_from_time_7.5/'
 WriteAnimation(output_directory + 'results.png', Magnification=1, Compression=False)
 
+# Get the video converter by linux distribution
+video_converter = ''
+if platform.linux_distribution()[2] == 'trusty':
+    video_converter = 'avconv'
+else:
+    video_converter = 'ffmpeg'
+
 framerate = str(len(time_step_info) / 10) # make the video last 10 seconds
-#For background on this line and the magic -crf value see https://trac.ffmpeg.org/wiki/Encode/H.264
-os.system('avconv -r ' + framerate + ' -f image2 -i ' + output_directory + 'results.%04d.png -c:v h264 -crf 0 -y ' +output_directory + 'movie.mp4')
+
+os.system(video_converter + ' -v 0 -r ' + framerate + ' -f image2 -i ' + output_directory + 'results.%04d.png -c:v h264 -crf 0 -y ' + output_directory + 'movie.mp4')
+
+os.system('rm ' + output_directory + '*.png')
