@@ -48,7 +48,7 @@ const double HiornsAirwayWallFactory::mN2[] = {10.0,10.0,10.0,10.0,10.0,10.0,10.
 
 const double HiornsAirwayWallFactory::mMaxGeneration = 16;
 
-//The below are values that can be retuned for particular airway trees
+//The below are values that can be returned for particular airway trees
 
 const double HiornsAirwayWallFactory::mmu[] = {64002., 60003., 56004., 52005., 48006., 44007., 40008., 36009., 32011., 28012., 24013., 20014., 16015., 12016., 8016.7, 4017.7, 18.7318};
 
@@ -59,10 +59,6 @@ const double HiornsAirwayWallFactory::mphi2[] = {0.7854, 0.7363, 0.6872, 0.6381,
 const double HiornsAirwayWallFactory::mC1[] = {179380., 168170., 156960., 145750., 134530., 123320., 112110., 100900., 89690., 78478., 67267., 56056., 44845., 33634., 22423., 11211., 0.2991};
 
 const double HiornsAirwayWallFactory::mC2[] = {101.9786, 95.6050, 89.2314, 82.8579, 76.4843, 70.1108, 63.7372, 57.3637, 50.9901, 44.6166, 38.2430, 31.8694, 25.4959, 19.1223, 12.7488, 6.3752, 0.0017};
-
-//const double HiornsAirwayWallFactory::mA[] = {98.0665*10.,98.0665*10.,98.0665*10.,98.0665*10.,98.0665*10.,98.0665*10.,98.0665*10.,98.0665*10.,98.0665*10.,98.0665*10.,98.0665*10.,98.0665*10.,98.0665*10.,98.0665*10.,98.0665*10.,98.0665*10.,98.0665*10.};
-
-const double HiornsAirwayWallFactory::mA[] = {0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.};
 
 
 HiornsAirwayWallFactory::HiornsAirwayWallFactory(bool useStrahlerOrder) : mpWalker(NULL), mUseStrahlerOrder(useStrahlerOrder)
@@ -100,10 +96,7 @@ double HiornsAirwayWallFactory::GetC2ForGeneration(unsigned generation)
 {
     return mC2[generation];
 }
-double HiornsAirwayWallFactory::GetAForGeneration(unsigned generation)
-{
-    return mA[generation];
-}
+
 double HiornsAirwayWallFactory::GetAlpha0ForGeneration(unsigned generation)
 {
     return mAlpha0[generation];
@@ -141,7 +134,6 @@ HiornsAirwayWall* HiornsAirwayWallFactory::CreateAirwayWallForElement(Element<1,
     double phi2 = mphi2[lower_generation] + (mphi2[upper_generation] - mphi2[lower_generation] )*(generation_factor - lower_generation);
     double C1 = mC1[lower_generation] + (mC1[upper_generation] - mC1[lower_generation] )*(generation_factor - lower_generation);
     double C2 = mC2[lower_generation] + (mC2[upper_generation] - mC2[lower_generation] )*(generation_factor - lower_generation);
-    double A = mA[lower_generation] + (mA[upper_generation] - mA[lower_generation] )*(generation_factor - lower_generation);    
 
     HiornsAirwayWall* wall = new HiornsAirwayWall;
     
@@ -150,7 +142,6 @@ HiornsAirwayWall* HiornsAirwayWallFactory::CreateAirwayWallForElement(Element<1,
     wall->Setphi2(phi2);
     wall->SetC1(C1);
     wall->SetC2(C2);
-    wall->SetA(A);
     wall->SetRIn(RIn);
     wall->SetROut(ROut);
 
