@@ -1076,8 +1076,6 @@ bool Hdf5DataWriter::GetUsingCache()
 
 void Hdf5DataWriter::WriteCache()
 {
-    ///\todo #2763 How to include this in timers?
-
     if ( mDataCache.empty() )
     {
         // Nothing to do.

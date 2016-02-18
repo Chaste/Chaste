@@ -594,8 +594,11 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::CloseFilesAndPos
         // Nothing to do
         return;
     }
+    HeartEventHandler::BeginEvent(HeartEventHandler::WRITE_OUTPUT);
+    // If write caching is on, the next line might actually take a significant amount of time.
     delete mpWriter;
     mpWriter = NULL;
+    HeartEventHandler::EndEvent(HeartEventHandler::WRITE_OUTPUT);
 
     FileFinder test_output(HeartConfig::Instance()->GetOutputDirectory(), RelativeTo::ChasteTestOutput);
 
