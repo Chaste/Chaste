@@ -262,6 +262,7 @@ public:
 
     /**
      * Whether we're caching writes
+     * @return whether we're caching writes
      */
     bool GetUsingCache();
 
