@@ -202,7 +202,7 @@ typename AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::ElementIterator
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::ElementIterator::ElementIterator(const std::set<unsigned>& rIndices,
-                                                                             AbstractMeshReader* pReader)
+                                                                             AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>* pReader)
     : mpIndices(&rIndices),
       mpReader(pReader)
 {
@@ -299,7 +299,7 @@ typename AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::NodeIterator
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::NodeIterator::NodeIterator(const std::set<unsigned>& rIndices,
-                                                                             AbstractMeshReader* pReader)
+                                                                             AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>* pReader)
     : mpIndices(&rIndices),
       mpReader(pReader)
 {

@@ -252,7 +252,7 @@ public:
          * @param index  the index of the item to point at
          * @param pReader  the mesh reader to iterate over
          */
-        ElementIterator(unsigned index, AbstractMeshReader* pReader)
+        ElementIterator(unsigned index, AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>* pReader)
             : mIndex(index),
               mpIndices(NULL),
               mpReader(pReader)
@@ -268,7 +268,7 @@ public:
          *
          */
         ElementIterator(const std::set<unsigned>& rIndices,
-                        AbstractMeshReader* pReader);
+                        AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>* pReader);
 
         /**
          * @return the index of the item pointed at.
@@ -329,7 +329,7 @@ public:
         std::set<unsigned>::const_iterator mIndicesIterator;
 
         /** The mesh reader we're iterating over. */
-        AbstractMeshReader* mpReader;
+        AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>* mpReader;
 
         /** Data for the last item read. */
         ElementData mLastDataRead;
@@ -389,7 +389,7 @@ public:
          * @param index  the index of the item to point at
          * @param pReader  the mesh reader to iterate over
          */
-        NodeIterator(unsigned index, AbstractMeshReader* pReader)
+        NodeIterator(unsigned index, AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>* pReader)
             : mIndex(index),
               mpIndices(NULL),
               mpReader(pReader)
@@ -405,7 +405,7 @@ public:
          *
          */
         NodeIterator(const std::set<unsigned>& rIndices,
-                     AbstractMeshReader* pReader);
+                     AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>* pReader);
 
         /**
          * @return the index of the item pointed at.
@@ -465,7 +465,7 @@ public:
         std::set<unsigned>::const_iterator mIndicesIterator;
 
         /** The mesh reader we're iterating over. */
-        AbstractMeshReader* mpReader;
+        AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>* mpReader;
 
         /** Data for the last item read. */
         std::vector<double> mLastDataRead;
