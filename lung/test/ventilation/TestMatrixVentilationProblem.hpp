@@ -183,6 +183,7 @@ public:
         TS_ASSERT_DELTA(flux[6], -7.102e-11, 1e-13); // (Inflow flux)
     }
 
+
     void TestThreeBifurcationsExtraLinksDirect() throw (Exception)
     {
         MatrixVentilationProblem problem("lung/test/data/three_bifurcations_extra_links", 0u);
@@ -321,6 +322,32 @@ public:
         TS_ASSERT_DELTA(pressure[6], 1.5e5, 1e-8); //BC
         TS_ASSERT_DELTA(pressure[7], 1.5e5, 1e-8); //BC
         TS_ASSERT_DELTA(flux[6], -4.424511e-7, 1e-11);
+#ifdef CHASTE_VTK
+        problem.WriteVtk("TestVentilation", "three_bifurcations_pedley");
+#endif
+    }
+
+    void TestThreeBifurcationsWithPerElementDynamicResistance() throw (Exception)
+    {
+        MatrixVentilationProblem problem("lung/test/data/three_bifurcations", 0u);
+        problem.SetMeshInMilliMetres();
+        problem.SetOutflowPressure(0.0);
+        problem.SetConstantInflowPressures(150000); //Needed to increase the resistance in these artificial airways
+        // Here's the set-up function with applies van Ertbruggen 2005
+        problem.SetPerGenerationDynamicResistance();
+
+        problem.Solve();
+        std::vector<double> flux, pressure;
+        problem.GetSolutionAsFluxesAndPressures(flux, pressure);
+        TS_ASSERT_DELTA(pressure[0], 0.0, 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[1], 75114.3782,   1e-1);
+        TS_ASSERT_DELTA(pressure[2], 125695.1375, 1e-2);
+        TS_ASSERT_DELTA(pressure[3], 125695.1375, 1e-2);
+        TS_ASSERT_DELTA(pressure[4], 1.5e5, 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[5], 1.5e5, 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[6], 1.5e5, 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[7], 1.5e5, 1e-8); //BC
+        TS_ASSERT_DELTA(flux[6], -6.2138e-7, 1e-11);  // -4.424511e-7 with Pedley. -7.1017e-7 with static
 #ifdef CHASTE_VTK
         problem.WriteVtk("TestVentilation", "three_bifurcations_pedley");
 #endif

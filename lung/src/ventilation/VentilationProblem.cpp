@@ -279,7 +279,6 @@ void VentilationProblem::FillInteractionMatrix(bool redoExisting)
         }
         else
         {
-            ///\todo Does this make so much difference?
             for (unsigned i=0; i<indices.size(); i++)
             {
                 MatSetValue(mTerminalInteractionMatrix, indices[i], indices[i], parent_resistance, ADD_VALUES);
