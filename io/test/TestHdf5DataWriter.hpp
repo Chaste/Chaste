@@ -361,6 +361,8 @@ public:
 
         TS_ASSERT_THROWS_THIS(writer.PutVector(node_id, petsc_data_1),
                               "Cached writes require an unlimited dimension.");
+
+        PetscTools::Destroy(petsc_data_1);
     }
 
     void TestHdf5DataWriterMultipleColumnsCachedFails() throw(Exception)
@@ -398,6 +400,8 @@ public:
         // Try and write ONE -> exception
         TS_ASSERT_THROWS_THIS(writer.PutVector(node_id, petsc_data_1),
                               "Cached writes must write all variables at once.");
+
+        PetscTools::Destroy(petsc_data_1);
     }
 
     void TestHdf5DataWriterNonEvenRowDistribution() throw(Exception)
