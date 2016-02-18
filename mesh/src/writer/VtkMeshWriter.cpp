@@ -193,11 +193,6 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::WriteFiles()
 #else
         p_writer->SetInput(mpVtkUnstructedMesh);
 #endif
-        //Uninitialised stuff arises (see #1079), but you can remove
-        //valgrind problems by removing compression:
-        // **** REMOVE WITH CAUTION *****
-        p_writer->SetCompressor(NULL);
-        // **** REMOVE WITH CAUTION *****
         std::string vtk_file_name = this->mpOutputFileHandler->GetOutputDirectoryFullPath() + this->mBaseName+".vtu";
         p_writer->SetFileName(vtk_file_name.c_str());
         //p_writer->PrintSelf(std::cout, vtkIndent());
@@ -734,11 +729,6 @@ void VtkMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(
 #else
             p_writer->SetInput(mpVtkUnstructedMesh);
 #endif
-            //Uninitialised stuff arises (see #1079), but you can remove
-            //valgrind problems by removing compression:
-            // **** REMOVE WITH CAUTION *****
-            p_writer->SetCompressor(NULL);
-            // **** REMOVE WITH CAUTION *****
             std::string pvtk_file_name = this->mpOutputFileHandler->GetOutputDirectoryFullPath() + this->mBaseName+ ".pvtu";
             p_writer->SetFileName(pvtk_file_name.c_str());
             //p_writer->PrintSelf(std::cout, vtkIndent());
