@@ -1146,6 +1146,7 @@ public:
             // Check values
             TS_ASSERT_EQUALS(p_monodomain_problem->GetTissue()->rGetCellsDistributed().size(),
                              num_cells);
+            TS_ASSERT(!p_monodomain_problem->mUseHdf5DataWriterCache);
 
             HeartConfig::Instance()->SetSimulationDuration(2.0); //ms
             p_monodomain_problem->Solve();
@@ -1531,7 +1532,7 @@ public:
             PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory;
             MonodomainProblem<2> monodomain_problem( &cell_factory );
             monodomain_problem.Initialise();
-
+            monodomain_problem.SetUseHdf5DataWriterCache(true); // cache on, for coveraging of archiving this
 
             HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
             HeartConfig::Instance()->SetCapacitance(1.0);
@@ -1557,6 +1558,7 @@ public:
         { // Load and run - first go
             MonodomainProblem<2> *p_monodomain_problem = CardiacSimulationArchiver<MonodomainProblem<2> >::Load(archive_location_1);
             HeartConfig::Instance()->SetSimulationDuration(1.0); //ms
+            TS_ASSERT(p_monodomain_problem->mUseHdf5DataWriterCache);
             p_monodomain_problem->Solve();
             CardiacSimulationArchiver<MonodomainProblem<2> >::Save(*p_monodomain_problem, archive_location_2);
             delete p_monodomain_problem;
@@ -1566,6 +1568,7 @@ public:
         { // Load and run - second go
             MonodomainProblem<2> *p_monodomain_problem = CardiacSimulationArchiver<MonodomainProblem<2> >::Load(archive_location_2);
             HeartConfig::Instance()->SetSimulationDuration(1.5); //ms
+            TS_ASSERT(p_monodomain_problem->mUseHdf5DataWriterCache);
             p_monodomain_problem->Solve();
             { // Check that the modifiers are still there
                 TS_ASSERT_EQUALS(p_monodomain_problem->mOutputModifiers.size(), 2u);
@@ -1598,10 +1601,11 @@ public:
 
         monodomain_problem.Initialise();
         monodomain_problem.Solve();
+        TS_ASSERT(monodomain_problem.mUseHdf5DataWriterCache);
 
-        // Doesn't really test that the cache was used (since this test would pass with cache turned off too)...
         TS_ASSERT(CompareFilesViaHdf5DataReader("MonodomainWithWriterCache", "MonodomainLR91_1d_with_cache", true,
-                                                "heart/test/data/MonodomainWithWriterCache", "MonodomainLR91_1d_with_cache", false));
+                                                "heart/test/data/MonodomainWithWriterCache", "MonodomainLR91_1d_with_cache", false,
+                                                2e-4));
     }
 
     void TestMonodomainProblemWithWriterCacheIncomplete() throw (Exception)
@@ -1623,9 +1627,11 @@ public:
 
         monodomain_problem.Initialise();
         monodomain_problem.Solve();
+        TS_ASSERT(monodomain_problem.mUseHdf5DataWriterCache);
 
         TS_ASSERT(CompareFilesViaHdf5DataReader("MonodomainWithWriterCacheIncomplete", "MonodomainLR91_1d_with_cache_incomplete", true,
-                                                "heart/test/data/MonodomainWithWriterCache", "MonodomainLR91_1d_with_cache_incomplete", false));
+                                                "heart/test/data/MonodomainWithWriterCache", "MonodomainLR91_1d_with_cache_incomplete", false,
+                                                1e-4));
     }
 };
 

@@ -101,10 +101,6 @@ Hdf5DataWriter::Hdf5DataWriter(DistributedVectorFactory& rVectorFactory,
 
     if (mUseExistingFile)
     {
-        if (mUseCache)
-        {
-            EXCEPTION("Extending and writer cache not supported."); ///TODO coverage
-        }
         // Variables should already be defined if we are extending.
         mIsInDefineMode = false;
 
@@ -194,6 +190,7 @@ Hdf5DataWriter::Hdf5DataWriter(DistributedVectorFactory& rVectorFactory,
             H5Sget_simple_extent_dims(timestep_dataspace, &num_timesteps, NULL);
             H5Sclose(timestep_dataspace);
             mCurrentTimeStep = (long)num_timesteps - 1;
+            mCacheFirstTimeStep = mCurrentTimeStep + 1;
 
             // Incomplete data?
             attribute_id = H5Aopen_name(mVariablesDatasetId, "IsDataComplete");
@@ -832,7 +829,7 @@ void Hdf5DataWriter::PutVector(int variableID, Vec petscVector)
     {
         if ( mUseCache )
         {
-            //Covered by TestHdf5DataWriterSingleColumnsCached
+            //Covered by TestHdf5DataWriterSingleColumnCached
             mDataCache.insert(mDataCache.end(), p_petsc_vector, p_petsc_vector+mNumberOwned);
         }
         else
@@ -1079,7 +1076,7 @@ bool Hdf5DataWriter::GetUsingCache()
 
 void Hdf5DataWriter::WriteCache()
 {
-    ///TODO How to include this in timers?
+    ///\todo #2763 How to include this in timers?
 
     if ( mDataCache.empty() )
     {
@@ -1095,8 +1092,9 @@ void Hdf5DataWriter::WriteCache()
     }
 
     // Select hyperslab in the file
-    //PRINT_3_VARIABLES(mCacheFirstTimeStep, mOffset, 0)
-    //PRINT_3_VARIABLES(mCurrentTimeStep-mCacheFirstTimeStep, mNumberOwned, mDatasetDims[2])
+//    PRINT_3_VARIABLES(mCacheFirstTimeStep, mOffset, 0)
+//    PRINT_3_VARIABLES(mCurrentTimeStep-mCacheFirstTimeStep, mNumberOwned, mDatasetDims[2])
+//    PRINT_VARIABLE(mDataCache.size())
     hsize_t start[DATASET_DIMS] = {mCacheFirstTimeStep, mOffset, 0};
     hsize_t count[DATASET_DIMS] = {mCurrentTimeStep-mCacheFirstTimeStep, mNumberOwned, mDatasetDims[2]};
     assert((mCurrentTimeStep-mCacheFirstTimeStep)*mNumberOwned*mDatasetDims[2] == mDataCache.size()); // Got size right?

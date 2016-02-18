@@ -204,9 +204,14 @@ private:
         SaveBoundaryConditions(archive, mpMesh, mpBoundaryConditionsContainer);
         SaveBoundaryConditions(archive, mpMesh, mpDefaultBoundaryConditionsContainer);
 
-        if (version>= 3)
+        if (version >= 3)
         {
             archive & mOutputModifiers;
+        }
+
+        if (version >= 4)
+        {
+            archive & mUseHdf5DataWriterCache;
         }
     }
 
@@ -323,9 +328,14 @@ private:
         mpBoundaryConditionsContainer = LoadBoundaryConditions(archive, mpMesh);
         mpDefaultBoundaryConditionsContainer = LoadBoundaryConditions(archive, mpMesh);
 
-        if (version>= 3)
+        if (version >= 3)
         {
             archive & mOutputModifiers;
+        }
+
+        if (version >= 4)
+        {
+            archive & mUseHdf5DataWriterCache;
         }
     }
 
@@ -856,7 +866,7 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM,  unsigned PROBLEM_DIM>
 struct version<AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM> >
 {
     ///Macro to set the version number of templated archive in known versions of Boost
-    CHASTE_VERSION_CONTENT(3);
+    CHASTE_VERSION_CONTENT(4);
 };
 } // namespace serialization
 } // namespace boost
