@@ -1,7 +1,11 @@
 import multiprocessing
-import subprocess
 import os
-import shutil
+import subprocess
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+import immersed_boundary as ib
 
 # Globally accessible directory paths and names
 path_to_exec   = os.environ.get('CHASTE_BUILD_DIR') + '/projects/ImmersedBoundary/apps/'
@@ -16,16 +20,13 @@ num_kicks_per_sim = 11
 
 def main():
     #run_simulations()
-    #combine_output()
-    plot_results()
+    make_movies_parallel()
+    # combine_output()
+    # plot_results()
 
 
 # Create a list of commands and pass them to separate processes
 def run_simulations():
-
-    # if os.path.isdir(path_to_output + exec_name):
-    #     print("Py: Deleting previous output")
-    #     shutil.rmtree(path_to_output + exec_name)
 
     # Make a list of calls to a Chaste executable
     command_list = []
@@ -52,9 +53,61 @@ def run_simulations():
 
 
 
+# Make an mp4 movie from each pvd file
+def make_movies_parallel():
+
+    print("Py: Combining chaste output to movies")
+
+    command_list = []
+    for global_const in range(num_global_consts):
+        for local_const in range(num_local_consts):
+            for kick in range(num_kicks_per_sim):
+                dir_name = path_to_output + exec_name + '/sim/' \
+                           + str(global_const) + '_' \
+                           + str(local_const) + '_' \
+                           + str(kick) + '/'
+
+                string_of_dir_name = '"' + dir_name + '"'
+
+                command_list.append("""python -c 'import immersed_boundary as ib; ib.pvd_to_mp4(""" + string_of_dir_name + """)'""")
+
+    # Use processes equal to the number of cpus available
+    count = multiprocessing.cpu_count()
+
+    print("Py: Creating movies from simulation output with " + str(count) + " processes")
+
+    # Generate a pool of workers
+    pool = multiprocessing.Pool(processes=count)
+
+    # Pass the list of bash commands to the pool
+
+    pool.map(execute_command, command_list)
+
+
 # This is a helper function for run_simulation that runs bash commands in separate processes
 def execute_command(cmd):
     return subprocess.call(cmd, shell=True)
+
+
+
+# Make an mp4 movie from each pvd file
+def make_movies():
+
+    print("Py: Combining chaste output to movies")
+
+    for global_const in range(num_global_consts):
+        for local_const in range(num_local_consts):
+            for kick in range(num_kicks_per_sim):
+                dir_name = path_to_output + exec_name + '/sim/' \
+                           + str(global_const) + '_' \
+                           + str(local_const) + '_' \
+                           + str(kick) + '/'
+
+                try:
+                    ib.pvd_to_mp4(dir_name)
+                except Exception as err:
+                    print(err)
+
 
 
 # Gather the output from all simulations and put it in the same file
@@ -86,9 +139,6 @@ def combine_output():
 def plot_results():
 
     print("Py: Plotting results")
-
-    import numpy as np
-    import matplotlib.pyplot as plt
 
     bg_gray = '0.75'
     bg_line_width = 0.5
