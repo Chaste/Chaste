@@ -314,7 +314,7 @@ endmacro(Chaste_DO_PROJECT)
 ##########################################################
 macro(Chaste_DO_APPS_COMMON component)
     include_directories("${Chaste_THIRD_PARTY_INCLUDE_DIRS}" "${Chaste_INCLUDE_DIRS}" "${CXXTEST_INCLUDES}")
-    file(GLOB Chaste_${component}_APPS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} src/*.cpp)
+    file(GLOB_RECURSE Chaste_${component}_APPS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} src/*.cpp)
     foreach(app ${Chaste_${component}_APPS})
         string(REGEX REPLACE ".*/([a-zA-Z0-9_]+)[.]cpp" "\\1" appName "${app}")
         if (${component} MATCHES "project_")
