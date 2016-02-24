@@ -111,7 +111,7 @@ def pvd_to_mp4(sim_dir):
         video_converter = 'ffmpeg'
 
     # Set how long you want the video to be (in seconds), and set the frame rate accordingly
-    video_duration = 10
+    video_duration = 10.0
     frame_rate = str(num_time_steps / video_duration)
 
     # Send the system command to run avconv/ffmpeg. Parameters:
