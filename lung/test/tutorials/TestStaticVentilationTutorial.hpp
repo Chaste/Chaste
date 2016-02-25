@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TESTSTATICVENTILATIONTUTORIAL_HPP_
 #define TESTSTATICVENTILATIONTUTORIAL_HPP_
 
-/* HOW_TO_TAG Lung/simulations
+/* HOW_TO_TAG Lung/Simulation
  * Calculate ventilation distribution in an airway tree for a given flow rate at the trachea
  */
 

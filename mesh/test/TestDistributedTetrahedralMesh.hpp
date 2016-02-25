@@ -2355,8 +2355,8 @@ public:
         }
     }
     /* HOW_TO_TAG Mesh
-     * Construct a distributed regular mesh (rectangle in 2D or cuboid in 3D) which is no does not have a
-     * regular split.  The default is for parallel code to split 2-D meshes into slices in the y-dimension
+     * Construct a distributed regular mesh (rectangle in 2D or cuboid in 3D) which does not have a default
+     * split plane.  The default is for parallel code to split 2-D meshes into slices in the y-dimension
      * and 3-D meshes in the z-dimension.
      */
     void TestConstructSlabMeshWithDimensionSplit() throw (Exception)

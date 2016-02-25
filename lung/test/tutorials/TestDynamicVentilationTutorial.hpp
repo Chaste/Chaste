@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TESTDYNAMICVENTILATIONTUTORIAL_HPP_
 #define TESTDYNAMICVENTILATIONTUTORIAL_HPP_
 
-/* HOW_TO_TAG Lung/simulations
+/* HOW_TO_TAG Lung/Simulation
  * Simulate ventilation on a full lung geometry with acinar dynamics over a breathing cycle.
  */
 

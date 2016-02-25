@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TESTSIMPLEIMPEDANCEPROBLEMTUTORIAL_HPP_
 #define TESTSIMPLEIMPEDANCEPROBLEMTUTORIAL_HPP_
 
-/* HOW_TO_TAG Lung/simulations
+/* HOW_TO_TAG Lung/Simulation
  * Calculate transfer impedance of an airway tree using a simple impedance model
  */
 
