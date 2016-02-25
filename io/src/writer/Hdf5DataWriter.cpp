@@ -311,14 +311,7 @@ void Hdf5DataWriter::OpenFile()
     }
     else
     {
-        // Do chunk size calculation now as it lets us optimise the size of the B tree (via H5Pset_istore_k), see:
-        // http://hdf-forum.184993.n3.nabble.com/size-of-quot-write-operation-quot-with-pHDF5-td2636129.html#a2647633
-        SetChunkSize();
         hid_t fcpl = H5Pcreate(H5P_FILE_CREATE);
-        if (mNumberOfChunks>64) // Default parameter is 32, so don't go lower than that
-        {
-            H5Pset_istore_k(fcpl, (mNumberOfChunks+1)/2);
-        }
         /*
          * Align objects to disk block size. Useful for striped filesystem e.g. Lustre
          * Ideally this should match the chunk size (see "target_size_in_bytes" below).

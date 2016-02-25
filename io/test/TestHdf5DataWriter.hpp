@@ -659,9 +659,6 @@ public:
         int ina_id = writer.DefineVariable("I_Na", "milliamperes");
         writer.DefineUnlimitedDimension("Time", "msec", 10);
 
-        // Set the chunk sizes (mostly for coverage)
-        writer.SetFixedChunkSize(3,5,3);
-
         writer.EndDefineMode();
 
         Vec petsc_data_1 = factory.CreateVec();
