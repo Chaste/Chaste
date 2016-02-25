@@ -1043,9 +1043,10 @@ unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetContainingElementIn
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetNearestElementIndexFromTestElements(const ChastePoint<SPACE_DIM>& rTestPoint,
-                                                                                         std::set<unsigned> testElements)
+                                                                                                 std::set<unsigned> testElements)
 {
     assert(testElements.size() > 0);
+    EXCEPT_IF_NOT(ELEMENT_DIM == SPACE_DIM); // CalculateInterpolationWeights hits an assertion otherwise
 
     double max_min_weight = -std::numeric_limits<double>::infinity();
     unsigned closest_index = 0;

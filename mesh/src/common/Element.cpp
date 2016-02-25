@@ -232,10 +232,10 @@ c_vector<double, SPACE_DIM+1> Element<ELEMENT_DIM, SPACE_DIM>::CalculateInterpol
 
     c_vector<double, SPACE_DIM+1> weights;
 
-    c_vector<double, SPACE_DIM> xi=CalculateXi(rTestPoint);
+    c_vector<double, SPACE_DIM> xi = CalculateXi(rTestPoint);
 
     // Copy 3 weights and compute the fourth weight
-    weights[0]=1.0;
+    weights[0] = 1.0;
     for (unsigned i=1; i<=SPACE_DIM; i++)
     {
         weights[0] -= xi[i-1];

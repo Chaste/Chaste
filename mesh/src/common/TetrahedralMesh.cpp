@@ -418,12 +418,13 @@ unsigned TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetContainingElementIndexWithI
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetNearestElementIndex(const ChastePoint<SPACE_DIM>& rTestPoint)
 {
+    EXCEPT_IF_NOT(ELEMENT_DIM == SPACE_DIM); // CalculateInterpolationWeights hits an assertion otherwise
     double max_min_weight = -std::numeric_limits<double>::infinity();
     unsigned closest_index = 0;
     for (unsigned i=0; i<this->mElements.size(); i++)
     {
-        c_vector<double, ELEMENT_DIM+1> weight=this->mElements[i]->CalculateInterpolationWeights(rTestPoint);
-        double neg_weight_sum=0.0;
+        c_vector<double, ELEMENT_DIM+1> weight = this->mElements[i]->CalculateInterpolationWeights(rTestPoint);
+        double neg_weight_sum = 0.0;
         for (unsigned j=0; j<=ELEMENT_DIM; j++)
         {
             if (weight[j] < 0.0)
