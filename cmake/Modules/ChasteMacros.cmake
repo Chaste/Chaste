@@ -114,7 +114,7 @@ macro(Chaste_ADD_TEST _testTargetName )
         add_custom_command(
             OUTPUT "${_test_real_output_filename}"
             DEPENDS ${ARGN}
-            COMMAND ${CXXTEST_TESTGEN_INTERPRETER} ${CXXTEST_TESTGEN_EXECUTABLE} ${CXXTEST_TESTGEN_ARGS} -o "${_test_real_output_filename}" ${ARGN}
+            COMMAND ${PYTHON_EXECUTABLE} ${CXXTEST_PYTHON_TESTGEN_EXECUTABLE} --error-printer -o "${_test_real_output_filename}" ${ARGN}
             )
 
         set_source_files_properties("${_test_real_output_filename}" PROPERTIES GENERATED true)
@@ -166,7 +166,7 @@ macro(Chaste_ADD_TEST _testTargetName )
     endif()
 
     if (post_command)
-        add_test(NAME ${_testTargetName} WORKING_DIRECTORY "${Chaste_SOURCE_DIR}/" 
+        add_test(NAME ${_testTargetName} WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/" 
             COMMAND ${CMAKE_COMMAND}
             -Denv_var=${env_var}
             -Denv_var_value=${env_var_value}
@@ -175,10 +175,10 @@ macro(Chaste_ADD_TEST _testTargetName )
             -Dpost_cmd=${post_command}
             -Dpost_args:string=${post_args}
             -Doutput_file=${output_file}
-            -P ${Chaste_SOURCE_DIR}/cmake/Modules/ChasteRunTestAndPostProcess.cmake)
+            -P ${Chaste_BINARY_DIR}/cmake/Modules/ChasteRunTestAndPostProcess.cmake)
     else()
         separate_arguments(test_args)
-        add_test(NAME ${_testTargetName} WORKING_DIRECTORY "${Chaste_SOURCE_DIR}/" 
+        add_test(NAME ${_testTargetName} WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/" 
             COMMAND ${test_command} ${test_args})
     endif()
     set_property(TEST ${testTargetName} PROPERTY PROCESSORS ${num_cpus})
@@ -217,6 +217,9 @@ endmacro(Chaste_GENERATE_TEST_NAME test outTestName)
 # layout
 ##########################################################
 macro(Chaste_DO_COMMON component)
+    if (NOT TARGET ${component})
+        add_custom_target(${component})
+    endif()
     if (NOT Chaste_${component}_INCLUDE_DIRS)
         set(Chaste_${component}_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
         header_dirs(${Chaste_${component}_SOURCE_DIR} Chaste_${component}_INCLUDE_DIRS)
@@ -287,7 +290,17 @@ macro(Chaste_DO_COMMON component)
 
     # Build applications if present
     if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/apps")
-        add_subdirectory(apps)
+        if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/apps/CMakeLists.txt")
+            set(Chaste_ENABLE_${component}_APPS ON CACHE BOOL "Generate the applications infrastructure for ${component} ")
+        else()
+            message(WARNING "No CMakeLists.txt file found in test directory ${CMAKE_CURRENT_SOURCE_DIR}/apps. Applications for ${component} will not be built")
+            set(Chaste_ENABLE_${component}_APPS OFF CACHE BOOL "Generate the applications infrastructure for ${component} ")
+        endif()
+        
+        # Do apps if requested
+        if(Chaste_ENABLE_${component}_APPS)
+            add_subdirectory(apps)
+        endif()
     endif()
 endmacro(Chaste_DO_COMMON)
 
@@ -337,7 +350,6 @@ macro(Chaste_DO_APPS_COMMON component)
     endforeach(app)
     if (Chaste_ENABLE_TESTING AND TEXTTEST_FOUND)
         configure_file(texttest/chaste/wrapper.cmake.in texttest/chaste/wrapper)
-        file(COPY ${Chaste_SOURCE_DIR}/python/infra/RoundResultsFiles.py DESTINATION ${Chaste_BINARY_DIR}/python/infra)
         file(GLOB test_directories texttest/*)
         foreach(tests_dir ${test_directories})
             file(RELATIVE_PATH acceptance_test ${CMAKE_CURRENT_SOURCE_DIR}/texttest ${tests_dir})
@@ -352,9 +364,9 @@ macro(Chaste_DO_APPS_COMMON component)
                 file(REMOVE_RECURSE ${texttest_output_dir})
                 file(MAKE_DIRECTORY ${texttest_report_dir})
                 file(MAKE_DIRECTORY ${texttest_output_dir})
-                execute_process(COMMAND  ${PYTHON_EXECUTABLE} ${TEXTTEST_PY} -d ${tests_dir} -b default -c ${Chaste_BINARY_DIR} 
+                execute_process(COMMAND  ${PYTHON_EXECUTABLE} ${TEXTTEST_PY} -d ${tests_dir} -b default -c ${CMAKE_BINARY_DIR} 
                     RESULT_VARIABLE result)
-                execute_process(COMMAND  ${PYTHON_EXECUTABLE} ${TEXTTEST_PY} -d ${tests_dir} -b default -c ${Chaste_BINARY_DIR} -coll web)
+                execute_process(COMMAND  ${PYTHON_EXECUTABLE} ${TEXTTEST_PY} -d ${tests_dir} -b default -c ${CMAKE_BINARY_DIR} -coll web)
                 if (result)
                     message(SEND_ERROR \"Error running acceptance test\")
                 endif()
@@ -398,8 +410,9 @@ endmacro(Chaste_DO_APPS_MAIN)
 ##########################################################
 macro(Chaste_DO_TEST_COMMON component)
     # make tutorial directories
-    file(MAKE_DIRECTORY ${Chaste_BINARY_DIR}/tutorials/UserTutorials)
-    file(MAKE_DIRECTORY ${Chaste_BINARY_DIR}/tutorials/PaperTutorials)
+    file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/tutorials)
+    file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/tutorials/UserTutorials)
+    file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/tutorials/PaperTutorials)
 
     # Figure out include path for tests
     header_dirs("${CMAKE_CURRENT_SOURCE_DIR}" Chaste_${component}_TEST_DIRS)
@@ -433,58 +446,61 @@ macro(Chaste_DO_TEST_COMMON component)
             file(STRINGS "${type}TestPack.txt" testpack)
             foreach(filename ${testpack})
                 string(STRIP ${filename} filename)
-                chaste_generate_test_name(${filename} "testTargetName")
-                set(parallel OFF)
-                set(exeTargetName ${testTargetName}Runner)
-                if (${type} STREQUAL "Parallel")
-                    set(testTargetName ${testTargetName}Parallel)
-                    set(parallel ON)
-                endif()
+                # TODO: support python tests
+                if (filename MATCHES ".hpp$")
+                    chaste_generate_test_name(${filename} "testTargetName")
+                    set(parallel OFF)
+                    set(exeTargetName ${testTargetName}Runner)
+                    if (${type} STREQUAL "Parallel")
+                        set(testTargetName ${testTargetName}Parallel)
+                        set(parallel ON)
+                    endif()
 
-                if (NOT DEFINED ${testTargetName})
-                    set(${testTargetName} ON)
-                    chaste_add_test(${testTargetName} "${CMAKE_CURRENT_SOURCE_DIR}/${filename}")
-                    if (BUILD_SHARED_LIBS)
-                        target_link_libraries(${exeTargetName} LINK_PUBLIC ${COMPONENT_LIBRARIES})
+                    if (NOT DEFINED ${testTargetName})
+                        set(${testTargetName} ON)
+                        chaste_add_test(${testTargetName} "${CMAKE_CURRENT_SOURCE_DIR}/${filename}")
+                        if (BUILD_SHARED_LIBS)
+                            target_link_libraries(${exeTargetName} LINK_PUBLIC ${COMPONENT_LIBRARIES})
+                        else()
+                            target_link_libraries(${exeTargetName} LINK_PUBLIC ${COMPONENT_LIBRARIES} ${Chaste_LIBRARIES} ${Chaste_THIRD_PARTY_LIBRARIES} )
+                        endif()
+                        set_target_properties(${exeTargetName} PROPERTIES LINK_FLAGS "${LINKER_FLAGS}")
+                        set_property(TEST ${testTargetName} PROPERTY LABELS ${component} ${type})
+                        add_dependencies(${component} ${exeTargetName})
+                        add_dependencies(${type} ${exeTargetName})
+
+                        if(NOT(${component} MATCHES "^project"))
+                            install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${testName}.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/${filename}"
+                                DESTINATION test/${component} COMPONENT  ${component}_tests)
+                        endif(NOT(${component} MATCHES "^project"))
+
+                        # filename is a user tutorial
+                        if(filename MATCHES "Test(.*)Tutorial.(hpp|py)") 
+                            set(out_filename  ${CMAKE_BINARY_DIR}/tutorials/UserTutorials/${CMAKE_MATCH_1})
+                            add_custom_command(OUTPUT ${out_filename}
+                                COMMAND ${PYTHON_EXECUTABLE} ARGS ${Chaste_BINARY_DIR}/python/utils/CreateTutorial.py ${CMAKE_CURRENT_SOURCE_DIR}/${filename} ${out_filename}
+                                DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${filename}
+                                COMMENT "Generating user tutorial ${out_filename}" VERBATIM)
+                            add_custom_target(${CMAKE_MATCH_1} DEPENDS ${out_filename})
+                            add_dependencies(tutorials ${CMAKE_MATCH_1})
+                        endif()
+
+                        # filename is a paper tutorial
+                        if(filename MATCHES "Test(.*)LiteratePaper.(hpp|py)") 
+                            set(out_filename  ${CMAKE_BINARY_DIR}/tutorials/PaperTutorials/${CMAKE_MATCH_1})
+                            add_custom_command(OUTPUT ${out_filename}
+                                COMMAND ${PYTHON_EXECUTABLE} ARGS ${Chaste_BINARY_DIR}/python/utils/CreateTutorial.py ${CMAKE_CURRENT_SOURCE_DIR}/${filename} ${out_filename} 
+                                DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${filename}
+                                COMMENT "Generating paper tutorial ${out_filename}" VERBATIM)
+                            add_custom_target(${CMAKE_MATCH_1} DEPENDS ${out_filename})
+                            add_dependencies(tutorials ${CMAKE_MATCH_1})
+                        endif()
+
                     else()
-                        target_link_libraries(${exeTargetName} LINK_PUBLIC ${COMPONENT_LIBRARIES} ${Chaste_LIBRARIES} ${Chaste_THIRD_PARTY_LIBRARIES} )
+                        get_property(myLabels TEST ${testTargetName} PROPERTY LABELS)
+                        list(APPEND myLabels ${type})
+                        set_property(TEST ${testTargetName} PROPERTY LABELS ${myLabels})
                     endif()
-                    set_target_properties(${exeTargetName} PROPERTIES LINK_FLAGS "${LINKER_FLAGS}")
-                    set_property(TEST ${testTargetName} PROPERTY LABELS ${component} ${type})
-                    add_dependencies(${component} ${exeTargetName})
-                    add_dependencies(${type} ${exeTargetName})
-
-                    if(NOT(${component} MATCHES "^project"))
-                        install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${testName}.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/${filename}"
-                            DESTINATION test/${component} COMPONENT  ${component}_tests)
-                    endif(NOT(${component} MATCHES "^project"))
-
-                    # filename is a user tutorial
-                    if(filename MATCHES "Test(.*)Tutorial.(hpp|py)") 
-                        set(out_filename  ${Chaste_BINARY_DIR}/tutorials/UserTutorials/${CMAKE_MATCH_1})
-                        add_custom_command(OUTPUT ${out_filename}
-                            COMMAND ${PYTHON_EXECUTABLE} ARGS ${Chaste_SOURCE_DIR}/python/utils/CreateTutorial.py ${CMAKE_CURRENT_SOURCE_DIR}/${filename} ${out_filename}
-                            DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${filename}
-                            COMMENT "Generating user tutorial ${out_filename}" VERBATIM)
-                        add_custom_target(${CMAKE_MATCH_1} DEPENDS ${out_filename})
-                        add_dependencies(tutorials ${CMAKE_MATCH_1})
-                    endif()
-
-                    # filename is a paper tutorial
-                    if(filename MATCHES "Test(.*)LiteratePaper.(hpp|py)") 
-                        set(out_filename  ${Chaste_BINARY_DIR}/tutorials/PaperTutorials/${CMAKE_MATCH_1})
-                        add_custom_command(OUTPUT ${out_filename}
-                            COMMAND ${PYTHON_EXECUTABLE} ARGS ${Chaste_SOURCE_DIR}/python/utils/CreateTutorial.py ${CMAKE_CURRENT_SOURCE_DIR}/${filename} ${out_filename} 
-                            DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${filename}
-                            COMMENT "Generating paper tutorial ${out_filename}" VERBATIM)
-                        add_custom_target(${CMAKE_MATCH_1} DEPENDS ${out_filename})
-                        add_dependencies(tutorials ${CMAKE_MATCH_1})
-                    endif()
-
-                else()
-                    get_property(myLabels TEST ${testTargetName} PROPERTY LABELS)
-                    list(APPEND myLabels ${type})
-                    set_property(TEST ${testTargetName} PROPERTY LABELS ${myLabels})
                 endif()
             endforeach(filename ${testpack})
         endif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${type}TestPack.txt")

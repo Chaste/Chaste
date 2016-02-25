@@ -322,9 +322,10 @@ if (Chaste_USE_XERCES)
     add_definitions(-DCHASTE_XERCES)
 endif()
 
-set(CXXTEST_INCLUDES "${CMAKE_SOURCE_DIR}/cxxtest")
-
 add_definitions(-DTRILIBRARY -DTETLIBRARY -DANSI_DECLARATORS)
+
+set(CXXTEST_INCLUDES "${Chaste_BINARY_DIR}/cxxtest")
+set(CXXTEST_PYTHON_TESTGEN_EXECUTABLE ${CXXTEST_INCLUDES}/cxxtestgen.py)
 
 if (WIN32 OR CYGWIN)
 	#MS Includes
@@ -503,17 +504,35 @@ configure_file(${Chaste_SOURCE_DIR}/cmake/Config/ChasteConfig.cmake.in
 file(COPY ${Chaste_SOURCE_DIR}/cmake/Modules/ChasteMacros.cmake 
     DESTINATION ${Chaste_BINARY_DIR}/cmake/Modules)
 
+file(COPY ${Chaste_SOURCE_DIR}/cmake/Modules/ChasteRunTestAndPostProcess.cmake
+    DESTINATION ${Chaste_BINARY_DIR}/cmake/Modules)
+
+file(COPY ${Chaste_SOURCE_DIR}/python
+    DESTINATION ${Chaste_BINARY_DIR})
+
+file(COPY ${Chaste_SOURCE_DIR}/cxxtest
+    DESTINATION ${Chaste_BINARY_DIR})
+
+
 install(FILES
     "${Chaste_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/ChasteConfig.cmake"
     "${Chaste_BINARY_DIR}/ChasteTargets.cmake"
-    "${Chaste_SOURCE_DIR}/cmake/Modules/ChasteMacros.cmake"
+    "${Chaste_BINARY_DIR}/cmake/Modules/ChasteMacros.cmake"
+    "${Chaste_BINARY_DIR}/cmake/Modules/ChasteRunTestAndPostProcess"
     DESTINATION .
      COMPONENT Config)
 
 # Python folder
-install(DIRECTORY ${Chaste_SOURCE_DIR}/python
+install(DIRECTORY ${Chaste_BINARY_DIR}/python
     DESTINATION .
     COMPONENT Python)
+
+# Cxxtest folder
+install(DIRECTORY ${Chaste_BINARY_DIR}/cxxtest
+    DESTINATION .
+    COMPONENT Cxxtest)
+
+
 
 ####################
 #    COVERAGE      #
