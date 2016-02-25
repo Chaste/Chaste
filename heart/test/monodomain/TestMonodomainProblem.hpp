@@ -1587,6 +1587,11 @@ public:
         TS_ASSERT(comp_meshalyzer_original_order.CompareFiles(1e-3));
     }
 
+    /*
+     * HOW_TO_TAG Cardiac/Output
+     * On large-scale parallel simulations it is advantageous to cache HDF5 output and only
+     * write to disk at end of simulation (or at checkpoint).  This is achieved with `SetUseHdf5DataWriterCache()`
+     */
     void TestMonodomainProblemWithWriterCache() throw (Exception)
     {
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.01);

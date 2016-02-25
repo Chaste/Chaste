@@ -1076,7 +1076,10 @@ bool Hdf5DataWriter::GetUsingCache()
 
 void Hdf5DataWriter::WriteCache()
 {
-    if ( mDataCache.empty() )
+    // The HDF5 writes are collective which means that if a process has nothing to write from
+    // its cache then it must still proceed in step with the other processes.
+    bool any_nonempty_caches = PetscTools::ReplicateBool( !mDataCache.empty() );
+    if ( !any_nonempty_caches )
     {
         // Nothing to do.
         return;
