@@ -804,11 +804,15 @@ void Hdf5DataWriter::PutVector(int variableID, Vec petscVector)
     }
 
     // Define a dataset in memory for this process
-    hid_t memspace=0;
+    hid_t memspace;
     if (mNumberOwned != 0)
     {
         hsize_t v_size[1] = {mNumberOwned};
         memspace = H5Screate_simple(1, v_size, NULL);
+    }
+    else
+    {
+        memspace = H5Screate(H5S_NULL);
     }
 
     // Select hyperslab in the file
@@ -965,11 +969,15 @@ void Hdf5DataWriter::PutStripedVector(std::vector<int> variableIDs, Vec petscVec
         MatMult(mDoublePermutation, petscVector, output_petsc_vector);
     }
     // Define a dataset in memory for this process
-    hid_t memspace=0;
-    if (mNumberOwned !=0)
+    hid_t memspace;
+    if (mNumberOwned != 0)
     {
         hsize_t v_size[1] = {mNumberOwned*NUM_STRIPES};
         memspace = H5Screate_simple(1, v_size, NULL);
+    }
+    else
+    {
+        memspace = H5Screate(H5S_NULL);
     }
 
     // Select hyperslab in the file
@@ -1056,10 +1064,7 @@ void Hdf5DataWriter::PutStripedVector(std::vector<int> variableIDs, Vec petscVec
     VecRestoreArray(output_petsc_vector, &p_petsc_vector);
 
     H5Sclose(hyperslab_space);
-    if (mNumberOwned != 0)
-    {
-        H5Sclose(memspace);
-    }
+    H5Sclose(memspace);
     H5Pclose(property_list_id);
 
     if (petscVector != output_petsc_vector)
@@ -1085,11 +1090,15 @@ void Hdf5DataWriter::WriteCache()
         return;
     }
     // Define a dataset in memory for this process
-    hid_t memspace=0;
-    if (mNumberOwned !=0)
+    hid_t memspace;
+    if (mNumberOwned != 0)
     {
         hsize_t v_size[1] = {mDataCache.size()};
         memspace = H5Screate_simple(1, v_size, NULL);
+    }
+    else
+    {
+        memspace = H5Screate(H5S_NULL);
     }
 
     // Select hyperslab in the file
@@ -1110,10 +1119,7 @@ void Hdf5DataWriter::WriteCache()
     H5Dwrite(mVariablesDatasetId, H5T_NATIVE_DOUBLE, memspace, hyperslab_space, property_list_id, &mDataCache[0]);
 
     H5Sclose(hyperslab_space);
-    if (mNumberOwned != 0)
-    {
-        H5Sclose(memspace);
-    }
+    H5Sclose(memspace);
     H5Pclose(property_list_id);
 
     mCacheFirstTimeStep = mCurrentTimeStep; // Update where we got to

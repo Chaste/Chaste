@@ -299,20 +299,6 @@ public:
 
         writer.Close();
 
-//        if (PetscTools::AmMaster())
-//        {
-//            // call h5dump to take the binary hdf5 output file and print it
-//            // to a text file. Note that the first line of the txt file would
-//            // be the directory it has been printed to, but is this line is
-//            // removed by piping the output through sed to delete the first line
-//            OutputFileHandler handler("TestHdf5DataWriter",false);
-//            std::string file = handler.GetOutputDirectoryFullPath() + "/hdf5_test_multi_column.h5";
-//            std::string new_file = handler.GetOutputDirectoryFullPath() + "/hdf5_test_multi_column_dumped.txt";
-//            system( ("h5dump "+file+" | sed 1d > "+new_file).c_str() );
-//            FileComparison comparer(new_file, "io/test/data/hdf5_test_multi_column_dumped.txt");
-//            TS_ASSERT(comparer.CompareFiles());
-//        }
-
         TS_ASSERT(CompareFilesViaHdf5DataReader("TestHdf5DataWriter", "hdf5_test_multi_column", true,
             "io/test/data", "hdf5_test_multi_column", false));
 
@@ -625,7 +611,7 @@ public:
         std::vector<unsigned> node_numbers;
         node_numbers.push_back(21);
         node_numbers.push_back(47);
-        node_numbers.push_back(60);
+        node_numbers.push_back(48);
         writer.DefineFixedDimension(node_numbers, number_nodes);
 
         writer.EndDefineMode();
@@ -712,20 +698,7 @@ public:
 
         writer.Close();
 
-//        if (PetscTools::AmMaster())
-//        {
-//            // call h5dump to take the binary hdf5 output file and print it
-//            // to a text file. Note that the first line of the txt file would
-//            // be the directory it has been printed to, but is this line is
-//            // removed by piping the output through sed to delete the first line
-//            OutputFileHandler handler("TestHdf5DataWriter",false);
-//            std::string file = handler.GetOutputDirectoryFullPath() + "/hdf5_test_full_format.h5";
-//            std::string new_file = handler.GetOutputDirectoryFullPath() + "/hdf5_test_full_format_dumped.txt";
-//            system( ("h5dump "+file+" | sed 1d > "+new_file).c_str() );
-//            FileComparison comparer(new_file, "io/test/data/hdf5_test_full_format_dumped.txt");
-//            TS_ASSERT(comparer.CompareFiles());
-//        }
-         TS_ASSERT(CompareFilesViaHdf5DataReader("TestHdf5DataWriter", "hdf5_test_full_format", true,
+        TS_ASSERT(CompareFilesViaHdf5DataReader("TestHdf5DataWriter", "hdf5_test_full_format", true,
                                                  "io/test/data", "hdf5_test_full_format", false));
 
         PetscTools::Destroy(petsc_data_1);
@@ -978,13 +951,12 @@ public:
                               useCache);
 
         std::vector<unsigned> node_numbers;
-        node_numbers.push_back(21);
-        node_numbers.push_back(47);
-        node_numbers.push_back(60);
-        node_numbers.push_back(61);
-        node_numbers.push_back(62);
-        node_numbers.push_back(90);
-        node_numbers.push_back(95);
+        node_numbers.push_back(4);
+        node_numbers.push_back(8);
+        node_numbers.push_back(15);
+        node_numbers.push_back(16);
+        node_numbers.push_back(23);
+        node_numbers.push_back(42);
         writer.DefineFixedDimension(node_numbers, number_nodes);
 
         int vm_id = writer.DefineVariable("V_m","millivolts");
@@ -1021,25 +993,10 @@ public:
         }
         writer.Close();
 
-//        if (PetscTools::AmMaster())
-//        {
-//            // call h5dump to take the binary hdf5 output file and print it
-//            // to a text file. Note that the first line of the txt file would
-//            // be the directory it has been printed to, but is this line is
-//            // removed by piping the output through sed to delete the first line
-//            OutputFileHandler handler("TestHdf5DataWriter",false);
-//            std::string file = handler.GetOutputDirectoryFullPath() + "/hdf5_test_full_format_striped_incomplete.h5";
-//            std::string new_file = handler.GetOutputDirectoryFullPath() + "/hdf5_test_full_format_striped_incomplete_dumped.txt";
-//            system( ("h5dump "+file+" | sed 1d > "+new_file).c_str() );
-//            FileComparison comparer(new_file, "io/test/data/hdf5_test_full_format_striped_incomplete_dumped.txt");
-//            TS_ASSERT(comparer.CompareFiles());
-//        }
-
         TS_ASSERT(CompareFilesViaHdf5DataReader("TestHdf5DataWriter", outputFile, true,
                                                 "io/test/data", "hdf5_test_full_format_striped_incomplete", false));
 
         PetscTools::Destroy(petsc_data_long);
-        writer.Close();
 
         // Now cover two exceptions: one is the unsupported PutStripedVector for incomplete data and 3 vars...
         int first = writer.DefineVariable("first","millivolts");
@@ -1990,13 +1947,12 @@ public:
                               useCache);
 
         std::vector<unsigned> node_numbers;
-        node_numbers.push_back(21);
-        node_numbers.push_back(47);
-        node_numbers.push_back(60);
-        node_numbers.push_back(61);
-        node_numbers.push_back(62);
-        node_numbers.push_back(90);
-        node_numbers.push_back(95);
+        node_numbers.push_back(4);
+        node_numbers.push_back(8);
+        node_numbers.push_back(15);
+        node_numbers.push_back(16);
+        node_numbers.push_back(23);
+        node_numbers.push_back(42);
         writer.DefineFixedDimensionUsingMatrix(node_numbers, number_nodes);
 
         int vm_id = writer.DefineVariable("V_m","millivolts");
