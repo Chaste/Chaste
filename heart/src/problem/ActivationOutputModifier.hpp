@@ -73,6 +73,12 @@ private:
     /** Needed for serialization. */
     friend class boost::serialization::access;
 
+    /**
+     * Archive the output modifier, never used directly - boost uses this.
+     *
+     * @param archive the archive
+     * @param version the current version of this class
+     */
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
