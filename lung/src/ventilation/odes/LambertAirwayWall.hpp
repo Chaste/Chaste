@@ -117,7 +117,7 @@ public:
      */
     void SetRi(double Ri);
 
-private:
+
     /** The airway radius at zero transpulmonary pressure */
     double mRi;
 
@@ -135,6 +135,9 @@ private:
 
     /** The parameter n2 */
     double mN2;
+
+
+private:
 
     /** The pressure inside the airway */
     double mAirwayPressure;

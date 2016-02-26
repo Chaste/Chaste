@@ -119,6 +119,7 @@ public: // Tests should be public!
         flows.push_back(0.00017);
         flows.push_back(0.00083);
         flows.push_back(0.00167);
+        flows.push_back(0.003);
 
         /* Loop over the tracheal flow rates and solve */
         for (unsigned i = 0; i < flows.size(); ++i)
@@ -140,6 +141,11 @@ public: // Tests should be public!
              * airways.
              */
             std::cout << "Total bronchial pressure drop for a tracheal flow rate of " << flows[i] << " m^3/s is " << pressure[0] << " Pa.\n";
+
+
+           // cout << pressure[1] << endl;
+
+
         }
     }
 

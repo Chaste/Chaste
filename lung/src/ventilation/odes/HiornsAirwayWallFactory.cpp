@@ -50,7 +50,7 @@ const double HiornsAirwayWallFactory::mMaxGeneration = 16;
 
 //The below are values that can be returned for particular airway trees
 
-const double HiornsAirwayWallFactory::mmu[] = {64002., 62826., 8099., 3472., 1617., 778., 425., 241., 170., 125., 94.3, 70.3, 52.9, 34., 31.3, 24.4, 28.73};
+const double HiornsAirwayWallFactory::mmu[] = {64002., 62826., 8099., 3472., 1617., 778., 425., 241., 170., 125., 94.3, 70.3, 52.9, 34., 31.3, 24.4, 18.73};
 
 const double HiornsAirwayWallFactory::mphi1[] = {0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.};
 

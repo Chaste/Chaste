@@ -59,6 +59,40 @@ LambertAirwayWallFactory::~LambertAirwayWallFactory()
     }
 }
 
+
+
+
+double LambertAirwayWallFactory::GetAlpha0ForGeneration(unsigned generation)
+{
+    return mAlpha0[generation];
+}
+
+double LambertAirwayWallFactory::GetAlpha0PrimeForGeneration(unsigned generation)
+{
+    return mAlpha0Prime[generation];
+}
+
+double LambertAirwayWallFactory::GetN1ForGeneration(unsigned generation)
+{
+    return mN1[generation];
+}
+
+double LambertAirwayWallFactory::GetN2ForGeneration(unsigned generation)
+{
+    return mN2[generation];
+}
+
+
+
+
+
+
+
+
+
+
+
+
 LambertAirwayWall* LambertAirwayWallFactory::CreateAirwayWallForElement(Element<1,3>* pElement)
 {
     unsigned order = 0;
