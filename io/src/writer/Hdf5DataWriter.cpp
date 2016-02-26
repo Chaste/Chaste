@@ -323,6 +323,9 @@ void Hdf5DataWriter::OpenFile()
          * file, and set back to normal just after, so that the H5 file inherits these
          * settings, by uncommenting the lines below. Adjust the command for your
          * specific filesystem!
+         *
+         * A simpler solution (where supported) might be to use an environment variable, e.g.
+         * export MPICH_MPIIO_HINTS="*.h5:striping_factor=48:striping_unit=1048576"
          */
         /*
         std::string command;
@@ -1406,87 +1409,97 @@ void Hdf5DataWriter::CalculateChunkDims( unsigned targetSize, unsigned* pChunkSi
 
 void Hdf5DataWriter::SetChunkSize()
 {
-    /*
-     * The size in each dimension is increased in step until the size of
-     * the chunk exceeds a limit, or we end up with one big chunk.
-     *
-     * Also make sure we don't have too many chunks. Over 75 K makes the
-     * H5Pset_istore_k optimisation above very detrimental to performance
-     * according to "Notes from 31 July 2013" at:
-     * http://confluence.diamond.ac.uk/display/Europroj/Ulrik+Pederson+-+Excalibur+Notes
-     */
-    const unsigned recommended_max_number_chunks = 75000;
+/*
+ * * NOTES ON CHUNK SIZE AND ALIGNMENT *
+ *
+ * A few lines below this block of documentation we set the target chunk size
+ * to 128 K, which seems to be a good compromise for small problems (e.g. on a
+ * desktop PC). For larger problems, I/O performance often improves with
+ * increased chunk size. A sweet spot seems to be 1 M chunks.
+ *
+ * On a striped filesystem, for best performance set the chunk size and
+ * alignment (using `H5Pset_alignment` above) to the file stripe size. With
+ * `H5Pset_alignment`, every chunk starts at a multiple of the alignment value.
+ *
+ * To avoid wasting space, the chunk size should be an integer multiple of the
+ * alignment value. Note that the algorithm below automatically goes back one
+ * step after exceeding the chunk size, which minimises wasted space. To see
+ * why, consider the examples below.
+ *
+ * (Example 1) Say our file system uses 1 M stripes. If we set
+ *     target_size_in_bytes = 1024*1024;
+ * below and uncomment
+ *     H5Pset_alignment(fapl, 0, 1024*1024);
+ * above, i.e. aim for (slightly under) 1 M chunks and align them to 1 M
+ * boundaries, then the algorithm below will get as close as possible to 1 M
+ * chunks but not exceed it, so each chunk will be padded slightly to sit on
+ * the 1 M boundaries. Each chunk will therefore have its own stripe on the
+ * file system, which should give us the best bandwidth and least contention.
+ * Conclusion: this is optimal!
+ *
+ * Note: In general the algorithm can get very close to the target so the
+ * waste isn't bad. Typical utilization is 99.99% (check with "h5ls -v ...").
+ *
+ * (Example 2) We set
+ *     target_size_in_bytes = 1024*1024/8;
+ * and uncomment
+ *     H5Pset_alignment(fapl, 0, 1024*1024);
+ * i.e. 128 K chunks aligned to 1 M boundaries. This would pad every chunk to
+ * 1 M boundaries, wasting 7/8 of the space in the file! A file which might be
+ * 5 G with an efficient layout would be more like 40 G! Conclusion: setting
+ * the chunk size to less than the alignment value is very bad!
+ *
+ * (Example 3) Say our file system uses 1 M stripes. We set
+ *     target_size_in_bytes = 1024*1024*2;
+ * and uncomment
+ *     H5Pset_alignment(fapl, 0, 1024*1024);
+ * i.e. 2 M chunks aligned to 1 M boundaries. This might not be optimal, but
+ * it's OK, since the chunk size is (slightly under) twice the alignment, as in
+ * Example 1 the amount of padding would be very small. Each read/write would
+ * require accessing 2 stripes on the file system. Conclusion: a chunk size of
+ * an integer multiple of the alignment value is fine (but not optimal).
+ */
     if (mUseOptimalChunkSizeAlgorithm)
     {
-        /*
-         * The line below sets the chunk size to (just under) 128 K chunks, which
-         * seems to be a good compromise.
-         *
-         * For large problems performance usually improves with increased chunk size.
-         * A sweet spot seems to be 1 M chunks.
-         *
-         * On a striped filesystem, for best performance, try to match the chunk size
-         * and alignment (see "H5Pset_alignment" above) with the file stripe size.
-         */
-        unsigned target_size_in_bytes = 1024*1024/8; // 128 K
+        const unsigned target_size_in_bytes = 1024*1024/8; // 128 K
 
         unsigned target_size = 0;
         unsigned chunk_size_in_bytes;
         bool all_one_chunk;
 
-        // While we have too many chunks, make target_size_in_bytes larger
+        // While the chunks are too small, make mChunkSize[i]s larger, unless
+        // we end up with a chunk that spans the dataset.
         do
         {
-            // While the chunks are too small, make mChunkSize[i]s larger, unless
-            // we end up with a chunk that spans the dataset.
-            do
-            {
-                target_size++;
-                CalculateChunkDims(target_size, &chunk_size_in_bytes, &all_one_chunk);
-            }
-            while ( chunk_size_in_bytes < target_size_in_bytes && !all_one_chunk);
-
-            // Go one step back if the target size has been exceeded
-            if ( chunk_size_in_bytes > target_size_in_bytes && !all_one_chunk )
-            {
-                target_size--;
-                CalculateChunkDims(target_size, &chunk_size_in_bytes, &all_one_chunk);
-            }
-
-            mNumberOfChunks = CalculateNumberOfChunks();
-
-            /*
-            if ( PetscTools::AmMaster() )
-            {
-                std::cout << "Hdf5DataWriter dataset contains " << mNumberOfChunks << " chunks of " << chunk_size_in_bytes << " B." << std::endl;
-            }
-            */
-
-            target_size_in_bytes *= 2; // Increase target size for next iteration
+            target_size++;
+            CalculateChunkDims(target_size, &chunk_size_in_bytes, &all_one_chunk);
         }
-        while ( mNumberOfChunks > recommended_max_number_chunks );
+        while ( chunk_size_in_bytes < target_size_in_bytes && !all_one_chunk);
+
+        // Go one step back if the target size has been exceeded
+        if ( chunk_size_in_bytes > target_size_in_bytes && !all_one_chunk )
+        {
+            target_size--;
+            CalculateChunkDims(target_size, &chunk_size_in_bytes, &all_one_chunk);
+        }
     }
-    /*
-     * ... unless the user has set chunk dimensions explicitly, in which case
-     * use those. The program will exit if the size results in too many chunks.
-     */
     else
     {
+        /*
+         * User-provided chunk dims.
+         */
         for (unsigned i=0; i<DATASET_DIMS; ++i)
         {
             mChunkSize[i] = mFixedChunkSize[i];
         }
-
-        mNumberOfChunks = CalculateNumberOfChunks();
-
-        if ( mNumberOfChunks > recommended_max_number_chunks)
-        {
-            /*
-             * The user-defined HDF5 chunk size has resulted in over 75,000 chunks,
-             * which is known to be extremely detrimental to performance. Try
-             * increasing the chunk dimensions or (better) not using fixed chunk sizes.
-             */
-            NEVER_REACHED;
-        }
     }
+
+    mNumberOfChunks = CalculateNumberOfChunks();
+
+    /*
+    if ( PetscTools::AmMaster() )
+    {
+        std::cout << "Hdf5DataWriter dataset contains " << mNumberOfChunks << " chunks of " << chunk_size_in_bytes << " B." << std::endl;
+    }
+    */
 }
