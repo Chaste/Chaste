@@ -1209,7 +1209,7 @@ public:
         // Doesn't really test that the cache was used (since this test would pass with cache turned off too)...
         TS_ASSERT(CompareFilesViaHdf5DataReader("BidomainWithWriterCache", "BidomainLR91_1d_with_cache", true,
                                                 "heart/test/data/BidomainWithWriterCache", "BidomainLR91_1d_with_cache", false,
-                                                2e-4));
+                                                4e-4));
     }
 
     void TestBidomainProblemWithWriterCacheIncomplete() throw (Exception)
@@ -1234,7 +1234,7 @@ public:
 
         TS_ASSERT(CompareFilesViaHdf5DataReader("BidomainWithWriterCacheIncomplete", "BidomainLR91_1d_with_cache_incomplete", true,
                                                 "heart/test/data/BidomainWithWriterCache", "BidomainLR91_1d_with_cache_incomplete", false,
-                                                1e-4));
+                                                4e-4));
     }
 
     /* Disabled this one for now as it passes in an ugly way */
