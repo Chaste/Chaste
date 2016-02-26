@@ -106,6 +106,8 @@ private:
      * mLocalBoxes based on these neighbours.  The set of neighbours is either half or all
      * of the neighbours, depending on the function calling this method.
      *
+     * \todo Pass the neighbours parameter by const reference!
+     *
      * @param neighbours a vector of neighbours
      */
     void SetupLocalBoxes(std::vector<c_vector<int, DIM> > neighbours);

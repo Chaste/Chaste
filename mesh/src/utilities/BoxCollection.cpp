@@ -539,7 +539,7 @@ void BoxCollection<DIM>::SetupLocalBoxes(std::vector<c_vector<int, DIM> > neighb
          */
 
         // Find if the current indices are penultimate in any dimension in which collection is periodic
-        c_vector<bool,DIM> is_penultimate_periodic = IsIndexPenultimate(grid_indices);
+        c_vector<bool, DIM> is_penultimate_periodic = IsIndexPenultimate(grid_indices);
         unsigned num_penultimate_periodic_dimensions = 0;
 
         for (unsigned dim = 0 ; dim < DIM ; dim++)
@@ -598,7 +598,8 @@ void BoxCollection<DIM>::SetupLocalBoxes(std::vector<c_vector<int, DIM> > neighb
                     // X and Y
                     if (is_penultimate_periodic(0) && is_penultimate_periodic(1))
                     {
-                        c_vector<int,DIM> ultimate_indices = grid_indices;
+                        c_vector<int, DIM> ultimate_indices;
+                        ultimate_indices = grid_indices;
                         ultimate_indices(0) ++;
                         ultimate_indices(1) ++;
 
@@ -614,7 +615,8 @@ void BoxCollection<DIM>::SetupLocalBoxes(std::vector<c_vector<int, DIM> > neighb
                     // X and Z
                     if (is_penultimate_periodic(0) && is_penultimate_periodic(2))
                     {
-                        c_vector<int,DIM> ultimate_indices = grid_indices;
+                        c_vector<int, DIM> ultimate_indices;
+                        ultimate_indices = grid_indices;
                         ultimate_indices(0) ++;
                         ultimate_indices(2) ++;
 
@@ -630,7 +632,8 @@ void BoxCollection<DIM>::SetupLocalBoxes(std::vector<c_vector<int, DIM> > neighb
                     // Y and Z
                     if (is_penultimate_periodic(1) && is_penultimate_periodic(2))
                     {
-                        c_vector<int,DIM> ultimate_indices = grid_indices;
+                        c_vector<int, DIM> ultimate_indices;
+                        ultimate_indices = grid_indices;
                         ultimate_indices(1) ++;
                         ultimate_indices(2) ++;
 

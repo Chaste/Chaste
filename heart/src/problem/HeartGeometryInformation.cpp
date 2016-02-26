@@ -426,17 +426,17 @@ ChasteCuboid<SPACE_DIM> HeartGeometryInformation<SPACE_DIM>::CalculateBoundingBo
         unsigned global_index=rSurfaceNodes[surface_index];
         if (mpMesh->GetDistributedVectorFactory()->IsGlobalIndexLocal(global_index) )
         {
-            c_vector<double, SPACE_DIM> position = mpMesh->GetNode(global_index)->rGetLocation();
+            const c_vector<double, SPACE_DIM>& r_position = mpMesh->GetNode(global_index)->rGetLocation();
             //Update max/min
             for (unsigned i=0; i<SPACE_DIM; i++)
             {
-                if (position[i] < my_minimum_point[i])
+                if (r_position[i] < my_minimum_point[i])
                 {
-                    my_minimum_point[i] = position[i];
+                    my_minimum_point[i] = r_position[i];
                 }
-                if (position[i] > my_maximum_point[i])
+                if (r_position[i] > my_maximum_point[i])
                 {
-                    my_maximum_point[i] = position[i];
+                    my_maximum_point[i] = r_position[i];
                 }
             }
         }

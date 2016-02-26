@@ -262,11 +262,12 @@ MutableVertexMesh<2, 2>* Cylindrical2dVertexMesh::GetMeshForVtk()
         // Compute whether the element straddles either periodic boundary
         bool element_straddles_left_right_boundary = false;
 
-        c_vector<double, 2> this_node_location = elem_iter->GetNode(0)->rGetLocation();
+        const c_vector<double, 2>& r_this_node_location = elem_iter->GetNode(0)->rGetLocation();
         for (unsigned local_index=0; local_index<num_nodes_in_elem; local_index++)
         {
-            c_vector<double, 2> next_node_location = elem_iter->GetNode((local_index+1)%num_nodes_in_elem)->rGetLocation();
-            c_vector<double, 2> vector = next_node_location - this_node_location;
+            const c_vector<double, 2>& r_next_node_location = elem_iter->GetNode((local_index+1)%num_nodes_in_elem)->rGetLocation();
+            c_vector<double, 2> vector;
+            vector = r_next_node_location - r_this_node_location;
 
             if (fabs(vector[0]) > 0.5*mWidth)
             {
