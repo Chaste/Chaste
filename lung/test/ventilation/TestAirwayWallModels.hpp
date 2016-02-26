@@ -414,7 +414,7 @@ public:
 
             { //generation 2
                 HiornsAirwayWall* p_wall = factory.CreateAirwayWallForElement(mesh.GetElement(2u));
-                TS_ASSERT_DELTA(p_wall->mC1, 89690., 1e-6);
+                TS_ASSERT_DELTA(p_wall->mC1, 32.9000, 1e-6);
                 delete p_wall;
             }
 

@@ -76,6 +76,15 @@ public:
     virtual HiornsAirwayWall* CreateAirwayWallForElement(Element<1,3>* pElement);
     
     /**
+     * Creates a new Hiorns airway wall.
+     *
+     * Can be overridden to allow specialised subclasses of the model to be used.
+     *
+     * @return An airway wall object
+     */
+    virtual HiornsAirwayWall* CreateBasicAirwayWall();
+
+    /**
      * @param generation The generation number to get the parameter for
      * @return The parameter mu for the given generation
      */
@@ -130,7 +139,6 @@ public:
      * @param pMesh  the mesh for which to create acinar units.
      */
     virtual void SetMesh(AbstractTetrahedralMesh<1,3>* pMesh);
-
 
 private:
     /** Walker to determine order of airway elements */

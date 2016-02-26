@@ -50,15 +50,15 @@ const double HiornsAirwayWallFactory::mMaxGeneration = 16;
 
 //The below are values that can be returned for particular airway trees
 
-const double HiornsAirwayWallFactory::mmu[] = {64002., 60003., 56004., 52005., 48006., 44007., 40008., 36009., 32011., 28012., 24013., 20014., 16015., 12016., 8016.7, 4017.7, 18.7318};
+const double HiornsAirwayWallFactory::mmu[] = {64002., 62826., 8099., 3472., 1617., 778., 425., 241., 170., 125., 94.3, 70.3, 52.9, 34., 31.3, 24.4, 28.73};
 
 const double HiornsAirwayWallFactory::mphi1[] = {0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.};
 
 const double HiornsAirwayWallFactory::mphi2[] = {0.7854, 0.7363, 0.6872, 0.6381, 0.5890, 0.54, 0.4909, 0.4418, 0.3927, 0.3436, 0.2945, 0.2454, 0.1963, 0.1473, 0.0982, 0.0491, 0.};
 
-const double HiornsAirwayWallFactory::mC1[] = {179380., 168170., 156960., 145750., 134530., 123320., 112110., 100900., 89690., 78478., 67267., 56056., 44845., 33634., 22423., 11211., 0.2991};
+const double HiornsAirwayWallFactory::mC1[] = {179380., 176033., 8531., 2232., 930., 352., 157., 70.9, 32.9, 16.8, 8.9, 4.70, 2.56, 0.84, 0.83, 0.51, 0.299};
 
-const double HiornsAirwayWallFactory::mC2[] = {101.9786, 95.6050, 89.2314, 82.8579, 76.4843, 70.1108, 63.7372, 57.3637, 50.9901, 44.6166, 38.2430, 31.8694, 25.4959, 19.1223, 12.7488, 6.3752, 0.0017};
+const double HiornsAirwayWallFactory::mC2[] = {101.9786, 102.3, 9.31, 2.72, 0.893, 0.4415, 0.2264, 0.1289, 0.07906, 0.04733, 0.02941, 0.018297, 0.0115175, 0.009006, 0.004454616, 0.002782845, 0.00165941};
 
 
 HiornsAirwayWallFactory::HiornsAirwayWallFactory(bool useStrahlerOrder) : mpWalker(NULL), mUseStrahlerOrder(useStrahlerOrder)
@@ -135,7 +135,7 @@ HiornsAirwayWall* HiornsAirwayWallFactory::CreateAirwayWallForElement(Element<1,
     double C1 = mC1[lower_generation] + (mC1[upper_generation] - mC1[lower_generation] )*(generation_factor - lower_generation);
     double C2 = mC2[lower_generation] + (mC2[upper_generation] - mC2[lower_generation] )*(generation_factor - lower_generation);
 
-    HiornsAirwayWall* wall = new HiornsAirwayWall;
+    HiornsAirwayWall* wall = CreateBasicAirwayWall();
     
     wall->Setmu(mu);
     wall->Setphi1(phi1);
@@ -147,6 +147,12 @@ HiornsAirwayWall* HiornsAirwayWallFactory::CreateAirwayWallForElement(Element<1,
 
     return wall;
 }
+
+HiornsAirwayWall* HiornsAirwayWallFactory::CreateBasicAirwayWall()
+{
+    return new HiornsAirwayWall;
+}
+
 
 double HiornsAirwayWallFactory::GetPleuralPressureForAirway(double time, Element<1,3>* pElement)
 {
