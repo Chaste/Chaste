@@ -223,10 +223,11 @@ for src_file in src_files:
                             (src_line_stripped.startswith('return') and
                              src_line_stripped[6] in [';', ' ']) or
                             src_line_stripped.startswith('TERMINATE(') or
-                            (src_line_stripped.startswith('assert(DIM') or
-                             src_line_stripped.startswith('assert(ELEM_DIM') or
-                             src_line_stripped.startswith('assert(SPACE_DIM') or
-                             src_line_stripped.startswith('assert(ELEMENT_DIM')) or
+                            src_line_stripped.startswith('assert(DIM') or
+                            src_line_stripped.startswith('assert(ELEM_DIM') or
+                            src_line_stripped.startswith('assert(SPACE_DIM') or
+                            src_line_stripped.startswith('assert(ELEMENT_DIM') or
+                            src_line_stripped.startswith('EXCEPT_IF_NOT(ELEMENT_DIM') or
                             src_line_stripped.startswith('#') or
                             src_line_stripped.startswith('EXPORT_TEMPLATE') or
                             src_line_stripped.startswith('template class ') or
