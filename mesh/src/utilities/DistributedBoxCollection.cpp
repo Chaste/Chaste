@@ -1065,7 +1065,7 @@ void DistributedBoxCollection<DIM>::SetupAllLocalBoxes()
 }
 
 template<unsigned DIM>
-std::set<unsigned> DistributedBoxCollection<DIM>::GetLocalBoxes(unsigned boxIndex)
+std::set<unsigned>& DistributedBoxCollection<DIM>::rGetLocalBoxes(unsigned boxIndex)
 {
     // Make sure the box is locally owned
     assert(!(boxIndex < mMinBoxIndex) && !(mMaxBoxIndex<boxIndex));
@@ -1207,32 +1207,34 @@ void DistributedBoxCollection<DIM>::CalculateBoundaryNodePairs(std::vector<Node<
 }
 
 template<unsigned DIM>
-void DistributedBoxCollection<DIM>::AddPairsFromBox(unsigned boxIndex, std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours)
+void DistributedBoxCollection<DIM>::AddPairsFromBox(unsigned boxIndex,
+                                                    std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs,
+                                                    std::map<unsigned, std::set<unsigned> >& rNodeNeighbours)
 {
     // Get the box
-    Box<DIM> box = rGetBox(boxIndex);
+    Box<DIM>& r_box = rGetBox(boxIndex);
 
     // Get the set of nodes in this box
-    std::set< Node<DIM>* >& r_contained_nodes = box.rGetNodesContained();
+    const std::set< Node<DIM>* >& r_contained_nodes = r_box.rGetNodesContained();
 
     // Get the local boxes to this box
-    std::set<unsigned> local_boxes_indices = GetLocalBoxes(boxIndex);
+    const std::set<unsigned>& local_boxes_indices = rGetLocalBoxes(boxIndex);
 
     // Loop over all the local boxes
     for (std::set<unsigned>::iterator box_iter = local_boxes_indices.begin();
          box_iter != local_boxes_indices.end();
          box_iter++)
     {
-        Box<DIM>* p_neighbour_box;
+        Box<DIM>* p_neighbour_box;// = &mBoxes[*box_iter];
 
         // Establish whether box is locally owned or halo.
         if (GetBoxOwnership(*box_iter))
         {
-            p_neighbour_box = &mBoxes[mBoxesMapping[*box_iter]];
+            p_neighbour_box = &mBoxes[mBoxesMapping.at(*box_iter)];
         }
         else // Assume it is a halo.
         {
-            p_neighbour_box = &mHaloBoxes[mHaloBoxesMapping[*box_iter]];
+            p_neighbour_box = &mHaloBoxes[mHaloBoxesMapping.at(*box_iter)];
         }
         assert(p_neighbour_box);
 
@@ -1246,6 +1248,7 @@ void DistributedBoxCollection<DIM>::AddPairsFromBox(unsigned boxIndex, std::vect
         {
             // Get the index of the other node
             unsigned other_node_index = (*neighbour_node_iter)->GetIndex();
+            std::set<unsigned>& r_other_node_neighbours = rNodeNeighbours[other_node_index];
 
             // Loop over nodes in this box
             for (typename std::set<Node<DIM>*>::iterator node_iter = r_contained_nodes.begin();
@@ -1255,25 +1258,13 @@ void DistributedBoxCollection<DIM>::AddPairsFromBox(unsigned boxIndex, std::vect
                 unsigned node_index = (*node_iter)->GetIndex();
 
                 // If we're in the same box, then take care not to store the node pair twice
-                if (*box_iter == boxIndex)
-                {
-                    if (other_node_index > node_index)
-                    {
-                        rNodePairs.push_back(std::pair<Node<DIM>*, Node<DIM>*>((*node_iter), (*neighbour_node_iter)));
-                        if (mCalculateNodeNeighbours)
-                        {
-                            rNodeNeighbours[node_index].insert(other_node_index);
-                            rNodeNeighbours[other_node_index].insert(node_index);
-                        }
-                    }
-                }
-                else
+                if (*box_iter != boxIndex || other_node_index > node_index)
                 {
                     rNodePairs.push_back(std::pair<Node<DIM>*, Node<DIM>*>((*node_iter), (*neighbour_node_iter)));
                     if (mCalculateNodeNeighbours)
                     {
                         rNodeNeighbours[node_index].insert(other_node_index);
-                        rNodeNeighbours[other_node_index].insert(node_index);
+                        r_other_node_neighbours.insert(node_index);
                     }
                 }
 

@@ -328,7 +328,7 @@ public:
 
         if (box_collection.GetBoxOwnership(0))
         {
-            std::set<unsigned> local_boxes_to_box_0 = box_collection.GetLocalBoxes(0);
+            std::set<unsigned>& local_boxes_to_box_0 = box_collection.rGetLocalBoxes(0);
             std::set<unsigned> correct_answer_0;
             correct_answer_0.insert(0);
             correct_answer_0.insert(1); // Halo above
@@ -337,7 +337,7 @@ public:
 
         if (box_collection.GetBoxOwnership(1))
         {
-            std::set<unsigned> local_boxes_to_box_1 = box_collection.GetLocalBoxes(1);
+            std::set<unsigned>& local_boxes_to_box_1 = box_collection.rGetLocalBoxes(1);
             std::set<unsigned> correct_answer_1;
             correct_answer_1.insert(0); // Halo below
             correct_answer_1.insert(1);
@@ -347,7 +347,7 @@ public:
 
         if (box_collection.GetBoxOwnership(4))
         {
-            std::set<unsigned> local_boxes_to_box_4 = box_collection.GetLocalBoxes(4);
+            std::set<unsigned>& local_boxes_to_box_4 = box_collection.rGetLocalBoxes(4);
             std::set<unsigned> correct_answer_4;
             correct_answer_4.insert(3); // Halo below
             correct_answer_4.insert(4);
@@ -444,7 +444,7 @@ public:
 
         if (box_collection.GetBoxOwnership(0))
         {
-            std::set<unsigned> local_boxes_to_box_0 = box_collection.GetLocalBoxes(0);
+            std::set<unsigned>& local_boxes_to_box_0 = box_collection.rGetLocalBoxes(0);
 
             std::set<unsigned> correct_answer_0;
             correct_answer_0.insert(0);
@@ -455,7 +455,7 @@ public:
         }
         if (box_collection.GetBoxOwnership(3))
         {
-            std::set<unsigned> local_boxes_to_box_3 = box_collection.GetLocalBoxes(3);
+            std::set<unsigned>& local_boxes_to_box_3 = box_collection.rGetLocalBoxes(3);
             std::set<unsigned> correct_answer_3;
             correct_answer_3.insert(3);
             correct_answer_3.insert(2);
@@ -465,7 +465,7 @@ public:
         }
         if (box_collection.GetBoxOwnership(5))
         {
-            std::set<unsigned> local_boxes_to_box_5 = box_collection.GetLocalBoxes(5);
+            std::set<unsigned>& local_boxes_to_box_5 = box_collection.rGetLocalBoxes(5);
             std::set<unsigned> correct_answer_5;
             correct_answer_5.insert(0);
             correct_answer_5.insert(1);
@@ -480,7 +480,7 @@ public:
         }
         if (box_collection.GetBoxOwnership(10))
         {
-            std::set<unsigned> local_boxes_to_box_10 = box_collection.GetLocalBoxes(10);
+            std::set<unsigned>& local_boxes_to_box_10 = box_collection.rGetLocalBoxes(10);
             std::set<unsigned> correct_answer_10;
             correct_answer_10.insert(5); // Halo below 9
             correct_answer_10.insert(6); // Halo below 10
@@ -519,7 +519,7 @@ public:
         box_collection.SetupAllLocalBoxes();
         if (box_collection.GetBoxOwnership(0))
         {
-            std::set<unsigned> local_boxes_to_box_0 = box_collection.GetLocalBoxes(0);
+            std::set<unsigned>& local_boxes_to_box_0 = box_collection.rGetLocalBoxes(0);
 
             std::set<unsigned> correct_answer_0;
             correct_answer_0.insert(0);
@@ -532,7 +532,7 @@ public:
         }
         if (box_collection.GetBoxOwnership(3))
         {
-            std::set<unsigned> local_boxes_to_box_3 = box_collection.GetLocalBoxes(3);
+            std::set<unsigned>& local_boxes_to_box_3 = box_collection.rGetLocalBoxes(3);
             std::set<unsigned> correct_answer_3;
             correct_answer_3.insert(0);
             correct_answer_3.insert(2);
@@ -544,7 +544,7 @@ public:
         }
         if (box_collection.GetBoxOwnership(5))
         {
-            std::set<unsigned> local_boxes_to_box_5 = box_collection.GetLocalBoxes(5);
+            std::set<unsigned>& local_boxes_to_box_5 = box_collection.rGetLocalBoxes(5);
             std::set<unsigned> correct_answer_5;
             correct_answer_5.insert(0);
             correct_answer_5.insert(1);
@@ -559,7 +559,7 @@ public:
         }
         if (box_collection.GetBoxOwnership(10))
         {
-            std::set<unsigned> local_boxes_to_box_10 = box_collection.GetLocalBoxes(10);
+            std::set<unsigned>& local_boxes_to_box_10 = box_collection.rGetLocalBoxes(10);
             std::set<unsigned> correct_answer_10;
             correct_answer_10.insert(5);
             correct_answer_10.insert(6);
@@ -571,7 +571,7 @@ public:
         }
         if (box_collection.GetBoxOwnership(11))
         {
-            std::set<unsigned> local_boxes_to_box_11 = box_collection.GetLocalBoxes(11);
+            std::set<unsigned>& local_boxes_to_box_11 = box_collection.rGetLocalBoxes(11);
             std::set<unsigned> correct_answer_11;
             correct_answer_11.insert(4);
             correct_answer_11.insert(6);
@@ -608,7 +608,7 @@ public:
         box_collection.SetupAllLocalBoxes();
         if (box_collection.GetBoxOwnership(0))
         {
-            std::set<unsigned> local_boxes_to_box_0 = box_collection.GetLocalBoxes(0);
+            std::set<unsigned>& local_boxes_to_box_0 = box_collection.rGetLocalBoxes(0);
 
             std::set<unsigned> correct_answer_0;
             correct_answer_0.insert(0);
@@ -623,7 +623,7 @@ public:
         }
         if (box_collection.GetBoxOwnership(3))
         {
-            std::set<unsigned> local_boxes_to_box_3 = box_collection.GetLocalBoxes(3);
+            std::set<unsigned>& local_boxes_to_box_3 = box_collection.rGetLocalBoxes(3);
             std::set<unsigned> correct_answer_3;
             correct_answer_3.insert(3);
             correct_answer_3.insert(2);
@@ -637,7 +637,7 @@ public:
         }
         if (box_collection.GetBoxOwnership(5))
         {
-            std::set<unsigned> local_boxes_to_box_5 = box_collection.GetLocalBoxes(5);
+            std::set<unsigned>& local_boxes_to_box_5 = box_collection.rGetLocalBoxes(5);
             std::set<unsigned> correct_answer_5;
             correct_answer_5.insert(0);
             correct_answer_5.insert(1);
@@ -662,7 +662,7 @@ public:
         }
         if (box_collection.GetBoxOwnership(19))
         {
-            std::set<unsigned> local_boxes_to_box_19 = box_collection.GetLocalBoxes(19);
+            std::set<unsigned>& local_boxes_to_box_19 = box_collection.rGetLocalBoxes(19);
             std::set<unsigned> correct_answer_19;
             correct_answer_19.insert(2);
             correct_answer_19.insert(3);
@@ -680,7 +680,7 @@ public:
         }
         if (box_collection.GetBoxOwnership(22))
         {
-            std::set<unsigned> local_boxes_to_box_22 = box_collection.GetLocalBoxes(22);
+            std::set<unsigned>& local_boxes_to_box_22 = box_collection.rGetLocalBoxes(22);
             std::set<unsigned> correct_answer_22;
             correct_answer_22.insert(5);
             correct_answer_22.insert(6);
@@ -957,7 +957,7 @@ public:
         // hardcode a few checks on the 6 by 6 grid.
         if (box_collection.GetBoxOwnership(0))
         {
-            std::set<unsigned> local_boxes_to_box_0 = box_collection.GetLocalBoxes(0);
+            std::set<unsigned>& local_boxes_to_box_0 = box_collection.rGetLocalBoxes(0);
             std::set<unsigned> correct_answer_0;
             correct_answer_0.insert(0);
             correct_answer_0.insert(1);
@@ -967,7 +967,7 @@ public:
         }
         if (box_collection.GetBoxOwnership(4))
         {
-            std::set<unsigned> local_boxes_to_box_4 = box_collection.GetLocalBoxes(4);
+            std::set<unsigned>& local_boxes_to_box_4 = box_collection.rGetLocalBoxes(4);
             std::set<unsigned> correct_answer_4;
             correct_answer_4.insert(4);
             correct_answer_4.insert(5);
@@ -978,7 +978,7 @@ public:
         }
         if (box_collection.GetBoxOwnership(10))
         {
-            std::set<unsigned> local_boxes_to_box_10 = box_collection.GetLocalBoxes(10);
+            std::set<unsigned>& local_boxes_to_box_10 = box_collection.rGetLocalBoxes(10);
             std::set<unsigned> correct_answer_10;
             correct_answer_10.insert(10);
             correct_answer_10.insert(11);
@@ -989,7 +989,7 @@ public:
         }
         if (box_collection.GetBoxOwnership(35))
         {
-            std::set<unsigned> local_boxes_to_box_35 = box_collection.GetLocalBoxes(35);
+            std::set<unsigned>& local_boxes_to_box_35 = box_collection.rGetLocalBoxes(35);
             std::set<unsigned> correct_answer_35;
             correct_answer_35.insert(35);
             TS_ASSERT_EQUALS(local_boxes_to_box_35, correct_answer_35);
@@ -1885,7 +1885,7 @@ public:
 
         if (box_collection.GetBoxOwnership(0))
         {
-            std::set<unsigned> local_boxes_to_box_0 = box_collection.GetLocalBoxes(0);
+            std::set<unsigned>& local_boxes_to_box_0 = box_collection.rGetLocalBoxes(0);
             std::set<unsigned> correct_answer_0;
             correct_answer_0.insert(0);
             correct_answer_0.insert(1);
@@ -1903,7 +1903,7 @@ public:
             // We won't test for that here - there is a 2-d equivalent test.
             if (box_collection.GetBoxOwnership(13))
             {
-                std::set<unsigned> local_boxes_to_box_13 = box_collection.GetLocalBoxes(13);
+                std::set<unsigned>& local_boxes_to_box_13 = box_collection.rGetLocalBoxes(13);
                 std::set<unsigned> correct_answer_13;
                 correct_answer_13.insert(5);
                 correct_answer_13.insert(6);
@@ -1931,7 +1931,7 @@ public:
 
             if (box_collection.GetBoxOwnership(34))
             {
-                std::set<unsigned> local_boxes_to_box_34 = box_collection.GetLocalBoxes(34);
+                std::set<unsigned>& local_boxes_to_box_34 = box_collection.rGetLocalBoxes(34);
                 std::set<unsigned> correct_answer_34;
                 correct_answer_34.insert(26);
                 correct_answer_34.insert(34);
@@ -1949,7 +1949,7 @@ public:
 
             if (box_collection.GetBoxOwnership(35))
             {
-                std::set<unsigned> local_boxes_to_box_35 = box_collection.GetLocalBoxes(35);
+                std::set<unsigned>& local_boxes_to_box_35 = box_collection.rGetLocalBoxes(35);
                 std::set<unsigned> correct_answer_35;
                 correct_answer_35.insert(35);
                 if (PetscTools::GetNumProcs() == 3)

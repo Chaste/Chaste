@@ -297,7 +297,7 @@ public:
      * @param boxIndex the index of the box
      * @return the set containing the indices of boxes local to box boxIndex.
      */
-    std::set<unsigned> GetLocalBoxes(unsigned boxIndex);
+    std::set<unsigned>& rGetLocalBoxes(unsigned boxIndex);
 
     /**
      * @param pNode the node to test.
