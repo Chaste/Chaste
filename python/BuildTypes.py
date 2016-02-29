@@ -618,7 +618,7 @@ class GoogleProfile(GccDebug):
                                exefile, profile_file,
                                '>', os.path.join(self.output_dir, base+'.gif')])
         import socket
-        if socket.getfqdn().startswith('scoop'):
+        if os.path.exists('/usr/lib/libprofiler.so'):
             preload_hack = 'LD_PRELOAD=/usr/lib/libprofiler.so '
         else:
             preload_hack = ''
