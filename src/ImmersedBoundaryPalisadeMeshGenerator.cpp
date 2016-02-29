@@ -63,10 +63,10 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
     double cell_width = 1.0 / double(mNumCellsWide);
     double cell_height = mCellAspectRatio * cell_width;
 
-    if (cell_height > 1.0)
+    if (cell_height > 0.8)
     {
-        cell_width /= cell_height;
-        cell_height = 1.0;
+        cell_height = 0.8;
+        cell_width = cell_height / mCellAspectRatio;
     }
 
     // Generate a reference superellipse

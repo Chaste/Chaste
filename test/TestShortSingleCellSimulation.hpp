@@ -37,15 +37,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 #include "AbstractCellBasedTestSuite.hpp"
 
-// External library - not part of Chaste
-#include <fftw3.h>
-
 #include "OffLatticeSimulation.hpp"
 #include "StochasticDurationCellCycleModel.hpp"
 #include "CellsGenerator.hpp"
 #include "ImmersedBoundaryMesh.hpp"
 #include "ImmersedBoundarySimulationModifier.hpp"
-#include "SuperellipseGenerator.hpp"
+#include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
 #include "ImmersedBoundaryMembraneElasticityForce.hpp"
 
 #include "Debug.hpp"
@@ -60,45 +57,25 @@ public:
 
     void TestShortSingleCellSim() throw(Exception)
     {
-        Timer timer;
-        timer.Reset();
-
         /*
-         * Create an Immersed Boundary Mesh using a SuperellipseGenerator
-         *
-         * 1: Num nodes
-         * 2: Superellipse exponent
-         * 3: Width
-         * 4: Height
-         * 5: Bottom-left x
-         * 6: Botton-left y
+         * 1: Num cells
+         * 2: Num nodes per cell
+         * 3: Superellipse exponent
+         * 4: Superellipse aspect ratio
+         * 5: Random y-variation
+         * 6: Include membrane
          */
-        SuperellipseGenerator *p_gen = new SuperellipseGenerator(1024, 0.2, 0.3, 0.6, 0.35, 0.2);
+        ImmersedBoundaryPalisadeMeshGenerator gen(1, 256, 0.1, 2.5, 0.0, false);
+        ImmersedBoundaryMesh<2, 2>* p_mesh = gen.GetMesh();
 
-        // Generate a mesh using this superellipse
-        std::vector<c_vector<double, 2> > locations = p_gen->GetPointsAsVectors();
-        delete p_gen;
-
-        std::vector<Node<2>* > nodes;
-        for (unsigned node_idx = 0 ; node_idx < locations.size() ; node_idx++)
-        {
-            nodes.push_back(new Node<2>(node_idx, locations[node_idx], true));
-        }
-
-        std::vector<ImmersedBoundaryElement<2,2>* > elements;
-        elements.push_back(new ImmersedBoundaryElement<2,2>(0, nodes));
-
-        ImmersedBoundaryMesh<2,2> mesh(nodes, elements, 1024, 1024);
-
-        mesh.GetElement(0)->SetMembraneSpringConstant(1e8);
-        mesh.GetElement(0)->SetMembraneRestLength(0.25 * mesh.GetCharacteristicNodeSpacing());
+        p_mesh->SetNumGridPtsXAndY(512);
 
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
-        ImmersedBoundaryCellPopulation<2> cell_population(mesh, cells);
+        ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
 
         OffLatticeSimulation<2> simulator(cell_population);
 
@@ -109,6 +86,7 @@ public:
         // Add force laws
         MAKE_PTR_ARGS(ImmersedBoundaryMembraneElasticityForce<2>, p_boundary_force, (cell_population));
         p_main_modifier->AddImmersedBoundaryForce(p_boundary_force);
+        p_boundary_force->SetSpringConstant(0.5 * 1e7);
 
 
         // Set simulation properties
@@ -117,10 +95,6 @@ public:
         simulator.SetSamplingTimestepMultiple(10);
         simulator.SetEndTime(100.0);
 
-        double setup_time = timer.GetElapsedTime();
         simulator.Solve();
-        double sim_time = timer.GetElapsedTime() - setup_time;
-
-        PRINT_2_VARIABLES(setup_time, sim_time);
     }
 };
