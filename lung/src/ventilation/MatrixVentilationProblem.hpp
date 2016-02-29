@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MATRIXVENTILATIONPROBLEM_HPP_
 #define MATRIXVENTILATIONPROBLEM_HPP_
 
-#define LUNG_USE_KLU 1 //Uncomment to use a direct solver
+//#define LUNG_USE_KLU 1 //Uncomment to use a direct solver
 
 #include "AbstractVentilationProblem.hpp"
 #include "LinearSystem.hpp"
