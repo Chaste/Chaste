@@ -1144,13 +1144,8 @@ void DistributedBoxCollection<DIM>::CalculateNodePairs(std::vector<Node<DIM>*>& 
         }
     }
 
-    for (std::map<unsigned, unsigned>::iterator map_iter = mBoxesMapping.begin();
-            map_iter != mBoxesMapping.end();
-            ++map_iter)
+    for (unsigned box_index=mMinBoxIndex; box_index<=mMaxBoxIndex; box_index++)
     {
-        // Get the box global index
-        unsigned box_index = map_iter->first;
-
         AddPairsFromBox(box_index, rNodePairs, rNodeNeighbours);
     }
 }
@@ -1175,13 +1170,8 @@ void DistributedBoxCollection<DIM>::CalculateInteriorNodePairs(std::vector<Node<
         }
     }
 
-    for (std::map<unsigned, unsigned>::iterator map_iter = mBoxesMapping.begin();
-            map_iter != mBoxesMapping.end();
-            ++map_iter)
+    for (unsigned box_index=mMinBoxIndex; box_index<=mMaxBoxIndex; box_index++)
     {
-        // Get the box global index
-        unsigned box_index = map_iter->first;
-
         if (IsInteriorBox(box_index))
         {
             AddPairsFromBox(box_index, rNodePairs, rNodeNeighbours);
@@ -1192,13 +1182,8 @@ void DistributedBoxCollection<DIM>::CalculateInteriorNodePairs(std::vector<Node<
 template<unsigned DIM>
 void DistributedBoxCollection<DIM>::CalculateBoundaryNodePairs(std::vector<Node<DIM>*>& rNodes, std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours)
 {
-    for (std::map<unsigned, unsigned>::iterator map_iter = mBoxesMapping.begin();
-            map_iter != mBoxesMapping.end();
-            ++map_iter)
+    for (unsigned box_index=mMinBoxIndex; box_index<=mMaxBoxIndex; box_index++)
     {
-        // Get the box global index
-        unsigned box_index = map_iter->first;
-
         if (!IsInteriorBox(box_index))
         {
             AddPairsFromBox(box_index, rNodePairs, rNodeNeighbours);
@@ -1225,16 +1210,16 @@ void DistributedBoxCollection<DIM>::AddPairsFromBox(unsigned boxIndex,
          box_iter != local_boxes_indices.end();
          box_iter++)
     {
-        Box<DIM>* p_neighbour_box;// = &mBoxes[*box_iter];
+        Box<DIM>* p_neighbour_box;
 
         // Establish whether box is locally owned or halo.
         if (GetBoxOwnership(*box_iter))
         {
-            p_neighbour_box = &mBoxes[mBoxesMapping.at(*box_iter)];
+            p_neighbour_box = &mBoxes[*box_iter - mMinBoxIndex];
         }
         else // Assume it is a halo.
         {
-            p_neighbour_box = &mHaloBoxes[mHaloBoxesMapping.at(*box_iter)];
+            p_neighbour_box = &mHaloBoxes[mHaloBoxesMapping[*box_iter]];
         }
         assert(p_neighbour_box);
 
@@ -1278,14 +1263,12 @@ std::vector<int> DistributedBoxCollection<DIM>::CalculateNumberOfNodesInEachStri
 {
     std::vector<int> cell_numbers(mpDistributedBoxStackFactory->GetHigh() - mpDistributedBoxStackFactory->GetLow(), 0);
 
-    for (std::map<unsigned, unsigned>::iterator iter = mBoxesMapping.begin();
-            iter != mBoxesMapping.end();
-            ++iter)
+    for (unsigned global_index=mMinBoxIndex; global_index<=mMaxBoxIndex; global_index++)
     {
-        c_vector<unsigned, DIM> coords = CalculateCoordinateIndices(iter->first);
-        unsigned location_in_vector = coords[DIM-1]-mpDistributedBoxStackFactory->GetLow();
-
-        cell_numbers[location_in_vector] += mBoxes[iter->second].rGetNodesContained().size();
+        c_vector<unsigned, DIM> coords = CalculateCoordinateIndices(global_index);
+        unsigned location_in_vector = coords[DIM-1] - mpDistributedBoxStackFactory->GetLow();
+        unsigned local_index = global_index - mMinBoxIndex;
+        cell_numbers[location_in_vector] += mBoxes[local_index].rGetNodesContained().size();
     }
 
     return cell_numbers;

@@ -379,15 +379,15 @@ std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNodesWithinNeighbourhoodRadi
 
     // Get location
     Node<DIM>* p_node_i = this->GetNode(index);
-    c_vector<double, DIM> node_i_location = p_node_i->rGetLocation();
+    const c_vector<double, DIM>& r_node_i_location = p_node_i->rGetLocation();
 
     // Get set of 'candidate' neighbours.
-    std::set<unsigned> near_nodes = mNodeNeighbours.find(index)->second;
+    const std::set<unsigned>& r_near_nodes = mNodeNeighbours.find(index)->second;
 
     // Find which ones are actually close
-    for (std::set<unsigned>::iterator iter = near_nodes.begin();
-            iter != near_nodes.end();
-            ++iter)
+    for (std::set<unsigned>::iterator iter = r_near_nodes.begin();
+         iter != r_near_nodes.end();
+         ++iter)
     {
         // Be sure not to return the index itself.
         if ((*iter) != index)
@@ -395,10 +395,10 @@ std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNodesWithinNeighbourhoodRadi
             Node<DIM>* p_node_j = this->GetNode((*iter));
 
             // Get the location of this node
-            c_vector<double, DIM> node_j_location = p_node_j->rGetLocation();
+            const c_vector<double, DIM>& r_node_j_location = p_node_j->rGetLocation();
 
             // Get the vector the two nodes (using GetVectorFromAtoB to catch periodicities etc.)
-            c_vector<double, DIM> node_to_node_vector = mpNodesOnlyMesh->GetVectorFromAtoB(node_j_location,node_i_location);
+            c_vector<double, DIM> node_to_node_vector = mpNodesOnlyMesh->GetVectorFromAtoB(r_node_j_location, r_node_i_location);
 
             // Calculate the distance between the two nodes
             double distance_between_nodes = norm_2(node_to_node_vector);
@@ -425,11 +425,11 @@ std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsi
         EXCEPTION("mNodeNeighbours not set up. Call Update() before GetNeighbouringNodeIndices()");
     }
 
-    std::set<unsigned>     neighbouring_node_indices;
+    std::set<unsigned> neighbouring_node_indices;
 
     // Get location and radius of node
     Node<DIM>* p_node_i = this->GetNode(index);
-    c_vector<double, DIM> node_i_location = p_node_i->rGetLocation();
+    const c_vector<double, DIM>& r_node_i_location = p_node_i->rGetLocation();
     double radius_of_cell_i = p_node_i->GetRadius();
 
     // Make sure that the max_interaction distance is smaller than or equal to the box collection size
@@ -439,11 +439,11 @@ std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsi
     }
 
     // Get set of 'candidate' neighbours
-    std::set<unsigned> near_nodes = mNodeNeighbours.find(index)->second;
+    const std::set<unsigned>& r_near_nodes = mNodeNeighbours.find(index)->second;
 
     // Find which ones are actually close
-    for (std::set<unsigned>::iterator iter = near_nodes.begin();
-         iter != near_nodes.end();
+    for (std::set<unsigned>::iterator iter = r_near_nodes.begin();
+         iter != r_near_nodes.end();
          ++iter)
     {
         // Be sure not to return the index itself
@@ -452,10 +452,10 @@ std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsi
             Node<DIM>* p_node_j = this->GetNode((*iter));
 
             // Get the location of this node
-            c_vector<double, DIM> node_j_location = p_node_j->rGetLocation();
+            const c_vector<double, DIM>& r_node_j_location = p_node_j->rGetLocation();
 
             // Get the vector the two nodes (using GetVectorFromAtoB to catch periodicities etc.)
-            c_vector<double, DIM> node_to_node_vector = mpNodesOnlyMesh->GetVectorFromAtoB(node_j_location,node_i_location);
+            c_vector<double, DIM> node_to_node_vector = mpNodesOnlyMesh->GetVectorFromAtoB(r_node_j_location, r_node_i_location);
 
             // Calculate the distance between the two nodes
             double distance_between_nodes = norm_2(node_to_node_vector);
