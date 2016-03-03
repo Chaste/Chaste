@@ -3,6 +3,7 @@
 # A collection of macros useful for the Chaste project
 #
 # header_dirs(base_dir return_list) - recursivly finds Chaste header locations
+# cellml_dirs(base_dir return_list) - recursivly finds Chaste cellml locations
 # chaste_do_cellml(output_sources cellml_file dynamic) - convert cellml file to source files
 # chaste_add_test(_testTargetName) - add a new test
 # chaste_generate_test_name(test outTestName) - generate test name from source file
@@ -24,10 +25,8 @@
 macro(HEADER_DIRS base_dir return_list)
     set(new_list "")
     set(dir_list "")
-    #message("base dir = ${base_dir}")
 
     file(GLOB_RECURSE new_list ${base_dir}/*.hpp ${base_dir}/*.h)
-    #message("new list = ${new_list}")
     foreach(file_path ${new_list})
         get_filename_component(dir_path ${file_path} PATH)
         set(dir_list ${dir_list} ${dir_path})
@@ -35,9 +34,25 @@ macro(HEADER_DIRS base_dir return_list)
 
     list(REMOVE_DUPLICATES dir_list)
 
+    set(${return_list} ${dir_list})
+endmacro()
 
-    #message("return list = ${return_list}")
-    #message("dir list = ${dir_list}")
+##########################################################
+# cellml_dirs
+# 
+# A macro to recursively find Chaste cellml locations
+##########################################################
+macro(CELLML_DIRS base_dir return_list)
+    set(new_list "")
+    set(dir_list "")
+
+    file(GLOB_RECURSE new_list ${base_dir}/*.cellml)
+    foreach(file_path ${new_list})
+        get_filename_component(dir_path ${file_path} PATH)
+        set(dir_list ${dir_list} ${dir_path})
+    endforeach()
+
+    list(REMOVE_DUPLICATES dir_list)
 
     set(${return_list} ${dir_list})
 endmacro()
@@ -84,6 +99,7 @@ macro(Chaste_DO_CELLML output_sources cellml_file dynamic)
         COMMAND "${PYTHON_EXECUTABLE}" ${Chaste_PYTHON_DIR}/ConvertCellModel.py ${pycml_args} ${cellml_file}
         DEPENDS ${depends}
         COMMENT "Processing CellML file ${cellml_file_rel}" 
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         VERBATIM
         )
 
@@ -217,14 +233,44 @@ endmacro(Chaste_GENERATE_TEST_NAME test outTestName)
 # layout
 ##########################################################
 macro(Chaste_DO_COMMON component)
+    add_definitions(-DCOMPONENT_SOURCE_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\")
     if (NOT TARGET ${component})
         add_custom_target(${component})
     endif()
+
+    # check if include dirs exists yet, and generate it if not
     if (NOT Chaste_${component}_INCLUDE_DIRS)
         set(Chaste_${component}_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
-        header_dirs(${Chaste_${component}_SOURCE_DIR} Chaste_${component}_INCLUDE_DIRS)
+        header_dirs(${Chaste_${component}_SOURCE_DIR} Chaste_${component}_SOURCE_INCLUDE_DIRS)
+        cellml_dirs(${Chaste_${component}_SOURCE_DIR} Chaste_${component}_CELLML_DIRS)
+
+        # generate include dirs
+        set(Chaste_${component}_INCLUDE_DIRS ${Chaste_${component}_SOURCE_INCLUDE_DIRS})
+        foreach(dir ${Chaste_${component}_CELLML_DIRS})
+            file(RELATIVE_PATH rel_dir ${CMAKE_CURRENT_SOURCE_DIR} ${dir})
+            list(APPEND Chaste_${component}_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/${rel_dir})
+        endforeach()
     endif()
 
+    # Find source files
+    file(GLOB_RECURSE Chaste_${component}_SOURCES 
+        RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp 
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/*.hpp)
+
+    # Generate additional source files from cellml
+    set(Chaste_${component}_SOURCES_CELLML)
+    foreach(cellml_dir ${Chaste_${component}_CELLML_DIRS})
+        file(RELATIVE_PATH cellml_rel_dir ${CMAKE_CURRENT_SOURCE_DIR} ${cellml_dir})
+        set(cellml_output_dir ${CMAKE_CURRENT_BINARY_DIR}/${cellml_rel_dir})
+        file(MAKE_DIRECTORY ${cellml_output_dir})
+        file(GLOB cellml_files ${cellml_dir}/*.cellml)
+        foreach(cellml_file ${cellml_files})
+            chaste_do_cellml(Chaste_${component}_SOURCES ${cellml_file} OFF  "--output-dir" ${cellml_output_dir})
+        endforeach()
+    endforeach()
+
+    # Add include directories
     if (Chaste_THIRD_PARTY_INCLUDE_DIRS)
         include_directories(SYSTEM "${Chaste_THIRD_PARTY_INCLUDE_DIRS}")
     endif()
@@ -236,11 +282,6 @@ macro(Chaste_DO_COMMON component)
     endif()
 
     # Make component library
-    file(GLOB_RECURSE Chaste_${component}_SOURCES 
-        RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp 
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/*.hpp)
-
     add_library(chaste_${component} ${Chaste_${component}_SOURCES} ${ARGN})
     if (BUILD_SHARED_LIBS)
         target_link_libraries(chaste_${component} LINK_PUBLIC ${Chaste_LIBRARIES})
@@ -264,11 +305,22 @@ macro(Chaste_DO_COMMON component)
 
 
     if(NOT(${component} MATCHES "^project"))
+        # install component library
         install(TARGETS chaste_${component} 
-            DESTINATION lib COMPONENT ${component}_libraries)
+            EXPORT chaste-targets
+            DESTINATION lib/chaste 
+            COMPONENT ${component}_libraries)
 
+        # install component headers
         install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/src/"
-            DESTINATION include/${component}
+            DESTINATION include/chaste/${component}
+            COMPONENT ${component}_headers
+            FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp"
+            )
+
+        # install generated headers
+        install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/src/"
+            DESTINATION include/chaste/${component}
             COMPONENT ${component}_headers
             FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp"
             )
@@ -449,6 +501,7 @@ macro(Chaste_DO_TEST_COMMON component)
                 # TODO: support python tests
                 if (filename MATCHES ".hpp$")
                     chaste_generate_test_name(${filename} "testTargetName")
+                    set(old_testTargetName ${testTargetName})
                     set(parallel OFF)
                     set(exeTargetName ${testTargetName}Runner)
                     if (${type} STREQUAL "Parallel")
@@ -469,10 +522,10 @@ macro(Chaste_DO_TEST_COMMON component)
                         add_dependencies(${component} ${exeTargetName})
                         add_dependencies(${type} ${exeTargetName})
 
-                        if(NOT(${component} MATCHES "^project"))
-                            install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${testName}.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/${filename}"
-                                DESTINATION test/${component} COMPONENT  ${component}_tests)
-                        endif(NOT(${component} MATCHES "^project"))
+                        if (Chaste_INSTALL_TESTS AND NOT(${component} MATCHES "^project")) 
+                            install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${old_testTargetName}.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/${filename}"
+                                DESTINATION lib/chaste/tests/${component} COMPONENT  ${component}_tests)
+                        endif()
 
                         # filename is a user tutorial
                         if(filename MATCHES "Test(.*)Tutorial.(hpp|py)") 

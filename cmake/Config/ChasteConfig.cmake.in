@@ -17,6 +17,7 @@ set(Chaste_VERSION_MINOR @Chaste_VERSION_MINOR@)
 # If not in a build tree set required variables
 if(NOT TARGET global AND NOT Chaste_BINARY_DIR)
     set(Chaste_BINARY_DIR ${Chaste_CMAKE_DIR})
+    message("-- Found Chaste libraries in ${Chaste_BINARY_DIR}")
     add_definitions(-DCHASTE_CMAKE)
 
     set(Chaste_USE_VTK @Chaste_USE_VTK@)

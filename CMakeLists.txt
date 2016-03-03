@@ -14,7 +14,7 @@ include(ChasteCompilerFlags)
 include(ChasteMacros)
 
 set (Chaste_VERSION_MAJOR 3 CACHE STRING "Chaste major version number")
-set (Chaste_VERSION_MINOR 3 CACHE STRING "Chaste minor version number")
+set (Chaste_VERSION_MINOR 4 CACHE STRING "Chaste minor version number")
 
 set(Chaste_NUM_CPUS_TEST 1 CACHE STRING  "Number of cpus to use when running tests.")
 
@@ -104,6 +104,7 @@ option(BUILD_SHARED_LIBS
 endif()
 
 option(Chaste_ENABLE_TESTING "Enable Chaste Testing" ON)
+option(Chaste_INSTALL_TESTS "Install Chaste Testing infrastructure" OFF)
 
 #Some Chaste-specific #defines
 add_definitions(-DCHASTE_CMAKE)
@@ -427,8 +428,21 @@ endforeach()
 
 foreach(component ${Chaste_COMPONENTS})
     set(Chaste_${component}_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/${component}/src")
-    header_dirs(${Chaste_${component}_SOURCE_DIR} Chaste_${component}_INCLUDE_DIRS)
+    header_dirs(${Chaste_${component}_SOURCE_DIR} Chaste_${component}_SOURCE_INCLUDE_DIRS)
+    cellml_dirs(${Chaste_${component}_SOURCE_DIR} Chaste_${component}_CELLML_DIRS)
 endforeach(component)
+
+# for now, assume only heart has xsd files
+set(Chaste_heart_XSD_DIRS ${Chaste_heart_SOURCE_DIR}/io)
+
+# generate include dirs
+foreach(component ${Chaste_COMPONENTS})
+    set(Chaste_${component}_INCLUDE_DIRS ${Chaste_${component}_SOURCE_INCLUDE_DIRS})
+    foreach(dir ${Chaste_${component}_CELLML_DIRS} ${Chaste_${component}_XSD_DIRS})
+        file(RELATIVE_PATH rel_dir "${Chaste_SOURCE_DIR}" "${dir}")
+        list(APPEND Chaste_${component}_INCLUDE_DIRS ${Chaste_BINARY_DIR}/${rel_dir})
+    endforeach()
+endforeach()
 
 set(Chaste_PYTHON_DIR "${Chaste_SOURCE_DIR}/python")
 
@@ -482,9 +496,9 @@ export(TARGETS ${Chaste_ALL_LIBRARIES}
 set(EXPORT_Chaste_PYTHON_DIR "\${Chaste_CMAKE_DIR}/python")
 foreach(component ${Chaste_COMPONENTS})
     set(EXPORT_Chaste_${component}_INCLUDE_DIRS "")
-    foreach(dir ${Chaste_${component}_INCLUDE_DIRS})
-        file(RELATIVE_PATH rel_dir "${Chaste_SOURCE_DIR}" "${dir}")
-        list(APPEND EXPORT_Chaste_${component}_INCLUDE_DIRS "\${Chaste_CMAKE_DIR}/include/${rel_dir}")
+    foreach(dir ${Chaste_${component}_SOURCE_INCLUDE_DIRS} ${Chaste_${component}_CELLML_DIRS} ${Chaste_${component}_XSD_DIRS})
+        file(RELATIVE_PATH rel_dir "${Chaste_SOURCE_DIR}/${component}/src" "${dir}")
+        list(APPEND EXPORT_Chaste_${component}_INCLUDE_DIRS "\${Chaste_CMAKE_DIR}/../../include/chaste/${component}/${rel_dir}")
     endforeach()
 endforeach(component)
 
@@ -499,7 +513,6 @@ endforeach(component)
 
 configure_file(${Chaste_SOURCE_DIR}/cmake/Config/ChasteConfig.cmake.in
     "${Chaste_BINARY_DIR}/ChasteConfig.cmake" @ONLY)
-
 
 file(COPY ${Chaste_SOURCE_DIR}/cmake/Modules/ChasteMacros.cmake 
     DESTINATION ${Chaste_BINARY_DIR}/cmake/Modules)
@@ -517,20 +530,34 @@ file(COPY ${Chaste_SOURCE_DIR}/cxxtest
 install(FILES
     "${Chaste_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/ChasteConfig.cmake"
     "${Chaste_BINARY_DIR}/ChasteTargets.cmake"
+    DESTINATION lib/chaste
+    COMPONENT Config)
+
+install(FILES
     "${Chaste_BINARY_DIR}/cmake/Modules/ChasteMacros.cmake"
-    "${Chaste_BINARY_DIR}/cmake/Modules/ChasteRunTestAndPostProcess"
-    DESTINATION .
-     COMPONENT Config)
+    "${Chaste_BINARY_DIR}/cmake/Modules/ChasteRunTestAndPostProcess.cmake"
+    DESTINATION lib/chaste/cmake/Modules
+    COMPONENT Config)
+
+# CxxTest folder
+install(DIRECTORY ${Chaste_BINARY_DIR}/cxxtest
+    DESTINATION lib/chaste
+    USE_SOURCE_PERMISSIONS
+    COMPONENT CxxTest)
 
 # Python folder
 install(DIRECTORY ${Chaste_BINARY_DIR}/python
-    DESTINATION .
+    DESTINATION lib/chaste
+    USE_SOURCE_PERMISSIONS
     COMPONENT Python)
 
-# Cxxtest folder
-install(DIRECTORY ${Chaste_BINARY_DIR}/cxxtest
-    DESTINATION .
-    COMPONENT Cxxtest)
+# libraries
+install(EXPORT chaste-targets 
+        DESTINATION lib/chaste
+        FILE ChasteTargets.cmake
+        #EXPORT_LINK_INTERFACE_LIBRARIES
+        COMPONENT ChasteTargets
+        )
 
 
 
@@ -648,17 +675,22 @@ SET(CPACK_PACKAGE_VERSION_MINOR "${Chaste_VERSION_MINOR}")
 SET(CPACK_PACKAGE_VERSION_PATCH "${chaste_revision}")
 
 
+set(CPACK_COMPONENT_Config_GROUP "config")
+set(CPACK_COMPONENT_Config_DESCRIPTION "configuration files")
+set(CPACK_COMPONENT_Config_DISPLAY_NAME "Config files")
+
+set(CPACK_COMPONENT_Python_GROUP "python")
+set(CPACK_COMPONENT_Python_DESCRIPTION "Support python files for Chaste project")
+set(CPACK_COMPONENT_Python_DISPLAY_NAME "Python")
+
+set(CPACK_COMPONENT_CxxTest_GROUP "cxxtest")
+set(CPACK_COMPONENT_CxxTest_DESCRIPTION "Bundled CxxTest library (http://cxxtest.com/)")
+set(CPACK_COMPONENT_CxxTest_DISPLAY_NAME "CxxTest")
+
 foreach(component ${Chaste_COMPONENTS})
     set(CPACK_COMPONENT_${component}_libraries_GROUP "libraries")
     set(CPACK_COMPONENT_${component}_headers_GROUP "headers")
-    set(CPACK_COMPONENT_${component}_tests_GROUP "tests")
-
-
-    set(CPACK_COMPONENT_${component}_headers_GROUP "headers")
-    set(CPACK_COMPONENT_${component}_tests_GROUP "tests")
-
     set(CPACK_COMPONENT_${component}_headers_DESCRIPTION "C++ header files (.hpp) for Chaste component ${component}")
-    set(CPACK_COMPONENT_${component}_tests_DESCRIPTION "Test Suite (C++ headers and source files) for Chaste component ${component}")
 
     if (BUILD_SHARED_LIBRARIES)
         set(CPACK_COMPONENT_${component}_libraries_DISPLAY_NAME "Dynamic Libraries")
@@ -669,7 +701,12 @@ foreach(component ${Chaste_COMPONENTS})
     endif(BUILD_SHARED_LIBRARIES)
 
     set(CPACK_COMPONENT_${component}_headers_DISPLAY_NAME "C++ Headers")
-    set(CPACK_COMPONENT_${component}_tests_DISPLAY_NAME "C++ Test Suite")
+
+    if (Chaste_INSTALL_TESTS)
+        set(CPACK_COMPONENT_${component}_tests_GROUP "tests")
+        set(CPACK_COMPONENT_${component}_tests_DESCRIPTION "Test Suite (C++ headers and source files) for Chaste component ${component}")
+        set(CPACK_COMPONENT_${component}_tests_DISPLAY_NAME "C++ Test Suite")
+    endif()
 
     foreach(depend_component Chaste_DEPENDS_${component})
         set(CPACK_COMPONENT_${component}_headers_DEPENDS ${CPACK_COMPONENT_${component}_headers_DEPENDS} ${depend_component}_headers)
@@ -686,8 +723,6 @@ set(CPACK_DEBIAN_PACKAGE_RECOMMENDS "valgrind, libfltk1.1")
 set(CPACK_DEBIAN_PACKAGE_SUGGESTS "libgoogle-perftools-dev, doxygen, graphviz, eclipse-cdt, gnuplot")
 set(CPACK_DEBIAN_PACKAGE_PRIORITY extra)
 set(CPACK_DEBIAN_PACKAGE_SECTION science)
-
-
 
 # This must always be last!
 include(CPack)
