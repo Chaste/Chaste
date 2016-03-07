@@ -135,7 +135,8 @@ def run(startRev):
         sys.stdout.flush()
 
 if __name__ == '__main__':
- start_rev = 25180
+ #start_rev = 25180
+ start_rev = 26220
  if len(sys.argv) > 1:
      start_rev = int(sys.argv[1])
      start_rev -= start_rev%10
