@@ -19,9 +19,9 @@ num_local_consts  = 8
 num_kicks_per_sim = 3
 
 def main():
-    run_simulations()
-    # make_movies_parallel()
-    combine_output()
+    #run_simulations()
+    make_movies_parallel()
+    #combine_output()
     # plot_results()
 
 

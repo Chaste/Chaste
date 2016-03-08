@@ -201,6 +201,32 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetTortuosityOfMesh()
     return total_length / straight_line_length;
 }
 
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::CompareNodesAlongX(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB)
+{
+    return pNodeA->rGetLocation()[0] < pNodeB->rGetLocation()[0];
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetSkewnessOfElementMassDistributionAboutAxis(unsigned elemIndex, c_vector<double, SPACE_DIM> axis)
+{
+    // This method only works in 2D
+    assert(ELEMENT_DIM == 2 && SPACE_DIM == 2);
+
+    ImmersedBoundaryElement<ELEMENT_DIM,SPACE_DIM>* p_elem = this->GetElement(elemIndex);
+
+    // Get the unit axis and unit perpendicular vectors
+    c_vector<double, SPACE_DIM> unit_axis = axis / norm_2(axis);
+    c_vector<double, SPACE_DIM> unit_perp;
+    unit_perp[0] = unit_axis[1];
+    unit_perp[1] = - unit_axis[0];
+
+    // Get the nodes of the current element
+
+
+}
+
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ChasteCuboid<SPACE_DIM> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::CalculateBoundingBoxOfElement(unsigned index)
 {

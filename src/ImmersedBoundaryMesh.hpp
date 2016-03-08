@@ -446,6 +446,27 @@ public:
     double GetTortuosityOfMesh();
 
     /**
+     * Helper function for GetSkewnessOfElementMassDistributionAboutAxis.
+     *
+     * @param pNodeA pointer to one node in the comparison
+     * @param pNodeB pointer to one node in the comparison
+     * @return if the x-location of node A is < the x-location of node B
+     */
+    bool CompareNodesAlongX(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB);
+
+    /**
+     * Calculate the skewness of the mass-distribution of a given element along a line perpendicular to a given axis,
+     * as a measure of element asymmetry.
+     *
+     * This method is only valid in 2D.
+     *
+     * @param elemIndex the index of the element in this mesh
+     * @param axis the axis perpendicular to which the distribution is found
+     * @return the skewness of the mass distribution for the given element about the given axis
+     */
+    double GetSkewnessOfElementMassDistributionAboutAxis(unsigned elemIndex, c_vector<double, SPACE_DIM> axis);
+
+    /**
      * Calculate the bounding box of an element specified by its index.
      *
      * @param index the index of the element
