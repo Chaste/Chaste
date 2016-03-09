@@ -222,9 +222,24 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetSkewnessOfElementMassDis
     unit_perp[0] = unit_axis[1];
     unit_perp[1] = - unit_axis[0];
 
-    // Get the nodes of the current element
+    // Get the centroid of the element
+    c_vector<double, SPACE_DIM> centroid = this->GetCentroidOfElement(elemIndex);
+
+    std::vector<c_vector<double, SPACE_DIM> > node_locations;
+
+    // Get the node locations of the current element
+    for (unsigned node_idx = 0 ; node_idx < p_elem->GetNumNodes() ; node_idx++)
+    {
+        const c_vector<double, SPACE_DIM>& node_location = p_elem->GetNode(node_idx)->rGetLocation();
+
+        // Translate the centroid to the origin
+        node_locations.push_back(this->GetVectorFromAtoB(centroid, node_location));
+    }
 
 
+
+
+    return 0.0;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

@@ -19,10 +19,10 @@ num_local_consts  = 8
 num_kicks_per_sim = 3
 
 def main():
-    run_simulations()
-    # make_movies_parallel()
-    combine_output()
-    # plot_results()
+    # run_simulations()
+    make_movies_parallel()
+    # combine_output()
+    plot_results()
 
 
 # Create a list of commands and pass them to separate processes
@@ -137,7 +137,7 @@ def plot_results():
 
     my_data = np.genfromtxt(path_to_output + exec_name + '/combined_results.dat', delimiter=',', skip_header=1)
 
-    col_to_plot = 5 # the column to plot from the data file
+    col_to_plot = 4 # the column to plot from the data file
 
     x_vals = my_data[:,1] # local const
     y_vals = my_data[:,col_to_plot] # summary statistic
@@ -158,9 +158,9 @@ def plot_results():
         plt.clf()
 
         plt.xlabel(r'Local spring constant multiple', fontsize=12, labelpad=20)
-        plt.ylabel(r'Change in height of cell centroid', fontsize=12, labelpad=20)
+        plt.ylabel(r'Right asymmetry', fontsize=12, labelpad=20)
 
-        title = 'Global cell-cell spring constant scaled by ' + str(0.25 * (1+plot))
+        title = 'Global cell-cell spring constant scaled by ' + str(0.5 + 0.25 * plot)
 
         plt.title(title, fontsize=14, y = 1.05)
 
