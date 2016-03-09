@@ -173,7 +173,7 @@ void SetupAndRunSimulation(unsigned kick, unsigned localSpringConst, unsigned gl
 
     // Create and set an output directory that is different for each simulation
     std::stringstream output_directory;
-    output_directory << "numerics_paper/Exe_VaryAdhesionOfSingleCellRhs/sim/"
+    output_directory << "numerics_paper/Exe_VaryAdhesionOfSingleCellRhs_2x/sim/"
                      << globalSpringConst << "_" << localSpringConst << "_" << kick;
     simulator.SetOutputDirectory(output_directory.str());
 
@@ -223,7 +223,7 @@ void SetupAndRunSimulation(unsigned kick, unsigned localSpringConst, unsigned gl
     ChasteCuboid<2> bounding_box_before = p_mesh->CalculateBoundingBoxOfElement(3);
 
     simulator.SetSamplingTimestepMultiple(160);
-    simulator.SetEndTime(16000.0 * dt);
+    simulator.SetEndTime(32000.0 * dt);
     simulator.Solve();
 
     double x_centroid_after = p_mesh->GetCentroidOfElement(3)[0];

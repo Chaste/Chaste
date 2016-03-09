@@ -10,13 +10,13 @@ import matplotlib.pyplot as plt
 # Globally accessible directory paths and names
 path_to_exec   = os.environ.get('CHASTE_BUILD_DIR') + '/projects/ImmersedBoundary/apps/'
 path_to_output = os.environ.get('CHASTE_TEST_OUTPUT') + '/numerics_paper/'
-sim_name = 'VaryAdhesionOfSingleCellRhs'
+sim_name = 'VaryAdhesionOfSingleCellRhs_2x'
 exec_name = 'Exe_' + sim_name
 
 # Range for two simulation parameters
 num_global_consts = 4
 num_local_consts  = 8
-num_kicks_per_sim = 3
+num_kicks_per_sim = 1
 
 def main():
     run_simulations()
