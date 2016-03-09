@@ -220,7 +220,7 @@ void SetupAndRunSimulation(unsigned kick, unsigned localSpringConst, unsigned gl
         }
         else
         {
-            p_mesh->GetElement(3)->GetNode(node_idx)->rGetNodeAttributes()[e_cad_location] = 0.0;
+            p_mesh->GetElement(3)->GetNode(node_idx)->rGetNodeAttributes()[e_cad_location] *= 0.1;
         }
     }
 
