@@ -799,28 +799,28 @@ void Hdf5DataWriter::PutVector(int variableID, Vec petscVector)
         MatMult(mSinglePermutation, petscVector, output_petsc_vector);
     }
 
-    // Define a dataset in memory for this process
-    hid_t memspace;
+    // Define memspace and hyperslab
+    hid_t memspace, hyperslab_space;
     if (mNumberOwned != 0)
     {
         hsize_t v_size[1] = {mNumberOwned};
         memspace = H5Screate_simple(1, v_size, NULL);
+
+        hsize_t count[DATASET_DIMS] = {1, mNumberOwned, 1};
+        hsize_t offset_dims[DATASET_DIMS] = {mCurrentTimeStep, mOffset, (unsigned)(variableID)};
+
+        hyperslab_space = H5Dget_space(mVariablesDatasetId);
+        H5Sselect_hyperslab(hyperslab_space, H5S_SELECT_SET, offset_dims, NULL, count, NULL);
     }
     else
     {
         memspace = H5Screate(H5S_NULL);
+        hyperslab_space = H5Screate(H5S_NULL);
     }
-
-    // Select hyperslab in the file
-    hsize_t count[DATASET_DIMS] = {1, mNumberOwned, 1};
-    hsize_t offset_dims[DATASET_DIMS] = {mCurrentTimeStep, mOffset, (unsigned)(variableID)};
-    hid_t file_dataspace = H5Dget_space(mVariablesDatasetId);
 
     // Create property list for collective dataset
     hid_t property_list_id = H5Pcreate(H5P_DATASET_XFER);
     H5Pset_dxpl_mpio(property_list_id, H5FD_MPIO_COLLECTIVE);
-
-    H5Sselect_hyperslab(file_dataspace, H5S_SELECT_SET, offset_dims, NULL, count, NULL);
 
     double* p_petsc_vector;
     VecGetArray(output_petsc_vector, &p_petsc_vector);
@@ -834,7 +834,7 @@ void Hdf5DataWriter::PutVector(int variableID, Vec petscVector)
         }
         else
         {
-            H5Dwrite(mVariablesDatasetId, H5T_NATIVE_DOUBLE, memspace, file_dataspace, property_list_id, p_petsc_vector);
+            H5Dwrite(mVariablesDatasetId, H5T_NATIVE_DOUBLE, memspace, hyperslab_space, property_list_id, p_petsc_vector);
         }
     }
     else
@@ -857,7 +857,7 @@ void Hdf5DataWriter::PutVector(int variableID, Vec petscVector)
             }
             else
             {
-                H5Dwrite(mVariablesDatasetId, H5T_NATIVE_DOUBLE, memspace, file_dataspace, property_list_id, p_petsc_vector_incomplete);
+                H5Dwrite(mVariablesDatasetId, H5T_NATIVE_DOUBLE, memspace, hyperslab_space, property_list_id, p_petsc_vector_incomplete);
             }
         }
         else
@@ -876,19 +876,16 @@ void Hdf5DataWriter::PutVector(int variableID, Vec petscVector)
             }
             else
             {
-                H5Dwrite(mVariablesDatasetId, H5T_NATIVE_DOUBLE, memspace, file_dataspace, property_list_id, local_data.get());
+                H5Dwrite(mVariablesDatasetId, H5T_NATIVE_DOUBLE, memspace, hyperslab_space, property_list_id, local_data.get());
             }
         }
     }
 
     VecRestoreArray(output_petsc_vector, &p_petsc_vector);
 
+    H5Sclose(memspace);
+    H5Sclose(hyperslab_space);
     H5Pclose(property_list_id);
-    H5Sclose(file_dataspace);
-    if (mNumberOwned !=0)
-    {
-        H5Sclose(memspace);
-    }
 
     if (petscVector != output_petsc_vector)
     {
@@ -964,26 +961,26 @@ void Hdf5DataWriter::PutStripedVector(std::vector<int> variableIDs, Vec petscVec
         // Apply the permutation matrix
         MatMult(mDoublePermutation, petscVector, output_petsc_vector);
     }
-    // Define a dataset in memory for this process
-    hid_t memspace;
+    // Define memspace and hyperslab
+    hid_t memspace, hyperslab_space;
     if (mNumberOwned != 0)
     {
         hsize_t v_size[1] = {mNumberOwned*NUM_STRIPES};
         memspace = H5Screate_simple(1, v_size, NULL);
+
+        hsize_t start[DATASET_DIMS] = {mCurrentTimeStep, mOffset, (unsigned)(firstVariableID)};
+        hsize_t stride[DATASET_DIMS] = {1, 1, 1};//we are imposing contiguous variables, hence the stride is 1 (3rd component)
+        hsize_t block_size[DATASET_DIMS] = {1, mNumberOwned, 1};
+        hsize_t number_blocks[DATASET_DIMS] = {1, 1, NUM_STRIPES};
+
+        hyperslab_space = H5Dget_space(mVariablesDatasetId);
+        H5Sselect_hyperslab(hyperslab_space, H5S_SELECT_SET, start, stride, number_blocks, block_size);
     }
     else
     {
         memspace = H5Screate(H5S_NULL);
+        hyperslab_space = H5Screate(H5S_NULL);
     }
-
-    // Select hyperslab in the file
-    hsize_t start[DATASET_DIMS] = {mCurrentTimeStep, mOffset, (unsigned)(firstVariableID)};
-    hsize_t stride[DATASET_DIMS] = {1, 1, 1};//we are imposing contiguous variables, hence the stride is 1 (3rd component)
-    hsize_t block_size[DATASET_DIMS] = {1, mNumberOwned, 1};
-    hsize_t number_blocks[DATASET_DIMS] = {1, 1, NUM_STRIPES};
-
-    hid_t hyperslab_space = H5Dget_space(mVariablesDatasetId);
-    H5Sselect_hyperslab(hyperslab_space, H5S_SELECT_SET, start, stride, number_blocks, block_size);
 
     // Create property list for collective dataset write, and write! Finally.
     hid_t property_list_id = H5Pcreate(H5P_DATASET_XFER);
@@ -1059,8 +1056,8 @@ void Hdf5DataWriter::PutStripedVector(std::vector<int> variableIDs, Vec petscVec
 
     VecRestoreArray(output_petsc_vector, &p_petsc_vector);
 
-    H5Sclose(hyperslab_space);
     H5Sclose(memspace);
+    H5Sclose(hyperslab_space);
     H5Pclose(property_list_id);
 
     if (petscVector != output_petsc_vector)
@@ -1085,37 +1082,41 @@ void Hdf5DataWriter::WriteCache()
         // Nothing to do.
         return;
     }
-    // Define a dataset in memory for this process
-    hid_t memspace;
+
+//    PRINT_3_VARIABLES(mCacheFirstTimeStep, mOffset, 0)
+//    PRINT_3_VARIABLES(mCurrentTimeStep-mCacheFirstTimeStep, mNumberOwned, mDatasetDims[2])
+//    PRINT_VARIABLE(mDataCache.size())
+
+    // Define memspace and hyperslab
+    hid_t memspace, hyperslab_space;
     if (mNumberOwned != 0)
     {
         hsize_t v_size[1] = {mDataCache.size()};
         memspace = H5Screate_simple(1, v_size, NULL);
+
+        hsize_t start[DATASET_DIMS] = {mCacheFirstTimeStep, mOffset, 0};
+        hsize_t count[DATASET_DIMS] = {mCurrentTimeStep-mCacheFirstTimeStep, mNumberOwned, mDatasetDims[2]};
+        assert((mCurrentTimeStep-mCacheFirstTimeStep)*mNumberOwned*mDatasetDims[2] == mDataCache.size()); // Got size right?
+
+        hyperslab_space = H5Dget_space(mVariablesDatasetId);
+        H5Sselect_hyperslab(hyperslab_space, H5S_SELECT_SET, start, NULL, count, NULL);
     }
     else
     {
         memspace = H5Screate(H5S_NULL);
+        hyperslab_space = H5Screate(H5S_NULL);
     }
 
-    // Select hyperslab in the file
-//    PRINT_3_VARIABLES(mCacheFirstTimeStep, mOffset, 0)
-//    PRINT_3_VARIABLES(mCurrentTimeStep-mCacheFirstTimeStep, mNumberOwned, mDatasetDims[2])
-//    PRINT_VARIABLE(mDataCache.size())
-    hsize_t start[DATASET_DIMS] = {mCacheFirstTimeStep, mOffset, 0};
-    hsize_t count[DATASET_DIMS] = {mCurrentTimeStep-mCacheFirstTimeStep, mNumberOwned, mDatasetDims[2]};
-    assert((mCurrentTimeStep-mCacheFirstTimeStep)*mNumberOwned*mDatasetDims[2] == mDataCache.size()); // Got size right?
-
-    hid_t hyperslab_space = H5Dget_space(mVariablesDatasetId);
-    H5Sselect_hyperslab(hyperslab_space, H5S_SELECT_SET, start, NULL, count, NULL);
-
-    // Create property list for collective dataset write, and write! Finally.
+    // Create property list for collective dataset write
     hid_t property_list_id = H5Pcreate(H5P_DATASET_XFER);
     H5Pset_dxpl_mpio(property_list_id, H5FD_MPIO_COLLECTIVE);
 
+    // Write!
     H5Dwrite(mVariablesDatasetId, H5T_NATIVE_DOUBLE, memspace, hyperslab_space, property_list_id, &mDataCache[0]);
 
-    H5Sclose(hyperslab_space);
+    // Tidy up
     H5Sclose(memspace);
+    H5Sclose(hyperslab_space);
     H5Pclose(property_list_id);
 
     mCacheFirstTimeStep = mCurrentTimeStep; // Update where we got to
