@@ -227,7 +227,7 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetSkewnessOfElementMassDis
 
     std::vector<c_vector<double, SPACE_DIM> > node_locations;
 
-    // Get the node locations of the current element
+    // Get the node locations of the current element relative to its centroid
     for (unsigned node_idx = 0 ; node_idx < p_elem->GetNumNodes() ; node_idx++)
     {
         const c_vector<double, SPACE_DIM>& node_location = p_elem->GetNode(node_idx)->rGetLocation();
