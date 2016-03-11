@@ -820,7 +820,8 @@ void Hdf5DataWriter::PutVector(int variableID, Vec petscVector)
 #else
         // Horrible hack for HDF5 1.6
         memspace = 0;
-        hyperslab_space = 0;
+        hyperslab_space = H5Dget_space(mVariablesDatasetId);
+        H5Sselect_none(hyperslab_space);
 #endif
     }
 
@@ -891,8 +892,8 @@ void Hdf5DataWriter::PutVector(int variableID, Vec petscVector)
 
 #if H5_VERS_MAJOR==1 && H5_VERS_MINOR>=8 // HDF5 1.8+
     H5Sclose(memspace);
-    H5Sclose(hyperslab_space);
 #endif
+    H5Sclose(hyperslab_space);
     H5Pclose(property_list_id);
 
     if (petscVector != output_petsc_vector)
@@ -992,7 +993,8 @@ void Hdf5DataWriter::PutStripedVector(std::vector<int> variableIDs, Vec petscVec
 #else
         // Horrible hack for HDF5 1.6
         memspace = 0;
-        hyperslab_space = 0;
+        hyperslab_space = H5Dget_space(mVariablesDatasetId);
+        H5Sselect_none(hyperslab_space);
 #endif
     }
 
@@ -1072,8 +1074,8 @@ void Hdf5DataWriter::PutStripedVector(std::vector<int> variableIDs, Vec petscVec
 
 #if H5_VERS_MAJOR==1 && H5_VERS_MINOR>=8 // HDF5 1.8+
     H5Sclose(memspace);
-    H5Sclose(hyperslab_space);
 #endif
+    H5Sclose(hyperslab_space);
     H5Pclose(property_list_id);
 
     if (petscVector != output_petsc_vector)
@@ -1125,7 +1127,8 @@ void Hdf5DataWriter::WriteCache()
 #else
         // Horrible hack for HDF5 1.6
         memspace = 0;
-        hyperslab_space = 0;
+        hyperslab_space = H5Dget_space(mVariablesDatasetId);
+        H5Sselect_none(hyperslab_space);
 #endif
     }
 
@@ -1139,8 +1142,8 @@ void Hdf5DataWriter::WriteCache()
     // Tidy up
 #if H5_VERS_MAJOR==1 && H5_VERS_MINOR>=8 // HDF5 1.8+
     H5Sclose(memspace);
-    H5Sclose(hyperslab_space);
 #endif
+    H5Sclose(hyperslab_space);
     H5Pclose(property_list_id);
 
     mCacheFirstTimeStep = mCurrentTimeStep; // Update where we got to
