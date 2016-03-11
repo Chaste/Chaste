@@ -442,6 +442,15 @@ public:
                                   "Data",
                                   true); // cache
 
+            // Check chunk info was read correctly
+            hsize_t expected_chunk_size[3] = {1, 100, 1};
+            for ( int i=0; i<3; ++i )
+            {
+                TS_ASSERT_EQUALS(writer.mChunkSize[i], expected_chunk_size[i]);
+            }
+            // Check the cache has reserved the right amount of space
+            TS_ASSERT_EQUALS(writer.mDataCache.capacity(), writer.mNumberOwned);
+
             // Get IDs for the variables in the file
             int node_id = writer.GetVariableByName("Node");
 
@@ -789,7 +798,10 @@ public:
                               true); // use cache
         writer.DefineFixedDimension(number_nodes);
 
-        /* For coverage: test cached writer can cope with chunking (see note below) */
+        /* Set specific chunk dims for coverage.
+         * We expect that the writer will flush whole chunks (every 3 steps in
+         * this case) automatically, but we have 10 entries, so Close() will do
+         * for the final flush. */
         writer.SetFixedChunkSize(3, 10, 2);
 
         int vm_id = writer.DefineVariable("V_m", "millivolts");
@@ -802,6 +814,16 @@ public:
         writer.DefineUnlimitedDimension("Time", "msec");
 
         writer.EndDefineMode();
+
+        // Check chunk info was read correctly
+        hsize_t expected_chunk_size[3] = {3, 10, 2};
+        for ( int i=0; i<3; ++i )
+        {
+            TS_ASSERT_EQUALS(writer.mChunkSize[i], expected_chunk_size[i]);
+        }
+        // Check the cache has reserved the right amount of space
+        unsigned expected_capacity = 3 * writer.mNumberOwned * 2;
+        TS_ASSERT_EQUALS(writer.mDataCache.capacity(), expected_capacity);
 
         DistributedVectorFactory factory(number_nodes);
 
@@ -824,11 +846,14 @@ public:
             writer.PutStripedVector(striped_variable_IDs, petsc_data_long);
             writer.PutUnlimitedVariable(time_step);
             writer.AdvanceAlongUnlimitedDimension();
+
+            // Check that the cache is emptied on whole chunks. Size of cache
+            // should go 0, 200, 400, 0, ... when run with one process.
+            unsigned expected_cache_size = ((time_step+1) % 3) * writer.mNumberOwned * 2;
+            TS_ASSERT_EQUALS(writer.mDataCache.size(), expected_cache_size);
         }
 
-        /* NOTE: The writer will flush whole chunks (every 3 steps in this
-         * case) automatically, but we have 10 entries, so Close() is
-         * responsible for the final flush. */
+        // Final flush happens here
         writer.Close();
 
         TS_ASSERT(CompareFilesViaHdf5DataReader("TestHdf5DataWriter", "hdf5_test_striped_with_cache", true,
@@ -1642,24 +1667,30 @@ public:
     }
 
     /**
-     * Test the functionality for adding further data to an existing file.
-     *
-     * This test must come after TestHdf5DataWriterFullFormat and TestHdf5DataWriterFullFormatStripedIncomplete,
-     * as we extend their files.
+     * This test must come after TestWriteToExistingFile as it extends even further.
      */
     void TestWriteToExistingFileWithCache(void)
     {
         int number_nodes = 100;
         DistributedVectorFactory factory(number_nodes);
 
-        // Open the real file
         Hdf5DataWriter writer(factory,
                               "TestHdf5DataWriter",
                               "hdf5_test_full_format",
                               false,
-                              true,
+                              true, // extend
                               "Data",
-                              true); // Cache
+                              true); // cache
+
+        // Check chunk info was read correctly
+        hsize_t expected_chunk_size[3] = {10, 100, 3};
+        for ( int i=0; i<3; ++i )
+        {
+            TS_ASSERT_EQUALS(writer.mChunkSize[i], expected_chunk_size[i]);
+        }
+        // Check the cache has reserved the right amount of space
+        unsigned expected_capacity = 10 * writer.mNumberOwned * 3;
+        TS_ASSERT_EQUALS(writer.mDataCache.capacity(), expected_capacity);
 
         // Get IDs for the variables in the file
         int node_id = writer.GetVariableByName("Node");
@@ -1693,7 +1724,23 @@ public:
             // Write to file
             writer.PutStripedVector(variable_IDs, petsc_data_long);
             writer.PutUnlimitedVariable(time_step);
+
+            // Check that the cache is growing at the expected rate.
+            // Should go 300, 600, 900, ... when run with one process.
+            unsigned expected_cache_size = ((time_step-15+1) % 10) * writer.mNumberOwned * 3;
+            TS_ASSERT_EQUALS(writer.mDataCache.size(), expected_cache_size);
+
             writer.AdvanceAlongUnlimitedDimension();
+
+            /*
+             * We started halfway through a chunk, so after the final
+             * iteration there should be a flush (despite only having a half-
+             * full cache).
+             */
+            if ( time_step == 19 )
+            {
+                TS_ASSERT_EQUALS(writer.mDataCache.size(), 0u);
+            }
         }
 
         // Close and test

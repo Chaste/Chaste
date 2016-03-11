@@ -251,6 +251,15 @@ Hdf5DataWriter::Hdf5DataWriter(DistributedVectorFactory& rVectorFactory,
                 EXCEPTION("Unable to extend an incomplete data file at present.");
             }
 
+            // Record chunk dimensions (useful for cached write mode)
+            hid_t dcpl = H5Dget_create_plist(mVariablesDatasetId); // get dataset creation property list
+            H5Pget_chunk(dcpl, DATASET_DIMS, mChunkSize );
+            if (mUseCache)
+            {
+                // Reserve space. Enough for one chunk in the time dimension.
+                mDataCache.reserve(mChunkSize[0]*mNumberOwned*mDatasetDims[2]);
+            }
+
             // Done
             AdvanceAlongUnlimitedDimension();
         }
@@ -592,15 +601,12 @@ void Hdf5DataWriter::EndDefineMode()
     dataset_max_dims[1] = mDatasetDims[1];
     dataset_max_dims[2] = mDatasetDims[2];
 
-    // If we didn't already do the chunk calculation (e.g. we're adding a dataset to an existing H5 file)
-    if (mNumberOfChunks==0)
-    {
-        SetChunkSize();
-    }
+    // Set chunk dimensions for the new dataset
+    SetChunkSize();
 
     if (mUseCache)
     {
-        // Reserve space. One chunk worth (in time) for now
+        // Reserve space. Enough for one chunk in the time dimension.
         mDataCache.reserve(mChunkSize[0]*mNumberOwned*mDatasetDims[2]);
     }
 
@@ -1238,8 +1244,12 @@ void Hdf5DataWriter::AdvanceAlongUnlimitedDimension()
 
     mCurrentTimeStep++;
 
-    // Write whole chunks
-    if ( mUseCache && (mCurrentTimeStep-mCacheFirstTimeStep == mChunkSize[0]))
+    /*
+     * Write when stepping over a chunk boundary. Note: NOT the same as write
+     * out when the chunk size == the cache size, because we might have started
+     * part-way through a chunk.
+     */
+    if ( mUseCache && (mCurrentTimeStep % mChunkSize[0] == 0))
     {
         WriteCache();
     }

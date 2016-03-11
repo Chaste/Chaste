@@ -54,6 +54,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 class Hdf5DataWriter : public AbstractHdf5Access //: public AbstractDataWriter
 {
+    friend class TestHdf5DataWriter;
 private:
 
     /** The factory to use in creating PETSc Vec and DistributedVector objects. */
