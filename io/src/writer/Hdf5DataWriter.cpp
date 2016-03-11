@@ -814,8 +814,14 @@ void Hdf5DataWriter::PutVector(int variableID, Vec petscVector)
     }
     else
     {
+#if H5_VERS_MAJOR==1 && H5_VERS_MINOR>=8 // HDF5 1.8+
         memspace = H5Screate(H5S_NULL);
         hyperslab_space = H5Screate(H5S_NULL);
+#else
+        // Horrible hack for HDF5 1.6
+        memspace = 0;
+        hyperslab_space = 0;
+#endif
     }
 
     // Create property list for collective dataset
@@ -883,8 +889,10 @@ void Hdf5DataWriter::PutVector(int variableID, Vec petscVector)
 
     VecRestoreArray(output_petsc_vector, &p_petsc_vector);
 
+#if H5_VERS_MAJOR==1 && H5_VERS_MINOR>=8 // HDF5 1.8+
     H5Sclose(memspace);
     H5Sclose(hyperslab_space);
+#endif
     H5Pclose(property_list_id);
 
     if (petscVector != output_petsc_vector)
@@ -978,8 +986,14 @@ void Hdf5DataWriter::PutStripedVector(std::vector<int> variableIDs, Vec petscVec
     }
     else
     {
+#if H5_VERS_MAJOR==1 && H5_VERS_MINOR>=8 // HDF5 1.8+
         memspace = H5Screate(H5S_NULL);
         hyperslab_space = H5Screate(H5S_NULL);
+#else
+        // Horrible hack for HDF5 1.6
+        memspace = 0;
+        hyperslab_space = 0;
+#endif
     }
 
     // Create property list for collective dataset write, and write! Finally.
@@ -1056,8 +1070,10 @@ void Hdf5DataWriter::PutStripedVector(std::vector<int> variableIDs, Vec petscVec
 
     VecRestoreArray(output_petsc_vector, &p_petsc_vector);
 
+#if H5_VERS_MAJOR==1 && H5_VERS_MINOR>=8 // HDF5 1.8+
     H5Sclose(memspace);
     H5Sclose(hyperslab_space);
+#endif
     H5Pclose(property_list_id);
 
     if (petscVector != output_petsc_vector)
@@ -1103,8 +1119,14 @@ void Hdf5DataWriter::WriteCache()
     }
     else
     {
+#if H5_VERS_MAJOR==1 && H5_VERS_MINOR>=8 // HDF5 1.8+
         memspace = H5Screate(H5S_NULL);
         hyperslab_space = H5Screate(H5S_NULL);
+#else
+        // Horrible hack for HDF5 1.6
+        memspace = 0;
+        hyperslab_space = 0;
+#endif
     }
 
     // Create property list for collective dataset write
@@ -1115,8 +1137,10 @@ void Hdf5DataWriter::WriteCache()
     H5Dwrite(mVariablesDatasetId, H5T_NATIVE_DOUBLE, memspace, hyperslab_space, property_list_id, &mDataCache[0]);
 
     // Tidy up
+#if H5_VERS_MAJOR==1 && H5_VERS_MINOR>=8 // HDF5 1.8+
     H5Sclose(memspace);
     H5Sclose(hyperslab_space);
+#endif
     H5Pclose(property_list_id);
 
     mCacheFirstTimeStep = mCurrentTimeStep; // Update where we got to
