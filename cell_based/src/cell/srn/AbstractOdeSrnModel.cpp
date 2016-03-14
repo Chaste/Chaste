@@ -50,7 +50,6 @@ AbstractOdeSrnModel::~AbstractOdeSrnModel()
 {
 }
 
-// NOTE - this code is based on AbstractOdeCellCycleModel::UpdateCellCyclePhase
 void AbstractOdeSrnModel::SimulateToCurrentTime()
 {
     assert(mpOdeSystem != NULL);
@@ -65,11 +64,6 @@ void AbstractOdeSrnModel::SimulateToCurrentTime()
         {
             // Update whether a stopping event has occurred
             mFinishedRunningOdes = SolveOdeToTime(current_time);
-
-            if (mFinishedRunningOdes) ///\todo #752 remove this pointless if statement
-            {
-                // Do nothing for now...
-            }
         }
         else
         {
@@ -112,7 +106,11 @@ AbstractSrnModel* AbstractOdeSrnModel::CreateSrnModel(AbstractOdeSrnModel* p_mod
      * Note 2: one or more of the new SRN model's member variables
      * may be set/overwritten as soon as InitialiseDaughterCell() is called on
      * the new SRN model.
+     *
+     * Note 3: Only set the variables defined in this class. Variables defined
+     * in parent classes will be defined there.
      */
+
     // Use the current values of the state variables in mpOdeSystem as an initial condition for the new cell-cycle model's ODE system
     assert(mpOdeSystem);
     p_model->SetStateVariables(mpOdeSystem->rGetStateVariables());
@@ -120,13 +118,14 @@ AbstractSrnModel* AbstractOdeSrnModel::CreateSrnModel(AbstractOdeSrnModel* p_mod
     // Set the values of the new cell-cycle model's member variables
     p_model->SetLastTime(mSimulatedToTime);
     p_model->SetFinishedRunningOdes(mFinishedRunningOdes);
-    p_model->SetSimulatedToTime(mSimulatedToTime);
     p_model->mStateSize = mStateSize;
     if (mInitialConditions != std::vector<double>())
     {
         p_model->SetInitialConditions(mInitialConditions);
     }
-    return p_model;
+
+    // call super to set current variables stored in parent classes
+    return AbstractSrnModel::CreateSrnModel(p_model);
 }
 
 void AbstractOdeSrnModel::ResetForDivision()
