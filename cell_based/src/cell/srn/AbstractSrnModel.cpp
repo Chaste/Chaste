@@ -52,6 +52,29 @@ void AbstractSrnModel::InitialiseDaughterCell()
 {
 }
 
+AbstractSrnModel* AbstractSrnModel::CopySrnModelVariables(AbstractSrnModel* p_model)
+{
+    /*
+     * Set each member variable of the new SRN model that inherits
+     * its value from the parent.
+     *
+     * Note 1: some of the new SRN model's member variables
+     * will already have been correctly initialized in its constructor.
+     *
+     * Note 2: one or more of the new SRN model's member variables
+     * may be set/overwritten as soon as InitialiseDaughterCell() is called on
+     * the new SRN model.
+     *
+     * Note 3: Only set the variables defined in this class. Variables defined
+     * in parent classes will be defined there.
+     */
+
+    // Set the values of the new cell-cycle model's member variables
+    p_model->SetSimulatedToTime(mSimulatedToTime);
+
+    return p_model;
+}
+
 void AbstractSrnModel::ResetForDivision()
 {
     // Make sure we're at the current time

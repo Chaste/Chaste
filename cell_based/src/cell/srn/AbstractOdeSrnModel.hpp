@@ -102,28 +102,24 @@ protected:
      */
     void Initialise(AbstractOdeSystem* pOdeSystem);
 
-    using AbstractSrnModel::CreateSrnModel;
+    using AbstractSrnModel::CopySrnModelVariables;
     /**
-     * Overridden CreateSrnModel() method.
+     * Copy method to set the member variables on a newly constructed SRN
      *
-     * Builder method to create new instances of the SRN model.
-     * Each concrete subclass must implement this method to create an
-     * instance of that subclass.
-     *
-     * This method is called by Cell::Divide() to create a SRN
-     * model for the daughter cell.  Note that the parent SRN
+     * This method is called by child classes to set member variables
+     * for the daughter cell.  Note that the parent SRN
      * model will have had ResetForDivision() called just before
      * CreateSrnModel() is called, so performing an exact copy of the
      * parent is suitable behaviour. Any daughter-cell-specific initialisation
      * can be done in InitialiseDaughterCell().
      *
-     * Note bring virtual functions from AbstractSrnModel into derived namespace so overloading virtual works.
+     * Note we bring virtual functions from AbstractSrnModel into derived namespace so overloading virtual works.
      *
      * @param pModel pointer to an ODE SRN model
      *
      * @return new SRN model
      */
-    AbstractSrnModel* CreateSrnModel(AbstractOdeSrnModel* pModel);
+    AbstractSrnModel* CopySrnModelVariables(AbstractOdeSrnModel* pModel);
 
 public:
     /**

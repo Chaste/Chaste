@@ -56,14 +56,29 @@ DeltaNotchSrnModel::DeltaNotchSrnModel(boost::shared_ptr<AbstractCellCycleModelO
 
 AbstractSrnModel* DeltaNotchSrnModel::CreateSrnModel()
 {
-    // Create a new srn model
+    // Create a new SRN model
     DeltaNotchSrnModel* p_model = new DeltaNotchSrnModel(this->mpOdeSolver);
+
+    /*
+     * Set each member variable of the new SRN model that inherits
+     * its value from the parent.
+     *
+     * Note 1: some of the new SRN model's member variables
+     * will already have been correctly initialized in its constructor.
+     *
+     * Note 2: one or more of the new SRN model's member variables
+     * may be set/overwritten as soon as InitialiseDaughterCell() is called on
+     * the new SRN model.
+     *
+     * Note 3: Only set the variables defined in this class. Variables defined
+     * in parent classes will be defined there.
+     */
 
     // Create the new srn model's ODE system
     p_model->SetOdeSystem(new DeltaNotchOdeSystem);
 
     // Call super to set current values of the state variables in mpOdeSystem as an initial condition for the new srn model's ODE system
-    return AbstractOdeSrnModel::CreateSrnModel(p_model);
+    return AbstractOdeSrnModel::CopySrnModelVariables(p_model);
 }
 
 void DeltaNotchSrnModel::SimulateToCurrentTime()

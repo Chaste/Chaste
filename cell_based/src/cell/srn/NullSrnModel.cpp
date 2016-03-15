@@ -71,9 +71,14 @@ AbstractSrnModel* NullSrnModel::CreateSrnModel()
      * Note 2: one or more of the new SRN model's member variables
      * may be set/overwritten as soon as InitialiseDaughterCell() is called on
      * the new SRN model.
+     *
+     * Note 3: Only set the variables defined in this class. Variables defined
+     * in parent classes will be defined there.
      */
-    p_model->SetSimulatedToTime(mSimulatedToTime);
-    return p_model;
+    // No new members to set for this class
+
+    // call super to set current variables stored in parent classes
+    return AbstractSrnModel::CopySrnModelVariables(p_model);
 }
 
 
