@@ -209,7 +209,8 @@ public:
 
         p_model->SetOdeSystem(new MyOdeSystem);
 
-        return AbstractOdeSrnModel::CreateSrnModel(p_model);
+        // Now call a method on the parent class to set the member variables contained in the parent classes.
+        return AbstractOdeSrnModel::CopySrnModelVariables(p_model);
     }
 
     /* The third public method overrides {{{Initialise()}}}. */
