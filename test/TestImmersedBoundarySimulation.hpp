@@ -59,7 +59,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SuperellipseGenerator.hpp"
 
 // Immersed boundary forces
-#include "ImmersedBoundaryElasticityForce.hpp"
+//#include "ImmersedBoundaryElasticityForce.hpp"
 
 #include "Debug.hpp"
 
@@ -245,46 +245,46 @@ public:
 
     void TestImmersedBoundarySimpleSimulation() throw(Exception)
     {
-        // Load immersed boundary mesh
-        ImmersedBoundaryMeshReader<2,2> mesh_reader("projects/ImmersedBoundary/test/mesh/ib_square_16");
-
-        // Construct the immersed boundary mesh from the mesh reader
-        ImmersedBoundaryMesh<2,2> mesh;
-
-        mesh.ConstructFromMeshReader(mesh_reader);
-
-        mesh.SetNumGridPtsX(64);
-        mesh.SetNumGridPtsY(64);
-
-        ImmersedBoundaryElement<2,2>* p_elem = mesh.GetElement(0u);
-        p_elem->SetMembraneRestLength(0.005);
-        p_elem->SetMembraneSpringConstant(1000.0);
-
-        std::vector<CellPtr> cells;
-        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
-
-        PRINT_VARIABLE(cells.size());
-
-        ImmersedBoundaryCellPopulation<2> cell_population(mesh, cells);
-
-        OffLatticeSimulation<2> simulator(cell_population);
-
-        // Add main immersed boundary simulation modifier
-        MAKE_PTR(ImmersedBoundarySimulationModifier<2>, p_main_modifier);
-        simulator.AddSimulationModifier(p_main_modifier);
-
-        MAKE_PTR(ImmersedBoundaryElasticityForce<2>, p_elas_force);
-        p_main_modifier->AddImmersedBoundaryForce(p_elas_force);
-
-        // Set simulation properties
-        simulator.SetOutputDirectory("IB/TestImmersedBoundary");
-        simulator.SetDt(0.01);
-        simulator.SetSamplingTimestepMultiple(1);
-        simulator.SetEndTime(0.02);
-
-        // Run the simulation
-        simulator.Solve();
+//        // Load immersed boundary mesh
+//        ImmersedBoundaryMeshReader<2,2> mesh_reader("projects/ImmersedBoundary/test/mesh/ib_square_16");
+//
+//        // Construct the immersed boundary mesh from the mesh reader
+//        ImmersedBoundaryMesh<2,2> mesh;
+//
+//        mesh.ConstructFromMeshReader(mesh_reader);
+//
+//        mesh.SetNumGridPtsX(64);
+//        mesh.SetNumGridPtsY(64);
+//
+//        ImmersedBoundaryElement<2,2>* p_elem = mesh.GetElement(0u);
+//        p_elem->SetMembraneRestLength(0.005);
+//        p_elem->SetMembraneSpringConstant(1000.0);
+//
+//        std::vector<CellPtr> cells;
+//        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+//        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+//        cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
+//
+//        PRINT_VARIABLE(cells.size());
+//
+//        ImmersedBoundaryCellPopulation<2> cell_population(mesh, cells);
+//
+//        OffLatticeSimulation<2> simulator(cell_population);
+//
+//        // Add main immersed boundary simulation modifier
+//        MAKE_PTR(ImmersedBoundarySimulationModifier<2>, p_main_modifier);
+//        simulator.AddSimulationModifier(p_main_modifier);
+//
+//        MAKE_PTR(ImmersedBoundaryElasticityForce<2>, p_elas_force);
+//        p_main_modifier->AddImmersedBoundaryForce(p_elas_force);
+//
+//        // Set simulation properties
+//        simulator.SetOutputDirectory("IB/TestImmersedBoundary");
+//        simulator.SetDt(0.01);
+//        simulator.SetSamplingTimestepMultiple(1);
+//        simulator.SetEndTime(0.02);
+//
+//        // Run the simulation
+//        simulator.Solve();
     }
 };

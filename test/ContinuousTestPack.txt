@@ -8,3 +8,4 @@ TestImmersedBoundaryPdeSolveMethods.hpp
 TestImmersedBoundarySimulation.hpp
 TestImmersedBoundarySimulationModifier.hpp
 TestSuperellipseGenerator.hpp
+numerics_paper/TestNumericsPaperSimulations.hpp
