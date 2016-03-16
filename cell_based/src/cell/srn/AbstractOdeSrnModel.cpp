@@ -46,6 +46,29 @@ AbstractOdeSrnModel::AbstractOdeSrnModel(unsigned stateSize, boost::shared_ptr<A
 {
 }
 
+AbstractOdeSrnModel::AbstractOdeSrnModel(AbstractOdeSrnModel& rModel)
+    : AbstractSrnModel(rModel),
+      CellCycleModelOdeHandler(SimulationTime::Instance()->GetTime(), rModel.mpOdeSolver), ///\todo #2173 Consider creating a proper copy constructor for this class
+      mFinishedRunningOdes(rModel.mFinishedRunningOdes),
+      mInitialConditions(rModel.mInitialConditions),
+      mStateSize(rModel.mStateSize)
+{
+    /*
+     * Set each member variable of the new SRN model that inherits
+     * its value from the parent.
+     *
+     * Note 1: some of the new SRN model's member variables
+     * will already have been correctly initialized in its constructor.
+     *
+     * Note 2: one or more of the new SRN model's member variables
+     * may be set/overwritten as soon as InitialiseDaughterCell() is called on
+     * the new SRN model.
+     *
+     * Note 3: Only set the variables defined in this class. Variables defined
+     * in parent classes will be defined there.
+     */
+}
+
 AbstractOdeSrnModel::~AbstractOdeSrnModel()
 {
 }
@@ -94,40 +117,6 @@ void AbstractOdeSrnModel::Initialise(AbstractOdeSystem* pOdeSystem)
     SetLastTime(mSimulatedToTime);
 }
 
-AbstractSrnModel* AbstractOdeSrnModel::CopySrnModelVariables(AbstractOdeSrnModel* p_model)
-{
-    /*
-     * Set each member variable of the new SRN model that inherits
-     * its value from the parent.
-     *
-     * Note 1: some of the new SRN model's member variables
-     * will already have been correctly initialized in its constructor.
-     *
-     * Note 2: one or more of the new SRN model's member variables
-     * may be set/overwritten as soon as InitialiseDaughterCell() is called on
-     * the new SRN model.
-     *
-     * Note 3: Only set the variables defined in this class. Variables defined
-     * in parent classes will be defined there.
-     */
-
-    // Use the current values of the state variables in mpOdeSystem as an initial condition for the new cell-cycle model's ODE system
-    assert(mpOdeSystem);
-    p_model->SetStateVariables(mpOdeSystem->rGetStateVariables());
-
-    // Set the values of the new cell-cycle model's member variables
-    p_model->SetLastTime(mSimulatedToTime);
-    p_model->SetFinishedRunningOdes(mFinishedRunningOdes);
-    p_model->mStateSize = mStateSize;
-    if (mInitialConditions != std::vector<double>())
-    {
-        p_model->SetInitialConditions(mInitialConditions);
-    }
-
-    // call super to set current variables stored in parent classes
-    return AbstractSrnModel::CopySrnModelVariables(p_model);
-}
-
 void AbstractOdeSrnModel::ResetForDivision()
 {
     AbstractSrnModel::ResetForDivision();
@@ -142,7 +131,7 @@ void AbstractOdeSrnModel::SetFinishedRunningOdes(bool finishedRunningOdes)
 
 void AbstractOdeSrnModel::SetInitialConditions(std::vector<double> initialConditions)
 {
-assert(initialConditions.size() == mStateSize);
+    assert(initialConditions.size() == mStateSize);
     mInitialConditions = initialConditions;
 }
 

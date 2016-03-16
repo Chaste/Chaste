@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CELLCYCLEMODELODEHANDLER_HPP_
 
 #include <boost/shared_ptr.hpp>
+#include <boost/noncopyable.hpp>
 
 #include "ChasteSerialization.hpp"
 #include "AbstractOdeSystem.hpp"
@@ -48,7 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * model.  It is designed to be used as an additional base class for models which
  * require this functionality.
  */
-class CellCycleModelOdeHandler
+class CellCycleModelOdeHandler : private boost::noncopyable
 {
 private:
 

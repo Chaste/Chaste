@@ -43,14 +43,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractOdeSrnModel.hpp"
 
 /**
- * A subclass of StochasticDurationGenerationBasedCellCycleModel
+ * A Subcellular Reaction Network Model
  * that includes a Goldbeter1991 ODE system in the sub-cellular reaction network.
  *
  * \todo #2752 give reference for this ODE system
- *
- * For another example of a cell cycle model that is not *based on*
- * an ODE system, but that includes an ODE system, see
- * SingleOdeWntCellCycleModel in the crypt folder.
  */
 class Goldbeter1991SrnModel : public AbstractOdeSrnModel
 {
@@ -69,6 +65,21 @@ private:
     {
         archive & boost::serialization::base_object<AbstractOdeSrnModel>(*this);
     }
+
+protected:
+    /**
+     * Protected copy-constructor for use by CreateSrnModel.  The only way for external code to create a copy of a SRN model
+     * is by calling that method, to ensure that a model of the correct subclass is created.
+     * This copy-constructor helps subclasses to ensure that all member variables are correctly copied when this happens.
+     *
+     * This method is called by child classes to set member variables for a daughter cell upon cell division.
+     * Note that the parent SRN model will have had ResetForDivision() called just before CreateSrnModel() is called,
+     * so performing an exact copy of the parent is suitable behaviour. Any daughter-cell-specific initialisation
+     * can be done in InitialiseDaughterCell().
+     *
+     * @param rModel  the SRN model to copy.
+     */
+    Goldbeter1991SrnModel(Goldbeter1991SrnModel& rModel);
 
 public:
 

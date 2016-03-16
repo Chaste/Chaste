@@ -52,7 +52,8 @@ void AbstractSrnModel::InitialiseDaughterCell()
 {
 }
 
-AbstractSrnModel* AbstractSrnModel::CopySrnModelVariables(AbstractSrnModel* p_model)
+AbstractSrnModel::AbstractSrnModel(AbstractSrnModel& rModel)
+    : mSimulatedToTime(rModel.GetSimulatedToTime())
 {
     /*
      * Set each member variable of the new SRN model that inherits
@@ -68,11 +69,6 @@ AbstractSrnModel* AbstractSrnModel::CopySrnModelVariables(AbstractSrnModel* p_mo
      * Note 3: Only set the variables defined in this class. Variables defined
      * in parent classes will be defined there.
      */
-
-    // Set the values of the new cell-cycle model's member variables
-    p_model->SetSimulatedToTime(mSimulatedToTime);
-
-    return p_model;
 }
 
 void AbstractSrnModel::ResetForDivision()

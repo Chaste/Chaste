@@ -134,9 +134,15 @@ private:
     }
 
 public:
-    MyOdeSystem() : AbstractOdeSystem(2)
+    MyOdeSystem(std::vector<double> stateVariables=std::vector<double>()) : AbstractOdeSystem(2)
     {
         mpSystemInfo = OdeSystemInformation<MyOdeSystem>::Instance();
+
+        if (stateVariables != std::vector<double>())
+        {
+            SetStateVariables(stateVariables);
+        }
+
     }
 
     void EvaluateYDerivatives(double time, const std::vector<double>& rY,
@@ -181,6 +187,27 @@ private:
         archive & boost::serialization::base_object<AbstractOdeSrnModel>(*this);
     }
 
+    /**
+     * We need to define a protected copy-constructor for use by CreateSrnModel.
+     * The only way for external code to create a copy of a SRN model
+     * is by calling that method, to ensure that a model of the correct subclass is created.
+     * This copy-constructor helps subclasses to ensure that all member variables are correctly copied when this happens.
+     *
+     * Note that the parent SRN model will have had ResetForDivision() called just before CreateSrnModel() is called,
+     * so performing an exact copy of the parent is suitable behaviour. Any daughter-cell-specific initialisation
+     * can be done in InitialiseDaughterCell().
+     */
+    MySrnModel(MySrnModel& rModel)
+        : AbstractOdeSrnModel(rModel)
+    {
+        /*
+         * These lines copy the ODE system.
+         */
+        assert(rModel.GetOdeSystem());
+        SetOdeSystem(new MyOdeSystem(rModel.GetOdeSystem()->rGetStateVariables()));
+    }
+
+
     /* The first public method is a constructor, which just calls the base
      * constructor.  Note you can include an optional argument to specify the ODE solver.*/
 public:
@@ -197,20 +224,13 @@ public:
     }
 
     /* The second public method overrides {{{CreateSrnModel()}}}. This is a
-     * builder method to create new copies of the SRN model. We first create
-     * a new SRN model, then set each member variable of the new SRN
-     * model that inherits its value from the parent.
-     * Finally we call the parent class method to set the current state variables
-     * as initial conditions.
+     * builder method to create new copies of the SRN model. We call
+     * the (protected) copy constructor which creates a copy of the cell cycle model.
+     *
      */
     AbstractSrnModel* CreateSrnModel()
     {
-        MySrnModel* p_model = new MySrnModel();
-
-        p_model->SetOdeSystem(new MyOdeSystem);
-
-        // Now call a method on the parent class to set the member variables contained in the parent classes.
-        return AbstractOdeSrnModel::CopySrnModelVariables(p_model);
+        return new MySrnModel(*this);
     }
 
     /* The third public method overrides {{{Initialise()}}}. */

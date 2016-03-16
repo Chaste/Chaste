@@ -59,7 +59,7 @@ typedef boost::shared_ptr<Cell> CellPtr;
  *
  * \todo #2752 Thoroughly document this class (including, for example, what SRN stands for!)
  */
-class AbstractSrnModel : public Identifiable, boost::noncopyable
+class AbstractSrnModel : public Identifiable
 {
 private:
 
@@ -83,6 +83,13 @@ private:
         archive & mSimulatedToTime;
     }
 
+    /**
+     * Prevent copy-assignment of this class, or its subclasses.
+     * Note that we do not define this method, therefore statements like "AbstractSrnModel new = old;" will not compile.
+     * We do not inherit from boost::noncopyable because we *do* define a protected copy-constructor, for use by CreateSrnModel.
+     */
+    AbstractSrnModel& operator=(const AbstractSrnModel&);
+
 protected:
 
     /**
@@ -94,6 +101,20 @@ protected:
      * The time the SRN model has been simulated to.
      */
     double mSimulatedToTime;
+
+    /**
+     * Protected copy-constructor for use by CreateSrnModel.  The only way for external code to create a copy of a SRN model
+     * is by calling that method, to ensure that a model of the correct subclass is created.
+     * This copy-constructor helps subclasses to ensure that all member variables are correctly copied when this happens.
+     *
+     * This method is called by child classes to set member variables for a daughter cell upon cell division.
+     * Note that the parent SRN model will have had ResetForDivision() called just before CreateSrnModel() is called,
+     * so performing an exact copy of the parent is suitable behaviour. Any daughter-cell-specific initialisation
+     * can be done in InitialiseDaughterCell().
+     *
+     * @param rModel the SRN model to copy.
+     */
+    AbstractSrnModel(AbstractSrnModel& rModel);
 
 public:
 
@@ -179,7 +200,8 @@ public:
      */
     virtual void ResetForDivision();
 
-    /* Builder method to create new instances of the SRN model.
+    /**
+     * Builder method to create new instances of the SRN model.
      * Each concrete subclass must implement this method to create an
      * instance of that subclass.
      *
@@ -190,26 +212,9 @@ public:
      * parent is suitable behaviour. Any daughter-cell-specific initialisation
      * can be done in InitialiseDaughterCell().
      *
-     * The below method CreateSrnModel(AbstractSrnModel* pModel) is called
-     * through the hierarchy to set all the member variables in the appropriate classes.
+     * Copy constructors are used to set all the member variables in the appropriate classes.
      */
     virtual AbstractSrnModel* CreateSrnModel()=0;
-
-    /**
-     * Copy method to set the member variables on a newly constructed SRN
-     *
-     * This method is called by child classes to set member variables
-     * for the daughter cell.  Note that the parent SRN
-     * model will have had ResetForDivision() called just before
-     * CreateSrnModel() is called, so performing an exact copy of the
-     * parent is suitable behaviour. Any daughter-cell-specific initialisation
-     * can be done in InitialiseDaughterCell().
-     *
-     * @param pModel pointer to an SRN model
-     *
-     * @return new SRN model
-     */
-    virtual AbstractSrnModel* CopySrnModelVariables(AbstractSrnModel* pModel);
 
     /**
      * Output SRN model used in the simulation to file and then call
