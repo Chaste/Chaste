@@ -55,7 +55,7 @@ DeltaNotchSrnModel::DeltaNotchSrnModel(boost::shared_ptr<AbstractCellCycleModelO
     assert(mpOdeSolver->IsSetUp());
 }
 
-DeltaNotchSrnModel::DeltaNotchSrnModel(DeltaNotchSrnModel& rModel)
+DeltaNotchSrnModel::DeltaNotchSrnModel(const DeltaNotchSrnModel& rModel)
     : AbstractOdeSrnModel(rModel)
 {
     assert(rModel.GetOdeSystem());

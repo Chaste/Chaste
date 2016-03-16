@@ -56,7 +56,7 @@ void NullSrnModel::SimulateToCurrentTime()
 }
 
 
-NullSrnModel::NullSrnModel(NullSrnModel& rModel)
+NullSrnModel::NullSrnModel(const NullSrnModel& rModel)
     : AbstractSrnModel(rModel)
 {
     // No new vatiables so dont do anything

@@ -79,7 +79,7 @@ private:
      *
      * @param rModel  the SRN model to copy.
      */
-    NullSrnModel(NullSrnModel& rModel);
+    NullSrnModel(const NullSrnModel& rModel);
 
 public:
 

@@ -49,7 +49,7 @@ Goldbeter1991SrnModel::Goldbeter1991SrnModel(boost::shared_ptr<AbstractCellCycle
 }
 
 
-Goldbeter1991SrnModel::Goldbeter1991SrnModel(Goldbeter1991SrnModel& rModel)
+Goldbeter1991SrnModel::Goldbeter1991SrnModel(const Goldbeter1991SrnModel& rModel)
     : AbstractOdeSrnModel(rModel)
 {
     assert(rModel.GetOdeSystem());

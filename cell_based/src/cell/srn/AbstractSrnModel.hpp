@@ -114,7 +114,7 @@ protected:
      *
      * @param rModel the SRN model to copy.
      */
-    AbstractSrnModel(AbstractSrnModel& rModel);
+    AbstractSrnModel(const AbstractSrnModel& rModel);
 
 public:
 
@@ -181,7 +181,7 @@ public:
     /**
      * @return the time the SRN simulated has run to.
      */
-    double GetSimulatedToTime();
+    double GetSimulatedToTime() const;
 
     /**
      * Simulate the SRN to the current time.
@@ -213,6 +213,8 @@ public:
      * can be done in InitialiseDaughterCell().
      *
      * Copy constructors are used to set all the member variables in the appropriate classes.
+     *
+     *  @return new srn model
      */
     virtual AbstractSrnModel* CreateSrnModel()=0;
 

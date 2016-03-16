@@ -52,7 +52,7 @@ void AbstractSrnModel::InitialiseDaughterCell()
 {
 }
 
-AbstractSrnModel::AbstractSrnModel(AbstractSrnModel& rModel)
+AbstractSrnModel::AbstractSrnModel(const AbstractSrnModel& rModel)
     : mSimulatedToTime(rModel.GetSimulatedToTime())
 {
     /*
@@ -94,7 +94,7 @@ void AbstractSrnModel::SetSimulatedToTime(double simulatedToTime)
     mSimulatedToTime = simulatedToTime;
 }
 
-double AbstractSrnModel::GetSimulatedToTime()
+double AbstractSrnModel::GetSimulatedToTime() const
 {
     return mSimulatedToTime;
 }
