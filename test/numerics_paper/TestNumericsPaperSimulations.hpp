@@ -44,6 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ImmersedBoundarySimulationModifier.hpp"
 #include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
 #include "ImmersedBoundaryMembraneElasticityForce.hpp"
+#include "OutputFileHandler.hpp"
 
 #include "Debug.hpp"
 #include "Timer.hpp"
@@ -58,19 +59,32 @@ public:
     void TestEllipseRelaxing() throw(Exception)
     {
         /*
-         * 1: Num cells
-         * 2: Num nodes per cell
-         * 3: Superellipse exponent
-         * 4: Superellipse aspect ratio
-         * 5: Random y-variation
-         * 6: Include membrane
+         * 1: num nodes
+         * 2: superellipse exponent
+         * 3: cell width
+         * 4: cell height
+         * 5: bottom left x
+         * 6: bottom left y
          */
-        MARK;
-        ImmersedBoundaryPalisadeMeshGenerator gen(1, 256, 0.1, 2.5, 0.0, false);
-        MARK;
-        ImmersedBoundaryMesh<2, 2>* p_mesh = gen.GetMesh();
-        MARK;
-        p_mesh->SetNumGridPtsXAndY(512);
+        SuperellipseGenerator* p_gen = new SuperellipseGenerator(128, 1.0, 0.4, 0.6, 0.3, 0.2);
+        std::vector<c_vector<double, 2> > locations = p_gen->GetPointsAsVectors();
+
+        std::vector<Node<2>* > nodes;
+        std::vector<ImmersedBoundaryElement<2,2>* > elements;
+
+        for(unsigned location = 0 ; location < locations.size() ; location++)
+        {
+            nodes.push_back(new Node<2>(location, locations[location], true));
+        }
+
+        elements.push_back(new ImmersedBoundaryElement<2,2>(0, nodes));
+        elements[0]->rGetCornerNodes().push_back(nodes[0]);
+        elements[0]->rGetCornerNodes().push_back(nodes[1]);
+        elements[0]->rGetCornerNodes().push_back(nodes[2]);
+        elements[0]->rGetCornerNodes().push_back(nodes[3]);
+
+        ImmersedBoundaryMesh<2,2>* p_mesh = new ImmersedBoundaryMesh<2,2>(nodes, elements);
+        p_mesh->SetNumGridPtsXAndY(32);
 
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
@@ -78,6 +92,7 @@ public:
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
         ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
+        cell_population.SetIfPopulationHasActiveSources(false);
 
         OffLatticeSimulation<2> simulator(cell_population);
 
@@ -88,15 +103,46 @@ public:
         // Add force laws
         MAKE_PTR_ARGS(ImmersedBoundaryMembraneElasticityForce<2>, p_boundary_force, (cell_population));
         p_main_modifier->AddImmersedBoundaryForce(p_boundary_force);
-        p_boundary_force->SetSpringConstant(0.5 * 1e7);
+        p_boundary_force->SetSpringConstant(1e8);
 
+        std::string output_directory = "numerics_paper/ellipse_relaxing";
+        simulator.SetOutputDirectory(output_directory);
+
+        // Write the state of the immersed boundary mesh to file
+        ImmersedBoundaryMeshWriter<2,2> mesh_at_start(output_directory, "example_simulation_mesh_at_start");
+        ImmersedBoundaryMeshWriter<2,2> mesh_at_end(output_directory, "example_simulation_mesh_at_end");
+
+        OutputFileHandler results_handler(output_directory, false);
+        out_stream results_file = results_handler.OpenOutputFile("example_simulation_esf.dat");
+
+        // Output summary statistics to results file
+        (*results_file) << "time,esf\n";
+        (*results_file) << 0.0 << "," << p_mesh->GetElongationShapeFactorOfElement(0) << "\n";
 
         // Set simulation properties
-        simulator.SetOutputDirectory("TestShortSingleCellSimulation");
-        simulator.SetDt(0.05);
-        simulator.SetSamplingTimestepMultiple(10);
-        simulator.SetEndTime(100.0);
+        double dt = 0.05;
+        simulator.SetDt(dt);
+        simulator.SetSamplingTimestepMultiple(1);
 
-        simulator.Solve();
+        for (unsigned i=0 ; i< 100 ; i++)
+        {
+            double new_end_time = dt * (1.0 + i);
+
+            simulator.SetEndTime(new_end_time);
+            simulator.Solve();
+
+            (*results_file) << new_end_time << "," << p_mesh->GetElongationShapeFactorOfElement(0) << "\n";
+
+            if(i==0)
+            {
+                mesh_at_start.WriteFilesUsingMesh(*p_mesh);
+            }
+        }
+
+        mesh_at_end.WriteFilesUsingMesh(*p_mesh);
+
+        // Tidy up
+        results_file->close();
+        delete(p_mesh);
     }
 };
