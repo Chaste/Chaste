@@ -197,7 +197,7 @@ private:
      * so performing an exact copy of the parent is suitable behaviour. Any daughter-cell-specific initialisation
      * can be done in InitialiseDaughterCell().
      */
-    MySrnModel(MySrnModel& rModel)
+    MySrnModel(const MySrnModel& rModel)
         : AbstractOdeSrnModel(rModel)
     {
         /*
