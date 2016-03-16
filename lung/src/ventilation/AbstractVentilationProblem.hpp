@@ -121,7 +121,7 @@ protected:
      *
      * @param rElement  The edge on which to perform this calculation
      * @param usePedley  Whether to add Pedley's increasing correction term.  Here the resistance increases
-     * which the sqrt of Reynold's number (dependent on flux).
+     * with the sqrt of Reynold's number (dependent on flux).
      * @param flux  The flux in the edge (used for Pedley correction).
      * @return the resistance of this element/edge
      */
