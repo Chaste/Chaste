@@ -53,7 +53,8 @@ void AbstractSrnModel::InitialiseDaughterCell()
 }
 
 AbstractSrnModel::AbstractSrnModel(const AbstractSrnModel& rModel)
-    : mSimulatedToTime(rModel.GetSimulatedToTime())
+    : boost::noncopyable_::noncopyable(),
+      mSimulatedToTime(rModel.GetSimulatedToTime())
 {
     /*
      * Set each member variable of the new SRN model that inherits

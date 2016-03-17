@@ -59,7 +59,7 @@ typedef boost::shared_ptr<Cell> CellPtr;
  *
  * \todo #2752 Thoroughly document this class (including, for example, what SRN stands for!)
  */
-class AbstractSrnModel : public Identifiable
+class AbstractSrnModel : public Identifiable, boost::noncopyable
 {
 private:
 

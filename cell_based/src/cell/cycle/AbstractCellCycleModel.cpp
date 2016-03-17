@@ -56,6 +56,7 @@ AbstractCellCycleModel::~AbstractCellCycleModel()
 }
 
 AbstractCellCycleModel::AbstractCellCycleModel(const AbstractCellCycleModel& rModel)
+    : boost::noncopyable_::noncopyable()
 {
     /*
      * Set each member variable of the new cell-cycle model that inherits
