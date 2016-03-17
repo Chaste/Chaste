@@ -43,39 +43,31 @@ StochasticDurationGenerationBasedCellCycleModel::StochasticDurationGenerationBas
 {
 }
 
-AbstractCellCycleModel* StochasticDurationGenerationBasedCellCycleModel::CreateCellCycleModel()
+StochasticDurationGenerationBasedCellCycleModel::StochasticDurationGenerationBasedCellCycleModel(const StochasticDurationGenerationBasedCellCycleModel& rModel)
+   : AbstractSimpleGenerationBasedCellCycleModel(rModel)
 {
-    // Create a new cell-cycle model
-    StochasticDurationGenerationBasedCellCycleModel* p_model = new StochasticDurationGenerationBasedCellCycleModel();
-
     /*
      * Set each member variable of the new cell-cycle model that inherits
      * its value from the parent.
      *
-     * Note 1: some of the new cell-cycle model's member variables (namely
-     * mBirthTime, mCurrentCellCyclePhase, mReadyToDivide) will already have been
-     * correctly initialized in its constructor.
+     * Note 1: some of the new cell-cycle model's member variables will already
+     * have been correctly initialized in its constructor or parent classes.
      *
      * Note 2: one or more of the new cell-cycle model's member variables
      * may be set/overwritten as soon as InitialiseDaughterCell() is called on
      * the new cell-cycle model.
      *
-     * Note 3: the member variable mDimension remains unset, since this cell-cycle
-     * model does not need to know the spatial dimension, so if we were to call
-     * SetDimension() on the new cell-cycle model an exception would be triggered;
-     * hence we do not set this member variable.
+     * Note 3: Only set the variables defined in this class. Variables defined
+     * in parent classes will be defined there.
+     *
      */
-    p_model->SetBirthTime(mBirthTime);
-    p_model->SetMinimumGapDuration(mMinimumGapDuration);
-    p_model->SetStemCellG1Duration(mStemCellG1Duration);
-    p_model->SetTransitCellG1Duration(mTransitCellG1Duration);
-    p_model->SetSDuration(mSDuration);
-    p_model->SetG2Duration(mG2Duration);
-    p_model->SetMDuration(mMDuration);
-    p_model->SetGeneration(mGeneration);
-    p_model->SetMaxTransitGenerations(mMaxTransitGenerations);
 
-    return p_model;
+    // No new member variables.
+}
+
+AbstractCellCycleModel* StochasticDurationGenerationBasedCellCycleModel::CreateCellCycleModel()
+{
+    return new StochasticDurationGenerationBasedCellCycleModel(*this);
 }
 
 void StochasticDurationGenerationBasedCellCycleModel::SetG1Duration()

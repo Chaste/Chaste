@@ -156,15 +156,25 @@ public:
         TS_ASSERT_DELTA(other_proteins[4], 0.67083371879876, 1e-2);
         TS_ASSERT_DELTA(other_proteins[5], 0.95328206604519, 2e-2);
 
+
+        TS_ASSERT_EQUALS(p_cell_model->ReadyToDivide(),true);
+
         // For coverage, we also test TysonNovakCellCycleModel methods for a mutant cell
         p_cell_model->ResetForDivision();
+
+        TS_ASSERT_EQUALS(p_cell_model->ReadyToDivide(),false);
 
         TysonNovakCellCycleModel* p_cell_model2 = static_cast<TysonNovakCellCycleModel*> (p_cell_model->CreateCellCycleModel());
 
         MAKE_PTR(ApcOneHitCellMutationState, p_mutation);
-
         CellPtr p_stem_cell_2(new Cell(p_mutation, p_cell_model2));
+
+        TS_ASSERT_EQUALS(p_cell_model2->ReadyToDivide(),false);
+
         p_stem_cell_2->SetCellProliferativeType(p_stem_type);
+
+        TS_ASSERT_EQUALS(p_cell_model->ReadyToDivide(),false);
+        TS_ASSERT_EQUALS(p_cell_model2->ReadyToDivide(),false);
 
         // Test the cell is ready to divide at the right time
         for (unsigned i=0; i<num_timesteps/2; i++)

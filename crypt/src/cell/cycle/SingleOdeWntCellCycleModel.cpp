@@ -57,48 +57,44 @@ SingleOdeWntCellCycleModel::SingleOdeWntCellCycleModel(boost::shared_ptr<Abstrac
     assert(mpOdeSolver->IsSetUp());
 }
 
-AbstractCellCycleModel* SingleOdeWntCellCycleModel::CreateCellCycleModel()
+SingleOdeWntCellCycleModel::SingleOdeWntCellCycleModel(const SingleOdeWntCellCycleModel& rModel)
+    : SimpleWntCellCycleModel(rModel),
+      CellCycleModelOdeHandler(SimulationTime::Instance()->GetTime(), rModel.mpOdeSolver) ///\todo #2173 Consider creating a proper copy constructor for this class
 {
-    // Create a new cell-cycle model
-    SingleOdeWntCellCycleModel* p_model = new SingleOdeWntCellCycleModel(this->mpOdeSolver);
-
     /*
      * Set each member variable of the new cell-cycle model that inherits
      * its value from the parent.
      *
-     * Note 1: some of the new cell-cycle model's member variables (namely
-     * mBirthTime, mCurrentCellCyclePhase, mReadyToDivide, mDt, mpOdeSolver)
-     * will already have been correctly initialized in its constructor.
+     * Note 1: some of the new cell-cycle model's member variables will already
+     * have been correctly initialized in its constructor or parent classes.
      *
      * Note 2: one or more of the new cell-cycle model's member variables
      * may be set/overwritten as soon as InitialiseDaughterCell() is called on
      * the new cell-cycle model.
+     *
+     * Note 3: Only set the variables defined in this class. Variables defined
+     * in parent classes will be defined there.
+     *
      */
-    p_model->SetBirthTime(mBirthTime);
-    p_model->SetDimension(mDimension);
-    p_model->SetMinimumGapDuration(mMinimumGapDuration);
-    p_model->SetStemCellG1Duration(mStemCellG1Duration);
-    p_model->SetTransitCellG1Duration(mTransitCellG1Duration);
-    p_model->SetSDuration(mSDuration);
-    p_model->SetG2Duration(mG2Duration);
-    p_model->SetMDuration(mMDuration);
-    p_model->SetUseCellProliferativeTypeDependentG1Duration(mUseCellProliferativeTypeDependentG1Duration);
-    p_model->SetWntStemThreshold(mWntStemThreshold);
-    p_model->SetWntTransitThreshold(mWntTransitThreshold);
-    p_model->SetWntLabelledThreshold(mWntLabelledThreshold);
-    p_model->SetLastTime(mLastTime);
-    p_model->SetBetaCateninDivisionThreshold(mBetaCateninDivisionThreshold);
+
+    SetLastTime(rModel.mLastTime);
+    mBetaCateninDivisionThreshold = rModel.mBetaCateninDivisionThreshold;
 
     /*
      * Create the new cell-cycle model's ODE system and use the current values
      * of the state variables in mpOdeSystem as an initial condition.
      */
-    assert(mpOdeSystem);
-    double wnt_level = this->GetWntLevel();
-    p_model->SetOdeSystem(new Mirams2010WntOdeSystem(wnt_level, mpCell->GetMutationState()));
-    p_model->SetStateVariables(mpOdeSystem->rGetStateVariables());
 
-    return p_model;
+    assert(rModel.GetOdeSystem());
+    double wnt_level = rModel.GetWntLevel();
+    SetOdeSystem(new Mirams2010WntOdeSystem(wnt_level, rModel.mpCell->GetMutationState()));
+    SetStateVariables(rModel.GetOdeSystem()->rGetStateVariables());
+}
+
+
+AbstractCellCycleModel* SingleOdeWntCellCycleModel::CreateCellCycleModel()
+{
+    return new SingleOdeWntCellCycleModel(*this);
 }
 
 void SingleOdeWntCellCycleModel::UpdateCellCyclePhase()
@@ -106,7 +102,7 @@ void SingleOdeWntCellCycleModel::UpdateCellCyclePhase()
     assert(SimulationTime::Instance()->IsStartTimeSetUp());
     SolveOdeToTime(SimulationTime::Instance()->GetTime());
     ChangeCellProliferativeTypeDueToCurrentBetaCateninLevel();
-    AbstractSimpleCellCycleModel::UpdateCellCyclePhase(); /// Don't call the SimpleWntCellCycleModel - it will overwrite this.
+    AbstractSimpleCellCycleModel::UpdateCellCyclePhase(); /// Don't call the SimpleWntCellCycleModel - it will overwrite thi    s.
 }
 
 void SingleOdeWntCellCycleModel::Initialise()

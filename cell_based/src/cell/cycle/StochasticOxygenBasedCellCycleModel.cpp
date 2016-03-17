@@ -42,6 +42,28 @@ StochasticOxygenBasedCellCycleModel::StochasticOxygenBasedCellCycleModel()
 {
 }
 
+StochasticOxygenBasedCellCycleModel::StochasticOxygenBasedCellCycleModel(const StochasticOxygenBasedCellCycleModel& rModel)
+   : SimpleOxygenBasedCellCycleModel(rModel)
+{
+    /*
+     * Set each member variable of the new cell-cycle model that inherits
+     * its value from the parent.
+     *
+     * Note 1: some of the new cell-cycle model's member variables will already
+     * have been correctly initialized in its constructor or parent classes.
+     *
+     * Note 2: one or more of the new cell-cycle model's member variables
+     * may be set/overwritten as soon as InitialiseDaughterCell() is called on
+     * the new cell-cycle model.
+     *
+     * Note 3: Only set the variables defined in this class. Variables defined
+     * in parent classes will be defined there.
+     *
+     */
+
+    // No new member variables.
+}
+
 void StochasticOxygenBasedCellCycleModel::GenerateStochasticG2Duration()
 {
     RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
@@ -76,43 +98,14 @@ void StochasticOxygenBasedCellCycleModel::ResetForDivision()
     GenerateStochasticG2Duration();
 }
 
-double StochasticOxygenBasedCellCycleModel::GetG2Duration()
+double StochasticOxygenBasedCellCycleModel::GetG2Duration() const
 {
     return mStochasticG2Duration;
 }
 
 AbstractCellCycleModel* StochasticOxygenBasedCellCycleModel::CreateCellCycleModel()
 {
-    // Create a new cell-cycle model
-    StochasticOxygenBasedCellCycleModel* p_model = new StochasticOxygenBasedCellCycleModel();
-
-    /*
-     * Set each member variable of the new cell-cycle model that inherits
-     * its value from the parent.
-     *
-     * Note 1: some of the new cell-cycle model's member variables (namely
-     * mBirthTime, mCurrentCellCyclePhase, mReadyToDivide, mTimeSpentInG1Phase,
-     * mCurrentHypoxicDuration, mCurrentHypoxiaOnsetTime) will already have been
-     * correctly initialized in its constructor.
-     *
-     * Note 2: one or more of the new cell-cycle model's member variables
-     * may be set/overwritten as soon as InitialiseDaughterCell() is called on
-     * the new cell-cycle model.
-     */
-    p_model->SetBirthTime(mBirthTime);
-    p_model->SetDimension(mDimension);
-    p_model->SetMinimumGapDuration(mMinimumGapDuration);
-    p_model->SetStemCellG1Duration(mStemCellG1Duration);
-    p_model->SetTransitCellG1Duration(mTransitCellG1Duration);
-    p_model->SetSDuration(mSDuration);
-    p_model->SetG2Duration(mG2Duration);
-    p_model->SetMDuration(mMDuration);
-    p_model->SetHypoxicConcentration(mHypoxicConcentration);
-    p_model->SetQuiescentConcentration(mQuiescentConcentration);
-    p_model->SetCriticalHypoxicDuration(mCriticalHypoxicDuration);
-    p_model->SetCurrentHypoxiaOnsetTime(mCurrentHypoxiaOnsetTime);
-
-    return p_model;
+    return new StochasticOxygenBasedCellCycleModel(*this);
 }
 
 void StochasticOxygenBasedCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)

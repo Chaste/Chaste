@@ -358,10 +358,16 @@ public:
 
         // Check that cell division correctly resets the cell cycle phase
         TS_ASSERT_EQUALS(p_stem_cell->ReadyToDivide(), true);
+        TS_ASSERT_EQUALS(p_stem_model->GetCurrentCellCyclePhase(), G_TWO_PHASE);
+
+        p_stem_model->ResetForDivision();
+        TS_ASSERT_EQUALS(p_stem_model->GetCurrentCellCyclePhase(), M_PHASE);
+
         GammaDistributedStochasticDurationCellCycleModel* p_stem_model2 = static_cast <GammaDistributedStochasticDurationCellCycleModel*> (p_stem_model->CreateCellCycleModel());
+        TS_ASSERT_EQUALS(p_stem_model2->GetCurrentCellCyclePhase(), M_PHASE);
+
         CellPtr p_stem_cell2(new Cell(p_healthy_state, p_stem_model2));
         p_stem_cell2->SetCellProliferativeType(p_stem_type);
-        p_stem_cell2->InitialiseCellCycleModel();
         TS_ASSERT_EQUALS(p_stem_model2->GetCurrentCellCyclePhase(), M_PHASE);
     }
 
@@ -445,11 +451,17 @@ public:
 
         // Check that cell division correctly resets the cell cycle phase
         TS_ASSERT_EQUALS(p_stem_cell->ReadyToDivide(), true);
+        TS_ASSERT_EQUALS(p_stem_model->GetCurrentCellCyclePhase(), G_TWO_PHASE);
+
+        p_stem_model->ResetForDivision();
+        TS_ASSERT_EQUALS(p_stem_model->GetCurrentCellCyclePhase(), M_PHASE);
+
         ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel* p_stem_model2 =
-                static_cast <ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel*> (p_stem_model->CreateCellCycleModel());
+                        static_cast <ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel*> (p_stem_model->CreateCellCycleModel());
+        TS_ASSERT_EQUALS(p_stem_model2->GetCurrentCellCyclePhase(), M_PHASE);
+
         CellPtr p_stem_cell2(new Cell(p_healthy_state, p_stem_model2));
         p_stem_cell2->SetCellProliferativeType(p_stem_type);
-        p_stem_cell2->InitialiseCellCycleModel();
         TS_ASSERT_EQUALS(p_stem_model2->GetCurrentCellCyclePhase(), M_PHASE);
     }
 
@@ -695,9 +707,12 @@ public:
 
         // Check that cell division correctly resets the cell cycle phase
         TS_ASSERT_EQUALS(p_hepa_one_cell->ReadyToDivide(), true);
+
         CellPtr p_hepa_one_cell2 = p_hepa_one_cell->Divide();
         ContactInhibitionCellCycleModel* p_hepa_one_model2 = static_cast <ContactInhibitionCellCycleModel*>(p_hepa_one_cell2->GetCellCycleModel());
 
+        TS_ASSERT_EQUALS(p_hepa_one_model->ReadyToDivide(), false);
+        TS_ASSERT_EQUALS(p_hepa_one_model->GetCurrentCellCyclePhase(), M_PHASE);
         TS_ASSERT_EQUALS(p_hepa_one_model2->ReadyToDivide(), false);
         TS_ASSERT_EQUALS(p_hepa_one_model2->GetCurrentCellCyclePhase(), M_PHASE);
     }
