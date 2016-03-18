@@ -53,13 +53,12 @@ typedef boost::shared_ptr<Cell> CellPtr;
 
 /**
  * The AbstractSrnModel contains basic information to all sub-cellular reaction network (SRN) models.
- * It handles assignment of a Cell.
  *
  * SRN models are noncopyable since cells are noncopyable.
  *
  * \todo #2752 Thoroughly document this class (including, for example, what SRN stands for!)
  */
-class AbstractSrnModel : public Identifiable, boost::noncopyable
+class AbstractSrnModel : public Identifiable
 {
 private:
 

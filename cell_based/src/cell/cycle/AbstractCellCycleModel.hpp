@@ -58,7 +58,7 @@ typedef boost::shared_ptr<Cell> CellPtr;
  *
  * Cell-cycle models are noncopyable since cells are noncopyable.
  */
-class AbstractCellCycleModel : public Identifiable, boost::noncopyable
+class AbstractCellCycleModel : public Identifiable
 {
 private:
 
