@@ -56,6 +56,7 @@ AbstractCellCycleModel::~AbstractCellCycleModel()
 }
 
 AbstractCellCycleModel::AbstractCellCycleModel(const AbstractCellCycleModel& rModel)
+    : mG2Duration(rModel.mG2Duration)
 {
     /*
      * Set each member variable of the new cell-cycle model that inherits
@@ -81,7 +82,6 @@ AbstractCellCycleModel::AbstractCellCycleModel(const AbstractCellCycleModel& rMo
     SetTransitCellG1Duration(rModel.GetTransitCellG1Duration());
 
     SetSDuration(rModel.GetSDuration());
-    SetG2Duration(rModel.GetG2Duration());
     SetMDuration(rModel.GetMDuration());
 
     // No set methods so use the member variables directly
