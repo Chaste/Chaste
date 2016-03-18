@@ -65,36 +65,42 @@ public:
          * 5: Random y-variation
          * 6: Include membrane
          */
-        ImmersedBoundaryPalisadeMeshGenerator gen(1, 256, 0.1, 2.5, 0.0, false);
+        ImmersedBoundaryPalisadeMeshGenerator gen(1, 32, 0.1, 2.5, 0.0, false);
         ImmersedBoundaryMesh<2, 2>* p_mesh = gen.GetMesh();
+//
+//        p_mesh->SetNumGridPtsXAndY(512);
 
-        p_mesh->SetNumGridPtsXAndY(512);
+        c_vector<double, 2> axis;
+        axis[0] = -1.0;
+        axis[1] = 1.0;
 
-        std::vector<CellPtr> cells;
-        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
+        p_mesh->GetSkewnessOfElementMassDistributionAboutAxis(0, axis);
 
-        ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
-
-        OffLatticeSimulation<2> simulator(cell_population);
-
-        // Add main immersed boundary simulation modifier
-        MAKE_PTR(ImmersedBoundarySimulationModifier<2>, p_main_modifier);
-        simulator.AddSimulationModifier(p_main_modifier);
-
-        // Add force laws
-        MAKE_PTR_ARGS(ImmersedBoundaryMembraneElasticityForce<2>, p_boundary_force, (cell_population));
-        p_main_modifier->AddImmersedBoundaryForce(p_boundary_force);
-        p_boundary_force->SetSpringConstant(0.5 * 1e7);
-
-
-        // Set simulation properties
-        simulator.SetOutputDirectory("TestShortSingleCellSimulation");
-        simulator.SetDt(0.05);
-        simulator.SetSamplingTimestepMultiple(10);
-        simulator.SetEndTime(100.0);
-
-        simulator.Solve();
+//        std::vector<CellPtr> cells;
+//        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+//        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+//        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
+//
+//        ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
+//
+//        OffLatticeSimulation<2> simulator(cell_population);
+//
+//        // Add main immersed boundary simulation modifier
+//        MAKE_PTR(ImmersedBoundarySimulationModifier<2>, p_main_modifier);
+//        simulator.AddSimulationModifier(p_main_modifier);
+//
+//        // Add force laws
+//        MAKE_PTR_ARGS(ImmersedBoundaryMembraneElasticityForce<2>, p_boundary_force, (cell_population));
+//        p_main_modifier->AddImmersedBoundaryForce(p_boundary_force);
+//        p_boundary_force->SetSpringConstant(0.5 * 1e7);
+//
+//
+//        // Set simulation properties
+//        simulator.SetOutputDirectory("TestShortSingleCellSimulation");
+//        simulator.SetDt(0.05);
+//        simulator.SetSamplingTimestepMultiple(10);
+//        simulator.SetEndTime(100.0);
+//
+//        simulator.Solve();
     }
 };

@@ -200,10 +200,9 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetTortuosityOfMesh()
 }
 
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-bool ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::CompareNodesAlongX(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB)
+bool CustomComparisonForSkewnessMeasure(std::pair<unsigned, c_vector<double, 2> > pairA, std::pair<unsigned, c_vector<double, 2> > pairB)
 {
-    return pNodeA->rGetLocation()[0] < pNodeB->rGetLocation()[0];
+    return pairA.second[0] < pairB.second[0];
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -214,26 +213,72 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetSkewnessOfElementMassDis
 
     ImmersedBoundaryElement<ELEMENT_DIM,SPACE_DIM>* p_elem = this->GetElement(elemIndex);
 
-    // Get the unit axis and unit perpendicular vectors
+    // Get the unit axis terms for rotation so that axis becomes vertical
     c_vector<double, SPACE_DIM> unit_axis = axis / norm_2(axis);
-    c_vector<double, SPACE_DIM> unit_perp;
-    unit_perp[0] = unit_axis[1];
-    unit_perp[1] = - unit_axis[0];
+    double sin_theta = unit_axis[0];
+    double cos_theta = unit_axis[1];
 
     // Get the centroid of the element
     c_vector<double, SPACE_DIM> centroid = this->GetCentroidOfElement(elemIndex);
 
-    std::vector<c_vector<double, SPACE_DIM> > node_locations;
+    std::vector<c_vector<double, SPACE_DIM> > node_locations_original_order;
+    std::vector<std::pair<unsigned, c_vector<double, SPACE_DIM> > > ordered_locations;
 
-    // Get the node locations of the current element relative to its centroid
+    // Get the node locations of the current element relative to its centroid, and rotate it
     for (unsigned node_idx = 0 ; node_idx < p_elem->GetNumNodes() ; node_idx++)
     {
         const c_vector<double, SPACE_DIM>& node_location = p_elem->GetNode(node_idx)->rGetLocation();
 
+        c_vector<double, SPACE_DIM> displacement = this->GetVectorFromAtoB(centroid, node_location);
+
+        c_vector<double, SPACE_DIM> rotated_location;
+        rotated_location[0] = cos_theta * displacement[0] - sin_theta * displacement[1];
+        rotated_location[1] = sin_theta * displacement[0] + cos_theta * displacement[1];
+
         // Translate the centroid to the origin
-        node_locations.push_back(this->GetVectorFromAtoB(centroid, node_location));
+        node_locations_original_order.push_back(rotated_location);
     }
 
+    // Fill up a vector of identical points, and sort it so nodes are ordered in ascending x value
+    for (unsigned i=0 ; i<node_locations_original_order.size() ; i++)
+    {
+        ordered_locations.push_back(std::pair<unsigned, c_vector<double, SPACE_DIM> >(i, node_locations_original_order[i]));
+    }
+    std::sort(ordered_locations.begin(), ordered_locations.end(), CustomComparisonForSkewnessMeasure);
+
+    for (unsigned i=0 ; i<ordered_locations.size() ; i++)
+    {
+        PRINT_VECTOR(ordered_locations[i].second);
+    }
+
+    /*
+     * For each node, we must find every place where the axis (now rotated to be vertical) intersects the polygon:
+     *
+     *       |
+     *     __|______
+     *    /  |      \
+     *   /   |       \
+     *  /____|___    |
+     *       |  |    |
+     *  _____|__|    |
+     *  \    |       |
+     *   \   |      /
+     *    \  |     /
+     *     \_|____/
+     *       |
+     *       |
+     *       ^
+     * For instance, the number of times the vertical intersects the polygon above is 4 and, for each node, we need to
+     * find all such intersections.  We can do this by checking where the dot product of the the vector a with the unit
+     * x direction changes sign as we iterate over the original node locations, where a is the vector from the current
+     * node to the test node.
+     */
+    for (unsigned location = 0 ; location < ordered_locations.size() ; location++)
+    {
+        unsigned this_index = ordered_locations[location].first;
+        c_vector<double, SPACE_DIM> this_location = ordered_locations[location].second;
+
+    }
 
 
 
