@@ -46,7 +46,8 @@ ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel::Exponen
 }
 
 ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel::ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel(const ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel& rModel)
-   : AbstractSimpleGenerationBasedCellCycleModel(rModel)
+   :  AbstractSimpleGenerationBasedCellCycleModel(rModel),
+      mRate(rModel.mRate)
 {
     /*
      * Set each member variable of the new cell-cycle model that inherits
@@ -63,7 +64,6 @@ ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel::Exponen
      * in parent classes will be defined there.
      *
      */
-    SetRate(rModel.GetRate());
 }
 
 AbstractCellCycleModel* ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel::CreateCellCycleModel()

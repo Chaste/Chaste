@@ -59,7 +59,8 @@ SingleOdeWntCellCycleModel::SingleOdeWntCellCycleModel(boost::shared_ptr<Abstrac
 
 SingleOdeWntCellCycleModel::SingleOdeWntCellCycleModel(const SingleOdeWntCellCycleModel& rModel)
     : SimpleWntCellCycleModel(rModel),
-      CellCycleModelOdeHandler(SimulationTime::Instance()->GetTime(), rModel.mpOdeSolver) ///\todo #2173 Consider creating a proper copy constructor for this class
+      CellCycleModelOdeHandler(SimulationTime::Instance()->GetTime(), rModel.mpOdeSolver), ///\todo #2173 Consider creating a proper copy constructor for this class
+      mBetaCateninDivisionThreshold(rModel.mBetaCateninDivisionThreshold)
 {
     /*
      * Set each member variable of the new cell-cycle model that inherits
@@ -77,8 +78,9 @@ SingleOdeWntCellCycleModel::SingleOdeWntCellCycleModel(const SingleOdeWntCellCyc
      *
      */
 
-    SetLastTime(rModel.mLastTime);
-    mBetaCateninDivisionThreshold = rModel.mBetaCateninDivisionThreshold;
+    // Set here as mLastTime is defined in CellCycleModelOdeHandler could
+    // be removed if making a copy constructor for CellCycleModelOdeHandler
+    mLastTime = rModel.mLastTime;
 
     /*
      * Create the new cell-cycle model's ODE system and use the current values

@@ -58,6 +58,21 @@ DeltaNotchSrnModel::DeltaNotchSrnModel(boost::shared_ptr<AbstractCellCycleModelO
 DeltaNotchSrnModel::DeltaNotchSrnModel(const DeltaNotchSrnModel& rModel)
     : AbstractOdeSrnModel(rModel)
 {
+    /*
+     * Set each member variable of the new SRN model that inherits
+     * its value from the parent.
+     *
+     * Note 1: some of the new SRN model's member variables
+     * will already have been correctly initialized in its constructor.
+     *
+     * Note 2: one or more of the new SRN model's member variables
+     * may be set/overwritten as soon as InitialiseDaughterCell() is called on
+     * the new SRN model.
+     *
+     * Note 3: Only set the variables defined in this class. Variables defined
+     * in parent classes will be defined there.
+     */
+
     assert(rModel.GetOdeSystem());
     SetOdeSystem(new DeltaNotchOdeSystem(rModel.GetOdeSystem()->rGetStateVariables()));
 }

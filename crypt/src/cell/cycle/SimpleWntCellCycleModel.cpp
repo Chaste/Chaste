@@ -48,7 +48,11 @@ SimpleWntCellCycleModel::SimpleWntCellCycleModel()
 }
 
 SimpleWntCellCycleModel::SimpleWntCellCycleModel(const SimpleWntCellCycleModel& rModel)
-   : AbstractSimpleCellCycleModel(rModel)
+   : AbstractSimpleCellCycleModel(rModel),
+     mUseCellProliferativeTypeDependentG1Duration(rModel.mUseCellProliferativeTypeDependentG1Duration),
+     mWntStemThreshold(rModel.mWntStemThreshold),
+     mWntTransitThreshold(rModel.mWntTransitThreshold),
+     mWntLabelledThreshold(rModel.mWntLabelledThreshold)
 {
     /*
      * Set each member variable of the new cell-cycle model that inherits
@@ -65,11 +69,6 @@ SimpleWntCellCycleModel::SimpleWntCellCycleModel(const SimpleWntCellCycleModel& 
      * in parent classes will be defined there.
      *
      */
-
-    SetUseCellProliferativeTypeDependentG1Duration(rModel.GetUseCellProliferativeTypeDependentG1Duration());
-    SetWntStemThreshold(rModel.GetWntStemThreshold());
-    SetWntTransitThreshold(rModel.GetWntTransitThreshold());
-    SetWntLabelledThreshold(rModel.GetWntLabelledThreshold());
 }
 
 

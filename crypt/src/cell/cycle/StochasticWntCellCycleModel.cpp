@@ -57,7 +57,8 @@ StochasticWntCellCycleModel::~StochasticWntCellCycleModel()
 {}
 
 StochasticWntCellCycleModel::StochasticWntCellCycleModel(const StochasticWntCellCycleModel& rModel)
-   : WntCellCycleModel(rModel)
+   : WntCellCycleModel(rModel),
+     mStochasticG2Duration(rModel.mStochasticG2Duration)
 {
     /*
      * Set each member variable of the new cell-cycle model that inherits
@@ -74,8 +75,6 @@ StochasticWntCellCycleModel::StochasticWntCellCycleModel(const StochasticWntCell
      * in parent classes will be defined there.
      *
      */
-
-    mStochasticG2Duration = rModel.mStochasticG2Duration;
 
     /*
      * Create the new cell-cycle model's ODE system and use the current values

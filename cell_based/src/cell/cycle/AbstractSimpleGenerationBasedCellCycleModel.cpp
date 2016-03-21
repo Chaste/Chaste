@@ -50,7 +50,9 @@ AbstractSimpleGenerationBasedCellCycleModel::~AbstractSimpleGenerationBasedCellC
 }
 
 AbstractSimpleGenerationBasedCellCycleModel::AbstractSimpleGenerationBasedCellCycleModel(const AbstractSimpleGenerationBasedCellCycleModel& rModel)
-    : AbstractSimpleCellCycleModel(rModel)
+    : AbstractSimpleCellCycleModel(rModel),
+      mGeneration(rModel.mGeneration),
+      mMaxTransitGenerations(rModel.mMaxTransitGenerations)
 {
     /*
      * Set each member variable of the new cell-cycle model that inherits
@@ -67,8 +69,6 @@ AbstractSimpleGenerationBasedCellCycleModel::AbstractSimpleGenerationBasedCellCy
      * in parent classes will be defined there.
      *
      */
-    SetGeneration(rModel.GetGeneration());
-    SetMaxTransitGenerations(rModel.GetMaxTransitGenerations());
 }
 
 void AbstractSimpleGenerationBasedCellCycleModel::ResetForDivision()

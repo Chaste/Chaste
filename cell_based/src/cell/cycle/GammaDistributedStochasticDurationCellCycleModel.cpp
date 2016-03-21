@@ -47,7 +47,9 @@ GammaDistributedStochasticDurationCellCycleModel::GammaDistributedStochasticDura
 }
 
 GammaDistributedStochasticDurationCellCycleModel::GammaDistributedStochasticDurationCellCycleModel(const GammaDistributedStochasticDurationCellCycleModel& rModel)
-   : AbstractSimpleCellCycleModel(rModel)
+   :  AbstractSimpleCellCycleModel(rModel),
+      mShape(rModel.mShape),
+      mScale(rModel.mScale)
 {
     /*
      * Set each member variable of the new cell-cycle model that inherits
@@ -64,9 +66,6 @@ GammaDistributedStochasticDurationCellCycleModel::GammaDistributedStochasticDura
      * in parent classes will be defined there.
      *
      */
-
-    SetShape(rModel.GetShape());
-    SetScale(rModel.GetScale());
 }
 
 AbstractCellCycleModel* GammaDistributedStochasticDurationCellCycleModel::CreateCellCycleModel()

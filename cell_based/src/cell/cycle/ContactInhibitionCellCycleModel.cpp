@@ -47,7 +47,11 @@ ContactInhibitionCellCycleModel::ContactInhibitionCellCycleModel()
 }
 
 ContactInhibitionCellCycleModel::ContactInhibitionCellCycleModel(const ContactInhibitionCellCycleModel& rModel)
-   : AbstractSimpleCellCycleModel(rModel)
+    : AbstractSimpleCellCycleModel(rModel),
+      mQuiescentVolumeFraction(rModel.mQuiescentVolumeFraction),
+      mEquilibriumVolume(rModel.mEquilibriumVolume),
+      mCurrentQuiescentOnsetTime(rModel.mCurrentQuiescentOnsetTime),
+      mCurrentQuiescentDuration(rModel.mCurrentQuiescentDuration)
 {
     /*
      * Set each member variable of the new cell-cycle model that inherits
@@ -64,11 +68,6 @@ ContactInhibitionCellCycleModel::ContactInhibitionCellCycleModel(const ContactIn
      * in parent classes will be defined there.
      *
      */
-
-    SetQuiescentVolumeFraction(rModel.GetQuiescentVolumeFraction());
-    SetEquilibriumVolume(rModel.GetEquilibriumVolume());
-    SetCurrentQuiescentOnsetTime(rModel.GetCurrentQuiescentOnsetTime());
-    SetCurrentQuiescentDuration(rModel.GetCurrentQuiescentDuration());
 }
 
 void ContactInhibitionCellCycleModel::UpdateCellCyclePhase()

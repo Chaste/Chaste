@@ -87,7 +87,12 @@ void SimpleOxygenBasedCellCycleModel::UpdateCellCyclePhase()
 }
 
 SimpleOxygenBasedCellCycleModel::SimpleOxygenBasedCellCycleModel(const SimpleOxygenBasedCellCycleModel& rModel)
-   : AbstractSimpleCellCycleModel(rModel)
+   : AbstractSimpleCellCycleModel(rModel),
+     mCurrentHypoxicDuration(rModel.mCurrentHypoxicDuration),
+     mCurrentHypoxiaOnsetTime(rModel.mCurrentHypoxiaOnsetTime),
+     mHypoxicConcentration(rModel.mHypoxicConcentration),
+     mQuiescentConcentration(rModel.mQuiescentConcentration),
+     mCriticalHypoxicDuration(rModel.mCriticalHypoxicDuration)
 {
     /*
      * Set each member variable of the new cell-cycle model that inherits
@@ -104,11 +109,6 @@ SimpleOxygenBasedCellCycleModel::SimpleOxygenBasedCellCycleModel(const SimpleOxy
      * in parent classes will be defined there.
      *
      */
-
-    SetHypoxicConcentration(rModel.GetHypoxicConcentration());
-    SetQuiescentConcentration(rModel.GetQuiescentConcentration());
-    SetCriticalHypoxicDuration(rModel.GetCriticalHypoxicDuration());
-    SetCurrentHypoxiaOnsetTime(rModel.GetCurrentHypoxiaOnsetTime());
 }
 
 

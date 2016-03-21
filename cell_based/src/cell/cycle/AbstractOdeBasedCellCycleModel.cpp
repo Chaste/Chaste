@@ -59,7 +59,6 @@ AbstractOdeBasedCellCycleModel::AbstractOdeBasedCellCycleModel(const AbstractOde
       mDivideTime(rModel.mDivideTime),
       mFinishedRunningOdes(rModel.mFinishedRunningOdes),
       mG2PhaseStartTime(rModel.mG2PhaseStartTime)
-//      mLastTime(rModel.mLastTime)
 //      mInitialConditions(rModel.mInitialConditions),
 //      mStateSize(rModel.mStateSize)
 {
@@ -78,6 +77,9 @@ AbstractOdeBasedCellCycleModel::AbstractOdeBasedCellCycleModel(const AbstractOde
      * in parent classes will be defined there.
      *
      */
+
+    // Set here as mLastTime is defined in CellCycleModelOdeHandler could
+    // be removed if making a copy constructor for CellCycleModelOdeHandler
     SetLastTime(rModel.mLastTime);
 }
 

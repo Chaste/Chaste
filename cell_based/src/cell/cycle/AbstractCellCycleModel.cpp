@@ -56,39 +56,33 @@ AbstractCellCycleModel::~AbstractCellCycleModel()
 }
 
 AbstractCellCycleModel::AbstractCellCycleModel(const AbstractCellCycleModel& rModel)
-    : mG2Duration(rModel.mG2Duration)
+    :   mBirthTime(rModel.mBirthTime),
+        mCurrentCellCyclePhase(rModel.mCurrentCellCyclePhase),
+        mG1Duration(rModel.mG1Duration),
+        mReadyToDivide(rModel.mReadyToDivide),
+        mDimension(rModel.mDimension),
+        mMinimumGapDuration(rModel.mMinimumGapDuration),
+        mStemCellG1Duration(rModel.mStemCellG1Duration),
+        mTransitCellG1Duration(rModel.mTransitCellG1Duration),
+        mSDuration(rModel.mSDuration),
+        mG2Duration(rModel.mG2Duration),
+        mMDuration(rModel.mMDuration)
 {
-    /*
-     * Set each member variable of the new cell-cycle model that inherits
-     * its value from the parent.
-     *
-     * Note 1: some of the new cell-cycle model's member variables will already
-     * have been correctly initialized in its constructor or parent classes.
-     *
-     * Note 2: one or more of the new cell-cycle model's member variables
-     * may be set/overwritten as soon as InitialiseDaughterCell() is called on
-     * the new cell-cycle model.
-     *
-     * Note 3: Only set the variables defined in this class. Variables defined
-     * in parent classes will be defined there.
-     *
-     */
-    SetBirthTime(rModel.GetBirthTime());
-    SetCurrentCellCyclePhase(rModel.GetCurrentCellCyclePhase());
-
-    SetDimension(rModel.GetDimension());
-    SetMinimumGapDuration(rModel.GetMinimumGapDuration());
-    SetStemCellG1Duration(rModel.GetStemCellG1Duration());
-    SetTransitCellG1Duration(rModel.GetTransitCellG1Duration());
-
-    SetSDuration(rModel.GetSDuration());
-    SetMDuration(rModel.GetMDuration());
-
-    // No set methods so use the member variables directly
-    // Note these two are reset to DBL_MAX and false in ResetForDivision
-    mG1Duration=rModel.mG1Duration;
-    mReadyToDivide =  rModel.mReadyToDivide;
-
+      /*
+       * Set each member variable of the new cell-cycle model that inherits
+       * its value from the parent.
+       *
+       * Note 1: some of the new cell-cycle model's member variables will already
+       * have been correctly initialized in its constructor or parent classes.
+       *
+       * Note 2: one or more of the new cell-cycle model's member variables
+       * may be set/overwritten as soon as InitialiseDaughterCell() is called on
+       * the new cell-cycle model.
+       *
+       * Note 3: Only set the variables defined in this class. Variables defined
+       * in parent classes will be defined there.
+       *
+       */
 }
 
 void AbstractCellCycleModel::Initialise()
