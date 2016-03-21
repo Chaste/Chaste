@@ -36,6 +36,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ImmersedBoundaryMesh.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "UblasCustomFunctions.hpp"
+#include <boost/accumulators/accumulators.hpp>
+#include <boost/accumulators/statistics/stats.hpp>
+#include <boost/accumulators/statistics/weighted_skewness.hpp>
 
 #include "Debug.hpp"
 
@@ -285,16 +288,18 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetSkewnessOfElementMassDis
      * node to the test node.
      */
 
-    std::vector<std::vector<double> > knots;
+    std::vector<std::vector<double> > knots(num_nodes);
+    knots.begin()->push_back(ordered_locations.begin()->second[1]);
+    knots.rbegin()->push_back(ordered_locations.rbegin()->second[1]);
 
     for (unsigned location = 1 ; location < num_nodes - 1 ; location++)
     {
         unsigned this_index = ordered_locations[location].first;
         c_vector<double, SPACE_DIM> this_location = ordered_locations[location].second;
 
-        c_vector<double, SPACE_DIM> to_previous = node_locations_original_order[this_index + 1] - this_location;
+        knots[location].push_back(this_location[1]);
 
-        std::vector<unsigned> crossing_points;
+        c_vector<double, SPACE_DIM> to_previous = node_locations_original_order[(this_index + 1) % num_nodes] - this_location;
 
         for (unsigned node = this_index + 2 ; node < this_index + num_nodes ; node++)
         {
@@ -304,16 +309,81 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetSkewnessOfElementMassDis
 
             if (to_previous[0] * to_this[0] <= 0.0)
             {
-                crossing_points.push_back((idx + num_nodes - 1) % num_nodes);
+                // Find how far between to_previous and to_this the intersection is
+                double interp = to_previous[0] / (to_previous[0] - to_this[0]);
+
+                assert(interp >= 0.0 && interp <= 1.0);
+
+                // Record the y-value of the intersection point
+                double new_intersection = this_location[1] + to_previous[1] + interp * (to_this[1] - to_previous[1]);
+                knots[location].push_back(new_intersection);
             }
+
 
             to_previous = to_this;
         }
 
-//        PRINT_VECTOR(crossing_points);
-
+        if (knots[location].size() > 4)
+        {
+            EXCEPTION("Axis intersects polygon more than 4 times - case not yet handled.");
+        }
     }
 
+    std::vector<double> ordered_x(num_nodes);
+    for (unsigned i=0 ; i<ordered_locations.size() ; i++)
+    {
+        ordered_x[i]  = ordered_locations[i].second[0];
+    }
+
+    std::vector<double> mass_contributions(num_nodes);
+    for (unsigned i=0 ; i<num_nodes ; i++)
+    {
+        std::sort(knots[i].begin(), knots[i].end());
+
+        switch (knots[i].size())
+        {
+            case 1:
+                mass_contributions[i] = 0.0;
+                break;
+
+            case 2:
+                mass_contributions[i] = knots[i][1] - knots[i][0];
+                break;
+
+            case 3:
+                mass_contributions[i] = knots[i][2] - knots[i][0];
+                break;
+
+            case 4:
+                mass_contributions[i] = (knots[i][3] - knots[i][2]) + (knots[i][1] - knots[i][0]);
+                break;
+
+            default:
+                NEVER_REACHED;
+        }
+    }
+
+    PRINT_VECTOR(mass_contributions);
+
+    boost::accumulators::accumulator_set<double, boost::accumulators::stats<boost::accumulators::tag::weighted_skewness>, double> skewness_acc;
+
+    skewness_acc(0.0, boost::accumulators::weight = ordered_x[1] - ordered_x[0]);
+
+    for (unsigned i=1 ; i<num_nodes ; i++)
+    {
+        // Weight is length of the x-interval
+        double interval_width = ordered_x[i] - ordered_x[i-1];
+
+        // Contribution is area of the relevant trapezium
+        double contribution = 0.5 * (mass_contributions[i-1] + mass_contributions[i]) * interval_width;
+
+        PRINT_VARIABLE(contribution);
+
+        // Add to the accumulator
+        skewness_acc(contribution, boost::accumulators::weight = interval_width);
+    }
+
+    PRINT_VARIABLE(boost::accumulators::weighted_skewness(skewness_acc));
 
 
     return 0.0;
