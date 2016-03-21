@@ -213,6 +213,8 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetSkewnessOfElementMassDis
 
     ImmersedBoundaryElement<ELEMENT_DIM,SPACE_DIM>* p_elem = this->GetElement(elemIndex);
 
+    unsigned num_nodes = p_elem->GetNumNodes();
+
     // Get the unit axis terms for rotation so that axis becomes vertical
     c_vector<double, SPACE_DIM> unit_axis = axis / norm_2(axis);
     double sin_theta = unit_axis[0];
@@ -244,11 +246,21 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetSkewnessOfElementMassDis
     {
         ordered_locations.push_back(std::pair<unsigned, c_vector<double, SPACE_DIM> >(i, node_locations_original_order[i]));
     }
+
     std::sort(ordered_locations.begin(), ordered_locations.end(), CustomComparisonForSkewnessMeasure);
+
+    if (ordered_locations.begin()->second[0] == (ordered_locations.begin()+1)->second[0])
+    {
+        EXCEPTION("First two sorted nodes have identical x-positions - case not yet handled.");
+    }
+    if (ordered_locations.rbegin()->second[0] == (ordered_locations.rbegin()+1)->second[0])
+    {
+        EXCEPTION("Last two sorted nodes have identical x-positions - case not yet handled.");
+    }
 
     for (unsigned i=0 ; i<ordered_locations.size() ; i++)
     {
-        PRINT_VECTOR(ordered_locations[i].second);
+//        PRINT_VECTOR(ordered_locations[i].second);
     }
 
     /*
@@ -263,8 +275,7 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetSkewnessOfElementMassDis
      *  _____|__|    |
      *  \    |       |
      *   \   |      /
-     *    \  |     /
-     *     \_|____/
+     *    \__|_____/
      *       |
      *       |
      *       ^
@@ -273,10 +284,33 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetSkewnessOfElementMassDis
      * x direction changes sign as we iterate over the original node locations, where a is the vector from the current
      * node to the test node.
      */
-    for (unsigned location = 0 ; location < ordered_locations.size() ; location++)
+
+    std::vector<std::vector<double> > knots;
+
+    for (unsigned location = 1 ; location < num_nodes - 1 ; location++)
     {
         unsigned this_index = ordered_locations[location].first;
         c_vector<double, SPACE_DIM> this_location = ordered_locations[location].second;
+
+        c_vector<double, SPACE_DIM> to_previous = node_locations_original_order[this_index + 1] - this_location;
+
+        std::vector<unsigned> crossing_points;
+
+        for (unsigned node = this_index + 2 ; node < this_index + num_nodes ; node++)
+        {
+            unsigned idx = node % num_nodes;
+
+            c_vector<double, SPACE_DIM> to_this = node_locations_original_order[idx] - this_location;
+
+            if (to_previous[0] * to_this[0] <= 0.0)
+            {
+                crossing_points.push_back((idx + num_nodes - 1) % num_nodes);
+            }
+
+            to_previous = to_this;
+        }
+
+//        PRINT_VECTOR(crossing_points);
 
     }
 
