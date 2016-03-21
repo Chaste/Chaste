@@ -65,16 +65,29 @@ public:
          * 5: Random y-variation
          * 6: Include membrane
          */
-        ImmersedBoundaryPalisadeMeshGenerator gen(1, 32, 0.1, 2.5, 0.0, false);
-        ImmersedBoundaryMesh<2, 2>* p_mesh = gen.GetMesh();
+//        ImmersedBoundaryPalisadeMeshGenerator gen(1, 32, 0.1, 2.5, 0.0, false);
+//        ImmersedBoundaryMesh<2, 2>* p_mesh = gen.GetMesh();
 //
 //        p_mesh->SetNumGridPtsXAndY(512);
 
+        std::vector<Node<2>*> nodes;
+
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 0.1, 0.0));
+        nodes.push_back(new Node<2>(2, true, 0.101, 0.2));
+        nodes.push_back(new Node<2>(3, true, 0.5, 0.2));
+        nodes.push_back(new Node<2>(4, true, 0.0, 0.3));
+
+        std::vector<ImmersedBoundaryElement<2,2>*> elems;
+        elems.push_back(new ImmersedBoundaryElement<2,2>(0, nodes));
+
+        ImmersedBoundaryMesh<2,2>* p_mesh = new ImmersedBoundaryMesh<2,2>(nodes, elems);
+
         c_vector<double, 2> axis;
-        axis[0] = -1.0;
+        axis[0] = 0.0;
         axis[1] = 1.0;
 
-        p_mesh->GetSkewnessOfElementMassDistributionAboutAxis(0, axis);
+        PRINT_VARIABLE(p_mesh->GetSkewnessOfElementMassDistributionAboutAxis(0, axis));
 
 //        std::vector<CellPtr> cells;
 //        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);

@@ -36,9 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ImmersedBoundaryMesh.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "UblasCustomFunctions.hpp"
-#include <boost/accumulators/accumulators.hpp>
-#include <boost/accumulators/statistics/stats.hpp>
-#include <boost/accumulators/statistics/weighted_skewness.hpp>
 
 #include "Debug.hpp"
 
@@ -211,26 +208,44 @@ bool CustomComparisonForSkewnessMeasure(std::pair<unsigned, c_vector<double, 2> 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetSkewnessOfElementMassDistributionAboutAxis(unsigned elemIndex, c_vector<double, SPACE_DIM> axis)
 {
+    /*
+     * Method outline:
+     *
+     * Given an arbitrary axis and a closed polygon, we calculate the skewness of the mass distribution of the polygon
+     * perpendicular to the axis.  This is used as a measure of asymmetry.
+     *
+     * To simplify calculating the mass distribution, we translate the centroid of the element to the origin and rotate
+     * about the centroid so the axis is vertical; then we sort all the nodes in ascending order of their x-coordinate.
+     *
+     * For each node in order, we need to know the length of the intersection through the node of the vertical line with
+     * the polygon.  Once calculated, we have a piecewise-linear PDF for the mass distribution, which can be normalised
+     * by the surface area of the polygon.
+     *
+     * By integrating the pdf directly, we can calculate exactly the necessary moments of the distribution needed for
+     * the skewness.
+     */
+
     // This method only works in 2D
     assert(ELEMENT_DIM == 2 && SPACE_DIM == 2);
 
+    // Get relevant info about the element
     ImmersedBoundaryElement<ELEMENT_DIM,SPACE_DIM>* p_elem = this->GetElement(elemIndex);
-
     unsigned num_nodes = p_elem->GetNumNodes();
+    double area_of_elem = this->GetVolumeOfElement(elemIndex);
+    c_vector<double, SPACE_DIM> centroid = this->GetCentroidOfElement(elemIndex);
 
-    // Get the unit axis terms for rotation so that axis becomes vertical
+    // Get the unit axis and trig terms for rotation
     c_vector<double, SPACE_DIM> unit_axis = axis / norm_2(axis);
     double sin_theta = unit_axis[0];
     double cos_theta = unit_axis[1];
 
-    // Get the centroid of the element
-    c_vector<double, SPACE_DIM> centroid = this->GetCentroidOfElement(elemIndex);
-
+    // We need the (rotated) node locations in two orders - original and ordered left-to-right.
+    // For the latter we need to keep track of index, so we store that as part of a pair.
     std::vector<c_vector<double, SPACE_DIM> > node_locations_original_order;
     std::vector<std::pair<unsigned, c_vector<double, SPACE_DIM> > > ordered_locations;
 
-    // Get the node locations of the current element relative to its centroid, and rotate it
-    for (unsigned node_idx = 0 ; node_idx < p_elem->GetNumNodes() ; node_idx++)
+    // Get the node locations of the current element relative to its centroid, and rotate them
+    for (unsigned node_idx = 0 ; node_idx < num_nodes ; node_idx++)
     {
         const c_vector<double, SPACE_DIM>& node_location = p_elem->GetNode(node_idx)->rGetLocation();
 
@@ -240,7 +255,6 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetSkewnessOfElementMassDis
         rotated_location[0] = cos_theta * displacement[0] - sin_theta * displacement[1];
         rotated_location[1] = sin_theta * displacement[0] + cos_theta * displacement[1];
 
-        // Translate the centroid to the origin
         node_locations_original_order.push_back(rotated_location);
     }
 
@@ -251,20 +265,6 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetSkewnessOfElementMassDis
     }
 
     std::sort(ordered_locations.begin(), ordered_locations.end(), CustomComparisonForSkewnessMeasure);
-
-    if (ordered_locations.begin()->second[0] == (ordered_locations.begin()+1)->second[0])
-    {
-        EXCEPTION("First two sorted nodes have identical x-positions - case not yet handled.");
-    }
-    if (ordered_locations.rbegin()->second[0] == (ordered_locations.rbegin()+1)->second[0])
-    {
-        EXCEPTION("Last two sorted nodes have identical x-positions - case not yet handled.");
-    }
-
-    for (unsigned i=0 ; i<ordered_locations.size() ; i++)
-    {
-//        PRINT_VECTOR(ordered_locations[i].second);
-    }
 
     /*
      * For each node, we must find every place where the axis (now rotated to be vertical) intersects the polygon:
@@ -288,53 +288,61 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetSkewnessOfElementMassDis
      * node to the test node.
      */
 
+    // For each node, we keep track of all the y-locations where the vertical through the node meets the polygon
     std::vector<std::vector<double> > knots(num_nodes);
-    knots.begin()->push_back(ordered_locations.begin()->second[1]);
-    knots.rbegin()->push_back(ordered_locations.rbegin()->second[1]);
 
-    for (unsigned location = 1 ; location < num_nodes - 1 ; location++)
+    for (unsigned location = 0 ; location < num_nodes ; location++)
     {
-        unsigned this_index = ordered_locations[location].first;
+        // Get the two parts of the pair
+        unsigned this_idx = ordered_locations[location].first;
         c_vector<double, SPACE_DIM> this_location = ordered_locations[location].second;
 
+        // The y-coordinate of the current location is always a knot
         knots[location].push_back(this_location[1]);
 
-        c_vector<double, SPACE_DIM> to_previous = node_locations_original_order[(this_index + 1) % num_nodes] - this_location;
+        // To calculate all the intersection points, we need to iterate over every other location and see, sequentially,
+        // if the x-coordinate of location i+1 and i+2 crosses the x-coordinate of the current location.
+        unsigned next_idx = (this_idx + 1) % num_nodes;
+        c_vector<double, SPACE_DIM> to_previous = node_locations_original_order[next_idx] - this_location;
 
-        for (unsigned node = this_index + 2 ; node < this_index + num_nodes ; node++)
+        for (unsigned node_idx = this_idx + 2 ; node_idx < this_idx + num_nodes ; node_idx++)
         {
-            unsigned idx = node % num_nodes;
+            unsigned idx = node_idx % num_nodes;
 
-            c_vector<double, SPACE_DIM> to_this = node_locations_original_order[idx] - this_location;
+            c_vector<double, SPACE_DIM> to_next = node_locations_original_order[idx] - this_location;
 
-            if (to_previous[0] * to_this[0] <= 0.0)
+            // If the segment between to_previous and to_next intersects the vertical through this_location, the clause
+            // in the if statement below will be triggered
+            if (to_previous[0] * to_next[0] <= 0.0)
             {
-                // Find how far between to_previous and to_this the intersection is
-                double interp = to_previous[0] / (to_previous[0] - to_this[0]);
+                // Find how far between to_previous and to_next the point of intersection is
+                double interp = to_previous[0] / (to_previous[0] - to_next[0]);
 
                 assert(interp >= 0.0 && interp <= 1.0);
 
                 // Record the y-value of the intersection point
-                double new_intersection = this_location[1] + to_previous[1] + interp * (to_this[1] - to_previous[1]);
+                double new_intersection = this_location[1] + to_previous[1] + interp * (to_next[1] - to_previous[1]);
                 knots[location].push_back(new_intersection);
             }
 
-
-            to_previous = to_this;
+            to_previous = to_next;
         }
 
-        if (knots[location].size() > 4)
+        if (knots[location].size() > 2)
         {
-            EXCEPTION("Axis intersects polygon more than 4 times - case not yet handled.");
+            EXCEPTION("Axis intersects polygon more than 2 times (concavity) - case not yet handled.");
         }
     }
 
+    // For ease, construct a vector of the x-locations of all the nodes, in order
     std::vector<double> ordered_x(num_nodes);
-    for (unsigned i=0 ; i<ordered_locations.size() ; i++)
+    for (unsigned location = 0 ; location < num_nodes ; location++)
     {
-        ordered_x[i]  = ordered_locations[i].second[0];
+        ordered_x[location]  = ordered_locations[location].second[0];
     }
 
+    // Calculate the mass contributions at each x-location - this is the length of the intersection of the vertical
+    // through each location
     std::vector<double> mass_contributions(num_nodes);
     for (unsigned i=0 ; i<num_nodes ; i++)
     {
@@ -350,43 +358,58 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetSkewnessOfElementMassDis
                 mass_contributions[i] = knots[i][1] - knots[i][0];
                 break;
 
-            case 3:
-                mass_contributions[i] = knots[i][2] - knots[i][0];
-                break;
-
-            case 4:
-                mass_contributions[i] = (knots[i][3] - knots[i][2]) + (knots[i][1] - knots[i][0]);
-                break;
-
             default:
                 NEVER_REACHED;
         }
+
+        // Normalise, so that these lengths define a pdf
+        mass_contributions[i] /= area_of_elem;
     }
 
-    PRINT_VECTOR(mass_contributions);
-
-    boost::accumulators::accumulator_set<double, boost::accumulators::stats<boost::accumulators::tag::weighted_skewness>, double> skewness_acc;
-
-    skewness_acc(0.0, boost::accumulators::weight = ordered_x[1] - ordered_x[0]);
+    // Calculate moments. Because we just have a bunch of linear segments, we can integrate the pdf exactly
+    double e_x0 = 0.0;
+    double e_x1 = 0.0;
+    double e_x2 = 0.0;
+    double e_x3 = 0.0;
 
     for (unsigned i=1 ; i<num_nodes ; i++)
     {
-        // Weight is length of the x-interval
-        double interval_width = ordered_x[i] - ordered_x[i-1];
+        double x0 = ordered_x[i-1];
+        double x1 = ordered_x[i];
 
-        // Contribution is area of the relevant trapezium
-        double contribution = 0.5 * (mass_contributions[i-1] + mass_contributions[i]) * interval_width;
+        double fx0 = mass_contributions[i-1];
+        double fx1 = mass_contributions[i];
 
-        PRINT_VARIABLE(contribution);
+        // We need squared, cubed, ..., order 5 for each x
+        double x0_2 = x0 * x0;
+        double x0_3 = x0_2 * x0;
+        double x0_4 = x0_3 * x0;
+        double x0_5 = x0_4 * x0;
 
-        // Add to the accumulator
-        skewness_acc(contribution, boost::accumulators::weight = interval_width);
+        double x1_2 = x1 * x1;
+        double x1_3 = x1_2 * x1;
+        double x1_4 = x1_3 * x1;
+        double x1_5 = x1_4 * x1;
+
+        if (x1 - x0 > 0)
+        {
+            // Calculate y = mx + c for this section of the pdf
+            double m = (fx1 - fx0) / (x1 - x0);
+            double c = fx0 - m * x0;
+
+            e_x0 += m * (x1_2 - x0_2) / 2.0 + c * (x1 - x0);
+            e_x1 += m * (x1_3 - x0_3) / 3.0 + c * (x1_2 - x0_2) / 2.0;
+            e_x2 += m * (x1_4 - x0_4) / 4.0 + c * (x1_3 - x0_3) / 3.0;
+            e_x3 += m * (x1_5 - x0_5) / 5.0 + c * (x1_4 - x0_4) / 4.0;
+        }
     }
 
-    PRINT_VARIABLE(boost::accumulators::weighted_skewness(skewness_acc));
+    // Check that we have correctly defined a pdf
+    assert(fabs(e_x0 - 1.0) < 1e-6);
 
-
-    return 0.0;
+    // Calculate the standard deviation, and return the skewness
+    double sd = sqrt(e_x2 - e_x1 * e_x1);
+    return (e_x3 - 3.0 * e_x1 * sd * sd - e_x1 * e_x1 * e_x1) / (sd * sd * sd);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
