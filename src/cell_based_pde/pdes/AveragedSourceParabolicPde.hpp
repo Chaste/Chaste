@@ -129,7 +129,7 @@ public:
     virtual double ComputeDuDtCoefficientFunction(const ChastePoint<DIM>& rX);
 
     /**
-     * Overridden ComputeSourceTerm() method. That is never called.
+     * Overridden ComputeSourceTerm() method.
      *
      * @return computed source term.
      *
@@ -142,10 +142,7 @@ public:
                                      Element<DIM,DIM>* pElement=NULL);
 
     /**
-     * Overridden ComputeSourceTermAtNode() method.
-     *
-     * Note that for Averged Parabolic PDEs used with CellBasedParabolicPdeSolver
-     * this method returns the coefficient of the linear component of the source term.
+     * Overridden ComputeSourceTermAtNode() method. That is never called.
      *
      * @return computed source term at a node.
      *
