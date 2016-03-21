@@ -184,33 +184,12 @@ public:
      */
     virtual void ResetForDivision();
 
-    /**
-     * Set mFinishedRunningOdes. Used in CreateCellCycleModel().
-     *
-     * @param finishedRunningOdes the new value of mFinishedRunningOdes
-     */
-    void SetFinishedRunningOdes(bool finishedRunningOdes);
-
 //    /**
 //     * Set mInitialConditions. Used in CreateSrnModel().
 //     *
 //     * @param initialConditions the new value of mInitialConditions
 //     */
 //    void SetInitialConditions(std::vector<double> initialConditions);
-
-    /**
-     * Set mDivideTime.
-     *
-     * @param divideTime the new value of mDivideTime
-     */
-    void SetDivideTime(double divideTime);
-
-    /**
-     * Set mG2PhaseStartTime. Used in CreateCellCycleModel().
-     *
-     * @param g2PhaseStartTime the new value of mG2PhaseStartTime
-     */
-    void SetG2PhaseStartTime(double g2PhaseStartTime);
 
     /**
      * Outputs cell cycle model parameters to file.

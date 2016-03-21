@@ -196,21 +196,6 @@ double AbstractOdeBasedCellCycleModel::GetOdeStopTime()
     return stop_time;
 }
 
-void AbstractOdeBasedCellCycleModel::SetFinishedRunningOdes(bool finishedRunningOdes)
-{
-    mFinishedRunningOdes = finishedRunningOdes;
-}
-
-void AbstractOdeBasedCellCycleModel::SetDivideTime(double divideTime)
-{
-    mDivideTime = divideTime;
-}
-
-void AbstractOdeBasedCellCycleModel::SetG2PhaseStartTime(double g2PhaseStartTime)
-{
-    mG2PhaseStartTime = g2PhaseStartTime;
-}
-
 void AbstractOdeBasedCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
 {
     // No new parameters to output

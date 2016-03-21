@@ -124,11 +124,6 @@ void AbstractOdeSrnModel::ResetForDivision()
     mFinishedRunningOdes = false;
 }
 
-void AbstractOdeSrnModel::SetFinishedRunningOdes(bool finishedRunningOdes)
-{
-    mFinishedRunningOdes = finishedRunningOdes;
-}
-
 void AbstractOdeSrnModel::SetInitialConditions(std::vector<double> initialConditions)
 {
     assert(initialConditions.size() == mStateSize);

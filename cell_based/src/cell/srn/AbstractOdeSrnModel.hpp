@@ -144,13 +144,6 @@ public:
     virtual void ResetForDivision();
 
     /**
-     * Set mFinishedRunningOdes. Used in CreateSrnModel().
-     *
-     * @param finishedRunningOdes the new value of mFinishedRunningOdes
-     */
-    void SetFinishedRunningOdes(bool finishedRunningOdes);
-
-    /**
      * Set mInitialConditions. Used in CreateSrnModel().
      *
      * @param initialConditions the new value of mInitialConditions
