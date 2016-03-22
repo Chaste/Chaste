@@ -49,7 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellwiseSourceEllipticPde.hpp"
 #include "VolumeTrackingModifier.hpp"
 
-#include "SimpleOxygenBasedPhaseBasedCellCycleModel.hpp"
+#include "SimpleOxygenBasedCellCycleModel.hpp"
 #include "OffLatticeSimulation.hpp"
 #include "OnLatticeSimulation.hpp"
 #include "CellsGenerator.hpp"
@@ -94,7 +94,7 @@ private:
 
         for (unsigned i=0; i<num_cells; i++)
         {
-            SimpleOxygenBasedPhaseBasedCellCycleModel* p_cycle_model = new SimpleOxygenBasedPhaseBasedCellCycleModel();
+            SimpleOxygenBasedCellCycleModel* p_cycle_model = new SimpleOxygenBasedCellCycleModel();
             p_cycle_model->SetDimension(2);
             ///\todo Change thresholds if necessary (#2687)
 

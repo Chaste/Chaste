@@ -46,7 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ParabolicGrowingDomainPdeModifier.hpp"
 #include "CellwiseSourceParabolicPde.hpp"
 
-#include "StochasticDurationPhaseBasedCellCycleModel.hpp"
+#include "StochasticDurationCellCycleModel.hpp"
 #include "ApoptoticCellProperty.hpp"
 #include "CellsGenerator.hpp"
 
@@ -91,7 +91,7 @@ public:
 
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_differentiated_type);
-        CellsGenerator<StochasticDurationPhaseBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_differentiated_type);
 
         // Set initial condition for pde
@@ -157,7 +157,7 @@ public:
 
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_differentiated_type);
-        CellsGenerator<StochasticDurationPhaseBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_differentiated_type);
 
         // Make cells with r<1/2 appoptotic (so no source term)
@@ -235,7 +235,7 @@ public:
 
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_differentiated_type);
-        CellsGenerator<StochasticDurationPhaseBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_differentiated_type);
 
         // Set initial condition for pde
@@ -288,7 +288,7 @@ public:
 
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_differentiated_type);
-        CellsGenerator<StochasticDurationPhaseBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), p_differentiated_type);
 
         // Make cells with x<10.0 appoptotic (so no source term)
@@ -346,7 +346,7 @@ public:
 
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_differentiated_type);
-        CellsGenerator<StochasticDurationPhaseBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), p_differentiated_type);
 
         // Make cells with x<10.0 appoptotic (so no source term)
@@ -408,7 +408,7 @@ public:
 
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_differentiated_type);
-        CellsGenerator<StochasticDurationPhaseBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_differentiated_type);
 
         // Make cells with x<10.0 appoptotic (so no source term)
@@ -469,7 +469,7 @@ public:
 
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_differentiated_type);
-        CellsGenerator<StochasticDurationPhaseBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_differentiated_type);
 
         // Make cells with x<10.0 appoptotic (so no source term)
@@ -536,7 +536,7 @@ public:
 
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_differentiated_type);
-        CellsGenerator<StochasticDurationPhaseBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, location_indices.size(), p_differentiated_type);
 
         // Make cells with x<10.0 appoptotic (so no source term)

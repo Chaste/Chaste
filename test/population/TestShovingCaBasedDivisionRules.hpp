@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ArchiveOpener.hpp"
 #include "CellsGenerator.hpp"
 #include "CaBasedCellPopulation.hpp"
-#include "FixedDurationGenerationBasedPhaseBasedCellCycleModel.hpp"
+#include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "AbstractCaBasedDivisionRule.hpp"
 #include "ShovingCaBasedDivisionRule.hpp"
@@ -84,7 +84,7 @@ public:
         }
 
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 1> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 1> cells_generator;
         cells_generator.GenerateBasic(cells, location_indices.size());
 
         // Create cell population
@@ -105,7 +105,7 @@ public:
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
 
-        FixedDurationGenerationBasedPhaseBasedCellCycleModel* p_model = new FixedDurationGenerationBasedPhaseBasedCellCycleModel();
+        FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         CellPtr p_new_cell(new Cell(p_state, p_model));
         p_new_cell->SetCellProliferativeType(p_stem_type);
         p_new_cell->SetBirthTime(-1);
@@ -162,7 +162,7 @@ public:
         }
 
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 1> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 1> cells_generator;
         cells_generator.GenerateBasic(cells, location_indices.size());
 
         // Create cell population
@@ -172,7 +172,7 @@ public:
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
 
-        FixedDurationGenerationBasedPhaseBasedCellCycleModel* p_model = new FixedDurationGenerationBasedPhaseBasedCellCycleModel();
+        FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         CellPtr p_new_cell(new Cell(p_state, p_model));
         p_new_cell->SetCellProliferativeType(p_stem_type);
         p_new_cell->SetBirthTime(-1);
@@ -245,7 +245,7 @@ public:
         }
 
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 1> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 1> cells_generator;
         cells_generator.GenerateBasic(cells, location_indices.size()); // Note all cells are stem cells by default.
 
         // Create cell population
@@ -266,7 +266,7 @@ public:
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
 
-        FixedDurationGenerationBasedPhaseBasedCellCycleModel* p_model = new FixedDurationGenerationBasedPhaseBasedCellCycleModel();
+        FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         CellPtr p_new_cell(new Cell(p_state, p_model));
         p_new_cell->SetCellProliferativeType(p_transit_type);
         p_new_cell->SetBirthTime(-1);
@@ -308,7 +308,7 @@ public:
         // Select transit cell we just added
         CellPtr p_cell_3 = cell_population.GetCellUsingLocationIndex(3);
 
-        FixedDurationGenerationBasedPhaseBasedCellCycleModel* p_model_2 = new FixedDurationGenerationBasedPhaseBasedCellCycleModel();
+        FixedDurationGenerationBasedCellCycleModel* p_model_2 = new FixedDurationGenerationBasedCellCycleModel();
         CellPtr p_new_cell_2(new Cell(p_state, p_model_2));
         p_new_cell_2->SetCellProliferativeType(p_transit_type);
         p_new_cell_2->SetBirthTime(-1);
@@ -352,7 +352,7 @@ public:
         }
 
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 1> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 1> cells_generator;
         cells_generator.GenerateBasic(cells, location_indices.size());
 
         // Create cell population
@@ -362,7 +362,7 @@ public:
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
 
-        FixedDurationGenerationBasedPhaseBasedCellCycleModel* p_model = new FixedDurationGenerationBasedPhaseBasedCellCycleModel();
+        FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         CellPtr p_new_cell(new Cell(p_state, p_model));
         p_new_cell->SetCellProliferativeType(p_stem_type);
         p_new_cell->SetBirthTime(-1);
