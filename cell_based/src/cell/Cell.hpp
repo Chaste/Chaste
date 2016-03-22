@@ -53,8 +53,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellVecData.hpp"
 
 #include "ApoptoticCellProperty.hpp"
-#include "AbstractSrnModel.hpp"
 #include "AbstractCellCycleModel.hpp"
+#include "AbstractSrnModel.hpp"
 #include "SimulationTime.hpp"
 #include "CellPropertyRegistry.hpp"
 #include "CellPropertyCollection.hpp"

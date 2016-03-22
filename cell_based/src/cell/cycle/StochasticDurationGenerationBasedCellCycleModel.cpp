@@ -33,18 +33,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "StochasticDurationGenerationBasedPhaseBasedCellCycleModel.hpp"
+#include "StochasticDurationGenerationBasedCellCycleModel.hpp"
 #include "Exception.hpp"
 #include "StemCellProliferativeType.hpp"
 #include "TransitCellProliferativeType.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 
-StochasticDurationGenerationBasedPhaseBasedCellCycleModel::StochasticDurationGenerationBasedPhaseBasedCellCycleModel()
+StochasticDurationGenerationBasedCellCycleModel::StochasticDurationGenerationBasedCellCycleModel()
 {
 }
 
-StochasticDurationGenerationBasedPhaseBasedCellCycleModel::StochasticDurationGenerationBasedPhaseBasedCellCycleModel(const StochasticDurationGenerationBasedPhaseBasedCellCycleModel& rModel)
-   : AbstractSimpleGenerationBasedPhaseBasedCellCycleModel(rModel)
+StochasticDurationGenerationBasedCellCycleModel::StochasticDurationGenerationBasedCellCycleModel(const StochasticDurationGenerationBasedCellCycleModel& rModel)
+   : AbstractSimpleGenerationBasedCellCycleModel(rModel)
 {
     /*
      * Set each member variable of the new cell-cycle model that inherits
@@ -65,12 +65,12 @@ StochasticDurationGenerationBasedPhaseBasedCellCycleModel::StochasticDurationGen
     // No new member variables.
 }
 
-AbstractCellCycleModel* StochasticDurationGenerationBasedPhaseBasedCellCycleModel::CreateCellCycleModel()
+AbstractCellCycleModel* StochasticDurationGenerationBasedCellCycleModel::CreateCellCycleModel()
 {
-    return new StochasticDurationGenerationBasedPhaseBasedCellCycleModel(*this);
+    return new StochasticDurationGenerationBasedCellCycleModel(*this);
 }
 
-void StochasticDurationGenerationBasedPhaseBasedCellCycleModel::SetG1Duration()
+void StochasticDurationGenerationBasedCellCycleModel::SetG1Duration()
 {
     RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
 
@@ -94,14 +94,14 @@ void StochasticDurationGenerationBasedPhaseBasedCellCycleModel::SetG1Duration()
     }
 }
 
-void StochasticDurationGenerationBasedPhaseBasedCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
+void StochasticDurationGenerationBasedCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
 {
     // No new parameters to output
 
     // Call method on direct parent class
-    AbstractSimpleGenerationBasedPhaseBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
+    AbstractSimpleGenerationBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
 }
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-CHASTE_CLASS_EXPORT(StochasticDurationGenerationBasedPhaseBasedCellCycleModel)
+CHASTE_CLASS_EXPORT(StochasticDurationGenerationBasedCellCycleModel)

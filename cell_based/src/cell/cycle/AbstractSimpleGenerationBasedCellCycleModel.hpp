@@ -33,26 +33,32 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef FIXEDDURATIONGENERATIONBASEDPHASEBASEDCELLCYCLEMODEL_HPP_
-#define FIXEDDURATIONGENERATIONBASEDPHASEBASEDCELLCYCLEMODEL_HPP_
+#ifndef ABSTRACTSIMPLEGENERATIONBASEDCYCLEMODEL_HPP_
+#define ABSTRACTSIMPLEGENERATIONBASEDCYCLEMODEL_HPP_
 
-#include "AbstractSimpleGenerationBasedPhaseBasedCellCycleModel.hpp"
+#include "ChasteSerialization.hpp"
+#include "ClassIsAbstract.hpp"
+#include <boost/serialization/base_object.hpp>
+
+#include "AbstractSimpleCellCycleModel.hpp"
 
 /**
- *  Fixed cell-cycle model.
+ * This class contains all the things common to simple generation-based cell cycle
+ * models, i.e. models in which the length of cell cycle phases are determined
+ * when the cell-cycle model is created, rather than evaluated 'on the fly'
+ * by ODEs and suchlike, and in which each cell has a 'generation'.
  *
- *  Cell cycle time is deterministic for stem and transit cells (with values
- *  StemCellG1Duration + SG2MDuration
- *  and TransitCellG1Duration + SG2MDuration (values found in AbstractPhaseBasedCellCycleModel))
+ * N.B. Whether or not the cell should actually divide may depend on
+ * Wnt / Oxygen etc. in subclasses.
  */
-class FixedDurationGenerationBasedPhaseBasedCellCycleModel : public AbstractSimpleGenerationBasedPhaseBasedCellCycleModel
+class AbstractSimpleGenerationBasedCellCycleModel : public AbstractSimpleCellCycleModel
 {
 private:
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
-     * Archive the cell-cycle model, never used directly - boost uses this.
+     * Archive the cell-cycle model.
      *
      * @param archive the archive
      * @param version the current version of this class
@@ -60,10 +66,19 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractSimpleGenerationBasedPhaseBasedCellCycleModel>(*this);
+        archive & boost::serialization::base_object<AbstractSimpleCellCycleModel>(*this);
+        archive & mGeneration;
+        archive & mMaxTransitGenerations;
     }
 
 protected:
+
+    /** The generation of this cell (cells with a StemCellProliferativeType have a generation of 0) */
+    unsigned mGeneration;
+
+    /** How many generations a transit cell lives for before becoming fully differentiated. */
+    unsigned mMaxTransitGenerations;
+
 
     /**
      * Protected copy-constructor for use by CreateCellCycleModel.
@@ -78,24 +93,52 @@ protected:
      *
      * @param rModel the cell cycle model to copy.
      */
-    FixedDurationGenerationBasedPhaseBasedCellCycleModel(const FixedDurationGenerationBasedPhaseBasedCellCycleModel& rModel);
+    AbstractSimpleGenerationBasedCellCycleModel(const AbstractSimpleGenerationBasedCellCycleModel& rModel);
 
 public:
 
     /**
-     * Default constructor. Note that mBirthTime is set in
-     * AbstractPhaseBasedCellCycleModel() and mG1Duration is set in
-     * AbstractSimplePhaseBasedCellCycleModel().
+     * Default constructor - creates an AbstractSimpleCellCycleModel.
      */
-    FixedDurationGenerationBasedPhaseBasedCellCycleModel();
+    AbstractSimpleGenerationBasedCellCycleModel();
 
     /**
-     * Overridden builder method to create new copies of
-     * this cell-cycle model.
-     *
-     * @return new cell-cycle model
+     * Destructor.
      */
-    AbstractCellCycleModel* CreateCellCycleModel();
+    virtual ~AbstractSimpleGenerationBasedCellCycleModel();
+
+    /** Overridden ResetForDivision() method. */
+    void ResetForDivision();
+
+    /**
+     * Set the new cell's G1 duration once it has been created after division.
+     * The duration will be based on cell type.
+     */
+    void InitialiseDaughterCell();
+
+    /**
+     * Sets the cell's generation.
+     *
+     * @param generation the cell's generation
+     */
+    void SetGeneration(unsigned generation);
+
+    /**
+     * @return the cell's generation.
+     */
+    unsigned GetGeneration() const;
+
+    /**
+     * Set mMaxTransitGenerations.
+     *
+     * @param maxTransitGenerations the new value of mMaxTransitGenerations
+     */
+    void SetMaxTransitGenerations(unsigned maxTransitGenerations);
+
+    /**
+     * @return mMaxTransitGenerations
+     */
+    unsigned GetMaxTransitGenerations() const;
 
     /**
      * Outputs cell cycle model parameters to file.
@@ -105,8 +148,6 @@ public:
     virtual void OutputCellCycleModelParameters(out_stream& rParamsFile);
 };
 
-#include "SerializationExportWrapper.hpp"
-// Declare identifier for the serializer
-CHASTE_CLASS_EXPORT(FixedDurationGenerationBasedPhaseBasedCellCycleModel)
+CLASS_IS_ABSTRACT(AbstractSimpleGenerationBasedCellCycleModel)
 
-#endif /*FIXEDDURATIONGENERATIONBASEDPHASEBASEDCELLCYCLEMODEL_HPP_*/
+#endif /*ABSTRACTSIMPLEGENERATIONBASEDCYCLEMODEL_HPP_*/

@@ -46,7 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MeshBasedCellPopulation.hpp"
 #include "TrianglesMeshReader.hpp"
 #include "CellsGenerator.hpp"
-#include "FixedDurationGenerationBasedPhaseBasedCellCycleModel.hpp"
+#include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "OutputFileHandler.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
@@ -69,7 +69,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         // Create cell population
@@ -124,7 +124,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         // Create cell population
@@ -171,7 +171,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         // Create cell population
@@ -220,7 +220,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         // Create cell population
@@ -297,7 +297,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         // Create cell population

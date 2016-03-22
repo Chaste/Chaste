@@ -40,7 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ClassIsAbstract.hpp"
 #include <boost/serialization/base_object.hpp>
 
-#include "AbstractOdeBasedPhaseBasedCellCycleModel.hpp"
+#include "AbstractOdeBasedCellCycleModel.hpp"
 #include "WntConcentration.hpp"
 
 /**
@@ -55,7 +55,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * random periods of time). The CellProliferativeType is updated dependent on the
  * concentration of beta-catenin (given by one of the ODEs).
  */
-class AbstractWntOdeBasedCellCycleModel : public AbstractOdeBasedPhaseBasedCellCycleModel
+class AbstractWntOdeBasedCellCycleModel : public AbstractOdeBasedCellCycleModel
 {
 private:
 
@@ -70,7 +70,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractOdeBasedPhaseBasedCellCycleModel>(*this);
+        archive & boost::serialization::base_object<AbstractOdeBasedCellCycleModel>(*this);
     }
 
 protected:

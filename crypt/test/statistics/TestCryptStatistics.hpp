@@ -98,7 +98,7 @@ public:
 
         // Set up cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, location_indices, true);// true = mature cells
 
         // Create cell population
@@ -188,7 +188,7 @@ public:
 
         // Set up cells
         std::vector<CellPtr> temp_cells;
-        CryptCellsGenerator<StochasticDurationGenerationBasedPhaseBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<StochasticDurationGenerationBasedCellCycleModel> cells_generator;
         cells_generator.Generate(temp_cells, p_mesh, std::vector<unsigned>(), true, 0.3, 2.0, 3.0, 4.0, true);
 
         // This awkward way of setting up the cells is a result of #430
@@ -392,7 +392,7 @@ public:
 
             // Set up cells
             std::vector<CellPtr> temp_cells;
-            CryptCellsGenerator<StochasticDurationGenerationBasedPhaseBasedCellCycleModel> cells_generator;
+            CryptCellsGenerator<StochasticDurationGenerationBasedCellCycleModel> cells_generator;
             cells_generator.Generate(temp_cells, p_mesh, std::vector<unsigned>(), true, 0.3, 2.0, 3.0, 4.0, true);
 
             // This awkward way of setting up the cells is a result of #430

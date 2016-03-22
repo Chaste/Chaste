@@ -46,7 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ArchiveOpener.hpp"
 #include "NodeBasedCellPopulation.hpp"
 #include "CellsGenerator.hpp"
-#include "FixedDurationGenerationBasedPhaseBasedCellCycleModel.hpp"
+#include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "TrianglesMeshReader.hpp"
 #include "TetrahedralMesh.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
@@ -95,7 +95,7 @@ private:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, DIM> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, DIM> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
         unsigned num_cells = cells.size();
 
@@ -153,7 +153,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         // Create the cell population
@@ -193,7 +193,7 @@ public:
         unsigned num_nodes = (mesh.GetNumNodes() > 0) ? mesh.GetNumNodes() - 1 : 0;
 
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, num_nodes);
 
         // Fails as no cell corresponding to a node
@@ -206,7 +206,7 @@ public:
             // Add another cell
             MAKE_PTR(WildTypeCellMutationState, p_state);
             MAKE_PTR(StemCellProliferativeType, p_stem_type);
-            FixedDurationGenerationBasedPhaseBasedCellCycleModel* p_cell_cycle_model = new FixedDurationGenerationBasedPhaseBasedCellCycleModel();
+            FixedDurationGenerationBasedCellCycleModel* p_cell_cycle_model = new FixedDurationGenerationBasedCellCycleModel();
             CellPtr p_cell(new Cell(p_state, p_cell_cycle_model));
             p_cell->SetCellProliferativeType(p_stem_type);
             double birth_time = -4.0;
@@ -244,7 +244,7 @@ public:
         mesh.ConstructNodesWithoutMesh(nodes, 1.5);
 
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 3> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         NodeBasedCellPopulation<3> node_based_cell_population(mesh, cells);
@@ -307,12 +307,12 @@ public:
             boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
             boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
 
-            FixedDurationGenerationBasedPhaseBasedCellCycleModel* p_model0 = new FixedDurationGenerationBasedPhaseBasedCellCycleModel();
+            FixedDurationGenerationBasedCellCycleModel* p_model0 = new FixedDurationGenerationBasedCellCycleModel();
             CellPtr p_cell0(new Cell(p_state, p_model0));
             p_cell0->SetCellProliferativeType(p_stem_type);
             p_cell0->SetBirthTime(-1);
 
-            FixedDurationGenerationBasedPhaseBasedCellCycleModel* p_model1 = new FixedDurationGenerationBasedPhaseBasedCellCycleModel();
+            FixedDurationGenerationBasedCellCycleModel* p_model1 = new FixedDurationGenerationBasedCellCycleModel();
             CellPtr p_cell1(new Cell(p_state, p_model1));
             p_cell1->SetCellProliferativeType(p_stem_type);
             p_cell1->SetBirthTime(-1);
@@ -338,7 +338,7 @@ public:
             boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
 
             // Create a new cell, DON'T set the node index, set birth time=-1
-            FixedDurationGenerationBasedPhaseBasedCellCycleModel* p_model2 = new FixedDurationGenerationBasedPhaseBasedCellCycleModel();
+            FixedDurationGenerationBasedCellCycleModel* p_model2 = new FixedDurationGenerationBasedCellCycleModel();
             CellPtr p_cell2(new Cell(p_state, p_model2));
             p_cell2->SetCellProliferativeType(p_stem_type);
             p_cell2->SetBirthTime(-1);
@@ -374,7 +374,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         // Create a cell population
@@ -417,7 +417,7 @@ public:
             // Create a new cell, DON'T set the node index, set birth time=-1
             boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
             boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
-            FixedDurationGenerationBasedPhaseBasedCellCycleModel* p_model = new FixedDurationGenerationBasedPhaseBasedCellCycleModel();
+            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             CellPtr p_cell(new Cell(p_state, p_model));
             p_cell->SetCellProliferativeType(p_stem_type);
             p_cell->SetBirthTime(-1);
@@ -462,7 +462,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         // Create a cell population
@@ -534,7 +534,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         // Create a cell population
@@ -588,7 +588,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         // Create a cell population
@@ -625,7 +625,7 @@ public:
 
             // Add a cell to the cell population
 
-            FixedDurationGenerationBasedPhaseBasedCellCycleModel* p_model = new FixedDurationGenerationBasedPhaseBasedCellCycleModel();
+            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             CellPtr p_new_cell(new Cell(p_state, p_model));
             p_new_cell->SetCellProliferativeType(p_stem_type);
             p_new_cell->SetBirthTime(0);
@@ -656,7 +656,7 @@ public:
             TS_ASSERT_EQUALS(node_based_cell_population.GetNumRealCells(), 81u);
 
             // Add another cell to the cell population
-            FixedDurationGenerationBasedPhaseBasedCellCycleModel* p_model2 = new FixedDurationGenerationBasedPhaseBasedCellCycleModel();
+            FixedDurationGenerationBasedCellCycleModel* p_model2 = new FixedDurationGenerationBasedCellCycleModel();
             CellPtr p_new_cell2(new Cell(p_state, p_model2));
             p_new_cell2->SetCellProliferativeType(p_stem_type);
             p_new_cell2->SetBirthTime(0);
@@ -705,7 +705,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         // Create a cell population
@@ -818,7 +818,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         // Create a cell population
@@ -933,7 +933,7 @@ public:
         mesh.ConstructNodesWithoutMesh(generating_mesh, 1.5);
 
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
@@ -983,7 +983,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         // Create a cell population
@@ -1032,7 +1032,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         // Create a cell population
@@ -1227,7 +1227,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 3> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         // Create a cell population
@@ -1330,7 +1330,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         cells[0]->SetBirthTime(-23.5);
@@ -1397,7 +1397,7 @@ public:
 
             // Create cells
             std::vector<CellPtr> cells;
-            CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 2> cells_generator;
+            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
             cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
             // Create a cell population
@@ -1495,7 +1495,7 @@ public:
         mesh.ConstructNodesWithoutMesh(nodes, 1.5);
 
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
@@ -1507,7 +1507,7 @@ public:
             boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
             boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
 
-            FixedDurationGenerationBasedPhaseBasedCellCycleModel* p_model = new FixedDurationGenerationBasedPhaseBasedCellCycleModel();
+            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             CellPtr p_cell(new Cell(p_state, p_model));
 
             boost::shared_ptr<Node<2> > p_node(new Node<2>(PetscTools::GetNumProcs() * (num_initial_cells + 1), false, 0.0, 0.5));

@@ -51,7 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AveragedSourcePde.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "CellsGenerator.hpp"
-#include "FixedDurationGenerationBasedPhaseBasedCellCycleModel.hpp"
+#include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "ReplicatableVector.hpp"
 #include "PetscSetupAndFinalize.hpp"
 #include "PetscTools.hpp"
@@ -307,7 +307,7 @@ public:
         HoneycombMeshGenerator generator(5, 5, 0);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
         assert(cells.empty());
@@ -365,7 +365,7 @@ public:
         // Create a new cell, DON'T set the node index, set birth time=-1
         MAKE_PTR(WildTypeCellMutationState, p_state);
 
-        FixedDurationGenerationBasedPhaseBasedCellCycleModel* p_cell_cycle_model = new FixedDurationGenerationBasedPhaseBasedCellCycleModel();
+        FixedDurationGenerationBasedCellCycleModel* p_cell_cycle_model = new FixedDurationGenerationBasedCellCycleModel();
         CellPtr p_cell(new Cell(p_state, p_cell_cycle_model));
         p_cell->SetBirthTime(-1);
         c_vector<double,2> new_cell_location;
@@ -395,7 +395,7 @@ public:
         MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_generating_mesh->GetNumNodes());
 
         NodesOnlyMesh<2> mesh;
@@ -450,7 +450,7 @@ public:
         // Create a new cell, DON'T set the node index, set birth time=-1
         MAKE_PTR(WildTypeCellMutationState, p_state);
 
-        FixedDurationGenerationBasedPhaseBasedCellCycleModel* p_cell_cycle_model = new FixedDurationGenerationBasedPhaseBasedCellCycleModel();
+        FixedDurationGenerationBasedCellCycleModel* p_cell_cycle_model = new FixedDurationGenerationBasedCellCycleModel();
         CellPtr p_cell(new Cell(p_state, p_cell_cycle_model));
         p_cell->SetBirthTime(-1);
         c_vector<double,2> new_cell_location;

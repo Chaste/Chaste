@@ -81,7 +81,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodesOnlyMesh.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
-#include "FixedDurationGenerationBasedPhaseBasedCellCycleModel.hpp"
+#include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
 #include "CellMutationStatesCountWriter.hpp"
 #include "OffLatticeSimulation.hpp"
@@ -245,7 +245,7 @@ public:
         std::vector<CellPtr> cells;
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            FixedDurationGenerationBasedPhaseBasedCellCycleModel* p_model = new FixedDurationGenerationBasedPhaseBasedCellCycleModel();
+            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
 
             CellPropertyCollection collection;
             if (RandomNumberGenerator::Instance()->ranf() < 0.2)

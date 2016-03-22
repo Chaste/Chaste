@@ -72,7 +72,7 @@ private:
 
     /**
      * Prevent copy-assignment of this class, or its subclasses.
-     * Note that we do not define this method, therefore statements like "AbstractPhaseBasedCellCycleModel new = old;" will not compile.
+     * Note that we do not define this method, therefore statements like "AbstractCellCycleModel new = old;" will not compile.
      * We do not inherit from boost::noncopyable because we *do* define a protected copy-constructor, for use by CreateCellCycleModel
      * and CreateSrnModel.
      *

@@ -36,14 +36,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef SIMPLEWNTCELLCYCLEMODEL_HPP_
 #define SIMPLEWNTCELLCYCLEMODEL_HPP_
 
-#include "AbstractSimplePhaseBasedCellCycleModel.hpp"
+#include "AbstractSimpleCellCycleModel.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "WntConcentration.hpp"
 
 /**
  * Simple Wnt-dependent cell-cycle model.
  */
-class SimpleWntCellCycleModel : public AbstractSimplePhaseBasedCellCycleModel
+class SimpleWntCellCycleModel : public AbstractSimpleCellCycleModel
 {
 private:
 
@@ -58,7 +58,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractSimplePhaseBasedCellCycleModel>(*this);
+        archive & boost::serialization::base_object<AbstractSimpleCellCycleModel>(*this);
 
         RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
         archive & *p_gen;
@@ -106,7 +106,7 @@ protected:
     /**
      * Stochastically set the G1 duration. The G1 duration is taken
      * from a normal distribution whose mean is the G1 duration given
-     * in AbstractPhaseBasedCellCycleModel for the cell type and whose standard deviation
+     * in AbstractCellCycleModel for the cell type and whose standard deviation
      * is 1.
      *
      * Called on cell creation at the start of a simulation, and for both
@@ -132,7 +132,7 @@ protected:
 public:
 
     /**
-     * Constructor - just a default, mBirthTime is now set in the AbstractPhaseBasedCellCycleModel class.
+     * Constructor - just a default, mBirthTime is now set in the AbstractCellCycleModel class.
      * mG1Duration is set very high, it is set for the individual cells when InitialiseDaughterCell is called.
      */
     SimpleWntCellCycleModel();

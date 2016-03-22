@@ -33,26 +33,27 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef SIMPLEOXYGENBASEDPHASEBASEDCELLCYCLEMODEL_HPP_
-#define SIMPLEOXYGENBASEDPHASEBASEDCELLCYCLEMODEL_HPP_
+#ifndef STOCHASTICOXYGENBASEDCELLCYCLEMODEL_HPP_
+#define STOCHASTICOXYGENBASEDCELLCYCLEMODEL_HPP_
 
-#include "AbstractSimplePhaseBasedCellCycleModel.hpp"
+#include "SimpleOxygenBasedCellCycleModel.hpp"
+#include "RandomNumberGenerator.hpp"
 
 /**
- * Simple oxygen-based cell-cycle model.
+ * Stochastic oxygen-based cell-cycle model.
  *
  * A simple oxygen-dependent cell-cycle model that inherits from
- * AbstractSimplePhaseBasedCellCycleModel. The duration of G1 phase depends
- * on the local oxygen concentration. A prolonged period of acute
- * hypoxia leads to the cell being labelled as apoptotic. This model
- * allows for quiescence imposed by transient periods of hypoxia,
- * followed by reoxygenation.
+ * SimpleOxygenBasedCellCycleModel and in addition spends a random
+ * duration in G2 phase.
  */
-class SimpleOxygenBasedPhaseBasedCellCycleModel : public AbstractSimplePhaseBasedCellCycleModel
+class StochasticOxygenBasedCellCycleModel : public SimpleOxygenBasedCellCycleModel
 {
+    friend class TestSimpleCellCycleModels;
+
 private:
 
     friend class boost::serialization::access;
+
     /**
      * Boost Serialization method for archiving/checkpointing
      * @param archive  The boost archive.
@@ -61,46 +62,28 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractSimplePhaseBasedCellCycleModel>(*this);
-        archive & mCurrentHypoxicDuration;
-        archive & mCurrentHypoxiaOnsetTime;
-        archive & mHypoxicConcentration;
-        archive & mQuiescentConcentration;
-        archive & mCriticalHypoxicDuration;
+        archive & boost::serialization::base_object<SimpleOxygenBasedCellCycleModel>(*this);
+
+        // Make sure the RandomNumberGenerator singleton gets saved too
+        SerializableSingleton<RandomNumberGenerator>* p_wrapper = RandomNumberGenerator::Instance()->GetSerializationWrapper();
+        archive & p_wrapper;
+
+        archive & mStochasticG2Duration;
     }
 
+    /**
+     * The duration of the G2 phase, set stochastically.
+     */
+    double mStochasticG2Duration;
+
+    /**
+     * Stochastically set the G2 duration.  Called on cell creation at
+     * the start of a simulation, and for both parent and daughter
+     * cells at cell division.
+     */
+    void GenerateStochasticG2Duration();
+
 protected:
-
-    /**
-     * How long the current period of hypoxia has lasted.
-     * Has units of hours.
-     */
-    double mCurrentHypoxicDuration;
-
-    /**
-     * The time when the current period of hypoxia began.
-     */
-    double mCurrentHypoxiaOnsetTime;
-
-    /**
-     * Non-dimensionalized oxygen concentration below which cells are
-     * considered to be hypoxic. A prolonged period of hypoxia causes
-     * the cell to become apoptotic.
-     */
-    double mHypoxicConcentration;
-
-    /**
-     * Non-dimensionalized oxygen concentration below which cells are
-     * considered to be quiescent and slow their progress through the
-     * G1 phase of the cell cycle.
-     */
-    double mQuiescentConcentration;
-
-    /**
-     * Non-dimensionalized critical hypoxic duration.
-     * Has units of hours.
-     */
-    double mCriticalHypoxicDuration;
 
     /**
      * Protected copy-constructor for use by CreateCellCycleModel.
@@ -115,35 +98,34 @@ protected:
      *
      * @param rModel the cell cycle model to copy.
      */
-    SimpleOxygenBasedPhaseBasedCellCycleModel(const SimpleOxygenBasedPhaseBasedCellCycleModel& rModel);
+    StochasticOxygenBasedCellCycleModel(const StochasticOxygenBasedCellCycleModel& rModel);
 
 public:
 
     /**
      * Constructor.
      */
-    SimpleOxygenBasedPhaseBasedCellCycleModel();
+    StochasticOxygenBasedCellCycleModel();
 
     /**
-     * Overridden UpdateCellCyclePhase() method.
+     * Overridden InitialiseDaughterCell() method.
      */
-    void UpdateCellCyclePhase();
+    void InitialiseDaughterCell();
 
     /**
-     * Method for updating mCurrentHypoxicDuration,
-     * called at the start of ReadyToDivide().
+     * Initialise the cell-cycle model at the start of a simulation.
      */
-    void UpdateHypoxicDuration();
+    void Initialise();
 
     /**
-     * @return mCurrentHypoxicDuration
+     * Overridden ResetForDivision() method.
      */
-    double GetCurrentHypoxicDuration() const;
+    void ResetForDivision();
 
     /**
-     * @return mCurrentHypoxiaOnsetTime
+     * @return mStochasticG2Duration.
      */
-    double GetCurrentHypoxiaOnsetTime() const;
+    double GetG2Duration() const;
 
     /**
      * Overridden builder method to create new copies of
@@ -152,49 +134,6 @@ public:
      * @return new cell-cycle model
      */
     AbstractCellCycleModel* CreateCellCycleModel();
-
-    /**
-     * @return mHypoxicConcentration
-     */
-    double GetHypoxicConcentration() const;
-
-    /**
-     * Set method for mHypoxicConcentration.
-     *
-     * @param hypoxicConcentration the new value of mHypoxicConcentration
-     */
-    void SetHypoxicConcentration(double hypoxicConcentration);
-
-    /**
-     * @return mQuiescentConcentration
-     */
-    double GetQuiescentConcentration() const;
-
-    /**
-     * Set method for mQuiescentConcentration.
-     *
-     * @param quiescentConcentration the new value of mQuiescentConcentration
-     */
-    void SetQuiescentConcentration(double quiescentConcentration);
-
-    /**
-     * @return mCriticalHypoxicDuration
-     */
-    double GetCriticalHypoxicDuration() const;
-
-    /**
-     * Set method for mCriticalHypoxicDuration.
-     *
-     * @param criticalHypoxicDuration the new value of mCriticalHypoxicDuration
-     */
-    void SetCriticalHypoxicDuration(double criticalHypoxicDuration);
-
-    /**
-     * Set method for mCurrentHypoxiaOnsetTime.
-     *
-     * @param currentHypoxiaOnsetTime the new value of mCurrentHypoxiaOnsetTime
-     */
-    void SetCurrentHypoxiaOnsetTime(double currentHypoxiaOnsetTime);
 
     /**
      * Outputs cell cycle model parameters to file.
@@ -206,6 +145,6 @@ public:
 
 // Declare identifier for the serializer
 #include "SerializationExportWrapper.hpp"
-CHASTE_CLASS_EXPORT(SimpleOxygenBasedPhaseBasedCellCycleModel)
+CHASTE_CLASS_EXPORT(StochasticOxygenBasedCellCycleModel)
 
-#endif /*SIMPLEOXYGENBASEDPHASEBASEDCELLCYCLEMODEL_HPP_*/
+#endif /*STOCHASTICOXYGENBASEDCELLCYCLEMODEL_HPP_*/

@@ -33,12 +33,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "ContactInhibitionPhaseBasedCellCycleModel.hpp"
+#include "ContactInhibitionCellCycleModel.hpp"
 #include "CellLabel.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 
-ContactInhibitionPhaseBasedCellCycleModel::ContactInhibitionPhaseBasedCellCycleModel()
-    : AbstractSimplePhaseBasedCellCycleModel(),
+ContactInhibitionCellCycleModel::ContactInhibitionCellCycleModel()
+    : AbstractSimpleCellCycleModel(),
       mQuiescentVolumeFraction(DOUBLE_UNSET),
       mEquilibriumVolume(DOUBLE_UNSET),
       mCurrentQuiescentOnsetTime(SimulationTime::Instance()->GetTime()),
@@ -46,8 +46,8 @@ ContactInhibitionPhaseBasedCellCycleModel::ContactInhibitionPhaseBasedCellCycleM
 {
 }
 
-ContactInhibitionPhaseBasedCellCycleModel::ContactInhibitionPhaseBasedCellCycleModel(const ContactInhibitionPhaseBasedCellCycleModel& rModel)
-    : AbstractSimplePhaseBasedCellCycleModel(rModel),
+ContactInhibitionCellCycleModel::ContactInhibitionCellCycleModel(const ContactInhibitionCellCycleModel& rModel)
+    : AbstractSimpleCellCycleModel(rModel),
       mQuiescentVolumeFraction(rModel.mQuiescentVolumeFraction),
       mEquilibriumVolume(rModel.mEquilibriumVolume),
       mCurrentQuiescentOnsetTime(rModel.mCurrentQuiescentOnsetTime),
@@ -70,7 +70,7 @@ ContactInhibitionPhaseBasedCellCycleModel::ContactInhibitionPhaseBasedCellCycleM
      */
 }
 
-void ContactInhibitionPhaseBasedCellCycleModel::UpdateCellCyclePhase()
+void ContactInhibitionCellCycleModel::UpdateCellCyclePhase()
 {
     if ((mQuiescentVolumeFraction == DOUBLE_UNSET) || (mEquilibriumVolume == DOUBLE_UNSET))
     {
@@ -139,60 +139,60 @@ void ContactInhibitionPhaseBasedCellCycleModel::UpdateCellCyclePhase()
     }
 }
 
-AbstractCellCycleModel* ContactInhibitionPhaseBasedCellCycleModel::CreateCellCycleModel()
+AbstractCellCycleModel* ContactInhibitionCellCycleModel::CreateCellCycleModel()
 {
-    return new ContactInhibitionPhaseBasedCellCycleModel(*this);
+    return new ContactInhibitionCellCycleModel(*this);
 }
 
-void ContactInhibitionPhaseBasedCellCycleModel::SetQuiescentVolumeFraction(double quiescentVolumeFraction)
+void ContactInhibitionCellCycleModel::SetQuiescentVolumeFraction(double quiescentVolumeFraction)
 {
     mQuiescentVolumeFraction = quiescentVolumeFraction;
 }
 
-double ContactInhibitionPhaseBasedCellCycleModel::GetQuiescentVolumeFraction() const
+double ContactInhibitionCellCycleModel::GetQuiescentVolumeFraction() const
 {
     return mQuiescentVolumeFraction;
 }
 
-void ContactInhibitionPhaseBasedCellCycleModel::SetEquilibriumVolume(double equilibriumVolume)
+void ContactInhibitionCellCycleModel::SetEquilibriumVolume(double equilibriumVolume)
 {
     mEquilibriumVolume = equilibriumVolume;
 }
 
-double ContactInhibitionPhaseBasedCellCycleModel::GetEquilibriumVolume() const
+double ContactInhibitionCellCycleModel::GetEquilibriumVolume() const
 {
     return mEquilibriumVolume;
 }
 
-void ContactInhibitionPhaseBasedCellCycleModel::SetCurrentQuiescentDuration(double currentQuiescentDuration)
+void ContactInhibitionCellCycleModel::SetCurrentQuiescentDuration(double currentQuiescentDuration)
 {
     mCurrentQuiescentDuration = currentQuiescentDuration;
 }
 
-double ContactInhibitionPhaseBasedCellCycleModel::GetCurrentQuiescentDuration() const
+double ContactInhibitionCellCycleModel::GetCurrentQuiescentDuration() const
 {
     return mCurrentQuiescentDuration;
 }
 
-void ContactInhibitionPhaseBasedCellCycleModel::SetCurrentQuiescentOnsetTime(double currentQuiescentOnsetTime)
+void ContactInhibitionCellCycleModel::SetCurrentQuiescentOnsetTime(double currentQuiescentOnsetTime)
 {
     mCurrentQuiescentOnsetTime = currentQuiescentOnsetTime;
 }
 
-double ContactInhibitionPhaseBasedCellCycleModel::GetCurrentQuiescentOnsetTime() const
+double ContactInhibitionCellCycleModel::GetCurrentQuiescentOnsetTime() const
 {
     return mCurrentQuiescentOnsetTime;
 }
 
-void ContactInhibitionPhaseBasedCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
+void ContactInhibitionCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<QuiescentVolumeFraction>" << mQuiescentVolumeFraction << "</QuiescentVolumeFraction>\n";
     *rParamsFile << "\t\t\t<EquilibriumVolume>" << mEquilibriumVolume << "</EquilibriumVolume>\n";
 
     // Call method on direct parent class
-    AbstractSimplePhaseBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
+    AbstractSimpleCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
 }
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-CHASTE_CLASS_EXPORT(ContactInhibitionPhaseBasedCellCycleModel)
+CHASTE_CLASS_EXPORT(ContactInhibitionCellCycleModel)

@@ -45,8 +45,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "CellCycleModelOdeSolver.hpp"
 
-#include "TysonNovakPhaseBasedCellCycleModel.hpp"
-#include "Alarcon2004OxygenBasedPhaseBasedCellCycleModel.hpp"
+#include "TysonNovakCellCycleModel.hpp"
+#include "Alarcon2004OxygenBasedCellCycleModel.hpp"
 #include "OutputFileHandler.hpp"
 #include "RungeKutta4IvpOdeSolver.hpp"
 #include "BackwardEulerIvpOdeSolver.hpp"
@@ -132,7 +132,7 @@ public:
 
     void TestMethods() throw(Exception)
     {
-        typedef CellCycleModelOdeSolver<TysonNovakPhaseBasedCellCycleModel,RungeKutta4IvpOdeSolver> RkSolver;
+        typedef CellCycleModelOdeSolver<TysonNovakCellCycleModel,RungeKutta4IvpOdeSolver> RkSolver;
 
         // Check we can create an instance
         boost::shared_ptr<RkSolver> p_solver = RkSolver::Instance();
@@ -169,7 +169,7 @@ public:
 
     void TestWithBackwardEulerIvpOdeSolver() throw(Exception)
     {
-        typedef CellCycleModelOdeSolver<TysonNovakPhaseBasedCellCycleModel, BackwardEulerIvpOdeSolver> EulerSolver;
+        typedef CellCycleModelOdeSolver<TysonNovakCellCycleModel, BackwardEulerIvpOdeSolver> EulerSolver;
 
         // Check we can create an instance
         boost::shared_ptr<EulerSolver> p_solver = EulerSolver::Instance();
@@ -216,7 +216,7 @@ public:
     void TestWithCvodeAdaptor() throw(Exception)
     {
 #ifdef CHASTE_CVODE
-        typedef CellCycleModelOdeSolver<TysonNovakPhaseBasedCellCycleModel, CvodeAdaptor> CvodeSolver;
+        typedef CellCycleModelOdeSolver<TysonNovakCellCycleModel, CvodeAdaptor> CvodeSolver;
 
         // Check we can create an instance
         boost::shared_ptr<CvodeSolver> p_solver = CvodeSolver::Instance();
@@ -242,7 +242,7 @@ public:
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "ode_solver.arch";
 
-        typedef CellCycleModelOdeSolver<Alarcon2004OxygenBasedPhaseBasedCellCycleModel, BackwardEulerIvpOdeSolver> EulerSolver;
+        typedef CellCycleModelOdeSolver<Alarcon2004OxygenBasedCellCycleModel, BackwardEulerIvpOdeSolver> EulerSolver;
 
         // Create an output archive
         {

@@ -33,55 +33,44 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef STOCHASTICOXYGENBASEDPHASEBASEDCELLCYCLEMODEL_HPP_
-#define STOCHASTICOXYGENBASEDPHASEBASEDCELLCYCLEMODEL_HPP_
+#ifndef TYSONNOVAKCELLCYCLEMODEL_HPP_
+#define TYSONNOVAKCELLCYCLEMODEL_HPP_
 
-#include "SimpleOxygenBasedPhaseBasedCellCycleModel.hpp"
-#include "RandomNumberGenerator.hpp"
+#include "ChasteSerialization.hpp"
+#include <boost/serialization/base_object.hpp>
+
+#include "AbstractOdeBasedCellCycleModel.hpp"
+#include "TysonNovak2001OdeSystem.hpp"
+
 
 /**
- * Stochastic oxygen-based cell-cycle model.
+ *  Tyson-Novak 2001 cell-cycle model, taken from the version at  doi:10.1006/jtbi.2001.2293
  *
- * A simple oxygen-dependent cell-cycle model that inherits from
- * SimpleOxygenBasedPhaseBasedCellCycleModel and in addition spends a random
- * duration in G2 phase.
+ *  Note that this is not a model for murine or human colonic-cell cycling, but is
+ *  included in chaste as one of the most commonly known ODE based cell-cycle models.
+ *
+ *  Time taken to progress through the cycle is deterministic and given by
+ *  an ODE system independent of external factors.
  */
-class StochasticOxygenBasedPhaseBasedCellCycleModel : public SimpleOxygenBasedPhaseBasedCellCycleModel
+class TysonNovakCellCycleModel : public AbstractOdeBasedCellCycleModel
 {
-    friend class TestSimplePhaseBasedCellCycleModels;
-
 private:
 
-    friend class boost::serialization::access;
+    friend class TestOdeBasedCellCycleModels;
 
+    /** Needed for serialization. */
+    friend class boost::serialization::access;
     /**
-     * Boost Serialization method for archiving/checkpointing
-     * @param archive  The boost archive.
-     * @param version  The current version of this class.
+     * Archive the cell-cycle model, never used directly - boost uses this.
+     *
+     * @param archive the archive
+     * @param version the current version of this class
      */
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<SimpleOxygenBasedPhaseBasedCellCycleModel>(*this);
-
-        // Make sure the RandomNumberGenerator singleton gets saved too
-        SerializableSingleton<RandomNumberGenerator>* p_wrapper = RandomNumberGenerator::Instance()->GetSerializationWrapper();
-        archive & p_wrapper;
-
-        archive & mStochasticG2Duration;
+        archive & boost::serialization::base_object<AbstractOdeBasedCellCycleModel>(*this);
     }
-
-    /**
-     * The duration of the G2 phase, set stochastically.
-     */
-    double mStochasticG2Duration;
-
-    /**
-     * Stochastically set the G2 duration.  Called on cell creation at
-     * the start of a simulation, and for both parent and daughter
-     * cells at cell division.
-     */
-    void GenerateStochasticG2Duration();
 
 protected:
 
@@ -98,34 +87,35 @@ protected:
      *
      * @param rModel the cell cycle model to copy.
      */
-    StochasticOxygenBasedPhaseBasedCellCycleModel(const StochasticOxygenBasedPhaseBasedCellCycleModel& rModel);
+    TysonNovakCellCycleModel(const TysonNovakCellCycleModel& rModel);
 
 public:
 
     /**
-     * Constructor.
+     * Default constructor.
+     *
+     * @param pOdeSolver An optional pointer to a cell-cycle model ODE solver object (allows the use of different ODE solvers)
      */
-    StochasticOxygenBasedPhaseBasedCellCycleModel();
-
-    /**
-     * Overridden InitialiseDaughterCell() method.
-     */
-    void InitialiseDaughterCell();
+    TysonNovakCellCycleModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver = boost::shared_ptr<AbstractCellCycleModelOdeSolver>());
 
     /**
      * Initialise the cell-cycle model at the start of a simulation.
+     *
+     * This method will be called precisely once per cell set up in the initial
+     * cell population. It is not called on cell division; use ResetForDivision(),
+     * CreateCellCycleModel() and InitialiseDaughterCell() for that.
+     *
+     * By the time this is called, a CellPopulation will have been set up, so the model
+     * can know where its cell is located in space. If relevant to the simulation,
+     * any singletons will also have been initialised.
      */
     void Initialise();
 
     /**
-     * Overridden ResetForDivision() method.
+     * Reset cell-cycle model by calling AbstractOdeBasedCellCycleModelWithStoppingEvent::ResetForDivision()
+     * and setting initial conditions for protein concentrations.
      */
     void ResetForDivision();
-
-    /**
-     * @return mStochasticG2Duration.
-     */
-    double GetG2Duration() const;
 
     /**
      * Overridden builder method to create new copies of
@@ -134,6 +124,44 @@ public:
      * @return new cell-cycle model
      */
     AbstractCellCycleModel* CreateCellCycleModel();
+
+    /**
+     * @return the duration of the cell's S phase.
+     */
+    double GetSDuration() const;
+
+    /**
+     * @return the duration of the cell's G2 phase.
+     */
+    double GetG2Duration() const;
+
+    /**
+     * @return the duration of the cell's M phase.
+     */
+    double GetMDuration() const;
+
+    /**
+     * If the daughter cell type is stem, change it to transit.
+     */
+    void InitialiseDaughterCell();
+
+    /**
+     * Overridden GetAverageTransitCellCycleTime() method.
+     * @return time
+     */
+    double GetAverageTransitCellCycleTime();
+
+    /**
+     * Overridden GetAverageStemCellCycleTime() method.
+     * @return time
+     */
+    double GetAverageStemCellCycleTime();
+
+    /**
+     * Overridden CanCellTerminallyDifferentiate() method.
+     * @return whether cell can terminally differentiate
+     */
+    bool CanCellTerminallyDifferentiate();
 
     /**
      * Outputs cell cycle model parameters to file.
@@ -145,6 +173,8 @@ public:
 
 // Declare identifier for the serializer
 #include "SerializationExportWrapper.hpp"
-CHASTE_CLASS_EXPORT(StochasticOxygenBasedPhaseBasedCellCycleModel)
+CHASTE_CLASS_EXPORT(TysonNovakCellCycleModel)
+#include "CellCycleModelOdeSolverExportWrapper.hpp"
+EXPORT_CELL_CYCLE_MODEL_ODE_SOLVER(TysonNovakCellCycleModel)
 
-#endif /*STOCHASTICOXYGENBASEDPHASEBASEDCELLCYCLEMODEL_HPP_*/
+#endif /*TYSONNOVAKCELLCYCLEMODEL_HPP_*/

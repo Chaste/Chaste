@@ -38,7 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 #include <cmath>
-#include "AbstractPhaseBasedCellCycleModel.hpp"
+#include "AbstractCellCycleModel.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 
 /**
@@ -48,11 +48,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * cxx-test classes (not source code) as it includes TS_ASSERT
  * calls.
  *
- * @param pModel Pointer to the cell-cycle model (note must be a phase based model)
+ * @param pModel Pointer to the cell-cycle model
  * @param g1Duration Correct duration of the G1 phase, to test against
  * @param g2Duration Correct duration of the G1 phase, to test against
  */
-void CheckReadyToDivideAndPhaseIsUpdated(AbstractPhaseBasedCellCycleModel* pModel,
+void CheckReadyToDivideAndPhaseIsUpdated(AbstractCellCycleModel* pModel,
                                          double g1Duration,
                                          double g2Duration=DBL_MAX)
 {

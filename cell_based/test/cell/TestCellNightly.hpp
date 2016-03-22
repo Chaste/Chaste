@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 
 #include "Cell.hpp"
-#include "TysonNovakPhaseBasedCellCycleModel.hpp"
+#include "TysonNovakCellCycleModel.hpp"
 #include "OutputFileHandler.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "ApcOneHitCellMutationState.hpp"
@@ -71,7 +71,7 @@ public:
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(end_time, time_steps);
         MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
         MAKE_PTR(StemCellProliferativeType, p_type);
-        TysonNovakPhaseBasedCellCycleModel* p_model = new TysonNovakPhaseBasedCellCycleModel();
+        TysonNovakCellCycleModel* p_model = new TysonNovakCellCycleModel();
         CellPtr p_stem_cell(new Cell(p_healthy_state, p_model));
         p_stem_cell->SetCellProliferativeType(p_type);
         p_stem_cell->InitialiseCellCycleModel();
@@ -104,7 +104,7 @@ public:
         MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
         MAKE_PTR(StemCellProliferativeType, p_type);
 
-        TysonNovakPhaseBasedCellCycleModel* p_model = new TysonNovakPhaseBasedCellCycleModel();
+        TysonNovakCellCycleModel* p_model = new TysonNovakCellCycleModel();
         CellPtr p_stem_cell(new Cell(p_healthy_state, p_model));
         p_stem_cell->SetCellProliferativeType(p_type);
         p_stem_cell->InitialiseCellCycleModel();

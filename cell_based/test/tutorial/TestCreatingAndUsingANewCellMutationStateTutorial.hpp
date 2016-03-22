@@ -79,7 +79,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Chaste tutorials. */
 #include "HoneycombMeshGenerator.hpp"
 #include "WildTypeCellMutationState.hpp"
-#include "FixedDurationGenerationBasedPhaseBasedCellCycleModel.hpp"
+#include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
 #include "OffLatticeSimulation.hpp"
 #include "CellMutationStatesCountWriter.hpp"
@@ -258,7 +258,7 @@ public:
 
         /* Next, we create some cells, as follows. */
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes());
 
         /* We now assign the mutation to the 11th and 51st cells.*/
@@ -293,7 +293,7 @@ public:
      * {{{java Visualize2dCentreCells /tmp/$USER/testoutput/TestOffLatticeSimulationWithNewMutationState/results_from_time_0}}}
      *
      * you should see two cells in black which are the cells with the new mutation. If we want these cells to behave differently we
-     * would need to write an new {{{PhaseBasedCellCycleModel}}}, {{{CellKiller}}}, {{{Force}}}, or {{{CellPopulationBoundaryCondition}}}
+     * would need to write an new {{{CellCycleModel}}}, {{{CellKiller}}}, {{{Force}}}, or {{{CellPopulationBoundaryCondition}}}
      * which checks for the new mutation.
      *
      */

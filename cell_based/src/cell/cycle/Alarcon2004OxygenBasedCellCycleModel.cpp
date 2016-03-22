@@ -33,24 +33,24 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "Alarcon2004OxygenBasedPhaseBasedCellCycleModel.hpp"
+#include "Alarcon2004OxygenBasedCellCycleModel.hpp"
 
 #include "CellLabel.hpp"
 #include "Exception.hpp"
 
-Alarcon2004OxygenBasedPhaseBasedCellCycleModel::Alarcon2004OxygenBasedPhaseBasedCellCycleModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
-    : AbstractOdeBasedPhaseBasedCellCycleModel(SimulationTime::Instance()->GetTime(), pOdeSolver)
+Alarcon2004OxygenBasedCellCycleModel::Alarcon2004OxygenBasedCellCycleModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
+    : AbstractOdeBasedCellCycleModel(SimulationTime::Instance()->GetTime(), pOdeSolver)
 {
     if (!mpOdeSolver)
     {
-        mpOdeSolver = CellCycleModelOdeSolver<Alarcon2004OxygenBasedPhaseBasedCellCycleModel, RungeKutta4IvpOdeSolver>::Instance();
+        mpOdeSolver = CellCycleModelOdeSolver<Alarcon2004OxygenBasedCellCycleModel, RungeKutta4IvpOdeSolver>::Instance();
         mpOdeSolver->Initialise();
     }
     SetDt(0.0001);
 }
 
-Alarcon2004OxygenBasedPhaseBasedCellCycleModel::Alarcon2004OxygenBasedPhaseBasedCellCycleModel(const Alarcon2004OxygenBasedPhaseBasedCellCycleModel& rModel)
-    : AbstractOdeBasedPhaseBasedCellCycleModel(rModel)
+Alarcon2004OxygenBasedCellCycleModel::Alarcon2004OxygenBasedCellCycleModel(const Alarcon2004OxygenBasedCellCycleModel& rModel)
+    : AbstractOdeBasedCellCycleModel(rModel)
 {
     /*
      * Set each member variable of the new cell-cycle model that inherits
@@ -74,15 +74,15 @@ Alarcon2004OxygenBasedPhaseBasedCellCycleModel::Alarcon2004OxygenBasedPhaseBased
 }
 
 
-AbstractCellCycleModel* Alarcon2004OxygenBasedPhaseBasedCellCycleModel::CreateCellCycleModel()
+AbstractCellCycleModel* Alarcon2004OxygenBasedCellCycleModel::CreateCellCycleModel()
 {
-    return new Alarcon2004OxygenBasedPhaseBasedCellCycleModel(*this);
+    return new Alarcon2004OxygenBasedCellCycleModel(*this);
 }
 
 
-void Alarcon2004OxygenBasedPhaseBasedCellCycleModel::ResetForDivision()
+void Alarcon2004OxygenBasedCellCycleModel::ResetForDivision()
 {
-    AbstractOdeBasedPhaseBasedCellCycleModel::ResetForDivision();
+    AbstractOdeBasedCellCycleModel::ResetForDivision();
     assert(mpOdeSystem != NULL);
 
     // This model needs the protein concentrations and phase resetting to G0/G1.
@@ -94,7 +94,7 @@ void Alarcon2004OxygenBasedPhaseBasedCellCycleModel::ResetForDivision()
     }
 }
 
-void Alarcon2004OxygenBasedPhaseBasedCellCycleModel::Initialise()
+void Alarcon2004OxygenBasedCellCycleModel::Initialise()
 {
     assert(mpOdeSystem == NULL);
     assert(mpCell != NULL);
@@ -103,10 +103,10 @@ void Alarcon2004OxygenBasedPhaseBasedCellCycleModel::Initialise()
     mpOdeSystem = new Alarcon2004OxygenBasedCellCycleOdeSystem(mpCell->GetCellData()->GetItem("oxygen"), is_labelled);
     mpOdeSystem->SetStateVariables(mpOdeSystem->GetInitialConditions());
 
-    AbstractOdeBasedPhaseBasedCellCycleModel::Initialise();
+    AbstractOdeBasedCellCycleModel::Initialise();
 }
 
-void Alarcon2004OxygenBasedPhaseBasedCellCycleModel::AdjustOdeParameters(double currentTime)
+void Alarcon2004OxygenBasedCellCycleModel::AdjustOdeParameters(double currentTime)
 {
     // Pass this time step's oxygen concentration into the solver as a constant over this timestep
 
@@ -117,16 +117,16 @@ void Alarcon2004OxygenBasedPhaseBasedCellCycleModel::AdjustOdeParameters(double 
     static_cast<Alarcon2004OxygenBasedCellCycleOdeSystem*>(mpOdeSystem)->SetIsLabelled(is_labelled);
 }
 
-void Alarcon2004OxygenBasedPhaseBasedCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
+void Alarcon2004OxygenBasedCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
 {
     // No new parameters to output
 
     // Call method on direct parent class
-    AbstractOdeBasedPhaseBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
+    AbstractOdeBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
 }
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-CHASTE_CLASS_EXPORT(Alarcon2004OxygenBasedPhaseBasedCellCycleModel)
+CHASTE_CLASS_EXPORT(Alarcon2004OxygenBasedCellCycleModel)
 #include "CellCycleModelOdeSolverExportWrapper.hpp"
-EXPORT_CELL_CYCLE_MODEL_ODE_SOLVER(Alarcon2004OxygenBasedPhaseBasedCellCycleModel)
+EXPORT_CELL_CYCLE_MODEL_ODE_SOLVER(Alarcon2004OxygenBasedCellCycleModel)

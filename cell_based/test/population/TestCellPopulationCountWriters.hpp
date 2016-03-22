@@ -55,7 +55,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HoneycombMeshGenerator.hpp"
 #include "PottsMeshGenerator.hpp"
 #include "CellsGenerator.hpp"
-#include "FixedDurationGenerationBasedPhaseBasedCellCycleModel.hpp"
+#include "FixedDurationGenerationBasedCellCycleModel.hpp"
 
 #include "MeshBasedCellPopulation.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
@@ -80,7 +80,7 @@ public:
         PottsMeshGenerator<2> generator(5, 0, 0, 5, 0, 0);
         PottsMesh<2>* p_mesh = generator.GetMesh();
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, 5u);
         std::vector<unsigned> location_indices;
         location_indices.push_back(7);
@@ -154,7 +154,7 @@ public:
         nodes.push_back(new Node<3>(4, false, 0.5, 0.5, 0.5));
         MutableMesh<3,3> mesh(nodes);
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 3> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
         MeshBasedCellPopulation<3> cell_population(mesh, cells);
 
@@ -221,7 +221,7 @@ public:
         nodes.push_back(new Node<3>(4, false, 0.5, 0.5, 0.5));
         MutableMesh<3,3> mesh(nodes);
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 3> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
         MeshBasedCellPopulation<3> cell_population(mesh, cells);
 

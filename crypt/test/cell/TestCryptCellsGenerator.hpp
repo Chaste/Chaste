@@ -40,7 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HoneycombMeshGenerator.hpp"
 #include "CylindricalHoneycombVertexMeshGenerator.hpp"
 #include "CryptCellsGenerator.hpp"
-#include "TysonNovakPhaseBasedCellCycleModel.hpp"
+#include "TysonNovakCellCycleModel.hpp"
 #include "WntCellCycleModel.hpp"
 #include "SimpleWntCellCycleModel.hpp"
 #include "StochasticWntCellCycleModel.hpp"
@@ -56,7 +56,7 @@ class TestCryptCellsGenerator : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestCryptCellsGeneratorWithFixedDurationGenerationBasedPhaseBasedCellCycleModel() throw(Exception)
+    void TestCryptCellsGeneratorWithFixedDurationGenerationBasedCellCycleModel() throw(Exception)
     {
         // Create mesh
         HoneycombMeshGenerator mesh_generator(5, 10, 0);
@@ -73,7 +73,7 @@ public:
         double y2 = 2.0;
         double y3 = 3.0;
 
-        CryptCellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel> generator;
+        CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> generator;
         generator.Generate(cells, p_mesh, location_indices, true, y0, y1, y2, y3);
 
         TS_ASSERT_EQUALS(cells.size(), p_mesh->GetNumNodes());
@@ -82,7 +82,7 @@ public:
         for (unsigned i=0; i<cells.size(); i++)
         {
             double height = p_mesh->GetNode(i)->rGetLocation()[1];
-            unsigned generation = static_cast<FixedDurationGenerationBasedPhaseBasedCellCycleModel*>(cells[i]->GetCellCycleModel())->GetGeneration();
+            unsigned generation = static_cast<FixedDurationGenerationBasedCellCycleModel*>(cells[i]->GetCellCycleModel())->GetGeneration();
 
             TS_ASSERT_EQUALS(cells[i]->GetCellCycleModel()->GetDimension(), 2u);
 
@@ -114,7 +114,7 @@ public:
         }
     }
 
-    void TestCryptCellsGeneratorWithStochasticDurationGenerationBasedPhaseBasedCellCycleModel() throw(Exception)
+    void TestCryptCellsGeneratorWithStochasticDurationGenerationBasedCellCycleModel() throw(Exception)
     {
         // Create mesh
         HoneycombMeshGenerator mesh_generator(5, 10, 0);
@@ -125,7 +125,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<StochasticDurationGenerationBasedPhaseBasedCellCycleModel> generator;
+        CryptCellsGenerator<StochasticDurationGenerationBasedCellCycleModel> generator;
         generator.Generate(cells, p_mesh, location_indices, false);
 
         TS_ASSERT_EQUALS(cells.size(), p_mesh->GetNumNodes());
@@ -139,7 +139,7 @@ public:
         for (unsigned i=0; i<cells.size(); i++)
         {
             double height = p_mesh->GetNode(i)->rGetLocation()[1];
-            unsigned generation = static_cast<StochasticDurationGenerationBasedPhaseBasedCellCycleModel*>(cells[i]->GetCellCycleModel())->GetGeneration();
+            unsigned generation = static_cast<StochasticDurationGenerationBasedCellCycleModel*>(cells[i]->GetCellCycleModel())->GetGeneration();
 
             if (height <= y0)
             {
@@ -177,7 +177,7 @@ public:
         }
     }
 
-    void TestCryptCellsGeneratorWithTysonNovakPhaseBasedCellCycleModel() throw(Exception)
+    void TestCryptCellsGeneratorWithTysonNovakCellCycleModel() throw(Exception)
     {
         // Create mesh
         HoneycombMeshGenerator mesh_generator(5, 10, 0);
@@ -188,7 +188,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<TysonNovakPhaseBasedCellCycleModel> generator;
+        CryptCellsGenerator<TysonNovakCellCycleModel> generator;
         generator.Generate(cells, p_mesh, location_indices, true);
 
         // Test that cells were generated correctly
@@ -298,7 +298,7 @@ public:
         }
     }
 
-    void TestCryptCellsGeneratorWithStochasticDurationGenerationBasedPhaseBasedCellCycleModelAndVertexMesh() throw(Exception)
+    void TestCryptCellsGeneratorWithStochasticDurationGenerationBasedCellCycleModelAndVertexMesh() throw(Exception)
       {
           // Create mesh
           unsigned crypt_width = 4;
@@ -313,10 +313,10 @@ public:
 
           // Create cells
           std::vector<CellPtr> fixed_cells, stochastic_cells;
-          CryptCellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel> fixed_cells_generator;
+          CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> fixed_cells_generator;
           fixed_cells_generator.Generate(fixed_cells, p_mesh, std::vector<unsigned>(), true, y0, y1, y2, y3, true);
 
-          CryptCellsGenerator<StochasticDurationGenerationBasedPhaseBasedCellCycleModel> stochastic_cells_generator;
+          CryptCellsGenerator<StochasticDurationGenerationBasedCellCycleModel> stochastic_cells_generator;
           stochastic_cells_generator.Generate(stochastic_cells, p_mesh, std::vector<unsigned>(), true, y0, y1, y2, y3, true);
 
           TS_ASSERT_EQUALS(fixed_cells.size(), p_mesh->GetNumElements());
@@ -326,8 +326,8 @@ public:
           for (unsigned i=0; i<fixed_cells.size(); i++)
           {
               double height = p_mesh->GetCentroidOfElement(i)[1];
-              unsigned fixed_generation = static_cast<FixedDurationGenerationBasedPhaseBasedCellCycleModel*>(fixed_cells[i]->GetCellCycleModel())->GetGeneration();
-              unsigned stochastic_generation = static_cast<StochasticDurationGenerationBasedPhaseBasedCellCycleModel*>(stochastic_cells[i]->GetCellCycleModel())->GetGeneration();
+              unsigned fixed_generation = static_cast<FixedDurationGenerationBasedCellCycleModel*>(fixed_cells[i]->GetCellCycleModel())->GetGeneration();
+              unsigned stochastic_generation = static_cast<StochasticDurationGenerationBasedCellCycleModel*>(stochastic_cells[i]->GetCellCycleModel())->GetGeneration();
 
               if (height <= y0)
               {

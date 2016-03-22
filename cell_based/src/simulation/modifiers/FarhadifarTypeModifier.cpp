@@ -34,7 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "FarhadifarTypeModifier.hpp"
-#include "AbstractPhaseBasedCellCycleModel.hpp"
 
 template<unsigned DIM>
 FarhadifarTypeModifier<DIM>::FarhadifarTypeModifier()
@@ -70,7 +69,7 @@ void FarhadifarTypeModifier<DIM>::UpdateTargetAreaOfCell(CellPtr pCell)
         double cell_age = pCell->GetAge();
 
         // Get the combined duration of the cell's M, G1 and S phases
-        AbstractPhaseBasedCellCycleModel* p_model = static_cast<AbstractPhaseBasedCellCycleModel*>(pCell->GetCellCycleModel());
+        AbstractCellCycleModel* p_model = pCell->GetCellCycleModel();
         double growth_start_time = p_model->GetMDuration() + p_model->GetG1Duration() + p_model->GetSDuration();
 
         // The target area of a proliferating cell increases linearly from A to 2A over the course of the G2 phase

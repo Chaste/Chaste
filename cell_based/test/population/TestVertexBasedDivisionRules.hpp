@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ArchiveOpener.hpp"
 #include "CellsGenerator.hpp"
 #include "VertexBasedCellPopulation.hpp"
-#include "FixedDurationGenerationBasedPhaseBasedCellCycleModel.hpp"
+#include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "AbstractVertexBasedDivisionRule.hpp"
 #include "DiagonalVertexBasedDivisionRule.hpp"
@@ -90,7 +90,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 1> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 1> cells_generator;
         cells_generator.GenerateBasic(cells, vertex_mesh.GetNumElements());
 
         // Create cell population
@@ -102,7 +102,7 @@ public:
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
 
-        FixedDurationGenerationBasedPhaseBasedCellCycleModel* p_model = new FixedDurationGenerationBasedPhaseBasedCellCycleModel();
+        FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         CellPtr p_temp_cell(new Cell(p_state, p_model));
         p_temp_cell->SetCellProliferativeType(p_stem_type);
         p_temp_cell->SetBirthTime(-1);
@@ -162,7 +162,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 1> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 1> cells_generator;
         cells_generator.GenerateBasic(cells, vertex_mesh.GetNumElements());
 
         // Create a cell population

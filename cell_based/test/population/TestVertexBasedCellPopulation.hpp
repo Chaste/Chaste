@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellsGenerator.hpp"
 #include "VertexBasedCellPopulation.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
-#include "FixedDurationGenerationBasedPhaseBasedCellCycleModel.hpp"
+#include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "ArchiveOpener.hpp"
 #include "WildTypeCellMutationState.hpp"
@@ -96,7 +96,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
 
         // Create cell population
@@ -171,7 +171,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements()-1);
 
         std::vector<unsigned> cell_location_indices;
@@ -187,7 +187,7 @@ public:
 
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
-        FixedDurationGenerationBasedPhaseBasedCellCycleModel* p_model = new FixedDurationGenerationBasedPhaseBasedCellCycleModel();
+        FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         CellPtr p_cell1(new Cell(p_state, p_model));
         p_cell1->SetCellProliferativeType(p_stem_type);
 
@@ -238,7 +238,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells2;
-        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 2> cells_generator2;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator2;
         cells_generator2.GenerateBasic(cells2, p_mesh2->GetNumElements()+1);
 
         std::vector<unsigned> cell_location_indices2;
@@ -267,7 +267,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
 
         cells[0]->SetMutationState(p_apc1);
@@ -343,7 +343,7 @@ public:
         // Create cells
         MAKE_PTR(ApcOneHitCellMutationState, p_apc1);
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, vertex_mesh.GetNumElements());
         cells[0]->SetMutationState(p_apc1);
 
@@ -371,7 +371,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
 
         // Create cell population
@@ -421,7 +421,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, vertex_mesh.GetNumElements());
 
         // Create cell population
@@ -449,7 +449,7 @@ public:
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
 
-        FixedDurationGenerationBasedPhaseBasedCellCycleModel* p_model = new FixedDurationGenerationBasedPhaseBasedCellCycleModel();
+        FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         CellPtr p_temp_cell(new Cell(p_state, p_model));
         p_temp_cell->SetCellProliferativeType(p_stem_type);
         p_temp_cell->SetBirthTime(-1);
@@ -539,7 +539,7 @@ public:
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
 
-        FixedDurationGenerationBasedPhaseBasedCellCycleModel* p_model = new FixedDurationGenerationBasedPhaseBasedCellCycleModel();
+        FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         CellPtr p_cell(new Cell(p_state, p_model));
         p_cell->SetCellProliferativeType(p_diff_type);
         p_cell->SetBirthTime(-20.0);
@@ -559,7 +559,7 @@ public:
         cell_division_axis[0] = 1.0;
         cell_division_axis[1] = 0.0;
 
-        FixedDurationGenerationBasedPhaseBasedCellCycleModel* p_model2 = new FixedDurationGenerationBasedPhaseBasedCellCycleModel();
+        FixedDurationGenerationBasedCellCycleModel* p_model2 = new FixedDurationGenerationBasedCellCycleModel();
         CellPtr p_temp_cell(new Cell(p_state, p_model2));
         p_temp_cell->SetCellProliferativeType(p_stem_type);
         p_temp_cell->SetBirthTime(-1.0);
@@ -609,7 +609,7 @@ public:
 
         for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
         {
-            FixedDurationGenerationBasedPhaseBasedCellCycleModel* p_model = new FixedDurationGenerationBasedPhaseBasedCellCycleModel();
+            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             CellPtr p_cell(new Cell(p_state, p_model));
 
             double birth_time = 0.0 - elem_index;
@@ -751,7 +751,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
 
         // Create cell population but do not try to validate
@@ -780,7 +780,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
 
         cells[5]->StartApoptosis();
@@ -869,7 +869,7 @@ public:
         std::vector<CellPtr> cells;
         for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
         {
-            FixedDurationGenerationBasedPhaseBasedCellCycleModel* p_model = new FixedDurationGenerationBasedPhaseBasedCellCycleModel();
+            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
 
             CellPtr p_cell(new Cell(p_wildtype, p_model));
             if (elem_index%3 == 0)
@@ -1034,7 +1034,7 @@ public:
 
             // Create cells
             std::vector<CellPtr> cells;
-            CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 2> cells_generator;
+            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
             cells_generator.GenerateBasic(cells, mesh.GetNumElements());
 
             // Create cell population
@@ -1245,7 +1245,7 @@ public:
 
             // Create cells
             std::vector<CellPtr> cells;
-            CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 2> cells_generator;
+            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
             cells_generator.GenerateBasic(cells, mesh.GetNumElements());
 
             // Create cell population
@@ -1364,7 +1364,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
 
         // Create cell population
@@ -1439,7 +1439,7 @@ public:
 
         // Create cells to correspond with VertexElements
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_vertex_mesh->GetNumElements());
 
         // Create cell population

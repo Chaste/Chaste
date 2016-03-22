@@ -89,7 +89,7 @@ public:
      * Overridden VisitCell() method.
      *
      * Visit a cell and write the protein concentrations associated with its cell-cycle model,
-     * if its cell-cycle model is a subclass of AbstractOdeBasedPhaseBasedCellCycleModel.
+     * if its cell-cycle model is a subclass of AbstractOdeBasedCellCycleModel.
      *
      * Outputs a line of space-separated values of the form:
      * ...[location index] [protein 1 conc] [protein 2 conc] ... [protein n conc] ...
@@ -99,7 +99,7 @@ public:
      *
      * Note that the "protein concentrations" refer to the solution of the ODE system that is
      * present in the cell-cycle model. If the cell-cycle model does not inherit from
-     * AbstractOdeBasedPhaseBasedCellCycleModel, then an exception is thrown.
+     * AbstractOdeBasedCellCycleModel, then an exception is thrown.
      *
      * @param pCell a pointer to a cell
      * @param pCellPopulation a pointer to the cell population owning the cell

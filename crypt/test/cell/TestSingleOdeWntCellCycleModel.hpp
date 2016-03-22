@@ -363,10 +363,10 @@ public:
             input_arch >> p_cell;
 
             // Check
-            SingleOdeWntCellCycleModel* p_cell_model = static_cast<SingleOdeWntCellCycleModel*>(p_cell->GetCellCycleModel());
+            AbstractCellCycleModel* p_cell_model = p_cell->GetCellCycleModel();
             TS_ASSERT_EQUALS(p_cell, p_cell_model->GetCell());
 
-            TS_ASSERT_DELTA(p_cell_model->GetBetaCateninDivisionThreshold(), beta_catenin_threshold, 1e-12);
+            TS_ASSERT_DELTA((static_cast<SingleOdeWntCellCycleModel*>(p_cell_model))->GetBetaCateninDivisionThreshold(), beta_catenin_threshold, 1e-12);
 
             TS_ASSERT_EQUALS(p_cell_model->ReadyToDivide(), false);
             p_simulation_time->IncrementTimeOneStep();
@@ -376,7 +376,7 @@ public:
             TS_ASSERT_DELTA(p_cell_model->GetSG2MDuration(), 10.0, 1e-12);
 
             TS_ASSERT_DELTA(p_gen->ranf(), random_number_test, 1e-7);
-            TS_ASSERT_EQUALS(p_cell_model->GetDimension(), 2u);
+            TS_ASSERT_EQUALS((static_cast<SingleOdeWntCellCycleModel*>(p_cell_model))->GetDimension(), 2u);
 
             // Tidy up
             SimulationTime::Destroy();

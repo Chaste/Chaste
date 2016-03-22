@@ -51,10 +51,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "GeneralisedLinearSpringForce.hpp"
 #include "CylindricalHoneycombMeshGenerator.hpp"
-#include "FixedDurationGenerationBasedPhaseBasedCellCycleModel.hpp"
-#include "StochasticDurationGenerationBasedPhaseBasedCellCycleModel.hpp"
+#include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "StochasticDurationGenerationBasedCellCycleModel.hpp"
 #include "WntCellCycleModel.hpp"
-#include "TysonNovakPhaseBasedCellCycleModel.hpp"
+#include "TysonNovakCellCycleModel.hpp"
 
 // Needed for NodesOnlyMesh
 #include "PetscSetupAndFinalize.hpp"

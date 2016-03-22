@@ -54,7 +54,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * The AbstractCellBasedSimulation is constructed with a CellPopulation, which
  * updates the correspondence between each Cell and its spatial representation
- * and handles cell division (governed by the PhaseBasedCellCycleModel associated
+ * and handles cell division (governed by the CellCycleModel associated
  * with each cell). Once constructed,  one or more CellKillers may be passed
  * to the AbstractCellBasedSimulation object to specify conditions in which Cells
  * may die,

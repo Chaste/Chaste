@@ -42,8 +42,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ParallelCellsGenerator.hpp"
 #include "Cell.hpp"
 #include "NodesOnlyMesh.hpp"
-#include "FixedDurationGenerationBasedPhaseBasedCellCycleModel.hpp"
-#include "StochasticDurationGenerationBasedPhaseBasedCellCycleModel.hpp"
+#include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "StochasticDurationGenerationBasedCellCycleModel.hpp"
 #include "CellPropertyRegistry.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 #include "TransitCellProliferativeType.hpp"
@@ -62,7 +62,7 @@ public:
 
         std::vector<CellPtr> cells;
 
-        ParallelCellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 1> generator;
+        ParallelCellsGenerator<FixedDurationGenerationBasedCellCycleModel, 1> generator;
         c_vector<double, 2> bounding_box = generator.GetArchiveBoundingBox("cell_based/test/data/TestParallelConstruction/Population1d.dat");
 
         TS_ASSERT_DELTA(bounding_box[0], 0.0, 1e-4);
@@ -98,7 +98,7 @@ public:
 
         std::vector<CellPtr> cells;
 
-        ParallelCellsGenerator<StochasticDurationGenerationBasedPhaseBasedCellCycleModel, 2> generator;
+        ParallelCellsGenerator<StochasticDurationGenerationBasedCellCycleModel, 2> generator;
         c_vector<double, 4> bounding_box = generator.GetArchiveBoundingBox("cell_based/test/data/TestParallelConstruction/Population2d.dat");
 
         TS_ASSERT_DELTA(bounding_box[0], 0.0, 1e-4);
@@ -133,7 +133,7 @@ public:
 
         std::vector<CellPtr> cells;
 
-        ParallelCellsGenerator<StochasticDurationGenerationBasedPhaseBasedCellCycleModel, 3> generator;
+        ParallelCellsGenerator<StochasticDurationGenerationBasedCellCycleModel, 3> generator;
         c_vector<double, 6> bounding_box = generator.GetArchiveBoundingBox("cell_based/test/data/TestParallelConstruction/Population3d.dat");
 
         TS_ASSERT_DELTA(bounding_box[0], 0.0, 1e-4);

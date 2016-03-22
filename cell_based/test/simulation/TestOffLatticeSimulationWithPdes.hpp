@@ -50,9 +50,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "GeneralisedLinearSpringForce.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "ApoptoticCellKiller.hpp"
-#include "SimpleOxygenBasedPhaseBasedCellCycleModel.hpp"
+#include "SimpleOxygenBasedCellCycleModel.hpp"
 #include "CellsGenerator.hpp"
-#include "FixedDurationGenerationBasedPhaseBasedCellCycleModel.hpp"
+#include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "SimpleUniformSourcePde.hpp"
 #include "CellwiseSourcePde.hpp"
 #include "ConstBoundaryCondition.hpp"
@@ -127,7 +127,7 @@ public:
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            SimpleOxygenBasedPhaseBasedCellCycleModel* p_model = new SimpleOxygenBasedPhaseBasedCellCycleModel();
+            SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
             p_model->SetDimension(2);
             p_model->SetHypoxicConcentration(0.9);
             p_model->SetQuiescentConcentration(0.9);
@@ -191,7 +191,7 @@ public:
 
             // Get cell model
             AbstractCellCycleModel* p_abstract_model = cell_iter->GetCellCycleModel();
-            SimpleOxygenBasedPhaseBasedCellCycleModel* p_oxygen_model = static_cast<SimpleOxygenBasedPhaseBasedCellCycleModel*> (p_abstract_model);
+            SimpleOxygenBasedCellCycleModel* p_oxygen_model = static_cast<SimpleOxygenBasedCellCycleModel*> (p_abstract_model);
 
             // First part of test - check that PDE solver is working correctly
             TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("oxygen"), analytic_solution, 1e-2);
@@ -222,7 +222,7 @@ public:
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
-            SimpleOxygenBasedPhaseBasedCellCycleModel* p_model = new SimpleOxygenBasedPhaseBasedCellCycleModel();
+            SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
             p_model->SetDimension(2);
 
             // Use non-default G1 durations
@@ -318,7 +318,7 @@ public:
 
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
-            SimpleOxygenBasedPhaseBasedCellCycleModel* p_model = new SimpleOxygenBasedPhaseBasedCellCycleModel();
+            SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
             p_model->SetDimension(2);
             CellPtr p_cell(new Cell(p_state, p_model));
             p_cell->SetCellProliferativeType(p_stem_type);
@@ -399,7 +399,7 @@ public:
 
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
-            SimpleOxygenBasedPhaseBasedCellCycleModel* p_model = new SimpleOxygenBasedPhaseBasedCellCycleModel();
+            SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
             p_model->SetDimension(2);
 
             // Use non-default G1 durations
@@ -491,7 +491,7 @@ public:
 
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
-            SimpleOxygenBasedPhaseBasedCellCycleModel* p_model = new SimpleOxygenBasedPhaseBasedCellCycleModel();
+            SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
             p_model->SetDimension(2);
 
             // Use non-default G1 durations
@@ -595,7 +595,7 @@ public:
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
-            SimpleOxygenBasedPhaseBasedCellCycleModel* p_model = new SimpleOxygenBasedPhaseBasedCellCycleModel();
+            SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
             p_model->SetDimension(2);
 
             // Use non-default G1 durations
@@ -752,7 +752,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes()-1);
 
         std::vector<unsigned> cell_location_indices;
@@ -833,7 +833,7 @@ public:
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
-            SimpleOxygenBasedPhaseBasedCellCycleModel* p_model = new SimpleOxygenBasedPhaseBasedCellCycleModel();
+            SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
             p_model->SetDimension(2);
 
             // Use non-default G1 durations
@@ -926,7 +926,7 @@ public:
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
-            SimpleOxygenBasedPhaseBasedCellCycleModel* p_model = new SimpleOxygenBasedPhaseBasedCellCycleModel();
+            SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
             p_model->SetDimension(2);
 
             // Use non-default G1 durations
@@ -998,14 +998,14 @@ public:
 
         // Set up cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 3> generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> generator;
         generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         // Set some model parameters for the cell-cycle model
         for (unsigned index=0; index < cells.size(); index++)
         {
-            static_cast<FixedDurationGenerationBasedPhaseBasedCellCycleModel*>(cells[index]->GetCellCycleModel())->SetTransitCellG1Duration(8.0);
-            static_cast<FixedDurationGenerationBasedPhaseBasedCellCycleModel*>(cells[index]->GetCellCycleModel())->SetStemCellG1Duration(8.0);
+            cells[index]->GetCellCycleModel()->SetTransitCellG1Duration(8.0);
+            cells[index]->GetCellCycleModel()->SetStemCellG1Duration(8.0);
         }
 
         // Set up cell population
@@ -1063,7 +1063,7 @@ public:
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            SimpleOxygenBasedPhaseBasedCellCycleModel* p_model = new SimpleOxygenBasedPhaseBasedCellCycleModel();
+            SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
             p_model->SetDimension(2);
             p_model->SetHypoxicConcentration(0.9);
             p_model->SetQuiescentConcentration(0.9);
@@ -1125,7 +1125,7 @@ public:
 
         // Set up cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
         // Create a cell population
@@ -1181,7 +1181,7 @@ public:
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            FixedDurationGenerationBasedPhaseBasedCellCycleModel* p_model = new FixedDurationGenerationBasedPhaseBasedCellCycleModel();
+            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetDimension(2);
 
             CellPtr p_cell(new Cell(p_state, p_model));
@@ -1238,7 +1238,7 @@ public:
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            FixedDurationGenerationBasedPhaseBasedCellCycleModel* p_model = new FixedDurationGenerationBasedPhaseBasedCellCycleModel();
+            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetDimension(2);
 
             CellPtr p_cell(new Cell(p_state, p_model));
@@ -1334,7 +1334,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
 
         // Create cell population
@@ -1433,7 +1433,7 @@ public:
 
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            FixedDurationGenerationBasedPhaseBasedCellCycleModel* p_model = new FixedDurationGenerationBasedPhaseBasedCellCycleModel();
+            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetDimension(2);
 
             CellPtr p_cell(new Cell(p_state, p_model));
@@ -1525,7 +1525,7 @@ public:
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            FixedDurationGenerationBasedPhaseBasedCellCycleModel* p_model = new FixedDurationGenerationBasedPhaseBasedCellCycleModel();
+            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetDimension(1);
 
             CellPtr p_cell(new Cell(p_state, p_model));
@@ -1589,7 +1589,7 @@ public:
 
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            FixedDurationGenerationBasedPhaseBasedCellCycleModel* p_model = new FixedDurationGenerationBasedPhaseBasedCellCycleModel();
+            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetDimension(2);
 
             CellPtr p_cell(new Cell(p_state, p_model));
@@ -1655,7 +1655,7 @@ public:
 
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            FixedDurationGenerationBasedPhaseBasedCellCycleModel* p_model = new FixedDurationGenerationBasedPhaseBasedCellCycleModel();
+            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetDimension(3);
 
             CellPtr p_cell(new Cell(p_state, p_model));

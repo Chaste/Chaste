@@ -33,35 +33,34 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef ABSTRACTSIMPLEPHASEBASEDCELLCYCLEMODEL_HPP_
-#define ABSTRACTSIMPLEPHASEBASEDCELLCYCLEMODEL_HPP_
+#ifndef STOCHASTICDURATIONCELLCYCLEMODEL_HPP_
+#define STOCHASTICDURATIONCELLCYCLEMODEL_HPP_
 
-#include "ChasteSerialization.hpp"
-#include "ClassIsAbstract.hpp"
-#include <boost/serialization/base_object.hpp>
-
-#include "AbstractPhaseBasedCellCycleModel.hpp"
+#include "AbstractSimpleCellCycleModel.hpp"
+#include "RandomNumberGenerator.hpp"
 
 /**
- * This class contains all the functionality shared by 'simple' cell-cycle models,
- * where the duration of each cell cycle phase is determined when the cell-cycle
- * model is created. Note that whether or not the cell should actually divide may
- * still depend on further conditions in subclasses; for example, the cell may only
- * divide if the local concentration of a signalling molecule is sufficiently high/
+ * A stochastic cell-cycle model where cells divide with a stochastic G1 phase duration.
  *
- * This class of cell-cycle models is distinct from 'ODE-based' cell-cycle models,
- * where the duration of one or more cell cycle phases are evaluated 'on the fly'
- * as the cell ages, according to a system of ordinary differential equations (ODEs)
- * governing (for example) the concentrations of key intracellular proteins.
+ * For proliferative cells, the G1 phase duration is drawn from a uniform distribution
+ * on [T, T+2], where the parameter T depends on cell proliferative type as follows: if
+ * the cell has StemCellProliferativeType, then T is given by GetStemCellG1Duration();
+ * and if the cell has TransitCellProliferativeType, then T is given by
+ * GetTransitCellG1Duration().
+ *
+ * If the cell has DifferentiatedCellProliferativeType, then the G1 phase duration is
+ * set to be infinite, so that the cell will never divide.
  */
-class AbstractSimplePhaseBasedCellCycleModel : public AbstractPhaseBasedCellCycleModel
+class StochasticDurationCellCycleModel : public AbstractSimpleCellCycleModel
 {
+    friend class TestSimpleCellCycleModels;
+
 private:
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
-     * Archive the cell-cycle model.
+     * Archive the cell-cycle model and random number generator, never used directly - boost uses this.
      *
      * @param archive the archive
      * @param version the current version of this class
@@ -69,17 +68,14 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractPhaseBasedCellCycleModel>(*this);
+        archive & boost::serialization::base_object<AbstractSimpleCellCycleModel>(*this);
+
+        // Make sure the RandomNumberGenerator singleton gets saved too
+        SerializableSingleton<RandomNumberGenerator>* p_wrapper = RandomNumberGenerator::Instance()->GetSerializationWrapper();
+        archive & p_wrapper;
     }
 
 protected:
-
-    /**
-     * Subclasses can override this function if they wish, this just
-     * allocates the default values for each of the different cell
-     * types' G1 durations as defined in AbstractPhaseBasedCellCycleModel.
-     */
-    virtual void SetG1Duration();
 
     /**
      * Protected copy-constructor for use by CreateCellCycleModel.
@@ -94,38 +90,28 @@ protected:
      *
      * @param rModel the cell cycle model to copy.
      */
-    AbstractSimplePhaseBasedCellCycleModel(const AbstractSimplePhaseBasedCellCycleModel& rModel);
+    StochasticDurationCellCycleModel(const StochasticDurationCellCycleModel& rModel);
 
 public:
 
     /**
-     * Default constructor - creates an AbstractSimplePhaseBasedCellCycleModel.
+     * Constructor - just a default, mBirthTime is now set in the AbstractCellCycleModel class.
+     * mG1Duration is set very high, it is set for the individual cells when InitialiseDaughterCell is called
      */
-    AbstractSimplePhaseBasedCellCycleModel();
+    StochasticDurationCellCycleModel();
 
     /**
-     * Destructor.
+     * Overridden SetG1Duration Method to add stochastic cell cycle times
      */
-    virtual ~AbstractSimplePhaseBasedCellCycleModel();
-
-    /** See AbstractPhaseBasedCellCycleModel::ResetForDivision() */
-    virtual void ResetForDivision();
+    void SetG1Duration();
 
     /**
-     * Default UpdateCellCyclePhase() method for a simple cell-cycle model.
+     * Overridden builder method to create new copies of
+     * this cell-cycle model.
      *
-     * Can be overridden if they should do something more subtle.
+     * @return new cell-cycle model
      */
-    virtual void UpdateCellCyclePhase();
-
-    /**
-     * Set the new cell's G1 duration once it has been created after division.
-     * The duration will be based on cell type.
-     */
-    void InitialiseDaughterCell();
-
-    /** See AbstractPhaseBasedCellCycleModel::Initialise() */
-    virtual void Initialise();
+    AbstractCellCycleModel* CreateCellCycleModel();
 
     /**
      * Outputs cell cycle model parameters to file.
@@ -135,6 +121,8 @@ public:
     virtual void OutputCellCycleModelParameters(out_stream& rParamsFile);
 };
 
-CLASS_IS_ABSTRACT(AbstractSimplePhaseBasedCellCycleModel)
+#include "SerializationExportWrapper.hpp"
+// Declare identifier for the serializer
+CHASTE_CLASS_EXPORT(StochasticDurationCellCycleModel)
 
-#endif /*ABSTRACTSIMPLEPHASEBASEDCELLCYCLEMODEL_HPP_*/
+#endif /*STOCHASTICDURATIONCELLCYCLEMODEL_HPP_*/

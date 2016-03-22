@@ -140,6 +140,7 @@ public:
      */
     void SetCell(CellPtr pCell);
 
+    ///\todo #2752 remove in favour of copy-constructors
     /**
      * Initialise the SRN model at the start of a simulation.
      *

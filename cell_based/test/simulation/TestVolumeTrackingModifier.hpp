@@ -50,8 +50,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SmartPointers.hpp"
 #include "OffLatticeSimulation.hpp"
 #include "VolumeTrackingModifier.hpp"
-#include "ContactInhibitionPhaseBasedCellCycleModel.hpp"
-#include "FixedDurationGenerationBasedPhaseBasedCellCycleModel.hpp"
+#include "ContactInhibitionCellCycleModel.hpp"
+#include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "CellLabel.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
@@ -92,7 +92,7 @@ public:
         std::vector<CellPtr> cells;
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            ContactInhibitionPhaseBasedCellCycleModel* p_cycle_model = new ContactInhibitionPhaseBasedCellCycleModel();
+            ContactInhibitionCellCycleModel* p_cycle_model = new ContactInhibitionCellCycleModel();
             p_cycle_model->SetDimension(2);
             p_cycle_model->SetBirthTime(-10.0);
             p_cycle_model->SetQuiescentVolumeFraction(0.9);
@@ -172,7 +172,7 @@ public:
         std::vector<CellPtr> cells;
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
-            ContactInhibitionPhaseBasedCellCycleModel* p_cycle_model = new ContactInhibitionPhaseBasedCellCycleModel();
+            ContactInhibitionCellCycleModel* p_cycle_model = new ContactInhibitionCellCycleModel();
             p_cycle_model->SetDimension(2);
             p_cycle_model->SetBirthTime(-10.0);
             p_cycle_model->SetQuiescentVolumeFraction(0.9);
@@ -245,7 +245,7 @@ public:
         std::vector<CellPtr> cells;
         for (unsigned i=0; i<location_indices.size(); i++)
         {
-            ContactInhibitionPhaseBasedCellCycleModel* p_cycle_model = new ContactInhibitionPhaseBasedCellCycleModel();
+            ContactInhibitionCellCycleModel* p_cycle_model = new ContactInhibitionCellCycleModel();
             p_cycle_model->SetDimension(2);
             p_cycle_model->SetBirthTime(-10.0);
             p_cycle_model->SetQuiescentVolumeFraction(0.9);
@@ -318,7 +318,7 @@ public:
 
         for (unsigned i=0; i<p_mesh->GetNumElements(); i++)
         {
-            ContactInhibitionPhaseBasedCellCycleModel* p_cycle_model = new ContactInhibitionPhaseBasedCellCycleModel();
+            ContactInhibitionCellCycleModel* p_cycle_model = new ContactInhibitionCellCycleModel();
             p_cycle_model->SetDimension(2);
             p_cycle_model->SetBirthTime(-10.0);
             p_cycle_model->SetQuiescentVolumeFraction(0.99); // Very high as cells are not that compressed, as low in number and want to check that contact inhibition works.
@@ -393,7 +393,7 @@ public:
         std::vector<CellPtr> cells;
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
-            ContactInhibitionPhaseBasedCellCycleModel* p_cycle_model = new ContactInhibitionPhaseBasedCellCycleModel();
+            ContactInhibitionCellCycleModel* p_cycle_model = new ContactInhibitionCellCycleModel();
             p_cycle_model->SetDimension(2);
             p_cycle_model->SetBirthTime(-1.0);
             p_cycle_model->SetQuiescentVolumeFraction(0.7);

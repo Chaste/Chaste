@@ -33,19 +33,21 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "StochasticDurationPhaseBasedCellCycleModel.hpp"
+#include "ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel.hpp"
 #include "Exception.hpp"
 #include "StemCellProliferativeType.hpp"
 #include "TransitCellProliferativeType.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 
-StochasticDurationPhaseBasedCellCycleModel::StochasticDurationPhaseBasedCellCycleModel()
-    : AbstractSimplePhaseBasedCellCycleModel()
+ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel::ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel()
+    : AbstractSimpleGenerationBasedCellCycleModel(),
+      mRate(1.0/mTransitCellG1Duration)
 {
 }
 
-StochasticDurationPhaseBasedCellCycleModel::StochasticDurationPhaseBasedCellCycleModel(const StochasticDurationPhaseBasedCellCycleModel& rModel)
-   : AbstractSimplePhaseBasedCellCycleModel(rModel)
+ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel::ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel(const ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel& rModel)
+   :  AbstractSimpleGenerationBasedCellCycleModel(rModel),
+      mRate(rModel.mRate)
 {
     /*
      * Set each member variable of the new cell-cycle model that inherits
@@ -62,26 +64,22 @@ StochasticDurationPhaseBasedCellCycleModel::StochasticDurationPhaseBasedCellCycl
      * in parent classes will be defined there.
      *
      */
-
-    // No new member variables.
 }
 
-AbstractCellCycleModel* StochasticDurationPhaseBasedCellCycleModel::CreateCellCycleModel()
+AbstractCellCycleModel* ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel::CreateCellCycleModel()
 {
-    return new StochasticDurationPhaseBasedCellCycleModel(*this);
+    return new ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel(*this);
 }
 
-void StochasticDurationPhaseBasedCellCycleModel::SetG1Duration()
+void ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel::SetG1Duration()
 {
     RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
 
-    if (mpCell->GetCellProliferativeType()->IsType<StemCellProliferativeType>())
+    if (    mpCell->GetCellProliferativeType()->IsType<StemCellProliferativeType>()
+            || mpCell->GetCellProliferativeType()->IsType<TransitCellProliferativeType>() )
     {
-        mG1Duration = GetStemCellG1Duration() + 2*p_gen->ranf(); // U[0,2]
-    }
-    else if (mpCell->GetCellProliferativeType()->IsType<TransitCellProliferativeType>())
-    {
-        mG1Duration = GetTransitCellG1Duration() + 2*p_gen->ranf(); // U[0,2]
+        // Generate an exponential random number with mScale
+        mG1Duration = p_gen->ExponentialRandomDeviate(mRate);
     }
     else if (mpCell->GetCellProliferativeType()->IsType<DifferentiatedCellProliferativeType>())
     {
@@ -93,12 +91,44 @@ void StochasticDurationPhaseBasedCellCycleModel::SetG1Duration()
     }
 }
 
-void StochasticDurationPhaseBasedCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
+double ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel::GetRate() const
 {
-    // No new parameters to output, so just call method on direct parent class
-    AbstractSimplePhaseBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
+    return mRate;
+}
+
+void ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel::SetRate(double rate)
+{
+    mRate = rate;
+
+    // These are now set to the average value of the G1Duration
+    SetTransitCellG1Duration(1.0/rate);
+    SetStemCellG1Duration(1.0/rate);
+}
+
+void ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel::SetStemCellG1Duration(double stemCellG1Duration)
+{
+    assert(stemCellG1Duration > 0.0);
+    mStemCellG1Duration = stemCellG1Duration;
+
+    mRate = 1.0/stemCellG1Duration;
+}
+
+void ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel::SetTransitCellG1Duration(double transitCellG1Duration)
+{
+    assert(transitCellG1Duration > 0.0);
+    mTransitCellG1Duration = transitCellG1Duration;
+
+    mRate = 1.0/transitCellG1Duration;
+}
+
+void ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
+{
+     *rParamsFile << "\t\t\t<Rate>" << mRate << "</Rate>\n";
+
+    // Call method on direct parent class
+    AbstractSimpleGenerationBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
 }
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-CHASTE_CLASS_EXPORT(StochasticDurationPhaseBasedCellCycleModel)
+CHASTE_CLASS_EXPORT(ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel)

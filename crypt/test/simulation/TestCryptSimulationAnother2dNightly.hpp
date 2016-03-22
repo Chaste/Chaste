@@ -90,7 +90,7 @@ public:
 
         // Set up cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, location_indices, true);
 
         // Create cell population
@@ -131,7 +131,7 @@ public:
 
         // Set up cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, location_indices, true);
 
         // Create cell population
@@ -185,7 +185,7 @@ public:
 
         // Set up cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, location_indices, true, -1.0);
 
         // Create cell population
@@ -251,11 +251,11 @@ public:
         // Set some model parameters for the cell-cycle model
         for (unsigned index=0; index < cells.size(); index++)
         {
-           static_cast<SimpleWntCellCycleModel*>(cells[index]->GetCellCycleModel())->SetSDuration(7.4);
-           static_cast<SimpleWntCellCycleModel*>(cells[index]->GetCellCycleModel())->SetG2Duration(1.4);
-           static_cast<SimpleWntCellCycleModel*>(cells[index]->GetCellCycleModel())->SetMDuration(0.72);
-           static_cast<SimpleWntCellCycleModel*>(cells[index]->GetCellCycleModel())->SetTransitCellG1Duration(9.4);
-           static_cast<SimpleWntCellCycleModel*>(cells[index]->GetCellCycleModel())->SetStemCellG1Duration(9.4);
+           cells[index]->GetCellCycleModel()->SetSDuration(7.4);
+           cells[index]->GetCellCycleModel()->SetG2Duration(1.4);
+           cells[index]->GetCellCycleModel()->SetMDuration(0.72);
+           cells[index]->GetCellCycleModel()->SetTransitCellG1Duration(9.4);
+           cells[index]->GetCellCycleModel()->SetStemCellG1Duration(9.4);
         }
 
         // Create cell population
@@ -286,7 +286,7 @@ public:
         // Unusual set-up here (corresponds to the Meineke crypt model parameters)
         p_linear_force->SetMeinekeSpringStiffness(30.0);
         // Sets the MeinekeSpringGrowthDuration to be the default MPhase duration
-        p_linear_force->SetMeinekeSpringGrowthDuration( static_cast<SimpleWntCellCycleModel*>(crypt.rGetCells().front())->GetCellCycleModel()->GetMDuration());
+        p_linear_force->SetMeinekeSpringGrowthDuration(crypt.rGetCells().front()->GetCellCycleModel()->GetMDuration());
         simulator.AddForce(p_linear_force);
 
         // Set up sloughing cell killer and pass in to simulation

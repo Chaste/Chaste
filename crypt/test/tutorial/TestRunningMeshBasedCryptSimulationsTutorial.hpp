@@ -68,7 +68,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CryptCellsGenerator.hpp"
 /*
  * The next two header files define two different types of cell-cycle model.
- * In a {{{FixedDurationGenerationBasedPhaseBasedCellCycleModel}}}, the duration of each phase
+ * In a {{{FixedDurationGenerationBasedCellCycleModel}}}, the duration of each phase
  * of the cell cycle is fixed. In a {{{WntCellCycleModel}}}, the duration of a cell's G1 phase
  * is determined by a system of nonlinear ODEs describing a cell's response to the local
  * concentration of Wnt,
@@ -76,7 +76,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * proliferation in the crypt. In our crypt simulations, we impose a fixed gradient of
  * Wnt up the axis of the crypt.
  */
-#include "FixedDurationGenerationBasedPhaseBasedCellCycleModel.hpp"
+#include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "WntCellCycleModel.hpp"
 /* The next header file defines a helper class for generating a suitable triangular mesh
  * for the crypt simulation, such that the cell corresponding to each node is initially
@@ -150,7 +150,7 @@ public:
         /*
          * Having created a mesh, we now create a {{{std::vector}}} of {{{CellPtr}}}s.
          * To do this, we use the `CryptCellsGenerator` helper class, which is templated over the type
-         * of cell-cycle model required (here {{{FixedDurationGenerationBasedPhaseBasedCellCycleModel}}})
+         * of cell-cycle model required (here {{{FixedDurationGenerationBasedCellCycleModel}}})
          * and the dimension. We create an empty vector of cells and pass this into the
          * method {{{Generate()}}} along with the mesh. The fourth argument 'true' indicates that the cells
          * should be assigned random birth times, to avoid synchronous division. The
@@ -158,7 +158,7 @@ public:
          * called. Note that we only ever deal with shared pointers to cells, named {{{CellPtr}}}s.
          */
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, location_indices, true);
 
         /*

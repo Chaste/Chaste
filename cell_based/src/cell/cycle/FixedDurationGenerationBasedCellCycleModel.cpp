@@ -33,23 +33,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "GammaDistributedStochasticDurationPhaseBasedCellCycleModel.hpp"
-#include "Exception.hpp"
-#include "StemCellProliferativeType.hpp"
-#include "TransitCellProliferativeType.hpp"
-#include "DifferentiatedCellProliferativeType.hpp"
+#include "FixedDurationGenerationBasedCellCycleModel.hpp"
 
-GammaDistributedStochasticDurationPhaseBasedCellCycleModel::GammaDistributedStochasticDurationPhaseBasedCellCycleModel()
-    : AbstractSimplePhaseBasedCellCycleModel(),
-      mShape(DOUBLE_UNSET),
-      mScale(DOUBLE_UNSET)
+FixedDurationGenerationBasedCellCycleModel::FixedDurationGenerationBasedCellCycleModel()
 {
 }
 
-GammaDistributedStochasticDurationPhaseBasedCellCycleModel::GammaDistributedStochasticDurationPhaseBasedCellCycleModel(const GammaDistributedStochasticDurationPhaseBasedCellCycleModel& rModel)
-   :  AbstractSimplePhaseBasedCellCycleModel(rModel),
-      mShape(rModel.mShape),
-      mScale(rModel.mScale)
+FixedDurationGenerationBasedCellCycleModel::FixedDurationGenerationBasedCellCycleModel(const FixedDurationGenerationBasedCellCycleModel& rModel)
+   : AbstractSimpleGenerationBasedCellCycleModel(rModel)
 {
     /*
      * Set each member variable of the new cell-cycle model that inherits
@@ -66,59 +57,24 @@ GammaDistributedStochasticDurationPhaseBasedCellCycleModel::GammaDistributedStoc
      * in parent classes will be defined there.
      *
      */
+
+    // No new member variables to set.
 }
 
-AbstractCellCycleModel* GammaDistributedStochasticDurationPhaseBasedCellCycleModel::CreateCellCycleModel()
+
+AbstractCellCycleModel* FixedDurationGenerationBasedCellCycleModel::CreateCellCycleModel()
 {
-    return new GammaDistributedStochasticDurationPhaseBasedCellCycleModel(*this);
+    return new FixedDurationGenerationBasedCellCycleModel(*this);
 }
 
-void GammaDistributedStochasticDurationPhaseBasedCellCycleModel::SetG1Duration()
+void FixedDurationGenerationBasedCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
 {
-    if (    mpCell->GetCellProliferativeType()->IsType<StemCellProliferativeType>()
-         || mpCell->GetCellProliferativeType()->IsType<TransitCellProliferativeType>() )
-    {
-        // Generate a gamma random number with mShape and mScale
-        mG1Duration = RandomNumberGenerator::Instance()->GammaRandomDeviate(mShape, mScale);
-    }
-    else if (mpCell->GetCellProliferativeType()->IsType<DifferentiatedCellProliferativeType>())
-    {
-        mG1Duration = DBL_MAX;
-    }
-    else
-    {
-        NEVER_REACHED;
-    }
-}
+    // No new parameters to output
 
-void GammaDistributedStochasticDurationPhaseBasedCellCycleModel::SetShape(double shape)
-{
-    mShape = shape;
-}
-
-void GammaDistributedStochasticDurationPhaseBasedCellCycleModel::SetScale(double scale)
-{
-    mScale = scale;
-}
-
-double GammaDistributedStochasticDurationPhaseBasedCellCycleModel::GetShape() const
-{
-    return mShape;
-}
-
-double GammaDistributedStochasticDurationPhaseBasedCellCycleModel::GetScale() const
-{
-    return mScale;
-}
-
-void GammaDistributedStochasticDurationPhaseBasedCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
-{
-    *rParamsFile << "\t\t\t<Shape>" << mShape << "</Shape>\n";
-    *rParamsFile << "\t\t\t<Scale>" << mScale << "</Scale>\n";
-
-    AbstractSimplePhaseBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
+    // Call method on direct parent class
+    AbstractSimpleGenerationBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
 }
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-CHASTE_CLASS_EXPORT(GammaDistributedStochasticDurationPhaseBasedCellCycleModel)
+CHASTE_CLASS_EXPORT(FixedDurationGenerationBasedCellCycleModel)

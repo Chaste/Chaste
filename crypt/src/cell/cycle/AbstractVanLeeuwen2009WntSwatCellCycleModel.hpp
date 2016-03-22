@@ -111,7 +111,7 @@ public:
     AbstractVanLeeuwen2009WntSwatCellCycleModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver = boost::shared_ptr<AbstractCellCycleModelOdeSolver>());
 
     /**
-     * See AbstractPhaseBasedCellCycleModel::Initialise()
+     * See AbstractCellCycleModel::Initialise()
      *
      * In this case we set up a new ODE system for a daughter cell.
      */

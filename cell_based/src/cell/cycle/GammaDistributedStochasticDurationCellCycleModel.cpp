@@ -33,22 +33,23 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "AbstractSimplePhaseBasedCellCycleModel.hpp"
+#include "GammaDistributedStochasticDurationCellCycleModel.hpp"
 #include "Exception.hpp"
 #include "StemCellProliferativeType.hpp"
 #include "TransitCellProliferativeType.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 
-AbstractSimplePhaseBasedCellCycleModel::AbstractSimplePhaseBasedCellCycleModel()
+GammaDistributedStochasticDurationCellCycleModel::GammaDistributedStochasticDurationCellCycleModel()
+    : AbstractSimpleCellCycleModel(),
+      mShape(DOUBLE_UNSET),
+      mScale(DOUBLE_UNSET)
 {
 }
 
-AbstractSimplePhaseBasedCellCycleModel::~AbstractSimplePhaseBasedCellCycleModel()
-{
-}
-
-AbstractSimplePhaseBasedCellCycleModel::AbstractSimplePhaseBasedCellCycleModel(const AbstractSimplePhaseBasedCellCycleModel& rModel)
-    : AbstractPhaseBasedCellCycleModel(rModel)
+GammaDistributedStochasticDurationCellCycleModel::GammaDistributedStochasticDurationCellCycleModel(const GammaDistributedStochasticDurationCellCycleModel& rModel)
+   :  AbstractSimpleCellCycleModel(rModel),
+      mShape(rModel.mShape),
+      mScale(rModel.mScale)
 {
     /*
      * Set each member variable of the new cell-cycle model that inherits
@@ -65,32 +66,20 @@ AbstractSimplePhaseBasedCellCycleModel::AbstractSimplePhaseBasedCellCycleModel(c
      * in parent classes will be defined there.
      *
      */
-
-    // No new member variables.
 }
 
-void AbstractSimplePhaseBasedCellCycleModel::Initialise()
+AbstractCellCycleModel* GammaDistributedStochasticDurationCellCycleModel::CreateCellCycleModel()
 {
-    SetG1Duration();
+    return new GammaDistributedStochasticDurationCellCycleModel(*this);
 }
 
-void AbstractSimplePhaseBasedCellCycleModel::InitialiseDaughterCell()
+void GammaDistributedStochasticDurationCellCycleModel::SetG1Duration()
 {
-    AbstractPhaseBasedCellCycleModel::InitialiseDaughterCell();
-    SetG1Duration();
-}
-
-void AbstractSimplePhaseBasedCellCycleModel::SetG1Duration()
-{
-    assert(mpCell != NULL);
-
-    if (mpCell->GetCellProliferativeType()->IsType<StemCellProliferativeType>())
+    if (    mpCell->GetCellProliferativeType()->IsType<StemCellProliferativeType>()
+         || mpCell->GetCellProliferativeType()->IsType<TransitCellProliferativeType>() )
     {
-        mG1Duration = GetStemCellG1Duration();
-    }
-    else if (mpCell->GetCellProliferativeType()->IsType<TransitCellProliferativeType>())
-    {
-        mG1Duration = GetTransitCellG1Duration();
+        // Generate a gamma random number with mShape and mScale
+        mG1Duration = RandomNumberGenerator::Instance()->GammaRandomDeviate(mShape, mScale);
     }
     else if (mpCell->GetCellProliferativeType()->IsType<DifferentiatedCellProliferativeType>())
     {
@@ -102,44 +91,34 @@ void AbstractSimplePhaseBasedCellCycleModel::SetG1Duration()
     }
 }
 
-void AbstractSimplePhaseBasedCellCycleModel::ResetForDivision()
+void GammaDistributedStochasticDurationCellCycleModel::SetShape(double shape)
 {
-    AbstractPhaseBasedCellCycleModel::ResetForDivision();
-    mBirthTime = SimulationTime::Instance()->GetTime();
-    SetG1Duration();
+    mShape = shape;
 }
 
-void AbstractSimplePhaseBasedCellCycleModel::UpdateCellCyclePhase()
+void GammaDistributedStochasticDurationCellCycleModel::SetScale(double scale)
 {
-    double time_since_birth = GetAge();
-    assert(time_since_birth >= 0);
-
-    if (mpCell->GetCellProliferativeType()->IsType<DifferentiatedCellProliferativeType>())
-    {
-        mCurrentCellCyclePhase = G_ZERO_PHASE;
-    }
-    else if (time_since_birth < GetMDuration())
-    {
-        mCurrentCellCyclePhase = M_PHASE;
-    }
-    else if (time_since_birth < GetMDuration() + mG1Duration)
-    {
-        mCurrentCellCyclePhase = G_ONE_PHASE;
-    }
-    else if (time_since_birth < GetMDuration() + mG1Duration + GetSDuration())
-    {
-        mCurrentCellCyclePhase = S_PHASE;
-    }
-    else if (time_since_birth < GetMDuration() + mG1Duration + GetSDuration() + GetG2Duration())
-    {
-        mCurrentCellCyclePhase = G_TWO_PHASE;
-    }
+    mScale = scale;
 }
 
-void AbstractSimplePhaseBasedCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
+double GammaDistributedStochasticDurationCellCycleModel::GetShape() const
 {
-    // No new parameters to output
-
-    // Call method on direct parent class
-    AbstractPhaseBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
+    return mShape;
 }
+
+double GammaDistributedStochasticDurationCellCycleModel::GetScale() const
+{
+    return mScale;
+}
+
+void GammaDistributedStochasticDurationCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
+{
+    *rParamsFile << "\t\t\t<Shape>" << mShape << "</Shape>\n";
+    *rParamsFile << "\t\t\t<Scale>" << mScale << "</Scale>\n";
+
+    AbstractSimpleCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
+}
+
+// Serialization for Boost >= 1.36
+#include "SerializationExportWrapperForCpp.hpp"
+CHASTE_CLASS_EXPORT(GammaDistributedStochasticDurationCellCycleModel)
