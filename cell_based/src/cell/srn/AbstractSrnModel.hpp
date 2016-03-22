@@ -86,6 +86,9 @@ private:
      * Prevent copy-assignment of this class, or its subclasses.
      * Note that we do not define this method, therefore statements like "AbstractSrnModel new = old;" will not compile.
      * We do not inherit from boost::noncopyable because we *do* define a protected copy-constructor, for use by CreateSrnModel.
+     *
+     * @return the new SRN model.
+     * @param rModel the SRN to copy.
      */
     AbstractSrnModel& operator=(const AbstractSrnModel&);
 

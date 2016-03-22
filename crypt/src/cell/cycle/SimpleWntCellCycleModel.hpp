@@ -156,7 +156,7 @@ public:
     virtual AbstractCellCycleModel* CreateCellCycleModel();
 
     /**
-     * return mUseCellProliferativeTypeDependentG1Duration
+     * @return mUseCellProliferativeTypeDependentG1Duration
      */
     bool GetUseCellProliferativeTypeDependentG1Duration() const;
 

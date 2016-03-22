@@ -96,6 +96,9 @@ private:
      * Prevent copy-assignment of this class, or its subclasses.
      * Note that we do not define this method, therefore statements like "AbstractCellCycleModel new = old;" will not compile.
      * We do not inherit from boost::noncopyable because we *do* define a protected copy-constructor, for use by CreateCellCycleModel.
+     *
+     * @return the new cell cycle model.
+     * @param rModel the cell cycle model to copy.
      */
     AbstractCellCycleModel& operator=(const AbstractCellCycleModel&);
 
