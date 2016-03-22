@@ -76,14 +76,7 @@ StochasticWntCellCycleModel::StochasticWntCellCycleModel(const StochasticWntCell
      *
      */
 
-    /*
-     * Create the new cell-cycle model's ODE system and use the current values
-     * of the state variables in mpOdeSystem as an initial condition.
-     */
-    assert(rModel.GetOdeSystem());
-    double wnt_level = rModel.GetWntLevel();
-    SetOdeSystem(new WntCellCycleOdeSystem(wnt_level, rModel.mpCell->GetMutationState()));
-    SetStateVariables(rModel.GetOdeSystem()->rGetStateVariables());
+    // No new parameters and ODE set in WntCellCycleModel.
 }
 
 void StochasticWntCellCycleModel::GenerateStochasticG2Duration()
