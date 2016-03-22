@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ArchiveOpener.hpp"
 #include "CellsGenerator.hpp"
 #include "CaBasedCellPopulation.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "FixedDurationGenerationBasedPhaseBasedCellCycleModel.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "AbstractCaBasedDivisionRule.hpp"
 #include "ExclusionCaBasedDivisionRule.hpp"
@@ -77,7 +77,7 @@ public:
         }
 
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 1> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 1> cells_generator;
         cells_generator.GenerateBasic(cells, location_indices.size());
 
         // Create cell population
@@ -87,7 +87,7 @@ public:
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
 
-        FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+        FixedDurationGenerationBasedPhaseBasedCellCycleModel* p_model = new FixedDurationGenerationBasedPhaseBasedCellCycleModel();
         CellPtr p_temp_cell(new Cell(p_state, p_model));
         p_temp_cell->SetCellProliferativeType(p_stem_type);
         p_temp_cell->SetBirthTime(-1);

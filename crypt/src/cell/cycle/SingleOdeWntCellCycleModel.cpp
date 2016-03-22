@@ -99,7 +99,7 @@ void SingleOdeWntCellCycleModel::UpdateCellCyclePhase()
     assert(SimulationTime::Instance()->IsStartTimeSetUp());
     SolveOdeToTime(SimulationTime::Instance()->GetTime());
     ChangeCellProliferativeTypeDueToCurrentBetaCateninLevel();
-    AbstractSimpleCellCycleModel::UpdateCellCyclePhase(); /// Don't call the SimpleWntCellCycleModel - it will overwrite thi    s.
+    AbstractSimplePhaseBasedCellCycleModel::UpdateCellCyclePhase(); /// Don't call the SimpleWntCellCycleModel - it will overwrite thi    s.
 }
 
 void SingleOdeWntCellCycleModel::Initialise()

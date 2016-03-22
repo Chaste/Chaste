@@ -33,48 +33,44 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef ALARCON2004OXYGENBASEDCELLCYCLEMODEL_HPP_
-#define ALARCON2004OXYGENBASEDCELLCYCLEMODEL_HPP_
+#ifndef TYSONNOVAKPHASEBASEDCELLCYCLEMODEL_HPP_
+#define TYSONNOVAKPHASEBASEDCELLCYCLEMODEL_HPP_
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
-#include <vector>
+#include "AbstractOdeBasedPhaseBasedCellCycleModel.hpp"
+#include "TysonNovak2001OdeSystem.hpp"
 
-#include "AbstractOdeBasedCellCycleModel.hpp"
-#include "Alarcon2004OxygenBasedCellCycleOdeSystem.hpp"
 
 /**
- * Oxygen-dependent ODE-based cell-cycle model.
+ *  Tyson-Novak 2001 cell-cycle model, taken from the version at  doi:10.1006/jtbi.2001.2293
  *
+ *  Note that this is not a model for murine or human colonic-cell cycling, but is
+ *  included in chaste as one of the most commonly known ODE based cell-cycle models.
  *
- *
- * Published by Alarcon et al. (doi:10.1016/j.jtbi.2004.04.016).
+ *  Time taken to progress through the cycle is deterministic and given by
+ *  an ODE system independent of external factors.
  */
-class Alarcon2004OxygenBasedCellCycleModel : public AbstractOdeBasedCellCycleModel
+class TysonNovakPhaseBasedCellCycleModel : public AbstractOdeBasedPhaseBasedCellCycleModel
 {
 private:
+
+    friend class TestOdeBasedPhaseBasedCellCycleModels;
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
-     * Archive the cell-cycle model and ODE system.
+     * Archive the cell-cycle model, never used directly - boost uses this.
      *
      * @param archive the archive
-     * @param version the archive version
+     * @param version the current version of this class
      */
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractOdeBasedCellCycleModel>(*this);
+        archive & boost::serialization::base_object<AbstractOdeBasedPhaseBasedCellCycleModel>(*this);
     }
-
-    /**
-     * Adjust any ODE parameters needed before solving until currentTime.
-     *
-     * @param currentTime  the time up to which the system will be solved.
-     */
-    void AdjustOdeParameters(double currentTime);
 
 protected:
 
@@ -91,7 +87,7 @@ protected:
      *
      * @param rModel the cell cycle model to copy.
      */
-    Alarcon2004OxygenBasedCellCycleModel(const Alarcon2004OxygenBasedCellCycleModel& rModel);
+    TysonNovakPhaseBasedCellCycleModel(const TysonNovakPhaseBasedCellCycleModel& rModel);
 
 public:
 
@@ -100,36 +96,75 @@ public:
      *
      * @param pOdeSolver An optional pointer to a cell-cycle model ODE solver object (allows the use of different ODE solvers)
      */
-    Alarcon2004OxygenBasedCellCycleModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver = boost::shared_ptr<AbstractCellCycleModelOdeSolver>());
+    TysonNovakPhaseBasedCellCycleModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver = boost::shared_ptr<AbstractCellCycleModelOdeSolver>());
 
     /**
-     * Resets the oxygen-based model to the start of the cell cycle
-     * (this model does not cycle naturally). Cells are given a new
-     * birth time and cell cycle proteins are reset. Note that the
-     * oxygen concentration maintains its current value.
+     * Initialise the cell-cycle model at the start of a simulation.
      *
-     * Should only be called by the Cell Divide() method.
+     * This method will be called precisely once per cell set up in the initial
+     * cell population. It is not called on cell division; use ResetForDivision(),
+     * CreateCellCycleModel() and InitialiseDaughterCell() for that.
+     *
+     * By the time this is called, a CellPopulation will have been set up, so the model
+     * can know where its cell is located in space. If relevant to the simulation,
+     * any singletons will also have been initialised.
      */
-    virtual void ResetForDivision();
+    void Initialise();
+
+    /**
+     * Reset cell-cycle model by calling AbstractOdeBasedPhaseBasedCellCycleModelWithStoppingEvent::ResetForDivision()
+     * and setting initial conditions for protein concentrations.
+     */
+    void ResetForDivision();
 
     /**
      * Overridden builder method to create new copies of
      * this cell-cycle model.
      *
      * @return new cell-cycle model
-     *
      */
     AbstractCellCycleModel* CreateCellCycleModel();
 
     /**
-     * Initialise the cell-cycle model at the start of a simulation.
-     *
-     * This overridden method sets up a new ODE system.
+     * @return the duration of the cell's S phase.
      */
-    void Initialise();
+    double GetSDuration() const;
 
     /**
-     * Outputs cell cycle model parameters to files.
+     * @return the duration of the cell's G2 phase.
+     */
+    double GetG2Duration() const;
+
+    /**
+     * @return the duration of the cell's M phase.
+     */
+    double GetMDuration() const;
+
+    /**
+     * If the daughter cell type is stem, change it to transit.
+     */
+    void InitialiseDaughterCell();
+
+    /**
+     * Overridden GetAverageTransitCellCycleTime() method.
+     * @return time
+     */
+    double GetAverageTransitCellCycleTime();
+
+    /**
+     * Overridden GetAverageStemCellCycleTime() method.
+     * @return time
+     */
+    double GetAverageStemCellCycleTime();
+
+    /**
+     * Overridden CanCellTerminallyDifferentiate() method.
+     * @return whether cell can terminally differentiate
+     */
+    bool CanCellTerminallyDifferentiate();
+
+    /**
+     * Outputs cell cycle model parameters to file.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
@@ -138,8 +173,8 @@ public:
 
 // Declare identifier for the serializer
 #include "SerializationExportWrapper.hpp"
-CHASTE_CLASS_EXPORT(Alarcon2004OxygenBasedCellCycleModel)
+CHASTE_CLASS_EXPORT(TysonNovakPhaseBasedCellCycleModel)
 #include "CellCycleModelOdeSolverExportWrapper.hpp"
-EXPORT_CELL_CYCLE_MODEL_ODE_SOLVER(Alarcon2004OxygenBasedCellCycleModel)
+EXPORT_CELL_CYCLE_MODEL_ODE_SOLVER(TysonNovakPhaseBasedCellCycleModel)
 
-#endif /*ALARCON2004OXYGENBASEDCELLCYCLEMODEL_HPP_*/
+#endif /*TYSONNOVAKPHASEBASEDCELLCYCLEMODEL_HPP_*/

@@ -84,7 +84,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * one with fixed cell-cycle times and one
  * where the cell-cycle time depends on the Wnt concentration.
  */
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "FixedDurationGenerationBasedPhaseBasedCellCycleModel.hpp"
 #include "SimpleWntCellCycleModel.hpp"
 /* The next header file defines a helper class for generating a suitable mesh. */
 #include "HoneycombVertexMeshGenerator.hpp"
@@ -132,7 +132,7 @@ public:
 
         /* Having created a mesh, we now create a {{{std::vector}}} of {{{CellPtr}}}s.
          * To do this, we the `CryptCellsGenerator` helper class, which is templated over the type
-         * of cell model required (here {{{FixedDurationGenerationBasedCellCycleModel}}})
+         * of cell model required (here {{{FixedDurationGenerationBasedPhaseBasedCellCycleModel}}})
          * and the dimension. We create an empty vector of cells and pass this into the
          * method along with the mesh. The third argument 'true' indicates that the cells
          * should be assigned random birth times, to avoid synchronous division. The
@@ -142,7 +142,7 @@ public:
          * 1, 2, 3 and 4, respectively.
          */
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true, 1.0, 2.0, 3.0, 4.0);
 
         /* Create a cell population, as before. */

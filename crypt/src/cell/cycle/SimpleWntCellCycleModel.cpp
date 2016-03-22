@@ -48,7 +48,7 @@ SimpleWntCellCycleModel::SimpleWntCellCycleModel()
 }
 
 SimpleWntCellCycleModel::SimpleWntCellCycleModel(const SimpleWntCellCycleModel& rModel)
-   : AbstractSimpleCellCycleModel(rModel),
+   : AbstractSimplePhaseBasedCellCycleModel(rModel),
      mUseCellProliferativeTypeDependentG1Duration(rModel.mUseCellProliferativeTypeDependentG1Duration),
      mWntStemThreshold(rModel.mWntStemThreshold),
      mWntTransitThreshold(rModel.mWntTransitThreshold),
@@ -261,7 +261,7 @@ void SimpleWntCellCycleModel::UpdateCellCyclePhase()
             mpCell->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<DifferentiatedCellProliferativeType>();
         mpCell->SetCellProliferativeType(p_diff_type);
     }
-    AbstractSimpleCellCycleModel::UpdateCellCyclePhase();
+    AbstractSimplePhaseBasedCellCycleModel::UpdateCellCyclePhase();
 }
 
 void SimpleWntCellCycleModel::InitialiseDaughterCell()
@@ -276,7 +276,7 @@ void SimpleWntCellCycleModel::InitialiseDaughterCell()
         mpCell->SetCellProliferativeType(p_transit_type);
     }
 
-    AbstractSimpleCellCycleModel::InitialiseDaughterCell();
+    AbstractSimplePhaseBasedCellCycleModel::InitialiseDaughterCell();
 }
 
 bool SimpleWntCellCycleModel::CanCellTerminallyDifferentiate()
@@ -328,7 +328,7 @@ void SimpleWntCellCycleModel::OutputCellCycleModelParameters(out_stream& rParams
     *rParamsFile << "\t\t\t<WntLabelledThreshold>" << mWntLabelledThreshold << "</WntLabelledThreshold>\n";
 
     // Call method on direct parent class
-    AbstractSimpleCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
+    AbstractSimplePhaseBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
 }
 
 // Serialization for Boost >= 1.36

@@ -45,11 +45,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellCycleModelOdeHandler.hpp"
 #include "SimulationTime.hpp"
 
-//class AbstractSrnModel; ///\todo #2752 remove this commented code
 
 /**
  * This class contains the abstract code for an ODE sub-cellular reaction network (SRN) model
- *  - based on AbstractOdeBasedCellCycleModel
+ *  - based on AbstractOdeBasedPhaseBasedCellCycleModel
  *
  * \todo #2752 Thoroughly document this class
  */
@@ -139,7 +138,7 @@ public:
      /**
      * For a naturally cycling model this does not need to be overridden in the
      * subclasses. But most models should override this function and then
-     * call AbstractOdeBasedCellCycleModel::ResetForDivision() from inside their version.
+     * call AbstractOdeBasedPhaseBasedCellCycleModel::ResetForDivision() from inside their version.
      */
     virtual void ResetForDivision();
 

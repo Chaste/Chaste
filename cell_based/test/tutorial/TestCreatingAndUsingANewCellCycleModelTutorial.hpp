@@ -75,7 +75,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * depend on the cell type. A simple cell-cycle model is defined as ''generation-based'' if it keeps track of the
  * generation of the corresponding cell, and sets the cell type according
  * to this. Our new cell-cycle model will inherit from this abstract class. */
-#include "AbstractSimpleGenerationBasedCellCycleModel.hpp"
+#include "AbstractSimpleGenerationBasedPhaseBasedCellCycleModel.hpp"
 
 /* The remaining header files define classes that will be used in the cell-based
  * simulation test. We have encountered each of these header files in previous cell-based Chaste
@@ -99,15 +99,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * of S, G2 and M phases are fixed, but the duration of G1 phase is an exponential
  * random variable with rate parameter λ. This rate parameter is a constant, dependent on cell type, whose value is
  * chosen such that the mean of the distribution, 1/λ, equals the mean
- * G1 duration as defined in the {{{AbstractCellCycleModel}}} class. We will also assume that
- * cells divide a certain number of generations before becoming differentiated. To implement this model we define a new cell-cycle model, {{{MyCellCycleModel}}},
- * which inherits from {{{AbstractSimpleGenerationBasedCellCycleModel}}} and
+ * G1 duration as defined in the {{{AbstractPhaseBasedCellCycleModel}}} class. We will also assume that
+ * cells divide a certain number of generations before becoming differentiated. To implement this model we define a new cell-cycle model, {{{MyPhaseBasedCellCycleModel}}},
+ * which inherits from {{{AbstractSimpleGenerationBasedPhaseBasedCellCycleModel}}} and
  * overrides the {{{SetG1Duration()}}} method.
  *
  * Note that usually this code would be separated out into a separate declaration in
  * a .hpp file and definition in a .cpp file.
  */
-class MyCellCycleModel : public AbstractSimpleGenerationBasedCellCycleModel
+class MyPhaseBasedCellCycleModel : public AbstractSimpleGenerationBasedPhaseBasedCellCycleModel
 {
 private:
 
@@ -115,7 +115,7 @@ private:
      * to archive (save or load) the cell-cycle model object in a cell-based simulation.
      * The code consists of a serialize method, in which we first archive the cell
      * cycle model using the serialization code defined in the base class
-     * {{{AbstractSimpleGenerationBasedCellCycleModel}}}. We then archive an instance
+     * {{{AbstractSimpleGenerationBasedPhaseBasedCellCycleModel}}}. We then archive an instance
      * of the {{{RandomNumberGenerator}}} singleton class, which is used in the
      * {{{SetG1Duration()}}} method. Note that serialization of singleton objects
      * must be done with care. Before the object is serialized via a pointer, it must
@@ -125,7 +125,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractSimpleGenerationBasedCellCycleModel>(*this);
+        archive & boost::serialization::base_object<AbstractSimpleGenerationBasedPhaseBasedCellCycleModel>(*this);
         RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
         archive & *p_gen;
         archive & p_gen;
@@ -167,7 +167,7 @@ private:
  * constructor. */
 public:
 
-    MyCellCycleModel()
+    MyPhaseBasedCellCycleModel()
     {}
 
     /* The second public method overrides {{{CreateCellCycleModel()}}}. This is a
@@ -178,7 +178,7 @@ public:
      * There are a number of things to mention regarding the {{{CreateCellCycleModel()}}}
      * method: these are quite technical, but are worth stating here for the sake of
      * completeness. If we look at which member variables
-     * {{{MyCellCycleModel}}} inherits from its base class, we will find that some of
+     * {{{MyPhaseBasedCellCycleModel}}} inherits from its base class, we will find that some of
      * these member variables are not set here. This is for two main reasons. First, some
      * of the new cell-cycle model's member variables (namely {{{mBirthTime}}},
      * {{{mCurrentCellCyclePhase}}}, {{{mReadyToDivide}}}) will already have been
@@ -194,7 +194,7 @@ public:
      */
     AbstractCellCycleModel* CreateCellCycleModel()
     {
-        MyCellCycleModel* p_model = new MyCellCycleModel();
+        MyPhaseBasedCellCycleModel* p_model = new MyPhaseBasedCellCycleModel();
 
         p_model->SetBirthTime(mBirthTime);
         p_model->SetMinimumGapDuration(mMinimumGapDuration);
@@ -216,7 +216,7 @@ public:
  * identifier for our new cell-cycle model. Thus every cell-cycle model class must provide this,
  * or you'll get errors when running simulations. */
 #include "SerializationExportWrapper.hpp"
-CHASTE_CLASS_EXPORT(MyCellCycleModel)
+CHASTE_CLASS_EXPORT(MyPhaseBasedCellCycleModel)
 
 /* Since we're defining the new cell-cycle model within the test file, we need to include the
  * following stanza as well, to make the code work with newer versions of the Boost libraries.
@@ -225,17 +225,17 @@ CHASTE_CLASS_EXPORT(MyCellCycleModel)
  * more information.
  */
 #include "SerializationExportWrapperForCpp.hpp"
-CHASTE_CLASS_EXPORT(MyCellCycleModel)
+CHASTE_CLASS_EXPORT(MyPhaseBasedCellCycleModel)
 
 /*
- * This completes the code for {{{MyCellCycleModel}}}. Note that usually this code would
+ * This completes the code for {{{MyPhaseBasedCellCycleModel}}}. Note that usually this code would
  * be separated out into a separate declaration in a .hpp file and definition in a .cpp file.
  *
  * === The Tests ===
  *
  * We now define the test class, which inherits from {{{AbstractCellBasedTestSuite}}}.
  */
-class TestCreatingAndUsingANewCellCycleModelTutorial : public AbstractCellBasedTestSuite
+class TestCreatingAndUsingANewPhaseBasedCellCycleModelTutorial : public AbstractCellBasedTestSuite
 {
 public:
 
@@ -244,12 +244,12 @@ public:
      *
      * We begin by testing that our new cell-cycle model is implemented correctly.
      */
-    void TestMyCellCycleModel() throw(Exception)
+    void TestMyPhaseBasedCellCycleModel() throw(Exception)
     {
-        /* Test that we can construct a {{{MyCellCycleModel}}} object: */
-        TS_ASSERT_THROWS_NOTHING(MyCellCycleModel cell_model3);
+        /* Test that we can construct a {{{MyPhaseBasedCellCycleModel}}} object: */
+        TS_ASSERT_THROWS_NOTHING(MyPhaseBasedCellCycleModel cell_model3);
 
-        /* Now we construct and initialise a large number of {{{MyCellCycleModel}}}s and
+        /* Now we construct and initialise a large number of {{{MyPhaseBasedCellCycleModel}}}s and
          * associated cells: */
         unsigned num_cells = (unsigned) 1e5;
         std::vector<CellPtr> cells;
@@ -258,27 +258,31 @@ public:
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         for (unsigned i=0; i<num_cells; i++)
         {
-            MyCellCycleModel* p_cell_cycle_model = new MyCellCycleModel;
+            MyPhaseBasedCellCycleModel* p_cell_cycle_model = new MyPhaseBasedCellCycleModel;
             CellPtr p_cell(new Cell(p_state, p_cell_cycle_model));
             p_cell->SetCellProliferativeType(p_stem_type);
             p_cell->InitialiseCellCycleModel();
             cells.push_back(p_cell);
         }
 
-        /* Find the mean G1 duration and test that it is within some tolerance of
+        /* To check the CCM has been set up correctly we get a pointer to the one stored on the first cell.
+         * We use a static_cast so we can access all the member variables in the concrete class MyPhaseBasedCellCycleModel.
+         *
+         * Find the mean G1 duration and test that it is within some tolerance of
          * the expected value: */
-        double expected_mean_g1_duration = cells[0]->GetCellCycleModel()->GetStemCellG1Duration();
+
+        double expected_mean_g1_duration = static_cast<MyPhaseBasedCellCycleModel*>(cells[0]->GetCellCycleModel())->GetStemCellG1Duration();
         double sample_mean_g1_duration = 0.0;
 
         for (unsigned i=0; i<num_cells; i++)
         {
-            sample_mean_g1_duration += cells[i]->GetCellCycleModel()->GetG1Duration()/ (double) num_cells;
+            sample_mean_g1_duration += static_cast<MyPhaseBasedCellCycleModel*>(cells[i]->GetCellCycleModel())->GetG1Duration()/ (double) num_cells;
         }
 
         TS_ASSERT_DELTA(sample_mean_g1_duration, expected_mean_g1_duration, 0.1);
 
-        /* Now construct another {{{MyCellCycleModel}}} and associated cell. */
-        MyCellCycleModel* p_my_model = new MyCellCycleModel;
+        /* Now construct another {{{MyPhaseBasedCellCycleModel}}} and associated cell. To check it works for transit cells. */
+        MyPhaseBasedCellCycleModel* p_my_model = new MyPhaseBasedCellCycleModel;
         CellPtr p_my_cell(new Cell(p_state, p_my_model));
         p_my_cell->SetCellProliferativeType(p_transit_type);
         p_my_cell->InitialiseCellCycleModel();
@@ -286,8 +290,8 @@ public:
         /* Use the helper method {{{CheckReadyToDivideAndPhaseIsUpdated()}}} to
          * test that this cell progresses correctly through the cell cycle. */
         unsigned num_steps = 100;
-        double mean_cell_cycle_time = cells[0]->GetCellCycleModel()->GetStemCellG1Duration()
-                                        + cells[0]->GetCellCycleModel()->GetSG2MDuration();
+        double mean_cell_cycle_time = p_my_model->GetTransitCellG1Duration()
+                                        + p_my_model->GetSG2MDuration();
 
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(mean_cell_cycle_time, num_steps);
 
@@ -300,7 +304,7 @@ public:
             CheckReadyToDivideAndPhaseIsUpdated(p_my_model, 2.35762);
         }
 
-        /* Lastly, we briefly test that archiving of {{{MyCellCycleModel}}} has
+        /* Lastly, we briefly test that archiving of {{{MyPhaseBasedCellCycleModel}}} has
          * been implemented correctly. Create an {{{OutputFileHandler}}} and use
          * this to define a filename for the archive.
          */
@@ -317,7 +321,7 @@ public:
             p_simulation_time->SetEndTimeAndNumberOfTimeSteps(3.0, 4);
 
             /* Create a cell with associated cell-cycle model. */
-            MyCellCycleModel* p_model = new MyCellCycleModel;
+            MyPhaseBasedCellCycleModel* p_model = new MyPhaseBasedCellCycleModel;
             CellPtr p_cell(new Cell(p_state, p_model));
             p_cell->SetCellProliferativeType(p_transit_type);
             p_cell->InitialiseCellCycleModel();
@@ -359,8 +363,9 @@ public:
 
             input_arch >> p_cell;
 
-            /* Test that the private data has been restored correctly. */
-            AbstractCellCycleModel* p_model = p_cell->GetCellCycleModel();
+            /* Test that the private data has been restored correctly. Note we cast it to the correct type
+             * so we can acess all the member variables */
+            MyPhaseBasedCellCycleModel* p_model = static_cast<MyPhaseBasedCellCycleModel*>(p_cell->GetCellCycleModel());
 
             TS_ASSERT_DELTA(p_model->GetBirthTime(), -1.0, 1e-12);
             TS_ASSERT_DELTA(p_model->GetAge(), 2.5, 1e-12);
@@ -371,10 +376,10 @@ public:
     /*
      * == Using the cell-cycle model in a cell-based simulation ==
      *
-     * We conclude with a brief test demonstrating how {{{MyCellCycleModel}}} can be used
+     * We conclude with a brief test demonstrating how {{{MyPhaseBasedCellCycleModel}}} can be used
      * in a cell-based simulation.
      */
-    void TestOffLatticeSimulationWithMyCellCycleModel() throw(Exception)
+    void TestOffLatticeSimulationWithMyPhaseBasedCellCycleModel() throw(Exception)
     {
         /* We use the honeycomb mesh generator to create a honeycomb mesh covering a
          * circular domain of given radius.
@@ -394,7 +399,7 @@ public:
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
             /* For each node we create a cell with our cell-cycle model. */
-            MyCellCycleModel* p_model = new MyCellCycleModel();
+            MyPhaseBasedCellCycleModel* p_model = new MyPhaseBasedCellCycleModel();
             CellPtr p_cell(new Cell(p_state, p_model));
             p_cell->SetCellProliferativeType(p_stem_type);
 
@@ -415,7 +420,7 @@ public:
         /* We then pass in the cell population into an {{{OffLatticeSimulation}}},
          * and set the output directory and end time. */
         OffLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("TestOffLatticeSimulationWithMyCellCycleModel");
+        simulator.SetOutputDirectory("TestOffLatticeSimulationWithMyPhaseBasedCellCycleModel");
         simulator.SetEndTime(10.0);
 
         /* We create a force law and pass it to the {{{OffLatticeSimulation}}}. */

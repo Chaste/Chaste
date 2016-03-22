@@ -33,16 +33,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef CONTACTINHIBITIONCELLCYCLEMODEL_HPP_
-#define CONTACTINHIBITIONCELLCYCLEMODEL_HPP_
+#ifndef CONTACTINHIBITIONPHASEBASEDCELLCYCLEMODEL_HPP_
+#define CONTACTINHIBITIONPHASEBASEDCELLCYCLEMODEL_HPP_
 
-#include "AbstractSimpleCellCycleModel.hpp"
+#include "AbstractSimplePhaseBasedCellCycleModel.hpp"
 
 /**
  * Simple stress-based cell-cycle model.
  *
  * A simple stress-dependent cell-cycle model that inherits from
- * AbstractSimpleCellCycleModel. The duration of G1 phase depends
+ * AbstractSimplePhaseBasedCellCycleModel. The duration of G1 phase depends
  * on the local stress, interpreted here as deviation from target
  * volume (or area/length in 2D/1D).
  *
@@ -54,7 +54,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * or S phases then it will still divide, and thus cells whose
  * volumes are smaller than the given threshold may still divide.
  */
-class ContactInhibitionCellCycleModel : public AbstractSimpleCellCycleModel
+class ContactInhibitionPhaseBasedCellCycleModel : public AbstractSimplePhaseBasedCellCycleModel
 {
 private:
 
@@ -68,7 +68,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractSimpleCellCycleModel>(*this);
+        archive & boost::serialization::base_object<AbstractSimplePhaseBasedCellCycleModel>(*this);
         archive & mQuiescentVolumeFraction;
         archive & mEquilibriumVolume;
         archive & mCurrentQuiescentDuration;
@@ -111,14 +111,14 @@ protected:
      *
      * @param rModel the cell cycle model to copy.
      */
-    ContactInhibitionCellCycleModel(const ContactInhibitionCellCycleModel& rModel);
+    ContactInhibitionPhaseBasedCellCycleModel(const ContactInhibitionPhaseBasedCellCycleModel& rModel);
 
 public:
 
     /**
      * Constructor.
      */
-    ContactInhibitionCellCycleModel();
+    ContactInhibitionPhaseBasedCellCycleModel();
 
     /**
      * Overridden UpdateCellCyclePhase() method.
@@ -188,6 +188,6 @@ public:
 
 // Declare identifier for the serializer
 #include "SerializationExportWrapper.hpp"
-CHASTE_CLASS_EXPORT(ContactInhibitionCellCycleModel)
+CHASTE_CLASS_EXPORT(ContactInhibitionPhaseBasedCellCycleModel)
 
-#endif // CONTACTINHIBITIONCELLCYCLEMODEL_HPP_
+#endif // CONTACTINHIBITIONPHASEBASEDCELLCYCLEMODEL_HPP_

@@ -33,13 +33,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "SimpleOxygenBasedCellCycleModel.hpp"
+#include "SimpleOxygenBasedPhaseBasedCellCycleModel.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "ApoptoticCellProperty.hpp"
 #include "CellPropertyRegistry.hpp"
 #include "Exception.hpp"
 
-SimpleOxygenBasedCellCycleModel::SimpleOxygenBasedCellCycleModel()
+SimpleOxygenBasedPhaseBasedCellCycleModel::SimpleOxygenBasedPhaseBasedCellCycleModel()
     : mCurrentHypoxicDuration(0.0),
       mHypoxicConcentration(0.4),
       mQuiescentConcentration(1.0),
@@ -48,17 +48,17 @@ SimpleOxygenBasedCellCycleModel::SimpleOxygenBasedCellCycleModel()
     mCurrentHypoxiaOnsetTime = SimulationTime::Instance()->GetTime();
 }
 
-double SimpleOxygenBasedCellCycleModel::GetCurrentHypoxicDuration() const
+double SimpleOxygenBasedPhaseBasedCellCycleModel::GetCurrentHypoxicDuration() const
 {
     return mCurrentHypoxicDuration;
 }
 
-double SimpleOxygenBasedCellCycleModel::GetCurrentHypoxiaOnsetTime() const
+double SimpleOxygenBasedPhaseBasedCellCycleModel::GetCurrentHypoxiaOnsetTime() const
 {
     return mCurrentHypoxiaOnsetTime;
 }
 
-void SimpleOxygenBasedCellCycleModel::UpdateCellCyclePhase()
+void SimpleOxygenBasedPhaseBasedCellCycleModel::UpdateCellCyclePhase()
 {
     // mG1Duration is set when the cell-cycle model is given a cell
 
@@ -71,7 +71,7 @@ void SimpleOxygenBasedCellCycleModel::UpdateCellCyclePhase()
         // Get cell's oxygen concentration
         double oxygen_concentration = mpCell->GetCellData()->GetItem("oxygen");
 
-        AbstractSimpleCellCycleModel::UpdateCellCyclePhase();
+        AbstractSimplePhaseBasedCellCycleModel::UpdateCellCyclePhase();
 
         if (mCurrentCellCyclePhase == G_ONE_PHASE)
         {
@@ -86,8 +86,8 @@ void SimpleOxygenBasedCellCycleModel::UpdateCellCyclePhase()
     }
 }
 
-SimpleOxygenBasedCellCycleModel::SimpleOxygenBasedCellCycleModel(const SimpleOxygenBasedCellCycleModel& rModel)
-   : AbstractSimpleCellCycleModel(rModel),
+SimpleOxygenBasedPhaseBasedCellCycleModel::SimpleOxygenBasedPhaseBasedCellCycleModel(const SimpleOxygenBasedPhaseBasedCellCycleModel& rModel)
+   : AbstractSimplePhaseBasedCellCycleModel(rModel),
      mCurrentHypoxicDuration(rModel.mCurrentHypoxicDuration),
      mCurrentHypoxiaOnsetTime(rModel.mCurrentHypoxiaOnsetTime),
      mHypoxicConcentration(rModel.mHypoxicConcentration),
@@ -112,12 +112,12 @@ SimpleOxygenBasedCellCycleModel::SimpleOxygenBasedCellCycleModel(const SimpleOxy
 }
 
 
-AbstractCellCycleModel* SimpleOxygenBasedCellCycleModel::CreateCellCycleModel()
+AbstractCellCycleModel* SimpleOxygenBasedPhaseBasedCellCycleModel::CreateCellCycleModel()
 {
-    return new SimpleOxygenBasedCellCycleModel(*this);
+    return new SimpleOxygenBasedPhaseBasedCellCycleModel(*this);
 }
 
-void SimpleOxygenBasedCellCycleModel::UpdateHypoxicDuration()
+void SimpleOxygenBasedPhaseBasedCellCycleModel::UpdateHypoxicDuration()
 {
     assert(!(mpCell->HasCellProperty<ApoptoticCellProperty>()));
     assert(!mpCell->HasApoptosisBegun());
@@ -155,57 +155,57 @@ void SimpleOxygenBasedCellCycleModel::UpdateHypoxicDuration()
     }
 }
 
-double SimpleOxygenBasedCellCycleModel::GetHypoxicConcentration() const
+double SimpleOxygenBasedPhaseBasedCellCycleModel::GetHypoxicConcentration() const
 {
     return mHypoxicConcentration;
 }
 
-void SimpleOxygenBasedCellCycleModel::SetHypoxicConcentration(double hypoxicConcentration)
+void SimpleOxygenBasedPhaseBasedCellCycleModel::SetHypoxicConcentration(double hypoxicConcentration)
 {
     assert(hypoxicConcentration<=1.0);
     assert(hypoxicConcentration>=0.0);
     mHypoxicConcentration = hypoxicConcentration;
 }
 
-double SimpleOxygenBasedCellCycleModel::GetQuiescentConcentration() const
+double SimpleOxygenBasedPhaseBasedCellCycleModel::GetQuiescentConcentration() const
 {
     return mQuiescentConcentration;
 }
 
-void SimpleOxygenBasedCellCycleModel::SetQuiescentConcentration(double quiescentConcentration)
+void SimpleOxygenBasedPhaseBasedCellCycleModel::SetQuiescentConcentration(double quiescentConcentration)
 {
     assert(quiescentConcentration <= 1.0);
     assert(quiescentConcentration >= 0.0);
     mQuiescentConcentration = quiescentConcentration;
 }
 
-double SimpleOxygenBasedCellCycleModel::GetCriticalHypoxicDuration() const
+double SimpleOxygenBasedPhaseBasedCellCycleModel::GetCriticalHypoxicDuration() const
 {
     return mCriticalHypoxicDuration;
 }
 
-void SimpleOxygenBasedCellCycleModel::SetCriticalHypoxicDuration(double criticalHypoxicDuration)
+void SimpleOxygenBasedPhaseBasedCellCycleModel::SetCriticalHypoxicDuration(double criticalHypoxicDuration)
 {
     assert(criticalHypoxicDuration >= 0.0);
     mCriticalHypoxicDuration = criticalHypoxicDuration;
 }
 
-void SimpleOxygenBasedCellCycleModel::SetCurrentHypoxiaOnsetTime(double currentHypoxiaOnsetTime)
+void SimpleOxygenBasedPhaseBasedCellCycleModel::SetCurrentHypoxiaOnsetTime(double currentHypoxiaOnsetTime)
 {
     assert(currentHypoxiaOnsetTime >= 0.0);
     mCurrentHypoxiaOnsetTime = currentHypoxiaOnsetTime;
 }
 
-void SimpleOxygenBasedCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
+void SimpleOxygenBasedPhaseBasedCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<HypoxicConcentration>" << mHypoxicConcentration << "</HypoxicConcentration>\n";
     *rParamsFile << "\t\t\t<QuiescentConcentration>" << mQuiescentConcentration << "</QuiescentConcentration>\n";
     *rParamsFile << "\t\t\t<CriticalHypoxicDuration>" << mCriticalHypoxicDuration << "</CriticalHypoxicDuration>\n";
 
     // Call method on direct parent class
-    AbstractSimpleCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
+    AbstractSimplePhaseBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
 }
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-CHASTE_CLASS_EXPORT(SimpleOxygenBasedCellCycleModel)
+CHASTE_CLASS_EXPORT(SimpleOxygenBasedPhaseBasedCellCycleModel)

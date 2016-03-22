@@ -33,22 +33,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "AbstractSimpleCellCycleModel.hpp"
-#include "Exception.hpp"
-#include "StemCellProliferativeType.hpp"
-#include "TransitCellProliferativeType.hpp"
-#include "DifferentiatedCellProliferativeType.hpp"
+#include "StochasticOxygenBasedPhaseBasedCellCycleModel.hpp"
+#include "ApoptoticCellProperty.hpp"
+#include "CellPropertyRegistry.hpp"
 
-AbstractSimpleCellCycleModel::AbstractSimpleCellCycleModel()
+StochasticOxygenBasedPhaseBasedCellCycleModel::StochasticOxygenBasedPhaseBasedCellCycleModel()
+    : SimpleOxygenBasedPhaseBasedCellCycleModel()
 {
 }
 
-AbstractSimpleCellCycleModel::~AbstractSimpleCellCycleModel()
-{
-}
-
-AbstractSimpleCellCycleModel::AbstractSimpleCellCycleModel(const AbstractSimpleCellCycleModel& rModel)
-    : AbstractCellCycleModel(rModel)
+StochasticOxygenBasedPhaseBasedCellCycleModel::StochasticOxygenBasedPhaseBasedCellCycleModel(const StochasticOxygenBasedPhaseBasedCellCycleModel& rModel)
+   : SimpleOxygenBasedPhaseBasedCellCycleModel(rModel)
 {
     /*
      * Set each member variable of the new cell-cycle model that inherits
@@ -69,77 +64,58 @@ AbstractSimpleCellCycleModel::AbstractSimpleCellCycleModel(const AbstractSimpleC
     // No new member variables.
 }
 
-void AbstractSimpleCellCycleModel::Initialise()
+void StochasticOxygenBasedPhaseBasedCellCycleModel::GenerateStochasticG2Duration()
 {
-    SetG1Duration();
-}
+    RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
 
-void AbstractSimpleCellCycleModel::InitialiseDaughterCell()
-{
-    AbstractCellCycleModel::InitialiseDaughterCell();
-    SetG1Duration();
-}
+    double mean = AbstractPhaseBasedCellCycleModel::GetG2Duration();
+    double standard_deviation = 1.0;
 
-void AbstractSimpleCellCycleModel::SetG1Duration()
-{
-    assert(mpCell != NULL);
+    mStochasticG2Duration = p_gen->NormalRandomDeviate(mean, standard_deviation);
 
-    if (mpCell->GetCellProliferativeType()->IsType<StemCellProliferativeType>())
+    // Check that the normal random deviate has not returned a small or negative G2 duration
+    if (mStochasticG2Duration < mMinimumGapDuration)
     {
-        mG1Duration = GetStemCellG1Duration();
-    }
-    else if (mpCell->GetCellProliferativeType()->IsType<TransitCellProliferativeType>())
-    {
-        mG1Duration = GetTransitCellG1Duration();
-    }
-    else if (mpCell->GetCellProliferativeType()->IsType<DifferentiatedCellProliferativeType>())
-    {
-        mG1Duration = DBL_MAX;
-    }
-    else
-    {
-        NEVER_REACHED;
+        mStochasticG2Duration = mMinimumGapDuration;
     }
 }
 
-void AbstractSimpleCellCycleModel::ResetForDivision()
+void StochasticOxygenBasedPhaseBasedCellCycleModel::InitialiseDaughterCell()
 {
-    AbstractCellCycleModel::ResetForDivision();
-    mBirthTime = SimulationTime::Instance()->GetTime();
-    SetG1Duration();
+    SimpleOxygenBasedPhaseBasedCellCycleModel::InitialiseDaughterCell();
+    GenerateStochasticG2Duration();
 }
 
-void AbstractSimpleCellCycleModel::UpdateCellCyclePhase()
+void StochasticOxygenBasedPhaseBasedCellCycleModel::Initialise()
 {
-    double time_since_birth = GetAge();
-    assert(time_since_birth >= 0);
-
-    if (mpCell->GetCellProliferativeType()->IsType<DifferentiatedCellProliferativeType>())
-    {
-        mCurrentCellCyclePhase = G_ZERO_PHASE;
-    }
-    else if (time_since_birth < GetMDuration())
-    {
-        mCurrentCellCyclePhase = M_PHASE;
-    }
-    else if (time_since_birth < GetMDuration() + mG1Duration)
-    {
-        mCurrentCellCyclePhase = G_ONE_PHASE;
-    }
-    else if (time_since_birth < GetMDuration() + mG1Duration + GetSDuration())
-    {
-        mCurrentCellCyclePhase = S_PHASE;
-    }
-    else if (time_since_birth < GetMDuration() + mG1Duration + GetSDuration() + GetG2Duration())
-    {
-        mCurrentCellCyclePhase = G_TWO_PHASE;
-    }
+    AbstractSimplePhaseBasedCellCycleModel::Initialise();
+    GenerateStochasticG2Duration();
 }
 
-void AbstractSimpleCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
+void StochasticOxygenBasedPhaseBasedCellCycleModel::ResetForDivision()
+{
+    SimpleOxygenBasedPhaseBasedCellCycleModel::ResetForDivision();
+    GenerateStochasticG2Duration();
+}
+
+double StochasticOxygenBasedPhaseBasedCellCycleModel::GetG2Duration() const
+{
+    return mStochasticG2Duration;
+}
+
+AbstractCellCycleModel* StochasticOxygenBasedPhaseBasedCellCycleModel::CreateCellCycleModel()
+{
+    return new StochasticOxygenBasedPhaseBasedCellCycleModel(*this);
+}
+
+void StochasticOxygenBasedPhaseBasedCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
 {
     // No new parameters to output
 
     // Call method on direct parent class
-    AbstractCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
+    SimpleOxygenBasedPhaseBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
 }
+
+// Serialization for Boost >= 1.36
+#include "SerializationExportWrapperForCpp.hpp"
+CHASTE_CLASS_EXPORT(StochasticOxygenBasedPhaseBasedCellCycleModel)

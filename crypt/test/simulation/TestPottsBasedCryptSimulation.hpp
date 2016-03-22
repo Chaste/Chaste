@@ -57,7 +57,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "BetaCateninOneHitCellMutationState.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "WntCellCycleModel.hpp"
-#include "TysonNovakCellCycleModel.hpp"
+#include "TysonNovakPhaseBasedCellCycleModel.hpp"
 #include "CellLabel.hpp"
 #include "CellPropertyRegistry.hpp"
 #include "SmartPointers.hpp"
@@ -128,7 +128,7 @@ public:
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 7u);
     }
 
-    void TestPottsCryptWithGenerationBasedCellCycleModel() throw (Exception)
+    void TestPottsCryptWithGenerationBasedPhaseBasedCellCycleModel() throw (Exception)
     {
         EXIT_IF_PARALLEL;    // Potts simulations don't work in parallel.
 
@@ -140,7 +140,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<StochasticDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<StochasticDurationGenerationBasedPhaseBasedCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true, 2.5, 8.0, 16.0, 36);
 
         // Create cell population

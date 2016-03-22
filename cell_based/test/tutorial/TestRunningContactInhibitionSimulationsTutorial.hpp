@@ -75,7 +75,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 
 /*
- * The next header file defines the contact inhibition cell-cycle model that inherits from {{{AbstractSimpleCellCycleModel}}}.
+ * The next header file defines the contact inhibition cell-cycle model that inherits from {{{AbstractSimplePhaseBasedCellCycleModel}}}.
  * The duration of the G1 phase depends on the deviation from a 'target' volume (or area/length in 2D/1D): if a cell's volume is
  * lower than a given fraction of its target volume, the G1 phase continues.
  * This model of cell-cycle progression allows for quiescence imposed by transient periods of high stress, followed by relaxation. Note that
@@ -84,10 +84,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * than the given threshold may still divide.
  *
  * The target volume and the critical fraction are specified using the methods {{{SetEquilibriumVolume()}}} and {{{SetQuiescentVolumeFraction()}}} respectively.
- * Within the {{{ContactInhibitionCellCycleModel}}}'s {{{UpdateCellCyclePhase()}}} method these parameters are compared to the actual cell volumes, which are stored
+ * Within the {{{ContactInhibitionPhaseBasedCellCycleModel}}}'s {{{UpdateCellCyclePhase()}}} method these parameters are compared to the actual cell volumes, which are stored
  * using the cell property {{{CellData}}}.
  */
-#include "ContactInhibitionCellCycleModel.hpp"
+#include "ContactInhibitionPhaseBasedCellCycleModel.hpp"
 
 /*
  * The next header defines the simulation class modifier corresponding to the contact inhibition cell-cycle model.
@@ -99,7 +99,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OffLatticeSimulation.hpp"
 #include "MeshBasedCellPopulation.hpp"
 #include "CellMutationStatesCountWriter.hpp"
-#include "StochasticDurationCellCycleModel.hpp"
+#include "StochasticDurationPhaseBasedCellCycleModel.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "TransitCellProliferativeType.hpp"
 #include "HoneycombMeshGenerator.hpp"
@@ -145,7 +145,7 @@ public:
          * in the initial mesh. */
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
-            ContactInhibitionCellCycleModel* p_cycle_model = new ContactInhibitionCellCycleModel();
+            ContactInhibitionPhaseBasedCellCycleModel* p_cycle_model = new ContactInhibitionPhaseBasedCellCycleModel();
             p_cycle_model->SetDimension(2);
             p_cycle_model->SetBirthTime(-2.0*(double)i);
             p_cycle_model->SetQuiescentVolumeFraction(0.5);
@@ -239,7 +239,7 @@ public:
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
 
         /* We again create the cells. The difference here is that one of the cells is not contact-inhibited, but rather
-         * is defined by a {{{StochasticDurationCellCycleModel}}}. */
+         * is defined by a {{{StochasticDurationPhaseBasedCellCycleModel}}}. */
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
@@ -248,7 +248,7 @@ public:
         {
             if (i==1)
             {
-                StochasticDurationCellCycleModel* p_cycle_model = new StochasticDurationCellCycleModel();
+                StochasticDurationPhaseBasedCellCycleModel* p_cycle_model = new StochasticDurationPhaseBasedCellCycleModel();
                 p_cycle_model->SetBirthTime(-14.0);
                 p_cycle_model->SetStemCellG1Duration(1.0);
 
@@ -259,7 +259,7 @@ public:
             }
             else
             {
-                ContactInhibitionCellCycleModel* p_cycle_model = new ContactInhibitionCellCycleModel();
+                ContactInhibitionPhaseBasedCellCycleModel* p_cycle_model = new ContactInhibitionPhaseBasedCellCycleModel();
                 p_cycle_model->SetDimension(2);
                 p_cycle_model->SetBirthTime(-2.0*(double)i);
                 p_cycle_model->SetQuiescentVolumeFraction(0.8);
@@ -355,7 +355,7 @@ public:
         std::vector<CellPtr> cells;
         for (unsigned i=0; i<p_mesh->GetNumElements(); i++)
         {
-            ContactInhibitionCellCycleModel* p_cycle_model = new ContactInhibitionCellCycleModel();
+            ContactInhibitionPhaseBasedCellCycleModel* p_cycle_model = new ContactInhibitionPhaseBasedCellCycleModel();
             p_cycle_model->SetDimension(2);
             p_cycle_model->SetBirthTime(-(double)i - 2.0); // So all out of M phase
             p_cycle_model->SetQuiescentVolumeFraction(0.9);

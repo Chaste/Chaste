@@ -80,7 +80,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellsGenerator.hpp"
 #include "TransitCellProliferativeType.hpp"
 /* The next header file defines a stochastic cell-cycle model class. */
-#include "StochasticDurationCellCycleModel.hpp"
+#include "StochasticDurationPhaseBasedCellCycleModel.hpp"
 /* The next header file defines a helper class for generating a suitable mesh. */
 #include "HoneycombMeshGenerator.hpp"
 /* The next header file defines the class that simulates the evolution of an off-lattice {{{CellPopulation}}}. */
@@ -120,10 +120,10 @@ public:
 
         /* Having created a mesh, we now create a {{{std::vector}}} of {{{CellPtr}}}s.
          * To do this, we use the `CellsGenerator` helper class, which is templated over the type
-         * of cell cycle model required (here {{{StochasticDurationCellCycleModel}}})
+         * of cell cycle model required (here {{{StochasticDurationPhaseBasedCellCycleModel}}})
          * and the dimension.
-         * For a list of possible cell cycle models see subclasses of {{{AbstractCellCycleModel}}}.
-         * These can be found in the inheritance diagram, here, [class:AbstractCellCycleModel AbstractCellCycleModel].
+         * For a list of possible cell cycle models see subclasses of {{{AbstractPhaseBasedCellCycleModel}}}.
+         * These can be found in the inheritance diagram, here, [class:AbstractPhaseBasedCellCycleModel AbstractPhaseBasedCellCycleModel].
          * Note that some of these models will require information on the surrounding medium such as Oxygen concentration to work,
          * see specific class documentation for details. Some of these will be covered in later tutorials (UserTutorials/RunningContactInhibitionSimulations,
          * UserTutorials/RunningDeltaNotchSimulations, and UserTutorials/RunningTumourSpheroidSimulations).
@@ -133,7 +133,7 @@ public:
          * the proliferative type of the cell. */
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
-        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+        CellsGenerator<StochasticDurationPhaseBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), p_transit_type);
 
         /* Now we have a mesh and a set of cells to go with it, we can create a {{{CellPopulation}}}.
@@ -243,7 +243,7 @@ public:
          * As before all cells have {{{TransitCellProliferativeType}}}. */
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
-        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+        CellsGenerator<StochasticDurationPhaseBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, location_indices.size(), p_transit_type);
 
         /* Now we have a mesh and a set of cells to go with it, we can create a {{{CellPopulation}}}.

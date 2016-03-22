@@ -33,24 +33,24 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "TysonNovakCellCycleModel.hpp"
+#include "TysonNovakPhaseBasedCellCycleModel.hpp"
 #include "StemCellProliferativeType.hpp"
 #include "TransitCellProliferativeType.hpp"
 
-TysonNovakCellCycleModel::TysonNovakCellCycleModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
-    : AbstractOdeBasedCellCycleModel(SimulationTime::Instance()->GetTime(), pOdeSolver)
+TysonNovakPhaseBasedCellCycleModel::TysonNovakPhaseBasedCellCycleModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
+    : AbstractOdeBasedPhaseBasedCellCycleModel(SimulationTime::Instance()->GetTime(), pOdeSolver)
 {
     if (!mpOdeSolver)
     {
 #ifdef CHASTE_CVODE
-        mpOdeSolver = CellCycleModelOdeSolver<TysonNovakCellCycleModel, CvodeAdaptor>::Instance();
+        mpOdeSolver = CellCycleModelOdeSolver<TysonNovakPhaseBasedCellCycleModel, CvodeAdaptor>::Instance();
         mpOdeSolver->Initialise();
         // Chaste solvers always check for stopping events, CVODE needs to be instructed to do so
         mpOdeSolver->CheckForStoppingEvents();
         mpOdeSolver->SetMaxSteps(10000);
         mpOdeSolver->SetTolerances(1e-6, 1e-8);
 #else
-        mpOdeSolver = CellCycleModelOdeSolver<TysonNovakCellCycleModel, BackwardEulerIvpOdeSolver>::Instance();
+        mpOdeSolver = CellCycleModelOdeSolver<TysonNovakPhaseBasedCellCycleModel, BackwardEulerIvpOdeSolver>::Instance();
         mpOdeSolver->SetSizeOfOdeSystem(6);
         mpOdeSolver->Initialise();
         SetDt(0.1/90.0);
@@ -58,8 +58,8 @@ TysonNovakCellCycleModel::TysonNovakCellCycleModel(boost::shared_ptr<AbstractCel
     }
 }
 
-TysonNovakCellCycleModel::TysonNovakCellCycleModel(const TysonNovakCellCycleModel& rModel)
-    : AbstractOdeBasedCellCycleModel(rModel)
+TysonNovakPhaseBasedCellCycleModel::TysonNovakPhaseBasedCellCycleModel(const TysonNovakPhaseBasedCellCycleModel& rModel)
+    : AbstractOdeBasedPhaseBasedCellCycleModel(rModel)
 {
     /*
      * Set each member variable of the new cell-cycle model that inherits
@@ -82,18 +82,18 @@ TysonNovakCellCycleModel::TysonNovakCellCycleModel(const TysonNovakCellCycleMode
 }
 
 
-void TysonNovakCellCycleModel::Initialise()
+void TysonNovakPhaseBasedCellCycleModel::Initialise()
 {
     assert(mpOdeSystem == NULL);
     mpOdeSystem = new TysonNovak2001OdeSystem;
     mpOdeSystem->SetStateVariables(mpOdeSystem->GetInitialConditions());
 
-    AbstractOdeBasedCellCycleModel::Initialise();
+    AbstractOdeBasedPhaseBasedCellCycleModel::Initialise();
 }
 
-void TysonNovakCellCycleModel::ResetForDivision()
+void TysonNovakPhaseBasedCellCycleModel::ResetForDivision()
 {
-    AbstractOdeBasedCellCycleModel::ResetForDivision();
+    AbstractOdeBasedPhaseBasedCellCycleModel::ResetForDivision();
 
     assert(mpOdeSystem != NULL);
 
@@ -116,7 +116,7 @@ void TysonNovakCellCycleModel::ResetForDivision()
 #endif //CHASTE_CVODE
 }
 
-void TysonNovakCellCycleModel::InitialiseDaughterCell()
+void TysonNovakPhaseBasedCellCycleModel::InitialiseDaughterCell()
 {
     if (mpCell->GetCellProliferativeType()->IsType<StemCellProliferativeType>())
     {
@@ -135,12 +135,12 @@ void TysonNovakCellCycleModel::InitialiseDaughterCell()
     }
 }
 
-AbstractCellCycleModel* TysonNovakCellCycleModel::CreateCellCycleModel()
+AbstractCellCycleModel* TysonNovakPhaseBasedCellCycleModel::CreateCellCycleModel()
 {
-    return new TysonNovakCellCycleModel(*this);
+    return new TysonNovakPhaseBasedCellCycleModel(*this);
 }
 
-double TysonNovakCellCycleModel::GetSDuration() const
+double TysonNovakPhaseBasedCellCycleModel::GetSDuration() const
 {
     /**
      * Tyson & Novak pretends it is running ODEs in just G1,
@@ -150,7 +150,7 @@ double TysonNovakCellCycleModel::GetSDuration() const
     return 0.0;
 }
 
-double TysonNovakCellCycleModel::GetG2Duration() const
+double TysonNovakPhaseBasedCellCycleModel::GetG2Duration() const
 {
     /**
      * Tyson & Novak pretends it is running ODEs in just G1,
@@ -160,7 +160,7 @@ double TysonNovakCellCycleModel::GetG2Duration() const
     return 0.0;
 }
 
-double TysonNovakCellCycleModel::GetMDuration() const
+double TysonNovakPhaseBasedCellCycleModel::GetMDuration() const
 {
     /**
      * Tyson & Novak pretends it is running ODEs in just G1,
@@ -170,29 +170,29 @@ double TysonNovakCellCycleModel::GetMDuration() const
     return 0.0;
 }
 
-double TysonNovakCellCycleModel::GetAverageTransitCellCycleTime()
+double TysonNovakPhaseBasedCellCycleModel::GetAverageTransitCellCycleTime()
 {
     return 1.25;
 }
 
-double TysonNovakCellCycleModel::GetAverageStemCellCycleTime()
+double TysonNovakPhaseBasedCellCycleModel::GetAverageStemCellCycleTime()
 {
     return 1.25;
 }
 
-bool TysonNovakCellCycleModel::CanCellTerminallyDifferentiate()
+bool TysonNovakPhaseBasedCellCycleModel::CanCellTerminallyDifferentiate()
 {
     return false;
 }
 
-void TysonNovakCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
+void TysonNovakPhaseBasedCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
 {
     // No new parameters to output, so just call method on direct parent class
-    AbstractOdeBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
+    AbstractOdeBasedPhaseBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
 }
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-CHASTE_CLASS_EXPORT(TysonNovakCellCycleModel)
+CHASTE_CLASS_EXPORT(TysonNovakPhaseBasedCellCycleModel)
 #include "CellCycleModelOdeSolverExportWrapper.hpp"
-EXPORT_CELL_CYCLE_MODEL_ODE_SOLVER(TysonNovakCellCycleModel)
+EXPORT_CELL_CYCLE_MODEL_ODE_SOLVER(TysonNovakPhaseBasedCellCycleModel)

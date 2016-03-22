@@ -41,8 +41,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HoneycombMeshGenerator.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "CellsGenerator.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
-#include "TysonNovakCellCycleModel.hpp"
+#include "FixedDurationGenerationBasedPhaseBasedCellCycleModel.hpp"
+#include "TysonNovakPhaseBasedCellCycleModel.hpp"
 #include "TrianglesMeshReader.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "TransitCellProliferativeType.hpp"
@@ -56,7 +56,7 @@ class TestCellsGenerator : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestGenerateBasicWithFixedDurationGenerationBasedCellCycleModel() throw(Exception)
+    void TestGenerateBasicWithFixedDurationGenerationBasedPhaseBasedCellCycleModel() throw(Exception)
     {
         // Create mesh
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_2_elements");
@@ -65,7 +65,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         // Test that cells were generated correctly
@@ -84,7 +84,7 @@ public:
         location_indices.push_back(9);
 
         std::vector<CellPtr> cells2;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator2;
+        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 2> cells_generator2;
         cells_generator2.GenerateBasic(cells2, 3, location_indices);
 
         TS_ASSERT_EQUALS(cells2.size(), 3u);
@@ -93,7 +93,7 @@ public:
         TS_ASSERT_DELTA(cells2[2]->GetBirthTime(), -9.0, 1e-4);
     }
 
-    void TestGenerateGivenLocationIndicesWithFixedDurationGenerationBasedCellCycleModel() throw(Exception)
+    void TestGenerateGivenLocationIndicesWithFixedDurationGenerationBasedPhaseBasedCellCycleModel() throw(Exception)
     {
         EXIT_IF_PARALLEL;
         // Use a mesh generator to generate some location indices corresponding to real cells
@@ -102,7 +102,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 2> cells_generator;
         TS_ASSERT_THROWS_THIS(cells_generator.GenerateBasic(cells, 83511u, location_indices),
                               "The size of the locationIndices vector must match the required number of output cells");
         cells_generator.GenerateGivenLocationIndices(cells, location_indices);
@@ -124,7 +124,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 2> cells_generator;
 
         cells_generator.GenerateGivenLocationIndices(cells,
                                                      location_indices,
@@ -148,7 +148,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
 
         // Test that cells were generated correctly
@@ -165,7 +165,7 @@ public:
         }
     }
 
-    void TestGenerateBasicRandomWithFixedDurationGenerationBasedCellCycleModel() throw(Exception)
+    void TestGenerateBasicRandomWithFixedDurationGenerationBasedPhaseBasedCellCycleModel() throw(Exception)
     {
         // Create mesh
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_2_elements");
@@ -175,7 +175,7 @@ public:
         // Create cells
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_transit_type);
 
         // Test that cells were generated correctly
@@ -196,7 +196,7 @@ public:
         TS_ASSERT_DELTA(cells[2]->GetBirthTime(), -10.2953, 1e-4);
     }
 
-    void TestGenerateBasicRandomWithFixedDurationGenerationBasedCellCycleModelandVertexCells() throw(Exception)
+    void TestGenerateBasicRandomWithFixedDurationGenerationBasedPhaseBasedCellCycleModelandVertexCells() throw(Exception)
     {
         EXIT_IF_PARALLEL;
         // Create mesh
@@ -206,7 +206,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_transit_type);
 
         // Test that cells were generated correctly

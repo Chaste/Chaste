@@ -57,7 +57,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
-class TestSimpleCellCycleModelsForCrypt : public AbstractCellBasedTestSuite
+class TestSimplePhaseBasedCellCycleModelsForCrypt : public AbstractCellBasedTestSuite
 {
 private:
     static const double mFirstRandomNumber;
@@ -379,7 +379,7 @@ public:
             // Wnt should change this to a transit cell
             TS_ASSERT_EQUALS(p_stem_cell->GetCellProliferativeType()->IsType<TransitCellProliferativeType>(), true);
             TS_ASSERT_EQUALS(p_stem_cell->GetCellCycleModel()->ReadyToDivide(), false);
-            TS_ASSERT_EQUALS(p_stem_cell->GetCellCycleModel()->GetCurrentCellCyclePhase(), G_TWO_PHASE);
+            TS_ASSERT_EQUALS(static_cast<SimpleWntCellCycleModel*>(p_stem_cell->GetCellCycleModel())->GetCurrentCellCyclePhase(), G_TWO_PHASE);
 
             std::ofstream ofs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_oarchive output_arch(ofs);
@@ -416,7 +416,7 @@ public:
             input_arch >> p_cell;
 
             // Check
-            AbstractCellCycleModel* p_cell_model = p_cell->GetCellCycleModel();
+            SimpleWntCellCycleModel* p_cell_model = static_cast<SimpleWntCellCycleModel*>(p_cell->GetCellCycleModel());
             TS_ASSERT_EQUALS(p_cell, p_cell_model->GetCell());
 
             TS_ASSERT_EQUALS(p_cell_model->ReadyToDivide(), false);
@@ -488,7 +488,7 @@ public:
             // Wnt should change this to a transit cell
             TS_ASSERT_EQUALS(p_cell->GetCellProliferativeType()->IsType<TransitCellProliferativeType>(), true);
             TS_ASSERT_EQUALS(p_cell->GetCellCycleModel()->ReadyToDivide(), false);
-            TS_ASSERT_EQUALS(p_cell->GetCellCycleModel()->GetCurrentCellCyclePhase(), G_TWO_PHASE);
+            TS_ASSERT_EQUALS(static_cast<SimpleWntCellCycleModel*>(p_cell->GetCellCycleModel())->GetCurrentCellCyclePhase(), G_TWO_PHASE);
 
             std::ofstream ofs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_oarchive output_arch(ofs);
@@ -528,7 +528,7 @@ public:
             input_arch >> p_cell;
 
             // Check
-            AbstractCellCycleModel* p_cell_model = p_cell->GetCellCycleModel();
+            SimpleWntCellCycleModel* p_cell_model = static_cast<SimpleWntCellCycleModel*>(p_cell->GetCellCycleModel());
             TS_ASSERT_EQUALS(p_cell, p_cell_model->GetCell());
 
             TS_ASSERT_EQUALS(p_cell_model->ReadyToDivide(), false);
@@ -573,10 +573,10 @@ public:
 };
 
 // Member initialisation
-const double TestSimpleCellCycleModelsForCrypt::mFirstRandomNumber = 1.08221;
-const double TestSimpleCellCycleModelsForCrypt::mSecondRandomNumber = 3.21839;
-const double TestSimpleCellCycleModelsForCrypt::mThirdRandomNumber = 3.73243;
-const double TestSimpleCellCycleModelsForCrypt::mFourthRandomNumber = 2.83804;
-const double TestSimpleCellCycleModelsForCrypt::mFifthRandomNumber = 1.7031;
+const double TestSimplePhaseBasedCellCycleModelsForCrypt::mFirstRandomNumber = 1.08221;
+const double TestSimplePhaseBasedCellCycleModelsForCrypt::mSecondRandomNumber = 3.21839;
+const double TestSimplePhaseBasedCellCycleModelsForCrypt::mThirdRandomNumber = 3.73243;
+const double TestSimplePhaseBasedCellCycleModelsForCrypt::mFourthRandomNumber = 2.83804;
+const double TestSimplePhaseBasedCellCycleModelsForCrypt::mFifthRandomNumber = 1.7031;
 
 #endif /*TESTSIMPLECELLCYCLEMODELSFORCRYPT_HPP_*/

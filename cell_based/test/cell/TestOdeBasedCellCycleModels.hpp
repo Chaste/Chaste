@@ -44,8 +44,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fstream>
 #include <boost/shared_ptr.hpp>
 
-#include "Alarcon2004OxygenBasedCellCycleModel.hpp"
-#include "TysonNovakCellCycleModel.hpp"
+#include "Alarcon2004OxygenBasedPhaseBasedCellCycleModel.hpp"
+#include "TysonNovakPhaseBasedCellCycleModel.hpp"
 
 #include "AbstractCellMutationState.hpp"
 #include "WildTypeCellMutationState.hpp"
@@ -66,13 +66,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * This class contains tests for methods on classes
- * inheriting from AbstractOdeBasedCellCycleModel.
+ * inheriting from AbstractOdeBasedPhaseBasedCellCycleModel.
  */
-class TestOdeBasedCellCycleModels : public AbstractCellBasedTestSuite
+class TestOdeBasedPhaseBasedCellCycleModels : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestTysonNovakCellCycleModel() throw(Exception)
+    void TestTysonNovakPhaseBasedCellCycleModel() throw(Exception)
     {
         // Set up
         SimulationTime* p_simulation_time = SimulationTime::Instance();
@@ -81,8 +81,8 @@ public:
 
         double standard_divide_time = 75.19/60.0;
 
-        // Test TysonNovakCellCycleModel methods for a healthy cell
-        TysonNovakCellCycleModel* p_cell_model = new TysonNovakCellCycleModel;
+        // Test TysonNovakPhaseBasedCellCycleModel methods for a healthy cell
+        TysonNovakPhaseBasedCellCycleModel* p_cell_model = new TysonNovakPhaseBasedCellCycleModel;
         p_cell_model->SetBirthTime(p_simulation_time->GetTime());
 
         TS_ASSERT_EQUALS(p_cell_model->CanCellTerminallyDifferentiate(), false);
@@ -101,12 +101,12 @@ public:
          * is the same type as the solver used by the cell-cycle model if no solver is provided
          * (unless CVODE is used), so our results should be identical.
          */
-        boost::shared_ptr<CellCycleModelOdeSolver<TysonNovakCellCycleModel, BackwardEulerIvpOdeSolver> >
-            p_solver(CellCycleModelOdeSolver<TysonNovakCellCycleModel, BackwardEulerIvpOdeSolver>::Instance());
+        boost::shared_ptr<CellCycleModelOdeSolver<TysonNovakPhaseBasedCellCycleModel, BackwardEulerIvpOdeSolver> >
+            p_solver(CellCycleModelOdeSolver<TysonNovakPhaseBasedCellCycleModel, BackwardEulerIvpOdeSolver>::Instance());
         p_solver->SetSizeOfOdeSystem(6);
         p_solver->Initialise();
 
-        TysonNovakCellCycleModel* p_other_cell_model = new TysonNovakCellCycleModel(p_solver);
+        TysonNovakPhaseBasedCellCycleModel* p_other_cell_model = new TysonNovakPhaseBasedCellCycleModel(p_solver);
         p_other_cell_model->SetBirthTime(p_simulation_time->GetTime());
         // Timestep for non-adaptive solvers defaults to 0.0001
         TS_ASSERT_EQUALS(p_other_cell_model->GetDt(), 0.0001);
@@ -159,12 +159,12 @@ public:
 
         TS_ASSERT_EQUALS(p_cell_model->ReadyToDivide(),true);
 
-        // For coverage, we also test TysonNovakCellCycleModel methods for a mutant cell
+        // For coverage, we also test TysonNovakPhaseBasedCellCycleModel methods for a mutant cell
         p_cell_model->ResetForDivision();
 
         TS_ASSERT_EQUALS(p_cell_model->ReadyToDivide(),false);
 
-        TysonNovakCellCycleModel* p_cell_model2 = static_cast<TysonNovakCellCycleModel*> (p_cell_model->CreateCellCycleModel());
+        TysonNovakPhaseBasedCellCycleModel* p_cell_model2 = static_cast<TysonNovakPhaseBasedCellCycleModel*> (p_cell_model->CreateCellCycleModel());
 
         MAKE_PTR(ApcOneHitCellMutationState, p_mutation);
         CellPtr p_stem_cell_2(new Cell(p_mutation, p_cell_model2));
@@ -216,7 +216,7 @@ public:
      * conditions, since the oscillatory solution computed using the Chaste
      * ODE solver is not stable.
      */
-    void TestTysonNovakCellCycleModelSolver() throw(Exception)
+    void TestTysonNovakPhaseBasedCellCycleModelSolver() throw(Exception)
     {
         // Set up simulation time
         unsigned num_timesteps = 100000;
@@ -224,7 +224,7 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(100.1*standard_divide_time, num_timesteps);
 
         // Create cell-cycle model and associated cell
-        TysonNovakCellCycleModel* p_repeating_cell_model = new TysonNovakCellCycleModel;
+        TysonNovakPhaseBasedCellCycleModel* p_repeating_cell_model = new TysonNovakPhaseBasedCellCycleModel;
 
         MAKE_PTR(ApcOneHitCellMutationState, p_mutation);
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
@@ -270,7 +270,7 @@ public:
          */
     }
 
-    void TestAlarcon2004OxygenBasedCellCycleModel() throw(Exception)
+    void TestAlarcon2004OxygenBasedPhaseBasedCellCycleModel() throw(Exception)
     {
         // Set up SimulationTime
         SimulationTime* p_simulation_time = SimulationTime::Instance();
@@ -280,13 +280,13 @@ public:
         double oxygen_concentration = 1.0;
 
          // Create cell-cycle models
-        Alarcon2004OxygenBasedCellCycleModel* p_model_1d = new Alarcon2004OxygenBasedCellCycleModel();
+        Alarcon2004OxygenBasedPhaseBasedCellCycleModel* p_model_1d = new Alarcon2004OxygenBasedPhaseBasedCellCycleModel();
         p_model_1d->SetDimension(1);
 
-        Alarcon2004OxygenBasedCellCycleModel* p_model_2d = new Alarcon2004OxygenBasedCellCycleModel();
+        Alarcon2004OxygenBasedPhaseBasedCellCycleModel* p_model_2d = new Alarcon2004OxygenBasedPhaseBasedCellCycleModel();
         p_model_2d->SetDimension(2);
 
-        Alarcon2004OxygenBasedCellCycleModel* p_model_3d = new Alarcon2004OxygenBasedCellCycleModel();
+        Alarcon2004OxygenBasedPhaseBasedCellCycleModel* p_model_3d = new Alarcon2004OxygenBasedPhaseBasedCellCycleModel();
         p_model_3d->SetDimension(3);
 
         // Create cells
@@ -309,11 +309,11 @@ public:
         p_cell_3d->InitialiseCellCycleModel();
 
         // For coverage, we create another cell-cycle model that is identical to p_model_2d except for the ODE solver
-        boost::shared_ptr<CellCycleModelOdeSolver<Alarcon2004OxygenBasedCellCycleModel, RungeKutta4IvpOdeSolver> >
-            p_solver(CellCycleModelOdeSolver<Alarcon2004OxygenBasedCellCycleModel, RungeKutta4IvpOdeSolver>::Instance());
+        boost::shared_ptr<CellCycleModelOdeSolver<Alarcon2004OxygenBasedPhaseBasedCellCycleModel, RungeKutta4IvpOdeSolver> >
+            p_solver(CellCycleModelOdeSolver<Alarcon2004OxygenBasedPhaseBasedCellCycleModel, RungeKutta4IvpOdeSolver>::Instance());
         p_solver->Initialise();
 
-        Alarcon2004OxygenBasedCellCycleModel* p_other_model_2d = new Alarcon2004OxygenBasedCellCycleModel(p_solver);
+        Alarcon2004OxygenBasedPhaseBasedCellCycleModel* p_other_model_2d = new Alarcon2004OxygenBasedPhaseBasedCellCycleModel(p_solver);
         p_other_model_2d->SetDimension(2);
 
         CellPtr p_other_cell_2d(new Cell(p_state, p_other_model_2d));
@@ -329,17 +329,17 @@ public:
         TS_ASSERT_EQUALS(p_other_model_2d->ReadyToDivide(), false);
 
         // Divide the cells
-        Alarcon2004OxygenBasedCellCycleModel* p_model_1d_2 = static_cast<Alarcon2004OxygenBasedCellCycleModel*> (p_model_1d->CreateCellCycleModel());
+        Alarcon2004OxygenBasedPhaseBasedCellCycleModel* p_model_1d_2 = static_cast<Alarcon2004OxygenBasedPhaseBasedCellCycleModel*> (p_model_1d->CreateCellCycleModel());
         CellPtr p_cell_1d_2(new Cell(p_state, p_model_1d_2));
         p_cell_1d_2->SetCellProliferativeType(p_stem_type);
         p_cell_1d_2->GetCellData()->SetItem("oxygen", oxygen_concentration);
 
-        Alarcon2004OxygenBasedCellCycleModel* p_model_2d_2 = static_cast<Alarcon2004OxygenBasedCellCycleModel*> (p_model_2d->CreateCellCycleModel());
+        Alarcon2004OxygenBasedPhaseBasedCellCycleModel* p_model_2d_2 = static_cast<Alarcon2004OxygenBasedPhaseBasedCellCycleModel*> (p_model_2d->CreateCellCycleModel());
         CellPtr p_cell_2d_2(new Cell(p_state, p_model_2d_2));
         p_cell_2d_2->SetCellProliferativeType(p_stem_type);
         p_cell_2d_2->GetCellData()->SetItem("oxygen", oxygen_concentration);
 
-        Alarcon2004OxygenBasedCellCycleModel* p_model_3d_2 = static_cast<Alarcon2004OxygenBasedCellCycleModel*> (p_model_3d->CreateCellCycleModel());
+        Alarcon2004OxygenBasedPhaseBasedCellCycleModel* p_model_3d_2 = static_cast<Alarcon2004OxygenBasedPhaseBasedCellCycleModel*> (p_model_3d->CreateCellCycleModel());
         CellPtr p_cell_3d_2(new Cell(p_state, p_model_3d_2));
         p_cell_3d_2->SetCellProliferativeType(p_stem_type);
         p_cell_3d_2->GetCellData()->SetItem("oxygen", oxygen_concentration);
@@ -359,7 +359,7 @@ public:
         TS_ASSERT_THROWS_NOTHING(p_model_2d->ResetForDivision());
 
         // For coverage, create a 1D model
-        Alarcon2004OxygenBasedCellCycleModel* p_cell_model3 = new Alarcon2004OxygenBasedCellCycleModel();
+        Alarcon2004OxygenBasedPhaseBasedCellCycleModel* p_cell_model3 = new Alarcon2004OxygenBasedPhaseBasedCellCycleModel();
         p_cell_model3->SetDimension(1);
 
         CellPtr p_cell3(new Cell(p_state, p_cell_model3));
@@ -373,22 +373,22 @@ public:
         TS_ASSERT_EQUALS(p_cell_model3->ReadyToDivide(), false);
     }
 
-    void TestArchiveTysonNovakCellCycleModels()
+    void TestArchiveTysonNovakPhaseBasedCellCycleModels()
     {
         // Set up
         OutputFileHandler handler("archive", false);
-        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "TysonNovakCellCycleModel.arch";
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "TysonNovakPhaseBasedCellCycleModel.arch";
 
         {
             // We must set up SimulationTime to avoid memory leaks
             SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
             // As usual, we archive via a pointer to the most abstract class possible
-            AbstractCellCycleModel* const p_model = new TysonNovakCellCycleModel;
+            AbstractCellCycleModel* const p_model = new TysonNovakPhaseBasedCellCycleModel;
 
             p_model->SetDimension(3);
             p_model->SetBirthTime(-1.5);
-            static_cast<TysonNovakCellCycleModel*>(p_model)->SetDt(0.085);
+            static_cast<TysonNovakPhaseBasedCellCycleModel*>(p_model)->SetDt(0.085);
 
             // We must create a cell to be able to initialise the cell cycle model's ODE system
             MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
@@ -419,10 +419,10 @@ public:
 
             TS_ASSERT_EQUALS(p_model2->GetDimension(), 3u);
             TS_ASSERT_DELTA(p_model2->GetBirthTime(), -1.5, 1e-12);
-            TS_ASSERT_DELTA(static_cast<TysonNovakCellCycleModel*>(p_model2)->GetDt(), 0.085, 1e-3);
+            TS_ASSERT_DELTA(static_cast<TysonNovakPhaseBasedCellCycleModel*>(p_model2)->GetDt(), 0.085, 1e-3);
 
-            TysonNovakCellCycleModel* p_static_cast_model =
-                static_cast<TysonNovakCellCycleModel*>(p_model2);
+            TysonNovakPhaseBasedCellCycleModel* p_static_cast_model =
+                static_cast<TysonNovakPhaseBasedCellCycleModel*>(p_model2);
 
             TysonNovak2001OdeSystem* p_ode_system =
                 static_cast<TysonNovak2001OdeSystem*>(p_static_cast_model->GetOdeSystem());
@@ -434,10 +434,10 @@ public:
         }
     }
 
-    void TestArchiveAlarcon2004OxygenBasedCellCycleModels()
+    void TestArchiveAlarcon2004OxygenBasedPhaseBasedCellCycleModels()
     {
         OutputFileHandler handler("archive", false);
-        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "Alarcon2004OxygenBasedCellCycleModel.arch";
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "Alarcon2004OxygenBasedPhaseBasedCellCycleModel.arch";
 
         // Set up oxygen_concentration
         double oxygen_concentration = 1.0;
@@ -447,11 +447,11 @@ public:
             SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
             // As usual, we archive via a pointer to the most abstract class possible
-            AbstractCellCycleModel* const p_model = new Alarcon2004OxygenBasedCellCycleModel;
+            AbstractCellCycleModel* const p_model = new Alarcon2004OxygenBasedPhaseBasedCellCycleModel;
 
             p_model->SetDimension(1);
             p_model->SetBirthTime(-1.5);
-            static_cast<Alarcon2004OxygenBasedCellCycleModel*>(p_model)->SetDt(0.085);
+            static_cast<Alarcon2004OxygenBasedPhaseBasedCellCycleModel*>(p_model)->SetDt(0.085);
 
             // We must create a cell to be able to initialise the cell cycle model's ODE system
             MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
@@ -483,10 +483,10 @@ public:
 
             TS_ASSERT_EQUALS(p_model2->GetDimension(), 1u);
             TS_ASSERT_DELTA(p_model2->GetBirthTime(), -1.5, 1e-12);
-            TS_ASSERT_DELTA(static_cast<Alarcon2004OxygenBasedCellCycleModel*>(p_model2)->GetDt(), 0.085, 1e-3);
+            TS_ASSERT_DELTA(static_cast<Alarcon2004OxygenBasedPhaseBasedCellCycleModel*>(p_model2)->GetDt(), 0.085, 1e-3);
 
-            Alarcon2004OxygenBasedCellCycleModel* p_static_cast_model =
-                static_cast<Alarcon2004OxygenBasedCellCycleModel*>(p_model2);
+            Alarcon2004OxygenBasedPhaseBasedCellCycleModel* p_static_cast_model =
+                static_cast<Alarcon2004OxygenBasedPhaseBasedCellCycleModel*>(p_model2);
 
             Alarcon2004OxygenBasedCellCycleOdeSystem* p_ode_system =
                 static_cast<Alarcon2004OxygenBasedCellCycleOdeSystem*>(p_static_cast_model->GetOdeSystem());
@@ -504,9 +504,9 @@ public:
         std::string output_directory = "TestCellCycleModelOutputParameters";
         OutputFileHandler output_file_handler(output_directory, false);
 
-        // Test with Alarcon2004OxygenBasedCellCycleModel
-        Alarcon2004OxygenBasedCellCycleModel alarcon_oxygen_based_cell_cycle_model;
-        TS_ASSERT_EQUALS(alarcon_oxygen_based_cell_cycle_model.GetIdentifier(), "Alarcon2004OxygenBasedCellCycleModel");
+        // Test with Alarcon2004OxygenBasedPhaseBasedCellCycleModel
+        Alarcon2004OxygenBasedPhaseBasedCellCycleModel alarcon_oxygen_based_cell_cycle_model;
+        TS_ASSERT_EQUALS(alarcon_oxygen_based_cell_cycle_model.GetIdentifier(), "Alarcon2004OxygenBasedPhaseBasedCellCycleModel");
 
         out_stream alarcon_oxygen_based_parameter_file = output_file_handler.OpenOutputFile("alarcon_oxygen_based_results.parameters");
         alarcon_oxygen_based_cell_cycle_model.OutputCellCycleModelParameters(alarcon_oxygen_based_parameter_file);
@@ -520,9 +520,9 @@ public:
             TS_ASSERT(comparer.CompareFiles());
         }
 
-        // Test with TysonNovakCellCycleModel
-        TysonNovakCellCycleModel tyson_novak_based_cell_cycle_model;
-        TS_ASSERT_EQUALS(tyson_novak_based_cell_cycle_model.GetIdentifier(), "TysonNovakCellCycleModel");
+        // Test with TysonNovakPhaseBasedCellCycleModel
+        TysonNovakPhaseBasedCellCycleModel tyson_novak_based_cell_cycle_model;
+        TS_ASSERT_EQUALS(tyson_novak_based_cell_cycle_model.GetIdentifier(), "TysonNovakPhaseBasedCellCycleModel");
 
         out_stream tyson_novak_based_parameter_file = output_file_handler.OpenOutputFile("tyson_novak_based_results.parameters");
         tyson_novak_based_cell_cycle_model.OutputCellCycleModelParameters(tyson_novak_based_parameter_file);

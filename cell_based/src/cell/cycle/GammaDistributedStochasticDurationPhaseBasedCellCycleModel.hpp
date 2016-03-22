@@ -33,21 +33,27 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef STOCHASTICDURATIONGENERATIONBASEDCELLCYCLEMODEL_HPP_
-#define STOCHASTICDURATIONGENERATIONBASEDCELLCYCLEMODEL_HPP_
+#ifndef GAMMADISTRIBUTEDSTOCHASTICDURATIONPHASEBASEDCELLCYCLEMODEL_HPP_
+#define GAMMADISTRIBUTEDSTOCHASTICDURATIONPHASEBASEDCELLCYCLEMODEL_HPP_
 
-#include "AbstractSimpleGenerationBasedCellCycleModel.hpp"
+#include "AbstractSimplePhaseBasedCellCycleModel.hpp"
 #include "RandomNumberGenerator.hpp"
 
 /**
- * A stochastic cell-cycle model employed by Meineke et al (2001) in their off-lattice
- * model of the intestinal crypt (doi:10.1046/j.0960-7722.2001.00216.x).
+ * A stochastic cell-cycle model where cells keep dividing with a stochastic G1 duration
+ * drawn from a gamma distribution with specified shape and scale parameters.
  */
-class StochasticDurationGenerationBasedCellCycleModel : public AbstractSimpleGenerationBasedCellCycleModel
+class GammaDistributedStochasticDurationPhaseBasedCellCycleModel : public AbstractSimplePhaseBasedCellCycleModel
 {
-    friend class TestSimpleCellCycleModels;
+    friend class TestSimplePhaseBasedCellCycleModels;
 
 private:
+
+    /** The shape parameter of the gamma distribution. This must be a positive real number. */
+    double mShape;
+
+    /** The scale parameter of the gamma distribution. This must be a positive real number. */
+    double mScale;
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
@@ -60,21 +66,17 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractSimpleGenerationBasedCellCycleModel>(*this);
+        archive & boost::serialization::base_object<AbstractSimplePhaseBasedCellCycleModel>(*this);
 
         // Make sure the RandomNumberGenerator singleton gets saved too
         SerializableSingleton<RandomNumberGenerator>* p_wrapper = RandomNumberGenerator::Instance()->GetSerializationWrapper();
         archive & p_wrapper;
+
+        archive & mShape;
+        archive & mScale;
     }
 
 protected:
-
-    /**
-     * Stochastically set the G1 duration.  Called on cell creation at
-     * the start of a simulation, and for both parent and daughter
-     * cells at cell division.
-     */
-    void SetG1Duration();
 
     /**
      * Protected copy-constructor for use by CreateCellCycleModel.
@@ -89,26 +91,52 @@ protected:
      *
      * @param rModel the cell cycle model to copy.
      */
-    StochasticDurationGenerationBasedCellCycleModel(const StochasticDurationGenerationBasedCellCycleModel& rModel);
+    GammaDistributedStochasticDurationPhaseBasedCellCycleModel(const GammaDistributedStochasticDurationPhaseBasedCellCycleModel& rModel);
 
 public:
 
     /**
-     * Constructor - just a default, mBirthTime is now set in the AbstractCellCycleModel class.
-     * mG1Duration is set very high, it is set for the individual cells when InitialiseDaughterCell is called
+     * Constructor.
      */
-    StochasticDurationGenerationBasedCellCycleModel();
+    GammaDistributedStochasticDurationPhaseBasedCellCycleModel();
 
     /**
-     * Overridden builder method to create new copies of
-     * this cell-cycle model.
-     *
-     * @return new cell-cycle model
+     * Overridden SetG1Duration().
+     */
+    void SetG1Duration();
+
+    /**
+     * Overridden builder method to create new copies of this cell-cycle model.
+     * @return a pointer to the GammaDistributedStochasticDurationPhaseBasedCellCycleModel created.
      */
     AbstractCellCycleModel* CreateCellCycleModel();
 
     /**
-     * Outputs cell cycle model parameters to file.
+     * Set mShape.
+     *
+     * @param shape the value of the shape parameter
+     */
+    void SetShape(double shape);
+
+    /**
+     * @return mScale.
+     *
+     * @param scale the value of the scale parameter
+     */
+    void SetScale(double scale);
+
+    /**
+     * @return mShape.
+     */
+    double GetShape() const;
+
+    /**
+     * @return mScale.
+     */
+    double GetScale() const;
+
+    /**
+     * Overridden OutputCellCycleModelParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
@@ -117,6 +145,6 @@ public:
 
 #include "SerializationExportWrapper.hpp"
 // Declare identifier for the serializer
-CHASTE_CLASS_EXPORT(StochasticDurationGenerationBasedCellCycleModel)
+CHASTE_CLASS_EXPORT(GammaDistributedStochasticDurationPhaseBasedCellCycleModel)
 
-#endif /*STOCHASTICDURATIONGENERATIONBASEDCELLCYCLEMODEL_HPP_*/
+#endif /* GAMMADISTRIBUTEDSTOCHASTICDURATIONPHASEBASEDCELLCYCLEMODEL_HPP_ */

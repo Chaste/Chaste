@@ -137,7 +137,7 @@ public:
     void Initialise();
 
     /**
-     * Reset cell-cycle model by calling AbstractOdeBasedCellCycleModel::ResetForDivision()
+     * Reset cell-cycle model by calling AbstractOdeBasedPhaseBasedCellCycleModel::ResetForDivision()
      * and setting a new random G2 duration.
      */
     void ResetForDivision();

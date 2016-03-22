@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "OffLatticeSimulation.hpp"
 #include "DiscreteSystemForceCalculator.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "FixedDurationGenerationBasedPhaseBasedCellCycleModel.hpp"
 #include "CellsGenerator.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
@@ -63,7 +63,7 @@ public:
         MutableMesh<2,2>* p_mesh = mesh_generator.GetMesh();
         std::vector<unsigned> location_indices = mesh_generator.GetCellLocationIndices();
 
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel,2> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel,2> cells_generator;
         std::vector<CellPtr> cells;
         cells_generator.GenerateGivenLocationIndices(cells, location_indices);
 
@@ -152,7 +152,7 @@ public:
         HoneycombMeshGenerator mesh_generator(7, 5, 0, 2.0);
         MutableMesh<2,2>* p_mesh = mesh_generator.GetMesh();
 
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 2> cells_generator;
         std::vector<CellPtr> cells;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
@@ -221,7 +221,7 @@ public:
         HoneycombMeshGenerator mesh_generator(7, 5, 0, 2.0);
         MutableMesh<2,2>* p_mesh = mesh_generator.GetMesh();
 
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 2> cells_generator;
         std::vector<CellPtr> cells;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 

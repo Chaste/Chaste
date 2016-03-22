@@ -33,28 +33,25 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef ABSTRACTSIMPLECELLCYCLEMODEL_HPP_
-#define ABSTRACTSIMPLECELLCYCLEMODEL_HPP_
+#ifndef ABSTRACTSIMPLEGENERATIONBASEDCYCLEMODEL_HPP_
+#define ABSTRACTSIMPLEGENERATIONBASEDCYCLEMODEL_HPP_
 
 #include "ChasteSerialization.hpp"
 #include "ClassIsAbstract.hpp"
 #include <boost/serialization/base_object.hpp>
 
-#include "AbstractCellCycleModel.hpp"
+#include "AbstractSimplePhaseBasedCellCycleModel.hpp"
 
 /**
- * This class contains all the functionality shared by 'simple' cell-cycle models,
- * where the duration of each cell cycle phase is determined when the cell-cycle
- * model is created. Note that whether or not the cell should actually divide may
- * still depend on further conditions in subclasses; for example, the cell may only
- * divide if the local concentration of a signalling molecule is sufficiently high/
+ * This class contains all the things common to simple generation-based cell cycle
+ * models, i.e. models in which the length of cell cycle phases are determined
+ * when the cell-cycle model is created, rather than evaluated 'on the fly'
+ * by ODEs and suchlike, and in which each cell has a 'generation'.
  *
- * This class of cell-cycle models is distinct from 'ODE-based' cell-cycle models,
- * where the duration of one or more cell cycle phases are evaluated 'on the fly'
- * as the cell ages, according to a system of ordinary differential equations (ODEs)
- * governing (for example) the concentrations of key intracellular proteins.
+ * N.B. Whether or not the cell should actually divide may depend on
+ * Wnt / Oxygen etc. in subclasses.
  */
-class AbstractSimpleCellCycleModel : public AbstractCellCycleModel
+class AbstractSimpleGenerationBasedPhaseBasedCellCycleModel : public AbstractSimplePhaseBasedCellCycleModel
 {
 private:
 
@@ -69,17 +66,19 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractCellCycleModel>(*this);
+        archive & boost::serialization::base_object<AbstractSimplePhaseBasedCellCycleModel>(*this);
+        archive & mGeneration;
+        archive & mMaxTransitGenerations;
     }
 
 protected:
 
-    /**
-     * Subclasses can override this function if they wish, this just
-     * allocates the default values for each of the different cell
-     * types' G1 durations as defined in AbstractCellCycleModel.
-     */
-    virtual void SetG1Duration();
+    /** The generation of this cell (cells with a StemCellProliferativeType have a generation of 0) */
+    unsigned mGeneration;
+
+    /** How many generations a transit cell lives for before becoming fully differentiated. */
+    unsigned mMaxTransitGenerations;
+
 
     /**
      * Protected copy-constructor for use by CreateCellCycleModel.
@@ -94,29 +93,22 @@ protected:
      *
      * @param rModel the cell cycle model to copy.
      */
-    AbstractSimpleCellCycleModel(const AbstractSimpleCellCycleModel& rModel);
+    AbstractSimpleGenerationBasedPhaseBasedCellCycleModel(const AbstractSimpleGenerationBasedPhaseBasedCellCycleModel& rModel);
 
 public:
 
     /**
-     * Default constructor - creates an AbstractSimpleCellCycleModel.
+     * Default constructor - creates an AbstractSimplePhaseBasedCellCycleModel.
      */
-    AbstractSimpleCellCycleModel();
+    AbstractSimpleGenerationBasedPhaseBasedCellCycleModel();
 
     /**
      * Destructor.
      */
-    virtual ~AbstractSimpleCellCycleModel();
+    virtual ~AbstractSimpleGenerationBasedPhaseBasedCellCycleModel();
 
-    /** See AbstractCellCycleModel::ResetForDivision() */
-    virtual void ResetForDivision();
-
-    /**
-     * Default UpdateCellCyclePhase() method for a simple cell-cycle model.
-     *
-     * Can be overridden if they should do something more subtle.
-     */
-    virtual void UpdateCellCyclePhase();
+    /** Overridden ResetForDivision() method. */
+    void ResetForDivision();
 
     /**
      * Set the new cell's G1 duration once it has been created after division.
@@ -124,8 +116,29 @@ public:
      */
     void InitialiseDaughterCell();
 
-    /** See AbstractCellCycleModel::Initialise() */
-    virtual void Initialise();
+    /**
+     * Sets the cell's generation.
+     *
+     * @param generation the cell's generation
+     */
+    void SetGeneration(unsigned generation);
+
+    /**
+     * @return the cell's generation.
+     */
+    unsigned GetGeneration() const;
+
+    /**
+     * Set mMaxTransitGenerations.
+     *
+     * @param maxTransitGenerations the new value of mMaxTransitGenerations
+     */
+    void SetMaxTransitGenerations(unsigned maxTransitGenerations);
+
+    /**
+     * @return mMaxTransitGenerations
+     */
+    unsigned GetMaxTransitGenerations() const;
 
     /**
      * Outputs cell cycle model parameters to file.
@@ -135,6 +148,6 @@ public:
     virtual void OutputCellCycleModelParameters(out_stream& rParamsFile);
 };
 
-CLASS_IS_ABSTRACT(AbstractSimpleCellCycleModel)
+CLASS_IS_ABSTRACT(AbstractSimpleGenerationBasedPhaseBasedCellCycleModel)
 
-#endif /*ABSTRACTSIMPLECELLCYCLEMODEL_HPP_*/
+#endif /*ABSTRACTSIMPLEGENERATIONBASEDCYCLEMODEL_HPP_*/

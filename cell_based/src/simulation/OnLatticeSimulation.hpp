@@ -48,7 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * The OnLatticeSimulation is constructed with a CellPopulation, which
  * updates the correspondence between each Cell and its spatial representation
- * and handles cell division (governed by the CellCycleModel associated
+ * and handles cell division (governed by the PhaseBasedCellCycleModel associated
  * with each cell). Once constructed, one or more Update rules may be passed
  * to the OnLatticeSimulation object, to define the processes which update
  * cells in the CellPopulation. Similarly, one or more CellKillers may be passed

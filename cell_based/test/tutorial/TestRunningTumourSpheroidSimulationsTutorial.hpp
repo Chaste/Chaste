@@ -84,7 +84,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "RandomNumberGenerator.hpp"
 #include "SmartPointers.hpp"
 /*
- * The {{{SimpleOxygenBasedCellCycleModel}}} header file defines a cell-cycle model in which
+ * The {{{SimpleOxygenBasedPhaseBasedCellCycleModel}}} header file defines a cell-cycle model in which
  * a cell's rate of progress through G1 phase changes over time in a simple manner, according
  * to the local oxygen concentration. We also include the {{{WildTypeCellMutationState}}}
  * header file, which defines a wild type cell mutation state that we will use to construct
@@ -92,7 +92,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * in earlier simulation tutorial we used a helper classes (({{{CellsGenerator}}} and {{{CryptCellsGenerator}}}) that
  * allowed us to avoid having to construct cells directly.
  */
-#include "SimpleOxygenBasedCellCycleModel.hpp"
+#include "SimpleOxygenBasedPhaseBasedCellCycleModel.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "StemCellProliferativeType.hpp"
 /*
@@ -162,10 +162,10 @@ public:
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
             /*
-             * ...then create a cell, giving it a {{{SimpleOxygenBasedCellCycleModel}}}.
+             * ...then create a cell, giving it a {{{SimpleOxygenBasedPhaseBasedCellCycleModel}}}.
              * The spatial dimension (1, 2 or 3) needs to be set on the cell-cycle model before it is passed to the cell.
              */
-            SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel;
+            SimpleOxygenBasedPhaseBasedCellCycleModel* p_model = new SimpleOxygenBasedPhaseBasedCellCycleModel;
             p_model->SetDimension(2);
             CellPtr p_cell(new Cell(p_state, p_model));
             p_cell->SetCellProliferativeType(p_stem_type);

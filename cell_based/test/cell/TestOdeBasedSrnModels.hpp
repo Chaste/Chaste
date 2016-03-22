@@ -47,10 +47,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NullSrnModel.hpp"
 #include "DeltaNotchSrnModel.hpp"
 #include "Goldbeter1991SrnModel.hpp"
-#include "StochasticDurationGenerationBasedCellCycleModel.hpp"
+#include "StochasticDurationGenerationBasedPhaseBasedCellCycleModel.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "OutputFileHandler.hpp"
-#include "StochasticDurationCellCycleModel.hpp"
+#include "StochasticDurationPhaseBasedCellCycleModel.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "TransitCellProliferativeType.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
@@ -76,7 +76,7 @@ public:
         starter_conditions.push_back(0.5);
         p_srn_model->SetInitialConditions(starter_conditions);
 
-        StochasticDurationGenerationBasedCellCycleModel* p_cc_model = new StochasticDurationGenerationBasedCellCycleModel();
+        StochasticDurationGenerationBasedPhaseBasedCellCycleModel* p_cc_model = new StochasticDurationGenerationBasedPhaseBasedCellCycleModel();
 
         MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
@@ -143,7 +143,7 @@ public:
             SimulationTime* p_simulation_time = SimulationTime::Instance();
             p_simulation_time->SetEndTimeAndNumberOfTimeSteps(2.0, 4);
 
-            StochasticDurationCellCycleModel* p_cc_model = new StochasticDurationCellCycleModel();
+            StochasticDurationPhaseBasedCellCycleModel* p_cc_model = new StochasticDurationPhaseBasedCellCycleModel();
 
             // As usual, we archive via a pointer to the most abstract class possible
             AbstractSrnModel* p_srn_model = new DeltaNotchSrnModel;
@@ -202,7 +202,7 @@ public:
         starter_conditions.push_back(0.7);
         p_srn_model->SetInitialConditions(starter_conditions);
 
-        StochasticDurationGenerationBasedCellCycleModel* p_cc_model = new StochasticDurationGenerationBasedCellCycleModel();
+        StochasticDurationGenerationBasedPhaseBasedCellCycleModel* p_cc_model = new StochasticDurationGenerationBasedPhaseBasedCellCycleModel();
 
         MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
@@ -273,7 +273,7 @@ public:
             SimulationTime* p_simulation_time = SimulationTime::Instance();
             p_simulation_time->SetEndTimeAndNumberOfTimeSteps(end_time, 100);
 
-            StochasticDurationCellCycleModel* p_cc_model = new StochasticDurationCellCycleModel();
+            StochasticDurationPhaseBasedCellCycleModel* p_cc_model = new StochasticDurationPhaseBasedCellCycleModel();
 
             // As usual, we archive via a pointer to the most abstract class possible
             AbstractSrnModel* p_srn_model = new Goldbeter1991SrnModel;

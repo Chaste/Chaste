@@ -33,35 +33,48 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef FIXEDDURATIONGENERATIONBASEDCELLCYCLEMODEL_HPP_
-#define FIXEDDURATIONGENERATIONBASEDCELLCYCLEMODEL_HPP_
+#ifndef ALARCON2004OXYGENBASEDPHASEBASEDCELLCYCLEMODEL_HPP_
+#define ALARCON2004OXYGENBASEDPHASEBASEDCELLCYCLEMODEL_HPP_
 
-#include "AbstractSimpleGenerationBasedCellCycleModel.hpp"
+#include "ChasteSerialization.hpp"
+#include <boost/serialization/base_object.hpp>
+
+#include <vector>
+
+#include "AbstractOdeBasedPhaseBasedCellCycleModel.hpp"
+#include "Alarcon2004OxygenBasedCellCycleOdeSystem.hpp"
 
 /**
- *  Fixed cell-cycle model.
+ * Oxygen-dependent ODE-based cell-cycle model.
  *
- *  Cell cycle time is deterministic for stem and transit cells (with values
- *  StemCellG1Duration + SG2MDuration
- *  and TransitCellG1Duration + SG2MDuration (values found in AbstractCellCycleModel))
+ *
+ *
+ * Published by Alarcon et al. (doi:10.1016/j.jtbi.2004.04.016).
  */
-class FixedDurationGenerationBasedCellCycleModel : public AbstractSimpleGenerationBasedCellCycleModel
+class Alarcon2004OxygenBasedPhaseBasedCellCycleModel : public AbstractOdeBasedPhaseBasedCellCycleModel
 {
 private:
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
-     * Archive the cell-cycle model, never used directly - boost uses this.
+     * Archive the cell-cycle model and ODE system.
      *
      * @param archive the archive
-     * @param version the current version of this class
+     * @param version the archive version
      */
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractSimpleGenerationBasedCellCycleModel>(*this);
+        archive & boost::serialization::base_object<AbstractOdeBasedPhaseBasedCellCycleModel>(*this);
     }
+
+    /**
+     * Adjust any ODE parameters needed before solving until currentTime.
+     *
+     * @param currentTime  the time up to which the system will be solved.
+     */
+    void AdjustOdeParameters(double currentTime);
 
 protected:
 
@@ -78,35 +91,55 @@ protected:
      *
      * @param rModel the cell cycle model to copy.
      */
-    FixedDurationGenerationBasedCellCycleModel(const FixedDurationGenerationBasedCellCycleModel& rModel);
+    Alarcon2004OxygenBasedPhaseBasedCellCycleModel(const Alarcon2004OxygenBasedPhaseBasedCellCycleModel& rModel);
 
 public:
 
     /**
-     * Default constructor. Note that mBirthTime is set in
-     * AbstractCellCycleModel() and mG1Duration is set in
-     * AbstractSimpleCellCycleModel().
+     * Default constructor.
+     *
+     * @param pOdeSolver An optional pointer to a cell-cycle model ODE solver object (allows the use of different ODE solvers)
      */
-    FixedDurationGenerationBasedCellCycleModel();
+    Alarcon2004OxygenBasedPhaseBasedCellCycleModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver = boost::shared_ptr<AbstractCellCycleModelOdeSolver>());
+
+    /**
+     * Resets the oxygen-based model to the start of the cell cycle
+     * (this model does not cycle naturally). Cells are given a new
+     * birth time and cell cycle proteins are reset. Note that the
+     * oxygen concentration maintains its current value.
+     *
+     * Should only be called by the Cell Divide() method.
+     */
+    virtual void ResetForDivision();
 
     /**
      * Overridden builder method to create new copies of
      * this cell-cycle model.
      *
      * @return new cell-cycle model
+     *
      */
     AbstractCellCycleModel* CreateCellCycleModel();
 
     /**
-     * Outputs cell cycle model parameters to file.
+     * Initialise the cell-cycle model at the start of a simulation.
+     *
+     * This overridden method sets up a new ODE system.
+     */
+    void Initialise();
+
+    /**
+     * Outputs cell cycle model parameters to files.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
     virtual void OutputCellCycleModelParameters(out_stream& rParamsFile);
 };
 
-#include "SerializationExportWrapper.hpp"
 // Declare identifier for the serializer
-CHASTE_CLASS_EXPORT(FixedDurationGenerationBasedCellCycleModel)
+#include "SerializationExportWrapper.hpp"
+CHASTE_CLASS_EXPORT(Alarcon2004OxygenBasedPhaseBasedCellCycleModel)
+#include "CellCycleModelOdeSolverExportWrapper.hpp"
+EXPORT_CELL_CYCLE_MODEL_ODE_SOLVER(Alarcon2004OxygenBasedPhaseBasedCellCycleModel)
 
-#endif /*FIXEDDURATIONGENERATIONBASEDCELLCYCLEMODEL_HPP_*/
+#endif /*ALARCON2004OXYGENBASEDPHASEBASEDCELLCYCLEMODEL_HPP_*/

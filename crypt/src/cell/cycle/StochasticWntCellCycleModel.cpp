@@ -83,7 +83,7 @@ void StochasticWntCellCycleModel::GenerateStochasticG2Duration()
 {
     RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
 
-    double mean = AbstractCellCycleModel::GetG2Duration();
+    double mean = AbstractPhaseBasedCellCycleModel::GetG2Duration();
     double standard_deviation = 0.9;
     mStochasticG2Duration = p_gen->NormalRandomDeviate(mean, standard_deviation);
 

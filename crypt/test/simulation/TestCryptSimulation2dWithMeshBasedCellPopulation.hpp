@@ -58,7 +58,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "BetaCateninOneHitCellMutationState.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "WntCellCycleModel.hpp"
-#include "TysonNovakCellCycleModel.hpp"
+#include "TysonNovakPhaseBasedCellCycleModel.hpp"
 #include "CellLabel.hpp"
 #include "CellId.hpp"
 #include "CellPropertyRegistry.hpp"
@@ -150,7 +150,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
 
         // Create a node based cell population
@@ -187,7 +187,7 @@ public:
 
         // Set up cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel> cells_generator;
 
         cells_generator.Generate(cells, &mesh, std::vector<unsigned>(), false, 0.0, 3.0, 6.5, 8.0);
 
@@ -253,7 +253,7 @@ public:
 
        // Set up cells
        std::vector<CellPtr> cells;
-       CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
+       CryptCellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel> cells_generator;
        cells_generator.Generate(cells, p_mesh, location_indices, true);
 
        // Create cell population
@@ -326,7 +326,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, location_indices, true);
 
         // Create cell population
@@ -417,7 +417,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, location_indices, true);// true = mature cells
 
         // Create cell population
@@ -491,7 +491,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, location_indices, true); // true = mature cells
 
         for (unsigned i=0; i<cells.size(); i++)
@@ -783,7 +783,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, location_indices, true);
 
         // Create cell population
@@ -858,7 +858,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, location_indices, true);
 
         // Create cell population
@@ -1097,7 +1097,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, location_indices, true);// true = mature cells
 
         for (unsigned i=0; i<cells.size(); i++)
@@ -1154,7 +1154,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<TysonNovakCellCycleModel> cells_generator;
+        CryptCellsGenerator<TysonNovakPhaseBasedCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, location_indices, true);
 
         // Create cell population
@@ -1213,7 +1213,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel> cells_generator;
         cells_generator.Generate(cells, &mesh, std::vector<unsigned>(), false, 0.0, 3.0, 6.5, 8.0);
 
         cells[60]->SetBirthTime(-50.0);
@@ -1254,7 +1254,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> conf_cells;
-        CryptCellsGenerator<TysonNovakCellCycleModel> cells_generator;
+        CryptCellsGenerator<TysonNovakPhaseBasedCellCycleModel> cells_generator;
         cells_generator.Generate(conf_cells, &conf_mesh, std::vector<unsigned>(), true);
 
         // Create cell population
@@ -1291,7 +1291,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> conf_cells;
-        CryptCellsGenerator<TysonNovakCellCycleModel> cells_generator;
+        CryptCellsGenerator<TysonNovakPhaseBasedCellCycleModel> cells_generator;
         cells_generator.Generate(conf_cells, &conf_mesh, std::vector<unsigned>(), true);
 
         // Create cell population
@@ -1334,7 +1334,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cyl_cells;
-        CryptCellsGenerator<TysonNovakCellCycleModel> cells_generator;
+        CryptCellsGenerator<TysonNovakPhaseBasedCellCycleModel> cells_generator;
         cells_generator.Generate(cyl_cells, &cyl_mesh, std::vector<unsigned>(), true);
 
         // Create cell population
@@ -1365,7 +1365,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cyl_cells;
-        CryptCellsGenerator<TysonNovakCellCycleModel> cells_generator;
+        CryptCellsGenerator<TysonNovakPhaseBasedCellCycleModel> cells_generator;
         cells_generator.Generate(cyl_cells, &cyl_mesh, std::vector<unsigned>(), true);
 
         // Create cell population
@@ -1409,7 +1409,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);// true = mature cells
 
         // Create cell population
@@ -1463,7 +1463,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, location_indices, true);
 
         // Create cell population
@@ -1503,7 +1503,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
 
         // Create cell population
@@ -1553,7 +1553,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
         TS_ASSERT_EQUALS(cells.size(), 16u);
 
@@ -1563,8 +1563,8 @@ public:
         cells[2]->SetMutationState(CellPropertyRegistry::Instance()->Get<ApcTwoHitCellMutationState>());
         cells[3]->SetMutationState(CellPropertyRegistry::Instance()->Get<BetaCateninOneHitCellMutationState>());
         cells[4]->AddCellProperty(CellPropertyRegistry::Instance()->Get<CellLabel>());
-        cells[2]->SetBirthTime(1.5-(cells[2]->GetCellCycleModel()->GetStemCellG1Duration()
-                                   + cells[2]->GetCellCycleModel()->GetSG2MDuration()));
+        cells[2]->SetBirthTime(1.5-(static_cast<FixedDurationGenerationBasedPhaseBasedCellCycleModel*>(cells[2]->GetCellCycleModel())->GetStemCellG1Duration()
+                                   + static_cast<FixedDurationGenerationBasedPhaseBasedCellCycleModel*>(cells[2]->GetCellCycleModel())->GetSG2MDuration()));
 
         // Create cell population
         MeshBasedCellPopulationWithGhostNodes<2> crypt(*p_mesh, cells, location_indices);
@@ -1823,7 +1823,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<FixedDurationGenerationBasedPhaseBasedCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, location_indices, true);// true = mature cells
 
         // Create cell population
@@ -1872,7 +1872,7 @@ public:
 
         // Set up cells
         std::vector<CellPtr> temp_cells;
-        CryptCellsGenerator<StochasticDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<StochasticDurationGenerationBasedPhaseBasedCellCycleModel> cells_generator;
         cells_generator.Generate(temp_cells, p_mesh, std::vector<unsigned>(), true, 0.3, 2.0, 3.0, 4.0, true);
 
         // This awkward way of setting up the cells is a result of #430

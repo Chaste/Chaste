@@ -122,7 +122,7 @@ public:
     {
         /*
          * This test is an abstraction of archiving a cyclically linked parent-child pair.
-         * The parent represents a Cell and the child represents an AbstractCellCycleModel.
+         * The parent represents a Cell and the child represents an AbstractPhaseBasedCellCycleModel.
          */
 
         OutputFileHandler handler("archive",false);

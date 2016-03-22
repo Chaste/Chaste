@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Cell.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "TransitCellProliferativeType.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "FixedDurationGenerationBasedPhaseBasedCellCycleModel.hpp"
 #include "Goldbeter1991SrnModel.hpp"
 #include "SmartPointers.hpp"
 #include "TransitCellProliferativeType.hpp"
@@ -71,7 +71,7 @@ public:
         boost::shared_ptr<AbstractCellProperty> p_transit_type(CellPropertyRegistry::Instance()->Get<TransitCellProliferativeType>());
 
         // Create a cell-cycle model
-        FixedDurationGenerationBasedCellCycleModel* p_cell_model = new FixedDurationGenerationBasedCellCycleModel();
+        FixedDurationGenerationBasedPhaseBasedCellCycleModel* p_cell_model = new FixedDurationGenerationBasedPhaseBasedCellCycleModel();
         Goldbeter1991SrnModel* p_srn_model = new Goldbeter1991SrnModel();
         CellPtr p_tn_cell(new Cell(p_healthy_state, p_cell_model, p_srn_model, false, CellPropertyCollection()));
         p_tn_cell->SetCellProliferativeType(p_transit_type);

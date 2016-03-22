@@ -45,10 +45,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CryptSimulation1d.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
 #include "SloughingCellKiller.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
-#include "StochasticDurationGenerationBasedCellCycleModel.hpp"
+#include "FixedDurationGenerationBasedPhaseBasedCellCycleModel.hpp"
+#include "StochasticDurationGenerationBasedPhaseBasedCellCycleModel.hpp"
 #include "WntCellCycleModel.hpp"
-#include "TysonNovakCellCycleModel.hpp"
+#include "TysonNovakPhaseBasedCellCycleModel.hpp"
 #include "ApcOneHitCellMutationState.hpp"
 #include "BetaCateninOneHitCellMutationState.hpp"
 #include "CellLabel.hpp"
@@ -89,7 +89,7 @@ public:
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         for (unsigned node_index=0; node_index<mesh.GetNumNodes(); node_index++)
         {
-            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+            FixedDurationGenerationBasedPhaseBasedCellCycleModel* p_model = new FixedDurationGenerationBasedPhaseBasedCellCycleModel();
             CellPtr p_cell(new Cell(p_healthy_state, p_model));
             p_cell->SetCellProliferativeType(p_diff_type);
             double birth_time = 0.0 - node_index;
@@ -154,7 +154,7 @@ public:
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         for (unsigned node_index=0; node_index<mesh.GetNumNodes(); node_index++)
         {
-            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+            FixedDurationGenerationBasedPhaseBasedCellCycleModel* p_model = new FixedDurationGenerationBasedPhaseBasedCellCycleModel();
             CellPtr p_cell(new Cell(p_healthy_state, p_model));
             p_cell->SetCellProliferativeType(p_diff_type);
             double birth_time = 0.0 - node_index;
@@ -220,7 +220,7 @@ public:
         std::vector<CellPtr> cells;
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            StochasticDurationGenerationBasedCellCycleModel* p_model = new StochasticDurationGenerationBasedCellCycleModel();
+            StochasticDurationGenerationBasedPhaseBasedCellCycleModel* p_model = new StochasticDurationGenerationBasedPhaseBasedCellCycleModel();
 
             double birth_time = 0;
             if (i == 0)
@@ -329,7 +329,7 @@ public:
                 birth_time = -1.0;
             }
 
-            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+            FixedDurationGenerationBasedPhaseBasedCellCycleModel* p_model = new FixedDurationGenerationBasedPhaseBasedCellCycleModel();
 
             CellPtr p_cell(new Cell(p_healthy_state, p_model));
             p_cell->SetCellProliferativeType(p_stem_type);
@@ -391,7 +391,7 @@ public:
         std::vector<CellPtr> cells;
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            StochasticDurationGenerationBasedCellCycleModel* p_model = new StochasticDurationGenerationBasedCellCycleModel();
+            StochasticDurationGenerationBasedPhaseBasedCellCycleModel* p_model = new StochasticDurationGenerationBasedPhaseBasedCellCycleModel();
 
             CellPtr p_cell(new Cell(p_healthy_state, p_model));
 
@@ -484,7 +484,7 @@ public:
 
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            TysonNovakCellCycleModel* p_model = new TysonNovakCellCycleModel();
+            TysonNovakPhaseBasedCellCycleModel* p_model = new TysonNovakPhaseBasedCellCycleModel();
 
             // For Tyson-Novak cells
             p_model->SetStemCellG1Duration(0.12);
@@ -530,7 +530,7 @@ public:
         MAKE_PTR(GeneralisedLinearSpringForce<1>, p_linear_force);
 
         // Set the MeinekeSpringGrowthDuration to be the default MPhase Duration
-        p_linear_force->SetMeinekeSpringGrowthDuration(crypt.rGetCells().front()->GetCellCycleModel()->GetMDuration());
+        p_linear_force->SetMeinekeSpringGrowthDuration(static_cast<TysonNovakPhaseBasedCellCycleModel*>(crypt.rGetCells().front()->GetCellCycleModel())->GetMDuration());
 
         simulator.AddForce(p_linear_force);
 
@@ -575,7 +575,7 @@ public:
         std::vector<CellPtr> cells;
         for (unsigned i=0; i<num_cells; i++)
         {
-            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+            FixedDurationGenerationBasedPhaseBasedCellCycleModel* p_model = new FixedDurationGenerationBasedPhaseBasedCellCycleModel();
             CellPtr p_cell(new Cell(p_healthy_state, p_model));
 
             unsigned generation = 4;
@@ -784,7 +784,7 @@ public:
         std::vector<CellPtr> cells;
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+            FixedDurationGenerationBasedPhaseBasedCellCycleModel* p_model = new FixedDurationGenerationBasedPhaseBasedCellCycleModel();
 
             CellPtr p_cell(new Cell(p_healthy_state, p_model));
 
@@ -933,7 +933,7 @@ public:
         std::vector<CellPtr> cells;
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            StochasticDurationGenerationBasedCellCycleModel* p_model = new StochasticDurationGenerationBasedCellCycleModel();
+            StochasticDurationGenerationBasedPhaseBasedCellCycleModel* p_model = new StochasticDurationGenerationBasedPhaseBasedCellCycleModel();
             CellPtr p_cell(new Cell(p_healthy_state, p_model));
 
             unsigned generation;

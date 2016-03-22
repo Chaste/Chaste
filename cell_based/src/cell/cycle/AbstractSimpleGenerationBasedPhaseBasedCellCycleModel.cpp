@@ -33,24 +33,24 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "AbstractSimpleGenerationBasedCellCycleModel.hpp"
+#include "AbstractSimpleGenerationBasedPhaseBasedCellCycleModel.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 #include "StemCellProliferativeType.hpp"
 #include "TransitCellProliferativeType.hpp"
 
-AbstractSimpleGenerationBasedCellCycleModel::AbstractSimpleGenerationBasedCellCycleModel()
-    : AbstractSimpleCellCycleModel(),
+AbstractSimpleGenerationBasedPhaseBasedCellCycleModel::AbstractSimpleGenerationBasedPhaseBasedCellCycleModel()
+    : AbstractSimplePhaseBasedCellCycleModel(),
       mGeneration(0),
       mMaxTransitGenerations(3) // taken from Meineke et al, 2001 (doi:10.1046/j.0960-7722.2001.00216.x)
 {
 }
 
-AbstractSimpleGenerationBasedCellCycleModel::~AbstractSimpleGenerationBasedCellCycleModel()
+AbstractSimpleGenerationBasedPhaseBasedCellCycleModel::~AbstractSimpleGenerationBasedPhaseBasedCellCycleModel()
 {
 }
 
-AbstractSimpleGenerationBasedCellCycleModel::AbstractSimpleGenerationBasedCellCycleModel(const AbstractSimpleGenerationBasedCellCycleModel& rModel)
-    : AbstractSimpleCellCycleModel(rModel),
+AbstractSimpleGenerationBasedPhaseBasedCellCycleModel::AbstractSimpleGenerationBasedPhaseBasedCellCycleModel(const AbstractSimpleGenerationBasedPhaseBasedCellCycleModel& rModel)
+    : AbstractSimplePhaseBasedCellCycleModel(rModel),
       mGeneration(rModel.mGeneration),
       mMaxTransitGenerations(rModel.mMaxTransitGenerations)
 {
@@ -71,7 +71,7 @@ AbstractSimpleGenerationBasedCellCycleModel::AbstractSimpleGenerationBasedCellCy
      */
 }
 
-void AbstractSimpleGenerationBasedCellCycleModel::ResetForDivision()
+void AbstractSimpleGenerationBasedPhaseBasedCellCycleModel::ResetForDivision()
 {
     mGeneration++;
     if (mGeneration > mMaxTransitGenerations)
@@ -93,10 +93,10 @@ void AbstractSimpleGenerationBasedCellCycleModel::ResetForDivision()
     {
         mGeneration = 0;
     }
-    AbstractSimpleCellCycleModel::ResetForDivision();
+    AbstractSimplePhaseBasedCellCycleModel::ResetForDivision();
 }
 
-void AbstractSimpleGenerationBasedCellCycleModel::InitialiseDaughterCell()
+void AbstractSimpleGenerationBasedPhaseBasedCellCycleModel::InitialiseDaughterCell()
 {
     /*
      * If the parent cell is a stem cell then its generation was reset
@@ -121,33 +121,33 @@ void AbstractSimpleGenerationBasedCellCycleModel::InitialiseDaughterCell()
             mpCell->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<DifferentiatedCellProliferativeType>();
         mpCell->SetCellProliferativeType(p_diff_type);
     }
-    AbstractSimpleCellCycleModel::InitialiseDaughterCell();
+    AbstractSimplePhaseBasedCellCycleModel::InitialiseDaughterCell();
 }
 
-void AbstractSimpleGenerationBasedCellCycleModel::SetGeneration(unsigned generation)
+void AbstractSimpleGenerationBasedPhaseBasedCellCycleModel::SetGeneration(unsigned generation)
 {
     mGeneration = generation;
 }
 
-unsigned AbstractSimpleGenerationBasedCellCycleModel::GetGeneration() const
+unsigned AbstractSimpleGenerationBasedPhaseBasedCellCycleModel::GetGeneration() const
 {
     return mGeneration;
 }
 
-void AbstractSimpleGenerationBasedCellCycleModel::SetMaxTransitGenerations(unsigned maxTransitGenerations)
+void AbstractSimpleGenerationBasedPhaseBasedCellCycleModel::SetMaxTransitGenerations(unsigned maxTransitGenerations)
 {
     mMaxTransitGenerations = maxTransitGenerations;
 }
 
-unsigned AbstractSimpleGenerationBasedCellCycleModel::GetMaxTransitGenerations() const
+unsigned AbstractSimpleGenerationBasedPhaseBasedCellCycleModel::GetMaxTransitGenerations() const
 {
     return mMaxTransitGenerations;
 }
 
-void AbstractSimpleGenerationBasedCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
+void AbstractSimpleGenerationBasedPhaseBasedCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<MaxTransitGenerations>" << mMaxTransitGenerations << "</MaxTransitGenerations>\n";
 
     // Call method on direct parent class
-    AbstractSimpleCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
+    AbstractSimplePhaseBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
 }
