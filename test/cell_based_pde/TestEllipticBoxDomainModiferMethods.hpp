@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellBasedWithTimingsTestSuite.hpp"
 #include "EllipticBoxDomainPdeModifier.hpp"
 #include "AveragedSourcePde.hpp"
-#include "StochasticDurationCellCycleModel.hpp"
+#include "StochasticDurationPhaseBasedCellCycleModel.hpp"
 #include "ApoptoticCellProperty.hpp"
 #include "CellsGenerator.hpp"
 #include "MeshBasedCellPopulation.hpp"
@@ -75,7 +75,7 @@ public:
 
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_differentiated_type);
-        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+        CellsGenerator<StochasticDurationPhaseBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), p_differentiated_type);
 
         // Make cells with x<5.0 appoptotic (so no source term)
@@ -134,7 +134,7 @@ public:
 
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_differentiated_type);
-        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+        CellsGenerator<StochasticDurationPhaseBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), p_differentiated_type);
 
         // Make cells with x<5.0 appoptotic (so no source term)
@@ -189,7 +189,7 @@ public:
 
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_differentiated_type);
-        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+        CellsGenerator<StochasticDurationPhaseBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_differentiated_type);
 
         // Make cells with x<5.0 appoptotic (so no source term)
@@ -243,7 +243,7 @@ public:
 
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_differentiated_type);
-        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+        CellsGenerator<StochasticDurationPhaseBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_differentiated_type);
 
         // Make cells with x<5.0 appoptotic (so no source term)
@@ -305,7 +305,7 @@ public:
 
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_differentiated_type);
-        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+        CellsGenerator<StochasticDurationPhaseBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, location_indices.size(), p_differentiated_type);
 
         // Make cells with x<5.0 appoptotic (so no source term)
