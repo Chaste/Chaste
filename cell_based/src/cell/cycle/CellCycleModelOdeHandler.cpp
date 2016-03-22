@@ -52,6 +52,14 @@ CellCycleModelOdeHandler::~CellCycleModelOdeHandler()
     }
 }
 
+CellCycleModelOdeHandler::CellCycleModelOdeHandler(const CellCycleModelOdeHandler& rHandler)
+    :   mDt(rHandler.mDt),
+        mpOdeSystem(rHandler.mpOdeSystem),
+        mpOdeSolver(rHandler.mpOdeSolver),
+        mLastTime(rHandler.mLastTime)
+{
+}
+
 void CellCycleModelOdeHandler::SetOdeSystem(AbstractOdeSystem* pOdeSystem)
 {
     mpOdeSystem = pOdeSystem;

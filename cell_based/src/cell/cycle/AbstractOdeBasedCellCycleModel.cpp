@@ -55,7 +55,7 @@ AbstractOdeBasedCellCycleModel::~AbstractOdeBasedCellCycleModel()
 
 AbstractOdeBasedCellCycleModel::AbstractOdeBasedCellCycleModel(const AbstractOdeBasedCellCycleModel& rModel)
     : AbstractCellCycleModel(rModel),
-      CellCycleModelOdeHandler(SimulationTime::Instance()->GetTime(), rModel.mpOdeSolver), ///\todo #2173 Consider creating a proper copy constructor for this class
+      CellCycleModelOdeHandler(rModel),
       mDivideTime(rModel.mDivideTime),
       mFinishedRunningOdes(rModel.mFinishedRunningOdes),
       mG2PhaseStartTime(rModel.mG2PhaseStartTime)
@@ -77,10 +77,6 @@ AbstractOdeBasedCellCycleModel::AbstractOdeBasedCellCycleModel(const AbstractOde
      * in parent classes will be defined there.
      *
      */
-
-    // Set here as mLastTime is defined in CellCycleModelOdeHandler could
-    // be removed if making a copy constructor for CellCycleModelOdeHandler
-    SetLastTime(rModel.mLastTime);
 }
 
 void AbstractOdeBasedCellCycleModel::SetBirthTime(double birthTime)

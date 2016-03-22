@@ -48,7 +48,7 @@ AbstractOdeSrnModel::AbstractOdeSrnModel(unsigned stateSize, boost::shared_ptr<A
 
 AbstractOdeSrnModel::AbstractOdeSrnModel(const AbstractOdeSrnModel& rModel)
     : AbstractSrnModel(rModel),
-      CellCycleModelOdeHandler(SimulationTime::Instance()->GetTime(), rModel.mpOdeSolver), ///\todo #2173 Consider creating a proper copy constructor for this class
+      CellCycleModelOdeHandler(rModel),
       mFinishedRunningOdes(rModel.mFinishedRunningOdes),
       mInitialConditions(rModel.mInitialConditions),
       mStateSize(rModel.mStateSize)

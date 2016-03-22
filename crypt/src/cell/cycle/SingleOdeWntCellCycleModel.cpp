@@ -59,7 +59,7 @@ SingleOdeWntCellCycleModel::SingleOdeWntCellCycleModel(boost::shared_ptr<Abstrac
 
 SingleOdeWntCellCycleModel::SingleOdeWntCellCycleModel(const SingleOdeWntCellCycleModel& rModel)
     : SimpleWntCellCycleModel(rModel),
-      CellCycleModelOdeHandler(SimulationTime::Instance()->GetTime(), rModel.mpOdeSolver), ///\todo #2173 Consider creating a proper copy constructor for this class
+      CellCycleModelOdeHandler(rModel),
       mBetaCateninDivisionThreshold(rModel.mBetaCateninDivisionThreshold)
 {
     /*
@@ -78,15 +78,10 @@ SingleOdeWntCellCycleModel::SingleOdeWntCellCycleModel(const SingleOdeWntCellCyc
      *
      */
 
-    // Set here as mLastTime is defined in CellCycleModelOdeHandler could
-    // be removed if making a copy constructor for CellCycleModelOdeHandler
-    mLastTime = rModel.mLastTime;
-
     /*
      * Create the new cell-cycle model's ODE system and use the current values
      * of the state variables in mpOdeSystem as an initial condition.
      */
-
     assert(rModel.GetOdeSystem());
     double wnt_level = rModel.GetWntLevel();
     SetOdeSystem(new Mirams2010WntOdeSystem(wnt_level, rModel.mpCell->GetMutationState()));

@@ -49,7 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * model.  It is designed to be used as an additional base class for models which
  * require this functionality.
  */
-class CellCycleModelOdeHandler : private boost::noncopyable
+class CellCycleModelOdeHandler
 {
 private:
 
@@ -70,7 +70,25 @@ private:
         archive & mDt;
     }
 
+    /**
+     * Prevent copy-assignment of this class, or its subclasses.
+     * Note that we do not define this method, therefore statements like "AbstractCellCycleModel new = old;" will not compile.
+     * We do not inherit from boost::noncopyable because we *do* define a protected copy-constructor, for use by CreateCellCycleModel
+     * and CreateSrnModel.
+     *
+     * @return the new ODE handler.
+     * @param rHandler the ODE handler to copy.
+     */
+    CellCycleModelOdeHandler& operator=(const AbstractCellCycleModelOdeSolver&);
+
 protected:
+
+    /**
+     * Protected copy-constructor for use by CreateCellCycleModel and Create SRN Model.
+     *
+     * @param rHandler ODE handler to copy.
+     */
+    CellCycleModelOdeHandler(const CellCycleModelOdeHandler& rHandler);
 
     /**
      * Timestep to use when solving the ODE system.
