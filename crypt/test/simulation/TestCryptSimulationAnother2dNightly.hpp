@@ -286,7 +286,7 @@ public:
         // Unusual set-up here (corresponds to the Meineke crypt model parameters)
         p_linear_force->SetMeinekeSpringStiffness(30.0);
         // Sets the MeinekeSpringGrowthDuration to be the default MPhase duration
-        p_linear_force->SetMeinekeSpringGrowthDuration( static_cast<SimpleWntCellCycleModel*>(crypt.rGetCells().front())->GetCellCycleModel()->GetMDuration());
+        p_linear_force->SetMeinekeSpringGrowthDuration(static_cast<SimpleWntCellCycleModel*>(crypt.rGetCells().front()->GetCellCycleModel())->GetMDuration());
         simulator.AddForce(p_linear_force);
 
         // Set up sloughing cell killer and pass in to simulation
