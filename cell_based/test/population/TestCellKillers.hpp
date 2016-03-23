@@ -265,11 +265,9 @@ public:
 
         double lo_oxygen_concentration = 0.0;
 
-        // Set some model parameters for the cell-cycle model
+        // Set the oxygen level for the cells
         for (unsigned index=0; index < cells.size(); index++)
         {
-            cells[index]->GetCellCycleModel()->SetStemCellG1Duration(8.0);
-            cells[index]->GetCellCycleModel()->SetTransitCellG1Duration(8.0);
             cells[index]->GetCellData()->SetItem("oxygen", lo_oxygen_concentration);
         }
 

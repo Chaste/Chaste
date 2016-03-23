@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 
 AbstractWntOdeBasedCellCycleModel::AbstractWntOdeBasedCellCycleModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
-    : AbstractOdeBasedCellCycleModel(SimulationTime::Instance()->GetTime(), pOdeSolver)
+    : AbstractOdeBasedPhaseBasedCellCycleModel(SimulationTime::Instance()->GetTime(), pOdeSolver)
 {
 }
 
@@ -45,7 +45,7 @@ AbstractWntOdeBasedCellCycleModel::~AbstractWntOdeBasedCellCycleModel()
 }
 
 AbstractWntOdeBasedCellCycleModel::AbstractWntOdeBasedCellCycleModel(const AbstractWntOdeBasedCellCycleModel& rModel)
-   : AbstractOdeBasedCellCycleModel(rModel)
+   : AbstractOdeBasedPhaseBasedCellCycleModel(rModel)
 {
     /*
      * Set each member variable of the new cell-cycle model that inherits
@@ -100,7 +100,7 @@ double AbstractWntOdeBasedCellCycleModel::GetWntLevel() const
 
 void AbstractWntOdeBasedCellCycleModel::ResetForDivision()
 {
-    AbstractOdeBasedCellCycleModel::ResetForDivision();
+    AbstractOdeBasedPhaseBasedCellCycleModel::ResetForDivision();
 
     assert(mpOdeSystem != NULL);
 
@@ -116,7 +116,7 @@ void AbstractWntOdeBasedCellCycleModel::ResetForDivision()
 
 void AbstractWntOdeBasedCellCycleModel::UpdateCellCyclePhase()
 {
-    AbstractOdeBasedCellCycleModel::UpdateCellCyclePhase();
+    AbstractOdeBasedPhaseBasedCellCycleModel::UpdateCellCyclePhase();
     if (SimulationTime::Instance()->GetTime() == mLastTime
         || GetOdeStopTime() == mLastTime)
     {
@@ -152,6 +152,6 @@ void AbstractWntOdeBasedCellCycleModel::OutputCellCycleModelParameters(out_strea
     // No new parameters to output
 
     // Call method on direct parent class
-    AbstractOdeBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
+    AbstractOdeBasedPhaseBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
 }
 

@@ -85,7 +85,7 @@ public:
     /**
      * Default constructor. Note that mBirthTime is set in
      * AbstractCellCycleModel() and mG1Duration is set in
-     * AbstractSimpleCellCycleModel().
+     * AbstractSimplePhaseBasedCellCycleModel().
      */
     FixedDurationGenerationBasedCellCycleModel();
 

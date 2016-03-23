@@ -33,34 +33,31 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "AbstractOdeBasedCellCycleModel.hpp"
+#include "AbstractOdeBasedPhaseBasedCellCycleModel.hpp"
 #include <iostream>
 #include <cassert>
 #include "Exception.hpp"
 
-AbstractOdeBasedCellCycleModel::AbstractOdeBasedCellCycleModel(double lastTime,
+AbstractOdeBasedPhaseBasedCellCycleModel::AbstractOdeBasedPhaseBasedCellCycleModel(double lastTime,
                                                                boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
     : CellCycleModelOdeHandler(lastTime, pOdeSolver),
       mDivideTime(lastTime),
       mFinishedRunningOdes(false),
       mG2PhaseStartTime(DBL_MAX)
-//      mStateSize(stateSize)
 {
-    AbstractCellCycleModel::SetBirthTime(lastTime);
+    AbstractPhaseBasedCellCycleModel::SetBirthTime(lastTime);
 }
 
-AbstractOdeBasedCellCycleModel::~AbstractOdeBasedCellCycleModel()
+AbstractOdeBasedPhaseBasedCellCycleModel::~AbstractOdeBasedPhaseBasedCellCycleModel()
 {
 }
 
-AbstractOdeBasedCellCycleModel::AbstractOdeBasedCellCycleModel(const AbstractOdeBasedCellCycleModel& rModel)
-    : AbstractCellCycleModel(rModel),
+AbstractOdeBasedPhaseBasedCellCycleModel::AbstractOdeBasedPhaseBasedCellCycleModel(const AbstractOdeBasedPhaseBasedCellCycleModel& rModel)
+    : AbstractPhaseBasedCellCycleModel(rModel),
       CellCycleModelOdeHandler(rModel),
       mDivideTime(rModel.mDivideTime),
       mFinishedRunningOdes(rModel.mFinishedRunningOdes),
       mG2PhaseStartTime(rModel.mG2PhaseStartTime)
-//      mInitialConditions(rModel.mInitialConditions),
-//      mStateSize(rModel.mStateSize)
 {
     /*
      * Set each member variable of the new cell-cycle model that inherits
@@ -79,20 +76,20 @@ AbstractOdeBasedCellCycleModel::AbstractOdeBasedCellCycleModel(const AbstractOde
      */
 }
 
-void AbstractOdeBasedCellCycleModel::SetBirthTime(double birthTime)
+void AbstractOdeBasedPhaseBasedCellCycleModel::SetBirthTime(double birthTime)
 {
-    AbstractCellCycleModel::SetBirthTime(birthTime);
+    AbstractPhaseBasedCellCycleModel::SetBirthTime(birthTime);
     mLastTime = birthTime;
     mDivideTime = birthTime;
 }
 
-std::vector<double> AbstractOdeBasedCellCycleModel::GetProteinConcentrations() const
+std::vector<double> AbstractOdeBasedPhaseBasedCellCycleModel::GetProteinConcentrations() const
 {
     assert(mpOdeSystem != NULL);
     return mpOdeSystem->rGetStateVariables();
 }
 
-void AbstractOdeBasedCellCycleModel::SetProteinConcentrationsForTestsOnly(double lastTime, std::vector<double> proteinConcentrations)
+void AbstractOdeBasedPhaseBasedCellCycleModel::SetProteinConcentrationsForTestsOnly(double lastTime, std::vector<double> proteinConcentrations)
 {
     assert(mpOdeSystem != NULL);
     assert(proteinConcentrations.size()==mpOdeSystem->rGetStateVariables().size());
@@ -100,7 +97,7 @@ void AbstractOdeBasedCellCycleModel::SetProteinConcentrationsForTestsOnly(double
     mpOdeSystem->SetStateVariables(proteinConcentrations);
 }
 
-void AbstractOdeBasedCellCycleModel::UpdateCellCyclePhase()
+void AbstractOdeBasedPhaseBasedCellCycleModel::UpdateCellCyclePhase()
 {
     assert(mpOdeSystem != NULL);
 
@@ -171,10 +168,10 @@ void AbstractOdeBasedCellCycleModel::UpdateCellCyclePhase()
     }
 }
 
-void AbstractOdeBasedCellCycleModel::ResetForDivision()
+void AbstractOdeBasedPhaseBasedCellCycleModel::ResetForDivision()
 {
     assert(mFinishedRunningOdes);
-    AbstractCellCycleModel::ResetForDivision();
+    AbstractPhaseBasedCellCycleModel::ResetForDivision();
     mBirthTime = mDivideTime;
     mLastTime = mDivideTime;
     mFinishedRunningOdes = false;
@@ -182,7 +179,7 @@ void AbstractOdeBasedCellCycleModel::ResetForDivision()
     mDivideTime = DBL_MAX;
 }
 
-double AbstractOdeBasedCellCycleModel::GetOdeStopTime()
+double AbstractOdeBasedPhaseBasedCellCycleModel::GetOdeStopTime()
 {
     double stop_time = DOUBLE_UNSET;
     if (mpOdeSolver->StoppingEventOccurred())
@@ -192,10 +189,10 @@ double AbstractOdeBasedCellCycleModel::GetOdeStopTime()
     return stop_time;
 }
 
-void AbstractOdeBasedCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
+void AbstractOdeBasedPhaseBasedCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
 {
     // No new parameters to output
 
     // Call method on direct parent class
-    AbstractCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
+    AbstractPhaseBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
 }

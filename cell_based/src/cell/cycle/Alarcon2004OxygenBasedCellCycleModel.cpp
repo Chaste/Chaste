@@ -39,7 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 
 Alarcon2004OxygenBasedCellCycleModel::Alarcon2004OxygenBasedCellCycleModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
-    : AbstractOdeBasedCellCycleModel(SimulationTime::Instance()->GetTime(), pOdeSolver)
+    : AbstractOdeBasedPhaseBasedCellCycleModel(SimulationTime::Instance()->GetTime(), pOdeSolver)
 {
     if (!mpOdeSolver)
     {
@@ -50,7 +50,7 @@ Alarcon2004OxygenBasedCellCycleModel::Alarcon2004OxygenBasedCellCycleModel(boost
 }
 
 Alarcon2004OxygenBasedCellCycleModel::Alarcon2004OxygenBasedCellCycleModel(const Alarcon2004OxygenBasedCellCycleModel& rModel)
-    : AbstractOdeBasedCellCycleModel(rModel)
+    : AbstractOdeBasedPhaseBasedCellCycleModel(rModel)
 {
     /*
      * Set each member variable of the new cell-cycle model that inherits
@@ -82,7 +82,7 @@ AbstractCellCycleModel* Alarcon2004OxygenBasedCellCycleModel::CreateCellCycleMod
 
 void Alarcon2004OxygenBasedCellCycleModel::ResetForDivision()
 {
-    AbstractOdeBasedCellCycleModel::ResetForDivision();
+    AbstractOdeBasedPhaseBasedCellCycleModel::ResetForDivision();
     assert(mpOdeSystem != NULL);
 
     // This model needs the protein concentrations and phase resetting to G0/G1.
@@ -103,7 +103,7 @@ void Alarcon2004OxygenBasedCellCycleModel::Initialise()
     mpOdeSystem = new Alarcon2004OxygenBasedCellCycleOdeSystem(mpCell->GetCellData()->GetItem("oxygen"), is_labelled);
     mpOdeSystem->SetStateVariables(mpOdeSystem->GetInitialConditions());
 
-    AbstractOdeBasedCellCycleModel::Initialise();
+    AbstractOdeBasedPhaseBasedCellCycleModel::Initialise();
 }
 
 void Alarcon2004OxygenBasedCellCycleModel::AdjustOdeParameters(double currentTime)
@@ -122,7 +122,7 @@ void Alarcon2004OxygenBasedCellCycleModel::OutputCellCycleModelParameters(out_st
     // No new parameters to output
 
     // Call method on direct parent class
-    AbstractOdeBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
+    AbstractOdeBasedPhaseBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
 }
 
 // Serialization for Boost >= 1.36

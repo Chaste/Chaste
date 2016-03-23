@@ -94,7 +94,7 @@ protected:
 public:
 
     /**
-     * Constructor - just a default, mBirthTime is now set in the AbstractCellCycleModel class.
+     * Constructor - just a default, mBirthTime is set in the AbstractCellCycleModel class.
      * mG1Duration is set very high, it is set for the individual cells when InitialiseDaughterCell is called
      */
     StochasticDurationGenerationBasedCellCycleModel();

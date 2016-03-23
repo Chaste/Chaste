@@ -36,19 +36,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef SIMPLEOXYGENBASEDCELLCYCLEMODEL_HPP_
 #define SIMPLEOXYGENBASEDCELLCYCLEMODEL_HPP_
 
-#include "AbstractSimpleCellCycleModel.hpp"
+#include "AbstractSimplePhaseBasedCellCycleModel.hpp"
 
 /**
  * Simple oxygen-based cell-cycle model.
  *
  * A simple oxygen-dependent cell-cycle model that inherits from
- * AbstractSimpleCellCycleModel. The duration of G1 phase depends
+ * AbstractSimplePhaseBasedCellCycleModel. The duration of G1 phase depends
  * on the local oxygen concentration. A prolonged period of acute
  * hypoxia leads to the cell being labelled as apoptotic. This model
  * allows for quiescence imposed by transient periods of hypoxia,
  * followed by reoxygenation.
  */
-class SimpleOxygenBasedCellCycleModel : public AbstractSimpleCellCycleModel
+class SimpleOxygenBasedCellCycleModel : public AbstractSimplePhaseBasedCellCycleModel
 {
 private:
 
@@ -61,7 +61,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractSimpleCellCycleModel>(*this);
+        archive & boost::serialization::base_object<AbstractSimplePhaseBasedCellCycleModel>(*this);
         archive & mCurrentHypoxicDuration;
         archive & mCurrentHypoxiaOnsetTime;
         archive & mHypoxicConcentration;

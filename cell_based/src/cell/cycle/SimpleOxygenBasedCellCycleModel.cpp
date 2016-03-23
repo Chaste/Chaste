@@ -71,7 +71,7 @@ void SimpleOxygenBasedCellCycleModel::UpdateCellCyclePhase()
         // Get cell's oxygen concentration
         double oxygen_concentration = mpCell->GetCellData()->GetItem("oxygen");
 
-        AbstractSimpleCellCycleModel::UpdateCellCyclePhase();
+        AbstractSimplePhaseBasedCellCycleModel::UpdateCellCyclePhase();
 
         if (mCurrentCellCyclePhase == G_ONE_PHASE)
         {
@@ -87,7 +87,7 @@ void SimpleOxygenBasedCellCycleModel::UpdateCellCyclePhase()
 }
 
 SimpleOxygenBasedCellCycleModel::SimpleOxygenBasedCellCycleModel(const SimpleOxygenBasedCellCycleModel& rModel)
-   : AbstractSimpleCellCycleModel(rModel),
+   : AbstractSimplePhaseBasedCellCycleModel(rModel),
      mCurrentHypoxicDuration(rModel.mCurrentHypoxicDuration),
      mCurrentHypoxiaOnsetTime(rModel.mCurrentHypoxiaOnsetTime),
      mHypoxicConcentration(rModel.mHypoxicConcentration),
@@ -203,7 +203,7 @@ void SimpleOxygenBasedCellCycleModel::OutputCellCycleModelParameters(out_stream&
     *rParamsFile << "\t\t\t<CriticalHypoxicDuration>" << mCriticalHypoxicDuration << "</CriticalHypoxicDuration>\n";
 
     // Call method on direct parent class
-    AbstractSimpleCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
+    AbstractSimplePhaseBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
 }
 
 // Serialization for Boost >= 1.36

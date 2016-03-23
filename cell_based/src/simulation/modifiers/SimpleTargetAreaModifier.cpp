@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "SimpleTargetAreaModifier.hpp"
+#include "AbstractPhaseBasedCellCycleModel.hpp"
 
 template<unsigned DIM>
 SimpleTargetAreaModifier<DIM>::SimpleTargetAreaModifier()
@@ -52,13 +53,15 @@ void SimpleTargetAreaModifier<DIM>::UpdateTargetAreaOfCell(CellPtr pCell)
     // Get target area A of a healthy cell in S, G2 or M phase
     double cell_target_area = this->mReferenceTargetArea;
 
-    double g1_duration = pCell->GetCellCycleModel()->GetG1Duration();
+    AbstractPhaseBasedCellCycleModel* p_model = static_cast<AbstractPhaseBasedCellCycleModel*>(pCell->GetCellCycleModel());
+
+    double g1_duration = p_model->GetG1Duration();
 
     // If the cell is differentiated then its G1 duration is infinite
     if (g1_duration == DBL_MAX) // don't use magic number, compare to DBL_MAX
     {
         // This is just for fixed cell-cycle models, need to work out how to find the g1 duration
-        g1_duration = pCell->GetCellCycleModel()->GetTransitCellG1Duration();
+        g1_duration = p_model->GetTransitCellG1Duration();
     }
 
     if (pCell->HasCellProperty<ApoptoticCellProperty>())

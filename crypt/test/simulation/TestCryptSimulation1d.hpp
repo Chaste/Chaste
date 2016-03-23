@@ -530,7 +530,7 @@ public:
         MAKE_PTR(GeneralisedLinearSpringForce<1>, p_linear_force);
 
         // Set the MeinekeSpringGrowthDuration to be the default MPhase Duration
-        p_linear_force->SetMeinekeSpringGrowthDuration(crypt.rGetCells().front()->GetCellCycleModel()->GetMDuration());
+        p_linear_force->SetMeinekeSpringGrowthDuration(static_cast<TysonNovakCellCycleModel*>(crypt.rGetCells().front()->GetCellCycleModel())->GetMDuration());
 
         simulator.AddForce(p_linear_force);
 

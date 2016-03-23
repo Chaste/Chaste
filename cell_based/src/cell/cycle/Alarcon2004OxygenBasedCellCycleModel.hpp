@@ -41,7 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vector>
 
-#include "AbstractOdeBasedCellCycleModel.hpp"
+#include "AbstractOdeBasedPhaseBasedCellCycleModel.hpp"
 #include "Alarcon2004OxygenBasedCellCycleOdeSystem.hpp"
 
 /**
@@ -51,7 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * Published by Alarcon et al. (doi:10.1016/j.jtbi.2004.04.016).
  */
-class Alarcon2004OxygenBasedCellCycleModel : public AbstractOdeBasedCellCycleModel
+class Alarcon2004OxygenBasedCellCycleModel : public AbstractOdeBasedPhaseBasedCellCycleModel
 {
 private:
 
@@ -66,7 +66,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractOdeBasedCellCycleModel>(*this);
+        archive & boost::serialization::base_object<AbstractOdeBasedPhaseBasedCellCycleModel>(*this);
     }
 
     /**

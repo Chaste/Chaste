@@ -40,7 +40,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <functional>
 
 #include "AbstractCellPopulation.hpp"
-#include "AbstractOdeBasedCellCycleModel.hpp"
 #include "Exception.hpp"
 #include "PetscTools.hpp"
 #include "SmartPointers.hpp"

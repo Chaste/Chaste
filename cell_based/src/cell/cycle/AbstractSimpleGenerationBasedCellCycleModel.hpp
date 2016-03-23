@@ -40,7 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ClassIsAbstract.hpp"
 #include <boost/serialization/base_object.hpp>
 
-#include "AbstractSimpleCellCycleModel.hpp"
+#include "AbstractSimplePhaseBasedCellCycleModel.hpp"
 
 /**
  * This class contains all the things common to simple generation-based cell cycle
@@ -51,7 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * N.B. Whether or not the cell should actually divide may depend on
  * Wnt / Oxygen etc. in subclasses.
  */
-class AbstractSimpleGenerationBasedCellCycleModel : public AbstractSimpleCellCycleModel
+class AbstractSimpleGenerationBasedCellCycleModel : public AbstractSimplePhaseBasedCellCycleModel
 {
 private:
 
@@ -66,7 +66,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractSimpleCellCycleModel>(*this);
+        archive & boost::serialization::base_object<AbstractSimplePhaseBasedCellCycleModel>(*this);
         archive & mGeneration;
         archive & mMaxTransitGenerations;
     }
@@ -98,7 +98,7 @@ protected:
 public:
 
     /**
-     * Default constructor - creates an AbstractSimpleCellCycleModel.
+     * Default constructor - creates an AbstractSimpleGenerationBasedCellCycleModel.
      */
     AbstractSimpleGenerationBasedCellCycleModel();
 

@@ -36,14 +36,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef GAMMADISTRIBUTEDSTOCHASTICDURATIONCELLCYCLEMODEL_HPP_
 #define GAMMADISTRIBUTEDSTOCHASTICDURATIONCELLCYCLEMODEL_HPP_
 
-#include "AbstractSimpleCellCycleModel.hpp"
+#include "AbstractSimplePhaseBasedCellCycleModel.hpp"
 #include "RandomNumberGenerator.hpp"
 
 /**
  * A stochastic cell-cycle model where cells keep dividing with a stochastic G1 duration
  * drawn from a gamma distribution with specified shape and scale parameters.
  */
-class GammaDistributedStochasticDurationCellCycleModel : public AbstractSimpleCellCycleModel
+class GammaDistributedStochasticDurationCellCycleModel : public AbstractSimplePhaseBasedCellCycleModel
 {
     friend class TestSimpleCellCycleModels;
 
@@ -66,7 +66,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractSimpleCellCycleModel>(*this);
+        archive & boost::serialization::base_object<AbstractSimplePhaseBasedCellCycleModel>(*this);
 
         // Make sure the RandomNumberGenerator singleton gets saved too
         SerializableSingleton<RandomNumberGenerator>* p_wrapper = RandomNumberGenerator::Instance()->GetSerializationWrapper();

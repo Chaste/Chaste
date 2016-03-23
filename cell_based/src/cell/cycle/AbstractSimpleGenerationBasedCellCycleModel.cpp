@@ -39,7 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TransitCellProliferativeType.hpp"
 
 AbstractSimpleGenerationBasedCellCycleModel::AbstractSimpleGenerationBasedCellCycleModel()
-    : AbstractSimpleCellCycleModel(),
+    : AbstractSimplePhaseBasedCellCycleModel(),
       mGeneration(0),
       mMaxTransitGenerations(3) // taken from Meineke et al, 2001 (doi:10.1046/j.0960-7722.2001.00216.x)
 {
@@ -50,7 +50,7 @@ AbstractSimpleGenerationBasedCellCycleModel::~AbstractSimpleGenerationBasedCellC
 }
 
 AbstractSimpleGenerationBasedCellCycleModel::AbstractSimpleGenerationBasedCellCycleModel(const AbstractSimpleGenerationBasedCellCycleModel& rModel)
-    : AbstractSimpleCellCycleModel(rModel),
+    : AbstractSimplePhaseBasedCellCycleModel(rModel),
       mGeneration(rModel.mGeneration),
       mMaxTransitGenerations(rModel.mMaxTransitGenerations)
 {
@@ -93,7 +93,7 @@ void AbstractSimpleGenerationBasedCellCycleModel::ResetForDivision()
     {
         mGeneration = 0;
     }
-    AbstractSimpleCellCycleModel::ResetForDivision();
+    AbstractSimplePhaseBasedCellCycleModel::ResetForDivision();
 }
 
 void AbstractSimpleGenerationBasedCellCycleModel::InitialiseDaughterCell()
@@ -121,7 +121,7 @@ void AbstractSimpleGenerationBasedCellCycleModel::InitialiseDaughterCell()
             mpCell->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<DifferentiatedCellProliferativeType>();
         mpCell->SetCellProliferativeType(p_diff_type);
     }
-    AbstractSimpleCellCycleModel::InitialiseDaughterCell();
+    AbstractSimplePhaseBasedCellCycleModel::InitialiseDaughterCell();
 }
 
 void AbstractSimpleGenerationBasedCellCycleModel::SetGeneration(unsigned generation)
@@ -149,5 +149,5 @@ void AbstractSimpleGenerationBasedCellCycleModel::OutputCellCycleModelParameters
     *rParamsFile << "\t\t\t<MaxTransitGenerations>" << mMaxTransitGenerations << "</MaxTransitGenerations>\n";
 
     // Call method on direct parent class
-    AbstractSimpleCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
+    AbstractSimplePhaseBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
 }

@@ -1563,8 +1563,8 @@ public:
         cells[2]->SetMutationState(CellPropertyRegistry::Instance()->Get<ApcTwoHitCellMutationState>());
         cells[3]->SetMutationState(CellPropertyRegistry::Instance()->Get<BetaCateninOneHitCellMutationState>());
         cells[4]->AddCellProperty(CellPropertyRegistry::Instance()->Get<CellLabel>());
-        cells[2]->SetBirthTime(1.5-(cells[2]->GetCellCycleModel()->GetStemCellG1Duration()
-                                   + cells[2]->GetCellCycleModel()->GetSG2MDuration()));
+        cells[2]->SetBirthTime(1.5-(static_cast<FixedDurationGenerationBasedCellCycleModel*>(cells[2]->GetCellCycleModel())->GetStemCellG1Duration()
+                                   + static_cast<FixedDurationGenerationBasedCellCycleModel*>(cells[2]->GetCellCycleModel())->GetSG2MDuration()));
 
         // Create cell population
         MeshBasedCellPopulationWithGhostNodes<2> crypt(*p_mesh, cells, location_indices);

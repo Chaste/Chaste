@@ -39,7 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
-#include "AbstractOdeBasedCellCycleModel.hpp"
+#include "AbstractOdeBasedPhaseBasedCellCycleModel.hpp"
 #include "TysonNovak2001OdeSystem.hpp"
 
 
@@ -52,7 +52,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *  Time taken to progress through the cycle is deterministic and given by
  *  an ODE system independent of external factors.
  */
-class TysonNovakCellCycleModel : public AbstractOdeBasedCellCycleModel
+class TysonNovakCellCycleModel : public AbstractOdeBasedPhaseBasedCellCycleModel
 {
 private:
 
@@ -69,7 +69,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractOdeBasedCellCycleModel>(*this);
+        archive & boost::serialization::base_object<AbstractOdeBasedPhaseBasedCellCycleModel>(*this);
     }
 
 protected:

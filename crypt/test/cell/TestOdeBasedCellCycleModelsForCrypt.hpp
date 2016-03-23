@@ -299,7 +299,8 @@ public:
         // is fine as the cell-cycle model dictates the division time, not when
         // the cell is actually divided.
         CellPtr p_daughter_cell = p_stem_cell->Divide();
-        AbstractCellCycleModel* p_cell_model2 = p_daughter_cell->GetCellCycleModel();
+        VanLeeuwen2009WntSwatCellCycleModelHypothesisOne* p_cell_model2 =
+                 static_cast<VanLeeuwen2009WntSwatCellCycleModelHypothesisOne*>(p_daughter_cell->GetCellCycleModel());
 
         TS_ASSERT_EQUALS(p_cell_model->GetCurrentCellCyclePhase(), M_PHASE);
         TS_ASSERT_EQUALS(p_cell_model2->GetCurrentCellCyclePhase(), M_PHASE);
@@ -501,7 +502,8 @@ public:
         // is fine as the cell-cycle model dictates the division time, not when
         // the cell is actually divided.
         CellPtr p_daughter_cell = p_stem_cell->Divide();
-        AbstractCellCycleModel* p_cell_model2 = p_daughter_cell->GetCellCycleModel();
+        VanLeeuwen2009WntSwatCellCycleModelHypothesisTwo* p_cell_model2 =
+                         static_cast<VanLeeuwen2009WntSwatCellCycleModelHypothesisTwo*>(p_daughter_cell->GetCellCycleModel());
 
         TS_ASSERT_EQUALS(p_cell_model->GetCurrentCellCyclePhase(), M_PHASE);
         TS_ASSERT_EQUALS(p_cell_model2->GetCurrentCellCyclePhase(), M_PHASE);
@@ -900,7 +902,9 @@ public:
             input_arch >> p_cell;
 
             // Test archiving
-            AbstractCellCycleModel* p_cell_model = p_cell->GetCellCycleModel();
+            WntCellCycleModel* p_cell_model = static_cast<WntCellCycleModel*>(p_cell->GetCellCycleModel());
+
+
             TS_ASSERT_EQUALS(p_cell, p_cell_model->GetCell());
 
             TS_ASSERT_EQUALS(p_cell_model->ReadyToDivide(), true);
@@ -973,7 +977,9 @@ public:
             input_arch >> p_cell;
 
             // Test archiving
-            AbstractCellCycleModel* p_cell_model = p_cell->GetCellCycleModel();
+            AbstractVanLeeuwen2009WntSwatCellCycleModel* p_cell_model =
+                    static_cast<AbstractVanLeeuwen2009WntSwatCellCycleModel*>(p_cell->GetCellCycleModel());
+
             TS_ASSERT_EQUALS(p_cell, p_cell_model->GetCell());
 
             TS_ASSERT_EQUALS(p_cell_model->ReadyToDivide(), true);
@@ -1044,7 +1050,9 @@ public:
             input_arch >> p_cell;
 
             // Test archiving
-            AbstractCellCycleModel* p_cell_model = p_cell->GetCellCycleModel();
+            AbstractVanLeeuwen2009WntSwatCellCycleModel* p_cell_model =
+                       static_cast<AbstractVanLeeuwen2009WntSwatCellCycleModel*>(p_cell->GetCellCycleModel());
+
             TS_ASSERT_EQUALS(p_cell, p_cell_model->GetCell());
 
             TS_ASSERT_EQUALS(p_cell_model->ReadyToDivide(), true);
@@ -1143,7 +1151,7 @@ public:
             input_arch >> p_wnt_cell;
 
             // Test archiving
-            TS_ASSERT_EQUALS(p_stoc_cell->GetCellCycleModel()->GetCurrentCellCyclePhase(), G_ONE_PHASE);
+            TS_ASSERT_EQUALS(static_cast<StochasticWntCellCycleModel*>(p_stoc_cell->GetCellCycleModel())->GetCurrentCellCyclePhase(), G_ONE_PHASE);
 
             // Check - stochastic should divide at 15.14499
             // Wnt should divide at 15.971
@@ -1173,7 +1181,7 @@ public:
 
             TS_ASSERT_DELTA(p_stoc_cell->GetCellCycleModel()->GetBirthTime(), 0.0, 1e-12);
             TS_ASSERT_DELTA(p_stoc_cell->GetCellCycleModel()->GetAge(), 17.0, 1e-12);
-            TS_ASSERT_DELTA(p_stoc_cell->GetCellCycleModel()->GetSG2MDuration(), 10.0, 1e-12);
+            TS_ASSERT_DELTA(static_cast<StochasticWntCellCycleModel*>(p_stoc_cell->GetCellCycleModel())->GetSG2MDuration(), 10.0, 1e-12);
         }
 
         // Tidy up

@@ -68,7 +68,7 @@ void StochasticOxygenBasedCellCycleModel::GenerateStochasticG2Duration()
 {
     RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
 
-    double mean = AbstractCellCycleModel::GetG2Duration();
+    double mean = AbstractPhaseBasedCellCycleModel::GetG2Duration();
     double standard_deviation = 1.0;
 
     mStochasticG2Duration = p_gen->NormalRandomDeviate(mean, standard_deviation);
@@ -88,7 +88,7 @@ void StochasticOxygenBasedCellCycleModel::InitialiseDaughterCell()
 
 void StochasticOxygenBasedCellCycleModel::Initialise()
 {
-    AbstractSimpleCellCycleModel::Initialise();
+    AbstractSimplePhaseBasedCellCycleModel::Initialise();
     GenerateStochasticG2Duration();
 }
 

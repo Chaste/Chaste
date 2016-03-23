@@ -38,7 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DifferentiatedCellProliferativeType.hpp"
 
 ContactInhibitionCellCycleModel::ContactInhibitionCellCycleModel()
-    : AbstractSimpleCellCycleModel(),
+    : AbstractSimplePhaseBasedCellCycleModel(),
       mQuiescentVolumeFraction(DOUBLE_UNSET),
       mEquilibriumVolume(DOUBLE_UNSET),
       mCurrentQuiescentOnsetTime(SimulationTime::Instance()->GetTime()),
@@ -47,7 +47,7 @@ ContactInhibitionCellCycleModel::ContactInhibitionCellCycleModel()
 }
 
 ContactInhibitionCellCycleModel::ContactInhibitionCellCycleModel(const ContactInhibitionCellCycleModel& rModel)
-    : AbstractSimpleCellCycleModel(rModel),
+    : AbstractSimplePhaseBasedCellCycleModel(rModel),
       mQuiescentVolumeFraction(rModel.mQuiescentVolumeFraction),
       mEquilibriumVolume(rModel.mEquilibriumVolume),
       mCurrentQuiescentOnsetTime(rModel.mCurrentQuiescentOnsetTime),
@@ -190,7 +190,7 @@ void ContactInhibitionCellCycleModel::OutputCellCycleModelParameters(out_stream&
     *rParamsFile << "\t\t\t<EquilibriumVolume>" << mEquilibriumVolume << "</EquilibriumVolume>\n";
 
     // Call method on direct parent class
-    AbstractSimpleCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
+    AbstractSimplePhaseBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
 }
 
 // Serialization for Boost >= 1.36

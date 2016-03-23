@@ -40,12 +40,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DifferentiatedCellProliferativeType.hpp"
 
 StochasticDurationCellCycleModel::StochasticDurationCellCycleModel()
-    : AbstractSimpleCellCycleModel()
+    : AbstractSimplePhaseBasedCellCycleModel()
 {
 }
 
 StochasticDurationCellCycleModel::StochasticDurationCellCycleModel(const StochasticDurationCellCycleModel& rModel)
-   : AbstractSimpleCellCycleModel(rModel)
+   : AbstractSimplePhaseBasedCellCycleModel(rModel)
 {
     /*
      * Set each member variable of the new cell-cycle model that inherits
@@ -96,7 +96,7 @@ void StochasticDurationCellCycleModel::SetG1Duration()
 void StochasticDurationCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
 {
     // No new parameters to output, so just call method on direct parent class
-    AbstractSimpleCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
+    AbstractSimplePhaseBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
 }
 
 // Serialization for Boost >= 1.36

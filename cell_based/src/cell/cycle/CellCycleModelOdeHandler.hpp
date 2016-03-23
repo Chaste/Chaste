@@ -46,8 +46,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * This class contains the functionality for running ODEs as part of a cell cycle
- * model.  It is designed to be used as an additional base class for models which
- * require this functionality.
+ * or SRN model.  It is designed to be used as an additional base class for models
+ * which require this functionality.
  */
 class CellCycleModelOdeHandler
 {
@@ -72,7 +72,7 @@ private:
 
     /**
      * Prevent copy-assignment of this class, or its subclasses.
-     * Note that we do not define this method, therefore statements like "AbstractCellCycleModel new = old;" will not compile.
+     * Note that we do not define this method, therefore statements like "CellCycleModelOdeHandler new = old;" will not compile.
      * We do not inherit from boost::noncopyable because we *do* define a protected copy-constructor, for use by CreateCellCycleModel
      * and CreateSrnModel.
      *
@@ -84,7 +84,7 @@ private:
 protected:
 
     /**
-     * Protected copy-constructor for use by CreateCellCycleModel and Create SRN Model.
+     * Protected copy-constructor for use by CreateCellCycleModel and CreateSrnModel.
      *
      * @param rHandler ODE handler to copy.
      */

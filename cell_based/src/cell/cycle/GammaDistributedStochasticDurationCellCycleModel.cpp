@@ -40,14 +40,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DifferentiatedCellProliferativeType.hpp"
 
 GammaDistributedStochasticDurationCellCycleModel::GammaDistributedStochasticDurationCellCycleModel()
-    : AbstractSimpleCellCycleModel(),
+    : AbstractSimplePhaseBasedCellCycleModel(),
       mShape(DOUBLE_UNSET),
       mScale(DOUBLE_UNSET)
 {
 }
 
 GammaDistributedStochasticDurationCellCycleModel::GammaDistributedStochasticDurationCellCycleModel(const GammaDistributedStochasticDurationCellCycleModel& rModel)
-   :  AbstractSimpleCellCycleModel(rModel),
+   :  AbstractSimplePhaseBasedCellCycleModel(rModel),
       mShape(rModel.mShape),
       mScale(rModel.mScale)
 {
@@ -116,7 +116,7 @@ void GammaDistributedStochasticDurationCellCycleModel::OutputCellCycleModelParam
     *rParamsFile << "\t\t\t<Shape>" << mShape << "</Shape>\n";
     *rParamsFile << "\t\t\t<Scale>" << mScale << "</Scale>\n";
 
-    AbstractSimpleCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
+    AbstractSimplePhaseBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
 }
 
 // Serialization for Boost >= 1.36

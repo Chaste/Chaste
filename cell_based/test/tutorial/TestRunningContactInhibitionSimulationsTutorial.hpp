@@ -75,7 +75,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 
 /*
- * The next header file defines the contact inhibition cell-cycle model that inherits from {{{AbstractSimpleCellCycleModel}}}.
+ * The next header file defines the contact inhibition cell-cycle model that inherits from {{{AbstractCellCycleModel}}}.
  * The duration of the G1 phase depends on the deviation from a 'target' volume (or area/length in 2D/1D): if a cell's volume is
  * lower than a given fraction of its target volume, the G1 phase continues.
  * This model of cell-cycle progression allows for quiescence imposed by transient periods of high stress, followed by relaxation. Note that

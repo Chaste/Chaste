@@ -266,7 +266,7 @@ public:
         // This is the cell from before, let's see what its target area is
         double target_area_before_division = p_cell->GetCellData()->GetItem("target area");
         double expected_area = p_growth_modifier->GetReferenceTargetArea() +
-                                  (p_cell->GetAge() - 8.0)/(p_cell->GetCellCycleModel()->GetG2Duration());
+                                  (p_cell->GetAge() - 8.0)/(static_cast<FixedDurationGenerationBasedCellCycleModel*>(p_cell->GetCellCycleModel())->GetG2Duration());
         TS_ASSERT_DELTA(target_area_before_division,expected_area,1e-9);
 
         // Now we adjust the end time and run the simulation a bit further

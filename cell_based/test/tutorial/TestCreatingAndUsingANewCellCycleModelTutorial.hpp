@@ -265,19 +265,23 @@ public:
             cells.push_back(p_cell);
         }
 
-        /* Find the mean G1 duration and test that it is within some tolerance of
+        /* To check the CCM has been set up correctly we get a pointer to the one stored on the first cell.
+         * We use a static_cast so we can access all the member variables in the concrete class MyCellCycleModel.
+         *
+         * Find the mean G1 duration and test that it is within some tolerance of
          * the expected value: */
-        double expected_mean_g1_duration = cells[0]->GetCellCycleModel()->GetStemCellG1Duration();
+
+        double expected_mean_g1_duration = static_cast<MyCellCycleModel*>(cells[0]->GetCellCycleModel())->GetStemCellG1Duration();
         double sample_mean_g1_duration = 0.0;
 
         for (unsigned i=0; i<num_cells; i++)
         {
-            sample_mean_g1_duration += cells[i]->GetCellCycleModel()->GetG1Duration()/ (double) num_cells;
+            sample_mean_g1_duration += static_cast<MyCellCycleModel*>(cells[i]->GetCellCycleModel())->GetG1Duration()/ (double) num_cells;
         }
 
         TS_ASSERT_DELTA(sample_mean_g1_duration, expected_mean_g1_duration, 0.1);
 
-        /* Now construct another {{{MyCellCycleModel}}} and associated cell. */
+        /* Now construct another {{{MyCellCycleModel}}} and associated cell. To check it works for transit cells. */
         MyCellCycleModel* p_my_model = new MyCellCycleModel;
         CellPtr p_my_cell(new Cell(p_state, p_my_model));
         p_my_cell->SetCellProliferativeType(p_transit_type);
@@ -286,8 +290,8 @@ public:
         /* Use the helper method {{{CheckReadyToDivideAndPhaseIsUpdated()}}} to
          * test that this cell progresses correctly through the cell cycle. */
         unsigned num_steps = 100;
-        double mean_cell_cycle_time = cells[0]->GetCellCycleModel()->GetStemCellG1Duration()
-                                        + cells[0]->GetCellCycleModel()->GetSG2MDuration();
+        double mean_cell_cycle_time = p_my_model->GetTransitCellG1Duration()
+                                        + p_my_model->GetSG2MDuration();
 
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(mean_cell_cycle_time, num_steps);
 
@@ -359,8 +363,9 @@ public:
 
             input_arch >> p_cell;
 
-            /* Test that the private data has been restored correctly. */
-            AbstractCellCycleModel* p_model = p_cell->GetCellCycleModel();
+            /* Test that the private data has been restored correctly. Note we cast it to the correct type
+             * so we can acess all the member variables */
+            MyCellCycleModel* p_model = static_cast<MyCellCycleModel*>(p_cell->GetCellCycleModel());
 
             TS_ASSERT_DELTA(p_model->GetBirthTime(), -1.0, 1e-12);
             TS_ASSERT_DELTA(p_model->GetAge(), 2.5, 1e-12);

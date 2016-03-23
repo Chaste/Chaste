@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef ABSTRACTODEBASEDCELLCYCLEMODEL_HPP_
-#define ABSTRACTODEBASEDCELLCYCLEMODEL_HPP_
+#ifndef ABSTRACTODEBASEDPHASEBASEDCELLCYCLEMODEL_HPP_
+#define ABSTRACTODEBASEDPHASEBASEDCELLCYCLEMODEL_HPP_
 
 #include <vector>
 
@@ -42,7 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ClassIsAbstract.hpp"
 #include <boost/serialization/base_object.hpp>
 
-#include "AbstractCellCycleModel.hpp"
+#include "AbstractPhaseBasedCellCycleModel.hpp"
 #include "CellCycleModelOdeHandler.hpp"
 #include "SimulationTime.hpp"
 
@@ -58,7 +58,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * the duration of each cell cycle phase is determined when the cell-cycle model is
  * created.
  */
-class AbstractOdeBasedCellCycleModel : public AbstractCellCycleModel, public CellCycleModelOdeHandler
+class AbstractOdeBasedPhaseBasedCellCycleModel : public AbstractPhaseBasedCellCycleModel, public CellCycleModelOdeHandler
 {
 private:
 
@@ -73,13 +73,11 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractCellCycleModel>(*this);
+        archive & boost::serialization::base_object<AbstractPhaseBasedCellCycleModel>(*this);
         archive & boost::serialization::base_object<CellCycleModelOdeHandler>(*this);
         archive & mDivideTime;
         archive & mFinishedRunningOdes;
         archive & mG2PhaseStartTime;
-//        archive & mInitialConditions;
-//        archive & mStateSize;
     }
 
 protected:
@@ -92,16 +90,6 @@ protected:
 
     /** The start time for the G2 phase. */
     double mG2PhaseStartTime;
-
-//    /**
-//     * The initial condition for the ODE state variables.
-//     */
-//    std::vector<double> mInitialConditions;
-//
-//    /**
-//     * The number of state variables.
-//     */
-//    unsigned mStateSize;
 
     /**
      * Protected copy-constructor for use by CreateCellCycleModel.
@@ -116,25 +104,25 @@ protected:
      *
      * @param rModel the cell cycle model to copy.
      */
-    AbstractOdeBasedCellCycleModel(const AbstractOdeBasedCellCycleModel& rModel);
+    AbstractOdeBasedPhaseBasedCellCycleModel(const AbstractOdeBasedPhaseBasedCellCycleModel& rModel);
 
 public:
 
     /**
-     * Creates an AbstractOdeBasedCellCycleModel, calls SetBirthTime on the
-     * AbstractCellCycleModel to make sure that can be set 'back in time' for
+     * Creates an AbstractOdeBasedPhaseBasedCellCycleModel, calls SetBirthTime on the
+     * AbstractPhaseBasedCellCycleModel to make sure that can be set 'back in time' for
      * cells which did not divide at the current time.
      *
      * @param lastTime  The birth time of the cell / last time model was evaluated (defaults to the current SimulationTime)
      * @param pOdeSolver An optional pointer to a cell-cycle model ODE solver object (allows the use of different ODE solvers)
      */
-    AbstractOdeBasedCellCycleModel(double lastTime = SimulationTime::Instance()->GetTime(),
+    AbstractOdeBasedPhaseBasedCellCycleModel(double lastTime = SimulationTime::Instance()->GetTime(),
                                    boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver = boost::shared_ptr<AbstractCellCycleModelOdeSolver>());
 
     /**
      * Destructor.
      */
-    virtual ~AbstractOdeBasedCellCycleModel();
+    virtual ~AbstractOdeBasedPhaseBasedCellCycleModel();
 
     /**
      * Default UpdateCellCyclePhase() method for an ODE-based cell-cycle model.
@@ -154,7 +142,7 @@ public:
     double GetOdeStopTime();
 
     /**
-     * This overrides the AbstractCellCycleModel::SetBirthTime(double birthTime)
+     * This overrides the AbstractPhaseBasedCellCycleModel::SetBirthTime(double birthTime)
      * because an ODE based cell-cycle model has more to reset...
      *
      * @param birthTime the simulation time when the cell was born
@@ -180,16 +168,9 @@ public:
     /**
      * For a naturally cycling model this does not need to be overridden in the
      * subclasses. But most models should override this function and then
-     * call AbstractOdeBasedCellCycleModel::ResetForDivision() from inside their version.
+     * call AbstractOdeBasedPhaseBasedCellCycleModel::ResetForDivision() from inside their version.
      */
     virtual void ResetForDivision();
-
-//    /**
-//     * Set mInitialConditions. Used in CreateSrnModel().
-//     *
-//     * @param initialConditions the new value of mInitialConditions
-//     */
-//    void SetInitialConditions(std::vector<double> initialConditions);
 
     /**
      * Outputs cell cycle model parameters to file.
@@ -199,6 +180,6 @@ public:
     virtual void OutputCellCycleModelParameters(out_stream& rParamsFile);
 };
 
-CLASS_IS_ABSTRACT(AbstractOdeBasedCellCycleModel)
+CLASS_IS_ABSTRACT(AbstractOdeBasedPhaseBasedCellCycleModel)
 
-#endif /*ABSTRACTODEBASEDCELLCYCLEMODEL_HPP_*/
+#endif /*ABSTRACTODEBASEDPHASEBASEDCELLCYCLEMODEL_HPP_*/

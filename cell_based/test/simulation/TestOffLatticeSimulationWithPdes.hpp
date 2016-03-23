@@ -1004,8 +1004,8 @@ public:
         // Set some model parameters for the cell-cycle model
         for (unsigned index=0; index < cells.size(); index++)
         {
-            cells[index]->GetCellCycleModel()->SetTransitCellG1Duration(8.0);
-            cells[index]->GetCellCycleModel()->SetStemCellG1Duration(8.0);
+            static_cast<FixedDurationGenerationBasedCellCycleModel*>(cells[index]->GetCellCycleModel())->SetTransitCellG1Duration(8.0);
+            static_cast<FixedDurationGenerationBasedCellCycleModel*>(cells[index]->GetCellCycleModel())->SetStemCellG1Duration(8.0);
         }
 
         // Set up cell population

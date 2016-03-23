@@ -35,7 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "CellCycleModelProteinConcentrationsWriter.hpp"
 #include "AbstractCellPopulation.hpp"
-#include "AbstractOdeBasedCellCycleModel.hpp"
+#include "AbstractOdeBasedPhaseBasedCellCycleModel.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 CellCycleModelProteinConcentrationsWriter<ELEMENT_DIM, SPACE_DIM>::CellCycleModelProteinConcentrationsWriter()
@@ -59,7 +59,7 @@ double CellCycleModelProteinConcentrationsWriter<ELEMENT_DIM, SPACE_DIM>::GetCel
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellCycleModelProteinConcentrationsWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
-    AbstractOdeBasedCellCycleModel* p_model = dynamic_cast<AbstractOdeBasedCellCycleModel*>(pCell->GetCellCycleModel());
+    AbstractOdeBasedPhaseBasedCellCycleModel* p_model = dynamic_cast<AbstractOdeBasedPhaseBasedCellCycleModel*>(pCell->GetCellCycleModel());
     if (p_model)
     {
         // Write location index corresponding to cell
@@ -74,7 +74,7 @@ void CellCycleModelProteinConcentrationsWriter<ELEMENT_DIM, SPACE_DIM>::VisitCel
     }
     else
     {
-        EXCEPTION("CellCycleModelProteinConcentrationsWriter cannot be used with a cell-cycle model that does not inherit from AbstractOdeBasedCellCycleModel");
+        EXCEPTION("CellCycleModelProteinConcentrationsWriter cannot be used with a cell-cycle model that does not inherit from AbstractOdeBasedPhaseBasedCellCycleModel");
     }
 }
 

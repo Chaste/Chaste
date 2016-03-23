@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef STOCHASTICDURATIONCELLCYCLEMODEL_HPP_
 #define STOCHASTICDURATIONCELLCYCLEMODEL_HPP_
 
-#include "AbstractSimpleCellCycleModel.hpp"
+#include "AbstractSimplePhaseBasedCellCycleModel.hpp"
 #include "RandomNumberGenerator.hpp"
 
 /**
@@ -51,7 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * If the cell has DifferentiatedCellProliferativeType, then the G1 phase duration is
  * set to be infinite, so that the cell will never divide.
  */
-class StochasticDurationCellCycleModel : public AbstractSimpleCellCycleModel
+class StochasticDurationCellCycleModel : public AbstractSimplePhaseBasedCellCycleModel
 {
     friend class TestSimpleCellCycleModels;
 
@@ -68,7 +68,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractSimpleCellCycleModel>(*this);
+        archive & boost::serialization::base_object<AbstractSimplePhaseBasedCellCycleModel>(*this);
 
         // Make sure the RandomNumberGenerator singleton gets saved too
         SerializableSingleton<RandomNumberGenerator>* p_wrapper = RandomNumberGenerator::Instance()->GetSerializationWrapper();
@@ -95,7 +95,7 @@ protected:
 public:
 
     /**
-     * Constructor - just a default, mBirthTime is now set in the AbstractCellCycleModel class.
+     * Constructor - just a default, mBirthTime is set in the AbstractCellCycleModel class.
      * mG1Duration is set very high, it is set for the individual cells when InitialiseDaughterCell is called
      */
     StochasticDurationCellCycleModel();

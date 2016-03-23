@@ -939,7 +939,7 @@ public:
             // As usual, we archive via a pointer to the most abstract class possible
             AbstractCellCycleModel* const p_model = new StochasticDurationGenerationBasedCellCycleModel;
             p_model->SetDimension(2);
-            p_model->SetTransitCellG1Duration(1.0);
+            static_cast<StochasticDurationGenerationBasedCellCycleModel*>(p_model)->SetTransitCellG1Duration(1.0);
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
@@ -1188,7 +1188,7 @@ public:
             static_cast<StochasticOxygenBasedCellCycleModel*>(p_model)->SetCurrentHypoxiaOnsetTime(3.1);
             static_cast<StochasticOxygenBasedCellCycleModel*>(p_model)->GenerateStochasticG2Duration();
 
-            TS_ASSERT_DELTA(p_model->GetG2Duration(), 3.0822, 1e-4);
+            TS_ASSERT_DELTA(static_cast<StochasticOxygenBasedCellCycleModel*>(p_model)->GetG2Duration(), 3.0822, 1e-4);
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
@@ -1213,8 +1213,7 @@ public:
 
             input_arch >> p_model2;
 
-            TS_ASSERT_DELTA(p_model2->GetG2Duration(), 3.0822, 1e-4);
-
+            TS_ASSERT_DELTA(static_cast<StochasticOxygenBasedCellCycleModel*>(p_model2)->GetG2Duration(), 3.0822, 1e-4);
             TS_ASSERT_DELTA(static_cast<StochasticOxygenBasedCellCycleModel*>(p_model2)->GetHypoxicConcentration(), 0.8, 1e-6);
             TS_ASSERT_DELTA(static_cast<StochasticOxygenBasedCellCycleModel*>(p_model2)->GetQuiescentConcentration(), 0.7, 1e-6);
             TS_ASSERT_DELTA(static_cast<StochasticOxygenBasedCellCycleModel*>(p_model2)->GetCriticalHypoxicDuration(), 2.5, 1e-6);
