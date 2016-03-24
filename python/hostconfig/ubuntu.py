@@ -187,3 +187,7 @@ def Configure(prefs, build):
     if use_cvode:
         DetermineCvodeVersion('/usr/include')
         other_libraries.extend(['sundials_cvode', 'sundials_nvecserial'])
+
+    #Extra lines to st boost version for TestArchiveFormat 
+    AddBoost('/home/ubuntu/boost_1_48_0', prefs['boost'])
+
