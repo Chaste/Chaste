@@ -230,7 +230,7 @@ public:
     /**
      * @return whether the cell is ready to divide.
      *
-     * It is pure virtual as needs to be defined in child clases.
+     * It is pure virtual as needs to be defined in child classes.
      *
      * The intention is that this method is called precisely once at
      * each timestep of the simulation. However this does not appear
