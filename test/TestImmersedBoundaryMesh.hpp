@@ -82,7 +82,60 @@ public:
 
     void TestGetSkewnessOfElementMassDistributionAboutAxis() throw(Exception)
     {
+        // A square should have no skewness about any axis
+        {
+            std::vector <Node<2>*> nodes;
+            nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+            nodes.push_back(new Node<2>(1, true, 0.1, 0.0));
+            nodes.push_back(new Node<2>(2, true, 0.1, 0.1));
+            nodes.push_back(new Node<2>(3, true, 0.0, 0.1));
 
+            std::vector < ImmersedBoundaryElement < 2, 2 > * > elems;
+            elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
+
+            ImmersedBoundaryMesh<2, 2> *p_mesh = new ImmersedBoundaryMesh<2, 2>(nodes, elems);
+
+            for (unsigned i = 0 ; i < 16 ; i++)
+            {
+                double theta = 2.0 * M_PI * (double)i / 16.0;
+
+                c_vector<double, 2> axis;
+                axis[0] = cos(theta);
+                axis[1] = sin(theta);
+
+                TS_ASSERT_DELTA(p_mesh->GetSkewnessOfElementMassDistributionAboutAxis(0, axis), 0.0, 1e-12);
+            }
+
+            delete(p_mesh);
+        }
+
+        // A triangle should have skewness
+        {
+            std::vector <Node<2>*> nodes;
+            nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+            nodes.push_back(new Node<2>(1, true, 0.1, 0.0));
+            nodes.push_back(new Node<2>(2, true, 0.1, 0.1));
+
+            std::vector < ImmersedBoundaryElement < 2, 2 > * > elems;
+            elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
+
+            ImmersedBoundaryMesh<2, 2> *p_mesh = new ImmersedBoundaryMesh<2, 2>(nodes, elems);
+
+            c_vector<double, 2> axis;
+            axis[0] = 0.0;
+            axis[1] = 1.0;
+
+            double hand_calculated_skewness = -0.5656854249;
+
+            // Test that the skewness is equal to the hand calculated value
+            TS_ASSERT_DELTA(p_mesh->GetSkewnessOfElementMassDistributionAboutAxis(0, axis) - hand_calculated_skewness,
+                            0.0, 1e-9);
+
+            // If we flip the axis, the skewness should be minus what it was before
+            axis[1] = 1.0;
+            TS_ASSERT_DELTA(p_mesh->GetSkewnessOfElementMassDistributionAboutAxis(0, axis) + hand_calculated_skewness,
+                            0.0, 1e-9);
+        }
     }
     
 };
