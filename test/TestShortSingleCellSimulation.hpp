@@ -57,63 +57,88 @@ public:
 
     void TestShortSingleCellSim() throw(Exception)
     {
-        /*
-         * 1: Num cells
-         * 2: Num nodes per cell
-         * 3: Superellipse exponent
-         * 4: Superellipse aspect ratio
-         * 5: Random y-variation
-         * 6: Include membrane
-         */
-//        ImmersedBoundaryPalisadeMeshGenerator gen(1, 32, 0.1, 2.5, 0.0, false);
-//        ImmersedBoundaryMesh<2, 2>* p_mesh = gen.GetMesh();
-//
-//        p_mesh->SetNumGridPtsXAndY(512);
+        std::vector<c_vector<double, 2> > offsets(9);
+        offsets[0][0] = 0.35; offsets[0][1] = 0.3;
+        offsets[1][0] = 0.35; offsets[1][1] = 0.6;
+        offsets[2][0] = 0.35; offsets[2][1] = 0.9;
+        offsets[3][0] = 0.50; offsets[3][1] = 0.15;
+        offsets[4][0] = 0.50; offsets[4][1] = 0.45;
+        offsets[5][0] = 0.50; offsets[5][1] = 0.75;
+        offsets[6][0] = 0.65; offsets[6][1] = 0.3;
+        offsets[7][0] = 0.65; offsets[7][1] = 0.6;
+        offsets[8][0] = 0.65; offsets[8][1] = 0.9;
+
+        std::vector<c_vector<double, 2> > node_locations(32);
+        for (unsigned location = 0 ; location < node_locations.size() ; location++)
+        {
+            double theta = 2.0 * M_PI * (double)location / (double)node_locations.size();
+            node_locations[location][0] = cos(theta);
+            node_locations[location][1] = sin(theta);
+        }
 
         std::vector<Node<2>*> nodes;
-
-        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
-        nodes.push_back(new Node<2>(1, true, 0.1, 0.0));
-        nodes.push_back(new Node<2>(2, true, 0.101, 0.2));
-        nodes.push_back(new Node<2>(3, true, 0.5, 0.2));
-        nodes.push_back(new Node<2>(4, true, 0.0, 0.3));
-
         std::vector<ImmersedBoundaryElement<2,2>*> elems;
-        elems.push_back(new ImmersedBoundaryElement<2,2>(0, nodes));
 
+        for (unsigned offset = 0 ; offset < offsets.size() ; offset++)
+        {
+            std::vector<Node<2>*> nodes_this_elem;
+
+            for (unsigned location = 0 ; location < node_locations.size() ; location++)
+            {
+                unsigned index = offset * node_locations.size() + location;
+                Node<2>* p_node = new Node<2>(index, offsets[offset] + 0.0725 * node_locations[location], true);
+
+                nodes_this_elem.push_back(p_node);
+                nodes.push_back(p_node);
+            }
+
+            ImmersedBoundaryElement<2,2>* p_elem = new ImmersedBoundaryElement<2,2>(offset, nodes_this_elem);
+            p_elem->rGetCornerNodes().push_back(nodes_this_elem[0]);
+            p_elem->rGetCornerNodes().push_back(nodes_this_elem[0]);
+            p_elem->rGetCornerNodes().push_back(nodes_this_elem[0]);
+            p_elem->rGetCornerNodes().push_back(nodes_this_elem[0]);
+
+            elems.push_back(p_elem);
+        }
+MARK;
         ImmersedBoundaryMesh<2,2>* p_mesh = new ImmersedBoundaryMesh<2,2>(nodes, elems);
+MARK;
+        p_mesh->SetNumGridPtsXAndY(64);
+MARK;
+        std::vector<CellPtr> cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
+MARK;
+        ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
 
-        c_vector<double, 2> axis;
-        axis[0] = 0.0;
-        axis[1] = 1.0;
+        OffLatticeSimulation<2> simulator(cell_population);
+        MARK;
+        // Add main immersed boundary simulation modifier
+        MAKE_PTR(ImmersedBoundarySimulationModifier<2>, p_main_modifier);
+        simulator.AddSimulationModifier(p_main_modifier);
+        MARK;
+        // Add force laws
+        MAKE_PTR_ARGS(ImmersedBoundaryMembraneElasticityForce<2>, p_boundary_force, (cell_population));
+        p_main_modifier->AddImmersedBoundaryForce(p_boundary_force);
+        p_boundary_force->SetSpringConstant(0.5 * 1e7);
+        MARK;
 
-        PRINT_VARIABLE(p_mesh->GetSkewnessOfElementMassDistributionAboutAxis(0, axis));
 
-//        std::vector<CellPtr> cells;
-//        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-//        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
-//        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
-//
-//        ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
-//
-//        OffLatticeSimulation<2> simulator(cell_population);
-//
-//        // Add main immersed boundary simulation modifier
-//        MAKE_PTR(ImmersedBoundarySimulationModifier<2>, p_main_modifier);
-//        simulator.AddSimulationModifier(p_main_modifier);
-//
-//        // Add force laws
-//        MAKE_PTR_ARGS(ImmersedBoundaryMembraneElasticityForce<2>, p_boundary_force, (cell_population));
-//        p_main_modifier->AddImmersedBoundaryForce(p_boundary_force);
-//        p_boundary_force->SetSpringConstant(0.5 * 1e7);
-//
-//
-//        // Set simulation properties
-//        simulator.SetOutputDirectory("TestShortSingleCellSimulation");
-//        simulator.SetDt(0.05);
-//        simulator.SetSamplingTimestepMultiple(10);
-//        simulator.SetEndTime(100.0);
-//
-//        simulator.Solve();
+
+        PRINT_2_VARIABLES(p_mesh->GetNumNodes(), p_mesh->GetNumElements());
+
+        // Set simulation properties
+        simulator.SetOutputDirectory("TestShortSingleCellSimulation");
+        MARK;
+        double dt = 0.05;
+        MARK;
+        simulator.SetDt(dt);
+        simulator.SetSamplingTimestepMultiple(1);
+        simulator.SetEndTime(100.0 * dt);
+        MARK;
+        simulator.Solve();
+        MARK;
+        delete(p_mesh);
     }
 };
