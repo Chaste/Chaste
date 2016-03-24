@@ -221,7 +221,7 @@ public:
     double GetAge();
 
     /**
-     * note this is virtual void temporaitly as part of #2788
+     * note this is virtual void temporarily as part of #2788
      *
      * @return the current cell cycle phase
      */
@@ -230,12 +230,14 @@ public:
     /**
      * @return whether the cell is ready to divide.
      *
+     * It is pure virtual as needs to be defined in child clases.
+     *
      * The intention is that this method is called precisely once at
      * each timestep of the simulation. However this does not appear
      * to always be the case at present, and so it can cope with more
      * unusual usage patterns.
      */
-    virtual bool ReadyToDivide();
+    virtual bool ReadyToDivide() = 0 ;
 
     /**
      * Each cell-cycle model must be able to be reset 'after' a cell division.
