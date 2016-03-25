@@ -105,6 +105,9 @@ protected:
     /** The multiplicative quantity by which we alter the rest length of the basement lamina, if present */
     double mBasementRestLengthModifier;
 
+    /** Whether the elements have corners tagged */
+    bool mElementsHaveCorners;
+
     /** Vector containing locations of apical and basal rest-lengths in the element attribute vectors */
     std::vector<unsigned> mRestLengthLocationsInAttributeVector;
 

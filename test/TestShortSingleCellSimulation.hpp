@@ -93,37 +93,31 @@ public:
             }
 
             ImmersedBoundaryElement<2,2>* p_elem = new ImmersedBoundaryElement<2,2>(offset, nodes_this_elem);
-            p_elem->rGetCornerNodes().push_back(nodes_this_elem[0]);
-            p_elem->rGetCornerNodes().push_back(nodes_this_elem[0]);
-            p_elem->rGetCornerNodes().push_back(nodes_this_elem[0]);
-            p_elem->rGetCornerNodes().push_back(nodes_this_elem[0]);
 
             elems.push_back(p_elem);
         }
-MARK;
+
         ImmersedBoundaryMesh<2,2>* p_mesh = new ImmersedBoundaryMesh<2,2>(nodes, elems);
-MARK;
+
         p_mesh->SetNumGridPtsXAndY(64);
-MARK;
+
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
-MARK;
+
         ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
 
         OffLatticeSimulation<2> simulator(cell_population);
-        MARK;
+
         // Add main immersed boundary simulation modifier
         MAKE_PTR(ImmersedBoundarySimulationModifier<2>, p_main_modifier);
         simulator.AddSimulationModifier(p_main_modifier);
-        MARK;
+
         // Add force laws
         MAKE_PTR_ARGS(ImmersedBoundaryMembraneElasticityForce<2>, p_boundary_force, (cell_population));
         p_main_modifier->AddImmersedBoundaryForce(p_boundary_force);
         p_boundary_force->SetSpringConstant(0.5 * 1e7);
-        MARK;
-
 
 
         PRINT_2_VARIABLES(p_mesh->GetNumNodes(), p_mesh->GetNumElements());

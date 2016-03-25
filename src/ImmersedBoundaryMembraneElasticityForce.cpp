@@ -46,45 +46,61 @@ ImmersedBoundaryMembraneElasticityForce<DIM>::ImmersedBoundaryMembraneElasticity
           mBasementSpringConstantModifier(5.0),
           mBasementRestLengthModifier(0.5)
 {
-    // First verify that all elements have the same number of attributes
-    mReferenceLocationInAttributesVector = mpMesh->GetElement(0)->GetNumElementAttributes();
+    // Verify whether each element has four corners tagged
+    unsigned num_corners = mpMesh->GetElement(0)->rGetCornerNodes().size();
     for (unsigned elem_idx = 1 ; elem_idx < mpMesh->GetNumElements() ; elem_idx++)
     {
-        if (mReferenceLocationInAttributesVector != mpMesh->GetElement(elem_idx)->GetNumElementAttributes())
+        if (num_corners != mpMesh->GetElement(elem_idx)->rGetCornerNodes().size())
         {
-            EXCEPTION("All elements must have the same number of attributes to use this force class.");
+            EXCEPTION("All elements must have the same number of corners to use this force class.");
         }
     }
 
-    /*
-     * We split the nodes into three categories: basal, apical, and lateral.  We keep this information in the attribute
-     * called region, with 0, 1, and 2 representing basal, apical, and lateral respectively.
-     */
-    TagNodeRegions();
+    mElementsHaveCorners = (num_corners == 4);
 
-    /*
-     * We keep track of the initial size of the apical and basal sides.  This will be the initial distance between the
-     * corners, which are stored by the element.
-     *
-     * Corners are represented as follows, and stored as four consecutive element attributes:
-     *
-     *     Apical
-     *     0-----1
-     *     |     |
-     *     |     |
-     *     |     |
-     *     |     |
-     *     |     |
-     *     3-----2
-     *      Basal
-     *
-     * The two element attributes store the starting distance between the apical corners and basal corners, giving
-     * us:
-     *
-     * Attribute i:   Initial distance between apical corners
-     *           i+1: Initial distance between basal corners
-     */
-    TagApicalAndBasalLengths();
+    // If each element has four corners tagged, we set up node regions and apical/basal lengths
+    if (mElementsHaveCorners)
+    {
+        // First verify that all elements have the same number of attributes
+        mReferenceLocationInAttributesVector = mpMesh->GetElement(0)->GetNumElementAttributes();
+        for (unsigned elem_idx = 1; elem_idx < mpMesh->GetNumElements(); elem_idx++)
+        {
+            if (mReferenceLocationInAttributesVector != mpMesh->GetElement(elem_idx)->GetNumElementAttributes())
+            {
+                EXCEPTION("All elements must have the same number of attributes to use this force class.");
+            }
+        }
+
+        /*
+         * We split the nodes into three categories: basal, apical, and lateral.  We keep this information in the attribute
+         * called region, with 0, 1, and 2 representing basal, apical, and lateral respectively.
+         */
+        TagNodeRegions();
+
+        /*
+         * We keep track of the initial size of the apical and basal sides.  This will be the initial distance between the
+         * corners, which are stored by the element.
+         *
+         * Corners are represented as follows, and stored as four consecutive element attributes:
+         *
+         *     Apical
+         *     0-----1
+         *     |     |
+         *     |     |
+         *     |     |
+         *     |     |
+         *     |     |
+         *     3-----2
+         *      Basal
+         *
+         * The two element attributes store the starting distance between the apical corners and basal corners, giving
+         * us:
+         *
+         * Attribute i:   Initial distance between apical corners
+         *           i+1: Initial distance between basal corners
+         */
+        TagApicalAndBasalLengths();
+    }
 }
 
 template<unsigned DIM>
@@ -192,33 +208,37 @@ void ImmersedBoundaryMembraneElasticityForce<DIM>::AddForceContribution(std::vec
             elem_it->GetNode(node_idx)->AddAppliedForceContribution(aggregate_force);
         }
 
-        // Add force contributions from apical and basal surfaces
-        if (elem_idx != mpMesh->GetMembraneIndex())
+        // If corners are present, we add on the additional functionality
+        if (mElementsHaveCorners)
         {
-            std::vector<Node<DIM>*> r_corners = elem_it->rGetCornerNodes();
+            // Add force contributions from apical and basal surfaces
+            if (elem_idx != mpMesh->GetMembraneIndex())
+            {
+                std::vector<Node<DIM> *> r_corners = elem_it->rGetCornerNodes();
 
-            // Apical surface
-            c_vector<double, DIM> apical_force = mpMesh->GetVectorFromAtoB(r_corners[0]->rGetLocation(),
-                                                                           r_corners[1]->rGetLocation());
-            normed_dist = norm_2(apical_force);
-            apical_force *=
-                    0.0 * mSpringConst * (normed_dist - GetApicalLengthForElement(elem_idx)) / normed_dist;
+                // Apical surface
+                c_vector<double, DIM> apical_force = mpMesh->GetVectorFromAtoB(r_corners[0]->rGetLocation(),
+                                                                               r_corners[1]->rGetLocation());
+                normed_dist = norm_2(apical_force);
+                apical_force *=
+                        0.0 * mSpringConst * (normed_dist - GetApicalLengthForElement(elem_idx)) / normed_dist;
 
-            r_corners[0]->AddAppliedForceContribution(apical_force);
-            apical_force *= -1.0;
-            r_corners[1]->AddAppliedForceContribution(apical_force);
+                r_corners[0]->AddAppliedForceContribution(apical_force);
+                apical_force *= -1.0;
+                r_corners[1]->AddAppliedForceContribution(apical_force);
 
-            // Basal surface
-            c_vector<double, DIM> basal_force = mpMesh->GetVectorFromAtoB(r_corners[3]->rGetLocation(),
-                                                                          r_corners[2]->rGetLocation());
+                // Basal surface
+                c_vector<double, DIM> basal_force = mpMesh->GetVectorFromAtoB(r_corners[3]->rGetLocation(),
+                                                                              r_corners[2]->rGetLocation());
 
-            normed_dist = norm_2(basal_force);
-            basal_force *=
-                    0.0 * mSpringConst * (normed_dist - GetBasalLengthForElement(elem_idx)) / normed_dist;
+                normed_dist = norm_2(basal_force);
+                basal_force *=
+                        0.0 * mSpringConst * (normed_dist - GetBasalLengthForElement(elem_idx)) / normed_dist;
 
-            r_corners[3]->AddAppliedForceContribution(basal_force);
-            basal_force *= -1.0;
-            r_corners[2]->AddAppliedForceContribution(basal_force);
+                r_corners[3]->AddAppliedForceContribution(basal_force);
+                basal_force *= -1.0;
+                r_corners[2]->AddAppliedForceContribution(basal_force);
+            }
         }
     }
 }
