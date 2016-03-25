@@ -86,7 +86,7 @@ public:
             for (unsigned location = 0 ; location < node_locations.size() ; location++)
             {
                 unsigned index = offset * node_locations.size() + location;
-                Node<2>* p_node = new Node<2>(index, offsets[offset] + 0.0725 * node_locations[location], true);
+                Node<2>* p_node = new Node<2>(index, offsets[offset] + 0.08 * node_locations[location], true);
 
                 nodes_this_elem.push_back(p_node);
                 nodes.push_back(p_node);
