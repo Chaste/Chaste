@@ -349,6 +349,74 @@ void ImmersedBoundaryCellPopulation<DIM>::UpdateNodeLocations(double dt)
         // Move the node
         this->SetNode(node_iter->GetIndex(), new_point);
     }
+    // If active sources, we need to update those location as well
+    if (this->DoesPopulationHaveActiveSources())
+    {
+        std::vector<FluidSource<DIM> *> &r_element_sources = this->rGetMesh().rGetElementFluidSources();
+        std::vector<FluidSource<DIM> *> &r_balance_sources = this->rGetMesh().rGetBalancingFluidSources();
+
+        // Construct a vector of all sources combined
+        std::vector<FluidSource<DIM> *> combined_sources;
+        combined_sources.insert(combined_sources.end(), r_element_sources.begin(), r_element_sources.end());
+        combined_sources.insert(combined_sources.end(), r_balance_sources.begin(), r_balance_sources.end());
+
+        c_vector<double, DIM> source_location;
+
+        // Iterate over all sources and update their locations
+        for (unsigned source_idx = 0 ; source_idx < combined_sources.size() ; source_idx++)
+        {
+            // Get location of current node
+            source_location = combined_sources[source_idx]->rGetLocation();
+
+            // Get first grid index in each dimension, taking account of possible wrap-around
+            first_idx_x = unsigned(floor(source_location[0] / grid_spacing_x)) + num_grid_pts_x - 1;
+            first_idx_y = unsigned(floor(source_location[1] / grid_spacing_y)) + num_grid_pts_y - 1;
+
+            // Calculate all four indices and deltas in each dimension
+            for (unsigned i = 0 ; i < 4 ; i ++)
+            {
+                x_indices[i] = (first_idx_x + i) % num_grid_pts_x;
+                y_indices[i] = (first_idx_y + i) % num_grid_pts_y;
+
+                x_deltas[i] = Delta1D(fabs(x_indices[i] * grid_spacing_x - source_location[0]), grid_spacing_x);
+                y_deltas[i] = Delta1D(fabs(y_indices[i] * grid_spacing_x - source_location[1]), grid_spacing_y);
+            }
+
+            // Loop over the 4x4 grid which will influence the displacement of the current node
+            for (unsigned x_idx = 0; x_idx < 4; x_idx++)
+            {
+                for (unsigned y_idx = 0; y_idx < 4; y_idx++)
+                {
+                    // The applied velocity is weighted by the delta function
+                    delta = x_deltas[x_idx] * y_deltas[y_idx];
+                    displacement[0] += vel_grids[0][x_indices[x_idx]][y_indices[y_idx]] * delta;
+                    displacement[1] += vel_grids[1][x_indices[x_idx]][y_indices[y_idx]] * delta;
+                }
+            }
+
+            // Normalise by timestep
+            displacement *= dt;
+
+            //If the displacement is too big, warn the user once and scale it back
+            if (norm_2(displacement) > characteristic_spacing)
+            {
+                WARN_ONCE_ONLY("Sources are moving more than half the CharacteristicNodeSpacing. This could cause elements to become inverted so the motion has been restricted. Use a smaller timestep to avoid these warnings.");
+                displacement *= characteristic_spacing / norm_2(displacement);
+            }
+
+            // Get new node location
+            source_location += displacement;
+
+            // Account for periodic boundary
+            for (unsigned i = 0; i < DIM; i++)
+            {
+                source_location[i] = fmod(source_location[i] + 1.0, 1.0);
+            }
+
+            // Move the node
+            combined_sources[source_idx]->rGetModifiableLocation() = source_location;
+        }
+    }
 }
 
 template<unsigned DIM>
