@@ -50,24 +50,29 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Simulation does not run in parallel
 #include "FakePetscSetup.hpp"
-#include "../src/SuperellipseGenerator.hpp"
 
 class TestGenerateFigureForReviewPaperWithAlex : public AbstractCellBasedTestSuite
 {
 public:
 
+    /*
+     * Function to return a vector of node locations specifying a hexagon with origin at (0, 0) with vertices on the
+     * unit circle.
+     */
     std::vector<c_vector<double, 2> > GetUnitHexagon(unsigned numPtsPerSide)
     {
         std::vector<c_vector<double, 2> > locations(numPtsPerSide * 6);
 
         // Find locations of the six vertices (and the seventh is the same as the first)
         std::vector<c_vector<double, 2> > vertices(7);
+        double sixty_degrees = M_PI / 3.0;
         for (unsigned vertex = 0 ; vertex < vertices.size() ; vertex++)
         {
-            vertices[vertex][0] = cos((double)vertex * M_PI / 3.0);
-            vertices[vertex][1] = sin((double)vertex * M_PI / 3.0);
+            vertices[vertex][0] = cos((double)vertex * sixty_degrees);
+            vertices[vertex][1] = sin((double)vertex * sixty_degrees);
         }
 
+        // Between each pair of vertices, fill in the specified number of locations evenly spaced along the edge
         for (unsigned vertex = 0 ; vertex < 6 ; vertex++)
         {
             c_vector<double, 2> this_vertex = vertices[vertex];
@@ -84,31 +89,42 @@ public:
 
     void TestHexagonalPacking() throw(Exception)
     {
+        /*
+         * Create a hexagonal packing of elements of a fixed radius
+         */
+
+        // Specify the number of elements in each direction and their radius
         unsigned num_x = 5;
         unsigned num_y = 4;
         double rad = 0.11;
+
+        // We need to calculate the required centre of each hexagon
         std::vector<c_vector<double, 2> > offsets(num_x * num_y);
 
+        // Specify the centre of the bottom-left most hexagon
         c_vector<double, 2> global_offset;
         global_offset[0] = 0.15;
         global_offset[1] = 0.15;
 
+        // Calculate the centres
         for (unsigned x = 0 ; x < num_x ; x++)
         {
             for (unsigned y = 0 ; y < num_y ; y++)
             {
                 unsigned idx = x * num_y + y;
 
-                offsets[idx][0] = global_offset[0] + 1.5 * rad * x;
+                offsets[idx][0] = global_offset[0] + 1.5 * rad * (double)x;
                 offsets[idx][1] = global_offset[1] + 0.5 * sqrt(3) * rad * (double)(2 * y + (x % 2 == 1));
             }
         }
 
+        // Get locations for the reference hexagon
         std::vector<c_vector<double, 2> > node_locations = GetUnitHexagon(10);
 
         std::vector<Node<2>*> nodes;
         std::vector<ImmersedBoundaryElement<2,2>*> elems;
 
+        // For each calculated centre, create the nodes representing each location around that hexagon
         for (unsigned offset = 0 ; offset < offsets.size() ; offset++)
         {
             std::vector<Node<2>*> nodes_this_elem;
@@ -126,6 +142,7 @@ public:
             elems.push_back(p_elem);
         }
 
+        // Create the mesh, cells, cell population, and simulation
         ImmersedBoundaryMesh<2,2>* p_mesh = new ImmersedBoundaryMesh<2,2>(nodes, elems);
         p_mesh->SetNumGridPtsXAndY(64);
 
@@ -148,39 +165,41 @@ public:
         p_main_modifier->AddImmersedBoundaryForce(p_boundary_force);
         p_boundary_force->SetSpringConstant(0.5 * 1e7);
 
-
-
+        // Set output location
         std::string output_directory = "TestGenerateFigureForReviewPaperWithAlex";
         simulator.SetOutputDirectory(output_directory);
 
-        // Write the state of the immersed boundary mesh to file
+        // Prepare mesh writers to export the .node and .grid files needed to draw quiver plots
         ImmersedBoundaryMeshWriter<2,2> mesh_at_1(output_directory, "mesh_at_1");
         ImmersedBoundaryMeshWriter<2,2> mesh_at_2(output_directory, "mesh_at_2");
 
         // Set simulation properties
         simulator.SetOutputDirectory(output_directory);
         double dt = 0.05;
-
         simulator.SetDt(dt);
         simulator.SetSamplingTimestepMultiple(100);
+
+        /*
+         * Run a first simulation to allow cells to relax to an equilibrium state, then write the mesh files
+         */
         simulator.SetEndTime(2500.0 * dt);
         simulator.Solve();
 
         mesh_at_1.WriteFilesUsingMesh(*p_mesh);
 
-        // Set fluid sources for growth phase of simulation
+        /*
+         * Add a fluid sink to one of the middle cells to make it reduce in size.  Run the simulation for a further
+         * duration and write the new mesh files.
+         */
         std::vector<FluidSource<2>*>& sources = p_mesh->rGetElementFluidSources();
-        PRINT_VARIABLE(sources.size());
-
         sources[10]->SetStrength(-2.0 * 1e4);
 
-        simulator.SetDt(dt);
-        simulator.SetSamplingTimestepMultiple(100);
         simulator.SetEndTime(7000.0 * dt);
         simulator.Solve();
 
         mesh_at_2.WriteFilesUsingMesh(*p_mesh);
 
+        // Tidy up by deleting the mesh.  This will free memory used for nodes and elements.
         delete(p_mesh);
     }
 };
