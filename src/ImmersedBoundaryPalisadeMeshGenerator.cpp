@@ -176,6 +176,13 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
 
         // Create the membrane element
         ib_elements.push_back(new ImmersedBoundaryElement<2,2>(0, nodes_this_elem));
+
+        // Pass in null corners
+        std::vector<Node<2>*>& r_elem_corners = ib_elements.back()->rGetCornerNodes();
+        for (unsigned corner = 0 ; corner < 4 ; corner++)
+        {
+            r_elem_corners.push_back(NULL);
+        }
     }
 
     RandomNumberGenerator* p_rand_gen = RandomNumberGenerator::Instance();

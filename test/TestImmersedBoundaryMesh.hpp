@@ -34,7 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 // Needed for test framework
-#include <cxxtest/TestSuite.h>
+#include <cxxtest/cxxtest/TestSuite.h>
 
 #include "ImmersedBoundaryMesh.hpp"
 #include "Debug.hpp"
@@ -132,7 +132,7 @@ public:
                             0.0, 1e-9);
 
             // If we flip the axis, the skewness should be minus what it was before
-            axis[1] = 1.0;
+            axis[1] = -1.0;
             TS_ASSERT_DELTA(p_mesh->GetSkewnessOfElementMassDistributionAboutAxis(0, axis) + hand_calculated_skewness,
                             0.0, 1e-9);
         }

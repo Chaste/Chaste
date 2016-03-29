@@ -42,7 +42,7 @@ ImmersedBoundaryMembraneElasticityForce<DIM>::ImmersedBoundaryMembraneElasticity
           mpCellPopulation(&rCellPopulation),
           mpMesh(&(rCellPopulation.rGetMesh())),
           mSpringConst(1e6),
-          mRestLengthMultiplier(0.25),
+          mRestLengthMultiplier(0.5),
           mBasementSpringConstantModifier(5.0),
           mBasementRestLengthModifier(0.5)
 {
@@ -191,18 +191,23 @@ void ImmersedBoundaryMembraneElasticityForce<DIM>::AddForceContribution(std::vec
             double modified_rest_length = rest_length;
 
             // Hooke's law linear spring force
-            elastic_force_to_next_node[node_idx] = mpMesh->GetVectorFromAtoB(elem_it->GetNodeLocation(next_idx), elem_it->GetNodeLocation(node_idx));
+            elastic_force_to_next_node[node_idx] = mpMesh->GetVectorFromAtoB(elem_it->GetNodeLocation(node_idx), elem_it->GetNodeLocation(next_idx));
             normed_dist = norm_2(elastic_force_to_next_node[node_idx]);
             elastic_force_to_next_node[node_idx] *= modified_spring_constant * (normed_dist - modified_rest_length) / normed_dist;
+
+//            if (elem_it->GetNode(node_idx)->GetRegion() == msApi && elem_it->GetNode(next_idx)->GetRegion() == msApi)
+//            {
+//                elastic_force_to_next_node[node_idx] *= 0.1;
+//            }
         }
 
         // Add the contributions of springs adjacent to each node
         for (unsigned node_idx = 0 ; node_idx < num_nodes ; node_idx++)
         {
-            // Index of previous node, but -1%n doesn't work, so we add num_nodes when calculating
+            // Get index of previous node
             unsigned prev_idx = (node_idx + num_nodes - 1) % num_nodes;
 
-            aggregate_force = elastic_force_to_next_node[prev_idx] - elastic_force_to_next_node[node_idx];
+            aggregate_force = elastic_force_to_next_node[node_idx] - elastic_force_to_next_node[prev_idx];
 
             // Add the aggregate force contribution to the node
             elem_it->GetNode(node_idx)->AddAppliedForceContribution(aggregate_force);

@@ -144,12 +144,12 @@ ImmersedBoundaryFftInterface<DIM>::ImmersedBoundaryFftInterface(ImmersedBoundary
     mFftwForwardPlan = fftw_plan_many_dft_r2c(rank, real_dims, how_many_forward,
                                               mpInputArray,   real_nembed, real_stride, real_sep,
                                               mpComplexArray, comp_nembed, comp_stride, comp_sep,
-                                              FFTW_ESTIMATE);
+                                              FFTW_PATIENT);
 
     mFftwInversePlan = fftw_plan_many_dft_c2r(rank, real_dims, how_many_inverse,
                                               mpComplexArray, comp_nembed, comp_stride, comp_sep,
                                               mpOutputArray,  real_nembed, real_stride, real_sep,
-                                              FFTW_ESTIMATE);
+                                              FFTW_PATIENT);
 }
 
 template<unsigned DIM>

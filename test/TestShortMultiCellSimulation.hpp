@@ -34,7 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 // Needed for the test environment
-#include <cxxtest/TestSuite.h>
+#include <cxxtest/cxxtest/TestSuite.h>
 #include "AbstractCellBasedTestSuite.hpp"
 
 // External library - not part of Chaste
@@ -92,20 +92,13 @@ public:
         // Add force laws
         MAKE_PTR_ARGS(ImmersedBoundaryMembraneElasticityForce<2>, p_boundary_force, (cell_population));
         p_main_modifier->AddImmersedBoundaryForce(p_boundary_force);
-        p_boundary_force->SetSpringConstant(5.0 * 1e6);
+        p_boundary_force->SetSpringConstant(1.0 * 1e7);
 
-        // Set simulation properties
-        double dt = 0.075;
-        simulator.SetOutputDirectory("TestShortMultiCellSimulation");
-        simulator.SetDt(dt);
-        simulator.SetSamplingTimestepMultiple(100);
-        simulator.SetEndTime(100.0 * dt);
-        simulator.Solve();
-
-        // Add a cell-cell interaction force with the same intrinsic strength as the membrane force
         MAKE_PTR_ARGS(ImmersedBoundaryCellCellInteractionForce<2>, p_cell_cell_force, (cell_population));
         p_main_modifier->AddImmersedBoundaryForce(p_cell_cell_force);
-        p_cell_cell_force->SetSpringConstant(2.0 * 1e6);
+        p_cell_cell_force->SetSpringConstant(1.0 * 1e6);
+
+
 
         // Get height of basement lamina
         double lamina_height = 0.0;
@@ -115,33 +108,34 @@ public:
         }
         lamina_height /= p_mesh->GetElement(0)->GetNumNodes();
 
+
         // Kick the second cell in from the left and set its E-cad level
-        double kick = 1.1;
-        unsigned e_cad_location = p_cell_cell_force->rGetProteinNodeAttributeLocations()[0];
-        unsigned p_cad_location = p_cell_cell_force->rGetProteinNodeAttributeLocations()[1];
+        double kick = 1.05;
+//        unsigned e_cad_location = p_cell_cell_force->rGetProteinNodeAttributeLocations()[0];
+//        unsigned p_cad_location = p_cell_cell_force->rGetProteinNodeAttributeLocations()[1];
 
 //        double centroid_x = p_mesh->GetCentroidOfElement(3)[0];
-//
-//        for (unsigned node_idx = 0 ; node_idx < p_mesh->GetElement(3)->GetNumNodes() ; node_idx++)
-//        {
-//            double new_height = lamina_height + kick * (p_mesh->GetElement(3)->GetNode(node_idx)->rGetLocation()[1] - lamina_height);
-//
-//            p_mesh->GetElement(3)->GetNode(node_idx)->rGetModifiableLocation()[1] = new_height;
-//
-////            if (p_mesh->GetElement(3)->GetNode(node_idx)->GetRegion() == 2 && p_mesh->GetElement(3)->GetNode(node_idx)->rGetLocation()[0] > centroid_x)
-////            {
-////                p_mesh->GetElement(3)->GetNode(node_idx)->rGetNodeAttributes()[e_cad_location] = 0.0;
-////            }
-////            else
-////            {
-////                p_mesh->GetElement(3)->GetNode(node_idx)->rGetNodeAttributes()[e_cad_location] = 0.0;
-////            }
+
+        for (unsigned node_idx = 0 ; node_idx < p_mesh->GetElement(3)->GetNumNodes() ; node_idx++)
+        {
+            double new_height = lamina_height + kick * (p_mesh->GetElement(3)->GetNode(node_idx)->rGetLocation()[1] - lamina_height);
+
+            p_mesh->GetElement(3)->GetNode(node_idx)->rGetModifiableLocation()[1] = new_height;
+
+//            if (p_mesh->GetElement(3)->GetNode(node_idx)->GetRegion() == 2 && p_mesh->GetElement(3)->GetNode(node_idx)->rGetLocation()[0] > centroid_x)
+//            {
+//                p_mesh->GetElement(3)->GetNode(node_idx)->rGetNodeAttributes()[e_cad_location] = 0.0;
+//            }
+//            else
+//            {
+//                p_mesh->GetElement(3)->GetNode(node_idx)->rGetNodeAttributes()[e_cad_location] = 0.0;
+//            }
 //
 //            p_mesh->GetElement(3)->GetNode(node_idx)->rGetNodeAttributes()[e_cad_location] = 0.0;
 //
 //            p_mesh->GetElement(3)->GetNode(node_idx)->rGetNodeAttributes()[p_cad_location] = 2.0;
-//
-//        }
+
+        }
 //
 //        for (unsigned node_idx = 0 ; node_idx < p_mesh->GetElement(4)->GetNumNodes() ; node_idx++)
 //        {
@@ -151,13 +145,18 @@ public:
 //            }
 //        }
 
-        ChasteCuboid<2> bb_2 = p_mesh->CalculateBoundingBoxOfElement(7);
-
-        PRINT_VECTOR(bb_2.rGetLowerCorner().rGetLocation());
-        PRINT_VECTOR(bb_2.rGetUpperCorner().rGetLocation());
-
+        // Set simulation properties
+        double dt = 0.05;
+        simulator.SetOutputDirectory("TestShortMultiCellSimulation");
+        simulator.SetDt(dt);
         simulator.SetSamplingTimestepMultiple(100);
-        simulator.SetEndTime(200.0 * dt);
+        simulator.SetEndTime(5000.0 * dt);
         simulator.Solve();
+
+//        // Add a cell-cell interaction force with the same intrinsic strength as the membrane force
+//        MAKE_PTR_ARGS(ImmersedBoundaryCellCellInteractionForce<2>, p_cell_cell_force, (cell_population));
+//        p_main_modifier->AddImmersedBoundaryForce(p_cell_cell_force);
+//        p_cell_cell_force->SetSpringConstant(2.0 * 1e6);
+
     }
 };

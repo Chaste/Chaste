@@ -85,13 +85,13 @@ protected:
     unsigned mReferenceLocationInAttributesVector;
 
     /** Node region code for basal, used only by this class */
-    const static unsigned msBas = 0;
+    const static unsigned msBas = 1;
 
     /** Node region code for apical, used only by this class */
-    const static unsigned msApi = 1;
+    const static unsigned msApi = 2;
 
     /** Node region code for lateral, used only by this class */
-    const static unsigned msLat = 2;
+    const static unsigned msLat = 3;
 
     /** The membrane spring constant associated with each element */
     double mSpringConst;

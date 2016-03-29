@@ -161,6 +161,12 @@ void ImmersedBoundaryCellCellInteractionForce<DIM>::AddForceContribution(std::ve
                  */
                 vector_between_nodes *= effective_spring_const * protein_mult * (normed_dist - mRestLength) / normed_dist;
 
+                // If a node is apical, increase adhesion
+                if (p_node_a->GetRegion() == 2 || p_node_b->GetRegion() == 2)
+                {
+                    vector_between_nodes *= 2.0;
+                }
+
                 force_a_to_b = vector_between_nodes * elem_spacing / node_a_elem_spacing;
                 p_node_a->AddAppliedForceContribution(force_a_to_b);
 

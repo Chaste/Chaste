@@ -55,7 +55,7 @@ SuperellipseGenerator::SuperellipseGenerator(unsigned numPoints,
     /*
      * Run a high-density pass around the parametric curve first
      */
-    unsigned dense_pts = 10000;
+    unsigned dense_pts = 50000;
 
     // Vectors to store information from the loop
     std::vector<double> cumulative_arc_length(dense_pts);
