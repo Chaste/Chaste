@@ -34,7 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 // Needed for test framework
-#include <cxxtest/TestSuite.h>
+#include <cxxtest/cxxtest/TestSuite.h>
 
 // Needed for Immersed Boundary simulations
 #include <complex>
@@ -91,7 +91,7 @@ public:
          * This test generates an fftw wisdom file telling fftw how to efficiently compute fourier transforms of a
          * given size, using two threads.  We generate wisdom for two and three DFTs of data contiguous in memory:
          *
-         *    * 2d forward R2C and backward C2R transforms (16x16 --> 4096x4096)
+         *    * 2d forward R2C and backward C2R transforms (16x16 --> mMaxArraySize x mMaxArraySize)
          */
 
         // We first forget all wisdom and re-load, as threaded wisdom doesn't play well with un-threaded
