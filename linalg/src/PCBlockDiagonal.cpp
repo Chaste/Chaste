@@ -219,16 +219,17 @@ void PCBlockDiagonal::PCBlockDiagonalSetUp()
     PetscPopErrorHandler();
 
 
-    //PCHYPRESetType(mPCContext.PC_amg_A11, "euclid");
+#if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR<=5 )
     PetscOptionsSetValue("-pc_hypre_type", "euclid");
     PetscOptionsSetValue("-pc_hypre_euclid_levels", "0");
+#else
+/* euclid was removed in 3.6. Use the previously-commented-out alternative */
+    PetscOptionsSetValue("-pc_hypre_type", "boomeramg");
+    PetscOptionsSetValue("-pc_hypre_boomeramg_max_iter", "1");
+    PetscOptionsSetValue("-pc_hypre_boomeramg_strong_threshold", "0.0");
+    PetscOptionsSetValue("-pc_hypre_boomeramg_coarsen_type", "HMIS");
+#endif
 
-
-    //PCSetType(mPCContext.PC_amg_A11, PCHYPRE);
-    //PetscOptionsSetValue("-pc_hypre_type", "boomeramg");
-    //PetscOptionsSetValue("-pc_hypre_boomeramg_max_iter", "1");
-    //PetscOptionsSetValue("-pc_hypre_boomeramg_strong_threshold", "0.0");
-    //PetscOptionsSetValue("-pc_hypre_boomeramg_coarsen_type", "HMIS");
 
 #if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5 )
     // Attempt to emulate SAME_PRECONDITIONER below
