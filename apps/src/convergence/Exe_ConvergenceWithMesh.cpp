@@ -40,14 +40,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "RandomNumberGenerator.hpp"
 #include "ExecutableSupport.hpp"
 
-#include "Debug.hpp"
-
 /*
  * These headers handle passing parameters to the executable.
  */
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/variables_map.hpp>
 #include <boost/program_options/parsers.hpp>
+
+#include <boost/lexical_cast.hpp>
 
 #include "OffLatticeSimulation.hpp"
 #include "StochasticDurationCellCycleModel.hpp"
@@ -57,7 +57,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ImmersedBoundarySimulationModifier.hpp"
 #include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
 #include "ImmersedBoundaryMembraneElasticityForce.hpp"
-#include "ImmersedBoundaryCellCellInteractionForce.hpp"
 
 /*
  * Prototype functions
@@ -184,8 +183,11 @@ void SetupAndRunSimulation(unsigned simulationId, unsigned numMeshPoints)
 
     double esf_at_end = p_mesh->GetElongationShapeFactorOfElement(0);
 
-    // Output summary statistics to results file
-    (*results_file) << simulationId << "," << 1.0/numMeshPoints << "," << esf_at_end;
+    // Output summary statistics to results file.  lexical_cast is a convenient way to output doubles at max precision.
+    (*results_file) << simulationId << ","
+                    << boost::lexical_cast<std::string>(1.0 / numMeshPoints) << ","
+                    << boost::lexical_cast<std::string>(esf_at_end);
+
 
     // Tidy up
     results_file->close();

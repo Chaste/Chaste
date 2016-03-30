@@ -5,14 +5,23 @@ import subprocess
 import numpy as np
 import matplotlib.pyplot as plt
 
-# import immersed_boundary as ib
 
-# Globally accessible directory paths and names
-path_to_exec   = os.environ.get('CHASTE_BUILD_DIR') + '/projects/ImmersedBoundary/apps/Exe_ConvergenceWithMesh'
-path_to_output = os.environ.get('CHASTE_TEST_OUTPUT') + '/convergence/mesh/'
+# Globally accessible directory paths, names, and variables
+chaste_build_dir = os.environ.get('CHASTE_BUILD_DIR')
+executable = os.path.join(chaste_build_dir, 'projects/ImmersedBoundary/apps', 'Exe_ConvergenceWithMesh')
+
+if not(os.path.isfile(executable)):
+    raise Exception('Py: Could not find executable: ' + executable)
+
+chaste_test_dir = os.environ.get('CHASTE_TEST_OUTPUT')
+path_to_output = os.path.join(chaste_test_dir, 'convergence', 'mesh')
+
+pdf_name = os.path.join(path_to_output, 'ConvergenceWithMesh.pdf')
+results_header_string = 'simulation_id,mesh_spacing,esf_at_end\n'
 
 # Range for simulation parameters
-num_sims = 4
+num_sims = 15
+
 
 def main():
     run_simulations()
@@ -27,9 +36,9 @@ def run_simulations():
     command_list = []
     for sim_id in range(num_sims):
 
-        num_mesh_pts = 2**(5 + sim_id)
+        num_mesh_pts = int(round(2**(5 + 0.5 * sim_id)))
 
-        command = 'nice -n 19 ' + path_to_exec \
+        command = 'nice -n 19 ' + executable \
                   + ' --ID ' + str(sim_id) \
                   + ' --MP ' + str(num_mesh_pts)
         command_list.append(command)
@@ -57,11 +66,14 @@ def combine_output():
 
     print("Py: Combining output")
 
-    combined_results = open(path_to_output + '/combined_results.dat', 'w')
-    combined_results.write("simulation_id,mesh_spacing,esf_at_end\n")
+    if not(os.path.isdir(path_to_output)):
+        raise Exception('Py: Could not find output directory: ' + path_to_output)
+
+    combined_results = open(os.path.join(path_to_output, 'combined_results.dat'), 'w')
+    combined_results.write(results_header_string)
 
     for sim_id in range(num_sims):
-        file_name = path_to_output + '/sim/' + str(sim_id) + '/results.dat'
+        file_name = os.path.join(path_to_output, 'sim', str(sim_id), 'results.dat')
 
         if os.path.isfile(file_name):
             local_results = open(file_name, 'r')
@@ -107,9 +119,8 @@ def plot_results():
     plt.rc('xtick.major', size=0, pad=4)
     plt.rc('ytick.major', size=0, pad=4)
 
-
     # Data for esf vs time plot
-    esf_data = np.genfromtxt(path_to_output + '/combined_results.dat',
+    esf_data = np.genfromtxt(os.path.join(path_to_output, 'combined_results.dat'),
                              delimiter=',',
                              skip_header=1)
 
@@ -127,11 +138,11 @@ def plot_results():
     y_lims = [y_min - margin * y_range, y_max + margin * y_range]
 
     # Plot the two continuous lines
-    plt.plot(time_step, esf_at_end, marker='o',
+    plt.plot(mesh_spacing, esf_at_end, marker='o',
              linestyle='-',
              linewidth=0.75,
              color=mycol_or,
-             markerfacecolor='#FFFFFF',
+             markerfacecolor=mycol_lb,
              markeredgecolor=mycol_or,
              markersize=4.0,
              markeredgewidth=0.75)
@@ -151,7 +162,7 @@ def plot_results():
     ax.grid(b=True, which='major', color=bg_gray, linestyle='dotted', dash_capstyle='round')
 
     # Export figure
-    plt.savefig(path_to_output + 'ConvergenceWithMesh.pdf', bbox_inches='tight', pad_inches=0.0)
+    plt.savefig(pdf_name, bbox_inches='tight', pad_inches=0.0)
 
 if __name__ == "__main__":
     main()

@@ -49,6 +49,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/program_options/variables_map.hpp>
 #include <boost/program_options/parsers.hpp>
 
+#include <boost/lexical_cast.hpp>
+
 #include "OffLatticeSimulation.hpp"
 #include "StochasticDurationCellCycleModel.hpp"
 #include "CellsGenerator.hpp"
@@ -64,8 +66,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 void SetupSingletons();
 void DestroySingletons();
-void SetupAndRunSimulation(unsigned kick, unsigned localSpringConst, unsigned globalSpringConst);
-void OutputOnCompletion(unsigned kick, unsigned localSpringConst, unsigned globalSpringConst);
+void SetupAndRunSimulation(std::string idString, double corRestLength, double corSpringConst, double rhsAdhesionMod);
+void OutputOnCompletion(std::string idString);
 
 int main(int argc, char *argv[])
 {
@@ -76,9 +78,10 @@ int main(int argc, char *argv[])
     boost::program_options::options_description general_options("This is a Chaste Immersed Boundary executable.\n");
     general_options.add_options()
                     ("help", "produce help message")
-                    ("K", boost::program_options::value<unsigned>()->default_value(0),"Amount of kick for the simulation")
-                    ("L", boost::program_options::value<unsigned>()->default_value(0),"Local multiplier for the cell-cell spring const")
-                    ("G", boost::program_options::value<unsigned>()->default_value(0),"Global multiplier for the cell-cell spring const");
+                    ("ID", boost::program_options::value<std::string>(),"ID string for the simulation")
+                    ("RL", boost::program_options::value<double>()->default_value(0.0),"Cortical rest length")
+                    ("SC", boost::program_options::value<double>()->default_value(0.0),"Cortical spring constant")
+                    ("AD", boost::program_options::value<double>()->default_value(0.0),"RHS adhesion modifier");
 
     // define parse command line into variables_map
     boost::program_options::variables_map variables_map;
@@ -93,14 +96,16 @@ int main(int argc, char *argv[])
     }
 
     // get id and name from command line
-    unsigned kick = variables_map["K"].as<unsigned>();
-    unsigned local = variables_map["L"].as<unsigned>();
-    unsigned global = variables_map["G"].as<unsigned>();
+    std::string id_string = variables_map["ID"].as<std::string>();
+    double cor_rest_length = variables_map["RL"].as<double>();
+    double cor_spring_const = variables_map["SC"].as<double>();
+    double rhs_adhesion_mod = variables_map["AD"].as<double>();
+
 
     SetupSingletons();
-    SetupAndRunSimulation(kick, local, global);
+    SetupAndRunSimulation(id_string, cor_rest_length, cor_spring_const, rhs_adhesion_mod);
     DestroySingletons();
-    OutputOnCompletion(kick, local, global);
+    OutputOnCompletion(id_string);
 }
 
 void SetupSingletons()
@@ -122,23 +127,17 @@ void DestroySingletons()
     CellPropertyRegistry::Instance()->Clear();
 }
 
-void OutputOnCompletion(unsigned kick, unsigned localSpringConst, unsigned globalSpringConst)
+void OutputOnCompletion(std::string idString)
 {
     // Compose the message
     std::stringstream message;
-    message << "Completed simulation with global SC " << globalSpringConst << ", local SC " << localSpringConst << ", and kick " << kick << std::endl;
+    message << "Completed simulation with ID string " << idString << std::endl;
 
     // Send it to the console
     std::cout << message.str() << std::flush;
 }
-void SetupAndRunSimulation(unsigned kick, unsigned localSpringConst, unsigned globalSpringConst)
+void SetupAndRunSimulation(std::string idString, double corRestLength, double corSpringConst, double rhsAdhesionMod)
 {
-    double reference_spring_const = 5.0 * 1e6;                      // the reference global spring const
-
-    double fp_global_sc = 0.5 + 0.25 * (double)(globalSpringConst); // global cell-cell spring constant multiplier
-    double fp_local_sc = 0.2 * (double)localSpringConst;            // local cell-cell spring constant multiplier
-    double fp_sim_kick = 1.0 + 0.075 * (double)kick;                 // the amount we kick the appropriate cell
-
     /*
      * 1: Num cells
      * 2: Num nodes per cell
@@ -169,12 +168,12 @@ void SetupAndRunSimulation(unsigned kick, unsigned localSpringConst, unsigned gl
     // Add force laws
     MAKE_PTR_ARGS(ImmersedBoundaryMembraneElasticityForce<2>, p_boundary_force, (cell_population));
     p_main_modifier->AddImmersedBoundaryForce(p_boundary_force);
-    p_boundary_force->SetSpringConstant(reference_spring_const);
+    p_boundary_force->SetSpringConstant(corSpringConst);
+    p_boundary_force->SetRestLengthMultiplier(corRestLength);
 
     // Create and set an output directory that is different for each simulation
     std::stringstream output_directory;
-    output_directory << "numerics_paper/Exe_VaryAdhesionOfSingleCellCrawling/sim/"
-                     << globalSpringConst << "_" << localSpringConst << "_" << kick;
+    output_directory << "numerics_paper/Exe_VaryAdhesionOfSingleCellCrawling/sim/" << idString;
     simulator.SetOutputDirectory(output_directory.str());
 
     // Set simulation properties
@@ -192,29 +191,28 @@ void SetupAndRunSimulation(unsigned kick, unsigned localSpringConst, unsigned gl
     // Add a cell-cell interaction force with the same intrinsic strength as the membrane force
     MAKE_PTR_ARGS(ImmersedBoundaryCellCellInteractionForce<2>, p_cell_cell_force, (cell_population));
     p_main_modifier->AddImmersedBoundaryForce(p_cell_cell_force);
-    p_cell_cell_force->SetSpringConstant(reference_spring_const * fp_global_sc);
+    p_cell_cell_force->SetSpringConstant(1.0 * corSpringConst);
 
-    // Get height of basement lamina
-    double lamina_height = 0.0;
-    for (unsigned node_idx = 0 ; node_idx < p_mesh->GetElement(0)->GetNumNodes() ; node_idx++)
-    {
-        lamina_height += p_mesh->GetElement(0)->GetNode(node_idx)->rGetModifiableLocation()[1];
-    }
-    lamina_height /= p_mesh->GetElement(0)->GetNumNodes();
+    // Get the centroid of the three relevant cells before anything happens
+    c_vector<double, 2> prev_centroid_start = p_mesh->GetCentroidOfElement(2);
+    c_vector<double, 2> this_centroid_start = p_mesh->GetCentroidOfElement(3);
+    c_vector<double, 2> next_centroid_start = p_mesh->GetCentroidOfElement(4);
+
+    // Get average height of basement lamina
+    ChasteCuboid<2> lamina_bounding_box = p_mesh->CalculateBoundingBoxOfElement(0);
+    double lamina_height = 0.5 * (lamina_bounding_box.rGetLowerCorner()[1] + lamina_bounding_box.rGetUpperCorner()[1]);
 
     // Kick the second cell in from the left and set its E-cad level
     unsigned e_cad_location = p_cell_cell_force->rGetProteinNodeAttributeLocations()[0];
     unsigned p_cad_location = p_cell_cell_force->rGetProteinNodeAttributeLocations()[1];
 
-    double x_centroid_before = p_mesh->GetCentroidOfElement(3)[0];
-
     for (unsigned node_idx = 0 ; node_idx < p_mesh->GetElement(3)->GetNumNodes() ; node_idx++)
     {
-        double new_height = lamina_height + fp_sim_kick * (p_mesh->GetElement(3)->GetNode(node_idx)->rGetLocation()[1] - lamina_height);
+        double new_height = lamina_height + 1.05 * (p_mesh->GetElement(3)->GetNode(node_idx)->rGetLocation()[1] - lamina_height);
         p_mesh->GetElement(3)->GetNode(node_idx)->rGetModifiableLocation()[1] = new_height;
 
-        p_mesh->GetElement(3)->GetNode(node_idx)->rGetNodeAttributes()[e_cad_location] = 0.0;
-        p_mesh->GetElement(3)->GetNode(node_idx)->rGetNodeAttributes()[p_cad_location] = fp_local_sc;
+        p_mesh->GetElement(3)->GetNode(node_idx)->rGetNodeAttributes()[e_cad_location] = 0.01;
+        p_mesh->GetElement(3)->GetNode(node_idx)->rGetNodeAttributes()[p_cad_location] = rhsAdhesionMod;
     }
 
     // In the top 25% of the cell directly to the right, add in p_cad
@@ -224,32 +222,38 @@ void SetupAndRunSimulation(unsigned kick, unsigned localSpringConst, unsigned gl
     {
         if (p_mesh->GetElement(4)->GetNode(node_idx)->rGetLocation()[1] - cell_four_y_cent > 0.25 * cell_four_height)
         {
-            p_mesh->GetElement(4)->GetNode(node_idx)->rGetNodeAttributes()[p_cad_location] = fp_local_sc;
+            p_mesh->GetElement(4)->GetNode(node_idx)->rGetNodeAttributes()[p_cad_location] = rhsAdhesionMod;
         }
     }
 
-    ChasteCuboid<2> bounding_box_before = p_mesh->CalculateBoundingBoxOfElement(3);
-
-    simulator.SetSamplingTimestepMultiple(160);
-    simulator.SetEndTime(16000.0 * dt);
+    simulator.SetSamplingTimestepMultiple(100);
+    simulator.SetEndTime(1000.0 * dt);
     simulator.Solve();
-
-    double x_centroid_after = p_mesh->GetCentroidOfElement(3)[0];
-    ChasteCuboid<2> bounding_box_after = p_mesh->CalculateBoundingBoxOfElement(3);
 
     OutputFileHandler results_handler(output_directory.str(), false);
     out_stream results_file = results_handler.OpenOutputFile("results.dat");
 
-    // Calculate summary statistics
+    // Get the centroid of the three relevant cells at end of simulation
+    c_vector<double, 2> prev_centroid_end = p_mesh->GetCentroidOfElement(2);
+    c_vector<double, 2> this_centroid_end = p_mesh->GetCentroidOfElement(3);
+    c_vector<double, 2> next_centroid_end = p_mesh->GetCentroidOfElement(4);
 
-    double width = bounding_box_after.GetWidth(0);
-
-    double ss_centroid = x_centroid_after - x_centroid_before;
-    double ss_symmetry = (bounding_box_after.rGetUpperCorner()[0] - x_centroid_before) / width;
+    c_vector<double, 2> axis = unit_vector<double>(2,1);
+    double prev_skew = p_mesh->GetSkewnessOfElementMassDistributionAboutAxis(2, axis);
+    double this_skew = p_mesh->GetSkewnessOfElementMassDistributionAboutAxis(3, axis);
+    double next_skew = p_mesh->GetSkewnessOfElementMassDistributionAboutAxis(4, axis);
 
     // Output summary statistics to results file
-    (*results_file) << fp_global_sc << "," << fp_local_sc << "," << fp_sim_kick << ","
-                    << ss_centroid << "," << ss_symmetry;
+    (*results_file) << idString << ","
+                    << boost::lexical_cast<std::string>(corRestLength) << ","
+                    << boost::lexical_cast<std::string>(corSpringConst) << ","
+                    << boost::lexical_cast<std::string>(rhsAdhesionMod) << ","
+                    << boost::lexical_cast<std::string>(prev_centroid_end[1] - prev_centroid_start[1]) << ","
+                    << boost::lexical_cast<std::string>(this_centroid_end[1] - this_centroid_start[1]) << ","
+                    << boost::lexical_cast<std::string>(next_centroid_end[1] - next_centroid_start[1]) << ","
+                    << boost::lexical_cast<std::string>(prev_skew) << ","
+                    << boost::lexical_cast<std::string>(this_skew) << ","
+                    << boost::lexical_cast<std::string>(next_skew);
 
     // Tidy up
     results_file->close();

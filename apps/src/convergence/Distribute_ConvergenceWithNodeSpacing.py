@@ -4,15 +4,25 @@ import subprocess
 
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.ticker as tck
 
-# import immersed_boundary as ib
 
-# Globally accessible directory paths and names
-path_to_exec   = os.environ.get('CHASTE_BUILD_DIR') + '/projects/ImmersedBoundary/apps/Exe_ConvergenceWithMesh'
-path_to_output = os.environ.get('CHASTE_TEST_OUTPUT') + '/convergence/node_spacing/'
+# Globally accessible directory paths, names, and variables
+chaste_build_dir = os.environ.get('CHASTE_BUILD_DIR')
+executable = os.path.join(chaste_build_dir, 'projects/ImmersedBoundary/apps', 'Exe_ConvergenceWithNodeSpacing')
+
+if not(os.path.isfile(executable)):
+    raise Exception('Py: Could not find executable: ' + executable)
+
+chaste_test_dir = os.environ.get('CHASTE_TEST_OUTPUT')
+path_to_output = os.path.join(chaste_test_dir, 'convergence', 'num_nodes')
+
+pdf_name = os.path.join(path_to_output, 'ConvergenceWithNodeSpacing.pdf')
+results_header_string = 'simulation_id,dl_at_start,esf_at_end\n'
 
 # Range for simulation parameters
-num_sims = 4
+num_sims = 16
+
 
 def main():
     run_simulations()
@@ -27,9 +37,9 @@ def run_simulations():
     command_list = []
     for sim_id in range(num_sims):
 
-        num_nodes = int(round(2**(5 + 0.5 * sim_id)))
+        num_nodes = int(round(2**(7 + sim_id / 3.0)))
 
-        command = 'nice -n 19 ' + path_to_exec \
+        command = 'nice -n 19 ' + executable \
                   + ' --ID ' + str(sim_id) \
                   + ' --NN ' + str(num_nodes)
         command_list.append(command)
@@ -57,11 +67,14 @@ def combine_output():
 
     print("Py: Combining output")
 
-    combined_results = open(path_to_output + '/combined_results.dat', 'w')
-    combined_results.write("simulation_id,dl_at_end,esf_at_end\n")
+    if not(os.path.isdir(path_to_output)):
+        raise Exception('Py: Could not find output directory: ' + path_to_output)
+
+    combined_results = open(os.path.join(path_to_output, 'combined_results.dat'), 'w')
+    combined_results.write(results_header_string)
 
     for sim_id in range(num_sims):
-        file_name = path_to_output + '/sim/' + str(sim_id) + '/results.dat'
+        file_name = os.path.join(path_to_output, 'sim', str(sim_id), 'results.dat')
 
         if os.path.isfile(file_name):
             local_results = open(file_name, 'r')
@@ -107,9 +120,8 @@ def plot_results():
     plt.rc('xtick.major', size=0, pad=4)
     plt.rc('ytick.major', size=0, pad=4)
 
-
     # Data for esf vs time plot
-    esf_data = np.genfromtxt(path_to_output + '/combined_results.dat',
+    esf_data = np.genfromtxt(os.path.join(path_to_output, 'combined_results.dat'),
                              delimiter=',',
                              skip_header=1)
 
@@ -131,7 +143,7 @@ def plot_results():
              linestyle='-',
              linewidth=0.75,
              color=mycol_or,
-             markerfacecolor='#FFFFFF',
+             markerfacecolor=mycol_lb,
              markeredgecolor=mycol_or,
              markersize=4.0,
              markeredgewidth=0.75)
@@ -146,10 +158,15 @@ def plot_results():
 
     # Customise axes
     ax = plt.gca()
+    # ax.get_yaxis().get_major_formatter()(False)
+
+    y_formatter = tck.ScalarFormatter(useOffset=False)
+    ax.yaxis.set_major_formatter(y_formatter)
+
     ax.grid(b=True, which='major', color=bg_gray, linestyle='dotted', dash_capstyle='round')
 
     # Export figure
-    plt.savefig(path_to_output + 'ConvergenceWithNodeSpacing.pdf', bbox_inches='tight', pad_inches=0.0)
+    plt.savefig(pdf_name, bbox_inches='tight', pad_inches=0.0)
 
 if __name__ == "__main__":
     main()
