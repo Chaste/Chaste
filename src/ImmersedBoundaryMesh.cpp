@@ -36,6 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ImmersedBoundaryMesh.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "UblasCustomFunctions.hpp"
+#include "Warnings.hpp"
 
 #include "Debug.hpp"
 
@@ -330,7 +331,7 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetSkewnessOfElementMassDis
 
         if (knots[location].size() > 2)
         {
-            EXCEPTION("Axis intersects polygon more than 2 times (concavity) - case not yet handled.");
+            WARN_ONCE_ONLY("Axis intersects polygon more than 2 times (concavity) - check element is fairly convex.");
         }
     }
 
@@ -359,7 +360,7 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetSkewnessOfElementMassDis
                 break;
 
             default:
-                NEVER_REACHED;
+                mass_contributions[i] = knots[i][knots[i].size() - 1] - knots[i][0];
         }
 
         // Normalise, so that these lengths define a pdf
