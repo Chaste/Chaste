@@ -241,7 +241,7 @@ public:
     Box<DIM>& rGetHaloBox(unsigned boxIndex);
 
     /**
-     * @return the total global number of boxes.
+     * @return the total (global) number of boxes.
      */
     unsigned GetNumBoxes();
 
@@ -295,7 +295,7 @@ public:
      * Get the set of all the local boxes, i.e. itself and its nearest-neighbours.
      *
      * @param boxIndex the index of the box
-     * @return the set containing the indices of boxes local to box boxIndex.
+     * @return the set containing the indices of boxes local to box boxIndex.  i.e. the box boxIndex itself and its nearest-neighbours.
      */
     std::set<unsigned>& rGetLocalBoxes(unsigned boxIndex);
 

@@ -35,7 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "BoxCollection.hpp"
 #include "Exception.hpp"
-#include "Debug.hpp"
 
 /////////////////////////////////////////////////////////////////////////////
 // BoxCollection methods
@@ -258,9 +257,9 @@ unsigned BoxCollection<DIM>::GetLinearIndex(c_vector<int, DIM> gridIndices)
 }
 
 template<unsigned DIM>
-c_vector<int,DIM> BoxCollection<DIM>::GetGridIndices(unsigned linearIndex)
+c_vector<unsigned, DIM> BoxCollection<DIM>::GetGridIndices(unsigned linearIndex)
 {
-    c_vector<int,DIM> grid_indices;
+    c_vector<unsigned, DIM> grid_indices;
 
     switch (DIM)
     {
@@ -295,7 +294,7 @@ c_vector<int,DIM> BoxCollection<DIM>::GetGridIndices(unsigned linearIndex)
 }
 
 template<unsigned DIM>
-bool BoxCollection<DIM>::IsBoxInDomain(c_vector<int, DIM> gridIndices)
+bool BoxCollection<DIM>::IsBoxInDomain(c_vector<unsigned, DIM> gridIndices)
 {
     /*
      * We assume that, for a given dimension, any location is in the domain
@@ -312,7 +311,7 @@ bool BoxCollection<DIM>::IsBoxInDomain(c_vector<int, DIM> gridIndices)
     {
         if (!mIsDomainPeriodic(dim))
         {
-            if (gridIndices(dim) < 0 || gridIndices(dim) >= (int)mNumBoxesEachDirection(dim))
+            if (gridIndices(dim) >= (int)mNumBoxesEachDirection(dim))
             {
                 is_in_domain = false;
             }
@@ -323,13 +322,13 @@ bool BoxCollection<DIM>::IsBoxInDomain(c_vector<int, DIM> gridIndices)
 }
 
 template<unsigned DIM>
-c_vector<bool,DIM> BoxCollection<DIM>::IsIndexPenultimate(c_vector<int,DIM> gridIndices)
+c_vector<bool,DIM> BoxCollection<DIM>::IsIndexPenultimate(c_vector<unsigned, DIM> gridIndices)
 {
     c_vector<bool,DIM> is_penultimate;
 
     for (unsigned dim = 0 ; dim < DIM ; dim++)
     {
-        is_penultimate(dim) = (gridIndices(dim) == (int)mNumBoxesEachDirection(dim) - 2);
+        is_penultimate(dim) = (gridIndices(dim) == mNumBoxesEachDirection(dim) - 2);
     }
 
     return is_penultimate;
@@ -434,7 +433,7 @@ template<unsigned DIM>
 void BoxCollection<DIM>::SetupAllLocalBoxes()
 {
     // Populate a list of all neighbours in this number of dimensions
-    std::vector<c_vector<int,DIM> > neighbours;
+    std::vector<c_vector<int, DIM> > neighbours;
 
     switch (DIM)
     {
@@ -445,7 +444,7 @@ void BoxCollection<DIM>::SetupAllLocalBoxes()
 
             for (int x_dim = -1 ; x_dim < 2 ; x_dim++)
             {
-                c_vector<int,DIM> neighbour;
+                c_vector<int, DIM> neighbour;
                 neighbour(0) = x_dim;
 
                 neighbours.push_back(neighbour);
@@ -462,7 +461,7 @@ void BoxCollection<DIM>::SetupAllLocalBoxes()
             {
                 for (int y_dim = -1 ; y_dim < 2 ; y_dim++)
                 {
-                    c_vector<int,DIM> neighbour;
+                    c_vector<int, DIM> neighbour;
                     neighbour(0) = x_dim;
                     neighbour(1) = y_dim;
 
@@ -483,7 +482,7 @@ void BoxCollection<DIM>::SetupAllLocalBoxes()
                 {
                     for (int z_dim = -1 ; z_dim < 2 ; z_dim++)
                     {
-                        c_vector<int,DIM> neighbour;
+                        c_vector<int, DIM> neighbour;
                         neighbour(0) = x_dim;
                         neighbour(1) = y_dim;
                         neighbour(2) = z_dim;
@@ -506,7 +505,7 @@ void BoxCollection<DIM>::SetupAllLocalBoxes()
 }
 
 template<unsigned DIM>
-void BoxCollection<DIM>::SetupLocalBoxes(std::vector<c_vector<int, DIM> > neighbours)
+void BoxCollection<DIM>::SetupLocalBoxes(const std::vector<c_vector<int, DIM> >& rNeighbours)
 {
     mLocalBoxes.clear();
 
@@ -516,15 +515,15 @@ void BoxCollection<DIM>::SetupLocalBoxes(std::vector<c_vector<int, DIM> > neighb
         std::set<unsigned> local_boxes;
 
         // The grid indices (i), (i,j) or (i,j,k) depending on DIM, corresponding to box_idx
-        c_vector<int, DIM> grid_indices = GetGridIndices(box_idx);
+        c_vector<unsigned, DIM> grid_indices = GetGridIndices(box_idx);
 
         // Check all neighbours (1 or 2 in 1D, 4 or 8 in 2D, 13 or 26 in 3D) and add them as local
         // boxes if they are in the domain
-        for (unsigned neighbour = 0 ; neighbour < neighbours.size() ; neighbour++)
+        for (unsigned neighbour = 0 ; neighbour < rNeighbours.size() ; neighbour++)
         {
-            if (IsBoxInDomain(grid_indices + neighbours[neighbour]))
+            if (IsBoxInDomain(grid_indices + rNeighbours[neighbour]))
             {
-                local_boxes.insert(GetLinearIndex(grid_indices + neighbours[neighbour]));
+                local_boxes.insert(GetLinearIndex(grid_indices + rNeighbours[neighbour]));
             }
         }
 
@@ -562,15 +561,15 @@ void BoxCollection<DIM>::SetupLocalBoxes(std::vector<c_vector<int, DIM> > neighb
                     // If we're penultimate in dimension dim, move to the final location and add each neighbour as before.
                     // The call to IsBoxInDomain() will handle periodicity.
                     // Note that we define this vector before setting it as otherwise the profiling build will break (see #2367)
-                    c_vector<int, DIM> ultimate_indices; // Initialisation on next line for profile compiler
+                    c_vector<unsigned, DIM> ultimate_indices; // Initialisation on next line for profile compiler
                     ultimate_indices = grid_indices;
                     ultimate_indices(dim) ++;
 
-                    for (unsigned neighbour = 0 ; neighbour < neighbours.size() ; neighbour++)
+                    for (unsigned neighbour = 0 ; neighbour < rNeighbours.size() ; neighbour++)
                     {
-                        if (IsBoxInDomain(ultimate_indices + neighbours[neighbour]))
+                        if (IsBoxInDomain(ultimate_indices + rNeighbours[neighbour]))
                         {
-                            local_boxes.insert(GetLinearIndex(ultimate_indices + neighbours[neighbour]));
+                            local_boxes.insert(GetLinearIndex(ultimate_indices + rNeighbours[neighbour]));
                         }
                     }
                 }
@@ -598,16 +597,16 @@ void BoxCollection<DIM>::SetupLocalBoxes(std::vector<c_vector<int, DIM> > neighb
                     // X and Y
                     if (is_penultimate_periodic(0) && is_penultimate_periodic(1))
                     {
-                        c_vector<int, DIM> ultimate_indices;
+                        c_vector<unsigned, DIM> ultimate_indices;
                         ultimate_indices = grid_indices;
                         ultimate_indices(0) ++;
                         ultimate_indices(1) ++;
 
-                        for (unsigned neighbour = 0 ; neighbour < neighbours.size() ; neighbour++)
+                        for (unsigned neighbour = 0 ; neighbour < rNeighbours.size() ; neighbour++)
                         {
-                            if (IsBoxInDomain(ultimate_indices + neighbours[neighbour]))
+                            if (IsBoxInDomain(ultimate_indices + rNeighbours[neighbour]))
                             {
-                                local_boxes.insert(GetLinearIndex(ultimate_indices + neighbours[neighbour]));
+                                local_boxes.insert(GetLinearIndex(ultimate_indices + rNeighbours[neighbour]));
                             }
                         }
                     }
@@ -615,16 +614,16 @@ void BoxCollection<DIM>::SetupLocalBoxes(std::vector<c_vector<int, DIM> > neighb
                     // X and Z
                     if (is_penultimate_periodic(0) && is_penultimate_periodic(2))
                     {
-                        c_vector<int, DIM> ultimate_indices;
+                        c_vector<unsigned, DIM> ultimate_indices;
                         ultimate_indices = grid_indices;
                         ultimate_indices(0) ++;
                         ultimate_indices(2) ++;
 
-                        for (unsigned neighbour = 0 ; neighbour < neighbours.size() ; neighbour++)
+                        for (unsigned neighbour = 0 ; neighbour < rNeighbours.size() ; neighbour++)
                         {
-                            if (IsBoxInDomain(ultimate_indices + neighbours[neighbour]))
+                            if (IsBoxInDomain(ultimate_indices + rNeighbours[neighbour]))
                             {
-                                local_boxes.insert(GetLinearIndex(ultimate_indices + neighbours[neighbour]));
+                                local_boxes.insert(GetLinearIndex(ultimate_indices + rNeighbours[neighbour]));
                             }
                         }
                     }
@@ -632,16 +631,16 @@ void BoxCollection<DIM>::SetupLocalBoxes(std::vector<c_vector<int, DIM> > neighb
                     // Y and Z
                     if (is_penultimate_periodic(1) && is_penultimate_periodic(2))
                     {
-                        c_vector<int, DIM> ultimate_indices;
+                        c_vector<unsigned, DIM> ultimate_indices;
                         ultimate_indices = grid_indices;
                         ultimate_indices(1) ++;
                         ultimate_indices(2) ++;
 
-                        for (unsigned neighbour = 0 ; neighbour < neighbours.size() ; neighbour++)
+                        for (unsigned neighbour = 0 ; neighbour < rNeighbours.size() ; neighbour++)
                         {
-                            if (IsBoxInDomain(ultimate_indices + neighbours[neighbour]))
+                            if (IsBoxInDomain(ultimate_indices + rNeighbours[neighbour]))
                             {
-                                local_boxes.insert(GetLinearIndex(ultimate_indices + neighbours[neighbour]));
+                                local_boxes.insert(GetLinearIndex(ultimate_indices + rNeighbours[neighbour]));
                             }
                         }
                     }
@@ -668,7 +667,7 @@ void BoxCollection<DIM>::SetupLocalBoxes(std::vector<c_vector<int, DIM> > neighb
 }
 
 template<unsigned DIM>
-std::set<unsigned> BoxCollection<DIM>::GetLocalBoxes(unsigned boxIndex)
+std::set<unsigned>& BoxCollection<DIM>::rGetLocalBoxes(unsigned boxIndex)
 {
     assert(boxIndex < mLocalBoxes.size());
     return mLocalBoxes[boxIndex];
@@ -709,7 +708,7 @@ void BoxCollection<DIM>::CalculateNodePairs(std::vector<Node<DIM>*>& rNodes,
         unsigned this_node_box_index = CalculateContainingBox(this_node);
 
         // Get the local boxes to this node
-        std::set<unsigned> local_boxes_indices = GetLocalBoxes(this_node_box_index);
+        std::set<unsigned> local_boxes_indices = rGetLocalBoxes(this_node_box_index);
 
         // Loop over all the local boxes
         for (std::set<unsigned>::iterator box_iter = local_boxes_indices.begin(); box_iter != local_boxes_indices.end();

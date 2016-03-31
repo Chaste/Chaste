@@ -39,6 +39,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Element.hpp"
 #include "Box.hpp"
 #include <map>
+#include <vector>
+
 
 /**
  * A collection of 'boxes' partitioning the domain with information on which nodes are located in which box
@@ -75,19 +77,19 @@ private:
      * @param gridIndices the grid indices (i), (i,j), or (i,j,k) depending on DIM
      * @return the linear index in row-major form
      */
-    unsigned GetLinearIndex(c_vector<int,DIM> gridIndices);
+    unsigned GetLinearIndex(c_vector<int, DIM> gridIndices);
 
     /**
      * @param linearIndex the linear index in row-major form
      * @return the grid indices (i), (i,j), or (i,j,k) depending on DIM
      */
-    c_vector<int,DIM> GetGridIndices(unsigned linearIndex);
+    c_vector<unsigned, DIM> GetGridIndices(unsigned linearIndex);
 
     /**
      * @param gridIndices the coordinates (i), (i,j), or (i,j,k) depending on DIM
      * @return whether the box is in the domain
      */
-    bool IsBoxInDomain(c_vector<int,DIM> gridIndices);
+    bool IsBoxInDomain(c_vector<unsigned, DIM> gridIndices);
 
     /**
      * This method is used for periodicity.  It is necessary to consider additional
@@ -97,7 +99,7 @@ private:
      * @param gridIndices the coordinates (i), (i,j), or (i,j,k) depending on DIM
      * @return whether the box is in the penultimate location in each dimension
      */
-    c_vector<bool,DIM> IsIndexPenultimate(c_vector<int,DIM> gridIndices);
+    c_vector<bool,DIM> IsIndexPenultimate(c_vector<unsigned, DIM> gridIndices);
 
     /**
      * Helper function for SetupLocalBoxesHalfOnly() and SetupAllLocalBoxes().
@@ -106,11 +108,9 @@ private:
      * mLocalBoxes based on these neighbours.  The set of neighbours is either half or all
      * of the neighbours, depending on the function calling this method.
      *
-     * \todo Pass the neighbours parameter by const reference!
-     *
      * @param neighbours a vector of neighbours
      */
-    void SetupLocalBoxes(std::vector<c_vector<int, DIM> > neighbours);
+    void SetupLocalBoxes(const std::vector<c_vector<int, DIM> >& rNeighbours);
 
 public:
 
@@ -147,13 +147,13 @@ public:
     unsigned CalculateContainingBox(c_vector<double, DIM>& rLocation);
 
     /**
-     * @return a box.
      * @param boxIndex the index of the box to return
+     * @return a reference to the box with global index boxIndex.
      */
     Box<DIM>& rGetBox(unsigned boxIndex);
 
     /**
-     * @return the number of boxes.
+     * @return the total (global) number of boxes.
      */
     unsigned GetNumBoxes();
 
@@ -171,10 +171,12 @@ public:
     void SetupAllLocalBoxes();
 
     /**
-     * @return the set of all the local boxes, i.e. itself and its nearest-neighbours.
+     * Get the set of all the local boxes, i.e. itself and its nearest-neighbours.
+     *
      * @param boxIndex the index of the box
+     * @return the set containing the indices of boxes local to box boxIndex.  i.e. the box boxIndex itself and its nearest-neighbours.
      */
-    std::set<unsigned> GetLocalBoxes(unsigned boxIndex);
+    std::set<unsigned>& rGetLocalBoxes(unsigned boxIndex);
 
     /**
      * Return the size of the domain partitioned by this collection

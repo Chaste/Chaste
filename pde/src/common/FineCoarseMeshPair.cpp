@@ -540,7 +540,7 @@ void FineCoarseMeshPair<DIM>::CollectElementsInLocalBoxes(BoxCollection<DIM>*& r
                                                           unsigned boxIndex,
                                                           std::set<unsigned>& rElementIndices)
 {
-    std::set<unsigned> local_boxes = rpBoxCollection->GetLocalBoxes(boxIndex);
+    std::set<unsigned> local_boxes = rpBoxCollection->rGetLocalBoxes(boxIndex);
     for (std::set<unsigned>::iterator local_box_iter = local_boxes.begin();
          local_box_iter != local_boxes.end();
          ++local_box_iter)
