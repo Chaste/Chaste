@@ -77,7 +77,9 @@ Hdf5DataWriter::Hdf5DataWriter(DistributedVectorFactory& rVectorFactory,
       mSingleIncompleteOutputMatrix(NULL),
       mDoubleIncompleteOutputMatrix(NULL),
       mUseOptimalChunkSizeAlgorithm(true),
-      mNumberOfChunks(0u),
+      mNumberOfChunks(0),
+      mChunkTargetSize(0x20000), // 128 K
+      mAlignment(0), // No alignment
       mUseCache(useCache),
       mCacheFirstTimeStep(0u)
 {
@@ -322,10 +324,14 @@ void Hdf5DataWriter::OpenFile()
     {
         hid_t fcpl = H5Pcreate(H5P_FILE_CREATE);
         /*
-         * Align objects to disk block size. Useful for striped filesystem e.g. Lustre
-         * Ideally this should match the chunk size (see "target_size_in_bytes" below).
+         * Align objects to multiples of some number of bytes. Useful for
+         * striped filesystem e.g. Lustre. Ideally this should match the chunk
+         * size (see SetTargetChunkSize).
          */
-        // H5Pset_alignment(fapl, 0, 1024*1024); // Align to 1 M blocks
+        if ( mAlignment != 0 )
+        {
+            H5Pset_alignment(fapl, 0, mAlignment);
+        }
 
         /*
          * The stripe size can be set on the directory just before creation of the H5
@@ -1447,59 +1453,9 @@ void Hdf5DataWriter::CalculateChunkDims( unsigned targetSize, unsigned* pChunkSi
 
 void Hdf5DataWriter::SetChunkSize()
 {
-/*
- * * NOTES ON CHUNK SIZE AND ALIGNMENT *
- *
- * A few lines below this block of documentation we set the target chunk size
- * to 128 K, which seems to be a good compromise for small problems (e.g. on a
- * desktop PC). For larger problems, I/O performance often improves with
- * increased chunk size. A sweet spot seems to be 1 M chunks.
- *
- * On a striped filesystem, for best performance set the chunk size and
- * alignment (using `H5Pset_alignment` above) to the file stripe size. With
- * `H5Pset_alignment`, every chunk starts at a multiple of the alignment value.
- *
- * To avoid wasting space, the chunk size should be an integer multiple of the
- * alignment value. Note that the algorithm below automatically goes back one
- * step after exceeding the chunk size, which minimises wasted space. To see
- * why, consider the examples below.
- *
- * (Example 1) Say our file system uses 1 M stripes. If we set
- *     target_size_in_bytes = 1024*1024;
- * below and uncomment
- *     H5Pset_alignment(fapl, 0, 1024*1024);
- * above, i.e. aim for (slightly under) 1 M chunks and align them to 1 M
- * boundaries, then the algorithm below will get as close as possible to 1 M
- * chunks but not exceed it, so each chunk will be padded slightly to sit on
- * the 1 M boundaries. Each chunk will therefore have its own stripe on the
- * file system, which should give us the best bandwidth and least contention.
- * Conclusion: this is optimal!
- *
- * Note: In general the algorithm can get very close to the target so the
- * waste isn't bad. Typical utilization is 99.99% (check with "h5ls -v ...").
- *
- * (Example 2) We set
- *     target_size_in_bytes = 1024*1024/8;
- * and uncomment
- *     H5Pset_alignment(fapl, 0, 1024*1024);
- * i.e. 128 K chunks aligned to 1 M boundaries. This would pad every chunk to
- * 1 M boundaries, wasting 7/8 of the space in the file! A file which might be
- * 5 G with an efficient layout would be more like 40 G! Conclusion: setting
- * the chunk size to less than the alignment value is very bad!
- *
- * (Example 3) Say our file system uses 1 M stripes. We set
- *     target_size_in_bytes = 1024*1024*2;
- * and uncomment
- *     H5Pset_alignment(fapl, 0, 1024*1024);
- * i.e. 2 M chunks aligned to 1 M boundaries. This might not be optimal, but
- * it's OK, since the chunk size is (slightly under) twice the alignment, as in
- * Example 1 the amount of padding would be very small. Each read/write would
- * require accessing 2 stripes on the file system. Conclusion: a chunk size of
- * an integer multiple of the alignment value is fine (but not optimal).
- */
     if (mUseOptimalChunkSizeAlgorithm)
     {
-        const unsigned target_size_in_bytes = 1024*1024/8; // 128 K
+        const unsigned target_size_in_bytes = mChunkTargetSize;
 
         unsigned target_size = 0;
         unsigned chunk_size_in_bytes;
@@ -1540,4 +1496,14 @@ void Hdf5DataWriter::SetChunkSize()
         std::cout << "Hdf5DataWriter dataset contains " << mNumberOfChunks << " chunks of " << chunk_size_in_bytes << " B." << std::endl;
     }
     */
+}
+
+void Hdf5DataWriter::SetTargetChunkSize(hsize_t targetSize)
+{
+    mChunkTargetSize = targetSize;
+}
+
+void Hdf5DataWriter::SetAlignment(hsize_t alignment)
+{
+    mAlignment = alignment;
 }

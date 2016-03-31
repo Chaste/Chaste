@@ -88,8 +88,11 @@ private:
 
     bool mUseOptimalChunkSizeAlgorithm;             /**< Whether to use the built-in algorithm for optimal chunk size */
     hsize_t mChunkSize[DATASET_DIMS];               /**< Stores chunk dimensions */
-    hsize_t mNumberOfChunks;                  /**< The total number of chunks in the dataset */
+    hsize_t mNumberOfChunks;                        /**< The total number of chunks in the dataset */
     hsize_t mFixedChunkSize[DATASET_DIMS];          /**< User-provided chunk size */
+    hsize_t mChunkTargetSize;                       /**< User-provided target chunk size (for the algorithm) */
+
+    hsize_t mAlignment;                             /**< User-provided alignment parameter */
 
     bool mUseCache;                                 /**< Whether to use a cache */
     long unsigned mCacheFirstTimeStep;              /**< Coordinate to keep track of cache writes */
@@ -331,6 +334,85 @@ public:
                            const unsigned& rNodesPerChunk,
                            const unsigned& rVariablesPerChunk);
 
+    /*
+     * * NOTES ON CHUNK SIZE AND ALIGNMENT *
+     *
+     * The default target chunk size is 128 K, which seems to be a good compromise
+     * for small problems (e.g. on a desktop PC). For larger problems, I/O
+     * performance often improves with increased chunk size. A sweet spot seems to
+     * be 1 M chunks.
+     *
+     * On a striped filesystem, for best performance set the chunk size and
+     * alignment (using `H5Pset_alignment` above) to the file stripe size. With
+     * `H5Pset_alignment`, every chunk starts at a multiple of the alignment value.
+     *
+     * To avoid wasting space, the chunk size should be an integer multiple of the
+     * alignment value. Note that the algorithm below automatically goes back one
+     * step after exceeding the chunk size, which minimises wasted space. To see
+     * why, consider the examples below.
+     *
+     * (Example 1) Say our file system uses 1 M stripes. If we set
+     *     target_size_in_bytes = 1024*1024;
+     * below and uncomment
+     *     H5Pset_alignment(fapl, 0, 1024*1024);
+     * above, i.e. aim for (slightly under) 1 M chunks and align them to 1 M
+     * boundaries, then the algorithm below will get as close as possible to 1 M
+     * chunks but not exceed it, so each chunk will be padded slightly to sit on
+     * the 1 M boundaries. Each chunk will therefore have its own stripe on the
+     * file system, which should give us the best bandwidth and least contention.
+     * Conclusion: this is optimal!
+     *
+     * Note: In general the algorithm can get very close to the target so the
+     * waste isn't bad. Typical utilization is 99.99% (check with "h5ls -v ...").
+     *
+     * (Example 2) We set
+     *     target_size_in_bytes = 128*1024;
+     * and uncomment
+     *     H5Pset_alignment(fapl, 0, 1024*1024);
+     * i.e. 128 K chunks aligned to 1 M boundaries. This would pad every chunk to
+     * 1 M boundaries, wasting 7/8 of the space in the file! A file which might be
+     * 5 G with an efficient layout would be more like 40 G! Conclusion: setting
+     * the chunk size to less than the alignment value is very bad!
+     *
+     * (Example 3) Say our file system uses 1 M stripes. We set
+     *     target_size_in_bytes = 2*1024*1024;
+     * and uncomment
+     *     H5Pset_alignment(fapl, 0, 1024*1024);
+     * i.e. 2 M chunks aligned to 1 M boundaries. This might not be optimal, but
+     * it's OK, since the chunk size is (slightly under) twice the alignment, as in
+     * Example 1 the amount of padding would be very small. Each read/write would
+     * require accessing 2 stripes on the file system. Conclusion: a chunk size of
+     * an integer multiple of the alignment value is fine (but not optimal).
+     */
+
+    /**
+     * Adjust the target (max) chunk size in the chunking algorithm. Useful
+     * when one knows roughly how big a chunk should be but doesn't care about
+     * the exact dimensions or shape. Default is 128 K.
+     *
+     * Especially useful with SetAlignment for ensuring each chunk gets its own
+     * stripe on striped file systems.
+     *
+     * This method only has an effect when creating a NEW DATASET.
+     *
+     * @param targetSize Max chunk size (bytes)
+     */
+    void SetTargetChunkSize(hsize_t targetSize);
+
+    /**
+     * Set the alignment parameter to pass through to H5Pset_alignment. Every
+     * file object will be aligned on the disk to a multiple of this parameter.
+     * See the H5P docs for more information.
+     *
+     * Especially useful with SetTargetChunkSize to ensure each chunk (each
+     * chunk is an 'file object') is aligned to a disk stripe on a striped file
+     * system with minimal wastage.
+     *
+     * This method only has an effect when creating a NEW HDF5 FILE.
+     *
+     * @param alignment Alignment (bytes)
+     */
+    void SetAlignment(hsize_t alignment);
 };
 
 #endif /*HDF5DATAWRITER_HPP_*/

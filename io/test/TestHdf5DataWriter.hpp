@@ -2053,6 +2053,74 @@ public:
         Hdf5DataWriterFullFormatStripedIncompleteUsingMatrix(true, "hdf5_test_full_format_striped_incomplete_using_matrix_cached");
     }
 
+    void TestHdf5DataWriterManualChunkSizeAndAlignment() throw(Exception)
+    {
+        std::string folder("TestHdf5DataWriter");
+        std::string filename("hdf5_test_manual_chunk_size_and_alignment");
+
+        {
+            int number_nodes = 2000;
+            DistributedVectorFactory factory(number_nodes);
+            Hdf5DataWriter writer(factory, folder, filename, false);
+
+            // Define some dimensions and variables
+            writer.DefineUnlimitedDimension("Time", "msec", 101);
+            writer.DefineFixedDimension(number_nodes);
+            // Odd number of variables for
+            writer.DefineVariable("Node","dimensionless");
+            writer.DefineVariable("I_K","milliamperes");
+            writer.DefineVariable("I_Na","milliamperes");
+
+            /* Set the target chunk size to 8 K (smaller than normal) and the
+             * alignment to 16 K.
+             * Note: this is a stupid example and just for testing. Because
+             * every 8 K chunk will be aligned to 16 K boundaries the file
+             * will be about twice the size it needs to be on disk!
+             */
+            writer.SetTargetChunkSize(0x2000); // 8 K
+            writer.SetAlignment(0x4000); // 16 K
+            writer.EndDefineMode();
+
+            // Don't bother actually writing anything, that's tested elsewhere
+            writer.Close();
+        }
+
+        // Open file
+        OutputFileHandler file_handler(folder, false);
+        FileFinder file = file_handler.FindFile(filename+".h5");
+        hid_t h5_file = H5Fopen(file.GetAbsolutePath().c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
+        hid_t dset = H5Dopen(h5_file, "Data"); // open dataset
+        hid_t dcpl = H5Dget_create_plist(dset); // get dataset creation property list
+
+        /* Check chunk dimensions are as expected for 8 K chunks with these
+         * dataset dimensions. */
+        hsize_t expected_dims[3] = {17, 20, 3};
+        hsize_t chunk_dims[3];
+        H5Pget_chunk(dcpl, 3, chunk_dims );
+        for (int i=0; i<3; ++i)
+        {
+            TS_ASSERT_EQUALS(chunk_dims[i], expected_dims[i]);
+        }
+
+        /*
+         * Check the "location" of the datasets (the offset from the start of
+         * file, a bit like a pointer to the start of the dataset) to confirm
+         * alignment was switched on.
+         * With alignment switched off, Data is usually located at 800 B. With
+         * alignment = 16 K it is at 64 K. For the Data_Unlimited dataset the
+         * numbers are 4935472 B (about 4.7 MB) and 10125312 B (about 9.7 MB),
+         * respectively.
+         * (These numbers might be machine-dependent!)
+         */
+        H5O_info_t data_info;
+        H5Oget_info( dset, &data_info );
+        TS_ASSERT_EQUALS(data_info.addr, 0x10000); // 64 KB
+        H5Dclose(dset);
+
+        dset = H5Dopen(h5_file, "Data_Unlimited");
+        H5Oget_info( dset, &data_info );
+        TS_ASSERT_EQUALS(data_info.addr, 0x9A8000); // About 9.7 MB
+    }
 };
 
 #endif /*TESTHDF5DATAWRITER_HPP_*/
