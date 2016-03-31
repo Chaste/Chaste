@@ -2114,12 +2114,12 @@ public:
          */
         H5O_info_t data_info;
         H5Oget_info( dset, &data_info );
-        TS_ASSERT_EQUALS(data_info.addr, 0x10000); // 64 KB
+        TS_ASSERT_EQUALS(data_info.addr, 0x10000u); // 64 KB
         H5Dclose(dset);
 
         dset = H5Dopen(h5_file, "Data_Unlimited");
         H5Oget_info( dset, &data_info );
-        TS_ASSERT_EQUALS(data_info.addr, 0x9A8000); // About 9.7 MB
+        TS_ASSERT_EQUALS(data_info.addr, 0x9A8000u); // About 9.7 MB
     }
 };
 
