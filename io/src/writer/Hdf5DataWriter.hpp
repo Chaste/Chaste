@@ -60,8 +60,8 @@ private:
     /** The factory to use in creating PETSc Vec and DistributedVector objects. */
     DistributedVectorFactory& mrVectorFactory;
 
-    bool mCleanDirectory;                           /**< Whether to wipe the output directory */
-    bool mUseExistingFile;                          /**< Whether we are using an existing file (for extending existing dataset, or adding a new one)*/
+    const bool mCleanDirectory;                     /**< Whether to wipe the output directory */
+    const bool mUseExistingFile;                    /**< Whether we are using an existing file (for extending existing dataset, or adding a new one)*/
     bool mIsInDefineMode;                           /**< Is the DataWriter in define mode or not */
     bool mIsFixedDimensionSet;                      /**< Is the fixed dimension set */
 
@@ -393,7 +393,8 @@ public:
      * Especially useful with SetAlignment for ensuring each chunk gets its own
      * stripe on striped file systems.
      *
-     * This method only has an effect when creating a NEW DATASET.
+     * This method only has an effect when creating a NEW DATASET. Must be
+     * called in define mode.
      *
      * @param targetSize Max chunk size (bytes)
      */
@@ -408,7 +409,8 @@ public:
      * chunk is an 'file object') is aligned to a disk stripe on a striped file
      * system with minimal wastage.
      *
-     * This method only has an effect when creating a NEW HDF5 FILE.
+     * This method only has an effect when creating a NEW HDF5 FILE. Must be
+     * called in define mode with extendData set to False.
      *
      * @param alignment Alignment (bytes)
      */

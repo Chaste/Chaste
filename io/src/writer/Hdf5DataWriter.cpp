@@ -1500,10 +1500,39 @@ void Hdf5DataWriter::SetChunkSize()
 
 void Hdf5DataWriter::SetTargetChunkSize(hsize_t targetSize)
 {
+    if (!mIsInDefineMode)
+    {
+        /* Must be in define mode, i.e. creating a new dataset (and possibly a
+         * new HDF5 file) to set the dataset chunk dims. */
+        EXCEPTION("Cannot set chunk target size when not in define mode.");
+    }
     mChunkTargetSize = targetSize;
 }
 
 void Hdf5DataWriter::SetAlignment(hsize_t alignment)
 {
+    /* Note: calling this method after OpenFile() is pointless as that's where
+     * H5Pset_alignment happens, so the obvious way to protect this method is
+     * to check mFileId to assert H5Fopen has not been called yet.
+     * Unfortunately it's uninitialised so is not always safe to check!
+     *
+     * Fortunately OpenFile() is only called in one of two ways:
+     * 1. In the constructor in combination with mUseExistingFile. Subsequently
+     *    calling this method will end up throwing in the first block below
+     *    (since mUseExistingFile is const).
+     * 2. By EndDefineMode(). Subsequently calling this method will end up in
+     *    the second block below.
+     */
+    if (mUseExistingFile)
+    {
+        // Must be called on new HDF5 files.
+        EXCEPTION("Alignment parameter can only be set for new HDF5 files.");
+    }
+    if (!mIsInDefineMode)
+    {
+        // Creating a new file but EndDefineMode() called already.
+        EXCEPTION("Cannot set alignment parameter when not in define mode.");
+    }
+
     mAlignment = alignment;
 }
