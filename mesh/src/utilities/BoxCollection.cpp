@@ -311,7 +311,7 @@ bool BoxCollection<DIM>::IsBoxInDomain(c_vector<unsigned, DIM> gridIndices)
     {
         if (!mIsDomainPeriodic(dim))
         {
-            if (gridIndices(dim) >= (int)mNumBoxesEachDirection(dim))
+            if (gridIndices(dim) >= mNumBoxesEachDirection(dim))
             {
                 is_in_domain = false;
             }
