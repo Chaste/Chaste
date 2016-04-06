@@ -215,17 +215,17 @@ public:
      *
      * See UserTutorials/VisualizingWithParaview for more information.
      *
-     * Load the file {{{/tmp/$USER/testoutput/PottsBasedMonolayer/results_from_time_0/results.pvd}}}, and click apply
+     * Load the file {{{/tmp/$USER/testoutput/PottsBasedMonolayer/results_from_time_0/results.pvd}}}, and click apply.
      *
      * Add box "Glyphs" to represent lattice sites. You will need to adjust the size so they don't overlap.
      *
-     * Select the "Display" tab and select "color by" cell index to see individual cells
+     * Select the "Display" tab and select "color by" cell index to see individual cells.
      *
-     * Add a "Threshold" filter, filter by cell type and make the lower threshold 0 or greater (unocupied lattice sites are labelled with -1). This will allow you to view only the cells.
+     * Add a "Threshold" filter, filter by cell type and make the lower threshold 0 or greater (unoccupied lattice sites are labelled with -1). This will allow you to view only the cells.
      *
-     * Load the files {{{/tmp/$USER/testoutput/PottsBasedMonolayer/results_from_time_0/outlines_..vtu}}}, and click apply
+     * Load the files {{{/tmp/$USER/testoutput/PottsBasedMonolayer/results_from_time_0/outlines_..vtu}}}, and click apply.
      *
-     * In order to see the cell outlines you will need to select "Surface With Edges" in the drop down menu
+     * In order to see the cell outlines you will need to select "Surface With Edges" in the drop down menu.
      *
      * Click play to see the evolution of the simulation.
      *
@@ -430,13 +430,13 @@ public:
      * To visualize the results, we need to use Paraview. Note that we don't output the cell boundaries (outlines) in 3D.
      * See UserTutorials/VisualizingWithParaview for more information.
      *
-     * Load the file {{{/tmp/$USER/testoutput/PottsCellSorting3D/results_from_time_0/results.pvd}}}, and click apply
+     * Load the file {{{/tmp/$USER/testoutput/PottsCellSorting3D/results_from_time_0/results.pvd}}}, and click apply.
      *
      * Add box "Glyphs" to represent lattice sites. You will need to adjust the size so they don't overlap.
      *
-     * Select the "Display" tab and select "color by" cell label. (you can also "color by" cell index to see individual cells)
+     * Select the "Display" tab and select "color by" cell label (you can also "color by" cell index to see individual cells).
      *
-     * Add a "Threshold" filter, filter by cell type and make the lower threshold 0 or greater (unocupied lattice sites are labelled with -1). This will allow you to view only the cells.
+     * Add a "Threshold" filter, filter by cell type and make the lower threshold 0 or greater (unoccupied lattice sites are labelled with -1). This will allow you to view only the cells.
      *
      * Click play to see the evolution of the simulation.
      *
@@ -446,4 +446,4 @@ public:
      */
 };
 
-#endif /* TESTRUNNINGVERTEXBASEDSIMULATIONSTUTORIAL_HPP_ */
+#endif /* TESTRUNNINGPOTTSBASEDSIMULATIONSTUTORIAL_HPP_ */
