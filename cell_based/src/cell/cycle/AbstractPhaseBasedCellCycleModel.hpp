@@ -215,13 +215,6 @@ public:
     virtual double GetMDuration() const;
 
     /**
-     * Set mCurrentCellCyclePhase
-     *
-     * @param currentCellCyclePhase
-     */
-    void SetCurrentCellCyclePhase(CellCyclePhase currentCellCyclePhase);
-
-    /**
      * Set mStemCellG1Duration.
      *
      * @param stemCellG1Duration  the new value of mStemCellG1Duration

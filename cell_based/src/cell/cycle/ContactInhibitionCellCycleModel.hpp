@@ -155,23 +155,9 @@ public:
     double GetEquilibriumVolume() const;
 
     /**
-     * Set method for mCurrentQuiescentDuration.
-     *
-     * @param currentQuiescentDuration the new value of mCurrentQuiescentDuration
-     */
-    void SetCurrentQuiescentDuration(double currentQuiescentDuration);
-
-    /**
      * @return mCurrentQuiescentDuration
      */
     double GetCurrentQuiescentDuration() const;
-
-    /**
-     * Set method for mCurrentQuiescentOnsetTime.
-     *
-     * @param currentQuiescentOnsetTime the new value of mCurrentQuiescentOnsetTime
-     */
-    void SetCurrentQuiescentOnsetTime(double currentQuiescentOnsetTime);
 
     /**
      * @return mCurrentQuiescentOnsetTime

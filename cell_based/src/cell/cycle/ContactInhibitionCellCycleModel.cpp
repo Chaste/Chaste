@@ -164,19 +164,9 @@ double ContactInhibitionCellCycleModel::GetEquilibriumVolume() const
     return mEquilibriumVolume;
 }
 
-void ContactInhibitionCellCycleModel::SetCurrentQuiescentDuration(double currentQuiescentDuration)
-{
-    mCurrentQuiescentDuration = currentQuiescentDuration;
-}
-
 double ContactInhibitionCellCycleModel::GetCurrentQuiescentDuration() const
 {
     return mCurrentQuiescentDuration;
-}
-
-void ContactInhibitionCellCycleModel::SetCurrentQuiescentOnsetTime(double currentQuiescentOnsetTime)
-{
-    mCurrentQuiescentOnsetTime = currentQuiescentOnsetTime;
 }
 
 double ContactInhibitionCellCycleModel::GetCurrentQuiescentOnsetTime() const

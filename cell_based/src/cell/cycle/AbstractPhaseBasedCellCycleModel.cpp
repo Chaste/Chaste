@@ -167,11 +167,6 @@ double AbstractPhaseBasedCellCycleModel::GetMinimumGapDuration() const
 // Setter methods
 ///////////////////////////////////////////////////////////////////////
 
-void AbstractPhaseBasedCellCycleModel::SetCurrentCellCyclePhase(CellCyclePhase currentCellCyclePhase)
-{
-    mCurrentCellCyclePhase = currentCellCyclePhase;
-}
-
 void AbstractPhaseBasedCellCycleModel::SetStemCellG1Duration(double stemCellG1Duration)
 {
     assert(stemCellG1Duration >= 0.0);
