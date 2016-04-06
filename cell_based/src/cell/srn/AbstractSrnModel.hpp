@@ -88,7 +88,6 @@ private:
      * We do not inherit from boost::noncopyable because we *do* define a protected copy-constructor, for use by CreateSrnModel.
      *
      * @return the new SRN model.
-     * @param rModel the SRN to copy.
      */
     AbstractSrnModel& operator=(const AbstractSrnModel&);
 

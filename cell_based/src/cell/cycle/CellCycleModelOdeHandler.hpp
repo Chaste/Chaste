@@ -77,7 +77,6 @@ private:
      * and CreateSrnModel.
      *
      * @return the new ODE handler.
-     * @param rHandler the ODE handler to copy.
      */
     CellCycleModelOdeHandler& operator=(const AbstractCellCycleModelOdeSolver&);
 
