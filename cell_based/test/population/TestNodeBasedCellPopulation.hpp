@@ -47,6 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodeBasedCellPopulation.hpp"
 #include "CellsGenerator.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "RandomDivisionCellCycleModel.hpp"
 #include "TrianglesMeshReader.hpp"
 #include "TetrahedralMesh.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
@@ -1363,13 +1364,26 @@ public:
         node_based_cell_population.WriteResultsToFiles(output_directory);
         node_based_cell_population.CloseWritersFiles();
 
-        // Test the rGetCellCyclePhaseCount() function
+        // Test the GetCellCyclePhaseCount() function
         std::vector<unsigned> cell_cycle_phases = node_based_cell_population.GetCellCyclePhaseCount();
         TS_ASSERT_EQUALS(cell_cycle_phases[0], 1u);
         TS_ASSERT_EQUALS(cell_cycle_phases[1], 3u);
         TS_ASSERT_EQUALS(cell_cycle_phases[2], 0u);
         TS_ASSERT_EQUALS(cell_cycle_phases[3], 0u);
         TS_ASSERT_EQUALS(cell_cycle_phases[4], 1u);
+
+
+        // Check throws error when using a non phased based CCM
+        std::vector<CellPtr> cells_2;
+        CellsGenerator<RandomDivisionCellCycleModel, 2> cells_generator_2;
+        cells_generator_2.GenerateBasic(cells_2, mesh.GetNumNodes());
+
+        // Create a cell population
+        NodeBasedCellPopulation<2> node_based_cell_population_2(mesh, cells_2);
+
+        TS_ASSERT_THROWS_THIS(node_based_cell_population_2.GetCellCyclePhaseCount(),"You are trying to record the cell cycle phase of cells with a non phase based cell cycle model.");
+
+
     }
 
     void TestArchivingCellPopulation() throw (Exception)

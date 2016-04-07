@@ -43,6 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fstream>
 
+#include "RandomDivisionCellCycleModel.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "StochasticDurationGenerationBasedCellCycleModel.hpp"
 #include "GammaDistributedStochasticDurationCellCycleModel.hpp"
@@ -71,6 +72,62 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestSimpleCellCycleModels : public AbstractCellBasedTestSuite
 {
 public:
+
+    void TestRandomDivisionCellCycleModel() throw(Exception)
+    {
+        TS_ASSERT_THROWS_NOTHING(RandomDivisionCellCycleModel cell_model3);
+
+        RandomDivisionCellCycleModel* p_diff_model = new RandomDivisionCellCycleModel;
+
+        RandomDivisionCellCycleModel* p_transit_model = new RandomDivisionCellCycleModel;
+
+
+        TS_ASSERT_DELTA(p_transit_model->GetDivisionProbability(),0.1,1e-9);
+        TS_ASSERT_DELTA(p_transit_model->GetMinimumDivisionAge(),1.0,1e-9);
+        // Change parameters for this model
+        p_transit_model->SetDivisionProbability(0.5);
+        p_transit_model->SetMinimumDivisionAge(0.1);
+        TS_ASSERT_DELTA(p_transit_model->GetDivisionProbability(),0.5,1e-9);
+        TS_ASSERT_DELTA(p_transit_model->GetMinimumDivisionAge(),0.1,1e-9);
+
+
+
+        MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+
+        CellPtr p_transit_cell(new Cell(p_healthy_state, p_transit_model));
+        p_transit_cell->SetCellProliferativeType(p_transit_type);
+        p_transit_cell->InitialiseCellCycleModel();
+
+        CellPtr p_diff_cell(new Cell(p_healthy_state, p_diff_model));
+        p_diff_cell->SetCellProliferativeType(p_diff_type);
+        p_diff_cell->InitialiseCellCycleModel();
+
+        SimulationTime* p_simulation_time = SimulationTime::Instance();
+        unsigned num_steps = 100;
+        p_simulation_time->SetEndTimeAndNumberOfTimeSteps(10.0, num_steps);
+
+        for (unsigned i=0; i<num_steps; i++)
+        {
+            p_simulation_time->IncrementTimeOneStep();
+
+            // The division time below is taken from the first
+            // random number generated
+            if (i< 33)
+            {
+                TS_ASSERT_EQUALS(p_transit_cell->ReadyToDivide(), false);
+            }
+            else
+            {
+                TS_ASSERT_EQUALS(p_transit_cell->ReadyToDivide(), true);
+            }
+            TS_ASSERT_EQUALS(p_diff_cell->ReadyToDivide(), false);
+        }
+        TS_ASSERT_DELTA(p_transit_model->GetAge(), p_simulation_time->GetTime(), 1e-9);
+        TS_ASSERT_DELTA(p_diff_model->GetAge(), p_simulation_time->GetTime(), 1e-9);
+
+    }
 
     void TestFixedDurationGenerationBasedCellCycleModel() throw(Exception)
     {
@@ -878,6 +935,55 @@ public:
         TS_ASSERT_DELTA(p_cell_model2->GetG2Duration(), 1e20, 1e-4);
     }
 
+    void TestArchiveRandomDivisionCellCycleModel() throw (Exception)
+    {
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "RandomDivisionCellCycleModel.arch";
+
+        {
+            // We must set up SimulationTime to avoid memory leaks
+            SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
+
+            // As usual, we archive via a pointer to the most abstract class possible
+            AbstractCellCycleModel* const p_model = new RandomDivisionCellCycleModel;
+
+            p_model->SetDimension(2);
+            p_model->SetBirthTime(-1.0);
+            static_cast <RandomDivisionCellCycleModel*>(p_model)->SetDivisionProbability(0.5);
+            static_cast <RandomDivisionCellCycleModel*>(p_model)->SetMinimumDivisionAge(0.1);
+
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            output_arch << p_model;
+
+            delete p_model;
+            SimulationTime::Destroy();
+        }
+
+        {
+            // We must set SimulationTime::mStartTime here to avoid tripping an assertion
+            SimulationTime::Instance()->SetStartTime(0.0);
+
+            AbstractCellCycleModel* p_model2;
+
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            input_arch >> p_model2;
+
+            // Check private data has been restored correctly
+            TS_ASSERT_DELTA(p_model2->GetBirthTime(), -1.0, 1e-12);
+            TS_ASSERT_DELTA(p_model2->GetAge(), 1.0, 1e-12);
+            TS_ASSERT_EQUALS(p_model2->GetDimension(), 2u);
+            TS_ASSERT_DELTA(static_cast <RandomDivisionCellCycleModel*>(p_model2)->GetDivisionProbability(),0.5,1e-9);
+            TS_ASSERT_DELTA(static_cast <RandomDivisionCellCycleModel*>(p_model2)->GetMinimumDivisionAge(),0.1,1e-9);
+
+            // Avoid memory leaks
+            delete p_model2;
+        }
+    }
+
     void TestArchiveFixedDurationGenerationBasedCellCycleModel() throw (Exception)
     {
         OutputFileHandler handler("archive", false);
@@ -916,7 +1022,7 @@ public:
             // Check private data has been restored correctly
             TS_ASSERT_DELTA(p_model2->GetBirthTime(), -1.0, 1e-12);
             TS_ASSERT_DELTA(p_model2->GetAge(), 1.0, 1e-12);
-            TS_ASSERT_EQUALS(p_model2->GetCurrentCellCyclePhase(), M_PHASE);
+            TS_ASSERT_EQUALS(static_cast<AbstractPhaseBasedCellCycleModel*>(p_model2)->GetCurrentCellCyclePhase(), M_PHASE);
             TS_ASSERT_EQUALS(p_model2->GetDimension(), 2u);
 
             // Avoid memory leaks
@@ -1264,11 +1370,11 @@ public:
 
             input_arch >> p_model2;
 
-            TS_ASSERT_EQUALS(p_model2->GetCurrentCellCyclePhase(), M_PHASE);
             TS_ASSERT_EQUALS(p_model2->GetDimension(), 1u);
             TS_ASSERT_DELTA(p_model2->GetBirthTime(), -1.5, 1e-12);
             TS_ASSERT_DELTA(p_model2->GetAge(), 1.5, 1e-12);
 
+            TS_ASSERT_EQUALS(static_cast<AbstractPhaseBasedCellCycleModel*>(p_model2)->GetCurrentCellCyclePhase(), M_PHASE);
             TS_ASSERT_DELTA(static_cast<ContactInhibitionCellCycleModel*>(p_model2)->GetQuiescentVolumeFraction(), 0.5, 1e-6);
             TS_ASSERT_DELTA(static_cast<ContactInhibitionCellCycleModel*>(p_model2)->GetEquilibriumVolume(), 1.0, 1e-6);
 

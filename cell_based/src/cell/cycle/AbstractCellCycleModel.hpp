@@ -220,13 +220,6 @@ public:
     double GetAge();
 
     /**
-     * note this is virtual void temporarily as part of #2788
-     *
-     * @return the current cell cycle phase
-     */
-    virtual CellCyclePhase GetCurrentCellCyclePhase() const = 0;
-
-    /**
      * @return whether the cell is ready to divide.
      *
      * It is pure virtual as needs to be defined in child classes.

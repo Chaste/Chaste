@@ -321,7 +321,7 @@ public:
             // Wnt should change this to a transit cell
             TS_ASSERT_EQUALS(p_stem_cell->GetCellProliferativeType()->IsType<TransitCellProliferativeType>(), true);
             TS_ASSERT_EQUALS(p_stem_cell->GetCellCycleModel()->ReadyToDivide(), false);
-            TS_ASSERT_EQUALS(p_stem_cell->GetCellCycleModel()->GetCurrentCellCyclePhase(), G_TWO_PHASE);
+            TS_ASSERT_EQUALS(static_cast<SingleOdeWntCellCycleModel*>(p_stem_cell->GetCellCycleModel())->GetCurrentCellCyclePhase(), G_TWO_PHASE);
 
             p_cell_model->SetBetaCateninDivisionThreshold(beta_catenin_threshold);
             TS_ASSERT_DELTA(p_cell_model->GetBetaCateninDivisionThreshold(), beta_catenin_threshold, 1e-12);

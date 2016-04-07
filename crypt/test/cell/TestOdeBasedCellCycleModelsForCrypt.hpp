@@ -1112,7 +1112,7 @@ public:
 
             TS_ASSERT_EQUALS(p_stoc_cell->GetCellCycleModel()->ReadyToDivide(), false);
             TS_ASSERT_EQUALS(p_wnt_cell->GetCellCycleModel()->ReadyToDivide(), false);
-            TS_ASSERT_EQUALS(p_stoc_cell->GetCellCycleModel()->GetCurrentCellCyclePhase(), G_ONE_PHASE);
+            TS_ASSERT_EQUALS(static_cast<StochasticWntCellCycleModel*>(p_stoc_cell->GetCellCycleModel())->GetCurrentCellCyclePhase(), G_ONE_PHASE);
 
             // When the above tests are included here they pass, so we
             // also put them after the load to see if they still pass.

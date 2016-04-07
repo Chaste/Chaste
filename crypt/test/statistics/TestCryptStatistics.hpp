@@ -42,6 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellBasedSimulationArchiver.hpp"
 
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
+#include "AbstractPhaseBasedCellCycleModel.hpp"
 #include "SimpleDataWriter.hpp"
 #include "CryptStatistics.hpp"
 #include "CryptSimulation2d.hpp"
@@ -256,7 +257,7 @@ public:
              ++cell_iter)
         {
             bool is_labelled = cell_iter->HasCellProperty<CellLabel>();
-            bool in_s_phase = (cell_iter->GetCellCycleModel()->GetCurrentCellCyclePhase() == S_PHASE);
+            bool in_s_phase = (static_cast <AbstractPhaseBasedCellCycleModel*>(cell_iter->GetCellCycleModel())->GetCurrentCellCyclePhase() == S_PHASE);
 
             TS_ASSERT_EQUALS(is_labelled, in_s_phase);
 

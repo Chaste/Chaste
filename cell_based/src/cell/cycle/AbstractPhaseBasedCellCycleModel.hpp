@@ -77,8 +77,6 @@ private:
         archive & mSDuration;
         archive & mG2Duration;
         archive & mMDuration;
-
-
     }
 
 protected:
@@ -177,7 +175,7 @@ public:
     /**
      * @return the current cell cycle phase
      */
-    virtual CellCyclePhase GetCurrentCellCyclePhase() const;
+    CellCyclePhase GetCurrentCellCyclePhase() const;
 
     /**
      * @return the duration of the G1 phase of the cell cycle

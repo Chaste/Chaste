@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <functional>
 
 #include "AbstractCellPopulation.hpp"
+#include "AbstractPhaseBasedCellCycleModel.hpp"
 #include "Exception.hpp"
 #include "PetscTools.hpp"
 #include "SmartPointers.hpp"
@@ -256,11 +257,16 @@ std::vector<unsigned> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCellCyc
         cell_cycle_phase_count[i] = 0;
     }
 
+    if (dynamic_cast<AbstractPhaseBasedCellCycleModel*>((*(this->Begin()))->GetCellCycleModel()) == NULL)
+    {
+        EXCEPTION("You are trying to record the cell cycle phase of cells with a non phase based cell cycle model.");
+    }
+
     for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter = this->Begin();
          cell_iter != this->End();
          ++cell_iter)
     {
-        switch ((*cell_iter)->GetCellCycleModel()->GetCurrentCellCyclePhase())
+        switch (static_cast<AbstractPhaseBasedCellCycleModel*>((*cell_iter)->GetCellCycleModel())->GetCurrentCellCyclePhase())
         {
             case G_ZERO_PHASE:
                 cell_cycle_phase_count[0]++;

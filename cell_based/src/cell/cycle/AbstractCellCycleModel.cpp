@@ -106,6 +106,7 @@ void AbstractCellCycleModel::ResetForDivision()
 {
     assert(mReadyToDivide);
     mReadyToDivide = false;
+    mBirthTime = SimulationTime::Instance()->GetTime();
 }
 
 bool AbstractCellCycleModel::ReadyToDivide()
