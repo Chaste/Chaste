@@ -81,8 +81,6 @@ bool RandomDivisionCellCycleModel::ReadyToDivide()
             {
                 RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
 
-                double p_division = mDivisionProbability*dt;
-
                 if (p_gen->ranf()<mDivisionProbability*dt)
                 {
                     mReadyToDivide = true;
