@@ -46,7 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "GeneralisedLinearSpringForce.hpp"
 #include "SloughingCellKiller.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
-#include "StochasticDurationGenerationBasedCellCycleModel.hpp"
+#include "UniformlyDistributedGenerationBasedCellCycleModel.hpp"
 #include "WntCellCycleModel.hpp"
 #include "TysonNovakCellCycleModel.hpp"
 #include "ApcOneHitCellMutationState.hpp"
@@ -220,7 +220,7 @@ public:
         std::vector<CellPtr> cells;
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            StochasticDurationGenerationBasedCellCycleModel* p_model = new StochasticDurationGenerationBasedCellCycleModel();
+            UniformlyDistributedGenerationBasedCellCycleModel* p_model = new UniformlyDistributedGenerationBasedCellCycleModel();
 
             double birth_time = 0;
             if (i == 0)
@@ -391,7 +391,7 @@ public:
         std::vector<CellPtr> cells;
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            StochasticDurationGenerationBasedCellCycleModel* p_model = new StochasticDurationGenerationBasedCellCycleModel();
+            UniformlyDistributedGenerationBasedCellCycleModel* p_model = new UniformlyDistributedGenerationBasedCellCycleModel();
 
             CellPtr p_cell(new Cell(p_healthy_state, p_model));
 
@@ -924,7 +924,7 @@ public:
         std::vector<CellPtr> cells;
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            StochasticDurationGenerationBasedCellCycleModel* p_model = new StochasticDurationGenerationBasedCellCycleModel();
+            UniformlyDistributedGenerationBasedCellCycleModel* p_model = new UniformlyDistributedGenerationBasedCellCycleModel();
             CellPtr p_cell(new Cell(p_healthy_state, p_model));
 
             unsigned generation;

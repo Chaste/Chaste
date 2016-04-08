@@ -47,10 +47,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NullSrnModel.hpp"
 #include "DeltaNotchSrnModel.hpp"
 #include "Goldbeter1991SrnModel.hpp"
-#include "StochasticDurationGenerationBasedCellCycleModel.hpp"
+#include "UniformlyDistributedGenerationBasedCellCycleModel.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "OutputFileHandler.hpp"
-#include "UniformlyDistributedStochasticDurationCellCycleModel.hpp"
+#include "UniformlyDistributedCellCycleModel.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "TransitCellProliferativeType.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
@@ -76,7 +76,7 @@ public:
         starter_conditions.push_back(0.5);
         p_srn_model->SetInitialConditions(starter_conditions);
 
-        StochasticDurationGenerationBasedCellCycleModel* p_cc_model = new StochasticDurationGenerationBasedCellCycleModel();
+        UniformlyDistributedGenerationBasedCellCycleModel* p_cc_model = new UniformlyDistributedGenerationBasedCellCycleModel();
 
         MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
@@ -143,7 +143,7 @@ public:
             SimulationTime* p_simulation_time = SimulationTime::Instance();
             p_simulation_time->SetEndTimeAndNumberOfTimeSteps(2.0, 4);
 
-            UniformlyDistributedStochasticDurationCellCycleModel* p_cc_model = new UniformlyDistributedStochasticDurationCellCycleModel();
+            UniformlyDistributedCellCycleModel* p_cc_model = new UniformlyDistributedCellCycleModel();
 
             // As usual, we archive via a pointer to the most abstract class possible
             AbstractSrnModel* p_srn_model = new DeltaNotchSrnModel;
@@ -202,7 +202,7 @@ public:
         starter_conditions.push_back(0.7);
         p_srn_model->SetInitialConditions(starter_conditions);
 
-        StochasticDurationGenerationBasedCellCycleModel* p_cc_model = new StochasticDurationGenerationBasedCellCycleModel();
+        UniformlyDistributedGenerationBasedCellCycleModel* p_cc_model = new UniformlyDistributedGenerationBasedCellCycleModel();
 
         MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
@@ -273,7 +273,7 @@ public:
             SimulationTime* p_simulation_time = SimulationTime::Instance();
             p_simulation_time->SetEndTimeAndNumberOfTimeSteps(end_time, 100);
 
-            UniformlyDistributedStochasticDurationCellCycleModel* p_cc_model = new UniformlyDistributedStochasticDurationCellCycleModel();
+            UniformlyDistributedCellCycleModel* p_cc_model = new UniformlyDistributedCellCycleModel();
 
             // As usual, we archive via a pointer to the most abstract class possible
             AbstractSrnModel* p_srn_model = new Goldbeter1991SrnModel;

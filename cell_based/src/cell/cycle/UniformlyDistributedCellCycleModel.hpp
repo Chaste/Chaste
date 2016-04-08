@@ -33,38 +33,29 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef EXPONENTIALLYDISTRIBUTEDSTOCHASTICDURATIONGENERATIONBASEDCELLCYCLEMODEL_HPP_
-#define EXPONENTIALLYDISTRIBUTEDSTOCHASTICDURATIONGENERATIONBASEDCELLCYCLEMODEL_HPP_
+#ifndef UNIFORMLYDISTRIBUTEDCELLCYCLEMODEL_HPP_
+#define UNIFORMLYDISTRIBUTEDCELLCYCLEMODEL_HPP_
 
-#include "AbstractSimpleGenerationBasedCellCycleModel.hpp"
+#include "AbstractSimplePhaseBasedCellCycleModel.hpp"
 #include "RandomNumberGenerator.hpp"
 
 /**
- * A cell cycle model where the G1 duration is drawn from an exponential
- * random distribution. The rate parameter of this distribution is defined
- * by the member variable mRate.
+ * A stochastic cell-cycle model where cells divide with a stochastic G1 phase duration.
  *
- * The default value of mRate is set to the inverse of the default value
- * of mTransitCellG1Duration in the constructor.
+ * For proliferative cells, the G1 phase duration is drawn from a uniform distribution
+ * on [T, T+2], where the parameter T depends on cell proliferative type as follows: if
+ * the cell has StemCellProliferativeType, then T is given by GetStemCellG1Duration();
+ * and if the cell has TransitCellProliferativeType, then T is given by
+ * GetTransitCellG1Duration().
  *
- * mRate may be set using the method SetRate(), which also sets
- * mTransitCellG1Duration and mStemCellG1Duration to take the inverse of
- * mRate's new value. Similarly, the overridden methods SetTransitCellG1Duration()
- * and SetStemCellG1Duration() also set mRate to take the inverse of the
- * new value of mTransitCellG1Duration and mStemCellG1Duration, respectively.
+ * If the cell has DifferentiatedCellProliferativeType, then the G1 phase duration is
+ * set to be infinite, so that the cell will never divide.
  */
-class ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel : public AbstractSimpleGenerationBasedCellCycleModel
+class UniformlyDistributedCellCycleModel : public AbstractSimplePhaseBasedCellCycleModel
 {
     friend class TestSimpleCellCycleModels;
 
 private:
-
-    /**
-     * The rate parameter of the exponential distribution, often denoted by lambda.
-     * This parameter is initialised to 1.0/mTransitCellG1Duration. The latter variable is inherited from the abstract cell cycle model.
-     * This initialisation ensures that cells will have the standard G1 duration (as defined in the abstract cell cycle model classes) on average.
-     */
-    double mRate;
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
@@ -77,22 +68,14 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractSimpleGenerationBasedCellCycleModel>(*this);
+        archive & boost::serialization::base_object<AbstractSimplePhaseBasedCellCycleModel>(*this);
 
         // Make sure the RandomNumberGenerator singleton gets saved too
         SerializableSingleton<RandomNumberGenerator>* p_wrapper = RandomNumberGenerator::Instance()->GetSerializationWrapper();
         archive & p_wrapper;
-        archive & mRate;
     }
 
 protected:
-
-    /**
-     * Stochastically set the G1 duration following an exponential distribution. Called on cell creation at
-     * the start of a simulation, and for both parent and daughter
-     * cells at cell division.
-     */
-    void SetG1Duration();
 
     /**
      * Protected copy-constructor for use by CreateCellCycleModel.
@@ -107,15 +90,20 @@ protected:
      *
      * @param rModel the cell cycle model to copy.
      */
-    ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel(const ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel& rModel);
+    UniformlyDistributedCellCycleModel(const UniformlyDistributedCellCycleModel& rModel);
 
 public:
 
     /**
-     * Constructor - just a default, mBirthTime is now set in the AbstractCellCycleModel class.
+     * Constructor - just a default, mBirthTime is set in the AbstractCellCycleModel class.
      * mG1Duration is set very high, it is set for the individual cells when InitialiseDaughterCell is called
      */
-    ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel();
+    UniformlyDistributedCellCycleModel();
+
+    /**
+     * Overridden SetG1Duration Method to add stochastic cell cycle times
+     */
+    void SetG1Duration();
 
     /**
      * Overridden builder method to create new copies of
@@ -124,44 +112,6 @@ public:
      * @return new cell-cycle model
      */
     AbstractCellCycleModel* CreateCellCycleModel();
-
-    /**
-     * Return the rate parameter (lambda) of the exponential distribution.
-     *
-     * @return mRate, the rate parameter of the distribution
-     */
-    double GetRate() const;
-
-    /**
-     * Set the rate parameter of the exponential distribution. For consistency,
-     * this function also resets the internal values for mTransitCellG1Duration
-     * and mStemCellG1Duration to the average value of the exponential random variable,
-     * i.e. 1.0/rate. This ensures that GetAverageTransitCellCycleTime and GetAverageStemCellCycleTime
-     * returns correct values.
-     *
-     * @param rate
-     */
-    void SetRate(double rate);
-
-    /**
-     * Overridden SetStemCellG1Duration() method.
-     *
-     * Set mStemCellG1Duration to be a given value and also
-     * set mRate to be the inverse of this value
-     *
-     * @param stemCellG1Duration  the new value of mStemCellG1Duration
-     */
-    void SetStemCellG1Duration(double stemCellG1Duration);
-
-    /**
-     * Overridden SetTransitCellG1Duration() method.
-     *
-     * Set mTransitCellG1Duration to be a given value and also
-     * set mRate to be the inverse of this value
-     *
-     * @param transitCellG1Duration  the new value of mTransitCellG1Duration
-     */
-    void SetTransitCellG1Duration(double transitCellG1Duration);
 
     /**
      * Outputs cell cycle model parameters to file.
@@ -173,6 +123,6 @@ public:
 
 #include "SerializationExportWrapper.hpp"
 // Declare identifier for the serializer
-CHASTE_CLASS_EXPORT(ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel)
+CHASTE_CLASS_EXPORT(UniformlyDistributedCellCycleModel)
 
-#endif /*EXPONENTIALLYDISTRIBUTEDSTOCHASTICDURATIONGENERATIONBASEDCELLCYCLEMODEL_HPP_*/
+#endif /*UNIFORMLYDISTRIBUTEDCELLCYCLEMODEL_HPP_*/

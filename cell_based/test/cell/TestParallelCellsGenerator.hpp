@@ -43,7 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Cell.hpp"
 #include "NodesOnlyMesh.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
-#include "StochasticDurationGenerationBasedCellCycleModel.hpp"
+#include "UniformlyDistributedGenerationBasedCellCycleModel.hpp"
 #include "CellPropertyRegistry.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 #include "TransitCellProliferativeType.hpp"
@@ -98,7 +98,7 @@ public:
 
         std::vector<CellPtr> cells;
 
-        ParallelCellsGenerator<StochasticDurationGenerationBasedCellCycleModel, 2> generator;
+        ParallelCellsGenerator<UniformlyDistributedGenerationBasedCellCycleModel, 2> generator;
         c_vector<double, 4> bounding_box = generator.GetArchiveBoundingBox("cell_based/test/data/TestParallelConstruction/Population2d.dat");
 
         TS_ASSERT_DELTA(bounding_box[0], 0.0, 1e-4);
@@ -133,7 +133,7 @@ public:
 
         std::vector<CellPtr> cells;
 
-        ParallelCellsGenerator<StochasticDurationGenerationBasedCellCycleModel, 3> generator;
+        ParallelCellsGenerator<UniformlyDistributedGenerationBasedCellCycleModel, 3> generator;
         c_vector<double, 6> bounding_box = generator.GetArchiveBoundingBox("cell_based/test/data/TestParallelConstruction/Population3d.dat");
 
         TS_ASSERT_DELTA(bounding_box[0], 0.0, 1e-4);

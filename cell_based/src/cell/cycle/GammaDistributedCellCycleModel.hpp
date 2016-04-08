@@ -33,29 +33,27 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef UNIFORMLYDISTRIBUTEDSTOCHASTICDURATIONCELLCYCLEMODEL_HPP_
-#define UNIFORMLYDISTRIBUTEDSTOCHASTICDURATIONCELLCYCLEMODEL_HPP_
+#ifndef GAMMADISTRIBUTEDCELLCYCLEMODEL_HPP_
+#define GAMMADISTRIBUTEDCELLCYCLEMODEL_HPP_
 
 #include "AbstractSimplePhaseBasedCellCycleModel.hpp"
 #include "RandomNumberGenerator.hpp"
 
 /**
- * A stochastic cell-cycle model where cells divide with a stochastic G1 phase duration.
- *
- * For proliferative cells, the G1 phase duration is drawn from a uniform distribution
- * on [T, T+2], where the parameter T depends on cell proliferative type as follows: if
- * the cell has StemCellProliferativeType, then T is given by GetStemCellG1Duration();
- * and if the cell has TransitCellProliferativeType, then T is given by
- * GetTransitCellG1Duration().
- *
- * If the cell has DifferentiatedCellProliferativeType, then the G1 phase duration is
- * set to be infinite, so that the cell will never divide.
+ * A stochastic cell-cycle model where cells keep dividing with a stochastic G1 duration
+ * drawn from a gamma distribution with specified shape and scale parameters.
  */
-class UniformlyDistributedStochasticDurationCellCycleModel : public AbstractSimplePhaseBasedCellCycleModel
+class GammaDistributedCellCycleModel : public AbstractSimplePhaseBasedCellCycleModel
 {
     friend class TestSimpleCellCycleModels;
 
 private:
+
+    /** The shape parameter of the gamma distribution. This must be a positive real number. */
+    double mShape;
+
+    /** The scale parameter of the gamma distribution. This must be a positive real number. */
+    double mScale;
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
@@ -73,6 +71,9 @@ private:
         // Make sure the RandomNumberGenerator singleton gets saved too
         SerializableSingleton<RandomNumberGenerator>* p_wrapper = RandomNumberGenerator::Instance()->GetSerializationWrapper();
         archive & p_wrapper;
+
+        archive & mShape;
+        archive & mScale;
     }
 
 protected:
@@ -90,31 +91,52 @@ protected:
      *
      * @param rModel the cell cycle model to copy.
      */
-    UniformlyDistributedStochasticDurationCellCycleModel(const UniformlyDistributedStochasticDurationCellCycleModel& rModel);
+    GammaDistributedCellCycleModel(const GammaDistributedCellCycleModel& rModel);
 
 public:
 
     /**
-     * Constructor - just a default, mBirthTime is set in the AbstractCellCycleModel class.
-     * mG1Duration is set very high, it is set for the individual cells when InitialiseDaughterCell is called
+     * Constructor.
      */
-    UniformlyDistributedStochasticDurationCellCycleModel();
+    GammaDistributedCellCycleModel();
 
     /**
-     * Overridden SetG1Duration Method to add stochastic cell cycle times
+     * Overridden SetG1Duration().
      */
     void SetG1Duration();
 
     /**
-     * Overridden builder method to create new copies of
-     * this cell-cycle model.
-     *
-     * @return new cell-cycle model
+     * Overridden builder method to create new copies of this cell-cycle model.
+     * @return a pointer to the GammaDistributedCellCycleModel created.
      */
     AbstractCellCycleModel* CreateCellCycleModel();
 
     /**
-     * Outputs cell cycle model parameters to file.
+     * Set mShape.
+     *
+     * @param shape the value of the shape parameter
+     */
+    void SetShape(double shape);
+
+    /**
+     * @return mScale.
+     *
+     * @param scale the value of the scale parameter
+     */
+    void SetScale(double scale);
+
+    /**
+     * @return mShape.
+     */
+    double GetShape() const;
+
+    /**
+     * @return mScale.
+     */
+    double GetScale() const;
+
+    /**
+     * Overridden OutputCellCycleModelParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
@@ -123,6 +145,6 @@ public:
 
 #include "SerializationExportWrapper.hpp"
 // Declare identifier for the serializer
-CHASTE_CLASS_EXPORT(UniformlyDistributedStochasticDurationCellCycleModel)
+CHASTE_CLASS_EXPORT(GammaDistributedCellCycleModel)
 
-#endif /*UNIFORMLYDISTRIBUTEDSTOCHASTICDURATIONCELLCYCLEMODEL_HPP_*/
+#endif /* GAMMADISTRIBUTEDCELLCYCLEMODEL_HPP_ */

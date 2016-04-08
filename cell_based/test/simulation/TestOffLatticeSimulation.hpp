@@ -47,7 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CylindricalHoneycombMeshGenerator.hpp"
 #include "CellsGenerator.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
-#include "UniformlyDistributedStochasticDurationCellCycleModel.hpp"
+#include "UniformlyDistributedCellCycleModel.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
 #include "ChemotacticForce.hpp"
 #include "RandomCellKiller.hpp"
@@ -1174,7 +1174,7 @@ public:
 
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
-            UniformlyDistributedStochasticDurationCellCycleModel* p_model = new UniformlyDistributedStochasticDurationCellCycleModel();
+            UniformlyDistributedCellCycleModel* p_model = new UniformlyDistributedCellCycleModel();
             p_model->SetDimension(2);
             CellPtr p_cell(new Cell(p_wild_state, p_model));
             p_cell->SetCellProliferativeType(p_transit_type);

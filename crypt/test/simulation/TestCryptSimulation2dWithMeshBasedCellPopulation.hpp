@@ -1872,7 +1872,7 @@ public:
 
         // Set up cells
         std::vector<CellPtr> temp_cells;
-        CryptCellsGenerator<StochasticDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<UniformlyDistributedGenerationBasedCellCycleModel> cells_generator;
         cells_generator.Generate(temp_cells, p_mesh, std::vector<unsigned>(), true, 0.3, 2.0, 3.0, 4.0, true);
 
         // This awkward way of setting up the cells is a result of #430

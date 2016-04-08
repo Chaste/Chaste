@@ -33,19 +33,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "UniformlyDistributedStochasticDurationCellCycleModel.hpp"
+#include "UniformlyDistributedGenerationBasedCellCycleModel.hpp"
 #include "Exception.hpp"
 #include "StemCellProliferativeType.hpp"
 #include "TransitCellProliferativeType.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 
-UniformlyDistributedStochasticDurationCellCycleModel::UniformlyDistributedStochasticDurationCellCycleModel()
-    : AbstractSimplePhaseBasedCellCycleModel()
+UniformlyDistributedGenerationBasedCellCycleModel::UniformlyDistributedGenerationBasedCellCycleModel()
 {
 }
 
-UniformlyDistributedStochasticDurationCellCycleModel::UniformlyDistributedStochasticDurationCellCycleModel(const UniformlyDistributedStochasticDurationCellCycleModel& rModel)
-   : AbstractSimplePhaseBasedCellCycleModel(rModel)
+UniformlyDistributedGenerationBasedCellCycleModel::UniformlyDistributedGenerationBasedCellCycleModel(const UniformlyDistributedGenerationBasedCellCycleModel& rModel)
+   : AbstractSimpleGenerationBasedCellCycleModel(rModel)
 {
     /*
      * Set each member variable of the new cell-cycle model that inherits
@@ -66,22 +65,24 @@ UniformlyDistributedStochasticDurationCellCycleModel::UniformlyDistributedStocha
     // No new member variables.
 }
 
-AbstractCellCycleModel* UniformlyDistributedStochasticDurationCellCycleModel::CreateCellCycleModel()
+AbstractCellCycleModel* UniformlyDistributedGenerationBasedCellCycleModel::CreateCellCycleModel()
 {
-    return new UniformlyDistributedStochasticDurationCellCycleModel(*this);
+    return new UniformlyDistributedGenerationBasedCellCycleModel(*this);
 }
 
-void UniformlyDistributedStochasticDurationCellCycleModel::SetG1Duration()
+void UniformlyDistributedGenerationBasedCellCycleModel::SetG1Duration()
 {
     RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
 
+    assert(mpCell != NULL);
+
     if (mpCell->GetCellProliferativeType()->IsType<StemCellProliferativeType>())
     {
-        mG1Duration = GetStemCellG1Duration() + 2*p_gen->ranf(); // U[0,2]
+        mG1Duration = GetStemCellG1Duration() + 4*p_gen->ranf(); // U[14,18] for default parameters (mStemCellG1Duration) according to Meineke
     }
     else if (mpCell->GetCellProliferativeType()->IsType<TransitCellProliferativeType>())
     {
-        mG1Duration = GetTransitCellG1Duration() + 2*p_gen->ranf(); // U[0,2]
+        mG1Duration = GetTransitCellG1Duration() + 2*p_gen->ranf(); // U[4,6] for default parameters (mTransitG1CellDuration) according to Meineke
     }
     else if (mpCell->GetCellProliferativeType()->IsType<DifferentiatedCellProliferativeType>())
     {
@@ -93,12 +94,14 @@ void UniformlyDistributedStochasticDurationCellCycleModel::SetG1Duration()
     }
 }
 
-void UniformlyDistributedStochasticDurationCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
+void UniformlyDistributedGenerationBasedCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
 {
-    // No new parameters to output, so just call method on direct parent class
-    AbstractSimplePhaseBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
+    // No new parameters to output
+
+    // Call method on direct parent class
+    AbstractSimpleGenerationBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
 }
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-CHASTE_CLASS_EXPORT(UniformlyDistributedStochasticDurationCellCycleModel)
+CHASTE_CLASS_EXPORT(UniformlyDistributedGenerationBasedCellCycleModel)

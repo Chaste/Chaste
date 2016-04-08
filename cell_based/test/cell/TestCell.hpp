@@ -52,7 +52,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellData.hpp"
 #include "ApcTwoHitCellMutationState.hpp"
 #include "ApcOneHitCellMutationState.hpp"
-#include "StochasticDurationGenerationBasedCellCycleModel.hpp"
+#include "UniformlyDistributedGenerationBasedCellCycleModel.hpp"
 #include "TysonNovakCellCycleModel.hpp"
 #include "Goldbeter1991SrnModel.hpp"
 #include "NullSrnModel.hpp"
@@ -532,7 +532,7 @@ public:
         TS_ASSERT_DELTA(p_stem_model->GetTransitCellG1Duration(), 2.0, 1e-12);
         TS_ASSERT_DELTA(p_stem_model->GetSG2MDuration(), 10.0, 1e-12);
 
-        StochasticDurationGenerationBasedCellCycleModel* p_stoch_model = new StochasticDurationGenerationBasedCellCycleModel();
+        UniformlyDistributedGenerationBasedCellCycleModel* p_stoch_model = new UniformlyDistributedGenerationBasedCellCycleModel();
         CellPtr p_stochastic_stem_cell(new Cell(p_healthy_state, p_stoch_model));
         p_stochastic_stem_cell->SetCellProliferativeType(p_type);
         p_stochastic_stem_cell->InitialiseCellCycleModel();
@@ -543,7 +543,7 @@ public:
         p_differentiated_cell->SetCellProliferativeType(p_diff_type);
         p_differentiated_cell->InitialiseCellCycleModel();
 
-        StochasticDurationGenerationBasedCellCycleModel* p_stoch_diff_model = new StochasticDurationGenerationBasedCellCycleModel();
+        UniformlyDistributedGenerationBasedCellCycleModel* p_stoch_diff_model = new UniformlyDistributedGenerationBasedCellCycleModel();
         p_stoch_diff_model->SetGeneration(6);
         CellPtr p_stochastic_differentiated_cell(new Cell(p_healthy_state, p_stoch_diff_model));
         p_stochastic_differentiated_cell->SetCellProliferativeType(p_diff_type);
@@ -628,7 +628,7 @@ public:
         // Now at t = 17.99, cell is 11.99 old
         TS_ASSERT_EQUALS(p_transit_cell->ReadyToDivide(), false);
 
-        StochasticDurationGenerationBasedCellCycleModel* p_cell_cycle_model = new StochasticDurationGenerationBasedCellCycleModel;
+        UniformlyDistributedGenerationBasedCellCycleModel* p_cell_cycle_model = new UniformlyDistributedGenerationBasedCellCycleModel;
         p_transit_cell->SetCellProliferativeType(p_transit_type);
 
         // This now resets the age of the cell to 0.0 so more time added in underneath
@@ -678,7 +678,7 @@ public:
             CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>();
             CellPropertyRegistry::Instance()->Get<TransitCellProliferativeType>();
 
-            StochasticDurationGenerationBasedCellCycleModel* p_model = new StochasticDurationGenerationBasedCellCycleModel();
+            UniformlyDistributedGenerationBasedCellCycleModel* p_model = new UniformlyDistributedGenerationBasedCellCycleModel();
             CellPtr p_stem_cell(new Cell(p_healthy_state, p_model));
             p_stem_cell->SetCellProliferativeType(p_type);
             p_stem_cell->InitialiseCellCycleModel();

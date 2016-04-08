@@ -47,7 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Cell.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "BetaCateninOneHitCellMutationState.hpp"
-#include "StochasticDurationGenerationBasedCellCycleModel.hpp"
+#include "UniformlyDistributedGenerationBasedCellCycleModel.hpp"
 #include "StemCellProliferativeType.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "TysonNovakCellCycleModel.hpp"
@@ -308,7 +308,7 @@ public:
         {
             DeltaNotchSrnModel* p_srn_model = new DeltaNotchSrnModel();
 
-            StochasticDurationGenerationBasedCellCycleModel* p_cc_model = new StochasticDurationGenerationBasedCellCycleModel();
+            UniformlyDistributedGenerationBasedCellCycleModel* p_cc_model = new UniformlyDistributedGenerationBasedCellCycleModel();
 
             MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
             MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);

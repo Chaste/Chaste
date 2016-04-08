@@ -33,18 +33,23 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "StochasticDurationGenerationBasedCellCycleModel.hpp"
+#include "GammaDistributedCellCycleModel.hpp"
 #include "Exception.hpp"
 #include "StemCellProliferativeType.hpp"
 #include "TransitCellProliferativeType.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 
-StochasticDurationGenerationBasedCellCycleModel::StochasticDurationGenerationBasedCellCycleModel()
+GammaDistributedCellCycleModel::GammaDistributedCellCycleModel()
+    : AbstractSimplePhaseBasedCellCycleModel(),
+      mShape(DOUBLE_UNSET),
+      mScale(DOUBLE_UNSET)
 {
 }
 
-StochasticDurationGenerationBasedCellCycleModel::StochasticDurationGenerationBasedCellCycleModel(const StochasticDurationGenerationBasedCellCycleModel& rModel)
-   : AbstractSimpleGenerationBasedCellCycleModel(rModel)
+GammaDistributedCellCycleModel::GammaDistributedCellCycleModel(const GammaDistributedCellCycleModel& rModel)
+   :  AbstractSimplePhaseBasedCellCycleModel(rModel),
+      mShape(rModel.mShape),
+      mScale(rModel.mScale)
 {
     /*
      * Set each member variable of the new cell-cycle model that inherits
@@ -61,28 +66,20 @@ StochasticDurationGenerationBasedCellCycleModel::StochasticDurationGenerationBas
      * in parent classes will be defined there.
      *
      */
-
-    // No new member variables.
 }
 
-AbstractCellCycleModel* StochasticDurationGenerationBasedCellCycleModel::CreateCellCycleModel()
+AbstractCellCycleModel* GammaDistributedCellCycleModel::CreateCellCycleModel()
 {
-    return new StochasticDurationGenerationBasedCellCycleModel(*this);
+    return new GammaDistributedCellCycleModel(*this);
 }
 
-void StochasticDurationGenerationBasedCellCycleModel::SetG1Duration()
+void GammaDistributedCellCycleModel::SetG1Duration()
 {
-    RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
-
-    assert(mpCell != NULL);
-
-    if (mpCell->GetCellProliferativeType()->IsType<StemCellProliferativeType>())
+    if (    mpCell->GetCellProliferativeType()->IsType<StemCellProliferativeType>()
+         || mpCell->GetCellProliferativeType()->IsType<TransitCellProliferativeType>() )
     {
-        mG1Duration = GetStemCellG1Duration() + 4*p_gen->ranf(); // U[14,18] for default parameters (mStemCellG1Duration) according to Meineke
-    }
-    else if (mpCell->GetCellProliferativeType()->IsType<TransitCellProliferativeType>())
-    {
-        mG1Duration = GetTransitCellG1Duration() + 2*p_gen->ranf(); // U[4,6] for default parameters (mTransitG1CellDuration) according to Meineke
+        // Generate a gamma random number with mShape and mScale
+        mG1Duration = RandomNumberGenerator::Instance()->GammaRandomDeviate(mShape, mScale);
     }
     else if (mpCell->GetCellProliferativeType()->IsType<DifferentiatedCellProliferativeType>())
     {
@@ -94,14 +91,34 @@ void StochasticDurationGenerationBasedCellCycleModel::SetG1Duration()
     }
 }
 
-void StochasticDurationGenerationBasedCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
+void GammaDistributedCellCycleModel::SetShape(double shape)
 {
-    // No new parameters to output
+    mShape = shape;
+}
 
-    // Call method on direct parent class
-    AbstractSimpleGenerationBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
+void GammaDistributedCellCycleModel::SetScale(double scale)
+{
+    mScale = scale;
+}
+
+double GammaDistributedCellCycleModel::GetShape() const
+{
+    return mShape;
+}
+
+double GammaDistributedCellCycleModel::GetScale() const
+{
+    return mScale;
+}
+
+void GammaDistributedCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
+{
+    *rParamsFile << "\t\t\t<Shape>" << mShape << "</Shape>\n";
+    *rParamsFile << "\t\t\t<Scale>" << mScale << "</Scale>\n";
+
+    AbstractSimplePhaseBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
 }
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-CHASTE_CLASS_EXPORT(StochasticDurationGenerationBasedCellCycleModel)
+CHASTE_CLASS_EXPORT(GammaDistributedCellCycleModel)
