@@ -48,7 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "StochasticDurationGenerationBasedCellCycleModel.hpp"
 #include "GammaDistributedStochasticDurationCellCycleModel.hpp"
 #include "ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel.hpp"
-#include "StochasticDurationCellCycleModel.hpp"
+#include "UniformlyDistributedStochasticDurationCellCycleModel.hpp"
 #include "SimpleOxygenBasedCellCycleModel.hpp"
 #include "StochasticOxygenBasedCellCycleModel.hpp"
 #include "ContactInhibitionCellCycleModel.hpp"
@@ -302,21 +302,21 @@ public:
         }
     }
 
-    void TestStochasticDurationCellCycleModel() throw(Exception)
+    void TestUniformlyDistributedStochasticDurationCellCycleModel() throw(Exception)
     {
-        TS_ASSERT_THROWS_NOTHING(StochasticDurationCellCycleModel cell_model3);
+        TS_ASSERT_THROWS_NOTHING(UniformlyDistributedStochasticDurationCellCycleModel cell_model3);
 
-        StochasticDurationCellCycleModel* p_stem_model = new StochasticDurationCellCycleModel;
+        UniformlyDistributedStochasticDurationCellCycleModel* p_stem_model = new UniformlyDistributedStochasticDurationCellCycleModel;
 
         // Change G1 duration for this model
         p_stem_model->SetStemCellG1Duration(8.0);
 
-        StochasticDurationCellCycleModel* p_transit_model = new StochasticDurationCellCycleModel;
+        UniformlyDistributedStochasticDurationCellCycleModel* p_transit_model = new UniformlyDistributedStochasticDurationCellCycleModel;
 
         // Change G1 duration for this model
         p_stem_model->SetTransitCellG1Duration(8.0);
 
-        StochasticDurationCellCycleModel* p_diff_model = new StochasticDurationCellCycleModel;
+        UniformlyDistributedStochasticDurationCellCycleModel* p_diff_model = new UniformlyDistributedStochasticDurationCellCycleModel;
 
         MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
@@ -351,7 +351,7 @@ public:
             CheckReadyToDivideAndPhaseIsUpdated(p_diff_model, 132);  // any old number
         }
 
-        StochasticDurationCellCycleModel* p_hepa_one_model = new StochasticDurationCellCycleModel;
+        UniformlyDistributedStochasticDurationCellCycleModel* p_hepa_one_model = new UniformlyDistributedStochasticDurationCellCycleModel;
         CellPtr p_hepa_one_cell(new Cell(p_healthy_state, p_hepa_one_model));
         p_hepa_one_cell->SetCellProliferativeType(p_stem_type);
         p_hepa_one_cell->InitialiseCellCycleModel();
@@ -1077,10 +1077,10 @@ public:
         }
     }
 
-    void TestArchiveStochasticDurationCellCycleModel()
+    void TestArchiveUniformlyDistributedStochasticDurationCellCycleModel()
     {
         OutputFileHandler handler("archive", false);
-        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "StochasticDurationCellCycleModel.arch";
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "UniformlyDistributedStochasticDurationCellCycleModel.arch";
 
         // We will also test that the random number generator is archived correctly
         double random_number_test = 0.0;
@@ -1090,7 +1090,7 @@ public:
             SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 4);
 
             // As usual, we archive via a pointer to the most abstract class possible
-            AbstractCellCycleModel* const p_model = new StochasticDurationCellCycleModel;
+            AbstractCellCycleModel* const p_model = new UniformlyDistributedStochasticDurationCellCycleModel;
             p_model->SetDimension(2);
 
             std::ofstream ofs(archive_filename.c_str());
@@ -1420,17 +1420,17 @@ public:
             TS_ASSERT(comparer.CompareFiles());
         }
 
-        // Test with StochasticDurationCellCycleModel
-        StochasticDurationCellCycleModel stochastic_duration_cell_cycle_model;
-        TS_ASSERT_EQUALS(stochastic_duration_cell_cycle_model.GetIdentifier(), "StochasticDurationCellCycleModel");
+        // Test with UniformlyDistributedStochasticDurationCellCycleModel
+        UniformlyDistributedStochasticDurationCellCycleModel uniform_distributed_cell_cycle_model;
+        TS_ASSERT_EQUALS(uniform_distributed_cell_cycle_model.GetIdentifier(), "UniformlyDistributedStochasticDurationCellCycleModel");
 
-        out_stream stochastic_duration_parameter_file = output_file_handler.OpenOutputFile("stochastic_duration_results.parameters");
-        stochastic_duration_cell_cycle_model.OutputCellCycleModelParameters(stochastic_duration_parameter_file);
-        stochastic_duration_parameter_file->close();
+        out_stream uniform_distributed_parameter_file = output_file_handler.OpenOutputFile("uniform_distributed_results.parameters");
+        uniform_distributed_cell_cycle_model.OutputCellCycleModelParameters(uniform_distributed_parameter_file);
+        uniform_distributed_parameter_file->close();
 
         {
             FileFinder generated_file = output_file_handler.FindFile("stochastic_duration_results.parameters");
-            FileFinder reference_file("cell_based/test/data/TestCellCycleModels/stochastic_duration_results.parameters",
+            FileFinder reference_file("cell_based/test/data/TestCellCycleModels/uniform_distributed_results.parameters",
                                       RelativeTo::ChasteSourceRoot);
             FileComparison comparer(generated_file,reference_file);
             TS_ASSERT(comparer.CompareFiles());
@@ -1487,18 +1487,18 @@ public:
         }
 
         // Test with GammaDistributedStochasticDurationCellCycleModel
-        GammaDistributedStochasticDurationCellCycleModel gamma_cell_cycle_model;
-        gamma_cell_cycle_model.SetShape(0.85);
-        gamma_cell_cycle_model.SetScale(1.23);
-        TS_ASSERT_EQUALS(gamma_cell_cycle_model.GetIdentifier(), "GammaDistributedStochasticDurationCellCycleModel");
+        GammaDistributedStochasticDurationCellCycleModel gamma_distributed_cell_cycle_model;
+        gamma_distributed_cell_cycle_model.SetShape(0.85);
+        gamma_distributed_cell_cycle_model.SetScale(1.23);
+        TS_ASSERT_EQUALS(gamma_distributed_cell_cycle_model.GetIdentifier(), "GammaDistributedStochasticDurationCellCycleModel");
 
-        out_stream gamma_parameter_file = output_file_handler.OpenOutputFile("gamma_results.parameters");
-        gamma_cell_cycle_model.OutputCellCycleModelParameters(gamma_parameter_file);
-        gamma_parameter_file->close();
+        out_stream gamma_distributed_parameter_file = output_file_handler.OpenOutputFile("gamma_distributed_results.parameters");
+        gamma_distributed_cell_cycle_model.OutputCellCycleModelParameters(gamma_distributed_parameter_file);
+        gamma_distributed_parameter_file->close();
 
         {
-            FileFinder generated_file = output_file_handler.FindFile("gamma_results.parameters");
-            FileFinder reference_file("cell_based/test/data/TestCellCycleModels/gamma_results.parameters",
+            FileFinder generated_file = output_file_handler.FindFile("gamma_distributed_results.parameters");
+            FileFinder reference_file("cell_based/test/data/TestCellCycleModels/gamma_distributed_results.parameters",
                                       RelativeTo::ChasteSourceRoot);
             FileComparison comparer(generated_file,reference_file);
             TS_ASSERT(comparer.CompareFiles());

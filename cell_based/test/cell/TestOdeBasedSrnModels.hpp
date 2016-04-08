@@ -50,7 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "StochasticDurationGenerationBasedCellCycleModel.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "OutputFileHandler.hpp"
-#include "StochasticDurationCellCycleModel.hpp"
+#include "UniformlyDistributedStochasticDurationCellCycleModel.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "TransitCellProliferativeType.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
@@ -143,7 +143,7 @@ public:
             SimulationTime* p_simulation_time = SimulationTime::Instance();
             p_simulation_time->SetEndTimeAndNumberOfTimeSteps(2.0, 4);
 
-            StochasticDurationCellCycleModel* p_cc_model = new StochasticDurationCellCycleModel();
+            UniformlyDistributedStochasticDurationCellCycleModel* p_cc_model = new UniformlyDistributedStochasticDurationCellCycleModel();
 
             // As usual, we archive via a pointer to the most abstract class possible
             AbstractSrnModel* p_srn_model = new DeltaNotchSrnModel;
@@ -273,7 +273,7 @@ public:
             SimulationTime* p_simulation_time = SimulationTime::Instance();
             p_simulation_time->SetEndTimeAndNumberOfTimeSteps(end_time, 100);
 
-            StochasticDurationCellCycleModel* p_cc_model = new StochasticDurationCellCycleModel();
+            UniformlyDistributedStochasticDurationCellCycleModel* p_cc_model = new UniformlyDistributedStochasticDurationCellCycleModel();
 
             // As usual, we archive via a pointer to the most abstract class possible
             AbstractSrnModel* p_srn_model = new Goldbeter1991SrnModel;

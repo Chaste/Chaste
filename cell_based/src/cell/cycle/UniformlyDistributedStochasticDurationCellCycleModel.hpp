@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef STOCHASTICDURATIONCELLCYCLEMODEL_HPP_
-#define STOCHASTICDURATIONCELLCYCLEMODEL_HPP_
+#ifndef UNIFORMLYDISTRIBUTEDSTOCHASTICDURATIONCELLCYCLEMODEL_HPP_
+#define UNIFORMLYDISTRIBUTEDSTOCHASTICDURATIONCELLCYCLEMODEL_HPP_
 
 #include "AbstractSimplePhaseBasedCellCycleModel.hpp"
 #include "RandomNumberGenerator.hpp"
@@ -51,7 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * If the cell has DifferentiatedCellProliferativeType, then the G1 phase duration is
  * set to be infinite, so that the cell will never divide.
  */
-class StochasticDurationCellCycleModel : public AbstractSimplePhaseBasedCellCycleModel
+class UniformlyDistributedStochasticDurationCellCycleModel : public AbstractSimplePhaseBasedCellCycleModel
 {
     friend class TestSimpleCellCycleModels;
 
@@ -90,7 +90,7 @@ protected:
      *
      * @param rModel the cell cycle model to copy.
      */
-    StochasticDurationCellCycleModel(const StochasticDurationCellCycleModel& rModel);
+    UniformlyDistributedStochasticDurationCellCycleModel(const UniformlyDistributedStochasticDurationCellCycleModel& rModel);
 
 public:
 
@@ -98,7 +98,7 @@ public:
      * Constructor - just a default, mBirthTime is set in the AbstractCellCycleModel class.
      * mG1Duration is set very high, it is set for the individual cells when InitialiseDaughterCell is called
      */
-    StochasticDurationCellCycleModel();
+    UniformlyDistributedStochasticDurationCellCycleModel();
 
     /**
      * Overridden SetG1Duration Method to add stochastic cell cycle times
@@ -123,6 +123,6 @@ public:
 
 #include "SerializationExportWrapper.hpp"
 // Declare identifier for the serializer
-CHASTE_CLASS_EXPORT(StochasticDurationCellCycleModel)
+CHASTE_CLASS_EXPORT(UniformlyDistributedStochasticDurationCellCycleModel)
 
-#endif /*STOCHASTICDURATIONCELLCYCLEMODEL_HPP_*/
+#endif /*UNIFORMLYDISTRIBUTEDSTOCHASTICDURATIONCELLCYCLEMODEL_HPP_*/

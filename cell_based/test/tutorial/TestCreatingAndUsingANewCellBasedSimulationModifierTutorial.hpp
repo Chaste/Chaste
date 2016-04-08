@@ -77,7 +77,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HoneycombMeshGenerator.hpp"
 #include "NodesOnlyMesh.hpp"
 #include "CellsGenerator.hpp"
-#include "StochasticDurationCellCycleModel.hpp"
+#include "UniformlyDistributedStochasticDurationCellCycleModel.hpp"
 #include "TransitCellProliferativeType.hpp"
 #include "RepulsionForce.hpp"
 #include "OffLatticeSimulation.hpp"
@@ -229,7 +229,7 @@ public:
         /*
          * In this case, we choose to create a small {{{NodeBasedCellPopulation}}} comprising 25 cells.
          * We choose a cut-off for mechanical interactions between cells of 1.5 units and add a
-         * simple {{{ReplusionForce}}} to the simulation. We use a {{{StochasticDurationCellCycleModel}}}
+         * simple {{{ReplusionForce}}} to the simulation. We use a {{{UniformlyDistributedStochasticDurationCellCycleModel}}}
          * to implement some random proliferation in the simulation.
          */
         HoneycombMeshGenerator generator(2, 2, 0);
@@ -239,7 +239,7 @@ public:
 
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
-        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+        CellsGenerator<UniformlyDistributedStochasticDurationCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_transit_type);
 
         NodeBasedCellPopulation<2> cell_population(mesh, cells);

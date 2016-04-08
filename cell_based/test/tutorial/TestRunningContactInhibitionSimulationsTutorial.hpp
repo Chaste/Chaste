@@ -99,7 +99,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OffLatticeSimulation.hpp"
 #include "MeshBasedCellPopulation.hpp"
 #include "CellMutationStatesCountWriter.hpp"
-#include "StochasticDurationCellCycleModel.hpp"
+#include "UniformlyDistributedStochasticDurationCellCycleModel.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "TransitCellProliferativeType.hpp"
 #include "HoneycombMeshGenerator.hpp"
@@ -239,7 +239,7 @@ public:
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
 
         /* We again create the cells. The difference here is that one of the cells is not contact-inhibited, but rather
-         * is defined by a {{{StochasticDurationCellCycleModel}}}. */
+         * is defined by a {{{UniformlyDistributedStochasticDurationCellCycleModel}}}. */
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
@@ -248,7 +248,7 @@ public:
         {
             if (i==1)
             {
-                StochasticDurationCellCycleModel* p_cycle_model = new StochasticDurationCellCycleModel();
+                UniformlyDistributedStochasticDurationCellCycleModel* p_cycle_model = new UniformlyDistributedStochasticDurationCellCycleModel();
                 p_cycle_model->SetBirthTime(-14.0);
                 p_cycle_model->SetStemCellG1Duration(1.0);
 

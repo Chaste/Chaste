@@ -33,18 +33,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "StochasticDurationCellCycleModel.hpp"
+#include "UniformlyDistributedStochasticDurationCellCycleModel.hpp"
 #include "Exception.hpp"
 #include "StemCellProliferativeType.hpp"
 #include "TransitCellProliferativeType.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 
-StochasticDurationCellCycleModel::StochasticDurationCellCycleModel()
+UniformlyDistributedStochasticDurationCellCycleModel::UniformlyDistributedStochasticDurationCellCycleModel()
     : AbstractSimplePhaseBasedCellCycleModel()
 {
 }
 
-StochasticDurationCellCycleModel::StochasticDurationCellCycleModel(const StochasticDurationCellCycleModel& rModel)
+UniformlyDistributedStochasticDurationCellCycleModel::UniformlyDistributedStochasticDurationCellCycleModel(const UniformlyDistributedStochasticDurationCellCycleModel& rModel)
    : AbstractSimplePhaseBasedCellCycleModel(rModel)
 {
     /*
@@ -66,12 +66,12 @@ StochasticDurationCellCycleModel::StochasticDurationCellCycleModel(const Stochas
     // No new member variables.
 }
 
-AbstractCellCycleModel* StochasticDurationCellCycleModel::CreateCellCycleModel()
+AbstractCellCycleModel* UniformlyDistributedStochasticDurationCellCycleModel::CreateCellCycleModel()
 {
-    return new StochasticDurationCellCycleModel(*this);
+    return new UniformlyDistributedStochasticDurationCellCycleModel(*this);
 }
 
-void StochasticDurationCellCycleModel::SetG1Duration()
+void UniformlyDistributedStochasticDurationCellCycleModel::SetG1Duration()
 {
     RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
 
@@ -93,7 +93,7 @@ void StochasticDurationCellCycleModel::SetG1Duration()
     }
 }
 
-void StochasticDurationCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
+void UniformlyDistributedStochasticDurationCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
 {
     // No new parameters to output, so just call method on direct parent class
     AbstractSimplePhaseBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
@@ -101,4 +101,4 @@ void StochasticDurationCellCycleModel::OutputCellCycleModelParameters(out_stream
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-CHASTE_CLASS_EXPORT(StochasticDurationCellCycleModel)
+CHASTE_CLASS_EXPORT(UniformlyDistributedStochasticDurationCellCycleModel)
