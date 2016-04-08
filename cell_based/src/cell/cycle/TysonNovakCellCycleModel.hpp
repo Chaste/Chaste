@@ -39,20 +39,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
-#include "AbstractOdeBasedPhaseBasedCellCycleModel.hpp"
+#include "AbstractOdeBasedCellCycleModel.hpp"
 #include "TysonNovak2001OdeSystem.hpp"
 
 
 /**
  *  Tyson-Novak 2001 cell-cycle model, taken from the version at  doi:10.1006/jtbi.2001.2293
  *
- *  Note that this is not a model for murine or human colonic-cell cycling, but is
- *  included in chaste as one of the most commonly known ODE based cell-cycle models.
- *
  *  Time taken to progress through the cycle is deterministic and given by
  *  an ODE system independent of external factors.
  */
-class TysonNovakCellCycleModel : public AbstractOdeBasedPhaseBasedCellCycleModel
+class TysonNovakCellCycleModel : public AbstractOdeBasedCellCycleModel
 {
 private:
 
@@ -69,7 +66,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractOdeBasedPhaseBasedCellCycleModel>(*this);
+        archive & boost::serialization::base_object<AbstractOdeBasedCellCycleModel>(*this);
     }
 
 protected:
@@ -81,7 +78,7 @@ protected:
      * This copy-constructor helps subclasses to ensure that all member variables are correctly copied when this happens.
      *
      * This method is called by child classes to set member variables for a daughter cell upon cell division.
-     * Note that the parent cell cycle model will have had ResetForDivision() called just before CreateSrnModel() is called,
+     * Note that the parent cell cycle model will have had ResetForDivision() called just before CreateCellCycleModel() is called,
      * so performing an exact copy of the parent is suitable behaviour. Any daughter-cell-specific initialisation
      * can be done in InitialiseDaughterCell().
      *
@@ -125,20 +122,6 @@ public:
      */
     AbstractCellCycleModel* CreateCellCycleModel();
 
-    /**
-     * @return the duration of the cell's S phase.
-     */
-    double GetSDuration() const;
-
-    /**
-     * @return the duration of the cell's G2 phase.
-     */
-    double GetG2Duration() const;
-
-    /**
-     * @return the duration of the cell's M phase.
-     */
-    double GetMDuration() const;
 
     /**
      * If the daughter cell type is stem, change it to transit.

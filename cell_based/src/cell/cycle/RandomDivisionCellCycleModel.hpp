@@ -139,6 +139,18 @@ public:
     double GetMinimumDivisionAge();
 
     /**
+     * Overridden GetAverageTransitCellCycleTime() method.
+     * @return time
+     */
+    double GetAverageTransitCellCycleTime();
+
+    /**
+     * Overridden GetAverageStemCellCycleTime() method.
+     * @return time
+     */
+    double GetAverageStemCellCycleTime();
+
+    /**
      * Outputs cell cycle model parameters to file.
      *
      * @param rParamsFile the file stream to which the parameters are output

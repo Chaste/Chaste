@@ -38,7 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TransitCellProliferativeType.hpp"
 
 TysonNovakCellCycleModel::TysonNovakCellCycleModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
-    : AbstractOdeBasedPhaseBasedCellCycleModel(SimulationTime::Instance()->GetTime(), pOdeSolver)
+    : AbstractOdeBasedCellCycleModel(SimulationTime::Instance()->GetTime(), pOdeSolver)
 {
     if (!mpOdeSolver)
     {
@@ -59,7 +59,7 @@ TysonNovakCellCycleModel::TysonNovakCellCycleModel(boost::shared_ptr<AbstractCel
 }
 
 TysonNovakCellCycleModel::TysonNovakCellCycleModel(const TysonNovakCellCycleModel& rModel)
-    : AbstractOdeBasedPhaseBasedCellCycleModel(rModel)
+    : AbstractOdeBasedCellCycleModel(rModel)
 {
     /*
      * Set each member variable of the new cell-cycle model that inherits
@@ -88,12 +88,12 @@ void TysonNovakCellCycleModel::Initialise()
     mpOdeSystem = new TysonNovak2001OdeSystem;
     mpOdeSystem->SetStateVariables(mpOdeSystem->GetInitialConditions());
 
-    AbstractOdeBasedPhaseBasedCellCycleModel::Initialise();
+    AbstractOdeBasedCellCycleModel::Initialise();
 }
 
 void TysonNovakCellCycleModel::ResetForDivision()
 {
-    AbstractOdeBasedPhaseBasedCellCycleModel::ResetForDivision();
+    AbstractOdeBasedCellCycleModel::ResetForDivision();
 
     assert(mpOdeSystem != NULL);
 
@@ -140,36 +140,6 @@ AbstractCellCycleModel* TysonNovakCellCycleModel::CreateCellCycleModel()
     return new TysonNovakCellCycleModel(*this);
 }
 
-double TysonNovakCellCycleModel::GetSDuration() const
-{
-    /**
-     * Tyson & Novak pretends it is running ODEs in just G1,
-     * but they really represent the whole cell cycle, so
-     * we set the other phases to zero.
-     */
-    return 0.0;
-}
-
-double TysonNovakCellCycleModel::GetG2Duration() const
-{
-    /**
-     * Tyson & Novak pretends it is running ODEs in just G1,
-     * but they really represent the whole cell cycle so
-     * we set the other phases to zero.
-     */
-    return 0.0;
-}
-
-double TysonNovakCellCycleModel::GetMDuration() const
-{
-    /**
-     * Tyson & Novak pretends it is running ODEs in just G1,
-     * but they really represent the whole cell cycle so
-     * we set the other phases to zero.
-     */
-    return 0.0;
-}
-
 double TysonNovakCellCycleModel::GetAverageTransitCellCycleTime()
 {
     return 1.25;
@@ -188,7 +158,7 @@ bool TysonNovakCellCycleModel::CanCellTerminallyDifferentiate()
 void TysonNovakCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
 {
     // No new parameters to output, so just call method on direct parent class
-    AbstractOdeBasedPhaseBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
+    AbstractOdeBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
 }
 
 // Serialization for Boost >= 1.36

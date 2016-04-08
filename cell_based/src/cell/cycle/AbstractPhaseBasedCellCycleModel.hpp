@@ -134,7 +134,7 @@ protected:
      * This copy-constructor helps subclasses to ensure that all member variables are correctly copied when this happens.
      *
      * This method is called by child classes to set member variables for a daughter cell upon cell division.
-     * Note that the parent cell cycle model will have had ResetForDivision() called just before CreateSrnModel() is called,
+     * Note that the parent cell cycle model will have had ResetForDivision() called just before CreateCellCycleModel() is called,
      * so performing an exact copy of the parent is suitable behaviour. Any daughter-cell-specific initialisation
      * can be done in InitialiseDaughterCell().
      *

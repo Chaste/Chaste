@@ -121,7 +121,7 @@ protected:
      * This copy-constructor helps subclasses to ensure that all member variables are correctly copied when this happens.
      *
      * This method is called by child classes to set member variables for a daughter cell upon cell division.
-     * Note that the parent cell cycle model will have had ResetForDivision() called just before CreateSrnModel() is called,
+     * Note that the parent cell cycle model will have had ResetForDivision() called just before CreateCellCycleModel() is called,
      * so performing an exact copy of the parent is suitable behaviour. Any daughter-cell-specific initialisation
      * can be done in InitialiseDaughterCell().
      *
@@ -263,6 +263,18 @@ public:
      *  @return whether a cell with this cell-cycle model is able to fully (terminally) differentiate.
      */
     virtual bool CanCellTerminallyDifferentiate();
+
+    /**
+     * @return the typical cell cycle duration for a transit cell, in hours.
+     * This method must be declared in subclasses.
+     */
+    virtual double GetAverageTransitCellCycleTime()=0;
+
+    /**
+     * @return the typical cell cycle duration for a stem cell, in hours.
+     * This method must be declared in subclasses.
+     */
+    virtual double GetAverageStemCellCycleTime()=0;
 
     /**
      * Outputs cell-cycle model used in the simulation to file and then calls

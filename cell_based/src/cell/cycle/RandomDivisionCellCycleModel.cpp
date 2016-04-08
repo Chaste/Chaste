@@ -117,6 +117,16 @@ double RandomDivisionCellCycleModel::GetMinimumDivisionAge()
     return mMinimumDivisionAge;
 }
 
+double RandomDivisionCellCycleModel::GetAverageTransitCellCycleTime()
+{
+    return 1.0/mDivisionProbability;
+}
+
+double RandomDivisionCellCycleModel::GetAverageStemCellCycleTime()
+{
+    return 1.0/mDivisionProbability;
+}
+
 void RandomDivisionCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<DivisionProbability>" << mDivisionProbability << "</DivisionProbability>\n";

@@ -1067,7 +1067,7 @@ public:
         AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
 
         TS_ASSERT_THROWS_THIS(cell_writer.VisitCell(*cell_iter, &cell_population),
-            "CellCycleModelProteinConcentrationsWriter cannot be used with a cell-cycle model that does not inherit from AbstractOdeBasedPhaseBasedCellCycleModel");
+            "CellCycleModelProteinConcentrationsWriter cannot be used with a cell-cycle model that does not inherit from AbstractOdeBasedCellCycleModel or AbstractOdeBasedPhaseBasedCellCycleModel");
 
         // Avoid memory leak
         for (unsigned i=0; i<nodes.size(); i++)

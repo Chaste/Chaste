@@ -486,27 +486,18 @@ public:
         {
             TysonNovakCellCycleModel* p_model = new TysonNovakCellCycleModel();
 
-            // For Tyson-Novak cells
-            p_model->SetStemCellG1Duration(0.12);
-            p_model->SetTransitCellG1Duration(0.12);
-            p_model->SetSDuration(0.01);
-            p_model->SetG2Duration(0.01);
-            p_model->SetMDuration(0.01);
-
             CellPtr p_cell(new Cell(p_healthy_state, p_model));
 
             double birth_time;
             if (i == 0)
             {
                 p_cell->SetCellProliferativeType(p_stem_type);
-                birth_time = -p_rand_gen->ranf()*(p_model->GetStemCellG1Duration()
-                                                  + p_model->GetSG2MDuration());
+                birth_time = -p_rand_gen->ranf()*(p_model->GetAverageStemCellCycleTime());
             }
             else if (i < 15)
             {
                 p_cell->SetCellProliferativeType(p_transit_type);
-                birth_time = -p_rand_gen->ranf()*(p_model->GetTransitCellG1Duration()
-                                                    + p_model->GetSG2MDuration());
+                birth_time = -p_rand_gen->ranf()*(p_model->GetAverageStemCellCycleTime());
             }
             else
             {
@@ -529,8 +520,8 @@ public:
         // Create a force law and pass it to the simulation
         MAKE_PTR(GeneralisedLinearSpringForce<1>, p_linear_force);
 
-        // Set the MeinekeSpringGrowthDuration to be the default MPhase Duration
-        p_linear_force->SetMeinekeSpringGrowthDuration(static_cast<TysonNovakCellCycleModel*>(crypt.rGetCells().front()->GetCellCycleModel())->GetMDuration());
+        // Set the MeinekeSpringGrowthDuration to be the shorter than the default MPhase Duration as Tyson Novak sells divide every 1.25 hours.
+        p_linear_force->SetMeinekeSpringGrowthDuration(0.1);
 
         simulator.AddForce(p_linear_force);
 
