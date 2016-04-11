@@ -50,6 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HoneycombMeshGenerator.hpp"
 #include "CellsGenerator.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "UniformlyDistributedCellCycleModel.hpp"
 #include "VertexBasedCellPopulation.hpp"
 #include "MeshBasedCellPopulation.hpp"
 #include "OffLatticeSimulation.hpp"
@@ -86,6 +87,31 @@ public:
                 "AbstractTargetAreaModifiers are to be used with a VertexBasedCellPopulation only");
         CellBasedEventHandler::Reset(); // Otherwise logging has been started but not stopped due to exception above
     }
+
+    void TestNonPhaseBasedCcmException() throw (Exception)
+    {
+        // First set up SimulationTime (this is usually handled by a simulation object)
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
+
+        // Create a cell mutation state
+        MAKE_PTR(WildTypeCellMutationState, p_state);
+        MAKE_PTR(TransitCellProliferativeType, p_type);
+
+        // Create a cell-cycle model
+        UniformlyDistributedCellCycleModel* p_model = new UniformlyDistributedCellCycleModel();
+
+        // Create a cell
+        CellPtr p_cell(new Cell(p_state, p_model));
+
+        // Create a FarhadifarTypeModifier
+        MAKE_PTR(FarhadifarTypeModifier<2>, p_modifier);
+
+        // Test that the correct exception is thrown if we try to call UpdateTargetAreas() on the population
+        TS_ASSERT_THROWS_THIS(p_modifier->UpdateTargetAreaOfCell(p_cell),
+            "FarhadifarTypeModifier is to be used with a AbstractPhaseBasedCellCycleModel only");
+        CellBasedEventHandler::Reset(); // Otherwise logging has been started but not stopped due to exception above.
+    }
+
 
     void TestFarhadifarTypeModifierMethods() throw (Exception)
     {

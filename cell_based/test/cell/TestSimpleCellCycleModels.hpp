@@ -308,13 +308,15 @@ public:
 
         UniformlyDistributedCellCycleModel* p_stem_model = new UniformlyDistributedCellCycleModel;
 
-        // Change G1 duration for this model
-        p_stem_model->SetStemCellG1Duration(8.0);
+        // Change Min and Max cell cycle duration for this model
+        p_stem_model->SetMinCellCycleDuration(18.0);
+        p_stem_model->SetMaxCellCycleDuration(20.0);
 
         UniformlyDistributedCellCycleModel* p_transit_model = new UniformlyDistributedCellCycleModel;
 
-        // Change G1 duration for this model
-        p_stem_model->SetTransitCellG1Duration(8.0);
+        // Use default Min and Max cell cycle duration for this model
+        p_transit_model->SetMinCellCycleDuration(12.0);
+        p_transit_model->SetMaxCellCycleDuration(14.0);
 
         UniformlyDistributedCellCycleModel* p_diff_model = new UniformlyDistributedCellCycleModel;
 
@@ -338,20 +340,26 @@ public:
         SimulationTime* p_simulation_time = SimulationTime::Instance();
         unsigned num_steps = 100;
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(
-                        4.0*(p_stem_model->GetStemCellG1Duration() + p_stem_model->GetSG2MDuration()), 2*num_steps);
+                        4.0*(p_stem_model->GetAverageStemCellCycleTime()), 2*num_steps);
 
         for (unsigned i=0; i<num_steps; i++)
         {
             p_simulation_time->IncrementTimeOneStep();
 
-            // The numbers for the G1 durations below are taken from the first three
+            // The numbers for the cell cycle durations below are taken from the first three
             // random numbers generated
-            CheckReadyToDivideAndPhaseIsUpdated(p_stem_model, 9.09763);
-            CheckReadyToDivideAndPhaseIsUpdated(p_transit_model, 3.18569);
-            CheckReadyToDivideAndPhaseIsUpdated(p_diff_model, 132);  // any old number
+            CheckReadyToDivideIsUpdated(p_stem_model, 19.09763);
+            CheckReadyToDivideIsUpdated(p_transit_model, 13.18569);
+            CheckReadyToDivideIsUpdated(p_diff_model, 132);  // any old number
         }
 
+        // Check with a mutation.
         UniformlyDistributedCellCycleModel* p_hepa_one_model = new UniformlyDistributedCellCycleModel;
+
+        // Use default Min and Max cell cycle duration for this model
+        p_hepa_one_model->SetMinCellCycleDuration(14.0);
+        p_hepa_one_model->SetMaxCellCycleDuration(16.0);
+
         CellPtr p_hepa_one_cell(new Cell(p_healthy_state, p_hepa_one_model));
         p_hepa_one_cell->SetCellProliferativeType(p_stem_type);
         p_hepa_one_cell->InitialiseCellCycleModel();
@@ -359,7 +367,7 @@ public:
         for (unsigned i=0; i< num_steps; i++)
         {
             p_simulation_time->IncrementTimeOneStep();
-            CheckReadyToDivideAndPhaseIsUpdated(p_hepa_one_model, 15.4304);
+            CheckReadyToDivideIsUpdated(p_hepa_one_model, 15.43038);
         }
     }
 
@@ -1092,6 +1100,8 @@ public:
             // As usual, we archive via a pointer to the most abstract class possible
             AbstractCellCycleModel* const p_model = new UniformlyDistributedCellCycleModel;
             p_model->SetDimension(2);
+            dynamic_cast<UniformlyDistributedCellCycleModel*>(p_model)->SetMinCellCycleDuration(1.0);
+            dynamic_cast<UniformlyDistributedCellCycleModel*>(p_model)->SetMaxCellCycleDuration(2.0);
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
@@ -1115,6 +1125,11 @@ public:
             boost::archive::text_iarchive input_arch(ifs);
 
             input_arch >> p_model2;
+
+            TS_ASSERT_EQUALS(p_model2->GetDimension(),2u);
+            TS_ASSERT_DELTA(dynamic_cast<UniformlyDistributedCellCycleModel*>(p_model2)->GetMinCellCycleDuration(),1.0,1e-5);
+            TS_ASSERT_DELTA(dynamic_cast<UniformlyDistributedCellCycleModel*>(p_model2)->GetMaxCellCycleDuration(),2.0,1e-5);
+
 
             TS_ASSERT_DELTA(RandomNumberGenerator::Instance()->ranf(), random_number_test, 1e-6);
 

@@ -294,7 +294,7 @@ public:
         /* The next two lines are for test purposes only and are not part of this tutorial.
          * We are checking that we reached the end time of the simulation
          * with the correct number of cells. */
-        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 100u);
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 101u);
         TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 1.0, 1e-10);
     }
 

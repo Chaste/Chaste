@@ -50,6 +50,11 @@ FarhadifarTypeModifier<DIM>::~FarhadifarTypeModifier()
 template<unsigned DIM>
 void FarhadifarTypeModifier<DIM>::UpdateTargetAreaOfCell(CellPtr pCell)
 {
+    if (dynamic_cast<AbstractPhaseBasedCellCycleModel*>(pCell->GetCellCycleModel()) == NULL)
+    {
+        EXCEPTION("FarhadifarTypeModifier is to be used with a AbstractPhaseBasedCellCycleModel only");
+    }
+
     // Get target area A of a healthy cell in S, G2 or M phase
     double cell_target_area = this->mReferenceTargetArea;
 

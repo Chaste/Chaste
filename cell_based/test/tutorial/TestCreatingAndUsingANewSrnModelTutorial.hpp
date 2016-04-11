@@ -88,7 +88,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * tutorials. */
 #include "CheckReadyToDivideAndPhaseIsUpdated.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
-#include "UniformlyDistributedCellCycleModel.hpp"
+#include "UniformlyDistributedGenerationBasedCellCycleModel.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "NagaiHondaForce.hpp"
 #include "SimpleTargetAreaModifier.hpp"
@@ -299,7 +299,7 @@ public:
         /* Now we construct and initialise a cell with a {{{MySrnModel}}}.*/
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        UniformlyDistributedCellCycleModel* p_cell_cycle_model = new UniformlyDistributedCellCycleModel();
+        UniformlyDistributedGenerationBasedCellCycleModel* p_cell_cycle_model = new UniformlyDistributedGenerationBasedCellCycleModel();
         MySrnModel* p_srn_model = new MySrnModel;
         CellPtr p_cell(new Cell(p_state, p_cell_cycle_model, p_srn_model));
         p_cell->SetCellProliferativeType(p_diff_type);
@@ -341,7 +341,7 @@ public:
             p_simulation_time->SetEndTimeAndNumberOfTimeSteps(3.0, 4);
 
             /* Create a cell with associated srn and cell-cycle model. */
-            UniformlyDistributedCellCycleModel* p_cell_cycle_model = new UniformlyDistributedCellCycleModel();
+            UniformlyDistributedGenerationBasedCellCycleModel* p_cell_cycle_model = new UniformlyDistributedGenerationBasedCellCycleModel();
             AbstractSrnModel* p_srn_model = new MySrnModel;
             CellPtr p_cell(new Cell(p_state, p_cell_cycle_model, p_srn_model));
             p_cell->SetCellProliferativeType(p_diff_type);
@@ -427,7 +427,7 @@ public:
         for (unsigned i=0; i<p_mesh->GetNumElements(); i++)
         {
             /* For each node we create a cell with our SRN model and simple Stochastic cell cycle model. */
-            UniformlyDistributedCellCycleModel* p_cell_cycle_model = new UniformlyDistributedCellCycleModel();
+            UniformlyDistributedGenerationBasedCellCycleModel* p_cell_cycle_model = new UniformlyDistributedGenerationBasedCellCycleModel();
             MySrnModel* p_srn_model = new MySrnModel;
 
             /* We choose to initialise the concentrations to random levels in each cell. */
@@ -441,15 +441,13 @@ public:
 
 
             /* Now, we define a random birth time, chosen from [-T,0], where
-             * T = t,,1,, + t,,2,,, where t,,1,, is a parameter representing the G,,1,, duration
-             * of a stem cell, and t,,2,, is the basic S+G,,2,,+M phases duration.
+             * T is the typical cell cycle duration
              */
-            double birth_time = - RandomNumberGenerator::Instance()->ranf() * (p_cell_cycle_model->GetStemCellG1Duration() + p_cell_cycle_model->GetSG2MDuration());
+            double birth_time = - RandomNumberGenerator::Instance()->ranf() * p_cell_cycle_model->GetAverageStemCellCycleTime();
             /* We then set the birth time and push the cell back into the vector of cells. */
             p_cell->SetBirthTime(birth_time);
             cells.push_back(p_cell);
         }
-
 
         /* Now that we have defined the mesh and cells, we can define the cell population, forces, areas modifier, and simulation
          * in the same way as the other tutorials. */

@@ -43,6 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "DeltaNotchSrnModel.hpp"
 #include "UniformlyDistributedCellCycleModel.hpp"
+#include "UniformlyDistributedGenerationBasedCellCycleModel.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "NodeBasedCellPopulation.hpp"
@@ -386,7 +387,7 @@ public:
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
         {
-            UniformlyDistributedCellCycleModel* p_cc_model = new UniformlyDistributedCellCycleModel();
+            UniformlyDistributedGenerationBasedCellCycleModel* p_cc_model = new UniformlyDistributedGenerationBasedCellCycleModel();
             p_cc_model->SetDimension(2);
 
             DeltaNotchSrnModel* p_srn_model = new DeltaNotchSrnModel();
@@ -641,7 +642,7 @@ public:
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
         {
-            UniformlyDistributedCellCycleModel* p_cc_model = new UniformlyDistributedCellCycleModel();
+            UniformlyDistributedGenerationBasedCellCycleModel* p_cc_model = new UniformlyDistributedGenerationBasedCellCycleModel();
             p_cc_model->SetDimension(2);
 
             DeltaNotchSrnModel* p_srn_model = new DeltaNotchSrnModel();

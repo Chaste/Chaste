@@ -33,41 +33,34 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef UNIFORMLYDISTRIBUTEDCELLCYCLEMODEL_HPP_
-#define UNIFORMLYDISTRIBUTEDCELLCYCLEMODEL_HPP_
+#ifndef ABSTRACTSIMPLECELLCYCLEMODEL_HPP_
+#define ABSTRACTSIMPLECELLCYCLEMODEL_HPP_
 
-#include "AbstractSimpleCellCycleModel.hpp"
-#include "RandomNumberGenerator.hpp"
+#include "ChasteSerialization.hpp"
+#include "ClassIsAbstract.hpp"
+
+#include <boost/serialization/base_object.hpp>
+
+#include <vector>
+
+#include "AbstractCellCycleModel.hpp"
+#include "CellCyclePhases.hpp"
+#include "SimulationTime.hpp"
+
 
 /**
- * A stochastic cell-cycle model where cells divide with a stochastic cell cycle duration
- * with the length of the cell cycle drawn from a uniform distribution
- * on [mMinCellCycleDuration, mMaxCellCycleDuration].
- *
- * If the cell has DifferentiatedCellProliferativeType, then the cell cycle duration is
- * set to be infinite, so that the cell will never divide.
+ * The AbstractSimpleCellCycleModel contains basic information to all phase based cell-cycle models.
+ * It handles assignment of aspects of cell cycle phase.
  *
  */
-class UniformlyDistributedCellCycleModel : public AbstractSimpleCellCycleModel
+class AbstractSimpleCellCycleModel : public AbstractCellCycleModel
 {
-    friend class TestSimpleCellCycleModels;
-
 private:
-
-    /**
-     * The minimum cell cycle duration. Used to define the uniform distribution.
-     */
-    double mMinCellCycleDuration;
-
-    /**
-     * The maximum cell cycle duration. Used to define the uniform distribution.
-     */
-    double mMaxCellCycleDuration;
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
-     * Archive the cell-cycle model and random number generator, never used directly - boost uses this.
+     * Archive the object and its member variables.
      *
      * @param archive the archive
      * @param version the current version of this class
@@ -75,16 +68,18 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractSimpleCellCycleModel>(*this);
-
-        // Make sure the RandomNumberGenerator singleton gets saved too
-        SerializableSingleton<RandomNumberGenerator>* p_wrapper = RandomNumberGenerator::Instance()->GetSerializationWrapper();
-        archive & p_wrapper;
-        archive & mMinCellCycleDuration;
-        archive & mMaxCellCycleDuration;
+        archive & boost::serialization::base_object<AbstractCellCycleModel>(*this);
+        archive & mCellCycleDuration;
     }
 
 protected:
+
+    /**
+     * Duration of G1 phase for stem cells.
+     * May be used as a mean duration for stochastic cell-cycle models.
+     *
+     */
+    double mCellCycleDuration;
 
     /**
      * Protected copy-constructor for use by CreateCellCycleModel.
@@ -99,75 +94,69 @@ protected:
      *
      * @param rModel the cell cycle model to copy.
      */
-    UniformlyDistributedCellCycleModel(const UniformlyDistributedCellCycleModel& rModel);
+    AbstractSimpleCellCycleModel(const AbstractSimpleCellCycleModel& rModel);
 
 public:
 
     /**
-     * Constructor - just a default, mBirthTime is set in the AbstractCellCycleModel class.
-     * mG1Duration is set very high, it is set for the individual cells when InitialiseDaughterCell is called
+     * Default constructor - creates an AbstractSimpleCellCycleModel.
      */
-    UniformlyDistributedCellCycleModel();
+    AbstractSimpleCellCycleModel();
 
     /**
-     * Overridden SetCellCycleDuration Method to add stochastic cell cycle times
+     * Destructor.
      */
-    void SetCellCycleDuration();
+    virtual ~AbstractSimpleCellCycleModel();
 
     /**
-     * Overridden builder method to create new copies of
-     * this cell-cycle model.
+     * See AbstractCellCycleModel::ResetForDivision()
      *
-     * @return new cell-cycle model
+     * @return whether the cell is ready to divide (enter M phase).
      */
-    AbstractCellCycleModel* CreateCellCycleModel();
+    virtual bool ReadyToDivide();
+
+    /** See AbstractCellCycleModel::ResetForDivision() */
+    virtual void ResetForDivision();
 
     /**
-     * @return mMinCellCycleDuration
-     */
-    double GetMinCellCycleDuration();
-
-    /**
-     * Set mMinCellCycleDuration
+     * See AbstractPhaseBasedCellCycleModel::InitialiseDaughterCell()
      *
-     * @param minCellCycleDuration
+     * Set the new cell's cell cycle duration once it has been created after division.
+     * This is by calling SetCellCycleDuration() defined in child classes.
      */
-    void SetMinCellCycleDuration(double minCellCycleDuration);
+    void InitialiseDaughterCell();
 
-    /**
-     * @return mMaxCellCycleDuration
-     */
-    double GetMaxCellCycleDuration();
-
-    /**
-     * Set mMaxCellCycleDuration
+    /** See AbstractPhaseBasedCellCycleModel::Initialise()
      *
-     * @param maxCellCycleDuration
+     * Calls SetCellCycleDuration() defined in child classes.
      */
-    void SetMaxCellCycleDuration(double maxCellCycleDuration);
+    virtual void Initialise();
 
     /**
-     * Overridden GetAverageTransitCellCycleTime() method.
-     * @return time
+     * This method is implemented in Subclasses to set the cell cycle duration of the cell.
+     * It is called on the beginning of the simulation (intialisation) when initialising
+     * daughter cells and when reseting parent cells
+     *
+     * It must be implemented in child classes.
      */
-    double GetAverageTransitCellCycleTime();
+    virtual void SetCellCycleDuration() = 0;
 
     /**
-     * Overridden GetAverageStemCellCycleTime() method.
-     * @return time
+     * @return mCellCycleDuration
      */
-    double GetAverageStemCellCycleTime();
+    double GetCellCycleDuration() const;
 
     /**
      * Outputs cell cycle model parameters to file.
      *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile);
+    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile)=0;
 };
 
-#include "SerializationExportWrapper.hpp"
-// Declare identifier for the serializer
-CHASTE_CLASS_EXPORT(UniformlyDistributedCellCycleModel)
+CLASS_IS_ABSTRACT(AbstractSimpleCellCycleModel)
 
-#endif /*UNIFORMLYDISTRIBUTEDCELLCYCLEMODEL_HPP_*/
+#endif /*ABSTRACTSIMPLECELLCYCLEMODEL_HPP_*/

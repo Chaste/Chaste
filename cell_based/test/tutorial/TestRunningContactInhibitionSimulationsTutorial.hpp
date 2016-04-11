@@ -250,7 +250,6 @@ public:
             {
                 UniformlyDistributedCellCycleModel* p_cycle_model = new UniformlyDistributedCellCycleModel();
                 p_cycle_model->SetBirthTime(-14.0);
-                p_cycle_model->SetStemCellG1Duration(1.0);
 
                 CellPtr p_cell(new Cell(p_state, p_cycle_model));
                 p_cell->SetCellProliferativeType(p_stem_type);
