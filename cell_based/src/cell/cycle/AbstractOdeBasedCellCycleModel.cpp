@@ -41,7 +41,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 AbstractOdeBasedCellCycleModel::AbstractOdeBasedCellCycleModel(double lastTime,
                                                                boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
     : CellCycleModelOdeHandler(lastTime, pOdeSolver),
-      mDivideTime(lastTime)
+      mDivideTime(lastTime),
+      mFinishedRunningOdes(false)
 {
     AbstractCellCycleModel::SetBirthTime(lastTime);
 }
@@ -53,7 +54,8 @@ AbstractOdeBasedCellCycleModel::~AbstractOdeBasedCellCycleModel()
 AbstractOdeBasedCellCycleModel::AbstractOdeBasedCellCycleModel(const AbstractOdeBasedCellCycleModel& rModel)
     : AbstractCellCycleModel(rModel),
       CellCycleModelOdeHandler(rModel),
-      mDivideTime(rModel.mDivideTime)
+      mDivideTime(rModel.mDivideTime),
+      mFinishedRunningOdes(false)
 {
     /*
      * Set each member variable of the new cell-cycle model that inherits
