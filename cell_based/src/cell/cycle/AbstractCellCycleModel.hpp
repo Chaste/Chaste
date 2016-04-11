@@ -268,7 +268,7 @@ public:
      * @return the typical cell cycle duration for a transit cell, in hours.
      * This method must be declared in subclasses.
      *
-     * #2788 Consider merging these to GetAverageCellCycleDuration
+     * #2788 Consider merging this with GetAverageStemCellCycleTime to GetAverageCellCycleDuration
      */
     virtual double GetAverageTransitCellCycleTime()=0;
 
@@ -276,7 +276,7 @@ public:
      * @return the typical cell cycle duration for a stem cell, in hours.
      * This method must be declared in subclasses.
      *
-     * #2788 Consider merging these to GetAverageCellCycleDuration
+     * #2788 Consider merging this with GetAverageTransitCellCycleTime to GetAverageCellCycleDuration
      */
     virtual double GetAverageStemCellCycleTime()=0;
 
