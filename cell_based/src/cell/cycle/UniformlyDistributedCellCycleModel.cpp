@@ -112,16 +112,12 @@ void UniformlyDistributedCellCycleModel::SetMaxCellCycleDuration(double maxCellC
 
 double UniformlyDistributedCellCycleModel::GetAverageTransitCellCycleTime()
 {
-    return mMinCellCycleDuration;
-    // This is to keep the tests the same it should be the following line, #2788
-    // return 0.5*(mMinCellCycleDuration+mMaxCellCycleDuration);
+    return 0.5*(mMinCellCycleDuration+mMaxCellCycleDuration);
 }
 
 double UniformlyDistributedCellCycleModel::GetAverageStemCellCycleTime()
 {
-    return mMinCellCycleDuration;
-    // This is to keep the tests the same it should be the following line, #2788
-    // return 0.5*(mMinCellCycleDuration+mMaxCellCycleDuration);
+    return 0.5*(mMinCellCycleDuration+mMaxCellCycleDuration);
 }
 
 void UniformlyDistributedCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
