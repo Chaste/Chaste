@@ -155,11 +155,11 @@ public:
     const std::vector<double>& GetStateVariables();
 
     /**
-     * Outputs cell cycle model parameters to file.
+     * Outputs cell cycle model parameters to file. Virtual void so needs to be specified in child classes.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputSrnModelParameters(out_stream& rParamsFile);
+    virtual void OutputSrnModelParameters(out_stream& rParamsFile) = 0;
 };
 
 CLASS_IS_ABSTRACT(AbstractOdeSrnModel)

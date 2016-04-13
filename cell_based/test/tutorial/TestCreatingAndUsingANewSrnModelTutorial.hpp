@@ -187,6 +187,7 @@ private:
         archive & boost::serialization::base_object<AbstractOdeSrnModel>(*this);
     }
 
+protected:
     /**
      * We need to define a protected copy-constructor for use by CreateSrnModel.
      * The only way for external code to create a copy of a SRN model
@@ -239,6 +240,7 @@ public:
         AbstractOdeSrnModel::Initialise(new MyOdeSystem);
     }
 
+    /* The fourth public method runs the ODEs at each timestep and saves some results to {{{CellData}}}. */
     void SimulateToCurrentTime()
     {
         // run the ODE simulation as needed
@@ -246,6 +248,15 @@ public:
 
         /* this line outputs the ODE system variable to {{{CellData}}}. */
         mpCell->GetCellData()->SetItem("x",mpOdeSystem->rGetStateVariables()[0]);
+    }
+
+    /* Finally we define a method to output any parameters in our model, this needs to be included in every SRN model.*/
+    void OutputSrnModelParameters(out_stream& rParamsFile)
+    {
+        // No new parameters to output.
+
+        // Call direct parent class
+        AbstractOdeSrnModel::OutputSrnModelParameters(rParamsFile);
     }
 
 };
