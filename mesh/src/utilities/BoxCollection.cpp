@@ -35,6 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "BoxCollection.hpp"
 #include "Exception.hpp"
+#include "IsNan.hpp"
 
 /////////////////////////////////////////////////////////////////////////////
 // BoxCollection methods
@@ -168,16 +169,24 @@ unsigned BoxCollection<DIM>::CalculateContainingBox(Node<DIM>* pNode)
 template<unsigned DIM>
 unsigned BoxCollection<DIM>::CalculateContainingBox(c_vector<double, DIM>& rLocation)
 {
+    // Confirm that the location is in the domain
+    for (unsigned i = 0; i < DIM; i++)
+    {
+        if (rLocation[i] < mDomainSize[2*i] || rLocation[i] > mDomainSize[2*i + 1] || isnan(rLocation[i]))
+        {
+            std::stringstream location_error;
+            location_error << "Location in dimension " << i << " is " << rLocation[i] << " which is not in the domain ["
+            << mDomainSize[2*i] << ", " << mDomainSize[2*i + 1] << "].";
+
+            EXCEPTION(location_error.str());
+        }
+    }
+
     // Compute the containing box index in each dimension
     c_vector<int, DIM> containing_box_indices;
     for (unsigned i = 0; i < DIM; i++)
     {
         containing_box_indices[i] = (int) floor((rLocation[i] - mDomainSize(2 * i) + msFudge) / mBoxWidth);
-    }
-
-    if(!IsBoxInDomain(containing_box_indices))
-    {
-        EXCEPTION("Location does not correspond to any box.");
     }
 
     return GetLinearIndex(containing_box_indices);

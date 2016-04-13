@@ -192,7 +192,7 @@ public:
 
         c_vector<double,1> miles_away;
         miles_away(0) = 47323854;
-        TS_ASSERT_THROWS_CONTAINS(box_collection.CalculateContainingBox(miles_away), "Location does not correspond to any box.");
+        TS_ASSERT_THROWS_CONTAINS(box_collection.CalculateContainingBox(miles_away), "Location in dimension 0 is");
     }
 
     void TestAddElement() throw(Exception)
@@ -248,6 +248,11 @@ public:
         unsigned correct_10[] = {5, 6, 7, 9, 10, 11};
         std::set<unsigned> correct_answer_10(correct_10, correct_10 + 6);
         TS_ASSERT_EQUALS(local_boxes_to_box_10, correct_answer_10);
+
+        c_vector<double, 2> location_nan;
+        location_nan[0] = 1.23;
+        location_nan[1] = -NAN;
+        TS_ASSERT_THROWS_CONTAINS(box_collection.CalculateContainingBox(location_nan), "Location in dimension 1 is -nan");
     }
 
     void TestSetupAllLocalBoxes2dPeriodic() throw(Exception)
