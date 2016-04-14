@@ -35,7 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "BoxCollection.hpp"
 #include "Exception.hpp"
-#include "IsNan.hpp"
 
 /////////////////////////////////////////////////////////////////////////////
 // BoxCollection methods
@@ -172,7 +171,7 @@ unsigned BoxCollection<DIM>::CalculateContainingBox(c_vector<double, DIM>& rLoca
     // Confirm that the location is in the domain
     for (unsigned i = 0; i < DIM; i++)
     {
-        if (rLocation[i] < mDomainSize[2*i] || rLocation[i] > mDomainSize[2*i + 1] || isnan(rLocation[i]))
+        if (!(rLocation[i] >= mDomainSize[2*i] && rLocation[i] <= mDomainSize[2*i + 1]))
         {
             std::stringstream location_error;
             location_error << "Location in dimension " << i << " is " << rLocation[i] << " which is not in the domain ["
