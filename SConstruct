@@ -52,13 +52,13 @@ except:
 Help("""
   Type: 'scons -c .' to remove all the compiled files (clean build),
         'scons' to do a default build,
-        'scons test_suite=<Path from chaste folder>' to run a single test,
+        'scons <Path to TestWhatever.hpp>' to run a single test,
         'scons <component>' to build and test a single component.
   
   For other options, such as profiling, optimised builds and 
   memory testing please refer to:
   
-  https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides/BuildGuide
+  https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides/UserBuildGuide
 
 """)
 
