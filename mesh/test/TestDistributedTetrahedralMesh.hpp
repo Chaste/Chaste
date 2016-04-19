@@ -54,6 +54,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FileComparison.hpp"
 
 #include "RandomNumberGenerator.hpp"
+#include "Warnings.hpp"
 
 #include "PetscSetupAndFinalize.hpp"
 
@@ -104,7 +105,7 @@ private:
                         DistributedTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>& rMesh2 )
     {
         // Check that the same partitioner was used
-        TS_ASSERT_EQUALS(rMesh1.mMetisPartitioning, rMesh2.mMetisPartitioning);
+        TS_ASSERT_EQUALS(rMesh1.mPartitioning, rMesh2.mPartitioning);
         // Check that we have the right number of nodes and elements
         TS_ASSERT_EQUALS(rMesh1.GetNumBoundaryElements(), rMesh2.GetNumBoundaryElements());
         TS_ASSERT_EQUALS(rMesh1.GetNumElements(), rMesh2.GetNumElements());
@@ -298,7 +299,7 @@ private:
         }
         else
         {
-            //Metis may allocate no nodes to a partition if the mesh is small and there are many processes
+            // A partitioner may allocate no nodes to a partition if the mesh is small and there are many processes
             // Look out for "You just increased the maxndoms"
             TS_ASSERT( 0u == total_nodes_this_process );
             TS_ASSERT( 0u == total_elements_this_process );
@@ -518,7 +519,7 @@ public:
     void TestConstructFromMeshReader3D()
     {
         /*
-         * In this test we let METIS reorder the DistributedTetrahedralMesh. We want to check that although
+         * In this test we let parMETIS reorder the DistributedTetrahedralMesh. We want to check that although
          * the indices of the nodes have changed, the location of the nodes is consistent with a
          * TetrahedralMesh representation of the same mesh.
          */
@@ -625,26 +626,6 @@ public:
         }
     }
 
-    void TestConstructFromMeshReaderWithBinaryFiles()
-    {
-        /* Note that the PARMETIS_LIBRARY partitioning type is able to randomly permute element
-         * access when using binary files (in order to avoid disk contention).  This means that a
-         * binary reader can give a different partition compared to the equivalent ascii reader
-         *
-         * Here we select the METIS_LIBRARY partition in order to avoid such issues.
-         */
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_136_elements_binary");
-        TrianglesMeshReader<3,3> mesh_reader_ascii("mesh/test/data/cube_136_elements");
-
-        DistributedTetrahedralMesh<3,3> mesh(DistributedTetrahedralMeshPartitionType::METIS_LIBRARY);
-        mesh.ConstructFromMeshReader(mesh_reader);
-
-        DistributedTetrahedralMesh<3,3> mesh_from_ascii(DistributedTetrahedralMeshPartitionType::METIS_LIBRARY);
-        mesh_from_ascii.ConstructFromMeshReader(mesh_reader_ascii);
-
-        CompareMeshes(mesh, mesh_from_ascii);
-    }
-
     void TestConstructFromMeshReaderWithNclFile()
     {
         TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_136_elements_binary");
@@ -663,19 +644,6 @@ public:
         mesh_from_ncl.ConstructFromMeshReader(mesh_reader_ncl);
 
         CompareMeshes( mesh, mesh_from_ncl );
-    }
-
-    void TestEverythingIsAssignedMetisLibrary()
-    {
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_136_elements");
-        DistributedTetrahedralMesh<3,3> mesh(DistributedTetrahedralMeshPartitionType::METIS_LIBRARY);
-        mesh.ConstructFromMeshReader(mesh_reader);
-
-        TS_ASSERT_EQUALS(mesh.GetNumNodes(), mesh_reader.GetNumNodes());
-        TS_ASSERT_EQUALS(mesh.GetNumElements(), mesh_reader.GetNumElements());
-        TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), mesh_reader.GetNumFaces());
-
-        CheckEverythingIsAssigned<3,3>(mesh);
     }
 
     void TestRandomShuffle() throw (Exception)
@@ -731,21 +699,19 @@ public:
      */
     void TestComparePartitionQualities()
     {
-        unsigned num_local_nodes_petsc_parmetis, num_local_nodes_parmetis, num_local_nodes_metis;
+        unsigned num_local_nodes_petsc_parmetis, num_local_nodes_parmetis, num_local_nodes_metis_deprecated;
 
         {
             TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/3D_0_to_1mm_6000_elements");
             //TrianglesMeshReader<3,3> mesh_reader("heart/test/data/heart");
             DistributedTetrahedralMesh<3,3> mesh(DistributedTetrahedralMeshPartitionType::METIS_LIBRARY);
+            TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
             mesh.ConstructFromMeshReader(mesh_reader);
+            // There's warning because METIS is deprecated and this is actually a parMETIS partition
+            TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
+            Warnings::Instance()->QuietDestroy();
 
-            TS_ASSERT_EQUALS(mesh.GetNumNodes(), mesh_reader.GetNumNodes());
-            TS_ASSERT_EQUALS(mesh.GetNumElements(), mesh_reader.GetNumElements());
-            TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), mesh_reader.GetNumFaces());
-
-            CheckEverythingIsAssigned<3,3>(mesh);
-
-            num_local_nodes_metis = mesh.GetNumLocalNodes();
+            num_local_nodes_metis_deprecated = mesh.GetNumLocalNodes();
         }
 
         if (PetscTools::HasParMetis())
@@ -781,20 +747,19 @@ public:
             CheckEverythingIsAssigned<3,3>(mesh);
 
             num_local_nodes_parmetis = mesh.GetNumLocalNodes();
+            TS_ASSERT_EQUALS(num_local_nodes_metis_deprecated, num_local_nodes_parmetis); // METIS is deprecated so these are the same
         }
 
-        unsigned max_local_nodes_metis;
         unsigned max_local_nodes_petsc_parmetis;
         unsigned max_local_nodes_parmetis;
 
-        MPI_Allreduce (&num_local_nodes_metis, &max_local_nodes_metis, 1, MPI_UNSIGNED, MPI_MAX, PETSC_COMM_WORLD );
         MPI_Allreduce (&num_local_nodes_petsc_parmetis, &max_local_nodes_petsc_parmetis, 1, MPI_UNSIGNED, MPI_MAX, PETSC_COMM_WORLD );
         MPI_Allreduce (&num_local_nodes_parmetis, &max_local_nodes_parmetis, 1, MPI_UNSIGNED, MPI_MAX, PETSC_COMM_WORLD );
 
         if (PetscTools::AmMaster())
         {
-            std::cout << "METIS\tPETSC PARMETIS\tPARMETIS" << std::endl;
-            std::cout << max_local_nodes_metis << "\t" << max_local_nodes_petsc_parmetis << "\t\t" << max_local_nodes_parmetis << std::endl;
+            std::cout << "PETSC PARMETIS\tPARMETIS" << std::endl;
+            std::cout << max_local_nodes_petsc_parmetis << "\t\t" << max_local_nodes_parmetis << std::endl;
         }
         PetscTools::Barrier();
 
@@ -907,32 +872,6 @@ public:
         }
     }
 
-    void TestMetisPartitioning()
-    {
-        EXIT_IF_SEQUENTIAL;
-
-        {
-            TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_136_elements");
-            DistributedTetrahedralMesh<3,3> mesh(DistributedTetrahedralMeshPartitionType::METIS_LIBRARY);
-            mesh.ConstructFromMeshReader(mesh_reader);
-
-            // Check that each processor owns the number of nodes corresponding to its METIS partition
-            unsigned local_nodes = mesh.GetDistributedVectorFactory()->GetLocalOwnership();
-            TS_ASSERT_EQUALS(local_nodes, mesh.GetNumLocalNodes());
-
-            TS_ASSERT_EQUALS(mesh.GetPartitionType(), DistributedTetrahedralMeshPartitionType::METIS_LIBRARY);
-        }
-
-        {
-            TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_984_elements");
-            DistributedTetrahedralMesh<2,2> mesh(DistributedTetrahedralMeshPartitionType::METIS_LIBRARY);
-            mesh.ConstructFromMeshReader(mesh_reader);
-
-            // Check that each processor owns the number of nodes corresponding to its METIS partition
-            unsigned local_nodes = mesh.GetDistributedVectorFactory()->GetLocalOwnership();
-            TS_ASSERT_EQUALS(local_nodes, mesh.GetNumLocalNodes());
-        }
-    }
 
     void TestPartitioningOfEmbeddedDimensionMesh()
     {
@@ -1021,7 +960,7 @@ public:
         std::string archive_file = "distributed_tetrahedral_mesh.arch";
         ArchiveLocationInfo::SetMeshFilename("distributed_tetrahedral_mesh");
 
-        DistributedTetrahedralMesh<2,2>* p_mesh = new DistributedTetrahedralMesh<2,2>(DistributedTetrahedralMeshPartitionType::METIS_LIBRARY);
+        DistributedTetrahedralMesh<2,2>* p_mesh = new DistributedTetrahedralMesh<2,2>(DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY);
         //std::vector<unsigned> halo_node_indices;
         std::vector<Node<2>*> halo_nodes;
         unsigned num_nodes;
@@ -1161,7 +1100,7 @@ public:
         std::string archive_file = "binary_mesh.arch";
         ArchiveLocationInfo::SetMeshFilename("binary_mesh");
 
-        DistributedTetrahedralMesh<3,3>* p_mesh = new DistributedTetrahedralMesh<3,3>(DistributedTetrahedralMeshPartitionType::METIS_LIBRARY);
+        DistributedTetrahedralMesh<3,3>* p_mesh = new DistributedTetrahedralMesh<3,3>(DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY);
         //std::vector<unsigned> halo_node_indices;
         std::vector<Node<3>*> halo_nodes;
         unsigned num_nodes;

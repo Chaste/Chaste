@@ -55,7 +55,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Timer.hpp"
 #include "TetrahedralMesh.hpp"
-
+#include "Warnings.hpp"
+ 
 #include "petscao.h"
 #include <parmetis.h>
 #if (PARMETIS_MAJOR_VERSION >= 4) //ParMETIS 4.x and above
@@ -77,12 +78,12 @@ DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::DistributedTetrahedralMesh(D
       mTotalNumBoundaryElements(0u),
       mTotalNumNodes(0u),
       mpSpaceRegion(NULL),
-      mMetisPartitioning(partitioningMethod)
+      mPartitioning(partitioningMethod)
 {
     if (ELEMENT_DIM == 1 && (partitioningMethod != DistributedTetrahedralMeshPartitionType::GEOMETRIC))
     {
         //No METIS partition is possible - revert to DUMB
-        mMetisPartitioning = DistributedTetrahedralMeshPartitionType::DUMB;
+        mPartitioning = DistributedTetrahedralMeshPartitionType::DUMB;
     }
 }
 
@@ -99,7 +100,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::SetDistributedVectorFactory(DistributedVectorFactory* pFactory)
 {
     AbstractMesh<ELEMENT_DIM,SPACE_DIM>::SetDistributedVectorFactory(pFactory);
-    mMetisPartitioning = DistributedTetrahedralMeshPartitionType::DUMB;
+    mPartitioning = DistributedTetrahedralMeshPartitionType::DUMB;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -110,8 +111,21 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ComputeMeshPartitioning
     std::set<unsigned>& rElementsOwned,
     std::vector<unsigned>& rProcessorsOffset)
 {
+    if (mPartitioning == DistributedTetrahedralMeshPartitionType::METIS_LIBRARY)
+    {
+        WARNING("METIS partitioning is deprecated.  Switching to parMETIS");
+        mPartitioning = DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY;
+    }
+    if (mPartitioning == DistributedTetrahedralMeshPartitionType::PETSC_MAT_PARTITION && !PetscTools::HasParMetis())
+    {
+        // The following warning can only be reproduced on machines which do not have the PETSc/parMETIS interface.
+#define COVERAGE_IGNORE
+        WARNING("PETSc/parMETIS partitioning requires PETSc to be configured with parMETIS as an option.  Current install has PETSc and parMETIS installed independently.  Switching to parMETIS");
+        mPartitioning = DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY;
+#undef COVERAGE_IGNORE
+    }
     ///\todo #1293 add a timing event for the partitioning
-    if (mMetisPartitioning==DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY && PetscTools::IsParallel())
+    if (mPartitioning==DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY && PetscTools::IsParallel())
     {
         /*
          *  With ParMetisLibraryNodeAndElementPartitioning we compute the element partition first
@@ -124,15 +138,11 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ComputeMeshPartitioning
         /*
          *  Otherwise we compute the node partition and then we work out element distribution
          */
-        if (mMetisPartitioning==DistributedTetrahedralMeshPartitionType::METIS_LIBRARY && PetscTools::IsParallel())
-        {
-            NodePartitioner<ELEMENT_DIM, SPACE_DIM>::MetisLibraryPartitioning(rMeshReader, this->mNodePermutation, rNodesOwned, rProcessorsOffset);
-        }
-        else if (mMetisPartitioning==DistributedTetrahedralMeshPartitionType::PETSC_MAT_PARTITION && PetscTools::IsParallel())
+        if (mPartitioning==DistributedTetrahedralMeshPartitionType::PETSC_MAT_PARTITION && PetscTools::IsParallel())
         {
             NodePartitioner<ELEMENT_DIM, SPACE_DIM>::PetscMatrixPartitioning(rMeshReader, this->mNodePermutation, rNodesOwned, rProcessorsOffset);
         }
-        else if (mMetisPartitioning==DistributedTetrahedralMeshPartitionType::GEOMETRIC && PetscTools::IsParallel())
+        else if (mPartitioning==DistributedTetrahedralMeshPartitionType::GEOMETRIC && PetscTools::IsParallel())
         {
             if (!mpSpaceRegion)
             {
@@ -206,7 +216,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ComputeMeshPartitioning
             }
         }
 
-        if (mMetisPartitioning==DistributedTetrahedralMeshPartitionType::PETSC_MAT_PARTITION && PetscTools::IsParallel())
+        if (mPartitioning==DistributedTetrahedralMeshPartitionType::PETSC_MAT_PARTITION && PetscTools::IsParallel())
         {
             PetscTools::Barrier();
             if (PetscTools::AmMaster())
@@ -414,7 +424,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader
     }
     PetscTools::ReplicateException(false);
 
-    if (mMetisPartitioning != DistributedTetrahedralMeshPartitionType::DUMB && PetscTools::IsParallel())
+    if (mPartitioning != DistributedTetrahedralMeshPartitionType::DUMB && PetscTools::IsParallel())
     {
         assert(this->mNodePermutation.size() != 0);
         // If we are partitioning (and permuting) a mesh, we need to be certain that we aren't doing it twice
@@ -497,7 +507,7 @@ unsigned DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetNumElements() co
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 DistributedTetrahedralMeshPartitionType::type DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetPartitionType() const
 {
-    return mMetisPartitioning;
+    return mPartitioning;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -695,7 +705,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructLinearMesh(uns
     }
 
     // Hook to pick up when we are using a geometric partition.
-    if(mMetisPartitioning == DistributedTetrahedralMeshPartitionType::GEOMETRIC)
+    if(mPartitioning == DistributedTetrahedralMeshPartitionType::GEOMETRIC)
     {
         if (!mpSpaceRegion)
         {
@@ -722,7 +732,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructLinearMesh(uns
     else    // use a default partition.
     {
         //Use dumb partition so that archiving doesn't permute anything
-        mMetisPartitioning=DistributedTetrahedralMeshPartitionType::DUMB;
+        mPartitioning=DistributedTetrahedralMeshPartitionType::DUMB;
         mTotalNumNodes=width+1;
         mTotalNumBoundaryElements=2u;
         mTotalNumElements=width;
@@ -812,7 +822,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRectangularMes
     }
 
     // Hook to pick up when we are using a geometric partition.
-    if(mMetisPartitioning == DistributedTetrahedralMeshPartitionType::GEOMETRIC)
+    if(mPartitioning == DistributedTetrahedralMeshPartitionType::GEOMETRIC)
     {
         if (!mpSpaceRegion)
         {
@@ -839,7 +849,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRectangularMes
     else
     {
         //Use dumb partition so that archiving doesn't permute anything
-        mMetisPartitioning=DistributedTetrahedralMeshPartitionType::DUMB;
+        mPartitioning=DistributedTetrahedralMeshPartitionType::DUMB;
 
         mTotalNumNodes=(width+1)*(height+1);
         mTotalNumBoundaryElements=(width+height)*2;
@@ -1015,7 +1025,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructCuboid(unsigne
     }
 
     // Hook to pick up when we are using a geometric partition.
-    if(mMetisPartitioning == DistributedTetrahedralMeshPartitionType::GEOMETRIC)
+    if(mPartitioning == DistributedTetrahedralMeshPartitionType::GEOMETRIC)
     {
         if (!mpSpaceRegion)
         {
@@ -1042,7 +1052,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructCuboid(unsigne
     else
     {
         //Use dumb partition so that archiving doesn't permute anything
-        mMetisPartitioning=DistributedTetrahedralMeshPartitionType::DUMB;
+        mPartitioning=DistributedTetrahedralMeshPartitionType::DUMB;
 
         mTotalNumNodes=(width+1)*(height+1)*(depth+1);
         mTotalNumBoundaryElements=((width*height)+(width*depth)+(height*depth))*4;//*2 for top-bottom, *2 for tessellating each unit square
