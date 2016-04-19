@@ -378,14 +378,6 @@ void ExecutableSupport::GetBuildInfo(std::string& rInfo)
     output << "." << PARMETIS_SUBMINOR_VERSION;
 #endif
     output << "</Parmetis>" << std::endl;
-    if (PetscTools::HasParMetis())
-    {
-            output << "\t\t\t<PETSc-Parmetis>yes</PETSc-Parmetis>\n";
-    }
-    else
-    {
-            output << "\t\t\t<PETSc-Parmetis>no</PETSc-Parmetis>\n";
-    }
     output << "\t\t</CompiledIn>\n";
 
     output << "\t\t<Binaries>\n";
