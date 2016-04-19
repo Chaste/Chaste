@@ -731,7 +731,7 @@ public:
      */
     void TestComparePartitionQualities()
     {
-        unsigned num_local_nodes_petsc_parmetis, num_local_nodes_binary, num_local_nodes_metis, num_total_nodes;
+        unsigned num_local_nodes_petsc_parmetis, num_local_nodes_parmetis, num_local_nodes_metis;
 
         {
             TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/3D_0_to_1mm_6000_elements");
@@ -746,7 +746,6 @@ public:
             CheckEverythingIsAssigned<3,3>(mesh);
 
             num_local_nodes_metis = mesh.GetNumLocalNodes();
-            num_total_nodes=mesh.GetNumNodes();
         }
 
         if (PetscTools::HasParMetis())
@@ -781,34 +780,31 @@ public:
 
             CheckEverythingIsAssigned<3,3>(mesh);
 
-            num_local_nodes_binary = mesh.GetNumLocalNodes();
+            num_local_nodes_parmetis = mesh.GetNumLocalNodes();
         }
 
         unsigned max_local_nodes_metis;
         unsigned max_local_nodes_petsc_parmetis;
-        unsigned max_local_nodes_binary;
+        unsigned max_local_nodes_parmetis;
 
         MPI_Allreduce (&num_local_nodes_metis, &max_local_nodes_metis, 1, MPI_UNSIGNED, MPI_MAX, PETSC_COMM_WORLD );
         MPI_Allreduce (&num_local_nodes_petsc_parmetis, &max_local_nodes_petsc_parmetis, 1, MPI_UNSIGNED, MPI_MAX, PETSC_COMM_WORLD );
-        MPI_Allreduce (&num_local_nodes_binary, &max_local_nodes_binary, 1, MPI_UNSIGNED, MPI_MAX, PETSC_COMM_WORLD );
+        MPI_Allreduce (&num_local_nodes_parmetis, &max_local_nodes_parmetis, 1, MPI_UNSIGNED, MPI_MAX, PETSC_COMM_WORLD );
 
         if (PetscTools::AmMaster())
         {
-            std::cout << "METIS\tPETSC PARMETIS\tPARMETIS BINARY" << std::endl;
-            std::cout << max_local_nodes_metis << "\t" << max_local_nodes_petsc_parmetis << "\t\t" << max_local_nodes_binary << std::endl;
+            std::cout << "METIS\tPETSC PARMETIS\tPARMETIS" << std::endl;
+            std::cout << max_local_nodes_metis << "\t" << max_local_nodes_petsc_parmetis << "\t\t" << max_local_nodes_parmetis << std::endl;
         }
         PetscTools::Barrier();
 
-        TS_ASSERT(num_local_nodes_petsc_parmetis <= max_local_nodes_binary);
+        TS_ASSERT(num_local_nodes_petsc_parmetis <= max_local_nodes_parmetis);
         //Watch out for dumb partition and warn about it
         if (PetscTools::IsParallel())
         {
-            //Dumb partition is ceil(n/p), ceil(n/p), .... [ceil(n/p) + n - p*ceil(n/p)]
-            //i.e. most processes get ceil(n/p)  = floor((n+p-1)/p)
-            unsigned max_in_dumb_partition = (num_total_nodes + PetscTools::GetNumProcs() - 1)/PetscTools::GetNumProcs();
-            if (max_local_nodes_petsc_parmetis ==  max_in_dumb_partition)
+            if (max_local_nodes_petsc_parmetis ==  0u)
             {
-                TS_TRACE("That was dumb partition -- it did not use ParMETIS");
+                TS_TRACE("Did not use ParMETIS because the interface is not available");
             }
         }
     }
