@@ -86,7 +86,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "RandomCellKiller.hpp"
 #include "RepulsionForce.hpp"
 #include "UniformlyDistributedGenerationBasedCellCycleModel.hpp"
-#include "UniformlyDistributedGenerationBasedCellCycleModel.hpp"
 #include "SurfaceAreaConstraintPottsUpdateRule.hpp"
 #include "TysonNovakCellCycleModel.hpp"
 #include "VertexBasedCellPopulation.hpp"
@@ -123,8 +122,10 @@ public:
 
         /* We now generate a collection of cells. We do this by using a {{{CellsGenerator}}} and we specify the proliferative
          * behaviour of the cell by choosing a {{{CellCycleModel}}}, here we choose a {{{UniformlyDistributedGenerationBasedCellCycleModel}}} where
-         * each cell is given a division time, drawn from a uniform distribution (Note here we need to use a phase based CCM so that we can use the
-         * target are modifiers), when it is created. For a vertex simulation
+         * each cell is given a division time, drawn from a uniform distribution when it is created.
+         * (Note that here we need to use a phase based cell cycle model so that we can use the target area modifiers which are needed by the vertex
+         * based simulations).
+         * For a vertex simulation
          * we need as may cells as elements in the mesh.*/
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
