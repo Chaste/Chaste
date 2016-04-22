@@ -174,4 +174,4 @@ public:
     }
 };
 
-#endif /*TESTCELL_HPP_*/
+#endif /*TESTCELLDATAMAPS_HPP_*/
