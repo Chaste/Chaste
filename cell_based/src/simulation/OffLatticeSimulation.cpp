@@ -137,94 +137,12 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellLocationsAndTopology
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::CalculateCellDivisionVector(CellPtr pParentCell)
 {
-    /**
-     * \todo #2400 Could remove this dynamic_cast by moving the code block below into
-     * AbstractCentreBasedCellPopulation::AddCell(), allowing it to be overruled by
-     * this method when overridden in subclasses. See also comment on #1093.
+    /*
+     * \todo #2800 refactor division rules to follow more closely the vertex case
      */
-    // If it is not vertex based...
-    if (bool(dynamic_cast<AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&(this->mrCellPopulation))))
-    {
-        // Location of parent and daughter cells
-        c_vector<double, SPACE_DIM> parent_coords = this->mrCellPopulation.GetLocationOfCellCentre(pParentCell);
-        c_vector<double, SPACE_DIM> daughter_coords;
 
-        // Get separation parameter
-        double separation = static_cast<AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&(this->mrCellPopulation))->GetMeinekeDivisionSeparation();
-
-        // Make a random direction vector of the required length
-        c_vector<double, SPACE_DIM> random_vector;
-
-        /*
-         * Pick a random direction and move the parent cell backwards by 0.5*separation
-         * in that direction and return the position of the daughter cell 0.5*separation
-         * forwards in that direction.
-         */
-        switch (SPACE_DIM)
-        {
-            case 1:
-            {
-                double random_direction = -1.0 + 2.0*(RandomNumberGenerator::Instance()->ranf() < 0.5);
-
-                random_vector(0) = 0.5*separation*random_direction;
-                break;
-            }
-            case 2:
-            {
-                double random_angle = 2.0*M_PI*RandomNumberGenerator::Instance()->ranf();
-
-                random_vector(0) = 0.5*separation*cos(random_angle);
-                random_vector(1) = 0.5*separation*sin(random_angle);
-                break;
-            }
-            case 3:
-            {
-                /*
-                 * Note that to pick a random point on the surface of a sphere, it is incorrect
-                 * to select spherical coordinates from uniform distributions on [0, 2*pi) and
-                 * [0, pi) respectively, since points picked in this way will be 'bunched' near
-                 * the poles. See #2230.
-                 */
-                double u = RandomNumberGenerator::Instance()->ranf();
-                double v = RandomNumberGenerator::Instance()->ranf();
-
-                double random_azimuth_angle = 2*M_PI*u;
-                double random_zenith_angle = std::acos(2*v - 1);
-
-                random_vector(0) = 0.5*separation*cos(random_azimuth_angle)*sin(random_zenith_angle);
-                random_vector(1) = 0.5*separation*sin(random_azimuth_angle)*sin(random_zenith_angle);
-                random_vector(2) = 0.5*separation*cos(random_zenith_angle);
-                break;
-            }
-            default:
-                // This can't happen
-                NEVER_REACHED;
-        }
-
-        parent_coords = parent_coords - random_vector;
-        daughter_coords = parent_coords + random_vector;
-
-        // Set the parent to use this location
-        ChastePoint<SPACE_DIM> parent_coords_point(parent_coords);
-        unsigned node_index = this->mrCellPopulation.GetLocationIndexUsingCell(pParentCell);
-        this->mrCellPopulation.SetNode(node_index, parent_coords_point);
-
-        return daughter_coords;
-    }
-    else if (bool(dynamic_cast<VertexBasedCellPopulation<SPACE_DIM>*>(&(this->mrCellPopulation))))
-    {
-        VertexBasedCellPopulation<SPACE_DIM>* p_vertex_population = dynamic_cast<VertexBasedCellPopulation<SPACE_DIM>*>(&(this->mrCellPopulation));
-        boost::shared_ptr<AbstractVertexBasedDivisionRule<SPACE_DIM> > p_division_rule = p_vertex_population->GetVertexBasedDivisionRule();
-
-        return p_division_rule->CalculateCellDivisionVector(pParentCell, *p_vertex_population);
-    }
-    else
-    {
-        // All classes derived from AbstractOffLatticeCellPopulation are covered by the above (except user-derived classes),
-        // i.e. if you want to use this class with your own subclass of AbstractOffLatticeCellPopulation, then simply
-        // comment out the line below
-        NEVER_REACHED;
-    }
+    // This static cast is always valid as the constructor tests that the cell population is AbstractOffLattice
+    return static_cast<AbstractOffLatticeCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&(this->mrCellPopulation))->CalculateCellDivisionVector(pParentCell);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

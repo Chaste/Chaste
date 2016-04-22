@@ -748,6 +748,12 @@ TetrahedralMesh<DIM, DIM>* VertexBasedCellPopulation<DIM>::GetTetrahedralMeshUsi
     return p_mesh;
 }
 
+template<unsigned DIM>
+c_vector<double, DIM> VertexBasedCellPopulation<DIM>::CalculateCellDivisionVector(CellPtr pParentCell)
+{
+    return mpVertexBasedDivisionRule->CalculateCellDivisionVector(pParentCell, *this);
+}
+
 // Explicit instantiation
 template class VertexBasedCellPopulation<1>;
 template class VertexBasedCellPopulation<2>;

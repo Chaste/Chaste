@@ -447,6 +447,14 @@ public:
     boost::shared_ptr<AbstractVertexBasedDivisionRule<DIM> > GetVertexBasedDivisionRule();
 
     /**
+     * Overridden method to specify a division vector.
+     *
+     * @param pParentCell the cell undergoing division
+     * @return a vector containing information on cell division
+     */
+    virtual c_vector<double, DIM> CalculateCellDivisionVector(CellPtr pParentCell);
+
+    /**
      * Set the division rule for this population.
      *
      * @param pVertexBasedDivisionRule  pointer to the new division rule

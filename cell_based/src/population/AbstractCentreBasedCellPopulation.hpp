@@ -261,6 +261,14 @@ public:
     void SetMeinekeDivisionSeparation(double divisionSeparation);
 
     /**
+     * Overridden method to specify a division vector.
+     *
+     * @param pParentCell the cell undergoing division
+     * @return a vector containing information on cell division
+     */
+    virtual c_vector<double, SPACE_DIM> CalculateCellDivisionVector(CellPtr pParentCell);
+
+    /**
      * Overridden OutputCellPopulationParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
