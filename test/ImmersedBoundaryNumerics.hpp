@@ -49,7 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "OffLatticeSimulation.hpp"
-#include "StochasticDurationCellCycleModel.hpp"
+#include "UniformlyDistributedCellCycleModel.hpp"
 #include "Timer.hpp"
 
 #include "CellsGenerator.hpp"
@@ -148,7 +148,7 @@ public:
 //
 //        std::vector<CellPtr> cells;
 //        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-//        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+//        CellsGenerator<UniformlyDistributedCellCycleModel, 2> cells_generator;
 //        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 //
 //        ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
@@ -233,7 +233,7 @@ public:
 //             */
 //            std::vector<CellPtr> cells;
 //            MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-//            CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+//            CellsGenerator<UniformlyDistributedCellCycleModel, 2> cells_generator;
 //            cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
 //
 //            ImmersedBoundaryCellPopulation<2> cell_population(mesh, cells);
@@ -362,7 +362,7 @@ public:
 //         */
 //        std::vector<CellPtr> cells;
 //        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-//        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+//        CellsGenerator<UniformlyDistributedCellCycleModel, 2> cells_generator;
 //        cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
 //
 //        ImmersedBoundaryCellPopulation<2> cell_population(mesh, cells);
@@ -483,7 +483,7 @@ public:
 //            // Set up cell population
 //            std::vector<CellPtr> cells;
 //            MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-//            CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+//            CellsGenerator<UniformlyDistributedCellCycleModel, 2> cells_generator;
 //            cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
 //            ImmersedBoundaryCellPopulation<2> cell_population(mesh, cells);
 //
@@ -566,7 +566,7 @@ public:
 //            // Set up cell population
 //            std::vector<CellPtr> cells;
 //            MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-//            CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+//            CellsGenerator<UniformlyDistributedCellCycleModel, 2> cells_generator;
 //            cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
 //            ImmersedBoundaryCellPopulation<2> cell_population(mesh, cells);
 //
@@ -701,7 +701,7 @@ public:
 //            // Set up cell population
 //            std::vector<CellPtr> cells;
 //            MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-//            CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+//            CellsGenerator<UniformlyDistributedCellCycleModel, 2> cells_generator;
 //            cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
 //            ImmersedBoundaryCellPopulation<2> cell_population(mesh, cells);
 //
@@ -794,7 +794,7 @@ public:
 //            // Set up cell population
 //            std::vector<CellPtr> cells;
 //            MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-//            CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+//            CellsGenerator<UniformlyDistributedCellCycleModel, 2> cells_generator;
 //            cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
 //            ImmersedBoundaryCellPopulation<2> cell_population(mesh, cells);
 //
@@ -922,7 +922,7 @@ public:
 //             */
 //            std::vector<CellPtr> cells;
 //            MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-//            CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+//            CellsGenerator<UniformlyDistributedCellCycleModel, 2> cells_generator;
 //            cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
 //
 //            ImmersedBoundaryCellPopulation<2> cell_population(mesh, cells);
@@ -1023,7 +1023,7 @@ public:
 //        // Set up cell population and simulation
 //        std::vector<CellPtr> cells;
 //        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-//        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+//        CellsGenerator<UniformlyDistributedCellCycleModel, 2> cells_generator;
 //        cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
 //        ImmersedBoundaryCellPopulation<2> cell_population(mesh, cells);
 //        OffLatticeSimulation<2> simulator(cell_population);
@@ -1111,7 +1111,7 @@ public:
 //             */
 //            std::vector<CellPtr> cells;
 //            MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-//            CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+//            CellsGenerator<UniformlyDistributedCellCycleModel, 2> cells_generator;
 //            cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
 //
 //            ImmersedBoundaryCellPopulation <2> cell_population(mesh, cells);
@@ -1216,7 +1216,7 @@ public:
 //             */
 //            std::vector<CellPtr> cells;
 //            MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-//            CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+//            CellsGenerator<UniformlyDistributedCellCycleModel, 2> cells_generator;
 //            cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
 //
 //            ImmersedBoundaryCellPopulation <2> cell_population(mesh, cells);
@@ -1319,7 +1319,7 @@ public:
 //             */
 //            std::vector<CellPtr> cells;
 //            MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-//            CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+//            CellsGenerator<UniformlyDistributedCellCycleModel, 2> cells_generator;
 //            cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
 //
 //            ImmersedBoundaryCellPopulation <2> cell_population(mesh, cells);
@@ -1413,7 +1413,7 @@ public:
 //
 //            std::vector<CellPtr> cells;
 //            MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-//            CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+//            CellsGenerator<UniformlyDistributedCellCycleModel, 2> cells_generator;
 //            cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 //
 //            ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
@@ -1491,7 +1491,7 @@ public:
 //
 //            std::vector<CellPtr> cells;
 //            MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-//            CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+//            CellsGenerator<UniformlyDistributedCellCycleModel, 2> cells_generator;
 //            cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 //
 //            ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);

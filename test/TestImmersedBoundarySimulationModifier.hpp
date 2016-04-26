@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DifferentiatedCellProliferativeType.hpp"
 #include "OffLatticeSimulation.hpp"
 #include "SmartPointers.hpp"
-#include "StochasticDurationCellCycleModel.hpp"
+#include "UniformlyDistributedCellCycleModel.hpp"
 
 
 // Includes from projects/ImmersedBoundary

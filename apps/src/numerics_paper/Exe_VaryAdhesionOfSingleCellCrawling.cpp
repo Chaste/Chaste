@@ -52,7 +52,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/lexical_cast.hpp>
 
 #include "OffLatticeSimulation.hpp"
-#include "StochasticDurationCellCycleModel.hpp"
+#include "UniformlyDistributedCellCycleModel.hpp"
 #include "CellsGenerator.hpp"
 #include "ImmersedBoundaryMesh.hpp"
 #include "ImmersedBoundaryCellPopulation.hpp"
@@ -166,7 +166,7 @@ void SetupAndRunSimulation(std::string idString, double corRestLength, double co
 
     std::vector<CellPtr> cells;
     MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-    CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+    CellsGenerator<UniformlyDistributedCellCycleModel, 2> cells_generator;
     cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
     ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
