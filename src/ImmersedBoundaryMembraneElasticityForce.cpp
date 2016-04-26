@@ -194,11 +194,6 @@ void ImmersedBoundaryMembraneElasticityForce<DIM>::AddForceContribution(std::vec
             elastic_force_to_next_node[node_idx] = mpMesh->GetVectorFromAtoB(elem_it->GetNodeLocation(node_idx), elem_it->GetNodeLocation(next_idx));
             normed_dist = norm_2(elastic_force_to_next_node[node_idx]);
             elastic_force_to_next_node[node_idx] *= modified_spring_constant * (normed_dist - modified_rest_length) / normed_dist;
-
-//            if (elem_it->GetNode(node_idx)->GetRegion() == msApi && elem_it->GetNode(next_idx)->GetRegion() == msApi)
-//            {
-//                elastic_force_to_next_node[node_idx] *= 0.1;
-//            }
         }
 
         // Add the contributions of springs adjacent to each node
@@ -214,37 +209,37 @@ void ImmersedBoundaryMembraneElasticityForce<DIM>::AddForceContribution(std::vec
         }
 
         // If corners are present, we add on the additional functionality
-        if (mElementsHaveCorners)
-        {
-            // Add force contributions from apical and basal surfaces
-            if (elem_idx != mpMesh->GetMembraneIndex())
-            {
-                std::vector<Node<DIM> *> r_corners = elem_it->rGetCornerNodes();
-
-                // Apical surface
-                c_vector<double, DIM> apical_force = mpMesh->GetVectorFromAtoB(r_corners[0]->rGetLocation(),
-                                                                               r_corners[1]->rGetLocation());
-                normed_dist = norm_2(apical_force);
-                apical_force *=
-                        0.0 * mSpringConst * (normed_dist - GetApicalLengthForElement(elem_idx)) / normed_dist;
-
-                r_corners[0]->AddAppliedForceContribution(apical_force);
-                apical_force *= -1.0;
-                r_corners[1]->AddAppliedForceContribution(apical_force);
-
-                // Basal surface
-                c_vector<double, DIM> basal_force = mpMesh->GetVectorFromAtoB(r_corners[3]->rGetLocation(),
-                                                                              r_corners[2]->rGetLocation());
-
-                normed_dist = norm_2(basal_force);
-                basal_force *=
-                        0.0 * mSpringConst * (normed_dist - GetBasalLengthForElement(elem_idx)) / normed_dist;
-
-                r_corners[3]->AddAppliedForceContribution(basal_force);
-                basal_force *= -1.0;
-                r_corners[2]->AddAppliedForceContribution(basal_force);
-            }
-        }
+//        if (mElementsHaveCorners)
+//        {
+//            // Add force contributions from apical and basal surfaces
+//            if (elem_idx != mpMesh->GetMembraneIndex())
+//            {
+//                std::vector<Node<DIM> *> r_corners = elem_it->rGetCornerNodes();
+//
+//                // Apical surface
+//                c_vector<double, DIM> apical_force = mpMesh->GetVectorFromAtoB(r_corners[0]->rGetLocation(),
+//                                                                               r_corners[1]->rGetLocation());
+//                normed_dist = norm_2(apical_force);
+//                apical_force *=
+//                        0.0 * mSpringConst * (normed_dist - GetApicalLengthForElement(elem_idx)) / normed_dist;
+//
+//                r_corners[0]->AddAppliedForceContribution(apical_force);
+//                apical_force *= -1.0;
+//                r_corners[1]->AddAppliedForceContribution(apical_force);
+//
+//                // Basal surface
+//                c_vector<double, DIM> basal_force = mpMesh->GetVectorFromAtoB(r_corners[3]->rGetLocation(),
+//                                                                              r_corners[2]->rGetLocation());
+//
+//                normed_dist = norm_2(basal_force);
+//                basal_force *=
+//                        0.0 * mSpringConst * (normed_dist - GetBasalLengthForElement(elem_idx)) / normed_dist;
+//
+//                r_corners[3]->AddAppliedForceContribution(basal_force);
+//                basal_force *= -1.0;
+//                r_corners[2]->AddAppliedForceContribution(basal_force);
+//            }
+//        }
     }
 }
 

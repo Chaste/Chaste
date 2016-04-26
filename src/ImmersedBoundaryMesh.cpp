@@ -1039,6 +1039,211 @@ c_vector<double, SPACE_DIM> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetSho
     return short_axis;
 }
 
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(ImmersedBoundaryElement<ELEMENT_DIM,SPACE_DIM>* pElement,
+                                                                                   c_vector<double, SPACE_DIM> axisOfDivision,
+                                                                                   bool placeOriginalElementBelow)
+{
+    assert(SPACE_DIM == 2);
+    assert(ELEMENT_DIM == SPACE_DIM);
+
+    // Get the centroid of the element
+    c_vector<double, SPACE_DIM> centroid = this->GetCentroidOfElement(pElement->GetIndex());
+
+    // Create a vector perpendicular to the axis of division
+    c_vector<double, SPACE_DIM> perp_axis;
+    perp_axis(0) = -axisOfDivision(1);
+    perp_axis(1) = axisOfDivision(0);
+
+    /*
+     * Find which edges the axis of division crosses by finding any node
+     * that lies on the opposite side of the axis of division to its next
+     * neighbour.
+     */
+    unsigned num_nodes = pElement->GetNumNodes();
+    std::vector<unsigned> intersecting_nodes;
+    bool is_current_node_on_left = (inner_prod(this->GetVectorFromAtoB(pElement->GetNodeLocation(0), centroid), perp_axis) >= 0);
+    for (unsigned i=0; i<num_nodes; i++)
+    {
+        bool is_next_node_on_left = (inner_prod(this->GetVectorFromAtoB(pElement->GetNodeLocation((i+1)%num_nodes), centroid), perp_axis) >= 0);
+        if (is_current_node_on_left != is_next_node_on_left)
+        {
+            intersecting_nodes.push_back(i);
+        }
+        is_current_node_on_left = is_next_node_on_left;
+    }
+
+    // If the axis of division does not cross two edges then we cannot proceed
+    if (intersecting_nodes.size() != 2)
+    {
+        EXCEPTION("Cannot proceed with element division: the given axis of division does not cross two edges of the element");
+    }
+
+    // Now call DivideElement() to divide the element using the nodes found above
+    unsigned new_element_index = DivideElement(pElement,
+                                               pElement->GetNodeLocalIndex(intersecting_nodes[0]),
+                                               pElement->GetNodeLocalIndex(intersecting_nodes[1]),
+                                               placeOriginalElementBelow);
+
+    return new_element_index;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongShortAxis(ImmersedBoundaryElement<ELEMENT_DIM,SPACE_DIM>* pElement,
+                                                                                   bool placeOriginalElementBelow)
+{
+    assert(SPACE_DIM == 2);
+    assert(ELEMENT_DIM == SPACE_DIM);
+
+    c_vector<double, SPACE_DIM> short_axis = this->GetShortAxisOfElement(pElement->GetIndex());
+
+    unsigned new_element_index = DivideElementAlongGivenAxis(pElement, short_axis, placeOriginalElementBelow);
+    return new_element_index;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::DivideElement(ImmersedBoundaryElement<ELEMENT_DIM,SPACE_DIM>* pElement,
+                                                                     unsigned nodeAIndex,
+                                                                     unsigned nodeBIndex,
+                                                                     bool placeOriginalElementBelow)
+{
+    assert(SPACE_DIM == 2);
+    assert(ELEMENT_DIM == SPACE_DIM);
+
+    /*
+     * Method outline:
+     *
+     *   Each element needs to end up with the same number of nodes as the original element, and those nodes will be
+     *   equally spaced around the outline of each of the two halves of the dividing element.
+     *
+     *   To keep things neat, we will simply move the nodes already in existence to new locations, and then create a
+     *   new element from scratch with nodes in the other half of the original element.
+     */
+
+    unsigned num_nodes = pElement->GetNumNodes();
+
+    std::vector<c_vector<double, SPACE_DIM> > daughter_a_location_stencil;
+    for (unsigned node_idx = nodeAIndex + 1 ; node_idx != nodeBIndex + 1 ; node_idx++)
+    {
+        node_idx = node_idx % num_nodes;
+        daughter_a_location_stencil.push_back(c_vector<double, SPACE_DIM>(pElement->GetNode(node_idx)->rGetLocation()));
+    }
+
+    std::vector<c_vector<double, SPACE_DIM> > daughter_b_location_stencil;
+    for (unsigned node_idx = nodeBIndex + 1 ; node_idx != nodeAIndex + 1 ; node_idx++)
+    {
+        node_idx = node_idx % num_nodes;
+        daughter_b_location_stencil.push_back(c_vector<double, SPACE_DIM>(pElement->GetNode(node_idx)->rGetLocation()));
+    }
+
+    assert(!daughter_a_location_stencil.size() > 1);
+    assert(!daughter_b_location_stencil.size() > 1);
+
+    // To help calculating cumulative distances, add the first location on to the end
+    daughter_a_location_stencil.push_back(daughter_a_location_stencil[0]);
+    daughter_b_location_stencil.push_back(daughter_b_location_stencil[0]);
+
+    // Calculate the cumulative distances around the stencils
+    std::vector<double> cumulative_distances_a;
+    std::vector<double> cumulative_distances_b;
+    cumulative_distances_a.push_back(0.0);
+    cumulative_distances_b.push_back(0.0);
+    for (unsigned loc_idx = 1 ; loc_idx < daughter_a_location_stencil.size() ; loc_idx++)
+    {
+        cumulative_distances_a.push_back(cumulative_distances_a.back() +
+                                         norm_2(this->GetVectorFromAtoB(daughter_a_location_stencil[loc_idx - 1], daughter_a_location_stencil[loc_idx])));
+    }
+    for (unsigned loc_idx = 1 ; loc_idx < daughter_b_location_stencil.size() ; loc_idx++)
+    {
+        cumulative_distances_b.push_back(cumulative_distances_b.back() +
+                                         norm_2(this->GetVectorFromAtoB(daughter_b_location_stencil[loc_idx - 1], daughter_b_location_stencil[loc_idx])));
+    }
+
+    // Find the target node spacing for each of the daughter elements
+    double target_spacing_a = cumulative_distances_a.back() / (double)num_nodes;
+    double target_spacing_b = cumulative_distances_b.back() / (double)num_nodes;
+
+    // Move the existing nodes into position to become daughter-A nodes
+    unsigned last_idx_used = 0;
+    for (unsigned node_idx = 0 ; node_idx < num_nodes ; node_idx++)
+    {
+        double location_along_arc = (double)node_idx * target_spacing_a;
+
+        while (location_along_arc > cumulative_distances_a[last_idx_used + 1])
+        {
+            last_idx_used++;
+        }
+
+        // Interpolant is the extra distance past the last index used divided by the length of the next line segment
+        double interpolant = (location_along_arc - cumulative_distances_a[last_idx_used]) /
+                             (cumulative_distances_a[last_idx_used + 1] - cumulative_distances_a[last_idx_used]);
+
+        c_vector<double, SPACE_DIM> this_to_next = this->GetVectorFromAtoB(daughter_a_location_stencil[last_idx_used],
+                                                                           daughter_a_location_stencil[last_idx_used + 1]);
+
+        c_vector<double, SPACE_DIM> new_location_a = daughter_a_location_stencil[last_idx_used] + interpolant * this_to_next;
+
+        pElement->GetNode(node_idx)->SetPoint(ChastePoint<SPACE_DIM>(new_location_a));
+    }
+
+
+    // Create new nodes at positions around the daughter-B stencil
+    last_idx_used = 0;
+    std::vector<Node<SPACE_DIM>*> new_nodes_vec;
+    for (unsigned node_idx = 0 ; node_idx < num_nodes ; node_idx++)
+    {
+        double location_along_arc = (double)node_idx * target_spacing_b;
+
+        while (location_along_arc > cumulative_distances_b[last_idx_used + 1])
+        {
+            last_idx_used++;
+        }
+
+        // Interpolant is the extra distance past the last index used divided by the length of the next line segment
+        double interpolant = (location_along_arc - cumulative_distances_b[last_idx_used]) /
+                             (cumulative_distances_b[last_idx_used + 1] - cumulative_distances_b[last_idx_used]);
+
+        c_vector<double, SPACE_DIM> this_to_next = this->GetVectorFromAtoB(daughter_b_location_stencil[last_idx_used],
+                                                                           daughter_b_location_stencil[last_idx_used + 1]);
+
+        c_vector<double, SPACE_DIM> new_location_b = daughter_b_location_stencil[last_idx_used] + interpolant * this_to_next;
+
+        unsigned new_node_idx = this->mNodes.size();
+        this->mNodes.push_back(new Node<SPACE_DIM>(new_node_idx, new_location_b, true));
+        new_nodes_vec.push_back(this->mNodes.back());
+    }
+
+    // Copy node attributes
+    for (unsigned node_idx = 0 ; node_idx < num_nodes ; node_idx++)
+    {
+        new_nodes_vec[node_idx]->SetRegion(pElement->GetNode(node_idx)->GetRegion());
+
+        for (unsigned node_attribute = 0 ; node_attribute < pElement->GetNode(node_idx)->GetNumNodeAttributes() ; node_attribute++)
+        {
+            new_nodes_vec[node_idx]->AddNodeAttribute(pElement->GetNode(node_idx)->rGetNodeAttributes()[node_attribute]);
+        }
+    }
+
+    // Create the new element
+    unsigned new_elem_idx = this->mElements.size();
+    this->mElements.push_back(new ImmersedBoundaryElement<ELEMENT_DIM,SPACE_DIM>(new_elem_idx, new_nodes_vec));
+    this->mElements.back()->RegisterWithNodes();
+
+    // Copy any element attributes
+    for (unsigned elem_attribute = 0 ; elem_attribute < pElement->GetNumElementAttributes() ; elem_attribute++)
+    {
+        this->mElements.back()->AddElementAttribute(pElement->rGetElementAttributes()[elem_attribute]);
+    }
+
+    // Add the necessary corners to keep consistency with the other daughter element
+    for (unsigned corner = 0 ; corner < pElement->rGetCornerNodes().size() ; corner ++)
+    {
+        this->mElements.back()->rGetCornerNodes().push_back(pElement->rGetCornerNodes()[corner]);
+    }
+
+    return new_elem_idx;
+}
+
 /////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
 /////////////////////////////////////////////////////////////////////////////////////

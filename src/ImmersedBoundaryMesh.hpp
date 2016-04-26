@@ -84,6 +84,12 @@ protected:
     /** Characteristic node spacing */
     double mCharacteristicNodeSpacing;
 
+    /** Indices of nodes that have been deleted. These indices can be reused when adding new elements/nodes. */
+    std::vector<unsigned> mDeletedNodeIndices;
+
+    /** Indices of elements that have been deleted. These indices can be reused when adding new elements. */
+    std::vector<unsigned> mDeletedElementIndices;
+
     /** 2D grid for fluid x velocity */
     multi_array<double, 3> m2dVelocityGrids;
 
@@ -125,6 +131,23 @@ protected:
      * @return local index
      */
     unsigned SolveBoundaryElementMapping(unsigned index) const;
+
+    /**
+     * Divide an element along the axis passing through two of its nodes.
+     *
+     * \todo This method currently assumes SPACE_DIM = 2 (see #866)
+     *
+     * @param pElement the element to divide
+     * @param nodeAIndex the local index of one node within this element
+     * @param nodeBIndex the local index of another node within this element
+     * @param placeOriginalElementBelow whether to place the original element below (in the y direction) the new element (defaults to false)
+     *
+     * @return the index of the new element
+     */
+    unsigned DivideElement(ImmersedBoundaryElement<ELEMENT_DIM,SPACE_DIM>* pElement,
+                           unsigned nodeAIndex,
+                           unsigned nodeBIndex,
+                           bool placeOriginalElementBelow=false);
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
@@ -492,6 +515,34 @@ public:
      * @return a unit vector giving the direction of the short axis
      */
     c_vector<double, SPACE_DIM> GetShortAxisOfElement(unsigned index);
+
+    /**
+     * Divide an element along a specified axis.
+     *
+     * If the new nodes (intersections of axis with element) are within
+     * mCellRearrangementThreshold of existing nodes then they are
+     * moved 2*mCellRearrangementThreshold away.
+     *
+     * @param pElement the element to divide
+     * @param axisOfDivision axis to divide the element by
+     * @param placeOriginalElementBelow whether to place the original element below (in the y direction) the new element (defaults to false)
+     *
+     * @return the index of the new element
+     */
+    unsigned DivideElementAlongGivenAxis(ImmersedBoundaryElement<ELEMENT_DIM,SPACE_DIM>* pElement,
+                                         c_vector<double, SPACE_DIM> axisOfDivision,
+                                         bool placeOriginalElementBelow=false);
+
+    /**
+     * Divide an element along its short axis.
+     *
+     * @param pElement the element to divide
+     * @param placeOriginalElementBelow whether to place the original element below (in the y direction) the new element (defaults to false)
+     *
+     * @return the index of the new element
+     */
+    unsigned DivideElementAlongShortAxis(ImmersedBoundaryElement<ELEMENT_DIM,SPACE_DIM>* pElement,
+                                         bool placeOriginalElementBelow=false);
 
 
     /**

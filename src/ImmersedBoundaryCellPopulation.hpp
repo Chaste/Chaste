@@ -422,6 +422,14 @@ public:
      * Set whether the population has active sources
      */
     void SetIfPopulationHasActiveSources(bool hasActiveSources);
+
+    /**
+     * Overridden method to specify a division vector.
+     *
+     * @param pParentCell the cell undergoing division
+     * @return a vector containing information on cell division
+     */
+    virtual c_vector<double, DIM> CalculateCellDivisionVector(CellPtr pParentCell);
 };
 
 #include "SerializationExportWrapper.hpp"

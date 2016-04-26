@@ -34,11 +34,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 // Needed for the test environment
-#include <cxxtest/TestSuite.h>
+#include <cxxtest/cxxtest/TestSuite.h>
 #include "AbstractCellBasedTestSuite.hpp"
 
 #include "OffLatticeSimulation.hpp"
-#include "StochasticDurationCellCycleModel.hpp"
+#include "UniformlyDistributedCellCycleModel.hpp"
 #include "CellsGenerator.hpp"
 #include "ImmersedBoundaryMesh.hpp"
 #include "ImmersedBoundarySimulationModifier.hpp"
@@ -50,89 +50,31 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Simulation does not run in parallel
 #include "FakePetscSetup.hpp"
-#include "../src/SuperellipseGenerator.hpp"
 
 class TestShortSingleCellSimulation : public AbstractCellBasedTestSuite
 {
 public:
 
-    std::vector<c_vector<double, 2> > GetUnitHexagon(unsigned numPtsPerSide)
-    {
-        std::vector<c_vector<double, 2> > locations(numPtsPerSide * 6);
-
-        // Find locations of the six vertices (and the seventh is the same as the first)
-        std::vector<c_vector<double, 2> > vertices(7);
-        for (unsigned vertex = 0 ; vertex < vertices.size() ; vertex++)
-        {
-            vertices[vertex][0] = cos((double)vertex * M_PI / 3.0);
-            vertices[vertex][1] = sin((double)vertex * M_PI / 3.0);
-        }
-
-        for (unsigned vertex = 0 ; vertex < 6 ; vertex++)
-        {
-            c_vector<double, 2> this_vertex = vertices[vertex];
-            c_vector<double, 2> next_vertex = vertices[vertex + 1];
-            c_vector<double, 2> vec_between = next_vertex - this_vertex;
-
-            for (unsigned i = 0 ; i < numPtsPerSide ; i++)
-            {
-                locations[vertex * numPtsPerSide + i] = this_vertex + i * vec_between / (double)numPtsPerSide;
-            }
-        }
-        return locations;
-    }
-
     void TestShortSingleCellSim() throw(Exception)
     {
-        unsigned num_x = 5;
-        unsigned num_y = 4;
-        double rad = 0.11;
-        std::vector<c_vector<double, 2> > offsets(num_x * num_y);
+        /*
+         * 1: Num cells
+         * 2: Num nodes per cell
+         * 3: Superellipse exponent
+         * 4: Superellipse aspect ratio
+         * 5: Random y-variation
+         * 6: Include membrane
+         */
+        ImmersedBoundaryPalisadeMeshGenerator gen(1, 128, 0.1, 2.5, 0.0, false);
+        ImmersedBoundaryMesh<2, 2>* p_mesh = gen.GetMesh();
 
-        c_vector<double, 2> global_offset;
-        global_offset[0] = 0.15;
-        global_offset[1] = 0.15;
+        p_mesh->SetNumGridPtsXAndY(128);
 
-        for (unsigned x = 0 ; x < num_x ; x++)
-        {
-            for (unsigned y = 0 ; y < num_y ; y++)
-            {
-                unsigned idx = x * num_y + y;
-
-                offsets[idx][0] = global_offset[0] + 1.5 * rad * x;
-                offsets[idx][1] = global_offset[1] + 0.5 * sqrt(3) * rad * (double)(2 * y + (x % 2 == 1));
-            }
-        }
-
-        std::vector<c_vector<double, 2> > node_locations = GetUnitHexagon(10);
-
-        std::vector<Node<2>*> nodes;
-        std::vector<ImmersedBoundaryElement<2,2>*> elems;
-
-        for (unsigned offset = 0 ; offset < offsets.size() ; offset++)
-        {
-            std::vector<Node<2>*> nodes_this_elem;
-
-            for (unsigned location = 0 ; location < node_locations.size() ; location++)
-            {
-                unsigned index = offset * node_locations.size() + location;
-                Node<2>* p_node = new Node<2>(index, offsets[offset] + 0.975 * rad * node_locations[location], true);
-
-                nodes_this_elem.push_back(p_node);
-                nodes.push_back(p_node);
-            }
-
-            ImmersedBoundaryElement<2,2>* p_elem = new ImmersedBoundaryElement<2,2>(offset, nodes_this_elem);
-            elems.push_back(p_elem);
-        }
-
-        ImmersedBoundaryMesh<2,2>* p_mesh = new ImmersedBoundaryMesh<2,2>(nodes, elems);
-        p_mesh->SetNumGridPtsXAndY(64);
 
         std::vector<CellPtr> cells;
-        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_cell_type);
+        CellsGenerator<UniformlyDistributedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_cell_type);
 
         ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
         cell_population.SetIfPopulationHasActiveSources(true);
@@ -149,38 +91,14 @@ public:
         p_boundary_force->SetSpringConstant(0.5 * 1e7);
 
 
-
-        std::string output_directory = "TestShortSingleCellSimulation";
-        simulator.SetOutputDirectory(output_directory);
-
-        // Write the state of the immersed boundary mesh to file
-        ImmersedBoundaryMeshWriter<2,2> mesh_at_1(output_directory, "mesh_at_1");
-        ImmersedBoundaryMeshWriter<2,2> mesh_at_2(output_directory, "mesh_at_2");
-
         // Set simulation properties
-        simulator.SetOutputDirectory(output_directory);
         double dt = 0.05;
-
+        simulator.SetOutputDirectory("TestShortSingleCellSimulation");
         simulator.SetDt(dt);
-        simulator.SetSamplingTimestepMultiple(100);
-        simulator.SetEndTime(2500.0 * dt);
+        simulator.SetSamplingTimestepMultiple(10);
+        simulator.SetEndTime(3000.0 * dt);
+
         simulator.Solve();
 
-        mesh_at_1.WriteFilesUsingMesh(*p_mesh);
-
-        // Set fluid sources for growth phase of simulation
-        std::vector<FluidSource<2>*>& sources = p_mesh->rGetElementFluidSources();
-        PRINT_VARIABLE(sources.size());
-
-        sources[10]->SetStrength(-2.0 * 1e4);
-
-        simulator.SetDt(dt);
-        simulator.SetSamplingTimestepMultiple(100);
-        simulator.SetEndTime(7000.0 * dt);
-        simulator.Solve();
-
-        mesh_at_2.WriteFilesUsingMesh(*p_mesh);
-
-        delete(p_mesh);
     }
 };

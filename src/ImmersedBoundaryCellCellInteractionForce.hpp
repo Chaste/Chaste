@@ -92,6 +92,12 @@ protected:
     /** The number of transmembrane proteins represented in this force class */
     unsigned mNumProteins;
 
+    /** Whether to use linear spring forces */
+    bool mLinearSpring;
+
+    /** Whether to use a force derived from the Morse potential */
+    bool mMorse;
+
     /** A vector storing in which position of the node attributes vector each protein is represented */
     std::vector<unsigned> mProteinNodeAttributeLocations;
 
@@ -144,6 +150,21 @@ public:
      * Set the spring constant.
      */
     void SetSpringConstant(double springConst);
+
+    /**
+     * Set the rest length.
+     */
+    void SetRestLength(double restLength);
+
+    /**
+     * Set the force law to linear spring (default)
+     */
+    void UseLinearSpringLaw();
+
+    /**
+     * Set the force law to be based on the Morse potential
+     */
+    void UseMoresePotential();
 
     /**
      * Overridden OutputForceParameters() method.

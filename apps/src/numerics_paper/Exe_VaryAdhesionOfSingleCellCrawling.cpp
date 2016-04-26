@@ -66,7 +66,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 void SetupSingletons();
 void DestroySingletons();
-void SetupAndRunSimulation(std::string idString, double corRestLength, double corSpringConst, double rhsAdhesionMod);
+void SetupAndRunSimulation(std::string idString, double corRestLength, double corSpringConst, double traRestLength,
+                           double traSpringConst, double rhsAdhesionMod, double interactionDist,
+                           unsigned numTimeSteps);
 void OutputOnCompletion(std::string idString);
 
 int main(int argc, char *argv[])
@@ -79,9 +81,13 @@ int main(int argc, char *argv[])
     general_options.add_options()
                     ("help", "produce help message")
                     ("ID", boost::program_options::value<std::string>(),"ID string for the simulation")
-                    ("RL", boost::program_options::value<double>()->default_value(0.0),"Cortical rest length")
-                    ("SC", boost::program_options::value<double>()->default_value(0.0),"Cortical spring constant")
-                    ("AD", boost::program_options::value<double>()->default_value(0.0),"RHS adhesion modifier");
+                    ("CRL", boost::program_options::value<double>()->default_value(0.0),"Cortical rest length")
+                    ("CSC", boost::program_options::value<double>()->default_value(0.0),"Cortical spring constant")
+                    ("TRL", boost::program_options::value<double>()->default_value(0.0),"Transmembrane rest length")
+                    ("TSC", boost::program_options::value<double>()->default_value(0.0),"Transmembrane spring constant")
+                    ("AD", boost::program_options::value<double>()->default_value(0.0),"RHS adhesion modifier")
+                    ("DI", boost::program_options::value<double>()->default_value(0.0),"Interaction distance for cell-cell forces")
+                    ("TS", boost::program_options::value<unsigned>()->default_value(1000),"Number of time steps");
 
     // define parse command line into variables_map
     boost::program_options::variables_map variables_map;
@@ -97,13 +103,18 @@ int main(int argc, char *argv[])
 
     // get id and name from command line
     std::string id_string = variables_map["ID"].as<std::string>();
-    double cor_rest_length = variables_map["RL"].as<double>();
-    double cor_spring_const = variables_map["SC"].as<double>();
+    double cor_rest_length = variables_map["CRL"].as<double>();
+    double cor_spring_const = variables_map["CSC"].as<double>();
+    double tra_rest_length = variables_map["TRL"].as<double>();
+    double tra_spring_const = variables_map["TSC"].as<double>();
     double rhs_adhesion_mod = variables_map["AD"].as<double>();
+    double interaction_dist = variables_map["DI"].as<double>();
+    unsigned num_time_steps = variables_map["TS"].as<unsigned>();
 
 
     SetupSingletons();
-    SetupAndRunSimulation(id_string, cor_rest_length, cor_spring_const, rhs_adhesion_mod);
+    SetupAndRunSimulation(id_string, cor_rest_length, cor_spring_const, tra_rest_length, tra_spring_const,
+                          rhs_adhesion_mod, interaction_dist, num_time_steps);
     DestroySingletons();
     OutputOnCompletion(id_string);
 }
@@ -136,7 +147,9 @@ void OutputOnCompletion(std::string idString)
     // Send it to the console
     std::cout << message.str() << std::flush;
 }
-void SetupAndRunSimulation(std::string idString, double corRestLength, double corSpringConst, double rhsAdhesionMod)
+void SetupAndRunSimulation(std::string idString, double corRestLength, double corSpringConst, double traRestLength,
+                           double traSpringConst, double rhsAdhesionMod, double interactionDist,
+                           unsigned numTimeSteps)
 {
     /*
      * 1: Num cells
@@ -158,6 +171,7 @@ void SetupAndRunSimulation(std::string idString, double corRestLength, double co
 
     ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
     cell_population.SetIfPopulationHasActiveSources(false);
+    cell_population.SetInteractionDistance(interactionDist);
 
     OffLatticeSimulation<2> simulator(cell_population);
 
@@ -191,7 +205,9 @@ void SetupAndRunSimulation(std::string idString, double corRestLength, double co
     // Add a cell-cell interaction force with the same intrinsic strength as the membrane force
     MAKE_PTR_ARGS(ImmersedBoundaryCellCellInteractionForce<2>, p_cell_cell_force, (cell_population));
     p_main_modifier->AddImmersedBoundaryForce(p_cell_cell_force);
-    p_cell_cell_force->SetSpringConstant(1.0 * corSpringConst);
+    p_cell_cell_force->SetSpringConstant(traSpringConst);
+    p_cell_cell_force->SetRestLength(traRestLength);
+    p_cell_cell_force->UseMoresePotential();
 
     // Get the centroid of the three relevant cells before anything happens
     c_vector<double, 2> prev_centroid_start = p_mesh->GetCentroidOfElement(2);
@@ -211,27 +227,27 @@ void SetupAndRunSimulation(std::string idString, double corRestLength, double co
         double new_height = lamina_height + 1.05 * (p_mesh->GetElement(3)->GetNode(node_idx)->rGetLocation()[1] - lamina_height);
         p_mesh->GetElement(3)->GetNode(node_idx)->rGetModifiableLocation()[1] = new_height;
 
-        p_mesh->GetElement(3)->GetNode(node_idx)->rGetNodeAttributes()[e_cad_location] = 0.01;
+        p_mesh->GetElement(3)->GetNode(node_idx)->rGetNodeAttributes()[e_cad_location] = 1.0;
         p_mesh->GetElement(3)->GetNode(node_idx)->rGetNodeAttributes()[p_cad_location] = rhsAdhesionMod;
     }
 
-    // In the top 25% of the cell directly to the right, add in p_cad
+    // In the top apical domain of the cell directly to the right, add in p_cad
     double cell_four_height = p_mesh->CalculateBoundingBoxOfElement(4).GetWidth(1);
     double cell_four_y_cent = p_mesh->GetCentroidOfElement(4)[1];
     for (unsigned node_idx = 0 ; node_idx < p_mesh->GetElement(4)->GetNumNodes() ; node_idx++)
     {
-        if (p_mesh->GetElement(4)->GetNode(node_idx)->rGetLocation()[1] - cell_four_y_cent > 0.25 * cell_four_height)
+        if (p_mesh->GetElement(4)->GetNode(node_idx)->rGetLocation()[1] - cell_four_y_cent > 0.45 * cell_four_height)
         {
             p_mesh->GetElement(4)->GetNode(node_idx)->rGetNodeAttributes()[p_cad_location] = rhsAdhesionMod;
         }
     }
 
     simulator.SetSamplingTimestepMultiple(100);
-    simulator.SetEndTime(1000.0 * dt);
+    simulator.SetEndTime(numTimeSteps * dt);
     simulator.Solve();
 
     OutputFileHandler results_handler(output_directory.str(), false);
-    out_stream results_file = results_handler.OpenOutputFile("results.dat");
+    out_stream results_file = results_handler.OpenOutputFile("results.csv");
 
     // Get the centroid of the three relevant cells at end of simulation
     c_vector<double, 2> prev_centroid_end = p_mesh->GetCentroidOfElement(2);
@@ -244,6 +260,17 @@ void SetupAndRunSimulation(std::string idString, double corRestLength, double co
     double next_skew = p_mesh->GetSkewnessOfElementMassDistributionAboutAxis(4, axis);
 
     // Output summary statistics to results file
+    (*results_file) << "id" << ","
+                    << "cortical_rest_length" << ","
+                    << "cortical_spring_const" << ","
+                    << "rhs_adhesion_mod" << ","
+                    << "delta_prev_cent" << ","
+                    << "delta_this_cent" << ","
+                    << "delta_next_cent" << ","
+                    << "delta_prev_skew" << ","
+                    << "delta_this_skew" << ","
+                    << "delta_next_skew" << std::endl;
+
     (*results_file) << idString << ","
                     << boost::lexical_cast<std::string>(corRestLength) << ","
                     << boost::lexical_cast<std::string>(corSpringConst) << ","

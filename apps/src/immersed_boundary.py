@@ -59,7 +59,7 @@ def pvd_to_mp4(sim_dir):
 
     # Show the data in the current render view as a surface
     results_pvd_display = pv.Show(results_pvd, render_view)
-    results_pvd_display.Representation = 'Surface'
+    results_pvd_display.Representation = 'Points'
 
 
     #######################################
@@ -111,7 +111,7 @@ def pvd_to_mp4(sim_dir):
         video_converter = 'ffmpeg'
 
     # Set how long you want the video to be (in seconds), and set the frame rate accordingly
-    video_duration = 10.0
+    video_duration = 15.0
     frame_rate = str(num_time_steps / video_duration)
 
     # Send the system command to run avconv/ffmpeg. Parameters:
@@ -122,10 +122,10 @@ def pvd_to_mp4(sim_dir):
     #   -c:v h264                   Video codec to use is h264
     #   -crf 0                      Set video quality: 0 is best, 51 is worst (https://trac.ffmpeg.org/wiki/Encode/H.264)
     #   -y dir/movie.mp4            Output directory and name
-    os.system(video_converter + ' -v 0 -r ' + frame_rate + ' -f image2 -i ' + sim_dir + 'results.%04d.png -c:v h264 -crf 0 -y ' + sim_dir + 'movie.mp4')
+    os.system(video_converter + ' -v 0 -r ' + frame_rate + ' -f image2 -i ' + sim_dir + 'results.%04d.png -c:v h264 -crf 0 -y ' + sim_dir + 'movie_points.mp4')
 
     # Raise exception if the mp4 file is not generated as expected
-    if not(os.path.isfile(sim_dir + 'movie.mp4')):
+    if not(os.path.isfile(sim_dir + 'movie_points.mp4')):
         raise Exception('pvd_to_mp4: mp4 not generated as expected')
 
     # Raise exception if the mp4 file file is created but is smaller than 1kb - ffmpeg sometimes

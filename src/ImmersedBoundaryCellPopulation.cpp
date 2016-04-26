@@ -78,8 +78,8 @@ ImmersedBoundaryCellPopulation<DIM>::ImmersedBoundaryCellPopulation(ImmersedBoun
         Validate();
     }
 
-    // Default active sources to true (safer - simulation will always work with sources set to zero, just a bit slower)
-    mPopulationHasActiveSources = true;
+    // Default active sources to false
+    mPopulationHasActiveSources = false;
 
     // Set the intrinsic spacing to a default 0.01
     //\todo should this be static?
@@ -201,17 +201,16 @@ unsigned ImmersedBoundaryCellPopulation<DIM>::GetNumElements()
 
 template<unsigned DIM>
 CellPtr ImmersedBoundaryCellPopulation<DIM>::AddCell(CellPtr pNewCell,
-                                                const c_vector<double,DIM>& rCellDivisionVector,
-                                                CellPtr pParentCell)
+                                                     const c_vector<double,DIM>& rCellDivisionVector,
+                                                     CellPtr pParentCell)
 {
-    /*
     // Get the element associated with this cell
     ImmersedBoundaryElement<DIM, DIM>* p_element = GetElementCorrespondingToCell(pParentCell);
 
     // Divide the element
     unsigned new_element_index = mpImmersedBoundaryMesh->DivideElementAlongGivenAxis(p_element,
-                                                                                  rCellDivisionVector,
-                                                                                  true);
+                                                                                     rCellDivisionVector,
+                                                                                     true);
     // Associate the new cell with the element
     this->mCells.push_back(pNewCell);
 
@@ -219,10 +218,6 @@ CellPtr ImmersedBoundaryCellPopulation<DIM>::AddCell(CellPtr pNewCell,
     CellPtr p_created_cell = this->mCells.back();
     this->SetCellUsingLocationIndex(new_element_index,p_created_cell);
     this->mCellLocationMap[p_created_cell.get()] = new_element_index;
-    return p_created_cell;*/
-
-    //\todo: may need to implement this when cells start dividing
-    CellPtr p_created_cell = this->mCells.back();
     return p_created_cell;
 }
 
@@ -655,6 +650,12 @@ template<unsigned DIM>
 void ImmersedBoundaryCellPopulation<DIM>::SetIfPopulationHasActiveSources(bool hasActiveSources)
 {
     mPopulationHasActiveSources = hasActiveSources;
+}
+
+template<unsigned DIM>
+c_vector<double, DIM> ImmersedBoundaryCellPopulation<DIM>::CalculateCellDivisionVector(CellPtr pParentCell)
+{
+    return unit_vector<double>(2,0);
 }
 
 // Explicit instantiation

@@ -122,6 +122,9 @@ void ImmersedBoundaryCellCellInteractionForce<DIM>::AddForceContribution(std::ve
     Node<DIM>* p_node_a;
     Node<DIM>* p_node_b;
 
+    // If using Morse potential, this can be pre-calculated
+    double well_width = 0.25 * mpCellPopulation->GetInteractionDistance();
+
     // Loop over all pairs of nodes that might be interacting
     for (unsigned pair = 0 ; pair < rNodePairs.size() ; pair++)
     {
@@ -159,12 +162,18 @@ void ImmersedBoundaryCellCellInteractionForce<DIM>::AddForceContribution(std::ve
                  * We must scale each applied force by a factor of elem_spacing / local spacing, so that forces
                  * balance when spread to the grid later (where the multiplicative factor is the local spacing)
                  */
-                vector_between_nodes *= effective_spring_const * protein_mult * (normed_dist - mRestLength) / normed_dist;
 
-                // If a node is apical, increase adhesion
-                if (p_node_a->GetRegion() == 2 || p_node_b->GetRegion() == 2)
+                if (mLinearSpring)
                 {
-                    vector_between_nodes *= 2.0;
+                    vector_between_nodes *=
+                            effective_spring_const * protein_mult * (normed_dist - mRestLength) / normed_dist;
+                }
+                else // Morse potential
+                {
+                    double morse_exp = exp((mRestLength - normed_dist) / well_width);
+                    vector_between_nodes *= 2.0 * well_width * effective_spring_const * protein_mult * morse_exp *
+                                            (1.0 - morse_exp) / normed_dist;
+
                 }
 
                 force_a_to_b = vector_between_nodes * elem_spacing / node_a_elem_spacing;
@@ -229,6 +238,27 @@ template<unsigned DIM>
 void ImmersedBoundaryCellCellInteractionForce<DIM>::SetSpringConstant(double springConst)
 {
     mSpringConst = springConst;
+}
+
+template<unsigned DIM>
+void ImmersedBoundaryCellCellInteractionForce<DIM>::SetRestLength(double restLength)
+{
+    mRestLength = restLength;
+}
+
+template<unsigned DIM>
+void ImmersedBoundaryCellCellInteractionForce<DIM>::UseLinearSpringLaw()
+{
+    mLinearSpring = true;
+    mMorse = false;
+}
+
+
+template<unsigned DIM>
+void ImmersedBoundaryCellCellInteractionForce<DIM>::UseMoresePotential()
+{
+    mLinearSpring = false;
+    mMorse = true;
 }
 
 template<unsigned DIM>
