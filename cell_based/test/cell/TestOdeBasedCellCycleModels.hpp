@@ -156,7 +156,6 @@ public:
         TS_ASSERT_DELTA(other_proteins[4], 0.67083371879876, 1e-2);
         TS_ASSERT_DELTA(other_proteins[5], 0.95328206604519, 2e-2);
 
-
         TS_ASSERT_EQUALS(p_cell_model->ReadyToDivide(),true);
 
         // For coverage, we also test TysonNovakCellCycleModel methods for a mutant cell
@@ -206,6 +205,20 @@ public:
         TS_ASSERT_DELTA(proteins[3], 1.40562614481544, 1e-1);
         TS_ASSERT_DELTA(proteins[4], 0.67083371879876, 1e-2);
         TS_ASSERT_DELTA(proteins[5], 0.9662, 1e-2);
+
+        // Coverage of AbstractOdeBasedCellCycleModel::SetProteinConcentrationsForTestsOnly()
+        std::vector<double> test_results;
+        for (unsigned i=0; i<6; i++)
+        {
+            test_results[i] = (double)i;
+        }
+        p_cell_model->SetProteinConcentrationsForTestsOnly(1.0, test_results);
+        proteins = p_cell_model->GetProteinConcentrations();
+
+        for (unsigned i=0; i<6; i++)
+        {
+            TS_ASSERT_DELTA(proteins[i], test_results[i], 1e-6);
+        }
     }
 
     /**

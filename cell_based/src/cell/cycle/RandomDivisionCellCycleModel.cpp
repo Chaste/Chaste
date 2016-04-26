@@ -41,8 +41,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 RandomDivisionCellCycleModel::RandomDivisionCellCycleModel()
     : AbstractCellCycleModel(),
-      mDivisionProbability(0.1), // Defaults to roughly dividing every 10 hours
-      mMinimumDivisionAge(1.0) // Defaults to minimum of 1 hour to allow cells to relax
+      mDivisionProbability(0.1),
+      mMinimumDivisionAge(1.0)
 {
 }
 
@@ -64,7 +64,6 @@ RandomDivisionCellCycleModel::RandomDivisionCellCycleModel(const RandomDivisionC
      *
      * Note 3: Only set the variables defined in this class. Variables defined
      * in parent classes will be defined there.
-     *
      */
 }
 
@@ -74,14 +73,13 @@ bool RandomDivisionCellCycleModel::ReadyToDivide()
 
     if (!mReadyToDivide)
     {
-        if (GetAge()>mMinimumDivisionAge)
+        if (GetAge() > mMinimumDivisionAge)
         {
             double dt = SimulationTime::Instance()->GetTimeStep();
             if (!(mpCell->GetCellProliferativeType()->IsType<DifferentiatedCellProliferativeType>()))
             {
                 RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
-
-                if (p_gen->ranf()<mDivisionProbability*dt)
+                if (p_gen->ranf() < mDivisionProbability*dt)
                 {
                     mReadyToDivide = true;
                 }
@@ -95,7 +93,6 @@ AbstractCellCycleModel* RandomDivisionCellCycleModel::CreateCellCycleModel()
 {
     return new RandomDivisionCellCycleModel(*this);
 }
-
 
 void RandomDivisionCellCycleModel::SetDivisionProbability(double divisionProbability)
 {

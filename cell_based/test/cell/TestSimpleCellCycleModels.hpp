@@ -78,19 +78,16 @@ public:
         TS_ASSERT_THROWS_NOTHING(RandomDivisionCellCycleModel cell_model3);
 
         RandomDivisionCellCycleModel* p_diff_model = new RandomDivisionCellCycleModel;
-
         RandomDivisionCellCycleModel* p_transit_model = new RandomDivisionCellCycleModel;
-
 
         TS_ASSERT_DELTA(p_transit_model->GetDivisionProbability(),0.1,1e-9);
         TS_ASSERT_DELTA(p_transit_model->GetMinimumDivisionAge(),1.0,1e-9);
+
         // Change parameters for this model
         p_transit_model->SetDivisionProbability(0.5);
         p_transit_model->SetMinimumDivisionAge(0.1);
         TS_ASSERT_DELTA(p_transit_model->GetDivisionProbability(),0.5,1e-9);
         TS_ASSERT_DELTA(p_transit_model->GetMinimumDivisionAge(),0.1,1e-9);
-
-
 
         MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
@@ -112,8 +109,7 @@ public:
         {
             p_simulation_time->IncrementTimeOneStep();
 
-            // The division time below is taken from the first
-            // random number generated
+            // The division time below is taken from the first random number generated
             if (i< 33)
             {
                 TS_ASSERT_EQUALS(p_transit_cell->ReadyToDivide(), false);
@@ -126,7 +122,6 @@ public:
         }
         TS_ASSERT_DELTA(p_transit_model->GetAge(), p_simulation_time->GetTime(), 1e-9);
         TS_ASSERT_DELTA(p_diff_model->GetAge(), p_simulation_time->GetTime(), 1e-9);
-
     }
 
     void TestFixedDurationGenerationBasedCellCycleModel() throw(Exception)
@@ -181,7 +176,7 @@ public:
         TS_ASSERT_EQUALS(p_diff_cell->GetCellProliferativeType(), p_diff_type);
         TS_ASSERT_EQUALS(p_diff_model->GetGeneration(), 0u);
 
-        //First cycle
+        // First cycle
         for (unsigned i=0; i<num_steps; i++)
         {
             p_simulation_time->IncrementTimeOneStep();
@@ -199,7 +194,7 @@ public:
 
         FixedDurationGenerationBasedCellCycleModel* p_hepa_one_model = new FixedDurationGenerationBasedCellCycleModel;
 
-        // Change G1 Duration for this model
+        // Change G1 duration for this model
         p_hepa_one_model->SetStemCellG1Duration(8.0);
         p_hepa_one_model->SetTransitCellG1Duration(8.0);
 
@@ -207,7 +202,7 @@ public:
         p_hepa_one_cell->SetCellProliferativeType(p_stem_type);
         p_hepa_one_cell->InitialiseCellCycleModel();
 
-        //Second cycle
+        // Second cycle
         for (unsigned i=0; i<num_steps; i++)
         {
             p_simulation_time->IncrementTimeOneStep();
@@ -217,7 +212,7 @@ public:
 
         TS_ASSERT_DELTA(p_hepa_one_model->GetAge() + hepa_one_cell_birth_time, p_simulation_time->GetTime(), 1e-9);
 
-        // Test Get and Set Methods
+        // Test get and set methods
         TS_ASSERT_DELTA(p_stem_model->GetSDuration(), 5.0, 1e-9);
         TS_ASSERT_DELTA(p_stem_model->GetG2Duration(), 4.0, 1e-9);
         TS_ASSERT_DELTA(p_stem_model->GetMDuration(), 1.0, 1e-9);
@@ -243,12 +238,12 @@ public:
 
         UniformlyDistributedGenerationBasedCellCycleModel* p_stem_model = new UniformlyDistributedGenerationBasedCellCycleModel;
 
-        // Change G1 Duration for this model
+        // Change G1 duration for this model
         p_stem_model->SetStemCellG1Duration(1.0);
 
         UniformlyDistributedGenerationBasedCellCycleModel* p_transit_model = new UniformlyDistributedGenerationBasedCellCycleModel;
 
-        // Change G1 Duration for this model
+        // Change G1 duration for this model
         p_transit_model->SetTransitCellG1Duration(1.0);
 
         UniformlyDistributedGenerationBasedCellCycleModel* p_diff_model = new UniformlyDistributedGenerationBasedCellCycleModel;
@@ -288,7 +283,7 @@ public:
 
         UniformlyDistributedGenerationBasedCellCycleModel* p_hepa_one_model = new UniformlyDistributedGenerationBasedCellCycleModel;
 
-        // Change G1 Duration for this model
+        // Change G1 duration for this model
         p_hepa_one_model->SetStemCellG1Duration(1.0);
 
         CellPtr p_hepa_one_cell(new Cell(p_healthy_state, p_hepa_one_model));
@@ -308,13 +303,13 @@ public:
 
         UniformlyDistributedCellCycleModel* p_stem_model = new UniformlyDistributedCellCycleModel;
 
-        // Change Min and Max cell cycle duration for this model
+        // Change min and max cell cycle duration for this model
         p_stem_model->SetMinCellCycleDuration(18.0);
         p_stem_model->SetMaxCellCycleDuration(20.0);
 
         UniformlyDistributedCellCycleModel* p_transit_model = new UniformlyDistributedCellCycleModel;
 
-        // Use default Min and Max cell cycle duration for this model
+        // Use default min and max cell cycle duration for this model
         p_transit_model->SetMinCellCycleDuration(12.0);
         p_transit_model->SetMaxCellCycleDuration(14.0);
 
@@ -1402,6 +1397,22 @@ public:
     {
         std::string output_directory = "TestCellCycleModelOutputParameters";
         OutputFileHandler output_file_handler(output_directory, false);
+
+        // Test with RandomDivisionCellCycleModel
+        RandomDivisionCellCycleModel random_division_cell_cycle_model;
+        TS_ASSERT_EQUALS(random_division_cell_cycle_model.GetIdentifier(), "RandomDivisionCellCycleModel");
+
+        out_stream random_division_parameter_file = output_file_handler.OpenOutputFile("random_division_results.parameters");
+        random_division_cell_cycle_model.OutputCellCycleModelParameters(random_division_parameter_file);
+        random_division_parameter_file->close();
+
+        {
+            FileFinder generated_file = output_file_handler.FindFile("random_division_results.parameters");
+            FileFinder reference_file("cell_based/test/data/TestCellCycleModels/random_division_results.parameters",
+                                      RelativeTo::ChasteSourceRoot);
+            FileComparison comparer(generated_file,reference_file);
+            TS_ASSERT(comparer.CompareFiles());
+        }
 
         // Test with FixedDurationGenerationBasedCellCycleModel
         FixedDurationGenerationBasedCellCycleModel fixed_duration_generation_based_cell_cycle_model;

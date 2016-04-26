@@ -39,12 +39,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellCycleModel.hpp"
 
 /**
- * Simple cell cycle model where non Differentiated cells have a certain probability of dividing at each timestep.
- * This takes two parameters:
- *  * the first mDivisionProbability defines the probability of divisions per hour.
- *  * the second mMinimumDivisionAge defines a minimum age at which cells may divide.
+ * Simple cell-cycle model where mature non-differentiated cells have a specified probability of
+ * dividing per hour.
+ *
+ * The class includes two parameters: the first, mDivisionProbability, defines the probability
+ * of dividing per hour; the second, mMinimumDivisionAge, defines a minimum age at which cells
+ * may divide.
  */
-
 class RandomDivisionCellCycleModel : public AbstractCellCycleModel
 {
 private:
@@ -66,30 +67,34 @@ private:
 
 protected:
     /**
-     * Probability of division of the cell in one hour.
+     * Probability of dividing per hour.
+     * Defaults to 0.1.
      */
     double mDivisionProbability;
 
     /**
-     *  Minimum age of division
+     * Minimum age of a cell at which it may divide.
+     * Defaults to 1 hour.
      */
     double mMinimumDivisionAge;
 
     /**
      * Protected copy-constructor for use by CreateCellCycleModel.
-     * The only way for external code to create a copy of a cell cycle model
-     * is by calling that method, to ensure that a model of the correct subclass is created.
-     * This copy-constructor helps subclasses to ensure that all member variables are correctly copied when this happens.
      *
-     * This method is called by child classes to set member variables for a daughter cell upon cell division.
-     * Note that the parent cell cycle model will have had ResetForDivision() called just before CreateCellCycleModel() is called,
-     * so performing an exact copy of the parent is suitable behaviour. Any daughter-cell-specific initialisation
-     * can be done in InitialiseDaughterCell().
+     * The only way for external code to create a copy of a cell cycle model
+     * is by calling that method, to ensure that a model of the correct subclass
+     * is created. This copy-constructor helps subclasses to ensure that all
+     * member variables are correctly copied when this happens.
+     *
+     * This method is called by child classes to set member variables for a
+     * daughter cell upon cell division. Note that the parent cell cycle model
+     * will have had ResetForDivision() called just before CreateCellCycleModel()
+     * is called, so performing an exact copy of the parent is suitable behaviour.
+     * Any daughter-cell-specific initialisation can be done in InitialiseDaughterCell().
      *
      * @param rModel the cell cycle model to copy.
      */
     RandomDivisionCellCycleModel(const RandomDivisionCellCycleModel& rModel);
-
 
 public:
 
@@ -99,11 +104,12 @@ public:
     RandomDivisionCellCycleModel();
 
     /**
-     * Overridden ReadyToDivideMethod
+     * Overridden ReadyToDivide() method.
      *
-     * Here we draw a random number p~(U(0,1))
-     * and if the cells age is > mMinimumDivisionAge
-     * then we divide if p < mDivisionProbability*dt
+     * If the cell's age is greater than mMinimumDivisionAge, then we draw a uniform
+     * random number r ~ U[0,1]. If r < mDivisionProbability*dt, where dt is the
+     * simulation time step, then the cell is ready to divide and we return true.
+     * Otherwise, the cell is not yet ready to divide and we return false.
      *
      * @return whether the cell is ready to divide.
      */
@@ -114,44 +120,54 @@ public:
      * the cell-cycle model.
      *
      * @return new cell-cycle model
-     *
      */
     AbstractCellCycleModel* CreateCellCycleModel();
 
     /**
-     * @param divisionProbability
+     * Set the value of mDivisionProbability.
+     *
+     * @param divisionProbability the new value of mDivisionProbability
      */
     void SetDivisionProbability(double divisionProbability);
 
     /**
+     * Get mDivisionProbability.
+     *
      * @return mDivisionProbability
      */
     double GetDivisionProbability();
 
     /**
-     * @param minimumDivisionAge
+     * Set the value of mMinimumDivisionAge.
+     *
+     * @param minimumDivisionAge the new value of mMinimumDivisionAge
      */
     void SetMinimumDivisionAge(double minimumDivisionAge);
 
     /**
+     * Get mMinimumDivisionAge.
+     *
      * @return mMinimumDivisionAge
      */
     double GetMinimumDivisionAge();
 
     /**
      * Overridden GetAverageTransitCellCycleTime() method.
-     * @return time
+     *
+     * @return the average cell cycle time for cells of transit proliferative type
      */
     double GetAverageTransitCellCycleTime();
 
     /**
      * Overridden GetAverageStemCellCycleTime() method.
-     * @return time
+     *
+     * @return the average cell cycle time for cells of stem proliferative type
      */
     double GetAverageStemCellCycleTime();
 
     /**
-     * Outputs cell cycle model parameters to file.
+     * Overridden OutputCellCycleModelParameters() method.
+     * Output cell cycle model parameters to file.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
