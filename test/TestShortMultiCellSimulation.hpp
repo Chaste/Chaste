@@ -83,7 +83,6 @@ public:
         cell_population.SetIfPopulationHasActiveSources(false);
 
         OffLatticeSimulation<2> simulator(cell_population);
-        simulator.SetConsoleProgressOutput(true);
 
         // Add main immersed boundary simulation modifier
         MAKE_PTR(ImmersedBoundarySimulationModifier<2>, p_main_modifier);
