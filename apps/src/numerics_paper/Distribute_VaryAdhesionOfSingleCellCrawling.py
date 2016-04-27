@@ -42,7 +42,7 @@ def run_simulations():
         for ad in range(num_ad):
             fix_ad = 1.0 + 0.05 * (-8 + tsc)
 
-            command = 'nice -n 19 ' + path_to_exec + exec_name \
+            command = 'nice -n 1 ' + path_to_exec + exec_name \
                       + ' --ID ' + str(tsc) + '_' + str(ad) \
                       + ' --CRL ' + str(fix_crl) \
                       + ' --CSC ' + str(fix_csc) \
