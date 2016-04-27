@@ -13,16 +13,22 @@ path_to_output = os.environ.get('CHASTE_TEST_OUTPUT') + '/numerics_paper/'
 sim_name = 'VaryAdhesionOfSingleCellCrawling'
 exec_name = 'Exe_' + sim_name
 
+# Fixed params
+fix_crl = 0.25
+fix_csc = 1e7
+fix_trl = 0.01
+fix_di = 0.02
+fix_ts = 20000
+
 # Range for two simulation parameters
-num_global_consts = 4
-num_local_consts  = 8
-num_kicks_per_sim = 3
+num_tsc = 20
+num_ad = 20
 
 def main():
-    # run_simulations()
-    make_movies_parallel()
+    run_simulations()
+    # make_movies_parallel()
     # combine_output()
-    plot_results()
+    # plot_results()
 
 
 # Create a list of commands and pass them to separate processes
@@ -30,14 +36,22 @@ def run_simulations():
 
     # Make a list of calls to a Chaste executable
     command_list = []
-    for global_const in range(num_global_consts):
-        for local_const in range(num_local_consts):
-            for kick in range(num_kicks_per_sim):
-                command = 'nice -n 19 ' + path_to_exec + exec_name \
-                          + ' --G ' + str(global_const) \
-                          + ' --L ' + str(local_const) \
-                          + ' --K ' + str(kick)
-                command_list.append(command)
+    for tsc in range(num_tsc):
+        fix_tsc = 1e6 * (1 + 0.2 * (1 + tsc))
+
+        for ad in range(num_ad):
+            fix_ad = 1.0 + 0.05 * (-8 + tsc)
+
+            command = 'nice -n 19 ' + path_to_exec + exec_name \
+                      + ' --ID ' + str(tsc) + '_' + str(ad) \
+                      + ' --CRL ' + str(fix_crl) \
+                      + ' --CSC ' + str(fix_csc) \
+                      + ' --TRL ' + str(fix_trl) \
+                      + ' --DI ' + str(fix_di) \
+                      + ' --TS ' + str(fix_ts) \
+                      + ' --TSC ' + str(fix_tsc) \
+                      + ' --AD ' + str(fix_ad)
+            command_list.append(command)
 
     # Use processes equal to the number of cpus available
     count = multiprocessing.cpu_count()
