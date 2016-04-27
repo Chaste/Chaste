@@ -255,7 +255,7 @@ void ImmersedBoundaryCellCellInteractionForce<DIM>::UseLinearSpringLaw()
 
 
 template<unsigned DIM>
-void ImmersedBoundaryCellCellInteractionForce<DIM>::UseMoresePotential()
+void ImmersedBoundaryCellCellInteractionForce<DIM>::UseMorsePotential()
 {
     mLinearSpring = false;
     mMorse = true;

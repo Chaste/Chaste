@@ -207,7 +207,7 @@ void SetupAndRunSimulation(std::string idString, double corRestLength, double co
     p_main_modifier->AddImmersedBoundaryForce(p_cell_cell_force);
     p_cell_cell_force->SetSpringConstant(traSpringConst);
     p_cell_cell_force->SetRestLength(traRestLength);
-    p_cell_cell_force->UseMoresePotential();
+    p_cell_cell_force->UseMorsePotential();
 
     // Get the centroid of the three relevant cells before anything happens
     c_vector<double, 2> prev_centroid_start = p_mesh->GetCentroidOfElement(2);

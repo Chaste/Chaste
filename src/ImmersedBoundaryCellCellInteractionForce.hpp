@@ -164,7 +164,7 @@ public:
     /**
      * Set the force law to be based on the Morse potential
      */
-    void UseMoresePotential();
+    void UseMorsePotential();
 
     /**
      * Overridden OutputForceParameters() method.
