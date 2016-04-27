@@ -63,7 +63,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "UniformlyDistributedCellCycleModel.hpp"
 
 /* Required for the Immersed Boundary functionality */
+#include "ImmersedBoundaryCellCellInteractionForce.hpp"
 #include "ImmersedBoundaryCellPopulation.hpp"
+#include "ImmersedBoundaryMembraneElasticityForce.hpp"
 #include "ImmersedBoundaryMesh.hpp"
 #include "ImmersedBoundarySimulationModifier.hpp"
 #include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
@@ -104,36 +106,6 @@ public:
         ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.2, 2.0, 0.15, true);
         ImmersedBoundaryMesh<2,2>* p_mesh = gen.GetMesh();
 
-        MARK;
-
-        /* Here, we set the elastic parameters of the cells (here called elements) in the mesh. While these parameters
-         * all have default values, this demonstrates how the parameters may be set differently per simulation.
-         * First we loop through all elements and use the two {{{SetMembraneXXX()}}} methods to set the spring constant
-         * and rest length of the linear springs between points adjacent points on the cell perimeters.  We then use
-         * the {{{SetCellCellXXX()}}} methods to alter parameters for the linear springs between nearby points in
-         * neighbouring cells.*/
-//        for (unsigned elem_idx = 0 ; elem_idx < p_mesh->GetNumElements() ; elem_idx++)
-//        {
-//            p_mesh->GetElement(elem_idx)->SetMembraneSpringConstant(1000.0);
-//            p_mesh->GetElement(elem_idx)->SetMembraneRestLength(0.1 * p_mesh->GetCharacteristicNodeSpacing());
-//
-//            p_mesh->GetElement(elem_idx)->SetCellCellSpringConstant(50.0);
-//            p_mesh->GetElement(elem_idx)->SetCellCellRestLength(p_mesh->GetCharacteristicNodeSpacing());
-//        }
-//
-//        MARK;
-//
-//        /* The membrane element (treated the same as other elements) can have parameters set independently by making use
-//         * of the mesh method {{{GetMembraneElement()}}}.  The following lines implement stiffer springs in the basement
-//         * membrane, and overwrite the values that have been assigned in the loop above.*/
-//        p_mesh->GetMembraneElement()->SetMembraneSpringConstant(10000.0);
-//        p_mesh->GetMembraneElement()->SetMembraneRestLength(0.0001);
-//
-//        p_mesh->GetMembraneElement()->SetCellCellSpringConstant(50.0);
-//        p_mesh->GetMembraneElement()->SetCellCellRestLength(0.5 * p_mesh->GetCharacteristicNodeSpacing());
-
-        MARK;
-
         /* We now generate a collection of cells. We do this by using a {{{CellsGenerator}}} and we specify the
          * proliferative behaviour of the cell by choosing a {{{CellCycleModel}}}. Here we choose an
          * {{{UniformlyDistributedCellCycleModel}}} which does not allow proliferation. For an Immersed Boundary
@@ -143,13 +115,9 @@ public:
         CellsGenerator<UniformlyDistributedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
-        MARK;
-
         /* We now create a {{{CellPopulation}}} object (passing in the mesh and cells) to connect the mesh and the cells
          * together. Here we use an {{{ImmersedBoundaryCellPopulation}}} and the dimension is <2>.*/
         ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
-
-        MARK;
 
         /* We now create an {{{OffLatticeSimulation}}} object and pass in the {{{CellPopulation}}}. We also set some
          * options for the simulation like output directory, output multiple (so we don't visualize every timestep),
@@ -157,27 +125,31 @@ public:
          */
         OffLatticeSimulation<2> simulator(cell_population);
 
-        MARK;
-
-        simulator.SetOutputDirectory("IB/TestPalisadeGenerator");
+        simulator.SetOutputDirectory("TestImmersedBoundaryDemoTutorial");
         simulator.SetDt(0.01);
-        simulator.SetSamplingTimestepMultiple(1);
-        simulator.SetEndTime(0.02);
+        simulator.SetSamplingTimestepMultiple(10);
+        simulator.SetEndTime(10.0);
 
-        MARK;
-
-         /* All of the machinery for the Immersed Boundary method is handled in the following {{{SimulationModifier}}}.
-          * Here, we create a 'shared pointer' to an {{{ImmersedBoundarySimulationModifier}}} object and pass it to the
-          * {{{OffLatticeSimulation}}}.*/
+        /* All of the machinery for the Immersed Boundary method is handled in the following {{{SimulationModifier}}}.
+         * Here, we create a 'shared pointer' to an {{{ImmersedBoundarySimulationModifier}}} object and pass it to the
+         * {{{OffLatticeSimulation}}}.*/
         MAKE_PTR(ImmersedBoundarySimulationModifier<2>, p_main_modifier);
         simulator.AddSimulationModifier(p_main_modifier);
 
-        MARK;
+        /* We now associate {{{ImmersedBoundaryMembraneElasticityForce}}} and
+         * {{{ImmersedBoundaryCellCellInteractionForce}}} to the {{{SimulationModifier}}} which
+         * handles the membrane elasticity forces.  These are created in a similar manner as above.*/
+        MAKE_PTR_ARGS(ImmersedBoundaryMembraneElasticityForce<2>, p_boundary_force, (cell_population));
+        p_main_modifier->AddImmersedBoundaryForce(p_boundary_force);
+        p_boundary_force->SetSpringConstant(0.5 * 1e8);
+
+        MAKE_PTR_ARGS(ImmersedBoundaryCellCellInteractionForce<2>, p_cell_cell_force, (cell_population));
+        p_main_modifier->AddImmersedBoundaryForce(p_cell_cell_force);
+        p_cell_cell_force->SetSpringConstant(1.0 * 1e6);
 
         /* Finally we call the {{{Solve}}} method on the simulation to run the simulation.*/
         simulator.Solve();
 
-        MARK;
     }
 
 };
