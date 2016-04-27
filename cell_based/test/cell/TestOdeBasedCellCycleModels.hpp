@@ -207,18 +207,18 @@ public:
         TS_ASSERT_DELTA(proteins[5], 0.9662, 1e-2);
 
         // Coverage of AbstractOdeBasedCellCycleModel::SetProteinConcentrationsForTestsOnly()
-//        std::vector<double> test_results;
-//        for (unsigned i=0; i<6; i++)
-//        {
-//            test_results[i] = (double)i;
-//        }
-//        p_cell_model->SetProteinConcentrationsForTestsOnly(1.0, test_results);
-//        proteins = p_cell_model->GetProteinConcentrations();
-//
-//        for (unsigned i=0; i<6; i++)
-//        {
-//            TS_ASSERT_DELTA(proteins[i], test_results[i], 1e-6);
-//        }
+        std::vector<double> test_results(6);
+        for (unsigned i=0; i<6; i++)
+        {
+            test_results[i] = (double)i;
+        }
+        p_cell_model->SetProteinConcentrationsForTestsOnly(1.0, test_results);
+        proteins = p_cell_model->GetProteinConcentrations();
+
+        for (unsigned i=0; i<6; i++)
+        {
+            TS_ASSERT_DELTA(proteins[i], test_results[i], 1e-6);
+        }
     }
 
     /**
