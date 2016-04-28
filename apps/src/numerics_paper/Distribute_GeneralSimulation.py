@@ -11,13 +11,13 @@ import matplotlib.pyplot as plt
 # Globally accessible directory paths and names
 # Globally accessible directory paths, names, and variables
 chaste_build_dir = os.environ.get('CHASTE_BUILD_DIR')
-executable = os.path.join(chaste_build_dir, 'projects/ImmersedBoundary/apps', 'Exe_VaryAdhesionOfSingleCellCrawling')
+executable = os.path.join(chaste_build_dir, 'projects/ImmersedBoundary/apps', 'Exe_GeneralSimulation')
 
 if not(os.path.isfile(executable)):
     raise Exception('Py: Could not find executable: ' + executable)
 
 chaste_test_dir = os.environ.get('CHASTE_TEST_OUTPUT')
-path_to_output = os.path.join(chaste_test_dir, 'numerics_paper', 'Exe_VaryAdhesionOfSingleCellCrawling')
+path_to_output = os.path.join(chaste_test_dir, 'numerics_paper', 'Exe_GeneralSimulation')
 
 command_line_args = [' --ID ', ' --CRL ', ' --CSC ', ' --TRL ', ' --TSC ', ' --AD ', ' --DI ', ' --TS ']
 params_list = ['simulation_id', 'cor_rest_length', 'cor_spring_const', 'tra_rest_length', 'tra_spring_const',
@@ -26,17 +26,17 @@ params_list = ['simulation_id', 'cor_rest_length', 'cor_spring_const', 'tra_rest
 # Param ranges (in lists, for itertools product
 crl = [0.25]
 csc = [1e7]
-trl = np.linspace(0.005, 0.01, num=6)
-tsc = np.linspace(1e6, 1e7, num=10)
-ad = np.linspace(0, 1, num=11)
+trl = np.linspace(0.005, 0.01, num=3)
+tsc = np.linspace(1e6, 5 * 1e6, num=6)
+ad = np.linspace(0, 1, num=5)
 di = [0.03]
-ts = [20000]
+ts = [100]
 
 
 def main():
-    # run_simulations()
-    make_movies_parallel()
-    # combine_output()
+    run_simulations()
+    # make_movies_parallel()
+    combine_output()
     # plot_results()
 
 
@@ -45,6 +45,9 @@ def run_simulations():
 
     # Make a list of calls to a Chaste executable
     command_list = []
+
+    if not os.path.exists(path_to_output):
+        os.makedirs(path_to_output)
 
     params_file = open(path_to_output + '/params_file.csv', 'w')
     params_file.write(','.join(params_list) + '\n')
@@ -135,8 +138,9 @@ def combine_output():
             # Add header to combined results if not yet done - else skip the header
             if not added_header:
                 combined_results.write(local_results.readline())
+                added_header = True
             else:
-                next(combined_results)
+                header = local_results.readline()
 
             # Write the results to the combined results file
             combined_results.write(local_results.readline())
