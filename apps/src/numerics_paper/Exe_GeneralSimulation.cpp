@@ -261,9 +261,6 @@ void SetupAndRunSimulation(std::string idString, double corRestLength, double co
 
     // Output summary statistics to results file
     (*results_file) << "id" << ","
-                    << "cortical_rest_length" << ","
-                    << "cortical_spring_const" << ","
-                    << "rhs_adhesion_mod" << ","
                     << "delta_prev_cent" << ","
                     << "delta_this_cent" << ","
                     << "delta_next_cent" << ","
@@ -272,9 +269,6 @@ void SetupAndRunSimulation(std::string idString, double corRestLength, double co
                     << "delta_next_skew" << std::endl;
 
     (*results_file) << idString << ","
-                    << boost::lexical_cast<std::string>(corRestLength) << ","
-                    << boost::lexical_cast<std::string>(corSpringConst) << ","
-                    << boost::lexical_cast<std::string>(rhsAdhesionMod) << ","
                     << boost::lexical_cast<std::string>(prev_centroid_end[1] - prev_centroid_start[1]) << ","
                     << boost::lexical_cast<std::string>(this_centroid_end[1] - this_centroid_start[1]) << ","
                     << boost::lexical_cast<std::string>(next_centroid_end[1] - next_centroid_start[1]) << ","

@@ -26,17 +26,17 @@ params_list = ['simulation_id', 'cor_rest_length', 'cor_spring_const', 'tra_rest
 # Param ranges (in lists, for itertools product
 crl = [0.25]
 csc = [1e7]
-trl = np.linspace(0.005, 0.01, num=3)
-tsc = np.linspace(1e6, 5 * 1e6, num=6)
+trl = np.linspace(0.001, 0.005, num=3)
+tsc = np.linspace(0, 1e6, num=5)
 ad = np.linspace(0, 1, num=5)
 di = [0.03]
-ts = [100]
+ts = [10000]
 
 
 def main():
     run_simulations()
     # make_movies_parallel()
-    combine_output()
+    # combine_output()
     # plot_results()
 
 
@@ -65,20 +65,21 @@ def run_simulations():
             command += command_line_args[arg+1] + str(param_set[arg])
 
         command_list.append(command)
+        print(command_list[-1])
 
     params_file.close()
-
-    # Use processes equal to the number of cpus available
-    count = multiprocessing.cpu_count()
-
-    print("Py: Starting simulations with " + str(count) + " processes")
-
-    # Generate a pool of workers
-    pool = multiprocessing.Pool(processes=count)
-
-    # Pass the list of bash commands to the pool
-
-    pool.map(execute_command, command_list)
+    #
+    # # Use processes equal to the number of cpus available
+    # count = multiprocessing.cpu_count()
+    #
+    # print("Py: Starting simulations with " + str(count) + " processes")
+    #
+    # # Generate a pool of workers
+    # pool = multiprocessing.Pool(processes=count)
+    #
+    # # Pass the list of bash commands to the pool
+    #
+    # pool.map(execute_command, command_list)
 
 
 # Make an mp4 movie from each pvd file
