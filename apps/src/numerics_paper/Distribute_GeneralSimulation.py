@@ -34,9 +34,9 @@ ts = [10000]
 
 
 def main():
-    run_simulations()
-    # make_movies_parallel()
-    combine_output()
+    # run_simulations()
+    make_movies_parallel()
+    # combine_output()
     # plot_results()
 
 

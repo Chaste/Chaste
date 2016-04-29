@@ -15,6 +15,8 @@ def pvd_to_mp4(sim_dir):
     if not (os.path.isdir(sim_dir)):
         raise Exception('pvd_to_mp4: Invalid simulation directory')
 
+    sim_id = os.path.basename(os.path.normpath(sim_dir))
+
     possible_data_directories = []
     for dir in os.listdir(sim_dir):
         if dir.startswith('results_from_time'):
@@ -59,7 +61,7 @@ def pvd_to_mp4(sim_dir):
 
     # Show the data in the current render view as a surface
     results_pvd_display = pv.Show(results_pvd, render_view)
-    results_pvd_display.Representation = 'Points'
+    results_pvd_display.Representation = 'Surface'
 
 
     #######################################
@@ -122,15 +124,15 @@ def pvd_to_mp4(sim_dir):
     #   -c:v h264                   Video codec to use is h264
     #   -crf 0                      Set video quality: 0 is best, 51 is worst (https://trac.ffmpeg.org/wiki/Encode/H.264)
     #   -y dir/movie.mp4            Output directory and name
-    os.system(video_converter + ' -v 0 -r ' + frame_rate + ' -f image2 -i ' + sim_dir + 'results.%04d.png -c:v h264 -crf 0 -y ' + sim_dir + 'movie_points.mp4')
+    os.system(video_converter + ' -v 0 -r ' + frame_rate + ' -f image2 -i ' + sim_dir + 'results.%04d.png -c:v h264 -crf 0 -y ' + sim_dir + sim_id + '.mp4')
 
     # Raise exception if the mp4 file is not generated as expected
-    if not(os.path.isfile(sim_dir + 'movie_points.mp4')):
+    if not(os.path.isfile(sim_dir + sim_id + '.mp4')):
         raise Exception('pvd_to_mp4: mp4 not generated as expected')
 
     # Raise exception if the mp4 file file is created but is smaller than 1kb - ffmpeg sometimes
     # generates an empty file even if an error occurs
-    if os.path.getsize(sim_dir + 'movie.mp4') < 1024:
+    if os.path.getsize(sim_dir + sim_id + '.mp4') < 1024:
         raise Exception('pvd_to_mp4: mp4 not generated as expected')
 
     # Clean up the png files created by WriteAnimation
