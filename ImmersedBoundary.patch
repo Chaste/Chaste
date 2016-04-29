@@ -1,6 +1,6 @@
 Index: CMakeLists.txt
 ===================================================================
---- CMakeLists.txt	(revision 26492)
+--- CMakeLists.txt	(revision 26496)
 +++ CMakeLists.txt	(working copy)
 @@ -211,13 +211,13 @@
  
@@ -156,7 +156,7 @@ Index: CMakeLists.txt
   and scientific computing.
 Index: cell_based/src/simulation/OffLatticeSimulation.cpp
 ===================================================================
---- cell_based/src/simulation/OffLatticeSimulation.cpp	(revision 26492)
+--- cell_based/src/simulation/OffLatticeSimulation.cpp	(revision 26496)
 +++ cell_based/src/simulation/OffLatticeSimulation.cpp	(working copy)
 @@ -77,7 +77,7 @@
          // All classes derived from AbstractOffLatticeCellPopulation are covered by the above (except user-derived classes),
@@ -167,9 +167,22 @@ Index: cell_based/src/simulation/OffLatticeSimulation.cpp
      }
  }
  
+Index: global/src/ExecutableSupport.cpp
+===================================================================
+--- global/src/ExecutableSupport.cpp	(revision 26496)
++++ global/src/ExecutableSupport.cpp	(working copy)
+@@ -411,7 +411,7 @@
+ void ExecutableSupport::StandardStartup(int* pArgc, char*** pArgv)
+ {
+     InitializePetsc(pArgc, pArgv);
+-    ShowCopyright();
++//    ShowCopyright();
+     ShowParallelLaunching();
+ }
+ 
 Index: mesh/src/utilities/BoxCollection.cpp
 ===================================================================
---- mesh/src/utilities/BoxCollection.cpp	(revision 26492)
+--- mesh/src/utilities/BoxCollection.cpp	(revision 26496)
 +++ mesh/src/utilities/BoxCollection.cpp	(working copy)
 @@ -693,7 +693,7 @@
                                              std::map<unsigned, std::set<unsigned> >& rNodeNeighbours)
