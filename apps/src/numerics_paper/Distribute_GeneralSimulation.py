@@ -2,13 +2,16 @@ import itertools
 import multiprocessing
 import os
 import subprocess
+import time
 
 import numpy as np
 import matplotlib.pyplot as plt
 
-# import immersed_boundary as ib
+try:
+    import immersed_boundary
+except ImportError:
+    print("Py: immersed_boundary not imported - is chaste project in the python path?")
 
-# Globally accessible directory paths and names
 # Globally accessible directory paths, names, and variables
 chaste_build_dir = os.environ.get('CHASTE_BUILD_DIR')
 executable = os.path.join(chaste_build_dir, 'projects/ImmersedBoundary/apps', 'Exe_GeneralSimulation')
@@ -23,21 +26,24 @@ command_line_args = [' --ID ', ' --CRL ', ' --CSC ', ' --TRL ', ' --TSC ', ' --A
 params_list = ['simulation_id', 'cor_rest_length', 'cor_spring_const', 'tra_rest_length', 'tra_spring_const',
                'adhesion_modifier', 'interaction_dist', 'num_time_steps']
 
+today = time.strftime('%Y-%m-%d')
+
 # Param ranges (in lists, for itertools product
 crl = [0.25]
 csc = [1e7]
 trl = np.linspace(0.001, 0.005, num=3)
-tsc = np.linspace(0, 1e6, num=5)
-ad = np.linspace(0, 1, num=5)
+tsc = np.linspace(0, 1e6, num=3)
+ad = np.linspace(0, 1, num=2)
 di = [0.03]
-ts = [10000]
+ts = [1000]
 
 
 def main():
-    # run_simulations()
+    run_simulations()
     make_movies_parallel()
-    # combine_output()
+    combine_output()
     # plot_results()
+    compress_output()
 
 
 # Create a list of commands and pass them to separate processes
@@ -78,7 +84,13 @@ def run_simulations():
 
     # Pass the list of bash commands to the pool
 
-    pool.map(execute_command, command_list)
+    # Wait at most one day
+    pool.map_async(execute_command, command_list).get(86400)
+
+
+# This is a helper function for run_simulation that runs bash commands in separate processes
+def execute_command(cmd):
+    return subprocess.call(cmd, shell=True)
 
 
 # Make an mp4 movie from each pvd file
@@ -89,6 +101,10 @@ def make_movies_parallel():
     if not (os.path.isdir(path_to_output)):
         raise Exception('Py: Could not find output directory: ' + path_to_output)
 
+    path_to_movies = os.path.join(path_to_output, 'movies')
+    if not (os.path.isdir(path_to_movies)):
+        os.makedirs(path_to_movies)
+
     command_list = []
 
     for idx, param_set in enumerate(itertools.product(crl, csc, trl, tsc, ad, di, ts)):
@@ -97,8 +113,8 @@ def make_movies_parallel():
         dir_name = os.path.join(path_to_output, 'sim', str(idx))
 
         if os.path.isfile(os.path.join(dir_name, 'results.csv')):
-            string_of_dir_name = '"' + dir_name + '"'
-            command_list.append("""python -c 'import immersed_boundary as ib; ib.pvd_to_mp4(""" + string_of_dir_name + """)'""")
+            command_list.append((dir_name, path_to_movies, str(idx), 'Surface'))
+            command_list.append((dir_name, path_to_movies, str(idx), 'Points'))
 
     # Use processes equal to the number of cpus available
     count = multiprocessing.cpu_count()
@@ -108,14 +124,13 @@ def make_movies_parallel():
     # Generate a pool of workers
     pool = multiprocessing.Pool(processes=count)
 
-    # Pass the list of bash commands to the pool
+    # Wait at most one day
+    pool.map_async(wrap_movie_command, command_list).get(86400)
 
-    pool.map(execute_command, command_list)
 
-
-# This is a helper function for run_simulation that runs bash commands in separate processes
-def execute_command(cmd):
-    return subprocess.call(cmd, shell=True)
+# Helper function to wrap the movie making command so that it only takes one variable
+def wrap_movie_command(args):
+    immersed_boundary.pvd_to_mp4(*args)
 
 
 # Gather the output from all simulations and put it in the same file
@@ -140,7 +155,7 @@ def combine_output():
                 combined_results.write(local_results.readline())
                 added_header = True
             else:
-                header = local_results.readline()
+                _ = local_results.readline()
 
             # Write the results to the combined results file
             combined_results.write(local_results.readline())
@@ -213,6 +228,23 @@ def plot_results():
     #
     #     plt.savefig(path_to_output + exec_name + '/Fig_' + exec_name + str(plot) + '_pdf.pdf', bbox_inches='tight', pad_inches=0.4)
     #     plt.savefig(path_to_output + exec_name + '/Fig_' + exec_name + str(plot) + '_eps.eps', bbox_inches='tight', pad_inches=0.5)
+
+
+# Compress output and suffix with date run
+def compress_output():
+
+    # Check that output directory exists
+    if not (os.path.isdir(path_to_output)):
+        raise Exception('Py: Could not find output directory: ' + path_to_output)
+
+    # Change cwd to one above output path
+    os.chdir(os.path.join(path_to_output, '..'))
+
+    simulation_name = os.path.basename(os.path.normpath(path_to_output))
+
+    # Compress entire output folder and append with the the simulations were started
+    os.system('tar -zcf ' + simulation_name + '_' + today + '.tar.gz ' + simulation_name)
+
 
 if __name__ == "__main__":
     main()

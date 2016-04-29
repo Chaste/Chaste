@@ -69,7 +69,7 @@ void DestroySingletons();
 void SetupAndRunSimulation(std::string idString, double corRestLength, double corSpringConst, double traRestLength,
                            double traSpringConst, double rhsAdhesionMod, double interactionDist,
                            unsigned numTimeSteps);
-void OutputOnCompletion(std::string idString);
+void OutputToConsole(std::string idString, std::string leading);
 
 int main(int argc, char *argv[])
 {
@@ -112,11 +112,12 @@ int main(int argc, char *argv[])
     unsigned num_time_steps = variables_map["TS"].as<unsigned>();
 
 
+    OutputToConsole(id_string, "Started");
     SetupSingletons();
     SetupAndRunSimulation(id_string, cor_rest_length, cor_spring_const, tra_rest_length, tra_spring_const,
                           rhs_adhesion_mod, interaction_dist, num_time_steps);
     DestroySingletons();
-    OutputOnCompletion(id_string);
+    OutputToConsole(id_string, "Completed");
 }
 
 void SetupSingletons()
@@ -138,15 +139,16 @@ void DestroySingletons()
     CellPropertyRegistry::Instance()->Clear();
 }
 
-void OutputOnCompletion(std::string idString)
+void OutputToConsole(std::string idString, std::string leading)
 {
     // Compose the message
     std::stringstream message;
-    message << "Completed simulation with ID string " << idString << std::endl;
+    message << leading << " simulation with ID string " << idString << std::endl;
 
     // Send it to the console
     std::cout << message.str() << std::flush;
 }
+
 void SetupAndRunSimulation(std::string idString, double corRestLength, double corSpringConst, double traRestLength,
                            double traSpringConst, double rhsAdhesionMod, double interactionDist,
                            unsigned numTimeSteps)
