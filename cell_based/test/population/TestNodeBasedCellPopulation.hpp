@@ -727,6 +727,7 @@ public:
 
         if (PetscTools::AmMaster())
         {
+            std::cout << ((node_based_cell_population.GetNode(0))->rGetNeighbours()).size() << std::endl;
             TS_ASSERT_THROWS_THIS(node_based_cell_population.GetNeighbouringNodeIndices(0), "mpNodesOnlyMesh::mMaxInteractionDistance is smaller than twice the radius of cell 0 (0.1) so interactions may be missed. Make the cut-off larger to avoid errors.");
         }
 

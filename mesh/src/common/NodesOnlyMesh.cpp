@@ -202,19 +202,19 @@ void NodesOnlyMesh<SPACE_DIM>::SetCalculateNodeNeighbours(bool calculateNodeNeig
 }
 
 template<unsigned SPACE_DIM>
-void NodesOnlyMesh<SPACE_DIM>::CalculateInteriorNodePairs(std::vector<std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours)
+void NodesOnlyMesh<SPACE_DIM>::CalculateInteriorNodePairs(std::vector<std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>*> >& rNodePairs)
 {
     assert(mpBoxCollection);
 
-    mpBoxCollection->CalculateInteriorNodePairs(this->mNodes, rNodePairs, rNodeNeighbours);
+    mpBoxCollection->CalculateInteriorNodePairs(this->mNodes, rNodePairs);
 }
 
 template<unsigned SPACE_DIM>
-void NodesOnlyMesh<SPACE_DIM>::CalculateBoundaryNodePairs(std::vector<std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours)
+void NodesOnlyMesh<SPACE_DIM>::CalculateBoundaryNodePairs(std::vector<std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>*> >& rNodePairs)
 {
     assert(mpBoxCollection);
 
-    mpBoxCollection->CalculateBoundaryNodePairs(this->mNodes, rNodePairs, rNodeNeighbours);
+    mpBoxCollection->CalculateBoundaryNodePairs(this->mNodes, rNodePairs);
 }
 
 template<unsigned SPACE_DIM>

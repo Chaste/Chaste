@@ -322,6 +322,66 @@ unsigned Node<SPACE_DIM>::GetNumBoundaryElements() const
 }
 
 //////////////////////////////////////////////////////////////////////////
+// Tracking neighbours of the node
+//////////////////////////////////////////////////////////////////////////
+
+template<unsigned SPACE_DIM>
+void Node<SPACE_DIM>::AddNeighbour(unsigned index)
+{
+    ConstructNodeAttributes();
+
+    return mpNodeAttributes->AddNeighbour(index);
+}
+
+template<unsigned SPACE_DIM>
+void Node<SPACE_DIM>::ClearNeighbours()
+{
+    ConstructNodeAttributes();
+
+    mpNodeAttributes->ClearNeighbours();
+}
+
+template<unsigned SPACE_DIM>
+void Node<SPACE_DIM>::RemoveDuplicateNeighbours()
+{
+    CheckForNodeAttributes();
+
+    mpNodeAttributes->RemoveDuplicateNeighbours();
+}
+
+template<unsigned SPACE_DIM>
+bool Node<SPACE_DIM>::NeighboursIsEmpty()
+{
+    CheckForNodeAttributes();
+
+    return mpNodeAttributes->NeighboursIsEmpty();
+}
+
+template<unsigned SPACE_DIM>
+void Node<SPACE_DIM>::SetNeighboursSetUp(bool flag)
+{
+    ConstructNodeAttributes();
+
+    mpNodeAttributes->SetNeighboursSetUp(flag);
+};
+
+template<unsigned SPACE_DIM>
+bool Node<SPACE_DIM>::GetNeighboursSetUp()
+{
+    CheckForNodeAttributes();
+
+    return mpNodeAttributes->GetNeighboursSetUp();
+};
+
+template<unsigned SPACE_DIM>
+std::vector<unsigned>& Node<SPACE_DIM>::rGetNeighbours()
+{
+    CheckForNodeAttributes();
+
+    return mpNodeAttributes->rGetNeighbours();
+};
+
+//////////////////////////////////////////////////////////////////////////
 // Methods dealing with some node flags (deleted, region)
 //////////////////////////////////////////////////////////////////////////
 

@@ -44,9 +44,10 @@ NodeAttributes<SPACE_DIM>::NodeAttributes()
         mRegion(0u),
         mAppliedForce(zero_vector<double>(SPACE_DIM)),
         mRadius(0.0),
+        mNeighbourIndices(std::vector<unsigned>()),
+        mNeighboursSetUp(false),
         mIsParticle(false)
 {
-
 }
 
 template<unsigned SPACE_DIM>
@@ -93,6 +94,50 @@ void NodeAttributes<SPACE_DIM>::ClearAppliedForce()
         mAppliedForce[d] = 0.0;
     }
 }
+
+template<unsigned SPACE_DIM>
+void NodeAttributes<SPACE_DIM>::AddNeighbour(unsigned index)
+{
+    mNeighbourIndices.push_back(index);
+}
+
+template<unsigned SPACE_DIM>
+void NodeAttributes<SPACE_DIM>::ClearNeighbours()
+{
+    mNeighbourIndices.clear();
+}
+
+template<unsigned SPACE_DIM>
+void NodeAttributes<SPACE_DIM>::RemoveDuplicateNeighbours()
+{
+    sort( mNeighbourIndices.begin(), mNeighbourIndices.end() );
+    mNeighbourIndices.erase( unique( mNeighbourIndices.begin(), mNeighbourIndices.end() ), mNeighbourIndices.end() );
+}
+
+template<unsigned SPACE_DIM>
+bool NodeAttributes<SPACE_DIM>::NeighboursIsEmpty()
+{
+    return mNeighbourIndices.empty();
+}
+
+template<unsigned SPACE_DIM>
+void NodeAttributes<SPACE_DIM>::SetNeighboursSetUp(bool flag)
+{
+    mNeighboursSetUp = flag;
+};
+
+template<unsigned SPACE_DIM>
+bool NodeAttributes<SPACE_DIM>::GetNeighboursSetUp()
+{
+    return mNeighboursSetUp;
+};
+
+template<unsigned SPACE_DIM>
+std::vector<unsigned>& NodeAttributes<SPACE_DIM>::rGetNeighbours()
+{
+    return mNeighbourIndices;
+};
+
 
 template<unsigned SPACE_DIM>
 bool NodeAttributes<SPACE_DIM>::IsParticle()

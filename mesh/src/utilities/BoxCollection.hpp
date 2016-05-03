@@ -193,11 +193,9 @@ public:
      *
      * @param rNodes all the nodes to be considered
      * @param rNodePairs the return value, a set of pairs of nodes
-     * @param rNodeNeighbours the other return value, the neighbours of each node.
      */
     void CalculateNodePairs(std::vector<Node<DIM>*>& rNodes,
-                            std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs,
-                            std::map<unsigned, std::set<unsigned> >& rNodeNeighbours);
+                            std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs);
 };
 
 #endif /*BOXCOLLECTION_HPP_*/

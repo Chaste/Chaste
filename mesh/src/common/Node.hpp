@@ -279,6 +279,41 @@ public:
     void AddBoundaryElement(unsigned index);
 
     /**
+     * Add a neighbour to this node's vector of indices.
+     */
+    void AddNeighbour(unsigned index);
+
+    /**
+     * Clear this node's vector of neighbour indices.
+     */
+    void ClearNeighbours();
+
+    /**
+     * Remove duplicates from the vector of node neighbour indices.
+     */  
+    void RemoveDuplicateNeighbours();
+
+    /**
+     * Check whether the node neighbours collection is empty.
+     */  
+    bool NeighboursIsEmpty();
+
+    /**
+    * Sets a flag to indicate that the neighbours of this node have/have not been updated. 
+    */
+    void SetNeighboursSetUp(bool flag);
+
+    /**
+    * Returns a flag to indicate that the neighbours of this node have/have not been updated. 
+    */
+    bool GetNeighboursSetUp();
+
+    /**
+     * @return this node's vector of neighbour indices.
+    */     
+    std::vector<unsigned>& rGetNeighbours();
+
+    /**
      * @return a set of indices of elements containing this node as a vertex.
      */
     std::set<unsigned>& rGetContainingElementIndices();

@@ -466,8 +466,8 @@ public:
         }
 
         std::vector< std::pair<Node<1>*, Node<1>* > > pairs_returned_vector;
-        std::map<unsigned, std::set<unsigned> > neighbours_returned;
-        box_collection.CalculateNodePairs(nodes,pairs_returned_vector, neighbours_returned);
+
+        box_collection.CalculateNodePairs(nodes,pairs_returned_vector);
 
         std::set< std::pair<Node<1>*, Node<1>* > > pairs_returned;
         for (unsigned i=0; i<pairs_returned_vector.size(); i++)
@@ -485,7 +485,10 @@ public:
         neighbours_should_be[2].insert(3);
         neighbours_should_be[3].insert(2);
         neighbours_should_be[4] = std::set<unsigned>();
-        TS_ASSERT_EQUALS(neighbours_should_be, neighbours_returned);
+        for(unsigned i=0; i<nodes.size(); i++){
+            std::vector<unsigned> expected(neighbours_should_be[i].begin(), neighbours_should_be[i].end());
+            TS_ASSERT_EQUALS(nodes[i]->rGetNeighbours(), expected);
+        }
 
         std::set< std::pair<Node<1>*, Node<1>* > > pairs_should_be;
         pairs_should_be.insert(std::pair<Node<1>*, Node<1>*>(nodes[0],nodes[1]));
@@ -632,9 +635,8 @@ public:
         }
 
         std::vector< std::pair<Node<2>*, Node<2>* > > pairs_returned_vector;
-        std::map<unsigned, std::set<unsigned> > neighbours_returned;
 
-        box_collection.CalculateNodePairs(nodes,pairs_returned_vector, neighbours_returned);
+        box_collection.CalculateNodePairs(nodes,pairs_returned_vector);
 
         std::set< std::pair<Node<2>*, Node<2>* > > pairs_returned;
         for (unsigned i=0; i<pairs_returned_vector.size(); i++)
@@ -682,8 +684,10 @@ public:
         neighbours_should_be[8].insert(6);
         neighbours_should_be[8].insert(7);
         neighbours_should_be[9] = std::set<unsigned>();
-
-        TS_ASSERT_EQUALS(neighbours_should_be, neighbours_returned);
+        for(unsigned i=0; i<nodes.size(); i++){
+            std::vector<unsigned> expected(neighbours_should_be[i].begin(), neighbours_should_be[i].end()); 
+            TS_ASSERT_EQUALS(nodes[i]->rGetNeighbours(), expected);
+        }
 
         std::set< std::pair<Node<2>*, Node<2>* > > pairs_should_be;
         pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[0],nodes[1]));
@@ -772,9 +776,8 @@ public:
         }
 
         std::vector< std::pair<Node<3>*, Node<3>*> > pairs_returned_vector;
-        std::map<unsigned, std::set<unsigned> > neighbours_returned;
 
-        box_collection.CalculateNodePairs(nodes, pairs_returned_vector, neighbours_returned);
+        box_collection.CalculateNodePairs(nodes, pairs_returned_vector);
 
         std::set< std::pair<unsigned, unsigned> > pairs_returned;
         for (unsigned i=0; i<pairs_returned_vector.size(); i++)
@@ -833,9 +836,9 @@ public:
         }
 
         // Check the neighbour lists
-        for (unsigned i=0; i<nodes.size(); i++)
-        {
-            TS_ASSERT_EQUALS(neighbours_should_be[i], neighbours_returned[i]);
+        for(unsigned i=0; i<nodes.size(); i++){
+            std::vector<unsigned> expected(neighbours_should_be[i].begin(), neighbours_should_be[i].end()); 
+            TS_ASSERT_EQUALS(nodes[i]->rGetNeighbours(), expected);
         }
 
         // Avoid memory leak
@@ -1148,9 +1151,8 @@ public:
                     nodes.push_back(new Node<2>(1, node_b_location, false));
 
                     std::vector< std::pair<Node<2>*, Node<2>* > > pairs_returned_vector;
-                    std::map<unsigned, std::set<unsigned> > neighbours_returned;
 
-                    box_collection.CalculateNodePairs(nodes, pairs_returned_vector, neighbours_returned);
+                    box_collection.CalculateNodePairs(nodes, pairs_returned_vector);
 
                     TS_ASSERT(pairs_returned_vector.size() == 1);
 
@@ -1236,7 +1238,6 @@ public:
                         nodes.push_back(new Node<3>(1, node_b_location, false));
 
                         std::vector< std::pair<Node<3>*, Node<3>* > > pairs_returned_vector;
-                        std::map<unsigned, std::set<unsigned> > neighbours_returned;
 
 //                        box_collection.CalculateNodePairs(nodes, pairs_returned_vector, neighbours_returned);
 

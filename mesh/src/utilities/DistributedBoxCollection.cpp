@@ -1125,48 +1125,50 @@ void DistributedBoxCollection<DIM>::SetCalculateNodeNeighbours(bool calculateNod
 }
 
 template<unsigned DIM>
-void DistributedBoxCollection<DIM>::CalculateNodePairs(std::vector<Node<DIM>*>& rNodes, std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours)
+void DistributedBoxCollection<DIM>::CalculateNodePairs(std::vector<Node<DIM>*>& rNodes, std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs)
 {
     rNodePairs.clear();
-    rNodeNeighbours.clear();
 
     // Create an empty neighbours set for each node
     for (unsigned i=0; i<rNodes.size(); i++)
     {
-        unsigned node_index = rNodes[i]->GetIndex();
-
         // Get the box containing this node
         unsigned box_index = CalculateContainingBox(rNodes[i]);
 
         if (GetBoxOwnership(box_index))
         {
-            rNodeNeighbours[node_index] = std::set<unsigned>();
+            rNodes[i]->ClearNeighbours();
         }
     }
 
     for (unsigned box_index=mMinBoxIndex; box_index<=mMaxBoxIndex; box_index++)
     {
-        AddPairsFromBox(box_index, rNodePairs, rNodeNeighbours);
+        AddPairsFromBox(box_index, rNodePairs);
+    }
+
+    if(mCalculateNodeNeighbours){
+        for (unsigned i = 0; i < rNodes.size(); i++)
+        {
+            rNodes[i]->RemoveDuplicateNeighbours();
+        }
     }
 }
 
 template<unsigned DIM>
-void DistributedBoxCollection<DIM>::CalculateInteriorNodePairs(std::vector<Node<DIM>*>& rNodes, std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours)
+void DistributedBoxCollection<DIM>::CalculateInteriorNodePairs(std::vector<Node<DIM>*>& rNodes, std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs)
 {
     rNodePairs.clear();
-    rNodeNeighbours.clear();
 
     // Create an empty neighbours set for each node
     for (unsigned i=0; i<rNodes.size(); i++)
     {
-        unsigned node_index = rNodes[i]->GetIndex();
-
         // Get the box containing this node
         unsigned box_index = CalculateContainingBox(rNodes[i]);
 
         if (GetBoxOwnership(box_index))
         {
-            rNodeNeighbours[node_index] = std::set<unsigned>();
+            rNodes[i]->ClearNeighbours();
+            rNodes[i]->SetNeighboursSetUp(false);
         }
     }
 
@@ -1174,27 +1176,42 @@ void DistributedBoxCollection<DIM>::CalculateInteriorNodePairs(std::vector<Node<
     {
         if (IsInteriorBox(box_index))
         {
-            AddPairsFromBox(box_index, rNodePairs, rNodeNeighbours);
+            AddPairsFromBox(box_index, rNodePairs);
+        }
+    }
+
+    if(mCalculateNodeNeighbours){
+        for (unsigned i = 0; i < rNodes.size(); i++)
+        {
+            rNodes[i]->RemoveDuplicateNeighbours();
+            rNodes[i]->SetNeighboursSetUp(true);
         }
     }
 }
 
 template<unsigned DIM>
-void DistributedBoxCollection<DIM>::CalculateBoundaryNodePairs(std::vector<Node<DIM>*>& rNodes, std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours)
+void DistributedBoxCollection<DIM>::CalculateBoundaryNodePairs(std::vector<Node<DIM>*>& rNodes, std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs)
 {
     for (unsigned box_index=mMinBoxIndex; box_index<=mMaxBoxIndex; box_index++)
     {
         if (!IsInteriorBox(box_index))
         {
-            AddPairsFromBox(box_index, rNodePairs, rNodeNeighbours);
+            AddPairsFromBox(box_index, rNodePairs);
+        }
+    }
+
+    if(mCalculateNodeNeighbours){
+        for (unsigned i = 0; i < rNodes.size(); i++)
+        {
+            rNodes[i]->RemoveDuplicateNeighbours();
+            rNodes[i]->SetNeighboursSetUp(true);
         }
     }
 }
 
 template<unsigned DIM>
 void DistributedBoxCollection<DIM>::AddPairsFromBox(unsigned boxIndex,
-                                                    std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs,
-                                                    std::map<unsigned, std::set<unsigned> >& rNodeNeighbours)
+                                                    std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs)
 {
     // Get the box
     Box<DIM>& r_box = rGetBox(boxIndex);
@@ -1233,7 +1250,6 @@ void DistributedBoxCollection<DIM>::AddPairsFromBox(unsigned boxIndex,
         {
             // Get the index of the other node
             unsigned other_node_index = (*neighbour_node_iter)->GetIndex();
-            std::set<unsigned>& r_other_node_neighbours = rNodeNeighbours[other_node_index];
 
             // Loop over nodes in this box
             for (typename std::set<Node<DIM>*>::iterator node_iter = r_contained_nodes.begin();
@@ -1248,8 +1264,8 @@ void DistributedBoxCollection<DIM>::AddPairsFromBox(unsigned boxIndex,
                     rNodePairs.push_back(std::pair<Node<DIM>*, Node<DIM>*>((*node_iter), (*neighbour_node_iter)));
                     if (mCalculateNodeNeighbours)
                     {
-                        rNodeNeighbours[node_index].insert(other_node_index);
-                        r_other_node_neighbours.insert(node_index);
+                        (*node_iter)->AddNeighbour(other_node_index);
+                        (*neighbour_node_iter)->AddNeighbour(node_index);
                     }
                 }
 

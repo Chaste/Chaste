@@ -155,11 +155,11 @@ void NodeBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
 
     RefreshHaloCells();
 
-    mpNodesOnlyMesh->CalculateInteriorNodePairs(mNodePairs, mNodeNeighbours);
+    mpNodesOnlyMesh->CalculateInteriorNodePairs(mNodePairs);
 
     AddReceivedHaloCells();
 
-    mpNodesOnlyMesh->CalculateBoundaryNodePairs(mNodePairs, mNodeNeighbours);
+    mpNodesOnlyMesh->CalculateBoundaryNodePairs(mNodePairs);
 
     /*
      * Update cell radii based on CellData
@@ -368,25 +368,24 @@ std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNodesWithinNeighbourhoodRadi
         EXCEPTION("neighbourhoodRadius should be less than or equal to the  the maximum interaction radius defined on the NodesOnlyMesh");
     }
 
-
-    // Check the mNodeNeighbours has been set up correctly
-    if (mNodeNeighbours.empty())
-    {
-        EXCEPTION("mNodeNeighbours not set up. Call Update() before GetNodesWithinNeighbourhoodRadius()");
-    }
-
     std::set<unsigned> neighbouring_node_indices;
 
     // Get location
     Node<DIM>* p_node_i = this->GetNode(index);
     const c_vector<double, DIM>& r_node_i_location = p_node_i->rGetLocation();
 
+    // Check the mNodeNeighbours has been set up correctly
+    if (!(p_node_i->GetNeighboursSetUp()))
+    {
+        EXCEPTION("mNodeNeighbours not set up. Call Update() before GetNodesWithinNeighbourhoodRadius()");
+    }
+
     // Get set of 'candidate' neighbours.
-    const std::set<unsigned>& r_near_nodes = mNodeNeighbours.find(index)->second;
+    std::vector<unsigned>& near_nodes = p_node_i->rGetNeighbours();
 
     // Find which ones are actually close
-    for (std::set<unsigned>::iterator iter = r_near_nodes.begin();
-         iter != r_near_nodes.end();
+    for (std::vector<unsigned>::iterator iter = near_nodes.begin();
+         iter != near_nodes.end();
          ++iter)
     {
         // Be sure not to return the index itself.
@@ -419,18 +418,18 @@ std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNodesWithinNeighbourhoodRadi
 template<unsigned DIM>
 std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsigned index)
 {
-    // Check the mNodeNeighbours has been set up correctly
-    if (mNodeNeighbours.empty())
-    {
-        EXCEPTION("mNodeNeighbours not set up. Call Update() before GetNeighbouringNodeIndices()");
-    }
-
     std::set<unsigned> neighbouring_node_indices;
 
     // Get location and radius of node
     Node<DIM>* p_node_i = this->GetNode(index);
     const c_vector<double, DIM>& r_node_i_location = p_node_i->rGetLocation();
     double radius_of_cell_i = p_node_i->GetRadius();
+
+    // Check the mNodeNeighbours has been set up correctly
+    if (!(p_node_i->GetNeighboursSetUp()))
+    {
+        EXCEPTION("mNodeNeighbours not set up. Call Update() before GetNeighbouringNodeIndices()");
+    }
 
     // Make sure that the max_interaction distance is smaller than or equal to the box collection size
     if (!(radius_of_cell_i * 2.0 <= mpNodesOnlyMesh->GetMaximumInteractionDistance()))
@@ -439,11 +438,11 @@ std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsi
     }
 
     // Get set of 'candidate' neighbours
-    const std::set<unsigned>& r_near_nodes = mNodeNeighbours.find(index)->second;
+    std::vector<unsigned>& near_nodes = p_node_i->rGetNeighbours();
 
     // Find which ones are actually close
-    for (std::set<unsigned>::iterator iter = r_near_nodes.begin();
-         iter != r_near_nodes.end();
+    for (std::vector<unsigned>::iterator iter = near_nodes.begin();
+         iter != near_nodes.end();
          ++iter)
     {
         // Be sure not to return the index itself

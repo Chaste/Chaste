@@ -689,11 +689,9 @@ const c_vector<double, 2 * DIM>& BoxCollection<DIM>::rGetDomainSize() const
 
 template<unsigned DIM>
 void BoxCollection<DIM>::CalculateNodePairs(std::vector<Node<DIM>*>& rNodes,
-                                            std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs,
-                                            std::map<unsigned, std::set<unsigned> >& rNodeNeighbours)
+                                            std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs)
 {
     rNodePairs.clear();
-    rNodeNeighbours.clear();
 
     // Ensure all boxes are empty
     EmptyBoxes();
@@ -701,7 +699,7 @@ void BoxCollection<DIM>::CalculateNodePairs(std::vector<Node<DIM>*>& rNodes,
     // Create an empty set of neighbours for each node, and add each node to its correct box
     for (unsigned node_index = 0; node_index < rNodes.size(); node_index++)
     {
-        rNodeNeighbours[node_index] = std::set<unsigned>();
+        rNodes[node_index]->ClearNeighbours();
 
         unsigned box_index = CalculateContainingBox(rNodes[node_index]);
         mBoxes[box_index].AddNode(rNodes[node_index]);
@@ -738,18 +736,23 @@ void BoxCollection<DIM>::CalculateNodePairs(std::vector<Node<DIM>*>& rNodes,
                     if (other_node_index > this_node->GetIndex())
                     {
                         rNodePairs.push_back(std::pair<Node<DIM>*, Node<DIM>*>(this_node, (*node_iter)));
-                        rNodeNeighbours[node_index].insert(other_node_index);
-                        rNodeNeighbours[other_node_index].insert(node_index);
+                        this_node->AddNeighbour(other_node_index);
+                        (*node_iter)->AddNeighbour(node_index);
                     }
                 }
                 else
                 {
                     rNodePairs.push_back(std::pair<Node<DIM>*, Node<DIM>*>(this_node, (*node_iter)));
-                    rNodeNeighbours[node_index].insert(other_node_index);
-                    rNodeNeighbours[other_node_index].insert(node_index);
+                    this_node->AddNeighbour(other_node_index);
+                    (*node_iter)->AddNeighbour(node_index);
                 }
             }
         }
+    }
+
+    for (unsigned i = 0; i < rNodes.size(); i++)
+    {
+        rNodes[i]->RemoveDuplicateNeighbours();
     }
 }
 

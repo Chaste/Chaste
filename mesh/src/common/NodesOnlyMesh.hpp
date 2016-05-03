@@ -295,17 +295,15 @@ public:
      * Calculate pairs of nodes from interior boxes using the BoxCollection.
      *
      * @param rNodePairs reference to the set of node pairs to populate.
-     * @param rNodeNeighbours reference to the list of neighbouring nodes for each node.
      */
-    void CalculateInteriorNodePairs(std::vector<std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours);
+    void CalculateInteriorNodePairs(std::vector<std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>*> >& rNodePairs);
 
     /**
      * Calculate pairs of nodes from boxes on the process boundary using the BoxCollection
      *
      * @param rNodePairs reference to the set of node pairs to populate.
-     * @param rNodeNeighbours reference to the list of neighbouring nodes for each node.
      */
-    void CalculateBoundaryNodePairs(std::vector<std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours);
+    void CalculateBoundaryNodePairs(std::vector<std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>*> >& rNodePairs);
 
     /**
      * Overridden ReMesh() method. Since only Nodes are stored, this method cleans up mNodes by

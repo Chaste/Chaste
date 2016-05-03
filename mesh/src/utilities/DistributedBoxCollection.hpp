@@ -345,36 +345,32 @@ public:
      *
      *  @param rNodes all the nodes to be consider
      *  @param rNodePairs the return value, a set of pairs of nodes
-     *  @param rNodeNeighbours the other return value, the neighbours of each node.
      */
-    void CalculateNodePairs(std::vector<Node<DIM>*>& rNodes, std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours);
+    void CalculateNodePairs(std::vector<Node<DIM>*>& rNodes, std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs);
 
     /**
      *  The same as CalculateNodePairs() only we only work on boxes that are interior on this process. I.e. none of their local boxes are halo boxes.
      *
      *  @param rNodes all the nodes to be consider
      *  @param rNodePairs the return value, a set of pairs of nodes
-     *  @param rNodeNeighbours the other return value, the neighbours of each node.
      */
-    void CalculateInteriorNodePairs(std::vector<Node<DIM>*>& rNodes, std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours);
+    void CalculateInteriorNodePairs(std::vector<Node<DIM>*>& rNodes, std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs);
 
     /**
      *  The same as CalculateNodePairs() only we only work on boxes that are ''not'' interior on this process. I.e. some of their local boxes are halo boxes.
      *
      *  @param rNodes all the nodes to be consider
      *  @param rNodePairs the return value, a set of pairs of nodes
-     *  @param rNodeNeighbours the other return value, the neighbours of each node.
      */
-    void CalculateBoundaryNodePairs(std::vector<Node<DIM>*>& rNodes, std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours);
+    void CalculateBoundaryNodePairs(std::vector<Node<DIM>*>& rNodes, std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs);
 
     /**
      * A method pulled out of CalculateNodePairs methods that adds all pairs of nodes from neighbouring boxes of the box with index boxIndex.
      *
      * @param boxIndex the box to add neighbours to.
      * @param rNodePairs the return value, a set of pairs of nodes
-     * @param rNodeNeighbours the other return value, the neighbours of each node.
      */
-    void AddPairsFromBox(unsigned boxIndex, std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours);
+    void AddPairsFromBox(unsigned boxIndex, std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs);
 
     /**
      * Calculate how many cells lie in each strip / face of boxes, used in load balancing

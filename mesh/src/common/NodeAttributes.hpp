@@ -60,6 +60,12 @@ private:
     /** The radius associated with the Node */
     double mRadius;
 
+    /** Vector of indices corresponding to neighbouring nodes. */
+    std::vector<unsigned> mNeighbourIndices;
+
+    /** A bool indicating whether the neighbours of this node have been calculated yet. */
+    bool mNeighboursSetUp;
+
     /** Whether the node represents a particle or not: Used for NodeBasedCellPopulationWithParticles */
     bool mIsParticle;
 
@@ -78,6 +84,8 @@ private:
         archive & mAttributes;
         archive & mRegion;
         archive & mRadius;
+        archive & mNeighbourIndices;
+        archive & mNeighboursSetUp;
         archive & mIsParticle;
 
         for (unsigned d = 0; d < SPACE_DIM; d++)
@@ -137,6 +145,41 @@ public:
      * Set mAppliedForce to a zero vector.
      */
     void ClearAppliedForce();
+
+    /**
+     * Add a neighbour to this node's vector of indices.
+     */
+    void AddNeighbour(unsigned index);
+
+    /**
+     * Clear this node's vector of neighbour indices.
+     */
+    void ClearNeighbours();
+
+    /**
+     * Remove duplicates from the vector of node neighbour indices.
+     */
+    void RemoveDuplicateNeighbours();
+
+    /**
+     * Check whether the node neighbours collection is empty.
+     */
+    bool NeighboursIsEmpty();
+
+    /**
+    * Sets a flag to indicate that the neighbours of this node have/have not been updated.
+    */
+    void SetNeighboursSetUp(bool flag);
+
+    /**
+    * Returns a flag to indicate that the neighbours of this node have/have not been updated.
+    */
+    bool GetNeighboursSetUp();
+
+    /**
+     * @return this node's vector of neighbour indices.
+    */
+    std::vector<unsigned>& rGetNeighbours();
 
     /**
      * Get whether this node is a particle, or not.
