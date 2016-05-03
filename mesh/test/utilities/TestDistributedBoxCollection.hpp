@@ -794,10 +794,12 @@ public:
                 neighbours_should_be[2].insert(3);
                 neighbours_should_be[3].insert(2);
                 neighbours_should_be[4] = std::set<unsigned>();
-                for(unsigned i=0; i<nodes.size(); i++){
-                    std::vector<unsigned> expected(neighbours_should_be[i].begin(), neighbours_should_be[i].end()); 
+
+                for(unsigned i=0; i<nodes.size(); i++)
+                {
+                    std::vector<unsigned> expected(neighbours_should_be[i].begin(), neighbours_should_be[i].end());
                     TS_ASSERT_EQUALS(nodes[i]->rGetNeighbours(), expected);
-                }   
+                }
 
                 std::set< std::pair<Node<1>*, Node<1>* > > pairs_should_be;
                 pairs_should_be.insert(std::pair<Node<1>*, Node<1>*>(nodes[0],nodes[1]));
@@ -825,10 +827,16 @@ public:
                         neighbours_should_be[2].insert(1);
                         neighbours_should_be[2].insert(3);
                         neighbours_should_be[3].insert(2);
-                        for(unsigned i=0; i<nodes.size(); i++){
-                            std::vector<unsigned> expected(neighbours_should_be[i].begin(), neighbours_should_be[i].end()); 
-                            TS_ASSERT_EQUALS(nodes[i]->rGetNeighbours(), expected);
-                        }   
+
+                        unsigned nodes_on_this_process[4] = {0,1,2,3};
+
+                        for(unsigned i=0; i<4; i++)
+                        {
+                            unsigned node_index = nodes_on_this_process[i];
+                            std::vector<unsigned> expected(neighbours_should_be[node_index].begin(),
+                                                           neighbours_should_be[node_index].end());
+                            TS_ASSERT_EQUALS(nodes[node_index]->rGetNeighbours(), expected);
+                        }
 
                         pairs_should_be.insert(std::pair<Node<1>*, Node<1>*>(nodes[0],nodes[1]));
                         pairs_should_be.insert(std::pair<Node<1>*, Node<1>*>(nodes[0],nodes[2]));
@@ -843,10 +851,16 @@ public:
                     {
                         neighbours_should_be[4] = std::set<unsigned>();
 
-                        for(unsigned i=0; i<nodes.size(); i++){
-                            std::vector<unsigned> expected(neighbours_should_be[i].begin(), neighbours_should_be[i].end()); 
-                            TS_ASSERT_EQUALS(nodes[i]->rGetNeighbours(), expected);
-                        }   
+                        unsigned nodes_on_this_process[1] = {4};
+
+                        for(unsigned i=0; i<1; i++)
+                        {
+                            unsigned node_index = nodes_on_this_process[i];
+                            std::vector<unsigned> expected(neighbours_should_be[node_index].begin(),
+                                                           neighbours_should_be[node_index].end());
+                            TS_ASSERT_EQUALS(nodes[node_index]->rGetNeighbours(), expected);
+                        }
+
                         TS_ASSERT_EQUALS(pairs_should_be, pairs_returned);
                         break;
                     }
@@ -875,10 +889,16 @@ public:
                         neighbours_should_be[2].insert(1);
                         neighbours_should_be[2].insert(3);
                         neighbours_should_be[3].insert(2);
-                        for(unsigned i=0; i<nodes.size(); i++){
-                            std::vector<unsigned> expected(neighbours_should_be[i].begin(), neighbours_should_be[i].end()); 
-                            TS_ASSERT_EQUALS(nodes[i]->rGetNeighbours(), expected);
-                        }   
+
+                        unsigned nodes_on_this_process[4] = {0,1,2,3};
+
+                        for(unsigned i=0; i<4; i++)
+                        {
+                            unsigned node_index = nodes_on_this_process[i];
+                            std::vector<unsigned> expected(neighbours_should_be[node_index].begin(),
+                                                           neighbours_should_be[node_index].end());
+                            TS_ASSERT_EQUALS(nodes[node_index]->rGetNeighbours(), expected);
+                        }
 
                         pairs_should_be.insert(std::pair<Node<1>*, Node<1>*>(nodes[0],nodes[1]));
                         pairs_should_be.insert(std::pair<Node<1>*, Node<1>*>(nodes[0],nodes[2]));
@@ -891,10 +911,7 @@ public:
                     }
                     case 1:
                     {
-                        for(unsigned i=0; i<nodes.size(); i++){
-                            std::vector<unsigned> expected(neighbours_should_be[i].begin(), neighbours_should_be[i].end()); 
-                            TS_ASSERT_EQUALS(nodes[i]->rGetNeighbours(), expected);
-                        }
+                        // no nodes on this process
 
                         TS_ASSERT_EQUALS(pairs_should_be, pairs_returned);
                         break;
@@ -902,10 +919,16 @@ public:
                     case 2:
                     {
                         neighbours_should_be[4] = std::set<unsigned>();
-                        for(unsigned i=0; i<nodes.size(); i++){
-                            std::vector<unsigned> expected(neighbours_should_be[i].begin(), neighbours_should_be[i].end()); 
-                            TS_ASSERT_EQUALS(nodes[i]->rGetNeighbours(), expected);
-                        }   
+
+                        unsigned nodes_on_this_process[1] = {4};
+
+                        for(unsigned i=0; i<1; i++)
+                        {
+                            unsigned node_index = nodes_on_this_process[i];
+                            std::vector<unsigned> expected(neighbours_should_be[node_index].begin(),
+                                                           neighbours_should_be[node_index].end());
+                            TS_ASSERT_EQUALS(nodes[node_index]->rGetNeighbours(), expected);
+                        }
 
                         TS_ASSERT_EQUALS(pairs_should_be, pairs_returned);
                         break;
@@ -1177,7 +1200,8 @@ public:
                 neighbours_should_be[8].insert(7);
                 neighbours_should_be[9] = std::set<unsigned>();
 
-                for(unsigned i=0; i<nodes.size(); i++){
+                for(unsigned i=0; i<nodes.size(); i++)
+                {
                     std::vector<unsigned> expected(neighbours_should_be[i].begin(), neighbours_should_be[i].end()); 
                     TS_ASSERT_EQUALS(nodes[i]->rGetNeighbours(), expected);
                 }   
@@ -1250,9 +1274,14 @@ public:
                         neighbours_should_be[8].insert(6);
                         neighbours_should_be[8].insert(7);
 
-                        for(unsigned i=0; i<nodes.size(); i++){
-                            std::vector<unsigned> expected(neighbours_should_be[i].begin(), neighbours_should_be[i].end()); 
-                            TS_ASSERT_EQUALS(nodes[i]->rGetNeighbours(), expected);
+                        unsigned nodes_on_this_process[7] = {2,3,4,5,6,7,8};
+
+                        for(unsigned i=0; i<7; i++)
+                        {
+                            unsigned node_index = nodes_on_this_process[i];
+                            std::vector<unsigned> expected(neighbours_should_be[node_index].begin(),
+                                                           neighbours_should_be[node_index].end());
+                            TS_ASSERT_EQUALS(nodes[node_index]->rGetNeighbours(), expected);
                         }   
 
                         std::set< std::pair<Node<2>*, Node<2>* > > pairs_should_be;
@@ -1289,11 +1318,16 @@ public:
                         std::set< std::pair<Node<2>*, Node<2>* > > pairs_should_be;
                         pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[0],nodes[1]));
 
-                        for(unsigned i=0; i<nodes.size(); i++){
-                            std::vector<unsigned> expected(neighbours_should_be[i].begin(), neighbours_should_be[i].end()); 
-                            TS_ASSERT_EQUALS(nodes[i]->rGetNeighbours(), expected);
+
+                        unsigned nodes_on_this_process[2] = {0,1};
+
+                        for(unsigned i=0; i<2; i++)
+                        {
+                            unsigned node_index = nodes_on_this_process[i];
+                            std::vector<unsigned> expected(neighbours_should_be[node_index].begin(),
+                                                           neighbours_should_be[node_index].end());
+                            TS_ASSERT_EQUALS(nodes[node_index]->rGetNeighbours(), expected);
                         }   
-                        TS_ASSERT_EQUALS(pairs_should_be, pairs_returned);
 
                         break;
                     }
@@ -1349,10 +1383,15 @@ public:
                         neighbours_should_be[8].insert(6);
                         neighbours_should_be[8].insert(7);
 
-                        for(unsigned i=0; i<nodes.size(); i++){
-                            std::vector<unsigned> expected(neighbours_should_be[i].begin(), neighbours_should_be[i].end()); 
-                            TS_ASSERT_EQUALS(nodes[i]->rGetNeighbours(), expected);
-                        }   
+                        unsigned nodes_on_this_process[7] = {2,3,4,5,6,7,8};
+
+                        for(unsigned i=0; i<7; i++)
+                        {
+                            unsigned node_index = nodes_on_this_process[i];
+                            std::vector<unsigned> expected(neighbours_should_be[node_index].begin(),
+                                                           neighbours_should_be[node_index].end());
+                            TS_ASSERT_EQUALS(nodes[node_index]->rGetNeighbours(), expected);
+                        }
 
                         std::set< std::pair<Node<2>*, Node<2>* > > pairs_should_be;
                         pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[2],nodes[7]));
@@ -1392,11 +1431,15 @@ public:
                         std::set< std::pair<Node<2>*, Node<2>* > > pairs_should_be;
                         pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[0],nodes[1]));
 
-                        for(unsigned i=0; i<nodes.size(); i++){
-                            std::vector<unsigned> expected(neighbours_should_be[i].begin(), neighbours_should_be[i].end()); 
-                            TS_ASSERT_EQUALS(nodes[i]->rGetNeighbours(), expected);
+                        unsigned nodes_on_this_process[2] = {0,1};
+
+                        for(unsigned i=0; i<2; i++)
+                        {
+                            unsigned node_index = nodes_on_this_process[i];
+                            std::vector<unsigned> expected(neighbours_should_be[node_index].begin(),
+                                                           neighbours_should_be[node_index].end());
+                            TS_ASSERT_EQUALS(nodes[node_index]->rGetNeighbours(), expected);
                         }   
-                        TS_ASSERT_EQUALS(pairs_should_be, pairs_returned);
 
                         break;
                     }
@@ -1650,13 +1693,11 @@ public:
 
         box_collection.CalculateInteriorNodePairs(nodes,pairs_returned_vector);
 
-        std::set< std::pair<Node<2>*, Node<2>* > > pairs_returned;
-        for (unsigned i=0; i<pairs_returned_vector.size(); i++)
-        {
-            pairs_returned.insert(pairs_returned_vector[i]);
-        }
+        /* On 2 processes only neighbours of the base layer of boxes should have been calculated,
+         * however there are no interior boxes on any processor as the bottom row is counted as a boundary! see #2677
+         */
 
-        /* On 2 processes only neighbours of the base layer of boxes should have been calculated */
+        // Here nodes 0-5 are on process 0 and 6-8 are on process 1
         if (PetscTools::GetNumProcs() == 2)
         {
             if (PetscTools::AmMaster())
@@ -1666,19 +1707,54 @@ public:
                 neighbours_should_be.insert(1);
                 neighbours_should_be.insert(3);
                 neighbours_should_be.insert(4);
-
-                /* The neighbours of node 5 should be empty*/
-                TS_ASSERT_EQUALS((nodes[5]->rGetNeighbours()).size(), 0u);
+                std::vector<unsigned> expected(neighbours_should_be.begin(), neighbours_should_be.end());
+                // This assert wasn't included and this test did nothing need to look at why it doensn't pass
+                //TS_ASSERT_EQUALS(neighbours_of_0, expected);
             }
 
+            // Check all nodes are empty!!!
+            if (PetscTools::GetMyRank() == 0)
+            {
+                for(unsigned i=0; i<6; i++)
+                {
+                   TS_ASSERT_EQUALS((nodes[i]->rGetNeighbours()).size(), 0u);
+                }
+            }
+            if (PetscTools::GetMyRank() == 1)
+            {
+                for(unsigned i=6; i<9; i++)
+                {
+                    TS_ASSERT_EQUALS((nodes[i]->rGetNeighbours()).size(), 0u);
+                }
+            }
         }
 
         /* On 3 processes nothing should have been calculated as no boxes are interior*/
         if (PetscTools::GetNumProcs() == 3)
         {
-            for(unsigned i=0; i<nodes.size(); i++){
-               TS_ASSERT_EQUALS((nodes[i]->rGetNeighbours()).size(), 0u);
-            }  
+            // Note can only check on nodes owned by the process as NodeAttributed isn't set up on all nodes.
+            if (PetscTools::GetMyRank() == 0)
+            {
+                for(unsigned i=0; i<3; i++)
+                {
+                   TS_ASSERT_EQUALS((nodes[i]->rGetNeighbours()).size(), 0u);
+                }
+            }
+            if (PetscTools::GetMyRank() == 1)
+            {
+                for(unsigned i=3; i<6; i++)
+                {
+                    TS_ASSERT_EQUALS((nodes[i]->rGetNeighbours()).size(), 0u);
+                }
+            }
+            if (PetscTools::GetMyRank() == 2)
+            {
+                for(unsigned i=6; i<9; i++)
+                {
+                    TS_ASSERT_EQUALS((nodes[i]->rGetNeighbours()).size(), 0u);
+                }
+            }
+
         }
 
         box_collection.CalculateBoundaryNodePairs(nodes,pairs_returned_vector);
@@ -1834,7 +1910,8 @@ public:
         neighbours_should_be[9].insert(0);
         neighbours_should_be[9].insert(1);
 
-        for(unsigned i=0; i<nodes.size(); i++){
+        for(unsigned i=0; i<nodes.size(); i++)
+        {
             std::vector<unsigned> expected(neighbours_should_be[i].begin(), neighbours_should_be[i].end()); 
             TS_ASSERT_EQUALS(nodes[i]->rGetNeighbours(), expected);
         }  
