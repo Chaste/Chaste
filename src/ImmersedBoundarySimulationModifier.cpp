@@ -88,7 +88,7 @@ void ImmersedBoundarySimulationModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCell
     // We need to update node neighbours occasionally, but not necessarily each timestep
     if(SimulationTime::Instance()->GetTimeStepsElapsed() % mNodeNeighbourUpdateFrequency == 0)
     {
-        mpBoxCollection->CalculateNodePairs(mpMesh->rGetNodes(), mNodePairs, mNodeNeighbours);
+        mpBoxCollection->CalculateNodePairs(mpMesh->rGetNodes(), mNodePairs);
     }
 
     // This will solve the fluid problem for all timesteps after the first, which is handled in SetupSolve()
