@@ -109,7 +109,7 @@ public:
         double dt = 0.01;
         simulator.SetDt(dt);
         simulator.SetSamplingTimestepMultiple(1000);
-        simulator.SetEndTime(51 * dt);
+        simulator.SetEndTime(10000 * dt);
         simulator.Solve();
 
         PRINT_VARIABLE(timer.GetElapsedTime());
@@ -169,7 +169,7 @@ public:
         double dt = 0.01;
         simulator.SetDt(dt);
         simulator.SetSamplingTimestepMultiple(1000);
-        simulator.SetEndTime(51 * dt);
+        simulator.SetEndTime(10000 * dt);
         simulator.Solve();
 
         PRINT_VARIABLE(timer.GetElapsedTime());
@@ -229,7 +229,7 @@ public:
         double dt = 0.01;
         simulator.SetDt(dt);
         simulator.SetSamplingTimestepMultiple(1000);
-        simulator.SetEndTime(51 * dt);
+        simulator.SetEndTime(10000 * dt);
         simulator.Solve();
 
         PRINT_VARIABLE(timer.GetElapsedTime());
