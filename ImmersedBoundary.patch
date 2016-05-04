@@ -1,162 +1,19 @@
 Index: CMakeLists.txt
 ===================================================================
---- CMakeLists.txt	(revision 26496)
+--- CMakeLists.txt	(revision 26526)
 +++ CMakeLists.txt	(working copy)
-@@ -211,13 +211,13 @@
- 
- #find Boost
- add_definitions( -DBOOST_ALL_NO_LIB )
--set( Boost_USE_STATIC_RUNTIME ON) 
-+set( Boost_USE_STATIC_RUNTIME ON)
- if(BUILD_SHARED_LIBS)
--	set( Boost_USE_STATIC_LIBS OFF) 
-+	set( Boost_USE_STATIC_LIBS OFF)
+@@ -217,7 +217,7 @@
  else()
--	set( Boost_USE_STATIC_LIBS ON) 
-+	set( Boost_USE_STATIC_LIBS ON)
+ 	set( Boost_USE_STATIC_LIBS ON) 
  endif()
 -find_package(Boost COMPONENTS filesystem system serialization REQUIRED)
 +find_package(Boost COMPONENTS filesystem system serialization program_options REQUIRED)
  list(APPEND Chaste_INCLUDES "${Boost_INCLUDE_DIR}")
  list(APPEND Chaste_LINK_LIBRARIES "${Boost_LIBRARIES}")
  
-@@ -236,7 +236,7 @@
-     PATH_SUFFIXES bin Bin
-     DOC "HDF5 Wrapper compiler.  Used only to detect HDF5 compile flags." )
- find_program( HDF5_CXX_COMPILER_EXECUTABLE
--    NAMES h5pc++ h5c++ 
-+    NAMES h5pc++ h5c++
-     HINTS ENV HDF5_ROOT
-     PATH_SUFFIXES bin Bin
-     DOC "HDF5 C++ Wrapper compiler.  Used only to detect HDF5 compile flags." )
-@@ -247,12 +247,12 @@
- list(APPEND Chaste_INCLUDES "${HDF5_INCLUDE_DIRS}")
- list(APPEND Chaste_LINK_LIBRARIES "${HDF5_LIBRARIES}")
- 
--# put petsc includes after hdf5 includes or else the hdf5 headers 
-+# put petsc includes after hdf5 includes or else the hdf5 headers
- # in the petsc include dir will clobber those chosen on FindHdf5.cmake
- list(APPEND Chaste_INCLUDES "${PETSC_INCLUDES}")
- 
- 
--#Locate MPI 
-+#Locate MPI
- if (PETSC_COMPILER)
-     string(REPLACE mpicc mpicxx MPI_CXX_COMPILER ${PETSC_COMPILER})
- endif()
-@@ -285,7 +285,7 @@
- 
- #find ParMETIS and METIS
- if (Chaste_USE_PETSC_PARMETIS)
--    set(PARMETIS_ROOT "${PETSC_DIR}/${PETSC_ARCH}" 
-+    set(PARMETIS_ROOT "${PETSC_DIR}/${PETSC_ARCH}"
-                       "${PETSC_DIR}/externalpackages"
-                       )
- endif()
-@@ -388,7 +388,7 @@
- # setup test pack and component testing targets #
- #################################################
- 
--if (Chaste_ENABLE_TESTING) 
-+if (Chaste_ENABLE_TESTING)
-     foreach(type ${TestPackTypes})
-         add_custom_target(${type})
-     endforeach()
-@@ -487,9 +487,9 @@
- 
- export(PACKAGE Chaste)
- 
--export(TARGETS ${Chaste_ALL_LIBRARIES} 
-+export(TARGETS ${Chaste_ALL_LIBRARIES}
-     FILE "${Chaste_BINARY_DIR}/ChasteTargets.cmake"
--    #added in 2.8.12, need this?    EXPORT_LINK_INTERFACE_LIBRARIES 
-+    #added in 2.8.12, need this?    EXPORT_LINK_INTERFACE_LIBRARIES
-     )
- 
- # Configure file for install dir
-@@ -514,7 +514,7 @@
- configure_file(${Chaste_SOURCE_DIR}/cmake/Config/ChasteConfig.cmake.in
-     "${Chaste_BINARY_DIR}/ChasteConfig.cmake" @ONLY)
- 
--file(COPY ${Chaste_SOURCE_DIR}/cmake/Modules/ChasteMacros.cmake 
-+file(COPY ${Chaste_SOURCE_DIR}/cmake/Modules/ChasteMacros.cmake
-     DESTINATION ${Chaste_BINARY_DIR}/cmake/Modules)
- 
- file(COPY ${Chaste_SOURCE_DIR}/cmake/Modules/ChasteRunTestAndPostProcess.cmake
-@@ -552,7 +552,7 @@
-     COMPONENT Python)
- 
- # libraries
--install(EXPORT chaste-targets 
-+install(EXPORT chaste-targets
-         DESTINATION lib/chaste
-         FILE ChasteTargets.cmake
-         #EXPORT_LINK_INTERFACE_LIBRARIES
-@@ -575,7 +575,7 @@
- 		${LCOV_PATH} --directory . --zerocounters
- 
- 		# Run tests
--        COMMAND ${CTEST_COMMAND} "-L" "Continuous|Parallel" "--output-on-failure" 
-+        COMMAND ${CTEST_COMMAND} "-L" "Continuous|Parallel" "--output-on-failure"
- 
- 		# Capturing lcov counters and generating report
- 		COMMAND ${LCOV_PATH} --directory . --capture --output-file ${_outputname}.info
-@@ -601,7 +601,7 @@
- ####################
- 
- add_custom_target(doxygen
--    COMMAND ${PYTHON_EXECUTABLE} "${Chaste_SOURCE_DIR}/cmake/run-doxygen.py" "${Chaste_SOURCE_DIR}" 
-+    COMMAND ${PYTHON_EXECUTABLE} "${Chaste_SOURCE_DIR}/cmake/run-doxygen.py" "${Chaste_SOURCE_DIR}"
-                                 "${Chaste_BINARY_DIR}/doxygen" "${Chaste_REVISION}"
-     WORKING_DIRECTORY ${Chaste_BINARY_DIR}
-     COMMENT "Generating Doxygen documentation"
-@@ -608,7 +608,7 @@
-     VERBATIM)
- 
- add_custom_target(doxygen_coverage
--    COMMAND ${PYTHON_EXECUTABLE} "${Chaste_SOURCE_DIR}/cmake/run-doxygen.py" "${Chaste_SOURCE_DIR}" 
-+    COMMAND ${PYTHON_EXECUTABLE} "${Chaste_SOURCE_DIR}/cmake/run-doxygen.py" "${Chaste_SOURCE_DIR}"
-                                 "${Chaste_BINARY_DIR}/doxygen_coverage" "${Chaste_REVISION}" "True"
-     WORKING_DIRECTORY ${Chaste_BINARY_DIR}
-     COMMENT "Checking Doxygen coverage"
-@@ -621,7 +621,7 @@
- if (Chaste_MEMORY_TESTING)
-     set(CTEST_COMMAND ctest)
-     add_custom_target(memtest
--        COMMAND ${CTEST_COMMAND} "-L" Continuous "--output-on-failure" 
-+        COMMAND ${CTEST_COMMAND} "-L" Continuous "--output-on-failure"
-         COMMAND ${PYTHON_EXECUTABLE} "${Chaste_SOURCE_DIR}/cmake/process_valgrind_output.py" "${Chaste_MEMORY_TESTING_OUTPUT_DIR}"
-         DEPENDS Continuous
-         WORKING_DIRECTORY ${Chaste_BINARY_DIR}
-@@ -638,7 +638,7 @@
-     else()
-         set(extension gmon)
-     endif()
--    
-+
-     set(CTEST_COMMAND ctest)
-     add_custom_target(profile
-         COMMAND ${CTEST_COMMAND} "-L" "Profile|ProfileAssembly" "--output-on-failure"
-@@ -658,11 +658,11 @@
- set(CPACK_PACKAGE_CONTACT "Chaste Team <chaste-admin@maillist.ox.ac.uk>")
- set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Chaste (Cancer, Heart and Soft Tissue Environment).")
- set(CPACK_PACKAGE_DESCRIPTION  "
-- Chaste is a general purpose simulation package aimed at multi-scale, 
-- computationally demanding problems arising in biology and physiology. 
-- Current functionality includes tissue and cell level electrophysiology, 
-- discrete tissue modelling, and soft tissue modelling. The package is 
-- being developed by a team mainly based in the Computational Biology Group 
-+ Chaste is a general purpose simulation package aimed at multi-scale,
-+ computationally demanding problems arising in biology and physiology.
-+ Current functionality includes tissue and cell level electrophysiology,
-+ discrete tissue modelling, and soft tissue modelling. The package is
-+ being developed by a team mainly based in the Computational Biology Group
-  at Oxford University Computing Laboratory, and development draws on expertise
-  from software engineering, high performance computing, mathematical modelling
-  and scientific computing.
 Index: cell_based/src/simulation/OffLatticeSimulation.cpp
 ===================================================================
---- cell_based/src/simulation/OffLatticeSimulation.cpp	(revision 26496)
+--- cell_based/src/simulation/OffLatticeSimulation.cpp	(revision 26526)
 +++ cell_based/src/simulation/OffLatticeSimulation.cpp	(working copy)
 @@ -77,7 +77,7 @@
          // All classes derived from AbstractOffLatticeCellPopulation are covered by the above (except user-derived classes),
@@ -169,7 +26,7 @@ Index: cell_based/src/simulation/OffLatticeSimulation.cpp
  
 Index: global/src/ExecutableSupport.cpp
 ===================================================================
---- global/src/ExecutableSupport.cpp	(revision 26496)
+--- global/src/ExecutableSupport.cpp	(revision 26526)
 +++ global/src/ExecutableSupport.cpp	(working copy)
 @@ -411,7 +411,7 @@
  void ExecutableSupport::StandardStartup(int* pArgc, char*** pArgv)
@@ -182,52 +39,47 @@ Index: global/src/ExecutableSupport.cpp
  
 Index: mesh/src/utilities/BoxCollection.cpp
 ===================================================================
---- mesh/src/utilities/BoxCollection.cpp	(revision 26496)
+--- mesh/src/utilities/BoxCollection.cpp	(revision 26526)
 +++ mesh/src/utilities/BoxCollection.cpp	(working copy)
-@@ -693,7 +693,7 @@
-                                             std::map<unsigned, std::set<unsigned> >& rNodeNeighbours)
- {
-     rNodePairs.clear();
--    rNodeNeighbours.clear();
-+//    rNodeNeighbours.clear();
- 
-     // Ensure all boxes are empty
-     EmptyBoxes();
-@@ -701,7 +701,7 @@
+@@ -699,7 +699,7 @@
      // Create an empty set of neighbours for each node, and add each node to its correct box
      for (unsigned node_index = 0; node_index < rNodes.size(); node_index++)
      {
--        rNodeNeighbours[node_index] = std::set<unsigned>();
-+//        rNodeNeighbours[node_index] = std::set<unsigned>();
+-        rNodes[node_index]->ClearNeighbours();
++//        rNodes[node_index]->ClearNeighbours();
  
          unsigned box_index = CalculateContainingBox(rNodes[node_index]);
          mBoxes[box_index].AddNode(rNodes[node_index]);
-@@ -710,7 +710,7 @@
-     for (unsigned i = 0; i < rNodes.size(); i++)
-     {
-         Node<DIM>* this_node = rNodes[i];
--        unsigned node_index = this_node->GetIndex();
-+//        unsigned node_index = this_node->GetIndex();
- 
-         // Get the box containing this node
-         unsigned this_node_box_index = CalculateContainingBox(this_node);
-@@ -738,15 +738,15 @@
+@@ -736,24 +736,24 @@
                      if (other_node_index > this_node->GetIndex())
                      {
                          rNodePairs.push_back(std::pair<Node<DIM>*, Node<DIM>*>(this_node, (*node_iter)));
--                        rNodeNeighbours[node_index].insert(other_node_index);
--                        rNodeNeighbours[other_node_index].insert(node_index);
-+//                        rNodeNeighbours[node_index].insert(other_node_index);
-+//                        rNodeNeighbours[other_node_index].insert(node_index);
+-                        this_node->AddNeighbour(other_node_index);
+-                        (*node_iter)->AddNeighbour(node_index);
++//                        this_node->AddNeighbour(other_node_index);
++//                        (*node_iter)->AddNeighbour(node_index);
                      }
                  }
                  else
                  {
                      rNodePairs.push_back(std::pair<Node<DIM>*, Node<DIM>*>(this_node, (*node_iter)));
--                    rNodeNeighbours[node_index].insert(other_node_index);
--                    rNodeNeighbours[other_node_index].insert(node_index);
-+//                    rNodeNeighbours[node_index].insert(other_node_index);
-+//                    rNodeNeighbours[other_node_index].insert(node_index);
+-                    this_node->AddNeighbour(other_node_index);
+-                    (*node_iter)->AddNeighbour(node_index);
++//                    this_node->AddNeighbour(other_node_index);
++//                    (*node_iter)->AddNeighbour(node_index);
                  }
              }
          }
+     }
+ 
+-    for (unsigned i = 0; i < rNodes.size(); i++)
+-    {
+-        rNodes[i]->RemoveDuplicateNeighbours();
+-    }
++//    for (unsigned i = 0; i < rNodes.size(); i++)
++//    {
++//        rNodes[i]->RemoveDuplicateNeighbours();
++//    }
+ }
+ 
+ /////////////////////////////////////////////////////////////////////////////
