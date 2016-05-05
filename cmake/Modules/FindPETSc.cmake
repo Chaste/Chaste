@@ -71,7 +71,9 @@ endfunction ()
 
 set(homebrew_dir /usr/local/Cellar/petsc)
 file(GLOB homebrew_dirs ${homebrew_dir}/*)
+
 set(debian_dir /usr/lib/petscdir)
+file(GLOB ubuntu_dirs ${debian_dir}/*/*)
 file(GLOB debian_dirs ${debian_dir}/*)
 
 find_path (PETSC_DIR include/petsc.h
@@ -82,6 +84,8 @@ find_path (PETSC_DIR include/petsc.h
   PATHS
   # Debian paths
   ${debian_dirs}
+  # Ubuntu paths
+  ${ubuntu_dirs}
   # MacPorts path
   /opt/local/lib/petsc
   # PETSc for Windows
@@ -96,6 +100,7 @@ if (PETSC_DIR AND NOT PETSC_ARCH)
     set (_petsc_arches
     $ENV{PETSC_ARCH}                   # If set, use environment variable first
     c-debug_icl_mkl c-opt_icl_mkl #PETSc for Windows
+    x86_64-linux-gnu-real x86_64-linux-gnu-real-debug 
     linux-gnu-c-debug linux-gnu-c-opt  # Debian defaults
     linux-gnu-debug linux-gnu linux-gnu-opt linux-gnu-profile
     linux-intel-debug linux-intel-opt linux-intel-opt-mkl
@@ -114,8 +119,6 @@ if (PETSC_DIR AND NOT PETSC_ARCH)
   endforeach (arch)
   set (petscconf "NOTFOUND" CACHE INTERNAL "Scratch variable" FORCE)
 endif (PETSC_DIR AND NOT PETSC_ARCH)
-
-
 
 set (petsc_slaves LIBRARIES_SYS LIBRARIES_VEC LIBRARIES_MAT LIBRARIES_DM LIBRARIES_KSP LIBRARIES_SNES LIBRARIES_TS
   INCLUDE_DIR INCLUDE_CONF)
@@ -226,7 +229,7 @@ show :
     else (WIN32)
       set (libname ${name})
     endif (WIN32)
-    find_library (PETSC_LIBRARY_${suffix} NAMES ${libname} cray${libname}_cray_real HINTS ${petsc_lib_dir} NO_DEFAULT_PATH)
+    find_library (PETSC_LIBRARY_${suffix} NAMES ${libname} ${libname}_real ${libname}_complex cray${libname}_cray_real  HINTS ${petsc_lib_dir} NO_DEFAULT_PATH)
     if (NOT PETSC_LIBRARY_${suffix})
         set (libname ${name})
 		find_library (PETSC_LIBRARY_${suffix} NAMES ${libname} HINTS ${petsc_lib_dir} NO_DEFAULT_PATH)
