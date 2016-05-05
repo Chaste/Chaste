@@ -1439,7 +1439,7 @@ public:
                             std::vector<unsigned> expected(neighbours_should_be[node_index].begin(),
                                                            neighbours_should_be[node_index].end());
                             TS_ASSERT_EQUALS(nodes[node_index]->rGetNeighbours(), expected);
-                        }   
+                        }
 
                         break;
                     }

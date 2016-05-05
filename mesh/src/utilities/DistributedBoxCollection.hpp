@@ -74,9 +74,6 @@ private:
     /** Set of Nodes that are halos of adjacent left process, but lie locally */
     std::vector<unsigned> mHaloNodesLeft;
 
-    /** Map of global to local indices of boxes. **/
-    std::map<unsigned, unsigned> mBoxesMapping;
-
     /** Map of global to local indices of halo boxes in mHaloBoxes. **/
     std::map<unsigned, unsigned> mHaloBoxesMapping;
 

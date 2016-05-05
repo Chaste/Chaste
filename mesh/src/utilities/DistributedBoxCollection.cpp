@@ -87,14 +87,14 @@ DistributedBoxCollection<DIM>::DistributedBoxCollection(double boxWidth, c_vecto
         mNumBoxesEachDirection(DIM-1) = PetscTools::GetNumProcs();
     }
 
-    // Make a distributed vectory factory to split the rows of boxes between processes.
+    // Make a distributed vector factory to split the rows of boxes between processes.
     mpDistributedBoxStackFactory = new DistributedVectorFactory(mNumBoxesEachDirection(DIM-1), localRows);
 
     // Calculate how many boxes in a row / face. A useful piece of data in the class.
     mNumBoxesInAFace = 1;
-    for (unsigned i=1; i<DIM; i++)
+    for (unsigned dim=0; dim<DIM-1; dim++)
     {
-        mNumBoxesInAFace *= mNumBoxesEachDirection(i-1);
+        mNumBoxesInAFace *= mNumBoxesEachDirection(dim);
     }
 
     unsigned num_boxes = mNumBoxesInAFace * (mpDistributedBoxStackFactory->GetHigh() - mpDistributedBoxStackFactory->GetLow());
@@ -104,17 +104,14 @@ DistributedBoxCollection<DIM>::DistributedBoxCollection(double boxWidth, c_vecto
 
     /*
      * The location of the Boxes doesn't matter as it isn't actually used so we don't bother to work it out.
-     * The reason it isn't used is because this class works out which box a node lies in without refernece to actual
+     * The reason it isn't used is because this class works out which box a node lies in without reference to actual
      * box locations, only their global index within the collection.
      */
     c_vector<double, 2*DIM> arbitrary_location;
-    for (unsigned i=0; i<num_boxes; i++)
+    for (unsigned local_index=0; local_index<num_boxes; local_index++)
     {
         Box<DIM> new_box(arbitrary_location);
         mBoxes.push_back(new_box);
-
-        unsigned global_index = mMinBoxIndex + i;
-        mBoxesMapping[global_index] = mBoxes.size() - 1;
     }
 
     mNumBoxes = mNumBoxesInAFace * mNumBoxesEachDirection(DIM-1);
