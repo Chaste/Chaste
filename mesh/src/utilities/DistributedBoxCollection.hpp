@@ -198,12 +198,12 @@ public:
     bool GetHaloBoxOwnership(unsigned globalIndex);
 
     /**
-     * Given the (i,j,k) co-ordniates of a box in the collection, calculate its global index.
+     * Given the (i,j,k) grid indices of a box in the collection, calculate its global index.
      *
-     * @param coordinateIndices the co-ordinate indices of the box (across, up, deep)
+     * @param gridIndices the (i,j,k) grid indices of the box
      * @return the global index of the box in the collection.
      */
-    unsigned CalculateGlobalIndex(c_vector<unsigned, DIM> coordinateIndices);
+    unsigned CalculateGlobalIndex(c_vector<unsigned, DIM> gridIndices);
 
     /**
      * @param pNode address of the node
@@ -221,9 +221,9 @@ public:
      * Calculate x,y,z indices of box given its 'global' index.
      *
      * @param globalIndex the global index of the box
-     * @return the co-ordinate indicies (boxes across, boxes up, boxes deep) of a box
+     * @return the grid indices (boxes across, boxes up, boxes deep) of a box
      */
-    c_vector<unsigned, DIM> CalculateCoordinateIndices(unsigned globalIndex);
+    c_vector<unsigned, DIM> CalculateGridIndices(unsigned globalIndex);
 
     /**
      * @param boxIndex the index of the box to return

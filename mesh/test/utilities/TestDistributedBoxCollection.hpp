@@ -284,7 +284,7 @@ public:
             }
         }
 
-        TS_ASSERT_EQUALS(0u, box_collection.CalculateCoordinateIndices(0)[0]);
+        TS_ASSERT_EQUALS(0u, box_collection.CalculateGridIndices(0)[0]);
 
         // The expected number of boxes is 5.
         // However, if there are more processes than required then the top-most processes will be

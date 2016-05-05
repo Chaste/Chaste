@@ -222,20 +222,37 @@ bool DistributedBoxCollection<DIM>::IsInteriorBox(unsigned globalIndex)
 }
 
 template<unsigned DIM>
-unsigned DistributedBoxCollection<DIM>::CalculateGlobalIndex(c_vector<unsigned, DIM> coordinateIndices)
+unsigned DistributedBoxCollection<DIM>::CalculateGlobalIndex(c_vector<unsigned, DIM> gridIndices)
 {
-    unsigned containing_box_index = 0;
-    for (unsigned i=0; i<DIM; i++)
-    {
-        unsigned temp = 1;
-        for (unsigned j=0; j<i; j++)
-        {
-            temp *= mNumBoxesEachDirection(j);
-        }
-        containing_box_index += temp*coordinateIndices[i];
-    }
+    ///\todo #2308 etc. We need to make allowance for periodicity here...
+    unsigned global_index;
 
-    return containing_box_index;
+    switch (DIM)
+    {
+        case 1:
+        {
+            global_index = gridIndices(0);
+            break;
+        }
+        case 2:
+        {
+            global_index = gridIndices(0) +
+                           gridIndices(1) * mNumBoxesEachDirection(0);
+            break;
+        }
+        case 3:
+        {
+            global_index = gridIndices(0) +
+                           gridIndices(1) * mNumBoxesEachDirection(0) +
+                           gridIndices(2) * mNumBoxesEachDirection(0) * mNumBoxesEachDirection(1);
+            break;
+        }
+        default:
+        {
+            NEVER_REACHED;
+        }
+    }
+    return global_index;
 }
 
 template<unsigned DIM>
@@ -290,32 +307,31 @@ unsigned DistributedBoxCollection<DIM>::CalculateContainingBox(c_vector<double, 
 }
 
 template<unsigned DIM>
-c_vector<unsigned, DIM> DistributedBoxCollection<DIM>::CalculateCoordinateIndices(unsigned globalIndex)
+c_vector<unsigned, DIM> DistributedBoxCollection<DIM>::CalculateGridIndices(unsigned globalIndex)
 {
-    c_vector<unsigned, DIM> indices;
+    c_vector<unsigned, DIM> grid_indices;
 
-    switch(DIM)
+    switch (DIM)
     {
         case 1:
         {
-            indices[0]=globalIndex;
+            grid_indices(0) = globalIndex;
             break;
         }
         case 2:
         {
-            unsigned remainder=globalIndex % mNumBoxesEachDirection(0);
-            indices[0]=remainder;
-            indices[1]=(unsigned)(globalIndex/mNumBoxesEachDirection(0));
+            unsigned num_x = mNumBoxesEachDirection(0);
+            grid_indices(0) = globalIndex % num_x;
+            grid_indices(1) = (globalIndex - grid_indices(0)) / num_x;
             break;
         }
-
         case 3:
         {
-            unsigned remainder1=globalIndex % (mNumBoxesEachDirection(0)*mNumBoxesEachDirection(1));
-            unsigned remainder2=remainder1 % mNumBoxesEachDirection(0);
-            indices[0]=remainder2;
-            indices[1]=((globalIndex-indices[0])/mNumBoxesEachDirection(0))%mNumBoxesEachDirection(1);
-            indices[2]=((globalIndex-indices[0]-mNumBoxesEachDirection(0)*indices[1])/(mNumBoxesEachDirection(0)*mNumBoxesEachDirection(1)));
+            unsigned num_x = mNumBoxesEachDirection(0);
+            unsigned num_xy = mNumBoxesEachDirection(0)*mNumBoxesEachDirection(1);
+            grid_indices(0) = globalIndex % num_x;
+            grid_indices(1) = (globalIndex % num_xy - grid_indices(0)) / num_x;
+            grid_indices(2) = globalIndex / num_xy;
             break;
         }
         default:
@@ -324,7 +340,7 @@ c_vector<unsigned, DIM> DistributedBoxCollection<DIM>::CalculateCoordinateIndice
         }
     }
 
-    return indices;
+    return grid_indices;
 }
 
 template<unsigned DIM>
@@ -526,7 +542,7 @@ void DistributedBoxCollection<DIM>::SetupLocalBoxesHalfOnly()
                     bool right = (global_index%mNumBoxesEachDirection(0) == mNumBoxesEachDirection(0)-1);
                     bool top = !(global_index < mNumBoxesEachDirection(0)*mNumBoxesEachDirection(1) - mNumBoxesEachDirection(0));
                     bool bottom = (global_index < mNumBoxesEachDirection(0));
-                    bool bottom_proc = (CalculateCoordinateIndices(global_index)[1] == mpDistributedBoxStackFactory->GetLow());
+                    bool bottom_proc = (CalculateGridIndices(global_index)[1] == mpDistributedBoxStackFactory->GetLow());
 
                     // Insert the current box
                     local_boxes.insert(global_index);
@@ -602,8 +618,8 @@ void DistributedBoxCollection<DIM>::SetupLocalBoxesHalfOnly()
                     bool right = (global_index % mNumBoxesEachDirection(0) == mNumBoxesEachDirection(0) - 1);
                     bool front = (global_index < num_boxes_xy);
                     bool back = !(global_index < num_boxes_xy*mNumBoxesEachDirection(2) - num_boxes_xy);
-                    bool proc_front = (CalculateCoordinateIndices(global_index)[2] == mpDistributedBoxStackFactory->GetLow());
-                    bool proc_back = (CalculateCoordinateIndices(global_index)[2] == mpDistributedBoxStackFactory->GetHigh()-1);
+                    bool proc_front = (CalculateGridIndices(global_index)[2] == mpDistributedBoxStackFactory->GetLow());
+                    bool proc_back = (CalculateGridIndices(global_index)[2] == mpDistributedBoxStackFactory->GetHigh()-1);
 
                     // Insert the current box
                     local_boxes.insert(global_index);
@@ -1294,7 +1310,7 @@ std::vector<int> DistributedBoxCollection<DIM>::CalculateNumberOfNodesInEachStri
 
     for (unsigned global_index=mMinBoxIndex; global_index<=mMaxBoxIndex; global_index++)
     {
-        c_vector<unsigned, DIM> coords = CalculateCoordinateIndices(global_index);
+        c_vector<unsigned, DIM> coords = CalculateGridIndices(global_index);
         unsigned location_in_vector = coords[DIM-1] - mpDistributedBoxStackFactory->GetLow();
         unsigned local_index = global_index - mMinBoxIndex;
         cell_numbers[location_in_vector] += mBoxes[local_index].rGetNodesContained().size();
