@@ -1691,17 +1691,17 @@ public:
          */
         H5O_info_t data_info;
         H5Oget_info(dset, &data_info);
-        TS_ASSERT_EQUALS(data_info.addr, 0x10000); // 64 KB
+        TS_ASSERT_EQUALS(data_info.addr, 0x10000u); // 64 KB
         H5Dclose(dset);
 
         dset = H5Dopen(h5_file, "Data_Unlimited", dapl);
         H5Oget_info(dset, &data_info);
-        TS_ASSERT_EQUALS(data_info.addr, 19300352); // About 18.4 MB
+        TS_ASSERT_EQUALS(data_info.addr, 19300352u); // About 18.4 MB
         H5Dclose(dset);
 
         dset = H5Dopen(h5_file, "UpstrokeTimeMap_0", dapl);
         H5Oget_info(dset, &data_info);
-        TS_ASSERT_EQUALS(data_info.addr, 19448832); // About 18.5 MB
+        TS_ASSERT_EQUALS(data_info.addr, 19448832u); // About 18.5 MB
         // And chunk dims for this one
         hsize_t expected_dims_upstroke[3] = {1, 2236, 1};
         dcpl = H5Dget_create_plist(dset); // get dataset creation property list
