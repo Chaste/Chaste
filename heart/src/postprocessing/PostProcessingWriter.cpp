@@ -52,11 +52,13 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::PostProcessingWriter(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>& rMesh,
                                                                    const FileFinder& rDirectory,
                                                                    const std::string& rHdf5FileName,
-                                                                   const std::string& rVoltageName)
+                                                                   const std::string& rVoltageName,
+                                                                   hsize_t hdf5DataWriterChunkSize)
         : mDirectory(rDirectory),
           mHdf5File(rHdf5FileName),
           mVoltageName(rVoltageName),
-          mrMesh(rMesh)
+          mrMesh(rMesh),
+          mHdf5DataWriterChunkSize(hdf5DataWriterChunkSize)
 {
     mLo = mrMesh.GetDistributedVectorFactory()->GetLow();
     mHi = mrMesh.GetDistributedVectorFactory()->GetHigh();
@@ -187,6 +189,14 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteOutputDataToHdf5(const s
         apd_id = writer.DefineVariable(rDatasetName, rDatasetUnit);
         writer.DefineFixedDimension(mrMesh.GetNumNodes());
         writer.DefineUnlimitedDimension(rUnlimitedVariableName, rUnlimitedVariableUnit);
+        if (mHdf5DataWriterChunkSize>0u)
+        {
+            /* Pass target chunk size through to writer. (We don't do the
+             * alignment one as well because that can only be done for a new
+             * file and PostProcessingWriter can only add to an existing file.)
+             */
+            writer.SetTargetChunkSize(mHdf5DataWriterChunkSize);
+        }
         writer.EndDefineMode();
     }
     else

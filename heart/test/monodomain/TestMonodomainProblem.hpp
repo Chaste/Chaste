@@ -1638,6 +1638,81 @@ public:
                                                 "heart/test/data/MonodomainWithWriterCache", "MonodomainLR91_1d_with_cache_incomplete", false,
                                                 1e-4));
     }
+
+    void TestMonodomainProblemWithTargetChunkSizeAndAlignment() throw (Exception)
+    {
+        {
+            DistributedTetrahedralMesh<3,3> mesh;
+            mesh.ConstructRegularSlabMesh(0.01, 0.42, 0.12, 0.03);
+
+            HeartConfig::Instance()->SetOutputDirectory("MonodomainWithTargetChunkSizeAndAlignment");
+            HeartConfig::Instance()->SetOutputFilenamePrefix("results");
+            HeartConfig::Instance()->SetSimulationDuration(10.0);
+            // Some postprocessing to test passing chunk size through to PostProcessingWriter
+            std::vector<double> upstroke_voltages;
+            upstroke_voltages.push_back(0.0);
+            HeartConfig::Instance()->SetUpstrokeTimeMaps(upstroke_voltages);
+
+            PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 3> cell_factory(-600 * 5000);
+
+            MonodomainProblem<3> monodomain_problem( &cell_factory );
+            monodomain_problem.SetMesh(&mesh);
+            monodomain_problem.SetHdf5DataWriterTargetChunkSizeAndAlignment(0x4000); // 16 K
+
+            monodomain_problem.Initialise();
+            monodomain_problem.Solve();
+        }
+
+        // Open file
+        OutputFileHandler file_handler("MonodomainWithTargetChunkSizeAndAlignment", false);
+        FileFinder file = file_handler.FindFile("results.h5");
+        hid_t h5_file = H5Fopen(file.GetAbsolutePath().c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
+        /* Need this next line as using the 1.8 API in this test suite
+         * (haven't explicitly included AbstractHdf5Access.hpp) */
+        hid_t dapl = H5Pcreate(H5P_DATASET_ACCESS);
+        hid_t dset = H5Dopen(h5_file, "Data", dapl); // open dataset
+        hid_t dcpl = H5Dget_create_plist(dset); // get dataset creation property list
+
+        /* Check chunk dimensions */
+        hsize_t expected_dims[3] = {44, 45, 1};
+        hsize_t chunk_dims[3];
+        H5Pget_chunk(dcpl, 3, chunk_dims);
+        for (int i=0; i<3; ++i)
+        {
+            TS_ASSERT_EQUALS(chunk_dims[i], expected_dims[i]);
+        }
+
+        /*
+         * Check the "location" of the datasets (the offset from the start of
+         * file, a bit like a pointer to the start of the dataset) to get a
+         * hint that  alignment was switched on. It's not the most specific
+         * test but I can't think of a better way.
+         * (These numbers might be machine-dependent!)
+         */
+        H5O_info_t data_info;
+        H5Oget_info(dset, &data_info);
+        TS_ASSERT_EQUALS(data_info.addr, 0x10000); // 64 KB
+        H5Dclose(dset);
+
+        dset = H5Dopen(h5_file, "Data_Unlimited", dapl);
+        H5Oget_info(dset, &data_info);
+        TS_ASSERT_EQUALS(data_info.addr, 19300352); // About 18.4 MB
+        H5Dclose(dset);
+
+        dset = H5Dopen(h5_file, "UpstrokeTimeMap_0", dapl);
+        H5Oget_info(dset, &data_info);
+        TS_ASSERT_EQUALS(data_info.addr, 19448832); // About 18.5 MB
+        // And chunk dims for this one
+        hsize_t expected_dims_upstroke[3] = {1, 2236, 1};
+        dcpl = H5Dget_create_plist(dset); // get dataset creation property list
+        H5Pget_chunk(dcpl, 3, chunk_dims);
+        for (int i=0; i<3; ++i)
+        {
+            TS_ASSERT_EQUALS(chunk_dims[i], expected_dims_upstroke[i]);
+        }
+        // Close
+        H5Dclose(dset);
+    }
 };
 
 #endif //_TESTMONODOMAINPROBLEM_HPP_

@@ -65,7 +65,8 @@ AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::AbstractCardiacProble
       mCurrentTime(0.0),
       mpTimeAdaptivityController(NULL),
       mpWriter(NULL),
-      mUseHdf5DataWriterCache(false)
+      mUseHdf5DataWriterCache(false),
+      mHdf5DataWriterChunkSizeAndAlignment(0)
 {
     assert(mNodesToOutput.empty());
     if (!mpCellFactory)
@@ -94,7 +95,8 @@ AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::AbstractCardiacProble
       mCurrentTime(0.0),
       mpTimeAdaptivityController(NULL),
       mpWriter(NULL),
-      mUseHdf5DataWriterCache(false)
+      mUseHdf5DataWriterCache(false),
+      mHdf5DataWriterChunkSizeAndAlignment(0)
 {
 }
 
@@ -616,7 +618,9 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::CloseFilesAndPos
     {
         PostProcessingWriter<ELEMENT_DIM, SPACE_DIM> post_writer(*mpMesh,
                                                                  test_output,
-                                                                 HeartConfig::Instance()->GetOutputFilenamePrefix());
+                                                                 HeartConfig::Instance()->GetOutputFilenamePrefix(),
+                                                                 "V",
+                                                                 mHdf5DataWriterChunkSizeAndAlignment);
         post_writer.WritePostProcessingFiles();
     }
     HeartEventHandler::EndEvent(HeartEventHandler::POST_PROC);
@@ -842,6 +846,19 @@ bool AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::InitialiseWriter
                                   "Data",
                                   mUseHdf5DataWriterCache);
 
+    /* If user has specified a chunk size and alignment parameter, pass it
+     * through. We set them to the same value as we think this is the most
+     * likely use case, specifically on striped filesystems where a chunk
+     * should squeeze into a stripe.
+     * Note: it is up to the writer whether it uses the parameters or not.
+     * E.g. When adding a dataset to a file the alignment parameter will be
+     * ignored; when adding to a dataset, both will be ignored.
+     */
+    if ( mHdf5DataWriterChunkSizeAndAlignment )
+    {
+        mpWriter->SetTargetChunkSize(mHdf5DataWriterChunkSizeAndAlignment);
+        mpWriter->SetAlignment(mHdf5DataWriterChunkSizeAndAlignment);
+    }
 
     // Define columns, or get the variable IDs from the writer
     DefineWriterColumns(extend_file);
@@ -869,6 +886,12 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::SetUseHdf5DataWriterCache(bool useCache)
 {
     mUseHdf5DataWriterCache = useCache;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::SetHdf5DataWriterTargetChunkSizeAndAlignment(hsize_t size)
+{
+    mHdf5DataWriterChunkSizeAndAlignment = size;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>

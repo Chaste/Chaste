@@ -212,6 +212,7 @@ private:
         if (version >= 4)
         {
             archive & mUseHdf5DataWriterCache;
+            archive & mHdf5DataWriterChunkSizeAndAlignment;
         }
     }
 
@@ -336,6 +337,7 @@ private:
         if (version >= 4)
         {
             archive & mUseHdf5DataWriterCache;
+            archive & mHdf5DataWriterChunkSizeAndAlignment;
         }
     }
 
@@ -477,6 +479,11 @@ protected:
      * Whether to instruct the writer to cache writes.
      */
     bool mUseHdf5DataWriterCache;
+
+    /**
+     * Size to pass to Hdf5DataWriter for chunk size and alignment.
+     */
+    hsize_t mHdf5DataWriterChunkSizeAndAlignment;
 
     /**
      * A vector of user-defined output modifiers which may be used to produce lightweight on the fly output
@@ -669,11 +676,33 @@ public:
     bool InitialiseWriter();
 
     /**
-     * *EXPERIMENTAL*
-     * Set whether to use caching in the Hdf5DataWriter.
+     * Set whether to use caching in the Hdf5DataWriter. This tells the
+     * Hdf5DataWriter to write only whole chunks to disk, rather than every
+     * print timestep, which is much faster when running with many processes.
      * @param useCache Whether to use the cache
      */
     void SetUseHdf5DataWriterCache(bool useCache=true);
+
+    /**
+     * Set Hdf5DataWriter target chunk size and alignment parameters.
+     *
+     * The most likely use case for this is setting it to the stripe size on a
+     * striped filesystem. This results in the writer choosing chunk dimensions
+     * that should efficiently fit within a stripe, AND padding the chunks so
+     * each chunk fits in one stripe.
+     *
+     * For example, if your filesystem uses 1 M stripes, call this method with
+     * argument 1048576 (or 0x100000 if you like round numbers).
+     *
+     * NOTE: The alignment parameter is only used for NEW HDF5 files. The chunk
+     *       size is only used for NEW datasets (e.g. results or postprocessing)
+     *       and NOT when EXTENDING a dataset.
+     *       In other words, when adding a dataset to a file the alignment
+     *       parameter will be ignored. When adding to a dataset, both will be
+     *       ignored. etc.
+     * @param size size in bytes to use for target chunk size and alignment
+     */
+    void SetHdf5DataWriterTargetChunkSizeAndAlignment(hsize_t size);
 
     /**
      * Specifies which nodes in the mesh to output. This method must be called before InitialiseWriter,
