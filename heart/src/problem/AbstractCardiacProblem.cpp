@@ -850,11 +850,10 @@ bool AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::InitialiseWriter
      * through. We set them to the same value as we think this is the most
      * likely use case, specifically on striped filesystems where a chunk
      * should squeeze into a stripe.
-     * Note: it is up to the writer whether it uses the parameters or not.
-     * E.g. When adding a dataset to a file the alignment parameter will be
-     * ignored; when adding to a dataset, both will be ignored.
+     * Only happens if !extend_file, i.e. we're NOT loading a checkpoint, or
+     * we are loading a checkpoint but the H5 file doesn't exist yet.
      */
-    if ( mHdf5DataWriterChunkSizeAndAlignment )
+    if ( !extend_file && mHdf5DataWriterChunkSizeAndAlignment )
     {
         mpWriter->SetTargetChunkSize(mHdf5DataWriterChunkSizeAndAlignment);
         mpWriter->SetAlignment(mHdf5DataWriterChunkSizeAndAlignment);

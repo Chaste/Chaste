@@ -1657,10 +1657,12 @@ public:
 
             MonodomainProblem<3> monodomain_problem( &cell_factory );
             monodomain_problem.SetMesh(&mesh);
-            monodomain_problem.SetHdf5DataWriterTargetChunkSizeAndAlignment(0x4000); // 16 K
+            monodomain_problem.SetHdf5DataWriterTargetChunkSizeAndAlignment(0x2000); // 8 K
 
             monodomain_problem.Initialise();
             monodomain_problem.Solve();
+
+            CardiacSimulationArchiver<MonodomainProblem<3> >::Save(monodomain_problem, "MonodomainWithTargetChunkSizeAndAlignment/checkpoint");
         }
 
         // Open file
@@ -1674,7 +1676,7 @@ public:
         hid_t dcpl = H5Dget_create_plist(dset); // get dataset creation property list
 
         /* Check chunk dimensions */
-        hsize_t expected_dims[3] = {44, 45, 1};
+        hsize_t expected_dims[3] = {32, 32, 1}; //(exactly 8K!)
         hsize_t chunk_dims[3];
         H5Pget_chunk(dcpl, 3, chunk_dims);
         for (int i=0; i<3; ++i)
@@ -1691,19 +1693,19 @@ public:
          */
         H5O_info_t data_info;
         H5Oget_info(dset, &data_info);
-        TS_ASSERT_EQUALS(data_info.addr, 0x10000u); // 64 KB
+        TS_ASSERT_EQUALS(data_info.addr, 0x8000u); // 32 KB
         H5Dclose(dset);
 
         dset = H5Dopen(h5_file, "Data_Unlimited", dapl);
         H5Oget_info(dset, &data_info);
-        TS_ASSERT_EQUALS(data_info.addr, 19300352u); // About 18.4 MB
+        TS_ASSERT_EQUALS(data_info.addr, 18735104u); // About 17.8 MB
         H5Dclose(dset);
 
         dset = H5Dopen(h5_file, "UpstrokeTimeMap_0", dapl);
         H5Oget_info(dset, &data_info);
-        TS_ASSERT_EQUALS(data_info.addr, 19448832u); // About 18.5 MB
+        TS_ASSERT_EQUALS(data_info.addr, 18809856u); // About 17.9 MB
         // And chunk dims for this one
-        hsize_t expected_dims_upstroke[3] = {1, 2236, 1};
+        hsize_t expected_dims_upstroke[3] = {1, 746, 1};
         dcpl = H5Dget_create_plist(dset); // get dataset creation property list
         H5Pget_chunk(dcpl, 3, chunk_dims);
         for (int i=0; i<3; ++i)
@@ -1712,6 +1714,46 @@ public:
         }
         // Close
         H5Dclose(dset);
+        H5Fclose(h5_file);
+    }
+
+    void TestResumeMonodomainProblemWithTargetChunkSizeAndAlignment() throw (Exception)
+    {
+        // Resume from previous test
+        {
+            MonodomainProblem<3> * p_monodomain_problem = CardiacSimulationArchiver<MonodomainProblem<3> >::Load("MonodomainWithTargetChunkSizeAndAlignment/checkpoint");
+            HeartConfig::Instance()->SetSimulationDuration(11.0);
+            std::vector<double> upstroke_voltages;
+            upstroke_voltages.push_back(3.0);
+            HeartConfig::Instance()->SetUpstrokeTimeMaps(upstroke_voltages);
+
+            p_monodomain_problem->Solve();
+        }
+        /* Check new dataset has the right chunk dims. This will confirm that
+         * the option was unarchived properly and that it works correctly when
+         * adding a new dataset to an existing file. */
+        // Open file
+        OutputFileHandler file_handler("MonodomainWithTargetChunkSizeAndAlignment", false);
+        FileFinder file = file_handler.FindFile("results.h5");
+        TS_ASSERT(file.IsFile());
+        hid_t h5_file = H5Fopen(file.GetAbsolutePath().c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
+        hid_t dapl = H5Pcreate(H5P_DATASET_ACCESS);
+        hid_t dset = H5Dopen(h5_file, "UpstrokeTimeMap_3", dapl); // open dataset
+        hid_t dcpl = H5Dget_create_plist(dset); // get dataset creation property list
+        // Check chunk dimensions
+        hsize_t expected_dims[3] = {1, 746, 1};
+        hsize_t chunk_dims[3];
+        H5Pget_chunk(dcpl, 3, chunk_dims);
+        for (int i=0; i<3; ++i)
+        {
+            TS_ASSERT_EQUALS(chunk_dims[i], expected_dims[i]);
+        }
+        // Check location
+        H5O_info_t data_info;
+        H5Oget_info(dset, &data_info);
+        TS_ASSERT_EQUALS(data_info.addr, 20567968u); // About 19.6 MB
+        H5Dclose(dset);
+        H5Fclose(h5_file);
     }
 };
 
