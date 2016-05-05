@@ -91,13 +91,15 @@ DistributedBoxCollection<DIM>::DistributedBoxCollection(double boxWidth, c_vecto
     mpDistributedBoxStackFactory = new DistributedVectorFactory(mNumBoxesEachDirection(DIM-1), localRows);
 
     // Calculate how many boxes in a row / face. A useful piece of data in the class.
-    mNumBoxesInAFace = 1;
-    for (unsigned dim=0; dim<DIM-1; dim++)
+    mNumBoxes = 1u;
+    for (unsigned dim=0; dim<DIM; dim++)
     {
-        mNumBoxesInAFace *= mNumBoxesEachDirection(dim);
+        mNumBoxes *= mNumBoxesEachDirection(dim);
     }
 
-    unsigned num_boxes = mNumBoxesInAFace * (mpDistributedBoxStackFactory->GetHigh() - mpDistributedBoxStackFactory->GetLow());
+    mNumBoxesInAFace = mNumBoxes / mNumBoxesEachDirection(DIM-1);
+
+    unsigned num_local_boxes = mNumBoxesInAFace * GetNumLocalRows();
 
     mMinBoxIndex = mpDistributedBoxStackFactory->GetLow() * mNumBoxesInAFace;
     mMaxBoxIndex = mpDistributedBoxStackFactory->GetHigh() * mNumBoxesInAFace - 1;
@@ -108,13 +110,12 @@ DistributedBoxCollection<DIM>::DistributedBoxCollection(double boxWidth, c_vecto
      * box locations, only their global index within the collection.
      */
     c_vector<double, 2*DIM> arbitrary_location;
-    for (unsigned local_index=0; local_index<num_boxes; local_index++)
+    for (unsigned local_index=0; local_index<num_local_boxes; local_index++)
     {
         Box<DIM> new_box(arbitrary_location);
         mBoxes.push_back(new_box);
     }
 
-    mNumBoxes = mNumBoxesInAFace * mNumBoxesEachDirection(DIM-1);
 }
 
 template<unsigned DIM>
