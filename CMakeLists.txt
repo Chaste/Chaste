@@ -474,6 +474,14 @@ if (NOT (WIN32 OR CYGWIN))
 endif()
 
 ####################
+# RUN PYTHON TESTS #
+####################
+
+if (Chaste_ENABLE_TESTING) 
+    add_subdirectory(python/test)
+endif()
+
+####################
 #  BUILD PROJECTS  #
 ####################
 
