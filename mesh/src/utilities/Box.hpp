@@ -51,9 +51,6 @@ class Box
 {
 private:
 
-    /** Coordinates of the box, in the form (for 2D) (xmin, xmax, ymin, ymax) (etc). */
-    c_vector<double, 2*DIM> mMinAndMaxValues;
-
     /** Nodes contained in this box. */
     std::set< Node<DIM>* > mNodesContained;
 
@@ -61,16 +58,6 @@ private:
     std::set< Element<DIM,DIM>* > mElementsContained;
 
 public:
-
-    /**
-     * Constructor just takes in the extremal values of the box.
-     *
-     * @param rMinAndMaxValues the extremal values. Of the from (for 2D, etc): xmin, xmax, ymin, ymax
-     */
-    Box(c_vector<double, 2*DIM>& rMinAndMaxValues);
-
-    /** @return the coordinates of the box, in the form (for 2D) (xmin, xmax, ymin, ymax) (etc). */
-    c_vector<double, 2*DIM>& rGetMinAndMaxValues();
 
     /**
      * Add a node to this box.

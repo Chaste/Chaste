@@ -52,18 +52,7 @@ public:
 
     void TestBox() throw (Exception)
     {
-        c_vector<double, 2*2> box_size;
-        box_size(0) = -0.1; // min x
-        box_size(1) =  1.1; // max x
-        box_size(2) = -0.1; // min y
-        box_size(3) =  1.1; // max y
-
-        Box<2> test_box(box_size);
-        c_vector<double, 2*2> returned_min_max_values = test_box.rGetMinAndMaxValues();
-        for (unsigned i=0; i<4; i++)
-        {
-            TS_ASSERT_EQUALS(returned_min_max_values(i), box_size(i));
-        }
+        Box<2> test_box;
 
         c_vector<double, 2> node_location;
         node_location(0) = 0.5;
@@ -155,7 +144,9 @@ public:
         for (unsigned i=0; i<box_collection.GetNumBoxes(); i++)
         {
             std::set< Node<1>* > nodes_in_box = box_collection.rGetBox(i).rGetNodesContained();
-            c_vector<double, 2> box_min_max_values = box_collection.rGetBox(i).rGetMinAndMaxValues();
+            c_vector<double, 2> box_min_max_values;
+            box_min_max_values(0) = i * cut_off_length - 0.1;
+            box_min_max_values(1) = (i+1) * cut_off_length - 0.1;
 
             for (std::set< Node<1>* >::iterator it_nodes_in_box = nodes_in_box.begin();
                  it_nodes_in_box != nodes_in_box.end();
@@ -542,7 +533,14 @@ public:
         for (unsigned i=0; i<box_collection.GetNumBoxes(); i++)
         {
             std::set< Node<2>* > nodes_in_box = box_collection.rGetBox(i).rGetNodesContained();
-            c_vector<double, 2*2> box_min_max_values = box_collection.rGetBox(i).rGetMinAndMaxValues();
+
+            c_vector<double, 2*2> box_min_max_values;
+            c_vector<unsigned, 2> indices = box_collection.GetGridIndices(i);
+            box_min_max_values(0) = indices(0)*cut_off_length - 0.1;
+            box_min_max_values(1) = (indices(0)+1)*cut_off_length - 0.1;
+            box_min_max_values(2) = indices(1)*cut_off_length - 0.1;
+            box_min_max_values(3) = (indices(1)+1)*cut_off_length - 0.1;
+
 
             for (std::set< Node<2>* >::iterator it_nodes_in_box = nodes_in_box.begin();
                  it_nodes_in_box != nodes_in_box.end();

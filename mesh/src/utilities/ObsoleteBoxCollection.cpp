@@ -77,75 +77,18 @@ ObsoleteBoxCollection<DIM>::ObsoleteBoxCollection(double boxWidth, c_vector<doub
         }
     }
 
-    /*
-     * Start by calculating the number of boxes in each direction and total number of boxes.
-     * Also create a helper vector of coefficients, whose first entry is 1 and whose i-th
-     * entry (for i>1) is the i-th partial product of the vector mNumBoxesEachDirection. This
-     * vector of coefficients will be used in the next code block to compute how many boxes
-     * along in each dimension each box is, given its index.
-     */
+    // Calculating the number of boxes in each direction and total number of boxes.
     unsigned num_boxes = 1;
-    std::vector<unsigned> coefficients;
-    coefficients.push_back(1);
 
     for (unsigned i = 0; i < DIM; i++)
     {
         ///\todo #2725 example: domain width of 1.0 and box width of 0.25, the following line will create 5 boxes not 4
         mNumBoxesEachDirection(i) = (unsigned) floor((domainSize(2 * i + 1) - domainSize(2 * i)) / boxWidth + msFudge) + 1;
         num_boxes *= mNumBoxesEachDirection(i);
-        coefficients.push_back(coefficients[i] * mNumBoxesEachDirection(i));
     }
 
-    for (unsigned box_index = 0 ; box_index < num_boxes ; box_index++)
-    {
-        /*
-         * The code block below computes how many boxes along in each dimension the
-         * current box is and stores this information in the second, ..., (DIM+1)th
-         * entries of the vector current_box_indices. The first entry of
-         * current_box_indices is zero to ensure that the for loop works correctly.
-         *
-         * Our convention is that in 3D the index of each box, box_index, is related
-         * to its indices (i,j,k) by
-         *
-         * box_index = i + mNumBoxesEachDirection(0)*j
-         *               + mNumBoxesEachDirection(0)*mNumBoxesEachDirection(1)*k,
-         *
-         * while in 2D, box_index is related to (i,j) by
-         *
-         * box_index = i + mNumBoxesEachDirection(0)*j
-         *
-         * and in 1D we simply have box_index = i.
-         */
-        c_vector<unsigned, DIM + 1> current_box_indices;
-        current_box_indices[0] = 0;
-
-        for (unsigned i = 0; i < DIM; i++)
-        {
-            unsigned temp = 0;
-            for (unsigned j = 1; j < i; j++)
-            {
-                temp += coefficients[j] * current_box_indices[j - 1];
-            }
-            current_box_indices[i + 1] = (box_index % coefficients[i + 1] - temp) / coefficients[i];
-        }
-
-        /*
-         * We now use the information stores in current_box_indices to construct the
-         * Box, which we add to mBoxes.
-         */
-        c_vector<double, 2 * DIM> box_coords;
-        for (unsigned l = 0; l < DIM; l++)
-        {
-            box_coords(2 * l) = domainSize(2 * l) + current_box_indices(l + 1) * boxWidth;
-            box_coords(2 * l + 1) = domainSize(2 * l) + (current_box_indices(l + 1) + 1) * boxWidth;
-        }
-
-        Box<DIM> new_box(box_coords);
-        mBoxes.push_back(new_box);
-    }
-
-    // Check that we have the correct number of boxes
-    assert(num_boxes == mBoxes.size());
+    // Create the correct number of boxes
+    mBoxes.resize(num_boxes);
 }
 
 template<unsigned DIM>

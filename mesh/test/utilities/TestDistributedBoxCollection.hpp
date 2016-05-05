@@ -79,12 +79,7 @@ private:
             if (box_collection.GetBoxOwnership(i))
             {
                 // Create a new node and add it to the box.
-                c_vector<double, 2*DIM> locations = box_collection.rGetBox(i).rGetMinAndMaxValues();
-                c_vector<double, DIM> node_location;
-                for (unsigned d=0; d<DIM; d++)
-                {
-                    node_location[d] = (locations[2*d+1] + locations[2*d]) / 2.0;
-                }
+                c_vector<double, DIM> node_location = zero_vector<double>(DIM);
                 box_collection.rGetBox(i).AddNode(new Node<DIM>(i, node_location));
             }
             if (box_collection.GetHaloBoxOwnership(i))
@@ -245,18 +240,7 @@ public:
 
     void TestBox() throw (Exception)
     {
-        c_vector<double, 2*2> box_size;
-        box_size(0) = -0.1; // min x
-        box_size(1) = 1.1; // max x
-        box_size(2) = -0.1; // min y
-        box_size(3) = 1.1; // max y
-
-        Box<2> test_box(box_size);
-        c_vector<double, 2*2> returned_min_max_values = test_box.rGetMinAndMaxValues();
-        for (unsigned i=0; i<4; i++)
-        {
-            TS_ASSERT_EQUALS(returned_min_max_values(i), box_size(i));
-        }
+        Box<2> test_box;
 
         c_vector<double, 2> node_location;
         node_location(0) = 0.5;

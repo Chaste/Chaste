@@ -34,23 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "Box.hpp"
 
-/////////////////////////////////////////////////////////////////////////////
-// Box methods
-/////////////////////////////////////////////////////////////////////////////
-
-
-template<unsigned DIM>
-Box<DIM>::Box(c_vector<double, 2*DIM>& rMinAndMaxValues)
-{
-    mMinAndMaxValues = rMinAndMaxValues;
-}
-
-template<unsigned DIM>
-c_vector<double, 2*DIM>& Box<DIM>::rGetMinAndMaxValues()
-{
-    return mMinAndMaxValues;
-}
-
 template<unsigned DIM>
 void Box<DIM>::AddNode(Node<DIM>* pNode)
 {
@@ -80,6 +63,8 @@ void Box<DIM>::AddElement(Element<DIM,DIM>* pElement)
 {
     mElementsContained.insert(pElement);
 }
+
+///\todo #2308 there are no methods to remove or clear elements
 
 template<unsigned DIM>
 std::set< Element<DIM,DIM>* >& Box<DIM>::rGetElementsContained()

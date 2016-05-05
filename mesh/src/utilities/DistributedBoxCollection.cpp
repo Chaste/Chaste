@@ -104,17 +104,8 @@ DistributedBoxCollection<DIM>::DistributedBoxCollection(double boxWidth, c_vecto
     mMinBoxIndex = mpDistributedBoxStackFactory->GetLow() * mNumBoxesInAFace;
     mMaxBoxIndex = mpDistributedBoxStackFactory->GetHigh() * mNumBoxesInAFace - 1;
 
-    /*
-     * The location of the Boxes doesn't matter as it isn't actually used so we don't bother to work it out.
-     * The reason it isn't used is because this class works out which box a node lies in without reference to actual
-     * box locations, only their global index within the collection.
-     */
-    c_vector<double, 2*DIM> arbitrary_location;
-    for (unsigned local_index=0; local_index<num_local_boxes; local_index++)
-    {
-        Box<DIM> new_box(arbitrary_location);
-        mBoxes.push_back(new_box);
-    }
+    // Create the correct number of boxes and set up halos
+    mBoxes.resize(num_local_boxes);
     SetupHaloBoxes();
 }
 
@@ -141,34 +132,32 @@ template<unsigned DIM>
 void DistributedBoxCollection<DIM>::SetupHaloBoxes()
 {
     // Get top-most and bottom-most value of Distributed Box Stack.
-    unsigned Hi = mpDistributedBoxStackFactory->GetHigh();
-    unsigned Lo = mpDistributedBoxStackFactory->GetLow();
+    unsigned hi = mpDistributedBoxStackFactory->GetHigh();
+    unsigned lo = mpDistributedBoxStackFactory->GetLow();
 
-    // If I am not the top-most process, add halo structures to the right.
+    // If I am not the top-most process, add halo structures above.
     if (!PetscTools::AmTopMost())
     {
         for (unsigned i=0; i < mNumBoxesInAFace; i++)
         {
-            c_vector<double, 2*DIM> arbitrary_location; // See comment in constructor.
-            Box<DIM> new_box(arbitrary_location);
+            Box<DIM> new_box;
             mHaloBoxes.push_back(new_box);
 
-            unsigned global_index = Hi * mNumBoxesInAFace + i;
+            unsigned global_index = hi * mNumBoxesInAFace + i;
             mHaloBoxesMapping[global_index] = mHaloBoxes.size()-1;
             mHalosRight.push_back(global_index - mNumBoxesInAFace);
         }
     }
 
-    // If I am not the bottom-most process, add halo structures to the left.
+    // If I am not the bottom-most process, add halo structures below.
     if (!PetscTools::AmMaster())
     {
         for (unsigned i=0; i< mNumBoxesInAFace; i++)
         {
-            c_vector<double, 2*DIM> arbitrary_location; // See comment in constructor.
-            Box<DIM> new_box(arbitrary_location);
+            Box<DIM> new_box;
             mHaloBoxes.push_back(new_box);
 
-            unsigned global_index = (Lo - 1) * mNumBoxesInAFace + i;
+            unsigned global_index = (lo - 1) * mNumBoxesInAFace + i;
             mHaloBoxesMapping[global_index] = mHaloBoxes.size() - 1;
 
             mHalosLeft.push_back(global_index  + mNumBoxesInAFace);
