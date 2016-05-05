@@ -561,7 +561,6 @@ void NodesOnlyMesh<SPACE_DIM>::SetUpBoxCollection(double cutOffLength, c_vector<
 
      mpBoxCollection = new DistributedBoxCollection<SPACE_DIM>(cutOffLength, domainSize, isPeriodic, numLocalRows);
      mpBoxCollection->SetupLocalBoxesHalfOnly();
-     mpBoxCollection->SetupHaloBoxes();
      mpBoxCollection->SetCalculateNodeNeighbours(mCalculateNodeNeighbours);
 }
 

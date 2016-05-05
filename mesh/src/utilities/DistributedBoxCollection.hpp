@@ -116,6 +116,14 @@ private:
     /** A flag that can be set to not save rNodeNeighbours in CalculateNodePairs - for efficiency */
     bool mCalculateNodeNeighbours;
 
+    /**
+     * Setup the halo box structure on this process.
+     * (Private method since this is called as a helper method by the constructor.)
+     *
+     * Sets up the containers mHaloBoxes, mHalosRight, mHalosLeft
+     */
+    void SetupHaloBoxes();
+
     /** Needed for serialization **/
     friend class boost::serialization::access;
 
@@ -156,13 +164,6 @@ public:
      * Remove the list of nodes stored in each box.
      */
     void EmptyBoxes();
-
-    /**
-     * Setup the halo box structure on this process.
-     *
-     * Sets up the containers mHaloBoxes, mHalosRight, mHalosLeft
-     */
-    void SetupHaloBoxes();
 
     /**
      * Update the halo boxes on this process, by transferring
@@ -463,7 +464,6 @@ inline void load_construct_data(
 
     if (are_boxes_set)
     {
-        t->SetupHaloBoxes();
         t->SetupLocalBoxesHalfOnly();
     }
 }

@@ -71,7 +71,6 @@ private:
         double box_width = 1.0;
 
         DistributedBoxCollection<DIM> box_collection(box_width, domain_size);
-        box_collection.SetupHaloBoxes();
 
 
         // Put a node in each local box.
@@ -142,8 +141,6 @@ private:
         double box_width = 1.0;
 
         DistributedBoxCollection<DIM> box_collection(box_width, domain_size);
-
-        box_collection.SetupHaloBoxes();
 
         // Work out how many rows of boxes I have.
         std::vector<unsigned> stacks_vector;
@@ -757,8 +754,6 @@ public:
         box_collection.SetupLocalBoxesHalfOnly();
         TS_ASSERT_THROWS_THIS(box_collection.SetupLocalBoxesHalfOnly(), "Local Boxes Are Already Set");
 
-        box_collection.SetupHaloBoxes();
-
         for (unsigned i=0; i<nodes.size(); i++)
         {
             unsigned box_index = box_collection.CalculateContainingBox(nodes[i]);
@@ -1128,9 +1123,7 @@ public:
         domain_size(3) = 4.0; // so 4*4 boxes
 
         DistributedBoxCollection<2> box_collection(cut_off_length, domain_size);
-
         box_collection.SetupLocalBoxesHalfOnly();
-        box_collection.SetupHaloBoxes();
 
         for (unsigned i=0; i<nodes.size(); i++)
         {
@@ -1509,7 +1502,6 @@ public:
 
         DistributedBoxCollection<3> box_collection(cut_off_length, domain_size);
         box_collection.SetupLocalBoxesHalfOnly();
-        box_collection.SetupHaloBoxes();
 
         for (unsigned i=0; i<nodes.size(); i++)
         {
@@ -1669,7 +1661,7 @@ public:
 
         DistributedBoxCollection<2> box_collection(cut_off_length, domain_size);
         box_collection.SetupLocalBoxesHalfOnly();
-        box_collection.SetupHaloBoxes();
+
 
         for (unsigned i=0; i<nodes.size(); i++)
         {
@@ -1977,7 +1969,6 @@ public:
 
         TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 9u * std::max(4u, PetscTools::GetNumProcs()));
         box_collection.SetupLocalBoxesHalfOnly();
-        box_collection.SetupHaloBoxes();
 
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {

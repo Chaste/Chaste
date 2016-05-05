@@ -115,7 +115,7 @@ DistributedBoxCollection<DIM>::DistributedBoxCollection(double boxWidth, c_vecto
         Box<DIM> new_box(arbitrary_location);
         mBoxes.push_back(new_box);
     }
-
+    SetupHaloBoxes();
 }
 
 template<unsigned DIM>
