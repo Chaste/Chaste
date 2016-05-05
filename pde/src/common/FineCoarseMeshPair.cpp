@@ -103,7 +103,7 @@ void FineCoarseMeshPair<DIM>::SetUpBoxesOnCoarseMesh(double boxWidth)
 template<unsigned DIM>
 void FineCoarseMeshPair<DIM>::SetUpBoxes(AbstractTetrahedralMesh<DIM, DIM>& rMesh,
                                          double boxWidth,
-                                         BoxCollection<DIM>*& rpBoxCollection)
+                                         ObsoleteBoxCollection<DIM>*& rpBoxCollection)
 {
     if (rpBoxCollection)
     {
@@ -147,7 +147,7 @@ void FineCoarseMeshPair<DIM>::SetUpBoxes(AbstractTetrahedralMesh<DIM, DIM>& rMes
         }
     }
 
-    rpBoxCollection = new BoxCollection<DIM>(boxWidth, extended_min_and_max);
+    rpBoxCollection = new ObsoleteBoxCollection<DIM>(boxWidth, extended_min_and_max);
     rpBoxCollection->SetupAllLocalBoxes();
 
     // For each element, if ANY of its nodes are physically in a box, put that element in that box
@@ -523,7 +523,7 @@ unsigned FineCoarseMeshPair<DIM>::ComputeCoarseElementForGivenPoint(ChastePoint<
 ////////////////////////////////////////////////////////////////////////////////////
 
 template<unsigned DIM>
-void FineCoarseMeshPair<DIM>::CollectElementsInContainingBox(BoxCollection<DIM>*& rpBoxCollection,
+void FineCoarseMeshPair<DIM>::CollectElementsInContainingBox(ObsoleteBoxCollection<DIM>*& rpBoxCollection,
                                                              unsigned boxIndex,
                                                              std::set<unsigned>& rElementIndices)
 {
@@ -536,7 +536,7 @@ void FineCoarseMeshPair<DIM>::CollectElementsInContainingBox(BoxCollection<DIM>*
 }
 
 template<unsigned DIM>
-void FineCoarseMeshPair<DIM>::CollectElementsInLocalBoxes(BoxCollection<DIM>*& rpBoxCollection,
+void FineCoarseMeshPair<DIM>::CollectElementsInLocalBoxes(ObsoleteBoxCollection<DIM>*& rpBoxCollection,
                                                           unsigned boxIndex,
                                                           std::set<unsigned>& rElementIndices)
 {

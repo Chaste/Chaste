@@ -32,8 +32,8 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
-#ifndef BOXCOLLECTION_HPP_
-#define BOXCOLLECTION_HPP_
+#ifndef OBSOLETEBOXCOLLECTION_HPP_
+#define OBSOLETEBOXCOLLECTION_HPP_
 
 #include "Node.hpp"
 #include "Element.hpp"
@@ -45,12 +45,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * A collection of 'boxes' partitioning the domain with information on which nodes are located in which box
  * Not archived - in cell_based constructed in NodeBasedCellPopulation constructor.
+ *
+ * This is to be merged with DistributedBoxCollection.
  */
 template<unsigned DIM>
-class BoxCollection
+class ObsoleteBoxCollection
 {
 private:
-    friend class TestBoxCollection;
+    friend class TestObsoleteBoxCollection;
 
     /** A vector of boxes to store rough node/element positions. */
     std::vector< Box<DIM> > mBoxes;
@@ -123,11 +125,11 @@ public:
      * @param isPeriodicInY whether the domain is periodic in the y direction
      * @param isPeriodicInZ whether the domain is periodic in the z direction
      */
-    BoxCollection(double boxWidth,
-                  c_vector<double, 2*DIM> domainSize,
-                  bool isPeriodicInX = false,
-                  bool isPeriodicInY = false,
-                  bool isPeriodicInZ = false);
+    ObsoleteBoxCollection(double boxWidth,
+                          c_vector<double, 2*DIM> domainSize,
+                          bool isPeriodicInX = false,
+                          bool isPeriodicInY = false,
+                          bool isPeriodicInZ = false);
 
     /**
      * Remove the list of nodes stored in each box.
@@ -198,4 +200,4 @@ public:
                             std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs);
 };
 
-#endif /*BOXCOLLECTION_HPP_*/
+#endif /*OBSOLETEBOXCOLLECTION_HPP_*/

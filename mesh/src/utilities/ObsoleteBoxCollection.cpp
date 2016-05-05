@@ -33,22 +33,22 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "BoxCollection.hpp"
+#include "ObsoleteBoxCollection.hpp"
 #include "Exception.hpp"
 
 /////////////////////////////////////////////////////////////////////////////
-// BoxCollection methods
+// ObsoleteBoxCollection methods
 /////////////////////////////////////////////////////////////////////////////
 
 // Static member for "fudge factor" is instantiated here
 template<unsigned DIM>
-const double BoxCollection<DIM>::msFudge = 5e-14;
+const double ObsoleteBoxCollection<DIM>::msFudge = 5e-14;
 
 template<unsigned DIM>
-BoxCollection<DIM>::BoxCollection(double boxWidth, c_vector<double, 2 * DIM> domainSize, bool isPeriodicInX,
-                                  bool isPeriodicInY, bool isPeriodicInZ)
-        : mDomainSize(domainSize),
-          mBoxWidth(boxWidth)
+ObsoleteBoxCollection<DIM>::ObsoleteBoxCollection(double boxWidth, c_vector<double, 2 * DIM> domainSize, bool isPeriodicInX,
+                                                  bool isPeriodicInY, bool isPeriodicInZ)
+                                                  : mDomainSize(domainSize),
+                                                    mBoxWidth(boxWidth)
 {
     // Populate mIsDomainPeriodic
     switch (DIM)
@@ -149,7 +149,7 @@ BoxCollection<DIM>::BoxCollection(double boxWidth, c_vector<double, 2 * DIM> dom
 }
 
 template<unsigned DIM>
-void BoxCollection<DIM>::EmptyBoxes()
+void ObsoleteBoxCollection<DIM>::EmptyBoxes()
 {
     for (unsigned i = 0; i < mBoxes.size(); i++)
     {
@@ -158,7 +158,7 @@ void BoxCollection<DIM>::EmptyBoxes()
 }
 
 template<unsigned DIM>
-unsigned BoxCollection<DIM>::CalculateContainingBox(Node<DIM>* pNode)
+unsigned ObsoleteBoxCollection<DIM>::CalculateContainingBox(Node<DIM>* pNode)
 {
     // Get the location of the node
     c_vector<double, DIM> location = pNode->rGetLocation();
@@ -166,7 +166,7 @@ unsigned BoxCollection<DIM>::CalculateContainingBox(Node<DIM>* pNode)
 }
 
 template<unsigned DIM>
-unsigned BoxCollection<DIM>::CalculateContainingBox(c_vector<double, DIM>& rLocation)
+unsigned ObsoleteBoxCollection<DIM>::CalculateContainingBox(c_vector<double, DIM>& rLocation)
 {
     // Confirm that the location is in the domain
     for (unsigned i = 0; i < DIM; i++)
@@ -192,20 +192,20 @@ unsigned BoxCollection<DIM>::CalculateContainingBox(c_vector<double, DIM>& rLoca
 }
 
 template<unsigned DIM>
-Box<DIM>& BoxCollection<DIM>::rGetBox(unsigned boxIndex)
+Box<DIM>& ObsoleteBoxCollection<DIM>::rGetBox(unsigned boxIndex)
 {
     assert(boxIndex < mBoxes.size());
     return mBoxes[boxIndex];
 }
 
 template<unsigned DIM>
-unsigned BoxCollection<DIM>::GetNumBoxes()
+unsigned ObsoleteBoxCollection<DIM>::GetNumBoxes()
 {
     return mBoxes.size();
 }
 
 template<unsigned DIM>
-unsigned BoxCollection<DIM>::GetLinearIndex(c_vector<int, DIM> gridIndices)
+unsigned ObsoleteBoxCollection<DIM>::GetLinearIndex(c_vector<int, DIM> gridIndices)
 {
     /*
      * This function may be passed values outside the range in one or more
@@ -265,7 +265,7 @@ unsigned BoxCollection<DIM>::GetLinearIndex(c_vector<int, DIM> gridIndices)
 }
 
 template<unsigned DIM>
-c_vector<unsigned, DIM> BoxCollection<DIM>::GetGridIndices(unsigned linearIndex)
+c_vector<unsigned, DIM> ObsoleteBoxCollection<DIM>::GetGridIndices(unsigned linearIndex)
 {
     c_vector<unsigned, DIM> grid_indices;
 
@@ -302,7 +302,7 @@ c_vector<unsigned, DIM> BoxCollection<DIM>::GetGridIndices(unsigned linearIndex)
 }
 
 template<unsigned DIM>
-bool BoxCollection<DIM>::IsBoxInDomain(c_vector<unsigned, DIM> gridIndices)
+bool ObsoleteBoxCollection<DIM>::IsBoxInDomain(c_vector<unsigned, DIM> gridIndices)
 {
     /*
      * We assume that, for a given dimension, any location is in the domain
@@ -330,7 +330,7 @@ bool BoxCollection<DIM>::IsBoxInDomain(c_vector<unsigned, DIM> gridIndices)
 }
 
 template<unsigned DIM>
-c_vector<bool,DIM> BoxCollection<DIM>::IsIndexPenultimate(c_vector<unsigned, DIM> gridIndices)
+c_vector<bool,DIM> ObsoleteBoxCollection<DIM>::IsIndexPenultimate(c_vector<unsigned, DIM> gridIndices)
 {
     c_vector<bool,DIM> is_penultimate;
 
@@ -343,7 +343,7 @@ c_vector<bool,DIM> BoxCollection<DIM>::IsIndexPenultimate(c_vector<unsigned, DIM
 }
 
 template<unsigned DIM>
-void BoxCollection<DIM>::SetupLocalBoxesHalfOnly()
+void ObsoleteBoxCollection<DIM>::SetupLocalBoxesHalfOnly()
 {
     // Populate a list of half the neighbours in this number of dimensions
     std::vector<c_vector<int,DIM> > neighbours;
@@ -438,7 +438,7 @@ void BoxCollection<DIM>::SetupLocalBoxesHalfOnly()
 }
 
 template<unsigned DIM>
-void BoxCollection<DIM>::SetupAllLocalBoxes()
+void ObsoleteBoxCollection<DIM>::SetupAllLocalBoxes()
 {
     // Populate a list of all neighbours in this number of dimensions
     std::vector<c_vector<int, DIM> > neighbours;
@@ -513,7 +513,7 @@ void BoxCollection<DIM>::SetupAllLocalBoxes()
 }
 
 template<unsigned DIM>
-void BoxCollection<DIM>::SetupLocalBoxes(const std::vector<c_vector<int, DIM> >& rNeighbours)
+void ObsoleteBoxCollection<DIM>::SetupLocalBoxes(const std::vector<c_vector<int, DIM> >& rNeighbours)
 {
     mLocalBoxes.clear();
 
@@ -675,20 +675,20 @@ void BoxCollection<DIM>::SetupLocalBoxes(const std::vector<c_vector<int, DIM> >&
 }
 
 template<unsigned DIM>
-std::set<unsigned>& BoxCollection<DIM>::rGetLocalBoxes(unsigned boxIndex)
+std::set<unsigned>& ObsoleteBoxCollection<DIM>::rGetLocalBoxes(unsigned boxIndex)
 {
     assert(boxIndex < mLocalBoxes.size());
     return mLocalBoxes[boxIndex];
 }
 
 template<unsigned DIM>
-const c_vector<double, 2 * DIM>& BoxCollection<DIM>::rGetDomainSize() const
+const c_vector<double, 2 * DIM>& ObsoleteBoxCollection<DIM>::rGetDomainSize() const
 {
     return mDomainSize;
 }
 
 template<unsigned DIM>
-void BoxCollection<DIM>::CalculateNodePairs(std::vector<Node<DIM>*>& rNodes,
+void ObsoleteBoxCollection<DIM>::CalculateNodePairs(std::vector<Node<DIM>*>& rNodes,
                                             std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs)
 {
     rNodePairs.clear();
@@ -760,6 +760,6 @@ void BoxCollection<DIM>::CalculateNodePairs(std::vector<Node<DIM>*>& rNodes,
 // Explicit instantiation
 /////////////////////////////////////////////////////////////////////////////
 
-template class BoxCollection<1>;
-template class BoxCollection<2>;
-template class BoxCollection<3>;
+template class ObsoleteBoxCollection<1>;
+template class ObsoleteBoxCollection<2>;
+template class ObsoleteBoxCollection<3>;

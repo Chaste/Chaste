@@ -33,20 +33,20 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef TESTBOXCOLLECTION_HPP_
-#define TESTBOXCOLLECTION_HPP_
+#ifndef TESTOBSOLETEBOXCOLLECTION_HPP_
+#define TESTOBSOLETEBOXCOLLECTION_HPP_
 
 #include <cxxtest/TestSuite.h>
 #include <RandomNumberGenerator.hpp>
 
 #include "CheckpointArchiveTypes.hpp"
 #include "TetrahedralMesh.hpp"
-#include "BoxCollection.hpp"
+#include "ObsoleteBoxCollection.hpp"
 #include "TrianglesMeshReader.hpp"
 #include "PetscSetupAndFinalize.hpp"
 #include "Timer.hpp"
 
-class TestBoxCollection : public CxxTest::TestSuite
+class TestObsoleteBoxCollection : public CxxTest::TestSuite
 {
 public:
 
@@ -90,7 +90,7 @@ public:
             domain_size(0) = 0.0; // min x
             domain_size(1) = 1.0; // max x
 
-            BoxCollection<1> box_collection(0.123, domain_size);
+            ObsoleteBoxCollection<1> box_collection(0.123, domain_size);
 
             TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 9u);
 
@@ -110,7 +110,7 @@ public:
             domain_size(2) = 0.0; // min y
             domain_size(3) = 1.0; // max y
 
-            BoxCollection<2> box_collection(0.123, domain_size);
+            ObsoleteBoxCollection<2> box_collection(0.123, domain_size);
             TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 81u);
         }
 
@@ -124,7 +124,7 @@ public:
             domain_size(4) = 0.0; // min z
             domain_size(5) = 1.0; // max z
 
-            BoxCollection<3> box_collection(0.123, domain_size);
+            ObsoleteBoxCollection<3> box_collection(0.123, domain_size);
             TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 729u);
         }
     }
@@ -140,7 +140,7 @@ public:
         domain_size(0) = -0.1;
         domain_size(1) = 20.15;
 
-        BoxCollection<1> box_collection(cut_off_length, domain_size);
+        ObsoleteBoxCollection<1> box_collection(cut_off_length, domain_size);
 
         box_collection.SetupAllLocalBoxes();
 
@@ -205,7 +205,7 @@ public:
         domain_size(0) = 0.0;
         domain_size(1) = 1.0;
 
-        BoxCollection<1> box_collection(width, domain_size);
+        ObsoleteBoxCollection<1> box_collection(width, domain_size);
         box_collection.rGetBox(0).AddElement(mesh.GetElement(0));
 
         TS_ASSERT_EQUALS(box_collection.rGetBox(0).rGetElementsContained().size(), 1u);
@@ -224,7 +224,7 @@ public:
         domain_size(2) = 0;
         domain_size(3) = 3-0.01;
 
-        BoxCollection<2> box_collection(width, domain_size);
+        ObsoleteBoxCollection<2> box_collection(width, domain_size);
         TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 12u); // 4 * 3 boxes altogether
 
         box_collection.SetupAllLocalBoxes();
@@ -260,7 +260,7 @@ public:
         domain_size(2) = 0;
         domain_size(3) = 3-0.01;
 
-        BoxCollection<2> box_collection(width, domain_size, true); // So periodic in X
+        ObsoleteBoxCollection<2> box_collection(width, domain_size, true); // So periodic in X
         TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 12u); // 4 * 3 boxes altogether
 
         box_collection.SetupAllLocalBoxes();
@@ -302,7 +302,7 @@ public:
             // This interaction distance will force 6 boxes one with nearly no overlap
             double interaction_distance = 0.1001;
 
-            BoxCollection<1> box_collection(interaction_distance, domain_size);
+            ObsoleteBoxCollection<1> box_collection(interaction_distance, domain_size);
 
             TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 6u);
 
@@ -324,7 +324,7 @@ public:
             // This interaction distance will force 6 boxes in each dim, one with nearly no overlap
             double interaction_distance = 0.1001;
 
-            BoxCollection<2> box_collection(interaction_distance, domain_size);
+            ObsoleteBoxCollection<2> box_collection(interaction_distance, domain_size);
 
             TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 36u);
 
@@ -348,7 +348,7 @@ public:
             // This interaction distance will force 6 boxes in each dim, one with nearly no overlap
             double interaction_distance = 0.1001;
 
-            BoxCollection<3> box_collection(interaction_distance, domain_size);
+            ObsoleteBoxCollection<3> box_collection(interaction_distance, domain_size);
 
             TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 24u);
 
@@ -372,7 +372,7 @@ public:
 
         double interaction_distance = 0.1001;
 
-        BoxCollection<3> box_collection(interaction_distance, domain_size);
+        ObsoleteBoxCollection<3> box_collection(interaction_distance, domain_size);
 
         TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 24u);
 
@@ -402,7 +402,7 @@ public:
         domain_size(4) = 0;
         domain_size(5) = 2-0.01;
 
-        BoxCollection<3> box_collection(width, domain_size);
+        ObsoleteBoxCollection<3> box_collection(width, domain_size);
 
         assert(box_collection.GetNumBoxes()==24); // 4 * 3 * 2 boxes altogether
 
@@ -455,7 +455,7 @@ public:
         domain_size(0) = 0.0;
         domain_size(1) = 7.0;
 
-        BoxCollection<1> box_collection(cut_off_length, domain_size);
+        ObsoleteBoxCollection<1> box_collection(cut_off_length, domain_size);
 
         box_collection.SetupLocalBoxesHalfOnly();
 
@@ -527,7 +527,7 @@ public:
         domain_size(2) = -0.1;
         domain_size(3) = 1.15;
 
-        BoxCollection<2> box_collection(cut_off_length, domain_size);
+        ObsoleteBoxCollection<2> box_collection(cut_off_length, domain_size);
 
         box_collection.SetupLocalBoxesHalfOnly();
 
@@ -563,11 +563,11 @@ public:
     }
 
     /*
-     * This test verifies repeatability of BoxCollection floating point
+     * This test verifies repeatability of ObsoleteBoxCollection floating point
      * calculations. Failure of this test on a given architecture implies
      * failure of node-based cell simulations.
      */
-    void TestLargeBoxCollection2d() throw (Exception)
+    void TestLargeObsoleteBoxCollection2d() throw (Exception)
     {
         double cut_off_length = 1e-3;
 
@@ -577,7 +577,7 @@ public:
         domain_size(2) = 0.0;
         domain_size(3) = 1.0;
 
-        BoxCollection<2> box_collection(cut_off_length, domain_size);
+        ObsoleteBoxCollection<2> box_collection(cut_off_length, domain_size);
         TS_ASSERT_EQUALS(box_collection.mNumBoxesEachDirection[0], 1001u);
         TS_ASSERT_EQUALS(box_collection.mNumBoxesEachDirection[1], 1001u);
 
@@ -624,7 +624,7 @@ public:
         domain_size(2) = 0.0;
         domain_size(3) = 4.0-0.01; // so 4*4 boxes
 
-        BoxCollection<2> box_collection(cut_off_length, domain_size);
+        ObsoleteBoxCollection<2> box_collection(cut_off_length, domain_size);
 
         box_collection.SetupLocalBoxesHalfOnly();
 
@@ -746,7 +746,7 @@ public:
         domain_size(4) = 0.0;
         domain_size(5) = 4.4;
 
-        BoxCollection<3> box_collection(cut_off_length, domain_size);
+        ObsoleteBoxCollection<3> box_collection(cut_off_length, domain_size);
         box_collection.SetupLocalBoxesHalfOnly();
 
         for (unsigned i=0; i<nodes.size(); i++)
@@ -862,7 +862,7 @@ public:
 
         // Create box collection without periodicity
         {
-            BoxCollection<2> box_collection(interaction_distance, domain_size, false, false);
+            ObsoleteBoxCollection<2> box_collection(interaction_distance, domain_size, false, false);
             box_collection.SetupLocalBoxesHalfOnly();
 
             TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 100u);
@@ -920,7 +920,7 @@ public:
 
         // Create box collection with periodicity in x
         {
-            BoxCollection<2> box_collection(interaction_distance, domain_size, true, false);
+            ObsoleteBoxCollection<2> box_collection(interaction_distance, domain_size, true, false);
             box_collection.SetupLocalBoxesHalfOnly();
 
             TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 100u);
@@ -978,7 +978,7 @@ public:
 
         // Create box collection with periodicity in y
         {
-            BoxCollection<2> box_collection(interaction_distance, domain_size, false, true);
+            ObsoleteBoxCollection<2> box_collection(interaction_distance, domain_size, false, true);
             box_collection.SetupLocalBoxesHalfOnly();
 
             TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 100u);
@@ -1036,7 +1036,7 @@ public:
 
         // Create box collection with periodicity in x and y
         {
-            BoxCollection<2> box_collection(interaction_distance, domain_size, true, true);
+            ObsoleteBoxCollection<2> box_collection(interaction_distance, domain_size, true, true);
             box_collection.SetupLocalBoxesHalfOnly();
 
             TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 100u);
@@ -1105,7 +1105,7 @@ public:
         double delta = 1e-10;
         double box_size = 0.1 + delta; // this will force 4 boxes in each dim, one with nearly no overlap
 
-        BoxCollection<2> box_collection(box_size, domain_size, true, true);
+        ObsoleteBoxCollection<2> box_collection(box_size, domain_size, true, true);
         box_collection.SetupLocalBoxesHalfOnly();
 
         TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 100u);
@@ -1178,7 +1178,7 @@ public:
         double delta = 1e-10;
         double box_size = 0.1 + delta; // this will force 10 boxes in each dim, one with nearly no overlap
 
-        BoxCollection<3> box_collection(box_size, domain_size, true, true, true);
+        ObsoleteBoxCollection<3> box_collection(box_size, domain_size, true, true, true);
         box_collection.SetupLocalBoxesHalfOnly();
 
         TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 64u);
@@ -1253,4 +1253,4 @@ public:
     }
 };
 
-#endif /*TESTBOXCOLLECTION_HPP_*/
+#endif /*TESTOBSOLETEBOXCOLLECTION_HPP_*/

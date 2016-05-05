@@ -46,7 +46,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractCentreBasedCellPopulation.hpp"
 #include "NodesOnlyMesh.hpp"
-#include "BoxCollection.hpp"
 
 /**
  * A NodeBasedCellPopulation is a CellPopulation consisting of only nodes in space with associated cells.
@@ -57,7 +56,6 @@ class NodeBasedCellPopulation : public AbstractCentreBasedCellPopulation<DIM>
 {
     friend class TestNodeBasedCellPopulation;
     friend class TestNodeBasedCellPopulationParallelMethods;
-    friend class TestBoxCollection;
 
 protected:
 
