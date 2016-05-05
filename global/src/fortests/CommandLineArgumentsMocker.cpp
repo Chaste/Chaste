@@ -71,9 +71,9 @@ CommandLineArgumentsMocker::~CommandLineArgumentsMocker()
 {
     for (int i=1; i<mNumArgs; i++)
     {
-        delete mpArgs[i];
+        delete[] mpArgs[i];
     }
-    delete mpArgs;
+    delete[] mpArgs;
 
     // Restore the real arguments
     CommandLineArguments::Instance()->p_argc = mpNumOldArgs;
