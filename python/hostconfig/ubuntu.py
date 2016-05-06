@@ -52,7 +52,10 @@ if ubuntu_ver == 'Trusty':
 else:
     ubuntu_ver = map(int, ubuntu_ver.split('.')[0:2])
 
-if ubuntu_ver >= [14,04]:
+if ubuntu_ver >= [16,04]:
+    petsc_ver = 3.6
+    petsc_path = '/usr/lib/petscdir/3.6.2/'
+elif ubuntu_ver >= [14,04]:
     petsc_ver = 3.4
     petsc_path = '/usr/lib/petscdir/3.4.2/'
 elif ubuntu_ver >= [12,10]:
@@ -69,9 +72,17 @@ else:
     petsc_2_3_path = '/usr/lib/petscdir/2.3.3/'
 
 petsc_2_2_path = ''
-petsc_build_name = 'linux-gnu-c-debug'
+if ubuntu_ver >= [16,04]:
+    petsc_build_name_optimized = os.path.basename(glob.glob(os.path.join(petsc_path, '*-real'))[0])
+    _dbg = glob.glob(os.path.join(petsc_path, '*-real-debug'))
+    if _dbg:
+        petsc_build_name = os.path.basename(_dbg[0])
+    else:
+        petsc_build_name = petsc_build_name_optimized
+else:
+    petsc_build_name = 'linux-gnu-c-debug'
+    petsc_build_name_optimized = 'linux-gnu-c-opt'
 petsc_build_name_profile = petsc_build_name
-petsc_build_name_optimized = 'linux-gnu-c-opt'
 
 dealii_path = None
 

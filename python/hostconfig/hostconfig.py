@@ -380,14 +380,17 @@ def DoPetsc(version, optimised, profile=False, production=False, includesOnly=Fa
     else:
         ConfigError('Unrecognised PETSc version requested: ' + version)
     incpaths.append(os.path.join(petsc_base, 'include'))
-    if not os.path.isdir(incpaths[-1]):
-        ConfigError('PETSc headers directory %s not found.' % incpaths[-1])
+    if not os.path.isdir(incpaths[-2]):
+        ConfigError('PETSc headers directory %s not found.' % incpaths[-2])
     if not includesOnly:
         if not os.path.isdir(libpath):
             ConfigError('PETSc libraries directory %s not found.' % libpath)
         libpaths.append(libpath)
         if version_number >= [3,1]:
-            libraries.append('petsc')
+            if os.path.exists(os.path.join(libpath, 'libpetsc_real.so')):
+                libraries.append('petsc_real')
+            else:
+                libraries.append('petsc')
         else:
             libraries.extend(['petscts', 'petscsnes', 'petscksp', 'petscdm', 
                               'petscmat', 'petscvec', 'petsc'])
