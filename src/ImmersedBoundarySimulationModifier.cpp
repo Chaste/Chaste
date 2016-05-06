@@ -155,7 +155,7 @@ void ImmersedBoundarySimulationModifier<DIM>::SetupConstantMemberVariables(Abstr
     domain_size(1) = 1.0;
     domain_size(2) = 0.0;
     domain_size(3) = 1.0;
-    mpBoxCollection = new BoxCollection<DIM>(mpCellPopulation->GetInteractionDistance(), domain_size, true, true);
+    mpBoxCollection = new ObsoleteBoxCollection<DIM>(mpCellPopulation->GetInteractionDistance(), domain_size, true, true);
     mpBoxCollection->SetupLocalBoxesHalfOnly();
     mpBoxCollection->CalculateNodePairs(mpMesh->rGetNodes(), mNodePairs);
 

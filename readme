@@ -6,7 +6,7 @@ The following changes to the Chaste source need to be made:
  (1) A "NEVER_REACHED" needs to be commented out of `OffLatticeSimulation.cpp`
      to allow `ImmersedBoundaryCellPopulation` to be used
  (2) For a large efficiency saving, certain lines need to be removed from
-     BoxCollection.cpp
+     ObsoleteBoxCollection.cpp
  (3) fftw must be linked by adding it to your hostconfig file or by including
      extra lines in your project CMakeLists.txt
 

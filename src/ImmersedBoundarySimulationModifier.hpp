@@ -39,7 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Chaste includes
 #include "AbstractCellBasedSimulationModifier.hpp"
-#include "BoxCollection.hpp"
+#include "ObsoleteBoxCollection.hpp"
 #include "ChasteSerialization.hpp"
 
 // Immersed boundary includes
@@ -106,7 +106,7 @@ private:
     double mFftNorm;
 
     /** A box collection to efficiently keep track of node neighbours */
-    BoxCollection<DIM>* mpBoxCollection;
+    ObsoleteBoxCollection<DIM>* mpBoxCollection;
 
     /** A vector of pairs of pointers to nodes, representing all possible node-node interactions */
     std::vector<std::pair<Node<DIM>*, Node<DIM>*> > mNodePairs;
