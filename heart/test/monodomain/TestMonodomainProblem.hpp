@@ -1728,6 +1728,8 @@ public:
             HeartConfig::Instance()->SetUpstrokeTimeMaps(upstroke_voltages);
 
             p_monodomain_problem->Solve();
+            //Tidy up
+            delete p_monodomain_problem;
         }
         /* Check new dataset has the right chunk dims. This will confirm that
          * the option was unarchived properly and that it works correctly when
