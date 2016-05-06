@@ -133,6 +133,13 @@ public:
 template<unsigned SPACE_DIM>
 class ImmersedBoundaryElement<1, SPACE_DIM> : public MutableElement<1,SPACE_DIM>
 {
+private:
+
+    /** Fluid source associated with this element. */
+    FluidSource<SPACE_DIM>* mpFluidSource;
+
+    /** Corner nodes associated with this element. */
+    std::vector<Node<SPACE_DIM>*> mCornerNodes;
 public:
 
     /**
