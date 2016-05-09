@@ -924,9 +924,19 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetSurfaceAreaOfElement(uns
 
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetAverageNodeSpacingOfElement(unsigned index)
+double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetAverageNodeSpacingOfElement(unsigned index, bool recalculate)
 {
-    return this->GetSurfaceAreaOfElement(index) / this->GetElement(index)->GetNumNodes();
+    if(recalculate || (this->GetElement(index)->GetAverageNodeSpacing() == DOUBLE_UNSET) )
+    {
+        double average_node_spacing = this->GetSurfaceAreaOfElement(index) / this->GetElement(index)->GetNumNodes();
+        this->GetElement(index)->SetAverageNodeSpacing(average_node_spacing);
+
+        return average_node_spacing;
+    }
+    else
+    {
+        return this->GetElement(index)->GetAverageNodeSpacing();
+    }
 }
 
 

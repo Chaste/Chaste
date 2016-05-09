@@ -106,7 +106,7 @@ public:
         double dt = 0.01;
         simulator.SetDt(dt);
         simulator.SetSamplingTimestepMultiple(1000);
-        simulator.SetEndTime(10000 * dt);
+        simulator.SetEndTime(10 * dt);
         simulator.Solve();
     }
 };

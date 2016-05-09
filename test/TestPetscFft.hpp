@@ -62,11 +62,5 @@ public:
             }
         }
 
-        double* test_double = reinterpret_cast<double*>(mat);
-
-        PRINT_VARIABLE(*(test_double+5));
-
-
-
     }
 };

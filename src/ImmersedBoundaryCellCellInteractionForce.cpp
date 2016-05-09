@@ -147,8 +147,8 @@ void ImmersedBoundaryCellCellInteractionForce<DIM>::AddForceContribution(std::ve
             if (normed_dist < mpCellPopulation->GetInteractionDistance())
             {
                 // Get the element spacing for each of the nodes concerned and calculate the effective spring constant
-                node_a_elem_spacing = mpMesh->GetAverageNodeSpacingOfElement(*(p_node_a->rGetContainingElementIndices().begin()));
-                node_b_elem_spacing = mpMesh->GetAverageNodeSpacingOfElement(*(p_node_b->rGetContainingElementIndices().begin()));
+                node_a_elem_spacing = mpMesh->GetAverageNodeSpacingOfElement(*(p_node_a->rGetContainingElementIndices().begin()), false);
+                node_b_elem_spacing = mpMesh->GetAverageNodeSpacingOfElement(*(p_node_b->rGetContainingElementIndices().begin()), false);
                 elem_spacing = 0.5 * (node_a_elem_spacing + node_b_elem_spacing);
 
                 effective_spring_const = mSpringConst * elem_spacing / intrinsic_spacing;

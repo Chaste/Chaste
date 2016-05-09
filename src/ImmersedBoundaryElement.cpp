@@ -40,7 +40,8 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryElement(unsigned index,
                                                                          const std::vector<Node<SPACE_DIM>*>& rNodes)
         : MutableElement<ELEMENT_DIM, SPACE_DIM>(index, rNodes),
-          mpFluidSource(NULL)
+          mpFluidSource(NULL),
+          mAverageNodeSpacing(DOUBLE_UNSET)
 {
     assert(ELEMENT_DIM == SPACE_DIM);
 
@@ -70,6 +71,18 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::vector<Node<SPACE_DIM>*>& ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::rGetCornerNodes(void)
 {
     return mCornerNodes;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+double ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::GetAverageNodeSpacing(void)
+{
+    return mAverageNodeSpacing;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::SetAverageNodeSpacing(double averageNodeSpacing)
+{
+    mAverageNodeSpacing = averageNodeSpacing;
 }
 
 
@@ -103,7 +116,19 @@ FluidSource<SPACE_DIM>* ImmersedBoundaryElement<1, SPACE_DIM>::GetFluidSource(vo
 template<unsigned SPACE_DIM>
 std::vector<Node<SPACE_DIM>*>& ImmersedBoundaryElement<1, SPACE_DIM>::rGetCornerNodes(void)
 {
-	return mCornerNodes;
+    std::vector<Node<SPACE_DIM>*> dummy_vec;
+    return dummy_vec;
+}
+
+template<unsigned SPACE_DIM>
+double ImmersedBoundaryElement<1, SPACE_DIM>::GetAverageNodeSpacing(void)
+{
+    return 0.0;
+}
+
+template<unsigned SPACE_DIM>
+void ImmersedBoundaryElement<1, SPACE_DIM>::SetAverageNodeSpacing(double averageNodeSpacing)
+{
 }
 
 

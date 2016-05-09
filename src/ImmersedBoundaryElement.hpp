@@ -62,6 +62,9 @@ private:
     /** Needed for serialization. */
     friend class boost::serialization::access;
 
+    /** The average node spacing. */
+    double mAverageNodeSpacing;
+
     /**
      * Serialize the object and its member variables.
      *
@@ -117,6 +120,16 @@ public:
      */
     std::vector<Node<SPACE_DIM>*>& rGetCornerNodes();
 
+    /**
+     * @return the average node spacing.
+     */
+    double GetAverageNodeSpacing();
+
+    /**
+     * @param averageNodeSpacing the new average node spacing.
+     */
+    void SetAverageNodeSpacing(double averageNodeSpacing);
+
 };
 
 
@@ -170,6 +183,16 @@ public:
      * Don't forget to assign the result of this call to a reference!
      */
     std::vector<Node<SPACE_DIM>*>& rGetCornerNodes();
+
+    /**
+     * @return the average node spacing.
+     */
+    double GetAverageNodeSpacing();
+
+    /**
+     * @param averageNodeSpacing the new average node spacing.
+     */
+    void SetAverageNodeSpacing(double averageNodeSpacing);
 
 };
 

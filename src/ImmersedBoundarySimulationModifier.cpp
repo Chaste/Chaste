@@ -264,7 +264,7 @@ void ImmersedBoundarySimulationModifier<DIM>::PropagateForcesToFluidGrid()
          elem_iter != mpMesh->GetElementIteratorEnd();
          ++elem_iter)
     {
-        dl = mpMesh->GetAverageNodeSpacingOfElement(elem_iter->GetIndex());
+        dl = mpMesh->GetAverageNodeSpacingOfElement(elem_iter->GetIndex(), false);
 
         for (unsigned node_idx = 0; node_idx < elem_iter->GetNumNodes(); node_idx++)
         {
