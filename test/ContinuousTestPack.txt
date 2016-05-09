@@ -8,5 +8,8 @@ TestImmersedBoundaryPdeSolveMethods.hpp
 TestImmersedBoundarySimulation.hpp
 TestImmersedBoundarySimulationModifier.hpp
 TestSuperellipseGenerator.hpp
+TestPetscFft.hpp
 numerics_paper/TestNumericsPaperSimulations.hpp
-numerics_paper/TestImmersedBoundaryProfiling.hpp
+numerics_paper/TestImmersedBoundaryProfiling512.hpp
+numerics_paper/TestImmersedBoundaryProfiling1024.hpp
+numerics_paper/TestImmersedBoundaryProfiling2048.hpp
