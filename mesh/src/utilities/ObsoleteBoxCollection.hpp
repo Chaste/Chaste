@@ -198,6 +198,35 @@ public:
      */
     void CalculateNodePairs(std::vector<Node<DIM>*>& rNodes,
                             std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs);
+
+    /**
+     *  Helper function for transition to distributed version of box collection.
+     *
+     *  This method allows us to insert of dummy test for whether a box/point/node/location is located
+     *  on the local process.
+     *
+     * @param pNode the node to test.
+     * @return true (whether the point at pNode->rGetLocation() is owned on this process)
+     */
+    bool IsOwned(Node<DIM>* pNode)
+    {
+        return true;
+    }
+
+    /**
+     *  Helper function for transition to distributed version of box collection.
+     *
+     *  This method allows us to insert of dummy test for whether a box/point/node/location is located
+     *  on the local process.
+     * @param globalIndex the global index of the box.
+     * @return true (whether the point at pNode->rGetLocation() is owned on this process)
+     */
+    bool GetBoxOwnership(unsigned globalIndex)
+    {
+        return true;
+    }
+
+
 };
 
 #endif /*OBSOLETEBOXCOLLECTION_HPP_*/

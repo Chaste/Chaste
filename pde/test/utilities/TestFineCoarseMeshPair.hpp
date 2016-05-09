@@ -39,9 +39,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 #include "FineCoarseMeshPair.hpp"
 #include "TetrahedralMesh.hpp"
-//#include "DistributedTetrahedralMesh.hpp"
 #include "QuadraticMesh.hpp"
-//#include "PetscSetupAndFinalize.hpp"
+#include "PetscSetupAndFinalize.hpp"
 
 class TestFineCoarseMeshPair : public CxxTest::TestSuite
 {
@@ -119,15 +118,17 @@ public:
         for (unsigned i=0; i<fine_mesh.GetNumNodes(); i++)
         {
             unsigned box_index = mesh_pair.mpFineMeshBoxCollection->CalculateContainingBox(fine_mesh.GetNode(i));
-
-            assert(fine_mesh.GetNode(i)->rGetContainingElementIndices().size() > 0);
-
-            for (std::set<unsigned>::iterator iter = fine_mesh.GetNode(i)->rGetContainingElementIndices().begin();
-                iter != fine_mesh.GetNode(i)->rGetContainingElementIndices().end();
-                ++iter)
+            if (mesh_pair.mpFineMeshBoxCollection->GetBoxOwnership(box_index))
             {
-                Element<3,3>* p_element = fine_mesh.GetElement(*iter);
-                TS_ASSERT_DIFFERS( mesh_pair.mpFineMeshBoxCollection->rGetBox(box_index).rGetElementsContained().find(p_element), mesh_pair.mpFineMeshBoxCollection->rGetBox(box_index).rGetElementsContained().end() )
+                assert(fine_mesh.GetNode(i)->rGetContainingElementIndices().size() > 0);
+
+                for (std::set<unsigned>::iterator iter = fine_mesh.GetNode(i)->rGetContainingElementIndices().begin();
+                        iter != fine_mesh.GetNode(i)->rGetContainingElementIndices().end();
+                        ++iter)
+                {
+                    Element<3,3>* p_element = fine_mesh.GetElement(*iter);
+                    TS_ASSERT_DIFFERS( mesh_pair.mpFineMeshBoxCollection->rGetBox(box_index).rGetElementsContained().find(p_element), mesh_pair.mpFineMeshBoxCollection->rGetBox(box_index).rGetElementsContained().end() )
+                }
             }
         }
 

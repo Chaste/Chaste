@@ -226,6 +226,8 @@ public:
     c_vector<unsigned, DIM> CalculateGridIndices(unsigned globalIndex);
 
     /**
+     * If this box is out-of-bounds to the local process then it will attempt to return
+     * a halo box (and trip an assertion is the box is completely out of scope.
      * @param boxIndex the index of the box to return
      * @return a reference to the box with global index boxIndex.
      */

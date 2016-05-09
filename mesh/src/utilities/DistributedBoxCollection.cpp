@@ -346,8 +346,14 @@ c_vector<unsigned, DIM> DistributedBoxCollection<DIM>::CalculateGridIndices(unsi
 template<unsigned DIM>
 Box<DIM>& DistributedBoxCollection<DIM>::rGetBox(unsigned boxIndex)
 {
-    assert(!(boxIndex<mMinBoxIndex) && !(mMaxBoxIndex<boxIndex));
-    return mBoxes[boxIndex-mMinBoxIndex];
+    // Check first for local ownership
+    if(!(boxIndex<mMinBoxIndex) && !(mMaxBoxIndex<boxIndex))
+    {
+        return mBoxes[boxIndex-mMinBoxIndex];
+    }
+
+    // If normal execution reaches this point then the box does not belong to the process so we will check for a halo box
+    return rGetHaloBox(boxIndex);
 }
 
 template<unsigned DIM>

@@ -159,14 +159,18 @@ void FineCoarseMeshPair<DIM>::SetUpBoxes(AbstractTetrahedralMesh<DIM, DIM>& rMes
         for (unsigned j=0; j<DIM+1; j++) // num vertices per element
         {
             Node<DIM>* p_node = p_element->GetNode(j);
-            unsigned box_index = rpBoxCollection->CalculateContainingBox(p_node);
-            box_indices_each_node_this_elem.insert(box_index);
+            // Only take note of box inclusions which are in our domain
+            if (rpBoxCollection->IsOwned(p_node))
+            {
+                unsigned box_index = rpBoxCollection->CalculateContainingBox(p_node);
+                box_indices_each_node_this_elem.insert(box_index);
+            }
         }
-
         for (std::set<unsigned>::iterator iter = box_indices_each_node_this_elem.begin();
             iter != box_indices_each_node_this_elem.end();
             ++iter)
         {
+            assert(rpBoxCollection->GetBoxOwnership( *iter ));
             rpBoxCollection->rGetBox( *iter ).AddElement(p_element);
         }
     }
@@ -215,11 +219,13 @@ void FineCoarseMeshPair<DIM>::ComputeFineElementsAndWeightsForCoarseQuadPoints(G
 
         // Get the box this point is in
         unsigned box_for_this_point = mpFineMeshBoxCollection->CalculateContainingBox( quad_point_posns.rGet(i) );
+        if (mpFineMeshBoxCollection->GetBoxOwnership(box_for_this_point))
+        {
+            // A chaste point version of the c-vector is needed for the GetContainingElement call.
+            ChastePoint<DIM> point(quad_point_posns.rGet(i));
 
-        // A chaste point version of the c-vector is needed for the GetContainingElement call.
-        ChastePoint<DIM> point(quad_point_posns.rGet(i));
-
-        ComputeFineElementAndWeightForGivenPoint(point, safeMode, box_for_this_point, i);
+            ComputeFineElementAndWeightForGivenPoint(point, safeMode, box_for_this_point, i);
+        }
     }
 
     if (mStatisticsCounters[1] > 0)
@@ -261,11 +267,13 @@ void FineCoarseMeshPair<DIM>::ComputeFineElementsAndWeightsForCoarseNodes(bool s
 
         // Get the box this point is in
         unsigned box_for_this_point = mpFineMeshBoxCollection->CalculateContainingBox( p_node->rGetModifiableLocation() );
+        if (mpFineMeshBoxCollection->GetBoxOwnership(box_for_this_point))
+        {
+            // A chaste point version of the c-vector is needed for the GetContainingElement call
+            ChastePoint<DIM> point(p_node->rGetLocation());
 
-        // A chaste point version of the c-vector is needed for the GetContainingElement call
-        ChastePoint<DIM> point(p_node->rGetLocation());
-
-        ComputeFineElementAndWeightForGivenPoint(point, safeMode, box_for_this_point, i);
+            ComputeFineElementAndWeightForGivenPoint(point, safeMode, box_for_this_point, i);
+        }
     }
 }
 
@@ -404,8 +412,10 @@ void FineCoarseMeshPair<DIM>::ComputeCoarseElementsForFineNodes(bool safeMode)
 
         // Get the box this point is in
         unsigned box_for_this_point = mpCoarseMeshBoxCollection->CalculateContainingBox(mrFineMesh.GetNode(i)->rGetModifiableLocation());
-
-        mCoarseElementsForFineNodes[i] = ComputeCoarseElementForGivenPoint(point, safeMode, box_for_this_point);
+        if (mpCoarseMeshBoxCollection->GetBoxOwnership(box_for_this_point))
+        {
+            mCoarseElementsForFineNodes[i] = ComputeCoarseElementForGivenPoint(point, safeMode, box_for_this_point);
+        }
     }
 }
 
@@ -442,7 +452,10 @@ void FineCoarseMeshPair<DIM>::ComputeCoarseElementsForFineElementCentroids(bool 
         // Get the box this point is in
         unsigned box_for_this_point = mpCoarseMeshBoxCollection->CalculateContainingBox( point_cvec );
 
-        mCoarseElementsForFineElementCentroids[i] = ComputeCoarseElementForGivenPoint(point, safeMode, box_for_this_point);
+        if (mpCoarseMeshBoxCollection->GetBoxOwnership(box_for_this_point))
+        {
+            mCoarseElementsForFineElementCentroids[i] = ComputeCoarseElementForGivenPoint(point, safeMode, box_for_this_point);
+        }
     }
 }
 
