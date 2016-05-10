@@ -165,7 +165,7 @@ void ImmersedBoundaryMembraneElasticityForce<DIM>::AddForceContribution(std::vec
          * takes into account the energy considerations of the elastic springs, and the other takes account of the
          * factor of spacing_ratio used in discretising the force relation.
          */
-        double spacing_ratio = mpMesh->GetAverageNodeSpacingOfElement(elem_idx);
+        double spacing_ratio = mpMesh->GetAverageNodeSpacingOfElement(elem_idx, false);
 
         double spring_constant = mSpringConst * intrinsic_spacing_squared / (spacing_ratio * spacing_ratio);
         double rest_length = mRestLengthMultiplier * spacing_ratio;
