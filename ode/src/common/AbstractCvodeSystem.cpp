@@ -222,7 +222,7 @@ OdeSolution AbstractCvodeSystem::Solve(realtype tStart,
         if (ierr<0)
         {
 //            DebugSteps(mpCvodeMem, this);
-            CvodeError(ierr, "CVODE failed to solve system", cvode_stopped_at);
+            CvodeError(ierr, "CVODE failed to solve system", cvode_stopped_at, stepper.GetTime(), stepper.GetNextTime());
         }
         // Not root finding, so should have reached requested time
         assert(fabs(cvode_stopped_at - stepper.GetNextTime()) < DBL_EPSILON);
@@ -263,7 +263,7 @@ void AbstractCvodeSystem::Solve(realtype tStart,
     if (ierr<0)
     {
 //        DebugSteps(mpCvodeMem, this);
-        CvodeError(ierr, "CVODE failed to solve system", cvode_stopped_at);
+        CvodeError(ierr, "CVODE failed to solve system", cvode_stopped_at, tStart, tEnd);
     }
     // Not root finding, so should have reached requested time
     assert(fabs(cvode_stopped_at - tEnd) < DBL_EPSILON);
@@ -466,7 +466,8 @@ void AbstractCvodeSystem::FreeCvodeMemory()
 }
 
 
-void AbstractCvodeSystem::CvodeError(int flag, const char * msg, const double& rTime)
+void AbstractCvodeSystem::CvodeError(int flag, const char * msg,
+                                     const double& rTime, const double& rStartTime, const double& rEndTime)
 {
     std::stringstream err;
     char* p_flag_name = CVodeGetReturnFlagName(flag);
@@ -491,7 +492,7 @@ void AbstractCvodeSystem::CvodeError(int flag, const char * msg, const double& r
         free(p_ls_flag_name);
     }
 
-    err << "\nGot to time " << rTime << "\n";
+    err << "\nGot from time " << rStartTime << " to time " << rTime << ", was supposed to finish at time " << rEndTime << "\n";
     err << "\nState variables are now:\n";
     std::vector<double> state_vars = MakeStdVec(mStateVariables);
     std::vector<std::string> state_var_names = rGetStateVariableNames();
