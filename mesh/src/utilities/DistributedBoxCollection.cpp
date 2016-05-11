@@ -199,13 +199,13 @@ unsigned DistributedBoxCollection<DIM>::GetNumLocalRows() const
 }
 
 template<unsigned DIM>
-bool DistributedBoxCollection<DIM>::GetBoxOwnership(unsigned globalIndex)
+bool DistributedBoxCollection<DIM>::IsBoxOwned(unsigned globalIndex)
 {
     return (!(globalIndex<mMinBoxIndex) && !(mMaxBoxIndex<globalIndex));
 }
 
 template<unsigned DIM>
-bool DistributedBoxCollection<DIM>::GetHaloBoxOwnership(unsigned globalIndex)
+bool DistributedBoxCollection<DIM>::IsHaloBox(unsigned globalIndex)
 {
     bool is_halo_right = ((globalIndex > mMaxBoxIndex) && !(globalIndex > mMaxBoxIndex + mNumBoxesInAFace));
     bool is_halo_left = ((globalIndex < mMinBoxIndex) && !(globalIndex < mMinBoxIndex - mNumBoxesInAFace));
@@ -359,7 +359,7 @@ Box<DIM>& DistributedBoxCollection<DIM>::rGetBox(unsigned boxIndex)
 template<unsigned DIM>
 Box<DIM>& DistributedBoxCollection<DIM>::rGetHaloBox(unsigned boxIndex)
 {
-    assert(GetHaloBoxOwnership(boxIndex));
+    assert(IsHaloBox(boxIndex));
 
     unsigned local_index = mHaloBoxesMapping.find(boxIndex)->second;
 
@@ -1086,7 +1086,7 @@ bool DistributedBoxCollection<DIM>::IsOwned(Node<DIM>* pNode)
 {
     unsigned index = CalculateContainingBox(pNode);
 
-    return GetBoxOwnership(index);
+    return IsBoxOwned(index);
 }
 
 template<unsigned DIM>
@@ -1094,7 +1094,7 @@ bool DistributedBoxCollection<DIM>::IsOwned(c_vector<double, DIM>& location)
 {
     unsigned index = CalculateContainingBox(location);
 
-    return GetBoxOwnership(index);
+    return IsBoxOwned(index);
 }
 
 template<unsigned DIM>
@@ -1145,7 +1145,7 @@ void DistributedBoxCollection<DIM>::CalculateNodePairs(std::vector<Node<DIM>*>& 
         // and therefore Neighbours setup.
         unsigned box_index = CalculateContainingBox(rNodes[i]);
 
-        if (GetBoxOwnership(box_index))
+        if (IsBoxOwned(box_index))
         {
             rNodes[i]->ClearNeighbours();
         }
@@ -1164,7 +1164,7 @@ void DistributedBoxCollection<DIM>::CalculateNodePairs(std::vector<Node<DIM>*>& 
             // and therefore Neighbours setup.
             unsigned box_index = CalculateContainingBox(rNodes[i]);
 
-            if (GetBoxOwnership(box_index))
+            if (IsBoxOwned(box_index))
             {
                 rNodes[i]->RemoveDuplicateNeighbours();
             }
@@ -1184,7 +1184,7 @@ void DistributedBoxCollection<DIM>::CalculateInteriorNodePairs(std::vector<Node<
         // and therefore Neighbours setup.
         unsigned box_index = CalculateContainingBox(rNodes[i]);
 
-        if (GetBoxOwnership(box_index))
+        if (IsBoxOwned(box_index))
         {
             rNodes[i]->ClearNeighbours();
             rNodes[i]->SetNeighboursSetUp(false);
@@ -1207,7 +1207,7 @@ void DistributedBoxCollection<DIM>::CalculateInteriorNodePairs(std::vector<Node<
             // and therefore Neighbours setup.
             unsigned box_index = CalculateContainingBox(rNodes[i]);
 
-            if (GetBoxOwnership(box_index))
+            if (IsBoxOwned(box_index))
             {
                 rNodes[i]->RemoveDuplicateNeighbours();
                 rNodes[i]->SetNeighboursSetUp(true);
@@ -1235,7 +1235,7 @@ void DistributedBoxCollection<DIM>::CalculateBoundaryNodePairs(std::vector<Node<
             // and therefore Neighbours setup.
             unsigned box_index = CalculateContainingBox(rNodes[i]);
 
-            if (GetBoxOwnership(box_index))
+            if (IsBoxOwned(box_index))
             {
                 rNodes[i]->RemoveDuplicateNeighbours();
                 rNodes[i]->SetNeighboursSetUp(true);
@@ -1265,7 +1265,7 @@ void DistributedBoxCollection<DIM>::AddPairsFromBox(unsigned boxIndex,
         Box<DIM>* p_neighbour_box;
 
         // Establish whether box is locally owned or halo.
-        if (GetBoxOwnership(*box_iter))
+        if (IsBoxOwned(*box_iter))
         {
             p_neighbour_box = &mBoxes[*box_iter - mMinBoxIndex];
         }

@@ -221,7 +221,7 @@ public:
      * @param globalIndex the global index of the box.
      * @return true (whether the point at pNode->rGetLocation() is owned on this process)
      */
-    bool GetBoxOwnership(unsigned globalIndex)
+    bool IsBoxOwned(unsigned globalIndex)
     {
         return true;
     }

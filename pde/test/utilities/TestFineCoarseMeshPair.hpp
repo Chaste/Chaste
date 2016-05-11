@@ -118,7 +118,7 @@ public:
         for (unsigned i=0; i<fine_mesh.GetNumNodes(); i++)
         {
             unsigned box_index = mesh_pair.mpFineMeshBoxCollection->CalculateContainingBox(fine_mesh.GetNode(i));
-            if (mesh_pair.mpFineMeshBoxCollection->GetBoxOwnership(box_index))
+            if (mesh_pair.mpFineMeshBoxCollection->IsBoxOwned(box_index))
             {
                 assert(fine_mesh.GetNode(i)->rGetContainingElementIndices().size() > 0);
 

@@ -180,7 +180,7 @@ public:
      * @param globalIndex the global index of the box.
      * @return whether the box with global index globalIndex is owned by this process.
      */
-    bool GetBoxOwnership(unsigned globalIndex);
+    bool IsBoxOwned(unsigned globalIndex);
 
     /**
      * Get whether the box with global index globalIndex is interior on this process.
@@ -195,7 +195,7 @@ public:
      * @param globalIndex the global index of the box.
      * @return whether the box with global index globalIndex is a halo to this process.
      */
-    bool GetHaloBoxOwnership(unsigned globalIndex);
+    bool IsHaloBox(unsigned globalIndex);
 
     /**
      * Given the (i,j,k) grid indices of a box in the collection, calculate its global index.
