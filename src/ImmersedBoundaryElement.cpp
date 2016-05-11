@@ -116,8 +116,7 @@ FluidSource<SPACE_DIM>* ImmersedBoundaryElement<1, SPACE_DIM>::GetFluidSource(vo
 template<unsigned SPACE_DIM>
 std::vector<Node<SPACE_DIM>*>& ImmersedBoundaryElement<1, SPACE_DIM>::rGetCornerNodes(void)
 {
-    std::vector<Node<SPACE_DIM>*> dummy_vec;
-    return dummy_vec;
+    return mCornerNodes;
 }
 
 template<unsigned SPACE_DIM>

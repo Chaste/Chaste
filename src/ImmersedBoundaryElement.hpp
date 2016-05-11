@@ -153,6 +153,7 @@ private:
 
     /** Corner nodes associated with this element. */
     std::vector<Node<SPACE_DIM>*> mCornerNodes;
+
 public:
 
     /**
