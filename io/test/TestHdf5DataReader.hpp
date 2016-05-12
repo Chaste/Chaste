@@ -47,13 +47,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 /*
- * Operator function to be called by H5Literate [HDF5 1.8.x] or H5Giterate [HDF5 1.6.x] (in TestListingDatasetsInAnHdf5File).
+ * Operator function to be called by H5Literate in TestListingDatasetsInAnHdf5File.
  */
 herr_t op_func (hid_t loc_id,
                 const char *name,
-#if H5_VERS_MAJOR >= 1 && H5_VERS_MINOR >=8
                 const H5L_info_t *info,
-#endif
                 void *operator_data);
 
 
@@ -120,7 +118,8 @@ private:
          * Create a new dataset within the file using defined dataspace and
          * datatype and default dataset creation properties.
          */
-        dataset = H5Dcreate(file, DATASETNAME, datatype, dataspace, H5P_DEFAULT);
+        dataset = H5Dcreate(file, DATASETNAME, datatype, dataspace,
+                            H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
         /*
          * Write the data to the dataset using default transfer properties.
@@ -183,7 +182,7 @@ public:
 
         // Open the file and the dataset
         file = H5Fopen(h5file_name.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
-        dataset = H5Dopen(file, DATASETNAME);
+        dataset = H5Dopen(file, DATASETNAME, H5P_DEFAULT);
 
         /*
          * Get datatype and dataspace handles and then query
@@ -645,13 +644,7 @@ public:
         /*
          * Begin iteration.
          */
-#if H5_VERS_MAJOR >= 1 && H5_VERS_MINOR >=8
-        std::cout << "HDF5 1.8.x or above detected.\n";
         herr_t status = H5Literate(file, H5_INDEX_NAME, H5_ITER_NATIVE, NULL, op_func, &dataset_names);
-#else
-        std::cout << "HDF5 1.6.x  detected.\n";
-        herr_t status = H5Giterate(file, "/", NULL, op_func, &dataset_names);
-#endif
 
         /*
          * Close and release resources.
@@ -680,9 +673,7 @@ public:
 
  ************************************************************/
 herr_t op_func (hid_t loc_id, const char *name,
-#if H5_VERS_MAJOR >= 1 && H5_VERS_MINOR >=8
                 const H5L_info_t *info,
-#endif
                 void *operator_data)
 {
     std::vector<std::string>* p_dataset_names = static_cast<std::vector< std::string > * >(operator_data);
@@ -692,7 +683,6 @@ herr_t op_func (hid_t loc_id, const char *name,
      * The name of the object is passed to this function by
      * the Library.
      */
-#if H5_VERS_MAJOR >= 1 && H5_VERS_MINOR >=8
     H5O_info_t infobuf;
     H5Oget_info_by_name (loc_id, name, &infobuf, H5P_DEFAULT);
     switch (infobuf.type)
@@ -706,22 +696,6 @@ herr_t op_func (hid_t loc_id, const char *name,
 //          case H5O_TYPE_NAMED_DATATYPE:
 //              printf ("  Datatype: %s\n", name);
 //              break;
-#else // HDF5 1.6.x
-    H5G_stat_t statbuf;
-    H5Gget_objinfo (loc_id, name, 0, &statbuf);
-    switch (statbuf.type)
-    {
-//        case H5G_GROUP:
-//            printf ("  Group: %s\n", name);
-//            break;
-        case H5G_DATASET:
-            //printf ("  Dataset: %s\n", name);
-            p_dataset_names->push_back(name);
-            break;
-//        case H5G_TYPE:
-//            printf ("  Datatype: %s\n", name);
-//            break;
-#endif
         default:
             EXCEPTION("File includes HDF5 object that it shouldn't.");
     }

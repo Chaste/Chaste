@@ -86,7 +86,7 @@ void Hdf5DataReader::CommonConstructor()
                   " , H5Fopen error code = " << mFileId);
     }
 
-    mVariablesDatasetId = H5Dopen(mFileId, mDatasetName.c_str());
+    mVariablesDatasetId = H5Dopen(mFileId, mDatasetName.c_str(), H5P_DEFAULT);
     SetMainDatasetRawChunkCache();
 
     if (mVariablesDatasetId <= 0)

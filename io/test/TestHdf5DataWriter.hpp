@@ -97,7 +97,8 @@ public:
         hid_t filespace = H5Screate_simple(DIMS, dimsf, NULL);
 
         // Create the dataset with default properties and close filespace.
-        hid_t dset_id = H5Dcreate(file_id, "IntArray", H5T_NATIVE_INT, filespace, H5P_DEFAULT);
+        hid_t dset_id = H5Dcreate(file_id, "IntArray", H5T_NATIVE_INT, filespace,
+                                  H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
         H5Sclose(filespace);
 
         // Define a dataset in memory for this process
@@ -132,7 +133,8 @@ public:
         hid_t char_type = H5Tcopy(H5T_C_S1);
         // H5Tset_strpad(char_type, H5T_STR_NULLPAD);
         H5Tset_size(char_type, 21 );
-        hid_t attr = H5Acreate(dset_id, "Name", char_type, colspace, H5P_DEFAULT);
+        hid_t attr = H5Acreate(dset_id, "Name", char_type, colspace,
+                               H5P_DEFAULT, H5P_DEFAULT);
 
         // Write to the attribute
         status = H5Awrite(attr, char_type, col_data);
@@ -191,7 +193,8 @@ public:
         hid_t filespace = H5Screate_simple(DIMS, dimsf, NULL);
 
         // Create the dataset with default properties and close filespace.
-        hid_t dset_id = H5Dcreate(file_id, "TheVector", H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT);
+        hid_t dset_id = H5Dcreate(file_id, "TheVector", H5T_NATIVE_DOUBLE, filespace,
+                                  H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
         H5Sclose(filespace);
 
         // Define a dataset in memory for this process
@@ -233,7 +236,7 @@ public:
 
         hsize_t file_id = H5Fopen(file_name.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
         //H5Tget_nmembers(file_id);
-        hsize_t dataset_id = H5Dopen(file_id, "TheVector");
+        hsize_t dataset_id = H5Dopen(file_id, "TheVector", H5P_DEFAULT);
         hsize_t dxpl = H5Pcreate(H5P_DATASET_XFER);
         hsize_t edc = H5Pget_edc_check(dxpl);
         TS_ASSERT_EQUALS(edc, (hsize_t) 1) //Checksum is enabled
@@ -1461,7 +1464,7 @@ public:
         OutputFileHandler file_handler("TestHdf5DataWriter", false);
         FileFinder file = file_handler.FindFile("hdf5_test_full_format.h5");
         hid_t h5_file = H5Fopen(file.GetAbsolutePath().c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
-        hid_t dset = H5Dopen(h5_file, "Postprocessing"); // open dataset
+        hid_t dset = H5Dopen(h5_file, "Postprocessing", H5P_DEFAULT); // open dataset
         hid_t dcpl = H5Dget_create_plist(dset); // get dataset creation property list
         hsize_t expected_dims[3] = {10, 25, 1};
         hsize_t chunk_dims[3];
@@ -2125,7 +2128,7 @@ public:
         OutputFileHandler file_handler(folder, false);
         FileFinder file = file_handler.FindFile(filename+".h5");
         hid_t h5_file = H5Fopen(file.GetAbsolutePath().c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
-        hid_t dset = H5Dopen(h5_file, "Data"); // open dataset
+        hid_t dset = H5Dopen(h5_file, "Data", H5P_DEFAULT); // open dataset
 
         /* Check chunk dimensions are as expected for 8 K chunks with these
          * dataset dimensions. */
@@ -2154,7 +2157,7 @@ public:
         TS_ASSERT_EQUALS(data_info.addr, 0x10000u); // 64 KB
         H5Dclose(dset);
 
-        dset = H5Dopen(h5_file, "Data_Unlimited");
+        dset = H5Dopen(h5_file, "Data_Unlimited", H5P_DEFAULT);
         H5Oget_info( dset, &data_info );
         TS_ASSERT_EQUALS(data_info.addr, 0x9A8000u); // About 9.7 MB
 

@@ -123,7 +123,7 @@ Hdf5DataWriter::Hdf5DataWriter(DistributedVectorFactory& rVectorFactory,
             // Where to find the file
             assert(mCleanDirectory==false);
 
-            mVariablesDatasetId = H5Dopen(mFileId, mDatasetName.c_str());
+            mVariablesDatasetId = H5Dopen(mFileId, mDatasetName.c_str(), H5P_DEFAULT);
             hid_t variables_dataspace = H5Dget_space(mVariablesDatasetId);
             //unsigned variables_dataset_rank = H5Sget_simple_extent_ndims(variables_dataspace);
             hsize_t dataset_max_sizes[DATASET_DIMS];
@@ -620,7 +620,8 @@ void Hdf5DataWriter::EndDefineMode()
     hid_t cparms = H5Pcreate (H5P_DATASET_CREATE);
     H5Pset_chunk( cparms, DATASET_DIMS, mChunkSize);
     hid_t filespace = H5Screate_simple(DATASET_DIMS, mDatasetDims, dataset_max_dims);
-    mVariablesDatasetId = H5Dcreate(mFileId, mDatasetName.c_str(), H5T_NATIVE_DOUBLE, filespace, cparms);
+    mVariablesDatasetId = H5Dcreate(mFileId, mDatasetName.c_str(), H5T_NATIVE_DOUBLE, filespace,
+                                    H5P_DEFAULT, cparms, H5P_DEFAULT);
     SetMainDatasetRawChunkCache(); // Set large cache (even though parallel drivers don't currently use it!)
     H5Sclose(filespace);
     H5Pclose(cparms);
@@ -644,7 +645,8 @@ void Hdf5DataWriter::EndDefineMode()
     // Create the type 'string'
     hid_t string_type = H5Tcopy(H5T_C_S1);
     H5Tset_size(string_type, MAX_STRING_SIZE );
-    hid_t attr = H5Acreate(mVariablesDatasetId, "Variable Details", string_type, colspace, H5P_DEFAULT);
+    hid_t attr = H5Acreate(mVariablesDatasetId, "Variable Details", string_type, colspace,
+                           H5P_DEFAULT, H5P_DEFAULT);
 
     // Write to the attribute
     H5Awrite(attr, string_type, col_data);
@@ -657,7 +659,8 @@ void Hdf5DataWriter::EndDefineMode()
     // Create "boolean" attribute telling the data to be incomplete or not
     columns[0] = 1;
     colspace = H5Screate_simple(1, columns, NULL);
-    attr = H5Acreate(mVariablesDatasetId, "IsDataComplete", H5T_NATIVE_UINT, colspace, H5P_DEFAULT);
+    attr = H5Acreate(mVariablesDatasetId, "IsDataComplete", H5T_NATIVE_UINT, colspace,
+                     H5P_DEFAULT, H5P_DEFAULT);
 
     // Write to the attribute - note that the native boolean is not predictable
     unsigned is_data_complete = mIsDataComplete ? 1 : 0;
@@ -672,7 +675,8 @@ void Hdf5DataWriter::EndDefineMode()
         // Create "unsigned" attribute with the map
         columns[0] = mFileFixedDimensionSize;
         colspace = H5Screate_simple(1, columns, NULL);
-        attr = H5Acreate(mVariablesDatasetId, "NodeMap", H5T_NATIVE_UINT, colspace, H5P_DEFAULT);
+        attr = H5Acreate(mVariablesDatasetId, "NodeMap", H5T_NATIVE_UINT, colspace,
+                         H5P_DEFAULT, H5P_DEFAULT);
 
         // Write to the attribute
         H5Awrite(attr, H5T_NATIVE_UINT, &mIncompleteNodeIndices[0]);
@@ -706,17 +710,20 @@ void Hdf5DataWriter::EndDefineMode()
         //   - a new attribute "Name" has been added to the Unlimited Dataset to allow it to assign
         //     any name to the unlimited variable. Which can then be easily read by Hdf5DataReader.
 
-        mUnlimitedDatasetId = H5Dcreate(mFileId, (mDatasetName + "_Unlimited").c_str(), H5T_NATIVE_DOUBLE, time_filespace, time_cparms);
+        mUnlimitedDatasetId = H5Dcreate(mFileId, (mDatasetName + "_Unlimited").c_str(), H5T_NATIVE_DOUBLE, time_filespace,
+                                        H5P_DEFAULT, time_cparms, H5P_DEFAULT);
 
         // Create the dataspace for the attribute
         hsize_t one = 1;
         hid_t one_column_space = H5Screate_simple(1, &one, NULL);
 
         // Create an attribute for the time unit
-        hid_t unit_attr = H5Acreate(mUnlimitedDatasetId, "Unit", string_type, one_column_space, H5P_DEFAULT);
+        hid_t unit_attr = H5Acreate(mUnlimitedDatasetId, "Unit", string_type, one_column_space,
+                                    H5P_DEFAULT, H5P_DEFAULT);
 
         // Create an attribute for the time name
-        hid_t name_attr = H5Acreate(mUnlimitedDatasetId, "Name", string_type, one_column_space, H5P_DEFAULT);
+        hid_t name_attr = H5Acreate(mUnlimitedDatasetId, "Name", string_type, one_column_space,
+                                    H5P_DEFAULT, H5P_DEFAULT);
 
         // Copy the unit to a string MAX_STRING_SIZE long and write it
         char unit_string[MAX_STRING_SIZE];
@@ -750,7 +757,8 @@ void Hdf5DataWriter::EndDefineMode()
     assert( ChasteBuildInfo::GetProvenanceString().length() < MAX_PROVENANCE_STRING_SIZE);
 
     strcpy(provenance_data,  ChasteBuildInfo::GetProvenanceString().c_str());
-    hid_t prov_attr = H5Acreate(mVariablesDatasetId, "Chaste Provenance", long_string_type, provenance_space, H5P_DEFAULT);
+    hid_t prov_attr = H5Acreate(mVariablesDatasetId, "Chaste Provenance", long_string_type, provenance_space,
+                                H5P_DEFAULT, H5P_DEFAULT);
 
     // Write to the attribute
     H5Awrite(prov_attr, long_string_type, provenance_data);
@@ -826,15 +834,8 @@ void Hdf5DataWriter::PutVector(int variableID, Vec petscVector)
     }
     else
     {
-#if H5_VERS_MAJOR==1 && H5_VERS_MINOR>=8 // HDF5 1.8+
         memspace = H5Screate(H5S_NULL);
         hyperslab_space = H5Screate(H5S_NULL);
-#else
-        // Horrible hack for HDF5 1.6
-        memspace = 0;
-        hyperslab_space = H5Dget_space(mVariablesDatasetId);
-        H5Sselect_none(hyperslab_space);
-#endif
     }
 
     // Create property list for collective dataset
@@ -902,9 +903,7 @@ void Hdf5DataWriter::PutVector(int variableID, Vec petscVector)
 
     VecRestoreArray(output_petsc_vector, &p_petsc_vector);
 
-#if H5_VERS_MAJOR==1 && H5_VERS_MINOR>=8 // HDF5 1.8+
     H5Sclose(memspace);
-#endif
     H5Sclose(hyperslab_space);
     H5Pclose(property_list_id);
 
@@ -999,15 +998,8 @@ void Hdf5DataWriter::PutStripedVector(std::vector<int> variableIDs, Vec petscVec
     }
     else
     {
-#if H5_VERS_MAJOR==1 && H5_VERS_MINOR>=8 // HDF5 1.8+
         memspace = H5Screate(H5S_NULL);
         hyperslab_space = H5Screate(H5S_NULL);
-#else
-        // Horrible hack for HDF5 1.6
-        memspace = 0;
-        hyperslab_space = H5Dget_space(mVariablesDatasetId);
-        H5Sselect_none(hyperslab_space);
-#endif
     }
 
     // Create property list for collective dataset write, and write! Finally.
@@ -1084,9 +1076,7 @@ void Hdf5DataWriter::PutStripedVector(std::vector<int> variableIDs, Vec petscVec
 
     VecRestoreArray(output_petsc_vector, &p_petsc_vector);
 
-#if H5_VERS_MAJOR==1 && H5_VERS_MINOR>=8 // HDF5 1.8+
     H5Sclose(memspace);
-#endif
     H5Sclose(hyperslab_space);
     H5Pclose(property_list_id);
 
@@ -1133,15 +1123,8 @@ void Hdf5DataWriter::WriteCache()
     }
     else
     {
-#if H5_VERS_MAJOR==1 && H5_VERS_MINOR>=8 // HDF5 1.8+
         memspace = H5Screate(H5S_NULL);
         hyperslab_space = H5Screate(H5S_NULL);
-#else
-        // Horrible hack for HDF5 1.6
-        memspace = 0;
-        hyperslab_space = H5Dget_space(mVariablesDatasetId);
-        H5Sselect_none(hyperslab_space);
-#endif
     }
 
     // Create property list for collective dataset write
@@ -1152,9 +1135,7 @@ void Hdf5DataWriter::WriteCache()
     H5Dwrite(mVariablesDatasetId, H5T_NATIVE_DOUBLE, memspace, hyperslab_space, property_list_id, &mDataCache[0]);
 
     // Tidy up
-#if H5_VERS_MAJOR==1 && H5_VERS_MINOR>=8 // HDF5 1.8+
     H5Sclose(memspace);
-#endif
     H5Sclose(hyperslab_space);
     H5Pclose(property_list_id);
 
@@ -1275,13 +1256,8 @@ void Hdf5DataWriter::PossiblyExtend()
 {
     if (mNeedExtend)
     {
-#if H5_VERS_MAJOR>=1 && H5_VERS_MINOR>=8 // HDF5 1.8+
         H5Dset_extent( mVariablesDatasetId, mDatasetDims );
         H5Dset_extent( mUnlimitedDatasetId, mDatasetDims );
-#else // Deprecated
-        H5Dextend( mVariablesDatasetId, mDatasetDims );
-        H5Dextend( mUnlimitedDatasetId, mDatasetDims );
-#endif
     }
     mNeedExtend = false;
 }

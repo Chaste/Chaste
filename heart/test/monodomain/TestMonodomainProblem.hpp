@@ -1671,8 +1671,7 @@ public:
         hid_t h5_file = H5Fopen(file.GetAbsolutePath().c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
         /* Need this next line as using the 1.8 API in this test suite
          * (haven't explicitly included AbstractHdf5Access.hpp) */
-        hid_t dapl = H5Pcreate(H5P_DATASET_ACCESS);
-        hid_t dset = H5Dopen(h5_file, "Data", dapl); // open dataset
+        hid_t dset = H5Dopen(h5_file, "Data", H5P_DEFAULT); // open dataset
         hid_t dcpl = H5Dget_create_plist(dset); // get dataset creation property list
 
         /* Check chunk dimensions */
@@ -1696,12 +1695,12 @@ public:
         TS_ASSERT_EQUALS(data_info.addr, 0x8000u); // 32 KB
         H5Dclose(dset);
 
-        dset = H5Dopen(h5_file, "Data_Unlimited", dapl);
+        dset = H5Dopen(h5_file, "Data_Unlimited", H5P_DEFAULT);
         H5Oget_info(dset, &data_info);
         TS_ASSERT_EQUALS(data_info.addr, 18735104u); // About 17.8 MB
         H5Dclose(dset);
 
-        dset = H5Dopen(h5_file, "UpstrokeTimeMap_0", dapl);
+        dset = H5Dopen(h5_file, "UpstrokeTimeMap_0", H5P_DEFAULT);
         H5Oget_info(dset, &data_info);
         TS_ASSERT_EQUALS(data_info.addr, 18809856u); // About 17.9 MB
         // And chunk dims for this one
