@@ -251,7 +251,7 @@ public:
         TS_ASSERT_THROWS_THIS(CommandLineArguments::Instance()->GetValueCorrespondingToOption("-mydoubleval"),
                 "No value(s) given after command line option '-mydoubleval'");
 
-        delete new_argv;
+        delete[] new_argv;
 
         // Restore the real args
         CommandLineArguments::Instance()->p_argc = p_real_argc;

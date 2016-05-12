@@ -789,7 +789,7 @@ class MemoryTesting(GccDebug):
 
         # Regexps to check for
         import re
-        invalid = re.compile(r'==\d+== Invalid ')
+        invalid = re.compile(r'==\d+== (Invalid|Mismatched) ')
         glibc = re.compile(r'__libc_freeres')
         leaks = re.compile(r'==\d+== LEAK SUMMARY:')
         lost = re.compile(r'==\d+==\s+(definitely|indirectly|possibly) lost: ([0-9,]+) bytes in ([0-9,]+) blocks')

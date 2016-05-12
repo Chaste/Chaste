@@ -50,10 +50,13 @@ CommandLineArgumentsMocker::CommandLineArgumentsMocker(std::string newArguments)
 
     mNumArgs = strings.size() + 1;
 
-    mpArgs = new char* [mNumArgs];
+    // Note that we allocate an extra pointer here since the standard says argv must contain
+    // a final NULL pointer.  OpenMPI will segfault without this!
+    // c.f. http://stackoverflow.com/questions/16418932/is-argvargc-equal-to-null-pointer
+    mpArgs = new char* [mNumArgs+1];
 
-    // Program name
-    mpArgs[0] = (*mpOldArgs)[0];
+    mpArgs[0] = (*mpOldArgs)[0]; // Program name
+    mpArgs[mNumArgs] = NULL;
 
     for (unsigned i=0; i<strings.size(); i++)
     {
@@ -71,9 +74,9 @@ CommandLineArgumentsMocker::~CommandLineArgumentsMocker()
 {
     for (int i=1; i<mNumArgs; i++)
     {
-        delete mpArgs[i];
+        delete[] mpArgs[i];
     }
-    delete mpArgs;
+    delete[] mpArgs;
 
     // Restore the real arguments
     CommandLineArguments::Instance()->p_argc = mpNumOldArgs;
