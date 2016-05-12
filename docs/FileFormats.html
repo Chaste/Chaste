@@ -22,14 +22,16 @@
     <li>Simulation statistics. The structure of each file varies depending on the data they contain. The structure should be described by comments in the methods which write these data.<br/>
     An example is the <tt>CellAgesWriter</tt> class:
         <ul>
-        <li> The output is a single value [current simulation time], followed by a tab, followed by a sequence of space-separated values.</li>
-        <li> This sequence has the form '...[location index] [x-pos] [y-pos] [z-pos] [cell age] ...' where [y-pos] and [z-pos] are included for 2 and 3 dimensional simulations, respectively.</li>
-        </ul></li>
+        <li>The output is a single value [current simulation time], followed by a tab, followed by a sequence of space-separated values.</li>
+        <li>This sequence has the form '...[location index] [x-pos] [y-pos] [z-pos] [cell age] ...' where [y-pos] and [z-pos] are included for 2 and 3 dimensional simulations, respectively.</li>
+        </ul>
+    </li>
     <li>Also used for the fixed-width space-separated column data file format, written by the <tt>ColumnDataWriter</tt> class, and compatible with <a href="http://www.gnuplot.info/">Gnuplot</a>.
         <ul>
         <li>First line is a header, of the form <tt>Name1(units1) Name2(units2) ... NameN(unitsN)</tt>.</li>
         <li>Subsequent lines give the data. Columns are padded with spaces to a fixed width, determined by the <tt>precision</tt> argument to the writer constructor.</li>
-        </ul></li>
+        </ul>
+    </li>
     </ul>
     They are all, however, data files with a similar structure suitable for plotting with <a href="http://www.gnuplot.info/">Gnuplot</a>.
   </dd>
@@ -190,7 +192,7 @@
   </dd>
   <dt>.pts</dt>
   <dd>
-    Meshalyzer (used for visualisation) nodes format. First line is <tt>&lt;number of nodes&gt</tt>. Following lines are the nodal coordinates.
+    Meshalyzer (used for visualisation) nodes format. First line is <tt>&lt;number of nodes&gt;</tt>. Following lines are the nodal coordinates.
   </dd>
   <dt>.tri</dt>
   <dd>
@@ -280,6 +282,6 @@
   </dd>
 </dl>
 
-  </body>
+</body>
 </html>
  
