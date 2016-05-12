@@ -1,3 +1,9 @@
+chaste-source (3.4.26597) xenial; urgency=low
+
+  * Package release 3.4.26597 of Chaste with support for Xenial (16.04).
+
+ -- Chaste Team <chaste-admin@maillist.ox.ac.uk>  Thu, 12 May 2016 13:59:32 +0000
+
 chaste-source (3.4) intrepid; urgency=low
 
   * Package release 3.4 of Chaste.
