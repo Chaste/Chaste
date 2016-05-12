@@ -1752,7 +1752,7 @@ public:
         // Check location
         H5O_info_t data_info;
         H5Oget_info(dset, &data_info);
-        TS_ASSERT_EQUALS(data_info.addr, 20567968u); // About 19.6 MB
+        TS_ASSERT_DELTA(data_info.addr, 20567968u, 41u); // About 19.6 MB with a little leeway
         H5Dclose(dset);
         H5Fclose(h5_file);
     }
