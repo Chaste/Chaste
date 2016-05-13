@@ -48,8 +48,8 @@ PCBlockDiagonal::PCBlockDiagonal(KSP& rKspObject)
 {
 #ifdef TRACE_KSP
     mPCContext.mScatterTime = 0.0;
-    mPCContext.mA1PreconditionerTime = 0.0;;
-    mPCContext.mA2PreconditionerTime = 0.0;;
+    mPCContext.mA1PreconditionerTime = 0.0;
+    mPCContext.mA2PreconditionerTime = 0.0;
     mPCContext.mGatherTime = 0.0;;
 #endif
 
@@ -109,7 +109,7 @@ void PCBlockDiagonal::PCBlockDiagonalCreate(KSP& rKspObject)
     // Odd number of local rows: impossible if V_m and phi_e for each node are stored in the same processor.
     if ((num_rows%2 != 0) || (num_local_rows%2 != 0))
     {
-        TERMINATE("Wrong matrix parallel layout detected in PCLDUFactorisation.");
+        TERMINATE("Wrong matrix parallel layout detected in PCBlockDiagonal.");
     }
 
     // Allocate memory
