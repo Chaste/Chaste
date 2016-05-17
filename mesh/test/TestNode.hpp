@@ -228,6 +228,8 @@ public:
 
         TS_ASSERT_EQUALS(node.IsParticle(), false);
 
+        TS_ASSERT_EQUALS(node.NeighboursIsEmpty(), true);
+
         // Check that we can correctly set each of the attributes.
         node.AddNodeAttribute(1.0);
         TS_ASSERT_EQUALS(node.GetNumNodeAttributes(), 1u);
@@ -252,6 +254,17 @@ public:
         TS_ASSERT_EQUALS(node.IsParticle(), false);
         node.SetIsParticle(true);
         TS_ASSERT_EQUALS(node.IsParticle(), true);
+
+        TS_ASSERT_EQUALS(node.NeighboursIsEmpty(), true);
+        node.AddNeighbour(1u);
+        node.AddNeighbour(1u);
+        TS_ASSERT_EQUALS(node.NeighboursIsEmpty(), false);
+        TS_ASSERT_EQUALS(node.rGetNeighbours().size(), 2u);
+        node.RemoveDuplicateNeighbours();
+        TS_ASSERT_EQUALS(node.rGetNeighbours().size(), 1u);
+        node.ClearNeighbours();
+        TS_ASSERT_EQUALS(node.NeighboursIsEmpty(), true);
+
 
         node.SetRadius(1.6);
         TS_ASSERT_DELTA(node.GetRadius(), 1.6, 1e-4);
