@@ -147,7 +147,9 @@ public:
     void ClearAppliedForce();
 
     /**
-     * Add a neighbour to this node's vector of indices.
+     * Add a neighbour to this node's vector of neighbouring node  indices.
+     *
+     * @param index of the node to add.
      */
     void AddNeighbour(unsigned index);
 
@@ -163,16 +165,20 @@ public:
 
     /**
      * Check whether the node neighbours collection is empty.
+     *
+     * @return whether this node has any neighbours.
      */
     bool NeighboursIsEmpty();
 
     /**
     * Sets a flag to indicate that the neighbours of this node have/have not been updated.
+    *
+    * @param whether the neighbours are set up or not
     */
     void SetNeighboursSetUp(bool flag);
 
     /**
-    * Returns a flag to indicate that the neighbours of this node have/have not been updated.
+    * @return a flag to indicate that the neighbours of this node have/have not been updated.
     */
     bool GetNeighboursSetUp();
 
