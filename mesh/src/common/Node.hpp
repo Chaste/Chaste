@@ -305,7 +305,7 @@ public:
     /**
     * Sets a flag to indicate that the neighbours of this node have/have not been updated. 
     *
-    * @param whether the neighbours are set up or not.
+    * @param flag whether the neighbours are set up or not.
     */
     void SetNeighboursSetUp(bool flag);
 
