@@ -53,7 +53,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Simulation does not run in parallel
 #include "FakePetscSetup.hpp"
 
-class TestImmersedBoundaryProfiling512 : public AbstractCellBasedTestSuite
+class TestImmersedBoundaryProfiling1024 : public AbstractCellBasedTestSuite
 {
 public:
 
@@ -105,7 +105,7 @@ public:
         // Set simulation properties
         double dt = 0.01;
         simulator.SetDt(dt);
-        simulator.SetSamplingTimestepMultiple(1000);
+        simulator.SetSamplingTimestepMultiple(10);
         simulator.SetEndTime(10000 * dt);
         simulator.Solve();
     }

@@ -1,6 +1,7 @@
 import multiprocessing
 import os
 import subprocess
+import time
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -19,28 +20,28 @@ path_to_output = os.path.join(chaste_test_dir, 'convergence', 'mesh')
 pdf_name = os.path.join(path_to_output, 'ConvergenceWithMesh.pdf')
 results_header_string = 'simulation_id,mesh_spacing,esf_at_end\n'
 
-# Range for simulation parameters
-num_sims = 15
-
 
 def main():
     run_simulations()
     combine_output()
     plot_results()
+    compress_output()
 
 
 # Create a list of commands and pass them to separate processes
 def run_simulations():
 
+    # 2^5 (32) up to 2^12 (4096) at half-integer powers, rounded to integer value
+    param_values = (2**(np.linspace(5, 12, num=15))).astype(int)
+
     # Make a list of calls to a Chaste executable
     command_list = []
-    for sim_id in range(num_sims):
 
-        num_mesh_pts = int(round(2**(5 + 0.5 * sim_id)))
+    for idx, param_val in enumerate(param_values):
 
         command = 'nice -n 19 ' + executable \
-                  + ' --ID ' + str(sim_id) \
-                  + ' --MP ' + str(num_mesh_pts)
+                  + ' --ID ' + str(idx) \
+                  + ' --MP ' + str(param_val)
         command_list.append(command)
 
     # Use processes equal to the number of cpus available
@@ -101,13 +102,18 @@ def plot_results():
     mycol_bl = '#2C2E83' #Blue
     mycol_lb = '#0072bd' #Light blue
 
-    # Useful to convert picas to inches or cm
     # SIAM max fig width = 31pi = 13.12cm = 5.17in
+
+    # latex line width in inches
+    latex_line_width = 5.126
+
+    # Potentially useful pica conversions
     pica_to_cm = 127.0/300.0
     pica_to_in = 1.0/6.0
+
     golden_rat = 1.618
 
-    fig_width = 14 * pica_to_in # num picas, but need it in inches
+    fig_width = 0.45 * latex_line_width
 
     # Set LaTeX font rendering
     plt.rc('text', usetex=True)
@@ -163,6 +169,24 @@ def plot_results():
 
     # Export figure
     plt.savefig(pdf_name, bbox_inches='tight', pad_inches=0.0)
+
+
+# Compress output and suffix with date run
+def compress_output():
+
+    # Check that output directory exists
+    if not (os.path.isdir(path_to_output)):
+        raise Exception('Py: Could not find output directory: ' + path_to_output)
+
+    # Change cwd to one above output path
+    os.chdir(os.path.join(path_to_output, '..'))
+
+    simulation_name = os.path.basename(os.path.normpath(path_to_output))
+
+    today = time.strftime('%Y-%m-%d')
+
+    # Compress entire output folder and append with the the simulations were started
+    os.system('tar -zcf ' + simulation_name + '_' + today + '.tar.gz ' + simulation_name)
 
 if __name__ == "__main__":
     main()

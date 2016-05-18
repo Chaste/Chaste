@@ -161,6 +161,7 @@ void SetupAndRunSimulation(unsigned simulationId, double timeStep)
     MAKE_PTR_ARGS(ImmersedBoundaryMembraneElasticityForce<2>, p_boundary_force, (cell_population));
     p_main_modifier->AddImmersedBoundaryForce(p_boundary_force);
     p_boundary_force->SetSpringConstant(1e7);
+    p_boundary_force->SetRestLengthMultiplier(0.5);
 
     // Create and set an output directory that is different for each simulation
     std::stringstream output_directory;

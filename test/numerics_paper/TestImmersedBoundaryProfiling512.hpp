@@ -105,8 +105,8 @@ public:
         // Set simulation properties
         double dt = 0.01;
         simulator.SetDt(dt);
-        simulator.SetSamplingTimestepMultiple(1000);
-        simulator.SetEndTime(5000 * dt);
+        simulator.SetSamplingTimestepMultiple(10);
+        simulator.SetEndTime(10000 * dt);
         simulator.Solve();
     }
 };
