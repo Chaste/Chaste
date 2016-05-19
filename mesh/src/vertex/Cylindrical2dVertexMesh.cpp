@@ -35,7 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Cylindrical2dVertexMesh.hpp"
 #include "Cylindrical2dMesh.hpp"
-#include "Debug.hpp"
 
 Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(double width,
                                                  std::vector<Node<2>*> nodes,

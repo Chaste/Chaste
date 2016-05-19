@@ -34,7 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "AbstractSimpleCellCycleModel.hpp"
-#include "Debug.hpp"
 
 AbstractSimpleCellCycleModel::AbstractSimpleCellCycleModel()
     :   AbstractCellCycleModel(),

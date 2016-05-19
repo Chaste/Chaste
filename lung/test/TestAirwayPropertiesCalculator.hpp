@@ -43,8 +43,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TrianglesMeshReader.hpp"
 #include "AirwayPropertiesCalculator.hpp"
 
-#include "Debug.hpp"
-
 class TestAirwayPropertiesCalculator : public CxxTest::TestSuite
 {
 public:

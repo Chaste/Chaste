@@ -35,7 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "AirwayPropertiesCalculator.hpp"
-#include "Debug.hpp"
 
 AirwayPropertiesCalculator::AirwayPropertiesCalculator(TetrahedralMesh<1,3>& rAirwaysMesh,
                                                        unsigned rootIndex,

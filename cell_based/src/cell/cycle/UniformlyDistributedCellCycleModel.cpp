@@ -38,7 +38,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "StemCellProliferativeType.hpp"
 #include "TransitCellProliferativeType.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
-#include "Debug.hpp"
 
 UniformlyDistributedCellCycleModel::UniformlyDistributedCellCycleModel()
     : AbstractSimpleCellCycleModel(),

@@ -46,7 +46,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CompareHdf5ResultsFiles.hpp"
 #include "OutputFileHandler.hpp"
 #include "FileFinder.hpp"
-#include "Debug.hpp"
 
 class TestCheckpointing : public CxxTest::TestSuite
 {
