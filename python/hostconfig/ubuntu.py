@@ -130,6 +130,7 @@ else:
 if petsc_ver >= 3.1:
     libs_for_petsc.remove('petsccontrib')
 
+
 boost_libs = ['boost_serialization', 'boost_filesystem']
 if ubuntu_ver >= [10,10]:
     boost_libs.append('boost_system')
@@ -164,6 +165,9 @@ tools = {'xsd': '/usr/bin/xsdcxx',
          'mpicxx': '/usr/bin/mpic++.openmpi'}
 
 def Configure(prefs, build):
+    
+    AddBoost('/home/ubuntu/boost_1_48_0', '1.48')
+
     """Set up the build configuring.
     
     prefs can specify which version of various libraries we should use, and which optional libraries.

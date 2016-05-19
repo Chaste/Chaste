@@ -145,8 +145,9 @@ def AddBoost(basePath, version, forceUseSystem=False):
     CheckPathExists(basePath, 'Boost')
     # Remove existing Boost libs
     for lib in conf.other_libraries[:]:
-        if lib.startswith('boost_'):
-            conf.other_libraries.remove(lib)
+	for lib2 in lib:
+            if lib2.startswith('boost_'):
+            	conf.other_libraries.remove(lib)
     RemoveFromPath(conf.other_includepaths, 'boost')
     RemoveFromPath(conf.other_libpaths, 'boost')
     # Add libs from new location

@@ -64,7 +64,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///\todo #2739
 #include <unistd.h>
 #include <sys/resource.h>
-//#include "Debug.hpp"
+#include "Debug.hpp"
 
 /* Here we define a cell factory that gives stimuli to all cells
  * below height z = 0.042... this corresponds to the apex of the heart.
@@ -158,7 +158,13 @@ public:
         RabbitHeartCellFactory cell_factory;
         MonodomainProblem<3> monodomain_problem( &cell_factory );
         monodomain_problem.SetWriteInfo();
-        monodomain_problem.Initialise();
+
+double before_init = GetMemoryUsage();
+monodomain_problem.Initialise();
+double after_init = GetMemoryUsage();
+PRINT_VARIABLE(after_init - before_init);
+
+       // monodomain_problem.Initialise();
         monodomain_problem.Solve();
 
         /* We can access nodes in the mesh using a `NodeIterator`. Here, we check that each node
