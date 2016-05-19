@@ -35,8 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "CellCycleModelProteinConcentrationsWriter.hpp"
 #include "AbstractCellPopulation.hpp"
-#include "AbstractOdeBasedCellCycleModel.hpp"
-#include "AbstractOdeBasedPhaseBasedCellCycleModel.hpp"
+#include "CellCycleModelOdeHandler.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 CellCycleModelProteinConcentrationsWriter<ELEMENT_DIM, SPACE_DIM>::CellCycleModelProteinConcentrationsWriter()
@@ -60,7 +59,7 @@ double CellCycleModelProteinConcentrationsWriter<ELEMENT_DIM, SPACE_DIM>::GetCel
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellCycleModelProteinConcentrationsWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
-    AbstractOdeBasedCellCycleModel* p_model = dynamic_cast<AbstractOdeBasedCellCycleModel*>(pCell->GetCellCycleModel());
+    CellCycleModelOdeHandler* p_model = dynamic_cast<CellCycleModelOdeHandler*>(pCell->GetCellCycleModel());
 
     if (p_model)
     {
@@ -74,25 +73,10 @@ void CellCycleModelProteinConcentrationsWriter<ELEMENT_DIM, SPACE_DIM>::VisitCel
             *this->mpOutStream << proteins[i] << " ";
         }
     }
+
     else
     {
-        AbstractOdeBasedPhaseBasedCellCycleModel* p_phase_model = dynamic_cast<AbstractOdeBasedPhaseBasedCellCycleModel*>(pCell->GetCellCycleModel());
-        if (p_phase_model)
-        {
-            // Write location index corresponding to cell
-            *this->mpOutStream << pCellPopulation->GetLocationIndexUsingCell(pCell) << " ";
-
-            // Write cell variables
-            std::vector<double> proteins = p_phase_model->GetProteinConcentrations();
-            for (unsigned i=0; i<proteins.size(); i++)
-            {
-                *this->mpOutStream << proteins[i] << " ";
-            }
-        }
-        else
-        {
-            EXCEPTION("CellCycleModelProteinConcentrationsWriter cannot be used with a cell-cycle model that does not inherit from AbstractOdeBasedCellCycleModel or AbstractOdeBasedPhaseBasedCellCycleModel");
-        }
+        EXCEPTION("CellCycleModelProteinConcentrationsWriter cannot be used with a cell-cycle model that does not inherit from CellCycleModelOdeHandler");
     }
 }
 

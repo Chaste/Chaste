@@ -42,7 +42,6 @@ AbstractOdeBasedPhaseBasedCellCycleModel::AbstractOdeBasedPhaseBasedCellCycleMod
                                                                boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
     : CellCycleModelOdeHandler(lastTime, pOdeSolver),
       mDivideTime(lastTime),
-      mFinishedRunningOdes(false),
       mG2PhaseStartTime(DBL_MAX)
 {
     AbstractPhaseBasedCellCycleModel::SetBirthTime(lastTime);
@@ -56,7 +55,6 @@ AbstractOdeBasedPhaseBasedCellCycleModel::AbstractOdeBasedPhaseBasedCellCycleMod
     : AbstractPhaseBasedCellCycleModel(rModel),
       CellCycleModelOdeHandler(rModel),
       mDivideTime(rModel.mDivideTime),
-      mFinishedRunningOdes(rModel.mFinishedRunningOdes),
       mG2PhaseStartTime(rModel.mG2PhaseStartTime)
 {
     /*
@@ -83,20 +81,6 @@ void AbstractOdeBasedPhaseBasedCellCycleModel::SetBirthTime(double birthTime)
     mDivideTime = birthTime;
 }
 
-std::vector<double> AbstractOdeBasedPhaseBasedCellCycleModel::GetProteinConcentrations() const
-{
-    assert(mpOdeSystem != NULL);
-    return mpOdeSystem->rGetStateVariables();
-}
-
-void AbstractOdeBasedPhaseBasedCellCycleModel::SetProteinConcentrationsForTestsOnly(double lastTime, std::vector<double> proteinConcentrations)
-{
-    assert(mpOdeSystem != NULL);
-    assert(proteinConcentrations.size()==mpOdeSystem->rGetStateVariables().size());
-    mLastTime = lastTime;
-    mpOdeSystem->SetStateVariables(proteinConcentrations);
-}
-
 void AbstractOdeBasedPhaseBasedCellCycleModel::UpdateCellCyclePhase()
 {
     assert(mpOdeSystem != NULL);
@@ -121,10 +105,10 @@ void AbstractOdeBasedPhaseBasedCellCycleModel::UpdateCellCyclePhase()
 
     if (current_time > mLastTime)
     {
-        if (!mFinishedRunningOdes)
+        if (!this->mFinishedRunningOdes)
         {
             // Update whether a stopping event has occurred
-            mFinishedRunningOdes = SolveOdeToTime(current_time);
+            this->mFinishedRunningOdes = SolveOdeToTime(current_time);
 
             // Check no concentrations have gone negative
             for (unsigned i=0; i<mpOdeSystem->GetNumberOfStateVariables(); i++)
@@ -139,7 +123,7 @@ void AbstractOdeBasedPhaseBasedCellCycleModel::UpdateCellCyclePhase()
                 }
             }
 
-            if (mFinishedRunningOdes)
+            if (this->mFinishedRunningOdes)
             {
                 // Update durations of each phase
                 mG1Duration = GetOdeStopTime() - mBirthTime - GetMDuration();
@@ -170,11 +154,11 @@ void AbstractOdeBasedPhaseBasedCellCycleModel::UpdateCellCyclePhase()
 
 void AbstractOdeBasedPhaseBasedCellCycleModel::ResetForDivision()
 {
-    assert(mFinishedRunningOdes);
+    assert(this->mFinishedRunningOdes);
     AbstractPhaseBasedCellCycleModel::ResetForDivision();
     mBirthTime = mDivideTime;
     mLastTime = mDivideTime;
-    mFinishedRunningOdes = false;
+    this->mFinishedRunningOdes = false;
     mG1Duration = DBL_MAX;
     mDivideTime = DBL_MAX;
 }

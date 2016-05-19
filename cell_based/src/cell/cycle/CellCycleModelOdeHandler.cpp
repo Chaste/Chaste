@@ -40,7 +40,8 @@ CellCycleModelOdeHandler::CellCycleModelOdeHandler(double lastTime,
     : mDt(DOUBLE_UNSET),
       mpOdeSystem(NULL),
       mpOdeSolver(pOdeSolver),
-      mLastTime(lastTime)
+      mLastTime(lastTime),
+      mFinishedRunningOdes(false)
 {
 }
 
@@ -56,7 +57,8 @@ CellCycleModelOdeHandler::CellCycleModelOdeHandler(const CellCycleModelOdeHandle
     :   mDt(rHandler.mDt),
         mpOdeSystem(rHandler.mpOdeSystem),
         mpOdeSolver(rHandler.mpOdeSolver),
-        mLastTime(rHandler.mLastTime)
+        mLastTime(rHandler.mLastTime),
+        mFinishedRunningOdes(rHandler.mFinishedRunningOdes)
 {
 }
 
@@ -131,4 +133,18 @@ void CellCycleModelOdeHandler::SetStateVariables(const std::vector<double>& rSta
 {
     assert(mpOdeSystem);
     mpOdeSystem->SetStateVariables(rStateVariables);
+}
+
+std::vector<double> CellCycleModelOdeHandler::GetProteinConcentrations() const
+{
+    assert(mpOdeSystem != NULL);
+    return mpOdeSystem->rGetStateVariables();
+}
+
+void CellCycleModelOdeHandler::SetProteinConcentrationsForTestsOnly(double lastTime, std::vector<double> proteinConcentrations)
+{
+    assert(mpOdeSystem != NULL);
+    assert(proteinConcentrations.size()==mpOdeSystem->rGetStateVariables().size());
+    mLastTime = lastTime;
+    mpOdeSystem->SetStateVariables(proteinConcentrations);
 }

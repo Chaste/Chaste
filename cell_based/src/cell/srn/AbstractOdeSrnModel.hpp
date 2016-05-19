@@ -69,17 +69,11 @@ private:
     {
         archive & boost::serialization::base_object<AbstractSrnModel>(*this);
         archive & boost::serialization::base_object<CellCycleModelOdeHandler>(*this);
-        archive & mFinishedRunningOdes;
         archive & mInitialConditions;
         archive & mStateSize;
     }
 
 protected:
-
-    /**
-     * Whether the SRN model is currently in a delay (not solving ODEs).
-     */
-    bool mFinishedRunningOdes;
 
     /**
      * The initial condition for the ODE state variables.
@@ -148,11 +142,6 @@ public:
      * @param initialConditions the new value of mInitialConditions
      */
     void SetInitialConditions(std::vector<double> initialConditions);
-
-    /**
-     * @return reference to the ODE system state values.
-     */
-    const std::vector<double>& GetStateVariables();
 
     /**
      * Outputs cell cycle model parameters to file. Virtual void so needs to be specified in child classes.

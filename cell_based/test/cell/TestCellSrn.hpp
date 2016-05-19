@@ -101,11 +101,11 @@ public:
         TS_ASSERT_DELTA(X, 0.0067, 1e-4);
 
         // Indirect access to state vector
-        C = dynamic_cast<Goldbeter1991SrnModel*>(p_tn_cell->GetSrnModel())->GetStateVariables()[0];
+        C = dynamic_cast<Goldbeter1991SrnModel*>(p_tn_cell->GetSrnModel())->GetProteinConcentrations()[0];
         TS_ASSERT_DELTA(C, 0.5470, 1e-4);
-        M = dynamic_cast<Goldbeter1991SrnModel*>(p_tn_cell->GetSrnModel())->GetStateVariables()[1];
+        M = dynamic_cast<Goldbeter1991SrnModel*>(p_tn_cell->GetSrnModel())->GetProteinConcentrations()[1];
         TS_ASSERT_DELTA(M, 0.2936, 1e-4);
-        X = dynamic_cast<Goldbeter1991SrnModel*>(p_tn_cell->GetSrnModel())->GetStateVariables()[2];
+        X = dynamic_cast<Goldbeter1991SrnModel*>(p_tn_cell->GetSrnModel())->GetProteinConcentrations()[2];
         TS_ASSERT_DELTA(X, 0.0067, 1e-4);
 
         std::cout << "Finished ODE - " << "C : " << C << ", M : " << M  << ", X : " << X << std::endl;

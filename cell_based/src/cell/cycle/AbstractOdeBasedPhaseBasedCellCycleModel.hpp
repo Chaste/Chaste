@@ -76,7 +76,6 @@ private:
         archive & boost::serialization::base_object<AbstractPhaseBasedCellCycleModel>(*this);
         archive & boost::serialization::base_object<CellCycleModelOdeHandler>(*this);
         archive & mDivideTime;
-        archive & mFinishedRunningOdes;
         archive & mG2PhaseStartTime;
     }
 
@@ -84,9 +83,6 @@ protected:
 
     /** The time at which the cell should divide - Set this to DBL_MAX in constructor. */
     double mDivideTime;
-
-    /** Whether the cell-cycle model is currently in a delay (not solving ODEs). */
-    bool mFinishedRunningOdes;
 
     /** The start time for the G2 phase. */
     double mG2PhaseStartTime;
@@ -148,22 +144,6 @@ public:
      * @param birthTime the simulation time when the cell was born
      */
     void SetBirthTime(double birthTime);
-
-    /**
-     * @return the protein concentrations at the current time (useful for tests)
-     *
-     * NB: Will copy the vector - you can't use this to modify the concentrations.
-     */
-    std::vector<double> GetProteinConcentrations() const;
-
-    /**
-     * Sets the protein concentrations and time when the model was last evaluated - should only be called by tests
-     *
-     * @param lastTime the SimulationTime at which the protein concentrations apply
-     * @param proteinConcentrations a standard vector of doubles of protein concentrations
-     *
-     */
-    void SetProteinConcentrationsForTestsOnly(double lastTime, std::vector<double> proteinConcentrations);
 
     /**
      * For a naturally cycling model this does not need to be overridden in the

@@ -41,7 +41,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 AbstractOdeSrnModel::AbstractOdeSrnModel(unsigned stateSize, boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
     : AbstractSrnModel(),
       CellCycleModelOdeHandler(SimulationTime::Instance()->GetTime(), pOdeSolver),
-      mFinishedRunningOdes(false),
       mStateSize(stateSize)
 {
 }
@@ -49,7 +48,6 @@ AbstractOdeSrnModel::AbstractOdeSrnModel(unsigned stateSize, boost::shared_ptr<A
 AbstractOdeSrnModel::AbstractOdeSrnModel(const AbstractOdeSrnModel& rModel)
     : AbstractSrnModel(rModel),
       CellCycleModelOdeHandler(rModel),
-      mFinishedRunningOdes(rModel.mFinishedRunningOdes),
       mInitialConditions(rModel.mInitialConditions),
       mStateSize(rModel.mStateSize)
 {
@@ -83,10 +81,10 @@ void AbstractOdeSrnModel::SimulateToCurrentTime()
     // Run ODEs if needed
     if (current_time > mLastTime)
     {
-        if (!mFinishedRunningOdes)
+        if (!this->mFinishedRunningOdes)
         {
             // Update whether a stopping event has occurred
-            mFinishedRunningOdes = SolveOdeToTime(current_time);
+            this->mFinishedRunningOdes = SolveOdeToTime(current_time);
         }
         else
         {
@@ -128,13 +126,6 @@ void AbstractOdeSrnModel::SetInitialConditions(std::vector<double> initialCondit
 {
     assert(initialConditions.size() == mStateSize);
     mInitialConditions = initialConditions;
-}
-
-const std::vector<double>& AbstractOdeSrnModel::GetStateVariables()
-{
-    assert(mpOdeSystem != NULL);
-    assert(mpOdeSystem->rGetStateVariables().size() == mStateSize);
-    return mpOdeSystem->rGetStateVariables();
 }
 
 void AbstractOdeSrnModel::OutputSrnModelParameters(out_stream& rParamsFile)

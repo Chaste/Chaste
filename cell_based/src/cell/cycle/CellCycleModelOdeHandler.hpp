@@ -68,6 +68,7 @@ private:
         archive & mpOdeSolver;
         archive & mLastTime;
         archive & mDt;
+        archive & mFinishedRunningOdes;
     }
 
     /**
@@ -103,6 +104,11 @@ protected:
 
     /** The last time the ODE system was evaluated. */
     double mLastTime;
+
+    /**
+     * Whether the model is currently in a delay (not solving ODEs).
+     */
+    bool mFinishedRunningOdes;
 
     /**
      * Solves the ODE system to a given time.
@@ -181,6 +187,23 @@ public:
      * @param rStateVariables vector containing values for the state variables
      */
     void SetStateVariables(const std::vector<double>& rStateVariables);
+
+    /**
+     * @return the protein concentrations at the current time (useful for tests)
+     *
+     * NB: Will copy the vector - you can't use this to modify the concentrations.
+     */
+    std::vector<double> GetProteinConcentrations() const;
+
+    /**
+     * Sets the protein concentrations and time when the model was last evaluated - should only be called by tests
+     *
+     * @param lastTime the SimulationTime at which the protein concentrations apply
+     * @param proteinConcentrations a standard vector of doubles of protein concentrations
+     *
+     */
+    void SetProteinConcentrationsForTestsOnly(double lastTime, std::vector<double> proteinConcentrations);
+
 };
 
 #endif /*CELLCYCLEMODELODEHANDLER_HPP_*/

@@ -41,8 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 AbstractOdeBasedCellCycleModel::AbstractOdeBasedCellCycleModel(double lastTime,
                                                                boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
     : CellCycleModelOdeHandler(lastTime, pOdeSolver),
-      mDivideTime(lastTime),
-      mFinishedRunningOdes(false)
+      mDivideTime(lastTime)
 {
     AbstractCellCycleModel::SetBirthTime(lastTime);
 }
@@ -54,8 +53,7 @@ AbstractOdeBasedCellCycleModel::~AbstractOdeBasedCellCycleModel()
 AbstractOdeBasedCellCycleModel::AbstractOdeBasedCellCycleModel(const AbstractOdeBasedCellCycleModel& rModel)
     : AbstractCellCycleModel(rModel),
       CellCycleModelOdeHandler(rModel),
-      mDivideTime(rModel.mDivideTime),
-      mFinishedRunningOdes(false)
+      mDivideTime(rModel.mDivideTime)
 {
     /*
      * Set each member variable of the new cell-cycle model that inherits
@@ -79,20 +77,6 @@ void AbstractOdeBasedCellCycleModel::SetBirthTime(double birthTime)
     AbstractCellCycleModel::SetBirthTime(birthTime);
     mLastTime = birthTime;
     mDivideTime = birthTime;
-}
-
-std::vector<double> AbstractOdeBasedCellCycleModel::GetProteinConcentrations() const
-{
-    assert(mpOdeSystem != NULL);
-    return mpOdeSystem->rGetStateVariables();
-}
-
-void AbstractOdeBasedCellCycleModel::SetProteinConcentrationsForTestsOnly(double lastTime, std::vector<double> proteinConcentrations)
-{
-    assert(mpOdeSystem != NULL);
-    assert(proteinConcentrations.size()==mpOdeSystem->rGetStateVariables().size());
-    mLastTime = lastTime;
-    mpOdeSystem->SetStateVariables(proteinConcentrations);
 }
 
 bool AbstractOdeBasedCellCycleModel::ReadyToDivide()
