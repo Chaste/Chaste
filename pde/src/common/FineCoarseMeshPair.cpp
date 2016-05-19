@@ -226,8 +226,12 @@ void FineCoarseMeshPair<DIM>::ComputeFineElementsAndWeightsForCoarseQuadPoints(G
 
             ComputeFineElementAndWeightForGivenPoint(point, safeMode, box_for_this_point, i);
         }
+        else
+        {
+            assert(mFineMeshElementsAndWeights[i].ElementNum == 0u); // and the weight is zero too...
+        }
     }
-
+    ShareFineElementData();
     if (mStatisticsCounters[1] > 0)
     {
         WARNING(mStatisticsCounters[1] << " of " << quad_point_posns.Size() << " coarse-mesh quadrature points were outside the fine mesh");
@@ -275,6 +279,7 @@ void FineCoarseMeshPair<DIM>::ComputeFineElementsAndWeightsForCoarseNodes(bool s
             ComputeFineElementAndWeightForGivenPoint(point, safeMode, box_for_this_point, i);
         }
     }
+    ShareFineElementData();
 }
 
 /**
@@ -395,8 +400,8 @@ void FineCoarseMeshPair<DIM>::ComputeCoarseElementsForFineNodes(bool safeMode)
         std::cout << "\nComputing coarse elements for fine nodes\n";
     }
     #undef COVERAGE_IGNORE
-
-    mCoarseElementsForFineNodes.resize(mrFineMesh.GetNumNodes());
+    mCoarseElementsForFineNodes.clear();
+    mCoarseElementsForFineNodes.resize(mrFineMesh.GetNumNodes(), 0.0);
 
     ResetStatisticsVariables();
     for (unsigned i=0; i<mCoarseElementsForFineNodes.size(); i++)
@@ -417,6 +422,7 @@ void FineCoarseMeshPair<DIM>::ComputeCoarseElementsForFineNodes(bool safeMode)
             mCoarseElementsForFineNodes[i] = ComputeCoarseElementForGivenPoint(point, safeMode, box_for_this_point);
         }
     }
+    ShareCoarseElementData();
 }
 
 template<unsigned DIM>
@@ -434,7 +440,8 @@ void FineCoarseMeshPair<DIM>::ComputeCoarseElementsForFineElementCentroids(bool 
     }
     #undef COVERAGE_IGNORE
 
-    mCoarseElementsForFineElementCentroids.resize(mrFineMesh.GetNumElements());
+    mCoarseElementsForFineElementCentroids.clear();
+    mCoarseElementsForFineElementCentroids.resize(mrFineMesh.GetNumElements(), 0.0);
 
     ResetStatisticsVariables();
     for (unsigned i=0; i<mrFineMesh.GetNumElements(); i++)
@@ -457,6 +464,7 @@ void FineCoarseMeshPair<DIM>::ComputeCoarseElementsForFineElementCentroids(bool 
             mCoarseElementsForFineElementCentroids[i] = ComputeCoarseElementForGivenPoint(point, safeMode, box_for_this_point);
         }
     }
+    ShareCoarseElementData();
 }
 
 template<unsigned DIM>
@@ -577,6 +585,55 @@ void FineCoarseMeshPair<DIM>::ResetStatisticsVariables()
     mNotInMesh.clear();
     mNotInMeshNearestElementWeights.clear();
     mStatisticsCounters.resize(2, 0u);
+}
+template<unsigned DIM>
+void FineCoarseMeshPair<DIM>::ShareFineElementData()
+{
+    if (PetscTools::IsSequential())
+    {
+        return;
+    }
+//Unnecessary with ObsoleteBoxCollection
+//    // This sums the results so it isn't idempotent: you get a different result if you call this method twice
+//    // Should not matter: the methods which call this helper method have reset everything which is about to be shared
+//    std::vector<unsigned> local_counters = mStatisticsCounters;
+//    MPI_Allreduce(&local_counters[0], &mStatisticsCounters[0], 2u, MPI_UNSIGNED, MPI_SUM, PETSC_COMM_WORLD);
+//
+//    ///\todo #2308 Inefficient loop for broadcasting all the data which has been set (assuming unset values are all zero).
+//    for (unsigned i=0; i<mFineMeshElementsAndWeights.size(); i++)
+//    {
+//        unsigned temp = mFineMeshElementsAndWeights[i].ElementNum;
+//        MPI_Allreduce(&temp, &(mFineMeshElementsAndWeights[i].ElementNum), 1u, MPI_UNSIGNED, MPI_SUM, PETSC_COMM_WORLD);
+//
+//        c_vector<double, DIM+1> local_weights = mFineMeshElementsAndWeights[i].Weights;
+//        MPI_Allreduce( &local_weights[0], &mFineMeshElementsAndWeights[i].Weights[0], DIM+1, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
+//    }
+}
+template<unsigned DIM>
+void FineCoarseMeshPair<DIM>::ShareCoarseElementData()
+{
+    if (PetscTools::IsSequential())
+    {
+        return;
+    }
+
+//Unnecessary with ObsoleteBoxCollection
+//    // This sums the results so it isn't idempotent: you get a different result if you call this method twice
+//    // Should not matter: the methods which call this helper method have reset #mStatisticsCounters
+//    std::vector<unsigned> local_counters = mStatisticsCounters;
+//    MPI_Allreduce(&local_counters[0], &mStatisticsCounters[0], 2u, MPI_UNSIGNED, MPI_SUM, PETSC_COMM_WORLD);
+//
+//    // The rest uses "max" so it is idempotent.  You can safely re-share results between processes without them changing.
+//    if (mCoarseElementsForFineNodes.empty() == false)
+//    {
+//        std::vector<unsigned> temp_coarse_elements = mCoarseElementsForFineNodes;
+//        MPI_Allreduce( &temp_coarse_elements[0], &mCoarseElementsForFineNodes[0], mCoarseElementsForFineNodes.size(), MPI_UNSIGNED, MPI_MAX, PETSC_COMM_WORLD);
+//    }
+//    if (mCoarseElementsForFineElementCentroids.empty() == false)
+//    {
+//        std::vector<unsigned> temp_coarse_elements = mCoarseElementsForFineElementCentroids;
+//        MPI_Allreduce( &temp_coarse_elements[0], &mCoarseElementsForFineElementCentroids[0], mCoarseElementsForFineElementCentroids.size(), MPI_UNSIGNED, MPI_MAX, PETSC_COMM_WORLD);
+//    }
 }
 
 template<unsigned DIM>

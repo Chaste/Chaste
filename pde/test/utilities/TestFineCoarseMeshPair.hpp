@@ -64,6 +64,8 @@ public:
 
         mesh_pair.SetUpBoxesOnFineMesh();
         GaussianQuadratureRule<2> quad_rule(3);
+        unsigned num_quads_per_element = quad_rule.GetNumQuadPoints();
+        TS_ASSERT_EQUALS(num_quads_per_element, 6u);
         mesh_pair.ComputeFineElementsAndWeightsForCoarseQuadPoints(quad_rule, true);
 
         // All coarse quadrature points should have been found in the fine mesh
@@ -71,16 +73,14 @@ public:
         TS_ASSERT_EQUALS(mesh_pair.mNotInMeshNearestElementWeights.size(), 0u);
 
         // Check the elements and weights have been set up correctly
+        // Each item corresponds to a quad point in an element in the coarse mesh with 6 quad points per element
+        TS_ASSERT_EQUALS(mesh_pair.rGetElementsAndWeights().size(), num_quads_per_element*coarse_mesh.GetNumAllElements());
         TS_ASSERT_EQUALS(mesh_pair.rGetElementsAndWeights().size(), 12u);
 
         for (unsigned i=0; i<mesh_pair.rGetElementsAndWeights().size(); i++)
         {
+            // All coarse mesh quad points are in the same fine element
             TS_ASSERT_EQUALS(mesh_pair.rGetElementsAndWeights()[i].ElementNum, 1u);
-        }
-
-        for (unsigned i=0; i<mesh_pair.rGetElementsAndWeights().size(); i++)
-        {
-            TS_ASSERT_LESS_THAN(mesh_pair.rGetElementsAndWeights()[i].ElementNum, fine_mesh.GetNumElements());
 
             /*
              * All the weights should be between 0 and 1 as no coarse nodes are.
@@ -94,7 +94,6 @@ public:
                 TS_ASSERT_LESS_THAN(mesh_pair.rGetElementsAndWeights()[i].Weights(j), 1.0+1e-14);
             }
         }
-
         TS_ASSERT_EQUALS(mesh_pair.mStatisticsCounters[0], 12u);
         TS_ASSERT_EQUALS(mesh_pair.mStatisticsCounters[1], 0u);
     }
@@ -196,9 +195,13 @@ public:
 
         mesh_pair.ComputeFineElementsAndWeightsForCoarseQuadPoints(quad_rule, true);
 
-        TS_ASSERT_EQUALS(mesh_pair.mNotInMesh.size(), 2u); // hardcoded
-        TS_ASSERT_EQUALS(mesh_pair.mNotInMeshNearestElementWeights.size(), 2u);
 
+        ///\todo #2308 These quantities are not shared yet...
+        if (PetscTools::IsSequential())
+        {
+            TS_ASSERT_EQUALS(mesh_pair.mNotInMesh.size(), 2u); // hardcoded
+            TS_ASSERT_EQUALS(mesh_pair.mNotInMeshNearestElementWeights.size(), 2u);
+        }
         TS_ASSERT_EQUALS(mesh_pair.rGetElementsAndWeights().size(), 6*8u);
 
         for (unsigned i=0; i<mesh_pair.rGetElementsAndWeights().size(); i++)
@@ -227,7 +230,11 @@ public:
 
         mesh_pair.PrintStatistics();
 
-        TS_ASSERT_EQUALS( Warnings::Instance()->GetNumWarnings(), 1u);
+        ///\todo #2308 warnings may or may not be triggered locally
+        if (PetscTools::IsSequential())
+        {
+            TS_ASSERT_EQUALS( Warnings::Instance()->GetNumWarnings(), 1u);
+        }
         Warnings::Instance()->QuietDestroy();
     }
 
@@ -322,8 +329,12 @@ public:
 
         mesh_pair.ComputeFineElementsAndWeightsForCoarseQuadPoints(quad_rule, false /* non-safe mode*/);
 
-        TS_ASSERT_EQUALS(mesh_pair.mNotInMesh.size(), 2u); // hardcoded
-        TS_ASSERT_EQUALS(mesh_pair.mNotInMeshNearestElementWeights.size(), 2u);
+        ///\todo #2308 These quantities are not shared yet...
+        if (PetscTools::IsSequential())
+        {
+            TS_ASSERT_EQUALS(mesh_pair.mNotInMesh.size(), 2u); // hardcoded
+            TS_ASSERT_EQUALS(mesh_pair.mNotInMeshNearestElementWeights.size(), 2u);
+        }
         TS_ASSERT_EQUALS(mesh_pair.rGetElementsAndWeights().size(), 6*8u);
 
         for (unsigned i=0; i<mesh_pair.rGetElementsAndWeights().size(); i++)
@@ -448,9 +459,10 @@ public:
         {
             TS_ASSERT_EQUALS(mesh_pair.rGetCoarseElementsForFineNodes()[i], lower_left_element_index);
         }
-
-        // Call again with safeMode=false this time (same results, faster)
+        // A little reset
+        TS_ASSERT_DIFFERS(mesh_pair.rGetCoarseElementsForFineNodes()[0], 0u);
         mesh_pair.rGetCoarseElementsForFineNodes()[0] = 189342958;
+        // Call again with safeMode=false this time (same results, faster)
         mesh_pair.ComputeCoarseElementsForFineNodes(false);
         for (unsigned i=0; i<fine_mesh.GetNumNodes(); i++)
         {

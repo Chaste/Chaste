@@ -149,7 +149,7 @@ private:
      *
      *  Note, after ComputeFineElementsAndWeightsForCoarseQuadPoints() or
      *  ComputeFineElementsAndWeightsForCoarseNodes(), then
-     *   mCounters[1] = mNotInMesh.size() = mNotInMeshNearestElementWeights.size();
+     *   mStatisticsCounters[1] = mNotInMesh.size() = mNotInMeshNearestElementWeights.size();
      */
     std::vector<unsigned> mStatisticsCounters;
 
@@ -238,6 +238,14 @@ private:
      * mStatisticsCounters.
      */
     void ResetStatisticsVariables();
+    /**
+     * In parallel: share mStatisticsCounters and all the "fine element weights for..." information
+     */
+    void ShareFineElementData();
+    /**
+     * In parallel: share mStatisticsCounters and all the "this coarse element index for..." information
+     */
+    void ShareCoarseElementData();
 
 public:
 
