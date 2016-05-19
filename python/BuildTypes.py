@@ -1116,7 +1116,8 @@ class CrayHpc(BuildType):
         self.tools['mpicxx'] = 'CC'
         self.build_dir = 'crayhpc'
         self._cc_flags = [
-            #'-O3', # Default is similar to -O2. Or try -O3 for more.
+            '-DNDEBUG',
+            '-O3',
             '-h nomessage=940', #940: A "return" statement is missing from the end of a non-void function.
             '-h nomessage=1254', #1254: The environment variable "CPATH" is not supported.
         ]
