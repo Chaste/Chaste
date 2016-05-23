@@ -155,7 +155,6 @@ void SetupAndRunSimulation(unsigned simulation_id, double reynolds_number)
     cell_population.SetIfPopulationHasActiveSources(true);
 
     OffLatticeSimulation<2> simulator(cell_population);
-//    simulator.SetConsoleProgressOutput(false);
 
     // Add main immersed boundary simulation modifier
     MAKE_PTR(ImmersedBoundarySimulationModifier<2>, p_main_modifier);

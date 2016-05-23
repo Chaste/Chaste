@@ -60,7 +60,7 @@ ImmersedBoundarySimulationModifier<DIM>::ImmersedBoundarySimulationModifier()
       mGridSpacingY(0.0),
       mFftNorm(0.0),
       mReynolds(1e-4),
-      mI(0.0 + 1.0 * 1i),
+      mI(0.0, 1.0),
       mpArrays(NULL)
 {
 }

@@ -56,7 +56,7 @@ class TestNumericsPaperSimulations : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestEllipseRelaxing() throw(Exception)
+    void xTestEllipseRelaxing() throw(Exception)
     {
         /*
          * 1: num nodes
@@ -144,5 +144,113 @@ public:
         // Tidy up
         results_file->close();
         delete(p_mesh);
+    }
+
+    void TestSingleCellVolumeChangeWithNodeSpacing() throw(Exception)
+    {
+        /**
+         * This test simulates a single circular cell for a fixed simulation time.
+         *
+         * We test node spacing ratios 0.1, 0.2, ..., 3.9, 4.0
+         *
+         * All parameters are fixed except the number of nodes, and the following are exported to a csv file:
+         *  * Number of nodes in the cell
+         *  * Node spacing to mesh spacing ratio
+         *  * Change in volume as ratio: absolute change / initial volume
+         */
+
+        unsigned num_sims = 40;
+        unsigned num_grid_pts = 256;
+        double radius = 0.4;
+
+        std::string output_directory = "numerics_paper/node_spacing_ratio";
+
+        OutputFileHandler results_handler(output_directory, false);
+        out_stream results_file = results_handler.OpenOutputFile("node_spacing_ratio.csv");
+
+        // Output summary statistics to results file
+        (*results_file) << "id,node_spacing_ratio,absolute_volume_change\n";
+
+        for (unsigned sim_idx = 0; sim_idx < num_sims; sim_idx++)
+        {
+            SimulationTime::Instance()->Destroy();
+            SimulationTime::Instance()->SetStartTime(0.0);
+
+            double target_spacing_ratio = 0.1 * (1 + sim_idx);
+            unsigned num_nodes = (unsigned)(M_PI / asin(0.5 * target_spacing_ratio / (radius * num_grid_pts)));
+
+            /*
+             * Create an Immersed Boundary Mesh using a SuperellipseGenerator
+             *
+             * 1: Num nodes
+             * 2: Superellipse exponent
+             * 3: Width
+             * 4: Height
+             * 5: Bottom-left x
+             * 6: Botton-left y
+             */
+            SuperellipseGenerator *p_gen = new SuperellipseGenerator(num_nodes, 1.0, 2.0*radius, 2.0*radius, 0.5-radius, 0.5-radius);
+
+            // Generate a mesh using this superellipse
+            std::vector<c_vector<double, 2> > locations = p_gen->GetPointsAsVectors();
+            delete p_gen;
+
+            std::vector<Node<2> *> nodes;
+            for (unsigned node_idx = 0; node_idx < locations.size(); node_idx++)
+            {
+                nodes.push_back(new Node<2>(node_idx, locations[node_idx], true));
+            }
+
+            std::vector<ImmersedBoundaryElement < 2, 2>* > elements;
+            elements.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
+
+            ImmersedBoundaryMesh<2, 2> mesh(nodes, elements);
+            mesh.SetNumGridPtsXAndY(256);
+
+            // The real node spacing ratio (it won't be exactly the target due to needing an integer number of nodes)
+            double node_spacing_ratio = mesh.GetSpacingRatio();
+
+            std::vector<CellPtr> cells;
+            MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+            CellsGenerator<UniformlyDistributedCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
+            ImmersedBoundaryCellPopulation<2> cell_population(mesh, cells);
+
+            OffLatticeSimulation<2> simulation(cell_population);
+            cell_population.SetIfPopulationHasActiveSources(false);
+
+            // Add main immersed boundary simulation modifier
+            MAKE_PTR(ImmersedBoundarySimulationModifier < 2 >, p_main_modifier);
+            simulation.AddSimulationModifier(p_main_modifier);
+
+            // Add force law
+            MAKE_PTR_ARGS(ImmersedBoundaryMembraneElasticityForce<2>, p_boundary_force, (cell_population));
+            p_main_modifier->AddImmersedBoundaryForce(p_boundary_force);
+            p_boundary_force->SetSpringConstant(1e9);
+            p_boundary_force->SetRestLengthMultiplier(0.5);
+
+
+            std::string sim_output_dir = output_directory + "/sim";
+            sim_output_dir += boost::lexical_cast<std::string>(sim_idx);
+
+            // Set simulation properties
+            double dt = 0.01;
+            simulation.SetOutputDirectory(sim_output_dir);
+            simulation.SetDt(dt);
+            simulation.SetSamplingTimestepMultiple(5);
+            simulation.SetEndTime(100.0 * dt);
+
+            // Run the simulation
+            simulation.Solve();
+
+            double new_radius = mesh.GetElement(0)->GetNode(0)->rGetLocation()[0] - 0.5;
+            double absolute_volume_change = fabs(radius * radius - new_radius * new_radius) / (radius * radius);
+
+            (*results_file) << boost::lexical_cast<std::string>(sim_idx) << ","
+                            << boost::lexical_cast<std::string>(node_spacing_ratio) << ","
+                            << boost::lexical_cast<std::string>(absolute_volume_change) << "\n";
+        }
+
+        results_file->close();
     }
 };
