@@ -630,7 +630,7 @@ void FineCoarseMeshPair<DIM>::ShareFineElementData()
         MPI_Allreduce( &local_weights[0], &mFineMeshElementsAndWeights[index].Weights[0], DIM+1, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
         for (unsigned j=0; j<DIM+1; j++)
         {
-            assert(  mFineMeshElementsAndWeights[index].Weights[j] = all_weights[index*(DIM+1)+j] );
+            assert(  mFineMeshElementsAndWeights[index].Weights[j] == all_weights[index*(DIM+1)+j] );
         }
     }
 }
