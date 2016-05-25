@@ -613,6 +613,7 @@ void FineCoarseMeshPair<DIM>::ShareFineElementData()
             all_weights[index*(DIM+1)+j] = mFineMeshElementsAndWeights[index].Weights[j];
         }
     }
+
     // Copy and share
     std::vector<unsigned> local_all_element_indices = all_element_indices;
     std::vector<double> local_all_weights = all_weights;
@@ -620,17 +621,12 @@ void FineCoarseMeshPair<DIM>::ShareFineElementData()
     MPI_Allreduce( &local_all_weights[0], &all_weights[0], weights_size, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
 
     // Put back into the regular data structure
-    ///\todo #2308 Inefficient loop for broadcasting all the data which has been set (assuming unset values are all zero).
     for (unsigned index=0; index<mFineMeshElementsAndWeights.size(); index++)
     {
-        unsigned temp = mFineMeshElementsAndWeights[index].ElementNum;
-        MPI_Allreduce(&temp, &(mFineMeshElementsAndWeights[index].ElementNum), 1u, MPI_UNSIGNED, MPI_SUM, PETSC_COMM_WORLD);
-        assert( mFineMeshElementsAndWeights[index].ElementNum == all_element_indices[index]);
-        c_vector<double, DIM+1> local_weights = mFineMeshElementsAndWeights[index].Weights;
-        MPI_Allreduce( &local_weights[0], &mFineMeshElementsAndWeights[index].Weights[0], DIM+1, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
+        mFineMeshElementsAndWeights[index].ElementNum = all_element_indices[index];
         for (unsigned j=0; j<DIM+1; j++)
         {
-            assert(  mFineMeshElementsAndWeights[index].Weights[j] == all_weights[index*(DIM+1)+j] );
+            mFineMeshElementsAndWeights[index].Weights[j] = all_weights[index*(DIM+1)+j] ;
         }
     }
 }
