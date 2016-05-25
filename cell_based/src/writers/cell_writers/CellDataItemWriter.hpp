@@ -67,12 +67,11 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & boost::serialization::base_object<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> >(*this);
-        // archive & mCellDataVariableName; not done here as need to pass to constructor so using sae load methods.
-
+        // archive & mCellDataVariableName; not done here as need to pass to constructor so using same load methods.
     }
 
     /**
-     * The item stored in CellData to output
+     * The item stored in CellData to output.
      */
     std::string mCellDataVariableName;
 
@@ -81,7 +80,7 @@ public:
     /**
      * Constructor.
      *
-     * @param cellDataVariableName the item in CellData to output (Defaults to "")
+     * @param cellDataVariableName the item in CellData to output (defaults to "")
      */
     CellDataItemWriter(std::string cellDataVariableName = "");
 
@@ -101,10 +100,10 @@ public:
     /**
      * Overridden VisitCell() method.
      *
-     * Visit a cell and write its morphogen data.
+     * Visit a cell and write its cell data item.
      *
      * Outputs a line of space-separated values of the form:
-     * ...[location index] [cell id] [x-pos] [y-pos] [z-pos] [morphogen]...
+     * ...[location index] [cell id] [x-pos] [y-pos] [z-pos] [cell data item]...
      * with [y-pos] and [z-pos] included for 2 and 3 dimensional simulations, respectively.
      *
      * This is appended to the output written by AbstractCellBasedWriter, which is a single
