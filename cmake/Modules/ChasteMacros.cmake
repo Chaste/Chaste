@@ -418,6 +418,11 @@ macro(Chaste_DO_APPS_COMMON component)
         endif()
         add_executable(${appName} ${app})
         #set_target_properties(${appName} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/src)
+
+        if (NOT ${component} STREQUAL "")
+            add_dependencies(${component} ${appName})
+        endif()
+
         if (BUILD_SHARED_LIBS)
             target_link_libraries(${appName} LINK_PUBLIC ${component_library} ${Chaste_LIBRARIES})
         else()
