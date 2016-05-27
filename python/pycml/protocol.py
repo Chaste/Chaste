@@ -31,8 +31,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
 """
-Defines the Protocol class, which encapsulates the input & output of a
-simulation protocol.
+Defines the Protocol class, which encapsulates the interface between a model
+and a Web Lab protocol.
 """
 
 import os
@@ -630,7 +630,7 @@ class Protocol(processors.ModelModifier):
             except ValueError:
                 # Is this declared as an output with units?
                 for output_spec in self._output_specifications:
-                    if output_spec['prefixed_name'] == vname:
+                    if output_spec['prefixed_name'] == vname and output_spec['units']:
                         var = self._create_annotated_variable(vname, output_spec['units'])
 #                         print 'Created output', vname, '=', var, 'with units', var.units
                         return
@@ -638,6 +638,8 @@ class Protocol(processors.ModelModifier):
                 if vname in self._optional_vars:
 #                     print 'Creating', vname, 'with magic units'
                     var = self._create_annotated_variable(vname, self.magic_units)
+                else:
+                    raise ProtocolError("Variable %s on the LHS of a 'define' does not exist in the model and is not an output with units or optional." % vname)
     
     def report_stats(self):
         """Output a short report on what the modified model looks like.
@@ -1129,7 +1131,8 @@ class Protocol(processors.ModelModifier):
         assert isinstance(expr, mathml_apply)
         assert expr.operator().localName == u'eq', 'Expression is not an assignment'
         lhs, rhs = list(expr.operands())
-        if not self._identify_referenced_variables(expr, check_optional=True):
+        orig_defn_kw = u'original_definition' # References the original definition if it appears as a variable on the new RHS
+        if not self._identify_referenced_variables(expr, check_optional=True, special_name=orig_defn_kw):
             # Some optional variables weren't present in the model, so we can't use this equation.
             print >>sys.stderr, "Warning: optional model variables missing, so not using model interface equation:"
             if hasattr(expr, 'loc'):
@@ -1145,6 +1148,19 @@ class Protocol(processors.ModelModifier):
                             raise ProtocolError("At least one optional variable required to override the definition of model output '%s' was not found and has no default value." % vname)
             self.inputs.remove(expr)
             return
+        # Determine if the original_definition keyword occurs on the RHS
+        orig_defn_refs = []
+        def find_refs(elt):
+            if isinstance(elt, mathml_ci):
+                if unicode(elt) == orig_defn_kw:
+                    orig_defn_refs.append(elt)
+            else:
+                for child in elt.xml_element_children():
+                    find_refs(child)
+        find_refs(lhs)
+        if orig_defn_refs:
+            raise ProtocolError("Cannot assign to the %s keyword." % orig_defn_kw)
+        find_refs(rhs)
         # Figure out what's on the LHS of the assignment
         if lhs.localName == u'ci':
             # Straight assignment to variable
@@ -1162,12 +1178,18 @@ class Protocol(processors.ModelModifier):
 #                     import traceback
 #                     traceback.print_exc()
 #                     raise ProtocolError("No suitable value found for clamped variable " + unicode(lhs))
+            if orig_defn_refs:
+                # Store the original definition before removing it
+                orig_defn = assigned_var.get_all_expr_dependencies()
+                if orig_defn:
+                    orig_defn = list(orig_defn[0].operands())[1] # Take the RHS of the defining expression
+                else:
+                     # It should be a constant var; represent its value in a <cn>
+                    orig_defn = mathml_cn.create_new(assigned_var, assigned_var.initial_value, assigned_var.units)
             self.remove_definition(assigned_var, keep_initial_value=clamping)
             if clamping:
-#                 print 'Clamping', assigned_var
                 self.inputs.remove(expr) # The equation isn't actually used in this case
             else:
-#                 print 'Redefining', assigned_var
                 self.add_expr_to_comp(cname, expr)
                 assigned_var._add_dependency(expr)
         else:
@@ -1178,11 +1200,18 @@ class Protocol(processors.ModelModifier):
             assert dep_var.localName == u'ci', 'ODE is malformed'
             cname, dep_var_name = self._split_name(unicode(dep_var))
             dep_var = self.model.get_variable_by_name(cname, dep_var_name)
-            self.remove_definition(dep_var, True)
+            if orig_defn_refs:
+                orig_defn = dep_var.get_all_expr_dependencies()
+                assert len(orig_defn) == 1
+                orig_defn = list(orig_defn[0].operands())[1] # Take the RHS of the defining ODE
+            self.remove_definition(dep_var, keep_initial_value=True)
             self.add_expr_to_comp(cname, expr)
             indep_name = self._split_name(unicode(lhs.bvar.ci))
             indep_var = self.model.get_variable_by_name(*indep_name)
             dep_var._add_ode_dependency(indep_var, expr)
+        # Insert the original definition in the new RHS if needed
+        for ref in orig_defn_refs:
+            ref.xml_parent.replace_child(ref, orig_defn.clone_self())
 
     def _filter_assignments(self):
         """Apply protocol outputs to reduce the model size.
