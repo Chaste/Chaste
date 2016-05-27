@@ -1148,12 +1148,15 @@ class Protocol(processors.ModelModifier):
                             raise ProtocolError("At least one optional variable required to override the definition of model output '%s' was not found and has no default value." % vname)
             self.inputs.remove(expr)
             return
-        # Determine if the original_definition keyword occurs on the RHS
+        # Determine if the original_definition keyword occurs on the RHS, and check that all numbers have units
         orig_defn_refs = []
         def find_refs(elt):
             if isinstance(elt, mathml_ci):
                 if unicode(elt) == orig_defn_kw:
                     orig_defn_refs.append(elt)
+            elif isinstance(elt, mathml_cn):
+                if not hasattr(elt, u'units'):
+                    raise ProtocolError("All numbers in model equations must have units; '%s' does not." % unicode(elt))
             else:
                 for child in elt.xml_element_children():
                     find_refs(child)
