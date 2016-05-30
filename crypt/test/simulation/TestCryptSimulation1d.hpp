@@ -492,12 +492,22 @@ public:
             if (i == 0)
             {
                 p_cell->SetCellProliferativeType(p_stem_type);
-                birth_time = -p_rand_gen->ranf()*(p_model->GetAverageStemCellCycleTime());
+                /* Note we can't set the age of the cell to be too large or the ODE solver may
+                 * not converge in the first timestep.
+                 * Numerical value chosen so results are unchanged with old revisions.
+                 * See #2788#comment:56
+                 */
+                birth_time = -p_rand_gen->ranf()*0.15; //(p_model->GetAverageStemCellCycleTime());
             }
             else if (i < 15)
             {
                 p_cell->SetCellProliferativeType(p_transit_type);
-                birth_time = -p_rand_gen->ranf()*(p_model->GetAverageStemCellCycleTime());
+                /* Note we can't set the age of the cell to be too large or the ODE solver may
+                 * not converge in the first timestep.
+                 * Numerical value chosen so results are unchanged with old revisions.
+                 * See #2788#comment:56
+                 */
+                birth_time = -p_rand_gen->ranf()*0.15; //(p_model->GetAverageTransitCellCycleTime());
             }
             else
             {
