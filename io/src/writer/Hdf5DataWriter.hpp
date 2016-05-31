@@ -138,6 +138,8 @@ private:
      * unless user-specified values have been set using #SetFixedChunkSize.
      * By default, chunks of 128 K are used, which seems to be a good compromise. For large problems
      * performance will usually improve by increasing this value (to e.g. 1 M).
+     *
+     * Note: The public method for altering the algorithm's target chunk size is #SetTargetChunkSize.
      */
     void SetChunkSize();
 
@@ -152,7 +154,7 @@ public:
      * @param cleanDirectory  whether to clean the directory (defaults to true)
      * @param extendData  whether to try opening an existing file and appending to it.
      * @param datasetName The name of the HDF5 dataset to write, defaults to "Data".
-     * @param useCache  *EXPERIMENTAL* Whether to cache writes.
+     * @param useCache  Whether to cache writes so only whole chunks are written to disk.
      *
      * The extendData parameter allows us to add to an existing dataset.  It only really makes
      * sense if the existing file has an unlimited dimension which we can extend.  It also only
