@@ -73,7 +73,7 @@ private:
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
-     * We don't have any member variables yet, but let's make things easy for the future.
+     * Save/load our member variables.
      *
      * @param archive the archive
      * @param version the current version of this class
