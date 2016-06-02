@@ -35,48 +35,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Needed for test framework
 #include <cxxtest/TestSuite.h>
-#include "AbstractCellBasedTestSuite.hpp"
 
 // Includes from projects/ImmersedBoundary
-#include "ImmersedBoundaryElement.hpp"
+#include "ImmersedBoundary2dArrays.hpp"
 
 // This test is never run in parallel
 #include "FakePetscSetup.hpp"
 
-class TestImmersedBoundaryElement : public CxxTest::TestSuite
+class TestImmersedBoundary2dArrays : public CxxTest::TestSuite
 {
 public:
 
-    // Note: the corner nodes and average node spacing of an element are set in the ImmersedBoundarMesh method DivideElement()
-
-    void TestFluidSourceMethods() throw(Exception)
+    void TestConstructor() throw(Exception)
     {
-        // Make 4 nodes to assign to a square element
-        std::vector<Node<2>*> nodes;
-        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
-        nodes.push_back(new Node<2>(1, true, 1.0, 0.0));
-        nodes.push_back(new Node<2>(2, true, 1.0, 1.0));
-        nodes.push_back(new Node<2>(3, true, 0.0, 1.0));
-
-        // Make a square element out of these nodes
-        ImmersedBoundaryElement<2,2> element(0, nodes);
-
-        TS_ASSERT_EQUALS(element.GetNumNodes(), 4u);
-
-        // Test SetFluidSource() and GetFluidSource() work correctly
-        TS_ASSERT(element.GetFluidSource() == NULL);
-
-        FluidSource<2> source(0, 0.5, 0.5);
-        source.SetStrength(57.0);
-        element.SetFluidSource(&source);
-
-        TS_ASSERT(element.GetFluidSource() != NULL);
-        TS_ASSERT_EQUALS(element.GetFluidSource()->GetIndex(), 0u);
-        TS_ASSERT_DELTA(element.GetFluidSource()->GetStrength(), 57.0, 1e-6);
-
-        TS_ASSERT_DELTA(element.GetAverageNodeSpacing(), DOUBLE_UNSET, 1e-6);
-
-        element.SetAverageNodeSpacing(0.123);
-        TS_ASSERT_DELTA(element.GetAverageNodeSpacing(), 0.123, 1e-6);
+        ///\todo Test this method
     }
 };

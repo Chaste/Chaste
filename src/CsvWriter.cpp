@@ -34,7 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "CsvWriter.hpp"
-#include "FileFinder.hpp"
+#include "OutputFileHandler.hpp"
 
 CsvWriter::CsvWriter()
     : mDirectoryName(""),
@@ -100,13 +100,12 @@ void CsvWriter::WriteDataToFile()
 
     if (mHeader && mHeaderStrings.size() != mVecUnsigned.size() + mVecDoubles.size() + mVecStrings.size())
     {
-        EXCEPTION("Expecting to write a header row, but header lenght does not match number of data rows");
+        EXCEPTION("Expecting to write a header row, but header length does not match number of data rows");
     }
 
     // Open file for writing
-    std::ofstream output;
-    output.open(mDirectoryName.c_str());
-    assert(output.is_open());
+    OutputFileHandler output_file_handler(mDirectoryName, false);
+    out_stream p_output = output_file_handler.OpenOutputFile(mFileName);
 
     // Output header, if present
     if (mHeader)
@@ -121,10 +120,10 @@ void CsvWriter::WriteDataToFile()
             {
                 sep.clear();
             }
-            output << mHeaderStrings[header_idx] << sep.c_str();
+            *p_output << mHeaderStrings[header_idx] << sep.c_str();
         }
 
-        output << "\n";
+        *p_output << "\n";
     }
 
     unsigned num_rows = (unsigned int) (mVecUnsigned.size() + mVecDoubles.size() + mVecStrings.size());
@@ -142,7 +141,7 @@ void CsvWriter::WriteDataToFile()
             {
                 sep.clear();
             }
-            output << mVecUnsigned[vec_idx][data_idx] << sep.c_str();
+            *p_output << mVecUnsigned[vec_idx][data_idx] << sep.c_str();
         }
 
         for (unsigned vec_idx = 0; vec_idx < mVecDoubles.size(); vec_idx++)
@@ -152,7 +151,7 @@ void CsvWriter::WriteDataToFile()
             {
                 sep.clear();
             }
-            output << std::scientific << mVecDoubles[vec_idx][data_idx] << sep.c_str();
+            *p_output << std::scientific << mVecDoubles[vec_idx][data_idx] << sep.c_str();
         }
 
         for (unsigned vec_idx = 0; vec_idx < mVecStrings.size(); vec_idx++)
@@ -162,14 +161,14 @@ void CsvWriter::WriteDataToFile()
             {
                 sep.clear();
             }
-            output << mVecStrings[vec_idx][data_idx] << sep.c_str();
+            *p_output << mVecStrings[vec_idx][data_idx] << sep.c_str();
         }
 
-        output << "\n";
+        *p_output << "\n";
     }
 
     // Close file
-    output.close();
+    p_output->close();
 }
 
 void CsvWriter::ValidateNewData(unsigned dataLength)
@@ -205,9 +204,7 @@ const std::string& CsvWriter::GetFileName() const
 
 void CsvWriter::SetDirectoryName(std::string directoryName)
 {
-    FileFinder file_finder(directoryName, RelativeTo::ChasteTestOutput);
-
-    mDirectoryName = file_finder.GetAbsolutePath();
+    mDirectoryName = directoryName;
 
     ///\todo Why is this code commented out?
 //    // Append "/" if necessary as later this will be concatenated with file name

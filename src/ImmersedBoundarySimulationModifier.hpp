@@ -66,6 +66,7 @@ private:
 
     /** To allow tests to directly access solver methods */
     friend class TestImmersedBoundaryPdeSolveMethods;
+    friend class TestImmersedBoundarySimulationModifier;
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
@@ -91,10 +92,18 @@ private:
     /** How often we calculate which cells are neighbours */
     unsigned mNodeNeighbourUpdateFrequency;
 
-    /** Number of grid points in the x direction */
+    /**
+     * Number of grid points in the x direction.
+     *
+     * \todo Duplicate of ImmersedBoundaryMesh::mNumGridPtsX - remove?
+     */
     unsigned mNumGridPtsX;
 
-    /** Number of grid points in the y direction */
+    /**
+     * Number of grid points in the y direction.
+     *
+     * \todo Duplicate of ImmersedBoundaryMesh::mNumGridPtY - remove?
+     */
     unsigned mNumGridPtsY;
 
     /** Number of grid points in the x direction */
@@ -122,7 +131,7 @@ private:
      */
     double mReynoldsNumber;
 
-    /** Imaginary unit */
+    /** Imaginary unit. */
     std::complex<double> mI;
 
     /** A list of force laws to determine the force applied to each node */

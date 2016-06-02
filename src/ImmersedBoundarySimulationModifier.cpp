@@ -46,6 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //#include <boost/thread.hpp>
 
 #include "FluidSource.hpp"
+#include "Debug.hpp"
 
 template<unsigned DIM>
 ImmersedBoundarySimulationModifier<DIM>::ImmersedBoundarySimulationModifier()
@@ -60,25 +61,33 @@ ImmersedBoundarySimulationModifier<DIM>::ImmersedBoundarySimulationModifier()
       mFftNorm(0.0),
       mReynoldsNumber(1e-4),
       mI(0.0, 1.0),
-      mpArrays(NULL)
+      mpArrays(NULL),
+      mpFftInterface(NULL)
 {
 }
 
 template<unsigned DIM>
 ImmersedBoundarySimulationModifier<DIM>::~ImmersedBoundarySimulationModifier()
 {
+    MARK;
     if (mpBoxCollection)
     {
+        MARK;
         delete(mpBoxCollection);
     }
+    MARK;
     if (mpArrays)
     {
+        MARK;
         delete(mpArrays);
     }
+    MARK;
     if (mpFftInterface)
     {
+        MARK;
         delete(mpFftInterface);
     }
+    MARK;
 }
 
 template<unsigned DIM>
@@ -162,6 +171,7 @@ void ImmersedBoundarySimulationModifier<DIM>::SetupConstantMemberVariables(Abstr
     switch (DIM)
     {
         case 2:
+        {
             mpArrays = new ImmersedBoundary2dArrays<DIM>(mpMesh, SimulationTime::Instance()->GetTimeStep(), mReynoldsNumber, mpCellPopulation->DoesPopulationHaveActiveSources());
             mpFftInterface = new ImmersedBoundaryFftInterface<DIM>(mpMesh,
                                                                    &(mpArrays->rGetModifiableRightHandSideGrids()[0][0][0]),
@@ -172,13 +182,9 @@ void ImmersedBoundarySimulationModifier<DIM>::SetupConstantMemberVariables(Abstr
 
             mFftNorm = (double) mNumGridPtsX * (double) mNumGridPtsY;
             break;
-
-        case 3:
-            EXCEPTION("Not implemented yet in 3D");
-            break;
-
+        }
         default:
-            NEVER_REACHED;
+            NEVER_REACHED; // Not yet implemented in 3D
     }
 }
 
@@ -187,8 +193,8 @@ void ImmersedBoundarySimulationModifier<DIM>::ClearForcesAndSources()
 {
     // Clear applied forces on each node
     for (typename ImmersedBoundaryMesh<DIM, DIM>::NodeIterator node_iter = mpMesh->GetNodeIteratorBegin(false);
-            node_iter != mpMesh->GetNodeIteratorEnd();
-            ++node_iter)
+         node_iter != mpMesh->GetNodeIteratorEnd();
+         ++node_iter)
     {
         node_iter->ClearAppliedForce();
     }
@@ -227,8 +233,8 @@ void ImmersedBoundarySimulationModifier<DIM>::AddImmersedBoundaryForceContributi
 {
     // Add contributions from each immersed boundary force
     for (typename std::vector<boost::shared_ptr<AbstractImmersedBoundaryForce<DIM> > >::iterator iter = mForceCollection.begin();
-            iter != mForceCollection.end();
-            ++iter)
+         iter != mForceCollection.end();
+         ++iter)
     {
         (*iter)->AddImmersedBoundaryForceContribution(mNodePairs);
     }

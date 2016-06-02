@@ -1,0 +1,4 @@
+UnsignedHeader1,UnsignedHeader2,DoubleHeader1,DoubleHeader2,StringHeader1,StringHeader2
+11,11,1.100000e+00,2.100000e+00,string11,string21
+12,12,1.200000e+00,2.200000e+00,string12,string22
+13,13,1.300000e+00,2.300000e+00,string13,string23

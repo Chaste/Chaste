@@ -67,6 +67,10 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & boost::serialization::base_object<AbstractImmersedBoundaryForce<DIM> >(*this);
+        archive & mSpringConst;
+        archive & mRestLengthMultiplier;
+        archive & mBasementSpringConstantModifier;
+        archive & mBasementRestLengthModifier;
     }
 
 protected:
@@ -107,6 +111,8 @@ protected:
      * The multiplicative quantity by which we alter the spring constant of the basement lamina, if present.
      *
      * Initialised to 5 in the constructor.
+     *
+     * \todo Add get/set methods?
      */
     double mBasementSpringConstantModifier;
 
@@ -114,6 +120,8 @@ protected:
      * The multiplicative quantity by which we alter the rest length of the basement lamina, if present.
      *
      * Initialised to 0.5 in the constructor.
+     *
+     * \todo Add get/set methods?
      */
     double mBasementRestLengthModifier;
 

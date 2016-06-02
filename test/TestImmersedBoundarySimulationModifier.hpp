@@ -43,28 +43,257 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Includes from trunk
 #include "CellsGenerator.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
-#include "OffLatticeSimulation.hpp"
-#include "SmartPointers.hpp"
+//#include "OffLatticeSimulation.hpp"
+//#include "SmartPointers.hpp"
 #include "UniformlyDistributedCellCycleModel.hpp"
+#include "FileComparison.hpp"
+#include "HoneycombVertexMeshGenerator.hpp"
+#include "VertexBasedCellPopulation.hpp"
 
 // Includes from projects/ImmersedBoundary
-#include "ImmersedBoundaryCellPopulation.hpp"
-#include "ImmersedBoundaryMesh.hpp"
-#include "ImmersedBoundaryMeshWriter.hpp"
-#include "ImmersedBoundaryMeshReader.hpp"
+//#include "ImmersedBoundaryCellPopulation.hpp"
+//#include "ImmersedBoundaryMesh.hpp"
+//#include "ImmersedBoundaryMeshWriter.hpp"
+//#include "ImmersedBoundaryMeshReader.hpp"
 #include "ImmersedBoundarySimulationModifier.hpp"
 #include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
-#include "SuperellipseGenerator.hpp"
+//#include "SuperellipseGenerator.hpp"
+#include "ImmersedBoundaryMembraneElasticityForce.hpp"
+#include "ImmersedBoundaryCellCellInteractionForce.hpp"
 
 // This test is never run in parallel
 #include "FakePetscSetup.hpp"
 
+#include "Debug.hpp"
+
+///\todo Improve testing
 class TestImmersedBoundarySimulationModifier : public AbstractCellBasedTestSuite
 {
 public:
 
-    ///\todo Improve testing
-    void TestNothingMuch() throw(Exception)
+    void TestConstructorAndGetAndSetMethods() throw(Exception)
     {
+        MARK;
+        ImmersedBoundarySimulationModifier<2> modifier;
+
+        MARK;
+        // Test GetNodeNeighbourUpdateFrequency() and SetNodeNeighbourUpdateFrequency()
+        TS_ASSERT_EQUALS(modifier.GetNodeNeighbourUpdateFrequency(), 1u);
+        modifier.SetNodeNeighbourUpdateFrequency(2);
+        TS_ASSERT_EQUALS(modifier.GetNodeNeighbourUpdateFrequency(), 2u);
+
+        MARK;
+        // Test GetReynoldsNumber() and SetReynoldsNumber()
+        TS_ASSERT_DELTA(modifier.GetReynoldsNumber(), 1e-4, 1e-6);
+        modifier.SetReynoldsNumber(1e-5);
+        TS_ASSERT_DELTA(modifier.GetReynoldsNumber(), 1e-5, 1e-6);
+        MARK;
+    }
+
+    void TestOutputParametersWithImmersedBoundarySimulationModifier() throw(Exception)
+    {
+        std::string output_directory = "TestOutputParametersWithImmersedBoundarySimulationModifier";
+        OutputFileHandler output_file_handler(output_directory, false);
+
+        MAKE_PTR(ImmersedBoundarySimulationModifier<2>, p_modifier);
+        TS_ASSERT_EQUALS(p_modifier->GetIdentifier(), "ImmersedBoundarySimulationModifier-2");
+
+        out_stream modifier_parameter_file = output_file_handler.OpenOutputFile("ImmersedBoundarySimulationModifier.parameters");
+        p_modifier->OutputSimulationModifierParameters(modifier_parameter_file);
+        modifier_parameter_file->close();
+
+        // Compare the generated file in test output with a reference copy in the source code
+        FileFinder generated = output_file_handler.FindFile("ImmersedBoundarySimulationModifier.parameters");
+        FileFinder reference("cell_based/test/data/TestOutputParametersWithImmersedBoundarySimulationModifier/ImmersedBoundarySimulationModifier.parameters",
+                RelativeTo::ChasteSourceRoot);
+        FileComparison comparer(generated, reference);
+        TS_ASSERT(comparer.CompareFiles());
+    }
+
+    void TestUpdateFluidVelocityGrids() throw(Exception)
+    {
+        ///\todo Test this method
+    }
+
+    void TestSetupConstantMemberVariables() throw(Exception)
+    {
+        ImmersedBoundarySimulationModifier<2> modifier;
+
+        TS_ASSERT_EQUALS(modifier.mNumGridPtsX, 0u);
+        TS_ASSERT_EQUALS(modifier.mNumGridPtsY, 0u);
+        TS_ASSERT_DELTA(modifier.mGridSpacingX, 0.0, 1e-6);
+        TS_ASSERT_DELTA(modifier.mGridSpacingY, 0.0, 1e-6);
+        TS_ASSERT_DELTA(modifier.mFftNorm, 0.0, 1e-6);
+        TS_ASSERT(modifier.mpArrays == NULL);
+        TS_ASSERT(modifier.mpFftInterface == NULL);
+
+        // Test that the correct exception is throw if trying to use the wrong cell population class
+        HoneycombVertexMeshGenerator vertex_generator(2, 2);
+        MutableVertexMesh<2,2>* p_vertex_mesh = vertex_generator.GetMesh();
+        std::vector<CellPtr> vertex_cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+        CellsGenerator<UniformlyDistributedCellCycleModel, 2> vertex_cells_generator;
+        vertex_cells_generator.GenerateBasicRandom(vertex_cells, p_vertex_mesh->GetNumElements(), p_diff_type);
+        VertexBasedCellPopulation<2> vertex_cell_population(*p_vertex_mesh, vertex_cells);
+
+        TS_ASSERT_THROWS_THIS(modifier.SetupConstantMemberVariables(vertex_cell_population),
+                "Cell population must be immersed boundary");
+
+        ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.2, 2.0, 0.15, true);
+        ImmersedBoundaryMesh<2,2>* p_mesh = gen.GetMesh();
+        std::vector<CellPtr> cells;
+        CellsGenerator<UniformlyDistributedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
+        ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
+
+        TS_ASSERT_THROWS_NOTHING(modifier.SetupConstantMemberVariables(vertex_cell_population));
+
+        TS_ASSERT_EQUALS(modifier.mNumGridPtsX, 10u);
+        TS_ASSERT_EQUALS(modifier.mNumGridPtsY, 10u);
+        TS_ASSERT_DELTA(modifier.mGridSpacingX, 0.1, 1e-6);
+        TS_ASSERT_DELTA(modifier.mGridSpacingY, 0.1, 1e-6);
+        TS_ASSERT_DELTA(modifier.mFftNorm, 100.0, 1e-6);
+        TS_ASSERT(modifier.mpArrays != NULL);
+        TS_ASSERT(modifier.mpFftInterface != NULL);
+    }
+
+    void TestClearForcesAndSources() throw(Exception)
+    {
+        ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.2, 2.0, 0.15, true);
+        ImmersedBoundaryMesh<2,2>* p_mesh = gen.GetMesh();
+
+        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        {
+            c_vector<double, 2> force;
+            force[0] = i*0.01;
+            force[1] = 2*i*0.01;
+
+            p_mesh->GetNode(i)->ClearAppliedForce();
+            p_mesh->GetNode(i)->AddAppliedForceContribution(force);
+        }
+
+        std::vector<CellPtr> cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+        CellsGenerator<UniformlyDistributedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
+        ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
+
+        // For coverage
+        cell_population.SetIfPopulationHasActiveSources(true);
+
+        ImmersedBoundarySimulationModifier<2> modifier;
+        modifier.SetupConstantMemberVariables(cell_population);
+
+        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        {
+            TS_ASSERT_DELTA(p_mesh->GetNode(i)->rGetAppliedForce()[0], 0.0, 1e-6);
+            TS_ASSERT_DELTA(p_mesh->GetNode(i)->rGetAppliedForce()[1], 0.0, 1e-6);
+        }
+
+        modifier.ClearForcesAndSources();
+
+        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        {
+            TS_ASSERT_DELTA(p_mesh->GetNode(i)->rGetAppliedForce()[0], 0.0, 1e-6);
+            TS_ASSERT_DELTA(p_mesh->GetNode(i)->rGetAppliedForce()[1], 0.0, 1e-6);
+        }
+
+        multi_array<double, 3>& r_force_grids = modifier.mpArrays->rGetModifiableForceGrids();
+        multi_array<double, 3>& r_rhs_grid = modifier.mpArrays->rGetModifiableRightHandSideGrids();
+
+        for (unsigned x=0; x<modifier.mNumGridPtsX; x++)
+        {
+            for (unsigned y=0; y<modifier.mNumGridPtsY; y++)
+            {
+                TS_ASSERT_DELTA(r_rhs_grid[2][x][y], 0.0, 1e-6);
+                for (unsigned dim=0; dim<2; dim++)
+                {
+                    TS_ASSERT_DELTA(r_force_grids[dim][x][y], 0.0, 1e-6);
+                }
+            }
+        }
+    }
+
+    void TestAddImmersedBoundaryForceContributions() throw(Exception)
+    {
+        ///\todo Test this method
+    }
+
+    void TestPropagateForcesToFluidGrid() throw(Exception)
+    {
+        ///\todo Test this method
+    }
+
+    void TestPropagateFluidSourcesToGrid() throw(Exception)
+    {
+        ///\todo Test this method
+    }
+
+    void TestSolveNavierStokesSpectral() throw(Exception)
+    {
+        ///\todo Test this method
+    }
+
+    void TestDelta1D() throw(Exception)
+    {
+        ///\todo Test this method
+    }
+
+    void TestUpwind2d() throw(Exception)
+    {
+        ///\todo Test this method
+    }
+
+    void TestSetMemberVariablesForTesting() throw(Exception)
+    {
+        ImmersedBoundarySimulationModifier<2> modifier;
+
+        modifier.SetMemberVariablesForTesting(15, 15);
+
+        TS_ASSERT_EQUALS(modifier.mNumGridPtsX, 15u);
+        TS_ASSERT_EQUALS(modifier.mNumGridPtsY, 15u);
+        TS_ASSERT_DELTA(modifier.mGridSpacingX, 0.0666, 1e-3);
+        TS_ASSERT_DELTA(modifier.mGridSpacingY, 0.0666, 1e-3);
+        TS_ASSERT_DELTA(modifier.mFftNorm, 15.0, 1e-4);
+    }
+
+    void TestUpdateAtEndOfTimeStep() throw(Exception)
+    {
+        ///\todo Test this method
+    }
+
+    void TestSetupSolve() throw(Exception)
+    {
+        ///\todo Test this method
+    }
+
+    void TestAddImmersedBoundaryForce() throw(Exception)
+    {
+        ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.2, 2.0, 0.15, true);
+        ImmersedBoundaryMesh<2,2>* p_mesh = gen.GetMesh();
+        std::vector<CellPtr> cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+        CellsGenerator<UniformlyDistributedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
+        ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
+
+        ImmersedBoundarySimulationModifier<2> modifier;
+        modifier.SetupConstantMemberVariables(cell_population);
+
+        MAKE_PTR_ARGS(ImmersedBoundaryMembraneElasticityForce<2>, p_boundary_force, (cell_population));
+        modifier.AddImmersedBoundaryForce(p_boundary_force);
+        p_boundary_force->SetSpringConstant(1.0 * 1e7);
+
+        MAKE_PTR_ARGS(ImmersedBoundaryCellCellInteractionForce<2>, p_cell_cell_force, (cell_population));
+        modifier.AddImmersedBoundaryForce(p_cell_cell_force);
+        p_cell_cell_force->SetSpringConstant(1.0 * 1e6);
+
+        modifier.AddImmersedBoundaryForceContributions();
+
+        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        {
+            TS_ASSERT_DELTA(p_mesh->GetNode(i)->rGetAppliedForce()[0], 0.0, 1e-3);
+            TS_ASSERT_DELTA(p_mesh->GetNode(i)->rGetAppliedForce()[1], 0.0, 1e-3);
+        }
     }
 };

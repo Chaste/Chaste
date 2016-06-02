@@ -228,7 +228,7 @@ void ImmersedBoundaryCellCellInteractionForce<DIM>::InitializeProteinLevels()
 template<unsigned DIM>
 void ImmersedBoundaryCellCellInteractionForce<DIM>::UpdateProteinLevels()
 {
-
+    ///\todo Do something in this method?
 }
 
 template<unsigned DIM>
@@ -238,9 +238,21 @@ void ImmersedBoundaryCellCellInteractionForce<DIM>::SetSpringConstant(double spr
 }
 
 template<unsigned DIM>
+double ImmersedBoundaryCellCellInteractionForce<DIM>::GetSpringConstant()
+{
+    return mSpringConst;
+}
+
+template<unsigned DIM>
 void ImmersedBoundaryCellCellInteractionForce<DIM>::SetRestLength(double restLength)
 {
     mRestLength = restLength;
+}
+
+template<unsigned DIM>
+double ImmersedBoundaryCellCellInteractionForce<DIM>::GetRestLength()
+{
+    return mRestLength;
 }
 
 template<unsigned DIM>
@@ -250,12 +262,23 @@ void ImmersedBoundaryCellCellInteractionForce<DIM>::UseLinearSpringLaw()
     mMorse = false;
 }
 
-
 template<unsigned DIM>
 void ImmersedBoundaryCellCellInteractionForce<DIM>::UseMorsePotential()
 {
     mLinearSpring = false;
     mMorse = true;
+}
+
+template<unsigned DIM>
+bool ImmersedBoundaryCellCellInteractionForce<DIM>::IsLinearSpringLaw()
+{
+    return mLinearSpring;
+}
+
+template<unsigned DIM>
+bool ImmersedBoundaryCellCellInteractionForce<DIM>::IsMorsePotential()
+{
+    return mMorse;
 }
 
 template<unsigned DIM>

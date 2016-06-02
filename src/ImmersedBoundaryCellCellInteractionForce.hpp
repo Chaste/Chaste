@@ -67,8 +67,8 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & boost::serialization::base_object<AbstractImmersedBoundaryForce<DIM> >(*this);
-//        archive & mRestLength;
-//        archive & mSpringConstant;
+        archive & mSpringConst;
+        archive & mRestLength;
     }
 
 protected:
@@ -156,9 +156,19 @@ public:
     void SetSpringConstant(double springConst);
 
     /**
+     * @return #mSpringConst
+     */
+    double GetSpringConstant();
+
+    /**
      * Set the rest length.
      */
     void SetRestLength(double restLength);
+
+    /**
+     * @return #mRestLength
+     */
+    double GetRestLength();
 
     /**
      * Set the force law to linear spring (default)
@@ -169,6 +179,16 @@ public:
      * Set the force law to be based on the Morse potential
      */
     void UseMorsePotential();
+
+    /**
+     * @return #mLinearSpring
+     */
+    bool IsLinearSpringLaw();
+
+    /**
+     * @return #mMorse
+     */
+    bool IsMorsePotential();
 
     /**
      * Overridden OutputImmersedBoundaryForceParameters() method.
