@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2015, University of Oxford.
+Copyright (c) 2005-2016, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -46,25 +46,22 @@ AbstractImmersedBoundaryForce<DIM>::~AbstractImmersedBoundaryForce()
 }
 
 template<unsigned DIM>
-void AbstractImmersedBoundaryForce<DIM>::OutputForceInfo(out_stream& rParamsFile)
+void AbstractImmersedBoundaryForce<DIM>::OutputImmersedBoundaryForceInfo(out_stream& rParamsFile)
 {
     std::string force_type = GetIdentifier();
 
     *rParamsFile << "\t\t<" << force_type << ">\n";
-    OutputForceParameters(rParamsFile);
+    OutputImmersedBoundaryForceParameters(rParamsFile);
     *rParamsFile << "\t\t</" << force_type << ">\n";
 }
 
 template<unsigned DIM>
-void AbstractImmersedBoundaryForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
+void AbstractImmersedBoundaryForce<DIM>::OutputImmersedBoundaryForceParameters(out_stream& rParamsFile)
 {
     // No parameters to output
 }
 
-/////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
 template class AbstractImmersedBoundaryForce<1>;
 template class AbstractImmersedBoundaryForce<2>;
 template class AbstractImmersedBoundaryForce<3>;

@@ -1,7 +1,7 @@
 
 /*
 
-Copyright (c) 2005-2015, University of Oxford.
+Copyright (c) 2005-2016, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -37,16 +37,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
 #include "RandomNumberGenerator.hpp"
 
-#include "Debug.hpp"
-
 ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(unsigned numCellsWide, unsigned numNodesPerCell, double ellipseExponent, double cellAspectRatio, double randomYMult, bool membrane)
-  : mpMesh(NULL),
-    mNumCellsWide(numCellsWide),
-    mNumNodesPerCell(numNodesPerCell),
-    mEllipseExponent(ellipseExponent),
-    mCellAspectRatio(cellAspectRatio),
-    mRandomYMult(randomYMult),
-    mMembrane(membrane)
+    : mpMesh(NULL),
+      mNumCellsWide(numCellsWide),
+      mNumNodesPerCell(numNodesPerCell),
+      mEllipseExponent(ellipseExponent),
+      mCellAspectRatio(cellAspectRatio),
+      mRandomYMult(randomYMult),
+      mMembrane(membrane)
 {
     // Check for sensible input
     assert(mNumCellsWide > 0);
@@ -86,7 +84,7 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
     std::vector<unsigned> corner_indices(4, UINT_MAX);
 
     // First anticlockwise corner is corner 1
-    for(unsigned location = 0 ; location < locations.size() ; location++)
+    for (unsigned location = 0; location < locations.size(); location++)
     {
         if (locations[location][1] > top_height)
         {
@@ -96,7 +94,7 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
     }
 
     // Second anticlockwise corner is corner 0
-    for(unsigned location = unsigned(0.25 * mNumNodesPerCell) ; location < locations.size() ; location++)
+    for (unsigned location = unsigned(0.25 * mNumNodesPerCell); location < locations.size(); location++)
     {
         if (locations[location][1] < top_height)
         {
@@ -106,7 +104,7 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
     }
 
     // Third anticlockwise corner is corner 3
-    for(unsigned location = unsigned(0.5 * mNumNodesPerCell) ; location < locations.size() ; location++)
+    for (unsigned location = unsigned(0.5 * mNumNodesPerCell); location < locations.size(); location++)
     {
         if (locations[location][1] < bot_height)
         {
@@ -116,7 +114,7 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
     }
 
     // Fourth anticlockwise corner is corner 2
-    for(unsigned location = unsigned(0.75 * mNumNodesPerCell) ; location < locations.size() ; location++)
+    for (unsigned location = unsigned(0.75 * mNumNodesPerCell); location < locations.size(); location++)
     {
         if (locations[location][1] > bot_height)
         {
@@ -164,7 +162,7 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
 
         std::vector<Node<2>*> nodes_this_elem;
 
-        for (unsigned mem_node_idx = 0 ; mem_node_idx < num_membrane_nodes ; mem_node_idx++)
+        for (unsigned mem_node_idx = 0; mem_node_idx < num_membrane_nodes; mem_node_idx++)
         {
             // Calculate location of node
             c_vector<double, 2> location = 0.97 * y_offset + ( 0.5 / num_membrane_nodes + double(mem_node_idx) / num_membrane_nodes ) * x_unit;
@@ -179,7 +177,7 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
 
         // Pass in null corners
         std::vector<Node<2>*>& r_elem_corners = ib_elements.back()->rGetCornerNodes();
-        for (unsigned corner = 0 ; corner < 4 ; corner++)
+        for (unsigned corner = 0; corner < 4; corner++)
         {
             r_elem_corners.push_back(NULL);
         }
@@ -187,12 +185,12 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
 
     RandomNumberGenerator* p_rand_gen = RandomNumberGenerator::Instance();
 
-    for (unsigned cell_idx = 0 ; cell_idx < mNumCellsWide ; cell_idx++)
+    for (unsigned cell_idx = 0; cell_idx < mNumCellsWide; cell_idx++)
     {
         std::vector<Node<2>*> nodes_this_elem;
         double temp_rand = p_rand_gen->ranf();
 
-        for(unsigned location = 0 ; location < locations.size() ; location++)
+        for (unsigned location = 0; location < locations.size(); location++)
         {
             unsigned node_index = nodes.size();
             c_vector<double, 2> scaled_location = 0.95 * locations[location] + x_offset * (cell_idx + 0.5);
@@ -209,7 +207,7 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
 
         // Pass in the correct corners
         std::vector<Node<2>*>& r_elem_corners = ib_elements.back()->rGetCornerNodes();
-        for (unsigned corner = 0 ; corner < 4 ; corner++)
+        for (unsigned corner = 0; corner < 4; corner++)
         {
             r_elem_corners.push_back(ib_elements.back()->GetNode(corner_indices[corner]));
         }
@@ -241,5 +239,3 @@ void ImmersedBoundaryPalisadeMeshGenerator::SetRandomYMult(double mult)
     assert(fabs(mult) < 1.0);
     mRandomYMult = mult;
 }
-
-

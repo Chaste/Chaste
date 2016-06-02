@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2015, University of Oxford.
+Copyright (c) 2005-2016, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -44,20 +44,24 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Node.hpp"
 
 /**
- * Class to generate roughly equally spaced points around a 2D superellipse (x/a)^n + (y/b)^n = 1
+ * Class to generate roughly equally spaced points around a 2D superellipse.
+ * This shape is described by the equation (x/a)^n + (y/b)^n = 1, where n, a
+ * and b are positive numbers.
  */
 class SuperellipseGenerator
 {
-
 private:
 
-    /** The target node spacing */
+    /** The target spacing between points. */
     double mTargetNodeSpacing;
 
-    /** The height at which the point of maximal curvature is achieved in the top right hand corner */
+    /**
+     * The height at which the point of maximal curvature is achieved in the
+     * top right-hand corner of the superellipse.
+     */
     double mHeightOfTopSurface;
 
-    /** Vector to store the points */
+    /** Vector to store the points. */
     std::vector<c_vector<double, 2> > mPoints;
 
 public:
@@ -65,14 +69,14 @@ public:
     /**
      * Constructor.
      *
-     * Default values produce a circle bounded by the unit square
+     * Default values of the input arguments produce a circle bounded by the unit square.
      *
-     * @param numPoints  The number of points to generate around the circumference
-     * @param ellipseExponent  The exponent of the superellipse
-     * @param width  The width of the superellipse
-     * @param height The height of the superellipse
-     * @param botLeftX The x-coordinate of the bottom-left of the superellipse bounding box
-     * @param botLeftY The y-coordinate of the bottom-left of the superellipse bounding box
+     * @param numPoints  The number of points to generate around the circumference (defaults to 100)
+     * @param ellipseExponent  The exponent of the superellipse (defaults to 1)
+     * @param width  The width of the superellipse (defaults to 1)
+     * @param height The height of the superellipse (defaults to 1)
+     * @param botLeftX The x-coordinate of the bottom-left of the superellipse bounding box (defaults to 0)
+     * @param botLeftY The y-coordinate of the bottom-left of the superellipse bounding box (defaults to 0)
      */
     SuperellipseGenerator(unsigned numPoints=100,
                           double ellipseExponent=1.0,
@@ -82,32 +86,31 @@ public:
                           double botLeftY=0.0);
 
     /**
-     * Destructor - clears mPoints
+     * Destructor.
+     *
+     * Clears mPoints.
      */
     virtual ~SuperellipseGenerator();
 
     /**
-     * @return the target node spacing
+     * @return #mPoints
      */
     double GetTargetNodeSpacing();
 
     /**
-     * @return the height of the top surface.
-     *
-     * This is defined as the height at which the point of maximal curvature is achieved in the top right hand corner.
+     * @return #mHeightOfTopSurface
      */
     double GetHeightOfTopSurface();
 
     /**
-     * @return vector of c_vector objects
+     * @return #mPoints
      */
     const std::vector<c_vector<double, 2> > GetPointsAsVectors() const;
 
     /**
-     * @return vector of ChastePoint objects
+     * @return #mPoints as a vector of ChastePoint objects
      */
     const std::vector<ChastePoint<2> > GetPointsAsChastePoints() const;
-
 };
 
 #endif /*SUPERELLIPSEGENERATOR_HPP_*/

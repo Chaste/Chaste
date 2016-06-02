@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2015, University of Oxford.
+Copyright (c) 2005-2016, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -38,15 +38,21 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ChasteSerialization.hpp"
 #include "ClassIsAbstract.hpp"
-
 #include "ImmersedBoundaryCellPopulation.hpp"
 
 /**
- * An abstract force class, for use in Immersed Boundary simulations.
+ * An abstract immersed boundary force class, for use in 
+ * immersed boundary cell-based simulations.
+ * 
+ * NOTE: while this class shares similarities with AbstractForce, 
+ * it is not passed to a simulation object, but instead to an 
+ * ImmersedBoundarySimulationModifier.
  */
 template<unsigned DIM>
 class AbstractImmersedBoundaryForce : public Identifiable
 {
+private:
+
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
@@ -73,20 +79,23 @@ public:
     virtual ~AbstractImmersedBoundaryForce();
 
     /**
-     * Calculates the force on each node.
+     * Calculates the force on each immersed boundary node.
      *
-     * This method must be overridden in concrete classes.
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
      *
-     * @param rCellPopulation reference to the cell population
+     * @param rNodePairs reference to a vector set of node pairs between which to contribute the force.
      */
-    virtual void AddForceContribution(std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs)=0;
+    virtual void AddImmersedBoundaryForceContribution(std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs)=0;
 
     /**
-     * Outputs force used in the simulation to file and then calls OutputForceParameters to output all relevant parameters.
+     * Outputs the name of the immersed boundary force used in 
+     * the simulation to file and then calls OutputImmersedBoundaryForceParameters()
+     * to output all relevant parameters.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputForceInfo(out_stream& rParamsFile);
+    void OutputImmersedBoundaryForceInfo(out_stream& rParamsFile);
 
     /**
      * Outputs force parameters to file.
@@ -96,7 +105,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputForceParameters(out_stream& rParamsFile)=0;
+    virtual void OutputImmersedBoundaryForceParameters(out_stream& rParamsFile)=0;
 };
 
 TEMPLATED_CLASS_IS_ABSTRACT_1_UNSIGNED(AbstractImmersedBoundaryForce)

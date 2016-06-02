@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2015, University of Oxford.
+Copyright (c) 2005-2016, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -32,9 +32,9 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
+
 #include "ImmersedBoundaryElement.hpp"
 #include "Exception.hpp"
-
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryElement(unsigned index,
@@ -62,19 +62,19 @@ void ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::SetFluidSource(FluidSource
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-FluidSource<SPACE_DIM>* ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::GetFluidSource(void)
+FluidSource<SPACE_DIM>* ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::GetFluidSource()
 {
     return mpFluidSource;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-std::vector<Node<SPACE_DIM>*>& ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::rGetCornerNodes(void)
+std::vector<Node<SPACE_DIM>*>& ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::rGetCornerNodes()
 {
     return mCornerNodes;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::GetAverageNodeSpacing(void)
+double ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::GetAverageNodeSpacing()
 {
     return mAverageNodeSpacing;
 }
@@ -84,7 +84,6 @@ void ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::SetAverageNodeSpacing(doub
 {
     mAverageNodeSpacing = averageNodeSpacing;
 }
-
 
 //////////////////////////////////////////////////////////////////////
 //                  Specialization for 1d elements                  //
@@ -108,19 +107,19 @@ void ImmersedBoundaryElement<1, SPACE_DIM>::SetFluidSource(FluidSource<SPACE_DIM
 }
 
 template<unsigned SPACE_DIM>
-FluidSource<SPACE_DIM>* ImmersedBoundaryElement<1, SPACE_DIM>::GetFluidSource(void)
+FluidSource<SPACE_DIM>* ImmersedBoundaryElement<1, SPACE_DIM>::GetFluidSource()
 {
     return NULL;
 }
 
 template<unsigned SPACE_DIM>
-std::vector<Node<SPACE_DIM>*>& ImmersedBoundaryElement<1, SPACE_DIM>::rGetCornerNodes(void)
+std::vector<Node<SPACE_DIM>*>& ImmersedBoundaryElement<1, SPACE_DIM>::rGetCornerNodes()
 {
     return mCornerNodes;
 }
 
 template<unsigned SPACE_DIM>
-double ImmersedBoundaryElement<1, SPACE_DIM>::GetAverageNodeSpacing(void)
+double ImmersedBoundaryElement<1, SPACE_DIM>::GetAverageNodeSpacing()
 {
     return 0.0;
 }
@@ -130,11 +129,7 @@ void ImmersedBoundaryElement<1, SPACE_DIM>::SetAverageNodeSpacing(double average
 {
 }
 
-
-/////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////////////
-
 template class ImmersedBoundaryElement<1,1>;
 template class ImmersedBoundaryElement<1,2>;
 template class ImmersedBoundaryElement<1,3>;

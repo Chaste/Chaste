@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2015, University of Oxford.
+Copyright (c) 2005-2016, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -34,21 +34,20 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "ImmersedBoundaryMembraneElasticityForce.hpp"
-#include "Debug.hpp"
 
 template<unsigned DIM>
 ImmersedBoundaryMembraneElasticityForce<DIM>::ImmersedBoundaryMembraneElasticityForce(ImmersedBoundaryCellPopulation<DIM>& rCellPopulation)
-        : AbstractImmersedBoundaryForce<DIM>(),
-          mpCellPopulation(&rCellPopulation),
-          mpMesh(&(rCellPopulation.rGetMesh())),
-          mSpringConst(1e6),
-          mRestLengthMultiplier(0.5),
-          mBasementSpringConstantModifier(5.0),
-          mBasementRestLengthModifier(0.5)
+    : AbstractImmersedBoundaryForce<DIM>(),
+      mpCellPopulation(&rCellPopulation),
+      mpMesh(&(rCellPopulation.rGetMesh())),
+      mSpringConst(1e6),
+      mRestLengthMultiplier(0.5),
+      mBasementSpringConstantModifier(5.0),
+      mBasementRestLengthModifier(0.5)
 {
     // Verify whether each element has four corners tagged
     unsigned num_corners = mpMesh->GetElement(0)->rGetCornerNodes().size();
-    for (unsigned elem_idx = 1 ; elem_idx < mpMesh->GetNumElements() ; elem_idx++)
+    for (unsigned elem_idx = 1; elem_idx < mpMesh->GetNumElements(); elem_idx++)
     {
         if (num_corners != mpMesh->GetElement(elem_idx)->rGetCornerNodes().size())
         {
@@ -134,7 +133,7 @@ double ImmersedBoundaryMembraneElasticityForce<DIM>::GetBasalLengthForElement(un
 }
 
 template<unsigned DIM>
-void ImmersedBoundaryMembraneElasticityForce<DIM>::AddForceContribution(std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs)
+void ImmersedBoundaryMembraneElasticityForce<DIM>::AddImmersedBoundaryForceContribution(std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs)
 {
     // Used in the calculation of the spring constant
     double intrinsic_spacing_squared = mpCellPopulation->GetIntrinsicSpacing() * mpCellPopulation->GetIntrinsicSpacing();
@@ -182,7 +181,7 @@ void ImmersedBoundaryMembraneElasticityForce<DIM>::AddForceContribution(std::vec
         }
 
         // Loop over nodes and calculate the force exerted on node i+1 by node i
-        for (unsigned node_idx = 0 ; node_idx < num_nodes ; node_idx++)
+        for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
         {
             // Index of the next node, calculated modulo number of nodes in this element
             unsigned next_idx = (node_idx + 1) % num_nodes;
@@ -197,7 +196,7 @@ void ImmersedBoundaryMembraneElasticityForce<DIM>::AddForceContribution(std::vec
         }
 
         // Add the contributions of springs adjacent to each node
-        for (unsigned node_idx = 0 ; node_idx < num_nodes ; node_idx++)
+        for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
         {
             // Get index of previous node
             unsigned prev_idx = (node_idx + num_nodes - 1) % num_nodes;
@@ -208,6 +207,7 @@ void ImmersedBoundaryMembraneElasticityForce<DIM>::AddForceContribution(std::vec
             elem_it->GetNode(node_idx)->AddAppliedForceContribution(aggregate_force);
         }
 
+        ///\todo Why is this code commented out?
         // If corners are present, we add on the additional functionality
 //        if (mElementsHaveCorners)
 //        {
@@ -253,7 +253,7 @@ void ImmersedBoundaryMembraneElasticityForce<DIM>::TagNodeRegions()
         // Basement lamina nodes are all basal
         if (mpMesh->GetMembraneIndex() == elem_it->GetIndex())
         {
-            for (unsigned node_idx = 0 ; node_idx < elem_it->GetNumNodes() ; node_idx++)
+            for (unsigned node_idx = 0; node_idx < elem_it->GetNumNodes(); node_idx++)
             {
                 elem_it->GetNode(node_idx)->SetRegion(msBas);
             }
@@ -270,23 +270,23 @@ void ImmersedBoundaryMembraneElasticityForce<DIM>::TagNodeRegions()
             unsigned change_3 = elem_it->GetNodeLocalIndex(r_corners[3]->GetIndex());
             unsigned change_4 = elem_it->GetNodeLocalIndex(r_corners[2]->GetIndex()) + 1;
 
-            for (unsigned node_idx = 0 ; node_idx < change_1 ; node_idx++)
+            for (unsigned node_idx = 0; node_idx < change_1; node_idx++)
             {
                 elem_it->GetNode(node_idx)->SetRegion(msLat);
             }
-            for (unsigned node_idx = change_1 ; node_idx < change_2 ; node_idx++)
+            for (unsigned node_idx = change_1; node_idx < change_2; node_idx++)
             {
                 elem_it->GetNode(node_idx)->SetRegion(msApi);
             }
-            for (unsigned node_idx = change_2 ; node_idx < change_3 ; node_idx++)
+            for (unsigned node_idx = change_2; node_idx < change_3; node_idx++)
             {
                 elem_it->GetNode(node_idx)->SetRegion(msLat);
             }
-            for (unsigned node_idx = change_3 ; node_idx < change_4 ; node_idx++)
+            for (unsigned node_idx = change_3; node_idx < change_4; node_idx++)
             {
                 elem_it->GetNode(node_idx)->SetRegion(msBas);
             }
-            for (unsigned node_idx = change_4 ; node_idx < elem_it->GetNumNodes() ; node_idx++)
+            for (unsigned node_idx = change_4; node_idx < elem_it->GetNumNodes(); node_idx++)
             {
                 elem_it->GetNode(node_idx)->SetRegion(msLat);
             }
@@ -317,7 +317,6 @@ void ImmersedBoundaryMembraneElasticityForce<DIM>::TagApicalAndBasalLengths()
             double elem_width = fabs( mpMesh->GetVectorFromAtoB(elem_it->GetNode(0)->rGetLocation(),
                                                                 elem_it->GetNode(half_way)->rGetLocation())[0] );
 
-
             elem_it->AddElementAttribute(elem_width);
             elem_it->AddElementAttribute(elem_width);
         }
@@ -337,13 +336,15 @@ void ImmersedBoundaryMembraneElasticityForce<DIM>::SetRestLengthMultiplier(doubl
 }
 
 template<unsigned DIM>
-void ImmersedBoundaryMembraneElasticityForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
+void ImmersedBoundaryMembraneElasticityForce<DIM>::OutputImmersedBoundaryForceParameters(out_stream& rParamsFile)
 {
-//    *rParamsFile << "\t\t\t<RestLength>" << mRestLengthMultiplier << "</RestLength>\n";
-//    *rParamsFile << "\t\t\t<SpringConstant>" << mSpringConstant << "</SpringConstant>\n";
+    *rParamsFile << "\t\t\t<SpringConst>" << mSpringConst << "</SpringConst>\n";
+    *rParamsFile << "\t\t\t<RestLengthMultiplier>" << mRestLengthMultiplier << "</RestLengthMultiplier>\n";
+    *rParamsFile << "\t\t\t<BasementSpringConstantModifier>" << mBasementSpringConstantModifier << "</BasementSpringConstantModifier>\n";
+    *rParamsFile << "\t\t\t<BasementRestLengthModifier>" << mBasementRestLengthModifier << "</BasementRestLengthModifier>\n";
 
-// Call method on direct parent class
-AbstractImmersedBoundaryForce<DIM>::OutputForceParameters(rParamsFile);
+    // Call method on direct parent class
+    AbstractImmersedBoundaryForce<DIM>::OutputImmersedBoundaryForceParameters(rParamsFile);
 }
 
 // Explicit instantiation

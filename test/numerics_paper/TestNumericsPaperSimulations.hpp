@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2014, University of Oxford.
+Copyright (c) 2005-2016, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -72,7 +72,7 @@ public:
         std::vector<Node<2>* > nodes;
         std::vector<ImmersedBoundaryElement<2,2>* > elements;
 
-        for(unsigned location = 0 ; location < locations.size() ; location++)
+        for (unsigned location = 0; location < locations.size(); location++)
         {
             nodes.push_back(new Node<2>(location, locations[location], true));
         }
@@ -124,7 +124,7 @@ public:
         simulator.SetDt(dt);
         simulator.SetSamplingTimestepMultiple(1);
 
-        for (unsigned i=0 ; i< 100 ; i++)
+        for (unsigned i=0; i< 100; i++)
         {
             double new_end_time = dt * (1.0 + i);
 
@@ -133,7 +133,7 @@ public:
 
             (*results_file) << new_end_time << "," << p_mesh->GetElongationShapeFactorOfElement(0) << "\n";
 
-            if(i==0)
+            if (i==0)
             {
                 mesh_at_start.WriteFilesUsingMesh(*p_mesh);
             }
@@ -180,7 +180,7 @@ public:
             unsigned num_nodes = (unsigned)(M_PI / asin(0.5 * target_spacing_ratio / (radius * num_grid_pts)));
 
             /*
-             * Create an Immersed Boundary Mesh using a SuperellipseGenerator
+             * Create an immersed boundary mesh using a SuperellipseGenerator
              *
              * 1: Num nodes
              * 2: Superellipse exponent

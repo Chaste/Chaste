@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2015, University of Oxford.
+Copyright (c) 2005-2016, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -37,7 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTIMMERSEDBOUNDARYDEMOTUTORIAL_HPP_
 
 /*
- * = Example showing how to create and run an Immersed Boundary simulation in Chaste =
+ * = Example showing how to create and run an immersed boundary simulation in Chaste =
  *
  * We create a simple palisade of cells with a basement membrane, and see how to:
  *   * set the initial conditions;
@@ -62,7 +62,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SmartPointers.hpp"
 #include "UniformlyDistributedCellCycleModel.hpp"
 
-/* Required for the Immersed Boundary functionality */
+/* Required for the immersed boundary functionality */
 #include "ImmersedBoundaryCellCellInteractionForce.hpp"
 #include "ImmersedBoundaryCellPopulation.hpp"
 #include "ImmersedBoundaryMembraneElasticityForce.hpp"
@@ -70,10 +70,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ImmersedBoundarySimulationModifier.hpp"
 #include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
 
-/* I'm not sure why we need this... */
+/*
+// This test is never run in parallel */
 #include "FakePetscSetup.hpp"
-
-#include "Debug.hpp"
 
 /* In Chaste, every simulation is run as a 'test', and here we define a test class which inherits from
  * {{{AbstractCellBasedTestSuite}}}. The class {{{AbstractCellBasedTestSuite}}} sets up various parameters for us.  Of
@@ -84,9 +83,9 @@ class TestImmersedBoundaryDemoTutorial : public AbstractCellBasedTestSuite
 {
 public:
     /*
-     * == Simulation - a basic Immersed Boundary simulation ==
+     * == Simulation - a basic immersed boundary simulation ==
      *
-     * In this simulation, we create an Immersed Boundary framework with a palisade of cells. The cells have a slight
+     * In this simulation, we create an immersed boundary framework with a palisade of cells. The cells have a slight
      * variation in size, and a basement membrane is included. Each cell in the simulation is assigned a basic
      * cell-cycle model; no proliferation occurs.
      */
@@ -108,7 +107,7 @@ public:
 
         /* We now generate a collection of cells. We do this by using a {{{CellsGenerator}}} and we specify the
          * proliferative behaviour of the cell by choosing a {{{CellCycleModel}}}. Here we choose an
-         * {{{UniformlyDistributedCellCycleModel}}} which does not allow proliferation. For an Immersed Boundary
+         * {{{UniformlyDistributedCellCycleModel}}} which does not allow proliferation. For an immersed boundary
          * simulation we need as may cells as elements in the mesh. */
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
@@ -130,7 +129,7 @@ public:
         simulator.SetSamplingTimestepMultiple(10);
         simulator.SetEndTime(10.0);
 
-        /* All of the machinery for the Immersed Boundary method is handled in the following {{{SimulationModifier}}}.
+        /* All of the machinery for the immersed boundary method is handled in the following {{{SimulationModifier}}}.
          * Here, we create a 'shared pointer' to an {{{ImmersedBoundarySimulationModifier}}} object and pass it to the
          * {{{OffLatticeSimulation}}}.*/
         MAKE_PTR(ImmersedBoundarySimulationModifier<2>, p_main_modifier);
@@ -149,9 +148,7 @@ public:
 
         /* Finally we call the {{{Solve}}} method on the simulation to run the simulation.*/
         simulator.Solve();
-
     }
-
 };
 
 #endif /*TESTIMMERSEDBOUNDARYDEMOTUTORIAL_HPP_*/

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2015, University of Oxford.
+Copyright (c) 2005-2016, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -32,6 +32,7 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
+
 #ifndef IMMERSEDBOUNDARYMESH_HPP_
 #define IMMERSEDBOUNDARYMESH_HPP_
 
@@ -489,7 +490,6 @@ public:
      */
     ChasteCuboid<SPACE_DIM> CalculateBoundingBoxOfElement(unsigned index);
 
-
     /**
      * Compute the direction of the shortest principal axis passing through the centroid,
      * or 'short axis', of a given element. This is the eigenvector associated with the
@@ -544,7 +544,6 @@ public:
      */
     unsigned DivideElementAlongShortAxis(ImmersedBoundaryElement<ELEMENT_DIM,SPACE_DIM>* pElement,
                                          bool placeOriginalElementBelow=false);
-
 
     /**
      * A smart iterator over the elements in the mesh.
@@ -620,7 +619,6 @@ public:
 
 #include "SerializationExportWrapper.hpp"
 EXPORT_TEMPLATE_CLASS_ALL_DIMS(ImmersedBoundaryMesh)
-
 
 //////////////////////////////////////////////////////////////////////////////
 // ImmersedBoundaryElementIterator class implementation - most methods are inlined    //

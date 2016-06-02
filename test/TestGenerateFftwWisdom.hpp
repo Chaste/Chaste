@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2014, University of Oxford.
+Copyright (c) 2005-2016, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Needed for test framework
 #include <cxxtest/cxxtest/TestSuite.h>
 
-// Needed for Immersed Boundary simulations
+// Needed for immersed boundary simulations
 #include <complex>
 #include <fftw3.h>
 #include <boost/multi_array.hpp>
@@ -44,7 +44,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ImmersedBoundaryArray.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "FileFinder.hpp"
-#include "Debug.hpp"
 
 // This test is never run in parallel
 #include "FakePetscSetup.hpp"
@@ -74,7 +73,7 @@ public:
         // If it doesn't exists, create it with blank wisdom file
         if (!file_finder.IsFile())
         {
-            void fftw_forget_wisdom(void);
+            void fftw_forget_wisdom();
             fftw_export_wisdom_to_filename(mWisdomFilename.c_str());
         }
 
@@ -95,7 +94,7 @@ public:
          */
 
         // We first forget all wisdom and re-load, as threaded wisdom doesn't play well with un-threaded
-        void fftw_forget_wisdom(void);
+        void fftw_forget_wisdom();
         int wisdom_flag = fftw_import_wisdom_from_filename(mWisdomFilename.c_str());
 
         // 1 means it's read correctly, 0 indicates a failure
@@ -106,7 +105,7 @@ public:
         typedef boost::multi_array<double, 3> real_array_2d;
 
         // Create 2D wisdom with 2 transforms
-        for (unsigned i = 16 ; i <= mMaxArraySize ; i*=2)
+        for (unsigned i = 16; i <= mMaxArraySize; i*=2)
         {
             real_array_2d input(boost::extents[2][i][i]);
             complex_array_2d output(boost::extents[2][i][(i/2) + 1]);
@@ -144,11 +143,11 @@ public:
                                             mFftwFlag);
 
             // We now verify that the forward followed by inverse transform produces the correct result
-            for (unsigned dim = 0 ; dim < 2 ; dim++)
+            for (unsigned dim = 0; dim < 2; dim++)
             {
-                for (unsigned x = 0 ; x < i ; x++)
+                for (unsigned x = 0; x < i; x++)
                 {
-                    for (unsigned y = 0 ; y < i ; y++)
+                    for (unsigned y = 0; y < i; y++)
                     {
                         input[dim][x][y] = RandomNumberGenerator::Instance()->ranf();
                     }
@@ -158,11 +157,11 @@ public:
             fftw_execute(plan_f);
             fftw_execute(plan_b);
 
-            for (unsigned dim = 0 ; dim < 2 ; dim++)
+            for (unsigned dim = 0; dim < 2; dim++)
             {
-                for (unsigned x = 0 ; x < i ; x++)
+                for (unsigned x = 0; x < i; x++)
                 {
-                    for (unsigned y = 0 ; y < i ; y++)
+                    for (unsigned y = 0; y < i; y++)
                     {
                         TS_ASSERT_DELTA(input[dim][x][y], check[dim][x][y]/(i*i), 1e-10);
                     }
@@ -175,7 +174,7 @@ public:
         }
 
         // Create 2D wisdom with 3 transforms
-        for (unsigned i = 16 ; i <= mMaxArraySize ; i*=2)
+        for (unsigned i = 16; i <= mMaxArraySize; i*=2)
         {
             real_array_2d input(boost::extents[3][i][i]);
             complex_array_2d output(boost::extents[3][i][(i/2) + 1]);
@@ -213,11 +212,11 @@ public:
                                             mFftwFlag);
 
             // We now verify that the forward followed by inverse transform produces the correct result
-            for (unsigned dim = 0 ; dim < 3 ; dim++)
+            for (unsigned dim = 0; dim < 3; dim++)
             {
-                for (unsigned x = 0 ; x < i ; x++)
+                for (unsigned x = 0; x < i; x++)
                 {
-                    for (unsigned y = 0 ; y < i ; y++)
+                    for (unsigned y = 0; y < i; y++)
                     {
                         input[dim][x][y] = RandomNumberGenerator::Instance()->ranf();
                     }
@@ -227,11 +226,11 @@ public:
             fftw_execute(plan_f);
             fftw_execute(plan_b);
 
-            for (unsigned dim = 0 ; dim < 3 ; dim++)
+            for (unsigned dim = 0; dim < 3; dim++)
             {
-                for (unsigned x = 0 ; x < i ; x++)
+                for (unsigned x = 0; x < i; x++)
                 {
-                    for (unsigned y = 0 ; y < i ; y++)
+                    for (unsigned y = 0; y < i; y++)
                     {
                         TS_ASSERT_DELTA(input[dim][x][y], check[dim][x][y]/(i*i), 1e-10);
                     }

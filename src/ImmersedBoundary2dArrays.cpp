@@ -1,7 +1,7 @@
 
 /*
 
-Copyright (c) 2005-2015, University of Oxford.
+Copyright (c) 2005-2016, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -38,12 +38,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <assert.h>
 #include "Exception.hpp"
 
-#include "Debug.hpp"
-
 template<unsigned DIM>
 ImmersedBoundary2dArrays<DIM>::ImmersedBoundary2dArrays(ImmersedBoundaryMesh<DIM,DIM>* pMesh, double dt, double reynoldsNumber, bool activeSources)
-        : mpMesh(pMesh),
-          mActiveSources(activeSources)
+    : mpMesh(pMesh),
+      mActiveSources(activeSources)
 {
     unsigned num_gridpts_x = mpMesh->GetNumGridPtsX();
     unsigned num_gridpts_y = mpMesh->GetNumGridPtsY();
@@ -79,19 +77,19 @@ ImmersedBoundary2dArrays<DIM>::ImmersedBoundary2dArrays(ImmersedBoundaryMesh<DIM
     double x_spacing = 1.0 / (double) num_gridpts_x;
     double y_spacing = 1.0 / (double) num_gridpts_y;
 
-    for (unsigned x = 0 ; x < num_gridpts_x ; x++)
+    for (unsigned x = 0; x < num_gridpts_x; x++)
     {
         mSin2x[x] = sin(2 * M_PI * (double) x * x_spacing);
     }
 
-    for (unsigned y = 0 ; y < reduced_y ; y++)
+    for (unsigned y = 0; y < reduced_y; y++)
     {
         mSin2y[y] = sin(2 * M_PI * (double) y * y_spacing);
     }
 
-    for (unsigned x = 0 ; x < num_gridpts_x ; x++)
+    for (unsigned x = 0; x < num_gridpts_x; x++)
     {
-        for (unsigned y = 0 ; y < reduced_y ; y++)
+        for (unsigned y = 0; y < reduced_y; y++)
         {
             mOperator1[x][y] = (mSin2x[x] * mSin2x[x] / (x_spacing * x_spacing)) + (mSin2y[y] * mSin2y[y] / (y_spacing * y_spacing));
             mOperator1[x][y] *= dt / reynoldsNumber;

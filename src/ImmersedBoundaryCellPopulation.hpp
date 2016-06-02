@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2015, University of Oxford.
+Copyright (c) 2005-2016, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -31,7 +31,7 @@ HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
 LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
- */
+*/
 
 #ifndef IMMERSEDBOUNDARYCELLPOPULATION_HPP_
 #define IMMERSEDBOUNDARYCELLPOPULATION_HPP_
@@ -45,14 +45,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/set.hpp>
 #include <boost/serialization/vector.hpp>
 
-template<unsigned DIM> class AbstractVertexBasedDivisionRule; // Circular definition thing.
+template<unsigned DIM> class AbstractVertexBasedDivisionRule; // Circular definition
 
 /**
  * A facade class encapsulating an immersed boundary cell population.
  *
  * Contains a group of cells and maintains the associations
  * between CellPtrs and elements in the ImmersedBoundaryMesh.
- *
  */
 template<unsigned DIM>
 class ImmersedBoundaryCellPopulation : public AbstractOffLatticeCellPopulation<DIM>
@@ -142,7 +141,7 @@ public:
      *
      * @param rMesh reference to a
      * @param rCells reference to a vector of CellPtrs
-     * @param deleteMesh set to true if you want the cell population to free the mesh memory on destruction
+     * @param deleteMesh set to true if you want the cell population to free the mesh memory on destruction (defaults to false)
      * @param validate whether to validate the cell population when it is created (defaults to true)
      * @param locationIndices an optional vector of location indices that correspond to real cells
      */
@@ -252,7 +251,6 @@ public:
      */
     std::set<unsigned> GetNeighbouringLocationIndices(CellPtr pCell);
 
-
     /**
      * Overridden AddNode() method.
      *
@@ -301,8 +299,8 @@ public:
      * @return address of cell as it appears in the cell list (internal of this method uses a copy constructor along the way)
      */
     CellPtr AddCell(CellPtr pNewCell,
-            const c_vector<double,DIM>& rCellDivisionVector,
-            CellPtr pParentCell=CellPtr());
+                    const c_vector<double,DIM>& rCellDivisionVector,
+                    CellPtr pParentCell=CellPtr());
 
     /**
      * Remove all cells labelled as dead.
@@ -343,29 +341,26 @@ public:
     virtual void OpenWritersFiles(OutputFileHandler& rOutputFileHandler);
 
     /**
-     * A virtual method to accept a cell population writer so it can
-     * write data from this object to file.
+     * Overridden AcceptPopulationWriter() method.
      *
      * @param pPopulationWriter the population writer.
      */
-    virtual void AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter);
+    void AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter);
 
     /**
-     * A virtual method to accept a cell population count writer so it can
-     * write data from this object to file.
+     * Overridden AcceptPopulationCountWriter() method.
      *
      * @param pPopulationCountWriter the population count writer.
      */
-    virtual void AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter);
+    void AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter);
 
     /**
-     * A virtual method to accept a cell writer so it can
-     * write data from this object to file.
+     * Overridden AcceptCellWriter() method.
      *
      * @param pCellWriter the population writer.
      * @param pCell the cell whose data are being written.
      */
-    virtual void AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell);
+    void AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell);
 
     /**
      * Overridden GetVolumeOfCell() method.
@@ -402,7 +397,7 @@ public:
     std::set<unsigned> GetNeighbouringNodeIndices(unsigned index);
 
     /**
-     * @return The Vertex division rule that is currently being used.
+     * @return The vertex division rule that is currently being used.
      */
     boost::shared_ptr<AbstractVertexBasedDivisionRule<DIM> > GetVertexBasedDivisionRule();
 
@@ -424,7 +419,7 @@ public:
     void SetIfPopulationHasActiveSources(bool hasActiveSources);
 
     /**
-     * Overridden method to specify a division vector.
+     * Overridden CalculateCellDivisionVector() method.
      *
      * @param pParentCell the cell undergoing division
      * @return a vector containing information on cell division
@@ -470,4 +465,3 @@ namespace boost
 } // namespace ...
 
 #endif /*IMMERSEDBOUNDARYCELLPOPULATION_HPP_*/
-

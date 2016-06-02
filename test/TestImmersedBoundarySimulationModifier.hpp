@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2014, University of Oxford.
+Copyright (c) 2005-2016, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -37,7 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 #include "AbstractCellBasedTestSuite.hpp"
 
-// Needed for Immersed Boundary simulations
+// Needed for immersed boundary simulations
 #include <fftw3.h>
 
 // Includes from trunk
@@ -46,7 +46,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OffLatticeSimulation.hpp"
 #include "SmartPointers.hpp"
 #include "UniformlyDistributedCellCycleModel.hpp"
-
 
 // Includes from projects/ImmersedBoundary
 #include "ImmersedBoundaryCellPopulation.hpp"
@@ -57,8 +56,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
 #include "SuperellipseGenerator.hpp"
 
-#include "Debug.hpp"
-
 // This test is never run in parallel
 #include "FakePetscSetup.hpp"
 
@@ -66,9 +63,8 @@ class TestImmersedBoundarySimulationModifier : public AbstractCellBasedTestSuite
 {
 public:
 
+    ///\todo Improve testing
     void TestNothingMuch() throw(Exception)
     {
-
     }
-    
 };

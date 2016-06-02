@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2015, University of Oxford.
+Copyright (c) 2005-2016, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -43,7 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SuperellipseGenerator.hpp"
 
 /**
- * Creates a palisade of immersed boundary elements
+ * Creates a palisade of immersed boundary elements.
  *
  * NOTE: the user should delete the mesh after use to manage memory.
  * NOTE: the user should change mesh parameters like fluid grid spacing, as these are not altered from defaults here.
@@ -52,35 +52,38 @@ class ImmersedBoundaryPalisadeMeshGenerator
 {
 protected:
 
-    /** A pointer to the mesh this class creates */
+    /** A pointer to the mesh this class creates. */
     ImmersedBoundaryMesh<2,2>* mpMesh;
 
-    /** The number of cells from left to right */
+    /** The number of cells from left to right. */
     unsigned mNumCellsWide;
 
-    /** The number of nodes per cell */
+    /** The number of nodes per cell. */
     unsigned mNumNodesPerCell;
 
-    /** The exponent of the superellipse */
+    /** The exponent of the superellipse. */
     double mEllipseExponent;
 
-    /** The aspect ratio of each cell (height / width) */
+    /** The aspect ratio of each cell (height / width). */
     double mCellAspectRatio;
 
-    /** The random variation in y_pos */
+    /** The random variation in y_pos. */
     double mRandomYMult;
 
-    /** Whether the mesh has a basement membrane */
+    /** Whether the mesh has a basement membrane. */
     bool mMembrane;
-
 
 public:
 
     /**
      * Default constructor.
      *
-     * @param numCellsWide  The number of cells you want from left to right along the domain
-     * @param cellAspectRatio The height/width (before random variation) of each cell
+     * @param numCellsWide  the number of cells from left to right along the domain
+     * @param numNodesPerCell  the number of nodes per cell (defaults to 100)
+     * @param ellipseExponent  the exponent of the superellipse (defaults to 0.2)
+     * @param cellAspectRatio  the aspect ratio of each cell (defaults to 2)
+     * @param randomYMult  the random variation in y_pos (defaults to 0)
+     * @param membrane  whether the mesh has a basement membrane (defaults to false)
      */
     ImmersedBoundaryPalisadeMeshGenerator(unsigned numCellsWide,
                                           unsigned numNodesPerCell=100,
@@ -97,7 +100,9 @@ public:
     }
 
     /**
-     * Destructor - deletes the mesh object and pointer
+     * Destructor.
+     *
+     * Deletes the mesh object and pointer.
      */
     virtual ~ImmersedBoundaryPalisadeMeshGenerator();
 
@@ -106,8 +111,8 @@ public:
      */
     ImmersedBoundaryMesh<2,2>* GetMesh();
 
+    ///\todo document this method
     void SetRandomYMult(double mult);
-
 };
 
 #endif /*IMMERSEDBOUNDARYPALISADEMESHGENERATOR_HPP_*/

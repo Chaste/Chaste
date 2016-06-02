@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2015, University of Oxford.
+Copyright (c) 2005-2016, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -50,13 +50,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * A force class for use in Vertex-based simulations. This force is based on the
  * Energy function proposed by Farhadifar et al in  Curr. Biol., 2007, 17, 2095-2104.
  */
-
-
 template<unsigned DIM>
 class ImmersedBoundaryMembraneElasticityForce : public AbstractImmersedBoundaryForce<DIM>
 {
-//friend class TestForces;
-
 private:
 
     friend class boost::serialization::access;
@@ -75,40 +71,56 @@ private:
 
 protected:
 
-    /** The cell population */
+    /** The cell population. */
     ImmersedBoundaryCellPopulation<DIM>* mpCellPopulation;
 
-    /** The immersed boundary mesh */
+    /** The immersed boundary mesh. */
     ImmersedBoundaryMesh<DIM,DIM>* mpMesh;
 
-    /** How far through the element attributes vector we are when this constructor is called */
+    /** How far through the element attributes vector we are when this constructor is called. */
     unsigned mReferenceLocationInAttributesVector;
 
-    /** Node region code for basal, used only by this class */
+    /** Node region code for basal, used only by this class. */
     const static unsigned msBas = 1;
 
-    /** Node region code for apical, used only by this class */
+    /** Node region code for apical, used only by this class. */
     const static unsigned msApi = 2;
 
-    /** Node region code for lateral, used only by this class */
+    /** Node region code for lateral, used only by this class. */
     const static unsigned msLat = 3;
 
-    /** The membrane spring constant associated with each element */
+    /**
+     * The membrane spring constant associated with each element.
+     *
+     * Initialised to 1e6 in the constructor.
+     */
     double mSpringConst;
 
-    /** The membrane rest length associated with each element */
+    /**
+     * The membrane rest length associated with each element.
+     *
+     * Initialised to 0.5 in the constructor.
+     */
     double mRestLengthMultiplier;
 
-    /** The multiplicative quantity by which we alter the spring constant of the basement lamina, if present */
+    /**
+     * The multiplicative quantity by which we alter the spring constant of the basement lamina, if present.
+     *
+     * Initialised to 5 in the constructor.
+     */
     double mBasementSpringConstantModifier;
 
-    /** The multiplicative quantity by which we alter the rest length of the basement lamina, if present */
+    /**
+     * The multiplicative quantity by which we alter the rest length of the basement lamina, if present.
+     *
+     * Initialised to 0.5 in the constructor.
+     */
     double mBasementRestLengthModifier;
 
-    /** Whether the elements have corners tagged */
+    /** Whether the elements have corners tagged. */
     bool mElementsHaveCorners;
 
-    /** Vector containing locations of apical and basal rest-lengths in the element attribute vectors */
+    /** Vector containing locations of apical and basal rest-lengths in the element attribute vectors. */
     std::vector<unsigned> mRestLengthLocationsInAttributeVector;
 
     /**
@@ -154,14 +166,14 @@ public:
     virtual ~ImmersedBoundaryMembraneElasticityForce();
 
     /**
-     * Overridden AddForceContribution() method.
+     * Overridden AddImmersedBoundaryForceContribution() method.
      *
      * Calculates the force on each node in the vertex-based cell population based on the energy function
      * Farhadifar's model.
      *
      * @param rCellPopulation reference to the cell population
      */
-    virtual void AddForceContribution(std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs);
+    virtual void AddImmersedBoundaryForceContribution(std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs);
 
     /**
      * Set mSpringConst
@@ -178,12 +190,11 @@ public:
     void SetRestLengthMultiplier(double restLengthMultiplier);
 
     /**
-     * Overridden OutputForceParameters() method.
+     * Overridden OutputImmersedBoundaryForceParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputForceParameters(out_stream& rParamsFile);
-
+    void OutputImmersedBoundaryForceParameters(out_stream& rParamsFile);
 };
 
 #include "SerializationExportWrapper.hpp"

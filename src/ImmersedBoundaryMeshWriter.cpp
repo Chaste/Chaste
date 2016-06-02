@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2015, University of Oxford.
+Copyright (c) 2005-2016, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -38,7 +38,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Cylindrical2dVertexMesh.hpp"
 #include "Toroidal2dVertexMesh.hpp"
 #include <boost/multi_array.hpp>
-#include "Debug.hpp"
 
 /**
  * Convenience collection of iterators, primarily to get compilation to happen.
@@ -84,7 +83,6 @@ ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::~ImmersedBoundaryMeshWriter(
 
     delete mpIters;
 
-
 #ifdef CHASTE_VTK
 // Dubious, since we shouldn't yet know what any details of the mesh are.
     mpVtkUnstructedMesh->Delete(); // Reference counted
@@ -118,8 +116,6 @@ std::vector<double> ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextN
     }
 }
 
-
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ImmersedBoundaryElementData ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextImmersedBoundaryElement()
 {
@@ -142,7 +138,6 @@ ImmersedBoundaryElementData ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::
     ++(*(mpIters->pElemIter));
 
     return elem_data;
-
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -221,7 +216,7 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(ImmersedBou
             vtkIdList* p_cell_id_list = p_cell->GetPointIds();
             p_cell_id_list->SetNumberOfIds(iter->GetNumNodes());
 
-            for (unsigned node_idx = 0 ; node_idx < num_nodes ; node_idx++)
+            for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
             {
                 // Get node, index and location
                 Node<SPACE_DIM>* p_node = iter->GetNode(node_idx);
@@ -266,7 +261,7 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(ImmersedBou
             vtkIdList* p_cell_id_list_a = p_cell_a->GetPointIds();
             p_cell_id_list_a->SetNumberOfIds(num_nodes_a);
 
-            for (unsigned node_idx = 0 ; node_idx < num_nodes_a ; node_idx++)
+            for (unsigned node_idx = 0; node_idx < num_nodes_a; node_idx++)
             {
                 // Get node, index and location
                 Node<SPACE_DIM>* p_node = iter->GetNode(node_idx + overlap[0]);
@@ -286,7 +281,7 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(ImmersedBou
             vtkIdList* p_cell_id_list_b = p_cell_b->GetPointIds();
             p_cell_id_list_b->SetNumberOfIds(num_nodes_b);
 
-            for (unsigned node_idx = 0 ; node_idx < num_nodes_b ; node_idx++)
+            for (unsigned node_idx = 0; node_idx < num_nodes_b; node_idx++)
             {
                 // Get node, index and location
                 Node<SPACE_DIM>* p_node = iter->GetNode((node_idx + overlap[1]) % num_nodes);
@@ -313,8 +308,6 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(ImmersedBou
             assert(1==2);
         }
     }
-
-
 
     mpVtkUnstructedMesh->SetPoints(p_pts);
     p_pts->Delete(); // Reference counted
@@ -471,18 +464,18 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
     // Write grid data
     const multi_array<double, 3>& vel_grids = mpMesh->rGet2dVelocityGrids();
 
-    for( unsigned y_idx = 0 ; y_idx < num_gridpts_y ; y_idx ++ )
+    for (unsigned y_idx = 0; y_idx < num_gridpts_y; y_idx ++)
     {
-        for( unsigned x_idx = 0 ; x_idx < num_gridpts_x ; x_idx ++ )
-            {
-                *p_grid_file << vel_grids[0][x_idx][y_idx] << "\t";
-            }
+        for (unsigned x_idx = 0; x_idx < num_gridpts_x; x_idx ++)
+        {
+            *p_grid_file << vel_grids[0][x_idx][y_idx] << "\t";
+        }
         *p_grid_file << "\n";
     }
 
-    for( unsigned y_idx = 0 ; y_idx < num_gridpts_y ; y_idx ++ )
+    for (unsigned y_idx = 0; y_idx < num_gridpts_y; y_idx ++)
     {
-        for( unsigned x_idx = 0 ; x_idx < num_gridpts_x ; x_idx ++ )
+        for (unsigned x_idx = 0; x_idx < num_gridpts_x; x_idx ++)
         {
             *p_grid_file << vel_grids[1][x_idx][y_idx] << "\t";
         }
@@ -527,7 +520,7 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::CalculateCellOverlaps(I
         assert(num_nodes > 1);
         prev_location = iter->GetNode(num_nodes - 1)->rGetLocation();
 
-        for (unsigned node_idx = 0 ; node_idx < num_nodes ; node_idx++)
+        for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
         {
             // Get node, index and location
             Node<SPACE_DIM>* p_node = iter->GetNode(node_idx);
@@ -549,7 +542,7 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::CalculateCellOverlaps(I
     }
 
     // We then loop over each element again to determine how many 'cells' we need to split each output element in to
-    for (unsigned elem_idx = 0 ; elem_idx < num_elem ; elem_idx++)
+    for (unsigned elem_idx = 0; elem_idx < num_elem; elem_idx++)
     {
         // If no overlap, we only need one cell
         if (!mHOverlaps[elem_idx] && !mVOverlaps[elem_idx])
@@ -557,7 +550,7 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::CalculateCellOverlaps(I
             mNumCellParts[elem_idx] = 1;
         }
         // If only one overlap is false, then we need two cells
-        else if( mHOverlaps[elem_idx] * mVOverlaps[elem_idx] == 0)
+        else if ( mHOverlaps[elem_idx] * mVOverlaps[elem_idx] == 0)
         {
             mNumCellParts[elem_idx] = 2;
         }
@@ -575,10 +568,7 @@ const std::vector<unsigned>& ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>:
     return mNumCellParts;
 }
 
-/////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
 template class ImmersedBoundaryMeshWriter<1,1>;
 template class ImmersedBoundaryMeshWriter<1,2>;
 template class ImmersedBoundaryMeshWriter<1,3>;

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2015, University of Oxford.
+Copyright (c) 2005-2016, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -34,7 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "SuperellipseGenerator.hpp"
-#include "Debug.hpp"
 
 SuperellipseGenerator::SuperellipseGenerator(unsigned numPoints,
                                              double ellipseExponent,
@@ -72,7 +71,7 @@ SuperellipseGenerator::SuperellipseGenerator(unsigned numPoints,
     dense_locations[0][1] = 0.0;
 
     // Fill in all other locations
-    for(unsigned point = 1 ; point < dense_pts ; point++)
+    for (unsigned point = 1; point < dense_pts; point++)
     {
         // Update cumulative distance
         cumulative_dist += dense_spacing;
@@ -85,7 +84,7 @@ SuperellipseGenerator::SuperellipseGenerator(unsigned numPoints,
         dense_locations[point][0] = copysign(pow(fabs(temp_cos), ellipseExponent), temp_cos) * width * 0.5;
         dense_locations[point][1] = copysign(pow(fabs(temp_sin), ellipseExponent), temp_sin) * height * 0.5;
 
-        //Check that the new point created is within [-width/2, width/2] x [-height/2, height/2]
+        // Check that the new point created lies within [-width/2, width/2] x [-height/2, height/2]
         assert(fabs(dense_locations[point][0]) < width * 0.5 + 1e-10);
         assert(fabs(dense_locations[point][1]) < height * 0.5 + 1e-10);
 
@@ -95,13 +94,14 @@ SuperellipseGenerator::SuperellipseGenerator(unsigned numPoints,
 
     double total_arc_length = cumulative_arc_length[dense_pts - 1] + norm_2(dense_locations[dense_pts - 1] - dense_locations[0]);
 
-    // Because our perimeter is periodic, we get back to the start
+    // Since our perimeter is periodic, we get back to the start
     cumulative_arc_length.push_back(total_arc_length);
     dense_locations.push_back(dense_locations[0]);
 
     /*
      * Decide on the best place to put the actual boundary points
      */
+
     // Helper variables for loop
     unsigned dense_it = 0;
 
@@ -114,11 +114,11 @@ SuperellipseGenerator::SuperellipseGenerator(unsigned numPoints,
     mPoints[0] = dense_locations[0];
 
     // Fill in all other locations
-    for(unsigned point = 1 ; point < numPoints ; point++)
+    for (unsigned point = 1; point < numPoints; point++)
     {
         target_arclength = double(point) * mTargetNodeSpacing;
 
-        while(cumulative_arc_length[dense_it] < target_arclength && dense_it < dense_pts)
+        while (cumulative_arc_length[dense_it] < target_arclength && dense_it < dense_pts)
         {
             dense_it ++;
         }
@@ -148,7 +148,7 @@ SuperellipseGenerator::SuperellipseGenerator(unsigned numPoints,
         NEVER_REACHED;
     }
 
-    for (unsigned i = 1 ; i < numPoints ; i++)
+    for (unsigned i = 1; i < numPoints; i++)
     {
         delta_x = fabs(mPoints[i][0] - mPoints[i-1][0]);
         delta_y = fabs(mPoints[i][1] - mPoints[i-1][1]);
@@ -179,7 +179,7 @@ SuperellipseGenerator::SuperellipseGenerator(unsigned numPoints,
     // Reposition the height of the top surface
     mHeightOfTopSurface += offset[1];
 
-    for(unsigned point = 0 ; point < numPoints ; point++)
+    for (unsigned point = 0; point < numPoints; point++)
     {
         // Reposition all points
         mPoints[point] += offset;
@@ -205,18 +205,16 @@ double SuperellipseGenerator::GetHeightOfTopSurface()
     return mHeightOfTopSurface;
 }
 
-
 const std::vector<c_vector<double, 2> > SuperellipseGenerator::GetPointsAsVectors() const
 {
     return mPoints;
 }
 
-
 const std::vector<ChastePoint<2> > SuperellipseGenerator::GetPointsAsChastePoints() const
 {
     std::vector<ChastePoint<2> > chaste_points;
 
-    for(unsigned point = 0 ; point < mPoints.size() ; point++)
+    for (unsigned point = 0; point < mPoints.size(); point++)
     {
         chaste_points.push_back(ChastePoint<2>(mPoints[point]));
     }

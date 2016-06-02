@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2015, University of Oxford.
+Copyright (c) 2005-2016, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -32,6 +32,7 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
+
 #ifndef IMMERSEDBOUNDARYMESHWRITER_HPP_
 #define IMMERSEDBOUNDARYMESHWRITER_HPP_
 
@@ -40,8 +41,8 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class ImmersedBoundaryMesh;
 
 #ifdef CHASTE_VTK
-//Requires  "sudo aptitude install libvtk5-dev" or similar
-#define _BACKWARD_BACKWARD_WARNING_H 1 //Cut out the strstream deprecated warning for now (gcc4.3)
+// Requires  "sudo aptitude install libvtk5-dev" or similar
+#define _BACKWARD_BACKWARD_WARNING_H 1 // Cut out the strstream deprecated warning for now (gcc4.3)
 #include <vtkDoubleArray.h>
 #include <vtkCellData.h>
 #include <vtkPointData.h>
@@ -79,12 +80,16 @@ private:
     /** Iterators over the mesh */
     MeshWriterIterators<ELEMENT_DIM,SPACE_DIM>* mpIters;
 
-    /** Vectors storing whether elements overlap or not */
+    /** Vector storing whether elements overlap horizontally. */
     std::vector<bool> mHOverlaps;
+
+    /** Vector storing whether elements overlap vertically. */
     std::vector<bool> mVOverlaps;
 
-    /** Vectors storing the position of overlaps, if any */
+    /** Vectors storing the position of horizontal overlaps, if any */
     std::vector<std::vector<unsigned> > mHOverlapPoints;
+
+    /** Vectors storing the position of vertical overlaps, if any */
     std::vector<std::vector<unsigned> > mVOverlapPoints;
 
     /** Vector containing number of cell parts */
@@ -106,11 +111,11 @@ public:
      *
      * @param rDirectory reference to the output directory, relative to where Chaste output is stored
      * @param rBaseName reference to the base name for results files
-     * @param clearOutputDir whether to clear the output directory prior to writing files
+     * @param clearOutputDir whether to clear the output directory prior to writing files (defaults to true)
      */
     ImmersedBoundaryMeshWriter(const std::string& rDirectory,
-                     const std::string& rBaseName,
-                     const bool clearOutputDir=true);
+                               const std::string& rBaseName,
+                               const bool clearOutputDir=true);
 
     /**
      * Destructor.

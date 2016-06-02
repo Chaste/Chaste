@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2014, University of Oxford.
+Copyright (c) 2005-2016, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -64,7 +64,7 @@ public:
         double max_y = -DBL_MAX;
 
         // Test all points are within the unit square, and find the four extreme positions
-        for (unsigned idx = 0 ; idx < points.size() ; idx++)
+        for (unsigned idx = 0; idx < points.size(); idx++)
         {
             double x_pos = points[idx][0];
             double y_pos = points[idx][1];
@@ -101,7 +101,7 @@ public:
 
         // Test points are roughly uniformly spaced
         double previous_dist = norm_2(points[0] - points[1]);
-        for (unsigned idx = 1 ; idx < points.size() ; idx++)
+        for (unsigned idx = 1; idx < points.size(); idx++)
         {
             double this_dist = norm_2(points[idx] - points[(idx + 1) % points.size()]);
 
@@ -158,7 +158,7 @@ public:
         TS_ASSERT_EQUALS(vector_points.size(), chaste_points.size());
 
         // Check locations coincide
-        for (unsigned idx = 1 ; idx < vector_points.size() ; idx++)
+        for (unsigned idx = 1; idx < vector_points.size(); idx++)
         {
             TS_ASSERT_DELTA(vector_points[idx][0], chaste_points[idx][0], 1e-6);
             TS_ASSERT_DELTA(vector_points[idx][1], chaste_points[idx][1], 1e-6);

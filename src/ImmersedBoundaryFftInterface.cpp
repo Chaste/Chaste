@@ -1,7 +1,6 @@
-
 /*
 
-Copyright (c) 2005-2015, University of Oxford.
+Copyright (c) 2005-2016, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -46,12 +45,12 @@ ImmersedBoundaryFftInterface<DIM>::ImmersedBoundaryFftInterface(ImmersedBoundary
                                                                 double* pOut,
                                                                 bool multiThread,
                                                                 bool activeSources)
-        : mThreadErrors(multiThread ? fftw_init_threads() : 1),
-          mpMesh(pMesh),
-          mpInputArray(pIn),
-          mpComplexArray(reinterpret_cast<fftw_complex*>(pComplex)),
-          mpOutputArray(pOut),
-          mMultiThread(multiThread)
+    : mThreadErrors(multiThread ? fftw_init_threads() : 1),
+      mpMesh(pMesh),
+      mpInputArray(pIn),
+      mpComplexArray(reinterpret_cast<fftw_complex*>(pComplex)),
+      mpOutputArray(pOut),
+      mMultiThread(multiThread)
 {
     /*
      * Set up fftw routines
@@ -73,7 +72,7 @@ ImmersedBoundaryFftInterface<DIM>::ImmersedBoundaryFftInterface(ImmersedBoundary
     }
 
     // Forget all wisdom; the correct wisdom for the number of threads used will be loaded from file
-    void fftw_forget_wisdom(void);
+    void fftw_forget_wisdom();
 
     // Path to the wisdom file
     std::string wisdom_path;

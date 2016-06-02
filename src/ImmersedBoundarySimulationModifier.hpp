@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2014, University of Oxford.
+Copyright (c) 2005-2016, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -36,7 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef IMMERSEDBOUNDARYSIMULATIONMODIFIER_HPP_
 #define IMMERSEDBOUNDARYSIMULATIONMODIFIER_HPP_
 
-
 // Chaste includes
 #include "AbstractCellBasedSimulationModifier.hpp"
 #include "ObsoleteBoxCollection.hpp"
@@ -55,13 +54,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/multi_array.hpp>
 
 /**
- * A modifier class which at each simulation time step implements the immersed boundary algorithm similar to
- * Rejniak, K. A., Kliman, H. J., & Fauci, L. J. (2004). A computational model of the mechanics of growth of the villous trophoblast bilayer.
- * Bulletin of Mathematical Biology, 66(2), 199–232. doi:10.1016/j.bulm.2003.06.001
+ * A modifier class which at each simulation time step implements the immersed
+ * boundary algorithm similar to Rejniak et al (2004). A computational model of
+ * the mechanics of growth of the villous trophoblast bilayer. Bull. Math. Biol.
+ * 66:199–232. doi:10.1016/j.bulm.2003.06.001.
  */
 template<unsigned DIM>
 class ImmersedBoundarySimulationModifier : public AbstractCellBasedSimulationModifier<DIM,DIM>
 {
+private:
+
     /** To allow tests to directly access solver methods */
     friend class TestImmersedBoundaryPdeSolveMethods;
 
@@ -80,7 +82,6 @@ class ImmersedBoundarySimulationModifier : public AbstractCellBasedSimulationMod
         archive & boost::serialization::base_object<AbstractCellBasedSimulationModifier<DIM,DIM> >(*this);
     }
 
-private:
     /** Pointer to the immersed boundary mesh */
     ImmersedBoundaryMesh<DIM,DIM>* mpMesh;
 
@@ -114,8 +115,12 @@ private:
     /** A map between node indices and a set of their possible neighbours, used calculating cell-cell interactions */
     std::map<unsigned, std::set<unsigned> > mNodeNeighbours;
 
-    /** The fluid Reynolds number */
-    double mReynolds;
+    /**
+     * The fluid Reynolds number.
+     *
+     * Initialised to 1e-4 in the constructor.
+     */
+    double mReynoldsNumber;
 
     /** Imaginary unit */
     std::complex<double> mI;
@@ -126,6 +131,7 @@ private:
     /** Pointer to structure storing all necessary arrays */
     ImmersedBoundary2dArrays<DIM>* mpArrays;
 
+    ///\todo Document class member
     ImmersedBoundaryFftInterface<DIM>* mpFftInterface;
 
     /**
@@ -152,9 +158,9 @@ private:
     void ClearForcesAndSources();
 
     /**
-     * Loops over each immersed boundary force and invokes AddForceContribution()
+     * Loops over each immersed boundary force and invokes AddImmersedBoundaryForceContribution()
      */
-    void AddForceContributions();
+    void AddImmersedBoundaryForceContributions();
 
     /**
      * Helper method for UpdateFluidVelocityGrids()
@@ -198,7 +204,6 @@ private:
      * @param numGridPtsX the number of grid points in the x direction
      */
     void SetMemberVariablesForTesting(unsigned numGridPtsY, unsigned numGridPtsX);
-
 
 public:
 
@@ -257,12 +262,14 @@ public:
     void AddImmersedBoundaryForce(boost::shared_ptr<AbstractImmersedBoundaryForce<DIM> > pForce);
 
     /**
+     * Set #mReynoldsNumber.
+     *
      * @param reynoldsNumber the new Reynolds number
      */
     void SetReynoldsNumber(double reynoldsNumber);
 
     /**
-     * @return the current Reynolds number
+     * @return #mReynoldsNumber
      */
     double GetReynoldsNumber();
 };

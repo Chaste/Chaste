@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2015, University of Oxford.
+Copyright (c) 2005-2016, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -41,14 +41,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "IsNan.hpp"
 #include "ShortAxisVertexBasedDivisionRule.hpp"
 #include <boost/multi_array.hpp>
-#include "Debug.hpp"
-
-
-// Cell population writers
 #include "CellPopulationElementWriter.hpp"
-
 #include "RandomNumberGenerator.hpp"
-
 
 template<unsigned DIM>
 ImmersedBoundaryCellPopulation<DIM>::ImmersedBoundaryCellPopulation(ImmersedBoundaryMesh<DIM, DIM>& rMesh,
@@ -163,7 +157,6 @@ double ImmersedBoundaryCellPopulation<DIM>::GetIntrinsicSpacing()
 {
     return mIntrinsicSpacing;
 }
-
 
 //\todo: implement this method. Decide what "neighbouring" should be for IB cells
 template<unsigned DIM>
@@ -298,7 +291,7 @@ void ImmersedBoundaryCellPopulation<DIM>::UpdateNodeLocations(double dt)
         first_idx_y = unsigned(floor(node_location[1] / grid_spacing_y)) + num_grid_pts_y - 1;
 
         // Calculate all four indices and deltas in each dimension
-        for (unsigned i = 0 ; i < 4 ; i ++)
+        for (unsigned i = 0; i < 4; i ++)
         {
             x_indices[i] = (first_idx_x + i) % num_grid_pts_x;
             y_indices[i] = (first_idx_y + i) % num_grid_pts_y;
@@ -344,6 +337,7 @@ void ImmersedBoundaryCellPopulation<DIM>::UpdateNodeLocations(double dt)
         // Move the node
         this->SetNode(node_iter->GetIndex(), new_point);
     }
+
     // If active sources, we need to update those location as well
     if (this->DoesPopulationHaveActiveSources())
     {
@@ -358,7 +352,7 @@ void ImmersedBoundaryCellPopulation<DIM>::UpdateNodeLocations(double dt)
         c_vector<double, DIM> source_location;
 
         // Iterate over all sources and update their locations
-        for (unsigned source_idx = 0 ; source_idx < combined_sources.size() ; source_idx++)
+        for (unsigned source_idx = 0; source_idx < combined_sources.size(); source_idx++)
         {
             // Get location of current node
             source_location = combined_sources[source_idx]->rGetLocation();
@@ -368,7 +362,7 @@ void ImmersedBoundaryCellPopulation<DIM>::UpdateNodeLocations(double dt)
             first_idx_y = unsigned(floor(source_location[1] / grid_spacing_y)) + num_grid_pts_y - 1;
 
             // Calculate all four indices and deltas in each dimension
-            for (unsigned i = 0 ; i < 4 ; i ++)
+            for (unsigned i = 0; i < 4; i ++)
             {
                 x_indices[i] = (first_idx_x + i) % num_grid_pts_x;
                 y_indices[i] = (first_idx_y + i) % num_grid_pts_y;
@@ -523,7 +517,7 @@ void ImmersedBoundaryCellPopulation<DIM>::WriteVtkResultsToFile(const std::strin
 
             // Populate the vector of VTK cell data.  We loop over the number of output cells as this takes into
             // account that some elements will be broken into pieces for visualisation
-            for (unsigned cell_part = 0 ; cell_part < num_cell_parts[elem_index] ; cell_part++)
+            for (unsigned cell_part = 0; cell_part < num_cell_parts[elem_index]; cell_part++)
             {
                 vtk_cell_data.push_back((*cell_writer_iter)->GetCellDataForVtkOutput(p_cell, this));
             }
@@ -559,7 +553,7 @@ void ImmersedBoundaryCellPopulation<DIM>::WriteVtkResultsToFile(const std::strin
         {
             // Populate the vector of VTK cell data.  We loop over the number of output cells as this takes into
             // account that some elements will be broken into pieces for visualisation
-            for (unsigned cell_part = 0 ; cell_part < num_cell_parts[elem_index] ; cell_part++)
+            for (unsigned cell_part = 0; cell_part < num_cell_parts[elem_index]; cell_part++)
             {
                 cell_data[var].push_back(p_cell->GetCellData()->GetItem(cell_data_names[var]));
             }
@@ -613,14 +607,11 @@ void ImmersedBoundaryCellPopulation<DIM>::OutputCellPopulationParameters(out_str
 template<unsigned DIM>
 double ImmersedBoundaryCellPopulation<DIM>::GetWidth(const unsigned& rDimension)
 {
-    // Call GetWidth() on the mesh
     double width = this->mrMesh.GetWidth(rDimension);
-
     return width;
 }
 
-
-//\todo: implement this.  May need to put method back in to mesh class
+///\todo: implement this.  May need to put method back in to mesh class
 template<unsigned DIM>
 std::set<unsigned> ImmersedBoundaryCellPopulation<DIM>::GetNeighbouringNodeIndices(unsigned index)
 {

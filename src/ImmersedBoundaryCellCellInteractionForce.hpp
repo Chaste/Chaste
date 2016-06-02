@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2015, University of Oxford.
+Copyright (c) 2005-2016, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -48,15 +48,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * A force class for use in Vertex-based simulations. This force is based on the
- * Energy function proposed by Farhadifar et al in  Curr. Biol., 2007, 17, 2095-2104.
+ * energy function proposed by Farhadifar et al in  Curr. Biol., 2007, 17, 2095-2104.
  */
-
-
 template<unsigned DIM>
 class ImmersedBoundaryCellCellInteractionForce : public AbstractImmersedBoundaryForce<DIM>
 {
-//friend class TestForces;
-
 private:
 
     friend class boost::serialization::access;
@@ -77,28 +73,36 @@ private:
 
 protected:
 
-    /** The immersed boundary cell population */
+    /** The immersed boundary cell population. */
     ImmersedBoundaryCellPopulation<DIM>* mpCellPopulation;
 
     /** The immersed boundary mesh */
     ImmersedBoundaryMesh<DIM,DIM>* mpMesh;
 
-    /** The cell-cell spring constant */
+    /**
+     * The cell-cell spring constant.
+     *
+     * Initialised to 1e3 in the constructor.
+     */
     double mSpringConst;
 
-    /** The cell-cell rest length */
+    /**
+     * The cell-cell rest length.
+     *
+     * Initialised to 0.25 times the cell interaction distance in the constructor.
+     */
     double mRestLength;
 
-    /** The number of transmembrane proteins represented in this force class */
+    /** The number of transmembrane proteins represented in this force class. */
     unsigned mNumProteins;
 
-    /** Whether to use linear spring forces */
+    /** Whether to use linear spring forces. */
     bool mLinearSpring;
 
-    /** Whether to use a force derived from the Morse potential */
+    /** Whether to use a force derived from the Morse potential. */
     bool mMorse;
 
-    /** A vector storing in which position of the node attributes vector each protein is represented */
+    /** A vector storing in which position of the node attributes vector each protein is represented. */
     std::vector<unsigned> mProteinNodeAttributeLocations;
 
 public:
@@ -119,13 +123,13 @@ public:
     virtual ~ImmersedBoundaryCellCellInteractionForce();
 
     /**
-     * Overridden AddForceContribution() method.
+     * Overridden AddImmersedBoundaryForceContribution() method.
      *
      * Calculates the force on each node in the immersed boundary cell population as a result of cell-cell interactions.
      *
      * @param rCellPopulation reference to the cell population
      */
-    virtual void AddForceContribution(std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs);
+    virtual void AddImmersedBoundaryForceContribution(std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs);
 
     /**
      * @return mProteinNodeAttributeLocations
@@ -140,7 +144,7 @@ public:
     void InitializeProteinLevels();
 
     /**
-     * Helper method for AddForceContribution().
+     * Helper method for AddImmersedBoundaryForceContribution().
      *
      * Updates the levels of each protein at each timestep.
      */
@@ -167,11 +171,11 @@ public:
     void UseMorsePotential();
 
     /**
-     * Overridden OutputForceParameters() method.
+     * Overridden OutputImmersedBoundaryForceParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputForceParameters(out_stream& rParamsFile);
+    void OutputImmersedBoundaryForceParameters(out_stream& rParamsFile);
 };
 
 #include "SerializationExportWrapper.hpp"

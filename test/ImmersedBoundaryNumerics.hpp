@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2014, University of Oxford.
+Copyright (c) 2005-2016, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -47,7 +47,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sys/stat.h>
 #include "CheckpointArchiveTypes.hpp"
 
-
 #include "OffLatticeSimulation.hpp"
 #include "UniformlyDistributedCellCycleModel.hpp"
 #include "Timer.hpp"
@@ -62,7 +61,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // User project fcooper
 #include "CsvWriter.hpp"
-#include "Debug.hpp"
 
 // Simulations do not run in parallel
 #include "FakePetscSetup.hpp"
@@ -79,9 +77,9 @@ private:
 
 public:
 
+    ///\todo Improve testing
     void TestNothingMuch() throw(Exception)
     {
-
     }
 
 //    void TestSetOutputDirectory() throw(Exception)
@@ -200,7 +198,7 @@ public:
 //            SimulationTime::Instance()->SetStartTime(0.0);
 //
 //            /*
-//             * Create an Immersed Boundary Mesh using a SuperellipseGenerator
+//             * Create an immersed boundary mesh using a SuperellipseGenerator
 //             *
 //             * 1: Num nodes
 //             * 2: Superellipse exponent
@@ -329,7 +327,7 @@ public:
 //        unsigned max_sim_idx = 40;
 //
 //        /*
-//         * Create an Immersed Boundary Mesh using a SuperellipseGenerator
+//         * Create an immersed boundary mesh using a SuperellipseGenerator
 //         *
 //         * 1: Num nodes
 //         * 2: Superellipse exponent
@@ -453,7 +451,7 @@ public:
 //        // Perform the first simulation
 //        {
 //            /*
-//             * Create an Immersed Boundary Mesh using a SuperellipseGenerator
+//             * Create an immersed boundary mesh using a SuperellipseGenerator
 //             *
 //             * 1: Num nodes
 //             * 2: Superellipse exponent
@@ -534,7 +532,7 @@ public:
 //        for (unsigned sc_idx = 0; sc_idx < num_springs; sc_idx++)
 //        {
 //            /*
-//             * Create an Immersed Boundary Mesh using a SuperellipseGenerator
+//             * Create an immersed boundary mesh using a SuperellipseGenerator
 //             *
 //             * 1: Num nodes
 //             * 2: Superellipse exponent
@@ -670,7 +668,7 @@ public:
 //        // Perform the first simulation
 //        {
 //            /*
-//             * Create an Immersed Boundary Mesh using a SuperellipseGenerator
+//             * Create an immersed boundary mesh using a SuperellipseGenerator
 //             *
 //             * 1: Num nodes
 //             * 2: Superellipse exponent
@@ -760,7 +758,7 @@ public:
 //            double scaling_factor = 2.0;
 //
 //            /*
-//             * Create an Immersed Boundary Mesh using a SuperellipseGenerator
+//             * Create an immersed boundary mesh using a SuperellipseGenerator
 //             *
 //             * 1: Num nodes
 //             * 2: Superellipse expoHi Sanent
@@ -891,7 +889,7 @@ public:
 //            SimulationTime::Instance()->SetStartTime(0.0);
 //
 //            /*
-//             * Create an Immersed Boundary Mesh using a SuperellipseGenerator
+//             * Create an immersed boundary mesh using a SuperellipseGenerator
 //             *
 //             * 1: Num nodes
 //             * 2: Superellipse exponent
@@ -989,7 +987,7 @@ public:
 //        SimulationTime::Instance()->SetStartTime(0.0);
 //
 //        /*
-//         * Create an Immersed Boundary Mesh using a SuperellipseGenerator
+//         * Create an immersed boundary mesh using a SuperellipseGenerator
 //         *
 //         * 1: Num nodes
 //         * 2: Superellipse exponent
@@ -1074,13 +1072,13 @@ public:
 //        double delta_t = 0.125;
 //        unsigned sampling_mult = 10;
 //
-//        for (unsigned halving = 0 ; halving < num_halvings ; halving++)
+//        for (unsigned halving = 0; halving < num_halvings; halving++)
 //        {
 //            SimulationTime::Instance()->Destroy();
 //            SimulationTime::Instance()->SetStartTime(0.0);
 //
 //            /*
-//             * Create an Immersed Boundary Mesh using a SuperellipseGenerator
+//             * Create an immersed boundary mesh using a SuperellipseGenerator
 //             *
 //             * 1: Num nodes
 //             * 2: Superellipse exponent
@@ -1096,7 +1094,7 @@ public:
 //            delete p_gen;
 //
 //            std::vector<Node<2>* > nodes;
-//            for (unsigned node_idx = 0 ; node_idx < locations.size() ; node_idx++)
+//            for (unsigned node_idx = 0; node_idx < locations.size(); node_idx++)
 //            {
 //                nodes.push_back(new Node<2>(node_idx, locations[node_idx], true));
 //            }
@@ -1179,13 +1177,13 @@ public:
 //        unsigned num_doublings = 7;
 //        unsigned grid_pts = 32;
 //
-//        for (unsigned doubling = 0 ; doubling < num_doublings ; doubling++)
+//        for (unsigned doubling = 0; doubling < num_doublings; doubling++)
 //        {
 //            SimulationTime::Instance()->Destroy();
 //            SimulationTime::Instance()->SetStartTime(0.0);
 //
 //            /*
-//             * Create an Immersed Boundary Mesh using a SuperellipseGenerator
+//             * Create an immersed boundary mesh using a SuperellipseGenerator
 //             *
 //             * 1: Num nodes
 //             * 2: Superellipse exponent
@@ -1201,7 +1199,7 @@ public:
 //            delete p_gen;
 //
 //            std::vector<Node<2>* > nodes;
-//            for (unsigned node_idx = 0 ; node_idx < locations.size() ; node_idx++)
+//            for (unsigned node_idx = 0; node_idx < locations.size(); node_idx++)
 //            {
 //                nodes.push_back(new Node<2>(node_idx, locations[node_idx], true));
 //            }
@@ -1282,13 +1280,13 @@ public:
 //        unsigned num_ib_nodes = 128;
 //        double kappa_int = 1e7;
 //
-//        for (unsigned doubling = 0 ; doubling < num_doublings ; doubling++)
+//        for (unsigned doubling = 0; doubling < num_doublings; doubling++)
 //        {
 //            SimulationTime::Instance()->Destroy();
 //            SimulationTime::Instance()->SetStartTime(0.0);
 //
 //            /*
-//             * Create an Immersed Boundary Mesh using a SuperellipseGenerator
+//             * Create an immersed boundary mesh using a SuperellipseGenerator
 //             *
 //             * 1: Num nodes
 //             * 2: Superellipse exponent
@@ -1304,7 +1302,7 @@ public:
 //            delete p_gen;
 //
 //            std::vector<Node<2>* > nodes;
-//            for (unsigned node_idx = 0 ; node_idx < locations.size() ; node_idx++)
+//            for (unsigned node_idx = 0; node_idx < locations.size(); node_idx++)
 //            {
 //                nodes.push_back(new Node<2>(node_idx, locations[node_idx], true));
 //            }
@@ -1458,7 +1456,7 @@ public:
 //        unsigned num_springs = 3;
 //        obs_elongation_shape_factor.resize(num_springs);
 //
-//        for (unsigned sc_idx = 0 ; sc_idx < num_springs ; sc_idx++)
+//        for (unsigned sc_idx = 0; sc_idx < num_springs; sc_idx++)
 //        {
 //            SimulationTime::Instance()->Destroy();
 //            SimulationTime::Instance()->SetStartTime(0.0);
@@ -1533,7 +1531,7 @@ public:
 //        csv_writer.AddData(simulation_time);
 //        csv_writer.AddData(ref_elongation_shape_factor);
 //
-//        for (unsigned sc_idx = 0 ; sc_idx < num_springs ; sc_idx++)
+//        for (unsigned sc_idx = 0; sc_idx < num_springs; sc_idx++)
 //        {
 //            csv_writer.AddData(obs_elongation_shape_factor[sc_idx]);
 //        }
@@ -1542,7 +1540,7 @@ public:
 //        header_names.push_back("Simulation time");
 //        header_names.push_back("Ref elongation shape factor");
 //
-//        for (unsigned sc_idx = 0 ; sc_idx < num_springs ; sc_idx++)
+//        for (unsigned sc_idx = 0; sc_idx < num_springs; sc_idx++)
 //        {
 //            std::string header = "Obs elongation shape factor ";
 //            header += boost::lexical_cast<std::string>(sc_idx);
@@ -1586,7 +1584,7 @@ public:
 //
 //        // Generate random numbers
 //        std::vector<double> rand_numbers;
-//        for (unsigned i = 0 ; i < num_points ; i++)
+//        for (unsigned i = 0; i < num_points; i++)
 //        {
 //            rand_numbers.push_back(-2.0 + 4.0 * RandomNumberGenerator::Instance()->ranf());
 //        }
@@ -1597,7 +1595,7 @@ public:
 //        double delta_2_time = 0.0;
 //        double delta_3_time = 0.0;
 //
-//        for (unsigned rep = 0 ; rep < reps ; rep++)
+//        for (unsigned rep = 0; rep < reps; rep++)
 //        {
 //            // Time the first delta function
 //            mTimer.Reset();

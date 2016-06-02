@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2015, University of Oxford.
+Copyright (c) 2005-2016, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -32,6 +32,7 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
+
 #ifndef IMMERSEDBOUNDARYELEMENT_HPP_
 #define IMMERSEDBOUNDARYELEMENT_HPP_
 
@@ -100,9 +101,9 @@ public:
     ~ImmersedBoundaryElement();
 
     /**
-     * Set mpFluidSource
+     * Set mpFluidSource.
      *
-     * @param the fluid source associated with this element
+     * @param fluidSource  the fluid source associated with this element
      */
     void SetFluidSource(FluidSource<SPACE_DIM>* fluidSource);
 
@@ -111,7 +112,7 @@ public:
      *
      * @return pointer to the fluid source
      */
-    FluidSource<SPACE_DIM>* GetFluidSource(void);
+    FluidSource<SPACE_DIM>* GetFluidSource();
 
     /**
      * @return the vector of corner nodes.
@@ -129,9 +130,7 @@ public:
      * @param averageNodeSpacing the new average node spacing.
      */
     void SetAverageNodeSpacing(double averageNodeSpacing);
-
 };
-
 
 //////////////////////////////////////////////////////////////////////
 //                  Specialization for 1d elements                  //
@@ -194,7 +193,6 @@ public:
      * @param averageNodeSpacing the new average node spacing.
      */
     void SetAverageNodeSpacing(double averageNodeSpacing);
-
 };
 
 #endif /*IMMERSEDBOUNDARYELEMENT_HPP_*/

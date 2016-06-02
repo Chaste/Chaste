@@ -37,30 +37,30 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned SPACE_DIM>
 FluidSource<SPACE_DIM>::FluidSource(unsigned index, ChastePoint<SPACE_DIM> point)
-        : mIndex(index),
-          mLocation(point.rGetLocation()),
-          mStrength(0.0),
-          mIsSourceAssociatedWithElement(false),
-          mAssociatedElementIndex(UINT_MAX)
+    : mIndex(index),
+      mLocation(point.rGetLocation()),
+      mStrength(0.0),
+      mIsSourceAssociatedWithElement(false),
+      mAssociatedElementIndex(UINT_MAX)
 {
 }
 
 template<unsigned SPACE_DIM>
 FluidSource<SPACE_DIM>::FluidSource(unsigned index, c_vector<double, SPACE_DIM> location)
-        : mIndex(index),
-          mLocation(location),
-          mStrength(0.0),
-          mIsSourceAssociatedWithElement(false),
-          mAssociatedElementIndex(UINT_MAX)
+    : mIndex(index),
+      mLocation(location),
+      mStrength(0.0),
+      mIsSourceAssociatedWithElement(false),
+      mAssociatedElementIndex(UINT_MAX)
 {
 }
 
 template<unsigned SPACE_DIM>
 FluidSource<SPACE_DIM>::FluidSource(unsigned index, double v1, double v2, double v3)
-        : mIndex(index),
-          mStrength(0.0),
-          mIsSourceAssociatedWithElement(false),
-          mAssociatedElementIndex(UINT_MAX)
+    : mIndex(index),
+      mStrength(0.0),
+      mIsSourceAssociatedWithElement(false),
+      mAssociatedElementIndex(UINT_MAX)
 {
     mLocation[0] = v1;
     if (SPACE_DIM > 1)
@@ -145,10 +145,7 @@ void FluidSource<SPACE_DIM>::SetAssociatedElementIndex(unsigned associatedElemen
     mAssociatedElementIndex = associatedElementIndex;
 }
 
-//////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-//////////////////////////////////////////////////////////////////////////
-
 template class FluidSource<1>;
 template class FluidSource<2>;
 template class FluidSource<3>;

@@ -39,11 +39,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChastePoint.hpp"
 
 /**
- * A fluid source in an Immersed Boundary Mesh, used in ImmersedBoundary simulations.
+ * A fluid source in an immersed boundary mesh, used in ImmersedBoundary simulations.
  */
 template<unsigned SPACE_DIM>
 class FluidSource
 {
+    ///\todo Implement archiving?
+
 private:
 
     /** The index of this fluid source within the mesh. */
@@ -55,10 +57,10 @@ private:
     /** The strength of the fluid source. */
     double mStrength;
 
-    /** Whether the fluid source is associated with an Immersed Boundary Element. */
+    /** Whether the fluid source is associated with an immersed boundary element. */
     bool mIsSourceAssociatedWithElement;
 
-    /** Index of the Immersed Boundary Element associated with this fluid source. */
+    /** Index of the immersed boundary element associated with this fluid source. */
     unsigned mAssociatedElementIndex;
 
 public:
@@ -88,7 +90,6 @@ public:
      * @param v3 the z-coordinate of the fluid source in the mesh (defaults to 0)
      */
     FluidSource(unsigned index, double v1=0.0, double v2=0.0, double v3=0.0);
-
 
     /**
      * Explicit destructor.

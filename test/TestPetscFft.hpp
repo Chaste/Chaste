@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2014, University of Oxford.
+Copyright (c) 2005-2016, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -33,14 +33,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-// Needed for test framework
 #include <cxxtest/TestSuite.h>
 
 #include "PetscTools.hpp"
 #include "PetscMatTools.hpp"
-
-#include "Debug.hpp"
-
 
 // This test is never run in parallel
 #include "FakePetscSetup.hpp"
@@ -54,13 +50,12 @@ public:
         Mat mat;
         PetscTools::SetupMat(mat, 5, 3, 3);
 
-        for (unsigned i = 0 ; i < 5 ; i++)
+        for (unsigned i = 0; i < 5; i++)
         {
-            for (unsigned j = 0 ; j < 3 ; j++)
+            for (unsigned j = 0; j < 3; j++)
             {
                 PetscMatTools::SetElement(mat, i, j, i + 5.0 * j);
             }
         }
-
     }
 };

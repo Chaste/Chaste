@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2014, University of Oxford.
+Copyright (c) 2005-2016, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -39,7 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Chaste includes
 #include "RandomNumberGenerator.hpp"
 
-// Needed for Immersed Boundary simulations
+// Needed for immersed boundary simulations
 #include <complex>
 #include <fftw3.h>
 #include <boost/multi_array.hpp>
@@ -94,7 +94,7 @@ public:
         fftw_plan plan_b;
         plan_b = fftw_plan_dft_c2r_2d(size, size, p_complex_data, p_real_output, FFTW_EXHAUSTIVE);
 
-        for (unsigned i=0 ; i < size ; i++)
+        for (unsigned i=0; i < size; i++)
         {
             for (unsigned j = 0; j < size; j++)
             {
@@ -109,13 +109,12 @@ public:
         fftw_execute(plan_b);
         fftw_destroy_plan(plan_b);
 
-        for (unsigned i=0 ; i < size ; i++)
+        for (unsigned i=0; i < size; i++)
         {
             for (unsigned j = 0; j < size; j++)
             {
                 TS_ASSERT_DELTA(original_data[i][j], real_output[i][j]/norm, 1e-15);
             }
         }
-
     }
 };

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2015, University of Oxford.
+Copyright (c) 2005-2016, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -34,9 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "ImmersedBoundaryCellCellInteractionForce.hpp"
-
 #include "ImmersedBoundaryElement.hpp"
-#include "Debug.hpp"
 
 template<unsigned DIM>
 ImmersedBoundaryCellCellInteractionForce<DIM>::ImmersedBoundaryCellCellInteractionForce(ImmersedBoundaryCellPopulation<DIM>& rCellPopulation)
@@ -55,7 +53,7 @@ ImmersedBoundaryCellCellInteractionForce<DIM>::ImmersedBoundaryCellCellInteracti
 
     // First verify that all nodes have the same number of attributes
     unsigned num_node_attributes = mpMesh->GetNode(0)->GetNumNodeAttributes();
-    for (unsigned node_idx = 0 ; node_idx < mpMesh->GetNumNodes() ; node_idx++ )
+    for (unsigned node_idx = 0; node_idx < mpMesh->GetNumNodes(); node_idx++ )
     {
         if (num_node_attributes != mpMesh->GetNode(node_idx)->GetNumNodeAttributes())
         {
@@ -65,13 +63,13 @@ ImmersedBoundaryCellCellInteractionForce<DIM>::ImmersedBoundaryCellCellInteracti
 
     // Set up the number of proteins and keep track of where they will be stored in the node attributes vector
     mNumProteins = 3;
-    for (unsigned protein_idx = 0 ; protein_idx < mNumProteins ; protein_idx++)
+    for (unsigned protein_idx = 0; protein_idx < mNumProteins; protein_idx++)
     {
         mProteinNodeAttributeLocations.push_back(num_node_attributes + protein_idx);
     }
 
     // Add protein attributes to each node
-    for (unsigned node_idx = 0 ; node_idx < mpMesh->GetNumNodes() ; node_idx++)
+    for (unsigned node_idx = 0; node_idx < mpMesh->GetNumNodes(); node_idx++)
     {
         for (unsigned protein_idx = 0; protein_idx < mNumProteins; protein_idx++)
         {
@@ -79,7 +77,7 @@ ImmersedBoundaryCellCellInteractionForce<DIM>::ImmersedBoundaryCellCellInteracti
         }
     }
 
-    //Initialize protein levels
+    // Initialize protein levels
     InitializeProteinLevels();
 }
 
@@ -94,7 +92,7 @@ ImmersedBoundaryCellCellInteractionForce<DIM>::~ImmersedBoundaryCellCellInteract
 }
 
 template<unsigned DIM>
-void ImmersedBoundaryCellCellInteractionForce<DIM>::AddForceContribution(std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs)
+void ImmersedBoundaryCellCellInteractionForce<DIM>::AddImmersedBoundaryForceContribution(std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs)
 {
     UpdateProteinLevels();
 
@@ -126,7 +124,7 @@ void ImmersedBoundaryCellCellInteractionForce<DIM>::AddForceContribution(std::ve
     double well_width = 0.25 * mpCellPopulation->GetInteractionDistance();
 
     // Loop over all pairs of nodes that might be interacting
-    for (unsigned pair = 0 ; pair < rNodePairs.size() ; pair++)
+    for (unsigned pair = 0; pair < rNodePairs.size(); pair++)
     {
         /*
          * Interactions only occur between different cells.  Since each node is only ever in a single cell, we can test
@@ -186,7 +184,6 @@ void ImmersedBoundaryCellCellInteractionForce<DIM>::AddForceContribution(std::ve
     }
 }
 
-
 template<unsigned DIM>
 const std::vector<unsigned>& ImmersedBoundaryCellCellInteractionForce<DIM>::rGetProteinNodeAttributeLocations() const
 {
@@ -202,7 +199,7 @@ void ImmersedBoundaryCellCellInteractionForce<DIM>::InitializeProteinLevels()
      *  * 1: P-cadherin
      *  * 2: Integrins
      */
-    for (unsigned elem_idx = 0 ; elem_idx < mpMesh->GetNumElements() ; elem_idx++)
+    for (unsigned elem_idx = 0; elem_idx < mpMesh->GetNumElements(); elem_idx++)
     {
         double e_cad = 0.0;
         double p_cad = 0.0;
@@ -217,7 +214,7 @@ void ImmersedBoundaryCellCellInteractionForce<DIM>::InitializeProteinLevels()
             e_cad = 1.0;
         }
 
-        for (unsigned node_idx = 0 ; node_idx < mpMesh->GetElement(elem_idx)->GetNumNodes() ; node_idx++)
+        for (unsigned node_idx = 0; node_idx < mpMesh->GetElement(elem_idx)->GetNumNodes(); node_idx++)
         {
             std::vector<double>& r_node_attributes = mpMesh->GetElement(elem_idx)->GetNode(node_idx)->rGetNodeAttributes();
 
@@ -262,13 +259,16 @@ void ImmersedBoundaryCellCellInteractionForce<DIM>::UseMorsePotential()
 }
 
 template<unsigned DIM>
-void ImmersedBoundaryCellCellInteractionForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
+void ImmersedBoundaryCellCellInteractionForce<DIM>::OutputImmersedBoundaryForceParameters(out_stream& rParamsFile)
 {
-//    *rParamsFile << "\t\t\t<RestLength>" << mRestLength << "</RestLength>\n";
-//    *rParamsFile << "\t\t\t<SpringConstant>" << mSpringConstant << "</SpringConstant>\n";
+    *rParamsFile << "\t\t\t<SpringConst>" << mSpringConst << "</SpringConst>\n";
+    *rParamsFile << "\t\t\t<RestLength>" << mRestLength << "</RestLength>\n";
+    *rParamsFile << "\t\t\t<NumProteins>" << mNumProteins << "</NumProteins>\n";
+    *rParamsFile << "\t\t\t<LinearSpring>" << mLinearSpring << "</LinearSpring>\n";
+    *rParamsFile << "\t\t\t<Morse>" << mMorse << "</Morse>\n";
 
     // Call method on direct parent class
-    AbstractImmersedBoundaryForce<DIM>::OutputForceParameters(rParamsFile);
+    AbstractImmersedBoundaryForce<DIM>::OutputImmersedBoundaryForceParameters(rParamsFile);
 }
 
 // Explicit instantiation

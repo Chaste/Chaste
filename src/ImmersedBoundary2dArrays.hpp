@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2015, University of Oxford.
+Copyright (c) 2005-2016, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -51,7 +51,7 @@ class ImmersedBoundary2dArrays
 {
 protected:
 
-    /** The Immersed Boundary Mesh */
+    /** The immersed boundary mesh. */
     ImmersedBoundaryMesh<DIM,DIM>* mpMesh;
 
     /** Whether the population has active fluid sources */
@@ -89,7 +89,7 @@ public:
     /**
      * Default constructor.
      *
-     * @param pMesh the Immersed Boundary mesh
+     * @param pMesh the immersed boundary mesh
      * @param dt the simulation timestep
      * @param reynoldsNumber the Reynolds Number of the fluid
      * @param activeSources whether the population has active fluid sources
@@ -97,14 +97,14 @@ public:
     ImmersedBoundary2dArrays(ImmersedBoundaryMesh<DIM,DIM>* pMesh, double dt, double reynoldsNumber, bool activeSources);
 
     /**
-     * Empty constructor
+     * Empty constructor.
      */
     ImmersedBoundary2dArrays()
     {
     }
 
     /**
-     * Destructor
+     * Destructor.
      */
     virtual ~ImmersedBoundary2dArrays();
 
@@ -131,7 +131,6 @@ public:
 
     /** @return reference to the vector of sine values in y. */
     const std::vector<double>& rGetSin2y() const;
-
 };
 
 #endif /*IMMERSEDBOUNDARY2DARRAYS_HPP_*/

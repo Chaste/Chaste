@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2014, University of Oxford.
+Copyright (c) 2005-2016, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -38,7 +38,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //#include "Exception.hpp"
 //#include "Warnings.hpp"
 //#include <complex>
-#include "Debug.hpp"
 //#include "Timer.hpp"
 //#include "FileFinder.hpp"
 //
@@ -59,7 +58,7 @@ ImmersedBoundarySimulationModifier<DIM>::ImmersedBoundarySimulationModifier()
       mGridSpacingX(0.0),
       mGridSpacingY(0.0),
       mFftNorm(0.0),
-      mReynolds(1e-4),
+      mReynoldsNumber(1e-4),
       mI(0.0, 1.0),
       mpArrays(NULL)
 {
@@ -86,7 +85,7 @@ template<unsigned DIM>
 void ImmersedBoundarySimulationModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
     // We need to update node neighbours occasionally, but not necessarily each timestep
-    if(SimulationTime::Instance()->GetTimeStepsElapsed() % mNodeNeighbourUpdateFrequency == 0)
+    if (SimulationTime::Instance()->GetTimeStepsElapsed() % mNodeNeighbourUpdateFrequency == 0)
     {
         mpBoxCollection->CalculateNodePairs(mpMesh->rGetNodes(), mNodePairs);
     }
@@ -116,7 +115,7 @@ template<unsigned DIM>
 void ImmersedBoundarySimulationModifier<DIM>::UpdateFluidVelocityGrids(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
     this->ClearForcesAndSources();
-    this->AddForceContributions();
+    this->AddImmersedBoundaryForceContributions();
     this->PropagateForcesToFluidGrid();
 
     // If sources are active, we must propagate them from their nodes to the grid
@@ -131,11 +130,9 @@ void ImmersedBoundarySimulationModifier<DIM>::UpdateFluidVelocityGrids(AbstractC
 template<unsigned DIM>
 void ImmersedBoundarySimulationModifier<DIM>::SetupConstantMemberVariables(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
-
-
     if (dynamic_cast<ImmersedBoundaryCellPopulation<DIM> *>(&rCellPopulation) == NULL)
     {
-        EXCEPTION("Cell population must be Immersed Boundary");
+        EXCEPTION("Cell population must be immersed boundary");
     }
 
     mpCellPopulation = static_cast<ImmersedBoundaryCellPopulation<DIM> *>(&rCellPopulation);
@@ -165,7 +162,7 @@ void ImmersedBoundarySimulationModifier<DIM>::SetupConstantMemberVariables(Abstr
     switch (DIM)
     {
         case 2:
-            mpArrays = new ImmersedBoundary2dArrays<DIM>(mpMesh, SimulationTime::Instance()->GetTimeStep(), mReynolds, mpCellPopulation->DoesPopulationHaveActiveSources());
+            mpArrays = new ImmersedBoundary2dArrays<DIM>(mpMesh, SimulationTime::Instance()->GetTimeStep(), mReynoldsNumber, mpCellPopulation->DoesPopulationHaveActiveSources());
             mpFftInterface = new ImmersedBoundaryFftInterface<DIM>(mpMesh,
                                                                    &(mpArrays->rGetModifiableRightHandSideGrids()[0][0][0]),
                                                                    &(mpArrays->rGetModifiableFourierGrids()[0][0][0]),
@@ -199,7 +196,7 @@ void ImmersedBoundarySimulationModifier<DIM>::ClearForcesAndSources()
     // Reset force grids to 0 everywhere
     multi_array<double, 3>& r_force_grids = mpArrays->rGetModifiableForceGrids();
 
-    for (unsigned dim = 0 ; dim < 2 ; dim++)
+    for (unsigned dim = 0; dim < 2; dim++)
     {
         for (unsigned x = 0; x < mNumGridPtsX; x++)
         {
@@ -226,14 +223,14 @@ void ImmersedBoundarySimulationModifier<DIM>::ClearForcesAndSources()
 }
 
 template<unsigned DIM>
-void ImmersedBoundarySimulationModifier<DIM>::AddForceContributions()
+void ImmersedBoundarySimulationModifier<DIM>::AddImmersedBoundaryForceContributions()
 {
     // Add contributions from each immersed boundary force
     for (typename std::vector<boost::shared_ptr<AbstractImmersedBoundaryForce<DIM> > >::iterator iter = mForceCollection.begin();
             iter != mForceCollection.end();
             ++iter)
     {
-        (*iter)->AddForceContribution(mNodePairs);
+        (*iter)->AddImmersedBoundaryForceContribution(mNodePairs);
     }
 }
 
@@ -334,20 +331,20 @@ void ImmersedBoundarySimulationModifier<DIM>::PropagateFluidSourcesToGrid()
 
     // Find the combined element source strength
     double cumulative_strength = 0.0;
-    for (unsigned source_idx = 0 ; source_idx < r_element_sources.size() ; source_idx++)
+    for (unsigned source_idx = 0; source_idx < r_element_sources.size(); source_idx++)
     {
         cumulative_strength += r_element_sources[source_idx]->GetStrength();
     }
 
     // Calculate the required balancing strength, and apply it to all balancing sources
     double balance_strength = -1.0 * cumulative_strength / (double)r_balance_sources.size();
-    for (unsigned source_idx = 0 ; source_idx < r_balance_sources.size() ; source_idx++)
+    for (unsigned source_idx = 0; source_idx < r_balance_sources.size(); source_idx++)
     {
         r_balance_sources[source_idx]->SetStrength(balance_strength);
     }
 
     // Iterate over all sources and propagate their effects to the source grid
-    for (unsigned source_idx = 0 ; source_idx < combined_sources.size() ; source_idx++)
+    for (unsigned source_idx = 0; source_idx < combined_sources.size(); source_idx++)
     {
         FluidSource<DIM>* this_source = combined_sources[source_idx];
 
@@ -360,7 +357,7 @@ void ImmersedBoundarySimulationModifier<DIM>::PropagateFluidSourcesToGrid()
         first_idx_y = unsigned(floor(source_location[1] / mGridSpacingY)) + mNumGridPtsY - 1;
 
         // Calculate all four indices and deltas in each dimension
-        for (unsigned i = 0 ; i < 4 ; i ++)
+        for (unsigned i = 0; i < 4; i ++)
         {
             x_indices[i] = (first_idx_x + i) % mNumGridPtsX;
             y_indices[i] = (first_idx_y + i) % mNumGridPtsY;
@@ -370,9 +367,9 @@ void ImmersedBoundarySimulationModifier<DIM>::PropagateFluidSourcesToGrid()
         }
 
         // Loop over the 4x4 grid needed to spread the source strength to the source grid
-        for (unsigned x_idx = 0 ; x_idx < 4 ; x_idx ++)
+        for (unsigned x_idx = 0; x_idx < 4; x_idx ++)
         {
-            for (unsigned y_idx = 0 ; y_idx < 4 ; y_idx ++)
+            for (unsigned y_idx = 0; y_idx < 4; y_idx ++)
             {
                 // The strength is weighted by the delta function
                 weight = x_deltas[x_idx] * y_deltas[y_idx] / (mGridSpacingX * mGridSpacingY);
@@ -406,9 +403,9 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
     // Perform upwind differencing and create RHS of linear system
     Upwind2d(vel_grids, rhs_grids);
 
-    for (unsigned dim = 0 ; dim < 2 ; dim++)
+    for (unsigned dim = 0; dim < 2; dim++)
     {
-        for(unsigned x = 0 ; x < mNumGridPtsX ; x++)
+        for (unsigned x = 0; x < mNumGridPtsX; x++)
         {
             for (unsigned y = 0; y < mNumGridPtsY; y++)
             {
@@ -460,12 +457,12 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
      * Do final stage of computation before inverse FFT.  We do the necessary DFT scaling at this stage so the output
      * from the inverse DFT is correct.
      */
-    for (unsigned x = 0 ; x < mNumGridPtsX ; x++)
+    for (unsigned x = 0; x < mNumGridPtsX; x++)
     {
-        for (unsigned y = 0 ; y < reduced_size ; y++)
+        for (unsigned y = 0; y < reduced_size; y++)
         {
-            fourier_grids[0][x][y] = (fourier_grids[0][x][y] - (mI * dt / (mReynolds * mGridSpacingX)) * sin_2x[x] * pressure_grid[x][y]) / (op_2[x][y] * large_number * mFftNorm);
-            fourier_grids[1][x][y] = (fourier_grids[1][x][y] - (mI * dt / (mReynolds * mGridSpacingY)) * sin_2y[y] * pressure_grid[x][y]) / (op_2[x][y] * large_number * mFftNorm);
+            fourier_grids[0][x][y] = (fourier_grids[0][x][y] - (mI * dt / (mReynoldsNumber * mGridSpacingX)) * sin_2x[x] * pressure_grid[x][y]) / (op_2[x][y] * large_number * mFftNorm);
+            fourier_grids[1][x][y] = (fourier_grids[1][x][y] - (mI * dt / (mReynoldsNumber * mGridSpacingY)) * sin_2y[y] * pressure_grid[x][y]) / (op_2[x][y] * large_number * mFftNorm);
         }
     }
 
@@ -488,12 +485,12 @@ void ImmersedBoundarySimulationModifier<DIM>::Upwind2d(const multi_array<double,
     unsigned next_x = 1;
     unsigned next_y = 1;
 
-    for(unsigned x = 0 ; x < mNumGridPtsX ; x++)
+    for (unsigned x = 0; x < mNumGridPtsX; x++)
     {
-        for (unsigned y = 0 ; y < mNumGridPtsY ; y++)
+        for (unsigned y = 0; y < mNumGridPtsY; y++)
         {
             // Set values for output from conditional on x grid
-            if(input[0][x][y] > 0)
+            if (input[0][x][y] > 0)
             {
                 output[0][x][y] = input[0][x][y] * (input[0][x][y] - input[0][prev_x][y]) / mGridSpacingX;
                 output[1][x][y] = input[0][x][y] * (input[1][x][y] - input[1][prev_x][y]) / mGridSpacingX;
@@ -505,7 +502,7 @@ void ImmersedBoundarySimulationModifier<DIM>::Upwind2d(const multi_array<double,
             }
 
             // Then add values from conditional on y grid
-            if(input[1][x][y] > 0)
+            if (input[1][x][y] > 0)
             {
                 output[0][x][y] += input[1][x][y] * (input[0][x][y] - input[0][x][prev_y]) / mGridSpacingY;
                 output[1][x][y] += input[1][x][y] * (input[1][x][y] - input[1][x][prev_y]) / mGridSpacingY;
@@ -559,15 +556,14 @@ template<unsigned DIM>
 void ImmersedBoundarySimulationModifier<DIM>::SetReynoldsNumber(double reynoldsNumber)
 {
     assert(reynoldsNumber > 0.0);
-    mReynolds = reynoldsNumber;
+    mReynoldsNumber = reynoldsNumber;
 }
 
 template<unsigned DIM>
 double ImmersedBoundarySimulationModifier<DIM>::GetReynoldsNumber()
 {
-    return mReynolds;
+    return mReynoldsNumber;
 }
-
 
 // Explicit instantiation
 template class ImmersedBoundarySimulationModifier<1>;

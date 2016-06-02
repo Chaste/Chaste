@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2014, University of Oxford.
+Copyright (c) 2005-2016, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -47,7 +47,9 @@ class TestImmersedBoundaryElement : public CxxTest::TestSuite
 {
 public:
 
-    void TestCreate2DImmersedBoundaryElement() throw(Exception)
+    // Note: the corner nodes and average node spacing of an element are set in the ImmersedBoundarMesh method DivideElement()
+
+    void TestFluidSourceMethods() throw(Exception)
     {
         // Make 4 nodes to assign to a square element
         std::vector<Node<2>*> nodes;
@@ -56,71 +58,22 @@ public:
         nodes.push_back(new Node<2>(2, true, 1.0, 1.0));
         nodes.push_back(new Node<2>(3, true, 0.0, 1.0));
 
-//        // Make a square element out of these nodes
-//        ImmersedBoundaryElement<2,2> element(0, nodes);
-//
-//        // Check default parameters
-//        TS_ASSERT_DELTA(element.GetMembraneSpringConstant(), 100000.0, 1e-6);
-//        TS_ASSERT_DELTA(element.GetMembraneRestLength(), 0.25, 1e-6);
-//
-//        TS_ASSERT_DELTA(element.GetCellCellSpringConstant(), 50.0, 1e-6);
-//        TS_ASSERT_DELTA(element.GetCellCellRestLength(), 0.01, 1e-6);
-//
-//        // Test source node
-//        TS_ASSERT(element.GetSourceNode() != NULL);
-//        Node<2>* source_node = element.GetSourceNode();
-//
-//        TS_ASSERT_DELTA(source_node->rGetLocation()[0], 0.0, 1e-10);
-//        TS_ASSERT_DELTA(source_node->rGetLocation()[1], 0.0, 1e-10);
-//        TS_ASSERT_DELTA(source_node->GetRadius(), 0.0, 1e-10);
+        // Make a square element out of these nodes
+        ImmersedBoundaryElement<2,2> element(0, nodes);
+
+        TS_ASSERT_EQUALS(element.GetNumNodes(), 4u);
+
+        // Test SetFluidSource() and GetFluidSource() work correctly
+        TS_ASSERT(element.GetFluidSource() == NULL);
+
+        FluidSource<2> source(0, 0.5, 0.5);
+        source.SetStrength(57.0);
+        element.SetFluidSource(&source);
+
+        TS_ASSERT(element.GetFluidSource() != NULL);
+        TS_ASSERT_EQUALS(element.GetFluidSource()->GetIndex(), 0u);
+        TS_ASSERT_DELTA(element.GetFluidSource()->GetStrength(), 57.0, 1e-6);
     }
 
-    void TestSetAndGetMethods() throw(Exception)
-    {
-//        // Make 4 nodes to assign to a square element
-//        std::vector<Node<2>*> nodes;
-//        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
-//        nodes.push_back(new Node<2>(1, true, 1.0, 0.0));
-//        nodes.push_back(new Node<2>(2, true, 1.0, 1.0));
-//        nodes.push_back(new Node<2>(3, true, 0.0, 1.0));
-//
-//        // Make a square element out of these nodes
-//        ImmersedBoundaryElement<2,2> element(0, nodes);
-//
-//        // Set the settable parameters
-//        element.SetMembraneSpringConstant(1.23);
-//        element.SetMembraneRestLength(2.34);
-//
-//        element.SetCellCellSpringConstant(3.45);
-//        element.SetCellCellRestLength(4.56);
-//
-//        // Check we get the correct values
-//        TS_ASSERT_DELTA(element.GetMembraneSpringConstant(), 1.23, 1e-6);
-//        TS_ASSERT_DELTA(element.GetMembraneRestLength(), 2.34, 1e-6);
-//
-//        TS_ASSERT_DELTA(element.GetCellCellSpringConstant(), 3.45, 1e-6);
-//        TS_ASSERT_DELTA(element.GetCellCellRestLength(), 4.56, 1e-6);
-//
-//        TS_ASSERT_THROWS_ANYTHING(element.SetMembraneSpringConstant(-1.23));
-    }
-
-    void TestSetAndGetExceptions() throw(Exception)
-    {
-//        // Make 4 nodes to assign to a square element
-//        std::vector<Node<2>*> nodes;
-//        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
-//        nodes.push_back(new Node<2>(1, true, 1.0, 0.0));
-//        nodes.push_back(new Node<2>(2, true, 1.0, 1.0));
-//        nodes.push_back(new Node<2>(3, true, 0.0, 1.0));
-//
-//        // Make a square element out of these nodes
-//        ImmersedBoundaryElement<2,2> element(0, nodes);
-//
-//        // Test exceptions when setting bad parameter values
-//        TS_ASSERT_THROWS_THIS(element.SetMembraneSpringConstant(-1.23), "This parameter must be non-negative");
-//        TS_ASSERT_THROWS_THIS(element.SetMembraneRestLength(-2.34), "This parameter must be non-negative");
-//
-//        TS_ASSERT_THROWS_THIS(element.SetCellCellSpringConstant(-3.45), "This parameter must be non-negative");
-//        TS_ASSERT_THROWS_THIS(element.SetCellCellRestLength(-4.56), "This parameter must be non-negative");
-    }
+    ///\todo Test archiving
 };

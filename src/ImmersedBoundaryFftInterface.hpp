@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2015, University of Oxford.
+Copyright (c) 2005-2016, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -41,35 +41,36 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ImmersedBoundaryMesh.hpp"
 
 /**
- * A class to Interface with discrete Fourier transform libraries and perform the necessary transforms for Immersed
- * boundary simulations.
+ * A class to interface with discrete Fourier transform libraries and perform
+ * the necessary transforms for immersed boundary simulations.
  */
 template<unsigned DIM>
 class ImmersedBoundaryFftInterface
 {
 protected:
 
+    ///\todo document this member variable
     int mThreadErrors;
 
-    /** The Immersed Boundary Mesh */
+    /** The immersed boundary mesh. */
     ImmersedBoundaryMesh<DIM,DIM>* mpMesh;
 
-    /** The fftw plan for the forward transforms */
+    /** The fftw plan for the forward transforms. */
     fftw_plan mFftwForwardPlan;
 
-     /** The fftw plan for the forward transforms */
+    /** The fftw plan for the forward transforms. */
     fftw_plan mFftwInversePlan;
 
-    // Pointer to the start of the input arrays
+    /** Pointer to the start of the input arrays. */
     double* mpInputArray;
 
-    // Pointer to the start of fourier domain
+    /** Pointer to the start of Fourier domain. */
     fftw_complex* mpComplexArray;
 
-    // Pointer to the start output array
+    /** Pointer to the start output array. */
     double* mpOutputArray;
 
-    // The max number of threads to use for computing the DFT
+    /** The max number of threads to use for computing the DFT. */
     bool mMultiThread;
 
 public:
@@ -77,7 +78,7 @@ public:
     /**
      * Default constructor.
      *
-     * @param pMesh the Immersed Boundary mesh
+     * @param pMesh the immersed boundary mesh
      * @param pIn pointer to the input array
      * @param pComplex pointer to the complex number array
      * @param pOut pointer to the output array
@@ -92,14 +93,14 @@ public:
                                  bool activeSources);
 
     /**
-     * Empty constructor
+     * Empty constructor.
      */
     ImmersedBoundaryFftInterface()
     {
     }
 
     /**
-     * Destructor
+     * Destructor.
      */
     virtual ~ImmersedBoundaryFftInterface();
 
@@ -108,7 +109,6 @@ public:
 
     /** Performs inverse fourier transforms */
     void FftExecuteInverse();
-
 };
 
 #endif /*IMMERSEDBOUNDARYFFTINTERFACE_HPP_*/

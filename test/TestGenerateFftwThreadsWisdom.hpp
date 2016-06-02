@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2014, University of Oxford.
+Copyright (c) 2005-2016, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Needed for test framework
 #include <cxxtest/TestSuite.h>
 
-// Needed for Immersed Boundary simulations
+// Needed for immersed boundary simulations
 #include <complex>
 #include <fftw3.h>
 #include <boost/multi_array.hpp>
@@ -44,7 +44,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ImmersedBoundaryArray.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "FileFinder.hpp"
-#include "Debug.hpp"
 
 // This test is never run in parallel
 #include "FakePetscSetup.hpp"
@@ -52,6 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestGenerateFftwWisdom : public CxxTest::TestSuite
 {
 private:
+
     /** Name of wisdom file when using a single thread */
     std::string mWisdomFilename;
 
@@ -60,7 +60,6 @@ private:
 
     /** The max array size N for N by N arrays. Must be a multiple of 2 */
     static const unsigned mMaxArraySize = 4096;
-
 
 public:
 
@@ -82,7 +81,7 @@ public:
         // If it doesn't exists, create it with blank wisdom file
         if (!wisdom_exists)
         {
-            void fftw_forget_wisdom(void);
+            void fftw_forget_wisdom();
             fftw_export_wisdom_to_filename(mWisdomThreadsFilename.c_str());
         }
 
@@ -107,7 +106,7 @@ public:
         fftw_plan_with_nthreads(2);
 
         // We first forget all wisdom and re-load, as threaded wisdom doesn't play well with un-threaded
-        void fftw_forget_wisdom(void);
+        void fftw_forget_wisdom();
         int wisdom_flag = fftw_import_wisdom_from_filename(mWisdomThreadsFilename.c_str());
 
         // 1 means it's read correctly, 0 indicates a failure

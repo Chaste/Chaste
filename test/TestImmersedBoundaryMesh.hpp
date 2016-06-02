@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2014, University of Oxford.
+Copyright (c) 2005-2016, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -37,7 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/cxxtest/TestSuite.h>
 
 #include "ImmersedBoundaryMesh.hpp"
-#include "Debug.hpp"
 
 // This test is never run in parallel
 #include "FakePetscSetup.hpp"
@@ -137,5 +136,4 @@ public:
                             0.0, 1e-9);
         }
     }
-    
 };

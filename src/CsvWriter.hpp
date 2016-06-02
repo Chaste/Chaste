@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2014, University of Oxford.
+Copyright (c) 2005-2016, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -48,37 +48,38 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class CsvWriter
 {
 private:
-    /** The directory for output */
+
+    /** The directory for output. */
     std::string mDirectoryName;
 
-    /** The output file name */
+    /** The output file name. */
     std::string mFileName;
 
-    /** The number of data points to be expected */
+    /** The number of data points to be expected. */
     unsigned mDataLength;
 
-    /** Whether mDataLength has been set yet */
+    /** Whether mDataLength has been set yet. */
     bool mDataLengthSet;
 
-    /** Whether a header row is to be written to the file */
+    /** Whether a header row is to be written to the file. */
     bool mHeader;
 
-    /** Vector strings for header row */
+    /** Vector strings for header row. */
     std::vector<std::string> mHeaderStrings;
 
-    /** Vector of vectors containing unsigned integer data */
+    /** Vector of vectors containing unsigned integer data. */
     std::vector<std::vector<unsigned> > mVecUnsigned;
 
-    /** Vector of vectors containing double precision values */
+    /** Vector of vectors containing double precision values. */
     std::vector<std::vector<double> > mVecDoubles;
 
-    /** Vector of vectors containing strings */
+    /** Vector of vectors containing strings. */
     std::vector<std::vector<std::string> > mVecStrings;
 
     /**
-     * Helper method for AddData()
+     * Helper method for AddData().
      *
-     * @param length of data vector to be added to this writer
+     * @param dataLength length of data vector to be added to this writer
      */
     void ValidateNewData(unsigned dataLength);
 
@@ -97,7 +98,7 @@ public:
     /**
      * Add header row.
      *
-     * @param rData reference to new unsigned data
+     * @param rHeaders reference to new unsigned data
      */
     void AddHeaders(std::vector<std::string>& rHeaders);
 
@@ -128,22 +129,26 @@ public:
     void WriteDataToFile();
 
     /**
-     * @return the directory that the output will be written to
+     * @return #mDirectoryName
      */
     const std::string& GetDirectoryName() const;
 
     /**
-     * @return the output file name
+     * @return #mFileName
      */
     const std::string& GetFileName() const;
 
     /**
-     * @param the directory that the output will be written to
+     * Set #mDirectoryName.
+     *
+     * @param directoryName the directory that the output will be written to
      */
     void SetDirectoryName(std::string directoryName);
 
     /**
-     * @param the output file name
+     * Set #mFileName.
+     *
+     * @param fileName the output file name
      */
     void SetFileName(std::string fileName);
 };

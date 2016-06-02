@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2014, University of Oxford.
+Copyright (c) 2005-2016, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -45,7 +45,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
 #include "ImmersedBoundaryMembraneElasticityForce.hpp"
 
-#include "Debug.hpp"
 #include "Timer.hpp"
 
 // Simulation does not run in parallel
@@ -67,9 +66,7 @@ public:
          */
         ImmersedBoundaryPalisadeMeshGenerator gen(1, 128, 0.1, 2.5, 0.0, false);
         ImmersedBoundaryMesh<2, 2>* p_mesh = gen.GetMesh();
-
         p_mesh->SetNumGridPtsXAndY(128);
-
 
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_cell_type);
@@ -90,7 +87,6 @@ public:
         p_main_modifier->AddImmersedBoundaryForce(p_boundary_force);
         p_boundary_force->SetSpringConstant(0.5 * 1e7);
 
-
         // Set simulation properties
         double dt = 0.05;
         simulator.SetOutputDirectory("TestShortSingleCellSimulation");
@@ -99,6 +95,5 @@ public:
         simulator.SetEndTime(3000.0 * dt);
 
         simulator.Solve();
-
     }
 };

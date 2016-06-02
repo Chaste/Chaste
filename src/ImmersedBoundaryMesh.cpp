@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2015, University of Oxford.
+Copyright (c) 2005-2016, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -38,17 +38,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "UblasCustomFunctions.hpp"
 #include "Warnings.hpp"
 
-#include "Debug.hpp"
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryMesh(std::vector<Node<SPACE_DIM>*> nodes,
                                                                    std::vector<ImmersedBoundaryElement<ELEMENT_DIM,SPACE_DIM>*> elements,
                                                                    unsigned numGridPtsX,
                                                                    unsigned numGridPtsY,
                                                                    unsigned membraneIndex)
-        : mNumGridPtsX(numGridPtsX),
-          mNumGridPtsY(numGridPtsY),
-          mMembraneIndex(membraneIndex)
+    : mNumGridPtsX(numGridPtsX),
+      mNumGridPtsY(numGridPtsY),
+      mMembraneIndex(membraneIndex)
 {
     // Clear mNodes and mElements
     Clear();
@@ -101,7 +99,7 @@ ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryMesh(std::vector<N
     // Set characteristic node spacing to the average distance between nodes
     double total_perimeter = 0.0;
     unsigned total_nodes = 0;
-    for (unsigned elem_index = 0 ; elem_index < elements.size() ; elem_index++)
+    for (unsigned elem_index = 0; elem_index < elements.size(); elem_index++)
     {
         if (elem_index != mMembraneIndex)
         {
@@ -112,7 +110,7 @@ ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryMesh(std::vector<N
     mCharacteristicNodeSpacing = total_perimeter / double(total_nodes);
 
     // Position fluid sources at the centroid of each cell, and set strength to zero
-    for (unsigned elem_it = 0 ; elem_it < elements.size() ; elem_it++)
+    for (unsigned elem_it = 0; elem_it < elements.size(); elem_it++)
     {
         unsigned this_elem_idx = mElements[elem_it]->GetIndex();
 
@@ -184,7 +182,7 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetTortuosityOfMesh()
 
     c_vector<double, SPACE_DIM> previous_centroid = this->GetCentroidOfElement(first_elem_idx);
 
-    for (unsigned elem_idx = first_elem_idx ; elem_idx < this->GetNumElements() ; elem_idx++)
+    for (unsigned elem_idx = first_elem_idx; elem_idx < this->GetNumElements(); elem_idx++)
     {
         c_vector<double, 2> this_centroid = this->GetCentroidOfElement(elem_idx);
         total_length += norm_2(this->GetVectorFromAtoB(previous_centroid, this_centroid));
@@ -246,7 +244,7 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetSkewnessOfElementMassDis
     std::vector<std::pair<unsigned, c_vector<double, SPACE_DIM> > > ordered_locations;
 
     // Get the node locations of the current element relative to its centroid, and rotate them
-    for (unsigned node_idx = 0 ; node_idx < num_nodes ; node_idx++)
+    for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
     {
         const c_vector<double, SPACE_DIM>& node_location = p_elem->GetNode(node_idx)->rGetLocation();
 
@@ -260,7 +258,7 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetSkewnessOfElementMassDis
     }
 
     // Fill up a vector of identical points, and sort it so nodes are ordered in ascending x value
-    for (unsigned i=0 ; i<node_locations_original_order.size() ; i++)
+    for (unsigned i=0; i<node_locations_original_order.size(); i++)
     {
         ordered_locations.push_back(std::pair<unsigned, c_vector<double, SPACE_DIM> >(i, node_locations_original_order[i]));
     }
@@ -292,7 +290,7 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetSkewnessOfElementMassDis
     // For each node, we keep track of all the y-locations where the vertical through the node meets the polygon
     std::vector<std::vector<double> > knots(num_nodes);
 
-    for (unsigned location = 0 ; location < num_nodes ; location++)
+    for (unsigned location = 0; location < num_nodes; location++)
     {
         // Get the two parts of the pair
         unsigned this_idx = ordered_locations[location].first;
@@ -306,7 +304,7 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetSkewnessOfElementMassDis
         unsigned next_idx = (this_idx + 1) % num_nodes;
         c_vector<double, SPACE_DIM> to_previous = node_locations_original_order[next_idx] - this_location;
 
-        for (unsigned node_idx = this_idx + 2 ; node_idx < this_idx + num_nodes ; node_idx++)
+        for (unsigned node_idx = this_idx + 2; node_idx < this_idx + num_nodes; node_idx++)
         {
             unsigned idx = node_idx % num_nodes;
 
@@ -337,7 +335,7 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetSkewnessOfElementMassDis
 
     // For ease, construct a vector of the x-locations of all the nodes, in order
     std::vector<double> ordered_x(num_nodes);
-    for (unsigned location = 0 ; location < num_nodes ; location++)
+    for (unsigned location = 0; location < num_nodes; location++)
     {
         ordered_x[location]  = ordered_locations[location].second[0];
     }
@@ -345,7 +343,7 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetSkewnessOfElementMassDis
     // Calculate the mass contributions at each x-location - this is the length of the intersection of the vertical
     // through each location
     std::vector<double> mass_contributions(num_nodes);
-    for (unsigned i=0 ; i<num_nodes ; i++)
+    for (unsigned i=0; i<num_nodes; i++)
     {
         std::sort(knots[i].begin(), knots[i].end());
 
@@ -373,7 +371,7 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetSkewnessOfElementMassDis
     double e_x2 = 0.0;
     double e_x3 = 0.0;
 
-    for (unsigned i=1 ; i<num_nodes ; i++)
+    for (unsigned i=1; i<num_nodes; i++)
     {
         double x0 = ordered_x[i-1];
         double x1 = ordered_x[i];
@@ -428,11 +426,11 @@ ChasteCuboid<SPACE_DIM> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::CalculateB
     c_vector<double, SPACE_DIM> top_right = zero_vector<double>(SPACE_DIM);
 
     // Loop over all nodes in the element and update bottom_left and top_right, relative to node zero to account for periodicity
-    for (unsigned node_idx = 0 ; node_idx < p_elem->GetNumNodes() ; node_idx++)
+    for (unsigned node_idx = 0; node_idx < p_elem->GetNumNodes(); node_idx++)
     {
         c_vector<double, SPACE_DIM> vec_to_node = this->GetVectorFromAtoB(ref_point, p_elem->GetNode(node_idx)->rGetLocation());
 
-        for (unsigned dim = 0 ; dim < SPACE_DIM ; dim++)
+        for (unsigned dim = 0; dim < SPACE_DIM; dim++)
         {
             if (vec_to_node[dim] < bottom_left[dim])
             {
@@ -633,7 +631,7 @@ c_vector<double, SPACE_DIM> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetVec
      * Handle the periodic condition here: if the points are more
      * than 0.5 apart in any direction, choose -(1.0-dist).
      */
-    for (unsigned dim = 0 ; dim < SPACE_DIM ; dim++)
+    for (unsigned dim = 0; dim < SPACE_DIM; dim++)
     {
         if (fabs(vector[dim]) > 0.5)
         {
@@ -843,7 +841,7 @@ void ImmersedBoundaryMesh<2,2>::ConstructFromMeshReader(AbstractMeshReader<2,2>&
     m2dVelocityGrids.resize(extents[2][mNumGridPtsX][mNumGridPtsY]);
 
     // Construct the velocity grids from mesh reader
-    for (unsigned dim = 0 ; dim < 2 ; dim++)
+    for (unsigned dim = 0; dim < 2; dim++)
     {
         for (unsigned grid_row = 0; grid_row < mNumGridPtsY; grid_row++)
         {
@@ -899,7 +897,6 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetVolumeOfElement(unsigned
     return fabs(element_volume);
 }
 
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetSurfaceAreaOfElement(unsigned index)
 {
@@ -922,11 +919,10 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetSurfaceAreaOfElement(uns
     return surface_area;
 }
 
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetAverageNodeSpacingOfElement(unsigned index, bool recalculate)
 {
-    if(recalculate || (this->GetElement(index)->GetAverageNodeSpacing() == DOUBLE_UNSET) )
+    if (recalculate || (this->GetElement(index)->GetAverageNodeSpacing() == DOUBLE_UNSET) )
     {
         double average_node_spacing = this->GetSurfaceAreaOfElement(index) / this->GetElement(index)->GetNumNodes();
         this->GetElement(index)->SetAverageNodeSpacing(average_node_spacing);
@@ -938,7 +934,6 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetAverageNodeSpacingOfElem
         return this->GetElement(index)->GetAverageNodeSpacing();
     }
 }
-
 
 //////////////////////////////////////////////////////////////////////
 //                        2D-specific methods                       //
@@ -997,7 +992,6 @@ c_vector<double, 3> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMomen
     }
     return moments;
 }
-
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetShortAxisOfElement(unsigned index)
@@ -1133,14 +1127,14 @@ unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::DivideElement(ImmersedBou
     unsigned num_nodes = pElement->GetNumNodes();
 
     std::vector<c_vector<double, SPACE_DIM> > daughter_a_location_stencil;
-    for (unsigned node_idx = nodeAIndex + 1 ; node_idx != nodeBIndex + 1 ; node_idx++)
+    for (unsigned node_idx = nodeAIndex + 1; node_idx != nodeBIndex + 1; node_idx++)
     {
         node_idx = node_idx % num_nodes;
         daughter_a_location_stencil.push_back(c_vector<double, SPACE_DIM>(pElement->GetNode(node_idx)->rGetLocation()));
     }
 
     std::vector<c_vector<double, SPACE_DIM> > daughter_b_location_stencil;
-    for (unsigned node_idx = nodeBIndex + 1 ; node_idx != nodeAIndex + 1 ; node_idx++)
+    for (unsigned node_idx = nodeBIndex + 1; node_idx != nodeAIndex + 1; node_idx++)
     {
         node_idx = node_idx % num_nodes;
         daughter_b_location_stencil.push_back(c_vector<double, SPACE_DIM>(pElement->GetNode(node_idx)->rGetLocation()));
@@ -1158,12 +1152,12 @@ unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::DivideElement(ImmersedBou
     std::vector<double> cumulative_distances_b;
     cumulative_distances_a.push_back(0.0);
     cumulative_distances_b.push_back(0.0);
-    for (unsigned loc_idx = 1 ; loc_idx < daughter_a_location_stencil.size() ; loc_idx++)
+    for (unsigned loc_idx = 1; loc_idx < daughter_a_location_stencil.size(); loc_idx++)
     {
         cumulative_distances_a.push_back(cumulative_distances_a.back() +
                                          norm_2(this->GetVectorFromAtoB(daughter_a_location_stencil[loc_idx - 1], daughter_a_location_stencil[loc_idx])));
     }
-    for (unsigned loc_idx = 1 ; loc_idx < daughter_b_location_stencil.size() ; loc_idx++)
+    for (unsigned loc_idx = 1; loc_idx < daughter_b_location_stencil.size(); loc_idx++)
     {
         cumulative_distances_b.push_back(cumulative_distances_b.back() +
                                          norm_2(this->GetVectorFromAtoB(daughter_b_location_stencil[loc_idx - 1], daughter_b_location_stencil[loc_idx])));
@@ -1175,7 +1169,7 @@ unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::DivideElement(ImmersedBou
 
     // Move the existing nodes into position to become daughter-A nodes
     unsigned last_idx_used = 0;
-    for (unsigned node_idx = 0 ; node_idx < num_nodes ; node_idx++)
+    for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
     {
         double location_along_arc = (double)node_idx * target_spacing_a;
 
@@ -1196,11 +1190,10 @@ unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::DivideElement(ImmersedBou
         pElement->GetNode(node_idx)->SetPoint(ChastePoint<SPACE_DIM>(new_location_a));
     }
 
-
     // Create new nodes at positions around the daughter-B stencil
     last_idx_used = 0;
     std::vector<Node<SPACE_DIM>*> new_nodes_vec;
-    for (unsigned node_idx = 0 ; node_idx < num_nodes ; node_idx++)
+    for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
     {
         double location_along_arc = (double)node_idx * target_spacing_b;
 
@@ -1224,11 +1217,11 @@ unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::DivideElement(ImmersedBou
     }
 
     // Copy node attributes
-    for (unsigned node_idx = 0 ; node_idx < num_nodes ; node_idx++)
+    for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
     {
         new_nodes_vec[node_idx]->SetRegion(pElement->GetNode(node_idx)->GetRegion());
 
-        for (unsigned node_attribute = 0 ; node_attribute < pElement->GetNode(node_idx)->GetNumNodeAttributes() ; node_attribute++)
+        for (unsigned node_attribute = 0; node_attribute < pElement->GetNode(node_idx)->GetNumNodeAttributes(); node_attribute++)
         {
             new_nodes_vec[node_idx]->AddNodeAttribute(pElement->GetNode(node_idx)->rGetNodeAttributes()[node_attribute]);
         }
@@ -1240,13 +1233,13 @@ unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::DivideElement(ImmersedBou
     this->mElements.back()->RegisterWithNodes();
 
     // Copy any element attributes
-    for (unsigned elem_attribute = 0 ; elem_attribute < pElement->GetNumElementAttributes() ; elem_attribute++)
+    for (unsigned elem_attribute = 0; elem_attribute < pElement->GetNumElementAttributes(); elem_attribute++)
     {
         this->mElements.back()->AddElementAttribute(pElement->rGetElementAttributes()[elem_attribute]);
     }
 
     // Add the necessary corners to keep consistency with the other daughter element
-    for (unsigned corner = 0 ; corner < pElement->rGetCornerNodes().size() ; corner ++)
+    for (unsigned corner = 0; corner < pElement->rGetCornerNodes().size(); corner ++)
     {
         this->mElements.back()->rGetCornerNodes().push_back(pElement->rGetCornerNodes()[corner]);
     }
@@ -1254,17 +1247,13 @@ unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::DivideElement(ImmersedBou
     return new_elem_idx;
 }
 
-/////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////////////
-
 template class ImmersedBoundaryMesh<1,1>;
 template class ImmersedBoundaryMesh<1,2>;
 template class ImmersedBoundaryMesh<1,3>;
 template class ImmersedBoundaryMesh<2,2>;
 template class ImmersedBoundaryMesh<2,3>;
 template class ImmersedBoundaryMesh<3,3>;
-
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
