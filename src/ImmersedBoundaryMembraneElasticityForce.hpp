@@ -67,7 +67,7 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & boost::serialization::base_object<AbstractImmersedBoundaryForce<DIM> >(*this);
-        archive & mSpringConst;
+        archive & mSpringConstant;
         archive & mRestLengthMultiplier;
         archive & mBasementSpringConstantModifier;
         archive & mBasementRestLengthModifier;
@@ -98,7 +98,7 @@ protected:
      *
      * Initialised to 1e6 in the constructor.
      */
-    double mSpringConst;
+    double mSpringConstant;
 
     /**
      * The membrane rest length associated with each element.
@@ -184,18 +184,28 @@ public:
     virtual void AddImmersedBoundaryForceContribution(std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs);
 
     /**
-     * Set mSpringConst
+     * Set #mSpringConstant.
      *
      * @param new value of the spring constant
      */
     void SetSpringConstant(double springConstant);
 
     /**
-     * Set mRestLength
+     * @return #mSpringConstant.
+     */
+    double GetSpringConstant();
+
+    /**
+     * Set #mRestLength.
      *
      * @param new value of the rest length
      */
     void SetRestLengthMultiplier(double restLengthMultiplier);
+
+    /**
+     * @return #mRestLength.
+     */
+    double GetRestLengthMultiplier();
 
     /**
      * Overridden OutputImmersedBoundaryForceParameters() method.

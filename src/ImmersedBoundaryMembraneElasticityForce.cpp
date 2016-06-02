@@ -40,7 +40,7 @@ ImmersedBoundaryMembraneElasticityForce<DIM>::ImmersedBoundaryMembraneElasticity
     : AbstractImmersedBoundaryForce<DIM>(),
       mpCellPopulation(&rCellPopulation),
       mpMesh(&(rCellPopulation.rGetMesh())),
-      mSpringConst(1e6),
+      mSpringConstant(1e6),
       mRestLengthMultiplier(0.5),
       mBasementSpringConstantModifier(5.0),
       mBasementRestLengthModifier(0.5)
@@ -166,7 +166,7 @@ void ImmersedBoundaryMembraneElasticityForce<DIM>::AddImmersedBoundaryForceContr
          */
         double spacing_ratio = mpMesh->GetAverageNodeSpacingOfElement(elem_idx, false);
 
-        double spring_constant = mSpringConst * intrinsic_spacing_squared / (spacing_ratio * spacing_ratio);
+        double spring_constant = mSpringConstant * intrinsic_spacing_squared / (spacing_ratio * spacing_ratio);
         double rest_length = mRestLengthMultiplier * spacing_ratio;
 
         /*
@@ -221,7 +221,7 @@ void ImmersedBoundaryMembraneElasticityForce<DIM>::AddImmersedBoundaryForceContr
 //                                                                               r_corners[1]->rGetLocation());
 //                normed_dist = norm_2(apical_force);
 //                apical_force *=
-//                        0.0 * mSpringConst * (normed_dist - GetApicalLengthForElement(elem_idx)) / normed_dist;
+//                        0.0 * mSpringConstant * (normed_dist - GetApicalLengthForElement(elem_idx)) / normed_dist;
 //
 //                r_corners[0]->AddAppliedForceContribution(apical_force);
 //                apical_force *= -1.0;
@@ -233,7 +233,7 @@ void ImmersedBoundaryMembraneElasticityForce<DIM>::AddImmersedBoundaryForceContr
 //
 //                normed_dist = norm_2(basal_force);
 //                basal_force *=
-//                        0.0 * mSpringConst * (normed_dist - GetBasalLengthForElement(elem_idx)) / normed_dist;
+//                        0.0 * mSpringConstant * (normed_dist - GetBasalLengthForElement(elem_idx)) / normed_dist;
 //
 //                r_corners[3]->AddAppliedForceContribution(basal_force);
 //                basal_force *= -1.0;
@@ -326,7 +326,13 @@ void ImmersedBoundaryMembraneElasticityForce<DIM>::TagApicalAndBasalLengths()
 template<unsigned DIM>
 void ImmersedBoundaryMembraneElasticityForce<DIM>::SetSpringConstant(double springConstant)
 {
-    mSpringConst = springConstant;
+    mSpringConstant = springConstant;
+}
+
+template<unsigned DIM>
+double ImmersedBoundaryMembraneElasticityForce<DIM>::GetSpringConstant()
+{
+    return mSpringConstant;
 }
 
 template<unsigned DIM>
@@ -336,9 +342,15 @@ void ImmersedBoundaryMembraneElasticityForce<DIM>::SetRestLengthMultiplier(doubl
 }
 
 template<unsigned DIM>
+double ImmersedBoundaryMembraneElasticityForce<DIM>::GetRestLengthMultiplier()
+{
+    return mRestLengthMultiplier;
+}
+
+template<unsigned DIM>
 void ImmersedBoundaryMembraneElasticityForce<DIM>::OutputImmersedBoundaryForceParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<SpringConst>" << mSpringConst << "</SpringConst>\n";
+    *rParamsFile << "\t\t\t<SpringConstant>" << mSpringConstant << "</SpringConstant>\n";
     *rParamsFile << "\t\t\t<RestLengthMultiplier>" << mRestLengthMultiplier << "</RestLengthMultiplier>\n";
     *rParamsFile << "\t\t\t<BasementSpringConstantModifier>" << mBasementSpringConstantModifier << "</BasementSpringConstantModifier>\n";
     *rParamsFile << "\t\t\t<BasementRestLengthModifier>" << mBasementRestLengthModifier << "</BasementRestLengthModifier>\n";

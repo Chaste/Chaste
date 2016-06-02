@@ -69,6 +69,8 @@ private:
         archive & boost::serialization::base_object<AbstractImmersedBoundaryForce<DIM> >(*this);
         archive & mSpringConst;
         archive & mRestLength;
+        archive & mLinearSpring;
+        archive & mMorse;
     }
 
 protected:
@@ -76,7 +78,7 @@ protected:
     /** The immersed boundary cell population. */
     ImmersedBoundaryCellPopulation<DIM>* mpCellPopulation;
 
-    /** The immersed boundary mesh */
+    /** The immersed boundary mesh. */
     ImmersedBoundaryMesh<DIM,DIM>* mpMesh;
 
     /**

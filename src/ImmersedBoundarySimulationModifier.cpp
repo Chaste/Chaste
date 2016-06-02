@@ -40,13 +40,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //#include <complex>
 //#include "Timer.hpp"
 //#include "FileFinder.hpp"
-//
 //#include <fftw3.h>
-//
 //#include <boost/thread.hpp>
-
 #include "FluidSource.hpp"
-#include "Debug.hpp"
 
 template<unsigned DIM>
 ImmersedBoundarySimulationModifier<DIM>::ImmersedBoundarySimulationModifier()
@@ -59,6 +55,7 @@ ImmersedBoundarySimulationModifier<DIM>::ImmersedBoundarySimulationModifier()
       mGridSpacingX(0.0),
       mGridSpacingY(0.0),
       mFftNorm(0.0),
+      mpBoxCollection(NULL),
       mReynoldsNumber(1e-4),
       mI(0.0, 1.0),
       mpArrays(NULL),
@@ -69,25 +66,18 @@ ImmersedBoundarySimulationModifier<DIM>::ImmersedBoundarySimulationModifier()
 template<unsigned DIM>
 ImmersedBoundarySimulationModifier<DIM>::~ImmersedBoundarySimulationModifier()
 {
-    MARK;
     if (mpBoxCollection)
     {
-        MARK;
         delete(mpBoxCollection);
     }
-    MARK;
     if (mpArrays)
     {
-        MARK;
         delete(mpArrays);
     }
-    MARK;
     if (mpFftInterface)
     {
-        MARK;
         delete(mpFftInterface);
     }
-    MARK;
 }
 
 template<unsigned DIM>

@@ -35,7 +35,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Needed for test framework
 #include <cxxtest/TestSuite.h>
-#include "AbstractCellBasedTestSuite.hpp"
+
+#include "CheckpointArchiveTypes.hpp"
 
 // Includes from projects/ImmersedBoundary
 #include "ImmersedBoundaryCellCellInteractionForce.hpp"
@@ -47,7 +48,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestImmersedBoundaryForces : public CxxTest::TestSuite
 {
 public:
-
 
     void TestImmersedBoundaryCellCellInteractionForceMethods() throw (Exception)
     {
@@ -72,12 +72,12 @@ public:
             force.UseMorsePotential();
 
             // Serialize via pointer to most abstract class possible
-            AbstractForce<2>* const p_force = &force;
+            AbstractImmersedBoundaryForce<2>* const p_force = &force;
             output_arch << p_force;
         }
 
         {
-            AbstractForce<2>* p_force;
+            AbstractImmersedBoundaryForce<2>* p_force;
 
             // Create an input archive
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
@@ -119,12 +119,12 @@ public:
             force.SetRestLengthMultiplier(7.8);
 
             // Serialize via pointer to most abstract class possible
-            AbstractForce<2>* const p_force = &force;
+            AbstractImmersedBoundaryForce<2>* const p_force = &force;
             output_arch << p_force;
         }
 
         {
-            AbstractForce<2>* p_force;
+            AbstractImmersedBoundaryForce<2>* p_force;
 
             // Create an input archive
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
