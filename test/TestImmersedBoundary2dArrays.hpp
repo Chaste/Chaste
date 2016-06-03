@@ -38,6 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Includes from projects/ImmersedBoundary
 #include "ImmersedBoundary2dArrays.hpp"
+#include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
 
 // This test is never run in parallel
 #include "FakePetscSetup.hpp"
@@ -46,8 +47,87 @@ class TestImmersedBoundary2dArrays : public CxxTest::TestSuite
 {
 public:
 
-    void TestConstructor() throw(Exception)
+    void TestMethods() throw(Exception)
     {
-        ///\todo Test this method
+        // Create an ImmersedBoundary2dArrays object
+        ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.2, 2.0, 0.15, true);
+        ImmersedBoundaryMesh<2,2>* p_mesh = gen.GetMesh();
+        ImmersedBoundary2dArrays<2> arrays(p_mesh, 0.123, 0.246, true);
+
+        // Test member variables are correctly initialised
+        TS_ASSERT_EQUALS(arrays.HasActiveSources(), true);
+        TS_ASSERT_EQUALS(arrays.GetMesh()->GetNumNodes(), 583u);
+        TS_ASSERT_EQUALS(arrays.GetMesh()->GetNumElements(), 6u);
+
+        // Test that each multi_array member has the correct shape
+        TS_ASSERT_EQUALS(arrays.rGetModifiableForceGrids().shape()[0], 2u);
+        TS_ASSERT_EQUALS(arrays.rGetModifiableForceGrids().shape()[1], 256u);
+        TS_ASSERT_EQUALS(arrays.rGetModifiableForceGrids().shape()[2], 256u);
+
+        TS_ASSERT_EQUALS(arrays.rGetModifiableRightHandSideGrids().shape()[0], 3u);
+        TS_ASSERT_EQUALS(arrays.rGetModifiableRightHandSideGrids().shape()[1], 256u);
+        TS_ASSERT_EQUALS(arrays.rGetModifiableRightHandSideGrids().shape()[2], 256u);
+
+        TS_ASSERT_EQUALS(arrays.rGetOperator1().shape()[0], 256u);
+        TS_ASSERT_EQUALS(arrays.rGetOperator1().shape()[1], 129u);
+        TS_ASSERT_EQUALS(arrays.rGetOperator2().shape()[0], 256u);
+        TS_ASSERT_EQUALS(arrays.rGetOperator2().shape()[1], 129u);
+
+        TS_ASSERT_EQUALS(arrays.rGetModifiableFourierGrids().shape()[0], 3u);
+        TS_ASSERT_EQUALS(arrays.rGetModifiableFourierGrids().shape()[1], 256u);
+        TS_ASSERT_EQUALS(arrays.rGetModifiableFourierGrids().shape()[2], 129u);
+        TS_ASSERT_EQUALS(arrays.rGetModifiablePressureGrid().shape()[0], 256u);
+        TS_ASSERT_EQUALS(arrays.rGetModifiablePressureGrid().shape()[1], 129u);
+
+        TS_ASSERT_EQUALS(arrays.rGetSin2x().size(), 256u);
+        TS_ASSERT_EQUALS(arrays.rGetSin2y().size(), 129u);
+
+        // Expected values of sin(x) and sin(2x), used below
+        std::vector<double> sin_x;
+        std::vector<double> sin_2x;
+        for (unsigned i=0; i<256; i++)
+        {
+            sin_x.push_back(sin(M_PI * (double) i / 256));
+            sin_2x.push_back(sin(2 * M_PI * (double) i / 256));
+        }
+
+        // Test that mSin2x and mSin2y are correctly initialised
+        for (unsigned i=0; i<256; i++)
+        {
+            TS_ASSERT_DELTA(arrays.rGetSin2x()[i], sin_2x[i], 1e-4);
+        }
+        for (unsigned j=0; j<129; j++)
+        {
+            TS_ASSERT_DELTA(arrays.rGetSin2y()[j], sin_2x[j], 1e-4);
+        }
+
+        for (unsigned i=0; i<256; i++)
+        {
+            for (unsigned j=0; j<129; j++)
+            {
+                TS_ASSERT_DELTA(arrays.rGetOperator1()[i][j], 0.5*256*256*(sin_2x[i]*sin_2x[i] + sin_2x[j]*sin_2x[j]), 1e-4);
+                TS_ASSERT_DELTA(arrays.rGetOperator2()[i][j], 1.0 + 2.0*256*256*(sin_x[i]*sin_x[i] + sin_x[j]*sin_x[j]), 1e-4);
+            }
+        }
+
+        // Test that these methods can be used to modify the respective members
+        arrays.rGetModifiableForceGrids().resize(extents[23][1][1]);
+        TS_ASSERT_EQUALS(arrays.rGetModifiableForceGrids().shape()[0], 23u);
+        TS_ASSERT_EQUALS(arrays.rGetModifiableForceGrids().shape()[1], 1u);
+        TS_ASSERT_EQUALS(arrays.rGetModifiableForceGrids().shape()[2], 1u);
+
+        arrays.rGetModifiableRightHandSideGrids().resize(extents[17][1][1]);
+        TS_ASSERT_EQUALS(arrays.rGetModifiableRightHandSideGrids().shape()[0], 17u);
+        TS_ASSERT_EQUALS(arrays.rGetModifiableRightHandSideGrids().shape()[1], 1u);
+        TS_ASSERT_EQUALS(arrays.rGetModifiableRightHandSideGrids().shape()[2], 1u);
+
+        arrays.rGetModifiableFourierGrids().resize(extents[13][2][1]);
+        TS_ASSERT_EQUALS(arrays.rGetModifiableFourierGrids().shape()[0], 13u);
+        TS_ASSERT_EQUALS(arrays.rGetModifiableFourierGrids().shape()[1], 2u);
+        TS_ASSERT_EQUALS(arrays.rGetModifiableFourierGrids().shape()[2], 1u);
+
+        arrays.rGetModifiablePressureGrid().resize(extents[7][4]);
+        TS_ASSERT_EQUALS(arrays.rGetModifiablePressureGrid().shape()[0], 7u);
+        TS_ASSERT_EQUALS(arrays.rGetModifiablePressureGrid().shape()[1], 4u);
     }
 };
