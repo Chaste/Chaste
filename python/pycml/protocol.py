@@ -85,8 +85,8 @@ class Protocol(processors.ModelModifier):
     def apply_protocol_file(doc, proto_file_path):
         """Parse a protocol XML file and apply it to the given model document."""
         proto = Protocol(doc.model)
-        proto_units = doc.model.get_standard_units().copy()
-        proto.parse_protocol(proto_file_path, proto_units)
+        proto.units = doc.model.get_standard_units().copy()
+        proto.parse_protocol(proto_file_path, proto.units)
         proto.modify_model()
     
     @staticmethod
@@ -150,6 +150,7 @@ class Protocol(processors.ModelModifier):
         self.add_protocol_namespaces(proto_xml.xmlns_prefixes)
         # Relative URIs must be resolved relative to this protocol file, or its xml:base if present
         base = os.path.dirname(getattr(proto_xml.protocol, 'base', proto_file_path))
+        self.base = getattr(self, 'base', base) # Only set this if we're the main file
         # Any imports?
         for proto_import in getattr(proto_xml.protocol, u'import_', []):
             source = proto_import.source
@@ -1116,6 +1117,61 @@ class Protocol(processors.ModelModifier):
 #         print 'Evaluated', variable, 'to', value
         return value
 
+    def _add_interpolation(self, expr, lhs, rhs):
+        """Add/replace a model equation with linear interpolation from a data file.
+
+        This is a special case of the 'define' construct.  The rhs is an apply of the
+        interpolate csymbol with 4 arguments: a data file path (relative to the protocol),
+        an independent variable reference, units of the independent variable in the data,
+        and units of the lhs values in the data.  The data file contains two columns
+        of values for the independent variable and lhs, respectively.  We construct a new
+        piecewise definition for the lhs using linear interpolation on these values,
+        modifying the rhs of expr to contain this piecewise MathML, so that _add_maths_to_model
+        can continue as for normal 'define' constructs.
+
+        @param expr: the new equation
+        @param lhs: the left-hand side of the new equation
+        @param rhs: the right-hand side of the new equation 
+        """
+        # Extract operands with paranoia checks
+        operands = list(rhs.operands())
+        assert len(operands) == 4
+        assert operands[0].localName == u'csymbol' and getattr(operands[0], u'definitionURL', u'') == u'https://chaste.cs.ox.ac.uk/nss/protocol/string'
+        for i in [1, 2, 3]:
+            assert isinstance(operands[i], mathml_ci)
+        data_path, indep_var_name, indep_units, dep_units = map(unicode, operands)
+        # Load the data
+        data_path = os.path.join(self.base, data_path)
+        if not os.path.exists(data_path):
+            raise ProtocolError("Unable to load data file '%s' for interpolation." % data_path)
+        import numpy
+        data = numpy.loadtxt(data_path, dtype=float, delimiter=',', ndmin=2, unpack=True)
+        assert data.ndim == 2
+        if data.shape[0] != 2:
+            raise ProtocolError("The data file for an interpolate() must have 2 columns; file '%s' has %d." % (data_path, data.shape[0]))
+        # Get units objects so we can do conversions if necessary
+        indep_units = self._get_units_object(self.units[indep_units])
+        dep_units = self._get_units_object(self.units[dep_units])
+        # Iterate over data rows to construct the piecewise representation
+        eqn = mathml_apply.create_new
+        pieces = [] 
+        for row in range(data.shape[1] - 1):
+            x1 = (data[0][row], indep_units.name)
+            x2 = (data[0][row+1], indep_units.name)
+            y1 = (data[1][row], dep_units.name)
+            y2 = (data[1][row+1], dep_units.name)
+            cond = eqn(rhs, 'and', [eqn(rhs, 'geq', [indep_var_name, x1]),
+                                    eqn(rhs, 'leq', [indep_var_name, x2])])
+            temp2 = eqn(rhs, 'divide', [eqn(rhs, 'minus', [y2, y1]),
+                                        eqn(rhs, 'minus', [x2, x1])])
+            temp1 = eqn(rhs, 'times', [temp2, eqn(rhs, 'minus', [indep_var_name, x1])])
+            case = eqn(rhs, 'plus', [y1, temp1])
+            pieces.append((case, cond))
+        piecewise = mathml_piecewise.create_new(rhs, pieces)
+        # Insert and return the new rhs
+        expr.replace_child(rhs, piecewise)
+        return piecewise
+
     def _add_maths_to_model(self, expr):
         """Add or replace an equation in the model.
         
@@ -1131,6 +1187,10 @@ class Protocol(processors.ModelModifier):
         assert isinstance(expr, mathml_apply)
         assert expr.operator().localName == u'eq', 'Expression is not an assignment'
         lhs, rhs = list(expr.operands())
+        if (isinstance(rhs, mathml_apply) and rhs.operator().localName == u'csymbol' and
+            getattr(rhs.operator(), u'definitionURL', u'') == u'https://chaste.cs.ox.ac.uk/nss/protocol/interpolate'):
+            # Special case for linear interpolation on a data file
+            rhs = self._add_interpolation(expr, lhs, rhs)
         orig_defn_kw = u'original_definition' # References the original definition if it appears as a variable on the new RHS
         if not self._identify_referenced_variables(expr, check_optional=True, special_name=orig_defn_kw):
             # Some optional variables weren't present in the model, so we can't use this equation.
@@ -1272,10 +1332,18 @@ class Protocol(processors.ModelModifier):
                                      self.model.get_assignments())
             self.model._cml_assignments = new_assignments
         # Remove existing annotations
+        free_vars, unknown_vars = [], []
         for var in self.model.get_all_variables():
             var.set_pe_keep(False)
             var.set_is_derived_quantity(False)
             var.set_is_modifiable_parameter(False)
+            # An algebraic model might have no free vars left, but if there is a single unknown var then treat it as free
+            if var.get_type() == VarTypes.Free:
+                free_vars.append(var)
+            if var.get_type() == VarTypes.Unknown:
+                unknown_vars.append(var)
+        if len(free_vars) == 0 and len(unknown_vars) == 1:
+            unknown_vars[0]._set_type(VarTypes.Free)
         # Add annotations for inputs & outputs
         for var in [input for input in self.inputs if isinstance(input, cellml_variable)]:
             var.set_pe_keep(True)
