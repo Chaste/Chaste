@@ -298,7 +298,7 @@ public:
         TS_ASSERT_DELTA(damping_const_1, cell_population.GetDampingConstantMutant(), 1e-6);
         TS_ASSERT_DELTA(damping_const_2, cell_population.GetDampingConstantMutant(), 1e-6);
         TS_ASSERT_DELTA(damping_const_3, cell_population.GetDampingConstantMutant(), 1e-6);
-        TS_ASSERT_DELTA(damping_const_4, cell_population.GetDampingConstantMutant(), 1e-6);
+        TS_ASSERT_DELTA(damping_const_4, cell_population.GetDampingConstantNormal(), 1e-6);
 
         // Coverage
         TS_ASSERT_DELTA(cell_population.GetAreaBasedDampingConstantParameter(), 0.1, 1e-6);

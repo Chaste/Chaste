@@ -194,7 +194,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetDampingConstant(unsigned nodeIndex)
 {
     CellPtr p_cell = this->GetCellUsingLocationIndex(nodeIndex);
-    if (p_cell->GetMutationState()->IsType<WildTypeCellMutationState>() && !p_cell->HasCellProperty<CellLabel>())
+    if (p_cell->GetMutationState()->IsType<WildTypeCellMutationState>())
     {
         return this->GetDampingConstantNormal();
     }
