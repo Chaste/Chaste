@@ -307,7 +307,7 @@ public:
 
         // Node 25 is contained in cells 6 and 7, therefore should have a mutant damping constant
         double damping_constant_at_node_25 = cell_population.GetDampingConstant(25);
-        TS_ASSERT_DELTA(damping_constant_at_node_25, mutant_damping_constant, 1e-6);
+        TS_ASSERT_DELTA(damping_constant_at_node_25, (normal_damping_constant+mutant_damping_constant)/2.0, 1e-6);
     }
 
     /**

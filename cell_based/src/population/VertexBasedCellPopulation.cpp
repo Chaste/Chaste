@@ -122,9 +122,8 @@ double VertexBasedCellPopulation<DIM>::GetDampingConstant(unsigned nodeIndex)
     {
         CellPtr p_cell = this->GetCellUsingLocationIndex(*iter);
         bool cell_is_wild_type = p_cell->GetMutationState()->IsType<WildTypeCellMutationState>();
-        bool cell_is_labelled = p_cell->HasCellProperty<CellLabel>();
 
-        if (cell_is_wild_type && !cell_is_labelled)
+        if (cell_is_wild_type)
         {
             average_damping_constant += this->GetDampingConstantNormal()*temp;
         }
