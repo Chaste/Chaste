@@ -83,6 +83,12 @@ public:
      *  scons build=GccOpt_hostconfig,boost=1-40,use-cvode=0 test_suite=crypt/test/simulation/TestGenerateSteadyStateCrypt.hpp
      *  cp /tmp/$USER/testoutput/SteadyStateCrypt/archive/?*_150.* crypt/test/data/SteadyStateCrypt/archive/
      *
+     * OR to produce archives in CMake:
+     *  cmake BOOST_ROOT=/path/to/boost1.40 Chaste_USE_CVODE=OFF /path/to/Chaste
+     *  make TestGenerateSteadyStateCrypt_simulation_Runner
+     *  ctest -R TestGenerateSteadyStateCrypt
+     *  cp /path/to/Chaste/testoutput/SteadyStateCrypt/archive/?*_150.* /path/to/Chaste/crypt/test/data/SteadyStateCrypt/archive/
+     *
      */
     void TestLoadArchive() throw (Exception)
     {
