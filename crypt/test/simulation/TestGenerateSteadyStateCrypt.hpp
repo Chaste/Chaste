@@ -141,6 +141,16 @@ public:
             delete p_simulator;
         }
 
+        {
+            // Testing here that the number of cells at the end doesn't change
+            // Not that this number is from having cvode turned on
+            CryptSimulation2d* p_simulator = CellBasedSimulationArchiver<2, CryptSimulation2d>::Load("SteadyStateCrypt",end_of_simulation);
+            TS_ASSERT_EQUALS(p_simulator->rGetCellPopulation().GetNumRealCells(),474u); // With cvode
+            // TS_ASSERT_EQUALS(p_simulator->rGetCellPopulation().GetNumRealCells(),445); // Without cvode
+
+            delete p_simulator;
+        }
+
         SimulationTime::Destroy();
         RandomNumberGenerator::Destroy();
         WntConcentration<2>::Destroy();
