@@ -1156,6 +1156,10 @@ class Protocol(processors.ModelModifier):
         eqn = mathml_apply.create_new
         pieces = [] 
         for row in range(data.shape[1] - 1):
+            if data[0][row] == data[0][row+1]:
+                # Vertical jumps are allowed in voltage clamp protocols, but trying to interpolate gives you a divide by zero.
+                # Just skip the jump part, and we'll interpolate correctly at either side.
+                continue
             x1 = (data[0][row], indep_units.name)
             x2 = (data[0][row+1], indep_units.name)
             y1 = (data[1][row], dep_units.name)
