@@ -83,7 +83,7 @@ public:
         simulator.AddSimulationModifier(p_main_modifier);
 
         // Add force laws
-        MAKE_PTR_ARGS(ImmersedBoundaryMembraneElasticityForce<2>, p_boundary_force, (cell_population));
+        MAKE_PTR(ImmersedBoundaryMembraneElasticityForce<2>, p_boundary_force);
         p_main_modifier->AddImmersedBoundaryForce(p_boundary_force);
         p_boundary_force->SetSpringConstant(0.5 * 1e7);
 

@@ -166,8 +166,8 @@ void SetupAndRunSimulation(unsigned kick, unsigned localSpringConst, unsigned gl
     MAKE_PTR(ImmersedBoundarySimulationModifier<2>, p_main_modifier);
     simulator.AddSimulationModifier(p_main_modifier);
 
-    // Add force laws
-    MAKE_PTR_ARGS(ImmersedBoundaryMembraneElasticityForce<2>, p_boundary_force, (cell_population));
+    // Add force law
+    MAKE_PTR(ImmersedBoundaryMembraneElasticityForce<2>, p_boundary_force);
     p_main_modifier->AddImmersedBoundaryForce(p_boundary_force);
     p_boundary_force->SetSpringConstant(reference_spring_const);
 
@@ -191,7 +191,7 @@ void SetupAndRunSimulation(unsigned kick, unsigned localSpringConst, unsigned gl
 
     // Get height of basement lamina
     double lamina_height = 0.0;
-    for (unsigned node_idx = 0 ; node_idx < p_mesh->GetElement(0)->GetNumNodes() ; node_idx++)
+    for (unsigned node_idx = 0; node_idx < p_mesh->GetElement(0)->GetNumNodes(); node_idx++)
     {
         lamina_height += p_mesh->GetElement(0)->GetNode(node_idx)->rGetModifiableLocation()[1];
     }
@@ -201,7 +201,7 @@ void SetupAndRunSimulation(unsigned kick, unsigned localSpringConst, unsigned gl
     unsigned e_cad_location = p_cell_cell_force->rGetProteinNodeAttributeLocations()[0];
     unsigned p_cad_location = p_cell_cell_force->rGetProteinNodeAttributeLocations()[1];
 
-    for (unsigned node_idx = 0 ; node_idx < p_mesh->GetElement(3)->GetNumNodes() ; node_idx++)
+    for (unsigned node_idx = 0; node_idx < p_mesh->GetElement(3)->GetNumNodes(); node_idx++)
     {
         double new_height = lamina_height + fp_sim_kick * (p_mesh->GetElement(3)->GetNode(node_idx)->rGetLocation()[1] - lamina_height);
         p_mesh->GetElement(3)->GetNode(node_idx)->rGetModifiableLocation()[1] = new_height;
@@ -210,7 +210,7 @@ void SetupAndRunSimulation(unsigned kick, unsigned localSpringConst, unsigned gl
         p_mesh->GetElement(3)->GetNode(node_idx)->rGetNodeAttributes()[p_cad_location] = fp_local_sc;
     }
 
-    for (unsigned node_idx = 0 ; node_idx < p_mesh->GetElement(4)->GetNumNodes() ; node_idx++)
+    for (unsigned node_idx = 0; node_idx < p_mesh->GetElement(4)->GetNumNodes(); node_idx++)
     {
         if (p_mesh->GetElement(4)->GetNode(node_idx)->rGetLocation()[1] > 0.6)
         {
@@ -227,7 +227,7 @@ void SetupAndRunSimulation(unsigned kick, unsigned localSpringConst, unsigned gl
     // Calculate extreme points
     double left_most = 1.0;
     double right_most = 0.0;
-    for (unsigned node_idx = 0 ; node_idx < p_mesh->GetElement(3)->GetNumNodes() ; node_idx++)
+    for (unsigned node_idx = 0; node_idx < p_mesh->GetElement(3)->GetNumNodes(); node_idx++)
     {
         if (p_mesh->GetElement(3)->GetNode(node_idx)->rGetLocation()[0] > right_most)
         {

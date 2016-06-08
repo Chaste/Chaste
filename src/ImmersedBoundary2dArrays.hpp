@@ -54,34 +54,38 @@ protected:
     /** The immersed boundary mesh. */
     ImmersedBoundaryMesh<DIM,DIM>* mpMesh;
 
-    /** Whether the population has active fluid sources */
+    /** Whether the population has active fluid sources. */
     bool mActiveSources;
 
-    /** Grid to store force acting on fluid */
+    /** Grid to store force acting on fluid. */
     multi_array<double, 3> mForceGrids;
 
-    /** Grid to calculate upwind scheme and store RHS of system */
+    /** Grid to calculate upwind scheme and store RHS of system. */
     multi_array<double, 3> mRightHandSideGrids;
 
-    /** The fluid source grid */
+    /**
+     * The fluid source grid.
+     *
+     * \todo Use this in the code, or remove it.
+     */
     multi_array<double, 2> mSourceGrid;
 
-    /** Grid to store the first of two operators needed for the fft algorithm */
+    /** Grid to store the first of two operators needed for the FFT algorithm. */
     multi_array<double, 2> mOperator1;
 
-    /** Grid to store the second of two operators needed for the fft algorithm */
+    /** Grid to store the second of two operators needed for the FFT algorithm. */
     multi_array<double, 2> mOperator2;
 
-    /** Grid to store results of R2C fft */
+    /** Grid to store results of R2C FFT. */
     multi_array<std::complex<double>, 3> mFourierGrids;
 
-    /** Grid to store the calculated pressure grid */
+    /** Grid to store the calculated pressure grid. */
     multi_array<std::complex<double>, 2> mPressureGrid;
 
-    /** Vector of sin values in x, constant once grid size is known */
+    /** Vector of sin values in x, constant once grid size is known. */
     std::vector<double> mSin2x;
 
-    /** Vector of sin values in x, constant once grid size is known */
+    /** Vector of sin values in x, constant once grid size is known. */
     std::vector<double> mSin2y;
 
 public:
@@ -131,6 +135,12 @@ public:
 
     /** @return reference to the vector of sine values in y. */
     const std::vector<double>& rGetSin2y() const;
+
+    /** @return #mpMesh. */
+    ImmersedBoundaryMesh<DIM,DIM>* GetMesh();
+
+    /** @return #mActiveSources. */
+    bool HasActiveSources();
 };
 
 #endif /*IMMERSEDBOUNDARY2DARRAYS_HPP_*/

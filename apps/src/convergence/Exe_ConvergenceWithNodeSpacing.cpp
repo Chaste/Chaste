@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2015, University of Oxford.
+Copyright (c) 2005-2016, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    // get id and name from command line
+    // Get ID and name from command line
     unsigned simulation_id = variables_map["ID"].as<unsigned>();
     unsigned num_nodes = variables_map["NN"].as<unsigned>();
 
@@ -113,7 +113,7 @@ void SetupSingletons()
 
 void DestroySingletons()
 {
-    // this is from the tearDown method of the test suite
+    // This is from the tearDown method of the test suite
     SimulationTime::Destroy();
     RandomNumberGenerator::Destroy();
     CellPropertyRegistry::Instance()->Clear();
@@ -158,7 +158,7 @@ void SetupAndRunSimulation(unsigned simulationId, unsigned numNodes)
     simulator.AddSimulationModifier(p_main_modifier);
 
     // Add force laws
-    MAKE_PTR_ARGS(ImmersedBoundaryMembraneElasticityForce<2>, p_boundary_force, (cell_population));
+    MAKE_PTR(ImmersedBoundaryMembraneElasticityForce<2>, p_boundary_force);
     p_main_modifier->AddImmersedBoundaryForce(p_boundary_force);
     p_boundary_force->SetSpringConstant(1e7);
     p_boundary_force->SetRestLengthMultiplier(0.5);

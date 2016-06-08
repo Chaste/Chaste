@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2015, University of Oxford.
+Copyright (c) 2005-2016, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -39,8 +39,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SimulationTime.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "ExecutableSupport.hpp"
-
-#include "Debug.hpp"
 
 /*
  * These headers handle passing parameters to the executable.
@@ -89,11 +87,11 @@ int main(int argc, char *argv[])
                     ("DI", boost::program_options::value<double>()->default_value(0.0),"Interaction distance for cell-cell forces")
                     ("TS", boost::program_options::value<unsigned>()->default_value(1000),"Number of time steps");
     
-    // define parse command line into variables_map
+    // Define parse command line into variables_map
     boost::program_options::variables_map variables_map;
     boost::program_options::store(parse_command_line(argc, argv, general_options), variables_map);
 
-    // print help message if wanted
+    // Print help message if wanted
     if (variables_map.count("help"))
     {
         std::cout << setprecision(3) << general_options << "\n";
@@ -101,7 +99,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    // get id and name from command line
+    // Get ID and name from command line
     std::string id_string = variables_map["ID"].as<std::string>();
     double cor_rest_length = variables_map["CRL"].as<double>();
     double cor_spring_const = variables_map["CSC"].as<double>();
@@ -110,7 +108,6 @@ int main(int argc, char *argv[])
     double rhs_adhesion_mod = variables_map["AD"].as<double>();
     double interaction_dist = variables_map["DI"].as<double>();
     unsigned num_time_steps = variables_map["TS"].as<unsigned>();
-
 
     OutputToConsole(id_string, "Started");
     SetupSingletons();
@@ -133,7 +130,7 @@ void SetupSingletons()
 
 void DestroySingletons()
 {
-    // this is from the tearDown method of the test suite
+    // This is from the tearDown method of the test suite
     SimulationTime::Destroy();
     RandomNumberGenerator::Destroy();
     CellPropertyRegistry::Instance()->Clear();
@@ -181,8 +178,8 @@ void SetupAndRunSimulation(std::string idString, double corRestLength, double co
     MAKE_PTR(ImmersedBoundarySimulationModifier<2>, p_main_modifier);
     simulator.AddSimulationModifier(p_main_modifier);
 
-    // Add force laws
-    MAKE_PTR_ARGS(ImmersedBoundaryMembraneElasticityForce<2>, p_boundary_force, (cell_population));
+    // Add force law
+    MAKE_PTR(ImmersedBoundaryMembraneElasticityForce<2>, p_boundary_force);
     p_main_modifier->AddImmersedBoundaryForce(p_boundary_force);
     p_boundary_force->SetSpringConstant(corSpringConst);
     p_boundary_force->SetRestLengthMultiplier(corRestLength);
@@ -224,7 +221,7 @@ void SetupAndRunSimulation(std::string idString, double corRestLength, double co
     unsigned e_cad_location = p_cell_cell_force->rGetProteinNodeAttributeLocations()[0];
     unsigned p_cad_location = p_cell_cell_force->rGetProteinNodeAttributeLocations()[1];
 
-    for (unsigned node_idx = 0 ; node_idx < p_mesh->GetElement(3)->GetNumNodes() ; node_idx++)
+    for (unsigned node_idx = 0; node_idx < p_mesh->GetElement(3)->GetNumNodes(); node_idx++)
     {
         double new_height = lamina_height + 1.05 * (p_mesh->GetElement(3)->GetNode(node_idx)->rGetLocation()[1] - lamina_height);
         p_mesh->GetElement(3)->GetNode(node_idx)->rGetModifiableLocation()[1] = new_height;
@@ -236,7 +233,7 @@ void SetupAndRunSimulation(std::string idString, double corRestLength, double co
     // In the top apical domain of the cell directly to the right, add in p_cad
     double cell_four_height = p_mesh->CalculateBoundingBoxOfElement(4).GetWidth(1);
     double cell_four_y_cent = p_mesh->GetCentroidOfElement(4)[1];
-    for (unsigned node_idx = 0 ; node_idx < p_mesh->GetElement(4)->GetNumNodes() ; node_idx++)
+    for (unsigned node_idx = 0; node_idx < p_mesh->GetElement(4)->GetNumNodes(); node_idx++)
     {
         if (p_mesh->GetElement(4)->GetNode(node_idx)->rGetLocation()[1] - cell_four_y_cent > 0.45 * cell_four_height)
         {

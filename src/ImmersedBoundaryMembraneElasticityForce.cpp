@@ -36,74 +36,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ImmersedBoundaryMembraneElasticityForce.hpp"
 
 template<unsigned DIM>
-ImmersedBoundaryMembraneElasticityForce<DIM>::ImmersedBoundaryMembraneElasticityForce(ImmersedBoundaryCellPopulation<DIM>& rCellPopulation)
+ImmersedBoundaryMembraneElasticityForce<DIM>::ImmersedBoundaryMembraneElasticityForce()
     : AbstractImmersedBoundaryForce<DIM>(),
-      mpCellPopulation(&rCellPopulation),
-      mpMesh(&(rCellPopulation.rGetMesh())),
+      mpMesh(NULL),
       mSpringConstant(1e6),
       mRestLengthMultiplier(0.5),
       mBasementSpringConstantModifier(5.0),
       mBasementRestLengthModifier(0.5)
-{
-    // Verify whether each element has four corners tagged
-    unsigned num_corners = mpMesh->GetElement(0)->rGetCornerNodes().size();
-    for (unsigned elem_idx = 1; elem_idx < mpMesh->GetNumElements(); elem_idx++)
-    {
-        if (num_corners != mpMesh->GetElement(elem_idx)->rGetCornerNodes().size())
-        {
-            EXCEPTION("All elements must have the same number of corners to use this force class.");
-        }
-    }
-
-    mElementsHaveCorners = (num_corners == 4);
-
-    // If each element has four corners tagged, we set up node regions and apical/basal lengths
-    if (mElementsHaveCorners)
-    {
-        // First verify that all elements have the same number of attributes
-        mReferenceLocationInAttributesVector = mpMesh->GetElement(0)->GetNumElementAttributes();
-        for (unsigned elem_idx = 1; elem_idx < mpMesh->GetNumElements(); elem_idx++)
-        {
-            if (mReferenceLocationInAttributesVector != mpMesh->GetElement(elem_idx)->GetNumElementAttributes())
-            {
-                EXCEPTION("All elements must have the same number of attributes to use this force class.");
-            }
-        }
-
-        /*
-         * We split the nodes into three categories: basal, apical, and lateral.  We keep this information in the attribute
-         * called region, with 0, 1, and 2 representing basal, apical, and lateral respectively.
-         */
-        TagNodeRegions();
-
-        /*
-         * We keep track of the initial size of the apical and basal sides.  This will be the initial distance between the
-         * corners, which are stored by the element.
-         *
-         * Corners are represented as follows, and stored as four consecutive element attributes:
-         *
-         *     Apical
-         *     0-----1
-         *     |     |
-         *     |     |
-         *     |     |
-         *     |     |
-         *     |     |
-         *     3-----2
-         *      Basal
-         *
-         * The two element attributes store the starting distance between the apical corners and basal corners, giving
-         * us:
-         *
-         * Attribute i:   Initial distance between apical corners
-         *           i+1: Initial distance between basal corners
-         */
-        TagApicalAndBasalLengths();
-    }
-}
-
-template<unsigned DIM>
-ImmersedBoundaryMembraneElasticityForce<DIM>::ImmersedBoundaryMembraneElasticityForce()
 {
 }
 
@@ -115,6 +54,8 @@ ImmersedBoundaryMembraneElasticityForce<DIM>::~ImmersedBoundaryMembraneElasticit
 template<unsigned DIM>
 double ImmersedBoundaryMembraneElasticityForce<DIM>::GetApicalLengthForElement(unsigned elemIndex)
 {
+    assert(mpMesh != NULL);
+
     // Calculate correct location in attributes vector and check it's valid
     unsigned attribute_location = mReferenceLocationInAttributesVector;
     assert(attribute_location < mpMesh->GetElement(elemIndex)->GetNumElementAttributes());
@@ -125,6 +66,8 @@ double ImmersedBoundaryMembraneElasticityForce<DIM>::GetApicalLengthForElement(u
 template<unsigned DIM>
 double ImmersedBoundaryMembraneElasticityForce<DIM>::GetBasalLengthForElement(unsigned elemIndex)
 {
+    assert(mpMesh != NULL);
+
     // Calculate correct location in attributes vector and check it's valid
     unsigned attribute_location = mReferenceLocationInAttributesVector + 1;
     assert(attribute_location < mpMesh->GetElement(elemIndex)->GetNumElementAttributes());
@@ -133,10 +76,72 @@ double ImmersedBoundaryMembraneElasticityForce<DIM>::GetBasalLengthForElement(un
 }
 
 template<unsigned DIM>
-void ImmersedBoundaryMembraneElasticityForce<DIM>::AddImmersedBoundaryForceContribution(std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs)
+void ImmersedBoundaryMembraneElasticityForce<DIM>::AddImmersedBoundaryForceContribution(std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs,
+        ImmersedBoundaryCellPopulation<DIM>& rCellPopulation)
 {
+    if (mpMesh == NULL)
+    {
+        mpMesh = &(rCellPopulation.rGetMesh());
+
+        // Verify whether each element has four corners tagged
+        unsigned num_corners = mpMesh->GetElement(0)->rGetCornerNodes().size();
+        for (unsigned elem_idx = 1; elem_idx < mpMesh->GetNumElements(); elem_idx++)
+        {
+            if (num_corners != mpMesh->GetElement(elem_idx)->rGetCornerNodes().size())
+            {
+                EXCEPTION("All elements must have the same number of corners to use this force class.");
+            }
+        }
+
+        mElementsHaveCorners = (num_corners == 4);
+
+        // If each element has four corners tagged, we set up node regions and apical/basal lengths
+        if (mElementsHaveCorners)
+        {
+            // First verify that all elements have the same number of attributes
+            mReferenceLocationInAttributesVector = mpMesh->GetElement(0)->GetNumElementAttributes();
+            for (unsigned elem_idx = 1; elem_idx < mpMesh->GetNumElements(); elem_idx++)
+            {
+                if (mReferenceLocationInAttributesVector != mpMesh->GetElement(elem_idx)->GetNumElementAttributes())
+                {
+                    EXCEPTION("All elements must have the same number of attributes to use this force class.");
+                }
+            }
+
+            /*
+             * We split the nodes into three categories: basal, apical, and lateral.  We keep this information in the attribute
+             * called region, with 0, 1, and 2 representing basal, apical, and lateral respectively.
+             */
+            TagNodeRegions();
+
+            /*
+             * We keep track of the initial size of the apical and basal sides.  This will be the initial distance between the
+             * corners, which are stored by the element.
+             *
+             * Corners are represented as follows, and stored as four consecutive element attributes:
+             *
+             *     Apical
+             *     0-----1
+             *     |     |
+             *     |     |
+             *     |     |
+             *     |     |
+             *     |     |
+             *     3-----2
+             *      Basal
+             *
+             * The two element attributes store the starting distance between the apical corners and basal corners, giving
+             * us:
+             *
+             * Attribute i:   Initial distance between apical corners
+             *           i+1: Initial distance between basal corners
+             */
+            TagApicalAndBasalLengths();
+        }
+    }
+
     // Used in the calculation of the spring constant
-    double intrinsic_spacing_squared = mpCellPopulation->GetIntrinsicSpacing() * mpCellPopulation->GetIntrinsicSpacing();
+    double intrinsic_spacing_squared = rCellPopulation.GetIntrinsicSpacing() * rCellPopulation.GetIntrinsicSpacing();
 
     for (typename ImmersedBoundaryMesh<DIM, DIM>::ImmersedBoundaryElementIterator elem_it = mpMesh->GetElementIteratorBegin();
          elem_it != mpMesh->GetElementIteratorEnd();
@@ -246,6 +251,8 @@ void ImmersedBoundaryMembraneElasticityForce<DIM>::AddImmersedBoundaryForceContr
 template<unsigned DIM>
 void ImmersedBoundaryMembraneElasticityForce<DIM>::TagNodeRegions()
 {
+    assert(mpMesh != NULL);
+
     for (typename ImmersedBoundaryMesh<DIM, DIM>::ImmersedBoundaryElementIterator elem_it = mpMesh->GetElementIteratorBegin();
          elem_it != mpMesh->GetElementIteratorEnd();
          ++elem_it)
@@ -297,6 +304,8 @@ void ImmersedBoundaryMembraneElasticityForce<DIM>::TagNodeRegions()
 template<unsigned DIM>
 void ImmersedBoundaryMembraneElasticityForce<DIM>::TagApicalAndBasalLengths()
 {
+    assert(mpMesh != NULL);
+
     for (typename ImmersedBoundaryMesh<DIM, DIM>::ImmersedBoundaryElementIterator elem_it = mpMesh->GetElementIteratorBegin();
          elem_it != mpMesh->GetElementIteratorEnd();
          ++elem_it)

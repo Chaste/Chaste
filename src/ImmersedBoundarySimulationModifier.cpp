@@ -226,7 +226,7 @@ void ImmersedBoundarySimulationModifier<DIM>::AddImmersedBoundaryForceContributi
          iter != mForceCollection.end();
          ++iter)
     {
-        (*iter)->AddImmersedBoundaryForceContribution(mNodePairs);
+        (*iter)->AddImmersedBoundaryForceContribution(mNodePairs, *mpCellPopulation);
     }
 }
 

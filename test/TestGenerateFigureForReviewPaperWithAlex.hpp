@@ -65,20 +65,20 @@ public:
         // Find locations of the six vertices (and the seventh is the same as the first)
         std::vector<c_vector<double, 2> > vertices(7);
         double sixty_degrees = M_PI / 3.0;
-        for (unsigned vertex = 0 ; vertex < vertices.size() ; vertex++)
+        for (unsigned vertex = 0; vertex < vertices.size(); vertex++)
         {
             vertices[vertex][0] = cos((double)vertex * sixty_degrees);
             vertices[vertex][1] = sin((double)vertex * sixty_degrees);
         }
 
         // Between each pair of vertices, fill in the specified number of locations evenly spaced along the edge
-        for (unsigned vertex = 0 ; vertex < 6 ; vertex++)
+        for (unsigned vertex = 0; vertex < 6; vertex++)
         {
             c_vector<double, 2> this_vertex = vertices[vertex];
             c_vector<double, 2> next_vertex = vertices[vertex + 1];
             c_vector<double, 2> vec_between = next_vertex - this_vertex;
 
-            for (unsigned i = 0 ; i < numPtsPerSide ; i++)
+            for (unsigned i = 0; i < numPtsPerSide; i++)
             {
                 locations[vertex * numPtsPerSide + i] = this_vertex + i * vec_between / (double)numPtsPerSide;
             }
@@ -106,9 +106,9 @@ public:
         global_offset[1] = 0.15;
 
         // Calculate the centres
-        for (unsigned x = 0 ; x < num_x ; x++)
+        for (unsigned x = 0; x < num_x; x++)
         {
-            for (unsigned y = 0 ; y < num_y ; y++)
+            for (unsigned y = 0; y < num_y; y++)
             {
                 unsigned idx = x * num_y + y;
 
@@ -124,11 +124,11 @@ public:
         std::vector<ImmersedBoundaryElement<2,2>*> elems;
 
         // For each calculated centre, create the nodes representing each location around that hexagon
-        for (unsigned offset = 0 ; offset < offsets.size() ; offset++)
+        for (unsigned offset = 0; offset < offsets.size(); offset++)
         {
             std::vector<Node<2>*> nodes_this_elem;
 
-            for (unsigned location = 0 ; location < node_locations.size() ; location++)
+            for (unsigned location = 0; location < node_locations.size(); location++)
             {
                 unsigned index = offset * node_locations.size() + location;
                 Node<2>* p_node = new Node<2>(index, offsets[offset] + 0.95 * rad * node_locations[location], true);
@@ -160,7 +160,7 @@ public:
         simulator.AddSimulationModifier(p_main_modifier);
 
         // Add force laws
-        MAKE_PTR_ARGS(ImmersedBoundaryMembraneElasticityForce<2>, p_boundary_force, (cell_population));
+        MAKE_PTR(ImmersedBoundaryMembraneElasticityForce<2>, p_boundary_force);
         p_main_modifier->AddImmersedBoundaryForce(p_boundary_force);
         p_boundary_force->SetSpringConstant(0.5 * 1e7);
 

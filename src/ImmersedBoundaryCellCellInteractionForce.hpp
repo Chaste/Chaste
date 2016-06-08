@@ -75,9 +75,6 @@ private:
 
 protected:
 
-    /** The immersed boundary cell population. */
-    ImmersedBoundaryCellPopulation<DIM>* mpCellPopulation;
-
     /** The immersed boundary mesh. */
     ImmersedBoundaryMesh<DIM,DIM>* mpMesh;
 
@@ -112,11 +109,6 @@ public:
     /**
      * Constructor.
      */
-    ImmersedBoundaryCellCellInteractionForce(ImmersedBoundaryCellPopulation<DIM>& rCellPopulation);
-
-    /**
-     * For serialization.
-     */
     ImmersedBoundaryCellCellInteractionForce();
 
     /**
@@ -129,9 +121,11 @@ public:
      *
      * Calculates the force on each node in the immersed boundary cell population as a result of cell-cell interactions.
      *
+     * @param rNodePairs reference to a vector set of node pairs between which to contribute the force
      * @param rCellPopulation reference to the cell population
      */
-    virtual void AddImmersedBoundaryForceContribution(std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs);
+    void AddImmersedBoundaryForceContribution(std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs,
+            ImmersedBoundaryCellPopulation<DIM>& rCellPopulation);
 
     /**
      * @return mProteinNodeAttributeLocations

@@ -40,8 +40,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "RandomNumberGenerator.hpp"
 #include "ExecutableSupport.hpp"
 
-#include "Debug.hpp"
-
 /*
  * These headers handle passing parameters to the executable.
  */
@@ -79,11 +77,11 @@ int main(int argc, char *argv[])
                     ("ID", boost::program_options::value<unsigned>()->default_value(0),"ID of the simulation (for output)")
                     ("K", boost::program_options::value<unsigned>()->default_value(0),"Cell-cell spring const for the simulation");
 
-    // define parse command line into variables_map
+    // Define parse command line into variables_map
     boost::program_options::variables_map variables_map;
     boost::program_options::store(parse_command_line(argc, argv, general_options), variables_map);
 
-    // print help message if wanted
+    // Print help message if wanted
     if (variables_map.count("help"))
     {
         std::cout << setprecision(3) << general_options << "\n";
@@ -91,9 +89,9 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    // get id and name from command line
-    unsigned simulation_id=variables_map["ID"].as<unsigned>();
-    unsigned spring_const=variables_map["K"].as<unsigned>();
+    // Get ID and name from command line
+    unsigned simulation_id = variables_map["ID"].as<unsigned>();
+    unsigned spring_const = variables_map["K"].as<unsigned>();
 
     SetupSingletons(simulation_id);
     SetupAndRunSimulation(simulation_id, spring_const);
@@ -114,7 +112,7 @@ void SetupSingletons(unsigned simulationId)
 
 void DestroySingletons()
 {
-    // this is from the tearDown method of the test suite
+    // This is from the tearDown method of the test suite
     SimulationTime::Destroy();
     RandomNumberGenerator::Destroy();
     CellPropertyRegistry::Instance()->Clear();
@@ -160,11 +158,11 @@ void SetupAndRunSimulation(unsigned simulation_id, unsigned spring_const)
     simulator.AddSimulationModifier(p_main_modifier);
 
     // Add force laws
-    MAKE_PTR_ARGS(ImmersedBoundaryMembraneElasticityForce<2>, p_boundary_force, (cell_population));
+    MAKE_PTR(ImmersedBoundaryMembraneElasticityForce<2>, p_boundary_force);
     p_main_modifier->AddImmersedBoundaryForce(p_boundary_force);
     p_boundary_force->SetSpringConstant(1e8);
 
-    MAKE_PTR_ARGS(ImmersedBoundaryCellCellInteractionForce<2>, p_cell_cell_force, (cell_population));
+    MAKE_PTR(ImmersedBoundaryCellCellInteractionForce<2>, p_cell_cell_force);
     p_main_modifier->AddImmersedBoundaryForce(p_cell_cell_force);
     p_cell_cell_force->SetSpringConstant(fp_spring_const);
 
@@ -180,21 +178,20 @@ void SetupAndRunSimulation(unsigned simulation_id, unsigned spring_const)
     simulator.SetEndTime(200.0 * dt);
     simulator.Solve();
 
-
     // Get height of basement lamina
     double lamina_height = 0.0;
-    for (unsigned node_idx = 0 ; node_idx < p_mesh->GetElement(0)->GetNumNodes() ; node_idx++)
+    for (unsigned node_idx = 0; node_idx < p_mesh->GetElement(0)->GetNumNodes(); node_idx++)
     {
         lamina_height += p_mesh->GetElement(0)->GetNode(node_idx)->rGetModifiableLocation()[1];
     }
     lamina_height /= p_mesh->GetElement(0)->GetNumNodes();
 
     // Kick
-    for (unsigned elem_idx = 1 ; elem_idx < p_mesh->GetNumElements() ; elem_idx++)
+    for (unsigned elem_idx = 1; elem_idx < p_mesh->GetNumElements(); elem_idx++)
     {
         double kick = 1.15 - 0.3 * RandomNumberGenerator::Instance()->ranf();
 
-        for (unsigned node_idx = 0 ; node_idx < p_mesh->GetElement(elem_idx)->GetNumNodes() ; node_idx++)
+        for (unsigned node_idx = 0; node_idx < p_mesh->GetElement(elem_idx)->GetNumNodes(); node_idx++)
         {
             double new_height = lamina_height + kick * (p_mesh->GetElement(elem_idx)->GetNode(node_idx)->rGetLocation()[1] - lamina_height);
 

@@ -75,9 +75,6 @@ private:
 
 protected:
 
-    /** The cell population. */
-    ImmersedBoundaryCellPopulation<DIM>* mpCellPopulation;
-
     /** The immersed boundary mesh. */
     ImmersedBoundaryMesh<DIM,DIM>* mpMesh;
 
@@ -161,11 +158,6 @@ public:
     /**
      * Constructor.
      */
-    ImmersedBoundaryMembraneElasticityForce(ImmersedBoundaryCellPopulation<DIM>& rCellPopulation);
-
-    /**
-     * For serialization.
-     */
     ImmersedBoundaryMembraneElasticityForce();
 
     /**
@@ -176,12 +168,13 @@ public:
     /**
      * Overridden AddImmersedBoundaryForceContribution() method.
      *
-     * Calculates the force on each node in the vertex-based cell population based on the energy function
-     * Farhadifar's model.
+     * Calculates the force on each node in the immersed boundary cell population as a result of cell-cell interactions.
      *
+     * @param rNodePairs reference to a vector set of node pairs between which to contribute the force
      * @param rCellPopulation reference to the cell population
      */
-    virtual void AddImmersedBoundaryForceContribution(std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs);
+    void AddImmersedBoundaryForceContribution(std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs,
+            ImmersedBoundaryCellPopulation<DIM>& rCellPopulation);
 
     /**
      * Set #mSpringConstant.

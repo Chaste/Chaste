@@ -94,7 +94,7 @@ public:
 
             ImmersedBoundaryMesh<2, 2> *p_mesh = new ImmersedBoundaryMesh<2, 2>(nodes, elems);
 
-            for (unsigned i = 0 ; i < 16 ; i++)
+            for (unsigned i = 0; i < 16; i++)
             {
                 double theta = 2.0 * M_PI * (double)i / 16.0;
 

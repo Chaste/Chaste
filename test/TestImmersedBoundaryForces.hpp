@@ -37,10 +37,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 
 #include "CheckpointArchiveTypes.hpp"
+#include "FileComparison.hpp"
+#include "CellsGenerator.hpp"
+#include "UniformlyDistributedCellCycleModel.hpp"
 
 // Includes from projects/ImmersedBoundary
 #include "ImmersedBoundaryCellCellInteractionForce.hpp"
 #include "ImmersedBoundaryMembraneElasticityForce.hpp"
+#include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
 
 // This test is never run in parallel
 #include "FakePetscSetup.hpp"
@@ -140,5 +144,56 @@ public:
             // Tidy up
             delete p_force;
         }
+    }
+
+    void TestImmersedBoundaryForceOutputParameters()
+    {
+        EXIT_IF_PARALLEL;
+        std::string output_directory = "TestForcesOutputParameters";
+        OutputFileHandler output_file_handler(output_directory, false);
+
+        // Test with ImmersedBoundaryCellCellInteractionForce
+        ImmersedBoundaryCellCellInteractionForce<2> cell_cell_force;
+        cell_cell_force.SetSpringConstant(1.2);
+        cell_cell_force.SetRestLength(3.4);
+        cell_cell_force.UseMorsePotential();
+
+        TS_ASSERT_EQUALS(cell_cell_force.GetIdentifier(), "ImmersedBoundaryCellCellInteractionForce-2");
+
+        out_stream cell_cell_force_parameter_file = output_file_handler.OpenOutputFile("ImmersedBoundaryCellCellInteractionForce.parameters");
+        cell_cell_force.OutputImmersedBoundaryForceParameters(cell_cell_force_parameter_file);
+        cell_cell_force_parameter_file->close();
+
+        {
+            FileFinder generated_file = output_file_handler.FindFile("ImmersedBoundaryCellCellInteractionForce.parameters");
+            FileFinder reference_file("projects/ImmersedBoundary/test/data/TestImmersedBoundaryForces/ImmersedBoundaryCellCellInteractionForce.parameters",
+                                      RelativeTo::ChasteSourceRoot);
+            FileComparison comparer(generated_file,reference_file);
+            TS_ASSERT(comparer.CompareFiles());
+        }
+
+        // Test with ImmersedBoundaryMembraneElasticityForce
+        ImmersedBoundaryMembraneElasticityForce<2> membrane_force;
+        membrane_force.SetSpringConstant(1.2);
+        membrane_force.SetRestLengthMultiplier(7.8);
+
+        TS_ASSERT_EQUALS(membrane_force.GetIdentifier(), "ImmersedBoundaryMembraneElasticityForce-2");
+
+        out_stream membrane_force_parameter_file = output_file_handler.OpenOutputFile("ImmersedBoundaryMembraneElasticityForce.parameters");
+        membrane_force.OutputImmersedBoundaryForceParameters(membrane_force_parameter_file);
+        membrane_force_parameter_file->close();
+
+        {
+            FileFinder generated_file = output_file_handler.FindFile("ImmersedBoundaryMembraneElasticityForce.parameters");
+            FileFinder reference_file("projects/ImmersedBoundary/test/data/TestImmersedBoundaryForces/ImmersedBoundaryMembraneElasticityForce.parameters",
+                                      RelativeTo::ChasteSourceRoot);
+            FileComparison comparer(generated_file,reference_file);
+            TS_ASSERT(comparer.CompareFiles());
+        }
+
+        // For coverage of AbstractImmersedBoundaryForce::OutputImmersedBoundaryForceInfo()
+        out_stream other_file = output_file_handler.OpenOutputFile("other_file.parameters");
+        membrane_force.OutputImmersedBoundaryForceInfo(other_file);
+        other_file->close();
     }
 };

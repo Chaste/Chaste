@@ -117,7 +117,7 @@ public:
         typedef boost::multi_array<double, 3> real_array_2d;
 
         // Create 2D wisdom
-        for (unsigned i = 16 ; i <= mMaxArraySize ; i*=2)
+        for (unsigned i = 16; i <= mMaxArraySize; i*=2)
         {
             real_array_2d input(boost::extents[2][i][i]);
             complex_array_2d output(boost::extents[2][i][(i/2) + 1]);
@@ -152,11 +152,11 @@ public:
                                             FFTW_PATIENT);
 
             // We now verify that the forward followed by inverse transform produces the correct result
-            for (unsigned dim = 0 ; dim < 2 ; dim++)
+            for (unsigned dim = 0; dim < 2; dim++)
             {
-                for (unsigned x = 0 ; x < i ; x++)
+                for (unsigned x = 0; x < i; x++)
                 {
-                    for (unsigned y = 0 ; y < i ; y++)
+                    for (unsigned y = 0; y < i; y++)
                     {
                         input[dim][x][y] = RandomNumberGenerator::Instance()->ranf();
                     }
@@ -166,11 +166,11 @@ public:
             fftw_execute(plan_f);
             fftw_execute(plan_b);
 
-            for (unsigned dim = 0 ; dim < 2 ; dim++)
+            for (unsigned dim = 0; dim < 2; dim++)
             {
-                for (unsigned x = 0 ; x < i ; x++)
+                for (unsigned x = 0; x < i; x++)
                 {
-                    for (unsigned y = 0 ; y < i ; y++)
+                    for (unsigned y = 0; y < i; y++)
                     {
                         TS_ASSERT_DELTA(input[dim][x][y], check[dim][x][y]/(i*i), 1e-10);
                     }
@@ -197,7 +197,7 @@ public:
         typedef boost::multi_array<double, 3> real_array_2d;
 
         // Create 2D wisdom
-        for (unsigned i = 16 ; i <= mMaxArraySize ; i*=2)
+        for (unsigned i = 16; i <= mMaxArraySize; i*=2)
         {
             real_array_2d input(boost::extents[3][i][i]);
             complex_array_2d output(boost::extents[3][i][(i/2) + 1]);
@@ -232,11 +232,11 @@ public:
                                             FFTW_PATIENT);
 
             // We now verify that the forward followed by inverse transform produces the correct result
-            for (unsigned dim = 0 ; dim < 3 ; dim++)
+            for (unsigned dim = 0; dim < 3; dim++)
             {
-                for (unsigned x = 0 ; x < i ; x++)
+                for (unsigned x = 0; x < i; x++)
                 {
-                    for (unsigned y = 0 ; y < i ; y++)
+                    for (unsigned y = 0; y < i; y++)
                     {
                         input[dim][x][y] = RandomNumberGenerator::Instance()->ranf();
                     }
@@ -246,11 +246,11 @@ public:
             fftw_execute(plan_f);
             fftw_execute(plan_b);
 
-            for (unsigned dim = 0 ; dim < 3 ; dim++)
+            for (unsigned dim = 0; dim < 3; dim++)
             {
-                for (unsigned x = 0 ; x < i ; x++)
+                for (unsigned x = 0; x < i; x++)
                 {
-                    for (unsigned y = 0 ; y < i ; y++)
+                    for (unsigned y = 0; y < i; y++)
                     {
                         TS_ASSERT_DELTA(input[dim][x][y], check[dim][x][y]/(i*i), 1e-10);
                     }

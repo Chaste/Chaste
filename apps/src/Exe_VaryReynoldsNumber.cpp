@@ -38,10 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "SimulationTime.hpp"
 #include "RandomNumberGenerator.hpp"
-
 #include "ExecutableSupport.hpp"
-
-#include "Debug.hpp"
 
 /*
  * These headers handle passing parameters to the executable.
@@ -62,7 +59,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "MutableVertexMesh.hpp"
-
 
 void SetupSingletons();
 void DestroySingletons();
@@ -85,7 +81,7 @@ int main(int argc, char *argv[])
     boost::program_options::variables_map variables_map;
     boost::program_options::store(parse_command_line(argc, argv, general_options), variables_map);
 
-    // print help message if wanted
+    // Print help message if wanted
     if (variables_map.count("help"))
     {
         std::cout << setprecision(3) << general_options << "\n";
@@ -93,7 +89,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    // get id and name from command line
+    // Get ID and name from command line
     unsigned simulation_id = variables_map["ID"].as<unsigned>();
     double generic_double = variables_map["D"].as<double>();
 
@@ -116,7 +112,7 @@ void SetupSingletons()
 
 void DestroySingletons()
 {
-    // this is from the tearDown method of the test suite
+    // This is from the tearDown method of the test suite
     SimulationTime::Destroy();
     RandomNumberGenerator::Destroy();
     CellPropertyRegistry::Instance()->Clear();
@@ -160,11 +156,11 @@ void SetupAndRunSimulation(unsigned simulation_id, double reynolds_number)
     MAKE_PTR(ImmersedBoundarySimulationModifier<2>, p_main_modifier);
     simulator.AddSimulationModifier(p_main_modifier);
 
-    // Set the reynolds number which is set on the command line
+    // Set the Reynolds number, which is set on the command line
     p_main_modifier->SetReynoldsNumber(reynolds_number);
 
     // Add force laws
-    MAKE_PTR_ARGS(ImmersedBoundaryMembraneElasticityForce<2>, p_boundary_force, (cell_population));
+    MAKE_PTR(ImmersedBoundaryMembraneElasticityForce<2>, p_boundary_force);
     p_main_modifier->AddImmersedBoundaryForce(p_boundary_force);
 
 //        MAKE_PTR_ARGS(ImmersedBoundaryCellCellInteractionForce<2>, p_cell_cell_force, (cell_population));

@@ -1,0 +1,4 @@
+			<SpringConstant>1.2</SpringConstant>
+			<RestLengthMultiplier>7.8</RestLengthMultiplier>
+			<BasementSpringConstantModifier>5</BasementSpringConstantModifier>
+			<BasementRestLengthModifier>0.5</BasementRestLengthModifier>

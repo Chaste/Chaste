@@ -71,8 +71,8 @@ ImmersedBoundary2dArrays<DIM>::ImmersedBoundary2dArrays(ImmersedBoundaryMesh<DIM
     mSin2y.resize(reduced_y);
 
     /*
-     * There are several constants used in the Fourier-domain as part of the Navier-Stokes solution which are constant
-     * once grid sizes are known.  We pre-calculate these to eliminate re-calculation at every timestep.
+     * There are several constants used in the Fourier domain as part of the Navier-Stokes solution which are constant
+     * once grid sizes are known. We pre-calculate these to eliminate re-calculation at every time step.
      */
     double x_spacing = 1.0 / (double) num_gridpts_x;
     double y_spacing = 1.0 / (double) num_gridpts_y;
@@ -155,6 +155,18 @@ template<unsigned DIM>
 const std::vector<double>& ImmersedBoundary2dArrays<DIM>::rGetSin2y() const
 {
     return mSin2y;
+}
+
+template<unsigned DIM>
+ImmersedBoundaryMesh<DIM,DIM>* ImmersedBoundary2dArrays<DIM>::GetMesh()
+{
+    return mpMesh;
+}
+
+template<unsigned DIM>
+bool ImmersedBoundary2dArrays<DIM>::HasActiveSources()
+{
+    return mActiveSources;
 }
 
 // Explicit instantiation

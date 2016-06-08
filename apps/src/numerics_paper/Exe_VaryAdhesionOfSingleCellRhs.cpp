@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2015, University of Oxford.
+Copyright (c) 2005-2016, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -40,8 +40,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "RandomNumberGenerator.hpp"
 #include "ExecutableSupport.hpp"
 
-#include "Debug.hpp"
-
 /*
  * These headers handle passing parameters to the executable.
  */
@@ -80,11 +78,11 @@ int main(int argc, char *argv[])
                     ("L", boost::program_options::value<unsigned>()->default_value(0),"Local multiplier for the cell-cell spring const")
                     ("G", boost::program_options::value<unsigned>()->default_value(0),"Global multiplier for the cell-cell spring const");
 
-    // define parse command line into variables_map
+    // Define parse command line into variables_map
     boost::program_options::variables_map variables_map;
     boost::program_options::store(parse_command_line(argc, argv, general_options), variables_map);
 
-    // print help message if wanted
+    // Print help message if wanted
     if (variables_map.count("help"))
     {
         std::cout << setprecision(3) << general_options << "\n";
@@ -92,7 +90,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    // get id and name from command line
+    // Get ID and name from command line
     unsigned kick = variables_map["K"].as<unsigned>();
     unsigned local = variables_map["L"].as<unsigned>();
     unsigned global = variables_map["G"].as<unsigned>();
@@ -116,7 +114,7 @@ void SetupSingletons()
 
 void DestroySingletons()
 {
-    // this is from the tearDown method of the test suite
+    // This is from the tearDown method of the test suite
     SimulationTime::Destroy();
     RandomNumberGenerator::Destroy();
     CellPropertyRegistry::Instance()->Clear();
@@ -131,6 +129,7 @@ void OutputOnCompletion(unsigned kick, unsigned localSpringConst, unsigned globa
     // Send it to the console
     std::cout << message.str() << std::flush;
 }
+
 void SetupAndRunSimulation(unsigned kick, unsigned localSpringConst, unsigned globalSpringConst)
 {
     double reference_spring_const = 5.0 * 1e6;                      // the reference global spring const
@@ -166,8 +165,8 @@ void SetupAndRunSimulation(unsigned kick, unsigned localSpringConst, unsigned gl
     MAKE_PTR(ImmersedBoundarySimulationModifier<2>, p_main_modifier);
     simulator.AddSimulationModifier(p_main_modifier);
 
-    // Add force laws
-    MAKE_PTR_ARGS(ImmersedBoundaryMembraneElasticityForce<2>, p_boundary_force, (cell_population));
+    // Add force law
+    MAKE_PTR(ImmersedBoundaryMembraneElasticityForce<2>, p_boundary_force);
     p_main_modifier->AddImmersedBoundaryForce(p_boundary_force);
     p_boundary_force->SetSpringConstant(reference_spring_const);
 
@@ -196,7 +195,7 @@ void SetupAndRunSimulation(unsigned kick, unsigned localSpringConst, unsigned gl
 
     // Get height of basement lamina
     double lamina_height = 0.0;
-    for (unsigned node_idx = 0 ; node_idx < p_mesh->GetElement(0)->GetNumNodes() ; node_idx++)
+    for (unsigned node_idx = 0; node_idx < p_mesh->GetElement(0)->GetNumNodes(); node_idx++)
     {
         lamina_height += p_mesh->GetElement(0)->GetNode(node_idx)->rGetModifiableLocation()[1];
     }
@@ -207,7 +206,7 @@ void SetupAndRunSimulation(unsigned kick, unsigned localSpringConst, unsigned gl
 
     double x_centroid_before = p_mesh->GetCentroidOfElement(3)[0];
 
-    for (unsigned node_idx = 0 ; node_idx < p_mesh->GetElement(3)->GetNumNodes() ; node_idx++)
+    for (unsigned node_idx = 0; node_idx < p_mesh->GetElement(3)->GetNumNodes(); node_idx++)
     {
         // Scale the node to its new height based on the kick parameter
         double new_height = lamina_height + fp_sim_kick * (p_mesh->GetElement(3)->GetNode(node_idx)->rGetLocation()[1] - lamina_height);

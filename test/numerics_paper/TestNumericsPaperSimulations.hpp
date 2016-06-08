@@ -101,7 +101,7 @@ public:
         simulator.AddSimulationModifier(p_main_modifier);
 
         // Add force laws
-        MAKE_PTR_ARGS(ImmersedBoundaryMembraneElasticityForce<2>, p_boundary_force, (cell_population));
+        MAKE_PTR(ImmersedBoundaryMembraneElasticityForce<2>, p_boundary_force);
         p_main_modifier->AddImmersedBoundaryForce(p_boundary_force);
         p_boundary_force->SetSpringConstant(1e8);
 
@@ -224,11 +224,10 @@ public:
             simulation.AddSimulationModifier(p_main_modifier);
 
             // Add force law
-            MAKE_PTR_ARGS(ImmersedBoundaryMembraneElasticityForce<2>, p_boundary_force, (cell_population));
+            MAKE_PTR(ImmersedBoundaryMembraneElasticityForce<2>, p_boundary_force);
             p_main_modifier->AddImmersedBoundaryForce(p_boundary_force);
             p_boundary_force->SetSpringConstant(1e9);
             p_boundary_force->SetRestLengthMultiplier(0.5);
-
 
             std::string sim_output_dir = output_directory + "/sim";
             sim_output_dir += boost::lexical_cast<std::string>(sim_idx);

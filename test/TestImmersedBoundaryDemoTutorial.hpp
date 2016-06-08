@@ -135,14 +135,14 @@ public:
         MAKE_PTR(ImmersedBoundarySimulationModifier<2>, p_main_modifier);
         simulator.AddSimulationModifier(p_main_modifier);
 
-        /* We now associate {{{ImmersedBoundaryMembraneElasticityForce}}} and
+        /* We now associate an {{{ImmersedBoundaryMembraneElasticityForce}}} and
          * {{{ImmersedBoundaryCellCellInteractionForce}}} to the {{{SimulationModifier}}} which
          * handles the membrane elasticity forces.  These are created in a similar manner as above.*/
-        MAKE_PTR_ARGS(ImmersedBoundaryMembraneElasticityForce<2>, p_boundary_force, (cell_population));
+        MAKE_PTR(ImmersedBoundaryMembraneElasticityForce<2>, p_boundary_force);
         p_main_modifier->AddImmersedBoundaryForce(p_boundary_force);
         p_boundary_force->SetSpringConstant(0.5 * 1e8);
 
-        MAKE_PTR_ARGS(ImmersedBoundaryCellCellInteractionForce<2>, p_cell_cell_force, (cell_population));
+        MAKE_PTR(ImmersedBoundaryCellCellInteractionForce<2>, p_cell_cell_force);
         p_main_modifier->AddImmersedBoundaryForce(p_cell_cell_force);
         p_cell_cell_force->SetSpringConstant(1.0 * 1e6);
 

@@ -155,9 +155,9 @@ public:
 //        std::vector<std::vector<double> > force_grid_y = p_mod->mFluidForceGridY;
 //
 //        // First check that there is no force propagated outside the sphere of influence of node 0
-//        for (unsigned y = 0 ; y < p_mod->mNumGridPtsY ; y++)
+//        for (unsigned y = 0; y < p_mod->mNumGridPtsY; y++)
 //        {
-//            for (unsigned x = 0 ; x < p_mod->mNumGridPtsX ; x++)
+//            for (unsigned x = 0; x < p_mod->mNumGridPtsX; x++)
 //            {
 //                if ( x < 3 || x > 6)
 //                {
@@ -219,9 +219,9 @@ public:
 //        // Read in vel_x
 //        ifstream f_vel_x;
 //        f_vel_x.open("projects/ImmersedBoundary/test/data/vel_x.dat");
-//        for (unsigned y = 0 ; y < num_gridpts_y ; y++)
+//        for (unsigned y = 0; y < num_gridpts_y; y++)
 //        {
-//            for (unsigned x = 0 ; x < num_gridpts_x ; x++)
+//            for (unsigned x = 0; x < num_gridpts_x; x++)
 //            {
 //                f_vel_x >> vel_x[y][x];
 //            }
@@ -231,9 +231,9 @@ public:
 //        // Read in vel_y
 //        ifstream f_vel_y;
 //        f_vel_y.open("projects/ImmersedBoundary/test/data/vel_y.dat");
-//        for (unsigned y = 0 ; y < num_gridpts_y ; y++)
+//        for (unsigned y = 0; y < num_gridpts_y; y++)
 //        {
-//            for (unsigned x = 0 ; x < num_gridpts_x ; x++)
+//            for (unsigned x = 0; x < num_gridpts_x; x++)
 //            {
 //                f_vel_y >> vel_y[y][x];
 //            }
@@ -243,9 +243,9 @@ public:
 //        // Read in hand_upwind_x
 //        ifstream f_hand_upwind_x;
 //        f_hand_upwind_x.open("projects/ImmersedBoundary/test/data/upwind_x.dat");
-//        for (unsigned y = 0 ; y < num_gridpts_y ; y++)
+//        for (unsigned y = 0; y < num_gridpts_y; y++)
 //        {
-//            for (unsigned x = 0 ; x < num_gridpts_x ; x++)
+//            for (unsigned x = 0; x < num_gridpts_x; x++)
 //            {
 //                f_hand_upwind_x >> hand_upwind_x[y][x];
 //            }
@@ -255,9 +255,9 @@ public:
 //        // Read in hand_upwind_y
 //        ifstream f_hand_upwind_y;
 //        f_hand_upwind_y.open("projects/ImmersedBoundary/test/data/upwind_y.dat");
-//        for (unsigned y = 0 ; y < num_gridpts_y ; y++)
+//        for (unsigned y = 0; y < num_gridpts_y; y++)
 //        {
-//            for (unsigned x = 0 ; x < num_gridpts_x ; x++)
+//            for (unsigned x = 0; x < num_gridpts_x; x++)
 //            {
 //                f_hand_upwind_y >> hand_upwind_y[y][x];
 //            }
@@ -275,9 +275,9 @@ public:
 //        p_mod->UpwindScheme(vel_x, vel_y, cpp_upwind_x, cpp_upwind_y);
 //
 //        // Loop through the hand and c++ calculated grids to check the values agree
-//        for (unsigned y = 0 ; y < num_gridpts_y ; y++)
+//        for (unsigned y = 0; y < num_gridpts_y; y++)
 //        {
-//            for (unsigned x = 0 ; x < num_gridpts_x ; x++)
+//            for (unsigned x = 0; x < num_gridpts_x; x++)
 //            {
 //                TS_ASSERT_LESS_THAN(fabs(hand_upwind_x[y][x] - cpp_upwind_x[y][x]), 1e-10);
 //                TS_ASSERT_LESS_THAN(fabs(hand_upwind_y[y][x] - cpp_upwind_y[y][x]), 1e-10);
@@ -313,9 +313,9 @@ public:
 //        // Read in matrix_a
 //        ifstream f_randn_mat_a;
 //        f_randn_mat_a.open("projects/ImmersedBoundary/test/data/matrix_a.dat");
-//        for (unsigned y = 0 ; y < num_gridpts_y ; y++)
+//        for (unsigned y = 0; y < num_gridpts_y; y++)
 //        {
-//            for (unsigned x = 0 ; x < num_gridpts_x ; x++)
+//            for (unsigned x = 0; x < num_gridpts_x; x++)
 //            {
 //                f_randn_mat_a >> randn_mat_a[y][x];
 //            }
@@ -325,9 +325,9 @@ public:
 //        // Read in matrix_b
 //        ifstream f_randn_mat_b;
 //        f_randn_mat_b.open("projects/ImmersedBoundary/test/data/matrix_b.dat");
-//        for (unsigned y = 0 ; y < num_gridpts_y ; y++)
+//        for (unsigned y = 0; y < num_gridpts_y; y++)
 //        {
-//            for (unsigned x = 0 ; x < num_gridpts_x ; x++)
+//            for (unsigned x = 0; x < num_gridpts_x; x++)
 //            {
 //                f_randn_mat_b >> randn_mat_b[y][x];
 //            }
@@ -340,9 +340,9 @@ public:
 //        f_imag.open("projects/ImmersedBoundary/test/data/ffta_imag.dat");
 //        double real_temp;
 //        double imag_temp;
-//        for (unsigned y = 0 ; y < num_gridpts_y ; y++)
+//        for (unsigned y = 0; y < num_gridpts_y; y++)
 //        {
-//            for (unsigned x = 0 ; x < num_gridpts_x ; x++)
+//            for (unsigned x = 0; x < num_gridpts_x; x++)
 //            {
 //                f_real >> real_temp;
 //                f_imag >> imag_temp;
@@ -355,9 +355,9 @@ public:
 //        // Read in real part of the inverse transform of mat_a + i * mat_b;
 //        ifstream f_ifft;
 //        f_ifft.open("projects/ImmersedBoundary/test/data/ifftaplusib_real.dat");
-//        for (unsigned y = 0 ; y < num_gridpts_y ; y++)
+//        for (unsigned y = 0; y < num_gridpts_y; y++)
 //        {
-//            for (unsigned x = 0 ; x < num_gridpts_x ; x++)
+//            for (unsigned x = 0; x < num_gridpts_x; x++)
 //            {
 //                f_ifft >> matlab_ifft2_aplusib[y][x];
 //            }
@@ -366,9 +366,9 @@ public:
 //
 //        // Create matrix_a + i * matrix_b
 //        std::vector<std::vector<std::complex<double> > > mat_aplusib; p_mod->SetupGrid(mat_aplusib);
-//        for (unsigned y = 0 ; y < num_gridpts_y ; y++)
+//        for (unsigned y = 0; y < num_gridpts_y; y++)
 //        {
-//            for (unsigned x = 0 ; x < num_gridpts_x ; x++)
+//            for (unsigned x = 0; x < num_gridpts_x; x++)
 //            {
 //                mat_aplusib[y][x] = randn_mat_a[y][x] + (p_mod->mI) * randn_mat_b[y][x];
 //            }
@@ -390,9 +390,9 @@ public:
 //        /*
 //         * Loop through the arrays to check values agree
 //         */
-//        for (unsigned y = 0 ; y < num_gridpts_y ; y++)
+//        for (unsigned y = 0; y < num_gridpts_y; y++)
 //        {
-//            for (unsigned x = 0 ; x < num_gridpts_x ; x++)
+//            for (unsigned x = 0; x < num_gridpts_x; x++)
 //            {
 //                TS_ASSERT_LESS_THAN(abs(matlab_fft2_mat_a[y][x] - cpp_fftw_mat_a[y][x]), 1e-10);
 //                TS_ASSERT_LESS_THAN(fabs(matlab_ifft2_aplusib[y][x] - cpp_ifftw_aplusib[y][x]), 1e-10);
@@ -407,9 +407,9 @@ public:
 //
 //        p_mod->Fft2DForwardRealToComplex(randn_mat_b, cpp_fftw_mat_b);
 //        p_mod->Fft2DInverseComplexToReal(cpp_fftw_mat_b, cpp_ifftw_fftw_mat_b);
-//        for (unsigned y = 0 ; y < num_gridpts_y ; y++)
+//        for (unsigned y = 0; y < num_gridpts_y; y++)
 //        {
-//            for (unsigned x = 0 ; x < num_gridpts_x ; x++)
+//            for (unsigned x = 0; x < num_gridpts_x; x++)
 //            {
 //                TS_ASSERT_LESS_THAN(fabs(randn_mat_b[y][x] - cpp_ifftw_fftw_mat_b[y][x]), 1e-10);
 //            }
@@ -436,7 +436,7 @@ public:
 //
 //        std::complex<double>* c_it = complex_input.origin();
 //        double*               r_it = real_input.origin();
-//        for ( ; c_it < (complex_input.origin() + complex_input.num_elements()) ; ++c_it, ++r_it)
+//        for (; c_it < (complex_input.origin() + complex_input.num_elements()); ++c_it, ++r_it)
 //        {
 //            *c_it = RandomNumberGenerator::Instance()->ranf() + 1i * RandomNumberGenerator::Instance()->ranf();
 //            *r_it = RandomNumberGenerator::Instance()->ranf();
@@ -448,16 +448,16 @@ public:
 //        c_it = complex_input.origin();
 //        r_it = real_input.origin();
 //        std::complex<double>* out_it = complex_output_1.origin();
-//        for ( ; out_it < (complex_output_1.origin() + complex_output_1.num_elements()) ; ++c_it, ++r_it, ++out_it)
+//        for (; out_it < (complex_output_1.origin() + complex_output_1.num_elements()); ++c_it, ++r_it, ++out_it)
 //        {
 //            *out_it = (*r_it) * (*c_it);
 //        }
 //
 //        double it_time = timer.GetElapsedTime();
 //
-//        for (unsigned i=0 ; i < 4096 ; i++)
+//        for (unsigned i=0; i < 4096; i++)
 //        {
-//            for (unsigned j=0 ; j < 4096 ; j++)
+//            for (unsigned j=0; j < 4096; j++)
 //            {
 //                complex_output_2[i][j] = real_input[i][j] * complex_input[i][j];
 //            }
@@ -466,9 +466,9 @@ public:
 //        double loop_time = timer.GetElapsedTime() - it_time;
 //
 //
-//        for (unsigned i=0 ; i < 4096 ; i++)
+//        for (unsigned i=0; i < 4096; i++)
 //        {
-//            for (unsigned j=0 ; j < 4096 ; j++)
+//            for (unsigned j=0; j < 4096; j++)
 //            {
 //                TS_ASSERT_DELTA(complex_output_1[i][j].real(), complex_output_2[i][j].real(),  1e-10);
 //                TS_ASSERT_DELTA(complex_output_1[i][j].imag(), complex_output_2[i][j].imag(),  1e-10);
@@ -532,9 +532,9 @@ public:
 //        std::vector<std::vector<double> > force_grid_y = p_mod->mFluidForceGridY;
 //
 //        // Check that there is no force propagated in the y-direction
-//        for (unsigned y = 0 ; y < p_mod->mNumGridPtsY ; y++)
+//        for (unsigned y = 0; y < p_mod->mNumGridPtsY; y++)
 //        {
-//            for (unsigned x = 0 ; x < p_mod->mNumGridPtsX ; x++)
+//            for (unsigned x = 0; x < p_mod->mNumGridPtsX; x++)
 //            {
 //                TS_ASSERT_LESS_THAN(fabs(force_grid_y[y][x]), 1e-15);
 //            }
@@ -548,18 +548,18 @@ public:
 ////        const std::vector<std::vector<double> > vel_grid_y = p_mesh->rGetFluidVelocityGridY();
 //
 ////        // All velocity should be in the positive x direction
-////        for (unsigned y = 0 ; y < p_mod->mNumGridPtsY ; y++)
+////        for (unsigned y = 0; y < p_mod->mNumGridPtsY; y++)
 ////        {
-////            for (unsigned x = 0 ; x < p_mod->mNumGridPtsX ; x++)
+////            for (unsigned x = 0; x < p_mod->mNumGridPtsX; x++)
 ////            {
 ////                TS_ASSERT(vel_grid_x[y][x] >= 0.0);
 ////            }
 ////        }
 //
 //        p_mod->ClearForces();
-//        for (unsigned y = 0 ; y < p_mod->mNumGridPtsY ; y++)
+//        for (unsigned y = 0; y < p_mod->mNumGridPtsY; y++)
 //        {
-//            for (unsigned x = 0 ; x < p_mod->mNumGridPtsX ; x++)
+//            for (unsigned x = 0; x < p_mod->mNumGridPtsX; x++)
 //            {
 //                p_mod->mFluidForceGridX[y][x] = 1.0;
 //            }
