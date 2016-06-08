@@ -4531,6 +4531,8 @@ class mathml_apply(Colourable, mathml_constructor, mathml_units_mixin):
         if units is current_units:
             return
         # Next, check if the required units can be achieved by suitable choices for operand units
+        if isinstance(current_units, cellml_units):
+            current_units = UnitsSet([current_units], self)
         done = False
         if units in current_units:
             # They can!
