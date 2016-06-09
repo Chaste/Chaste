@@ -266,6 +266,11 @@ public:
     double GetBoxWidth() const;
 
     /**
+     * @return Whether the domain is periodic in x
+     */
+    bool GetIsPeriodicInX() const;
+
+    /**
      * @return the number of rows in the DIM-1th direction on this process.
      */
     unsigned GetNumRowsOfBoxes() const;

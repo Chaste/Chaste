@@ -397,6 +397,12 @@ double DistributedBoxCollection<DIM>::GetBoxWidth() const
 }
 
 template<unsigned DIM>
+bool DistributedBoxCollection<DIM>::GetIsPeriodicInX() const
+{
+    return mIsPeriodicInX;
+}
+
+template<unsigned DIM>
 unsigned DistributedBoxCollection<DIM>::GetNumRowsOfBoxes() const
 {
     return mpDistributedBoxStackFactory->GetHigh() - mpDistributedBoxStackFactory->GetLow();

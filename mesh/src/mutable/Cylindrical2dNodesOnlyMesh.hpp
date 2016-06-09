@@ -140,6 +140,14 @@ public:
      * @return index of new node
      */
     unsigned AddNode(Node<2>* pNewNode);
+
+    /**
+     * Overridden RefreshMesh() method.
+     *
+     * If the location is outside the domain width, move it to
+     * within the boundary
+     */
+    void RefreshMesh();
 };
 
 namespace boost

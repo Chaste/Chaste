@@ -472,15 +472,16 @@ void NodesOnlyMesh<SPACE_DIM>::EnlargeBoxCollection()
     int new_local_rows = num_local_rows + (int)(PetscTools::AmTopMost()) + (int)(PetscTools::AmMaster());
 
     c_vector<double, 2*SPACE_DIM> current_domain_size = mpBoxCollection->rGetDomainSize();
-    c_vector<double, 2*SPACE_DIM> new_domain_size;
+    c_vector<double, 2*SPACE_DIM> new_domain_size = current_domain_size;
 
     double fudge = 1e-14;
-    for (unsigned d=0; d < SPACE_DIM; d++)
+    // We don't enlarge the x direction if periodic
+    unsigned d0 = ( mpBoxCollection->GetIsPeriodicInX() ) ? 1 : 0;
+    for (unsigned d=d0; d < SPACE_DIM; d++)
     {
         new_domain_size[2*d] = current_domain_size[2*d] - (mMaximumInteractionDistance - fudge);
         new_domain_size[2*d+1] = current_domain_size[2*d+1] + (mMaximumInteractionDistance - fudge);
     }
-
     SetUpBoxCollection(mMaximumInteractionDistance, new_domain_size, new_local_rows);
 }
 
@@ -492,6 +493,9 @@ bool NodesOnlyMesh<SPACE_DIM>::IsANodeCloseToDomainBoundary()
     int is_local_node_close = 0;
     c_vector<double, 2*SPACE_DIM> domain_boundary = mpBoxCollection->rGetDomainSize();
 
+    // We ignore the x direction if the domain is periodic in x
+    unsigned d0 = ( mpBoxCollection->GetIsPeriodicInX() ) ? 1 : 0;
+
     for (typename AbstractMesh<SPACE_DIM, SPACE_DIM>::NodeIterator node_iter = this->GetNodeIteratorBegin();
          node_iter != this->GetNodeIteratorEnd();
          ++node_iter)
@@ -500,7 +504,7 @@ bool NodesOnlyMesh<SPACE_DIM>::IsANodeCloseToDomainBoundary()
         c_vector<double, SPACE_DIM> location;
         location = node_iter->rGetLocation();
 
-        for (unsigned d=0; d<SPACE_DIM; d++)
+        for (unsigned d=d0; d<SPACE_DIM; d++)
         {
             if (location[d] < (domain_boundary[2*d] + mMinimumNodeDomainBoundarySeparation) ||  location[d] > (domain_boundary[2*d+1] - mMinimumNodeDomainBoundarySeparation))
             {
