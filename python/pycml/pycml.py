@@ -2562,9 +2562,13 @@ class cellml_units(Colourable, element_base):
         self._cml_quotients = {}
         self._cml_hash = None
         return
-    
+
     def __repr__(self):
         return '<cellml_units %s @ 0x%x>' % (self.name, id(self))
+
+    def __contains__(self, item):
+        """Prevent the default implementation using Amara's __iter__ to give unexpected results."""
+        return False
 
     @property
     def _hash_tuple(self):
@@ -4088,7 +4092,9 @@ class mathml_constructor(mathml):
                 # Unknown or unexpected element
                 raise UnitsError(self, u''.join([
                     u'Unsupported element "', elt.localName, '".']))
-        if not return_set:
+        if return_set:
+            assert isinstance(u, UnitsSet)
+        else:
             u = u.extract()
         return u
 
@@ -4204,6 +4210,8 @@ class mathml_cn(mathml, mathml_units_mixin_tokens):
         if not return_set:
             u = self._cml_units.extract()
         else:
+            if not isinstance(self._cml_units, UnitsSet):
+                self._cml_units = UnitsSet([self._cml_units], expression=self)
             u = self._cml_units
         return u
 
@@ -4253,6 +4261,8 @@ class mathml_ci(mathml, mathml_units_mixin_tokens):
         if not return_set:
             u = self._cml_units.extract()
         else:
+            if not isinstance(self._cml_units, UnitsSet):
+                self._cml_units = UnitsSet([self._cml_units], expression=self)
             u = self._cml_units
         return u
     
@@ -4531,8 +4541,6 @@ class mathml_apply(Colourable, mathml_constructor, mathml_units_mixin):
         if units is current_units:
             return
         # Next, check if the required units can be achieved by suitable choices for operand units
-        if isinstance(current_units, cellml_units):
-            current_units = UnitsSet([current_units], self)
         done = False
         if units in current_units:
             # They can!
