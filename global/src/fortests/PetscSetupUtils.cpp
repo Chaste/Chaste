@@ -121,6 +121,9 @@ void PetscSetupUtils::InitialisePetsc()
     // The CommandLineArguments instance is filled in by the cxxtest test suite runner.
     CommandLineArguments* p_args = CommandLineArguments::Instance();
     PETSCEXCEPT(PetscInitialize(p_args->p_argc, p_args->p_argv, PETSC_NULL, PETSC_NULL));
+    // Work around what seems to be an Intel compiler bug/quirk that makes the cache stale,
+    // by using an explicit reset to ensure all code is aware we're running in parallel.
+    PetscTools::ResetCache();
 }
 
 
