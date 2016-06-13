@@ -41,7 +41,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * A stochastic cell-cycle model employed by Meineke et al (2001) in their off-lattice
- * model of the intestinal crypt (doi:10.1046/j.0960-7722.2001.00216.x).
+ * model of the intestinal crypt (doi:10.1046/j.0960-7722.2001.00216.x). Cells that
+ * are proliferating are assigned G1 phase durations drawn from a uniform distribution,
+ * which differs between stem and transit amplifying cells. All other cell-cycle phases
+ * are held constant.
  */
 class UniformlyDistributedGenerationBasedCellCycleModel : public AbstractSimpleGenerationBasedCellCycleModel
 {
@@ -70,15 +73,27 @@ private:
 protected:
 
     /**
-     * Stochastically set the G1 duration.  Called on cell creation at
-     * the start of a simulation, and for both parent and daughter
-     * cells at cell division.
+     * Set the duration of G1 phase. This method is called on each cell at the
+     * start of a simulation, and for both daughter cells immediately following
+     * cell division.
+     *
+     * If the cell associated with this cell-cycle model has stem proliferative
+     * type, then the G1 phase duration is drawn from the uniform distribution
+     * U[14,18]. If the cell has transit proliferative type (semi-differentiated),
+     * then the G1 phase duration is drawn from the uniform distribution U[4,6].
+     * These two distributions, proposed by Meineke et al (doi:10.1046/j.0960-7722.2001.00216.x),
+     * reflect indirect biological observations that stem cells cycle more
+     * slowly than their progeny.
+     *
+     * If the cell is differentiated, then the G1 phase duration is set to DBL_MAX,
+     * so that the cell will never reach the end of G1 phase.
      */
     void SetG1Duration();
 
     /**
-     * Protected copy-constructor for use by CreateCellCycleModel.
-     * The only way for external code to create a copy of a cell cycle model
+     * Protected copy-constructor for use by CreateCellCycleModel().
+     *
+     * The only way for external code to create a copy of a cell-cycle model
      * is by calling that method, to ensure that a model of the correct subclass is created.
      * This copy-constructor helps subclasses to ensure that all member variables are correctly copied when this happens.
      *
@@ -108,7 +123,7 @@ public:
     AbstractCellCycleModel* CreateCellCycleModel();
 
     /**
-     * Outputs cell cycle model parameters to file.
+     * Overridden OutputCellCycleModelParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */

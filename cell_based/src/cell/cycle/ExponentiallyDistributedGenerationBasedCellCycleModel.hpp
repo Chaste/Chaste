@@ -164,7 +164,7 @@ public:
     void SetTransitCellG1Duration(double transitCellG1Duration);
 
     /**
-     * Outputs cell cycle model parameters to file.
+     * Overridden OutputCellCycleModelParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */

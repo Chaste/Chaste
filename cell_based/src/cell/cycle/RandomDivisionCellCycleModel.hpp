@@ -167,7 +167,6 @@ public:
 
     /**
      * Overridden OutputCellCycleModelParameters() method.
-     * Output cell cycle model parameters to file.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */

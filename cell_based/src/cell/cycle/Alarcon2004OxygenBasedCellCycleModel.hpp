@@ -47,8 +47,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * Oxygen-dependent ODE-based cell-cycle model.
  *
- *
- *
  * Published by Alarcon et al. (doi:10.1016/j.jtbi.2004.04.016).
  */
 class Alarcon2004OxygenBasedCellCycleModel : public AbstractOdeBasedPhaseBasedCellCycleModel
@@ -129,7 +127,7 @@ public:
     void Initialise();
 
     /**
-     * Outputs cell cycle model parameters to files.
+     * Overridden OutputCellCycleModelParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */

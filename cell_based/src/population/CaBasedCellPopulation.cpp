@@ -727,13 +727,13 @@ void CaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirec
     // Use an approximation of the node spacing as the interaction distance for the nodes only mesh. This is to
     // avoid rounding errors in distributed box collection.
     double volume = this->mrMesh.GetWidth(0);
-    for(unsigned idx=1; idx<DIM; idx++)
+    for (unsigned idx=1; idx<DIM; idx++)
     {
         volume *= this->mrMesh.GetWidth(idx);
     }
 
     double spacing;
-    if(this->mrMesh.GetNumNodes() >0 && volume > 0.0)
+    if (this->mrMesh.GetNumNodes() >0 && volume > 0.0)
     {
         spacing = std::pow(volume / double(this->mrMesh.GetNumNodes()), 1.0/double(DIM));
     }

@@ -165,7 +165,7 @@ public:
     double GetCurrentQuiescentOnsetTime() const;
 
     /**
-     * Outputs cell cycle model parameters to file.
+     * Overridden OutputCellCycleModelParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */

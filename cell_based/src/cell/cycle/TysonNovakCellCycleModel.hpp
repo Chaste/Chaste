@@ -42,9 +42,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractOdeBasedCellCycleModel.hpp"
 #include "TysonNovak2001OdeSystem.hpp"
 
-
 /**
- *  Tyson-Novak 2001 cell-cycle model, taken from the version at  doi:10.1006/jtbi.2001.2293
+ *  Tyson-Novak 2001 cell-cycle model, taken from the version at doi:10.1006/jtbi.2001.2293
  *
  *  Time taken to progress through the cycle is deterministic and given by
  *  an ODE system independent of external factors.
@@ -122,7 +121,6 @@ public:
      */
     AbstractCellCycleModel* CreateCellCycleModel();
 
-
     /**
      * If the daughter cell type is stem, change it to transit.
      */
@@ -147,7 +145,7 @@ public:
     bool CanCellTerminallyDifferentiate();
 
     /**
-     * Outputs cell cycle model parameters to file.
+     * Overridden OutputCellCycleModelParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */

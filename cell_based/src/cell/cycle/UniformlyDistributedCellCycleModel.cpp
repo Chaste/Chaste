@@ -66,8 +66,6 @@ UniformlyDistributedCellCycleModel::UniformlyDistributedCellCycleModel(const Uni
      * in parent classes will be defined there.
      *
      */
-
-    // No new member variables.
 }
 
 AbstractCellCycleModel* UniformlyDistributedCellCycleModel::CreateCellCycleModel()
@@ -111,12 +109,12 @@ void UniformlyDistributedCellCycleModel::SetMaxCellCycleDuration(double maxCellC
 
 double UniformlyDistributedCellCycleModel::GetAverageTransitCellCycleTime()
 {
-    return 0.5*(mMinCellCycleDuration+mMaxCellCycleDuration);
+    return 0.5*(mMinCellCycleDuration + mMaxCellCycleDuration);
 }
 
 double UniformlyDistributedCellCycleModel::GetAverageStemCellCycleTime()
 {
-    return 0.5*(mMinCellCycleDuration+mMaxCellCycleDuration);
+    return 0.5*(mMinCellCycleDuration + mMaxCellCycleDuration);
 }
 
 void UniformlyDistributedCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)

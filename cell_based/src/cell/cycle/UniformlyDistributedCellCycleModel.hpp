@@ -44,9 +44,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * with the length of the cell cycle drawn from a uniform distribution
  * on [mMinCellCycleDuration, mMaxCellCycleDuration].
  *
- * If the cell has DifferentiatedCellProliferativeType, then the cell cycle duration is
- * set to be infinite, so that the cell will never divide.
- *
+ * If the cell is differentiated, then the cell cycle duration is set to be infinite,
+ * so that the cell will never divide.
  */
 class UniformlyDistributedCellCycleModel : public AbstractSimpleCellCycleModel
 {
@@ -56,11 +55,13 @@ private:
 
     /**
      * The minimum cell cycle duration. Used to define the uniform distribution.
+     * Defaults to 12 hours.
      */
     double mMinCellCycleDuration;
 
     /**
      * The maximum cell cycle duration. Used to define the uniform distribution.
+     * Defaults to 14 hours.
      */
     double mMaxCellCycleDuration;
 
@@ -87,7 +88,8 @@ private:
 protected:
 
     /**
-     * Protected copy-constructor for use by CreateCellCycleModel.
+     * Protected copy-constructor for use by CreateCellCycleModel().
+     *
      * The only way for external code to create a copy of a cell cycle model
      * is by calling that method, to ensure that a model of the correct subclass is created.
      * This copy-constructor helps subclasses to ensure that all member variables are correctly copied when this happens.
@@ -128,7 +130,7 @@ public:
     double GetMinCellCycleDuration();
 
     /**
-     * Set mMinCellCycleDuration
+     * Set mMinCellCycleDuration.
      *
      * @param minCellCycleDuration
      */
@@ -140,7 +142,7 @@ public:
     double GetMaxCellCycleDuration();
 
     /**
-     * Set mMaxCellCycleDuration
+     * Set mMaxCellCycleDuration.
      *
      * @param maxCellCycleDuration
      */
@@ -148,18 +150,20 @@ public:
 
     /**
      * Overridden GetAverageTransitCellCycleTime() method.
-     * @return time
+     *
+     * @return the average of mMinCellCycleDuration and mMaxCellCycleDuration
      */
     double GetAverageTransitCellCycleTime();
 
     /**
      * Overridden GetAverageStemCellCycleTime() method.
-     * @return time
+     *
+     * @return the average of mMinCellCycleDuration and mMaxCellCycleDuration
      */
     double GetAverageStemCellCycleTime();
 
     /**
-     * Outputs cell cycle model parameters to file.
+     * Overridden OutputCellCycleModelParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
