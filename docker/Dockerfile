@@ -22,24 +22,19 @@ RUN apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 422C4D99 \
 # See https://github.com/phusion/baseimage-docker/issues/186
 RUN touch /etc/service/syslog-forwarder/down
 
-#COPY set-home-permissions.sh /etc/my_init.d/set-home-permissions.sh
-#RUN chmod +x /etc/my_init.d/set-home-permissions.sh
-
-# Set up chaste user so that we do not build as root
-RUN useradd -m -s /bin/bash -G sudo,docker_env chaste && \
-    echo "chaste:docker" | chpasswd && \
-    echo "chaste ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
-USER chaste
+# The entrypoint script below will ensure our new chaste user (for doing builds)
+# has the same userid as the host user owning the source code volume, to avoid
+# permission issues.
+# Based on https://denibertovic.com/posts/handling-permissions-with-docker-volumes/
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 
 # Hook to link to host chaste source folder, and set it as the working dir
 VOLUME /usr/src/chaste
 WORKDIR /usr/src/chaste
 
 # Use baseimage-docker's init system, and switch to the chaste user running
-# bash by default.  The -l makes bash behave like a login shell, so the USER
-# environment variable will be set.  The -c at the end of the ENTRYPOINT
-# means we can do things like "docker run -it ... scons" to build Chaste.  If
-# no specific command is given the default CMD will drop us into an
+# bash as a login shell by default (see entrypoint.sh).
+# If no specific command is given the default CMD will drop us into an
 # interactive shell.
-ENTRYPOINT ["sudo", "/sbin/my_init", "--quiet", "--", "sudo", "-u", "chaste", "/bin/bash", "-l", "-c"]
+ENTRYPOINT ["/sbin/my_init", "--quiet", "--", "/usr/local/bin/entrypoint.sh"]
 CMD ["bash -i"]
