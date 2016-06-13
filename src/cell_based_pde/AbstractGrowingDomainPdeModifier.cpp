@@ -69,9 +69,9 @@ void AbstractGrowingDomainPdeModifier<DIM>::GenerateFeMesh(AbstractCellPopulatio
     }
 
     // Get FE mesh from Cell Population different for each type of Cell Population
-    if(dynamic_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL)
+    if (dynamic_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL)
     {
-        if(dynamic_cast<MeshBasedCellPopulationWithGhostNodes<DIM>*>(&rCellPopulation) != NULL)
+        if (dynamic_cast<MeshBasedCellPopulationWithGhostNodes<DIM>*>(&rCellPopulation) != NULL)
         {
             EXCEPTION("Currently can't solve PDEs on meshes with ghost nodes");
         }
