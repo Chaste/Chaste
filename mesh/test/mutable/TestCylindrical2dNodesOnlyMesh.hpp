@@ -245,6 +245,34 @@ public:
         delete p_mesh;
     }
 
+    void TestRefreshMesh()
+    {
+        // Create generating mesh
+        HoneycombMeshGenerator generator(4, 4);
+        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+
+        // Convert this to a Cylindrical2dNodesOnlyMesh
+        double periodic_width = 4.0;
+        Cylindrical2dNodesOnlyMesh* p_mesh = new Cylindrical2dNodesOnlyMesh(periodic_width);
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, periodic_width);
+
+        //Check some node positions
+        TS_ASSERT_DELTA(p_mesh->GetNode(0)->rGetLocation()[0], 0.0, 1e-6);
+        TS_ASSERT_DELTA(p_mesh->GetNode(3)->rGetLocation()[0], 3.0, 1e-6);
+
+        p_mesh->Translate(2.0,0.0);
+
+        //Check nodes moved correctly
+        TS_ASSERT_DELTA(p_mesh->GetNode(0)->rGetLocation()[0], 2.0, 1e-6);
+        TS_ASSERT_DELTA(p_mesh->GetNode(3)->rGetLocation()[0], 1.0, 1e-6);
+        
+        p_mesh->Translate(-2.0,0.0);
+
+        //Check nodes moved periodically
+        TS_ASSERT_DELTA(p_mesh->GetNode(0)->rGetLocation()[0], 0.0, 1e-6);
+        TS_ASSERT_DELTA(p_mesh->GetNode(3)->rGetLocation()[0], 3.0, 1e-6);
+    }
+
     void TestConstuctingBoxCollection() throw (Exception)
     {
         EXIT_IF_PARALLEL;    // Cylindrical2dNodesOnlyMesh doesn't work in parallel.
