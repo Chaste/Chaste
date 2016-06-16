@@ -188,7 +188,7 @@ void SetupAndRunSimulation(unsigned kick, unsigned localSpringConst, unsigned gl
     SimulationTime::Instance()->SetStartTime(0.0);
 
     // Add a cell-cell interaction force with the same intrinsic strength as the membrane force
-    MAKE_PTR_ARGS(ImmersedBoundaryCellCellInteractionForce<2>, p_cell_cell_force, (cell_population));
+    MAKE_PTR(ImmersedBoundaryCellCellInteractionForce<2>, p_cell_cell_force);
     p_main_modifier->AddImmersedBoundaryForce(p_cell_cell_force);
     p_cell_cell_force->SetSpringConstant(reference_spring_const * fp_global_sc);
 

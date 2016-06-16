@@ -172,11 +172,10 @@ void SetupAndRunSimulation(unsigned simulationId, unsigned numNodes)
 
     double end_time = 10.0;
     double dt = 0.01;
-    unsigned num_time_steps = (unsigned) (end_time / dt);
 
     // Set simulation properties and solve
     simulator.SetDt(dt);
-    simulator.SetSamplingTimestepMultiple(num_time_steps);
+    simulator.SetSamplingTimestepMultiple(10);
     simulator.SetEndTime(end_time);
     simulator.Solve();
 

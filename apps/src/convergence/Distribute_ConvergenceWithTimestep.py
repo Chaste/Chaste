@@ -35,7 +35,7 @@ def main():
 def run_simulations():
 
     # 2^-2 down to 2^-11 at half-integer powers, rounded to integer value
-    param_values = 2**(np.linspace(-2, -11, num=19))
+    param_values = 2**(np.linspace(-2, -11, num=num_sims))
 
     # Make a list of calls to a Chaste executable
     command_list = []
@@ -57,7 +57,7 @@ def run_simulations():
 
     # Pass the list of bash commands to the pool
 
-    pool.map(execute_command, command_list)
+    pool.map(execute_command, reversed(command_list))
 
 
 # This is a helper function for run_simulation that runs bash commands in separate processes

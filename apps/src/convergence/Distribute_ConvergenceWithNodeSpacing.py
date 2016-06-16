@@ -21,6 +21,8 @@ path_to_output = os.path.join(chaste_test_dir, 'convergence', 'num_nodes')
 pdf_name = os.path.join(path_to_output, 'ConvergenceWithNodeSpacing.pdf')
 results_header_string = 'simulation_id,dl_at_start,esf_at_end\n'
 
+num_sims = 16
+
 
 def main():
     run_simulations()
@@ -33,7 +35,7 @@ def main():
 def run_simulations():
 
     # 2^7 (128) up to 2^12 (4096) at third-integer powers, rounded to integer value
-    param_values = (2**(np.linspace(7, 12, num=16))).astype(int)
+    param_values = (2**(np.linspace(7, 12, num=num_sims))).astype(int)
 
     # Make a list of calls to a Chaste executable
     command_list = []
@@ -55,7 +57,7 @@ def run_simulations():
 
     # Pass the list of bash commands to the pool
 
-    pool.map(execute_command, command_list)
+    pool.map(execute_command, reversed(command_list))
 
 
 # This is a helper function for run_simulation that runs bash commands in separate processes

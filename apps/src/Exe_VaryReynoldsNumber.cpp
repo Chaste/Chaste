@@ -163,7 +163,7 @@ void SetupAndRunSimulation(unsigned simulation_id, double reynolds_number)
     MAKE_PTR(ImmersedBoundaryMembraneElasticityForce<2>, p_boundary_force);
     p_main_modifier->AddImmersedBoundaryForce(p_boundary_force);
 
-//        MAKE_PTR_ARGS(ImmersedBoundaryCellCellInteractionForce<2>, p_cell_cell_force, (cell_population));
+//        MAKE_PTR(ImmersedBoundaryCellCellInteractionForce<2>, p_cell_cell_force);
 //        p_main_modifier->AddImmersedBoundaryForce(p_cell_cell_force);
 
     // Create and set an output directory that is different for each

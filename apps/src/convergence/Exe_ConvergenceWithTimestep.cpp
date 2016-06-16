@@ -169,11 +169,10 @@ void SetupAndRunSimulation(unsigned simulationId, double timeStep)
     simulator.SetOutputDirectory(output_directory.str());
 
     double end_time = 10.0;
-    unsigned num_time_steps = (unsigned) (end_time / timeStep);
 
     // Set simulation properties and solve
     simulator.SetDt(timeStep);
-    simulator.SetSamplingTimestepMultiple(num_time_steps);
+    simulator.SetSamplingTimestepMultiple(10);
     simulator.SetEndTime(end_time);
     simulator.Solve();
 
