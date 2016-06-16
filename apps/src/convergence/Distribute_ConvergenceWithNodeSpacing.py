@@ -161,7 +161,7 @@ def plot_results():
     plt.ylim(y_lims)
 
     # Label the axes
-    plt.xlabel(r'$-\log_2(\Delta l)$', fontsize=font_size, labelpad=1.0*font_size)
+    plt.xlabel(r'$-\log_2(\Delta \gamma_k)$', fontsize=font_size, labelpad=1.0*font_size)
     plt.ylabel(r'ESF', fontsize=font_size, labelpad=1.0*font_size)
 
     # Customise axes

@@ -61,8 +61,12 @@ void ImmersedBoundaryCellCellInteractionForce<DIM>::AddImmersedBoundaryForceCont
      * location.  We attach these quantities as node attributes, and keep track of where in the node attributes vector
      * each protein concentration is stored.
      */
+
+    // This will be triggered only once - during simulation set up
     if (mProteinNodeAttributeLocations.empty())
     {
+        mpMesh = &(rCellPopulation.rGetMesh());
+
         mRestLength = 0.25 * rCellPopulation.GetInteractionDistance();
 
         // First verify that all nodes have the same number of attributes

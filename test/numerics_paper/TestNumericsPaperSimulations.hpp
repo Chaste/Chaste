@@ -47,6 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OutputFileHandler.hpp"
 
 #include <boost/lexical_cast.hpp>
+#include <ImmersedBoundaryCellCellInteractionForce.hpp>
 
 #include "Debug.hpp"
 #include "Timer.hpp"
@@ -256,9 +257,9 @@ public:
     }
 
 
-    void TestIntraCellularParameterScaling() throw(Exception)
+    void xTestIntraCellularParameterScaling() throw(Exception)
     {
-        /**
+        /*
          * This test runs two simulations of the same elliptical membrane twice with different
          * numbers of nodes, in order to demonstrate the inbuilt scaling correctly calculates
          * the necessary intra-cellular spring constant to compensate.
@@ -272,7 +273,7 @@ public:
         std::string output_directory = "numerics_paper/intra_cellular_scaling";
 
         OutputFileHandler results_handler(output_directory, false);
-        out_stream results_file = results_handler.OpenOutputFile("numerical_results_intra_scaling.dat");
+        out_stream results_file = results_handler.OpenOutputFile("numerical_results_intra.dat");
 
         // Output summary statistics to results file
         (*results_file) << "time,esf_256,esf_512\n";
@@ -294,16 +295,27 @@ public:
             SimulationTime::Instance()->SetStartTime(0.0);
 
             /*
-             * 1: Num cells
-             * 2: Num nodes per cell
-             * 3: Superellipse exponent
-             * 4: Superellipse aspect ratio
-             * 5: Random y-variation
-             * 6: Include membrane
+             * 1: num nodes
+             * 2: superellipse exponent
+             * 3: cell width
+             * 4: cell height
+             * 5: bottom left x
+             * 6: bottom left y
              */
-            ImmersedBoundaryPalisadeMeshGenerator gen(1, 256, 1.0, 2.0, 0.0, false);
-            ImmersedBoundaryMesh<2, 2>* p_mesh = gen.GetMesh();
+            SuperellipseGenerator* p_gen = new SuperellipseGenerator(256, 1.0, 0.3, 0.6, 0.35, 0.2);
+            std::vector<c_vector<double, 2> > locations = p_gen->GetPointsAsVectors();
 
+            std::vector<Node<2>* > nodes;
+            std::vector<ImmersedBoundaryElement<2,2>* > elements;
+
+            for (unsigned location = 0; location < locations.size(); location++)
+            {
+                nodes.push_back(new Node<2>(location, locations[location], true));
+            }
+
+            elements.push_back(new ImmersedBoundaryElement<2,2>(0, nodes));
+
+            ImmersedBoundaryMesh<2,2>* p_mesh = new ImmersedBoundaryMesh<2,2>(nodes, elements);
             p_mesh->SetNumGridPtsXAndY(256);
 
             // Initial value at start of simulation
@@ -355,16 +367,27 @@ public:
             SimulationTime::Instance()->SetStartTime(0.0);
 
             /*
-             * 1: Num cells
-             * 2: Num nodes per cell
-             * 3: Superellipse exponent
-             * 4: Superellipse aspect ratio
-             * 5: Random y-variation
-             * 6: Include membrane
+             * 1: num nodes
+             * 2: superellipse exponent
+             * 3: cell width
+             * 4: cell height
+             * 5: bottom left x
+             * 6: bottom left y
              */
-            ImmersedBoundaryPalisadeMeshGenerator gen(1, 512, 1.0, 2.0, 0.0, false);
-            ImmersedBoundaryMesh<2, 2>* p_mesh = gen.GetMesh();
+            SuperellipseGenerator* p_gen = new SuperellipseGenerator(512, 1.0, 0.3, 0.6, 0.35, 0.2);
+            std::vector<c_vector<double, 2> > locations = p_gen->GetPointsAsVectors();
 
+            std::vector<Node<2>* > nodes;
+            std::vector<ImmersedBoundaryElement<2,2>* > elements;
+
+            for (unsigned location = 0; location < locations.size(); location++)
+            {
+                nodes.push_back(new Node<2>(location, locations[location], true));
+            }
+
+            elements.push_back(new ImmersedBoundaryElement<2,2>(0, nodes));
+
+            ImmersedBoundaryMesh<2,2>* p_mesh = new ImmersedBoundaryMesh<2,2>(nodes, elements);
             p_mesh->SetNumGridPtsXAndY(256);
 
             // Initial value at start of simulation
@@ -397,6 +420,233 @@ public:
             simulation.SetDt(dt);
             simulation.SetSamplingTimestepMultiple(1);
             simulation.SetOutputDirectory(output_dir_512);
+
+            for (unsigned i=0; i<num_time_pts; i++)
+            {
+                double new_end_time = num_steps_per_sample * dt * (1.0 + i);
+
+                simulation.SetEndTime(new_end_time);
+                simulation.Solve();
+
+                esf_512.push_back(p_mesh->GetElongationShapeFactorOfElement(0));
+            }
+        }
+
+        // Check we output arrays all contain the same number of elements
+        TS_ASSERT_EQUALS(time_points.size(), esf_256.size());
+        TS_ASSERT_EQUALS(time_points.size(), esf_512.size());
+
+        for(unsigned time_pt = 0 ; time_pt < time_points.size() ; time_pt++)
+        {
+            (*results_file) << boost::lexical_cast<std::string>(time_points[time_pt]) << ","
+                            << boost::lexical_cast<std::string>(esf_256[time_pt]) << ","
+                            << boost::lexical_cast<std::string>(esf_512[time_pt]) << "\n";
+        }
+
+        results_file->close();
+    }
+
+    void TestInterCellularParameterScaling() throw(Exception)
+    {
+        /*
+         * This test runs two simulations of two ellipsoid membrane with different
+         * numbers of nodes, in order to demonstrate the inbuilt scaling correctly calculates
+         * the necessary inter-cellular spring constant to compensate.
+         *
+         * All parameters are fixed except the number of nodes, and the following are exported to a csv file:
+         *  * The time points at which the ESF is sampled
+         *  * The ESF for one ellipse in the first scenario, at each time point
+         *  * The ESF for the second scenario, at each time point
+         */
+
+        std::string output_directory = "numerics_paper/inter_cellular_scaling";
+
+        OutputFileHandler results_handler(output_directory, false);
+        out_stream results_file = results_handler.OpenOutputFile("numerical_results_inter.dat");
+
+        // Output summary statistics to results file
+        (*results_file) << "time,esf_256,esf_512\n";
+
+        // Vectors to store summary statistics
+        std::vector<double> time_points;
+        std::vector<double> esf_256;
+        std::vector<double> esf_512;
+
+        // Initial time value at start of simulation
+        time_points.push_back(0.0);
+
+        unsigned num_time_pts = 20;
+        unsigned num_steps_per_sample = 50;
+
+        // Sim with 256 nodes
+        {
+            SimulationTime::Instance()->Destroy();
+            SimulationTime::Instance()->SetStartTime(0.0);
+
+            /*
+             * 1: num nodes
+             * 2: superellipse exponent
+             * 3: cell width
+             * 4: cell height
+             * 5: bottom left x
+             * 6: bottom left y
+             */
+            SuperellipseGenerator* p_gen = new SuperellipseGenerator(256, 0.1, 0.3, 0.6, 0.19, 0.2);
+            std::vector<c_vector<double, 2> > locations = p_gen->GetPointsAsVectors();
+
+            c_vector<double, 2> offset = 0.32 * unit_vector<double>(2,0);
+
+            std::vector<Node<2>* > nodes;
+            std::vector<Node<2>* > nodes_elem_1;
+            std::vector<Node<2>* > nodes_elem_2;
+            std::vector<ImmersedBoundaryElement<2,2>* > elements;
+
+            for (unsigned location = 0; location < locations.size(); location++)
+            {
+                nodes.push_back(new Node<2>(location, locations[location], true));
+                nodes_elem_1.push_back(nodes.back());
+            }
+
+            elements.push_back(new ImmersedBoundaryElement<2,2>(0, nodes_elem_1));
+
+            for (unsigned location = 0; location < locations.size(); location++)
+            {
+                nodes.push_back(new Node<2>(location + locations.size(), locations[location] + offset, true));
+                nodes_elem_2.push_back(nodes.back());
+            }
+
+            elements.push_back(new ImmersedBoundaryElement<2,2>(1, nodes_elem_2));
+
+            ImmersedBoundaryMesh<2,2>* p_mesh = new ImmersedBoundaryMesh<2,2>(nodes, elements);
+
+            p_mesh->SetNumGridPtsXAndY(256);
+
+            // Initial value at start of simulation
+            esf_256.push_back(p_mesh->GetElongationShapeFactorOfElement(0));
+
+            std::vector<CellPtr> cells;
+            MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+            CellsGenerator<UniformlyDistributedCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
+            ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
+
+            OffLatticeSimulation<2> simulation(cell_population);
+            cell_population.SetIfPopulationHasActiveSources(false);
+
+            // Add main immersed boundary simulation modifier
+            MAKE_PTR(ImmersedBoundarySimulationModifier < 2 >, p_main_modifier);
+            simulation.AddSimulationModifier(p_main_modifier);
+
+            // Add intra-cellular force law
+            MAKE_PTR(ImmersedBoundaryMembraneElasticityForce<2>, p_boundary_force);
+            p_main_modifier->AddImmersedBoundaryForce(p_boundary_force);
+            p_boundary_force->SetSpringConstant(1e7);
+            p_boundary_force->SetRestLengthMultiplier(0.5);
+
+            // Add inter-cellular force law
+            MAKE_PTR(ImmersedBoundaryCellCellInteractionForce<2>, p_cell_cell_force);
+            p_main_modifier->AddImmersedBoundaryForce(p_cell_cell_force);
+            p_cell_cell_force->SetSpringConstant(1e6);
+
+            // Simulation output directory
+            std::string output_dir_256 = output_directory + '/' + boost::lexical_cast<std::string>(256);
+
+            // Set simulation properties
+            double dt = 0.05;
+            simulation.SetDt(dt);
+            simulation.SetSamplingTimestepMultiple(1);
+            simulation.SetOutputDirectory(output_dir_256);
+
+            for (unsigned i=0; i<num_time_pts; i++)
+            {
+                double new_end_time = num_steps_per_sample * dt * (1.0 + i);
+
+                simulation.SetEndTime(new_end_time);
+                simulation.Solve();
+
+                time_points.push_back(new_end_time);
+                esf_256.push_back(p_mesh->GetElongationShapeFactorOfElement(0));
+            }
+        }
+
+        // Sim with 512 nodes
+        {
+            SimulationTime::Instance()->Destroy();
+            SimulationTime::Instance()->SetStartTime(0.0);
+
+            /*
+             * 1: num nodes
+             * 2: superellipse exponent
+             * 3: cell width
+             * 4: cell height
+             * 5: bottom left x
+             * 6: bottom left y
+             */
+            SuperellipseGenerator* p_gen = new SuperellipseGenerator(512, 0.1, 0.3, 0.6, 0.19, 0.2);
+            std::vector<c_vector<double, 2> > locations = p_gen->GetPointsAsVectors();
+
+            c_vector<double, 2> offset = 0.32 * unit_vector<double>(2,0);
+
+            std::vector<Node<2>* > nodes;
+            std::vector<Node<2>* > nodes_elem_1;
+            std::vector<Node<2>* > nodes_elem_2;
+            std::vector<ImmersedBoundaryElement<2,2>* > elements;
+
+            for (unsigned location = 0; location < locations.size(); location++)
+            {
+                nodes.push_back(new Node<2>(location, locations[location], true));
+                nodes_elem_1.push_back(nodes.back());
+            }
+
+            elements.push_back(new ImmersedBoundaryElement<2,2>(0, nodes_elem_1));
+
+            for (unsigned location = 0; location < locations.size(); location++)
+            {
+                nodes.push_back(new Node<2>(location + locations.size(), locations[location] + offset, true));
+                nodes_elem_2.push_back(nodes.back());
+            }
+
+            elements.push_back(new ImmersedBoundaryElement<2,2>(1, nodes_elem_2));
+
+            ImmersedBoundaryMesh<2,2>* p_mesh = new ImmersedBoundaryMesh<2,2>(nodes, elements);
+
+            p_mesh->SetNumGridPtsXAndY(256);
+
+            // Initial value at start of simulation
+            esf_512.push_back(p_mesh->GetElongationShapeFactorOfElement(0));
+
+            std::vector<CellPtr> cells;
+            MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+            CellsGenerator<UniformlyDistributedCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
+            ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
+
+            OffLatticeSimulation<2> simulation(cell_population);
+            cell_population.SetIfPopulationHasActiveSources(false);
+
+            // Add main immersed boundary simulation modifier
+            MAKE_PTR(ImmersedBoundarySimulationModifier < 2 >, p_main_modifier);
+            simulation.AddSimulationModifier(p_main_modifier);
+
+            // Add intra-cellular force law
+            MAKE_PTR(ImmersedBoundaryMembraneElasticityForce<2>, p_boundary_force);
+            p_main_modifier->AddImmersedBoundaryForce(p_boundary_force);
+            p_boundary_force->SetSpringConstant(1e7);
+            p_boundary_force->SetRestLengthMultiplier(0.5);
+
+            // Add inter-cellular force law
+            MAKE_PTR(ImmersedBoundaryCellCellInteractionForce<2>, p_cell_cell_force);
+            p_main_modifier->AddImmersedBoundaryForce(p_cell_cell_force);
+            p_cell_cell_force->SetSpringConstant(1e6);
+
+            // Simulation output directory
+            std::string output_dir_256 = output_directory + '/' + boost::lexical_cast<std::string>(512);
+
+            // Set simulation properties
+            double dt = 0.05;
+            simulation.SetDt(dt);
+            simulation.SetSamplingTimestepMultiple(1);
+            simulation.SetOutputDirectory(output_dir_256);
 
             for (unsigned i=0; i<num_time_pts; i++)
             {

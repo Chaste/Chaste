@@ -131,16 +131,27 @@ void OutputOnCompletion(unsigned simulationId, unsigned numNodes)
 void SetupAndRunSimulation(unsigned simulationId, unsigned numNodes)
 {
     /*
-     * 1: Num cells
-     * 2: Num nodes per cell
-     * 3: Superellipse exponent
-     * 4: Superellipse aspect ratio
-     * 5: Random y-variation
-     * 6: Include membrane
+     * 1: num nodes
+     * 2: superellipse exponent
+     * 3: cell width
+     * 4: cell height
+     * 5: bottom left x
+     * 6: bottom left y
      */
-    ImmersedBoundaryPalisadeMeshGenerator gen(1, numNodes, 1.0, 2.0, 0.0, false);
-    ImmersedBoundaryMesh<2, 2>* p_mesh = gen.GetMesh();
+    SuperellipseGenerator* p_gen = new SuperellipseGenerator(numNodes, 1.0, 0.3, 0.6, 0.35, 0.2);
+    std::vector<c_vector<double, 2> > locations = p_gen->GetPointsAsVectors();
 
+    std::vector<Node<2>* > nodes;
+    std::vector<ImmersedBoundaryElement<2,2>* > elements;
+
+    for (unsigned location = 0; location < locations.size(); location++)
+    {
+        nodes.push_back(new Node<2>(location, locations[location], true));
+    }
+
+    elements.push_back(new ImmersedBoundaryElement<2,2>(0, nodes));
+
+    ImmersedBoundaryMesh<2,2>* p_mesh = new ImmersedBoundaryMesh<2,2>(nodes, elements);
     p_mesh->SetNumGridPtsXAndY(64);
 
     std::vector<CellPtr> cells;
