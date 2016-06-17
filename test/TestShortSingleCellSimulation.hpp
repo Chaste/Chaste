@@ -44,8 +44,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ImmersedBoundarySimulationModifier.hpp"
 #include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
 #include "ImmersedBoundaryMembraneElasticityForce.hpp"
+#include "FluidSource.hpp"
 
-#include "Timer.hpp"
+#include "Debug.hpp"
+
 
 // Simulation does not run in parallel
 #include "FakePetscSetup.hpp"
@@ -57,16 +59,29 @@ public:
     void TestShortSingleCellSim() throw(Exception)
     {
         /*
-         * 1: Num cells
-         * 2: Num nodes per cell
-         * 3: Superellipse exponent
-         * 4: Superellipse aspect ratio
-         * 5: Random y-variation
-         * 6: Include membrane
+         * 1: num nodes
+         * 2: superellipse exponent
+         * 3: cell width
+         * 4: cell height
+         * 5: bottom left x
+         * 6: bottom left y
          */
-        ImmersedBoundaryPalisadeMeshGenerator gen(1, 128, 0.1, 2.5, 0.0, false);
-        ImmersedBoundaryMesh<2, 2>* p_mesh = gen.GetMesh();
-        p_mesh->SetNumGridPtsXAndY(128);
+        double diam = 0.3;
+        SuperellipseGenerator* p_gen = new SuperellipseGenerator(64, 1.0, diam, diam, 0.5-0.5*diam, 0.5-0.5*diam);
+        std::vector<c_vector<double, 2> > locations = p_gen->GetPointsAsVectors();
+
+        std::vector<Node<2>* > nodes;
+        std::vector<ImmersedBoundaryElement<2,2>* > elements;
+
+        for (unsigned location = 0; location < locations.size(); location++)
+        {
+            nodes.push_back(new Node<2>(location, locations[location], true));
+        }
+
+        elements.push_back(new ImmersedBoundaryElement<2,2>(0, nodes));
+
+        ImmersedBoundaryMesh<2,2>* p_mesh = new ImmersedBoundaryMesh<2,2>(nodes, elements);
+        p_mesh->SetNumGridPtsXAndY(64);
 
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_cell_type);
@@ -85,15 +100,22 @@ public:
         // Add force laws
         MAKE_PTR(ImmersedBoundaryMembraneElasticityForce<2>, p_boundary_force);
         p_main_modifier->AddImmersedBoundaryForce(p_boundary_force);
-        p_boundary_force->SetSpringConstant(0.5 * 1e7);
+        p_boundary_force->SetSpringConstant(1e1);
+
+        // Set fluid source strength
+        p_mesh->GetElement(0)->GetFluidSource()->SetStrength(0.01);
+
+        PRINT_VARIABLE(p_mesh->GetVolumeOfElement(0));
 
         // Set simulation properties
-        double dt = 0.05;
+        double dt = 0.01;
         simulator.SetOutputDirectory("TestShortSingleCellSimulation");
         simulator.SetDt(dt);
         simulator.SetSamplingTimestepMultiple(10);
-        simulator.SetEndTime(3000.0 * dt);
+        simulator.SetEndTime(10 * dt);
 
         simulator.Solve();
+
+        PRINT_VARIABLE(p_mesh->GetVolumeOfElement(0));
     }
 };

@@ -63,12 +63,8 @@ protected:
     /** Grid to calculate upwind scheme and store RHS of system. */
     multi_array<double, 3> mRightHandSideGrids;
 
-    /**
-     * The fluid source grid.
-     *
-     * \todo Use this in the code, or remove it.
-     */
-    multi_array<double, 2> mSourceGrid;
+    /** Grid to store the gradient of the fluid sources. */
+    multi_array<double, 3> mSourceGradientGrids;
 
     /** Grid to store the first of two operators needed for the FFT algorithm. */
     multi_array<double, 2> mOperator1;
@@ -117,6 +113,9 @@ public:
 
     /** @return reference to modifiable right-hand-side grids. */
     multi_array<double, 3>& rGetModifiableRightHandSideGrids();
+
+    /** @return reference to modifiable source gradient grids. */
+    multi_array<double, 3>& rGetModifiableSourceGradientGrids();
 
     /** @return reference to modifiable Fourier grids. */
     multi_array<std::complex<double>, 3>& rGetModifiableFourierGrids();

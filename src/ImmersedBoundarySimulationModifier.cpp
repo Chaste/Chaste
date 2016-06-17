@@ -375,18 +375,18 @@ void ImmersedBoundarySimulationModifier<DIM>::PropagateFluidSourcesToGrid()
         }
     }
 }
-
+#include "Debug.hpp"
 template<unsigned DIM>
 void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
 {
     double dt = SimulationTime::Instance()->GetTimeStep();
-    double large_number = 268435456.0;
     unsigned reduced_size = 1 + (mNumGridPtsY/2);
 
     // Get references to all the necessary grids
     multi_array<double, 3>& vel_grids   = mpMesh->rGetModifiable2dVelocityGrids();
     multi_array<double, 3>& force_grids = mpArrays->rGetModifiableForceGrids();
     multi_array<double, 3>& rhs_grids   = mpArrays->rGetModifiableRightHandSideGrids();
+    multi_array<double, 3>& source_gradient_grids   = mpArrays->rGetModifiableSourceGradientGrids();
 
     const multi_array<double, 2>& op_1  = mpArrays->rGetOperator1();
     const multi_array<double, 2>& op_2  = mpArrays->rGetOperator2();
@@ -399,13 +399,34 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
     // Perform upwind differencing and create RHS of linear system
     Upwind2d(vel_grids, rhs_grids);
 
-    for (unsigned dim = 0; dim < 2; dim++)
+    // If the population has active sources, the Right Hand Side grids are calculated differently.
+    if (mpCellPopulation->DoesPopulationHaveActiveSources())
     {
-        for (unsigned x = 0; x < mNumGridPtsX; x++)
+        double factor = 1.0 / (3.0 * mReynoldsNumber);
+
+        CalculateSourceGradients(rhs_grids, source_gradient_grids);
+
+        for (unsigned dim = 0; dim < 2; dim++)
         {
-            for (unsigned y = 0; y < mNumGridPtsY; y++)
+            for (unsigned x = 0; x < mNumGridPtsX; x++)
             {
-                rhs_grids[dim][x][y] = large_number * (vel_grids[dim][x][y] + dt * (force_grids[dim][x][y] - rhs_grids[dim][x][y]));
+                for (unsigned y = 0; y < mNumGridPtsY; y++)
+                {
+                    rhs_grids[dim][x][y] = vel_grids[dim][x][y] + dt * (force_grids[dim][x][y] + factor * source_gradient_grids[dim][x][y] - rhs_grids[dim][x][y]);
+                }
+            }
+        }
+    }
+    else
+    {
+        for (unsigned dim = 0; dim < 2; dim++)
+        {
+            for (unsigned x = 0; x < mNumGridPtsX; x++)
+            {
+                for (unsigned y = 0; y < mNumGridPtsY; y++)
+                {
+                    rhs_grids[dim][x][y] = (vel_grids[dim][x][y] + dt * (force_grids[dim][x][y] - rhs_grids[dim][x][y]));
+                }
             }
         }
     }
@@ -457,13 +478,23 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
     {
         for (unsigned y = 0; y < reduced_size; y++)
         {
-            fourier_grids[0][x][y] = (fourier_grids[0][x][y] - (mI * dt / (mReynoldsNumber * mGridSpacingX)) * sin_2x[x] * pressure_grid[x][y]) / (op_2[x][y] * large_number * mFftNorm);
-            fourier_grids[1][x][y] = (fourier_grids[1][x][y] - (mI * dt / (mReynoldsNumber * mGridSpacingY)) * sin_2y[y] * pressure_grid[x][y]) / (op_2[x][y] * large_number * mFftNorm);
+            fourier_grids[0][x][y] = (fourier_grids[0][x][y] - (mI * dt / (mReynoldsNumber * mGridSpacingX)) * sin_2x[x] * pressure_grid[x][y]) / (op_2[x][y]);
+            fourier_grids[1][x][y] = (fourier_grids[1][x][y] - (mI * dt / (mReynoldsNumber * mGridSpacingY)) * sin_2y[y] * pressure_grid[x][y]) / (op_2[x][y]);
         }
     }
 
-    // Perform inverse fft on fourier_grids; results are in vel_grids
+    // Perform inverse fft on fourier_grids; results are in vel_grids.  Then, normalise the DFT.
     mpFftInterface->FftExecuteInverse();
+    for (unsigned dim = 0; dim < 2; dim++)
+    {
+        for (unsigned x = 0; x < mNumGridPtsX; x++)
+        {
+            for (unsigned y = 0; y < mNumGridPtsY; y++)
+            {
+                vel_grids[dim][x][y] /= mFftNorm;
+            }
+        }
+    }
 }
 
 template<unsigned DIM>
@@ -515,6 +546,29 @@ void ImmersedBoundarySimulationModifier<DIM>::Upwind2d(const multi_array<double,
 
         prev_x = (prev_x + 1) % mNumGridPtsX;
         next_x = (next_x + 1) % mNumGridPtsX;
+    }
+}
+
+template<unsigned DIM>
+void ImmersedBoundarySimulationModifier<DIM>::CalculateSourceGradients(const multi_array<double, 3>& rhs, multi_array<double, 3>& gradients)
+{
+    // \todo: this assumes mGridSpacingX = mGridSpacingY (fine for the foreseeable future)
+    double factor = 1.0 / (2.0 * mGridSpacingX);
+
+    // The fluid sources are stored in the third slice of the rhs grids
+    for (unsigned x = 0; x < mNumGridPtsX; x++)
+    {
+        unsigned next_x = (x + 1) % mNumGridPtsX;
+        unsigned prev_x = (x + mNumGridPtsX - 1) % mNumGridPtsX;
+
+        for (unsigned y = 0; y < mNumGridPtsY; y++)
+        {
+            unsigned next_y = (y + 1) % mNumGridPtsY;
+            unsigned prev_y = (y + mNumGridPtsY - 1) % mNumGridPtsY;
+
+            gradients[0][x][y] = factor * (rhs[2][next_x][y] - rhs[2][prev_x][y]);
+            gradients[1][x][y] = factor * (rhs[2][x][next_y] - rhs[2][x][prev_y]);
+        }
     }
 }
 

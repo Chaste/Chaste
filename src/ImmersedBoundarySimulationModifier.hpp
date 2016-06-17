@@ -193,18 +193,26 @@ private:
      * Helper method for PropagateForcesToFluidGrid()
      * Calculates the discrete delta approximation based on distance and grid spacing
      *
-     * @param absolute 1-D distance between boundary-node and fluid-node
-     * @param the grid spacing
+     * @param dist absolute 1-D distance between boundary-node and fluid-node
+     * @param spacing the grid spacing
      */
     double Delta1D(double dist, double spacing);
 
     /**
-     * Calculates upwind difference
+     * Calculates upwind difference of fluid velocity grids
      *
-     * @param const reference to input grids
-     * @param reference to output grids
+     * @param input const reference to input grids
+     * @param output reference to output grids
      */
     void Upwind2d(const multi_array<double, 3>& input, multi_array<double, 3>& output);
+
+    /**
+     * Calculates the vector of central differences of the fluid source grid
+     *
+     * @param rhs const reference to rhs grids which contain the fluid source strengths
+     * @param gradients reference to grids storing the graidents
+     */
+    void CalculateSourceGradients(const multi_array<double, 3>& rhs, multi_array<double, 3>& gradients);
 
     /**
      * Helper method to set member variables for testing purposes

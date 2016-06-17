@@ -55,10 +55,25 @@ ImmersedBoundary2dArrays<DIM>::ImmersedBoundary2dArrays(ImmersedBoundaryMesh<DIM
      */
     unsigned reduced_y = 1 + (num_gridpts_y/2);
 
-    // Resize real arrays to X by Y
-    // There are three such RightHandSide arrays if sources are active
+    // Resize real arrays to be num X by num Y
     mForceGrids.resize(extents[2][num_gridpts_x][num_gridpts_y]);
-    mRightHandSideGrids.resize(extents[2 + (int)mActiveSources][num_gridpts_x][num_gridpts_y]);
+
+    // The RHS grids in this implementation represent a contiguous list of all arrays which undergo a DFT.
+    // This is two grids in the absence of sources and 3 in the presence of sources.
+    if(mActiveSources)
+    {
+        mRightHandSideGrids.resize(extents[3][num_gridpts_x][num_gridpts_y]);
+    }
+    else
+    {
+        mRightHandSideGrids.resize(extents[2][num_gridpts_x][num_gridpts_y]);
+    }
+
+    // The source gradient grids are only needed when fluid sources are present.  Otherwise, we need do nothing
+    if(mActiveSources)
+    {
+        mSourceGradientGrids.resize(extents[2][num_gridpts_x][num_gridpts_y]);
+    }
 
     // Resize Fourier-domain arrays
     // There are three such FourierGrid arrays if sources are active
@@ -119,6 +134,12 @@ template<unsigned DIM>
 multi_array<double, 3>& ImmersedBoundary2dArrays<DIM>::rGetModifiableRightHandSideGrids()
 {
     return mRightHandSideGrids;
+}
+
+template<unsigned DIM>
+multi_array<double, 3>& ImmersedBoundary2dArrays<DIM>::rGetModifiableSourceGradientGrids()
+{
+    return mSourceGradientGrids;
 }
 
 template<unsigned DIM>
