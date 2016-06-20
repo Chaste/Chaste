@@ -67,7 +67,7 @@ public:
          * 6: bottom left y
          */
         double diam = 0.3;
-        SuperellipseGenerator* p_gen = new SuperellipseGenerator(64, 1.0, diam, diam, 0.5-0.5*diam, 0.5-0.5*diam);
+        SuperellipseGenerator* p_gen = new SuperellipseGenerator(64, 1.0, diam, 0.4, 0.5-0.5*diam, 0.3);
         std::vector<c_vector<double, 2> > locations = p_gen->GetPointsAsVectors();
 
         std::vector<Node<2>* > nodes;
@@ -84,12 +84,12 @@ public:
         p_mesh->SetNumGridPtsXAndY(64);
 
         std::vector<CellPtr> cells;
-        MAKE_PTR(DifferentiatedCellProliferativeType, p_cell_type);
+        MAKE_PTR(TransitCellProliferativeType, p_cell_type);
         CellsGenerator<UniformlyDistributedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_cell_type);
 
         ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.SetIfPopulationHasActiveSources(true);
+        cell_population.SetIfPopulationHasActiveSources(false);
 
         OffLatticeSimulation<2> simulator(cell_population);
 
@@ -102,20 +102,14 @@ public:
         p_main_modifier->AddImmersedBoundaryForce(p_boundary_force);
         p_boundary_force->SetSpringConstant(1e1);
 
-        // Set fluid source strength
-        p_mesh->GetElement(0)->GetFluidSource()->SetStrength(0.01);
-
-        PRINT_VARIABLE(p_mesh->GetVolumeOfElement(0));
-
         // Set simulation properties
         double dt = 0.01;
         simulator.SetOutputDirectory("TestShortSingleCellSimulation");
         simulator.SetDt(dt);
-        simulator.SetSamplingTimestepMultiple(10);
-        simulator.SetEndTime(10 * dt);
+        simulator.SetSamplingTimestepMultiple(1);
+        simulator.SetEndTime(1000 * dt);
 
         simulator.Solve();
 
-        PRINT_VARIABLE(p_mesh->GetVolumeOfElement(0));
     }
 };

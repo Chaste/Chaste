@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "RandomNumberGenerator.hpp"
 #include "UblasCustomFunctions.hpp"
 #include "Warnings.hpp"
+#include "Debug.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryMesh(std::vector<Node<SPACE_DIM>*> nodes,
@@ -1087,7 +1088,8 @@ unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAx
     unsigned new_element_index = DivideElement(pElement,
                                                pElement->GetNodeLocalIndex(intersecting_nodes[0]),
                                                pElement->GetNodeLocalIndex(intersecting_nodes[1]),
-                                               placeOriginalElementBelow);
+                                               centroid,
+                                               axisOfDivision);
 
     return new_element_index;
 }
@@ -1109,10 +1111,13 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::DivideElement(ImmersedBoundaryElement<ELEMENT_DIM,SPACE_DIM>* pElement,
                                                                      unsigned nodeAIndex,
                                                                      unsigned nodeBIndex,
-                                                                     bool placeOriginalElementBelow)
+                                                                     c_vector<double, SPACE_DIM> centroid,
+                                                                     c_vector<double, SPACE_DIM> axisOfDivision)
 {
     assert(SPACE_DIM == 2);
     assert(ELEMENT_DIM == SPACE_DIM);
+
+    double elem_spacing = 0.0001;
 
     /*
      * Method outline:
@@ -1124,20 +1129,150 @@ unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::DivideElement(ImmersedBou
      *   new element from scratch with nodes in the other half of the original element.
      */
 
+    // Get unit vectors in the direction of the division axis, and the perpendicular
+    c_vector<double, SPACE_DIM> unit_axis = axisOfDivision / norm_2(axisOfDivision);
+    c_vector<double, SPACE_DIM> unit_perp;
+    unit_perp[0] = -unit_axis[1];
+    unit_perp[1] = unit_axis[0];
+
     unsigned num_nodes = pElement->GetNumNodes();
 
-    std::vector<c_vector<double, SPACE_DIM> > daughter_a_location_stencil;
-    for (unsigned node_idx = nodeAIndex + 1; node_idx != nodeBIndex + 1; node_idx++)
+    /*
+     * We first identify the start and end indices of the nodes which will form the location stencil for each daughter
+     * cell.  Our starting point is the node indices already identified.
+     *
+     * In order to ensure the resulting gap between the elements is the correct size, we remove as many nodes as
+     * necessary until the perpendicular distance between the centroid and the node is at least half the required
+     * spacing.
+     *
+     * Finally, we move the relevant node to be exactly half the required spacing.
+     */
+    unsigned start_a = (nodeAIndex + 1) % num_nodes;
+    unsigned end_a = nodeBIndex;
+
+    unsigned start_b = (nodeBIndex + 1) % num_nodes;
+    unsigned end_b = nodeAIndex;
+
+    // Find correct start_a
+    bool no_node_satisfied_condition_1 = true;
+    for (unsigned i = start_a ; i != end_a ;)
     {
-        node_idx = node_idx % num_nodes;
+        c_vector<double, SPACE_DIM> centroid_to_i = this->GetVectorFromAtoB(centroid, pElement->GetNode(i)->rGetLocation());
+        double perpendicular_dist = inner_prod(centroid_to_i, unit_perp);
+
+        if (fabs(perpendicular_dist) >= 0.5 * elem_spacing)
+        {
+            no_node_satisfied_condition_1 = false;
+            start_a = i;
+
+            // Calculate position so it's exactly 0.5 * elem_spacing perpendicular distance from the centroid
+            c_vector<double, SPACE_DIM> new_location = pElement->GetNode(i)->rGetLocation();
+            new_location -= unit_perp * copysign(fabs(perpendicular_dist) - 0.5 * elem_spacing, perpendicular_dist);
+
+            pElement->GetNode(i)->SetPoint(ChastePoint<SPACE_DIM>(new_location));
+            break;
+        }
+
+        // Go to the next node
+        i = (i + 1) % num_nodes;
+    }
+
+    // Find correct end_a
+    bool no_node_satisfied_condition_2 = true;
+    for (unsigned i = end_a ; i != start_a ;)
+    {
+        c_vector<double, SPACE_DIM> centroid_to_i = this->GetVectorFromAtoB(centroid, pElement->GetNode(i)->rGetLocation());
+        double perpendicular_dist = inner_prod(centroid_to_i, unit_perp);
+
+        if (fabs(perpendicular_dist) >= 0.5 * elem_spacing)
+        {
+            no_node_satisfied_condition_2 = false;
+            end_a = i;
+
+            // Calculate position so it's exactly 0.5 * elem_spacing perpendicular distance from the centroid
+            c_vector<double, SPACE_DIM> new_location = pElement->GetNode(i)->rGetLocation();
+            new_location -= unit_perp * copysign(fabs(perpendicular_dist) - 0.5 * elem_spacing, perpendicular_dist);
+
+            pElement->GetNode(i)->SetPoint(ChastePoint<SPACE_DIM>(new_location));
+            break;
+        }
+
+        // Go to the previous node
+        i = (i + num_nodes - 1) % num_nodes;
+    }
+
+    // Find correct start_b
+    bool no_node_satisfied_condition_3 = true;
+    for (unsigned i = start_b ; i != end_b ;)
+    {
+        c_vector<double, SPACE_DIM> centroid_to_i = this->GetVectorFromAtoB(centroid, pElement->GetNode(i)->rGetLocation());
+        double perpendicular_dist = inner_prod(centroid_to_i, unit_perp);
+
+        if (fabs(perpendicular_dist) >= 0.5 * elem_spacing)
+        {
+            no_node_satisfied_condition_3 = false;
+            start_b = i;
+
+            // Calculate position so it's exactly 0.5 * elem_spacing perpendicular distance from the centroid
+            c_vector<double, SPACE_DIM> new_location = pElement->GetNode(i)->rGetLocation();
+            new_location -= unit_perp * copysign(fabs(perpendicular_dist) - 0.5 * elem_spacing, perpendicular_dist);
+
+            pElement->GetNode(i)->SetPoint(ChastePoint<SPACE_DIM>(new_location));
+            break;
+        }
+
+        // Go to the next node
+        i = (i + 1) % num_nodes;
+    }
+
+    // Find correct end_b
+    bool no_node_satisfied_condition_4 = true;
+    for (unsigned i = end_b ; i != start_b ;)
+    {
+        c_vector<double, SPACE_DIM> centroid_to_i = this->GetVectorFromAtoB(centroid, pElement->GetNode(i)->rGetLocation());
+        double perpendicular_dist = inner_prod(centroid_to_i, unit_perp);
+
+        if (fabs(perpendicular_dist) >= 0.5 * elem_spacing)
+        {
+            no_node_satisfied_condition_4 = false;
+            end_b = i;
+
+            // Calculate position so it's exactly 0.5 * elem_spacing perpendicular distance from the centroid
+            c_vector<double, SPACE_DIM> new_location = pElement->GetNode(i)->rGetLocation();
+            new_location -= unit_perp * copysign(fabs(perpendicular_dist) - 0.5 * elem_spacing, perpendicular_dist);
+
+            pElement->GetNode(i)->SetPoint(ChastePoint<SPACE_DIM>(new_location));
+            break;
+        }
+
+        // Go to the previous node
+        i = (i + num_nodes - 1) % num_nodes;
+    }
+
+    if (no_node_satisfied_condition_1 || no_node_satisfied_condition_2 || no_node_satisfied_condition_3 || no_node_satisfied_condition_4)
+    {
+        EXCEPTION("Could not space elements far enough apart during cell division.  Cannot currently handle this case");
+    }
+
+    /*
+     * Create location stencils for each of the daughter cells
+     */
+    std::vector<c_vector<double, SPACE_DIM> > daughter_a_location_stencil;
+    for (unsigned node_idx = start_a; node_idx != (end_a + 1) % num_nodes; )
+    {
         daughter_a_location_stencil.push_back(c_vector<double, SPACE_DIM>(pElement->GetNode(node_idx)->rGetLocation()));
+
+        // Go to next node
+        node_idx = (node_idx + 1) % num_nodes;
     }
 
     std::vector<c_vector<double, SPACE_DIM> > daughter_b_location_stencil;
-    for (unsigned node_idx = nodeBIndex + 1; node_idx != nodeAIndex + 1; node_idx++)
+    for (unsigned node_idx = start_b; node_idx != (end_b + 1) % num_nodes; )
     {
-        node_idx = node_idx % num_nodes;
         daughter_b_location_stencil.push_back(c_vector<double, SPACE_DIM>(pElement->GetNode(node_idx)->rGetLocation()));
+
+        // Go to next node
+        node_idx = (node_idx + 1) % num_nodes;
     }
 
     assert(!daughter_a_location_stencil.size() > 1);

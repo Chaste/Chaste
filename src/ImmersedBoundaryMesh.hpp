@@ -141,14 +141,16 @@ protected:
      * @param pElement the element to divide
      * @param nodeAIndex the local index of one node within this element
      * @param nodeBIndex the local index of another node within this element
-     * @param placeOriginalElementBelow whether to place the original element below (in the y direction) the new element (defaults to false)
+     * @param centroid the centroid of the element being divided
+     * @param axisOfDivision the specified division axis
      *
      * @return the index of the new element
      */
     unsigned DivideElement(ImmersedBoundaryElement<ELEMENT_DIM,SPACE_DIM>* pElement,
                            unsigned nodeAIndex,
                            unsigned nodeBIndex,
-                           bool placeOriginalElementBelow=false);
+                           c_vector<double, SPACE_DIM> centroid,
+                           c_vector<double, SPACE_DIM> axisOfDivision);
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
