@@ -6076,6 +6076,9 @@ class ConfigurationStore(object):
         # Find the stimulus current, if it exists for this kind of model (some are self-excitatory)
         if not self.doc.model.is_self_excitatory():
             self.i_stim_var = self._find_var('membrane_stimulus_current', self.i_stim_definitions)
+            if self.i_stim_var.get_type() == VarTypes.Mapped:
+                print >>sys.stderr, "Mapped variable specified as stimulus; using its source instead."
+                self.i_stim_var = self.i_stim_var.get_source_variable(recurse=True)
             DEBUG('config', 'Found stimulus', self.i_stim_var)
             if not self.i_stim_var:
                 # No match :(
