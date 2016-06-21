@@ -733,9 +733,18 @@ class CellMLTranslator(object):
         elif op.localName == u'diff':
             # ODE occuring on the RHS
             self.write(self.code_name(op.dependent_variable, ode=True))
+        elif op.localName == u'csymbol':
+            self.output_special(expr, paren)
         else:
             # Unrecognised operator
             self.error(["Unsupported operator element " + str(op.localName)], xml=expr)
+
+    def output_special(self, expr, paren):
+        """Output a special-case operation, represented by a csymbol element.
+        
+        This needs to be implemented by subclasses if supported.
+        """
+        self.error(["Special-case operators are not supported by this translator."], xml=expr)
 
     def output_function(self, func_name, args, paren, reciprocal=False):
         """Output a function call with name func_name and arguments args.
@@ -1516,6 +1525,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
             self.output_state_assignments(assign_rY=False, nodeset=nodeset)
             self.writeln()
             table_index_nodes_used = self.calculate_lookup_table_indices(nodeset, self.code_name(self.free_vars[0]))
+            table_index_nodes_used.update(self.output_data_table_lookups(nodeset - table_index_nodes_used))
             # Output equations
             self.output_comment('Mathematics')
             self.output_equations(nodeset - table_index_nodes_used)
@@ -1951,7 +1961,79 @@ class CellMLToChasteTranslator(CellMLTranslator):
     def output_extra_constructor_content(self):
         """Hook for subclasses to add further content to the constructor."""
         pass
-    
+
+    # Methods for interpolating on data files, used by Functional Curation
+
+    def output_data_tables(self):
+        """Output the data for interpolated lookups by output_special."""
+        for i, expr in enumerate(getattr(self.model, '_cml_interp_exprs' ,[])):
+            name = expr._cml_interp_table_name = '_data_table_' + str(i)
+            data = expr._cml_interp_data
+            self.output_array_definition(name, data[1])
+            # Set variable names for use in other data-table methods
+            expr._cml_interp_table_index = '_data_table_index_' + str(i)
+            expr._cml_interp_table_factor = '_data_table_factor_' + str(i)
+            # Calculate and cache the inverse of the table step
+            expr._cml_interp_step_inverse = "%.17g" % (1.0 / (data[0,1] - data[0,0]))
+
+    def output_data_table_lookups(self, nodeset):
+        """Output the index and factor generation code for any data tables used in the given nodeset.
+        
+        We may also use the equations within nodeset to calculate the value(s) of the independent variable(s),
+        and return a set containing just those nodes so used, so we can avoid recalculating them later.
+        """
+        nodes_used = set()
+        for expr in getattr(self.model, '_cml_interp_exprs', []):
+            parent = expr.xml_parent
+            while not parent.is_top_level():
+                parent = parent.xml_parent
+            if parent in nodeset:
+                # Code to calculate the independent variable
+                indep_var = expr._cml_interp_table_index + '_raw'
+                self.writeln(self.TYPE_CONST_DOUBLE, indep_var, self.EQ_ASSIGN, nl=False)
+                self.output_expr(expr.operands().next(), paren=False)
+                self.writeln(self.STMT_END, indent=False)
+                # Code to check we're within the table bounds
+                data = expr._cml_interp_data
+                self.output_assert('%s >= %.17g' % (indep_var, data[0,0]))
+                self.output_assert('%s <= %.17g' % (indep_var, data[0,-1]))
+                # Output the index & factor generation code
+                offset_over_step = "(%s - %.17g)*%s" % (indep_var, data[0,0], expr._cml_interp_step_inverse)
+                self.writeln(self.TYPE_CONST_UNSIGNED, expr._cml_interp_table_index, self.EQ_ASSIGN,
+                             self.fast_floor(offset_over_step), self.STMT_END)
+                self.writeln(self.TYPE_CONST_DOUBLE, expr._cml_interp_table_factor, self.EQ_ASSIGN,
+                             offset_over_step, ' - ', expr._cml_interp_table_index, self.STMT_END)
+        return nodes_used
+
+    def output_special(self, expr, paren):
+        """Output a special-case operation, represented by a csymbol element.
+        
+        The only operation currently supported is a table lookup on hardcoded data.
+        """
+        assert expr.operator().definitionURL == u'https://chaste.cs.ox.ac.uk/nss/protocol/interp'
+        self.open_paren(paren)
+        self.write(expr._cml_interp_table_name, '[', expr._cml_interp_table_index, '] + ',
+                   expr._cml_interp_table_factor, ' * (',
+                   expr._cml_interp_table_name, '[1+'+expr._cml_interp_table_index, ']-',
+                   expr._cml_interp_table_name, '[',expr._cml_interp_table_index, '])')
+        self.close_paren(paren)
+
+    # The following three will need overriding in non-C++ translators
+
+    def output_array_definition(self, array_name, array_data):
+        """Output code to create and fill a fixed-size 1d array."""
+        self.writeln('const static double ', array_name, '[] = {', ', '.join(map(lambda f: "%.17g" % f, array_data)), '};')
+
+    def fast_floor(self, arg):
+        """Return code to compute the floor of an argument as an integer quickly, typically by casting."""
+        return "(unsigned)(%s)" % arg
+
+    def output_assert(self, expr):
+        """Output an assertion (or equivalent) that the given expression is true."""
+        self.writeln('EXCEPT_IF_NOT(', expr, ');')
+
+    # Normal lookup table methods
+
     def output_chaste_lut_methods(self):
         """
         Output lookup table declarations & methods, if not using a separate class,
@@ -2509,6 +2591,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
         self.output_state_assignments(assign_rY=assign_rY, nodeset=all_nodes)
         self.writeln()
         table_index_nodes_used = self.calculate_lookup_table_indices(all_nodes|extra_table_nodes, self.code_name(self.free_vars[0]))
+        table_index_nodes_used.update(self.output_data_table_lookups(all_nodes - table_index_nodes_used))
         self.output_comment('Mathematics')
         #907: Declare dV/dt
         if dvdt:
@@ -3500,6 +3583,7 @@ class CellMLToCvodeTranslator(CellMLToChasteTranslator):
         # Separate class for lookup tables?
         if self.use_lookup_tables and self.separate_lut_class:
             self.output_lut_class()
+        self.output_data_tables()
         # Start cell model class
         self.writeln_hpp('class ', self.class_name, self.class_inheritance)
         self.open_block(subsidiary=True)
@@ -4889,8 +4973,9 @@ class CellMLToPythonTranslator(CellMLToChasteTranslator):
         # Do the calculations
         self.writeln(self.TYPE_CONST_DOUBLE, self.code_name(self.free_vars[0]), self.EQ_ASSIGN, 'self.freeVariable')
         self.output_state_assignments(nodeset, 'self.state')
+        nodes_used = self.output_data_table_lookups(nodeset)
         self.output_comment('Mathematics computing outputs of interest')
-        self.output_equations(nodeset)
+        self.output_equations(nodeset - nodes_used)
         self.writeln()
         # Put the results in a list to be returned to the caller
         self.writeln('outputs = self._outputs')
@@ -4975,6 +5060,7 @@ class CellMLToCythonTranslator(CellMLToPythonTranslator):
         self.writeln('cimport fc.sundials.sundials as Sundials')
         self.writeln('from fc.utility.error_handling import ProtocolError')
         self.writeln()
+        self.output_data_tables()
 
     def output_bottom_boilerplate(self):
         """Output file content occurring after the model equations, i.e. the model class."""
@@ -5074,7 +5160,9 @@ class CellMLToCythonTranslator(CellMLToPythonTranslator):
         self.open_block()
         self.writeln('cdef np.ndarray[Sundials.realtype, ndim=1] parameters = self.parameters')
         self.param_vector_name = 'parameters'
+        self.TYPE_CONST_UNSIGNED = 'cdef unsigned '
         self.output_get_outputs_content()
+        del self.TYPE_CONST_UNSIGNED
         self.param_vector_name = 'self.parameters'
         self.close_block()
     
@@ -5098,15 +5186,32 @@ class CellMLToCythonTranslator(CellMLToPythonTranslator):
             if var in nodeset:
                 self.writeln(self.TYPE_DOUBLE, self.code_name(var), ' = (<Sundials.N_VectorContent_Serial>y.content).data[', i, ']')
         self.writeln()
+        self.TYPE_CONST_UNSIGNED = 'cdef unsigned '
+        nodes_used = self.output_data_table_lookups(nodeset)
+        del self.TYPE_CONST_UNSIGNED
+        self.writeln()
         self.output_comment('Mathematics')
-        self.output_equations(nodeset)
+        self.output_equations(nodeset - nodes_used)
         self.writeln()
         # Assign to derivatives vector
         for i, var in enumerate(self.state_vars):
             self.writeln('(<Sundials.N_VectorContent_Serial>ydot.content).data[', i, '] = ', self.code_name(var, True))
         self.param_vector_name = 'self.parameters'
         self.close_block()
-        
+
+    def output_array_definition(self, array_name, array_data):
+        """Output code to create and fill a fixed-size 1d array."""
+        self.writeln('cdef Sundials.realtype[', len(array_data), ']', array_name)
+        self.writeln(array_name, '[:] = [', ', '.join(map(lambda f: "%.17g" % f, array_data)), ']')
+
+    def fast_floor(self, arg):
+        """Return code to compute the floor of an argument as an integer quickly, typically by casting."""
+        return "int(%s)" % arg
+
+    def output_assert(self, expr):
+        """Output an assertion (or equivalent) that the given expression is true."""
+        self.writeln('assert ', expr)
+
     def write_setup_py(self):
         """Write our subsidiary setup.py file for building the extension."""
         self.out2.write("""

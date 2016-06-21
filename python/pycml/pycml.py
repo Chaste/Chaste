@@ -182,7 +182,8 @@ def make_xml_binder():
                        'leq', 'geq', 'lt', 'gt', 'eq', 'neq',
                        'rem',
                        'ci', 'cn', 'apply', 'piecewise', 'piece',
-                       'sin', 'cos', 'tan', 'arcsin', 'arccos', 'arctan']:
+                       'sin', 'cos', 'tan', 'arcsin', 'arccos', 'arctan',
+                       'csymbol']:
         exec "binder.set_binding_class(NSS[u'm'], '%s', mathml_%s)" % (mathml_elt, mathml_elt)
     binder.set_binding_class(NSS[u'm'], "and_", mathml_and)
     binder.set_binding_class(NSS[u'm'], "or_", mathml_or)
@@ -6176,6 +6177,26 @@ class mathml_arctan(mathml_operator, mathml_units_mixin_set_operands):
         if len(ops) != 1:
             self.wrong_number_of_operands(len(ops), [1])
         return math.atan(self.eval(ops[0]))
+
+
+class mathml_csymbol(mathml_operator, mathml_units_mixin):
+    """Class representing the MathML <csymbol> operator.
+    
+    This is used to represent special-case operations that are treated uniquely by the code generation phase.
+    """
+    def evaluate(self):
+        raise NotImplementedError
+
+    def _set_in_units(self, units, no_act=False):
+        """Set the units of the application of this operator, adding a conversion if needed."""
+        app = self.xml_parent
+        defn_units = app.get_units().extract()
+        if defn_units != units:
+            self._add_units_conversion(app, defn_units, units, no_act)
+        # Store the units
+        if not no_act:
+            app._cml_units = units
+        return
 
 
 ## Don't export module imports to people who do "from pycml import *"

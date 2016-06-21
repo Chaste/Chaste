@@ -733,7 +733,26 @@ class Protocol(processors.ModelModifier):
         input_var._cml_ok_as_input = True
         self.inputs.add(input_var)
         return input_var
+
+    def _add_converted_variable(self, orig_var, new_units):
+        """Add a new version of the given variable with different units.
         
+        An assignment will be added making the new variable equal to the old, so that a units conversion will happen.
+        We also ensure that the new units are added to the model if needed.
+        Used by _add_interpolation, and relies on being in the _add_maths_to_model processing phase.
+        
+        :returns: the new variable
+        """
+        new_units = self.add_units(new_units)
+        comp = orig_var.component
+        new_name = self._uniquify_var_name(orig_var.name, comp)
+        new_var = self.add_variable(comp, new_name, new_units)
+        cname = comp.name
+        assign = mathml_apply.create_new(new_var, 'eq', [cname + ',' + new_var.name, cname + ',' + orig_var.name])
+        self.inputs.add(assign)
+        self._add_maths_to_model(assign)
+        return new_var
+
     def _replace_variable(self, var, units, allow_existing=False):
         """Replace the given variable with a version in the given units in the protocol component.
 
@@ -1150,29 +1169,52 @@ class Protocol(processors.ModelModifier):
         # Get units objects so we can do conversions if necessary
         indep_units = self._get_units_object(self.units[indep_units])
         dep_units = self._get_units_object(self.units[dep_units])
-        # Iterate over data rows to construct the piecewise representation
-        eqn = mathml_apply.create_new
-        pieces = [] 
-        for row in range(data.shape[1] - 1):
-            if data[0][row] == data[0][row+1]:
-                # Vertical jumps are allowed in voltage clamp protocols, but trying to interpolate gives you a divide by zero.
-                # Just skip the jump part, and we'll interpolate correctly at either side.
-                continue
-            x1 = (data[0][row], indep_units.name)
-            x2 = (data[0][row+1], indep_units.name)
-            y1 = (data[1][row], dep_units.name)
-            y2 = (data[1][row+1], dep_units.name)
-            cond = eqn(rhs, 'and', [eqn(rhs, 'geq', [indep_var_name, x1]),
-                                    eqn(rhs, 'leq', [indep_var_name, x2])])
-            temp2 = eqn(rhs, 'divide', [eqn(rhs, 'minus', [y2, y1]),
-                                        eqn(rhs, 'minus', [x2, x1])])
-            temp1 = eqn(rhs, 'times', [temp2, eqn(rhs, 'minus', [indep_var_name, x1])])
-            case = eqn(rhs, 'plus', [y1, temp1])
-            pieces.append((case, cond))
-        piecewise = mathml_piecewise.create_new(rhs, pieces)
+        # Check to see whether we can do a special-case optimisation for equally spaced independent variable points
+        steps = numpy.diff(data[0])
+        if abs(numpy.max(steps) - numpy.min(steps)) < 1e-6 * numpy.max(steps):
+            if steps[0] == 0.0:
+                raise ProtocolError("The data file for an interpolate() cannot have all zero table steps.")
+            # Find the independent variable, which must exist, to determine if we need a conversion
+            self._identify_referenced_variables(operands[1])
+            indep_var_name = unicode(operands[1])
+            indep_var = self.model.get_variable_by_name(*self._split_name(indep_var_name))
+            if not indep_var.get_units().equals(indep_units):
+                indep_var = self._add_converted_variable(indep_var, indep_units)
+                indep_var_name = indep_var.component.name + ',' + indep_var.name
+            # Create a 'magic' expression that code generation will comprehend
+            new_rhs = mathml_apply.create_new(rhs, 'csymbol', [indep_var_name])
+            new_rhs._cml_interp_data = data
+            new_rhs._cml_units = UnitsSet([dep_units], expression=new_rhs)
+            new_rhs.xml_set_attribute((u'pe:binding_time', NSS[u'pe']), u'dynamic')
+            new_rhs.operands().next().xml_set_attribute((u'pe:binding_time', NSS[u'pe']), u'dynamic')
+            new_rhs.operator().xml_set_attribute(u'definitionURL', u'https://chaste.cs.ox.ac.uk/nss/protocol/interp')
+            # Update list of interpolations on the model for convenience
+            self.model._cml_interp_exprs = getattr(self.model, '_cml_interp_exprs', [])
+            self.model._cml_interp_exprs.append(new_rhs)
+        else:
+            # Iterate over data rows to construct a piecewise representation for the interpolation
+            eqn = mathml_apply.create_new
+            pieces = []
+            for row in range(data.shape[1] - 1):
+                if data[0,row] == data[0,row+1]:
+                    # Vertical jumps are allowed in voltage clamp protocols, but trying to interpolate gives you a divide by zero.
+                    # Just skip the jump part, and we'll interpolate correctly at either side.
+                    continue
+                x1 = (data[0,row], indep_units.name)
+                x2 = (data[0,row+1], indep_units.name)
+                y1 = (data[1,row], dep_units.name)
+                y2 = (data[1,row+1], dep_units.name)
+                cond = eqn(rhs, 'and', [eqn(rhs, 'geq', [indep_var_name, x1]),
+                                        eqn(rhs, 'leq', [indep_var_name, x2])])
+                temp2 = eqn(rhs, 'divide', [eqn(rhs, 'minus', [y2, y1]),
+                                            eqn(rhs, 'minus', [x2, x1])])
+                temp1 = eqn(rhs, 'times', [temp2, eqn(rhs, 'minus', [indep_var_name, x1])])
+                case = eqn(rhs, 'plus', [y1, temp1])
+                pieces.append((case, cond))
+            new_rhs = mathml_piecewise.create_new(rhs, pieces)
         # Insert and return the new rhs
-        expr.replace_child(rhs, piecewise)
-        return piecewise
+        expr.replace_child(rhs, new_rhs)
+        return new_rhs
 
     def _add_maths_to_model(self, expr):
         """Add or replace an equation in the model.
