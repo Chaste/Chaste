@@ -736,11 +736,11 @@ class Protocol(processors.ModelModifier):
         
     def _replace_variable(self, var, units, allow_existing=False):
         """Replace the given variable with a version in the given units in the protocol component.
-        
+
         Ensures that the units are added to the model if needed, and transfers the cmeta:id if
         present.  It doesn't transfer the initial_value, since this would break the output variable
         case.
-        
+
         The new variable will be given a local name equal to the full name of the original, to avoid
         potential conflicts.  If allow_existing is False then it's an error if the variable has
         already been replaced.  If allow_existing is True, then we just reuse the existing replacement.
@@ -944,8 +944,7 @@ class Protocol(processors.ModelModifier):
                 try:
                     var = self._get_protocol_component().get_variable_by_name(vname)
                 except KeyError:
-                    raise ValueError("The variable name '%s' has not been declared in the protocol"
-                                     % vname)
+                    raise ValueError("The variable name '%s' has not been declared in the protocol" % vname)
             full_name = var.component.name + u',' + var.name
             ci_elt._rename(full_name)
         return all_vars_found
@@ -957,9 +956,8 @@ class Protocol(processors.ModelModifier):
         mapping (prefix->uri, as found e.g. at elt.rootNode.xmlns_prefixes).
         
         Will throw ValueError if the variable doesn't exist in the model, or the given term is invalid.
-        If enforce_uniqueness is True, also ensures there's only one variable with the annotation.
-        
-        If check_optional is True, we don't throw on missing ontology-annotated variables if they're
+        :param enforce_uniqueness: if True, also ensures there's only one variable with the annotation.
+        :param check_optional: if True, we don't throw on missing ontology-annotated variables if they're
         in the optional set, but just return None instead.
         """
         try:
@@ -1129,9 +1127,9 @@ class Protocol(processors.ModelModifier):
         modifying the rhs of expr to contain this piecewise MathML, so that _add_maths_to_model
         can continue as for normal 'define' constructs.
 
-        @param expr: the new equation
-        @param lhs: the left-hand side of the new equation
-        @param rhs: the right-hand side of the new equation 
+        :param expr: the new equation
+        :param lhs: the left-hand side of the new equation
+        :param rhs: the right-hand side of the new equation 
         """
         # Extract operands with paranoia checks
         operands = list(rhs.operands())
