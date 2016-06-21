@@ -884,15 +884,19 @@ class Protocol(processors.ModelModifier):
                     comp = expr.component
                     if comp.name != cname:
                         # Check for the special case of the referenced variable having a source in this component already
+                        # (providing it has identical units)
                         src_comp = self.model.get_component_by_name(cname)
-                        src_var = src_comp.get_variable_by_name(vname).get_source_variable(recurse=True)
+                        referenced_var = src_comp.get_variable_by_name(vname)
+                        src_var = referenced_var.get_source_variable(recurse=True)
                         if src_var.component is comp:
                             # Use the existing var
 #                             print 'Using existing var', src_var, 'for reference', unicode(ci_elt)
+                            if not src_var.get_units().equals(referenced_var.get_units()):
+                                raise ProtocolError("Unable to connect to a variable in the same component with different units!")
                             vname = src_var.name
                         else:
 #                             print 'Connecting to reference', unicode(ci_elt), 'from component', comp.name
-                            self.connect_variables(src_var, (comp.name,vname))
+                            self.connect_variables(referenced_var, (comp.name,vname))
                     # Now just rename to be local
                     ci_elt._rename(vname)
     
