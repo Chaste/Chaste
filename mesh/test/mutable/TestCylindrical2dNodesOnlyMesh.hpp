@@ -247,6 +247,8 @@ public:
 
     void TestRefreshMesh()
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
+
         // Create generating mesh
         HoneycombMeshGenerator generator(4, 4);
         TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
@@ -271,6 +273,9 @@ public:
         //Check nodes moved periodically
         TS_ASSERT_DELTA(p_mesh->GetNode(0)->rGetLocation()[0], 0.0, 1e-6);
         TS_ASSERT_DELTA(p_mesh->GetNode(3)->rGetLocation()[0], 3.0, 1e-6);
+
+        // Avoid memory leak
+        delete p_mesh;
     }
 
     void TestConstuctingBoxCollection() throw (Exception)
