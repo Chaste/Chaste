@@ -687,9 +687,9 @@ if (Chaste_PROFILE_GPROF OR Chaste_PROFILE_GPERFTOOLS)
     
     set(CTEST_COMMAND ctest)
     add_custom_target(profile
-        COMMAND ${CTEST_COMMAND} "-L" "Profile|ProfileAssembly" "--output-on-failure"
+        COMMAND ${CTEST_COMMAND} "-L" "Profile" "--output-on-failure"
         COMMAND ${PYTHON_EXECUTABLE} "${Chaste_SOURCE_DIR}/cmake/process_profile.py" "${Chaste_PROFILE_OUTPUT_DIR}" ${extension}
-        DEPENDS Profile ProfileAssembly
+        DEPENDS Profile 
         WORKING_DIRECTORY ${Chaste_BINARY_DIR}
         VERBATIM)
 endif()
