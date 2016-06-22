@@ -269,7 +269,7 @@ class Protocol(processors.ModelModifier):
             prefixed_name = output_spec['prefixed_name']
             units = output_spec['units']
             try:
-                vars = self._lookup_ontology_term(prefixed_name, enforce_uniqueness=False, check_optional=True)
+                vars = self._lookup_ontology_term(prefixed_name, enforce_uniqueness=False, check_optional=True, transitive=True)
             except ValueError, e:
                 raise ProtocolError(str(e))
             if vars is None:
@@ -295,7 +295,7 @@ class Protocol(processors.ModelModifier):
         """
         # Re-lookup all the ontology terms that matched multiple variables
         for prefixed_name, units in self._vector_outputs_detail:
-            vars = self._lookup_ontology_term(prefixed_name, False)
+            vars = self._lookup_ontology_term(prefixed_name, enforce_uniqueness=False, transitive=True)
             vector_name = prefixed_name.split(':')[1]
             for var in vars:
                 # Units convert if needed
@@ -972,7 +972,7 @@ class Protocol(processors.ModelModifier):
             ci_elt._rename(full_name)
         return all_vars_found
     
-    def _lookup_ontology_term(self, prefixed_name, enforce_uniqueness=True, check_optional=False):
+    def _lookup_ontology_term(self, prefixed_name, enforce_uniqueness=True, check_optional=False, transitive=False):
         """Find the variable annotated with the given term, if it exists.
         
         The term should be given in prefixed form, with the prefix appearing in the protocol's namespace
@@ -982,6 +982,8 @@ class Protocol(processors.ModelModifier):
         :param enforce_uniqueness: if True, also ensures there's only one variable with the annotation.
         :param check_optional: if True, we don't throw on missing ontology-annotated variables if they're
         in the optional set, but just return None instead.
+        :param transitive: if True, look not just for direct annotations but also for terms belonging to
+        the class given by prefixed_name, searching transitively along rdf:type predicates.
         """
         try:
             prefix, _ = prefixed_name.split(':')
@@ -992,7 +994,7 @@ class Protocol(processors.ModelModifier):
             nsuri = self._protocol_namespaces[prefix]
         except KeyError:
             raise ValueError("The namespace prefix '%s' has not been declared" % prefix)
-        vars = self.model.get_variables_by_ontology_term((prefixed_name, nsuri))
+        vars = self.model.get_variables_by_ontology_term((prefixed_name, nsuri), transitive=transitive)
         if len(vars) == 0:
             if check_optional and prefixed_name in self._optional_vars:
                 return None

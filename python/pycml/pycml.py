@@ -457,20 +457,27 @@ class cellml_model(element_base):
             var = None
         return var
     
-    def get_variables_by_ontology_term(self, term):
+    def get_variables_by_ontology_term(self, term, transitive=False):
         """Return a list of variables annotated with the given ontology term.
         
-        The annotations have the same form as for oxmeta name annotations (see
-        get_variable_by_oxmeta_name).  However, here we are not restricted to
-        namespace, and no check is done on the number of results returned.
+        The annotations have the same form as for oxmeta name annotations (see get_variable_by_oxmeta_name).
+        However, here we are not restricted to namespace, and no check is done on the number of results returned.
         
-        The given term must be a (prefixed_name, nsuri) tuple.
+        :param term: must be a (prefixed_name, nsuri) tuple.
+        :param transitive: if True, look not just for direct annotations but also for terms belonging to
+        the class given by prefixed_name, searching transitively along rdf:type predicates.
         """
         assert isinstance(term, tuple)
         assert len(term) == 2
-        named_vars = cellml_metadata.find_variables(self, ('bqbiol:is', NSS['bqbiol']), term)
-        category_vars = cellml_metadata.find_variables(self, ('bqbiol:isVersionOf', NSS['bqbiol']), term)
-        return named_vars + category_vars
+        vars = []
+        if transitive:
+            terms = cellml_metadata.transitive_subjects(term)
+        else:
+            terms = [term]
+        for term in terms:
+            vars.extend(cellml_metadata.find_variables(self, ('bqbiol:is', NSS['bqbiol']), term))
+            vars.extend(cellml_metadata.find_variables(self, ('bqbiol:isVersionOf', NSS['bqbiol']), term))
+        return vars
     
     def get_variable_by_cmeta_id(self, cmeta_id):
         """

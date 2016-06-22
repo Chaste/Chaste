@@ -69,7 +69,7 @@ class RdfProcessor(object):
         # Map from cellml_model instances to RDF stores
         self._models = {}
         # Oxford metadata will be loaded lazily
-        self._metadata_names = self._stimulus_names = None
+        self._metadata_names = self._stimulus_names = self._ontology = None
         # Cope with differences in API between library versions
         rdflib_major_version = int(rdflib.__version__[0])
         if rdflib_major_version >= 3:
@@ -99,7 +99,7 @@ class RdfProcessor(object):
         oxmeta_ttl = os.path.join(pycml_path, 'oxford-metadata.ttl')
         oxmeta_rdf = os.path.join(pycml_path, 'oxford-metadata.rdf')
 
-        g = self.Graph()
+        g = self._ontology = self.Graph()
         # We allow a difference in modification time of 10s, so we don't get confused when checking out!
         if os.stat(oxmeta_ttl).st_mtime > os.stat(oxmeta_rdf).st_mtime + 10.0:
             # Try to regenerate RDF/XML version of ontology
@@ -197,11 +197,10 @@ class RdfProcessor(object):
     def create_rdf_node(self, node_content=None, fragment_id=None):
         """Create an RDF node.
         
-        node_content, if given, must either be a tuple (qname, namespace_uri),
+        node_content, if given, must either be an rdflib.term.Node instance, a tuple (qname, namespace_uri),
         or a string, in which case it is interpreted as a literal RDF node.
         
-        Alternatively, fragment_id may be given to refer to a cmeta:id within the
-        current model.
+        Alternatively, fragment_id may be given to refer to a cmeta:id within the current model.
         
         If neither are given, a blank node is created.
         """
@@ -217,6 +216,8 @@ class RdfProcessor(object):
                 node = ns[local_name]
             elif type(node_content) in types.StringTypes:
                 node = rdflib.Literal(node_content)
+            elif isinstance(node_content, rdflib.term.Node):
+                node = node_content
             else:
                 raise ValueError("Don't know how to make a node from " + str(node_content)
                                  + " of type " + type(node_content))
@@ -317,6 +318,13 @@ class RdfProcessor(object):
             assert len(var_objs) == 1, "Didn't find a unique variable with ID " + var_id
             vars.append(var_objs[0])
         return vars
+    
+    def transitive_subjects(self, term):
+        """Transitively generate subjects connected to term by the rdf:type (a) property in the ontology."""
+        if self._ontology is None:
+            self._load_ontology()
+        term = self.create_rdf_node(term)
+        return self._ontology.transitive_subjects(rdflib.RDF.type, term)
     
     def get_all_rdf(self, cellml_model):
         """Return an iterator over all RDF triples in the model."""
