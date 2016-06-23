@@ -94,7 +94,7 @@ private:
         HeartConfig::Instance()->SetKSPSolver("symmlq");
         HeartConfig::Instance()->SetKSPPreconditioner("bjacobi");
         HeartConfig::Instance()->SetOutputFilenamePrefix("BidomainLR91HalfHeart");
-        PetscOptionsSetValue("-options_table", "");
+        PetscTools::SetOption("-options_table", "");
     }
 public:
 

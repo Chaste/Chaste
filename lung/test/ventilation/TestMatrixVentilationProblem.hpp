@@ -407,7 +407,7 @@ public:
     void TestTopOfAirwaysPatientData() throw (Exception)
     {
         MatrixVentilationProblem problem("lung/test/data/top_of_tree", 0u);
-        PetscOptionsSetValue("-ksp_monitor", "");
+        PetscTools::SetOption("-ksp_monitor", "");
         problem.SetOutflowPressure(0.0);
         problem.SetConstantInflowPressures(50.0);
         //problem.SetConstantInflowFluxes(100.0);
@@ -427,7 +427,7 @@ public:
     void TestTopOfAirwaysPatientDataOutflowFlux() throw (Exception)
     {
         MatrixVentilationProblem problem("lung/test/data/top_of_tree", 0u);
-        PetscOptionsSetValue("-ksp_monitor", "");
+        PetscTools::SetOption("-ksp_monitor", "");
         problem.SetOutflowFlux(0.001);
         problem.SetConstantInflowPressures(50.0);
         //problem.SetConstantInflowFluxes(100.0);
@@ -444,7 +444,7 @@ public:
     void OnlyWorksWithUMFPACKTestPatientData() throw (Exception)
     {
         MatrixVentilationProblem problem("notforrelease_lung/test/data/Novartis002", 0u);
-        PetscOptionsSetValue("-ksp_monitor", "");
+        PetscTools::SetOption("-ksp_monitor", "");
 
         problem.SetOutflowPressure(0.);
         problem.SetConstantInflowPressures(50.0);

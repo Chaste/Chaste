@@ -148,7 +148,7 @@ public:
         // Make sure we are not inheriting a non-default number of iterations from previous test
         std::stringstream num_it_str;
         num_it_str << 1000;
-        PetscOptionsSetValue("-ksp_max_it", num_it_str.str().c_str());
+        PetscTools::SetOption("-ksp_max_it", num_it_str.str().c_str());
 
         try
         {
@@ -185,7 +185,7 @@ public:
 
 
         // Make sure we are not inheriting a non-default number of iterations from previous test
-        PetscOptionsSetValue("-ksp_max_it", num_it_str.str().c_str());
+        PetscTools::SetOption("-ksp_max_it", num_it_str.str().c_str());
         {
             LinearSystem ls = LinearSystem(system_rhs, system_matrix);
 
@@ -205,7 +205,7 @@ public:
         }
 
         // Make sure we are not inheriting a non-default number of iterations from previous test
-        PetscOptionsSetValue("-ksp_max_it", num_it_str.str().c_str());
+        PetscTools::SetOption("-ksp_max_it", num_it_str.str().c_str());
         {
             LinearSystem ls = LinearSystem(system_rhs, system_matrix);
 

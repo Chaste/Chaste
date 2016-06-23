@@ -1080,7 +1080,7 @@ Vec LinearSystem::Solve(Vec lhsGuess)
             /// \todo #1695 Store this number in a member variable.
             std::stringstream num_it_str;
             num_it_str << 1000;
-            PetscOptionsSetValue("-ksp_max_it", num_it_str.str().c_str());
+            PetscTools::SetOption("-ksp_max_it", num_it_str.str().c_str());
 
             // Adaptive Chebyshev: reevaluate spectrum with cg
             if (mKspType == "chebychev")
@@ -1180,7 +1180,7 @@ Vec LinearSystem::Solve(Vec lhsGuess)
             KSPGetIterationNumber(mKspSolver, &num_it);
             std::stringstream num_it_str;
             num_it_str << num_it;
-            PetscOptionsSetValue("-ksp_max_it", num_it_str.str().c_str());
+            PetscTools::SetOption("-ksp_max_it", num_it_str.str().c_str());
 
             KSPSetFromOptions(mKspSolver);
             KSPSetUp(mKspSolver);
@@ -1251,7 +1251,7 @@ void LinearSystem::ResetKspSolver()
     /// \todo #1695 Store this number in a member variable.
     std::stringstream num_it_str;
     num_it_str << 1000;
-    PetscOptionsSetValue("-ksp_max_it", num_it_str.str().c_str());
+    PetscTools::SetOption("-ksp_max_it", num_it_str.str().c_str());
 }
 
 // Serialization for Boost >= 1.36

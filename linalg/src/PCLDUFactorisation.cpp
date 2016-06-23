@@ -244,9 +244,9 @@ void PCLDUFactorisation::PCLDUFactorisationCreate(KSP& rKspObject)
 void PCLDUFactorisation::PCLDUFactorisationSetUp()
 {
     // These options will get read by PCSetFromOptions
-//     PetscOptionsSetValue("-pc_hypre_boomeramg_max_iter", "1");
-//     PetscOptionsSetValue("-pc_hypre_boomeramg_strong_threshold", "0.0");
-//     PetscOptionsSetValue("-pc_hypre_type", "boomeramg");
+//     PetscTools::SetOption("-pc_hypre_boomeramg_max_iter", "1");
+//     PetscTools::SetOption("-pc_hypre_boomeramg_strong_threshold", "0.0");
+//     PetscTools::SetOption("-pc_hypre_type", "boomeramg");
 
     /*
      * Set up preconditioner for block A11
@@ -277,14 +277,14 @@ void PCLDUFactorisation::PCLDUFactorisationSetUp()
     PetscPopErrorHandler();
 
 #if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR<=5 )
-    PetscOptionsSetValue("-pc_hypre_type", "euclid");
-    PetscOptionsSetValue("-pc_hypre_euclid_levels", "0");
+    PetscTools::SetOption("-pc_hypre_type", "euclid");
+    PetscTools::SetOption("-pc_hypre_euclid_levels", "0");
 #else
     /* euclid was removed in 3.6. Use the previously-commented-out alternative */
-    PetscOptionsSetValue("-pc_hypre_type", "boomeramg");
-    PetscOptionsSetValue("-pc_hypre_boomeramg_max_iter", "1");
-    PetscOptionsSetValue("-pc_hypre_boomeramg_strong_threshold", "0.0");
-    PetscOptionsSetValue("-pc_hypre_boomeramg_coarsen_type", "HMIS");
+    PetscTools::SetOption("-pc_hypre_type", "boomeramg");
+    PetscTools::SetOption("-pc_hypre_boomeramg_max_iter", "1");
+    PetscTools::SetOption("-pc_hypre_boomeramg_strong_threshold", "0.0");
+    PetscTools::SetOption("-pc_hypre_boomeramg_coarsen_type", "HMIS");
 #endif
 
 ////////
@@ -330,11 +330,11 @@ void PCLDUFactorisation::PCLDUFactorisationSetUp()
     // Stop supressing error
     PetscPopErrorHandler();
 
-    PetscOptionsSetValue("-pc_hypre_type", "boomeramg");
-    PetscOptionsSetValue("-pc_hypre_boomeramg_max_iter", "1");
-    PetscOptionsSetValue("-pc_hypre_boomeramg_strong_threshold", "0.0");
-    PetscOptionsSetValue("-pc_hypre_boomeramg_coarsen_type", "HMIS");
-    //    PetscOptionsSetValue("-pc_hypre_boomeramg_interp_type","ext+i");
+    PetscTools::SetOption("-pc_hypre_type", "boomeramg");
+    PetscTools::SetOption("-pc_hypre_boomeramg_max_iter", "1");
+    PetscTools::SetOption("-pc_hypre_boomeramg_strong_threshold", "0.0");
+    PetscTools::SetOption("-pc_hypre_boomeramg_coarsen_type", "HMIS");
+    //    PetscTools::SetOption("-pc_hypre_boomeramg_interp_type","ext+i");
 
 ////////
 //    PCSetType(mPCContext.PC_amg_A22, PCKSP);

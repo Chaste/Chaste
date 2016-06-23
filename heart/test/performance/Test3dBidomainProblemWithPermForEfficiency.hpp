@@ -76,7 +76,7 @@ public:
 
         HeartConfig::Instance()->SetKSPSolver("symmlq");
         HeartConfig::Instance()->SetKSPPreconditioner("bjacobi");
-        PetscOptionsSetValue("-log_summary", "");
+        PetscTools::SetOption("-log_summary", "");
 
         bidomain_problem.Initialise();
 

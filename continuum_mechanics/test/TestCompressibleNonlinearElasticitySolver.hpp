@@ -765,7 +765,7 @@ public:
         // In parallel, this fails with the current solver / preconditioner combination (cg + bjacobi)
         // although checked that matrix is positive definite. Fails because one of the blocks is
         // not positive def? Get round this by using just jacobi preconditioning.
-        PetscOptionsSetValue("-pc_type","jacobi");
+        PetscTools::SetOption("-pc_type","jacobi");
 
         solver.Solve();
 

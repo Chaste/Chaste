@@ -1634,9 +1634,9 @@ void AbstractNonlinearElasticitySolver<DIM>::SetKspSolverAndPcType(KSP solver)
                 //regression testing.  If a name changes, then the behaviour of the code changes
                 //because it won't recognise the old name.  However, it won't fail to compile/run.
                 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 1) //PETSc 3.1 or later
-                    PetscOptionsSetValue("-pc_factor_shift_type", "positive_definite");
+                    PetscTools::SetOption("-pc_factor_shift_type", "positive_definite");
                 #else
-                    PetscOptionsSetValue("-pc_factor_shift_positive_definite", "");
+                    PetscTools::SetOption("-pc_factor_shift_positive_definite", "");
                 #endif
             }
             else
@@ -1657,9 +1657,9 @@ void AbstractNonlinearElasticitySolver<DIM>::SetKspSolverAndPcType(KSP solver)
                 // Speed up linear solve time massively for larger simulations (in fact GMRES may stagnate without
                 // this for larger problems), by using a AMG preconditioner -- needs HYPRE installed
                 /////////////////////////////////////////////////////////////////////////////////////////////////////
-                PetscOptionsSetValue("-pc_hypre_type", "boomeramg");
-                // PetscOptionsSetValue("-pc_hypre_boomeramg_max_iter", "1");
-                // PetscOptionsSetValue("-pc_hypre_boomeramg_strong_threshold", "0.0");
+                PetscTools::SetOption("-pc_hypre_type", "boomeramg");
+                // PetscTools::SetOption("-pc_hypre_boomeramg_max_iter", "1");
+                // PetscTools::SetOption("-pc_hypre_boomeramg_strong_threshold", "0.0");
 
                 PCSetType(pc, PCHYPRE);
                 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >=2) //PETSc 3.2 or later
@@ -1775,8 +1775,8 @@ double AbstractNonlinearElasticitySolver<DIM>::TakeNewtonStep()
     // Set the type of KSP solver (CG, GMRES etc) and preconditioner (ILU, HYPRE, etc)
     SetKspSolverAndPcType(solver);
 
-    //PetscOptionsSetValue("-ksp_monitor","");
-    //PetscOptionsSetValue("-ksp_norm_type","natural");
+    //PetscTools::SetOption("-ksp_monitor","");
+    //PetscTools::SetOption("-ksp_norm_type","natural");
 
     KSPSetFromOptions(solver);
     KSPSetUp(solver);
@@ -2214,7 +2214,7 @@ void AbstractNonlinearElasticitySolver<DIM>::SolveSnes()
 
     if(this->mVerbose)
     {
-        PetscOptionsSetValue("-snes_monitor","");
+        PetscTools::SetOption("-snes_monitor","");
     }
     SNESSetFromOptions(snes);
 

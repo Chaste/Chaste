@@ -256,9 +256,9 @@ void PCTwoLevelsBlockDiagonal::PCTwoLevelsBlockDiagonalCreate(KSP& rKspObject, s
 void PCTwoLevelsBlockDiagonal::PCTwoLevelsBlockDiagonalSetUp()
 {
     // These options will get read by PCSetFromOptions
-    PetscOptionsSetValue("-pc_hypre_boomeramg_max_iter", "1");
-    PetscOptionsSetValue("-pc_hypre_boomeramg_strong_threshold", "0.0");
-    PetscOptionsSetValue("-pc_hypre_type", "boomeramg");
+    PetscTools::SetOption("-pc_hypre_boomeramg_max_iter", "1");
+    PetscTools::SetOption("-pc_hypre_boomeramg_strong_threshold", "0.0");
+    PetscTools::SetOption("-pc_hypre_type", "boomeramg");
 
     // Set up amg preconditioner for block A11
     PCCreate(PETSC_COMM_WORLD, &(mPCContext.PC_amg_A11));
@@ -286,11 +286,11 @@ void PCTwoLevelsBlockDiagonal::PCTwoLevelsBlockDiagonalSetUp()
     PCCreate(PETSC_COMM_WORLD, &(mPCContext.PC_amg_A22_B2));
     PCSetType(mPCContext.PC_amg_A22_B2, PCHYPRE);
     //PCHYPRESetType(mPCContext.PC_amg_A22_B2, "boomeramg");
-    PetscOptionsSetValue("-pc_hypre_type", "boomeramg");
+    PetscTools::SetOption("-pc_hypre_type", "boomeramg");
 
-    PetscOptionsSetValue("-pc_hypre_boomeramg_max_iter", "1");
-    PetscOptionsSetValue("-pc_hypre_boomeramg_strong_threshold", "0.0");
-    PetscOptionsSetValue("-pc_hypre_boomeramg_coarsen_type", "HMIS");
+    PetscTools::SetOption("-pc_hypre_boomeramg_max_iter", "1");
+    PetscTools::SetOption("-pc_hypre_boomeramg_strong_threshold", "0.0");
+    PetscTools::SetOption("-pc_hypre_boomeramg_coarsen_type", "HMIS");
 
 #if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5 )
     PCSetOperators(mPCContext.PC_amg_A22_B2, mPCContext.A22_B2_matrix_subblock, mPCContext.A22_B2_matrix_subblock);

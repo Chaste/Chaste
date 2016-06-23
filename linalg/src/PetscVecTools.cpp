@@ -76,8 +76,15 @@ void PetscVecTools::AddToElement(Vec vector, PetscInt row, double value)
 void PetscVecTools::Display(Vec vector)
 {
     //Give full precision, scientific notation
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 7) // PETSc 3.7+
+    PetscViewerPushFormat(PETSC_VIEWER_STDOUT_WORLD, PETSC_VIEWER_ASCII_MATLAB);
+#else
     PetscViewerSetFormat(PETSC_VIEWER_STDOUT_WORLD, PETSC_VIEWER_ASCII_MATLAB);
+#endif
     VecView(vector, PETSC_VIEWER_STDOUT_WORLD);
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 7) // PETSc 3.7+
+    PetscViewerPopFormat(PETSC_VIEWER_STDOUT_WORLD);
+#endif
 }
 
 void PetscVecTools::Zero(Vec vector)

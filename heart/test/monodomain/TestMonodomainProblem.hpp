@@ -1350,7 +1350,7 @@ public:
 #ifdef CHASTE_CVODE
 
         // Switch this back on to watch linear solver converge on each step.
-        //PetscOptionsSetValue("-ksp_monitor", "");
+        //PetscTools::SetOption("-ksp_monitor", "");
 
         // Make sure that this test isn't having problems because of PDE tolerances.
         HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-12);

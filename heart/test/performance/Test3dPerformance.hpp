@@ -57,7 +57,7 @@ public:
     {
         HeartConfig::Instance()->SetKSPSolver("symmlq");
         HeartConfig::Instance()->SetKSPPreconditioner("bjacobi");
-        PetscOptionsSetValue("-log_summary", "");
+        PetscTools::SetOption("-log_summary", "");
         // write headings
         PerformanceTester<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<3>, 3>::DisplayHeadings();
         HeartEventHandler::Headings();

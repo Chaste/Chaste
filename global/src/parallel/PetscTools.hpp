@@ -372,6 +372,22 @@ public:
         MatDestroy(rMat);
 #endif
      }
+
+     /**
+      * Set a PETSc option.
+      * This is a wrapper for PetscOptionsSetValue, which changed signature in PETSc 3.7.
+      *
+      * @param pOptionName  the option name
+      * @param pOptionValue  the option value
+      */
+     static inline void SetOption(const char* pOptionName, const char* pOptionValue)
+     {
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 7) // PETSc 3.7 or later
+         PetscOptionsSetValue(NULL, pOptionName, pOptionValue);
+#else
+         PetscOptionsSetValue(pOptionName, pOptionValue);
+#endif
+     }
 };
 
 #endif /*PETSCTOOLS_HPP_*/

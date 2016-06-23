@@ -1593,8 +1593,8 @@ public:
     void TestSetFromOptions()
     {
         LinearSystem ls = LinearSystem(5);
-        PetscOptionsSetValue("-ksp_type", "gmres");
-        PetscOptionsSetValue("-pc_type", "jacobi");
+        PetscTools::SetOption("-ksp_type", "gmres");
+        PetscTools::SetOption("-pc_type", "jacobi");
         ls.AssembleFinalLinearSystem();
 
         ls.SetKspType("cg"); //Not really -- see above

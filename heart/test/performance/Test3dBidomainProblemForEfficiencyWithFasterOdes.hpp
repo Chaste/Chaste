@@ -102,7 +102,7 @@ public:
 
         bidomain_problem.PrintOutput(false);
 
-        PetscOptionsSetValue("-log_summary", "");
+        PetscTools::SetOption("-log_summary", "");
 
         bidomain_problem.Initialise();
 

@@ -198,9 +198,9 @@ void PCBlockDiagonal::PCBlockDiagonalCreate(KSP& rKspObject)
 void PCBlockDiagonal::PCBlockDiagonalSetUp()
 {
     // These options will get read by PCSetFromOptions
-//     PetscOptionsSetValue("-pc_hypre_boomeramg_max_iter", "1");
-//     PetscOptionsSetValue("-pc_hypre_boomeramg_strong_threshold", "0.0");
-//     PetscOptionsSetValue("-pc_hypre_type", "boomeramg");
+//     PetscTools::SetOption("-pc_hypre_boomeramg_max_iter", "1");
+//     PetscTools::SetOption("-pc_hypre_boomeramg_strong_threshold", "0.0");
+//     PetscTools::SetOption("-pc_hypre_type", "boomeramg");
 
     // Set up amg preconditioner for block A11
     PCCreate(PETSC_COMM_WORLD, &(mPCContext.PC_amg_A11));
@@ -220,14 +220,14 @@ void PCBlockDiagonal::PCBlockDiagonalSetUp()
 
 
 #if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR<=5 )
-    PetscOptionsSetValue("-pc_hypre_type", "euclid");
-    PetscOptionsSetValue("-pc_hypre_euclid_levels", "0");
+    PetscTools::SetOption("-pc_hypre_type", "euclid");
+    PetscTools::SetOption("-pc_hypre_euclid_levels", "0");
 #else
 /* euclid was removed in 3.6. Use the previously-commented-out alternative */
-    PetscOptionsSetValue("-pc_hypre_type", "boomeramg");
-    PetscOptionsSetValue("-pc_hypre_boomeramg_max_iter", "1");
-    PetscOptionsSetValue("-pc_hypre_boomeramg_strong_threshold", "0.0");
-    PetscOptionsSetValue("-pc_hypre_boomeramg_coarsen_type", "HMIS");
+    PetscTools::SetOption("-pc_hypre_type", "boomeramg");
+    PetscTools::SetOption("-pc_hypre_boomeramg_max_iter", "1");
+    PetscTools::SetOption("-pc_hypre_boomeramg_strong_threshold", "0.0");
+    PetscTools::SetOption("-pc_hypre_boomeramg_coarsen_type", "HMIS");
 #endif
 
 
@@ -251,45 +251,45 @@ void PCBlockDiagonal::PCBlockDiagonalSetUp()
     PetscPopErrorHandler();
 
     //PCHYPRESetType(mPCContext.PC_amg_A22, "boomeramg");
-    PetscOptionsSetValue("-pc_hypre_type", "boomeramg");
-    PetscOptionsSetValue("-pc_hypre_boomeramg_max_iter", "1");
-    PetscOptionsSetValue("-pc_hypre_boomeramg_strong_threshold", "0.0");
-    PetscOptionsSetValue("-pc_hypre_boomeramg_coarsen_type", "HMIS");
-    //    PetscOptionsSetValue("-pc_hypre_boomeramg_relax_type_all","Jacobi");
-    //PetscOptionsSetValue("-pc_hypre_boomeramg_max_levels","10");
-    //PetscOptionsSetValue("-pc_hypre_boomeramg_agg_nl", "1");
-    //    PetscOptionsSetValue("-pc_hypre_boomeramg_print_statistics","");
-    //    PetscOptionsSetValue("-pc_hypre_boomeramg_interp_type","standard");
-    //    PetscOptionsSetValue("-pc_hypre_boomeramg_interp_type","ext+i");
+    PetscTools::SetOption("-pc_hypre_type", "boomeramg");
+    PetscTools::SetOption("-pc_hypre_boomeramg_max_iter", "1");
+    PetscTools::SetOption("-pc_hypre_boomeramg_strong_threshold", "0.0");
+    PetscTools::SetOption("-pc_hypre_boomeramg_coarsen_type", "HMIS");
+    //PetscTools::SetOption("-pc_hypre_boomeramg_relax_type_all","Jacobi");
+    //PetscTools::SetOption("-pc_hypre_boomeramg_max_levels","10");
+    //PetscTools::SetOption("-pc_hypre_boomeramg_agg_nl", "1");
+    //PetscTools::SetOption("-pc_hypre_boomeramg_print_statistics","");
+    //PetscTools::SetOption("-pc_hypre_boomeramg_interp_type","standard");
+    //PetscTools::SetOption("-pc_hypre_boomeramg_interp_type","ext+i");
 
     //    PCHYPRESetType(mPCContext.PC_amg_A22, "euclid");
 
     /* Block Jacobi with AMG at each block */
     //     PCSetType(mPCContext.PC_amg_A22, PCBJACOBI);
 
-    //     PetscOptionsSetValue("-sub_pc_type", "hypre");
+    //     PetscTools::SetOption("-sub_pc_type", "hypre");
 
-    //     PetscOptionsSetValue("-sub_pc_hypre_type", "boomeramg");
-    //     PetscOptionsSetValue("-sub_pc_hypre_boomeramg_max_iter", "1");
-    //     PetscOptionsSetValue("-sub_pc_hypre_boomeramg_strong_threshold", "0.0");
+    //     PetscTools::SetOption("-sub_pc_hypre_type", "boomeramg");
+    //     PetscTools::SetOption("-sub_pc_hypre_boomeramg_max_iter", "1");
+    //     PetscTools::SetOption("-sub_pc_hypre_boomeramg_strong_threshold", "0.0");
 
-    //     PetscOptionsSetValue("-pc_hypre_type", "boomeramg");
-    //     PetscOptionsSetValue("-pc_hypre_boomeramg_max_iter", "1");
-    //     PetscOptionsSetValue("-pc_hypre_boomeramg_strong_threshold", "0.0");
+    //     PetscTools::SetOption("-pc_hypre_type", "boomeramg");
+    //     PetscTools::SetOption("-pc_hypre_boomeramg_max_iter", "1");
+    //     PetscTools::SetOption("-pc_hypre_boomeramg_strong_threshold", "0.0");
 
     /* Additive Schwarz with AMG at each block */
 //     PCSetType(mPCContext.PC_amg_A22, PCASM);
 
-//     PetscOptionsSetValue("-pc_asm_type", "basic");
-//     PetscOptionsSetValue("-pc_asm_overlap", "1");
+//     PetscTools::SetOption("-pc_asm_type", "basic");
+//     PetscTools::SetOption("-pc_asm_overlap", "1");
 
-//     PetscOptionsSetValue("-sub_ksp_type", "preonly");
+//     PetscTools::SetOption("-sub_ksp_type", "preonly");
 
-//     PetscOptionsSetValue("-sub_pc_type", "hypre");
+//     PetscTools::SetOption("-sub_pc_type", "hypre");
 
-//     PetscOptionsSetValue("-sub_pc_hypre_type", "boomeramg");
-//     PetscOptionsSetValue("-sub_pc_hypre_boomeramg_max_iter", "1");
-//     PetscOptionsSetValue("-sub_pc_hypre_boomeramg_strong_threshold", "0.0");
+//     PetscTools::SetOption("-sub_pc_hypre_type", "boomeramg");
+//     PetscTools::SetOption("-sub_pc_hypre_boomeramg_max_iter", "1");
+//     PetscTools::SetOption("-sub_pc_hypre_boomeramg_strong_threshold", "0.0");
 
 #if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5 )
     // Attempt to emulate SAME_PRECONDITIONER below

@@ -79,8 +79,15 @@ void PetscMatTools::SwitchWriteMode(Mat matrix)
 void PetscMatTools::Display(Mat matrix)
 {
     //Give full precision, scientific notation
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 7) // PETSc 3.7+
+    PetscViewerPushFormat(PETSC_VIEWER_STDOUT_WORLD, PETSC_VIEWER_ASCII_MATLAB);
+#else
     PetscViewerSetFormat(PETSC_VIEWER_STDOUT_WORLD, PETSC_VIEWER_ASCII_MATLAB);
+#endif
     MatView(matrix,PETSC_VIEWER_STDOUT_WORLD);
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 7) // PETSc 3.7+
+    PetscViewerPopFormat(PETSC_VIEWER_STDOUT_WORLD);
+#endif
 }
 
 void PetscMatTools::SetRow(Mat matrix, PetscInt row, double value)

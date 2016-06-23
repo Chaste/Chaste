@@ -94,7 +94,7 @@ public:
     {
         HeartConfig::Instance()->SetKSPSolver("symmlq");
         HeartConfig::Instance()->SetKSPPreconditioner("bjacobi");
-        PetscOptionsSetValue("-log_summary", "");
+        PetscTools::SetOption("-log_summary", "");
         SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<3>, 3, 2> tester;
         HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-7);
         //tester.SetKspAbsoluteTolerance(1e-7);
@@ -112,7 +112,7 @@ public:
     {
         HeartConfig::Instance()->SetKSPSolver("symmlq");
         HeartConfig::Instance()->SetKSPPreconditioner("bjacobi");
-        PetscOptionsSetValue("-log_summary", "");
+        PetscTools::SetOption("-log_summary", "");
         SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<3>, 3, 2> tester;
         HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-7);
         //tester.SetKspAbsoluteTolerance(1e-7);
