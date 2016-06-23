@@ -130,10 +130,14 @@ class CellMLTranslator(object):
     ###########################
     # Various language tokens #
     ###########################
-    STMT_END = ';'        # End of statement
-    EQ_ASSIGN = ' = '     # Assignment operator
-    COMMENT_START = '// ' # Start of a 1 line comment
+    STMT_END = ';'                 # End of statement
+    EQ_ASSIGN = ' = '              # Assignment operator
+    COMMENT_START = '// '          # Start of a 1 line comment
     DOXYGEN_COMMENT_START = '//! ' # Start of a 1 line Doxygen comment
+    LOGICAL_AND = ' && '
+    LOGICAL_OR = ' || '
+    LOGICAL_TRUE = ' true '
+    ASSERT = 'EXCEPT_IF_NOT'       # Start of an assertion statement
 
     # Variable types
     TYPE_DOUBLE = 'double '
@@ -1966,7 +1970,20 @@ class CellMLToChasteTranslator(CellMLTranslator):
 
     def output_data_tables(self):
         """Output the data for interpolated lookups by output_special."""
-        for i, expr in enumerate(getattr(self.model, '_cml_interp_exprs' ,[])):
+        if hasattr(self.model, '_cml_interp_exprs'):
+            # We do have data tables, but PE may have moved them, so rescan the whole model just in case!
+            # This also ensures that self.model._cml_interp_exprs lists expressions in the order in which they (may) need to
+            # be evaluated, in case one table uses the value looked up from another.
+            self.model._cml_interp_exprs[:] = []
+            def find_tables(expr):
+                if hasattr(expr, '_cml_interp_data'):
+                    self.model._cml_interp_exprs.append(expr)
+                for elt in expr.xml_element_children():
+                    find_tables(elt)
+            for expr in self.model.get_assignments():
+                if isinstance(expr, mathml_apply):
+                    find_tables(expr)
+        for i, expr in enumerate(getattr(self.model, '_cml_interp_exprs', [])):
             name = expr._cml_interp_table_name = '_data_table_' + str(i)
             data = expr._cml_interp_data
             self.output_array_definition(name, data[1])
@@ -1984,19 +2001,57 @@ class CellMLToChasteTranslator(CellMLTranslator):
         """
         nodes_used = set()
         for expr in getattr(self.model, '_cml_interp_exprs', []):
-            parent = expr.xml_parent
-            while not parent.is_top_level():
-                parent = parent.xml_parent
-            if parent in nodeset:
-                # Code to calculate the independent variable
+            top_expr = expr
+            piecewises = []
+            while not (isinstance(top_expr, mathml_apply) and top_expr.is_top_level()):
+                if isinstance(top_expr.xml_parent, mathml_piecewise):
+                    piecewises.append((top_expr.xml_parent, top_expr))
+                top_expr = top_expr.xml_parent
+            if top_expr in nodeset:
+                # Code to calculate the independent variable (it may have a units conversion for instance)
+                indep_expr = expr.operands().next()
+                vars_used = self._vars_in(indep_expr)
+                indep_nodes_used = self.calculate_extended_dependencies(vars_used, prune=nodes_used)
+                self.output_equations(indep_nodes_used)
+                nodes_used.update(indep_nodes_used)
                 indep_var = expr._cml_interp_table_index + '_raw'
                 self.writeln(self.TYPE_CONST_DOUBLE, indep_var, self.EQ_ASSIGN, nl=False)
-                self.output_expr(expr.operands().next(), paren=False)
+                self.output_expr(indep_expr, paren=False)
                 self.writeln(self.STMT_END, indent=False)
-                # Code to check we're within the table bounds
+                # Code to check we're within the table bounds.
+                # We need to take account of any piecewise expressions we are within.
                 data = expr._cml_interp_data
-                self.output_assert('%s >= %.17g' % (indep_var, data[0,0]))
-                self.output_assert('%s <= %.17g' % (indep_var, data[0,-1]))
+                def process_piecewise(piecewises):
+                    if len(piecewises) == 0:
+                        # Base case
+                        self.write('%s >= %.17g' % (indep_var, data[0,0]), self.LOGICAL_AND,
+                                   '%s <= %.17g' % (indep_var, data[0,-1]))
+                    else:
+                        piecewise, piece_or_otherwise = piecewises.pop()
+                        needs_operator = False
+                        for piece in getattr(piecewise, u'piece', []):
+                            if needs_operator:
+                                self.write(self.LOGICAL_OR)
+                            if piece is piece_or_otherwise:
+                                # This is the branch that the interpolate occurs in
+                                self.write('(')
+                                self.output_expr(child_i(piece, 2), paren=True)
+                                self.write(self.LOGICAL_AND)
+                                process_piecewise(piecewises)
+                                self.write(')')
+                            else:
+                                self.output_expr(child_i(piece, 2), paren=True)
+                            needs_operator = True
+                        if hasattr(piecewise, u'otherwise'):
+                            if needs_operator:
+                                self.write(self.LOGICAL_OR)
+                            if piecewise.otherwise is piece_or_otherwise:
+                                process_piecewise(piecewises)
+                            else:
+                                self.write(self.LOGICAL_TRUE) # TODO: Think about this some more!
+                self.writeln(self.ASSERT, '(', nl=False)
+                process_piecewise(piecewises)
+                self.writeln(')', self.STMT_END)
                 # Output the index & factor generation code
                 offset_over_step = "(%s - %.17g)*%s" % (indep_var, data[0,0], expr._cml_interp_step_inverse)
                 self.writeln(self.TYPE_CONST_UNSIGNED, expr._cml_interp_table_index, self.EQ_ASSIGN,
@@ -2027,10 +2082,6 @@ class CellMLToChasteTranslator(CellMLTranslator):
     def fast_floor(self, arg):
         """Return code to compute the floor of an argument as an integer quickly, typically by casting."""
         return "(unsigned)(%s)" % arg
-
-    def output_assert(self, expr):
-        """Output an assertion (or equivalent) that the given expression is true."""
-        self.writeln('EXCEPT_IF_NOT(', expr, ');')
 
     # Normal lookup table methods
 
@@ -4674,6 +4725,10 @@ class CellMLToPythonTranslator(CellMLToChasteTranslator):
     STMT_END = ''
     COMMENT_START = '# '
     DOXYGEN_COMMENT_START = '## '
+    LOGICAL_AND = ' and '
+    LOGICAL_OR = ' or '
+    LOGICAL_TRUE = ' True '
+    ASSERT = 'assert '
     TYPE_DOUBLE = ''
     TYPE_CONST_DOUBLE = ''
     TYPE_VOID = ''
@@ -5207,10 +5262,6 @@ class CellMLToCythonTranslator(CellMLToPythonTranslator):
     def fast_floor(self, arg):
         """Return code to compute the floor of an argument as an integer quickly, typically by casting."""
         return "int(%s)" % arg
-
-    def output_assert(self, expr):
-        """Output an assertion (or equivalent) that the given expression is true."""
-        self.writeln('assert ', expr)
 
     def write_setup_py(self):
         """Write our subsidiary setup.py file for building the extension."""
