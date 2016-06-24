@@ -257,17 +257,23 @@ std::vector<unsigned> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCellCyc
         cell_cycle_phase_count[i] = 0;
     }
 
-    if (dynamic_cast<AbstractPhaseBasedCellCycleModel*>((*(this->Begin()))->GetCellCycleModel()) == NULL)
+    /*
+     * Note that in parallel with a poor partition a process could end up with zero cells
+     * in which case the calculation should be skipped since `this->Begin()` is not defined.
+     */
+    if ( GetNumAllCells() > 0u)
     {
-        EXCEPTION("You are trying to record the cell cycle phase of cells with a non phase based cell cycle model.");
-    }
-
-    for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter = this->Begin();
-         cell_iter != this->End();
-         ++cell_iter)
-    {
-        switch (static_cast<AbstractPhaseBasedCellCycleModel*>((*cell_iter)->GetCellCycleModel())->GetCurrentCellCyclePhase())
+        if (dynamic_cast<AbstractPhaseBasedCellCycleModel*>((*(this->Begin()))->GetCellCycleModel()) == NULL)
         {
+            EXCEPTION("You are trying to record the cell cycle phase of cells with a non phase based cell cycle model.");
+        }
+
+        for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter = this->Begin();
+                cell_iter != this->End();
+                ++cell_iter)
+        {
+            switch (static_cast<AbstractPhaseBasedCellCycleModel*>((*cell_iter)->GetCellCycleModel())->GetCurrentCellCyclePhase())
+            {
             case G_ZERO_PHASE:
                 cell_cycle_phase_count[0]++;
                 break;
@@ -285,6 +291,7 @@ std::vector<unsigned> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCellCyc
                 break;
             default:
                 NEVER_REACHED;
+            }
         }
     }
 
