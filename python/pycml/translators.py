@@ -2024,8 +2024,8 @@ class CellMLToChasteTranslator(CellMLTranslator):
                 def process_piecewise(piecewises):
                     if len(piecewises) == 0:
                         # Base case
-                        self.write('%s >= %.17g' % (indep_var, data[0,0]), self.LOGICAL_AND,
-                                   '%s <= %.17g' % (indep_var, data[0,-1]))
+                        self.write('(%s >= %.17g' % (indep_var, data[0,0]), self.LOGICAL_AND,
+                                   '%s <= %.17g)' % (indep_var, data[0,-1]))
                     else:
                         piecewise, piece_or_otherwise = piecewises.pop()
                         needs_operator = False
