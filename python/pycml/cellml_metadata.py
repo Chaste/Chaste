@@ -74,8 +74,10 @@ class RdfProcessor(object):
         rdflib_major_version = int(rdflib.__version__[0])
         if rdflib_major_version >= 3:
             self.Graph = rdflib.Graph
+            self.Node = rdflib.term.Node
         else:
             self.Graph = rdflib.ConjunctiveGraph
+            self.Node = rdflib.Node.Node
 
     def __getattribute__(self, name):
         """Provide access to real module-level variables as though they're class properties."""
@@ -197,7 +199,7 @@ class RdfProcessor(object):
     def create_rdf_node(self, node_content=None, fragment_id=None):
         """Create an RDF node.
         
-        node_content, if given, must either be an rdflib.term.Node instance, a tuple (qname, namespace_uri),
+        node_content, if given, must either be a self.Node instance, a tuple (qname, namespace_uri),
         or a string, in which case it is interpreted as a literal RDF node.
         
         Alternatively, fragment_id may be given to refer to a cmeta:id within the current model.
@@ -216,7 +218,7 @@ class RdfProcessor(object):
                 node = ns[local_name]
             elif type(node_content) in types.StringTypes:
                 node = rdflib.Literal(node_content)
-            elif isinstance(node_content, rdflib.term.Node):
+            elif isinstance(node_content, self.Node):
                 node = node_content
             else:
                 raise ValueError("Don't know how to make a node from " + str(node_content)
