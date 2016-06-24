@@ -48,10 +48,10 @@ DistributedBoxCollection<DIM>::DistributedBoxCollection(double boxWidth, c_vecto
       mAreLocalBoxesSet(false),
       mCalculateNodeNeighbours(true)
 {
-    // Periodicity only works in 2d and in serial.
+    // Periodicity only works in 2d
     if (isPeriodicInX)
     {
-        assert(DIM==2 && PetscTools::IsSequential());
+        assert(DIM==2);
     }
 
     // If the domain size is not 'divisible' (i.e. fmod(width, box_size) > 0.0) we swell the domain to enforce this.

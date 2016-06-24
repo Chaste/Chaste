@@ -37,14 +37,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTOBSOLETEBOXCOLLECTION_HPP_
 
 #include <cxxtest/TestSuite.h>
-#include <RandomNumberGenerator.hpp>
 
 #include "CheckpointArchiveTypes.hpp"
+
 #include "TetrahedralMesh.hpp"
 #include "ObsoleteBoxCollection.hpp"
 #include "TrianglesMeshReader.hpp"
 #include "PetscSetupAndFinalize.hpp"
-#include "Timer.hpp"
 
 class TestObsoleteBoxCollection : public CxxTest::TestSuite
 {

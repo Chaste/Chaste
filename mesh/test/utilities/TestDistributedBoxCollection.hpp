@@ -483,8 +483,6 @@ public:
 
     void TestSetupAllLocalBoxes2dPeriodic() throw(Exception)
     {
-        EXIT_IF_PARALLEL;
-
         double width = 1.0;
 
         c_vector<double, 2*2> domain_size;
@@ -493,9 +491,22 @@ public:
         domain_size(2) = 0;
         domain_size(3) = 3.0;
 
+        Warnings::Instance()->QuietDestroy();
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
+
         DistributedBoxCollection<2> box_collection(width, domain_size, true); // So periodic in X
 
-        assert(box_collection.GetNumBoxes()==12); // 4 * 3 boxes altogether
+        if (PetscTools::GetNumProcs() > 3u)
+        {
+            TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
+            TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),
+                             "There are more processes than convenient for the domain/mesh/box size.  The domain size has been swollen.");
+            Warnings::Instance()->QuietDestroy();
+        }
+        // Number of slices is 3, unless there are more than 3 processes.
+        // Hence the expected number of boxes is 12, but will grow with the number of processes.
+        unsigned expected_number_boxes = 4u * std::max(3u, PetscTools::GetNumProcs());
+        TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), expected_number_boxes); // 4 * 3 boxes altogether, normally
 
         box_collection.SetupAllLocalBoxes();
         if (box_collection.IsBoxOwned(0))
@@ -548,6 +559,13 @@ public:
             correct_answer_10.insert(9);
             correct_answer_10.insert(10);
             correct_answer_10.insert(11);
+            if (PetscTools::GetNumProcs() > 3u)
+            {
+                // There's a process (spinning) which requires an extra halo slice (12, 13, 14, 15)
+                correct_answer_10.insert(13); // Halo above 9
+                correct_answer_10.insert(14); // Halo above 10
+                correct_answer_10.insert(15); // Halo above 11
+            }
             TS_ASSERT_EQUALS(local_boxes_to_box_10, correct_answer_10);
         }
         if (box_collection.IsBoxOwned(11))
@@ -560,7 +578,14 @@ public:
             correct_answer_11.insert(8);
             correct_answer_11.insert(10);
             correct_answer_11.insert(11);
-            TS_ASSERT_EQUALS(local_boxes_to_box_11, correct_answer_11);
+            if (PetscTools::GetNumProcs() > 3u)
+            {
+                // There's a process (spinning) which requires an extra halo slice (12, 13, 14, 15)
+                correct_answer_11.insert(14); // Halo above 10
+                correct_answer_11.insert(15); // Halo above 11
+                correct_answer_11.insert(12); // Halo above 8 (Periodic in x)
+            }
+           TS_ASSERT_EQUALS(local_boxes_to_box_11, correct_answer_11);
         }
     }
 
