@@ -63,6 +63,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "NodeBasedCellPopulation.hpp"
 #include "RepulsionForce.hpp"
+#include "CellLabel.hpp"
 
 #include "VertexBasedCellPopulation.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
