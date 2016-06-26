@@ -56,6 +56,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteCuboid.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "MeshBasedCellPopulation.hpp"
+#include "ApcTwoHitCellMutationState.hpp"
 
 #include "AbstractCellBasedTestSuite.hpp"
 #include "FileComparison.hpp"

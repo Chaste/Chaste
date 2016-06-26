@@ -102,6 +102,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * into the lumen once they reach the top of the crypt.
  */
 #include "SloughingCellKiller.hpp"
+/* These headers are used for defining and recording mutations. */
+#include "ApcTwoHitCellMutationState.hpp"
 #include "CellMutationStatesCountWriter.hpp"
 /* The final header ensures that this test is only ever run sequentially, not in parallel. */
 #include "FakePetscSetup.hpp"
@@ -113,11 +115,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestRunningCryptSimulationsWithMutationsTutorial : public AbstractCellBasedTestSuite
 {
 public:
-    /* EMPTYLINE
-     *
-     * == Test 1: a mesh-based crypt simulation with mutations ==
-     *
-     * EMPTYLINE
+    /* == Test 1: a mesh-based crypt simulation with mutations ==
      *
      * In the first test, we demonstrate how to introduce mutations into a simulation of a crypt.
      */
@@ -222,10 +220,7 @@ public:
         */
        WntConcentration<2>::Destroy();
     }
-    /*
-     * EMPTYLINE
-     *
-     * To visualize the results, open a new terminal, {{{cd}}} to the Chaste directory,
+    /* To visualize the results, open a new terminal, {{{cd}}} to the Chaste directory,
      * then {{{cd}}} to {{{anim}}}. Then do: {{{java Visualize2dCentreCells /tmp/$USER/testoutput/MeshBasedCryptWithMutations/results_from_time_0}}}.
      *
      * These are the results before we add the mutations do: {{{java Visualize2dCentreCells /tmp/$USER/testoutput/MeshBasedCryptWithMutations/results_from_time_10}}}
@@ -236,8 +231,6 @@ public:
      *
      * In the results folder there is also a file {{{cellmutationstates.dat}}} which tracks the numbers of each mutation type in the simulation.
      * These results are just tab separated columns so may be visualized by using gnuplot, Matlab or similar.
-     *
-     * EMPTYLINE
      */
 };
 

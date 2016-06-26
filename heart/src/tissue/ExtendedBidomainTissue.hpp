@@ -520,9 +520,7 @@ public:
 //                 archive & shared_object_path;
 //                 DynamicModelLoaderRegistry::Instance()->GetLoader(shared_object_path);
  #else
-                 // Since checkpoints with dynamically loadable cells can only be
-                 // created on Boost>=1.37, trying to load such a checkpoint on an
-                 // earlier Boost would give an error when first opening the archive.
+                 // Could only happen on Mac OS X, and will probably be trapped earlier.
                  NEVER_REACHED;
  #endif // CHASTE_CAN_CHECKPOINT_DLLS
              }

@@ -51,7 +51,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "StemCellProliferativeType.hpp"
 #include "TransitCellProliferativeType.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
+#include "ApcTwoHitCellMutationState.hpp"
+#include "BetaCateninOneHitCellMutationState.hpp"
+#include "CellLabel.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
+#include "ApoptoticCellProperty.hpp"
 #include "SmartPointers.hpp"
 #include "FileComparison.hpp"
 

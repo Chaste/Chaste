@@ -45,20 +45,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractCellMutationState.hpp"
 #include "AbstractCellProliferativeType.hpp"
-#include "DefaultCellProliferativeType.hpp"
-#include "CellLabel.hpp"
-#include "CellAncestor.hpp"
-#include "CellId.hpp"
 #include "CellData.hpp"
 #include "CellVecData.hpp"
 
-#include "ApoptoticCellProperty.hpp"
 #include "AbstractCellCycleModel.hpp"
 #include "AbstractSrnModel.hpp"
-#include "SimulationTime.hpp"
-#include "CellPropertyRegistry.hpp"
 #include "CellPropertyCollection.hpp"
-#include "SmartPointers.hpp"
 
 class AbstractCellCycleModel; // Circular definition (cells need to know about cycle models and vice-versa).
 class AbstractSrnModel; // Circular definition (cells need to know about subcellular reaction network models and vice-versa).

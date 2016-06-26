@@ -35,6 +35,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "UblasIncludes.hpp"
 #include "AbstractVanLeeuwen2009WntSwatCellCycleModel.hpp"
+#include "TransitCellProliferativeType.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
 
 AbstractVanLeeuwen2009WntSwatCellCycleModel::AbstractVanLeeuwen2009WntSwatCellCycleModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
    : AbstractWntOdeBasedCellCycleModel(pOdeSolver)

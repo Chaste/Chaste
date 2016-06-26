@@ -61,6 +61,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellPropertyRegistry.hpp"
 #include "SmartPointers.hpp"
 #include "FileComparison.hpp"
+#include "ApoptoticCellProperty.hpp"
+#include "CellAncestor.hpp"
 
 // Cell writers
 #include "CellAgesWriter.hpp"

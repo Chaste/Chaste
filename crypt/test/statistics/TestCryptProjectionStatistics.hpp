@@ -51,6 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WntConcentration.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "SmartPointers.hpp"
+#include "TransitCellProliferativeType.hpp"
 
 #include "FakePetscSetup.hpp"
 

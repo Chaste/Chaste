@@ -43,6 +43,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ArchiveOpener.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
+#include "ApoptoticCellProperty.hpp"
+#include "CellLabel.hpp"
 #include "CellsGenerator.hpp"
 #include "TargetedCellKiller.hpp"
 #include "RandomCellKiller.hpp"
@@ -56,6 +59,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WildTypeCellMutationState.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "FileComparison.hpp"
+#include "SmartPointers.hpp"
 
 //This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"

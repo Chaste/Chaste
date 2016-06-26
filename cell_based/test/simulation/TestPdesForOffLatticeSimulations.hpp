@@ -44,6 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AveragedSourcePde.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "CellsGenerator.hpp"
+#include "ApoptoticCellProperty.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "SmartPointers.hpp"
 

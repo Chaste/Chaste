@@ -34,7 +34,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "CellProliferativeTypesWriter.hpp"
+
 #include "AbstractCellPopulation.hpp"
+#include "ApoptoticCellProperty.hpp"
+#include "CellLabel.hpp"
+#include "WildTypeCellMutationState.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 CellProliferativeTypesWriter<ELEMENT_DIM, SPACE_DIM>::CellProliferativeTypesWriter()

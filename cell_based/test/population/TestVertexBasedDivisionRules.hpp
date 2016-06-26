@@ -50,6 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DiagonalVertexBasedDivisionRule.hpp"
 #include "RandomDirectionVertexBasedDivisionRule.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
+#include "SmartPointers.hpp"
 
 //This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"

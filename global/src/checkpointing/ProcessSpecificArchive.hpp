@@ -35,13 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef PROCESSSPECIFICARCHIVE_HPP_
 #define PROCESSSPECIFICARCHIVE_HPP_
 
-#include <string>
-#include <sstream>
-#include <cassert>
-#include <iostream>
-
 #include "Exception.hpp"
-#include "PetscTools.hpp"
 
 /**
  * When checkpointing a parallel simulation, there are two kinds of data that need to be saved:

@@ -52,6 +52,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ApoptoticCellKiller.hpp"
 #include "SimpleOxygenBasedCellCycleModel.hpp"
 #include "CellsGenerator.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
+#include "ApoptoticCellProperty.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "SimpleUniformSourcePde.hpp"
 #include "CellwiseSourcePde.hpp"

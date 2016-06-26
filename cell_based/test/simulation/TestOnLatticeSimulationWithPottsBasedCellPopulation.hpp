@@ -46,6 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HoneycombMeshGenerator.hpp"
 #include "PottsMeshGenerator.hpp"
 #include "CellsGenerator.hpp"
+#include "CellLabel.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "UniformlyDistributedGenerationBasedCellCycleModel.hpp"
 #include "WildTypeCellMutationState.hpp"

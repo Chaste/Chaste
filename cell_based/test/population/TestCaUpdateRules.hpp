@@ -46,6 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "RandomCaSwitchingUpdateRule.hpp"
 #include "CellsGenerator.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
 #include "CaBasedCellPopulation.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "WildTypeCellMutationState.hpp"

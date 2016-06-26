@@ -35,6 +35,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "DifferentialAdhesionPottsUpdateRule.hpp"
 
+#include "CellLabel.hpp"
+
 template<unsigned DIM>
 DifferentialAdhesionPottsUpdateRule<DIM>::DifferentialAdhesionPottsUpdateRule()
     : AdhesionPottsUpdateRule<DIM>(),

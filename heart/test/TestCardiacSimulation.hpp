@@ -603,7 +603,7 @@ public:
 
 #ifndef CHASTE_CAN_CHECKPOINT_DLLS
         TS_ASSERT_THROWS_THIS(CardiacSimulation simulation("heart/test/data/xml/dynamic_checkpoint.xml"),
-                              "Checkpointing is not compatible with dynamically loaded cell models on Boost<1.37.");
+                              "Checkpointing is not compatible with dynamically loaded cell models on Mac OS X.");
 #endif
     }
 

@@ -51,6 +51,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ApcOneHitCellMutationState.hpp"
 #include "ApcTwoHitCellMutationState.hpp"
 #include "BetaCateninOneHitCellMutationState.hpp"
+#include "TransitCellProliferativeType.hpp"
+#include "StemCellProliferativeType.hpp"
 #include "CellLabel.hpp"
 #include "FileComparison.hpp"
 

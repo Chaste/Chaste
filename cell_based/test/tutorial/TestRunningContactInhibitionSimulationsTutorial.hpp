@@ -101,6 +101,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellMutationStatesCountWriter.hpp"
 #include "UniformlyDistributedCellCycleModel.hpp"
 #include "WildTypeCellMutationState.hpp"
+#include "StemCellProliferativeType.hpp"
 #include "TransitCellProliferativeType.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"

@@ -62,6 +62,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellLabel.hpp"
 #include "CellId.hpp"
 #include "CellPropertyRegistry.hpp"
+#include "ApoptoticCellProperty.hpp"
 #include "SmartPointers.hpp"
 #include "SimpleWntCellCycleModel.hpp"
 #include "FileComparison.hpp"

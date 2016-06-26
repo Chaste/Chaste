@@ -34,12 +34,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "HeterotypicBoundaryLengthWriter.hpp"
+
 #include "AbstractCellPopulation.hpp"
 #include "MeshBasedCellPopulation.hpp"
 #include "CaBasedCellPopulation.hpp"
 #include "NodeBasedCellPopulation.hpp"
 #include "PottsBasedCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
+
+#include "CellLabel.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::HeterotypicBoundaryLengthWriter()

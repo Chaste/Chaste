@@ -34,7 +34,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "CellMutationStatesWriter.hpp"
+
 #include "AbstractCellPopulation.hpp"
+#include "CellLabel.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 CellMutationStatesWriter<ELEMENT_DIM, SPACE_DIM>::CellMutationStatesWriter()

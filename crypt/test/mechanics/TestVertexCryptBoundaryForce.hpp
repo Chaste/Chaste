@@ -48,6 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexCryptBoundaryForce.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "FileComparison.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
 
 #include "PetscSetupAndFinalize.hpp"
 

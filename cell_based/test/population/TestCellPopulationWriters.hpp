@@ -44,6 +44,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ArchiveOpener.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "FileComparison.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
+#include "CellLabel.hpp"
 
 // Cell population writers
 #include "BoundaryNodeWriter.hpp"

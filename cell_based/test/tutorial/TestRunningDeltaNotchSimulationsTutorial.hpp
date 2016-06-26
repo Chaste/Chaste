@@ -87,6 +87,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SimpleTargetAreaModifier.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
+#include "WildTypeCellMutationState.hpp"
 #include "CellAgesWriter.hpp"
 #include "CellIdWriter.hpp"
 #include "CellProliferativePhasesWriter.hpp"

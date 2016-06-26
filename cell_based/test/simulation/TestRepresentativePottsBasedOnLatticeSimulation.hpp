@@ -54,6 +54,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Warnings.hpp"
 #include "LogFile.hpp"
 #include "SmartPointers.hpp"
+#include "CellLabel.hpp"
 #include "CellMutationStatesCountWriter.hpp"
 
 // Needed for NodesOnlyMesh

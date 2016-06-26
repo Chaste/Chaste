@@ -132,7 +132,7 @@ AbstractCardiacCellInterface* HeartConfigRelatedCellFactory<SPACE_DIM>::CreateCe
 #ifndef CHASTE_CAN_CHECKPOINT_DLLS
         if (HeartConfig::Instance()->GetCheckpointSimulation())
         {
-            EXCEPTION("Checkpointing is not compatible with dynamically loaded cell models on Boost<1.37.");
+            EXCEPTION("Checkpointing is not compatible with dynamically loaded cell models on Mac OS X.");
         }
 #endif // CHASTE_CAN_CHECKPOINT_DLLS
         // Load model from shared library

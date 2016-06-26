@@ -35,8 +35,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Cell.hpp"
 
-// Included here rather than the .hpp to avoid a circular include.
+#include "ApoptoticCellProperty.hpp"
+#include "CellAncestor.hpp"
+#include "CellId.hpp"
+#include "CellLabel.hpp"
+#include "CellPropertyRegistry.hpp"
+#include "DefaultCellProliferativeType.hpp"
 #include "NullSrnModel.hpp"
+#include "SimulationTime.hpp"
+#include "SmartPointers.hpp"
 
 /**
  * null_deleter means "doesn't delete" rather than "deletes nulls".

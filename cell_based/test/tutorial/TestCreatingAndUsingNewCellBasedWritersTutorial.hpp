@@ -81,6 +81,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodesOnlyMesh.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
+#include "CellLabel.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
 #include "CellMutationStatesCountWriter.hpp"

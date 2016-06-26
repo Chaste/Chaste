@@ -61,6 +61,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TransitCellProliferativeType.hpp"
 #include "StemCellProliferativeType.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
+#include "ApoptoticCellProperty.hpp"
+#include "CellAncestor.hpp"
 
 #include "AbstractCellBasedTestSuite.hpp"
 #include "FakePetscSetup.hpp"

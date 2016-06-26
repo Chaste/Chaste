@@ -66,6 +66,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellIdWriter.hpp"
 #include "VolumeTrackingModifier.hpp"
 #include "CellBasedSimulationArchiver.hpp"
+#include "ApcOneHitCellMutationState.hpp"
+#include "ApcTwoHitCellMutationState.hpp"
+#include "BetaCateninOneHitCellMutationState.hpp"
+#include "DefaultCellProliferativeType.hpp"
 
 // Cell population writers
 #include "CellMutationStatesCountWriter.hpp"

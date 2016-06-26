@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteSyscalls.hpp"
 #include "IsNan.hpp"
 #include "ShortAxisVertexBasedDivisionRule.hpp"
+#include "WildTypeCellMutationState.hpp"
 
 // Cell writers
 #include "CellAgesWriter.hpp"

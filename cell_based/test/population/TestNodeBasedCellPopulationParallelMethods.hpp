@@ -148,10 +148,6 @@ public:
         TS_ASSERT(!(mpNodeBasedCellPopulation->mpCellsRecvRight));
         TS_ASSERT(!(mpNodeBasedCellPopulation->mpCellsRecvLeft));
 
-#if BOOST_VERSION < 103700
-        TS_ASSERT_THROWS_THIS(mpNodeBasedCellPopulation->SendCellsToNeighbourProcesses(),
-                              "Parallel cell-based Chaste requires Boost >= 1.37");
-#else
         mpNodeBasedCellPopulation->SendCellsToNeighbourProcesses();
 
         if (!PetscTools::AmTopMost())
@@ -168,7 +164,6 @@ public:
             unsigned index = (*mpNodeBasedCellPopulation->mpCellsRecvLeft->begin()).second->GetIndex();
             TS_ASSERT_EQUALS(index, PetscTools::GetMyRank() - 1);
         }
-#endif
     }
 
     void TestSendAndReceiveCellsNonBlocking() throw (Exception)
@@ -182,10 +177,6 @@ public:
         TS_ASSERT(!(mpNodeBasedCellPopulation->mpCellsRecvRight));
         TS_ASSERT(!(mpNodeBasedCellPopulation->mpCellsRecvLeft));
 
-#if BOOST_VERSION < 103700
-        TS_ASSERT_THROWS_THIS(mpNodeBasedCellPopulation->SendCellsToNeighbourProcesses(),
-                              "Parallel cell-based Chaste requires Boost >= 1.37");
-#else
         mpNodeBasedCellPopulation->NonBlockingSendCellsToNeighbourProcesses();
 
         mpNodeBasedCellPopulation->GetReceivedCells();
@@ -204,7 +195,6 @@ public:
             unsigned index = (*mpNodeBasedCellPopulation->mpCellsRecvLeft->begin()).second->GetIndex();
             TS_ASSERT_EQUALS(index, PetscTools::GetMyRank() - 1);
         }
-#endif
     }
 
     void TestUpdateCellProcessLocation() throw (Exception)
@@ -227,10 +217,6 @@ public:
                 ChastePoint<3> point(new_location);
                 mpNodesOnlyMesh->GetNode(1)->SetPoint(point);
             }
-#if BOOST_VERSION < 103700
-        TS_ASSERT_THROWS_THIS(mpNodeBasedCellPopulation->SendCellsToNeighbourProcesses(),
-                              "Parallel cell-based Chaste requires Boost >= 1.37");
-#else
             mpNodeBasedCellPopulation->UpdateCellProcessLocation();
 
             if (PetscTools::AmMaster())
@@ -246,16 +232,11 @@ public:
                 AbstractMesh<3,3>::NodeIterator node_iter = mpNodesOnlyMesh->GetNodeIteratorBegin();
                 TS_ASSERT_DELTA(node_iter->rGetLocation()[2], 1.6, 1e-4);
             }
-#endif
         }
     }
 
     void TestRefreshHaloCells() throw (Exception)
     {
-#if BOOST_VERSION < 103700
-        TS_ASSERT_THROWS_THIS(mpNodeBasedCellPopulation->SendCellsToNeighbourProcesses(),
-                              "Parallel cell-based Chaste requires Boost >= 1.37");
-#else
         // Set up the halo boxes and nodes.
         mpNodeBasedCellPopulation->Update();
 
@@ -274,15 +255,10 @@ public:
         {
            TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mHaloCells.size(), 1u);
         }
-#endif
     }
 
     void TestUpdateWithLoadBalanceDoesntThrow() throw (Exception)
     {
-#if BOOST_VERSION < 103700
-        TS_ASSERT_THROWS_THIS(mpNodeBasedCellPopulation->SendCellsToNeighbourProcesses(),
-                              "Parallel cell-based Chaste requires Boost >= 1.37");
-#else
         SimulationTime* p_simulation_time = SimulationTime::Instance();
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(10.0, 1);
 
@@ -293,7 +269,6 @@ public:
         TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mLoadBalanceFrequency, 50u);
 
         TS_ASSERT_THROWS_NOTHING(mpNodeBasedCellPopulation->Update());
-#endif
     }
 
     void TestGetCellUsingLocationIndexWithHaloCell() throw (Exception)

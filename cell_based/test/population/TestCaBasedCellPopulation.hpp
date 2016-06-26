@@ -48,6 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VolumeConstraintPottsUpdateRule.hpp"
 #include "PottsMeshGenerator.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
 #include "DiffusionCaUpdateRule.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "ArchiveOpener.hpp"

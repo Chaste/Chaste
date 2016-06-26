@@ -48,7 +48,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellLabel.hpp"
 #include "ApcTwoHitCellMutationState.hpp"
 #include "ApcOneHitCellMutationState.hpp"
+#include "BetaCateninOneHitCellMutationState.hpp"
 #include "StochasticWntCellCycleModel.hpp"
+#include "TransitCellProliferativeType.hpp"
+#include "StemCellProliferativeType.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
 
 #include "AbstractCellBasedTestSuite.hpp"
 #include "PetscSetupAndFinalize.hpp"

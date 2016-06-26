@@ -34,12 +34,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "CryptSimulation2d.hpp"
-#include "WntConcentration.hpp"
-#include "VanLeeuwen2009WntSwatCellCycleModelHypothesisOne.hpp"
-#include "VanLeeuwen2009WntSwatCellCycleModelHypothesisTwo.hpp"
+
+#include "CellAncestor.hpp"
 #include "CellBetaCateninWriter.hpp"
 #include "MeshBasedCellPopulation.hpp"
 #include "SmartPointers.hpp"
+#include "StemCellProliferativeType.hpp"
+#include "VanLeeuwen2009WntSwatCellCycleModelHypothesisOne.hpp"
+#include "VanLeeuwen2009WntSwatCellCycleModelHypothesisTwo.hpp"
+#include "WntConcentration.hpp"
 
 CryptSimulation2d::CryptSimulation2d(AbstractCellPopulation<2>& rCellPopulation,
                                      bool deleteCellPopulationInDestructor,

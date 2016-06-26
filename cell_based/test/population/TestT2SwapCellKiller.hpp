@@ -51,6 +51,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HoneycombMeshGenerator.hpp"
 #include "MeshBasedCellPopulation.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
+#include "SmartPointers.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
 
 #include "FakePetscSetup.hpp"
 

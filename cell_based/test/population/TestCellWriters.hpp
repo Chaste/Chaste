@@ -62,6 +62,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PottsMeshGenerator.hpp"
 #include "CellAncestor.hpp"
 #include "SimulationTime.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
+#include "ApoptoticCellProperty.hpp"
+#include "CellLabel.hpp"
+#include "SmartPointers.hpp"
 
 // Cell writers
 #include "CellAgesWriter.hpp"

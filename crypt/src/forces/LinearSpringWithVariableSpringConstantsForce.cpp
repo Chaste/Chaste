@@ -38,6 +38,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VanLeeuwen2009WntSwatCellCycleModelHypothesisOne.hpp"
 #include "VanLeeuwen2009WntSwatCellCycleModelHypothesisTwo.hpp"
 #include "ApoptoticCellProperty.hpp"
+#include "BetaCateninOneHitCellMutationState.hpp"
+#include "ApcTwoHitCellMutationState.hpp"
 
 template<unsigned DIM>
 LinearSpringWithVariableSpringConstantsForce<DIM>::LinearSpringWithVariableSpringConstantsForce()

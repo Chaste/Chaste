@@ -752,9 +752,6 @@ struct null_deleter
 template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::SendCellsToNeighbourProcesses()
 {
-#if BOOST_VERSION < 103700
-    EXCEPTION("Parallel cell-based Chaste requires Boost >= 1.37");
-#else // BOOST_VERSION >= 103700
     MPI_Status status;
 
     if (!PetscTools::AmTopMost())
@@ -767,16 +764,11 @@ void NodeBasedCellPopulation<DIM>::SendCellsToNeighbourProcesses()
         boost::shared_ptr<std::vector<std::pair<CellPtr, Node<DIM>* > > > p_cells_left(&mCellsToSendLeft, null_deleter());
         mpCellsRecvLeft = mLeftCommunicator.SendRecvObject(p_cells_left, PetscTools::GetMyRank() - 1, mCellCommunicationTag, PetscTools::GetMyRank() - 1, mCellCommunicationTag, status);
     }
-#endif
 }
 
 template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::NonBlockingSendCellsToNeighbourProcesses()
 {
-#if BOOST_VERSION < 103700
-    EXCEPTION("Parallel cell-based Chaste requires Boost >= 1.37");
-#else // BOOST_VERSION >= 103700
-
     if (!PetscTools::AmTopMost())
     {
         boost::shared_ptr<std::vector<std::pair<CellPtr, Node<DIM>* > > > p_cells_right(&mCellsToSendRight, null_deleter());
@@ -800,16 +792,11 @@ void NodeBasedCellPopulation<DIM>::NonBlockingSendCellsToNeighbourProcesses()
         int tag = SmallPow (3u, 1 + PetscTools::GetMyRank() ) * SmallPow (2u, 1+ PetscTools::GetMyRank() - 1);
         mLeftCommunicator.IRecvObject(PetscTools::GetMyRank() - 1, tag);
     }
-#endif
 }
 
 template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::GetReceivedCells()
 {
-#if BOOST_VERSION < 103700
-    EXCEPTION("Parallel cell-based Chaste requires Boost >= 1.37");
-#else // BOOST_VERSION >= 103700
-
     if (!PetscTools::AmTopMost())
     {
         mpCellsRecvRight = mRightCommunicator.GetRecvObject();
@@ -818,8 +805,8 @@ void NodeBasedCellPopulation<DIM>::GetReceivedCells()
     {
         mpCellsRecvLeft = mLeftCommunicator.GetRecvObject();
     }
-#endif
 }
+
 template<unsigned DIM>
 std::pair<CellPtr, Node<DIM>* > NodeBasedCellPopulation<DIM>::GetCellNodePair(unsigned nodeIndex)
 {

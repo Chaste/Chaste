@@ -34,7 +34,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "ChemotacticForce.hpp"
+
 #include "CellwiseDataGradient.hpp"
+#include "CellLabel.hpp"
 
 template<unsigned DIM>
 ChemotacticForce<DIM>::ChemotacticForce()

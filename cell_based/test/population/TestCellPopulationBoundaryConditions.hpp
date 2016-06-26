@@ -42,6 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/archive/text_iarchive.hpp>
 
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
 #include "CellsGenerator.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
@@ -58,6 +59,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ArchiveOpener.hpp"
 #include "ArchiveLocationInfo.hpp"
 #include "FileComparison.hpp"
+#include "SmartPointers.hpp"
 
 #include "PetscSetupAndFinalize.hpp"
 

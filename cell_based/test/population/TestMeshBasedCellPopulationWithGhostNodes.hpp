@@ -54,6 +54,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SmartPointers.hpp"
 #include "CellId.hpp"
 #include "FileComparison.hpp"
+#include "ApoptoticCellProperty.hpp"
 
 // Cell writers
 #include "CellAgesWriter.hpp"

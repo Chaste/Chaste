@@ -36,6 +36,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OutputFileHandler.hpp"
 
 #include <cstdlib>
+#include <fstream>
+#include <sstream>
 
 #include "ArchiveLocationInfo.hpp"
 #include "BoostFilesystem.hpp"

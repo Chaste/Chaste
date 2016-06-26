@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MeshBasedCellPopulation.hpp"
 #include "WntConcentration.hpp"
 #include "IsNan.hpp"
+#include "StemCellProliferativeType.hpp"
 
 CryptProjectionForce::CryptProjectionForce()
     : GeneralisedLinearSpringForce<2>(),

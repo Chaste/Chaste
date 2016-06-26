@@ -38,7 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <string>
 #include <fstream>
-#include <sstream>
+#include <ios>
 #include <memory>
 
 class FileFinder; // Avoid circular includes

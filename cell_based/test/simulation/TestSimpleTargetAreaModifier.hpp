@@ -51,6 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellsGenerator.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "UniformlyDistributedCellCycleModel.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
 #include "VertexBasedCellPopulation.hpp"
 #include "MeshBasedCellPopulation.hpp"
 #include "OffLatticeSimulation.hpp"

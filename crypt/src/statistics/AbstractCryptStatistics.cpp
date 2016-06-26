@@ -35,6 +35,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCryptStatistics.hpp"
 #include "CellPropertyRegistry.hpp"
 #include "AbstractPhaseBasedCellCycleModel.hpp"
+#include "CellLabel.hpp"
+#include "WildTypeCellMutationState.hpp"
 
 AbstractCryptStatistics::AbstractCryptStatistics(MeshBasedCellPopulation<2>& rCrypt)
     : mrCrypt(rCrypt)

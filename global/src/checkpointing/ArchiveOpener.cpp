@@ -38,7 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/archive/text_iarchive.hpp>
 
 #include <sstream>
-#include <iostream>
+#include <fstream>
 
 #include "ArchiveOpener.hpp"
 #include "ArchiveLocationInfo.hpp"

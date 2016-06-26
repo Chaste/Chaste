@@ -44,6 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 #include "PetscTools.hpp"
 #include "SmartPointers.hpp"
+#include "CellAncestor.hpp"
 
 // Cell writers
 #include "BoundaryNodeWriter.hpp"
@@ -54,6 +55,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellProliferativePhasesCountWriter.hpp"
 #include "CellProliferativeTypesCountWriter.hpp"
 #include "NodeLocationWriter.hpp"
+
+// These #includes are needed for SetDefaultCellMutationStateAndProliferativeTypeOrdering()
+#include "WildTypeCellMutationState.hpp"
+#include "ApcOneHitCellMutationState.hpp"
+#include "ApcTwoHitCellMutationState.hpp"
+#include "BetaCateninOneHitCellMutationState.hpp"
+#include "DefaultCellProliferativeType.hpp"
+#include "StemCellProliferativeType.hpp"
+#include "TransitCellProliferativeType.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractCellPopulation( AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,

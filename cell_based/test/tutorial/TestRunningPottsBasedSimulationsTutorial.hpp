@@ -47,21 +47,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*
  * = Examples showing how to create, run and visualize Potts-based simulations =
  *
- * EMPTYLINE
- *
  * == Introduction ==
- *
- * EMPTYLINE
  *
  * In this tutorial we show how Chaste can be used to create, run and visualize Potts-based simulations.
  * Full details of the mathematical model can be found in Graner, F. and Glazier, J. A. (1992). Simulation
  * of biological cell sorting using a two-dimensional extended Potts model. Phys. Rev. Lett., 69(13):2015–2016.
  *
- * EMPTYLINE
- *
  * == The test ==
- *
- * EMPTYLINE
  *
  * As in previous cell-based Chaste tutorials, we begin by including the necessary header files.
  */
@@ -83,11 +75,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OnLatticeSimulation.hpp"
 /* The next header file defines a{{{CellPopulation}}} class for implementing a cellular Potts model.*/
 #include "PottsBasedCellPopulation.hpp"
-/* The next header file defines some update rules for describing the Hamiltonian used to define the Potts simulations. */
+/* The next header files define some update rules for describing the Hamiltonian used to define the Potts simulations. */
 #include "VolumeConstraintPottsUpdateRule.hpp"
 #include "AdhesionPottsUpdateRule.hpp"
 #include "DifferentialAdhesionPottsUpdateRule.hpp"
 #include "TransitCellProliferativeType.hpp"
+/* Finally these headers allow us to output cell labels. */
+#include "CellLabel.hpp"
 #include "CellLabelWriter.hpp"
 
 /*
