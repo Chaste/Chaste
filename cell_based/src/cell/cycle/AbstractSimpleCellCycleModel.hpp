@@ -49,9 +49,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 /**
- * The AbstractSimpleCellCycleModel contains basic information to all phase based cell-cycle models.
- * It handles assignment of aspects of cell cycle phase.
- *
+ * This class contains basic information to all cell-cycle models
+ * that do NOT explicitly include distinct phases (G1, S, G2, M).
  */
 class AbstractSimpleCellCycleModel : public AbstractCellCycleModel
 {
