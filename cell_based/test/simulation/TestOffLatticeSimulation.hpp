@@ -1217,6 +1217,51 @@ public:
         TS_ASSERT(type_files.CompareFiles());
         TS_ASSERT(node_files.CompareFiles());
     }
+
+     void TestOffLatticeSimulationWithAdaptiveTimestep() throw(Exception)
+    {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel
+
+        // Create a simple 2D MeshBasedCellPopulation
+        HoneycombMeshGenerator generator(3, 3, 0);
+        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+
+        std::vector<CellPtr> cells;
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), p_transit_type);
+
+        MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+        // Use smaller movement threshold to maintain smooth motion
+        cell_population.SetAbsoluteMovementThreshold(0.1); 
+
+        // Set up simulation
+        OffLatticeSimulation<2> simulator(cell_population);
+        simulator.SetOutputDirectory("TestOffLatticeSimulationWithAdaptivity");
+        simulator.SetEndTime(5.0);
+
+        // Use larger timestep and use adaptivity to correct if too much motion. 
+        simulator.SetDt(0.1);
+        simulator.SetIsAdaptiveTimestep(true);
+
+        // Create a force law and pass it to the simulation
+        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
+        p_force->SetCutOffLength(1.5);
+        simulator.AddForce(p_force);
+
+        // Record division locations
+        simulator.SetOutputDivisionLocations(true);
+
+        // Run simulation
+        simulator.Solve();
+
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 14u);
+
+        // Check cells have moved to the correct location 
+        TS_ASSERT_DELTA(simulator.rGetCellPopulation().rGetMesh().GetNode(0)->rGetLocation()[0], 0.3906,1e-4);
+        TS_ASSERT_DELTA(simulator.rGetCellPopulation().rGetMesh().GetNode(0)->rGetLocation()[1], -0.1782,1e-4);
+    } 
 };
 
 #endif /*TESTOFFLATTICESIMULATION_HPP_*/

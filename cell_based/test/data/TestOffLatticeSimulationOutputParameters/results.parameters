@@ -48,4 +48,10 @@
 	<CellPopulationBoundaryConditions>
 	</CellPopulationBoundaryConditions>
 
+	<NumericalMethod>
+		<ForwardEulerNumericalMethod-2-2>
+		</ForwardEulerNumericalMethod-2-2>
+		<IsAdaptiveTimestep>0</IsAdaptiveTimestep>
+	</NumericalMethod>
+
 </Chaste>

@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
+#include "Warnings.hpp"
 
 // Cell writers
 #include "CellAgesWriter.hpp"
@@ -140,55 +141,6 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::SetGhostNodes(const std::set<un
     Validate();
 }
 
-template<unsigned DIM>
-void MeshBasedCellPopulationWithGhostNodes<DIM>::UpdateGhostPositions(double dt)
-{
-    // Initialise vector of forces on ghost nodes
-    std::vector<c_vector<double, DIM> > drdt(this->GetNumNodes());
-    for (unsigned i=0; i<drdt.size(); i++)
-    {
-        drdt[i] = zero_vector<double>(DIM);
-    }
-
-    // Calculate forces on ghost nodes
-    for (typename MutableMesh<DIM, DIM>::EdgeIterator edge_iterator = static_cast<MutableMesh<DIM, DIM>&>((this->mrMesh)).EdgesBegin();
-        edge_iterator != static_cast<MutableMesh<DIM, DIM>&>((this->mrMesh)).EdgesEnd();
-        ++edge_iterator)
-    {
-        unsigned nodeA_global_index = edge_iterator.GetNodeA()->GetIndex();
-        unsigned nodeB_global_index = edge_iterator.GetNodeB()->GetIndex();
-
-        c_vector<double, DIM> force = CalculateForceBetweenGhostNodes(nodeA_global_index, nodeB_global_index);
-
-        double damping_constant = this->GetDampingConstantNormal();
-
-        if (!this->mIsGhostNode[nodeA_global_index])
-        {
-            drdt[nodeB_global_index] -= force / damping_constant;
-        }
-        else
-        {
-            drdt[nodeA_global_index] += force / damping_constant;
-
-            if (this->mIsGhostNode[nodeB_global_index])
-            {
-                drdt[nodeB_global_index] -= force / damping_constant;
-            }
-        }
-    }
-
-    for (typename AbstractMesh<DIM,DIM>::NodeIterator node_iter = this->mrMesh.GetNodeIteratorBegin();
-         node_iter != this->mrMesh.GetNodeIteratorEnd();
-         ++node_iter)
-    {
-        unsigned node_index = node_iter->GetIndex();
-        if (this->mIsGhostNode[node_index])
-        {
-            ChastePoint<DIM> new_point(node_iter->rGetLocation() + dt*drdt[node_index]);
-            static_cast<MutableMesh<DIM, DIM>&>((this->mrMesh)).SetNode(node_index, new_point, false);
-        }
-    }
-}
 
 template<unsigned DIM>
 c_vector<double, DIM> MeshBasedCellPopulationWithGhostNodes<DIM>::CalculateForceBetweenGhostNodes(const unsigned& rNodeAGlobalIndex, const unsigned& rNodeBGlobalIndex)
@@ -324,15 +276,53 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::AcceptCellWritersAcrossPopulati
 }
 
 template<unsigned DIM>
-void MeshBasedCellPopulationWithGhostNodes<DIM>::UpdateNodeLocations(double dt)
+void MeshBasedCellPopulationWithGhostNodes<DIM>::ApplyGhostForces()
 {
-    // First update ghost positions first because they do not affect the real cells
-    UpdateGhostPositions(dt);
+    // Initialise vector of forces on ghost nodes
+    std::vector<c_vector<double, DIM> > drdt(this->GetNumNodes());
+    for (unsigned i=0; i<drdt.size(); i++)
+    {
+        drdt[i] = zero_vector<double>(DIM);
+    }
 
-    // Then call the base class method
-    AbstractCentreBasedCellPopulation<DIM,DIM>::UpdateNodeLocations(dt);
-}
+    // Calculate forces on ghost nodes
+    for (typename MutableMesh<DIM, DIM>::EdgeIterator edge_iterator = static_cast<MutableMesh<DIM, DIM>&>((this->mrMesh)).EdgesBegin();
+        edge_iterator != static_cast<MutableMesh<DIM, DIM>&>((this->mrMesh)).EdgesEnd();
+        ++edge_iterator)
+    {
+        unsigned nodeA_global_index = edge_iterator.GetNodeA()->GetIndex();
+        unsigned nodeB_global_index = edge_iterator.GetNodeB()->GetIndex();
 
+        c_vector<double, DIM> force = CalculateForceBetweenGhostNodes(nodeA_global_index, nodeB_global_index);
+
+        if (!this->mIsGhostNode[nodeA_global_index])
+        {
+            drdt[nodeB_global_index] -= force;
+        }
+        else
+        {
+            drdt[nodeA_global_index] += force;
+
+            if (this->mIsGhostNode[nodeB_global_index])
+            {
+                drdt[nodeB_global_index] -= force;
+            }
+        }
+    }
+
+    for (typename AbstractMesh<DIM,DIM>::NodeIterator node_iter = this->mrMesh.GetNodeIteratorBegin();
+         node_iter != this->mrMesh.GetNodeIteratorEnd();
+         ++node_iter)
+    {
+        unsigned node_index = node_iter->GetIndex();
+        if (this->mIsGhostNode[node_index])
+        {
+            node_iter->ClearAppliedForce();
+            node_iter->AddAppliedForceContribution(drdt[node_index]);
+        }
+    }
+
+};
 
 template<unsigned DIM>
 void MeshBasedCellPopulationWithGhostNodes<DIM>::OpenWritersFiles(OutputFileHandler& rOutputFileHandler)

@@ -45,14 +45,21 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "LogFile.hpp"
 #include "Version.hpp"
 #include "ExecutableSupport.hpp"
+#include "ForwardEulerNumericalMethod.hpp"
+#include "StepSizeException.hpp"
 #include "SmartPointers.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::OffLatticeSimulation(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation,
                                                 bool deleteCellPopulationInDestructor,
-                                                bool initialiseCells)
-    : AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>(rCellPopulation, deleteCellPopulationInDestructor, initialiseCells)
+                                                bool initialiseCells,
+                                                boost::shared_ptr<AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM> > numericalMethod,
+                                                bool isAdaptiveTimestep)
+    : AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>(rCellPopulation, deleteCellPopulationInDestructor, initialiseCells),
+      mNumericalMethod(numericalMethod),
+      mIsAdaptiveTimestep(isAdaptiveTimestep)
 {
+
     if (!dynamic_cast<AbstractOffLatticeCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&rCellPopulation))
     {
         EXCEPTION("OffLatticeSimulations require a subclass of AbstractOffLatticeCellPopulation.");
@@ -80,7 +87,12 @@ OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::OffLatticeSimulation(AbstractCellPo
         // comment out the line below
         NEVER_REACHED;
     }
+
+    mNumericalMethod->SetCellPopulation(dynamic_cast<AbstractOffLatticeCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&rCellPopulation));
+    mNumericalMethod->SetForceCollection(&mForceCollection);
+    mNumericalMethod->SetIsAdaptiveTimestep(&mIsAdaptiveTimestep);
 }
+
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::AddForce(boost::shared_ptr<AbstractForce<ELEMENT_DIM,SPACE_DIM> > pForce)
@@ -107,33 +119,121 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::RemoveAllCellPopulationBoundar
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+const boost::shared_ptr<AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM> > OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::GetNumericalMethod() const{
+    return mNumericalMethod;
+};
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::GetIsAdaptiveTimestep() const
+{
+    return mIsAdaptiveTimestep;
+};
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::SetIsAdaptiveTimestep(bool isAdaptiveTimestep)
+{
+    mIsAdaptiveTimestep = isAdaptiveTimestep;
+};
+
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellLocationsAndTopology()
 {
-    // Calculate forces
-    CellBasedEventHandler::BeginEvent(CellBasedEventHandler::FORCE);
-
-    // Clear all forces
-    for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = this->mrCellPopulation.rGetMesh().GetNodeIteratorBegin();
-         node_iter != this->mrCellPopulation.rGetMesh().GetNodeIteratorEnd();
-         ++node_iter)
-    {
-        node_iter->ClearAppliedForce();
-    }
-
-    // Now add force contributions from each AbstractForce
-    for (typename std::vector<boost::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > >::iterator iter = mForceCollection.begin();
-         iter != mForceCollection.end();
-         ++iter)
-    {
-        (*iter)->AddForceContribution(this->mrCellPopulation);
-    }
-    CellBasedEventHandler::EndEvent(CellBasedEventHandler::FORCE);
-
-    // Update node positions
     CellBasedEventHandler::BeginEvent(CellBasedEventHandler::POSITION);
-    UpdateNodePositions();
+
+    double timeAdvancedSoFar = 0; 
+    double targetTimeStep  = this->mDt;
+    double currentTimeStep = this->mDt;
+
+    while(timeAdvancedSoFar < targetTimeStep)
+    {
+        // Store the initial node positions (these may be needed when applying boundary conditions)    
+        std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> > old_node_locations;
+
+        for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = this->mrCellPopulation.rGetMesh().GetNodeIteratorBegin();
+            node_iter != this->mrCellPopulation.rGetMesh().GetNodeIteratorEnd();
+            ++node_iter)
+        {
+            old_node_locations[&(*node_iter)] = (node_iter)->rGetLocation();
+        }
+
+        // Try to update node positions according to the numerical method 
+        try
+        {
+            mNumericalMethod->UpdateAllNodePositions(currentTimeStep);
+            ApplyBoundaries(old_node_locations);
+
+            // Successful timestep! Update timeAdvancedSoFar 
+            timeAdvancedSoFar += currentTimeStep;
+
+            // and if using adaptive timestep then increase the currentTimeStep (by 1% for now)
+            if(mIsAdaptiveTimestep)
+            {
+                // \todo #2087 Make this a setable member variable.
+                double timestep_increase = 0.01;
+                currentTimeStep = fmin((1+timestep_increase)*currentTimeStep, targetTimeStep - timeAdvancedSoFar);
+            }
+
+        }
+        catch(StepSizeException* e)
+        {
+            // Detects if a node has travelled too far in a single time step
+            if(mIsAdaptiveTimestep)
+            {
+                // If adaptivity is switched on, revert node locations and choose a suitable
+                // smaller time step
+                RevertToOldLocations(old_node_locations);
+                currentTimeStep = fmin(e->mSuggestedNewStep, targetTimeStep - timeAdvancedSoFar); 
+            }
+            else
+            {
+                // If adaptivity is switched off, terminate with an error
+                EXCEPTION(e->what());
+            }
+        }
+
+    }
+
     CellBasedEventHandler::EndEvent(CellBasedEventHandler::POSITION);
 }
+
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::RevertToOldLocations(std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> > oldNodeLoctions)
+{
+    
+    for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = this->mrCellPopulation.rGetMesh().GetNodeIteratorBegin();
+        node_iter != this->mrCellPopulation.rGetMesh().GetNodeIteratorEnd();
+        ++node_iter)
+    {
+        (node_iter)->rGetModifiableLocation() = oldNodeLoctions[&(*node_iter)];
+    }
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::ApplyBoundaries(std::map<Node<SPACE_DIM>*,c_vector<double, SPACE_DIM> > oldNodeLoctions)
+{
+
+    // Apply any boundary conditions
+    for (typename std::vector<boost::shared_ptr<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM> > >::iterator bcs_iter = mBoundaryConditions.begin();
+         bcs_iter != mBoundaryConditions.end();
+         ++bcs_iter)
+    {
+        (*bcs_iter)->ImposeBoundaryCondition(oldNodeLoctions);
+    }
+
+    // Verify that each boundary condition is now satisfied
+    for (typename std::vector<boost::shared_ptr<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM> > >::iterator bcs_iter = mBoundaryConditions.begin();
+         bcs_iter != mBoundaryConditions.end();
+         ++bcs_iter)
+    {
+        if (!((*bcs_iter)->VerifyBoundaryCondition()))
+        {
+            EXCEPTION("The cell population boundary conditions are incompatible.");
+        }
+    }
+}
+
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::CalculateCellDivisionVector(CellPtr pParentCell)
@@ -182,43 +282,7 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::WriteVisualizerSetupFile()
     }
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateNodePositions()
-{
-    /*
-     * Get the previous node positions (these may be needed when applying boundary conditions,
-     * e.g. in the case of immotile cells)
-     */
-    std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> > old_node_locations;
-    for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = this->mrCellPopulation.rGetMesh().GetNodeIteratorBegin();
-         node_iter != this->mrCellPopulation.rGetMesh().GetNodeIteratorEnd();
-         ++node_iter)
-    {
-        old_node_locations[&(*node_iter)] = (node_iter)->rGetLocation();
-    }
 
-    // Update node locations
-    static_cast<AbstractOffLatticeCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&(this->mrCellPopulation))->UpdateNodeLocations(this->mDt);
-
-    // Apply any boundary conditions
-    for (typename std::vector<boost::shared_ptr<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM> > >::iterator bcs_iter = mBoundaryConditions.begin();
-         bcs_iter != mBoundaryConditions.end();
-         ++bcs_iter)
-    {
-        (*bcs_iter)->ImposeBoundaryCondition(old_node_locations);
-    }
-
-    // Verify that each boundary condition is now satisfied
-    for (typename std::vector<boost::shared_ptr<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM> > >::iterator bcs_iter = mBoundaryConditions.begin();
-         bcs_iter != mBoundaryConditions.end();
-         ++bcs_iter)
-    {
-        if (!((*bcs_iter)->VerifyBoundaryCondition()))
-        {
-            EXCEPTION("The cell population boundary conditions are incompatible.");
-        }
-    }
-}
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::SetupSolve()
@@ -257,6 +321,12 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::OutputAdditionalSimulationSetu
         (*iter)->OutputCellPopulationBoundaryConditionInfo(rParamsFile);
     }
     *rParamsFile << "\t</CellPopulationBoundaryConditions>\n";
+
+    // Output numerical method details
+    *rParamsFile << "\n\t<NumericalMethod>\n";
+    mNumericalMethod->OutputNumericalMethodInfo(rParamsFile);
+    *rParamsFile << "\t\t<IsAdaptiveTimestep>" << (int)mIsAdaptiveTimestep << "</IsAdaptiveTimestep>\n";
+    *rParamsFile << "\t</NumericalMethod>\n";
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

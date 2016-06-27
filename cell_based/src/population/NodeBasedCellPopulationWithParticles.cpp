@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "NodeBasedCellPopulationWithParticles.hpp"
+#include "Warnings.hpp"
 #include "VtkMeshWriter.hpp"
 #include "CellAgesWriter.hpp"
 #include "CellAncestorWriter.hpp"
@@ -132,34 +133,6 @@ void NodeBasedCellPopulationWithParticles<DIM>::SetParticles(const std::set<unsi
     NodeBasedCellPopulationWithParticles::Validate();
 }
 
-template<unsigned DIM>
-void NodeBasedCellPopulationWithParticles<DIM>::UpdateParticlePositions(double dt)
-{
-    // Initialise vector of forces on particles
-    std::vector<c_vector<double, DIM> > drdt(this->GetNumNodes());
-    for (unsigned i=0; i<drdt.size(); i++)
-    {
-        drdt[i] = zero_vector<double>(DIM);
-    }
-
-    // Calculate forces on particles
-    double damping_constant = this->GetDampingConstantNormal();
-    for (unsigned i=0; i<drdt.size(); i++)
-    {
-        drdt[i] = this->GetNode(i)->rGetAppliedForce()/damping_constant;
-    }
-
-    for (typename AbstractMesh<DIM,DIM>::NodeIterator node_iter = this->mrMesh.GetNodeIteratorBegin();
-         node_iter != this->mrMesh.GetNodeIteratorEnd();
-         ++node_iter)
-    {
-        if (node_iter->IsParticle())
-        {
-            ChastePoint<DIM> new_point(node_iter->rGetLocation() + dt*drdt[node_iter->GetIndex()]);
-            node_iter->SetPoint(new_point);
-        }
-    }
-}
 
 template<unsigned DIM>
 void NodeBasedCellPopulationWithParticles<DIM>::UpdateParticlesAfterReMesh(NodeMap& rMap)
@@ -217,16 +190,6 @@ void NodeBasedCellPopulationWithParticles<DIM>::Validate()
             EXCEPTION("Node " << map_iter->first << " does not appear to be a particle or has a cell associated with it");
         }
     }
-}
-
-template<unsigned DIM>
-void NodeBasedCellPopulationWithParticles<DIM>::UpdateNodeLocations(double dt)
-{
-    // First update particle positions
-    UpdateParticlePositions(dt);
-
-    // Then call the base class method
-    AbstractCentreBasedCellPopulation<DIM>::UpdateNodeLocations(dt);
 }
 
 template<unsigned DIM>

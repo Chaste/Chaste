@@ -159,14 +159,10 @@ public:
     std::set<unsigned> GetNeighbouringLocationIndices(CellPtr pCell);
 
     /**
-     * Overridden UpdateNodeLocation() method.
-     *
-     * Update the location of each node in the cell population given
-     * a time step over which to integrate the equations of motion.
-     *
-     * @param dt  time step
-     */
-    void UpdateNodeLocations(double dt);
+    * Applies the appropriate force to each ghost node in the population.
+    * Called by AbstractNumericalMethod.
+    */
+    void ApplyGhostForces();
 
     /**
      * @return mIsGhostNode.
@@ -190,13 +186,6 @@ public:
      */
     std::set<unsigned> GetGhostNodeIndices();
 
-    /**
-     * Update the GhostNode positions using the spring force model with rest length=1.
-     * Forces are applied to ghost nodes from connected ghost and normal nodes.
-     *
-     * @param dt
-     */
-    void UpdateGhostPositions(double dt);
 
     /**
      * Update mIsGhostNode if required by a remesh.

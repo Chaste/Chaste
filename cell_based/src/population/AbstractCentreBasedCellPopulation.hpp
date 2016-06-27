@@ -194,12 +194,16 @@ public:
      */
     virtual std::set<unsigned> GetNeighbouringLocationIndices(CellPtr pCell);
 
-    /**
-     * Overridden UpdateNodeLocations() method.
-     *
-     * @param dt the time step
-     */
-    virtual void UpdateNodeLocations(double dt);
+    /*
+    * Checks whether a given node displacement violates the movement threshold 
+    * for this population. If so, a stepSizeException is generated that contains 
+    * a warning/error message and a suggested smaller dt that should avoid the problem.
+    *
+    * @param nodeIndex Index of the node in question (allows us to check whether this is a ghost or particle)
+    * @param displacement Movement vector of the node at this time step
+    * @param dt Current time step size
+    */
+    virtual void CheckForStepSizeException(unsigned nodeIndex, c_vector<double,SPACE_DIM>& displacement, double dt);
 
     /**
      * Overridden GetDampingConstant() method.

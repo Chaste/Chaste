@@ -115,12 +115,6 @@ public:
      */
     NodeBasedCellPopulationWithParticles(NodesOnlyMesh<DIM>& rMesh);
 
-    /**
-     * Update particle positions.
-     *
-     * @param dt
-     */
-    void UpdateParticlePositions(double dt);
 
     /**
      * Update mIsParticle if required by a remesh.
@@ -128,17 +122,6 @@ public:
      * @param rMap A map between node indices before and after remesh
      */
     void UpdateParticlesAfterReMesh(NodeMap& rMap);
-
-    /**
-     * Overridden UpdateNodeLocation() method.
-     *
-     * Update the location of each node in the cell population given
-     * a two vectors of forces on cells and particles and a time step over which
-     * to integrate the equations of motion.
-     *
-     * @param dt  time step
-     */
-    void UpdateNodeLocations(double dt);
 
     /**
      * IsParticle() method.

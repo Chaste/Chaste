@@ -47,6 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodeBasedCellPopulation.hpp"
 #include "VanLeeuwen2009WntSwatCellCycleModelHypothesisOne.hpp"
 #include "LinearSpringWithVariableSpringConstantsForce.hpp"
+#include "PopulationTestingForce.hpp"
 #include "CylindricalHoneycombMeshGenerator.hpp"
 #include "TargetedCellKiller.hpp"
 #include "RandomCellKiller.hpp"
@@ -336,29 +337,21 @@ public:
         // Create crypt simulation from cell population
         CryptSimulation2d simulator(cell_population);
 
-        // No force law passed to simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
-        simulator.AddForce(p_linear_force);
+        // Add a simple testing force
+        bool positionDependentForce = false;
+        MAKE_PTR_ARGS(PopulationTestingForce<2>, p_force,(positionDependentForce));
+        simulator.AddForce(p_force);
 
+        // Save old node locations
         std::vector<c_vector<double, 2> > old_posns(p_mesh->GetNumNodes());
-
-        // Make up some forces
         for (unsigned i=0; i<p_mesh->GetNumAllNodes(); i++)
         {
-            c_vector<double, 2> force;
-
             old_posns[i][0] = p_mesh->GetNode(i)->rGetLocation()[0];
             old_posns[i][1] = p_mesh->GetNode(i)->rGetLocation()[1];
-
-            force[0] = i*0.01;
-            force[1] = 2*i*0.01;
-
-            p_mesh->GetNode(i)->ClearAppliedForce();
-            p_mesh->GetNode(i)->AddAppliedForceContribution(force);
         }
 
         simulator.SetDt(0.01);
-        simulator.UpdateNodePositions();
+        simulator.UpdateCellLocationsAndTopology();
 
         // Create a set of node indices corresponding to ghost nodes
         std::set<unsigned> node_indices;
@@ -385,6 +378,10 @@ public:
             unsigned index = simulator.rGetCellPopulation().GetLocationIndexUsingCell(*cell_iter);
             c_vector<double, 2> cell_location = simulator.rGetCellPopulation().GetLocationOfCellCentre(*cell_iter);
 
+            AbstractOffLatticeCellPopulation<2,2>* p_offLattice_pop = dynamic_cast<AbstractOffLatticeCellPopulation<2,2>* >(&(simulator.rGetCellPopulation()));
+            double damping = p_offLattice_pop->GetDampingConstant(index);
+            c_vector<double, 2> expected_location = p_force->GetExpectedOneStepLocationFE(index, damping, old_posns[index], 0.01);
+
             if (old_posns[index][1] == 0) // stem
             {
                 // No Wnt so shouldn't have been moved
@@ -393,8 +390,8 @@ public:
             }
             else
             {
-                TS_ASSERT_DELTA(cell_location[0], old_posns[index][0] +   index*0.01*0.01, 1e-9);
-                TS_ASSERT_DELTA(cell_location[1], old_posns[index][1] + 2*index*0.01*0.01, 1e-9);
+                TS_ASSERT_DELTA(cell_location[0], expected_location[0], 1e-9);
+                TS_ASSERT_DELTA(cell_location[1], expected_location[1], 1e-9);
             }
         }
     }

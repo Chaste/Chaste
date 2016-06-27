@@ -128,6 +128,8 @@ public:
     virtual void SetNode(unsigned nodeIndex, ChastePoint<SPACE_DIM>& rNewLocation)=0;
 
     /**
+     * THis is a depricated method and only used in NodesOnlyCellPopulationWithBuskeUpdate.
+     *
      * Update the location of each node in the cell population given
      * a vector of forces on nodes and a time step over which to
      * integrate the equations of motion.
@@ -137,7 +139,18 @@ public:
      *
      * @param dt time step
      */
-    virtual void UpdateNodeLocations(double dt)=0;
+    virtual void UpdateNodeLocations(double dt);
+
+    /*
+    * Checks whether a given node displacement violates the movement threshold 
+    * for this population. If so, a stepSizeException is generated that contains 
+    * a warning/error message and a suggested smaller dt that should avoid the problem.
+    *
+    * @param nodeIndex Index of the node in question (allows us to check whether this is a ghost or particle)
+    * @param displacement Movement vector of the node at this time step
+    * @param dt Current time step size
+    */
+    virtual void CheckForStepSizeException(unsigned nodeIndex, c_vector<double,SPACE_DIM>& displacement, double dt) = 0;
 
     /**
      * Get the damping constant for this node - ie d in drdt = F/d.

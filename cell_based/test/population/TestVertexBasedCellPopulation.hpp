@@ -1354,59 +1354,15 @@ public:
         }
     }
 
-    void TestUpdateNodeLocations() throw (Exception)
-    {
-        // Create a simple 2D VertexMesh
-        HoneycombVertexMeshGenerator generator(5, 3);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
-
-        // Impose a larger cell rearrangement threshold so that motion is uninhibited (see #1376)
-        p_mesh->SetCellRearrangementThreshold(0.1);
-
-        // Create cells
-        std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
-
-        // Create cell population
-        VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
-
-        // Make up some forces
-        std::vector<c_vector<double, 2> > old_posns(cell_population.GetNumNodes());
-
-        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
-        {
-            c_vector<double, 2> force;
-            old_posns[i][0] = p_mesh->GetNode(i)->rGetLocation()[0];
-            old_posns[i][1] = p_mesh->GetNode(i)->rGetLocation()[1];
-
-            force[0] = i*0.01;
-            force[1] = 2*i*0.01;
-
-            cell_population.GetNode(i)->ClearAppliedForce();
-            cell_population.GetNode(i)->AddAppliedForceContribution(force);
-        }
-
-        double time_step = 0.01;
-
-        cell_population.UpdateNodeLocations(time_step);
-
-        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
-        {
-            TS_ASSERT_DELTA(cell_population.GetNode(i)->rGetLocation()[0], old_posns[i][0] +   i*0.01*0.01, 1e-9);
-            TS_ASSERT_DELTA(cell_population.GetNode(i)->rGetLocation()[1], old_posns[i][1] + 2*i*0.01*0.01, 1e-9);
-        }
-    }
-
     ///\todo create test (#2221)
     void TestGetTetrahedralMeshUsingVertexMesh() throw (Exception)
     {
         /* Create a simple VertexMesh comprising three VertexElements.
          *
          * Note: central node is not a boundary node.
-         *   ____
+         *     ____
          *    |\  /|
-         *  | \/ |
+         *    | \/ |
          *    |  \ |
          *    |___\|
          *
