@@ -37,7 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "RandomNumberGenerator.hpp"
 #include "UblasCustomFunctions.hpp"
 #include "Warnings.hpp"
-#include "Debug.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryMesh(std::vector<Node<SPACE_DIM>*> nodes,
@@ -47,7 +46,8 @@ ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryMesh(std::vector<N
                                                                    unsigned membraneIndex)
     : mNumGridPtsX(numGridPtsX),
       mNumGridPtsY(numGridPtsY),
-      mMembraneIndex(membraneIndex)
+      mMembraneIndex(membraneIndex),
+      mElementDivisionSpacing(DOUBLE_UNSET)
 {
     // Clear mNodes and mElements
     Clear();
@@ -936,6 +936,18 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetAverageNodeSpacingOfElem
     }
 }
 
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetElementDivisionSpacing()
+{
+    return mElementDivisionSpacing;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::SetElementDivisionSpacing(double elementDivisionSpacing)
+{
+    mElementDivisionSpacing = elementDivisionSpacing;
+}
+
 //////////////////////////////////////////////////////////////////////
 //                        2D-specific methods                       //
 //////////////////////////////////////////////////////////////////////
@@ -1117,17 +1129,25 @@ unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::DivideElement(ImmersedBou
     assert(SPACE_DIM == 2);
     assert(ELEMENT_DIM == SPACE_DIM);
 
-    double elem_spacing = 0.0001;
+    if (mElementDivisionSpacing == DOUBLE_UNSET)
+    {
+        EXCEPTION("The value of mElementDivisionSpacing has not been set.");
+    }
 
     /*
      * Method outline:
      *
      *   Each element needs to end up with the same number of nodes as the original element, and those nodes will be
-     *   equally spaced around the outline of each of the two halves of the dividing element.
+     *   equally spaced around the outline of each of the two daughter elements.
      *
-     *   To keep things neat, we will simply move the nodes already in existence to new locations, and then create a
-     *   new element from scratch with nodes in the other half of the original element.
+     *   The two elements need to be divided by a distance of mElementDivisionSpacing, where the distance is measured
+     *   perpendicular to the axis of division.
+     *
+     *   To achieve this, we find four 'corner' locations, each of which has a perpendicular distance from the axis of
+     *   half the required spacing, and are found by using the locations from the existing element as a stencil.
      */
+
+    double half_spacing = 0.5 * mElementDivisionSpacing;
 
     // Get unit vectors in the direction of the division axis, and the perpendicular
     c_vector<double, SPACE_DIM> unit_axis = axisOfDivision / norm_2(axisOfDivision);
@@ -1160,14 +1180,14 @@ unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::DivideElement(ImmersedBou
         c_vector<double, SPACE_DIM> centroid_to_i = this->GetVectorFromAtoB(centroid, pElement->GetNode(i)->rGetLocation());
         double perpendicular_dist = inner_prod(centroid_to_i, unit_perp);
 
-        if (fabs(perpendicular_dist) >= 0.5 * elem_spacing)
+        if (fabs(perpendicular_dist) >= half_spacing)
         {
             no_node_satisfied_condition_1 = false;
             start_a = i;
 
             // Calculate position so it's exactly 0.5 * elem_spacing perpendicular distance from the centroid
             c_vector<double, SPACE_DIM> new_location = pElement->GetNode(i)->rGetLocation();
-            new_location -= unit_perp * copysign(fabs(perpendicular_dist) - 0.5 * elem_spacing, perpendicular_dist);
+            new_location -= unit_perp * copysign(fabs(perpendicular_dist) - half_spacing, perpendicular_dist);
 
             pElement->GetNode(i)->SetPoint(ChastePoint<SPACE_DIM>(new_location));
             break;
@@ -1184,14 +1204,14 @@ unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::DivideElement(ImmersedBou
         c_vector<double, SPACE_DIM> centroid_to_i = this->GetVectorFromAtoB(centroid, pElement->GetNode(i)->rGetLocation());
         double perpendicular_dist = inner_prod(centroid_to_i, unit_perp);
 
-        if (fabs(perpendicular_dist) >= 0.5 * elem_spacing)
+        if (fabs(perpendicular_dist) >= half_spacing)
         {
             no_node_satisfied_condition_2 = false;
             end_a = i;
 
             // Calculate position so it's exactly 0.5 * elem_spacing perpendicular distance from the centroid
             c_vector<double, SPACE_DIM> new_location = pElement->GetNode(i)->rGetLocation();
-            new_location -= unit_perp * copysign(fabs(perpendicular_dist) - 0.5 * elem_spacing, perpendicular_dist);
+            new_location -= unit_perp * copysign(fabs(perpendicular_dist) - half_spacing, perpendicular_dist);
 
             pElement->GetNode(i)->SetPoint(ChastePoint<SPACE_DIM>(new_location));
             break;
@@ -1208,14 +1228,14 @@ unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::DivideElement(ImmersedBou
         c_vector<double, SPACE_DIM> centroid_to_i = this->GetVectorFromAtoB(centroid, pElement->GetNode(i)->rGetLocation());
         double perpendicular_dist = inner_prod(centroid_to_i, unit_perp);
 
-        if (fabs(perpendicular_dist) >= 0.5 * elem_spacing)
+        if (fabs(perpendicular_dist) >= half_spacing)
         {
             no_node_satisfied_condition_3 = false;
             start_b = i;
 
             // Calculate position so it's exactly 0.5 * elem_spacing perpendicular distance from the centroid
             c_vector<double, SPACE_DIM> new_location = pElement->GetNode(i)->rGetLocation();
-            new_location -= unit_perp * copysign(fabs(perpendicular_dist) - 0.5 * elem_spacing, perpendicular_dist);
+            new_location -= unit_perp * copysign(fabs(perpendicular_dist) - half_spacing, perpendicular_dist);
 
             pElement->GetNode(i)->SetPoint(ChastePoint<SPACE_DIM>(new_location));
             break;
@@ -1232,14 +1252,14 @@ unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::DivideElement(ImmersedBou
         c_vector<double, SPACE_DIM> centroid_to_i = this->GetVectorFromAtoB(centroid, pElement->GetNode(i)->rGetLocation());
         double perpendicular_dist = inner_prod(centroid_to_i, unit_perp);
 
-        if (fabs(perpendicular_dist) >= 0.5 * elem_spacing)
+        if (fabs(perpendicular_dist) >= half_spacing)
         {
             no_node_satisfied_condition_4 = false;
             end_b = i;
 
             // Calculate position so it's exactly 0.5 * elem_spacing perpendicular distance from the centroid
             c_vector<double, SPACE_DIM> new_location = pElement->GetNode(i)->rGetLocation();
-            new_location -= unit_perp * copysign(fabs(perpendicular_dist) - 0.5 * elem_spacing, perpendicular_dist);
+            new_location -= unit_perp * copysign(fabs(perpendicular_dist) - half_spacing, perpendicular_dist);
 
             pElement->GetNode(i)->SetPoint(ChastePoint<SPACE_DIM>(new_location));
             break;
@@ -1275,8 +1295,8 @@ unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::DivideElement(ImmersedBou
         node_idx = (node_idx + 1) % num_nodes;
     }
 
-    assert(!daughter_a_location_stencil.size() > 1);
-    assert(!daughter_b_location_stencil.size() > 1);
+    assert(daughter_a_location_stencil.size() > 1);
+    assert(daughter_b_location_stencil.size() > 1);
 
     // To help calculating cumulative distances, add the first location on to the end
     daughter_a_location_stencil.push_back(daughter_a_location_stencil[0]);
@@ -1378,6 +1398,20 @@ unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::DivideElement(ImmersedBou
     {
         this->mElements.back()->rGetCornerNodes().push_back(pElement->rGetCornerNodes()[corner]);
     }
+
+    // Update fluid source location for the existing element
+    pElement->GetFluidSource()->rGetModifiableLocation() = this->GetCentroidOfElement(pElement->GetIndex());
+
+    // Add a fluid source for the new element
+    c_vector<double, SPACE_DIM> new_centroid = this->GetCentroidOfElement(new_elem_idx);
+    mElementFluidSources.push_back(new FluidSource<SPACE_DIM>(new_elem_idx, new_centroid));
+
+    // Set source parameters
+    mElementFluidSources.back()->SetAssociatedElementIndex(new_elem_idx);
+    mElementFluidSources.back()->SetStrength(0.0);
+
+    // Associate source with element
+    mElements[new_elem_idx]->SetFluidSource(mElementFluidSources.back());
 
     return new_elem_idx;
 }

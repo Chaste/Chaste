@@ -38,6 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellBasedTestSuite.hpp"
 
 #include "OffLatticeSimulation.hpp"
+#include "TransitCellProliferativeType.hpp"
 #include "UniformlyDistributedCellCycleModel.hpp"
 #include "CellsGenerator.hpp"
 #include "ImmersedBoundaryMesh.hpp"
@@ -45,6 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
 #include "ImmersedBoundaryMembraneElasticityForce.hpp"
 #include "FluidSource.hpp"
+#include "SmartPointers.hpp"
 
 #include "Debug.hpp"
 
@@ -67,7 +69,7 @@ public:
          * 6: bottom left y
          */
         double diam = 0.3;
-        SuperellipseGenerator* p_gen = new SuperellipseGenerator(64, 1.0, diam, 0.4, 0.5-0.5*diam, 0.3);
+        SuperellipseGenerator* p_gen = new SuperellipseGenerator(128, 1.0, 0.3, 0.3, 0.5-0.5*diam, 0.3);
         std::vector<c_vector<double, 2> > locations = p_gen->GetPointsAsVectors();
 
         std::vector<Node<2>* > nodes;
@@ -100,16 +102,18 @@ public:
         // Add force laws
         MAKE_PTR(ImmersedBoundaryMembraneElasticityForce<2>, p_boundary_force);
         p_main_modifier->AddImmersedBoundaryForce(p_boundary_force);
-        p_boundary_force->SetSpringConstant(1e1);
+        p_boundary_force->SetSpringConstant(5e7);
 
         // Set simulation properties
         double dt = 0.01;
         simulator.SetOutputDirectory("TestShortSingleCellSimulation");
         simulator.SetDt(dt);
         simulator.SetSamplingTimestepMultiple(1);
-        simulator.SetEndTime(1000 * dt);
+        simulator.SetEndTime(5000 * dt);
 
         simulator.Solve();
+
+        PRINT_VECTOR(p_mesh->GetCentroidOfElement(0));
 
     }
 };

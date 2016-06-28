@@ -58,6 +58,9 @@ ImmersedBoundaryCellPopulation<DIM>::ImmersedBoundaryCellPopulation(ImmersedBoun
 
     mInteractionDistance = 0.05 * sqrt(mpImmersedBoundaryMesh->GetVolumeOfElement(mpImmersedBoundaryMesh->GetNumElements()-1));
 
+    // Set the mesh division spacing distance
+    rMesh.SetElementDivisionSpacing(0.25 * mInteractionDistance);
+
     // If no location indices are specified, associate with elements from the mesh (assumed to be sequentially ordered).
     std::list<CellPtr>::iterator it = this->mCells.begin();
     for (unsigned i=0; it != this->mCells.end(); ++it, ++i)
@@ -451,6 +454,29 @@ void ImmersedBoundaryCellPopulation<DIM>::Validate()
             // This should never be reached as you can only set one cell per element index
             EXCEPTION("At time " << SimulationTime::Instance()->GetTime() <<", Element " << i << " appears to have " << validated_element[i] << " cells associated with it");
         }
+    }
+}
+
+template<unsigned DIM>
+void ImmersedBoundaryCellPopulation<DIM>::CheckForStepSizeException(unsigned nodeIndex, c_vector<double,DIM>& displacement, double dt)
+{
+
+    double length = norm_2(displacement);
+    double characteristic_spacing = mpImmersedBoundaryMesh->GetCharacteristicNodeSpacing();
+
+    if (length > characteristic_spacing)
+    {
+        displacement *= characteristic_spacing/length;
+
+        std::ostringstream message;
+        message << "Vertices are moving more than half the CellRearrangementThreshold. This could cause elements to become inverted ";
+        message << "so the motion has been restricted. Use a smaller timestep to avoid these warnings.";
+
+        double suggestedStep = 0.95 * dt * characteristic_spacing / length;
+        bool terminate = false;
+
+        //\todo: uncomment the next line
+//        throw new StepSizeException(length, suggestedStep, message.str(), terminate);
     }
 }
 

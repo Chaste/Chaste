@@ -85,6 +85,9 @@ protected:
     /** Characteristic node spacing */
     double mCharacteristicNodeSpacing;
 
+    /** The required spacing when an element divides */
+    double mElementDivisionSpacing;
+
     /** Indices of nodes that have been deleted. These indices can be reused when adding new elements/nodes. */
     std::vector<unsigned> mDeletedNodeIndices;
 
@@ -546,6 +549,17 @@ public:
      */
     unsigned DivideElementAlongShortAxis(ImmersedBoundaryElement<ELEMENT_DIM,SPACE_DIM>* pElement,
                                          bool placeOriginalElementBelow=false);
+
+
+    /**
+     * @return mElementDivisionSpacing
+     */
+    double GetElementDivisionSpacing();
+
+    /**
+     * @param the new value of mElementDivisionSpacing
+     */
+    void SetElementDivisionSpacing(double elementDivisionSpacing);
 
     /**
      * A smart iterator over the elements in the mesh.
