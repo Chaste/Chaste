@@ -198,7 +198,7 @@ void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::DetectStepSizeExceptions(un
     }
     catch (StepSizeException* e)
     {
-        if (!(e->mIsTerminal) && (*mpIsAdaptiveTimestep==false))
+        if (!(e->IsTerminal()) && (*mpIsAdaptiveTimestep==false))
         {
             // If adaptivity is turned off but the simulation can continue, just produce a warning.
             // Only the case for vertex based populations, which can alter node displacement directly 

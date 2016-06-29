@@ -84,7 +84,23 @@ public:
     }
 
     /** Destructor. */
-    ~StepSizeException() throw() {} 
+    ~StepSizeException() throw() {}
+
+    /**
+     * @return mSuggestedNewStep.
+     */
+    double GetSuggestedNewStep()
+    {
+        return mSuggestedNewStep;
+    }
+
+    /**
+     * @return mIsTerminal.
+     */
+    double IsTerminal()
+    {
+        return mIsTerminal;
+    }
 };
 
 #endif // _STEPSIZEEXCEPTION_HPP_

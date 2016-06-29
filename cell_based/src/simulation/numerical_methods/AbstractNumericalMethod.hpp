@@ -78,7 +78,11 @@ protected:
     /** Pointer to the force collection to apply*/
     std::vector<boost::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > >* mpForceCollection;
 
-    /** Pointer to the member mAdaptive of the OffLatticeSimulation, determines whether adaptivity is turned on*/
+    /**
+     * Pointer to the member mAdaptive of the OffLatticeSimulation, determines whether adaptivity is turned on.
+     *
+     * \todo #2087 why on earth is this a pointer to a bool?
+     */
     bool* mpIsAdaptiveTimestep;
 
     /**

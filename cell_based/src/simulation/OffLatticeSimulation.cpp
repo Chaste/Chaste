@@ -93,7 +93,6 @@ OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::OffLatticeSimulation(AbstractCellPo
     mNumericalMethod->SetIsAdaptiveTimestep(&mIsAdaptiveTimestep);
 }
 
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::AddForce(boost::shared_ptr<AbstractForce<ELEMENT_DIM,SPACE_DIM> > pForce)
 {
@@ -119,33 +118,33 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::RemoveAllCellPopulationBoundar
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-const boost::shared_ptr<AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM> > OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::GetNumericalMethod() const{
+const boost::shared_ptr<AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM> > OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::GetNumericalMethod() const
+{
     return mNumericalMethod;
-};
+}
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::GetIsAdaptiveTimestep() const
 {
     return mIsAdaptiveTimestep;
-};
+}
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::SetIsAdaptiveTimestep(bool isAdaptiveTimestep)
 {
     mIsAdaptiveTimestep = isAdaptiveTimestep;
-};
-
+}
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellLocationsAndTopology()
 {
     CellBasedEventHandler::BeginEvent(CellBasedEventHandler::POSITION);
 
-    double timeAdvancedSoFar = 0; 
-    double targetTimeStep  = this->mDt;
-    double currentTimeStep = this->mDt;
+    double time_advanced_so_far = 0;
+    double target_time_step  = this->mDt;
+    double present_time_step = this->mDt;
 
-    while(timeAdvancedSoFar < targetTimeStep)
+    while (time_advanced_so_far < target_time_step)
     {
         // Store the initial node positions (these may be needed when applying boundary conditions)    
         std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> > old_node_locations;
@@ -160,30 +159,30 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellLocationsAndTopology
         // Try to update node positions according to the numerical method 
         try
         {
-            mNumericalMethod->UpdateAllNodePositions(currentTimeStep);
+            mNumericalMethod->UpdateAllNodePositions(present_time_step);
             ApplyBoundaries(old_node_locations);
 
-            // Successful timestep! Update timeAdvancedSoFar 
-            timeAdvancedSoFar += currentTimeStep;
+            // Successful time step! Update time_advanced_so_far
+            time_advanced_so_far += present_time_step;
 
-            // and if using adaptive timestep then increase the currentTimeStep (by 1% for now)
-            if(mIsAdaptiveTimestep)
+            // and if using adaptive timestep then increase the present_time_step (by 1% for now)
+            if (mIsAdaptiveTimestep)
             {
                 // \todo #2087 Make this a setable member variable.
                 double timestep_increase = 0.01;
-                currentTimeStep = fmin((1+timestep_increase)*currentTimeStep, targetTimeStep - timeAdvancedSoFar);
+                present_time_step = fmin((1+timestep_increase)*present_time_step, target_time_step - time_advanced_so_far);
             }
 
         }
-        catch(StepSizeException* e)
+        catch (StepSizeException* e)
         {
             // Detects if a node has travelled too far in a single time step
-            if(mIsAdaptiveTimestep)
+            if (mIsAdaptiveTimestep)
             {
                 // If adaptivity is switched on, revert node locations and choose a suitable
                 // smaller time step
                 RevertToOldLocations(old_node_locations);
-                currentTimeStep = fmin(e->mSuggestedNewStep, targetTimeStep - timeAdvancedSoFar); 
+                present_time_step = fmin(e->GetSuggestedNewStep(), target_time_step - time_advanced_so_far);
             }
             else
             {
@@ -191,17 +190,14 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellLocationsAndTopology
                 EXCEPTION(e->what());
             }
         }
-
     }
 
     CellBasedEventHandler::EndEvent(CellBasedEventHandler::POSITION);
 }
 
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::RevertToOldLocations(std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> > oldNodeLoctions)
 {
-    
     for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = this->mrCellPopulation.rGetMesh().GetNodeIteratorBegin();
         node_iter != this->mrCellPopulation.rGetMesh().GetNodeIteratorEnd();
         ++node_iter)
@@ -213,7 +209,6 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::RevertToOldLocations(std::map<
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::ApplyBoundaries(std::map<Node<SPACE_DIM>*,c_vector<double, SPACE_DIM> > oldNodeLoctions)
 {
-
     // Apply any boundary conditions
     for (typename std::vector<boost::shared_ptr<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM> > >::iterator bcs_iter = mBoundaryConditions.begin();
          bcs_iter != mBoundaryConditions.end();
@@ -233,7 +228,6 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::ApplyBoundaries(std::map<Node<
         }
     }
 }
-
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::CalculateCellDivisionVector(CellPtr pParentCell)
@@ -282,8 +276,6 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::WriteVisualizerSetupFile()
     }
 }
 
-
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::SetupSolve()
 {
@@ -295,7 +287,6 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::SetupSolve()
         node_iter->ClearAppliedForce();
     }
 }
-
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::OutputAdditionalSimulationSetup(out_stream& rParamsFile)
@@ -332,11 +323,11 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::OutputAdditionalSimulationSetu
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::OutputSimulationParameters(out_stream& rParamsFile)
 {
-    // Call method on direct parent class
+    // No new parameters to output, so just call method on direct parent class
     AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::OutputSimulationParameters(rParamsFile);
 }
 
-///////// Explicit instantiation
+// Explicit instantiation
 template class OffLatticeSimulation<1,1>;
 template class OffLatticeSimulation<1,2>;
 template class OffLatticeSimulation<2,2>;
