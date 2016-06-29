@@ -112,7 +112,9 @@ public:
     const AbstractCellPopulation<DIM>& rGetCellPopulation() const;
 
     /**
-     * Set up the source terms. TODO this is identical to the one in AveragedSourcePde so refactor.
+     * Set up the source terms.
+     *
+     * \todo this is identical to the one in AveragedSourcePde so refactor.
      *
      * @param rCoarseMesh reference to the coarse mesh
      * @param pCellPdeElementMap optional pointer to the map from cells to coarse elements
