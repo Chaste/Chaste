@@ -70,6 +70,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ApcTwoHitCellMutationState.hpp"
 #include "BetaCateninOneHitCellMutationState.hpp"
 #include "DefaultCellProliferativeType.hpp"
+#include "ForwardEulerNumericalMethod.hpp"
 
 // Cell population writers
 #include "CellMutationStatesCountWriter.hpp"
@@ -1236,14 +1237,14 @@ public:
         // Use smaller movement threshold to maintain smooth motion
         cell_population.SetAbsoluteMovementThreshold(0.1); 
 
-        // Set up simulation
-        OffLatticeSimulation<2> simulator(cell_population);
+        // Set up simulation, using a large time step and adaptivity to correct if too much motion
+        boost::shared_ptr<AbstractNumericalMethod<2,2> > p_method(new ForwardEulerNumericalMethod<2,2>());
+        p_method->SetUseAdaptiveTimestep(true);
+
+        OffLatticeSimulation<2> simulator(cell_population, false, true, p_method);
         simulator.SetOutputDirectory("TestOffLatticeSimulationWithAdaptivity");
         simulator.SetEndTime(5.0);
-
-        // Use larger timestep and use adaptivity to correct if too much motion. 
         simulator.SetDt(0.1);
-        simulator.SetIsAdaptiveTimestep(true);
 
         // Create a force law and pass it to the simulation
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);

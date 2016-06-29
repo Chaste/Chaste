@@ -53,11 +53,9 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::OffLatticeSimulation(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation,
                                                 bool deleteCellPopulationInDestructor,
                                                 bool initialiseCells,
-                                                boost::shared_ptr<AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM> > numericalMethod,
-                                                bool isAdaptiveTimestep)
+                                                boost::shared_ptr<AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM> > pNumericalMethod)
     : AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>(rCellPopulation, deleteCellPopulationInDestructor, initialiseCells),
-      mNumericalMethod(numericalMethod),
-      mIsAdaptiveTimestep(isAdaptiveTimestep)
+      mpNumericalMethod(pNumericalMethod)
 {
 
     if (!dynamic_cast<AbstractOffLatticeCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&rCellPopulation))
@@ -82,15 +80,16 @@ OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::OffLatticeSimulation(AbstractCellPo
     }
     else
     {
-        // All classes derived from AbstractOffLatticeCellPopulation are covered by the above (except user-derived classes),
-        // i.e. if you want to use this method with your own subclass of AbstractOffLatticeCellPopulation, then simply
-        // comment out the line below
+        /*
+         * All classes derived from AbstractOffLatticeCellPopulation are covered by the above
+         * (except user-derived classes), i.e. if you want to use this method with your own
+         * subclass of AbstractOffLatticeCellPopulation, then simply comment out the line below.
+         */
         NEVER_REACHED;
     }
 
-    mNumericalMethod->SetCellPopulation(dynamic_cast<AbstractOffLatticeCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&rCellPopulation));
-    mNumericalMethod->SetForceCollection(&mForceCollection);
-    mNumericalMethod->SetIsAdaptiveTimestep(&mIsAdaptiveTimestep);
+    mpNumericalMethod->SetCellPopulation(dynamic_cast<AbstractOffLatticeCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&rCellPopulation));
+    mpNumericalMethod->SetForceCollection(&mForceCollection);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -120,19 +119,7 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::RemoveAllCellPopulationBoundar
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 const boost::shared_ptr<AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM> > OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::GetNumericalMethod() const
 {
-    return mNumericalMethod;
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-bool OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::GetIsAdaptiveTimestep() const
-{
-    return mIsAdaptiveTimestep;
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::SetIsAdaptiveTimestep(bool isAdaptiveTimestep)
-{
-    mIsAdaptiveTimestep = isAdaptiveTimestep;
+    return mpNumericalMethod;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -159,14 +146,14 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellLocationsAndTopology
         // Try to update node positions according to the numerical method 
         try
         {
-            mNumericalMethod->UpdateAllNodePositions(present_time_step);
+            mpNumericalMethod->UpdateAllNodePositions(present_time_step);
             ApplyBoundaries(old_node_locations);
 
             // Successful time step! Update time_advanced_so_far
             time_advanced_so_far += present_time_step;
 
             // and if using adaptive timestep then increase the present_time_step (by 1% for now)
-            if (mIsAdaptiveTimestep)
+            if (mpNumericalMethod->HasAdaptiveTimestep())
             {
                 // \todo #2087 Make this a setable member variable.
                 double timestep_increase = 0.01;
@@ -177,7 +164,7 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellLocationsAndTopology
         catch (StepSizeException* e)
         {
             // Detects if a node has travelled too far in a single time step
-            if (mIsAdaptiveTimestep)
+            if (mpNumericalMethod->HasAdaptiveTimestep())
             {
                 // If adaptivity is switched on, revert node locations and choose a suitable
                 // smaller time step
@@ -315,8 +302,7 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::OutputAdditionalSimulationSetu
 
     // Output numerical method details
     *rParamsFile << "\n\t<NumericalMethod>\n";
-    mNumericalMethod->OutputNumericalMethodInfo(rParamsFile);
-    *rParamsFile << "\t\t<IsAdaptiveTimestep>" << (int)mIsAdaptiveTimestep << "</IsAdaptiveTimestep>\n";
+    mpNumericalMethod->OutputNumericalMethodInfo(rParamsFile);
     *rParamsFile << "\t</NumericalMethod>\n";
 }
 

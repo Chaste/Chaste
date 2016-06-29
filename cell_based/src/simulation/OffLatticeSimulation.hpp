@@ -88,6 +88,7 @@ private:
         archive & boost::serialization::base_object<AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM> >(*this);
         archive & mForceCollection;
         archive & mBoundaryConditions;
+        ///\todo #2087 archive mpNumericalMethod?
     }
 
 protected:
@@ -99,10 +100,7 @@ protected:
     std::vector<boost::shared_ptr<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM> > > mBoundaryConditions;
 
     /** The numerical method to use in this simulation. Defaults to forward Euler. */
-    boost::shared_ptr<AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM> > mNumericalMethod;
-
-    /** Whether or not to use an adaptive time step size. */
-    bool mIsAdaptiveTimestep;
+    boost::shared_ptr<AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM> > mpNumericalMethod;
 
     /**
      * Overridden UpdateCellLocationsAndTopology() method.
@@ -165,15 +163,13 @@ public:
      *     free up memory (defaults to false)
      * @param initialiseCells Whether to initialise cells (defaults to true, set to false when loading
      *     from an archive)
-     * @param numericalMethod Pointer to a numerical method object (defaults to forward Euler).
-     * @param isAdaptiveTimestep Whether or not to use an adaptive step size
+     * @param pNumericalMethod Pointer to a numerical method object (defaults to forward Euler)
      */
     OffLatticeSimulation(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation,
                          bool deleteCellPopulationInDestructor=false,
                          bool initialiseCells=true,
-                         boost::shared_ptr<AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM> > numericalMethod 
-                          = boost::shared_ptr<ForwardEulerNumericalMethod<ELEMENT_DIM, SPACE_DIM> >(new ForwardEulerNumericalMethod<ELEMENT_DIM,SPACE_DIM>()),
-                         bool isAdaptiveTimestep=false);
+                         boost::shared_ptr<AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM> > pNumericalMethod
+                          = boost::shared_ptr<ForwardEulerNumericalMethod<ELEMENT_DIM, SPACE_DIM> >(new ForwardEulerNumericalMethod<ELEMENT_DIM,SPACE_DIM>()));
 
     /**
      * Add a force to be used in this simulation (use this to set the mechanics system).
@@ -205,30 +201,16 @@ public:
     const boost::shared_ptr<AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM> > GetNumericalMethod() const;
 
     /**
-     * @return whether adaptive time stepping is turned on or not.
-     */
-    bool GetIsAdaptiveTimestep() const;
-
-    /**
-     * Set whether adaptive step size is turned on.
+     * Overridden OutputAdditionalSimulationSetup() method.
      *
-     * @param isAdaptiveTimestep New value for mIsAdaptiveTimestep
-     */
-    void SetIsAdaptiveTimestep(bool isAdaptiveTimestep);
-
-    /**
-     * Overridden OutputAdditionalSimulationSetup method to output the force and cell
-     * population boundary condition information.
+     * Output any force, boundary condition or numerical method information.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
     void OutputAdditionalSimulationSetup(out_stream& rParamsFile);
 
     /**
-     * Outputs simulation parameters to file
-     *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * Overridden OutputSimulationParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
@@ -256,9 +238,6 @@ inline void save_construct_data(
 
     const boost::shared_ptr<AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM> > p_numerical_method = t->GetNumericalMethod();
     ar << p_numerical_method;
-
-    const bool is_adaptive = t->GetIsAdaptiveTimestep();
-    ar << is_adaptive;
 }
 
 /**
@@ -275,12 +254,9 @@ inline void load_construct_data(
     boost::shared_ptr<AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM> > p_numerical_method;
     ar >> p_numerical_method;
 
-    bool is_adaptive;
-    ar >> is_adaptive;
-
     // Invoke inplace constructor to initialise instance, middle two variables set extra
     // member variables to be deleted as they are loaded from archive and to not initialise cells.
-    ::new(t)OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>(*p_cell_population, true, false, p_numerical_method, is_adaptive);
+    ::new(t)OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>(*p_cell_population, true, false, p_numerical_method);
 }
 }
 } // namespace

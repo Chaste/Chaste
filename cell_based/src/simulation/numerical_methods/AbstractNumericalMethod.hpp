@@ -79,14 +79,12 @@ protected:
     std::vector<boost::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > >* mpForceCollection;
 
     /**
-     * Pointer to the member mAdaptive of the OffLatticeSimulation, determines whether adaptivity is turned on.
-     *
-     * \todo #2087 why on earth is this a pointer to a bool?
+     * Whether the numerical method uses an adaptive time step.
      */
-    bool* mpIsAdaptiveTimestep;
+    bool mUseAdaptiveTimestep;
 
     /**
-     * A boolean flag indicating whether non forward Euler methods are supported for this type of cell
+     * A boolean flag indicating whether non-forward Euler methods are supported for this type of cell
      * population. Allows us to fall back to the old method of updating node positions for populations
      * that require it (This is only for NodeBasedCellPopulationWithBuskeUpdates).
      *
@@ -160,12 +158,16 @@ public:
     void SetForceCollection(std::vector<boost::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > >* pForces);
 
     /**
-     * Sets a pointer to OffLatticeSimulation mIsAdaptiveTimestep, allows the method to check whether
-     * adaptivity is turned on
+     * Set mUseAdaptiveTimestep.
      *
-     * @param pIsAdaptiveTimestep Pointer to mIsAdaptiveTimestep of OffLatticeSimulation
+     * @param useAdaptiveTimestep whether to use an adaptive time step
      */
-    void SetIsAdaptiveTimestep(bool* pIsAdaptiveTimestep);
+    void SetUseAdaptiveTimestep(bool useAdaptiveTimestep);
+
+    /**
+     * @return whether the numerical method uses an adaptive time step.
+     */
+    bool HasAdaptiveTimestep();
 
     /**
      * Updates node positions according to Newton's 2nd law with overdamping.

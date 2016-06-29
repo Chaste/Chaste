@@ -46,15 +46,11 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::AbstractNumericalMethod()
     : mpCellPopulation(NULL),
       mpForceCollection(NULL),
-      mpIsAdaptiveTimestep(NULL)
+      mUseAdaptiveTimestep(false),
+      mUseUpdateNodeLocation(false),
+      mGhostNodeForcesEnabled(true)
 {
-    /*
-     * mpCellPopulation and mpForceCollection are initialized by OffLatticeSimulation in
-     * its constructor. For now we set some safe defaults for the other member variables.
-     */
-
-    mUseUpdateNodeLocation = false;
-    mGhostNodeForcesEnabled = true;
+    // mpCellPopulation and mpForceCollection are initialized by the OffLatticeSimulation constructor
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -109,16 +105,15 @@ void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::SetForceCollection(std::vec
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::SetIsAdaptiveTimestep(bool* pIsAdaptiveTimestep)
+void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::SetUseAdaptiveTimestep(bool useAdaptiveTimestep)
 {
-    if (mpIsAdaptiveTimestep == NULL)
-    {
-        mpIsAdaptiveTimestep = pIsAdaptiveTimestep;
-    }
-    else
-    {
-        EXCEPTION("The numerical method function mpIsAdaptiveTimestep should only be called once by OffLatticeSimulation in its constructor");
-    }
+    mUseAdaptiveTimestep = useAdaptiveTimestep;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::HasAdaptiveTimestep()
+{
+    return mUseAdaptiveTimestep;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -198,7 +193,7 @@ void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::DetectStepSizeExceptions(un
     }
     catch (StepSizeException* e)
     {
-        if (!(e->IsTerminal()) && (*mpIsAdaptiveTimestep==false))
+        if (!(e->IsTerminal()) && (mUseAdaptiveTimestep==false))
         {
             // If adaptivity is turned off but the simulation can continue, just produce a warning.
             // Only the case for vertex based populations, which can alter node displacement directly 
@@ -225,7 +220,9 @@ void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::OutputNumericalMethodInfo(o
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::OutputNumericalMethodParameters(out_stream& rParamsFile)
 {
-    // No parameters to return here
+    *rParamsFile << "\t\t\t<UseAdaptiveTimestep>" << mUseAdaptiveTimestep << "</UseAdaptiveTimestep> \n";
+    *rParamsFile << "\t\t\t<UseUpdateNodeLocation>" << mUseUpdateNodeLocation << "</UseUpdateNodeLocation> \n";
+    *rParamsFile << "\t\t\t<GhostNodeForcesEnabled>" << mGhostNodeForcesEnabled << "</GhostNodeForcesEnabled> \n";
 }
 
 // Explicit instantiation
