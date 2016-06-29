@@ -76,6 +76,8 @@ public:
     
     void TestUpdateAllNodePositionsWithMeshBased() throw(Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel
+
         // Create a simple mesh
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
         MutableMesh<2,2> mesh;
@@ -126,6 +128,8 @@ public:
 
     void TestUpdateAllNodePositionsWithMeshBasedWithGhosts() throw(Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel
+
         HoneycombMeshGenerator generator(3, 3, 1);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
@@ -253,12 +257,13 @@ public:
     }
     void TestUpdateAllNodePositionsWithNodeBased() throw(Exception)
     {
+        //TODO add this test!
     }
 
     void TestUpdateAllNodePositionsWithNodeBasedWithParticles() throw(Exception)
     {
-        EXIT_IF_PARALLEL;    // This test doesn't work in parallel.
-
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel
+        
         HoneycombMeshGenerator generator(3, 3, 1);
         TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
 
