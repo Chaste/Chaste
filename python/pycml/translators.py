@@ -2011,6 +2011,10 @@ class CellMLToChasteTranslator(CellMLTranslator):
                 # Code to calculate the independent variable (it may have a units conversion for instance)
                 indep_expr = expr.operands().next()
                 vars_used = self._vars_in(indep_expr)
+                for piecewise, child in piecewises:
+                    # We may also need to calculate variables used in the bounds check below
+                    for piece in getattr(piecewise, u'piece', []):
+                        vars_used.update(self._vars_in(child_i(piece, 2)))
                 indep_nodes_used = self.calculate_extended_dependencies(vars_used, prune=nodes_used)
                 self.output_equations(indep_nodes_used)
                 nodes_used.update(indep_nodes_used)
