@@ -105,7 +105,7 @@ public:
      */
     void AddForceContribution(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation);
 
-    /*
+    /**
      * Helper method to return the expected step location for ForwardEulerNumericalMethod.
      *
      * @return the expected location after one step
@@ -120,7 +120,7 @@ public:
                                                            c_vector<double, SPACE_DIM>& oldLocation, 
                                                            double dt);
 
-    /*
+    /**
      * Helper method to return the expected step location for RK4NumericalMethod.
      *
      * @return the expected location after one step
@@ -135,7 +135,7 @@ public:
                                                            c_vector<double, SPACE_DIM>& oldLocation, 
                                                            double dt);
 
-    /*
+    /**
      * Helper method to return the expected step location for AdamsMoultonNumericalMethod.
      *
      * @return the expected location after one step
@@ -150,7 +150,7 @@ public:
                                                            c_vector<double, SPACE_DIM>& oldLocation, 
                                                            double dt);
 
-    /*
+    /**
      * Helper method to return the expected step location for BackwardEulerNumericalMethod.
      *
      * @return the expected location after one step

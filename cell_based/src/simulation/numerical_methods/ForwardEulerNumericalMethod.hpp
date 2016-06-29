@@ -42,15 +42,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractNumericalMethod.hpp"
 
 /**
-* Implements forward Euler time stepping.
-*
-* Solves the equations of motion dr/dt = F
-* Using the scheme
-*
-* r^(t+1) = r^t + dt F^t
-*
-*/
-
+ * Implements forward Euler time stepping.
+ *
+ * Solves the equations of motion dr/dt = F
+ * Using the scheme
+ *
+ * r^(t+1) = r^t + dt F^t.
+ */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
 class ForwardEulerNumericalMethod : public AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM> {
 
@@ -71,27 +69,27 @@ private:
         archive & boost::serialization::base_object<AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM> >(*this);
     }
 
-public:	
-	
+public:
+
     /**
-     * Constructor
+     * Constructor.
      */
     ForwardEulerNumericalMethod();
 
     /**
-     * Destructor
+     * Destructor.
      */
     virtual ~ForwardEulerNumericalMethod();
 
     /**
-     * Updates all node positions
+     * Updates all node positions.
      *
      * @param dt Time step
      */
     virtual void UpdateAllNodePositions(double dt);
 
-    /*
-     * Outputs any additional numerical method details to the parameters file
+    /**
+     * Overridden OutputNumericalMethodParameters() method.
      *
      * @param rParamsFile Reference to the parameter output filestream
      */

@@ -112,21 +112,19 @@ protected:
     virtual void UpdateCellLocationsAndTopology();
 
     /**
-    * Sends nodes back to the positions given in the input map. Used after a failed step
-    * when adaptivity is turned on.
-    *
-    * @param oldNodeLoctions A map linking nodes to their old positions.
-    */
+     * Sends nodes back to the positions given in the input map. Used after a failed step
+     * when adaptivity is turned on.
+     *
+     * @param oldNodeLoctions A map linking nodes to their old positions.
+     */
     void RevertToOldLocations(std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> > oldNodeLoctions);
 
-
     /**
-    * Applies any boundary conditions.
-    *
-    * @param oldNodeLoctions Mapping between node indices and old node locations
-    */
+     * Applies any boundary conditions.
+     *
+     * @param oldNodeLoctions Mapping between node indices and old node locations
+     */
     void ApplyBoundaries(std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> > oldNodeLoctions);
-
 
     /**
      * Overridden SetupSolve() method to clear the forces applied to the nodes.
@@ -160,23 +158,22 @@ protected:
 public:
 
     /**
-    * Constructor
-    *
-    * @param rCellPopulation Reference to a cell population object
-    * @param deleteCellPopulationInDestructor Whether to delete the cell population on destruction to
-    *     free up memory (defaults to false)
-    * @param initialiseCells Whether to initialise cells (defaults to true, set to false when loading
-    *     from an archive)
-    * @param numericalMethod Pointer to a numerical method object (defaults to forward Euler).
-    * @param isAdaptiveTimestep Whether or not to use an adaptive step size
-    */
+     * Constructor.
+     *
+     * @param rCellPopulation Reference to a cell population object
+     * @param deleteCellPopulationInDestructor Whether to delete the cell population on destruction to
+     *     free up memory (defaults to false)
+     * @param initialiseCells Whether to initialise cells (defaults to true, set to false when loading
+     *     from an archive)
+     * @param numericalMethod Pointer to a numerical method object (defaults to forward Euler).
+     * @param isAdaptiveTimestep Whether or not to use an adaptive step size
+     */
     OffLatticeSimulation(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation,
                          bool deleteCellPopulationInDestructor=false,
                          bool initialiseCells=true,
                          boost::shared_ptr<AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM> > numericalMethod 
                           = boost::shared_ptr<ForwardEulerNumericalMethod<ELEMENT_DIM, SPACE_DIM> >(new ForwardEulerNumericalMethod<ELEMENT_DIM,SPACE_DIM>()),
                          bool isAdaptiveTimestep=false);
-
 
     /**
      * Add a force to be used in this simulation (use this to set the mechanics system).
@@ -186,7 +183,7 @@ public:
     void AddForce(boost::shared_ptr<AbstractForce<ELEMENT_DIM,SPACE_DIM> > pForce);
 
     /**
-     * Method to remove all the Forces
+     * Remove all the forces.
      */
     void RemoveAllForces();
 
@@ -203,20 +200,20 @@ public:
     void RemoveAllCellPopulationBoundaryConditions();
 
     /**
-    * Get the current numerical method. 
-    */
+     * @return the current numerical method.
+     */
     const boost::shared_ptr<AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM> > GetNumericalMethod() const;
 
     /**
-    * Returns whether adaptive time stepping is turned on or not. 
-    */
+     * @return whether adaptive time stepping is turned on or not.
+     */
     bool GetIsAdaptiveTimestep() const;
 
     /**
-    * Set whether adaptive step size is turned on. 
-    *
-    * @param isAdaptive New value for mIsAdaptiveTimestep
-    */
+     * Set whether adaptive step size is turned on.
+     *
+     * @param isAdaptiveTimestep New value for mIsAdaptiveTimestep
+     */
     void SetIsAdaptiveTimestep(bool isAdaptiveTimestep);
 
     /**
@@ -260,8 +257,8 @@ inline void save_construct_data(
     const boost::shared_ptr<AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM> > p_numerical_method = t->GetNumericalMethod();
     ar << p_numerical_method;
 
-    const bool isAdaptive = t->GetIsAdaptiveTimestep();
-    ar << isAdaptive;
+    const bool is_adaptive = t->GetIsAdaptiveTimestep();
+    ar << is_adaptive;
 }
 
 /**
@@ -278,12 +275,12 @@ inline void load_construct_data(
     boost::shared_ptr<AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM> > p_numerical_method;
     ar >> p_numerical_method;
 
-    bool isAdaptive;
-    ar >> isAdaptive;
+    bool is_adaptive;
+    ar >> is_adaptive;
 
     // Invoke inplace constructor to initialise instance, middle two variables set extra
     // member variables to be deleted as they are loaded from archive and to not initialise cells.
-    ::new(t)OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>(*p_cell_population, true, false, p_numerical_method, isAdaptive);
+    ::new(t)OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>(*p_cell_population, true, false, p_numerical_method, is_adaptive);
 }
 }
 } // namespace

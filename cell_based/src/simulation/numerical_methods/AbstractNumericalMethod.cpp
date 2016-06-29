@@ -42,15 +42,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "CellBasedEventHandler.hpp"
 
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>	
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::AbstractNumericalMethod()
-    :mpCellPopulation(NULL),
-     mpForceCollection(NULL),
-     mpIsAdaptiveTimestep(NULL)
-{	
-    /* mpCellPopulation and mpForceCollection are initialized by OffLatticeSimulation in
-    its constructor. For now we set some safe defaults for the other member variables */
+    : mpCellPopulation(NULL),
+      mpForceCollection(NULL),
+      mpIsAdaptiveTimestep(NULL)
+{
+    /*
+     * mpCellPopulation and mpForceCollection are initialized by OffLatticeSimulation in
+     * its constructor. For now we set some safe defaults for the other member variables.
+     */
 
     mUseUpdateNodeLocation = false;
     mGhostNodeForcesEnabled = true;
@@ -64,7 +65,7 @@ AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::~AbstractNumericalMethod()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::SetCellPopulation(AbstractOffLatticeCellPopulation<ELEMENT_DIM,SPACE_DIM>* pPopulation)
 {
-    if(!mpCellPopulation)
+    if (!mpCellPopulation)
     {
         mpCellPopulation = pPopulation;
     }
@@ -74,7 +75,7 @@ void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::SetCellPopulation(AbstractO
     }    
 
     // Set other member variables according to the type of the cell population
-    if(dynamic_cast<NodeBasedCellPopulationWithBuskeUpdate<SPACE_DIM>*>(mpCellPopulation))
+    if (dynamic_cast<NodeBasedCellPopulationWithBuskeUpdate<SPACE_DIM>*>(mpCellPopulation))
     {
         mUseUpdateNodeLocation = true;
         WARNING("Non-Euler steppers are not yet implemented for NodeBasedCellPopulationWithBuskeUpdate");
@@ -84,7 +85,7 @@ void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::SetCellPopulation(AbstractO
         mUseUpdateNodeLocation = false;
     }
 
-    if(dynamic_cast<MeshBasedCellPopulationWithGhostNodes<SPACE_DIM>*>(mpCellPopulation))
+    if (dynamic_cast<MeshBasedCellPopulationWithGhostNodes<SPACE_DIM>*>(mpCellPopulation))
     {
         mGhostNodeForcesEnabled = true;
     }
@@ -92,12 +93,12 @@ void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::SetCellPopulation(AbstractO
     {
         mGhostNodeForcesEnabled = false;
     }
-};
+}
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::SetForceCollection(std::vector<boost::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > >* pForces)
 {
-    if(!mpForceCollection)
+    if (!mpForceCollection)
     {
         mpForceCollection = pForces;
     }
@@ -105,25 +106,24 @@ void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::SetForceCollection(std::vec
     {
         EXCEPTION("The force collection referred to by a numerical method should not be reset");
     }    
-};
+}
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::SetIsAdaptiveTimestep(bool* pIsAdaptiveTimestep)
 {
-    if(mpIsAdaptiveTimestep==NULL)
+    if (mpIsAdaptiveTimestep == NULL)
     {
-        mpIsAdaptiveTimestep=pIsAdaptiveTimestep;
+        mpIsAdaptiveTimestep = pIsAdaptiveTimestep;
     }
     else
     {
         EXCEPTION("The numerical method function mpIsAdaptiveTimestep should only be called once by OffLatticeSimulation in its constructor");
     }
-};
-
+}
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-std::vector<c_vector<double, SPACE_DIM> > AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::ComputeForcesIncludingDamping(){
-
+std::vector<c_vector<double, SPACE_DIM> > AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::ComputeForcesIncludingDamping()
+{
     CellBasedEventHandler::BeginEvent(CellBasedEventHandler::FORCE);
 
     for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = mpCellPopulation->rGetMesh().GetNodeIteratorBegin();
@@ -138,46 +138,48 @@ std::vector<c_vector<double, SPACE_DIM> > AbstractNumericalMethod<ELEMENT_DIM,SP
         (*iter)->AddForceContribution(*mpCellPopulation);
     }
 
-    // Here we deal with the special case forces on ghost nodes. I removed special case treatment for particles because
-    // it seems to be unnecessary - they use rGetAppliedForce just like everything else.
-    // TODO: #2087 Are we OK with a dynamic cast here? Could always add a virtual method to
-    // AbstractOffLatticeCellPopulation, something like "ApplyForcesToNonCellNodes"?
-    if(mGhostNodeForcesEnabled)
+    /**
+     * Here we deal with the special case forces on ghost nodes. Note that 'particles'
+     * are dealt with like normal cells.
+     *
+     * \todo #2087 Consider removing dynamic_cast and instead adding a virtual method ApplyForcesToNonCellNodes()
+     */
+    if (mGhostNodeForcesEnabled)
     {
         dynamic_cast<MeshBasedCellPopulationWithGhostNodes<SPACE_DIM>*>(mpCellPopulation)->ApplyGhostForces();
     }
 
     // Store applied forces in a vector
-	std::vector<c_vector<double, SPACE_DIM> > forcesAsVector;
-	forcesAsVector.reserve(mpCellPopulation->GetNumNodes());
+    std::vector<c_vector<double, SPACE_DIM> > forces_as_vector;
+    forces_as_vector.reserve(mpCellPopulation->GetNumNodes());
 
     for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = mpCellPopulation->rGetMesh().GetNodeIteratorBegin();
          node_iter != mpCellPopulation->rGetMesh().GetNodeIteratorEnd(); ++node_iter)
     {
         double damping = mpCellPopulation->GetDampingConstant(node_iter->GetIndex());
-        forcesAsVector.push_back(node_iter->rGetAppliedForce()/damping); 
+        forces_as_vector.push_back(node_iter->rGetAppliedForce()/damping);
     }
     
     CellBasedEventHandler::EndEvent(CellBasedEventHandler::FORCE);
 
-    return forcesAsVector;
-};
+    return forces_as_vector;
+}
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::vector<c_vector<double, SPACE_DIM> > AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::SaveCurrentLocations()
 {
-	std::vector<c_vector<double, SPACE_DIM> > currentLocations;
-	currentLocations.reserve(mpCellPopulation->GetNumNodes());
+    std::vector<c_vector<double, SPACE_DIM> > current_locations;
+    current_locations.reserve(mpCellPopulation->GetNumNodes());
 
-	int index = 0;
-	for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = mpCellPopulation->rGetMesh().GetNodeIteratorBegin();
+    unsigned index = 0;
+    for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = mpCellPopulation->rGetMesh().GetNodeIteratorBegin();
          node_iter != mpCellPopulation->rGetMesh().GetNodeIteratorEnd();
          ++index, ++node_iter)
     {
-		currentLocations[index] = node_iter->rGetLocation();	
-	}
+        current_locations[index] = node_iter->rGetLocation();
+    }
 
-	return currentLocations;
+    return current_locations;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>  
@@ -185,7 +187,7 @@ void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::SafeNodePositionUpdate( uns
 {
     ChastePoint<SPACE_DIM> new_point(newPosition);
     mpCellPopulation->SetNode(nodeIndex, new_point);
-};
+}
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::DetectStepSizeExceptions(unsigned nodeIndex, c_vector<double,SPACE_DIM>& displacement, double dt)
@@ -194,9 +196,9 @@ void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::DetectStepSizeExceptions(un
     {
         mpCellPopulation->CheckForStepSizeException(nodeIndex, displacement, dt);
     }
-    catch(StepSizeException* e)
+    catch (StepSizeException* e)
     {
-        if(!(e->mIsTerminal) && *mpIsAdaptiveTimestep==false)
+        if (!(e->mIsTerminal) && (*mpIsAdaptiveTimestep==false))
         {
             // If adaptivity is turned off but the simulation can continue, just produce a warning.
             // Only the case for vertex based populations, which can alter node displacement directly 
@@ -210,27 +212,23 @@ void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::DetectStepSizeExceptions(un
     }   
 }
 
-
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::OutputNumericalMethodInfo(out_stream& rParamsFile)
 {
-
     std::string numerical_method_type = GetIdentifier();
 
     *rParamsFile << "\t\t<" << numerical_method_type << ">\n";
     OutputNumericalMethodParameters(rParamsFile);
     *rParamsFile << "\t\t</" << numerical_method_type << ">\n";
-};
+}
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::OutputNumericalMethodParameters(out_stream& rParamsFile)
 {
     // No parameters to return here
-};
+}
 
-
-///////// Explicit instantiation
+// Explicit instantiation
 template class AbstractNumericalMethod<1,1>;
 template class AbstractNumericalMethod<1,2>;
 template class AbstractNumericalMethod<2,2>;

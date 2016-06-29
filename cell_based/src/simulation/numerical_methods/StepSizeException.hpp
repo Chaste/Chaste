@@ -36,26 +36,26 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _STEPSIZEEXCEPTION_HPP_
 #define _STEPSIZEEXCEPTION_HPP_
 
-
-/* 
- *Exception class to handle the adaptive time stepping in off lattice simulations.  
+/**
+ * Exception class to handle the adaptive time stepping in off lattice simulations.
  */
-
 class StepSizeException : public std::exception
 {
-public:
+private:
 
-    /** The current nodes displacement */
+    /** The current nodes displacement. */
     double mDisplacement;
     
-    /** A suggested new timestep */
+    /** A suggested new time step. */
     double mSuggestedNewStep;
 
-    /** Error message */
+    /** Error message. */
     const std::string mMessage;
 
-    /** Wheter to terminate the simulation or not */
+    /** Whether or not to terminate the simulation. */
     bool mIsTerminal;
+
+public:
 
     /**
      * Construct an exception with a message string.
@@ -74,12 +74,16 @@ public:
     {
     }
 
-    /** Overidden what() method to return the message specific to this error handler. */
+    /**
+     * Overidden what() method to return the message specific to this error handler.
+     *
+     * @return the exception message
+     */
     virtual const char* what() const throw() {
         return mMessage.c_str();
     }
 
-    /** Destructor */
+    /** Destructor. */
     ~StepSizeException() throw() {} 
 };
 

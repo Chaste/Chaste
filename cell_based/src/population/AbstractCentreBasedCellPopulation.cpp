@@ -157,35 +157,32 @@ std::set<unsigned> AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::Get
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::CheckForStepSizeException(unsigned nodeIndex, c_vector<double,SPACE_DIM>& displacement, double dt){
+void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::CheckForStepSizeException(unsigned nodeIndex, c_vector<double,SPACE_DIM>& rDisplacement, double dt)
+{
+    double length = norm_2(rDisplacement);
  
-    double length = norm_2(displacement);
- 
-    if (length > this->mAbsoluteMovementThreshold && !this->IsGhostNode(nodeIndex) && !this->IsParticle(nodeIndex))
+    if ((length > this->mAbsoluteMovementThreshold) && (!this->IsGhostNode(nodeIndex)) && (!this->IsParticle(nodeIndex)))
     {
         std::ostringstream message;
         message << "Cells are moving by " << length;
         message << ", which is more than the AbsoluteMovementThreshold: use a smaller timestep to avoid this exception.";
-        
 
-        //Suggest a net timestep that will give a movement smaller than the Movement threshold 
-        double newStep = 0.95*dt*(this->mAbsoluteMovementThreshold/length);
-        
-        bool terminate = true;
+        // Suggest a net time step that will give a movement smaller than the movement threshold
+        double new_step = 0.95*dt*(this->mAbsoluteMovementThreshold/length);
 
-        throw new StepSizeException(length, newStep, message.str(), terminate);
-     }
-};
+        throw new StepSizeException(length, new_step, message.str(), true); // terminate
+    }
+}
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetDampingConstant(unsigned nodeIndex)
 {
-    if(this->IsGhostNode(nodeIndex) || this->IsParticle(nodeIndex))
-     {
-         return this->GetDampingConstantNormal();
-     }
-     else
-     {
+    if (this->IsGhostNode(nodeIndex) || this->IsParticle(nodeIndex))
+    {
+        return this->GetDampingConstantNormal();
+    }
+    else
+    {
         CellPtr p_cell = this->GetCellUsingLocationIndex(nodeIndex);
         if (p_cell->GetMutationState()->IsType<WildTypeCellMutationState>())
         {

@@ -72,118 +72,117 @@ private:
 
 protected:
 
-	/** Pointer to the cell population being updated by this method*/
-	AbstractOffLatticeCellPopulation<ELEMENT_DIM,SPACE_DIM>* mpCellPopulation;
+    /** Pointer to the cell population being updated by this method*/
+    AbstractOffLatticeCellPopulation<ELEMENT_DIM,SPACE_DIM>* mpCellPopulation;
 
-	/** Pointer to the force collection to apply*/
-	std::vector<boost::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > >* mpForceCollection;
+    /** Pointer to the force collection to apply*/
+    std::vector<boost::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > >* mpForceCollection;
 
-	/** Pointer to the member mAdaptive of the OffLatticeSimulation, determines whether adaptivity is turned on*/
-	bool* mpIsAdaptiveTimestep;
+    /** Pointer to the member mAdaptive of the OffLatticeSimulation, determines whether adaptivity is turned on*/
+    bool* mpIsAdaptiveTimestep;
 
-	/**  A boolean flag indicating whether non forward Euler methods are supported for this type of cell 
-	 *   population. Allows us to fall back to the old method of updating node positions for populations
-	 *   that require it (This is only for NodeBasedCellPopulationWithBuskeUpdates).
+    /**
+     * A boolean flag indicating whether non forward Euler methods are supported for this type of cell
+     * population. Allows us to fall back to the old method of updating node positions for populations
+     * that require it (This is only for NodeBasedCellPopulationWithBuskeUpdates).
      *
      * \todo #2087 Consider replacing this with static_casts
-	 */
-	bool mUseUpdateNodeLocation; 
+     */
+    bool mUseUpdateNodeLocation;
 
-	/**
-	 * A boolean indicating whether this cell population type contains ghost nodes.
-	 */
-	bool mGhostNodeForcesEnabled;
+    /**
+     * A boolean indicating whether this cell population type contains ghost nodes.
+     */
+    bool mGhostNodeForcesEnabled;
 
-	/**
-	 * Computes and returns the force on each node, including the damping factor
-	 * @return A vector of applied forces
-	 */
-	std::vector<c_vector<double, SPACE_DIM> > ComputeForcesIncludingDamping();
+    /**
+     * Computes and returns the force on each node, including the damping factor
+     * @return A vector of applied forces
+     */
+    std::vector<c_vector<double, SPACE_DIM> > ComputeForcesIncludingDamping();
 
-	/**
-	 * Saves the current location of each cell in the population in a vector.
-	 * @return A vector of cell positions
-	 */
-	std::vector<c_vector<double, SPACE_DIM> > SaveCurrentLocations();
+    /**
+     * Saves the current location of each cell in the population in a vector.
+     * @return A vector of cell positions
+     */
+    std::vector<c_vector<double, SPACE_DIM> > SaveCurrentLocations();
 
-	/**
- 	 * Updates a single node's position, taking into account periodic boundary conditions
- 	 *
- 	 * @param nodeIndex Index of the node to update
- 	 * @param newPosition C_vector holding the new node position
- 	 */
- 	void SafeNodePositionUpdate(unsigned nodeIndex, c_vector<double, SPACE_DIM> newPosition);
+    /**
+     * Updates a single node's position, taking into account periodic boundary conditions
+     *
+     * @param nodeIndex Index of the node to update
+     * @param newPosition C_vector holding the new node position
+     */
+     void SafeNodePositionUpdate(unsigned nodeIndex, c_vector<double, SPACE_DIM> newPosition);
 
-	/**
-	 * Detects whether a node has exceeded the acceptable displacement for one timestep.
-	 * If a step size exception has occurred, it either causes the simulation to terminate or,
-	 * in adaptive simulations, the exception is caught and the step size is reduced in response.
-  	 *
- 	 * @param nodeIndex Index of the node being examined
-	 * @param displacement Displacement of the node this step
-	 * @param dt Time step size
-	 */
-	void DetectStepSizeExceptions(unsigned nodeIndex, c_vector<double,SPACE_DIM>& displacement, double dt);
+    /**
+     * Detects whether a node has exceeded the acceptable displacement for one timestep.
+     * If a step size exception has occurred, it either causes the simulation to terminate or,
+     * in adaptive simulations, the exception is caught and the step size is reduced in response.
+     *
+     * @param nodeIndex Index of the node being examined
+     * @param displacement Displacement of the node this step
+     * @param dt Time step size
+     */
+    void DetectStepSizeExceptions(unsigned nodeIndex, c_vector<double,SPACE_DIM>& displacement, double dt);
 
+public:
 
-public:	
-	
-	/**
-	* Constructor. 
-	* No input parameters are required, allowing the numerical method to be created first, then passed to
-	* the simulation. The cell population and force collection pointers are then set by the simulation in 
-	* its constructor.
-	*/
-	AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>();
+    /**
+     * Constructor.
+     * No input parameters are required, allowing the numerical method to be created first, then passed to
+     * the simulation. The cell population and force collection pointers are then set by the simulation in
+     * its constructor.
+     */
+    AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>();
 
-	/**
-	* Destructor
-	*/
-	virtual ~AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>();
+    /**
+     * Destructor.
+     */
+    virtual ~AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>();
 
-	/**
-	* Sets the pointer to the cell population updated by this method
-	*
-	* @param pPopulation Pointer to an AbstractOffLattice cell population 
-	*/
-	void SetCellPopulation(AbstractOffLatticeCellPopulation<ELEMENT_DIM,SPACE_DIM>* pPopulation);
+    /**
+     * Sets the pointer to the cell population updated by this method
+     *
+     * @param pPopulation Pointer to an AbstractOffLattice cell population
+     */
+    void SetCellPopulation(AbstractOffLatticeCellPopulation<ELEMENT_DIM,SPACE_DIM>* pPopulation);
 
-	/**
-	* Sets the pointer to the force collection applied by this method
-	*
-	* @param pForces Pointer to the simulation's force collection 
-	*/
-	void SetForceCollection(std::vector<boost::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > >* pForces);
+    /**
+     * Sets the pointer to the force collection applied by this method
+     *
+     * @param pForces Pointer to the simulation's force collection
+     */
+    void SetForceCollection(std::vector<boost::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > >* pForces);
 
-	/**
-	* Sets a pointer to OffLatticeSimulation mIsAdaptiveTimestep, allows the method to check whether
-	* adaptivity is turned on
-	*
-	* @param pIsAdaptiveTimestep Pointer to mIsAdaptiveTimestep of OffLatticeSimulation
-	*/
-	void SetIsAdaptiveTimestep(bool* pIsAdaptiveTimestep);
+    /**
+     * Sets a pointer to OffLatticeSimulation mIsAdaptiveTimestep, allows the method to check whether
+     * adaptivity is turned on
+     *
+     * @param pIsAdaptiveTimestep Pointer to mIsAdaptiveTimestep of OffLatticeSimulation
+     */
+    void SetIsAdaptiveTimestep(bool* pIsAdaptiveTimestep);
 
-	/**
-	* Updates node positions according to Newton's 2nd law with overdamping. 
-	* 
-	* @param dt Time step size  
-	*/
-	virtual void UpdateAllNodePositions(double dt)=0;
+    /**
+     * Updates node positions according to Newton's 2nd law with overdamping.
+     *
+     * @param dt Time step size
+     */
+    virtual void UpdateAllNodePositions(double dt)=0;
 
-	/*
-	* Saves the name of the numerical method to the parameters file
-	*
-	* @param rParamsFile Reference to the parameter output filestream
-	*/
-	void OutputNumericalMethodInfo(out_stream& rParamsFile);
+    /**
+     * Saves the name of the numerical method to the parameters file
+     *
+     * @param rParamsFile Reference to the parameter output filestream
+     */
+    void OutputNumericalMethodInfo(out_stream& rParamsFile);
 
-	/*
-	* Saves any additional numerical method details to the parameters file
-	*
-	* @param rParamsFile Reference to the parameter output filestream
-	*/
-	virtual void OutputNumericalMethodParameters(out_stream& rParamsFile);
-
+    /**
+     * Saves any additional numerical method details to the parameters file.
+     *
+     * @param rParamsFile Reference to the parameter output filestream
+     */
+    virtual void OutputNumericalMethodParameters(out_stream& rParamsFile);
 };
 
 TEMPLATED_CLASS_IS_ABSTRACT_2_UNSIGNED(AbstractNumericalMethod)

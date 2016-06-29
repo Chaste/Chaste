@@ -263,9 +263,9 @@ unsigned VertexBasedCellPopulation<DIM>::RemoveDeadCells()
 }
 
 template<unsigned DIM>
-void VertexBasedCellPopulation<DIM>::CheckForStepSizeException(unsigned nodeIndex, c_vector<double,DIM>& displacement, double dt){
-    
-    double length = norm_2(displacement);
+void VertexBasedCellPopulation<DIM>::CheckForStepSizeException(unsigned nodeIndex, c_vector<double,DIM>& rDisplacement, double dt)
+{
+    double length = norm_2(rDisplacement);
 
     if (length > 0.5*mpMutableVertexMesh->GetCellRearrangementThreshold())
     {   
@@ -275,13 +275,12 @@ void VertexBasedCellPopulation<DIM>::CheckForStepSizeException(unsigned nodeInde
         message << "Vertices are moving more than half the CellRearrangementThreshold. This could cause elements to become inverted ";
         message << "so the motion has been restricted. Use a smaller timestep to avoid these warnings.";
 
-        double suggestedStep = 0.95*dt*((0.5*mpMutableVertexMesh->GetCellRearrangementThreshold())/length);
+        double suggested_step = 0.95*dt*((0.5*mpMutableVertexMesh->GetCellRearrangementThreshold())/length);
         bool terminate = false;
 
-        throw new StepSizeException(length, suggestedStep, message.str(), terminate);
+        throw new StepSizeException(length, suggested_step, message.str(), terminate);
     }
-};
-
+}
 
 template<unsigned DIM>
 bool VertexBasedCellPopulation<DIM>::IsCellAssociatedWithADeletedLocation(CellPtr pCell)
