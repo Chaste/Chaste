@@ -34,29 +34,29 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include <cxxtest/TestSuite.h>
-#include "CheckpointArchiveTypes.hpp"
 
-#include "SimulationTime.hpp"
-#include "RandomNumberGenerator.hpp"
-#include "ExecutableSupport.hpp"
-
-/*
- * These headers handle passing parameters to the executable.
- */
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/variables_map.hpp>
-#include <boost/program_options/parsers.hpp>
-
-#include <boost/lexical_cast.hpp>
-
-#include "OffLatticeSimulation.hpp"
-#include "UniformlyDistributedCellCycleModel.hpp"
+// Includes from trunk
+#include "CellId.hpp"
 #include "CellsGenerator.hpp"
+#include "CheckpointArchiveTypes.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
+#include "ExecutableSupport.hpp"
+#include "OffLatticeSimulation.hpp"
+#include "SmartPointers.hpp"
+#include "UniformlyDistributedCellCycleModel.hpp"
+
+// Includes from Immersed Boundary
 #include "ImmersedBoundaryMesh.hpp"
 #include "ImmersedBoundaryCellPopulation.hpp"
 #include "ImmersedBoundarySimulationModifier.hpp"
 #include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
 #include "ImmersedBoundaryMembraneElasticityForce.hpp"
+#include "ImmersedBoundaryCellCellInteractionForce.hpp"
+
+// Program option includes for handling command line arguments
+#include <boost/program_options/options_description.hpp>
+#include <boost/program_options/variables_map.hpp>
+#include <boost/program_options/parsers.hpp>
 
 /*
  * Prototype functions

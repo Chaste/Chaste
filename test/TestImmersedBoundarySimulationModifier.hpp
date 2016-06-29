@@ -33,22 +33,23 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-// Needed for test framework
+// Needed for the test environment
 #include <cxxtest/TestSuite.h>
 #include "AbstractCellBasedTestSuite.hpp"
 
-// Needed for immersed boundary simulations
-#include <fftw3.h>
-
 // Includes from trunk
 #include "CellsGenerator.hpp"
+#include "CheckpointArchiveTypes.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
-#include "UniformlyDistributedCellCycleModel.hpp"
 #include "FileComparison.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
-#include "VertexBasedCellPopulation.hpp"
+#include "OffLatticeSimulation.hpp"
+#include "SmartPointers.hpp"
+#include "UniformlyDistributedCellCycleModel.hpp"
 
-// Includes from projects/ImmersedBoundary
+// Includes from Immersed Boundary
+#include "ImmersedBoundaryMesh.hpp"
+#include "ImmersedBoundaryCellPopulation.hpp"
 #include "ImmersedBoundarySimulationModifier.hpp"
 #include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
 #include "ImmersedBoundaryMembraneElasticityForce.hpp"

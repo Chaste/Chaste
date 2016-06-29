@@ -35,20 +35,26 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Needed for the test environment
 #include <cxxtest/TestSuite.h>
-#include <ImmersedBoundaryCellCellInteractionForce.hpp>
 #include "AbstractCellBasedTestSuite.hpp"
 
-#include "OffLatticeSimulation.hpp"
-#include "UniformlyDistributedCellCycleModel.hpp"
+// Includes from trunk
 #include "CellsGenerator.hpp"
+#include "CheckpointArchiveTypes.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
+#include "OffLatticeSimulation.hpp"
+#include "OutputFileHandler.hpp"
+#include "SmartPointers.hpp"
+#include "UniformlyDistributedCellCycleModel.hpp"
+
+// Includes from Immersed Boundary
 #include "ImmersedBoundaryMesh.hpp"
+#include "ImmersedBoundaryCellPopulation.hpp"
 #include "ImmersedBoundarySimulationModifier.hpp"
 #include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
 #include "ImmersedBoundaryMembraneElasticityForce.hpp"
-#include "OutputFileHandler.hpp"
+#include "ImmersedBoundaryCellCellInteractionForce.hpp"
 
 #include "Debug.hpp"
-#include "Timer.hpp"
 
 // Simulation does not run in parallel
 #include "FakePetscSetup.hpp"

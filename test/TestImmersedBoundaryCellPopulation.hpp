@@ -33,42 +33,44 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-// Needed for test framework
+// Needed for the test environment
 #include <cxxtest/TestSuite.h>
 #include "AbstractCellBasedTestSuite.hpp"
 
-// Needed for immersed boundary simulations
-#include <fftw3.h>
-
 // Includes from trunk
-#include "CellsGenerator.hpp"
-#include "DifferentiatedCellProliferativeType.hpp"
-#include "OffLatticeSimulation.hpp"
-#include "SmartPointers.hpp"
-#include "UniformlyDistributedCellCycleModel.hpp"
-#include "DiagonalVertexBasedDivisionRule.hpp"
-#include "CellMutationStatesCountWriter.hpp"
-#include "CellProliferativeTypesCountWriter.hpp"
-#include "CellProliferativePhasesCountWriter.hpp"
+#include "ApcOneHitCellMutationState.hpp"
+#include "ApcTwoHitCellMutationState.hpp"
+#include "ApoptoticCellProperty.hpp"
+#include "BetaCateninOneHitCellMutationState.hpp"
 #include "CellAgesWriter.hpp"
 #include "CellAncestorWriter.hpp"
 #include "CellIdWriter.hpp"
+#include "CellLabel.hpp"
 #include "CellLabelWriter.hpp"
 #include "CellLocationIndexWriter.hpp"
+#include "CellMutationStatesCountWriter.hpp"
 #include "CellMutationStatesWriter.hpp"
+#include "CellProliferativePhasesCountWriter.hpp"
 #include "CellProliferativePhasesWriter.hpp"
+#include "CellProliferativeTypesCountWriter.hpp"
 #include "CellProliferativeTypesWriter.hpp"
+#include "CellsGenerator.hpp"
 #include "CellVolumesWriter.hpp"
+#include "CheckpointArchiveTypes.hpp"
+#include "DiagonalVertexBasedDivisionRule.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
 #include "FileComparison.hpp"
+#include "OffLatticeSimulation.hpp"
+#include "SmartPointers.hpp"
+#include "UniformlyDistributedCellCycleModel.hpp"
 
-// Includes from projects/ImmersedBoundary
-#include "ImmersedBoundaryCellPopulation.hpp"
+// Includes from Immersed Boundary
 #include "ImmersedBoundaryMesh.hpp"
-#include "ImmersedBoundaryMeshWriter.hpp"
-#include "ImmersedBoundaryMeshReader.hpp"
+#include "ImmersedBoundaryCellPopulation.hpp"
 #include "ImmersedBoundarySimulationModifier.hpp"
 #include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
-#include "SuperellipseGenerator.hpp"
+#include "ImmersedBoundaryMembraneElasticityForce.hpp"
+#include "ImmersedBoundaryCellCellInteractionForce.hpp"
 
 // This test is never run in parallel
 #include "FakePetscSetup.hpp"

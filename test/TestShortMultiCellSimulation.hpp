@@ -34,24 +34,24 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 // Needed for the test environment
-#include <cxxtest/cxxtest/TestSuite.h>
+#include <cxxtest/TestSuite.h>
 #include "AbstractCellBasedTestSuite.hpp"
 
-// External library - not part of Chaste
-#include <fftw3.h>
-
-#include "OffLatticeSimulation.hpp"
-#include "UniformlyDistributedCellCycleModel.hpp"
+// Includes from trunk
 #include "CellsGenerator.hpp"
+#include "CheckpointArchiveTypes.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
+#include "OffLatticeSimulation.hpp"
+#include "SmartPointers.hpp"
+#include "UniformlyDistributedCellCycleModel.hpp"
+
+// Includes from Immersed Boundary
 #include "ImmersedBoundaryMesh.hpp"
+#include "ImmersedBoundaryCellPopulation.hpp"
 #include "ImmersedBoundarySimulationModifier.hpp"
 #include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
 #include "ImmersedBoundaryMembraneElasticityForce.hpp"
 #include "ImmersedBoundaryCellCellInteractionForce.hpp"
-#include "Timer.hpp"
-
-// Simulation does not run in parallel
-#include "FakePetscSetup.hpp"
 
 class TestShortMultiCellSimulation : public AbstractCellBasedTestSuite
 {
