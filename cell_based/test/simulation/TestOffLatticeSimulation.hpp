@@ -559,6 +559,7 @@ public:
         // Create a cell population
         MeshBasedCellPopulation<2,3> cell_population(mesh, cells);
         cell_population.SetWriteVtkAsPoints(true);
+
         // Add a writer
         cell_population.AddCellWriter<CellIdWriter>();
 
@@ -574,7 +575,7 @@ public:
         p_force->SetCutOffLength(1.5);
         simulator.AddForce(p_force);
 
-        // Stops remeshing as not possible for 2d in 3d meshes
+        // Stop remeshing, as this is not possible for 2d in 3d meshes
         simulator.SetUpdateCellPopulationRule(false);
 
         CellBasedSimulationArchiver<2,OffLatticeSimulation<2,3>, 3>::Save(&simulator);

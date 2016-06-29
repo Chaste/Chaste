@@ -88,7 +88,7 @@ private:
         archive & boost::serialization::base_object<AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM> >(*this);
         archive & mForceCollection;
         archive & mBoundaryConditions;
-        ///\todo #2087 archive mpNumericalMethod?
+        archive & mpNumericalMethod;
     }
 
 protected:

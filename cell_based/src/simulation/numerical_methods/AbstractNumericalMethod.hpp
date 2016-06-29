@@ -68,6 +68,9 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
+        archive & mUseAdaptiveTimestep;
+        archive & mUseUpdateNodeLocation;
+        archive & mGhostNodeForcesEnabled;
     }
 
 protected:
@@ -80,6 +83,7 @@ protected:
 
     /**
      * Whether the numerical method uses an adaptive time step.
+     * Initialized to false in the AbstractNumericalMethod constructor.
      */
     bool mUseAdaptiveTimestep;
 
@@ -88,12 +92,15 @@ protected:
      * population. Allows us to fall back to the old method of updating node positions for populations
      * that require it (This is only for NodeBasedCellPopulationWithBuskeUpdates).
      *
+     * Initialized to false in the AbstractNumericalMethod constructor.
+     *
      * \todo #2087 Consider replacing this with static_casts
      */
     bool mUseUpdateNodeLocation;
 
     /**
      * A boolean indicating whether this cell population type contains ghost nodes.
+     * Initialized to true in the AbstractNumericalMethod constructor.
      */
     bool mGhostNodeForcesEnabled;
 

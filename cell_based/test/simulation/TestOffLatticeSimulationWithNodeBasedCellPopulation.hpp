@@ -57,6 +57,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SmartPointers.hpp"
 #include "CellVolumesWriter.hpp"
 #include "FileComparison.hpp"
+#include "ForwardEulerNumericalMethod.hpp"
 
 // Cell population writers
 #include "CellMutationStatesCountWriter.hpp"
@@ -596,14 +597,14 @@ public:
         TS_ASSERT_DELTA(node_4_location[1], mNode4y, 1e-4);
     }
 
-    // Testing Save
+    // Testing Save()
     void TestSave() throw (Exception)
     {
         EXIT_IF_PARALLEL; // HoneycombMeshGenereator does not work in parallel
 
         // Create a simple mesh
-        int num_cells_depth = 5;
-        int num_cells_width = 5;
+        unsigned num_cells_depth = 5;
+        unsigned num_cells_width = 5;
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
         TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
 
@@ -635,6 +636,16 @@ public:
         MAKE_PTR_ARGS(PlaneBoundaryCondition<2>, p_bc, (&node_based_cell_population, zero_vector<double>(2), normal)); // y>0
         simulator.AddCellPopulationBoundaryCondition(p_bc);
 
+        /*
+         * For more thorough testing of serialization, we 'turn on' adaptivity.
+         * Note that this has no effect on the numerical results, since the
+         * conditions under which the time step would be adapted are not invoked
+         * in this example.
+         */
+        boost::shared_ptr<AbstractNumericalMethod<2,2> > p_method(new ForwardEulerNumericalMethod<2,2>());
+        p_method->SetUseAdaptiveTimestep(true);
+        simulator.SetNumericalMethod(p_method);
+
         // Solve
         simulator.Solve();
 
@@ -642,7 +653,7 @@ public:
         CellBasedSimulationArchiver<2, OffLatticeSimulation<2> >::Save(&simulator);
     }
 
-    // Testing Load (based on previous two tests)
+    // Testing Load() (based on previous two tests)
     void TestLoad() throw (Exception)
     {
         EXIT_IF_PARALLEL;    // Cell based archiving doesn't work in parallel.
@@ -651,6 +662,10 @@ public:
         // run it from 0.1 to 1.0
         OffLatticeSimulation<2>* p_simulator1;
         p_simulator1 = CellBasedSimulationArchiver<2, OffLatticeSimulation<2> >::Load("TestOffLatticeSimulationWithNodeBasedCellPopulationSaveAndLoad", 0.1);
+
+        // Test that the numerical method was archived correctly
+        boost::shared_ptr<AbstractNumericalMethod<2, 2> > p_method = p_simulator1->GetNumericalMethod();
+        TS_ASSERT_EQUALS(p_method->HasAdaptiveTimestep(), true);
 
         p_simulator1->SetEndTime(1.0);
         p_simulator1->Solve();
