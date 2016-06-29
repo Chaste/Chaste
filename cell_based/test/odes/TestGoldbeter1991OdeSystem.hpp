@@ -194,10 +194,6 @@ public:
             delete p_ode_system;
         }
     }
-
-
-
 };
-
 
 #endif /* TESTGOLDBETER1991ODESYSTEM_HPP_ */

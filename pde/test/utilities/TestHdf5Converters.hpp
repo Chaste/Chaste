@@ -429,8 +429,8 @@ public:
     }
 
     /**
-    * This tests the HDF5 to XDMF converter
-    */
+     * This tests the HDF5 to XDMF converter
+     */
     void TestHdf5ToXdmfConverter() throw(Exception)
     {
 #ifndef _MSC_VER

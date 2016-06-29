@@ -171,20 +171,20 @@ public:
     bool NeighboursIsEmpty();
 
     /**
-    * Sets a flag to indicate that the neighbours of this node have/have not been updated.
-    *
-    * @param flag whether the neighbours are set up or not
-    */
+     * Sets a flag to indicate that the neighbours of this node have/have not been updated.
+     *
+     * @param flag whether the neighbours are set up or not
+     */
     void SetNeighboursSetUp(bool flag);
 
     /**
-    * @return a flag to indicate that the neighbours of this node have/have not been updated.
-    */
+     * @return a flag to indicate that the neighbours of this node have/have not been updated.
+     */
     bool GetNeighboursSetUp();
 
     /**
      * @return this node's vector of neighbour indices.
-    */
+     */
     std::vector<unsigned>& rGetNeighbours();
 
     /**

@@ -97,7 +97,7 @@ public:
         double end_time = 10.0;
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(end_time, num_steps);
 
-        while(p_simulation_time->GetTime() < end_time)
+        while (p_simulation_time->GetTime() < end_time)
         {
             p_simulation_time->IncrementTimeOneStep();
             p_srn_model->SimulateToCurrentTime();
@@ -224,7 +224,7 @@ public:
         double end_time = 10.0;
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(end_time, num_steps);
 
-        while(p_simulation_time->GetTime() < end_time)
+        while (p_simulation_time->GetTime() < end_time)
         {
             p_simulation_time->IncrementTimeOneStep();
             p_srn_model->SimulateToCurrentTime();
@@ -288,12 +288,11 @@ public:
             p_cell->InitialiseSrnModel();
             p_cell->SetBirthTime(0.0);
 
-
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
 
             // Now update the SRN so the state variables are different from ICS
-            while(p_simulation_time->GetTime() < end_time)
+            while (p_simulation_time->GetTime() < end_time)
             {
                 p_simulation_time->IncrementTimeOneStep();
                 p_srn_model->SimulateToCurrentTime();
