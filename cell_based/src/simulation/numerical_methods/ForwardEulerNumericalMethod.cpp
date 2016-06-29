@@ -35,24 +35,22 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ForwardEulerNumericalMethod.hpp"
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>	
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ForwardEulerNumericalMethod<ELEMENT_DIM,SPACE_DIM>::ForwardEulerNumericalMethod()
     :AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>()
-{	
-};
+{
+}
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>  
 ForwardEulerNumericalMethod<ELEMENT_DIM,SPACE_DIM>::~ForwardEulerNumericalMethod()
 {
-};
-
+}
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>  
 void ForwardEulerNumericalMethod<ELEMENT_DIM,SPACE_DIM>::UpdateAllNodePositions(double dt)
 {
-    if(!this->mUseUpdateNodeLocation)
+    if (!this->mUseUpdateNodeLocation)
     {
-
         // Apply forces to each cell, and save a vector of net forces F
         std::vector<c_vector<double, SPACE_DIM> > forces = this->ComputeForcesIncludingDamping();
 
@@ -79,19 +77,16 @@ void ForwardEulerNumericalMethod<ELEMENT_DIM,SPACE_DIM>::UpdateAllNodePositions(
         // Basically only applies to NodeBasedCellPopulationWithBuskeUpdates.
         this->mpCellPopulation->UpdateNodeLocations(dt);
     }
-};
+}
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>  
 void ForwardEulerNumericalMethod<ELEMENT_DIM, SPACE_DIM>::OutputNumericalMethodParameters(out_stream& rParamsFile)
 {
-    // Nothing here yet
-
-    // Call method on direct parent class
+    // No new parameters to output, so just call method on direct parent class
     AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::OutputNumericalMethodParameters(rParamsFile);
-};
+}
 
-
-///////// Explicit instantiation
+// Explicit instantiation
 template class ForwardEulerNumericalMethod<1,1>;
 template class ForwardEulerNumericalMethod<1,2>;
 template class ForwardEulerNumericalMethod<2,2>;

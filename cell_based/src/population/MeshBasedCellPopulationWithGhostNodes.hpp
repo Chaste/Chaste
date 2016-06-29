@@ -159,9 +159,9 @@ public:
     std::set<unsigned> GetNeighbouringLocationIndices(CellPtr pCell);
 
     /**
-    * Applies the appropriate force to each ghost node in the population.
-    * Called by AbstractNumericalMethod.
-    */
+     * Applies the appropriate force to each ghost node in the population.
+     * Called by AbstractNumericalMethod.
+     */
     void ApplyGhostForces();
 
     /**

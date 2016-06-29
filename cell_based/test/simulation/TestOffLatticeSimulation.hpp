@@ -1218,7 +1218,7 @@ public:
         TS_ASSERT(node_files.CompareFiles());
     }
 
-     void TestOffLatticeSimulationWithAdaptiveTimestep() throw(Exception)
+    void TestOffLatticeSimulationWithAdaptiveTimestep() throw(Exception)
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel
 

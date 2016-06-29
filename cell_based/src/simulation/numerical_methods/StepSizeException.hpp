@@ -38,6 +38,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * Exception class to handle the adaptive time stepping in off lattice simulations.
+ *
+ * \todo #2087 Add corresponding test suite
  */
 class StepSizeException : public std::exception
 {

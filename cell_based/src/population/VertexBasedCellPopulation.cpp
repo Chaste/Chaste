@@ -269,7 +269,7 @@ void VertexBasedCellPopulation<DIM>::CheckForStepSizeException(unsigned nodeInde
 
     if (length > 0.5*mpMutableVertexMesh->GetCellRearrangementThreshold())
     {   
-        displacement *= 0.5*mpMutableVertexMesh->GetCellRearrangementThreshold()/length;
+        rDisplacement *= 0.5*mpMutableVertexMesh->GetCellRearrangementThreshold()/length;
         
         std::ostringstream message;
         message << "Vertices are moving more than half the CellRearrangementThreshold. This could cause elements to become inverted ";

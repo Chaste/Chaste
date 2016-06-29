@@ -321,8 +321,7 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::ApplyGhostForces()
             node_iter->AddAppliedForceContribution(drdt[node_index]);
         }
     }
-
-};
+}
 
 template<unsigned DIM>
 void MeshBasedCellPopulationWithGhostNodes<DIM>::OpenWritersFiles(OutputFileHandler& rOutputFileHandler)
