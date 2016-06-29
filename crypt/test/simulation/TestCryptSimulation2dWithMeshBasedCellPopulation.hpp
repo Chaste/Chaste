@@ -351,6 +351,7 @@ public:
         }
 
         simulator.SetDt(0.01);
+        simulator.SetupSolve();
         simulator.UpdateCellLocationsAndTopology();
 
         // Create a set of node indices corresponding to ghost nodes

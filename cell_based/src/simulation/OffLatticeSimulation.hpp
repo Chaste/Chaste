@@ -40,7 +40,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractForce.hpp"
 #include "AbstractCellPopulationBoundaryCondition.hpp"
 #include "AbstractNumericalMethod.hpp"
-#include "ForwardEulerNumericalMethod.hpp"
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
@@ -74,6 +73,7 @@ private:
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
+    friend class TestOffLatticeSimulation;
     friend class TestOffLatticeSimulationWithNodeBasedCellPopulation;
 
     /**
@@ -163,13 +163,10 @@ public:
      *     free up memory (defaults to false)
      * @param initialiseCells Whether to initialise cells (defaults to true, set to false when loading
      *     from an archive)
-     * @param pNumericalMethod Pointer to a numerical method object (defaults to forward Euler)
      */
     OffLatticeSimulation(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation,
                          bool deleteCellPopulationInDestructor=false,
-                         bool initialiseCells=true,
-                         boost::shared_ptr<AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM> > pNumericalMethod
-                          = boost::shared_ptr<ForwardEulerNumericalMethod<ELEMENT_DIM, SPACE_DIM> >(new ForwardEulerNumericalMethod<ELEMENT_DIM,SPACE_DIM>()));
+                         bool initialiseCells=true);
 
     /**
      * Add a force to be used in this simulation (use this to set the mechanics system).
@@ -194,6 +191,13 @@ public:
      * Method to remove all the cell population boundary conditions
      */
     void RemoveAllCellPopulationBoundaryConditions();
+
+    /**
+     * Set the numerical method to be used in this simulation (use this to solve the mechanics system).
+     *
+     * @param pNumericalMethod pointer to a numerical method object
+     */
+    void SetNumericalMethod(boost::shared_ptr<AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM> > pNumericalMethod);
 
     /**
      * @return the current numerical method.
@@ -235,9 +239,6 @@ inline void save_construct_data(
     // Save data required to construct instance
     const AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>* p_cell_population = &(t->rGetCellPopulation());
     ar & p_cell_population;
-
-    const boost::shared_ptr<AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM> > p_numerical_method = t->GetNumericalMethod();
-    ar << p_numerical_method;
 }
 
 /**
@@ -251,12 +252,9 @@ inline void load_construct_data(
     AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>* p_cell_population;
     ar >> p_cell_population;
 
-    boost::shared_ptr<AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM> > p_numerical_method;
-    ar >> p_numerical_method;
-
     // Invoke inplace constructor to initialise instance, middle two variables set extra
     // member variables to be deleted as they are loaded from archive and to not initialise cells.
-    ::new(t)OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>(*p_cell_population, true, false, p_numerical_method);
+    ::new(t)OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>(*p_cell_population, true, false);
 }
 }
 } // namespace

@@ -741,6 +741,7 @@ public:
         OffLatticeSimulation<2> simulator(node_based_cell_population);
         simulator.SetEndTime(0.1);
         simulator.SetOutputDirectory("TestOffLatticeSimulationUpdateCellLocationsAndTopologyWithNoForce");
+        simulator.SetupSolve();
 
         simulator.UpdateCellLocationsAndTopology();
 

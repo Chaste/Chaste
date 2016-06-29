@@ -52,12 +52,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::OffLatticeSimulation(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation,
                                                 bool deleteCellPopulationInDestructor,
-                                                bool initialiseCells,
-                                                boost::shared_ptr<AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM> > pNumericalMethod)
-    : AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>(rCellPopulation, deleteCellPopulationInDestructor, initialiseCells),
-      mpNumericalMethod(pNumericalMethod)
+                                                bool initialiseCells)
+    : AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>(rCellPopulation, deleteCellPopulationInDestructor, initialiseCells)
 {
-
     if (!dynamic_cast<AbstractOffLatticeCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&rCellPopulation))
     {
         EXCEPTION("OffLatticeSimulations require a subclass of AbstractOffLatticeCellPopulation.");
@@ -75,8 +72,8 @@ OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::OffLatticeSimulation(AbstractCellPo
         // For VertexBasedCellPopulations we automatically add a T2SwapCellKiller. In order to inhibit T2 swaps
         // the user needs to set the threshold for T2 swaps in the mesh to 0.
         VertexBasedCellPopulation<SPACE_DIM>* p_vertex_based_cell_population = dynamic_cast<VertexBasedCellPopulation<SPACE_DIM>*>(&rCellPopulation);
-        MAKE_PTR_ARGS(T2SwapCellKiller<SPACE_DIM>, T2_swap_cell_killer, (p_vertex_based_cell_population));
-        this->AddCellKiller(T2_swap_cell_killer);
+        MAKE_PTR_ARGS(T2SwapCellKiller<SPACE_DIM>, p_t2_swap_cell_killer, (p_vertex_based_cell_population));
+        this->AddCellKiller(p_t2_swap_cell_killer);
     }
     else
     {
@@ -87,9 +84,6 @@ OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::OffLatticeSimulation(AbstractCellPo
          */
         NEVER_REACHED;
     }
-
-    mpNumericalMethod->SetCellPopulation(dynamic_cast<AbstractOffLatticeCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&rCellPopulation));
-    mpNumericalMethod->SetForceCollection(&mForceCollection);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -114,6 +108,12 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::RemoveAllCellPopulationBoundaryConditions()
 {
     mBoundaryConditions.clear();
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::SetNumericalMethod(boost::shared_ptr<AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM> > pNumericalMethod)
+{
+    mpNumericalMethod = pNumericalMethod;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -152,10 +152,10 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellLocationsAndTopology
             // Successful time step! Update time_advanced_so_far
             time_advanced_so_far += present_time_step;
 
-            // and if using adaptive timestep then increase the present_time_step (by 1% for now)
+            // If using adaptive timestep, then increase the present_time_step (by 1% for now)
             if (mpNumericalMethod->HasAdaptiveTimestep())
             {
-                // \todo #2087 Make this a setable member variable.
+                ///\todo #2087 Make this a settable member variable
                 double timestep_increase = 0.01;
                 present_time_step = fmin((1+timestep_increase)*present_time_step, target_time_step - time_advanced_so_far);
             }
@@ -166,8 +166,7 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellLocationsAndTopology
             // Detects if a node has travelled too far in a single time step
             if (mpNumericalMethod->HasAdaptiveTimestep())
             {
-                // If adaptivity is switched on, revert node locations and choose a suitable
-                // smaller time step
+                // If adaptivity is switched on, revert node locations and choose a suitably smaller time step
                 RevertToOldLocations(old_node_locations);
                 present_time_step = fmin(e->GetSuggestedNewStep(), target_time_step - time_advanced_so_far);
             }
@@ -219,9 +218,7 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::ApplyBoundaries(std::map<Node<
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::CalculateCellDivisionVector(CellPtr pParentCell)
 {
-    /*
-     * \todo #2800 refactor division rules to follow more closely the vertex case
-     */
+    ///\todo #2800 refactor division rules to follow more closely the vertex case
 
     // This static cast is always valid as the constructor tests that the cell population is AbstractOffLattice
     return static_cast<AbstractOffLatticeCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&(this->mrCellPopulation))->CalculateCellDivisionVector(pParentCell);
@@ -273,6 +270,16 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::SetupSolve()
     {
         node_iter->ClearAppliedForce();
     }
+
+    // Use a forward Euler method by default, unless a numerical method has been specified already
+    if (mpNumericalMethod == NULL)
+    {
+        typedef ForwardEulerNumericalMethod<ELEMENT_DIM, SPACE_DIM> EulerMethod;
+        MAKE_PTR(EulerMethod, p_method);
+        mpNumericalMethod = p_method;
+    }
+    mpNumericalMethod->SetCellPopulation(dynamic_cast<AbstractOffLatticeCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&(this->mrCellPopulation)));
+    mpNumericalMethod->SetForceCollection(&mForceCollection);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

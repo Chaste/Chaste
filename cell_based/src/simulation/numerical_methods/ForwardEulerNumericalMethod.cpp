@@ -37,7 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ForwardEulerNumericalMethod<ELEMENT_DIM,SPACE_DIM>::ForwardEulerNumericalMethod()
-    :AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>()
+    : AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>()
 {
 }
 
@@ -54,27 +54,30 @@ void ForwardEulerNumericalMethod<ELEMENT_DIM,SPACE_DIM>::UpdateAllNodePositions(
         // Apply forces to each cell, and save a vector of net forces F
         std::vector<c_vector<double, SPACE_DIM> > forces = this->ComputeForcesIncludingDamping();
 
-        int index = 0;
+        unsigned index = 0;
         for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = this->mpCellPopulation->rGetMesh().GetNodeIteratorBegin();
              node_iter != this->mpCellPopulation->rGetMesh().GetNodeIteratorEnd();
              ++node_iter, ++index)
         {
-            // Get the current node location and calculate the new location according to forward Euler
-            c_vector<double, SPACE_DIM> oldLocation = node_iter->rGetLocation();
+            // Get the current node location and calculate the new location according to the forward Euler method
+            c_vector<double, SPACE_DIM> old_location = node_iter->rGetLocation();
             c_vector<double, SPACE_DIM> displacement = dt * forces[index];
 
-            // In the vertex-based case, displacement may be scaled if the cellrearrangement threshold is exceeded
+            // In the vertex-based case, the displacement may be scaled if the cell rearrangement threshold is exceeded
             this->DetectStepSizeExceptions(node_iter->GetIndex(), displacement, dt);
 
-            c_vector<double, SPACE_DIM> newLocation = oldLocation + displacement;
-            this->SafeNodePositionUpdate(node_iter->GetIndex(), newLocation);
+            c_vector<double, SPACE_DIM> new_location = old_location + displacement;
+            this->SafeNodePositionUpdate(node_iter->GetIndex(), new_location);
         }
     }
     else
     {
-        // If this type of cell population does not support the new numerical methods, delegate
-        // updating node positions to the population itself.
-        // Basically only applies to NodeBasedCellPopulationWithBuskeUpdates.
+        /*
+         * If this type of cell population does not support the new numerical methods, delegate
+         * updating node positions to the population itself.
+         *
+         * This only applies to NodeBasedCellPopulationWithBuskeUpdates.
+         */
         this->mpCellPopulation->UpdateNodeLocations(dt);
     }
 }

@@ -276,9 +276,8 @@ void VertexBasedCellPopulation<DIM>::CheckForStepSizeException(unsigned nodeInde
         message << "so the motion has been restricted. Use a smaller timestep to avoid these warnings.";
 
         double suggested_step = 0.95*dt*((0.5*mpMutableVertexMesh->GetCellRearrangementThreshold())/length);
-        bool terminate = false;
 
-        throw new StepSizeException(length, suggested_step, message.str(), terminate);
+        throw new StepSizeException(suggested_step, message.str(), false);
     }
 }
 

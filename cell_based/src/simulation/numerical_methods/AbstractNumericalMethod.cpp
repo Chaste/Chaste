@@ -61,14 +61,7 @@ AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::~AbstractNumericalMethod()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::SetCellPopulation(AbstractOffLatticeCellPopulation<ELEMENT_DIM,SPACE_DIM>* pPopulation)
 {
-    if (!mpCellPopulation)
-    {
-        mpCellPopulation = pPopulation;
-    }
-    else
-    {
-        EXCEPTION("The cell population referred to by a numerical method should not be reset");
-    }    
+    mpCellPopulation = pPopulation;
 
     // Set other member variables according to the type of the cell population
     if (dynamic_cast<NodeBasedCellPopulationWithBuskeUpdate<SPACE_DIM>*>(mpCellPopulation))
@@ -94,14 +87,7 @@ void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::SetCellPopulation(AbstractO
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::SetForceCollection(std::vector<boost::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > >* pForces)
 {
-    if (!mpForceCollection)
-    {
-        mpForceCollection = pForces;
-    }
-    else
-    {
-        EXCEPTION("The force collection referred to by a numerical method should not be reset");
-    }    
+    mpForceCollection = pForces;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -195,9 +181,11 @@ void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::DetectStepSizeExceptions(un
     {
         if (!(e->IsTerminal()) && (mUseAdaptiveTimestep==false))
         {
-            // If adaptivity is turned off but the simulation can continue, just produce a warning.
-            // Only the case for vertex based populations, which can alter node displacement directly 
-            // to avoid cell rearrangement problems.
+            /*
+             * If adaptivity is turned off but the simulation can continue, just produce a warning.
+             * Only the case for vertex-based cell populations, which can alter node displacement directly
+             * to avoid cell rearrangement problems.
+             */
             WARN_ONCE_ONLY(e->what());
         }
         else

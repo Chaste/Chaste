@@ -33,71 +33,40 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef FORWARDEULERNUMERICALMETHOD_HPP_
-#define FORWARDEULERNUMERICALMETHOD_HPP_
+#ifndef _TESTSTEPSIZEEXCEPTION_HPP_
+#define _TESTSTEPSIZEEXCEPTION_HPP_
 
-#include "ChasteSerialization.hpp"
-#include <boost/serialization/base_object.hpp>
+#include <cxxtest/TestSuite.h>
+#include "StepSizeException.hpp"
+#include "PetscSetupAndFinalize.hpp"
 
-#include "AbstractNumericalMethod.hpp"
-
-/**
- * Implements forward Euler time stepping.
- *
- * Solves the equations of motion dr/dt = F
- * Using the scheme
- *
- * r^(t+1) = r^t + dt F^t.
- */
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
-class ForwardEulerNumericalMethod : public AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM> {
-
-private:
-
-    /** Needed for serialization. */
-    friend class boost::serialization::access;
-
-    /**
-     * Save or restore the simulation.
-     *
-     * @param archive the archive
-     * @param version the current version of this class
-     */
-    template<class Archive>
-    void serialize(Archive & archive, const unsigned int version)
-    {
-        archive & boost::serialization::base_object<AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM> >(*this);
-    }
-
+class TestStepSizeException : public CxxTest::TestSuite
+{
 public:
 
-    /**
-     * Constructor.
-     */
-    ForwardEulerNumericalMethod();
+    void TestGetMessage()
+    {
+        double new_step = 0.015;
+        std::string message("This is a step size exception");
 
-    /**
-     * Destructor.
-     */
-    virtual ~ForwardEulerNumericalMethod();
+        try
+        {
+            StepSizeException(new_step, message, true);
+        }
+        catch (StepSizeException* exc)
+        {
+            const char* msg_char = exc->what();
+            std::string exc_msg = std::string(msg_char);
+            std::string::size_type e_len = exc_msg.length();
+            std::string::size_type len = message.length();
 
-    /**
-     * Overridden UpdateAllNodePositions() method.
-     *
-     * @param dt Time step size
-     */
-    void UpdateAllNodePositions(double dt);
+            TS_ASSERT_EQUALS(exc_msg.substr(e_len - len), message);
+            TS_ASSERT_EQUALS(exc_msg, message);
 
-    /**
-     * Overridden OutputNumericalMethodParameters() method.
-     *
-     * @param rParamsFile Reference to the parameter output filestream
-     */
-    virtual void OutputNumericalMethodParameters(out_stream& rParamsFile);
+            TS_ASSERT_EQUALS(exc->IsTerminal(), true);
+            TS_ASSERT_DELTA(exc->GetSuggestedNewStep(), new_step, 1e-6);
+        }
+    }
 };
 
-// Serialization for Boost >= 1.36
-#include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_ALL_DIMS(ForwardEulerNumericalMethod)
-
-#endif /*FORWARDEULERNUMERICALMETHOD_HPP_*/
+#endif //_TESTSTEPSIZEEXCEPTION_HPP_

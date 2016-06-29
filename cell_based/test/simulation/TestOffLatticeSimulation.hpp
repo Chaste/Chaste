@@ -919,6 +919,10 @@ public:
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetEndTime(0.5);
+
+        // We call SetupSolve() here to set up the default numerical method, which is otherwise NULL
+        simulator.SetupSolve();
+
         TS_ASSERT_EQUALS(simulator.GetIdentifier(), "OffLatticeSimulation-2-2");
 
         ///\todo (#1453) should have forces and cell killer included here to make it a better test
@@ -930,7 +934,7 @@ public:
         parameter_file->close();
 
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
-        FileComparison( results_dir + "cell_based_sim_results.parameters", "cell_based/test/data/TestOffLatticeSimulationOutputParameters/cell_based_sim_results.parameters").CompareFiles();
+        FileComparison(results_dir + "cell_based_sim_results.parameters", "cell_based/test/data/TestOffLatticeSimulationOutputParameters/cell_based_sim_results.parameters").CompareFiles();
 
         simulator.SetOutputDirectory("TestOffLatticeSimulationOutputParameters");
         simulator.OutputSimulationSetup();
@@ -1237,14 +1241,15 @@ public:
         // Use smaller movement threshold to maintain smooth motion
         cell_population.SetAbsoluteMovementThreshold(0.1); 
 
-        // Set up simulation, using a large time step and adaptivity to correct if too much motion
-        boost::shared_ptr<AbstractNumericalMethod<2,2> > p_method(new ForwardEulerNumericalMethod<2,2>());
-        p_method->SetUseAdaptiveTimestep(true);
-
-        OffLatticeSimulation<2> simulator(cell_population, false, true, p_method);
+        OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestOffLatticeSimulationWithAdaptivity");
         simulator.SetEndTime(5.0);
         simulator.SetDt(0.1);
+
+        // Pass an adaptive numerical method to the simulation
+        boost::shared_ptr<AbstractNumericalMethod<2,2> > p_method(new ForwardEulerNumericalMethod<2,2>());
+        p_method->SetUseAdaptiveTimestep(true);
+        simulator.SetNumericalMethod(p_method);
 
         // Create a force law and pass it to the simulation
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);

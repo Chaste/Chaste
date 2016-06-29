@@ -38,15 +38,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * Exception class to handle the adaptive time stepping in off lattice simulations.
- *
- * \todo #2087 Add corresponding test suite
  */
 class StepSizeException : public std::exception
 {
 private:
-
-    /** The current nodes displacement. */
-    double mDisplacement;
     
     /** A suggested new time step. */
     double mSuggestedNewStep;
@@ -62,14 +57,12 @@ public:
     /**
      * Construct an exception with a message string.
      *
-     * @param displacement the current node displacement
      * @param suggestedNewStep a suggestion for an updated timestep 
      * @param message the error message to display
      * @param isTerminal whether the erroe is terminal if true the the simulation stops
      */
-    StepSizeException(double displacement, double suggestedNewStep, const std::string message, bool isTerminal):
+    StepSizeException(double suggestedNewStep, const std::string message, bool isTerminal):
         std::exception(),
-        mDisplacement(displacement),
         mSuggestedNewStep(suggestedNewStep),
         mMessage(message),
         mIsTerminal(isTerminal)
@@ -99,7 +92,7 @@ public:
     /**
      * @return mIsTerminal.
      */
-    double IsTerminal()
+    bool IsTerminal()
     {
         return mIsTerminal;
     }
