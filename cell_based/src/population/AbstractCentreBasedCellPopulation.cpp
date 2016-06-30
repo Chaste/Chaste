@@ -170,7 +170,7 @@ void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::CheckForStepSize
         // Suggest a net time step that will give a movement smaller than the movement threshold
         double new_step = 0.95*dt*(this->mAbsoluteMovementThreshold/length);
 
-        throw new StepSizeException(new_step, message.str(), true); // terminate
+        throw StepSizeException(new_step, message.str(), true); // terminate
     }
 }
 

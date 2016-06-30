@@ -176,16 +176,16 @@ void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::DetectStepSizeExceptions(un
     {
         mpCellPopulation->CheckForStepSizeException(nodeIndex, displacement, dt);
     }
-    catch (StepSizeException* e)
+    catch (StepSizeException& e)
     {
-        if (!(e->IsTerminal()) && (mUseAdaptiveTimestep==false))
+        if (!(e.IsTerminal()) && (mUseAdaptiveTimestep==false))
         {
             /*
              * If adaptivity is turned off but the simulation can continue, just produce a warning.
              * Only the case for vertex-based cell populations, which can alter node displacement directly
              * to avoid cell rearrangement problems.
              */
-            WARN_ONCE_ONLY(e->what());
+            WARN_ONCE_ONLY(e.what());
         }
         else
         {

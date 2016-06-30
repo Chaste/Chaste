@@ -277,7 +277,7 @@ void VertexBasedCellPopulation<DIM>::CheckForStepSizeException(unsigned nodeInde
 
         double suggested_step = 0.95*dt*((0.5*mpMutableVertexMesh->GetCellRearrangementThreshold())/length);
 
-        throw new StepSizeException(suggested_step, message.str(), false);
+        throw StepSizeException(suggested_step, message.str(), false);
     }
 }
 

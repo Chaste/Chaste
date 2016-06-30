@@ -161,19 +161,19 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellLocationsAndTopology
             }
 
         }
-        catch (StepSizeException* e)
+        catch (StepSizeException& e)
         {
             // Detects if a node has travelled too far in a single time step
             if (mpNumericalMethod->HasAdaptiveTimestep())
             {
                 // If adaptivity is switched on, revert node locations and choose a suitably smaller time step
                 RevertToOldLocations(old_node_locations);
-                present_time_step = fmin(e->GetSuggestedNewStep(), target_time_step - time_advanced_so_far);
+                present_time_step = fmin(e.GetSuggestedNewStep(), target_time_step - time_advanced_so_far);
             }
             else
             {
                 // If adaptivity is switched off, terminate with an error
-                EXCEPTION(e->what());
+                EXCEPTION(e.what());
             }
         }
     }
