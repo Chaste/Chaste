@@ -47,6 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "VertexBasedCellPopulation.hpp"
 #include "NodeBasedCellPopulationWithParticles.hpp"
+#include "NodeBasedCellPopulationWithBuskeUpdate.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
@@ -56,7 +57,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ApcTwoHitCellMutationState.hpp"
 #include "BetaCateninOneHitCellMutationState.hpp"
 #include "WildTypeCellMutationState.hpp"
-#include "DifferentiatedCellProliferativeType.hpp"
 #include "CellLabel.hpp"
 #include "CellAncestor.hpp"
 #include "CellId.hpp"
@@ -66,21 +66,93 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PopulationTestingForce.hpp"
 #include "ForwardEulerNumericalMethod.hpp"
 #include "Warnings.hpp"
+
+
 #include "PetscSetupAndFinalize.hpp"
 
 class TestNumericalMethods : public AbstractCellBasedTestSuite
 {
 public:
     
+	void TestMethodsAndExceptions() throw(Exception)
+	{
+
+		EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
+
+		{
+			unsigned cells_across = 7;
+			unsigned cells_up = 5;
+
+			HoneycombMeshGenerator generator(cells_across, cells_up, 0);
+			MutableMesh<2,2>* p_mesh = generator.GetMesh();
+		
+			// Create cells
+			std::vector<CellPtr> cells;
+			CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+			cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
+
+			// Create cell population
+			MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+            // Create a force collection
+            std::vector<boost::shared_ptr<AbstractForce<2,2> > > force_collection;
+            MAKE_PTR(PopulationTestingForce<2>, p_test_force);
+            force_collection.push_back(p_test_force);
+
+			// Create Numerical method
+			ForwardEulerNumericalMethod<2> numerical_method;
+
+			numerical_method.SetCellPopulation(&cell_population);
+			numerical_method.SetForceCollection(&force_collection);
+			numerical_method.SetUseAdaptiveTimestep(true);
+
+			std::vector<c_vector<double, 2> > saved_locations;
+
+			saved_locations = numerical_method.SaveCurrentLocations();
+
+			TS_ASSERT_EQUALS(saved_locations.size(), cell_population.GetNumRealCells());
+
+		}
+
+		// This tests the exceptions for Node based with Buske Update
+		{
+			// Create a simple mesh
+			TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
+			MutableMesh<2,2> generating_mesh;
+			generating_mesh.ConstructFromMeshReader(mesh_reader);
+
+			// Convert this to a NodesOnlyMesh
+			NodesOnlyMesh<2> mesh;
+			mesh.ConstructNodesWithoutMesh(generating_mesh, 1.2);
+
+			std::vector<CellPtr> cells;
+			CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+			cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+
+			// Create a cell population, with no ghost nodes at the moment
+			NodeBasedCellPopulationWithBuskeUpdate<2> cell_population(mesh, cells);
+
+
+			// Create Numerical method
+			ForwardEulerNumericalMethod<2> numerical_method;
+
+			numerical_method.SetCellPopulation(&cell_population);
+
+			TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
+			TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(), "Non-Euler steppers are not yet implemented for NodeBasedCellPopulationWithBuskeUpdate");
+			Warnings::QuietDestroy();
+
+		}
+	}
+
     void TestUpdateAllNodePositionsWithMeshBased() throw(Exception)
     {
-        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel
-
         // Create a simple mesh
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
         MutableMesh<2,2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
+        // Create cells
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
@@ -104,7 +176,7 @@ public:
 
         // Save starting positions
         std::vector<c_vector<double, 2> > old_posns(cell_population.GetNumNodes());
-        for (unsigned j=0; j<cell_population.GetNumNodes(); j++)
+        for(unsigned j=0; j<cell_population.GetNumNodes(); j++)
         {
             old_posns[j][0] = cell_population.GetNode(j)->rGetLocation()[0];
             old_posns[j][1] = cell_population.GetNode(j)->rGetLocation()[1];
@@ -113,106 +185,28 @@ public:
         // Update positions and check the answer   
         p_fe_method->UpdateAllNodePositions(dt);
 
-        for (unsigned j=0; j<cell_population.GetNumNodes(); j++)
+        for(unsigned j=0; j<cell_population.GetNumNodes(); j++)
         {
-            c_vector<double, 2> actual_location = cell_population.GetNode(j)->rGetLocation();
+            c_vector<double, 2> actualLocation = cell_population.GetNode(j)->rGetLocation();
             
-            double damping = cell_population.GetDampingConstant(j);
-            c_vector<double, 2> expected_location;
-            expected_location = p_test_force->GetExpectedOneStepLocationFE(j, damping, old_posns[j], dt);
+            double damping =  cell_population.GetDampingConstant(j);
+            c_vector<double, 2> expectedLocation;
+            expectedLocation = p_test_force->GetExpectedOneStepLocationFE(j, damping, old_posns[j], dt);
             
-            TS_ASSERT_DELTA(norm_2(actual_location - expected_location), 0, 1e-6);
+            TS_ASSERT_DELTA(norm_2(actualLocation - expectedLocation), 0, 1e-6);
         }
     }
 
     void TestUpdateAllNodePositionsWithMeshBasedWithGhosts() throw(Exception)
     {
-        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel
-
         HoneycombMeshGenerator generator(3, 3, 1);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
-        CellPropertyRegistry::Instance()->Clear();
-        RandomNumberGenerator* p_random_num_gen = RandomNumberGenerator::Instance();
-
-        // Set up cells
+        // Create cells
         std::vector<CellPtr> cells;
-        cells.clear();
-        unsigned num_cells = location_indices.empty() ? p_mesh->GetNumNodes() : location_indices.size();
-        cells.reserve(num_cells);
-
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
-        {
-            unsigned generation;
-            double y = 0.0;
-
-            if (std::find(location_indices.begin(), location_indices.end(), i) != location_indices.end())
-            {
-                y = p_mesh->GetNode(i)->GetPoint().rGetLocation()[1];
-            }
-
-            FixedDurationGenerationBasedCellCycleModel* p_cell_cycle_model = new FixedDurationGenerationBasedCellCycleModel;
-            p_cell_cycle_model->SetDimension(2);
-
-            double typical_transit_cycle_time = p_cell_cycle_model->GetAverageTransitCellCycleTime();
-            double typical_stem_cycle_time = p_cell_cycle_model->GetAverageStemCellCycleTime();
-
-            boost::shared_ptr<AbstractCellProperty> p_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
-            boost::shared_ptr<AbstractCellProperty> p_stem_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
-            boost::shared_ptr<AbstractCellProperty> p_transit_type(CellPropertyRegistry::Instance()->Get<TransitCellProliferativeType>());
-            boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
-
-            CellPtr p_cell(new Cell(p_state, p_cell_cycle_model));
-
-            double birth_time = -p_random_num_gen->ranf();
-
-            if (y <= 0.3)
-            {
-                p_cell->SetCellProliferativeType(p_stem_type);
-                generation = 0;
-                birth_time *= typical_stem_cycle_time; // hours
-            }
-            else if (y < 2.0)
-            {
-                p_cell->SetCellProliferativeType(p_transit_type);
-                generation = 1;
-                birth_time *= typical_transit_cycle_time; // hours
-            }
-            else if (y < 3.0)
-            {
-                p_cell->SetCellProliferativeType(p_transit_type);
-                generation = 2;
-                birth_time *= typical_transit_cycle_time; // hours
-            }
-            else if (y < 4.0)
-            {
-                p_cell->SetCellProliferativeType(p_transit_type);
-                generation = 3;
-                birth_time *= typical_transit_cycle_time; // hours
-            }
-            else
-            {
-                if (p_cell_cycle_model->CanCellTerminallyDifferentiate())
-                {
-                    p_cell->SetCellProliferativeType(p_diff_type);
-                }
-                else
-                {
-                    p_cell->SetCellProliferativeType(p_transit_type);
-                }
-                generation = 4;
-                birth_time *= typical_transit_cycle_time; // hours
-            }
-
-            p_cell_cycle_model->SetGeneration(generation);
-            p_cell->SetBirthTime(birth_time);
-
-            if (std::find(location_indices.begin(), location_indices.end(), i) != location_indices.end())
-            {
-                cells.push_back(p_cell);
-            }
-        }
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, location_indices.size());
 
         MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices);
         cell_population.SetDampingConstantNormal(1.1);
@@ -232,7 +226,7 @@ public:
 
         // Save starting positions
         std::vector<c_vector<double, 2> > old_posns(cell_population.GetNumNodes());
-        for (unsigned j=0; j<cell_population.GetNumNodes(); j++)
+        for(unsigned j=0; j<cell_population.GetNumNodes(); j++)
         {
             old_posns[j][0] = cell_population.GetNode(j)->rGetLocation()[0];
             old_posns[j][1] = cell_population.GetNode(j)->rGetLocation()[1];
@@ -242,32 +236,135 @@ public:
         p_fe_method->UpdateAllNodePositions(dt);
 
         //Check the answer (for cell associated nodes only)
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for(AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
             cell_iter != cell_population.End();
             ++cell_iter)
         {
-            ///\todo #2087 Why is j an int, not an unsigned?
             int j = cell_population.GetLocationIndexUsingCell(*cell_iter);
-            c_vector<double, 2> actual_location = cell_population.GetNode(j)->rGetLocation();
+            c_vector<double, 2> actualLocation = cell_population.GetNode(j)->rGetLocation();
             
             double damping =  cell_population.GetDampingConstant(j);
-            c_vector<double, 2> expected_location;
-            expected_location = p_test_force->GetExpectedOneStepLocationFE(j, damping, old_posns[j], dt);
-            TS_ASSERT_DELTA(norm_2(actual_location - expected_location), 0, 1e-9);
+            c_vector<double, 2> expectedLocation;
+            expectedLocation = p_test_force->GetExpectedOneStepLocationFE(j, damping, old_posns[j], dt);
+            TS_ASSERT_DELTA(norm_2(actualLocation - expectedLocation), 0, 1e-9);
         }
     }
 
-    ///\todo #2087 Implement this test
     void TestUpdateAllNodePositionsWithNodeBased() throw(Exception)
     {
+        EXIT_IF_PARALLEL;    // This test doesn't work in parallel.
+
+        HoneycombMeshGenerator generator(3, 3, 0);
+        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+
+        // Convert this to a NodesOnlyMesh
+        MAKE_PTR(NodesOnlyMesh<2>, p_mesh);
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 2.0);
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
+
+        NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
+        cell_population.SetDampingConstantNormal(1.1);
+
+        // Create a force collection
+        std::vector<boost::shared_ptr<AbstractForce<2,2> > > force_collection;
+        MAKE_PTR(PopulationTestingForce<2>, p_test_force);
+        force_collection.push_back(p_test_force);
+
+        // Create numerical method for testing
+        MAKE_PTR(ForwardEulerNumericalMethod<2>, p_fe_method);
+        
+        double dt = 0.01;
+        
+        p_fe_method->SetCellPopulation(&cell_population);
+        p_fe_method->SetForceCollection(&force_collection);
+
+        // Save starting positions
+        std::vector<c_vector<double, 2> > old_posns(cell_population.GetNumNodes());
+        for(unsigned j=0; j<cell_population.GetNumNodes(); j++)
+        {
+            old_posns[j][0] = cell_population.GetNode(j)->rGetLocation()[0];
+            old_posns[j][1] = cell_population.GetNode(j)->rGetLocation()[1];
+        }
+     
+        // Update positions and check the answer   
+        p_fe_method->UpdateAllNodePositions(dt);
+
+        for(unsigned j=0; j<cell_population.GetNumNodes(); j++)
+        {
+            c_vector<double, 2> actualLocation = cell_population.GetNode(j)->rGetLocation();
+            
+            double damping =  cell_population.GetDampingConstant(j);
+            c_vector<double, 2> expectedLocation;
+            expectedLocation = p_test_force->GetExpectedOneStepLocationFE(j, damping, old_posns[j], dt);
+            
+            TS_ASSERT_DELTA(norm_2(actualLocation - expectedLocation), 0, 1e-12);
+        }
+    }
+
+    void TestUpdateAllNodePositionsWithNodeBasedWithBuskeUpdate() throw(Exception)
+    {
+        EXIT_IF_PARALLEL;    // This test doesn't work in parallel.
+
+        HoneycombMeshGenerator generator(3, 3, 0);
+        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+
+        // Convert this to a NodesOnlyMesh
+        MAKE_PTR(NodesOnlyMesh<2>, p_mesh);
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 2.0);
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
+
+        NodeBasedCellPopulationWithBuskeUpdate<2> cell_population(*p_mesh, cells);
+        cell_population.SetDampingConstantNormal(1.1);
+
+        // Create a force collection
+        std::vector<boost::shared_ptr<AbstractForce<2,2> > > force_collection;
+        MAKE_PTR(PopulationTestingForce<2>, p_test_force);
+        force_collection.push_back(p_test_force);
+
+        // Create numerical method for testing
+        MAKE_PTR(ForwardEulerNumericalMethod<2>, p_fe_method);
+        
+        double dt = 0.01;
+        
+        p_fe_method->SetCellPopulation(&cell_population);
+        p_fe_method->SetForceCollection(&force_collection);
+
+        // Save starting positions
+        std::vector<c_vector<double, 2> > old_posns(cell_population.GetNumNodes());
+        for(unsigned j=0; j<cell_population.GetNumNodes(); j++)
+        {
+            old_posns[j][0] = cell_population.GetNode(j)->rGetLocation()[0];
+            old_posns[j][1] = cell_population.GetNode(j)->rGetLocation()[1];
+        }
+     
+        // Update positions and check the answer
+        // Currently this throws an error as not set up correctly as it is in a simulation #2087   
+        TS_ASSERT_THROWS_THIS(p_fe_method->UpdateAllNodePositions(dt),"You must provide a rowPreallocation argument for a large sparse system");
+
+        // for(unsigned j=0; j<cell_population.GetNumNodes(); j++)
+        // {
+        //     c_vector<double, 2> actualLocation = cell_population.GetNode(j)->rGetLocation();
+            
+        //     double damping =  cell_population.GetDampingConstant(j);
+        //     c_vector<double, 2> expectedLocation;
+        //     expectedLocation = p_test_force->GetExpectedOneStepLocationFE(j, damping, old_posns[j], dt);
+            
+        //     TS_ASSERT_DELTA(norm_2(actualLocation - expectedLocation), 0, 1e-12);
+        // }
     }
 
     void TestUpdateAllNodePositionsWithNodeBasedWithParticles() throw(Exception)
     {
-        EXIT_IF_PARALLEL; // This test doesn't work in parallel
+        EXIT_IF_PARALLEL;    // This test doesn't work in parallel.
 
-        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel
-        
         HoneycombMeshGenerator generator(3, 3, 1);
         TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
 
@@ -277,88 +374,11 @@ public:
 
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
-        CellPropertyRegistry::Instance()->Clear();
-        RandomNumberGenerator* p_random_num_gen = RandomNumberGenerator::Instance();
-
-        // Set up cells
+        // Create cells
         std::vector<CellPtr> cells;
-        cells.clear();
-        unsigned num_cells = location_indices.empty() ? p_mesh->GetNumNodes() : location_indices.size();
-        cells.reserve(num_cells);
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, location_indices.size());
 
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
-        {
-            double y = 0.0;
-            if (std::find(location_indices.begin(), location_indices.end(), i) != location_indices.end())
-            {
-                y = p_mesh->GetNode(i)->GetPoint().rGetLocation()[1];
-            }
-
-            FixedDurationGenerationBasedCellCycleModel* p_cell_cycle_model = new FixedDurationGenerationBasedCellCycleModel;
-            p_cell_cycle_model->SetDimension(2);
-
-            double typical_transit_cycle_time = p_cell_cycle_model->GetAverageTransitCellCycleTime();
-            double typical_stem_cycle_time = p_cell_cycle_model->GetAverageStemCellCycleTime();
-
-            unsigned generation;
-            if (y <= 0.3)
-            {
-                generation = 0;
-            }
-            else if (y < 2.0)
-            {
-                generation = 1;
-            }
-            else if (y < 3.0)
-            {
-                generation = 2;
-            }
-            else if (y < 4.0)
-            {
-                generation = 3;
-            }
-            else
-            {
-                generation = 4;
-            }
-            p_cell_cycle_model->SetGeneration(generation);
-
-            boost::shared_ptr<AbstractCellProperty> p_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
-            boost::shared_ptr<AbstractCellProperty> p_stem_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
-            boost::shared_ptr<AbstractCellProperty> p_transit_type(CellPropertyRegistry::Instance()->Get<TransitCellProliferativeType>());
-            boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
-
-            CellPtr p_cell(new Cell(p_state, p_cell_cycle_model));
-
-            if (y <= 0.3)
-            {
-                p_cell->SetCellProliferativeType(p_stem_type);
-            }
-            else
-            {
-                p_cell->SetCellProliferativeType(p_transit_type);
-                if (y >= 4.0 && p_cell_cycle_model->CanCellTerminallyDifferentiate())
-                {
-                    p_cell->SetCellProliferativeType(p_diff_type);
-                }
-            }
-
-            double birth_time = -p_random_num_gen->ranf();
-            if (y <= 0.3)
-            {
-                birth_time *= typical_stem_cycle_time; // hours
-            }
-            else
-            {
-                birth_time *= typical_transit_cycle_time; // hours
-            }
-            p_cell->SetBirthTime(birth_time);
-
-            if (std::find(location_indices.begin(), location_indices.end(), i) != location_indices.end())
-            {
-                cells.push_back(p_cell);
-            }
-        }
 
         NodeBasedCellPopulationWithParticles<2> cell_population(*p_mesh, cells, location_indices);
         cell_population.SetDampingConstantNormal(1.1);
@@ -378,7 +398,8 @@ public:
 
         // Save starting positions
         std::vector<c_vector<double, 2> > old_posns(cell_population.GetNumNodes());
-        for(unsigned j=0; j<cell_population.GetNumNodes(); j++){
+        for(unsigned j=0; j<cell_population.GetNumNodes(); j++)
+        {
             old_posns[j][0] = cell_population.GetNode(j)->rGetLocation()[0];
             old_posns[j][1] = cell_population.GetNode(j)->rGetLocation()[1];
         }
@@ -388,13 +409,13 @@ public:
 
         for(unsigned j=0; j<cell_population.GetNumNodes(); j++)
         {
-            c_vector<double, 2> actual_location = cell_population.GetNode(j)->rGetLocation();
+            c_vector<double, 2> actualLocation = cell_population.GetNode(j)->rGetLocation();
             
             double damping =  cell_population.GetDampingConstant(j);
-            c_vector<double, 2> expected_location;
-            expected_location = p_test_force->GetExpectedOneStepLocationFE(j, damping, old_posns[j], dt);
+            c_vector<double, 2> expectedLocation;
+            expectedLocation = p_test_force->GetExpectedOneStepLocationFE(j, damping, old_posns[j], dt);
             
-            TS_ASSERT_DELTA(norm_2(actual_location - expected_location), 0, 1e-12);
+            TS_ASSERT_DELTA(norm_2(actualLocation - expectedLocation), 0, 1e-12);
         }
     }
 
@@ -431,7 +452,7 @@ public:
 
         // Save starting positions
         std::vector<c_vector<double, 2> > old_posns(cell_population.GetNumNodes());
-        for (unsigned j=0; j<cell_population.GetNumNodes(); j++)
+        for(unsigned j=0; j<cell_population.GetNumNodes(); j++)
         {
             old_posns[j][0] = cell_population.GetNode(j)->rGetLocation()[0];
             old_posns[j][1] = cell_population.GetNode(j)->rGetLocation()[1];
@@ -440,15 +461,16 @@ public:
         // Update positions and check the answer   
         p_fe_method->UpdateAllNodePositions(dt);
 
-        for (unsigned j=0; j<cell_population.GetNumNodes(); j++)
+        for(unsigned j=0; j<cell_population.GetNumNodes(); j++)
         {
-            c_vector<double, 2> actual_location = cell_population.GetNode(j)->rGetLocation();
+            
+            c_vector<double, 2> actualLocation = cell_population.GetNode(j)->rGetLocation();
             
             double damping =  cell_population.GetDampingConstant(j);
-            c_vector<double, 2> expected_location;
-            expected_location = p_test_force->GetExpectedOneStepLocationFE(j, damping, old_posns[j], dt);
+            c_vector<double, 2> expectedLocation;
+            expectedLocation = p_test_force->GetExpectedOneStepLocationFE(j, damping, old_posns[j], dt);
             
-            TS_ASSERT_DELTA(norm_2(actual_location - expected_location), 0, 1e-12);
+            TS_ASSERT_DELTA(norm_2(actualLocation - expectedLocation), 0, 1e-12);
         }
     }
 };

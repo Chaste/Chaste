@@ -152,12 +152,11 @@ std::vector<c_vector<double, SPACE_DIM> > AbstractNumericalMethod<ELEMENT_DIM,SP
     std::vector<c_vector<double, SPACE_DIM> > current_locations;
     current_locations.reserve(mpCellPopulation->GetNumNodes());
 
-    unsigned index = 0;
     for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = mpCellPopulation->rGetMesh().GetNodeIteratorBegin();
          node_iter != mpCellPopulation->rGetMesh().GetNodeIteratorEnd();
-         ++index, ++node_iter)
+         ++node_iter)
     {
-        current_locations[index] = node_iter->rGetLocation();
+        current_locations.push_back(node_iter->rGetLocation());
     }
 
     return current_locations;
