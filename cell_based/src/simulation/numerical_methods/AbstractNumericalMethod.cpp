@@ -195,6 +195,18 @@ void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::DetectStepSizeExceptions(un
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::SetUseUpdateNodeLocation(bool useUpdateNodeLocation)
+{
+    mUseUpdateNodeLocation = useUpdateNodeLocation;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::GetUseUpdateNodeLocation()
+{
+    return mUseUpdateNodeLocation;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::OutputNumericalMethodInfo(out_stream& rParamsFile)
 {
     std::string numerical_method_type = GetIdentifier();

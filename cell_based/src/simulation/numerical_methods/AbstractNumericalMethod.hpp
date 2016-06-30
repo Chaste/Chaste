@@ -174,6 +174,20 @@ public:
     void SetUseAdaptiveTimestep(bool useAdaptiveTimestep);
 
     /**
+     * Set mUseUpdateNodeLocation.
+     *
+     * @param useUpdateNodeLocation whether to use the population method UpdateNodeLocations()
+     */
+    void SetUseUpdateNodeLocation(bool useUpdateNodeLocation);
+
+    /**
+     * Get mUseUpdateNodeLocation.
+     *
+     * @return whether the population method UpdateNodeLocations() is being used
+     */
+    bool GetUseUpdateNodeLocation();
+
+    /**
      * @return whether the numerical method uses an adaptive time step.
      */
     bool HasAdaptiveTimestep();

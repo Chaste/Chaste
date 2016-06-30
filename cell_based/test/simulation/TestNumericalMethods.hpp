@@ -473,6 +473,19 @@ public:
             TS_ASSERT_DELTA(norm_2(actualLocation - expectedLocation), 0, 1e-12);
         }
     }
+
+    void TestSettingAndGettingFlags() throw (Exception)
+	{
+    	// Create numerical methods for testing
+    	MAKE_PTR(ForwardEulerNumericalMethod<2>, p_fe_method);
+
+    	// mUseUpdateNodeLocation should default to false
+    	TS_ASSERT(!(p_fe_method->GetUseUpdateNodeLocation()));
+
+    	// Set mUseUpdateNodeLocation to true and check
+    	p_fe_method->SetUseUpdateNodeLocation(true);
+    	TS_ASSERT(p_fe_method->GetUseUpdateNodeLocation());
+	}
 };
 
 #endif /*TESTMESHBASEDCELLPOPULATION_HPP_*/
