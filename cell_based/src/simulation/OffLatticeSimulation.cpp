@@ -34,6 +34,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "OffLatticeSimulation.hpp"
+
+#include <boost/make_shared.hpp>
+
 #include "AbstractCentreBasedCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
 #include "T2SwapCellKiller.hpp"
@@ -82,7 +85,7 @@ OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::OffLatticeSimulation(AbstractCellPo
          * (except user-derived classes), i.e. if you want to use this method with your own
          * subclass of AbstractOffLatticeCellPopulation, then simply comment out the line below.
          */
-        NEVER_REACHED;
+//        NEVER_REACHED;
     }
 }
 
@@ -274,9 +277,7 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::SetupSolve()
     // Use a forward Euler method by default, unless a numerical method has been specified already
     if (mpNumericalMethod == NULL)
     {
-        typedef ForwardEulerNumericalMethod<ELEMENT_DIM, SPACE_DIM> EulerMethod;
-        MAKE_PTR(EulerMethod, p_method);
-        mpNumericalMethod = p_method;
+        mpNumericalMethod = boost::make_shared<ForwardEulerNumericalMethod<ELEMENT_DIM, SPACE_DIM> >();
     }
     mpNumericalMethod->SetCellPopulation(dynamic_cast<AbstractOffLatticeCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&(this->mrCellPopulation)));
     mpNumericalMethod->SetForceCollection(&mForceCollection);
