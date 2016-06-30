@@ -69,10 +69,6 @@ void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::SetCellPopulation(AbstractO
         mUseUpdateNodeLocation = true;
         WARNING("Non-Euler steppers are not yet implemented for NodeBasedCellPopulationWithBuskeUpdate");
     }
-    else
-    {
-        mUseUpdateNodeLocation = false;
-    }
 
     if (dynamic_cast<MeshBasedCellPopulationWithGhostNodes<SPACE_DIM>*>(mpCellPopulation))
     {
