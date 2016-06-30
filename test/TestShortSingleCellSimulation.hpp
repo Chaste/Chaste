@@ -38,6 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellBasedTestSuite.hpp"
 
 #include "OffLatticeSimulation.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
 #include "TransitCellProliferativeType.hpp"
 #include "UniformlyDistributedCellCycleModel.hpp"
 #include "CellsGenerator.hpp"
@@ -69,7 +70,7 @@ public:
          * 6: bottom left y
          */
         double diam = 0.3;
-        SuperellipseGenerator* p_gen = new SuperellipseGenerator(128, 1.0, 0.3, 0.3, 0.5-0.5*diam, 0.3);
+        SuperellipseGenerator* p_gen = new SuperellipseGenerator(128, 1.0, 0.3, 0.5, 0.5-0.5*diam, 0.25);
         std::vector<c_vector<double, 2> > locations = p_gen->GetPointsAsVectors();
 
         std::vector<Node<2>* > nodes;
