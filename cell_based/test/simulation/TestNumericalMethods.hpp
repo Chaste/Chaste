@@ -74,76 +74,76 @@ class TestNumericalMethods : public AbstractCellBasedTestSuite
 {
 public:
     
-	void TestMethodsAndExceptions() throw(Exception)
-	{
+    void TestMethodsAndExceptions() throw(Exception)
+    {
 
-		EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
-		{
-			unsigned cells_across = 7;
-			unsigned cells_up = 5;
+        {
+            unsigned cells_across = 7;
+            unsigned cells_up = 5;
 
-			HoneycombMeshGenerator generator(cells_across, cells_up, 0);
-			MutableMesh<2,2>* p_mesh = generator.GetMesh();
-		
-			// Create cells
-			std::vector<CellPtr> cells;
-			CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-			cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
+            HoneycombMeshGenerator generator(cells_across, cells_up, 0);
+            MutableMesh<2,2>* p_mesh = generator.GetMesh();
 
-			// Create cell population
-			MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
+            // Create cells
+            std::vector<CellPtr> cells;
+            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
+
+            // Create cell population
+            MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
             // Create a force collection
             std::vector<boost::shared_ptr<AbstractForce<2,2> > > force_collection;
             MAKE_PTR(PopulationTestingForce<2>, p_test_force);
             force_collection.push_back(p_test_force);
 
-			// Create Numerical method
-			ForwardEulerNumericalMethod<2> numerical_method;
+            // Create Numerical method
+            ForwardEulerNumericalMethod<2> numerical_method;
 
-			numerical_method.SetCellPopulation(&cell_population);
-			numerical_method.SetForceCollection(&force_collection);
-			numerical_method.SetUseAdaptiveTimestep(true);
+            numerical_method.SetCellPopulation(&cell_population);
+            numerical_method.SetForceCollection(&force_collection);
+            numerical_method.SetUseAdaptiveTimestep(true);
 
-			std::vector<c_vector<double, 2> > saved_locations;
+            std::vector<c_vector<double, 2> > saved_locations;
 
-			saved_locations = numerical_method.SaveCurrentLocations();
+            saved_locations = numerical_method.SaveCurrentLocations();
 
-			TS_ASSERT_EQUALS(saved_locations.size(), cell_population.GetNumRealCells());
+            TS_ASSERT_EQUALS(saved_locations.size(), cell_population.GetNumRealCells());
 
-		}
+        }
 
-		// This tests the exceptions for Node based with Buske Update
-		{
-			// Create a simple mesh
-			TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
-			MutableMesh<2,2> generating_mesh;
-			generating_mesh.ConstructFromMeshReader(mesh_reader);
+        // This tests the exceptions for Node based with Buske Update
+        {
+            // Create a simple mesh
+            TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
+            MutableMesh<2,2> generating_mesh;
+            generating_mesh.ConstructFromMeshReader(mesh_reader);
 
-			// Convert this to a NodesOnlyMesh
-			NodesOnlyMesh<2> mesh;
-			mesh.ConstructNodesWithoutMesh(generating_mesh, 1.2);
+            // Convert this to a NodesOnlyMesh
+            NodesOnlyMesh<2> mesh;
+            mesh.ConstructNodesWithoutMesh(generating_mesh, 1.2);
 
-			std::vector<CellPtr> cells;
-			CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-			cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+            std::vector<CellPtr> cells;
+            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
-			// Create a cell population, with no ghost nodes at the moment
-			NodeBasedCellPopulationWithBuskeUpdate<2> cell_population(mesh, cells);
+            // Create a cell population, with no ghost nodes at the moment
+            NodeBasedCellPopulationWithBuskeUpdate<2> cell_population(mesh, cells);
 
 
-			// Create Numerical method
-			ForwardEulerNumericalMethod<2> numerical_method;
+            // Create Numerical method
+            ForwardEulerNumericalMethod<2> numerical_method;
 
-			numerical_method.SetCellPopulation(&cell_population);
+            numerical_method.SetCellPopulation(&cell_population);
 
-			TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
-			TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(), "Non-Euler steppers are not yet implemented for NodeBasedCellPopulationWithBuskeUpdate");
-			Warnings::QuietDestroy();
+            TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
+            TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(), "Non-Euler steppers are not yet implemented for NodeBasedCellPopulationWithBuskeUpdate");
+            Warnings::QuietDestroy();
 
-		}
-	}
+        }
+    }
 
     void TestUpdateAllNodePositionsWithMeshBased() throw(Exception)
     {
@@ -475,17 +475,17 @@ public:
     }
 
     void TestSettingAndGettingFlags() throw (Exception)
-	{
-    	// Create numerical methods for testing
-    	MAKE_PTR(ForwardEulerNumericalMethod<2>, p_fe_method);
+    {
+        // Create numerical methods for testing
+        MAKE_PTR(ForwardEulerNumericalMethod<2>, p_fe_method);
 
-    	// mUseUpdateNodeLocation should default to false
-    	TS_ASSERT(!(p_fe_method->GetUseUpdateNodeLocation()));
+        // mUseUpdateNodeLocation should default to false
+        TS_ASSERT(!(p_fe_method->GetUseUpdateNodeLocation()));
 
-    	// Set mUseUpdateNodeLocation to true and check
-    	p_fe_method->SetUseUpdateNodeLocation(true);
-    	TS_ASSERT(p_fe_method->GetUseUpdateNodeLocation());
-	}
+        // Set mUseUpdateNodeLocation to true and check
+        p_fe_method->SetUseUpdateNodeLocation(true);
+        TS_ASSERT(p_fe_method->GetUseUpdateNodeLocation());
+    }
 };
 
 #endif /*TESTMESHBASEDCELLPOPULATION_HPP_*/
