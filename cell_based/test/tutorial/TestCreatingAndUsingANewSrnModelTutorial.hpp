@@ -253,12 +253,9 @@ public:
     /* Finally we define a method to output any parameters in our model, this needs to be included in every SRN model.*/
     void OutputSrnModelParameters(out_stream& rParamsFile)
     {
-        // No new parameters to output.
-
-        // Call direct parent class
+        // No new parameters to output, so just call method on direct parent class
         AbstractOdeSrnModel::OutputSrnModelParameters(rParamsFile);
     }
-
 };
 
 /* We need to include the next block of code if you want to be able to archive (save or load)

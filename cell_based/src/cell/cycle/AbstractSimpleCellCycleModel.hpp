@@ -118,7 +118,7 @@ public:
     virtual void ResetForDivision();
 
     /**
-     * See AbstractPhaseBasedCellCycleModel::InitialiseDaughterCell()
+     * Overridden InitialiseDaughterCell() method.
      *
      * Set the new cell's cell cycle duration once it has been created after division.
      * This is by calling SetCellCycleDuration() defined in child classes.

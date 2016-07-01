@@ -54,19 +54,18 @@ ContactInhibitionCellCycleModel::ContactInhibitionCellCycleModel(const ContactIn
       mCurrentQuiescentDuration(rModel.mCurrentQuiescentDuration)
 {
     /*
-     * Set each member variable of the new cell-cycle model that inherits
-     * its value from the parent.
+     * Initialize only those member variables defined in this class.
      *
-     * Note 1: some of the new cell-cycle model's member variables will already
-     * have been correctly initialized in its constructor or parent classes.
+     * The member variables mCurrentCellCyclePhase, mG1Duration,
+     * mMinimumGapDuration, mStemCellG1Duration, mTransitCellG1Duration,
+     * mSDuration, mG2Duration and mMDuration are initialized in the
+     * AbstractPhaseBasedCellCycleModel constructor.
      *
-     * Note 2: one or more of the new cell-cycle model's member variables
-     * may be set/overwritten as soon as InitialiseDaughterCell() is called on
-     * the new cell-cycle model.
+     * The member variables mBirthTime, mReadyToDivide and mDimension
+     * are initialized in the AbstractCellCycleModel constructor.
      *
-     * Note 3: Only set the variables defined in this class. Variables defined
-     * in parent classes will be defined there.
-     *
+     * Note that mG1Duration is (re)set as soon as InitialiseDaughterCell()
+     * is called on the new cell-cycle model.
      */
 }
 
@@ -121,19 +120,19 @@ void ContactInhibitionCellCycleModel::UpdateCellCyclePhase()
     {
         mCurrentCellCyclePhase = G_ZERO_PHASE;
     }
-    else if ( time_since_birth < GetMDuration() )
+    else if (time_since_birth < GetMDuration())
     {
         mCurrentCellCyclePhase = M_PHASE;
     }
-    else if ( time_since_birth < GetMDuration() + mG1Duration)
+    else if (time_since_birth < GetMDuration() + mG1Duration)
     {
         mCurrentCellCyclePhase = G_ONE_PHASE;
     }
-    else if ( time_since_birth < GetMDuration() + mG1Duration + GetSDuration())
+    else if (time_since_birth < GetMDuration() + mG1Duration + GetSDuration())
     {
         mCurrentCellCyclePhase = S_PHASE;
     }
-    else if ( time_since_birth < GetMDuration() + mG1Duration + GetSDuration() + GetG2Duration())
+    else if (time_since_birth < GetMDuration() + mG1Duration + GetSDuration() + GetG2Duration())
     {
         mCurrentCellCyclePhase = G_TWO_PHASE;
     }

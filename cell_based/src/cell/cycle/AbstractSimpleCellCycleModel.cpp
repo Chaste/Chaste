@@ -36,8 +36,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractSimpleCellCycleModel.hpp"
 
 AbstractSimpleCellCycleModel::AbstractSimpleCellCycleModel()
-    :   AbstractCellCycleModel(),
-        mCellCycleDuration(DOUBLE_UNSET)
+    : AbstractCellCycleModel(),
+      mCellCycleDuration(DOUBLE_UNSET)
 {
 }
 
@@ -50,19 +50,13 @@ AbstractSimpleCellCycleModel::AbstractSimpleCellCycleModel(const AbstractSimpleC
       mCellCycleDuration(rModel.mCellCycleDuration)
 {
     /*
-     * Set each member variable of the new cell-cycle model that inherits
-     * its value from the parent.
+     * Initialize only the member variable defined in this class.
      *
-     * Note 1: some of the new cell-cycle model's member variables will already
-     * have been correctly initialized in its constructor or parent classes.
+     * The member variables mBirthTime, mReadyToDivide and mDimension
+     * are initialized in the AbstractCellCycleModel constructor.
      *
-     * Note 2: one or more of the new cell-cycle model's member variables
-     * may be set/overwritten as soon as InitialiseDaughterCell() is called on
-     * the new cell-cycle model.
-     *
-     * Note 3: Only set the variables defined in this class. Variables defined
-     * in parent classes will be defined there.
-     *
+     * Note that mCellCycleDuration is (re)set as soon as
+     * InitialiseDaughterCell() is called on the new cell-cycle model.
      */
 }
 

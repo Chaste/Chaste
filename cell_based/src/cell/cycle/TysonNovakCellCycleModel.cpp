@@ -62,25 +62,23 @@ TysonNovakCellCycleModel::TysonNovakCellCycleModel(const TysonNovakCellCycleMode
     : AbstractOdeBasedCellCycleModel(rModel)
 {
     /*
-     * Set each member variable of the new cell-cycle model that inherits
-     * its value from the parent.
+     * Initialize only those member variables defined in this class.
+     * Create the new cell-cycle model's ODE system and use the current
+     * values of the state variables in mpOdeSystem as an initial condition.
      *
-     * Note 1: some of the new cell-cycle model's member variables will already
-     * have been correctly initialized in its constructor or parent classes.
+     * The member variable mDivideTime is initialized in the
+     * AbstractOdeBasedCellCycleModel constructor.
      *
-     * Note 2: one or more of the new cell-cycle model's member variables
-     * may be set/overwritten as soon as InitialiseDaughterCell() is called on
-     * the new cell-cycle model.
+     * The member variables mBirthTime, mReadyToDivide and mDimension
+     * are initialized in the AbstractCellCycleModel constructor.
      *
-     * Note 3: Only set the variables defined in this class. Variables defined
-     * in parent classes will be defined there.
-     *
+     * Note that the cell proliferative type is (re)set as soon as
+     * InitialiseDaughterCell() is called on the new cell-cycle model.
      */
     assert(rModel.GetOdeSystem());
     SetOdeSystem(new TysonNovak2001OdeSystem);
     SetStateVariables(rModel.GetOdeSystem()->rGetStateVariables());
 }
-
 
 void TysonNovakCellCycleModel::Initialise()
 {

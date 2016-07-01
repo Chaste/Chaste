@@ -63,31 +63,28 @@ SingleOdeWntCellCycleModel::SingleOdeWntCellCycleModel(const SingleOdeWntCellCyc
       mBetaCateninDivisionThreshold(rModel.mBetaCateninDivisionThreshold)
 {
     /*
-     * Set each member variable of the new cell-cycle model that inherits
-     * its value from the parent.
-     *
-     * Note 1: some of the new cell-cycle model's member variables will already
-     * have been correctly initialized in its constructor or parent classes.
-     *
-     * Note 2: one or more of the new cell-cycle model's member variables
-     * may be set/overwritten as soon as InitialiseDaughterCell() is called on
-     * the new cell-cycle model.
-     *
-     * Note 3: Only set the variables defined in this class. Variables defined
-     * in parent classes will be defined there.
-     *
-     */
-
-    /*
+     * Initialize only those member variables defined in this class.
      * Create the new cell-cycle model's ODE system and use the current values
      * of the state variables in mpOdeSystem as an initial condition.
+     *
+     * The member variables mUseCellProliferativeTypeDependentG1Duration,
+     * mWntStemThreshold, mWntTransitThreshold and mWntLabelledThreshold
+     * are initialized in the SimpleWntCellCycleModel constructor.
+     *
+     * The member variables mCurrentCellCyclePhase, mG1Duration,
+     * mMinimumGapDuration, mStemCellG1Duration, mTransitCellG1Duration,
+     * mSDuration, mG2Duration and mMDuration are initialized in the
+     * AbstractPhaseBasedCellCycleModel constructor.
+     *
+     * The member variables mBirthTime, mReadyToDivide and mDimension
+     * are initialized in the AbstractCellCycleModel constructor.
      */
+
     assert(rModel.GetOdeSystem());
     double wnt_level = rModel.GetWntLevel();
     SetOdeSystem(new Mirams2010WntOdeSystem(wnt_level, rModel.mpCell->GetMutationState()));
     SetStateVariables(rModel.GetOdeSystem()->rGetStateVariables());
 }
-
 
 AbstractCellCycleModel* SingleOdeWntCellCycleModel::CreateCellCycleModel()
 {
@@ -176,9 +173,7 @@ double SingleOdeWntCellCycleModel::GetBetaCateninDivisionThreshold()
 
 void SingleOdeWntCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
 {
-    // No new parameters to output
-
-    // Call method on direct parent class
+    // No new parameters to output, so just call method on direct parent class
     SimpleWntCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
 }
 

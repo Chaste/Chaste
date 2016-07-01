@@ -61,22 +61,26 @@ StochasticWntCellCycleModel::StochasticWntCellCycleModel(const StochasticWntCell
      mStochasticG2Duration(rModel.mStochasticG2Duration)
 {
     /*
-     * Set each member variable of the new cell-cycle model that inherits
-     * its value from the parent.
+     * Initialize only the member variable defined in this class.
      *
-     * Note 1: some of the new cell-cycle model's member variables will already
-     * have been correctly initialized in its constructor or parent classes.
+     * The new cell-cycle model's ODE system is created and initialized
+     * in the WntCellCycleModel constructor.
      *
-     * Note 2: one or more of the new cell-cycle model's member variables
-     * may be set/overwritten as soon as InitialiseDaughterCell() is called on
-     * the new cell-cycle model.
+     * The member variables mDivideTime and mG2PhaseStartTime are
+     * initialized in the AbstractOdeBasedPhaseBasedCellCycleModel
+     * constructor.
      *
-     * Note 3: Only set the variables defined in this class. Variables defined
-     * in parent classes will be defined there.
+     * The member variables mCurrentCellCyclePhase, mG1Duration,
+     * mMinimumGapDuration, mStemCellG1Duration, mTransitCellG1Duration,
+     * mSDuration, mG2Duration and mMDuration are initialized in the
+     * AbstractPhaseBasedCellCycleModel constructor.
      *
+     * The member variables mBirthTime, mReadyToDivide and mDimension
+     * are initialized in the AbstractCellCycleModel constructor.
+     *
+     * Note that mStochasticG2Duration is (re)set as soon as
+     * InitialiseDaughterCell() is called on the new cell-cycle model.
      */
-
-    // No new parameters and ODE set in WntCellCycleModel.
 }
 
 void StochasticWntCellCycleModel::GenerateStochasticG2Duration()
@@ -124,9 +128,7 @@ AbstractCellCycleModel* StochasticWntCellCycleModel::CreateCellCycleModel()
 
 void StochasticWntCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
 {
-    // No new parameters to output
-
-    // Call method on direct parent class
+    // No new parameters to output, so just call method on direct parent class
     WntCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
 }
 

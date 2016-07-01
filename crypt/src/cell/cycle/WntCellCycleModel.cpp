@@ -62,24 +62,21 @@ WntCellCycleModel::WntCellCycleModel(const WntCellCycleModel& rModel)
    : AbstractWntOdeBasedCellCycleModel(rModel)
 {
     /*
-     * Set each member variable of the new cell-cycle model that inherits
-     * its value from the parent.
+     * Initialize only those member variables defined in this class.
+     * Create the new cell-cycle model's ODE system and use the current
+     * values of the state variables in mpOdeSystem as an initial condition.
      *
-     * Note 1: some of the new cell-cycle model's member variables will already
-     * have been correctly initialized in its constructor or parent classes.
+     * The member variables mDivideTime and mG2PhaseStartTime are
+     * initialized in the AbstractOdeBasedPhaseBasedCellCycleModel
+     * constructor.
      *
-     * Note 2: one or more of the new cell-cycle model's member variables
-     * may be set/overwritten as soon as InitialiseDaughterCell() is called on
-     * the new cell-cycle model.
+     * The member variables mCurrentCellCyclePhase, mG1Duration,
+     * mMinimumGapDuration, mStemCellG1Duration, mTransitCellG1Duration,
+     * mSDuration, mG2Duration and mMDuration are initialized in the
+     * AbstractPhaseBasedCellCycleModel constructor.
      *
-     * Note 3: Only set the variables defined in this class. Variables defined
-     * in parent classes will be defined there.
-     *
-     */
-
-    /*
-     * Create the new cell-cycle model's ODE system and use the current values
-     * of the state variables in mpOdeSystem as an initial condition.
+     * The member variables mBirthTime, mReadyToDivide and mDimension
+     * are initialized in the AbstractCellCycleModel constructor.
      */
     assert(rModel.GetOdeSystem());
     double wnt_level = rModel.GetWntLevel();
@@ -149,9 +146,7 @@ void WntCellCycleModel::AdjustOdeParameters(double currentTime)
 
 void WntCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
 {
-    // No new parameters to output
-
-    // Call method on direct parent class
+    // No new parameters to output, so just call method on direct parent class
     AbstractWntOdeBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
 }
 

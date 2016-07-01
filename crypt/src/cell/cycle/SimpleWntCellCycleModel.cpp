@@ -60,22 +60,21 @@ SimpleWntCellCycleModel::SimpleWntCellCycleModel(const SimpleWntCellCycleModel& 
      mWntLabelledThreshold(rModel.mWntLabelledThreshold)
 {
     /*
-     * Set each member variable of the new cell-cycle model that inherits
-     * its value from the parent.
+     * Initialize only those member variables defined in this class.
      *
-     * Note 1: some of the new cell-cycle model's member variables will already
-     * have been correctly initialized in its constructor or parent classes.
+     * The member variables mCurrentCellCyclePhase, mG1Duration,
+     * mMinimumGapDuration, mStemCellG1Duration, mTransitCellG1Duration,
+     * mSDuration, mG2Duration and mMDuration are initialized in the
+     * AbstractPhaseBasedCellCycleModel constructor.
      *
-     * Note 2: one or more of the new cell-cycle model's member variables
-     * may be set/overwritten as soon as InitialiseDaughterCell() is called on
-     * the new cell-cycle model.
+     * The member variables mBirthTime, mReadyToDivide and mDimension
+     * are initialized in the AbstractCellCycleModel constructor.
      *
-     * Note 3: Only set the variables defined in this class. Variables defined
-     * in parent classes will be defined there.
-     *
+     * Note that mG1Duration and the cell's proliferative type are
+     * (re)set as soon as InitialiseDaughterCell() is called on the
+     * new cell-cycle model.
      */
 }
-
 
 AbstractCellCycleModel* SimpleWntCellCycleModel::CreateCellCycleModel()
 {
@@ -271,7 +270,6 @@ void SimpleWntCellCycleModel::UpdateCellCyclePhase()
 
 void SimpleWntCellCycleModel::InitialiseDaughterCell()
 {
-
     WntConcentrationType wnt_type = GetWntType();
 
     if (wnt_type == RADIAL)

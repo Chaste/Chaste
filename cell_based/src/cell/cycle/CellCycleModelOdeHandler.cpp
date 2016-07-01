@@ -54,11 +54,11 @@ CellCycleModelOdeHandler::~CellCycleModelOdeHandler()
 }
 
 CellCycleModelOdeHandler::CellCycleModelOdeHandler(const CellCycleModelOdeHandler& rHandler)
-    :   mDt(rHandler.mDt),
-        mpOdeSystem(rHandler.mpOdeSystem),
-        mpOdeSolver(rHandler.mpOdeSolver),
-        mLastTime(rHandler.mLastTime),
-        mFinishedRunningOdes(rHandler.mFinishedRunningOdes)
+    : mDt(rHandler.mDt),
+      mpOdeSystem(rHandler.mpOdeSystem),
+      mpOdeSolver(rHandler.mpOdeSolver),
+      mLastTime(rHandler.mLastTime),
+      mFinishedRunningOdes(rHandler.mFinishedRunningOdes)
 {
 }
 

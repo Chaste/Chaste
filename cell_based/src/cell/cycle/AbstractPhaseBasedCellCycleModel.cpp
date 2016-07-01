@@ -54,38 +54,28 @@ AbstractPhaseBasedCellCycleModel::~AbstractPhaseBasedCellCycleModel()
 }
 
 AbstractPhaseBasedCellCycleModel::AbstractPhaseBasedCellCycleModel(const AbstractPhaseBasedCellCycleModel& rModel)
-    :   AbstractCellCycleModel(rModel),
-        mCurrentCellCyclePhase(rModel.mCurrentCellCyclePhase),
-        mG1Duration(rModel.mG1Duration),
-        mMinimumGapDuration(rModel.mMinimumGapDuration),
-        mStemCellG1Duration(rModel.mStemCellG1Duration),
-        mTransitCellG1Duration(rModel.mTransitCellG1Duration),
-        mSDuration(rModel.mSDuration),
-        mG2Duration(rModel.mG2Duration),
-        mMDuration(rModel.mMDuration)
+    : AbstractCellCycleModel(rModel),
+      mCurrentCellCyclePhase(rModel.mCurrentCellCyclePhase),
+      mG1Duration(rModel.mG1Duration),
+      mMinimumGapDuration(rModel.mMinimumGapDuration),
+      mStemCellG1Duration(rModel.mStemCellG1Duration),
+      mTransitCellG1Duration(rModel.mTransitCellG1Duration),
+      mSDuration(rModel.mSDuration),
+      mG2Duration(rModel.mG2Duration),
+      mMDuration(rModel.mMDuration)
 {
-      /*
-       * Set each member variable of the new cell-cycle model that inherits
-       * its value from the parent.
-       *
-       * Note 1: some of the new cell-cycle model's member variables will already
-       * have been correctly initialized in its constructor or parent classes.
-       *
-       * Note 2: one or more of the new cell-cycle model's member variables
-       * may be set/overwritten as soon as InitialiseDaughterCell() is called on
-       * the new cell-cycle model.
-       *
-       * Note 3: Only set the variables defined in this class. Variables defined
-       * in parent classes will be defined there.
-       *
-       */
+    /*
+     * Initialize only those member variables defined in this class.
+     *
+     * The member variables mBirthTime, mReadyToDivide and mDimension
+     * are initialized in the AbstractCellCycleModel constructor.
+     */
 }
 
 void AbstractPhaseBasedCellCycleModel::ResetForDivision()
 {
     AbstractCellCycleModel::ResetForDivision();
     mCurrentCellCyclePhase = M_PHASE;
-
 }
 
 bool AbstractPhaseBasedCellCycleModel::ReadyToDivide()
@@ -103,10 +93,6 @@ bool AbstractPhaseBasedCellCycleModel::ReadyToDivide()
     }
     return mReadyToDivide;
 }
-
-///////////////////////////////////////////////////////////////////////
-// Getter methods
-///////////////////////////////////////////////////////////////////////
 
 double AbstractPhaseBasedCellCycleModel::GetG1Duration() const
 {
@@ -163,30 +149,30 @@ double AbstractPhaseBasedCellCycleModel::GetMinimumGapDuration() const
     return mMinimumGapDuration;
 }
 
-///////////////////////////////////////////////////////////////////////
-// Setter methods
-///////////////////////////////////////////////////////////////////////
-
 void AbstractPhaseBasedCellCycleModel::SetStemCellG1Duration(double stemCellG1Duration)
 {
     assert(stemCellG1Duration >= 0.0);
     mStemCellG1Duration = stemCellG1Duration;
 }
+
 void AbstractPhaseBasedCellCycleModel::SetTransitCellG1Duration(double transitCellG1Duration)
 {
     assert(transitCellG1Duration >= 0.0);
     mTransitCellG1Duration = transitCellG1Duration;
 }
+
 void AbstractPhaseBasedCellCycleModel::SetSDuration(double SDuration)
 {
     assert(SDuration >= 0.0);
     mSDuration = SDuration;
 }
+
 void AbstractPhaseBasedCellCycleModel::SetG2Duration(double G2Duration)
 {
     assert(G2Duration >= 0.0);
     mG2Duration = G2Duration;
 }
+
 void AbstractPhaseBasedCellCycleModel::SetMDuration(double MDuration)
 {
     assert(MDuration >= 0.0);
