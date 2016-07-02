@@ -381,7 +381,7 @@ public:
 
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 6) //PETSc 3.6 or later
         // Lock the vector so that modern PETSc (3.6) won't want to change it
-        VecLockPush(petsc_vec);
+        EXCEPT_IF_NOT(VecLockPush(petsc_vec) == 0);
 #endif
         {
             DistributedVector distributed_vector_read = factory.CreateDistributedVector(petsc_vec, true);
@@ -396,7 +396,7 @@ public:
         }
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 6) //PETSc 3.6 or later
         // Take the lock back
-        VecLockPop(petsc_vec);
+        EXCEPT_IF_NOT(VecLockPop(petsc_vec) == 0);
 #endif
 
         PetscTools::Destroy(petsc_vec);
