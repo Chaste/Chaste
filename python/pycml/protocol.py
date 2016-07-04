@@ -80,6 +80,7 @@ class Protocol(processors.ModelModifier):
         self._optional_vars = set()
         warn_only = not model.get_option('fully_automatic') and model.get_option('warn_on_units_errors')
         self.set_units_converter(processors.UnitsConverter(self.model, warn_only))
+        self.assignments_to_convert = set()
     
     @staticmethod
     def apply_protocol_file(doc, proto_file_path):
@@ -884,15 +885,15 @@ class Protocol(processors.ModelModifier):
                     comp = expr.component
                     if comp.name != cname:
                         # Check for the special case of the referenced variable having a source in this component already
-                        # (providing it has identical units)
+                        # (ensuring either it has identical units or the expression will be units converted)
                         src_comp = self.model.get_component_by_name(cname)
                         referenced_var = src_comp.get_variable_by_name(vname)
                         src_var = referenced_var.get_source_variable(recurse=True)
                         if src_var.component is comp:
                             # Use the existing var
-#                             print 'Using existing var', src_var, 'for reference', unicode(ci_elt)
+#                             print 'Using existing var', src_var, 'for reference', unicode(ci_elt), 'in', comp.name
                             if not src_var.get_units().equals(referenced_var.get_units()):
-                                raise ProtocolError("Unable to connect to a variable in the same component with different units!")
+                                self.assignments_to_convert.add(expr)
                             vname = src_var.name
                         else:
 #                             print 'Connecting to reference', unicode(ci_elt), 'from component', comp.name
@@ -1059,7 +1060,8 @@ class Protocol(processors.ModelModifier):
         self._fix_magic_units()
         proto_comp = self._get_protocol_component()
         converter.add_conversions_for_component(proto_comp)
-        converter.convert_assignments(filter(lambda i: isinstance(i, mathml_apply), self.inputs))
+        self.assignments_to_convert.update(filter(lambda i: isinstance(i, mathml_apply), self.inputs))
+        converter.convert_assignments(self.assignments_to_convert)
         converter.convert_connections(self.connections_made)
         converter.finalize(self._error_handler, check_units=False)
         notifier.flush()
