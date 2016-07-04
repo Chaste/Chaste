@@ -41,6 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define BOOST_DISABLE_ASSERTS
 #include <boost/multi_array.hpp>
 
-using namespace boost;
+using boost::multi_array;
+using boost::extents;
 
 #endif /*IMMERSEDBOUNDARYARRAY_HPP_*/
