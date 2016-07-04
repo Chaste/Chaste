@@ -49,6 +49,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FluidSource.hpp"
 #include "SmartPointers.hpp"
 
+#include "ForwardEulerNumericalMethod.hpp"
+#include <boost/make_shared.hpp>
+
 #include "Debug.hpp"
 
 
@@ -87,7 +90,7 @@ public:
         p_mesh->SetNumGridPtsXAndY(64);
 
         std::vector<CellPtr> cells;
-        MAKE_PTR(TransitCellProliferativeType, p_cell_type);
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_cell_type);
         CellsGenerator<UniformlyDistributedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_cell_type);
 
@@ -95,6 +98,8 @@ public:
         cell_population.SetIfPopulationHasActiveSources(false);
 
         OffLatticeSimulation<2> simulator(cell_population);
+        simulator.SetNumericalMethod(boost::make_shared<ForwardEulerNumericalMethod<2,2> >());
+        simulator.GetNumericalMethod()->SetUseUpdateNodeLocation(true);
 
         // Add main immersed boundary simulation modifier
         MAKE_PTR(ImmersedBoundarySimulationModifier<2>, p_main_modifier);
@@ -110,7 +115,7 @@ public:
         simulator.SetOutputDirectory("TestShortSingleCellSimulation");
         simulator.SetDt(dt);
         simulator.SetSamplingTimestepMultiple(1);
-        simulator.SetEndTime(5000 * dt);
+        simulator.SetEndTime(2000 * dt);
 
         simulator.Solve();
 
