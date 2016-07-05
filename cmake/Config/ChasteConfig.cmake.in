@@ -85,12 +85,12 @@ if(NOT TARGET global AND NOT Chaste_BINARY_DIR)
     set(Chaste_crypt_INCLUDE_DIRS @EXPORT_Chaste_crypt_INCLUDE_DIRS@)
     set(Chaste_lung_INCLUDE_DIRS @EXPORT_Chaste_lung_INCLUDE_DIRS@)
     set(Chaste_heart_INCLUDE_DIRS @EXPORT_Chaste_heart_INCLUDE_DIRS@)
+    @EXPORT_Chaste_ADDITIONAL_PROJECTS@
 
     set(Chaste_INCLUDES @Chaste_INCLUDES@)
     set(Chaste_LINK_LIBRARIES @Chaste_LINK_LIBRARIES@)
 
     set(Chaste_ALL_LIBRARIES @Chaste_ALL_LIBRARIES@)
-
 
     # Our library dependencies (contains definitions for IMPORTED targets)
     include("${Chaste_CMAKE_DIR}/ChasteTargets.cmake")

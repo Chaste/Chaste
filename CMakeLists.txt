@@ -249,7 +249,7 @@ if(BUILD_SHARED_LIBS)
 else()
 	set( Boost_USE_STATIC_LIBS ON) 
 endif()
-find_package(Boost COMPONENTS filesystem system serialization REQUIRED)
+find_package(Boost COMPONENTS filesystem system serialization program_options REQUIRED)
 list(APPEND Chaste_INCLUDES "${Boost_INCLUDE_DIR}")
 list(APPEND Chaste_LINK_LIBRARIES "${Boost_LIBRARIES}")
 
@@ -404,6 +404,7 @@ foreach(potential_dir ${potential_dirs})
         # test for CMakeLists.txt file
         if (EXISTS "${Chaste_SOURCE_DIR}/projects/${potential_dir}/CMakeLists.txt")
             list(APPEND Chaste_PROJECTS "${potential_dir}")
+            set(Chaste_ENABLE_project_${potential_dir}_INSTALL OFF CACHE BOOL "Install ${project} along with standard Chaste libraries.")
         else()
             message(WARNING "No CMakeLists.txt file found in project directory ${Chaste_SOURCE_DIR}/projects/${potential_dir}. This project will not be built")
         endif()
@@ -420,17 +421,26 @@ add_custom_target(tutorials)
 # setup test pack and component testing targets #
 #################################################
 
+set(Chaste_ALL_LIBRARIES "")
 if (Chaste_ENABLE_TESTING) 
     foreach(type ${TestPackTypes})
         add_custom_target(${type})
     endforeach()
 
     foreach(component ${Chaste_COMPONENTS})
+        # ${component} target will build library and tests
         add_custom_target(${component})
+        # chaste_${component} is the actual library target
+        list(APPEND Chaste_ALL_LIBRARIES chaste_${component})
     endforeach()
 
     foreach(project ${Chaste_PROJECTS})
+        # project_${project} target will build library and tests
         add_custom_target(project_${project})
+        # chaste_project_${project} target is the actual library target
+        if (Chaste_ENABLE_project_${project}_INSTALL)
+            list(APPEND Chaste_ALL_LIBRARIES chaste_project_${project})
+        endif()
     endforeach()
 
     add_custom_target(core)
@@ -458,17 +468,17 @@ set(Chaste_DEPENDS_core global io linalg mesh ode pde continuum_mechanics)
 # Add dependencies to core target
 add_dependencies(core ${Chaste_DEPENDS_core})
 
-
-set(Chaste_ALL_LIBRARIES "")
-foreach(component ${Chaste_COMPONENTS})
-    list(APPEND Chaste_ALL_LIBRARIES chaste_${component})
-endforeach()
-
 foreach(component ${Chaste_COMPONENTS})
     set(Chaste_${component}_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/${component}/src")
     header_dirs(${Chaste_${component}_SOURCE_DIR} Chaste_${component}_SOURCE_INCLUDE_DIRS)
     cellml_dirs(${Chaste_${component}_SOURCE_DIR} Chaste_${component}_CELLML_DIRS)
 endforeach(component)
+
+foreach(project ${Chaste_PROJECTS})
+    set(Chaste_project_${project}_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/projects/${project}/src")
+    header_dirs(${Chaste_project_${project}_SOURCE_DIR} Chaste_project_${project}_SOURCE_INCLUDE_DIRS)
+    cellml_dirs(${Chaste_project_${project}_SOURCE_DIR} Chaste_project_${project}_CELLML_DIRS)
+endforeach(project)
 
 # for now, assume only heart has xsd files
 set(Chaste_heart_XSD_DIRS ${Chaste_heart_SOURCE_DIR}/io)
@@ -479,6 +489,14 @@ foreach(component ${Chaste_COMPONENTS})
     foreach(dir ${Chaste_${component}_CELLML_DIRS} ${Chaste_${component}_XSD_DIRS})
         file(RELATIVE_PATH rel_dir "${Chaste_SOURCE_DIR}" "${dir}")
         list(APPEND Chaste_${component}_INCLUDE_DIRS ${Chaste_BINARY_DIR}/${rel_dir})
+    endforeach()
+endforeach()
+
+foreach(project ${Chaste_PROJECTS})
+    set(Chaste_project_${project}_INCLUDE_DIRS ${Chaste_project_${project}_SOURCE_INCLUDE_DIRS})
+    foreach(dir ${Chaste_project_${project}_CELLML_DIRS})
+        file(RELATIVE_PATH rel_dir "${Chaste_SOURCE_DIR}" "${dir}")
+        list(APPEND Chaste_project_${project}_INCLUDE_DIRS ${Chaste_BINARY_DIR}/${rel_dir})
     endforeach()
 endforeach()
 
@@ -547,6 +565,14 @@ foreach(component ${Chaste_COMPONENTS})
         list(APPEND EXPORT_Chaste_${component}_INCLUDE_DIRS "\${Chaste_CMAKE_DIR}/../../include/chaste/${component}/${rel_dir}")
     endforeach()
 endforeach(component)
+
+
+set(EXPORT_Chaste_ADDITIONAL_PROJECTS "")
+foreach(project ${Chaste_PROJECTS})
+    if (Chaste_ENABLE_project_${project}_INSTALL)
+        set(EXPORT_Chaste_ADDITIONAL_PROJECTS "${EXPORT_Chaste_ADDITIONAL_PROJECTS}\n\tset(Chaste_project_${project}_INCLUDE_DIRS ${Chaste_project_${project}_INCLUDE_DIRS})")
+    endif()
+endforeach()
 
 configure_file(${Chaste_SOURCE_DIR}/cmake/Config/ChasteConfig.cmake.in
     "${Chaste_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/ChasteConfig.cmake" @ONLY)
