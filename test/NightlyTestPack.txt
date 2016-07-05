@@ -1,4 +1,3 @@
-ImmersedBoundaryNumerics.hpp
 TestImmersedBoundaryDemoTutorial.hpp
 numerics_paper/TestNumericsPaperSimulations.hpp
 numerics_paper/TestImmersedBoundaryProfiling512.hpp
