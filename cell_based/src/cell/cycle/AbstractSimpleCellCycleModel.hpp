@@ -74,9 +74,8 @@ private:
 protected:
 
     /**
-     * Duration of G1 phase for stem cells.
+     * Duration of cell cycle.
      * May be used as a mean duration for stochastic cell-cycle models.
-     *
      */
     double mCellCycleDuration;
 
