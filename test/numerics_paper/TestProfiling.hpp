@@ -50,33 +50,44 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ImmersedBoundaryMesh.hpp"
 #include "ImmersedBoundaryCellPopulation.hpp"
 #include "ImmersedBoundarySimulationModifier.hpp"
-#include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
+#include "ImmersedBoundaryHoneycombMeshGenerator.hpp"
 #include "ImmersedBoundaryMembraneElasticityForce.hpp"
 #include "ImmersedBoundaryCellCellInteractionForce.hpp"
 
+#include "ForwardEulerNumericalMethod.hpp"
+#include <boost/lexical_cast.hpp>
+#include <boost/make_shared.hpp>
+
 #include "Debug.hpp"
+#include "Timer.hpp"
 
 // Simulation does not run in parallel
 #include "FakePetscSetup.hpp"
 
-class TestImmersedBoundaryProfiling2048 : public AbstractCellBasedTestSuite
+class TestProfiling : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestProfile2048() throw(Exception)
+    /**
+     * A helper defining a profiling test with settable variables.  Each simulation defines a hexagonal packing which
+     * relaxes for a fixed number of time steps.
+     *
+     * @param numGridPts  the number of fluid grid points in each dimension
+     * @param numNodesPerSide  the number of nodes on each side of each hexagon
+     */
+    void Profile(unsigned numGridPts, unsigned numNodesPerSide)
     {
-        /*
-         * 1: Num cells
-         * 2: Num nodes per cell
-         * 3: Superellipse exponent
-         * 4: Superellipse aspect ratio
-         * 5: Random y-variation
-         * 6: Include membrane
+        /**
+         * @param numElementsX  the number of cells from left to right along the domain
+         * @param numElementsY  the number of cells from top to bottom up the domain
+         * @param numNodesPerCell  the number of nodes per cell (defaults to 100)
+         * @param proportionalGap  the proportion of space between elements
+         * @param padding  the minimum padding around the edge of the generated mesh
          */
-        ImmersedBoundaryPalisadeMeshGenerator gen(12, 1024, 0.1, 2.5, 0.0, true);
+        ImmersedBoundaryHoneycombMeshGenerator gen(5, 4, numNodesPerSide, 0.025, 0.1);
         ImmersedBoundaryMesh<2, 2>* p_mesh = gen.GetMesh();
 
-        p_mesh->SetNumGridPtsXAndY(2048);
+        p_mesh->SetNumGridPtsXAndY(numGridPts);
 
         PRINT_VARIABLE(p_mesh->GetSpacingRatio());
 
@@ -89,6 +100,8 @@ public:
         cell_population.SetIfPopulationHasActiveSources(false);
 
         OffLatticeSimulation<2> simulator(cell_population);
+        simulator.SetNumericalMethod(boost::make_shared<ForwardEulerNumericalMethod<2,2> >());
+        simulator.GetNumericalMethod()->SetUseUpdateNodeLocation(true);
 
         // Add main immersed boundary simulation modifier
         MAKE_PTR(ImmersedBoundarySimulationModifier<2>, p_main_modifier);
@@ -103,14 +116,47 @@ public:
         p_main_modifier->AddImmersedBoundaryForce(p_cell_cell_force);
         p_cell_cell_force->SetSpringConstant(1e6);
 
-        std::string output_directory = "numerics_paper/profiling_2048";
+        std::string output_directory = "numerics_paper/profiling_" + boost::lexical_cast<std::string>(numGridPts);
         simulator.SetOutputDirectory(output_directory);
 
         // Set simulation properties
         double dt = 0.01;
         simulator.SetDt(dt);
-        simulator.SetSamplingTimestepMultiple(10);
-        simulator.SetEndTime(10000 * dt);
+        simulator.SetSamplingTimestepMultiple(1);
+        simulator.SetEndTime(2000 * dt);
         simulator.Solve();
+
+        // Because this will be run multiple times, we destroy the SimulationTime singleton
+        SimulationTime::Destroy();
+    }
+
+    void TestProfile512() throw(Exception)
+    {
+        Timer timer;
+        timer.Reset();
+
+        Profile(512, 50);
+
+        PRINT_VARIABLE(timer.GetElapsedTime());
+    }
+
+    void TestProfile1024() throw(Exception)
+    {
+        Timer timer;
+        timer.Reset();
+
+        Profile(1024, 100);
+
+        PRINT_VARIABLE(timer.GetElapsedTime());
+    }
+
+    void TestProfile2048() throw(Exception)
+    {
+        Timer timer;
+        timer.Reset();
+
+        Profile(2048, 200);
+
+        PRINT_VARIABLE(timer.GetElapsedTime());
     }
 };

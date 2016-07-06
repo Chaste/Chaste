@@ -1,5 +1,3 @@
 TestImmersedBoundaryDemoTutorial.hpp
 numerics_paper/TestNumericsPaperSimulations.hpp
-numerics_paper/TestImmersedBoundaryProfiling512.hpp
-numerics_paper/TestImmersedBoundaryProfiling1024.hpp
-numerics_paper/TestImmersedBoundaryProfiling2048.hpp
+numerics_paper/TestProfiling.hpp
