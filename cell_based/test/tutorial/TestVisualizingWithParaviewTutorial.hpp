@@ -53,7 +53,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * EMPTYLINE
  *
- * In this tutorial we show how Chaste is used to generate simulations
+ * In this tutorial we show how Chaste can be used to generate simulations
  * that can be viewed in Paraview, and how to use Paraview itself. Four examples
  * are provided: the first two use a `MeshBasedCellPopulation` (a cell-centre model
  * based on a Delaunay triangulation description of cell neighbours);
