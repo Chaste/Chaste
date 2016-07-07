@@ -262,7 +262,7 @@ public:
     {
         {
             /* HOW_TO_TAG General
-             * Use mock/pretend command line arguments
+             * Use mock (pretend) command line arguments
              */
             CommandLineArgumentsMocker wrapper("--option1 choice1 --option2 2 --option3 1.0 2.0 3.0");
 
