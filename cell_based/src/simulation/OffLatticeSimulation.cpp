@@ -86,7 +86,7 @@ OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::OffLatticeSimulation(AbstractCellPo
          * (except user-derived classes), i.e. if you want to use this method with your own
          * subclass of AbstractOffLatticeCellPopulation, then simply comment out the line below.
          */
-        NEVER_REACHED;
+//        NEVER_REACHED;
     }
 }
 
