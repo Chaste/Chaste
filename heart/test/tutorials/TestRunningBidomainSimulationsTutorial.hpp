@@ -74,15 +74,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscSetupAndFinalize.hpp"
 
 /* HOW_TO_TAG Cardiac/Problem definition
- * Use different cell models, defined using cellml files
+ * Use different cell models, defined using CellML files
  */
 
 /* The above files are contained in the source release and can be located and studied. Cardiac cell
- * models are different: the C++ code is automatically generated from cellml files. To use a particular
- * cellml file, place it in `heart/src/odes/cellml` (there are several in here already). If the cellml
+ * models are different: the C++ code is automatically generated from CellML files. To use a particular
+ * CellML file, place it in `heart/src/odes/cellml` (there are several in here already). If the CellML
  * is called `<CELLMODEL>.cellml`, a file `<CELLMODEL>.hpp` will be automatically generated, which will define
  * a class called `Cell<CELLMODEL>FromCellML`. So to use a particular cell model in a tissue simulation,
- * given the cellml, you just have to do two things: include this `.hpp` file, and then use the class.
+ * given the CellML, you just have to do two things: include this `.hpp` file, and then use the class.
  * For example, we will use the !LuoRudy1991 model, so we have to include the following, and
  * later on use {{{CellLuoRudy1991FromCellML}}} as the cell model class.
  * See ["ChasteGuides/CodeGenerationFromCellML"] for more information on this process.
