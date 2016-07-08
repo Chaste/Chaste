@@ -152,6 +152,16 @@ foreach( LIB ${SUNDIALS_WANT_COMPONENTS} )
     mark_as_advanced(SUNDIALS_${LIB}_LIBRARY)
 endforeach()
 
+# find blas and lapack
+find_package(LAPACK REQUIRED)
+if (BUILD_SHARED_LIBS)
+    find_package(LAPACK REQUIRED)
+else()
+    set(BLA_STATIC ON)
+    find_package(LAPACK REQUIRED)
+endif()
+
+list(APPEND SUNDIALS_LIBRARIES ${LAPACK_LIBRARIES})
 
 find_package_handle_standard_args( SUNDIALS DEFAULT_MSG
     SUNDIALS_LIBRARIES
