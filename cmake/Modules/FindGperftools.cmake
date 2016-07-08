@@ -61,7 +61,7 @@ find_library(GPERFTOOLS_TCMALLOC_AND_PROFILER
   HINTS ${Gperftools_ROOT_DIR}/lib)
 
 find_path(GPERFTOOLS_INCLUDE_DIR
-  NAMES gperftools/heap-profiler.h
+  NAMES gperftools/heap-profiler.h google/heap-profiler.h
   HINTS ${Gperftools_ROOT_DIR}/include)
 
 find_file(GPERFTOOLS_PPROF_EXE
