@@ -55,8 +55,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * == The test ==
  *
- * EMPTYLINE
- *
  * As in previous cell-based Chaste tutorials, we begin by including the necessary header files.
  */
 #include <cxxtest/TestSuite.h>
