@@ -47,8 +47,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*
  * = Examples showing how to create, run and visualize vertex-based simulations on periodic meshes with different cell-cycle models =
  *
- * EMPTYLINE
- *
  * == Introduction ==
  *
  * EMPTYLINE
