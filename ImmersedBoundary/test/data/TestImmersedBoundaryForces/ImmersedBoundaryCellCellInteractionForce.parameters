@@ -1,0 +1,5 @@
+			<SpringConst>1.2</SpringConst>
+			<RestLength>3.4</RestLength>
+			<NumProteins>3</NumProteins>
+			<LinearSpring>0</LinearSpring>
+			<Morse>1</Morse>
