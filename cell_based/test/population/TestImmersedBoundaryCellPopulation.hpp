@@ -326,7 +326,7 @@ public:
             cell_iter->GetCellData()->SetItem("var1", 3.0);
         }
 
-        std::string output_directory = "TestWritersWithImmersedBoundaryCellPopulation";
+        std::string output_directory = "TestImmersedBoundaryPopulationWriters";
         OutputFileHandler output_file_handler(output_directory, false);
 
         cell_population.OpenWritersFiles(output_file_handler);
@@ -341,22 +341,22 @@ public:
         // Compare output with saved files of what they should look like
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
-        FileComparison(results_dir + "results.viznodes", "projects/ImmersedBoundary/test/data/TestWritersWithImmersedBoundaryCellPopulation/results.viznodes").CompareFiles();
-        FileComparison(results_dir + "results.vizelements", "projects/ImmersedBoundary/test/data/TestWritersWithImmersedBoundaryCellPopulation/results.vizelements").CompareFiles();
+        FileComparison(results_dir + "results.viznodes", "cell_based/test/data/TestImmersedBoundaryPopulationWriters/results.viznodes").CompareFiles();
+        FileComparison(results_dir + "results.vizelements", "cell_based/test/data/TestImmersedBoundaryPopulationWriters/results.vizelements").CompareFiles();
 
-        FileComparison(results_dir + "cellages.dat", "projects/ImmersedBoundary/test/data/TestWritersWithImmersedBoundaryCellPopulation/cellages.dat").CompareFiles();
-        FileComparison(results_dir + "results.vizancestors", "projects/ImmersedBoundary/test/data/TestWritersWithImmersedBoundaryCellPopulation/results.vizancestors").CompareFiles();
-        FileComparison(results_dir + "loggedcell.dat", "projects/ImmersedBoundary/test/data/TestWritersWithImmersedBoundaryCellPopulation/loggedcell.dat").CompareFiles();
-        FileComparison(results_dir + "results.vizlabels", "projects/ImmersedBoundary/test/data/TestWritersWithImmersedBoundaryCellPopulation/results.vizlabels").CompareFiles();
-        FileComparison(results_dir + "results.vizlocationindices", "projects/ImmersedBoundary/test/data/TestWritersWithImmersedBoundaryCellPopulation/results.vizlocationindices").CompareFiles();
-        FileComparison(results_dir + "results.vizmutationstates", "projects/ImmersedBoundary/test/data/TestWritersWithImmersedBoundaryCellPopulation/results.vizmutationstates").CompareFiles();
-        FileComparison(results_dir + "results.vizcellphases", "projects/ImmersedBoundary/test/data/TestWritersWithImmersedBoundaryCellPopulation/results.vizcellphases").CompareFiles();
-        FileComparison(results_dir + "results.vizcelltypes", "projects/ImmersedBoundary/test/data/TestWritersWithImmersedBoundaryCellPopulation/results.vizcelltypes").CompareFiles();
-        FileComparison(results_dir + "cellareas.dat", "projects/ImmersedBoundary/test/data/TestWritersWithImmersedBoundaryCellPopulation/cellareas.dat").CompareFiles();
+        FileComparison(results_dir + "cellages.dat", "cell_based/test/data/TestImmersedBoundaryPopulationWriters/cellages.dat").CompareFiles();
+        FileComparison(results_dir + "results.vizancestors", "cell_based/test/data/TestImmersedBoundaryPopulationWriters/results.vizancestors").CompareFiles();
+        FileComparison(results_dir + "loggedcell.dat", "cell_based/test/data/TestImmersedBoundaryPopulationWriters/loggedcell.dat").CompareFiles();
+        FileComparison(results_dir + "results.vizlabels", "cell_based/test/data/TestImmersedBoundaryPopulationWriters/results.vizlabels").CompareFiles();
+        FileComparison(results_dir + "results.vizlocationindices", "cell_based/test/data/TestImmersedBoundaryPopulationWriters/results.vizlocationindices").CompareFiles();
+        FileComparison(results_dir + "results.vizmutationstates", "cell_based/test/data/TestImmersedBoundaryPopulationWriters/results.vizmutationstates").CompareFiles();
+        FileComparison(results_dir + "results.vizcellphases", "cell_based/test/data/TestImmersedBoundaryPopulationWriters/results.vizcellphases").CompareFiles();
+        FileComparison(results_dir + "results.vizcelltypes", "cell_based/test/data/TestImmersedBoundaryPopulationWriters/results.vizcelltypes").CompareFiles();
+        FileComparison(results_dir + "cellareas.dat", "cell_based/test/data/TestImmersedBoundaryPopulationWriters/cellareas.dat").CompareFiles();
 
-        FileComparison(results_dir + "cellmutationstates.dat", "projects/ImmersedBoundary/test/data/TestWritersWithImmersedBoundaryCellPopulation/cellmutationstates.dat").CompareFiles();
-        FileComparison(results_dir + "cellcyclephases.dat", "projects/ImmersedBoundary/test/data/TestWritersWithImmersedBoundaryCellPopulation/cellcyclephases.dat").CompareFiles();
-        FileComparison(results_dir + "celltypes.dat", "projects/ImmersedBoundary/test/data/TestWritersWithImmersedBoundaryCellPopulation/celltypes.dat").CompareFiles();
+        FileComparison(results_dir + "cellmutationstates.dat", "cell_based/test/data/TestImmersedBoundaryPopulationWriters/cellmutationstates.dat").CompareFiles();
+        FileComparison(results_dir + "cellcyclephases.dat", "cell_based/test/data/TestImmersedBoundaryPopulationWriters/cellcyclephases.dat").CompareFiles();
+        FileComparison(results_dir + "celltypes.dat", "cell_based/test/data/TestImmersedBoundaryPopulationWriters/celltypes.dat").CompareFiles();
 
         // Test the GetCellMutationStateCount function
         std::vector<unsigned> cell_mutation_states = cell_population.GetCellMutationStateCount();
@@ -379,7 +379,7 @@ public:
         cell_population.OutputCellPopulationParameters(parameter_file);
         parameter_file->close();
 
-        FileComparison( results_dir + "results.parameters", "projects/ImmersedBoundary/test/data/TestWritersWithImmersedBoundaryCellPopulation/results.parameters").CompareFiles();
+        FileComparison( results_dir + "results.parameters", "cell_based/test/data/TestImmersedBoundaryPopulationWriters/results.parameters").CompareFiles();
 
 #ifdef CHASTE_VTK
         // Test that VTK writer has produced some files
