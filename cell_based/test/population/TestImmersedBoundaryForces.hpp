@@ -33,6 +33,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#ifndef TESTIMMERSEDBOUNDARYFORCES_HPP_
+#define TESTIMMERSEDBOUNDARYFORCES_HPP_
+
 // Needed for test framework
 #include <cxxtest/TestSuite.h>
 
@@ -197,3 +200,5 @@ public:
         other_file->close();
     }
 };
+
+#endif /*TESTIMMERSEDBOUNDARYFORCES_HPP_*/

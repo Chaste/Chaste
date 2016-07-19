@@ -33,6 +33,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  */
 
+#ifndef TESTGENERATEFFTWWISDOM_HPP_
+#define TESTGENERATEFFTWWISDOM_HPP_
+
 // Needed for test framework
 #include <cxxtest/cxxtest/TestSuite.h>
 
@@ -243,3 +246,5 @@ public:
         }
     }
 };
+
+#endif /*TESTGENERATEFFTWWISDOM_HPP_*/

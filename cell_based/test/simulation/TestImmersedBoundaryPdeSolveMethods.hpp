@@ -33,14 +33,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  */
 
+#ifndef TESTIMMERSEDBOUNDARYPDESOLVEMETHODS_HPP_
+#define TESTIMMERSEDBOUNDARYPDESOLVEMETHODS_HPP_
+
 // Needed for test framework
 #include <cxxtest/TestSuite.h>
 #include "AbstractCellBasedTestSuite.hpp"
-
-// Needed for immersed boundary simulations
-#include <complex>
-#include <fftw3.h>
-#include "Timer.hpp"
 
 #define BOOST_DISABLE_ASSERTS
 #include "boost/multi_array.hpp"
@@ -566,3 +564,5 @@ public:
 //        }
     }
 };
+
+#endif /*TESTIMMERSEDBOUNDARYPDESOLVEMETHODS_HPP_*/

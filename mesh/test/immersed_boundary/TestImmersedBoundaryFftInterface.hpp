@@ -33,6 +33,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#ifndef TESTFLUIDSOURCE_HPP_
+#define TESTFLUIDSOURCE_HPP_
+
 // Needed for test framework
 #include <cxxtest/TestSuite.h>
 
@@ -61,3 +64,5 @@ public:
         ///\todo Test this method
     }
 };
+
+#endif /*TESTFLUIDSOURCE_HPP_*/

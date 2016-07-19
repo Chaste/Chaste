@@ -33,6 +33,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#ifndef TESTIMMERSEDBOUNDARYSIMULATIONMODIFIER_HPP_
+#define TESTIMMERSEDBOUNDARYSIMULATIONMODIFIER_HPP_
+
 // Needed for the test environment
 #include <cxxtest/TestSuite.h>
 #include "AbstractCellBasedTestSuite.hpp"
@@ -291,3 +294,5 @@ public:
         TS_ASSERT_DELTA(p_mesh->GetNode(5)->rGetAppliedForce()[1], 16800.5590, 1e-3);
     }
 };
+
+#endif /*TESTIMMERSEDBOUNDARYSIMULATIONMODIFIER_HPP_*/

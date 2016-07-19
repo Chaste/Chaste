@@ -33,6 +33,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#ifndef TESTIMMERSEDBOUNDARYELEMENT_HPP_
+#define TESTIMMERSEDBOUNDARYELEMENT_HPP_
+
 // Needed for test framework
 #include <cxxtest/TestSuite.h>
 
@@ -79,3 +82,5 @@ public:
         TS_ASSERT_DELTA(element.GetAverageNodeSpacing(), 0.123, 1e-6);
     }
 };
+
+#endif /*TESTIMMERSEDBOUNDARYELEMENT_HPP_*/

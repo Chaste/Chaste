@@ -33,6 +33,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#ifndef TESTIMMERSEDBOUNDARY2DARRAYS_HPP_
+#define TESTIMMERSEDBOUNDARY2DARRAYS_HPP_
+
 // Needed for test framework
 #include <cxxtest/TestSuite.h>
 
@@ -131,3 +134,5 @@ public:
         TS_ASSERT_EQUALS(arrays.rGetModifiablePressureGrid().shape()[1], 4u);
     }
 };
+
+#endif /*TESTIMMERSEDBOUNDARY2DARRAYS_HPP_*/

@@ -33,6 +33,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#ifndef TESTIMMERSEDBOUNDARYCELLPOPULATION_HPP_
+#define TESTIMMERSEDBOUNDARYCELLPOPULATION_HPP_
+
 // Needed for the test environment
 #include <cxxtest/TestSuite.h>
 #include "AbstractCellBasedTestSuite.hpp"
@@ -145,7 +148,7 @@ public:
         TS_ASSERT_EQUALS(p_element_0->GetNumNodes(), 83u);
 
         // Note: we cannot yet test the corner nodes or average node spacing of this element;
-        //       these are set in the ImmersedBoundarMesh method DivideElement()
+        //       these are set in the ImmersedBoundaryMesh method DivideElement()
 
         // Test that GetElementCorrespondingToCell() returns an element correctly
         CellPtr p_cell_0 = *(cell_population.Begin());
@@ -400,3 +403,5 @@ public:
 
     ///\todo Test archiving?
 };
+
+#endif /*TESTIMMERSEDBOUNDARYCELLPOPULATION_HPP_*/

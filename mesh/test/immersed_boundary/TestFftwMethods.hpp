@@ -33,6 +33,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  */
 
+#ifndef TESTFFTWMETHODS_HPP_
+#define TESTFFTWMETHODS_HPP_
+
 // Needed for test framework
 #include <cxxtest/TestSuite.h>
 
@@ -118,3 +121,5 @@ public:
         }
     }
 };
+
+#endif /*TESTFFTWMETHODS_HPP_*/

@@ -33,6 +33,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#ifndef TESTFLUIDSOURCE_HPP_
+#define TESTFLUIDSOURCE_HPP_
+
 #include <cxxtest/TestSuite.h>
 
 #include "FluidSource.hpp"
@@ -130,3 +133,5 @@ public:
         TS_ASSERT_EQUALS(source.GetAssociatedElementIndex(), 15u);
     }
 };
+
+#endif /*TESTFLUIDSOURCE_HPP_*/

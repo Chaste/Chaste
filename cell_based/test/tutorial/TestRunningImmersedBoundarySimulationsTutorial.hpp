@@ -52,9 +52,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 #include "AbstractCellBasedTestSuite.hpp"
 
-/* External library required for FFT used in solving Navier-Stokes */
-#include <fftw3.h>
-
 /* Required for core elements of the Chaste simulation environment */
 #include "CellsGenerator.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"

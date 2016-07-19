@@ -33,6 +33,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#ifndef TESTIMMERSEDBOUNDARYMESHREADER_HPP_
+#define TESTIMMERSEDBOUNDARYMESHREADER_HPP_
+
 // Needed for test framework
 #include <cxxtest/TestSuite.h>
 
@@ -55,3 +58,5 @@ public:
     {
     }
 };
+
+#endif /*TESTIMMERSEDBOUNDARYMESHREADER_HPP_*/

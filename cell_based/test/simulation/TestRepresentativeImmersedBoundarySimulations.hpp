@@ -33,6 +33,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  */
 
+#ifndef TESTREPRESENTATIVEIMMERSEDBOUNDARYSIMULATIONS_HPP_
+#define TESTREPRESENTATIVEIMMERSEDBOUNDARYSIMULATIONS_HPP_
+
 // Needed for the test environment
 #include <cxxtest/cxxtest/TestSuite.h>
 #include "AbstractCellBasedTestSuite.hpp"
@@ -46,6 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ImmersedBoundarySimulationModifier.hpp"
 #include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
 #include "ImmersedBoundaryMembraneElasticityForce.hpp"
+#include "ImmersedBoundaryCellCellInteractionForce.hpp"
 #include "FluidSource.hpp"
 #include "SmartPointers.hpp"
 
@@ -216,3 +220,6 @@ public:
         simulator.Solve();
     }
 };
+
+
+#endif /*TESTREPRESENTATIVEIMMERSEDBOUNDARYSIMULATIONS_HPP_*/
