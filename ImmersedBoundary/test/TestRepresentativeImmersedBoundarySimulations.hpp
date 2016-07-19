@@ -58,7 +58,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Simulation does not run in parallel
 #include "FakePetscSetup.hpp"
 
-class TestShortSingleCellSimulation : public AbstractCellBasedTestSuite
+class TestRepresentativeImmersedBoundarySimulations : public AbstractCellBasedTestSuite
 {
 public:
 
@@ -72,8 +72,7 @@ public:
          * 5: bottom left x
          * 6: bottom left y
          */
-        double diam = 0.3;
-        SuperellipseGenerator* p_gen = new SuperellipseGenerator(128, 1.0, 0.3, 0.5, 0.5-0.5*diam, 0.25);
+        SuperellipseGenerator* p_gen = new SuperellipseGenerator(128, 1.0, 0.4, 0.6, 0.3, 0.2);
         std::vector<c_vector<double, 2> > locations = p_gen->GetPointsAsVectors();
 
         std::vector<Node<2>* > nodes;
@@ -105,7 +104,7 @@ public:
         MAKE_PTR(ImmersedBoundarySimulationModifier<2>, p_main_modifier);
         simulator.AddSimulationModifier(p_main_modifier);
 
-        // Add force laws
+        // Add force law
         MAKE_PTR(ImmersedBoundaryMembraneElasticityForce<2>, p_boundary_force);
         p_main_modifier->AddImmersedBoundaryForce(p_boundary_force);
         p_boundary_force->SetSpringConstant(5e7);
@@ -115,11 +114,105 @@ public:
         simulator.SetOutputDirectory("TestShortSingleCellSimulation");
         simulator.SetDt(dt);
         simulator.SetSamplingTimestepMultiple(1);
-        simulator.SetEndTime(2000 * dt);
+        simulator.SetEndTime(100 * dt);
 
         simulator.Solve();
+    }
 
-        PRINT_VECTOR(p_mesh->GetCentroidOfElement(0));
+    void TestShortTwoCellSim() throw(Exception)
+    {
+        /*
+         * 1: Num cells
+         * 2: Num nodes per cell
+         * 3: Superellipse exponent
+         * 4: Superellipse aspect ratio
+         * 5: Random y-variation
+         * 6: Include membrane
+         */
+        ImmersedBoundaryPalisadeMeshGenerator gen(2, 128, 0.1, 2.0, 0.0, false);
+        ImmersedBoundaryMesh<2, 2>* p_mesh = gen.GetMesh();
 
+        p_mesh->SetNumGridPtsXAndY(64);
+
+        std::vector<CellPtr> cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+        CellsGenerator<UniformlyDistributedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
+
+        ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
+        cell_population.SetIfPopulationHasActiveSources(true);
+
+        OffLatticeSimulation<2> simulator(cell_population);
+
+        // Add main immersed boundary simulation modifier
+        MAKE_PTR(ImmersedBoundarySimulationModifier<2>, p_main_modifier);
+        simulator.AddSimulationModifier(p_main_modifier);
+
+        // Add force laws
+        MAKE_PTR(ImmersedBoundaryMembraneElasticityForce<2>, p_boundary_force);
+        p_main_modifier->AddImmersedBoundaryForce(p_boundary_force);
+        p_boundary_force->SetSpringConstant(1.0 * 1e7);
+
+        MAKE_PTR(ImmersedBoundaryCellCellInteractionForce<2>, p_cell_cell_force);
+        p_main_modifier->AddImmersedBoundaryForce(p_cell_cell_force);
+        p_boundary_force->SetSpringConstant(1.0 * 1e6);
+
+        // Set simulation properties
+        double dt = 0.01;
+        simulator.SetOutputDirectory("TestShortTwoCellSimulation");
+        simulator.SetDt(dt);
+        simulator.SetSamplingTimestepMultiple(1);
+        simulator.SetEndTime(100.0 * dt);
+
+        simulator.Solve();
+    }
+
+
+    void TestShortMultiCellSim() throw(Exception)
+    {
+        /*
+         * 1: Num cells
+         * 2: Num nodes per cell
+         * 3: Superellipse exponent
+         * 4: Superellipse aspect ratio
+         * 5: Random y-variation
+         * 6: Include membrane
+         */
+        ImmersedBoundaryPalisadeMeshGenerator gen(11, 128, 0.1, 2.0, 0.0, true);
+        ImmersedBoundaryMesh<2, 2>* p_mesh = gen.GetMesh();
+
+        p_mesh->SetNumGridPtsXAndY(256);
+
+        std::vector<CellPtr> cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+        CellsGenerator<UniformlyDistributedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
+
+        ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
+        cell_population.SetIfPopulationHasActiveSources(false);
+
+        OffLatticeSimulation<2> simulator(cell_population);
+
+        // Add main immersed boundary simulation modifier
+        MAKE_PTR(ImmersedBoundarySimulationModifier<2>, p_main_modifier);
+        simulator.AddSimulationModifier(p_main_modifier);
+
+        // Add force laws
+        MAKE_PTR(ImmersedBoundaryMembraneElasticityForce<2>, p_boundary_force);
+        p_main_modifier->AddImmersedBoundaryForce(p_boundary_force);
+        p_boundary_force->SetSpringConstant(1.0 * 1e7);
+
+        MAKE_PTR(ImmersedBoundaryCellCellInteractionForce<2>, p_cell_cell_force);
+        p_main_modifier->AddImmersedBoundaryForce(p_cell_cell_force);
+        p_cell_cell_force->SetSpringConstant(1.0 * 1e6);
+
+        // Set simulation properties
+        double dt = 0.01;
+        simulator.SetOutputDirectory("TestShortMultiCellSimulation");
+        simulator.SetDt(dt);
+        simulator.SetSamplingTimestepMultiple(1);
+        simulator.SetEndTime(100.0 * dt);
+        
+        simulator.Solve();
     }
 };
