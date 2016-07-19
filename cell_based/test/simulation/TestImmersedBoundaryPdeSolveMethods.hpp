@@ -218,7 +218,7 @@ public:
 //
 //        // Read in vel_x
 //        ifstream f_vel_x;
-//        f_vel_x.open("projects/ImmersedBoundary/test/data/vel_x.dat");
+//        f_vel_x.open("cell_based/test/data/TestImmersedBoundaryPdeSolveMethods/vel_x.dat");
 //        for (unsigned y = 0; y < num_gridpts_y; y++)
 //        {
 //            for (unsigned x = 0; x < num_gridpts_x; x++)
@@ -230,7 +230,7 @@ public:
 //
 //        // Read in vel_y
 //        ifstream f_vel_y;
-//        f_vel_y.open("projects/ImmersedBoundary/test/data/vel_y.dat");
+//        f_vel_y.open("cell_based/test/data/TestImmersedBoundaryPdeSolveMethods/vel_y.dat");
 //        for (unsigned y = 0; y < num_gridpts_y; y++)
 //        {
 //            for (unsigned x = 0; x < num_gridpts_x; x++)
@@ -242,7 +242,7 @@ public:
 //
 //        // Read in hand_upwind_x
 //        ifstream f_hand_upwind_x;
-//        f_hand_upwind_x.open("projects/ImmersedBoundary/test/data/upwind_x.dat");
+//        f_hand_upwind_x.open("cell_based/test/data/TestImmersedBoundaryPdeSolveMethods/upwind_x.dat");
 //        for (unsigned y = 0; y < num_gridpts_y; y++)
 //        {
 //            for (unsigned x = 0; x < num_gridpts_x; x++)
@@ -254,7 +254,7 @@ public:
 //
 //        // Read in hand_upwind_y
 //        ifstream f_hand_upwind_y;
-//        f_hand_upwind_y.open("projects/ImmersedBoundary/test/data/upwind_y.dat");
+//        f_hand_upwind_y.open("cell_based/test/data/TestImmersedBoundaryPdeSolveMethods/upwind_y.dat");
 //        for (unsigned y = 0; y < num_gridpts_y; y++)
 //        {
 //            for (unsigned x = 0; x < num_gridpts_x; x++)
@@ -312,7 +312,7 @@ public:
 //
 //        // Read in matrix_a
 //        ifstream f_randn_mat_a;
-//        f_randn_mat_a.open("projects/ImmersedBoundary/test/data/matrix_a.dat");
+//        f_randn_mat_a.open("cell_based/test/data/TestImmersedBoundaryPdeSolveMethods/matrix_a.dat");
 //        for (unsigned y = 0; y < num_gridpts_y; y++)
 //        {
 //            for (unsigned x = 0; x < num_gridpts_x; x++)
@@ -324,7 +324,7 @@ public:
 //
 //        // Read in matrix_b
 //        ifstream f_randn_mat_b;
-//        f_randn_mat_b.open("projects/ImmersedBoundary/test/data/matrix_b.dat");
+//        f_randn_mat_b.open("cell_based/test/data/TestImmersedBoundaryPdeSolveMethods/matrix_b.dat");
 //        for (unsigned y = 0; y < num_gridpts_y; y++)
 //        {
 //            for (unsigned x = 0; x < num_gridpts_x; x++)
@@ -336,8 +336,8 @@ public:
 //
 //        // Read in the fft of matrix_a
 //        ifstream f_real, f_imag;
-//        f_real.open("projects/ImmersedBoundary/test/data/ffta_real.dat");
-//        f_imag.open("projects/ImmersedBoundary/test/data/ffta_imag.dat");
+//        f_real.open("cell_based/test/data/TestImmersedBoundaryPdeSolveMethods/ffta_real.dat");
+//        f_imag.open("cell_based/test/data/TestImmersedBoundaryPdeSolveMethods/ffta_imag.dat");
 //        double real_temp;
 //        double imag_temp;
 //        for (unsigned y = 0; y < num_gridpts_y; y++)
@@ -354,7 +354,7 @@ public:
 //
 //        // Read in real part of the inverse transform of mat_a + i * mat_b;
 //        ifstream f_ifft;
-//        f_ifft.open("projects/ImmersedBoundary/test/data/ifftaplusib_real.dat");
+//        f_ifft.open("cell_based/test/data/TestImmersedBoundaryPdeSolveMethods/ifftaplusib_real.dat");
 //        for (unsigned y = 0; y < num_gridpts_y; y++)
 //        {
 //            for (unsigned x = 0; x < num_gridpts_x; x++)
