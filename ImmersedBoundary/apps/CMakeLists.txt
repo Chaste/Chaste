@@ -1,1 +1,0 @@
-chaste_do_apps_project(ImmersedBoundary)
