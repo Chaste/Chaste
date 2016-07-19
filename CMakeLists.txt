@@ -355,6 +355,10 @@ if (Chaste_USE_XERCES)
     add_definitions(-DCHASTE_XERCES)
 endif()
 
+
+# Add fftw
+list(APPEND Chaste_LINK_LIBRARIES "fftw3")
+
 add_definitions(-DTRILIBRARY -DTETLIBRARY -DANSI_DECLARATORS)
 
 set(CXXTEST_INCLUDES "${Chaste_BINARY_DIR}/cxxtest")
