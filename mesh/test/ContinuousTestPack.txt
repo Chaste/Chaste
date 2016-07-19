@@ -14,6 +14,7 @@ TestNonCachedTetrahedralMesh.hpp
 TestQuadraticMesh.hpp
 TestTetrahedralMesh.hpp
 TestTransformations.hpp
+immersed_boundary/TestImmersedBoundaryElement.hpp
 immersed_boundary/TestImmersedBoundaryMesh.hpp
 immersed_boundary/TestImmersedBoundaryMeshReader.hpp
 immersed_boundary/TestImmersedBoundaryMeshWriter.hpp
