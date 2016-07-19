@@ -49,9 +49,6 @@ class ImmersedBoundaryFftInterface
 {
 protected:
 
-    ///\todo document this member variable
-    int mThreadErrors;
-
     /** The immersed boundary mesh. */
     ImmersedBoundaryMesh<DIM,DIM>* mpMesh;
 
@@ -70,9 +67,6 @@ protected:
     /** Pointer to the start output array. */
     double* mpOutputArray;
 
-    /** The max number of threads to use for computing the DFT. */
-    bool mMultiThread;
-
 public:
 
     /**
@@ -82,14 +76,12 @@ public:
      * @param pIn pointer to the input array
      * @param pComplex pointer to the complex number array
      * @param pOut pointer to the output array
-     * @param multiThread whether to use multiple threads
      * @param activeSources whether the population has active fluid sources
      */
     ImmersedBoundaryFftInterface(ImmersedBoundaryMesh<DIM,DIM>* pMesh,
                                  double* pIn,
                                  std::complex<double>* pComplex,
                                  double* pOut,
-                                 bool multiThread,
                                  bool activeSources);
 
     /**

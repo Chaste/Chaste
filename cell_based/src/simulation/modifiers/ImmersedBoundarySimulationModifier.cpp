@@ -34,14 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "ImmersedBoundarySimulationModifier.hpp"
-
-//#include "Exception.hpp"
-//#include "Warnings.hpp"
-//#include <complex>
-//#include "Timer.hpp"
-//#include "FileFinder.hpp"
-//#include <fftw3.h>
-//#include <boost/thread.hpp>
 #include "FluidSource.hpp"
 
 template<unsigned DIM>
@@ -155,8 +147,6 @@ void ImmersedBoundarySimulationModifier<DIM>::SetupConstantMemberVariables(Abstr
     mpBoxCollection->SetupLocalBoxesHalfOnly();
     mpBoxCollection->CalculateNodePairs(mpMesh->rGetNodes(), mNodePairs);
 
-    bool multi_thread_fft = false;
-
     // Set up dimension-dependent variables
     switch (DIM)
     {
@@ -167,7 +157,6 @@ void ImmersedBoundarySimulationModifier<DIM>::SetupConstantMemberVariables(Abstr
                                                                    &(mpArrays->rGetModifiableRightHandSideGrids()[0][0][0]),
                                                                    &(mpArrays->rGetModifiableFourierGrids()[0][0][0]),
                                                                    &(mpMesh->rGetModifiable2dVelocityGrids()[0][0][0]),
-                                                                   multi_thread_fft,
                                                                    mpCellPopulation->DoesPopulationHaveActiveSources());
 
             mFftNorm = (double) mNumGridPtsX * (double) mNumGridPtsY;

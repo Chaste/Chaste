@@ -43,55 +43,30 @@ ImmersedBoundaryFftInterface<DIM>::ImmersedBoundaryFftInterface(ImmersedBoundary
                                                                 double* pIn,
                                                                 std::complex<double>* pComplex,
                                                                 double* pOut,
-                                                                bool multiThread,
                                                                 bool activeSources)
-    : mThreadErrors(multiThread ? fftw_init_threads() : 1),
-      mpMesh(pMesh),
+    : mpMesh(pMesh),
       mpInputArray(pIn),
       mpComplexArray(reinterpret_cast<fftw_complex*>(pComplex)),
-      mpOutputArray(pOut),
-      mMultiThread(multiThread)
+      mpOutputArray(pOut)
 {
     /*
      * Set up fftw routines
      */
 
-    // If more than one thread, the following must happen before any other fftw routines
-    if (mMultiThread)
-    {
-//        int potential_thread_errors = fftw_init_threads();
-
-        // 1 means success, 0 indicates a failure
-        if (mThreadErrors != 1)
-        {
-            EXCEPTION("fftw thread error");
-        }
-
-        // Plan with number of threads equal to the max number of arrays to transform
-        fftw_plan_with_nthreads(2 + (int)activeSources);
-    }
-
-    // Forget all wisdom; the correct wisdom for the number of threads used will be loaded from file
+    // Forget all wisdom; the correct wisdom will be loaded from file
     void fftw_forget_wisdom();
 
     // Path to the wisdom file
     std::string wisdom_path;
     std::string wisdom_filename;
 
-    if (!mMultiThread)
-    {
-        wisdom_filename = "fftw.wisdom";
-    }
-    else
-    {
-        wisdom_filename = "fftw_threads.wisdom";
-    }
 
+    wisdom_filename = "fftw.wisdom";
     FileFinder file_finder(wisdom_filename, RelativeTo::ChasteTestOutput);
 
     if (!file_finder.IsFile())
     {
-//        WARNING("It is strongly recommended to generate wisdom using TestGenerateFftwWisdom before using this code.");
+        WARNING("It is strongly recommended to generate wisdom using TestGenerateFftwWisdom before using this code.");
     }
 
     wisdom_path = file_finder.GetAbsolutePath();
@@ -101,7 +76,7 @@ ImmersedBoundaryFftInterface<DIM>::ImmersedBoundaryFftInterface(ImmersedBoundary
     // 1 means success, 0 indicates a failure
     if (wisdom_flag != 1)
     {
-//        WARNING("fftw wisdom not imported correctly");
+        WARNING("fftw wisdom not imported correctly");
     }
 
     int num_gridpts_x = (int)mpMesh->GetNumGridPtsX();
