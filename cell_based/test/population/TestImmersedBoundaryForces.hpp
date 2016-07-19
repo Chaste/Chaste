@@ -160,13 +160,13 @@ public:
 
         TS_ASSERT_EQUALS(cell_cell_force.GetIdentifier(), "ImmersedBoundaryCellCellInteractionForce-2");
 
-        out_stream cell_cell_force_parameter_file = output_file_handler.OpenOutputFile("ImmersedBoundaryCellCellInteractionForce.parameters");
+        out_stream cell_cell_force_parameter_file = output_file_handler.OpenOutputFile("ib_cell_cell.parameters");
         cell_cell_force.OutputImmersedBoundaryForceParameters(cell_cell_force_parameter_file);
         cell_cell_force_parameter_file->close();
 
         {
-            FileFinder generated_file = output_file_handler.FindFile("ImmersedBoundaryCellCellInteractionForce.parameters");
-            FileFinder reference_file("projects/ImmersedBoundary/test/data/TestImmersedBoundaryForces/ImmersedBoundaryCellCellInteractionForce.parameters",
+            FileFinder generated_file = output_file_handler.FindFile("ib_cell_cell.parameters");
+            FileFinder reference_file("cell_based/test/data/TestForces/ib_cell_cell.parameters",
                                       RelativeTo::ChasteSourceRoot);
             FileComparison comparer(generated_file,reference_file);
             TS_ASSERT(comparer.CompareFiles());
@@ -179,13 +179,13 @@ public:
 
         TS_ASSERT_EQUALS(membrane_force.GetIdentifier(), "ImmersedBoundaryMembraneElasticityForce-2");
 
-        out_stream membrane_force_parameter_file = output_file_handler.OpenOutputFile("ImmersedBoundaryMembraneElasticityForce.parameters");
+        out_stream membrane_force_parameter_file = output_file_handler.OpenOutputFile("ib_membrane.parameters");
         membrane_force.OutputImmersedBoundaryForceParameters(membrane_force_parameter_file);
         membrane_force_parameter_file->close();
 
         {
-            FileFinder generated_file = output_file_handler.FindFile("ImmersedBoundaryMembraneElasticityForce.parameters");
-            FileFinder reference_file("projects/ImmersedBoundary/test/data/TestImmersedBoundaryForces/ImmersedBoundaryMembraneElasticityForce.parameters",
+            FileFinder generated_file = output_file_handler.FindFile("ib_membrane.parameters");
+            FileFinder reference_file("cell_based/test/data/TestForces/ib_membrane.parameters",
                                       RelativeTo::ChasteSourceRoot);
             FileComparison comparer(generated_file,reference_file);
             TS_ASSERT(comparer.CompareFiles());
