@@ -37,9 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 #include "AbstractCellBasedTestSuite.hpp"
 
-// Needed for immersed boundary simulations
-#include <fftw3.h>
-
 // Includes from trunk
 #include "CellsGenerator.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
