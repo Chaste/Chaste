@@ -35,7 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Needed for test framework
 #include <cxxtest/TestSuite.h>
-#include "AbstractCellBasedTestSuite.hpp"
 
 // Includes from projects/ImmersedBoundary
 #include "ImmersedBoundaryElement.hpp"

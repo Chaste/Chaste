@@ -35,28 +35,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Needed for test framework
 #include <cxxtest/TestSuite.h>
-#include "AbstractCellBasedTestSuite.hpp"
-
-// Includes from trunk
-#include "CellsGenerator.hpp"
-#include "DifferentiatedCellProliferativeType.hpp"
-#include "OffLatticeSimulation.hpp"
-#include "SmartPointers.hpp"
-#include "UniformlyDistributedCellCycleModel.hpp"
 
 // Includes from projects/ImmersedBoundary
-#include "ImmersedBoundaryCellPopulation.hpp"
 #include "ImmersedBoundaryMesh.hpp"
 #include "ImmersedBoundaryMeshWriter.hpp"
 #include "ImmersedBoundaryMeshReader.hpp"
-#include "ImmersedBoundarySimulationModifier.hpp"
-#include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
-#include "SuperellipseGenerator.hpp"
+#include "ImmersedBoundaryHoneycombMeshGenerator.hpp"
 
 // This test is never run in parallel
 #include "FakePetscSetup.hpp"
 
-class TestImmersedBoundaryHoneycombMeshGenerator : public AbstractCellBasedTestSuite
+class TestImmersedBoundaryHoneycombMeshGenerator : public CxxTest::TestSuite
 {
 public:
 
