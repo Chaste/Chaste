@@ -92,7 +92,7 @@ public:
 
         // Compare the generated file in test output with a reference copy in the source code
         FileFinder generated = output_file_handler.FindFile("ImmersedBoundarySimulationModifier.parameters");
-        FileFinder reference("projects/ImmersedBoundary/test/data/TestOutputParametersWithImmersedBoundarySimulationModifier/ImmersedBoundarySimulationModifier.parameters",
+        FileFinder reference("cell_based/test/data/TestSimulationModifierOutputParameters/ImmersedBoundarySimulationModifier.parameters",
                 RelativeTo::ChasteSourceRoot);
         FileComparison comparer(generated, reference);
         TS_ASSERT(comparer.CompareFiles());
