@@ -212,7 +212,7 @@ public:
         simulator.SetDt(dt);
         simulator.SetSamplingTimestepMultiple(1);
         simulator.SetEndTime(100.0 * dt);
-        
+
         simulator.Solve();
     }
 };
