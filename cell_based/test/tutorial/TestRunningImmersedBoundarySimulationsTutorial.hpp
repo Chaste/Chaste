@@ -79,7 +79,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * particular use is that {{{RandomNumberGenerator}}} is re-seeded with zero.  This means any random numbers generated
  * (for instance, random variation in cell size) is reproducible from one simulation to the next.
  */
-class TestImmersedBoundaryDemoTutorial : public AbstractCellBasedTestSuite
+class TestRunningImmersedBoundarySimulationsTutorial : public AbstractCellBasedTestSuite
 {
 public:
     /*

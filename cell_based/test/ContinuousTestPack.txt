@@ -55,6 +55,7 @@ population/TestVertexBasedDivisionRules.hpp
 simulation/TestCellBasedPdeSolver.hpp
 simulation/TestDeltaNotchModifier.hpp
 simulation/TestFarhadifarTypeModifier.hpp
+simulation/TestImmersedBoundaryPdeSolveMethods.hpp
 simulation/TestImmersedBoundarySimulationModifier.hpp
 simulation/TestNumericalMethods.hpp
 simulation/TestOffLatticeSimulation.hpp
@@ -83,6 +84,7 @@ tutorial/TestCreatingAndUsingNewCellBasedWritersTutorial.hpp
 tutorial/TestRunningContactInhibitionSimulationsTutorial.hpp
 tutorial/TestRunningDeltaNotchSimulationsTutorial.hpp
 tutorial/TestRunningDifferentialAdhesionSimulationsTutorial.hpp
+tutorial/TestRunningImmersedBoundarySimulationsTutorial.hpp
 tutorial/TestRunningMeshBasedSimulationsTutorial.hpp
 tutorial/TestRunningNodeBasedSimulationsTutorial.hpp
 tutorial/TestRunningPottsBasedSimulationsTutorial.hpp
