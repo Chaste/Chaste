@@ -14,7 +14,10 @@ TestNonCachedTetrahedralMesh.hpp
 TestQuadraticMesh.hpp
 TestTetrahedralMesh.hpp
 TestTransformations.hpp
+immersed_boundary/TestFluidSource.hpp
+immersed_boundary/TestImmersedBoundary2dArrays.hpp
 immersed_boundary/TestImmersedBoundaryElement.hpp
+immersed_boundary/TestImmersedBoundaryFftInterface.hpp
 immersed_boundary/TestImmersedBoundaryHoneycombMeshGenerator.hpp
 immersed_boundary/TestImmersedBoundaryMesh.hpp
 immersed_boundary/TestImmersedBoundaryMeshReader.hpp
