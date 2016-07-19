@@ -54,6 +54,8 @@ population/TestVertexBasedCellPopulation.hpp
 population/TestVertexBasedDivisionRules.hpp
 simulation/TestCellBasedPdeSolver.hpp
 simulation/TestDeltaNotchModifier.hpp
+simulation/TestFarhadifarTypeModifier.hpp
+simulation/TestImmersedBoundarySimulationModifier.hpp
 simulation/TestNumericalMethods.hpp
 simulation/TestOffLatticeSimulation.hpp
 simulation/TestOffLatticeSimulation3d.hpp
@@ -66,7 +68,6 @@ simulation/TestOnLatticeSimulationWithCaBasedCellPopulation.hpp
 simulation/TestOnLatticeSimulationWithPdes.hpp
 simulation/TestOnLatticeSimulationWithPottsBasedCellPopulation.hpp
 simulation/TestSimpleTargetAreaModifier.hpp
-simulation/TestFarhadifarTypeModifier.hpp
 simulation/TestPdesForOffLatticeSimulations.hpp
 simulation/TestStepSizeException.hpp
 simulation/TestVolumeTrackingModifier.hpp
