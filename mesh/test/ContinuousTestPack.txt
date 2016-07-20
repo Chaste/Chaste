@@ -53,4 +53,4 @@ vertex/TestVertexMeshWriter.hpp
 vertex/TestVoronoiVertexMeshGenerator.hpp
 writer/TestMeshWriters.hpp
 writer/TestXmlMeshWriters.hpp
-
+immersed_boundary/TestGenerateFftwWisdom.hpp
