@@ -147,6 +147,8 @@ public:
         cell_population.SetIfPopulationHasActiveSources(true);
 
         OffLatticeSimulation<2> simulator(cell_population);
+        simulator.SetNumericalMethod(boost::make_shared<ForwardEulerNumericalMethod<2,2> >());
+        simulator.GetNumericalMethod()->SetUseUpdateNodeLocation(true);
 
         // Add main immersed boundary simulation modifier
         MAKE_PTR(ImmersedBoundarySimulationModifier<2>, p_main_modifier);
@@ -196,6 +198,8 @@ public:
         cell_population.SetIfPopulationHasActiveSources(false);
 
         OffLatticeSimulation<2> simulator(cell_population);
+        simulator.SetNumericalMethod(boost::make_shared<ForwardEulerNumericalMethod<2,2> >());
+        simulator.GetNumericalMethod()->SetUseUpdateNodeLocation(true);
 
         // Add main immersed boundary simulation modifier
         MAKE_PTR(ImmersedBoundarySimulationModifier<2>, p_main_modifier);
