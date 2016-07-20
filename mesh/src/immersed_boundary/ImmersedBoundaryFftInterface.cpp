@@ -56,27 +56,35 @@ ImmersedBoundaryFftInterface<DIM>::ImmersedBoundaryFftInterface(ImmersedBoundary
     // Forget all wisdom; the correct wisdom will be loaded from file
     void fftw_forget_wisdom();
 
-    // Path to the wisdom file
-    std::string wisdom_path;
-    std::string wisdom_filename;
-
-
-    wisdom_filename = "fftw.wisdom";
+    // Load wisdom from file
+    std::string wisdom_filename = "fftw.wisdom";
     FileFinder file_finder(wisdom_filename, RelativeTo::ChasteTestOutput);
 
-    if (!file_finder.IsFile())
+    std::string wisdom_path = file_finder.GetAbsolutePath();
+    int wisdom_flag;
+
+    if (file_finder.IsFile())
     {
-        WARNING("It is strongly recommended to generate wisdom using TestGenerateFftwWisdom before using this code.");
+        wisdom_flag = fftw_import_wisdom_from_filename(wisdom_path.c_str());
+
+        // 1 means success, 0 indicates a failure
+        if (wisdom_flag != 1)
+        {
+            WARNING("fftw wisdom not imported correctly from " + wisdom_path);
+        }
     }
-
-    wisdom_path = file_finder.GetAbsolutePath();
-
-    int wisdom_flag = fftw_import_wisdom_from_filename(wisdom_path.c_str());
-
-    // 1 means success, 0 indicates a failure
-    if (wisdom_flag != 1)
+    else // file in test output folder not found
     {
-        WARNING("fftw wisdom not imported correctly");
+        WARNING("Cannot find fftw wisdom file at " + wisdom_path +
+                ". It is strongly recommended to run TestGenerateFftwWisdom.hpp.");
+
+        wisdom_flag = fftw_import_system_wisdom();
+
+        // 1 means success, 0 indicates a failure
+        if (wisdom_flag != 1)
+        {
+            WARNING("fftw system wisdom not imported correctly");
+        }
     }
 
     int num_gridpts_x = (int)mpMesh->GetNumGridPtsX();

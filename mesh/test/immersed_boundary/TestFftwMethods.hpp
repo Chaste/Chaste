@@ -41,6 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Chaste includes
 #include "RandomNumberGenerator.hpp"
+#include "FileFinder.hpp"
 
 // Needed for immersed boundary simulations
 #include <complex>
@@ -62,10 +63,15 @@ public:
 
     void TestLoadWisdom() throw(Exception)
     {
-        std::string filename = "./projects/ImmersedBoundary/src/fftw.wisdom";
-        int wisdom_flag = fftw_import_wisdom_from_filename(filename.c_str());
+        std::string wisdom_filename = "fftw.wisdom";
+        FileFinder file_finder(wisdom_filename, RelativeTo::ChasteTestOutput);
+
+        // Verify the file can be found in its default location
+        std::string wisdom_path = file_finder.GetAbsolutePath();
+        TS_ASSERT(file_finder.IsFile());
 
         // 1 means it's read correctly, 0 indicates a failure
+        int wisdom_flag = fftw_import_wisdom_from_filename(wisdom_path.c_str());
         TS_ASSERT_EQUALS(wisdom_flag, 1);
     }
 
@@ -92,10 +98,10 @@ public:
         fftw_complex* p_complex_data = reinterpret_cast<fftw_complex*>(complex_data.data());
 
         fftw_plan plan_f;
-        plan_f = fftw_plan_dft_r2c_2d(size, size, p_real_input, p_complex_data, FFTW_EXHAUSTIVE);
+        plan_f = fftw_plan_dft_r2c_2d(size, size, p_real_input, p_complex_data, FFTW_ESTIMATE);
 
         fftw_plan plan_b;
-        plan_b = fftw_plan_dft_c2r_2d(size, size, p_complex_data, p_real_output, FFTW_EXHAUSTIVE);
+        plan_b = fftw_plan_dft_c2r_2d(size, size, p_complex_data, p_real_output, FFTW_ESTIMATE);
 
         for (unsigned i=0; i < size; i++)
         {
