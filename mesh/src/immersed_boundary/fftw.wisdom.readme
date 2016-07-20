@@ -1,0 +1,26 @@
+The file `fftw.wisdom` contains instructions, generated via the test suite
+`TestGenerateFftwWisdom.hpp`, to enable `fftw` to optimize fft speed for
+certain sized discrete Fourier transforms.
+
+This version of the file `fftw.wisdom` contains single-thread
+real-to-complex and complex-to-real optimizations using flag
+`FFTW_EXHAUSTIVE` for:
+
+two contiguous arrays of size 16 by 16
+two contiguous arrays of size 32 by 32
+two contiguous arrays of size 64 by 64
+two contiguous arrays of size 128 by 128
+two contiguous arrays of size 256 by 256
+two contiguous arrays of size 512 by 512
+two contiguous arrays of size 1024 by 1024
+two contiguous arrays of size 2048 by 2048
+two contiguous arrays of size 4096 by 4096
+three contiguous arrays of size 16 by 16
+three contiguous arrays of size 32 by 32
+three contiguous arrays of size 64 by 64
+three contiguous arrays of size 128 by 128
+three contiguous arrays of size 256 by 256
+three contiguous arrays of size 512 by 512
+three contiguous arrays of size 1024 by 1024
+three contiguous arrays of size 2048 by 2048
+three contiguous arrays of size 4096 by 4096
