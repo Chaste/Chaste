@@ -234,10 +234,7 @@ endif()
 
 #Locate VTK
 if (Chaste_USE_VTK)
-    #set(VTK_FIND_QUIETLY ON)
     find_package(VTK REQUIRED)
-    list(APPEND Chaste_INCLUDES "${VTK_INCLUDE_DIRS}")
-    list(APPEND Chaste_LINK_LIBRARIES "${VTK_LIBRARIES}")
     add_definitions(-DCHASTE_VTK)
 endif()
 
@@ -345,6 +342,11 @@ endif()
 #chaste_add_libraries(MPI_CXX_LIBRARIES Chaste_THIRD_PARTY_STATIC_LIBRARIES Chaste_LINK_LIBRARIES)
 list(APPEND Chaste_LINK_LIBRARIES "${MPI_CXX_LIBRARIES}")
 
+# make sure VTK libraries added after HDF5 so VTK's link with HDF5 isn't used
+if (Chaste_USE_VTK)
+    list(APPEND Chaste_INCLUDES "${VTK_INCLUDE_DIRS}")
+    list(APPEND Chaste_LINK_LIBRARIES "${VTK_LIBRARIES}")
+endif()
 
 #Locate Xerces and XSD
 if (Chaste_USE_XERCES)
