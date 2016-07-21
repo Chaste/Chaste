@@ -83,15 +83,15 @@ private:
      * This is a specialisation for Vertex models.
      */
     boost::shared_ptr<AbstractVertexBasedDivisionRule<DIM> > mpVertexBasedDivisionRule;
-
-    /** The distance over which cell-cell interactions occur */
-    double mInteractionDistance;
-
+    
     /** The intrinsic node spacing, relative to which various parameters must be calculated */
     double mIntrinsicSpacing;
 
     /** Whether the simulation has active fluid sources */
     bool mPopulationHasActiveSources;
+
+    /** The distance over which cell-cell interactions occur */
+    double mInteractionDistance;
 
     /**
      * Overridden WriteVtkResultsToFile() method.

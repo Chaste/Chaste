@@ -51,15 +51,12 @@ ImmersedBoundaryCellPopulation<DIM>::ImmersedBoundaryCellPopulation(ImmersedBoun
                                           bool validate,
                                           const std::vector<unsigned> locationIndices)
     : AbstractOffLatticeCellPopulation<DIM>(rMesh, rCells, locationIndices),
-      mDeleteMesh(deleteMesh)
+      mDeleteMesh(deleteMesh),
+      mIntrinsicSpacing(0.01),
+      mPopulationHasActiveSources(false)
 {
     mpImmersedBoundaryMesh = static_cast<ImmersedBoundaryMesh<DIM, DIM>* >(&(this->mrMesh));
     mpVertexBasedDivisionRule.reset(new ShortAxisVertexBasedDivisionRule<DIM>());
-
-    mInteractionDistance = 0.05 * sqrt(mpImmersedBoundaryMesh->GetVolumeOfElement(mpImmersedBoundaryMesh->GetNumElements()-1));
-
-    // Set the mesh division spacing distance
-    rMesh.SetElementDivisionSpacing(0.25 * mInteractionDistance);
 
     // If no location indices are specified, associate with elements from the mesh (assumed to be sequentially ordered).
     std::list<CellPtr>::iterator it = this->mCells.begin();
@@ -75,12 +72,10 @@ ImmersedBoundaryCellPopulation<DIM>::ImmersedBoundaryCellPopulation(ImmersedBoun
         Validate();
     }
 
-    // Default active sources to false
-    mPopulationHasActiveSources = false;
+    mInteractionDistance = 0.05 * sqrt(mpImmersedBoundaryMesh->GetVolumeOfElement(mpImmersedBoundaryMesh->GetNumElements()-1));
 
-    // Set the intrinsic spacing to a default 0.01
-    //\todo should this be static?
-    mIntrinsicSpacing = 0.01;
+    // Set the mesh division spacing distance
+    rMesh.SetElementDivisionSpacing(0.25 * mInteractionDistance);
 }
 
 template<unsigned DIM>
