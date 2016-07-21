@@ -145,8 +145,6 @@ public:
         location[0] = 34.0;
         ChastePoint<1> point(location);
         TS_ASSERT_EQUALS(point[0], 34.0);
-
-        TS_ASSERT_EQUALS(point[0], 34.0);
     }
 
     void TestCreateFromStdVector()
