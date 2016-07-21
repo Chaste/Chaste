@@ -415,6 +415,12 @@ void ExecutableSupport::StandardStartup(int* pArgc, char*** pArgv)
     ShowParallelLaunching();
 }
 
+void ExecutableSupport::StartupWithoutShowingCopyright(int* pArgc, char*** pArgv)
+{
+    InitializePetsc(pArgc, pArgv);
+    ShowParallelLaunching();
+}
+
 void ExecutableSupport::PrintError(const std::string& rMessage, bool masterOnly)
 {
     if (!masterOnly || PetscTools::AmMaster())
