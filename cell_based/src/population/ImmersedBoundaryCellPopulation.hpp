@@ -83,7 +83,7 @@ private:
      * This is a specialisation for Vertex models.
      */
     boost::shared_ptr<AbstractVertexBasedDivisionRule<DIM> > mpVertexBasedDivisionRule;
-    
+
     /** The intrinsic node spacing, relative to which various parameters must be calculated */
     double mIntrinsicSpacing;
 
@@ -120,10 +120,16 @@ private:
     }
 
     /**
-     * Helper method
-     * Calculates the discrete delta approximation based on distance and grid spacing
+     * Helper method.
+     * Calculates the discrete delta approximation based on distance and grid spacing.
      */
     double Delta1D(double dist, double spacing);
+
+    /**
+     * Helper method for the constructor.
+     * Calculates an intrinsic length scale based on the size of elements in the mesh.
+     */
+    double CalculateIntrinsicCellSize();
 
     /**
      * Check the consistency of internal data structures.

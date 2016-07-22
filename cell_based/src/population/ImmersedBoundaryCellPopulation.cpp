@@ -96,6 +96,26 @@ ImmersedBoundaryCellPopulation<DIM>::~ImmersedBoundaryCellPopulation()
 }
 
 template<unsigned DIM>
+double ImmersedBoundaryCellPopulation<DIM>:: CalculateIntrinsicCellSize()
+{
+    double average_intrinsic_size = 0.0;
+
+    for (typename ImmersedBoundaryMesh<DIM,DIM>::ImmersedBoundaryElementIterator elem_iter = mpImmersedBoundaryMesh->GetElementIteratorBegin();
+         elem_iter != mpImmersedBoundaryMesh->GetElementIteratorEnd();
+         ++elem_iter)
+    {
+        unsigned elem_idx = elem_iter->GetIndex();
+
+        if (elem_idx != mpImmersedBoundaryMesh->GetMembraneIndex())
+        {
+            average_intrinsic_size += mpImmersedBoundaryMesh->GetVolumeOfElement(elem_idx);
+        }
+    }
+
+    return average_intrinsic_size / mpImmersedBoundaryMesh->GetNumElements();
+}
+
+template<unsigned DIM>
 double ImmersedBoundaryCellPopulation<DIM>::GetDampingConstant(unsigned nodeIndex)
 {
     return 0.0;
