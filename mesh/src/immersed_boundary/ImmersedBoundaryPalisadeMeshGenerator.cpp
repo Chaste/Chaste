@@ -37,14 +37,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
 #include "RandomNumberGenerator.hpp"
 
-ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(unsigned numCellsWide, unsigned numNodesPerCell, double ellipseExponent, double cellAspectRatio, double randomYMult, bool membrane)
+ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(unsigned numCellsWide,
+                                                                             unsigned numNodesPerCell,
+                                                                             double ellipseExponent,
+                                                                             double cellAspectRatio,
+                                                                             double randomYMult,
+                                                                             bool basalLamina,
+                                                                             bool apicalLamina)
     : mpMesh(NULL),
       mNumCellsWide(numCellsWide),
       mNumNodesPerCell(numNodesPerCell),
       mEllipseExponent(ellipseExponent),
       mCellAspectRatio(cellAspectRatio),
-      mRandomYMult(randomYMult),
-      mMembrane(membrane)
+      mRandomYMult(randomYMult)
 {
     // Check for sensible input
     assert(mNumCellsWide > 0);
@@ -143,16 +148,17 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
         EXCEPTION("Apical and basal surfaces are different sizes");
     }
 
-    // Create a vector of immersed boundary elements and vector of nodes
+    // Create vectors of immersed boundary elements, laminas, nodes
     std::vector<ImmersedBoundaryElement<2,2>*> ib_elements;
+    std::vector<ImmersedBoundaryElement<1,2>*> ib_laminas;
     std::vector<Node<2>*> nodes;
 
     // Helper c_vector for offsets in x and y
     c_vector<double, 2> x_offset = x_unit * cell_width;
     c_vector<double, 2> y_offset = y_unit * (1.0 - cell_height) / 2.0;
 
-    // Add the membrane element, if there is one
-    if (mMembrane)
+    // Add the lamina below, if there is one
+    if (basalLamina)
     {
         // Aim to give the membrane roughly the same node-spacing as the other cells
         double perimeter = 2.0 * (cell_height + cell_width);
@@ -181,6 +187,13 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
         {
             r_elem_corners.push_back(NULL);
         }
+    }
+
+    // Add the lamina below, if there is one
+    if (apicalLamina)
+    {
+        //\todo: implement this
+        NEVER_REACHED;
     }
 
     RandomNumberGenerator* p_rand_gen = RandomNumberGenerator::Instance();
@@ -216,11 +229,11 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
     // Create a mesh with the nodes and elements vectors
     if (mMembrane)
     {
-        mpMesh = new ImmersedBoundaryMesh<2,2>(nodes, ib_elements, 256, 256, 0);
+        mpMesh = new ImmersedBoundaryMesh<2,2>(nodes, ib_elements, ib_laminas, 256, 256, 0);
     }
     else
     {
-        mpMesh = new ImmersedBoundaryMesh<2,2>(nodes, ib_elements, 256, 256);
+        mpMesh = new ImmersedBoundaryMesh<2,2>(nodes, ib_elements, ib_laminas, 256, 256);
     }
 }
 
@@ -232,10 +245,4 @@ ImmersedBoundaryPalisadeMeshGenerator::~ImmersedBoundaryPalisadeMeshGenerator()
 ImmersedBoundaryMesh<2,2>* ImmersedBoundaryPalisadeMeshGenerator::GetMesh()
 {
     return mpMesh;
-}
-
-void ImmersedBoundaryPalisadeMeshGenerator::SetRandomYMult(double mult)
-{
-    assert(fabs(mult) < 1.0);
-    mRandomYMult = mult;
 }

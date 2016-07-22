@@ -70,9 +70,6 @@ protected:
     /** The random variation in y_pos. */
     double mRandomYMult;
 
-    /** Whether the mesh has a basement membrane. */
-    bool mMembrane;
-
 public:
 
     /**
@@ -83,14 +80,16 @@ public:
      * @param ellipseExponent  the exponent of the superellipse (defaults to 0.2)
      * @param cellAspectRatio  the aspect ratio of each cell (defaults to 2)
      * @param randomYMult  the random variation in y_pos (defaults to 0)
-     * @param membrane  whether the mesh has a basement membrane (defaults to false)
+     * @param basalLamina whether the palisade has a basal lamina (defaults to false)
+     * @param apicalLamina whether the palisade has an apical lamina (defaults to false)
      */
     ImmersedBoundaryPalisadeMeshGenerator(unsigned numCellsWide,
                                           unsigned numNodesPerCell=100,
                                           double ellipseExponent=0.2,
                                           double cellAspectRatio=2.0,
                                           double randomYMult=0.0,
-                                          bool membrane=false);
+                                          bool basalLamina=false,
+                                          bool apicalLamina=false);
 
     /**
      * Null constructor for derived classes to call.
@@ -111,8 +110,6 @@ public:
      */
     ImmersedBoundaryMesh<2,2>* GetMesh();
 
-    ///\todo document this method
-    void SetRandomYMult(double mult);
 };
 
 #endif /*IMMERSEDBOUNDARYPALISADEMESHGENERATOR_HPP_*/
