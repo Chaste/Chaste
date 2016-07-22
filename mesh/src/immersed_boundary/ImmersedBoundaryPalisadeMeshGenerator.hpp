@@ -55,21 +55,6 @@ protected:
     /** A pointer to the mesh this class creates. */
     ImmersedBoundaryMesh<2,2>* mpMesh;
 
-    /** The number of cells from left to right. */
-    unsigned mNumCellsWide;
-
-    /** The number of nodes per cell. */
-    unsigned mNumNodesPerCell;
-
-    /** The exponent of the superellipse. */
-    double mEllipseExponent;
-
-    /** The aspect ratio of each cell (height / width). */
-    double mCellAspectRatio;
-
-    /** The random variation in y_pos. */
-    double mRandomYMult;
-
 public:
 
     /**

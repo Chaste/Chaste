@@ -44,36 +44,31 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
                                                                              double randomYMult,
                                                                              bool basalLamina,
                                                                              bool apicalLamina)
-    : mpMesh(NULL),
-      mNumCellsWide(numCellsWide),
-      mNumNodesPerCell(numNodesPerCell),
-      mEllipseExponent(ellipseExponent),
-      mCellAspectRatio(cellAspectRatio),
-      mRandomYMult(randomYMult)
+    : mpMesh(NULL)
 {
     // Check for sensible input
-    assert(mNumCellsWide > 0);
-    assert(mNumNodesPerCell > 3);
-    assert(mEllipseExponent > 0.0);
-    assert(mCellAspectRatio > 0.0); // aspect ratio is cell height / cell width
-    assert(fabs(mRandomYMult < 2.0));
+    assert(numCellsWide > 0);
+    assert(numNodesPerCell > 3);
+    assert(ellipseExponent > 0.0);
+    assert(cellAspectRatio > 0.0); // aspect ratio is cell height / cell width
+    assert(fabs(randomYMult < 2.0));
 
     // Helper vectors
     unit_vector<double> x_unit(2,0);
     unit_vector<double> y_unit(2,1);
 
     // Calculate cell sizes and rescale if necessary
-    double cell_width = 1.0 / double(mNumCellsWide);
-    double cell_height = mCellAspectRatio * cell_width;
+    double cell_width = 1.0 / double(numCellsWide);
+    double cell_height = cellAspectRatio * cell_width;
 
     if (cell_height > 0.8)
     {
         cell_height = 0.8;
-        cell_width = cell_height / mCellAspectRatio;
+        cell_width = cell_height / cellAspectRatio;
     }
 
     // Generate a reference superellipse
-    SuperellipseGenerator* p_gen = new SuperellipseGenerator(mNumNodesPerCell, mEllipseExponent, cell_width, cell_height, 0.0, 0.0);
+    SuperellipseGenerator* p_gen = new SuperellipseGenerator(numNodesPerCell, ellipseExponent, cell_width, cell_height, 0.0, 0.0);
     std::vector<c_vector<double, 2> > locations = p_gen->GetPointsAsVectors();
 
     // Calculate which locations will be the element corners
@@ -99,7 +94,7 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
     }
 
     // Second anticlockwise corner is corner 0
-    for (unsigned location = unsigned(0.25 * mNumNodesPerCell); location < locations.size(); location++)
+    for (unsigned location = unsigned(0.25 * numNodesPerCell); location < locations.size(); location++)
     {
         if (locations[location][1] < top_height)
         {
@@ -109,7 +104,7 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
     }
 
     // Third anticlockwise corner is corner 3
-    for (unsigned location = unsigned(0.5 * mNumNodesPerCell); location < locations.size(); location++)
+    for (unsigned location = unsigned(0.5 * numNodesPerCell); location < locations.size(); location++)
     {
         if (locations[location][1] < bot_height)
         {
@@ -119,7 +114,7 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
     }
 
     // Fourth anticlockwise corner is corner 2
-    for (unsigned location = unsigned(0.75 * mNumNodesPerCell); location < locations.size(); location++)
+    for (unsigned location = unsigned(0.75 * numNodesPerCell); location < locations.size(); location++)
     {
         if (locations[location][1] > bot_height)
         {
@@ -162,7 +157,7 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
     {
         // Aim to give the membrane roughly the same node-spacing as the other cells
         double perimeter = 2.0 * (cell_height + cell_width);
-        double node_spacing = perimeter / (double)mNumNodesPerCell;
+        double node_spacing = perimeter / (double)numNodesPerCell;
 
         unsigned num_membrane_nodes = (unsigned)floor(1.0 / node_spacing);
 
@@ -198,7 +193,7 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
 
     RandomNumberGenerator* p_rand_gen = RandomNumberGenerator::Instance();
 
-    for (unsigned cell_idx = 0; cell_idx < mNumCellsWide; cell_idx++)
+    for (unsigned cell_idx = 0; cell_idx < numCellsWide; cell_idx++)
     {
         std::vector<Node<2>*> nodes_this_elem;
         double temp_rand = p_rand_gen->ranf();
@@ -209,7 +204,7 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
             c_vector<double, 2> scaled_location = 0.95 * locations[location] + x_offset * (cell_idx + 0.5);
 
             scaled_location[0] = fmod(scaled_location[0], 1.0);
-            scaled_location[1] *= (1.0 + temp_rand * mRandomYMult);
+            scaled_location[1] *= (1.0 + temp_rand * randomYMult);
             scaled_location[1] += y_offset[1];
 
             nodes.push_back(new Node<2>(node_index, scaled_location, true));
