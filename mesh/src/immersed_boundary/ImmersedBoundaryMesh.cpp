@@ -53,8 +53,6 @@ ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryMesh(std::vector<N
     // Clear mNodes and mElements
     Clear();
 
-    m2dVelocityGrids.resize(extents[2][mNumGridPtsX][mNumGridPtsY]);
-
     switch (SPACE_DIM)
     {
         case 2:
@@ -72,80 +70,81 @@ ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryMesh(std::vector<N
     // If the membrane index is UINT_MAX, there is no membrane; if not, there is
     mMeshHasMembrane = mMembraneIndex != UINT_MAX;
 
-    // Populate mNodes and mElements
-    for (unsigned node_index=0; node_index<nodes.size(); node_index++)
+    // Populate mNodes, mElements, and mLaminas
+    for (unsigned node_it = 0; node_it < nodes.size(); node_it++)
     {
-        Node<SPACE_DIM>* p_temp_node = nodes[node_index];
+        Node<SPACE_DIM>* p_temp_node = nodes[node_it];
         this->mNodes.push_back(p_temp_node);
     }
-    for (unsigned elem_index=0; elem_index<elements.size(); elem_index++)
+    for (unsigned elem_it = 0; elem_it < elements.size(); elem_it++)
     {
-        ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>* p_temp_element = elements[elem_index];
+        ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>* p_temp_element = elements[elem_it];
         mElements.push_back(p_temp_element);
+    }
+    for (unsigned lam_it = 0; lam_it < laminas.size(); lam_it++)
+    {
+        ImmersedBoundaryElement<ELEMENT_DIM-1, SPACE_DIM>* p_temp_lamina = laminas[lam_it];
+        mLaminas.push_back(p_temp_lamina);
     }
 
     // Register elements with nodes
-    for (unsigned index=0; index<mElements.size(); index++)
+    for (unsigned elem_it = 0; elem_it < mElements.size(); elem_it++)
     {
-        ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>* p_element = mElements[index];
+        ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>* p_element = mElements[elem_it];
 
         unsigned element_index = p_element->GetIndex();
         unsigned num_nodes_in_element = p_element->GetNumNodes();
 
-        for (unsigned node_index=0; node_index<num_nodes_in_element; node_index++)
+        for (unsigned node_idx = 0; node_idx < num_nodes_in_element; node_idx++)
         {
-            p_element->GetNode(node_index)->AddElement(element_index);
+            p_element->GetNode(node_idx)->AddElement(element_index);
         }
     }
 
-    // Set characteristic node spacing to the average distance between nodes
+    // Register laminas with nodes
+    //\todo is there a way we can register laminas with nodes?
+
+    // Set characteristic node spacing to the average distance between nodes in elements
     double total_perimeter = 0.0;
     unsigned total_nodes = 0;
-    for (unsigned elem_index = 0; elem_index < elements.size(); elem_index++)
+    for (unsigned elem_it = 0; elem_it < mElements.size(); elem_it++)
     {
-        if (elem_index != mMembraneIndex)
-        {
-            total_perimeter += this->GetSurfaceAreaOfElement(elem_index);
-            total_nodes += mElements[elem_index]->GetNumNodes();
-        }
+        total_perimeter += this->GetSurfaceAreaOfElement(elem_it);
+        total_nodes += mElements[elem_it]->GetNumNodes();
     }
     mCharacteristicNodeSpacing = total_perimeter / double(total_nodes);
 
-    // Position fluid sources at the centroid of each cell, and set strength to zero
+    // Position fluid sources at the centroid of each element, and set strength to zero
     for (unsigned elem_it = 0; elem_it < elements.size(); elem_it++)
     {
-        unsigned this_elem_idx = mElements[elem_it]->GetIndex();
+        unsigned elem_idx = mElements[elem_it]->GetIndex();
 
-        // Each element other than the membrane element will have a source associated with it
-        if (this_elem_idx != mMembraneIndex)
-        {
-            // Create a new fluid source at the correct location for each element
-            unsigned source_idx = mElementFluidSources.size();
-            c_vector<double, SPACE_DIM> source_location = this->GetCentroidOfElement(this_elem_idx);
-            mElementFluidSources.push_back(new FluidSource<SPACE_DIM>(source_idx, source_location));
+        // Create a new fluid source at the correct location for each element
+        unsigned source_idx = mElementFluidSources.size();
+        c_vector<double, SPACE_DIM> source_location = this->GetCentroidOfElement(elem_idx);
+        mElementFluidSources.push_back(new FluidSource<SPACE_DIM>(source_idx, source_location));
 
-            // Set source parameters
-            mElementFluidSources.back()->SetAssociatedElementIndex(this_elem_idx);
-            mElementFluidSources.back()->SetStrength(0.0);
+        // Set source parameters
+        mElementFluidSources.back()->SetAssociatedElementIndex(elem_idx);
+        mElementFluidSources.back()->SetStrength(0.0);
 
-            // Associate source with element
-            mElements[elem_it]->SetFluidSource(mElementFluidSources.back());
-        }
+        // Associate source with element
+        mElements[elem_it]->SetFluidSource(mElementFluidSources.back());
     }
 
-    /*
-     * Set up a number of sources to balance any active sources associated with elements
-     */
-    double balancing_source_spacing = 4.0 / (double)numGridPtsX;
+    //Set up a number of sources to balance any active sources associated with elements
+    double balancing_source_spacing = 2.0 * mCharacteristicNodeSpacing;
 
-    // We start 1/2 a grid-spacing in from the left-hand end, and place a source every 4-grid-spacings
-    double current_location = balancing_source_spacing / 8.0;
+    // We start at the characteristic spacing in from the left-hand end, and place a source every 2 spacings
+    double current_location = mCharacteristicNodeSpacing;
 
     while (current_location < 1.0)
     {
         // Create a new fluid source at the current x-location and zero y-location
         unsigned source_idx = mBalancingFluidSources.size();
         mBalancingFluidSources.push_back(new FluidSource<SPACE_DIM>(source_idx, current_location));
+
+        mBalancingFluidSources.back()->SetStrength(0.0);
 
         // Increment the current location
         current_location += balancing_source_spacing;
