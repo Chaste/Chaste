@@ -103,6 +103,8 @@ protected:
     /** Vector of pointers to ImmersedBoundaryElements. */
     std::vector<ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>*> mElements;
 
+    std::vector<ImmersedBoundaryElement<ELEMENT_DIM-1, SPACE_DIM>*> mLaminas;
+
     /** Vector of fluid sources related to elements. */
     std::vector<FluidSource<SPACE_DIM>*> mElementFluidSources;
 
@@ -221,6 +223,7 @@ public:
      */
     ImmersedBoundaryMesh(std::vector<Node<SPACE_DIM>*> nodes,
                          std::vector<ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>*> elements,
+                         std::vector<ImmersedBoundaryElement<ELEMENT_DIM-1, SPACE_DIM>*> laminas=std::vector<ImmersedBoundaryElement<ELEMENT_DIM-1, SPACE_DIM>*>(),
                          unsigned numGridPtsX=128,
                          unsigned numGridPtsY=128,
                          unsigned membraneIndex=UINT_MAX);
@@ -249,6 +252,11 @@ public:
      * @return the number of ImmersedBoundaryElements in the mesh, including those marked as deleted.
      */
     unsigned GetNumAllElements() const;
+
+    /**
+     * @return the number of laminas in the mesh.
+     */
+    unsigned GetNumLaminas() const;
 
     /**
      * @return the number of fluid mesh points in the x direction.
@@ -366,6 +374,13 @@ public:
      * @return a pointer to the immersed boundary element
      */
     ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>* GetElement(unsigned index) const;
+
+    /**
+     * @param index  the global index of a specified immersed boundary lamina.
+     *
+     * @return a pointer to the immersed boundary lamina
+     */
+    ImmersedBoundaryElement<ELEMENT_DIM-1, SPACE_DIM>* GetLamina(unsigned index) const;
 
     /**
      * Compute the centroid of an element.

@@ -41,6 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryMesh(std::vector<Node<SPACE_DIM>*> nodes,
                                                                    std::vector<ImmersedBoundaryElement<ELEMENT_DIM,SPACE_DIM>*> elements,
+                                                                   std::vector<ImmersedBoundaryElement<ELEMENT_DIM-1,SPACE_DIM>*> laminas,
                                                                    unsigned numGridPtsX,
                                                                    unsigned numGridPtsY,
                                                                    unsigned membraneIndex)
@@ -668,10 +669,23 @@ unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetNumAllElements() const
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetNumLaminas() const
+{
+    return mLaminas.size();
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>* ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetElement(unsigned index) const
 {
     assert(index < mElements.size());
     return mElements[index];
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+ImmersedBoundaryElement<ELEMENT_DIM-1, SPACE_DIM>* ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetLamina(unsigned index) const
+{
+    assert(index < mLaminas.size());
+    return mLaminas[index];
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
