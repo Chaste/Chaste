@@ -152,39 +152,32 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
     c_vector<double, 2> x_offset = x_unit * cell_width;
     c_vector<double, 2> y_offset = y_unit * (1.0 - cell_height) / 2.0;
 
-    // Add the lamina below, if there is one
+    // Add the basal lamina, if there is one
     if (basalLamina)
     {
-        // Aim to give the membrane roughly the same node-spacing as the other cells
+        // Aim to give the lamina roughly the same node-spacing as the other cells
         double perimeter = 2.0 * (cell_height + cell_width);
         double node_spacing = perimeter / (double)numNodesPerCell;
 
-        unsigned num_membrane_nodes = (unsigned)floor(1.0 / node_spacing);
+        unsigned num_lamina_nodes = (unsigned)floor(1.0 / node_spacing);
 
         std::vector<Node<2>*> nodes_this_elem;
 
-        for (unsigned mem_node_idx = 0; mem_node_idx < num_membrane_nodes; mem_node_idx++)
+        for (unsigned node_idx = 0; node_idx < num_lamina_nodes; node_idx++)
         {
             // Calculate location of node
-            c_vector<double, 2> location = 0.97 * y_offset + ( 0.5 / num_membrane_nodes + double(mem_node_idx) / num_membrane_nodes ) * x_unit;
+            c_vector<double, 2> location = 0.97 * y_offset + ( 0.5 / num_lamina_nodes + double(node_idx) / num_lamina_nodes ) * x_unit;
 
             // Create the new node
-            nodes.push_back(new Node<2>(mem_node_idx, location, true));
+            nodes.push_back(new Node<2>(node_idx, location, true));
             nodes_this_elem.push_back(nodes.back());
         }
 
-        // Create the membrane element
-        ib_elements.push_back(new ImmersedBoundaryElement<2,2>(0, nodes_this_elem));
-
-        // Pass in null corners
-        std::vector<Node<2>*>& r_elem_corners = ib_elements.back()->rGetCornerNodes();
-        for (unsigned corner = 0; corner < 4; corner++)
-        {
-            r_elem_corners.push_back(NULL);
-        }
+        // Create the lamina element
+        ib_laminas.push_back(new ImmersedBoundaryElement<1,2>(0, nodes_this_elem));
     }
 
-    // Add the lamina below, if there is one
+    // Add the apical lamina, if there is one
     if (apicalLamina)
     {
         //\todo: implement this
@@ -193,27 +186,27 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
 
     RandomNumberGenerator* p_rand_gen = RandomNumberGenerator::Instance();
 
-    for (unsigned cell_idx = 0; cell_idx < numCellsWide; cell_idx++)
+    for (unsigned elem_idx = 0; elem_idx < numCellsWide; elem_idx++)
     {
         std::vector<Node<2>*> nodes_this_elem;
-        double temp_rand = p_rand_gen->ranf();
+        double random_variation = p_rand_gen->ranf() * randomYMult;
 
         for (unsigned location = 0; location < locations.size(); location++)
         {
             unsigned node_index = nodes.size();
-            c_vector<double, 2> scaled_location = 0.95 * locations[location] + x_offset * (cell_idx + 0.5);
+            c_vector<double, 2> scaled_location = 0.95 * locations[location] + x_offset * (elem_idx + 0.5);
 
             scaled_location[0] = fmod(scaled_location[0], 1.0);
-            scaled_location[1] *= (1.0 + temp_rand * randomYMult);
+            scaled_location[1] *= (1.0 + random_variation);
             scaled_location[1] += y_offset[1];
 
             nodes.push_back(new Node<2>(node_index, scaled_location, true));
             nodes_this_elem.push_back(nodes.back());
         }
 
-        ib_elements.push_back(new ImmersedBoundaryElement<2,2>(ib_elements.size(), nodes_this_elem));
+        ib_elements.push_back(new ImmersedBoundaryElement<2,2>(elem_idx, nodes_this_elem));
 
-        // Pass in the correct corners
+        // Pass in the corners calculated above
         std::vector<Node<2>*>& r_elem_corners = ib_elements.back()->rGetCornerNodes();
         for (unsigned corner = 0; corner < 4; corner++)
         {
@@ -221,15 +214,7 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
         }
     }
 
-    // Create a mesh with the nodes and elements vectors
-    if (mMembrane)
-    {
-        mpMesh = new ImmersedBoundaryMesh<2,2>(nodes, ib_elements, ib_laminas, 256, 256, 0);
-    }
-    else
-    {
-        mpMesh = new ImmersedBoundaryMesh<2,2>(nodes, ib_elements, ib_laminas, 256, 256);
-    }
+    mpMesh = new ImmersedBoundaryMesh<2,2>(nodes, ib_elements, ib_laminas);
 }
 
 ImmersedBoundaryPalisadeMeshGenerator::~ImmersedBoundaryPalisadeMeshGenerator()
