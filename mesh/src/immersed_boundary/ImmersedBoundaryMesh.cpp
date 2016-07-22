@@ -43,11 +43,9 @@ ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryMesh(std::vector<N
                                                                    std::vector<ImmersedBoundaryElement<ELEMENT_DIM,SPACE_DIM>*> elements,
                                                                    std::vector<ImmersedBoundaryElement<ELEMENT_DIM-1,SPACE_DIM>*> laminas,
                                                                    unsigned numGridPtsX,
-                                                                   unsigned numGridPtsY,
-                                                                   unsigned membraneIndex)
+                                                                   unsigned numGridPtsY)
     : mNumGridPtsX(numGridPtsX),
       mNumGridPtsY(numGridPtsY),
-      mMembraneIndex(membraneIndex),
       mElementDivisionSpacing(DOUBLE_UNSET)
 {
     // Clear mNodes and mElements
@@ -66,9 +64,6 @@ ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryMesh(std::vector<N
         default:
             NEVER_REACHED;
     }
-
-    // If the membrane index is UINT_MAX, there is no membrane; if not, there is
-    mMeshHasMembrane = mMembraneIndex != UINT_MAX;
 
     // Populate mNodes, mElements, and mLaminas
     for (unsigned node_it = 0; node_it < nodes.size(); node_it++)
@@ -170,35 +165,38 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetElongationShapeFactorOfE
     return elongation_shape_factor;
 }
 
+bool CustomComparisonForVectorX(c_vector<double, 2> vecA, c_vector<double, 2> vecB)
+{
+    return vecA[0] < vecB[0];
+}
+
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetTortuosityOfMesh()
 {
     assert(SPACE_DIM == 2);
 
-    // Compute tortuosity (defined as ratio of total length to straight-line length) of piecewise linear curve through centroids of successive elements
     double total_length = 0.0;
 
-    // We assume that if there is a membrane present, it has index 0
-    unsigned first_elem_idx = this->mMeshHasMembrane ? 1 : 0;
-
-    c_vector<double, SPACE_DIM> previous_centroid = this->GetCentroidOfElement(first_elem_idx);
-
-    for (unsigned elem_idx = first_elem_idx; elem_idx < this->GetNumElements(); elem_idx++)
+    // Get the current elements
+    std::vector<c_vector<double, 2> > centroids(mElements.size());
+    for (unsigned elem_it = 0; elem_it < mElements.size(); elem_it++)
     {
-        c_vector<double, 2> this_centroid = this->GetCentroidOfElement(elem_idx);
-        total_length += norm_2(this->GetVectorFromAtoB(previous_centroid, this_centroid));
-        previous_centroid = this_centroid;
+        centroids[elem_it] = this->GetCentroidOfElement(mElements[elem_it]->GetIndex());
     }
 
-    c_vector<double, 2> first_centroid = this->GetCentroidOfElement(first_elem_idx);
-    c_vector<double, 2> last_centroid = this->GetCentroidOfElement(this->GetNumElements()-1);
+    // Sort centroids by X
+    std::sort(centroids.begin(), centroids.end(), CustomComparisonForVectorX);
 
-    double straight_line_length = norm_2(this->GetVectorFromAtoB(first_centroid, last_centroid));
-    straight_line_length = std::max(straight_line_length, 1.0-straight_line_length);
+    // Calculate piecewise linear length connecting centroids
+    for (unsigned cent_it = 1; cent_it < centroids.size(); cent_it++)
+    {
+        total_length += norm_2(centroids[cent_it - 1] - centroids[cent_it]);
+    }
+
+    double straight_line_length = norm_2(centroids[0] - centroids[centroids.size()-1]);
 
     return total_length / straight_line_length;
 }
-
 
 bool CustomComparisonForSkewnessMeasure(std::pair<unsigned, c_vector<double, 2> > pairA, std::pair<unsigned, c_vector<double, 2> > pairB)
 {
@@ -556,31 +554,6 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::SetCharacteristicNodeSpacing(
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::SetMembraneIndex(unsigned membrane_index)
-{
-    mMembraneIndex = membrane_index;
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>* ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetMembraneElement()
-{
-    if (mMembraneIndex < UINT_MAX)
-    {
-        return this->GetElement(mMembraneIndex);
-    }
-    else
-    {
-        return NULL;
-    }
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetMembraneIndex()
-{
-    return mMembraneIndex;
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::vector<FluidSource<SPACE_DIM>*>& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::rGetElementFluidSources()
 {
     return mElementFluidSources;
@@ -695,59 +668,50 @@ c_vector<double, SPACE_DIM> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetCen
 
     ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>* p_element = GetElement(index);
 
-    // The membrane must be treated differently
-    if (index == mMembraneIndex)
+    unsigned num_nodes = p_element->GetNumNodes();
+    c_vector<double, SPACE_DIM> centroid = zero_vector<double>(SPACE_DIM);
+
+    double centroid_x = 0;
+    double centroid_y = 0;
+
+    // Note that we cannot use GetVolumeOfElement() below as it returns the absolute, rather than signed, area
+    double element_signed_area = 0.0;
+
+    // Map the first vertex to the origin and employ GetVectorFromAtoB() to allow for periodicity
+    c_vector<double, SPACE_DIM> first_node_location = p_element->GetNodeLocation(0);
+    c_vector<double, SPACE_DIM> pos_1 = zero_vector<double>(SPACE_DIM);
+
+    // Loop over vertices
+    for (unsigned local_index = 0; local_index < num_nodes; local_index++)
     {
-        return zero_vector<double>(2);
+        c_vector<double, SPACE_DIM> next_node_location = p_element->GetNodeLocation((local_index + 1) % num_nodes);
+        c_vector<double, SPACE_DIM> pos_2 = GetVectorFromAtoB(first_node_location, next_node_location);
+
+        double this_x = pos_1[0];
+        double this_y = pos_1[1];
+        double next_x = pos_2[0];
+        double next_y = pos_2[1];
+
+        double signed_area_term = this_x * next_y - this_y * next_x;
+
+        centroid_x += (this_x + next_x) * signed_area_term;
+        centroid_y += (this_y + next_y) * signed_area_term;
+        element_signed_area += 0.5 * signed_area_term;
+
+        pos_1 = pos_2;
     }
 
-    else
-    {
-        unsigned num_nodes = p_element->GetNumNodes();
-        c_vector<double, SPACE_DIM> centroid = zero_vector<double>(SPACE_DIM);
+    assert(element_signed_area != 0.0);
 
-        double centroid_x = 0;
-        double centroid_y = 0;
+    // Finally, map back and employ GetVectorFromAtoB() to allow for periodicity
+    centroid = first_node_location;
+    centroid[0] += centroid_x / (6.0 * element_signed_area);
+    centroid[1] += centroid_y / (6.0 * element_signed_area);
 
-        // Note that we cannot use GetVolumeOfElement() below as it returns the absolute, rather than signed, area
-        double element_signed_area = 0.0;
+    centroid[0] = centroid[0] < 0 ? centroid[0] + 1.0 : fmod(centroid[0], 1.0);
+    centroid[1] = centroid[1] < 0 ? centroid[1] + 1.0 : fmod(centroid[1], 1.0);
 
-        // Map the first vertex to the origin and employ GetVectorFromAtoB() to allow for periodicity
-        c_vector<double, SPACE_DIM> first_node_location = p_element->GetNodeLocation(0);
-        c_vector<double, SPACE_DIM> pos_1 = zero_vector<double>(SPACE_DIM);
-
-        // Loop over vertices
-        for (unsigned local_index = 0; local_index < num_nodes; local_index++)
-        {
-            c_vector<double, SPACE_DIM> next_node_location = p_element->GetNodeLocation((local_index + 1) % num_nodes);
-            c_vector<double, SPACE_DIM> pos_2 = GetVectorFromAtoB(first_node_location, next_node_location);
-
-            double this_x = pos_1[0];
-            double this_y = pos_1[1];
-            double next_x = pos_2[0];
-            double next_y = pos_2[1];
-
-            double signed_area_term = this_x * next_y - this_y * next_x;
-
-            centroid_x += (this_x + next_x) * signed_area_term;
-            centroid_y += (this_y + next_y) * signed_area_term;
-            element_signed_area += 0.5 * signed_area_term;
-
-            pos_1 = pos_2;
-        }
-
-        assert(element_signed_area != 0.0);
-
-        // Finally, map back and employ GetVectorFromAtoB() to allow for periodicity
-        centroid = first_node_location;
-        centroid[0] += centroid_x / (6.0 * element_signed_area);
-        centroid[1] += centroid_y / (6.0 * element_signed_area);
-
-        centroid[0] = centroid[0] < 0 ? centroid[0] + 1.0 : fmod(centroid[0], 1.0);
-        centroid[1] = centroid[1] < 0 ? centroid[1] + 1.0 : fmod(centroid[1], 1.0);
-
-        return centroid;
-    }
+    return centroid;
 }
 
 
@@ -786,38 +750,30 @@ void ImmersedBoundaryMesh<2,2>::ConstructFromMeshReader(AbstractMeshReader<2,2>&
 {
     ImmersedBoundaryMeshReader<2,2>& rIBMeshReader = dynamic_cast<ImmersedBoundaryMeshReader<2,2>&>(rMeshReader);
 
-    assert(rIBMeshReader.HasNodePermutation() == false);
+    assert(!rIBMeshReader.HasNodePermutation());
+
     // Store numbers of nodes and elements
     unsigned num_nodes = rIBMeshReader.GetNumNodes();
     unsigned num_elements = rIBMeshReader.GetNumElements();
+    unsigned num_laminas = rIBMeshReader.GetNumLaminas();
     this->mCharacteristicNodeSpacing = rIBMeshReader.GetCharacteristicNodeSpacing();
 
-    // Reserve memory for nodes
-    this->mNodes.reserve(num_nodes);
-
-    rIBMeshReader.Reset();
-
     // Add nodes
+    rIBMeshReader.Reset();
+    mNodes.reserve(num_nodes);
     std::vector<double> node_data;
-    for (unsigned i=0; i<num_nodes; i++)
+    for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
     {
         node_data = rIBMeshReader.GetNextNode();
         unsigned is_boundary_node = (bool) node_data[2];
         node_data.pop_back();
-        this->mNodes.push_back(new Node<2>(i, node_data, is_boundary_node));
+        this->mNodes.push_back(new Node<2>(node_idx, node_data, is_boundary_node));
     }
 
-    rIBMeshReader.Reset();
-
-    // Reserve memory for nodes
-    mElements.reserve(rIBMeshReader.GetNumElements());
-
-    // Initially ensure there is no boundary element - this will be updated in the next loop if there is
-    this->mMembraneIndex = UINT_MAX;
-    this->mMeshHasMembrane = false;
-
     // Add elements
-    for (unsigned elem_index=0; elem_index<num_elements; elem_index++)
+    rIBMeshReader.Reset();
+    mElements.reserve(num_elements);
+    for (unsigned elem_idx = 0; elem_idx < num_elements; elem_idx++)
     {
         // Get the data for this element
         ImmersedBoundaryElementData element_data = rIBMeshReader.GetNextImmersedBoundaryElementData();
@@ -825,26 +781,20 @@ void ImmersedBoundaryMesh<2,2>::ConstructFromMeshReader(AbstractMeshReader<2,2>&
         // Get the nodes owned by this element
         std::vector<Node<2>*> nodes;
         unsigned num_nodes_in_element = element_data.NodeIndices.size();
-        for (unsigned j=0; j<num_nodes_in_element; j++)
+        for (unsigned node_idx = 0; node_idx < num_nodes_in_element; node_idx++)
         {
-            assert(element_data.NodeIndices[j] < this->mNodes.size());
-            nodes.push_back(this->mNodes[element_data.NodeIndices[j]]);
+            assert(element_data.NodeIndices[node_idx] < this->mNodes.size());
+            nodes.push_back(this->mNodes[element_data.NodeIndices[node_idx]]);
         }
 
         // Use nodes and index to construct this element
-        ImmersedBoundaryElement<2,2>* p_element = new ImmersedBoundaryElement<2,2>(elem_index, nodes);
+        ImmersedBoundaryElement<2,2>* p_element = new ImmersedBoundaryElement<2,2>(elem_idx, nodes);
         mElements.push_back(p_element);
-
-        if (element_data.MembraneElement)
-        {
-            this->mMeshHasMembrane = true;
-            this->mMembraneIndex = elem_index;
-        }
 
         if (rIBMeshReader.GetNumElementAttributes() > 0)
         {
             assert(rIBMeshReader.GetNumElementAttributes() == 1);
-            unsigned attribute_value = (unsigned) element_data.AttributeValue;
+            unsigned attribute_value = element_data.AttributeValue;
             p_element->SetAttribute(attribute_value);
         }
     }

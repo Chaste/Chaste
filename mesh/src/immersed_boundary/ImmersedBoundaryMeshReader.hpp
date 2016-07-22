@@ -54,7 +54,6 @@ struct ImmersedBoundaryElementData
     unsigned AttributeValue; /**< Attribute value associated with the element. */
     double SpringConstant; /**< Spring constant associated with the element. */
     double RestLength; /**< Spring rest length associated with the element. */
-    bool MembraneElement; /**< Whether element is the basement membrane. */
 };
 
 /**
@@ -86,11 +85,17 @@ private:
     /** Number of elements in the mesh. */
     unsigned mNumElements;
 
+    /** Number of laminas in the mesh. */
+    unsigned mNumLaminas;
+
     /** Number of nodes read in by the reader. */
     unsigned mNodesRead;
 
     /** Number of elements read in by the reader. */
     unsigned mElementsRead;
+
+    /** Number of laminas read in by the reader. */
+    unsigned mLaminasRead;
 
     /** Is the number of attributes stored at each node. */
     unsigned mNumNodeAttributes;
@@ -164,6 +169,11 @@ public:
      * @return the number of elements in the mesh.
      */
     unsigned GetNumElements() const;
+
+    /**
+     * @return the number of laminas in the mesh.
+     */
+    unsigned GetNumLaminas() const;
 
     /**
      * @return the number of nodes in the mesh.

@@ -62,7 +62,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Simulation does not run in parallel
 #include "FakePetscSetup.hpp"
 
-class TestRepresentativeImmersedBoundarySimulations : public AbstractCellBasedTestSuite
+class TestShortImmersedBoundarySimulations : public AbstractCellBasedTestSuite
 {
 public:
 

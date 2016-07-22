@@ -95,9 +95,6 @@ private:
     /** Vector containing number of cell parts */
     std::vector<unsigned> mNumCellParts;
 
-    /** The index of the basement membrane */
-    unsigned mMembraneIndex;
-
 #ifdef CHASTE_VTK
 //Requires  "sudo aptitude install libvtk5-dev" or similar
 ///\todo Merge into VtkMeshWriter (#1076)

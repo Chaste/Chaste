@@ -133,8 +133,6 @@ ImmersedBoundaryElementData ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::
     // Set attribute
     elem_data.AttributeValue = (*(mpIters->pElemIter))->GetAttribute();
 
-    elem_data.MembraneElement = bool( (*(mpIters->pElemIter))->GetIndex() == mMembraneIndex );
-
     ++(*(mpIters->pElemIter));
 
     return elem_data;
@@ -228,14 +226,14 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(ImmersedBou
                 p_cell_id_list->SetId(node_idx, global_idx);
             }
 
-            if (elem_idx == rMesh.GetMembraneIndex())
-            {
-                mpVtkUnstructedMesh->InsertNextCell(3, p_cell_id_list);
-            }
-            else
-            {
-                mpVtkUnstructedMesh->InsertNextCell(p_cell->GetCellType(), p_cell_id_list);
-            }
+//            if (elem_idx == rMesh.GetMembraneIndex())
+//            {
+//                mpVtkUnstructedMesh->InsertNextCell(3, p_cell_id_list);
+//            }
+//            else
+//            {
+            mpVtkUnstructedMesh->InsertNextCell(p_cell->GetCellType(), p_cell_id_list);
+//            }
 
             p_cell->Delete(); // Reference counted
         }
@@ -305,7 +303,7 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(ImmersedBou
             // which has not been considered
             assert( (mHOverlapPoints[elem_idx].size() == 2) && (mVOverlapPoints[elem_idx].size() == 2) );
 
-            assert(1==2);
+            NEVER_REACHED;
         }
     }
 
@@ -358,7 +356,6 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(Imm
 
     this->mNumNodes = mpMesh->GetNumNodes();
     this->mNumElements = mpMesh->GetNumElements();
-    this->mMembraneIndex = mpMesh->GetMembraneIndex();
 
     typedef typename AbstractMesh<ELEMENT_DIM,SPACE_DIM>::NodeIterator NodeIterType;
     mpIters->pNodeIter = new NodeIterType(mpMesh->GetNodeIteratorBegin());
@@ -439,8 +436,6 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
 
             *p_element_file << "\t" << elem_data.RestLength;
 
-            *p_element_file << "\t" << elem_data.MembraneElement;
-
             // New line
             *p_element_file << "\n";
         }
@@ -509,12 +504,6 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::CalculateCellOverlaps(I
          ++iter)
     {
         unsigned elem_idx = iter->GetIndex();
-
-        // We do not want to treat the membrane as overlapping
-        if (elem_idx == rMesh.GetMembraneIndex())
-        {
-            continue;
-        }
 
         unsigned num_nodes = iter->GetNumNodes();
         assert(num_nodes > 1);

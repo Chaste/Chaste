@@ -76,12 +76,6 @@ protected:
     /** Number of grid points in y direction */
     unsigned mNumGridPtsY;
 
-    /** Whether there is a membrane */
-    bool mMeshHasMembrane;
-
-    /** A pointer to the immersed boundary membrane */
-    unsigned mMembraneIndex;
-
     /** Characteristic node spacing */
     double mCharacteristicNodeSpacing;
 
@@ -200,10 +194,13 @@ public:
     /** Forward declaration of element iterator. */
     class ImmersedBoundaryElementIterator;
 
+    /** Forward declaration of lamina iterator. */
+    class ImmersedBoundaryLaminaIterator;
+
     /**
      * @return an iterator to the first element in the mesh.
      *
-     * @param skipDeletedElements whether to include deleted element
+     * @param skipDeletedElements whether to include deleted elements
      */
     inline ImmersedBoundaryElementIterator GetElementIteratorBegin(bool skipDeletedElements=true);
 
@@ -213,20 +210,30 @@ public:
     inline ImmersedBoundaryElementIterator GetElementIteratorEnd();
 
     /**
+     * @return an iterator to the first lamina in the mesh.
+     *
+     * @param skipDeletedLaminas whether to include deleted laminas
+     */
+    inline ImmersedBoundaryLaminaIterator GetLaminaIteratorBegin(bool skipDeletedLaminas=true);
+
+    /**
+     * @return an iterator to one past the last element in the mesh.
+     */
+    inline ImmersedBoundaryLaminaIterator GetLaminaIteratorEnd();
+
+    /**
      * Default constructor.
      *
      * @param nodes vector of pointers to nodes
      * @param elements vector of pointers to ImmersedBoundaryElements
      * @param numGridPtsX the number of grid points in the x direction
      * @param numGridPtsY the number of grid points in the y direction
-     * @param the index of the basement membrane element
      */
     ImmersedBoundaryMesh(std::vector<Node<SPACE_DIM>*> nodes,
                          std::vector<ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>*> elements,
                          std::vector<ImmersedBoundaryElement<ELEMENT_DIM-1, SPACE_DIM>*> laminas=std::vector<ImmersedBoundaryElement<ELEMENT_DIM-1, SPACE_DIM>*>(),
                          unsigned numGridPtsX=128,
-                         unsigned numGridPtsY=128,
-                         unsigned membraneIndex=UINT_MAX);
+                         unsigned numGridPtsY=128);
 
     /**
      * Default constructor for use by serializer.
@@ -342,21 +349,6 @@ public:
      * @param the new characteristic node spacing.
      */
     void SetCharacteristicNodeSpacing(double node_spacing);
-
-    /**
-     * @param unsigned index of the membrane element
-     */
-    void SetMembraneIndex(unsigned membrane_index);
-
-    /**
-     * @return a pointer to the membrane element, NULL if no membrane
-     */
-    ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>* GetMembraneElement();
-
-    /**
-     * @return the global index of the membrane element (UINT_MAX if no membrane element)
-     */
-    unsigned GetMembraneIndex();
 
     /**
      * @return reference to vector of element-associated fluid sources
@@ -486,6 +478,9 @@ public:
     double GetElongationShapeFactorOfElement(unsigned elementIndex);
 
     /**
+     * Compute tortuosity, defined as the ratio of total length to straight-line length, of piecewise linear curve
+     * through centroids of successive elements.
+     *
      * @return the tortuosity of the mesh
      */
     double GetTortuosityOfMesh();
@@ -578,8 +573,6 @@ public:
 
     /**
      * A smart iterator over the elements in the mesh.
-     *
-     * \todo This is the same as in AbstractTetrahedralMesh and PottsMesh - merge? (#1379)
      */
     class ImmersedBoundaryElementIterator
     {
@@ -646,14 +639,83 @@ public:
          */
         inline bool IsAllowedElement();
     };
+
+    /**
+     * A smart iterator over the laminas in the mesh.
+     */
+    class ImmersedBoundaryLaminaIterator
+    {
+    public:
+        /**
+         * Dereference the iterator giving you a *reference* to the current lamina.
+         * @return reference
+         * Make sure to use a reference for the result to avoid copying laminas unnecessarily.
+         */
+        inline ImmersedBoundaryElement<ELEMENT_DIM-1, SPACE_DIM>& operator*();
+
+        /**
+         * Member access from a pointer.
+         * @return pointer
+         */
+        inline ImmersedBoundaryElement<ELEMENT_DIM-1, SPACE_DIM>* operator->();
+
+        /**
+         * Comparison not-equal-to.
+         * @return true if not equal
+         * @param rOther iterator with which comparison is made
+         */
+        inline bool operator!=(const typename ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryLaminaIterator& rOther);
+
+        /**
+         * Prefix increment operator.
+         * @return reference to incremented object
+         */
+        inline ImmersedBoundaryLaminaIterator& operator++();
+
+        /**
+         * Constructor for a new iterator.
+         *
+         * This should not be called directly by user code; use the mesh methods
+         * ImmersedBoundaryMesh::GetlaminaIteratorBegin and ImmersedBoundaryMesh::GetlaminaIteratorEnd instead.
+         *
+         * @param rMesh the mesh to iterator over
+         * @param laminaIter where to start iterating
+         * @param skipDeletedLaminas whether to include deleted laminas
+         */
+        ImmersedBoundaryLaminaIterator(ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
+                                        typename std::vector<ImmersedBoundaryElement<ELEMENT_DIM-1, SPACE_DIM> *>::iterator laminaIter,
+                                        bool skipDeletedLaminas=true);
+
+    private:
+        /** The mesh we're iterating over. */
+        ImmersedBoundaryMesh& mrMesh;
+
+        /** The actual lamina iterator. */
+        typename std::vector<ImmersedBoundaryElement<ELEMENT_DIM-1, SPACE_DIM> *>::iterator mLaminaIter;
+
+        /** Whether to skip deleted laminas. */
+        bool mSkipDeletedLaminas;
+
+        /**
+         * Helper method to say when we're at the end.
+         * @return true if at end
+         */
+        inline bool IsAtEnd();
+
+        /**
+         * Helper method to say if we're allowed to point at this lamina.
+         * @return true if allowed
+         */
+        inline bool IsAllowedLamina();
+    };
 };
 
 #include "SerializationExportWrapper.hpp"
 EXPORT_TEMPLATE_CLASS_ALL_DIMS(ImmersedBoundaryMesh)
 
-//////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////
 // ImmersedBoundaryElementIterator class implementation - most methods are inlined    //
-//////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 typename ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryElementIterator ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetElementIteratorBegin(
@@ -734,6 +796,91 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryElementIterator::IsAllowedElement()
 {
     return !(mSkipDeletedElements && (*this)->IsDeleted());
+}
+
+///////////////////////////////////////////////////////////////////////////////////////
+// ImmersedBoundaryLaminaIterator class implementation - most methods are inlined    //
+///////////////////////////////////////////////////////////////////////////////////////
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+typename ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryLaminaIterator ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetLaminaIteratorBegin(
+        bool skipDeletedLaminas)
+{
+    return ImmersedBoundaryLaminaIterator(*this, mLaminas.begin(), skipDeletedLaminas);
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+typename ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryLaminaIterator ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetLaminaIteratorEnd()
+{
+    return ImmersedBoundaryLaminaIterator(*this, mLaminas.end());
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+ImmersedBoundaryElement<ELEMENT_DIM-1, SPACE_DIM>& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryLaminaIterator::operator*()
+{
+    assert(!IsAtEnd());
+    return **mLaminaIter;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+ImmersedBoundaryElement<ELEMENT_DIM-1, SPACE_DIM>* ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryLaminaIterator::operator->()
+{
+    assert(!IsAtEnd());
+    return *mLaminaIter;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryLaminaIterator::operator!=(const typename ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryLaminaIterator& rOther)
+{
+    return mLaminaIter != rOther.mLaminaIter;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+typename ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryLaminaIterator& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryLaminaIterator::operator++()
+{
+    do
+    {
+        ++mLaminaIter;
+    }
+    while (!IsAtEnd() && !IsAllowedLamina());
+
+    return (*this);
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryLaminaIterator::ImmersedBoundaryLaminaIterator(
+        ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
+        typename std::vector<ImmersedBoundaryElement<ELEMENT_DIM-1, SPACE_DIM> *>::iterator laminaIter,
+        bool skipDeletedLaminas)
+        : mrMesh(rMesh),
+          mLaminaIter(laminaIter),
+          mSkipDeletedLaminas(skipDeletedLaminas)
+{
+    if (mrMesh.mLaminas.empty())
+    {
+        // Cope with empty meshes
+        mLaminaIter = mrMesh.mLaminas.end();
+    }
+    else
+    {
+        // Make sure we start at an allowed lamina
+        if (mLaminaIter == mrMesh.mLaminas.begin() && !IsAllowedLamina())
+        {
+            ++(*this);
+        }
+    }
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryLaminaIterator::IsAtEnd()
+{
+    return mLaminaIter == mrMesh.mLaminas.end();
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryLaminaIterator::IsAllowedLamina()
+{
+    return !(mSkipDeletedLaminas && (*this)->IsDeleted());
 }
 
 #endif /*IMMERSEDBOUNDARYMESH_HPP_*/

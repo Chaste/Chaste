@@ -44,8 +44,10 @@ ImmersedBoundaryMeshReader<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryMeshReader(s
       mIndexFromZero(false), // initially assume that nodes are not numbered from zero
       mNumNodes(0),
       mNumElements(0),
+      mNumLaminas(0),
       mNodesRead(0),
       mElementsRead(0),
+      mLaminasRead(0),
       mNumElementAttributes(0)
 {
     OpenFiles();
@@ -56,6 +58,12 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned ImmersedBoundaryMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNumElements() const
 {
     return mNumElements;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned ImmersedBoundaryMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNumLaminas() const
+{
+    return mNumLaminas;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -185,14 +193,12 @@ ImmersedBoundaryElementData ImmersedBoundaryMeshReader<ELEMENT_DIM, SPACE_DIM>::
     {
         assert(mNumElementAttributes == 1);
 
-        buffer_stream >>  element_data.AttributeValue;
+        buffer_stream >> element_data.AttributeValue;
     }
     else
     {
         element_data.AttributeValue = 0;
     }
-
-    buffer_stream >> element_data.MembraneElement;
 
     mElementsRead++;
     return element_data;
@@ -224,7 +230,7 @@ void ImmersedBoundaryMeshReader<ELEMENT_DIM, SPACE_DIM>::OpenElementsFile()
 {
     // Elements definition
     std::string file_name;
-    file_name = mFilesBaseName + ".cell";
+    file_name = mFilesBaseName + ".elem";
 
     mElementsFile.open(file_name.c_str());
     if (!mElementsFile.is_open())

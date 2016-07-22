@@ -174,17 +174,6 @@ void ImmersedBoundaryMembraneElasticityForce<DIM>::AddImmersedBoundaryForceContr
         double spring_constant = mSpringConstant * intrinsic_spacing_squared / (spacing_ratio * spacing_ratio);
         double rest_length = mRestLengthMultiplier * spacing_ratio;
 
-        /*
-         * Here we make any necessary modifications to the spring properties
-         */
-
-        // The basement lamina, if present, will have different properties
-        if (elem_idx == mpMesh->GetMembraneIndex())
-        {
-            spring_constant *= mBasementSpringConstantModifier;
-            rest_length *= mBasementRestLengthModifier;
-        }
-
         // Loop over nodes and calculate the force exerted on node i+1 by node i
         for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
         {
@@ -257,46 +246,35 @@ void ImmersedBoundaryMembraneElasticityForce<DIM>::TagNodeRegions()
          elem_it != mpMesh->GetElementIteratorEnd();
          ++elem_it)
     {
-        // Basement lamina nodes are all basal
-        if (mpMesh->GetMembraneIndex() == elem_it->GetIndex())
+        // Nodes are ordered anti-clockwise, so nodes to the first corner will be lateral, then apical, lateral,
+        // basal, lateral
+
+        std::vector<Node<DIM>*> r_corners = elem_it->rGetCornerNodes();
+
+        unsigned change_1 = elem_it->GetNodeLocalIndex(r_corners[1]->GetIndex());
+        unsigned change_2 = elem_it->GetNodeLocalIndex(r_corners[0]->GetIndex()) + 1;
+        unsigned change_3 = elem_it->GetNodeLocalIndex(r_corners[3]->GetIndex());
+        unsigned change_4 = elem_it->GetNodeLocalIndex(r_corners[2]->GetIndex()) + 1;
+
+        for (unsigned node_idx = 0; node_idx < change_1; node_idx++)
         {
-            for (unsigned node_idx = 0; node_idx < elem_it->GetNumNodes(); node_idx++)
-            {
-                elem_it->GetNode(node_idx)->SetRegion(msBas);
-            }
+            elem_it->GetNode(node_idx)->SetRegion(msLat);
         }
-        else // not the basal lamina
+        for (unsigned node_idx = change_1; node_idx < change_2; node_idx++)
         {
-            // Nodes are ordered anti-clockwise, so nodes to the first corner will be lateral, then apical, lateral,
-            // basal, lateral
-
-            std::vector<Node<DIM>*> r_corners = elem_it->rGetCornerNodes();
-
-            unsigned change_1 = elem_it->GetNodeLocalIndex(r_corners[1]->GetIndex());
-            unsigned change_2 = elem_it->GetNodeLocalIndex(r_corners[0]->GetIndex()) + 1;
-            unsigned change_3 = elem_it->GetNodeLocalIndex(r_corners[3]->GetIndex());
-            unsigned change_4 = elem_it->GetNodeLocalIndex(r_corners[2]->GetIndex()) + 1;
-
-            for (unsigned node_idx = 0; node_idx < change_1; node_idx++)
-            {
-                elem_it->GetNode(node_idx)->SetRegion(msLat);
-            }
-            for (unsigned node_idx = change_1; node_idx < change_2; node_idx++)
-            {
-                elem_it->GetNode(node_idx)->SetRegion(msApi);
-            }
-            for (unsigned node_idx = change_2; node_idx < change_3; node_idx++)
-            {
-                elem_it->GetNode(node_idx)->SetRegion(msLat);
-            }
-            for (unsigned node_idx = change_3; node_idx < change_4; node_idx++)
-            {
-                elem_it->GetNode(node_idx)->SetRegion(msBas);
-            }
-            for (unsigned node_idx = change_4; node_idx < elem_it->GetNumNodes(); node_idx++)
-            {
-                elem_it->GetNode(node_idx)->SetRegion(msLat);
-            }
+            elem_it->GetNode(node_idx)->SetRegion(msApi);
+        }
+        for (unsigned node_idx = change_2; node_idx < change_3; node_idx++)
+        {
+            elem_it->GetNode(node_idx)->SetRegion(msLat);
+        }
+        for (unsigned node_idx = change_3; node_idx < change_4; node_idx++)
+        {
+            elem_it->GetNode(node_idx)->SetRegion(msBas);
+        }
+        for (unsigned node_idx = change_4; node_idx < elem_it->GetNumNodes(); node_idx++)
+        {
+            elem_it->GetNode(node_idx)->SetRegion(msLat);
         }
     }
 }
@@ -310,25 +288,15 @@ void ImmersedBoundaryMembraneElasticityForce<DIM>::TagApicalAndBasalLengths()
          elem_it != mpMesh->GetElementIteratorEnd();
          ++elem_it)
     {
-        if (elem_it->GetIndex() == mpMesh->GetMembraneIndex())
-        {
-            // These lengths are irrelevant, but we will add them as zero to maintain the same number of element
-            // attributes throughout
-            elem_it->AddElementAttribute(0.0); //apical-length
-            elem_it->AddElementAttribute(0.0); //basal-length
-        }
-        else
-        {
-            // Elements start roughly rectangular, so the correct apical and basal lengths are the width of the element
+        // Elements start roughly rectangular, so the correct apical and basal lengths are the width of the element
 
-            unsigned half_way = unsigned(elem_it->GetNumNodes() / 2.0);
+        unsigned half_way = unsigned(elem_it->GetNumNodes() / 2.0);
 
-            double elem_width = fabs( mpMesh->GetVectorFromAtoB(elem_it->GetNode(0)->rGetLocation(),
-                                                                elem_it->GetNode(half_way)->rGetLocation())[0] );
+        double elem_width = fabs( mpMesh->GetVectorFromAtoB(elem_it->GetNode(0)->rGetLocation(),
+                                                            elem_it->GetNode(half_way)->rGetLocation())[0] );
 
-            elem_it->AddElementAttribute(elem_width);
-            elem_it->AddElementAttribute(elem_width);
-        }
+        elem_it->AddElementAttribute(elem_width);
+        elem_it->AddElementAttribute(elem_width);
     }
 }
 

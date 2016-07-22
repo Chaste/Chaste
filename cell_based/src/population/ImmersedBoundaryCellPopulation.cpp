@@ -72,7 +72,7 @@ ImmersedBoundaryCellPopulation<DIM>::ImmersedBoundaryCellPopulation(ImmersedBoun
         Validate();
     }
 
-    mInteractionDistance = 0.05 * sqrt(mpImmersedBoundaryMesh->GetVolumeOfElement(mpImmersedBoundaryMesh->GetNumElements()-1));
+    mInteractionDistance = 0.05 * CalculateIntrinsicCellSize();
 
     // Set the mesh division spacing distance
     rMesh.SetElementDivisionSpacing(0.25 * mInteractionDistance);
@@ -104,12 +104,7 @@ double ImmersedBoundaryCellPopulation<DIM>:: CalculateIntrinsicCellSize()
          elem_iter != mpImmersedBoundaryMesh->GetElementIteratorEnd();
          ++elem_iter)
     {
-        unsigned elem_idx = elem_iter->GetIndex();
-
-        if (elem_idx != mpImmersedBoundaryMesh->GetMembraneIndex())
-        {
-            average_intrinsic_size += mpImmersedBoundaryMesh->GetVolumeOfElement(elem_idx);
-        }
+        average_intrinsic_size += mpImmersedBoundaryMesh->GetVolumeOfElement(elem_iter->GetIndex());
     }
 
     return average_intrinsic_size / mpImmersedBoundaryMesh->GetNumElements();
