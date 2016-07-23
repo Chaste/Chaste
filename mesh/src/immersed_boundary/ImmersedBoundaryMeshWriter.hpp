@@ -80,6 +80,9 @@ private:
     /** Iterators over the mesh */
     MeshWriterIterators<ELEMENT_DIM,SPACE_DIM>* mpIters;
 
+    /** The number of laminas in the mesh */
+    unsigned mNumLaminas;
+
     /** Vector storing whether elements overlap horizontally. */
     std::vector<bool> mHOverlaps;
 
@@ -168,6 +171,11 @@ public:
      * @return the data (indices/attributes) of the next element to be written to file
      */
     ImmersedBoundaryElementData GetNextImmersedBoundaryElement();
+
+    /**
+     * @return the data (indices/attributes) of the next lamina to be written to file
+     */
+    ImmersedBoundaryElementData GetNextImmersedBoundaryLamina();
 
     /**
      * Write mesh data to files.

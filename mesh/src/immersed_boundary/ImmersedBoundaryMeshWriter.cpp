@@ -49,6 +49,8 @@ struct MeshWriterIterators
     typename AbstractMesh<ELEMENT_DIM,SPACE_DIM>::NodeIterator* pNodeIter;
     /** Iterator over immersed boundary elements */
     typename ImmersedBoundaryMesh<ELEMENT_DIM,SPACE_DIM>::ImmersedBoundaryElementIterator* pElemIter;
+    /** Iterator over immersed boundary laminas */
+    typename ImmersedBoundaryMesh<ELEMENT_DIM,SPACE_DIM>::ImmersedBoundaryLaminaIterator* pLamIter;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////
@@ -65,6 +67,7 @@ ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryMeshWriter(c
 {
     mpIters->pNodeIter = NULL;
     mpIters->pElemIter = NULL;
+    mpIters->pLamIter = NULL;
 
 #ifdef CHASTE_VTK
     // Dubious, since we shouldn't yet know what any details of the mesh are.
@@ -79,6 +82,7 @@ ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::~ImmersedBoundaryMeshWriter(
     {
         delete mpIters->pNodeIter;
         delete mpIters->pElemIter;
+        delete mpIters->pLamIter;
     }
 
     delete mpIters;
@@ -139,6 +143,28 @@ ImmersedBoundaryElementData ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+ImmersedBoundaryElementData ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextImmersedBoundaryLamina()
+{
+    ///\todo Assert this method should only be called in 2D? (#1076/#1377)
+
+    assert(mNumLaminas == mpMesh->GetNumLaminas());
+
+    ImmersedBoundaryElementData lamina_data;
+    lamina_data.NodeIndices.resize((*(mpIters->pLamIter))->GetNumNodes());
+    for (unsigned j=0; j<lamina_data.NodeIndices.size(); j++)
+    {
+        lamina_data.NodeIndices[j] = (*(mpIters->pLamIter))->GetNodeGlobalIndex(j);
+    }
+
+    // Set attribute
+    lamina_data.AttributeValue = (*(mpIters->pLamIter))->GetAttribute();
+
+    ++(*(mpIters->pLamIter));
+
+    return lamina_data;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteVtkUsingMesh(ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>& rMesh, std::string stamp)
 {
 #ifdef CHASTE_VTK
@@ -196,7 +222,7 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(ImmersedBou
     vtkPoints* p_pts = vtkPoints::New(VTK_DOUBLE);
     p_pts->GetData()->SetName("Vertex positions");
 
-    // Next, we decide how to output the VTK data depending on the type of overlap
+    // Next, we decide how to output the VTK data for elements depending on the type of overlap
     for (typename ImmersedBoundaryMesh<ELEMENT_DIM,SPACE_DIM>::ImmersedBoundaryElementIterator iter = rMesh.GetElementIteratorBegin();
             iter != rMesh.GetElementIteratorEnd();
             ++iter)
@@ -296,7 +322,7 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(ImmersedBou
         }
 
 
-        // Case 2:  only horizontal OR vertical overlap (exclusive)
+        // Case 3:  only horizontal OR vertical overlap (exclusive)
         else //( (h_overlaps[elem_idx] == true) && (v_overlaps[elem_idx] == true)
         {
             // There should be exactly two points of overlap found - if not, there is likely to be some weird geometry
@@ -305,6 +331,33 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(ImmersedBou
 
             NEVER_REACHED;
         }
+    }
+
+    // Finally, output the VTK data for laminas
+    for (typename ImmersedBoundaryMesh<ELEMENT_DIM,SPACE_DIM>::ImmersedBoundaryLaminaIterator iter = rMesh.GetLaminaIteratorBegin();
+         iter != rMesh.GetLaminaIteratorEnd();
+         ++iter)
+    {
+        unsigned num_nodes = iter->GetNumNodes();
+
+        vtkCell* p_cell = vtkPolygon::New();
+        vtkIdList* p_cell_id_list = p_cell->GetPointIds();
+        p_cell_id_list->SetNumberOfIds(iter->GetNumNodes());
+
+        for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
+        {
+            // Get node, index and location
+            Node<SPACE_DIM>* p_node = iter->GetNode(node_idx);
+            unsigned global_idx = p_node->GetIndex();
+            c_vector<double, SPACE_DIM> position = p_node->rGetLocation();
+
+            p_pts->InsertPoint(global_idx, position[0], position[1], 0.0);
+
+            p_cell_id_list->SetId(node_idx, global_idx);
+        }
+
+        mpVtkUnstructedMesh->InsertNextCell(3, p_cell_id_list);
+        p_cell->Delete(); // Reference counted
     }
 
     mpVtkUnstructedMesh->SetPoints(p_pts);
@@ -356,12 +409,16 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(Imm
 
     this->mNumNodes = mpMesh->GetNumNodes();
     this->mNumElements = mpMesh->GetNumElements();
+    mNumLaminas = mpMesh->GetNumLaminas();
 
     typedef typename AbstractMesh<ELEMENT_DIM,SPACE_DIM>::NodeIterator NodeIterType;
     mpIters->pNodeIter = new NodeIterType(mpMesh->GetNodeIteratorBegin());
 
     typedef typename ImmersedBoundaryMesh<ELEMENT_DIM,SPACE_DIM>::ImmersedBoundaryElementIterator ElemIterType;
     mpIters->pElemIter = new ElemIterType(mpMesh->GetElementIteratorBegin());
+
+    typedef typename ImmersedBoundaryMesh<ELEMENT_DIM,SPACE_DIM>::ImmersedBoundaryLaminaIterator LamIterType;
+    mpIters->pLamIter = new LamIterType(mpMesh->GetLaminaIteratorBegin());
 
     WriteFiles();
 }
@@ -402,7 +459,7 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
     p_node_file->close();
 
     // Write element file
-    std::string element_file_name = this->mBaseName + ".cell";
+    std::string element_file_name = this->mBaseName + ".elem";
     out_stream p_element_file = this->mpOutputFileHandler->OpenOutputFile(element_file_name);
 
     // Write the element header
@@ -445,6 +502,51 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
     }
     *p_element_file << comment << "\n";
     p_element_file->close();
+
+    // Write lamina file
+    std::string lamina_file_name = this->mBaseName + ".lam";
+    out_stream p_lamina_file = this->mpOutputFileHandler->OpenOutputFile(lamina_file_name);
+
+    // Write the lamina header
+    num_attr = 1; //Always write element attributes
+    unsigned num_laminas = mpMesh->GetNumLaminas();
+    *p_lamina_file << num_laminas << "\t" << num_attr << "\n";
+
+    // Write each lamina's data
+    for (unsigned item_num=0; item_num<num_laminas; item_num++)
+    {
+        if (SPACE_DIM == 2) // In 2D, write the node indices owned by this element
+        {
+            // Get data for this element
+            ImmersedBoundaryElementData lamina_data = this->GetNextImmersedBoundaryLamina();
+
+            // Get the node indices owned by this element
+            std::vector<unsigned> node_indices = lamina_data.NodeIndices;
+
+            // Write this element's index and the number of nodes owned by it to file
+            *p_lamina_file << item_num <<  "\t" << node_indices.size();
+
+            // Write the node indices owned by this element to file
+            for (unsigned i=0; i<node_indices.size(); i++)
+            {
+                *p_lamina_file << "\t" << node_indices[i];
+            }
+
+            *p_lamina_file << "\t" << lamina_data.AttributeValue;
+
+            *p_lamina_file << "\t" << lamina_data.SpringConstant;
+
+            *p_lamina_file << "\t" << lamina_data.RestLength;
+
+            // New line
+            *p_lamina_file << "\n";
+        }
+        else // 3D
+        {
+        }
+    }
+    *p_lamina_file << comment << "\n";
+    p_lamina_file->close();
 
     // Write grid file
     std::string grid_file_name = this->mBaseName + ".grid";
