@@ -240,6 +240,20 @@ void ImmersedBoundaryMeshReader<ELEMENT_DIM, SPACE_DIM>::OpenElementsFile()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void ImmersedBoundaryMeshReader<ELEMENT_DIM, SPACE_DIM>::OpenLaminasFile()
+{
+    // Elements definition
+    std::string file_name;
+    file_name = mFilesBaseName + ".lam";
+
+    mLaminasFile.open(file_name.c_str());
+    if (!mLaminasFile.is_open())
+    {
+        EXCEPTION("Could not open data file: " + file_name);
+    }
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void ImmersedBoundaryMeshReader<ELEMENT_DIM, SPACE_DIM>::OpenGridFile()
 {
     // Grid definition
@@ -278,14 +292,19 @@ void ImmersedBoundaryMeshReader<ELEMENT_DIM, SPACE_DIM>::ReadHeaders()
     OpenNodeFile();
     GetNextLineFromStream(mNodesFile, buffer);
 
-    GetNextLineFromStream(mElementsFile, buffer);
+    // Element header
+    GetNextLineFromStream(mLaminasFile, buffer);
     std::stringstream element_buffer_stream(buffer);
-
     element_buffer_stream >> mNumElements >> mNumElementAttributes;
 
+    // Lamina header
+    GetNextLineFromStream(mElementsFile, buffer);
+    std::stringstream lamina_buffer_stream(buffer);
+    lamina_buffer_stream >> mNumLaminas >> mNumLaminaAttributes;
+
+    // Grid header
     GetNextLineFromStream(mGridFile, buffer);
     std::stringstream grid_buffer_stream(buffer);
-
     grid_buffer_stream >> mNumGridPtsX >> mNumGridPtsY;
 }
 

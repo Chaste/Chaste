@@ -73,6 +73,9 @@ private:
     /** The elements file for the mesh. */
     std::ifstream mElementsFile;
 
+    /** The laminas file for the mesh. */
+    std::ifstream mLaminasFile;
+
     /** The grid file for the mesh. */
     std::ifstream mGridFile;
 
@@ -97,11 +100,14 @@ private:
     /** Number of laminas read in by the reader. */
     unsigned mLaminasRead;
 
-    /** Is the number of attributes stored at each node. */
+    /** Number of attributes stored at each node. */
     unsigned mNumNodeAttributes;
 
-    /** Is the number of attributes stored for each element. */
+    /** Number of attributes stored for each element. */
     unsigned mNumElementAttributes;
+
+    /** Number of attributes stored for each lamina. */
+    unsigned mNumLaminaAttributes;
 
     /** Is the number of grid points in the x direction. */
     unsigned mNumGridPtsX;
@@ -128,7 +134,12 @@ private:
     void OpenElementsFile();
 
     /**
-     * Open element file.
+     * Open laminas file.
+     */
+    void OpenLaminasFile();
+
+    /**
+     * Open grids file.
      */
     void OpenGridFile();
 
