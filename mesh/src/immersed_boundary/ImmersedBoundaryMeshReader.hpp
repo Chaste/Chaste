@@ -202,9 +202,14 @@ public:
     unsigned GetNumGridPtsY() const;
 
     /**
-     * @return the number of attributes in the mesh
+     * @return the number of attributes associated with elements in the mesh
      */
     unsigned GetNumElementAttributes() const;
+
+    /**
+     * @return the number of attributes associated with laminas in the mesh
+     */
+    unsigned GetNumLaminaAttributes() const;
 
     /**
      * @return the characteristic node spacing in the mesh
@@ -230,6 +235,11 @@ public:
      * @return the nodes of each element (and any attribute information, if there is any) in turn.
      */
     ImmersedBoundaryElementData GetNextImmersedBoundaryElementData();
+
+    /**
+     * @return the nodes of each lamina (and any attribute information, if there is any) in turn.
+     */
+    ImmersedBoundaryElementData GetNextImmersedBoundaryLaminaData();
 
     /**
      * @return the number of faces in the mesh (synonym of GetNumEdges()).

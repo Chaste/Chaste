@@ -91,6 +91,12 @@ unsigned ImmersedBoundaryMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNumElementAttrib
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned ImmersedBoundaryMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNumLaminaAttributes() const
+{
+    return mNumLaminaAttributes;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double ImmersedBoundaryMeshReader<ELEMENT_DIM, SPACE_DIM>::GetCharacteristicNodeSpacing()
 {
     return mCharacteristicNodeSpacing;
@@ -204,6 +210,52 @@ ImmersedBoundaryElementData ImmersedBoundaryMeshReader<ELEMENT_DIM, SPACE_DIM>::
     return element_data;
 }
 
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+ImmersedBoundaryElementData ImmersedBoundaryMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextImmersedBoundaryLaminaData()
+{
+    // Create data structure for this lamina
+    ImmersedBoundaryElementData lamina_data;
+
+    std::string buffer;
+    GetNextLineFromStream(mLaminasFile, buffer);
+
+    std::stringstream buffer_stream(buffer);
+
+    unsigned lamina_idx;
+    buffer_stream >> lamina_idx;
+
+    unsigned offset = mIndexFromZero ? 0 : 1;
+    if (lamina_idx != mElementsRead + offset)
+    {
+        EXCEPTION("Data for lamina " << mLaminasRead << " missing");
+    }
+
+    unsigned num_nodes_in_lamina;
+    buffer_stream >> num_nodes_in_lamina;
+
+    // Store node indices owned by this element
+    unsigned node_index;
+    for (unsigned i=0; i<num_nodes_in_lamina; i++)
+    {
+        buffer_stream >> node_index;
+        lamina_data.NodeIndices.push_back(node_index - offset);
+    }
+
+    if (mNumLaminaAttributes > 0)
+    {
+        assert(mNumLaminaAttributes == 1);
+
+        buffer_stream >> lamina_data.AttributeValue;
+    }
+    else
+    {
+        lamina_data.AttributeValue = 0;
+    }
+
+    mLaminasRead++;
+    return lamina_data;
+}
+
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void ImmersedBoundaryMeshReader<ELEMENT_DIM, SPACE_DIM>::OpenFiles()
@@ -313,6 +365,7 @@ void ImmersedBoundaryMeshReader<ELEMENT_DIM, SPACE_DIM>::CloseFiles()
 {
     mNodesFile.close();
     mElementsFile.close();
+    mLaminasFile.close();
     mGridFile.close();
 }
 
@@ -327,7 +380,7 @@ void ImmersedBoundaryMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextLineFromStream(s
 
         if (fileStream.eof())
         {
-            EXCEPTION("Cannot get the next line from node, element or grid file due to incomplete data");
+            EXCEPTION("Cannot get the next line from node, element, lamina or grid file due to incomplete data");
         }
 
         // Get rid of any comment
