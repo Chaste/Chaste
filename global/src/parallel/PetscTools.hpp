@@ -323,7 +323,7 @@ public:
      * @param rOutputFileFullPath where to read the matrix from
      * @param rParallelLayout If provided, rMat will have the same parallel layout. Its content is irrelevant.
      */
-    static void ReadPetscObject(Mat& rMat, const std::string& rOutputFileFullPath, Vec rParallelLayout=NULL);
+    static void ReadPetscObject(Mat& rMat, const std::string& rOutputFileFullPath, Vec rParallelLayout=nullptr);
 
     /**
      * Read a previously dumped PETSc object from disk.
@@ -332,7 +332,7 @@ public:
      * @param rOutputFileFullPath where to read the matrix from
      * @param rParallelLayout If provided, rMat will have the same parallel layout. Its content is irrelevant.
      */
-    static void ReadPetscObject(Vec& rVec, const std::string& rOutputFileFullPath, Vec rParallelLayout=NULL);
+    static void ReadPetscObject(Vec& rVec, const std::string& rOutputFileFullPath, Vec rParallelLayout=nullptr);
 
     /**
      * Checks if PETSc has been configured with ParMetis partioning support.
@@ -383,7 +383,7 @@ public:
      static inline void SetOption(const char* pOptionName, const char* pOptionValue)
      {
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 7) // PETSc 3.7 or later
-         PetscOptionsSetValue(NULL, pOptionName, pOptionValue);
+         PetscOptionsSetValue(nullptr, pOptionName, pOptionValue);
 #else
          PetscOptionsSetValue(pOptionName, pOptionValue);
 #endif

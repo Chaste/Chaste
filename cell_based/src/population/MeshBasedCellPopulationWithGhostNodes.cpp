@@ -341,7 +341,7 @@ template<unsigned DIM>
 void MeshBasedCellPopulationWithGhostNodes<DIM>::WriteVtkResultsToFile(const std::string& rDirectory)
 {
 #ifdef CHASTE_VTK
-    if (this->mpVoronoiTessellation != NULL)
+    if (this->mpVoronoiTessellation != nullptr)
     {
         unsigned num_timesteps = SimulationTime::Instance()->GetTimeStepsElapsed();
         std::stringstream time;

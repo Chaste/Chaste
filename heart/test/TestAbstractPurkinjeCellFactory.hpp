@@ -99,17 +99,17 @@ public:
              current_node != mixed_mesh.GetNodeIteratorEnd();
              ++current_node)
         {
-            AbstractCardiacCellInterface* p_cell = cell_factory.CreatePurkinjeCellForNode( &(*current_node) , NULL);
+            AbstractCardiacCellInterface* p_cell = cell_factory.CreatePurkinjeCellForNode( &(*current_node) , nullptr);
             double y = current_node->rGetLocation()[1];
 
             // cable nodes are on y=0.05 (we don't test by index because indices may be permuted in parallel).
             if( fabs(y-0.05) < 1e-8 )
             {
-                TS_ASSERT(dynamic_cast<CellDiFrancescoNoble1985FromCellML*>(p_cell) != NULL);
+                TS_ASSERT(dynamic_cast<CellDiFrancescoNoble1985FromCellML*>(p_cell) != nullptr);
             }
             else
             {
-                TS_ASSERT(dynamic_cast<FakeBathCell*>(p_cell) != NULL);
+                TS_ASSERT(dynamic_cast<FakeBathCell*>(p_cell) != nullptr);
             }
             delete p_cell;
         }

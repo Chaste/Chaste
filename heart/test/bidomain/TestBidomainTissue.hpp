@@ -376,7 +376,7 @@ public:
                 AbstractCardiacTissue<3>* p_bidomain_tissue;
                 (*p_arch) >> p_bidomain_tissue;
 
-                assert(p_bidomain_tissue!=NULL);
+                assert(p_bidomain_tissue!=nullptr);
 
                 const c_matrix<double, 3, 3>& intra_tensor_after_archiving = p_bidomain_tissue->rGetIntracellularConductivityTensor(0);
                 const c_matrix<double, 3, 3>& extra_tensor_after_archiving = dynamic_cast<BidomainTissue<3>*>(p_bidomain_tissue)->rGetExtracellularConductivityTensor(0); //Naughty Gary using dynamic cast, but only for testing...

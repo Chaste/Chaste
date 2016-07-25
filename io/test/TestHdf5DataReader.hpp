@@ -105,7 +105,7 @@ private:
          */
         dimsf[0] = NX;
         dimsf[1] = NY;
-        dataspace = H5Screate_simple(RANK, dimsf, NULL);
+        dataspace = H5Screate_simple(RANK, dimsf, nullptr);
 
         /*
          * Define datatype for the data in the file.
@@ -202,7 +202,7 @@ public:
 
         dataspace = H5Dget_space(dataset);    /* dataspace handle */
         rank      = H5Sget_simple_extent_ndims(dataspace);
-        status_n  = H5Sget_simple_extent_dims(dataspace, dims_out, NULL);
+        status_n  = H5Sget_simple_extent_dims(dataspace, dims_out, nullptr);
         TS_ASSERT_EQUALS(rank,2);
         TS_ASSERT_EQUALS(status_n,2);
         //printf("rank %d, dimensions %lu x %lu \n", rank,
@@ -213,15 +213,15 @@ public:
         offset[1] = 2;
         count[0]  = NX_SUB;
         count[1]  = NY_SUB;
-        status = H5Sselect_hyperslab(dataspace, H5S_SELECT_SET, offset, NULL,
-                     count, NULL);
+        status = H5Sselect_hyperslab(dataspace, H5S_SELECT_SET, offset, nullptr,
+                     count, nullptr);
         TS_ASSERT_EQUALS(status, 0);
 
         // Define the memory dataspace
         dimsm[0] = NX;
         dimsm[1] = NY;
         dimsm[2] = NZ;
-        memspace = H5Screate_simple(RANK_OUT,dimsm,NULL);
+        memspace = H5Screate_simple(RANK_OUT,dimsm,nullptr);
 
         // Define memory hyperslab
         offset_out[0] = 3;
@@ -230,8 +230,8 @@ public:
         count_out[0]  = NX_SUB;
         count_out[1]  = NY_SUB;
         count_out[2]  = 1;
-        status = H5Sselect_hyperslab(memspace, H5S_SELECT_SET, offset_out, NULL,
-                     count_out, NULL);
+        status = H5Sselect_hyperslab(memspace, H5S_SELECT_SET, offset_out, nullptr,
+                     count_out, nullptr);
 
         /*
          * Read data from hyperslab in the file into the hyperslab in
@@ -644,7 +644,7 @@ public:
         /*
          * Begin iteration.
          */
-        herr_t status = H5Literate(file, H5_INDEX_NAME, H5_ITER_NATIVE, NULL, op_func, &dataset_names);
+        herr_t status = H5Literate(file, H5_INDEX_NAME, H5_ITER_NATIVE, nullptr, op_func, &dataset_names);
 
         /*
          * Close and release resources.

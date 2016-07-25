@@ -49,7 +49,7 @@ SphereGeometryBoundaryCondition<DIM>::SphereGeometryBoundaryCondition(AbstractCe
     assert(mRadiusOfSphere > 0.0);
     assert(mMaximumDistance > 0.0);
 
-    if (dynamic_cast<NodeBasedCellPopulation<DIM>*>(this->mpCellPopulation) == NULL)
+    if (dynamic_cast<NodeBasedCellPopulation<DIM>*>(this->mpCellPopulation) == nullptr)
     {
         EXCEPTION("A NodeBasedCellPopulation must be used with this boundary condition object.");
     }

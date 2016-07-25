@@ -512,7 +512,7 @@ public:
             TS_ASSERT_DELTA(p_pde_and_bc->GetBoundaryCondition()->GetValue(point), 2.45, 1e-6);
 
             AbstractLinearEllipticPde<2,2>* p_pde = p_pde_and_bc->GetPde();
-            TS_ASSERT(dynamic_cast<SimpleUniformSourcePde<2>*>(p_pde) != NULL);
+            TS_ASSERT(dynamic_cast<SimpleUniformSourcePde<2>*>(p_pde) != nullptr);
             TS_ASSERT_DELTA(static_cast<SimpleUniformSourcePde<2>*>(p_pde)->GetCoefficient(), 0.75, 1e-6);
 
             // Avoid memory leaks
@@ -573,7 +573,7 @@ public:
             TS_ASSERT_DELTA(p_pde_and_bc->GetBoundaryCondition()->GetValue(point), 2.45, 1e-6);
 
             AbstractLinearEllipticPde<2,2>* p_pde = p_pde_and_bc->GetPde();
-            TS_ASSERT(dynamic_cast<SimpleUniformSourcePde<2>*>(p_pde) != NULL);
+            TS_ASSERT(dynamic_cast<SimpleUniformSourcePde<2>*>(p_pde) != nullptr);
             TS_ASSERT_DELTA(static_cast<SimpleUniformSourcePde<2>*>(p_pde)->GetCoefficient(), 0.75, 1e-6);
 
             Vec solution = p_pde_and_bc->GetSolution();

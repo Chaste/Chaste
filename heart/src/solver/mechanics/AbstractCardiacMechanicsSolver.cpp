@@ -44,7 +44,7 @@ AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::AbstractCardiacMechanicsS
    : ELASTICITY_SOLVER(rQuadMesh,
                        rProblemDefinition,
                        outputDirectory),
-     mpMeshPair(NULL),
+     mpMeshPair(nullptr),
      mCurrentTime(DBL_MAX),
      mNextTime(DBL_MAX),
      mOdeTimestep(DBL_MAX),
@@ -61,7 +61,7 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::Initialise()
 
     std::vector<ElementAndWeights<DIM> > fine_elements = mpMeshPair->rGetElementsAndWeights();
     assert(fine_elements.size()==mTotalQuadPoints);
-    assert(mpMeshPair!=NULL);
+    assert(mpMeshPair!=nullptr);
 
     AbstractContractionCellFactory<DIM>* p_factory = mrElectroMechanicsProblemDefinition.GetContractionCellFactory();
 
@@ -110,7 +110,7 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::Initialise()
         mConstantFibreSheetDirections(i,i) = 1.0;
     }
 
-    mpVariableFibreSheetDirections = NULL;
+    mpVariableFibreSheetDirections = nullptr;
 
     // Check that we are using the right kind of solver.
     for(std::map<unsigned,DataAtQuadraturePoint>::iterator iter = this->mQuadPointToDataAtQuadPointMap.begin();
@@ -133,7 +133,7 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::Initialise()
 template<class ELASTICITY_SOLVER,unsigned DIM>
 void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::SetFineCoarseMeshPair(FineCoarseMeshPair<DIM>* pMeshPair)
 {
-    assert(pMeshPair!=NULL);
+    assert(pMeshPair!=nullptr);
     if (pMeshPair->GetCoarseMesh().GetNumElements() != this->mrQuadMesh.GetNumElements())
     {
         EXCEPTION("When setting a mesh pair into the solver, the coarse mesh of the mesh pair must be the same as the quadratic mesh");

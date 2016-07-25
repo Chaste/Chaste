@@ -576,7 +576,7 @@ Release 3.1 is a minor release, which brings support for newer versions of libra
     </ul></li>
     <li>Moved all methods of <tt>AbstractParameterisedSystem</tt> which don't require the vector type up into a new base class <tt>AbstractUntemplatedParameterisedSystem</tt>.  This should not affect other code.</li>
     <li>Renamed <tt>PetscMatTools::AssembleFinal</tt> to <tt>PetscMatTools::Finalise</tt>, <tt>PetscMatTools::AssembleIntermediate</tt> to <tt>PetscMatTools::SwitchWriteMode</tt>, and <tt>PetscVecTools::Assemble</tt> to <tt>PetscVecTools::Finalise</tt>.  Similar name changes happened to the analogous <tt>LinearSystem</tt> convenience methods.</li>
-    <li>Changed <tt>AbstractLinearEllipticPde::ComputeConstantInUSourceTerm(rX)</tt> to <tt>AbstractLinearEllipticPde::ComputeConstantInUSourceTerm(rX, pElement)</tt> so it can take in an element containing <tt>rX</tt> to make it consistent with <tt>ComputeLinearInUCoeffInSourceTerm</tt>.  You can pass in a <tt>NULL</tt> pointer for <tt>pElement</tt>.  Changed all associated classes.</li>
+    <li>Changed <tt>AbstractLinearEllipticPde::ComputeConstantInUSourceTerm(rX)</tt> to <tt>AbstractLinearEllipticPde::ComputeConstantInUSourceTerm(rX, pElement)</tt> so it can take in an element containing <tt>rX</tt> to make it consistent with <tt>ComputeLinearInUCoeffInSourceTerm</tt>.  You can pass in a <tt>nullptr</tt> pointer for <tt>pElement</tt>.  Changed all associated classes.</li>
     <li>Method for writing strain per element added to <tt>AbstractNonlinearElasticitySolver</tt>. There is as yet no interface to it: to use it you must call it from the main output method.</li>
   </ul></li>
 </ul>

@@ -48,16 +48,16 @@ ExtendedBidomainTissue<SPACE_DIM>::ExtendedBidomainTissue(AbstractCardiacCellFac
                                                           AbstractCardiacCellFactory<SPACE_DIM>* pCellFactorySecondCell,
                                                           AbstractStimulusFactory<SPACE_DIM>* pExtracellularStimulusFactory)
     : AbstractCardiacTissue<SPACE_DIM>(pCellFactory),
-      mpIntracellularConductivityTensorsSecondCell(NULL),
+      mpIntracellularConductivityTensorsSecondCell(nullptr),
       mUserSuppliedExtracellularStimulus(false)
 {
     //First, do the same that the abstract constructor does, but applied to the second cell
 
-    assert(pCellFactorySecondCell != NULL);
-    assert(pCellFactorySecondCell->GetMesh() != NULL);
+    assert(pCellFactorySecondCell != nullptr);
+    assert(pCellFactorySecondCell->GetMesh() != nullptr);
     assert(pCellFactorySecondCell->GetNumberOfCells() == pCellFactory->GetNumberOfCells() );
-    assert(pExtracellularStimulusFactory != NULL);
-    assert(pExtracellularStimulusFactory->GetMesh() != NULL);
+    assert(pExtracellularStimulusFactory != nullptr);
+    assert(pExtracellularStimulusFactory->GetMesh() != nullptr);
     assert(pExtracellularStimulusFactory->GetNumberOfCells() == pCellFactorySecondCell->GetNumberOfCells() );
 
     unsigned num_local_nodes = this->mpDistributedVectorFactory->GetLocalOwnership();
@@ -121,7 +121,7 @@ ExtendedBidomainTissue<SPACE_DIM>::ExtendedBidomainTissue(std::vector<AbstractCa
                                                           AbstractTetrahedralMesh<SPACE_DIM,SPACE_DIM>* pMesh,
                                                           c_vector<double, SPACE_DIM>  intracellularConductivitiesSecondCell)
         :   AbstractCardiacTissue<SPACE_DIM>(pMesh),
-            mpIntracellularConductivityTensorsSecondCell(NULL),
+            mpIntracellularConductivityTensorsSecondCell(nullptr),
             mIntracellularConductivitiesSecondCell(intracellularConductivitiesSecondCell),
             mCellsDistributedSecondCell(rSecondCellsDistributed),
             mExtracellularStimuliDistributed(rExtraStimuliDistributed),
@@ -156,7 +156,7 @@ template <unsigned SPACE_DIM>
 void ExtendedBidomainTissue<SPACE_DIM>::CreateGGapConductivities()
 {
     assert(mGgapHeterogeneityRegions.size() == mGgapValues.size());
-    assert(this->mpMesh != NULL);
+    assert(this->mpMesh != nullptr);
 
     unsigned ownership_range_low = this->mpDistributedVectorFactory->GetLow();
     unsigned num_local_nodes = this->mpDistributedVectorFactory->GetLocalOwnership();
@@ -471,7 +471,7 @@ template <unsigned SPACE_DIM>
 const c_matrix<double, SPACE_DIM, SPACE_DIM>& ExtendedBidomainTissue<SPACE_DIM>::rGetExtracellularConductivityTensor(unsigned elementIndex)
 {
     assert(mpExtracellularConductivityTensors);
-    if (this->mpConductivityModifier==NULL)
+    if (this->mpConductivityModifier==nullptr)
     {
         return (*mpExtracellularConductivityTensors)[elementIndex];
     }
@@ -485,7 +485,7 @@ template <unsigned SPACE_DIM>
 const c_matrix<double, SPACE_DIM, SPACE_DIM>& ExtendedBidomainTissue<SPACE_DIM>::rGetIntracellularConductivityTensorSecondCell(unsigned elementIndex)
 {
     assert(mpIntracellularConductivityTensorsSecondCell);
-    if (this->mpConductivityModifier==NULL)
+    if (this->mpConductivityModifier==nullptr)
     {
         return (*mpIntracellularConductivityTensorsSecondCell)[elementIndex];
     }

@@ -684,7 +684,7 @@ public:
         // Run cell-based simulation
         TS_ASSERT_THROWS_NOTHING(simulator.Solve());
 
-        TS_ASSERT(p_coarse_mesh != NULL);
+        TS_ASSERT(p_coarse_mesh != nullptr);
 
         ReplicatableVector pde_solution0(simulator.GetCellBasedPdeHandler()->GetPdeSolution("oxygen"));
         ReplicatableVector pde_solution1(simulator.GetCellBasedPdeHandler()->GetPdeSolution("dunno"));

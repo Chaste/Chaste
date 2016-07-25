@@ -79,7 +79,7 @@ void AbstractOdeBasedPhaseBasedCellCycleModel::SetBirthTime(double birthTime)
 
 void AbstractOdeBasedPhaseBasedCellCycleModel::UpdateCellCyclePhase()
 {
-    assert(mpOdeSystem != NULL);
+    assert(mpOdeSystem != nullptr);
 
     double current_time = SimulationTime::Instance()->GetTime();
 

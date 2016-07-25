@@ -42,7 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void BidomainSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolve(Vec initialSolution)
 {
-    if (this->mpLinearSystem != NULL)
+    if (this->mpLinearSystem != nullptr)
     {
         return;
     }
@@ -67,9 +67,9 @@ void BidomainSolver<ELEMENT_DIM,SPACE_DIM>::SetupLinearSystem(
         Vec currentSolution,
         bool computeMatrix)
 {
-    assert(this->mpLinearSystem->rGetLhsMatrix() != NULL);
-    assert(this->mpLinearSystem->rGetRhsVector() != NULL);
-    assert(currentSolution != NULL);
+    assert(this->mpLinearSystem->rGetLhsMatrix() != nullptr);
+    assert(this->mpLinearSystem->rGetRhsVector() != nullptr);
+    assert(currentSolution != nullptr);
 
 
     /////////////////////////////////////////
@@ -208,7 +208,7 @@ BidomainSolver<ELEMENT_DIM,SPACE_DIM>::BidomainSolver(
 {
     // Tell tissue there's no need to replicate ionic caches
     pTissue->SetCacheReplication(false);
-    mVecForConstructingRhs = NULL;
+    mVecForConstructingRhs = nullptr;
 
     // create assembler
     if(bathSimulation)
@@ -232,7 +232,7 @@ BidomainSolver<ELEMENT_DIM,SPACE_DIM>::BidomainSolver(
     }
     else
     {
-        mpBidomainCorrectionTermAssembler = NULL;
+        mpBidomainCorrectionTermAssembler = nullptr;
     }
 }
 

@@ -60,13 +60,13 @@ public:
 
     void TestSetAndGetUseJiggledBottomCells() throw (Exception)
     {
-        CryptSimulationBoundaryCondition<1> boundary_condition1d(NULL);
+        CryptSimulationBoundaryCondition<1> boundary_condition1d(nullptr);
         TS_ASSERT_EQUALS(boundary_condition1d.GetUseJiggledBottomCells(), false);
 
         boundary_condition1d.SetUseJiggledBottomCells(true);
         TS_ASSERT_EQUALS(boundary_condition1d.GetUseJiggledBottomCells(), true);
 
-        CryptSimulationBoundaryCondition<2> boundary_condition2d(NULL);
+        CryptSimulationBoundaryCondition<2> boundary_condition2d(nullptr);
         TS_ASSERT_EQUALS(boundary_condition2d.GetUseJiggledBottomCells(), false);
 
         boundary_condition2d.SetUseJiggledBottomCells(true);
@@ -90,7 +90,7 @@ public:
 
         // Test access to the cell population
         const AbstractCellPopulation<1>* p_population1d = boundary_condition1d.GetCellPopulation();
-        TS_ASSERT(p_population1d != NULL);
+        TS_ASSERT(p_population1d != nullptr);
     }
 
     void TestConstructorWithCellPopulation2d() throw (Exception)
@@ -111,7 +111,7 @@ public:
 
         // Test access to the cell population
         const AbstractCellPopulation<2>* p_population = boundary_condition.GetCellPopulation();
-        TS_ASSERT(p_population != NULL);
+        TS_ASSERT(p_population != nullptr);
     }
 
     void TestOutputParameters1d() throw(Exception)
@@ -119,7 +119,7 @@ public:
         std::string output_directory = "TestOutputParameters1d";
         OutputFileHandler output_file_handler(output_directory, false);
 
-        CryptSimulationBoundaryCondition<1> boundary_condition(NULL);
+        CryptSimulationBoundaryCondition<1> boundary_condition(nullptr);
         TS_ASSERT_EQUALS(boundary_condition.GetIdentifier(), "CryptSimulationBoundaryCondition-1");
 
         out_stream boundary_condition_parameter_file = output_file_handler.OpenOutputFile("results1d.parameters");
@@ -142,7 +142,7 @@ public:
         std::string output_directory = "TestOutputParameters2d";
         OutputFileHandler output_file_handler(output_directory, false);
 
-        CryptSimulationBoundaryCondition<2> boundary_condition(NULL);
+        CryptSimulationBoundaryCondition<2> boundary_condition(nullptr);
         TS_ASSERT_EQUALS(boundary_condition.GetIdentifier(), "CryptSimulationBoundaryCondition-2");
 
         out_stream boundary_condition_parameter_file = output_file_handler.OpenOutputFile("results2d.parameters");
@@ -502,7 +502,7 @@ public:
 
         {
             // Create an output archive
-            CryptSimulationBoundaryCondition<1> boundary_condition(NULL);
+            CryptSimulationBoundaryCondition<1> boundary_condition(nullptr);
             boundary_condition.SetUseJiggledBottomCells(true);
 
             std::ofstream ofs(archive_filename.c_str());
@@ -539,7 +539,7 @@ public:
 
         {
             // Create an output archive
-            CryptSimulationBoundaryCondition<2> boundary_condition(NULL);
+            CryptSimulationBoundaryCondition<2> boundary_condition(nullptr);
             boundary_condition.SetUseJiggledBottomCells(true);
 
             std::ofstream ofs(archive_filename.c_str());

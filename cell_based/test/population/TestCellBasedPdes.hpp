@@ -76,8 +76,8 @@ public:
 
         ChastePoint<2> point;
 
-        TS_ASSERT_DELTA(pde.ComputeConstantInUSourceTerm(point, NULL), 0.0, 1e-6);
-        TS_ASSERT_DELTA(pde.ComputeLinearInUCoeffInSourceTerm(point, NULL), 0.05, 1e-6);
+        TS_ASSERT_DELTA(pde.ComputeConstantInUSourceTerm(point, nullptr), 0.0, 1e-6);
+        TS_ASSERT_DELTA(pde.ComputeLinearInUCoeffInSourceTerm(point, nullptr), 0.05, 1e-6);
 
         c_matrix<double,2,2> diffusion_matrix = pde.ComputeDiffusionTerm(point);
         for (unsigned i=0; i<2; i++)
@@ -123,7 +123,7 @@ public:
             (*p_arch) >> p_pde;
 
             // Test that the PDE and its member variables were archived correctly
-            TS_ASSERT(dynamic_cast<SimpleUniformSourcePde<2>*>(p_pde) != NULL);
+            TS_ASSERT(dynamic_cast<SimpleUniformSourcePde<2>*>(p_pde) != nullptr);
 
             SimpleUniformSourcePde<2>* p_static_cast_pde = static_cast<SimpleUniformSourcePde<2>*>(p_pde);
             TS_ASSERT_DELTA(p_static_cast_pde->GetCoefficient(), 0.05, 1e-6);
@@ -211,7 +211,7 @@ public:
             (*p_arch) >> p_pde;
 
             // Test that the PDE and its member variables were archived correctly
-            TS_ASSERT(dynamic_cast<CellwiseSourcePde<2>*>(p_pde) != NULL);
+            TS_ASSERT(dynamic_cast<CellwiseSourcePde<2>*>(p_pde) != nullptr);
 
             CellwiseSourcePde<2>* p_static_cast_pde = static_cast<CellwiseSourcePde<2>*>(p_pde);
             TS_ASSERT_DELTA(p_static_cast_pde->GetCoefficient(), 0.05, 1e-6);
@@ -280,7 +280,7 @@ public:
         ChastePoint<2> point;
         TS_ASSERT_DELTA(pde.ComputeLinearInUCoeffInSourceTerm(point, coarse_mesh.GetElement(0)), 0.05*0.5, 1e-6);
 
-        TS_ASSERT_DELTA(pde.ComputeConstantInUSourceTerm(point, NULL), 0.0, 1e-6);
+        TS_ASSERT_DELTA(pde.ComputeConstantInUSourceTerm(point, nullptr), 0.0, 1e-6);
 
         c_matrix<double,2,2> diffusion_matrix = pde.ComputeDiffusionTerm(point);
         for (unsigned i=0; i<2; i++)
@@ -337,7 +337,7 @@ public:
             (*p_arch) >> p_pde;
 
             // Test that the PDE and its member variables were archived correctly
-            TS_ASSERT(dynamic_cast<AveragedSourcePde<2>*>(p_pde) != NULL);
+            TS_ASSERT(dynamic_cast<AveragedSourcePde<2>*>(p_pde) != nullptr);
 
             AveragedSourcePde<2>* p_static_cast_pde = static_cast<AveragedSourcePde<2>*>(p_pde);
             TS_ASSERT_DELTA(p_static_cast_pde->GetCoefficient(), 0.05, 1e-6);
@@ -367,7 +367,7 @@ public:
         VolumeDependentAveragedSourcePde<2> pde(cell_population, 0.05);
 
         // Test that the member variables have been initialised correctly
-        TS_ASSERT(pde.mpStaticCastCellPopulation != NULL);
+        TS_ASSERT(pde.mpStaticCastCellPopulation != nullptr);
 
         // For simplicity we create a very large coarse mesh, so we know that all cells are contained in one element
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_2_elements");
@@ -444,12 +444,12 @@ public:
             (*p_arch) >> p_pde;
 
             // Test that the PDE and its member variables were archived correctly
-            TS_ASSERT(dynamic_cast<VolumeDependentAveragedSourcePde<2>*>(p_pde) != NULL);
+            TS_ASSERT(dynamic_cast<VolumeDependentAveragedSourcePde<2>*>(p_pde) != nullptr);
 
             VolumeDependentAveragedSourcePde<2>* p_static_cast_pde = static_cast<VolumeDependentAveragedSourcePde<2>*>(p_pde);
             TS_ASSERT_DELTA(p_static_cast_pde->GetCoefficient(), 0.05, 1e-6);
             TS_ASSERT_EQUALS(p_static_cast_pde->mrCellPopulation.GetNumRealCells(), 25u);
-            TS_ASSERT(p_static_cast_pde->mpStaticCastCellPopulation != NULL);
+            TS_ASSERT(p_static_cast_pde->mpStaticCastCellPopulation != nullptr);
             TS_ASSERT_EQUALS(p_static_cast_pde->mpStaticCastCellPopulation->GetNumRealCells(), 25u);
 
             // Avoid memory leaks

@@ -610,11 +610,11 @@ public:
 
             AbstractCardiacTissue<3>* p_abstract_tissue;
             (*p_arch) >> p_abstract_tissue;
-            assert(p_abstract_tissue!=NULL);
+            assert(p_abstract_tissue!=nullptr);
 
             //dynamic cast so we are able to test specific variables of ExtendedBidomainTissue
             ExtendedBidomainTissue<3>* p_extended_tissue = dynamic_cast<ExtendedBidomainTissue<3>*>(p_abstract_tissue);
-            assert(p_extended_tissue != NULL);
+            assert(p_extended_tissue != nullptr);
 
             const c_matrix<double, 3, 3>& intra_tensor_after_archiving = p_extended_tissue->rGetIntracellularConductivityTensor(0);
             const c_matrix<double, 3, 3>& intra_tensor_second_cell_after_archiving = p_extended_tissue->rGetIntracellularConductivityTensorSecondCell(0);

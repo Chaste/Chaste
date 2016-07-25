@@ -79,7 +79,7 @@ public:
             point(0) = 2.0;
             c_vector<double,2> normal = zero_vector<double>(2);
             normal(0) = -1.0;
-            PlaneBoundaryCondition<2> boundary_condition(NULL, point, normal);
+            PlaneBoundaryCondition<2> boundary_condition(nullptr, point, normal);
 
             TS_ASSERT_EQUALS(boundary_condition.GetIdentifier(), "PlaneBoundaryCondition-2-2");
         }
@@ -89,7 +89,7 @@ public:
             point(0) = 2.0;
             c_vector<double,3> normal = zero_vector<double>(3);
             normal(0) = -1.0;
-            PlaneBoundaryCondition<3> boundary_condition(NULL, point, normal);
+            PlaneBoundaryCondition<3> boundary_condition(nullptr, point, normal);
 
             TS_ASSERT_EQUALS(boundary_condition.GetIdentifier(), "PlaneBoundaryCondition-3-3");
         }
@@ -99,7 +99,7 @@ public:
             point(0) = 2.0;
             c_vector<double,3> normal = zero_vector<double>(3);
             normal(0) = -1.0;
-            PlaneBoundaryCondition<2,3> boundary_condition(NULL, point, normal);
+            PlaneBoundaryCondition<2,3> boundary_condition(nullptr, point, normal);
 
             TS_ASSERT_EQUALS(boundary_condition.GetIdentifier(), "PlaneBoundaryCondition-2-3");
         }
@@ -170,7 +170,7 @@ public:
         TS_ASSERT_EQUALS(boundary_condition.VerifyBoundaryCondition(), true);
 
         // For coverage, test VerifyBoundaryCondition() method in the case DIM = 1
-        PlaneBoundaryCondition<1> plane_boundary_condition_1d(NULL, zero_vector<double>(1), unit_vector<double>(1,0));
+        PlaneBoundaryCondition<1> plane_boundary_condition_1d(nullptr, zero_vector<double>(1), unit_vector<double>(1,0));
         TS_ASSERT_THROWS_THIS(plane_boundary_condition_1d.VerifyBoundaryCondition(),
                               "PlaneBoundaryCondition is not implemented in 1D");
     }
@@ -296,7 +296,7 @@ public:
         TS_ASSERT_EQUALS(boundary_condition.VerifyBoundaryCondition(), true);
 
         // For coverage, test VerifyBoundaryCondition() method in the case DIM == 1
-        PlaneBoundaryCondition<1> plane_boundary_condition_1d(NULL, zero_vector<double>(1), unit_vector<double>(1,0));
+        PlaneBoundaryCondition<1> plane_boundary_condition_1d(nullptr, zero_vector<double>(1), unit_vector<double>(1,0));
         TS_ASSERT_THROWS_THIS(plane_boundary_condition_1d.VerifyBoundaryCondition(),
                               "PlaneBoundaryCondition is not implemented in 1D");
 
@@ -473,7 +473,7 @@ public:
 
         {
             // Create an output archive
-            PlaneBoundaryCondition<2> boundary_condition(NULL, zero_vector<double>(2), unit_vector<double>(2,1));
+            PlaneBoundaryCondition<2> boundary_condition(nullptr, zero_vector<double>(2), unit_vector<double>(2,1));
 
             TS_ASSERT_DELTA(boundary_condition.rGetPointOnPlane()[0], 0.0, 1e-6);
             TS_ASSERT_DELTA(boundary_condition.rGetPointOnPlane()[1], 0.0, 1e-6);
@@ -577,7 +577,7 @@ public:
         OutputFileHandler output_file_handler(output_directory, false);
 
         // Test with PlaneBoundaryCondition
-        PlaneBoundaryCondition<2> plane_boundary_condition(NULL, zero_vector<double>(2), unit_vector<double>(2,1));
+        PlaneBoundaryCondition<2> plane_boundary_condition(nullptr, zero_vector<double>(2), unit_vector<double>(2,1));
         TS_ASSERT_EQUALS(plane_boundary_condition.GetIdentifier(), "PlaneBoundaryCondition-2-2");
 
         out_stream plane_boundary_condition_parameter_file = output_file_handler.OpenOutputFile("plane_results.parameters");

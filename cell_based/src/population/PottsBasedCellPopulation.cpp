@@ -81,8 +81,8 @@ PottsBasedCellPopulation<DIM>::PottsBasedCellPopulation(PottsMesh<DIM>& rMesh,
                                                         bool validate,
                                                         const std::vector<unsigned> locationIndices)
     : AbstractOnLatticeCellPopulation<DIM>(rMesh, rCells, locationIndices, deleteMesh),
-      mpElementTessellation(NULL),
-      mpMutableMesh(NULL),
+      mpElementTessellation(nullptr),
+      mpMutableMesh(nullptr),
       mTemperature(0.1),
       mNumSweepsPerTimestep(1)
 {
@@ -97,8 +97,8 @@ PottsBasedCellPopulation<DIM>::PottsBasedCellPopulation(PottsMesh<DIM>& rMesh,
 template<unsigned DIM>
 PottsBasedCellPopulation<DIM>::PottsBasedCellPopulation(PottsMesh<DIM>& rMesh)
     : AbstractOnLatticeCellPopulation<DIM>(rMesh),
-      mpElementTessellation(NULL),
-      mpMutableMesh(NULL),
+      mpElementTessellation(nullptr),
+      mpMutableMesh(nullptr),
       mTemperature(0.1),
       mNumSweepsPerTimestep(1)
 {
@@ -436,7 +436,7 @@ void PottsBasedCellPopulation<DIM>::CreateElementTessellation()
 template<unsigned DIM>
 VertexMesh<DIM,DIM>* PottsBasedCellPopulation<DIM>::GetElementTessellation()
 {
-//    assert(mpElementTessellation != NULL);
+//    assert(mpElementTessellation != nullptr);
     return mpElementTessellation;
 }
 

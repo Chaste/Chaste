@@ -38,7 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 CellCycleModelOdeHandler::CellCycleModelOdeHandler(double lastTime,
                                                    boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
     : mDt(DOUBLE_UNSET),
-      mpOdeSystem(NULL),
+      mpOdeSystem(nullptr),
       mpOdeSolver(pOdeSolver),
       mLastTime(lastTime),
       mFinishedRunningOdes(false)
@@ -47,7 +47,7 @@ CellCycleModelOdeHandler::CellCycleModelOdeHandler(double lastTime,
 
 CellCycleModelOdeHandler::~CellCycleModelOdeHandler()
 {
-    if (mpOdeSystem != NULL)
+    if (mpOdeSystem != nullptr)
     {
         delete mpOdeSystem;
     }
@@ -137,13 +137,13 @@ void CellCycleModelOdeHandler::SetStateVariables(const std::vector<double>& rSta
 
 std::vector<double> CellCycleModelOdeHandler::GetProteinConcentrations() const
 {
-    assert(mpOdeSystem != NULL);
+    assert(mpOdeSystem != nullptr);
     return mpOdeSystem->rGetStateVariables();
 }
 
 void CellCycleModelOdeHandler::SetProteinConcentrationsForTestsOnly(double lastTime, std::vector<double> proteinConcentrations)
 {
-    assert(mpOdeSystem != NULL);
+    assert(mpOdeSystem != nullptr);
     assert(proteinConcentrations.size()==mpOdeSystem->rGetStateVariables().size());
     mLastTime = lastTime;
     mpOdeSystem->SetStateVariables(proteinConcentrations);

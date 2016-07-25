@@ -38,10 +38,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 #include "UblasCustomFunctions.hpp"
 
-AirwayBranch::AirwayBranch(bool radiusOnEdge) : mpChildOne(NULL),
-                                                mpChildTwo(NULL),
-                                                mpParent(NULL),
-                                                mpSibling(NULL),
+AirwayBranch::AirwayBranch(bool radiusOnEdge) : mpChildOne(nullptr),
+                                                mpChildTwo(nullptr),
+                                                mpParent(nullptr),
+                                                mpSibling(nullptr),
                                                 mIndex(UINT_MAX),
                                                 mRadiusOnEdge(radiusOnEdge)
 {}
@@ -142,7 +142,7 @@ c_vector<double, 3> AirwayBranch::GetDirection()
 
 bool AirwayBranch::IsMajor()
 {
-    if (this->GetSibling() == NULL)
+    if (this->GetSibling() == nullptr)
     {
         return true;
     }
@@ -152,7 +152,7 @@ bool AirwayBranch::IsMajor()
 
 double AirwayBranch::GetBranchAngle()
 {
-    if(this->GetParent() == NULL)
+    if(this->GetParent() == nullptr)
     {
         EXCEPTION("Insufficient airway tree structure to calculate branch angle.");
     }
@@ -165,7 +165,7 @@ double AirwayBranch::GetBranchAngle()
 
 double AirwayBranch::GetRotationAngle()
 {
-    if(this->GetParent() == NULL || this->GetParent()->GetSibling() == NULL || this->GetSibling() == NULL)
+    if(this->GetParent() == nullptr || this->GetParent()->GetSibling() == nullptr || this->GetSibling() == nullptr)
     {
         EXCEPTION("Insufficient airway tree structure to calculate rotation angle.");
     }

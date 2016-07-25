@@ -79,9 +79,9 @@ TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::TrianglesMeshReader(std::string pat
       mReadContainingElementOfBoundaryElement(readContainingElementForBoundaryElements),
       mFilesAreBinary(false),
       mMeshIsHexahedral(false),
-      mNodeFileReadBuffer(NULL),
-      mElementFileReadBuffer(NULL),
-      mFaceFileReadBuffer(NULL),
+      mNodeFileReadBuffer(nullptr),
+      mElementFileReadBuffer(nullptr),
+      mFaceFileReadBuffer(nullptr),
       mNodePermutationDefined(false)
 {
     // Only linear and quadratic elements

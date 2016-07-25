@@ -276,7 +276,7 @@ void ExecutableSupport::WriteMachineInfoFile(std::string fileBaseName)
 #ifdef __APPLE__
     *out_file << "\nInformation on number and type processors, and cache and memory sizes (in bytes)\n";
     system_info = popen("sysctl hw.ncpu hw.physicalcpu machdep.cpu.brand_string hw.l1icachesize hw.l1dcachesize hw.l2cachesize hw.l3cachesize hw.memsize", "r");
-    while ( fgets(buffer, 100, system_info) != NULL )
+    while ( fgets(buffer, 100, system_info) != nullptr )
     {
         *out_file << buffer;
     }
@@ -285,7 +285,7 @@ void ExecutableSupport::WriteMachineInfoFile(std::string fileBaseName)
     //GNU
     *out_file << "\nInformation on number and type of processors:\n";
     system_info = popen("grep ^model.name /proc/cpuinfo", "r");
-    while ( fgets(buffer, 100, system_info) != NULL )
+    while ( fgets(buffer, 100, system_info) != nullptr )
     {
         *out_file << buffer;
     }
@@ -293,7 +293,7 @@ void ExecutableSupport::WriteMachineInfoFile(std::string fileBaseName)
 
     *out_file << "\nInformation on processor caches, in the same order as above:\n";
     system_info = popen("grep ^cache.size /proc/cpuinfo", "r");
-    while ( fgets(buffer, 100, system_info) != NULL )
+    while ( fgets(buffer, 100, system_info) != nullptr )
     {
         *out_file << buffer;
     }
@@ -301,7 +301,7 @@ void ExecutableSupport::WriteMachineInfoFile(std::string fileBaseName)
 
     *out_file << "\nInformation on system memory:\n";
     system_info = popen("grep ^MemTotal /proc/meminfo", "r");
-    while ( fgets(buffer, 100, system_info) != NULL )
+    while ( fgets(buffer, 100, system_info) != nullptr )
     {
         *out_file << buffer;
     }

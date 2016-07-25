@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 #include "RandomNumberGenerator.hpp"
 
-RandomNumberGenerator* RandomNumberGenerator::mpInstance = NULL;
+RandomNumberGenerator* RandomNumberGenerator::mpInstance = nullptr;
 
 RandomNumberGenerator::RandomNumberGenerator()
     : mMersenneTwisterGenerator(0u),
@@ -47,12 +47,12 @@ RandomNumberGenerator::RandomNumberGenerator()
       mGenerateStandardNormal(mMersenneTwisterGenerator, boost::normal_distribution<>(0.0, 1.0))
 #endif
 {
-    assert(mpInstance == NULL); // Ensure correct serialization
+    assert(mpInstance == nullptr); // Ensure correct serialization
 }
 
 RandomNumberGenerator* RandomNumberGenerator::Instance()
 {
-    if (mpInstance == NULL)
+    if (mpInstance == nullptr)
     {
         mpInstance = new RandomNumberGenerator();
     }
@@ -64,7 +64,7 @@ void RandomNumberGenerator::Destroy()
     if (mpInstance)
     {
         delete mpInstance;
-        mpInstance = NULL;
+        mpInstance = nullptr;
     }
 }
 

@@ -73,7 +73,7 @@ void UniformlyDistributedGenerationBasedCellCycleModel::SetG1Duration()
 {
     RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
 
-    assert(mpCell != NULL);
+    assert(mpCell != nullptr);
 
     if (mpCell->GetCellProliferativeType()->IsType<StemCellProliferativeType>())
     {

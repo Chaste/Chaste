@@ -64,7 +64,7 @@ void ParameterisedCvode::EvaluateYDerivatives(double time, const N_Vector rY, N_
 N_Vector ParameterisedCvode::ComputeDerivedQuantities(double time,
                                                       const N_Vector& rState)
 {
-    N_Vector derived_quantities = NULL;
+    N_Vector derived_quantities = nullptr;
     CreateVectorIfEmpty(derived_quantities,1);
     SetVectorComponent(derived_quantities, 0,
                        2*GetVectorComponent(mParameters,0) + GetVectorComponent(rState,0));

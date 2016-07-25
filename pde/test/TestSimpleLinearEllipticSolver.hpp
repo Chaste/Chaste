@@ -98,11 +98,11 @@ public:
         SimplePoissonEquation<1,1> pde;
 
         double value1 = pde.ComputeConstantInUSourceTermAtNode(*(mesh.GetNode(0)));
-        double value2 = pde.ComputeConstantInUSourceTerm(mesh.GetNode(0)->GetPoint(), NULL);
+        double value2 = pde.ComputeConstantInUSourceTerm(mesh.GetNode(0)->GetPoint(), nullptr);
         TS_ASSERT_DELTA(value1, value2, 1e-10);
 
         value1 = pde.ComputeLinearInUCoeffInSourceTermAtNode(*(mesh.GetNode(0)));
-        value2 = pde.ComputeLinearInUCoeffInSourceTerm(mesh.GetNode(0)->GetPoint(), NULL);
+        value2 = pde.ComputeLinearInUCoeffInSourceTerm(mesh.GetNode(0)->GetPoint(), nullptr);
         TS_ASSERT_DELTA(value1, value2, 1e-10);
 
         // Boundary conditions
@@ -667,7 +667,7 @@ public:
         }
 
         // Coverage
-        TS_ASSERT(solver.GetLinearSystem()!=NULL);
+        TS_ASSERT(solver.GetLinearSystem()!=nullptr);
 
         PetscTools::Destroy(result);
     }

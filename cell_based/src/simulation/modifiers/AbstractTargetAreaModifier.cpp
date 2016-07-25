@@ -56,7 +56,7 @@ void AbstractTargetAreaModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulati
 template<unsigned DIM>
 void AbstractTargetAreaModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)
 {
-    if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation) == NULL)
+    if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation) == nullptr)
     {
         EXCEPTION("AbstractTargetAreaModifiers are to be used with a VertexBasedCellPopulation only");
     }

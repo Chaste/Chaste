@@ -134,7 +134,7 @@ public:
     DistanceMapCalculator(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>& rMesh);
 
      /**
-     * Destructor - cleans up mNumHalosPerProcess (which is normally set to NULL anyway).
+     * Destructor - cleans up mNumHalosPerProcess (which is normally set to nullptr anyway).
      */
     ~DistanceMapCalculator()
     {

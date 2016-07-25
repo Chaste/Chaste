@@ -397,7 +397,7 @@ void AirwayPropertiesCalculator::CalculateBranchProperties()
 
         mLengthOverDiameterMean += length/diameter;
 
-        if((*iter)->GetParent() != NULL)
+        if((*iter)->GetParent() != nullptr)
         {
             double theta = (*iter)->GetBranchAngle();
             double parent_diameter = 2*(*iter)->GetParent()->GetAverageRadius();
@@ -428,7 +428,7 @@ void AirwayPropertiesCalculator::CalculateBranchProperties()
                 thetaParentDiameter2mmTo1mmCount++;
             }
 
-            if((*iter)->GetSibling() != NULL)
+            if((*iter)->GetSibling() != nullptr)
             {
                 if(is_major)
                 {
@@ -453,13 +453,13 @@ void AirwayPropertiesCalculator::CalculateBranchProperties()
                 }
             }
 
-            if((*iter)->GetParent() != NULL && length < (*iter)->GetParent()->GetLength())
+            if((*iter)->GetParent() != nullptr && length < (*iter)->GetParent()->GetLength())
             {
                 lengthOverParentLengthLessThanOneCount++;
             }
         }
 
-        if((*iter)->GetParent() != NULL && (*iter)->GetParent()->GetSibling() != NULL && (*iter)->GetSibling() != NULL)
+        if((*iter)->GetParent() != nullptr && (*iter)->GetParent()->GetSibling() != nullptr && (*iter)->GetSibling() != nullptr)
         {
             mPhiMean += (*iter)->GetRotationAngle();
             phiMeanCount++;
@@ -683,7 +683,7 @@ void AirwayPropertiesCalculator::RecursivelyCalculateUpstreamLengths(AirwayBranc
     unsigned current_index = pBranch->GetIndex();
 
     // If current branch is trachea, there is nothing upstream, so just need current branch data
-    if( pBranch->GetParent() == NULL )
+    if( pBranch->GetParent() == nullptr )
     {
         mUpstreamPathBranchLengths[current_index] = pBranch->GetLength();
     }
@@ -694,11 +694,11 @@ void AirwayPropertiesCalculator::RecursivelyCalculateUpstreamLengths(AirwayBranc
     }
 
     // Recursively calculate correct value for each child branch
-    if( pBranch->GetChildOne() != NULL )
+    if( pBranch->GetChildOne() != nullptr )
     {
         RecursivelyCalculateUpstreamLengths(pBranch->GetChildOne());
     }
-    if( pBranch->GetChildTwo() != NULL )
+    if( pBranch->GetChildTwo() != nullptr )
     {
         RecursivelyCalculateUpstreamLengths(pBranch->GetChildTwo());
     }
@@ -708,7 +708,7 @@ void AirwayPropertiesCalculator::RecursivelyCalculateUpstreamVolumes(AirwayBranc
     unsigned current_index = pBranch->GetIndex();
 
     // If current branch is trachea, there is nothing upstream, so just need current branch data
-    if( pBranch->GetParent() == NULL )
+    if( pBranch->GetParent() == nullptr )
     {
         mUpstreamPathBranchVolumes[current_index] = pBranch->GetBranchVolume();
     }
@@ -719,11 +719,11 @@ void AirwayPropertiesCalculator::RecursivelyCalculateUpstreamVolumes(AirwayBranc
     }
 
     // Recursively calculate correct value for each child branch
-    if( pBranch->GetChildOne() != NULL )
+    if( pBranch->GetChildOne() != nullptr )
     {
         RecursivelyCalculateUpstreamVolumes(pBranch->GetChildOne());
     }
-    if( pBranch->GetChildTwo() != NULL )
+    if( pBranch->GetChildTwo() != nullptr )
     {
         RecursivelyCalculateUpstreamVolumes(pBranch->GetChildTwo());
     }
@@ -733,7 +733,7 @@ void AirwayPropertiesCalculator::RecursivelyCalculateUpstreamLateralSurfaceAreas
     unsigned current_index = pBranch->GetIndex();
 
     // If current branch is trachea, there is nothing upstream, so just need current branch data
-    if( pBranch->GetParent() == NULL )
+    if( pBranch->GetParent() == nullptr )
     {
         mUpstreamPathBranchLateralSurfaceAreas[current_index] = pBranch->GetBranchLateralSurfaceArea();
     }
@@ -744,11 +744,11 @@ void AirwayPropertiesCalculator::RecursivelyCalculateUpstreamLateralSurfaceAreas
     }
 
     // Recursively calculate correct value for each child branch
-    if( pBranch->GetChildOne() != NULL )
+    if( pBranch->GetChildOne() != nullptr )
     {
         RecursivelyCalculateUpstreamLateralSurfaceAreas(pBranch->GetChildOne());
     }
-    if( pBranch->GetChildTwo() != NULL )
+    if( pBranch->GetChildTwo() != nullptr )
     {
         RecursivelyCalculateUpstreamLateralSurfaceAreas(pBranch->GetChildTwo());
     }
@@ -759,7 +759,7 @@ void AirwayPropertiesCalculator::RecursivelyCalculateUpstreamPoiseuilleResistanc
     unsigned current_index = pBranch->GetIndex();
 
     // If current branch is trachea, there is nothing upstream, so just need current branch data
-    if( pBranch->GetParent() == NULL )
+    if( pBranch->GetParent() == nullptr )
     {
         mUpstreamPathPoiseuilleResistances[current_index] = pBranch->GetPoiseuilleResistance();
     }
@@ -770,11 +770,11 @@ void AirwayPropertiesCalculator::RecursivelyCalculateUpstreamPoiseuilleResistanc
     }
 
     // Recursively calculate correct value for each child branch
-    if( pBranch->GetChildOne() != NULL )
+    if( pBranch->GetChildOne() != nullptr )
     {
         RecursivelyCalculateUpstreamPoiseuilleResistances(pBranch->GetChildOne());
     }
-    if( pBranch->GetChildTwo() != NULL )
+    if( pBranch->GetChildTwo() != nullptr )
     {
         RecursivelyCalculateUpstreamPoiseuilleResistances(pBranch->GetChildTwo());
     }

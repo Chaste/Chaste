@@ -409,7 +409,7 @@ public:
                                                         scale_factor_gks_2D,
                                                         scale_factor_ito_2D,
                                                         scale_factor_gkr_2D,
-                                                        NULL);
+                                                        nullptr);
 
         TS_ASSERT(cell_heterogeneity_areas_2D[0]->DoesContain(ChastePoint<2>(-1.0, 0)));
         TS_ASSERT_EQUALS(scale_factor_gks_2D[0], 0.462);
@@ -428,7 +428,7 @@ public:
                                                         scale_factor_gks_1D,
                                                         scale_factor_ito_1D,
                                                         scale_factor_gkr_1D,
-                                                        NULL);
+                                                        nullptr);
 
         TS_ASSERT(cell_heterogeneity_areas_1D[0]->DoesContain(ChastePoint<1>(-1.0)));
         TS_ASSERT_EQUALS(scale_factor_gks_1D[0], 0.462);
@@ -569,7 +569,7 @@ public:
                                                             scale_factor_gks,
                                                             scale_factor_ito,
                                                             scale_factor_gkr,
-                                                            NULL);
+                                                            nullptr);
 
             //in this file, they are supplied as epi first, then endo, then mid
             TS_ASSERT_EQUALS(HeartConfig::Instance()->GetEpiLayerIndex(), 0u);
@@ -638,7 +638,7 @@ public:
                                                                                   scale_factor_gks,
                                                                                   scale_factor_ito,
                                                                                   scale_factor_gkr,
-                                                                                  NULL),
+                                                                                  nullptr),
                                   "Invalid region type for cell heterogeneity definition");
 
         }
@@ -656,7 +656,7 @@ public:
                                                                                   scale_factor_gks,
                                                                                   scale_factor_ito,
                                                                                   scale_factor_gkr,
-                                                                                  NULL),
+                                                                                  nullptr),
                                   "Summation of epicardial, midmyocardial and endocardial fractions should be 1");
 
         }
@@ -674,7 +674,7 @@ public:
                                                                                   scale_factor_gks,
                                                                                   scale_factor_ito,
                                                                                   scale_factor_gkr,
-                                                                                  NULL),
+                                                                                  nullptr),
                                   "Fractions must be positive");
 
         }
@@ -693,7 +693,7 @@ public:
                                                                                   scale_factor_gks,
                                                                                   scale_factor_ito,
                                                                                   scale_factor_gkr,
-                                                                                  NULL),
+                                                                                  nullptr),
                                   "Fractions must be positive");
 
         }
@@ -711,7 +711,7 @@ public:
                                                                                   scale_factor_gks,
                                                                                   scale_factor_ito,
                                                                                   scale_factor_gkr,
-                                                                                  NULL),
+                                                                                  nullptr),
                                   "Three specifications of layers must be supplied");
 
 
@@ -736,7 +736,7 @@ public:
                                                                                   scale_factor_gks,
                                                                                   scale_factor_ito,
                                                                                   scale_factor_gkr,
-                                                                                  NULL),
+                                                                                  nullptr),
                                   "Specification of cellular heterogeneities by cuboids/ellipsoids and layers at the same time is not yet supported");
 
 
@@ -1830,7 +1830,7 @@ public:
         std::vector<double> scale_factor_gks;
         std::vector<double> scale_factor_ito;
         std::vector<double> scale_factor_gkr;
-        TS_ASSERT_THROWS_THIS(HeartConfig::Instance()->GetCellHeterogeneities(cell_heterogeneity_areas, scale_factor_gks, scale_factor_ito, scale_factor_gkr, NULL),
+        TS_ASSERT_THROWS_THIS(HeartConfig::Instance()->GetCellHeterogeneities(cell_heterogeneity_areas, scale_factor_gks, scale_factor_ito, scale_factor_gkr, nullptr),
                               "CellHeterogeneities information is not available in a resumed simulation.");
         TS_ASSERT_THROWS_THIS(HeartConfig::Instance()->GetConductivityHeterogeneitiesProvided(),
                               "ConductivityHeterogeneities information is not available in a resumed simulation.");

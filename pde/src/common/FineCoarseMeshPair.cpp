@@ -39,8 +39,8 @@ template<unsigned DIM>
 FineCoarseMeshPair<DIM>::FineCoarseMeshPair(AbstractTetrahedralMesh<DIM,DIM>& rFineMesh, AbstractTetrahedralMesh<DIM,DIM>& rCoarseMesh)
     : mrFineMesh(rFineMesh),
       mrCoarseMesh(rCoarseMesh),
-      mpFineMeshBoxCollection(NULL),
-      mpCoarseMeshBoxCollection(NULL)
+      mpFineMeshBoxCollection(nullptr),
+      mpCoarseMeshBoxCollection(nullptr)
 {
     ResetStatisticsVariables();
 }
@@ -67,20 +67,20 @@ FineCoarseMeshPair<DIM>::~FineCoarseMeshPair()
 template<unsigned DIM>
 void FineCoarseMeshPair<DIM>::DeleteFineBoxCollection()
 {
-    if (mpFineMeshBoxCollection != NULL)
+    if (mpFineMeshBoxCollection != nullptr)
     {
         delete mpFineMeshBoxCollection;
-        mpFineMeshBoxCollection = NULL;
+        mpFineMeshBoxCollection = nullptr;
     }
 }
 
 template<unsigned DIM>
 void FineCoarseMeshPair<DIM>::DeleteCoarseBoxCollection()
 {
-    if (mpCoarseMeshBoxCollection != NULL)
+    if (mpCoarseMeshBoxCollection != nullptr)
     {
         delete mpCoarseMeshBoxCollection;
-        mpCoarseMeshBoxCollection = NULL;
+        mpCoarseMeshBoxCollection = nullptr;
     }
 }
 
@@ -108,7 +108,7 @@ void FineCoarseMeshPair<DIM>::SetUpBoxes(AbstractTetrahedralMesh<DIM, DIM>& rMes
     if (rpBoxCollection)
     {
         delete rpBoxCollection;
-        rpBoxCollection = NULL;
+        rpBoxCollection = nullptr;
     }
 
     // Compute min and max values for the fine mesh nodes
@@ -188,7 +188,7 @@ template<unsigned DIM>
 void FineCoarseMeshPair<DIM>::ComputeFineElementsAndWeightsForCoarseQuadPoints(GaussianQuadratureRule<DIM>& rQuadRule,
                                                                                bool safeMode)
 {
-    if (mpFineMeshBoxCollection == NULL)
+    if (mpFineMeshBoxCollection == nullptr)
     {
         EXCEPTION("Call SetUpBoxesOnFineMesh() before ComputeFineElementsAndWeightsForCoarseQuadPoints()");
     }
@@ -241,7 +241,7 @@ void FineCoarseMeshPair<DIM>::ComputeFineElementsAndWeightsForCoarseQuadPoints(G
 template<unsigned DIM>
 void FineCoarseMeshPair<DIM>::ComputeFineElementsAndWeightsForCoarseNodes(bool safeMode)
 {
-    if (mpFineMeshBoxCollection==NULL)
+    if (mpFineMeshBoxCollection==nullptr)
     {
         EXCEPTION("Call SetUpBoxesOnFineMesh() before ComputeFineElementsAndWeightsForCoarseNodes()");
     }
@@ -389,7 +389,7 @@ void FineCoarseMeshPair<DIM>::ComputeFineElementAndWeightForGivenPoint(ChastePoi
 template<unsigned DIM>
 void FineCoarseMeshPair<DIM>::ComputeCoarseElementsForFineNodes(bool safeMode)
 {
-    if (mpCoarseMeshBoxCollection==NULL)
+    if (mpCoarseMeshBoxCollection==nullptr)
     {
         EXCEPTION("Call SetUpBoxesOnCoarseMesh() before ComputeCoarseElementsForFineNodes()");
     }
@@ -428,7 +428,7 @@ void FineCoarseMeshPair<DIM>::ComputeCoarseElementsForFineNodes(bool safeMode)
 template<unsigned DIM>
 void FineCoarseMeshPair<DIM>::ComputeCoarseElementsForFineElementCentroids(bool safeMode)
 {
-    if (mpCoarseMeshBoxCollection==NULL)
+    if (mpCoarseMeshBoxCollection==nullptr)
     {
         EXCEPTION("Call SetUpBoxesOnCoarseMesh() before ComputeCoarseElementsForFineElementCentroids()");
     }

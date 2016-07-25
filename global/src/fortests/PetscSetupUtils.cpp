@@ -159,7 +159,7 @@ void PetscSetupUtils::CommonSetup()
     sa.sa_sigaction = FpeSignalToAbort;
     sa.sa_flags = SA_RESETHAND|SA_SIGINFO;
     sa.sa_restorer = 0;
-    sigaction(SIGFPE, &sa, NULL);
+    sigaction(SIGFPE, &sa, nullptr);
 #endif
 }
 

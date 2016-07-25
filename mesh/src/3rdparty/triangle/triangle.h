@@ -81,7 +81,7 @@
 /*                                                                           */
 /*  `in', `out', and `vorout' are descriptions of the input, the output,     */
 /*  and the Voronoi output.  If the `v' (Voronoi output) switch is not used, */
-/*  `vorout' may be NULL.  `in' and `out' may never be NULL.                 */
+/*  `vorout' may be nullptr.  `in' and `out' may never be nullptr.                 */
 /*                                                                           */
 /*  Certain fields of the input and output structures must be initialized,   */
 /*  as described below.                                                      */
@@ -162,7 +162,7 @@
 /*  Furthermore, for each output array that Triangle will write to, you      */
 /*  must either provide space by setting the appropriate pointer to point    */
 /*  to the space you want the data written to, or you must initialize the    */
-/*  pointer to NULL, which tells Triangle to allocate space for the results. */
+/*  pointer to nullptr, which tells Triangle to allocate space for the results. */
 /*  The latter option is preferable, because Triangle always knows exactly   */
 /*  how much space to allocate.  The former option is provided mainly for    */
 /*  people who need to call Triangle from Fortran code, though it also makes */
@@ -183,7 +183,7 @@
 /*                                                                           */
 /*    - `pointlist' must always point to a list of points; `numberofpoints'  */
 /*      and `numberofpointattributes' must be properly set.                  */
-/*      `pointmarkerlist' must either be set to NULL (in which case all      */
+/*      `pointmarkerlist' must either be set to nullptr (in which case all      */
 /*      markers default to zero), or must point to a list of markers.  If    */
 /*      `numberofpointattributes' is not zero, `pointattributelist' must     */
 /*      point to a list of point attributes.                                 */
@@ -196,7 +196,7 @@
 /*      list of triangle area constraints.  `neighborlist' may be ignored.   */
 /*    - If the `p' switch is used, `segmentlist' must point to a list of     */
 /*      segments, `numberofsegments' must be properly set, and               */
-/*      `segmentmarkerlist' must either be set to NULL (in which case all    */
+/*      `segmentmarkerlist' must either be set to nullptr (in which case all    */
 /*      markers default to zero), or must point to a list of markers.        */
 /*    - If the `p' switch is used without the `r' switch, then               */
 /*      `numberofholes' and `numberofregions' must be properly set.  If      */
@@ -212,7 +212,7 @@
 /*                                                                           */
 /*  `out':                                                                   */
 /*                                                                           */
-/*    - `pointlist' must be initialized (NULL or pointing to memory) unless  */
+/*    - `pointlist' must be initialized (nullptr or pointing to memory) unless  */
 /*      the `N' switch is used.  `pointmarkerlist' must be initialized       */
 /*      unless the `N' or `B' switch is used.  If `N' is not used and        */
 /*      `in->numberofpointattributes' is not zero, `pointattributelist' must */

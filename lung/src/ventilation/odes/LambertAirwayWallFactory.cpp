@@ -48,7 +48,7 @@ const double LambertAirwayWallFactory::mN2[] = {10.0,10.0,10.0,10.0,10.0,10.0,10
 
 const double LambertAirwayWallFactory::mMaxGeneration = 16;
 
-LambertAirwayWallFactory::LambertAirwayWallFactory(bool useStrahlerOrder) : mpWalker(NULL), mUseStrahlerOrder(useStrahlerOrder)
+LambertAirwayWallFactory::LambertAirwayWallFactory(bool useStrahlerOrder) : mpWalker(nullptr), mUseStrahlerOrder(useStrahlerOrder)
 {}
 
 LambertAirwayWallFactory::~LambertAirwayWallFactory()

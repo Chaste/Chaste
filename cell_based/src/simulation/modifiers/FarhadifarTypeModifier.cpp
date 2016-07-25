@@ -52,7 +52,7 @@ FarhadifarTypeModifier<DIM>::~FarhadifarTypeModifier()
 template<unsigned DIM>
 void FarhadifarTypeModifier<DIM>::UpdateTargetAreaOfCell(CellPtr pCell)
 {
-    if (dynamic_cast<AbstractPhaseBasedCellCycleModel*>(pCell->GetCellCycleModel()) == NULL)
+    if (dynamic_cast<AbstractPhaseBasedCellCycleModel*>(pCell->GetCellCycleModel()) == nullptr)
     {
         EXCEPTION("FarhadifarTypeModifier is to be used with a AbstractPhaseBasedCellCycleModel only");
     }

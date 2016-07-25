@@ -128,7 +128,7 @@ public:
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
 
-            ElementAttributes<2,2>* const p_element_attributes = NULL;
+            ElementAttributes<2,2>* const p_element_attributes = nullptr;
 
             output_arch << p_element_attributes;
 

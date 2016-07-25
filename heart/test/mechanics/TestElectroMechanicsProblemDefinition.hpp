@@ -62,7 +62,7 @@ public:
         TS_ASSERT_EQUALS(&mesh, cell_factory.mpMesh);
 
         // Wipe the cell factory (since we are a friend class we can do this) for further testing below.
-        problem_defn.mpContractionCellFactory = NULL;
+        problem_defn.mpContractionCellFactory = nullptr;
 
         TS_ASSERT_THROWS_THIS(problem_defn.Validate(), "Timestep for mechanics solve hasn't been set yet");
 
@@ -79,11 +79,11 @@ public:
 
         problem_defn.SetUseDefaultCardiacMaterialLaw(INCOMPRESSIBLE);
         NashHunterPoleZeroLaw<2>* p_law = dynamic_cast<NashHunterPoleZeroLaw<2>*>(problem_defn.GetIncompressibleMaterialLaw(0));
-        TS_ASSERT(p_law != NULL);
+        TS_ASSERT(p_law != nullptr);
 
         problem_defn.SetUseDefaultCardiacMaterialLaw(COMPRESSIBLE);
         CompressibleExponentialLaw<2>* p_law_2 = dynamic_cast<CompressibleExponentialLaw<2>*>(problem_defn.GetCompressibleMaterialLaw(0));
-        TS_ASSERT(p_law_2 != NULL);
+        TS_ASSERT(p_law_2 != nullptr);
 
         problem_defn.SetDeformationAffectsElectrophysiology(true,false);
         TS_ASSERT_EQUALS(problem_defn.GetDeformationAffectsConductivity(), true);

@@ -168,7 +168,7 @@ void CellMLToSharedLibraryConverter::ConvertCellmlToSo(const std::string& rCellm
         {
             // Create a temporary folder within heart/dynamic
             std::stringstream folder_name;
-            folder_name << "dynamic/tmp_" << getpid() << "_" << time(NULL);
+            folder_name << "dynamic/tmp_" << getpid() << "_" << time(nullptr);
 
 #ifdef CHASTE_CMAKE ///todo: #2656 - ignoring all cmake-specific code, revise after cmake transition
 #define COVERAGE_IGNORE

@@ -492,7 +492,7 @@ public:
         mesh.SetDistributedVectorFactory(p_wrong_factory2);
         TS_ASSERT_THROWS_THIS(mesh.ConstructFromMeshReader(mesh_reader),
                               "The distributed vector factory size in the mesh doesn't match the total number of nodes.");
-        mesh.mpDistributedVectorFactory=NULL;
+        mesh.mpDistributedVectorFactory=nullptr;
         delete p_wrong_factory2;
 
         // OK call
@@ -1064,7 +1064,7 @@ public:
                 ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(
                         archive_dir, "distributed_tetrahedral_mesh.arch");
                 boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
-                AbstractTetrahedralMesh<2,2>* p_mesh3 = NULL;
+                AbstractTetrahedralMesh<2,2>* p_mesh3 = nullptr;
                 (*p_arch) >> p_mesh3;
                 delete p_mesh3;
             }
@@ -1083,7 +1083,7 @@ public:
                     // this archive was written on one process.
                     InputArchiveOpener arch_opener(archive_dir, "distributed_tetrahedral_mesh.arch");
                     boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
-                    AbstractTetrahedralMesh<2,2>* p_mesh3 = NULL;
+                    AbstractTetrahedralMesh<2,2>* p_mesh3 = nullptr;
                     TS_ASSERT_THROWS_THIS((*p_arch) >> p_mesh3,
                                           "This archive was written for a different number of processors");
 

@@ -73,7 +73,7 @@ public:
 
     /**
      * Sets relevant data at all quad points, including whether it is an active region or not.
-     * The contraction model is set to NULL.
+     * The contraction model is set to nullptr.
      * At the end, it calls InitialiseContractionModels in the child class to assign a proper model.
      */
     virtual void Initialise() = 0;

@@ -42,7 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 CylindricalHoneycombMeshGenerator::CylindricalHoneycombMeshGenerator(unsigned numNodesAlongWidth, unsigned numNodesAlongLength, unsigned ghosts, double scaleFactor)
 {
-    mpMesh = NULL;
+    mpMesh = nullptr;
     mDomainWidth = numNodesAlongWidth*scaleFactor;
     mNumCellWidth = numNodesAlongWidth; //*1 because cells are considered to be size one
     mNumCellLength = numNodesAlongLength;

@@ -141,13 +141,13 @@ TEMPLATED_CLASS_IS_ABSTRACT_2_UNSIGNED(AbstractLinearEllipticPde)
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double AbstractLinearEllipticPde<ELEMENT_DIM, SPACE_DIM>::ComputeConstantInUSourceTermAtNode(const Node<SPACE_DIM>& rNode)
 {
-    return ComputeConstantInUSourceTerm(rNode.GetPoint(), NULL);
+    return ComputeConstantInUSourceTerm(rNode.GetPoint(), nullptr);
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double AbstractLinearEllipticPde<ELEMENT_DIM, SPACE_DIM>::ComputeLinearInUCoeffInSourceTermAtNode(const Node<SPACE_DIM>& rNode)
 {
-    return ComputeLinearInUCoeffInSourceTerm(rNode.GetPoint(), NULL);
+    return ComputeLinearInUCoeffInSourceTerm(rNode.GetPoint(), nullptr);
 }
 
 #endif //_ABSTRACTLINEARELLIPTICPDE_HPP_

@@ -267,7 +267,7 @@ public:
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "my_cell_killer.arch";
 
         {
-            AbstractCellKiller<2>* const p_cell_killer = new MyCellKiller(NULL);
+            AbstractCellKiller<2>* const p_cell_killer = new MyCellKiller(nullptr);
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);

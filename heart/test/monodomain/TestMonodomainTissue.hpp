@@ -554,11 +554,11 @@ public:
             // cable nodes are on y=0.05 (we don't test by index because indices may be permuted in parallel).
             if( fabs(y-0.05) < 1e-8 )
             {
-                TS_ASSERT(dynamic_cast<CellDiFrancescoNoble1985FromCellML*>(p_purkinje_cell) != NULL);
+                TS_ASSERT(dynamic_cast<CellDiFrancescoNoble1985FromCellML*>(p_purkinje_cell) != nullptr);
             }
             else
             {
-                TS_ASSERT(dynamic_cast<FakeBathCell*>(p_purkinje_cell) != NULL);
+                TS_ASSERT(dynamic_cast<FakeBathCell*>(p_purkinje_cell) != nullptr);
             }
 
             TS_ASSERT_EQUALS(tissue.rGetPurkinjeCellsDistributed()[global_index-mixed_mesh.GetDistributedVectorFactory()->GetLow()],
@@ -607,11 +607,11 @@ public:
                 // cable nodes are on y=0.05 (we don't test by index because indices may be permuted in parallel).
                 if( fabs(y-0.05) < 1e-8 )
                 {
-                    TS_ASSERT(dynamic_cast<CellDiFrancescoNoble1985FromCellML*>(p_purkinje_cell) != NULL);
+                    TS_ASSERT(dynamic_cast<CellDiFrancescoNoble1985FromCellML*>(p_purkinje_cell) != nullptr);
                 }
                 else
                 {
-                    TS_ASSERT(dynamic_cast<FakeBathCell*>(p_purkinje_cell) != NULL);
+                    TS_ASSERT(dynamic_cast<FakeBathCell*>(p_purkinje_cell) != nullptr);
                 }
                 TS_ASSERT_EQUALS(p_purkinje_cell->GetVoltage(),
                                  tissue.GetPurkinjeCell(global_index)->GetVoltage());

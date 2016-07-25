@@ -165,7 +165,7 @@ private:
         //archive & mpWriter; // Created by InitialiseWriter, called from Solve
         archive & mpCardiacTissue;
         //archive & mpSolver; // Only exists during calls to the Solve method
-        bool has_solution = (mSolution != NULL);
+        bool has_solution = (mSolution != nullptr);
         archive & has_solution;
         if (has_solution)
         {
@@ -239,14 +239,14 @@ private:
                  * archive is templated as AbstractTetrahedralMesh<element_dim, space_dim>
                  * which doesn't match AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>*  mpMesh.
                  * Boost will through away the unarchived one, without deleting it properly and
-                 * then set mpMesh=NULL.  We need to avoid this happening by bailing out.
+                 * then set mpMesh=nullptr.  We need to avoid this happening by bailing out.
                  */
                 EXCEPTION("Failed to load from checkpoint because the dimensions of the archive do not match the object it's being read into.");
             }
         }
         archive & mMeshFilename;
         archive & mpMesh;
-        assert(mpMesh != NULL); //If NULL then loading mesh has failed without an exception so Boost has given up on the mesh.  This would happen if a 2-dimensional mesh was successfully unarchived but mpMesh was expecting a 3-d mesh etc.
+        assert(mpMesh != nullptr); //If nullptr then loading mesh has failed without an exception so Boost has given up on the mesh.  This would happen if a 2-dimensional mesh was successfully unarchived but mpMesh was expecting a 3-d mesh etc.
         //archive & mAllocatedMemoryForMesh; // Will always be true after a load
 
         if (version < 2)
@@ -434,7 +434,7 @@ protected:
      */
     double mCurrentTime;
 
-    /** Adaptivity controller (defaults to NULL). */
+    /** Adaptivity controller (defaults to nullptr). */
     AbstractTimeAdaptivityController* mpTimeAdaptivityController;
 
 
@@ -761,7 +761,7 @@ public:
      *  @param pController The controller (only relevant if useAdaptivity==true)
      */
     void SetUseTimeAdaptivityController(bool useAdaptivity,
-                                        AbstractTimeAdaptivityController* pController = NULL);
+                                        AbstractTimeAdaptivityController* pController = nullptr);
 
     /**
      * Used when loading a set of archives written by a parallel simulation onto a single process.

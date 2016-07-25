@@ -184,7 +184,7 @@ public:
      * \todo Which subclasses? Why is the second input argument needed?
      *
      * @param index  The global index of a specified node.
-     * @param pCell  The cell wanting to divide into the lattice site (defaults to NULL).
+     * @param pCell  The cell wanting to divide into the lattice site (defaults to nullptr).
      *
      * @return whether the node is an empty site
      */

@@ -136,7 +136,7 @@ ExtendedBidomainAssembler<ELEMENT_DIM,SPACE_DIM>::ExtendedBidomainAssembler(
     : AbstractCardiacFeVolumeIntegralAssembler<ELEMENT_DIM,SPACE_DIM,3,true,true,NORMAL>(pMesh,pTissue),
               mpExtendedBidomainTissue(pTissue)
 {
-    assert(pTissue != NULL);
+    assert(pTissue != nullptr);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

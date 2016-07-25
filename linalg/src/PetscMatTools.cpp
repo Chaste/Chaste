@@ -180,7 +180,7 @@ void PetscMatTools::ZeroRowsWithValueOnDiagonal(Mat matrix, std::vector<unsigned
     }
     */
 #elif (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
-    MatZeroRows(matrix, rRows.size(), rows, diagonalValue , NULL, NULL);
+    MatZeroRows(matrix, rRows.size(), rows, diagonalValue , nullptr, nullptr);
 #else
     MatZeroRows(matrix, rRows.size(), rows, diagonalValue);
 #endif

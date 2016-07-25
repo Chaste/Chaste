@@ -255,8 +255,8 @@ public:
         {
             //When you try to load into the wrong dimension, the mesh reader (unarchiver)
             //will throw an exception.  Boost will eat this exception and set the mesh pointer
-            //to NULL.  Your mileage may vary depending on Boost version.
-            //We detect a NULL pointer and turn it back into an exception.
+            //to nullptr.  Your mileage may vary depending on Boost version.
+            //We detect a nullptr pointer and turn it back into an exception.
             TS_ASSERT_THROWS_THIS(CardiacSimulationArchiver<BidomainProblem<2> >::Load(archive_dir),
                 "Failed to load from checkpoint because the dimensions of the archive do not match the object it's being read into.");
 
@@ -427,11 +427,11 @@ private:
         const DistributedTetrahedralMesh<DIM,DIM>* p_dist_mesh = dynamic_cast<const DistributedTetrahedralMesh<DIM,DIM>*>(p_problem->GetTissue()->pGetMesh());
         if (isDistributedMesh)
         {
-            TS_ASSERT(p_dist_mesh != NULL);
+            TS_ASSERT(p_dist_mesh != nullptr);
         }
         else
         {
-            TS_ASSERT(p_dist_mesh == NULL);
+            TS_ASSERT(p_dist_mesh == nullptr);
         }
 
         // All real cells should be at initial conditions if we're starting at t=0.
@@ -442,7 +442,7 @@ private:
             {
                 AbstractCardiacCell* p_cell = static_cast<AbstractCardiacCell*>(p_problem->GetTissue()->GetCardiacCell(i));
                 FakeBathCell* p_fake_cell = dynamic_cast<FakeBathCell*>(p_cell);
-                if (p_fake_cell == NULL)
+                if (p_fake_cell == nullptr)
                 {
                     if (inits.empty())
                     {
@@ -770,7 +770,7 @@ cp  /tmp/$USER/testoutput/TestCreateArchiveForLoadAsSequentialWithBathAndDistrib
             AbstractCardiacCellInterface* p_cell = p_problem->GetTissue()->GetCardiacCell(i);
             AbstractStimulusFunction* p_stim = p_cell->GetStimulusFunction().get();
             ZeroStimulus* p_zero_stim = dynamic_cast<ZeroStimulus*>(p_stim);
-            TS_ASSERT(p_zero_stim != NULL);
+            TS_ASSERT(p_zero_stim != nullptr);
             TS_ASSERT_DELTA(p_cell->GetStimulus(0.0), 0.0, 1e-10);
             TS_ASSERT_DELTA(p_cell->GetStimulus(1.0), 0.0, 1e-10);
         }
@@ -871,11 +871,11 @@ private:
         const DistributedTetrahedralMesh<DIM,DIM>* p_dist_mesh = dynamic_cast<const DistributedTetrahedralMesh<DIM,DIM>*>(p_problem->GetTissue()->pGetMesh());
         if (isDistributedMesh)
         {
-            TS_ASSERT(p_dist_mesh != NULL);
+            TS_ASSERT(p_dist_mesh != nullptr);
         }
         else
         {
-            TS_ASSERT(p_dist_mesh == NULL);
+            TS_ASSERT(p_dist_mesh == nullptr);
         }
 
         if (currentTime == 0.0)
@@ -888,7 +888,7 @@ private:
                 {
                     AbstractCardiacCellInterface* p_cell = p_problem->GetTissue()->GetCardiacCell(i);
                     FakeBathCell* p_fake_cell = dynamic_cast<FakeBathCell*>(p_cell);
-                    if (p_fake_cell == NULL)
+                    if (p_fake_cell == nullptr)
                     {
                         if (inits.empty())
                         {
@@ -1078,7 +1078,7 @@ cp /tmp/$USER/testoutput/TestCreateArchiveForLoadFromSequentialWithBath/?* ./hea
             AbstractCardiacCellInterface* p_cell = p_problem->GetTissue()->GetCardiacCell(i);
             AbstractStimulusFunction* p_stim = p_cell->GetStimulusFunction().get();
             ZeroStimulus* p_zero_stim = dynamic_cast<ZeroStimulus*>(p_stim);
-            TS_ASSERT(p_zero_stim != NULL);
+            TS_ASSERT(p_zero_stim != nullptr);
             TS_ASSERT_DELTA(p_cell->GetStimulus(0.0), 0.0, 1e-10);
             TS_ASSERT_DELTA(p_cell->GetStimulus(1.0), 0.0, 1e-10);
         }

@@ -1101,7 +1101,7 @@ class CellMLTranslator(object):
                 self.writeln('if (_lookup_table_', idx, ')')
                 self.open_block()
                 self.writeln('delete[] _lookup_table_', idx, self.STMT_END)
-                self.writeln('_lookup_table_', idx, self.EQ_ASSIGN, 'NULL', self.STMT_END)
+                self.writeln('_lookup_table_', idx, self.EQ_ASSIGN, 'nullptr', self.STMT_END)
                 self.close_block(blank_line=False)
 
     def output_lut_declarations(self):
@@ -2195,7 +2195,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
         # Method to get the table instance object
         self.writeln('static ', self.lt_class_name, '* Instance()')
         self.open_block()
-        self.writeln('if (mpInstance.get() == NULL)')
+        self.writeln('if (mpInstance.get() == nullptr)')
         self.writeln('{')
         self.writeln('mpInstance.reset(new ', self.lt_class_name, ');', indent_offset=1)
         self.writeln('}')
@@ -2222,7 +2222,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
         # Constructor
         self.writeln(self.lt_class_name, '()')
         self.open_block()
-        self.writeln('assert(mpInstance.get() == NULL);')
+        self.writeln('assert(mpInstance.get() == nullptr);')
         if self.config.options.include_dt_in_tables:
             self.writeln('mDt = HeartConfig::Instance()->GetOdeTimeStep();')
             self.writeln('assert(mDt > 0.0);')
@@ -2244,7 +2244,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
             self.writeln('mTableStepInverses[', idx, '] = ', str(1/float(step)), self.STMT_END)
             self.writeln('mTableMaxs[', idx, '] = ', max, self.STMT_END)
             self.writeln('mNeedsRegeneration[', idx, '] = true;')
-            self.writeln('_lookup_table_', idx, self.EQ_ASSIGN, 'NULL', self.STMT_END)
+            self.writeln('_lookup_table_', idx, self.EQ_ASSIGN, 'nullptr', self.STMT_END)
         self.writeln(self.lt_class_name, '::RegenerateTables();')
         self.close_block()
         # Table (re-)generation
@@ -2550,7 +2550,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
         use_modifiers = self.use_modifiers
         self.use_modifiers = False
         self.output_method_start('GetIIonic', ['const std::vector<double>* pStateVariables'],
-                                 self.TYPE_DOUBLE, access='public', defaults=['NULL'])
+                                 self.TYPE_DOUBLE, access='public', defaults=['nullptr'])
         self.open_block()
         # Output mathematics to calculate ionic current, using solver_info.ionic_current.
         if (hasattr(self.model, u'solver_info') and hasattr(self.model.solver_info, u'ionic_current')):
@@ -5169,7 +5169,7 @@ class CellMLToCythonTranslator(CellMLToPythonTranslator):
         # Cython-level destructor
         self.writeln('def __dealloc__(self):')
         self.open_block()
-        self.writeln('if self._parameters != NULL:')
+        self.writeln('if self._parameters != nullptr:')
         self.writeln('    Sundials.N_VDestroy_Serial(self._parameters)')
         self.close_block()
         # Methods to match the AbstractModel class

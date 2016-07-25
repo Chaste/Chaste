@@ -164,7 +164,7 @@ public:
         collection.AddProperty(p_label);
 
         // Create a cell
-        CellPtr p_cell(new Cell(p_wild_type, p_model, NULL, false, collection)); // NUll -> NullSrnModel
+        CellPtr p_cell(new Cell(p_wild_type, p_model, nullptr, false, collection)); // NUll -> NullSrnModel
         p_cell->SetCellProliferativeType(p_type);
         p_cell->SetBirthTime(-1.0);
         p_cell->InitialiseCellCycleModel();
@@ -187,7 +187,7 @@ public:
         TS_ASSERT_EQUALS(p_wild_type->GetCellCount(), 1u);
 
         FixedDurationGenerationBasedCellCycleModel* p_model2 = new FixedDurationGenerationBasedCellCycleModel();
-        CellPtr p_cell2(new Cell(p_wild_type, p_model2, NULL, false, collection));
+        CellPtr p_cell2(new Cell(p_wild_type, p_model2, nullptr, false, collection));
         p_cell2->SetCellProliferativeType(p_type);
         p_cell2->SetBirthTime(-1.0);
         p_cell2->InitialiseCellCycleModel();
@@ -286,7 +286,7 @@ public:
         p_simulation_time->SetStartTime(0.0);
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(2.0, 4);
 
-        TS_ASSERT_THROWS_THIS(CellPtr p_stem_cell(new Cell(p_healthy_state, NULL)),
+        TS_ASSERT_THROWS_THIS(CellPtr p_stem_cell(new Cell(p_healthy_state, nullptr)),
                               "Cell-cycle model is null");
 
         // Cell wasn't created - count should be zero
@@ -349,7 +349,7 @@ public:
         boost::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
         boost::shared_ptr<AbstractCellProperty> p_type_transit(CellPropertyRegistry::Instance()->Get<TransitCellProliferativeType>());
 
-        TS_ASSERT_THROWS_THIS(CellPtr p_bad_cell2(new Cell(p_healthy_state, NULL)), "Cell-cycle model is null");
+        TS_ASSERT_THROWS_THIS(CellPtr p_bad_cell2(new Cell(p_healthy_state, nullptr)), "Cell-cycle model is null");
 
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         Goldbeter1991SrnModel* p_srn_model = new Goldbeter1991SrnModel();

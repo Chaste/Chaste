@@ -270,7 +270,7 @@ void XmlTools::PrintNode(const std::string& rMsg, xercesc::DOMNode* pNode, bool 
     if (showChildren)
     {
         for (xercesc::DOMNode* p_node = pNode->getFirstChild();
-             p_node != NULL;
+             p_node != nullptr;
              p_node = p_node->getNextSibling())
         {
             std::cout << "     child type " << p_node->getNodeType();
@@ -346,7 +346,7 @@ std::vector<xercesc::DOMElement*> XmlTools::GetChildElements(const xercesc::DOME
 {
     std::vector<xercesc::DOMElement*> children;
     for (xercesc::DOMNode* p_node = pElement->getFirstChild();
-         p_node != NULL;
+         p_node != nullptr;
          p_node = p_node->getNextSibling())
     {
         if (p_node->getNodeType() == xercesc::DOMNode::ELEMENT_NODE)
@@ -364,7 +364,7 @@ void XmlTools::FindElements(const xercesc::DOMElement* pContextElement,
                             unsigned depth)
 {
     for (xercesc::DOMNode* p_node = pContextElement->getFirstChild();
-         p_node != NULL;
+         p_node != nullptr;
          p_node = p_node->getNextSibling())
     {
         if (p_node->getNodeType() == xercesc::DOMNode::ELEMENT_NODE &&

@@ -156,7 +156,7 @@ PROBLEM_CLASS* CardiacSimulationArchiver<PROBLEM_CLASS>::Migrate(const FileFinde
 
         // Work out how many more process-specific files to load
         DistributedVectorFactory* p_factory = p_unarchived_simulation->rGetMesh().GetDistributedVectorFactory();
-        assert(p_factory != NULL);
+        assert(p_factory != nullptr);
         unsigned original_num_procs = p_factory->GetOriginalFactory()->GetNumProcs();
         assert(original_num_procs == num_procs); // Paranoia
 

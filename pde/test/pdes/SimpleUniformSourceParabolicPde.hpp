@@ -96,17 +96,17 @@ public:
      *
      * @return the the source term.
      */
-    double ComputeSourceTerm(const ChastePoint<DIM>& rX, double u, Element<DIM,DIM>* pElement=NULL);
+    double ComputeSourceTerm(const ChastePoint<DIM>& rX, double u, Element<DIM,DIM>* pElement=nullptr);
 
     /**
      * Overridden ComputeDiffusionTerm() method.
      *
      * @param rX the point in space at which the diffusion term is computed
-     * @param pElement the mesh element that x is contained in (optional; defaults to NULL).
+     * @param pElement the mesh element that x is contained in (optional; defaults to nullptr).
      *
      * @return a matrix.
      */
-    c_matrix<double, DIM, DIM> ComputeDiffusionTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement=NULL);
+    c_matrix<double, DIM, DIM> ComputeDiffusionTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement=nullptr);
 
     /**
      * Overridden ComputeDuDtCoefficientFunction() method.

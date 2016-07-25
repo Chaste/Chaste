@@ -297,7 +297,7 @@ public:
 
             // Prevent an assertion being thrown about setting the cell factory more than once.
             delete problem_defn.mpContractionCellFactory;
-            problem_defn.mpContractionCellFactory = NULL;
+            problem_defn.mpContractionCellFactory = nullptr;
 
             problem_defn.SetContractionModel(NASH2004,0.01);
             IncompressibleExplicitSolver2d expl_solver_with_nash(mesh,problem_defn,"");
@@ -306,7 +306,7 @@ public:
 
             // Prevent an assertion being thrown about setting the cell factory more than once.
             delete problem_defn.mpContractionCellFactory;
-            problem_defn.mpContractionCellFactory = NULL;
+            problem_defn.mpContractionCellFactory = nullptr;
 
             problem_defn.SetContractionModel(KERCHOFFS2003,0.01);
             IncompressibleExplicitSolver2d expl_solver_with_kerchoffs(mesh,problem_defn,"");

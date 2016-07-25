@@ -73,7 +73,7 @@ void AbstractSimpleCellCycleModel::InitialiseDaughterCell()
 
 bool AbstractSimpleCellCycleModel::ReadyToDivide()
 {
-    assert(mpCell != NULL);
+    assert(mpCell != nullptr);
 
     if (!mReadyToDivide)
     {

@@ -314,7 +314,7 @@ PetscErrorCode PCTwoLevelsBlockDiagonalApply(void* pc_context, Vec x, Vec y)
 
     // Cast the context pointer to PCTwoLevelsBlockDiagonalContext
     PCTwoLevelsBlockDiagonal::PCTwoLevelsBlockDiagonalContext* block_diag_context = (PCTwoLevelsBlockDiagonal::PCTwoLevelsBlockDiagonalContext*) pc_context;
-    assert(block_diag_context!=NULL);
+    assert(block_diag_context!=nullptr);
 
     /*
      * Scatter x = [x1 x21 x22]'

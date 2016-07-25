@@ -140,7 +140,7 @@ public:
         // Test the method GetOdeSystemAtNode()
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            TS_ASSERT(solver.GetOdeSystemAtNode(i) != NULL);
+            TS_ASSERT(solver.GetOdeSystemAtNode(i) != nullptr);
             TS_ASSERT_DELTA(static_cast<OdeSystemForCoupledHeatEquationWithSource*>(solver.GetOdeSystemAtNode(i))->GetA(), 5.0, 1e-6);
         }
 

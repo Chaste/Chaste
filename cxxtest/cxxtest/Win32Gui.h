@@ -132,9 +132,9 @@ namespace CxxTest
 
         void startGuiThread()
         {
-            _canStartTests = CreateEvent( NULL, TRUE, FALSE, NULL );
+            _canStartTests = CreateEvent( nullptr, TRUE, FALSE, nullptr );
 			DWORD threadId;
-            _gui = CreateThread( NULL, 0, &(Win32Gui::guiThread), (LPVOID)this, 0, &threadId );
+            _gui = CreateThread( nullptr, 0, &(Win32Gui::guiThread), (LPVOID)this, 0, &threadId );
             WaitForSingleObject( _canStartTests, INFINITE );
         }
 
@@ -166,13 +166,13 @@ namespace CxxTest
             _windowClass.lpfnWndProc = &(Win32Gui::windowProcedure);
             _windowClass.cbClsExtra = 0;
             _windowClass.cbWndExtra = sizeof(LONG);
-            _windowClass.hInstance = (HINSTANCE)NULL;
-            _windowClass.hIcon = (HICON)NULL;
-            _windowClass.hCursor = (HCURSOR)NULL;
+            _windowClass.hInstance = (HINSTANCE)nullptr;
+            _windowClass.hIcon = (HICON)nullptr;
+            _windowClass.hCursor = (HCURSOR)nullptr;
             _windowClass.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-            _windowClass.lpszMenuName = NULL;
+            _windowClass.lpszMenuName = nullptr;
             _windowClass.lpszClassName = TEXT("CxxTest Window Class");
-            _windowClass.hIconSm = (HICON)NULL;
+            _windowClass.hIconSm = (HICON)nullptr;
 
             RegisterClassEx( &_windowClass );
         }
@@ -230,10 +230,10 @@ namespace CxxTest
             _statusOffsets[STATUS_WORLD_TIME] = (_statusTotal += worldTimeRatio);
         }
 
-        HWND createWindow( LPCTSTR className, DWORD style, HWND parent = (HWND)NULL )
+        HWND createWindow( LPCTSTR className, DWORD style, HWND parent = (HWND)nullptr )
         {
-            return CreateWindow( className, NULL, style, 0, 0, 0, 0, parent,
-                                 (HMENU)NULL, (HINSTANCE)NULL, (LPVOID)this );
+            return CreateWindow( className, nullptr, style, 0, 0, 0, 0, parent,
+                                 (HMENU)nullptr, (HINSTANCE)nullptr, (LPVOID)this );
         }
 
         void progressBarMessage( UINT message, WPARAM wParam = 0, LPARAM lParam = 0 )
@@ -315,7 +315,7 @@ namespace CxxTest
         void messageLoop()
         {
             MSG message;
-            while ( BOOL haveMessage = GetMessage( &message, NULL, 0, 0 ) )
+            while ( BOOL haveMessage = GetMessage( &message, nullptr, 0, 0 ) )
                 if ( haveMessage != -1 )
                     DispatchMessage( &message );
         }
@@ -406,7 +406,7 @@ namespace CxxTest
 
         HICON loadStandardIcon( LPCTSTR icon )
         {
-            return LoadIcon( (HINSTANCE)NULL, icon );
+            return LoadIcon( (HINSTANCE)nullptr, icon );
         }
 
         void setTestCaption( const char *suiteName, const char *testName )

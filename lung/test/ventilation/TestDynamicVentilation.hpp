@@ -120,7 +120,7 @@ public:
         while (!time_stepper.IsTimeAtEnd())
         {
             //Solve corresponding backward Euler problem for testing
-            double pleural_pressure =  factory.GetPleuralPressureForNode(time_stepper.GetNextTime(), NULL);
+            double pleural_pressure =  factory.GetPleuralPressureForNode(time_stepper.GetNextTime(), nullptr);
 
             double dt = time_stepper.GetNextTimeStep();
             ode_volume = (ode_volume - dt*pleural_pressure/terminal_airway_resistance)/(1 + dt/(terminal_airway_resistance*compliance));
@@ -172,7 +172,7 @@ public:
         while (!time_stepper.IsTimeAtEnd())
         {
             //Solve corresponding backward Euler problem for testing
-            double pleural_pressure =  factory.GetPleuralPressureForNode(time_stepper.GetNextTime(), NULL);
+            double pleural_pressure =  factory.GetPleuralPressureForNode(time_stepper.GetNextTime(), nullptr);
 
             double dt = time_stepper.GetNextTimeStep();
             ode_volume = (ode_volume - dt*pleural_pressure/total_airway_resistance)/(1 + dt/(total_airway_resistance*total_compliance));

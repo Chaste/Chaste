@@ -80,7 +80,7 @@ public:
         // argv[0] will be equal to global/build/debug/TestCommandLineArgumentsRunner
         // or global/build/optimised/TestCommandLineArgumentsRunner, etc
         char** argv = *(CommandLineArguments::Instance()->p_argv);
-        assert(argv != NULL);
+        assert(argv != nullptr);
         std::string arg_as_string(argv[0]);
 #ifdef _MSC_VER
         std::string final_part_of_string = arg_as_string.substr(arg_as_string.length()-34,arg_as_string.length());
@@ -285,7 +285,7 @@ public:
 
         // Check the original arguments are still working...
         char** argv = *(CommandLineArguments::Instance()->p_argv);
-        assert(argv != NULL);
+        assert(argv != nullptr);
         std::string arg_as_string(argv[0]);
 #ifdef _MSC_VER
         std::string final_part_of_string = arg_as_string.substr(arg_as_string.length()-34,arg_as_string.length());

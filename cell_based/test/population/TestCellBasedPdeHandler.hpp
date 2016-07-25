@@ -112,7 +112,7 @@ public:
         TS_ASSERT_EQUALS(pde_handler.GetWriteDailyAverageRadialPdeSolution(), false);
         TS_ASSERT_EQUALS(pde_handler.GetImposeBcsOnCoarseBoundary(), true);
         TS_ASSERT_EQUALS(pde_handler.GetNumRadialIntervals(), UNSIGNED_UNSET);
-        TS_ASSERT(pde_handler.GetCoarsePdeMesh() == NULL);
+        TS_ASSERT(pde_handler.GetCoarsePdeMesh() == nullptr);
     }
 
     void TestSetMethods() throw(Exception)
@@ -296,7 +296,7 @@ public:
             TS_ASSERT_EQUALS(p_pde_handler->mAverageRadialSolutionVariableName, "averaged quantity");
 
             ///\todo we currently do not archive mpCoarsePdeMesh - consider doing this (#1891)
-            TS_ASSERT(p_pde_handler->GetCoarsePdeMesh() == NULL);
+            TS_ASSERT(p_pde_handler->GetCoarsePdeMesh() == nullptr);
 
             TS_ASSERT_EQUALS(p_pde_handler->mPdeAndBcCollection.size(), 1u);
             TS_ASSERT_EQUALS(p_pde_handler->mPdeAndBcCollection[0]->IsNeumannBoundaryCondition(), false);
@@ -384,7 +384,7 @@ public:
             TS_ASSERT_EQUALS(p_pde_handler->mAverageRadialSolutionVariableName, "averaged quantity");
 
             ///\todo we currently do not archive mpCoarsePdeMesh - consider doing this (#1891)
-            TS_ASSERT(p_pde_handler->GetCoarsePdeMesh() == NULL);
+            TS_ASSERT(p_pde_handler->GetCoarsePdeMesh() == nullptr);
 
             TS_ASSERT_EQUALS(p_pde_handler->mPdeAndBcCollection.size(), 1u);
             TS_ASSERT_EQUALS(p_pde_handler->mPdeAndBcCollection[0]->IsNeumannBoundaryCondition(), false);
@@ -1114,7 +1114,7 @@ public:
         pde_handler.mpVizPdeSolutionResultsFile->close();
 
         TetrahedralMesh<2,2>* p_coarse_mesh = pde_handler.GetCoarsePdeMesh();
-        TS_ASSERT(p_coarse_mesh != NULL);
+        TS_ASSERT(p_coarse_mesh != nullptr);
 
         TS_ASSERT_THROWS_THIS(pde_handler.GetPdeSolution("quantity 3"), "The PDE collection does not contain a PDE named quantity 3");
         ReplicatableVector pde_solution0(pde_handler.GetPdeSolution("quantity 1"));

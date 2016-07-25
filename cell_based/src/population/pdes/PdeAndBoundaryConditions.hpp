@@ -106,18 +106,18 @@ public:
     /**
      * Constructor.
      *
-     * @param pPde A pointer to a linear elliptic PDE object (defaults to NULL)
+     * @param pPde A pointer to a linear elliptic PDE object (defaults to nullptr)
      * @param pBoundaryCondition A pointer to an abstract boundary condition
-     *     (defaults to NULL, corresponding to a constant boundary condition with value zero)
+     *     (defaults to nullptr, corresponding to a constant boundary condition with value zero)
      * @param isNeumannBoundaryCondition Whether the boundary condition is Neumann (defaults to true)
-     * @param solution A solution vector (defaults to NULL)
+     * @param solution A solution vector (defaults to nullptr)
      * @param deleteMemberPointersInDestructor whether to delete member pointers in the destructor
      *     (defaults to false)
      */
-    PdeAndBoundaryConditions(AbstractLinearEllipticPde<DIM,DIM>* pPde=NULL,
-                             AbstractBoundaryCondition<DIM>* pBoundaryCondition=NULL,
+    PdeAndBoundaryConditions(AbstractLinearEllipticPde<DIM,DIM>* pPde=nullptr,
+                             AbstractBoundaryCondition<DIM>* pBoundaryCondition=nullptr,
                              bool isNeumannBoundaryCondition=true,
-                             Vec solution=NULL,
+                             Vec solution=nullptr,
                              bool deleteMemberPointersInDestructor=false);
 
     /**
@@ -174,7 +174,7 @@ public:
      * @param pMesh Pointer to a tetrahedral mesh
      * @param pCellPdeElementMap map between cells and elements, from CellBasedPdeHandler
      */
-    void SetUpSourceTermsForAveragedSourcePde(TetrahedralMesh<DIM,DIM>* pMesh, std::map< CellPtr, unsigned >* pCellPdeElementMap=NULL);
+    void SetUpSourceTermsForAveragedSourcePde(TetrahedralMesh<DIM,DIM>* pMesh, std::map< CellPtr, unsigned >* pCellPdeElementMap=nullptr);
 
     /**
      * Set the name of the dependent variable.
@@ -214,7 +214,7 @@ template<class Archive, unsigned DIM>
 inline void load_construct_data(
     Archive & ar, PdeAndBoundaryConditions<DIM> * t, const unsigned int file_version)
 {
-    Vec solution = NULL;
+    Vec solution = nullptr;
 
     std::string archive_filename = ArchiveLocationInfo::GetArchiveDirectory() + "solution.vec";
     FileFinder file_finder(archive_filename, RelativeTo::Absolute);
@@ -224,7 +224,7 @@ inline void load_construct_data(
         PetscTools::ReadPetscObject(solution, archive_filename);
     }
 
-    ::new(t)PdeAndBoundaryConditions<DIM>(NULL, NULL, false, solution, true);
+    ::new(t)PdeAndBoundaryConditions<DIM>(nullptr, nullptr, false, solution, true);
 }
 }
 } // namespace ...

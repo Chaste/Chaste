@@ -40,7 +40,7 @@ T2SwapCellKiller<DIM>::T2SwapCellKiller(AbstractCellPopulation<DIM>* pCellPopula
     : AbstractCellKiller<DIM>(pCellPopulation)
 {
     // Throw an exception if the population is not a VertexBasedCellPopulation
-    if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(this->mpCellPopulation) == NULL)
+    if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(this->mpCellPopulation) == nullptr)
     {
         EXCEPTION("A T2SwapCellKiller should only be used together with a VertexBasedCellPopulation.");
     }

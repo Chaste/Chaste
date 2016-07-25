@@ -176,7 +176,7 @@ template <unsigned SPACE_DIM>
 const c_matrix<double, SPACE_DIM, SPACE_DIM>& BidomainTissue<SPACE_DIM>::rGetExtracellularConductivityTensor(unsigned elementIndex)
 {
     assert(mpExtracellularConductivityTensors);
-    if(this->mpConductivityModifier==NULL)
+    if(this->mpConductivityModifier==nullptr)
     {
         return (*mpExtracellularConductivityTensors)[elementIndex];
     }

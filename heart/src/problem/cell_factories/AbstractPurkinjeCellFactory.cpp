@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::AbstractPurkinjeCellFactory()
     : AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>(),
-      mpMixedDimensionMesh(NULL)
+      mpMixedDimensionMesh(nullptr)
 {
 }
 
@@ -166,7 +166,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::SetMesh(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh)
 {
     mpMixedDimensionMesh = dynamic_cast<MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>*>(pMesh);
-    if (mpMixedDimensionMesh == NULL)
+    if (mpMixedDimensionMesh == nullptr)
     {
         EXCEPTION("AbstractPurkinjeCellFactory must take a MixedDimensionMesh");
     }
@@ -204,7 +204,7 @@ AbstractCardiacCellInterface*  AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>* AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::GetMixedDimensionMesh()
 {
-    if (mpMixedDimensionMesh == NULL)
+    if (mpMixedDimensionMesh == nullptr)
     {
         EXCEPTION("The mixed dimension mesh object has not been set in the cell factory");
     }

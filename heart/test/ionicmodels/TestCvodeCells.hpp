@@ -94,7 +94,7 @@ public :
         }
     }
 
-    double GetIIonic(const std::vector<double>* pStateVariables=NULL)
+    double GetIIonic(const std::vector<double>* pStateVariables=nullptr)
     {
         return 0.0;
     }

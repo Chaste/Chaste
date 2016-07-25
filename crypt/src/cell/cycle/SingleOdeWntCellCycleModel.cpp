@@ -101,8 +101,8 @@ void SingleOdeWntCellCycleModel::UpdateCellCyclePhase()
 
 void SingleOdeWntCellCycleModel::Initialise()
 {
-    assert(mpOdeSystem == NULL);
-    assert(mpCell != NULL);
+    assert(mpOdeSystem == nullptr);
+    assert(mpCell != nullptr);
 
     double wnt_level = this->GetWntLevel();
     mpOdeSystem = new Mirams2010WntOdeSystem(wnt_level, mpCell->GetMutationState());
@@ -130,8 +130,8 @@ void SingleOdeWntCellCycleModel::AdjustOdeParameters(double currentTime)
 
 void SingleOdeWntCellCycleModel::ChangeCellProliferativeTypeDueToCurrentBetaCateninLevel()
 {
-    assert(mpOdeSystem != NULL);
-    assert(mpCell != NULL);
+    assert(mpOdeSystem != nullptr);
+    assert(mpCell != nullptr);
 
     if (GetBetaCateninConcentration() < GetBetaCateninDivisionThreshold())
     {

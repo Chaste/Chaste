@@ -80,14 +80,14 @@ void DistributedVectorFactory::SetFromFactory(DistributedVectorFactory* pFactory
 
 DistributedVectorFactory::DistributedVectorFactory(Vec vec)
     : mPetscStatusKnown(false),
-      mpOriginalFactory(NULL)
+      mpOriginalFactory(nullptr)
 {
     CalculateOwnership(vec);
 }
 
 DistributedVectorFactory::DistributedVectorFactory(unsigned size, PetscInt local)
     : mPetscStatusKnown(false),
-      mpOriginalFactory(NULL)
+      mpOriginalFactory(nullptr)
 {
 #ifndef NDEBUG
     CheckForPetsc();
@@ -101,7 +101,7 @@ DistributedVectorFactory::DistributedVectorFactory(DistributedVectorFactory* pOr
     : mPetscStatusKnown(false),
       mpOriginalFactory(pOriginalFactory)
 {
-    assert(mpOriginalFactory != NULL);
+    assert(mpOriginalFactory != nullptr);
 
     /*
      * Normally called when mpOriginalFactory->GetNumProcs() != PetscTools::GetNumProcs()
@@ -119,7 +119,7 @@ DistributedVectorFactory::DistributedVectorFactory(unsigned lo, unsigned hi, uns
       mProblemSize(size),
       mNumProcs(numProcs),
       mPetscStatusKnown(false),
-      mpOriginalFactory(NULL)
+      mpOriginalFactory(nullptr)
 {
 #ifndef NDEBUG
     CheckForPetsc();

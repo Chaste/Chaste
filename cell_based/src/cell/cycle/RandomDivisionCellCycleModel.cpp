@@ -61,7 +61,7 @@ RandomDivisionCellCycleModel::RandomDivisionCellCycleModel(const RandomDivisionC
 
 bool RandomDivisionCellCycleModel::ReadyToDivide()
 {
-    assert(mpCell != NULL);
+    assert(mpCell != nullptr);
 
     if (!mReadyToDivide)
     {

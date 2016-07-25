@@ -147,8 +147,8 @@ public:
         delete p_arch2;
 
         // Clean up
-        ProcessSpecificArchive<boost::archive::text_iarchive>::Set(NULL);
-        ProcessSpecificArchive<boost::archive::text_oarchive>::Set(NULL);
+        ProcessSpecificArchive<boost::archive::text_iarchive>::Set(nullptr);
+        ProcessSpecificArchive<boost::archive::text_oarchive>::Set(nullptr);
     }
 
     std::string mArchiveDir;

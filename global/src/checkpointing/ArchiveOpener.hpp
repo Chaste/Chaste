@@ -97,7 +97,7 @@ public:
      */
     Archive* GetCommonArchive()
     {
-        assert(mpCommonArchive != NULL);
+        assert(mpCommonArchive != nullptr);
         return mpCommonArchive;
     }
 

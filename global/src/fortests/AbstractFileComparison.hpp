@@ -176,7 +176,7 @@ private:
             if (!mpFile1->is_open())
             {
                 delete mpFile1;
-                mpFile1 = NULL;
+                mpFile1 = nullptr;
                 EXCEPTION("Couldn't open file: " + mFilename1);
             }
 
@@ -187,9 +187,9 @@ private:
             {
                 mpFile1->close();
                 delete mpFile1;
-                mpFile1 = NULL;
+                mpFile1 = nullptr;
                 delete mpFile2;
-                mpFile2 = NULL;
+                mpFile2 = nullptr;
                 EXCEPTION("Couldn't open file: " + mFilename2);
             }
 
@@ -197,8 +197,8 @@ private:
         }
         else
         {
-            mpFile1 = NULL;
-            mpFile2 = NULL;
+            mpFile1 = nullptr;
+            mpFile2 = nullptr;
         }
     }
 

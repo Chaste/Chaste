@@ -73,7 +73,7 @@ class VertexMeshWriter : public AbstractMeshWriter<ELEMENT_DIM, SPACE_DIM>
 private:
     /**
      * If writing from a mesh object, the mesh to write to disk.
-     * Otherwise NULL.
+     * Otherwise nullptr.
      */
     VertexMesh<ELEMENT_DIM,SPACE_DIM>* mpMesh;
 

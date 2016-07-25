@@ -74,9 +74,9 @@ public:
     void TestToyController() throw(Exception)
     {
         ToyController controller(0.2,1.0);
-        TS_ASSERT_EQUALS(controller.GetNextTimeStep(0.5,NULL), 0.2);
-        TS_ASSERT_EQUALS(controller.GetNextTimeStep(1.5,NULL), 0.5);
-        TS_ASSERT_EQUALS(controller.GetNextTimeStep(10 ,NULL), 1.0);
+        TS_ASSERT_EQUALS(controller.GetNextTimeStep(0.5,nullptr), 0.2);
+        TS_ASSERT_EQUALS(controller.GetNextTimeStep(1.5,nullptr), 0.5);
+        TS_ASSERT_EQUALS(controller.GetNextTimeStep(10 ,nullptr), 1.0);
     }
 };
 

@@ -217,7 +217,7 @@ public :
      *
      *  NOTE if SetWatchedLocation but not Initialise has been
      *  called, mpWatchedLocationFile will be uninitialised and
-     *  using it will cause a seg fault. Hence the mpMechanicsMesh!=NULL
+     *  using it will cause a seg fault. Hence the mpMechanicsMesh!=nullptr
      *  it is true if Initialise has been called.
      */
     virtual ~CardiacElectroMechanicsProblem();

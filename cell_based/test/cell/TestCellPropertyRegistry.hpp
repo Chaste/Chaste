@@ -184,7 +184,7 @@ public:
             input_arch >> p_label;
 
             CellLabel* p_real_label = dynamic_cast<CellLabel*>(p_label);
-            TS_ASSERT(p_real_label != NULL);
+            TS_ASSERT(p_real_label != nullptr);
 
             TS_ASSERT_EQUALS(p_real_label->GetCellCount(), 1u);
             TS_ASSERT_EQUALS(p_real_label->GetColour(), 5u);

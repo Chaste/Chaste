@@ -228,8 +228,8 @@ public:
             const std::set<ClassOfSimpleVariables*>& a_set = *(wrapper_set.begin());
             TS_ASSERT_EQUALS(a_set.size(), 2u);
 
-            ClassOfSimpleVariables* p_one_in_set = NULL;
-            ClassOfSimpleVariables* p_two_in_set = NULL;
+            ClassOfSimpleVariables* p_one_in_set = nullptr;
+            ClassOfSimpleVariables* p_two_in_set = nullptr;
             for (std::set<ClassOfSimpleVariables*>::iterator it = a_set.begin();
                  it != a_set.end();
                  ++it)
@@ -249,8 +249,8 @@ public:
                    }
             }
 
-            ClassOfSimpleVariables* p_one_in_list = NULL;
-            ClassOfSimpleVariables* p_two_in_list = NULL;
+            ClassOfSimpleVariables* p_one_in_list = nullptr;
+            ClassOfSimpleVariables* p_two_in_list = nullptr;
             for (std::list<ClassOfSimpleVariables>::iterator it = a_list.begin();
                  it != a_list.end();
                  ++it)
@@ -274,8 +274,8 @@ public:
                         TS_ASSERT_EQUALS(p_class->GetString(), "not used in set");
                    }
             }
-            TS_ASSERT_DIFFERS(p_one_in_list, (void*)NULL);
-            TS_ASSERT_DIFFERS(p_two_in_list, (void*)NULL);
+            TS_ASSERT_DIFFERS(p_one_in_list, (void*)nullptr);
+            TS_ASSERT_DIFFERS(p_two_in_list, (void*)nullptr);
             TS_ASSERT_EQUALS(p_one_in_list, p_one_in_set);
             TS_ASSERT_EQUALS(p_two_in_list, p_two_in_set);
         }

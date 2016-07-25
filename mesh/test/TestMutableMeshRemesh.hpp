@@ -478,20 +478,20 @@ public:
         in.pointlist[8] = 0.5;
         in.pointlist[9] = 7.0;
 
-        in.pointmarkerlist = NULL;
+        in.pointmarkerlist = nullptr;
         in.numberofsegments = 0;
         in.numberofholes = 0;
         in.numberofregions = 0;
 
-        out.pointlist = NULL;
-        out.pointattributelist = (double *) NULL;
-        out.pointmarkerlist = (int *) NULL;
-        out.trianglelist = (int *) NULL;
-        out.triangleattributelist = (double *) NULL;
-        out.edgelist = (int *) NULL;
-        out.edgemarkerlist = (int *) NULL;
+        out.pointlist = nullptr;
+        out.pointattributelist = (double *) nullptr;
+        out.pointmarkerlist = (int *) nullptr;
+        out.trianglelist = (int *) nullptr;
+        out.triangleattributelist = (double *) nullptr;
+        out.edgelist = (int *) nullptr;
+        out.edgemarkerlist = (int *) nullptr;
 
-        triangulate((char*)"Qze", &in, &out, NULL);
+        triangulate((char*)"Qze", &in, &out, nullptr);
 
         TS_ASSERT_EQUALS(out.numberofpoints,             5);
         TS_ASSERT_EQUALS(out.numberofpointattributes,    0);

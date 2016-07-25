@@ -192,7 +192,7 @@ protected:
 
 public:
 
-    /**  Default constructor to initialise BoxCollection to NULL.  */
+    /**  Default constructor to initialise BoxCollection to nullptr.  */
     NodesOnlyMesh();
 
     /**  Over-written destructor to delete pointer to BoxCollection. */

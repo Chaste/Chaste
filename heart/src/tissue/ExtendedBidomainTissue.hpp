@@ -435,7 +435,7 @@ public:
          for (unsigned i=0; i<num_cells; i++)
          {
              AbstractDynamicallyLoadableEntity* p_entity = dynamic_cast<AbstractDynamicallyLoadableEntity*>(r_cells_distributed[i]);
-             bool is_dynamic = (p_entity != NULL);
+             bool is_dynamic = (p_entity != nullptr);
              r_archive & is_dynamic;
              if (is_dynamic)
              {
@@ -475,7 +475,7 @@ public:
                                   std::vector<double>& rGgaps,
                                   AbstractTetrahedralMesh<SPACE_DIM,SPACE_DIM>* pMesh)
      {
-         assert(pMesh!=NULL);
+         assert(pMesh!=nullptr);
          DistributedVectorFactory* p_factory;
          archive & p_factory;
          unsigned num_cells;
@@ -488,8 +488,8 @@ public:
          assert(rCells.size() == rSecondCells.size());
          for (unsigned i=0; i<rCells.size(); i++)
          {
-             assert(rCells[i] == NULL);
-             assert(rSecondCells[i] == NULL);
+             assert(rCells[i] == nullptr);
+             assert(rSecondCells[i] == nullptr);
          }
  #endif
 
@@ -574,7 +574,7 @@ public:
       * @param archive  the master archive; cells will actually be written to the process-specific archive.
       * @param version
       * @param rStimuli the extracellular stimuli (will be filled from the archive).
-      * @param pMesh the mesh (needed to work out number of nodes). Here it is assumed we have already unarchived the mesh somewhere and the pointer passed in is not NULL.
+      * @param pMesh the mesh (needed to work out number of nodes). Here it is assumed we have already unarchived the mesh somewhere and the pointer passed in is not nullptr.
       */
      template<class Archive>
      void LoadExtracellularStimulus(Archive & archive, const unsigned int version,
@@ -591,7 +591,7 @@ public:
           // Paranoia
           for (unsigned i=0; i<rStimuli.size(); i++)
           {
-              assert(rStimuli[i] == NULL);
+              assert(rStimuli[i] == nullptr);
           }
 #endif
 
@@ -601,7 +601,7 @@ public:
         // low index.
         unsigned index_low = p_factory->GetOriginalFactory() ? p_factory->GetOriginalFactory()->GetLow() : p_factory->GetLow();
 
-        assert(pMesh!=NULL);
+        assert(pMesh!=nullptr);
         //unsigned num_cells = pMesh->GetNumNodes();
         for (unsigned local_index=0; local_index<num_cells; local_index++)
         {

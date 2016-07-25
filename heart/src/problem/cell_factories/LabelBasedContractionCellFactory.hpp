@@ -112,7 +112,7 @@ public:
             }
         }
 #define COVERAGE_IGNORE
-        return NULL;  //This is included to appease compilers which analysis the NEVER_REACHED branch as not returning a pointer
+        return nullptr;  //This is included to appease compilers which analysis the NEVER_REACHED branch as not returning a pointer
 #undef COVERAGE_IGNORE
     }
 };

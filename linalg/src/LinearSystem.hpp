@@ -210,7 +210,7 @@ public:
      * Alternative constructor.
      *
      * Create a linear system which wraps the provided PETSc objects so we can
-     * access them using our API.  Either of the objects may be NULL, but at
+     * access them using our API.  Either of the objects may be nullptr, but at
      * least one of them must not be.
      *
      * Useful for storing residuals and jacobians when solving nonlinear PDEs.
@@ -418,9 +418,9 @@ public:
     /**
      * Solve the linear system.
      * @return the solution vector
-     * @param lhsGuess  an optional initial guess for the solution (defaults to NULL)
+     * @param lhsGuess  an optional initial guess for the solution (defaults to nullptr)
      */
-    Vec Solve(Vec lhsGuess=NULL);
+    Vec Solve(Vec lhsGuess=nullptr);
 
     /**
      * Set an element of the right-hand side vector to a given value.

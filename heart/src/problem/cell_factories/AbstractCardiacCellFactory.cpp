@@ -83,15 +83,15 @@ void AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>::FillInCellularTransmural
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>::GetNumberOfCells()
 {
-    assert(mpMesh != NULL);
+    assert(mpMesh != nullptr);
     return mpMesh->GetNumNodes();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>::AbstractCardiacCellFactory(
         boost::shared_ptr<AbstractIvpOdeSolver> pSolver)
-    : mpMesh(NULL),
-      mpHeartGeometryInformation(NULL),
+    : mpMesh(nullptr),
+      mpHeartGeometryInformation(nullptr),
       mpZeroStimulus(new ZeroStimulus),
       mpSolver(pSolver)
 {
@@ -111,7 +111,7 @@ void AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>::SetMesh(AbstractTetrahed
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>::GetMesh()
 {
-    if (mpMesh == NULL)
+    if (mpMesh == nullptr)
     {
         EXCEPTION("The mesh object has not been set in the cell factory");
     }
@@ -127,7 +127,7 @@ void AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>::SetHeartGeometryInformat
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 HeartGeometryInformation<SPACE_DIM>* AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>::GetHeartGeometryInformation()
 {
-    if (mpHeartGeometryInformation == NULL)
+    if (mpHeartGeometryInformation == nullptr)
     {
         EXCEPTION("HeartGeometryInformation object has not been set in the cell factory");
     }

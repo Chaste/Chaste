@@ -229,7 +229,7 @@ public:
             TS_ASSERT_EQUALS(p_arch_state->GetCellCount(), 1u);
 
             P53GainOfFunctionCellMutationState* p_real_state = dynamic_cast<P53GainOfFunctionCellMutationState*>(p_arch_state);
-            TS_ASSERT(p_real_state != NULL);
+            TS_ASSERT(p_real_state != nullptr);
             TS_ASSERT_EQUALS(p_real_state->GetColour(), 5u);
 
             delete p_arch_state;

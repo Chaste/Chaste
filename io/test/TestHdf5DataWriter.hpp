@@ -94,7 +94,7 @@ public:
         MPI_Comm_size(PETSC_COMM_WORLD, &num_procs);
         dimsf[0] = X * num_procs;
         dimsf[1] = Y;
-        hid_t filespace = H5Screate_simple(DIMS, dimsf, NULL);
+        hid_t filespace = H5Screate_simple(DIMS, dimsf, nullptr);
 
         // Create the dataset with default properties and close filespace.
         hid_t dset_id = H5Dcreate(file_id, "IntArray", H5T_NATIVE_INT, filespace,
@@ -103,12 +103,12 @@ public:
 
         // Define a dataset in memory for this process
         hsize_t count[DIMS] = {X, Y};
-        hid_t memspace = H5Screate_simple(DIMS, count, NULL);
+        hid_t memspace = H5Screate_simple(DIMS, count, nullptr);
 
         // Select hyperslab in the file.
         hsize_t offset[DIMS] = {PetscTools::GetMyRank()*X, 0};
         filespace = H5Dget_space(dset_id);
-        H5Sselect_hyperslab(filespace, H5S_SELECT_SET, offset, NULL, count, NULL);
+        H5Sselect_hyperslab(filespace, H5S_SELECT_SET, offset, nullptr, count, nullptr);
 
         // Create property list for collective dataset write, and write!  Finally.
         plist_id = H5Pcreate(H5P_DATASET_XFER);
@@ -119,7 +119,7 @@ public:
 
         // Create dataspace for the name, unit attribute
         hsize_t columns[2] = {Y, 21};
-        hid_t colspace = H5Screate_simple(1, columns, NULL);
+        hid_t colspace = H5Screate_simple(1, columns, nullptr);
 
         // Create attribute
         char col_data[5][21];
@@ -190,7 +190,7 @@ public:
         //TS_ASSERT_EQUALS(data_size, hi-lo);
         hsize_t dimsf[DIMS]={data_size}; // dataset dimensions
 
-        hid_t filespace = H5Screate_simple(DIMS, dimsf, NULL);
+        hid_t filespace = H5Screate_simple(DIMS, dimsf, nullptr);
 
         // Create the dataset with default properties and close filespace.
         hid_t dset_id = H5Dcreate(file_id, "TheVector", H5T_NATIVE_DOUBLE, filespace,
@@ -199,12 +199,12 @@ public:
 
         // Define a dataset in memory for this process
         hsize_t count[DIMS] = {(unsigned)(hi-lo)};
-        hid_t memspace = H5Screate_simple(DIMS, count, NULL);
+        hid_t memspace = H5Screate_simple(DIMS, count, nullptr);
 
         // Select hyperslab in the file.
         hsize_t offset[DIMS] = {(unsigned)(lo)};
         filespace = H5Dget_space(dset_id);
-        H5Sselect_hyperslab(filespace, H5S_SELECT_SET, offset, NULL, count, NULL);
+        H5Sselect_hyperslab(filespace, H5S_SELECT_SET, offset, nullptr, count, nullptr);
 
         // Create property list for collective dataset write, and write!  Finally.
         plist_id = H5Pcreate(H5P_DATASET_XFER);

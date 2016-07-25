@@ -114,7 +114,7 @@ public:
             input_arch >> p_cell_id;
 
             CellId* p_real_cell_id = dynamic_cast<CellId*>(p_cell_id);
-            TS_ASSERT(p_real_cell_id != NULL);
+            TS_ASSERT(p_real_cell_id != nullptr);
 
             TS_ASSERT_EQUALS(p_real_cell_id->GetCellId(), 1u);
             TS_ASSERT_EQUALS(p_real_cell_id->GetMaxCellId(), 2u);
@@ -177,7 +177,7 @@ public:
             input_arch >> p_cell_data;
 
             CellData* p_real_cell_data = dynamic_cast<CellData*>(p_cell_data);
-            TS_ASSERT(p_real_cell_data != NULL);
+            TS_ASSERT(p_real_cell_data != nullptr);
 
             TS_ASSERT_DELTA(p_real_cell_data->GetItem("thing1"), 1.0, 1e-8);
             TS_ASSERT_DELTA(p_real_cell_data->GetItem("thing2"), 2.0, 1e-8);

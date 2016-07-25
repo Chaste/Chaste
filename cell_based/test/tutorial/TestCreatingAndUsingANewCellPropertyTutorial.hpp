@@ -329,7 +329,7 @@ public:
             TS_ASSERT_EQUALS(p_arch_property->GetCellCount(), 1u);
 
             MotileCellProperty* p_real_property = dynamic_cast<MotileCellProperty*>(p_arch_property);
-            TS_ASSERT(p_real_property != NULL);
+            TS_ASSERT(p_real_property != nullptr);
             TS_ASSERT_EQUALS(p_real_property->GetColour(), 7u);
 
             delete p_arch_property;
@@ -385,7 +385,7 @@ public:
                 collection.AddProperty(p_label);
             }
 
-            CellPtr p_cell(new Cell(p_state, p_model, NULL, false, collection));
+            CellPtr p_cell(new Cell(p_state, p_model, nullptr, false, collection));
             p_cell->SetCellProliferativeType(p_diff_type);
 
             /* Now, we define a random birth time, chosen from [-T,0], where

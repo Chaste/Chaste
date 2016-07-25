@@ -80,7 +80,7 @@ void AbstractPhaseBasedCellCycleModel::ResetForDivision()
 
 bool AbstractPhaseBasedCellCycleModel::ReadyToDivide()
 {
-    assert(mpCell != NULL);
+    assert(mpCell != nullptr);
 
     if (!mReadyToDivide)
     {

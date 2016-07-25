@@ -59,7 +59,7 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(AbstractTetrahe
 #else
     assert(keepOriginalElementIndexing);
     this->mpDistributedMesh = dynamic_cast<DistributedTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* >(&rMesh);
-    bool mesh_is_distributed = (this->mpDistributedMesh != NULL) && PetscTools::IsParallel();
+    bool mesh_is_distributed = (this->mpDistributedMesh != nullptr) && PetscTools::IsParallel();
 
     if (PetscTools::AmMaster())
     {

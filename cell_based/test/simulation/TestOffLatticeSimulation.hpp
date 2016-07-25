@@ -921,7 +921,7 @@ public:
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetEndTime(0.5);
 
-        // We call SetupSolve() here to set up the default numerical method, which is otherwise NULL
+        // We call SetupSolve() here to set up the default numerical method, which is otherwise nullptr
         simulator.SetupSolve();
 
         TS_ASSERT_EQUALS(simulator.GetIdentifier(), "OffLatticeSimulation-2-2");

@@ -57,7 +57,7 @@ private:
 
     /**
      * If writing from a mesh object, the mesh to write to disk.
-     * Otherwise NULL.
+     * Otherwise nullptr.
      */
     PottsMesh<SPACE_DIM>* mpMesh;
 

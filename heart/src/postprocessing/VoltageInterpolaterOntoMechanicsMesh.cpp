@@ -85,7 +85,7 @@ VoltageInterpolaterOntoMechanicsMesh<DIM>::VoltageInterpolaterOntoMechanicsMesh(
     DistributedVectorFactory factory(rElectricsMesh.GetNumNodes());
     Vec voltage = factory.CreateVec();
     std::vector<double> interpolated_voltages(rMechanicsMesh.GetNumNodes());
-    Vec voltage_coarse = NULL;
+    Vec voltage_coarse = nullptr;
 
     for(unsigned time_step=0; time_step<num_timesteps; time_step++)
     {
@@ -111,7 +111,7 @@ VoltageInterpolaterOntoMechanicsMesh<DIM>::VoltageInterpolaterOntoMechanicsMesh(
                 interpolated_voltages[i] = interpolated_voltage;
             }
 
-            if(voltage_coarse!=NULL)
+            if(voltage_coarse!=nullptr)
             {
                 PetscTools::Destroy(voltage_coarse);
             }
@@ -123,7 +123,7 @@ VoltageInterpolaterOntoMechanicsMesh<DIM>::VoltageInterpolaterOntoMechanicsMesh(
         p_writer->AdvanceAlongUnlimitedDimension();
     }
 
-    if(voltage_coarse!=NULL)
+    if(voltage_coarse!=nullptr)
     {
         PetscTools::Destroy(voltage);
         PetscTools::Destroy(voltage_coarse);

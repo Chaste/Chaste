@@ -46,7 +46,7 @@ DistributedVector::DistributedVector(Vec vec, DistributedVectorFactory* pFactory
       mpFactory(pFactory),
       mReadOnly(readOnly)
 {
-    assert(pFactory != NULL);
+    assert(pFactory != nullptr);
 
     // Set local copies of problem size, etc.
     mProblemSize = pFactory->GetProblemSize();
@@ -98,7 +98,7 @@ void DistributedVector::Restore()
 
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
     /**
-     * mpVec is NULL after this function call
+     * mpVec is nullptr after this function call
      */
     VecGetArray(mVec, &mpVec);
 #endif

@@ -170,7 +170,7 @@ public:
         mesh_pair.PrintStatistics();
 
         mesh_pair.DeleteFineBoxCollection();
-        TS_ASSERT(mesh_pair.mpFineMeshBoxCollection==NULL);
+        TS_ASSERT(mesh_pair.mpFineMeshBoxCollection==nullptr);
     }
 
     void TestWithCoarseSlightlyOutsideFine() throw(Exception)

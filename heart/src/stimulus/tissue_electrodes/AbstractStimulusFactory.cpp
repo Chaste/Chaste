@@ -48,13 +48,13 @@ boost::shared_ptr<AbstractStimulusFunction>  AbstractStimulusFactory<ELEMENT_DIM
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned AbstractStimulusFactory<ELEMENT_DIM,SPACE_DIM>::GetNumberOfCells()
 {
-    assert(mpMesh != NULL);
+    assert(mpMesh != nullptr);
     return mpMesh->GetNumNodes();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractStimulusFactory<ELEMENT_DIM,SPACE_DIM>::AbstractStimulusFactory()
-    : mpMesh(NULL)
+    : mpMesh(nullptr)
 {
 
 }
@@ -79,7 +79,7 @@ void AbstractStimulusFactory<ELEMENT_DIM,SPACE_DIM>::SetCompatibleExtracellularS
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* AbstractStimulusFactory<ELEMENT_DIM,SPACE_DIM>::GetMesh()
 {
-    if (mpMesh == NULL)
+    if (mpMesh == nullptr)
     {
         EXCEPTION("The mesh object has not been set in the stimulus factory");
     }

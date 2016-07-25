@@ -62,8 +62,8 @@ public:
         TS_ASSERT_EQUALS(walker.GetParentElement(2u), mesh.GetElement(1u));
         TS_ASSERT_EQUALS(walker.GetParentElementIndex(2u), 1u);
 
-        TS_ASSERT(walker.GetParentElement(mesh.GetElement(0u)) == NULL);
-        TS_ASSERT(walker.GetParentElement(0u) == NULL);
+        TS_ASSERT(walker.GetParentElement(mesh.GetElement(0u)) == nullptr);
+        TS_ASSERT(walker.GetParentElement(0u) == nullptr);
 
         std::vector<Element<1,3>* > child_eles = walker.GetChildElements(mesh.GetElement(1u));
         TS_ASSERT_EQUALS(child_eles.size(), 2u);

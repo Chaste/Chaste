@@ -99,7 +99,7 @@ public:
      * AbstractLinearPdeSolver::SetupLinearSystem which calls this method.
      *
      * @param currentSolution The current solution which can be used in setting up
-     *  the linear system if needed (NULL if there isn't a current solution)
+     *  the linear system if needed (nullptr if there isn't a current solution)
      * @param computeMatrix Whether to compute the LHS matrix of the linear system
      *  (mainly for dynamic solves)
      * @param pLinearSystem  The linear system to set up.
@@ -112,14 +112,14 @@ void AbstractAssemblerSolverHybrid<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, INTERPOL
                                                                                                                      bool computeMatrix,
                                                                                                                      LinearSystem* pLinearSystem)
 {
-    assert(pLinearSystem->rGetLhsMatrix() != NULL);
-    assert(pLinearSystem->rGetRhsVector() != NULL);
+    assert(pLinearSystem->rGetLhsMatrix() != nullptr);
+    assert(pLinearSystem->rGetRhsVector() != nullptr);
 
     // Assemble the matrix and vector calling methods on AbstractFeVolumeIntegralAssembler
     this->SetMatrixToAssemble(pLinearSystem->rGetLhsMatrix());
     this->SetVectorToAssemble(pLinearSystem->rGetRhsVector(), true);
 
-    if (currentSolution != NULL)
+    if (currentSolution != nullptr)
     {
         this->SetCurrentSolution(currentSolution);
     }

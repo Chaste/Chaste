@@ -72,11 +72,11 @@ void AbstractOdeBasedCellCycleModel::SetBirthTime(double birthTime)
 
 bool AbstractOdeBasedCellCycleModel::ReadyToDivide()
 {
-    assert(mpCell != NULL);
+    assert(mpCell != nullptr);
 
     if (!mReadyToDivide)
     {
-        assert(mpOdeSystem != NULL);
+        assert(mpOdeSystem != nullptr);
 
         double current_time = SimulationTime::Instance()->GetTime();
 

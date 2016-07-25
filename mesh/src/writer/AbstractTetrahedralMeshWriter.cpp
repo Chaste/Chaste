@@ -73,12 +73,12 @@ AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::AbstractTetrahedralMeshWr
                    const std::string& rBaseName,
                    const bool clearOutputDir)
     : AbstractMeshWriter<ELEMENT_DIM, SPACE_DIM>(rDirectory, rBaseName, clearOutputDir),
-      mpNodeMap(NULL),
+      mpNodeMap(nullptr),
       mNodesPerElement(ELEMENT_DIM+1),
       mNodesPerBoundaryElement(ELEMENT_DIM),
-      mpMesh(NULL),
-      mpDistributedMesh(NULL),
-      mpMixedMesh(NULL),
+      mpMesh(nullptr),
+      mpDistributedMesh(nullptr),
+      mpMixedMesh(nullptr),
       mpIters(new MeshWriterIterators<ELEMENT_DIM,SPACE_DIM>),
       mNodeCounterForParallelMesh(0),
       mElementCounterForParallelMesh(0),
@@ -86,9 +86,9 @@ AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::AbstractTetrahedralMeshWr
       mCableElementCounterForParallelMesh(0),
       mFilesAreBinary(false)
 {
-    mpIters->pNodeIter = NULL;
-    mpIters->pElemIter = NULL;
-    mpIters->pBoundaryElemIter = NULL;
+    mpIters->pNodeIter = nullptr;
+    mpIters->pElemIter = nullptr;
+    mpIters->pBoundaryElemIter = nullptr;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -144,7 +144,7 @@ std::vector<double> AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNe
         // If we didn't return then the iterator has reached the end of the local nodes.
         // It must be a parallel mesh and we are expecting messages...
 
-        assert( mpDistributedMesh != NULL );
+        assert( mpDistributedMesh != nullptr );
 
         MPI_Status status;
         status.MPI_ERROR = MPI_SUCCESS; //For MPICH2
@@ -176,7 +176,7 @@ ElementData AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextElemen
         ElementData elem_data;
         elem_data.NodeIndices.resize(mNodesPerElement);
 
-        if ( mpDistributedMesh == NULL ) // not using parallel mesh
+        if ( mpDistributedMesh == nullptr ) // not using parallel mesh
         {
             // Use the iterator
             assert(this->mNumElements==mpMesh->GetNumElements());
@@ -236,7 +236,7 @@ ElementData AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextBounda
         ElementData boundary_elem_data;
         boundary_elem_data.NodeIndices.resize(mNodesPerBoundaryElement);
 
-        if ( mpDistributedMesh == NULL ) // not using parallel mesh
+        if ( mpDistributedMesh == nullptr ) // not using parallel mesh
         {
             // Use the iterator
             assert(this->mNumBoundaryElements==mpMesh->GetNumBoundaryElements());
@@ -353,7 +353,7 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteNclFile(
 
     PetscTools::BeginRoundRobin();
     {
-        out_stream p_ncl_file = out_stream(NULL);
+        out_stream p_ncl_file = out_stream(nullptr);
 
         if (PetscTools::AmMaster())
         {
@@ -443,7 +443,7 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(
       AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>& rMesh,
       bool keepOriginalElementIndexing)
 {
-    this->mpMeshReader = NULL;
+    this->mpMeshReader = nullptr;
     mpMesh = &rMesh;
 
     this->mNumNodes = mpMesh->GetNumNodes();
@@ -486,7 +486,7 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(
     ///\todo #1322,  This should be const too
     mpMixedMesh = dynamic_cast<MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>* >(this->mpMesh);
 
-    if (mpDistributedMesh != NULL)
+    if (mpDistributedMesh != nullptr)
     {
         // It's a parallel mesh
         WriteFilesUsingParallelMesh(keepOriginalElementIndexing);
@@ -513,11 +513,11 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(
     this->WriteFiles();
     PetscTools::Barrier("AbstractTetrahedralMeshWriter::WriteFilesUsingMesh"); // Paired with waiting Slave processes
     delete mpIters->pNodeIter;
-    mpIters->pNodeIter = NULL;
+    mpIters->pNodeIter = nullptr;
     delete mpIters->pElemIter;
-    mpIters->pElemIter = NULL;
+    mpIters->pElemIter = nullptr;
     delete mpIters->pBoundaryElemIter;
-    mpIters->pBoundaryElemIter = NULL;
+    mpIters->pBoundaryElemIter = nullptr;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

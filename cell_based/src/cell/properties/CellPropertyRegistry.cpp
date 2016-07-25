@@ -38,11 +38,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellPropertyRegistry.hpp"
 #include "Exception.hpp"
 
-CellPropertyRegistry* CellPropertyRegistry::mpInstance = NULL;
+CellPropertyRegistry* CellPropertyRegistry::mpInstance = nullptr;
 
 CellPropertyRegistry* CellPropertyRegistry::Instance()
 {
-    if (mpInstance == NULL)
+    if (mpInstance == nullptr)
     {
         mpInstance = new CellPropertyRegistry;
     }
@@ -67,7 +67,7 @@ CellPropertyRegistry::CellPropertyRegistry()
 
 CellPropertyRegistry* CellPropertyRegistry::TakeOwnership()
 {
-    mpInstance = NULL;
+    mpInstance = nullptr;
     return this;
 }
 

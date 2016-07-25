@@ -100,7 +100,7 @@ BidomainAssembler<ELEMENT_DIM,SPACE_DIM>::BidomainAssembler(
             BidomainTissue<SPACE_DIM>* pTissue)
     : AbstractCardiacFeVolumeIntegralAssembler<ELEMENT_DIM,SPACE_DIM,2,false,true,CARDIAC>(pMesh,pTissue)
 {
-    assert(pTissue != NULL);
+    assert(pTissue != nullptr);
 }
 
 

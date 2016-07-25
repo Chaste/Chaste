@@ -122,14 +122,14 @@ protected:
     c_matrix<double,DIM,DIM> mConstantFibreSheetDirections;
 
     /**
-     * The fibre-sheet-normal directions (matrices), one for each element. Only non-NULL if SetVariableFibreSheetDirections()
+     * The fibre-sheet-normal directions (matrices), one for each element. Only non-nullptr if SetVariableFibreSheetDirections()
      * is called, if not mConstantFibreSheetDirections is used instead
      */
     std::vector<c_matrix<double,DIM,DIM> >* mpVariableFibreSheetDirections;
 
     /**
      *  Whether the fibre-sheet directions that where read in where define per element or per quadrature point.
-     *  Only valid if mpVariableFibreSheetDirections!=NULL
+     *  Only valid if mpVariableFibreSheetDirections!=nullptr
      */
     bool mFibreSheetDirectionsDefinedByQuadraturePoint;
 

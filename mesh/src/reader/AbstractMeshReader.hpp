@@ -237,8 +237,8 @@ public:
          */
         ElementIterator()
             : mIndex(UNSIGNED_UNSET),
-              mpIndices(NULL),
-              mpReader(NULL)
+              mpIndices(nullptr),
+              mpReader(nullptr)
         {
         }
 
@@ -254,7 +254,7 @@ public:
          */
         ElementIterator(unsigned index, AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>* pReader)
             : mIndex(index),
-              mpIndices(NULL),
+              mpIndices(nullptr),
               mpReader(pReader)
         {
             CacheData(mIndex, true);
@@ -374,8 +374,8 @@ public:
          */
         NodeIterator()
             : mIndex(UNSIGNED_UNSET),
-              mpIndices(NULL),
-              mpReader(NULL)
+              mpIndices(nullptr),
+              mpReader(nullptr)
         {
         }
 
@@ -391,7 +391,7 @@ public:
          */
         NodeIterator(unsigned index, AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>* pReader)
             : mIndex(index),
-              mpIndices(NULL),
+              mpIndices(nullptr),
               mpReader(pReader)
         {
             CacheData(mIndex, true);

@@ -45,23 +45,23 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /** The process-specific output archive */
 /** \cond */
 template <>
-boost::archive::text_oarchive* ProcessSpecificArchive<boost::archive::text_oarchive>::mpArchive = NULL;
+boost::archive::text_oarchive* ProcessSpecificArchive<boost::archive::text_oarchive>::mpArchive = nullptr;
 /**\endcond */
 
 /** The process-specific input archive */
 /** \cond */
 template <>
-boost::archive::text_iarchive* ProcessSpecificArchive<boost::archive::text_iarchive>::mpArchive = NULL;
+boost::archive::text_iarchive* ProcessSpecificArchive<boost::archive::text_iarchive>::mpArchive = nullptr;
 /**\endcond */
 
 /** The process-specific output archive */
 /** \cond */
 template <>
-boost::archive::binary_oarchive* ProcessSpecificArchive<boost::archive::binary_oarchive>::mpArchive = NULL;
+boost::archive::binary_oarchive* ProcessSpecificArchive<boost::archive::binary_oarchive>::mpArchive = nullptr;
 /**\endcond */
 
 /** The process-specific input archive */
 /** \cond */
 template <>
-boost::archive::binary_iarchive* ProcessSpecificArchive<boost::archive::binary_iarchive>::mpArchive = NULL;
+boost::archive::binary_iarchive* ProcessSpecificArchive<boost::archive::binary_iarchive>::mpArchive = nullptr;
 /**\endcond */

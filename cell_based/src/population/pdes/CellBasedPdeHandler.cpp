@@ -53,7 +53,7 @@ CellBasedPdeHandler<DIM>::CellBasedPdeHandler(AbstractCellPopulation<DIM>* pCell
       mAverageRadialSolutionVariableName(""),
       mSetBcsOnCoarseBoundary(true),
       mNumRadialIntervals(UNSIGNED_UNSET),
-      mpCoarsePdeMesh(NULL),
+      mpCoarsePdeMesh(nullptr),
       mDeleteMemberPointersInDestructor(deleteMemberPointersInDestructor)
 {
     // We must be using a CellPopulation with at least one cell
@@ -137,7 +137,7 @@ Vec CellBasedPdeHandler<DIM>::GetPdeSolution(const std::string& rName)
 template<unsigned DIM>
 void CellBasedPdeHandler<DIM>::InitialiseCellPdeElementMap()
 {
-    if (mpCoarsePdeMesh == NULL)
+    if (mpCoarsePdeMesh == nullptr)
     {
         EXCEPTION("InitialiseCellPdeElementMap() should only be called if mpCoarsePdeMesh is set up.");
     }
@@ -173,7 +173,7 @@ template<unsigned DIM>
 void CellBasedPdeHandler<DIM>::OpenResultsFiles(std::string outputDirectory)
 {
     // If appropriate, make a coarse mesh which exactly overlays the lattice sites of a PottsMesh (used for all OnLattice simulations)
-    if ((dynamic_cast<CaBasedCellPopulation<DIM>*>(mpCellPopulation) != NULL) && mpCoarsePdeMesh==NULL)
+    if ((dynamic_cast<CaBasedCellPopulation<DIM>*>(mpCellPopulation) != nullptr) && mpCoarsePdeMesh==nullptr)
     {
         assert(DIM ==2);
         ChasteCuboid<DIM> cuboid = mpCellPopulation->rGetMesh().CalculateBoundingBox();
@@ -185,12 +185,12 @@ void CellBasedPdeHandler<DIM>::OpenResultsFiles(std::string outputDirectory)
     }
 
     // If using a NodeBasedCellPopulation a VertexBasedCellPopulation, a CaBasedCellPopulation or a PottsBasedCellPopulation, mpCoarsePdeMesh must be set up
-    if (PdeSolveNeedsCoarseMesh() && mpCoarsePdeMesh==NULL)
+    if (PdeSolveNeedsCoarseMesh() && mpCoarsePdeMesh==nullptr)
     {
         EXCEPTION("Trying to solve a PDE on a cell population that doesn't have a mesh. Try calling UseCoarsePdeMesh().");
     }
 
-    if (mpCoarsePdeMesh != NULL)
+    if (mpCoarsePdeMesh != nullptr)
     {
         InitialiseCellPdeElementMap();
 
@@ -203,7 +203,7 @@ void CellBasedPdeHandler<DIM>::OpenResultsFiles(std::string outputDirectory)
     {
         OutputFileHandler output_file_handler(outputDirectory+"/", false);
 
-        if (mpCoarsePdeMesh != NULL)
+        if (mpCoarsePdeMesh != nullptr)
         {
             mpVizPdeSolutionResultsFile = output_file_handler.OpenOutputFile("results.vizcoarsepdesolution");
         }
@@ -308,7 +308,7 @@ template<unsigned DIM>
 void CellBasedPdeHandler<DIM>::SolvePdeAndWriteResultsToFile(unsigned samplingTimestepMultiple)
 {
     // Record whether we are solving PDEs on a coarse mesh
-    bool using_coarse_pde_mesh = (mpCoarsePdeMesh != NULL);
+    bool using_coarse_pde_mesh = (mpCoarsePdeMesh != nullptr);
 
     // If solving PDEs on a coarse mesh, each PDE should have an averaged source term; otherwise none should
     assert(!mPdeAndBcCollection.empty());
@@ -496,7 +496,7 @@ std::unique_ptr<BoundaryConditionsContainer<DIM,DIM,1> > CellBasedPdeHandler<DIM
     }
     else // assume that if the BC is not of Neumann type, then it is Dirichlet
     {
-        bool using_coarse_pde_mesh = (mpCoarsePdeMesh != NULL);
+        bool using_coarse_pde_mesh = (mpCoarsePdeMesh != nullptr);
 
         if (using_coarse_pde_mesh && !mSetBcsOnCoarseBoundary)
         {
@@ -587,8 +587,8 @@ void CellBasedPdeHandler<DIM>::WritePdeSolution(double time)
 
 #ifdef CHASTE_VTK
         // Note that this mesh writer is only constructed and used if mpCoarsePdeMesh exists
-        VtkMeshWriter<DIM,DIM>* p_vtk_mesh_writer = NULL;
-        if (DIM>1 && mpCoarsePdeMesh != NULL )
+        VtkMeshWriter<DIM,DIM>* p_vtk_mesh_writer = nullptr;
+        if (DIM>1 && mpCoarsePdeMesh != nullptr )
         {
             std::ostringstream time_string;
             time_string << SimulationTime::Instance()->GetTimeStepsElapsed()+1;
@@ -599,7 +599,7 @@ void CellBasedPdeHandler<DIM>::WritePdeSolution(double time)
 #endif //CHASTE_VTK
         for (unsigned pde_index=0; pde_index<mPdeAndBcCollection.size(); pde_index++)
         {
-            if (mpCoarsePdeMesh != NULL)
+            if (mpCoarsePdeMesh != nullptr)
             {
                 PdeAndBoundaryConditions<DIM>* p_pde_and_bc = mPdeAndBcCollection[pde_index];
                 assert(p_pde_and_bc->rGetDependentVariableName() != "");
@@ -663,7 +663,7 @@ void CellBasedPdeHandler<DIM>::WritePdeSolution(double time)
         }
         (*mpVizPdeSolutionResultsFile) << "\n";
 #ifdef CHASTE_VTK
-        if (p_vtk_mesh_writer != NULL)
+        if (p_vtk_mesh_writer != nullptr)
         {
             p_vtk_mesh_writer->WriteFilesUsingMesh(*mpCoarsePdeMesh);
             delete p_vtk_mesh_writer;
@@ -770,7 +770,7 @@ double CellBasedPdeHandler<DIM>::GetPdeSolutionAtPoint(const c_vector<double,DIM
 
     Element<DIM,DIM>* p_containing_element;
 
-    if (mpCoarsePdeMesh != NULL)
+    if (mpCoarsePdeMesh != nullptr)
     {
         // Find PDE element containing point
         unsigned elem_index = mpCoarsePdeMesh->GetContainingElementIndex(ChastePoint<DIM>(rPoint));
@@ -845,10 +845,10 @@ void CellBasedPdeHandler<DIM>::OutputParameters(out_stream& rParamsFile)
 template<unsigned DIM>
 bool CellBasedPdeHandler<DIM>::PdeSolveNeedsCoarseMesh()
 {
-    return ((dynamic_cast<NodeBasedCellPopulation<DIM>*>(mpCellPopulation) != NULL)
-            || (dynamic_cast<PottsBasedCellPopulation<DIM>*>(mpCellPopulation) != NULL)
-            || (dynamic_cast<CaBasedCellPopulation<DIM>*>(mpCellPopulation) != NULL)
-            || (dynamic_cast<VertexBasedCellPopulation<DIM>*>(mpCellPopulation) != NULL));
+    return ((dynamic_cast<NodeBasedCellPopulation<DIM>*>(mpCellPopulation) != nullptr)
+            || (dynamic_cast<PottsBasedCellPopulation<DIM>*>(mpCellPopulation) != nullptr)
+            || (dynamic_cast<CaBasedCellPopulation<DIM>*>(mpCellPopulation) != nullptr)
+            || (dynamic_cast<VertexBasedCellPopulation<DIM>*>(mpCellPopulation) != nullptr));
 }
 
 // Serialization for Boost >= 1.36

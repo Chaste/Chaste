@@ -113,7 +113,7 @@ public :
     ///////////////////////
     // ionic current
     ///////////////////////
-    double GetIIonic(const std::vector<double>* pStateVariables=NULL)
+    double GetIIonic(const std::vector<double>* pStateVariables=nullptr)
     {
         // We use the next timestep to be consistent with how GetStimulus(time) is called.
 

@@ -137,11 +137,11 @@ protected:
      * @param mesherInput is a triangulateio or tetgenio class (decided at compile time)
      *  Note that only nodes are exported and thus any late mesh is based on the convex hull
      * @param elementList is a pointer to either mesherInput.trianglelist or mesherInput.tetrahedronlist (used when we are not remeshing, but converting the form of an existing mesh)
-     * Note that this should have been re-malloced and mesherInput.numberoftriangles or mesherInput.numberoftetrahedra should be set prior to the call when elementList is non-NULL
+     * Note that this should have been re-malloced and mesherInput.numberoftriangles or mesherInput.numberoftetrahedra should be set prior to the call when elementList is non-nullptr
      *
      */
     template <class MESHER_IO>
-    void ExportToMesher(NodeMap& map, MESHER_IO& mesherInput, int *elementList=NULL);
+    void ExportToMesher(NodeMap& map, MESHER_IO& mesherInput, int *elementList=nullptr);
 
     /**
      * Import the mesh from an external mesher
@@ -156,7 +156,7 @@ protected:
      * @param elementList is a pointer to either mesherOutput.trianglelist or mesherOutput.tetrahedronlist
      * @param numberOfFaces is a copy of either mesherOutput.edges or mesherOutput.numberoftrifaces
      * @param faceList is a pointer to either mesherOutput.edgelist or mesherOutput.trifacelist
-     * @param edgeMarkerList is a pointer to either mesherOutput.edgemarkerlist or NULL
+     * @param edgeMarkerList is a pointer to either mesherOutput.edgemarkerlist or nullptr
      * \todo #1545: (or add arguments ...)
      *
      */

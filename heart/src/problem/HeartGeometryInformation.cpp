@@ -108,7 +108,7 @@ HeartGeometryInformation<SPACE_DIM>::HeartGeometryInformation (AbstractTetrahedr
 template<unsigned SPACE_DIM>
 HeartGeometryInformation<SPACE_DIM>::HeartGeometryInformation (std::string nodeHeterogeneityFileName)
 {
-    mpMesh = NULL;
+    mpMesh = nullptr;
     std::ifstream heterogeneity_file;
     heterogeneity_file.open(nodeHeterogeneityFileName.c_str());
 

@@ -44,7 +44,7 @@ PdeAndBoundaryConditions<DIM>::PdeAndBoundaryConditions(AbstractLinearEllipticPd
     : mpPde(pPde),
       mpBoundaryCondition(pBoundaryCondition),
       mIsNeumannBoundaryCondition(isNeumannBoundaryCondition),
-      mSolution(NULL),
+      mSolution(nullptr),
       mDeleteMemberPointersInDestructor(deleteMemberPointersInDestructor),
       mDependentVariableName("")
 {
@@ -106,7 +106,7 @@ bool PdeAndBoundaryConditions<DIM>::IsNeumannBoundaryCondition()
 template<unsigned DIM>
 bool PdeAndBoundaryConditions<DIM>::HasAveragedSourcePde()
 {
-    return (dynamic_cast<AveragedSourcePde<DIM>*>(mpPde) != NULL);
+    return (dynamic_cast<AveragedSourcePde<DIM>*>(mpPde) != nullptr);
 }
 
 template<unsigned DIM>

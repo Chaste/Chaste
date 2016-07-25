@@ -546,7 +546,7 @@ public:
         }
         dist_vec.Restore();
 
-        LinearSystem lsv(test_vec, (Mat) NULL);
+        LinearSystem lsv(test_vec, (Mat) nullptr);
         TS_ASSERT_EQUALS(lsv.GetSize(), size);
 
         if (dist_vec.Begin() != dist_vec.End())
@@ -577,7 +577,7 @@ public:
             PetscMatTools::SetElement(m, dist_vec.Begin().Global, 0, test_val);
         }
 
-        LinearSystem lsm(NULL, m);
+        LinearSystem lsm(nullptr, m);
         TS_ASSERT_EQUALS(lsm.GetSize(), size);
         lsm.FinaliseLhsMatrix();
 

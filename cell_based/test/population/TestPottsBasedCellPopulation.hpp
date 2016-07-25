@@ -102,7 +102,7 @@ public:
         TS_ASSERT_EQUALS(cell_population.rGetUpdateRuleCollection().empty(), true);
 
         // Test that the other member variables of this object are initialised correctly
-        TS_ASSERT(cell_population.GetElementTessellation() == NULL);
+        TS_ASSERT(cell_population.GetElementTessellation() == nullptr);
         TS_ASSERT_DELTA(cell_population.GetTemperature(), 0.1, 1e-6);
         TS_ASSERT_EQUALS(cell_population.GetNumSweepsPerTimestep(), 1u);
         TS_ASSERT_EQUALS(cell_population.GetUpdateNodesInRandomOrder(), true);
@@ -411,7 +411,7 @@ public:
 //
 //        VertexMesh<2,2>* p_tessellation = cell_population.GetElementTessellation();
 //
-//        TS_ASSERT(p_tessellation != NULL);
+//        TS_ASSERT(p_tessellation != nullptr);
 //
 //        TS_ASSERT_EQUALS(p_tessellation->GetNumNodes(), 25u);
 //        TS_ASSERT_EQUALS(p_tessellation->GetNumElements(), 16u);

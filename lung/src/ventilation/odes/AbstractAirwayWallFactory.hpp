@@ -82,7 +82,7 @@ public:
     /**
      * Default constructor.
      */
-    AbstractAirwayWallFactory() : mpMesh(NULL)
+    AbstractAirwayWallFactory() : mpMesh(nullptr)
     {
 
     }

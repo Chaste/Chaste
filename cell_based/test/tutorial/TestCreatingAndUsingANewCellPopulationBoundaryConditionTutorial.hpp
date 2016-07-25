@@ -305,7 +305,7 @@ public:
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
 
-            AbstractCellPopulationBoundaryCondition<2>* const p_bc = new MyBoundaryCondition(NULL);
+            AbstractCellPopulationBoundaryCondition<2>* const p_bc = new MyBoundaryCondition(nullptr);
             output_arch << p_bc;
             delete p_bc;
         }

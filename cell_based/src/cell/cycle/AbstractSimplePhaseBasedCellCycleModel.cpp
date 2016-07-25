@@ -77,7 +77,7 @@ void AbstractSimplePhaseBasedCellCycleModel::InitialiseDaughterCell()
 
 void AbstractSimplePhaseBasedCellCycleModel::SetG1Duration()
 {
-    assert(mpCell != NULL);
+    assert(mpCell != nullptr);
 
     if (mpCell->GetCellProliferativeType()->IsType<StemCellProliferativeType>())
     {

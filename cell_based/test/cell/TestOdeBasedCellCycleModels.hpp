@@ -440,7 +440,7 @@ public:
             TysonNovak2001OdeSystem* p_ode_system =
                 static_cast<TysonNovak2001OdeSystem*>(p_static_cast_model->GetOdeSystem());
 
-            TS_ASSERT(p_ode_system != NULL);
+            TS_ASSERT(p_ode_system != nullptr);
 
             // Avoid memory leaks
             delete p_model2;
@@ -504,7 +504,7 @@ public:
             Alarcon2004OxygenBasedCellCycleOdeSystem* p_ode_system =
                 static_cast<Alarcon2004OxygenBasedCellCycleOdeSystem*>(p_static_cast_model->GetOdeSystem());
 
-            TS_ASSERT(p_ode_system != NULL);
+            TS_ASSERT(p_ode_system != nullptr);
             TS_ASSERT_EQUALS(p_ode_system->IsLabelled(), false);
 
             // Avoid memory leaks

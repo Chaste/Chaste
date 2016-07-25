@@ -61,7 +61,7 @@ const double HiornsAirwayWallFactory::mC1[] = {179380., 176033., 8531., 2232., 9
 const double HiornsAirwayWallFactory::mC2[] = {101.9786, 102.3, 9.31, 2.72, 0.893, 0.4415, 0.2264, 0.1289, 0.07906, 0.04733, 0.02941, 0.018297, 0.0115175, 0.009006, 0.004454616, 0.002782845, 0.00165941};
 
 
-HiornsAirwayWallFactory::HiornsAirwayWallFactory(bool useStrahlerOrder) : mpWalker(NULL), mUseStrahlerOrder(useStrahlerOrder)
+HiornsAirwayWallFactory::HiornsAirwayWallFactory(bool useStrahlerOrder) : mpWalker(nullptr), mUseStrahlerOrder(useStrahlerOrder)
 {}
 
 HiornsAirwayWallFactory::~HiornsAirwayWallFactory()

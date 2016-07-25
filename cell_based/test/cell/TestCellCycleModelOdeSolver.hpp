@@ -136,7 +136,7 @@ public:
 
         // Check we can create an instance
         boost::shared_ptr<RkSolver> p_solver = RkSolver::Instance();
-        TS_ASSERT(p_solver.get() != NULL);
+        TS_ASSERT(p_solver.get() != nullptr);
 
         // Check singleton-ness
         boost::shared_ptr<RkSolver> p_solver2 = RkSolver::Instance();
@@ -173,7 +173,7 @@ public:
 
         // Check we can create an instance
         boost::shared_ptr<EulerSolver> p_solver = EulerSolver::Instance();
-        TS_ASSERT(p_solver.get() != NULL);
+        TS_ASSERT(p_solver.get() != nullptr);
 
         // Check singleton-ness
         boost::shared_ptr<EulerSolver> p_solver2 = EulerSolver::Instance();
@@ -220,7 +220,7 @@ public:
 
         // Check we can create an instance
         boost::shared_ptr<CvodeSolver> p_solver = CvodeSolver::Instance();
-        TS_ASSERT(p_solver.get() != NULL);
+        TS_ASSERT(p_solver.get() != nullptr);
 
         // Check singleton-ness
         boost::shared_ptr<CvodeSolver> p_solver2 = CvodeSolver::Instance();

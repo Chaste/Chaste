@@ -81,7 +81,7 @@
 
 // Here are the most general used head files for C/C++ programs.
 
-#include <stdio.h>            // Standard IO: FILE, NULL, EOF, printf(), ...
+#include <stdio.h>            // Standard IO: FILE, nullptr, EOF, printf(), ...
 #include <stdlib.h>        // Standard lib: abort(), system(), getenv(), ...
 #include <string.h>         // String lib: strcpy(), strcat(), strcmp(), ...
 #include <math.h>                     // Math lib: sin(), sqrt(), pow(), ...
@@ -164,7 +164,7 @@ namespace tetgen
 // allocate enough memory for them, e.g., use the "new" operator in C++. On  //
 // deletion of the object, the memory occupied by these arrays needs to be   //
 // freed.  Routine deinitialize() will be automatically called. It will de-  //
-// allocate the memory for an array if it is not a NULL. However, it assumes //
+// allocate the memory for an array if it is not a nullptr. However, it assumes //
 // that the memory is allocated by the C++ "new" operator. If you use malloc //
 // (), you should free() them and set the pointers to NULLs before reaching  //
 // deinitialize().                                                           //
@@ -204,7 +204,7 @@ class tetgenio {
     } polygon;
 
     static void init(polygon* p) {
-      p->vertexlist = (int *) NULL;
+      p->vertexlist = (int *) nullptr;
       p->numberofvertices = 0;
     }
 
@@ -220,9 +220,9 @@ class tetgenio {
     } facet;
 
     static void init(facet* f) {
-      f->polygonlist = (polygon *) NULL;
+      f->polygonlist = (polygon *) nullptr;
       f->numberofpolygons = 0;
-      f->holelist = (REAL *) NULL;
+      f->holelist = (REAL *) nullptr;
       f->numberofholes = 0;
     }
 
@@ -722,7 +722,7 @@ class tetgenmesh {
 // For a tetrahedron on a boundary (or a hull) of the mesh, some or all of   //
 // the adjoining tetrahedra may not be present. For an interior tetrahedron, //
 // often no neighboring subfaces are present,  Such absent tetrahedra and    //
-// subfaces are never represented by the NULL pointers; they are represented //
+// subfaces are never represented by the nullptr pointers; they are represented //
 // by two special records: `dummytet', the tetrahedron fills "outer space",  //
 // and `dummysh',  the vacuous subfaces which are omnipresent.               //
 //                                                                           //
@@ -1003,7 +1003,7 @@ class tetgenmesh {
 //   size (items) when the list is full.                                     //
 //                                                                           //
 // 'comp' is a pointer pointing to a linear order function for the list.     //
-//   default it is set to 'NULL'.                                            //
+//   default it is set to 'nullptr'.                                            //
 //                                                                           //
 // The index of list always starts from zero, i.e., for a list L contains    //
 //   n elements, the first element is L[0], and the last element is L[n-1].  //
@@ -1196,14 +1196,14 @@ class tetgenmesh {
 
       public:
 
-        queue(int bytes, int count = 256) : link(bytes, NULL, count) {}
+        queue(int bytes, int count = 256) : link(bytes, nullptr, count) {}
         bool empty() { return linkitems == 0; }
         void *push(void* newitem) {return link::add(newitem);} 
         void *pop() {return link::deletenode((void **) *head);}
         // Stack is implemented as a single link list.
         void *stackpush() {
           void **newnode = (void **) alloc();
-          // if (newitem != (void *) NULL) {
+          // if (newitem != (void *) nullptr) {
           //   memcpy((void *)(newnode + 2), newitem, linkitembytes);
           // }
           void **nextnode = (void **) *head;
@@ -1905,17 +1905,17 @@ class tetgenmesh {
 //                                                                           //
 // 'in' is an object of 'tetgenio' which contains a PLC you want to tetrahed-//
 // ralize or a previously generated tetrahedral mesh you want to refine.  It //
-// must not be a NULL. 'out' is another object of 'tetgenio' for storing the //
-// generated tetrahedral mesh. It can be a NULL. If so, the output will be   //
-// saved to file(s). If 'bgmin' != NULL, it contains a background mesh which //
+// must not be a nullptr. 'out' is another object of 'tetgenio' for storing the //
+// generated tetrahedral mesh. It can be a nullptr. If so, the output will be   //
+// saved to file(s). If 'bgmin' != nullptr, it contains a background mesh which //
 // defines a mesh size distruction function.                                 //
 //                                                                           //
 ///////////////////////////////////////////////////////////////////////////////
 
 void tetrahedralize(tetgenbehavior *b, tetgenio *in, tetgenio *out, 
-                    tetgenio *addin = NULL, tetgenio *bgmin = NULL);
+                    tetgenio *addin = nullptr, tetgenio *bgmin = nullptr);
 void tetrahedralize(char *switches, tetgenio *in, tetgenio *out,
-                    tetgenio *addin = NULL, tetgenio *bgmin = NULL);
+                    tetgenio *addin = nullptr, tetgenio *bgmin = nullptr);
 
 } //Added namespace to avoid clash with triangle
 

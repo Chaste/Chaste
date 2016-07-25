@@ -820,8 +820,8 @@ public:
             // Restore from the archive
             (*p_arch) >> p_cell_killer;
 
-            TS_ASSERT(p_cell_killer != NULL);
-            TS_ASSERT(p_cell_killer->GetCellPopulation() != NULL);
+            TS_ASSERT(p_cell_killer != nullptr);
+            TS_ASSERT(p_cell_killer->GetCellPopulation() != nullptr);
 
             // Tidy up
             delete p_cell_killer->mpCellPopulation;

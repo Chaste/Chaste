@@ -120,7 +120,7 @@ private:
          * of the PottsMesh class, so instead we delete mpVoronoiTessellation.
          */
         delete mpElementTessellation;
-        mpElementTessellation = NULL;
+        mpElementTessellation = nullptr;
 
         archive & mUpdateRuleCollection;
         archive & mTemperature;

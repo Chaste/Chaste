@@ -66,7 +66,7 @@ public:
 
         // Test Compute source term
         ChastePoint<2> unused_point;
-        double value_at_elem_0 = pde.ComputeConstantInUSourceTerm(unused_point, NULL);
+        double value_at_elem_0 = pde.ComputeConstantInUSourceTerm(unused_point, nullptr);
         double value_at_elem_1 = pde.ComputeLinearInUCoeffInSourceTerm(unused_point,p_mesh->GetElement(0));
 
         TS_ASSERT_DELTA(value_at_elem_0, 0.0, 1e-6);
@@ -93,7 +93,7 @@ public:
 
         // Test compute source terms
         ChastePoint<2> unused_point;
-        double constant_in_u_source_term = pde.ComputeConstantInUSourceTerm(unused_point, NULL);
+        double constant_in_u_source_term = pde.ComputeConstantInUSourceTerm(unused_point, nullptr);
 
         TS_ASSERT_DELTA(constant_in_u_source_term, 0.0, 1e-6);
 

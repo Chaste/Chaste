@@ -75,7 +75,7 @@ public:
  * @return Returns a PETSc Vec of the solution.
  *
  * To be used in the form:
- * Vec answer=solver->Solve(&ComputeResidual, &ComputeJacobian, initialGuess, NULL);
+ * Vec answer=solver->Solve(&ComputeResidual, &ComputeJacobian, initialGuess, nullptr);
  *
  * In the same file, but outside this class the functions ComputeResidual and
  * ComputeJacobian must sit, using the input arguments specified above.

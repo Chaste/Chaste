@@ -38,7 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolve(Vec initialSolution)
 {
-    if (this->mpLinearSystem != NULL)
+    if (this->mpLinearSystem != nullptr)
     {
         return;
     }
@@ -213,8 +213,8 @@ AbstractExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::AbstractExtendedBidomainS
               mpExtendedBidomainTissue(pTissue),
               mpBoundaryConditions(pBcc)
 {
-    assert(pTissue != NULL);
-    assert(pBcc != NULL);
+    assert(pTissue != nullptr);
+    assert(pBcc != nullptr);
 
     mNullSpaceCreated = false;
 
@@ -224,7 +224,7 @@ AbstractExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::AbstractExtendedBidomainS
     mRowForAverageOfPhiZeroed = INT_MAX; //this->mpLinearSystem->GetSize() - 1;
     mpConfig = HeartConfig::Instance();
 
-    mpExtendedBidomainAssembler = NULL; // can't initialise until know what dt is
+    mpExtendedBidomainAssembler = nullptr; // can't initialise until know what dt is
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

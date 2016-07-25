@@ -42,7 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolve(Vec initialSolution)
 {
-    if (this->mpLinearSystem != NULL)
+    if (this->mpLinearSystem != nullptr)
     {
         return;
     }
@@ -269,8 +269,8 @@ AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>::AbstractBidomainSolver(
       mpBidomainTissue(pTissue),
       mpBoundaryConditions(pBoundaryConditions)
 {
-    assert(pTissue != NULL);
-    assert(pBoundaryConditions != NULL);
+    assert(pTissue != nullptr);
+    assert(pBoundaryConditions != nullptr);
 
     mNullSpaceCreated = false;
 

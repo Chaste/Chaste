@@ -136,7 +136,7 @@ public:
      * @param pStateVariables  optional state at which to evaluate the current
      * @return the total ionic current
      */
-    double GetIIonic(const std::vector<double>* pStateVariables=NULL);
+    double GetIIonic(const std::vector<double>* pStateVariables=nullptr);
 
     /**
      * Get the intracellular calcium concentration

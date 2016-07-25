@@ -160,7 +160,7 @@ private:
     }
 
     virtual void AssembleSystem(bool assembleVector, bool assembleMatrix
-                                /*Vec currentSolutionOrGuess=NULL, double currentTime=0.0*/)
+                                /*Vec currentSolutionOrGuess=nullptr, double currentTime=0.0*/)
     {
         // Check we've actually been asked to do something!
         assert(assembleVector || assembleMatrix);

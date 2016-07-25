@@ -159,15 +159,15 @@ private:
      * already set up. Can use an initial solution as PETSc template,
      * or base it on the mesh size.
      *
-     * @param initialSolution Initial solution (defaults to NULL) for PETSc to use as a template.
+     * @param initialSolution Initial solution (defaults to nullptr) for PETSc to use as a template.
      */
-    void InitialiseForSolve(Vec initialSolution=NULL);
+    void InitialiseForSolve(Vec initialSolution=nullptr);
 
     /**
      * Completely set up the linear system that has to be solved each timestep.
      *
      * @param currentSolution The current solution which can be used in setting up
-     *  the linear system if needed (NULL if there isn't a current solution)
+     *  the linear system if needed (nullptr if there isn't a current solution)
      * @param computeMatrix Whether to compute the LHS matrix of the linear system
      *   (mainly for dynamic solves).
      */
@@ -182,7 +182,7 @@ public:
      * @param pPdeSystem pointer to the PDE system
      * @param pBoundaryConditions pointer to the boundary conditions.
      * @param odeSystemsAtNodes optional vector of pointers to ODE systems, defined at nodes
-     * @param pOdeSolver optional pointer to an ODE solver (defaults to NULL)
+     * @param pOdeSolver optional pointer to an ODE solver (defaults to nullptr)
      */
     LinearParabolicPdeSystemWithCoupledOdeSystemSolver(TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
                                                        AbstractLinearParabolicPdeSystemForCoupledOdeSystem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>* pPdeSystem,
@@ -337,7 +337,7 @@ void LinearParabolicPdeSystemWithCoupledOdeSystemSolver<ELEMENT_DIM, SPACE_DIM, 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 void LinearParabolicPdeSystemWithCoupledOdeSystemSolver<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::InitialiseForSolve(Vec initialSolution)
 {
-    if (this->mpLinearSystem == NULL)
+    if (this->mpLinearSystem == nullptr)
     {
         unsigned preallocation = mpMesh->CalculateMaximumContainingElementsPerProcess() + ELEMENT_DIM;
         if (ELEMENT_DIM > 1)

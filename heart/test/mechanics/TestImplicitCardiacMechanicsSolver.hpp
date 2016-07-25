@@ -470,7 +470,7 @@ public:
         // Prevent an assertion being thrown about setting the cell factory more than once.
         // (just for testing)
         delete problem_defn.mpContractionCellFactory;
-        problem_defn.mpContractionCellFactory=NULL;
+        problem_defn.mpContractionCellFactory=nullptr;
 
         problem_defn.SetContractionModel(NONPHYSIOL3,0.01);
         IncompressibleImplicitSolver2d impl_solver2(mesh,problem_defn,"");

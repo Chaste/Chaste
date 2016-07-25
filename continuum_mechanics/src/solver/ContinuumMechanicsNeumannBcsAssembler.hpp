@@ -132,7 +132,7 @@ public:
         QuadraticMesh<DIM>* p_quad_mesh = dynamic_cast<QuadraticMesh<DIM>* >(pMesh);
         DistributedQuadraticMesh<DIM>* p_distributed_quad_mesh = dynamic_cast<DistributedQuadraticMesh<DIM>* >(pMesh);
 
-        if(p_quad_mesh == NULL && p_distributed_quad_mesh == NULL)
+        if(p_quad_mesh == nullptr && p_distributed_quad_mesh == nullptr)
         {
             EXCEPTION("Continuum mechanics solvers require a quadratic mesh");
         }
@@ -155,7 +155,7 @@ public:
 template<unsigned DIM>
 void ContinuumMechanicsNeumannBcsAssembler<DIM>::DoAssemble()
 {
-    if(this->mVectorToAssemble==NULL)
+    if(this->mVectorToAssemble==nullptr)
     {
         EXCEPTION("Vector to be assembled has not been set");
     }

@@ -370,7 +370,7 @@ public:
      * Overridden GetVectorFromAtoB() method. Returns a vector between two points in space.
      *
      * If the mesh is being used to represent a Voronoi tessellation, and mpDelaunayMesh
-     * is not NULL, then use that to compute GetVectorFromAtoB.
+     * is not nullptr, then use that to compute GetVectorFromAtoB.
      *
      * @param rLocationA a c_vector of coordinates
      * @param rLocationB a c_vector of coordinates

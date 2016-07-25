@@ -72,7 +72,7 @@ Hdf5ToVtkConverter<ELEMENT_DIM, SPACE_DIM>::Hdf5ToVtkConverter(const FileFinder&
     if (parallelVtk)
     {
         // If it's not a distributed mesh, then we might want to give a warning and back-off
-        if (p_distributed_mesh == NULL)
+        if (p_distributed_mesh == nullptr)
         {
             WARNING("Can only write parallel VTK from a DistributedTetrahedralMesh - writing sequential VTK instead");
             parallelVtk = false;

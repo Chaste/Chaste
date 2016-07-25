@@ -262,13 +262,13 @@ CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::CardiacElectroMechanicsProble
             ElectroMechanicsProblemDefinition<DIM>* pProblemDefinition,
             std::string outputDirectory)
       : mCompressibilityType(compressibilityType),
-        mpCardiacMechSolver(NULL),
-        mpMechanicsSolver(NULL),
+        mpCardiacMechSolver(nullptr),
+        mpMechanicsSolver(nullptr),
         mpElectricsMesh(pElectricsMesh),
         mpMechanicsMesh(pMechanicsMesh),
         mpProblemDefinition(pProblemDefinition),
         mHasBath(false),
-        mpMeshPair(NULL),
+        mpMeshPair(nullptr),
         mNoElectricsOutput(false),
         mIsWatchedLocation(false),
         mWatchedElectricsNodeIndex(UNSIGNED_UNSET),
@@ -277,7 +277,7 @@ CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::CardiacElectroMechanicsProble
 {
     // Do some initial set up...
     // However, NOTE, we don't use either the passed in meshes or the problem_definition.
-    // These pointers are allowed to be NULL, in case a child constructor wants to set
+    // These pointers are allowed to be nullptr, in case a child constructor wants to set
     // them up (eg CardiacElectroMechProbRegularGeom).
     // The meshes and problem_defn are used for the first time in Initialise().
 
@@ -297,7 +297,7 @@ CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::CardiacElectroMechanicsProble
     // Create the monodomain problem.
     // **NOTE** WE ONLY USE THIS TO: set up the cells, get an initial condition
     // (voltage) vector, and get a solver. We won't ever call Solve on the cardiac problem class
-    assert(pCellFactory != NULL);
+    assert(pCellFactory != nullptr);
     mpElectricsProblem = CreateElectricsProblem<DIM,ELEC_PROB_DIM>::Create(electricsProblemType, pCellFactory);
 
     if (electricsProblemType == BIDOMAIN_WITH_BATH)
@@ -320,14 +320,14 @@ CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::CardiacElectroMechanicsProble
         mDeformationOutputDirectory = "";
     }
 
-//    mpImpactRegion=NULL;
+//    mpImpactRegion=nullptr;
 }
 
 template<unsigned DIM, unsigned ELEC_PROB_DIM>
 CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::~CardiacElectroMechanicsProblem()
 {
     // NOTE if SetWatchedLocation but not Initialise has been called, mpWatchedLocationFile
-    // will be uninitialised and using it will cause a seg fault. Hence the mpMechanicsMesh!=NULL
+    // will be uninitialised and using it will cause a seg fault. Hence the mpMechanicsMesh!=nullptr
     // it is true if Initialise has been called.
     if(mIsWatchedLocation && mpMechanicsMesh)
     {
@@ -344,10 +344,10 @@ CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::~CardiacElectroMechanicsProbl
 template<unsigned DIM, unsigned ELEC_PROB_DIM>
 void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Initialise()
 {
-    assert(mpElectricsMesh!=NULL);
-    assert(mpMechanicsMesh!=NULL);
-    assert(mpProblemDefinition!=NULL);
-    assert(mpCardiacMechSolver==NULL);
+    assert(mpElectricsMesh!=nullptr);
+    assert(mpMechanicsMesh!=nullptr);
+    assert(mpProblemDefinition!=nullptr);
+    assert(mpCardiacMechSolver==nullptr);
 
     ///\todo This is fragile: check how the TimeStepper does it, and possibly refactor the behaviour there
     /// into a static helper method if it isn't already.
@@ -488,7 +488,7 @@ template<unsigned DIM, unsigned ELEC_PROB_DIM>
 void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
 {
     // initialise the meshes and mechanics solver
-    if(mpCardiacMechSolver==NULL)
+    if(mpCardiacMechSolver==nullptr)
     {
         Initialise();
     }
@@ -510,7 +510,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
        = mpElectricsProblem->CreateSolver();
 
     // set up initial voltage etc
-    Vec electrics_solution=NULL; //This will be set and used later
+    Vec electrics_solution=nullptr; //This will be set and used later
     Vec calcium_data= mpElectricsMesh->GetDistributedVectorFactory()->CreateVec();
     Vec initial_voltage = mpElectricsProblem->CreateInitialCondition();
 
@@ -519,7 +519,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
 
     TimeStepper stepper(0.0, HeartConfig::Instance()->GetSimulationDuration(), mpProblemDefinition->GetMechanicsSolveTimestep());
 
-    CmguiDeformedSolutionsWriter<DIM>* p_cmgui_writer = NULL;
+    CmguiDeformedSolutionsWriter<DIM>* p_cmgui_writer = nullptr;
 
     std::vector<std::string> variable_names;
 

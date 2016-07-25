@@ -382,13 +382,13 @@ AbstractContinuumMechanicsSolver<DIM>::AbstractContinuumMechanicsSolver(Abstract
     : mrQuadMesh(rQuadMesh),
       mrProblemDefinition(rProblemDefinition),
       mOutputDirectory(outputDirectory),
-      mpOutputFileHandler(NULL),
-      mpQuadratureRule(NULL),
-      mpBoundaryQuadratureRule(NULL),
+      mpOutputFileHandler(nullptr),
+      mpQuadratureRule(nullptr),
+      mpBoundaryQuadratureRule(nullptr),
       mCompressibilityType(compressibilityType),
-      mResidualVector(NULL),
-      mSystemLhsMatrix(NULL),
-      mPreconditionMatrix(NULL)
+      mResidualVector(nullptr),
+      mSystemLhsMatrix(nullptr),
+      mPreconditionMatrix(nullptr)
 {
     assert(DIM==2 || DIM==3);
 
@@ -396,7 +396,7 @@ AbstractContinuumMechanicsSolver<DIM>::AbstractContinuumMechanicsSolver(Abstract
     QuadraticMesh<DIM>* p_quad_mesh = dynamic_cast<QuadraticMesh<DIM>* >(&rQuadMesh);
     DistributedQuadraticMesh<DIM>* p_distributed_quad_mesh = dynamic_cast<DistributedQuadraticMesh<DIM>* >(&rQuadMesh);
 
-    if(p_quad_mesh == NULL && p_distributed_quad_mesh == NULL)
+    if(p_quad_mesh == nullptr && p_distributed_quad_mesh == nullptr)
     {
         EXCEPTION("Continuum mechanics solvers require a quadratic mesh");
     }
@@ -686,7 +686,7 @@ void AbstractContinuumMechanicsSolver<DIM>::ApplyDirichletBoundaryConditions(App
 
     if (applySymmetrically)
     {
-        if(mDirichletBoundaryConditionsVector==NULL)
+        if(mDirichletBoundaryConditionsVector==nullptr)
         {
             VecDuplicate(mResidualVector, &mDirichletBoundaryConditionsVector);
         }
@@ -846,7 +846,7 @@ void AbstractContinuumMechanicsSolver<DIM>::AllocateMatrixMemory()
     VecDuplicate(mResidualVector, &mLinearSystemRhsVector);
     // the one is only allocated if it will be needed (in ApplyDirichletBoundaryConditions),
     // depending on whether the matrix is kept symmetric.
-    mDirichletBoundaryConditionsVector = NULL;
+    mDirichletBoundaryConditionsVector = nullptr;
     PetscTools::Destroy(template_vec);
 
     ///////////////////////////

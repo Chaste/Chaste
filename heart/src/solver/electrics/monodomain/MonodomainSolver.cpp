@@ -41,8 +41,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MonodomainSolver<ELEMENT_DIM,SPACE_DIM>::SetupLinearSystem(Vec currentSolution, bool computeMatrix)
 {
-    assert(this->mpLinearSystem->rGetLhsMatrix() != NULL);
-    assert(this->mpLinearSystem->rGetRhsVector() != NULL);
+    assert(this->mpLinearSystem->rGetLhsMatrix() != nullptr);
+    assert(this->mpLinearSystem->rGetRhsVector() != nullptr);
 
 
     /////////////////////////////////////////
@@ -136,7 +136,7 @@ void MonodomainSolver<ELEMENT_DIM,SPACE_DIM>::SetupLinearSystem(Vec currentSolut
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MonodomainSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolve(Vec initialSolution)
 {
-    if (this->mpLinearSystem != NULL)
+    if (this->mpLinearSystem != nullptr)
     {
         return;
     }
@@ -198,7 +198,7 @@ MonodomainSolver<ELEMENT_DIM,SPACE_DIM>::MonodomainSolver(
 
     // Tell tissue there's no need to replicate ionic caches
     pTissue->SetCacheReplication(false);
-    mVecForConstructingRhs = NULL;
+    mVecForConstructingRhs = nullptr;
 
     if(HeartConfig::Instance()->GetUseStateVariableInterpolation())
     {
@@ -209,7 +209,7 @@ MonodomainSolver<ELEMENT_DIM,SPACE_DIM>::MonodomainSolver(
     }
     else
     {
-        mpMonodomainCorrectionTermAssembler = NULL;
+        mpMonodomainCorrectionTermAssembler = nullptr;
     }
 }
 

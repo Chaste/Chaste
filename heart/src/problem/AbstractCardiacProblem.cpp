@@ -57,14 +57,14 @@ AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::AbstractCardiacProble
       mAllocatedMemoryForMesh(false),
       mWriteInfo(false),
       mPrintOutput(true),
-      mpCardiacTissue(NULL),
-      mpSolver(NULL),
+      mpCardiacTissue(nullptr),
+      mpSolver(nullptr),
       mpCellFactory(pCellFactory),
-      mpMesh(NULL),
-      mSolution(NULL),
+      mpMesh(nullptr),
+      mSolution(nullptr),
       mCurrentTime(0.0),
-      mpTimeAdaptivityController(NULL),
-      mpWriter(NULL),
+      mpTimeAdaptivityController(nullptr),
+      mpWriter(nullptr),
       mUseHdf5DataWriterCache(false),
       mHdf5DataWriterChunkSizeAndAlignment(0)
 {
@@ -87,14 +87,14 @@ AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::AbstractCardiacProble
       mVoltageColumnId(UINT_MAX),
       mTimeColumnId(UINT_MAX),
       mNodeColumnId(UINT_MAX),
-      mpCardiacTissue(NULL),
-      mpSolver(NULL),
-      mpCellFactory(NULL),
-      mpMesh(NULL),
-      mSolution(NULL),
+      mpCardiacTissue(nullptr),
+      mpSolver(nullptr),
+      mpCellFactory(nullptr),
+      mpMesh(nullptr),
+      mSolution(nullptr),
       mCurrentTime(0.0),
-      mpTimeAdaptivityController(NULL),
-      mpWriter(NULL),
+      mpTimeAdaptivityController(nullptr),
+      mpWriter(nullptr),
       mUseHdf5DataWriterCache(false),
       mHdf5DataWriterChunkSizeAndAlignment(0)
 {
@@ -204,7 +204,7 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::Initialise()
     {
         HeartEventHandler::BeginEvent(HeartEventHandler::COMMUNICATION);
         PetscTools::Destroy(mSolution);
-        mSolution = NULL;
+        mSolution = nullptr;
         HeartEventHandler::EndEvent(HeartEventHandler::COMMUNICATION);
     }
 
@@ -230,7 +230,7 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::SetBoundaryCondi
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::PreSolveChecks()
 {
-    if ( mpCardiacTissue == NULL ) // if tissue is NULL, Initialise() probably hasn't been called
+    if ( mpCardiacTissue == nullptr ) // if tissue is nullptr, Initialise() probably hasn't been called
     {
         EXCEPTION("Cardiac tissue is null, Initialise() probably hasn't been called");
     }
@@ -300,8 +300,8 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::SetMesh(Abstract
      * If this fails the mesh has already been set. We assert rather throw
      * an exception to avoid a memory leak when checking it throws correctly.
      */
-    assert(mpMesh == NULL);
-    assert(pMesh != NULL);
+    assert(mpMesh == nullptr);
+    assert(pMesh != nullptr);
     mAllocatedMemoryForMesh = false;
     mpMesh = pMesh;
 }
@@ -346,7 +346,7 @@ AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM> & AbstractCardiacProblem<ELEMENT_
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>* AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::GetTissue()
 {
-    if (mpCardiacTissue == NULL)
+    if (mpCardiacTissue == nullptr)
     {
         EXCEPTION("Tissue not yet set up, you may need to call Initialise() before GetTissue().");
     }
@@ -365,7 +365,7 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::SetUseTimeAdapti
     }
     else
     {
-        mpTimeAdaptivityController = NULL;
+        mpTimeAdaptivityController = nullptr;
     }
 }
 
@@ -398,7 +398,7 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::Solve()
         mpBoundaryConditionsContainer = mpDefaultBoundaryConditionsContainer;
     }
 
-    assert(mpSolver==NULL);
+    assert(mpSolver==nullptr);
     mpSolver = CreateSolver(); // passes mpBoundaryConditionsContainer to solver
 
     // If we have already run a simulation, use the old solution as initial condition
@@ -425,7 +425,7 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::Solve()
         catch (Exception& e)
         {
             delete mpWriter;
-            mpWriter = NULL;
+            mpWriter = nullptr;
             delete mpSolver;
             if (mSolution != initial_condition)
             {
@@ -512,7 +512,7 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::Solve()
         {
             // Free memory
             delete mpSolver;
-            mpSolver = NULL;
+            mpSolver = nullptr;
             if (initial_condition != mSolution)
             {
                 /*
@@ -575,7 +575,7 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::Solve()
 
     // Free solver
     delete mpSolver;
-    mpSolver = NULL;
+    mpSolver = nullptr;
 
     // Close the file that stores voltage values
     progress_reporter.PrintFinalising();
@@ -599,7 +599,7 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::CloseFilesAndPos
     HeartEventHandler::BeginEvent(HeartEventHandler::WRITE_OUTPUT);
     // If write caching is on, the next line might actually take a significant amount of time.
     delete mpWriter;
-    mpWriter = NULL;
+    mpWriter = nullptr;
     HeartEventHandler::EndEvent(HeartEventHandler::WRITE_OUTPUT);
 
     FileFinder test_output(HeartConfig::Instance()->GetOutputDirectory(), RelativeTo::ChasteTestOutput);
@@ -803,7 +803,7 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::WriteExtraVariab
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 bool AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::InitialiseWriter()
 {
-    bool extend_file = (mSolution != NULL);
+    bool extend_file = (mSolution != nullptr);
 
     // I think this is impossible to trip; certainly it's very difficult!
     assert(!mpWriter);

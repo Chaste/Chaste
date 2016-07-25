@@ -206,7 +206,7 @@ std::unique_ptr<HeartConfig> HeartConfig::mpInstance;
 
 HeartConfig* HeartConfig::Instance()
 {
-    if (mpInstance.get() == NULL)
+    if (mpInstance.get() == nullptr)
     {
         mpInstance.reset(new HeartConfig);
     }
@@ -219,7 +219,7 @@ HeartConfig::HeartConfig()
       mUseFixedNumberIterations(false),
       mEvaluateNumItsEveryNSolves(UINT_MAX)
 {
-    assert(mpInstance.get() == NULL);
+    assert(mpInstance.get() == nullptr);
     mUseFixedSchemaLocation = true;
     SetDefaultSchemaLocations();
 
@@ -657,7 +657,7 @@ void HeartConfig::UpdateParametersFromResumeSimulation(boost::shared_ptr<cp::cha
 
 void HeartConfig::Reset()
 {
-    // Throw it away first, so that mpInstance is NULL when we...
+    // Throw it away first, so that mpInstance is nullptr when we...
     mpInstance.reset();
     // ...make a new one
     mpInstance.reset(new HeartConfig);

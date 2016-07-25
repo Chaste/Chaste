@@ -211,7 +211,7 @@ public:
 
 
         // coverage
-        TS_ASSERT(problem.GetMechanicsSolver()!=NULL);
+        TS_ASSERT(problem.GetMechanicsSolver()!=nullptr);
     }
 
     /* HOW_TO_TAG Cardiac/Electro-mechanics

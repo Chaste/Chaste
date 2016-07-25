@@ -258,7 +258,7 @@ public:
            TS_ASSERT_EQUALS(p_cell->GetNumberOfStateVariables(), 39u);
 
            // Check modifiers were archived correctly
-           if (dynamic_cast<AbstractCardiacCellWithModifiers<AbstractCvodeCellWithDataClamp>* >(p_cell) == NULL)
+           if (dynamic_cast<AbstractCardiacCellWithModifiers<AbstractCvodeCellWithDataClamp>* >(p_cell) == nullptr)
            {
                // Pointer could not be cast as the right kind, so throw error.
                TS_ASSERT(false);
@@ -270,7 +270,7 @@ public:
            TS_ASSERT_DELTA(p_modifier->Calc(2 /*param*/,3 /*time*/), fixed_modifier_value, 1e-12); // Fixed modifier returns 56 from above..
 
            // Check data clamp was archived correctly.
-           if (dynamic_cast<AbstractCvodeCellWithDataClamp*>(p_cell) == NULL)
+           if (dynamic_cast<AbstractCvodeCellWithDataClamp*>(p_cell) == nullptr)
            {
                // Pointer could not be cast as the right kind, so throw error.
                TS_ASSERT(false);

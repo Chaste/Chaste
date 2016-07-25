@@ -53,7 +53,7 @@ ID_OPEN=102
 
 class SconsTreeView(wxApp):
   def OnInit(self):
-    frame = wxFrame(NULL, -1, 'Scons tree view')
+    frame = wxFrame(nullptr, -1, 'Scons tree view')
     self.frame=frame
     frame.Show(true)
     self.SetTopWindow(frame)

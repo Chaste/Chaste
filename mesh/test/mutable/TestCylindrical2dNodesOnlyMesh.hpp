@@ -309,7 +309,7 @@ public:
 
         DistributedBoxCollection<2>* p_box_collection = p_mesh->GetBoxCollection();
 
-        TS_ASSERT(p_box_collection != NULL);
+        TS_ASSERT(p_box_collection != nullptr);
 
         // 3x2x1 box collection
         TS_ASSERT_EQUALS(p_box_collection->GetNumBoxes(), 6u);

@@ -45,8 +45,8 @@ VoronoiVertexMeshGenerator::VoronoiVertexMeshGenerator(unsigned numElementsX,
                                                        unsigned numElementsY,
                                                        unsigned numRelaxationSteps,
                                                        double elementTargetArea)
-        : mpMesh(NULL),
-          mpTorMesh(NULL),
+        : mpMesh(nullptr),
+          mpTorMesh(nullptr),
           mNumElementsX(numElementsX),
           mNumElementsY(numElementsY),
           mNumRelaxationSteps(numRelaxationSteps),
@@ -784,7 +784,7 @@ void VoronoiVertexMeshGenerator::ValidateSeedLocations(std::vector<c_vector<doub
 
 std::vector<double> VoronoiVertexMeshGenerator::GetPolygonDistribution()
 {
-    assert(mpMesh != NULL);
+    assert(mpMesh != nullptr);
 
     // Number of elements in the mesh
     unsigned num_elems = mpMesh->GetNumElements();
@@ -828,7 +828,7 @@ std::vector<double> VoronoiVertexMeshGenerator::GetPolygonDistribution()
 
 double VoronoiVertexMeshGenerator::GetAreaCoefficientOfVariation()
 {
-    assert(mpMesh != NULL);
+    assert(mpMesh != nullptr);
 
     // Number of elements in the mesh, and check there are at least two
     unsigned num_elems = mpMesh->GetNumElements();

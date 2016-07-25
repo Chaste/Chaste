@@ -82,7 +82,7 @@ public:
      * then this can be supplied to speed up finding the full element containing each boundary element.
      *
      * @param pMesh  the mesh to modify
-     * @param pMeshReader  pointer to the reader for accessing the on-disk mesh data, if any; NULL otherwise
+     * @param pMeshReader  pointer to the reader for accessing the on-disk mesh data, if any; nullptr otherwise
      */
     static void AddNodesToBoundaryElements(AbstractTetrahedralMesh<DIM, DIM>* pMesh,
                                             AbstractMeshReader<DIM,DIM>* pMeshReader);

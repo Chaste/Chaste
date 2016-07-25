@@ -73,7 +73,7 @@ AbstractOdeSrnModel::~AbstractOdeSrnModel()
 
 void AbstractOdeSrnModel::SimulateToCurrentTime()
 {
-    assert(mpOdeSystem != NULL);
+    assert(mpOdeSystem != nullptr);
     assert(SimulationTime::Instance()->IsStartTimeSetUp());
 
     double current_time = SimulationTime::Instance()->GetTime();
@@ -99,8 +99,8 @@ void AbstractOdeSrnModel::SimulateToCurrentTime()
 
 void AbstractOdeSrnModel::Initialise(AbstractOdeSystem* pOdeSystem)
 {
-    assert(mpOdeSystem == NULL);
-    assert(mpCell != NULL);
+    assert(mpOdeSystem == nullptr);
+    assert(mpCell != nullptr);
 
     mpOdeSystem = pOdeSystem;
     if (mInitialConditions == std::vector<double>())

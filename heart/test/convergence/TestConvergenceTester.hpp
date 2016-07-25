@@ -61,11 +61,11 @@ public:
 //    time_t start;
 //    void setUp()
 //    {
-//        start=time(NULL);
+//        start=time(nullptr);
 //    }
 //    void tearDown()
 //    {
-//        unsigned secs = time(NULL) - start;
+//        unsigned secs = time(nullptr) - start;
 //        std::cout<<"REAL TIME Test took "<< secs/60<<" minutes, "<< secs%60<<" seconds of real time\n";
 //    }
     void Test1DOdeTime() throw(Exception)

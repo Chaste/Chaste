@@ -225,7 +225,7 @@ public:
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
 
-            NodeAttributes<3>* const p_node_attributes = NULL;
+            NodeAttributes<3>* const p_node_attributes = nullptr;
 
             output_arch << p_node_attributes;
 
