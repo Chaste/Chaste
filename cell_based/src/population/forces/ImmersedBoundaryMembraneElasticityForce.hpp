@@ -122,8 +122,16 @@ protected:
      */
     double mBasementRestLengthModifier;
 
+    /**
+     * A value needed to calculate elastic forces, set every time step in AddImmersedBoundaryForceContribution()
+     */
+    double mIntrinsicSpacingSquared;
+
     /** Whether the elements have corners tagged. */
     bool mElementsHaveCorners;
+
+    template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+    void CalculateForcesOnElement(ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>& rElement);
 
     /** Vector containing locations of apical and basal rest-lengths in the element attribute vectors. */
     std::vector<unsigned> mRestLengthLocationsInAttributeVector;

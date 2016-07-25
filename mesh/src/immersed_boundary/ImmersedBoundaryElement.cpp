@@ -97,7 +97,9 @@ void ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::SetAverageNodeSpacing(doub
  */
 template<unsigned SPACE_DIM>
 ImmersedBoundaryElement<1, SPACE_DIM>::ImmersedBoundaryElement(unsigned index, const std::vector<Node<SPACE_DIM>*>& rNodes)
-    : MutableElement<1, SPACE_DIM>(index, rNodes)
+    : MutableElement<1, SPACE_DIM>(index, rNodes),
+      mpFluidSource(NULL),
+      mAverageNodeSpacing(DOUBLE_UNSET)
 {
 }
 
@@ -121,19 +123,22 @@ std::vector<Node<SPACE_DIM>*>& ImmersedBoundaryElement<1, SPACE_DIM>::rGetCorner
 template<unsigned SPACE_DIM>
 double ImmersedBoundaryElement<1, SPACE_DIM>::GetAverageNodeSpacing()
 {
-    return 0.0;
+    return mAverageNodeSpacing;
 }
 
 template<unsigned SPACE_DIM>
 void ImmersedBoundaryElement<1, SPACE_DIM>::SetAverageNodeSpacing(double averageNodeSpacing)
 {
+    mAverageNodeSpacing = averageNodeSpacing;
 }
 
 // Explicit instantiation
 template class ImmersedBoundaryElement<0,1>;
 template class ImmersedBoundaryElement<1,1>;
+template class ImmersedBoundaryElement<0,2>;
 template class ImmersedBoundaryElement<1,2>;
-template class ImmersedBoundaryElement<1,3>;
 template class ImmersedBoundaryElement<2,2>;
+template class ImmersedBoundaryElement<0,3>;
+template class ImmersedBoundaryElement<1,3>;
 template class ImmersedBoundaryElement<2,3>;
 template class ImmersedBoundaryElement<3,3>;

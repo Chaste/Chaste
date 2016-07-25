@@ -430,9 +430,18 @@ public:
      *
      * @param index  the global index of a specified immersed boundary element
      * @param recalculate whether or not to recalculate the value
-     * @return the surface area of the element
+     * @return the average node spacing of the element
      */
     double GetAverageNodeSpacingOfElement(unsigned index, bool recalculate=true);
+
+    /**
+     * Compute the average node spacing of a lamina.
+     *
+     * @param index  the global index of a specified immersed boundary lamina
+     * @param recalculate whether or not to recalculate the value
+     * @return the average node spacing of the lamina
+     */
+    double GetAverageNodeSpacingOfLamina(unsigned index, bool recalculate=true);
 
     /**
      * Compute the second moments and product moment of area for a given 2D element

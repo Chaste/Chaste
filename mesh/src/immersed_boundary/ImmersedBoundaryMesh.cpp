@@ -900,6 +900,33 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetAverageNodeSpacingOfElem
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetAverageNodeSpacingOfLamina(unsigned index, bool recalculate)
+{
+    if (recalculate || (this->GetLamina(index)->GetAverageNodeSpacing() == DOUBLE_UNSET) )
+    {
+        ImmersedBoundaryElement<ELEMENT_DIM-1, SPACE_DIM>* p_lam = this->GetLamina(index);
+
+        // Explicitly calculate the average node spacing
+        double average_node_spacing = 0.0;
+        for (unsigned node_it = 1; node_it < p_lam->GetNumNodes(); node_it++)
+        {
+            average_node_spacing += this->GetDistanceBetweenNodes(p_lam->GetNodeGlobalIndex(node_it),
+                                                                  p_lam->GetNodeGlobalIndex(node_it-1));
+        }
+
+        average_node_spacing /= (p_lam->GetNumNodes() - 1);
+
+        // Set it for quick retrieval next time
+        p_lam->SetAverageNodeSpacing(average_node_spacing);
+        return average_node_spacing;
+    }
+    else
+    {
+        return this->GetLamina(index)->GetAverageNodeSpacing();
+    }
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetElementDivisionSpacing()
 {
     return mElementDivisionSpacing;

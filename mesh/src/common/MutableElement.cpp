@@ -307,8 +307,10 @@ bool MutableElement<1, SPACE_DIM>::IsElementOnBoundary() const
 
 template class MutableElement<0,1>;
 template class MutableElement<1,1>;
+template class MutableElement<0,2>;
 template class MutableElement<1,2>;
-template class MutableElement<1,3>;
 template class MutableElement<2,2>;
+template class MutableElement<0,3>;
+template class MutableElement<1,3>;
 template class MutableElement<2,3>;
 template class MutableElement<3,3>;

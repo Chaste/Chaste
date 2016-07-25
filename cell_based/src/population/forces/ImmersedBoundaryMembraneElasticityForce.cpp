@@ -79,6 +79,7 @@ template<unsigned DIM>
 void ImmersedBoundaryMembraneElasticityForce<DIM>::AddImmersedBoundaryForceContribution(std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs,
         ImmersedBoundaryCellPopulation<DIM>& rCellPopulation)
 {
+    // This is only run once, on the first pass, and performs a set-up of all necessary class members
     if (mpMesh == NULL)
     {
         mpMesh = &(rCellPopulation.rGetMesh());
@@ -140,75 +141,110 @@ void ImmersedBoundaryMembraneElasticityForce<DIM>::AddImmersedBoundaryForceContr
         }
     }
 
+    /*
+     * The following is called each time step, and calculates the forces acting on each element and lamina
+     */
+
     // Used in the calculation of the spring constant
-    double intrinsic_spacing_squared = rCellPopulation.GetIntrinsicSpacing() * rCellPopulation.GetIntrinsicSpacing();
+    mIntrinsicSpacingSquared = rCellPopulation.GetIntrinsicSpacing() * rCellPopulation.GetIntrinsicSpacing();
 
     for (typename ImmersedBoundaryMesh<DIM, DIM>::ImmersedBoundaryElementIterator elem_it = mpMesh->GetElementIteratorBegin();
          elem_it != mpMesh->GetElementIteratorEnd();
          ++elem_it)
     {
-        // Get index and number of nodes of current element
-        unsigned elem_idx = elem_it->GetIndex();
-        unsigned num_nodes = elem_it->GetNumNodes();
+        CalculateForcesOnElement(*elem_it);
+    }
 
-        // Helper variables
-        double normed_dist;
-        c_vector<double, DIM> aggregate_force;
+    for (typename ImmersedBoundaryMesh<DIM, DIM>::ImmersedBoundaryLaminaIterator lam_it = mpMesh->GetLaminaIteratorBegin();
+         lam_it != mpMesh->GetLaminaIteratorEnd();
+         ++lam_it)
+    {
+        CalculateForcesOnElement(*lam_it);
+    }
+}
 
-        // Make a vector to store the force on node i+1 from node i
-        std::vector<c_vector<double, DIM> > elastic_force_to_next_node(num_nodes);
+template<unsigned DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void ImmersedBoundaryMembraneElasticityForce<DIM>::CalculateForcesOnElement(ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>& rElement)
+{
+    // Get index and number of nodes of current element
+    unsigned elem_idx = rElement.GetIndex();
+    unsigned num_nodes = rElement.GetNumNodes();
 
-        /*
-         * Get the node spacing ratio for this element.  The rest length and spring constant are derived from this
-         * characteristic length.
-         *
-         * The spring constant is derived with reference to the intrinsic spacing, so that with different node spacings
-         * the user-defined parameters do not have to be updated.
-         *
-         * The correct factor to increase the spring constant by is (intrinsic spacing / spacing_ratio)^2.  One factor
-         * takes into account the energy considerations of the elastic springs, and the other takes account of the
-         * factor of spacing_ratio used in discretising the force relation.
-         */
-        double spacing_ratio = mpMesh->GetAverageNodeSpacingOfElement(elem_idx, false);
+    // Helper variables
+    double normed_dist;
+    c_vector<double, DIM> aggregate_force;
 
-        double spring_constant = mSpringConstant * intrinsic_spacing_squared / (spacing_ratio * spacing_ratio);
-        double rest_length = mRestLengthMultiplier * spacing_ratio;
+    // Make a vector to store the force on node i+1 from node i
+    std::vector<c_vector<double, DIM> > elastic_force_to_next_node(num_nodes);
 
-        // Loop over nodes and calculate the force exerted on node i+1 by node i
-        for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
-        {
-            // Index of the next node, calculated modulo number of nodes in this element
-            unsigned next_idx = (node_idx + 1) % num_nodes;
+    /*
+     * Get the node spacing ratio for this element.  The rest length and spring constant are derived from this
+     * characteristic length.
+     *
+     * The spring constant is derived with reference to the intrinsic spacing, so that with different node spacings
+     * the user-defined parameters do not have to be updated.
+     *
+     * The correct factor to increase the spring constant by is (intrinsic spacing / node_spacing)^2.  One factor
+     * takes into account the energy considerations of the elastic springs, and the other takes account of the
+     * factor of node_spacing used in discretising the force relation.
+     */
 
-            double modified_spring_constant = spring_constant;
-            double modified_rest_length = rest_length;
+    double node_spacing;
+    double spring_constant;
+    double rest_length;
 
-            // Hooke's law linear spring force
-            elastic_force_to_next_node[node_idx] = mpMesh->GetVectorFromAtoB(elem_it->GetNodeLocation(node_idx), elem_it->GetNodeLocation(next_idx));
-            normed_dist = norm_2(elastic_force_to_next_node[node_idx]);
-            elastic_force_to_next_node[node_idx] *= modified_spring_constant * (normed_dist - modified_rest_length) / normed_dist;
-        }
+    // Determine if we're in a lamina or not
+    if(ELEMENT_DIM < SPACE_DIM)
+    {
+        node_spacing = mpMesh->GetAverageNodeSpacingOfLamina(elem_idx, false);
 
-        // Add the contributions of springs adjacent to each node
-        for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
-        {
-            // Get index of previous node
-            unsigned prev_idx = (node_idx + num_nodes - 1) % num_nodes;
+        spring_constant = mBasementSpringConstantModifier * mSpringConstant * mIntrinsicSpacingSquared / (node_spacing * node_spacing);
+        rest_length = mBasementRestLengthModifier * mRestLengthMultiplier * node_spacing;
+    }
+    else // regular element
+    {
+        node_spacing = mpMesh->GetAverageNodeSpacingOfElement(elem_idx, false);
 
-            aggregate_force = elastic_force_to_next_node[node_idx] - elastic_force_to_next_node[prev_idx];
+        spring_constant = mSpringConstant * mIntrinsicSpacingSquared / (node_spacing * node_spacing);
+        rest_length = mRestLengthMultiplier * node_spacing;
+    }
 
-            // Add the aggregate force contribution to the node
-            elem_it->GetNode(node_idx)->AddAppliedForceContribution(aggregate_force);
-        }
+    // Loop over nodes and calculate the force exerted on node i+1 by node i
+    for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
+    {
+        // Index of the next node, calculated modulo number of nodes in this element
+        unsigned next_idx = (node_idx + 1) % num_nodes;
 
-        ///\todo Why is this code commented out?
-        // If corners are present, we add on the additional functionality
+        double modified_spring_constant = spring_constant;
+        double modified_rest_length = rest_length;
+
+        // Hooke's law linear spring force
+        elastic_force_to_next_node[node_idx] = mpMesh->GetVectorFromAtoB(rElement.GetNodeLocation(node_idx), rElement.GetNodeLocation(next_idx));
+        normed_dist = norm_2(elastic_force_to_next_node[node_idx]);
+        elastic_force_to_next_node[node_idx] *= modified_spring_constant * (normed_dist - modified_rest_length) / normed_dist;
+    }
+
+    // Add the contributions of springs adjacent to each node
+    for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
+    {
+        // Get index of previous node
+        unsigned prev_idx = (node_idx + num_nodes - 1) % num_nodes;
+
+        aggregate_force = elastic_force_to_next_node[node_idx] - elastic_force_to_next_node[prev_idx];
+
+        // Add the aggregate force contribution to the node
+        rElement.GetNode(node_idx)->AddAppliedForceContribution(aggregate_force);
+    }
+
+    ///\todo Why is this code commented out?
+    // If corners are present, we add on the additional functionality
 //        if (mElementsHaveCorners)
 //        {
 //            // Add force contributions from apical and basal surfaces
 //            if (elem_idx != mpMesh->GetMembraneIndex())
 //            {
-//                std::vector<Node<DIM> *> r_corners = elem_it->rGetCornerNodes();
+//                std::vector<Node<DIM> *> r_corners = rElement.rGetCornerNodes();
 //
 //                // Apical surface
 //                c_vector<double, DIM> apical_force = mpMesh->GetVectorFromAtoB(r_corners[0]->rGetLocation(),
@@ -234,7 +270,6 @@ void ImmersedBoundaryMembraneElasticityForce<DIM>::AddImmersedBoundaryForceContr
 //                r_corners[2]->AddAppliedForceContribution(basal_force);
 //            }
 //        }
-    }
 }
 
 template<unsigned DIM>

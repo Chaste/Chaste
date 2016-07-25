@@ -38,7 +38,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Cylindrical2dVertexMesh.hpp"
 #include "Toroidal2dVertexMesh.hpp"
 #include <boost/multi_array.hpp>
-#include <Debug.hpp>
 
 /**
  * Convenience collection of iterators, primarily to get compilation to happen.

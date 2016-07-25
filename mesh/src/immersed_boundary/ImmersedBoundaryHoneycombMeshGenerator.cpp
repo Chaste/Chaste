@@ -35,7 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "ImmersedBoundaryHoneycombMeshGenerator.hpp"
-#include "Debug.hpp"
 
 ImmersedBoundaryHoneycombMeshGenerator::ImmersedBoundaryHoneycombMeshGenerator(unsigned numElementsX,
                                                                                unsigned numElementsY,

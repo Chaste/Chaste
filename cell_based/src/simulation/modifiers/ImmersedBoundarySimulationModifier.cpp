@@ -284,6 +284,50 @@ void ImmersedBoundarySimulationModifier<DIM>::PropagateForcesToFluidGrid()
             }
         }
     }
+
+    // Here, we loop over laminas and then nodes as the length scale dl varies per element
+    for (typename ImmersedBoundaryMesh<DIM, DIM>::ImmersedBoundaryLaminaIterator lam_iter = mpMesh->GetLaminaIteratorBegin(false);
+         lam_iter != mpMesh->GetLaminaIteratorEnd();
+         ++lam_iter)
+    {
+        dl = mpMesh->GetAverageNodeSpacingOfLamina(lam_iter->GetIndex(), false);
+
+        for (unsigned node_idx = 0; node_idx < lam_iter->GetNumNodes(); node_idx++)
+        {
+            Node<DIM> *p_node = lam_iter->GetNode(node_idx);
+
+            // Get location and applied force contribution of current node
+            node_location = p_node->rGetLocation();
+            applied_force = p_node->rGetAppliedForce();
+
+            // Get first grid index in each dimension, taking account of possible wrap-around
+            first_idx_x = unsigned(floor(node_location[0] / mGridSpacingX)) + mNumGridPtsX - 1;
+            first_idx_y = unsigned(floor(node_location[1] / mGridSpacingY)) + mNumGridPtsY - 1;
+
+            // Calculate all four indices and deltas in each dimension
+            for (unsigned i = 0; i < 4; i++)
+            {
+                x_indices[i] = (first_idx_x + i) % mNumGridPtsX;
+                y_indices[i] = (first_idx_y + i) % mNumGridPtsY;
+
+                x_deltas[i] = Delta1D(fabs(x_indices[i] * mGridSpacingX - node_location[0]), mGridSpacingX);
+                y_deltas[i] = Delta1D(fabs(y_indices[i] * mGridSpacingY - node_location[1]), mGridSpacingY);
+            }
+
+            // Loop over the 4x4 grid used to spread the force on the nodes to the fluid grid
+            for (unsigned x_idx = 0; x_idx < 4; x_idx++)
+            {
+                for (unsigned y_idx = 0; y_idx < 4; y_idx++)
+                {
+                    // The applied force is weighted by the delta function
+                    weight = x_deltas[x_idx] * y_deltas[y_idx] * dl / (mGridSpacingX * mGridSpacingY);
+
+                    force_grids[0][x_indices[x_idx]][y_indices[y_idx]] += applied_force[0] * weight;
+                    force_grids[1][x_indices[x_idx]][y_indices[y_idx]] += applied_force[1] * weight;
+                }
+            }
+        }
+    }
 }
 
 template<unsigned DIM>
@@ -364,7 +408,7 @@ void ImmersedBoundarySimulationModifier<DIM>::PropagateFluidSourcesToGrid()
         }
     }
 }
-#include "Debug.hpp"
+
 template<unsigned DIM>
 void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
 {
