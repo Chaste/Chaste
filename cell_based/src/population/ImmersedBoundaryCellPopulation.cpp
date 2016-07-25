@@ -470,24 +470,7 @@ void ImmersedBoundaryCellPopulation<DIM>::Validate()
 template<unsigned DIM>
 void ImmersedBoundaryCellPopulation<DIM>::CheckForStepSizeException(unsigned nodeIndex, c_vector<double,DIM>& displacement, double dt)
 {
-
-    double length = norm_2(displacement);
-    double characteristic_spacing = mpImmersedBoundaryMesh->GetCharacteristicNodeSpacing();
-
-    if (length > characteristic_spacing)
-    {
-        displacement *= characteristic_spacing/length;
-
-        std::ostringstream message;
-        message << "Vertices are moving more than half the CellRearrangementThreshold. This could cause elements to become inverted ";
-        message << "so the motion has been restricted. Use a smaller timestep to avoid these warnings.";
-
-        double suggestedStep = 0.95 * dt * characteristic_spacing / length;
-        bool terminate = false;
-
-        //\todo: uncomment the next line
-//        throw new StepSizeException(length, suggestedStep, message.str(), terminate);
-    }
+    //\todo: deal with this method...
 }
 
 template<unsigned DIM>
