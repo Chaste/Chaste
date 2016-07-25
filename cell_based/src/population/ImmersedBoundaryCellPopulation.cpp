@@ -523,7 +523,7 @@ double ImmersedBoundaryCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
 template<unsigned DIM>
 void ImmersedBoundaryCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirectory)
 {
-//#ifdef CHASTE_VTK
+#ifdef CHASTE_VTK
     // Create mesh writer for VTK output
     ImmersedBoundaryMeshWriter<DIM, DIM> mesh_writer(rDirectory, "results", false);
 
@@ -539,7 +539,7 @@ void ImmersedBoundaryCellPopulation<DIM>::WriteVtkResultsToFile(const std::strin
         // Create vector to store VTK cell data
         std::vector<double> vtk_cell_data;
 
-        // Iterate over vertex elements ///\todo #2512 - replace with loop over cells
+        // Iterate over immersed boundary elements
         for (typename ImmersedBoundaryMesh<DIM,DIM>::ImmersedBoundaryElementIterator elem_iter = mpImmersedBoundaryMesh->GetElementIteratorBegin();
              elem_iter != mpImmersedBoundaryMesh->GetElementIteratorEnd();
              ++elem_iter)
@@ -559,6 +559,14 @@ void ImmersedBoundaryCellPopulation<DIM>::WriteVtkResultsToFile(const std::strin
             }
         }
 
+        // Iterate over immersed boundary laminas (no associated cell) to ensure vtk_cell_data is the correct size
+        for (typename ImmersedBoundaryMesh<DIM,DIM>::ImmersedBoundaryLaminaIterator lam_iter = mpImmersedBoundaryMesh->GetLaminaIteratorBegin();
+             lam_iter != mpImmersedBoundaryMesh->GetLaminaIteratorEnd();
+             ++lam_iter)
+        {
+            vtk_cell_data.push_back(DOUBLE_UNSET);
+        }
+
         mesh_writer.AddCellData((*cell_writer_iter)->GetVtkCellDataName(), vtk_cell_data);
     }
 
@@ -573,7 +581,7 @@ void ImmersedBoundaryCellPopulation<DIM>::WriteVtkResultsToFile(const std::strin
         cell_data.push_back(cell_data_var);
     }
 
-    // Loop over vertex elements ///\todo #2512 - replace with loop over cells
+    // Iterate over immersed boundary elements
     for (typename ImmersedBoundaryMesh<DIM,DIM>::ImmersedBoundaryElementIterator elem_iter = mpImmersedBoundaryMesh->GetElementIteratorBegin();
          elem_iter != mpImmersedBoundaryMesh->GetElementIteratorEnd();
          ++elem_iter)
@@ -595,6 +603,18 @@ void ImmersedBoundaryCellPopulation<DIM>::WriteVtkResultsToFile(const std::strin
             }
         }
     }
+
+    // Iterate over immersed boundary laminas (no associated cell) to ensure cell_data is the correct size
+    for (typename ImmersedBoundaryMesh<DIM,DIM>::ImmersedBoundaryLaminaIterator lam_iter = mpImmersedBoundaryMesh->GetLaminaIteratorBegin();
+         lam_iter != mpImmersedBoundaryMesh->GetLaminaIteratorEnd();
+         ++lam_iter)
+    {
+        for (unsigned var=0; var<num_cell_data_items; var++)
+        {
+            cell_data[var].push_back(DOUBLE_UNSET);
+        }
+    }
+
     for (unsigned var=0; var<num_cell_data_items; var++)
     {
         mesh_writer.AddCellData(cell_data_names[var], cell_data[var]);
@@ -611,7 +631,7 @@ void ImmersedBoundaryCellPopulation<DIM>::WriteVtkResultsToFile(const std::strin
     *(this->mpVtkMetaFile) << "\" group=\"\" part=\"0\" file=\"results_";
     *(this->mpVtkMetaFile) << num_timesteps;
     *(this->mpVtkMetaFile) << ".vtu\"/>\n";
-//#endif //CHASTE_VTK
+#endif //CHASTE_VTK
 }
 
 template<unsigned DIM>
