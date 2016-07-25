@@ -130,6 +130,7 @@ void ImmersedBoundaryElement<1, SPACE_DIM>::SetAverageNodeSpacing(double average
 }
 
 // Explicit instantiation
+template class ImmersedBoundaryElement<0,1>;
 template class ImmersedBoundaryElement<1,1>;
 template class ImmersedBoundaryElement<1,2>;
 template class ImmersedBoundaryElement<1,3>;
