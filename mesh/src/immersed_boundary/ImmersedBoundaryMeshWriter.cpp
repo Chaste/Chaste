@@ -38,6 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Cylindrical2dVertexMesh.hpp"
 #include "Toroidal2dVertexMesh.hpp"
 #include <boost/multi_array.hpp>
+#include <Debug.hpp>
 
 /**
  * Convenience collection of iterators, primarily to get compilation to happen.
@@ -252,15 +253,7 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(ImmersedBou
                 p_cell_id_list->SetId(node_idx, global_idx);
             }
 
-//            if (elem_idx == rMesh.GetMembraneIndex())
-//            {
-//                mpVtkUnstructedMesh->InsertNextCell(3, p_cell_id_list);
-//            }
-//            else
-//            {
             mpVtkUnstructedMesh->InsertNextCell(p_cell->GetCellType(), p_cell_id_list);
-//            }
-
             p_cell->Delete(); // Reference counted
         }
 
@@ -322,9 +315,11 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(ImmersedBou
         }
 
 
-        // Case 3:  only horizontal OR vertical overlap (exclusive)
+        // Case 3:  multiple overlaps
         else //( (h_overlaps[elem_idx] == true) && (v_overlaps[elem_idx] == true)
         {
+            //\todo: implement this
+
             // There should be exactly two points of overlap found - if not, there is likely to be some weird geometry
             // which has not been considered
             assert( (mHOverlapPoints[elem_idx].size() == 2) && (mVOverlapPoints[elem_idx].size() == 2) );
@@ -342,7 +337,7 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(ImmersedBou
 
         vtkCell* p_cell = vtkPolygon::New();
         vtkIdList* p_cell_id_list = p_cell->GetPointIds();
-        p_cell_id_list->SetNumberOfIds(iter->GetNumNodes());
+        p_cell_id_list->SetNumberOfIds(num_nodes);
 
         for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
         {
