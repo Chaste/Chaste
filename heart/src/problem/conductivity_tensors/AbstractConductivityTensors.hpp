@@ -75,7 +75,7 @@ protected:
     FileFinder mFibreOrientationFile;
 
     /** Fibre file reader */
-    std::auto_ptr<FibreReader<SPACE_DIM> > mFileReader;
+    std::unique_ptr<FibreReader<SPACE_DIM> > mFileReader;
 
 public:
 

@@ -466,7 +466,7 @@ Release 3.1 is a minor release, which brings support for newer versions of libra
   </ul></li>
   <li>Mesh-related changes:
   <ul>
-    <li><tt>GenericMeshReader</tt> has been changed from a class to a function.  If you use it directly, you must now do something like "<tt>std::auto_ptr&lt;AbstractMeshReader&lt;2,2&gt; &gt; p_reader = GenericMeshReader&lt;2,2&gt;(mesh_path);</tt>".  The returned smart pointer will automatically destroy the reader when it goes out of scope, so any other changes to your code should be limited to replacing <tt>reader</tt> with <tt>*p_reader</tt>.</li>
+    <li><tt>GenericMeshReader</tt> has been changed from a class to a function.  If you use it directly, you must now do something like "<tt>std::unique_ptr&lt;AbstractMeshReader&lt;2,2&gt; &gt; p_reader = GenericMeshReader&lt;2,2&gt;(mesh_path);</tt>".  The returned smart pointer will automatically destroy the reader when it goes out of scope, so any other changes to your code should be limited to replacing <tt>reader</tt> with <tt>*p_reader</tt>.</li>
     <li>Some mixed dimension meshes may now be read in to Chaste, i.e. 1d elements embedded in a 2d or 3d mesh.  The 1d elements are defined in a separate <tt>.cable</tt> file, with the same format as the <tt>.edge</tt> file.</li>
   </ul></li>
   <li>Other new functionality:

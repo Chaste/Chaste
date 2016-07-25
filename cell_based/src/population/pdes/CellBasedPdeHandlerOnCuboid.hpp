@@ -102,7 +102,7 @@ public:
      * @param pMesh the mesh on which to solve the PDE
      * @return The full boundary conditions container
      */
-    std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ConstructBoundaryConditionsContainer(
+    std::unique_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ConstructBoundaryConditionsContainer(
             PdeAndBoundaryConditions<DIM>* pPdeAndBc,
             TetrahedralMesh<DIM,DIM>* pMesh);
 

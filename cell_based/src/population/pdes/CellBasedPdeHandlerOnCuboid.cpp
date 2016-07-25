@@ -54,14 +54,14 @@ CellBasedPdeHandlerOnCuboid<DIM>::~CellBasedPdeHandlerOnCuboid()
 }
 
 template<unsigned DIM>
-std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > CellBasedPdeHandlerOnCuboid<DIM>::ConstructBoundaryConditionsContainer(
+std::unique_ptr<BoundaryConditionsContainer<DIM,DIM,1> > CellBasedPdeHandlerOnCuboid<DIM>::ConstructBoundaryConditionsContainer(
         PdeAndBoundaryConditions<DIM>* pPdeAndBc,
         TetrahedralMesh<DIM,DIM>* pMesh)
 {
     // Not using the inputs as there's only one BC
     assert(DIM==2);
 
-    std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc(new BoundaryConditionsContainer<DIM,DIM,1>(false));
+    std::unique_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc(new BoundaryConditionsContainer<DIM,DIM,1>(false));
 
     // Use these two vectors to define what's happening on the top right bottom and left boundaries
 

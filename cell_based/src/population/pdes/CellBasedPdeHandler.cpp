@@ -340,7 +340,7 @@ void CellBasedPdeHandler<DIM>::SolvePdeAndWriteResultsToFile(unsigned samplingTi
         PdeAndBoundaryConditions<DIM>* p_pde_and_bc = mPdeAndBcCollection[pde_index];
 
         // Set up boundary conditions
-        std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc = ConstructBoundaryConditionsContainer(p_pde_and_bc, p_mesh);
+        std::unique_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc = ConstructBoundaryConditionsContainer(p_pde_and_bc, p_mesh);
 
         // If the solution at the previous timestep exists...
         PetscInt previous_solution_size = 0;
@@ -476,11 +476,11 @@ void CellBasedPdeHandler<DIM>::SolvePdeAndWriteResultsToFile(unsigned samplingTi
 }
 
 template<unsigned DIM>
-std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > CellBasedPdeHandler<DIM>::ConstructBoundaryConditionsContainer(
+std::unique_ptr<BoundaryConditionsContainer<DIM,DIM,1> > CellBasedPdeHandler<DIM>::ConstructBoundaryConditionsContainer(
         PdeAndBoundaryConditions<DIM>* pPdeAndBc,
         TetrahedralMesh<DIM,DIM>* pMesh)
 {
-    std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc(new BoundaryConditionsContainer<DIM,DIM,1>(false));
+    std::unique_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc(new BoundaryConditionsContainer<DIM,DIM,1>(false));
 
     AbstractBoundaryCondition<DIM>* p_bc = pPdeAndBc->GetBoundaryCondition();
 

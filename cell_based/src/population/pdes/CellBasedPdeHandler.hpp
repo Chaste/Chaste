@@ -252,7 +252,7 @@ public:
      *
      * @return the full boundary conditions container
      */
-    virtual std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ConstructBoundaryConditionsContainer(
+    virtual std::unique_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ConstructBoundaryConditionsContainer(
             PdeAndBoundaryConditions<DIM>* pPdeAndBc,
             TetrahedralMesh<DIM,DIM>* pMesh);
 
