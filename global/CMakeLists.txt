@@ -31,7 +31,6 @@ add_executable(timekeeper "${generate_dir}/timekeeper.cpp")
 ###################################################################
 
 add_custom_command(OUTPUT 
-    dummy
     ${generate_dir}/Version.cpp
     ${generate_dir}/ChasteBuildInfo.cpp
     COMMAND ${CMAKE_COMMAND} 
