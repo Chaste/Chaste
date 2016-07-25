@@ -131,8 +131,8 @@ void ImmersedBoundaryCellCellInteractionForce<DIM>::AddImmersedBoundaryForceCont
     for (unsigned pair = 0; pair < rNodePairs.size(); pair++)
     {
         /*
-         * Interactions only occur between different cells.  Since each node is only ever in a single cell, we can test
-         * equality of the first ContainingElement.
+         * Interactions only occur between different elements.  Since each node is only ever in a single cell, we can
+         * test equality of the first ContainingElement.
          */
         if ( *(rNodePairs[pair].first->ContainingElementsBegin()) !=
              *(rNodePairs[pair].second->ContainingElementsBegin()) )
