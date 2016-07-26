@@ -41,7 +41,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCentreBasedCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
 #include "T2SwapCellKiller.hpp"
-#include "AbstractVertexBasedDivisionRule.hpp"
 #include "Cylindrical2dMesh.hpp"
 #include "Cylindrical2dVertexMesh.hpp"
 #include "AbstractTwoBodyInteractionForce.hpp"
