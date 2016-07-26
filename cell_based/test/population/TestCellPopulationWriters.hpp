@@ -163,7 +163,7 @@ public:
         MeshBasedCellPopulation<2> mesh_based_cell_population(*p_tet_mesh, mesh_based_cells);
 
         // Label a subset of the cells
-        std::shared_ptr<AbstractCellProperty> p_label(mesh_based_cell_population.GetCellPropertyRegistry()->Get<CellLabel>());
+        boost::shared_ptr<AbstractCellProperty> p_label(mesh_based_cell_population.GetCellPropertyRegistry()->Get<CellLabel>());
         mesh_based_cell_population.GetCellUsingLocationIndex(0)->AddCellProperty(p_label);
         mesh_based_cell_population.GetCellUsingLocationIndex(1)->AddCellProperty(p_label);
 
@@ -245,12 +245,12 @@ public:
             HoneycombVertexMeshGenerator vertex_based_generator(4, 6);
             MutableVertexMesh<2,2>* p_vertex_based_mesh = vertex_based_generator.GetMesh();
             std::vector<CellPtr> vertex_based_cells;
-            std::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
+            boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
             CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> vertex_based_cells_generator;
             vertex_based_cells_generator.GenerateBasic(vertex_based_cells, p_vertex_based_mesh->GetNumElements(), std::vector<unsigned>(), p_diff_type);
             VertexBasedCellPopulation<2> vertex_based_cell_population(*p_vertex_based_mesh, vertex_based_cells);
 
-            std::shared_ptr<AbstractCellProperty> p_new_label(vertex_based_cell_population.GetCellPropertyRegistry()->Get<CellLabel>());
+            boost::shared_ptr<AbstractCellProperty> p_new_label(vertex_based_cell_population.GetCellPropertyRegistry()->Get<CellLabel>());
             vertex_based_cell_population.GetCellUsingLocationIndex(3)->AddCellProperty(p_new_label);
             vertex_based_cell_population.GetCellUsingLocationIndex(4)->AddCellProperty(p_new_label);
             vertex_based_cell_population.GetCellUsingLocationIndex(5)->AddCellProperty(p_new_label);
@@ -358,7 +358,7 @@ public:
         HoneycombVertexMeshGenerator generator(4, 6);
         MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
         std::vector<CellPtr> cells;
-        std::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
+        boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements(), std::vector<unsigned>(), p_diff_type);
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
@@ -428,7 +428,7 @@ public:
             cell_population.InitialiseCells();
 
             // Label a subset of the cells
-            std::shared_ptr<AbstractCellProperty> p_label(cell_population.GetCellPropertyRegistry()->Get<CellLabel>());
+            boost::shared_ptr<AbstractCellProperty> p_label(cell_population.GetCellPropertyRegistry()->Get<CellLabel>());
             cell_population.GetCellUsingLocationIndex(20)->AddCellProperty(p_label);
             cell_population.GetCellUsingLocationIndex(21)->AddCellProperty(p_label);
             cell_population.GetCellUsingLocationIndex(22)->AddCellProperty(p_label);
@@ -493,7 +493,7 @@ public:
             cell_population.InitialiseCells();
 
             // Label a subset of the cells
-            std::shared_ptr<AbstractCellProperty> p_label(cell_population.GetCellPropertyRegistry()->Get<CellLabel>());
+            boost::shared_ptr<AbstractCellProperty> p_label(cell_population.GetCellPropertyRegistry()->Get<CellLabel>());
             cell_population.GetCellUsingLocationIndex(0)->AddCellProperty(p_label);
             cell_population.GetCellUsingLocationIndex(6)->AddCellProperty(p_label);
             cell_population.GetCellUsingLocationIndex(9)->AddCellProperty(p_label);
@@ -557,7 +557,7 @@ public:
             cell_population.InitialiseCells();
 
             // Label a subset of the cells
-            std::shared_ptr<AbstractCellProperty> p_label(cell_population.GetCellPropertyRegistry()->Get<CellLabel>());
+            boost::shared_ptr<AbstractCellProperty> p_label(cell_population.GetCellPropertyRegistry()->Get<CellLabel>());
             cell_population.GetCellUsingLocationIndex(0)->AddCellProperty(p_label);
             cell_population.GetCellUsingLocationIndex(1)->AddCellProperty(p_label);
             cell_population.GetCellUsingLocationIndex(4)->AddCellProperty(p_label);
@@ -618,7 +618,7 @@ public:
             cell_population.InitialiseCells();
 
             // Label a subset of the cells
-            std::shared_ptr<AbstractCellProperty> p_label(cell_population.GetCellPropertyRegistry()->Get<CellLabel>());
+            boost::shared_ptr<AbstractCellProperty> p_label(cell_population.GetCellPropertyRegistry()->Get<CellLabel>());
             cell_population.GetCellUsingLocationIndex(0)->AddCellProperty(p_label);
             cell_population.GetCellUsingLocationIndex(1)->AddCellProperty(p_label);
             cell_population.GetCellUsingLocationIndex(4)->AddCellProperty(p_label);
@@ -662,14 +662,14 @@ public:
             HoneycombVertexMeshGenerator generator(4, 4);
             MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
             std::vector<CellPtr> cells;
-            std::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
+            boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
             CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
             cells_generator.GenerateBasic(cells, p_mesh->GetNumElements(), std::vector<unsigned>(), p_diff_type);
             VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
             cell_population.InitialiseCells();
 
             // Label a subset of the cells
-            std::shared_ptr<AbstractCellProperty> p_label(cell_population.GetCellPropertyRegistry()->Get<CellLabel>());
+            boost::shared_ptr<AbstractCellProperty> p_label(cell_population.GetCellPropertyRegistry()->Get<CellLabel>());
             cell_population.GetCellUsingLocationIndex(1)->AddCellProperty(p_label);
             cell_population.GetCellUsingLocationIndex(4)->AddCellProperty(p_label);
             cell_population.GetCellUsingLocationIndex(7)->AddCellProperty(p_label);
@@ -948,7 +948,7 @@ public:
         HoneycombVertexMeshGenerator vertex_based_generator(4, 6);
         MutableVertexMesh<2,2>* p_vertex_based_mesh = vertex_based_generator.GetMesh();
         std::vector<CellPtr> vertex_based_cells;
-        std::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
+        boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> vertex_based_cells_generator;
         vertex_based_cells_generator.GenerateBasic(vertex_based_cells, p_vertex_based_mesh->GetNumElements(), std::vector<unsigned>(), p_diff_type);
         VertexBasedCellPopulation<2> vertex_based_cell_population(*p_vertex_based_mesh, vertex_based_cells);
@@ -1019,7 +1019,7 @@ public:
         HoneycombVertexMeshGenerator generator(4, 6);
         MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
         std::vector<CellPtr> cells;
-        std::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
+        boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements(), std::vector<unsigned>(), p_diff_type);
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
@@ -1142,7 +1142,7 @@ public:
         HoneycombVertexMeshGenerator generator(4, 6);
         MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
         std::vector<CellPtr> cells;
-        std::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
+        boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements(), std::vector<unsigned>(), p_diff_type);
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
@@ -1265,7 +1265,7 @@ public:
         HoneycombVertexMeshGenerator generator(4, 6);
         MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
         std::vector<CellPtr> cells;
-        std::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
+        boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements(), std::vector<unsigned>(), p_diff_type);
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);

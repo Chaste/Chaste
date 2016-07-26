@@ -148,7 +148,7 @@ void CryptCellsGenerator<CELL_CYCLE_MODEL>::Generate(
         rCells.reserve(mesh_size);
     }
 
-    std::shared_ptr<AbstractCellProperty> p_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
+    boost::shared_ptr<AbstractCellProperty> p_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
 
     // Loop over the mesh and populate rCells
     for (unsigned i=0; i<mesh_size; i++)

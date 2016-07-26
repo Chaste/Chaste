@@ -248,7 +248,7 @@ New functionality and code changes, which may still require changes to user code
 </li><li>Unfortunately, an error was discovered in a calculation behind the <tt>CompressibleExponentialLaw</tt> (a material law, and for compressible cardiac electro-mechanics the default law), which will have resulted in too small stresses and overly large deformations. The class has been fixed. This may change user projects results
 </li><li>The coarsened version of the Oxford Rabbit mesh located at <tt>apps/texttest/weekly/Propagation3d</tt> has been renamed <tt>OxfordRabbitHeart_481um</tt>.
 </li><li>When constraints are placed on valid values for cardiac cell model state variables (e.g. gating variables should stay between 0 and 1), CVODE is now allowed to break these to within a factor of its specified absolute tolerances, following the CVODE documentation on "Advice on controlling unphysical negative values".
-</li><li><tt>AbstractCardiacCellInterface::UseCellMLDefaultStimulus()</tt> now returns a <tt>std::shared_ptr&lt;RegularStimulus&gt;</tt> to the stimulus instead of returning <tt>void</tt>. <strong>This may break user projects if you are storing auto-generated models</strong>. In this case the method should be updated as per <a href="https://chaste.cs.ox.ac.uk/trac/changeset/19552" title="#2412 Make dealing with the CellML default stimulus nicer.">r19552</a>. This has the benefit of providing access to the <tt>RegularStimulus</tt> methods, without having to remember how to static cast a boost shared pointer to an <tt>AbstractStimulusFunction</tt>.
+</li><li><tt>AbstractCardiacCellInterface::UseCellMLDefaultStimulus()</tt> now returns a <tt>boost::shared_ptr&lt;RegularStimulus&gt;</tt> to the stimulus instead of returning <tt>void</tt>. <strong>This may break user projects if you are storing auto-generated models</strong>. In this case the method should be updated as per <a href="https://chaste.cs.ox.ac.uk/trac/changeset/19552" title="#2412 Make dealing with the CellML default stimulus nicer.">r19552</a>. This has the benefit of providing access to the <tt>RegularStimulus</tt> methods, without having to remember how to static cast a boost shared pointer to an <tt>AbstractStimulusFunction</tt>. 
 </li><li> You can now print out additional action potential model variables in a <tt>BidomainWithBath</tt> simulation, previously this failed because a <tt>FakeBathCell</tt> doesn't have them.
 </li><li><tt>HeartConfig::Instance()-&gt;SetVisualizeWithVtk();</tt> will now work in 1D as well as 2D and 3D.
 </li><li>The CVODE change (see general above) has led to a small improvement in accuracy for CVODE in heart tissue, since voltage was not being updated at precisely the correct time before.
@@ -514,10 +514,10 @@ Release 3.1 is a minor release, which brings support for newer versions of libra
     <li>Simulations make use of the existing cell-cycle model and cell-killer hierarchies.</li>
     <li>Added functionality for visualizing Potts-based cell simulations either using the visualizer <tt>Visualize2dVertexCells.java</tt> or using Paraview with VTK output.</li>
   </ul></li>
-  <li>We have moved much of the cell-based code to use <tt>std::shared_ptr</tt>s rather than plain pointers. This makes memory handling much more straightforward.
+  <li>We have moved much of the cell-based code to use <tt>boost::shared_ptr</tt>s rather than plain pointers. This makes memory handling much more straightforward.
   <ul>
-    <li>The <tt>CellBasedSimulation</tt> class and its subclasses now store collections of cell killers, boundary conditions, forces or update rules as <tt>std::shared_ptr</tt>s.
-        These are passed to cell-based simulations as  (e.g.) <tt>std::vector&lt;std::shared_ptr&lt;AbstractForce&lt;DIM&gt;&gt;&gt;</tt> instead of <tt>std::vector&lt;AbstractForce&lt;DIM&gt;*&gt;</tt>.</li>
+    <li>The <tt>CellBasedSimulation</tt> class and its subclasses now store collections of cell killers, boundary conditions, forces or update rules as <tt>boost::shared_ptr</tt>s.
+        These are passed to cell-based simulations as  (e.g.) <tt>std::vector&lt;boost::shared_ptr&lt;AbstractForce&lt;DIM&gt;&gt;&gt;</tt> instead of <tt>std::vector&lt;AbstractForce&lt;DIM&gt;*&gt;</tt>.</li>
     <li>We also use helper macros such as <tt>MAKE_PTR</tt> a lot more in tests; these are defined in the header <tt>SmartPointers.hpp</tt>.</li>
   </ul></li>
   <li>A new overlapping spheres based force law, used by Buske <i>et al.</i> in their 2011 model of the crypt based on previous work by Galle <i>et al.</i>, has been implemented.
@@ -728,7 +728,7 @@ Release 3.1 is a minor release, which brings support for newer versions of libra
       <li><tt>FileFinder::GetLeafName</tt> - get the leaf name of a file</li>
     </ul></li>
   <li>Support has been added for Boost version 1.44. However, note that due to a bug in this Boost version, many tests will crash after they have finished running (with the message "pure virtual method called. terminate called without an active exception")!</li>
-  <li>A new header <tt>SmartPointers.hpp</tt> has been added containing a few helpful macros for working with <tt>std::shared_ptr</tt>.</li>
+  <li>A new header <tt>SmartPointers.hpp</tt> has been added containing a few helpful macros for working with <tt>boost::shared_ptr</tt>.</li>
   <li>Created new helper classes <tt>PetscVecTools</tt> and <tt>PetscMatTools</tt> in <tt>linalg</tt> that encapsulate many of the PETSc functions we use related to vectors and matrices. This isolates much of the PETSc-version-specific code within these classes, enabling cleaner user code. If new PETSc-version-specific code is written, suitable methods should be added to these classes in preference to using PETSc directly.</li>
   <li>Added named attribute functionality to <tt>AbstractParameterisedSystem</tt>, allowing arbitrary real-valued attributes to be attached to ODE classes. This is used by PyCml to support named attributes on CellML models.  Also added <tt>Has...</tt> methods to ODE system information, to avoid the need for <tt>try...catch</tt> statements in generic code.</li>
   <li>Changed the event handler classes to use <tt>MPI_Wtime</tt> rather than <tt>std::clock</tt> as underlying timer. This will give a more accurate wall clock time.</li>
@@ -1312,7 +1312,7 @@ Chaste DOES NOT WORK with Boost 1.35 (due to a known bug in that version of Boos
   
   <li>Cardiac:<ul>
     <li>
-      The boundary conditions container in cardiac problem classes is now accessed via a <tt>std::shared_ptr</tt> (rather than a raw pointer).
+      The boundary conditions container in cardiac problem classes is now accessed via a <tt>boost::shared_ptr</tt> (rather than a raw pointer).
       The PDE assembler hierarchy is still using normal pointers, however, so this should only affect people creating cardiac problem subclasses,
       or setting their own boundary conditions for cardiac problems: if you do these, you'll need to use a shared pointer now.
     </li>
@@ -1427,7 +1427,7 @@ Chaste DOES NOT WORK with Boost 1.35 (due to a known bug in that version of Boos
 
 <li>Heart:<ul>
 <li><tt>this-&gt;mpMesh</tt> is no longer directly available to cell factories, as it can be used accidentally while unset. Use the <tt>GetMesh()</tt> method instead.</li>
-<li>Cardiac cell models are now constructed using <tt>std::shared_ptr&lt;&gt;</tt> instead of normal pointers for the 'stimulus' and 'ode solver' arguments.  This will require changes to cell factories too.  See files <tt>heart/test/ionicmodels/TestIonicModels.hpp</tt> and <tt>heart/src/problem/PlaneStimulusCellFactory.hpp</tt> for examples of the new usage.</li>
+<li>Cardiac cell models are now constructed using <tt>boost::shared_ptr&lt;&gt;</tt> instead of normal pointers for the 'stimulus' and 'ode solver' arguments.  This will require changes to cell factories too.  See files <tt>heart/test/ionicmodels/TestIonicModels.hpp</tt> and <tt>heart/src/problem/PlaneStimulusCellFactory.hpp</tt> for examples of the new usage.</li>
 </ul></li>
 
 <li>Cancer:<ul>

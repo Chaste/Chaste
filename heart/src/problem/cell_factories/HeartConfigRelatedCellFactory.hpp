@@ -38,7 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vector>
 #include <map>
-
+#include <boost/shared_ptr.hpp>
 
 #include "AbstractCardiacCellFactory.hpp"
 #include "HeartConfig.hpp"
@@ -99,14 +99,14 @@ private:
     /** Default cardiac cell model to be used in all tissue (except heterogeneous regions)*/
     cp::ionic_model_selection_type mDefaultIonicModel;
     /** List of axis-aligned box regions which contain heterogeneous cardiac ionic model types*/
-    std::vector<std::shared_ptr<AbstractChasteRegion<SPACE_DIM> > > mIonicModelRegions;
+    std::vector<boost::shared_ptr<AbstractChasteRegion<SPACE_DIM> > > mIonicModelRegions;
     /** List of ionic model (size matches that of mIonicModelRegions)*/
     std::vector<cp::ionic_model_selection_type> mIonicModelsDefined;
 
     /** List of axis-aligned box or ellipsoid regions which represent areas to stimulate*/
-    std::vector<std::shared_ptr<AbstractChasteRegion<SPACE_DIM> > > mStimulatedAreas;
+    std::vector<boost::shared_ptr<AbstractChasteRegion<SPACE_DIM> > > mStimulatedAreas;
     /** List of intracellular current stimuli to apply (size matches that of mStimulatedAreas)*/
-    std::vector<std::shared_ptr<AbstractStimulusFunction> > mStimuliApplied;
+    std::vector<boost::shared_ptr<AbstractStimulusFunction> > mStimuliApplied;
 
     /**
      *  List of regions which represent areas in which to give parametric heterogeneity (scaling gating parameters)
@@ -119,7 +119,7 @@ private:
      *  that node is contained in the heterogeneity area or not.
      *
      */
-    std::vector<std::shared_ptr<AbstractChasteRegion<SPACE_DIM> > > mCellHeterogeneityAreas;
+    std::vector<boost::shared_ptr<AbstractChasteRegion<SPACE_DIM> > > mCellHeterogeneityAreas;
     /** List of scale factors for Gks scaling in each region (size of list matches that of mCellHeterogeneityAreas)*/
     std::vector<double> mScaleFactorGks;
     /** List of scale factors for Ito scaling in each region (size of list matches that of mCellHeterogeneityAreas)*/
@@ -163,7 +163,7 @@ public:
      * @param nodeIndex is the global index within the mesh
      */
     AbstractCardiacCellInterface* CreateCellWithIntracellularStimulus(
-            std::shared_ptr<AbstractStimulusFunction> intracellularStimulus,
+            boost::shared_ptr<AbstractStimulusFunction> intracellularStimulus,
             unsigned nodeIndex);
 
     /**

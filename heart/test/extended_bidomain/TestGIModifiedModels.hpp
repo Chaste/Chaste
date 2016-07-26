@@ -70,8 +70,8 @@ public:
     {
         HeartConfig::Instance()->Reset();
 
-        std::shared_ptr<ZeroStimulus> stimulus(new ZeroStimulus()); //define the stimulus
-        std::shared_ptr<EulerIvpOdeSolver> solver(new EulerIvpOdeSolver); //define the solver
+        boost::shared_ptr<ZeroStimulus> stimulus(new ZeroStimulus()); //define the stimulus
+        boost::shared_ptr<EulerIvpOdeSolver> solver(new EulerIvpOdeSolver); //define the solver
 
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.1,0.1,0.1);
         CorriasBuistICCModified icc_ode_system(solver, stimulus);
@@ -120,12 +120,12 @@ public:
         double duration_stimulus = 0.05;  // ms
         double start_stimulus = 0.01;   // ms
         double period=1;//
-        std::shared_ptr<RegularStimulus> stimulus(new RegularStimulus(magnitude_stimulus,
+        boost::shared_ptr<RegularStimulus> stimulus(new RegularStimulus(magnitude_stimulus,
                                                                         duration_stimulus,
                                                                         period,
                                                                         start_stimulus));
 
-        std::shared_ptr<EulerIvpOdeSolver> solver(new EulerIvpOdeSolver); //define the solver
+        boost::shared_ptr<EulerIvpOdeSolver> solver(new EulerIvpOdeSolver); //define the solver
 
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.1,0.1,1);
         CorriasBuistSMCModified smc_ode_system(solver, stimulus);
@@ -193,8 +193,8 @@ public:
         // Save
         {
 
-            std::shared_ptr<SimpleStimulus> p_stimulus(new SimpleStimulus(0.0,1.0,0.5));
-            std::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
+            boost::shared_ptr<SimpleStimulus> p_stimulus(new SimpleStimulus(0.0,1.0,0.5));
+            boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
             double time_step = 0.01;
             HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(time_step, time_step, time_step);
 

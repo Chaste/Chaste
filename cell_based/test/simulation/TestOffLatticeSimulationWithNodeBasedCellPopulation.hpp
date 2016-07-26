@@ -642,7 +642,7 @@ public:
          * conditions under which the time step would be adapted are not invoked
          * in this example.
          */
-        std::shared_ptr<AbstractNumericalMethod<2,2> > p_method(new ForwardEulerNumericalMethod<2,2>());
+        boost::shared_ptr<AbstractNumericalMethod<2,2> > p_method(new ForwardEulerNumericalMethod<2,2>());
         p_method->SetUseAdaptiveTimestep(true);
         simulator.SetNumericalMethod(p_method);
 
@@ -664,7 +664,7 @@ public:
         p_simulator1 = CellBasedSimulationArchiver<2, OffLatticeSimulation<2> >::Load("TestOffLatticeSimulationWithNodeBasedCellPopulationSaveAndLoad", 0.1);
 
         // Test that the numerical method was archived correctly
-        std::shared_ptr<AbstractNumericalMethod<2, 2> > p_method = p_simulator1->GetNumericalMethod();
+        boost::shared_ptr<AbstractNumericalMethod<2, 2> > p_method = p_simulator1->GetNumericalMethod();
         TS_ASSERT_EQUALS(p_method->HasAdaptiveTimestep(), true);
 
         p_simulator1->SetEndTime(1.0);

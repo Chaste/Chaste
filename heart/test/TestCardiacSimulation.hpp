@@ -122,7 +122,7 @@ public:
         Warnings::QuietDestroy();
         {
             CardiacSimulation simulation("heart/test/data/xml/monodomain2d_small.xml", false, true);
-            std::shared_ptr<AbstractUntemplatedCardiacProblem> p_problem = simulation.GetSavedProblem();
+            boost::shared_ptr<AbstractUntemplatedCardiacProblem> p_problem = simulation.GetSavedProblem();
             TS_ASSERT(p_problem);
             MonodomainProblem<2,2>* p_mono_problem = dynamic_cast<MonodomainProblem<2,2>*>(p_problem.get());
             TS_ASSERT(p_mono_problem != nullptr);
@@ -506,7 +506,7 @@ public:
         { // Load
             CardiacSimulation simulation("heart/test/data/xml/resume_monodomain_changing_parameter.xml", false, true);
 
-            std::shared_ptr<AbstractUntemplatedCardiacProblem> p_problem = simulation.GetSavedProblem();
+            boost::shared_ptr<AbstractUntemplatedCardiacProblem> p_problem = simulation.GetSavedProblem();
             TS_ASSERT(p_problem);
             MonodomainProblem<1,1>* p_mono_problem = dynamic_cast<MonodomainProblem<1,1>*>(p_problem.get());
             TS_ASSERT(p_mono_problem != nullptr);

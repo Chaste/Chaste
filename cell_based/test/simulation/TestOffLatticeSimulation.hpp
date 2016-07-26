@@ -729,10 +729,10 @@ public:
             double typical_transit_cycle_time = p_cell_cycle_model->GetAverageTransitCellCycleTime();
             double typical_stem_cycle_time = p_cell_cycle_model->GetAverageStemCellCycleTime();
 
-            std::shared_ptr<AbstractCellProperty> p_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
-            std::shared_ptr<AbstractCellProperty> p_stem_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
-            std::shared_ptr<AbstractCellProperty> p_transit_type(CellPropertyRegistry::Instance()->Get<TransitCellProliferativeType>());
-            std::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
+            boost::shared_ptr<AbstractCellProperty> p_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
+            boost::shared_ptr<AbstractCellProperty> p_stem_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
+            boost::shared_ptr<AbstractCellProperty> p_transit_type(CellPropertyRegistry::Instance()->Get<TransitCellProliferativeType>());
+            boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
 
             CellPtr p_cell(new Cell(p_state, p_cell_cycle_model));
 
@@ -1149,7 +1149,7 @@ public:
         simulator.AddSimulationModifier(p_modifier);
 
         // Check there is a modifier and its the correct type
-        std::vector<std::shared_ptr<AbstractCellBasedSimulationModifier<2> > >::iterator iter = simulator.GetSimulationModifiers()->begin();
+        std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<2> > >::iterator iter = simulator.GetSimulationModifiers()->begin();
         TS_ASSERT(boost::static_pointer_cast<VolumeTrackingModifier<2> >(*iter));
         TS_ASSERT_EQUALS(simulator.GetSimulationModifiers()->size(),1u);
 
@@ -1248,7 +1248,7 @@ public:
         simulator.SetDt(0.1);
 
         // Pass an adaptive numerical method to the simulation
-        std::shared_ptr<AbstractNumericalMethod<2,2> > p_method(new ForwardEulerNumericalMethod<2,2>());
+        boost::shared_ptr<AbstractNumericalMethod<2,2> > p_method(new ForwardEulerNumericalMethod<2,2>());
         p_method->SetUseAdaptiveTimestep(true);
         simulator.SetNumericalMethod(p_method);
 

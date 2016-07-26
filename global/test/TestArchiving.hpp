@@ -293,12 +293,12 @@ public:
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
 
-            std::shared_ptr<ChildClass> p_child(new ChildClass);
+            boost::shared_ptr<ChildClass> p_child(new ChildClass);
 
             p_child->mTag = 11;
             p_child->mTagInBaseClass = 3;
 
-            std::shared_ptr<ChildClass> const p_child_for_archiving = p_child;
+            boost::shared_ptr<ChildClass> const p_child_for_archiving = p_child;
 
             output_arch << p_child_for_archiving;
         }
@@ -309,7 +309,7 @@ public:
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
 
-            std::shared_ptr<ChildClass> p_child;
+            boost::shared_ptr<ChildClass> p_child;
 
             input_arch >> p_child;
 
@@ -330,7 +330,7 @@ public:
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
 
-            std::shared_ptr<BaseClass> p_base(new ChildClass());
+            boost::shared_ptr<BaseClass> p_base(new ChildClass());
 
             p_base->mTagInBaseClass = 6;
 
@@ -343,7 +343,7 @@ public:
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
 
-            std::shared_ptr<BaseClass> p_base;
+            boost::shared_ptr<BaseClass> p_base;
 
             input_arch >> p_base;
 
@@ -363,7 +363,7 @@ public:
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
 
-            std::shared_ptr<BaseClass> p_base(new SubChildClass());
+            boost::shared_ptr<BaseClass> p_base(new SubChildClass());
 
             p_base->mTagInBaseClass = 6;
 
@@ -376,7 +376,7 @@ public:
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
 
-            std::shared_ptr<BaseClass> p_base;
+            boost::shared_ptr<BaseClass> p_base;
 
             input_arch >> p_base;
 
@@ -412,7 +412,7 @@ public:
             std::ofstream ofs(archive_filename.c_str(), std::ios::binary);
             boost::archive::binary_oarchive output_arch(ofs); // LINE CHANGED!
 
-            std::shared_ptr<BaseClass> p_base(new SubChildClass());
+            boost::shared_ptr<BaseClass> p_base(new SubChildClass());
 
             p_base->mTagInBaseClass = 6;
 
@@ -425,7 +425,7 @@ public:
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::binary_iarchive input_arch(ifs); // LINE CHANGED!
 
-            std::shared_ptr<BaseClass> p_base;
+            boost::shared_ptr<BaseClass> p_base;
 
             input_arch >> p_base;
 

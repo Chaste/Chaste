@@ -68,8 +68,8 @@ class ExceptionalCell : public AbstractCvodeCell
 private:
     bool mNice;
 public :
-    ExceptionalCell(std::shared_ptr<AbstractIvpOdeSolver> pOdeSolver,
-                    std::shared_ptr<AbstractStimulusFunction> pStimulus)
+    ExceptionalCell(boost::shared_ptr<AbstractIvpOdeSolver> pOdeSolver,
+                    boost::shared_ptr<AbstractStimulusFunction> pStimulus)
         : AbstractCvodeCell(pOdeSolver, 2, 0, pStimulus)
     {
         mNice = false;
@@ -128,14 +128,14 @@ public:
         double duration  = 2.0 ;  // ms
         double start = 50.0; // ms
         double period = 500; // ms
-        std::shared_ptr<ZeroStimulus> p_zero_stimulus(new ZeroStimulus()); // For coverage of SetStimulusFunction()
-        std::shared_ptr<RegularStimulus> p_stimulus(new RegularStimulus(magnitude,
+        boost::shared_ptr<ZeroStimulus> p_zero_stimulus(new ZeroStimulus()); // For coverage of SetStimulusFunction()
+        boost::shared_ptr<RegularStimulus> p_stimulus(new RegularStimulus(magnitude,
                                                                           duration,
                                                                           period,
                                                                           start));
         double start_time = 0.0;
         double end_time = 1000.0; //One second in milliseconds
-        std::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
+        boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
 
         // Make a model that uses Cvode directly:
         CellLuoRudy1991FromCellMLCvode lr91_cvode_system(p_solver, p_zero_stimulus);
@@ -145,7 +145,7 @@ public:
         // More "coverage" - CVODE cells don't have a solver
         TS_ASSERT(!lr91_cvode_system.GetSolver());
 
-        std::shared_ptr<AbstractStimulusFunction> p_abs_stim = lr91_cvode_system.GetStimulusFunction();
+        boost::shared_ptr<AbstractStimulusFunction> p_abs_stim = lr91_cvode_system.GetStimulusFunction();
         double period_back = boost::static_pointer_cast<RegularStimulus>(p_abs_stim)->GetPeriod();
         TS_ASSERT_DELTA(period_back,period,1e-7);
         TS_ASSERT_EQUALS(p_abs_stim,p_stimulus);
@@ -228,7 +228,7 @@ public:
 
 
         // Coverage
-        std::shared_ptr<const AbstractOdeSystemInformation> p_sys_info = lr91_cvode_system.GetSystemInformation();
+        boost::shared_ptr<const AbstractOdeSystemInformation> p_sys_info = lr91_cvode_system.GetSystemInformation();
         TS_ASSERT(p_sys_info->rGetStateVariableNames() == lr91_cvode_system.rGetStateVariableNames());
         TS_ASSERT(p_sys_info->rGetStateVariableUnits() == lr91_cvode_system.rGetStateVariableUnits());
         TS_ASSERT_EQUALS(lr91_cvode_system.GetStateVariableIndex("membrane_voltage"),
@@ -275,7 +275,7 @@ public:
         TS_ASSERT_THROWS_CONTAINS(lr91_cvode_system.Solve(start_time, end_time, max_timestep, sampling_time),
                               "CVODE failed to solve system: CV_TOO_MUCH_WORK");
         // Kill the cell -- will trigger exp overflow if FPE exceptions are on
-        std::shared_ptr<SimpleStimulus> p_boom_stimulus(new SimpleStimulus(-50000, 2.0, 1.0));
+        boost::shared_ptr<SimpleStimulus> p_boom_stimulus(new SimpleStimulus(-50000, 2.0, 1.0));
 #ifndef TEST_FOR_FPE
         CellLuoRudy1991FromCellMLCvode lr91_boom(p_solver, p_boom_stimulus);
         TS_ASSERT_THROWS_CONTAINS(lr91_boom.Solve(start_time, end_time, max_timestep, sampling_time),
@@ -295,7 +295,7 @@ public:
 
         // This should work now that metadata has been added to the LuoRudy1991 cellML.
         TS_ASSERT_EQUALS(lr91_cvode_system.HasCellMLDefaultStimulus(), true);
-        std::shared_ptr<RegularStimulus> p_cellml_stim = lr91_cvode_system.UseCellMLDefaultStimulus();
+        boost::shared_ptr<RegularStimulus> p_cellml_stim = lr91_cvode_system.UseCellMLDefaultStimulus();
         TS_ASSERT_DELTA(p_cellml_stim->GetPeriod(), 1000.0, 1e-9);
 
         {
@@ -317,7 +317,7 @@ public:
         double duration  = 2.0 ;  // ms
         double start = 50.0; // ms
         double period = 500; // ms
-        std::shared_ptr<RegularStimulus> p_stimulus(new RegularStimulus(magnitude,
+        boost::shared_ptr<RegularStimulus> p_stimulus(new RegularStimulus(magnitude,
                                                                           duration,
                                                                           period,
                                                                           start));
@@ -326,7 +326,7 @@ public:
         HeartConfig::Instance()->SetOdeTimeStep(ode_time_step);
         double start_time = 0.0;
         double end_time = 1000.0; //One second in milliseconds
-        std::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
+        boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
 
         // Make a model that uses Cvode directly:
         CellShannon2004FromCellMLCvode sh04_cvode_system(p_solver, p_stimulus);
@@ -480,11 +480,11 @@ public:
             boost::archive::text_oarchive output_arch(ofs);
 
             // Set stimulus
-            std::shared_ptr<RegularStimulus> p_stimulus(new RegularStimulus(magnitude_stimulus,
+            boost::shared_ptr<RegularStimulus> p_stimulus(new RegularStimulus(magnitude_stimulus,
                                                                               duration_stimulus,
                                                                               period_stimulus,
                                                                               start_stimulus));
-            std::shared_ptr<AbstractIvpOdeSolver> p_solver;
+            boost::shared_ptr<AbstractIvpOdeSolver> p_solver;
 
             // Check Standard
             AbstractCardiacCellInterface* const p_luo_rudy_cell = new CellLuoRudy1991FromCellMLCvode(p_solver, p_stimulus);
@@ -507,7 +507,7 @@ public:
             input_arch >> p_luo_rudy_cell;
 
             TS_ASSERT_EQUALS( p_luo_rudy_cell->GetNumberOfStateVariables(), 8U );
-            std::shared_ptr<RegularStimulus> p_stimulus = boost::static_pointer_cast<RegularStimulus>(p_luo_rudy_cell->GetStimulusFunction());
+            boost::shared_ptr<RegularStimulus> p_stimulus = boost::static_pointer_cast<RegularStimulus>(p_luo_rudy_cell->GetStimulusFunction());
 
             TS_ASSERT_DELTA(p_stimulus->GetPeriod(),   period_stimulus,   1e-12);
             TS_ASSERT_DELTA(p_stimulus->GetDuration(), duration_stimulus, 1e-12);

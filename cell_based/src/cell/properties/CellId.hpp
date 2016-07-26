@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CELLID_HPP_
 #define CELLID_HPP_
 
-
+#include <boost/shared_ptr.hpp>
 #include "AbstractCellProperty.hpp"
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>

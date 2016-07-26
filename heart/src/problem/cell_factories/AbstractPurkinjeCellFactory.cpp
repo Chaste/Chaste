@@ -141,8 +141,8 @@ void AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::CreateJunction(const No
         resistance *= total_cross_sectional_area / HeartConfig::Instance()->GetPurkinjeSurfaceAreaToVolumeRatio();
     }
     // Create the junction stimuli, and associate them with the cells
-    std::shared_ptr<PurkinjeVentricularJunctionStimulus> p_pvj_ventricular_stim(new PurkinjeVentricularJunctionStimulus(resistance));
-    std::shared_ptr<PurkinjeVentricularJunctionStimulus> p_pvj_purkinje_stim(new PurkinjeVentricularJunctionStimulus(resistance));
+    boost::shared_ptr<PurkinjeVentricularJunctionStimulus> p_pvj_ventricular_stim(new PurkinjeVentricularJunctionStimulus(resistance));
+    boost::shared_ptr<PurkinjeVentricularJunctionStimulus> p_pvj_purkinje_stim(new PurkinjeVentricularJunctionStimulus(resistance));
     p_pvj_purkinje_stim->SetAppliedToPurkinjeCellModel();
     p_pvj_ventricular_stim->SetVentricularCellModel(pCardiacCell);
     p_pvj_ventricular_stim->SetPurkinjeCellModel(pPurkinjeCell);
@@ -150,12 +150,12 @@ void AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::CreateJunction(const No
     p_pvj_purkinje_stim->SetPurkinjeCellModel(pPurkinjeCell);
 
     // Create new combined stimuli which add the junction stimuli to those already in the cells
-    std::shared_ptr<MultiStimulus> p_multi_stim_ventricular(new MultiStimulus);
+    boost::shared_ptr<MultiStimulus> p_multi_stim_ventricular(new MultiStimulus);
     p_multi_stim_ventricular->AddStimulus(p_pvj_ventricular_stim);
     p_multi_stim_ventricular->AddStimulus(pCardiacCell->GetStimulusFunction());
     pCardiacCell->SetStimulusFunction(p_multi_stim_ventricular);
 
-    std::shared_ptr<MultiStimulus> p_multi_stim_purkinje(new MultiStimulus);
+    boost::shared_ptr<MultiStimulus> p_multi_stim_purkinje(new MultiStimulus);
     p_multi_stim_purkinje->AddStimulus(p_pvj_purkinje_stim);
     p_multi_stim_purkinje->AddStimulus(pPurkinjeCell->GetStimulusFunction());
     pPurkinjeCell->SetStimulusFunction(p_multi_stim_purkinje);

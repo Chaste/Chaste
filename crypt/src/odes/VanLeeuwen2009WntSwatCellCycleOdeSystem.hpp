@@ -189,7 +189,7 @@ private:
     double mXiC;
 
     /** The mutation state of the cell. */
-    std::shared_ptr<AbstractCellMutationState> mpMutationState;
+    boost::shared_ptr<AbstractCellMutationState> mpMutationState;
 
     /**
      * The hypothesis we are using
@@ -226,7 +226,7 @@ public:
      */
     VanLeeuwen2009WntSwatCellCycleOdeSystem(unsigned hypothesis,
                                             double wntLevel = 0.0,
-                                            std::shared_ptr<AbstractCellMutationState> pMutationState=std::shared_ptr<AbstractCellMutationState>(),
+                                            boost::shared_ptr<AbstractCellMutationState> pMutationState=boost::shared_ptr<AbstractCellMutationState>(),
                                             std::vector<double> stateVariables=std::vector<double>());
 
     /**
@@ -247,14 +247,14 @@ public:
      *
      * @param pMutationState the mutation state.
      */
-    void SetMutationState(std::shared_ptr<AbstractCellMutationState> pMutationState);
+    void SetMutationState(boost::shared_ptr<AbstractCellMutationState> pMutationState);
 
     /**
      * Called by the archive function on the Wnt cell-cycle model.
      *
      * @return #mpMutationState the mutation state of the cell.
      */
-    const std::shared_ptr<AbstractCellMutationState> GetMutationState() const;
+    const boost::shared_ptr<AbstractCellMutationState> GetMutationState() const;
 
     /**
      * Compute the RHS of the system of ODEs.
@@ -322,7 +322,7 @@ inline void save_construct_data(
     const double wnt_level = t->GetWntLevel();
     ar & wnt_level;
 
-    const std::shared_ptr<AbstractCellMutationState> p_mutation_state = t->GetMutationState();
+    const boost::shared_ptr<AbstractCellMutationState> p_mutation_state = t->GetMutationState();
     ar & p_mutation_state;
 
     const std::vector<double> state_variables = t->rGetConstStateVariables();
@@ -343,7 +343,7 @@ inline void load_construct_data(
     double wnt_level;
     ar & wnt_level;
 
-    std::shared_ptr<AbstractCellMutationState> p_mutation_state;
+    boost::shared_ptr<AbstractCellMutationState> p_mutation_state;
     ar & p_mutation_state;
 
     std::vector<double> state_variables;

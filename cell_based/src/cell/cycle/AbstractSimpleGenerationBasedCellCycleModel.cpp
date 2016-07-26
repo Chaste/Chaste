@@ -84,7 +84,7 @@ void AbstractSimpleGenerationBasedCellCycleModel::ResetForDivision()
          * would be incorrect. We must therefore access the CellProliferativeType via the cell's
          * CellPropertyCollection.
          */
-        std::shared_ptr<AbstractCellProperty> p_diff_type =
+        boost::shared_ptr<AbstractCellProperty> p_diff_type =
             mpCell->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<DifferentiatedCellProliferativeType>();
         mpCell->SetCellProliferativeType(p_diff_type);
     }
@@ -110,13 +110,13 @@ void AbstractSimpleGenerationBasedCellCycleModel::InitialiseDaughterCell()
      * In generation-based cell-cycle models, the daughter cell
      * is always of type transit or differentiated.
      */
-    std::shared_ptr<AbstractCellProperty> p_transit_type =
+    boost::shared_ptr<AbstractCellProperty> p_transit_type =
         mpCell->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<TransitCellProliferativeType>();
     mpCell->SetCellProliferativeType(p_transit_type);
 
     if (mGeneration > mMaxTransitGenerations)
     {
-        std::shared_ptr<AbstractCellProperty> p_diff_type =
+        boost::shared_ptr<AbstractCellProperty> p_diff_type =
             mpCell->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<DifferentiatedCellProliferativeType>();
         mpCell->SetCellProliferativeType(p_diff_type);
     }

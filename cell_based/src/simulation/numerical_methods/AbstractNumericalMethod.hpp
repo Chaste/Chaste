@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ABSTRACTNUMERICALMETHOD_HPP_
 #define ABSTRACTNUMERICALMETHOD_HPP_
 
-
+#include <boost/shared_ptr.hpp>
 #include "ChasteSerialization.hpp"
 #include "ClassIsAbstract.hpp"
 #include "Identifiable.hpp"
@@ -81,7 +81,7 @@ protected:
     AbstractOffLatticeCellPopulation<ELEMENT_DIM,SPACE_DIM>* mpCellPopulation;
 
     /** Pointer to the force collection to apply*/
-    std::vector<std::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > >* mpForceCollection;
+    std::vector<boost::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > >* mpForceCollection;
 
     /**
      * Whether the numerical method uses an adaptive time step.
@@ -164,7 +164,7 @@ public:
      *
      * @param pForces Pointer to the simulation's force collection
      */
-    void SetForceCollection(std::vector<std::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > >* pForces);
+    void SetForceCollection(std::vector<boost::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > >* pForces);
 
     /**
      * Set mUseAdaptiveTimestep.

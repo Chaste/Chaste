@@ -42,7 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/archive/text_iarchive.hpp>
 
 #include <fstream>
-
+#include <boost/shared_ptr.hpp>
 
 #include "VanLeeuwen2009WntSwatCellCycleModelHypothesisOne.hpp"
 #include "VanLeeuwen2009WntSwatCellCycleModelHypothesisTwo.hpp"
@@ -98,8 +98,8 @@ public:
 
         TS_ASSERT_EQUALS(p_cell_model->CanCellTerminallyDifferentiate(), false);
 
-        std::shared_ptr<AbstractCellMutationState> p_healthy_state(new WildTypeCellMutationState);
-        std::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
+        boost::shared_ptr<AbstractCellMutationState> p_healthy_state(new WildTypeCellMutationState);
+        boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
         CellPtr p_stem_cell(new Cell(p_healthy_state, p_cell_model));
         p_stem_cell->SetCellProliferativeType(p_stem_type);
         p_stem_cell->InitialiseCellCycleModel();
@@ -118,13 +118,13 @@ public:
          * (unless CVODE is used), so our results should be identical.
          */
 #ifdef CHASTE_CVODE
-        std::shared_ptr<CellCycleModelOdeSolver<WntCellCycleModel, CvodeAdaptor> >
+        boost::shared_ptr<CellCycleModelOdeSolver<WntCellCycleModel, CvodeAdaptor> >
             p_solver(CellCycleModelOdeSolver<WntCellCycleModel, CvodeAdaptor>::Instance());
         p_solver->Initialise();
         p_solver->CheckForStoppingEvents();
         p_solver->SetMaxSteps(10000);
 #else
-        std::shared_ptr<CellCycleModelOdeSolver<WntCellCycleModel, RungeKutta4IvpOdeSolver> >
+        boost::shared_ptr<CellCycleModelOdeSolver<WntCellCycleModel, RungeKutta4IvpOdeSolver> >
             p_solver(CellCycleModelOdeSolver<WntCellCycleModel, RungeKutta4IvpOdeSolver>::Instance());
         p_solver->Initialise();
 #endif //CHASTE_CVODE
@@ -231,8 +231,8 @@ public:
         p_cell_model->SetDimension(2);
 
         // Test that member variables are set correctly
-        std::shared_ptr<AbstractCellMutationState> p_healthy_state(new WildTypeCellMutationState);
-        std::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
+        boost::shared_ptr<AbstractCellMutationState> p_healthy_state(new WildTypeCellMutationState);
+        boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
         CellPtr p_stem_cell(new Cell(p_healthy_state, p_cell_model));
         p_stem_cell->SetCellProliferativeType(p_stem_type);
         p_stem_cell->InitialiseCellCycleModel();
@@ -465,8 +465,8 @@ public:
         VanLeeuwen2009WntSwatCellCycleModelHypothesisTwo* p_cell_model = new VanLeeuwen2009WntSwatCellCycleModelHypothesisTwo();
         p_cell_model->SetDimension(2);
 
-        std::shared_ptr<AbstractCellMutationState> p_healthy_state(new WildTypeCellMutationState);
-        std::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
+        boost::shared_ptr<AbstractCellMutationState> p_healthy_state(new WildTypeCellMutationState);
+        boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
         CellPtr p_stem_cell(new Cell(p_healthy_state, p_cell_model));
         p_stem_cell->SetCellProliferativeType(p_stem_type);
         p_stem_cell->InitialiseCellCycleModel();
@@ -534,8 +534,8 @@ public:
         WntCellCycleModel* p_cell_model = new WntCellCycleModel();
         p_cell_model->SetDimension(2);
 
-        std::shared_ptr<AbstractCellMutationState> p_healthy_state(new WildTypeCellMutationState);
-        std::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
+        boost::shared_ptr<AbstractCellMutationState> p_healthy_state(new WildTypeCellMutationState);
+        boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
 
         CellPtr p_stem_cell(new Cell(p_healthy_state, p_cell_model));
         p_stem_cell->SetCellProliferativeType(p_stem_type);
@@ -548,7 +548,7 @@ public:
         WntCellCycleModel* p_cell_model_1 = new WntCellCycleModel();
         p_cell_model_1->SetDimension(2);
 
-        std::shared_ptr<AbstractCellMutationState> p_mutation(new ApcOneHitCellMutationState);
+        boost::shared_ptr<AbstractCellMutationState> p_mutation(new ApcOneHitCellMutationState);
 
         CellPtr p_stem_cell_1(new Cell(p_mutation, p_cell_model_1));
         p_stem_cell_1->SetCellProliferativeType(p_stem_type);
@@ -602,8 +602,8 @@ public:
         WntCellCycleModel* p_cell_model = new WntCellCycleModel();
         p_cell_model->SetDimension(2);
 
-        std::shared_ptr<AbstractCellMutationState> p_mutation(new BetaCateninOneHitCellMutationState);
-        std::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
+        boost::shared_ptr<AbstractCellMutationState> p_mutation(new BetaCateninOneHitCellMutationState);
+        boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
 
         CellPtr p_stem_cell(new Cell(p_mutation, p_cell_model));
         p_stem_cell->SetCellProliferativeType(p_stem_type);
@@ -666,8 +666,8 @@ public:
         WntCellCycleModel* p_cell_model_1 = new WntCellCycleModel();
         p_cell_model_1->SetDimension(2);
 
-        std::shared_ptr<AbstractCellMutationState> p_mutation(new ApcTwoHitCellMutationState);
-        std::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
+        boost::shared_ptr<AbstractCellMutationState> p_mutation(new ApcTwoHitCellMutationState);
+        boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
 
         CellPtr p_stem_cell_1(new Cell(p_mutation, p_cell_model_1));
         p_stem_cell_1->SetCellProliferativeType(p_stem_type);
@@ -731,8 +731,8 @@ public:
         WntCellCycleModel* p_cell_model_1 = new WntCellCycleModel();
         p_cell_model_1->SetDimension(2);
 
-        std::shared_ptr<AbstractCellMutationState> p_healthy_state(new WildTypeCellMutationState);
-        std::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
+        boost::shared_ptr<AbstractCellMutationState> p_healthy_state(new WildTypeCellMutationState);
+        boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
 
         CellPtr p_stem_cell_1(new Cell(p_healthy_state, p_cell_model_1));
         p_stem_cell_1->SetCellProliferativeType(p_stem_type);
@@ -795,8 +795,8 @@ public:
         StochasticWntCellCycleModel* p_cell_model = new StochasticWntCellCycleModel();
         p_cell_model->SetDimension(2);
 
-        std::shared_ptr<AbstractCellMutationState> p_healthy_state(new WildTypeCellMutationState);
-        std::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
+        boost::shared_ptr<AbstractCellMutationState> p_healthy_state(new WildTypeCellMutationState);
+        boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
 
         CellPtr p_stem_cell(new Cell(p_healthy_state, p_cell_model));
         p_stem_cell->SetCellProliferativeType(p_stem_type);
@@ -860,8 +860,8 @@ public:
             WntCellCycleModel* p_cell_model = new WntCellCycleModel();
             p_cell_model->SetDimension(3);
 
-            std::shared_ptr<AbstractCellMutationState> p_healthy_state(new WildTypeCellMutationState);
-            std::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
+            boost::shared_ptr<AbstractCellMutationState> p_healthy_state(new WildTypeCellMutationState);
+            boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
 
             CellPtr p_stem_cell(new Cell(p_healthy_state, p_cell_model));
             p_stem_cell->SetCellProliferativeType(p_stem_type);
@@ -938,8 +938,8 @@ public:
             AbstractVanLeeuwen2009WntSwatCellCycleModel* p_cell_model = new VanLeeuwen2009WntSwatCellCycleModelHypothesisOne();
             p_cell_model->SetDimension(2);
 
-            std::shared_ptr<AbstractCellMutationState> p_healthy_state(new WildTypeCellMutationState);
-            std::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
+            boost::shared_ptr<AbstractCellMutationState> p_healthy_state(new WildTypeCellMutationState);
+            boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
 
             CellPtr p_stem_cell(new Cell(p_healthy_state, p_cell_model));
             p_stem_cell->SetCellProliferativeType(p_stem_type);
@@ -1011,8 +1011,8 @@ public:
             AbstractVanLeeuwen2009WntSwatCellCycleModel* p_cell_model = new VanLeeuwen2009WntSwatCellCycleModelHypothesisTwo();
             p_cell_model->SetDimension(2);
 
-            std::shared_ptr<AbstractCellMutationState> p_healthy_state(new WildTypeCellMutationState);
-            std::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
+            boost::shared_ptr<AbstractCellMutationState> p_healthy_state(new WildTypeCellMutationState);
+            boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
 
             CellPtr p_stem_cell(new Cell(p_healthy_state, p_cell_model));
             p_stem_cell->SetCellProliferativeType(p_stem_type);
@@ -1090,8 +1090,8 @@ public:
             StochasticWntCellCycleModel* p_stoc_model = new StochasticWntCellCycleModel();
             p_stoc_model->SetDimension(2);
 
-            std::shared_ptr<AbstractCellMutationState> p_healthy_state(new WildTypeCellMutationState);
-            std::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
+            boost::shared_ptr<AbstractCellMutationState> p_healthy_state(new WildTypeCellMutationState);
+            boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
 
             CellPtr p_stoc_cell(new Cell(p_healthy_state, p_stoc_model));
             p_stoc_cell->SetCellProliferativeType(p_stem_type);

@@ -76,14 +76,14 @@ public:
         double duration  = 1.0 ;  // ms
         double start = 50.0; // ms
         double period = 500; // ms
-        std::shared_ptr<RegularStimulus> p_stimulus(new RegularStimulus(magnitude, duration, period, start));
+        boost::shared_ptr<RegularStimulus> p_stimulus(new RegularStimulus(magnitude, duration, period, start));
 
         double end_time = 1000.0; //One second in milliseconds
 
 
         HeartConfig::Instance()->SetOdeTimeStep(0.002); // 0.005 leads to NaNs.
 
-        std::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
+        boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
         CellFoxModel2002FromCellML fox_ode_system(p_solver, p_stimulus);
 
         // Solve and write to file
@@ -136,15 +136,15 @@ public:
         double duration_stimulus = 1.0;  // ms
         double start_stimulus = 10.0;   // ms
         double period=1000;//here, this is ms
-        std::shared_ptr<RegularStimulus> p_stimulus(new RegularStimulus(magnitude_stimulus,
+        boost::shared_ptr<RegularStimulus> p_stimulus(new RegularStimulus(magnitude_stimulus,
                                                                           duration_stimulus,
                                                                           period,
                                                                           start_stimulus));
 
-        std::shared_ptr<EulerIvpOdeSolver> p_forward_solver(new EulerIvpOdeSolver); //define the solver
+        boost::shared_ptr<EulerIvpOdeSolver> p_forward_solver(new EulerIvpOdeSolver); //define the solver
 
         CellMahajan2008FromCellML forward_model(p_forward_solver, p_stimulus);
-        std::shared_ptr<BackwardEulerIvpOdeSolver> p_backward_solver(new BackwardEulerIvpOdeSolver(
+        boost::shared_ptr<BackwardEulerIvpOdeSolver> p_backward_solver(new BackwardEulerIvpOdeSolver(
                                     forward_model.GetNumberOfStateVariables()));
 
         CellMahajan2008FromCellML epicardial_model(p_backward_solver, p_stimulus);
@@ -237,10 +237,10 @@ public:
         double magnitude = -38.0;   // pA/pF
         double duration = 1.0;  // ms
         double start = 100;   // ms
-        std::shared_ptr<SimpleStimulus> p_stimulus(new SimpleStimulus(magnitude,
+        boost::shared_ptr<SimpleStimulus> p_stimulus(new SimpleStimulus(magnitude,
                                                                         duration,
                                                                         start));
-        std::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver); //define the solver
+        boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver); //define the solver
         HeartConfig::Instance()->SetOdeTimeStep(0.001);// with Forward Euler, this must be as small as 0.001.
 
 
@@ -335,12 +335,12 @@ public:
     void TestScaleFactorsMaleckar(void) throw (Exception)
     {
         double end_time =500;
-        std::shared_ptr<RegularStimulus> p_stimulus(new RegularStimulus(-5.6,
+        boost::shared_ptr<RegularStimulus> p_stimulus(new RegularStimulus(-5.6,
                                                                           6,
                                                                           1000,
                                                                           4.0));
 
-        std::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver); //define the solver
+        boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver); //define the solver
         HeartConfig::Instance()->SetOdeTimeStep(0.001);
         CellMaleckar2008FromCellML atrial_ode_system(p_solver, p_stimulus);
 

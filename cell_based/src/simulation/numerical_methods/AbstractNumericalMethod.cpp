@@ -81,7 +81,7 @@ void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::SetCellPopulation(AbstractO
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::SetForceCollection(std::vector<std::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > >* pForces)
+void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::SetForceCollection(std::vector<boost::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > >* pForces)
 {
     mpForceCollection = pForces;
 }
@@ -109,7 +109,7 @@ std::vector<c_vector<double, SPACE_DIM> > AbstractNumericalMethod<ELEMENT_DIM,SP
         node_iter->ClearAppliedForce();
     }
     
-    for (typename std::vector<std::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > >::iterator iter = mpForceCollection->begin();
+    for (typename std::vector<boost::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > >::iterator iter = mpForceCollection->begin();
         iter != mpForceCollection->end(); ++iter)
     {
         (*iter)->AddForceContribution(*mpCellPopulation);

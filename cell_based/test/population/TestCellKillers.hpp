@@ -298,7 +298,7 @@ public:
         // Check that a single cell reaches apoptosis
         TS_ASSERT_EQUALS((*r_cells.begin())->HasApoptosisBegun(), false);
 
-        std::shared_ptr<AbstractCellProperty> p_apoptotic_state(CellPropertyRegistry::Instance()->Get<ApoptoticCellProperty>());
+        boost::shared_ptr<AbstractCellProperty> p_apoptotic_state(CellPropertyRegistry::Instance()->Get<ApoptoticCellProperty>());
         (*r_cells.begin())->AddCellProperty(p_apoptotic_state);
         oxygen_based_cell_killer.CheckAndLabelCellsForApoptosisOrDeath();
 
@@ -509,7 +509,7 @@ public:
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Label cells 0 and 1 (which are neighbours) and 3 (which is isolated
-        std::shared_ptr<AbstractCellProperty> p_label(cell_population.GetCellPropertyRegistry()->Get<CellLabel>());
+        boost::shared_ptr<AbstractCellProperty> p_label(cell_population.GetCellPropertyRegistry()->Get<CellLabel>());
         cell_population.GetCellUsingLocationIndex(0)->AddCellProperty(p_label);
         cell_population.GetCellUsingLocationIndex(1)->AddCellProperty(p_label);
         cell_population.GetCellUsingLocationIndex(3)->AddCellProperty(p_label);

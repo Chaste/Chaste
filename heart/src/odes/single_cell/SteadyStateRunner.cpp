@@ -40,7 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 void SteadyStateRunner::RunToSteadyStateImplementation()
 {
     // Get necessary things from stimulus current
-    std::shared_ptr<RegularStimulus> p_reg_stim =
+    boost::shared_ptr<RegularStimulus> p_reg_stim =
                          boost::static_pointer_cast<RegularStimulus>(mpModel->GetStimulusFunction());
     const double pacing_cycle_length = p_reg_stim->GetPeriod(); //ms
     double maximum_time_step = p_reg_stim->GetDuration();  // ms

@@ -48,7 +48,7 @@ class SmallBenchmarkStimulusHeartCellFactory : public AbstractCardiacCellFactory
 {
 
 private:
-    std::shared_ptr<SimpleStimulus> mpStimulus;
+    boost::shared_ptr<SimpleStimulus> mpStimulus;
 
 public:
     SmallBenchmarkStimulusHeartCellFactory()

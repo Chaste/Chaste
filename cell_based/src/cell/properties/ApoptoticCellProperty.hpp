@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef APOPTOTICCELLPROPERTY_HPP_
 #define APOPTOTICCELLPROPERTY_HPP_
 
-
+#include <boost/shared_ptr.hpp>
 #include "AbstractCellProperty.hpp"
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>

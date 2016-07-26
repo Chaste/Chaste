@@ -440,7 +440,7 @@ public:
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // For coverage, label one cell
-        std::shared_ptr<AbstractCellProperty> p_label(cell_population.GetCellPropertyRegistry()->Get<CellLabel>());
+        boost::shared_ptr<AbstractCellProperty> p_label(cell_population.GetCellPropertyRegistry()->Get<CellLabel>());
         cell_population.GetCellUsingLocationIndex(0)->AddCellProperty(p_label);
 
         TS_ASSERT_EQUALS(cell_population.GetIdentifier(), "PottsBasedCellPopulation-2");
@@ -594,7 +594,7 @@ public:
         cell_population.AddUpdateRule(p_volume_constraint_update_rule);
 
         // Check the update rules are correct
-        std::vector<std::shared_ptr<AbstractPottsUpdateRule<2> > > update_rule_collection = cell_population.rGetUpdateRuleCollection();
+        std::vector<boost::shared_ptr<AbstractPottsUpdateRule<2> > > update_rule_collection = cell_population.rGetUpdateRuleCollection();
         TS_ASSERT_EQUALS(update_rule_collection.size(),1u);
         TS_ASSERT_EQUALS((*update_rule_collection[0]).GetIdentifier(), "VolumeConstraintPottsUpdateRule-2");
     }
@@ -687,7 +687,7 @@ public:
             TS_ASSERT_EQUALS(p_static_population->GetIterateRandomlyOverUpdateRuleCollection(), true);
 
             // Test that the update rule has been archived correctly
-            std::vector<std::shared_ptr<AbstractPottsUpdateRule<2> > > update_rule_collection = p_static_population->rGetUpdateRuleCollection();
+            std::vector<boost::shared_ptr<AbstractPottsUpdateRule<2> > > update_rule_collection = p_static_population->rGetUpdateRuleCollection();
             TS_ASSERT_EQUALS(update_rule_collection.size(), 1u);
             TS_ASSERT_EQUALS((*update_rule_collection[0]).GetIdentifier(), "VolumeConstraintPottsUpdateRule-2");
 

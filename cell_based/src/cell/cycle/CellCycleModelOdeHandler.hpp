@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CELLCYCLEMODELODEHANDLER_HPP_
 #define CELLCYCLEMODELODEHANDLER_HPP_
 
-
+#include <boost/shared_ptr.hpp>
 #include <boost/noncopyable.hpp>
 
 #include "ChasteSerialization.hpp"
@@ -100,7 +100,7 @@ protected:
     AbstractOdeSystem* mpOdeSystem;
 
     /** A shared pointer to an ODE solver object. */
-    std::shared_ptr<AbstractCellCycleModelOdeSolver> mpOdeSolver;
+    boost::shared_ptr<AbstractCellCycleModelOdeSolver> mpOdeSolver;
 
     /** The last time the ODE system was evaluated. */
     double mLastTime;
@@ -136,7 +136,7 @@ public:
      * @param pOdeSolver An optional pointer to a cell-cycle model ODE solver object (allows the use of different ODE solvers)
      */
     CellCycleModelOdeHandler(double lastTime = SimulationTime::Instance()->GetTime(),
-                             std::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver = std::shared_ptr<AbstractCellCycleModelOdeSolver>());
+                             boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver = boost::shared_ptr<AbstractCellCycleModelOdeSolver>());
 
     /**
      * Destructor.
@@ -158,7 +158,7 @@ public:
     /**
      * @return mpOdeSolver
      */
-    const std::shared_ptr<AbstractCellCycleModelOdeSolver> GetOdeSolver() const;
+    const boost::shared_ptr<AbstractCellCycleModelOdeSolver> GetOdeSolver() const;
 
     /**
      * Set mLastTime.

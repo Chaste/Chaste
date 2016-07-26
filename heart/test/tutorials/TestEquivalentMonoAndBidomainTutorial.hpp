@@ -98,12 +98,12 @@ class PointStimulus2dCellFactory : public AbstractCardiacCellFactory<2>
 {
 ///* Declare (smart) pointer to a {{{SimpleStimulus}}} for the cell which is stimulated.
 // * Note that {{{AbstractCardiacCellFactory}}} also has as protected members: {{{mpZeroStimulus}}}
-// * of type {{{std::shared_ptr<ZeroStimulus>}}}; {{{mpMesh}}}, a pointer to the mesh used (the problem
+// * of type {{{boost::shared_ptr<ZeroStimulus>}}}; {{{mpMesh}}}, a pointer to the mesh used (the problem
 // * class will set this before it calls {{{CreateCardiacCellForTissueNode}}}, so it can be used
-// * in that method); {{{mTimestep}}}, a double (see below); and {{{std::shared_ptr<mpSolver>}}}
+// * in that method); {{{mTimestep}}}, a double (see below); and {{{boost::shared_ptr<mpSolver>}}}
 // * a forward euler ode solver (see below). */
 private:
-    std::shared_ptr<SimpleStimulus> mpStimulus;
+    boost::shared_ptr<SimpleStimulus> mpStimulus;
 
 public:
     // Our contructor takes in nothing. It calls the constructor of {{{AbstractCardiacCellFactory}}}

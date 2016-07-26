@@ -58,12 +58,12 @@ public:
         double magnitude_stimulus = 0.0;  // uA/cm2
         double duration_stimulus = 0.;  // ms
         double start_stimulus = 0.0;   // ms
-        std::shared_ptr<SimpleStimulus> p_stimulus(new SimpleStimulus(
+        boost::shared_ptr<SimpleStimulus> p_stimulus(new SimpleStimulus(
                 magnitude_stimulus,
                 duration_stimulus,
                 start_stimulus));
 
-        std::shared_ptr<AbstractIvpOdeSolver> p_solver; // We don't actually need a solver
+        boost::shared_ptr<AbstractIvpOdeSolver> p_solver; // We don't actually need a solver
 
         CellHodgkinHuxley1952FromCellML hh52_ode_system(p_solver, p_stimulus);
 

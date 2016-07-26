@@ -107,10 +107,10 @@ public:
      * @param voltageIndex  The index of the variable which represents membrane voltage.
      * @param pIntracellularStimulus  The intracellular stimulus function.
      */
-    AbstractCvodeCellWithDataClamp(std::shared_ptr<AbstractIvpOdeSolver> pSolver,
+    AbstractCvodeCellWithDataClamp(boost::shared_ptr<AbstractIvpOdeSolver> pSolver,
                                    unsigned numberOfStateVariables,
                                    unsigned voltageIndex,
-                                   std::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus);
+                                   boost::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus);
 
     /**
      * Destructor: free any memory we've used.

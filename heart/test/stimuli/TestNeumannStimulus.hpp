@@ -79,7 +79,7 @@ public:
         HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1*1.75/0.0005);
 
         // create boundary conditions container
-        std::shared_ptr<BoundaryConditionsContainer<1,1,1> > p_bcc(new BoundaryConditionsContainer<1,1,1>);
+        boost::shared_ptr<BoundaryConditionsContainer<1,1,1> > p_bcc(new BoundaryConditionsContainer<1,1,1>);
         ConstBoundaryCondition<1>* p_bc_stim = new ConstBoundaryCondition<1>(2*1.75/0.0005);
 
         // get mesh
@@ -131,7 +131,7 @@ public:
         HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1*1.75/0.0005);
 
         // create boundary conditions container
-        std::shared_ptr<BoundaryConditionsContainer<1,1,1> > p_bcc(new BoundaryConditionsContainer<1,1,1>);
+        boost::shared_ptr<BoundaryConditionsContainer<1,1,1> > p_bcc(new BoundaryConditionsContainer<1,1,1>);
         SimpleStimulus stim(4*1.75/0.0005, 0.5);
         StimulusBoundaryCondition<1>* p_bc_stim = new StimulusBoundaryCondition<1>(&stim);
 

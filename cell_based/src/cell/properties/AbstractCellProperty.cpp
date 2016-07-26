@@ -54,7 +54,7 @@ bool AbstractCellProperty::IsSame(const AbstractCellProperty* pOther) const
     return r_our_info == r_their_info;
 }
 
-bool AbstractCellProperty::IsSame(std::shared_ptr<const AbstractCellProperty> pOther) const
+bool AbstractCellProperty::IsSame(boost::shared_ptr<const AbstractCellProperty> pOther) const
 {
     return IsSame(pOther.get());
 }

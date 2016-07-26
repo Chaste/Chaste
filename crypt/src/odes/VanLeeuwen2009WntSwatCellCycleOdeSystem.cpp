@@ -42,7 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 VanLeeuwen2009WntSwatCellCycleOdeSystem::VanLeeuwen2009WntSwatCellCycleOdeSystem(unsigned hypothesis,
                                                                                  double wntLevel,
-                                                                                 std::shared_ptr<AbstractCellMutationState> pMutationState,
+                                                                                 boost::shared_ptr<AbstractCellMutationState> pMutationState,
                                                                                  std::vector<double> stateVariables)
     : AbstractOdeSystem(22),
       mpMutationState(pMutationState),
@@ -155,7 +155,7 @@ VanLeeuwen2009WntSwatCellCycleOdeSystem::VanLeeuwen2009WntSwatCellCycleOdeSystem
     }
 }
 
-void VanLeeuwen2009WntSwatCellCycleOdeSystem::SetMutationState(std::shared_ptr<AbstractCellMutationState> pMutationState)
+void VanLeeuwen2009WntSwatCellCycleOdeSystem::SetMutationState(boost::shared_ptr<AbstractCellMutationState> pMutationState)
 {
     mpMutationState = pMutationState;
 }
@@ -371,7 +371,7 @@ void VanLeeuwen2009WntSwatCellCycleOdeSystem::EvaluateYDerivatives(double time, 
     rDY[21] = 0.0;  // don't interfere with Wnt stimulus
 }
 
-const std::shared_ptr<AbstractCellMutationState> VanLeeuwen2009WntSwatCellCycleOdeSystem::GetMutationState() const
+const boost::shared_ptr<AbstractCellMutationState> VanLeeuwen2009WntSwatCellCycleOdeSystem::GetMutationState() const
 {
     return mpMutationState;
 }

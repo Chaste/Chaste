@@ -81,9 +81,9 @@ private:
     c_vector<double,DIM> mX;
 
 public :
-    ToyCellModel(std::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus,
+    ToyCellModel(boost::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus,
                  c_vector<double,DIM> x)
-        : AbstractCardiacCell(std::shared_ptr<AbstractIvpOdeSolver>(),
+        : AbstractCardiacCell(boost::shared_ptr<AbstractIvpOdeSolver>(),
                               1, 0, pIntracellularStimulus)
     {
         mX = x;
@@ -186,7 +186,7 @@ public:
     {
         c_vector<double,DIM> x = pNode->rGetLocation();
 
-        std::shared_ptr<PositionDependentStimulus<DIM> >
+        boost::shared_ptr<PositionDependentStimulus<DIM> >
             p_stimulus(new PositionDependentStimulus<DIM>(x));
 
         ToyCellModel<DIM>* p_cell_model = new ToyCellModel<DIM>(p_stimulus, x);

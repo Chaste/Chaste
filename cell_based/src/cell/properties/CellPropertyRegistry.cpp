@@ -49,7 +49,7 @@ CellPropertyRegistry* CellPropertyRegistry::Instance()
     return mpInstance;
 }
 
-const std::vector<std::shared_ptr<AbstractCellProperty> >& CellPropertyRegistry::rGetAllCellProperties()
+const std::vector<boost::shared_ptr<AbstractCellProperty> >& CellPropertyRegistry::rGetAllCellProperties()
 {
     return mCellProperties;
 }
@@ -71,17 +71,17 @@ CellPropertyRegistry* CellPropertyRegistry::TakeOwnership()
     return this;
 }
 
-void CellPropertyRegistry::SpecifyOrdering(const std::vector<std::shared_ptr<AbstractCellProperty> >& rOrdering)
+void CellPropertyRegistry::SpecifyOrdering(const std::vector<boost::shared_ptr<AbstractCellProperty> >& rOrdering)
 {
     if (mOrderingHasBeenSpecified)
     {
         EXCEPTION("An ordering has already been specified.");
     }
 
-    std::vector<std::shared_ptr<AbstractCellProperty> > temp_vector = rOrdering;
+    std::vector<boost::shared_ptr<AbstractCellProperty> > temp_vector = rOrdering;
     for (unsigned i=0; i<mCellProperties.size(); i++)
     {
-        std::vector<std::shared_ptr<AbstractCellProperty> >::const_iterator it
+        std::vector<boost::shared_ptr<AbstractCellProperty> >::const_iterator it
             = find(rOrdering.begin(), rOrdering.end(), mCellProperties[i]);
         if (it == rOrdering.end())
         {

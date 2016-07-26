@@ -39,7 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 
 AbstractOdeBasedPhaseBasedCellCycleModel::AbstractOdeBasedPhaseBasedCellCycleModel(double lastTime,
-                                                               std::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
+                                                               boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
     : CellCycleModelOdeHandler(lastTime, pOdeSolver),
       mDivideTime(lastTime),
       mG2PhaseStartTime(DBL_MAX)

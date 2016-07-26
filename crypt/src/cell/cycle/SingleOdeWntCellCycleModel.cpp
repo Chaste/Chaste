@@ -38,11 +38,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TransitCellProliferativeType.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 
-SingleOdeWntCellCycleModel::SingleOdeWntCellCycleModel(std::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
+SingleOdeWntCellCycleModel::SingleOdeWntCellCycleModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
     : CellCycleModelOdeHandler(DOUBLE_UNSET, pOdeSolver),
       mBetaCateninDivisionThreshold(100)// MAGIC NUMBER!
 {
-    if (mpOdeSolver == std::shared_ptr<AbstractCellCycleModelOdeSolver>())
+    if (mpOdeSolver == boost::shared_ptr<AbstractCellCycleModelOdeSolver>())
     {
 #ifdef CHASTE_CVODE
         mpOdeSolver = CellCycleModelOdeSolver<SingleOdeWntCellCycleModel, CvodeAdaptor>::Instance();
@@ -144,13 +144,13 @@ void SingleOdeWntCellCycleModel::ChangeCellProliferativeTypeDueToCurrentBetaCate
          * would be incorrect. We must therefore access the CellProliferativeType via the cell's
          * CellPropertyCollection.
          */
-        std::shared_ptr<AbstractCellProperty> p_diff_type =
+        boost::shared_ptr<AbstractCellProperty> p_diff_type =
             mpCell->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<DifferentiatedCellProliferativeType>();
         mpCell->SetCellProliferativeType(p_diff_type);
     }
     else
     {
-        std::shared_ptr<AbstractCellProperty> p_transit_type =
+        boost::shared_ptr<AbstractCellProperty> p_transit_type =
             mpCell->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<TransitCellProliferativeType>();
         mpCell->SetCellProliferativeType(p_transit_type);
     }

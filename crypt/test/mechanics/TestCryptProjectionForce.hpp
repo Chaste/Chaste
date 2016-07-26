@@ -90,8 +90,8 @@ public:
 
         // Create some cells
         std::vector<CellPtr> cells;
-        std::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
-        std::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
+        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+        boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
@@ -269,8 +269,8 @@ public:
 
         // Create some cells
         std::vector<CellPtr> cells;
-        std::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
-        std::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
+        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+        boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
@@ -349,8 +349,8 @@ public:
             SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0,1);
 
             std::vector<CellPtr> cells;
-            std::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
-            std::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
+            boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+            boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
 
             for (unsigned i=0; i<mesh.GetNumNodes(); i++)
             {
@@ -409,9 +409,9 @@ private:
     void SetUpCellsForTestForceCollection(std::vector<CellPtr>& rCells,
                                           std::vector<unsigned>& rLocationIndices)
     {
-        std::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
-        std::shared_ptr<AbstractCellMutationState> p_apc2(new ApcTwoHitCellMutationState);
-        std::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
+        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+        boost::shared_ptr<AbstractCellMutationState> p_apc2(new ApcTwoHitCellMutationState);
+        boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
 
         for (unsigned i=0; i<rLocationIndices.size(); i++)
         {

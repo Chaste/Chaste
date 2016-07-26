@@ -82,7 +82,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class BenchmarkCellFactory : public AbstractCardiacCellFactory<3>
 {
 private:
-    std::shared_ptr<SimpleStimulus> mpStimulus;
+    boost::shared_ptr<SimpleStimulus> mpStimulus;
 
 public:
     BenchmarkCellFactory()

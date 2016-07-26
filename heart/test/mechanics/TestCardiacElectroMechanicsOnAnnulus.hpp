@@ -62,7 +62,7 @@ double LinearPressureFunction(double t)
 class PointStimulus2dCellFactory : public AbstractCardiacCellFactory<2>
 {
 private:
-    std::shared_ptr<SimpleStimulus> mpStimulus;
+    boost::shared_ptr<SimpleStimulus> mpStimulus;
 
 public:
     PointStimulus2dCellFactory()

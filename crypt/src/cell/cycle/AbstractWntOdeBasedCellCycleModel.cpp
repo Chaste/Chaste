@@ -35,7 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractWntOdeBasedCellCycleModel.hpp"
 #include "Exception.hpp"
 
-AbstractWntOdeBasedCellCycleModel::AbstractWntOdeBasedCellCycleModel(std::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
+AbstractWntOdeBasedCellCycleModel::AbstractWntOdeBasedCellCycleModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
     : AbstractOdeBasedPhaseBasedCellCycleModel(SimulationTime::Instance()->GetTime(), pOdeSolver)
 {
 }

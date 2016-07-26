@@ -159,9 +159,9 @@ void ElectrodesStimulusFactory<DIM>::SetCompatibleExtracellularStimulus()
 }
 
 template<unsigned DIM>
-std::shared_ptr<AbstractStimulusFunction> ElectrodesStimulusFactory<DIM>::CreateStimulusForNode(Node<DIM>* pNode)
+boost::shared_ptr<AbstractStimulusFunction> ElectrodesStimulusFactory<DIM>::CreateStimulusForNode(Node<DIM>* pNode)
 {
-    std::shared_ptr<RegularStimulus> p_stimulus;
+    boost::shared_ptr<RegularStimulus> p_stimulus;
     for (unsigned pair_index = 0; pair_index < mrElectrodePairs.size(); pair_index++)
     {
         if (mrElectrodePairs[pair_index].first->DoesContain(pNode->GetPoint()) )

@@ -41,7 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ClassIsAbstract.hpp"
 #include "ChasteSerializationVersion.hpp"
 #include <boost/serialization/base_object.hpp>
-
+#include <boost/shared_ptr.hpp>
 
 #include "ChastePoint.hpp"
 

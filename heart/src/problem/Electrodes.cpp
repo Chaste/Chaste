@@ -132,7 +132,7 @@ Electrodes<DIM>::Electrodes(AbstractTetrahedralMesh<DIM,DIM>& rMesh)
 
 
 template<unsigned DIM>
-std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,2> > Electrodes<DIM>::GetBoundaryConditionsContainer()
+boost::shared_ptr<BoundaryConditionsContainer<DIM,DIM,2> > Electrodes<DIM>::GetBoundaryConditionsContainer()
 {
     //assert(mAreActive);
     return mpBoundaryConditionsContainer;

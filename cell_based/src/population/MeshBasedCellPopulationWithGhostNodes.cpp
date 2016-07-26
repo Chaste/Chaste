@@ -264,7 +264,7 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::AcceptCellWritersAcrossPopulati
         // If it isn't a ghost node then there might be cell writers attached
         if (! this->IsGhostNode(node_iter->GetIndex()))
         {
-            for (typename std::vector<std::shared_ptr<AbstractCellWriter<DIM, DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
+            for (typename std::vector<boost::shared_ptr<AbstractCellWriter<DIM, DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
                  cell_writer_iter != this->mCellWriters.end();
                  ++cell_writer_iter)
             {
@@ -352,7 +352,7 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::WriteVtkResultsToFile(const std
 
         // Iterate over any cell writers that are present
         unsigned num_vtk_cells = this->mpVoronoiTessellation->GetNumElements();
-        for (typename std::vector<std::shared_ptr<AbstractCellWriter<DIM, DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
+        for (typename std::vector<boost::shared_ptr<AbstractCellWriter<DIM, DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
              cell_writer_iter != this->mCellWriters.end();
              ++cell_writer_iter)
         {

@@ -236,7 +236,7 @@ public:
 
         // create boundary conditions container
         double boundary_val = 1.0;
-        std::shared_ptr<BoundaryConditionsContainer<1,1,2> > p_bcc(new BoundaryConditionsContainer<1,1,2>);
+        boost::shared_ptr<BoundaryConditionsContainer<1,1,2> > p_bcc(new BoundaryConditionsContainer<1,1,2>);
         ConstBoundaryCondition<1>* p_bc_stim = new ConstBoundaryCondition<1>(boundary_val);
         ConstBoundaryCondition<1>* p_zero_stim = new ConstBoundaryCondition<1>(0.0);
 
@@ -791,7 +791,7 @@ public:
             }
 
             // We can get away with the following line only because this is a friend class and test.
-            std::shared_ptr<Electrodes<2> > p_electrodes = static_cast<BidomainWithBathProblem<2>* >(p_abstract_problem)->mpElectrodes;
+            boost::shared_ptr<Electrodes<2> > p_electrodes = static_cast<BidomainWithBathProblem<2>* >(p_abstract_problem)->mpElectrodes;
 
             TS_ASSERT_EQUALS(p_electrodes->mAreActive, false); // should be switched off by now..
             TS_ASSERT_EQUALS(ap_triggered, true);
@@ -868,7 +868,7 @@ public:
             }
 
             // We can get away with the following line only because this is a friend class and test.
-            std::shared_ptr<Electrodes<2> > p_electrodes = static_cast<BidomainWithBathProblem<2>* >(p_abstract_problem)->mpElectrodes;
+            boost::shared_ptr<Electrodes<2> > p_electrodes = static_cast<BidomainWithBathProblem<2>* >(p_abstract_problem)->mpElectrodes;
 
             TS_ASSERT_EQUALS(p_electrodes->mAreActive, false); // should be switched off by now..
             TS_ASSERT_EQUALS(ap_triggered, true);

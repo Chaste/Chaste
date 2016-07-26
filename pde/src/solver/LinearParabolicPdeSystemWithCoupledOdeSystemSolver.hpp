@@ -46,7 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Warnings.hpp"
 #include "VtkMeshWriter.hpp"
 
-
+#include <boost/shared_ptr.hpp>
 
 /**
  * A class for solving systems of parabolic PDEs and ODEs, which may be coupled
@@ -77,7 +77,7 @@ private:
     std::vector<double> mInterpolatedOdeStateVariables;
 
     /** The ODE solver. */
-    std::shared_ptr<AbstractIvpOdeSolver> mpOdeSolver;
+    boost::shared_ptr<AbstractIvpOdeSolver> mpOdeSolver;
 
     /**
      * A sampling timestep for writing results to file. Set to
@@ -188,7 +188,7 @@ public:
                                                        AbstractLinearParabolicPdeSystemForCoupledOdeSystem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>* pPdeSystem,
                                                        BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>* pBoundaryConditions,
                                                        std::vector<AbstractOdeSystemForCoupledPdeSystem*> odeSystemsAtNodes=std::vector<AbstractOdeSystemForCoupledPdeSystem*>(),
-                                                       std::shared_ptr<AbstractIvpOdeSolver> pOdeSolver=std::shared_ptr<AbstractIvpOdeSolver>());
+                                                       boost::shared_ptr<AbstractIvpOdeSolver> pOdeSolver=boost::shared_ptr<AbstractIvpOdeSolver>());
 
     /**
      * Destructor.
@@ -372,7 +372,7 @@ LinearParabolicPdeSystemWithCoupledOdeSystemSolver<ELEMENT_DIM, SPACE_DIM, PROBL
         AbstractLinearParabolicPdeSystemForCoupledOdeSystem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>* pPdeSystem,
         BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>* pBoundaryConditions,
         std::vector<AbstractOdeSystemForCoupledPdeSystem*> odeSystemsAtNodes,
-        std::shared_ptr<AbstractIvpOdeSolver> pOdeSolver)
+        boost::shared_ptr<AbstractIvpOdeSolver> pOdeSolver)
     : AbstractAssemblerSolverHybrid<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, NORMAL>(pMesh, pBoundaryConditions),
       AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>(pMesh),
       mpMesh(pMesh),

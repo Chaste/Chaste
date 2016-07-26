@@ -41,7 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 #include <set>
 #include <map>
-
+#include <boost/shared_ptr.hpp>
 
 #include "UblasVectorInclude.hpp"
 
@@ -174,7 +174,7 @@ private:
      *
      * @param pResumeParameters  the parameters containing the ResumeSimulation element.
      */
-    void UpdateParametersFromResumeSimulation(std::shared_ptr<cp::chaste_parameters_type> pResumeParameters);
+    void UpdateParametersFromResumeSimulation(boost::shared_ptr<cp::chaste_parameters_type> pResumeParameters);
 
 public:
     /**
@@ -252,7 +252,7 @@ public:
      * @param rFileName  Name of XML file
      * @return a pointer to the parameters in a convenience class created by CodeSynthesis XSD
      */
-    std::shared_ptr<cp::chaste_parameters_type> ReadFile(const std::string& rFileName);
+    boost::shared_ptr<cp::chaste_parameters_type> ReadFile(const std::string& rFileName);
 
     /**
      * Throw away the current instance by resetting auto_ptr #mpInstance to nullptr.
@@ -329,7 +329,7 @@ public:
      * @param rIonicModels vector of models (one per cellular heterogeneity)
      */
     template<unsigned DIM>
-    void GetIonicModelRegions(std::vector<std::shared_ptr<AbstractChasteRegion<DIM> > >& rDefinedRegions,
+    void GetIonicModelRegions(std::vector<boost::shared_ptr<AbstractChasteRegion<DIM> > >& rDefinedRegions,
                               std::vector<cp::ionic_model_selection_type>& rIonicModels) const;
 
     /**
@@ -381,8 +381,8 @@ public:
      * \todo There is no set method
      */
     template<unsigned DIM>
-    void GetStimuli(std::vector<std::shared_ptr<AbstractStimulusFunction> >& rStimuliApplied,
-                    std::vector<std::shared_ptr<AbstractChasteRegion<DIM> > >& rStimulatedAreas) const;
+    void GetStimuli(std::vector<boost::shared_ptr<AbstractStimulusFunction> >& rStimuliApplied,
+                    std::vector<boost::shared_ptr<AbstractChasteRegion<DIM> > >& rStimulatedAreas) const;
 
     /**
      * Reads from the XML file the cellular hetrogeneities. It fugures out whether the user specified a cuboid
@@ -400,7 +400,7 @@ public:
      * \todo There is no set method
      */
     template<unsigned DIM>
-    void GetCellHeterogeneities(std::vector<std::shared_ptr<AbstractChasteRegion<DIM> > >& rCellHeterogeneityRegions,
+    void GetCellHeterogeneities(std::vector<boost::shared_ptr<AbstractChasteRegion<DIM> > >& rCellHeterogeneityRegions,
                                 std::vector<double>& rScaleFactorGks,
                                 std::vector<double>& rScaleFactorIto,
                                 std::vector<double>& rScaleFactorGkr,
@@ -453,7 +453,7 @@ public:
      * \todo - do we assume the vectors are initially empty?
      */
     template<unsigned DIM>
-    void GetConductivityHeterogeneities(std::vector<std::shared_ptr<AbstractChasteRegion<DIM> > >& conductivitiesHeterogeneityAreas,
+    void GetConductivityHeterogeneities(std::vector<boost::shared_ptr<AbstractChasteRegion<DIM> > >& conductivitiesHeterogeneityAreas,
                                         std::vector< c_vector<double,3> >& intraConductivities,
                                         std::vector< c_vector<double,3> >& extraConductivities) const;
     std::string GetOutputDirectory() const; /**< @return output directory path name*/
@@ -1270,7 +1270,7 @@ private:
     HeartConfig();
 
     /** Pointer to parameters read from the user's input XML file  */
-    std::shared_ptr<cp::chaste_parameters_type> mpParameters;
+    boost::shared_ptr<cp::chaste_parameters_type> mpParameters;
 
     /** The single instance of the class */
     static std::unique_ptr<HeartConfig> mpInstance;

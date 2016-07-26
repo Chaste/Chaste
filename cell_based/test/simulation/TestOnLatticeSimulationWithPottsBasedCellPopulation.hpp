@@ -69,7 +69,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestOnLatticeSimulationWithPottsBasedCellPopulation : public AbstractCellBasedWithTimingsTestSuite
 {
 private:
-    void RandomlyLabelCells(std::vector<CellPtr>& rCells, std::shared_ptr<AbstractCellProperty> pLabel, double labelledRatio)
+    void RandomlyLabelCells(std::vector<CellPtr>& rCells, boost::shared_ptr<AbstractCellProperty> pLabel, double labelledRatio)
     {
         for (unsigned i = 0; i<rCells.size(); i++)
         {
@@ -310,7 +310,7 @@ public:
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
         // Randomly label some cells
-        std::shared_ptr<AbstractCellProperty> p_label(CellPropertyRegistry::Instance()->Get<CellLabel>());
+        boost::shared_ptr<AbstractCellProperty> p_label(CellPropertyRegistry::Instance()->Get<CellLabel>());
         RandomlyLabelCells(cells, p_label, 0.5);
 
         // Create cell population
@@ -380,7 +380,7 @@ public:
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
         // Randomly label some cells
-        std::shared_ptr<AbstractCellProperty> p_label(CellPropertyRegistry::Instance()->Get<CellLabel>());
+        boost::shared_ptr<AbstractCellProperty> p_label(CellPropertyRegistry::Instance()->Get<CellLabel>());
         RandomlyLabelCells(cells, p_label, 0.5);
 
         // Create cell population
@@ -578,7 +578,7 @@ public:
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
         // Randomly label some cells
-        std::shared_ptr<AbstractCellProperty> p_label(CellPropertyRegistry::Instance()->Get<CellLabel>());
+        boost::shared_ptr<AbstractCellProperty> p_label(CellPropertyRegistry::Instance()->Get<CellLabel>());
         RandomlyLabelCells(cells, p_label, 0.5);
 
         // Create cell population

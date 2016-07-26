@@ -40,10 +40,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HeartConfig.hpp"
 #include "Exception.hpp"
 
-AbstractCardiacCell::AbstractCardiacCell(std::shared_ptr<AbstractIvpOdeSolver> pOdeSolver,
+AbstractCardiacCell::AbstractCardiacCell(boost::shared_ptr<AbstractIvpOdeSolver> pOdeSolver,
                                          unsigned numberOfStateVariables,
                                          unsigned voltageIndex,
-                                         std::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus)
+                                         boost::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus)
     : AbstractCardiacCellInterface(pOdeSolver, voltageIndex, pIntracellularStimulus),
       AbstractOdeSystem(numberOfStateVariables),
       mDt(HeartConfig::Instance()->GetOdeTimeStep())

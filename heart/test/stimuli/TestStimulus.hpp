@@ -330,8 +330,8 @@ public:
     void TestSumStimulus()
     {
         MultiStimulus multi_stim;
-        std::shared_ptr<SimpleStimulus> p1(new SimpleStimulus(2,1,0));
-        std::shared_ptr<SimpleStimulus> p2(new SimpleStimulus(3,1,3));
+        boost::shared_ptr<SimpleStimulus> p1(new SimpleStimulus(2,1,0));
+        boost::shared_ptr<SimpleStimulus> p2(new SimpleStimulus(3,1,3));
 
         multi_stim.AddStimulus(p1);
         multi_stim.AddStimulus(p2);
@@ -358,11 +358,11 @@ public:
         // No stimulus after creation.
         TS_ASSERT_EQUALS( multi_stim.GetStimulus(1.0), 0.0);
 
-        std::shared_ptr<SimpleStimulus> p_init_stim_a(new SimpleStimulus(2,1,0));
-        std::shared_ptr<SimpleStimulus> p_init_stim_b(new SimpleStimulus(3,1,30));
+        boost::shared_ptr<SimpleStimulus> p_init_stim_a(new SimpleStimulus(2,1,0));
+        boost::shared_ptr<SimpleStimulus> p_init_stim_b(new SimpleStimulus(3,1,30));
         // RegularStimulus result at a boundary point isn't the same for Default and IntelProduction build
         // (in fact it gives different answers to "fmod" within the IntelProduction test)
-        std::shared_ptr<RegularStimulus> p_regular_stim(new RegularStimulus(2.0, 1.0, 1.0/0.15, 1));
+        boost::shared_ptr<RegularStimulus> p_regular_stim(new RegularStimulus(2.0, 1.0, 1.0/0.15, 1));
 
         multi_stim.AddStimulus(p_init_stim_a);
         multi_stim.AddStimulus(p_init_stim_b);
@@ -387,9 +387,9 @@ public:
     {
         MultiStimulus multi_stim;
 
-        std::shared_ptr<RegularStimulus> pr1(new RegularStimulus(1,10,20,100,200));
+        boost::shared_ptr<RegularStimulus> pr1(new RegularStimulus(1,10,20,100,200));
         // First stimulus applies pulses for 10ms every 20ms between t=100 and t=200.
-        std::shared_ptr<RegularStimulus> pr2(new RegularStimulus(2,20,40,300,400));
+        boost::shared_ptr<RegularStimulus> pr2(new RegularStimulus(2,20,40,300,400));
         // Second stimulus applies pulses for 20ms every 40ms between t=300 and t=400.
 
         multi_stim.AddStimulus(pr1);
@@ -461,8 +461,8 @@ public:
                                          when);
 
             MultiStimulus* p_multiple_stimulus = new MultiStimulus;
-            std::shared_ptr<SimpleStimulus> p1(new SimpleStimulus(2,1,0));
-            std::shared_ptr<SimpleStimulus> p2(new SimpleStimulus(3,1,3));
+            boost::shared_ptr<SimpleStimulus> p1(new SimpleStimulus(2,1,0));
+            boost::shared_ptr<SimpleStimulus> p2(new SimpleStimulus(3,1,3));
             p_multiple_stimulus->AddStimulus(p1);
             p_multiple_stimulus->AddStimulus(p2);
 

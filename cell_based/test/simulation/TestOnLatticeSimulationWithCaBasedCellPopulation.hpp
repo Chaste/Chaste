@@ -73,7 +73,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class TestOnLatticeSimulationWithCaBasedCellPopulation : public AbstractCellBasedWithTimingsTestSuite
 {
-    void RandomlyLabelCells(std::vector<CellPtr>& rCells, std::shared_ptr<AbstractCellProperty> pLabel, double labelledRatio)
+    void RandomlyLabelCells(std::vector<CellPtr>& rCells, boost::shared_ptr<AbstractCellProperty> pLabel, double labelledRatio)
     {
         for (unsigned i=0; i<rCells.size(); i++)
         {

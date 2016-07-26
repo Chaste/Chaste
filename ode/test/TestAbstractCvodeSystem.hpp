@@ -107,7 +107,7 @@ public:
     {
 #ifdef CHASTE_CVODE
         ParameterisedCvode ode;
-        std::shared_ptr<const AbstractOdeSystemInformation> p_info = ode.GetSystemInformation();
+        boost::shared_ptr<const AbstractOdeSystemInformation> p_info = ode.GetSystemInformation();
 
         TS_ASSERT_EQUALS(ode.GetSystemName(), "ParameterisedCvode");
         TS_ASSERT_EQUALS(p_info->GetSystemName(), "ParameterisedCvode");
@@ -223,7 +223,7 @@ public:
         TS_ASSERT(!ode.HasAttribute("missing"));
         TS_ASSERT_THROWS_THIS(ode.GetAttribute("missing"), "No attribute 'missing' found.");
 
-        std::shared_ptr<const AbstractOdeSystemInformation> p_info = ode.GetSystemInformation();
+        boost::shared_ptr<const AbstractOdeSystemInformation> p_info = ode.GetSystemInformation();
         TS_ASSERT_EQUALS(p_info->GetNumberOfAttributes(), 1u);
         TS_ASSERT(p_info->HasAttribute("attr"));
         TS_ASSERT_DELTA(p_info->GetAttribute("attr"), 1.1, 1e-12);
@@ -238,7 +238,7 @@ public:
     {
 #ifdef CHASTE_CVODE
         ParameterisedCvode ode;
-        std::shared_ptr<const AbstractOdeSystemInformation> p_info = ode.GetSystemInformation();
+        boost::shared_ptr<const AbstractOdeSystemInformation> p_info = ode.GetSystemInformation();
 
         TS_ASSERT_EQUALS(ode.GetNumberOfDerivedQuantities(), 1u);
         TS_ASSERT_EQUALS(ode.HasDerivedQuantity("2a_plus_y"), true);

@@ -41,7 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 SimulationTime* SimulationTime::mpInstance = nullptr;
 
 /** Shared pointer to the delegated class */
-std::shared_ptr<TimeStepper> SimulationTime::mpTimeStepper;
+boost::shared_ptr<TimeStepper> SimulationTime::mpTimeStepper;
 
 SimulationTime* SimulationTime::Instance()
 {

@@ -273,7 +273,7 @@ public:
 
     void TestGetCellUsingLocationIndexWithHaloCell() throw (Exception)
     {
-        std::shared_ptr<Node<3> > p_node(new Node<3>(10, false, 0.0, 0.0, 0.0));
+        boost::shared_ptr<Node<3> > p_node(new Node<3>(10, false, 0.0, 0.0, 0.0));
 
         // Create a cell.
         MAKE_PTR(WildTypeCellMutationState, p_state);

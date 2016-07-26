@@ -42,7 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * typing when using it.
  */
 
-
+#include <boost/shared_ptr.hpp>
 
 /**
  * Create a new instance of a class and assign it to a smart pointer.
@@ -51,7 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * @param NAME  the name of the pointer variable
  * @param ARGS  constructor arguments for the instance, in brackets
  */
-#define MAKE_PTR_ABS(ABS_TYPE, TYPE, NAME, ARGS) std::shared_ptr<ABS_TYPE> NAME(new TYPE ARGS)
+#define MAKE_PTR_ABS(ABS_TYPE, TYPE, NAME, ARGS) boost::shared_ptr<ABS_TYPE> NAME(new TYPE ARGS)
 
 /**
  * Create a new instance of a class and assign it to a smart pointer.

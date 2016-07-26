@@ -212,13 +212,13 @@ public:
      * @return the saved problem instance, if any.  Will return an empty pointer if the
      * instance was not saved.
      */
-    std::shared_ptr<AbstractUntemplatedCardiacProblem> GetSavedProblem();
+    boost::shared_ptr<AbstractUntemplatedCardiacProblem> GetSavedProblem();
 private:
     /** Whether to save a copy of the problem instance for examination by tests. */
     bool mSaveProblemInstance;
 
     /** The saved problem instance, if any. */
-    std::shared_ptr<AbstractUntemplatedCardiacProblem> mSavedProblem;
+    boost::shared_ptr<AbstractUntemplatedCardiacProblem> mSavedProblem;
 };
 
 #endif /*CARDIACSIMULATION_HPP_*/

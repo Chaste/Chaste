@@ -69,7 +69,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class PointStimulus2dCellFactory : public AbstractCardiacCellFactory<2>
 {
 private:
-    std::shared_ptr<SimpleStimulus> mpStimulus;
+    boost::shared_ptr<SimpleStimulus> mpStimulus;
 
 public:
     PointStimulus2dCellFactory()

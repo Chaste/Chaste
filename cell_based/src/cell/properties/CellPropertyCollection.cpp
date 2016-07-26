@@ -58,7 +58,7 @@ void CellPropertyCollection::SetCellPropertyRegistry(CellPropertyRegistry* pRegi
     mpCellPropertyRegistry = pRegistry;
 }
 
-void CellPropertyCollection::AddProperty(const std::shared_ptr<AbstractCellProperty>& rProp)
+void CellPropertyCollection::AddProperty(const boost::shared_ptr<AbstractCellProperty>& rProp)
 {
     if (HasProperty(rProp))
     {
@@ -67,12 +67,12 @@ void CellPropertyCollection::AddProperty(const std::shared_ptr<AbstractCellPrope
     mProperties.insert(rProp);
 }
 
-bool CellPropertyCollection::HasProperty(const std::shared_ptr<AbstractCellProperty>& rProp) const
+bool CellPropertyCollection::HasProperty(const boost::shared_ptr<AbstractCellProperty>& rProp) const
 {
     return (mProperties.find(rProp) != mProperties.end());
 }
 
-void CellPropertyCollection::RemoveProperty(const std::shared_ptr<AbstractCellProperty>& rProp)
+void CellPropertyCollection::RemoveProperty(const boost::shared_ptr<AbstractCellProperty>& rProp)
 {
     IteratorType it = mProperties.find(rProp);
     if (it == mProperties.end())
@@ -100,7 +100,7 @@ CellPropertyCollection::Iterator CellPropertyCollection::End()
     return mProperties.end();
 }
 
-std::shared_ptr<AbstractCellProperty> CellPropertyCollection::GetProperty() const
+boost::shared_ptr<AbstractCellProperty> CellPropertyCollection::GetProperty() const
 {
     if (GetSize() == 1)
     {

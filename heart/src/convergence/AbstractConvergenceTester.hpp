@@ -80,7 +80,7 @@ class RampedQuarterStimulusCellFactory : public AbstractCardiacCellFactory<DIM>
 {
 private:
     /** define a new vector of stimuli - one for each step in x-direction*/
-    std::vector< std::shared_ptr<SimpleStimulus> > mpStimuli;
+    std::vector< boost::shared_ptr<SimpleStimulus> > mpStimuli;
     /** Width (x-width) of mesh*/
     double mMeshWidth;
     /** Step size of mesh is derived from the width and the number of elements across*/
@@ -109,7 +109,7 @@ public:
         {
             double this_stim = fullStim - (level*fullStim)/mLevels;
             //this_stim is full_stim at the zero level and would be zero at level=mLevels
-            mpStimuli.push_back((std::shared_ptr<SimpleStimulus>)new SimpleStimulus(this_stim, 0.5));
+            mpStimuli.push_back((boost::shared_ptr<SimpleStimulus>)new SimpleStimulus(this_stim, 0.5));
         }
     }
 
@@ -392,7 +392,7 @@ public:
 
             cardiac_problem.Initialise();
 
-            std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,PROBLEM_DIM> > p_bcc(new BoundaryConditionsContainer<DIM,DIM,PROBLEM_DIM>);
+            boost::shared_ptr<BoundaryConditionsContainer<DIM,DIM,PROBLEM_DIM> > p_bcc(new BoundaryConditionsContainer<DIM,DIM,PROBLEM_DIM>);
             SimpleStimulus stim(NeumannStimulus, 0.5);
             if (Stimulus==NEUMANN)
             {

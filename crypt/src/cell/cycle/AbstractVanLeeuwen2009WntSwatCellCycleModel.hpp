@@ -108,7 +108,7 @@ public:
      *
      * @param pOdeSolver An optional pointer to a cell-cycle model ODE solver object (allows the use of different ODE solvers)
      */
-    AbstractVanLeeuwen2009WntSwatCellCycleModel(std::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver = std::shared_ptr<AbstractCellCycleModelOdeSolver>());
+    AbstractVanLeeuwen2009WntSwatCellCycleModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver = boost::shared_ptr<AbstractCellCycleModelOdeSolver>());
 
     /**
      * See AbstractCellCycleModel::Initialise()
@@ -140,7 +140,7 @@ public:
      * @param wntConcentration Wnt concentration
      * @param pMutationState Mutation state
      */
-    virtual void InitialiseOdeSystem(double wntConcentration, std::shared_ptr<AbstractCellMutationState> pMutationState)=0;
+    virtual void InitialiseOdeSystem(double wntConcentration, boost::shared_ptr<AbstractCellMutationState> pMutationState)=0;
 
     /**
      * Overridden OutputCellCycleModelParameters() method.

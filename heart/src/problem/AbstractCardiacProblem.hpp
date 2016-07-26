@@ -43,7 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 #include <cassert>
 #include <climits>
-
+#include <boost/shared_ptr.hpp>
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/vector.hpp>
@@ -119,7 +119,7 @@ class AbstractCardiacProblem : public AbstractUntemplatedCardiacProblem
     friend class TestCardiacSimulationArchiver;
 
     /** To save typing */
-    typedef typename std::shared_ptr<BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM> >
+    typedef typename boost::shared_ptr<BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM> >
         BccType;
 
 private:
@@ -488,7 +488,7 @@ protected:
     /**
      * A vector of user-defined output modifiers which may be used to produce lightweight on the fly output
      */
-    std::vector<std::shared_ptr<AbstractOutputModifier> > mOutputModifiers;
+    std::vector<boost::shared_ptr<AbstractOutputModifier> > mOutputModifiers;
 
 public:
     /**
@@ -802,7 +802,7 @@ public:
      * The modifier should not be destroyed before the solve loop has completed
      * @param pOutputModifier  Pointer to the modifier to be added
      */
-    void AddOutputModifier( std::shared_ptr<AbstractOutputModifier> pOutputModifier)
+    void AddOutputModifier( boost::shared_ptr<AbstractOutputModifier> pOutputModifier)
     {
         mOutputModifiers.push_back(pOutputModifier);
     }

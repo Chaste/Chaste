@@ -52,8 +52,8 @@ and the MITACS/Mprime Canadian Network of Centres of Excellence.
 
 AbstractGeneralizedRushLarsenCardiacCell::AbstractGeneralizedRushLarsenCardiacCell(unsigned numberOfStateVariables,
                                                              unsigned voltageIndex,
-                                                             std::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus)
-    : AbstractCardiacCell(std::shared_ptr<AbstractIvpOdeSolver>(),
+                                                             boost::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus)
+    : AbstractCardiacCell(boost::shared_ptr<AbstractIvpOdeSolver>(),
                           numberOfStateVariables,
                           voltageIndex,
                           pIntracellularStimulus),

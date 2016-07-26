@@ -64,7 +64,7 @@ template<unsigned DIM>
 class BlockCellFactory : public AbstractCardiacCellFactory<DIM>
 {
 private:
-    std::shared_ptr<SimpleStimulus> mpStimulus;
+    boost::shared_ptr<SimpleStimulus> mpStimulus;
 
 public:
     BlockCellFactory()

@@ -306,7 +306,7 @@ public:
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         /* We now use the cell population to construct a cell killer object. This object
-         * must be added to the cell-based simulation as a std::shared_ptr, so we make
+         * must be added to the cell-based simulation as a boost::shared_ptr, so we make
          * use of the macro MAKR_PTR_ARGS (defined in the header {{{SmartPointers.hpp}}}).*/
         MAKE_PTR_ARGS(MyCellKiller, p_killer, (&cell_population));
 

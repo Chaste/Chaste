@@ -292,19 +292,19 @@ void NodeBasedCellPopulation<DIM>::OutputCellPopulationParameters(out_stream& rP
 }
 
 template<unsigned DIM>
-void NodeBasedCellPopulation<DIM>::AcceptPopulationWriter(std::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter)
+void NodeBasedCellPopulation<DIM>::AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter)
 {
     pPopulationWriter->Visit(this);
 }
 
 template<unsigned DIM>
-void NodeBasedCellPopulation<DIM>::AcceptPopulationCountWriter(std::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter)
+void NodeBasedCellPopulation<DIM>::AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter)
 {
     pPopulationCountWriter->Visit(this);
 }
 
 template<unsigned DIM>
-void NodeBasedCellPopulation<DIM>::AcceptCellWriter(std::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell)
+void NodeBasedCellPopulation<DIM>::AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell)
 {
     pCellWriter->VisitCell(pCell, this);
 }
@@ -609,7 +609,7 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDir
     mesh_writer.SetParallelFiles(*mpNodesOnlyMesh);
 
     // Iterate over any cell writers that are present
-    for (typename std::vector<std::shared_ptr<AbstractCellWriter<DIM, DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
+    for (typename std::vector<boost::shared_ptr<AbstractCellWriter<DIM, DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
          cell_writer_iter != this->mCellWriters.end();
          ++cell_writer_iter)
     {
@@ -700,7 +700,7 @@ CellPtr NodeBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, const c_vector<d
 }
 
 template<unsigned DIM>
-void NodeBasedCellPopulation<DIM>::AddMovedCell(CellPtr pCell, std::shared_ptr<Node<DIM> > pNode)
+void NodeBasedCellPopulation<DIM>::AddMovedCell(CellPtr pCell, boost::shared_ptr<Node<DIM> > pNode)
 {
     // Create a new node
     mpNodesOnlyMesh->AddMovedNode(pNode);
@@ -756,12 +756,12 @@ void NodeBasedCellPopulation<DIM>::SendCellsToNeighbourProcesses()
 
     if (!PetscTools::AmTopMost())
     {
-        std::shared_ptr<std::vector<std::pair<CellPtr, Node<DIM>* > > > p_cells_right(&mCellsToSendRight, null_deleter());
+        boost::shared_ptr<std::vector<std::pair<CellPtr, Node<DIM>* > > > p_cells_right(&mCellsToSendRight, null_deleter());
         mpCellsRecvRight = mRightCommunicator.SendRecvObject(p_cells_right, PetscTools::GetMyRank() + 1, mCellCommunicationTag, PetscTools::GetMyRank() + 1, mCellCommunicationTag, status);
     }
     if (!PetscTools::AmMaster())
     {
-        std::shared_ptr<std::vector<std::pair<CellPtr, Node<DIM>* > > > p_cells_left(&mCellsToSendLeft, null_deleter());
+        boost::shared_ptr<std::vector<std::pair<CellPtr, Node<DIM>* > > > p_cells_left(&mCellsToSendLeft, null_deleter());
         mpCellsRecvLeft = mLeftCommunicator.SendRecvObject(p_cells_left, PetscTools::GetMyRank() - 1, mCellCommunicationTag, PetscTools::GetMyRank() - 1, mCellCommunicationTag, status);
     }
 }
@@ -771,14 +771,14 @@ void NodeBasedCellPopulation<DIM>::NonBlockingSendCellsToNeighbourProcesses()
 {
     if (!PetscTools::AmTopMost())
     {
-        std::shared_ptr<std::vector<std::pair<CellPtr, Node<DIM>* > > > p_cells_right(&mCellsToSendRight, null_deleter());
+        boost::shared_ptr<std::vector<std::pair<CellPtr, Node<DIM>* > > > p_cells_right(&mCellsToSendRight, null_deleter());
         int tag = SmallPow(2u, 1+ PetscTools::GetMyRank() ) * SmallPow (3u, 1 + PetscTools::GetMyRank() + 1);
         mRightCommunicator.ISendObject(p_cells_right, PetscTools::GetMyRank() + 1, tag);
     }
     if (!PetscTools::AmMaster())
     {
         int tag = SmallPow (2u, 1 + PetscTools::GetMyRank() ) * SmallPow (3u, 1 + PetscTools::GetMyRank() - 1);
-        std::shared_ptr<std::vector<std::pair<CellPtr, Node<DIM>* > > > p_cells_left(&mCellsToSendLeft, null_deleter());
+        boost::shared_ptr<std::vector<std::pair<CellPtr, Node<DIM>* > > > p_cells_left(&mCellsToSendLeft, null_deleter());
         mLeftCommunicator.ISendObject(p_cells_left, PetscTools::GetMyRank() - 1, tag);
     }
     // Now post receives to start receiving data before returning.
@@ -845,7 +845,7 @@ void NodeBasedCellPopulation<DIM>::AddReceivedCells()
              ++iter)
         {
             // Make a shared pointer to the node to make sure it is correctly deleted.
-            std::shared_ptr<Node<DIM> > p_node(iter->second);
+            boost::shared_ptr<Node<DIM> > p_node(iter->second);
             AddMovedCell(iter->first, p_node);
         }
     }
@@ -855,7 +855,7 @@ void NodeBasedCellPopulation<DIM>::AddReceivedCells()
              iter != mpCellsRecvRight->end();
              ++iter)
         {
-            std::shared_ptr<Node<DIM> > p_node(iter->second);
+            boost::shared_ptr<Node<DIM> > p_node(iter->second);
             AddMovedCell(iter->first, p_node);
         }
     }
@@ -952,7 +952,7 @@ void NodeBasedCellPopulation<DIM>::AddReceivedHaloCells()
                 iter != mpCellsRecvLeft->end();
                 ++iter)
         {
-            std::shared_ptr<Node<DIM> > p_node(iter->second);
+            boost::shared_ptr<Node<DIM> > p_node(iter->second);
             AddHaloCell(iter->first, p_node);
 
         }
@@ -963,7 +963,7 @@ void NodeBasedCellPopulation<DIM>::AddReceivedHaloCells()
                 iter != mpCellsRecvRight->end();
                 ++iter)
         {
-            std::shared_ptr<Node<DIM> > p_node(iter->second);
+            boost::shared_ptr<Node<DIM> > p_node(iter->second);
             AddHaloCell(iter->first, p_node);
         }
     }
@@ -972,7 +972,7 @@ void NodeBasedCellPopulation<DIM>::AddReceivedHaloCells()
 }
 
 template<unsigned DIM>
-void NodeBasedCellPopulation<DIM>::AddHaloCell(CellPtr pCell, std::shared_ptr<Node<DIM> > pNode)
+void NodeBasedCellPopulation<DIM>::AddHaloCell(CellPtr pCell, boost::shared_ptr<Node<DIM> > pNode)
 {
     mHaloCells.push_back(pCell);
 

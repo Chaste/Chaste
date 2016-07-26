@@ -86,7 +86,7 @@ private:
     MutableMesh<DIM,DIM>* mpMutableMesh;
 
     /** The update rules used to determine the new location of the cells. */
-    std::vector<std::shared_ptr<AbstractPottsUpdateRule<DIM> > > mUpdateRuleCollection;
+    std::vector<boost::shared_ptr<AbstractPottsUpdateRule<DIM> > > mUpdateRuleCollection;
 
     /** The temperature of the system. Initialized to 0.1 in the constructor. */
     double mTemperature;
@@ -316,7 +316,7 @@ public:
      *
      * @param pPopulationWriter the population writer.
      */
-    virtual void AcceptPopulationWriter(std::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter);
+    virtual void AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter);
 
     /**
      * A virtual method to accept a cell population count writer so it can
@@ -324,7 +324,7 @@ public:
      *
      * @param pPopulationCountWriter the population count writer.
      */
-    virtual void AcceptPopulationCountWriter(std::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter);
+    virtual void AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter);
 
     /**
      * A virtual method to accept a cell writer so it can
@@ -333,7 +333,7 @@ public:
      * @param pCellWriter the population writer.
      * @param pCell the cell whose data are being written.
      */
-    virtual void AcceptCellWriter(std::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell);
+    virtual void AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell);
 
     /**
      * Overridden GetVolumeOfCell() method.
@@ -359,7 +359,7 @@ public:
      *
      * @param pUpdateRule pointer to an update rule
      */
-    void AddUpdateRule(std::shared_ptr<AbstractPottsUpdateRule<DIM> > pUpdateRule);
+    void AddUpdateRule(boost::shared_ptr<AbstractPottsUpdateRule<DIM> > pUpdateRule);
 
     /**
      * Method to remove all the update rules
@@ -371,7 +371,7 @@ public:
      *
      * @return the update rule collection
      */
-    const std::vector<std::shared_ptr<AbstractPottsUpdateRule<DIM> > >& rGetUpdateRuleCollection() const;
+    const std::vector<boost::shared_ptr<AbstractPottsUpdateRule<DIM> > >& rGetUpdateRuleCollection() const;
 
     /**
      * Outputs CellPopulation parameters to file

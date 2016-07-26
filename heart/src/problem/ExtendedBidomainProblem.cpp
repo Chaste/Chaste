@@ -210,7 +210,7 @@ void ExtendedBidomainProblem<DIM>::SetExtendedBidomainParameters(double Am1, dou
 }
 
 template <unsigned DIM>
-void ExtendedBidomainProblem<DIM>::SetGgapHeterogeneities ( std::vector<std::shared_ptr<AbstractChasteRegion<DIM> > >& rGgapHeterogeneityRegions, std::vector<double>& rGgapValues)
+void ExtendedBidomainProblem<DIM>::SetGgapHeterogeneities ( std::vector<boost::shared_ptr<AbstractChasteRegion<DIM> > >& rGgapHeterogeneityRegions, std::vector<double>& rGgapValues)
 {
     if (rGgapHeterogeneityRegions.size() != rGgapValues.size() )
     {
@@ -232,7 +232,7 @@ AbstractDynamicLinearPdeSolver<DIM, DIM, 3>* ExtendedBidomainProblem<DIM>::Creat
 {
     /*
      * NOTE: The this->mpBoundaryConditionsContainer.get() lines below convert a
-     * std::shared_ptr to a normal pointer, as this is what the assemblers are
+     * boost::shared_ptr to a normal pointer, as this is what the assemblers are
      * expecting. We have to be a bit careful though as boost could decide to delete
      * them whenever it feels like as it won't count the assemblers as using them.
      *

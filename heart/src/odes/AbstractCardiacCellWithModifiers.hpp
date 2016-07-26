@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ABSTRACTCARDIACCELLWITHMODIFIERS_HPP_
 #define ABSTRACTCARDIACCELLWITHMODIFIERS_HPP_
 
-
+#include <boost/shared_ptr.hpp>
 #include <map>
 #include <string>
 
@@ -80,11 +80,11 @@ private:
         // So we deal with it specially on reloading below.
         // The map is always set up in the same way, so should be in the same order, but we'll
         // archive the names as well for testing on load to be on the safe side.
-        std::map<std::string, std::shared_ptr<AbstractModifier>* >::const_iterator iter;
+        std::map<std::string, boost::shared_ptr<AbstractModifier>* >::const_iterator iter;
         for (iter = mModifiersMap.begin(); iter!= mModifiersMap.end(); ++iter)
         {
-            const std::shared_ptr<AbstractModifier>* p_to_smart_pointer = (*iter).second;
-            const std::shared_ptr<AbstractModifier> p_modifier = *p_to_smart_pointer;
+            const boost::shared_ptr<AbstractModifier>* p_to_smart_pointer = (*iter).second;
+            const boost::shared_ptr<AbstractModifier> p_modifier = *p_to_smart_pointer;
             archive & (*iter).first; // Name of the modifier
             archive & p_modifier;    // Modifier
         }
@@ -104,11 +104,11 @@ private:
         // We have made new smart pointers to dummy modifiers via the constructor, so instead of overwriting
         // these pointers with new pointers (leaving a memory leak), go through and make the existing pointers
         // point to the correct modifiers again!
-        std::map<std::string, std::shared_ptr<AbstractModifier>* >::iterator iter;
+        std::map<std::string, boost::shared_ptr<AbstractModifier>* >::iterator iter;
         for (iter = mModifiersMap.begin(); iter!= mModifiersMap.end(); ++iter)
         {
-            std::shared_ptr<AbstractModifier>* p_to_constructed_smart_pointer = (*iter).second;
-            std::shared_ptr<AbstractModifier> p_loaded;
+            boost::shared_ptr<AbstractModifier>* p_to_constructed_smart_pointer = (*iter).second;
+            boost::shared_ptr<AbstractModifier> p_loaded;
             std::string modifier_name;
             archive & modifier_name;  // Name of the modifier
             archive & p_loaded;       // Modifier
@@ -129,7 +129,7 @@ private:
     BOOST_SERIALIZATION_SPLIT_MEMBER()
 
     /** A map between a string description and the location of the relevant modifier in concrete classes. */
-    std::map<std::string, std::shared_ptr<AbstractModifier>* > mModifiersMap;
+    std::map<std::string, boost::shared_ptr<AbstractModifier>* > mModifiersMap;
 
 protected:
     /**
@@ -138,7 +138,7 @@ protected:
      * @param modifierName  The name which will act as a 'key' for this modifier.
      * @param pModifier  The pointer to the modifier in the concrete class.
      */
-    void AddModifier(std::string modifierName, std::shared_ptr<AbstractModifier>& pModifier);
+    void AddModifier(std::string modifierName, boost::shared_ptr<AbstractModifier>& pModifier);
 
 public:
     /**
@@ -152,10 +152,10 @@ public:
      * @param voltageIndex  the index of the transmembrane potential within the vector of state variables
      * @param pIntracellularStimulus  the intracellular stimulus current
      */
-    AbstractCardiacCellWithModifiers(std::shared_ptr<AbstractIvpOdeSolver> pOdeSolver,
+    AbstractCardiacCellWithModifiers(boost::shared_ptr<AbstractIvpOdeSolver> pOdeSolver,
                                      unsigned numberOfStateVariables,
                                      unsigned voltageIndex,
-                                     std::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus);
+                                     boost::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus);
 
     /**
      * Get access to a modifier
@@ -163,7 +163,7 @@ public:
      * @param rModifierName  The oxmeta name of the modifier to fetch.
      * @return a pointer to the specified modifier
      */
-    std::shared_ptr<AbstractModifier> GetModifier(const std::string& rModifierName);
+    boost::shared_ptr<AbstractModifier> GetModifier(const std::string& rModifierName);
 
     /**
      * Check for the presence of a modifier. To avoid the necessity of using
@@ -180,7 +180,7 @@ public:
      * @param rModifierName  The oxmeta name of the modifier to replace.
      * @param pNewModifier  The new modifier object to use.
      */
-    void SetModifier(const std::string& rModifierName, std::shared_ptr<AbstractModifier>& pNewModifier);
+    void SetModifier(const std::string& rModifierName, boost::shared_ptr<AbstractModifier>& pNewModifier);
 
 };
 

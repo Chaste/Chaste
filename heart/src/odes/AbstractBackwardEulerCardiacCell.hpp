@@ -101,7 +101,7 @@ public:
     AbstractBackwardEulerCardiacCell(
         unsigned numberOfStateVariables,
         unsigned voltageIndex,
-        std::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus);
+        boost::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus);
 
     /** Virtual destructor */
     virtual ~AbstractBackwardEulerCardiacCell();
@@ -208,8 +208,8 @@ template <unsigned SIZE>
 AbstractBackwardEulerCardiacCell<SIZE>::AbstractBackwardEulerCardiacCell(
     unsigned numberOfStateVariables,
     unsigned voltageIndex,
-    std::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus)
-        : AbstractCardiacCell(std::shared_ptr<AbstractIvpOdeSolver>(),
+    boost::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus)
+        : AbstractCardiacCell(boost::shared_ptr<AbstractIvpOdeSolver>(),
                               numberOfStateVariables,
                               voltageIndex,
                               pIntracellularStimulus)
@@ -358,8 +358,8 @@ public:
      */
     AbstractBackwardEulerCardiacCell(unsigned numberOfStateVariables,
                                      unsigned voltageIndex,
-                                     std::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus)
-        : AbstractCardiacCell(std::shared_ptr<AbstractIvpOdeSolver>(),
+                                     boost::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus)
+        : AbstractCardiacCell(boost::shared_ptr<AbstractIvpOdeSolver>(),
                               numberOfStateVariables,
                               voltageIndex,
                               pIntracellularStimulus)

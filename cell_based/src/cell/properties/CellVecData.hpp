@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CELLVECDATA_HPP_
 #define CELLVECDATA_HPP_
 
-
+#include <boost/shared_ptr.hpp>
 #include <map>
 #include <string>
 #include <vector>

@@ -110,7 +110,7 @@ private:
         TS_ASSERT_EQUALS(node_based_cell_population.rGetCells().size(), num_cells);
         TS_ASSERT_EQUALS(cells.size(), 0u);
 
-        std::shared_ptr<CellPropertyRegistry> p_population_registry = node_based_cell_population.GetCellPropertyRegistry();
+        boost::shared_ptr<CellPropertyRegistry> p_population_registry = node_based_cell_population.GetCellPropertyRegistry();
 
         unsigned counter = 0;
         for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = node_based_cell_population.Begin();
@@ -307,8 +307,8 @@ public:
             mesh.GetNode(0)->SetRadius(0.1);
             mesh.GetNode(PetscTools::GetNumProcs())->SetRadius(0.2);
 
-            std::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
-            std::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
+            boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
+            boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
 
             FixedDurationGenerationBasedCellCycleModel* p_model0 = new FixedDurationGenerationBasedCellCycleModel();
             CellPtr p_cell0(new Cell(p_state, p_model0));
@@ -337,8 +337,8 @@ public:
 
         if (PetscTools::AmMaster())
         {
-            std::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
-            std::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
+            boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
+            boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
 
             // Create a new cell, DON'T set the node index, set birth time=-1
             FixedDurationGenerationBasedCellCycleModel* p_model2 = new FixedDurationGenerationBasedCellCycleModel();
@@ -418,8 +418,8 @@ public:
             unsigned old_num_cells = node_based_cell_population.rGetCells().size();
 
             // Create a new cell, DON'T set the node index, set birth time=-1
-            std::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
-            std::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
+            boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
+            boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             CellPtr p_cell(new Cell(p_state, p_model));
             p_cell->SetCellProliferativeType(p_stem_type);
@@ -606,8 +606,8 @@ public:
         node_based_cell_population.Update();
 
         unsigned num_removed;
-        std::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
-        std::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
+        boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
+        boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
 
         if (PetscTools::AmMaster())
         {
@@ -1052,13 +1052,13 @@ public:
 
         // For coverage of WriteResultsToFiles()
         node_based_cell_population.GetCellPropertyRegistry()->Get<WildTypeCellMutationState>();
-        std::shared_ptr<AbstractCellProperty> p_apc1(node_based_cell_population.GetCellPropertyRegistry()->Get<ApcOneHitCellMutationState>());
-        std::shared_ptr<AbstractCellProperty> p_apc2(node_based_cell_population.GetCellPropertyRegistry()->Get<ApcTwoHitCellMutationState>());
-        std::shared_ptr<AbstractCellProperty> p_bcat1(node_based_cell_population.GetCellPropertyRegistry()->Get<BetaCateninOneHitCellMutationState>());
-        std::shared_ptr<AbstractCellProperty> p_apoptotic_state(node_based_cell_population.GetCellPropertyRegistry()->Get<ApoptoticCellProperty>());
-        std::shared_ptr<AbstractCellProperty> p_label(node_based_cell_population.GetCellPropertyRegistry()->Get<CellLabel>());
-        std::shared_ptr<AbstractCellProperty> p_transit_type(node_based_cell_population.GetCellPropertyRegistry()->Get<TransitCellProliferativeType>());
-        std::shared_ptr<AbstractCellProperty> p_diff_type(node_based_cell_population.GetCellPropertyRegistry()->Get<DifferentiatedCellProliferativeType>());
+        boost::shared_ptr<AbstractCellProperty> p_apc1(node_based_cell_population.GetCellPropertyRegistry()->Get<ApcOneHitCellMutationState>());
+        boost::shared_ptr<AbstractCellProperty> p_apc2(node_based_cell_population.GetCellPropertyRegistry()->Get<ApcTwoHitCellMutationState>());
+        boost::shared_ptr<AbstractCellProperty> p_bcat1(node_based_cell_population.GetCellPropertyRegistry()->Get<BetaCateninOneHitCellMutationState>());
+        boost::shared_ptr<AbstractCellProperty> p_apoptotic_state(node_based_cell_population.GetCellPropertyRegistry()->Get<ApoptoticCellProperty>());
+        boost::shared_ptr<AbstractCellProperty> p_label(node_based_cell_population.GetCellPropertyRegistry()->Get<CellLabel>());
+        boost::shared_ptr<AbstractCellProperty> p_transit_type(node_based_cell_population.GetCellPropertyRegistry()->Get<TransitCellProliferativeType>());
+        boost::shared_ptr<AbstractCellProperty> p_diff_type(node_based_cell_population.GetCellPropertyRegistry()->Get<DifferentiatedCellProliferativeType>());
 
         node_based_cell_population.GetCellUsingLocationIndex(0)->SetCellProliferativeType(p_transit_type);
         node_based_cell_population.GetCellUsingLocationIndex(0)->AddCellProperty(p_label);
@@ -1521,13 +1521,13 @@ public:
         {
             unsigned num_initial_cells = cell_population.GetNumNodes();
 
-            std::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
-            std::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
+            boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
+            boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
 
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             CellPtr p_cell(new Cell(p_state, p_model));
 
-            std::shared_ptr<Node<2> > p_node(new Node<2>(PetscTools::GetNumProcs() * (num_initial_cells + 1), false, 0.0, 0.5));
+            boost::shared_ptr<Node<2> > p_node(new Node<2>(PetscTools::GetNumProcs() * (num_initial_cells + 1), false, 0.0, 0.5));
             cell_population.AddMovedCell(p_cell, p_node);
 
             TS_ASSERT_EQUALS(cell_population.GetNumNodes(), num_initial_cells +1);

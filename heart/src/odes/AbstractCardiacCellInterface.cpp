@@ -51,9 +51,9 @@ const char CardiacCellChasteCitation[] = "@article{cooper2015cce,\n"
 "}\n";
 
 AbstractCardiacCellInterface::AbstractCardiacCellInterface(
-            std::shared_ptr<AbstractIvpOdeSolver> pOdeSolver,
+            boost::shared_ptr<AbstractIvpOdeSolver> pOdeSolver,
             unsigned voltageIndex,
-            std::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus)
+            boost::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus)
     : mVoltageIndex(voltageIndex),
       mpOdeSolver(pOdeSolver),
       mpIntracellularStimulus(pIntracellularStimulus),
@@ -79,7 +79,7 @@ unsigned AbstractCardiacCellInterface::GetVoltageIndex()
 }
 
 
-void AbstractCardiacCellInterface::SetStimulusFunction(std::shared_ptr<AbstractStimulusFunction> pStimulus)
+void AbstractCardiacCellInterface::SetStimulusFunction(boost::shared_ptr<AbstractStimulusFunction> pStimulus)
 {
     SetIntracellularStimulusFunction(pStimulus);
 }
@@ -91,7 +91,7 @@ double AbstractCardiacCellInterface::GetStimulus(double time)
 }
 
 
-void AbstractCardiacCellInterface::SetIntracellularStimulusFunction(std::shared_ptr<AbstractStimulusFunction> pStimulus)
+void AbstractCardiacCellInterface::SetIntracellularStimulusFunction(boost::shared_ptr<AbstractStimulusFunction> pStimulus)
 {
     mpIntracellularStimulus = pStimulus;
 }
@@ -123,11 +123,11 @@ void AbstractCardiacCellInterface::SetUsedInTissueSimulation(bool tissue)
     mIsUsedInTissue = tissue;
 }
 
-std::shared_ptr<RegularStimulus> AbstractCardiacCellInterface::UseCellMLDefaultStimulus()
+boost::shared_ptr<RegularStimulus> AbstractCardiacCellInterface::UseCellMLDefaultStimulus()
 {
     assert(!mHasDefaultStimulusFromCellML);
     EXCEPTION("This class has no default stimulus from CellML metadata.");
-    return std::shared_ptr<RegularStimulus>();
+    return boost::shared_ptr<RegularStimulus>();
 }
 
 bool AbstractCardiacCellInterface::HasCellMLDefaultStimulus()
@@ -135,23 +135,23 @@ bool AbstractCardiacCellInterface::HasCellMLDefaultStimulus()
     return mHasDefaultStimulusFromCellML;
 }
 
-std::shared_ptr<AbstractStimulusFunction> AbstractCardiacCellInterface::GetStimulusFunction()
+boost::shared_ptr<AbstractStimulusFunction> AbstractCardiacCellInterface::GetStimulusFunction()
 {
     return mpIntracellularStimulus;
 }
 
 // Methods needed by boost serialization.
-const std::shared_ptr<AbstractStimulusFunction> AbstractCardiacCellInterface::GetStimulusFunction() const
+const boost::shared_ptr<AbstractStimulusFunction> AbstractCardiacCellInterface::GetStimulusFunction() const
 {
     return mpIntracellularStimulus;
 }
 
-const std::shared_ptr<AbstractIvpOdeSolver> AbstractCardiacCellInterface::GetSolver() const
+const boost::shared_ptr<AbstractIvpOdeSolver> AbstractCardiacCellInterface::GetSolver() const
 {
     return mpOdeSolver;
 }
 
-void AbstractCardiacCellInterface::SetSolver(std::shared_ptr<AbstractIvpOdeSolver> pSolver)
+void AbstractCardiacCellInterface::SetSolver(boost::shared_ptr<AbstractIvpOdeSolver> pSolver)
 {
     mpOdeSolver = pSolver;
 }

@@ -87,7 +87,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 </ChasteParameters>
 \endverbatim
  */
-std::shared_ptr<cp::chaste_parameters_type> CreateDefaultParameters()
+boost::shared_ptr<cp::chaste_parameters_type> CreateDefaultParameters()
 {
     // Simulation parameters
     cp::simulation_type simulation_params;
@@ -145,7 +145,7 @@ std::shared_ptr<cp::chaste_parameters_type> CreateDefaultParameters()
     //cp::postprocessing_type postproc;
 
     // Full default parameters
-    std::shared_ptr<cp::chaste_parameters_type> p_defaults(new cp::chaste_parameters_type(phys_params, numerical_params));
+    boost::shared_ptr<cp::chaste_parameters_type> p_defaults(new cp::chaste_parameters_type(phys_params, numerical_params));
     p_defaults->Simulation().set(simulation_params);
     //p_defaults->PostProcessing().set(postproc);
     return p_defaults;
@@ -181,8 +181,8 @@ std::shared_ptr<cp::chaste_parameters_type> CreateDefaultParameters()
  * @param pDefaults  the default parameters, which must have been created by CreateDefaultParameters
  *    (or be a subset thereof) for this method to work as intended
  */
-void MergeDefaults(std::shared_ptr<cp::chaste_parameters_type> pParams,
-                   std::shared_ptr<cp::chaste_parameters_type> pDefaults)
+void MergeDefaults(boost::shared_ptr<cp::chaste_parameters_type> pParams,
+                   boost::shared_ptr<cp::chaste_parameters_type> pDefaults)
 {
     // Simulation and ResumeSimulation are mutually exclusive
     if (!pParams->ResumeSimulation().present())

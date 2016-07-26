@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ABSTRACTCELLMUTATIONSTATE_HPP_
 #define ABSTRACTCELLMUTATIONSTATE_HPP_
 
-
+#include <boost/shared_ptr.hpp>
 #include "AbstractCellProperty.hpp"
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>

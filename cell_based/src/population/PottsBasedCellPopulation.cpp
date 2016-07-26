@@ -285,7 +285,7 @@ void PottsBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
                 double delta_H = 0.0; // This is H_1-H_0.
 
                 // Now add contributions to the Hamiltonian from each AbstractPottsUpdateRule
-                for (typename std::vector<std::shared_ptr<AbstractPottsUpdateRule<DIM> > >::iterator iter = mUpdateRuleCollection.begin();
+                for (typename std::vector<boost::shared_ptr<AbstractPottsUpdateRule<DIM> > >::iterator iter = mUpdateRuleCollection.begin();
                      iter != mUpdateRuleCollection.end();
                      ++iter)
                 {
@@ -359,19 +359,19 @@ void PottsBasedCellPopulation<DIM>::WriteResultsToFiles(const std::string& rDire
 }
 
 template<unsigned DIM>
-void PottsBasedCellPopulation<DIM>::AcceptPopulationWriter(std::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter)
+void PottsBasedCellPopulation<DIM>::AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter)
 {
     pPopulationWriter->Visit(this);
 }
 
 template<unsigned DIM>
-void PottsBasedCellPopulation<DIM>::AcceptPopulationCountWriter(std::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter)
+void PottsBasedCellPopulation<DIM>::AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter)
 {
     pPopulationCountWriter->Visit(this);
 }
 
 template<unsigned DIM>
-void PottsBasedCellPopulation<DIM>::AcceptCellWriter(std::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell)
+void PottsBasedCellPopulation<DIM>::AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell)
 {
     pCellWriter->VisitCell(pCell, this);
 }
@@ -398,7 +398,7 @@ double PottsBasedCellPopulation<DIM>::GetWidth(const unsigned& rDimension)
 }
 
 template<unsigned DIM>
-void PottsBasedCellPopulation<DIM>::AddUpdateRule(std::shared_ptr<AbstractPottsUpdateRule<DIM> > pUpdateRule)
+void PottsBasedCellPopulation<DIM>::AddUpdateRule(boost::shared_ptr<AbstractPottsUpdateRule<DIM> > pUpdateRule)
 {
     mUpdateRuleCollection.push_back(pUpdateRule);
 }
@@ -410,7 +410,7 @@ void PottsBasedCellPopulation<DIM>::RemoveAllUpdateRules()
 }
 
 template<unsigned DIM>
-const std::vector<std::shared_ptr<AbstractPottsUpdateRule<DIM> > >& PottsBasedCellPopulation<DIM>::rGetUpdateRuleCollection() const
+const std::vector<boost::shared_ptr<AbstractPottsUpdateRule<DIM> > >& PottsBasedCellPopulation<DIM>::rGetUpdateRuleCollection() const
 {
     return mUpdateRuleCollection;
 }
@@ -510,7 +510,7 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDi
 
     // Iterate over any cell writers that are present
     unsigned num_nodes = GetNumNodes();
-    for (typename std::vector<std::shared_ptr<AbstractCellWriter<DIM, DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
+    for (typename std::vector<boost::shared_ptr<AbstractCellWriter<DIM, DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
          cell_writer_iter != this->mCellWriters.end();
          ++cell_writer_iter)
     {

@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ABSTRACTCELLPROPERTY_HPP_
 #define ABSTRACTCELLPROPERTY_HPP_
 
-
+#include <boost/shared_ptr.hpp>
 #include "ChasteSerialization.hpp"
 #include "Identifiable.hpp"
 
@@ -124,7 +124,7 @@ public:
      * @return whether this property is the same as another.
      * @param pOther  the property to compare against.
      */
-    bool IsSame(std::shared_ptr<const AbstractCellProperty> pOther) const;
+    bool IsSame(boost::shared_ptr<const AbstractCellProperty> pOther) const;
 
     /**
      * Increment #mCellCount.

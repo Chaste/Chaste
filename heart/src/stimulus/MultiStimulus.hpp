@@ -42,7 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/vector.hpp>
-
+#include <boost/shared_ptr.hpp>
 #include <boost/serialization/shared_ptr.hpp>
 
 #include "AbstractStimulusFunction.hpp"
@@ -75,7 +75,7 @@ private:
     }
 protected:
     /** Vector of stimuli. */
-    std::vector<std::shared_ptr<AbstractStimulusFunction> > mStimuli;
+    std::vector<boost::shared_ptr<AbstractStimulusFunction> > mStimuli;
 
 public:
     /**
@@ -88,7 +88,7 @@ public:
      *
      * @param pStimulus pointer to the stimulus to be added.
      */
-     void AddStimulus(std::shared_ptr<AbstractStimulusFunction> pStimulus);
+     void AddStimulus(boost::shared_ptr<AbstractStimulusFunction> pStimulus);
 
     /**
      * Get the magnitude of the multiple stimuli at time 'time'

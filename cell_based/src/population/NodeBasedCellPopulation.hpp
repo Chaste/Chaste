@@ -86,10 +86,10 @@ private:
     std::vector<std::pair<CellPtr, Node<DIM>* > > mCellsToSendLeft;
 
     /** A shared pointer to the cells received from the right process */
-    std::shared_ptr<std::vector<std::pair<CellPtr, Node<DIM>* > > > mpCellsRecvRight;
+    boost::shared_ptr<std::vector<std::pair<CellPtr, Node<DIM>* > > > mpCellsRecvRight;
 
     /** A pointer to the cells received from the left process */
-    std::shared_ptr<std::vector<std::pair<CellPtr, Node<DIM>* > > > mpCellsRecvLeft;
+    boost::shared_ptr<std::vector<std::pair<CellPtr, Node<DIM>* > > > mpCellsRecvLeft;
 
     /** A communicator to send cells to the right hand process */
     ObjectCommunicator<std::vector<std::pair<CellPtr, Node<DIM>* > > > mRightCommunicator;
@@ -150,7 +150,7 @@ private:
      * @param pCell the pointer to the cell that is to be added.
      * @param pNode the pointer to the node that is to be added.
      */
-    void AddMovedCell(CellPtr pCell, std::shared_ptr<Node<DIM> > pNode);
+    void AddMovedCell(CellPtr pCell, boost::shared_ptr<Node<DIM> > pNode);
 
     /**
      * Delete a cell and its associated node that have moved off this process.
@@ -201,7 +201,7 @@ private:
      * @param pCell the cell to add.
      * @param pNode the node to add.
      */
-    void AddHaloCell(CellPtr pCell, std::shared_ptr<Node<DIM> > pNode);
+    void AddHaloCell(CellPtr pCell, boost::shared_ptr<Node<DIM> > pNode);
 
     /**
      * Update the map between nodes and cells after a call to remesh.
@@ -354,7 +354,7 @@ public:
      *
      * @param pPopulationWriter the population writer.
      */
-    virtual void AcceptPopulationWriter(std::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter);
+    virtual void AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter);
 
     /**
      * A virtual method to accept a cell population count writer so it can
@@ -362,7 +362,7 @@ public:
      *
      * @param pPopulationCountWriter the population count writer.
      */
-    virtual void AcceptPopulationCountWriter(std::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter);
+    virtual void AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter);
 
     /**
      * A virtual method to accept a cell writer so it can
@@ -371,7 +371,7 @@ public:
      * @param pCellWriter the population writer.
      * @param pCell the cell whose data are being written.
      */
-    virtual void AcceptCellWriter(std::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell);
+    virtual void AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell);
 
     /**
      * @return the maximum interaction distance between cells, defined in NodesOnlyMesh.

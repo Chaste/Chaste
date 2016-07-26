@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ABSTRACTCARDIACCELLINTERFACE_HPP_
 #define ABSTRACTCARDIACCELLINTERFACE_HPP_
 
-
+#include <boost/shared_ptr.hpp>
 
 #include "ChasteSerialization.hpp"
 #include "ChasteSerializationVersion.hpp"
@@ -70,9 +70,9 @@ public:
      * @param voltageIndex  the index of the transmembrane potential within the system; see #mVoltageIndex
      * @param pIntracellularStimulus  the intracellular stimulus current
      */
-    AbstractCardiacCellInterface(std::shared_ptr<AbstractIvpOdeSolver> pOdeSolver,
+    AbstractCardiacCellInterface(boost::shared_ptr<AbstractIvpOdeSolver> pOdeSolver,
                                  unsigned voltageIndex,
-                                 std::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus);
+                                 boost::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus);
 
     /** Virtual destructor */
     virtual ~AbstractCardiacCellInterface();
@@ -279,7 +279,7 @@ public:
      * Shorthand for SetIntracellularStimulusFunction.
      * @param pStimulus  new stimulus function
      */
-    void SetStimulusFunction(std::shared_ptr<AbstractStimulusFunction> pStimulus);
+    void SetStimulusFunction(boost::shared_ptr<AbstractStimulusFunction> pStimulus);
 
     /**
      * @return the value of the intracellular stimulus.
@@ -294,7 +294,7 @@ public:
      * or uA/cm^3 in a tissue simulation.
      * @param pStimulus  new stimulus function
      */
-    void SetIntracellularStimulusFunction(std::shared_ptr<AbstractStimulusFunction> pStimulus);
+    void SetIntracellularStimulusFunction(boost::shared_ptr<AbstractStimulusFunction> pStimulus);
 
     /**
      * @return the value of the intracellular stimulus.
@@ -330,7 +330,7 @@ public:
      * the CellML.
      * @return a regular stimulus as defined in the CellML
      */
-    virtual std::shared_ptr<RegularStimulus> UseCellMLDefaultStimulus();
+    virtual boost::shared_ptr<RegularStimulus> UseCellMLDefaultStimulus();
 
     /**
      * @return Whether the cell was generated from a CellML file with stimulus metadata.
@@ -351,7 +351,7 @@ public:
     /**
      * @return The Intracellular stimulus function pointer
      */
-    std::shared_ptr<AbstractStimulusFunction> GetStimulusFunction();
+    boost::shared_ptr<AbstractStimulusFunction> GetStimulusFunction();
 
     /**
      * For boost archiving use only
@@ -359,7 +359,7 @@ public:
      *
      * @return The Intracellular stimulus function pointer
      */
-    const std::shared_ptr<AbstractStimulusFunction> GetStimulusFunction() const;
+    const boost::shared_ptr<AbstractStimulusFunction> GetStimulusFunction() const;
 
     /**
      * For boost archiving use only
@@ -367,7 +367,7 @@ public:
      *
      * @return pointer to the ODE solver being used
      */
-    const std::shared_ptr<AbstractIvpOdeSolver> GetSolver() const;
+    const boost::shared_ptr<AbstractIvpOdeSolver> GetSolver() const;
 
     /**
      * Change the ODE solver used by this cell.
@@ -376,7 +376,7 @@ public:
      *
      * @param pSolver  the new solver to use
      */
-    void SetSolver(std::shared_ptr<AbstractIvpOdeSolver> pSolver);
+    void SetSolver(boost::shared_ptr<AbstractIvpOdeSolver> pSolver);
 
     /**
      * Set whether to clamp the voltage by setting its derivative to zero.
@@ -424,10 +424,10 @@ protected:
     unsigned mVoltageIndex;
 
     /** Pointer to the solver used to simulate this cell. */
-    std::shared_ptr<AbstractIvpOdeSolver> mpOdeSolver;
+    boost::shared_ptr<AbstractIvpOdeSolver> mpOdeSolver;
 
     /** The intracellular stimulus current. */
-    std::shared_ptr<AbstractStimulusFunction> mpIntracellularStimulus;
+    boost::shared_ptr<AbstractStimulusFunction> mpIntracellularStimulus;
 
     /**
      * Flag set to true if ComputeExceptVoltage is called, to indicate

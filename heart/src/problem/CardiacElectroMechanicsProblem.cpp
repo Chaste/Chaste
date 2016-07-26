@@ -500,7 +500,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
 
     mpProblemDefinition->Validate();
 
-    std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,ELEC_PROB_DIM> > p_bcc(new BoundaryConditionsContainer<DIM,DIM,ELEC_PROB_DIM>);
+    boost::shared_ptr<BoundaryConditionsContainer<DIM,DIM,ELEC_PROB_DIM> > p_bcc(new BoundaryConditionsContainer<DIM,DIM,ELEC_PROB_DIM>);
     p_bcc->DefineZeroNeumannOnMeshBoundary(mpElectricsMesh, 0);
     mpElectricsProblem->SetBoundaryConditionsContainer(p_bcc);
 

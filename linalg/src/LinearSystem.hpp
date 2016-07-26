@@ -113,7 +113,7 @@ private:
     PCTwoLevelsBlockDiagonal* mpTwoLevelsBlockDiagonalPC;
 
     /** Pointer to vector containing a list of bath nodes*/
-    std::shared_ptr<std::vector<PetscInt> > mpBathNodes;
+    boost::shared_ptr<std::vector<PetscInt> > mpBathNodes;
 
     /** Whether the matrix used for preconditioning is the same as the LHS*/
     bool mPrecondMatrixIsNotLhs;
@@ -338,7 +338,7 @@ public:
      * @param pBathNodes the list of nodes defining the bath
      */
     /// \todo: #1082 is this the way of defining a null pointer as the default value of pBathNodes?
-    void SetPcType(const char* pcType, std::shared_ptr<std::vector<PetscInt> > pBathNodes=std::shared_ptr<std::vector<PetscInt> >() );
+    void SetPcType(const char* pcType, boost::shared_ptr<std::vector<PetscInt> > pBathNodes=boost::shared_ptr<std::vector<PetscInt> >() );
 
     /**
      * Display the left-hand side matrix.

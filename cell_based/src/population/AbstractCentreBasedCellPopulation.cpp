@@ -228,7 +228,7 @@ void AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::AcceptCellWriters
          node_iter != this->rGetMesh().GetNodeIteratorEnd();
          ++node_iter)
     {
-        for (typename std::vector<std::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
+        for (typename std::vector<boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
              cell_writer_iter != this->mCellWriters.end();
              ++cell_writer_iter)
         {

@@ -36,8 +36,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FakeBathCell.hpp"
 #include "OdeSystemInformation.hpp"
 
-FakeBathCell::FakeBathCell(std::shared_ptr<AbstractIvpOdeSolver> pSolver,
-                           std::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus)
+FakeBathCell::FakeBathCell(boost::shared_ptr<AbstractIvpOdeSolver> pSolver,
+                           boost::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus)
     : AbstractCardiacCell(pSolver, 1, 0, pIntracellularStimulus)
 {
     mpSystemInfo = OdeSystemInformation<FakeBathCell>::Instance();

@@ -41,7 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 
 #include <vector>
-
+#include <boost/shared_ptr.hpp>
 #include <boost/serialization/shared_ptr.hpp>
 
 #include "AbstractCardiacProblem.hpp"
@@ -132,7 +132,7 @@ protected:
     bool mHasBath;
 
     /** Electrodes used to provide a shock */
-    std::shared_ptr<Electrodes<DIM> > mpElectrodes;
+    boost::shared_ptr<Electrodes<DIM> > mpElectrodes;
 
     /**
      *  Create normal initial condition but overwrite V to zero for bath nodes, if
@@ -308,7 +308,7 @@ void BidomainProblem<DIM>::LoadExtraArchiveForBidomain(Archive & archive, unsign
         // We might need to get some of the boundary conditions from this archive, but it might be
         // the case that the problem's BCC is the same object as the Electrodes' (if they are turned
         // on) in which case we need to do 'nothing'.
-        std::shared_ptr<BoundaryConditionsContainer<DIM, DIM, 2> > p_bcc;
+        boost::shared_ptr<BoundaryConditionsContainer<DIM, DIM, 2> > p_bcc;
         archive >> p_bcc;
         if (mpElectrodes->GetBoundaryConditionsContainer() != this->mpBoundaryConditionsContainer)
         {

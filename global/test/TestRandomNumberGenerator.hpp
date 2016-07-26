@@ -339,10 +339,10 @@ public:
         p_gen->Reseed(0);
 
         // Make an identity permutation vector and put it through the generic version of shuffle
-        std::vector<std::shared_ptr<unsigned> > identity_perm_for_shuffle(test_size);
+        std::vector<boost::shared_ptr<unsigned> > identity_perm_for_shuffle(test_size);
         for (unsigned i=0; i<test_size; i++)
         {
-            std::shared_ptr<unsigned> p_i(new unsigned(i));
+            boost::shared_ptr<unsigned> p_i(new unsigned(i));
             identity_perm_for_shuffle[i] = p_i;
         }
         p_gen->Shuffle(identity_perm_for_shuffle);
@@ -353,7 +353,7 @@ public:
         }
 
         // Cover null case
-        std::vector<std::shared_ptr<unsigned> > just_empty;
+        std::vector<boost::shared_ptr<unsigned> > just_empty;
         p_gen->Shuffle(just_empty);
     }
 

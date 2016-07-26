@@ -116,7 +116,7 @@ ExtendedBidomainTissue<SPACE_DIM>::ExtendedBidomainTissue(AbstractCardiacCellFac
 template <unsigned SPACE_DIM>
 ExtendedBidomainTissue<SPACE_DIM>::ExtendedBidomainTissue(std::vector<AbstractCardiacCellInterface*> & rCellsDistributed,
                                                           std::vector<AbstractCardiacCellInterface*> & rSecondCellsDistributed,
-                                                          std::vector<std::shared_ptr<AbstractStimulusFunction> > & rExtraStimuliDistributed,
+                                                          std::vector<boost::shared_ptr<AbstractStimulusFunction> > & rExtraStimuliDistributed,
                                                           std::vector<double> & rGgapsDistributed,
                                                           AbstractTetrahedralMesh<SPACE_DIM,SPACE_DIM>* pMesh,
                                                           c_vector<double, SPACE_DIM>  intracellularConductivitiesSecondCell)
@@ -144,7 +144,7 @@ ExtendedBidomainTissue<SPACE_DIM>::ExtendedBidomainTissue(std::vector<AbstractCa
 
 
 template <unsigned SPACE_DIM>
-void ExtendedBidomainTissue<SPACE_DIM>::SetGgapHeterogeneities(std::vector<std::shared_ptr<AbstractChasteRegion<SPACE_DIM> > >& rGgapHeterogeneityRegions,
+void ExtendedBidomainTissue<SPACE_DIM>::SetGgapHeterogeneities(std::vector<boost::shared_ptr<AbstractChasteRegion<SPACE_DIM> > >& rGgapHeterogeneityRegions,
                                                                std::vector<double> rGgapValues)
 {
     assert( rGgapHeterogeneityRegions.size() == rGgapValues.size() );//problem class (which calls this method should have thrown otherwise)
@@ -257,7 +257,7 @@ void ExtendedBidomainTissue<SPACE_DIM>::CreateIntracellularConductivityTensorSec
         }
         PetscTools::ReplicateException(false);
 
-        std::vector<std::shared_ptr<AbstractChasteRegion<SPACE_DIM> > > conductivities_heterogeneity_areas;
+        std::vector<boost::shared_ptr<AbstractChasteRegion<SPACE_DIM> > > conductivities_heterogeneity_areas;
         std::vector< c_vector<double,3> > intra_h_conductivities;
         std::vector< c_vector<double,3> > extra_h_conductivities;
         HeartConfig::Instance()->GetConductivityHeterogeneities(conductivities_heterogeneity_areas,
@@ -321,7 +321,7 @@ const std::vector<double>& ExtendedBidomainTissue<SPACE_DIM>::rGetGapsDistribute
 }
 
 template <unsigned SPACE_DIM>
-const std::vector<std::shared_ptr<AbstractStimulusFunction> >& ExtendedBidomainTissue<SPACE_DIM>::rGetExtracellularStimulusDistributed() const
+const std::vector<boost::shared_ptr<AbstractStimulusFunction> >& ExtendedBidomainTissue<SPACE_DIM>::rGetExtracellularStimulusDistributed() const
 {
     return mExtracellularStimuliDistributed;
 }
@@ -392,7 +392,7 @@ void ExtendedBidomainTissue<SPACE_DIM>::CreateExtracellularConductivityTensors()
         }
         PetscTools::ReplicateException(false);
 
-        std::vector<std::shared_ptr<AbstractChasteRegion<SPACE_DIM> > > conductivities_heterogeneity_areas;
+        std::vector<boost::shared_ptr<AbstractChasteRegion<SPACE_DIM> > > conductivities_heterogeneity_areas;
         std::vector< c_vector<double,3> > intra_h_conductivities;
         std::vector< c_vector<double,3> > extra_h_conductivities;
         HeartConfig::Instance()->GetConductivityHeterogeneities(conductivities_heterogeneity_areas,
@@ -502,7 +502,7 @@ AbstractCardiacCellInterface* ExtendedBidomainTissue<SPACE_DIM>::GetCardiacSecon
 }
 
 template <unsigned SPACE_DIM>
-std::shared_ptr<AbstractStimulusFunction> ExtendedBidomainTissue<SPACE_DIM>::GetExtracellularStimulus( unsigned globalIndex )
+boost::shared_ptr<AbstractStimulusFunction> ExtendedBidomainTissue<SPACE_DIM>::GetExtracellularStimulus( unsigned globalIndex )
 {
     return mExtracellularStimuliDistributed[globalIndex - this->mpDistributedVectorFactory->GetLow()];
 }

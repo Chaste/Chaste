@@ -70,11 +70,11 @@ private:
                                     std::string filePrefix,
                                     bool clearDir)
     {
-        std::shared_ptr<SimpleStimulus> p_stimulus(new SimpleStimulus(
+        boost::shared_ptr<SimpleStimulus> p_stimulus(new SimpleStimulus(
                 -3 /*magnitude*/,
                 3 /*duration*/,
                 10.0 /*start time*/));
-        std::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
+        boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
 
         double time_step = 0.01;
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(time_step, time_step, 1.0);

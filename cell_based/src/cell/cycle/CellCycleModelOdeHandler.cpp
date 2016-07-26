@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellCycleModelOdeHandler.hpp"
 
 CellCycleModelOdeHandler::CellCycleModelOdeHandler(double lastTime,
-                                                   std::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
+                                                   boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
     : mDt(DOUBLE_UNSET),
       mpOdeSystem(nullptr),
       mpOdeSolver(pOdeSolver),
@@ -72,7 +72,7 @@ AbstractOdeSystem* CellCycleModelOdeHandler::GetOdeSystem() const
     return mpOdeSystem;
 }
 
-const std::shared_ptr<AbstractCellCycleModelOdeSolver> CellCycleModelOdeHandler::GetOdeSolver() const
+const boost::shared_ptr<AbstractCellCycleModelOdeSolver> CellCycleModelOdeHandler::GetOdeSolver() const
 {
     return mpOdeSolver;
 }

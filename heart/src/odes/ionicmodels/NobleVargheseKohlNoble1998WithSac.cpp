@@ -37,8 +37,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HeartConfig.hpp"
 
 CML_noble_varghese_kohl_noble_1998_basic_with_sac::CML_noble_varghese_kohl_noble_1998_basic_with_sac(
-        std::shared_ptr<AbstractIvpOdeSolver> pSolver,
-        std::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus)
+        boost::shared_ptr<AbstractIvpOdeSolver> pSolver,
+        boost::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus)
     : AbstractCardiacCell(pSolver, 22, 0, pIntracellularStimulus)
 {
     mStretch = 1.0;

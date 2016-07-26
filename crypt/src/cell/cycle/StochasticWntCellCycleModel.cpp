@@ -35,7 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "StochasticWntCellCycleModel.hpp"
 
-StochasticWntCellCycleModel::StochasticWntCellCycleModel(std::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
+StochasticWntCellCycleModel::StochasticWntCellCycleModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
     : WntCellCycleModel(pOdeSolver)
 {
     if (!pOdeSolver)

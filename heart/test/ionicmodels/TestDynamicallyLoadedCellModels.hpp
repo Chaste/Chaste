@@ -38,7 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 #include <boost/assign.hpp>
-
+#include <boost/shared_ptr.hpp>
 
 #include "ChasteSerialization.hpp"
 #ifdef CHASTE_CAN_CHECKPOINT_DLLS
@@ -153,13 +153,13 @@ public:
     {
         FileFinder cellml_file("heart/src/odes/cellml/LuoRudy1991.cellml", RelativeTo::ChasteSourceRoot);
         // Stimulus to use for simulation, so it matches other tests in this suite
-        std::shared_ptr<AbstractStimulusFunction> p_stimulus(new SimpleStimulus(-25.5, 2.0, 50.0));
+        boost::shared_ptr<AbstractStimulusFunction> p_stimulus(new SimpleStimulus(-25.5, 2.0, 50.0));
         {
             OutputFileHandler handler("TestCardiacCellMLLoader");
             // Note that the --cvode flag will be ignored since we call the LoadCardiacCell method.
             std::vector<std::string> options = boost::assign::list_of("--cvode")("--expose-annotated-variables");
             CellMLLoader loader(cellml_file, handler, options);
-            std::shared_ptr<AbstractCardiacCell> p_cell = loader.LoadCardiacCell();
+            boost::shared_ptr<AbstractCardiacCell> p_cell = loader.LoadCardiacCell();
             TS_ASSERT_EQUALS(p_cell->GetSystemName(), "luo_rudy_1991");
             p_cell->SetStimulusFunction(p_stimulus);
             SimulateLr91AndCompare(p_cell.get());
@@ -175,7 +175,7 @@ public:
             OutputFileHandler handler("TestCvodeCellMLLoader");
             std::vector<std::string> options = boost::assign::list_of("--expose-annotated-variables");
             CellMLLoader loader(cellml_file, handler, options);
-            std::shared_ptr<AbstractCvodeCell> p_cell = loader.LoadCvodeCell();
+            boost::shared_ptr<AbstractCvodeCell> p_cell = loader.LoadCvodeCell();
             TS_ASSERT_EQUALS(p_cell->GetSystemName(), "luo_rudy_1991");
             p_cell->SetStimulusFunction(p_stimulus);
             SimulateLr91AndCompare(p_cell.get(), 1.0); // Large tolerance due to different ODE solver

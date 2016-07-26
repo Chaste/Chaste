@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 #include <vector>
 #include <string>
-
+#include <boost/shared_ptr.hpp>
 
 #include "Exception.hpp"
 #include "S1S2Stimulus.hpp"

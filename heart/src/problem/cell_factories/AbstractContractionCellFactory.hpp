@@ -111,7 +111,7 @@ public:
 //     *
 //     * @param pSolver  the ODE solver to use to simulate this cell.
 //     */
-//    AbstractContractionCellFactory(std::shared_ptr<AbstractIvpOdeSolver> pSolver = std::shared_ptr<AbstractIvpOdeSolver>(new EulerIvpOdeSolver));
+//    AbstractContractionCellFactory(boost::shared_ptr<AbstractIvpOdeSolver> pSolver = boost::shared_ptr<AbstractIvpOdeSolver>(new EulerIvpOdeSolver));
 
     /**
      * Destructor

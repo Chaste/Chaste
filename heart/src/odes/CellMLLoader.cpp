@@ -88,8 +88,8 @@ AbstractCardiacCellInterface* CellMLLoader::LoadCellMLFile(bool makeCvodeCell)
     DynamicCellModelLoaderPtr p_loader = mpConverter->Convert(copied_model);
 
     // Use the shared library to load a concrete cell
-    std::shared_ptr<AbstractStimulusFunction> p_stimulus;
-    std::shared_ptr<EulerIvpOdeSolver> p_solver;
+    boost::shared_ptr<AbstractStimulusFunction> p_stimulus;
+    boost::shared_ptr<EulerIvpOdeSolver> p_solver;
     if (!makeCvodeCell)
     {
         // Put in a Forward Euler solver as a default for normal cells
@@ -105,18 +105,18 @@ AbstractCardiacCellInterface* CellMLLoader::LoadCellMLFile(bool makeCvodeCell)
     return p_loaded_cell;
 }
 
-std::shared_ptr<AbstractCardiacCell> CellMLLoader::LoadCardiacCell(void)
+boost::shared_ptr<AbstractCardiacCell> CellMLLoader::LoadCardiacCell(void)
 {
     AbstractCardiacCellInterface* p_loaded_cell = LoadCellMLFile(false);
-    std::shared_ptr<AbstractCardiacCell> p_model(dynamic_cast<AbstractCardiacCell*>(p_loaded_cell));
+    boost::shared_ptr<AbstractCardiacCell> p_model(dynamic_cast<AbstractCardiacCell*>(p_loaded_cell));
     return p_model;
 }
 
 #ifdef CHASTE_CVODE
-std::shared_ptr<AbstractCvodeCell> CellMLLoader::LoadCvodeCell(void)
+boost::shared_ptr<AbstractCvodeCell> CellMLLoader::LoadCvodeCell(void)
 {
     AbstractCardiacCellInterface* p_loaded_cell = LoadCellMLFile(true);
-    std::shared_ptr<AbstractCvodeCell> p_model(dynamic_cast<AbstractCvodeCell*>(p_loaded_cell));
+    boost::shared_ptr<AbstractCvodeCell> p_model(dynamic_cast<AbstractCvodeCell*>(p_loaded_cell));
     return p_model;
 }
 #endif

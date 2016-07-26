@@ -35,10 +35,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "VanLeeuwen2009WntSwatCellCycleModelHypothesisTwo.hpp"
 
-VanLeeuwen2009WntSwatCellCycleModelHypothesisTwo::VanLeeuwen2009WntSwatCellCycleModelHypothesisTwo(std::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
+VanLeeuwen2009WntSwatCellCycleModelHypothesisTwo::VanLeeuwen2009WntSwatCellCycleModelHypothesisTwo(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
     : AbstractVanLeeuwen2009WntSwatCellCycleModel(pOdeSolver)
 {
-    if (mpOdeSolver == std::shared_ptr<AbstractCellCycleModelOdeSolver>())
+    if (mpOdeSolver == boost::shared_ptr<AbstractCellCycleModelOdeSolver>())
     {
 #ifdef CHASTE_CVODE
         mpOdeSolver = CellCycleModelOdeSolver<VanLeeuwen2009WntSwatCellCycleModelHypothesisTwo, CvodeAdaptor>::Instance();
@@ -80,7 +80,7 @@ VanLeeuwen2009WntSwatCellCycleModelHypothesisTwo::VanLeeuwen2009WntSwatCellCycle
     SetStateVariables(rModel.GetOdeSystem()->rGetStateVariables());
 }
 
-void VanLeeuwen2009WntSwatCellCycleModelHypothesisTwo::InitialiseOdeSystem(double wntConcentration, std::shared_ptr<AbstractCellMutationState> pMutationState)
+void VanLeeuwen2009WntSwatCellCycleModelHypothesisTwo::InitialiseOdeSystem(double wntConcentration, boost::shared_ptr<AbstractCellMutationState> pMutationState)
 {
     mpOdeSystem = new VanLeeuwen2009WntSwatCellCycleOdeSystem(2, wntConcentration,  pMutationState);
 }

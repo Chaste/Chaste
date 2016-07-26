@@ -41,7 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/archive/binary_iarchive.hpp>
 
 #include <boost/scoped_array.hpp>
-
+#include <boost/shared_ptr.hpp>
 #include <boost/serialization/shared_ptr.hpp>
 #include "PetscTools.hpp" // For MPI methods
 #include "Exception.hpp"
@@ -97,7 +97,7 @@ public:
      * @param destinationProcess the index of the process to send the data to
      * @param tag a unique identifier tag for this communication
      */
-    void SendObject(std::shared_ptr<CLASS> const pObject, unsigned destinationProcess, unsigned tag);
+    void SendObject(boost::shared_ptr<CLASS> const pObject, unsigned destinationProcess, unsigned tag);
 
     /**
      * Send an object.
@@ -106,7 +106,7 @@ public:
      * @param destinationProcess the index of the process to send the data to
      * @param tag a unique identifier tag for this communication
      */
-    void ISendObject(std::shared_ptr<CLASS> const pObject, unsigned destinationProcess, unsigned tag);
+    void ISendObject(boost::shared_ptr<CLASS> const pObject, unsigned destinationProcess, unsigned tag);
 
     /**
      * Receive an object
@@ -117,7 +117,7 @@ public:
      *
      * @return A pointer to the object returned.
      */
-    std::shared_ptr<CLASS> RecvObject(unsigned sourceProcess, unsigned tag, MPI_Status& status);
+    boost::shared_ptr<CLASS> RecvObject(unsigned sourceProcess, unsigned tag, MPI_Status& status);
 
     /**
      * Post an asynchronous receive for an object
@@ -132,7 +132,7 @@ public:
      *
      * @return a boost shared pointer to a receive object
      */
-    std::shared_ptr<CLASS> GetRecvObject();
+    boost::shared_ptr<CLASS> GetRecvObject();
 
      /**
      * Send and receive an object
@@ -146,7 +146,7 @@ public:
      *
      * @return A pointer to the object returned.
      */
-    std::shared_ptr<CLASS> SendRecvObject(std::shared_ptr<CLASS> const pSendObject, unsigned destinationProcess, unsigned sendTag, unsigned sourceProcess, unsigned sourceTag, MPI_Status& status);
+    boost::shared_ptr<CLASS> SendRecvObject(boost::shared_ptr<CLASS> const pSendObject, unsigned destinationProcess, unsigned sendTag, unsigned sourceProcess, unsigned sourceTag, MPI_Status& status);
 };
 
 #include <sstream>
@@ -163,7 +163,7 @@ ObjectCommunicator<CLASS>::ObjectCommunicator()
 }
 
 template<typename CLASS>
-void ObjectCommunicator<CLASS>::SendObject(std::shared_ptr<CLASS> const pObject, unsigned destinationProcess, unsigned tag)
+void ObjectCommunicator<CLASS>::SendObject(boost::shared_ptr<CLASS> const pObject, unsigned destinationProcess, unsigned tag)
 {
     // Create an output archive
     std::ostringstream ss(std::ios::binary);
@@ -184,7 +184,7 @@ void ObjectCommunicator<CLASS>::SendObject(std::shared_ptr<CLASS> const pObject,
 }
 
 template<typename CLASS>
-void ObjectCommunicator<CLASS>::ISendObject(std::shared_ptr<CLASS> const pObject, unsigned destinationProcess, unsigned tag)
+void ObjectCommunicator<CLASS>::ISendObject(boost::shared_ptr<CLASS> const pObject, unsigned destinationProcess, unsigned tag)
 {
     MPI_Request request;
 
@@ -208,7 +208,7 @@ void ObjectCommunicator<CLASS>::ISendObject(std::shared_ptr<CLASS> const pObject
 }
 
 template<typename CLASS>
-std::shared_ptr<CLASS> ObjectCommunicator<CLASS>::RecvObject(unsigned sourceProcess, unsigned tag, MPI_Status& status)
+boost::shared_ptr<CLASS> ObjectCommunicator<CLASS>::RecvObject(unsigned sourceProcess, unsigned tag, MPI_Status& status)
 {
     unsigned string_length = 0;
     MPI_Recv(&string_length, 1, MPI_UNSIGNED, sourceProcess, tag, PetscTools::GetWorld(), &status);
@@ -221,7 +221,7 @@ std::shared_ptr<CLASS> ObjectCommunicator<CLASS>::RecvObject(unsigned sourceProc
     delete[] recv_array;
     std::istringstream ss(recv_string, std::ios::binary);
 
-    std::shared_ptr<CLASS> p_recv_object(new CLASS);
+    boost::shared_ptr<CLASS> p_recv_object(new CLASS);
     boost::archive::binary_iarchive input_arch(ss);
 
     input_arch >> p_recv_object;
@@ -241,7 +241,7 @@ void ObjectCommunicator<CLASS>::IRecvObject(unsigned sourceProcess, unsigned tag
 }
 
 template<typename CLASS>
-std::shared_ptr<CLASS> ObjectCommunicator<CLASS>::GetRecvObject()
+boost::shared_ptr<CLASS> ObjectCommunicator<CLASS>::GetRecvObject()
 {
     if (!mIsWriting)
     {
@@ -259,7 +259,7 @@ std::shared_ptr<CLASS> ObjectCommunicator<CLASS>::GetRecvObject()
     std::string recv_string(mRecvBuffer, recv_size);
     std::istringstream ss(recv_string, std::ios::binary);
 
-    std::shared_ptr<CLASS> p_recv_object(new CLASS);
+    boost::shared_ptr<CLASS> p_recv_object(new CLASS);
     boost::archive::binary_iarchive input_arch(ss);
 
     input_arch >> p_recv_object;
@@ -273,7 +273,7 @@ std::shared_ptr<CLASS> ObjectCommunicator<CLASS>::GetRecvObject()
 }
 
 template<typename CLASS>
-std::shared_ptr<CLASS> ObjectCommunicator<CLASS>::SendRecvObject(std::shared_ptr<CLASS> const pSendObject, unsigned destinationProcess, unsigned sendTag, unsigned sourceProcess, unsigned sourceTag, MPI_Status& status)
+boost::shared_ptr<CLASS> ObjectCommunicator<CLASS>::SendRecvObject(boost::shared_ptr<CLASS> const pSendObject, unsigned destinationProcess, unsigned sendTag, unsigned sourceProcess, unsigned sourceTag, MPI_Status& status)
 {
     // Create an output archive
     std::ostringstream oss(std::ios::binary);
@@ -299,7 +299,7 @@ std::shared_ptr<CLASS> ObjectCommunicator<CLASS>::SendRecvObject(std::shared_ptr
     std::string recv_string(recv_array.get(), recv_string_length);
     std::istringstream iss(recv_string, std::ios::binary);
 
-    std::shared_ptr<CLASS> p_recv_object(new CLASS);
+    boost::shared_ptr<CLASS> p_recv_object(new CLASS);
     boost::archive::binary_iarchive input_arch(iss);
 
     input_arch >> p_recv_object;

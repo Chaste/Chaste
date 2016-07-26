@@ -143,7 +143,7 @@ private:
     std::vector< AbstractCardiacCellInterface* > mCellsDistributedSecondCell;
 
     /** The vector of stimuli for the extracellular stimulus. Distributed. */
-    std::vector<std::shared_ptr<AbstractStimulusFunction> > mExtracellularStimuliDistributed;
+    std::vector<boost::shared_ptr<AbstractStimulusFunction> > mExtracellularStimuliDistributed;
 
     /** The vector of gap junction conductances. Distributed*/
     std::vector<double> mGgapDistributed;
@@ -201,7 +201,7 @@ private:
     void ReplicateAdditionalCaches();
 
     /** vector of regions for Ggap heterogeneities*/
-    std::vector<std::shared_ptr<AbstractChasteRegion<SPACE_DIM> > > mGgapHeterogeneityRegions;
+    std::vector<boost::shared_ptr<AbstractChasteRegion<SPACE_DIM> > > mGgapHeterogeneityRegions;
     /**values of heterogeneous Ggaps corresponding to mGgapHeterogeneityRegions. This has the same size as mGgapHeterogeneityRegions*/
     std::vector<double> mGgapValues;
 
@@ -226,7 +226,7 @@ public:
      */
     ExtendedBidomainTissue(std::vector<AbstractCardiacCellInterface*> & rCellsDistributed,
                            std::vector<AbstractCardiacCellInterface*> & rSecondCellsDistributed,
-                           std::vector<std::shared_ptr<AbstractStimulusFunction> > & rExtraStimuliDistributed,
+                           std::vector<boost::shared_ptr<AbstractStimulusFunction> > & rExtraStimuliDistributed,
                            std::vector<double>& rGgapsDistributed,
                            AbstractTetrahedralMesh<SPACE_DIM,SPACE_DIM>* pMesh,
                            c_vector<double, SPACE_DIM>  intracellularConductivitiesSecondCell);
@@ -256,7 +256,7 @@ public:
      *
      * @param globalIndex the global index in the mesh
      */
-    std::shared_ptr<AbstractStimulusFunction> GetExtracellularStimulus( unsigned globalIndex );
+    boost::shared_ptr<AbstractStimulusFunction> GetExtracellularStimulus( unsigned globalIndex );
 
     /**
      *  @return a reference to the vector of distributed cells (second cell). Needed for archiving.
@@ -272,7 +272,7 @@ public:
     /**
      *  @return a reference to the vector of distributed extracellular stimuli. Needed for archiving.
      */
-    const std::vector<std::shared_ptr<AbstractStimulusFunction> >& rGetExtracellularStimulusDistributed() const;
+    const std::vector<boost::shared_ptr<AbstractStimulusFunction> >& rGetExtracellularStimulusDistributed() const;
 
 
     /**
@@ -302,7 +302,7 @@ public:
      *  @param rGgapHeterogeneityRegions a vector of (pointers to) heterogeneity regions for gap junctions
      *  @param rGgapValues a vector (of the same size as rGgapHeterogeneityRegions) with the respective values of Ggap for every region.
      */
-    void SetGgapHeterogeneities ( std::vector<std::shared_ptr<AbstractChasteRegion<SPACE_DIM> > > & rGgapHeterogeneityRegions, std::vector<double> rGgapValues);
+    void SetGgapHeterogeneities ( std::vector<boost::shared_ptr<AbstractChasteRegion<SPACE_DIM> > > & rGgapHeterogeneityRegions, std::vector<double> rGgapValues);
 
     /**
      * Create the pattern of Ggap across the mesh based upon mCellHeterogeneityRegions, mGgapValues and mGgap. This will fill in mGgapDistributed.
@@ -558,7 +558,7 @@ public:
      void SaveExtracellularStimulus(Archive & archive, const unsigned int version) const
      {
          Archive& r_archive = *ProcessSpecificArchive<Archive>::Get();
-         const std::vector<std::shared_ptr<AbstractStimulusFunction> > & r_stimulus_distributed = rGetExtracellularStimulusDistributed();
+         const std::vector<boost::shared_ptr<AbstractStimulusFunction> > & r_stimulus_distributed = rGetExtracellularStimulusDistributed();
          r_archive & this->mpDistributedVectorFactory; // Needed when loading
          const unsigned num_cells = r_stimulus_distributed.size();
          r_archive & num_cells;
@@ -578,7 +578,7 @@ public:
       */
      template<class Archive>
      void LoadExtracellularStimulus(Archive & archive, const unsigned int version,
-                                               std::vector<std::shared_ptr<AbstractStimulusFunction> >& rStimuli,
+                                               std::vector<boost::shared_ptr<AbstractStimulusFunction> >& rStimuli,
                                                AbstractTetrahedralMesh<SPACE_DIM,SPACE_DIM>* pMesh)
      {
 
@@ -610,7 +610,7 @@ public:
           unsigned new_local_index = global_index - p_factory->GetLow();
           bool local = p_factory->IsGlobalIndexLocal(global_index);
 
-          std::shared_ptr<AbstractStimulusFunction> p_stim;
+          boost::shared_ptr<AbstractStimulusFunction> p_stim;
           archive & p_stim;//get from archive
 
           if (local)
@@ -679,7 +679,7 @@ public:
 
      std::vector<AbstractCardiacCellInterface*> cells_distributed;
      std::vector<AbstractCardiacCellInterface*> cells_distributed_second_cell;
-     std::vector<std::shared_ptr<AbstractStimulusFunction> > extra_stim;
+     std::vector<boost::shared_ptr<AbstractStimulusFunction> > extra_stim;
      std::vector<double> g_gaps;
      AbstractTetrahedralMesh<SPACE_DIM,SPACE_DIM>* p_mesh;
      ar & p_mesh;

@@ -94,7 +94,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class BenchmarkCellFactory : public AbstractCardiacCellFactory<3> // <3> here
 {
 private:
-    std::shared_ptr<SimpleStimulus> mpStimulus;
+    boost::shared_ptr<SimpleStimulus> mpStimulus;
 
 public:
     BenchmarkCellFactory()
@@ -116,7 +116,7 @@ public:
          * constructor, but it is not used (CVODE is instead). So an empty
          * pointer can be passed.
          */
-        std::shared_ptr<AbstractIvpOdeSolver> p_empty_solver;
+        boost::shared_ptr<AbstractIvpOdeSolver> p_empty_solver;
 
         double x = pNode->rGetLocation()[0];
         double y = pNode->rGetLocation()[1];

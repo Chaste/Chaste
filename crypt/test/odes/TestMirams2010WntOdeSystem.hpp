@@ -63,7 +63,7 @@ public:
     {
 #ifdef CHASTE_CVODE
         double wnt_level = 0.5;
-        std::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         Mirams2010WntOdeSystem wnt_system(wnt_level, p_state);
         // Solve system using CVODE solver
         // Matlab's strictest bit uses 0.01 below and relaxes it on flatter bits.
@@ -99,7 +99,7 @@ public:
     {
 #ifdef CHASTE_CVODE
         double wnt_level = 0.5;
-        std::shared_ptr<AbstractCellMutationState> p_apc2(new ApcTwoHitCellMutationState);
+        boost::shared_ptr<AbstractCellMutationState> p_apc2(new ApcTwoHitCellMutationState);
         Mirams2010WntOdeSystem wnt_system(wnt_level, p_apc2);
 
         // Solve system using CVODE solver
@@ -133,7 +133,7 @@ public:
     {
 #ifdef CHASTE_CVODE
         double wnt_level = 0.5;
-        std::shared_ptr<AbstractCellMutationState> p_bcat1(new BetaCateninOneHitCellMutationState);
+        boost::shared_ptr<AbstractCellMutationState> p_bcat1(new BetaCateninOneHitCellMutationState);
         Mirams2010WntOdeSystem wnt_system(wnt_level, p_bcat1);
 
         // Solve system using CVODE solver
@@ -172,7 +172,7 @@ public:
 
         {
             double wnt_level = 0.5;
-            std::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+            boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
             Mirams2010WntOdeSystem ode_system(wnt_level, p_state);
 
             TS_ASSERT_DELTA(ode_system.GetWntLevel(), 0.50, 1e-6);

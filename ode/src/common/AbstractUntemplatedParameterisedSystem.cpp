@@ -49,7 +49,7 @@ AbstractUntemplatedParameterisedSystem::~AbstractUntemplatedParameterisedSystem(
 {
 }
 
-std::shared_ptr<const AbstractOdeSystemInformation> AbstractUntemplatedParameterisedSystem::GetSystemInformation() const
+boost::shared_ptr<const AbstractOdeSystemInformation> AbstractUntemplatedParameterisedSystem::GetSystemInformation() const
 {
     assert(mpSystemInfo);
     return mpSystemInfo;

@@ -37,7 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef PLANESTIMULUSCELLFACTORY_HPP_
 #define PLANESTIMULUSCELLFACTORY_HPP_
 
-
+#include <boost/shared_ptr.hpp>
 
 #include "AbstractCardiacCellFactory.hpp"
 #include "LogFile.hpp"
@@ -51,7 +51,7 @@ class PlaneStimulusCellFactory : public AbstractCardiacCellFactory<ELEMENT_DIM,S
 {
 protected:
     /** The stimulus to apply at stimulated nodes */
-    std::shared_ptr<SimpleStimulus> mpStimulus;
+    boost::shared_ptr<SimpleStimulus> mpStimulus;
 
 public:
     /**

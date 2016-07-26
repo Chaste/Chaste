@@ -65,8 +65,8 @@ public:
         SimulationTime* p_simulation_time = SimulationTime::Instance();
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(25, 2);
 
-        std::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
-        std::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
+        boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
+        boost::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
 
         FixedDurationGenerationBasedCellCycleModel* p_cell_model = new FixedDurationGenerationBasedCellCycleModel();
         CellPtr p_cell(new Cell(p_healthy_state, p_cell_model));
@@ -87,14 +87,14 @@ public:
         CellPtr p_cell2 = p_cell->Divide();
 
         CellPropertyCollection cell_data_collection = p_cell->rGetCellPropertyCollection().GetPropertiesType<CellData>();
-        std::shared_ptr<CellData> p_parentcell_data = boost::static_pointer_cast<CellData>(cell_data_collection.GetProperty());
+        boost::shared_ptr<CellData> p_parentcell_data = boost::static_pointer_cast<CellData>(cell_data_collection.GetProperty());
         p_parentcell_data->SetItem("something", 3.0);
 
         TS_ASSERT_EQUALS(p_cell->GetCellData()->GetItem("something"), 3.0);
         TS_ASSERT_EQUALS(p_cell->GetCellData()->GetItem("some other thing"), 2.0);
 
         CellPropertyCollection cell2_data_collection = p_cell2->rGetCellPropertyCollection().GetPropertiesType<CellData>();
-        std::shared_ptr<CellData> p_daughtercell_data = boost::static_pointer_cast<CellData>(cell2_data_collection.GetProperty());
+        boost::shared_ptr<CellData> p_daughtercell_data = boost::static_pointer_cast<CellData>(cell2_data_collection.GetProperty());
 
         TS_ASSERT_EQUALS(p_daughtercell_data->GetItem("something"), 1.0);
         TS_ASSERT_EQUALS(p_daughtercell_data->GetItem("some other thing"), 2.0);
@@ -105,8 +105,8 @@ public:
         SimulationTime* p_simulation_time = SimulationTime::Instance();
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(25, 2);
 
-        std::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
-        std::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
+        boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
+        boost::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
 
         FixedDurationGenerationBasedCellCycleModel* p_cell_model = new FixedDurationGenerationBasedCellCycleModel();
         CellPtr p_cell(new Cell(p_healthy_state, p_cell_model));
@@ -117,12 +117,12 @@ public:
         TS_ASSERT(!p_cell->HasCellVecData());
 
         // Add CellVecData
-        std::shared_ptr<AbstractCellProperty> p_vec_data(CellPropertyRegistry::Instance()->Get<CellVecData>());
+        boost::shared_ptr<AbstractCellProperty> p_vec_data(CellPropertyRegistry::Instance()->Get<CellVecData>());
         p_cell->AddCellProperty(p_vec_data);
         TS_ASSERT(p_cell->HasCellVecData());
 
         CellPropertyCollection parent_cell_property_collection = p_cell->rGetCellPropertyCollection().GetPropertiesType<CellVecData>();
-        std::shared_ptr<CellVecData> p_parent_cell_vec_data = boost::static_pointer_cast<CellVecData>(parent_cell_property_collection.GetProperty());
+        boost::shared_ptr<CellVecData> p_parent_cell_vec_data = boost::static_pointer_cast<CellVecData>(parent_cell_property_collection.GetProperty());
 
         Vec vec_item_1 = PetscTools::CreateAndSetVec(1, 17.3);
         std::string i1 = "item 1";
@@ -141,7 +141,7 @@ public:
         Vec vec_replace_item_1 = PetscTools::CreateAndSetVec(1, -8.54);
 
         CellPropertyCollection parent_cell_property_collection_now = p_cell->rGetCellPropertyCollection().GetPropertiesType<CellVecData>();
-        std::shared_ptr<CellVecData> p_parent_cell_vec_data_now = boost::static_pointer_cast<CellVecData>(parent_cell_property_collection_now.GetProperty());
+        boost::shared_ptr<CellVecData> p_parent_cell_vec_data_now = boost::static_pointer_cast<CellVecData>(parent_cell_property_collection_now.GetProperty());
 
         p_parent_cell_vec_data_now->SetItem("item 1", vec_replace_item_1);
 
@@ -159,7 +159,7 @@ public:
         TS_ASSERT_THROWS_THIS(p_parent_cell_vec_data_now->GetItem("item 3"), "The item item 3 is not stored");
 
         CellPropertyCollection daughter_cell_property_collection = p_daughter_cell->rGetCellPropertyCollection().GetPropertiesType<CellVecData>();
-        std::shared_ptr<CellVecData> p_daughter_cell_vec_data = boost::static_pointer_cast<CellVecData>(daughter_cell_property_collection.GetProperty());
+        boost::shared_ptr<CellVecData> p_daughter_cell_vec_data = boost::static_pointer_cast<CellVecData>(daughter_cell_property_collection.GetProperty());
 
         ReplicatableVector rep_item_1_daughter(p_daughter_cell_vec_data->GetItem("item 1"));
         ReplicatableVector rep_item_2_daughter(p_daughter_cell_vec_data->GetItem("item 2"));

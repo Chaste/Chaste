@@ -41,7 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 
 #include <vector>
-
+#include <boost/shared_ptr.hpp>
 #include <boost/serialization/shared_ptr.hpp>
 
 #include "AbstractCardiacProblem.hpp"
@@ -283,7 +283,7 @@ protected:
      * If empty (i.e., the user did not specify any heterogeneities) then the empty vector will still be passed to the tissue object, which,
      * seeing the empty vector, will apply mGgap everywhere
      */
-    std::vector<std::shared_ptr<AbstractChasteRegion<DIM> > > mGgapHeterogeneityRegions;
+    std::vector<boost::shared_ptr<AbstractChasteRegion<DIM> > > mGgapHeterogeneityRegions;
 
     /**Corresponding vector of values of Ggap for every heterogeneous region in mGgapHeterogeneityRegions*/
     std::vector<double> mGgapHeterogenousValues;
@@ -414,7 +414,7 @@ public:
      *  @param rGgapHeterogeneityRegions a vector of heterogeneity regions for gap junctions
      *  @param rGgapValues a vector (of the same size as rGgapHeterogeneityRegions) with the respective values of Ggap for every region.
      */
-    void SetGgapHeterogeneities ( std::vector<std::shared_ptr<AbstractChasteRegion<DIM> > >& rGgapHeterogeneityRegions, std::vector<double>& rGgapValues);
+    void SetGgapHeterogeneities ( std::vector<boost::shared_ptr<AbstractChasteRegion<DIM> > >& rGgapHeterogeneityRegions, std::vector<double>& rGgapValues);
 
     /**
      * Sets a stimulus factory as the extracellular one.

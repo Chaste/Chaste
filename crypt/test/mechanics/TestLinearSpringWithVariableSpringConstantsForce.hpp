@@ -249,10 +249,10 @@ public:
             }
             p_cell_cycle_model->SetGeneration(generation);
 
-            std::shared_ptr<AbstractCellProperty> p_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
-            std::shared_ptr<AbstractCellProperty> p_stem_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
-            std::shared_ptr<AbstractCellProperty> p_transit_type(CellPropertyRegistry::Instance()->Get<TransitCellProliferativeType>());
-            std::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
+            boost::shared_ptr<AbstractCellProperty> p_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
+            boost::shared_ptr<AbstractCellProperty> p_stem_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
+            boost::shared_ptr<AbstractCellProperty> p_transit_type(CellPropertyRegistry::Instance()->Get<TransitCellProliferativeType>());
+            boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
 
             CellPtr p_cell(new Cell(p_state, p_cell_cycle_model));
 
@@ -406,10 +406,10 @@ public:
             double birth_time = 0.0;
             birth_time = -p_random_num_gen->ranf();
 
-            std::shared_ptr<AbstractCellProperty> p_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
-            std::shared_ptr<AbstractCellProperty> p_stem_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
-            std::shared_ptr<AbstractCellProperty> p_transit_type(CellPropertyRegistry::Instance()->Get<TransitCellProliferativeType>());
-            std::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
+            boost::shared_ptr<AbstractCellProperty> p_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
+            boost::shared_ptr<AbstractCellProperty> p_stem_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
+            boost::shared_ptr<AbstractCellProperty> p_transit_type(CellPropertyRegistry::Instance()->Get<TransitCellProliferativeType>());
+            boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
 
             CellPtr p_cell(new Cell(p_state, p_cell_cycle_model));
 
@@ -517,10 +517,10 @@ public:
         LinearSpringWithVariableSpringConstantsForce<2> linear_force;
 
         // Set cells' mutation states
-        std::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
-        std::shared_ptr<AbstractCellMutationState> p_apc2(new ApcTwoHitCellMutationState);
-        std::shared_ptr<AbstractCellMutationState> p_bcat1(new BetaCateninOneHitCellMutationState);
-        std::shared_ptr<AbstractCellProperty> p_label(new CellLabel);
+        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+        boost::shared_ptr<AbstractCellMutationState> p_apc2(new ApcTwoHitCellMutationState);
+        boost::shared_ptr<AbstractCellMutationState> p_bcat1(new BetaCateninOneHitCellMutationState);
+        boost::shared_ptr<AbstractCellProperty> p_label(new CellLabel);
 
         cell_population.GetCellUsingLocationIndex(0)->SetMutationState(p_state);
         cell_population.GetCellUsingLocationIndex(1)->AddCellProperty(p_label);
@@ -566,7 +566,7 @@ public:
         stretched_cell_population.InitialiseCells();
 
         // Set one of the non-boundary cells to be necrotic
-        std::shared_ptr<AbstractCellProperty> p_apoptotic_state(new ApoptoticCellProperty);
+        boost::shared_ptr<AbstractCellProperty> p_apoptotic_state(new ApoptoticCellProperty);
         stretched_cell_population.GetCellUsingLocationIndex(6)->AddCellProperty(p_apoptotic_state);
 
         LinearSpringWithVariableSpringConstantsForce<2> linear_force;
@@ -646,8 +646,8 @@ public:
             SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0,1);
 
             std::vector<CellPtr> cells;
-            std::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
-            std::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
+            boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+            boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
 
             for (unsigned i=0; i<mesh.GetNumNodes(); i++)
             {

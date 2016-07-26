@@ -55,7 +55,7 @@ double CellMutationStatesWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataForVtkOutput
 
     if (label_collection.GetSize() == 1)
     {
-        std::shared_ptr<CellLabel> p_label = boost::static_pointer_cast<CellLabel>(label_collection.GetProperty());
+        boost::shared_ptr<CellLabel> p_label = boost::static_pointer_cast<CellLabel>(label_collection.GetProperty());
         mutation_state = p_label->GetColour();
     }
 
@@ -73,7 +73,7 @@ void CellMutationStatesWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, 
 
     if (label_collection.GetSize() == 1)
     {
-        std::shared_ptr<CellLabel> p_label = boost::static_pointer_cast<CellLabel>(label_collection.GetProperty());
+        boost::shared_ptr<CellLabel> p_label = boost::static_pointer_cast<CellLabel>(label_collection.GetProperty());
         mutation_state = p_label->GetColour();
     }
 

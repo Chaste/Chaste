@@ -349,7 +349,7 @@ public:
         }
 
         // For coverage, label one cell
-        std::shared_ptr<AbstractCellProperty> p_label(cell_population.GetCellPropertyRegistry()->Get<CellLabel>());
+        boost::shared_ptr<AbstractCellProperty> p_label(cell_population.GetCellPropertyRegistry()->Get<CellLabel>());
         cell_population.GetCellUsingLocationIndex(location_indices[0])->AddCellProperty(p_label);
 
         TS_ASSERT_EQUALS(cell_population.GetIdentifier(), "CaBasedCellPopulation-2");
@@ -841,7 +841,7 @@ public:
             TS_ASSERT_EQUALS(p_static_population->GetIterateRandomlyOverUpdateRuleCollection(), true);
 
             // Test that the update rule has been archived correctly
-            std::vector<std::shared_ptr<AbstractCaUpdateRule<2> > > update_rule_collection = p_static_population->rGetUpdateRuleCollection();
+            std::vector<boost::shared_ptr<AbstractCaUpdateRule<2> > > update_rule_collection = p_static_population->rGetUpdateRuleCollection();
             TS_ASSERT_EQUALS(update_rule_collection.size(), 1u);
             TS_ASSERT_EQUALS((*update_rule_collection[0]).GetIdentifier(), "DiffusionCaUpdateRule-2");
 

@@ -60,8 +60,8 @@ AbstractCardiacCellInterface* CreateCellWithStandardStimulus(DynamicCellModelLoa
     // Set stimulus
     double duration = 2.0; // ms
     double when = 50.0; // ms
-    std::shared_ptr<AbstractStimulusFunction> p_stimulus(new SimpleStimulus(magnitude, duration, when));
-    std::shared_ptr<AbstractIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
+    boost::shared_ptr<AbstractStimulusFunction> p_stimulus(new SimpleStimulus(magnitude, duration, when));
+    boost::shared_ptr<AbstractIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
 
     // Load the cell model dynamically
     AbstractCardiacCellInterface* p_cell = rLoader.CreateCell(p_solver, p_stimulus);

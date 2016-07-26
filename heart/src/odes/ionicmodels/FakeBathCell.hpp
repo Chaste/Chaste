@@ -75,8 +75,8 @@ public:
      * @param pSolver  unused
      * @param pIntracellularStimulus  unused
      */
-    FakeBathCell(std::shared_ptr<AbstractIvpOdeSolver> pSolver,
-                 std::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus);
+    FakeBathCell(boost::shared_ptr<AbstractIvpOdeSolver> pSolver,
+                 boost::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus);
 
     /**
      * Destructor; does nothing.
@@ -133,8 +133,8 @@ template<class Archive>
 inline void save_construct_data(
     Archive & ar, const FakeBathCell * t, const unsigned int file_version)
 {
-    const std::shared_ptr<AbstractIvpOdeSolver> p_solver = t->GetSolver();
-    const std::shared_ptr<AbstractStimulusFunction> p_stimulus = t->GetStimulusFunction();
+    const boost::shared_ptr<AbstractIvpOdeSolver> p_solver = t->GetSolver();
+    const boost::shared_ptr<AbstractStimulusFunction> p_stimulus = t->GetStimulusFunction();
     ar << p_solver;
     ar << p_stimulus;
 }
@@ -148,8 +148,8 @@ inline void load_construct_data(
     Archive & ar, FakeBathCell * t, const unsigned int file_version)
 {
 
-    std::shared_ptr<AbstractIvpOdeSolver> p_solver;
-    std::shared_ptr<AbstractStimulusFunction> p_stimulus;
+    boost::shared_ptr<AbstractIvpOdeSolver> p_solver;
+    boost::shared_ptr<AbstractStimulusFunction> p_stimulus;
     ar >> p_solver;
     ar >> p_stimulus;
     ::new(t)FakeBathCell(p_solver, p_stimulus);

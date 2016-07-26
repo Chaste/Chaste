@@ -69,9 +69,9 @@ public:
     {
         SimulationTime* p_simulation_time = SimulationTime::Instance();
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(200, 20);
-        std::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
-        std::shared_ptr<AbstractCellProperty> p_stem_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
-        std::shared_ptr<AbstractCellProperty> p_transit_type(CellPropertyRegistry::Instance()->Get<TransitCellProliferativeType>());
+        boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
+        boost::shared_ptr<AbstractCellProperty> p_stem_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
+        boost::shared_ptr<AbstractCellProperty> p_transit_type(CellPropertyRegistry::Instance()->Get<TransitCellProliferativeType>());
 
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         CellPtr p_stem_cell(new Cell(p_healthy_state, p_model));
@@ -137,8 +137,8 @@ public:
 
         double wnt_stimulus = 1.0;
         WntConcentration<2>::Instance()->SetConstantWntValueForTesting(wnt_stimulus);
-        std::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
-        std::shared_ptr<AbstractCellProperty> p_transit_type(CellPropertyRegistry::Instance()->Get<TransitCellProliferativeType>());
+        boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
+        boost::shared_ptr<AbstractCellProperty> p_transit_type(CellPropertyRegistry::Instance()->Get<TransitCellProliferativeType>());
 
         WntCellCycleModel* p_cell_cycle_model1 = new WntCellCycleModel();
         p_cell_cycle_model1->SetDimension(2);
@@ -225,8 +225,8 @@ public:
         double wnt_stimulus = 1.0;
         WntConcentration<2>::Instance()->SetConstantWntValueForTesting(wnt_stimulus);
 
-        std::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
-        std::shared_ptr<AbstractCellProperty> p_transit_type(CellPropertyRegistry::Instance()->Get<TransitCellProliferativeType>());
+        boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
+        boost::shared_ptr<AbstractCellProperty> p_transit_type(CellPropertyRegistry::Instance()->Get<TransitCellProliferativeType>());
 
         StochasticWntCellCycleModel* p_cell_model = new StochasticWntCellCycleModel();
         p_cell_model->SetDimension(2);
@@ -315,12 +315,12 @@ public:
         double wnt_stimulus = 1.0;
         WntConcentration<2>::Instance()->SetConstantWntValueForTesting(wnt_stimulus);
 
-        std::shared_ptr<AbstractCellProperty> p_wt_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
-        std::shared_ptr<AbstractCellProperty> p_apc_one_hit_state(CellPropertyRegistry::Instance()->Get<ApcOneHitCellMutationState>());
-        std::shared_ptr<AbstractCellProperty> p_apc_two_hit_state(CellPropertyRegistry::Instance()->Get<ApcTwoHitCellMutationState>());
-        std::shared_ptr<AbstractCellProperty> p_bcat_one_hit_state(CellPropertyRegistry::Instance()->Get<BetaCateninOneHitCellMutationState>());
-        std::shared_ptr<AbstractCellProperty> p_label(CellPropertyRegistry::Instance()->Get<CellLabel>());
-        std::shared_ptr<AbstractCellProperty> p_transit_type(CellPropertyRegistry::Instance()->Get<TransitCellProliferativeType>());
+        boost::shared_ptr<AbstractCellProperty> p_wt_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
+        boost::shared_ptr<AbstractCellProperty> p_apc_one_hit_state(CellPropertyRegistry::Instance()->Get<ApcOneHitCellMutationState>());
+        boost::shared_ptr<AbstractCellProperty> p_apc_two_hit_state(CellPropertyRegistry::Instance()->Get<ApcTwoHitCellMutationState>());
+        boost::shared_ptr<AbstractCellProperty> p_bcat_one_hit_state(CellPropertyRegistry::Instance()->Get<BetaCateninOneHitCellMutationState>());
+        boost::shared_ptr<AbstractCellProperty> p_label(CellPropertyRegistry::Instance()->Get<CellLabel>());
+        boost::shared_ptr<AbstractCellProperty> p_transit_type(CellPropertyRegistry::Instance()->Get<TransitCellProliferativeType>());
 
         WntCellCycleModel* p_cell_cycle_model1 = new WntCellCycleModel();
         p_cell_cycle_model1->SetDimension(2);

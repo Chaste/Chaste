@@ -49,7 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Cell.hpp"
 
 class Cell; // Circular definition (cells need to know about SRN models and vice-versa)
-typedef std::shared_ptr<Cell> CellPtr;
+typedef boost::shared_ptr<Cell> CellPtr;
 
 /**
  * The AbstractSrnModel contains basic information to all sub-cellular reaction network (SRN) models.

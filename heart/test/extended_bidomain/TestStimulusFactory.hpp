@@ -69,13 +69,13 @@ public:
     {
     }
 
-    std::shared_ptr<AbstractStimulusFunction> CreateStimulusForNode(Node<3>* pNode)
+    boost::shared_ptr<AbstractStimulusFunction> CreateStimulusForNode(Node<3>* pNode)
     {
         double x = pNode->rGetLocation()[0];
         double y = pNode->rGetLocation()[1];
         double z = pNode->rGetLocation()[2];
 
-        std::shared_ptr<SimpleStimulus> p_stimulus;
+        boost::shared_ptr<SimpleStimulus> p_stimulus;
         if ((x < 0.0005) && (y < 0.0005) && (z < 0.0005))
         {
             p_stimulus.reset ( new SimpleStimulus(-428000, 1.0, 0.1) );
@@ -107,7 +107,7 @@ public:
              iter != mesh.GetNodeIteratorEnd();
              ++iter)
         {
-            std::shared_ptr<AbstractStimulusFunction> stimulus = my_factory.CreateStimulusForNode(&(*iter));
+            boost::shared_ptr<AbstractStimulusFunction> stimulus = my_factory.CreateStimulusForNode(&(*iter));
 
             TS_ASSERT_EQUALS(stimulus->GetStimulus(0), 0);
             TS_ASSERT_EQUALS(stimulus->GetStimulus(1), 0);
@@ -133,14 +133,14 @@ public:
         TS_ASSERT_EQUALS(my_factory.GetNumberOfCells(), 27u);
 
         //probe node 0 (in the stimulated corner)
-        std::shared_ptr<AbstractStimulusFunction> stimulus = my_factory.CreateStimulusForNode(mesh.GetNode(0));
+        boost::shared_ptr<AbstractStimulusFunction> stimulus = my_factory.CreateStimulusForNode(mesh.GetNode(0));
 
         TS_ASSERT_EQUALS(stimulus->GetStimulus(0), 0);//before it starts
         TS_ASSERT_EQUALS(stimulus->GetStimulus(1.01), -428000);//during the stimulus
         TS_ASSERT_EQUALS(stimulus->GetStimulus(2), 0);//after it finished
 
         //probe node 15 (not in the stimulated corner)
-        std::shared_ptr<AbstractStimulusFunction> stimulus_zero = my_factory.CreateStimulusForNode(mesh.GetNode(15));
+        boost::shared_ptr<AbstractStimulusFunction> stimulus_zero = my_factory.CreateStimulusForNode(mesh.GetNode(15));
 
         TS_ASSERT_EQUALS(stimulus_zero->GetStimulus(0), 0);
         TS_ASSERT_EQUALS(stimulus_zero->GetStimulus(1.01), 0);

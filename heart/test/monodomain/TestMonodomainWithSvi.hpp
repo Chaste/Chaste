@@ -61,7 +61,7 @@ template<unsigned DIM>
 class BlockCellFactory : public AbstractCardiacCellFactory<DIM>
 {
 private:
-    std::shared_ptr<SimpleStimulus> mpStimulus;
+    boost::shared_ptr<SimpleStimulus> mpStimulus;
 
 public:
     BlockCellFactory()
@@ -100,7 +100,7 @@ template<unsigned DIM>
 class BlockCellFactoryCvode : public AbstractCardiacCellFactory<DIM>
 {
 private:
-    std::shared_ptr<SimpleStimulus> mpStimulus;
+    boost::shared_ptr<SimpleStimulus> mpStimulus;
 
 public:
     BlockCellFactoryCvode()
@@ -140,7 +140,7 @@ public:
 class HeterogeneousCellFactory : public AbstractCardiacCellFactory<1>
 {
 private:
-    std::shared_ptr<SimpleStimulus> mpStimulus;
+    boost::shared_ptr<SimpleStimulus> mpStimulus;
 
 public:
     HeterogeneousCellFactory()

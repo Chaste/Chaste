@@ -38,7 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vector>
 #include <string>
-
+#include <boost/shared_ptr.hpp>
 #include <boost/logic/tribool.hpp>
 
 #include "FileFinder.hpp"
@@ -74,14 +74,14 @@ public:
      * and uses the default stimulus from the CellML file (if present).
      * @return a pointer to the cell
      */
-    std::shared_ptr<AbstractCardiacCell> LoadCardiacCell(void);
+    boost::shared_ptr<AbstractCardiacCell> LoadCardiacCell(void);
 
 #ifdef CHASTE_CVODE
     /**
      * Make an AbstractCvodeCell, using the default stimulus from the CellML file (if present).
      * @return a pointer to the cell
      */
-    std::shared_ptr<AbstractCvodeCell> LoadCvodeCell(void);
+    boost::shared_ptr<AbstractCvodeCell> LoadCvodeCell(void);
 #endif
 
 private:
@@ -95,7 +95,7 @@ private:
     std::vector<std::string> mOptions;
 
     /** The converter we will use */
-    std::shared_ptr<CellMLToSharedLibraryConverter> mpConverter;
+    boost::shared_ptr<CellMLToSharedLibraryConverter> mpConverter;
 
     /** Whether we are building 'normal' (false) or 'CVODE' (true) cells. */
     boost::logic::tribool mUseCvode;

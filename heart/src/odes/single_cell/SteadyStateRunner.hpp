@@ -77,7 +77,7 @@ public:
      * @param pModel  The cell model to run to steady state.
      * @param twoPaces  Whether to run two paces at once, for detection of steady state alternans.
      */
-    SteadyStateRunner(std::shared_ptr<AbstractCvodeCell> pModel, bool twoPaces=false)
+    SteadyStateRunner(boost::shared_ptr<AbstractCvodeCell> pModel, bool twoPaces=false)
      : AbstractSteadyStateRunner(pModel),
        mTwoPaceScan(twoPaces)
     {};

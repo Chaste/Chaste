@@ -75,7 +75,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class PointStimulus2dCellFactory : public AbstractCardiacCellFactory<2>
 {
 private:
-    std::shared_ptr<SimpleStimulus> mpStimulus;
+    boost::shared_ptr<SimpleStimulus> mpStimulus;
     unsigned mFoundMiddlePoint;
 
 public:
@@ -116,7 +116,7 @@ public:
 class Cvode1dCellFactory : public AbstractCardiacCellFactory<1>
 {
 private:
-    std::shared_ptr<SimpleStimulus> mpStimulus;
+    boost::shared_ptr<SimpleStimulus> mpStimulus;
 
 public:
     Cvode1dCellFactory() : AbstractCardiacCellFactory<1>(),
@@ -127,7 +127,7 @@ public:
     AbstractCvodeCell* CreateCardiacCellForTissueNode(Node<1>* pNode)
     {
         AbstractCvodeCell* p_cell;
-        std::shared_ptr<AbstractIvpOdeSolver> p_empty_solver;
+        boost::shared_ptr<AbstractIvpOdeSolver> p_empty_solver;
 
         double x = pNode->rGetLocation()[0];
 
@@ -1538,8 +1538,8 @@ public:
             HeartConfig::Instance()->SetCapacitance(1.0);
 
             { // Add output modifiers
-                std::shared_ptr<SingleTraceOutputModifier> trace_5(new SingleTraceOutputModifier("trace_5.txt", 5));
-                std::shared_ptr<ActivationOutputModifier> activation(new ActivationOutputModifier("activation.txt", 0.0));
+                boost::shared_ptr<SingleTraceOutputModifier> trace_5(new SingleTraceOutputModifier("trace_5.txt", 5));
+                boost::shared_ptr<ActivationOutputModifier> activation(new ActivationOutputModifier("activation.txt", 0.0));
                 TS_ASSERT_EQUALS(monodomain_problem.mOutputModifiers.size(), 0u);
                 monodomain_problem.AddOutputModifier(trace_5);
                 monodomain_problem.AddOutputModifier(activation);

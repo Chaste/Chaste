@@ -38,24 +38,24 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DummyModifier.hpp"
 
 template<class CARDIAC_CELL>
-void AbstractCardiacCellWithModifiers<CARDIAC_CELL>::AddModifier(std::string modifierName, std::shared_ptr<AbstractModifier>& pModifier)
+void AbstractCardiacCellWithModifiers<CARDIAC_CELL>::AddModifier(std::string modifierName, boost::shared_ptr<AbstractModifier>& pModifier)
 {
     mModifiersMap[modifierName] = &pModifier;
-    pModifier = std::shared_ptr<AbstractModifier>(new DummyModifier()); // This modifier always returns what is passed in.
+    pModifier = boost::shared_ptr<AbstractModifier>(new DummyModifier()); // This modifier always returns what is passed in.
 }
 
 template<class CARDIAC_CELL>
-AbstractCardiacCellWithModifiers<CARDIAC_CELL>::AbstractCardiacCellWithModifiers(std::shared_ptr<AbstractIvpOdeSolver> pOdeSolver,
+AbstractCardiacCellWithModifiers<CARDIAC_CELL>::AbstractCardiacCellWithModifiers(boost::shared_ptr<AbstractIvpOdeSolver> pOdeSolver,
                                  unsigned numberOfStateVariables,
                                  unsigned voltageIndex,
-                                 std::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus)
+                                 boost::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus)
     : CARDIAC_CELL(pOdeSolver, numberOfStateVariables, voltageIndex, pIntracellularStimulus)
 {
     mModifiersMap.clear();
 }
 
 template<class CARDIAC_CELL>
-std::shared_ptr<AbstractModifier> AbstractCardiacCellWithModifiers<CARDIAC_CELL>::GetModifier(const std::string& rModifierName)
+boost::shared_ptr<AbstractModifier> AbstractCardiacCellWithModifiers<CARDIAC_CELL>::GetModifier(const std::string& rModifierName)
 {
     if (mModifiersMap.find(rModifierName) == mModifiersMap.end())
     {
@@ -71,7 +71,7 @@ bool AbstractCardiacCellWithModifiers<CARDIAC_CELL>::HasModifier(const std::stri
 }
 
 template<class CARDIAC_CELL>
-void AbstractCardiacCellWithModifiers<CARDIAC_CELL>::SetModifier(const std::string& rModifierName, std::shared_ptr<AbstractModifier>& pNewModifier)
+void AbstractCardiacCellWithModifiers<CARDIAC_CELL>::SetModifier(const std::string& rModifierName, boost::shared_ptr<AbstractModifier>& pNewModifier)
 {
     if (mModifiersMap.find(rModifierName) == mModifiersMap.end())
     {

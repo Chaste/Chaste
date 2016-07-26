@@ -65,7 +65,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class StimulatedCellFactory: public AbstractCardiacCellFactory<3>
 {
 private:
-        std::shared_ptr<SimpleStimulus> mpStimulus;
+        boost::shared_ptr<SimpleStimulus> mpStimulus;
         //static const double magnitude = -105.0*1400;
 public:
     StimulatedCellFactory() : AbstractCardiacCellFactory<3>(),
@@ -116,13 +116,13 @@ public:
     {
     }
 
-    std::shared_ptr<AbstractStimulusFunction> CreateStimulusForNode(Node<3>* pNode)
+    boost::shared_ptr<AbstractStimulusFunction> CreateStimulusForNode(Node<3>* pNode)
     {
         double x = pNode->rGetLocation()[0];
         double y = pNode->rGetLocation()[1];
         double z = pNode->rGetLocation()[2];
 
-        std::shared_ptr<SimpleStimulus> p_stimulus;
+        boost::shared_ptr<SimpleStimulus> p_stimulus;
         if ((x < 0.005) && (y < 0.005) && (z < 0.005))
         {
             p_stimulus.reset ( new SimpleStimulus(-428000, 1.0, 0.1) );
@@ -141,9 +141,9 @@ class StimulusFactory2D: public AbstractStimulusFactory<2>
 public:
     StimulusFactory2D() : AbstractStimulusFactory<2>()
     {}
-    std::shared_ptr<AbstractStimulusFunction> CreateStimulusForNode(Node<2>* pNode)
+    boost::shared_ptr<AbstractStimulusFunction> CreateStimulusForNode(Node<2>* pNode)
     {
-        std::shared_ptr<SimpleStimulus> p_stimulus ( new SimpleStimulus(-428000, 1.0, 0.1) );
+        boost::shared_ptr<SimpleStimulus> p_stimulus ( new SimpleStimulus(-428000, 1.0, 0.1) );
         return p_stimulus;
     }
 };
@@ -409,19 +409,19 @@ public:
         TetrahedralMesh<3,3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
-        std::vector<std::shared_ptr<AbstractChasteRegion<3> > > heterogeneity_areas;
+        std::vector<boost::shared_ptr<AbstractChasteRegion<3> > > heterogeneity_areas;
         std::vector<double> Ggap_values;
 
         //first cuboid include node 0
         ChastePoint<3> cornerA(-1, -1, 0);
         ChastePoint<3> cornerB(0.001, 0.001, 0.001);
-        std::shared_ptr<ChasteCuboid<3> > p_cuboid_1(new ChasteCuboid<3>(cornerA, cornerB));
+        boost::shared_ptr<ChasteCuboid<3> > p_cuboid_1(new ChasteCuboid<3>(cornerA, cornerB));
         heterogeneity_areas.push_back(p_cuboid_1);
 
         //second cuboid include node 6
         ChastePoint<3> cornerC(0.199, 0.199, 0.199);
         ChastePoint<3> cornerD(0.25, 0.25, 0.25);
-        std::shared_ptr<ChasteCuboid<3> > p_cuboid_2(new ChasteCuboid<3>(cornerC, cornerD));
+        boost::shared_ptr<ChasteCuboid<3> > p_cuboid_2(new ChasteCuboid<3>(cornerC, cornerD));
         ChasteCuboid<3> cuboid_2(cornerC, cornerD);
 
         heterogeneity_areas.push_back(p_cuboid_2);
@@ -573,11 +573,11 @@ public:
             extended_tissue.SetUserSuppliedExtracellularStimulus(true);
 
             //set some heterogeneities in Ggap
-            std::vector<std::shared_ptr<AbstractChasteRegion<3> > > heterogeneity_areas;
+            std::vector<boost::shared_ptr<AbstractChasteRegion<3> > > heterogeneity_areas;
             std::vector<double> Ggap_values;
             ChastePoint<3> cornerA(-1, -1, 0);
             ChastePoint<3> cornerB(0.001, 0.001, 0.001);
-            std::shared_ptr<ChasteCuboid<3> > p_cuboid_1(new ChasteCuboid<3>(cornerA, cornerB));
+            boost::shared_ptr<ChasteCuboid<3> > p_cuboid_1(new ChasteCuboid<3>(cornerA, cornerB));
             heterogeneity_areas.push_back(p_cuboid_1);
             //within the first area
             Ggap_values.push_back(143.0);

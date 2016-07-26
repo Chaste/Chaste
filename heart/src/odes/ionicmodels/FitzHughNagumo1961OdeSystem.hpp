@@ -56,8 +56,8 @@ public:
      * @param pOdeSolver is a pointer to the ODE solver
      * @param pIntracellularStimulus is a pointer to the intracellular stimulus
      */
-    FitzHughNagumo1961OdeSystem(std::shared_ptr<AbstractIvpOdeSolver> pOdeSolver,
-                                std::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus);
+    FitzHughNagumo1961OdeSystem(boost::shared_ptr<AbstractIvpOdeSolver> pOdeSolver,
+                                boost::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus);
 
     /**
      * Destructor

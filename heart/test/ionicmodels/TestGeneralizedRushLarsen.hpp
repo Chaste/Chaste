@@ -85,8 +85,8 @@ class TestGeneralizedRushLarsen : public CxxTest::TestSuite
         CellMLToSharedLibraryConverter converter(true);
         std::string dirname = "TestGeneralizedRushLarsen";
         std::string model = "LuoRudy1991";
-        std::shared_ptr<AbstractIvpOdeSolver> p_solver;
-        std::shared_ptr<ZeroStimulus> p_stimulus(new ZeroStimulus());
+        boost::shared_ptr<AbstractIvpOdeSolver> p_solver;
+        boost::shared_ptr<ZeroStimulus> p_stimulus(new ZeroStimulus());
 
         std::vector<std::string> args;
         args.push_back("--grl1");
@@ -110,8 +110,8 @@ class TestGeneralizedRushLarsen : public CxxTest::TestSuite
         CellMLToSharedLibraryConverter converter(true);
         std::string dirname = "TestGeneralizedRushLarsen2";
         std::string model = "LuoRudy1991";
-        std::shared_ptr<AbstractIvpOdeSolver> p_solver;
-        std::shared_ptr<ZeroStimulus> p_stimulus(new ZeroStimulus());
+        boost::shared_ptr<AbstractIvpOdeSolver> p_solver;
+        boost::shared_ptr<ZeroStimulus> p_stimulus(new ZeroStimulus());
 
         std::vector<std::string> args;
         args.push_back("--grl2");
@@ -149,7 +149,7 @@ public:
         TS_ASSERT_THROWS_NOTHING(p_grl_cell->ForceUseOfNumericalJacobian(true));
 
         // Normal Luo-Rudy for comparison
-        std::shared_ptr<HeunIvpOdeSolver> p_heun_solver(new HeunIvpOdeSolver());
+        boost::shared_ptr<HeunIvpOdeSolver> p_heun_solver(new HeunIvpOdeSolver());
         CellLuoRudy1991FromCellML reference_model(p_heun_solver, mpGeneralizedRushLarsenCell->GetStimulusFunction());
 
         // Check GetIIonic is identical
@@ -168,7 +168,7 @@ public:
         }
 
         // Test stimulated cell (using Compute)
-        std::shared_ptr<SimpleStimulus> p_stimulus(new SimpleStimulus(-25.5, 1.99, 0.0));
+        boost::shared_ptr<SimpleStimulus> p_stimulus(new SimpleStimulus(-25.5, 1.99, 0.0));
         mpGeneralizedRushLarsenCell->ResetToInitialConditions();
         mpGeneralizedRushLarsenCell->SetStimulusFunction(p_stimulus);
         OdeSolution solutions_GRL1 = mpGeneralizedRushLarsenCell->Compute(0.0, 1.0, 0.01);
@@ -186,7 +186,7 @@ public:
 
         //Compare LuoRudy solution with general GRL1 solver solution (should match)
         mpGeneralizedRushLarsenCell->ResetToInitialConditions();
-        std::shared_ptr<ZeroStimulus> p_stimulus_zero(new ZeroStimulus());
+        boost::shared_ptr<ZeroStimulus> p_stimulus_zero(new ZeroStimulus());
         mpGeneralizedRushLarsenCell->SetStimulusFunction(p_stimulus_zero);
         mpGeneralizedRushLarsenCell->SetTimestep(1e-3);
         mpGeneralizedRushLarsenCell->SetVoltage(-30);
@@ -203,7 +203,7 @@ public:
         }
 
         // Compare with general GRL1 method
-        std::shared_ptr<GRL1IvpOdeSolver> p_grl1_solver(new GRL1IvpOdeSolver());
+        boost::shared_ptr<GRL1IvpOdeSolver> p_grl1_solver(new GRL1IvpOdeSolver());
         CellLuoRudy1991FromCellML reference_model_grl1(p_grl1_solver, mpGeneralizedRushLarsenCell->GetStimulusFunction());
         reference_model_grl1.ResetToInitialConditions();
         reference_model_grl1.SetStimulusFunction(p_stimulus_zero);
@@ -233,7 +233,7 @@ public:
         OdeSolution solutions_GRL1_stimulated_cell_order2 = mpGeneralizedRushLarsenCell->Compute(0.0, 1.0);
 
         // Get accurate solution to be used as reference solution
-        //std::shared_ptr<HeunIvpOdeSolver> p_heun_solver(new HeunIvpOdeSolver());
+        //boost::shared_ptr<HeunIvpOdeSolver> p_heun_solver(new HeunIvpOdeSolver());
         reference_model.SetStimulusFunction(p_stimulus_zero);
         reference_model.SetVoltage(-30);
         reference_model.ResetToInitialConditions();
@@ -262,7 +262,7 @@ public:
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
 
         // Normal Luo-Rudy for comparison
-        std::shared_ptr<HeunIvpOdeSolver> p_heun_solver(new HeunIvpOdeSolver());
+        boost::shared_ptr<HeunIvpOdeSolver> p_heun_solver(new HeunIvpOdeSolver());
         CellLuoRudy1991FromCellML reference_model(p_heun_solver, mpGeneralizedRushLarsenCell->GetStimulusFunction());
 
         // Check GetIIonic is identical
@@ -280,7 +280,7 @@ public:
                             reference_model.rGetStateVariables()[i], 1e-6);
         }
         // Test stimulated cell (using Compute)
-        std::shared_ptr<SimpleStimulus> p_stimulus(new SimpleStimulus(-25.5, 1.99, 0.0));
+        boost::shared_ptr<SimpleStimulus> p_stimulus(new SimpleStimulus(-25.5, 1.99, 0.0));
         mpGeneralizedRushLarsenCell->ResetToInitialConditions();
         mpGeneralizedRushLarsenCell->SetStimulusFunction(p_stimulus);
         OdeSolution solutions_GRL2 = mpGeneralizedRushLarsenCell->Compute(0.0, 1.0, 0.01);
@@ -298,14 +298,14 @@ public:
 
         //Compare LuoRudy solution with general GRL2 solver solution (should match)
         mpGeneralizedRushLarsenCell->ResetToInitialConditions();
-        std::shared_ptr<ZeroStimulus> p_stimulus_zero(new ZeroStimulus());
+        boost::shared_ptr<ZeroStimulus> p_stimulus_zero(new ZeroStimulus());
         mpGeneralizedRushLarsenCell->ResetToInitialConditions();
         mpGeneralizedRushLarsenCell->SetStimulusFunction(p_stimulus_zero);
         mpGeneralizedRushLarsenCell->SetTimestep(1e-3);
         mpGeneralizedRushLarsenCell->SetVoltage(-30);
         OdeSolution solutions_GRL2_stimulated_cell_order2 = mpGeneralizedRushLarsenCell->Compute(0.0, 1e-3);
 
-        std::shared_ptr<GRL2IvpOdeSolver> p_grl2_solver(new GRL2IvpOdeSolver());
+        boost::shared_ptr<GRL2IvpOdeSolver> p_grl2_solver(new GRL2IvpOdeSolver());
         CellLuoRudy1991FromCellML reference_model_grl2(p_grl2_solver, mpGeneralizedRushLarsenCell->GetStimulusFunction());
 
         // Compare with general GRL2 method

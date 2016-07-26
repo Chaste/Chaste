@@ -80,8 +80,8 @@ DynamicCellModelLoader::~DynamicCellModelLoader()
     }
 }
 
-AbstractCardiacCellInterface* DynamicCellModelLoader::CreateCell(std::shared_ptr<AbstractIvpOdeSolver> pSolver,
-                                                                 std::shared_ptr<AbstractStimulusFunction> pStimulus)
+AbstractCardiacCellInterface* DynamicCellModelLoader::CreateCell(boost::shared_ptr<AbstractIvpOdeSolver> pSolver,
+                                                                 boost::shared_ptr<AbstractStimulusFunction> pStimulus)
 {
     AbstractCardiacCellInterface* p_cell = (*mpCreationFunction)(pSolver, pStimulus);
 

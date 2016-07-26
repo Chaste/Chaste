@@ -38,7 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cassert>
 #include "Exception.hpp"
 
-AbstractOdeSrnModel::AbstractOdeSrnModel(unsigned stateSize, std::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
+AbstractOdeSrnModel::AbstractOdeSrnModel(unsigned stateSize, boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
     : AbstractSrnModel(),
       CellCycleModelOdeHandler(SimulationTime::Instance()->GetTime(), pOdeSolver),
       mStateSize(stateSize)

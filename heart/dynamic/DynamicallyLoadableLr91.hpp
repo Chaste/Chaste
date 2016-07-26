@@ -111,8 +111,8 @@ public:
      * @param pSolver is a pointer to the ODE solver
      * @param pIntracellularStimulus is a pointer to the intracellular stimulus
      */
-    DynamicallyLoadableLr91(std::shared_ptr<AbstractIvpOdeSolver> pSolver,
-                            std::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus);
+    DynamicallyLoadableLr91(boost::shared_ptr<AbstractIvpOdeSolver> pSolver,
+                            boost::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus);
 
     /**
      * Destructor
@@ -161,8 +161,8 @@ template<class Archive>
 inline void save_construct_data(
     Archive & ar, const DynamicallyLoadableLr91 * t, const unsigned int file_version)
 {
-    const std::shared_ptr<AbstractIvpOdeSolver> p_solver = t->GetSolver();
-    const std::shared_ptr<AbstractStimulusFunction> p_stimulus = t->GetStimulusFunction();
+    const boost::shared_ptr<AbstractIvpOdeSolver> p_solver = t->GetSolver();
+    const boost::shared_ptr<AbstractStimulusFunction> p_stimulus = t->GetStimulusFunction();
     ar << p_solver;
     ar << p_stimulus;
 }
@@ -178,8 +178,8 @@ inline void load_construct_data(
     Archive & ar, DynamicallyLoadableLr91 * t, const unsigned int file_version)
 {
 
-    std::shared_ptr<AbstractIvpOdeSolver> p_solver;
-    std::shared_ptr<AbstractStimulusFunction> p_stimulus;
+    boost::shared_ptr<AbstractIvpOdeSolver> p_solver;
+    boost::shared_ptr<AbstractStimulusFunction> p_stimulus;
     ar >> p_solver;
     ar >> p_stimulus;
     ::new(t)DynamicallyLoadableLr91(p_solver, p_stimulus);

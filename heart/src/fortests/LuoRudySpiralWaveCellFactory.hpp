@@ -50,11 +50,11 @@ class LuoRudySpiralWaveCellFactory : public AbstractCardiacCellFactory<2>
 {
 private:
     /** The stimulus to be applied at the S1 site (simple one-off stimulus). */
-    std::shared_ptr<SimpleStimulus> mpS1Stimulus;
+    boost::shared_ptr<SimpleStimulus> mpS1Stimulus;
     /** The stimulus to be applied at the S2 site (simple one-off stimulus). */
-    std::shared_ptr<SimpleStimulus> mpS2Stimulus;
+    boost::shared_ptr<SimpleStimulus> mpS2Stimulus;
     /** Both of the S1 and S2 stimuli. */
-    std::shared_ptr<MultiStimulus> mpBothStimulus;
+    boost::shared_ptr<MultiStimulus> mpBothStimulus;
     /** Width of the domain. */
     double mXExtent;
     /** Height of the domain. */

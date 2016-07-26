@@ -94,13 +94,13 @@ public:
          * If you want to define your own stimulus without using the default one,
          * you can define it here instead of giving it an empty stimulus:
          *
-         * {{{std::shared_ptr<RegularStimulus> p_stimulus(new RegularStimulus(-25.5,2.0,50.0,500));}}}
+         * {{{boost::shared_ptr<RegularStimulus> p_stimulus(new RegularStimulus(-25.5,2.0,50.0,500));}}}
          *
          * the parameters are magnitude, duration, period, and start time of stimulus.
          */
-        std::shared_ptr<RegularStimulus> p_stimulus;
-        std::shared_ptr<AbstractIvpOdeSolver> p_solver;
-        std::shared_ptr<AbstractCvodeCell> p_model(new CellShannon2004FromCellMLCvode(p_solver, p_stimulus));
+        boost::shared_ptr<RegularStimulus> p_stimulus;
+        boost::shared_ptr<AbstractIvpOdeSolver> p_solver;
+        boost::shared_ptr<AbstractCvodeCell> p_model(new CellShannon2004FromCellMLCvode(p_solver, p_stimulus));
 
         /*
          * Once the model is set up we can tell it to use the the default stimulus from CellML,
@@ -111,7 +111,7 @@ public:
          * {{{p_model->HasCellMLDefaultStimulus()}}}
          *
          */
-        std::shared_ptr<RegularStimulus> p_regular_stim = p_model->UseCellMLDefaultStimulus();
+        boost::shared_ptr<RegularStimulus> p_regular_stim = p_model->UseCellMLDefaultStimulus();
 
         /*
          * Now you can modify certain parameters of the stimulus function, such as the period

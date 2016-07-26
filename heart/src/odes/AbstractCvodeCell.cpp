@@ -45,11 +45,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VectorHelperFunctions.hpp"
 
 
-AbstractCvodeCell::AbstractCvodeCell(std::shared_ptr<AbstractIvpOdeSolver> /* unused */,
+AbstractCvodeCell::AbstractCvodeCell(boost::shared_ptr<AbstractIvpOdeSolver> /* unused */,
                                      unsigned numberOfStateVariables,
                                      unsigned voltageIndex,
-                                     std::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus)
-    : AbstractCardiacCellInterface(std::shared_ptr<AbstractIvpOdeSolver>(), voltageIndex, pIntracellularStimulus),
+                                     boost::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus)
+    : AbstractCardiacCellInterface(boost::shared_ptr<AbstractIvpOdeSolver>(), voltageIndex, pIntracellularStimulus),
       AbstractCvodeSystem(numberOfStateVariables),
       mMaxDt(DOUBLE_UNSET)
 {

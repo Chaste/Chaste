@@ -202,7 +202,7 @@ void NodeBasedCellPopulationWithParticles<DIM>::AcceptCellWritersAcrossPopulatio
         // If it isn't a particle then there might be cell writers attached
         if (! this->IsParticle(node_iter->GetIndex()))
         {
-            for (typename std::vector<std::shared_ptr<AbstractCellWriter<DIM, DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
+            for (typename std::vector<boost::shared_ptr<AbstractCellWriter<DIM, DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
                  cell_writer_iter != this->mCellWriters.end();
                  ++cell_writer_iter)
             {
@@ -253,7 +253,7 @@ void NodeBasedCellPopulationWithParticles<DIM>::WriteVtkResultsToFile(const std:
     mesh_writer.SetParallelFiles(*(this->mpNodesOnlyMesh));
 
     // Iterate over any cell writers that are present
-    for (typename std::vector<std::shared_ptr<AbstractCellWriter<DIM, DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
+    for (typename std::vector<boost::shared_ptr<AbstractCellWriter<DIM, DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
          cell_writer_iter != this->mCellWriters.end();
          ++cell_writer_iter)
     {

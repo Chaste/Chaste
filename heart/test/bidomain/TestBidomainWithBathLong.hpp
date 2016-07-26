@@ -52,7 +52,7 @@ class BathCellFactory : public AbstractCardiacCellFactory<DIM>
 {
 private:
     // define a new stimulus
-    std::shared_ptr<SimpleStimulus> mpStimulus;
+    boost::shared_ptr<SimpleStimulus> mpStimulus;
     c_vector<double,DIM> mStimulatedPoint;
 
 public:

@@ -85,8 +85,8 @@ public:
         // Set up cells, one for each VertexElement. Give each cell
         // a birth time of -elem_index, so its age is elem_index
         std::vector<CellPtr> cells;
-        std::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
-        std::shared_ptr<AbstractCellProliferativeType> p_diff_type(new DifferentiatedCellProliferativeType);
+        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+        boost::shared_ptr<AbstractCellProliferativeType> p_diff_type(new DifferentiatedCellProliferativeType);
         for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();

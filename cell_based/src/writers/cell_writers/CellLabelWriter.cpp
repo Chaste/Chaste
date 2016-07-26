@@ -51,7 +51,7 @@ double CellLabelWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataForVtkOutput(CellPtr 
     if (pCell->HasCellProperty<CellLabel>())
     {
         CellPropertyCollection collection = pCell->rGetCellPropertyCollection().GetProperties<CellLabel>();
-        std::shared_ptr<CellLabel> p_label = boost::static_pointer_cast<CellLabel>(collection.GetProperty());
+        boost::shared_ptr<CellLabel> p_label = boost::static_pointer_cast<CellLabel>(collection.GetProperty());
         label = p_label->GetColour();
     }
     return label;
@@ -64,7 +64,7 @@ void CellLabelWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, AbstractC
     if (pCell->HasCellProperty<CellLabel>())
     {
         CellPropertyCollection collection = pCell->rGetCellPropertyCollection().GetProperties<CellLabel>();
-        std::shared_ptr<CellLabel> p_label = boost::static_pointer_cast<CellLabel>(collection.GetProperty());
+        boost::shared_ptr<CellLabel> p_label = boost::static_pointer_cast<CellLabel>(collection.GetProperty());
         label = p_label->GetColour();
     }
 
