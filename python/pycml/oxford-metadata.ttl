@@ -126,6 +126,10 @@
     a :Concentration ;
     rdfs:label "Ionic concentrations in the cleft / dyadic space" .
 
+:SubMembraneConcentration
+    a :Concentration ;
+    rdfs:label "Ionic concentrations in the sub-membrane space" .
+
 :ChasteMetadata
     a :Category ;
     rdfs:label "Basic Chaste metadata" ;
@@ -334,6 +338,30 @@
     a :CleftConcentration ;
     rdfs:label "Concentration of chloride ions in the dyadic sub-space" ;
     rdfs:comment "Some models also have a separate dyadic sub-space (cytosol between JSR and t-tubules)." .
+
+:submembrane_space_calcium_concentration
+    a :Annotation ;
+    a :SubMembraneConcentration ;
+    rdfs:label "Concentration of calcium ions in the sub-membrane compartment" ;
+    rdfs:comment "Some models have a separate compartment underlying the entire cell membrane, distinct from the dyadic sub-space." .
+
+:submembrane_space_potassium_concentration
+    a :Annotation ;
+    a :SubMembraneConcentration ;
+    rdfs:label "Concentration of potassium ions in the sub-membrane compartment" ;
+    rdfs:comment "Some models have a separate compartment underlying the entire cell membrane, distinct from the dyadic sub-space." .
+
+:submembrane_space_sodium_concentration
+    a :Annotation ;
+    a :SubMembraneConcentration ;
+    rdfs:label "Concentration of sodium ions in the sub-membrane compartment" ;
+    rdfs:comment "Some models have a separate compartment underlying the entire cell membrane, distinct from the dyadic sub-space." .
+
+:submembrane_space_chloride_concentration
+    a :Annotation ;
+    a :SubMembraneConcentration ;
+    rdfs:label "Concentration of chloride ions in the sub-membrane compartment" ;
+    rdfs:comment "Some models have a separate compartment underlying the entire cell membrane, distinct from the dyadic sub-space." .
 
 # Others
 :bath_potassium_concentration
