@@ -685,7 +685,7 @@ void ImmersedBoundaryCellPopulation<DIM>::SetIfPopulationHasActiveSources(bool h
 template<unsigned DIM>
 c_vector<double, DIM> ImmersedBoundaryCellPopulation<DIM>::CalculateCellDivisionVector(CellPtr pParentCell)
 {
-    return unit_vector<double>(2,0);
+    return unit_vector<double>(DIM,0);
 }
 
 // Explicit instantiation
