@@ -65,7 +65,7 @@ struct null_deleter
     }
 };
 
-Cell::Cell(boost::shared_ptr<AbstractCellProperty> pMutationState,
+Cell::Cell(std::shared_ptr<AbstractCellProperty> pMutationState,
            AbstractCellCycleModel* pCellCycleModel,
            AbstractSrnModel* pSrnModel,
            bool archiving,
@@ -162,14 +162,14 @@ Cell::~Cell()
     delete mpSrnModel;
 }
 
-void Cell::SetCellProliferativeType(boost::shared_ptr<AbstractCellProperty> pProliferativeType)
+void Cell::SetCellProliferativeType(std::shared_ptr<AbstractCellProperty> pProliferativeType)
 {
     if (!pProliferativeType->IsSubType<AbstractCellProliferativeType>())
     {
         EXCEPTION("Attempting to give cell a cell proliferative type that is not a subtype of AbstractCellProliferativeType");
     }
 
-    boost::shared_ptr<AbstractCellProliferativeType> p_old_proliferative_type = GetCellProliferativeType();
+    std::shared_ptr<AbstractCellProliferativeType> p_old_proliferative_type = GetCellProliferativeType();
 
     p_old_proliferative_type->DecrementCellCount();
     mCellPropertyCollection.RemoveProperty(p_old_proliferative_type);
@@ -177,7 +177,7 @@ void Cell::SetCellProliferativeType(boost::shared_ptr<AbstractCellProperty> pPro
     AddCellProperty(pProliferativeType);
 }
 
-boost::shared_ptr<AbstractCellProliferativeType> Cell::GetCellProliferativeType()  const
+std::shared_ptr<AbstractCellProliferativeType> Cell::GetCellProliferativeType()  const
 {
     CellPropertyCollection proliferative_type_collection = mCellPropertyCollection.GetPropertiesType<AbstractCellProliferativeType>();
 
@@ -247,21 +247,21 @@ void Cell::SetBirthTime(double birthTime)
     mpCellCycleModel->SetBirthTime(birthTime);
 }
 
-void Cell::SetMutationState(boost::shared_ptr<AbstractCellProperty> pMutationState)
+void Cell::SetMutationState(std::shared_ptr<AbstractCellProperty> pMutationState)
 {
     if (!pMutationState->IsSubType<AbstractCellMutationState>())
     {
         EXCEPTION("Attempting to give cell a cell mutation state that is not a subtype of AbstractCellMutationState");
     }
 
-    boost::shared_ptr<AbstractCellMutationState> p_old_mutation_state = GetMutationState();
+    std::shared_ptr<AbstractCellMutationState> p_old_mutation_state = GetMutationState();
     p_old_mutation_state->DecrementCellCount();
     mCellPropertyCollection.RemoveProperty(p_old_mutation_state);
 
     AddCellProperty(pMutationState);
 }
 
-boost::shared_ptr<AbstractCellMutationState> Cell::GetMutationState() const
+std::shared_ptr<AbstractCellMutationState> Cell::GetMutationState() const
 {
     CellPropertyCollection mutation_state_collection = mCellPropertyCollection.GetPropertiesType<AbstractCellMutationState>();
 
@@ -276,7 +276,7 @@ boost::shared_ptr<AbstractCellMutationState> Cell::GetMutationState() const
     return boost::static_pointer_cast<AbstractCellMutationState>(mutation_state_collection.GetProperty());
 }
 
-boost::shared_ptr<CellData> Cell::GetCellData() const
+std::shared_ptr<CellData> Cell::GetCellData() const
 {
     CellPropertyCollection cell_data_collection = mCellPropertyCollection.GetPropertiesType<CellData>();
 
@@ -294,7 +294,7 @@ bool Cell::HasCellVecData() const
     return mCellPropertyCollection.HasPropertyType<CellVecData>();
 }
 
-boost::shared_ptr<CellVecData> Cell::GetCellVecData() const
+std::shared_ptr<CellVecData> Cell::GetCellVecData() const
 {
     assert(HasCellVecData());
 
@@ -319,7 +319,7 @@ const CellPropertyCollection& Cell::rGetCellPropertyCollection() const
     return mCellPropertyCollection;
 }
 
-void Cell::AddCellProperty(const boost::shared_ptr<AbstractCellProperty>& rProperty)
+void Cell::AddCellProperty(const std::shared_ptr<AbstractCellProperty>& rProperty)
 {
     // Note: if the cell already has the specified property, no action is taken
     if (!mCellPropertyCollection.HasProperty(rProperty))
@@ -416,7 +416,7 @@ void Cell::Kill()
     mIsDead = true;
 }
 
-void Cell::SetAncestor(boost::shared_ptr<AbstractCellProperty> pCellAncestor)
+void Cell::SetAncestor(std::shared_ptr<AbstractCellProperty> pCellAncestor)
 {
     if (!pCellAncestor->IsSubType<CellAncestor>())
     {
@@ -447,7 +447,7 @@ unsigned Cell::GetAncestor() const
         return UNSIGNED_UNSET;
     }
 
-    boost::shared_ptr<CellAncestor> p_ancestor = boost::static_pointer_cast<CellAncestor>(ancestor_collection.GetProperty());
+    std::shared_ptr<CellAncestor> p_ancestor = boost::static_pointer_cast<CellAncestor>(ancestor_collection.GetProperty());
 
     return p_ancestor->GetAncestor();
 }
@@ -458,7 +458,7 @@ unsigned Cell::GetCellId() const
 
     assert(cell_id_collection.GetSize() == 1);
 
-    boost::shared_ptr<CellId> p_cell_id = boost::static_pointer_cast<CellId>(cell_id_collection.GetProperty());
+    std::shared_ptr<CellId> p_cell_id = boost::static_pointer_cast<CellId>(cell_id_collection.GetProperty());
 
     return p_cell_id->GetCellId();
 }
@@ -500,7 +500,7 @@ CellPtr Cell::Divide()
     assert(daughter_property_collection.HasPropertyType<CellData>());
 
     // Get the existing copy of the cell data and remove it from the daughter cell
-    boost::shared_ptr<CellData> p_cell_data = GetCellData();
+    std::shared_ptr<CellData> p_cell_data = GetCellData();
     daughter_property_collection.RemoveProperty(p_cell_data);
 
     // Create a new cell data object using the copy constructor and add this to the daughter cell
@@ -511,7 +511,7 @@ CellPtr Cell::Divide()
     if (daughter_property_collection.HasPropertyType<CellVecData>())
     {
         // Get the existing copy of the cell data and remove it from the daughter cell
-        boost::shared_ptr<CellVecData> p_cell_vec_data = GetCellVecData();
+        std::shared_ptr<CellVecData> p_cell_vec_data = GetCellVecData();
         daughter_property_collection.RemoveProperty(p_cell_vec_data);
 
         // Create a new cell data object using the copy constructor and add this to the daughter cell

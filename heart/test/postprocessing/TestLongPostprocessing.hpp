@@ -42,7 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include <vector>
 #include <iostream>
-#include <boost/shared_ptr.hpp>
+
 
 #include "CardiacSimulationArchiver.hpp"
 
@@ -64,7 +64,7 @@ template <unsigned DIM>
 class PointStimulusCellFactory : public AbstractCardiacCellFactory<DIM>
 {
 private:
-    boost::shared_ptr<RegularStimulus> mpStimulus;
+    std::shared_ptr<RegularStimulus> mpStimulus;
     double mAreaOrVolume;
 
 public:

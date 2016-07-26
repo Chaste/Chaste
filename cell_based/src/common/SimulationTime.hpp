@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef SIMULATIONTIME_HPP_
 #define SIMULATIONTIME_HPP_
 
-#include <boost/shared_ptr.hpp>
+
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/shared_ptr.hpp>
 #include "SerializableSingleton.hpp"
@@ -165,7 +165,7 @@ private:
     /**
      * Delegate all time stepping to a TimeStepper class
      */
-    static boost::shared_ptr<TimeStepper> mpTimeStepper;
+    static std::shared_ptr<TimeStepper> mpTimeStepper;
 
     /**
      * Stores the time at which the simulation started

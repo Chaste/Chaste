@@ -37,7 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TransitCellProliferativeType.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 
-WntCellCycleModel::WntCellCycleModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
+WntCellCycleModel::WntCellCycleModel(std::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
     : AbstractWntOdeBasedCellCycleModel(pOdeSolver)
 {
     if (!mpOdeSolver)
@@ -109,13 +109,13 @@ void WntCellCycleModel::ChangeCellProliferativeTypeDueToCurrentBetaCateninLevel(
          * would be incorrect. We must therefore access the CellProliferativeType via the cell's
          * CellPropertyCollection.
          */
-        boost::shared_ptr<AbstractCellProperty> p_diff_type =
+        std::shared_ptr<AbstractCellProperty> p_diff_type =
             mpCell->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<DifferentiatedCellProliferativeType>();
         mpCell->SetCellProliferativeType(p_diff_type);
     }
     else
     {
-        boost::shared_ptr<AbstractCellProperty> p_transit_type =
+        std::shared_ptr<AbstractCellProperty> p_transit_type =
             mpCell->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<TransitCellProliferativeType>();
         mpCell->SetCellProliferativeType(p_transit_type);
     }

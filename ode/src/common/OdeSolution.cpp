@@ -63,7 +63,7 @@ void OdeSolution::SetNumberOfTimeSteps(unsigned numTimeSteps)
 }
 
 
-void OdeSolution::SetOdeSystemInformation(boost::shared_ptr<const AbstractOdeSystemInformation> pOdeSystemInfo)
+void OdeSolution::SetOdeSystemInformation(std::shared_ptr<const AbstractOdeSystemInformation> pOdeSystemInfo)
 {
     mpOdeSystemInformation = pOdeSystemInfo;
 }

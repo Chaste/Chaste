@@ -38,7 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vector>
 #include <string>
-#include <boost/shared_ptr.hpp>
+
 
 #include "AbstractUntemplatedParameterisedSystem.hpp"
 

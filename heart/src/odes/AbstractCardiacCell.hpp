@@ -40,7 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteSerializationVersion.hpp"
 #include "ClassIsAbstract.hpp"
 #include <boost/serialization/base_object.hpp>
-#include <boost/shared_ptr.hpp>
+
 #include <boost/serialization/shared_ptr.hpp>
 
 
@@ -148,10 +148,10 @@ public:
      * @param voltageIndex  the index of the transmembrane potential within the vector of state variables
      * @param pIntracellularStimulus  the intracellular stimulus current
      */
-    AbstractCardiacCell(boost::shared_ptr<AbstractIvpOdeSolver> pOdeSolver,
+    AbstractCardiacCell(std::shared_ptr<AbstractIvpOdeSolver> pOdeSolver,
                         unsigned numberOfStateVariables,
                         unsigned voltageIndex,
-                        boost::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus);
+                        std::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus);
 
     /** Virtual destructor */
     virtual ~AbstractCardiacCell();

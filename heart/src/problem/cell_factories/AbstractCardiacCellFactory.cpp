@@ -89,7 +89,7 @@ unsigned AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>::GetNumberOfCells()
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>::AbstractCardiacCellFactory(
-        boost::shared_ptr<AbstractIvpOdeSolver> pSolver)
+        std::shared_ptr<AbstractIvpOdeSolver> pSolver)
     : mpMesh(nullptr),
       mpHeartGeometryInformation(nullptr),
       mpZeroStimulus(new ZeroStimulus),

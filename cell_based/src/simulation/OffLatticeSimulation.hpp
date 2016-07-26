@@ -94,13 +94,13 @@ private:
 protected:
 
     /** The mechanics used to determine the new location of the cells, a list of the forces. */
-    std::vector<boost::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > > mForceCollection;
+    std::vector<std::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > > mForceCollection;
 
     /** List of boundary conditions. */
-    std::vector<boost::shared_ptr<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM> > > mBoundaryConditions;
+    std::vector<std::shared_ptr<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM> > > mBoundaryConditions;
 
     /** The numerical method to use in this simulation. Defaults to forward Euler. */
-    boost::shared_ptr<AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM> > mpNumericalMethod;
+    std::shared_ptr<AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM> > mpNumericalMethod;
 
     /**
      * Overridden UpdateCellLocationsAndTopology() method.
@@ -173,7 +173,7 @@ public:
      *
      * @param pForce pointer to a force law
      */
-    void AddForce(boost::shared_ptr<AbstractForce<ELEMENT_DIM,SPACE_DIM> > pForce);
+    void AddForce(std::shared_ptr<AbstractForce<ELEMENT_DIM,SPACE_DIM> > pForce);
 
     /**
      * Remove all the forces.
@@ -185,7 +185,7 @@ public:
      *
      * @param pBoundaryCondition pointer to a boundary condition
      */
-    void AddCellPopulationBoundaryCondition(boost::shared_ptr<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM> >  pBoundaryCondition);
+    void AddCellPopulationBoundaryCondition(std::shared_ptr<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM> >  pBoundaryCondition);
 
     /**
      * Method to remove all the cell population boundary conditions
@@ -197,12 +197,12 @@ public:
      *
      * @param pNumericalMethod pointer to a numerical method object
      */
-    void SetNumericalMethod(boost::shared_ptr<AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM> > pNumericalMethod);
+    void SetNumericalMethod(std::shared_ptr<AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM> > pNumericalMethod);
 
     /**
      * @return the current numerical method.
      */
-    const boost::shared_ptr<AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM> > GetNumericalMethod() const;
+    const std::shared_ptr<AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM> > GetNumericalMethod() const;
 
     /**
      * Overridden OutputAdditionalSimulationSetup() method.

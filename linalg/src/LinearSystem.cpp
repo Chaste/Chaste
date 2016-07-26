@@ -65,7 +65,7 @@ LinearSystem::LinearSystem(PetscInt lhsVectorSize, unsigned rowPreallocation)
     mpBlockDiagonalPC(nullptr),
     mpLDUFactorisationPC(nullptr),
     mpTwoLevelsBlockDiagonalPC(nullptr),
-    mpBathNodes( boost::shared_ptr<std::vector<PetscInt> >() ),
+    mpBathNodes( std::shared_ptr<std::vector<PetscInt> >() ),
     mPrecondMatrixIsNotLhs(false),
     mRowPreallocation(rowPreallocation),
     mUseFixedNumberIterations(false),
@@ -120,7 +120,7 @@ LinearSystem::LinearSystem(PetscInt lhsVectorSize, Mat lhsMatrix, Vec rhsVector)
     mpBlockDiagonalPC(nullptr),
     mpLDUFactorisationPC(nullptr),
     mpTwoLevelsBlockDiagonalPC(nullptr),
-    mpBathNodes( boost::shared_ptr<std::vector<PetscInt> >() ),
+    mpBathNodes( std::shared_ptr<std::vector<PetscInt> >() ),
     mPrecondMatrixIsNotLhs(false),
     mUseFixedNumberIterations(false),
     mEvaluateNumItsEveryNSolves(UINT_MAX),
@@ -155,7 +155,7 @@ LinearSystem::LinearSystem(Vec templateVector, unsigned rowPreallocation, bool n
     mpBlockDiagonalPC(nullptr),
     mpLDUFactorisationPC(nullptr),
     mpTwoLevelsBlockDiagonalPC(nullptr),
-    mpBathNodes( boost::shared_ptr<std::vector<PetscInt> >() ),
+    mpBathNodes( std::shared_ptr<std::vector<PetscInt> >() ),
     mPrecondMatrixIsNotLhs(false),
     mRowPreallocation(rowPreallocation),
     mUseFixedNumberIterations(false),
@@ -196,7 +196,7 @@ LinearSystem::LinearSystem(Vec residualVector, Mat jacobianMatrix)
     mpBlockDiagonalPC(nullptr),
     mpLDUFactorisationPC(nullptr),
     mpTwoLevelsBlockDiagonalPC(nullptr),
-    mpBathNodes( boost::shared_ptr<std::vector<PetscInt> >() ),
+    mpBathNodes( std::shared_ptr<std::vector<PetscInt> >() ),
     mPrecondMatrixIsNotLhs(false),
     mRowPreallocation(UINT_MAX),
     mUseFixedNumberIterations(false),
@@ -611,7 +611,7 @@ void LinearSystem::SetKspType(const char *kspType)
     }
 }
 
-void LinearSystem::SetPcType(const char* pcType, boost::shared_ptr<std::vector<PetscInt> > pBathNodes)
+void LinearSystem::SetPcType(const char* pcType, std::shared_ptr<std::vector<PetscInt> > pBathNodes)
 {
     mPcType = pcType;
     mpBathNodes = pBathNodes;

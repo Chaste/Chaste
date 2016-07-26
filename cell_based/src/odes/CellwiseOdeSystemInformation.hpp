@@ -46,7 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * Note: unexpected behaviour can occur if ODE system objects are copied
  * (via copy constructor or operator=).  The AbstractOdeSystem maintains a smart
- * pointer (boost::shared_ptr) to the system information object.  Hence both the
+ * pointer (std::shared_ptr) to the system information object.  Hence both the
  * original and the copy will share the same information object.
  */
 template<class ODE_SYSTEM>

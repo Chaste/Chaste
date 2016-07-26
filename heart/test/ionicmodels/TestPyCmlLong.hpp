@@ -75,7 +75,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestPyCmlNightly : public CxxTest::TestSuite
 {
 private:
-    double GetAttribute(boost::shared_ptr<AbstractCardiacCellInterface> pCell,
+    double GetAttribute(std::shared_ptr<AbstractCardiacCellInterface> pCell,
                         const std::string& rAttrName,
                         double defaultValue)
     {
@@ -105,7 +105,7 @@ private:
 
     void Simulate(const std::string& rOutputDirName,
                   const std::string& rModelName,
-                  boost::shared_ptr<AbstractCardiacCellInterface> pCell)
+                  std::shared_ptr<AbstractCardiacCellInterface> pCell)
     {
         double end_time = GetAttribute(pCell, "SuggestedCycleLength", 700.0); // ms
         if (pCell->GetSolver() || dynamic_cast<AbstractRushLarsenCardiacCell*>(pCell.get()))
@@ -244,16 +244,16 @@ private:
         FileFinder copied_file(rOutputDirName + "/" + rModelName + ".cellml", RelativeTo::ChasteTestOutput);
         DynamicCellModelLoaderPtr p_loader = converter.Convert(copied_file);
         // Apply a stimulus of -40 uA/cm^2 - should work for all models
-        boost::shared_ptr<AbstractCardiacCellInterface> p_cell(CreateCellWithStandardStimulus(*p_loader, -40.0));
+        std::shared_ptr<AbstractCardiacCellInterface> p_cell(CreateCellWithStandardStimulus(*p_loader, -40.0));
 
         // Check that the default stimulus units are correct
         if (p_cell->HasCellMLDefaultStimulus())
         {
             // Record the existing stimulus and re-apply it at the end
-            boost::shared_ptr<AbstractStimulusFunction> original_stim = p_cell->GetStimulusFunction();
+            std::shared_ptr<AbstractStimulusFunction> original_stim = p_cell->GetStimulusFunction();
 
             // Tell the cell to use the default stimulus and retrieve it
-            boost::shared_ptr<RegularStimulus> p_reg_stim = p_cell->UseCellMLDefaultStimulus();
+            std::shared_ptr<RegularStimulus> p_reg_stim = p_cell->UseCellMLDefaultStimulus();
 
             if (rModelName!="aslanidi_model_2009") // Even before recent changes aslanidi model has stimulus of -400 !
             {

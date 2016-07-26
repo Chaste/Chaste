@@ -37,7 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define DYNAMICCELLMODELLOADER_HPP_
 
 #include <string>
-#include <boost/shared_ptr.hpp>
+
 #include <boost/enable_shared_from_this.hpp>
 
 #include "AbstractCardiacCellInterface.hpp"
@@ -48,7 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class DynamicCellModelLoader;
 
 /** The main type for dealing with a loader instance. */
-typedef boost::shared_ptr<DynamicCellModelLoader> DynamicCellModelLoaderPtr;
+typedef std::shared_ptr<DynamicCellModelLoader> DynamicCellModelLoaderPtr;
 
 /**
  * This class takes care of loading cell models at run-time from .so files.
@@ -85,8 +85,8 @@ public:
      * @param pSolver  ODE solver used to simulate the cell
      * @param pStimulus  intracellular stimulus
      */
-    AbstractCardiacCellInterface* CreateCell(boost::shared_ptr<AbstractIvpOdeSolver> pSolver,
-                                             boost::shared_ptr<AbstractStimulusFunction> pStimulus);
+    AbstractCardiacCellInterface* CreateCell(std::shared_ptr<AbstractIvpOdeSolver> pSolver,
+                                             std::shared_ptr<AbstractStimulusFunction> pStimulus);
 
     /**
      * @return the absolute path to the .so file we have loaded
@@ -109,8 +109,8 @@ private:
      * @param pSolver  ODE solver used to simulate the cell
      * @param pStimulus  intracellular stimulus
      */
-    typedef AbstractCardiacCellInterface* CellCreationFunctionType(boost::shared_ptr<AbstractIvpOdeSolver> pSolver,
-                                                                   boost::shared_ptr<AbstractStimulusFunction> pStimulus);
+    typedef AbstractCardiacCellInterface* CellCreationFunctionType(std::shared_ptr<AbstractIvpOdeSolver> pSolver,
+                                                                   std::shared_ptr<AbstractStimulusFunction> pStimulus);
 
     /** Our cell creation function */
     CellCreationFunctionType* mpCreationFunction;

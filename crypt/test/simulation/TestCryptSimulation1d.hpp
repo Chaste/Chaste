@@ -320,7 +320,7 @@ public:
         // Set up cells by iterating through the nodes
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
-        boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
+        std::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             double birth_time;
@@ -683,7 +683,7 @@ public:
         // (don't use any stem cells as we want to test the jiggling)
         unsigned num_cells = mesh.GetNumNodes();
         std::vector<CellPtr> cells;
-        boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
+        std::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
 
         for (unsigned i=0; i<num_cells; i++)
         {
@@ -711,9 +711,9 @@ public:
         ++cell_iterator;
         cell_iterator->SetBirthTime(-1.0);
 
-        boost::shared_ptr<AbstractCellProperty> p_apc1(crypt.GetCellPropertyRegistry()->Get<ApcOneHitCellMutationState>());
-        boost::shared_ptr<AbstractCellProperty> p_bcat1(crypt.GetCellPropertyRegistry()->Get<BetaCateninOneHitCellMutationState>());
-        boost::shared_ptr<AbstractCellProperty> p_label(crypt.GetCellPropertyRegistry()->Get<CellLabel>());
+        std::shared_ptr<AbstractCellProperty> p_apc1(crypt.GetCellPropertyRegistry()->Get<ApcOneHitCellMutationState>());
+        std::shared_ptr<AbstractCellProperty> p_bcat1(crypt.GetCellPropertyRegistry()->Get<BetaCateninOneHitCellMutationState>());
+        std::shared_ptr<AbstractCellProperty> p_label(crypt.GetCellPropertyRegistry()->Get<CellLabel>());
 
         cell_iterator->AddCellProperty(p_label);
         ++cell_iterator;

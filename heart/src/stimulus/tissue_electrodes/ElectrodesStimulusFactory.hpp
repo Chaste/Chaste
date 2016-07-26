@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ELECTRODESSTIMULSUFACTORY_HPP_
 #define ELECTRODESSTIMULSUFACTORY_HPP_
 
-#include <boost/shared_ptr.hpp>
+
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/split_member.hpp>
 #include <boost/serialization/shared_ptr.hpp>
@@ -162,7 +162,7 @@ public:
      *
      * @param pNode the node for which to create the stimulus
      */
-    boost::shared_ptr<AbstractStimulusFunction> CreateStimulusForNode(Node<DIM>* pNode);
+    std::shared_ptr<AbstractStimulusFunction> CreateStimulusForNode(Node<DIM>* pNode);
 
     /**
      * Destructor

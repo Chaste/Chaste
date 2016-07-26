@@ -140,7 +140,7 @@ void SimpleOxygenBasedCellCycleModel::UpdateHypoxicDuration()
              * count would be incorrect. We must therefore access the ApoptoticCellProperty via the
              * cell's CellPropertyCollection.
              */
-            boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
+            std::shared_ptr<AbstractCellProperty> p_apoptotic_property =
                 mpCell->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
             mpCell->AddCellProperty(p_apoptotic_property);
         }

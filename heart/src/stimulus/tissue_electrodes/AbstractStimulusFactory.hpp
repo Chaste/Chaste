@@ -37,7 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ABSTRACTSTIMULUSFACTORY_HPP_
 #define ABSTRACTSTIMULUSFACTORY_HPP_
 
-#include <boost/shared_ptr.hpp>
+
 
 #include "AbstractStimulusFunction.hpp"
 #include "AbstractTetrahedralMesh.hpp"
@@ -79,7 +79,7 @@ public:
      *
      * @param pNode  pointer to the node object
      */
-    virtual boost::shared_ptr<AbstractStimulusFunction> CreateStimulusForNode(Node<SPACE_DIM>* pNode);
+    virtual std::shared_ptr<AbstractStimulusFunction> CreateStimulusForNode(Node<SPACE_DIM>* pNode);
 
     /**
      * @return  The number of cells

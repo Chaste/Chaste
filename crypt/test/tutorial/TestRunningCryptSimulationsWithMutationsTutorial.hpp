@@ -143,7 +143,7 @@ public:
          * Each mutation has a different effect on the cell cycle models; see the class
          * documentation for details.
          */
-        boost::shared_ptr<AbstractCellProperty> p_state(CellPropertyRegistry::Instance()->Get<ApcTwoHitCellMutationState>());
+        std::shared_ptr<AbstractCellProperty> p_state(CellPropertyRegistry::Instance()->Get<ApcTwoHitCellMutationState>());
 
         /* We create the cell population, as before. */
         MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices);

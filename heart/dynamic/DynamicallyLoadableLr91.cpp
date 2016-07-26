@@ -62,8 +62,8 @@ const double DynamicallyLoadableLr91::time_dependent_potassium_current_PR_NaK = 
  * Constructor
  */
 DynamicallyLoadableLr91::DynamicallyLoadableLr91(
-    boost::shared_ptr<AbstractIvpOdeSolver> pSolver,
-    boost::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus)
+    std::shared_ptr<AbstractIvpOdeSolver> pSolver,
+    std::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus)
         : AbstractCardiacCell(pSolver, 8, 4, pIntracellularStimulus)
 {
     mpSystemInfo = OdeSystemInformation<DynamicallyLoadableLr91>::Instance();
@@ -384,8 +384,8 @@ extern "C" {
      * @param pSolver  ODE solver used to simulate the cell
      * @param pIntracellularStimulus  intracellular stimulus
      */
-    AbstractCardiacCellInterface* MakeCardiacCell(boost::shared_ptr<AbstractIvpOdeSolver> pSolver,
-                                         boost::shared_ptr<AbstractStimulusFunction> pStimulus){
+    AbstractCardiacCellInterface* MakeCardiacCell(std::shared_ptr<AbstractIvpOdeSolver> pSolver,
+                                         std::shared_ptr<AbstractStimulusFunction> pStimulus){
          return new DynamicallyLoadableLr91(pSolver, pStimulus);
     }
 }

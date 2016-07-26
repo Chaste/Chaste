@@ -143,8 +143,8 @@ public:
         double inter_node_space = HeartConfig::Instance()->GetInterNodeSpace();
         TS_ASSERT_EQUALS(inter_node_space, 0.1);
 
-        std::vector<boost::shared_ptr<AbstractStimulusFunction> > stimuli_applied;
-        std::vector<boost::shared_ptr<AbstractChasteRegion<3> > > stimulated_areas;
+        std::vector<std::shared_ptr<AbstractStimulusFunction> > stimuli_applied;
+        std::vector<std::shared_ptr<AbstractChasteRegion<3> > > stimulated_areas;
 
         HeartConfig::Instance()->GetStimuli(stimuli_applied, stimulated_areas);
 
@@ -163,16 +163,16 @@ public:
         TS_ASSERT_EQUALS(stimuli_applied[4]->GetStimulus(4.1), -25500.0);
 
         //covering the 2D case
-        std::vector<boost::shared_ptr<AbstractChasteRegion<2> > > stimulated_areas_2D;
-        std::vector<boost::shared_ptr<AbstractStimulusFunction> > stimuli_applied_2D;
+        std::vector<std::shared_ptr<AbstractChasteRegion<2> > > stimulated_areas_2D;
+        std::vector<std::shared_ptr<AbstractStimulusFunction> > stimuli_applied_2D;
         HeartConfig::Instance()->GetStimuli(stimuli_applied_2D, stimulated_areas_2D);
 
         TS_ASSERT_EQUALS(stimuli_applied_2D.size(), 5u);
         TS_ASSERT_EQUALS(stimulated_areas_2D.size(), 5u);
 
         //covering the 1D case
-        std::vector<boost::shared_ptr<AbstractChasteRegion<1> > > stimulated_areas_1D;
-        std::vector<boost::shared_ptr<AbstractStimulusFunction> > stimuli_applied_1D;
+        std::vector<std::shared_ptr<AbstractChasteRegion<1> > > stimulated_areas_1D;
+        std::vector<std::shared_ptr<AbstractStimulusFunction> > stimuli_applied_1D;
         HeartConfig::Instance()->GetStimuli(stimuli_applied_1D, stimulated_areas_1D);
 
         TS_ASSERT_EQUALS(stimuli_applied_1D.size(), 5u);
@@ -300,7 +300,7 @@ public:
         ///////////////
         //ionic models
         //////////////
-        std::vector<boost::shared_ptr<AbstractChasteRegion<3> > > ionic_model_regions;
+        std::vector<std::shared_ptr<AbstractChasteRegion<3> > > ionic_model_regions;
         std::vector<cp::ionic_model_selection_type> ionic_models_defined;
         HeartConfig::Instance()->GetIonicModelRegions(ionic_model_regions,
                                                       ionic_models_defined);
@@ -317,7 +317,7 @@ public:
         TS_ASSERT_EQUALS(ionic_models_defined[1].Hardcoded().get(), cp::ionic_models_available_type::DifrancescoNoble);
 
         //cover the 2D case
-        std::vector<boost::shared_ptr<AbstractChasteRegion<2> > > ionic_model_regions_2D;
+        std::vector<std::shared_ptr<AbstractChasteRegion<2> > > ionic_model_regions_2D;
         std::vector<cp::ionic_model_selection_type> ionic_models_defined_2D;
         HeartConfig::Instance()->GetIonicModelRegions(ionic_model_regions_2D,
                                                       ionic_models_defined_2D);
@@ -339,7 +339,7 @@ public:
         TS_ASSERT_EQUALS(ionic_models_defined_2D[2].Hardcoded().get(), cp::ionic_models_available_type::tenTusscher2006);
 
         //cover the 1D case
-        std::vector<boost::shared_ptr<AbstractChasteRegion<1> > > ionic_model_regions_1D;
+        std::vector<std::shared_ptr<AbstractChasteRegion<1> > > ionic_model_regions_1D;
         std::vector<cp::ionic_model_selection_type> ionic_models_defined_1D;
         HeartConfig::Instance()->GetIonicModelRegions(ionic_model_regions_1D,
                                                       ionic_models_defined_1D);
@@ -358,7 +358,7 @@ public:
         //Cell heterogeneities
         //////////////
 
-        std::vector<boost::shared_ptr<AbstractChasteRegion<3> > > cell_heterogeneity_areas_3D;
+        std::vector<std::shared_ptr<AbstractChasteRegion<3> > > cell_heterogeneity_areas_3D;
         std::vector<double> scale_factor_gks_3D;
         std::vector<double> scale_factor_ito_3D;
         std::vector<double> scale_factor_gkr_3D;
@@ -401,7 +401,7 @@ public:
         TS_ASSERT_EQUALS(param_it->second, 2.0);
 
         //cover the 2D case
-        std::vector<boost::shared_ptr<AbstractChasteRegion<2> > > cell_heterogeneity_areas_2D;
+        std::vector<std::shared_ptr<AbstractChasteRegion<2> > > cell_heterogeneity_areas_2D;
         std::vector<double> scale_factor_gks_2D;
         std::vector<double> scale_factor_ito_2D;
         std::vector<double> scale_factor_gkr_2D;
@@ -420,7 +420,7 @@ public:
         TS_ASSERT_EQUALS(scale_factor_gkr_2D[1], 1.0);
 
          //cover the 1D case
-        std::vector<boost::shared_ptr<AbstractChasteRegion<1> > > cell_heterogeneity_areas_1D;
+        std::vector<std::shared_ptr<AbstractChasteRegion<1> > > cell_heterogeneity_areas_1D;
         std::vector<double> scale_factor_gks_1D;
         std::vector<double> scale_factor_ito_1D;
         std::vector<double> scale_factor_gkr_1D;
@@ -444,7 +444,7 @@ public:
 
         // Cuboid
 
-        std::vector<boost::shared_ptr<AbstractChasteRegion<3> > > conductivities_heterogeneity_areas;
+        std::vector<std::shared_ptr<AbstractChasteRegion<3> > > conductivities_heterogeneity_areas;
         std::vector< c_vector<double,3> > intra_h_conductivities;
         std::vector< c_vector<double,3> > extra_h_conductivities;
         HeartConfig::Instance()->GetConductivityHeterogeneities(conductivities_heterogeneity_areas,
@@ -457,7 +457,7 @@ public:
         TS_ASSERT_EQUALS(intra_h_conductivities[1][0], 0.75);
 
         //cover the 2D case
-        std::vector<boost::shared_ptr<AbstractChasteRegion<2> > > conductivities_heterogeneity_areas_2D;
+        std::vector<std::shared_ptr<AbstractChasteRegion<2> > > conductivities_heterogeneity_areas_2D;
         std::vector< c_vector<double,3> > intra_h_conductivities_2D;
         std::vector< c_vector<double,3> > extra_h_conductivities_2D;
         HeartConfig::Instance()->GetConductivityHeterogeneities(conductivities_heterogeneity_areas_2D,
@@ -470,7 +470,7 @@ public:
         TS_ASSERT_EQUALS(intra_h_conductivities_2D[1][0], 0.75);
 
         //cover the 1D case
-        std::vector<boost::shared_ptr<AbstractChasteRegion<1> > > conductivities_heterogeneity_areas_1D;
+        std::vector<std::shared_ptr<AbstractChasteRegion<1> > > conductivities_heterogeneity_areas_1D;
         std::vector< c_vector<double,3> > intra_h_conductivities_1D;
         std::vector< c_vector<double,3> > extra_h_conductivities_1D;
         HeartConfig::Instance()->GetConductivityHeterogeneities(conductivities_heterogeneity_areas_1D,
@@ -484,7 +484,7 @@ public:
 
         // Ellipsoid
 
-        std::vector<boost::shared_ptr<AbstractChasteRegion<3> > > conductivities_heterogeneity_areas_ellipsoid;
+        std::vector<std::shared_ptr<AbstractChasteRegion<3> > > conductivities_heterogeneity_areas_ellipsoid;
         std::vector< c_vector<double,3> > intra_h_conductivities_ellipsoid;
         std::vector< c_vector<double,3> > extra_h_conductivities_ellipsoid;
         HeartConfig::Instance()->GetConductivityHeterogeneities(conductivities_heterogeneity_areas_ellipsoid,
@@ -497,7 +497,7 @@ public:
         TS_ASSERT_EQUALS(intra_h_conductivities_ellipsoid[4][0], 0.75);
 
         //cover the 2D case
-        std::vector<boost::shared_ptr<AbstractChasteRegion<2> > > conductivities_heterogeneity_areas_2D_ellipsoid;
+        std::vector<std::shared_ptr<AbstractChasteRegion<2> > > conductivities_heterogeneity_areas_2D_ellipsoid;
         std::vector< c_vector<double,3> > intra_h_conductivities_2D_ellipsoid;
         std::vector< c_vector<double,3> > extra_h_conductivities_2D_ellipsoid;
         HeartConfig::Instance()->GetConductivityHeterogeneities(conductivities_heterogeneity_areas_2D_ellipsoid,
@@ -510,7 +510,7 @@ public:
         TS_ASSERT_EQUALS(intra_h_conductivities_2D_ellipsoid[4][0], 0.75);
 
         //cover the 1D case
-        std::vector<boost::shared_ptr<AbstractChasteRegion<1> > > conductivities_heterogeneity_areas_1D_ellipsoid;
+        std::vector<std::shared_ptr<AbstractChasteRegion<1> > > conductivities_heterogeneity_areas_1D_ellipsoid;
         std::vector< c_vector<double,3> > intra_h_conductivities_1D_ellipsoid;
         std::vector< c_vector<double,3> > extra_h_conductivities_1D_ellipsoid;
         HeartConfig::Instance()->GetConductivityHeterogeneities(conductivities_heterogeneity_areas_1D_ellipsoid,
@@ -552,7 +552,7 @@ public:
             //the _unsupported file has valid transmural heterogeneity definition for cellular heterogeneities, but transmural heterogeneities defined for other things we don't support yet.
             HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteParametersCellHeterogeneities_unsupported.xml");
 
-            std::vector<boost::shared_ptr<AbstractChasteRegion<3> > > cell_heterogeneity_areas;
+            std::vector<std::shared_ptr<AbstractChasteRegion<3> > > cell_heterogeneity_areas;
             std::vector<double> scale_factor_gks;
             std::vector<double> scale_factor_ito;
             std::vector<double> scale_factor_gkr;
@@ -588,7 +588,7 @@ public:
             TS_ASSERT_EQUALS(scale_factor_gkr[0], 1.0);
 
             //covering the case when the user specify transmural layers for conductivities (not supported and probably not worth considering)...
-            std::vector<boost::shared_ptr<AbstractChasteRegion<3> > > conductivities_heterogeneity_areas;
+            std::vector<std::shared_ptr<AbstractChasteRegion<3> > > conductivities_heterogeneity_areas;
             std::vector< c_vector<double,3> > intra_h_conductivities;
             std::vector< c_vector<double,3> > extra_h_conductivities;
             TS_ASSERT_THROWS_THIS(HeartConfig::Instance()->GetConductivityHeterogeneities(conductivities_heterogeneity_areas,
@@ -597,13 +597,13 @@ public:
                                   "Definition of transmural layers is not allowed for conductivities heterogeneities, you may use fibre orientation support instead");
 
              //covering the case when the user specify transmural layers for stimulated areas (not yet supported)...
-            std::vector<boost::shared_ptr<AbstractStimulusFunction> > stimuli_applied;
-            std::vector<boost::shared_ptr<AbstractChasteRegion<3> > > stimulated_area;
+            std::vector<std::shared_ptr<AbstractStimulusFunction> > stimuli_applied;
+            std::vector<std::shared_ptr<AbstractChasteRegion<3> > > stimulated_area;
             TS_ASSERT_THROWS_THIS(HeartConfig::Instance()->GetStimuli(stimuli_applied, stimulated_area),
                                   "Definition of transmural layers is not yet supported for specifying stimulated areas, please use cuboids instead");
 
             //covering the case when the user specify transmural layers for ionic model heterogeneities (not yet supported)...
-            std::vector<boost::shared_ptr<AbstractChasteRegion<3> > > ionic_model_regions;
+            std::vector<std::shared_ptr<AbstractChasteRegion<3> > > ionic_model_regions;
             std::vector<cp::ionic_model_selection_type> ionic_models;
             TS_ASSERT_THROWS_THIS(HeartConfig::Instance()->GetIonicModelRegions(ionic_model_regions, ionic_models),
                                   "Definition of transmural layers is not yet supported for defining different ionic models, please use cuboids instead");
@@ -614,23 +614,23 @@ public:
             //the _unsupported file has "never used" locations
             HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteParameters_unsupported.xml");
             //covering the case when the conductivities regions are not supported
-            std::vector<boost::shared_ptr<AbstractChasteRegion<3> > > conductivities_heterogeneity_areas;
+            std::vector<std::shared_ptr<AbstractChasteRegion<3> > > conductivities_heterogeneity_areas;
             std::vector< c_vector<double,3> > intra_h_conductivities;
             std::vector< c_vector<double,3> > extra_h_conductivities;
             TS_ASSERT_THROWS_THIS(HeartConfig::Instance()->GetConductivityHeterogeneities(conductivities_heterogeneity_areas,
                                                             intra_h_conductivities,
                                                             extra_h_conductivities),
                                                             "Invalid region type for conductivity definition");
-            std::vector<boost::shared_ptr<AbstractChasteRegion<3> > > ionic_model_regions;
+            std::vector<std::shared_ptr<AbstractChasteRegion<3> > > ionic_model_regions;
             std::vector<cp::ionic_model_selection_type> ionic_models;
             TS_ASSERT_THROWS_THIS(HeartConfig::Instance()->GetIonicModelRegions(ionic_model_regions, ionic_models),
                                   "Invalid region type for ionic model definition");
 
-            std::vector<boost::shared_ptr<AbstractStimulusFunction> > stimuli_applied;
-            std::vector<boost::shared_ptr<AbstractChasteRegion<3> > > stimulated_area;
+            std::vector<std::shared_ptr<AbstractStimulusFunction> > stimuli_applied;
+            std::vector<std::shared_ptr<AbstractChasteRegion<3> > > stimulated_area;
             TS_ASSERT_THROWS_THIS(HeartConfig::Instance()->GetStimuli(stimuli_applied, stimulated_area),
                                   "Invalid region type for stimulus definition");
-            std::vector<boost::shared_ptr<AbstractChasteRegion<3> > > cell_heterogeneity_areas;
+            std::vector<std::shared_ptr<AbstractChasteRegion<3> > > cell_heterogeneity_areas;
             std::vector<double> scale_factor_gks;
             std::vector<double> scale_factor_ito;
             std::vector<double> scale_factor_gkr;
@@ -647,7 +647,7 @@ public:
             HeartConfig::Reset();
             HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteParametersCellHeterogeneities_inconsistent.xml");
 
-            std::vector<boost::shared_ptr<AbstractChasteRegion<3> > > cell_heterogeneity_areas;
+            std::vector<std::shared_ptr<AbstractChasteRegion<3> > > cell_heterogeneity_areas;
             std::vector<double> scale_factor_gks;
             std::vector<double> scale_factor_ito;
             std::vector<double> scale_factor_gkr;
@@ -665,7 +665,7 @@ public:
             HeartConfig::Reset();
             HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteParametersCellHeterogeneities_negative.xml");
 
-            std::vector<boost::shared_ptr<AbstractChasteRegion<3> > > cell_heterogeneity_areas;
+            std::vector<std::shared_ptr<AbstractChasteRegion<3> > > cell_heterogeneity_areas;
             std::vector<double> scale_factor_gks;
             std::vector<double> scale_factor_ito;
             std::vector<double> scale_factor_gkr;
@@ -684,7 +684,7 @@ public:
             HeartConfig::Reset();
             HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteParametersCellHeterogeneities_negative_2.xml");
 
-            std::vector<boost::shared_ptr<AbstractChasteRegion<3> > > cell_heterogeneity_areas;
+            std::vector<std::shared_ptr<AbstractChasteRegion<3> > > cell_heterogeneity_areas;
             std::vector<double> scale_factor_gks;
             std::vector<double> scale_factor_ito;
             std::vector<double> scale_factor_gkr;
@@ -702,7 +702,7 @@ public:
             HeartConfig::Reset();
             HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteParametersCellHeterogeneities_incomplete.xml");
 
-            std::vector<boost::shared_ptr<AbstractChasteRegion<3> > > cell_heterogeneity_areas;
+            std::vector<std::shared_ptr<AbstractChasteRegion<3> > > cell_heterogeneity_areas;
             std::vector<double> scale_factor_gks;
             std::vector<double> scale_factor_ito;
             std::vector<double> scale_factor_gkr;
@@ -727,7 +727,7 @@ public:
             HeartConfig::Reset();
             HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteParametersCellHeterogeneities_cuboids_and_layers.xml");
 
-            std::vector<boost::shared_ptr<AbstractChasteRegion<3> > > cell_heterogeneity_areas;
+            std::vector<std::shared_ptr<AbstractChasteRegion<3> > > cell_heterogeneity_areas;
             std::vector<double> scale_factor_gks;
             std::vector<double> scale_factor_ito;
             std::vector<double> scale_factor_gkr;
@@ -883,7 +883,7 @@ public:
 
         TS_ASSERT(HeartConfig::Instance()->GetConductivityHeterogeneitiesProvided());
 
-        std::vector<boost::shared_ptr<AbstractChasteRegion<3> > > conductivities_heterogeneity_areas;
+        std::vector<std::shared_ptr<AbstractChasteRegion<3> > > conductivities_heterogeneity_areas;
         std::vector< c_vector<double,3> > intra_h_conductivities;
         std::vector< c_vector<double,3> > extra_h_conductivities;
         HeartConfig::Instance()->GetConductivityHeterogeneities(conductivities_heterogeneity_areas,
@@ -923,7 +923,7 @@ public:
 
         TS_ASSERT(HeartConfig::Instance()->GetConductivityHeterogeneitiesProvided());
 
-        std::vector<boost::shared_ptr<AbstractChasteRegion<3> > > conductivities_heterogeneity_areas_ellipsoid;
+        std::vector<std::shared_ptr<AbstractChasteRegion<3> > > conductivities_heterogeneity_areas_ellipsoid;
         std::vector< c_vector<double,3> > intra_h_conductivities_ellipsoid;
         std::vector< c_vector<double,3> > extra_h_conductivities_ellipsoid;
         HeartConfig::Instance()->GetConductivityHeterogeneities(conductivities_heterogeneity_areas_ellipsoid,
@@ -942,7 +942,7 @@ public:
         TS_ASSERT_EQUALS(conductivities_heterogeneity_areas_ellipsoid[1]->DoesContain(ChastePoint<3>(-1.5, -1.5, -1.5)), true);
         TS_ASSERT_EQUALS(intra_h_conductivities_ellipsoid[1][0], 1.0);
 
-        std::vector<boost::shared_ptr<AbstractChasteRegion<3> > > ionic_model_regions;
+        std::vector<std::shared_ptr<AbstractChasteRegion<3> > > ionic_model_regions;
         std::vector<cp::ionic_model_selection_type> ionic_models;
 
         //No ionic model regions
@@ -1495,8 +1495,8 @@ public:
         HeartConfig::Reset();
         HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteParametersWrongSimpleStimulusDefinition.xml");
 
-        std::vector<boost::shared_ptr<AbstractStimulusFunction> > stimuli_applied;
-        std::vector<boost::shared_ptr<AbstractChasteRegion<3> > > stimulated_areas;
+        std::vector<std::shared_ptr<AbstractStimulusFunction> > stimuli_applied;
+        std::vector<std::shared_ptr<AbstractChasteRegion<3> > > stimulated_areas;
 
         TS_ASSERT_THROWS_THIS(HeartConfig::Instance()->GetStimuli(stimuli_applied, stimulated_areas),
                 "Stop time can not be defined for SimpleStimulus. Use Duration instead.");
@@ -1797,7 +1797,7 @@ public:
         // Cover loads of methods where we ask for information that is not present in a ResumedSimulation
         TS_ASSERT_THROWS_THIS(HeartConfig::Instance()->GetDefaultIonicModel(), "DefaultIonicModel information is not available in a resumed simulation.")
 
-        std::vector<boost::shared_ptr<AbstractChasteRegion<3> > > definedRegions;
+        std::vector<std::shared_ptr<AbstractChasteRegion<3> > > definedRegions;
         std::vector<cp::ionic_model_selection_type> ionic_models;
         TS_ASSERT_THROWS_THIS(HeartConfig::Instance()->GetIonicModelRegions(definedRegions,ionic_models),
                               "IonicModelRegions information is not available in a resumed simulation.");
@@ -1822,11 +1822,11 @@ public:
         TS_ASSERT_THROWS_THIS(HeartConfig::Instance()->GetMeshName(), "LoadMesh information is not available in a resumed simulation.")
         TS_ASSERT_THROWS_THIS(HeartConfig::Instance()->GetConductivityMedia(), "LoadMesh information is not available in a resumed simulation.")
 
-        std::vector<boost::shared_ptr<AbstractStimulusFunction> > stimuli_applied;
-        std::vector<boost::shared_ptr<AbstractChasteRegion<3> > > stimulated_area;
+        std::vector<std::shared_ptr<AbstractStimulusFunction> > stimuli_applied;
+        std::vector<std::shared_ptr<AbstractChasteRegion<3> > > stimulated_area;
         TS_ASSERT_THROWS_THIS(HeartConfig::Instance()->GetStimuli(stimuli_applied, stimulated_area), "Stimuli information is not available in a resumed simulation.")
 
-        std::vector<boost::shared_ptr<AbstractChasteRegion<3> > > cell_heterogeneity_areas;
+        std::vector<std::shared_ptr<AbstractChasteRegion<3> > > cell_heterogeneity_areas;
         std::vector<double> scale_factor_gks;
         std::vector<double> scale_factor_ito;
         std::vector<double> scale_factor_gkr;
@@ -1835,7 +1835,7 @@ public:
         TS_ASSERT_THROWS_THIS(HeartConfig::Instance()->GetConductivityHeterogeneitiesProvided(),
                               "ConductivityHeterogeneities information is not available in a resumed simulation.");
 
-        std::vector<boost::shared_ptr<AbstractChasteRegion<3> > > conductivitiesHeterogeneityAreas;
+        std::vector<std::shared_ptr<AbstractChasteRegion<3> > > conductivitiesHeterogeneityAreas;
         std::vector< c_vector<double,3> > intraConductivities;
         std::vector< c_vector<double,3> > extraConductivities;
         TS_ASSERT_THROWS_THIS(HeartConfig::Instance()->GetConductivityHeterogeneities(conductivitiesHeterogeneityAreas,
@@ -1933,7 +1933,7 @@ public:
     }
 
 private:
-    void WriteParamsFile(boost::shared_ptr<cp::chaste_parameters_type> pParams,
+    void WriteParamsFile(std::shared_ptr<cp::chaste_parameters_type> pParams,
                          const std::string& rDirname,
                          const std::string& rFilename)
     {

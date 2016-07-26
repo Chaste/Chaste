@@ -350,19 +350,19 @@ void VertexBasedCellPopulation<DIM>::Validate()
 }
 
 template<unsigned DIM>
-void VertexBasedCellPopulation<DIM>::AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter)
+void VertexBasedCellPopulation<DIM>::AcceptPopulationWriter(std::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter)
 {
     pPopulationWriter->Visit(this);
 }
 
 template<unsigned DIM>
-void VertexBasedCellPopulation<DIM>::AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter)
+void VertexBasedCellPopulation<DIM>::AcceptPopulationCountWriter(std::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter)
 {
     pPopulationCountWriter->Visit(this);
 }
 
 template<unsigned DIM>
-void VertexBasedCellPopulation<DIM>::AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell)
+void VertexBasedCellPopulation<DIM>::AcceptCellWriter(std::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell)
 {
     pCellWriter->VisitCell(pCell, this);
 }
@@ -401,7 +401,7 @@ void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rD
 
     // Iterate over any cell writers that are present
     unsigned num_cells = this->GetNumAllCells();
-    for (typename std::vector<boost::shared_ptr<AbstractCellWriter<DIM, DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
+    for (typename std::vector<std::shared_ptr<AbstractCellWriter<DIM, DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
          cell_writer_iter != this->mCellWriters.end();
          ++cell_writer_iter)
     {
@@ -549,13 +549,13 @@ std::set<unsigned> VertexBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(un
 }
 
 template<unsigned DIM>
-boost::shared_ptr<AbstractVertexBasedDivisionRule<DIM> > VertexBasedCellPopulation<DIM>::GetVertexBasedDivisionRule()
+std::shared_ptr<AbstractVertexBasedDivisionRule<DIM> > VertexBasedCellPopulation<DIM>::GetVertexBasedDivisionRule()
 {
     return mpVertexBasedDivisionRule;
 }
 
 template<unsigned DIM>
-void VertexBasedCellPopulation<DIM>::SetVertexBasedDivisionRule(boost::shared_ptr<AbstractVertexBasedDivisionRule<DIM> > pVertexBasedDivisionRule)
+void VertexBasedCellPopulation<DIM>::SetVertexBasedDivisionRule(std::shared_ptr<AbstractVertexBasedDivisionRule<DIM> > pVertexBasedDivisionRule)
 {
     mpVertexBasedDivisionRule = pVertexBasedDivisionRule;
 }

@@ -135,7 +135,7 @@ AbstractDynamicLinearPdeSolver<DIM, DIM, 2>* BidomainProblem<DIM>::CreateSolver(
 {
     /*
      * NOTE: The this->mpBoundaryConditionsContainer.get() lines below convert a
-     * boost::shared_ptr to a normal pointer, as this is what the solvers are
+     * std::shared_ptr to a normal pointer, as this is what the solvers are
      * expecting. We have to be a bit careful though as boost could decide to delete
      * them whenever it feels like as it won't count the assembers as using them.
      *
@@ -291,7 +291,7 @@ void BidomainProblem<DIM>::SetElectrodes()
 
     if (HeartConfig::Instance()->IsElectrodesPresent())
     {
-        mpElectrodes = (boost::shared_ptr<Electrodes<DIM> >) new Electrodes<DIM>(*(this->mpMesh));
+        mpElectrodes = (std::shared_ptr<Electrodes<DIM> >) new Electrodes<DIM>(*(this->mpMesh));
     }
 }
 

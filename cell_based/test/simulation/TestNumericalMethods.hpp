@@ -95,7 +95,7 @@ public:
             MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
             // Create a force collection
-            std::vector<boost::shared_ptr<AbstractForce<2,2> > > force_collection;
+            std::vector<std::shared_ptr<AbstractForce<2,2> > > force_collection;
             MAKE_PTR(PopulationTestingForce<2>, p_test_force);
             force_collection.push_back(p_test_force);
 
@@ -162,7 +162,7 @@ public:
         cell_population.SetDampingConstantNormal(1.1);
 
         // Create a force collection
-        std::vector<boost::shared_ptr<AbstractForce<2,2> > > force_collection;
+        std::vector<std::shared_ptr<AbstractForce<2,2> > > force_collection;
         MAKE_PTR(PopulationTestingForce<2>, p_test_force);
         force_collection.push_back(p_test_force);
 
@@ -212,7 +212,7 @@ public:
         cell_population.SetDampingConstantNormal(1.1);
 
         // Create a force collection
-        std::vector<boost::shared_ptr<AbstractForce<2,2> > > force_collection;
+        std::vector<std::shared_ptr<AbstractForce<2,2> > > force_collection;
         MAKE_PTR(PopulationTestingForce<2>, p_test_force);
         force_collection.push_back(p_test_force);
 
@@ -270,7 +270,7 @@ public:
         cell_population.SetDampingConstantNormal(1.1);
 
         // Create a force collection
-        std::vector<boost::shared_ptr<AbstractForce<2,2> > > force_collection;
+        std::vector<std::shared_ptr<AbstractForce<2,2> > > force_collection;
         MAKE_PTR(PopulationTestingForce<2>, p_test_force);
         force_collection.push_back(p_test_force);
 
@@ -325,7 +325,7 @@ public:
         cell_population.SetDampingConstantNormal(1.1);
 
         // Create a force collection
-        std::vector<boost::shared_ptr<AbstractForce<2,2> > > force_collection;
+        std::vector<std::shared_ptr<AbstractForce<2,2> > > force_collection;
         MAKE_PTR(PopulationTestingForce<2>, p_test_force);
         force_collection.push_back(p_test_force);
 
@@ -384,7 +384,7 @@ public:
         cell_population.SetDampingConstantNormal(1.1);
 
         // Create a force collection
-        std::vector<boost::shared_ptr<AbstractForce<2,2> > > force_collection;
+        std::vector<std::shared_ptr<AbstractForce<2,2> > > force_collection;
         MAKE_PTR(PopulationTestingForce<2>, p_test_force);
         force_collection.push_back(p_test_force);
 
@@ -438,7 +438,7 @@ public:
         cell_population.SetDampingConstantNormal(1.1);
 
         // Create a force collection
-        std::vector<boost::shared_ptr<AbstractForce<2,2> > > force_collection;
+        std::vector<std::shared_ptr<AbstractForce<2,2> > > force_collection;
         MAKE_PTR(PopulationTestingForce<2>, p_test_force);
         force_collection.push_back(p_test_force);
 

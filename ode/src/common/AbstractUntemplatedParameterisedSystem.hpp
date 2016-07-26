@@ -38,7 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vector>
 #include <string>
-#include <boost/shared_ptr.hpp>
+
 
 #include "AbstractOdeSystemInformation.hpp"
 
@@ -66,7 +66,7 @@ public:
     /**
      * @return the object which provides information about this ODE system.
      */
-    boost::shared_ptr<const AbstractOdeSystemInformation> GetSystemInformation() const;
+    std::shared_ptr<const AbstractOdeSystemInformation> GetSystemInformation() const;
 
     /**
      * @return the name of this system.
@@ -298,7 +298,7 @@ protected:
      * Subclasses @b need to set this in their constructor to point to an instance
      * of a suitable class.  See for example the OdeSystemInformation class.
      */
-    boost::shared_ptr<AbstractOdeSystemInformation> mpSystemInfo;
+    std::shared_ptr<AbstractOdeSystemInformation> mpSystemInfo;
 
 };
 

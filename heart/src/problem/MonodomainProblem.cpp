@@ -54,7 +54,7 @@ AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, 1>* MonodomainProblem<ELE
     assert(mpMonodomainTissue);
     /*
      * NOTE: The this->mpBoundaryConditionsContainer.get() lines below convert a
-     * boost::shared_ptr to a normal pointer, as this is what the solvers are
+     * std::shared_ptr to a normal pointer, as this is what the solvers are
      * expecting. We have to be a bit careful though as boost could decide to delete
      * them whenever it feels like as it won't count the assembers as using them.
      *

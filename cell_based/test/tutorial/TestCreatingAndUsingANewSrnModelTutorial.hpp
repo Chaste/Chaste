@@ -214,7 +214,7 @@ protected:
 public:
 
     MySrnModel()
-        : AbstractOdeSrnModel(2, boost::shared_ptr<AbstractCellCycleModelOdeSolver>())
+        : AbstractOdeSrnModel(2, std::shared_ptr<AbstractCellCycleModelOdeSolver>())
     {
 
         mpOdeSolver = CellCycleModelOdeSolver<MySrnModel, RungeKutta4IvpOdeSolver>::Instance();

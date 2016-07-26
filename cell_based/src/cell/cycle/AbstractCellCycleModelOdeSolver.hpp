@@ -40,7 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ClassIsAbstract.hpp"
 #include <boost/serialization/base_object.hpp>
 
-#include <boost/shared_ptr.hpp>
+
 
 #include "AbstractIvpOdeSolver.hpp"
 
@@ -75,7 +75,7 @@ private:
 protected:
 
     /** The ODE solver. */
-    boost::shared_ptr<AbstractIvpOdeSolver> mpOdeSolver;
+    std::shared_ptr<AbstractIvpOdeSolver> mpOdeSolver;
 
     /** The size of the ODE system to be solved. */
     unsigned mSizeOfOdeSystem;

@@ -38,7 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vector>
 
-#include <boost/shared_ptr.hpp>
+
 
 #include "AbstractOdeSystemInformation.hpp"
 #include "AbstractOdeSystem.hpp"
@@ -57,9 +57,9 @@ private:
     struct InstancePointers
     {
         /** The 'singleton' instance. */
-        boost::shared_ptr<CombinedOdeSystemInformation> pInfoInstance;
+        std::shared_ptr<CombinedOdeSystemInformation> pInfoInstance;
         /** The subsystem information objects that contribute to this 'singleton' instance. */
-        std::vector<boost::shared_ptr<const AbstractOdeSystemInformation> > subsystemInformation;
+        std::vector<std::shared_ptr<const AbstractOdeSystemInformation> > subsystemInformation;
     };
 
     /**
@@ -77,7 +77,7 @@ protected:
      * @param rSubsystemInfo  the information objects of the ODE systems used to construct
      *     the system we are providing information about.
      */
-    CombinedOdeSystemInformation(const std::vector<boost::shared_ptr<const AbstractOdeSystemInformation> >& rSubsystemInfo);
+    CombinedOdeSystemInformation(const std::vector<std::shared_ptr<const AbstractOdeSystemInformation> >& rSubsystemInfo);
 
     /**
      * Copy constructor.  Not defined.
@@ -104,7 +104,7 @@ public:
      *
      * @param rSubsystems  the ODE systems used to construct the system we are providing information about.
      */
-    static boost::shared_ptr<CombinedOdeSystemInformation> Instance(const std::vector<AbstractOdeSystem*>& rSubsystems);
+    static std::shared_ptr<CombinedOdeSystemInformation> Instance(const std::vector<AbstractOdeSystem*>& rSubsystems);
 
 };
 

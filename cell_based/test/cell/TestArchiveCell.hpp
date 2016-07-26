@@ -82,8 +82,8 @@ public:
             p_simulation_time->SetEndTimeAndNumberOfTimeSteps(2.0, 4);
 
             // Create mutation state
-            boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
-            boost::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
+            std::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
+            std::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
 
             // Create cell-cycle model
             FixedDurationGenerationBasedCellCycleModel* p_cell_model = new FixedDurationGenerationBasedCellCycleModel();
@@ -112,7 +112,7 @@ public:
             TS_ASSERT_EQUALS(p_cell->GetAncestor(), 2u);
 
             // Set CellVecData with some actual content
-            boost::shared_ptr<AbstractCellProperty> p_vec_data(CellPropertyRegistry::Instance()->Get<CellVecData>());
+            std::shared_ptr<AbstractCellProperty> p_vec_data(CellPropertyRegistry::Instance()->Get<CellVecData>());
             p_cell->AddCellProperty(p_vec_data);
             Vec item_1 = PetscTools::CreateAndSetVec(2, -17.3); // <-17.3, -17.3>
             p_cell->GetCellVecData()->SetItem("item 1", item_1);
@@ -147,11 +147,11 @@ public:
             }
 
             // Create another cell
-            boost::shared_ptr<AbstractCellProperty> p_another_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
+            std::shared_ptr<AbstractCellProperty> p_another_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
             FixedDurationGenerationBasedCellCycleModel* p_another_cell_model = new FixedDurationGenerationBasedCellCycleModel();
             Goldbeter1991SrnModel* p_another_srn_model = new Goldbeter1991SrnModel();
             CellPtr p_another_cell(new Cell(p_another_healthy_state, p_another_cell_model, p_another_srn_model, false, collection));
-            boost::shared_ptr<AbstractCellProperty> p_another_vec_data(new CellVecData);
+            std::shared_ptr<AbstractCellProperty> p_another_vec_data(new CellVecData);
             p_another_cell->AddCellProperty(p_another_vec_data);
             TS_ASSERT_EQUALS(p_cell->GetCellVecData()->GetNumItems(), 1u);
             TS_ASSERT_EQUALS(p_another_cell->GetCellVecData()->GetNumItems(), 0u);
@@ -227,7 +227,7 @@ public:
             TS_ASSERT_EQUALS(collection.HasPropertyType<CellVecData>(), true);
 
             // Check that the Vec stored in CellVecData was unarchived correctly
-            boost::shared_ptr<CellVecData> p_cell_vec_data = boost::static_pointer_cast<CellVecData>(collection.GetPropertiesType<CellVecData>().GetProperty());
+            std::shared_ptr<CellVecData> p_cell_vec_data = boost::static_pointer_cast<CellVecData>(collection.GetPropertiesType<CellVecData>().GetProperty());
             PetscInt vec_size;
             VecGetSize(p_cell_vec_data->GetItem("item 1"), &vec_size);
             TS_ASSERT_EQUALS(vec_size, 2);

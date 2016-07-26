@@ -37,7 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CELLPROPERTYCOLLECTION_HPP_
 
 #include <set>
-#include <boost/shared_ptr.hpp>
+
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/shared_ptr.hpp>
@@ -56,7 +56,7 @@ class CellPropertyCollection
 {
 private:
     /** The type of container used to store properties */
-    typedef std::set<boost::shared_ptr<AbstractCellProperty> > CollectionType;
+    typedef std::set<std::shared_ptr<AbstractCellProperty> > CollectionType;
 
     /** Type of a const iterator over the container */
     typedef CollectionType::const_iterator ConstIteratorType;
@@ -96,7 +96,7 @@ public:
      *
      * @param rProp  the property to add
      */
-    void AddProperty(const boost::shared_ptr<AbstractCellProperty>& rProp);
+    void AddProperty(const std::shared_ptr<AbstractCellProperty>& rProp);
 
     /**
      * @return a pointer to the CellPropertyRegistry (as assigned to this cell in the AbstractCellPopulation constructor).
@@ -115,7 +115,7 @@ public:
      *
      * @param rProp  the property to compare against
      */
-    bool HasProperty(const boost::shared_ptr<AbstractCellProperty>& rProp) const;
+    bool HasProperty(const std::shared_ptr<AbstractCellProperty>& rProp) const;
 
     /**
      * @return whether the collection contains a property that has the exact type CLASS.
@@ -177,7 +177,7 @@ public:
      *
      * @param rProp  the property to remove
      */
-    void RemoveProperty(const boost::shared_ptr<AbstractCellProperty>& rProp);
+    void RemoveProperty(const std::shared_ptr<AbstractCellProperty>& rProp);
 
     /**
      * @return the size of this container.
@@ -204,7 +204,7 @@ public:
      * @return If this collection contains a single property, then return it.
      * Otherwise, throws an exception.
      */
-    boost::shared_ptr<AbstractCellProperty> GetProperty() const;
+    std::shared_ptr<AbstractCellProperty> GetProperty() const;
 
     /**
      * @return a sub-collection containing all our properties that are instances

@@ -1001,9 +1001,9 @@ public:
         ++cell_iterator;
         cell_iterator->SetBirthTime(-1.0);
 
-        boost::shared_ptr<AbstractCellProperty> p_apc1(crypt.GetCellPropertyRegistry()->Get<ApcOneHitCellMutationState>());
-        boost::shared_ptr<AbstractCellProperty> p_bcat1(crypt.GetCellPropertyRegistry()->Get<BetaCateninOneHitCellMutationState>());
-        boost::shared_ptr<AbstractCellProperty> p_label(crypt.GetCellPropertyRegistry()->Get<CellLabel>());
+        std::shared_ptr<AbstractCellProperty> p_apc1(crypt.GetCellPropertyRegistry()->Get<ApcOneHitCellMutationState>());
+        std::shared_ptr<AbstractCellProperty> p_bcat1(crypt.GetCellPropertyRegistry()->Get<BetaCateninOneHitCellMutationState>());
+        std::shared_ptr<AbstractCellProperty> p_label(crypt.GetCellPropertyRegistry()->Get<CellLabel>());
 
         cell_iterator->AddCellProperty(p_label);
         ++cell_iterator;
@@ -1585,7 +1585,7 @@ public:
         TS_ASSERT_EQUALS(cell_mutation_state_count1[3], 1u);
 
         // However, using the cell mutation objects, they have counted!
-        boost::shared_ptr<CellPropertyRegistry> p_registry = crypt.GetCellPropertyRegistry();
+        std::shared_ptr<CellPropertyRegistry> p_registry = crypt.GetCellPropertyRegistry();
         TS_ASSERT_EQUALS(p_registry->Get<WildTypeCellMutationState>()->GetCellCount(), 13u);
         TS_ASSERT_EQUALS(p_registry->Get<ApcTwoHitCellMutationState>()->GetCellCount(), 1u);
         TS_ASSERT_EQUALS(p_registry->Get<BetaCateninOneHitCellMutationState>()->GetCellCount(), 1u);

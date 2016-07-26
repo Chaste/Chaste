@@ -69,7 +69,7 @@ public:
         TS_ASSERT_DELTA(electrodes.GetSwitchOnTime(), start_time, 1e-12);
         TS_ASSERT_DELTA(electrodes.GetSwitchOffTime(), start_time+duration, 1e-12);
 
-        boost::shared_ptr<BoundaryConditionsContainer<2,2,2> > p_bcc = electrodes.GetBoundaryConditionsContainer();
+        std::shared_ptr<BoundaryConditionsContainer<2,2,2> > p_bcc = electrodes.GetBoundaryConditionsContainer();
 
         for(DistributedTetrahedralMesh<2,2>::BoundaryElementIterator iter
            = mesh.GetBoundaryElementIteratorBegin();
@@ -141,7 +141,7 @@ public:
 
         TS_ASSERT_EQUALS(electrodes.HasGroundedElectrode(), false);
 
-        boost::shared_ptr<BoundaryConditionsContainer<2,2,2> >  p_bcc = electrodes.GetBoundaryConditionsContainer();
+        std::shared_ptr<BoundaryConditionsContainer<2,2,2> >  p_bcc = electrodes.GetBoundaryConditionsContainer();
 
         for(DistributedTetrahedralMesh<2,2>::BoundaryElementIterator iter
                 = mesh.GetBoundaryElementIteratorBegin();
@@ -204,7 +204,7 @@ public:
 
         TS_ASSERT_THROWS_ANYTHING(electrodes.ComputeElectrodesAreasAndCheckEquality(0,0,10));
 
-        boost::shared_ptr<BoundaryConditionsContainer<2,2,2> >  p_bcc = electrodes.GetBoundaryConditionsContainer();
+        std::shared_ptr<BoundaryConditionsContainer<2,2,2> >  p_bcc = electrodes.GetBoundaryConditionsContainer();
 
         for(DistributedTetrahedralMesh<2,2>::BoundaryElementIterator iter
                 = mesh.GetBoundaryElementIteratorBegin();
@@ -237,7 +237,7 @@ public:
         HeartConfig::Instance()->SetElectrodeParameters(true,1,magnitude,0.0,duration);
         Electrodes<3> electrodes(mesh);
 
-        boost::shared_ptr<BoundaryConditionsContainer<3,3,2> >  p_bcc = electrodes.GetBoundaryConditionsContainer();
+        std::shared_ptr<BoundaryConditionsContainer<3,3,2> >  p_bcc = electrodes.GetBoundaryConditionsContainer();
 
         for(DistributedTetrahedralMesh<3,3>::BoundaryElementIterator iter
                 = mesh.GetBoundaryElementIteratorBegin();
@@ -277,7 +277,7 @@ public:
         HeartConfig::Instance()->SetElectrodeParameters(false,1,magnitude,0.0,duration);
         Electrodes<3> electrodes(mesh);
 
-        boost::shared_ptr<BoundaryConditionsContainer<3,3,2> > p_bcc = electrodes.GetBoundaryConditionsContainer();
+        std::shared_ptr<BoundaryConditionsContainer<3,3,2> > p_bcc = electrodes.GetBoundaryConditionsContainer();
 
         for(DistributedTetrahedralMesh<3,3>::BoundaryElementIterator iter
                 = mesh.GetBoundaryElementIteratorBegin();

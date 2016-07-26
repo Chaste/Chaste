@@ -59,9 +59,9 @@ ZeroNetChargeElectrodes<DIM>::~ZeroNetChargeElectrodes()
 
 
 template<unsigned DIM>
-boost::shared_ptr<AbstractStimulusFunction> ZeroNetChargeElectrodes<DIM>::CreateStimulusForNode(Node<DIM>* pNode)
+std::shared_ptr<AbstractStimulusFunction> ZeroNetChargeElectrodes<DIM>::CreateStimulusForNode(Node<DIM>* pNode)
 {
-    boost::shared_ptr<RegularStimulusZeroNetCharge> p_stimulus;
+    std::shared_ptr<RegularStimulusZeroNetCharge> p_stimulus;
     for (unsigned pair_index = 0; pair_index < this->mrElectrodePairs.size(); pair_index++)
     {
         if (this->mrElectrodePairs[pair_index].first->DoesContain(pNode->GetPoint()) )

@@ -58,7 +58,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class StimulatedCellFactory: public AbstractCardiacCellFactory<2>
 {
 private:
-        boost::shared_ptr<SimpleStimulus> mpStimulus;
+        std::shared_ptr<SimpleStimulus> mpStimulus;
         //static const double magnitude = -445000.0;
 public:
         StimulatedCellFactory() : AbstractCardiacCellFactory<2>(),
@@ -85,7 +85,7 @@ public:
 class UnStimulatedCellFactory: public AbstractCardiacCellFactory<2>
 {
 private:
-        boost::shared_ptr<SimpleStimulus> mpStimulus;
+        std::shared_ptr<SimpleStimulus> mpStimulus;
         //static const double magnitude = 0.0;
 public:
         UnStimulatedCellFactory() : AbstractCardiacCellFactory<2>(),
@@ -112,11 +112,11 @@ public:
     {
     }
 
-    boost::shared_ptr<AbstractStimulusFunction> CreateStimulusForNode(Node<2>* pNode)
+    std::shared_ptr<AbstractStimulusFunction> CreateStimulusForNode(Node<2>* pNode)
     {
         double x = pNode->rGetLocation()[0];
 
-        boost::shared_ptr<SimpleStimulus> p_stimulus;
+        std::shared_ptr<SimpleStimulus> p_stimulus;
         if ((x <= 0.01))
         {
             p_stimulus.reset( new SimpleStimulus(25000, 0.5, 3.5) );
@@ -241,11 +241,11 @@ private:
         extended_problem.SetIntracellularConductivitiesForSecondCell(Create_c_vector(1.5,1.5));
 
         //also put in non-default Ggap heterogeneity pattern to check for archiving
-        std::vector<boost::shared_ptr<AbstractChasteRegion<2> > > heterogeneity_areas;
+        std::vector<std::shared_ptr<AbstractChasteRegion<2> > > heterogeneity_areas;
         std::vector<double> Ggap_values;
         ChastePoint<2> cornerA(-1, -1);
         ChastePoint<2> cornerB(0.05, 0.05);
-        boost::shared_ptr<ChasteCuboid<2> > p_cuboid_1(new ChasteCuboid<2>(cornerA, cornerB));
+        std::shared_ptr<ChasteCuboid<2> > p_cuboid_1(new ChasteCuboid<2>(cornerA, cornerB));
         heterogeneity_areas.push_back(p_cuboid_1);
         Ggap_values.push_back(0.1);
         extended_problem.SetGgapHeterogeneities(heterogeneity_areas, Ggap_values);
@@ -280,11 +280,11 @@ private:
         extended_problem.SetIntracellularConductivitiesForSecondCell(Create_c_vector(1.5,1.5));
 
         //also put in non-default Ggap heterogeneity pattern to check for archiving
-        std::vector<boost::shared_ptr<AbstractChasteRegion<2> > > heterogeneity_areas;
+        std::vector<std::shared_ptr<AbstractChasteRegion<2> > > heterogeneity_areas;
         std::vector<double> Ggap_values;
         ChastePoint<2> cornerA(-1, -1);
         ChastePoint<2> cornerB(0.05, 0.05);
-        boost::shared_ptr<ChasteCuboid<2> > p_cuboid_1(new ChasteCuboid<2>(cornerA, cornerB));
+        std::shared_ptr<ChasteCuboid<2> > p_cuboid_1(new ChasteCuboid<2>(cornerA, cornerB));
         heterogeneity_areas.push_back(p_cuboid_1);
         Ggap_values.push_back(0.1);
         extended_problem.SetGgapHeterogeneities(heterogeneity_areas, Ggap_values);

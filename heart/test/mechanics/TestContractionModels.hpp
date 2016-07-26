@@ -136,10 +136,10 @@ public :
 
         TS_ASSERT_DELTA(nhs_system.GetCalciumTroponinValue(), 0.0, 0.01);
 
-        boost::shared_ptr<EulerIvpOdeSolver> p_euler_solver(new EulerIvpOdeSolver);
+        std::shared_ptr<EulerIvpOdeSolver> p_euler_solver(new EulerIvpOdeSolver);
 
         // the following is just to get a realistic Ca_I value
-        boost::shared_ptr<ZeroStimulus> p_zero_stimulus(new ZeroStimulus);
+        std::shared_ptr<ZeroStimulus> p_zero_stimulus(new ZeroStimulus);
         CellLuoRudy1991FromCellML lr91(p_euler_solver, p_zero_stimulus);
         unsigned Ca_i_index = lr91.GetStateVariableIndex("cytosolic_calcium_concentration");
         double Ca_I = lr91.rGetStateVariables()[Ca_i_index];
@@ -186,11 +186,11 @@ public :
         double magnitude =  -25.5;
         double duration  =   2.0;  // ms
         double when      =   0.0;  // ms
-        boost::shared_ptr<SimpleStimulus> p_stimulus(new SimpleStimulus(magnitude, duration, when));
+        std::shared_ptr<SimpleStimulus> p_stimulus(new SimpleStimulus(magnitude, duration, when));
 
         double end_time = 1000.0;
 
-        boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
+        std::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
         CellLuoRudy1991FromCellML electrophys_model(p_solver, p_stimulus);
         NhsContractionModel cellmech_model;
 
@@ -293,12 +293,12 @@ public :
      */
     void TestNhsConstantCaVaryingStretch() throw(Exception)
     {
-        boost::shared_ptr<ZeroStimulus> p_zero_stimulus(new ZeroStimulus);
+        std::shared_ptr<ZeroStimulus> p_zero_stimulus(new ZeroStimulus);
         double end_time = 100.0;
 
         double min_lam = 0.85;
 
-        boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
+        std::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
         CellLuoRudy1991FromCellML electrophys_model(p_solver, p_zero_stimulus);
         NhsContractionModel cellmech_model;
 
@@ -399,7 +399,7 @@ public :
         double magnitude =  -25.5;
         double duration  =   2.0;  // ms
         double when      =   0.0;  // ms
-        boost::shared_ptr<SimpleStimulus> p_stimulus(new SimpleStimulus(magnitude, duration, when));
+        std::shared_ptr<SimpleStimulus> p_stimulus(new SimpleStimulus(magnitude, duration, when));
 
         double end_time = 1000.0;
 
@@ -414,7 +414,7 @@ public :
 
         for(unsigned run=0; run<3; run++)
         {
-            boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
+            std::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
             CellLuoRudy1991FromCellML electrophys_model(p_solver, p_stimulus);
             unsigned Ca_i_index = electrophys_model.GetStateVariableIndex("cytosolic_calcium_concentration");
 
@@ -680,9 +680,9 @@ public :
         // coverage, doesn't use these..
         nash_model.SetStretchAndStretchRate(0.99,0.0);
 
-        boost::shared_ptr<SimpleStimulus> p_stimulus(new SimpleStimulus(-25.5, 2.0, 0.0));
+        std::shared_ptr<SimpleStimulus> p_stimulus(new SimpleStimulus(-25.5, 2.0, 0.0));
 
-        boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
+        std::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
         CellLuoRudy1991FromCellML electrophys_model(p_solver, p_stimulus);
 
         std::vector<double> times;

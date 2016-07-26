@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CELLPROPERTYREGISTRY_HPP_
 #define CELLPROPERTYREGISTRY_HPP_
 
-#include <boost/shared_ptr.hpp>
+
 #include <vector>
 
 #include "AbstractCellProperty.hpp"
@@ -55,11 +55,11 @@ public:
      * The main interface to this class.
      * @return a particular cell property object.
      * Use like:
-     *    boost::shared_ptr<AbstractCellProperty> p_property(
+     *    std::shared_ptr<AbstractCellProperty> p_property(
                 CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
      */
     template<class SUBCLASS>
-    boost::shared_ptr<AbstractCellProperty> Get();
+    std::shared_ptr<AbstractCellProperty> Get();
 
     /**
      * @return the single instance of the registry.
@@ -69,7 +69,7 @@ public:
     /**
      * @return a list of the cell properties registered.
      */
-    const std::vector<boost::shared_ptr<AbstractCellProperty> >& rGetAllCellProperties();
+    const std::vector<std::shared_ptr<AbstractCellProperty> >& rGetAllCellProperties();
 
     /**
      * Clear all registered cell properties.
@@ -95,7 +95,7 @@ public:
      *
      * @param rOrdering  vector of cell properties in the desired order
      */
-    void SpecifyOrdering(const std::vector<boost::shared_ptr<AbstractCellProperty> >& rOrdering);
+    void SpecifyOrdering(const std::vector<std::shared_ptr<AbstractCellProperty> >& rOrdering);
 
     /**
      * @return whether an ordering has been specified.
@@ -128,7 +128,7 @@ private:
     /**
      * The cell properties in the registry.
      */
-    std::vector<boost::shared_ptr<AbstractCellProperty> > mCellProperties;
+    std::vector<std::shared_ptr<AbstractCellProperty> > mCellProperties;
 
     /** Whether an ordering has been set up */
     bool mOrderingHasBeenSpecified;
@@ -150,9 +150,9 @@ private:
 };
 
 template<class SUBCLASS>
-boost::shared_ptr<AbstractCellProperty> CellPropertyRegistry::Get()
+std::shared_ptr<AbstractCellProperty> CellPropertyRegistry::Get()
 {
-    boost::shared_ptr<AbstractCellProperty> p_property;
+    std::shared_ptr<AbstractCellProperty> p_property;
     for (unsigned i=0; i<mCellProperties.size(); i++)
     {
         if (mCellProperties[i]->IsType<SUBCLASS>())

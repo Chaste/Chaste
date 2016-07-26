@@ -65,7 +65,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class MyCardiacCellFactory : public AbstractCardiacCellFactory<1>
 {
 private:
-    boost::shared_ptr<SimpleStimulus> mpStimulus;
+    std::shared_ptr<SimpleStimulus> mpStimulus;
 
 public:
 
@@ -88,7 +88,7 @@ public:
         }
     }
 
-    boost::shared_ptr<SimpleStimulus> GetStimulus()
+    std::shared_ptr<SimpleStimulus> GetStimulus()
     {
         return mpStimulus;
     }
@@ -97,7 +97,7 @@ public:
 class PurkinjeCellFactory : public AbstractPurkinjeCellFactory<2>
 {
 private:
-    boost::shared_ptr<SimpleStimulus> mpStimulus;
+    std::shared_ptr<SimpleStimulus> mpStimulus;
 
 public:
     PurkinjeCellFactory()
@@ -147,13 +147,13 @@ public:
         double start_time = 0;
         double big_time_step = 0.5;
 
-        boost::shared_ptr<AbstractIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
+        std::shared_ptr<AbstractIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
         MyCardiacCellFactory cell_factory;
         cell_factory.SetMesh(&mesh);
 
         // Stimulus function to use at node 0. Node 1 is not stimulated.
-        boost::shared_ptr<SimpleStimulus> p_stimulus = cell_factory.GetStimulus();
-        boost::shared_ptr<ZeroStimulus> p_zero_stim(new ZeroStimulus);
+        std::shared_ptr<SimpleStimulus> p_stimulus = cell_factory.GetStimulus();
+        std::shared_ptr<ZeroStimulus> p_zero_stim(new ZeroStimulus);
 
         MonodomainTissue<1> monodomain_tissue( &cell_factory );
 

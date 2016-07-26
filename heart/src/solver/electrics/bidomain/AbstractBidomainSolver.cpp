@@ -80,7 +80,7 @@ void AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolve(Vec initi
         TetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* p_mesh = dynamic_cast<TetrahedralMesh<ELEMENT_DIM,SPACE_DIM>*>(this->mpMesh);
         if (p_mesh && PetscTools::IsSequential())
         {
-            boost::shared_ptr<std::vector<PetscInt> > p_bath_nodes(new std::vector<PetscInt>());
+            std::shared_ptr<std::vector<PetscInt> > p_bath_nodes(new std::vector<PetscInt>());
 
             for(unsigned node_index=0; node_index<this->mpMesh->GetNumNodes(); node_index++)
             {

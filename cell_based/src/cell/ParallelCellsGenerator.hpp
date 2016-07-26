@@ -73,13 +73,13 @@ public:
     void GenerateParallelCells( std::string archivePath,
                                 std::vector<CellPtr>& cells,
                                 NodesOnlyMesh<DIM>& mesh,
-                                boost::shared_ptr<AbstractCellProperty> pCellProliferativeType=boost::shared_ptr<AbstractCellProperty>());
+                                std::shared_ptr<AbstractCellProperty> pCellProliferativeType=std::shared_ptr<AbstractCellProperty>());
 
 };
 
 // Implementation
 template<class CELL_CYCLE_MODEL, unsigned DIM>
-void ParallelCellsGenerator<CELL_CYCLE_MODEL, DIM>::GenerateParallelCells(std::string archivePath, std::vector<CellPtr>& cells, NodesOnlyMesh<DIM>& mesh, boost::shared_ptr<AbstractCellProperty> pCellProliferativeType)
+void ParallelCellsGenerator<CELL_CYCLE_MODEL, DIM>::GenerateParallelCells(std::string archivePath, std::vector<CellPtr>& cells, NodesOnlyMesh<DIM>& mesh, std::shared_ptr<AbstractCellProperty> pCellProliferativeType)
 {
     // Get a bounding box for the archived nodes
     c_vector<double, 2*DIM> base_bounding_box = GetArchiveBoundingBox(archivePath);
@@ -125,7 +125,7 @@ void ParallelCellsGenerator<CELL_CYCLE_MODEL, DIM>::GenerateParallelCells(std::s
             p_cell_cycle_model->SetDimension(DIM);
 
             // Wild type hard-coded for now.
-            boost::shared_ptr<AbstractCellProperty> p_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
+            std::shared_ptr<AbstractCellProperty> p_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
             CellPtr p_cell(new Cell(p_state, p_cell_cycle_model));
             p_cell->SetCellProliferativeType(pCellProliferativeType);
             cells.push_back(p_cell);

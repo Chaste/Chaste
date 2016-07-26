@@ -135,11 +135,11 @@ public:
         typedef CellCycleModelOdeSolver<TysonNovakCellCycleModel,RungeKutta4IvpOdeSolver> RkSolver;
 
         // Check we can create an instance
-        boost::shared_ptr<RkSolver> p_solver = RkSolver::Instance();
+        std::shared_ptr<RkSolver> p_solver = RkSolver::Instance();
         TS_ASSERT(p_solver.get() != nullptr);
 
         // Check singleton-ness
-        boost::shared_ptr<RkSolver> p_solver2 = RkSolver::Instance();
+        std::shared_ptr<RkSolver> p_solver2 = RkSolver::Instance();
         TS_ASSERT_EQUALS(p_solver, p_solver2);
 
         p_solver->Initialise();
@@ -172,11 +172,11 @@ public:
         typedef CellCycleModelOdeSolver<TysonNovakCellCycleModel, BackwardEulerIvpOdeSolver> EulerSolver;
 
         // Check we can create an instance
-        boost::shared_ptr<EulerSolver> p_solver = EulerSolver::Instance();
+        std::shared_ptr<EulerSolver> p_solver = EulerSolver::Instance();
         TS_ASSERT(p_solver.get() != nullptr);
 
         // Check singleton-ness
-        boost::shared_ptr<EulerSolver> p_solver2 = EulerSolver::Instance();
+        std::shared_ptr<EulerSolver> p_solver2 = EulerSolver::Instance();
         TS_ASSERT_EQUALS(p_solver, p_solver2);
 
         TS_ASSERT_THROWS_THIS(p_solver->Initialise(), "SetSizeOfOdeSystem() must be called before calling Initialise()");
@@ -219,11 +219,11 @@ public:
         typedef CellCycleModelOdeSolver<TysonNovakCellCycleModel, CvodeAdaptor> CvodeSolver;
 
         // Check we can create an instance
-        boost::shared_ptr<CvodeSolver> p_solver = CvodeSolver::Instance();
+        std::shared_ptr<CvodeSolver> p_solver = CvodeSolver::Instance();
         TS_ASSERT(p_solver.get() != nullptr);
 
         // Check singleton-ness
-        boost::shared_ptr<CvodeSolver> p_solver2 = CvodeSolver::Instance();
+        std::shared_ptr<CvodeSolver> p_solver2 = CvodeSolver::Instance();
         TS_ASSERT_EQUALS(p_solver, p_solver2);
 
         p_solver->Initialise();
@@ -246,7 +246,7 @@ public:
 
         // Create an output archive
         {
-            boost::shared_ptr<EulerSolver> p_solver = EulerSolver::Instance();
+            std::shared_ptr<EulerSolver> p_solver = EulerSolver::Instance();
             p_solver->SetSizeOfOdeSystem(4);
             p_solver->Initialise();
 
@@ -261,7 +261,7 @@ public:
         }
 
         {
-            boost::shared_ptr<EulerSolver> p_solver = EulerSolver::Instance();
+            std::shared_ptr<EulerSolver> p_solver = EulerSolver::Instance();
 
             TS_ASSERT_EQUALS(p_solver->GetSizeOfOdeSystem(), UNSIGNED_UNSET);
 

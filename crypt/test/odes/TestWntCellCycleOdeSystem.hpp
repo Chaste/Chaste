@@ -65,7 +65,7 @@ public:
     void TestWntCellCycleEquations()
     {
         double wnt_level = 0.0;
-        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+        std::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         WntCellCycleOdeSystem wnt_cell_cycle_system(wnt_level, p_state);
 
         double time = 0.0;
@@ -91,7 +91,7 @@ public:
          * And the same for a high Wnt level
          */
         wnt_level = 1.0;
-        boost::shared_ptr<AbstractCellMutationState> p_wt_state(new WildTypeCellMutationState);
+        std::shared_ptr<AbstractCellMutationState> p_wt_state(new WildTypeCellMutationState);
         WntCellCycleOdeSystem wnt_cell_cycle_system2(wnt_level, p_wt_state);
         initial_conditions = wnt_cell_cycle_system2.GetInitialConditions();
 
@@ -115,7 +115,7 @@ public:
          * A test for the case mutation = 1
          * (An APC +/- mutation)
          */
-        boost::shared_ptr<AbstractCellMutationState> p_apc1(new ApcOneHitCellMutationState);
+        std::shared_ptr<AbstractCellMutationState> p_apc1(new ApcOneHitCellMutationState);
         wnt_level = 1.0;
         WntCellCycleOdeSystem wnt_cell_cycle_system3(wnt_level, p_apc1);
         initial_conditions = wnt_cell_cycle_system3.GetInitialConditions();
@@ -140,7 +140,7 @@ public:
         * A test for the case mutation = 2
         * (A beta-cat delta45 mutation)
         */
-        boost::shared_ptr<AbstractCellMutationState> p_bcat1(new BetaCateninOneHitCellMutationState);
+        std::shared_ptr<AbstractCellMutationState> p_bcat1(new BetaCateninOneHitCellMutationState);
         wnt_level = 1.0;
         WntCellCycleOdeSystem wnt_cell_cycle_system4(wnt_level, p_bcat1);
         initial_conditions = wnt_cell_cycle_system4.GetInitialConditions();
@@ -165,7 +165,7 @@ public:
         * A test for the case mutation = 3
         * (An APC -/- mutation)
         */
-        boost::shared_ptr<AbstractCellMutationState> p_apc2(new ApcTwoHitCellMutationState);
+        std::shared_ptr<AbstractCellMutationState> p_apc2(new ApcTwoHitCellMutationState);
         wnt_level = 1.0;
         WntCellCycleOdeSystem wnt_cell_cycle_system5(wnt_level, p_apc2);
         initial_conditions = wnt_cell_cycle_system5.GetInitialConditions();
@@ -190,7 +190,7 @@ public:
     void TestWntCellCycleSolver() throw(Exception)
     {
         double wnt_level = 1.0;
-        boost::shared_ptr<AbstractCellMutationState> p_wt_state(new WildTypeCellMutationState);
+        std::shared_ptr<AbstractCellMutationState> p_wt_state(new WildTypeCellMutationState);
         WntCellCycleOdeSystem wnt_system(wnt_level, p_wt_state);
         // Solve system using rk4 solver
         // Matlab's strictest bit uses 0.01 below and relaxes it on flatter bits.
@@ -262,7 +262,7 @@ public:
     void TestWntCellCycleSolverWithAPCSingleHit() throw(Exception)
     {
         double wnt_level = 1.0;
-        boost::shared_ptr<AbstractCellMutationState> p_apc1(new ApcOneHitCellMutationState);
+        std::shared_ptr<AbstractCellMutationState> p_apc1(new ApcOneHitCellMutationState);
         WntCellCycleOdeSystem wnt_system(wnt_level, p_apc1);
         // Solve system using rk4 solver
         // Matlab's strictest bit uses 0.01 below and relaxes it on flatter bits.
@@ -298,7 +298,7 @@ public:
     void TestWntCellCycleSolverWithBetaCateninHit() throw(Exception)
     {
         double wnt_level = 0.0;
-        boost::shared_ptr<AbstractCellMutationState> p_bcat1(new BetaCateninOneHitCellMutationState);
+        std::shared_ptr<AbstractCellMutationState> p_bcat1(new BetaCateninOneHitCellMutationState);
         WntCellCycleOdeSystem wnt_system(wnt_level, p_bcat1);
         // Solve system using rk4 solver
         // Matlab's strictest bit uses 0.01 below and relaxes it on flatter bits.
@@ -336,7 +336,7 @@ public:
     void TestWntCellCycleSolverWithAPCDoubleHit() throw(Exception)
     {
         double wnt_level = 0.0;
-        boost::shared_ptr<AbstractCellMutationState> p_apc2(new ApcTwoHitCellMutationState);
+        std::shared_ptr<AbstractCellMutationState> p_apc2(new ApcTwoHitCellMutationState);
         WntCellCycleOdeSystem wnt_system(wnt_level, p_apc2);
         // Solve system using rk4 solver
         // Matlab's strictest bit uses 0.01 below and relaxes it on flatter bits.
@@ -378,7 +378,7 @@ public:
 
         {
             double wnt_level = 0.567;
-            boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+            std::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
             WntCellCycleOdeSystem ode_system(wnt_level, p_state);
 
             TS_ASSERT_DELTA(ode_system.GetWntLevel(), 0.567, 1e-6);

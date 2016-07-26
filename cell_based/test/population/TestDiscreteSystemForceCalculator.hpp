@@ -71,7 +71,7 @@ public:
 
         // Create the force law and pass in to a std::list
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
-        std::vector<boost::shared_ptr<AbstractTwoBodyInteractionForce<2> > > force_collection;
+        std::vector<std::shared_ptr<AbstractTwoBodyInteractionForce<2> > > force_collection;
         force_collection.push_back(p_force);
 
         // Create a force calculator
@@ -160,7 +160,7 @@ public:
 
         // Create the force law and pass in to a std::list
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
-        std::vector<boost::shared_ptr<AbstractTwoBodyInteractionForce<2> > > force_collection;
+        std::vector<std::shared_ptr<AbstractTwoBodyInteractionForce<2> > > force_collection;
         force_collection.push_back(p_force);
 
         // Create a force calculator
@@ -229,7 +229,7 @@ public:
 
         // Create the force law and pass in to a std::list
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
-        std::vector<boost::shared_ptr<AbstractTwoBodyInteractionForce<2> > > force_collection;
+        std::vector<std::shared_ptr<AbstractTwoBodyInteractionForce<2> > > force_collection;
         force_collection.push_back(p_force);
 
         // Create a force calculator

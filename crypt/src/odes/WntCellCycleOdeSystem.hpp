@@ -123,7 +123,7 @@ private:
     double mPhiE2F1;
 
     /** The mutation state of the cell - Wnt pathway behaviour (and hence cell cycle time) changes depending on this */
-    boost::shared_ptr<AbstractCellMutationState> mpMutationState;
+    std::shared_ptr<AbstractCellMutationState> mpMutationState;
 
     /** The Wnt level (this affects the ODE system). */
     double mWntLevel;
@@ -151,7 +151,7 @@ public:
      * @param stateVariables optional initial conditions for state variables (only used in archiving)
      */
     WntCellCycleOdeSystem(double wntLevel=0.0,
-                          boost::shared_ptr<AbstractCellMutationState> pMutationState=boost::shared_ptr<AbstractCellMutationState>(),
+                          std::shared_ptr<AbstractCellMutationState> pMutationState=std::shared_ptr<AbstractCellMutationState>(),
                           std::vector<double> stateVariables=std::vector<double>());
 
     /**
@@ -172,14 +172,14 @@ public:
      *
      * @param pMutationState the mutation state.
      */
-    void SetMutationState(boost::shared_ptr<AbstractCellMutationState> pMutationState);
+    void SetMutationState(std::shared_ptr<AbstractCellMutationState> pMutationState);
 
     /**
      * Called by the archive function on the Wnt cell-cycle model.
      *
      * @return #mpMutationState the mutation state of the cell.
      */
-    const boost::shared_ptr<AbstractCellMutationState> GetMutationState() const;
+    const std::shared_ptr<AbstractCellMutationState> GetMutationState() const;
 
     /**
      * Compute the RHS of the WntCellCycle system of ODEs.
@@ -240,7 +240,7 @@ inline void save_construct_data(
     const double wnt_level = t->GetWntLevel();
     ar & wnt_level;
 
-    const boost::shared_ptr<AbstractCellMutationState> p_mutation_state = t->GetMutationState();
+    const std::shared_ptr<AbstractCellMutationState> p_mutation_state = t->GetMutationState();
     ar & p_mutation_state;
 
     const std::vector<double> state_variables = t->rGetConstStateVariables();
@@ -258,7 +258,7 @@ inline void load_construct_data(
     double wnt_level;
     ar & wnt_level;
 
-    boost::shared_ptr<AbstractCellMutationState> p_mutation_state;
+    std::shared_ptr<AbstractCellMutationState> p_mutation_state;
     ar & p_mutation_state;
 
     std::vector<double> state_variables;

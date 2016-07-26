@@ -66,16 +66,16 @@ public:
         ///////// END DEFINE PARAMETERS ////////////////////////
 
         // Setup a CVODE model that has empty solver and stimulus
-        boost::shared_ptr<RegularStimulus> p_stimulus;
-        boost::shared_ptr<AbstractIvpOdeSolver> p_solver;
-        boost::shared_ptr<AbstractCvodeCell> p_model(new CellShannon2004FromCellMLCvode(p_solver, p_stimulus));
+        std::shared_ptr<RegularStimulus> p_stimulus;
+        std::shared_ptr<AbstractIvpOdeSolver> p_solver;
+        std::shared_ptr<AbstractCvodeCell> p_model(new CellShannon2004FromCellMLCvode(p_solver, p_stimulus));
 
         // Get it to use the default stimulus from CellML
-        boost::shared_ptr<RegularStimulus> p_reg_stim = p_model->UseCellMLDefaultStimulus();
+        std::shared_ptr<RegularStimulus> p_reg_stim = p_model->UseCellMLDefaultStimulus();
 
         { // Test that the steady state analysis throws a nice error if we try to run it with a non-RegularStimulus
 
-            boost::shared_ptr<ZeroStimulus> p_stim(new ZeroStimulus());
+            std::shared_ptr<ZeroStimulus> p_stim(new ZeroStimulus());
             p_model->SetStimulusFunction(p_stim);
 
             SteadyStateRunner bad_steady_runner(p_model);

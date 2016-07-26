@@ -307,9 +307,9 @@ public:
         TS_ASSERT_DELTA(solutions.rGetSolutions().back()[1], cos(2.0), global_error);
 
         // Check that if we create the same combination, we get the same information object
-        boost::shared_ptr<const AbstractOdeSystemInformation> info1 = combined_ode_system.GetSystemInformation();
+        std::shared_ptr<const AbstractOdeSystemInformation> info1 = combined_ode_system.GetSystemInformation();
         CombinedOdeSystem combined_ode_system2(ode_systems);
-        boost::shared_ptr<const AbstractOdeSystemInformation> info2 = combined_ode_system2.GetSystemInformation();
+        std::shared_ptr<const AbstractOdeSystemInformation> info2 = combined_ode_system2.GetSystemInformation();
         TS_ASSERT_EQUALS(info1, info2);
     }
 

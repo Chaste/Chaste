@@ -90,7 +90,7 @@ public:
     AbstractRushLarsenCardiacCell(
         unsigned numberOfStateVariables,
         unsigned voltageIndex,
-        boost::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus);
+        std::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus);
 
     /** Virtual destructor */
     virtual ~AbstractRushLarsenCardiacCell();

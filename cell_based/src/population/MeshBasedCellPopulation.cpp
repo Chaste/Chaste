@@ -578,19 +578,19 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteResultsToFiles(const s
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationWriter)
+void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::AcceptPopulationWriter(std::shared_ptr<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationWriter)
 {
     pPopulationWriter->Visit(this);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationCountWriter)
+void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::AcceptPopulationCountWriter(std::shared_ptr<AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationCountWriter)
 {
     pPopulationCountWriter->Visit(this);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > pCellWriter, CellPtr pCell)
+void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::AcceptCellWriter(std::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > pCellWriter, CellPtr pCell)
 {
     pCellWriter->VisitCell(pCell, this);
 }
@@ -636,7 +636,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile(const
 
         // Iterate over any cell writers that are present
         unsigned num_cells = this->GetNumAllCells();
-        for (typename std::vector<boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
+        for (typename std::vector<std::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
              cell_writer_iter != this->mCellWriters.end();
              ++cell_writer_iter)
         {
@@ -704,7 +704,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile(const
 
         // Iterate over any cell writers that are present
         unsigned num_cells = this->GetNumAllCells();
-        for (typename std::vector<boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
+        for (typename std::vector<std::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
              cell_writer_iter != this->mCellWriters.end();
              ++cell_writer_iter)
         {

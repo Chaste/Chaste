@@ -71,8 +71,8 @@ class TestRushLarsen : public CxxTest::TestSuite
         CellMLToSharedLibraryConverter converter(true);
         std::string dirname = "TestRushLarsen";
         std::string model = "LuoRudy1991";
-        boost::shared_ptr<AbstractIvpOdeSolver> p_solver;
-        boost::shared_ptr<ZeroStimulus> p_stimulus(new ZeroStimulus());
+        std::shared_ptr<AbstractIvpOdeSolver> p_solver;
+        std::shared_ptr<ZeroStimulus> p_stimulus(new ZeroStimulus());
 
         std::vector<std::string> args;
         args.push_back("--rush-larsen");
@@ -115,7 +115,7 @@ public:
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
 
         // Normal Luo-Rudy for comparison
-        boost::shared_ptr<EulerIvpOdeSolver> p_euler_solver(new EulerIvpOdeSolver());
+        std::shared_ptr<EulerIvpOdeSolver> p_euler_solver(new EulerIvpOdeSolver());
         CellLuoRudy1991FromCellML reference_model(p_euler_solver, mpRushLarsenCell->GetStimulusFunction());
         CellLuoRudy1991FromCellMLOpt reference_model_opt(p_euler_solver, mpRushLarsenCell->GetStimulusFunction());
 
@@ -142,7 +142,7 @@ public:
 
 
         // Test stimulated cell (using Compute)
-        boost::shared_ptr<SimpleStimulus> p_stimulus(new SimpleStimulus(-25.5, 1.99, 0.0));
+        std::shared_ptr<SimpleStimulus> p_stimulus(new SimpleStimulus(-25.5, 1.99, 0.0));
         mpRushLarsenCell->ResetToInitialConditions();
         mpRushLarsenCell->SetStimulusFunction(p_stimulus);
         OdeSolution solutions_RL = mpRushLarsenCell->Compute(0.0, 1.0, 0.01);

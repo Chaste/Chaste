@@ -38,7 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "CheckpointArchiveTypes.hpp"
 
-#include <boost/shared_ptr.hpp>
+
 
 #include "CellPropertyCollection.hpp"
 #include "AbstractCellProperty.hpp"
@@ -54,7 +54,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellBasedTestSuite.hpp"
 #include "FakePetscSetup.hpp"
 
-#define NEW_PROP(type, name) boost::shared_ptr<AbstractCellProperty> name(new type)
+#define NEW_PROP(type, name) std::shared_ptr<AbstractCellProperty> name(new type)
 
 class TestCellPropertyCollection : public AbstractCellBasedTestSuite
 {

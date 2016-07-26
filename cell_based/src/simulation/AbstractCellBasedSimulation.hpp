@@ -159,10 +159,10 @@ protected:
     out_stream mpCellVelocitiesFile;
 
     /** List of cell killers. */
-    std::vector<boost::shared_ptr<AbstractCellKiller<SPACE_DIM> > > mCellKillers;
+    std::vector<std::shared_ptr<AbstractCellKiller<SPACE_DIM> > > mCellKillers;
 
     /** List of SimulationModifier rules. */
-    std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM> > > mSimulationModifiers;
+    std::vector<std::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM> > > mSimulationModifiers;
 
     /**
      * The ratio of the number of actual timesteps to the number
@@ -387,7 +387,7 @@ public:
      *
      * @param pCellKiller pointer to a cell killer
      */
-    void AddCellKiller(boost::shared_ptr<AbstractCellKiller<SPACE_DIM> > pCellKiller);
+    void AddCellKiller(std::shared_ptr<AbstractCellKiller<SPACE_DIM> > pCellKiller);
 
     /**
      * Method to remove all the cell killers.
@@ -399,12 +399,12 @@ public:
      *
      * @param pSimulationModifier pointer to a SimulationModifier
      */
-    void AddSimulationModifier(boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM,SPACE_DIM> > pSimulationModifier);
+    void AddSimulationModifier(std::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM,SPACE_DIM> > pSimulationModifier);
 
     /**
      * @return a pointer to the vector of SimulationModifiers used in this simulation.
      */
-    std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM> > >* GetSimulationModifiers();
+    std::vector<std::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM> > >* GetSimulationModifiers();
 
     /**
      * Main Solve() method, used to evolve the cell population. Note that prior to calling Solve()

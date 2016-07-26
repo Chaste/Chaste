@@ -38,7 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 
-#include <boost/shared_ptr.hpp>
+
 
 #include "DummyModifier.hpp"
 #include "TimeModifier.hpp"
@@ -61,8 +61,8 @@ class TestModifiers : public CxxTest::TestSuite
 public:
     void TestAccessingParametersWithoutModifiers() throw(Exception)
     {
-        boost::shared_ptr<ZeroStimulus> p_stimulus(new ZeroStimulus());
-        boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
+        std::shared_ptr<ZeroStimulus> p_stimulus(new ZeroStimulus());
+        std::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
         CellShannon2004FromCellML* p_shannon = new CellShannon2004FromCellML(p_solver, p_stimulus);
 
         // We should now have all of the following methods available as an alternative to using 'modifiers'
@@ -76,8 +76,8 @@ public:
 
     void TestAssigningModifiersToACellModel() throw(Exception)
     {
-        boost::shared_ptr<ZeroStimulus> p_stimulus(new ZeroStimulus());
-        boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
+        std::shared_ptr<ZeroStimulus> p_stimulus(new ZeroStimulus());
+        std::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
         CellShannon2004FromCellML* p_shannon = new CellShannon2004FromCellML(p_solver, p_stimulus);
 
         TS_ASSERT_EQUALS(p_shannon->HasModifier("Alan"), false);
@@ -89,7 +89,7 @@ public:
         TS_ASSERT_DELTA(p_shannon->GetModifier("membrane_rapid_delayed_rectifier_potassium_current_conductance")->Calc(123,0),123,1e-9);
 
         // Make a new modifier
-        boost::shared_ptr<AbstractModifier> p_new_modifier(new FixedModifier(-90.0));
+        std::shared_ptr<AbstractModifier> p_new_modifier(new FixedModifier(-90.0));
 
         TS_ASSERT_THROWS_THIS(p_shannon->SetModifier("Alan",p_new_modifier), "There is no modifier called Alan in this model.");
 

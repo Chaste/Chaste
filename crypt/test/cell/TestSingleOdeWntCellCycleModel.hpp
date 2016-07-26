@@ -96,8 +96,8 @@ public:
         WntConcentration<2>::Instance()->SetConstantWntValueForTesting(wnt_level);
 
         // Create cell mutation state
-        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
-        boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
+        std::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+        std::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
 
         // Create cell-cycle model
         SingleOdeWntCellCycleModel* p_cycle_model = new SingleOdeWntCellCycleModel();
@@ -132,7 +132,7 @@ public:
         // Divide the cell
         TS_ASSERT_EQUALS(p_cell->ReadyToDivide(), true);
         CellPtr p_cell2 = p_cell->Divide();
-        boost::shared_ptr<AbstractCellProperty> p_label(new CellLabel);
+        std::shared_ptr<AbstractCellProperty> p_label(new CellLabel);
         p_cell->AddCellProperty(p_label);
 
         SingleOdeWntCellCycleModel* p_cycle_model2 = static_cast<SingleOdeWntCellCycleModel*> (p_cell2->GetCellCycleModel());
@@ -176,9 +176,9 @@ public:
         WntConcentration<2>::Instance()->SetConstantWntValueForTesting(wnt_level);
 
         // Introduce a mutation (no immediate effect)
-        boost::shared_ptr<AbstractCellMutationState> p_apc1(new ApcOneHitCellMutationState);
-        boost::shared_ptr<AbstractCellMutationState> p_apc2(new ApcTwoHitCellMutationState);
-        boost::shared_ptr<AbstractCellMutationState> p_bcat1(new BetaCateninOneHitCellMutationState);
+        std::shared_ptr<AbstractCellMutationState> p_apc1(new ApcOneHitCellMutationState);
+        std::shared_ptr<AbstractCellMutationState> p_apc2(new ApcTwoHitCellMutationState);
+        std::shared_ptr<AbstractCellMutationState> p_bcat1(new BetaCateninOneHitCellMutationState);
         p_cell2->SetMutationState(p_apc1);
         TS_ASSERT_EQUALS(p_cycle_model->ReadyToDivide(), false);
         TS_ASSERT_EQUALS(p_cycle_model2->ReadyToDivide(), false);
@@ -300,8 +300,8 @@ public:
             p_cell_model->SetDimension(2);
             p_cell_model->SetBirthTime(-1.0);
 
-            boost::shared_ptr<AbstractCellMutationState> p_healthy_state(new WildTypeCellMutationState);
-            boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
+            std::shared_ptr<AbstractCellMutationState> p_healthy_state(new WildTypeCellMutationState);
+            std::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
 
             CellPtr p_stem_cell(new Cell(p_healthy_state, p_cell_model));
             p_stem_cell->SetCellProliferativeType(p_stem_type);

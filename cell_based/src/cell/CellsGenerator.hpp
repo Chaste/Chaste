@@ -67,7 +67,7 @@ public:
     void GenerateBasic(std::vector<CellPtr>& rCells,
                        unsigned numCells,
                        const std::vector<unsigned> locationIndices=std::vector<unsigned>(),
-                       boost::shared_ptr<AbstractCellProperty> pCellProliferativeType=boost::shared_ptr<AbstractCellProperty>());
+                       std::shared_ptr<AbstractCellProperty> pCellProliferativeType=std::shared_ptr<AbstractCellProperty>());
 
     /**
      * Fills a vector of cells with a specified cell-cycle model, to match
@@ -80,7 +80,7 @@ public:
      */
     void GenerateBasicRandom(std::vector<CellPtr>& rCells,
                              unsigned numCells,
-                             boost::shared_ptr<AbstractCellProperty> pCellProliferativeType=boost::shared_ptr<AbstractCellProperty>());
+                             std::shared_ptr<AbstractCellProperty> pCellProliferativeType=std::shared_ptr<AbstractCellProperty>());
 
     /**
      * Fills a vector of cells with birth times to match a given vector of location indices.
@@ -91,14 +91,14 @@ public:
      */
     void GenerateGivenLocationIndices(std::vector<CellPtr>& rCells,
                                       const std::vector<unsigned> locationIndices,
-                                      boost::shared_ptr<AbstractCellProperty> pCellProliferativeType=boost::shared_ptr<AbstractCellProperty>());
+                                      std::shared_ptr<AbstractCellProperty> pCellProliferativeType=std::shared_ptr<AbstractCellProperty>());
 };
 
 template<class CELL_CYCLE_MODEL, unsigned DIM>
 void CellsGenerator<CELL_CYCLE_MODEL,DIM>::GenerateBasic(std::vector<CellPtr>& rCells,
                                                          unsigned numCells,
                                                          const std::vector<unsigned> locationIndices,
-                                                         boost::shared_ptr<AbstractCellProperty> pCellProliferativeType)
+                                                         std::shared_ptr<AbstractCellProperty> pCellProliferativeType)
 {
     rCells.clear();
 
@@ -118,7 +118,7 @@ void CellsGenerator<CELL_CYCLE_MODEL,DIM>::GenerateBasic(std::vector<CellPtr>& r
         CELL_CYCLE_MODEL* p_cell_cycle_model = new CELL_CYCLE_MODEL;
         p_cell_cycle_model->SetDimension(DIM);
 
-        boost::shared_ptr<AbstractCellProperty> p_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
+        std::shared_ptr<AbstractCellProperty> p_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
         CellPtr p_cell(new Cell(p_state, p_cell_cycle_model));
 
         if (!pCellProliferativeType)
@@ -148,7 +148,7 @@ void CellsGenerator<CELL_CYCLE_MODEL,DIM>::GenerateBasic(std::vector<CellPtr>& r
 template<class CELL_CYCLE_MODEL, unsigned DIM>
 void CellsGenerator<CELL_CYCLE_MODEL,DIM>::GenerateBasicRandom(std::vector<CellPtr>& rCells,
                                                                unsigned numCells,
-                                                               boost::shared_ptr<AbstractCellProperty> pCellProliferativeType)
+                                                               std::shared_ptr<AbstractCellProperty> pCellProliferativeType)
 {
     rCells.clear();
 
@@ -160,7 +160,7 @@ void CellsGenerator<CELL_CYCLE_MODEL,DIM>::GenerateBasicRandom(std::vector<CellP
         CELL_CYCLE_MODEL* p_cell_cycle_model = new CELL_CYCLE_MODEL;
         p_cell_cycle_model->SetDimension(DIM);
 
-        boost::shared_ptr<AbstractCellProperty> p_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
+        std::shared_ptr<AbstractCellProperty> p_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
         CellPtr p_cell(new Cell(p_state, p_cell_cycle_model));
 
         if (!pCellProliferativeType)
@@ -187,7 +187,7 @@ void CellsGenerator<CELL_CYCLE_MODEL,DIM>::GenerateBasicRandom(std::vector<CellP
 template<class CELL_CYCLE_MODEL, unsigned DIM>
 void CellsGenerator<CELL_CYCLE_MODEL,DIM>::GenerateGivenLocationIndices(std::vector<CellPtr>& rCells,
                                                                         const std::vector<unsigned> locationIndices,
-                                                                        boost::shared_ptr<AbstractCellProperty> pCellProliferativeType)
+                                                                        std::shared_ptr<AbstractCellProperty> pCellProliferativeType)
 {
     assert(!locationIndices.empty());
 
@@ -202,7 +202,7 @@ void CellsGenerator<CELL_CYCLE_MODEL,DIM>::GenerateGivenLocationIndices(std::vec
         CELL_CYCLE_MODEL* p_cell_cycle_model = new CELL_CYCLE_MODEL;
         p_cell_cycle_model->SetDimension(DIM);
 
-        boost::shared_ptr<AbstractCellProperty> p_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
+        std::shared_ptr<AbstractCellProperty> p_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
 
         CellPtr p_cell(new Cell(p_state, p_cell_cycle_model));
 

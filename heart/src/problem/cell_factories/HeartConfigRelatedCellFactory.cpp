@@ -109,7 +109,7 @@ HeartConfigRelatedCellFactory<SPACE_DIM>::~HeartConfigRelatedCellFactory()
 
 template<unsigned SPACE_DIM>
 AbstractCardiacCellInterface* HeartConfigRelatedCellFactory<SPACE_DIM>::CreateCellWithIntracellularStimulus(
-        boost::shared_ptr<AbstractStimulusFunction> intracellularStimulus,
+        std::shared_ptr<AbstractStimulusFunction> intracellularStimulus,
         unsigned nodeIndex)
 {
     cp::ionic_model_selection_type ionic_model = mDefaultIonicModel;
@@ -318,7 +318,7 @@ template<unsigned SPACE_DIM>
 void HeartConfigRelatedCellFactory<SPACE_DIM>::SetCellIntracellularStimulus(AbstractCardiacCellInterface* pCell,
                                                                             unsigned nodeIndex)
 {
-    boost::shared_ptr<MultiStimulus> node_specific_stimulus(new MultiStimulus());
+    std::shared_ptr<MultiStimulus> node_specific_stimulus(new MultiStimulus());
     // Check which of the defined stimuli contain the current node
     for (unsigned stimulus_index = 0;
          stimulus_index < mStimuliApplied.size();
@@ -336,7 +336,7 @@ void HeartConfigRelatedCellFactory<SPACE_DIM>::SetCellIntracellularStimulus(Abst
 template<unsigned SPACE_DIM>
 AbstractCardiacCellInterface* HeartConfigRelatedCellFactory<SPACE_DIM>::CreateCardiacCellForTissueNode(Node<SPACE_DIM>* pNode)
 {
-    boost::shared_ptr<MultiStimulus> node_specific_stimulus(new MultiStimulus());
+    std::shared_ptr<MultiStimulus> node_specific_stimulus(new MultiStimulus());
 
     // Check which of the defined stimuli contain the current node
     for (unsigned stimulus_index = 0;
@@ -461,15 +461,15 @@ void HeartConfigRelatedCellFactory<3u>::FillInCellularTransmuralAreas()
         //create the node lists based on the calculations above
         if (counter==0)
         {
-            mCellHeterogeneityAreas.push_back(boost::shared_ptr<AbstractChasteRegion<3u> >(new ChasteNodesList<3u>(epi_nodes)) );
+            mCellHeterogeneityAreas.push_back(std::shared_ptr<AbstractChasteRegion<3u> >(new ChasteNodesList<3u>(epi_nodes)) );
         }
         if (counter==1)
         {
-            mCellHeterogeneityAreas.push_back(boost::shared_ptr<AbstractChasteRegion<3u> >(new ChasteNodesList<3u>(mid_nodes)) );
+            mCellHeterogeneityAreas.push_back(std::shared_ptr<AbstractChasteRegion<3u> >(new ChasteNodesList<3u>(mid_nodes)) );
         }
         if (counter==2)
         {
-            mCellHeterogeneityAreas.push_back(boost::shared_ptr<AbstractChasteRegion<3u> >(new ChasteNodesList<3u>(endo_nodes)) );
+            mCellHeterogeneityAreas.push_back(std::shared_ptr<AbstractChasteRegion<3u> >(new ChasteNodesList<3u>(endo_nodes)) );
         }
         assert(counter<3);
     }

@@ -55,7 +55,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class StimulatedCellFactory: public AbstractCardiacCellFactory<1>
 {
 private:
-        boost::shared_ptr<SimpleStimulus> mpStimulus;
+        std::shared_ptr<SimpleStimulus> mpStimulus;
         //static const double magnitude = -105000.0;//volume stimulus in microA/cm3
 public:
     StimulatedCellFactory() : AbstractCardiacCellFactory<1>(),
@@ -83,7 +83,7 @@ public:
 class StimulatedCellFactoryBidomain: public AbstractCardiacCellFactory<1>
 {
 private:
-        boost::shared_ptr<SimpleStimulus> mpStimulus;
+        std::shared_ptr<SimpleStimulus> mpStimulus;
         //static const double magnitude = -105000.0;
         // this is a volume stimulus in microA/cm3
 public:
@@ -135,10 +135,10 @@ public:
     {
     }
 
-    boost::shared_ptr<AbstractStimulusFunction> CreateStimulusForNode(Node<1>* pNode)
+    std::shared_ptr<AbstractStimulusFunction> CreateStimulusForNode(Node<1>* pNode)
     {
         double x = pNode->rGetLocation()[0];
-        boost::shared_ptr<SimpleStimulus> p_stimulus;
+        std::shared_ptr<SimpleStimulus> p_stimulus;
         if (x < 0.005)
         {
             p_stimulus.reset (new SimpleStimulus(-428, 1.0, 0.1));
@@ -553,12 +553,12 @@ public:
         ///////////////
         // Putting the second half of the cable with Ggap=0
         ///////////////
-        std::vector<boost::shared_ptr<AbstractChasteRegion<1> > > heterogeneity_areas;
+        std::vector<std::shared_ptr<AbstractChasteRegion<1> > > heterogeneity_areas;
         std::vector<double> Ggap_values;
         //second half of the cable
         ChastePoint<1> cornerA(-0.1);
         ChastePoint<1> cornerB(0.1);
-        boost::shared_ptr<ChasteCuboid<1> > p_cuboid_1(new ChasteCuboid<1>(cornerA, cornerB));
+        std::shared_ptr<ChasteCuboid<1> > p_cuboid_1(new ChasteCuboid<1>(cornerA, cornerB));
         heterogeneity_areas.push_back(p_cuboid_1);
         //...where cells are coupled
         Ggap_values.push_back(2.0);
@@ -694,12 +694,12 @@ public:
         TS_ASSERT_THROWS_THIS(extended_problem.Solve(),"Fixed node number must be less than total number nodes");
 
         //cover an exception in SetGgapHeterogeneities
-        std::vector<boost::shared_ptr<AbstractChasteRegion<1> > > heterogeneity_areas;
+        std::vector<std::shared_ptr<AbstractChasteRegion<1> > > heterogeneity_areas;
         std::vector<double> Ggap_values;
 
         ChastePoint<1> cornerA(-1);
         ChastePoint<1> cornerB(0.001);
-        boost::shared_ptr<ChasteCuboid<1> > p_cuboid_1(new ChasteCuboid<1>(cornerA, cornerB));
+        std::shared_ptr<ChasteCuboid<1> > p_cuboid_1(new ChasteCuboid<1>(cornerA, cornerB));
         heterogeneity_areas.push_back(p_cuboid_1);
         Ggap_values.push_back(143.0);
         Ggap_values.push_back(91.0);//now Ggap_values has 2 members while heterogeneity_areas only 1.

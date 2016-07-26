@@ -122,8 +122,8 @@ public:
         p_cycle_model->SetWntTransitThreshold(0.65);
         p_cycle_model->SetWntLabelledThreshold(0.65);
 
-        boost::shared_ptr<AbstractCellMutationState> p_healthy_state(new WildTypeCellMutationState);
-        boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
+        std::shared_ptr<AbstractCellMutationState> p_healthy_state(new WildTypeCellMutationState);
+        std::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
 
         CellPtr p_cell(new Cell(p_healthy_state, p_cycle_model));
         p_cell->SetCellProliferativeType(p_stem_type);
@@ -144,7 +144,7 @@ public:
         // Divide the cell
         TS_ASSERT_EQUALS(p_cell->ReadyToDivide(), true);
         CellPtr p_cell2 = p_cell->Divide();
-        boost::shared_ptr<AbstractCellProperty> p_label(new CellLabel);
+        std::shared_ptr<AbstractCellProperty> p_label(new CellLabel);
         p_cell->AddCellProperty(p_label);
 
         SimpleWntCellCycleModel* p_cycle_model2 = static_cast<SimpleWntCellCycleModel*> (p_cell2->GetCellCycleModel());
@@ -174,16 +174,16 @@ public:
         wnt_level = 0.15;
         WntConcentration<2>::Instance()->SetConstantWntValueForTesting(wnt_level);
 
-        boost::shared_ptr<AbstractCellMutationState> p_apc1_mutation(new ApcOneHitCellMutationState);
+        std::shared_ptr<AbstractCellMutationState> p_apc1_mutation(new ApcOneHitCellMutationState);
         p_cell->SetMutationState(p_apc1_mutation);
-        boost::shared_ptr<AbstractCellMutationState> p_bcat_mutation(new BetaCateninOneHitCellMutationState);
+        std::shared_ptr<AbstractCellMutationState> p_bcat_mutation(new BetaCateninOneHitCellMutationState);
         p_cell2->SetMutationState(p_bcat_mutation);
 
         TS_ASSERT_EQUALS(p_cycle_model->ReadyToDivide(), false);
         TS_ASSERT_EQUALS(p_cycle_model2->ReadyToDivide(), false);
 
         // Coverage...
-        boost::shared_ptr<AbstractCellMutationState> p_apc2_mutation(new ApcTwoHitCellMutationState);
+        std::shared_ptr<AbstractCellMutationState> p_apc2_mutation(new ApcTwoHitCellMutationState);
         p_cell->SetMutationState(p_apc2_mutation);
         TS_ASSERT_EQUALS(p_cycle_model->ReadyToDivide(), false);
         p_cell->SetMutationState(p_apc1_mutation);
@@ -364,8 +364,8 @@ public:
             p_simulation_time->SetEndTimeAndNumberOfTimeSteps(end_time, num_timesteps);
 
             // Set up associated cell
-            boost::shared_ptr<AbstractCellMutationState> p_healthy_state(new WildTypeCellMutationState);
-            boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
+            std::shared_ptr<AbstractCellMutationState> p_healthy_state(new WildTypeCellMutationState);
+            std::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
 
             CellPtr p_stem_cell(new Cell(p_healthy_state, p_cell_model));
             p_stem_cell->SetCellProliferativeType(p_stem_type);
@@ -472,8 +472,8 @@ public:
             unsigned num_timesteps = 50;
             p_simulation_time->SetEndTimeAndNumberOfTimeSteps(end_time, num_timesteps);
 
-            boost::shared_ptr<AbstractCellMutationState> p_healthy_state(new WildTypeCellMutationState);
-            boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
+            std::shared_ptr<AbstractCellMutationState> p_healthy_state(new WildTypeCellMutationState);
+            std::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
 
             CellPtr p_cell(new Cell(p_healthy_state, p_cell_model));
             p_cell->SetCellProliferativeType(p_stem_type);

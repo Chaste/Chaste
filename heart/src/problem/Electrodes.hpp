@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ELECTRODES_HPP_
 #define ELECTRODES_HPP_
 
-#include <boost/shared_ptr.hpp>
+
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/split_member.hpp>
 #include <boost/serialization/shared_ptr.hpp>
@@ -71,7 +71,7 @@ private:
     /** Whether the second electrode is grounded */
     bool mGroundSecondElectrode;
     /** The created bcc, which BidomainProblem will use */
-    boost::shared_ptr<BoundaryConditionsContainer<DIM,DIM,2> > mpBoundaryConditionsContainer;
+    std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,2> > mpBoundaryConditionsContainer;
     /** The time the electrodes are switched on */
     double mStartTime;
     /** The time the electrodes are switched off */
@@ -163,7 +163,7 @@ public:
      *  fluxes for the first electrode, and the opposite fluxes for the second
      *  electrode if the the second electrode isn't grounded
      */
-    boost::shared_ptr<BoundaryConditionsContainer<DIM,DIM,2> > GetBoundaryConditionsContainer();
+    std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,2> > GetBoundaryConditionsContainer();
 
     /**
      *  @return whether it is time to switch off the electrodes yet. THIS ONLY RETURNS

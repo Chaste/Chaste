@@ -346,7 +346,7 @@ void NodesOnlyMesh<SPACE_DIM>::AddNodeWithFixedIndex(Node<SPACE_DIM>* pNewNode)
 }
 
 template<unsigned SPACE_DIM>
-void NodesOnlyMesh<SPACE_DIM>::AddHaloNode(boost::shared_ptr<Node<SPACE_DIM> > pNewNode)
+void NodesOnlyMesh<SPACE_DIM>::AddHaloNode(std::shared_ptr<Node<SPACE_DIM> > pNewNode)
 {
     mHaloNodes.push_back(pNewNode);
     mHaloNodesMapping[pNewNode->GetIndex()] = mHaloNodes.size() - 1;
@@ -382,7 +382,7 @@ void NodesOnlyMesh<SPACE_DIM>::SetNode(unsigned nodeIndex, ChastePoint<SPACE_DIM
 }
 
 template<unsigned SPACE_DIM>
-void NodesOnlyMesh<SPACE_DIM>::AddMovedNode(boost::shared_ptr<Node<SPACE_DIM> > pMovedNode)
+void NodesOnlyMesh<SPACE_DIM>::AddMovedNode(std::shared_ptr<Node<SPACE_DIM> > pMovedNode)
 {
     // Make a deep copy of this node pointer so that it isn't accidentally deleted.
     unsigned index = pMovedNode->GetIndex();
@@ -585,7 +585,7 @@ template<unsigned SPACE_DIM>
 void NodesOnlyMesh<SPACE_DIM>::AddHaloNodesToBoxes()
 {
     // Add halo nodes
-    for (typename std::vector<boost::shared_ptr<Node<SPACE_DIM> > >::iterator halo_node_iter = mHaloNodes.begin();
+    for (typename std::vector<std::shared_ptr<Node<SPACE_DIM> > >::iterator halo_node_iter = mHaloNodes.begin();
             halo_node_iter != mHaloNodes.end();
             ++halo_node_iter)
     {

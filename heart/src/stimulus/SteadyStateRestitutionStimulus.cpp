@@ -40,7 +40,7 @@ SteadyStateRestitutionStimulus::SteadyStateRestitutionStimulus(double magnitude,
 {
     for (unsigned stim=0; stim < pacingCycleLengths.size() ; stim++)
     {
-        boost::shared_ptr<RegularStimulus> p_stim(new RegularStimulus(magnitude, stimulusDuration, pacingCycleLengths[stim], startTime, startTime + numberOfPulses*pacingCycleLengths[stim]));
+        std::shared_ptr<RegularStimulus> p_stim(new RegularStimulus(magnitude, stimulusDuration, pacingCycleLengths[stim], startTime, startTime + numberOfPulses*pacingCycleLengths[stim]));
         this->AddStimulus(p_stim);
         // increment start time to the end of this pulse train.
         startTime = startTime + numberOfPulses*pacingCycleLengths[stim];

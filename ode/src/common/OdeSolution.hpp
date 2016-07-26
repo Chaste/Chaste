@@ -40,7 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 #include <string>
 #include <cassert>
-#include <boost/shared_ptr.hpp>
+
 
 #include "AbstractOdeSystemInformation.hpp"
 #include "AbstractParameterisedSystem.hpp"
@@ -81,7 +81,7 @@ private:
      *
      * Used to get names and units into the file output.
      */
-    boost::shared_ptr<const AbstractOdeSystemInformation> mpOdeSystemInformation;
+    std::shared_ptr<const AbstractOdeSystemInformation> mpOdeSystemInformation;
 
 public:
     /**
@@ -108,7 +108,7 @@ public:
      *
      * @param pOdeSystemInfo  ODE system information (used to get the names and units of variables).
      */
-    void SetOdeSystemInformation(boost::shared_ptr<const AbstractOdeSystemInformation> pOdeSystemInfo);
+    void SetOdeSystemInformation(std::shared_ptr<const AbstractOdeSystemInformation> pOdeSystemInfo);
 
     /**
      * @return the values of a state variable, parameter or derived quantity with a given index in

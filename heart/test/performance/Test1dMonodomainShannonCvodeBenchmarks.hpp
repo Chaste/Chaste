@@ -64,7 +64,7 @@ class ShannonCardiacCellFactory : public AbstractCardiacCellFactory<1>
 {
 private:
 
-    boost::shared_ptr<RegularStimulus> mpStimulus;
+    std::shared_ptr<RegularStimulus> mpStimulus;
 
 public:
     ShannonCardiacCellFactory()
@@ -105,7 +105,7 @@ class ShannonCvodeAdaptorCellFactory : public AbstractCardiacCellFactory<1>
 {
 private:
 
-    boost::shared_ptr<RegularStimulus> mpStimulus;
+    std::shared_ptr<RegularStimulus> mpStimulus;
 
 public:
     ShannonCvodeAdaptorCellFactory()
@@ -124,7 +124,7 @@ public:
          */
 
         // Here we add a new Cvode Adaptor solver for every node.
-        boost::shared_ptr<CvodeAdaptor> p_cvode_solver(new CvodeAdaptor());
+        std::shared_ptr<CvodeAdaptor> p_cvode_solver(new CvodeAdaptor());
         p_cvode_solver->SetMinimalReset(true);
         p_cvode_solver->SetTolerances(1e-4,1e-6);// NB These defaulted to different values in AbstractCvodeSystem.
         if (pNode->GetPoint()[0] == 0.0)
@@ -152,7 +152,7 @@ class ShannonCvodeNativeCellFactory : public AbstractCardiacCellFactory<1>
 {
 private:
 
-    boost::shared_ptr<RegularStimulus> mpStimulus;
+    std::shared_ptr<RegularStimulus> mpStimulus;
 
 public:
     ShannonCvodeNativeCellFactory()
@@ -171,7 +171,7 @@ public:
          */
 
         // Here we add a native Cvode cell (which includes its own solver) at every node.
-        boost::shared_ptr<AbstractIvpOdeSolver> p_empty_solver;
+        std::shared_ptr<AbstractIvpOdeSolver> p_empty_solver;
 
         if (pNode->GetPoint()[0] == 0.0)
         {

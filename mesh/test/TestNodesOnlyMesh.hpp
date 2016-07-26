@@ -677,7 +677,7 @@ public:
             TS_ASSERT(mesh.mDeletedGlobalNodeIndices.empty());
             TS_ASSERT(mesh.mDeletedNodeIndices.size() == 1u);
 
-            boost::shared_ptr<Node<2> > p_node(new Node<2>(1));
+            std::shared_ptr<Node<2> > p_node(new Node<2>(1));
             p_node->AddNodeAttribute(1.0);
             mesh.AddMovedNode(p_node);
             TS_ASSERT_EQUALS(mesh.GetNumNodes(), num_initial_nodes);
@@ -705,7 +705,7 @@ public:
         NodesOnlyMesh<2> mesh;
         mesh.ConstructNodesWithoutMesh(nodes, 1.5);
 
-        boost::shared_ptr<Node<2> > p_node(new Node<2>(3, false));
+        std::shared_ptr<Node<2> > p_node(new Node<2>(3, false));
         mesh.AddHaloNode(p_node);
 
         TS_ASSERT_EQUALS(mesh.mHaloNodes.size(), 1u);
@@ -776,7 +776,7 @@ public:
         mesh.ConstructNodesWithoutMesh(nodes, 1.0);
 
         unsigned num_original_nodes = mesh.GetNumNodes();
-        boost::shared_ptr<Node<2> > p_halo_node(new Node<2>(10, false, 0.0, 1.0));
+        std::shared_ptr<Node<2> > p_halo_node(new Node<2>(10, false, 0.0, 1.0));
         mesh.AddHaloNode(p_halo_node);
 
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), num_original_nodes);

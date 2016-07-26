@@ -43,7 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "BetaCateninOneHitCellMutationState.hpp"
 
 WntCellCycleOdeSystem::WntCellCycleOdeSystem(double wntLevel,
-                                             boost::shared_ptr<AbstractCellMutationState> pMutationState,
+                                             std::shared_ptr<AbstractCellMutationState> pMutationState,
                                              std::vector<double> stateVariables)
     : AbstractOdeSystem(9),
       mpMutationState(pMutationState),
@@ -114,7 +114,7 @@ WntCellCycleOdeSystem::WntCellCycleOdeSystem(double wntLevel,
     }
 }
 
-void WntCellCycleOdeSystem::SetMutationState(boost::shared_ptr<AbstractCellMutationState> pMutationState)
+void WntCellCycleOdeSystem::SetMutationState(std::shared_ptr<AbstractCellMutationState> pMutationState)
 {
     mpMutationState = pMutationState;
 }
@@ -283,7 +283,7 @@ void WntCellCycleOdeSystem::EvaluateYDerivatives(double time, const std::vector<
     rDY[8] = 0.0; // do not change the Wnt level
 }
 
-const boost::shared_ptr<AbstractCellMutationState> WntCellCycleOdeSystem::GetMutationState() const
+const std::shared_ptr<AbstractCellMutationState> WntCellCycleOdeSystem::GetMutationState() const
 {
     return mpMutationState;
 }

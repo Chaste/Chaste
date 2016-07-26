@@ -202,13 +202,13 @@ public:
         double duration_of_stimulus  = 0.5;  // ms
         double period = 1000.0; // 1s
         double when = 100.0;
-        boost::shared_ptr<RegularStimulus> p_stimulus(new RegularStimulus(
+        std::shared_ptr<RegularStimulus> p_stimulus(new RegularStimulus(
                 magnitude_of_stimulus,
                 duration_of_stimulus,
                 period,
                 when));
 
-        boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
+        std::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
 
         /*
          * Solve

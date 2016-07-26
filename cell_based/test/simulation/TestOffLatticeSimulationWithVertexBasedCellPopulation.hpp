@@ -453,7 +453,7 @@ public:
             cells[i]->SetBirthTime(-2.0);
         }
 
-        boost::shared_ptr<AbstractCellProperty> p_label(CellPropertyRegistry::Instance()->Get<CellLabel>());
+        std::shared_ptr<AbstractCellProperty> p_label(CellPropertyRegistry::Instance()->Get<CellLabel>());
         cells[0]->AddCellProperty(p_label);
         cells[2]->AddCellProperty(p_label);
 
@@ -511,7 +511,7 @@ public:
             cells[i]->SetBirthTime(-2.0);
         }
 
-        boost::shared_ptr<AbstractCellProperty> p_label(CellPropertyRegistry::Instance()->Get<CellLabel>());
+        std::shared_ptr<AbstractCellProperty> p_label(CellPropertyRegistry::Instance()->Get<CellLabel>());
         cells[0]->AddCellProperty(p_label);
         cells[2]->AddCellProperty(p_label);
 

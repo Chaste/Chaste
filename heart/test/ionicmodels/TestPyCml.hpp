@@ -154,8 +154,8 @@ public:
         double magnitude = -25.5;
         double duration  = 2.0 ;  // ms
         double when = 50.0; // ms
-        boost::shared_ptr<SimpleStimulus> p_stimulus(new SimpleStimulus(magnitude, duration, when));
-        boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
+        std::shared_ptr<SimpleStimulus> p_stimulus(new SimpleStimulus(magnitude, duration, when));
+        std::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
         double end_time = 1000.0; //One second in milliseconds
         double i_ionic_end_time = 60.0; // ms
         double i_ionic = 1.9411; // test value
@@ -480,8 +480,8 @@ public:
 
     void TestModelWithNoIntracellularCalcium() throw(Exception)
     {
-        boost::shared_ptr<AbstractStimulusFunction> p_stimulus;
-        boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
+        std::shared_ptr<AbstractStimulusFunction> p_stimulus;
+        std::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
 
         // Normal model
         CellDiFrancescoNoble1985FromCellML normal(p_solver, p_stimulus);

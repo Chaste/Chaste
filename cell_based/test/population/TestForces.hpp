@@ -481,7 +481,7 @@ public:
             cell_population.GetNode(i)->ClearAppliedForce();
         }
 
-        boost::shared_ptr<AbstractCellProperty> p_label(cell_population.GetCellPropertyRegistry()->Get<CellLabel>());
+        std::shared_ptr<AbstractCellProperty> p_label(cell_population.GetCellPropertyRegistry()->Get<CellLabel>());
         cell_population.GetCellUsingLocationIndex(59)->AddCellProperty(p_label);
 
         force.AddForceContribution(cell_population);
@@ -1970,7 +1970,7 @@ public:
         }
 
         std::vector<CellPtr> cells;
-        boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
+        std::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements(), std::vector<unsigned>(), p_diff_type);
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
@@ -2019,7 +2019,7 @@ public:
         }
 
         std::vector<CellPtr> cells;
-        boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
+        std::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes(), std::vector<unsigned>(), p_diff_type);
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);

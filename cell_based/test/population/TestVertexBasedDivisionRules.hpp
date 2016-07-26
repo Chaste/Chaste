@@ -110,11 +110,11 @@ public:
 
         // Set the division rule for our population to be the diagonal division rule
 
-        boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule_to_set(new DiagonalVertexBasedDivisionRule<2>());
+        std::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule_to_set(new DiagonalVertexBasedDivisionRule<2>());
         cell_population.SetVertexBasedDivisionRule(p_division_rule_to_set);
 
         // Get the division rule back from the population and add new cell by dividing element 0 along diagonal axis
-        boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule = cell_population.GetVertexBasedDivisionRule();
+        std::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule = cell_population.GetVertexBasedDivisionRule();
         c_vector<double, 2> diagonal_axis = p_division_rule->CalculateCellDivisionVector(p_cell0, cell_population);
 
         // Check that the axis is pointing in direction (1,1)
@@ -172,11 +172,11 @@ public:
         CellPtr p_cell0 = cell_population.GetCellUsingLocationIndex(0);
 
         // Set the division rule for our population to be the random direction division rule
-        boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule_to_set(new RandomDirectionVertexBasedDivisionRule<2>());
+        std::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule_to_set(new RandomDirectionVertexBasedDivisionRule<2>());
         cell_population.SetVertexBasedDivisionRule(p_division_rule_to_set);
 
         // Get the division rule back from the population
-        boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule = cell_population.GetVertexBasedDivisionRule();
+        std::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule = cell_population.GetVertexBasedDivisionRule();
 
         // Get 10000 division vectors, check each length, their mean and their variance.
         c_vector<double, 2> average_axis = zero_vector<double>(2);
@@ -216,7 +216,7 @@ public:
 
         // Create data structures to store variables to test for equality here
         {
-            boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule(new RandomDirectionVertexBasedDivisionRule<2>());
+            std::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule(new RandomDirectionVertexBasedDivisionRule<2>());
 
             // Create output archive
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
@@ -230,7 +230,7 @@ public:
         }
 
         {
-            boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule;
+            std::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule;
 
             // Create an input archive
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
@@ -254,7 +254,7 @@ public:
 
         // Create data structures to store variables to test for equality here
         {
-            boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule(new DiagonalVertexBasedDivisionRule<2>());
+            std::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule(new DiagonalVertexBasedDivisionRule<2>());
 
             // Create output archive
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
@@ -268,7 +268,7 @@ public:
         }
 
         {
-            boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule;
+            std::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule;
 
             // Create an input archive
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);

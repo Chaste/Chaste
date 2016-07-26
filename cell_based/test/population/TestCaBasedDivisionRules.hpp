@@ -95,11 +95,11 @@ public:
 
         // Set the division rule for our population to be the exclusion division rule (note that this is the default
 
-        boost::shared_ptr<AbstractCaBasedDivisionRule<2> > p_division_rule_to_set(new ExclusionCaBasedDivisionRule<2>());
+        std::shared_ptr<AbstractCaBasedDivisionRule<2> > p_division_rule_to_set(new ExclusionCaBasedDivisionRule<2>());
         cell_population.SetCaBasedDivisionRule(p_division_rule_to_set);
 
         // Get the division rule back from the population and try to add new cell by dividing cell at site 0;
-        boost::shared_ptr<AbstractCaBasedDivisionRule<2> > p_division_rule = cell_population.GetCaBasedDivisionRule();
+        std::shared_ptr<AbstractCaBasedDivisionRule<2> > p_division_rule = cell_population.GetCaBasedDivisionRule();
 
 
         CellPtr p_parent_cell = cell_population.GetCellUsingLocationIndex(0);

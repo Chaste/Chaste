@@ -38,17 +38,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cassert>
 
-boost::shared_ptr<CombinedOdeSystemInformation> CombinedOdeSystemInformation::Instance(const std::vector<AbstractOdeSystem*>& rSubsystems)
+std::shared_ptr<CombinedOdeSystemInformation> CombinedOdeSystemInformation::Instance(const std::vector<AbstractOdeSystem*>& rSubsystems)
 {
     // Get the information for the subsystems
-    std::vector<boost::shared_ptr<const AbstractOdeSystemInformation> > info_vec;
+    std::vector<std::shared_ptr<const AbstractOdeSystemInformation> > info_vec;
     info_vec.reserve(rSubsystems.size());
     for (unsigned i=0; i<rSubsystems.size(); i++)
     {
         info_vec.push_back(rSubsystems[i]->GetSystemInformation());
     }
 
-    boost::shared_ptr<CombinedOdeSystemInformation> p_inst;
+    std::shared_ptr<CombinedOdeSystemInformation> p_inst;
 
     // Search to see if we have an information object for this sequence of
     // subsystems already.
@@ -86,7 +86,7 @@ boost::shared_ptr<CombinedOdeSystemInformation> CombinedOdeSystemInformation::In
     return p_inst;
 }
 
-CombinedOdeSystemInformation::CombinedOdeSystemInformation(const std::vector<boost::shared_ptr<const AbstractOdeSystemInformation> >& rSubsystemInfo)
+CombinedOdeSystemInformation::CombinedOdeSystemInformation(const std::vector<std::shared_ptr<const AbstractOdeSystemInformation> >& rSubsystemInfo)
 {
     // Figure out our size
     unsigned total_system_size = 0u;
