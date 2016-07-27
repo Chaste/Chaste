@@ -36,6 +36,7 @@ population/TestCellPopulationCountWriters.hpp
 population/TestCellPopulationWriters.hpp
 population/TestCellwiseDataGradient.hpp
 population/TestCellWriters.hpp
+population/TestCentreBasedDivisionRules.hpp
 population/TestDiscreteSystemForceCalculator.hpp
 population/TestForces.hpp
 population/TestMeshBasedCellPopulation.hpp

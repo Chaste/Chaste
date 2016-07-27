@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef TESTVERTEXBASEDDIVISIONRULE_HPP_
-#define TESTVERTEXBASEDDIVISIONRULE_HPP_
+#ifndef TESTVERTEXBASEDDIVISIONRULES_HPP_
+#define TESTVERTEXBASEDDIVISIONRULES_HPP_
 
 #include <cxxtest/TestSuite.h>
 
@@ -284,7 +284,6 @@ public:
             TS_ASSERT(dynamic_cast <DiagonalVertexBasedDivisionRule<2>* > (p_division_rule.get()));
         }
     }
-
 };
 
-#endif /*TESTVERTEXBASEDDIVISIONRULE_HPP_*/
+#endif /*TESTVERTEXBASEDDIVISIONRULES_HPP_*/

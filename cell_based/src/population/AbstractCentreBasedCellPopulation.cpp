@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "AbstractCentreBasedCellPopulation.hpp"
+#include "RandomDirectionCentreBasedDivisionRule.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "StepSizeException.hpp"
 #include "Warnings.hpp"
@@ -55,6 +56,8 @@ AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractCentreBasedCe
         unsigned index = locationIndices.empty() ? node_iter->GetIndex() : locationIndices[i]; // assume that the ordering matches
         AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddCellUsingLocationIndex(index,*it);
     }
+
+    mpCentreBasedDivisionRule.reset(new RandomDirectionCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM>());
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -238,66 +241,22 @@ void AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::AcceptCellWriters
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+boost::shared_ptr<AbstractCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM> > AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCentreBasedDivisionRule()
+{
+    return mpCentreBasedDivisionRule;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::CalculateCellDivisionVector(CellPtr pParentCell)
 {
+    c_vector<double, SPACE_DIM> division_vector = mpCentreBasedDivisionRule->CalculateCellDivisionVector(pParentCell, *this);
+
     // Location of parent and daughter cells
     c_vector<double, SPACE_DIM> parent_coords = this->GetLocationOfCellCentre(pParentCell);
     c_vector<double, SPACE_DIM> daughter_coords;
 
-    // Get separation parameter
-    double separation = GetMeinekeDivisionSeparation();
-
-    // Make a random direction vector of the required length
-    c_vector<double, SPACE_DIM> random_vector;
-
-    /*
-     * Pick a random direction and move the parent cell backwards by 0.5*separation
-     * in that direction and return the position of the daughter cell 0.5*separation
-     * forwards in that direction.
-     */
-    switch (SPACE_DIM)
-    {
-        case 1:
-        {
-            double random_direction = -1.0 + 2.0*(RandomNumberGenerator::Instance()->ranf() < 0.5);
-
-            random_vector(0) = 0.5*separation*random_direction;
-            break;
-        }
-        case 2:
-        {
-            double random_angle = 2.0*M_PI*RandomNumberGenerator::Instance()->ranf();
-
-            random_vector(0) = 0.5*separation*cos(random_angle);
-            random_vector(1) = 0.5*separation*sin(random_angle);
-            break;
-        }
-        case 3:
-        {
-            /*
-             * Note that to pick a random point on the surface of a sphere, it is incorrect
-             * to select spherical coordinates from uniform distributions on [0, 2*pi) and
-             * [0, pi) respectively, since points picked in this way will be 'bunched' near
-             * the poles. See #2230.
-             */
-            double u = RandomNumberGenerator::Instance()->ranf();
-            double v = RandomNumberGenerator::Instance()->ranf();
-
-            double random_azimuth_angle = 2*M_PI*u;
-            double random_zenith_angle = std::acos(2*v - 1);
-
-            random_vector(0) = 0.5*separation*cos(random_azimuth_angle)*sin(random_zenith_angle);
-            random_vector(1) = 0.5*separation*sin(random_azimuth_angle)*sin(random_zenith_angle);
-            random_vector(2) = 0.5*separation*cos(random_zenith_angle);
-            break;
-        }
-        default:
-            // This can't happen
-        NEVER_REACHED;
-    }
-
-    parent_coords = parent_coords - random_vector;
-    daughter_coords = parent_coords + random_vector;
+    parent_coords = parent_coords - division_vector;
+    daughter_coords = parent_coords + division_vector;
 
     // Set the parent to use this location
     ChastePoint<SPACE_DIM> parent_coords_point(parent_coords);
@@ -308,9 +267,20 @@ c_vector<double, SPACE_DIM> AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetCentreBasedDivisionRule(boost::shared_ptr<AbstractCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM> > pCentreBasedDivisionRule)
+{
+    mpCentreBasedDivisionRule = pCentreBasedDivisionRule;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulationParameters(out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t<MeinekeDivisionSeparation>" << mMeinekeDivisionSeparation << "</MeinekeDivisionSeparation>\n";
+
+    // Add the division rule parameters
+    *rParamsFile << "\t\t<CentreBasedDivisionRule>\n";
+    mpCentreBasedDivisionRule->OutputCellCentreBasedDivisionRuleInfo(rParamsFile);
+    *rParamsFile << "\t\t</CentreBasedDivisionRule>\n";
 
     // Call method on direct parent class
     AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulationParameters(rParamsFile);
