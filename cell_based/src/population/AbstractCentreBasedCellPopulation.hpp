@@ -267,6 +267,9 @@ public:
     /**
      * Overridden method to specify a division vector.
      *
+     * \todo Generalize to allow the user to specify a rule for division 
+     *       orientation (#2834)
+     *
      * @param pParentCell the cell undergoing division
      * @return a vector containing information on cell division
      */
