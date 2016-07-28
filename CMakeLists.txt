@@ -32,7 +32,9 @@
 
 cmake_minimum_required(VERSION 2.8.10)
 
-if(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} LESS 3.3)
+if(CMAKE_VERSION VERSION_LESS "2.8.12")
+    add_definitions(-std=c++0x)
+elseif(CMAKE_VERSION VERSION_LESS "3.3.0")
     add_compile_options(-std=c++0x)
 endif()
 
