@@ -48,6 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "RandomDirectionCentreBasedDivisionRule.hpp"
+#include "FixedCentreBasedDivisionRule.hpp"
 #include "SmartPointers.hpp"
 
 // This test is always run sequentially (never in parallel)
@@ -97,7 +98,8 @@ public:
         double angle_variance = 0.0;
         for (unsigned iteration = 0; iteration < 10000; iteration++)
         {
-            c_vector<double, 2> random_axis = p_division_rule->CalculateCellDivisionVector(p_cell0, cell_population);
+        	std::pair<c_vector<double, 2>, c_vector<double, 2> > positions = p_division_rule->CalculateCellDivisionVector(p_cell0, cell_population);
+            c_vector<double, 2> random_axis = positions.second - positions.first;
 
             // Each random vector should have norm equal to 0.5*0.3 = 0.15
             TS_ASSERT_DELTA(norm_2(random_axis), 0.15,1e-6);
@@ -126,6 +128,52 @@ public:
         TS_ASSERT_DELTA(angle_variance, M_PI*M_PI/12.0, 1e-2);
     }
 
+    void TestFixedCentreBasedDivisionRule()
+    {
+        // Create a simple mesh
+        HoneycombMeshGenerator generator(5, 5, 0);
+        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+
+        // Convert this to a NodesOnlyMesh
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 1> cells_generator;
+        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+
+        // Create a cell population
+        NodeBasedCellPopulation<2> cell_population(mesh, cells);
+
+        CellPtr p_cell0 = cell_population.GetCellUsingLocationIndex(0);
+        c_vector<double, 2> expected_parent_location = cell_population.GetLocationOfCellCentre(p_cell0);
+
+        c_vector<double, 2> expected_daughter_location;
+        expected_daughter_location[0] = 1.2;
+        expected_daughter_location[1] = 3.4;
+
+        // Set the division rule for our population to be the random direction division rule
+        typedef FixedCentreBasedDivisionRule<2,2> FixedRule;
+        MAKE_PTR(FixedRule, p_division_rule_to_set);
+        p_division_rule_to_set->SetDaughterLocation(expected_daughter_location);
+        cell_population.SetCentreBasedDivisionRule(p_division_rule_to_set);
+
+        // Get the division rule back from the population
+        boost::shared_ptr<AbstractCentreBasedDivisionRule<2,2> > p_division_rule = cell_population.GetCentreBasedDivisionRule();
+
+        // Check that the division rule returns the correct pair of vectors
+        std::pair<c_vector<double, 2>, c_vector<double, 2> > positions = p_division_rule->CalculateCellDivisionVector(p_cell0, cell_population);
+
+        c_vector<double, 2> parent_location = positions.first;
+        TS_ASSERT_DELTA(parent_location[0], expected_parent_location[0], 1e-6);
+        TS_ASSERT_DELTA(parent_location[1], expected_parent_location[1], 1e-6);
+
+        c_vector<double, 2> daughter_location = positions.second;
+        TS_ASSERT_DELTA(daughter_location[0], expected_daughter_location[0], 1e-6);
+        TS_ASSERT_DELTA(daughter_location[1], expected_daughter_location[1], 1e-6);
+    }
+
     void TestArchiveRandomDirectionCentreBasedDivisionRule() throw(Exception)
     {
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
@@ -150,6 +198,41 @@ public:
 
             typedef RandomDirectionCentreBasedDivisionRule<2,2> RandomRule;
             TS_ASSERT(dynamic_cast<RandomRule*>(p_division_rule.get()));
+        }
+    }
+
+    void TestArchiveFixedCentreBasedDivisionRule() throw(Exception)
+    {
+        FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
+        std::string archive_file = "FixedCentreBasedDivisionRule.arch";
+
+        {
+            c_vector<double, 2> location;
+            location[0] = -0.73;
+            location[1] = 5.82;
+
+            typedef FixedCentreBasedDivisionRule<2,2> FixedRule;
+            MAKE_PTR(FixedRule, p_division_rule);
+            p_division_rule->SetDaughterLocation(location);
+
+            ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
+            boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
+
+            (*p_arch) << p_division_rule;
+        }
+
+        {
+            boost::shared_ptr<AbstractCentreBasedDivisionRule<2,2> > p_division_rule;
+
+            ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
+            boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
+
+            (*p_arch) >> p_division_rule;
+
+            typedef FixedCentreBasedDivisionRule<2,2> FixedRule;
+            TS_ASSERT(dynamic_cast<FixedRule*>(p_division_rule.get()));
+
+            ///\todo #2800 test that mDaughterLocation is correct
         }
     }
 };

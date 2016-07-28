@@ -33,42 +33,44 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "CryptSimulation1d.hpp"
+#include "CryptVertexBasedDivisionRule.hpp"
 #include "WntConcentration.hpp"
-#include "SmartPointers.hpp"
+#include "StemCellProliferativeType.hpp"
 
-CryptSimulation1d::CryptSimulation1d(AbstractCellPopulation<1>& rCellPopulation,
-                  bool deleteCellPopulationInDestructor,
-                  bool initialiseCells)
-    : OffLatticeSimulation<1>(rCellPopulation,
-                          deleteCellPopulationInDestructor,
-                          initialiseCells)
+template <unsigned SPACE_DIM>
+c_vector<double, SPACE_DIM> CryptVertexBasedDivisionRule<SPACE_DIM>::CalculateCellDivisionVector(
+    CellPtr pParentCell,
+    VertexBasedCellPopulation<SPACE_DIM>& rCellPopulation)
 {
-    mpStaticCastCellPopulation = static_cast<MeshBasedCellPopulation<1>*>(&mrCellPopulation);
+    assert(SPACE_DIM == 2);
 
-    if (!mDeleteCellPopulationInDestructor)
+    c_vector<double, SPACE_DIM> axis_of_division;
+
+    double random_angle = 2.0*M_PI*RandomNumberGenerator::Instance()->ranf();
+    axis_of_division(0) = cos(random_angle);
+    axis_of_division(1) = sin(random_angle);
+
+    // We don't need to prescribe how 'stem' cells divide if Wnt is not present
+    bool is_wnt_included = WntConcentration<2>::Instance()->IsWntSetUp();
+    if (!is_wnt_included)
     {
-        // Pass a CryptSimulationBoundaryCondition object into mBoundaryConditions
-        MAKE_PTR_ARGS(CryptSimulationBoundaryCondition<1>, p_bc, (&rCellPopulation));
-        AddCellPopulationBoundaryCondition(p_bc);
+        WntConcentration<2>::Destroy();
+        if (pParentCell->GetCellProliferativeType()->IsType<StemCellProliferativeType>())
+        {
+            axis_of_division(0) = 1.0;
+            axis_of_division(1) = 0.0;
+        }
     }
 
-    MAKE_PTR(CryptCentreBasedDivisionRule<1>, p_centre_div_rule);
-    mpStaticCastCellPopulation->SetCentreBasedDivisionRule(p_centre_div_rule);
+    return axis_of_division;
 }
 
-CryptSimulation1d::~CryptSimulation1d()
-{
-}
-
-void CryptSimulation1d::OutputSimulationParameters(out_stream& rParamsFile)
-{
-    // No parameters to output
-
-    // Call method on direct parent class
-    OffLatticeSimulation<1>::OutputSimulationParameters(rParamsFile);
-}
+// Explicit instantiation
+template class CryptVertexBasedDivisionRule<1>;
+template class CryptVertexBasedDivisionRule<2>;
+template class CryptVertexBasedDivisionRule<3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-CHASTE_CLASS_EXPORT(CryptSimulation1d)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(CryptVertexBasedDivisionRule)
+

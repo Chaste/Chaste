@@ -461,7 +461,7 @@ public:
         TS_ASSERT_DELTA(short_axis[0], 0.0, 1e-9);
         TS_ASSERT_DELTA(short_axis[1], 1.0, 1e-9);
 
-        CellPtr p_new_cell = cell_population.AddCell(p_temp_cell, short_axis, p_cell0);
+        CellPtr p_new_cell = cell_population.AddCell(p_temp_cell, p_cell0);
 
         // Check that the new cell was successfully added to the cell population
         TS_ASSERT_EQUALS(cell_population.GetNumNodes(), old_num_nodes+2);
@@ -565,7 +565,7 @@ public:
         p_temp_cell->SetCellProliferativeType(p_stem_type);
         p_temp_cell->SetBirthTime(-1.0);
 
-        CellPtr p_new_cell = cell_population.AddCell(p_temp_cell, cell_division_axis, p_cell);
+        CellPtr p_new_cell = cell_population.AddCell(p_temp_cell, p_cell);
 
         // Check that the new cell was successfully added to the cell population
         TS_ASSERT_EQUALS(cell_population.GetNumNodes(), 6u);
@@ -658,11 +658,10 @@ public:
 
         CellPtr p_new_cell = cell_population.GetCellUsingLocationIndex(4)->Divide();
 
-        c_vector<double, 2> new_location = cell_population.GetVertexBasedDivisionRule()
-                ->CalculateCellDivisionVector(p_cell4, cell_population);
+        c_vector<double, 2> new_location = cell_population.GetVertexBasedDivisionRule()->CalculateCellDivisionVector(p_cell4, cell_population);
 
         // Add new cell to the cell population
-        cell_population.AddCell(p_new_cell, new_location, p_cell4);
+        cell_population.AddCell(p_new_cell, p_cell4);
 
         // Check that the new cell was successfully added to the cell population
         TS_ASSERT_EQUALS(cell_population.GetNumNodes(), old_num_nodes+2);

@@ -206,20 +206,20 @@ unsigned VertexBasedCellPopulation<DIM>::GetNumElements()
 }
 
 template<unsigned DIM>
-CellPtr VertexBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell,
-                                                const c_vector<double,DIM>& rCellDivisionVector,
-                                                CellPtr pParentCell)
+CellPtr VertexBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, CellPtr pParentCell)
 {
 	// Start by calling method on parent class (this takes care of outputting the dividing cell's location to file, if needed)
-	AbstractOffLatticeCellPopulation<DIM>::AddCell(pNewCell, rCellDivisionVector, pParentCell);
+	AbstractOffLatticeCellPopulation<DIM>::AddCell(pNewCell, pParentCell);
 
     // Get the element associated with this cell
     VertexElement<DIM, DIM>* p_element = GetElementCorrespondingToCell(pParentCell);
 
+    // Get the orientation of division
+    c_vector<double, DIM> division_vector = mpVertexBasedDivisionRule->CalculateCellDivisionVector(pParentCell, *this);
+
     // Divide the element
-    unsigned new_element_index = mpMutableVertexMesh->DivideElementAlongGivenAxis(p_element,
-                                                                                  rCellDivisionVector,
-                                                                                  true);
+    unsigned new_element_index = mpMutableVertexMesh->DivideElementAlongGivenAxis(p_element, division_vector, true);
+
     // Associate the new cell with the element
     this->mCells.push_back(pNewCell);
 
@@ -729,12 +729,6 @@ TetrahedralMesh<DIM, DIM>* VertexBasedCellPopulation<DIM>::GetTetrahedralMeshUsi
     p_mesh->SetMeshHasChangedSinceLoading();
 
     return p_mesh;
-}
-
-template<unsigned DIM>
-c_vector<double, DIM> VertexBasedCellPopulation<DIM>::CalculateCellDivisionVector(CellPtr pParentCell)
-{
-    return mpVertexBasedDivisionRule->CalculateCellDivisionVector(pParentCell, *this);
 }
 
 // Explicit instantiation

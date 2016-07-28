@@ -121,7 +121,7 @@ public:
         TS_ASSERT_DELTA(diagonal_axis[0], 1.0, 1e-9);
         TS_ASSERT_DELTA(diagonal_axis[1], 1.0, 1e-9);
 
-        cell_population.AddCell(p_temp_cell, diagonal_axis, p_cell0);
+        cell_population.AddCell(p_temp_cell, p_cell0);
 
         // Check the location of the new nodes
         TS_ASSERT_DELTA(cell_population.GetNode(old_num_nodes)->rGetLocation()[0], 1.0, 1e-12);

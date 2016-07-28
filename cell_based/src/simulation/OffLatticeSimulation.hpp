@@ -130,25 +130,6 @@ protected:
     virtual void SetupSolve();
 
     /**
-     * Overridden CalculateCellDivisionVector() method for determining how cell division occurs.
-     * This method returns a vector which is then passed into the CellPopulation method AddCell().
-     * This method may be overridden by subclasses.
-     *
-     * For a centre-based cell population, this method calculates the new locations of the cell
-     * centres of a dividing cell, moves the parent cell and returns the location of
-     * the daughter cell. The new locations are found by picking a random direction
-     * and placing the parent and daughter in opposing directions along this axis.
-     *
-     * For a vertex-based cell population, the method calls the AbstractVertexBasedDivisionRule which
-     * is a member of the cell population.
-     *
-     * @param pParentCell the parent cell
-     *
-     * @return a vector containing information on cell division.
-     */
-    virtual c_vector<double, SPACE_DIM> CalculateCellDivisionVector(CellPtr pParentCell);
-
-    /**
      * Overridden WriteVisualizerSetupFile() method.
      */
     virtual void WriteVisualizerSetupFile();

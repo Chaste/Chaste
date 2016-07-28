@@ -301,17 +301,11 @@ public:
      * Add a new cell to the cell population.
      *
      * @param pNewCell  the cell to add
-     * @param rCellDivisionVector  a vector providing information regarding how the cell division should occur
-     *     (for cell-centre cell populations, this vector is the position of the daughter cell; for vertex cell populations it
-     *      can be used by any subclass of CellBasedSimulation to as a means of dictating the axis along which
-     *      the parent cell divides)
      * @param pParentCell pointer to a parent cell (if required)
      *
      * @return address of cell as it appears in the cell list (internal of this method uses a copy constructor along the way).
      */
-    virtual CellPtr AddCell(CellPtr pNewCell,
-                            const c_vector<double,SPACE_DIM>& rCellDivisionVector,
-                            CellPtr pParentCell=CellPtr());
+    virtual CellPtr AddCell(CellPtr pNewCell, CellPtr pParentCell=CellPtr());
 
     class Iterator; // Forward declaration; see below
 

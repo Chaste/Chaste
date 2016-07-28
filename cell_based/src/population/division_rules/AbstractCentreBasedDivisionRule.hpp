@@ -49,6 +49,8 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCentreBasedCell
  *
  * The purpose of this class is to return the location of one of the daughters 
  * (the one corresponding to a new Cell object) of a dividing cell.
+ * 
+ * \todo #2800 update documentation to reflect output type
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
 class AbstractCentreBasedDivisionRule : public Identifiable
@@ -90,15 +92,13 @@ public:
     virtual ~AbstractCentreBasedDivisionRule();
 
     /**
-     * Return a vector, v, that will be used to position the daughters of a 
-     * dividing cell. If the parent cell has position vector x then one 
-     * daughter cell will be positioned at x+v and the other at x-v.
+     * Return a pair of vectors used to position the daughters of a dividing cell.
      *
      * @param pParentCell  The cell to divide
      * @param rCellPopulation  The centre-based cell population
      * @return the division vector.
      */
-    virtual c_vector<double, SPACE_DIM> CalculateCellDivisionVector(CellPtr pParentCell,
+    virtual std::pair<c_vector<double, SPACE_DIM>, c_vector<double, SPACE_DIM> > CalculateCellDivisionVector(CellPtr pParentCell,
         AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>& rCellPopulation)=0;
 
     /**
@@ -109,7 +109,4 @@ public:
     void OutputCellCentreBasedDivisionRuleInfo(out_stream& rParamsFile);
 };
 
-//TEMPLATED_CLASS_IS_ABSTRACT_1_UNSIGNED(AbstractCentreBasedDivisionRule)
-
 #endif /*ABSTRACTCENTREBASEDDIVISIONRULE_HPP_*/
-

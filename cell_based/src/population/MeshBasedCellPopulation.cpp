@@ -531,16 +531,14 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::UpdateGhostNodesAfterReMesh
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-CellPtr MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::AddCell(CellPtr pNewCell, const c_vector<double,SPACE_DIM>& rCellDivisionVector, CellPtr pParentCell)
+CellPtr MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::AddCell(CellPtr pNewCell, CellPtr pParentCell)
 {
-	// Start by calling method on parent class (this takes care of outputting the dividing cell's location to file, if needed)
-	AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddCell(pNewCell, rCellDivisionVector, pParentCell);
-
     assert(pNewCell);
     assert(pParentCell);
 
+	// Start by calling method on parent class (this takes care of outputting the dividing cell's location to file, if needed)
     // Add new cell to cell population
-    CellPtr p_created_cell = AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::AddCell(pNewCell, rCellDivisionVector, pParentCell);
+    CellPtr p_created_cell = AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::AddCell(pNewCell, pParentCell);
     assert(p_created_cell == pNewCell);
 
     // Mark spring between parent cell and new cell

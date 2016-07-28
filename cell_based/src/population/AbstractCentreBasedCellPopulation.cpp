@@ -81,13 +81,24 @@ Node<SPACE_DIM>* AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetN
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-CellPtr AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddCell(CellPtr pNewCell, const c_vector<double,SPACE_DIM>& rCellDivisionVector, CellPtr pParentCell)
+CellPtr AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddCell(CellPtr pNewCell, CellPtr pParentCell)
 {
 	// Start by calling method on parent class (this takes care of outputting the dividing cell's location to file, if needed)
-	AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddCell(pNewCell, rCellDivisionVector, pParentCell);
+	AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddCell(pNewCell, pParentCell);
+
+	// Calculate the locations of the two daughter cells
+	std::pair<c_vector<double, SPACE_DIM>, c_vector<double, SPACE_DIM> > positions = mpCentreBasedDivisionRule->CalculateCellDivisionVector(pParentCell, *this);
+
+	c_vector<double, SPACE_DIM> parent_position = positions.first;
+	c_vector<double, SPACE_DIM> daughter_position = positions.second;
+
+	// Set the parent cell to use this location
+	ChastePoint<SPACE_DIM> parent_point(parent_position);
+	unsigned node_index = this->GetLocationIndexUsingCell(pParentCell);
+	this->SetNode(node_index, parent_point);
 
     // Create a new node
-    Node<SPACE_DIM>* p_new_node = new Node<SPACE_DIM>(this->GetNumNodes(), rCellDivisionVector, false);   // never on boundary
+    Node<SPACE_DIM>* p_new_node = new Node<SPACE_DIM>(this->GetNumNodes(), daughter_position, false); // never on boundary
     unsigned new_node_index = this->AddNode(p_new_node); // use copy constructor so it doesn't matter that new_node goes out of scope
 
     // Update cells vector
@@ -247,26 +258,6 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 boost::shared_ptr<AbstractCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM> > AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCentreBasedDivisionRule()
 {
     return mpCentreBasedDivisionRule;
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-c_vector<double, SPACE_DIM> AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::CalculateCellDivisionVector(CellPtr pParentCell)
-{
-    c_vector<double, SPACE_DIM> division_vector = mpCentreBasedDivisionRule->CalculateCellDivisionVector(pParentCell, *this);
-
-    // Location of parent and daughter cells
-    c_vector<double, SPACE_DIM> parent_coords = this->GetLocationOfCellCentre(pParentCell);
-    c_vector<double, SPACE_DIM> daughter_coords;
-
-    parent_coords = parent_coords - division_vector;
-    daughter_coords = parent_coords + division_vector;
-
-    // Set the parent to use this location
-    ChastePoint<SPACE_DIM> parent_coords_point(parent_coords);
-    unsigned node_index = this->GetLocationIndexUsingCell(pParentCell);
-    this->SetNode(node_index, parent_coords_point);
-
-    return daughter_coords;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

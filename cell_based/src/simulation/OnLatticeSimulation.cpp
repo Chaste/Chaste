@@ -113,13 +113,6 @@ void OnLatticeSimulation<DIM>::RemoveAllPottsUpdateRules()
 }
 
 template<unsigned DIM>
-c_vector<double, DIM> OnLatticeSimulation<DIM>::CalculateCellDivisionVector(CellPtr pParentCell)
-{
-    ///\todo do something for Potts models here
-    return zero_vector<double>(DIM);
-}
-
-template<unsigned DIM>
 void OnLatticeSimulation<DIM>::WriteVisualizerSetupFile()
 {
     if (bool(dynamic_cast<PottsBasedCellPopulation<DIM>*>(&this->mrCellPopulation)))

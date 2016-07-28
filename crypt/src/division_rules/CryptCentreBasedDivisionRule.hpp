@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef RANDOMDIRECTIONCENTREBASEDDIVISIONRULE_HPP_
-#define RANDOMDIRECTIONCENTREBASEDDIVISIONRULE_HPP_
+#ifndef CRYPTCENTREBASEDDIVISIONRULE_HPP_
+#define CRYPTCENTREBASEDDIVISIONRULE_HPP_
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
@@ -50,11 +50,9 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCentreBasedDivi
  * A class to generate a division vector of length 
  * AbstractCentreBasedCellPopulation::mMeinekeDivisionSeparation that points 
  * in a random direction.
- *
- * \todo #2800 update documentation to reflect output type
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
-class RandomDirectionCentreBasedDivisionRule : public AbstractCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM>
+class CryptCentreBasedDivisionRule : public AbstractCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM>
 {
 private:
     friend class boost::serialization::access;
@@ -74,14 +72,14 @@ public:
     /**
      * Default constructor.
      */
-    RandomDirectionCentreBasedDivisionRule()
+    CryptCentreBasedDivisionRule()
     {
     }
 
     /**
      * Empty destructor.
      */
-    virtual ~RandomDirectionCentreBasedDivisionRule()
+    virtual ~CryptCentreBasedDivisionRule()
     {
     }
 
@@ -97,7 +95,6 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_ALL_DIMS(RandomDirectionCentreBasedDivisionRule)
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(CryptCentreBasedDivisionRule)
 
-#endif // RANDOMDIRECTIONCENTREBASEDDIVISIONRULE_HPP_
-
+#endif // CRYPTCENTREBASEDDIVISIONRULE_HPP_

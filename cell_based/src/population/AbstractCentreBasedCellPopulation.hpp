@@ -150,12 +150,11 @@ public:
      * Add a new cell to the cell population.
      *
      * @param pNewCell  the cell to add
-     * @param rCellDivisionVector  the position in space at which to put it
      * @param pParentCell pointer to a parent cell (if required)
      *
      * @return address of cell as it appears in the cell list
      */
-    CellPtr AddCell(CellPtr pNewCell, const c_vector<double,SPACE_DIM>& rCellDivisionVector, CellPtr pParentCell=CellPtr());
+    CellPtr AddCell(CellPtr pNewCell, CellPtr pParentCell=CellPtr());
 
     /**
      * @return a an ordered pair of pointers to two given Cells.
@@ -282,14 +281,6 @@ public:
      * @return The division rule that is currently being used.
      */
     boost::shared_ptr<AbstractCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM> > GetCentreBasedDivisionRule();
-
-    /**
-     * Overridden method to specify a division vector.
-     *
-     * @param pParentCell the cell undergoing division
-     * @return a vector containing information on cell division
-     */
-    virtual c_vector<double, SPACE_DIM> CalculateCellDivisionVector(CellPtr pParentCell);
 
     /**
      * Set the division rule for this population.

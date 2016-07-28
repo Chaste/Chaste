@@ -193,19 +193,6 @@ protected:
     virtual unsigned DoCellBirth();
 
     /**
-     * Method for determining how cell division occurs. This method returns a vector
-     * which is then passed into the CellPopulation method AddCell().
-     *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
-     *
-     * @param pParentCell the parent cell
-     *
-     * @return a vector containing information on cell division.
-     */
-    virtual c_vector<double, SPACE_DIM> CalculateCellDivisionVector(CellPtr pParentCell)=0;
-
-    /**
      * During a simulation time step, process any cell sloughing or death
      *
      * This uses the cell killers to remove cells and associated nodes from the

@@ -37,7 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "RandomNumberGenerator.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-c_vector<double, SPACE_DIM> RandomDirectionCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM>::CalculateCellDivisionVector(
+std::pair<c_vector<double, SPACE_DIM>, c_vector<double, SPACE_DIM> > RandomDirectionCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM>::CalculateCellDivisionVector(
     CellPtr pParentCell,
     AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>& rCellPopulation)
 {
@@ -93,7 +93,12 @@ c_vector<double, SPACE_DIM> RandomDirectionCentreBasedDivisionRule<ELEMENT_DIM, 
             NEVER_REACHED;
     }
 
-    return random_vector;
+    c_vector<double, SPACE_DIM> parent_position = rCellPopulation.GetLocationOfCellCentre(pParentCell) - random_vector;
+    c_vector<double, SPACE_DIM> daughter_position = parent_position + random_vector;
+
+    std::pair<c_vector<double, SPACE_DIM>, c_vector<double, SPACE_DIM> > positions(parent_position, daughter_position);
+
+    return positions;
 }
 
 // Explicit instantiation

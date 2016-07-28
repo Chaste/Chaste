@@ -277,14 +277,10 @@ public:
      * Add a new cell to the cell population.
      *
      * @param pNewCell  the cell to add
-     * @param rCellDivisionVector  if this vector has any non-zero component, then it is used as the axis
-     *     along which the parent cell divides
      * @param pParentCell pointer to a parent cell (if required)
      * @return address of cell as it appears in the cell list (internal of this method uses a copy constructor along the way)
      */
-    CellPtr AddCell(CellPtr pNewCell,
-                    const c_vector<double,DIM>& rCellDivisionVector,
-                    CellPtr pParentCell=CellPtr());
+    CellPtr AddCell(CellPtr pNewCell, CellPtr pParentCell=CellPtr());
 
     /**
      * Remove all cells labelled as dead.
@@ -449,14 +445,6 @@ public:
      * @return The Vertex division rule that is currently being used.
      */
     boost::shared_ptr<AbstractVertexBasedDivisionRule<DIM> > GetVertexBasedDivisionRule();
-
-    /**
-     * Overridden method to specify a division vector.
-     *
-     * @param pParentCell the cell undergoing division
-     * @return a vector containing information on cell division
-     */
-    virtual c_vector<double, DIM> CalculateCellDivisionVector(CellPtr pParentCell);
 
     /**
      * Set the division rule for this population.

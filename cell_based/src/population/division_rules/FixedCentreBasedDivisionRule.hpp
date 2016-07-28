@@ -33,14 +33,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef RANDOMDIRECTIONCENTREBASEDDIVISIONRULE_HPP_
-#define RANDOMDIRECTIONCENTREBASEDDIVISIONRULE_HPP_
+#ifndef FIXEDCENTREBASEDDIVISIONRULE_HPP_
+#define FIXEDCENTREBASEDDIVISIONRULE_HPP_
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 #include "AbstractCentreBasedDivisionRule.hpp"
 #include "AbstractCentreBasedCellPopulation.hpp"
-#include "RandomNumberGenerator.hpp"
 
 // Forward declaration prevents circular include chain
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCentreBasedCellPopulation;
@@ -49,14 +48,18 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCentreBasedDivi
 /**
  * A class to generate a division vector of length 
  * AbstractCentreBasedCellPopulation::mMeinekeDivisionSeparation that points 
- * in a random direction.
- *
+ * in a fixed direction specified by the user
+ * 
  * \todo #2800 update documentation to reflect output type
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
-class RandomDirectionCentreBasedDivisionRule : public AbstractCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM>
+class FixedCentreBasedDivisionRule : public AbstractCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM>
 {
 private:
+
+    /** The specified location of the new daughter cell. Set in the constructor. */
+    c_vector<double, SPACE_DIM> mDaughterLocation;
+
     friend class boost::serialization::access;
     /**
      * Serialize the object and its member variables.
@@ -68,22 +71,34 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & boost::serialization::base_object<AbstractCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM> >(*this);
+        archive & mDaughterLocation;
     }
 
 public:
     /**
      * Default constructor.
+     *
+     * \todo #2800 initialize mDaughterLocation?
+     *
+     * @param rDaughterLocation the specified location of the new daughter cell
      */
-    RandomDirectionCentreBasedDivisionRule()
+    FixedCentreBasedDivisionRule()
     {
     }
 
     /**
      * Empty destructor.
      */
-    virtual ~RandomDirectionCentreBasedDivisionRule()
+    virtual ~FixedCentreBasedDivisionRule()
     {
     }
+
+    /**
+     * Set mDaughterLocation.
+     *
+     * @param rDaughterLocation the specified location of the daughter cell
+     */
+    void SetDaughterLocation(c_vector<double, SPACE_DIM>& rDaughterLocation);
 
     /**
      * Overridden CalculateCellDivisionVector() method.
@@ -97,7 +112,6 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_ALL_DIMS(RandomDirectionCentreBasedDivisionRule)
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(FixedCentreBasedDivisionRule)
 
-#endif // RANDOMDIRECTIONCENTREBASEDDIVISIONRULE_HPP_
-
+#endif // FIXEDCENTREBASEDDIVISIONRULE_HPP_

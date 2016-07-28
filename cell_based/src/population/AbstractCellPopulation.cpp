@@ -484,7 +484,7 @@ void AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>::SetDivisionLocationFile(out_
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-CellPtr AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>::AddCell(CellPtr pNewCell, const c_vector<double,SPACE_DIM>& rCellDivisionVector, CellPtr pParentCell)
+CellPtr AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>::AddCell(CellPtr pNewCell, CellPtr pParentCell)
 {
     // If required, output the location of the dividing cell to file
     if (mOutputDivisionLocations)

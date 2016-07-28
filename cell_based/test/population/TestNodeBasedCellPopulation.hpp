@@ -63,6 +63,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FileComparison.hpp"
 #include "ApoptoticCellProperty.hpp"
 #include "CellAncestor.hpp"
+#include "FixedCentreBasedDivisionRule.hpp"
 
 // Cell writers
 #include "CellAgesWriter.hpp"
@@ -350,7 +351,7 @@ public:
             cell2_location[0] = 0.9;
             cell2_location[1] = 1.4;
 
-            node_based_cell_population.AddCell(p_cell2, cell2_location, node_based_cell_population.GetCellUsingLocationIndex(0));
+            node_based_cell_population.AddCell(p_cell2, node_based_cell_population.GetCellUsingLocationIndex(0));
 
             // Check the radii of all the cells are correct (cell 0 divided into 0 and 2)
             AbstractMesh<2,2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
@@ -429,9 +430,14 @@ public:
             new_cell_location[0] = 1.4;
             new_cell_location[1] = 1.4;
 
+	        typedef FixedCentreBasedDivisionRule<2,2> FixedRule;
+			MAKE_PTR(FixedRule, p_div_rule);
+			p_div_rule->SetDaughterLocation(new_cell_location);
+			node_based_cell_population.SetCentreBasedDivisionRule(p_div_rule);
+
             CellPtr p_parent_cell = node_based_cell_population.GetCellUsingLocationIndex(PetscTools::GetNumProcs());
 
-            CellPtr p_child_cell = node_based_cell_population.AddCell(p_cell, new_cell_location, p_parent_cell);
+            CellPtr p_child_cell = node_based_cell_population.AddCell(p_cell, p_parent_cell);
 
             // CellPopulation should have updated nodes and cells
             TS_ASSERT_EQUALS(node_based_cell_population.GetNumNodes(), old_num_nodes+1);
@@ -638,7 +644,7 @@ public:
 
             CellPtr p_parent_cell = node_based_cell_population.GetCellUsingLocationIndex(0u);
 
-            node_based_cell_population.AddCell(p_new_cell, new_location, p_parent_cell);
+            node_based_cell_population.AddCell(p_new_cell, p_parent_cell);
 
             // Test that the numbers of nodes and cells has been updated
             TS_ASSERT_EQUALS(node_based_cell_population.GetNumNodes(), 82u);
@@ -670,7 +676,7 @@ public:
 
             CellPtr p_parent_cell = node_based_cell_population.GetCellUsingLocationIndex(PetscTools::GetNumProcs());
 
-            node_based_cell_population.AddCell(p_new_cell2, new_location2, p_parent_cell); // Use same parent cell
+            node_based_cell_population.AddCell(p_new_cell2, p_parent_cell); // Use same parent cell
 
             // Test that the numbers of nodes and cells has been updated
             TS_ASSERT_EQUALS(node_based_cell_population.GetNumNodes(), 82u);
