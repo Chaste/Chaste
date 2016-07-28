@@ -97,6 +97,7 @@ private:
         archive & mOutputDirectory;
         archive & mNumBirths;
         archive & mNumDeaths;
+        archive & mOutputDivisionLocations;
         archive & mOutputCellVelocities;
         archive & mCellKillers;
         archive & mSimulationModifiers;
@@ -142,6 +143,12 @@ protected:
     /** Counts the number of deaths during the simulation. */
     unsigned mNumDeaths;
 
+    /** Whether to output the locations of division events (defaults to false).*/
+    bool mOutputDivisionLocations;
+
+    /** Output file for location of division events. */
+    out_stream mpDivisionLocationFile;
+
     /**
      * Whether to write the cell velocities to a file.
      * Initialised to false in constructor.
@@ -181,7 +188,7 @@ protected:
      * to produce daughter cells.
      *
      * If mOutputDivisionLocations is set to true, then this method also writes the
-     * location of each cell division at the present time to mrCellPopulation::mpDivisionLocationFile.
+     * location of each cell division at the present time to mpDivisionLocationFile.
      * This outputs a line of tab-separated values of the form:
      * [time] [div 0 x-pos] [div 0 y-pos] [div 0 z-pos] [div 0 age] [div 1 x-pos] [div 1 y-pos] [div 1 z-pos] [div 1 age] ...
      *
@@ -453,14 +460,14 @@ public:
     const AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rGetCellPopulation() const;
 
     /**
-     * @return mrCellPopulation.GetOutputDivisionLocations()
+     * @return mOutputDivisionLocations
      */
     bool GetOutputDivisionLocations();
 
     /**
-     * Set the cell population member mOutputDivisionLocations.
+     * Set mOutputDivisionLocations.
      *
-     * @param outputDivisionLocations the new value of the cell population member mOutputDivisionLocations
+     * @param outputDivisionLocations the new value of mOutputDivisionLocations
      */
     void SetOutputDivisionLocations(bool outputDivisionLocations);
 

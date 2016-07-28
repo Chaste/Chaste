@@ -47,11 +47,10 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCentreBasedCell
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCentreBasedDivisionRule;
 
 /**
- * A class to generate a division vector of length 
- * AbstractCentreBasedCellPopulation::mMeinekeDivisionSeparation that points 
- * in a random direction.
- *
- * \todo #2800 update documentation to reflect output type
+ * A class to generate two daughter cell positions, located a distance
+ * AbstractCentreBasedCellPopulation::mMeinekeDivisionSeparation apart,
+ * along a random axis. The midpoint between the two daughter cell
+ * positions corresponds to the parent cell's position.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
 class RandomDirectionCentreBasedDivisionRule : public AbstractCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM>
@@ -71,6 +70,7 @@ private:
     }
 
 public:
+
     /**
      * Default constructor.
      */
@@ -90,7 +90,8 @@ public:
      *
      * @param pParentCell  The cell to divide
      * @param rCellPopulation  The centre-based cell population
-     * @return the division vector.
+     *
+     * @return the two daughter cell positions.
      */
     virtual std::pair<c_vector<double, SPACE_DIM>, c_vector<double, SPACE_DIM> > CalculateCellDivisionVector(CellPtr pParentCell,
         AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>& rCellPopulation);

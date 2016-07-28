@@ -109,7 +109,6 @@ public:
         p_temp_cell->SetBirthTime(-1);
 
         // Set the division rule for our population to be the diagonal division rule
-
         boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule_to_set(new DiagonalVertexBasedDivisionRule<2>());
         cell_population.SetVertexBasedDivisionRule(p_division_rule_to_set);
 

@@ -221,9 +221,6 @@ bool CaBasedCellPopulation<DIM>::IsRoomToDivide(CellPtr pCell)
 template<unsigned DIM>
 CellPtr CaBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, CellPtr pParentCell)
 {
-	// Start by calling method on parent class (this takes care of outputting the dividing cell's location to file, if needed)
-	AbstractOnLatticeCellPopulation<DIM>::AddCell(pNewCell, pParentCell);
-
     unsigned daughter_node_index = mpCaBasedDivisionRule->CalculateDaughterNodeIndex(pNewCell,pParentCell,*this);
 
     // Associate the new cell with the neighbouring node

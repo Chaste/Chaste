@@ -310,8 +310,6 @@ public:
     /**
      * In this test, we check that the daughters of a cell that has just divided
      * are put in the correct positions.
-     *
-     * \todo #2800 move into separate test suite covering CryptCentreBasedDivisionRule and CryptVertexBasedDivisionRule
      */
     void TestCalculateCellDivisionVector() throw (Exception)
     {

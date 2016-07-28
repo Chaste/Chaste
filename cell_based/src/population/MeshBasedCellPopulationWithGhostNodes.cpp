@@ -164,7 +164,7 @@ c_vector<double, DIM> MeshBasedCellPopulationWithGhostNodes<DIM>::CalculateForce
 template<unsigned DIM>
 CellPtr MeshBasedCellPopulationWithGhostNodes<DIM>::AddCell(CellPtr pNewCell, CellPtr pParentCell)
 {
-	// Start by calling method on parent class (this takes care of outputting the dividing cell's location to file, if needed)
+    // Add new cell to population
 	CellPtr p_created_cell = MeshBasedCellPopulation<DIM,DIM>::AddCell(pNewCell, pParentCell);
     assert(p_created_cell == pNewCell);
 

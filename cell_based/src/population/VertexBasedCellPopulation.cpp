@@ -208,9 +208,6 @@ unsigned VertexBasedCellPopulation<DIM>::GetNumElements()
 template<unsigned DIM>
 CellPtr VertexBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, CellPtr pParentCell)
 {
-	// Start by calling method on parent class (this takes care of outputting the dividing cell's location to file, if needed)
-	AbstractOffLatticeCellPopulation<DIM>::AddCell(pNewCell, pParentCell);
-
     // Get the element associated with this cell
     VertexElement<DIM, DIM>* p_element = GetElementCorrespondingToCell(pParentCell);
 

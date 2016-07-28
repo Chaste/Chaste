@@ -92,7 +92,6 @@ private:
         archive & mCellWriters;
         archive & mCellPopulationWriters;
         archive & mCellPopulationCountWriters;
-        archive & mOutputDivisionLocations;
     }
 
     /**
@@ -139,12 +138,6 @@ protected:
 
     /** Whether to write results to file for visualization using the Chaste java visualizer (defaults to true). */
     bool mOutputResultsForChasteVisualizer;
-
-    /** Whether to output the locations of division events (defaults to false).*/
-    bool mOutputDivisionLocations;
-
-    /** Output file for location of division events. */
-    out_stream mpDivisionLocationFile;
 
     /** A list of cell writers. */
     std::vector<boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > > mCellWriters;
@@ -286,26 +279,17 @@ public:
     virtual bool IsCellAssociatedWithADeletedLocation(CellPtr pCell)=0;
 
     /**
-     * @return mpDivisionLocationFile
-     */
-    out_stream GetDivisionLocationFile();
-
-    /**
-     * Set mpDivisionLocationFile.
-     *
-     * @param divisionLocationFile  the division location file
-     */
-    void SetDivisionLocationFile(out_stream divisionLocationFile);
-
-    /**
      * Add a new cell to the cell population.
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
      *
      * @param pNewCell  the cell to add
      * @param pParentCell pointer to a parent cell (if required)
      *
      * @return address of cell as it appears in the cell list (internal of this method uses a copy constructor along the way).
      */
-    virtual CellPtr AddCell(CellPtr pNewCell, CellPtr pParentCell=CellPtr());
+    virtual CellPtr AddCell(CellPtr pNewCell, CellPtr pParentCell=CellPtr())=0;
 
     class Iterator; // Forward declaration; see below
 
@@ -563,18 +547,6 @@ public:
      * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
      */
     virtual void WriteResultsToFiles(const std::string& rDirectory);
-
-    /**
-     * @return mOutputDivisionLocations
-     */
-    bool GetOutputDivisionLocations();
-
-    /**
-     * Set mOutputDivisionLocations.
-     *
-     * @param outputDivisionLocations the new value of mOutputDivisionLocations
-     */
-    void SetOutputDivisionLocations(bool outputDivisionLocations);
 
     /**
      * A virtual method to accept a cell population writer so it can

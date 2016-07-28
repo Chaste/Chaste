@@ -61,6 +61,7 @@ AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::AbstractCellBasedSimulation(
       mSimulationOutputDirectory(mOutputDirectory),
       mNumBirths(0),
       mNumDeaths(0),
+      mOutputDivisionLocations(false),
       mOutputCellVelocities(false),
       mSamplingTimestepMultiple(1),
       mpCellBasedPdeHandler(NULL)
@@ -122,6 +123,36 @@ unsigned AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::DoCellBirth()
                 {
                     // Create a new cell
                     CellPtr p_new_cell = cell_iter->Divide();
+
+                    /**
+                     * If required, output this location to file
+                     *
+                     * \todo (#2578)
+                     *
+                     * For consistency with the rest of the output code, consider removing the
+                     * AbstractCellBasedSimulation member mOutputDivisionLocations, adding a new
+                     * member mAgesAndLocationsOfDividingCells to AbstractCellPopulation, adding
+                     * a new class CellDivisionLocationsWriter to the CellPopulationWriter hierarchy
+                     * to output the content of mAgesAndLocationsOfDividingCells to file (remembering
+                     * to clear mAgesAndLocationsOfDividingCells at each timestep), and replacing the
+                     * following conditional statement with something like
+                     *
+                     * if (mrCellPopulation.HasWriter<CellDivisionLocationsWriter>())
+                     * {
+                     *     mCellDivisionLocations.push_back(new_location);
+                     * }
+                     */
+                    if (mOutputDivisionLocations)
+                    {
+                        c_vector<double, SPACE_DIM> cell_location = mrCellPopulation.GetLocationOfCellCentre(*cell_iter);
+
+                        *mpDivisionLocationFile << SimulationTime::Instance()->GetTime() << "\t";
+                        for (unsigned i=0; i<SPACE_DIM; i++)
+                        {
+                            *mpDivisionLocationFile << cell_location[i] << "\t";
+                        }
+                        *mpDivisionLocationFile << "\t" << cell_age << "\n";
+                    }
 
                     // Add the new cell to the cell population
                     mrCellPopulation.AddCell(p_new_cell, *cell_iter);
@@ -333,9 +364,9 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
 
     mrCellPopulation.OpenWritersFiles(output_file_handler);
 
-    if (mrCellPopulation.GetOutputDivisionLocations())
+    if (mOutputDivisionLocations)
     {
-    	mrCellPopulation.SetDivisionLocationFile(output_file_handler.OpenOutputFile("divisions.dat"));
+        mpDivisionLocationFile = output_file_handler.OpenOutputFile("divisions.dat");
     }
     if (mOutputCellVelocities)
     {
@@ -540,9 +571,9 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
 
     mrCellPopulation.CloseWritersFiles();
 
-    if (mrCellPopulation.GetOutputDivisionLocations())
+    if (mOutputDivisionLocations)
     {
-    	(mrCellPopulation.GetDivisionLocationFile())->close();
+        mpDivisionLocationFile->close();
     }
     if (mOutputCellVelocities)
     {
@@ -603,13 +634,13 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellPopulation()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::GetOutputDivisionLocations()
 {
-    return mrCellPopulation.GetOutputDivisionLocations();
+    return mOutputDivisionLocations;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::SetOutputDivisionLocations(bool outputDivisionLocations)
 {
-	mrCellPopulation.SetOutputDivisionLocations(outputDivisionLocations);
+    mOutputDivisionLocations = outputDivisionLocations;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -698,7 +729,7 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::OutputSimulationParamet
     *rParamsFile << "\t\t<Dt>" << mDt << "</Dt>\n";
     *rParamsFile << "\t\t<EndTime>" << mEndTime << "</EndTime>\n";
     *rParamsFile << "\t\t<SamplingTimestepMultiple>" << mSamplingTimestepMultiple << "</SamplingTimestepMultiple>\n";
-    *rParamsFile << "\t\t<OutputDivisionLocations>" << mrCellPopulation.GetOutputDivisionLocations() << "</OutputDivisionLocations>\n";
+    *rParamsFile << "\t\t<OutputDivisionLocations>" << mOutputDivisionLocations << "</OutputDivisionLocations>\n";
     *rParamsFile << "\t\t<OutputCellVelocities>" << mOutputCellVelocities << "</OutputCellVelocities>\n";
 }
 

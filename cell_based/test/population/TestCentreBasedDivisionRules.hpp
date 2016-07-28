@@ -156,7 +156,15 @@ public:
         // Set the division rule for our population to be the random direction division rule
         typedef FixedCentreBasedDivisionRule<2,2> FixedRule;
         MAKE_PTR(FixedRule, p_division_rule_to_set);
+
+        TS_ASSERT_DELTA(p_division_rule_to_set->GetDaughterLocation()[0], 0.0, 1e-6);
+        TS_ASSERT_DELTA(p_division_rule_to_set->GetDaughterLocation()[1], 0.0, 1e-6);
+
         p_division_rule_to_set->SetDaughterLocation(expected_daughter_location);
+
+        TS_ASSERT_DELTA(p_division_rule_to_set->GetDaughterLocation()[0], 1.2, 1e-6);
+        TS_ASSERT_DELTA(p_division_rule_to_set->GetDaughterLocation()[1], 3.4, 1e-6);
+
         cell_population.SetCentreBasedDivisionRule(p_division_rule_to_set);
 
         // Get the division rule back from the population
@@ -232,7 +240,9 @@ public:
             typedef FixedCentreBasedDivisionRule<2,2> FixedRule;
             TS_ASSERT(dynamic_cast<FixedRule*>(p_division_rule.get()));
 
-            ///\todo #2800 test that mDaughterLocation is correct
+            c_vector<double, 2> location = (dynamic_cast<FixedRule*>(p_division_rule.get()))->GetDaughterLocation();
+            TS_ASSERT_DELTA(location[0], -0.73, 1e-6);
+            TS_ASSERT_DELTA(location[1], 5.82, 1e-6);
         }
     }
 };

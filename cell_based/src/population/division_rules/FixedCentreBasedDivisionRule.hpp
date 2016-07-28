@@ -38,6 +38,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
+#include <boost/serialization/vector.hpp>
+
 #include "AbstractCentreBasedDivisionRule.hpp"
 #include "AbstractCentreBasedCellPopulation.hpp"
 
@@ -46,18 +48,22 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCentreBasedCell
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCentreBasedDivisionRule;
 
 /**
- * A class to generate a division vector of length 
- * AbstractCentreBasedCellPopulation::mMeinekeDivisionSeparation that points 
- * in a fixed direction specified by the user
+ * A class to generate two daughter cell positions, one given by the
+ * position of the dividing cell and the other specified by the user
+ * through the method SetDaughterLocation().
  * 
- * \todo #2800 update documentation to reflect output type
+ * This helper class is used in TestMeshBasedCellPopulation.hpp and
+ * TestNodeBasedCellPopulation.hpp.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
 class FixedCentreBasedDivisionRule : public AbstractCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM>
 {
 private:
 
-    /** The specified location of the new daughter cell. Set in the constructor. */
+    /**
+     * The specified location of the new daughter cell.
+     * Initialized to the zero vector in the constructor.
+     */
     c_vector<double, SPACE_DIM> mDaughterLocation;
 
     friend class boost::serialization::access;
@@ -75,16 +81,13 @@ private:
     }
 
 public:
+
     /**
      * Default constructor.
      *
-     * \todo #2800 initialize mDaughterLocation?
-     *
      * @param rDaughterLocation the specified location of the new daughter cell
      */
-    FixedCentreBasedDivisionRule()
-    {
-    }
+    FixedCentreBasedDivisionRule();
 
     /**
      * Empty destructor.
@@ -101,11 +104,17 @@ public:
     void SetDaughterLocation(c_vector<double, SPACE_DIM>& rDaughterLocation);
 
     /**
+     * @return mDaughterLocation.
+     */
+    c_vector<double, SPACE_DIM> GetDaughterLocation();
+
+    /**
      * Overridden CalculateCellDivisionVector() method.
      *
      * @param pParentCell  The cell to divide
      * @param rCellPopulation  The centre-based cell population
-     * @return the division vector.
+     *
+     * @return the two daughter cell positions.
      */
     virtual std::pair<c_vector<double, SPACE_DIM>, c_vector<double, SPACE_DIM> > CalculateCellDivisionVector(CellPtr pParentCell,
         AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>& rCellPopulation);

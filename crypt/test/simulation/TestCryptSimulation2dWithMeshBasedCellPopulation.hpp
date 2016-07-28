@@ -1238,7 +1238,6 @@ public:
         TS_ASSERT_EQUALS(num_deaths, 11u);
     }
 
-    ///\todo #2800 move into separate test suite covering CryptCentreBasedDivisionRule and CryptVertexBasedDivisionRule
     void TestCalculateCellDivisionVectorConfMesh() throw (Exception)
     {
         EXIT_IF_PARALLEL;
@@ -1279,7 +1278,6 @@ public:
         TS_ASSERT_DELTA(norm_2(parent_to_daughter), conf_crypt.GetMeinekeDivisionSeparation(), 1e-7);
     }
 
-    ///\todo #2800 move into separate test suite covering CryptCentreBasedDivisionRule and CryptVertexBasedDivisionRule
     void TestCalculateCellDivisionVectorConfMeshStemCell() throw (Exception)
     {
         EXIT_IF_PARALLEL;
@@ -1325,7 +1323,6 @@ public:
        }
     }
 
-    ///\todo #2800 move into separate test suite covering CryptCentreBasedDivisionRule and CryptVertexBasedDivisionRule
     void TestCalculateCellDivisionVectorCylindricalMesh() throw (Exception)
     {
         EXIT_IF_PARALLEL;
@@ -1359,7 +1356,6 @@ public:
         TS_ASSERT_DELTA(norm_2(parent_to_daughter), cyl_crypt.GetMeinekeDivisionSeparation(), 1e-7);
     }
 
-    ///\todo #2800 move into separate test suite covering CryptCentreBasedDivisionRule and CryptVertexBasedDivisionRule
     void TestCalculateCellDivisionVectorCylindricalMeshStemCell() throw (Exception)
     {
         EXIT_IF_PARALLEL;

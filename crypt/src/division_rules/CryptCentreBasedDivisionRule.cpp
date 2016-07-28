@@ -51,7 +51,6 @@ std::pair<c_vector<double, SPACE_DIM>, c_vector<double, SPACE_DIM> > CryptCentre
     c_vector<double, SPACE_DIM> parent_coords = rCellPopulation.GetLocationOfCellCentre(pParentCell);
     c_vector<double, SPACE_DIM> daughter_coords;
 
-    ///\todo #2800 Assess scope for refactoring this code block
     switch (SPACE_DIM)
     {
         case 1:

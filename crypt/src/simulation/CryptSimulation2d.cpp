@@ -121,7 +121,7 @@ void CryptSimulation2d::SetBottomCellAncestors()
      * population we are using, a MeshBasedCellPopulationWithGhostNodes or
      * a VertexBasedCellPopulation.
      *
-     * \todo (#2800) Make this threshold height a member variable and set it in the constructor,
+     * \todo Make this threshold height a member variable and set it in the constructor,
      *       depending on the cell population type; this would allow us to remove mUsingMeshBasedCellPopulation
      */
     double threshold_height = 1.0;

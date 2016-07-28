@@ -176,9 +176,6 @@ PottsElement<DIM>* PottsBasedCellPopulation<DIM>::GetElementCorrespondingToCell(
 template<unsigned DIM>
 CellPtr PottsBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, CellPtr pParentCell)
 {
-	// Start by calling method on parent class (this takes care of outputting the dividing cell's location to file, if needed)
-	AbstractOnLatticeCellPopulation<DIM>::AddCell(pNewCell, pParentCell);
-
     // Get the element associated with this cell
     PottsElement<DIM>* p_element = GetElementCorrespondingToCell(pParentCell);
 

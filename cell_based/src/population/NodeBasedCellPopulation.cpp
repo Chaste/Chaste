@@ -682,8 +682,7 @@ CellPtr NodeBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, CellPtr pParentC
 {
     assert(pNewCell);
 
-    // Start by calling method on parent class (this takes care of outputting the dividing cell's location to file, if needed)
-    // Add new cell to cell population
+    // Add new cell to population
     CellPtr p_created_cell = AbstractCentreBasedCellPopulation<DIM>::AddCell(pNewCell, pParentCell);
     assert(p_created_cell == pNewCell);
 

@@ -83,9 +83,6 @@ Node<SPACE_DIM>* AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetN
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 CellPtr AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddCell(CellPtr pNewCell, CellPtr pParentCell)
 {
-	// Start by calling method on parent class (this takes care of outputting the dividing cell's location to file, if needed)
-	AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddCell(pNewCell, pParentCell);
-
 	// Calculate the locations of the two daughter cells
 	std::pair<c_vector<double, SPACE_DIM>, c_vector<double, SPACE_DIM> > positions = mpCentreBasedDivisionRule->CalculateCellDivisionVector(pParentCell, *this);
 
