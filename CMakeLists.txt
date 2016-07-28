@@ -32,6 +32,10 @@
 
 cmake_minimum_required(VERSION 2.8.10)
 
+if(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} LESS 3.3)
+    add_compile_options(-std=c++0x)
+endif()
+
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules)
 include(EnsureOutOfSourceBuild)
 Ensure_Out_Of_Source_Build()
