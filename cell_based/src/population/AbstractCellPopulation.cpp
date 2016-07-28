@@ -74,7 +74,8 @@ AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractCellPopulation( Abstract
       mCells(rCells.begin(), rCells.end()),
       mCentroid(zero_vector<double>(SPACE_DIM)),
       mpCellPropertyRegistry(CellPropertyRegistry::Instance()->TakeOwnership()),
-      mOutputResultsForChasteVisualizer(true)
+      mOutputResultsForChasteVisualizer(true),
+      mOutputDivisionLocations(false)
 {
     /*
      * To avoid double-counting problems, clear the passed-in cells vector.
@@ -456,6 +457,49 @@ c_vector<double, SPACE_DIM> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetC
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::UpdateCellProcessLocation()
 {
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetOutputDivisionLocations()
+{
+    return mOutputDivisionLocations;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>::SetOutputDivisionLocations(bool outputDivisionLocations)
+{
+	mOutputDivisionLocations = outputDivisionLocations;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+out_stream AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetDivisionLocationFile()
+{
+    return mpDivisionLocationFile;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>::SetDivisionLocationFile(out_stream divisionLocationFile)
+{
+	mpDivisionLocationFile = divisionLocationFile;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+CellPtr AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>::AddCell(CellPtr pNewCell, const c_vector<double,SPACE_DIM>& rCellDivisionVector, CellPtr pParentCell)
+{
+    // If required, output the location of the dividing cell to file
+    if (mOutputDivisionLocations)
+    {
+        c_vector<double, SPACE_DIM> cell_location = GetLocationOfCellCentre(pParentCell);
+
+        *mpDivisionLocationFile << SimulationTime::Instance()->GetTime() << "\t";
+        for (unsigned i=0; i<SPACE_DIM; i++)
+        {
+            *mpDivisionLocationFile << cell_location[i] << "\t";
+        }
+        *mpDivisionLocationFile << "\t" << pParentCell->GetAge() << "\n";
+    }
+
+    return pNewCell;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

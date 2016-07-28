@@ -83,6 +83,9 @@ Node<SPACE_DIM>* AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetN
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 CellPtr AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddCell(CellPtr pNewCell, const c_vector<double,SPACE_DIM>& rCellDivisionVector, CellPtr pParentCell)
 {
+	// Start by calling method on parent class (this takes care of outputting the dividing cell's location to file, if needed)
+	AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddCell(pNewCell, rCellDivisionVector, pParentCell);
+
     // Create a new node
     Node<SPACE_DIM>* p_new_node = new Node<SPACE_DIM>(this->GetNumNodes(), rCellDivisionVector, false);   // never on boundary
     unsigned new_node_index = this->AddNode(p_new_node); // use copy constructor so it doesn't matter that new_node goes out of scope

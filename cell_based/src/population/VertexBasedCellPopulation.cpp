@@ -210,6 +210,9 @@ CellPtr VertexBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell,
                                                 const c_vector<double,DIM>& rCellDivisionVector,
                                                 CellPtr pParentCell)
 {
+	// Start by calling method on parent class (this takes care of outputting the dividing cell's location to file, if needed)
+	AbstractOffLatticeCellPopulation<DIM>::AddCell(pNewCell, rCellDivisionVector, pParentCell);
+
     // Get the element associated with this cell
     VertexElement<DIM, DIM>* p_element = GetElementCorrespondingToCell(pParentCell);
 
@@ -224,6 +227,7 @@ CellPtr VertexBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell,
     CellPtr p_created_cell = this->mCells.back();
     this->SetCellUsingLocationIndex(new_element_index,p_created_cell);
     this->mCellLocationMap[p_created_cell.get()] = new_element_index;
+
     return p_created_cell;
 }
 

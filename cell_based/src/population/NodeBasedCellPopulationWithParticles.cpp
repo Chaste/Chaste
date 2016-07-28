@@ -144,6 +144,8 @@ CellPtr NodeBasedCellPopulationWithParticles<DIM>::AddCell(CellPtr pNewCell, con
 {
     assert(pNewCell);
 
+    // Start by calling method on parent class (this takes care of outputting the dividing cell's location to file, if needed)
+
     // Add new cell to cell population
     CellPtr p_created_cell = AbstractCentreBasedCellPopulation<DIM>::AddCell(pNewCell, rCellDivisionVector, pParentCell);
     assert(p_created_cell == pNewCell);
