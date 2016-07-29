@@ -474,6 +474,15 @@ public:
      * simulate the cell population.
      */
     virtual double GetDefaultTimeStep();
+
+    /**
+     * Overridden WriteDataToVisualizerSetupFile() method.
+     * Write any data necessary to a visualization setup file.
+     * Used by AbstractCellBasedSimulation::WriteVisualizerSetupFile().
+     * 
+     * @param pVizSetupFile a visualization setup file
+     */
+    virtual void WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile);
 };
 
 #include "SerializationExportWrapper.hpp"

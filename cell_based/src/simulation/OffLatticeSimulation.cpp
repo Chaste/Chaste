@@ -40,9 +40,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "VertexBasedCellPopulation.hpp"
 #include "T2SwapCellKiller.hpp"
-#include "Cylindrical2dMesh.hpp"
-#include "Cylindrical2dVertexMesh.hpp"
-#include "AbstractTwoBodyInteractionForce.hpp"
 #include "CellBasedEventHandler.hpp"
 #include "LogFile.hpp"
 #include "Version.hpp"
@@ -217,32 +214,10 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::WriteVisualizerSetupFile()
     {
         for (unsigned i=0; i<this->mForceCollection.size(); i++)
         {
-            // This may cause compilation problems, probably due to AbstractTwoBodyInteractionForce not having two template parameters
-            ///\todo Check whether this comment is still valid
-
-            boost::shared_ptr<AbstractForce<ELEMENT_DIM,SPACE_DIM> > p_force = this->mForceCollection[i];
-            if (boost::dynamic_pointer_cast<AbstractTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM> >(p_force))
-            {
-                double cutoff = (boost::static_pointer_cast<AbstractTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM> >(p_force))->GetCutOffLength();
-                *(this->mpVizSetupFile) << "Cutoff\t" << cutoff << "\n";
-            }
+            p_this->mForceCollection[i]->WriteDataToVisualizerSetupFile(this->mpVizSetupFile);
         }
 
-        // This is a quick and dirty check to see if the mesh is periodic
-        if (bool(dynamic_cast<MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&this->mrCellPopulation)))
-        {
-           if (bool(dynamic_cast<Cylindrical2dMesh*>(&(dynamic_cast<MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&(this->mrCellPopulation))->rGetMesh()))))
-           {
-               *this->mpVizSetupFile << "MeshWidth\t" << this->mrCellPopulation.GetWidth(0) << "\n";
-           }
-        }
-        else if (bool(dynamic_cast<VertexBasedCellPopulation<SPACE_DIM>*>(&this->mrCellPopulation)))
-        {
-           if (bool(dynamic_cast<Cylindrical2dVertexMesh*>(&(dynamic_cast<VertexBasedCellPopulation<SPACE_DIM>*>(&(this->mrCellPopulation))->rGetMesh()))))
-           {
-               *this->mpVizSetupFile << "MeshWidth\t" << this->mrCellPopulation.GetWidth(0) << "\n";
-           }
-        }
+        this->mrCellPopulation.WriteDataToVisualizerSetupFile(this->mpVizSetupFile);
     }
 }
 

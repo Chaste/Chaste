@@ -279,6 +279,14 @@ public:
     virtual bool IsCellAssociatedWithADeletedLocation(CellPtr pCell)=0;
 
     /**
+     * Write any data necessary to a visualization setup file.
+     * Used by AbstractCellBasedSimulation::WriteVisualizerSetupFile().
+     * 
+     * @param pVizSetupFile a visualization setup file
+     */
+    virtual void WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile);
+ 
+    /**
      * Add a new cell to the cell population.
      *
      * As this method is pure virtual, it must be overridden

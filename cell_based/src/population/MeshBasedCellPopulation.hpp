@@ -426,6 +426,15 @@ public:
     double GetWidth(const unsigned& rDimension);
 
     /**
+     * Overridden WriteDataToVisualizerSetupFile() method.
+     * Write any data necessary to a visualization setup file.
+     * Used by AbstractCellBasedSimulation::WriteVisualizerSetupFile().
+     * 
+     * @param pVizSetupFile a visualization setup file
+     */
+    virtual void WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile);
+
+    /**
      * Iterator over edges in the mesh, which correspond to springs between cells.
      *
      * This class takes care of the logic to make sure that you consider each edge exactly once.

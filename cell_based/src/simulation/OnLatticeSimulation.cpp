@@ -118,15 +118,6 @@ c_vector<double, DIM> OnLatticeSimulation<DIM>::CalculateCellDivisionVector(Cell
 }
 
 template<unsigned DIM>
-void OnLatticeSimulation<DIM>::WriteVisualizerSetupFile()
-{
-    if (bool(dynamic_cast<PottsBasedCellPopulation<DIM>*>(&this->mrCellPopulation)))
-    {
-       *this->mpVizSetupFile << "PottsSimulation\n";
-    }
-}
-
-template<unsigned DIM>
 void OnLatticeSimulation<DIM>::UpdateCellLocationsAndTopology()
 {
     // Update cell locations
