@@ -38,19 +38,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 FixedCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM>::FixedCentreBasedDivisionRule()
 {
-	mDaughterLocation = zero_vector<double>(SPACE_DIM);
+    mDaughterLocation = zero_vector<double>(SPACE_DIM);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void FixedCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM>::SetDaughterLocation(c_vector<double, SPACE_DIM>& rDaughterLocation)
 {
-	mDaughterLocation = rDaughterLocation;
+    mDaughterLocation = rDaughterLocation;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> FixedCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM>::GetDaughterLocation()
 {
-	return mDaughterLocation;
+    return mDaughterLocation;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

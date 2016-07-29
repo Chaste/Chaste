@@ -38,6 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
+
 #include "AbstractVertexBasedDivisionRule.hpp"
 #include "VertexBasedCellPopulation.hpp"
 
@@ -71,6 +72,7 @@ private:
     }
 
 public:
+
     /**
      * Default constructor.
      */
@@ -103,3 +105,4 @@ public:
 EXPORT_TEMPLATE_CLASS_SAME_DIMS(ShortAxisVertexBasedDivisionRule)
 
 #endif // SHORTAXISVERTEXBASEDDIVISIONRULE_HPP_
+

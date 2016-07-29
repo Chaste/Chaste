@@ -58,6 +58,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SmartPointers.hpp"
 #include "FileComparison.hpp"
 #include "ShortAxisVertexBasedDivisionRule.hpp"
+#include "FixedVertexBasedDivisionRule.hpp"
 #include "ApoptoticCellProperty.hpp"
 
 // Cell writers
@@ -559,6 +560,10 @@ public:
         c_vector<double,2> cell_division_axis;
         cell_division_axis[0] = 1.0;
         cell_division_axis[1] = 0.0;
+
+		MAKE_PTR(FixedVertexBasedDivisionRule<2>, p_div_rule);
+		p_div_rule->SetDivisionVector(cell_division_axis);
+		cell_population.SetVertexBasedDivisionRule(p_div_rule);
 
         FixedDurationGenerationBasedCellCycleModel* p_model2 = new FixedDurationGenerationBasedCellCycleModel();
         CellPtr p_temp_cell(new Cell(p_state, p_model2));

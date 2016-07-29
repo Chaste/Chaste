@@ -84,8 +84,6 @@ public:
 
     /**
      * Default constructor.
-     *
-     * @param rDaughterLocation the specified location of the new daughter cell
      */
     FixedCentreBasedDivisionRule();
 
