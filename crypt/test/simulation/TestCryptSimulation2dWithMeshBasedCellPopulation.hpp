@@ -1272,9 +1272,11 @@ public:
 
         MeshBasedCellPopulation<2>* p_cast_population = static_cast<MeshBasedCellPopulation<2>*>(&(simulator.rGetCellPopulation()));
         std::pair<c_vector<double, 2>, c_vector<double, 2> > locations = p_cast_population->GetCentreBasedDivisionRule()->CalculateCellDivisionVector(*conf_iter, *p_cast_population);
+
+        c_vector<double, 2> new_parent_location = locations.first;
         c_vector<double, 2> daughter_location = locations.second;
-        c_vector<double, 2> new_parent_location = conf_mesh.GetNode(0)->rGetLocation();
         c_vector<double, 2> parent_to_daughter = conf_mesh.GetVectorFromAtoB(new_parent_location, daughter_location);
+
         TS_ASSERT_DELTA(norm_2(parent_to_daughter), conf_crypt.GetMeinekeDivisionSeparation(), 1e-7);
     }
 
@@ -1350,9 +1352,11 @@ public:
 
         MeshBasedCellPopulation<2>* p_cast_population = static_cast<MeshBasedCellPopulation<2>*>(&(simulator.rGetCellPopulation()));
         std::pair<c_vector<double, 2>, c_vector<double, 2> > locations = p_cast_population->GetCentreBasedDivisionRule()->CalculateCellDivisionVector(*cyl_iter, *p_cast_population);
+
+        c_vector<double, 2> new_parent_location = locations.first;
         c_vector<double, 2> daughter_location = locations.second;
-        c_vector<double, 2> new_parent_location = cyl_mesh.GetNode(0)->rGetLocation();
         c_vector<double, 2> parent_to_daughter = cyl_mesh.GetVectorFromAtoB(new_parent_location, daughter_location);
+
         TS_ASSERT_DELTA(norm_2(parent_to_daughter), cyl_crypt.GetMeinekeDivisionSeparation(), 1e-7);
     }
 

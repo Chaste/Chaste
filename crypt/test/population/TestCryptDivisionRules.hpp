@@ -101,8 +101,8 @@ public:
         c_vector<double, 1> parent_position = positions.first;
         c_vector<double, 1> daughter_position = positions.second;
 
-        TS_ASSERT_DELTA(parent_position[0], 1.0, 1e-6);
-        TS_ASSERT_DELTA(daughter_position[0], 1.0, 1e-6);
+        TS_ASSERT_DELTA(parent_position[0], 0.0, 1e-4);
+        TS_ASSERT_DELTA(daughter_position[0], 0.15, 1e-4);
     }
 
     void TestCryptCentreBasedDivisionRule2d()
@@ -139,10 +139,10 @@ public:
         c_vector<double, 2> parent_position = positions.first;
         c_vector<double, 2> daughter_position = positions.second;
 
-        TS_ASSERT_DELTA(parent_position[0], 1.0, 1e-6);
-        TS_ASSERT_DELTA(parent_position[1], 1.0, 1e-6);
-        TS_ASSERT_DELTA(daughter_position[0], 1.0, 1e-6);
-        TS_ASSERT_DELTA(daughter_position[1], 1.0, 1e-6);
+        TS_ASSERT_DELTA(parent_position[0], 1.0417, 1e-4);
+        TS_ASSERT_DELTA(parent_position[1], 1.0275, 1e-4);
+        TS_ASSERT_DELTA(daughter_position[0], 0.9582, 1e-4);
+        TS_ASSERT_DELTA(daughter_position[1], 0.9724, 1e-4);
     }
 
     void TestCryptCentreBasedDivisionRule3d()
@@ -204,8 +204,8 @@ public:
         boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule = cell_population.GetVertexBasedDivisionRule();
 
         c_vector<double, 2> division_axis = p_division_rule->CalculateCellDivisionVector(p_cell0, cell_population);
-        TS_ASSERT_DELTA(division_axis[0], 1.0, 1e-6);
-        TS_ASSERT_DELTA(division_axis[1], 1.0, 1e-6);
+        TS_ASSERT_DELTA(division_axis[0], 1.0, 1e-4);
+        TS_ASSERT_DELTA(division_axis[1], 0.0, 1e-4);
     }
 
     void TestArchiveCryptCentreBasedDivisionRule() throw(Exception)

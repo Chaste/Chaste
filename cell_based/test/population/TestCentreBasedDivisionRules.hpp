@@ -214,8 +214,7 @@ public:
             location[0] = -0.73;
             location[1] = 5.82;
 
-            typedef FixedCentreBasedDivisionRule<2,2> FixedRule;
-            MAKE_PTR_ARGS(FixedRule, p_division_rule, (location));
+            boost::shared_ptr<AbstractCentreBasedDivisionRule<2,2> > p_division_rule(new FixedCentreBasedDivisionRule<2,2>(location));
 
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
             boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();

@@ -57,7 +57,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
-///\todo #2800 add explicit tests for ShortAxisVertexBasedDivisionRule
 class TestVertexBasedDivisionRules : public AbstractCellBasedTestSuite
 {
 public:
