@@ -36,19 +36,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FixedCentreBasedDivisionRule.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-FixedCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM>::FixedCentreBasedDivisionRule()
-{
-    mDaughterLocation = zero_vector<double>(SPACE_DIM);
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void FixedCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM>::SetDaughterLocation(c_vector<double, SPACE_DIM>& rDaughterLocation)
+FixedCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM>::FixedCentreBasedDivisionRule(c_vector<double, SPACE_DIM>& rDaughterLocation)
 {
     mDaughterLocation = rDaughterLocation;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-c_vector<double, SPACE_DIM> FixedCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM>::GetDaughterLocation()
+const c_vector<double, SPACE_DIM>& FixedCentreBasedDivisionRule<ELEMENT_DIM,SPACE_DIM>::rGetDaughterLocation() const
 {
     return mDaughterLocation;
 }
@@ -77,4 +71,3 @@ template class FixedCentreBasedDivisionRule<3,3>;
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
 EXPORT_TEMPLATE_CLASS_ALL_DIMS(FixedCentreBasedDivisionRule)
-

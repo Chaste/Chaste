@@ -431,8 +431,7 @@ public:
             new_cell_location[1] = 1.4;
 
 	        typedef FixedCentreBasedDivisionRule<2,2> FixedRule;
-			MAKE_PTR(FixedRule, p_div_rule);
-			p_div_rule->SetDaughterLocation(new_cell_location);
+			MAKE_PTR_ARGS(FixedRule, p_div_rule, (new_cell_location));
 			node_based_cell_population.SetCentreBasedDivisionRule(p_div_rule);
 
             CellPtr p_parent_cell = node_based_cell_population.GetCellUsingLocationIndex(PetscTools::GetNumProcs());

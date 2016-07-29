@@ -38,6 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
+#include <boost/serialization/vector.hpp>
 
 #include "AbstractVertexBasedDivisionRule.hpp"
 #include "VertexBasedCellPopulation.hpp"
@@ -46,8 +47,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned SPACE_DIM> class VertexBasedCellPopulation;
 template<unsigned SPACE_DIM> class AbstractVertexBasedDivisionRule;
 /**
- * A class to generate a division vector of unit length specified by the user
- * through the method SetDivisionVector().
+ * A class to generate a division vector of unit length specified in
+ * the class constructor.
  * 
  * This helper class is used in TestVertexhBasedCellPopulation.hpp.
  */
@@ -58,7 +59,7 @@ private:
 
     /**
      * The specified division vector.
-     * Initialized to the vector whose first element is one in the constructor.
+     * Initialized in the constructor.
      */
     c_vector<double, SPACE_DIM> mDivisionVector;
 
@@ -73,15 +74,16 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & boost::serialization::base_object<AbstractVertexBasedDivisionRule<SPACE_DIM> >(*this);
-        archive & mDivisionVector;
     }
 
 public:
 
     /**
      * Default constructor.
+     *
+     * @param rDivisionVector the specified division vector
      */
-    FixedVertexBasedDivisionRule();
+    FixedVertexBasedDivisionRule(c_vector<double, SPACE_DIM>& rDivisionVector);
 
     /**
      * Empty destructor.
@@ -91,16 +93,9 @@ public:
     }
 
     /**
-     * Set mDivisionVector.
-     *
-     * @param rDivisionVector the division vector
-     */
-    void SetDivisionVector(c_vector<double, SPACE_DIM>& rDivisionVector);
-
-    /**
      * @return mDivisionVector.
      */
-    c_vector<double, SPACE_DIM> GetDivisionVector();
+    const c_vector<double, SPACE_DIM>& rGetDivisionVector() const;
 
     /**
      * Overridden CalculateCellDivisionVector() method.
@@ -119,5 +114,43 @@ public:
 #include "SerializationExportWrapper.hpp"
 EXPORT_TEMPLATE_CLASS_SAME_DIMS(FixedVertexBasedDivisionRule)
 
-#endif // FIXEDVERTEXBASEDDIVISIONRULE_HPP_
+namespace boost
+{
+namespace serialization
+{
+/**
+ * Serialize information required to construct a FixedVertexBasedDivisionRule.
+ */
+template<class Archive, unsigned SPACE_DIM>
+inline void save_construct_data(
+    Archive & ar, const FixedVertexBasedDivisionRule<SPACE_DIM>* t, const unsigned int file_version)
+{
+    // Archive c_vector one component at a time
+    c_vector<double, SPACE_DIM> vector = t->rGetDivisionVector();
+    for (unsigned i=0; i<SPACE_DIM; i++)
+    {
+        ar << vector[i];
+    }
+}
 
+/**
+ * De-serialize constructor parameters and initialize a FixedVertexBasedDivisionRule.
+ */
+template<class Archive, unsigned SPACE_DIM>
+inline void load_construct_data(
+    Archive & ar, FixedVertexBasedDivisionRule<SPACE_DIM>* t, const unsigned int file_version)
+{
+    // Archive c_vector one component at a time
+    c_vector<double, SPACE_DIM> vector;
+    for (unsigned i=0; i<SPACE_DIM; i++)
+    {
+        ar >> vector[i];
+    }
+
+    // Invoke inplace constructor to initialise instance
+    ::new(t)FixedVertexBasedDivisionRule<SPACE_DIM>(vector);
+}
+}
+} // namespace ...
+
+#endif // FIXEDVERTEXBASEDDIVISIONRULE_HPP_

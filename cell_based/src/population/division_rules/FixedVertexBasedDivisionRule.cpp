@@ -34,12 +34,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "FixedVertexBasedDivisionRule.hpp"
+#include "Exception.hpp"
 
 template <unsigned SPACE_DIM>
-FixedVertexBasedDivisionRule<SPACE_DIM>::FixedVertexBasedDivisionRule()
+FixedVertexBasedDivisionRule<SPACE_DIM>::FixedVertexBasedDivisionRule(c_vector<double, SPACE_DIM>& rDivisionVector)
 {
-    mDivisionVector = zero_vector<double>(SPACE_DIM);
-    mDivisionVector(0) = 1.0;
+    mDivisionVector = rDivisionVector;
 }
 
 template <unsigned SPACE_DIM>
@@ -51,14 +51,7 @@ c_vector<double, SPACE_DIM> FixedVertexBasedDivisionRule<SPACE_DIM>::CalculateCe
 }
 
 template <unsigned SPACE_DIM>
-void FixedVertexBasedDivisionRule<SPACE_DIM>::SetDivisionVector(c_vector<double, SPACE_DIM>& rDivisionVector)
-{
-	///\todo #2800 throw exception if rDivisionVector is not a unit vector
-    mDivisionVector = rDivisionVector;
-}
-
-template <unsigned SPACE_DIM>
-c_vector<double, SPACE_DIM> FixedVertexBasedDivisionRule<SPACE_DIM>::GetDivisionVector()
+const c_vector<double, SPACE_DIM>& FixedVertexBasedDivisionRule<SPACE_DIM>::rGetDivisionVector() const
 {
     return mDivisionVector;
 }

@@ -389,7 +389,6 @@ public:
 
     void TestAddCellWithSimpleMesh() throw (Exception)
     {
-        // This also tests the correct implementation of ShortAxisVertexBasedDivisionRule.
         // Make some nodes
         std::vector<Node<2>*> nodes;
         nodes.push_back(new Node<2>(0, true, 2.0, -1.0));
@@ -561,8 +560,7 @@ public:
         cell_division_axis[0] = 1.0;
         cell_division_axis[1] = 0.0;
 
-		MAKE_PTR(FixedVertexBasedDivisionRule<2>, p_div_rule);
-		p_div_rule->SetDivisionVector(cell_division_axis);
+		MAKE_PTR_ARGS(FixedVertexBasedDivisionRule<2>, p_div_rule, (cell_division_axis));
 		cell_population.SetVertexBasedDivisionRule(p_div_rule);
 
         FixedDurationGenerationBasedCellCycleModel* p_model2 = new FixedDurationGenerationBasedCellCycleModel();

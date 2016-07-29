@@ -48,6 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellBasedTestSuite.hpp"
 #include "AbstractVertexBasedDivisionRule.hpp"
 #include "DiagonalVertexBasedDivisionRule.hpp"
+#include "ShortAxisVertexBasedDivisionRule.hpp"
 #include "RandomDirectionVertexBasedDivisionRule.hpp"
 #include "FixedVertexBasedDivisionRule.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
@@ -61,7 +62,7 @@ class TestVertexBasedDivisionRules : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestAddCellwithDiagonalVertexBasedDivisionRule()
+    void TestDiagonalVertexBasedDivisionRule()
     {
         /**
          * In this test we basically test that the AbstractVertexBasedDivisionRule is implemented and joined with the population
@@ -129,6 +130,66 @@ public:
         TS_ASSERT_DELTA(cell_population.GetNode(old_num_nodes)->rGetLocation()[1], 1.0, 1e-12);
         TS_ASSERT_DELTA(cell_population.GetNode(old_num_nodes+1)->rGetLocation()[0], -1.0, 1e-12);
         TS_ASSERT_DELTA(cell_population.GetNode(old_num_nodes+1)->rGetLocation()[1], -1.0, 1e-12);
+    }
+
+    void TestFixedVertexBasedDivisionRule()
+    {
+        // Make some nodes
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true, 2.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 0.0, 2.0));
+        nodes.push_back(new Node<2>(2, true, -2.0, 0.0));
+        nodes.push_back(new Node<2>(3, true, 0.0, -2.0));
+
+        // Make a rectangular element out of nodes 0,1,2,3
+        std::vector<Node<2>*> nodes_elem_1;
+        nodes_elem_1.push_back(nodes[0]);
+        nodes_elem_1.push_back(nodes[1]);
+        nodes_elem_1.push_back(nodes[2]);
+        nodes_elem_1.push_back(nodes[3]);
+
+        std::vector<VertexElement<2,2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_1));
+
+        // Make a vertex mesh
+        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 1u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 4u);
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 1> cells_generator;
+        cells_generator.GenerateBasic(cells, vertex_mesh.GetNumElements());
+
+        // Create a cell population
+        VertexBasedCellPopulation<2> cell_population(vertex_mesh, cells);
+
+        CellPtr p_cell0 = cell_population.GetCellUsingLocationIndex(0);
+
+        c_vector<double, 2> expected_vector;
+        expected_vector(0) = 6.0/5.0;
+        expected_vector(1) = 3.0/5.0;
+
+        TS_ASSERT_THROWS_THIS(new FixedVertexBasedDivisionRule<2>(expected_vector),
+            "Input argument must be a unit vector");
+
+        expected_vector(0) = 4.0/5.0;
+
+        // Set the division rule
+        MAKE_PTR_ARGS(FixedVertexBasedDivisionRule<2>, p_division_rule_to_set, (expected_vector));
+        cell_population.SetVertexBasedDivisionRule(p_division_rule_to_set);
+
+        // Get the division rule back from the population
+        boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule = cell_population.GetVertexBasedDivisionRule();
+
+        c_vector<double, 2> division_vector = boost::static_pointer_cast<FixedVertexBasedDivisionRule<2> >(p_division_rule)->rGetDivisionVector();
+        TS_ASSERT_DELTA(division_vector(0), 0.8, 1e-6);
+        TS_ASSERT_DELTA(division_vector(1), 0.6, 1e-6);
+
+        c_vector<double, 2> division_vector_again = p_division_rule->CalculateCellDivisionVector(p_cell0, cell_population);
+        TS_ASSERT_DELTA(division_vector_again(0), 0.8, 1e-6);
+        TS_ASSERT_DELTA(division_vector_again(1), 0.6, 1e-6);
     }
 
     void TestRandomDirectionVertexBasedDivisionRule()
@@ -210,70 +271,119 @@ public:
         TS_ASSERT_DELTA(angle_variance, M_PI*M_PI/12.0, 1e-2);
     }
 
-    void TestFixedVertexBasedDivisionRule()
-    {
-        // Make some nodes
-        std::vector<Node<2>*> nodes;
-        nodes.push_back(new Node<2>(0, true, 2.0, 0.0));
-        nodes.push_back(new Node<2>(1, true, 0.0, 2.0));
-        nodes.push_back(new Node<2>(2, true, -2.0, 0.0));
-        nodes.push_back(new Node<2>(3, true, 0.0, -2.0));
+	void TestShortAxisVertexBasedDivisionRule()
+	{
+		// Create a vertex mesh
+		std::vector<Node<2>*> nodes;
+		nodes.push_back(new Node<2>(0, true, 2.0, -1.0));
+		nodes.push_back(new Node<2>(1, true, 2.0, 1.0));
+		nodes.push_back(new Node<2>(2, true, -2.0, 1.0));
+		nodes.push_back(new Node<2>(3, true, -2.0, -1.0));
+		nodes.push_back(new Node<2>(4, true, 0.0, 2.0));
 
-        // Make a rectangular element out of nodes 0,1,2,3
-        std::vector<Node<2>*> nodes_elem_1;
-        nodes_elem_1.push_back(nodes[0]);
-        nodes_elem_1.push_back(nodes[1]);
-        nodes_elem_1.push_back(nodes[2]);
-        nodes_elem_1.push_back(nodes[3]);
+		std::vector<Node<2>*> nodes_elem_1;
+		nodes_elem_1.push_back(nodes[0]);
+		nodes_elem_1.push_back(nodes[1]);
+		nodes_elem_1.push_back(nodes[2]);
+		nodes_elem_1.push_back(nodes[3]);
 
-        std::vector<VertexElement<2,2>*> vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_1));
+		std::vector<Node<2>*> nodes_elem_2;
+		nodes_elem_2.push_back(nodes[1]);
+		nodes_elem_2.push_back(nodes[4]);
+		nodes_elem_2.push_back(nodes[2]);
 
-        // Make a vertex mesh
-        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+		std::vector<VertexElement<2,2>*> vertex_elements;
+		vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_1));
+		vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_2));
 
-        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 1u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 4u);
+		MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
 
-        // Create cells
-        std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 1> cells_generator;
-        cells_generator.GenerateBasic(cells, vertex_mesh.GetNumElements());
+		// Create cells
+		std::vector<CellPtr> cells;
+		CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+		cells_generator.GenerateBasic(cells, vertex_mesh.GetNumElements());
 
-        // Create a cell population
-        VertexBasedCellPopulation<2> cell_population(vertex_mesh, cells);
+		// Create cell population
+		VertexBasedCellPopulation<2> cell_population(vertex_mesh, cells);
 
-        CellPtr p_cell0 = cell_population.GetCellUsingLocationIndex(0);
+		// Note: ShortAxisVertexBasedDivisionRule is the default division rule for vertex-based cell populations
 
-        // Set the division rule
-        boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule_to_set(new FixedVertexBasedDivisionRule<2>());
-
-        c_vector<double, 2> default_vector = p_division_rule_to_set->GetDivisionVector();
-        TS_ASSERT_DELTA(default_vector(0), 1.0, 1e-6);
-        TS_ASSERT_DELTA(default_vector(1), 0.0, 1e-6);
-
-        c_vector<double, 2> expected_vector;
-        expected_vector(0) = 6.0/5.0;
-        expected_vector(1) = 3.0/5.0;
-
-        TS_ASSERT_THROWS_THIS(p_division_rule_to_set->SetDivisionVector(expected_vector),
-            "Input argument must be a unit vector");
-
-        expected_vector(0) = 4.0/5.0;
-        p_division_rule_to_set->SetDivisionVector(expected_vector);
-
-        cell_population.SetVertexBasedDivisionRule(p_division_rule_to_set);
+		CellPtr p_cell0 = cell_population.GetCellUsingLocationIndex(0);
 
         // Get the division rule back from the population
-        boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule = cell_population.GetVertexBasedDivisionRule();
+		boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule = cell_population.GetVertexBasedDivisionRule();
+		c_vector<double, 2> short_axis = p_division_rule->CalculateCellDivisionVector(p_cell0, cell_population);
 
-        c_vector<double, 2> division_vector = p_division_rule->GetDivisionVector();
-        TS_ASSERT_DELTA(division_vector(0), 0.8, 1e-6);
-        TS_ASSERT_DELTA(division_vector(1), 0.6, 1e-6);
+		TS_ASSERT_DELTA(short_axis[0], 0.0, 1e-9);
+		TS_ASSERT_DELTA(short_axis[1], 1.0, 1e-9);
+	}
 
-        c_vector<double, 2> division_vector_again = p_division_rule->CalculateCellDivisionVector(p_cell0, cell_population);
-        TS_ASSERT_DELTA(division_vector_again(0), 0.8, 1e-6);
-        TS_ASSERT_DELTA(division_vector_again(1), 0.6, 1e-6);
+    void TestArchiveDiagonalVertexBasedDivisionRule() throw(Exception)
+    {
+        FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
+        std::string archive_file = "DiagonalVertexBasedDivisionRule.arch";
+
+        // Create data structures to store variables to test for equality here
+        {
+            boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule(new DiagonalVertexBasedDivisionRule<2>());
+
+            // Create output archive
+            ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
+            boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
+
+            // Record values to test into data structures
+            (*p_arch) << p_division_rule;
+        }
+
+        {
+            boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule;
+
+            // Create an input archive
+            ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
+            boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
+
+            // Restore from the archive
+            (*p_arch) >> p_division_rule;
+
+            TS_ASSERT(dynamic_cast <DiagonalVertexBasedDivisionRule<2>* > (p_division_rule.get()));
+        }
+    }
+
+    void TestArchiveFixedVertexBasedDivisionRule() throw(Exception)
+    {
+        FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
+        std::string archive_file = "FixedVertexBasedDivisionRule.arch";
+
+        // Create data structures to store variables to test for equality here
+        {
+            c_vector<double, 2> vector;
+            vector(0) = 8.3;
+            vector(1) = 9.2;
+            boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule(new FixedVertexBasedDivisionRule<2>(vector));
+
+            // Create output archive
+            ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
+            boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
+
+            // Record values to test into data structures
+            (*p_arch) << p_division_rule;
+        }
+
+        {
+            boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule;
+
+            ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
+            boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
+
+            // Restore from the archive
+            (*p_arch) >> p_division_rule;
+
+            TS_ASSERT(dynamic_cast<FixedVertexBasedDivisionRule<2>*>(p_division_rule.get()));
+
+            c_vector<double, 2> location = (dynamic_cast<FixedVertexBasedDivisionRule<2>*>(p_division_rule.get()))->rGetDivisionVector();
+            TS_ASSERT_DELTA(location[0], 8.3, 1e-6);
+            TS_ASSERT_DELTA(location[1], 9.2, 1e-6);
+        }
     }
 
     void TestArchiveRandomDirectionVertexBasedDivisionRule() throw(Exception)
@@ -290,9 +400,6 @@ public:
             boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
 
             // Record values to test into data structures
-            // If necessary you can use static_cast<ConcreteClass*>(p_abstract_class)
-            // (if your abstract class doesn't contain the necessary variables and methods)
-
             (*p_arch) << p_division_rule;
         }
 
@@ -303,34 +410,27 @@ public:
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
             boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
 
-            // restore from the archive
+            // Restore from the archive
             (*p_arch) >> p_division_rule;
 
-            // Check things in the data structures with TS_ASSERTS here.
-            // If necessary you can use static_cast<ConcreteClass*>(p_abstract_class_2)
-            // (if your abstract class doesn't contain the necessary variables and methods)
-            // Check that we have got back the right kind of division rule.
-            TS_ASSERT(dynamic_cast <RandomDirectionVertexBasedDivisionRule<2>* > (p_division_rule.get()));
+            TS_ASSERT(dynamic_cast<RandomDirectionVertexBasedDivisionRule<2>*>(p_division_rule.get()));
         }
     }
 
-    void TestArchiveDiagonalVertexBasedDivisionRule() throw(Exception)
+    void TestArchiveShortAxisVertexBasedDivisionRule() throw(Exception)
     {
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
-        std::string archive_file = "DiagonalVertexBasedDivisionRule.arch";
+        std::string archive_file = "ShortAxisVertexBasedDivisionRule.arch";
 
         // Create data structures to store variables to test for equality here
         {
-            boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule(new DiagonalVertexBasedDivisionRule<2>());
+            boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule(new ShortAxisVertexBasedDivisionRule<2>());
 
             // Create output archive
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
             boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
 
             // Record values to test into data structures
-            // If necessary you can use static_cast<ConcreteClass*>(p_abstract_class)
-            // (if your abstract class doesn't contain the necessary variables and methods)
-
             (*p_arch) << p_division_rule;
         }
 
@@ -341,40 +441,10 @@ public:
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
             boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
 
-            // restore from the archive
+            // Restore from the archive
             (*p_arch) >> p_division_rule;
 
-            // Check things in the data structures with TS_ASSERTS here.
-            // If necessary you can use static_cast<ConcreteClass*>(p_abstract_class_2)
-            // (if your abstract class doesn't contain the necessary variables and methods)
-            // Check that we have got back the right kind of division rule.
-            TS_ASSERT(dynamic_cast <DiagonalVertexBasedDivisionRule<2>* > (p_division_rule.get()));
-        }
-    }
-
-    void TestArchiveFixedVertexBasedDivisionRule() throw(Exception)
-    {
-        FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
-        std::string archive_file = "FixedVertexBasedDivisionRule.arch";
-
-        {
-            boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule(new FixedVertexBasedDivisionRule<2>());
-
-            ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
-            boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
-
-            (*p_arch) << p_division_rule;
-        }
-
-        {
-            boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule;
-
-            ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
-            boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
-
-            (*p_arch) >> p_division_rule;
-
-            TS_ASSERT(dynamic_cast <FixedVertexBasedDivisionRule<2>* >(p_division_rule.get()));
+            TS_ASSERT(dynamic_cast<ShortAxisVertexBasedDivisionRule<2>*>(p_division_rule.get()));
         }
     }
 };

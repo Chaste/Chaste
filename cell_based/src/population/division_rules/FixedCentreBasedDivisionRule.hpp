@@ -49,8 +49,8 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCentreBasedDivi
 
 /**
  * A class to generate two daughter cell positions, one given by the
- * position of the dividing cell and the other specified by the user
- * through the method SetDaughterLocation().
+ * position of the dividing cell and the other specified in the
+ * class constructor.
  * 
  * This helper class is used in TestMeshBasedCellPopulation.hpp and
  * TestNodeBasedCellPopulation.hpp.
@@ -62,7 +62,7 @@ private:
 
     /**
      * The specified location of the new daughter cell.
-     * Initialized to the zero vector in the constructor.
+     * Initialized in the constructor.
      */
     c_vector<double, SPACE_DIM> mDaughterLocation;
 
@@ -77,15 +77,16 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & boost::serialization::base_object<AbstractCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM> >(*this);
-        archive & mDaughterLocation;
     }
 
 public:
 
     /**
      * Default constructor.
+     *
+     * @param rDaughterLocation the specified location of the daughter cell
      */
-    FixedCentreBasedDivisionRule();
+    FixedCentreBasedDivisionRule(c_vector<double, SPACE_DIM>& rDaughterLocation);
 
     /**
      * Empty destructor.
@@ -95,16 +96,9 @@ public:
     }
 
     /**
-     * Set mDaughterLocation.
-     *
-     * @param rDaughterLocation the specified location of the daughter cell
-     */
-    void SetDaughterLocation(c_vector<double, SPACE_DIM>& rDaughterLocation);
-
-    /**
      * @return mDaughterLocation.
      */
-    c_vector<double, SPACE_DIM> GetDaughterLocation();
+    const c_vector<double, SPACE_DIM>& rGetDaughterLocation() const;
 
     /**
      * Overridden CalculateCellDivisionVector() method.
@@ -120,5 +114,44 @@ public:
 
 #include "SerializationExportWrapper.hpp"
 EXPORT_TEMPLATE_CLASS_ALL_DIMS(FixedCentreBasedDivisionRule)
+
+namespace boost
+{
+namespace serialization
+{
+/**
+ * Serialize information required to construct a FixedCentreBasedDivisionRule.
+ */
+template<class Archive, unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+inline void save_construct_data(
+    Archive & ar, const FixedCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM>* t, const unsigned int file_version)
+{
+    // Archive c_vector one component at a time
+    c_vector<double, SPACE_DIM> location = t->rGetDaughterLocation();
+    for (unsigned i=0; i<SPACE_DIM; i++)
+    {
+        ar << location[i];
+    }
+}
+
+/**
+ * De-serialize constructor parameters and initialize a FixedCentreBasedDivisionRule.
+ */
+template<class Archive, unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+inline void load_construct_data(
+    Archive & ar, FixedCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM>* t, const unsigned int file_version)
+{
+    // Archive c_vector one component at a time
+    c_vector<double, SPACE_DIM> location;
+    for (unsigned i=0; i<SPACE_DIM; i++)
+    {
+        ar >> location[i];
+    }
+
+    // Invoke inplace constructor to initialise instance
+    ::new(t)FixedCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM>(location);
+}
+}
+} // namespace ...
 
 #endif // FIXEDCENTREBASEDDIVISIONRULE_HPP_

@@ -404,8 +404,7 @@ public:
         new_cell_location[1] = 2;
 
         typedef FixedCentreBasedDivisionRule<2,2> FixedRule;
-        MAKE_PTR(FixedRule, p_div_rule);
-        p_div_rule->SetDaughterLocation(new_cell_location);
+        MAKE_PTR_ARGS(FixedRule, p_div_rule, (new_cell_location));
         cell_population.SetCentreBasedDivisionRule(p_div_rule);
 
         cell_population.AddCell(p_cell, cell_population.rGetCells().front()); // random choice of parent

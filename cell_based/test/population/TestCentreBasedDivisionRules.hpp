@@ -155,15 +155,10 @@ public:
 
         // Set the division rule for our population to be the random direction division rule
         typedef FixedCentreBasedDivisionRule<2,2> FixedRule;
-        MAKE_PTR(FixedRule, p_division_rule_to_set);
+        MAKE_PTR_ARGS(FixedRule, p_division_rule_to_set, (expected_daughter_location));
 
-        TS_ASSERT_DELTA(p_division_rule_to_set->GetDaughterLocation()[0], 0.0, 1e-6);
-        TS_ASSERT_DELTA(p_division_rule_to_set->GetDaughterLocation()[1], 0.0, 1e-6);
-
-        p_division_rule_to_set->SetDaughterLocation(expected_daughter_location);
-
-        TS_ASSERT_DELTA(p_division_rule_to_set->GetDaughterLocation()[0], 1.2, 1e-6);
-        TS_ASSERT_DELTA(p_division_rule_to_set->GetDaughterLocation()[1], 3.4, 1e-6);
+        TS_ASSERT_DELTA(p_division_rule_to_set->rGetDaughterLocation()[0], 1.2, 1e-6);
+        TS_ASSERT_DELTA(p_division_rule_to_set->rGetDaughterLocation()[1], 3.4, 1e-6);
 
         cell_population.SetCentreBasedDivisionRule(p_division_rule_to_set);
 
@@ -220,8 +215,7 @@ public:
             location[1] = 5.82;
 
             typedef FixedCentreBasedDivisionRule<2,2> FixedRule;
-            MAKE_PTR(FixedRule, p_division_rule);
-            p_division_rule->SetDaughterLocation(location);
+            MAKE_PTR_ARGS(FixedRule, p_division_rule, (location));
 
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
             boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
@@ -240,7 +234,7 @@ public:
             typedef FixedCentreBasedDivisionRule<2,2> FixedRule;
             TS_ASSERT(dynamic_cast<FixedRule*>(p_division_rule.get()));
 
-            c_vector<double, 2> location = (dynamic_cast<FixedRule*>(p_division_rule.get()))->GetDaughterLocation();
+            c_vector<double, 2> location = (dynamic_cast<FixedRule*>(p_division_rule.get()))->rGetDaughterLocation();
             TS_ASSERT_DELTA(location[0], -0.73, 1e-6);
             TS_ASSERT_DELTA(location[1], 5.82, 1e-6);
         }

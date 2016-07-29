@@ -44,8 +44,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ArchiveOpener.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "CellsGenerator.hpp"
+#include "MeshBasedCellPopulation.hpp"
 #include "NodeBasedCellPopulation.hpp"
+#include "CryptCellsGenerator.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "RandomDirectionCentreBasedDivisionRule.hpp"
 #include "CryptCentreBasedDivisionRule.hpp"
@@ -82,7 +85,7 @@ public:
             cells.push_back(p_cell);
         }
 
-        MeshBasedCellPopulation<1> cell_population(mesh, cells);
+        MeshBasedCellPopulation<1,1> cell_population(mesh, cells);
 
         CellPtr p_cell0 = cell_population.GetCellUsingLocationIndex(0);
 
@@ -115,11 +118,11 @@ public:
 
         // Create cells
         std::vector<CellPtr> conf_cells;
-        CryptCellsGenerator<TysonNovakCellCycleModel> cells_generator;
+        CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
         cells_generator.Generate(conf_cells, &conf_mesh, std::vector<unsigned>(), true);
 
         // Create cell population
-        MeshBasedCellPopulation<2> cell_population(conf_mesh, conf_cells);
+        MeshBasedCellPopulation<2,2> cell_population(conf_mesh, conf_cells);
         cell_population.SetMeinekeDivisionSeparation(0.1);
 
         CellPtr p_cell0 = *(cell_population.Begin());
@@ -153,7 +156,7 @@ public:
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel,3> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
-        MeshBasedCellPopulation<3> cell_population(mesh, cells);
+        MeshBasedCellPopulation<3,3> cell_population(mesh, cells);
 
         CellPtr p_cell0 = *(cell_population.Begin());
 
@@ -238,7 +241,7 @@ public:
         std::string archive_file = "CryptVertexBasedDivisionRule.arch";
 
         {
-            boost::shared_ptr<AbstractCentreBasedDivisionRule<2,2> > p_division_rule(new CryptVertexBasedDivisionRule<2,2>());
+            boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule(new CryptVertexBasedDivisionRule<2>());
 
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
             boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
@@ -247,14 +250,14 @@ public:
         }
 
         {
-            boost::shared_ptr<AbstractCentreBasedDivisionRule<2,2> > p_division_rule;
+            boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule;
 
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
             boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
 
             (*p_arch) >> p_division_rule;
 
-            typedef CryptVertexBasedDivisionRule<2,2> CryptRule;
+            typedef CryptVertexBasedDivisionRule<2> CryptRule;
             TS_ASSERT(dynamic_cast<CryptRule*>(p_division_rule.get()));
         }
     }
