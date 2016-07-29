@@ -160,7 +160,7 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellLocationsAndTopology
             {
                 ///\todo #2087 Make this a settable member variable
                 double timestep_increase = 0.01;
-                present_time_step = fmin((1+timestep_increase)*present_time_step, target_time_step - time_advanced_so_far);
+                present_time_step = std::min((1+timestep_increase)*present_time_step, target_time_step - time_advanced_so_far);
             }
 
         }
@@ -171,7 +171,7 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellLocationsAndTopology
             {
                 // If adaptivity is switched on, revert node locations and choose a suitably smaller time step
                 RevertToOldLocations(old_node_locations);
-                present_time_step = fmin(e.GetSuggestedNewStep(), target_time_step - time_advanced_so_far);
+                present_time_step = std::min(e.GetSuggestedNewStep(), target_time_step - time_advanced_so_far);
             }
             else
             {
