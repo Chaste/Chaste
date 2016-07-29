@@ -153,13 +153,14 @@ foreach( LIB ${SUNDIALS_WANT_COMPONENTS} )
 endforeach()
 
 # find blas and lapack
-find_package(LAPACK REQUIRED)
+# (sundials on ubuntu 12.04 need to explicitly link against lapack)
 if (BUILD_SHARED_LIBS)
-    find_package(LAPACK REQUIRED)
+    find_package(LAPACK)
 else()
     set(BLA_STATIC ON)
-    find_package(LAPACK REQUIRED)
+    find_package(LAPACK)
 endif()
+    
 
 list(APPEND SUNDIALS_LIBRARIES ${LAPACK_LIBRARIES})
 
