@@ -50,7 +50,7 @@ template<unsigned SPACE_DIM> class AbstractVertexBasedDivisionRule;
  * A class to generate a division vector of unit length that points in a random direction.
  */
 template <unsigned SPACE_DIM>
-class RandomDirectionVertexBasedDivisionRule  : public AbstractVertexBasedDivisionRule<SPACE_DIM>
+class RandomDirectionVertexBasedDivisionRule : public AbstractVertexBasedDivisionRule<SPACE_DIM>
 {
 private:
     friend class boost::serialization::access;

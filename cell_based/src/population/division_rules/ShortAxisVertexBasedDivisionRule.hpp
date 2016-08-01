@@ -55,7 +55,7 @@ template<unsigned SPACE_DIM> class AbstractVertexBasedDivisionRule;
  * of the moment of inertia of the cell's polygon.
  */
 template <unsigned SPACE_DIM>
-class ShortAxisVertexBasedDivisionRule  : public AbstractVertexBasedDivisionRule<SPACE_DIM>
+class ShortAxisVertexBasedDivisionRule : public AbstractVertexBasedDivisionRule<SPACE_DIM>
 {
 private:
     friend class boost::serialization::access;
@@ -105,4 +105,3 @@ public:
 EXPORT_TEMPLATE_CLASS_SAME_DIMS(ShortAxisVertexBasedDivisionRule)
 
 #endif // SHORTAXISVERTEXBASEDDIVISIONRULE_HPP_
-

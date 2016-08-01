@@ -664,8 +664,6 @@ public:
 
         CellPtr p_new_cell = cell_population.GetCellUsingLocationIndex(4)->Divide();
 
-        c_vector<double, 2> new_location = cell_population.GetVertexBasedDivisionRule()->CalculateCellDivisionVector(p_cell4, cell_population);
-
         // Add new cell to the cell population
         cell_population.AddCell(p_new_cell, p_cell4);
 
