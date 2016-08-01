@@ -356,8 +356,8 @@ public:
         // Create data structures to store variables to test for equality here
         {
             c_vector<double, 2> vector;
-            vector(0) = 8.3;
-            vector(1) = 9.2;
+            vector(0) = 5.0/13.0;
+            vector(1) = 12.0/13.0;
             boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule(new FixedVertexBasedDivisionRule<2>(vector));
 
             // Create output archive
@@ -380,8 +380,8 @@ public:
             TS_ASSERT(dynamic_cast<FixedVertexBasedDivisionRule<2>*>(p_division_rule.get()));
 
             c_vector<double, 2> location = (dynamic_cast<FixedVertexBasedDivisionRule<2>*>(p_division_rule.get()))->rGetDivisionVector();
-            TS_ASSERT_DELTA(location[0], 8.3, 1e-6);
-            TS_ASSERT_DELTA(location[1], 9.2, 1e-6);
+            TS_ASSERT_DELTA(location[0], 5.0/13.0, 1e-6);
+            TS_ASSERT_DELTA(location[1], 12.0/13.0, 1e-6);
         }
     }
 
