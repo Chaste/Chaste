@@ -119,14 +119,14 @@ public:
     /**
      * Add an update rule to be used in this simulation.
      *
-     * @param pUpdateRule shared pointer to a CA update rule law
+     * @param pUpdateRule shared pointer to an update rule law
      */
-    void AddCaUpdateRule(boost::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule);
+    void AddUpdateRule(boost::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule);
 
     /**
      * Method to remove all the CaUpdateRules
      */
-    void RemoveAllCaUpdateRules();
+    void RemoveAllUpdateRules();
 
     /**
      * Add a switching update rule to be used in this simulation.
@@ -139,18 +139,6 @@ public:
      * Method to remove all the CaSwitchingUpdateRules
      */
     void RemoveAllCaSwitchingUpdateRules();
-
-    /**
-     * Add an update rule to be used in this simulation (use this to set the Hamiltonian).
-     *
-     * @param pUpdateRule shared pointer to a Potts update rule law
-     */
-    void AddPottsUpdateRule(boost::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule);
-
-    /**
-     * Method to remove all the PottsUpdateRules
-     */
-    void RemoveAllPottsUpdateRules();
 
     /**
      * Overridden OutputAdditionalSimulationSetup() method to output the force and cell

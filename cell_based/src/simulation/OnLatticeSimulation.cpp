@@ -56,15 +56,14 @@ OnLatticeSimulation<DIM>::OnLatticeSimulation(AbstractCellPopulation<DIM>& rCell
 }
 
 template<unsigned DIM>
-void OnLatticeSimulation<DIM>::AddCaUpdateRule(boost::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule)
+void OnLatticeSimulation<DIM>::AddUpdateRule(boost::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule)
 {
 	// This static_cast is fine, since otherwise an exception would have been thrown in the constructor
     static_cast<AbstractOnLatticeCellPopulation<DIM>*>(&(this->mrCellPopulation))->AddUpdateRule(pUpdateRule);
 }
 
-//\todo #2836 - merge with other remove method into a new method RemoveAllUpdateRules() (or just call the population method)
 template<unsigned DIM>
-void OnLatticeSimulation<DIM>::RemoveAllCaUpdateRules()
+void OnLatticeSimulation<DIM>::RemoveAllUpdateRules()
 {
 	// This static_cast is fine, since otherwise an exception would have been thrown in the constructor
     static_cast<AbstractOnLatticeCellPopulation<DIM>*>(&(this->mrCellPopulation))->RemoveAllUpdateRules();
@@ -86,20 +85,6 @@ void OnLatticeSimulation<DIM>::RemoveAllCaSwitchingUpdateRules()
     {
         static_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->RemoveAllSwitchingUpdateRules();
     }
-}
-
-template<unsigned DIM>
-void OnLatticeSimulation<DIM>::AddPottsUpdateRule(boost::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule)
-{
-	// This static_cast is fine, since otherwise an exception would have been thrown in the constructor
-    static_cast<AbstractOnLatticeCellPopulation<DIM>*>(&(this->mrCellPopulation))->AddUpdateRule(pUpdateRule);
-}
-
-template<unsigned DIM>
-void OnLatticeSimulation<DIM>::RemoveAllPottsUpdateRules()
-{
-	// This static_cast is fine, since otherwise an exception would have been thrown in the constructor
-    static_cast<AbstractOnLatticeCellPopulation<DIM>*>(&(this->mrCellPopulation))->RemoveAllUpdateRules();
 }
 
 template<unsigned DIM>
