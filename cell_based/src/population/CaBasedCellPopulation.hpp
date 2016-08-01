@@ -375,18 +375,6 @@ public:
     double GetWidth(const unsigned& rDimension);
 
     /**
-     * Add an update rule to be used in this simulation (use this to set up how cells move).
-     *
-     * @param pUpdateRule pointer to an update rule
-     */
-    void AddUpdateRule(boost::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule);
-
-    /**
-     * Method to remove all the update rules
-     */
-    void RemoveAllUpdateRules();
-
-    /**
      * Add a switching update rule to be used in this simulation (use this to set up how cells move).
      *
      * @param pUpdateRule pointer to an update rule
@@ -436,6 +424,13 @@ public:
      * @param pCaBasedDivisionRule  pointer to the new division rule
      */
     void SetCaBasedDivisionRule(boost::shared_ptr<AbstractCaBasedDivisionRule<DIM> > pCaBasedDivisionRule);
+
+    /**
+     * Overridden AddUpdateRule() method.
+     *
+     * @param pUpdateRule pointer to an update rule
+     */
+    virtual void AddUpdateRule(boost::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule);
 };
 
 #include "SerializationExportWrapper.hpp"

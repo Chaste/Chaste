@@ -408,12 +408,6 @@ void PottsBasedCellPopulation<DIM>::AddUpdateRule(boost::shared_ptr<AbstractUpda
 }
 
 template<unsigned DIM>
-void PottsBasedCellPopulation<DIM>::RemoveAllUpdateRules()
-{
-	this->mUpdateRuleCollection.clear();
-}
-
-template<unsigned DIM>
 void PottsBasedCellPopulation<DIM>::CreateElementTessellation()
 {
     ///\todo implement this method (#1666)

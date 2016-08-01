@@ -40,8 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 
 #include "AbstractCellBasedSimulation.hpp"
-#include "AbstractPottsUpdateRule.hpp"
-#include "AbstractCaUpdateRule.hpp"
+#include "AbstractUpdateRule.hpp"
 
 /**
  * Run an on-lattice 2D or 3D cell-based simulation.

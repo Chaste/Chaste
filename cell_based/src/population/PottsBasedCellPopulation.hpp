@@ -348,18 +348,6 @@ public:
     double GetWidth(const unsigned& rDimension);
 
     /**
-     * Add an update rule to be used in this simulation (use this to set up the Hamiltonian).
-     *
-     * @param pUpdateRule pointer to an update rule
-     */
-    void AddUpdateRule(boost::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule);
-
-    /**
-     * Method to remove all the update rules
-     */
-    void RemoveAllUpdateRules();
-
-    /**
      * Outputs CellPopulation parameters to file
      *
      * As this method is pure virtual, it must be overridden
@@ -421,6 +409,13 @@ public:
      * @param pVizSetupFile a visualization setup file
      */
     virtual void WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile);
+
+    /**
+     * Overridden AddUpdateRule() method.
+     *
+     * @param pUpdateRule pointer to an update rule
+     */
+    virtual void AddUpdateRule(boost::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule);
 };
 
 #include "SerializationExportWrapper.hpp"

@@ -177,7 +177,7 @@ public:
     std::set<unsigned> GetNeighbouringNodeIndices(unsigned index);
 
     /**
-     * Outputs CellPopulation parameters to file
+     * Outputs parameters to file.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
@@ -192,6 +192,21 @@ public:
      * simulate the cell population.
      */
     virtual double GetDefaultTimeStep();
+
+    /**
+     * Add an update rule to be used with this population.
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     *
+     * @param pUpdateRule pointer to an update rule
+     */
+    virtual void AddUpdateRule(boost::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule)=0;
+
+    /**
+     * Remove any update rules previously passed to this population.
+     */
+    void RemoveAllUpdateRules();
 
     /**
      * Get the collection of update rules to be used with this population.

@@ -127,6 +127,12 @@ const std::vector<boost::shared_ptr<AbstractUpdateRule<DIM> > >& AbstractOnLatti
     return mUpdateRuleCollection;
 }
 
+template<unsigned DIM>
+void AbstractOnLatticeCellPopulation<DIM>::RemoveAllUpdateRules()
+{
+	mUpdateRuleCollection.clear();
+}
+
 // Explicit instantiation
 template class AbstractOnLatticeCellPopulation<1>;
 template class AbstractOnLatticeCellPopulation<2>;

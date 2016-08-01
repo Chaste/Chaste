@@ -58,19 +58,16 @@ OnLatticeSimulation<DIM>::OnLatticeSimulation(AbstractCellPopulation<DIM>& rCell
 template<unsigned DIM>
 void OnLatticeSimulation<DIM>::AddCaUpdateRule(boost::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule)
 {
-    if (bool(dynamic_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))))
-    {
-        static_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->AddUpdateRule(pUpdateRule);
-    }
+	// This static_cast is fine, since otherwise an exception would have been thrown in the constructor
+    static_cast<AbstractOnLatticeCellPopulation<DIM>*>(&(this->mrCellPopulation))->AddUpdateRule(pUpdateRule);
 }
 
+//\todo #2836 - merge with other remove method into a new method RemoveAllUpdateRules() (or just call the population method)
 template<unsigned DIM>
 void OnLatticeSimulation<DIM>::RemoveAllCaUpdateRules()
 {
-    if (bool(dynamic_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))))
-    {
-        static_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->RemoveAllUpdateRules();
-    }
+	// This static_cast is fine, since otherwise an exception would have been thrown in the constructor
+    static_cast<AbstractOnLatticeCellPopulation<DIM>*>(&(this->mrCellPopulation))->RemoveAllUpdateRules();
 }
 
 template<unsigned DIM>
@@ -94,19 +91,15 @@ void OnLatticeSimulation<DIM>::RemoveAllCaSwitchingUpdateRules()
 template<unsigned DIM>
 void OnLatticeSimulation<DIM>::AddPottsUpdateRule(boost::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule)
 {
-    if (bool(dynamic_cast<PottsBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))))
-    {
-        static_cast<PottsBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->AddUpdateRule(pUpdateRule);
-    }
+	// This static_cast is fine, since otherwise an exception would have been thrown in the constructor
+    static_cast<AbstractOnLatticeCellPopulation<DIM>*>(&(this->mrCellPopulation))->AddUpdateRule(pUpdateRule);
 }
 
 template<unsigned DIM>
 void OnLatticeSimulation<DIM>::RemoveAllPottsUpdateRules()
 {
-    if (bool(dynamic_cast<PottsBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))))
-    {
-        static_cast<PottsBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->RemoveAllUpdateRules();
-    }
+	// This static_cast is fine, since otherwise an exception would have been thrown in the constructor
+    static_cast<AbstractOnLatticeCellPopulation<DIM>*>(&(this->mrCellPopulation))->RemoveAllUpdateRules();
 }
 
 template<unsigned DIM>

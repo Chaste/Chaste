@@ -547,12 +547,6 @@ void CaBasedCellPopulation<DIM>::AddUpdateRule(boost::shared_ptr<AbstractUpdateR
 }
 
 template<unsigned DIM>
-void CaBasedCellPopulation<DIM>::RemoveAllUpdateRules()
-{
-	this->mUpdateRuleCollection.clear();
-}
-
-template<unsigned DIM>
 void CaBasedCellPopulation<DIM>::AddSwitchingUpdateRule(boost::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule)
 {
 	assert(bool(dynamic_cast<AbstractCaSwitchingUpdateRule<DIM>*>(pUpdateRule.get())));
