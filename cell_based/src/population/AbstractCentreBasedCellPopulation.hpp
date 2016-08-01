@@ -268,7 +268,7 @@ public:
      * Overridden method to specify a division vector.
      *
      * \todo Generalize to allow the user to specify a rule for division 
-     *       orientation (#2834)
+     *       orientation (#2800)
      *
      * @param pParentCell the cell undergoing division
      * @return a vector containing information on cell division
@@ -281,6 +281,16 @@ public:
      * @param rParamsFile the file stream to which the parameters are output
      */
     virtual void OutputCellPopulationParameters(out_stream& rParamsFile);
+
+    /**
+     * Overridden method to get a default value for the time step to use 
+     * when simulating the cell population.
+     *
+     * A hard-coded value of 1/120 is returned. However, note that the time 
+     * step can be reset by calling SetDt() on the simulation object used to 
+     * simulate the cell population.
+     */
+    virtual double GetDefaultTimeStep();
 };
 
 #endif /*ABSTRACTCENTREBASEDCELLPOPULATION_HPP_*/

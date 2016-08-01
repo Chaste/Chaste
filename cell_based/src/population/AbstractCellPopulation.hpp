@@ -297,6 +297,18 @@ public:
                             const c_vector<double,SPACE_DIM>& rCellDivisionVector,
                             CellPtr pParentCell=CellPtr())=0;
 
+    /**
+     * Get a default value for the time step to use when simulating 
+     * the cell population.
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     *
+     * Note that the time step can be reset by calling SetDt() on the 
+     * simulation object used to simulate the cell population.
+     */
+    virtual double GetDefaultTimeStep()=0;
+
     class Iterator; // Forward declaration; see below
 
     /**

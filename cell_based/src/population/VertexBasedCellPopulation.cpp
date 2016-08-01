@@ -733,6 +733,12 @@ c_vector<double, DIM> VertexBasedCellPopulation<DIM>::CalculateCellDivisionVecto
     return mpVertexBasedDivisionRule->CalculateCellDivisionVector(pParentCell, *this);
 }
 
+template<unsigned DIM>
+double VertexBasedCellPopulation<DIM>::GetDefaultTimeStep()
+{
+    return 0.002;
+}
+
 // Explicit instantiation
 template class VertexBasedCellPopulation<1>;
 template class VertexBasedCellPopulation<2>;

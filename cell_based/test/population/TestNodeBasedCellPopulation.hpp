@@ -227,7 +227,7 @@ public:
         r_node_pairs.clear();
 
         // Set a new cut-off
-        if (PetscTools::IsSequential()) // This causes nodes to jump to different process in parallel.
+        if (PetscTools::IsSequential()) // This causes nodes to jump to different process in parallel
         {
             mesh.Clear();
             mesh.ConstructNodesWithoutMesh(generating_mesh, 1e-3);
@@ -235,6 +235,9 @@ public:
             cell_population.Update();
             TS_ASSERT(cell_population.rGetNodePairs().empty());
         }
+
+        // For coverage, test that GetDefaultTimeStep() returns the correct value
+        TS_ASSERT_DELTA(cell_population.GetDefaultTimeStep(), 1.0/120.0, 1e-6);
     }
 
     void TestUpdatingCellLocationMapOnDelete() throw (Exception)

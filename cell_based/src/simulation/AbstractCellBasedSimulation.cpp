@@ -73,6 +73,12 @@ AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::AbstractCellBasedSimulation(
     {
         mrCellPopulation.InitialiseCells();
     }
+
+    /*
+     * Specify a default time step to use, which may depend on the cell population type.
+     * Note that the time step may be reset using SetDt().
+     */
+    mDt = rCellPopulation.GetDefaultTimeStep();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

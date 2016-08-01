@@ -53,8 +53,6 @@ OnLatticeSimulation<DIM>::OnLatticeSimulation(AbstractCellPopulation<DIM>& rCell
     {
         EXCEPTION("OnLatticeSimulations require a subclass of AbstractOnLatticeCellPopulation.");
     }
-
-    this->mDt = 0.1; // 6 minutes
 }
 
 template<unsigned DIM>
