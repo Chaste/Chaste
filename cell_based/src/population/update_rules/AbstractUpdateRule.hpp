@@ -33,25 +33,65 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "AbstractCaUpdateRule.hpp"
+#ifndef ABSTRACTUPDATERULE_HPP_
+#define ABSTRACTUPDATERULE_HPP_
 
+#include "ChasteSerialization.hpp"
+#include "ClassIsAbstract.hpp"
+#include "Identifiable.hpp"
+#include "OutputFileHandler.hpp"
+
+/**
+ * An abstract update rule class, for use in on-lattice cell-based simulations.
+ */
 template<unsigned DIM>
-AbstractCaUpdateRule<DIM>::AbstractCaUpdateRule()
-    : AbstractUpdateRule<DIM>()
+class AbstractUpdateRule : public Identifiable
 {
-}
+    /** Needed for serialization. */
+    friend class boost::serialization::access;
+    /**
+     * Boost Serialization method for archiving/checkpointing.
+     * Archives the object and its member variables.
+     *
+     * @param archive  The boost archive.
+     * @param version  The current version of this class.
+     */
+    template<class Archive>
+    void serialize(Archive & archive, const unsigned int version)
+    {
+    }
 
-template<unsigned DIM>
-AbstractCaUpdateRule<DIM>::~AbstractCaUpdateRule()
-{
-}
+public:
 
-template<unsigned DIM>
-void AbstractCaUpdateRule<DIM>::OutputUpdateRuleParameters(out_stream& rParamsFile)
-{
-}
+    /**
+     * Default constructor.
+     */
+    AbstractUpdateRule();
 
-// Explicit instantiation
-template class AbstractCaUpdateRule<1>;
-template class AbstractCaUpdateRule<2>;
-template class AbstractCaUpdateRule<3>;
+    /**
+     * Destructor.
+     */
+    virtual ~AbstractUpdateRule();
+
+    /**
+     * Output update rule to file. Call OutputUpdateRuleParameters() to output
+     * all member variables to file.
+     *
+     * @param rParamsFile a file stream
+     */
+    void OutputUpdateRuleInfo(out_stream& rParamsFile);
+
+    /**
+     * Output update rule parameters to file.
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     *
+     * @param rParamsFile a file stream
+     */
+    virtual void OutputUpdateRuleParameters(out_stream& rParamsFile)=0;
+};
+
+TEMPLATED_CLASS_IS_ABSTRACT_1_UNSIGNED(AbstractUpdateRule)
+
+#endif /*ABSTRACTUPDATERULE_HPP_*/

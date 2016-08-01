@@ -70,12 +70,12 @@ void RandomCaSwitchingUpdateRule<DIM>::SetSwitchingParameter(double switchingPar
 }
 
 template<unsigned DIM>
-void RandomCaSwitchingUpdateRule<DIM>::OutputSwitchingUpdateRuleParameters(out_stream& rParamsFile)
+void RandomCaSwitchingUpdateRule<DIM>::OutputUpdateRuleParameters(out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<SwitchingParameter>" << mSwitchingParameter << "</SwitchingParameter>\n";
 
     // Call method on direct parent class
-    AbstractCaSwitchingUpdateRule<DIM>::OutputSwitchingUpdateRuleParameters(rParamsFile);
+    AbstractCaSwitchingUpdateRule<DIM>::OutputUpdateRuleParameters(rParamsFile);
 }
 
 // Explicit instantiation

@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned DIM>
 AbstractPottsUpdateRule<DIM>::AbstractPottsUpdateRule()
+    : AbstractUpdateRule<DIM>()
 {
 }
 
@@ -46,22 +47,11 @@ AbstractPottsUpdateRule<DIM>::~AbstractPottsUpdateRule()
 }
 
 template<unsigned DIM>
-void AbstractPottsUpdateRule<DIM>::OutputUpdateRuleInfo(out_stream& rParamsFile)
-{
-    std::string update_type = GetIdentifier();
-
-    *rParamsFile << "\t\t<" << update_type << ">\n";
-    OutputUpdateRuleParameters(rParamsFile);
-    *rParamsFile << "\t\t</" << update_type << ">\n";
-}
-
-template<unsigned DIM>
 void AbstractPottsUpdateRule<DIM>::OutputUpdateRuleParameters(out_stream& rParamsFile)
 {
-    // No parameters to output
 }
 
-///////// Explicit instantiation
+// Explicit instantiation
 template class AbstractPottsUpdateRule<1>;
 template class AbstractPottsUpdateRule<2>;
 template class AbstractPottsUpdateRule<3>;

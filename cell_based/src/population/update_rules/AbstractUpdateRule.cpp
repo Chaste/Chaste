@@ -33,25 +33,35 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "AbstractCaUpdateRule.hpp"
+#include "AbstractUpdateRule.hpp"
 
 template<unsigned DIM>
-AbstractCaUpdateRule<DIM>::AbstractCaUpdateRule()
-    : AbstractUpdateRule<DIM>()
+AbstractUpdateRule<DIM>::AbstractUpdateRule()
 {
 }
 
 template<unsigned DIM>
-AbstractCaUpdateRule<DIM>::~AbstractCaUpdateRule()
+AbstractUpdateRule<DIM>::~AbstractUpdateRule()
 {
 }
 
 template<unsigned DIM>
-void AbstractCaUpdateRule<DIM>::OutputUpdateRuleParameters(out_stream& rParamsFile)
+void AbstractUpdateRule<DIM>::OutputUpdateRuleInfo(out_stream& rParamsFile)
 {
+    std::string update_type = GetIdentifier();
+
+    *rParamsFile << "\t\t<" << update_type << ">\n";
+    OutputUpdateRuleParameters(rParamsFile);
+    *rParamsFile << "\t\t</" << update_type << ">\n";
+}
+
+template<unsigned DIM>
+void AbstractUpdateRule<DIM>::OutputUpdateRuleParameters(out_stream& rParamsFile)
+{
+    // No parameters to output
 }
 
 // Explicit instantiation
-template class AbstractCaUpdateRule<1>;
-template class AbstractCaUpdateRule<2>;
-template class AbstractCaUpdateRule<3>;
+template class AbstractUpdateRule<1>;
+template class AbstractUpdateRule<2>;
+template class AbstractUpdateRule<3>;
