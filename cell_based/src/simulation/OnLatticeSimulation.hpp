@@ -122,7 +122,7 @@ public:
      *
      * @param pUpdateRule shared pointer to a CA update rule law
      */
-    void AddCaUpdateRule(boost::shared_ptr<AbstractCaUpdateRule<DIM> > pUpdateRule);
+    void AddCaUpdateRule(boost::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule);
 
     /**
      * Method to remove all the CaUpdateRules
@@ -134,7 +134,7 @@ public:
      *
      * @param pUpdateRule shared pointer to a CA switching update rule law
      */
-    void AddCaSwitchingUpdateRule(boost::shared_ptr<AbstractCaSwitchingUpdateRule<DIM> > pUpdateRule);
+    void AddCaSwitchingUpdateRule(boost::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule);
 
     /**
      * Method to remove all the CaSwitchingUpdateRules
@@ -146,7 +146,7 @@ public:
      *
      * @param pUpdateRule shared pointer to a Potts update rule law
      */
-    void AddPottsUpdateRule(boost::shared_ptr<AbstractPottsUpdateRule<DIM> > pUpdateRule);
+    void AddPottsUpdateRule(boost::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule);
 
     /**
      * Method to remove all the PottsUpdateRules

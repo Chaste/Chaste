@@ -39,19 +39,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractOnLatticeCellPopulation.hpp"
 #include "PottsMesh.hpp"
 #include "VertexMesh.hpp"
-#include "AbstractCaUpdateRule.hpp"
-#include "AbstractCaSwitchingUpdateRule.hpp"
+#include "AbstractUpdateRule.hpp"
 #include "AbstractCaBasedDivisionRule.hpp"
-
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/vector.hpp>
 
 template<unsigned DIM> class AbstractCaBasedDivisionRule; // Circular definition thing.
-
-template<unsigned DIM>
-class AbstractCaUpdateRule; // Circular definition
 
 /**
  * A facade class encapsulating a cell population under the Cellular
@@ -78,16 +73,10 @@ private:
 
     /**
      * The update rules used to determine the new location of the cells.
-     * These rules specify how individual cells move into free spaces.
-     */
-    std::vector<boost::shared_ptr<AbstractCaUpdateRule<DIM> > > mUpdateRuleCollection;
-
-    /**
-     * The update rules used to determine the new location of the cells.
      * These rules specify is cells switch locations.
-     * \todo serialize this member
+     * \todo serialize this member (#2836)
      */
-    std::vector<boost::shared_ptr<AbstractCaSwitchingUpdateRule<DIM> > > mSwitchingUpdateRuleCollection;
+    std::vector<boost::shared_ptr<AbstractUpdateRule<DIM> > > mSwitchingUpdateRuleCollection;
 
     /** Records for each node the node the number of spaces available. */
     std::vector<unsigned> mAvailableSpaces;
@@ -121,7 +110,6 @@ private:
 #define COVERAGE_IGNORE
         archive & boost::serialization::base_object<AbstractOnLatticeCellPopulation<DIM> >(*this);
         archive & mLatticeCarryingCapacity;
-        archive & mUpdateRuleCollection;
         archive & mAvailableSpaces;
         archive & mpCaBasedDivisionRule;
 #undef COVERAGE_IGNORE
@@ -391,7 +379,7 @@ public:
      *
      * @param pUpdateRule pointer to an update rule
      */
-    void AddUpdateRule(boost::shared_ptr<AbstractCaUpdateRule<DIM> > pUpdateRule);
+    void AddUpdateRule(boost::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule);
 
     /**
      * Method to remove all the update rules
@@ -399,18 +387,11 @@ public:
     void RemoveAllUpdateRules();
 
     /**
-     * Get the collection of update rules to be used in this simulation.
-     *
-     * @return the update rule collection
-     */
-    const std::vector<boost::shared_ptr<AbstractCaUpdateRule<DIM> > >& rGetUpdateRuleCollection() const;
-
-    /**
      * Add a switching update rule to be used in this simulation (use this to set up how cells move).
      *
      * @param pUpdateRule pointer to an update rule
      */
-    void AddSwitchingUpdateRule(boost::shared_ptr<AbstractCaSwitchingUpdateRule<DIM> > pUpdateRule);
+    void AddSwitchingUpdateRule(boost::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule);
 
     /**
      * Method to remove all the switching update rules
@@ -422,7 +403,7 @@ public:
      *
      * @return the update rule collection
      */
-    const std::vector<boost::shared_ptr<AbstractCaSwitchingUpdateRule<DIM> > >& rGetSwitchingUpdateRuleCollection() const;
+    const std::vector<boost::shared_ptr<AbstractUpdateRule<DIM> > >& rGetSwitchingUpdateRuleCollection() const;
 
     /**
      * Outputs CellPopulation parameters to file
@@ -444,7 +425,6 @@ public:
      */
     bool IsRoomToDivide(CellPtr pCell);
 
-
     /**
      * @return The Ca division rule that is currently being used.
      */
@@ -456,8 +436,6 @@ public:
      * @param pCaBasedDivisionRule  pointer to the new division rule
      */
     void SetCaBasedDivisionRule(boost::shared_ptr<AbstractCaBasedDivisionRule<DIM> > pCaBasedDivisionRule);
-
-
 };
 
 #include "SerializationExportWrapper.hpp"

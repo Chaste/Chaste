@@ -36,6 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PottsBasedCellPopulation.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "Warnings.hpp"
+#include "AbstractPottsUpdateRule.hpp"
 
 // Needed to convert mesh in order to write nodes to VTK (visualize as glyphs)
 #include "VtkMeshWriter.hpp"
@@ -236,7 +237,7 @@ void PottsBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
     if (this->mIterateRandomlyOverUpdateRuleCollection)
     {
         // Randomly permute mUpdateRuleCollection
-        p_gen->Shuffle(mUpdateRuleCollection);
+        p_gen->Shuffle(this->mUpdateRuleCollection);
     }
 
     for (unsigned i=0; i<num_nodes*mNumSweepsPerTimestep; i++)
@@ -285,11 +286,13 @@ void PottsBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
                 double delta_H = 0.0; // This is H_1-H_0.
 
                 // Now add contributions to the Hamiltonian from each AbstractPottsUpdateRule
-                for (typename std::vector<boost::shared_ptr<AbstractPottsUpdateRule<DIM> > >::iterator iter = mUpdateRuleCollection.begin();
-                     iter != mUpdateRuleCollection.end();
+                for (typename std::vector<boost::shared_ptr<AbstractUpdateRule<DIM> > >::iterator iter = this->mUpdateRuleCollection.begin();
+                     iter != this->mUpdateRuleCollection.end();
                      ++iter)
                 {
-                    delta_H += (*iter)->EvaluateHamiltonianContribution(neighbour_location_index, p_node->GetIndex(), *this);
+                	// This static cast is fine, since we assert the update rule must be a Potts update rule in AddUpdateRule()
+                	double dH = (boost::static_pointer_cast<AbstractPottsUpdateRule<DIM> >(*iter))->EvaluateHamiltonianContribution(neighbour_location_index, p_node->GetIndex(), *this);
+                    delta_H += dH;
                 }
 
                 // Generate a uniform random number to do the random motion
@@ -398,21 +401,16 @@ double PottsBasedCellPopulation<DIM>::GetWidth(const unsigned& rDimension)
 }
 
 template<unsigned DIM>
-void PottsBasedCellPopulation<DIM>::AddUpdateRule(boost::shared_ptr<AbstractPottsUpdateRule<DIM> > pUpdateRule)
+void PottsBasedCellPopulation<DIM>::AddUpdateRule(boost::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule)
 {
-    mUpdateRuleCollection.push_back(pUpdateRule);
+	assert(bool(dynamic_cast<AbstractPottsUpdateRule<DIM>*>(pUpdateRule.get())));
+	this->mUpdateRuleCollection.push_back(pUpdateRule);
 }
 
 template<unsigned DIM>
 void PottsBasedCellPopulation<DIM>::RemoveAllUpdateRules()
 {
-    mUpdateRuleCollection.clear();
-}
-
-template<unsigned DIM>
-const std::vector<boost::shared_ptr<AbstractPottsUpdateRule<DIM> > >& PottsBasedCellPopulation<DIM>::rGetUpdateRuleCollection() const
-{
-    return mUpdateRuleCollection;
+	this->mUpdateRuleCollection.clear();
 }
 
 template<unsigned DIM>

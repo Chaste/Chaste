@@ -34,6 +34,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "CaBasedCellPopulation.hpp"
+#include "AbstractCaUpdateRule.hpp"
+#include "AbstractCaSwitchingUpdateRule.hpp"
 
 #include <boost/scoped_array.hpp>
 
@@ -53,7 +55,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Cell population writers
 #include "CellMutationStatesWriter.hpp"
 
-//Ca division rules
+// CA division rules
 #include "ExclusionCaBasedDivisionRule.hpp"
 
 #include "NodesOnlyMesh.hpp"
@@ -276,7 +278,7 @@ void CaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
      * Here we loop over the nodes and calculate the probability of moving
      * and then select the node to move to.
      */
-    if (!(mUpdateRuleCollection.empty()))
+    if (!(this->mUpdateRuleCollection.empty()))
     {
         // Iterate over cells
         ///\todo make this sweep random
@@ -308,11 +310,13 @@ void CaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
                     if (IsSiteAvailable(*iter, *cell_iter))
                     {
                         // Iterating over the update rule
-                        for (typename std::vector<boost::shared_ptr<AbstractCaUpdateRule<DIM> > >::iterator iterRule = mUpdateRuleCollection.begin();
-                             iterRule != mUpdateRuleCollection.end();
-                             ++iterRule)
+                        for (typename std::vector<boost::shared_ptr<AbstractUpdateRule<DIM> > >::iterator iter_rule = this->mUpdateRuleCollection.begin();
+                        	 iter_rule != this->mUpdateRuleCollection.end();
+                             ++iter_rule)
                         {
-                            probability_of_moving += (*iterRule)->EvaluateProbability(node_index, *iter, *this, dt, 1, *cell_iter);
+                        	// This static cast is fine, since we assert the update rule must be a CA update rule in AddUpdateRule()
+                        	double p = (boost::static_pointer_cast<AbstractCaUpdateRule<DIM> >(*iter_rule))->EvaluateProbability(node_index, *iter, *this, dt, 1, *cell_iter);
+                            probability_of_moving += p;
                             if (probability_of_moving < 0)
                             {
                                 EXCEPTION("The probability of cellular movement is smaller than zero. In order to prevent it from happening you should change your time step and parameters");
@@ -421,15 +425,18 @@ void CaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
                 {
                     double probability_of_switch = 0.0;
 
-                    // Now add contributions to the probability  from each AbstractPottsUpdateRule
-                    for (typename std::vector<boost::shared_ptr<AbstractCaSwitchingUpdateRule<DIM> > >::iterator iter = mSwitchingUpdateRuleCollection.begin();
-                         iter != mSwitchingUpdateRuleCollection.end();
-                         ++iter)
+                    // Now add contributions to the probability from each CA switching update rule
+                    for (typename std::vector<boost::shared_ptr<AbstractUpdateRule<DIM> > >::iterator iter_rule = mSwitchingUpdateRuleCollection.begin();
+                    	 iter_rule != mSwitchingUpdateRuleCollection.end();
+                         ++iter_rule)
                     {
-                        probability_of_switch += (*iter)->EvaluateSwitchingProbability(node_index, neighbour_location_index, *this, dt, 1);
+                    	// This static cast is fine, since we assert the update rule must be a CA switching update rule in AddSwitchingUpdateRule()
+                    	double p = (boost::static_pointer_cast<AbstractCaSwitchingUpdateRule<DIM> >(*iter_rule))->EvaluateSwitchingProbability(node_index, neighbour_location_index, *this, dt, 1);
+                        probability_of_switch += p;
                     }
-                    assert(probability_of_switch>=0);
-                    assert(probability_of_switch<=1);
+
+                    assert(probability_of_switch >= 0);
+                    assert(probability_of_switch <= 1);
 
                     // Generate a uniform random number to do the random switch
                     double random_number = p_gen->ranf();
@@ -452,7 +459,7 @@ void CaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
                         }
                         else if (is_cell_on_node_index && !is_cell_on_neighbour_location_index)
                         {
-                            // Nove the cells associated with the node to the neighbour node
+                            // Move the cells associated with the node to the neighbour node
                             CellPtr p_cell = this->GetCellUsingLocationIndex(node_index);
                             RemoveCellUsingLocationIndex(node_index, p_cell);
                             AddCellUsingLocationIndex(neighbour_location_index, p_cell);
@@ -468,7 +475,6 @@ void CaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
                         {
                             NEVER_REACHED;
                         }
-
                     }
                 }
             }
@@ -534,26 +540,22 @@ double CaBasedCellPopulation<DIM>::GetWidth(const unsigned& rDimension)
 }
 
 template<unsigned DIM>
-void CaBasedCellPopulation<DIM>::AddUpdateRule(boost::shared_ptr<AbstractCaUpdateRule<DIM> > pUpdateRule)
+void CaBasedCellPopulation<DIM>::AddUpdateRule(boost::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule)
 {
-    mUpdateRuleCollection.push_back(pUpdateRule);
+	assert(bool(dynamic_cast<AbstractCaUpdateRule<DIM>*>(pUpdateRule.get())));
+	this->mUpdateRuleCollection.push_back(pUpdateRule);
 }
 
 template<unsigned DIM>
 void CaBasedCellPopulation<DIM>::RemoveAllUpdateRules()
 {
-    mUpdateRuleCollection.clear();
+	this->mUpdateRuleCollection.clear();
 }
 
 template<unsigned DIM>
-const std::vector<boost::shared_ptr<AbstractCaUpdateRule<DIM> > >& CaBasedCellPopulation<DIM>::rGetUpdateRuleCollection() const
+void CaBasedCellPopulation<DIM>::AddSwitchingUpdateRule(boost::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule)
 {
-    return mUpdateRuleCollection;
-}
-
-template<unsigned DIM>
-void CaBasedCellPopulation<DIM>::AddSwitchingUpdateRule(boost::shared_ptr<AbstractCaSwitchingUpdateRule<DIM> > pUpdateRule)
-{
+	assert(bool(dynamic_cast<AbstractCaSwitchingUpdateRule<DIM>*>(pUpdateRule.get())));
     mSwitchingUpdateRuleCollection.push_back(pUpdateRule);
 }
 
@@ -564,7 +566,7 @@ void CaBasedCellPopulation<DIM>::RemoveAllSwitchingUpdateRules()
 }
 
 template<unsigned DIM>
-const std::vector<boost::shared_ptr<AbstractCaSwitchingUpdateRule<DIM> > >& CaBasedCellPopulation<DIM>::rGetSwitchingUpdateRuleCollection() const
+const std::vector<boost::shared_ptr<AbstractUpdateRule<DIM> > >& CaBasedCellPopulation<DIM>::rGetSwitchingUpdateRuleCollection() const
 {
     return mSwitchingUpdateRuleCollection;
 }

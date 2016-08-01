@@ -39,15 +39,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractOnLatticeCellPopulation.hpp"
 #include "PottsMesh.hpp"
 #include "VertexMesh.hpp"
-#include "AbstractPottsUpdateRule.hpp"
+#include "AbstractUpdateRule.hpp"
 #include "MutableMesh.hpp"
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/vector.hpp>
-
-template<unsigned DIM>
-class AbstractPottsUpdateRule; // Circular definition
 
 /**
  * A facade class encapsulating a cell population under the Cellular
@@ -85,9 +82,6 @@ private:
      */
     MutableMesh<DIM,DIM>* mpMutableMesh;
 
-    /** The update rules used to determine the new location of the cells. */
-    std::vector<boost::shared_ptr<AbstractPottsUpdateRule<DIM> > > mUpdateRuleCollection;
-
     /** The temperature of the system. Initialized to 0.1 in the constructor. */
     double mTemperature;
 
@@ -122,7 +116,6 @@ private:
         delete mpElementTessellation;
         mpElementTessellation = NULL;
 
-        archive & mUpdateRuleCollection;
         archive & mTemperature;
         archive & mNumSweepsPerTimestep;
 
@@ -359,19 +352,12 @@ public:
      *
      * @param pUpdateRule pointer to an update rule
      */
-    void AddUpdateRule(boost::shared_ptr<AbstractPottsUpdateRule<DIM> > pUpdateRule);
+    void AddUpdateRule(boost::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule);
 
     /**
      * Method to remove all the update rules
      */
     void RemoveAllUpdateRules();
-
-    /**
-     * Get the collection of update rules to be used in this simulation.
-     *
-     * @return the update rule collection
-     */
-    const std::vector<boost::shared_ptr<AbstractPottsUpdateRule<DIM> > >& rGetUpdateRuleCollection() const;
 
     /**
      * Outputs CellPopulation parameters to file
