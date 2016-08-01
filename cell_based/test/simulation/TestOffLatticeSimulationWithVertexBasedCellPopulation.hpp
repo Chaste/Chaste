@@ -263,6 +263,10 @@ public:
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
+
+        // Test that the member mDt has been initialised correctly
+        TS_ASSERT_DELTA(simulator.GetDt(), 0.002, 1e-6);
+
         simulator.SetOutputDirectory("TestVertexMonolayerWithCellBirth");
         simulator.SetSamplingTimestepMultiple(50);
         simulator.SetEndTime(0.1);

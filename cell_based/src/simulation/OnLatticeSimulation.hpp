@@ -91,11 +91,6 @@ protected:
      */
     void UpdateCellLocationsAndTopology();
 
-    /**
-     * Overridden WriteVisualizerSetupFile() method.
-     */
-    virtual void WriteVisualizerSetupFile();
-
 public:
 
     /**

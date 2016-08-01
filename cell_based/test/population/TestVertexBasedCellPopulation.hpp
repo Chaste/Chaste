@@ -163,6 +163,9 @@ public:
 
         std::set<unsigned> neighbours_of_cell_0 = cell_population.GetNeighbouringLocationIndices(*(cell_population.Begin()));
         TS_ASSERT(neighbours_of_cell_0 == expected_neighbours_of_cell_0);
+
+        // For coverage, test that GetDefaultTimeStep() returns the correct value
+        TS_ASSERT_DELTA(cell_population.GetDefaultTimeStep(), 0.002, 1e-6);
     }
 
     void TestValidate() throw (Exception)

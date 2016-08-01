@@ -115,10 +115,14 @@ void AbstractOnLatticeCellPopulation<DIM>::OutputCellPopulationParameters(out_st
     AbstractCellPopulation<DIM>::OutputCellPopulationParameters(rParamsFile);
 }
 
-/////////////////////////////////////////////////////////////////////
-// Explicit instantiation
-/////////////////////////////////////////////////////////////////////
+template<unsigned DIM>
+double AbstractOnLatticeCellPopulation<DIM>::GetDefaultTimeStep()
+{
+    return 0.1;
+}
 
+// Explicit instantiation
 template class AbstractOnLatticeCellPopulation<1>;
 template class AbstractOnLatticeCellPopulation<2>;
 template class AbstractOnLatticeCellPopulation<3>;
+

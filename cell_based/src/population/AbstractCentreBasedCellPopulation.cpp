@@ -277,6 +277,12 @@ void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputCellPopula
     AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulationParameters(rParamsFile);
 }
 
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+double AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetDefaultTimeStep()
+{
+    return 1.0/120.0;
+}
+
 // Explicit instantiation
 template class AbstractCentreBasedCellPopulation<1,1>;
 template class AbstractCentreBasedCellPopulation<1,2>;

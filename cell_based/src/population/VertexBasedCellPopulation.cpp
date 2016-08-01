@@ -42,6 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ShortAxisVertexBasedDivisionRule.hpp"
 #include "StepSizeException.hpp"
 #include "WildTypeCellMutationState.hpp"
+#include "Cylindrical2dVertexMesh.hpp"
 
 // Cell writers
 #include "CellAgesWriter.hpp"
@@ -726,6 +727,21 @@ TetrahedralMesh<DIM, DIM>* VertexBasedCellPopulation<DIM>::GetTetrahedralMeshUsi
     p_mesh->SetMeshHasChangedSinceLoading();
 
     return p_mesh;
+}
+
+template<unsigned DIM>
+double VertexBasedCellPopulation<DIM>::GetDefaultTimeStep()
+{
+    return 0.002;
+}
+
+template<unsigned DIM>
+void VertexBasedCellPopulation<DIM>::WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile)
+{
+    if (dynamic_cast<Cylindrical2dVertexMesh*>(&(this->mrMesh)))
+    {
+        *pVizSetupFile << "MeshWidth\t" << this->GetWidth(0) << "\n";
+    }
 }
 
 // Explicit instantiation

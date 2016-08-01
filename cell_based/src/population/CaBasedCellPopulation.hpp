@@ -76,19 +76,24 @@ private:
     /** The carrying capacity (number of cells allowed per site). */
     unsigned mLatticeCarryingCapacity;
 
-    /** The update rules used to determine the new location of the cells.
-     * These rules specify how individual cells move into free spaces */
+    /**
+     * The update rules used to determine the new location of the cells.
+     * These rules specify how individual cells move into free spaces.
+     */
     std::vector<boost::shared_ptr<AbstractCaUpdateRule<DIM> > > mUpdateRuleCollection;
 
-    /** The update rules used to determine the new location of the cells.
-     * THese rules specify is cells switch locations*/
+    /**
+     * The update rules used to determine the new location of the cells.
+     * These rules specify is cells switch locations.
+     * \todo serialize this member
+     */
     std::vector<boost::shared_ptr<AbstractCaSwitchingUpdateRule<DIM> > > mSwitchingUpdateRuleCollection;
 
     /** Records for each node the node the number of spaces available. */
     std::vector<unsigned> mAvailableSpaces;
 
     /** A pointer to a division rule that is used to specify how cells divide. I.e do they move other cells out of the way.
-     * This is a specialisation for Ca models. */
+     * This is a specialisation for CA models. */
     boost::shared_ptr<AbstractCaBasedDivisionRule<DIM> > mpCaBasedDivisionRule;
 
     /**

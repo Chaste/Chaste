@@ -279,6 +279,14 @@ public:
     virtual bool IsCellAssociatedWithADeletedLocation(CellPtr pCell)=0;
 
     /**
+     * Write any data necessary to a visualization setup file.
+     * Used by AbstractCellBasedSimulation::WriteVisualizerSetupFile().
+     * 
+     * @param pVizSetupFile a visualization setup file
+     */
+    virtual void WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile);
+ 
+    /**
      * Add a new cell to the cell population.
      *
      * As this method is pure virtual, it must be overridden
@@ -290,6 +298,18 @@ public:
      * @return address of cell as it appears in the cell list (internal of this method uses a copy constructor along the way).
      */
     virtual CellPtr AddCell(CellPtr pNewCell, CellPtr pParentCell=CellPtr())=0;
+
+    /**
+     * Get a default value for the time step to use when simulating 
+     * the cell population.
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     *
+     * Note that the time step can be reset by calling SetDt() on the 
+     * simulation object used to simulate the cell population.
+     */
+    virtual double GetDefaultTimeStep()=0;
 
     class Iterator; // Forward declaration; see below
 

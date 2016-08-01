@@ -452,6 +452,25 @@ public:
      * @param pVertexBasedDivisionRule  pointer to the new division rule
      */
     void SetVertexBasedDivisionRule(boost::shared_ptr<AbstractVertexBasedDivisionRule<DIM> > pVertexBasedDivisionRule);
+
+    /**
+     * Overridden method to get a default value for the time step to use 
+     * when simulating the cell population.
+     *
+     * A hard-coded value of 0.002 is returned. However, note that the time 
+     * step can be reset by calling SetDt() on the simulation object used to 
+     * simulate the cell population.
+     */
+    virtual double GetDefaultTimeStep();
+
+    /**
+     * Overridden WriteDataToVisualizerSetupFile() method.
+     * Write any data necessary to a visualization setup file.
+     * Used by AbstractCellBasedSimulation::WriteVisualizerSetupFile().
+     * 
+     * @param pVizSetupFile a visualization setup file
+     */
+    virtual void WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile);
 };
 
 #include "SerializationExportWrapper.hpp"

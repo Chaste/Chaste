@@ -467,7 +467,7 @@ set(Chaste_DEPENDS_heart ${Chaste_DEPENDS_continuum_mechanics} continuum_mechani
 set(Chaste_DEPENDS_lung ${Chaste_DEPENDS_continuum_mechanics} continuum_mechanics)
 set(Chaste_DEPENDS_core global io linalg mesh ode pde continuum_mechanics)
 
-# Set  dependencies to core target
+# Set dependencies to core target
 add_dependencies(core ${Chaste_DEPENDS_core})
 
 foreach(component ${Chaste_COMPONENTS})

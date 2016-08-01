@@ -607,9 +607,8 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDi
     *(this->mpVtkMetaFile) << num_timesteps;
     *(this->mpVtkMetaFile) << ".vtu\"/>\n";
 
-    // Extra Part to output the outlines of cells
-
-    if (DIM ==2 )
+    // Extra part to output the outlines of cells
+    if (DIM ==2)
     {
         std::vector<Node<2>*> outline_nodes;
         std::vector<VertexElement<2,2>*>  outline_elements;
@@ -744,10 +743,14 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDi
         VertexMeshWriter<2, 2> outline_mesh_writer(rDirectory, "outlines", false);
         outline_mesh_writer.WriteVtkUsingMesh(cell_outline_mesh, time.str());
         outline_mesh_writer.WriteFilesUsingMesh(cell_outline_mesh);
-
-
     }
 #endif //CHASTE_VTK
+}
+
+template<unsigned DIM>
+void PottsBasedCellPopulation<DIM>::WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile)
+{
+    *pVizSetupFile << "PottsSimulation\n";
 }
 
 // Explicit instantiation
