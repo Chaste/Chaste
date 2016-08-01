@@ -138,7 +138,7 @@ void AbstractTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::OutputForceParamete
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile)
 {
-    *pVizSetupFile << "Cutoff\t" << mUseCutOffLength << "\n";
+    *pVizSetupFile << "Cutoff\t" << mMechanicsCutOffLength << "\n";
 }
 
 // Explicit instantiation

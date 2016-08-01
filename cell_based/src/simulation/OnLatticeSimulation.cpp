@@ -73,7 +73,6 @@ void OnLatticeSimulation<DIM>::RemoveAllCaUpdateRules()
     }
 }
 
-
 template<unsigned DIM>
 void OnLatticeSimulation<DIM>::AddCaSwitchingUpdateRule(boost::shared_ptr<AbstractCaSwitchingUpdateRule<DIM> > pUpdateRule)
 {
@@ -209,7 +208,7 @@ void OnLatticeSimulation<DIM>::OutputSimulationParameters(out_stream& rParamsFil
     AbstractCellBasedSimulation<DIM>::OutputSimulationParameters(rParamsFile);
 }
 
-///////// Explicit instantiation
+// Explicit instantiation
 template class OnLatticeSimulation<1>;
 template class OnLatticeSimulation<2>;
 template class OnLatticeSimulation<3>;

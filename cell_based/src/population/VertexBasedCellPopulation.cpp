@@ -42,6 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ShortAxisVertexBasedDivisionRule.hpp"
 #include "StepSizeException.hpp"
 #include "WildTypeCellMutationState.hpp"
+#include "Cylindrical2dVertexMesh.hpp"
 
 // Cell writers
 #include "CellAgesWriter.hpp"

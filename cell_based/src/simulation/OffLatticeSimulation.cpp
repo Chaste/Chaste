@@ -214,7 +214,7 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::WriteVisualizerSetupFile()
     {
         for (unsigned i=0; i<this->mForceCollection.size(); i++)
         {
-            p_this->mForceCollection[i]->WriteDataToVisualizerSetupFile(this->mpVizSetupFile);
+            this->mForceCollection[i]->WriteDataToVisualizerSetupFile(this->mpVizSetupFile);
         }
 
         this->mrCellPopulation.WriteDataToVisualizerSetupFile(this->mpVizSetupFile);
@@ -261,7 +261,7 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::OutputAdditionalSimulationSetu
          iter != mBoundaryConditions.end();
          ++iter)
     {
-        // Output cell Boundary condition details
+        // Output cell boundary condition details
         (*iter)->OutputCellPopulationBoundaryConditionInfo(rParamsFile);
     }
     *rParamsFile << "\t</CellPopulationBoundaryConditions>\n";
