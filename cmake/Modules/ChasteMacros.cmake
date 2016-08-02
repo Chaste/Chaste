@@ -79,6 +79,16 @@ macro(Chaste_DO_CELLML output_sources cellml_file dynamic)
         endif()
     endif()
     set(depends ${cellml_dir}/${cellml_file_name}.cellml)
+    
+    #set depends on everything in python/pycml/* except for *.pyc and protocol.py
+    file(GLOB PyCML_SOURCES 
+        ${Chaste_SOURCE_DIR}/python/pycml/* )
+    file(GLOB PyCML_NOT_SOURCES 
+        ${Chaste_SOURCE_DIR}/python/pycml/*.pyc )
+    list(REMOVE_ITEM PyCML_SOURCES ${PYCML_NOT_SOURCES} ${Chaste_SOURCE_DIR}/python/pycml/protocol.py)
+
+    set(depends ${depends} ${PyCML_SOURCES})
+
     if(EXISTS ${cellml_dir}/${cellml_file_name}-conf.xml)
         set(depends ${depends} ${cellml_dir}/${cellml_file_name}-conf.xml)
         set(pycml_args ${pycml_args} "--conf=${cellml_dir}/${cellml_file_name}-conf.xml")
