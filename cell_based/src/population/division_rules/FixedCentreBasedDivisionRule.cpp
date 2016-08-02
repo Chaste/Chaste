@@ -33,42 +33,41 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "CryptSimulation1d.hpp"
-#include "WntConcentration.hpp"
-#include "SmartPointers.hpp"
+#include "FixedCentreBasedDivisionRule.hpp"
 
-CryptSimulation1d::CryptSimulation1d(AbstractCellPopulation<1>& rCellPopulation,
-                  bool deleteCellPopulationInDestructor,
-                  bool initialiseCells)
-    : OffLatticeSimulation<1>(rCellPopulation,
-                          deleteCellPopulationInDestructor,
-                          initialiseCells)
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+FixedCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM>::FixedCentreBasedDivisionRule(c_vector<double, SPACE_DIM>& rDaughterLocation)
 {
-    mpStaticCastCellPopulation = static_cast<MeshBasedCellPopulation<1>*>(&mrCellPopulation);
-
-    if (!mDeleteCellPopulationInDestructor)
-    {
-        // Pass a CryptSimulationBoundaryCondition object into mBoundaryConditions
-        MAKE_PTR_ARGS(CryptSimulationBoundaryCondition<1>, p_bc, (&rCellPopulation));
-        AddCellPopulationBoundaryCondition(p_bc);
-    }
-
-    MAKE_PTR(CryptCentreBasedDivisionRule<1>, p_centre_div_rule);
-    mpStaticCastCellPopulation->SetCentreBasedDivisionRule(p_centre_div_rule);
+    mDaughterLocation = rDaughterLocation;
 }
 
-CryptSimulation1d::~CryptSimulation1d()
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+const c_vector<double, SPACE_DIM>& FixedCentreBasedDivisionRule<ELEMENT_DIM,SPACE_DIM>::rGetDaughterLocation() const
 {
+    return mDaughterLocation;
 }
 
-void CryptSimulation1d::OutputSimulationParameters(out_stream& rParamsFile)
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+std::pair<c_vector<double, SPACE_DIM>, c_vector<double, SPACE_DIM> > FixedCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM>::CalculateCellDivisionVector(
+    CellPtr pParentCell,
+    AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>& rCellPopulation)
 {
-    // No parameters to output
+    c_vector<double, SPACE_DIM> parent_position = rCellPopulation.GetLocationOfCellCentre(pParentCell);
+    c_vector<double, SPACE_DIM> daughter_position = mDaughterLocation;
 
-    // Call method on direct parent class
-    OffLatticeSimulation<1>::OutputSimulationParameters(rParamsFile);
+    std::pair<c_vector<double, SPACE_DIM>, c_vector<double, SPACE_DIM> > positions(parent_position, daughter_position);
+
+    return positions;
 }
+
+// Explicit instantiation
+template class FixedCentreBasedDivisionRule<1,1>;
+template class FixedCentreBasedDivisionRule<1,2>;
+template class FixedCentreBasedDivisionRule<2,2>;
+template class FixedCentreBasedDivisionRule<1,3>;
+template class FixedCentreBasedDivisionRule<2,3>;
+template class FixedCentreBasedDivisionRule<3,3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-CHASTE_CLASS_EXPORT(CryptSimulation1d)
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(FixedCentreBasedDivisionRule)

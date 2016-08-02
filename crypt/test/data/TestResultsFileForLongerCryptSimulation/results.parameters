@@ -17,6 +17,10 @@
 		<OutputMeshInVtk>0</OutputMeshInVtk>
 		<HasVariableRestLength>0</HasVariableRestLength>
 		<MeinekeDivisionSeparation>0.3</MeinekeDivisionSeparation>
+		<CentreBasedDivisionRule>
+			<CryptCentreBasedDivisionRule-2-2>
+			</CryptCentreBasedDivisionRule-2-2>
+		</CentreBasedDivisionRule>
 		<DampingConstantNormal>1</DampingConstantNormal>
 		<DampingConstantMutant>1</DampingConstantMutant>
 		<OutputResultsForChasteVisualizer>1</OutputResultsForChasteVisualizer>

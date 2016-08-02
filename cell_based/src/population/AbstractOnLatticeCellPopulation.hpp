@@ -184,7 +184,9 @@ public:
     virtual void OutputCellPopulationParameters(out_stream& rParamsFile);
 
     /**
-     * Overridden method to get a default value for the time step to use 
+     * Overridden GetDefaultTimeStep() method.
+     *
+     * @return a default value for the time step to use
      * when simulating the cell population.
      *
      * A hard-coded value of 0.1 is returned. However, note that the time 

@@ -33,24 +33,26 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef RANDOMDIRECTIONVERTEXBASEDDIVISIONRULE_HPP_
-#define RANDOMDIRECTIONVERTEXBASEDDIVISIONRULE_HPP_
+#ifndef CRYPTCENTREBASEDDIVISIONRULE_HPP_
+#define CRYPTCENTREBASEDDIVISIONRULE_HPP_
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
-#include "AbstractVertexBasedDivisionRule.hpp"
-#include "VertexBasedCellPopulation.hpp"
+#include "AbstractCentreBasedDivisionRule.hpp"
+#include "AbstractCentreBasedCellPopulation.hpp"
 #include "RandomNumberGenerator.hpp"
 
 // Forward declaration prevents circular include chain
-template<unsigned SPACE_DIM> class VertexBasedCellPopulation;
-template<unsigned SPACE_DIM> class AbstractVertexBasedDivisionRule;
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCentreBasedCellPopulation;
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCentreBasedDivisionRule;
 
 /**
- * A class to generate a division vector of unit length that points in a random direction.
+ * A class to generate a division vector of length 
+ * AbstractCentreBasedCellPopulation::mMeinekeDivisionSeparation that points 
+ * in a random direction.
  */
-template <unsigned SPACE_DIM>
-class RandomDirectionVertexBasedDivisionRule : public AbstractVertexBasedDivisionRule<SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
+class CryptCentreBasedDivisionRule : public AbstractCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM>
 {
 private:
     friend class boost::serialization::access;
@@ -63,38 +65,36 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractVertexBasedDivisionRule<SPACE_DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM> >(*this);
     }
 
 public:
     /**
      * Default constructor.
      */
-    RandomDirectionVertexBasedDivisionRule()
+    CryptCentreBasedDivisionRule()
     {
     }
 
     /**
      * Empty destructor.
      */
-    virtual ~RandomDirectionVertexBasedDivisionRule()
+    virtual ~CryptCentreBasedDivisionRule()
     {
     }
 
     /**
      * Overridden CalculateCellDivisionVector() method.
      *
-     * Return a unit vector in a random direction, i.e the arguments are redundant for this division rule.
-     *
      * @param pParentCell  The cell to divide
-     * @param rCellPopulation  The vertex-based cell population
+     * @param rCellPopulation  The centre-based cell population
      * @return the division vector.
      */
-    virtual c_vector<double, SPACE_DIM> CalculateCellDivisionVector(CellPtr pParentCell,
-        VertexBasedCellPopulation<SPACE_DIM>& rCellPopulation);
+    virtual std::pair<c_vector<double, SPACE_DIM>, c_vector<double, SPACE_DIM> > CalculateCellDivisionVector(CellPtr pParentCell,
+        AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>& rCellPopulation);
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(RandomDirectionVertexBasedDivisionRule)
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(CryptCentreBasedDivisionRule)
 
-#endif // RANDOMDIRECTIONVERTEXBASEDDIVISIONRULE_HPP_
+#endif // CRYPTCENTREBASEDDIVISIONRULE_HPP_

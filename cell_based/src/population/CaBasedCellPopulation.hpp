@@ -109,6 +109,7 @@ private:
     {
 #define COVERAGE_IGNORE
         archive & boost::serialization::base_object<AbstractOnLatticeCellPopulation<DIM> >(*this);
+        archive & mSwitchingUpdateRuleCollection;
         archive & mLatticeCarryingCapacity;
         archive & mAvailableSpaces;
         archive & mpCaBasedDivisionRule;
@@ -266,11 +267,10 @@ public:
      * Add a new cell to the cell population.
      *
      * @param pNewCell  the cell to add
-     * @param rCellDivisionVector  this parameter is not yet used in this class (see #1737)
      * @param pParentCell pointer to a parent cell (if required)
      * @return address of cell as it appears in the cell list (internal of this method uses a copy constructor along the way)
      */
-    CellPtr AddCell(CellPtr pNewCell, const c_vector<double,DIM>& rCellDivisionVector, CellPtr pParentCell=CellPtr());
+    CellPtr AddCell(CellPtr pNewCell, CellPtr pParentCell=CellPtr());
 
     /**
       * Calculate the propensity of a dividing into a given site.

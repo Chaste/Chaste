@@ -60,6 +60,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FileComparison.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 #include "ApoptoticCellProperty.hpp"
+#include "FixedCentreBasedDivisionRule.hpp"
 
 // Cell writers
 #include "CellAgesWriter.hpp"
@@ -402,7 +403,11 @@ public:
         new_cell_location[0] = 2;
         new_cell_location[1] = 2;
 
-        cell_population.AddCell(p_cell, new_cell_location, cell_population.rGetCells().front() /*random choice of parent*/);
+        typedef FixedCentreBasedDivisionRule<2,2> FixedRule;
+        MAKE_PTR_ARGS(FixedRule, p_div_rule, (new_cell_location));
+        cell_population.SetCentreBasedDivisionRule(p_div_rule);
+
+        cell_population.AddCell(p_cell, cell_population.rGetCells().front()); // random choice of parent
 
         // CellPopulation should have updated mesh and cells
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), old_num_nodes+1);

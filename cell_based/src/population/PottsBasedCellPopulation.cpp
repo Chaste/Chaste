@@ -175,7 +175,7 @@ PottsElement<DIM>* PottsBasedCellPopulation<DIM>::GetElementCorrespondingToCell(
 }
 
 template<unsigned DIM>
-CellPtr PottsBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, const c_vector<double,DIM>& rCellDivisionVector, CellPtr pParentCell)
+CellPtr PottsBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, CellPtr pParentCell)
 {
     // Get the element associated with this cell
     PottsElement<DIM>* p_element = GetElementCorrespondingToCell(pParentCell);

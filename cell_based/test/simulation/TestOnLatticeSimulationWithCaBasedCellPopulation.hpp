@@ -63,13 +63,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellIdWriter.hpp"
 #include "ApoptoticCellKiller.hpp"
 #include "ApoptoticCellProperty.hpp"
-
 #include "CellProliferativeTypesWriter.hpp"
 #include "CellProliferativePhasesWriter.hpp"
 #include "CellMutationStatesWriter.hpp"
 #include "CellLabelWriter.hpp"
 #include "CellProliferativePhasesCountWriter.hpp"
-
 
 class TestOnLatticeSimulationWithCaBasedCellPopulation : public AbstractCellBasedWithTimingsTestSuite
 {
@@ -236,10 +234,10 @@ public:
         simulator.Solve();
 
         // Check the number of cells
-        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 12u); ///\todo #2066 Check this!
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 12u);
 
         // Test no deaths and some births
-        TS_ASSERT_EQUALS(simulator.GetNumBirths(), 10u); ///\todo #2066 Check this!
+        TS_ASSERT_EQUALS(simulator.GetNumBirths(), 10u);
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
 
         // Now remove the update rules and check that only birth happens when the simulator runs again
@@ -820,10 +818,15 @@ public:
         // Check some results
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 10u);
 
-        CellPtr p_cell = *(simulator.rGetCellPopulation().Begin());
-        c_vector<double, 2> cell_location = simulator.rGetCellPopulation().GetLocationOfCellCentre(p_cell);
-        TS_ASSERT_DELTA(cell_location[0], 1.0, 1e-4);
-        TS_ASSERT_DELTA(cell_location[1], 3.0, 1e-4);
+        CellPtr p_cell_0 = *(simulator.rGetCellPopulation().Begin());
+        c_vector<double, 2> cell_location_0 = simulator.rGetCellPopulation().GetLocationOfCellCentre(p_cell_0);
+        TS_ASSERT_DELTA(cell_location_0[0], 1.0, 1e-4);
+        TS_ASSERT_DELTA(cell_location_0[1], 3.0, 1e-4);
+
+        CellPtr p_cell_1 = *(++(simulator.rGetCellPopulation().Begin()));
+        c_vector<double, 2> cell_location_1 = simulator.rGetCellPopulation().GetLocationOfCellCentre(p_cell_1);
+        TS_ASSERT_DELTA(cell_location_1[0], 1.0, 1e-4);
+        TS_ASSERT_DELTA(cell_location_1[1], 0.0, 1e-4);
     }
 
     void TestSave() throw (Exception)
@@ -864,8 +867,7 @@ public:
         CellBasedSimulationArchiver<2, OnLatticeSimulation<2> >::Save(&simulator);
     }
 
-    ///\todo make the following test pass - see #2066 and comment in OnLatticeSimulation::UpdateCellPopulation()
-    void DONOTTestLoad() throw (Exception)
+    void TestLoad() throw (Exception)
     {
         EXIT_IF_PARALLEL;
 
@@ -887,10 +889,21 @@ public:
         // These results are from time 20 in TestStandardResultForArchivingTestsBelow()
         TS_ASSERT_EQUALS(p_simulator2->rGetCellPopulation().GetNumRealCells(), 10u);
 
-        CellPtr p_cell = *(p_simulator2->rGetCellPopulation().Begin());
-        c_vector<double, 2> cell_location = static_cast <CaBasedCellPopulation<2>*>(&p_simulator2->rGetCellPopulation())->GetLocationOfCellCentre(p_cell);
-        TS_ASSERT_DELTA(cell_location[0], 1.0, 1e-4);
-        TS_ASSERT_DELTA(cell_location[1], 0.0, 1e-4);
+        CellPtr p_cell_0 = *(p_simulator2->rGetCellPopulation().Begin());
+        c_vector<double, 2> cell_location_0 = p_simulator2->rGetCellPopulation().GetLocationOfCellCentre(p_cell_0);
+        TS_ASSERT_DELTA(cell_location_0[0], 1.0, 1e-4);
+        TS_ASSERT_DELTA(cell_location_0[1], 3.0, 1e-4);
+
+        CellPtr p_cell_1 = *(++(p_simulator2->rGetCellPopulation().Begin()));
+        c_vector<double, 2> cell_location_1 = p_simulator2->rGetCellPopulation().GetLocationOfCellCentre(p_cell_1);
+        TS_ASSERT_DELTA(cell_location_1[0], 1.0, 1e-4);
+        TS_ASSERT_DELTA(cell_location_1[1], 0.0, 1e-4);
+
+        std::vector<boost::shared_ptr<AbstractCaUpdateRule<2> > > update_rules =
+            static_cast<CaBasedCellPopulation<2>*>(&(p_simulator2->rGetCellPopulation()))->rGetUpdateRuleCollection();
+
+        double diffusion_parameter = (dynamic_cast<DiffusionCaUpdateRule<2>*>(update_rules[0].get()))->GetDiffusionParameter();
+        TS_ASSERT_DELTA(diffusion_parameter, 0.1, 1e-4);
 
         // Tidy up
         delete p_simulator1;

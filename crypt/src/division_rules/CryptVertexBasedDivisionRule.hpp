@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef RANDOMDIRECTIONVERTEXBASEDDIVISIONRULE_HPP_
-#define RANDOMDIRECTIONVERTEXBASEDDIVISIONRULE_HPP_
+#ifndef CRYPTVERTEXBASEDDIVISIONRULE_HPP_
+#define CRYPTVERTEXBASEDDIVISIONRULE_HPP_
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
@@ -47,10 +47,12 @@ template<unsigned SPACE_DIM> class VertexBasedCellPopulation;
 template<unsigned SPACE_DIM> class AbstractVertexBasedDivisionRule;
 
 /**
- * A class to generate a division vector of unit length that points in a random direction.
+ * A class to generate a division vector of unit lengths that points in a random direction,
+ * unless dealing with a 'stem' cell in the absence of a Wnt gradient. For use in 
+ * CryptSimulation2d.
  */
 template <unsigned SPACE_DIM>
-class RandomDirectionVertexBasedDivisionRule : public AbstractVertexBasedDivisionRule<SPACE_DIM>
+class CryptVertexBasedDivisionRule  : public AbstractVertexBasedDivisionRule<SPACE_DIM>
 {
 private:
     friend class boost::serialization::access;
@@ -70,14 +72,14 @@ public:
     /**
      * Default constructor.
      */
-    RandomDirectionVertexBasedDivisionRule()
+    CryptVertexBasedDivisionRule()
     {
     }
 
     /**
      * Empty destructor.
      */
-    virtual ~RandomDirectionVertexBasedDivisionRule()
+    virtual ~CryptVertexBasedDivisionRule()
     {
     }
 
@@ -95,6 +97,7 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(RandomDirectionVertexBasedDivisionRule)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(CryptVertexBasedDivisionRule)
 
-#endif // RANDOMDIRECTIONVERTEXBASEDDIVISIONRULE_HPP_
+#endif // CRYPTVERTEXBASEDDIVISIONRULE_HPP_
+

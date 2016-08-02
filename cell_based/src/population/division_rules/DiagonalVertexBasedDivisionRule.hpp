@@ -38,8 +38,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
-#include "AbstractVertexBasedDivisionRule.hpp"
 
+#include "AbstractVertexBasedDivisionRule.hpp"
 #include "VertexBasedCellPopulation.hpp"
 
 template<unsigned SPACE_DIM> class VertexBasedCellPopulation;

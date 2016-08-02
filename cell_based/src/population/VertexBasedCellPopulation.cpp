@@ -207,17 +207,17 @@ unsigned VertexBasedCellPopulation<DIM>::GetNumElements()
 }
 
 template<unsigned DIM>
-CellPtr VertexBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell,
-                                                const c_vector<double,DIM>& rCellDivisionVector,
-                                                CellPtr pParentCell)
+CellPtr VertexBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, CellPtr pParentCell)
 {
     // Get the element associated with this cell
     VertexElement<DIM, DIM>* p_element = GetElementCorrespondingToCell(pParentCell);
 
+    // Get the orientation of division
+    c_vector<double, DIM> division_vector = mpVertexBasedDivisionRule->CalculateCellDivisionVector(pParentCell, *this);
+
     // Divide the element
-    unsigned new_element_index = mpMutableVertexMesh->DivideElementAlongGivenAxis(p_element,
-                                                                                  rCellDivisionVector,
-                                                                                  true);
+    unsigned new_element_index = mpMutableVertexMesh->DivideElementAlongGivenAxis(p_element, division_vector, true);
+
     // Associate the new cell with the element
     this->mCells.push_back(pNewCell);
 
@@ -225,6 +225,7 @@ CellPtr VertexBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell,
     CellPtr p_created_cell = this->mCells.back();
     this->SetCellUsingLocationIndex(new_element_index,p_created_cell);
     this->mCellLocationMap[p_created_cell.get()] = new_element_index;
+
     return p_created_cell;
 }
 
@@ -726,12 +727,6 @@ TetrahedralMesh<DIM, DIM>* VertexBasedCellPopulation<DIM>::GetTetrahedralMeshUsi
     p_mesh->SetMeshHasChangedSinceLoading();
 
     return p_mesh;
-}
-
-template<unsigned DIM>
-c_vector<double, DIM> VertexBasedCellPopulation<DIM>::CalculateCellDivisionVector(CellPtr pParentCell)
-{
-    return mpVertexBasedDivisionRule->CalculateCellDivisionVector(pParentCell, *this);
 }
 
 template<unsigned DIM>

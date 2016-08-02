@@ -33,42 +33,38 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "CryptSimulation1d.hpp"
-#include "WntConcentration.hpp"
-#include "SmartPointers.hpp"
+#include "FixedVertexBasedDivisionRule.hpp"
+#include "Exception.hpp"
 
-CryptSimulation1d::CryptSimulation1d(AbstractCellPopulation<1>& rCellPopulation,
-                  bool deleteCellPopulationInDestructor,
-                  bool initialiseCells)
-    : OffLatticeSimulation<1>(rCellPopulation,
-                          deleteCellPopulationInDestructor,
-                          initialiseCells)
+template <unsigned SPACE_DIM>
+FixedVertexBasedDivisionRule<SPACE_DIM>::FixedVertexBasedDivisionRule(c_vector<double, SPACE_DIM>& rDivisionVector)
 {
-    mpStaticCastCellPopulation = static_cast<MeshBasedCellPopulation<1>*>(&mrCellPopulation);
-
-    if (!mDeleteCellPopulationInDestructor)
-    {
-        // Pass a CryptSimulationBoundaryCondition object into mBoundaryConditions
-        MAKE_PTR_ARGS(CryptSimulationBoundaryCondition<1>, p_bc, (&rCellPopulation));
-        AddCellPopulationBoundaryCondition(p_bc);
-    }
-
-    MAKE_PTR(CryptCentreBasedDivisionRule<1>, p_centre_div_rule);
-    mpStaticCastCellPopulation->SetCentreBasedDivisionRule(p_centre_div_rule);
+	if (fabs(norm_2(rDivisionVector) - 1.0) > DBL_EPSILON)
+	{
+		EXCEPTION("Input argument must be a unit vector");
+	}
+    mDivisionVector = rDivisionVector;
 }
 
-CryptSimulation1d::~CryptSimulation1d()
+template <unsigned SPACE_DIM>
+c_vector<double, SPACE_DIM> FixedVertexBasedDivisionRule<SPACE_DIM>::CalculateCellDivisionVector(
+    CellPtr pParentCell,
+    VertexBasedCellPopulation<SPACE_DIM>& rCellPopulation)
 {
+    return mDivisionVector;
 }
 
-void CryptSimulation1d::OutputSimulationParameters(out_stream& rParamsFile)
+template <unsigned SPACE_DIM>
+const c_vector<double, SPACE_DIM>& FixedVertexBasedDivisionRule<SPACE_DIM>::rGetDivisionVector() const
 {
-    // No parameters to output
-
-    // Call method on direct parent class
-    OffLatticeSimulation<1>::OutputSimulationParameters(rParamsFile);
+    return mDivisionVector;
 }
+
+// Explicit instantiation
+template class FixedVertexBasedDivisionRule<1>;
+template class FixedVertexBasedDivisionRule<2>;
+template class FixedVertexBasedDivisionRule<3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-CHASTE_CLASS_EXPORT(CryptSimulation1d)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(FixedVertexBasedDivisionRule)

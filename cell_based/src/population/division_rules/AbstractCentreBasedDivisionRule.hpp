@@ -33,26 +33,28 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef RANDOMDIRECTIONVERTEXBASEDDIVISIONRULE_HPP_
-#define RANDOMDIRECTIONVERTEXBASEDDIVISIONRULE_HPP_
+#ifndef ABSTRACTCENTREBASEDDIVISIONRULE_HPP_
+#define ABSTRACTCENTREBASEDDIVISIONRULE_HPP_
+
+#include "AbstractCentreBasedCellPopulation.hpp"
 
 #include "ChasteSerialization.hpp"
-#include <boost/serialization/base_object.hpp>
-#include "AbstractVertexBasedDivisionRule.hpp"
-#include "VertexBasedCellPopulation.hpp"
-#include "RandomNumberGenerator.hpp"
+#include "ClassIsAbstract.hpp"
 
 // Forward declaration prevents circular include chain
-template<unsigned SPACE_DIM> class VertexBasedCellPopulation;
-template<unsigned SPACE_DIM> class AbstractVertexBasedDivisionRule;
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCentreBasedCellPopulation;
 
 /**
- * A class to generate a division vector of unit length that points in a random direction.
+ * An abstract cell division rule for use in centre-based simulations.
+ *
+ * The purpose of this class is to return the locations of the two
+ * daughters of a dividing cell.
  */
-template <unsigned SPACE_DIM>
-class RandomDirectionVertexBasedDivisionRule : public AbstractVertexBasedDivisionRule<SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
+class AbstractCentreBasedDivisionRule : public Identifiable
 {
 private:
+
     friend class boost::serialization::access;
     /**
      * Serialize the object and its member variables.
@@ -63,38 +65,48 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractVertexBasedDivisionRule<SPACE_DIM> >(*this);
     }
 
+protected:
+
+    /**
+     * Output any parameters associated with the division rule.
+     * Currently empty since this class has no member variables. Should
+     * be overridden by any child classes that have parameters.
+     *
+     * @param rParamsFile  The stream of the parameter file
+     */
+    virtual void OutputCellCentreBasedDivisionRuleParameters(out_stream& rParamsFile);
+
 public:
+
     /**
      * Default constructor.
      */
-    RandomDirectionVertexBasedDivisionRule()
-    {
-    }
+    AbstractCentreBasedDivisionRule();
 
     /**
      * Empty destructor.
      */
-    virtual ~RandomDirectionVertexBasedDivisionRule()
-    {
-    }
+    virtual ~AbstractCentreBasedDivisionRule();
 
     /**
-     * Overridden CalculateCellDivisionVector() method.
-     *
-     * Return a unit vector in a random direction, i.e the arguments are redundant for this division rule.
+     * Return a pair of vectors used to position the daughters of a dividing cell.
      *
      * @param pParentCell  The cell to divide
-     * @param rCellPopulation  The vertex-based cell population
-     * @return the division vector.
+     * @param rCellPopulation  The centre-based cell population
+     *
+     * @return the two daughter cell positions.
      */
-    virtual c_vector<double, SPACE_DIM> CalculateCellDivisionVector(CellPtr pParentCell,
-        VertexBasedCellPopulation<SPACE_DIM>& rCellPopulation);
+    virtual std::pair<c_vector<double, SPACE_DIM>, c_vector<double, SPACE_DIM> > CalculateCellDivisionVector(CellPtr pParentCell,
+        AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>& rCellPopulation)=0;
+
+    /**
+     * Output the name of the concrete class and call OutputCellCentreBasedDivisionRuleParameters().
+     *
+     * @param rParamsFile  The stream of the parameter file
+     */
+    void OutputCellCentreBasedDivisionRuleInfo(out_stream& rParamsFile);
 };
 
-#include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(RandomDirectionVertexBasedDivisionRule)
-
-#endif // RANDOMDIRECTIONVERTEXBASEDDIVISIONRULE_HPP_
+#endif /*ABSTRACTCENTREBASEDDIVISIONRULE_HPP_*/

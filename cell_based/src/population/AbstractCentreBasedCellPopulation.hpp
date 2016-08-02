@@ -37,15 +37,23 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define ABSTRACTCENTREBASEDCELLPOPULATION_HPP_
 
 #include "AbstractOffLatticeCellPopulation.hpp"
+#include "AbstractCentreBasedDivisionRule.hpp"
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCentreBasedDivisionRule; // Circular definition thing.
 
 /**
  * An abstract facade class encapsulating a centre-based cell population, in which
  * each cell corresponds to a Node.
  */
-template<unsigned ELEMENT_DIM, unsigned  SPACE_DIM=ELEMENT_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
 class AbstractCentreBasedCellPopulation : public AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>
 {
 private:
+    /**
+     * This test uses the private constructor to simplify testing.
+     */
+    friend class TestCentreBasedDivisionRules;
+
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
@@ -60,6 +68,7 @@ private:
         archive & boost::serialization::base_object<AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM> >(*this);
         archive & mMeinekeDivisionSeparation;
         archive & mMarkedSprings;
+        archive & mpCentreBasedDivisionRule;
     }
 
 protected:
@@ -75,6 +84,11 @@ protected:
      * (which are represented as two cells joined by a shorter spring).
      */
     std::set<std::pair<CellPtr,CellPtr> > mMarkedSprings;
+
+    /** A pointer to a division rule that is used to generate the locations of daughter cells when a cell divides. 
+     * This is a specialisation for centre-based models.
+     */
+    boost::shared_ptr<AbstractCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM> > mpCentreBasedDivisionRule;
 
     /**
      * Constructor that just takes in a mesh.
@@ -109,8 +123,8 @@ public:
      * @param rCells a vector of cells
      * @param locationIndices an optional vector of location indices that correspond to real cells
      */
-    AbstractCentreBasedCellPopulation( AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
-                                        std::vector<CellPtr>& rCells,
+    AbstractCentreBasedCellPopulation(AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
+                                      std::vector<CellPtr>& rCells,
                                       const std::vector<unsigned> locationIndices=std::vector<unsigned>());
 
     /**
@@ -136,12 +150,11 @@ public:
      * Add a new cell to the cell population.
      *
      * @param pNewCell  the cell to add
-     * @param rCellDivisionVector  the position in space at which to put it
      * @param pParentCell pointer to a parent cell (if required)
      *
      * @return address of cell as it appears in the cell list
      */
-    CellPtr AddCell(CellPtr pNewCell, const c_vector<double,SPACE_DIM>& rCellDivisionVector, CellPtr pParentCell=CellPtr());
+    CellPtr AddCell(CellPtr pNewCell, CellPtr pParentCell=CellPtr());
 
     /**
      * @return a an ordered pair of pointers to two given Cells.
@@ -265,15 +278,16 @@ public:
     void SetMeinekeDivisionSeparation(double divisionSeparation);
 
     /**
-     * Overridden method to specify a division vector.
-     *
-     * \todo Generalize to allow the user to specify a rule for division 
-     *       orientation (#2800)
-     *
-     * @param pParentCell the cell undergoing division
-     * @return a vector containing information on cell division
+     * @return The division rule that is currently being used.
      */
-    virtual c_vector<double, SPACE_DIM> CalculateCellDivisionVector(CellPtr pParentCell);
+    boost::shared_ptr<AbstractCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM> > GetCentreBasedDivisionRule();
+
+    /**
+     * Set the division rule for this population.
+     *
+     * @param pCentreBasedDivisionRule  pointer to the new division rule
+     */
+    void SetCentreBasedDivisionRule(boost::shared_ptr<AbstractCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM> > pCentreBasedDivisionRule);
 
     /**
      * Overridden OutputCellPopulationParameters() method.
@@ -283,7 +297,9 @@ public:
     virtual void OutputCellPopulationParameters(out_stream& rParamsFile);
 
     /**
-     * Overridden method to get a default value for the time step to use 
+     * Overridden GetDefaultTimeStep() method.
+     *
+     * @return a default value for the time step to use
      * when simulating the cell population.
      *
      * A hard-coded value of 1/120 is returned. However, note that the time 

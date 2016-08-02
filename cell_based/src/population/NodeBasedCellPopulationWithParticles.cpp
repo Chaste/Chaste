@@ -140,12 +140,12 @@ void NodeBasedCellPopulationWithParticles<DIM>::UpdateParticlesAfterReMesh(NodeM
 }
 
 template<unsigned DIM>
-CellPtr NodeBasedCellPopulationWithParticles<DIM>::AddCell(CellPtr pNewCell, const c_vector<double,DIM>& rCellDivisionVector, CellPtr pParentCell)
+CellPtr NodeBasedCellPopulationWithParticles<DIM>::AddCell(CellPtr pNewCell, CellPtr pParentCell)
 {
     assert(pNewCell);
 
-    // Add new cell to cell population
-    CellPtr p_created_cell = AbstractCentreBasedCellPopulation<DIM>::AddCell(pNewCell, rCellDivisionVector, pParentCell);
+    // Add new cell to population
+    CellPtr p_created_cell = AbstractCentreBasedCellPopulation<DIM>::AddCell(pNewCell, pParentCell);
     assert(p_created_cell == pNewCell);
 
     // Then set the new cell radius in the NodesOnlyMesh

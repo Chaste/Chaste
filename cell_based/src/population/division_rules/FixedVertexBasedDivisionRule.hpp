@@ -33,26 +33,36 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef RANDOMDIRECTIONVERTEXBASEDDIVISIONRULE_HPP_
-#define RANDOMDIRECTIONVERTEXBASEDDIVISIONRULE_HPP_
+#ifndef FIXEDVERTEXBASEDDIVISIONRULE_HPP_
+#define FIXEDVERTEXBASEDDIVISIONRULE_HPP_
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
+#include <boost/serialization/vector.hpp>
+
 #include "AbstractVertexBasedDivisionRule.hpp"
 #include "VertexBasedCellPopulation.hpp"
-#include "RandomNumberGenerator.hpp"
 
 // Forward declaration prevents circular include chain
 template<unsigned SPACE_DIM> class VertexBasedCellPopulation;
 template<unsigned SPACE_DIM> class AbstractVertexBasedDivisionRule;
-
 /**
- * A class to generate a division vector of unit length that points in a random direction.
+ * A class to generate a division vector of unit length specified in
+ * the class constructor.
+ * 
+ * This helper class is used in TestVertexhBasedCellPopulation.hpp.
  */
-template <unsigned SPACE_DIM>
-class RandomDirectionVertexBasedDivisionRule : public AbstractVertexBasedDivisionRule<SPACE_DIM>
+template<unsigned SPACE_DIM>
+class FixedVertexBasedDivisionRule : public AbstractVertexBasedDivisionRule<SPACE_DIM>
 {
 private:
+
+    /**
+     * The specified division vector.
+     * Initialized in the constructor.
+     */
+    c_vector<double, SPACE_DIM> mDivisionVector;
+
     friend class boost::serialization::access;
     /**
      * Serialize the object and its member variables.
@@ -67,24 +77,31 @@ private:
     }
 
 public:
+
     /**
      * Default constructor.
+     *
+     * @param rDivisionVector the specified division vector
      */
-    RandomDirectionVertexBasedDivisionRule()
-    {
-    }
+    FixedVertexBasedDivisionRule(c_vector<double, SPACE_DIM>& rDivisionVector);
 
     /**
      * Empty destructor.
      */
-    virtual ~RandomDirectionVertexBasedDivisionRule()
+    virtual ~FixedVertexBasedDivisionRule()
     {
     }
 
     /**
+     * @return mDivisionVector.
+     */
+    const c_vector<double, SPACE_DIM>& rGetDivisionVector() const;
+
+    /**
      * Overridden CalculateCellDivisionVector() method.
      *
-     * Return a unit vector in a random direction, i.e the arguments are redundant for this division rule.
+     * Return the short axis of the existing cell, which will be used to
+     * form the boundary between the daughter cells.
      *
      * @param pParentCell  The cell to divide
      * @param rCellPopulation  The vertex-based cell population
@@ -95,6 +112,45 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(RandomDirectionVertexBasedDivisionRule)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(FixedVertexBasedDivisionRule)
 
-#endif // RANDOMDIRECTIONVERTEXBASEDDIVISIONRULE_HPP_
+namespace boost
+{
+namespace serialization
+{
+/**
+ * Serialize information required to construct a FixedVertexBasedDivisionRule.
+ */
+template<class Archive, unsigned SPACE_DIM>
+inline void save_construct_data(
+    Archive & ar, const FixedVertexBasedDivisionRule<SPACE_DIM>* t, const unsigned int file_version)
+{
+    // Archive c_vector one component at a time
+    c_vector<double, SPACE_DIM> vector = t->rGetDivisionVector();
+    for (unsigned i=0; i<SPACE_DIM; i++)
+    {
+        ar << vector[i];
+    }
+}
+
+/**
+ * De-serialize constructor parameters and initialize a FixedVertexBasedDivisionRule.
+ */
+template<class Archive, unsigned SPACE_DIM>
+inline void load_construct_data(
+    Archive & ar, FixedVertexBasedDivisionRule<SPACE_DIM>* t, const unsigned int file_version)
+{
+    // Archive c_vector one component at a time
+    c_vector<double, SPACE_DIM> vector;
+    for (unsigned i=0; i<SPACE_DIM; i++)
+    {
+        ar >> vector[i];
+    }
+
+    // Invoke inplace constructor to initialise instance
+    ::new(t)FixedVertexBasedDivisionRule<SPACE_DIM>(vector);
+}
+}
+} // namespace ...
+
+#endif // FIXEDVERTEXBASEDDIVISIONRULE_HPP_

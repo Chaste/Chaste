@@ -15,6 +15,10 @@
 		<OutputMeshInVtk>0</OutputMeshInVtk>
 		<HasVariableRestLength>0</HasVariableRestLength>
 		<MeinekeDivisionSeparation>0.3</MeinekeDivisionSeparation>
+		<CentreBasedDivisionRule>
+			<RandomDirectionCentreBasedDivisionRule-2-2>
+			</RandomDirectionCentreBasedDivisionRule-2-2>
+		</CentreBasedDivisionRule>
 		<DampingConstantNormal>1</DampingConstantNormal>
 		<DampingConstantMutant>1</DampingConstantMutant>
 		<OutputResultsForChasteVisualizer>1</OutputResultsForChasteVisualizer>

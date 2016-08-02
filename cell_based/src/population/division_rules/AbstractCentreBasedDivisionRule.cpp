@@ -33,42 +33,37 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "CryptSimulation1d.hpp"
-#include "WntConcentration.hpp"
-#include "SmartPointers.hpp"
+#include "AbstractCentreBasedDivisionRule.hpp"
 
-CryptSimulation1d::CryptSimulation1d(AbstractCellPopulation<1>& rCellPopulation,
-                  bool deleteCellPopulationInDestructor,
-                  bool initialiseCells)
-    : OffLatticeSimulation<1>(rCellPopulation,
-                          deleteCellPopulationInDestructor,
-                          initialiseCells)
-{
-    mpStaticCastCellPopulation = static_cast<MeshBasedCellPopulation<1>*>(&mrCellPopulation);
-
-    if (!mDeleteCellPopulationInDestructor)
-    {
-        // Pass a CryptSimulationBoundaryCondition object into mBoundaryConditions
-        MAKE_PTR_ARGS(CryptSimulationBoundaryCondition<1>, p_bc, (&rCellPopulation));
-        AddCellPopulationBoundaryCondition(p_bc);
-    }
-
-    MAKE_PTR(CryptCentreBasedDivisionRule<1>, p_centre_div_rule);
-    mpStaticCastCellPopulation->SetCentreBasedDivisionRule(p_centre_div_rule);
-}
-
-CryptSimulation1d::~CryptSimulation1d()
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+AbstractCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM>::AbstractCentreBasedDivisionRule()
 {
 }
 
-void CryptSimulation1d::OutputSimulationParameters(out_stream& rParamsFile)
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+AbstractCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM>::~AbstractCentreBasedDivisionRule()
 {
-    // No parameters to output
-
-    // Call method on direct parent class
-    OffLatticeSimulation<1>::OutputSimulationParameters(rParamsFile);
 }
 
-// Serialization for Boost >= 1.36
-#include "SerializationExportWrapperForCpp.hpp"
-CHASTE_CLASS_EXPORT(CryptSimulation1d)
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM>::OutputCellCentreBasedDivisionRuleInfo(out_stream& rParamsFile)
+{
+    std::string cell_division_rule_type = GetIdentifier();
+
+    *rParamsFile << "\t\t\t<" << cell_division_rule_type << ">\n";
+    OutputCellCentreBasedDivisionRuleParameters(rParamsFile);
+    *rParamsFile << "\t\t\t</" << cell_division_rule_type << ">\n";
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM>::OutputCellCentreBasedDivisionRuleParameters(out_stream& rParamsFile)
+{
+}
+
+// Explicit instantiation
+template class AbstractCentreBasedDivisionRule<1,1>;
+template class AbstractCentreBasedDivisionRule<1,2>;
+template class AbstractCentreBasedDivisionRule<2,2>;
+template class AbstractCentreBasedDivisionRule<1,3>;
+template class AbstractCentreBasedDivisionRule<2,3>;
+template class AbstractCentreBasedDivisionRule<3,3>;

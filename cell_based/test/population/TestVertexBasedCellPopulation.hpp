@@ -58,6 +58,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SmartPointers.hpp"
 #include "FileComparison.hpp"
 #include "ShortAxisVertexBasedDivisionRule.hpp"
+#include "FixedVertexBasedDivisionRule.hpp"
 #include "ApoptoticCellProperty.hpp"
 
 // Cell writers
@@ -391,7 +392,6 @@ public:
 
     void TestAddCellWithSimpleMesh() throw (Exception)
     {
-        // This also tests the correct implementation of ShortAxisVertexBasedDivisionRule.
         // Make some nodes
         std::vector<Node<2>*> nodes;
         nodes.push_back(new Node<2>(0, true, 2.0, -1.0));
@@ -464,7 +464,7 @@ public:
         TS_ASSERT_DELTA(short_axis[0], 0.0, 1e-9);
         TS_ASSERT_DELTA(short_axis[1], 1.0, 1e-9);
 
-        CellPtr p_new_cell = cell_population.AddCell(p_temp_cell, short_axis, p_cell0);
+        CellPtr p_new_cell = cell_population.AddCell(p_temp_cell, p_cell0);
 
         // Check that the new cell was successfully added to the cell population
         TS_ASSERT_EQUALS(cell_population.GetNumNodes(), old_num_nodes+2);
@@ -563,12 +563,15 @@ public:
         cell_division_axis[0] = 1.0;
         cell_division_axis[1] = 0.0;
 
+		MAKE_PTR_ARGS(FixedVertexBasedDivisionRule<2>, p_div_rule, (cell_division_axis));
+		cell_population.SetVertexBasedDivisionRule(p_div_rule);
+
         FixedDurationGenerationBasedCellCycleModel* p_model2 = new FixedDurationGenerationBasedCellCycleModel();
         CellPtr p_temp_cell(new Cell(p_state, p_model2));
         p_temp_cell->SetCellProliferativeType(p_stem_type);
         p_temp_cell->SetBirthTime(-1.0);
 
-        CellPtr p_new_cell = cell_population.AddCell(p_temp_cell, cell_division_axis, p_cell);
+        CellPtr p_new_cell = cell_population.AddCell(p_temp_cell, p_cell);
 
         // Check that the new cell was successfully added to the cell population
         TS_ASSERT_EQUALS(cell_population.GetNumNodes(), 6u);
@@ -661,11 +664,8 @@ public:
 
         CellPtr p_new_cell = cell_population.GetCellUsingLocationIndex(4)->Divide();
 
-        c_vector<double, 2> new_location = cell_population.GetVertexBasedDivisionRule()
-                ->CalculateCellDivisionVector(p_cell4, cell_population);
-
         // Add new cell to the cell population
-        cell_population.AddCell(p_new_cell, new_location, p_cell4);
+        cell_population.AddCell(p_new_cell, p_cell4);
 
         // Check that the new cell was successfully added to the cell population
         TS_ASSERT_EQUALS(cell_population.GetNumNodes(), old_num_nodes+2);
