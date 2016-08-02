@@ -300,7 +300,7 @@ public:
     virtual CellPtr AddCell(CellPtr pNewCell, CellPtr pParentCell=CellPtr())=0;
 
     /**
-     * Get a default value for the time step to use when simulating 
+     * @return a default value for the time step to use when simulating
      * the cell population.
      *
      * As this method is pure virtual, it must be overridden

@@ -454,7 +454,9 @@ public:
     void SetVertexBasedDivisionRule(boost::shared_ptr<AbstractVertexBasedDivisionRule<DIM> > pVertexBasedDivisionRule);
 
     /**
-     * Overridden method to get a default value for the time step to use 
+     * Overridden GetDefaultTimeStep() method.
+     *
+     * @return a default value for the time step to use
      * when simulating the cell population.
      *
      * A hard-coded value of 0.002 is returned. However, note that the time 
