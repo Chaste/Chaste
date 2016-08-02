@@ -49,6 +49,8 @@ AbstractPottsUpdateRule<DIM>::~AbstractPottsUpdateRule()
 template<unsigned DIM>
 void AbstractPottsUpdateRule<DIM>::OutputUpdateRuleParameters(out_stream& rParamsFile)
 {
+    // Call method on direct parent class
+	AbstractUpdateRule<DIM>::OutputUpdateRuleParameters(rParamsFile);
 }
 
 // Explicit instantiation

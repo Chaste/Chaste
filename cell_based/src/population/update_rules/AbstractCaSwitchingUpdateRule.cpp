@@ -49,6 +49,8 @@ AbstractCaSwitchingUpdateRule<DIM>::~AbstractCaSwitchingUpdateRule()
 template<unsigned DIM>
 void AbstractCaSwitchingUpdateRule<DIM>::OutputUpdateRuleParameters(out_stream& rParamsFile)
 {
+    // Call method on direct parent class
+	AbstractUpdateRule<DIM>::OutputUpdateRuleParameters(rParamsFile);
 }
 
 // Explicit instantiation
