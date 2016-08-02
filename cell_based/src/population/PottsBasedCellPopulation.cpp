@@ -197,24 +197,30 @@ unsigned PottsBasedCellPopulation<DIM>::RemoveDeadCells()
 {
     unsigned num_removed = 0;
 
-    for (std::list<CellPtr>::iterator it = this->mCells.begin();
-         it != this->mCells.end();
+    for (std::list<CellPtr>::iterator cell_iter = this->mCells.begin();
+         cell_iter != this->mCells.end();
          )
     {
-        if ((*it)->IsDead())
+        if ((*cell_iter)->IsDead())
         {
-            // Remove the element from the mesh
+            // Get the location index corresponding to this cell
+            unsigned location_index = this->GetLocationIndexUsingCell(*cell_iter);
+
+            // Use this to remove the cell from the population
+            mpPottsMesh->DeleteElement(location_index);
+
+            // Erase cell and update counter
+            cell_iter = this->mCells.erase(cell_iter);
             num_removed++;
-            mpPottsMesh->DeleteElement(this->GetLocationIndexUsingCell((*it)));
-            it = this->mCells.erase(it);
         }
         else
         {
-            ++it;
+            ++cell_iter;
         }
     }
     return num_removed;
 }
+
 template<unsigned DIM>
 void PottsBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
 {

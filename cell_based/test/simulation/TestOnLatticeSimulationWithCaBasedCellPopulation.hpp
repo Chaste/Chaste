@@ -900,7 +900,7 @@ public:
         TS_ASSERT_DELTA(cell_location_1[1], 0.0, 1e-4);
 
         std::vector<boost::shared_ptr<AbstractCaUpdateRule<2> > > update_rules =
-            static_cast<CaBasedCellPopulation<2>*>(&(p_simulator2->rGetCellPopulation()))->rGetUpdateRuleCollection();
+            static_cast<CaBasedCellPopulation<2>*>(&(p_simulator2->rGetCellPopulation()))->GetUpdateRuleCollection();
 
         double diffusion_parameter = (dynamic_cast<DiffusionCaUpdateRule<2>*>(update_rules[0].get()))->GetDiffusionParameter();
         TS_ASSERT_DELTA(diffusion_parameter, 0.1, 1e-4);

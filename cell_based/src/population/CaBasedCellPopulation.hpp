@@ -59,7 +59,6 @@ template<unsigned DIM> class AbstractCaBasedDivisionRule; // Circular definition
  * The PottsMesh is used to define node connectivity.
  *
  * Multiple cells can be associated at a single node.
- *
  */
 template<unsigned DIM>
 class CaBasedCellPopulation : public AbstractOnLatticeCellPopulation<DIM>
@@ -74,7 +73,6 @@ private:
     /**
      * The update rules used to determine the new location of the cells.
      * These rules specify is cells switch locations.
-     * \todo serialize this member (#2836)
      */
     std::vector<boost::shared_ptr<AbstractUpdateRule<DIM> > > mSwitchingUpdateRuleCollection;
 
@@ -274,7 +272,9 @@ public:
 
     /**
       * Calculate the propensity of a dividing into a given site.
-      * Overridden in child classes to define other division methods. eg directed division.
+      * Overridden in child classes to define other division methods, e.g. directed division.
+      *
+      * \todo This functionality should be moved into the CA-based division rule hierarchy
       *
       * @param currentNodeIndex The index of the current node/lattice site
       * @param targetNodeIndex The index of the target node/lattice site
@@ -282,8 +282,8 @@ public:
       * @return The probability of the cell dividing from the current node to the target node
       */
      double virtual EvaluateDivisionPropensity(unsigned currentNodeIndex,
-                                        unsigned targetNodeIndex,
-                                        CellPtr pCell);
+                                               unsigned targetNodeIndex,
+                                               CellPtr pCell);
     /**
      * Remove all cells labelled as dead.
      *

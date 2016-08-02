@@ -94,7 +94,7 @@ CaBasedCellPopulation<DIM>::CaBasedCellPopulation(PottsMesh<DIM>& rMesh,
         std::list<CellPtr>::iterator it = this->mCells.begin();
         for (unsigned i=0; it != this->mCells.end(); ++it, ++i)
         {
-            assert(i<locationIndices.size());
+            assert(i < locationIndices.size());
             if (!IsSiteAvailable(locationIndices[i],*it))
             {
                 EXCEPTION("One of the lattice sites has more cells than the carrying capacity. Check the initial cell locations.");
@@ -237,8 +237,8 @@ CellPtr CaBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, CellPtr pParentCel
 
 template<unsigned DIM>
 double CaBasedCellPopulation<DIM>:: EvaluateDivisionPropensity(unsigned currentNodeIndex,
-                                                                       unsigned targetNodeIndex,
-                                                                       CellPtr pCell)
+                                                               unsigned targetNodeIndex,
+                                                               CellPtr pCell)
 {
     return 1.0;
 }
@@ -254,14 +254,15 @@ unsigned CaBasedCellPopulation<DIM>::RemoveDeadCells()
     {
         if ((*cell_iter)->IsDead())
         {
-            // Get the index of the node corresponding to this cell
-            unsigned node_index = this->GetLocationIndexUsingCell(*cell_iter);
+            // Get the location index corresponding to this cell
+            unsigned location_index = this->GetLocationIndexUsingCell(*cell_iter);
 
-            RemoveCellUsingLocationIndex(node_index, (*cell_iter));
+            // Use this to remove the cell from the population
+            RemoveCellUsingLocationIndex(location_index, (*cell_iter));
 
             // Erase cell and update counter
-            num_removed++;
             cell_iter = this->mCells.erase(cell_iter);
+            num_removed++;
         }
         else
         {
@@ -351,7 +352,7 @@ void CaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
                     total_probability += neighbouring_node_propensities[counter];
                     if (total_probability >= random_number)
                     {
-                        //Move the cell to this neighbour location
+                        // Move the cell to this neighbour location
                         unsigned chosen_neighbour_location_index = neighbouring_node_indices_vector[counter];
                         this->MoveCellInLocationMap((*cell_iter), node_index, chosen_neighbour_location_index);
                         break;

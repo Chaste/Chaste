@@ -34,11 +34,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "OnLatticeSimulation.hpp"
+#include "AbstractOnLatticeCellPopulation.hpp"
 #include "CellBasedEventHandler.hpp"
 #include "LogFile.hpp"
 #include "Version.hpp"
 #include "ExecutableSupport.hpp"
-#include "CaBasedCellPopulation.hpp"
 
 template<unsigned DIM>
 OnLatticeSimulation<DIM>::OnLatticeSimulation(AbstractCellPopulation<DIM>& rCellPopulation,
@@ -71,7 +71,6 @@ void OnLatticeSimulation<DIM>::RemoveAllUpdateRules()
 template<unsigned DIM>
 void OnLatticeSimulation<DIM>::UpdateCellLocationsAndTopology()
 {
-    // Update cell locations
     CellBasedEventHandler::BeginEvent(CellBasedEventHandler::POSITION);
     static_cast<AbstractOnLatticeCellPopulation<DIM>*>(&(this->mrCellPopulation))->UpdateCellLocations(this->mDt);
     CellBasedEventHandler::EndEvent(CellBasedEventHandler::POSITION);
@@ -81,7 +80,6 @@ template<unsigned DIM>
 void OnLatticeSimulation<DIM>::UpdateCellPopulation()
 {
 	bool update_cell_population_this_timestep = (this->mInitialiseCells) || (SimulationTime::Instance()->GetTimeStepsElapsed() != 0);
-
     if (update_cell_population_this_timestep)
     {
         AbstractCellBasedSimulation<DIM>::UpdateCellPopulation();
@@ -94,6 +92,7 @@ void OnLatticeSimulation<DIM>::OutputAdditionalSimulationSetup(out_stream& rPara
     // Loop over the collection of update rules and output info for each
     *rParamsFile << "\n\t<UpdateRules>\n";
 
+    // This static_cast is fine, since otherwise an exception would have been thrown in the constructor
     std::vector<boost::shared_ptr<AbstractUpdateRule<DIM> > > collection =
             static_cast<AbstractOnLatticeCellPopulation<DIM>*>(&(this->mrCellPopulation))->GetUpdateRuleCollection();
 
