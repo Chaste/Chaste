@@ -442,11 +442,11 @@ public:
         // Add switching Update Rule
         MAKE_PTR(RandomCaSwitchingUpdateRule<2u>, p_switching_update_rule);
         p_switching_update_rule->SetSwitchingParameter(1.0);
-        simulator.AddCaSwitchingUpdateRule(p_switching_update_rule);
+        simulator.AddUpdateRule(p_switching_update_rule);
 
         // Coverage of remove method
-        simulator.RemoveAllCaSwitchingUpdateRules();
-        simulator.AddCaSwitchingUpdateRule(p_switching_update_rule);
+        simulator.RemoveAllUpdateRules();
+        simulator.AddUpdateRule(p_switching_update_rule);
 
         // Run simulation
         simulator.Solve();
@@ -509,7 +509,7 @@ public:
         // Add switching update rule
         MAKE_PTR(RandomCaSwitchingUpdateRule<2u>, p_switching_update_rule);
         p_switching_update_rule->SetSwitchingParameter(0.5);
-        simulator.AddCaSwitchingUpdateRule(p_switching_update_rule);
+        simulator.AddUpdateRule(p_switching_update_rule);
 
         // Run simulation
         simulator.Solve();

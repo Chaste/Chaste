@@ -375,23 +375,12 @@ public:
     double GetWidth(const unsigned& rDimension);
 
     /**
-     * Add a switching update rule to be used in this simulation (use this to set up how cells move).
+     * Overridden RemoveAllUpdateRules() method.
      *
-     * @param pUpdateRule pointer to an update rule
+     * Remove any update rules previously passed to this population by clearing
+     * mUpdateRuleCollection and mSwitchingUpdateRuleCollection.
      */
-    void AddSwitchingUpdateRule(boost::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule);
-
-    /**
-     * Method to remove all the switching update rules
-     */
-    void RemoveAllSwitchingUpdateRules();
-
-    /**
-     * Get the collection of switching update rules to be used in this simulation.
-     *
-     * @return the update rule collection
-     */
-    const std::vector<boost::shared_ptr<AbstractUpdateRule<DIM> > >& rGetSwitchingUpdateRuleCollection() const;
+    void RemoveAllUpdateRules();
 
     /**
      * Outputs CellPopulation parameters to file
@@ -431,6 +420,17 @@ public:
      * @param pUpdateRule pointer to an update rule
      */
     virtual void AddUpdateRule(boost::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule);
+
+    /**
+     * Overridden AddUpdateRule() method.
+     *
+     * Get the collection of update rules to be used with this population.
+     * This vector is comprised of mUpdateRuleCollection and mSwitchingUpdateRuleCollection,
+     * one after the other.
+     *
+     * @return the update rule collection
+     */
+    virtual const std::vector<boost::shared_ptr<AbstractUpdateRule<DIM> > > GetUpdateRuleCollection() const;
 };
 
 #include "SerializationExportWrapper.hpp"

@@ -206,14 +206,14 @@ public:
     /**
      * Remove any update rules previously passed to this population.
      */
-    void RemoveAllUpdateRules();
+    virtual void RemoveAllUpdateRules();
 
     /**
      * Get the collection of update rules to be used with this population.
      *
      * @return the update rule collection
      */
-    const std::vector<boost::shared_ptr<AbstractUpdateRule<DIM> > >& rGetUpdateRuleCollection() const;
+    virtual const std::vector<boost::shared_ptr<AbstractUpdateRule<DIM> > > GetUpdateRuleCollection() const;
 };
 
 #endif /*ABSTRACTONLATTICECELLPOPULATION_HPP_*/

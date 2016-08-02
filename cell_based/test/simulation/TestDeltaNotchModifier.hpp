@@ -53,6 +53,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexBasedCellPopulation.hpp"
 #include "OffLatticeSimulation.hpp"
 #include "PottsMeshGenerator.hpp"
+#include "CaBasedCellPopulation.hpp"
 #include "PottsBasedCellPopulation.hpp"
 #include "OnLatticeSimulation.hpp"
 #include "DeltaNotchTrackingModifier.hpp"

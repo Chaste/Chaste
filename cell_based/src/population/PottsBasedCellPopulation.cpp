@@ -290,8 +290,8 @@ void PottsBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
                      iter != this->mUpdateRuleCollection.end();
                      ++iter)
                 {
-                	// This static cast is fine, since we assert the update rule must be a Potts update rule in AddUpdateRule()
-                	double dH = (boost::static_pointer_cast<AbstractPottsUpdateRule<DIM> >(*iter))->EvaluateHamiltonianContribution(neighbour_location_index, p_node->GetIndex(), *this);
+                    // This static cast is fine, since we assert the update rule must be a Potts update rule in AddUpdateRule()
+                    double dH = (boost::static_pointer_cast<AbstractPottsUpdateRule<DIM> >(*iter))->EvaluateHamiltonianContribution(neighbour_location_index, p_node->GetIndex(), *this);
                     delta_H += dH;
                 }
 
@@ -403,8 +403,8 @@ double PottsBasedCellPopulation<DIM>::GetWidth(const unsigned& rDimension)
 template<unsigned DIM>
 void PottsBasedCellPopulation<DIM>::AddUpdateRule(boost::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule)
 {
-	assert(bool(dynamic_cast<AbstractPottsUpdateRule<DIM>*>(pUpdateRule.get())));
-	this->mUpdateRuleCollection.push_back(pUpdateRule);
+    assert(bool(dynamic_cast<AbstractPottsUpdateRule<DIM>*>(pUpdateRule.get())));
+    this->mUpdateRuleCollection.push_back(pUpdateRule);
 }
 
 template<unsigned DIM>

@@ -124,21 +124,9 @@ public:
     void AddUpdateRule(boost::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule);
 
     /**
-     * Method to remove all the CaUpdateRules
+     * Remove any update rules that have previously been passed to the cell population.
      */
     void RemoveAllUpdateRules();
-
-    /**
-     * Add a switching update rule to be used in this simulation.
-     *
-     * @param pUpdateRule shared pointer to a CA switching update rule law
-     */
-    void AddCaSwitchingUpdateRule(boost::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule);
-
-    /**
-     * Method to remove all the CaSwitchingUpdateRules
-     */
-    void RemoveAllCaSwitchingUpdateRules();
 
     /**
      * Overridden OutputAdditionalSimulationSetup() method to output the force and cell
