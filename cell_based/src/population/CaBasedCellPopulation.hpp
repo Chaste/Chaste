@@ -120,6 +120,7 @@ private:
     {
 #define COVERAGE_IGNORE
         archive & boost::serialization::base_object<AbstractOnLatticeCellPopulation<DIM> >(*this);
+        archive & mSwitchingUpdateRuleCollection;
         archive & mLatticeCarryingCapacity;
         archive & mUpdateRuleCollection;
         archive & mAvailableSpaces;
