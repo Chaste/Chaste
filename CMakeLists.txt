@@ -274,8 +274,9 @@ if (NOT HDF5_IS_PARALLEL)
     message(SEND_ERROR "Hdf5 library found was not build with --enable-parallel, use the HDF5_ROOT environment variable to specify a parallel hdf5 library. Note: include dirs are ${HDF5_INCLUDE_DIRS} and libraries are ${HDF5_LIBRARIES}")
 endif()
 list(APPEND Chaste_INCLUDES "${HDF5_INCLUDE_DIRS}")
+
 # for some reason the CMake in Homebrew returns a NOTFOUND entry in the Hdf5 libraries
-foreach(dir in ${HDF5_LIBRARIES})
+foreach(dir ${HDF5_LIBRARIES})
     if (dir)
         list(APPEND Chaste_LINK_LIBRARIES "${dir}")
     endif()
@@ -284,8 +285,7 @@ endforeach()
 # put petsc includes after hdf5 includes or else the hdf5 headers 
 # in the petsc include dir will clobber those chosen on FindHdf5.cmake
 list(APPEND Chaste_INCLUDES "${PETSC_INCLUDES}")
-
-
+ 
 #Locate MPI 
 if (PETSC_COMPILER)
     string(REPLACE mpicc mpicxx MPI_CXX_COMPILER ${PETSC_COMPILER})
