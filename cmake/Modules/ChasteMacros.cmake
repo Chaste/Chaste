@@ -538,6 +538,18 @@ macro(Chaste_DO_TEST_COMMON component)
     foreach(type ${TestPackTypes})
         if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${type}TestPack.txt")
             file(STRINGS "${type}TestPack.txt" testpack)
+
+            # remove python tests from windows builds
+            if (WIN32 OR CYGWIN) 
+                set(testpack_new "")
+                foreach(filename ${testpack})
+                    if (NOT filename MATCHES ".py$")
+                        list(APPEND testpack_new ${filename}) 
+                    endif()
+                endforeach()
+                set(testpack ${testpack_new})
+            endif(WIN32 OR CYGWIN)
+
             foreach(filename ${testpack})
                 string(STRIP ${filename} filename)
                 chaste_generate_test_name(${filename} "testTargetName")
