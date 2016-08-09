@@ -96,7 +96,7 @@ void ImmersedBoundaryMembraneElasticityForce<DIM>::AddImmersedBoundaryForceContr
 
         mElementsHaveCorners = (num_corners == 4);
 
-        // If each element has four corners tagged, we set up node regions and apical/basal lengths
+        // If each element has four corners tagged, we set up apical and basal lengths
         if (mElementsHaveCorners)
         {
             // First verify that all elements have the same number of attributes
@@ -110,32 +110,13 @@ void ImmersedBoundaryMembraneElasticityForce<DIM>::AddImmersedBoundaryForceContr
             }
 
             /*
-             * We split the nodes into three categories: basal, apical, and lateral.  We keep this information in the attribute
-             * called region, with 0, 1, and 2 representing basal, apical, and lateral respectively.
-             */
-            TagNodeRegions();
-
-            /*
-             * We keep track of the initial size of the apical and basal sides.  This will be the initial distance between the
-             * corners, which are stored by the element.
+             * We keep track of the initial size of the apical and basal sides.  This will be the initial width of the
+             * element.
              *
-             * Corners are represented as follows, and stored as four consecutive element attributes:
+             * The two element attributes store the apical and basal lengths, respectively.
              *
-             *     Apical
-             *     0-----1
-             *     |     |
-             *     |     |
-             *     |     |
-             *     |     |
-             *     |     |
-             *     3-----2
-             *      Basal
-             *
-             * The two element attributes store the starting distance between the apical corners and basal corners, giving
-             * us:
-             *
-             * Attribute i:   Initial distance between apical corners
-             *           i+1: Initial distance between basal corners
+             * Attribute i:   Apical length
+             *           i+1: Basal length
              */
             TagApicalAndBasalLengths();
         }
@@ -270,48 +251,6 @@ void ImmersedBoundaryMembraneElasticityForce<DIM>::CalculateForcesOnElement(Imme
 //                r_corners[2]->AddAppliedForceContribution(basal_force);
 //            }
 //        }
-}
-
-template<unsigned DIM>
-void ImmersedBoundaryMembraneElasticityForce<DIM>::TagNodeRegions()
-{
-    assert(mpMesh != NULL);
-
-    for (typename ImmersedBoundaryMesh<DIM, DIM>::ImmersedBoundaryElementIterator elem_it = mpMesh->GetElementIteratorBegin();
-         elem_it != mpMesh->GetElementIteratorEnd();
-         ++elem_it)
-    {
-        // Nodes are ordered anti-clockwise, so nodes to the first corner will be lateral, then apical, lateral,
-        // basal, lateral
-
-        std::vector<Node<DIM>*> r_corners = elem_it->rGetCornerNodes();
-
-        unsigned change_1 = elem_it->GetNodeLocalIndex(r_corners[1]->GetIndex());
-        unsigned change_2 = elem_it->GetNodeLocalIndex(r_corners[0]->GetIndex()) + 1;
-        unsigned change_3 = elem_it->GetNodeLocalIndex(r_corners[3]->GetIndex());
-        unsigned change_4 = elem_it->GetNodeLocalIndex(r_corners[2]->GetIndex()) + 1;
-
-        for (unsigned node_idx = 0; node_idx < change_1; node_idx++)
-        {
-            elem_it->GetNode(node_idx)->SetRegion(msLat);
-        }
-        for (unsigned node_idx = change_1; node_idx < change_2; node_idx++)
-        {
-            elem_it->GetNode(node_idx)->SetRegion(msApi);
-        }
-        for (unsigned node_idx = change_2; node_idx < change_3; node_idx++)
-        {
-            elem_it->GetNode(node_idx)->SetRegion(msLat);
-        }
-        for (unsigned node_idx = change_3; node_idx < change_4; node_idx++)
-        {
-            elem_it->GetNode(node_idx)->SetRegion(msBas);
-        }
-        for (unsigned node_idx = change_4; node_idx < elem_it->GetNumNodes(); node_idx++)
-        {
-            elem_it->GetNode(node_idx)->SetRegion(msLat);
-        }
-    }
 }
 
 template<unsigned DIM>

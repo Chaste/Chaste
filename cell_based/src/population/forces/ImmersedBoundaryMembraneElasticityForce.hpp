@@ -81,15 +81,6 @@ protected:
     /** How far through the element attributes vector we are when this constructor is called. */
     unsigned mReferenceLocationInAttributesVector;
 
-    /** Node region code for basal, used only by this class. */
-    const static unsigned msBas = 1;
-
-    /** Node region code for apical, used only by this class. */
-    const static unsigned msApi = 2;
-
-    /** Node region code for lateral, used only by this class. */
-    const static unsigned msLat = 3;
-
     /**
      * The membrane spring constant associated with each element.
      *
@@ -147,12 +138,6 @@ protected:
      * @return basal length of the specified element
      */
     double GetBasalLengthForElement(unsigned elemIndex);
-
-    /**
-     * Splits the nodes into three categories: basal, apical, and lateral.  We keep this information in the node
-     * attribute called region, with 0, 1, and 2 representing basal, apical, and lateral respectively.
-     */
-    void TagNodeRegions();
 
     /*
      * We calculate the 'corners' of each element, in order to alter behaviour on apical, lateral, and basal regions

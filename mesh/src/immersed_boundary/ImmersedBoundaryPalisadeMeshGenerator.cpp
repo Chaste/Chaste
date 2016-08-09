@@ -35,6 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
+#include "ImmersedBoundaryEnumerations.hpp"
 #include "RandomNumberGenerator.hpp"
 
 ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(unsigned numCellsWide,
@@ -71,11 +72,22 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
     SuperellipseGenerator* p_gen = new SuperellipseGenerator(numNodesPerCell, ellipseExponent, cell_width, cell_height, 0.0, 0.0);
     std::vector<c_vector<double, 2> > locations = p_gen->GetPointsAsVectors();
 
-    // Calculate which locations will be the element corners
-    double top_height = p_gen->GetHeightOfTopSurface();
-    double bot_height = cell_height - top_height;
+    /*
+     * The top and bottom heights are the heights at which there is maximum curvature in the superellipse.
+     * These define the apical and basal domains.
+     *       _____
+     *    __/_____\__ Apical cutoff
+     *    __|_____|__ Periapical cutoff
+     *      |     |
+     *      |     |
+     *    __|_____|__ Basal cutoff
+     *      \_____/__ y = 0
+     */
+    double apical_cutoff = p_gen->GetHeightOfTopSurface();
+    double basal_cutoff = cell_height - apical_cutoff;
+    double periapical_cutoff = apical_cutoff - basal_cutoff;
 
-    if (top_height < 0.5 * cell_height || top_height > cell_height)
+    if (apical_cutoff < 0.5 * cell_height || apical_cutoff > cell_height || periapical_cutoff < basal_cutoff)
     {
         EXCEPTION("Something went wrong calculating the height of top surface of the cell.");
     }
@@ -83,42 +95,44 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
     // Corner 0 is left-apical, 1 is right-apical, 2 is right-basal, 3 is left-basal
     std::vector<unsigned> corner_indices(4, UINT_MAX);
 
-    // First anticlockwise corner is corner 1
+    // Node 0 is middle of right lateral side
+
+    // First anticlockwise is RIGHT_APICAL_CORNER
     for (unsigned location = 0; location < locations.size(); location++)
     {
-        if (locations[location][1] > top_height)
+        if (locations[location][1] > apical_cutoff)
         {
-            corner_indices[1] = location;
+            corner_indices[RIGHT_APICAL_CORNER] = location;
             break;
         }
     }
 
-    // Second anticlockwise corner is corner 0
+    // Second anticlockwise is LEFT_APICAL_CORNER
     for (unsigned location = unsigned(0.25 * numNodesPerCell); location < locations.size(); location++)
     {
-        if (locations[location][1] < top_height)
+        if (locations[location][1] < apical_cutoff)
         {
-            corner_indices[0] = location - 1;
+            corner_indices[LEFT_APICAL_CORNER] = location - 1;
             break;
         }
     }
 
-    // Third anticlockwise corner is corner 3
+    // Third anticlockwise is LEFT_BASAL_CORNER
     for (unsigned location = unsigned(0.5 * numNodesPerCell); location < locations.size(); location++)
     {
-        if (locations[location][1] < bot_height)
+        if (locations[location][1] < basal_cutoff)
         {
-            corner_indices[3] = location;
+            corner_indices[LEFT_BASAL_CORNER] = location;
             break;
         }
     }
 
-    // Fourth anticlockwise corner is corner 2
+    // Fourth anticlockwise is RIGHT_BASAL_CORNER
     for (unsigned location = unsigned(0.75 * numNodesPerCell); location < locations.size(); location++)
     {
-        if (locations[location][1] > bot_height)
+        if (locations[location][1] > basal_cutoff)
         {
-            corner_indices[2] = location - 1;
+            corner_indices[RIGHT_BASAL_CORNER] = location - 1;
             break;
         }
     }
@@ -128,17 +142,19 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
          (corner_indices[2] == UINT_MAX) ||
          (corner_indices[3] == UINT_MAX) )
     {
-        EXCEPTION("At least one corner not tagged properly");
+        EXCEPTION("At least one corner not tagged");
     }
 
-    if ( (corner_indices[0] < corner_indices[1]) ||
-         (corner_indices[3] < corner_indices[0]) ||
-         (corner_indices[2] < corner_indices[3]) )
+    // Should have RIGHT_APICAL_CORNER < LEFT_APICAL_CORNER < LEFT_BASAL_CORNER < RIGHT_BASAL_CORNER
+    if ( (corner_indices[RIGHT_APICAL_CORNER] > corner_indices[LEFT_APICAL_CORNER]) ||
+         (corner_indices[LEFT_APICAL_CORNER] > corner_indices[LEFT_BASAL_CORNER]) ||
+         (corner_indices[LEFT_BASAL_CORNER] > corner_indices[RIGHT_BASAL_CORNER]) )
     {
         EXCEPTION("Something went wrong when tagging corner locations");
     }
 
-    if ( corner_indices[0] - corner_indices[1] != corner_indices[2] - corner_indices[3] )
+    if ( corner_indices[LEFT_APICAL_CORNER] - corner_indices[RIGHT_APICAL_CORNER] !=
+         corner_indices[RIGHT_BASAL_CORNER] - corner_indices[LEFT_BASAL_CORNER] )
     {
         EXCEPTION("Apical and basal surfaces are different sizes");
     }
@@ -169,8 +185,11 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
             c_vector<double, 2> location = 0.97 * y_offset + ( 0.5 / num_lamina_nodes + double(node_idx) / num_lamina_nodes ) * x_unit;
 
             // Create the new node
-            nodes.push_back(new Node<2>(node_idx, location, true));
-            nodes_this_elem.push_back(nodes.back());
+            Node<2>* p_node = new Node<2>(node_idx, location, true);
+            p_node->SetRegion(LAMINA_REGION);
+
+            nodes.push_back(p_node);
+            nodes_this_elem.push_back(p_node);
         }
 
         // Create the lamina element
@@ -200,8 +219,57 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
             scaled_location[1] *= (1.0 + random_variation);
             scaled_location[1] += y_offset[1];
 
-            nodes.push_back(new Node<2>(node_index, scaled_location, true));
-            nodes_this_elem.push_back(nodes.back());
+            // Create the new node
+            Node<2>* p_node = new Node<2>(node_index, scaled_location, true);
+
+            // Tag the node region
+            if (locations[location][1] <= basal_cutoff)
+            {
+                if (locations[location][0] < 0.5 * cell_width)
+                {
+                    p_node->SetRegion(LEFT_BASAL_REGION);
+                }
+                else
+                {
+                    p_node->SetRegion(RIGHT_BASAL_REGION);
+                }
+            }
+            else if (locations[location][1] <= periapical_cutoff)
+            {
+                if (locations[location][0] < 0.5 * cell_width)
+                {
+                    p_node->SetRegion(LEFT_LATERAL_REGION);
+                }
+                else
+                {
+                    p_node->SetRegion(RIGHT_LATERAL_REGION);
+                }
+            }
+            else if (locations[location][1] < apical_cutoff)
+            {
+                if (locations[location][0] < 0.5 * cell_width)
+                {
+                    p_node->SetRegion(LEFT_PERIAPICAL_REGION);
+                }
+                else
+                {
+                    p_node->SetRegion(RIGHT_PERIAPICAL_REGION);
+                }
+            }
+            else
+            {
+                if (locations[location][0] < 0.5 * cell_width)
+                {
+                    p_node->SetRegion(LEFT_APICAL_REGION);
+                }
+                else
+                {
+                    p_node->SetRegion(RIGHT_APICAL_REGION);
+                }
+            }
+
+            nodes.push_back(p_node);
+            nodes_this_elem.push_back(p_node);
         }
 
         ib_elements.push_back(new ImmersedBoundaryElement<2,2>(elem_idx, nodes_this_elem));

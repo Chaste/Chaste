@@ -191,7 +191,6 @@ MutableElement<1, SPACE_DIM>::MutableElement(unsigned index, const std::vector<N
     : AbstractElement<1, SPACE_DIM>(index, rNodes)
 {
     // Sanity checking
-    assert(this->mNodes.size() == 2);
     assert(SPACE_DIM > 0);
 }
 
