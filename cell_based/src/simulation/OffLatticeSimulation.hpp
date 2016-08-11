@@ -47,14 +47,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/vector.hpp>
 
 /**
- * Run an off-lattice 2D or 3D cell-based simulation using a cell-centre-
- * or vertex-based cell population.
+ * Run an off-lattice 2D or 3D cell-based simulation using an off-lattice
+ * cell population.
  *
  * In cell-centre-based cell populations, each cell is represented by a
  * single node (corresponding to its centre), and connectivity is defined
  * either by a Delaunay triangulation or a radius of influence. In vertex-
  * based cell populations, each cell is represented by a polytope
  * (corresponding to its membrane) with a variable number of vertices.
+ * Alternative cell populations may be defined by the user.
  *
  * The OffLatticeSimulation is constructed with a CellPopulation, which
  * updates the correspondence between each Cell and its spatial representation
@@ -99,7 +100,7 @@ protected:
     /** List of boundary conditions. */
     std::vector<boost::shared_ptr<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM> > > mBoundaryConditions;
 
-    /** The numerical method to use in this simulation. Defaults to forward Euler. */
+    /** The numerical method to use in this simulation. Defaults to the explicit forward Euler method. */
     boost::shared_ptr<AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM> > mpNumericalMethod;
 
     /**
@@ -128,25 +129,6 @@ protected:
      * Overridden SetupSolve() method to clear the forces applied to the nodes.
      */
     virtual void SetupSolve();
-
-    /**
-     * Overridden CalculateCellDivisionVector() method for determining how cell division occurs.
-     * This method returns a vector which is then passed into the CellPopulation method AddCell().
-     * This method may be overridden by subclasses.
-     *
-     * For a centre-based cell population, this method calculates the new locations of the cell
-     * centres of a dividing cell, moves the parent cell and returns the location of
-     * the daughter cell. The new locations are found by picking a random direction
-     * and placing the parent and daughter in opposing directions along this axis.
-     *
-     * For a vertex-based cell population, the method calls the AbstractVertexBasedDivisionRule which
-     * is a member of the cell population.
-     *
-     * @param pParentCell the parent cell
-     *
-     * @return a vector containing information on cell division.
-     */
-    virtual c_vector<double, SPACE_DIM> CalculateCellDivisionVector(CellPtr pParentCell);
 
     /**
      * Overridden WriteVisualizerSetupFile() method.

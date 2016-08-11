@@ -91,23 +91,6 @@ protected:
      */
     void UpdateCellLocationsAndTopology();
 
-    /**
-     * Overridden CalculateCellDivisionVector() method for determining how cell division occurs.
-     * This method returns a vector which is then passed into the CellPopulation method AddCell().
-     * This method may be overridden by subclasses.
-     *
-     * @param pParentCell the parent cell
-     *
-     * @return a vector containing information on cell division.
-     */
-    virtual c_vector<double, DIM> CalculateCellDivisionVector(CellPtr pParentCell);
-
-    /**
-     * Overridden WriteVisualizerSetupFile() method.
-     */
-    virtual void WriteVisualizerSetupFile();
-
-
 public:
 
     /**

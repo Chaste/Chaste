@@ -414,7 +414,7 @@ public:
         c_vector<double,2> new_location = zero_vector<double>(2);
         new_location[0] = 0.3433453454443;
         new_location[0] = 0.3435346344234;
-        cell_population.AddCell(p_new_cell, new_location, cell_population.rGetCells().front() /*random choice of parent*/);
+        cell_population.AddCell(p_new_cell, cell_population.rGetCells().front()); // random choice of parent
 
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 82u);
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 71u);
@@ -435,7 +435,7 @@ public:
         c_vector<double,2> new_location2 = zero_vector<double>(2);
         new_location2[0] = 0.6433453454443;
         new_location2[0] = 0.6435346344234;
-        cell_population.AddCell(p_new_cell2, new_location2, cell_population.rGetCells().front() /*random choice of parent*/);
+        cell_population.AddCell(p_new_cell2, cell_population.rGetCells().front()); // random choice of parent
 
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 82u);
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 71u);

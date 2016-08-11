@@ -115,7 +115,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         for (unsigned i=0; i<cells.size(); i++)

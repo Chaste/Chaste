@@ -102,6 +102,9 @@ public:
         OffLatticeSimulation<2> simulator(node_based_cell_population);
         simulator.SetOutputDirectory("TestOffLatticeSimulationWithNodeBasedCellPopulation");
 
+        // Test that the member mDt has been initialised correctly
+        TS_ASSERT_DELTA(simulator.GetDt(), 1.0/120.0, 1e-6);
+
         // No need to go for long, don't want any birth or regular grid will be disrupted.
         simulator.SetEndTime(0.5);
 

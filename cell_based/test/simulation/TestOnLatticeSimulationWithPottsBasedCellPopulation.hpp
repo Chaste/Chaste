@@ -145,6 +145,10 @@ public:
 
         // Set up cell-based simulation
         OnLatticeSimulation<2> simulator(cell_population);
+
+        // Test that the member mDt has been initialised correctly
+        TS_ASSERT_DELTA(simulator.GetDt(), 0.1, 1e-6);
+
         simulator.SetOutputDirectory("TestSimplePottsMonolayer");
         simulator.SetEndTime(0.1);
 

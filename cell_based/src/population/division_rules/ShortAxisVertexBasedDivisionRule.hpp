@@ -38,6 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
+
 #include "AbstractVertexBasedDivisionRule.hpp"
 #include "VertexBasedCellPopulation.hpp"
 
@@ -54,7 +55,7 @@ template<unsigned SPACE_DIM> class AbstractVertexBasedDivisionRule;
  * of the moment of inertia of the cell's polygon.
  */
 template <unsigned SPACE_DIM>
-class ShortAxisVertexBasedDivisionRule  : public AbstractVertexBasedDivisionRule<SPACE_DIM>
+class ShortAxisVertexBasedDivisionRule : public AbstractVertexBasedDivisionRule<SPACE_DIM>
 {
 private:
     friend class boost::serialization::access;
@@ -71,6 +72,7 @@ private:
     }
 
 public:
+
     /**
      * Default constructor.
      */

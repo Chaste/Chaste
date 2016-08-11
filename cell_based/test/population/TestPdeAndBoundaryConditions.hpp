@@ -372,7 +372,7 @@ public:
         new_cell_location[0] = 2;
         new_cell_location[1] = 2;
 
-        cell_population.AddCell(p_cell, new_cell_location, cell_population.rGetCells().front() /*random choice of parent*/);
+        cell_population.AddCell(p_cell, cell_population.rGetCells().front()); // random choice of parent
 
         pde_and_bc.SetUpSourceTermsForAveragedSourcePde(&coarse_mesh);
 
@@ -457,7 +457,7 @@ public:
         new_cell_location[0] = 2;
         new_cell_location[1] = 2;
 
-        cell_population.AddCell(p_cell, new_cell_location, cell_population.rGetCells().front() /*random choice of parent*/);
+        cell_population.AddCell(p_cell, cell_population.rGetCells().front()); // random choice of parent
 
         pde_and_bc.SetUpSourceTermsForAveragedSourcePde(&coarse_mesh);
 

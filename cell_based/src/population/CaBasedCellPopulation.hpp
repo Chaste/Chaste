@@ -76,19 +76,24 @@ private:
     /** The carrying capacity (number of cells allowed per site). */
     unsigned mLatticeCarryingCapacity;
 
-    /** The update rules used to determine the new location of the cells.
-     * These rules specify how individual cells move into free spaces */
+    /**
+     * The update rules used to determine the new location of the cells.
+     * These rules specify how individual cells move into free spaces.
+     */
     std::vector<boost::shared_ptr<AbstractCaUpdateRule<DIM> > > mUpdateRuleCollection;
 
-    /** The update rules used to determine the new location of the cells.
-     * THese rules specify is cells switch locations*/
+    /**
+     * The update rules used to determine the new location of the cells.
+     * These rules specify is cells switch locations.
+     * \todo serialize this member
+     */
     std::vector<boost::shared_ptr<AbstractCaSwitchingUpdateRule<DIM> > > mSwitchingUpdateRuleCollection;
 
     /** Records for each node the node the number of spaces available. */
     std::vector<unsigned> mAvailableSpaces;
 
     /** A pointer to a division rule that is used to specify how cells divide. I.e do they move other cells out of the way.
-     * This is a specialisation for Ca models. */
+     * This is a specialisation for CA models. */
     boost::shared_ptr<AbstractCaBasedDivisionRule<DIM> > mpCaBasedDivisionRule;
 
     /**
@@ -115,6 +120,7 @@ private:
     {
 #define COVERAGE_IGNORE
         archive & boost::serialization::base_object<AbstractOnLatticeCellPopulation<DIM> >(*this);
+        archive & mSwitchingUpdateRuleCollection;
         archive & mLatticeCarryingCapacity;
         archive & mUpdateRuleCollection;
         archive & mAvailableSpaces;
@@ -273,11 +279,10 @@ public:
      * Add a new cell to the cell population.
      *
      * @param pNewCell  the cell to add
-     * @param rCellDivisionVector  this parameter is not yet used in this class (see #1737)
      * @param pParentCell pointer to a parent cell (if required)
      * @return address of cell as it appears in the cell list (internal of this method uses a copy constructor along the way)
      */
-    CellPtr AddCell(CellPtr pNewCell, const c_vector<double,DIM>& rCellDivisionVector, CellPtr pParentCell=CellPtr());
+    CellPtr AddCell(CellPtr pNewCell, CellPtr pParentCell=CellPtr());
 
     /**
       * Calculate the propensity of a dividing into a given site.

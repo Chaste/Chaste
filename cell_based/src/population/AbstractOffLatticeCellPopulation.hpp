@@ -200,15 +200,6 @@ public:
     double GetDampingConstantMutant();
 
     /**
-     * A virtual method implemented in specific off-lattice cell populations to
-     * specify a division vector.
-     *
-     * @param pParentCell the cell undergoing division
-     * @return a vector containing information on cell division
-     */
-    virtual c_vector<double, SPACE_DIM> CalculateCellDivisionVector(CellPtr pParentCell)=0;
-
-    /**
      * Overridden OutputCellPopulationParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output

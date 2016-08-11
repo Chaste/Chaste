@@ -73,6 +73,12 @@ AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::AbstractCellBasedSimulation(
     {
         mrCellPopulation.InitialiseCells();
     }
+
+    /*
+     * Specify a default time step to use, which may depend on the cell population type.
+     * Note that the time step may be reset using SetDt().
+     */
+    mDt = rCellPopulation.GetDefaultTimeStep();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -124,11 +130,9 @@ unsigned AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::DoCellBirth()
                     // Create a new cell
                     CellPtr p_new_cell = cell_iter->Divide();
 
-                    // Call method that determines how cell division occurs and returns a vector
-                    c_vector<double, SPACE_DIM> new_location = CalculateCellDivisionVector(*cell_iter);
-
-                    // If required, output this location to file
                     /**
+                     * If required, output this location to file
+                     *
                      * \todo (#2578)
                      *
                      * For consistency with the rest of the output code, consider removing the
@@ -156,8 +160,8 @@ unsigned AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::DoCellBirth()
                         *mpDivisionLocationFile << "\t" << cell_age << "\n";
                     }
 
-                    // Add new cell to the cell population
-                    mrCellPopulation.AddCell(p_new_cell, new_location, *cell_iter);
+                    // Add the new cell to the cell population
+                    mrCellPopulation.AddCell(p_new_cell, *cell_iter);
 
                     // Update counter
                     num_births_this_step++;

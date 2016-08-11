@@ -38,12 +38,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cmath>
 #include <boost/make_shared.hpp>
 
-#include "AbstractCentreBasedCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
 #include "T2SwapCellKiller.hpp"
-#include "Cylindrical2dMesh.hpp"
-#include "Cylindrical2dVertexMesh.hpp"
-#include "AbstractTwoBodyInteractionForce.hpp"
 #include "CellBasedEventHandler.hpp"
 #include "LogFile.hpp"
 #include "Version.hpp"
@@ -63,15 +59,8 @@ OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::OffLatticeSimulation(AbstractCellPo
         EXCEPTION("OffLatticeSimulations require a subclass of AbstractOffLatticeCellPopulation.");
     }
 
-    // Different time steps are used for cell-centre and vertex-based simulations
-    if (bool(dynamic_cast<AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&rCellPopulation)))
+    if (bool(dynamic_cast<VertexBasedCellPopulation<SPACE_DIM>*>(&rCellPopulation)))
     {
-        this->mDt = 1.0/120.0; // 30 seconds
-    }
-    else if (bool(dynamic_cast<VertexBasedCellPopulation<SPACE_DIM>*>(&rCellPopulation)))
-    {
-        this->mDt = 0.002; // smaller time step required for convergence/stability
-
         // For VertexBasedCellPopulations we automatically add a T2SwapCellKiller. In order to inhibit T2 swaps
         // the user needs to set the threshold for T2 swaps in the mesh to 0.
         VertexBasedCellPopulation<SPACE_DIM>* p_vertex_based_cell_population = dynamic_cast<VertexBasedCellPopulation<SPACE_DIM>*>(&rCellPopulation);
@@ -85,7 +74,7 @@ OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::OffLatticeSimulation(AbstractCellPo
          * (except user-derived classes), i.e. if you want to use this method with your own
          * subclass of AbstractOffLatticeCellPopulation, then simply comment out the line below.
          */
-//        NEVER_REACHED;
+        //NEVER_REACHED;
     }
 }
 
@@ -160,7 +149,7 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellLocationsAndTopology
             {
                 ///\todo #2087 Make this a settable member variable
                 double timestep_increase = 0.01;
-                present_time_step = fmin((1+timestep_increase)*present_time_step, target_time_step - time_advanced_so_far);
+                present_time_step = std::min((1+timestep_increase)*present_time_step, target_time_step - time_advanced_so_far);
             }
 
         }
@@ -171,7 +160,7 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellLocationsAndTopology
             {
                 // If adaptivity is switched on, revert node locations and choose a suitably smaller time step
                 RevertToOldLocations(old_node_locations);
-                present_time_step = fmin(e.GetSuggestedNewStep(), target_time_step - time_advanced_so_far);
+                present_time_step = std::min(e.GetSuggestedNewStep(), target_time_step - time_advanced_so_far);
             }
             else
             {
@@ -219,47 +208,16 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::ApplyBoundaries(std::map<Node<
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-c_vector<double, SPACE_DIM> OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::CalculateCellDivisionVector(CellPtr pParentCell)
-{
-    ///\todo #2800 refactor division rules to follow more closely the vertex case
-
-    // This static cast is always valid as the constructor tests that the cell population is AbstractOffLattice
-    return static_cast<AbstractOffLatticeCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&(this->mrCellPopulation))->CalculateCellDivisionVector(pParentCell);
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::WriteVisualizerSetupFile()
 {
     if (PetscTools::AmMaster())
     {
         for (unsigned i=0; i<this->mForceCollection.size(); i++)
         {
-            // This may cause compilation problems, probably due to AbstractTwoBodyInteractionForce not having two template parameters
-            ///\todo Check whether this comment is still valid
-
-            boost::shared_ptr<AbstractForce<ELEMENT_DIM,SPACE_DIM> > p_force = this->mForceCollection[i];
-            if (boost::dynamic_pointer_cast<AbstractTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM> >(p_force))
-            {
-                double cutoff = (boost::static_pointer_cast<AbstractTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM> >(p_force))->GetCutOffLength();
-                *(this->mpVizSetupFile) << "Cutoff\t" << cutoff << "\n";
-            }
+            this->mForceCollection[i]->WriteDataToVisualizerSetupFile(this->mpVizSetupFile);
         }
 
-        // This is a quick and dirty check to see if the mesh is periodic
-        if (bool(dynamic_cast<MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&this->mrCellPopulation)))
-        {
-           if (bool(dynamic_cast<Cylindrical2dMesh*>(&(dynamic_cast<MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&(this->mrCellPopulation))->rGetMesh()))))
-           {
-               *this->mpVizSetupFile << "MeshWidth\t" << this->mrCellPopulation.GetWidth(0) << "\n";
-           }
-        }
-        else if (bool(dynamic_cast<VertexBasedCellPopulation<SPACE_DIM>*>(&this->mrCellPopulation)))
-        {
-           if (bool(dynamic_cast<Cylindrical2dVertexMesh*>(&(dynamic_cast<VertexBasedCellPopulation<SPACE_DIM>*>(&(this->mrCellPopulation))->rGetMesh()))))
-           {
-               *this->mpVizSetupFile << "MeshWidth\t" << this->mrCellPopulation.GetWidth(0) << "\n";
-           }
-        }
+        this->mrCellPopulation.WriteDataToVisualizerSetupFile(this->mpVizSetupFile);
     }
 }
 
@@ -303,7 +261,7 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::OutputAdditionalSimulationSetu
          iter != mBoundaryConditions.end();
          ++iter)
     {
-        // Output cell Boundary condition details
+        // Output cell boundary condition details
         (*iter)->OutputCellPopulationBoundaryConditionInfo(rParamsFile);
     }
     *rParamsFile << "\t</CellPopulationBoundaryConditions>\n";

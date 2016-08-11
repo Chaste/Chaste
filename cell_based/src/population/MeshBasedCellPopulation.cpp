@@ -531,13 +531,13 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::UpdateGhostNodesAfterReMesh
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-CellPtr MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::AddCell(CellPtr pNewCell, const c_vector<double,SPACE_DIM>& rCellDivisionVector, CellPtr pParentCell)
+CellPtr MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::AddCell(CellPtr pNewCell, CellPtr pParentCell)
 {
     assert(pNewCell);
     assert(pParentCell);
 
-    // Add new cell to cell population
-    CellPtr p_created_cell = AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::AddCell(pNewCell, rCellDivisionVector, pParentCell);
+    // Add new cell to population
+    CellPtr p_created_cell = AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::AddCell(pNewCell, pParentCell);
     assert(p_created_cell == pNewCell);
 
     // Mark spring between parent cell and new cell
@@ -849,6 +849,15 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetOutputMeshInVtk()
 {
     return mOutputMeshInVtk;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile)
+{
+    if (dynamic_cast<Cylindrical2dMesh*>(&(this->mrMesh)))
+    {
+        *pVizSetupFile << "MeshWidth\t" << this->GetWidth(0) << "\n";
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////////

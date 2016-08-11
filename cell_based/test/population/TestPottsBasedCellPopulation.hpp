@@ -123,6 +123,9 @@ public:
 
         std::set<unsigned> neighbours_of_cell_0 = cell_population.GetNeighbouringLocationIndices(*(cell_population.Begin()));
         TS_ASSERT(neighbours_of_cell_0 == expected_neighbours_of_cell_0);
+
+        // For coverage, test that GetDefaultTimeStep() returns the correct value
+        TS_ASSERT_DELTA(cell_population.GetDefaultTimeStep(), 0.1, 1e-6);
     }
 
     void TestIsCellAssociatedWithADeletedLocation() throw (Exception)
@@ -301,7 +304,7 @@ public:
 
         // Add new cell to the cell population by dividing the cell
         AbstractCellPopulation<2>::Iterator cell_iter_1 = cell_population.Begin();
-        cell_population.AddCell(p_new_cell, zero_vector<double>(2), *cell_iter_1);
+        cell_population.AddCell(p_new_cell, *cell_iter_1);
 
         TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(p_new_cell), 1u);
 

@@ -109,7 +109,8 @@ public:
      * @param rCellPopulation  The CA-based cell population
      * @return the node index for the daughter cell.
      */
-    virtual unsigned CalculateDaughterNodeIndex(CellPtr pNewCell, CellPtr pParentCell,
+    virtual unsigned CalculateDaughterNodeIndex(CellPtr pNewCell,
+    		                                    CellPtr pParentCell,
                                                 CaBasedCellPopulation<SPACE_DIM>& rCellPopulation)=0;
 
     /**

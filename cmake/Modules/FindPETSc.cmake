@@ -70,7 +70,7 @@ function (petsc_get_version)
 endfunction ()
 
 set(homebrew_dir /usr/local/Cellar/petsc)
-file(GLOB homebrew_dirs ${homebrew_dir}/*)
+file(GLOB homebrew_dirs ${homebrew_dir}/*/real)
 
 set(debian_dir /usr/lib/petscdir)
 file(GLOB ubuntu_dirs ${debian_dir}/*/*)
