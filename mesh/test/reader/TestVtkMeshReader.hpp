@@ -557,6 +557,9 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 1632u);
         TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 32u);
         TS_ASSERT_EQUALS(mesh.GetNumCableElements(), 0u);
+
+        TS_ASSERT(!mesh.GetNode(2)->IsBoundaryNode());
+        TS_ASSERT(mesh.GetNode(831)->IsBoundaryNode());
 #else
         std::cout << "This test was not run, as VTK is not enabled." << std::endl;
         std::cout << "If required please install and alter your hostconfig settings to switch on chaste VTK support." << std::endl;

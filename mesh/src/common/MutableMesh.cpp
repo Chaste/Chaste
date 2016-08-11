@@ -106,6 +106,18 @@ unsigned MutableMesh<ELEMENT_DIM, SPACE_DIM>::AddElement(Element<ELEMENT_DIM,SPA
         new_elt_index = this->mElements.size();
         this->mElements.push_back(pNewElement);
         pNewElement->ResetIndex(new_elt_index);
+
+        if (SPACE_DIM == ELEMENT_DIM)
+        {
+            this->mElementJacobians.resize(this->mElements.size());
+            this->mElementInverseJacobians.resize(this->mElements.size());
+        }
+        else
+        {
+            this->mElementWeightedDirections.resize(this->mElements.size());
+        }
+        this->mElementJacobianDeterminants.resize(this->mElements.size());
+
     }
     else
     {

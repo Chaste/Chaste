@@ -45,6 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "VtkMeshReader.hpp"
 #include "Exception.hpp"
+#include <vtkMath.h>
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::VtkMeshReader(std::string pathBaseName) :
@@ -146,6 +147,11 @@ void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::CommonConstructor()
         mpVtkFilterEdges->SetInputConnection(p_surface->GetOutputPort());
 #else
         p_surface->SetInput(mpVtkUnstructuredGrid);
+        mpVtkFilterEdges->BoundaryEdgesOn();
+        mpVtkFilterEdges->FeatureEdgesOff();
+        mpVtkFilterEdges->NonManifoldEdgesOff();
+        mpVtkFilterEdges->ManifoldEdgesOff();
+        mpVtkFilterEdges->ColoringOff();
         mpVtkFilterEdges->SetInput(p_surface->GetOutput());
 #endif
         mpVtkFilterEdges->Update();
@@ -396,7 +402,22 @@ ElementData VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetNextFaceData()
     {
         for (unsigned i = 0; i < (mNodesPerElement-1); i++)
         {
-            next_face_data.NodeIndices.push_back(mpVtkFilterEdges->GetOutput()->GetCell(mBoundaryFacesRead)->GetPointId(i));
+            double* coords_edge_node = mpVtkFilterEdges->GetOutput()->GetCell(mBoundaryFacesRead)->GetPoints()->GetPoint(i);
+
+            double min_distance = DBL_MAX;
+            unsigned matching_node;
+            for (unsigned node_index=0; node_index<mNumNodes; ++node_index)
+            {
+                double* coords_test_node = mpVtkUnstructuredGrid->GetPoint(node_index);
+                double distance_squared = vtkMath::Distance2BetweenPoints(coords_edge_node, coords_test_node);
+
+                if (distance_squared < min_distance)
+                {
+                    min_distance = distance_squared;
+                    matching_node = node_index;
+                }
+            }
+            next_face_data.NodeIndices.push_back(matching_node);
         }
     }
     else if (ELEMENT_DIM == 1u)
