@@ -62,6 +62,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellPopulationWriter.hpp"
 #include "AbstractCellWriter.hpp"
 
+// Forward declaration prevents circular include chain
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCellBasedSimulation;
+
 /**
  * An abstract facade class encapsulating a cell population.
  *
@@ -609,6 +612,22 @@ public:
      * @param rParamsFile the file stream to which the parameters are output
      */
     virtual void OutputCellPopulationParameters(out_stream& rParamsFile)=0;
+
+    /**
+     * Empty hook method to provide the ability to specify some additional property 
+     * of a cell-based simulation object. 
+     *
+     * This method is called immediately prior to calling SetupSolve() within the 
+     * Solve() method in AbstractCellBasedSimulation.
+     *
+     * This method can be overridden, for example, to add a T2SwapCellKiller to the 
+     * simulation object in the case of a VertexBasedCellPopulation. This functionality 
+     * avoids the need for static or dynamic casts to specific cell population types 
+     * within simulation methods.
+     *
+     * @param pSimulation pointer to a cell-based simulation object
+     */
+    virtual void SimulationSetupHook(AbstractCellBasedSimulation<ELEMENT_DIM, SPACE_DIM>* pSimulation);
 
     /**
      * @return mOutputResultsForChasteVisualizer

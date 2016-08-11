@@ -752,6 +752,11 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulationParamet
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::SimulationSetupHook(AbstractCellBasedSimulation<ELEMENT_DIM, SPACE_DIM>* pSimulation)
+{
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetOutputResultsForChasteVisualizer()
 {
     return mOutputResultsForChasteVisualizer;

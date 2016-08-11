@@ -473,6 +473,21 @@ public:
      * @param pVizSetupFile a visualization setup file
      */
     virtual void WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile);
+
+    /**
+     * Overridden SimulationSetupHook() method.
+     * 
+     * Hook method to add a T2SwapCellKiller to a simulation object, which is always 
+     * required in the case of a VertexBasedCellPopulation. This functionality avoids 
+     * the need for static or dynamic casts to specific cell population types within 
+     * simulation methods.
+     * 
+     * Note: In order to inhibit T2 swaps, the user needs to set the threshold for T2 
+     * swaps in the MutableVertexMesh object mrMesh to 0, using the SetT2Threshold() method.
+     *
+     * @param pSimulation pointer to a cell-based simulation object
+     */
+    virtual void SimulationSetupHook(AbstractCellBasedSimulation<DIM, DIM>* pSimulation);
 };
 
 #include "SerializationExportWrapper.hpp"

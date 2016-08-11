@@ -43,6 +43,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "StepSizeException.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "Cylindrical2dVertexMesh.hpp"
+#include "SmartPointers.hpp"
+#include "T2SwapCellKiller.hpp"
 
 // Cell writers
 #include "CellAgesWriter.hpp"
@@ -57,6 +59,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexT1SwapLocationsWriter.hpp"
 #include "VertexT2SwapLocationsWriter.hpp"
 #include "VertexT3SwapLocationsWriter.hpp"
+
+#include "AbstractCellBasedSimulation.hpp"
 
 template<unsigned DIM>
 VertexBasedCellPopulation<DIM>::VertexBasedCellPopulation(MutableVertexMesh<DIM, DIM>& rMesh,
@@ -742,6 +746,13 @@ void VertexBasedCellPopulation<DIM>::WriteDataToVisualizerSetupFile(out_stream& 
     {
         *pVizSetupFile << "MeshWidth\t" << this->GetWidth(0) << "\n";
     }
+}
+
+template<unsigned DIM>
+void VertexBasedCellPopulation<DIM>::SimulationSetupHook(AbstractCellBasedSimulation<DIM, DIM>* pSimulation)
+{
+    MAKE_PTR_ARGS(T2SwapCellKiller<DIM>, p_t2_swap_cell_killer, (this));
+    pSimulation->AddCellKiller(p_t2_swap_cell_killer);
 }
 
 // Explicit instantiation

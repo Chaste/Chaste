@@ -404,6 +404,8 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
         CellBasedEventHandler::EndEvent(CellBasedEventHandler::PDE);
     }
 
+    this->mrCellPopulation.SimulationSetupHook(this);
+
     SetupSolve();
 
     // Call SetupSolve() on each modifier

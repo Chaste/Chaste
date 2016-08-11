@@ -48,6 +48,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractForce.hpp"
 #include "RandomNumberGenerator.hpp"
 
+// Forward declaration prevents circular include chain
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCellPopulation;
+
 /**
  * An abstract cell-based simulation class. This class contains common functionality
  * from off lattice and on lattice simulations.
