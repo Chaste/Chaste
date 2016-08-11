@@ -206,24 +206,24 @@ unsigned ImmersedBoundaryCellPopulation<DIM>::GetNumElements()
 }
 
 template<unsigned DIM>
-CellPtr ImmersedBoundaryCellPopulation<DIM>::AddCell(CellPtr pNewCell,
-                                                     const c_vector<double,DIM>& rCellDivisionVector,
-                                                     CellPtr pParentCell)
+CellPtr ImmersedBoundaryCellPopulation<DIM>::AddCell(CellPtr pNewCell, CellPtr pParentCell)
 {
     // Get the element associated with this cell
     ImmersedBoundaryElement<DIM, DIM>* p_element = GetElementCorrespondingToCell(pParentCell);
 
+    // Get the orientation of division
+    c_vector<double, DIM> division_vector = unit_vector<double>(2,0);
+
     // Divide the element
-    unsigned new_element_index = mpImmersedBoundaryMesh->DivideElementAlongGivenAxis(p_element,
-                                                                                     rCellDivisionVector,
-                                                                                     true);
+    unsigned new_elem_idx = mpImmersedBoundaryMesh->DivideElementAlongGivenAxis(p_element, division_vector, true);
     // Associate the new cell with the element
     this->mCells.push_back(pNewCell);
 
     // Update location cell map
     CellPtr p_created_cell = this->mCells.back();
-    this->SetCellUsingLocationIndex(new_element_index,p_created_cell);
-    this->mCellLocationMap[p_created_cell.get()] = new_element_index;
+    this->SetCellUsingLocationIndex(new_elem_idx,p_created_cell);
+    this->mCellLocationMap[p_created_cell.get()] = new_elem_idx;
+
     return p_created_cell;
 }
 
@@ -683,9 +683,9 @@ void ImmersedBoundaryCellPopulation<DIM>::SetIfPopulationHasActiveSources(bool h
 }
 
 template<unsigned DIM>
-c_vector<double, DIM> ImmersedBoundaryCellPopulation<DIM>::CalculateCellDivisionVector(CellPtr pParentCell)
+double ImmersedBoundaryCellPopulation<DIM>::GetDefaultTimeStep()
 {
-    return unit_vector<double>(DIM,0);
+    return 0.002;
 }
 
 // Explicit instantiation

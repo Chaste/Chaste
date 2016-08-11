@@ -299,14 +299,10 @@ public:
      * Add a new cell to the cell population.
      *
      * @param pNewCell  the cell to add
-     * @param rCellDivisionVector  if this vector has any non-zero component, then it is used as the axis
-     *     along which the parent cell divides
      * @param pParentCell pointer to a parent cell (if required)
      * @return address of cell as it appears in the cell list (internal of this method uses a copy constructor along the way)
      */
-    CellPtr AddCell(CellPtr pNewCell,
-                    const c_vector<double,DIM>& rCellDivisionVector,
-                    CellPtr pParentCell=CellPtr());
+    CellPtr AddCell(CellPtr pNewCell, CellPtr pParentCell=CellPtr());
 
     /**
      * Remove all cells labelled as dead.
@@ -351,14 +347,14 @@ public:
      *
      * @param pPopulationWriter the population writer.
      */
-    void AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter);
+    virtual void AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter);
 
     /**
      * Overridden AcceptPopulationCountWriter() method.
      *
      * @param pPopulationCountWriter the population count writer.
      */
-    void AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter);
+    virtual void AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter);
 
     /**
      * Overridden AcceptCellWriter() method.
@@ -366,7 +362,7 @@ public:
      * @param pCellWriter the population writer.
      * @param pCell the cell whose data are being written.
      */
-    void AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell);
+    virtual void AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell);
 
     /**
      * Overridden GetVolumeOfCell() method.
@@ -436,12 +432,16 @@ public:
     virtual void CheckForStepSizeException(unsigned nodeIndex, c_vector<double,DIM>& displacement, double dt);
 
     /**
-     * Overridden CalculateCellDivisionVector() method.
+     * Overridden GetDefaultTimeStep() method.
      *
-     * @param pParentCell the cell undergoing division
-     * @return a vector containing information on cell division
+     * @return a default value for the time step to use
+     * when simulating the cell population.
+     *
+     * A hard-coded value of 0.002 is returned. However, note that the time
+     * step can be reset by calling SetDt() on the simulation object used to
+     * simulate the cell population.
      */
-    virtual c_vector<double, DIM> CalculateCellDivisionVector(CellPtr pParentCell);
+    virtual double GetDefaultTimeStep();
 };
 
 #include "SerializationExportWrapper.hpp"
@@ -456,7 +456,7 @@ namespace boost
      */
     template<class Archive, unsigned DIM>
     inline void save_construct_data(
-            Archive & ar, const ImmersedBoundaryCellPopulation<DIM> * t, const BOOST_PFTO unsigned int file_version)
+            Archive & ar, const ImmersedBoundaryCellPopulation<DIM> * t, const unsigned int file_version)
     {
         // Save data required to construct instance
         const ImmersedBoundaryMesh<DIM,DIM>* p_mesh = &(t->rGetMesh());
