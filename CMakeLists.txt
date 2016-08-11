@@ -240,10 +240,7 @@ endif()
 
 #Locate VTK
 if (Chaste_USE_VTK)
-    #set(VTK_FIND_QUIETLY ON)
     find_package(VTK REQUIRED)
-    list(APPEND Chaste_INCLUDES "${VTK_INCLUDE_DIRS}")
-    list(APPEND Chaste_LINK_LIBRARIES "${VTK_LIBRARIES}")
     add_definitions(-DCHASTE_VTK)
 endif()
 
@@ -283,13 +280,18 @@ if (NOT HDF5_IS_PARALLEL)
     message(SEND_ERROR "Hdf5 library found was not build with --enable-parallel, use the HDF5_ROOT environment variable to specify a parallel hdf5 library. Note: include dirs are ${HDF5_INCLUDE_DIRS} and libraries are ${HDF5_LIBRARIES}")
 endif()
 list(APPEND Chaste_INCLUDES "${HDF5_INCLUDE_DIRS}")
-list(APPEND Chaste_LINK_LIBRARIES "${HDF5_LIBRARIES}")
+
+# for some reason the CMake in Homebrew returns a NOTFOUND entry in the Hdf5 libraries
+foreach(dir ${HDF5_LIBRARIES})
+    if (dir)
+        list(APPEND Chaste_LINK_LIBRARIES "${dir}")
+    endif()
+endforeach()
 
 # put petsc includes after hdf5 includes or else the hdf5 headers 
 # in the petsc include dir will clobber those chosen on FindHdf5.cmake
 list(APPEND Chaste_INCLUDES "${PETSC_INCLUDES}")
-
-
+ 
 #Locate MPI 
 if (PETSC_COMPILER)
     string(REPLACE mpicc mpicxx MPI_CXX_COMPILER ${PETSC_COMPILER})
@@ -309,8 +311,8 @@ SET( CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} ${MPI_CXX_LINK_FLAGS}" )
 list(APPEND Chaste_INCLUDES "${MPI_CXX_INCLUDE_PATH}")
 
 if (Chaste_MEMORY_TESTING)
-    get_filename_component(openmpi_supp_path ${MPIEXEC} DIRECTORY)
-    get_filename_component(openmpi_supp_path ${openmpi_supp_path} DIRECTORY)
+    get_filename_component(openmpi_supp_path ${MPIEXEC} PATH)
+    get_filename_component(openmpi_supp_path ${openmpi_supp_path} PATH)
     set(openmpi_supp_path "${openmpi_supp_path}/share/openmpi/openmpi-valgrind.supp")
     set(Chaste_MEMORY_TESTING_SUPPS "--suppressions=${Chaste_SOURCE_DIR}/chaste.supp")
     set(Chaste_MEMORY_TESTING_SUPPS "${Chaste_MEMORY_TESTING_SUPPS} --suppressions=${Chaste_SOURCE_DIR}/chaste-lucid.supp")
@@ -351,6 +353,11 @@ endif()
 #chaste_add_libraries(MPI_CXX_LIBRARIES Chaste_THIRD_PARTY_STATIC_LIBRARIES Chaste_LINK_LIBRARIES)
 list(APPEND Chaste_LINK_LIBRARIES "${MPI_CXX_LIBRARIES}")
 
+# make sure VTK libraries added after HDF5 so VTK's link with HDF5 isn't used
+if (Chaste_USE_VTK)
+    list(APPEND Chaste_INCLUDES "${VTK_INCLUDE_DIRS}")
+    list(APPEND Chaste_LINK_LIBRARIES "${VTK_LIBRARIES}")
+endif()
 
 #Locate Xerces and XSD
 if (Chaste_USE_XERCES)
@@ -471,7 +478,7 @@ set(Chaste_DEPENDS_heart ${Chaste_DEPENDS_continuum_mechanics} continuum_mechani
 set(Chaste_DEPENDS_lung ${Chaste_DEPENDS_continuum_mechanics} continuum_mechanics)
 set(Chaste_DEPENDS_core global io linalg mesh ode pde continuum_mechanics)
 
-# Add dependencies to core target
+# Set dependencies to core target
 add_dependencies(core ${Chaste_DEPENDS_core})
 
 foreach(component ${Chaste_COMPONENTS})

@@ -61,6 +61,12 @@ void AbstractForce<ELEMENT_DIM, SPACE_DIM>::OutputForceParameters(out_stream& rP
     // No parameters to output
 }
 
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractForce<ELEMENT_DIM, SPACE_DIM>::WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile)
+{
+    // Nothing to output
+}
+
 // Explicit instantiation
 template class AbstractForce<1,1>;
 template class AbstractForce<1,2>;

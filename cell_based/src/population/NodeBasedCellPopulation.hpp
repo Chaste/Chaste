@@ -449,13 +449,12 @@ public:
      * Add a new cell to the cell population and update the vector of cell radii in the NodesOnlyMesh.
      *
      * @param pNewCell  the cell to add
-     * @param rCellDivisionVector  the position in space at which to put it
      * @param pParentCell pointer to a parent cell - this is required for
      *  node-based cell populations
      *
      * @return address of cell as it appears in the cell list (internal of this method uses a copy constructor along the way)
      */
-    virtual CellPtr AddCell(CellPtr pNewCell, const c_vector<double,DIM>& rCellDivisionVector, CellPtr pParentCell);
+    virtual CellPtr AddCell(CellPtr pNewCell, CellPtr pParentCell);
 
     /**
      * Overridden GetVolumeOfCell() method.

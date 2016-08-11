@@ -152,6 +152,17 @@ foreach( LIB ${SUNDIALS_WANT_COMPONENTS} )
     mark_as_advanced(SUNDIALS_${LIB}_LIBRARY)
 endforeach()
 
+# find blas and lapack
+# (sundials on ubuntu 12.04 need to explicitly link against lapack)
+if (BUILD_SHARED_LIBS)
+    find_package(LAPACK)
+else()
+    set(BLA_STATIC ON)
+    find_package(LAPACK)
+endif()
+    
+
+list(APPEND SUNDIALS_LIBRARIES ${LAPACK_LIBRARIES})
 
 find_package_handle_standard_args( SUNDIALS DEFAULT_MSG
     SUNDIALS_LIBRARIES

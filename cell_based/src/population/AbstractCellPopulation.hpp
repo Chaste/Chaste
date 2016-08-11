@@ -279,23 +279,37 @@ public:
     virtual bool IsCellAssociatedWithADeletedLocation(CellPtr pCell)=0;
 
     /**
+     * Write any data necessary to a visualization setup file.
+     * Used by AbstractCellBasedSimulation::WriteVisualizerSetupFile().
+     * 
+     * @param pVizSetupFile a visualization setup file
+     */
+    virtual void WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile);
+ 
+    /**
      * Add a new cell to the cell population.
      *
      * As this method is pure virtual, it must be overridden
      * in subclasses.
      *
      * @param pNewCell  the cell to add
-     * @param rCellDivisionVector  a vector providing information regarding how the cell division should occur
-     *     (for cell-centre cell populations, this vector is the position of the daughter cell; for vertex cell populations it
-     *      can be used by any subclass of CellBasedSimulation to as a means of dictating the axis along which
-     *      the parent cell divides)
      * @param pParentCell pointer to a parent cell (if required)
      *
      * @return address of cell as it appears in the cell list (internal of this method uses a copy constructor along the way).
      */
-    virtual CellPtr AddCell(CellPtr pNewCell,
-                            const c_vector<double,SPACE_DIM>& rCellDivisionVector,
-                            CellPtr pParentCell=CellPtr())=0;
+    virtual CellPtr AddCell(CellPtr pNewCell, CellPtr pParentCell=CellPtr())=0;
+
+    /**
+     * @return a default value for the time step to use when simulating
+     * the cell population.
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     *
+     * Note that the time step can be reset by calling SetDt() on the 
+     * simulation object used to simulate the cell population.
+     */
+    virtual double GetDefaultTimeStep()=0;
 
     class Iterator; // Forward declaration; see below
 

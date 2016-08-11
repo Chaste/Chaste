@@ -79,6 +79,16 @@ macro(Chaste_DO_CELLML output_sources cellml_file dynamic)
         endif()
     endif()
     set(depends ${cellml_dir}/${cellml_file_name}.cellml)
+    
+    #set depends on everything in python/pycml/* except for *.pyc and protocol.py
+    file(GLOB PyCML_SOURCES 
+        ${Chaste_SOURCE_DIR}/python/pycml/* )
+    file(GLOB PyCML_NOT_SOURCES 
+        ${Chaste_SOURCE_DIR}/python/pycml/*.pyc )
+    list(REMOVE_ITEM PyCML_SOURCES ${PYCML_NOT_SOURCES} ${Chaste_SOURCE_DIR}/python/pycml/protocol.py)
+
+    set(depends ${depends} ${PyCML_SOURCES})
+
     if(EXISTS ${cellml_dir}/${cellml_file_name}-conf.xml)
         set(depends ${depends} ${cellml_dir}/${cellml_file_name}-conf.xml)
         set(pycml_args ${pycml_args} "--conf=${cellml_dir}/${cellml_file_name}-conf.xml")
@@ -536,6 +546,18 @@ macro(Chaste_DO_TEST_COMMON component)
     foreach(type ${TestPackTypes})
         if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${type}TestPack.txt")
             file(STRINGS "${type}TestPack.txt" testpack)
+
+            # remove python tests from windows builds
+            if (WIN32 OR CYGWIN) 
+                set(testpack_new "")
+                foreach(filename ${testpack})
+                    if (NOT filename MATCHES ".py$")
+                        list(APPEND testpack_new ${filename}) 
+                    endif()
+                endforeach()
+                set(testpack ${testpack_new})
+            endif(WIN32 OR CYGWIN)
+
             foreach(filename ${testpack})
                 string(STRIP ${filename} filename)
                 chaste_generate_test_name(${filename} "testTargetName")
@@ -558,8 +580,6 @@ macro(Chaste_DO_TEST_COMMON component)
                             target_link_libraries(${exeTargetName} LINK_PUBLIC ${COMPONENT_LIBRARIES} ${Chaste_LIBRARIES} ${Chaste_THIRD_PARTY_LIBRARIES} )
                         endif()
                         set_target_properties(${exeTargetName} PROPERTIES LINK_FLAGS "${LINKER_FLAGS}")
-                        add_dependencies(${component} ${exeTargetName})
-                        add_dependencies(${type} ${exeTargetName})
                     endif()
 
 
@@ -596,6 +616,12 @@ macro(Chaste_DO_TEST_COMMON component)
                     get_property(myLabels TEST ${testTargetName} PROPERTY LABELS)
                     list(APPEND myLabels ${type})
                     set_property(TEST ${testTargetName} PROPERTY LABELS ${myLabels})
+                endif()
+
+                # add dependencies to component and type targets
+                if (NOT ${component} STREQUAL python)
+                    add_dependencies(${component} ${exeTargetName})
+                    add_dependencies(${type} ${exeTargetName})
                 endif()
             endforeach(filename ${testpack})
         endif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${type}TestPack.txt")

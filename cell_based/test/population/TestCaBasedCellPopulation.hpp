@@ -541,7 +541,7 @@ public:
 
         // Add new cell to the cell population by dividing the cell
         AbstractCellPopulation<2>::Iterator cell_iter_1 = cell_population.Begin();
-        cell_population.AddCell(p_new_cell, zero_vector<double>(2), *cell_iter_1);
+        cell_population.AddCell(p_new_cell, *cell_iter_1);
 
         // Test that the initial cell is still in the same place
         TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*cell_iter_1), initial_cell_index);
@@ -602,8 +602,7 @@ public:
 
         // Test thatAdd new cell to the cell population by dividing the cell
         AbstractCellPopulation<2>::Iterator cell_iter_1 = cell_population.Begin();
-        TS_ASSERT_THROWS_THIS(cell_population.AddCell(p_new_cell, zero_vector<double>(2), *cell_iter_1),
-            "No free space to divide.");
+        TS_ASSERT_THROWS_THIS(cell_population.AddCell(p_new_cell, *cell_iter_1), "No free space to divide.");
     }
 
     void TestUpdateCellLocationsExceptions()

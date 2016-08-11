@@ -106,7 +106,7 @@ public:
         TS_ASSERT(!(p_division_rule->IsRoomToDivide(p_parent_cell,cell_population)));
 
         // Test adding the new cell in the population (note this calls CalculateDaughterNodeIndex)
-        TS_ASSERT_THROWS_THIS(cell_population.AddCell(p_cell_0, zero_vector<double>(2), p_parent_cell),
+        TS_ASSERT_THROWS_THIS(cell_population.AddCell(p_cell_0, p_parent_cell),
                               "Trying to divide when there is no room to divide, check your division rule");
 
         // Test adding it in a free space
@@ -116,7 +116,7 @@ public:
         TS_ASSERT_EQUALS(p_division_rule->CalculateDaughterNodeIndex(p_cell_0,p_parent_cell,cell_population), 7u);
 
         // Test adding the new cell in the population (note this calls CalculateDaughterNodeIndex)
-        cell_population.AddCell(p_cell_0, zero_vector<double>(2), p_parent_cell);
+        cell_population.AddCell(p_cell_0, p_parent_cell);
 
         // Now check the cells are in the correct place
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 7u);

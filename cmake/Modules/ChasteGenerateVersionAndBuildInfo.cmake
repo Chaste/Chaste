@@ -45,7 +45,11 @@ else()
     endif()
 endif()
 
-set(Chaste_REVISION ${Chaste_revision} CACHE STRING "Current Chaste Git Revision" FORCE)
+if (Chaste_UPDATE_PROVENANCE)
+    set(Chaste_REVISION ${Chaste_revision} CACHE STRING "Current Chaste Git Revision" FORCE)
+else()
+    set(Chaste_REVISION ${Chaste_revision} CACHE STRING "Current Chaste Git Revision")
+endif()
 
 
 #string(TIMESTAMP build_time)

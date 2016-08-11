@@ -1270,9 +1270,13 @@ public:
         p_linear_force->SetMeinekeDivisionRestingSpringLength(0.9); // coverage
         simulator.AddForce(p_linear_force);
 
-        c_vector<double, 2> daughter_location = simulator.CalculateCellDivisionVector(*conf_iter);
-        c_vector<double, 2> new_parent_location = conf_mesh.GetNode(0)->rGetLocation();
+        MeshBasedCellPopulation<2>* p_cast_population = static_cast<MeshBasedCellPopulation<2>*>(&(simulator.rGetCellPopulation()));
+        std::pair<c_vector<double, 2>, c_vector<double, 2> > locations = p_cast_population->GetCentreBasedDivisionRule()->CalculateCellDivisionVector(*conf_iter, *p_cast_population);
+
+        c_vector<double, 2> new_parent_location = locations.first;
+        c_vector<double, 2> daughter_location = locations.second;
         c_vector<double, 2> parent_to_daughter = conf_mesh.GetVectorFromAtoB(new_parent_location, daughter_location);
+
         TS_ASSERT_DELTA(norm_2(parent_to_daughter), conf_crypt.GetMeinekeDivisionSeparation(), 1e-7);
     }
 
@@ -1304,9 +1308,11 @@ public:
         // Repeat two times for coverage
         // need vector from parent to daughter to have both +ve and -ve y component
         // different branches will execute to make sure daughter stays in crypt ie. +ve y component
+        MeshBasedCellPopulation<2>* p_cast_population = static_cast<MeshBasedCellPopulation<2>*>(&(simulator.rGetCellPopulation()));
         for (unsigned repetitions=0; repetitions<=1; repetitions++)
         {
-            c_vector<double, 2> daughter_location = simulator.CalculateCellDivisionVector(*conf_iter);
+            std::pair<c_vector<double, 2>, c_vector<double, 2> > locations = p_cast_population->GetCentreBasedDivisionRule()->CalculateCellDivisionVector(*conf_iter, *p_cast_population);
+            c_vector<double, 2> daughter_location = locations.second;
             c_vector<double, 2> new_parent_location = conf_mesh.GetNode(0)->rGetLocation();
             c_vector<double, 2> parent_to_daughter = conf_mesh.GetVectorFromAtoB(new_parent_location, daughter_location);
 
@@ -1344,9 +1350,13 @@ public:
         // Create crypt simulation from cell population
         CryptSimulation2d simulator(cyl_crypt);
 
-        c_vector<double, 2> daughter_location = simulator.CalculateCellDivisionVector(*cyl_iter);
-        c_vector<double, 2> new_parent_location = cyl_mesh.GetNode(0)->rGetLocation();
+        MeshBasedCellPopulation<2>* p_cast_population = static_cast<MeshBasedCellPopulation<2>*>(&(simulator.rGetCellPopulation()));
+        std::pair<c_vector<double, 2>, c_vector<double, 2> > locations = p_cast_population->GetCentreBasedDivisionRule()->CalculateCellDivisionVector(*cyl_iter, *p_cast_population);
+
+        c_vector<double, 2> new_parent_location = locations.first;
+        c_vector<double, 2> daughter_location = locations.second;
         c_vector<double, 2> parent_to_daughter = cyl_mesh.GetVectorFromAtoB(new_parent_location, daughter_location);
+
         TS_ASSERT_DELTA(norm_2(parent_to_daughter), cyl_crypt.GetMeinekeDivisionSeparation(), 1e-7);
     }
 
@@ -1375,7 +1385,9 @@ public:
         // Create crypt simulation from cell population
         CryptSimulation2d simulator(cyl_crypt);
 
-        c_vector<double,2> daughter_location = simulator.CalculateCellDivisionVector(*cyl_iter);
+        MeshBasedCellPopulation<2>* p_cast_population = static_cast<MeshBasedCellPopulation<2>*>(&(simulator.rGetCellPopulation()));
+        std::pair<c_vector<double, 2>, c_vector<double, 2> > locations = p_cast_population->GetCentreBasedDivisionRule()->CalculateCellDivisionVector(*cyl_iter, *p_cast_population);
+        c_vector<double,2> daughter_location = locations.second;
         c_vector<double,2> new_parent_location = cyl_mesh.GetNode(0)->rGetLocation();
         c_vector<double,2> parent_to_daughter = cyl_mesh.GetVectorFromAtoB(new_parent_location, daughter_location);
 

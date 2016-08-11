@@ -108,6 +108,14 @@ public:
     static void StandardStartup(int* pArgc, char*** pArgv);
 
     /**
+     * Call InitializePetsc, then ShowParallelLaunching. Omit ShowCopyright.
+     *
+     * @param pArgc  pointer to the number of arguments
+     * @param pArgv  pointer to the argument list
+     */
+    static void StartupWithoutShowingCopyright(int* pArgc, char*** pArgv);
+
+    /**
      * Display an error message to the user, on stderr.
      *
      * @param rMessage  the message to display

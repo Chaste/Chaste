@@ -277,14 +277,10 @@ public:
      * Add a new cell to the cell population.
      *
      * @param pNewCell  the cell to add
-     * @param rCellDivisionVector  if this vector has any non-zero component, then it is used as the axis
-     *     along which the parent cell divides
      * @param pParentCell pointer to a parent cell (if required)
      * @return address of cell as it appears in the cell list (internal of this method uses a copy constructor along the way)
      */
-    CellPtr AddCell(CellPtr pNewCell,
-                    const c_vector<double,DIM>& rCellDivisionVector,
-                    CellPtr pParentCell=CellPtr());
+    CellPtr AddCell(CellPtr pNewCell, CellPtr pParentCell=CellPtr());
 
     /**
      * Remove all cells labelled as dead.
@@ -451,19 +447,32 @@ public:
     boost::shared_ptr<AbstractVertexBasedDivisionRule<DIM> > GetVertexBasedDivisionRule();
 
     /**
-     * Overridden method to specify a division vector.
-     *
-     * @param pParentCell the cell undergoing division
-     * @return a vector containing information on cell division
-     */
-    virtual c_vector<double, DIM> CalculateCellDivisionVector(CellPtr pParentCell);
-
-    /**
      * Set the division rule for this population.
      *
      * @param pVertexBasedDivisionRule  pointer to the new division rule
      */
     void SetVertexBasedDivisionRule(boost::shared_ptr<AbstractVertexBasedDivisionRule<DIM> > pVertexBasedDivisionRule);
+
+    /**
+     * Overridden GetDefaultTimeStep() method.
+     *
+     * @return a default value for the time step to use
+     * when simulating the cell population.
+     *
+     * A hard-coded value of 0.002 is returned. However, note that the time 
+     * step can be reset by calling SetDt() on the simulation object used to 
+     * simulate the cell population.
+     */
+    virtual double GetDefaultTimeStep();
+
+    /**
+     * Overridden WriteDataToVisualizerSetupFile() method.
+     * Write any data necessary to a visualization setup file.
+     * Used by AbstractCellBasedSimulation::WriteVisualizerSetupFile().
+     * 
+     * @param pVizSetupFile a visualization setup file
+     */
+    virtual void WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile);
 };
 
 #include "SerializationExportWrapper.hpp"

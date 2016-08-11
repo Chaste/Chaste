@@ -219,11 +219,11 @@ bool CaBasedCellPopulation<DIM>::IsRoomToDivide(CellPtr pCell)
 }
 
 template<unsigned DIM>
-CellPtr CaBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, const c_vector<double,DIM>& rCellDivisionVector, CellPtr pParentCell)
+CellPtr CaBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, CellPtr pParentCell)
 {
     unsigned daughter_node_index = mpCaBasedDivisionRule->CalculateDaughterNodeIndex(pNewCell,pParentCell,*this);
 
-    // Associate the new cell with the neighboring node
+    // Associate the new cell with the neighbouring node
     this->mCells.push_back(pNewCell);
 
     // Update location cell map
