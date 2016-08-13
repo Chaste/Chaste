@@ -33,14 +33,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
 
-FixedDurationGenerationBasedCellCycleModel::FixedDurationGenerationBasedCellCycleModel()
+FixedG1GenerationalCellCycleModel::FixedG1GenerationalCellCycleModel()
 {
 }
 
-FixedDurationGenerationBasedCellCycleModel::FixedDurationGenerationBasedCellCycleModel(const FixedDurationGenerationBasedCellCycleModel& rModel)
-   : AbstractSimpleGenerationBasedCellCycleModel(rModel)
+FixedG1GenerationalCellCycleModel::FixedG1GenerationalCellCycleModel(const FixedG1GenerationalCellCycleModel& rModel)
+   : AbstractSimpleGenerationalCellCycleModel(rModel)
 {
     /*
      * The member variables mCurrentCellCyclePhase, mG1Duration,
@@ -56,17 +56,17 @@ FixedDurationGenerationBasedCellCycleModel::FixedDurationGenerationBasedCellCycl
      */
 }
 
-AbstractCellCycleModel* FixedDurationGenerationBasedCellCycleModel::CreateCellCycleModel()
+AbstractCellCycleModel* FixedG1GenerationalCellCycleModel::CreateCellCycleModel()
 {
-    return new FixedDurationGenerationBasedCellCycleModel(*this);
+    return new FixedG1GenerationalCellCycleModel(*this);
 }
 
-void FixedDurationGenerationBasedCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
+void FixedG1GenerationalCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
 {
     // No new parameters to output, so just call method on direct parent class
-    AbstractSimpleGenerationBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
+    AbstractSimpleGenerationalCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
 }
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-CHASTE_CLASS_EXPORT(FixedDurationGenerationBasedCellCycleModel)
+CHASTE_CLASS_EXPORT(FixedG1GenerationalCellCycleModel)

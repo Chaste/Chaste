@@ -33,42 +33,26 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef UNIFORMLYDISTRIBUTEDCELLCYCLEMODEL_HPP_
-#define UNIFORMLYDISTRIBUTEDCELLCYCLEMODEL_HPP_
+#ifndef FIXEDG1GENERATIONALCELLCYCLEMODEL_HPP_
+#define FIXEDG1GENERATIONALCELLCYCLEMODEL_HPP_
 
-#include "AbstractSimpleCellCycleModel.hpp"
-#include "RandomNumberGenerator.hpp"
+#include "AbstractSimpleGenerationalCellCycleModel.hpp"
 
 /**
- * A stochastic cell-cycle model where cells divide with a stochastic cell cycle duration
- * with the length of the cell cycle drawn from a uniform distribution
- * on [mMinCellCycleDuration, mMaxCellCycleDuration].
+ *  Fixed cell-cycle model.
  *
- * If the cell is differentiated, then the cell cycle duration is set to be infinite,
- * so that the cell will never divide.
+ *  Cell cycle time is deterministic for stem and transit cells (with values
+ *  StemCellG1Duration + SG2MDuration
+ *  and TransitCellG1Duration + SG2MDuration (values found in AbstractCellCycleModel))
  */
-class UniformlyDistributedCellCycleModel : public AbstractSimpleCellCycleModel
+class FixedG1GenerationalCellCycleModel : public AbstractSimpleGenerationalCellCycleModel
 {
-    friend class TestSimpleCellCycleModels;
-
 private:
-
-    /**
-     * The minimum cell cycle duration. Used to define the uniform distribution.
-     * Defaults to 12 hours.
-     */
-    double mMinCellCycleDuration;
-
-    /**
-     * The maximum cell cycle duration. Used to define the uniform distribution.
-     * Defaults to 14 hours.
-     */
-    double mMaxCellCycleDuration;
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
-     * Archive the cell-cycle model and random number generator, never used directly - boost uses this.
+     * Archive the cell-cycle model, never used directly - boost uses this.
      *
      * @param archive the archive
      * @param version the current version of this class
@@ -76,20 +60,13 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractSimpleCellCycleModel>(*this);
-
-        // Make sure the RandomNumberGenerator singleton gets saved too
-        SerializableSingleton<RandomNumberGenerator>* p_wrapper = RandomNumberGenerator::Instance()->GetSerializationWrapper();
-        archive & p_wrapper;
-        archive & mMinCellCycleDuration;
-        archive & mMaxCellCycleDuration;
+        archive & boost::serialization::base_object<AbstractSimpleGenerationalCellCycleModel>(*this);
     }
 
 protected:
 
     /**
-     * Protected copy-constructor for use by CreateCellCycleModel().
-     *
+     * Protected copy-constructor for use by CreateCellCycleModel.
      * The only way for external code to create a copy of a cell cycle model
      * is by calling that method, to ensure that a model of the correct subclass is created.
      * This copy-constructor helps subclasses to ensure that all member variables are correctly copied when this happens.
@@ -101,20 +78,16 @@ protected:
      *
      * @param rModel the cell cycle model to copy.
      */
-    UniformlyDistributedCellCycleModel(const UniformlyDistributedCellCycleModel& rModel);
+    FixedG1GenerationalCellCycleModel(const FixedG1GenerationalCellCycleModel& rModel);
 
 public:
 
     /**
-     * Constructor - just a default, mBirthTime is set in the AbstractCellCycleModel class.
-     * mG1Duration is set very high, it is set for the individual cells when InitialiseDaughterCell is called
+     * Default constructor. Note that mBirthTime is set in
+     * AbstractCellCycleModel() and mG1Duration is set in
+     * AbstractSimplePhaseBasedCellCycleModel().
      */
-    UniformlyDistributedCellCycleModel();
-
-    /**
-     * Overridden SetCellCycleDuration Method to add stochastic cell cycle times
-     */
-    void SetCellCycleDuration();
+    FixedG1GenerationalCellCycleModel();
 
     /**
      * Overridden builder method to create new copies of
@@ -123,44 +96,6 @@ public:
      * @return new cell-cycle model
      */
     AbstractCellCycleModel* CreateCellCycleModel();
-
-    /**
-     * @return mMinCellCycleDuration
-     */
-    double GetMinCellCycleDuration();
-
-    /**
-     * Set mMinCellCycleDuration.
-     *
-     * @param minCellCycleDuration
-     */
-    void SetMinCellCycleDuration(double minCellCycleDuration);
-
-    /**
-     * @return mMaxCellCycleDuration
-     */
-    double GetMaxCellCycleDuration();
-
-    /**
-     * Set mMaxCellCycleDuration.
-     *
-     * @param maxCellCycleDuration
-     */
-    void SetMaxCellCycleDuration(double maxCellCycleDuration);
-
-    /**
-     * Overridden GetAverageTransitCellCycleTime() method.
-     *
-     * @return the average of mMinCellCycleDuration and mMaxCellCycleDuration
-     */
-    double GetAverageTransitCellCycleTime();
-
-    /**
-     * Overridden GetAverageStemCellCycleTime() method.
-     *
-     * @return the average of mMinCellCycleDuration and mMaxCellCycleDuration
-     */
-    double GetAverageStemCellCycleTime();
 
     /**
      * Overridden OutputCellCycleModelParameters() method.
@@ -172,6 +107,6 @@ public:
 
 #include "SerializationExportWrapper.hpp"
 // Declare identifier for the serializer
-CHASTE_CLASS_EXPORT(UniformlyDistributedCellCycleModel)
+CHASTE_CLASS_EXPORT(FixedG1GenerationalCellCycleModel)
 
-#endif /*UNIFORMLYDISTRIBUTEDCELLCYCLEMODEL_HPP_*/
+#endif /*FIXEDG1GENERATIONALCELLCYCLEMODEL_HPP_*/

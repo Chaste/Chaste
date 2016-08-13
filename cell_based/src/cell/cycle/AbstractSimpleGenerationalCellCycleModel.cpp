@@ -33,23 +33,23 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "AbstractSimpleGenerationBasedCellCycleModel.hpp"
+#include "AbstractSimpleGenerationalCellCycleModel.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 #include "StemCellProliferativeType.hpp"
 #include "TransitCellProliferativeType.hpp"
 
-AbstractSimpleGenerationBasedCellCycleModel::AbstractSimpleGenerationBasedCellCycleModel()
+AbstractSimpleGenerationalCellCycleModel::AbstractSimpleGenerationalCellCycleModel()
     : AbstractSimplePhaseBasedCellCycleModel(),
       mGeneration(0),
       mMaxTransitGenerations(3) // taken from Meineke et al, 2001 (doi:10.1046/j.0960-7722.2001.00216.x)
 {
 }
 
-AbstractSimpleGenerationBasedCellCycleModel::~AbstractSimpleGenerationBasedCellCycleModel()
+AbstractSimpleGenerationalCellCycleModel::~AbstractSimpleGenerationalCellCycleModel()
 {
 }
 
-AbstractSimpleGenerationBasedCellCycleModel::AbstractSimpleGenerationBasedCellCycleModel(const AbstractSimpleGenerationBasedCellCycleModel& rModel)
+AbstractSimpleGenerationalCellCycleModel::AbstractSimpleGenerationalCellCycleModel(const AbstractSimpleGenerationalCellCycleModel& rModel)
     : AbstractSimplePhaseBasedCellCycleModel(rModel),
       mGeneration(rModel.mGeneration),
       mMaxTransitGenerations(rModel.mMaxTransitGenerations)
@@ -70,7 +70,7 @@ AbstractSimpleGenerationBasedCellCycleModel::AbstractSimpleGenerationBasedCellCy
      */
 }
 
-void AbstractSimpleGenerationBasedCellCycleModel::ResetForDivision()
+void AbstractSimpleGenerationalCellCycleModel::ResetForDivision()
 {
     mGeneration++;
     if (mGeneration > mMaxTransitGenerations)
@@ -95,7 +95,7 @@ void AbstractSimpleGenerationBasedCellCycleModel::ResetForDivision()
     AbstractSimplePhaseBasedCellCycleModel::ResetForDivision();
 }
 
-void AbstractSimpleGenerationBasedCellCycleModel::InitialiseDaughterCell()
+void AbstractSimpleGenerationalCellCycleModel::InitialiseDaughterCell()
 {
     /*
      * If the parent cell is a stem cell then its generation was reset
@@ -123,27 +123,27 @@ void AbstractSimpleGenerationBasedCellCycleModel::InitialiseDaughterCell()
     AbstractSimplePhaseBasedCellCycleModel::InitialiseDaughterCell();
 }
 
-void AbstractSimpleGenerationBasedCellCycleModel::SetGeneration(unsigned generation)
+void AbstractSimpleGenerationalCellCycleModel::SetGeneration(unsigned generation)
 {
     mGeneration = generation;
 }
 
-unsigned AbstractSimpleGenerationBasedCellCycleModel::GetGeneration() const
+unsigned AbstractSimpleGenerationalCellCycleModel::GetGeneration() const
 {
     return mGeneration;
 }
 
-void AbstractSimpleGenerationBasedCellCycleModel::SetMaxTransitGenerations(unsigned maxTransitGenerations)
+void AbstractSimpleGenerationalCellCycleModel::SetMaxTransitGenerations(unsigned maxTransitGenerations)
 {
     mMaxTransitGenerations = maxTransitGenerations;
 }
 
-unsigned AbstractSimpleGenerationBasedCellCycleModel::GetMaxTransitGenerations() const
+unsigned AbstractSimpleGenerationalCellCycleModel::GetMaxTransitGenerations() const
 {
     return mMaxTransitGenerations;
 }
 
-void AbstractSimpleGenerationBasedCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
+void AbstractSimpleGenerationalCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<MaxTransitGenerations>" << mMaxTransitGenerations << "</MaxTransitGenerations>\n";
 

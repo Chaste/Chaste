@@ -33,10 +33,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef EXPONENTIALLYDISTRIBUTEDGENERATIONBASEDCELLCYCLEMODEL_HPP_
-#define EXPONENTIALLYDISTRIBUTEDGENERATIONBASEDCELLCYCLEMODEL_HPP_
+#ifndef EXPONENTIALG1GENERATIONALCELLCYCLEMODEL_HPP_
+#define EXPONENTIALG1GENERATIONALCELLCYCLEMODEL_HPP_
 
-#include "AbstractSimpleGenerationBasedCellCycleModel.hpp"
+#include "AbstractSimpleGenerationalCellCycleModel.hpp"
 #include "RandomNumberGenerator.hpp"
 
 /**
@@ -53,7 +53,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * and SetStemCellG1Duration() also set mRate to take the inverse of the
  * new value of mTransitCellG1Duration and mStemCellG1Duration, respectively.
  */
-class ExponentiallyDistributedGenerationBasedCellCycleModel : public AbstractSimpleGenerationBasedCellCycleModel
+class ExponentialG1GenerationalCellCycleModel : public AbstractSimpleGenerationalCellCycleModel
 {
     friend class TestSimpleCellCycleModels;
 
@@ -77,7 +77,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractSimpleGenerationBasedCellCycleModel>(*this);
+        archive & boost::serialization::base_object<AbstractSimpleGenerationalCellCycleModel>(*this);
 
         // Make sure the RandomNumberGenerator singleton gets saved too
         SerializableSingleton<RandomNumberGenerator>* p_wrapper = RandomNumberGenerator::Instance()->GetSerializationWrapper();
@@ -107,7 +107,7 @@ protected:
      *
      * @param rModel the cell cycle model to copy.
      */
-    ExponentiallyDistributedGenerationBasedCellCycleModel(const ExponentiallyDistributedGenerationBasedCellCycleModel& rModel);
+    ExponentialG1GenerationalCellCycleModel(const ExponentialG1GenerationalCellCycleModel& rModel);
 
 public:
 
@@ -115,7 +115,7 @@ public:
      * Constructor - just a default, mBirthTime is now set in the AbstractCellCycleModel class.
      * mG1Duration is set very high, it is set for the individual cells when InitialiseDaughterCell is called
      */
-    ExponentiallyDistributedGenerationBasedCellCycleModel();
+    ExponentialG1GenerationalCellCycleModel();
 
     /**
      * Overridden builder method to create new copies of
@@ -173,6 +173,6 @@ public:
 
 #include "SerializationExportWrapper.hpp"
 // Declare identifier for the serializer
-CHASTE_CLASS_EXPORT(ExponentiallyDistributedGenerationBasedCellCycleModel)
+CHASTE_CLASS_EXPORT(ExponentialG1GenerationalCellCycleModel)
 
-#endif /*EXPONENTIALLYDISTRIBUTEDGENERATIONBASEDCELLCYCLEMODEL_HPP_*/
+#endif /*EXPONENTIALG1GENERATIONALCELLCYCLEMODEL_HPP_*/

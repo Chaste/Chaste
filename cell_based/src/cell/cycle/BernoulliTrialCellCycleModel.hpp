@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef RANDOMDIVISIONCELLCYCLEMODEL_HPP_
-#define RANDOMDIVISIONCELLCYCLEMODEL_HPP_
+#ifndef BERNOULLITRIALCELLCYCLEMODEL_HPP_
+#define BERNOULLITRIALCELLCYCLEMODEL_HPP_
 
 #include "AbstractCellCycleModel.hpp"
 
@@ -46,7 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * of dividing per hour; the second, mMinimumDivisionAge, defines a minimum age at which cells
  * may divide.
  */
-class RandomDivisionCellCycleModel : public AbstractCellCycleModel
+class BernoulliTrialCellCycleModel : public AbstractCellCycleModel
 {
 private:
 
@@ -94,14 +94,14 @@ protected:
      *
      * @param rModel the cell cycle model to copy.
      */
-    RandomDivisionCellCycleModel(const RandomDivisionCellCycleModel& rModel);
+    BernoulliTrialCellCycleModel(const BernoulliTrialCellCycleModel& rModel);
 
 public:
 
     /**
      * Constructor.
      */
-    RandomDivisionCellCycleModel();
+    BernoulliTrialCellCycleModel();
 
     /**
      * Overridden ReadyToDivide() method.
@@ -175,6 +175,6 @@ public:
 
 // Declare identifier for the serializer
 #include "SerializationExportWrapper.hpp"
-CHASTE_CLASS_EXPORT(RandomDivisionCellCycleModel)
+CHASTE_CLASS_EXPORT(BernoulliTrialCellCycleModel)
 
-#endif // RANDOMDIVISIONCELLCYCLEMODEL_HPP_
+#endif // BERNOULLITRIALCELLCYCLEMODEL_HPP_

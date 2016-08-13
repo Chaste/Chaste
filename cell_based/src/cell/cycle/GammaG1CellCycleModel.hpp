@@ -33,26 +33,32 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef FIXEDDURATIONGENERATIONBASEDCELLCYCLEMODEL_HPP_
-#define FIXEDDURATIONGENERATIONBASEDCELLCYCLEMODEL_HPP_
+#ifndef GAMMAG1CELLCYCLEMODEL_HPP_
+#define GAMMAG1CELLCYCLEMODEL_HPP_
 
-#include "AbstractSimpleGenerationBasedCellCycleModel.hpp"
+#include "AbstractSimplePhaseBasedCellCycleModel.hpp"
+#include "RandomNumberGenerator.hpp"
 
 /**
- *  Fixed cell-cycle model.
- *
- *  Cell cycle time is deterministic for stem and transit cells (with values
- *  StemCellG1Duration + SG2MDuration
- *  and TransitCellG1Duration + SG2MDuration (values found in AbstractCellCycleModel))
+ * A stochastic cell-cycle model where cells keep dividing with a stochastic G1 duration
+ * drawn from a gamma distribution with specified shape and scale parameters.
  */
-class FixedDurationGenerationBasedCellCycleModel : public AbstractSimpleGenerationBasedCellCycleModel
+class GammaG1CellCycleModel : public AbstractSimplePhaseBasedCellCycleModel
 {
+    friend class TestSimpleCellCycleModels;
+
 private:
+
+    /** The shape parameter of the gamma distribution. This must be a positive real number. */
+    double mShape;
+
+    /** The scale parameter of the gamma distribution. This must be a positive real number. */
+    double mScale;
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
-     * Archive the cell-cycle model, never used directly - boost uses this.
+     * Archive the cell-cycle model and random number generator, never used directly - boost uses this.
      *
      * @param archive the archive
      * @param version the current version of this class
@@ -60,7 +66,14 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractSimpleGenerationBasedCellCycleModel>(*this);
+        archive & boost::serialization::base_object<AbstractSimplePhaseBasedCellCycleModel>(*this);
+
+        // Make sure the RandomNumberGenerator singleton gets saved too
+        SerializableSingleton<RandomNumberGenerator>* p_wrapper = RandomNumberGenerator::Instance()->GetSerializationWrapper();
+        archive & p_wrapper;
+
+        archive & mShape;
+        archive & mScale;
     }
 
 protected:
@@ -78,24 +91,49 @@ protected:
      *
      * @param rModel the cell cycle model to copy.
      */
-    FixedDurationGenerationBasedCellCycleModel(const FixedDurationGenerationBasedCellCycleModel& rModel);
+    GammaG1CellCycleModel(const GammaG1CellCycleModel& rModel);
 
 public:
 
     /**
-     * Default constructor. Note that mBirthTime is set in
-     * AbstractCellCycleModel() and mG1Duration is set in
-     * AbstractSimplePhaseBasedCellCycleModel().
+     * Constructor.
      */
-    FixedDurationGenerationBasedCellCycleModel();
+    GammaG1CellCycleModel();
 
     /**
-     * Overridden builder method to create new copies of
-     * this cell-cycle model.
-     *
-     * @return new cell-cycle model
+     * Overridden SetG1Duration().
+     */
+    void SetG1Duration();
+
+    /**
+     * Overridden builder method to create new copies of this cell-cycle model.
+     * @return a pointer to the GammaG1CellCycleModel created.
      */
     AbstractCellCycleModel* CreateCellCycleModel();
+
+    /**
+     * Set mShape.
+     *
+     * @param shape the value of the shape parameter
+     */
+    void SetShape(double shape);
+
+    /**
+     * @return mScale.
+     *
+     * @param scale the value of the scale parameter
+     */
+    void SetScale(double scale);
+
+    /**
+     * @return mShape.
+     */
+    double GetShape() const;
+
+    /**
+     * @return mScale.
+     */
+    double GetScale() const;
 
     /**
      * Overridden OutputCellCycleModelParameters() method.
@@ -107,6 +145,6 @@ public:
 
 #include "SerializationExportWrapper.hpp"
 // Declare identifier for the serializer
-CHASTE_CLASS_EXPORT(FixedDurationGenerationBasedCellCycleModel)
+CHASTE_CLASS_EXPORT(GammaG1CellCycleModel)
 
-#endif /*FIXEDDURATIONGENERATIONBASEDCELLCYCLEMODEL_HPP_*/
+#endif /* GAMMAG1CELLCYCLEMODEL_HPP_ */

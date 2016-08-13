@@ -33,20 +33,20 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "UniformlyDistributedCellCycleModel.hpp"
+#include "UniformCellCycleModel.hpp"
 #include "Exception.hpp"
 #include "StemCellProliferativeType.hpp"
 #include "TransitCellProliferativeType.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 
-UniformlyDistributedCellCycleModel::UniformlyDistributedCellCycleModel()
+UniformCellCycleModel::UniformCellCycleModel()
     : AbstractSimpleCellCycleModel(),
       mMinCellCycleDuration(12.0), // Hours
       mMaxCellCycleDuration(14.0)  // Hours
 {
 }
 
-UniformlyDistributedCellCycleModel::UniformlyDistributedCellCycleModel(const UniformlyDistributedCellCycleModel& rModel)
+UniformCellCycleModel::UniformCellCycleModel(const UniformCellCycleModel& rModel)
    : AbstractSimpleCellCycleModel(rModel),
      mMinCellCycleDuration(rModel.mMinCellCycleDuration),
      mMaxCellCycleDuration(rModel.mMaxCellCycleDuration)
@@ -65,12 +65,12 @@ UniformlyDistributedCellCycleModel::UniformlyDistributedCellCycleModel(const Uni
      */
 }
 
-AbstractCellCycleModel* UniformlyDistributedCellCycleModel::CreateCellCycleModel()
+AbstractCellCycleModel* UniformCellCycleModel::CreateCellCycleModel()
 {
-    return new UniformlyDistributedCellCycleModel(*this);
+    return new UniformCellCycleModel(*this);
 }
 
-void UniformlyDistributedCellCycleModel::SetCellCycleDuration()
+void UniformCellCycleModel::SetCellCycleDuration()
 {
     RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
 
@@ -84,37 +84,37 @@ void UniformlyDistributedCellCycleModel::SetCellCycleDuration()
     }
 }
 
-double UniformlyDistributedCellCycleModel::GetMinCellCycleDuration()
+double UniformCellCycleModel::GetMinCellCycleDuration()
 {
     return mMinCellCycleDuration;
 }
 
-void UniformlyDistributedCellCycleModel::SetMinCellCycleDuration(double minCellCycleDuration)
+void UniformCellCycleModel::SetMinCellCycleDuration(double minCellCycleDuration)
 {
     mMinCellCycleDuration = minCellCycleDuration;
 }
 
-double UniformlyDistributedCellCycleModel::GetMaxCellCycleDuration()
+double UniformCellCycleModel::GetMaxCellCycleDuration()
 {
     return mMaxCellCycleDuration;
 }
 
-void UniformlyDistributedCellCycleModel::SetMaxCellCycleDuration(double maxCellCycleDuration)
+void UniformCellCycleModel::SetMaxCellCycleDuration(double maxCellCycleDuration)
 {
     mMaxCellCycleDuration = maxCellCycleDuration;
 }
 
-double UniformlyDistributedCellCycleModel::GetAverageTransitCellCycleTime()
+double UniformCellCycleModel::GetAverageTransitCellCycleTime()
 {
     return 0.5*(mMinCellCycleDuration + mMaxCellCycleDuration);
 }
 
-double UniformlyDistributedCellCycleModel::GetAverageStemCellCycleTime()
+double UniformCellCycleModel::GetAverageStemCellCycleTime()
 {
     return 0.5*(mMinCellCycleDuration + mMaxCellCycleDuration);
 }
 
-void UniformlyDistributedCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
+void UniformCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<MinCellCycleDuration>" << mMinCellCycleDuration << "</MinCellCycleDuration>\n";
     *rParamsFile << "\t\t\t<MaxCellCycleDuration>" << mMaxCellCycleDuration << "</MaxCellCycleDuration>\n";
@@ -125,4 +125,4 @@ void UniformlyDistributedCellCycleModel::OutputCellCycleModelParameters(out_stre
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-CHASTE_CLASS_EXPORT(UniformlyDistributedCellCycleModel)
+CHASTE_CLASS_EXPORT(UniformCellCycleModel)

@@ -46,7 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OffLatticeSimulation.hpp"
 #include "TrianglesMeshWriter.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "AbstractCellBasedWithTimingsTestSuite.hpp"
 #include "WildTypeCellMutationState.hpp"
@@ -87,12 +87,12 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         for (unsigned i=0; i<cells.size(); i++)
         {
-            dynamic_cast<FixedDurationGenerationBasedCellCycleModel*>(cells[i]->GetCellCycleModel())->SetGeneration(0);
+            dynamic_cast<FixedG1GenerationalCellCycleModel*>(cells[i]->GetCellCycleModel())->SetGeneration(0);
             cells[i]->SetBirthTime(0.0);
         }
         cells[50]->SetBirthTime(-50.0);
@@ -115,12 +115,12 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         for (unsigned i=0; i<cells.size(); i++)
         {
-            dynamic_cast<FixedDurationGenerationBasedCellCycleModel*>(cells[i]->GetCellCycleModel())->SetGeneration(0);
+            dynamic_cast<FixedG1GenerationalCellCycleModel*>(cells[i]->GetCellCycleModel())->SetGeneration(0);
             cells[i]->SetBirthTime(0.0);
         }
         cells[mesh.GetNumNodes()-1]->SetBirthTime(-50.0);
@@ -164,12 +164,12 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
 
         for (unsigned i=0; i<cells.size(); i++)
         {
-            dynamic_cast<FixedDurationGenerationBasedCellCycleModel*>(cells[i]->GetCellCycleModel())->SetGeneration(0);
+            dynamic_cast<FixedG1GenerationalCellCycleModel*>(cells[i]->GetCellCycleModel())->SetGeneration(0);
         }
 
         MeshBasedCellPopulation<3> cell_population(mesh, cells);
@@ -243,7 +243,7 @@ public:
                 }
             }
 
-            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+            FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
             p_model->SetGeneration(0);
             CellPtr p_cell(new Cell(p_state, p_model));
             p_cell->SetCellProliferativeType(p_stem_type);

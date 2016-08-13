@@ -45,8 +45,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CryptSimulation1d.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
 #include "SloughingCellKiller.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
-#include "UniformlyDistributedGenerationBasedCellCycleModel.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
+#include "UniformG1GenerationalCellCycleModel.hpp"
 #include "WntCellCycleModel.hpp"
 #include "TysonNovakCellCycleModel.hpp"
 #include "WildTypeCellMutationState.hpp"
@@ -93,7 +93,7 @@ public:
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         for (unsigned node_index=0; node_index<mesh.GetNumNodes(); node_index++)
         {
-            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+            FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
             CellPtr p_cell(new Cell(p_healthy_state, p_model));
             p_cell->SetCellProliferativeType(p_diff_type);
             double birth_time = 0.0 - node_index;
@@ -158,7 +158,7 @@ public:
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         for (unsigned node_index=0; node_index<mesh.GetNumNodes(); node_index++)
         {
-            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+            FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
             CellPtr p_cell(new Cell(p_healthy_state, p_model));
             p_cell->SetCellProliferativeType(p_diff_type);
             double birth_time = 0.0 - node_index;
@@ -224,7 +224,7 @@ public:
         std::vector<CellPtr> cells;
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            UniformlyDistributedGenerationBasedCellCycleModel* p_model = new UniformlyDistributedGenerationBasedCellCycleModel();
+            UniformG1GenerationalCellCycleModel* p_model = new UniformG1GenerationalCellCycleModel();
 
             double birth_time = 0;
             if (i == 0)
@@ -333,7 +333,7 @@ public:
                 birth_time = -1.0;
             }
 
-            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+            FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
 
             CellPtr p_cell(new Cell(p_healthy_state, p_model));
             p_cell->SetCellProliferativeType(p_stem_type);
@@ -395,7 +395,7 @@ public:
         std::vector<CellPtr> cells;
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            UniformlyDistributedGenerationBasedCellCycleModel* p_model = new UniformlyDistributedGenerationBasedCellCycleModel();
+            UniformG1GenerationalCellCycleModel* p_model = new UniformG1GenerationalCellCycleModel();
 
             CellPtr p_cell(new Cell(p_healthy_state, p_model));
 
@@ -580,7 +580,7 @@ public:
         std::vector<CellPtr> cells;
         for (unsigned i=0; i<num_cells; i++)
         {
-            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+            FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
             CellPtr p_cell(new Cell(p_healthy_state, p_model));
 
             unsigned generation = 4;
@@ -789,7 +789,7 @@ public:
         std::vector<CellPtr> cells;
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+            FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
 
             CellPtr p_cell(new Cell(p_healthy_state, p_model));
 
@@ -938,7 +938,7 @@ public:
         std::vector<CellPtr> cells;
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            UniformlyDistributedGenerationBasedCellCycleModel* p_model = new UniformlyDistributedGenerationBasedCellCycleModel();
+            UniformG1GenerationalCellCycleModel* p_model = new UniformG1GenerationalCellCycleModel();
             CellPtr p_cell(new Cell(p_healthy_state, p_model));
 
             unsigned generation;

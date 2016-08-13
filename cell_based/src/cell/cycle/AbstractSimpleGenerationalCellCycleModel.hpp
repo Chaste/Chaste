@@ -33,32 +33,32 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef GAMMADISTRIBUTEDCELLCYCLEMODEL_HPP_
-#define GAMMADISTRIBUTEDCELLCYCLEMODEL_HPP_
+#ifndef ABSTRACTSIMPLEGENERATIONALCYCLEMODEL_HPP_
+#define ABSTRACTSIMPLEGENERATIONALCYCLEMODEL_HPP_
+
+#include "ChasteSerialization.hpp"
+#include "ClassIsAbstract.hpp"
+#include <boost/serialization/base_object.hpp>
 
 #include "AbstractSimplePhaseBasedCellCycleModel.hpp"
-#include "RandomNumberGenerator.hpp"
 
 /**
- * A stochastic cell-cycle model where cells keep dividing with a stochastic G1 duration
- * drawn from a gamma distribution with specified shape and scale parameters.
+ * This class contains all the things common to simple generation-based cell cycle
+ * models, i.e. models in which the length of cell cycle phases are determined
+ * when the cell-cycle model is created, rather than evaluated 'on the fly'
+ * by ODEs and suchlike, and in which each cell has a 'generation'.
+ *
+ * N.B. Whether or not the cell should actually divide may depend on
+ * Wnt / Oxygen etc. in subclasses.
  */
-class GammaDistributedCellCycleModel : public AbstractSimplePhaseBasedCellCycleModel
+class AbstractSimpleGenerationalCellCycleModel : public AbstractSimplePhaseBasedCellCycleModel
 {
-    friend class TestSimpleCellCycleModels;
-
 private:
-
-    /** The shape parameter of the gamma distribution. This must be a positive real number. */
-    double mShape;
-
-    /** The scale parameter of the gamma distribution. This must be a positive real number. */
-    double mScale;
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
-     * Archive the cell-cycle model and random number generator, never used directly - boost uses this.
+     * Archive the cell-cycle model.
      *
      * @param archive the archive
      * @param version the current version of this class
@@ -67,16 +67,18 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & boost::serialization::base_object<AbstractSimplePhaseBasedCellCycleModel>(*this);
-
-        // Make sure the RandomNumberGenerator singleton gets saved too
-        SerializableSingleton<RandomNumberGenerator>* p_wrapper = RandomNumberGenerator::Instance()->GetSerializationWrapper();
-        archive & p_wrapper;
-
-        archive & mShape;
-        archive & mScale;
+        archive & mGeneration;
+        archive & mMaxTransitGenerations;
     }
 
 protected:
+
+    /** The generation of this cell (cells with a StemCellProliferativeType have a generation of 0) */
+    unsigned mGeneration;
+
+    /** How many generations a transit cell lives for before becoming fully differentiated. */
+    unsigned mMaxTransitGenerations;
+
 
     /**
      * Protected copy-constructor for use by CreateCellCycleModel.
@@ -91,49 +93,52 @@ protected:
      *
      * @param rModel the cell cycle model to copy.
      */
-    GammaDistributedCellCycleModel(const GammaDistributedCellCycleModel& rModel);
+    AbstractSimpleGenerationalCellCycleModel(const AbstractSimpleGenerationalCellCycleModel& rModel);
 
 public:
 
     /**
-     * Constructor.
+     * Default constructor - creates an AbstractSimpleGenerationalCellCycleModel.
      */
-    GammaDistributedCellCycleModel();
+    AbstractSimpleGenerationalCellCycleModel();
 
     /**
-     * Overridden SetG1Duration().
+     * Destructor.
      */
-    void SetG1Duration();
+    virtual ~AbstractSimpleGenerationalCellCycleModel();
+
+    /** Overridden ResetForDivision() method. */
+    void ResetForDivision();
 
     /**
-     * Overridden builder method to create new copies of this cell-cycle model.
-     * @return a pointer to the GammaDistributedCellCycleModel created.
+     * Set the new cell's G1 duration once it has been created after division.
+     * The duration will be based on cell type.
      */
-    AbstractCellCycleModel* CreateCellCycleModel();
+    void InitialiseDaughterCell();
 
     /**
-     * Set mShape.
+     * Sets the cell's generation.
      *
-     * @param shape the value of the shape parameter
+     * @param generation the cell's generation
      */
-    void SetShape(double shape);
+    void SetGeneration(unsigned generation);
 
     /**
-     * @return mScale.
+     * @return the cell's generation.
+     */
+    unsigned GetGeneration() const;
+
+    /**
+     * Set mMaxTransitGenerations.
      *
-     * @param scale the value of the scale parameter
+     * @param maxTransitGenerations the new value of mMaxTransitGenerations
      */
-    void SetScale(double scale);
+    void SetMaxTransitGenerations(unsigned maxTransitGenerations);
 
     /**
-     * @return mShape.
+     * @return mMaxTransitGenerations
      */
-    double GetShape() const;
-
-    /**
-     * @return mScale.
-     */
-    double GetScale() const;
+    unsigned GetMaxTransitGenerations() const;
 
     /**
      * Overridden OutputCellCycleModelParameters() method.
@@ -143,8 +148,6 @@ public:
     virtual void OutputCellCycleModelParameters(out_stream& rParamsFile);
 };
 
-#include "SerializationExportWrapper.hpp"
-// Declare identifier for the serializer
-CHASTE_CLASS_EXPORT(GammaDistributedCellCycleModel)
+CLASS_IS_ABSTRACT(AbstractSimpleGenerationalCellCycleModel)
 
-#endif /* GAMMADISTRIBUTEDCELLCYCLEMODEL_HPP_ */
+#endif /*ABSTRACTSIMPLEGENERATIONALCYCLEMODEL_HPP_*/

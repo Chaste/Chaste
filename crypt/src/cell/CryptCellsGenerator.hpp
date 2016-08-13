@@ -47,8 +47,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexMesh.hpp"
 #include "PottsMesh.hpp"
 
-#include "UniformlyDistributedGenerationBasedCellCycleModel.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "UniformG1GenerationalCellCycleModel.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
 #include "TysonNovakCellCycleModel.hpp"
 #include "WntCellCycleModel.hpp"
 #include "SimpleWntCellCycleModel.hpp"
@@ -209,9 +209,9 @@ void CryptCellsGenerator<CELL_CYCLE_MODEL>::Generate(
         {
             generation = 3;
         }
-        if (dynamic_cast<AbstractSimpleGenerationBasedCellCycleModel*>(p_cell_cycle_model))
+        if (dynamic_cast<AbstractSimpleGenerationalCellCycleModel*>(p_cell_cycle_model))
         {
-            dynamic_cast<AbstractSimpleGenerationBasedCellCycleModel*>(p_cell_cycle_model)->SetGeneration(generation);
+            dynamic_cast<AbstractSimpleGenerationalCellCycleModel*>(p_cell_cycle_model)->SetGeneration(generation);
         }
 
         // Create a cell

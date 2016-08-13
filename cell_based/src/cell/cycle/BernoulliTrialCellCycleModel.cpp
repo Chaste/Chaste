@@ -33,20 +33,20 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "RandomDivisionCellCycleModel.hpp"
+#include "BernoulliTrialCellCycleModel.hpp"
 #include "CellLabel.hpp"
 #include "DefaultCellProliferativeType.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 
-RandomDivisionCellCycleModel::RandomDivisionCellCycleModel()
+BernoulliTrialCellCycleModel::BernoulliTrialCellCycleModel()
     : AbstractCellCycleModel(),
       mDivisionProbability(0.1),
       mMinimumDivisionAge(1.0)
 {
 }
 
-RandomDivisionCellCycleModel::RandomDivisionCellCycleModel(const RandomDivisionCellCycleModel& rModel)
+BernoulliTrialCellCycleModel::BernoulliTrialCellCycleModel(const BernoulliTrialCellCycleModel& rModel)
    : AbstractCellCycleModel(rModel),
      mDivisionProbability(rModel.mDivisionProbability),
      mMinimumDivisionAge(rModel.mMinimumDivisionAge)
@@ -59,7 +59,7 @@ RandomDivisionCellCycleModel::RandomDivisionCellCycleModel(const RandomDivisionC
      */
 }
 
-bool RandomDivisionCellCycleModel::ReadyToDivide()
+bool BernoulliTrialCellCycleModel::ReadyToDivide()
 {
     assert(mpCell != NULL);
 
@@ -81,42 +81,42 @@ bool RandomDivisionCellCycleModel::ReadyToDivide()
     return mReadyToDivide;
 }
 
-AbstractCellCycleModel* RandomDivisionCellCycleModel::CreateCellCycleModel()
+AbstractCellCycleModel* BernoulliTrialCellCycleModel::CreateCellCycleModel()
 {
-    return new RandomDivisionCellCycleModel(*this);
+    return new BernoulliTrialCellCycleModel(*this);
 }
 
-void RandomDivisionCellCycleModel::SetDivisionProbability(double divisionProbability)
+void BernoulliTrialCellCycleModel::SetDivisionProbability(double divisionProbability)
 {
     mDivisionProbability = divisionProbability;
 }
 
-double RandomDivisionCellCycleModel::GetDivisionProbability()
+double BernoulliTrialCellCycleModel::GetDivisionProbability()
 {
     return mDivisionProbability;
 }
 
-void RandomDivisionCellCycleModel::SetMinimumDivisionAge(double minimumDivisionAge)
+void BernoulliTrialCellCycleModel::SetMinimumDivisionAge(double minimumDivisionAge)
 {
     mMinimumDivisionAge = minimumDivisionAge;
 }
 
-double RandomDivisionCellCycleModel::GetMinimumDivisionAge()
+double BernoulliTrialCellCycleModel::GetMinimumDivisionAge()
 {
     return mMinimumDivisionAge;
 }
 
-double RandomDivisionCellCycleModel::GetAverageTransitCellCycleTime()
+double BernoulliTrialCellCycleModel::GetAverageTransitCellCycleTime()
 {
     return 1.0/mDivisionProbability;
 }
 
-double RandomDivisionCellCycleModel::GetAverageStemCellCycleTime()
+double BernoulliTrialCellCycleModel::GetAverageStemCellCycleTime()
 {
     return 1.0/mDivisionProbability;
 }
 
-void RandomDivisionCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
+void BernoulliTrialCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<DivisionProbability>" << mDivisionProbability << "</DivisionProbability>\n";
     *rParamsFile << "\t\t\t<MinimumDivisionAge>" << mMinimumDivisionAge << "</MinimumDivisionAge>\n";
@@ -127,4 +127,4 @@ void RandomDivisionCellCycleModel::OutputCellCycleModelParameters(out_stream& rP
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-CHASTE_CLASS_EXPORT(RandomDivisionCellCycleModel)
+CHASTE_CLASS_EXPORT(BernoulliTrialCellCycleModel)

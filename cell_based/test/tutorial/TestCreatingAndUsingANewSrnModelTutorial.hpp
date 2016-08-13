@@ -88,7 +88,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * tutorials. */
 #include "CheckReadyToDivideAndPhaseIsUpdated.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
-#include "UniformlyDistributedGenerationBasedCellCycleModel.hpp"
+#include "UniformG1GenerationalCellCycleModel.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "NagaiHondaForce.hpp"
 #include "SimpleTargetAreaModifier.hpp"
@@ -312,7 +312,7 @@ public:
         /* Now we construct and initialise a cell with a {{{MySrnModel}}}.*/
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        UniformlyDistributedGenerationBasedCellCycleModel* p_cell_cycle_model = new UniformlyDistributedGenerationBasedCellCycleModel();
+        UniformG1GenerationalCellCycleModel* p_cell_cycle_model = new UniformG1GenerationalCellCycleModel();
         MySrnModel* p_srn_model = new MySrnModel;
         CellPtr p_cell(new Cell(p_state, p_cell_cycle_model, p_srn_model));
         p_cell->SetCellProliferativeType(p_diff_type);
@@ -354,7 +354,7 @@ public:
             p_simulation_time->SetEndTimeAndNumberOfTimeSteps(3.0, 4);
 
             /* Create a cell with associated srn and cell-cycle model. */
-            UniformlyDistributedGenerationBasedCellCycleModel* p_cell_cycle_model = new UniformlyDistributedGenerationBasedCellCycleModel();
+            UniformG1GenerationalCellCycleModel* p_cell_cycle_model = new UniformG1GenerationalCellCycleModel();
             AbstractSrnModel* p_srn_model = new MySrnModel;
             CellPtr p_cell(new Cell(p_state, p_cell_cycle_model, p_srn_model));
             p_cell->SetCellProliferativeType(p_diff_type);
@@ -440,7 +440,7 @@ public:
         for (unsigned i=0; i<p_mesh->GetNumElements(); i++)
         {
             /* For each node we create a cell with our SRN model and simple Stochastic cell cycle model. */
-            UniformlyDistributedGenerationBasedCellCycleModel* p_cell_cycle_model = new UniformlyDistributedGenerationBasedCellCycleModel();
+            UniformG1GenerationalCellCycleModel* p_cell_cycle_model = new UniformG1GenerationalCellCycleModel();
             MySrnModel* p_srn_model = new MySrnModel;
 
             /* We choose to initialise the concentrations to random levels in each cell. */

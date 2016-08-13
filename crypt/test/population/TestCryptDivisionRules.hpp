@@ -47,7 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MeshBasedCellPopulation.hpp"
 #include "NodeBasedCellPopulation.hpp"
 #include "CryptCellsGenerator.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "RandomDirectionCentreBasedDivisionRule.hpp"
@@ -77,7 +77,7 @@ public:
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         for (unsigned node_index=0; node_index<mesh.GetNumNodes(); node_index++)
         {
-            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+            FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
             CellPtr p_cell(new Cell(p_healthy_state, p_model));
             p_cell->SetCellProliferativeType(p_diff_type);
             double birth_time = 0.0 - node_index;
@@ -118,7 +118,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> conf_cells;
-        CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
         cells_generator.Generate(conf_cells, &conf_mesh, std::vector<unsigned>(), true);
 
         // Create cell population
@@ -153,7 +153,7 @@ public:
         mesh.ConstructFromMeshReader(mesh_reader);
 
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel,3> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel,3> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         MeshBasedCellPopulation<3,3> cell_population(mesh, cells);
@@ -189,7 +189,7 @@ public:
         MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
 
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 1> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 1> cells_generator;
         cells_generator.GenerateBasic(cells, vertex_mesh.GetNumElements());
 
         VertexBasedCellPopulation<2> cell_population(vertex_mesh, cells);

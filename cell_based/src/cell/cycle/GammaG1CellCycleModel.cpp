@@ -33,24 +33,26 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "ExponentiallyDistributedGenerationBasedCellCycleModel.hpp"
+#include "GammaG1CellCycleModel.hpp"
 #include "Exception.hpp"
 #include "StemCellProliferativeType.hpp"
 #include "TransitCellProliferativeType.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 
-ExponentiallyDistributedGenerationBasedCellCycleModel::ExponentiallyDistributedGenerationBasedCellCycleModel()
-    : AbstractSimpleGenerationBasedCellCycleModel(),
-      mRate(1.0/mTransitCellG1Duration)
+GammaG1CellCycleModel::GammaG1CellCycleModel()
+    : AbstractSimplePhaseBasedCellCycleModel(),
+      mShape(DOUBLE_UNSET),
+      mScale(DOUBLE_UNSET)
 {
 }
 
-ExponentiallyDistributedGenerationBasedCellCycleModel::ExponentiallyDistributedGenerationBasedCellCycleModel(const ExponentiallyDistributedGenerationBasedCellCycleModel& rModel)
-   :  AbstractSimpleGenerationBasedCellCycleModel(rModel),
-      mRate(rModel.mRate)
+GammaG1CellCycleModel::GammaG1CellCycleModel(const GammaG1CellCycleModel& rModel)
+   :  AbstractSimplePhaseBasedCellCycleModel(rModel),
+      mShape(rModel.mShape),
+      mScale(rModel.mScale)
 {
     /*
-     * Initialize only the member variable defined in this class.
+     * Initialize only those member variables defined in this class.
      *
      * The member variables mCurrentCellCyclePhase, mG1Duration,
      * mMinimumGapDuration, mStemCellG1Duration, mTransitCellG1Duration,
@@ -65,20 +67,18 @@ ExponentiallyDistributedGenerationBasedCellCycleModel::ExponentiallyDistributedG
      */
 }
 
-AbstractCellCycleModel* ExponentiallyDistributedGenerationBasedCellCycleModel::CreateCellCycleModel()
+AbstractCellCycleModel* GammaG1CellCycleModel::CreateCellCycleModel()
 {
-    return new ExponentiallyDistributedGenerationBasedCellCycleModel(*this);
+    return new GammaG1CellCycleModel(*this);
 }
 
-void ExponentiallyDistributedGenerationBasedCellCycleModel::SetG1Duration()
+void GammaG1CellCycleModel::SetG1Duration()
 {
-    RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
-
     if (    mpCell->GetCellProliferativeType()->IsType<StemCellProliferativeType>()
-            || mpCell->GetCellProliferativeType()->IsType<TransitCellProliferativeType>() )
+         || mpCell->GetCellProliferativeType()->IsType<TransitCellProliferativeType>() )
     {
-        // Generate an exponential random number with mScale
-        mG1Duration = p_gen->ExponentialRandomDeviate(mRate);
+        // Generate a gamma random number with mShape and mScale
+        mG1Duration = RandomNumberGenerator::Instance()->GammaRandomDeviate(mShape, mScale);
     }
     else if (mpCell->GetCellProliferativeType()->IsType<DifferentiatedCellProliferativeType>())
     {
@@ -90,44 +90,34 @@ void ExponentiallyDistributedGenerationBasedCellCycleModel::SetG1Duration()
     }
 }
 
-double ExponentiallyDistributedGenerationBasedCellCycleModel::GetRate() const
+void GammaG1CellCycleModel::SetShape(double shape)
 {
-    return mRate;
+    mShape = shape;
 }
 
-void ExponentiallyDistributedGenerationBasedCellCycleModel::SetRate(double rate)
+void GammaG1CellCycleModel::SetScale(double scale)
 {
-    mRate = rate;
-
-    // These are now set to the average value of the G1Duration
-    SetTransitCellG1Duration(1.0/rate);
-    SetStemCellG1Duration(1.0/rate);
+    mScale = scale;
 }
 
-void ExponentiallyDistributedGenerationBasedCellCycleModel::SetStemCellG1Duration(double stemCellG1Duration)
+double GammaG1CellCycleModel::GetShape() const
 {
-    assert(stemCellG1Duration > 0.0);
-    mStemCellG1Duration = stemCellG1Duration;
-
-    mRate = 1.0/stemCellG1Duration;
+    return mShape;
 }
 
-void ExponentiallyDistributedGenerationBasedCellCycleModel::SetTransitCellG1Duration(double transitCellG1Duration)
+double GammaG1CellCycleModel::GetScale() const
 {
-    assert(transitCellG1Duration > 0.0);
-    mTransitCellG1Duration = transitCellG1Duration;
-
-    mRate = 1.0/transitCellG1Duration;
+    return mScale;
 }
 
-void ExponentiallyDistributedGenerationBasedCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
+void GammaG1CellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
 {
-     *rParamsFile << "\t\t\t<Rate>" << mRate << "</Rate>\n";
+    *rParamsFile << "\t\t\t<Shape>" << mShape << "</Shape>\n";
+    *rParamsFile << "\t\t\t<Scale>" << mScale << "</Scale>\n";
 
-    // Call method on direct parent class
-    AbstractSimpleGenerationBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
+    AbstractSimplePhaseBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
 }
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-CHASTE_CLASS_EXPORT(ExponentiallyDistributedGenerationBasedCellCycleModel)
+CHASTE_CLASS_EXPORT(GammaG1CellCycleModel)

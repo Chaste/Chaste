@@ -85,7 +85,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PottsMeshGenerator.hpp"
 #include "RandomCellKiller.hpp"
 #include "RepulsionForce.hpp"
-#include "UniformlyDistributedGenerationBasedCellCycleModel.hpp"
+#include "UniformG1GenerationalCellCycleModel.hpp"
 #include "SurfaceAreaConstraintPottsUpdateRule.hpp"
 #include "TysonNovakCellCycleModel.hpp"
 #include "VertexBasedCellPopulation.hpp"
@@ -121,7 +121,7 @@ public:
         MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
 
         /* We now generate a collection of cells. We do this by using a {{{CellsGenerator}}} and we specify the proliferative
-         * behaviour of the cell by choosing a {{{CellCycleModel}}}, here we choose a {{{UniformlyDistributedGenerationBasedCellCycleModel}}} where
+         * behaviour of the cell by choosing a {{{CellCycleModel}}}, here we choose a {{{UniformG1GenerationalCellCycleModel}}} where
          * each cell is given a division time, drawn from a uniform distribution when it is created.
          * (Note that here we need to use a phase based cell cycle model so that we can use the target area modifiers which are needed by the vertex
          * based simulations).
@@ -129,7 +129,7 @@ public:
          * we need as may cells as elements in the mesh.*/
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
-        CellsGenerator<UniformlyDistributedGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<UniformG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_transit_type);
 
         /* We now create a {{{CellPopulation}}} object (passing in the mesh and cells) to connect the mesh and the cells together.
@@ -212,7 +212,7 @@ public:
         /* We create the cells as before, only this time we need one cell per node.*/
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
-        CellsGenerator<UniformlyDistributedGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<UniformG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_transit_type); //**Changed**//
 
         /* This time we create a {{{NodeBasedCellPopulation}}} as we are using a {{{NodesOnlyMesh}}}.*/
@@ -274,7 +274,7 @@ public:
         /* We create the same number of cells as the previous test.*/
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
-        CellsGenerator<UniformlyDistributedGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<UniformG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), p_transit_type);
 
         /* This time we create a {{{MeshBasedCellPopulation}}} as we are using a {{{MutableMesh}}}.*/
@@ -376,11 +376,11 @@ public:
         CylindricalHoneycombMeshGenerator generator(5, 2, 2); //**Changed**//
         Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh(); //**Changed**//
 
-        /* Again we create one cell for each non ghost node. Note that we have changed back to using a {{{UniformlyDistributedGenerationBasedCellCycleModel}}}.*/
+        /* Again we create one cell for each non ghost node. Note that we have changed back to using a {{{UniformG1GenerationalCellCycleModel}}}.*/
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
-        CellsGenerator<UniformlyDistributedGenerationBasedCellCycleModel, 2> cells_generator; //**Changed**//
+        CellsGenerator<UniformG1GenerationalCellCycleModel, 2> cells_generator; //**Changed**//
         cells_generator.GenerateBasicRandom(cells, location_indices.size(), p_transit_type);
 
         /* We use the same {{{CellPopulation}}}, {{{CellBasedSimulation}}} (only changing the output directory and end time) and {{{Force}}} as before and run the simulation.*/
@@ -424,7 +424,7 @@ public:
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
         std::vector<CellPtr> cells;
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
-        CellsGenerator<UniformlyDistributedGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<UniformG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, location_indices.size(), p_stem_type); //**Changed**//
 
         MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices);
@@ -476,7 +476,7 @@ public:
         /* We generate one cell for each element as in vertex based simulations.*/
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
-        CellsGenerator<UniformlyDistributedGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<UniformG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_transit_type);
 
         /* As we have a {{{PottsMesh}}} we use a {{{PottsBasedCellPopulation}}}. Note here we also change the

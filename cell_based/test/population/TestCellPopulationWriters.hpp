@@ -65,7 +65,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HoneycombMeshGenerator.hpp"
 #include "PottsMeshGenerator.hpp"
 #include "CellsGenerator.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
 
 #include "MeshBasedCellPopulation.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
@@ -98,7 +98,7 @@ public:
         nodes.push_back(new Node<3>(4, false, 0.5, 0.5, 0.5));
         MutableMesh<3,3> mesh(nodes);
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
         MeshBasedCellPopulation<3> cell_population(mesh, cells);
 
@@ -158,7 +158,7 @@ public:
         HoneycombMeshGenerator tet_generator(5, 5, 0);
         MutableMesh<2,2>* p_tet_mesh = tet_generator.GetMesh();
         std::vector<CellPtr> mesh_based_cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> mesh_based_cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> mesh_based_cells_generator;
         mesh_based_cells_generator.GenerateBasic(mesh_based_cells, p_tet_mesh->GetNumNodes());
         MeshBasedCellPopulation<2> mesh_based_cell_population(*p_tet_mesh, mesh_based_cells);
 
@@ -196,7 +196,7 @@ public:
             PottsMeshGenerator<2> ca_based_generator(5, 0, 0, 5, 0, 0);
             PottsMesh<2>* p_ca_based_mesh = ca_based_generator.GetMesh();
             std::vector<CellPtr> ca_based_cells;
-            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> ca_based_cells_generator;
+            CellsGenerator<FixedG1GenerationalCellCycleModel, 2> ca_based_cells_generator;
             ca_based_cells_generator.GenerateBasic(ca_based_cells, 5);
             std::vector<unsigned> location_indices;
             location_indices.push_back(7);
@@ -217,7 +217,7 @@ public:
             NodesOnlyMesh<2> node_based_mesh;
             node_based_mesh.ConstructNodesWithoutMesh(node_based_nodes, 1.5);
             std::vector<CellPtr> node_based_cells;
-            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> node_based_generator;
+            CellsGenerator<FixedG1GenerationalCellCycleModel, 2> node_based_generator;
             node_based_generator.GenerateBasic(node_based_cells, node_based_mesh.GetNumNodes());
             NodeBasedCellPopulation<2> node_based_cell_population(node_based_mesh, node_based_cells);
 
@@ -233,7 +233,7 @@ public:
             PottsMeshGenerator<2> potts_based_generator(4, 1, 2, 4, 1, 2);
             PottsMesh<2>* p_potts_based_mesh = potts_based_generator.GetMesh();
             std::vector<CellPtr> potts_based_cells;
-            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> potts_based_cells_generator;
+            CellsGenerator<FixedG1GenerationalCellCycleModel, 2> potts_based_cells_generator;
             potts_based_cells_generator.GenerateBasic(potts_based_cells, p_potts_based_mesh->GetNumElements());
             PottsBasedCellPopulation<2> potts_based_cell_population(*p_potts_based_mesh, potts_based_cells);
 
@@ -246,7 +246,7 @@ public:
             MutableVertexMesh<2,2>* p_vertex_based_mesh = vertex_based_generator.GetMesh();
             std::vector<CellPtr> vertex_based_cells;
             boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
-            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> vertex_based_cells_generator;
+            CellsGenerator<FixedG1GenerationalCellCycleModel, 2> vertex_based_cells_generator;
             vertex_based_cells_generator.GenerateBasic(vertex_based_cells, p_vertex_based_mesh->GetNumElements(), std::vector<unsigned>(), p_diff_type);
             VertexBasedCellPopulation<2> vertex_based_cell_population(*p_vertex_based_mesh, vertex_based_cells);
 
@@ -296,7 +296,7 @@ public:
         nodes.push_back(new Node<3>(4, false, 0.5, 0.5, 0.5));
         MutableMesh<3,3> mesh(nodes);
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
         MeshBasedCellPopulation<3> cell_population(mesh, cells);
 
@@ -359,7 +359,7 @@ public:
         MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
         std::vector<CellPtr> cells;
         boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements(), std::vector<unsigned>(), p_diff_type);
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
@@ -422,7 +422,7 @@ public:
             MutableMesh<2,2>* p_mesh = generator.GetMesh();
             std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
             std::vector<CellPtr> cells;
-            CellsGenerator<FixedDurationGenerationBasedCellCycleModel,2> cells_generator;
+            CellsGenerator<FixedG1GenerationalCellCycleModel,2> cells_generator;
             cells_generator.GenerateGivenLocationIndices(cells, location_indices);
             MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices);
             cell_population.InitialiseCells();
@@ -487,7 +487,7 @@ public:
                 mesh.GetNode(index)->SetRadius(0.6);
             }
             std::vector<CellPtr> cells;
-            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+            CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
             cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
             NodeBasedCellPopulation<2> cell_population(mesh, cells);
             cell_population.InitialiseCells();
@@ -551,7 +551,7 @@ public:
             PottsMeshGenerator<2> generator(9, 3, 3, 6, 3, 2);
             PottsMesh<2>* p_mesh = generator.GetMesh();
             std::vector<CellPtr> cells;
-            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+            CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
             cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
             PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
             cell_population.InitialiseCells();
@@ -612,7 +612,7 @@ public:
             }
 
             std::vector<CellPtr> cells;
-            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+            CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
             cells_generator.GenerateBasic(cells, location_indices.size());
             CaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
             cell_population.InitialiseCells();
@@ -663,7 +663,7 @@ public:
             MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
             std::vector<CellPtr> cells;
             boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
-            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+            CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
             cells_generator.GenerateBasic(cells, p_mesh->GetNumElements(), std::vector<unsigned>(), p_diff_type);
             VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
             cell_population.InitialiseCells();
@@ -752,7 +752,7 @@ public:
         NodesOnlyMesh<3> mesh;
         mesh.ConstructNodesWithoutMesh(nodes, 1.5);
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 3> generator;
         generator.GenerateBasic(cells, mesh.GetNumNodes());
         NodeBasedCellPopulation<3> cell_population(mesh, cells);
 
@@ -824,7 +824,7 @@ public:
         mesh_based_nodes.push_back(new Node<3>(4, false, 0.5, 0.5, 0.5));
         MutableMesh<3,3> mesh_based_mesh(mesh_based_nodes);
         std::vector<CellPtr> mesh_based_cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> mesh_based_cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 3> mesh_based_cells_generator;
         mesh_based_cells_generator.GenerateBasic(mesh_based_cells, mesh_based_mesh.GetNumNodes());
         MeshBasedCellPopulation<3> mesh_based_cell_population(mesh_based_mesh, mesh_based_cells);
 
@@ -879,7 +879,7 @@ public:
         NodesOnlyMesh<3> node_based_mesh;
         node_based_mesh.ConstructNodesWithoutMesh(node_based_nodes, 1.5);
         std::vector<CellPtr> node_based_cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> node_based_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 3> node_based_generator;
         node_based_generator.GenerateBasic(node_based_cells, node_based_mesh.GetNumNodes());
         NodeBasedCellPopulation<3> node_based_cell_population(node_based_mesh, node_based_cells);
 
@@ -949,7 +949,7 @@ public:
         MutableVertexMesh<2,2>* p_vertex_based_mesh = vertex_based_generator.GetMesh();
         std::vector<CellPtr> vertex_based_cells;
         boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> vertex_based_cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> vertex_based_cells_generator;
         vertex_based_cells_generator.GenerateBasic(vertex_based_cells, p_vertex_based_mesh->GetNumElements(), std::vector<unsigned>(), p_diff_type);
         VertexBasedCellPopulation<2> vertex_based_cell_population(*p_vertex_based_mesh, vertex_based_cells);
 
@@ -1020,7 +1020,7 @@ public:
         MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
         std::vector<CellPtr> cells;
         boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements(), std::vector<unsigned>(), p_diff_type);
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
@@ -1053,7 +1053,7 @@ public:
             HoneycombMeshGenerator tet_generator(5, 5, 0);
             MutableMesh<2,2>* p_tet_mesh = tet_generator.GetMesh();
             std::vector<CellPtr> mesh_based_cells;
-            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> mesh_based_cells_generator;
+            CellsGenerator<FixedG1GenerationalCellCycleModel, 2> mesh_based_cells_generator;
             mesh_based_cells_generator.GenerateBasic(mesh_based_cells, p_tet_mesh->GetNumNodes());
             MeshBasedCellPopulation<2> mesh_based_cell_population(*p_tet_mesh, mesh_based_cells);
 
@@ -1065,7 +1065,7 @@ public:
             PottsMeshGenerator<2> ca_based_generator(5, 0, 0, 5, 0, 0);
             PottsMesh<2>* p_ca_based_mesh = ca_based_generator.GetMesh();
             std::vector<CellPtr> ca_based_cells;
-            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> ca_based_cells_generator;
+            CellsGenerator<FixedG1GenerationalCellCycleModel, 2> ca_based_cells_generator;
             ca_based_cells_generator.GenerateBasic(ca_based_cells, 5);
             std::vector<unsigned> location_indices;
             location_indices.push_back(7);
@@ -1086,7 +1086,7 @@ public:
             NodesOnlyMesh<2> node_based_mesh;
             node_based_mesh.ConstructNodesWithoutMesh(node_based_nodes, 1.5);
             std::vector<CellPtr> node_based_cells;
-            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> node_based_generator;
+            CellsGenerator<FixedG1GenerationalCellCycleModel, 2> node_based_generator;
             node_based_generator.GenerateBasic(node_based_cells, node_based_mesh.GetNumNodes());
             NodeBasedCellPopulation<2> node_based_cell_population(node_based_mesh, node_based_cells);
 
@@ -1102,7 +1102,7 @@ public:
             PottsMeshGenerator<2> potts_based_generator(4, 1, 2, 4, 1, 2);
             PottsMesh<2>* p_potts_based_mesh = potts_based_generator.GetMesh();
             std::vector<CellPtr> potts_based_cells;
-            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> potts_based_cells_generator;
+            CellsGenerator<FixedG1GenerationalCellCycleModel, 2> potts_based_cells_generator;
             potts_based_cells_generator.GenerateBasic(potts_based_cells, p_potts_based_mesh->GetNumElements());
             PottsBasedCellPopulation<2> potts_based_cell_population(*p_potts_based_mesh, potts_based_cells);
 
@@ -1143,7 +1143,7 @@ public:
         MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
         std::vector<CellPtr> cells;
         boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements(), std::vector<unsigned>(), p_diff_type);
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
@@ -1176,7 +1176,7 @@ public:
             HoneycombMeshGenerator tet_generator(5, 5, 0);
             MutableMesh<2,2>* p_tet_mesh = tet_generator.GetMesh();
             std::vector<CellPtr> mesh_based_cells;
-            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> mesh_based_cells_generator;
+            CellsGenerator<FixedG1GenerationalCellCycleModel, 2> mesh_based_cells_generator;
             mesh_based_cells_generator.GenerateBasic(mesh_based_cells, p_tet_mesh->GetNumNodes());
             MeshBasedCellPopulation<2> mesh_based_cell_population(*p_tet_mesh, mesh_based_cells);
 
@@ -1188,7 +1188,7 @@ public:
             PottsMeshGenerator<2> ca_based_generator(5, 0, 0, 5, 0, 0);
             PottsMesh<2>* p_ca_based_mesh = ca_based_generator.GetMesh();
             std::vector<CellPtr> ca_based_cells;
-            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> ca_based_cells_generator;
+            CellsGenerator<FixedG1GenerationalCellCycleModel, 2> ca_based_cells_generator;
             ca_based_cells_generator.GenerateBasic(ca_based_cells, 5);
             std::vector<unsigned> location_indices;
             location_indices.push_back(7);
@@ -1209,7 +1209,7 @@ public:
             NodesOnlyMesh<2> node_based_mesh;
             node_based_mesh.ConstructNodesWithoutMesh(node_based_nodes, 1.5);
             std::vector<CellPtr> node_based_cells;
-            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> node_based_generator;
+            CellsGenerator<FixedG1GenerationalCellCycleModel, 2> node_based_generator;
             node_based_generator.GenerateBasic(node_based_cells, node_based_mesh.GetNumNodes());
             NodeBasedCellPopulation<2> node_based_cell_population(node_based_mesh, node_based_cells);
 
@@ -1225,7 +1225,7 @@ public:
             PottsMeshGenerator<2> potts_based_generator(4, 1, 2, 4, 1, 2);
             PottsMesh<2>* p_potts_based_mesh = potts_based_generator.GetMesh();
             std::vector<CellPtr> potts_based_cells;
-            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> potts_based_cells_generator;
+            CellsGenerator<FixedG1GenerationalCellCycleModel, 2> potts_based_cells_generator;
             potts_based_cells_generator.GenerateBasic(potts_based_cells, p_potts_based_mesh->GetNumElements());
             PottsBasedCellPopulation<2> potts_based_cell_population(*p_potts_based_mesh, potts_based_cells);
 
@@ -1266,7 +1266,7 @@ public:
         MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
         std::vector<CellPtr> cells;
         boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements(), std::vector<unsigned>(), p_diff_type);
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
@@ -1299,7 +1299,7 @@ public:
             HoneycombMeshGenerator tet_generator(5, 5, 0);
             MutableMesh<2,2>* p_tet_mesh = tet_generator.GetMesh();
             std::vector<CellPtr> mesh_based_cells;
-            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> mesh_based_cells_generator;
+            CellsGenerator<FixedG1GenerationalCellCycleModel, 2> mesh_based_cells_generator;
             mesh_based_cells_generator.GenerateBasic(mesh_based_cells, p_tet_mesh->GetNumNodes());
             MeshBasedCellPopulation<2> mesh_based_cell_population(*p_tet_mesh, mesh_based_cells);
 
@@ -1311,7 +1311,7 @@ public:
             PottsMeshGenerator<2> ca_based_generator(5, 0, 0, 5, 0, 0);
             PottsMesh<2>* p_ca_based_mesh = ca_based_generator.GetMesh();
             std::vector<CellPtr> ca_based_cells;
-            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> ca_based_cells_generator;
+            CellsGenerator<FixedG1GenerationalCellCycleModel, 2> ca_based_cells_generator;
             ca_based_cells_generator.GenerateBasic(ca_based_cells, 5);
             std::vector<unsigned> location_indices;
             location_indices.push_back(7);
@@ -1332,7 +1332,7 @@ public:
             NodesOnlyMesh<2> node_based_mesh;
             node_based_mesh.ConstructNodesWithoutMesh(node_based_nodes, 1.5);
             std::vector<CellPtr> node_based_cells;
-            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> node_based_generator;
+            CellsGenerator<FixedG1GenerationalCellCycleModel, 2> node_based_generator;
             node_based_generator.GenerateBasic(node_based_cells, node_based_mesh.GetNumNodes());
             NodeBasedCellPopulation<2> node_based_cell_population(node_based_mesh, node_based_cells);
 
@@ -1348,7 +1348,7 @@ public:
             PottsMeshGenerator<2> potts_based_generator(4, 1, 2, 4, 1, 2);
             PottsMesh<2>* p_potts_based_mesh = potts_based_generator.GetMesh();
             std::vector<CellPtr> potts_based_cells;
-            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> potts_based_cells_generator;
+            CellsGenerator<FixedG1GenerationalCellCycleModel, 2> potts_based_cells_generator;
             potts_based_cells_generator.GenerateBasic(potts_based_cells, p_potts_based_mesh->GetNumElements());
             PottsBasedCellPopulation<2> potts_based_cell_population(*p_potts_based_mesh, potts_based_cells);
 
@@ -1392,7 +1392,7 @@ public:
         nodes.push_back(new Node<3>(4, false, 0.5, 0.5, 0.5));
         MutableMesh<3,3> mesh(nodes);
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
         MeshBasedCellPopulation<3> cell_population(mesh, cells);
 

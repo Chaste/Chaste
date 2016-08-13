@@ -33,10 +33,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef UNIFORMLYDISTRIBUTEDGENERATIONBASEDCELLCYCLEMODEL_HPP_
-#define UNIFORMLYDISTRIBUTEDGENERATIONBASEDCELLCYCLEMODEL_HPP_
+#ifndef UNIFORMG1GENERATIONALCELLCYCLEMODEL_HPP_
+#define UNIFORMG1GENERATIONALCELLCYCLEMODEL_HPP_
 
-#include "AbstractSimpleGenerationBasedCellCycleModel.hpp"
+#include "AbstractSimpleGenerationalCellCycleModel.hpp"
 #include "RandomNumberGenerator.hpp"
 
 /**
@@ -46,7 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * which differs between stem and transit amplifying cells. All other cell-cycle phases
  * are held constant.
  */
-class UniformlyDistributedGenerationBasedCellCycleModel : public AbstractSimpleGenerationBasedCellCycleModel
+class UniformG1GenerationalCellCycleModel : public AbstractSimpleGenerationalCellCycleModel
 {
     friend class TestSimpleCellCycleModels;
 
@@ -63,7 +63,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractSimpleGenerationBasedCellCycleModel>(*this);
+        archive & boost::serialization::base_object<AbstractSimpleGenerationalCellCycleModel>(*this);
 
         // Make sure the RandomNumberGenerator singleton gets saved too
         SerializableSingleton<RandomNumberGenerator>* p_wrapper = RandomNumberGenerator::Instance()->GetSerializationWrapper();
@@ -104,7 +104,7 @@ protected:
      *
      * @param rModel the cell cycle model to copy.
      */
-    UniformlyDistributedGenerationBasedCellCycleModel(const UniformlyDistributedGenerationBasedCellCycleModel& rModel);
+    UniformG1GenerationalCellCycleModel(const UniformG1GenerationalCellCycleModel& rModel);
 
 public:
 
@@ -112,7 +112,7 @@ public:
      * Constructor - just a default, mBirthTime is set in the AbstractCellCycleModel class.
      * mG1Duration is set very high, it is set for the individual cells when InitialiseDaughterCell is called
      */
-    UniformlyDistributedGenerationBasedCellCycleModel();
+    UniformG1GenerationalCellCycleModel();
 
     /**
      * Overridden builder method to create new copies of
@@ -132,6 +132,6 @@ public:
 
 #include "SerializationExportWrapper.hpp"
 // Declare identifier for the serializer
-CHASTE_CLASS_EXPORT(UniformlyDistributedGenerationBasedCellCycleModel)
+CHASTE_CLASS_EXPORT(UniformG1GenerationalCellCycleModel)
 
-#endif /*UNIFORMLYDISTRIBUTEDGENERATIONBASEDCELLCYCLEMODEL_HPP_*/
+#endif /*UNIFORMG1GENERATIONALCELLCYCLEMODEL_HPP_*/
