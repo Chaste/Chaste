@@ -36,6 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PottsBasedCellPopulation.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "Warnings.hpp"
+#include "FixedPottsBasedDivisionRule.hpp"
 
 // Needed to convert mesh in order to write nodes to VTK (visualize as glyphs)
 #include "VtkMeshWriter.hpp"
@@ -87,6 +88,12 @@ PottsBasedCellPopulation<DIM>::PottsBasedCellPopulation(PottsMesh<DIM>& rMesh,
       mNumSweepsPerTimestep(1)
 {
     mpPottsMesh = static_cast<PottsMesh<DIM>* >(&(this->mrMesh));
+
+    // Supply a default cell division rule whereby cells divide along a line parallel to the x axis
+    c_vector<double, DIM> axis_of_division = zero_vector<double>(DIM);
+    axis_of_division(0) = 1.0;
+    mpPottsBasedDivisionRule.reset(new FixedPottsBasedDivisionRule<DIM>(axis_of_division));
+
     // Check each element has only one cell associated with it
     if (validate)
     {
@@ -179,7 +186,12 @@ CellPtr PottsBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, CellPtr pParent
     // Get the element associated with this cell
     PottsElement<DIM>* p_element = GetElementCorrespondingToCell(pParentCell);
 
-    // Divide the element
+    ///\todo #1737 - uncomment these lines
+//    // Get the orientation of division
+//    c_vector<double, DIM> division_vector = mpPottsBasedDivisionRule->CalculateCellDivisionVector(pParentCell, *this);
+//
+//    // Divide the element
+//    unsigned new_element_index = mpPottsMesh->DivideElementAlongGivenAxis(p_element, division_vector, true); // new element will be below the existing element
     unsigned new_element_index = mpPottsMesh->DivideElement(p_element, true); // new element will be below the existing element
 
     // Associate the new cell with the element
@@ -469,6 +481,11 @@ void PottsBasedCellPopulation<DIM>::OutputCellPopulationParameters(out_stream& r
     *rParamsFile << "\t\t<Temperature>" << mTemperature << "</Temperature>\n";
     *rParamsFile << "\t\t<NumSweepsPerTimestep>" << mNumSweepsPerTimestep << "</NumSweepsPerTimestep>\n";
 
+    // Add the division rule parameters
+    *rParamsFile << "\t\t<PottsBasedDivisionRule>\n";
+    mpPottsBasedDivisionRule->OutputCellPottsBasedDivisionRuleInfo(rParamsFile);
+    *rParamsFile << "\t\t</PottsBasedDivisionRule>\n";
+
     // Call method on direct parent class
     AbstractOnLatticeCellPopulation<DIM>::OutputCellPopulationParameters(rParamsFile);
 }
@@ -751,6 +768,18 @@ template<unsigned DIM>
 void PottsBasedCellPopulation<DIM>::WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile)
 {
     *pVizSetupFile << "PottsSimulation\n";
+}
+
+template<unsigned DIM>
+boost::shared_ptr<AbstractPottsBasedDivisionRule<DIM> > PottsBasedCellPopulation<DIM>::GetPottsBasedDivisionRule()
+{
+    return mpPottsBasedDivisionRule;
+}
+
+template<unsigned DIM>
+void PottsBasedCellPopulation<DIM>::SetPottsBasedDivisionRule(boost::shared_ptr<AbstractPottsBasedDivisionRule<DIM> > pPottsBasedDivisionRule)
+{
+	mpPottsBasedDivisionRule = pPottsBasedDivisionRule;
 }
 
 // Explicit instantiation

@@ -37,7 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "RandomNumberGenerator.hpp"
 #include "UblasCustomFunctions.hpp"
 #include <list>
-
+#include "Debug.hpp"
 
 template<unsigned DIM>
 PottsMesh<DIM>::PottsMesh(std::vector<Node<DIM>*> nodes,
@@ -206,7 +206,7 @@ double PottsMesh<DIM>::GetSurfaceAreaOfElement(unsigned index)
     PottsElement<DIM>* p_element = GetElement(index);
 
     double surface_area = 0.0;
-    for (unsigned node_index=0; node_index< p_element->GetNumNodes(); node_index++)
+    for (unsigned node_index=0; node_index<p_element->GetNumNodes(); node_index++)
     {
         std::set<unsigned> neighbouring_node_indices = GetVonNeumannNeighbouringNodeIndices(p_element->GetNode(node_index)->GetIndex());
         unsigned local_edges = 2*DIM;
@@ -385,10 +385,105 @@ void PottsMesh<DIM>::DeleteNode(unsigned index)
 }
 
 template<unsigned DIM>
+unsigned PottsMesh<DIM>::DivideElementAlongGivenAxis(PottsElement<DIM>* pElement, c_vector<double, DIM> axisOfDivision, bool placeOriginalElementBelow)
+{
+    assert(DIM == 2);
+
+    /*
+     * If necessary, replace axisOfDivision with -axisOfDivision to ensure that
+     * the original element is in fact (not) placed below the axis of division if
+     * placeOriginalElementBelow is true (false)
+     */
+    if (axisOfDivision(0) < 0)
+    {
+    	axisOfDivision = -axisOfDivision;
+    }
+
+    // Store the number of nodes in the element (this changes when nodes are deleted from the element)
+    unsigned num_nodes = pElement->GetNumNodes();
+    if (num_nodes < 2)
+    {
+        EXCEPTION("Tried to divide a Potts element with only one node. Cell dividing too often given dynamic parameters.");
+    }
+
+    // Get the centroid of the original element
+    c_vector<double, DIM> centroid = this->GetCentroidOfElement(pElement->GetIndex());
+
+    // Copy the nodes in this element
+    std::vector<Node<DIM>*> nodes_elem;
+    for (unsigned i=0; i<num_nodes; i++)
+    {
+        nodes_elem.push_back(pElement->GetNode(i));
+    }
+
+    // Get the index of the new element
+    unsigned new_element_index;
+    if (mDeletedElementIndices.empty())
+    {
+        new_element_index = this->mElements.size();
+    }
+    else
+    {
+        new_element_index = mDeletedElementIndices.back();
+        mDeletedElementIndices.pop_back();
+        delete this->mElements[new_element_index];
+    }
+
+    // Add the new element to the mesh
+    AddElement(new PottsElement<DIM>(new_element_index, nodes_elem));
+
+    /**
+     * Remove the correct nodes from each element. If placeOriginalElementBelow is true,
+     * place the original element below (in the y direction or z in 3d) the line that is
+     * parallel to axisOfDivision and passes through the original element's centroid;
+     * otherwise, place it above.
+     */
+    for (unsigned i=num_nodes; i>0; i--)
+    {
+        c_vector<double, DIM> node_location = pElement->GetNode(i-1)->rGetLocation();
+        c_vector<double, DIM> v1 = axisOfDivision;
+        c_vector<double, DIM> v2 = node_location - centroid;
+
+        double cross_product = v1(0)*v2(1) - v1(1)*v2(0);
+        if (cross_product > 0)
+        {
+            // On one side
+            if (placeOriginalElementBelow)
+            {
+                pElement->DeleteNode(i-1);
+            }
+            else
+            {
+                this->mElements[new_element_index]->DeleteNode(i-1);
+            }
+        }
+        else if (cross_product < 0)
+        {
+            // On the other side
+            if (placeOriginalElementBelow)
+            {
+                this->mElements[new_element_index]->DeleteNode(i-1);
+            }
+            else
+            {
+                pElement->DeleteNode(i-1);
+            }
+        }
+        else
+        {
+            // Colinear - we adopt the convention that the original element has these
+            this->mElements[new_element_index]->DeleteNode(i-1);
+        }
+    }
+
+    return new_element_index;
+}
+
+template<unsigned DIM>
 unsigned PottsMesh<DIM>::DivideElement(PottsElement<DIM>* pElement,
                                        bool placeOriginalElementBelow)
 {
-    /// Not implemented in 1d
+    // Not implemented in 1d
     assert(DIM==2 || DIM==3);
 
     // Store the number of nodes in the element (this changes when nodes are deleted from the element)

@@ -40,14 +40,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PottsMesh.hpp"
 #include "VertexMesh.hpp"
 #include "AbstractPottsUpdateRule.hpp"
+#include "AbstractPottsBasedDivisionRule.hpp"
 #include "MutableMesh.hpp"
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/vector.hpp>
 
-template<unsigned DIM>
-class AbstractPottsUpdateRule; // Circular definition
+// Circular definitions
+template<unsigned DIM> class AbstractPottsUpdateRule;
+template<unsigned DIM> class AbstractPottsBasedDivisionRule;
 
 /**
  * A facade class encapsulating a cell population under the Cellular
@@ -97,6 +99,12 @@ private:
      */
     unsigned mNumSweepsPerTimestep;
 
+    /**
+     * A pointer to a division rule that is used to generate the axis when dividing cells.
+     * This is a specialisation for Potts-based cell populations.
+     */
+    boost::shared_ptr<AbstractPottsBasedDivisionRule<DIM> > mpPottsBasedDivisionRule;
+
     friend class boost::serialization::access;
     /**
      * Serialize the object and its member variables.
@@ -125,6 +133,7 @@ private:
         archive & mUpdateRuleCollection;
         archive & mTemperature;
         archive & mNumSweepsPerTimestep;
+        archive & mpPottsBasedDivisionRule;
 
 #undef COVERAGE_IGNORE
     }
@@ -434,6 +443,18 @@ public:
      * @param pVizSetupFile a visualization setup file
      */
     virtual void WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile);
+
+    /**
+     * @return The Potts division rule that is currently being used.
+     */
+    boost::shared_ptr<AbstractPottsBasedDivisionRule<DIM> > GetPottsBasedDivisionRule();
+
+    /**
+     * Set the division rule for this population.
+     *
+     * @param pPottsBasedDivisionRule  pointer to the new division rule
+     */
+    void SetPottsBasedDivisionRule(boost::shared_ptr<AbstractPottsBasedDivisionRule<DIM> > pPottsBasedDivisionRule);
 };
 
 #include "SerializationExportWrapper.hpp"

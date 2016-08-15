@@ -54,6 +54,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellId.hpp"
 #include "MutableMesh.hpp"
 #include "FileComparison.hpp"
+#include "PetscSetupAndFinalize.hpp"
 
 // Cell writers
 #include "CellAgesWriter.hpp"
@@ -65,8 +66,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellMutationStatesCountWriter.hpp"
 #include "CellProliferativePhasesCountWriter.hpp"
 #include "CellProliferativeTypesCountWriter.hpp"
-
-#include "PetscSetupAndFinalize.hpp"
 
 class TestPottsBasedCellPopulation : public AbstractCellBasedTestSuite
 {
