@@ -563,8 +563,8 @@ public:
         cell_division_axis[0] = 1.0;
         cell_division_axis[1] = 0.0;
 
-		MAKE_PTR_ARGS(FixedVertexBasedDivisionRule<2>, p_div_rule, (cell_division_axis));
-		cell_population.SetVertexBasedDivisionRule(p_div_rule);
+        MAKE_PTR_ARGS(FixedVertexBasedDivisionRule<2>, p_div_rule, (cell_division_axis));
+        cell_population.SetVertexBasedDivisionRule(p_div_rule);
 
         FixedG1GenerationalCellCycleModel* p_model2 = new FixedG1GenerationalCellCycleModel();
         CellPtr p_temp_cell(new Cell(p_state, p_model2));

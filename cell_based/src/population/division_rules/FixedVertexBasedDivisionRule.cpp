@@ -39,10 +39,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template <unsigned SPACE_DIM>
 FixedVertexBasedDivisionRule<SPACE_DIM>::FixedVertexBasedDivisionRule(c_vector<double, SPACE_DIM>& rDivisionVector)
 {
-	if (fabs(norm_2(rDivisionVector) - 1.0) > DBL_EPSILON)
-	{
-		EXCEPTION("Input argument must be a unit vector");
-	}
+    if (fabs(norm_2(rDivisionVector) - 1.0) > DBL_EPSILON)
+    {
+        EXCEPTION("Input argument must be a unit vector");
+    }
     mDivisionVector = rDivisionVector;
 }
 

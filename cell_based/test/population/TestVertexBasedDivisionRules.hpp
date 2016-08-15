@@ -199,52 +199,52 @@ public:
         TS_ASSERT_DELTA(angle_variance, M_PI*M_PI/12.0, 1e-2);
     }
 
-	void TestShortAxisVertexBasedDivisionRule()
-	{
-		// Create a vertex mesh
-		std::vector<Node<2>*> nodes;
-		nodes.push_back(new Node<2>(0, true, 2.0, -1.0));
-		nodes.push_back(new Node<2>(1, true, 2.0, 1.0));
-		nodes.push_back(new Node<2>(2, true, -2.0, 1.0));
-		nodes.push_back(new Node<2>(3, true, -2.0, -1.0));
-		nodes.push_back(new Node<2>(4, true, 0.0, 2.0));
+    void TestShortAxisVertexBasedDivisionRule()
+    {
+        // Create a vertex mesh
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true, 2.0, -1.0));
+        nodes.push_back(new Node<2>(1, true, 2.0, 1.0));
+        nodes.push_back(new Node<2>(2, true, -2.0, 1.0));
+        nodes.push_back(new Node<2>(3, true, -2.0, -1.0));
+        nodes.push_back(new Node<2>(4, true, 0.0, 2.0));
 
-		std::vector<Node<2>*> nodes_elem_1;
-		nodes_elem_1.push_back(nodes[0]);
-		nodes_elem_1.push_back(nodes[1]);
-		nodes_elem_1.push_back(nodes[2]);
-		nodes_elem_1.push_back(nodes[3]);
+        std::vector<Node<2>*> nodes_elem_1;
+        nodes_elem_1.push_back(nodes[0]);
+        nodes_elem_1.push_back(nodes[1]);
+        nodes_elem_1.push_back(nodes[2]);
+        nodes_elem_1.push_back(nodes[3]);
 
-		std::vector<Node<2>*> nodes_elem_2;
-		nodes_elem_2.push_back(nodes[1]);
-		nodes_elem_2.push_back(nodes[4]);
-		nodes_elem_2.push_back(nodes[2]);
+        std::vector<Node<2>*> nodes_elem_2;
+        nodes_elem_2.push_back(nodes[1]);
+        nodes_elem_2.push_back(nodes[4]);
+        nodes_elem_2.push_back(nodes[2]);
 
-		std::vector<VertexElement<2,2>*> vertex_elements;
-		vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_1));
-		vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_2));
+        std::vector<VertexElement<2,2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_2));
 
-		MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
 
-		// Create cells
-		std::vector<CellPtr> cells;
-		CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
-		cells_generator.GenerateBasic(cells, vertex_mesh.GetNumElements());
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, vertex_mesh.GetNumElements());
 
-		// Create cell population
-		VertexBasedCellPopulation<2> cell_population(vertex_mesh, cells);
+        // Create cell population
+        VertexBasedCellPopulation<2> cell_population(vertex_mesh, cells);
 
-		// Note: ShortAxisVertexBasedDivisionRule is the default division rule for vertex-based cell populations
+        // Note: ShortAxisVertexBasedDivisionRule is the default division rule for vertex-based cell populations
 
-		CellPtr p_cell0 = cell_population.GetCellUsingLocationIndex(0);
+        CellPtr p_cell0 = cell_population.GetCellUsingLocationIndex(0);
 
         // Get the division rule back from the population
-		boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule = cell_population.GetVertexBasedDivisionRule();
-		c_vector<double, 2> short_axis = p_division_rule->CalculateCellDivisionVector(p_cell0, cell_population);
+        boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule = cell_population.GetVertexBasedDivisionRule();
+        c_vector<double, 2> short_axis = p_division_rule->CalculateCellDivisionVector(p_cell0, cell_population);
 
-		TS_ASSERT_DELTA(short_axis[0], 0.0, 1e-9);
-		TS_ASSERT_DELTA(short_axis[1], 1.0, 1e-9);
-	}
+        TS_ASSERT_DELTA(short_axis[0], 0.0, 1e-9);
+        TS_ASSERT_DELTA(short_axis[1], 1.0, 1e-9);
+    }
 
     void TestArchiveFixedVertexBasedDivisionRule() throw(Exception)
     {

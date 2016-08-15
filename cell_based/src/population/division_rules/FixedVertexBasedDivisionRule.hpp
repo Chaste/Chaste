@@ -46,6 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Forward declaration prevents circular include chain
 template<unsigned SPACE_DIM> class VertexBasedCellPopulation;
 template<unsigned SPACE_DIM> class AbstractVertexBasedDivisionRule;
+
 /**
  * A class to generate a division vector of unit length specified in
  * the class constructor.
@@ -100,12 +101,9 @@ public:
     /**
      * Overridden CalculateCellDivisionVector() method.
      *
-     * Return the short axis of the existing cell, which will be used to
-     * form the boundary between the daughter cells.
-     *
      * @param pParentCell  The cell to divide
      * @param rCellPopulation  The vertex-based cell population
-     * @return the division vector.
+     * @return mDivisionVector.
      */
     virtual c_vector<double, SPACE_DIM> CalculateCellDivisionVector(CellPtr pParentCell,
         VertexBasedCellPopulation<SPACE_DIM>& rCellPopulation);

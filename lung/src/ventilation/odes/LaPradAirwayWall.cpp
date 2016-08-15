@@ -106,32 +106,32 @@ void LaPradAirwayWall::SolveAndUpdateState(double tStart, double tEnd)
 
 void LaPradAirwayWall::SetRIn(double RIn)
 {
-    assert (RIn >= 0.);
-	mRIn = RIn;
+    assert (RIn >= 0.0);
+    mRIn = RIn;
 }
 
 void LaPradAirwayWall::SetROut(double ROut)
 {
-    assert (ROut >= 0.);
-	mROut = ROut;
+    assert (ROut >= 0.0);
+    mROut = ROut;
 }
 
 void LaPradAirwayWall::Setk1(double k1)
 {
-    assert (k1 >= 0.);
-	mk1 = k1;
+    assert (k1 >= 0.0);
+    mk1 = k1;
 }
 
 void LaPradAirwayWall::Setk2(double k2)
 {
     assert (k2 >= 0.);
-	mk2 = k2;
+    mk2 = k2;
 }
 
 void LaPradAirwayWall::Setk3(double k3)
 {
     assert (k3 >= 0.);
-	mk3 = k3;
+    mk3 = k3;
 }
 
 double LaPradAirwayWall::GetLumenRadius()

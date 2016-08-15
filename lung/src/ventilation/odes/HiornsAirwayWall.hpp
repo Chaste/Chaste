@@ -93,18 +93,18 @@ public:
     /**
      * @param RIn The parameter RIn
      */
-	void SetRIn(double);
-	
-	 /**
+    void SetRIn(double);
+
+     /**
      * @param ROut The parameter ROut
      */
-	void SetROut(double);
-	
-	 /**
+    void SetROut(double);
+
+     /**
      * @param mu The parameter mu
      */
-	void Setmu(double);
-	
+    void Setmu(double);
+
      /**
      * @param phi1 The parameter phi1
      */
@@ -129,11 +129,11 @@ public:
      * @param A The parameter A
      */
     void SetA(double);
-	
-	/**
-	* Works out the difference between the pressure and the pressure needed to produce a particular radius
-	*/
-	double CalculatePressureRadiusResidual(double radius);
+
+    /**
+    * Works out the difference between the pressure and the pressure needed to produce a particular radius
+    */
+    double CalculatePressureRadiusResidual(double radius);
 
 private:
     /** The airway radius at zero transpulmonary pressure */
@@ -152,27 +152,27 @@ private:
     double mDeformedAirwayRadius;
 
     /** The outward pointing pressure applied to the airway wall*/
-	double mTargetPressure;
-	
-	/** The airway inner radius pre deformation*/
-	double mRIn;
-	
-	/** The airway outer radius pre deformation*/
-	double mROut;
-	
-	/** The parameter mu from Hiorns et al. 2014 Biophys J*/
-	double mmu;
-	
-	/** The parameter phi1 from Hiorns et al. 2014 Biophys J - Angle of collagen to hoop direction */
-	double mphi1;
-	
+    double mTargetPressure;
+
+    /** The airway inner radius pre deformation*/
+    double mRIn;
+
+    /** The airway outer radius pre deformation*/
+    double mROut;
+
+    /** The parameter mu from Hiorns et al. 2014 Biophys J*/
+    double mmu;
+
+    /** The parameter phi1 from Hiorns et al. 2014 Biophys J - Angle of collagen to hoop direction */
+    double mphi1;
+
     /** The parameter phi2 from Hiorns et al. 2014 Biophys J - Angle of ASM to hoop direction */
     double mphi2;
-	
-	/** The parameter C1 from Hiorns et al. 2014 Biophys J*/
-	double mC1;
-	
-	/** The parameter C2 from Hiorns et al. 2014 Biophys J*/
+
+    /** The parameter C1 from Hiorns et al. 2014 Biophys J*/
+    double mC1;
+
+    /** The parameter C2 from Hiorns et al. 2014 Biophys J*/
     double mC2;
     
     /** The parameter A from Hiorns et al. 2014 Biophys J*/

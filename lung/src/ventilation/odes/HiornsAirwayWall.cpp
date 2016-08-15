@@ -132,25 +132,24 @@ void HiornsAirwayWall::SolveAndUpdateState(double tStart, double tEnd)
     
     std::pair<double, double> found = boost::math::tools::bracket_and_solve_root(boost::bind(&HiornsAirwayWall::CalculatePressureRadiusResidual, this, _1), guess, factor, false, tol, maxIterations);
     mDeformedAirwayRadius = found.first;
-
 }
 
 void HiornsAirwayWall::SetRIn(double RIn) 
 {
-    assert (RIn >= 0.);
-	mRIn = RIn;
+    assert (RIn >= 0.0);
+    mRIn = RIn;
 }
 
 void HiornsAirwayWall::SetROut(double ROut) 
 {
-    assert (ROut >= 0.);
-	mROut = ROut;
+    assert (ROut >= 0.9);
+    mROut = ROut;
 }
 
 void HiornsAirwayWall::Setmu(double mu) 
 {
-    assert (mu >= 0.);
-	mmu = mu;
+    assert (mu >= 0.0);
+    mmu = mu;
 }
 
 void HiornsAirwayWall::Setphi1(double phi1) 

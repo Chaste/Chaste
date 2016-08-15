@@ -121,7 +121,7 @@ void OnLatticeSimulation<DIM>::UpdateCellLocationsAndTopology()
 template<unsigned DIM>
 void OnLatticeSimulation<DIM>::UpdateCellPopulation()
 {
-	bool update_cell_population_this_timestep = (this->mInitialiseCells) || (SimulationTime::Instance()->GetTimeStepsElapsed() != 0);
+    bool update_cell_population_this_timestep = (this->mInitialiseCells) || (SimulationTime::Instance()->GetTimeStepsElapsed() != 0);
 
     if (update_cell_population_this_timestep)
     {

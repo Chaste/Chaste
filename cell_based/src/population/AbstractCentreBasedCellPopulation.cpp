@@ -83,16 +83,16 @@ Node<SPACE_DIM>* AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetN
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 CellPtr AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddCell(CellPtr pNewCell, CellPtr pParentCell)
 {
-	// Calculate the locations of the two daughter cells
-	std::pair<c_vector<double, SPACE_DIM>, c_vector<double, SPACE_DIM> > positions = mpCentreBasedDivisionRule->CalculateCellDivisionVector(pParentCell, *this);
+    // Calculate the locations of the two daughter cells
+    std::pair<c_vector<double, SPACE_DIM>, c_vector<double, SPACE_DIM> > positions = mpCentreBasedDivisionRule->CalculateCellDivisionVector(pParentCell, *this);
 
-	c_vector<double, SPACE_DIM> parent_position = positions.first;
-	c_vector<double, SPACE_DIM> daughter_position = positions.second;
+    c_vector<double, SPACE_DIM> parent_position = positions.first;
+    c_vector<double, SPACE_DIM> daughter_position = positions.second;
 
-	// Set the parent cell to use this location
-	ChastePoint<SPACE_DIM> parent_point(parent_position);
-	unsigned node_index = this->GetLocationIndexUsingCell(pParentCell);
-	this->SetNode(node_index, parent_point);
+    // Set the parent cell to use this location
+    ChastePoint<SPACE_DIM> parent_point(parent_position);
+    unsigned node_index = this->GetLocationIndexUsingCell(pParentCell);
+    this->SetNode(node_index, parent_point);
 
     // Create a new node
     Node<SPACE_DIM>* p_new_node = new Node<SPACE_DIM>(this->GetNumNodes(), daughter_position, false); // never on boundary

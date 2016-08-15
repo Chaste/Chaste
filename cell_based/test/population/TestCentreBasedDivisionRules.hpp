@@ -98,7 +98,7 @@ public:
         double angle_variance = 0.0;
         for (unsigned iteration = 0; iteration < 10000; iteration++)
         {
-        	std::pair<c_vector<double, 2>, c_vector<double, 2> > positions = p_division_rule->CalculateCellDivisionVector(p_cell0, cell_population);
+            std::pair<c_vector<double, 2>, c_vector<double, 2> > positions = p_division_rule->CalculateCellDivisionVector(p_cell0, cell_population);
             c_vector<double, 2> random_axis = positions.second - positions.first;
 
             // Each random vector should have norm equal to 0.5*0.3 = 0.15
