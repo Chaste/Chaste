@@ -40,7 +40,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 #include "AbstractCentreBasedDivisionRule.hpp"
 #include "AbstractCentreBasedCellPopulation.hpp"
-#include "RandomNumberGenerator.hpp"
 
 // Forward declaration prevents circular include chain
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCentreBasedCellPopulation;

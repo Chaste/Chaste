@@ -78,6 +78,9 @@ public:
     /**
      * Calculate the contribution to the Hamiltonian.
      *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     *
      * @param currentNodeIndex The index of the current node/lattice site
      * @param targetNodeIndex The index of the target node/lattice site
      * @param rCellPopulation The cell population
