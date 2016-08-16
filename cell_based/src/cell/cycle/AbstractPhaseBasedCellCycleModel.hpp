@@ -165,10 +165,13 @@ public:
     virtual void ResetForDivision();
 
     /**
-     * This method must be implemented by subclasses in order to set the phase
-     * the cell-cycle model is currently in. It is called from ReadyToDivide()
-     * just prior to deciding whether to divide the cell based on how far through
-     * the cell cycle it is, i.e. whether it has completed M, G1, S and G2 phases.
+     * Set the phase the cell-cycle model is currently in. This method is called
+     * from ReadyToDivide() just prior to deciding whether to divide the cell,
+     * based on how far through the cell cycle it is, i.e. whether it has
+     * completed M, G1, S and G2 phases.
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
      */
     virtual void UpdateCellCyclePhase()=0;
 

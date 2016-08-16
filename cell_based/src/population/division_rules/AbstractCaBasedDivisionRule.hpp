@@ -93,6 +93,9 @@ public:
     /**
      * Return whether there is room to divide at all.
      *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     *
      * @param pParentCell  The cell to divide
      * @param rCellPopulation  The CA-based cell population
      * @return if the site is available.

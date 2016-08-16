@@ -330,6 +330,9 @@ public:
      * Remove the Nodes (for cell-centre) or VertexElements (for cell-vertex) which
      * have been marked as deleted and update the correspondence with Cells.
      *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     *
      * @param hasHadBirthsOrDeaths - a bool saying whether cell population has had Births Or Deaths
      */
     virtual void Update(bool hasHadBirthsOrDeaths=true)=0;
@@ -572,24 +575,30 @@ public:
     virtual void WriteResultsToFiles(const std::string& rDirectory);
 
     /**
-     * A virtual method to accept a cell population writer so it can
-     * write data from this object to file.
+     * Accept a cell population writer so it can write data from this object to file.
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
      *
      * @param pPopulationWriter the population writer.
      */
     virtual void AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationWriter)=0;
 
     /**
-     * A virtual method to accept a cell population count writer so it can
-     * write data from this object to file.
+     * Accept a cell population count writer so it can write data from this object to file.
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
      *
      * @param pPopulationCountWriter the population count writer.
      */
     virtual void AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationCountWriter)=0;
 
     /**
-     * A virtual method to accept a cell writer so it can
-     * write data from this object to file.
+     * Accept a cell writer so it can write data from this object to file.
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
      *
      * @param pCellWriter the population writer.
      * @param pCell the cell whose data are being written.

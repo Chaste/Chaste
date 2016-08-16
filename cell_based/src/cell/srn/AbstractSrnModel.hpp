@@ -186,7 +186,8 @@ public:
     /**
      * Simulate the SRN to the current time.
      *
-     * This should be overridden for each SRN type i.e. ODE based.
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
      */
     virtual void SimulateToCurrentTime()=0;
 
@@ -202,8 +203,9 @@ public:
 
     /**
      * Builder method to create new instances of the SRN model.
-     * Each concrete subclass must implement this method to create an
-     * instance of that subclass.
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
      *
      * This method is called by Cell::Divide() to create a SRN
      * model for the daughter cell.  Note that the parent SRN

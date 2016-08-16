@@ -195,6 +195,9 @@ public:
     /**
      * Updates node positions according to Newton's 2nd law with overdamping.
      *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     *
      * @param dt Time step size
      */
     virtual void UpdateAllNodePositions(double dt)=0;

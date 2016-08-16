@@ -75,7 +75,8 @@ public:
     /**
      * Calculates the force on each node.
      *
-     * This method must be overridden in concrete classes.
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
      *
      * @param rCellPopulation reference to the cell population
      */

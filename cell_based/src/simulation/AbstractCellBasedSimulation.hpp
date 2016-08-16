@@ -234,8 +234,9 @@ protected:
 
     /**
      * Update the cell locations and topology (connectivity) of the cell population. This method
-     * is called within the main time loop of Solve() and is pure virtual in the parent class,
-     * so must be overridden.
+     * is called within the main time loop of Solve() .
+     *
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
      * In the case of an OffLatticeSimulation, the method computes the force acting on each node
      * (corresponding to a cell in centre-based models and to a vertex in vertex-based models)

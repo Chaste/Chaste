@@ -46,7 +46,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexBasedCellPopulation.hpp"
 #include "FixedG1GenerationalCellCycleModel.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
-#include "AbstractVertexBasedDivisionRule.hpp"
 #include "ShortAxisVertexBasedDivisionRule.hpp"
 #include "RandomDirectionVertexBasedDivisionRule.hpp"
 #include "FixedVertexBasedDivisionRule.hpp"

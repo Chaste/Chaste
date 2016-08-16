@@ -85,6 +85,9 @@ public:
      * Get a double associated with a cell. This method reduces duplication
      * of code between the methods VisitCell() and AddVtkData().
      *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     *
      * @param pCell a cell
      * @param pCellPopulation a pointer to the cell population owning the cell.
      *
@@ -94,6 +97,9 @@ public:
 
     /**
      * Visit a cell and write its data.
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
      *
      * @param pCell a cell
      * @param pCellPopulation a pointer to the cell population owning the cell.

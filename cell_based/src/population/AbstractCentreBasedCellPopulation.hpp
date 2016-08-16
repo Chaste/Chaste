@@ -259,7 +259,8 @@ public:
     /**
      * Method to return the connected nodes in  a centre based simulation.
      *
-     * Overridden in sub classes to have correct functionality.
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
      *
      * @return Node pairs for force calculation.
      */

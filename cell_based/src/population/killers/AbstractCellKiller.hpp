@@ -87,6 +87,9 @@ public:
      * Pure method which should call StartApoptosis() on any cell
      * which should be about to undergo programmed death, or Kill()
      * on any cell which should die immediately.
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
      */
     virtual void CheckAndLabelCellsForApoptosisOrDeath()=0;
 
