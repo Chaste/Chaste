@@ -497,11 +497,11 @@ public:
          * This is analogous to {{{Forces}}} in earlier examples.
          */
         MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule); //**Changed**//
-        simulator.AddPottsUpdateRule(p_volume_constraint_update_rule); //**Changed**//
+        simulator.AddUpdateRule(p_volume_constraint_update_rule); //**Changed**//
         MAKE_PTR(SurfaceAreaConstraintPottsUpdateRule<2>, p_surface_area_update_rule); //**Changed**//
-        simulator.AddPottsUpdateRule(p_surface_area_update_rule); //**Changed**//
+        simulator.AddUpdateRule(p_surface_area_update_rule); //**Changed**//
         MAKE_PTR(AdhesionPottsUpdateRule<2>, p_adhesion_update_rule); //**Changed**//
-        simulator.AddPottsUpdateRule(p_adhesion_update_rule); //**Changed**//
+        simulator.AddUpdateRule(p_adhesion_update_rule); //**Changed**//
 
         /* We can add {{{CellKillers}}} as before.*/
         MAKE_PTR_ARGS(RandomCellKiller<2>, p_cell_killer, (&cell_population, 0.01));

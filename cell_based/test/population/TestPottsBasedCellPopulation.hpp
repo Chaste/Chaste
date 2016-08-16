@@ -99,7 +99,7 @@ public:
         }
 
         // Test that we do not have any update rules present
-        TS_ASSERT_EQUALS(cell_population.rGetUpdateRuleCollection().empty(), true);
+        TS_ASSERT_EQUALS(cell_population.GetUpdateRuleCollection().empty(), true);
 
         // Test that the other member variables of this object are initialised correctly
         TS_ASSERT(cell_population.GetElementTessellation() == NULL);
@@ -597,7 +597,7 @@ public:
         cell_population.AddUpdateRule(p_volume_constraint_update_rule);
 
         // Check the update rules are correct
-        std::vector<boost::shared_ptr<AbstractPottsUpdateRule<2> > > update_rule_collection = cell_population.rGetUpdateRuleCollection();
+        std::vector<boost::shared_ptr<AbstractUpdateRule<2> > > update_rule_collection = cell_population.GetUpdateRuleCollection();
         TS_ASSERT_EQUALS(update_rule_collection.size(),1u);
         TS_ASSERT_EQUALS((*update_rule_collection[0]).GetIdentifier(), "VolumeConstraintPottsUpdateRule-2");
     }
@@ -690,7 +690,7 @@ public:
             TS_ASSERT_EQUALS(p_static_population->GetIterateRandomlyOverUpdateRuleCollection(), true);
 
             // Test that the update rule has been archived correctly
-            std::vector<boost::shared_ptr<AbstractPottsUpdateRule<2> > > update_rule_collection = p_static_population->rGetUpdateRuleCollection();
+            std::vector<boost::shared_ptr<AbstractUpdateRule<2> > > update_rule_collection = p_static_population->GetUpdateRuleCollection();
             TS_ASSERT_EQUALS(update_rule_collection.size(), 1u);
             TS_ASSERT_EQUALS((*update_rule_collection[0]).GetIdentifier(), "VolumeConstraintPottsUpdateRule-2");
 

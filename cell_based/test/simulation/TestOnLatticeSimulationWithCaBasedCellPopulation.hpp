@@ -145,7 +145,7 @@ public:
         // Add update rule
         MAKE_PTR(DiffusionCaUpdateRule<2>, p_diffusion_update_rule);
         p_diffusion_update_rule->SetDiffusionParameter(diffusion_parameter);
-        simulator.AddCaUpdateRule(p_diffusion_update_rule);
+        simulator.AddUpdateRule(p_diffusion_update_rule);
 
         for (unsigned i=1; i<=num_runs; i++)
         {
@@ -192,7 +192,7 @@ public:
         TS_ASSERT_DELTA(probability_of_occupation[8], diffusion_parameter*delta_t/4.0, 1e-2);
 
         // For coverage
-        simulator.RemoveAllCaUpdateRules();
+        simulator.RemoveAllUpdateRules();
     }
 
     void TestCaMonolayerWithBirth() throw (Exception)
@@ -227,7 +227,7 @@ public:
         // Adding update rule(s)
         MAKE_PTR(DiffusionCaUpdateRule<2u>, p_diffusion_update_rule);
         p_diffusion_update_rule->SetDiffusionParameter(0.5);
-        simulator.AddCaUpdateRule(p_diffusion_update_rule);
+        simulator.AddUpdateRule(p_diffusion_update_rule);
         simulator.SetOutputDivisionLocations(true);
 
         // Run simulation
@@ -241,7 +241,7 @@ public:
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
 
         // Now remove the update rules and check that only birth happens when the simulator runs again
-        simulator.RemoveAllPottsUpdateRules();
+        simulator.RemoveAllUpdateRules();
         simulator.SetEndTime(50);
         simulator.Solve();
 
@@ -440,11 +440,11 @@ public:
         // Add switching Update Rule
         MAKE_PTR(RandomCaSwitchingUpdateRule<2u>, p_switching_update_rule);
         p_switching_update_rule->SetSwitchingParameter(1.0);
-        simulator.AddCaSwitchingUpdateRule(p_switching_update_rule);
+        simulator.AddUpdateRule(p_switching_update_rule);
 
         // Coverage of remove method
-        simulator.RemoveAllCaSwitchingUpdateRules();
-        simulator.AddCaSwitchingUpdateRule(p_switching_update_rule);
+        simulator.RemoveAllUpdateRules();
+        simulator.AddUpdateRule(p_switching_update_rule);
 
         // Run simulation
         simulator.Solve();
@@ -507,7 +507,7 @@ public:
         // Add switching update rule
         MAKE_PTR(RandomCaSwitchingUpdateRule<2u>, p_switching_update_rule);
         p_switching_update_rule->SetSwitchingParameter(0.5);
-        simulator.AddCaSwitchingUpdateRule(p_switching_update_rule);
+        simulator.AddUpdateRule(p_switching_update_rule);
 
         // Run simulation
         simulator.Solve();
@@ -590,7 +590,7 @@ public:
         // Add update rule
         MAKE_PTR(DiffusionCaUpdateRule<2>, p_diffusion_update_rule);
         p_diffusion_update_rule->SetDiffusionParameter(0.1);
-        simulator.AddCaUpdateRule(p_diffusion_update_rule);
+        simulator.AddUpdateRule(p_diffusion_update_rule);
 
         // Run simulation
         simulator.Solve();
@@ -635,7 +635,7 @@ public:
         // Add update rule
         MAKE_PTR(DiffusionCaUpdateRule<3>, p_diffusion_update_rule);
         p_diffusion_update_rule->SetDiffusionParameter(0.1);
-        simulator.AddCaUpdateRule(p_diffusion_update_rule);
+        simulator.AddUpdateRule(p_diffusion_update_rule);
 
         // Run simulation
         simulator.Solve();
@@ -681,7 +681,7 @@ public:
         // Add update rule
         MAKE_PTR(DiffusionCaUpdateRule<2u>, p_diffusion_update_rule);
         p_diffusion_update_rule->SetDiffusionParameter(0.5);
-        simulator.AddCaUpdateRule(p_diffusion_update_rule);
+        simulator.AddUpdateRule(p_diffusion_update_rule);
 
         // Run simulation
         simulator.Solve();
@@ -810,7 +810,7 @@ public:
         // Add update rule
         MAKE_PTR(DiffusionCaUpdateRule<2>, p_diffusion_update_rule);
         p_diffusion_update_rule->SetDiffusionParameter(0.1);
-        simulator.AddCaUpdateRule(p_diffusion_update_rule);
+        simulator.AddUpdateRule(p_diffusion_update_rule);
 
         // Run simulation
         simulator.Solve();
@@ -858,7 +858,7 @@ public:
         // Add update rule
         MAKE_PTR(DiffusionCaUpdateRule<2>, p_diffusion_update_rule);
         p_diffusion_update_rule->SetDiffusionParameter(0.1);
-        simulator.AddCaUpdateRule(p_diffusion_update_rule);
+        simulator.AddUpdateRule(p_diffusion_update_rule);
 
         // Run simulation
         simulator.Solve();
@@ -899,8 +899,8 @@ public:
         TS_ASSERT_DELTA(cell_location_1[0], 1.0, 1e-4);
         TS_ASSERT_DELTA(cell_location_1[1], 0.0, 1e-4);
 
-        std::vector<boost::shared_ptr<AbstractCaUpdateRule<2> > > update_rules =
-            static_cast<CaBasedCellPopulation<2>*>(&(p_simulator2->rGetCellPopulation()))->rGetUpdateRuleCollection();
+        std::vector<boost::shared_ptr<AbstractUpdateRule<2> > > update_rules =
+            static_cast<CaBasedCellPopulation<2>*>(&(p_simulator2->rGetCellPopulation()))->GetUpdateRuleCollection();
 
         double diffusion_parameter = (dynamic_cast<DiffusionCaUpdateRule<2>*>(update_rules[0].get()))->GetDiffusionParameter();
         TS_ASSERT_DELTA(diffusion_parameter, 0.1, 1e-4);

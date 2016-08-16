@@ -33,27 +33,35 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "AbstractCaSwitchingUpdateRule.hpp"
+#include "AbstractUpdateRule.hpp"
 
 template<unsigned DIM>
-AbstractCaSwitchingUpdateRule<DIM>::AbstractCaSwitchingUpdateRule()
-: AbstractUpdateRule<DIM>()
+AbstractUpdateRule<DIM>::AbstractUpdateRule()
 {
 }
 
 template<unsigned DIM>
-AbstractCaSwitchingUpdateRule<DIM>::~AbstractCaSwitchingUpdateRule()
+AbstractUpdateRule<DIM>::~AbstractUpdateRule()
 {
 }
 
 template<unsigned DIM>
-void AbstractCaSwitchingUpdateRule<DIM>::OutputUpdateRuleParameters(out_stream& rParamsFile)
+void AbstractUpdateRule<DIM>::OutputUpdateRuleInfo(out_stream& rParamsFile)
 {
-    // Call method on direct parent class
-	AbstractUpdateRule<DIM>::OutputUpdateRuleParameters(rParamsFile);
+    std::string update_type = GetIdentifier();
+
+    *rParamsFile << "\t\t<" << update_type << ">\n";
+    OutputUpdateRuleParameters(rParamsFile);
+    *rParamsFile << "\t\t</" << update_type << ">\n";
+}
+
+template<unsigned DIM>
+void AbstractUpdateRule<DIM>::OutputUpdateRuleParameters(out_stream& rParamsFile)
+{
+    // No parameters to output
 }
 
 // Explicit instantiation
-template class AbstractCaSwitchingUpdateRule<1>;
-template class AbstractCaSwitchingUpdateRule<2>;
-template class AbstractCaSwitchingUpdateRule<3>;
+template class AbstractUpdateRule<1>;
+template class AbstractUpdateRule<2>;
+template class AbstractUpdateRule<3>;

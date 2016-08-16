@@ -113,9 +113,9 @@ public:
 
         // Create update rules and pass to the simulation
         MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule);
-        simulator.AddPottsUpdateRule(p_volume_constraint_update_rule);
+        simulator.AddUpdateRule(p_volume_constraint_update_rule);
         MAKE_PTR(AdhesionPottsUpdateRule<2>, p_adhesion_update_rule);
-        simulator.AddPottsUpdateRule(p_adhesion_update_rule);
+        simulator.AddUpdateRule(p_adhesion_update_rule);
 
         // Run simulation
         simulator.Solve();
@@ -161,9 +161,9 @@ public:
 
         // Create update rules and pass to the simulation
         MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule);
-        simulator.AddPottsUpdateRule(p_volume_constraint_update_rule);
+        simulator.AddUpdateRule(p_volume_constraint_update_rule);
         MAKE_PTR(AdhesionPottsUpdateRule<2>, p_adhesion_update_rule);
-        simulator.AddPottsUpdateRule(p_adhesion_update_rule);
+        simulator.AddUpdateRule(p_adhesion_update_rule);
 
         // Run simulation
         simulator.Solve();

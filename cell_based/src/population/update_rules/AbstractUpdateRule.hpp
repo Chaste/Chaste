@@ -33,20 +33,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef ABSTRACTCAUPDATERULE_HPP_
-#define ABSTRACTCAUPDATERULE_HPP_
+#ifndef ABSTRACTUPDATERULE_HPP_
+#define ABSTRACTUPDATERULE_HPP_
 
-#include "AbstractUpdateRule.hpp"
-#include "CaBasedCellPopulation.hpp"
-
-template<unsigned DIM>
-class CaBasedCellPopulation; // Circular definition
+#include "ChasteSerialization.hpp"
+#include "ClassIsAbstract.hpp"
+#include "Identifiable.hpp"
+#include "OutputFileHandler.hpp"
 
 /**
- * An abstract CA update rule class, for use in CA simulations.
+ * An abstract update rule class, for use in on-lattice cell-based simulations.
  */
 template<unsigned DIM>
-class AbstractCaUpdateRule : public AbstractUpdateRule<DIM>
+class AbstractUpdateRule : public Identifiable
 {
     /** Needed for serialization. */
     friend class boost::serialization::access;
@@ -60,7 +59,6 @@ class AbstractCaUpdateRule : public AbstractUpdateRule<DIM>
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractUpdateRule<DIM> >(*this);
     }
 
 public:
@@ -68,39 +66,32 @@ public:
     /**
      * Default constructor.
      */
-    AbstractCaUpdateRule();
+    AbstractUpdateRule();
 
     /**
      * Destructor.
      */
-    virtual ~AbstractCaUpdateRule();
-
-   /**
-     * Calculate the probability of a given move.
-     *
-     * Uses random diffusion to each neighbouring node, scaled according to distance.
-     *
-     * @param currentNodeIndex The index of the current node/lattice site
-     * @param targetNodeIndex The index of the target node/lattice site
-     * @param rCellPopulation The cell population
-     * @param dt is the time interval
-     * @param deltaX defines the size of the lattice site
-     * @param cell a pointer to the cell (needed if more than one cell per lattice site
-     * @return The probability of the cell moving from the current node to the target node
-     */
-    double virtual EvaluateProbability(unsigned currentNodeIndex,
-                                       unsigned targetNodeIndex,
-                                       CaBasedCellPopulation<DIM>& rCellPopulation,
-                                       double dt,
-                                       double deltaX,
-                                       CellPtr cell)=0;
+    virtual ~AbstractUpdateRule();
 
     /**
-     * Overridden OutputUpdateRuleParameters() method.
+     * Output update rule to file. Call OutputUpdateRuleParameters() to output
+     * all member variables to file.
      *
      * @param rParamsFile a file stream
      */
-    virtual void OutputUpdateRuleParameters(out_stream& rParamsFile);
+    void OutputUpdateRuleInfo(out_stream& rParamsFile);
+
+    /**
+     * Output update rule parameters to file.
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     *
+     * @param rParamsFile a file stream
+     */
+    virtual void OutputUpdateRuleParameters(out_stream& rParamsFile)=0;
 };
 
-#endif /*ABSTRACTCAUPDATERULE_HPP_*/
+TEMPLATED_CLASS_IS_ABSTRACT_1_UNSIGNED(AbstractUpdateRule)
+
+#endif /*ABSTRACTUPDATERULE_HPP_*/

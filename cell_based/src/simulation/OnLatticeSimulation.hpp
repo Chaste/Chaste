@@ -40,8 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 
 #include "AbstractCellBasedSimulation.hpp"
-#include "AbstractPottsUpdateRule.hpp"
-#include "AbstractCaUpdateRule.hpp"
+#include "AbstractUpdateRule.hpp"
 
 /**
  * Run an on-lattice 2D or 3D cell-based simulation.
@@ -109,38 +108,14 @@ public:
     /**
      * Add an update rule to be used in this simulation.
      *
-     * @param pUpdateRule shared pointer to a CA update rule law
+     * @param pUpdateRule shared pointer to an update rule law
      */
-    void AddCaUpdateRule(boost::shared_ptr<AbstractCaUpdateRule<DIM> > pUpdateRule);
+    void AddUpdateRule(boost::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule);
 
     /**
-     * Method to remove all the CaUpdateRules
+     * Remove any update rules that have previously been passed to the cell population.
      */
-    void RemoveAllCaUpdateRules();
-
-    /**
-     * Add a switching update rule to be used in this simulation.
-     *
-     * @param pUpdateRule shared pointer to a CA switching update rule law
-     */
-    void AddCaSwitchingUpdateRule(boost::shared_ptr<AbstractCaSwitchingUpdateRule<DIM> > pUpdateRule);
-
-    /**
-     * Method to remove all the CaSwitchingUpdateRules
-     */
-    void RemoveAllCaSwitchingUpdateRules();
-
-    /**
-     * Add an update rule to be used in this simulation (use this to set the Hamiltonian).
-     *
-     * @param pUpdateRule shared pointer to a Potts update rule law
-     */
-    void AddPottsUpdateRule(boost::shared_ptr<AbstractPottsUpdateRule<DIM> > pUpdateRule);
-
-    /**
-     * Method to remove all the PottsUpdateRules
-     */
-    void RemoveAllPottsUpdateRules();
+    void RemoveAllUpdateRules();
 
     /**
      * Overridden OutputAdditionalSimulationSetup() method to output the force and cell
