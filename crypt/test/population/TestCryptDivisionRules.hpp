@@ -43,6 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ArchiveOpener.hpp"
 #include "HoneycombMeshGenerator.hpp"
+#include "PottsMeshGenerator.hpp"
 #include "CellsGenerator.hpp"
 #include "MeshBasedCellPopulation.hpp"
 #include "NodeBasedCellPopulation.hpp"
@@ -53,6 +54,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "RandomDirectionCentreBasedDivisionRule.hpp"
 #include "CryptCentreBasedDivisionRule.hpp"
 #include "CryptVertexBasedDivisionRule.hpp"
+#include "CryptShovingCaBasedDivisionRule.hpp"
 #include "SmartPointers.hpp"
 
 // This test is always run sequentially (never in parallel)
@@ -208,6 +210,165 @@ public:
         TS_ASSERT_DELTA(division_axis[1], 0.0, 1e-4);
     }
 
+    void TestAddCellWithCryptShovingBasedDivisionRule()
+    {
+        /**
+         * In this test we create a new CryptShovingCaBasedDivisionRule, divide a cell with it
+         * and check that the new cells are in the correct locations. First, we test where
+         * there is space around the cells. This is the default setup.
+         */
+
+        // Create a simple Potts mesh
+        PottsMeshGenerator<2> generator(3, 0, 0, 4, 0, 0,1,0,0,false, true); // Periodic in x
+        PottsMesh<2>* p_mesh = generator.GetMesh();
+
+        // Create 6 cells in the bottom 2 rows
+        std::vector<unsigned> location_indices;
+        for (unsigned index=0; index<6; index++)
+        {
+            location_indices.push_back(index);
+        }
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 1> cells_generator;
+        cells_generator.GenerateBasic(cells, location_indices.size()); // Note all cells are stem cells by default.
+
+        // Create cell population
+        CaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
+
+        // Check the cell locations
+        unsigned cell_locations[6] = {0,1,2,3,4,5};
+        unsigned index = 0;
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
+        {
+            TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*cell_iter),cell_locations[index])
+            ++index;
+        }
+
+        // Make a new cell to add
+        MAKE_PTR(WildTypeCellMutationState, p_state);
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
+
+        FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
+        CellPtr p_new_cell(new Cell(p_state, p_model));
+        p_new_cell->SetCellProliferativeType(p_transit_type);
+        p_new_cell->SetBirthTime(-1);
+
+        // Set the division rule for our population to be the cryot shoving division rule
+        boost::shared_ptr<AbstractCaBasedDivisionRule<2> > p_division_rule_to_set(new CryptShovingCaBasedDivisionRule());
+        cell_population.SetCaBasedDivisionRule(p_division_rule_to_set);
+
+        // Get the division rule back from the population and try to add new cell by dividing cell at site 0;
+        boost::shared_ptr<AbstractCaBasedDivisionRule<2> > p_division_rule = cell_population.GetCaBasedDivisionRule();
+
+        // Select left cell in bottom row
+        CellPtr p_cell_0 = cell_population.GetCellUsingLocationIndex(0);
+
+        // The CryptShovingCaBasedDivisionRule method IsRoomToDivide() always returns true
+        TS_ASSERT((p_division_rule->IsRoomToDivide(p_cell_0,cell_population)));
+
+        /*
+         * Test adding the new cell in the population; this calls CalculateDaughterNodeIndex().
+         * The new cell moves into node 3. This is because stem cells always divide upwards
+         */
+        cell_population.AddCell(p_new_cell, p_cell_0);
+
+        // Now check the cells are in the correct place
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 7u);
+
+        // Note the cell on node 3 has been shoved to node 6 and the new cell is on node 3
+        unsigned new_cell_locations[7] = {0,1,2,6,4,5,3};
+        index = 0;
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
+        {
+            TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*cell_iter),new_cell_locations[index])
+            ++index;
+        }
+
+        //Now divide a non stem cell
+        // Select transit cell we just added
+        CellPtr p_cell_3 = cell_population.GetCellUsingLocationIndex(3);
+
+        FixedG1GenerationalCellCycleModel* p_model_2 = new FixedG1GenerationalCellCycleModel();
+        CellPtr p_new_cell_2(new Cell(p_state, p_model_2));
+        p_new_cell_2->SetCellProliferativeType(p_transit_type);
+        p_new_cell_2->SetBirthTime(-1);
+
+        /*
+         * Test adding the new cell in the population; this calls CalculateDaughterNodeIndex().
+         * The new cell moves into node 7.
+         */
+        cell_population.AddCell(p_new_cell_2, p_cell_3);
+
+        // Now check the cells are in the correct place
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 8u);
+
+        // Note the cell on node 4 has been shoved to node 7 and the new cell is on node 4
+        unsigned new_cell_locations_2[8] = {0,1,2,6,7,5,3,4};
+        index = 0;
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
+        {
+            TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*cell_iter),new_cell_locations_2[index])
+            ++index;
+        }
+    }
+
+    void TestAddCellWithCryptShovingBasedDivisionRuleAndShovingRequired()
+    {
+
+        /**
+         * In this test of CryptShovingCaBasedDivisionRule we check the case where there is
+         * no room to divide without the cells being shoved to the edge of the mesh.
+         */
+
+        // Create a simple Potts mesh
+        PottsMeshGenerator<2> generator(3, 0, 0, 3, 0, 0, 1, 0, 0, false, true); // x periodic
+        PottsMesh<2>* p_mesh = generator.GetMesh();
+
+        // Create 9 cells, one for each node
+        std::vector<unsigned> location_indices;
+        for (unsigned index=0; index<9; index++)
+        {
+            location_indices.push_back(index);
+        }
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 1> cells_generator;
+        cells_generator.GenerateBasic(cells, location_indices.size());
+
+        // Create cell population
+        CaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
+
+        // Make a new cell to add
+        MAKE_PTR(WildTypeCellMutationState, p_state);
+        MAKE_PTR(StemCellProliferativeType, p_stem_type);
+
+        FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
+        CellPtr p_new_cell(new Cell(p_state, p_model));
+        p_new_cell->SetCellProliferativeType(p_stem_type);
+        p_new_cell->SetBirthTime(-1);
+
+        // Set the division rule for our population to be the crypt shoving division rule
+        boost::shared_ptr<AbstractCaBasedDivisionRule<2> > p_division_rule_to_set(new CryptShovingCaBasedDivisionRule());
+        cell_population.SetCaBasedDivisionRule(p_division_rule_to_set);
+
+        // Get the division rule back from the population and try to add new cell by dividing cell at site 0
+        boost::shared_ptr<AbstractCaBasedDivisionRule<2> > p_division_rule = cell_population.GetCaBasedDivisionRule();
+
+        // Select bottom left cell
+        CellPtr p_cell_0 = cell_population.GetCellUsingLocationIndex(0);
+
+        // Can't divide without shoving into top
+        TS_ASSERT_THROWS_THIS(p_division_rule->CalculateDaughterNodeIndex(p_new_cell, p_cell_0, cell_population),
+            "Cells reaching the top of the crypt need to increase length to at least double the sloughing height.");
+    }
+
     void TestArchiveCryptCentreBasedDivisionRule() throw(Exception)
     {
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
@@ -259,6 +420,40 @@ public:
 
             typedef CryptVertexBasedDivisionRule<2> CryptRule;
             TS_ASSERT(dynamic_cast<CryptRule*>(p_division_rule.get()));
+        }
+    }
+
+    void TestArchivingCryptShovingCaBasedDivisionRule() throw (Exception)
+    {
+        EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "CryptShovingCaBasedDivisionRule.arch";
+
+        {
+            CryptShovingCaBasedDivisionRule division_rule;
+
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            // Serialize via pointer to most abstract class possible
+            AbstractCaBasedDivisionRule<2>* const p_division_rule = &division_rule;
+            output_arch << p_division_rule;
+        }
+
+        {
+            AbstractCaBasedDivisionRule<2>* p_division_rule;
+
+            // Create an input archive
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            // Restore from the archive
+            input_arch >> p_division_rule;
+
+            TS_ASSERT(p_division_rule != NULL);
+
+            // Tidy up
+            delete p_division_rule;
         }
     }
 };
