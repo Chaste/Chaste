@@ -142,7 +142,7 @@ void HiornsAirwayWall::SetRIn(double RIn)
 
 void HiornsAirwayWall::SetROut(double ROut) 
 {
-    assert (ROut >= 0.9);
+    assert (ROut >= 0.0);
     mROut = ROut;
 }
 
