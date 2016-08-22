@@ -46,7 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* HOW_TO_TAG General
  * Read and use parameters from the command line
  *
- * If your want to use parameters that are supplied in the command line, then
+ * If you want to use parameters that are supplied in the command line, then
  *  (i) add lines such as "double x = CommandLineArguments::Instance()->GetDoubleCorrespondingToOption("-myparam");" below
  *  (ii) use scons to compile but not run the test (see ChasteGuides/RunningBinariesFromCommandLine)
  *  (iii) run the compiled executable from the command line (see ChasteGuides/RunningBinariesFromCommandLine), with your parameter.
