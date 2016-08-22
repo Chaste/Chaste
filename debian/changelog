@@ -1,3 +1,9 @@
+chaste-source (3.4.93221.r9616683962b91916de365e1204de168821cbcfd7) precise; urgency=low
+
+  * Package commit 9616683962b91916de365e1204de168821cbcfd7 in Chaste 3.4.
+
+ -- Chaste Team <chaste-admin@maillist.ox.ac.uk>  Mon, 22 Aug 2016 10:45:33 +0000
+
 chaste-source (3.4.26597) xenial; urgency=low
 
   * Package release 3.4.26597 of Chaste with support for Xenial (16.04).
