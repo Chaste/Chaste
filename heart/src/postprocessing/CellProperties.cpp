@@ -36,6 +36,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cmath>
 #include <sstream>
 #include <cassert>
+#include <algorithm>
+
+//// Useful for debugging...
+//#include <iostream>
+//#include <iomanip>
 
 #include "CellProperties.hpp"
 #include "Exception.hpp"
@@ -212,53 +217,77 @@ std::vector<double> CellProperties::CalculateActionPotentialDurations(const doub
     CheckExceededThreshold();
 
     double prev_v = mrVoltage[0];
-    unsigned APcounter=0;//will keep count of the APDs that we calculate
-    bool apd_is_calculated=true;//this will ensure we hit the target only once per AP.
+    double prev_t = mrTime[0];
     std::vector<double> apds;
-    double target = DBL_MAX;
-    bool apd_starting_time_found=false;
+    double target;
     double apd_start_time=DBL_MAX;
 
-    double t;
-    double v;
-    for (unsigned i=1; i<mrTime.size(); i++)
+    unsigned apd_starting_index = UNSIGNED_UNSET;
+
+    // New algorithm is to loop over APs instead of time.
+    for (unsigned ap_index = 0; ap_index<mPeakValues.size(); ap_index++)
     {
-        t = mrTime[i];
-        v = mrVoltage[i];
+        target = mRestingValues[ap_index]+0.01*(100-percentage)*(mPeakValues[ap_index]-mRestingValues[ap_index]);
 
-        //First we make sure we stop calculating after the last AP has been calculated
-        if (APcounter<mPeakValues.size())
+        // We need to look from starting_time_index (just before threshold is reached)
+        unsigned starting_time_index = std::lower_bound(mrTime.begin(),mrTime.end(),mOnsets[ap_index])-mrTime.begin()-1u;
+
+        // Now if the target voltage for depolarisation is above the threshold,
+        // we'll need to look forwards in time for the crossing point.
+        if (target >= mThreshold)
         {
-            //Set the target potential
-            target = mRestingValues[APcounter]+0.01*(100-percentage)*(mPeakValues[APcounter]-mRestingValues[APcounter]);
-
-            //if we reach the peak, we need to start to calculate an APD
-            if (fabs(v-mPeakValues[APcounter])<=1e-6)
+            //std::cout << "Looking forwards\n";
+            prev_v = mrVoltage[starting_time_index];
+            prev_t = mrTime[starting_time_index];
+            for (unsigned t = starting_time_index+1u; t < mrTime.size(); t++)
             {
-                apd_is_calculated = false;
-            }
-
-            // Start the timing where we first cross the target voltage
-            if ( prev_v<v && prev_v<=target && v>=target && apd_starting_time_found==false)
-            {
-                // Linear interpolation of target crossing time.
-                apd_start_time=t+( (target-prev_v)/(v-prev_v) )*(t-mrTime[i-1]);
-                apd_starting_time_found = true;
-            }
-
-            //if we hit the target while repolarising
-            //and we are told this apd is not calculated yet.
-            if ( prev_v>v && prev_v>=target && v<=target && apd_is_calculated==false)
-            {
-                // Linear interpolation of target crossing time.
-                apds.push_back (t - apd_start_time + ( (target-prev_v)/(v-prev_v) )*(t-mrTime[i-1]) );
-                APcounter++;
-                apd_is_calculated = true;
-                apd_starting_time_found = false;
+                if (mrVoltage[t] > target)
+                {
+                    apd_start_time = prev_t + ( (target-prev_v)/(mrVoltage[t]-prev_v) )*(mrTime[t]-prev_t);
+                    apd_starting_index = t;
+                    break;
+                }
+                prev_t = mrTime[t];
+                prev_v = mrVoltage[t];
             }
         }
-        prev_v = v;
+        else // otherwise, we'll need to look backwards.
+        {
+            //std::cout << "Looking backwards\n";
+            prev_v = mrVoltage[starting_time_index+1];
+            prev_t = mrTime[starting_time_index+1];
+            for (unsigned t = starting_time_index; t >= 0u; t--)
+            {
+                if (mrVoltage[t] < target)
+                {
+                    apd_start_time = prev_t+( (target-prev_v)/(mrVoltage[t]-prev_v) )*(mrTime[t]-prev_t);
+                    apd_starting_index = t+1;
+                    break;
+                }
+                prev_t = mrTime[t];
+                prev_v = mrVoltage[t];
+            }
+        }
+
+        // Now just look forwards for the repolarisation time.
+        if (apd_starting_index != UNSIGNED_UNSET)
+        {
+            prev_t = mrTime[apd_starting_index-1u];
+            prev_v = mrVoltage[apd_starting_index-1u];
+            // Now look for a fall below threshold after 1 past the Onset index
+            for (unsigned t = apd_starting_index; t < mrTime.size(); t++)
+            {
+                if (mrVoltage[t] < target)
+                {
+                    apds.push_back (mrTime[t-1] - apd_start_time + ( (target-prev_v)/(mrVoltage[t]-prev_v) )*(mrTime[t]-mrTime[t-1]) );
+                    break;
+                }
+                prev_t = mrTime[t];
+                prev_v = mrVoltage[t];
+            }
+        }
     }
+
     if (apds.size() == 0)
     {
         EXCEPTION("No full action potential was recorded");

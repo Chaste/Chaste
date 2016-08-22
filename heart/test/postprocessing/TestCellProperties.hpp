@@ -228,6 +228,7 @@ public:
         double timestep = solution.rGetTimes()[1] - solution.rGetTimes()[0];
         unsigned size = cell_props.GetMaxUpstrokeVelocities().size();
 
+        TS_ASSERT_EQUALS(size,4u);
         TS_ASSERT_DELTA(cell_props.GetMaxUpstrokeVelocities()[size-1], 418.4795, 0.001);
         TS_ASSERT_DELTA(cell_props.GetCycleLengths()[size-2], 1000.00, 0.01);//last apd is not finished, get cycle lengths from before
         TS_ASSERT_DELTA(cell_props.GetPeakPotentials()[size-1], 43.1665, 0.0001);
@@ -489,8 +490,9 @@ public:
             TS_ASSERT_EQUALS(finder.IsFile(), true);
             std::vector<double> voltages;
             std::vector<double> times;
-            LoadMeshalyzerOutputTraces(finder, 40001, times, voltages);
+            LoadMeshalyzerOutputTraces(finder, 22674, times, voltages);
 
+            //std::cout << "With -50 threshold:\n";
             threshold = -50.0; // Last one above, first one below
             {
                 CellProperties cell_properties(voltages, times, threshold);
@@ -502,7 +504,7 @@ public:
                 std::vector<double> apds = cell_properties.GetAllActionPotentialDurations(90);
                 TS_ASSERT_EQUALS(apds.size(), 1u);
 
-                TS_ASSERT_DELTA(cell_properties.GetLastActionPotentialDuration(90), 209.4662, tolerance);
+                TS_ASSERT_DELTA(apds[0], 209.4662, tolerance);
 
                 std::vector<double> peak_Vs = cell_properties.GetPeakPotentials();
                 TS_ASSERT_EQUALS(peak_Vs.size(), 1u);
@@ -521,6 +523,7 @@ public:
                 TS_ASSERT_DELTA(resting_potentials[0], -85.4714, tolerance);
             }
 
+            //std::cout << "With -60 threshold:\n";
             threshold = -60.0; // Both above threshold - all these properties were already calculated OK
             {
                 CellProperties cell_properties(voltages, times, threshold);
