@@ -256,12 +256,12 @@ std::vector<double> CellProperties::CalculateActionPotentialDurations(const doub
             //std::cout << "Looking backwards\n";
             prev_v = mrVoltage[starting_time_index+1];
             prev_t = mrTime[starting_time_index+1];
-            for (unsigned t = starting_time_index; t > 0u; t--)
+            for (int t = starting_time_index; t >= 0; t--)
             {
                 if (mrVoltage[t] < target)
                 {
                     apd_start_time = prev_t+( (target-prev_v)/(mrVoltage[t]-prev_v) )*(mrTime[t]-prev_t);
-                    apd_starting_index = t+1;
+                    apd_starting_index = (unsigned)(t+1); // Should be a safe conversion since t not allowed to go negaive in this loop.
                     break;
                 }
                 prev_t = mrTime[t];
