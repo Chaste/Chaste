@@ -148,7 +148,7 @@ public:
             // Testing here that the number of cells at the end doesn't change
             CryptSimulation2d* p_simulator = CellBasedSimulationArchiver<2, CryptSimulation2d>::Load("SteadyStateCrypt", end_of_simulation);
             unsigned expected_cell_count = 474u; // GccOpt with CVODE on
-            if (strstr(ChasteBuildInfo::GetCompilerType(), "intel") != NULL)
+            if (strstr(ChasteBuildInfo::GetCompilerType(), "ntel") != NULL)
             {
                 expected_cell_count = 450u; // IntelProduction with CVODE on
             }
