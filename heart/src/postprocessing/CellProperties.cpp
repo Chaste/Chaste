@@ -256,7 +256,7 @@ std::vector<double> CellProperties::CalculateActionPotentialDurations(const doub
             //std::cout << "Looking backwards\n";
             prev_v = mrVoltage[starting_time_index+1];
             prev_t = mrTime[starting_time_index+1];
-            for (unsigned t = starting_time_index; t >= 0u; t--)
+            for (unsigned t = starting_time_index; t > 0u; t--)
             {
                 if (mrVoltage[t] < target)
                 {
