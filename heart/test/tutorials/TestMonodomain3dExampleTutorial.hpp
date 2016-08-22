@@ -94,7 +94,7 @@ public:
 };
 
 /* Now define the test */
-class TestMonodomain3dExample : public CxxTest::TestSuite
+class TestMonodomain3dExampleTutorial : public CxxTest::TestSuite
 {
 public:
     void TestMonodomain3d() throw(Exception)

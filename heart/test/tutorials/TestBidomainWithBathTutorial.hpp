@@ -84,7 +84,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cmath>
 
 /* Define the test */
-class TestRunningBidomainSimulationsTutorial : public CxxTest::TestSuite
+class TestBidomainWithBathTutorial : public CxxTest::TestSuite
 {
 public: // Tests should be public!
 

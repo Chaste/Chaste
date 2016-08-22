@@ -41,8 +41,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *
  */
-#ifndef TESTSOLVINGMOREELASTICITYPROBLEMSTUTORIALS_HPP_
-#define TESTSOLVINGMOREELASTICITYPROBLEMSTUTORIALS_HPP_
+#ifndef TESTSOLVINGMOREELASTICITYPROBLEMSTUTORIAL_HPP_
+#define TESTSOLVINGMOREELASTICITYPROBLEMSTUTORIAL_HPP_
 
 /* == Introduction ==
  *
@@ -79,7 +79,7 @@ c_vector<double,2> MyTraction(c_vector<double,2>& rX, double time)
  */
 
 
-class TestSolvingMoreElasticityProblemsTutorials : public CxxTest::TestSuite
+class TestSolvingMoreElasticityProblemsTutorial : public CxxTest::TestSuite
 {
 public:
 
@@ -372,4 +372,4 @@ public:
     }
 };
 
-#endif // TESTSOLVINGMOREELASTICITYPROBLEMSTUTORIALS_HPP_
+#endif // TESTSOLVINGMOREELASTICITYPROBLEMSTUTORIAL_HPP_
