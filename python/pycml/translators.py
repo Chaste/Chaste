@@ -1926,7 +1926,13 @@ class CellMLToChasteTranslator(CellMLTranslator):
                 assert len(vector_outputs) > 0
                 if name == 'state_variable':
                     # Special case to ensure the ordering as an output matches the state vector in the ODE system
-                    vector_outputs.sort(key=lambda v: self.state_vars.index(v))
+                    def get_state_index(v):
+                        """Find the index of the state variable corresponding to this variable, which may be units converted."""
+                        v = v.get_source_variable(recurse=True)
+                        if v.get_type() is VarTypes.Computed:
+                            v = v.get_dependencies()[0].get_dependencies()[0]
+                        return self.state_vars.index(v)
+                    vector_outputs.sort(key=get_state_index)
                 else:
                     vector_outputs.sort(key=lambda v: self.var_display_name(v))
                 self.writeln('this->mVectorOutputsInfo[', i, '].resize(', len(vector_outputs), ');')
