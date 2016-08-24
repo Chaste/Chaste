@@ -78,7 +78,7 @@ simulation/TestOnLatticeSimulationWithCaBasedCellPopulation.hpp
 simulation/TestOnLatticeSimulationWithPdes.hpp
 simulation/TestOnLatticeSimulationWithPottsBasedCellPopulation.hpp
 simulation/TestSimpleTargetAreaModifier.hpp
-simulation/TestFarhadifarTypeModifier.hpp
+simulation/TestTargetAreaLinearGrowthModifier.hpp
 simulation/TestPdesForOffLatticeSimulations.hpp
 simulation/TestStepSizeException.hpp
 simulation/TestVolumeTrackingModifier.hpp
