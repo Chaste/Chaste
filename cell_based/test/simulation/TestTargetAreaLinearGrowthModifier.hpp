@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef TESTFARHADIFARTYPEMODIFIER_HPP_
-#define TESTFARHADIFARTYPEMODIFIER_HPP_
+#ifndef TESTTARGETAREALINEARGROWTHMODIFIER_HPP_
+#define TESTTARGETAREALINEARGROWTHMODIFIER_HPP_
 
 #include <cxxtest/TestSuite.h>
 
@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellBasedTestSuite.hpp"
 #include "SmartPointers.hpp"
 
-#include "FarhadifarTypeModifier.hpp"
+#include "TargetAreaLinearGrowthModifier.hpp"
 #include "AbstractCellBasedSimulationModifier.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "HoneycombMeshGenerator.hpp"
@@ -61,7 +61,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // This test is only run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
-class TestFarhadifarTypeModifier : public AbstractCellBasedTestSuite
+class TestTargetAreaLinearGrowthModifier : public AbstractCellBasedTestSuite
 {
 public:
     void TestSetupSolveException() throw (Exception)
@@ -69,10 +69,10 @@ public:
         // First set up SimulationTime (this is usually handled by a simulation object)
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
-        // Create a FarhadifarTypeModifier
-        MAKE_PTR(FarhadifarTypeModifier<2>, p_modifier);
+        // Create a TargetAreaLinearGrowthModifier
+        MAKE_PTR(TargetAreaLinearGrowthModifier<2>, p_modifier);
 
-        // Create a cell population whose type should not be used with a FarhadifarTypeModifier
+        // Create a cell population whose type should not be used with a TargetAreaLinearGrowthModifier
         HoneycombMeshGenerator generator(4, 4, 0);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
 
@@ -88,7 +88,7 @@ public:
         CellBasedEventHandler::Reset(); // Otherwise logging has been started but not stopped due to exception above
     }
 
-    void TestNonPhaseBasedCcmException() throw (Exception)
+    void TestNonPhaseBasedCellCycleModelMethodsAndExceptions() throw (Exception)
     {
         // First set up SimulationTime (this is usually handled by a simulation object)
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
@@ -103,20 +103,46 @@ public:
         // Create a cell
         CellPtr p_cell(new Cell(p_state, p_model));
 
-        // Create a FarhadifarTypeModifier
-        MAKE_PTR(FarhadifarTypeModifier<2>, p_modifier);
+        // Create a TargetAreaLinearGrowthModifier
+        MAKE_PTR(TargetAreaLinearGrowthModifier<2>, p_modifier);
+
+        p_modifier->SetReferenceTargetArea(5.0);
 
         // Test that the correct exception is thrown if we try to call UpdateTargetAreas() on the population
         TS_ASSERT_THROWS_THIS(p_modifier->UpdateTargetAreaOfCell(p_cell),
-            "FarhadifarTypeModifier is to be used with a AbstractPhaseBasedCellCycleModel only");
-        CellBasedEventHandler::Reset(); // Otherwise logging has been started but not stopped due to exception above.
+            "If SetAgeToStartGrowing() has not been called, a subclass of AbstractPhaseBasedCellCycleModel must be used");
+
+        // Set mAgeToStartGrowing, but not mGrowthRate
+        p_modifier->SetAgeToStartGrowing(0.5);
+        TS_ASSERT_THROWS_THIS(p_modifier->UpdateTargetAreaOfCell(p_cell),
+            "If SetAgeToStartGrowing() has been called, then SetGrowthRate() must also be called");
+
+        // Set mGrowthRate
+        p_modifier->SetGrowthRate(3.0);
+
+        TS_ASSERT_THROWS_NOTHING(p_modifier->UpdateTargetAreaOfCell(p_cell));
+
+        // At time 0, the cell's target area should be the reference target area, which in this case is 5
+        TS_ASSERT_DELTA(p_cell->GetCellData()->GetItem("target area"), 5.0, 1e-6);
+
+        SimulationTime::Instance()->IncrementTimeOneStep();
+        p_modifier->UpdateTargetAreaOfCell(p_cell);
+
+        // At time 1, the cell should have grown with rate 3 for a duration 0.5, so it's target area should be 5 + 3*0.5 = 6.5
+        TS_ASSERT_DELTA(p_cell->GetCellData()->GetItem("target area"), 6.5, 1e-6);
+
+        // Coverage
+        TS_ASSERT_DELTA(p_modifier->GetReferenceTargetArea(), 5.0, 1e-6);
+        TS_ASSERT_DELTA(p_modifier->GetAgeToStartGrowing(), 0.5, 1e-6);
+        TS_ASSERT_DELTA(p_modifier->GetGrowthRate(), 3.0, 1e-6);
+
+        CellBasedEventHandler::Reset(); // Otherwise logging has been started but not stopped due to exception above
     }
 
-
-    void TestFarhadifarTypeModifierMethods() throw (Exception)
+    void TestTargetAreaLinearGrowthModifierMethods() throw (Exception)
     {
         // Create a modifier
-        MAKE_PTR(FarhadifarTypeModifier<2>,p_growth_modifier);
+        MAKE_PTR(TargetAreaLinearGrowthModifier<2>,p_growth_modifier);
 
         SimulationTime* p_simulation_time = SimulationTime::Instance();
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(3*0.25, 3);
@@ -279,7 +305,7 @@ public:
         simulator.AddForce(p_nagai_honda_force);
 
         // Create modifier
-        MAKE_PTR(FarhadifarTypeModifier<2>, p_growth_modifier);
+        MAKE_PTR(TargetAreaLinearGrowthModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
         // Run simulation
@@ -329,17 +355,19 @@ public:
         }
     }
 
-    void TestFarhadifarTypeModifierArchiving()
+    void TestTargetAreaLinearGrowthModifierArchiving()
     {
         // Create a file for archiving
         OutputFileHandler handler("archive", false);
-        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "FarhadifarTypeModifier.arch";
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "TargetAreaLinearGrowthModifier.arch";
 
         // Separate scope to write the archive
         {
             // Initialise a growth modifier and set a non-standard mature target area
-            AbstractCellBasedSimulationModifier<2,2>* const p_modifier = new FarhadifarTypeModifier<2>();
-            (static_cast<FarhadifarTypeModifier<2>*>(p_modifier))->SetReferenceTargetArea(14.3);
+            AbstractCellBasedSimulationModifier<2,2>* const p_modifier = new TargetAreaLinearGrowthModifier<2>();
+            (static_cast<TargetAreaLinearGrowthModifier<2>*>(p_modifier))->SetReferenceTargetArea(14.3);
+            (static_cast<TargetAreaLinearGrowthModifier<2>*>(p_modifier))->SetAgeToStartGrowing(0.7);
+            (static_cast<TargetAreaLinearGrowthModifier<2>*>(p_modifier))->SetGrowthRate(6.8);
 
             // Create an output archive
             std::ofstream ofs(archive_filename.c_str());
@@ -360,31 +388,41 @@ public:
 
             input_arch >> p_modifier2;
 
-            // See whether we read out the correct target area
-            double mature_target_area = (static_cast<FarhadifarTypeModifier<2>*>(p_modifier2))->GetReferenceTargetArea();
-            TS_ASSERT_DELTA(mature_target_area, 14.3, 1e-9);
+            // See whether we read out the correct member variables
+            double reference_target_area = (static_cast<TargetAreaLinearGrowthModifier<2>*>(p_modifier2))->GetReferenceTargetArea();
+            TS_ASSERT_DELTA(reference_target_area, 14.3, 1e-9);
+
+            double age_to_start_growing = (static_cast<TargetAreaLinearGrowthModifier<2>*>(p_modifier2))->GetAgeToStartGrowing();
+            TS_ASSERT_DELTA(age_to_start_growing, 0.7, 1e-9);
+
+            double growth_rate = (static_cast<TargetAreaLinearGrowthModifier<2>*>(p_modifier2))->GetGrowthRate();
+            TS_ASSERT_DELTA(growth_rate, 6.8, 1e-9);
 
             delete p_modifier2;
         }
     }
 
-    void TestFarhadifarTypeModifierOutputParameters()
+    void TestTargetAreaLinearGrowthModifierOutputParameters()
     {
         EXIT_IF_PARALLEL;
-        std::string output_directory = "TestFarhadifarTypeModifierOutputParameters";
+        std::string output_directory = "TestTargetAreaLinearGrowthModifierOutputParameters";
         OutputFileHandler output_file_handler(output_directory, false);
 
-        MAKE_PTR(FarhadifarTypeModifier<2>, p_modifier);
-        TS_ASSERT_EQUALS(p_modifier->GetIdentifier(), "FarhadifarTypeModifier-2");
+        MAKE_PTR(TargetAreaLinearGrowthModifier<2>, p_modifier);
+        TS_ASSERT_EQUALS(p_modifier->GetIdentifier(), "TargetAreaLinearGrowthModifier-2");
 
-        out_stream modifier_parameter_file = output_file_handler.OpenOutputFile("FarhadifarTypeModifier.parameters");
+        p_modifier->SetReferenceTargetArea(17.9);
+        p_modifier->SetAgeToStartGrowing(5.8);
+        p_modifier->SetGrowthRate(1.3);
+
+        out_stream modifier_parameter_file = output_file_handler.OpenOutputFile("TargetAreaLinearGrowthModifier.parameters");
         p_modifier->OutputSimulationModifierParameters(modifier_parameter_file);
         modifier_parameter_file->close();
 
         {
             // Compare the generated file in test output with a reference copy in the source code
-            FileFinder generated = output_file_handler.FindFile("FarhadifarTypeModifier.parameters");
-            FileFinder reference("cell_based/test/data/TestSimulationModifierOutputParameters/FarhadifarTypeModifier.parameters",
+            FileFinder generated = output_file_handler.FindFile("TargetAreaLinearGrowthModifier.parameters");
+            FileFinder reference("cell_based/test/data/TestSimulationModifierOutputParameters/TargetAreaLinearGrowthModifier.parameters",
                     RelativeTo::ChasteSourceRoot);
             FileComparison comparer(generated, reference);
             TS_ASSERT(comparer.CompareFiles());
@@ -392,4 +430,4 @@ public:
     }
 };
 
-#endif /*TESTFARHADIFARTYPEMODIFIER_HPP_*/
+#endif /*TESTTARGETAREALINEARGROWTHMODIFIER_HPP_*/

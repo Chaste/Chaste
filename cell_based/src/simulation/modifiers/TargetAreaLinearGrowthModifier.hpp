@@ -43,19 +43,29 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexBasedCellPopulation.hpp"
 
 /**
- * A modifier class in which the target area property of each cell is updated.
- * It is used to implement growth in vertex-based simulations.
- * The precise growth rule is that proposed by:
+ * A target area modifier class in which the target area of a cell grows linearly,
+ * starting from mReferenceTargetArea, over a prescribed duration.
  *
- * Farhadifar et al. 2007.
- * The influence of cell mechanics, cell-cell interactions, and proliferation on epithelial packing.
- * Current Biology 17(24):2095-2104.
- * http://dx.doi.org/10.1016/j.cub.2007.11.049
+ * If used with a phase-based cell-cycle model (such as FixedG1GenerationalCellCycleModel),
+ * the target area of a cell doubles from the value mReferenceTargetArea over the course of
+ * the cell's G2 phase. This rule is based on the description of cell growth and division
+ * proposed by Farhadifar et al (The influence of cell mechanics, cell-cell interactions,
+ * and proliferation on epithelial packing, Current Biology 17(24):2095-2104, 2007,
+ * http://dx.doi.org/10.1016/j.cub.2007.11.049).
  *
- * \todo Consider renaming as FarhadifarTargetAreaModifier for clarity
+ * If used with a non-phase-based cell-cycle model, the target area of a cell increases
+ * linearly at a rate mGrowthRate as soon as the cell's age exceeds mAgeToStartGrowing.
+ *
+ * Here mReferenceTargetArea, mAgeToStartGrowing and mGrowthRate are settable member
+ * variables. The default value of mReferenceTargetArea is 1.0 and the default value of
+ * mAgeToStartGrowing and mGrowthRate is DOUBLE_UNSET.
+ *
+ * If mAgeToStartGrowing is set by the user, then mGrowthRate must also be set; note that
+ * in this case, these values are used to prescribe target area growth as described earlier,
+ * regardless of whether a phase-based cell-cycle model is present.
  */
 template<unsigned DIM>
-class FarhadifarTypeModifier : public AbstractTargetAreaModifier<DIM>
+class TargetAreaLinearGrowthModifier : public AbstractTargetAreaModifier<DIM>
 {
     /** Needed for serialization. */
     friend class boost::serialization::access;
@@ -70,19 +80,35 @@ class FarhadifarTypeModifier : public AbstractTargetAreaModifier<DIM>
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & boost::serialization::base_object<AbstractTargetAreaModifier<DIM> >(*this);
+        archive & mAgeToStartGrowing;
+        archive & mGrowthRate;
     }
+
+    /**
+     * The age of a proliferating cell at which its target area should start growing.
+     * Defaults to DOUBLE_UNSET. If this variable is set using SetAgeToStartGrowing(),
+     * then it is used regardless of whether a phase-based cell-cycle model is used.
+     */
+    double mAgeToStartGrowing;
+
+    /**
+     * The growth rate of a proliferating cell's target area, when it is growing.
+     * Defaults to DOUBLE_UNSET. This variable must be set if mAgeToStartGrowing is set,
+     * otherwise an exception is thrown.
+     */
+    double mGrowthRate;
 
 public:
 
     /**
      * Default constructor.
      */
-    FarhadifarTypeModifier();
+    TargetAreaLinearGrowthModifier();
 
     /**
      * Destructor.
      */
-    virtual ~FarhadifarTypeModifier();
+    virtual ~TargetAreaLinearGrowthModifier();
 
     /**
      * Helper method to update the target area property of an individual cell.
@@ -90,6 +116,30 @@ public:
      * @param pCell pointer to a cell
      */
     void UpdateTargetAreaOfCell(const CellPtr pCell);
+
+    /**
+     * @return #mAgeToStartGrowing.
+     */
+    double GetAgeToStartGrowing();
+
+    /**
+     * Set #mAgeToStartGrowing.
+     *
+     * @param ageToStartGrowing the new value of #mAgeToStartGrowing
+     */
+    void SetAgeToStartGrowing(double ageToStartGrowing);
+
+    /**
+     * @return #mGrowthRate
+     */
+    double GetGrowthRate();
+
+    /**
+     * Set #mGrowthRate.
+     *
+     * @param growthRate the new value of #mGrowthRate
+     */
+    void SetGrowthRate(double growthRate);
 
     /**
      * Overridden OutputSimulationModifierParameters() method.
@@ -101,6 +151,6 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(FarhadifarTypeModifier)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(TargetAreaLinearGrowthModifier)
 
 #endif /*FARHADIFARTYPEMODIFIER_HPP_*/

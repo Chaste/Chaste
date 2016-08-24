@@ -91,7 +91,7 @@ public:
 
     }
 
-    void TestNonPhaseBasedCcmException() throw (Exception)
+    void TestNonPhaseBasedCellCycleModelMethodsAndExceptions() throw (Exception)
     {
         // First set up SimulationTime (this is usually handled by a simulation object)
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
@@ -111,8 +111,22 @@ public:
 
         // Test that the correct exception is thrown if we try to call UpdateTargetAreas() on the population
         TS_ASSERT_THROWS_THIS(p_modifier->UpdateTargetAreaOfCell(p_cell),
-            "SimpleTargetAreaModifier is to be used with a AbstractPhaseBasedCellCycleModel only");
-        CellBasedEventHandler::Reset(); // Otherwise logging has been started but not stopped due to exception above.
+            "If SetGrowthDuration() has not been called, a subclass of AbstractPhaseBasedCellCycleModel must be used");
+
+        p_modifier->SetReferenceTargetArea(9.0);
+        p_modifier->SetGrowthDuration(2.0);
+
+        SimulationTime::Instance()->IncrementTimeOneStep();
+        p_modifier->UpdateTargetAreaOfCell(p_cell);
+
+        // At time 1, the cell should be halfway between its initial target area of 9.0/2 = 4.5 and its final target area of 9.0
+        TS_ASSERT_DELTA(p_cell->GetCellData()->GetItem("target area"), 6.75, 1e-6);
+
+        // Coverage
+        TS_ASSERT_DELTA(p_modifier->GetReferenceTargetArea(), 9.0, 1e-6);
+        TS_ASSERT_DELTA(p_modifier->GetGrowthDuration(), 2.0, 1e-6);
+
+        CellBasedEventHandler::Reset(); // Otherwise logging has been started but not stopped due to exception above
     }
 
     void TestSimpleTargetAreaModifierMethods() throw (Exception)
@@ -340,6 +354,7 @@ public:
             // Initialise a growth modifier and set a non-standard mature target area
             AbstractCellBasedSimulationModifier<2,2>* const p_modifier = new SimpleTargetAreaModifier<2>();
             (static_cast<SimpleTargetAreaModifier<2>*>(p_modifier))->SetReferenceTargetArea(14.3);
+            (static_cast<SimpleTargetAreaModifier<2>*>(p_modifier))->SetGrowthDuration(9.2);
 
             // Create an output archive
             std::ofstream ofs(archive_filename.c_str());
@@ -360,9 +375,12 @@ public:
 
             input_arch >> p_modifier2;
 
-            // See whether we read out the correct target area
-            double mature_target_area = (static_cast<SimpleTargetAreaModifier<2>*>(p_modifier2))->GetReferenceTargetArea();
-            TS_ASSERT_DELTA(mature_target_area, 14.3, 1e-9);
+            // See whether we read out the correct member variables
+            double reference_target_area = (static_cast<SimpleTargetAreaModifier<2>*>(p_modifier2))->GetReferenceTargetArea();
+            TS_ASSERT_DELTA(reference_target_area, 14.3, 1e-9);
+
+            double growth_duration = (static_cast<SimpleTargetAreaModifier<2>*>(p_modifier2))->GetGrowthDuration();
+            TS_ASSERT_DELTA(growth_duration, 9.2, 1e-9);
 
             delete p_modifier2;
         }
@@ -376,6 +394,9 @@ public:
 
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_modifier);
         TS_ASSERT_EQUALS(p_modifier->GetIdentifier(), "SimpleTargetAreaModifier-2");
+
+        p_modifier->SetReferenceTargetArea(6.2);
+        p_modifier->SetGrowthDuration(1.7);
 
         out_stream modifier_parameter_file = output_file_handler.OpenOutputFile("SimpleTargetAreaModifier.parameters");
         p_modifier->OutputSimulationModifierParameters(modifier_parameter_file);
