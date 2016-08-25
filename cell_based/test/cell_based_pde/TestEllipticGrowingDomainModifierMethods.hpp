@@ -94,7 +94,7 @@ public:
         // Make the PDE and BCs
         CellwiseSourceEllipticPde<2> pde(cell_population, 1);
         ConstBoundaryCondition<2> bc(1.0);
-        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+        MAKE_PTR_ARGS(EllipticPdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
         p_pde_and_bc->SetDependentVariableName("variable");
 
         // Create a PDE modifier object using this PDE and BCs object
@@ -164,7 +164,7 @@ public:
         // Make the PDE and BCs
         CellwiseSourceEllipticPde<2> pde(cell_population, 1);
         ConstBoundaryCondition<2> bc(1.0);
-        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+        MAKE_PTR_ARGS(EllipticPdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
         p_pde_and_bc->SetDependentVariableName("variable");
 
         // Create a PDE modifier object using this PDE and BCs object
@@ -228,7 +228,7 @@ public:
         // Make the PDE and BCs
         CellwiseSourceEllipticPde<2> pde(cell_population, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
-        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+        MAKE_PTR_ARGS(EllipticPdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
         p_pde_and_bc->SetDependentVariableName("variable");
 
         // Create a PDE modifier object using this PDE and BCs object
@@ -275,7 +275,7 @@ public:
         // Make the PDE and BCs
         CellwiseSourceEllipticPde<2> pde(cell_population, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
-        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+        MAKE_PTR_ARGS(EllipticPdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
         p_pde_and_bc->SetDependentVariableName("variable");
 
         // Create a PDE modifier object using this PDE and BCs object
@@ -328,7 +328,7 @@ public:
         // Make the PDE and BCs
         CellwiseSourceEllipticPde<2> pde(cell_population, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
-        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+        MAKE_PTR_ARGS(EllipticPdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
         p_pde_and_bc->SetDependentVariableName("variable");
 
         // Create a PDE modifier object using this PDE and BCs object
@@ -380,7 +380,7 @@ public:
         // Make the PDE and BCs
         CellwiseSourceEllipticPde<2> pde(cell_population, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
-        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+        MAKE_PTR_ARGS(EllipticPdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
         p_pde_and_bc->SetDependentVariableName("variable");
 
         // Create a PDE modifier object using this PDE and BCs object
@@ -438,7 +438,7 @@ public:
         // Make the PDE and BCs
         CellwiseSourceEllipticPde<2> pde(cell_population, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
-        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+        MAKE_PTR_ARGS(EllipticPdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
         p_pde_and_bc->SetDependentVariableName("variable");
 
         // Create a PDE modifier object using this PDE and BCs object

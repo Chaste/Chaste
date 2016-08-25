@@ -62,7 +62,7 @@ public:
         // Make the PDE and BCs
         UniformSourceEllipticPde<2> pde(-0.1);
         ConstBoundaryCondition<2> bc(1.0);
-        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+        MAKE_PTR_ARGS(EllipticPdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
         p_pde_and_bc->SetDependentVariableName("averaged quantity");
 
         // Make domain
@@ -143,7 +143,7 @@ public:
             // Make the PDE and BCs
             UniformSourceEllipticPde<2> pde(-0.1);
             ConstBoundaryCondition<2> bc(1.0);
-            MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+            MAKE_PTR_ARGS(EllipticPdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
             p_pde_and_bc->SetDependentVariableName("averaged quantity");
 
             // Make domain

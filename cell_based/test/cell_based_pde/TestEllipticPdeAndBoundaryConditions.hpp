@@ -43,7 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Timer.hpp"
 #include "EllipticPdeAndBoundaryConditions.hpp"
 #include "ConstBoundaryCondition.hpp"
-#include "SimpleUniformSourcePde.hpp"
+#include "UniformSourceEllipticPde.hpp"
 #include "FunctionalBoundaryCondition.hpp"
 #include "MeshBasedCellPopulation.hpp"
 #include "NodesOnlyMesh.hpp"
@@ -481,7 +481,7 @@ public:
 
         {
             // Create a EllipticPdeAndBoundaryConditions object
-            SimpleUniformSourcePde<2> pde(0.75);
+            UniformSourceEllipticPde<2> pde(0.75);
             ConstBoundaryCondition<2> bc(2.45);
             bool is_neumann_bc = false;
 
@@ -512,8 +512,8 @@ public:
             TS_ASSERT_DELTA(p_pde_and_bc->GetBoundaryCondition()->GetValue(point), 2.45, 1e-6);
 
             AbstractLinearEllipticPde<2,2>* p_pde = p_pde_and_bc->GetPde();
-            TS_ASSERT(dynamic_cast<SimpleUniformSourcePde<2>*>(p_pde) != NULL);
-            TS_ASSERT_DELTA(static_cast<SimpleUniformSourcePde<2>*>(p_pde)->GetCoefficient(), 0.75, 1e-6);
+            TS_ASSERT(dynamic_cast<UniformSourceEllipticPde<2>*>(p_pde) != NULL);
+            TS_ASSERT_DELTA(static_cast<UniformSourceEllipticPde<2>*>(p_pde)->GetCoefficient(), 0.75, 1e-6);
 
             // Avoid memory leaks
             delete p_pde_and_bc;
@@ -530,7 +530,7 @@ public:
 
         {
             // Create a EllipticPdeAndBoundaryConditions object
-            SimpleUniformSourcePde<2> pde(0.75);
+            UniformSourceEllipticPde<2> pde(0.75);
             ConstBoundaryCondition<2> bc(2.45);
             bool is_neumann_bc = false;
 
@@ -573,8 +573,8 @@ public:
             TS_ASSERT_DELTA(p_pde_and_bc->GetBoundaryCondition()->GetValue(point), 2.45, 1e-6);
 
             AbstractLinearEllipticPde<2,2>* p_pde = p_pde_and_bc->GetPde();
-            TS_ASSERT(dynamic_cast<SimpleUniformSourcePde<2>*>(p_pde) != NULL);
-            TS_ASSERT_DELTA(static_cast<SimpleUniformSourcePde<2>*>(p_pde)->GetCoefficient(), 0.75, 1e-6);
+            TS_ASSERT(dynamic_cast<UniformSourceEllipticPde<2>*>(p_pde) != NULL);
+            TS_ASSERT_DELTA(static_cast<UniformSourceEllipticPde<2>*>(p_pde)->GetCoefficient(), 0.75, 1e-6);
 
             Vec solution = p_pde_and_bc->GetSolution();
             ReplicatableVector solution_repl(solution);

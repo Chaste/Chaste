@@ -78,7 +78,7 @@ public:
         // Make the PDE and BCs
         UniformSourceEllipticPde<2> pde(-0.1);
         ConstBoundaryCondition<2> bc(1.0);
-        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+        MAKE_PTR_ARGS(EllipticPdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
         p_pde_and_bc->SetDependentVariableName("variable");
 
         // Create an elliptic PDE modifier object using this PDE and BCs object
@@ -108,7 +108,7 @@ public:
         // Create a PDE and BCs object to be used by all cell populations
         UniformSourceEllipticPde<2> pde(-0.1);
         ConstBoundaryCondition<2> bc(1.0);
-        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+        MAKE_PTR_ARGS(EllipticPdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
         p_pde_and_bc->SetDependentVariableName("averaged quantity");
 
         // Create a CellsGenerator to be used by all cell populations
@@ -264,7 +264,7 @@ public:
             // Make the Pde and BCS
             UniformSourceEllipticPde<2> pde(-0.1);
             ConstBoundaryCondition<2> bc(1.0);
-            MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+            MAKE_PTR_ARGS(EllipticPdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
             p_pde_and_bc->SetDependentVariableName("averaged quantity");
 
             // Initialise an Elliptic PDE modifier object using this PDE and BCs object

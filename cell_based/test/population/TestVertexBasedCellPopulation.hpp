@@ -1458,7 +1458,6 @@ public:
 
         // Avoid memory leak
         delete p_vertex_mesh;
-        delete p_tetrahedral_mesh;
     }
 
     void TestGetCellDataItemAtPdeNode() throw (Exception)
