@@ -76,7 +76,7 @@ private:
 protected:
 
     /** The solution to the PDE problem at the current timestep. */
-    Vec mSolution; ///\todo NEED TO ARCHIVE THIS see PdeandBoundaryCondidtion (#2687)
+    Vec mSolution; ///\todo NEED TO ARCHIVE THIS see AbstractPdeandBoundaryCondidtion (#2687)
 
     /** Shared pointer to the finite element mesh on which to solve the PDE. **/
     boost::shared_ptr<TetrahedralMesh<DIM,DIM> > mpFeMesh;  ///\todo #2687 NEED TO ARCHIVE THIS

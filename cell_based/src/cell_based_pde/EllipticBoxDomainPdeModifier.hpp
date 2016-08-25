@@ -42,7 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractBoxDomainPdeModifier.hpp"
 #include "BoundaryConditionsContainer.hpp"
-#include "PdeAndBoundaryConditions.hpp"
+#include "EllipticPdeAndBoundaryConditions.hpp"
 
 /**
  * A modifier class in which an elliptic PDE is solved on a box domain and the results are stored in CellData.
@@ -71,7 +71,7 @@ private:
     }
 
     /** Shared pointer to a linear elliptic PDE object with associated boundary conditions. */
-    boost::shared_ptr<PdeAndBoundaryConditions<DIM> > mpPdeAndBcs;
+    boost::shared_ptr<EllipticPdeAndBoundaryConditions<DIM> > mpPdeAndBcs;
 
 public:
 
@@ -89,7 +89,7 @@ public:
      * @param meshCuboid the outer boundary for the FEM mesh
      * @param stepSize the step size to be used in the FEM mesh (defaults to 1, i.e. the default cell size)
      */
-    EllipticBoxDomainPdeModifier(boost::shared_ptr<PdeAndBoundaryConditions<DIM> > pPdeAndBcs, ChasteCuboid<DIM> meshCuboid, double stepSize = 1.0);
+    EllipticBoxDomainPdeModifier(boost::shared_ptr<EllipticPdeAndBoundaryConditions<DIM> > pPdeAndBcs, ChasteCuboid<DIM> meshCuboid, double stepSize = 1.0);
 
     /**
      * Destructor.

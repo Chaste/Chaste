@@ -44,7 +44,7 @@ EllipticGrowingDomainPdeModifier<DIM>::EllipticGrowingDomainPdeModifier()
 }
 
 template<unsigned DIM>
-EllipticGrowingDomainPdeModifier<DIM>::EllipticGrowingDomainPdeModifier(boost::shared_ptr<PdeAndBoundaryConditions<DIM> > pPdeAndBcs)
+EllipticGrowingDomainPdeModifier<DIM>::EllipticGrowingDomainPdeModifier(boost::shared_ptr<EllipticPdeAndBoundaryConditions<DIM> > pPdeAndBcs)
     : AbstractGrowingDomainPdeModifier<DIM>(),
       mpPdeAndBcs(pPdeAndBcs)
 {

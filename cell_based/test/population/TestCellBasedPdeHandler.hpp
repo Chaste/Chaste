@@ -152,7 +152,7 @@ public:
         // Test AddPdeAndBc()
         SimpleUniformSourcePde<2> pde(-0.1);
         ConstBoundaryCondition<2> bc(1.0);
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        EllipticPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("averaged quantity");
 
         unsigned num_nodes = mesh.GetNumNodes();
@@ -249,7 +249,7 @@ public:
             // Set up PDE and pass to handler
             AveragedSourceEllipticPde<2> pde(cell_population, -0.1);
             ConstBoundaryCondition<2> bc(1.0);
-            PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+            EllipticPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
             pde_and_bc.SetDependentVariableName("averaged quantity");
             p_pde_handler->AddPdeAndBc(&pde_and_bc);
 
@@ -337,7 +337,7 @@ public:
             // Set up PDE and pass to handler
             AveragedSourceEllipticPde<2> pde(cell_population, -0.1);
             ConstBoundaryCondition<2> bc(1.0);
-            PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+            EllipticPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
             pde_and_bc.SetDependentVariableName("averaged quantity");
             p_pde_handler->AddPdeAndBc(&pde_and_bc);
 
@@ -423,7 +423,7 @@ public:
         // Set up PDE and pass to handler
         AveragedSourceEllipticPde<2> pde(cell_population, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        EllipticPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_handler.AddPdeAndBc(&pde_and_bc);
 
         // Test UseCoarsePdeMesh() again
@@ -452,7 +452,7 @@ public:
         // Test that UseCoarsePdeMesh()  throws an exception if the wrong type of PDE is specified
         SimpleUniformSourcePde<2> pde2(-0.1);
         ConstBoundaryCondition<2> bc2(1.0);
-        PdeAndBoundaryConditions<2> pde_and_bc2(&pde2, &bc2, false);
+        EllipticPdeAndBoundaryConditions<2> pde_and_bc2(&pde2, &bc2, false);
         pde_and_bc2.SetDependentVariableName("second variable");
         pde_handler.AddPdeAndBc(&pde_and_bc2);
 
@@ -476,7 +476,7 @@ public:
 
         AveragedSourceEllipticPde<1> pde_1d(cell_population_1d, -0.1);
         ConstBoundaryCondition<1> bc_1d(1.0);
-        PdeAndBoundaryConditions<1> pde_and_bc_1d(&pde_1d, &bc_1d, false);
+        EllipticPdeAndBoundaryConditions<1> pde_and_bc_1d(&pde_1d, &bc_1d, false);
         pde_handler_1d.AddPdeAndBc(&pde_and_bc_1d);
 
         ChastePoint<1> lower1(0.0);
@@ -506,7 +506,7 @@ public:
 
         AveragedSourceEllipticPde<3> pde_3d(cell_population_3d, -0.1);
         ConstBoundaryCondition<3> bc_3d(1.0);
-        PdeAndBoundaryConditions<3> pde_and_bc_3d(&pde_3d, &bc_3d, false);
+        EllipticPdeAndBoundaryConditions<3> pde_and_bc_3d(&pde_3d, &bc_3d, false);
         pde_handler_3d.AddPdeAndBc(&pde_and_bc_3d);
 
         ChastePoint<3> lower3(0.0, 0.0, 0.0);
@@ -555,7 +555,7 @@ public:
         // Set up PDE and pass to handler
         AveragedSourceEllipticPde<2> pde(cell_population, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        EllipticPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_handler.AddPdeAndBc(&pde_and_bc);
 
         // Test UseCoarsePdeMesh() again
@@ -602,7 +602,7 @@ public:
         // Set up PDE and pass to handler
         AveragedSourceEllipticPde<2> pde(cell_population, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        EllipticPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_handler.AddPdeAndBc(&pde_and_bc);
 
         // Use a coarse PDE mesh
@@ -655,7 +655,7 @@ public:
         // Use a coarse PDE mesh since we are using a node-based cell population
         AveragedSourceEllipticPde<2> pde(cell_population, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        EllipticPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("variable");
         pde_handler.AddPdeAndBc(&pde_and_bc);
 
@@ -773,7 +773,7 @@ public:
         // Create a single PDE and pass to the handler
         SimplePdeForTesting pde;
         ConstBoundaryCondition<2> bc(1.0);
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        EllipticPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("variable");
 
         // For coverage, provide an initial guess for the solution
@@ -884,7 +884,7 @@ public:
         // Also note that when using Neuman conditions the only solution that works is u=0
         CellwiseSourceEllipticPde<2> pde(cell_population, 0.0);
         ConstBoundaryCondition<2> bc(0.0);
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, true);
+        EllipticPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, true);
         pde_and_bc.SetDependentVariableName("variable");
 
         // For coverage, provide an initial guess for the solution
@@ -945,7 +945,7 @@ public:
         // Set up PDE and pass to handler
         AveragedSourceEllipticPde<2> pde(cell_population, -0.01);
         ConstBoundaryCondition<2> bc(1.0);
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        EllipticPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("variable");
 
         pde_handler.AddPdeAndBc(&pde_and_bc);
@@ -1015,7 +1015,7 @@ public:
         // Set up PDE and pass to handler
         AveragedSourceEllipticPde<2> pde(cell_population, -0.01);
         ConstBoundaryCondition<2> bc(0.0);
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, true); // Last boolean specifies Neuman conditions
+        EllipticPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, true); // Last boolean specifies Neuman conditions
         pde_and_bc.SetDependentVariableName("variable");
 
         pde_handler.AddPdeAndBc(&pde_and_bc);
@@ -1082,13 +1082,13 @@ public:
         // Set up PDE and pass to handler
         AveragedSourceEllipticPde<2> pde(cell_population, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        EllipticPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("quantity 1");
         pde_handler.AddPdeAndBc(&pde_and_bc);
 
         // Set up second PDE and pass to handler
         AveragedSourceEllipticPde<2> pde2(cell_population, -0.5);
-        PdeAndBoundaryConditions<2> pde_and_bc2(&pde2, &bc, false);
+        EllipticPdeAndBoundaryConditions<2> pde_and_bc2(&pde2, &bc, false);
         TS_ASSERT_THROWS_THIS(pde_handler.AddPdeAndBc(&pde_and_bc2), "When adding more than one PDE to CellBasedPdeHandler set the dependent variable name using SetDependentVariableName(name).");
         pde_and_bc2.SetDependentVariableName("quantity 1");
         TS_ASSERT_THROWS_THIS(pde_handler.AddPdeAndBc(&pde_and_bc2), "The name quantity 1 has already been used in the PDE collection");

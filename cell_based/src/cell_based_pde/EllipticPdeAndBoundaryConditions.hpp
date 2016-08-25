@@ -33,30 +33,34 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef PARABOLICPDEANDBOUNDARYCONDITIONS_HPP_
-#define PARABOLICPDEANDBOUNDARYCONDITIONS_HPP_
+#ifndef ELLIPTICPDEANDBOUNDARYCONDITIONS_HPP_
+#define ELLIPTICPDEANDBOUNDARYCONDITIONS_HPP_
 
 #include "AbstractPdeAndBoundaryConditions.hpp"
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
-#include "AbstractLinearParabolicPde.hpp"
+#include "AbstractLinearEllipticPde.hpp"
 
 /**
  * A helper class for use in cell-based simulations with PDEs. The class
- * contains a pointer to a linear parabolic PDE. The class also contains
+ * contains a pointer to a linear elliptic PDE, which is to be solved
+ * on the domain defined by the cell population. The class also contains
  * information describing the boundary condition that is to be imposed
  * when solving the PDE. Currently we allow Neumann (imposed flux) or
  * Dirichlet (imposed value) boundary conditions. The boundary condition
  * may be constant on the boundary or vary spatially and/or temporally.
  * In cell-based simulations with PDEs, one or more of these objects are
- * accessed via the PdeModifier classes.
+ * accessed via the CellBasedPdeHandler class.
+ *
+ * \todo Rename as EllipticPdeAndBoundaryConditions and move to cell_based/src/cell_based/pde (#2687)
+ *       and merge, or create shared parent class, with ParabolicPdeAndBoundaryConditions (#2767)
  */
 template<unsigned DIM>
-class ParabolicPdeAndBoundaryConditions : public AbstractPdeAndBoundaryConditions
+class EllipticPdeAndBoundaryConditions : public AbstractPdeAndBoundaryConditions
 {
-    friend class TestParabolicPdeAndBoundaryConditions;
+    friend class TestEllipticPdeAndBoundaryConditions;
 
 private:
 
@@ -76,14 +80,14 @@ private:
     }
 
     /** Pointer to a linear elliptic PDE object. */
-    AbstractLinearParabolicPde<DIM,DIM>* mpPde;
+    AbstractLinearEllipticPde<DIM,DIM>* mpPde;
 
 public:
 
     /**
      * Constructor.
      *
-     * @param pPde A pointer to a linear parabolic PDE object (defaults to NULL)
+     * @param pPde A pointer to a linear elliptic PDE object (defaults to NULL)
      * @param pBoundaryCondition A pointer to an abstract boundary condition
      *     (defaults to NULL, corresponding to a constant boundary condition with value zero)
      * @param isNeumannBoundaryCondition Whether the boundary condition is Neumann (defaults to true)
@@ -91,7 +95,7 @@ public:
      * @param deleteMemberPointersInDestructor whether to delete member pointers in the destructor
      *     (defaults to false)
      */
-    ParabolicPdeAndBoundaryConditions(AbstractLinearParabolicPde<DIM,DIM>* pPde=NULL,
+    PdeAndBoundaryConditions(AbstractLinearEllipticPde<DIM,DIM>* pPde=NULL,
                              AbstractBoundaryCondition<DIM>* pBoundaryCondition=NULL,
                              bool isNeumannBoundaryCondition=true,
                              Vec solution=NULL,
@@ -100,31 +104,31 @@ public:
     /**
      * Destructor.
      */
-    ~ParabolicPdeAndBoundaryConditions();
+    ~PdeAndBoundaryConditions();
 
     /**
      * @return mpPde
      */
-    AbstractLinearParabolicPde<DIM,DIM>* GetPde();
+    AbstractLinearEllipticPde<DIM,DIM>* GetPde();
 
     /**
-     * @return whether the PDE is of type AveragedSourceParabolicPde
+     * @return whether the PDE is of type AveragedSourceEllipticPde
      */
     bool HasAveragedSourcePde();
 
     /**
-     * In the case where mpPde is of type AveragedSourceParabolicPde, set the source terms
+     * In the case where mpPde is of type AveragedSourceEllipticPde, set the source terms
      * using the information in the given mesh.
      *
      * @param pMesh Pointer to a tetrahedral mesh
-     * @param pCellPdeElementMap map between cells and elements, from parabolic PDE modifiers
+     * @param pCellPdeElementMap map between cells and elements, from CellBasedPdeHandler
      */
-    void SetUpSourceTermsForAveragedSourcePde(TetrahedralMesh<DIM,DIM>* pMesh, std::map<CellPtr, unsigned>* pCellPdeElementMap=NULL);
+    void SetUpSourceTermsForAveragedSourcePde(TetrahedralMesh<DIM,DIM>* pMesh, std::map< CellPtr, unsigned >* pCellPdeElementMap=NULL);
 };
 
 #include "SerializationExportWrapper.hpp"
 // Declare identifier for the serializer
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(ParabolicPdeAndBoundaryConditions)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(EllipticPdeAndBoundaryConditions)
 
 namespace boost
 {
@@ -132,7 +136,7 @@ namespace serialization
 {
 template<class Archive, unsigned DIM>
 inline void save_construct_data(
-    Archive & ar, const ParabolicPdeAndBoundaryConditions<DIM> * t, const unsigned int file_version)
+    Archive & ar, const EllipticPdeAndBoundaryConditions<DIM> * t, const unsigned int file_version)
 {
     if (t->GetSolution())
     {
@@ -143,7 +147,7 @@ inline void save_construct_data(
 
 template<class Archive, unsigned DIM>
 inline void load_construct_data(
-    Archive & ar, ParabolicPdeAndBoundaryConditions<DIM> * t, const unsigned int file_version)
+    Archive & ar, EllipticPdeAndBoundaryConditions<DIM> * t, const unsigned int file_version)
 {
     Vec solution = NULL;
 
@@ -155,9 +159,9 @@ inline void load_construct_data(
         PetscTools::ReadPetscObject(solution, archive_filename);
     }
 
-    ::new(t)ParabolicPdeAndBoundaryConditions<DIM>(NULL, NULL, false, solution, true);
+    ::new(t)EllipticPdeAndBoundaryConditions<DIM>(NULL, NULL, false, solution, true);
 }
 }
 } // namespace ...
 
-#endif /* PARABOLICPDEANDBOUNDARYCONDITIONS_HPP_ */
+#endif /* ELLIPTICPDEANDBOUNDARYCONDITIONS_HPP_ */

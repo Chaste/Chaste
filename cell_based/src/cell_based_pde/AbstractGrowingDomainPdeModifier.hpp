@@ -41,7 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractPdeModifier.hpp"
 #include "BoundaryConditionsContainer.hpp"
-#include "PdeAndBoundaryConditions.hpp"
+#include "EllipticPdeAndBoundaryConditions.hpp"
 
 /**
  * A modifier class in which has the common functionality of solving a PDE on a Mesh defined by the tissue.

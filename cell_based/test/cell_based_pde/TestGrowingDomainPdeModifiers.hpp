@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CheckpointArchiveTypes.hpp"
 #include "EllipticGrowingDomainPdeModifier.hpp"
 #include "ParabolicGrowingDomainPdeModifier.hpp"
-#include "PdeAndBoundaryConditions.hpp"
+#include "EllipticPdeAndBoundaryConditions.hpp"
 #include "ParabolicPdeAndBoundaryConditions.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"

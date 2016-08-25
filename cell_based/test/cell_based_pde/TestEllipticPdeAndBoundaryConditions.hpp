@@ -33,15 +33,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef TESTPDEANDBOUNDARYCONDITIONS_HPP_
-#define TESTPDEANDBOUNDARYCONDITIONS_HPP_
+#ifndef TESTELLIPTICPDEANDBOUNDARYCONDITIONS_HPP_
+#define TESTELLIPTICPDEANDBOUNDARYCONDITIONS_HPP_
 
 #include <cxxtest/TestSuite.h>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 
 #include "Timer.hpp"
-#include "PdeAndBoundaryConditions.hpp"
+#include "EllipticPdeAndBoundaryConditions.hpp"
 #include "ConstBoundaryCondition.hpp"
 #include "SimpleUniformSourcePde.hpp"
 #include "FunctionalBoundaryCondition.hpp"
@@ -127,7 +127,7 @@ public:
         ConstBoundaryCondition<2> bc(15.0);
         bool is_neumann_bc = false;
 
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, is_neumann_bc);
+        EllipticPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, is_neumann_bc);
 
         // Make sure it has no name
         TS_ASSERT_EQUALS(pde_and_bc.rGetDependentVariableName(), "");
@@ -178,11 +178,11 @@ public:
 
     void TestMethodsNeumann() throw(Exception)
     {
-        // Create a PdeAndBoundaryConditions object
+        // Create a EllipticPdeAndBoundaryConditions object
         Simple2dPdeForTesting pde;
         ConstBoundaryCondition<2> bc(0.0);
 
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc); // third argument defaults to Neumann
+        EllipticPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc); // third argument defaults to Neumann
 
         // Test Get methods
         ChastePoint<2> point;
@@ -228,12 +228,12 @@ public:
 
     void TestWithBoundaryConditionVaryingInSpace() throw(Exception)
     {
-        // Create a PdeAndBoundaryConditions object with spatially varying boundary condition
+        // Create a EllipticPdeAndBoundaryConditions object with spatially varying boundary condition
         Simple2dPdeForTesting pde;
         FunctionalBoundaryCondition<2> functional_bc(&bc_func1);
         bool is_neumann_bc = false;
 
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &functional_bc, is_neumann_bc);
+        EllipticPdeAndBoundaryConditions<2> pde_and_bc(&pde, &functional_bc, is_neumann_bc);
 
         ChastePoint<2> point1;
         point1.rGetLocation()[0] = 0.0;
@@ -260,12 +260,12 @@ public:
         SimulationTime* p_simulation_time = SimulationTime::Instance();
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(10.0, 2);
 
-        // Create a PdeAndBoundaryConditions object with time-dependent boundary condition
+        // Create a EllipticPdeAndBoundaryConditions object with time-dependent boundary condition
         Simple2dPdeForTesting pde;
         FunctionalBoundaryCondition<2> functional_bc(&bc_func2);
         bool is_neumann_bc = false;
 
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &functional_bc, is_neumann_bc);
+        EllipticPdeAndBoundaryConditions<2> pde_and_bc(&pde, &functional_bc, is_neumann_bc);
 
         ChastePoint<2> point;
         point.rGetLocation()[0] = 0.0;
@@ -285,10 +285,10 @@ public:
 
     void TestIn3d() throw(Exception)
     {
-        // Create a 3D PdeAndBoundaryConditions object
+        // Create a 3D EllipticPdeAndBoundaryConditions object
         Simple3dPdeForTesting pde;
         ConstBoundaryCondition<3> bc(0.0);
-        PdeAndBoundaryConditions<3> pde_and_bc(&pde, &bc);
+        EllipticPdeAndBoundaryConditions<3> pde_and_bc(&pde, &bc);
 
         ChastePoint<3> point;
         point.rGetLocation()[0] = 0.0;
@@ -332,8 +332,8 @@ public:
 
         ConstBoundaryCondition<2> bc(0.0);
 
-        // Create a PdeAndBoundaryConditions object
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc);
+        // Create a EllipticPdeAndBoundaryConditions object
+        EllipticPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc);
 
         ChastePoint<2> point;
         point.rGetLocation()[0] = 0.0;
@@ -416,8 +416,8 @@ public:
 
         ConstBoundaryCondition<2> bc(0.0);
 
-        // Create a PdeAndBoundaryConditions object
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc);
+        // Create a EllipticPdeAndBoundaryConditions object
+        EllipticPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc);
 
         ChastePoint<2> point;
         point.rGetLocation()[0] = 0.0;
@@ -477,16 +477,16 @@ public:
 
         OutputFileHandler handler("archive", false);
         handler.SetArchiveDirectory();
-        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "PdeAndBoundaryConditions.arch";
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "EllipticPdeAndBoundaryConditions.arch";
 
         {
-            // Create a PdeAndBoundaryConditions object
+            // Create a EllipticPdeAndBoundaryConditions object
             SimpleUniformSourcePde<2> pde(0.75);
             ConstBoundaryCondition<2> bc(2.45);
             bool is_neumann_bc = false;
 
-            PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, is_neumann_bc);
-            PdeAndBoundaryConditions<2>* const p_const_pde_and_bc = &pde_and_bc;
+            EllipticPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, is_neumann_bc);
+            EllipticPdeAndBoundaryConditions<2>* const p_const_pde_and_bc = &pde_and_bc;
 
             // Archive the object
             std::ofstream ofs(archive_filename.c_str());
@@ -496,7 +496,7 @@ public:
         }
 
         {
-            PdeAndBoundaryConditions<2>* p_pde_and_bc;
+            EllipticPdeAndBoundaryConditions<2>* p_pde_and_bc;
 
             // Create an input archive
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
@@ -526,15 +526,15 @@ public:
 
         OutputFileHandler handler("archive", false);
         handler.SetArchiveDirectory();
-        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "PdeAndBoundaryConditions.arch";
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "EllipticPdeAndBoundaryConditions.arch";
 
         {
-            // Create a PdeAndBoundaryConditions object
+            // Create a EllipticPdeAndBoundaryConditions object
             SimpleUniformSourcePde<2> pde(0.75);
             ConstBoundaryCondition<2> bc(2.45);
             bool is_neumann_bc = false;
 
-            PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, is_neumann_bc);
+            EllipticPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, is_neumann_bc);
             pde_and_bc.SetDependentVariableName("quantity");
 
             std::vector<double> data(10);
@@ -546,7 +546,7 @@ public:
             Vec vector = PetscTools::CreateVec(data);
             pde_and_bc.SetSolution(vector);
 
-            PdeAndBoundaryConditions<2>* const p_const_pde_and_bc = &pde_and_bc;
+            EllipticPdeAndBoundaryConditions<2>* const p_const_pde_and_bc = &pde_and_bc;
 
             // Archive the object
             std::ofstream ofs(archive_filename.c_str());
@@ -556,7 +556,7 @@ public:
         }
 
         {
-            PdeAndBoundaryConditions<2>* p_pde_and_bc;
+            EllipticPdeAndBoundaryConditions<2>* p_pde_and_bc;
 
             // Create an input archive
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
@@ -591,4 +591,4 @@ public:
     }
 };
 
-#endif /* TESTPDEANDBOUNDARYCONDITIONS_HPP_ */
+#endif /* TESTELLIPTICPDEANDBOUNDARYCONDITIONS_HPP_ */

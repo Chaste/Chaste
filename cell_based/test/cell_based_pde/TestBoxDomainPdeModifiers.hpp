@@ -42,7 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CheckpointArchiveTypes.hpp"
 #include "EllipticBoxDomainPdeModifier.hpp"
 #include "ParabolicBoxDomainPdeModifier.hpp"
-#include "PdeAndBoundaryConditions.hpp"
+#include "EllipticPdeAndBoundaryConditions.hpp"
 #include "ParabolicPdeAndBoundaryConditions.hpp"
 #include "SimpleUniformSourcePde.hpp"
 #include "UniformSourceParabolicPde.hpp"

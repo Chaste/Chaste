@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VoronoiDataWriter.hpp"
 #include "CellMutationStatesWriter.hpp"
 #include "EllipticBoxDomainPdeModifier.hpp"
-#include "CellwiseSourceEllipticPde.hpp"
+#include "AveragedSourceEllipticPde.hpp"
 #include "VolumeTrackingModifier.hpp"
 #include "SimpleOxygenBasedCellCycleModel.hpp"
 #include "OffLatticeSimulation.hpp"
@@ -132,7 +132,7 @@ public:
 
         // Create Modifiers and pass to simulation
 
-        // Create a pde modifier and pass it to the simulation Add this first so in place for SimpleTargetArea one (calls cell pop update)
+        // Create a PDE modifier and pass it to the simulation Add this first so in place for SimpleTargetArea one (calls cell pop update)
 
         // Make the PDE and BCs
         AveragedSourceEllipticPde<2> pde(cell_population, -0.1);

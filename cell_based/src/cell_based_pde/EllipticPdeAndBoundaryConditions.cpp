@@ -33,10 +33,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "ParabolicPdeAndBoundaryConditions.hpp"
+#include "EllipticPdeAndBoundaryConditions.hpp"
 
 template<unsigned DIM>
-ParabolicPdeAndBoundaryConditions<DIM>::ParabolicPdeAndBoundaryConditions(AbstractLinearParabolicPde<DIM,DIM>* pPde,
+EllipticPdeAndBoundaryConditions<DIM>::EllipticPdeAndBoundaryConditions(AbstractLinearEllipticPde<DIM,DIM>* pPde,
                                                         AbstractBoundaryCondition<DIM>* pBoundaryCondition,
                                                         bool isNeumannBoundaryCondition,
                                                         Vec solution,
@@ -47,39 +47,39 @@ ParabolicPdeAndBoundaryConditions<DIM>::ParabolicPdeAndBoundaryConditions(Abstra
 }
 
 template<unsigned DIM>
-ParabolicPdeAndBoundaryConditions<DIM>::~ParabolicPdeAndBoundaryConditions()
+EllipticPdeAndBoundaryConditions<DIM>::~EllipticPdeAndBoundaryConditions()
 {
     // Avoid memory leaks if the object was loaded from an archive
-    if (this->mDeleteMemberPointersInDestructor)
+    if (mDeleteMemberPointersInDestructor)
     {
         delete mpPde;
     }
 }
 
 template<unsigned DIM>
-AbstractLinearParabolicPde<DIM,DIM>* ParabolicPdeAndBoundaryConditions<DIM>::GetPde()
+AbstractLinearEllipticPde<DIM,DIM>* EllipticPdeAndBoundaryConditions<DIM>::GetPde()
 {
     return mpPde;
 }
 
 template<unsigned DIM>
-bool ParabolicPdeAndBoundaryConditions<DIM>::HasAveragedSourcePde()
+bool EllipticPdeAndBoundaryConditions<DIM>::HasAveragedSourcePde()
 {
-    return (dynamic_cast<AveragedSourceParabolicPde<DIM>*>(mpPde) != NULL);
+    return (dynamic_cast<AveragedSourceEllipticPde<DIM>*>(mpPde) != NULL);
 }
 
 template<unsigned DIM>
-void ParabolicPdeAndBoundaryConditions<DIM>::SetUpSourceTermsForAveragedSourcePde(TetrahedralMesh<DIM,DIM>* pMesh, std::map<CellPtr, unsigned>* pCellPdeElementMap)
+void EllipticPdeAndBoundaryConditions<DIM>::SetUpSourceTermsForAveragedSourcePde(TetrahedralMesh<DIM,DIM>* pMesh, std::map< CellPtr, unsigned >* pCellPdeElementMap)
 {
     assert(HasAveragedSourcePde());
-    static_cast<AveragedSourceParabolicPde<DIM>*>(mpPde)->SetupSourceTerms(*pMesh, pCellPdeElementMap);
+    static_cast<AveragedSourceEllipticPde<DIM>*>(mpPde)->SetupSourceTerms(*pMesh, pCellPdeElementMap);
 }
 
 // Explicit instantiation
-template class ParabolicPdeAndBoundaryConditions<1>;
-template class ParabolicPdeAndBoundaryConditions<2>;
-template class ParabolicPdeAndBoundaryConditions<3>;
+template class PdeAndBoundaryConditions<1>;
+template class PdeAndBoundaryConditions<2>;
+template class PdeAndBoundaryConditions<3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(ParabolicPdeAndBoundaryConditions)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(PdeAndBoundaryConditions)

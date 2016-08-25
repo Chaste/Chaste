@@ -18,6 +18,7 @@ cell_based_pde/TestCellBasedEllipticPdes.hpp
 cell_based_pde/TestCellBasedParabolicPdes.hpp
 cell_based_pde/TestEllipticBoxDomainModifierMethods.hpp
 cell_based_pde/TestEllipticGrowingDomainModifierMethods.hpp
+cell_based_pde/TestEllipticPdeAndBoundaryConditions.hpp
 cell_based_pde/TestGrowingDomainPdeModifiers.hpp
 cell_based_pde/TestParabolicBoxDomainModifierMethods.hpp
 cell_based_pde/TestParabolicGrowingDomainModifierMethods.hpp
@@ -58,7 +59,6 @@ population/TestNodeBasedCellPopulation.hpp
 population/TestNodeBasedCellPopulationParallelMethods.hpp
 population/TestNodeBasedCellPopulationWithBuskeUpdate.hpp
 population/TestNodeBasedCellPopulationWithParticles.hpp
-population/TestPdeAndBoundaryConditions.hpp
 population/TestPottsBasedCellPopulation.hpp
 population/TestPottsUpdateRules.hpp
 population/TestT2SwapCellKiller.hpp

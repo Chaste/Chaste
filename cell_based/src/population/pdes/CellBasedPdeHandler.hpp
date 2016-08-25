@@ -43,7 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/vector.hpp>
 
 #include "AbstractCellPopulation.hpp"
-#include "PdeAndBoundaryConditions.hpp"
+#include "EllipticPdeAndBoundaryConditions.hpp"
 #include "BoundaryConditionsContainer.hpp"
 #include "TetrahedralMesh.hpp"
 #include "ChasteCuboid.hpp"

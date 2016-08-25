@@ -44,7 +44,7 @@ EllipticBoxDomainPdeModifier<DIM>::EllipticBoxDomainPdeModifier()
 }
 
 template<unsigned DIM>
-EllipticBoxDomainPdeModifier<DIM>::EllipticBoxDomainPdeModifier(boost::shared_ptr<PdeAndBoundaryConditions<DIM> > pPdeAndBcs,
+EllipticBoxDomainPdeModifier<DIM>::EllipticBoxDomainPdeModifier(boost::shared_ptr<EllipticPdeAndBoundaryConditions<DIM> > pPdeAndBcs,
                                                                 ChasteCuboid<DIM> meshCuboid,
                                                                 double stepSize)
     : AbstractBoxDomainPdeModifier<DIM>(),

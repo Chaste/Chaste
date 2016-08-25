@@ -42,7 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractGrowingDomainPdeModifier.hpp"
 #include "BoundaryConditionsContainer.hpp"
-#include "PdeAndBoundaryConditions.hpp"
+#include "EllipticPdeAndBoundaryConditions.hpp"
 
 /**
  * A modifier class in which an elliptic PDE is solved on a growing domain and the results are stored in CellData.
@@ -69,12 +69,11 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & boost::serialization::base_object<AbstractGrowingDomainPdeModifier<DIM> >(*this);
-
         archive & mpPdeAndBcs;
     }
 
     /** Shared pointer to a linear elliptic PDE object with associated boundary conditions. */
-    boost::shared_ptr<PdeAndBoundaryConditions<DIM> > mpPdeAndBcs;
+    boost::shared_ptr<EllipticPdeAndBoundaryConditions<DIM> > mpPdeAndBcs;
 
 public:
 
@@ -90,7 +89,7 @@ public:
      *
      * @param pPdeAndBcs shared pointer to a linear elliptic PDE object with associated boundary conditions.
      */
-    EllipticGrowingDomainPdeModifier(boost::shared_ptr<PdeAndBoundaryConditions<DIM> > pPdeAndBcs);
+    EllipticGrowingDomainPdeModifier(boost::shared_ptr<EllipticPdeAndBoundaryConditions<DIM> > pPdeAndBcs);
 
     /**
      * Destructor.

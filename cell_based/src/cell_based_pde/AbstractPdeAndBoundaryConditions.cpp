@@ -33,35 +33,27 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "PdeAndBoundaryConditions.hpp"
-#include "AveragedSourceEllipticPde.hpp"
+#include "AbstractPdeAndBoundaryConditions.hpp"
 
 template<unsigned DIM>
-PdeAndBoundaryConditions<DIM>::PdeAndBoundaryConditions(AbstractLinearEllipticPde<DIM,DIM>* pPde,
-                                                        AbstractBoundaryCondition<DIM>* pBoundaryCondition,
-                                                        bool isNeumannBoundaryCondition,
-                                                        Vec solution,
-                                                        bool deleteMemberPointersInDestructor)
-    : mpPde(pPde),
-      mpBoundaryCondition(pBoundaryCondition),
+AbstractPdeAndBoundaryConditions<DIM>::AbstractPdeAndBoundaryConditions(AbstractBoundaryCondition<DIM>* pBoundaryCondition,
+                                                                        bool isNeumannBoundaryCondition,
+                                                                        Vec solution,
+                                                                        bool deleteMemberPointersInDestructor)
+    : mpBoundaryCondition(pBoundaryCondition),
       mIsNeumannBoundaryCondition(isNeumannBoundaryCondition),
       mSolution(NULL),
       mDeleteMemberPointersInDestructor(deleteMemberPointersInDestructor),
       mDependentVariableName("")
 {
-    if (solution)
-    {
-        mSolution = solution;
-    }
 }
 
 template<unsigned DIM>
-PdeAndBoundaryConditions<DIM>::~PdeAndBoundaryConditions()
+AbstractPdeAndBoundaryConditions<DIM>::~AbstractPdeAndBoundaryConditions()
 {
     // Avoid memory leaks if the object was loaded from an archive
     if (mDeleteMemberPointersInDestructor)
     {
-        delete mpPde;
         delete mpBoundaryCondition;
     }
 
@@ -69,49 +61,37 @@ PdeAndBoundaryConditions<DIM>::~PdeAndBoundaryConditions()
 }
 
 template<unsigned DIM>
-AbstractLinearEllipticPde<DIM,DIM>* PdeAndBoundaryConditions<DIM>::GetPde()
-{
-    return mpPde;
-}
-
-template<unsigned DIM>
-AbstractBoundaryCondition<DIM>* PdeAndBoundaryConditions<DIM>::GetBoundaryCondition() const
+AbstractBoundaryCondition<DIM>* AbstractPdeAndBoundaryConditions<DIM>::GetBoundaryCondition() const
 {
     return mpBoundaryCondition;
 }
 
 template<unsigned DIM>
-Vec PdeAndBoundaryConditions<DIM>::GetSolution()
+Vec AbstractPdeAndBoundaryConditions<DIM>::GetSolution()
 {
     return mSolution;
 }
 
 template<unsigned DIM>
-Vec PdeAndBoundaryConditions<DIM>::GetSolution() const
+Vec AbstractPdeAndBoundaryConditions<DIM>::GetSolution() const
 {
     return mSolution;
 }
 
 template<unsigned DIM>
-void PdeAndBoundaryConditions<DIM>::SetSolution(Vec solution)
+void AbstractPdeAndBoundaryConditions<DIM>::SetSolution(Vec solution)
 {
     mSolution = solution;
 }
 
 template<unsigned DIM>
-bool PdeAndBoundaryConditions<DIM>::IsNeumannBoundaryCondition()
+bool AbstractPdeAndBoundaryConditions<DIM>::IsNeumannBoundaryCondition()
 {
     return mIsNeumannBoundaryCondition;
 }
 
 template<unsigned DIM>
-bool PdeAndBoundaryConditions<DIM>::HasAveragedSourcePde()
-{
-    return (dynamic_cast<AveragedSourceEllipticPde<DIM>*>(mpPde) != NULL);
-}
-
-template<unsigned DIM>
-void PdeAndBoundaryConditions<DIM>::DestroySolution()
+void AbstractPdeAndBoundaryConditions<DIM>::DestroySolution()
 {
     if (mSolution)
     {
@@ -120,29 +100,22 @@ void PdeAndBoundaryConditions<DIM>::DestroySolution()
 }
 
 template<unsigned DIM>
-void PdeAndBoundaryConditions<DIM>::SetUpSourceTermsForAveragedSourcePde(TetrahedralMesh<DIM,DIM>* pMesh, std::map< CellPtr, unsigned >* pCellPdeElementMap)
-{
-    assert(HasAveragedSourcePde());
-    static_cast<AveragedSourceEllipticPde<DIM>*>(mpPde)->SetupSourceTerms(*pMesh, pCellPdeElementMap);
-}
-
-template<unsigned DIM>
-void PdeAndBoundaryConditions<DIM>::SetDependentVariableName(const std::string& rName)
+void AbstractPdeAndBoundaryConditions<DIM>::SetDependentVariableName(const std::string& rName)
 {
     mDependentVariableName = rName;
 }
 
 template<unsigned DIM>
-std::string& PdeAndBoundaryConditions<DIM>::rGetDependentVariableName()
+std::string& AbstractPdeAndBoundaryConditions<DIM>::rGetDependentVariableName()
 {
     return mDependentVariableName;
 }
 
 // Explicit instantiation
-template class PdeAndBoundaryConditions<1>;
-template class PdeAndBoundaryConditions<2>;
-template class PdeAndBoundaryConditions<3>;
+template class AbstractPdeAndBoundaryConditions<1>;
+template class AbstractPdeAndBoundaryConditions<2>;
+template class AbstractPdeAndBoundaryConditions<3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(PdeAndBoundaryConditions)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(AbstractPdeAndBoundaryConditions)
