@@ -56,6 +56,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/foreach.hpp>
 
 #include "AbstractMesh.hpp"
+#include "TetrahedralMesh.hpp"
 #include "CellPropertyRegistry.hpp"
 #include "Identifiable.hpp"
 #include "AbstractCellPopulationCountWriter.hpp"
@@ -222,6 +223,49 @@ public:
      * @return reference to the mesh, mrMesh.
      */
     AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rGetMesh();
+
+    /**
+     * @return a tetrahedral mesh for use with a PDE modifier.
+     * This method is called by AbstractGrowingDomainPdeModifier.
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     */
+    virtual TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* GetTetrahedralMeshForPdeModifier()=0;
+
+    /**
+     * @param pdeNdeIndex index of a node in a tetrahedral mesh for use
+     *         with a PDE modifier
+     *
+     * @return if a node, specified by its index in a tetrahedral mesh for use
+     *         with a PDE modifier, is associated with an apoptotic cell.
+     * This method can be called by PDE classes.
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     */
+    virtual bool IsPdeNodeAssociatedWithApoptoticCell(unsigned pdeNodeIndex)=0;
+
+    /**
+     * @param pdeNdeIndex index of a node in a tetrahedral mesh for use
+     *         with a PDE modifier
+     * @param rVariableName the name of the cell data item to get
+     * @param dirichletBoundaryConditionApplies where a Dirichlet boundary condition is used
+     *        (optional; defaults to false)
+     * @param dirichletBoundaryValue the value of the Dirichlet boundary condition, if used
+     *        (optional; defaults to 0.0)
+     *
+     * @return the value of a CellData item (interpolated if necessary) at a node,
+     *         specified by its index in a tetrahedral mesh for use with a PDE modifier.
+     * This method can be called by PDE modifier classes.
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     */
+    virtual double GetCellDataItemAtPdeNode(unsigned pdeNodeIndex,
+                                            std::string& rVariableName,
+                                            bool dirichletBoundaryConditionApplies=false,
+                                            double dirichletBoundaryValue=0.0)=0;
 
     /**
      * @return reference to mCells.

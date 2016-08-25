@@ -45,21 +45,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Cylindrical2dVertexMesh.hpp"
 #include "SmartPointers.hpp"
 #include "T2SwapCellKiller.hpp"
-
-// Cell writers
-#include "CellAgesWriter.hpp"
-#include "CellAncestorWriter.hpp"
-#include "CellProliferativePhasesWriter.hpp"
-#include "CellProliferativeTypesWriter.hpp"
-#include "CellVolumesWriter.hpp"
-
-// Cell population writers
-#include "CellMutationStatesCountWriter.hpp"
+#include "ApoptoticCellProperty.hpp"
 #include "CellPopulationElementWriter.hpp"
 #include "VertexT1SwapLocationsWriter.hpp"
 #include "VertexT2SwapLocationsWriter.hpp"
 #include "VertexT3SwapLocationsWriter.hpp"
-
 #include "AbstractCellBasedSimulation.hpp"
 
 template<unsigned DIM>
@@ -598,7 +588,7 @@ void VertexBasedCellPopulation<DIM>::ClearLocationsAndCellIdsOfT2Swaps()
 }
 
 template<unsigned DIM>
-TetrahedralMesh<DIM, DIM>* VertexBasedCellPopulation<DIM>::GetTetrahedralMeshUsingVertexMesh()
+TetrahedralMesh<DIM, DIM>* VertexBasedCellPopulation<DIM>::GetTetrahedralMeshForPdeModifier()
 {
     // This method only works in 2D sequential
     assert(DIM == 2);
@@ -718,7 +708,8 @@ TetrahedralMesh<DIM, DIM>* VertexBasedCellPopulation<DIM>::GetTetrahedralMeshUsi
 
     // Having written the mesh to file, now construct it using TrianglesMeshReader
     TetrahedralMesh<DIM, DIM>* p_mesh = new TetrahedralMesh<DIM, DIM>;
-    // Nested scope so reader is destroyed before we remove the temporary files.
+
+    // Nested scope so reader is destroyed before we remove the temporary files
     {
         TrianglesMeshReader<DIM, DIM> mesh_reader(output_dir + mesh_file_name);
         p_mesh->ConstructFromMeshReader(mesh_reader);
@@ -731,6 +722,87 @@ TetrahedralMesh<DIM, DIM>* VertexBasedCellPopulation<DIM>::GetTetrahedralMeshUsi
     p_mesh->SetMeshHasChangedSinceLoading();
 
     return p_mesh;
+}
+
+template<unsigned DIM>
+bool VertexBasedCellPopulation<DIM>::IsPdeNodeAssociatedWithApoptoticCell(unsigned pdeNodeIndex)
+{
+    bool is_cell_apoptotic = false;
+
+    if (pdeNodeIndex < this->GetNumNodes())
+    {
+        std::set<unsigned> containing_element_indices = this->GetNode(pdeNodeIndex)->rGetContainingElementIndices();
+
+        for (std::set<unsigned>::iterator iter = containing_element_indices.begin();
+             iter != containing_element_indices.end();
+             iter++)
+        {
+            if (this->GetCellUsingLocationIndex(*iter)->template HasCellProperty<ApoptoticCellProperty>() )
+            {
+                is_cell_apoptotic = true;
+                break;
+            }
+        }
+    }
+    else
+    {
+        /*
+         * This node of the tetrahedral finite element mesh is in the centre of the element of the
+         * vertex-based cell population, so we can use an offset to compute which cell to interrogate.
+         */
+        is_cell_apoptotic = this->GetCellUsingLocationIndex(pdeNodeIndex- this->GetNumNodes())->template HasCellProperty<ApoptoticCellProperty>();
+    }
+
+    return is_cell_apoptotic;
+}
+template<unsigned DIM>
+double VertexBasedCellPopulation<DIM>::GetCellDataItemAtPdeNode(
+        unsigned pdeNodeIndex,
+        std::string& rVariableName,
+        bool dirichletBoundaryConditionApplies,
+        double dirichletBoundaryValue)
+{
+    unsigned num_nodes = this->GetNumNodes();
+    double value = 0.0;
+
+    // Cells correspond to nodes in the centre of the vertex element; nodes on vertices have averaged values from containing cells
+
+    if (pdeNodeIndex >= num_nodes)
+    {
+        // Offset to relate elements in vertex mesh to nodes in tetrahedral mesh
+        assert(pdeNodeIndex-num_nodes < num_nodes);
+
+        CellPtr p_cell = this->GetCellUsingLocationIndex(pdeNodeIndex - num_nodes);
+        value = p_cell->GetCellData()->GetItem(rVariableName);
+    }
+    else
+    {
+        ///\todo Work out a better way to do the nodes not associated with cells (#2687)
+        if (dirichletBoundaryConditionApplies)
+        {
+            // We need to impose the Dirichlet boundaries again here as not represented in cell data
+            value = dirichletBoundaryValue;
+        }
+        else
+        {
+            assert(pdeNodeIndex < num_nodes);
+            Node<DIM>* p_node = this->GetNode(pdeNodeIndex);
+
+            // Average over data from containing elements (cells)
+            std::set<unsigned> containing_elements = p_node->rGetContainingElementIndices();
+            for (std::set<unsigned>::iterator index_iter = containing_elements.begin();
+                 index_iter != containing_elements.end();
+                 ++index_iter)
+            {
+                assert(*index_iter < num_nodes);
+                CellPtr p_cell = this->GetCellUsingLocationIndex(*index_iter);
+                value += p_cell->GetCellData()->GetItem(rVariableName);
+            }
+            value /= containing_elements.size();
+        }
+    }
+
+    return value;
 }
 
 template<unsigned DIM>

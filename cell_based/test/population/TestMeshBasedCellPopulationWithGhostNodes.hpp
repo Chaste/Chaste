@@ -980,6 +980,22 @@ public:
         TS_ASSERT_EQUALS(keys[0], "added variable");
         TS_ASSERT_EQUALS(keys[1], "variable");
     }
+
+    void TestGetTetrahedralMeshForPdeModifier() throw(Exception)
+    {
+        HoneycombMeshGenerator generator(2, 2, 2);
+        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel,2> cells_generator;
+        cells_generator.GenerateGivenLocationIndices(cells, location_indices);
+
+        MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices);
+
+        TS_ASSERT_THROWS_THIS(cell_population.GetTetrahedralMeshForPdeModifier(),
+            "Currently can't solve PDEs on meshes with ghost nodes");
+    }
 };
 
 #endif /*TESTMESHBASEDCELLPOPULATIONWITHGHOSTNODES_HPP_*/

@@ -193,7 +193,7 @@ public:
     virtual ~MeshBasedCellPopulation();
 
     /**
-     * @return reference to  mrMesh.
+     * @return reference to mrMesh.
      */
     MutableMesh<ELEMENT_DIM, SPACE_DIM>& rGetMesh();
 
@@ -201,6 +201,15 @@ public:
      * @return const reference to mrMesh (used in archiving).
      */
     const MutableMesh<ELEMENT_DIM, SPACE_DIM>& rGetMesh() const;
+
+    /**
+     * Overridden GetTetrahedralMeshForPdeModifier() method.
+     *
+     * @return a copy of mrMesh.
+     *
+     * This method is called by AbstractGrowingDomainPdeModifier.
+     */
+    virtual TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* GetTetrahedralMeshForPdeModifier();
 
     /** @return mUseAreaBasedDampingConstant. */
     bool UseAreaBasedDampingConstant();

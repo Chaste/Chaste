@@ -137,4 +137,3 @@ void AbstractOnLatticeCellPopulation<DIM>::RemoveAllUpdateRules()
 template class AbstractOnLatticeCellPopulation<1>;
 template class AbstractOnLatticeCellPopulation<2>;
 template class AbstractOnLatticeCellPopulation<3>;
-

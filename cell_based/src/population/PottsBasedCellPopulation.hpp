@@ -183,6 +183,27 @@ public:
     const PottsMesh<DIM>& rGetMesh() const;
 
     /**
+     * Overridden GetTetrahedralMeshForPdeModifier() method.
+     *
+     * @return a tetrahedral mesh \todo #2687
+     *
+     * This method is called by AbstractGrowingDomainPdeModifier.
+     */
+    virtual TetrahedralMesh<DIM, DIM>* GetTetrahedralMeshForPdeModifier();
+
+    /**
+     * Overridden IsPdeNodeAssociatedWithApoptoticCell() method.
+     *
+     * @param pdeNdeIndex index of a node in a tetrahedral mesh for use
+     *         with a PDE modifier
+     *
+     * @return if a node, specified by its index in a tetrahedral mesh for use
+     *         with a PDE modifier, is associated with an apoptotic cell.
+     * This method can be called by PDE classes.
+     */
+    virtual bool IsPdeNodeAssociatedWithApoptoticCell(unsigned pdeNodeIndex);
+
+    /**
      * Get a particular PottsElement.
      *
      * @param elementIndex the global index of the PottsElement
@@ -415,6 +436,26 @@ public:
      * @param pUpdateRule pointer to an update rule
      */
     virtual void AddUpdateRule(boost::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule);
+
+    /**
+     * Overridden GetCellDataItemAtPdeNode() method.
+     *
+     * @param pdeNdeIndex index of a node in a tetrahedral mesh for use
+     *         with a PDE modifier
+     * @param rVariableName the name of the cell data item to get
+     * @param dirichletBoundaryConditionApplies where a Dirichlet boundary condition is used
+     *        (optional; defaults to false)
+     * @param dirichletBoundaryValue the value of the Dirichlet boundary condition, if used
+     *        (optional; defaults to 0.0)
+     *
+     * @return the value of a CellData item (interpolated if necessary) at a node,
+     *         specified by its index in a tetrahedral mesh for use with a PDE modifier.
+     * This method can be called by PDE modifier classes.
+     */
+    virtual double GetCellDataItemAtPdeNode(unsigned pdeNodeIndex,
+                                            std::string& rVariableName,
+                                            bool dirichletBoundaryConditionApplies=false,
+                                            double dirichletBoundaryValue=0.0);
 };
 
 #include "SerializationExportWrapper.hpp"

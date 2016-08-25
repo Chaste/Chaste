@@ -149,6 +149,15 @@ public:
     virtual ~MeshBasedCellPopulationWithGhostNodes();
 
     /**
+     * Overridden GetTetrahedralMeshForPdeModifier() method.
+     *
+     * @return a copy of mrMesh.
+     *
+     * This method is called by AbstractGrowingDomainPdeModifier.
+     */
+    virtual TetrahedralMesh<DIM, DIM>* GetTetrahedralMeshForPdeModifier();
+
+    /**
      * Overridden GetNeighbouringLocationIndices() method.
      *
      * Given a cell, returns the set of location indices corresponding to neighbouring cells.

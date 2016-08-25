@@ -613,6 +613,9 @@ public:
 
         node_based_cell_population.Update();
 
+        TS_ASSERT_EQUALS(node_based_cell_population.IsPdeNodeAssociatedWithApoptoticCell(0), true);
+        TS_ASSERT_EQUALS(node_based_cell_population.IsPdeNodeAssociatedWithApoptoticCell(1), false);
+
         unsigned num_removed;
         boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
         boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
@@ -1555,6 +1558,61 @@ public:
         {
             delete nodes[i];
         }
+    }
+
+    void TestGetTetrahedralMeshForPdeModifier() throw(Exception)
+    {
+        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
+        TetrahedralMesh<2,2> generating_mesh;
+        generating_mesh.ConstructFromMeshReader(mesh_reader);
+
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(generating_mesh, 1.2);
+        mesh.SetCalculateNodeNeighbours(false);
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+
+        NodeBasedCellPopulation<2> cell_population(mesh, cells);
+
+        TetrahedralMesh<2,2>* p_tet_mesh = cell_population.GetTetrahedralMeshForPdeModifier();
+
+        // Check it has the correct number of nodes and elements
+        TS_ASSERT_EQUALS(p_tet_mesh->GetNumNodes(), cell_population.GetNumNodes());
+        TS_ASSERT_EQUALS(p_tet_mesh->GetNumElements(), 4u);
+
+        // Check some nodes have the correct locations
+        TS_ASSERT_DELTA(p_tet_mesh->GetNode(0)->rGetLocation()[0], 0.0, 1e-6);
+        TS_ASSERT_DELTA(p_tet_mesh->GetNode(0)->rGetLocation()[1], 0.0, 1e-6);
+        TS_ASSERT_DELTA(p_tet_mesh->GetNode(1)->rGetLocation()[0], 1.0, 1e-6);
+        TS_ASSERT_DELTA(p_tet_mesh->GetNode(1)->rGetLocation()[1], 0.0, 1e-6);
+        TS_ASSERT_DELTA(p_tet_mesh->GetNode(2)->rGetLocation()[0], 1.0, 1e-6);
+        TS_ASSERT_DELTA(p_tet_mesh->GetNode(2)->rGetLocation()[1], 1.0, 1e-6);
+    }
+
+    void TestGetCellDataItemAtPdeNode() throw (Exception)
+    {
+        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
+        TetrahedralMesh<2,2> generating_mesh;
+        generating_mesh.ConstructFromMeshReader(mesh_reader);
+
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(generating_mesh, 1.5);
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+
+        NodeBasedCellPopulation<2> cell_population(mesh, cells);
+
+        std::string var_name = "foo";
+        TS_ASSERT_THROWS_THIS(cell_population.GetCellDataItemAtPdeNode(0,var_name),
+            "The item foo is not stored");
+
+        cell_population.GetCellUsingLocationIndex(0)->GetCellData()->SetItem(var_name, 3.14);
+
+        TS_ASSERT_DELTA(cell_population.GetCellDataItemAtPdeNode(0,var_name), 3.14, 1e-6);
     }
 };
 

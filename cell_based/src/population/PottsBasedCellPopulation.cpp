@@ -34,18 +34,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "PottsBasedCellPopulation.hpp"
+#include "MutableMesh.hpp"
 #include "RandomNumberGenerator.hpp"
-#include "Warnings.hpp"
 #include "AbstractPottsUpdateRule.hpp"
+#include "ApoptoticCellProperty.hpp"
+#include "NodesOnlyMesh.hpp"
+#include "Exception.hpp"
+#include "CellPopulationElementWriter.hpp"
+#include "CellIdWriter.hpp"
 
 // Needed to convert mesh in order to write nodes to VTK (visualize as glyphs)
 #include "VtkMeshWriter.hpp"
-#include "NodesOnlyMesh.hpp"
-#include "Exception.hpp"
-
-// Cell writers
-#include "CellPopulationElementWriter.hpp"
-#include "CellIdWriter.hpp"
 
 template<unsigned DIM>
 void PottsBasedCellPopulation<DIM>::Validate()
@@ -129,6 +128,36 @@ template<unsigned DIM>
 const PottsMesh<DIM>& PottsBasedCellPopulation<DIM>::rGetMesh() const
 {
     return *mpPottsMesh;
+}
+
+template<unsigned DIM>
+TetrahedralMesh<DIM, DIM>* PottsBasedCellPopulation<DIM>::GetTetrahedralMeshForPdeModifier()
+{
+    std::vector<Node<DIM>*> temp_nodes;
+
+    // Create nodes at the centre of the cells
+    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
+         cell_iter != this->End();
+         ++cell_iter)
+    {
+        unsigned index = this->GetLocationIndexUsingCell(*cell_iter);
+        c_vector<double, DIM> location = this->GetLocationOfCellCentre(*cell_iter);
+        temp_nodes.push_back(new Node<DIM>(index, location));
+    }
+
+    return new MutableMesh<DIM, DIM>(temp_nodes);
+}
+
+template<unsigned DIM>
+bool PottsBasedCellPopulation<DIM>::IsPdeNodeAssociatedWithApoptoticCell(unsigned pdeNodeIndex)
+{
+    bool is_cell_apoptotic = false;
+
+    if (this->IsCellAttachedToLocationIndex(pdeNodeIndex))
+    {
+        is_cell_apoptotic = this->GetCellUsingLocationIndex(pdeNodeIndex)->template HasCellProperty<ApoptoticCellProperty>();
+    }
+    return is_cell_apoptotic;
 }
 
 template<unsigned DIM>
@@ -749,6 +778,18 @@ template<unsigned DIM>
 void PottsBasedCellPopulation<DIM>::WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile)
 {
     *pVizSetupFile << "PottsSimulation\n";
+}
+
+template<unsigned DIM>
+double PottsBasedCellPopulation<DIM>::GetCellDataItemAtPdeNode(
+    unsigned pdeNodeIndex,
+    std::string& rVariableName,
+    bool dirichletBoundaryConditionApplies,
+    double dirichletBoundaryValue)
+{
+    CellPtr p_cell = this->GetCellUsingLocationIndex(pdeNodeIndex);
+    double value = p_cell->GetCellData()->GetItem(rVariableName);
+    return value;
 }
 
 // Explicit instantiation

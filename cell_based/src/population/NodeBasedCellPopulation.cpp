@@ -34,16 +34,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "NodeBasedCellPopulation.hpp"
+#include "MutableMesh.hpp"
 #include "MathsCustomFunctions.hpp"
 #include "VtkMeshWriter.hpp"
-
-// Cell writers
-#include "CellAgesWriter.hpp"
-#include "CellAncestorWriter.hpp"
-#include "CellProliferativePhasesWriter.hpp"
-#include "CellProliferativeTypesWriter.hpp"
-#include "CellVolumesWriter.hpp"
-#include "CellMutationStatesWriter.hpp"
 
 template<unsigned DIM>
 NodeBasedCellPopulation<DIM>::NodeBasedCellPopulation(NodesOnlyMesh<DIM>& rMesh,
@@ -96,6 +89,22 @@ template<unsigned DIM>
 const NodesOnlyMesh<DIM>& NodeBasedCellPopulation<DIM>::rGetMesh() const
 {
     return *mpNodesOnlyMesh;
+}
+
+template<unsigned DIM>
+TetrahedralMesh<DIM, DIM>* NodeBasedCellPopulation<DIM>::GetTetrahedralMeshForPdeModifier()
+{
+    std::vector<Node<DIM>*> temp_nodes;
+
+    // Get the nodes of mpNodesOnlyMesh
+    for (typename AbstractMesh<DIM,DIM>::NodeIterator node_iter = mpNodesOnlyMesh->GetNodeIteratorBegin();
+         node_iter != mpNodesOnlyMesh->GetNodeIteratorEnd();
+         ++node_iter)
+    {
+        temp_nodes.push_back(new Node<DIM>(node_iter->GetIndex(), node_iter->rGetLocation()));
+    }
+
+    return new MutableMesh<DIM,DIM>(temp_nodes);
 }
 
 template<unsigned DIM>

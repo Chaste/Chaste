@@ -410,12 +410,12 @@ public:
         // Create a PDE modifier and pass it to the simulation Add this first so in place for SimpleTargetArea one (calls cell pop update)
 
         // Make the PDE and BCs
-        CellwiseSourceParabolicPde<2> pde(cell_population, M_DUDT_COEFFICIENT,M_DIFFUSION_CONSTANT,M_UPTAKE_RATE);
+        CellwiseSourceParabolicPde<2> pde(cell_population, M_DUDT_COEFFICIENT, M_DIFFUSION_CONSTANT, M_UPTAKE_RATE);
         ConstBoundaryCondition<2> bc(1.0);
         ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("oxygen");
 
-        // Create a PDE Modifier object using this PDE and BCs object
+        // Create a PDE modifier object using this PDE and BCs object
         MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc));
         simulator.AddSimulationModifier(p_pde_modifier);
 
@@ -426,7 +426,7 @@ public:
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumAllCells(), 9u); // No births yet
 
         // Test nothing's changed
-        AbstractCellPopulation<2, 2>::Iterator cell_iter=simulator.rGetCellPopulation().Begin();
+        AbstractCellPopulation<2, 2>::Iterator cell_iter = simulator.rGetCellPopulation().Begin();
         TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("oxygen"), 1, 1e-4);
         ++cell_iter;
         ++cell_iter;

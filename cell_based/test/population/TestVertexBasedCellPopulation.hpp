@@ -1357,8 +1357,7 @@ public:
         }
     }
 
-    ///\todo create test (#2221)
-    void TestGetTetrahedralMeshUsingVertexMesh() throw (Exception)
+    void TestGetTetrahedralMeshForPdeModifier() throw (Exception)
     {
         /* Create a simple VertexMesh comprising three VertexElements.
          *
@@ -1405,8 +1404,8 @@ public:
         // Create cell population
         VertexBasedCellPopulation<2> cell_population(*p_vertex_mesh, cells);
 
-        // Test GetTetrahedralMeshUsingVertexMesh() method
-        TetrahedralMesh<2,2>* p_tetrahedral_mesh = cell_population.GetTetrahedralMeshUsingVertexMesh();
+        // Test TetrahedralMeshForPdeModifier() method
+        TetrahedralMesh<2,2>* p_tetrahedral_mesh = cell_population.GetTetrahedralMeshForPdeModifier();
 
         // The VertexMesh has 5 Nodes and 3 VertexElements, so the TetrahedralMesh has 5+3=8 Nodes
         TS_ASSERT_EQUALS(p_tetrahedral_mesh->GetNumNodes(), 8u);
@@ -1460,6 +1459,44 @@ public:
         // Avoid memory leak
         delete p_vertex_mesh;
         delete p_tetrahedral_mesh;
+    }
+
+    void TestGetCellDataItemAtPdeNode() throw (Exception)
+    {
+        // Create a small cell population
+        HoneycombVertexMeshGenerator generator(4, 4);
+        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
+
+        VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+        TS_ASSERT_EQUALS(cell_population.GetNumNodes(), 48u);
+        TS_ASSERT_EQUALS(cell_population.GetNumElements(), 16u);
+
+        std::string var_name = "foo";
+        TS_ASSERT_THROWS_THIS(cell_population.GetCellDataItemAtPdeNode(0,var_name),
+            "The item foo is not stored");
+
+        // Set the cell data item "foo" on each cell
+        for (unsigned index=0; index<cell_population.GetNumElements(); index++)
+        {
+            double value = (double)index;
+            cell_population.GetCellUsingLocationIndex(index)->GetCellData()->SetItem(var_name, value);
+        }
+
+        // The PDE mesh nodes 48 to 60 coincide with the cell centroids
+        for (unsigned index=48; index<60; index++)
+        {
+            double expected_value = (double)index - 48.0;
+            TS_ASSERT_DELTA(cell_population.GetCellDataItemAtPdeNode(index,var_name), expected_value, 1e-6);
+        }
+
+        // PDE mesh node 11 interpolates the value of "foo" from cells 1, 2 and 5
+        double expected_value_11 = (1.0 + 2.0 + 5.0)/3.0;
+        TS_ASSERT_DELTA(cell_population.GetCellDataItemAtPdeNode(11,var_name), expected_value_11, 1e-6);
     }
 };
 

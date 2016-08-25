@@ -496,7 +496,7 @@ public:
         MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc));
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseParabolicPdeWithPottsOnSquare");
 
-        // Run for 10 timesteps
+        // Run for 10 time steps
         for (unsigned i=0; i<10; i++)
         {
             SimulationTime::Instance()->IncrementTimeOneStep();
@@ -508,8 +508,9 @@ public:
         CellPtr p_cell_210 = cell_population.GetCellUsingLocationIndex(210);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[0], 10, 1e-4);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[1], 5.0*sqrt(3.0), 1e-4);
-        TS_ASSERT_DELTA( p_cell_210->GetCellData()->GetItem("variable"), 0.6309, 2e-1);//low error as mesh is slightly larger than for centre based models.
-        //Checking it doesn't change for this cell population
+        TS_ASSERT_DELTA( p_cell_210->GetCellData()->GetItem("variable"), 0.6309, 2e-1); // Low error as mesh is slightly larger than for centre-based models
+
+        // Checking it doesn't change for this cell population
         TS_ASSERT_DELTA(p_cell_210->GetCellData()->GetItem("variable"), 0.6086, 1e-4);
     }
 
@@ -518,7 +519,7 @@ public:
         PottsMeshGenerator<2> generator(20, 0, 0, 20, 0, 0);
         PottsMesh<2>* p_mesh = generator.GetMesh();
 
-        // Scale so cells are on top of those in the above centre based tests.
+        // Scale so cells are on top of those in the above centre-based tests
         p_mesh->Scale(1.0,sqrt(3.0)*0.5);
 
         // Specify where cells lie
@@ -536,17 +537,17 @@ public:
         // Make cells with x<10.0 apoptotic (so no source term)
         boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
                 cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
-        for (unsigned i =0; i<cells.size(); i++)
+        for (unsigned i=0; i<cells.size(); i++)
         {
             c_vector<double,2> cell_location = p_mesh->GetNode(i)->rGetLocation();
-            if (cell_location(0)<10.0)
+            if (cell_location(0) < 10.0)
             {
                 cells[i]->AddCellProperty(p_apoptotic_property);
             }
             // Set initial condition for pde
-            cells[i]->GetCellData()->SetItem("variable",1.0);
+            cells[i]->GetCellData()->SetItem("variable", 1.0);
         }
-        TS_ASSERT_EQUALS(p_apoptotic_property->GetCellCount(),200u);
+        TS_ASSERT_EQUALS(p_apoptotic_property->GetCellCount(), 200u);
 
         CaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
 
@@ -563,7 +564,7 @@ public:
         MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc));
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseParabolicPdeWithCaOnSquare");
 
-        // Run for 10 timesteps
+        // Run for 10 time steps
         for (unsigned i=0; i<10; i++)
         {
             SimulationTime::Instance()->IncrementTimeOneStep();
@@ -575,11 +576,11 @@ public:
         CellPtr p_cell_210 = cell_population.GetCellUsingLocationIndex(210);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[0], 10, 1e-4);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[1], 5.0*sqrt(3.0), 1e-4);
-        TS_ASSERT_DELTA( p_cell_210->GetCellData()->GetItem("variable"), 0.6309, 2e-1);//low error as mesh is slightly larger than for centre based models.
-        //Checking it doesn't change for this cell population
-        TS_ASSERT_DELTA(p_cell_210->GetCellData()->GetItem("variable"), 0.6086, 2e-3);// Low threshold as slightly different on Intel.
-    }
+        TS_ASSERT_DELTA( p_cell_210->GetCellData()->GetItem("variable"), 0.6309, 2e-1); // low error as mesh is slightly larger than for centre-based models
 
+        // Checking it doesn't change for this cell population
+        TS_ASSERT_DELTA(p_cell_210->GetCellData()->GetItem("variable"), 0.6086, 2e-3);// Low threshold as slightly different on Intel
+    }
 };
 
 #endif /*TESTPARABOLICGROWINGDOMAINMODIFIERMETHODS_HPP_*/

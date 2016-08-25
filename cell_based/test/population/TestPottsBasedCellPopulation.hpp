@@ -277,6 +277,32 @@ public:
         TS_ASSERT_THROWS_NOTHING(cell_population.Update());
     }
 
+    void TestIsPdeNodeAssociatedWithApoptoticCell()
+    {
+        // Create a simple 2D PottsMesh
+        PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
+        PottsMesh<2>* p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
+
+        // Create cell population
+        PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+        // Make one cell start apoptosis
+        if (PetscTools::AmMaster())
+        {
+            cell_population.GetCellUsingLocationIndex(0)->StartApoptosis();
+        }
+
+        cell_population.Update();
+
+        TS_ASSERT_EQUALS(cell_population.IsPdeNodeAssociatedWithApoptoticCell(0), true);
+        TS_ASSERT_EQUALS(cell_population.IsPdeNodeAssociatedWithApoptoticCell(1), false);
+    }
+
     void TestAddCell() throw(Exception)
     {
         // Create a simple 2D PottsMesh with one cell
@@ -717,9 +743,58 @@ public:
 
         MutableMesh<2,2>* p_mutable_mesh = cell_population.GetMutableMesh();
 
-        //Check it has the correct number of nodes and elements
+        // Check it has the correct number of nodes and elements
         TS_ASSERT_EQUALS(p_mutable_mesh->GetNumNodes(), p_mesh->GetNumNodes());
         TS_ASSERT_EQUALS(p_mutable_mesh->GetNumElements(), 18u);
+    }
+
+    void TestGetTetrahedralMeshForPdeModifier() throw(Exception)
+    {
+        // Create a simple 2D PottsMesh
+        PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
+        PottsMesh<2>* p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
+
+        // Create cell population
+        PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+        TetrahedralMesh<2,2>* p_tet_mesh = cell_population.GetTetrahedralMeshForPdeModifier();
+
+        // Check it has the correct number of nodes and elements
+        TS_ASSERT_EQUALS(p_tet_mesh->GetNumNodes(), 4u);
+        TS_ASSERT_EQUALS(p_tet_mesh->GetNumElements(), 2u);
+
+        // Check some nodes have the correct locations
+        TS_ASSERT_DELTA(p_tet_mesh->GetNode(0)->rGetLocation()[0], 0.5, 1e-6);
+        TS_ASSERT_DELTA(p_tet_mesh->GetNode(0)->rGetLocation()[1], 0.5, 1e-6);
+        TS_ASSERT_DELTA(p_tet_mesh->GetNode(1)->rGetLocation()[0], 2.5, 1e-6);
+        TS_ASSERT_DELTA(p_tet_mesh->GetNode(1)->rGetLocation()[1], 0.5, 1e-6);
+        TS_ASSERT_DELTA(p_tet_mesh->GetNode(2)->rGetLocation()[0], 0.5, 1e-6);
+        TS_ASSERT_DELTA(p_tet_mesh->GetNode(2)->rGetLocation()[1], 2.5, 1e-6);
+    }
+
+    void TestGetCellDataItemAtPdeNode() throw (Exception)
+    {
+        PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
+        PottsMesh<2>* p_mesh = generator.GetMesh();
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
+
+        PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+        std::string var_name = "foo";
+        TS_ASSERT_THROWS_THIS(cell_population.GetCellDataItemAtPdeNode(0,var_name),
+            "The item foo is not stored");
+
+        cell_population.GetCellUsingLocationIndex(0)->GetCellData()->SetItem(var_name, 3.14);
+
+        TS_ASSERT_DELTA(cell_population.GetCellDataItemAtPdeNode(0,var_name), 3.14, 1e-6);
     }
 };
 

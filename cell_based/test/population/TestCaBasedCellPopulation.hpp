@@ -511,6 +511,36 @@ public:
         TS_ASSERT_THROWS_NOTHING(cell_population.Update());
     }
 
+    void TestIsPdeNodeAssociatedWithApoptoticCell()
+    {
+        // Create a simple 2D PottsMesh
+        PottsMeshGenerator<2> generator(5, 0, 0, 5, 0, 0);
+        PottsMesh<2>* p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, 2);
+
+        std::vector<unsigned> location_indices;
+        location_indices.push_back(12);
+        location_indices.push_back(13);
+
+        // Create cell population
+        CaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
+
+        // Make one cell start apoptosis
+        if (PetscTools::AmMaster())
+        {
+            cell_population.GetCellUsingLocationIndex(12)->StartApoptosis();
+        }
+
+        cell_population.Update();
+
+        TS_ASSERT_EQUALS(cell_population.IsPdeNodeAssociatedWithApoptoticCell(0), true);
+        TS_ASSERT_EQUALS(cell_population.IsPdeNodeAssociatedWithApoptoticCell(1), false);
+    }
+
     void TestAddCell() throw(Exception)
     {
         // Create a simple 2D PottsMesh
@@ -607,7 +637,7 @@ public:
 
     void TestUpdateCellLocationsExceptions()
     {
-        // Create a simple 2D PottsMesh with one cells
+        // Create a simple 2D PottsMesh with one cell
         PottsMeshGenerator<2> generator(3, 0, 0, 3, 0, 0);
         PottsMesh<2>* p_mesh = generator.GetMesh();
 
@@ -847,6 +877,38 @@ public:
             // Tidy up
             delete p_cell_population;
         }
+    }
+
+    void TestGetTetrahedralMeshForPdeModifier() throw(Exception)
+    {
+        PottsMeshGenerator<2> generator(3, 0, 0, 3, 0, 0);
+        PottsMesh<2>* p_mesh = generator.GetMesh();
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, 9);
+
+        std::vector<unsigned> location_indices;
+        for (unsigned i=0; i<9; i++)
+        {
+            location_indices.push_back(i);
+        }
+
+        CaBasedCellPopulation<2u> cell_population(*p_mesh, cells, location_indices);
+
+        TetrahedralMesh<2,2>* p_tet_mesh = cell_population.GetTetrahedralMeshForPdeModifier();
+
+        // Check it has the correct number of nodes and elements
+        TS_ASSERT_EQUALS(p_tet_mesh->GetNumNodes(), p_mesh->GetNumNodes());
+        TS_ASSERT_EQUALS(p_tet_mesh->GetNumElements(), 8u);
+
+        // Check some nodes have the correct locations
+        TS_ASSERT_DELTA(p_tet_mesh->GetNode(0)->rGetLocation()[0], 0.0, 1e-6);
+        TS_ASSERT_DELTA(p_tet_mesh->GetNode(0)->rGetLocation()[1], 0.0, 1e-6);
+        TS_ASSERT_DELTA(p_tet_mesh->GetNode(3)->rGetLocation()[0], 0.0, 1e-6);
+        TS_ASSERT_DELTA(p_tet_mesh->GetNode(3)->rGetLocation()[1], 1.0, 1e-6);
+        TS_ASSERT_DELTA(p_tet_mesh->GetNode(7)->rGetLocation()[0], 1.0, 1e-6);
+        TS_ASSERT_DELTA(p_tet_mesh->GetNode(7)->rGetLocation()[1], 2.0, 1e-6);
     }
 };
 

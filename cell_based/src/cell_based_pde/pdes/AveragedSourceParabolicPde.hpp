@@ -44,13 +44,23 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractLinearParabolicPde.hpp"
 
 /**
- * A parabolic PDE to be solved numerically using the finite element method.
+ * A parabolic PDE to be solved numerically using the finite element method, for
+ * coupling to a cell population.
  *
- * \todo State the actual PDE (#2687)
+ * The PDE takes the form
  *
- * Here, the source term at a point is defined to be the number of non-apoptotic
- * cells whose centres lie in the finite element containing that point, scaled
- * by the area of that element.
+ * c*du/dt = Grad.(D*Grad(u)) + k*u*rho(x),
+ *
+ * where the scalars c, D and k are specified by the members mDuDtCoefficient,
+ * mDiffusionCoefficient and mUptakeCoefficient, respectively. Their values must
+ * be set in the constructor.
+ *
+ * The function rho(x) denotes the local density of non-apoptotic cells. This
+ * quantity is computed for each element of a 'coarse' finite element mesh that is
+ * passed to the method SetupSourceTerms() and stored in the member mCellDensityOnCoarseElements.
+ * For a point x, rho(x) is defined to be the number of non-apoptotic cells whose
+ * centres lie in each finite element containing that point, scaled by the area of
+ * that element.
  *
  *  \todo this is the parabolic version of AveragedSourcePde; we should refactor the common functionality (#2687)
  */
@@ -107,8 +117,8 @@ public:
      * @param uptakeCoefficient coefficient of the rate of uptake of the dependent variable by non-apoptotic cells (defaults to 0.0)
      */
     AveragedSourceParabolicPde(AbstractCellPopulation<DIM, DIM>& rCellPopulation,
-                               double duDtCoefficient = 1.0,
-                               double diffusionCoefficient = 1.0,
+                               double duDtCoefficient=1.0,
+                               double diffusionCoefficient=1.0,
                                double uptakeCoefficient = 0.0);
 
     /**

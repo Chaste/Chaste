@@ -34,19 +34,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "AbstractGrowingDomainPdeModifier.hpp"
-#include "NodeBasedCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
 #include "MeshBasedCellPopulation.hpp"
-#include "MeshBasedCellPopulationWithGhostNodes.hpp"
-#include "PottsBasedCellPopulation.hpp"
 #include "CaBasedCellPopulation.hpp"
 #include "ReplicatableVector.hpp"
 #include "LinearBasisFunction.hpp"
 
 template<unsigned DIM>
 AbstractGrowingDomainPdeModifier<DIM>::AbstractGrowingDomainPdeModifier()
-
-: AbstractPdeModifier<DIM>()
+    : AbstractPdeModifier<DIM>()
 {
 }
 
@@ -58,6 +54,8 @@ AbstractGrowingDomainPdeModifier<DIM>::~AbstractGrowingDomainPdeModifier()
 template<unsigned DIM>
 void AbstractGrowingDomainPdeModifier<DIM>::GenerateFeMesh(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
+    ///\todo Improve memory management, e.g. by making mpFeMesh a shared_ptr (#2687)
+
     if (this->mDeleteMesh)
     {
         // If a mesh has been created on a previous time-step then we need to tidy it up
@@ -65,79 +63,9 @@ void AbstractGrowingDomainPdeModifier<DIM>::GenerateFeMesh(AbstractCellPopulatio
         delete this->mpFeMesh;
     }
 
-    // Get FE mesh from cell population different for each type of cell population
-    if (dynamic_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL)
-    {
-        if (dynamic_cast<MeshBasedCellPopulationWithGhostNodes<DIM>*>(&rCellPopulation) != NULL)
-        {
-            EXCEPTION("Currently can't solve PDEs on meshes with ghost nodes");
-        }
-        else
-        {
-            this->mpFeMesh = &(static_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation)->rGetMesh());
-        }
-    }
-    else if (dynamic_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL)
-    {
-        std::vector<Node<DIM> *> nodes;
-
-        // Get the nodes of the NodesOnlyMesh
-        for (typename AbstractMesh<DIM,DIM>::NodeIterator node_iter = rCellPopulation.rGetMesh().GetNodeIteratorBegin();
-             node_iter != rCellPopulation.rGetMesh().GetNodeIteratorEnd();
-             ++node_iter)
-        {
-            nodes.push_back(new Node<DIM>(node_iter->GetIndex(), node_iter->rGetLocation()));
-        }
-
-        this->mDeleteMesh = true;
-        this->mpFeMesh = new MutableMesh<DIM,DIM>(nodes);
-        assert(this->mpFeMesh->GetNumNodes() == rCellPopulation.GetNumRealCells());
-
-    }
-    else if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL)
-    {
-        // GetTetrahedralMeshUsingVertexMesh will '''make''' a new mesh so we better be sure to delete it
-        this->mDeleteMesh = true;
-        this->mpFeMesh = static_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation)->GetTetrahedralMeshUsingVertexMesh();
-    }
-    else if (dynamic_cast<PottsBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL)
-    {
-        std::vector<Node<DIM>*> nodes;
-
-        // Create nodes at the centre of the cells
-        for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
-             cell_iter != rCellPopulation.End();
-             ++cell_iter)
-        {
-            nodes.push_back(new Node<DIM>(rCellPopulation.GetLocationIndexUsingCell(*cell_iter), rCellPopulation.GetLocationOfCellCentre(*cell_iter)));
-        }
-
-        this->mDeleteMesh = true;
-        this->mpFeMesh = new MutableMesh<DIM,DIM>(nodes);
-        assert(this->mpFeMesh->GetNumNodes() == rCellPopulation.GetNumRealCells());
-    }
-    else if (dynamic_cast<CaBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL)
-    {
-        std::vector<Node<DIM> *> nodes;
-
-        // Create nodes at the centre of the cells
-        unsigned cell_index = 0;
-        for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
-             cell_iter != rCellPopulation.End();
-             ++cell_iter)
-        {
-            nodes.push_back(new Node<DIM>(cell_index, rCellPopulation.GetLocationOfCellCentre(*cell_iter)));
-            cell_index++;
-        }
-
-        this->mDeleteMesh = true;
-        this->mpFeMesh = new MutableMesh<DIM,DIM>(nodes);
-        assert(this->mpFeMesh->GetNumNodes() == rCellPopulation.GetNumRealCells());
-    }
-    else
-    {
-        NEVER_REACHED;
-    }
+    // Get the finite element mesh via the cell population
+    this->mDeleteMesh = (dynamic_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation) == NULL);
+    this->mpFeMesh = rCellPopulation.GetTetrahedralMeshForPdeModifier();
 }
 
 template<unsigned DIM>
