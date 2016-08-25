@@ -91,7 +91,7 @@ protected:
     AbstractCellPopulation<DIM>* mpCellPopulation;
 
     /** Vector of pointers to linear elliptic PDE objects with additional boundary condition information. */
-    std::vector<PdeAndBoundaryConditions<DIM>*> mPdeAndBcCollection;
+    std::vector<EllipticPdeAndBoundaryConditions<DIM>*> mPdeAndBcCollection;
 
     /** A cache of where the results are going (used for VTK writer). */
     std::string mDirPath;
@@ -253,7 +253,7 @@ public:
      * @return the full boundary conditions container
      */
     virtual std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ConstructBoundaryConditionsContainer(
-            PdeAndBoundaryConditions<DIM>* pPdeAndBc,
+            EllipticPdeAndBoundaryConditions<DIM>* pPdeAndBc,
             TetrahedralMesh<DIM,DIM>* pMesh);
 
     /**
@@ -320,7 +320,7 @@ public:
      *
      * @param pPdeAndBc a pointer to a PdeAndBoundaryConditions object
      */
-    void AddPdeAndBc(PdeAndBoundaryConditions<DIM>* pPdeAndBc);
+    void AddPdeAndBc(EllipticPdeAndBoundaryConditions<DIM>* pPdeAndBc);
 
     /**
      * Output parameters to file.

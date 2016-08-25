@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "ParabolicPdeAndBoundaryConditions.hpp"
+#include "AveragedSourceParabolicPde.hpp"
 
 template<unsigned DIM>
 ParabolicPdeAndBoundaryConditions<DIM>::ParabolicPdeAndBoundaryConditions(AbstractLinearParabolicPde<DIM,DIM>* pPde,

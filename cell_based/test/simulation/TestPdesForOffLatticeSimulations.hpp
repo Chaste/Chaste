@@ -39,7 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 
 #include "MeshBasedCellPopulation.hpp"
-#include "SimpleUniformSourcePde.hpp"
+#include "UniformSourceEllipticPde.hpp"
 #include "CellwiseSourceEllipticPde.hpp"
 #include "AveragedSourceEllipticPde.hpp"
 #include "HoneycombMeshGenerator.hpp"
@@ -54,14 +54,14 @@ class TestPdesForOffLatticeSimulations : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestSimpleUniformSourcePde()
+    void TestUniformSourceEllipticPde()
     {
         // Set up mesh
         HoneycombMeshGenerator generator(5, 5, 0);
         TetrahedralMesh<2,2>* p_mesh = generator.GetMesh();
 
         // Set up PDE
-        SimpleUniformSourcePde<2> pde(-1.0);
+        UniformSourceEllipticPde<2> pde(-1.0);
 
         // Test Compute source term
         ChastePoint<2> unused_point;

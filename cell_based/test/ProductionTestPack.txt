@@ -1,6 +1,7 @@
 cell/TestOdeBasedCellCycleModels.hpp
 cell/TestSimpleCellCycleModels.hpp
 cell/TestCell.hpp
+cell_based_pde/TestEllipticPdeAndBoundaryConditions.hpp
 common/TestSimulationTime.hpp
 odes/TestAlarcon2004OxygenBasedCellCycleOdeSystem.hpp
 odes/TestTysonNovak2001OdeSystem.hpp
@@ -9,4 +10,3 @@ simulation/TestOffLatticeSimulationWithPdes.hpp
 population/TestCellKillers.hpp
 population/TestMeshBasedCellPopulation.hpp
 population/TestNodeBasedCellPopulation.hpp
-population/TestPdeAndBoundaryConditions.hpp

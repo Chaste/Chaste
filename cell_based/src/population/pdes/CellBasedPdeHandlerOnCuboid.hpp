@@ -103,7 +103,7 @@ public:
      * @return The full boundary conditions container
      */
     std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ConstructBoundaryConditionsContainer(
-            PdeAndBoundaryConditions<DIM>* pPdeAndBc,
+            EllipticPdeAndBoundaryConditions<DIM>* pPdeAndBc,
             TetrahedralMesh<DIM,DIM>* pMesh);
 
     /**

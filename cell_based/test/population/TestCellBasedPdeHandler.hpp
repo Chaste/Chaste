@@ -51,7 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MeshBasedCellPopulation.hpp"
 #include "NodeBasedCellPopulation.hpp"
 #include "CellwiseSourceEllipticPde.hpp"
-#include "SimpleUniformSourcePde.hpp"
+#include "UniformSourceEllipticPde.hpp"
 #include "ConstBoundaryCondition.hpp"
 #include "PetscSetupAndFinalize.hpp"
 #include "ReplicatableVector.hpp"
@@ -150,7 +150,7 @@ public:
         TS_ASSERT_EQUALS(pde_handler.GetImposeBcsOnCoarseBoundary(), false);
 
         // Test AddPdeAndBc()
-        SimpleUniformSourcePde<2> pde(-0.1);
+        UniformSourceEllipticPde<2> pde(-0.1);
         ConstBoundaryCondition<2> bc(1.0);
         EllipticPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("averaged quantity");
@@ -450,7 +450,7 @@ public:
         TS_ASSERT_DELTA(norm_2(centre_difference), 0.0, 1e-4);
 
         // Test that UseCoarsePdeMesh()  throws an exception if the wrong type of PDE is specified
-        SimpleUniformSourcePde<2> pde2(-0.1);
+        UniformSourceEllipticPde<2> pde2(-0.1);
         ConstBoundaryCondition<2> bc2(1.0);
         EllipticPdeAndBoundaryConditions<2> pde_and_bc2(&pde2, &bc2, false);
         pde_and_bc2.SetDependentVariableName("second variable");

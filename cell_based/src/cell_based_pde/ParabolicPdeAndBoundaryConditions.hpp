@@ -54,7 +54,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * accessed via the PdeModifier classes.
  */
 template<unsigned DIM>
-class ParabolicPdeAndBoundaryConditions : public AbstractPdeAndBoundaryConditions
+class ParabolicPdeAndBoundaryConditions : public AbstractPdeAndBoundaryConditions<DIM>
 {
     friend class TestParabolicPdeAndBoundaryConditions;
 

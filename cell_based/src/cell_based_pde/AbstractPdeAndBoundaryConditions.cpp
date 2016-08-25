@@ -115,7 +115,3 @@ std::string& AbstractPdeAndBoundaryConditions<DIM>::rGetDependentVariableName()
 template class AbstractPdeAndBoundaryConditions<1>;
 template class AbstractPdeAndBoundaryConditions<2>;
 template class AbstractPdeAndBoundaryConditions<3>;
-
-// Serialization for Boost >= 1.36
-#include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(AbstractPdeAndBoundaryConditions)

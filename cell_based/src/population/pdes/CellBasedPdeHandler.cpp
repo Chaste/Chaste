@@ -96,7 +96,7 @@ TetrahedralMesh<DIM,DIM>* CellBasedPdeHandler<DIM>::GetCoarsePdeMesh()
 }
 
 template<unsigned DIM>
-void CellBasedPdeHandler<DIM>::AddPdeAndBc(PdeAndBoundaryConditions<DIM>* pPdeAndBc)
+void CellBasedPdeHandler<DIM>::AddPdeAndBc(EllipticPdeAndBoundaryConditions<DIM>* pPdeAndBc)
 {
     if (!mPdeAndBcCollection.empty() && (pPdeAndBc->rGetDependentVariableName()==""))
     {
@@ -337,7 +337,7 @@ void CellBasedPdeHandler<DIM>::SolvePdeAndWriteResultsToFile(unsigned samplingTi
     for (unsigned pde_index=0; pde_index<mPdeAndBcCollection.size(); pde_index++)
     {
         // Get pointer to this PdeAndBoundaryConditions object
-        PdeAndBoundaryConditions<DIM>* p_pde_and_bc = mPdeAndBcCollection[pde_index];
+        EllipticPdeAndBoundaryConditions<DIM>* p_pde_and_bc = mPdeAndBcCollection[pde_index];
 
         // Set up boundary conditions
         std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc = ConstructBoundaryConditionsContainer(p_pde_and_bc, p_mesh);
@@ -477,7 +477,7 @@ void CellBasedPdeHandler<DIM>::SolvePdeAndWriteResultsToFile(unsigned samplingTi
 
 template<unsigned DIM>
 std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > CellBasedPdeHandler<DIM>::ConstructBoundaryConditionsContainer(
-        PdeAndBoundaryConditions<DIM>* pPdeAndBc,
+        EllipticPdeAndBoundaryConditions<DIM>* pPdeAndBc,
         TetrahedralMesh<DIM,DIM>* pMesh)
 {
     std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc(new BoundaryConditionsContainer<DIM,DIM,1>(false));
@@ -601,7 +601,7 @@ void CellBasedPdeHandler<DIM>::WritePdeSolution(double time)
         {
             if (mpCoarsePdeMesh != NULL)
             {
-                PdeAndBoundaryConditions<DIM>* p_pde_and_bc = mPdeAndBcCollection[pde_index];
+                EllipticPdeAndBoundaryConditions<DIM>* p_pde_and_bc = mPdeAndBcCollection[pde_index];
                 assert(p_pde_and_bc->rGetDependentVariableName() != "");
 
 #ifdef CHASTE_VTK
@@ -766,7 +766,7 @@ double CellBasedPdeHandler<DIM>::GetPdeSolutionAtPoint(const c_vector<double,DIM
     {
         EXCEPTION("Tried to get the solution of a variable name: " + rVariable + ". There is no PDE with that variable.");
     }
-    PdeAndBoundaryConditions<DIM>* p_pde_and_bc = mPdeAndBcCollection[pde_index];
+    EllipticPdeAndBoundaryConditions<DIM>* p_pde_and_bc = mPdeAndBcCollection[pde_index];
 
     Element<DIM,DIM>* p_containing_element;
 

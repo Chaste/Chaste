@@ -55,7 +55,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DifferentiatedCellProliferativeType.hpp"
 #include "ApoptoticCellProperty.hpp"
 #include "FixedG1GenerationalCellCycleModel.hpp"
-#include "SimpleUniformSourcePde.hpp"
+#include "UniformSourceEllipticPde.hpp"
 #include "CellwiseSourceEllipticPde.hpp"
 #include "ConstBoundaryCondition.hpp"
 #include "PetscSetupAndFinalize.hpp"
@@ -248,7 +248,7 @@ public:
         TS_ASSERT_EQUALS(simulator.GetIdentifier(), "OffLatticeSimulation-2-2");
 
         // Set up PDE and pass to simulation via handler
-        SimpleUniformSourcePde<2> pde(-0.1);
+        UniformSourceEllipticPde<2> pde(-0.1);
         ConstBoundaryCondition<2> bc(1.0);
         EllipticPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("oxygen");
@@ -522,7 +522,7 @@ public:
         simulator.SetEndTime(1.0/120.0);
 
         // Set up PDE and pass to simulation via handler
-        SimpleUniformSourcePde<2> pde(-0.1);
+        UniformSourceEllipticPde<2> pde(-0.1);
         ConstBoundaryCondition<2> bc(1.0);
         EllipticPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("oxygen");
@@ -859,7 +859,7 @@ public:
         simulator.SetEndTime(0.2);
 
         // Set up PDE and pass to simulation via handler
-        SimpleUniformSourcePde<2> pde(-0.1);
+        UniformSourceEllipticPde<2> pde(-0.1);
         ConstBoundaryCondition<2> bc(1.0);
         EllipticPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("oxygen");
@@ -1020,7 +1020,7 @@ public:
         simulator.SetEndTime(0.1);
 
         // Set up PDE and pass to simulation via handler
-        SimpleUniformSourcePde<3> pde(-0.03);
+        UniformSourceEllipticPde<3> pde(-0.03);
         ConstBoundaryCondition<3> bc(1.0);
         EllipticPdeAndBoundaryConditions<3> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("oxygen");

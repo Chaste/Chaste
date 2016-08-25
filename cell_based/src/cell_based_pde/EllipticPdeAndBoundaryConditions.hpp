@@ -58,7 +58,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *       and merge, or create shared parent class, with ParabolicPdeAndBoundaryConditions (#2767)
  */
 template<unsigned DIM>
-class EllipticPdeAndBoundaryConditions : public AbstractPdeAndBoundaryConditions
+class EllipticPdeAndBoundaryConditions : public AbstractPdeAndBoundaryConditions<DIM>
 {
     friend class TestEllipticPdeAndBoundaryConditions;
 
@@ -95,7 +95,7 @@ public:
      * @param deleteMemberPointersInDestructor whether to delete member pointers in the destructor
      *     (defaults to false)
      */
-    PdeAndBoundaryConditions(AbstractLinearEllipticPde<DIM,DIM>* pPde=NULL,
+    EllipticPdeAndBoundaryConditions(AbstractLinearEllipticPde<DIM,DIM>* pPde=NULL,
                              AbstractBoundaryCondition<DIM>* pBoundaryCondition=NULL,
                              bool isNeumannBoundaryCondition=true,
                              Vec solution=NULL,
@@ -104,7 +104,7 @@ public:
     /**
      * Destructor.
      */
-    ~PdeAndBoundaryConditions();
+    ~EllipticPdeAndBoundaryConditions();
 
     /**
      * @return mpPde

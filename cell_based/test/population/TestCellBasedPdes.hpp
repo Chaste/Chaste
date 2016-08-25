@@ -43,7 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ArchiveOpener.hpp"
 #include "ArchiveLocationInfo.hpp"
-#include "SimpleUniformSourcePde.hpp"
+#include "UniformSourceEllipticPde.hpp"
 #include "CellwiseSourceEllipticPde.hpp"
 #include "AveragedSourceEllipticPde.hpp"
 #include "VolumeDependentAveragedSourceEllipticPde.hpp"
@@ -65,12 +65,12 @@ class TestCellBasedPdes : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestSimpleUniformSourcePdeMethods() throw(Exception)
+    void TestUniformSourceEllipticPdeMethods() throw(Exception)
     {
         EXIT_IF_PARALLEL;
 
         // Create a PDE object
-        SimpleUniformSourcePde<2> pde(0.05);
+        UniformSourceEllipticPde<2> pde(0.05);
 
         // Test that the member variables have been initialised correctly
         TS_ASSERT_DELTA(pde.GetCoefficient(), 0.05, 1e-6);
@@ -95,17 +95,17 @@ public:
         }
     }
 
-    void TestSimpleUniformSourcePdeArchiving() throw(Exception)
+    void TestUniformSourceEllipticPdeArchiving() throw(Exception)
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
 
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
-        std::string archive_file = "SimpleUniformSourcePde.arch";
-        ArchiveLocationInfo::SetMeshFilename("SimpleUniformSourcePde");
+        std::string archive_file = "UniformSourceEllipticPde.arch";
+        ArchiveLocationInfo::SetMeshFilename("UniformSourceEllipticPde");
 
         {
             // Create a PDE object
-            AbstractLinearEllipticPde<2,2>* const p_pde = new SimpleUniformSourcePde<2>(0.05);
+            AbstractLinearEllipticPde<2,2>* const p_pde = new UniformSourceEllipticPde<2>(0.05);
 
             // Create output archive and archive PDE object
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
@@ -124,9 +124,9 @@ public:
             (*p_arch) >> p_pde;
 
             // Test that the PDE and its member variables were archived correctly
-            TS_ASSERT(dynamic_cast<SimpleUniformSourcePde<2>*>(p_pde) != NULL);
+            TS_ASSERT(dynamic_cast<UniformSourceEllipticPde<2>*>(p_pde) != NULL);
 
-            SimpleUniformSourcePde<2>* p_static_cast_pde = static_cast<SimpleUniformSourcePde<2>*>(p_pde);
+            UniformSourceEllipticPde<2>* p_static_cast_pde = static_cast<UniformSourceEllipticPde<2>*>(p_pde);
             TS_ASSERT_DELTA(p_static_cast_pde->GetCoefficient(), 0.05, 1e-6);
 
             delete p_pde;

@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef SIMPLEUNIFORMSOURCEPDE_HPP_
-#define SIMPLEUNIFORMSOURCEPDE_HPP_
+#ifndef UNIFORMSOURCEELLIPTICPDE_HPP_
+#define UNIFORMSOURCEELLIPTICPDE_HPP_
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
@@ -42,13 +42,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractLinearEllipticPde.hpp"
 
 /**
+ * \todo Improve documentation (#2687)
+ *
  * A simple nutrient PDE which is not directly coupled to the cell population.
  *
  * \todo Rename as UniformSourceEllipticPde and move to cell_based/src/cell_based_pde/pdes (#2687)
  */
 template<unsigned DIM>
-class SimpleUniformSourcePde : public AbstractLinearEllipticPde<DIM,DIM>
+class UniformSourceEllipticPde : public AbstractLinearEllipticPde<DIM,DIM>
 {
+	///\todo Move TestCellBasedPdes into cell_based/test/cell_based_pde (#2687)
     friend class TestCellBasedPdes;
 
 private:
@@ -78,7 +81,7 @@ public:
      *
      * @param coefficient the coefficient of consumption of nutrient by cells (defaults to 0.0)
      */
-    SimpleUniformSourcePde(double coefficient=0.0);
+    UniformSourceEllipticPde(double coefficient=0.0);
 
     /**
      * @return mCoefficient
@@ -118,6 +121,6 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(SimpleUniformSourcePde)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(UniformSourceEllipticPde)
 
-#endif /*SIMPLEUNIFORMSOURCEPDE_HPP_*/
+#endif /*UNIFORMSOURCEELLIPTICPDE_HPP_*/

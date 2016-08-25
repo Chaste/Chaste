@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "EllipticPdeAndBoundaryConditions.hpp"
+#include "AveragedSourceEllipticPde.hpp"
 
 template<unsigned DIM>
 EllipticPdeAndBoundaryConditions<DIM>::EllipticPdeAndBoundaryConditions(AbstractLinearEllipticPde<DIM,DIM>* pPde,
@@ -50,7 +51,7 @@ template<unsigned DIM>
 EllipticPdeAndBoundaryConditions<DIM>::~EllipticPdeAndBoundaryConditions()
 {
     // Avoid memory leaks if the object was loaded from an archive
-    if (mDeleteMemberPointersInDestructor)
+    if (this->mDeleteMemberPointersInDestructor)
     {
         delete mpPde;
     }
@@ -76,10 +77,10 @@ void EllipticPdeAndBoundaryConditions<DIM>::SetUpSourceTermsForAveragedSourcePde
 }
 
 // Explicit instantiation
-template class PdeAndBoundaryConditions<1>;
-template class PdeAndBoundaryConditions<2>;
-template class PdeAndBoundaryConditions<3>;
+template class EllipticPdeAndBoundaryConditions<1>;
+template class EllipticPdeAndBoundaryConditions<2>;
+template class EllipticPdeAndBoundaryConditions<3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(PdeAndBoundaryConditions)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(EllipticPdeAndBoundaryConditions)

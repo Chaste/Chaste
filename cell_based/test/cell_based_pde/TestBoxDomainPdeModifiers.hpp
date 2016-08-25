@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ParabolicBoxDomainPdeModifier.hpp"
 #include "EllipticPdeAndBoundaryConditions.hpp"
 #include "ParabolicPdeAndBoundaryConditions.hpp"
-#include "SimpleUniformSourcePde.hpp"
+#include "UniformSourceEllipticPde.hpp"
 #include "UniformSourceParabolicPde.hpp"
 #include "ConstBoundaryCondition.hpp"
 #include "ArchiveOpener.hpp"
@@ -60,7 +60,7 @@ public:
     void TestEllipticConstructor() throw(Exception)
     {
         // Make the PDE and BCs
-        SimpleUniformSourcePde<2> pde(-0.1);
+        UniformSourceEllipticPde<2> pde(-0.1);
         ConstBoundaryCondition<2> bc(1.0);
         MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
         p_pde_and_bc->SetDependentVariableName("averaged quantity");
@@ -141,7 +141,7 @@ public:
         // Separate scope to write the archive
         {
             // Make the PDE and BCs
-            SimpleUniformSourcePde<2> pde(-0.1);
+            UniformSourceEllipticPde<2> pde(-0.1);
             ConstBoundaryCondition<2> bc(1.0);
             MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
             p_pde_and_bc->SetDependentVariableName("averaged quantity");

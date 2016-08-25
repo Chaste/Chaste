@@ -51,7 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * and ParabolicPdeAndBoundaryConditions.
  */
 template<unsigned DIM>
-class ABSTRACTPDEANDBOUNDARYCONDITIONS
+class AbstractPdeAndBoundaryConditions
 {
 private:
 
@@ -71,6 +71,8 @@ private:
         archive & mIsNeumannBoundaryCondition;
         archive & mDependentVariableName;
     }
+
+protected:
 
     /** Pointer to a boundary condition object. */
     AbstractBoundaryCondition<DIM>* mpBoundaryCondition;
@@ -102,21 +104,15 @@ public:
      * @param deleteMemberPointersInDestructor whether to delete member pointers in the destructor
      *     (defaults to false)
      */
-    AbstractPdeAndBoundaryConditions(AbstractLinearParabolicPde<DIM,DIM>* pPde=NULL,
-                             AbstractBoundaryCondition<DIM>* pBoundaryCondition=NULL,
-                             bool isNeumannBoundaryCondition=true,
-                             Vec solution=NULL,
-                             bool deleteMemberPointersInDestructor=false);
+    AbstractPdeAndBoundaryConditions(AbstractBoundaryCondition<DIM>* pBoundaryCondition=NULL,
+                                     bool isNeumannBoundaryCondition=true,
+                                     Vec solution=NULL,
+                                     bool deleteMemberPointersInDestructor=false);
 
     /**
      * Destructor.
      */
     ~AbstractPdeAndBoundaryConditions();
-
-    /**
-     * @return mpPde
-     */
-    AbstractLinearParabolicPde<DIM,DIM>* GetPde();
 
     /**
      * @return mpBoundaryCondition
@@ -179,9 +175,8 @@ public:
     std::string& rGetDependentVariableName();
 };
 
-#include "SerializationExportWrapper.hpp"
 // Declare identifier for the serializer
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(AbstractPdeAndBoundaryConditions)
+TEMPLATED_CLASS_IS_ABSTRACT_1_UNSIGNED(AbstractPdeAndBoundaryConditions)
 
 namespace boost
 {

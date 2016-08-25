@@ -33,43 +33,43 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "SimpleUniformSourcePde.hpp"
+#include "UniformSourceEllipticPde.hpp"
 
 template<unsigned DIM>
-SimpleUniformSourcePde<DIM>::SimpleUniformSourcePde(double coefficient)
+UniformSourceEllipticPde<DIM>::UniformSourceEllipticPde(double coefficient)
     : mCoefficient(coefficient)
 {
 }
 
 template<unsigned DIM>
-double SimpleUniformSourcePde<DIM>::GetCoefficient() const
+double UniformSourceEllipticPde<DIM>::GetCoefficient() const
 {
     return mCoefficient;
 }
 
 template<unsigned DIM>
-double SimpleUniformSourcePde<DIM>::ComputeConstantInUSourceTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement)
+double UniformSourceEllipticPde<DIM>::ComputeConstantInUSourceTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement)
 {
     return 0.0;
 }
 
 template<unsigned DIM>
-double SimpleUniformSourcePde<DIM>::ComputeLinearInUCoeffInSourceTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement)
+double UniformSourceEllipticPde<DIM>::ComputeLinearInUCoeffInSourceTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement)
 {
     return mCoefficient;
 }
 
 template<unsigned DIM>
-c_matrix<double,DIM,DIM> SimpleUniformSourcePde<DIM>::ComputeDiffusionTerm(const ChastePoint<DIM>& rX)
+c_matrix<double,DIM,DIM> UniformSourceEllipticPde<DIM>::ComputeDiffusionTerm(const ChastePoint<DIM>& rX)
 {
     return identity_matrix<double>(DIM);
 }
 
 // Explicit instantiation
-template class SimpleUniformSourcePde<1>;
-template class SimpleUniformSourcePde<2>;
-template class SimpleUniformSourcePde<3>;
+template class UniformSourceEllipticPde<1>;
+template class UniformSourceEllipticPde<2>;
+template class UniformSourceEllipticPde<3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(SimpleUniformSourcePde)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(UniformSourceEllipticPde)
