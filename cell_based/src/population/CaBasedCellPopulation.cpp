@@ -543,7 +543,7 @@ double CaBasedCellPopulation<DIM>::GetWidth(const unsigned& rDimension)
 template<unsigned DIM>
 void CaBasedCellPopulation<DIM>::AddUpdateRule(boost::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule)
 {
-	// The update rule must be derived from AbstractCaUpdateRule or AbstractCaSwitchingUpdateRule
+    // The update rule must be derived from AbstractCaUpdateRule or AbstractCaSwitchingUpdateRule
     assert(bool(dynamic_cast<AbstractCaUpdateRule<DIM>*>(pUpdateRule.get())) ||
            bool(dynamic_cast<AbstractCaSwitchingUpdateRule<DIM>*>(pUpdateRule.get())));
 
@@ -553,7 +553,7 @@ void CaBasedCellPopulation<DIM>::AddUpdateRule(boost::shared_ptr<AbstractUpdateR
     }
     else
     {
-    	mSwitchingUpdateRuleCollection.push_back(pUpdateRule);
+        mSwitchingUpdateRuleCollection.push_back(pUpdateRule);
     }
 }
 
@@ -570,16 +570,16 @@ void CaBasedCellPopulation<DIM>::RemoveAllUpdateRules()
 template<unsigned DIM>
 const std::vector<boost::shared_ptr<AbstractUpdateRule<DIM> > > CaBasedCellPopulation<DIM>::GetUpdateRuleCollection() const
 {
-	std::vector<boost::shared_ptr<AbstractUpdateRule<DIM> > > update_rules;
+    std::vector<boost::shared_ptr<AbstractUpdateRule<DIM> > > update_rules;
 
-	for (unsigned i=0; i<this->mUpdateRuleCollection.size(); i++)
-	{
-		update_rules.push_back(this->mUpdateRuleCollection[i]);
-	}
-	for (unsigned i=0; i<mSwitchingUpdateRuleCollection.size(); i++)
-	{
-		update_rules.push_back(mSwitchingUpdateRuleCollection[i]);
-	}
+    for (unsigned i=0; i<this->mUpdateRuleCollection.size(); i++)
+    {
+        update_rules.push_back(this->mUpdateRuleCollection[i]);
+    }
+    for (unsigned i=0; i<mSwitchingUpdateRuleCollection.size(); i++)
+    {
+        update_rules.push_back(mSwitchingUpdateRuleCollection[i]);
+    }
 
     return update_rules;
 }

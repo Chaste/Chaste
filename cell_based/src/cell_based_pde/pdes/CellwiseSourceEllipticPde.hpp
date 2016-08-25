@@ -46,6 +46,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * A PDE which has a source at each non-apoptotic cell.
+ *
+ * \todo Improve documentation (#2687)
  */
 template<unsigned DIM>
 class CellwiseSourceEllipticPde : public AbstractLinearEllipticPde<DIM,DIM>
@@ -74,7 +76,7 @@ protected:
     /** The cell population member. */
     AbstractCellPopulation<DIM, DIM>& mrCellPopulation;
 
-    /** Coefficient of consumption of nutrient by cells. */
+    /** Coefficient of the rate of uptake of the dependent variable by non-apoptotic cells. */
     double mCoefficient;
 
 public:

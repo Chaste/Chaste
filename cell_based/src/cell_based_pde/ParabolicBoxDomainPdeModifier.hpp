@@ -41,9 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractBoxDomainPdeModifier.hpp"
 #include "ParabolicPdeAndBoundaryConditions.hpp"
-#include "TetrahedralMesh.hpp"
 #include "BoundaryConditionsContainer.hpp"
-#include "ConstBoundaryCondition.hpp"
 
 /**
  * A modifier class in which a parabolic PDE is solved on a box domain and the results are stored in CellData.

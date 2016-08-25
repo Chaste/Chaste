@@ -44,8 +44,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractLinearParabolicPde.hpp"
 
 /**
- *  A parabolic PDE which calculates the source term by adding the number of non apoptotic
- *   cells in the element containing that point and scaling by the element area.
+ * A parabolic PDE to be solved numerically using the finite element method.
+ *
+ * \todo State the actual PDE (#2687)
+ *
+ * Here, the source term at a point is defined to be the number of non-apoptotic
+ * cells whose centres lie in the finite element containing that point, scaled
+ * by the area of that element.
  *
  *  \todo this is the parabolic version of AveragedSourcePde; we should refactor the common functionality (#2687)
  */

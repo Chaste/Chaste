@@ -34,15 +34,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "ParabolicBoxDomainPdeModifier.hpp"
-#include "NodeBasedCellPopulation.hpp"
-#include "VertexBasedCellPopulation.hpp"
-#include "MeshBasedCellPopulation.hpp"
-#include "PottsBasedCellPopulation.hpp"
-#include "CaBasedCellPopulation.hpp"
 #include "TetrahedralMesh.hpp"
-#include "VtkMeshWriter.hpp"
 #include "SimpleLinearParabolicSolver.hpp"
-#include "AveragedSourceParabolicPde.hpp"
 
 template<unsigned DIM>
 ParabolicBoxDomainPdeModifier<DIM>::ParabolicBoxDomainPdeModifier()

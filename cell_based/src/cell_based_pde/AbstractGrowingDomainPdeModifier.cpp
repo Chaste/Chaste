@@ -40,11 +40,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "PottsBasedCellPopulation.hpp"
 #include "CaBasedCellPopulation.hpp"
-#include "TetrahedralMesh.hpp"
-#include "VtkMeshWriter.hpp"
-#include "CellBasedPdeSolver.hpp"
-#include "SimpleLinearEllipticSolver.hpp"
-#include "AveragedSourcePde.hpp"
+#include "ReplicatableVector.hpp"
+#include "LinearBasisFunction.hpp"
 
 template<unsigned DIM>
 AbstractGrowingDomainPdeModifier<DIM>::AbstractGrowingDomainPdeModifier()
@@ -64,11 +61,11 @@ void AbstractGrowingDomainPdeModifier<DIM>::GenerateFeMesh(AbstractCellPopulatio
     if (this->mDeleteMesh)
     {
         // If a mesh has been created on a previous time-step then we need to tidy it up
-        assert (this->mpFeMesh != NULL);
+        assert(this->mpFeMesh != NULL);
         delete this->mpFeMesh;
     }
 
-    // Get FE mesh from Cell Population different for each type of Cell Population
+    // Get FE mesh from cell population different for each type of cell population
     if (dynamic_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL)
     {
         if (dynamic_cast<MeshBasedCellPopulationWithGhostNodes<DIM>*>(&rCellPopulation) != NULL)
@@ -210,6 +207,7 @@ void AbstractGrowingDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulatio
             // Divide by number of containing elements
             solution_gradient /= p_tet_node->GetNumContainingElements();
 
+            ///\todo Investigate why the lines below are commented (#2687)
             switch (DIM)
             {
     //            case 1:

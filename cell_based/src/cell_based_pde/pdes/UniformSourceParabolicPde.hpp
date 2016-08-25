@@ -40,8 +40,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 
 #include "AbstractLinearParabolicPde.hpp"
-#include "ChastePoint.hpp"
-#include "Element.hpp"
 
 /**
  * A simple parabolic PDE used in tests.

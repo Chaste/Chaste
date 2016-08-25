@@ -73,6 +73,7 @@ double CellwiseSourceEllipticPde<DIM>::ComputeLinearInUCoeffInSourceTerm(const C
     return 0.0;
 }
 
+///\todo Consider how to reduce the number of dynamic_casts, here and elsewhere (#2687)
 template<unsigned DIM>
 double CellwiseSourceEllipticPde<DIM>::ComputeLinearInUCoeffInSourceTermAtNode(const Node<DIM>& rNode)
 {

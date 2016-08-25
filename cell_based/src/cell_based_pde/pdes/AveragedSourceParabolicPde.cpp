@@ -34,13 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "AveragedSourceParabolicPde.hpp"
-
-#include "AbstractCentreBasedCellPopulation.hpp"
-#include "VertexBasedCellPopulation.hpp"
-#include "PottsBasedCellPopulation.hpp"
-#include "CaBasedCellPopulation.hpp"
 #include "ApoptoticCellProperty.hpp"
-
 #include "Exception.hpp"
 
 template<unsigned DIM>
@@ -113,7 +107,6 @@ double AveragedSourceParabolicPde<DIM>::ComputeDuDtCoefficientFunction(const Cha
     return mDuDtCoefficient;
 }
 
-
 template<unsigned DIM>
 double AveragedSourceParabolicPde<DIM>::ComputeSourceTerm(const ChastePoint<DIM>& rX, double u, Element<DIM,DIM>* pElement)
 {
@@ -143,10 +136,7 @@ double AveragedSourceParabolicPde<DIM>::GetUptakeRateForElement(unsigned element
     return this->mCellDensityOnCoarseElements[elementIndex];
 }
 
-/////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
 template class AveragedSourceParabolicPde<1>;
 template class AveragedSourceParabolicPde<2>;
 template class AveragedSourceParabolicPde<3>;

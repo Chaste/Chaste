@@ -43,9 +43,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractLinearParabolicPde.hpp"
 
 /**
- *  A parabolic PDE that has a source at each non-apoptotic cell.
+ * A parabolic PDE that has a source at each non-apoptotic cell.
  *
- *  \todo this is the parabolic version of CellwiseSourceEllipticPde; we should refactor the common functionality (#2687)
+ * \todo Improve documentation (#2687)
+ *
+ * \todo this is the parabolic version of CellwiseSourceEllipticPde; we should refactor the common functionality (#2687)
  */
 template<unsigned DIM>
 class CellwiseSourceParabolicPde : public AbstractLinearParabolicPde<DIM,DIM>
