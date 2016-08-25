@@ -102,11 +102,11 @@ public:
         // Make the PDE and BCs
         CellwiseSourceParabolicPde<2> pde(cell_population, 1, 1, 1);
         ConstBoundaryCondition<2> bc(1.0);
-        ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("variable");
+        MAKE_PTR_ARGS(ParabolicPdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+        p_pde_and_bc->SetDependentVariableName("variable");
 
         // Create a PDE modifier object using this PDE and BCs object
-        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc));
+        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc));
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseParabolicPdeWithMeshOnDisk");
 
         // Run for 100 timesteps
@@ -178,11 +178,11 @@ public:
         // Make the PDE and BCs
         CellwiseSourceParabolicPde<2> pde(cell_population, 1, 1, 1);
         ConstBoundaryCondition<2> bc(1.0);
-        ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("variable");
+        MAKE_PTR_ARGS(ParabolicPdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+        p_pde_and_bc->SetDependentVariableName("variable");
 
         // Create a PDE modifier object using this PDE and BCs object
-        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc));
+        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc));
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseParabolicPdeWithMeshOnHeterogeneousDisk");
 
         // Run for 10 timesteps
@@ -246,11 +246,11 @@ public:
         // Make the PDE and BCs
         CellwiseSourceParabolicPde<2> pde(cell_population, 1, 1, 1);
         ConstBoundaryCondition<2> bc(1.0);
-        ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, true);
-        pde_and_bc.SetDependentVariableName("variable");
+        MAKE_PTR_ARGS(ParabolicPdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, true));
+        p_pde_and_bc->SetDependentVariableName("variable");
 
         // Create a PDE modifier object using this PDE and BCs object
-        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc));
+        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc));
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseParabolicPdeWithMeshNeumanBcs");
 
         // Run for 10 timesteps
@@ -308,11 +308,11 @@ public:
         // Make the PDE and BCs
         CellwiseSourceParabolicPde<2> pde(cell_population, 0.1, 1, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
-        ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("variable");
+        MAKE_PTR_ARGS(ParabolicPdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+        p_pde_and_bc->SetDependentVariableName("variable");
 
         // Create a PDE modifier object using this PDE and BCs object
-        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc));
+        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc));
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseParabolicPdeWithMeshOnSquare");
 
         // Run for 10 timesteps
@@ -366,14 +366,14 @@ public:
         // Make the PDE and BCs
         CellwiseSourceParabolicPde<2> pde(cell_population, 0.1, 1, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
-        ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("variable");
+        MAKE_PTR_ARGS(ParabolicPdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+        p_pde_and_bc->SetDependentVariableName("variable");
 
         // Create a PDE modifier object using this PDE and BCs object
-        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc));
+        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc));
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseParabolicPdeWithNodeOnSquare");
 
-        // Run for 10 timesteps
+        // Run for 10 time steps
         for (unsigned i=0; i<10; i++)
         {
             SimulationTime::Instance()->IncrementTimeOneStep();
@@ -386,7 +386,8 @@ public:
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[0], 10, 1e-4);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[1], 5.0*sqrt(3.0), 1e-4);
         TS_ASSERT_DELTA( p_cell_210->GetCellData()->GetItem("variable"), 0.6309, 1e-2);
-        //Checking it doesn't change for this cell population
+
+        // Checking it doesn't change for this cell population
         TS_ASSERT_DELTA(p_cell_210->GetCellData()->GetItem("variable"), 0.6296, 1e-4);
 
         // Clear memory
@@ -410,12 +411,13 @@ public:
                         cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
         for (unsigned i =0; i<cells.size(); i++)
         {
-              c_vector<double,2> cell_location = p_mesh->GetCentroidOfElement(i);
-              if (cell_location(0)<10.0)
-              {
+            c_vector<double,2> cell_location = p_mesh->GetCentroidOfElement(i);
+            if (cell_location(0) < 10.0)
+            {
                 cells[i]->AddCellProperty(p_apoptotic_property);
-              }
-            // Set initial condition for pde
+            }
+
+            // Set initial condition for PDE
             cells[i]->GetCellData()->SetItem("variable",1.0);
         }
         TS_ASSERT_EQUALS(p_apoptotic_property->GetCellCount(),200u);
@@ -428,11 +430,11 @@ public:
         // Make the PDE and BCs
         CellwiseSourceParabolicPde<2> pde(cell_population, 0.1, 1, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
-        ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("variable");
+        MAKE_PTR_ARGS(ParabolicPdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+        p_pde_and_bc->SetDependentVariableName("variable");
 
         // Create a PDE modifier object using this PDE and BCs object
-        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc));
+        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc));
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseParabolicPdeWithVertexOnSquare");
 
         // Run for 10 timesteps
@@ -489,11 +491,11 @@ public:
         // Make the PDE and BCs
         CellwiseSourceParabolicPde<2> pde(cell_population, 0.1, 1, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
-        ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("variable");
+        MAKE_PTR_ARGS(ParabolicPdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+        p_pde_and_bc->SetDependentVariableName("variable");
 
         // Create a PDE modifier object using this PDE and BCs object
-        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc));
+        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc));
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseParabolicPdeWithPottsOnSquare");
 
         // Run for 10 time steps
@@ -557,11 +559,11 @@ public:
         // Make the PDE and BCs
         CellwiseSourceParabolicPde<2> pde(cell_population, 0.1, 1, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
-        ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("variable");
+        MAKE_PTR_ARGS(ParabolicPdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+        p_pde_and_bc->SetDependentVariableName("variable");
 
         // Create a PDE modifier object using this PDE and BCs object
-        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc));
+        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc));
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseParabolicPdeWithCaOnSquare");
 
         // Run for 10 time steps

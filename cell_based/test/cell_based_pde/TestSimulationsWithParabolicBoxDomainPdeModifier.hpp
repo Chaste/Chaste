@@ -143,8 +143,8 @@ public:
         // Make the PDE and BCs
         AveragedSourceParabolicPde<2> pde(cell_population, M_DUDT_COEFFICIENT,M_DIFFUSION_CONSTANT,M_UPTAKE_RATE);
         ConstBoundaryCondition<2> bc(1.0);
-        ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("oxygen");
+        MAKE_PTR_ARGS(ParabolicPdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+        p_pde_and_bc->SetDependentVariableName("oxygen");
 
         // Make domain
         ChastePoint<2> lower(-3.0, -3.0);
@@ -152,7 +152,7 @@ public:
         ChasteCuboid<2> cuboid(lower, upper);
 
         // Create a PDE modifier object using this PDE and BCs object
-        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc,cuboid));
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc,cuboid));
         simulator.AddSimulationModifier(p_pde_modifier);
 
         // A NagaiHondaForce has to be used together with an AbstractTargetAreaModifier
@@ -201,8 +201,8 @@ public:
         // Make the PDE and BCs
         AveragedSourceParabolicPde<2> pde(cell_population, M_DUDT_COEFFICIENT,M_DIFFUSION_CONSTANT,M_UPTAKE_RATE);
         ConstBoundaryCondition<2> bc(1.0);
-        ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("oxygen");
+        MAKE_PTR_ARGS(ParabolicPdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+        p_pde_and_bc->SetDependentVariableName("oxygen");
 
         // Make domain
         ChastePoint<2> lower(-3.0, -3.0);
@@ -210,7 +210,7 @@ public:
         ChasteCuboid<2> cuboid(lower, upper);
 
         // Create a PDE modifier object using this PDE and BCs object
-        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc,cuboid));
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc,cuboid));
         simulator.AddSimulationModifier(p_pde_modifier);
 
         simulator.Solve();
@@ -259,8 +259,8 @@ public:
         // Make the PDE and BCs
         AveragedSourceParabolicPde<2> pde(cell_population, M_DUDT_COEFFICIENT,M_DIFFUSION_CONSTANT,M_UPTAKE_RATE);
         ConstBoundaryCondition<2> bc(1.0);
-        ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("oxygen");
+        MAKE_PTR_ARGS(ParabolicPdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+        p_pde_and_bc->SetDependentVariableName("oxygen");
 
         // Make domain
         ChastePoint<2> lower(-3.0, -3.0);
@@ -268,7 +268,7 @@ public:
         ChasteCuboid<2> cuboid(lower, upper);
 
         // Create a PDE modifier object using this PDE and BCs object
-        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc,cuboid));
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc,cuboid));
         simulator.AddSimulationModifier(p_pde_modifier);
 
         simulator.Solve();
@@ -319,8 +319,8 @@ public:
         // Make the PDE and BCs
         AveragedSourceParabolicPde<2> pde(cell_population, M_DUDT_COEFFICIENT,M_DIFFUSION_CONSTANT,M_UPTAKE_RATE);
         ConstBoundaryCondition<2> bc(1.0);
-        ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("oxygen");
+        MAKE_PTR_ARGS(ParabolicPdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+        p_pde_and_bc->SetDependentVariableName("oxygen");
 
         // Make domain
         ChastePoint<2> lower(-3.0, -3.0);
@@ -328,7 +328,7 @@ public:
         ChasteCuboid<2> cuboid(lower, upper);
 
         // Create a PDE modifier object using this PDE and BCs object
-        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc,cuboid));
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc,cuboid));
         simulator.AddSimulationModifier(p_pde_modifier);
 
         simulator.Solve();
@@ -380,8 +380,8 @@ public:
         // Make the PDE and BCs
         AveragedSourceParabolicPde<2> pde(cell_population, M_DUDT_COEFFICIENT,M_DIFFUSION_CONSTANT,M_UPTAKE_RATE);
         ConstBoundaryCondition<2> bc(1.0);
-        ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("oxygen");
+        MAKE_PTR_ARGS(ParabolicPdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+        p_pde_and_bc->SetDependentVariableName("oxygen");
 
         // Make domain
         ChastePoint<2> lower(-3.0, -3.0);
@@ -389,7 +389,7 @@ public:
         ChasteCuboid<2> cuboid(lower, upper);
 
         // Create a PDE modifier object using this PDE and BCs object
-        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc,cuboid));
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc,cuboid));
         simulator.AddSimulationModifier(p_pde_modifier);
 
         simulator.Solve();
@@ -448,8 +448,8 @@ public:
         // Make the PDE and BCs
         AveragedSourceParabolicPde<2> pde(cell_population, M_DUDT_COEFFICIENT,M_DIFFUSION_CONSTANT,M_UPTAKE_RATE);
         ConstBoundaryCondition<2> bc(1.0);
-        ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("oxygen");
+        MAKE_PTR_ARGS(ParabolicPdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+        p_pde_and_bc->SetDependentVariableName("oxygen");
 
         // Make domain
         ChastePoint<2> lower(-3.0, -3.0);
@@ -457,7 +457,7 @@ public:
         ChasteCuboid<2> cuboid(lower, upper);
 
         // Create a PDE modifier object using this PDE and BCs object
-        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc,cuboid));
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc,cuboid));
         simulator.AddSimulationModifier(p_pde_modifier);
 
         // Run simulation

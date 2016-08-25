@@ -40,14 +40,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "MeshBasedCellPopulation.hpp"
 #include "SimpleUniformSourcePde.hpp"
-#include "CellwiseSourcePde.hpp"
-#include "AveragedSourcePde.hpp"
+#include "CellwiseSourceEllipticPde.hpp"
+#include "AveragedSourceEllipticPde.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "CellsGenerator.hpp"
 #include "ApoptoticCellProperty.hpp"
 #include "FixedG1GenerationalCellCycleModel.hpp"
 #include "SmartPointers.hpp"
-
 #include "AbstractCellBasedTestSuite.hpp"
 #include "FakePetscSetup.hpp"
 
@@ -73,7 +72,7 @@ public:
         TS_ASSERT_DELTA(value_at_elem_1, -1.0, 1e-6);
     }
 
-    void TestCellwiseSourcePde()
+    void TestCellwiseSourceEllipticPde()
     {
         // Set up cell population
         HoneycombMeshGenerator generator(5, 5, 0);
@@ -89,7 +88,7 @@ public:
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Set up PDE
-        CellwiseSourcePde<2> pde(cell_population, -1.0);
+        CellwiseSourceEllipticPde<2> pde(cell_population, -1.0);
 
         // Test compute source terms
         ChastePoint<2> unused_point;
@@ -110,7 +109,7 @@ public:
         RandomNumberGenerator::Destroy();
     }
 
-    void TestAveragedSourcePde()
+    void TestAveragedSourceEllipticPde()
     {
         // Set up cell population
         HoneycombMeshGenerator generator(5, 5, 0);
@@ -120,22 +119,23 @@ public:
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        // Create a coarse mesh - element 1 contains all the cells,
-        // element 0 contains none
+        // Create a coarse mesh - element 1 contains all the cells, element 0 contains none
         TetrahedralMesh<2,2> coarse_mesh;
         coarse_mesh.ConstructRegularSlabMesh(100.0, 100.0,100.0);
 
-        //Top right
+        // Top right
         TS_ASSERT_DELTA(coarse_mesh.GetElement(0)->CalculateCentroid()[0], 200.0/3.0, 0.1);
         TS_ASSERT_DELTA(coarse_mesh.GetElement(0)->CalculateCentroid()[1], 200.0/3.0, 0.1);
-        //Bottom left
+
+        // Bottom left
         TS_ASSERT_DELTA(coarse_mesh.GetElement(1)->CalculateCentroid()[0], 100.0/3.0, 0.1);
         TS_ASSERT_DELTA(coarse_mesh.GetElement(1)->CalculateCentroid()[1], 100.0/3.0, 0.1);
+
         // Set up PDE
-        AveragedSourcePde<2> pde(cell_population, -1.0);
+        AveragedSourceEllipticPde<2> pde(cell_population, -1.0);
         pde.SetupSourceTerms(coarse_mesh);
 
-        // Test Compute source term
+        // Test compute source term
         ChastePoint<2> unused_point;
         double value_at_elem_0 = pde.ComputeLinearInUCoeffInSourceTerm(unused_point,coarse_mesh.GetElement(0));
         double value_at_elem_1 = pde.ComputeLinearInUCoeffInSourceTerm(unused_point,coarse_mesh.GetElement(1));

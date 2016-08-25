@@ -38,9 +38,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ChasteSerialization.hpp"
 #include "AbstractBoundaryCondition.hpp"
+#include "TetrahedralMesh.hpp"
+#include "Cell.hpp"
 #include "ArchiveLocationInfo.hpp"
 #include "AbstractLinearEllipticPde.hpp"
-#include "AveragedSourcePde.hpp"
 #include "PetscTools.hpp"
 #include "FileFinder.hpp"
 
@@ -54,6 +55,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * may be constant on the boundary or vary spatially and/or temporally.
  * In cell-based simulations with PDEs, one or more of these objects are
  * accessed via the CellBasedPdeHandler class.
+ *
+ * \todo Rename as EllipticPdeAndBoundaryConditions and move to cell_based/src/cell_based/pde (#2687)
+ *       and merge, or create shared parent class, with ParabolicPdeAndBoundaryConditions (#2767)
  */
 template<unsigned DIM>
 class PdeAndBoundaryConditions
@@ -158,7 +162,7 @@ public:
     bool IsNeumannBoundaryCondition();
 
     /**
-     * @return whether the PDE is of type AveragedSourcePde
+     * @return whether the PDE is of type AveragedSourceEllipticPde
      */
     bool HasAveragedSourcePde();
 
@@ -168,7 +172,7 @@ public:
     void DestroySolution();
 
     /**
-     * In the case where mpPde is of type AveragedSourcePde, set the source terms
+     * In the case where mpPde is of type AveragedSourceEllipticPde, set the source terms
      * using the information in the given mesh.
      *
      * @param pMesh Pointer to a tetrahedral mesh

@@ -33,31 +33,31 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "AveragedSourcePde.hpp"
+#include "AveragedSourceEllipticPde.hpp"
 #include "ApoptoticCellProperty.hpp"
 #include "PetscTools.hpp"
 
 template<unsigned DIM>
-AveragedSourcePde<DIM>::AveragedSourcePde(AbstractCellPopulation<DIM>& rCellPopulation, double coefficient)
+AveragedSourceEllipticPde<DIM>::AveragedSourceEllipticPde(AbstractCellPopulation<DIM>& rCellPopulation, double coefficient)
     : mrCellPopulation(rCellPopulation),
       mCoefficient(coefficient)
 {
 }
 
 template<unsigned DIM>
-const AbstractCellPopulation<DIM>& AveragedSourcePde<DIM>::rGetCellPopulation() const
+const AbstractCellPopulation<DIM>& AveragedSourceEllipticPde<DIM>::rGetCellPopulation() const
 {
     return mrCellPopulation;
 }
 
 template<unsigned DIM>
-double AveragedSourcePde<DIM>::GetCoefficient() const
+double AveragedSourceEllipticPde<DIM>::GetCoefficient() const
 {
     return mCoefficient;
 }
 
 template<unsigned DIM>
-void AveragedSourcePde<DIM>::SetupSourceTerms(TetrahedralMesh<DIM,DIM>& rCoarseMesh, std::map< CellPtr, unsigned >* pCellPdeElementMap) // must be called before solve
+void AveragedSourceEllipticPde<DIM>::SetupSourceTerms(TetrahedralMesh<DIM,DIM>& rCoarseMesh, std::map< CellPtr, unsigned >* pCellPdeElementMap) // must be called before solve
 {
     // Allocate memory
     mCellDensityOnCoarseElements.resize(rCoarseMesh.GetNumElements());
@@ -103,35 +103,35 @@ void AveragedSourcePde<DIM>::SetupSourceTerms(TetrahedralMesh<DIM,DIM>& rCoarseM
 }
 
 template<unsigned DIM>
-double AveragedSourcePde<DIM>::ComputeConstantInUSourceTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement)
+double AveragedSourceEllipticPde<DIM>::ComputeConstantInUSourceTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement)
 {
     return 0.0;
 }
 
 template<unsigned DIM>
-double AveragedSourcePde<DIM>::ComputeLinearInUCoeffInSourceTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement) // now takes in element
+double AveragedSourceEllipticPde<DIM>::ComputeLinearInUCoeffInSourceTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement) // now takes in element
 {
     assert(!mCellDensityOnCoarseElements.empty());
     return mCoefficient * mCellDensityOnCoarseElements[pElement->GetIndex()];
 }
 
 template<unsigned DIM>
-c_matrix<double,DIM,DIM> AveragedSourcePde<DIM>::ComputeDiffusionTerm(const ChastePoint<DIM>& rX)
+c_matrix<double,DIM,DIM> AveragedSourceEllipticPde<DIM>::ComputeDiffusionTerm(const ChastePoint<DIM>& rX)
 {
     return identity_matrix<double>(DIM);
 }
 
 template<unsigned DIM>
-double AveragedSourcePde<DIM>::GetUptakeRateForElement(unsigned elementIndex)
+double AveragedSourceEllipticPde<DIM>::GetUptakeRateForElement(unsigned elementIndex)
 {
     return this->mCellDensityOnCoarseElements[elementIndex];
 }
 
-///////// Explicit instantiation
-template class AveragedSourcePde<1>;
-template class AveragedSourcePde<2>;
-template class AveragedSourcePde<3>;
+// Explicit instantiation
+template class AveragedSourceEllipticPde<1>;
+template class AveragedSourceEllipticPde<2>;
+template class AveragedSourceEllipticPde<3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(AveragedSourcePde)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(AveragedSourceEllipticPde)

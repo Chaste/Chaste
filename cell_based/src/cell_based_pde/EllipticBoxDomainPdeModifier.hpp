@@ -38,6 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include "AbstractBoxDomainPdeModifier.hpp"
 #include "BoundaryConditionsContainer.hpp"
@@ -69,9 +70,8 @@ private:
         archive & mpPdeAndBcs;
     }
 
-    /** Pointer to a linear elliptic PDE object with associated boundary conditions. */
-    ///\todo #2687 Memory-management of mpPdeAndBcs is not enabled. Suggest using a shared-pointer.
-    PdeAndBoundaryConditions<DIM>* mpPdeAndBcs;
+    /** Shared pointer to a linear elliptic PDE object with associated boundary conditions. */
+    boost::shared_ptr<PdeAndBoundaryConditions<DIM> > mpPdeAndBcs;
 
 public:
 
@@ -85,11 +85,11 @@ public:
     /**
      * Constructor.
      *
-     * @param pPdeAndBcs a pointer to a linear elliptic PDE object with associated boundary conditions
+     * @param pPdeAndBcs a shared pointer to a linear elliptic PDE object with associated boundary conditions
      * @param meshCuboid the outer boundary for the FEM mesh
      * @param stepSize the step size to be used in the FEM mesh (defaults to 1, i.e. the default cell size)
      */
-    EllipticBoxDomainPdeModifier(PdeAndBoundaryConditions<DIM>* pPdeAndBcs, ChasteCuboid<DIM> meshCuboid, double stepSize = 1.0);
+    EllipticBoxDomainPdeModifier(boost::shared_ptr<PdeAndBoundaryConditions<DIM> > pPdeAndBcs, ChasteCuboid<DIM> meshCuboid, double stepSize = 1.0);
 
     /**
      * Destructor.

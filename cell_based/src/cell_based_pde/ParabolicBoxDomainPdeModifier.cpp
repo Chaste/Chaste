@@ -44,7 +44,7 @@ ParabolicBoxDomainPdeModifier<DIM>::ParabolicBoxDomainPdeModifier()
 }
 
 template<unsigned DIM>
-ParabolicBoxDomainPdeModifier<DIM>::ParabolicBoxDomainPdeModifier(ParabolicPdeAndBoundaryConditions<DIM>* pPdeAndBcs,
+ParabolicBoxDomainPdeModifier<DIM>::ParabolicBoxDomainPdeModifier(boost::shared_ptr<ParabolicPdeAndBoundaryConditions<DIM> > pPdeAndBcs,
                                                                   ChasteCuboid<DIM> meshCuboid,
                                                                   double stepSize)
     : AbstractBoxDomainPdeModifier<DIM>(),
@@ -74,12 +74,12 @@ void ParabolicBoxDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopul
 
     this->UpdateCellPdeElementMap(rCellPopulation);
 
-    // When using a PDE mesh which doesnt coincide with the cells, we must set up the source terms before solving the PDE.
+    // When using a PDE mesh which doesn't coincide with the cells, we must set up the source terms before solving the PDE.
     // Pass in already updated CellPdeElementMap to speed up finding cells.
-    mpPdeAndBcs->SetUpSourceTermsForAveragedSourcePde(this->mpFeMesh, &this->mCellPdeElementMap);
+    mpPdeAndBcs->SetUpSourceTermsForAveragedSourcePde(this->mpFeMesh.get(), &this->mCellPdeElementMap);
 
-    // Use SimpleLinearParabolicSolver as Averaged Source PDE
-    SimpleLinearParabolicSolver<DIM,DIM> solver(this->mpFeMesh, mpPdeAndBcs->GetPde(), p_bcc.get());
+    // Use SimpleLinearParabolicSolver as averaged Source PDE
+    SimpleLinearParabolicSolver<DIM,DIM> solver(this->mpFeMesh.get(), mpPdeAndBcs->GetPde(), p_bcc.get());
 
     ///\todo Investigate more than one PDE time step per spatial step (#2687)
     SimulationTime* p_simulation_time = SimulationTime::Instance();

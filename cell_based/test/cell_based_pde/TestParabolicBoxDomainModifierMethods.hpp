@@ -101,8 +101,8 @@ public:
         // Make the PDE and BCs
         AveragedSourceParabolicPde<2> pde(cell_population, 0.1, 1.0, -1.0);
         ConstBoundaryCondition<2> bc(1.0);
-        ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("variable");
+        MAKE_PTR_ARGS(ParabolicPdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+        p_pde_and_bc->SetDependentVariableName("variable");
 
         // Make domain
         ChastePoint<2> lower(-5.0, -5.0);
@@ -110,7 +110,7 @@ public:
         ChasteCuboid<2> cuboid(lower, upper);
 
         // Create a PDE modifier object using this PDE and BCs object
-        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc,cuboid));
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc, cuboid));
 
         // For coverage, output the solution gradient
         p_pde_modifier->SetOutputGradient(true);
@@ -168,8 +168,9 @@ public:
         // Make the PDE and BCs
         AveragedSourceParabolicPde<2> pde(cell_population, 0.1, 1.0, -1.0);
         ConstBoundaryCondition<2> bc(1.0);
-        ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, true); // Only differnece from above test is the use of Neuman BCS here
-        pde_and_bc.SetDependentVariableName("variable");
+        MAKE_PTR_ARGS(ParabolicPdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, true));
+        p_pde_and_bc->SetDependentVariableName("variable");
+        // Only difference from above test is the use of Neuman BCs here
 
         // Make domain
         ChastePoint<2> lower(-5.0, -5.0);
@@ -177,13 +178,13 @@ public:
         ChasteCuboid<2> cuboid(lower, upper);
 
         // Create a PDE modifier object using this PDE and BCs object
-        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc,cuboid));
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc, cuboid));
 
         // For coverage, output the solution gradient
         p_pde_modifier->SetOutputGradient(true);
         p_pde_modifier->SetupSolve(cell_population,"TestAveragedParabolicPdeWithNeumannWithMeshOnSquare");
 
-        // Run for 10 timesteps
+        // Run for 10 time steps
         for (unsigned i=0; i<10; i++)
         {
             SimulationTime::Instance()->IncrementTimeOneStep();
@@ -236,8 +237,8 @@ public:
         // Make the PDE and BCs
         AveragedSourceParabolicPde<2> pde(cell_population, 0.1, 1.0, -1.0);
         ConstBoundaryCondition<2> bc(1.0);
-        ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("variable");
+        MAKE_PTR_ARGS(ParabolicPdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+        p_pde_and_bc->SetDependentVariableName("variable");
 
         // Make domain
         ChastePoint<2> lower(-5.0, -5.0);
@@ -245,13 +246,13 @@ public:
         ChasteCuboid<2> cuboid(lower, upper);
 
         // Create a PDE modifier object using this PDE and BCs object
-        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc,cuboid));
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc, cuboid));
 
         // For coverage, output the solution gradient
         p_pde_modifier->SetOutputGradient(true);
         p_pde_modifier->SetupSolve(cell_population,"TestAveragedParabolicPdeWithNodeOnSquare");
 
-        // Run for 10 timesteps
+        // Run for 10 time steps
         for (unsigned i=0; i<10; i++)
         {
             SimulationTime::Instance()->IncrementTimeOneStep();
@@ -305,8 +306,8 @@ public:
         // Make the PDE and BCs
         AveragedSourceParabolicPde<2> pde(cell_population, 0.1, 1.0, -1.0);
         ConstBoundaryCondition<2> bc(1.0);
-        ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("variable");
+        MAKE_PTR_ARGS(ParabolicPdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+        p_pde_and_bc->SetDependentVariableName("variable");
 
         // Make domain
         ChastePoint<2> lower(-5.0, -5.0);
@@ -314,7 +315,7 @@ public:
         ChasteCuboid<2> cuboid(lower, upper);
 
         // Create a PDE modifier object using this PDE and BCs object
-        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc,cuboid));
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc, cuboid));
 
         // For coverage, output the solution gradient
         p_pde_modifier->SetOutputGradient(true);
@@ -373,8 +374,8 @@ public:
         // Make the PDE and BCs
         AveragedSourceParabolicPde<2> pde(cell_population, 0.1, 1.0, -1.0);
         ConstBoundaryCondition<2> bc(1.0);
-        ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("variable");
+        MAKE_PTR_ARGS(ParabolicPdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+        p_pde_and_bc->SetDependentVariableName("variable");
 
         // Make domain
         ChastePoint<2> lower(-5.0, -5.0);
@@ -382,7 +383,7 @@ public:
         ChasteCuboid<2> cuboid(lower, upper);
 
         // Create a PDE modifier object using this PDE and BCs object
-        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc,cuboid));
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc, cuboid));
         // For coverage, output the solution gradient
         p_pde_modifier->SetOutputGradient(true);
         p_pde_modifier->SetupSolve(cell_population,"TestAveragedParabolicPdeWithNodeOnSquare");
@@ -448,8 +449,8 @@ public:
         // Make the PDE and BCs
         AveragedSourceParabolicPde<2> pde(cell_population, 0.1, 1.0, -1.0);
         ConstBoundaryCondition<2> bc(1.0);
-        ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("variable");
+        MAKE_PTR_ARGS(ParabolicPdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+        p_pde_and_bc->SetDependentVariableName("variable");
 
         // Make domain
         ChastePoint<2> lower(-5.0, -5.0);
@@ -457,13 +458,13 @@ public:
         ChasteCuboid<2> cuboid(lower, upper);
 
         // Create a PDE modifier object using this PDE and BCs object
-        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc,cuboid));
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc, cuboid));
 
         // For coverage, output the solution gradient
         p_pde_modifier->SetOutputGradient(true);
         p_pde_modifier->SetupSolve(cell_population,"TestAveragedParabolicPdeWithNodeOnSquare");
 
-        // Run for 10 timesteps
+        // Run for 10 time steps
         for (unsigned i=0; i<10; i++)
         {
             SimulationTime::Instance()->IncrementTimeOneStep();

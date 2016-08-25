@@ -62,7 +62,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SimpleUniformSourcePde.hpp"
 #include "UniformSourceParabolicPde.hpp"
 #include "ConstBoundaryCondition.hpp"
-#include "AveragedSourcePde.hpp"
+#include "AveragedSourceEllipticPde.hpp"
 #include "ArchiveOpener.hpp"
 #include "SmartPointers.hpp"
 #include "AbstractCellBasedWithTimingsTestSuite.hpp"
@@ -78,11 +78,11 @@ public:
         // Make the PDE and BCs
         SimpleUniformSourcePde<2> pde(-0.1);
         ConstBoundaryCondition<2> bc(1.0);
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("averaged quantity");
+        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+        p_pde_and_bc->SetDependentVariableName("variable");
 
         // Create an elliptic PDE modifier object using this PDE and BCs object
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc));
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc));
 
         // Test that member variables are initialised correctly
         TS_ASSERT_EQUALS(p_pde_modifier->mpPdeAndBcs->rGetDependentVariableName(), "averaged quantity");
@@ -93,11 +93,11 @@ public:
         // Make the PDE and BCs
         UniformSourceParabolicPde<2> pde(-0.1);
         ConstBoundaryCondition<2> bc(1.0);
-        ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("averaged quantity");
+        MAKE_PTR_ARGS(ParabolicPdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+        p_pde_and_bc->SetDependentVariableName("averaged quantity");
 
         // Create a parabolic PDE modifier object using this PDE and BCs object
-        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc));
+        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc));
 
         // Test that member variables are initialised correctly
         TS_ASSERT_EQUALS(p_pde_modifier->mpPdeAndBcs->rGetDependentVariableName(), "averaged quantity");
@@ -108,14 +108,14 @@ public:
         // Create a PDE and BCs object to be used by all cell populations
         SimpleUniformSourcePde<2> pde(-0.1);
         ConstBoundaryCondition<2> bc(1.0);
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("averaged quantity");
+        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+        p_pde_and_bc->SetDependentVariableName("averaged quantity");
 
         // Create a CellsGenerator to be used by all cell populations
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
 
         // Create a PDE modifier object using this PDE and BCs object
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc));
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc));
         {
             // Create a MeshBasedCellPopulation
             HoneycombMeshGenerator generator(10,10, 0);
@@ -264,11 +264,11 @@ public:
             // Make the Pde and BCS
             SimpleUniformSourcePde<2> pde(-0.1);
             ConstBoundaryCondition<2> bc(1.0);
-            PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-            pde_and_bc.SetDependentVariableName("averaged quantity");
+            MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+            p_pde_and_bc->SetDependentVariableName("averaged quantity");
 
             // Initialise an Elliptic PDE modifier object using this PDE and BCs object
-            AbstractCellBasedSimulationModifier<2,2>* const p_modifier = new EllipticGrowingDomainPdeModifier<2>(&pde_and_bc);
+            AbstractCellBasedSimulationModifier<2,2>* const p_modifier = new EllipticGrowingDomainPdeModifier<2>(p_pde_and_bc);
 
             // Create an output archive
             std::ofstream ofs(archive_filename.c_str());
@@ -293,8 +293,6 @@ public:
             std::string variable_name = (static_cast<EllipticGrowingDomainPdeModifier<2>*>(p_modifier2))->mpPdeAndBcs->rGetDependentVariableName();
             TS_ASSERT_EQUALS(variable_name, "averaged quantity");
 
-            ///\todo #2687 The archive created a new PDE object. Memory-management of mpPdeAndBcs is not enabled. Suggest using a shared-pointer.
-            delete (static_cast<EllipticGrowingDomainPdeModifier<2>*>(p_modifier2))->mpPdeAndBcs;
             delete p_modifier2;
         }
     }
@@ -311,16 +309,16 @@ public:
             // Make the Pde and BCS
             UniformSourceParabolicPde<2> pde(-0.1);
             ConstBoundaryCondition<2> bc(1.0);
-            ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-            pde_and_bc.SetDependentVariableName("averaged quantity");
+            MAKE_PTR_ARGS(ParabolicPdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+            p_pde_and_bc->SetDependentVariableName("averaged quantity");
 
             ///\todo #2687
             // Make a dummy solution (because the archiver expects to be able to read/write PETSc Vecs)
             Vec vector = PetscTools::CreateAndSetVec(10, -42.0);
-            pde_and_bc.SetSolution(vector);
+            p_pde_and_bc->SetSolution(vector);
 
             // Initialise a parabolic PDE modifier object using this PDE and BCs object
-            AbstractCellBasedSimulationModifier<2,2>* const p_modifier = new ParabolicGrowingDomainPdeModifier<2>(&pde_and_bc);
+            AbstractCellBasedSimulationModifier<2,2>* const p_modifier = new ParabolicGrowingDomainPdeModifier<2>(p_pde_and_bc);
 
             // Create an output archive
             std::ofstream ofs(archive_filename.c_str());
@@ -345,8 +343,6 @@ public:
             std::string variable_name = (static_cast<ParabolicGrowingDomainPdeModifier<2>*>(p_modifier2))->mpPdeAndBcs->rGetDependentVariableName();
             TS_ASSERT_EQUALS(variable_name, "averaged quantity");
 
-            ///\todo #2687 The archive created a new PDE object. Memory-management of mpPdeAndBcs is not enabled. Suggest using a shared-pointer.
-            delete (static_cast<ParabolicGrowingDomainPdeModifier<2>*>(p_modifier2))->mpPdeAndBcs;
             delete p_modifier2;
         }
     }

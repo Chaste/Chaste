@@ -437,13 +437,13 @@ public:
     /**
      * Overridden GetTetrahedralMeshForPdeModifier() method.
      *
-     * @return a tetrahedral mesh using the nodes in the VertexMesh
+     * @return a shared pointer to a tetrahedral mesh using the nodes in the VertexMesh
      * as well as an additional node at the centre of each VertexElement.
      * At present, this method only works in 2D.
      *
      * This method is called by AbstractGrowingDomainPdeModifier.
      */
-    virtual TetrahedralMesh<DIM, DIM>* GetTetrahedralMeshForPdeModifier();
+    virtual boost::shared_ptr<TetrahedralMesh<DIM, DIM> > GetTetrahedralMeshForPdeModifier();
 
     /**
      * Overridden IsPdeNodeAssociatedWithApoptoticCell() method.

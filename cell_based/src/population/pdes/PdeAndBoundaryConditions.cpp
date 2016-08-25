@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "PdeAndBoundaryConditions.hpp"
+#include "AveragedSourceEllipticPde.hpp"
 
 template<unsigned DIM>
 PdeAndBoundaryConditions<DIM>::PdeAndBoundaryConditions(AbstractLinearEllipticPde<DIM,DIM>* pPde,
@@ -106,7 +107,7 @@ bool PdeAndBoundaryConditions<DIM>::IsNeumannBoundaryCondition()
 template<unsigned DIM>
 bool PdeAndBoundaryConditions<DIM>::HasAveragedSourcePde()
 {
-    return (dynamic_cast<AveragedSourcePde<DIM>*>(mpPde) != NULL);
+    return (dynamic_cast<AveragedSourceEllipticPde<DIM>*>(mpPde) != NULL);
 }
 
 template<unsigned DIM>
@@ -122,7 +123,7 @@ template<unsigned DIM>
 void PdeAndBoundaryConditions<DIM>::SetUpSourceTermsForAveragedSourcePde(TetrahedralMesh<DIM,DIM>* pMesh, std::map< CellPtr, unsigned >* pCellPdeElementMap)
 {
     assert(HasAveragedSourcePde());
-    static_cast<AveragedSourcePde<DIM>*>(mpPde)->SetupSourceTerms(*pMesh, pCellPdeElementMap);
+    static_cast<AveragedSourceEllipticPde<DIM>*>(mpPde)->SetupSourceTerms(*pMesh, pCellPdeElementMap);
 }
 
 template<unsigned DIM>
@@ -136,7 +137,8 @@ std::string& PdeAndBoundaryConditions<DIM>::rGetDependentVariableName()
 {
     return mDependentVariableName;
 }
-///////// Explicit instantiation
+
+// Explicit instantiation
 template class PdeAndBoundaryConditions<1>;
 template class PdeAndBoundaryConditions<2>;
 template class PdeAndBoundaryConditions<3>;

@@ -38,6 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TetrahedralMesh.hpp"
 #include "ReplicatableVector.hpp"
 #include "LinearBasisFunction.hpp"
+#include <boost/make_shared.hpp>
 
 template<unsigned DIM>
 AbstractBoxDomainPdeModifier<DIM>::AbstractBoxDomainPdeModifier()
@@ -48,11 +49,6 @@ AbstractBoxDomainPdeModifier<DIM>::AbstractBoxDomainPdeModifier()
 template<unsigned DIM>
 AbstractBoxDomainPdeModifier<DIM>::~AbstractBoxDomainPdeModifier()
 {
-    // Avoid memory leaks
-    if (this->mpFeMesh != NULL)
-    {
-        delete this->mpFeMesh;
-    }
 }
 
 template<unsigned DIM>
@@ -65,7 +61,7 @@ template<unsigned DIM>
 void AbstractBoxDomainPdeModifier<DIM>::GenerateFeMesh(ChasteCuboid<DIM> meshCuboid, double stepSize)
 {
     // Create a regular coarse tetrahedral mesh
-    this->mpFeMesh = new TetrahedralMesh<DIM,DIM>;
+    this->mpFeMesh = boost::make_shared<TetrahedralMesh<DIM,DIM> >();
     switch (DIM)
     {
 //        case 1:

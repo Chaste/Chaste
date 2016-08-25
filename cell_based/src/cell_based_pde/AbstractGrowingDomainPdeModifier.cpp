@@ -54,17 +54,7 @@ AbstractGrowingDomainPdeModifier<DIM>::~AbstractGrowingDomainPdeModifier()
 template<unsigned DIM>
 void AbstractGrowingDomainPdeModifier<DIM>::GenerateFeMesh(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
-    ///\todo Improve memory management, e.g. by making mpFeMesh a shared_ptr (#2687)
-
-    if (this->mDeleteMesh)
-    {
-        // If a mesh has been created on a previous time-step then we need to tidy it up
-        assert(this->mpFeMesh != NULL);
-        delete this->mpFeMesh;
-    }
-
     // Get the finite element mesh via the cell population
-    this->mDeleteMesh = (dynamic_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation) == NULL);
     this->mpFeMesh = rCellPopulation.GetTetrahedralMeshForPdeModifier();
 }
 

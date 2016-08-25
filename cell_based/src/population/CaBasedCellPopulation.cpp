@@ -137,7 +137,7 @@ const PottsMesh<DIM>& CaBasedCellPopulation<DIM>::rGetMesh() const
 }
 
 template<unsigned DIM>
-TetrahedralMesh<DIM, DIM>* CaBasedCellPopulation<DIM>::GetTetrahedralMeshForPdeModifier()
+boost::shared_ptr<TetrahedralMesh<DIM, DIM> > CaBasedCellPopulation<DIM>::GetTetrahedralMeshForPdeModifier()
 {
     std::vector<Node<DIM>*> temp_nodes;
 
@@ -151,7 +151,8 @@ TetrahedralMesh<DIM, DIM>* CaBasedCellPopulation<DIM>::GetTetrahedralMeshForPdeM
         cell_index++;
     }
 
-    return new MutableMesh<DIM,DIM>(temp_nodes);
+    boost::shared_ptr<TetrahedralMesh<DIM, DIM> > p_mesh(new MutableMesh<DIM,DIM>(temp_nodes));
+    return p_mesh;
 }
 
 template<unsigned DIM>

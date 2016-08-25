@@ -44,34 +44,27 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OnLatticeSimulation.hpp"
 #include "CellsGenerator.hpp"
 #include "FixedG1GenerationalCellCycleModel.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
 #include "ConstBoundaryCondition.hpp"
 #include "PetscSetupAndFinalize.hpp"
 #include "AbstractCellBasedWithTimingsTestSuite.hpp"
 #include "ReplicatableVector.hpp"
 #include "NumericFileComparison.hpp"
 #include "WildTypeCellMutationState.hpp"
-#include "FunctionalBoundaryCondition.hpp"
-#include "AveragedSourcePde.hpp"
-#include "CellwiseSourcePde.hpp"
-#include "SmartPointers.hpp"
-#include "HoneycombMeshGenerator.hpp"
+#include "AveragedSourceEllipticPde.hpp"
+#include "CellwiseSourceEllipticPde.hpp"
 #include "PottsMeshGenerator.hpp"
 #include "PottsBasedCellPopulation.hpp"
 #include "CaBasedCellPopulation.hpp"
+#include "OnLatticeSimulation.hpp"
 #include "VolumeConstraintPottsUpdateRule.hpp"
 #include "DiffusionCaUpdateRule.hpp"
 #include "AdhesionPottsUpdateRule.hpp"
-#include "DifferentialAdhesionPottsUpdateRule.hpp"
-#include "ChemotaxisPottsUpdateRule.hpp"
-#include "OnLatticeSimulation.hpp"
-#include "DifferentiatedCellProliferativeType.hpp"
 #include "Warnings.hpp"
 #include "SmartPointers.hpp"
-#include "AbstractCellPopulation.hpp"
 #include "CellBasedPdeHandlerOnCuboid.hpp"
 #include "CellBasedPdeHandler.hpp"
 #include "FileComparison.hpp"
-
 
 class SimplePdeForTesting : public AbstractLinearEllipticPde<2,2>
 {
@@ -128,7 +121,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.SetEndTime(0.1);
 
         // Set up PDE and pass to simulation via handler (zero uptake to check analytic solution)
-        AveragedSourcePde<2> pde(cell_population, 0.0);
+        AveragedSourceEllipticPde<2> pde(cell_population, 0.0);
         ConstBoundaryCondition<2> bc(1.0);
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("nutrient");
@@ -172,7 +165,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.SetEndTime(0.1);
 
         // Set up PDE and pass to simulation via handler (zero uptake to check analytic solution)
-        AveragedSourcePde<2> pde(cell_population, 0.0);
+        AveragedSourceEllipticPde<2> pde(cell_population, 0.0);
         ConstBoundaryCondition<2> bc(1.0);
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("nutrient");
@@ -270,12 +263,12 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
 
         // Set up 2 PDEs (one with Dirichlet and one with Neumann BCs) and pass to simulation via handler (zero uptake to check analytic solution)
         // Note even with uptake the PDE has U=0 as solution with zero neumann conditions.
-        AveragedSourcePde<2> pde_1(cell_population, 0.0);
+        AveragedSourceEllipticPde<2> pde_1(cell_population, 0.0);
         ConstBoundaryCondition<2> bc_1(1.0);
         PdeAndBoundaryConditions<2> pde_and_bc_1(&pde_1, &bc_1, false);
         pde_and_bc_1.SetDependentVariableName("nutrient_dirichlet");
 
-        AveragedSourcePde<2> pde_2(cell_population, 0.0);
+        AveragedSourceEllipticPde<2> pde_2(cell_population, 0.0);
         ConstBoundaryCondition<2> bc_2(0.0);
         PdeAndBoundaryConditions<2> pde_and_bc_2(&pde_2, &bc_2, true);
         pde_and_bc_2.SetDependentVariableName("nutrient_neumann");
@@ -321,7 +314,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
     }
 
     // In this test there are only 9 cells but 100 lattice sites
-    void TestCaBasedWithCellwiseSourcePde() throw(Exception)
+    void TestCaBasedWithCellwiseSourceEllipticPde() throw(Exception)
     {
         EXIT_IF_PARALLEL;
 
@@ -351,7 +344,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.SetDt(0.1);
         simulator.SetEndTime(1);
 
-        CellwiseSourcePde<2> pde(cell_population, 0.0);
+        CellwiseSourceEllipticPde<2> pde(cell_population, 0.0);
         ConstBoundaryCondition<2> bc(1.0);
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("nutrient");
@@ -359,7 +352,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         double pde_coefficient = 0.0;
         TS_ASSERT_DELTA(pde.ComputeLinearInUCoeffInSourceTermAtNode(*p_mesh->GetNode(0)), pde_coefficient, 1e-3);
 
-        CellwiseSourcePde<2> non_trivial_pde(cell_population, 1.0);
+        CellwiseSourceEllipticPde<2> non_trivial_pde(cell_population, 1.0);
 
         double non_trivial_pde_coefficient = 1.0;
         for (PottsMesh<2>::NodeIterator node_iter = p_mesh->GetNodeIteratorBegin();
@@ -398,7 +391,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
     }
 
     // In this test there are only 50 cells but 100 lattice sites
-    void TestCaBasedWithCellwiseSourcePdeWithTightBoundaries() throw(Exception)
+    void TestCaBasedWithCellwiseSourceEllipticPdeWithTightBoundaries() throw(Exception)
     {
         EXIT_IF_PARALLEL;
 
@@ -431,7 +424,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.SetDt(0.1);
         simulator.SetEndTime(1);
 
-        CellwiseSourcePde<2> pde(cell_population, 0.0);
+        CellwiseSourceEllipticPde<2> pde(cell_population, 0.0);
         ConstBoundaryCondition<2> bc(1.0);
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("nutrient");
@@ -487,7 +480,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.SetEndTime(1);
 
         // Set up a PDE with mixed boundary conditions (use zero uptake to check analytic solution)
-        AveragedSourcePde<2> pde(cell_population, 0.0);
+        AveragedSourceEllipticPde<2> pde(cell_population, 0.0);
         ConstBoundaryCondition<2> bc(1.0);
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("nutrient");
@@ -551,7 +544,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.SetEndTime(1);
 
         // Set up PDE and pass to simulation via handler (zero uptake to check analytic solution)
-        AveragedSourcePde<2> pde(cell_population, 0.0);
+        AveragedSourceEllipticPde<2> pde(cell_population, 0.0);
         ConstBoundaryCondition<2> bc(1.0);
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("nutrient");
@@ -598,7 +591,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.SetEndTime(0.1);
 
         // Set up PDE and pass to simulation via handler (zero uptake to check analytic solution)
-        AveragedSourcePde<2> pde(cell_population, 0.0);
+        AveragedSourceEllipticPde<2> pde(cell_population, 0.0);
         ConstBoundaryCondition<2> bc(1.0);
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("nutrient");
@@ -701,12 +694,12 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.SetEndTime(0.1);
 
         // Set up PDE and pass to simulation via handler (zero uptake to check analytic solution)
-        AveragedSourcePde<2> pde_1(cell_population, 0.0);
+        AveragedSourceEllipticPde<2> pde_1(cell_population, 0.0);
         ConstBoundaryCondition<2> bc_1(1.0);
         PdeAndBoundaryConditions<2> pde_and_bc_1(&pde_1, &bc_1, false);
         pde_and_bc_1.SetDependentVariableName("quantity 1");
 
-        AveragedSourcePde<2> pde_2(cell_population, 0.0);
+        AveragedSourceEllipticPde<2> pde_2(cell_population, 0.0);
         ConstBoundaryCondition<2> bc_2(1.0);
         PdeAndBoundaryConditions<2> pde_and_bc_2(&pde_2, &bc_2, false);
         pde_and_bc_2.SetDependentVariableName("quantity 2");
@@ -794,7 +787,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
 
         // Set up PDE and pass to simulation via handler
         double nutrient_uptake_rate=-0.1;
-        AveragedSourcePde<2> pde(cell_population, nutrient_uptake_rate);
+        AveragedSourceEllipticPde<2> pde(cell_population, nutrient_uptake_rate);
         ConstBoundaryCondition<2> bc(1.0);
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("nutrient");

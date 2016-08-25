@@ -50,20 +50,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FixedG1GenerationalCellCycleModel.hpp"
 #include "MeshBasedCellPopulation.hpp"
 #include "NodeBasedCellPopulation.hpp"
-#include "CellwiseSourcePde.hpp"
+#include "CellwiseSourceEllipticPde.hpp"
 #include "SimpleUniformSourcePde.hpp"
 #include "ConstBoundaryCondition.hpp"
 #include "PetscSetupAndFinalize.hpp"
 #include "ReplicatableVector.hpp"
 #include "WildTypeCellMutationState.hpp"
-#include "AveragedSourcePde.hpp"
+#include "AveragedSourceEllipticPde.hpp"
 #include "FileComparison.hpp"
 #include "NumericFileComparison.hpp"
 #include "FunctionalBoundaryCondition.hpp"
 #include "ArchiveOpener.hpp"
 #include "SmartPointers.hpp"
 #include "AbstractCellBasedWithTimingsTestSuite.hpp"
-
 
 class SimplePdeForTesting : public AbstractLinearEllipticPde<2,2>
 {
@@ -248,7 +247,7 @@ public:
             p_pde_handler->SetImposeBcsOnCoarseBoundary(false);
 
             // Set up PDE and pass to handler
-            AveragedSourcePde<2> pde(cell_population, -0.1);
+            AveragedSourceEllipticPde<2> pde(cell_population, -0.1);
             ConstBoundaryCondition<2> bc(1.0);
             PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
             pde_and_bc.SetDependentVariableName("averaged quantity");
@@ -336,7 +335,7 @@ public:
             p_pde_handler->SetImposeBcsOnCoarseBoundary(false);
 
             // Set up PDE and pass to handler
-            AveragedSourcePde<2> pde(cell_population, -0.1);
+            AveragedSourceEllipticPde<2> pde(cell_population, -0.1);
             ConstBoundaryCondition<2> bc(1.0);
             PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
             pde_and_bc.SetDependentVariableName("averaged quantity");
@@ -422,7 +421,7 @@ public:
             "mPdeAndBcCollection should be populated prior to calling UseCoarsePdeMesh().");
 
         // Set up PDE and pass to handler
-        AveragedSourcePde<2> pde(cell_population, -0.1);
+        AveragedSourceEllipticPde<2> pde(cell_population, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_handler.AddPdeAndBc(&pde_and_bc);
@@ -475,7 +474,7 @@ public:
 
         CellBasedPdeHandler<1> pde_handler_1d(&cell_population_1d);
 
-        AveragedSourcePde<1> pde_1d(cell_population_1d, -0.1);
+        AveragedSourceEllipticPde<1> pde_1d(cell_population_1d, -0.1);
         ConstBoundaryCondition<1> bc_1d(1.0);
         PdeAndBoundaryConditions<1> pde_and_bc_1d(&pde_1d, &bc_1d, false);
         pde_handler_1d.AddPdeAndBc(&pde_and_bc_1d);
@@ -505,7 +504,7 @@ public:
 
         CellBasedPdeHandler<3> pde_handler_3d(&cell_population_3d);
 
-        AveragedSourcePde<3> pde_3d(cell_population_3d, -0.1);
+        AveragedSourceEllipticPde<3> pde_3d(cell_population_3d, -0.1);
         ConstBoundaryCondition<3> bc_3d(1.0);
         PdeAndBoundaryConditions<3> pde_and_bc_3d(&pde_3d, &bc_3d, false);
         pde_handler_3d.AddPdeAndBc(&pde_and_bc_3d);
@@ -554,7 +553,7 @@ public:
         ChasteCuboid<2> cuboid(lower, upper);
 
         // Set up PDE and pass to handler
-        AveragedSourcePde<2> pde(cell_population, -0.1);
+        AveragedSourceEllipticPde<2> pde(cell_population, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_handler.AddPdeAndBc(&pde_and_bc);
@@ -601,7 +600,7 @@ public:
             "InitialiseCellPdeElementMap() should only be called if mpCoarsePdeMesh is set up.");
 
         // Set up PDE and pass to handler
-        AveragedSourcePde<2> pde(cell_population, -0.1);
+        AveragedSourceEllipticPde<2> pde(cell_population, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_handler.AddPdeAndBc(&pde_and_bc);
@@ -654,7 +653,7 @@ public:
                 "Trying to solve a PDE on a cell population that doesn't have a mesh. Try calling UseCoarsePdeMesh().");
 
         // Use a coarse PDE mesh since we are using a node-based cell population
-        AveragedSourcePde<2> pde(cell_population, -0.1);
+        AveragedSourceEllipticPde<2> pde(cell_population, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("variable");
@@ -881,9 +880,9 @@ public:
         CellBasedPdeHandler<2> pde_handler(&cell_population);
 
         // Create a single PDE and pass to the handler
-        // Note SimplePdeForTesting wouldnt work as theres no solution with Neuman conditions.
+        // Note SimplePdeForTesting wouldn't work as there's no solution with Neuman conditions.
         // Also note that when using Neuman conditions the only solution that works is u=0
-        CellwiseSourcePde<2> pde(cell_population, 0.0);
+        CellwiseSourceEllipticPde<2> pde(cell_population, 0.0);
         ConstBoundaryCondition<2> bc(0.0);
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, true);
         pde_and_bc.SetDependentVariableName("variable");
@@ -944,7 +943,7 @@ public:
         CellBasedPdeHandler<2> pde_handler(&cell_population);
 
         // Set up PDE and pass to handler
-        AveragedSourcePde<2> pde(cell_population, -0.01);
+        AveragedSourceEllipticPde<2> pde(cell_population, -0.01);
         ConstBoundaryCondition<2> bc(1.0);
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("variable");
@@ -1014,7 +1013,7 @@ public:
         CellBasedPdeHandler<2> pde_handler(&cell_population);
 
         // Set up PDE and pass to handler
-        AveragedSourcePde<2> pde(cell_population, -0.01);
+        AveragedSourceEllipticPde<2> pde(cell_population, -0.01);
         ConstBoundaryCondition<2> bc(0.0);
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, true); // Last boolean specifies Neuman conditions
         pde_and_bc.SetDependentVariableName("variable");
@@ -1081,14 +1080,14 @@ public:
         CellBasedPdeHandler<2> pde_handler(&cell_population);
 
         // Set up PDE and pass to handler
-        AveragedSourcePde<2> pde(cell_population, -0.1);
+        AveragedSourceEllipticPde<2> pde(cell_population, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("quantity 1");
         pde_handler.AddPdeAndBc(&pde_and_bc);
 
         // Set up second PDE and pass to handler
-        AveragedSourcePde<2> pde2(cell_population, -0.5);
+        AveragedSourceEllipticPde<2> pde2(cell_population, -0.5);
         PdeAndBoundaryConditions<2> pde_and_bc2(&pde2, &bc, false);
         TS_ASSERT_THROWS_THIS(pde_handler.AddPdeAndBc(&pde_and_bc2), "When adding more than one PDE to CellBasedPdeHandler set the dependent variable name using SetDependentVariableName(name).");
         pde_and_bc2.SetDependentVariableName("quantity 1");

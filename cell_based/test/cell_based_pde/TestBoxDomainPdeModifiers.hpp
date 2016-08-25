@@ -62,8 +62,8 @@ public:
         // Make the PDE and BCs
         SimpleUniformSourcePde<2> pde(-0.1);
         ConstBoundaryCondition<2> bc(1.0);
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("averaged quantity");
+        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+        p_pde_and_bc->SetDependentVariableName("averaged quantity");
 
         // Make domain
         ChastePoint<2> lower(-10.0, -10.0);
@@ -71,7 +71,7 @@ public:
         ChasteCuboid<2> cuboid(lower, upper);
 
         // Create an elliptic PDE modifier object using this PDE and BCs object
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc, cuboid, 2.0));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc, cuboid, 2.0));
 
         // Test that member variables are initialised correctly
         TS_ASSERT_EQUALS(p_pde_modifier->mpPdeAndBcs->rGetDependentVariableName(), "averaged quantity");
@@ -99,8 +99,8 @@ public:
         // Make the PDE and BCs
         UniformSourceParabolicPde<2> pde(-0.1);
         ConstBoundaryCondition<2> bc(1.0);
-        ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("averaged quantity");
+        MAKE_PTR_ARGS(ParabolicPdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+        p_pde_and_bc->SetDependentVariableName("averaged quantity");
 
         // Make domain
         ChastePoint<2> lower(-10.0, -10.0);
@@ -108,7 +108,7 @@ public:
         ChasteCuboid<2> cuboid(lower, upper);
 
         // Create a parabolic PDE modifier object using this PDE and BCs object
-        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc,cuboid,2.0));
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc, cuboid, 2.0));
 
         // Test that member variables are initialised correctly
         TS_ASSERT_EQUALS(p_pde_modifier->mpPdeAndBcs->rGetDependentVariableName(), "averaged quantity");
@@ -143,8 +143,8 @@ public:
             // Make the PDE and BCs
             SimpleUniformSourcePde<2> pde(-0.1);
             ConstBoundaryCondition<2> bc(1.0);
-            PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-            pde_and_bc.SetDependentVariableName("averaged quantity");
+            MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+            p_pde_and_bc->SetDependentVariableName("averaged quantity");
 
             // Make domain
             ChastePoint<2> lower(-10.0, -10.0);
@@ -152,7 +152,7 @@ public:
             ChasteCuboid<2> cuboid(lower, upper);
 
             // Initialise an elliptic PDE modifier object using this PDE and BCs object
-            AbstractCellBasedSimulationModifier<2,2>* const p_modifier = new EllipticBoxDomainPdeModifier<2>(&pde_and_bc, cuboid, 2.0);
+            AbstractCellBasedSimulationModifier<2,2>* const p_modifier = new EllipticBoxDomainPdeModifier<2>(p_pde_and_bc, cuboid, 2.0);
 
             // Create an output archive
             std::ofstream ofs(archive_filename.c_str());
@@ -177,8 +177,6 @@ public:
             std::string variable_name = (static_cast<EllipticBoxDomainPdeModifier<2>*>(p_modifier2))->mpPdeAndBcs->rGetDependentVariableName();
             TS_ASSERT_EQUALS(variable_name, "averaged quantity");
 
-            ///\todo #2687 The archive created a new PDE object. Memory-management of mpPdeAndBcs is not enabled. Suggest using a shared-pointer.
-            delete (static_cast<EllipticBoxDomainPdeModifier<2>*>(p_modifier2))->mpPdeAndBcs;
             delete p_modifier2;
         }
     }
@@ -195,13 +193,13 @@ public:
             // Make the PDE and BCs
             UniformSourceParabolicPde<2> pde(-0.1);
             ConstBoundaryCondition<2> bc(1.0);
-            ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-            pde_and_bc.SetDependentVariableName("averaged quantity");
+            MAKE_PTR_ARGS(ParabolicPdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+            p_pde_and_bc->SetDependentVariableName("averaged quantity");
 
             ///\todo #2687
             // Make a dummy solution (because the archiver expects to be able to read/write PETSc Vecs).
             Vec vector = PetscTools::CreateAndSetVec(10, -42.0);
-            pde_and_bc.SetSolution(vector);
+            p_pde_and_bc->SetSolution(vector);
 
             // Make domain
             ChastePoint<2> lower(-10.0, -10.0);
@@ -209,7 +207,7 @@ public:
             ChasteCuboid<2> cuboid(lower, upper);
 
             // Initialise a parabolic PDE modifier object using this PDE and BCs object
-            AbstractCellBasedSimulationModifier<2,2>* const p_modifier = new ParabolicBoxDomainPdeModifier<2>(&pde_and_bc,cuboid,2.0);
+            AbstractCellBasedSimulationModifier<2,2>* const p_modifier = new ParabolicBoxDomainPdeModifier<2>(p_pde_and_bc, cuboid, 2.0);
 
             // Create an output archive
             std::ofstream ofs(archive_filename.c_str());
@@ -234,8 +232,6 @@ public:
             std::string variable_name = (static_cast<ParabolicBoxDomainPdeModifier<2>*>(p_modifier2))->mpPdeAndBcs->rGetDependentVariableName();
             TS_ASSERT_EQUALS(variable_name, "averaged quantity");
 
-            ///\todo #2687 The archive created a new PDE object. Memory-management of mpPdeAndBcs is not enabled. Suggest using a shared-pointer.
-            delete (static_cast<ParabolicBoxDomainPdeModifier<2>*>(p_modifier2))->mpPdeAndBcs;
             delete p_modifier2;
         }
     }

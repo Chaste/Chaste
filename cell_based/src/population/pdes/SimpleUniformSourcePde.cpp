@@ -65,7 +65,7 @@ c_matrix<double,DIM,DIM> SimpleUniformSourcePde<DIM>::ComputeDiffusionTerm(const
     return identity_matrix<double>(DIM);
 }
 
-///////// Explicit instantiation
+// Explicit instantiation
 template class SimpleUniformSourcePde<1>;
 template class SimpleUniformSourcePde<2>;
 template class SimpleUniformSourcePde<3>;

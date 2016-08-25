@@ -44,7 +44,7 @@ ParabolicGrowingDomainPdeModifier<DIM>::ParabolicGrowingDomainPdeModifier()
 }
 
 template<unsigned DIM>
-ParabolicGrowingDomainPdeModifier<DIM>::ParabolicGrowingDomainPdeModifier(ParabolicPdeAndBoundaryConditions<DIM>* pPdeAndBcs)
+ParabolicGrowingDomainPdeModifier<DIM>::ParabolicGrowingDomainPdeModifier(boost::shared_ptr<ParabolicPdeAndBoundaryConditions<DIM> > pPdeAndBcs)
     : AbstractGrowingDomainPdeModifier<DIM>(),
       mpPdeAndBcs(pPdeAndBcs)
 {
@@ -73,7 +73,7 @@ void ParabolicGrowingDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellP
     UpdateSolutionVector(rCellPopulation);
 
     // Use CellBasedParabolicPdeSolver as cell wise PDE
-    CellBasedParabolicPdeSolver<DIM> solver(this->mpFeMesh, mpPdeAndBcs->GetPde(), p_bcc.get());
+    CellBasedParabolicPdeSolver<DIM> solver(this->mpFeMesh.get(), mpPdeAndBcs->GetPde(), p_bcc.get());
 
     ///\todo Investigate more than one PDE time step per spatial step (#2687)
     SimulationTime* p_simulation_time = SimulationTime::Instance();
@@ -97,7 +97,7 @@ template<unsigned DIM>
 void ParabolicGrowingDomainPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)
 {
     // Temporarily cache the variable name until we create an AbstractPdeAndBcs object
-    // and move mpPdeAndBcs to the abstract class. See #2767
+    // and move mpPdeAndBcs to the abstract class. See #2767, #2687
     this->mCachedDependentVariableName = mpPdeAndBcs->rGetDependentVariableName();
 
     // Cache the output directory

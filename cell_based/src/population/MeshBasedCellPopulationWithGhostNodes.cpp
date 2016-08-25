@@ -91,10 +91,11 @@ MeshBasedCellPopulationWithGhostNodes<DIM>::~MeshBasedCellPopulationWithGhostNod
 }
 
 template<unsigned DIM>
-TetrahedralMesh<DIM, DIM>* MeshBasedCellPopulationWithGhostNodes<DIM>::GetTetrahedralMeshForPdeModifier()
+boost::shared_ptr<TetrahedralMesh<DIM, DIM> > MeshBasedCellPopulationWithGhostNodes<DIM>::GetTetrahedralMeshForPdeModifier()
 {
     EXCEPTION("Currently can't solve PDEs on meshes with ghost nodes");
-    return static_cast<TetrahedralMesh<DIM, DIM>*>(&(this->mrMesh));
+    boost::shared_ptr<TetrahedralMesh<DIM, DIM> > p_mesh(static_cast<TetrahedralMesh<DIM, DIM>*>(&(this->mrMesh)));
+    return p_mesh;
 }
 
 template<unsigned DIM>

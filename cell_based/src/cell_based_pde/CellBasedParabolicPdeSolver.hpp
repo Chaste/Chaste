@@ -60,14 +60,12 @@ protected:
      * The SimpleLinearParabolicSolver version of this method is
      * overloaded using the interpolated source term.
      *
-     * \todo document each input argument (#2687)
-     *
-     * @param rPhi
-     * @param rGradPhi
-     * @param rX
-     * @param rU
-     * @param rGradU
-     * @param pElement
+     * @param rPhi The basis functions, rPhi(i) = phi_i, i=1..numBases
+     * @param rGradPhi Basis gradients, rGradPhi(i,j) = d(phi_j)/d(X_i)
+     * @param rX The point in space
+     * @param rU The unknown as a vector, u(i) = u_i
+     * @param rGradU The gradient of the unknown as a matrix, rGradU(i,j) = d(u_i)/d(X_j)
+     * @param pElement Pointer to the element
      *
      * @return vector term.
      */

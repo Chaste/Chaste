@@ -208,9 +208,10 @@ const MutableMesh<ELEMENT_DIM,SPACE_DIM>& MeshBasedCellPopulation<ELEMENT_DIM,SP
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetTetrahedralMeshForPdeModifier()
+boost::shared_ptr<TetrahedralMesh<ELEMENT_DIM, SPACE_DIM> > MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetTetrahedralMeshForPdeModifier()
 {
-    return mpMutableMesh;
+    boost::shared_ptr<TetrahedralMesh<ELEMENT_DIM, SPACE_DIM> > p_mesh(mpMutableMesh);
+    return p_mesh;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

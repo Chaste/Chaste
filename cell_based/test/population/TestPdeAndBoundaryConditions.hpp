@@ -48,7 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MeshBasedCellPopulation.hpp"
 #include "NodesOnlyMesh.hpp"
 #include "NodeBasedCellPopulation.hpp"
-#include "AveragedSourcePde.hpp"
+#include "AveragedSourceEllipticPde.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "CellsGenerator.hpp"
 #include "FixedG1GenerationalCellCycleModel.hpp"
@@ -58,7 +58,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OutputFileHandler.hpp"
 #include "AbstractCellBasedWithTimingsTestSuite.hpp"
 #include "SmartPointers.hpp"
-#include "VolumeDependentAveragedSourcePde.hpp"
+#include "VolumeDependentAveragedSourceEllipticPde.hpp"
 
 class Simple2dPdeForTesting : public AbstractLinearEllipticPde<2,2>
 {
@@ -299,7 +299,7 @@ public:
         TS_ASSERT_EQUALS(pde_and_bc.IsNeumannBoundaryCondition(), true);
     }
 
-    void TestWithAveragedSourcePde() throw(Exception)
+    void TestWithAveragedSourceEllipticPde() throw(Exception)
     {
         // Set up cell population
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
@@ -327,7 +327,7 @@ public:
         TS_ASSERT_DELTA(coarse_mesh.GetElement(1)->CalculateCentroid()[1], 100.0/3.0, 0.1);
 
         // Set up PDE
-        AveragedSourcePde<2> pde(cell_population, -1.0);
+        AveragedSourceEllipticPde<2> pde(cell_population, -1.0);
         pde.SetupSourceTerms(coarse_mesh);
 
         ConstBoundaryCondition<2> bc(0.0);
@@ -347,7 +347,7 @@ public:
 
         TS_ASSERT_EQUALS(pde_and_bc.HasAveragedSourcePde(), true);
 
-        AveragedSourcePde<2>* p_pde = static_cast<AveragedSourcePde<2>*>(pde_and_bc.GetPde());
+        AveragedSourceEllipticPde<2>* p_pde = static_cast<AveragedSourceEllipticPde<2>*>(pde_and_bc.GetPde());
 
         // Test Compute source term
         ChastePoint<2> unused_point;
@@ -386,7 +386,7 @@ public:
         pde_and_bc.SetUpSourceTermsForAveragedSourcePde(&coarse_mesh);
     }
 
-    void TestWithVolumeDependentAveragedSourcePdeSetupSourceTermsWithoutMap() throw(Exception)
+    void TestWithVolumeDependentAveragedSourceEllipticPdeSetupSourceTermsWithoutMap() throw(Exception)
     {
         // Set up cell population
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
@@ -411,7 +411,7 @@ public:
 
         // Set up PDE
         double cell_weight=1.0/pow(cell_population.GetNode(1)->GetRadius(), 2);
-        VolumeDependentAveragedSourcePde<2> pde(cell_population, -cell_weight);
+        VolumeDependentAveragedSourceEllipticPde<2> pde(cell_population, -cell_weight);
         pde.SetupSourceTerms(coarse_mesh);
 
         ConstBoundaryCondition<2> bc(0.0);
@@ -431,7 +431,7 @@ public:
 
         TS_ASSERT_EQUALS(pde_and_bc.HasAveragedSourcePde(), true);
 
-        VolumeDependentAveragedSourcePde<2>* p_pde = static_cast<VolumeDependentAveragedSourcePde<2>*>(pde_and_bc.GetPde());
+        VolumeDependentAveragedSourceEllipticPde<2>* p_pde = static_cast<VolumeDependentAveragedSourceEllipticPde<2>*>(pde_and_bc.GetPde());
 
         // Test Compute source term
         ChastePoint<2> unused_point;

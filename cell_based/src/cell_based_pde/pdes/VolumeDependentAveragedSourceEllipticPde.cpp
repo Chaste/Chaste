@@ -33,19 +33,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "VolumeDependentAveragedSourcePde.hpp"
+#include "VolumeDependentAveragedSourceEllipticPde.hpp"
 #include "ApoptoticCellProperty.hpp"
 
 template<unsigned DIM>
-VolumeDependentAveragedSourcePde<DIM>::VolumeDependentAveragedSourcePde(AbstractCellPopulation<DIM>& rCellPopulation, double coefficient)
-    : AveragedSourcePde<DIM>(rCellPopulation, coefficient)
+VolumeDependentAveragedSourceEllipticPde<DIM>::VolumeDependentAveragedSourceEllipticPde(AbstractCellPopulation<DIM>& rCellPopulation, double coefficient)
+    : AveragedSourceEllipticPde<DIM>(rCellPopulation, coefficient)
 {
     assert(bool(dynamic_cast<NodeBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))));
     mpStaticCastCellPopulation = static_cast<NodeBasedCellPopulation<DIM>*>(&(this->mrCellPopulation));
 }
 
 template<unsigned DIM>
-void VolumeDependentAveragedSourcePde<DIM>::SetupSourceTerms(TetrahedralMesh<DIM,DIM>& rCoarseMesh,  std::map< CellPtr, unsigned >* pCellPdeElementMap) // must be called before solve
+void VolumeDependentAveragedSourceEllipticPde<DIM>::SetupSourceTerms(TetrahedralMesh<DIM,DIM>& rCoarseMesh,  std::map< CellPtr, unsigned >* pCellPdeElementMap) // must be called before solve
 {
     // Allocate memory
     this->mCellDensityOnCoarseElements.resize(rCoarseMesh.GetNumElements());
@@ -96,11 +96,11 @@ void VolumeDependentAveragedSourcePde<DIM>::SetupSourceTerms(TetrahedralMesh<DIM
     }
 }
 
-///////// Explicit instantiation
-template class VolumeDependentAveragedSourcePde<1>;
-template class VolumeDependentAveragedSourcePde<2>;
-template class VolumeDependentAveragedSourcePde<3>;
+// Explicit instantiation
+template class VolumeDependentAveragedSourceEllipticPde<1>;
+template class VolumeDependentAveragedSourceEllipticPde<2>;
+template class VolumeDependentAveragedSourceEllipticPde<3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(VolumeDependentAveragedSourcePde)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(VolumeDependentAveragedSourceEllipticPde)

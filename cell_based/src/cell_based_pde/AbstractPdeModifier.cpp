@@ -40,9 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned DIM>
 AbstractPdeModifier<DIM>::AbstractPdeModifier()
     : AbstractCellBasedSimulationModifier<DIM>(),
-      mDeleteMesh(false),
       mSolution(NULL),
-      mpFeMesh(NULL),
       mOutputDirectory(""),
       mCachedDependentVariableName(""),
       mOutputGradient(false)
@@ -53,10 +51,6 @@ AbstractPdeModifier<DIM>::AbstractPdeModifier()
 template<unsigned DIM>
 AbstractPdeModifier<DIM>::~AbstractPdeModifier()
 {
-    if (this->mDeleteMesh)
-    {
-        delete mpFeMesh;
-    }
 }
 
 template<unsigned DIM>
@@ -79,7 +73,7 @@ void AbstractPdeModifier<DIM>::UpdateAtEndOfOutputTimeStep(AbstractCellPopulatio
 
         p_vtk_mesh_writer->AddPointData(mCachedDependentVariableName,pde_solution);
 
-        p_vtk_mesh_writer->WriteFilesUsingMesh(*mpFeMesh);
+        p_vtk_mesh_writer->WriteFilesUsingMesh(*(mpFeMesh.get()));
         delete p_vtk_mesh_writer;
     }
 #endif //CHASTE_VTK

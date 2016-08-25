@@ -72,9 +72,8 @@ private:
         archive & mpPdeAndBcs;
     }
 
-    /** Pointer to a linear parabolic PDE object with associated boundary conditions. */
-    ///\todo #2687 Memory-management of mpPdeAndBcs is not enabled. Suggest using a shared-pointer.
-    ParabolicPdeAndBoundaryConditions<DIM>* mpPdeAndBcs;
+    /** Shared pointer to a linear parabolic PDE object with associated boundary conditions. */
+    boost::shared_ptr<ParabolicPdeAndBoundaryConditions<DIM> > mpPdeAndBcs;
 
 public:
 
@@ -88,9 +87,9 @@ public:
     /**
      * Constructor.
      *
-     * @param pPdeAndBcs an optional pointer to a linear elliptic PDE object with associated boundary conditions
+     * @param pPdeAndBcs a shared pointer to a linear elliptic PDE object with associated boundary conditions
      */
-    ParabolicGrowingDomainPdeModifier(ParabolicPdeAndBoundaryConditions<DIM>* pPdeAndBcs);
+    ParabolicGrowingDomainPdeModifier(boost::shared_ptr<ParabolicPdeAndBoundaryConditions<DIM> > pPdeAndBcs);
 
     /**
      * Destructor.

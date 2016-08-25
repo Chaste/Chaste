@@ -194,7 +194,7 @@ void CellBasedPdeHandlerOnCuboid<DIM>::OutputParameters(out_stream& rParamsFile)
 #include "SerializationExportWrapperForCpp.hpp"
 EXPORT_TEMPLATE_CLASS_SAME_DIMS(CellBasedPdeHandlerOnCuboid)
 
-///////// Explicit instantiation
+// Explicit instantiation
 template class CellBasedPdeHandlerOnCuboid<1>;
 template class CellBasedPdeHandlerOnCuboid<2>;
 template class CellBasedPdeHandlerOnCuboid<3>;

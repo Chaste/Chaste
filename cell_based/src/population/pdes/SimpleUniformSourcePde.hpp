@@ -42,7 +42,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractLinearEllipticPde.hpp"
 
 /**
- *  A simple nutrient PDE which is not directly coupled to the cell population.
+ * A simple nutrient PDE which is not directly coupled to the cell population.
+ *
+ * \todo Rename as UniformSourceEllipticPde and move to cell_based/src/cell_based_pde/pdes (#2687)
  */
 template<unsigned DIM>
 class SimpleUniformSourcePde : public AbstractLinearEllipticPde<DIM,DIM>

@@ -44,7 +44,7 @@ EllipticGrowingDomainPdeModifier<DIM>::EllipticGrowingDomainPdeModifier()
 }
 
 template<unsigned DIM>
-EllipticGrowingDomainPdeModifier<DIM>::EllipticGrowingDomainPdeModifier(PdeAndBoundaryConditions<DIM>* pPdeAndBcs)
+EllipticGrowingDomainPdeModifier<DIM>::EllipticGrowingDomainPdeModifier(boost::shared_ptr<PdeAndBoundaryConditions<DIM> > pPdeAndBcs)
     : AbstractGrowingDomainPdeModifier<DIM>(),
       mpPdeAndBcs(pPdeAndBcs)
 {
@@ -70,7 +70,7 @@ void EllipticGrowingDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPo
     std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc = this->ConstructBoundaryConditionsContainer();
 
     // Use CellBasedPdeSolver as cell wise PDE
-    CellBasedPdeSolver<DIM> solver(this->mpFeMesh, mpPdeAndBcs->GetPde(), p_bcc.get());
+    CellBasedPdeSolver<DIM> solver(this->mpFeMesh.get(), mpPdeAndBcs->GetPde(), p_bcc.get());
 
     ///\todo Use initial guess when solving the system (#2687)
     Vec old_solution_copy = this->mSolution;

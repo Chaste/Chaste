@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef AVERAGEDSOURCEPDE_HPP_
-#define AVERAGEDSOURCEPDE_HPP_
+#ifndef AVERAGEDSOURCEELLIPTICPDE_HPP_
+#define AVERAGEDSOURCEELLIPTICPDE_HPP_
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
@@ -45,11 +45,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractLinearEllipticPde.hpp"
 
 /**
- *  An Elliptic PDE which calculates the source term by adding the number of cells
+ *  An elliptic PDE which calculates the source term by adding the number of cells
  *  in the element containing that point and scaling by the element area.
  */
 template<unsigned DIM>
-class AveragedSourcePde : public AbstractLinearEllipticPde<DIM,DIM>
+class AveragedSourceEllipticPde : public AbstractLinearEllipticPde<DIM,DIM>
 {
     friend class TestCellBasedPdes;
 
@@ -90,7 +90,7 @@ public:
      * @param rCellPopulation reference to the cell population
      * @param coefficient the coefficient of consumption of nutrient by cells (defaults to 0.0)
      */
-    AveragedSourcePde(AbstractCellPopulation<DIM>& rCellPopulation, double coefficient=0.0);
+    AveragedSourceEllipticPde(AbstractCellPopulation<DIM>& rCellPopulation, double coefficient=0.0);
 
     /**
      * @return const reference to the cell population (used in archiving).
@@ -150,18 +150,18 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(AveragedSourcePde)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(AveragedSourceEllipticPde)
 
 namespace boost
 {
 namespace serialization
 {
 /**
- * Serialize information required to construct an AveragedSourcePde.
+ * Serialize information required to construct an AveragedSourceEllipticPde.
  */
 template<class Archive, unsigned DIM>
 inline void save_construct_data(
-    Archive & ar, const AveragedSourcePde<DIM>* t, const unsigned int file_version)
+    Archive & ar, const AveragedSourceEllipticPde<DIM>* t, const unsigned int file_version)
 {
     // Save data required to construct instance
     const AbstractCellPopulation<DIM>* p_cell_population = &(t->rGetCellPopulation());
@@ -169,20 +169,20 @@ inline void save_construct_data(
 }
 
 /**
- * De-serialize constructor parameters and initialise an AveragedSourcePde.
+ * De-serialize constructor parameters and initialise an AveragedSourceEllipticPde.
  */
 template<class Archive, unsigned DIM>
 inline void load_construct_data(
-    Archive & ar, AveragedSourcePde<DIM>* t, const unsigned int file_version)
+    Archive & ar, AveragedSourceEllipticPde<DIM>* t, const unsigned int file_version)
 {
     // Retrieve data from archive required to construct new instance
     AbstractCellPopulation<DIM>* p_cell_population;
     ar >> p_cell_population;
 
     // Invoke inplace constructor to initialise instance
-    ::new(t)AveragedSourcePde<DIM>(*p_cell_population);
+    ::new(t)AveragedSourceEllipticPde<DIM>(*p_cell_population);
 }
 }
 } // namespace ...
 
-#endif /*AVERAGEDSOURCEPDE_HPP_*/
+#endif /*AVERAGEDSOURCEELLIPTICPDE_HPP_*/

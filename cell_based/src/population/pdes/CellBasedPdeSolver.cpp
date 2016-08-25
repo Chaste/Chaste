@@ -109,7 +109,6 @@ void CellBasedPdeSolver<DIM>::InitialiseForSolve(Vec initialSolution)
 }
 
 // Explicit instantiation
-
 template class CellBasedPdeSolver<1>;
 template class CellBasedPdeSolver<2>;
 template class CellBasedPdeSolver<3>;

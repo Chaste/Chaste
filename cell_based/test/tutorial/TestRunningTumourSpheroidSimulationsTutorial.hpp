@@ -101,7 +101,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * associate with the PDE; and a PDE handler class, which is passed to the simulation object and
  * handles the numerical solution of any PDEs.
  */
-#include "CellwiseSourcePde.hpp"
+#include "CellwiseSourceEllipticPde.hpp"
 #include "ConstBoundaryCondition.hpp"
 #include "CellBasedPdeHandler.hpp"
 
@@ -202,7 +202,7 @@ public:
         /*
          * Next we instantiate an instance of the PDE class which we defined above.
          * This will be passed into the {{{OffLatticeSimulationWithPdes}}} object. The
-         * {{{CellwiseSourcePde}}} is a {{{PDE}}} class which inherits from
+         * {{{CellwiseSourceEllipticPde}}} is a {{{PDE}}} class which inherits from
          * {{{AbstractLinearEllipticPde}}} and represents
          * the PDE ''u_xx'' + ''u_yy'' = ''k''(''x'',''y'') ''u'', where ''u''(''x'',''y'') denotes
          * the oxygen concentration at
@@ -211,7 +211,7 @@ public:
          * the cell located at (''x'',''y'') is a live cell, and zero if the cell has died due
          * to oxygen deprivation.
          */
-        CellwiseSourcePde<2> pde(cell_population, -0.03);
+        CellwiseSourceEllipticPde<2> pde(cell_population, -0.03);
 
         /*
          * We also create a constant-valued boundary condition to associate with the PDE.

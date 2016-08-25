@@ -588,7 +588,7 @@ void VertexBasedCellPopulation<DIM>::ClearLocationsAndCellIdsOfT2Swaps()
 }
 
 template<unsigned DIM>
-TetrahedralMesh<DIM, DIM>* VertexBasedCellPopulation<DIM>::GetTetrahedralMeshForPdeModifier()
+boost::shared_ptr<TetrahedralMesh<DIM, DIM> > VertexBasedCellPopulation<DIM>::GetTetrahedralMeshForPdeModifier()
 {
     // This method only works in 2D sequential
     assert(DIM == 2);
@@ -721,7 +721,8 @@ TetrahedralMesh<DIM, DIM>* VertexBasedCellPopulation<DIM>::GetTetrahedralMeshFor
     // The original files have been deleted, it is better if the mesh object forgets about them
     p_mesh->SetMeshHasChangedSinceLoading();
 
-    return p_mesh;
+    boost::shared_ptr<TetrahedralMesh<DIM, DIM> > p_shared_mesh(p_mesh);
+    return p_shared_mesh;
 }
 
 template<unsigned DIM>

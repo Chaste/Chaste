@@ -62,7 +62,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * centres lie in each finite element containing that point, scaled by the area of
  * that element.
  *
- *  \todo this is the parabolic version of AveragedSourcePde; we should refactor the common functionality (#2687)
+ *  \todo this is the parabolic version of AveragedSourceEllipticPde; we should refactor the common functionality (#2687)
  */
 template<unsigned DIM>
 class AveragedSourceParabolicPde : public AbstractLinearParabolicPde<DIM,DIM>
@@ -129,7 +129,7 @@ public:
     /**
      * Set up the source terms.
      *
-     * \todo this is identical to the one in AveragedSourcePde so refactor.
+     * \todo this is identical to the one in AveragedSourceEllipticPde so refactor.
      *
      * @param rCoarseMesh reference to the coarse mesh
      * @param pCellPdeElementMap optional pointer to the map from cells to coarse elements

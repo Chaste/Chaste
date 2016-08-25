@@ -38,6 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include "AbstractCellBasedSimulationModifier.hpp"
 #include "TetrahedralMesh.hpp"
@@ -74,17 +75,11 @@ private:
 
 protected:
 
-    /**
-     * Whether to delete the mesh when we are destroyed.
-     * Needed if to free memory if creating meshes.
-     */
-    bool mDeleteMesh;
-
     /** The solution to the PDE problem at the current timestep. */
     Vec mSolution; ///\todo NEED TO ARCHIVE THIS see PdeandBoundaryCondidtion (#2687)
 
-    /** Pointer to the finite element mesh on which to solve the PDE. **/
-    TetrahedralMesh<DIM,DIM>* mpFeMesh;  ///\todo #2687 NEED TO ARCHIVE THIS
+    /** Shared pointer to the finite element mesh on which to solve the PDE. **/
+    boost::shared_ptr<TetrahedralMesh<DIM,DIM> > mpFeMesh;  ///\todo #2687 NEED TO ARCHIVE THIS
 
     /** Store the output directory name. */
     std::string mOutputDirectory;

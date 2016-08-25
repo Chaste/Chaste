@@ -175,7 +175,7 @@ void CellBasedPdeHandler<DIM>::OpenResultsFiles(std::string outputDirectory)
     // If appropriate, make a coarse mesh which exactly overlays the lattice sites of a PottsMesh (used for all OnLattice simulations)
     if ((dynamic_cast<CaBasedCellPopulation<DIM>*>(mpCellPopulation) != NULL) && mpCoarsePdeMesh==NULL)
     {
-        assert(DIM ==2);
+        assert(DIM == 2);
         ChasteCuboid<DIM> cuboid = mpCellPopulation->rGetMesh().CalculateBoundingBox();
 
         // Currently only works with square meshes
@@ -855,7 +855,7 @@ bool CellBasedPdeHandler<DIM>::PdeSolveNeedsCoarseMesh()
 #include "SerializationExportWrapperForCpp.hpp"
 EXPORT_TEMPLATE_CLASS_SAME_DIMS(CellBasedPdeHandler)
 
-///////// Explicit instantiation
+// Explicit instantiation
 template class CellBasedPdeHandler<1>;
 template class CellBasedPdeHandler<2>;
 template class CellBasedPdeHandler<3>;

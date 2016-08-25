@@ -205,11 +205,11 @@ public:
     /**
      * Overridden GetTetrahedralMeshForPdeModifier() method.
      *
-     * @return a copy of mrMesh.
+     * @return a shared pointer to mpMutableMesh.
      *
      * This method is called by AbstractGrowingDomainPdeModifier.
      */
-    virtual TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* GetTetrahedralMeshForPdeModifier();
+    virtual boost::shared_ptr<TetrahedralMesh<ELEMENT_DIM, SPACE_DIM> > GetTetrahedralMeshForPdeModifier();
 
     /** @return mUseAreaBasedDampingConstant. */
     bool UseAreaBasedDampingConstant();

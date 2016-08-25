@@ -38,6 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include "AbstractGrowingDomainPdeModifier.hpp"
 #include "BoundaryConditionsContainer.hpp"
@@ -72,9 +73,8 @@ private:
         archive & mpPdeAndBcs;
     }
 
-    /** Pointer to a linear elliptic PDE object with associated boundary conditions. */
-    ///\todo #2687 Memory-management of mpPdeAndBcs is not enabled. Suggest using a shared-pointer.
-    PdeAndBoundaryConditions<DIM>* mpPdeAndBcs;
+    /** Shared pointer to a linear elliptic PDE object with associated boundary conditions. */
+    boost::shared_ptr<PdeAndBoundaryConditions<DIM> > mpPdeAndBcs;
 
 public:
 
@@ -88,9 +88,9 @@ public:
     /**
      * Constructor.
      *
-     * @param pPdeAndBcs an optional pointer to a linear elliptic PDE object with associated boundary conditions.
+     * @param pPdeAndBcs shared pointer to a linear elliptic PDE object with associated boundary conditions.
      */
-    EllipticGrowingDomainPdeModifier(PdeAndBoundaryConditions<DIM>* pPdeAndBcs);
+    EllipticGrowingDomainPdeModifier(boost::shared_ptr<PdeAndBoundaryConditions<DIM> > pPdeAndBcs);
 
     /**
      * Destructor.

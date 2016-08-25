@@ -42,8 +42,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellPopulation.hpp"
 #include "AbstractLinearEllipticPde.hpp"
 
-///\todo #2687 this should replace CellwiseSourcePde in the trunk.
-
 /**
  * A PDE which has a source at each non-apoptotic cell.
  *
