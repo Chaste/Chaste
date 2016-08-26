@@ -166,6 +166,11 @@ public:
 
         simulator.SetCellBasedPdeHandler(&pde_handler);
 
+///\todo Refactor CellBasedPdeHandler as a simulation modifier (#2687)
+//        // Create a PDE modifier object using this PDE and BCs object
+//        MAKE_PTR_ARGS(CellBasedPdeHandler<2>, p_pde_modifier, (p_pde_and_bc, false)); // Don't impose BCs on coarse boundary
+//        simulator.AddSimulationModifier(p_pde_modifier);
+
         /*
          * Create a force law and pass it to the simulation. Use an extremely small
          * cutoff so that no cells interact - this is to ensure that in the Solve()
@@ -255,8 +260,12 @@ public:
 
         CellBasedPdeHandler<2> pde_handler(&cell_population);
         pde_handler.AddPdeAndBc(&pde_and_bc);
-
         simulator.SetCellBasedPdeHandler(&pde_handler);
+
+///\todo Refactor CellBasedPdeHandler as a simulation modifier (#2687)
+//        // Create a PDE modifier object using this PDE and BCs object
+//        MAKE_PTR_ARGS(CellBasedPdeHandler<2>, p_pde_modifier, (p_pde_and_bc));
+//        simulator.AddSimulationModifier(p_pde_modifier);
 
         simulator.SetOutputDirectory("OffLatticeSimulationWithOxygen");
         simulator.SetEndTime(0.5);
@@ -366,6 +375,11 @@ public:
 
         simulator.SetCellBasedPdeHandler(&pde_handler);
 
+///\todo Refactor CellBasedPdeHandler as a simulation modifier (#2687)
+//        // Create a PDE modifier object using this PDE and BCs object
+//        MAKE_PTR_ARGS(CellBasedPdeHandler<2>, p_pde_modifier, (p_pde_and_bc, false)); // Don't impose BCs on coarse boundary
+//        simulator.AddSimulationModifier(p_pde_modifier);
+
         // Create a force law and pass it to the simulation
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
         p_linear_force->SetCutOffLength(1.5);
@@ -455,6 +469,11 @@ public:
         pde_handler.SetImposeBcsOnCoarseBoundary(false);
         simulator.SetCellBasedPdeHandler(&pde_handler);
 
+///\todo Refactor CellBasedPdeHandler as a simulation modifier (#2687)
+//        // Create a PDE modifier object using this PDE and BCs object
+//        MAKE_PTR_ARGS(CellBasedPdeHandler<2>, p_pde_modifier, (p_pde_and_bc, false)); // Don't impose BCs on coarse boundary
+//        simulator.AddSimulationModifier(p_pde_modifier);
+
         // Create a force law and pass it to the simulation
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
         p_linear_force->SetCutOffLength(1.5);
@@ -533,6 +552,11 @@ public:
         pde_handler.SetImposeBcsOnCoarseBoundary(false);
 
         simulator.SetCellBasedPdeHandler(&pde_handler);
+
+    ///\todo Refactor CellBasedPdeHandler as a simulation modifier (#2687)
+    //        // Create a PDE modifier object using this PDE and BCs object
+    //        MAKE_PTR_ARGS(CellBasedPdeHandler<2>, p_pde_modifier, (p_pde_and_bc, false)); // Don't impose BCs on coarse boundary
+    //        simulator.AddSimulationModifier(p_pde_modifier);
 
         // Create a force law and pass it to the simulation
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
@@ -642,6 +666,11 @@ public:
         pde_handler.UseCoarsePdeMesh(10.0, cuboid, true);
         pde_handler.SetImposeBcsOnCoarseBoundary(false);
         simulator.SetCellBasedPdeHandler(&pde_handler);
+
+///\todo Refactor CellBasedPdeHandler as a simulation modifier (#2687)
+//        // Create a PDE modifier object using this PDE and BCs object
+//        MAKE_PTR_ARGS(CellBasedPdeHandler<2>, p_pde_modifier, (p_pde_and_bc, false, cuboid)); // Don't impose BCs on coarse boundary
+//        simulator.AddSimulationModifier(p_pde_modifier);
 
         // Create a force law and pass it to the simulation
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
@@ -789,6 +818,11 @@ public:
         pde_handler.SetImposeBcsOnCoarseBoundary(false);
         simulator.SetCellBasedPdeHandler(&pde_handler);
 
+///\todo Refactor CellBasedPdeHandler as a simulation modifier (#2687)
+//        // Create a PDE modifier object using this PDE and BCs object
+//        MAKE_PTR_ARGS(CellBasedPdeHandler<2>, p_pde_modifier, (p_pde_and_bc, false, cuboid)); // Don't impose BCs on coarse boundary
+//        simulator.AddSimulationModifier(p_pde_modifier);
+
         // Create a force law and pass it to the simulation
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
         p_linear_force->SetCutOffLength(1.5);
@@ -868,6 +902,11 @@ public:
 
         pde_handler.SetImposeBcsOnCoarseBoundary(false);
         simulator.SetCellBasedPdeHandler(&pde_handler);
+
+///\todo Refactor CellBasedPdeHandler as a simulation modifier (#2687)
+//        // Create a PDE modifier object using this PDE and BCs object
+//        MAKE_PTR_ARGS(CellBasedPdeHandler<2>, p_pde_modifier, (p_pde_and_bc, false)); // Don't impose BCs on coarse boundary
+//        simulator.AddSimulationModifier(p_pde_modifier);
 
         // Create a force law and pass it to the simulation
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
@@ -963,6 +1002,11 @@ public:
 
         simulator.SetCellBasedPdeHandler(&pde_handler);
 
+///\todo Refactor CellBasedPdeHandler as a simulation modifier (#2687)
+//        // Create a PDE modifier object using this PDE and BCs object
+//        MAKE_PTR_ARGS(CellBasedPdeHandler<2>, p_pde_modifier, (p_pde_and_bc, false)); // Don't impose BCs on coarse boundary
+//        simulator.AddSimulationModifier(p_pde_modifier);
+
         // Create a force law and pass it to the simulation
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
         p_linear_force->SetCutOffLength(3.0);
@@ -1031,6 +1075,11 @@ public:
 
         simulator.SetCellBasedPdeHandler(&pde_handler);
 
+///\todo Refactor CellBasedPdeHandler as a simulation modifier (#2687)
+//        // Create a PDE modifier object using this PDE and BCs object
+//        MAKE_PTR_ARGS(CellBasedPdeHandler<3>, p_pde_modifier, (p_pde_and_bc, false)); // Don't impose BCs on coarse boundary
+//        simulator.AddSimulationModifier(p_pde_modifier);
+
         // Create a force law and pass it to the simulation
         MAKE_PTR(GeneralisedLinearSpringForce<3>, p_linear_force);
         p_linear_force->SetCutOffLength(1.5);
@@ -1095,6 +1144,11 @@ public:
 
         simulator.SetCellBasedPdeHandler(&pde_handler);
 
+///\todo Refactor CellBasedPdeHandler as a simulation modifier (#2687)
+//        // Create a PDE modifier object using this PDE and BCs object
+//        MAKE_PTR_ARGS(CellBasedPdeHandler<2>, p_pde_modifier, (p_pde_and_bc, false)); // Don't impose BCs on coarse boundary
+//        simulator.AddSimulationModifier(p_pde_modifier);
+
         double end_time = 0.5;
         simulator.SetEndTime(end_time);
 
@@ -1146,6 +1200,11 @@ public:
         CellBasedPdeHandler<2> pde_handler(&cell_population);
         pde_handler.AddPdeAndBc(&pde_and_bc);
         simulator.SetCellBasedPdeHandler(&pde_handler);
+
+///\todo Refactor CellBasedPdeHandler as a simulation modifier (#2687)
+//        // Create a PDE modifier object using this PDE and BCs object
+//        MAKE_PTR_ARGS(CellBasedPdeHandler<2>, p_pde_modifier, (p_pde_and_bc));
+//        simulator.AddSimulationModifier(p_pde_modifier);
 
         // Create a force law and pass it to the simulation
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
@@ -1213,6 +1272,11 @@ public:
         pde_handler.SetImposeBcsOnCoarseBoundary(false);
         simulator.SetCellBasedPdeHandler(&pde_handler);
 
+///\todo Refactor CellBasedPdeHandler as a simulation modifier (#2687)
+//        // Create a PDE modifier object using this PDE and BCs object
+//        MAKE_PTR_ARGS(CellBasedPdeHandler<2>, p_pde_modifier, (p_pde_and_bc, false)); // Don't impose BCs on coarse boundary
+//        simulator.AddSimulationModifier(p_pde_modifier);
+
         // Create a force law and pass it to the simulation
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
         p_linear_force->SetCutOffLength(1.5);
@@ -1274,6 +1338,11 @@ public:
         pde_handler.SetImposeBcsOnCoarseBoundary(false);
 
         simulator.SetCellBasedPdeHandler(&pde_handler);
+
+///\todo Refactor CellBasedPdeHandler as a simulation modifier (#2687)
+//        // Create a PDE modifier object using this PDE and BCs object
+//        MAKE_PTR_ARGS(CellBasedPdeHandler<2>, p_pde_modifier, (p_pde_and_bc, false, cuboid)); // Don't impose BCs on coarse boundary
+//        simulator.AddSimulationModifier(p_pde_modifier);
 
         // Create a force law and pass it to the simulation
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
@@ -1362,6 +1431,11 @@ public:
         //pde_handler.SetImposeBcsOnCoarseBoundary(false);
 
         simulator.SetCellBasedPdeHandler(&pde_handler);
+
+///\todo Refactor CellBasedPdeHandler as a simulation modifier (#2687)
+//        // Create a PDE modifier object using this PDE and BCs object
+//        MAKE_PTR_ARGS(CellBasedPdeHandler<2>, p_pde_modifier, (p_pde_and_bc, true, cuboid));
+//        simulator.AddSimulationModifier(p_pde_modifier);
 
         // Create a force law and pass it to the simulation
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
@@ -1474,6 +1548,11 @@ public:
         pde_handler.SetImposeBcsOnCoarseBoundary(false);
         simulator.SetCellBasedPdeHandler(&pde_handler);
 
+///\todo Refactor CellBasedPdeHandler as a simulation modifier (#2687)
+//        // Create a PDE modifier object using this PDE and BCs object
+//        MAKE_PTR_ARGS(CellBasedPdeHandler<2>, p_pde_modifier, (p_pde_and_bc, false, cuboid)); // Don't impose BCs on coarse boundary
+//        simulator.AddSimulationModifier(p_pde_modifier);
+
         // Solve the system
         simulator.Solve();
 
@@ -1561,6 +1640,12 @@ public:
         pde_handler.UseCoarsePdeMesh(mesh_size, cuboid, true);
 
         simulator.SetCellBasedPdeHandler(&pde_handler);
+
+///\todo Refactor CellBasedPdeHandler as a simulation modifier (#2687)
+//        // Create a PDE modifier object using this PDE and BCs object
+//        MAKE_PTR_ARGS(CellBasedPdeHandler<2>, p_pde_modifier, (p_pde_and_bc, true, cuboid));
+//        simulator.AddSimulationModifier(p_pde_modifier);
+
         simulator.SetOutputDirectory("TestCoarsePdeSolutionOnNodeBased1d");
 
         // Solve the system
@@ -1631,6 +1716,11 @@ public:
 
         simulator.SetCellBasedPdeHandler(&pde_handler);
 
+///\todo Refactor CellBasedPdeHandler as a simulation modifier (#2687)
+//        // Create a PDE modifier object using this PDE and BCs object
+//        MAKE_PTR_ARGS(CellBasedPdeHandler<2>, p_pde_modifier, (p_pde_and_bc, false, cuboid)); // Don't impose BCs on coarse boundary
+//        simulator.AddSimulationModifier(p_pde_modifier);
+
         // Solve the system
         simulator.Solve();
 
@@ -1696,6 +1786,11 @@ public:
         pde_handler.UseCoarsePdeMesh(10.0, cuboid, true);
         pde_handler.SetImposeBcsOnCoarseBoundary(false);
         simulator.SetCellBasedPdeHandler(&pde_handler);
+
+///\todo Refactor CellBasedPdeHandler as a simulation modifier (#2687)
+//        // Create a PDE modifier object using this PDE and BCs object
+//        MAKE_PTR_ARGS(CellBasedPdeHandler<3>, p_pde_modifier, (p_pde_and_bc, false, cuboid)); // Don't impose BCs on coarse boundary
+//        simulator.AddSimulationModifier(p_pde_modifier);
 
         // Solve the system
         simulator.Solve();

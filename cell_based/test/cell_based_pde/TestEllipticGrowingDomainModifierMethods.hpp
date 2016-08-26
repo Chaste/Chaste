@@ -239,7 +239,7 @@ public:
         CellPtr p_cell_210 = cell_population.GetCellUsingLocationIndex(210);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[0], 10, 1e-4);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[1], 5.0*sqrt(3.0), 1e-4);
-        TS_ASSERT_DELTA( p_cell_210->GetCellData()->GetItem("variable"), 0.4542, 1e-4);
+        TS_ASSERT_DELTA(p_cell_210->GetCellData()->GetItem("variable"), 0.4542, 1e-4);
     }
 
     void TestNodeBasedSquareMonolayer() throw (Exception)

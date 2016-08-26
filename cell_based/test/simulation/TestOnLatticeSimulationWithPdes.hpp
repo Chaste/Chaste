@@ -132,6 +132,11 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
 
         simulator.SetCellBasedPdeHandler(&pde_handler);
 
+///\todo Refactor CellBasedPdeHandler as a simulation modifier (#2687)
+//        // Create a PDE modifier object using this PDE and BCs object
+//        MAKE_PTR_ARGS(CellBasedPdeHandler<2>, p_pde_modifier, (p_pde_and_bc, true));
+//        simulator.AddSimulationModifier(p_pde_modifier);
+
         // Create update rules and pass to the simulation
         MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule);
         simulator.AddUpdateRule(p_volume_constraint_update_rule);
@@ -180,6 +185,11 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         pde_handler.SetImposeBcsOnCoarseBoundary(false);
 
         simulator.SetCellBasedPdeHandler(&pde_handler);
+
+///\todo Refactor CellBasedPdeHandler as a simulation modifier (#2687)
+//        // Create a PDE modifier object using this PDE and BCs object
+//        MAKE_PTR_ARGS(CellBasedPdeHandler<2>, p_pde_modifier, (p_pde_and_bc, false, cuboid)); // Don't impose BCs on coarse boundary
+//        simulator.AddSimulationModifier(p_pde_modifier);
 
         // Create update rules and pass to the simulation
         MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule);
@@ -280,6 +290,12 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
 
         simulator.SetCellBasedPdeHandler(&pde_handler);
 
+///\todo Refactor CellBasedPdeHandler as a simulation modifier (#2687)
+///\todo Let other PDE simulation modifiers solve multiple PDEs (#2687)
+//        // Create a PDE modifier object using this PDE and BCs object
+//        MAKE_PTR_ARGS(CellBasedPdeHandler<2>, p_pde_modifier, (p_pde_and_bc, false)); // Don't impose BCs on coarse boundary
+//        simulator.AddSimulationModifier(p_pde_modifier);
+
         // Create update rules and pass to the simulation
         MAKE_PTR(DiffusionCaUpdateRule<2>, p_diffusion_update_rule);
         p_diffusion_update_rule->SetDiffusionParameter(0.5);
@@ -377,6 +393,11 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
 
         simulator.SetCellBasedPdeHandler(&pde_handler);
 
+///\todo Refactor CellBasedPdeHandler as a simulation modifier (#2687)
+//        // Create a PDE modifier object using this PDE and BCs object
+//        MAKE_PTR_ARGS(CellBasedPdeHandler<2>, p_pde_modifier, (p_pde_and_bc, false)); // Don't impose BCs on coarse boundary
+//        simulator.AddSimulationModifier(p_pde_modifier);
+
         simulator.Solve();
 
         // Test solution is constant
@@ -435,12 +456,17 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
 
         simulator.SetCellBasedPdeHandler(&pde_handler);
 
+///\todo Refactor CellBasedPdeHandler as a simulation modifier (#2687)
+//        // Create a PDE modifier object using this PDE and BCs object
+//        MAKE_PTR_ARGS(CellBasedPdeHandler<2>, p_pde_modifier, (p_pde_and_bc));
+//        simulator.AddSimulationModifier(p_pde_modifier);
+
         simulator.Solve();
 
         // Test solution is constant
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-                cell_iter != cell_population.End();
-                ++cell_iter)
+             cell_iter != cell_population.End();
+             ++cell_iter)
         {
             double analytic_solution = 1.0;
             // Test that PDE solver is working correctly
@@ -490,6 +516,11 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         pde_handler.AddPdeAndBc(&pde_and_bc);
         pde_handler.SetImposeBcsOnCoarseBoundary(false);
         simulator.SetCellBasedPdeHandler(&pde_handler);
+
+///\todo Refactor CellBasedPdeHandler as a simulation modifier (#2687)
+//        // Create a PDE modifier object using this PDE and BCs object
+//        MAKE_PTR_ARGS(CellBasedPdeHandlerOnCuboid<2>, p_pde_modifier, (p_pde_and_bc, false)); // Don't impose BCs on coarse boundary
+//        simulator.AddSimulationModifier(p_pde_modifier);
 
         // Solve the system
         simulator.Solve();
@@ -562,6 +593,11 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
 
         simulator.SetCellBasedPdeHandler(&pde_handler);
 
+///\todo Refactor CellBasedPdeHandler as a simulation modifier (#2687)
+//        // Create a PDE modifier object using this PDE and BCs object
+//        MAKE_PTR_ARGS(CellBasedPdeHandler<2>, p_pde_modifier, (p_pde_and_bc, true, cuboid));
+//        simulator.AddSimulationModifier(p_pde_modifier);
+
         // Solve the system
         TS_ASSERT_THROWS_THIS(simulator.Solve(), "Point [6,0] is not in mesh - all elements tested");
     }
@@ -617,6 +653,11 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         pde_handler.SetImposeBcsOnCoarseBoundary(true);
 
         simulator.SetCellBasedPdeHandler(&pde_handler);
+
+///\todo Refactor CellBasedPdeHandler as a simulation modifier (#2687)
+//        // Create a PDE modifier object using this PDE and BCs object
+//        MAKE_PTR_ARGS(CellBasedPdeHandler<2>, p_pde_modifier, (p_pde_and_bc, true, cuboid));
+//        simulator.AddSimulationModifier(p_pde_modifier);
 
         // Create update rules and pass to the simulation
         MAKE_PTR(DiffusionCaUpdateRule<2>, p_diffusion_update_rule);
@@ -715,6 +756,11 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
 
         simulator.SetCellBasedPdeHandler(&pde_handler);
 
+///\todo Refactor CellBasedPdeHandler as a simulation modifier (#2687)
+//        // Create a PDE modifier object using this PDE and BCs object
+//        MAKE_PTR_ARGS(CellBasedPdeHandler<2>, p_pde_modifier, (p_pde_and_bc, true, cuboid));
+//        simulator.AddSimulationModifier(p_pde_modifier);
+
         // Create update rules and pass to the simulation
         MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule);
         simulator.AddUpdateRule(p_volume_constraint_update_rule);
@@ -798,6 +844,11 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         pde_handler.SetImposeBcsOnCoarseBoundary(true);
 
         simulator.SetCellBasedPdeHandler(&pde_handler);
+
+///\todo Refactor CellBasedPdeHandler as a simulation modifier (#2687)
+//        // Create a PDE modifier object using this PDE and BCs object
+//        MAKE_PTR_ARGS(CellBasedPdeHandler<2>, p_pde_modifier, (p_pde_and_bc, true));
+//        simulator.AddSimulationModifier(p_pde_modifier);
 
         // Create update rules and pass to the simulation
         MAKE_PTR(DiffusionCaUpdateRule<2>, p_diffusion_update_rule);

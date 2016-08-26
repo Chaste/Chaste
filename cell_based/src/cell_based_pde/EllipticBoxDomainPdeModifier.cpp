@@ -74,7 +74,7 @@ void EllipticBoxDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopula
 
     this->UpdateCellPdeElementMap(rCellPopulation);
 
-    // When using a PDE mesh which doesnt coincide with the cells, we must set up the source terms before solving the PDE.
+    // When using a PDE mesh which doesn't coincide with the cells, we must set up the source terms before solving the PDE.
     // Pass in already updated CellPdeElementMap to speed up finding cells.
     mpPdeAndBcs->SetUpSourceTermsForAveragedSourcePde(this->mpFeMesh.get(), &this->mCellPdeElementMap);
 

@@ -101,7 +101,11 @@ protected:
     /** File that the values of the PDE solution are written out to. */
     out_stream mpVizPdeSolutionResultsFile;
 
-    /** File that the average radial PDE solution is written out to. */
+    /**
+     * File that the average radial PDE solution is written out to.
+     *
+     * \todo Extract this functionality out to a separate writer class (#2687)
+     */
     out_stream mpAverageRadialPdeSolutionResultsFile;
 
     /** Whether to write to file the average radial PDE solution. */

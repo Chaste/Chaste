@@ -236,7 +236,7 @@ public:
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Create a PDE object
-        AveragedSourceEllipticPde<2> pde(cell_population, 1.0, 0.05);
+        AveragedSourceEllipticPde<2> pde(cell_population, 0.05);
 
         // Test that the member variables have been initialised correctly
         TS_ASSERT_EQUALS(&(pde.rGetCellPopulation()), &cell_population);
