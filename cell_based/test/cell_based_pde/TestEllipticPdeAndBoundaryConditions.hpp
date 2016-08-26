@@ -178,7 +178,7 @@ public:
 
     void TestMethodsNeumann() throw(Exception)
     {
-        // Create a EllipticPdeAndBoundaryConditions object
+        // Create an EllipticPdeAndBoundaryConditions object
         Simple2dPdeForTesting pde;
         ConstBoundaryCondition<2> bc(0.0);
 
@@ -228,7 +228,7 @@ public:
 
     void TestWithBoundaryConditionVaryingInSpace() throw(Exception)
     {
-        // Create a EllipticPdeAndBoundaryConditions object with spatially varying boundary condition
+        // Create an EllipticPdeAndBoundaryConditions object with spatially varying boundary condition
         Simple2dPdeForTesting pde;
         FunctionalBoundaryCondition<2> functional_bc(&bc_func1);
         bool is_neumann_bc = false;
@@ -260,7 +260,7 @@ public:
         SimulationTime* p_simulation_time = SimulationTime::Instance();
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(10.0, 2);
 
-        // Create a EllipticPdeAndBoundaryConditions object with time-dependent boundary condition
+        // Create an EllipticPdeAndBoundaryConditions object with time-dependent boundary condition
         Simple2dPdeForTesting pde;
         FunctionalBoundaryCondition<2> functional_bc(&bc_func2);
         bool is_neumann_bc = false;
@@ -332,7 +332,7 @@ public:
 
         ConstBoundaryCondition<2> bc(0.0);
 
-        // Create a EllipticPdeAndBoundaryConditions object
+        // Create an EllipticPdeAndBoundaryConditions object
         EllipticPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc);
 
         ChastePoint<2> point;
@@ -416,7 +416,7 @@ public:
 
         ConstBoundaryCondition<2> bc(0.0);
 
-        // Create a EllipticPdeAndBoundaryConditions object
+        // Create an EllipticPdeAndBoundaryConditions object
         EllipticPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc);
 
         ChastePoint<2> point;
@@ -480,7 +480,7 @@ public:
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "EllipticPdeAndBoundaryConditions.arch";
 
         {
-            // Create a EllipticPdeAndBoundaryConditions object
+            // Create an EllipticPdeAndBoundaryConditions object
             UniformSourceEllipticPde<2> pde(0.75);
             ConstBoundaryCondition<2> bc(2.45);
             bool is_neumann_bc = false;
@@ -529,7 +529,7 @@ public:
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "EllipticPdeAndBoundaryConditions.arch";
 
         {
-            // Create a EllipticPdeAndBoundaryConditions object
+            // Create an EllipticPdeAndBoundaryConditions object
             UniformSourceEllipticPde<2> pde(0.75);
             ConstBoundaryCondition<2> bc(2.45);
             bool is_neumann_bc = false;

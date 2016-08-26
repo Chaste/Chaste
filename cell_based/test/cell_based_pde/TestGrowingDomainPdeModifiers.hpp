@@ -118,7 +118,7 @@ public:
         MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc));
         {
             // Create a MeshBasedCellPopulation
-            HoneycombMeshGenerator generator(10,10, 0);
+            HoneycombMeshGenerator generator(10, 10, 0);
             MutableMesh<2,2>* p_mesh = generator.GetMesh();
 
             std::vector<CellPtr> mesh_cells;
@@ -132,9 +132,8 @@ public:
             // Check that the meshes have the same nodes
             for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
             {
-                TS_ASSERT_DELTA(p_pde_modifier->mpFeMesh->GetNode(i)->rGetLocation()[0], p_mesh->GetNode(i)->rGetLocation()[0],1e-5);
-                TS_ASSERT_DELTA(p_pde_modifier->mpFeMesh->GetNode(i)->rGetLocation()[1], p_mesh->GetNode(i)->rGetLocation()[1],1e-5);
-
+                TS_ASSERT_DELTA(p_pde_modifier->mpFeMesh->GetNode(i)->rGetLocation()[0], p_mesh->GetNode(i)->rGetLocation()[0], 1e-5);
+                TS_ASSERT_DELTA(p_pde_modifier->mpFeMesh->GetNode(i)->rGetLocation()[1], p_mesh->GetNode(i)->rGetLocation()[1], 1e-5);
                 TS_ASSERT_EQUALS(p_pde_modifier->mpFeMesh->GetNode(i)->IsBoundaryNode(), p_mesh->GetNode(i)->IsBoundaryNode());
             }
         }

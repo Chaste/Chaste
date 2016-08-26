@@ -42,17 +42,24 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractLinearEllipticPde.hpp"
 
 /**
- * \todo Improve documentation (#2687)
+ * An elliptic PDE to be solved numerically using the finite element method, for
+ * coupling to a cell-based simulation.
  *
- * A simple nutrient PDE which is not directly coupled to the cell population.
+ * The PDE takes the form
  *
- * \todo Rename as UniformSourceEllipticPde and move to cell_based/src/cell_based_pde/pdes (#2687)
+ * Grad.(Grad(u)) + k = 0,
+ *
+ * where the scalar k is specified by the member mSourceCoefficient, whose value
+ * must be set in the constructor.
+ *
+ * Thus, there is no direct coupling between the cell-based simulation and the
+ * terms of the PDE; here, the cell population just defines the spatial domain
+ * on which to solve the PDE.
  */
 template<unsigned DIM>
 class UniformSourceEllipticPde : public AbstractLinearEllipticPde<DIM,DIM>
 {
-	///\todo Move TestCellBasedPdes into cell_based/test/cell_based_pde (#2687)
-    friend class TestCellBasedPdes;
+    friend class TestCellBasedEllipticPdes;
 
 private:
 
@@ -68,23 +75,23 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
        archive & boost::serialization::base_object<AbstractLinearEllipticPde<DIM, DIM> >(*this);
-       archive & mCoefficient;
+       archive & mSourceCoefficient;
     }
 
-    /** Coefficient of consumption of nutrient by cells. */
-    double mCoefficient;
+    /** Coefficient of source term. */
+    double mSourceCoefficient;
 
 public:
 
     /**
      * Constructor.
      *
-     * @param coefficient the coefficient of consumption of nutrient by cells (defaults to 0.0)
+     * @param sourceCeofficient the source term coefficient (defaults to 0.0)
      */
-    UniformSourceEllipticPde(double coefficient=0.0);
+    UniformSourceEllipticPde(double sourceCoefficient=0.0);
 
     /**
-     * @return mCoefficient
+     * @return mSourceCoefficient
      */
     double GetCoefficient() const;
 

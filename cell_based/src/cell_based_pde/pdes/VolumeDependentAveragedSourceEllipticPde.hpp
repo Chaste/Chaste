@@ -45,13 +45,35 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractLinearEllipticPde.hpp"
 
 /**
- * A PDE which calculates the source term by adding the number of cells
- * in the element containing that point and scaling by the element area.
+ * An elliptic PDE to be solved numerically using the finite element method, for
+ * coupling to a cell-based simulation.
+ *
+ * This class inherits from AveragedSourceEllipticPde and may only be used with
+ * a NodeBasedCellPopulation, since it assumes that each cell is associated with
+ * a Node object.
+ *
+ * The PDE takes the form
+ *
+ * Grad.(D*Grad(u)) + k*u*rho(x) = 0,
+ *
+ * where the scalars D and k are specified by the members mDiffusionCoefficient and
+ * mSourceCoefficient, respectively. Their values must be set in the constructor.
+ *
+ * The function rho(x) denotes the local density of non-apoptotic cells. This
+ * quantity is computed for each element of a 'coarse' finite element mesh that is
+ * passed to the method SetupSourceTerms() and stored in the member mCellDensityOnCoarseElements.
+ *
+ * For a point x, rho(x) is a weighted sum of the non-apoptotic cells whose centres
+ * lie in each finite element containing that point, scaled by the area of that element.
+ * The weighting assigned to each cell is given by the square of the radius of the
+ * associated node, which is accessed using the GetRadius() method.
+ *
+ * \todo Consider creating a VolumeDependentAveragedSourceParabolicPde class (#2687)
  */
 template<unsigned DIM>
 class VolumeDependentAveragedSourceEllipticPde : public AveragedSourceEllipticPde<DIM>
 {
-    friend class TestCellBasedPdes;
+    friend class TestCellBasedEllipticPdes;
 
 private:
 

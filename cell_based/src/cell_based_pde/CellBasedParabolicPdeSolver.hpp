@@ -45,6 +45,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * known at the cells (nodes), not the Gauss points.
  *
  * \todo NOTE THAT THIS IS THE PARABOLIC EQUIVALENT OF CellBasedParabolicPdeSolver and they should be refactored (#2687)
+ *
+ * \todo Improve documentation (#2687)
  */
 template<unsigned DIM>
 class CellBasedParabolicPdeSolver : public SimpleLinearParabolicSolver<DIM, DIM>

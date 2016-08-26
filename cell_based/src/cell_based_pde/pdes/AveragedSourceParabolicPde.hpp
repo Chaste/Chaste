@@ -45,14 +45,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * A parabolic PDE to be solved numerically using the finite element method, for
- * coupling to a cell population.
+ * coupling to a cell-based simulation.
  *
  * The PDE takes the form
  *
  * c*du/dt = Grad.(D*Grad(u)) + k*u*rho(x),
  *
  * where the scalars c, D and k are specified by the members mDuDtCoefficient,
- * mDiffusionCoefficient and mUptakeCoefficient, respectively. Their values must
+ * mDiffusionCoefficient and mSourceCoefficient, respectively. Their values must
  * be set in the constructor.
  *
  * The function rho(x) denotes the local density of non-apoptotic cells. This
@@ -61,8 +61,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * For a point x, rho(x) is defined to be the number of non-apoptotic cells whose
  * centres lie in each finite element containing that point, scaled by the area of
  * that element.
- *
- *  \todo this is the parabolic version of AveragedSourceEllipticPde; we should refactor the common functionality (#2687)
  */
 template<unsigned DIM>
 class AveragedSourceParabolicPde : public AbstractLinearParabolicPde<DIM,DIM>
@@ -85,7 +83,7 @@ private:
        archive & boost::serialization::base_object<AbstractLinearParabolicPde<DIM, DIM> >(*this);
        archive & mDuDtCoefficient;
        archive & mDiffusionCoefficient;
-       archive & mUptakeCoefficient;
+       archive & mSourceCoefficient;
        archive & mCellDensityOnCoarseElements;
     }
 
@@ -101,7 +99,7 @@ protected:
     double mDiffusionCoefficient;
 
     /** Coefficient of the rate of uptake of the dependent variable by non-apoptotic cells. */
-    double mUptakeCoefficient;
+    double mSourceCoefficient;
 
     /** Vector of averaged cell densities on elements of the coarse mesh. */
     std::vector<double> mCellDensityOnCoarseElements;
@@ -114,12 +112,12 @@ public:
      * @param rCellPopulation reference to the cell population
      * @param duDtCoefficient rate of reaction (defaults to 1.0)
      * @param diffusionCoefficient rate of diffusion (defaults to 1.0)
-     * @param uptakeCoefficient coefficient of the rate of uptake of the dependent variable by non-apoptotic cells (defaults to 0.0)
+     * @param sourceCoefficient the source term coefficient (defaults to 0.0)
      */
     AveragedSourceParabolicPde(AbstractCellPopulation<DIM, DIM>& rCellPopulation,
                                double duDtCoefficient=1.0,
                                double diffusionCoefficient=1.0,
-                               double uptakeCoefficient = 0.0);
+                               double sourceCoefficient=0.0);
 
     /**
      * @return const reference to the cell population (used in archiving).

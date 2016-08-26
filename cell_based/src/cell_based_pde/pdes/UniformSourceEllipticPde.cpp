@@ -36,15 +36,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "UniformSourceEllipticPde.hpp"
 
 template<unsigned DIM>
-UniformSourceEllipticPde<DIM>::UniformSourceEllipticPde(double coefficient)
-    : mCoefficient(coefficient)
+UniformSourceEllipticPde<DIM>::UniformSourceEllipticPde(double sourceCoefficient)
+    : mSourceCoefficient(sourceCoefficient)
 {
 }
 
 template<unsigned DIM>
 double UniformSourceEllipticPde<DIM>::GetCoefficient() const
 {
-    return mCoefficient;
+    return mSourceCoefficient;
 }
 
 template<unsigned DIM>
@@ -56,7 +56,7 @@ double UniformSourceEllipticPde<DIM>::ComputeConstantInUSourceTerm(const ChasteP
 template<unsigned DIM>
 double UniformSourceEllipticPde<DIM>::ComputeLinearInUCoeffInSourceTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement)
 {
-    return mCoefficient;
+    return mSourceCoefficient;
 }
 
 template<unsigned DIM>

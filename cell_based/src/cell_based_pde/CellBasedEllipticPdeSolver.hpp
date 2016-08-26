@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef CELLBASEDPDESOLVER_HPP_
-#define CELLBASEDPDESOLVER_HPP_
+#ifndef CELLBASEDELLIPTICPDESOLVER_HPP_
+#define CELLBASEDELLIPTICPDESOLVER_HPP_
 
 #include "SimpleLinearEllipticSolver.hpp"
 #include "TetrahedralMesh.hpp"
@@ -45,9 +45,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * known at the cells (nodes), not the Gauss points.
  *
  * \todo Rename as CellBasedEllipticPdeSolver and move to cell_based/src/cell_based_pde (#2687)
+ *
+ * \todo Improve documentation (#2687)
  */
 template<unsigned DIM>
-class CellBasedPdeSolver : public SimpleLinearEllipticSolver<DIM, DIM>
+class CellBasedEllipticPdeSolver : public SimpleLinearEllipticSolver<DIM, DIM>
 {
 private:
 
@@ -131,14 +133,14 @@ public:
      * @param pPde pointer to the PDE
      * @param pBoundaryConditions pointer to the boundary conditions
      */
-    CellBasedPdeSolver(TetrahedralMesh<DIM,DIM>* pMesh,
+    CellBasedEllipticPdeSolver(TetrahedralMesh<DIM,DIM>* pMesh,
                        AbstractLinearEllipticPde<DIM,DIM>* pPde,
                        BoundaryConditionsContainer<DIM,DIM,1>* pBoundaryConditions);
 
     /**
      * Destructor.
      */
-    virtual ~CellBasedPdeSolver();
+    virtual ~CellBasedEllipticPdeSolver();
 };
 
-#endif /*CELLBASEDPDESOLVER_HPP_*/
+#endif /*CELLBASEDELLIPTICPDESOLVER_HPP_*/

@@ -36,22 +36,34 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef PARABOLICPDEANDBOUNDARYCONDITIONS_HPP_
 #define PARABOLICPDEANDBOUNDARYCONDITIONS_HPP_
 
-#include "AbstractPdeAndBoundaryConditions.hpp"
-
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
+#include "ArchiveLocationInfo.hpp"
+#include "PetscTools.hpp"
+#include "FileFinder.hpp"
 
+#include "AbstractPdeAndBoundaryConditions.hpp"
 #include "AbstractLinearParabolicPde.hpp"
 
 /**
- * A helper class for use in cell-based simulations with PDEs. The class
- * contains a pointer to a linear parabolic PDE. The class also contains
- * information describing the boundary condition that is to be imposed
- * when solving the PDE. Currently we allow Neumann (imposed flux) or
- * Dirichlet (imposed value) boundary conditions. The boundary condition
- * may be constant on the boundary or vary spatially and/or temporally.
- * In cell-based simulations with PDEs, one or more of these objects are
- * accessed via the PdeModifier classes.
+ * A helper class for solving a linear parabolic PDE coupled to a cell-based
+ * simulation.
+ *
+ * The class contains a pointer to a linear parabolic PDE, to be solved
+ * on the spatial domain defined by the cell population. The class also
+ * contains information describing the boundary conditions to be imposed
+ * when solving the PDE.
+ *
+ * At present, we allow Neumann (imposed flux) or Dirichlet (imposed value)
+ * boundary conditions. The boundary condition may be constant on the
+ * boundary or vary spatially and/or temporally.
+ *
+ * To solve a linear parabolic PDE coupled to a cell-based simulation, we
+ * create an EllipticPdeAndBoundaryConditions object and pass it to an
+ * ParabolicBoxDomainPdeModifier or ParabolicGrowingDomainPdeModifier object,
+ * which we in turn pass to the cell-based simulation object.
+ *
+ * \todo Consider how to extend to allow multiple PDEs to be solved (#2687)
  */
 template<unsigned DIM>
 class ParabolicPdeAndBoundaryConditions : public AbstractPdeAndBoundaryConditions<DIM>

@@ -46,6 +46,10 @@ AbstractPdeAndBoundaryConditions<DIM>::AbstractPdeAndBoundaryConditions(Abstract
       mDeleteMemberPointersInDestructor(deleteMemberPointersInDestructor),
       mDependentVariableName("")
 {
+    if (solution)
+    {
+        mSolution = solution;
+    }
 }
 
 template<unsigned DIM>

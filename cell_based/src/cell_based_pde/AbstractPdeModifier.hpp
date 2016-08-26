@@ -44,8 +44,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TetrahedralMesh.hpp"
 
 /**
- * A modifier class in which has the common functionality of solving a PDE on an arbitrary Mesh.
+ * A modifier class in which has the common functionality of solving a PDE on an arbitrary mesh.
  * The results are stored in CellData.
+ *
+ * \todo Improve documentation (#2687)
  */
 template<unsigned DIM>
 class AbstractPdeModifier : public AbstractCellBasedSimulationModifier<DIM,DIM>

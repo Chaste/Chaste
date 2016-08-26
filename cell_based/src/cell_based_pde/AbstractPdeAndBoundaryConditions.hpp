@@ -40,11 +40,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ClassIsAbstract.hpp"
 
 #include "AbstractBoundaryCondition.hpp"
-#include "ArchiveLocationInfo.hpp"
 #include "TetrahedralMesh.hpp"
 #include "Cell.hpp"
-#include "PetscTools.hpp"
-#include "FileFinder.hpp"
 
 /**
  * Abstract class storing shared functionality of EllipticPdeAndBoundaryConditions 
@@ -80,7 +77,11 @@ protected:
     /** Whether the boundary condition is Neumann (false corresponds to a Dirichlet boundary condition). */
     bool mIsNeumannBoundaryCondition;
 
-    /** The solution to the PDE problem, for use as an initial guess when solving at the next time step. */
+    /**
+     * The solution to the PDE problem, for use as an initial guess when solving at the next time step.
+     *
+     * \todo Why is there also an mSolution in AbstractPdeModifier? Can one of these be removed? (#2687)
+     */
     Vec mSolution;
 
     /** Whether to delete member pointers in the destructor (used in archiving). */
@@ -177,39 +178,5 @@ public:
 
 // Declare identifier for the serializer
 TEMPLATED_CLASS_IS_ABSTRACT_1_UNSIGNED(AbstractPdeAndBoundaryConditions)
-
-namespace boost
-{
-namespace serialization
-{
-template<class Archive, unsigned DIM>
-inline void save_construct_data(
-    Archive & ar, const AbstractPdeAndBoundaryConditions<DIM> * t, const unsigned int file_version)
-{
-    if (t->GetSolution())
-    {
-        std::string archive_filename = ArchiveLocationInfo::GetArchiveDirectory() + "solution.vec";
-        PetscTools::DumpPetscObject(t->GetSolution(), archive_filename);
-    }
-}
-
-template<class Archive, unsigned DIM>
-inline void load_construct_data(
-    Archive & ar, AbstractPdeAndBoundaryConditions<DIM> * t, const unsigned int file_version)
-{
-    Vec solution = NULL;
-
-    std::string archive_filename = ArchiveLocationInfo::GetArchiveDirectory() + "solution.vec";
-    FileFinder file_finder(archive_filename, RelativeTo::Absolute);
-
-    if (file_finder.Exists())
-    {
-        PetscTools::ReadPetscObject(solution, archive_filename);
-    }
-
-    ::new(t)AbstractPdeAndBoundaryConditions<DIM>(NULL, NULL, false, solution, true);
-}
-}
-} // namespace ...
 
 #endif /* ABSTRACTPDEANDBOUNDARYCONDITIONS_HPP_ */

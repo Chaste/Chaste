@@ -15,6 +15,7 @@ cell/TestParallelCellsGenerator.hpp
 cell/TestSimpleCellCycleModels.hpp
 cell_based_pde/TestBoxDomainPdeModifiers.hpp
 cell_based_pde/TestCellBasedEllipticPdes.hpp
+cell_based_pde/TestCellBasedEllipticPdeSolver.hpp
 cell_based_pde/TestCellBasedParabolicPdes.hpp
 cell_based_pde/TestEllipticBoxDomainModifierMethods.hpp
 cell_based_pde/TestEllipticGrowingDomainModifierMethods.hpp
@@ -43,7 +44,6 @@ population/TestCaBasedCellPopulation.hpp
 population/TestCaBasedDivisionRules.hpp
 population/TestCaUpdateRules.hpp
 population/TestCellBasedPdeHandler.hpp
-population/TestCellBasedPdes.hpp
 population/TestCellKillers.hpp
 population/TestCellPopulationBoundaryConditions.hpp
 population/TestCellPopulationCountWriters.hpp
@@ -64,7 +64,6 @@ population/TestPottsUpdateRules.hpp
 population/TestT2SwapCellKiller.hpp
 population/TestVertexBasedCellPopulation.hpp
 population/TestVertexBasedDivisionRules.hpp
-simulation/TestCellBasedPdeSolver.hpp
 simulation/TestDeltaNotchModifier.hpp
 simulation/TestNumericalMethods.hpp
 simulation/TestOffLatticeSimulation.hpp

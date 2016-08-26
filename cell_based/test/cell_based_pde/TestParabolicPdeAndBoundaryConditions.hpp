@@ -73,7 +73,6 @@ public:
     {
         return 1;
     }
-
 };
 
 /**
@@ -373,6 +372,7 @@ public:
             TS_ASSERT_DELTA(static_cast<UniformSourceParabolicPde<2>*>(p_pde)->GetCoefficient(), 0.75, 1e-6);
 
             Vec solution = p_pde_and_bc->GetSolution();
+
             ReplicatableVector solution_repl(solution);
 
             TS_ASSERT_EQUALS(solution_repl.GetSize(), 10u);

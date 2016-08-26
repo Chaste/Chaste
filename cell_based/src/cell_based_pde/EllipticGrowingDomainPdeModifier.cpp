@@ -35,7 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "EllipticGrowingDomainPdeModifier.hpp"
 #include "TetrahedralMesh.hpp"
-#include "CellBasedPdeSolver.hpp"
+#include "CellBasedEllipticPdeSolver.hpp"
 
 template<unsigned DIM>
 EllipticGrowingDomainPdeModifier<DIM>::EllipticGrowingDomainPdeModifier()
@@ -69,8 +69,8 @@ void EllipticGrowingDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPo
     // Add the BCs to the BCs container
     std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc = this->ConstructBoundaryConditionsContainer();
 
-    // Use CellBasedPdeSolver as cell wise PDE
-    CellBasedPdeSolver<DIM> solver(this->mpFeMesh.get(), mpPdeAndBcs->GetPde(), p_bcc.get());
+    // Use CellBasedEllipticPdeSolver as cell wise PDE
+    CellBasedEllipticPdeSolver<DIM> solver(this->mpFeMesh.get(), mpPdeAndBcs->GetPde(), p_bcc.get());
 
     ///\todo Use initial guess when solving the system (#2687)
     Vec old_solution_copy = this->mSolution;
@@ -134,4 +134,3 @@ template class EllipticGrowingDomainPdeModifier<3>;
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
 EXPORT_TEMPLATE_CLASS_SAME_DIMS(EllipticGrowingDomainPdeModifier)
-

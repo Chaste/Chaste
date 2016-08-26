@@ -46,6 +46,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * A modifier class in which an elliptic PDE is solved on a box domain and the results are stored in CellData.
+ *
+ * \todo Improve documentation (#2687)
  */
 template<unsigned DIM>
 class EllipticBoxDomainPdeModifier : public AbstractBoxDomainPdeModifier<DIM>

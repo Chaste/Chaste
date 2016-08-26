@@ -36,26 +36,34 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ELLIPTICPDEANDBOUNDARYCONDITIONS_HPP_
 #define ELLIPTICPDEANDBOUNDARYCONDITIONS_HPP_
 
-#include "AbstractPdeAndBoundaryConditions.hpp"
-
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
+#include "ArchiveLocationInfo.hpp"
+#include "PetscTools.hpp"
+#include "FileFinder.hpp"
 
+#include "AbstractPdeAndBoundaryConditions.hpp"
 #include "AbstractLinearEllipticPde.hpp"
 
 /**
- * A helper class for use in cell-based simulations with PDEs. The class
- * contains a pointer to a linear elliptic PDE, which is to be solved
- * on the domain defined by the cell population. The class also contains
- * information describing the boundary condition that is to be imposed
- * when solving the PDE. Currently we allow Neumann (imposed flux) or
- * Dirichlet (imposed value) boundary conditions. The boundary condition
- * may be constant on the boundary or vary spatially and/or temporally.
- * In cell-based simulations with PDEs, one or more of these objects are
- * accessed via the CellBasedPdeHandler class.
+ * A helper class for solving a linear elliptic PDE coupled to a cell-based
+ * simulation.
  *
- * \todo Rename as EllipticPdeAndBoundaryConditions and move to cell_based/src/cell_based/pde (#2687)
- *       and merge, or create shared parent class, with ParabolicPdeAndBoundaryConditions (#2767)
+ * The class contains a pointer to a linear elliptic PDE, to be solved
+ * on the spatial domain defined by the cell population. The class also
+ * contains information describing the boundary conditions to be imposed
+ * when solving the PDE.
+ *
+ * At present, we allow Neumann (imposed flux) or Dirichlet (imposed value)
+ * boundary conditions. The boundary condition may be constant on the
+ * boundary or vary spatially and/or temporally.
+ *
+ * To solve a linear elliptic PDE coupled to a cell-based simulation, we
+ * create an EllipticPdeAndBoundaryConditions object and pass it to an
+ * EllipticBoxDomainPdeModifier or EllipticGrowingDomainPdeModifier object,
+ * which we in turn pass to the cell-based simulation object.
+ *
+ * \todo Consider how to extend to allow multiple PDEs to be solved (#2687)
  */
 template<unsigned DIM>
 class EllipticPdeAndBoundaryConditions : public AbstractPdeAndBoundaryConditions<DIM>
@@ -121,7 +129,7 @@ public:
      * using the information in the given mesh.
      *
      * @param pMesh Pointer to a tetrahedral mesh
-     * @param pCellPdeElementMap map between cells and elements, from CellBasedPdeHandler
+     * @param pCellPdeElementMap map between cells and elements, from elliptic PDE modifiers
      */
     void SetUpSourceTermsForAveragedSourcePde(TetrahedralMesh<DIM,DIM>* pMesh, std::map< CellPtr, unsigned >* pCellPdeElementMap=NULL);
 };

@@ -40,7 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexBasedCellPopulation.hpp"
 #include "CaBasedCellPopulation.hpp"
 #include "SimpleLinearEllipticSolver.hpp"
-#include "CellBasedPdeSolver.hpp"
+#include "CellBasedEllipticPdeSolver.hpp"
 #include "Exception.hpp"
 #include "VtkMeshWriter.hpp"
 
@@ -401,7 +401,7 @@ void CellBasedPdeHandler<DIM>::SolvePdeAndWriteResultsToFile(unsigned samplingTi
         }
         else
         {
-            CellBasedPdeSolver<DIM> solver(p_mesh, p_pde_and_bc->GetPde(), p_bcc.get());
+            CellBasedEllipticPdeSolver<DIM> solver(p_mesh, p_pde_and_bc->GetPde(), p_bcc.get());
 
             // If we have an initial guess, use this...
             if (is_previous_solution_size_correct)

@@ -43,9 +43,22 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractLinearEllipticPde.hpp"
 
 /**
- * A PDE which has a source at each non-apoptotic cell.
+ * An elliptic PDE to be solved numerically using the finite element method, for
+ * coupling to a cell-based simulation.
  *
- * \todo Improve documentation (#2687)
+ * The PDE takes the form
+ *
+ * Grad.(Grad(u)) + k*u*rho(x) = 0,
+ *
+ * where the scalar k is specified by the member mSourceCoefficient, whose value must
+ * be set in the constructor.
+ *
+ * For a node of the finite element mesh with location x, the function rho(x)
+ * equals zero if there is an apoptotic cell associated with x, and
+ * one otherwise. Here, 'associated with' takes a different meaning for each
+ * cell population class, and is encoded in the method IsPdeNodeAssociatedWithApoptoticCell().
+ *
+ * \todo make member names and methods consistent with those of CellwiseSourceParabolicPde (#2876)
  */
 template<unsigned DIM>
 class CellwiseSourceEllipticPde : public AbstractLinearEllipticPde<DIM,DIM>
@@ -66,7 +79,7 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
        archive & boost::serialization::base_object<AbstractLinearEllipticPde<DIM, DIM> >(*this);
-       archive & mCoefficient;
+       archive & mSourceCoefficient;
     }
 
 protected:
@@ -74,8 +87,8 @@ protected:
     /** The cell population member. */
     AbstractCellPopulation<DIM, DIM>& mrCellPopulation;
 
-    /** Coefficient of the rate of uptake of the dependent variable by non-apoptotic cells. */
-    double mCoefficient;
+    /** Coefficient of the source term. */
+    double mSourceCoefficient;
 
 public:
 
@@ -83,9 +96,9 @@ public:
      * Constructor.
      *
      * @param rCellPopulation reference to the cell population
-     * @param coefficient the coefficient of consumption of nutrient by cells (defaults to 0.0)
+     * @param sourceCoefficient the source term coefficient (defaults to 0.0)
      */
-    CellwiseSourceEllipticPde(AbstractCellPopulation<DIM, DIM>& rCellPopulation, double coefficient=0.0);
+    CellwiseSourceEllipticPde(AbstractCellPopulation<DIM, DIM>& rCellPopulation, double sourceCoefficient=0.0);
 
     /**
      * @return const reference to the cell population (used in archiving).
@@ -93,7 +106,7 @@ public:
     const AbstractCellPopulation<DIM>& rGetCellPopulation() const;
 
     /**
-     * @return mCoefficient (used in archiving).
+     * @return mSourceCoefficient (used in archiving).
      */
     double GetCoefficient() const;
 

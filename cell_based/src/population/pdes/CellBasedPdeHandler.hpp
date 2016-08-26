@@ -55,6 +55,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * By letting AbstractCellBasedSimulation have a pointer to an object of this type as a
  * member variable, we separate out all PDE-related functionality into this class, and thus
  * obviate the need for specialized cell-based simulation subclasses.
+ *
+ * \todo replace usage of this code with the simulation modifier approach (#2687)
  */
 template<unsigned DIM>
 class CellBasedPdeHandler : public Identifiable

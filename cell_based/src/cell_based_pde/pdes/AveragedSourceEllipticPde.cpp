@@ -38,9 +38,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscTools.hpp"
 
 template<unsigned DIM>
-AveragedSourceEllipticPde<DIM>::AveragedSourceEllipticPde(AbstractCellPopulation<DIM>& rCellPopulation, double coefficient)
+AveragedSourceEllipticPde<DIM>::AveragedSourceEllipticPde(AbstractCellPopulation<DIM>& rCellPopulation,
+                                                          double sourceCoefficient,
+                                                          double diffusionCoefficient)
     : mrCellPopulation(rCellPopulation),
-      mCoefficient(coefficient)
+      mSourceCoefficient(sourceCoefficient),
+      mDiffusionCoefficient(diffusionCoefficient)
 {
 }
 
@@ -53,7 +56,7 @@ const AbstractCellPopulation<DIM>& AveragedSourceEllipticPde<DIM>::rGetCellPopul
 template<unsigned DIM>
 double AveragedSourceEllipticPde<DIM>::GetCoefficient() const
 {
-    return mCoefficient;
+    return mSourceCoefficient;
 }
 
 template<unsigned DIM>
@@ -112,13 +115,13 @@ template<unsigned DIM>
 double AveragedSourceEllipticPde<DIM>::ComputeLinearInUCoeffInSourceTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement) // now takes in element
 {
     assert(!mCellDensityOnCoarseElements.empty());
-    return mCoefficient * mCellDensityOnCoarseElements[pElement->GetIndex()];
+    return mSourceCoefficient * mCellDensityOnCoarseElements[pElement->GetIndex()];
 }
 
 template<unsigned DIM>
 c_matrix<double,DIM,DIM> AveragedSourceEllipticPde<DIM>::ComputeDiffusionTerm(const ChastePoint<DIM>& rX)
 {
-    return identity_matrix<double>(DIM);
+    return mDiffusionCoefficient*identity_matrix<double>(DIM);
 }
 
 template<unsigned DIM>

@@ -45,13 +45,29 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractLinearEllipticPde.hpp"
 
 /**
- *  An elliptic PDE which calculates the source term by adding the number of cells
- *  in the element containing that point and scaling by the element area.
+ * An elliptic PDE to be solved numerically using the finite element method, for
+ * coupling to a cell-based simulation.
+ *
+ * The PDE takes the form
+ *
+ * Grad.(D*Grad(u)) + k*u*rho(x) = 0,
+ *
+ * where the scalars D and k are specified by the members mDiffusionCoefficient and
+ * mSourceCoefficient, respectively. Their values must be set in the constructor.
+ *
+ * The function rho(x) denotes the local density of non-apoptotic cells. This
+ * quantity is computed for each element of a 'coarse' finite element mesh that is
+ * passed to the method SetupSourceTerms() and stored in the member mCellDensityOnCoarseElements.
+ * For a point x, rho(x) is defined to be the number of non-apoptotic cells whose
+ * centres lie in each finite element containing that point, scaled by the area of
+ * that element.
+ *
+ * \todo make member names and methods consistent with those of AveragedSourceParabolicPde (#2876)
  */
 template<unsigned DIM>
 class AveragedSourceEllipticPde : public AbstractLinearEllipticPde<DIM,DIM>
 {
-    friend class TestCellBasedPdes;
+    friend class TestCellBasedEllipticPdes;
 
 private:
 
@@ -67,7 +83,8 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
        archive & boost::serialization::base_object<AbstractLinearEllipticPde<DIM, DIM> >(*this);
-       archive & mCoefficient;
+       archive & mSourceCoefficient;
+       archive & mDiffusionCoefficient;
        archive & mCellDensityOnCoarseElements;
     }
 
@@ -77,7 +94,10 @@ protected:
     AbstractCellPopulation<DIM>& mrCellPopulation;
 
     /** Coefficient of consumption of nutrient by cells. */
-    double mCoefficient;
+    double mSourceCoefficient;
+
+    /** Diffusion coefficient. */
+    double mDiffusionCoefficient;
 
     /** Vector of averaged cell densities on elements of the coarse mesh. */
     std::vector<double> mCellDensityOnCoarseElements;
@@ -88,9 +108,12 @@ public:
      * Constructor.
      *
      * @param rCellPopulation reference to the cell population
-     * @param coefficient the coefficient of consumption of nutrient by cells (defaults to 0.0)
+     * @param sourceCoefficient the source term coefficient (defaults to 0.0)
+     * @param diffusionCoefficient the rate of diffusion (defaults to 1.0)
      */
-    AveragedSourceEllipticPde(AbstractCellPopulation<DIM>& rCellPopulation, double coefficient=0.0);
+    AveragedSourceEllipticPde(AbstractCellPopulation<DIM>& rCellPopulation,
+                              double sourceCoefficient=0.0,
+                              double diffusionCoefficient=1.0);
 
     /**
      * @return const reference to the cell population (used in archiving).
@@ -98,7 +121,7 @@ public:
     const AbstractCellPopulation<DIM>& rGetCellPopulation() const;
 
     /**
-     * @return mCoefficient
+     * @return mSourceCoefficient
      */
     double GetCoefficient() const;
 
