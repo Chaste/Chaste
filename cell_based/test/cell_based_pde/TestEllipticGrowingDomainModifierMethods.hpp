@@ -240,6 +240,18 @@ public:
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[0], 10, 1e-4);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[1], 5.0*sqrt(3.0), 1e-4);
         TS_ASSERT_DELTA(p_cell_210->GetCellData()->GetItem("variable"), 0.4542, 1e-4);
+
+///\todo #2687
+//        // Seeing what's what
+//        boost::shared_ptr<TetrahedralMesh<2,2> > p_tet_mesh = cell_population.GetTetrahedralMeshForPdeModifier();
+//
+//        TS_ASSERT_EQUALS(p_tet_mesh->GetNumNodes(), cell_population.rGetMesh().GetNumNodes());
+//        TS_ASSERT_EQUALS(p_tet_mesh->GetNumElements(), cell_population.rGetMesh().GetNumElements());
+//        for (unsigned i=0; i<p_tet_mesh->GetNumNodes(); i++)
+//        {
+//            TS_ASSERT_DELTA(p_tet_mesh->GetNode(i)->rGetLocation()[0], cell_population.rGetMesh().GetNode(i)->rGetLocation()[0], 1e-6);
+//            TS_ASSERT_DELTA(p_tet_mesh->GetNode(i)->rGetLocation()[1], cell_population.rGetMesh().GetNode(i)->rGetLocation()[1], 1e-6);
+//        }
     }
 
     void TestNodeBasedSquareMonolayer() throw (Exception)
