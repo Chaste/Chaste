@@ -440,7 +440,7 @@ public:
     /**
      * Overridden GetCellDataItemAtPdeNode() method.
      *
-     * @param pdeNdeIndex index of a node in a tetrahedral mesh for use
+     * @param pdeNodeIndex index of a node in a tetrahedral mesh for use
      *         with a PDE modifier
      * @param rVariableName the name of the cell data item to get
      * @param dirichletBoundaryConditionApplies where a Dirichlet boundary condition is used
