@@ -111,7 +111,7 @@ bool MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::UseAreaBasedDampingConstant
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::SetAreaBasedDampingConstant(bool useAreaBasedDampingConstant)
 {
-    assert(SPACE_DIM==2);
+    assert(SPACE_DIM == 2);
     mUseAreaBasedDampingConstant = useAreaBasedDampingConstant;
 }
 
@@ -148,7 +148,7 @@ double MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetDampingConstant(unsign
          * is the damping constant if not using mUseAreaBasedDampingConstant
          */
 
-        assert(SPACE_DIM==2);
+        assert(SPACE_DIM == 2);
 
         double rest_length = 1.0;
         double d0 = mAreaBasedDampingConstantParameter;
@@ -210,7 +210,28 @@ const MutableMesh<ELEMENT_DIM,SPACE_DIM>& MeshBasedCellPopulation<ELEMENT_DIM,SP
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 boost::shared_ptr<TetrahedralMesh<ELEMENT_DIM, SPACE_DIM> > MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetTetrahedralMeshForPdeModifier()
 {
-    boost::shared_ptr<TetrahedralMesh<ELEMENT_DIM, SPACE_DIM> > p_mesh(mpMutableMesh);
+	/*
+	 * Here we construct a temporary mesh by copying the locations and indices of
+	 * the nodes in mrMesh, and exploiting the fact that mrMesh is always
+	 * Delaunay. This is a bit of a hack - ideally we would pass a shared pointer
+	 * to the mesh member itself, but this isn't possible at present. In future,
+	 * we may wish to consider changing mrMesh itself to be shared pointer.
+	 */
+    std::vector<Node<SPACE_DIM>*> temp_nodes;
+
+    // Create nodes at the centre of the cells
+    for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter = this->Begin();
+         cell_iter != this->End();
+         ++cell_iter)
+    {
+    	unsigned node_index = this->GetLocationIndexUsingCell(*cell_iter);
+    	c_vector<double, SPACE_DIM> node_location = this->GetLocationOfCellCentre(*cell_iter);
+    	bool is_boundary_node = this->GetNode(node_index)->IsBoundaryNode();
+        temp_nodes.push_back(new Node<SPACE_DIM>(node_index, node_location, is_boundary_node));
+    }
+
+    boost::shared_ptr<TetrahedralMesh<ELEMENT_DIM, SPACE_DIM> > p_mesh(new MutableMesh<ELEMENT_DIM, SPACE_DIM>(temp_nodes));
+
     return p_mesh;
 }
 
