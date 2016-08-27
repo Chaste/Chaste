@@ -1038,7 +1038,9 @@ public:
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         // Create a RadialCellDataDistributionWriter and test that the correct output is generated
-        RadialCellDataDistributionWriter<2,2> radial_writer("this average", 3);
+        RadialCellDataDistributionWriter<2,2> radial_writer;
+        radial_writer.SetVariableName("this average");
+        radial_writer.SetNumRadialBins(3);
         radial_writer.OpenOutputFile(output_file_handler);
         radial_writer.WriteTimeStamp();
         radial_writer.Visit(&cell_population);
@@ -1147,7 +1149,9 @@ public:
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "RadialCellDataDistributionWriter.arch";
 
         {
-            AbstractCellBasedWriter<2,2>* const p_cell_writer = new RadialCellDataDistributionWriter<2,2>("radial average", 5);
+            AbstractCellBasedWriter<2,2>* const p_cell_writer = new RadialCellDataDistributionWriter<2,2>();
+            static_cast<RadialCellDataDistributionWriter<2,2>*>(p_cell_writer)->SetVariableName("radial average");
+            static_cast<RadialCellDataDistributionWriter<2,2>*>(p_cell_writer)->SetNumRadialBins(5);
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);

@@ -51,7 +51,7 @@ class RadialCellDataDistributionWriter : public AbstractCellPopulationWriter<ELE
 {
 private:
 
-    /** the name of the CellData item to write to file. */
+    /** The name of the CellData item to write to file. */
     std::string mVariableName;
 
     /** The number of radial bins to use. */
@@ -77,12 +77,8 @@ public:
 
     /**
      * Constructor.
-     *
-     * @param variableName the name of the CellData item to write to file (defaults to "")
-     * @param numRadialBins the number of radial bins to use (defaults to 1)
      */
-    RadialCellDataDistributionWriter(std::string variableName="",
-                                     unsigned numRadialBins=1);
+    RadialCellDataDistributionWriter();
 
     /**
      * Visit any population and write the data. This is the same structure for any population.
@@ -162,9 +158,23 @@ public:
     virtual void Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation);
 
     /**
+     * Set mVariableName.
+     *
+     * @param variableName the name of the CellData item to write to file
+     */
+    void SetVariableName(std::string variableName);
+
+    /**
      * @return mVariableName (used in archiving)
      */
     std::string GetVariableName() const;
+
+    /**
+     * Set mNumRadialBins.
+     *
+     * @param numRadialBins the number of radial bins to use
+     */
+    void SetNumRadialBins(unsigned numRadialBins);
 
     /**
      * @return mNumRadialBins (used in archiving)

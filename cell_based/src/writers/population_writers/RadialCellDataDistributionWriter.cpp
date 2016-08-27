@@ -41,10 +41,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexBasedCellPopulation.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::RadialCellDataDistributionWriter(std::string variableName, unsigned numRadialBins)
+RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::RadialCellDataDistributionWriter()
     : AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>("radial_dist.dat"),
-      mVariableName(variableName),
-      mNumRadialBins(numRadialBins)
+      mVariableName(""),
+      mNumRadialBins(UNSIGNED_UNSET)
 {
 }
 
@@ -185,9 +185,21 @@ void RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBased
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::SetVariableName(std::string variableName)
+{
+    mVariableName = variableName;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::string RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::GetVariableName() const
 {
     return mVariableName;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::SetNumRadialBins(unsigned numRadialBins)
+{
+	mNumRadialBins = numRadialBins;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
