@@ -56,7 +56,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * member variable, we separate out all PDE-related functionality into this class, and thus
  * obviate the need for specialized cell-based simulation subclasses.
  *
- * \todo replace usage of this code with the simulation modifier approach (#2687)
+ * \todo move this class to cell_based/src/cell_based_pde folder, rename, and adopt the simulation modifier approach (#2687)
  */
 template<unsigned DIM>
 class CellBasedPdeHandler : public Identifiable
@@ -89,7 +89,11 @@ private:
 
 protected:
 
-    /** Pointer to a cell population. */
+    /**
+     * Pointer to a cell population.
+     *
+     * \todo Remove this member and instead pass as an argument to relevant methods (#2687)
+     */
     AbstractCellPopulation<DIM>* mpCellPopulation;
 
     /** Vector of pointers to linear elliptic PDE objects with additional boundary condition information. */
@@ -104,23 +108,39 @@ protected:
     /**
      * File that the average radial PDE solution is written out to.
      *
-     * \todo Extract this functionality out to a separate writer class (#2687)
+     * \todo Remove this functionality and instead use a RadialCellDataDistributionWriter in relevant simulations (#2687)
      */
     out_stream mpAverageRadialPdeSolutionResultsFile;
 
-    /** Whether to write to file the average radial PDE solution. */
+    /**
+     * Whether to write to file the average radial PDE solution.
+     *
+     * \todo Remove this functionality and instead use a RadialCellDataDistributionWriter in relevant simulations (#2687)
+     */
     bool mWriteAverageRadialPdeSolution;
 
-    /** Whether to write the average radial PDE solution daily. */
+    /**
+     * Whether to write the average radial PDE solution daily.
+     *
+     * \todo Remove this functionality and instead use a RadialCellDataDistributionWriter in relevant simulations (#2687)
+     */
     bool mWriteDailyAverageRadialPdeSolution;
 
-    /** The name of the quantity that gets averaged. */
+    /**
+     * The name of the quantity that gets averaged.
+     *
+     * \todo Remove this functionality and instead use a RadialCellDataDistributionWriter in relevant simulations (#2687)
+     */
     std::string mAverageRadialSolutionVariableName;
 
     /** Whether to set the boundary condition on the edge of the coarse mesh rather than the cell population. */
     bool mSetBcsOnCoarseBoundary;
 
-    /** Number of radial 'bins' used to calculate the average radial PDE solution. */
+    /**
+     * Number of radial 'bins' used to calculate the average radial PDE solution.
+     *
+     * \todo Remove this functionality and instead use a RadialCellDataDistributionWriter in relevant simulations (#2687)
+     */
     unsigned mNumRadialIntervals;
 
     /** Coarse mesh on which to solve the PDE. */
@@ -159,6 +179,8 @@ protected:
 
     /**
      * Write the average radial PDE solution to file at a specified time.
+     *
+     * \todo Remove this functionality and instead use a RadialCellDataDistributionWriter in relevant simulations (#2687)
      *
      * Outputs a line of space-separated values of the form:
      * [time] [radius interval 0] [average solution 0] [radius interval 1] [average solution 1] ...
@@ -215,11 +237,15 @@ public:
     void CloseResultsFiles();
 
     /**
+     * \todo Remove this functionality and instead use a RadialCellDataDistributionWriter in relevant simulations (#2687)
+     *
      * @return mWriteAverageRadialPdeSolution
      */
     bool GetWriteAverageRadialPdeSolution();
 
     /**
+     * \todo Remove this functionality and instead use a RadialCellDataDistributionWriter in relevant simulations (#2687)
+     *
      * @return mWriteDailyAverageRadialPdeSolution
      */
     bool GetWriteDailyAverageRadialPdeSolution();
@@ -238,6 +264,8 @@ public:
     bool GetImposeBcsOnCoarseBoundary();
 
     /**
+     * \todo Remove this functionality and instead use a RadialCellDataDistributionWriter in relevant simulations (#2687)
+     *
      * @return mNumRadialIntervals
      */
     unsigned GetNumRadialIntervals();

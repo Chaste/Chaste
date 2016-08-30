@@ -36,6 +36,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellBasedPdeHandlerOnCuboid.hpp"
 #include "ConstBoundaryCondition.hpp"
 
+///\todo move this class to cell_based/src/cell_based_pde folder and adopt the simulation modifier approach (#2687)
+
 template<unsigned DIM>
 CellBasedPdeHandlerOnCuboid<DIM>::CellBasedPdeHandlerOnCuboid(AbstractCellPopulation<DIM>* pCellPopulation,
                                               bool deleteMemberPointersInDestructor)

@@ -64,6 +64,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SmartPointers.hpp"
 #include "AbstractCellBasedWithTimingsTestSuite.hpp"
 
+///\todo move this test suite to cell_based/test/cell_based_pde folder (#2687)
+
 class SimplePdeForTesting : public AbstractLinearEllipticPde<2,2>
 {
 public:
