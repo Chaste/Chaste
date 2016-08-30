@@ -128,7 +128,7 @@ public:
          * Test adding the new cell to the population; this calls CalculateDaughterNodeIndex().
          * The new cell moves into node 13.
          */
-        cell_population.AddCell(p_new_cell, zero_vector<double>(2), p_cell_12);
+        cell_population.AddCell(p_new_cell, p_cell_12);
 
         // Now check the cells are in the correct place
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 10u);
@@ -289,7 +289,7 @@ public:
          * Test adding the new cell in the population; this calls CalculateDaughterNodeIndex().
          * The new cell moves into node 3. This is because stem cells always divide upwards
          */
-        cell_population.AddCell(p_new_cell, zero_vector<double>(2), p_cell_0);
+        cell_population.AddCell(p_new_cell, p_cell_0);
 
         // Now check the cells are in the correct place
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 7u);
@@ -318,7 +318,7 @@ public:
          * Test adding the new cell in the population; this calls CalculateDaughterNodeIndex().
          * The new cell moves into node 7.
          */
-        cell_population.AddCell(p_new_cell_2, zero_vector<double>(2), p_cell_3);
+        cell_population.AddCell(p_new_cell_2, p_cell_3);
 
         // Now check the cells are in the correct place
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 8u);
