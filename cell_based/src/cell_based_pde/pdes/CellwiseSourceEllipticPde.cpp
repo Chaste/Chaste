@@ -73,10 +73,13 @@ double CellwiseSourceEllipticPde<DIM>::ComputeLinearInUCoeffInSourceTermAtNode(c
 {
     double source_coefficient = 0.0;
 
-    bool is_cell_apoptotic = mrCellPopulation.IsPdeNodeAssociatedWithApoptoticCell(rNode.GetIndex());
-    if (!is_cell_apoptotic)
+    if (mrCellPopulation.IsCellAttachedToLocationIndex(rNode.GetIndex()))
     {
-        source_coefficient = mSourceCoefficient;
+        bool is_cell_apoptotic = mrCellPopulation.IsPdeNodeAssociatedWithApoptoticCell(rNode.GetIndex());
+        if (!is_cell_apoptotic)
+        {
+            source_coefficient = mSourceCoefficient;
+        }
     }
 
     return source_coefficient;

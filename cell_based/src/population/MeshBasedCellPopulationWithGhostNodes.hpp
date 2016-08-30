@@ -155,7 +155,7 @@ public:
      *
      * This method is called by AbstractGrowingDomainPdeModifier.
      */
-    virtual boost::shared_ptr<TetrahedralMesh<DIM, DIM> > GetTetrahedralMeshForPdeModifier();
+    virtual TetrahedralMesh<DIM, DIM>* GetTetrahedralMeshForPdeModifier();
 
     /**
      * Overridden GetNeighbouringLocationIndices() method.

@@ -70,7 +70,7 @@ void EllipticGrowingDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPo
     std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc = this->ConstructBoundaryConditionsContainer();
 
     // Use CellBasedEllipticPdeSolver as cell wise PDE
-    CellBasedEllipticPdeSolver<DIM> solver(this->mpFeMesh.get(), mpPdeAndBcs->GetPde(), p_bcc.get());
+    CellBasedEllipticPdeSolver<DIM> solver(this->mpFeMesh, mpPdeAndBcs->GetPde(), p_bcc.get());
 
     ///\todo Use initial guess when solving the system (#2687)
     Vec old_solution_copy = this->mSolution;
@@ -89,12 +89,11 @@ void EllipticGrowingDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPo
 template<unsigned DIM>
 void EllipticGrowingDomainPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)
 {
+    AbstractGrowingDomainPdeModifier<DIM>::SetupSolve(rCellPopulation, outputDirectory);
+
     // Temporarily cache the variable name until we create an AbstractPdeAndBcs object
     // and move mpPdeAndBcs to the abstract class. See #2767
     this->mCachedDependentVariableName = mpPdeAndBcs->rGetDependentVariableName();
-
-    // Cache the output directory
-    this->mOutputDirectory = outputDirectory;
 
     // Call these  methods to solve the PDE on the initial step and Output the results.
     UpdateAtEndOfTimeStep(rCellPopulation);

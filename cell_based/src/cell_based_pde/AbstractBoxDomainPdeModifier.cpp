@@ -54,6 +54,8 @@ AbstractBoxDomainPdeModifier<DIM>::~AbstractBoxDomainPdeModifier()
 template<unsigned DIM>
 void AbstractBoxDomainPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)
 {
+    AbstractPdeModifier<DIM>::SetupSolve(rCellPopulation, outputDirectory);
+
     InitialiseCellPdeElementMap(rCellPopulation);
 }
 
@@ -61,7 +63,7 @@ template<unsigned DIM>
 void AbstractBoxDomainPdeModifier<DIM>::GenerateFeMesh(ChasteCuboid<DIM> meshCuboid, double stepSize)
 {
     // Create a regular coarse tetrahedral mesh
-    this->mpFeMesh = boost::make_shared<TetrahedralMesh<DIM,DIM> >();
+    this->mpFeMesh = new TetrahedralMesh<DIM,DIM>();
     switch (DIM)
     {
 //        case 1:

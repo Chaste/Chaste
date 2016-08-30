@@ -76,10 +76,10 @@ void ParabolicBoxDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopul
 
     // When using a PDE mesh which doesn't coincide with the cells, we must set up the source terms before solving the PDE.
     // Pass in already updated CellPdeElementMap to speed up finding cells.
-    mpPdeAndBcs->SetUpSourceTermsForAveragedSourcePde(this->mpFeMesh.get(), &this->mCellPdeElementMap);
+    mpPdeAndBcs->SetUpSourceTermsForAveragedSourcePde(this->mpFeMesh, &this->mCellPdeElementMap);
 
     // Use SimpleLinearParabolicSolver as averaged Source PDE
-    SimpleLinearParabolicSolver<DIM,DIM> solver(this->mpFeMesh.get(), mpPdeAndBcs->GetPde(), p_bcc.get());
+    SimpleLinearParabolicSolver<DIM,DIM> solver(this->mpFeMesh, mpPdeAndBcs->GetPde(), p_bcc.get());
 
     ///\todo Investigate more than one PDE time step per spatial step (#2687)
     SimulationTime* p_simulation_time = SimulationTime::Instance();
@@ -107,9 +107,6 @@ void ParabolicBoxDomainPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,D
     // Temporarily cache the variable name until we create an AbstractPdeAndBcs object
     // and move mpPdeAndBcs to the abstract class (see #2767)
     this->mCachedDependentVariableName = mpPdeAndBcs->rGetDependentVariableName();
-
-    // Cache the output directory
-    this->mOutputDirectory = outputDirectory;
 
     // Copy the cell data to mSolution (this is the initial condition)
     SetupInitialSolutionVector(rCellPopulation);

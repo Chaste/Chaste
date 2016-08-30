@@ -195,11 +195,11 @@ public:
     /**
      * Overridden GetTetrahedralMeshForPdeModifier() method.
      *
-     * @return a shared pointer to a tetrahedral mesh, for use with a PDE modifier.
+     * @return a pointer to a tetrahedral mesh, for use with a PDE modifier.
      *
      * This method is called by AbstractGrowingDomainPdeModifier.
      */
-    virtual boost::shared_ptr<TetrahedralMesh<DIM, DIM> > GetTetrahedralMeshForPdeModifier();
+    virtual TetrahedralMesh<DIM, DIM>* GetTetrahedralMeshForPdeModifier();
 
     /**
      * Overridden IsPdeNodeAssociatedWithApoptoticCell() method.

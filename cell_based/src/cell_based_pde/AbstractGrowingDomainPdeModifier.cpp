@@ -42,18 +42,31 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned DIM>
 AbstractGrowingDomainPdeModifier<DIM>::AbstractGrowingDomainPdeModifier()
-    : AbstractPdeModifier<DIM>()
+    : AbstractPdeModifier<DIM>(),
+      mDeleteMesh(false)
 {
 }
 
 template<unsigned DIM>
 AbstractGrowingDomainPdeModifier<DIM>::~AbstractGrowingDomainPdeModifier()
 {
+    if (mDeleteMesh)
+    {
+        delete this->mpFeMesh;
+    }
 }
 
 template<unsigned DIM>
 void AbstractGrowingDomainPdeModifier<DIM>::GenerateFeMesh(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
+    if (mDeleteMesh)
+    {
+        // If a mesh has been created on a previous time-step then we need to tidy it up
+        assert(this->mpFeMesh != NULL);
+        delete this->mpFeMesh;
+    }
+    mDeleteMesh = (dynamic_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation) == NULL);
+
     // Get the finite element mesh via the cell population
     this->mpFeMesh = rCellPopulation.GetTetrahedralMeshForPdeModifier();
 }

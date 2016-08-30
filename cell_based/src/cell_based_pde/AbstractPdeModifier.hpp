@@ -77,16 +77,20 @@ private:
 
 protected:
 
-    /** The solution to the PDE problem at the current timestep. */
+    /** The solution to the PDE problem at the current time step. */
     Vec mSolution; ///\todo NEED TO ARCHIVE THIS see AbstractPdeandBoundaryCondidtion (#2687)
 
     /** Shared pointer to the finite element mesh on which to solve the PDE. **/
-    boost::shared_ptr<TetrahedralMesh<DIM,DIM> > mpFeMesh;  ///\todo #2687 NEED TO ARCHIVE THIS
+    TetrahedralMesh<DIM,DIM>* mpFeMesh;  ///\todo #2687 NEED TO ARCHIVE THIS
 
     /** Store the output directory name. */
     std::string mOutputDirectory;
 
-    /** Caching the variable name. */
+    /**
+     * Caching the variable name.
+     *
+     * \todo Consider removing this member and moving mpPdeAndBcs up to this class (#2687)
+     */
     std::string mCachedDependentVariableName;
 
     /** Whether or not to calculate and output the gradient of the solution. */
@@ -130,7 +134,7 @@ public:
      * @param rCellPopulation reference to the cell population
      * @param outputDirectory the output directory, relative to where Chaste output is stored
      */
-    virtual void SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)=0;
+    virtual void SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory);
 
     /**
      * Overridden OutputSimulationModifierParameters() method.

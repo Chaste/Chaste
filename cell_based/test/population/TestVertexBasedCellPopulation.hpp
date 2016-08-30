@@ -1405,7 +1405,7 @@ public:
         VertexBasedCellPopulation<2> cell_population(*p_vertex_mesh, cells);
 
         // Test TetrahedralMeshForPdeModifier() method
-        boost::shared_ptr<TetrahedralMesh<2,2> > p_tetrahedral_mesh = cell_population.GetTetrahedralMeshForPdeModifier();
+        TetrahedralMesh<2,2>* p_tetrahedral_mesh = cell_population.GetTetrahedralMeshForPdeModifier();
 
         // The VertexMesh has 5 Nodes and 3 VertexElements, so the TetrahedralMesh has 5+3=8 Nodes
         TS_ASSERT_EQUALS(p_tetrahedral_mesh->GetNumNodes(), 8u);

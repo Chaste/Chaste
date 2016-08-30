@@ -70,6 +70,12 @@ private:
         archive & boost::serialization::base_object<AbstractPdeModifier<DIM> >(*this);
     }
 
+    /**
+     * Whether to delete the mesh when we are destroyed.
+     * Needed if to free memory if creating meshes.
+     */
+    bool mDeleteMesh;
+
 public:
 
     /**

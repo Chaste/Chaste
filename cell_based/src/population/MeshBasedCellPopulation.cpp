@@ -208,37 +208,9 @@ const MutableMesh<ELEMENT_DIM,SPACE_DIM>& MeshBasedCellPopulation<ELEMENT_DIM,SP
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-boost::shared_ptr<TetrahedralMesh<ELEMENT_DIM, SPACE_DIM> > MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetTetrahedralMeshForPdeModifier()
+TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetTetrahedralMeshForPdeModifier()
 {
-	/*
-	 * Here we construct a temporary mesh by copying the locations and indices of
-	 * the nodes in mrMesh, exploiting the fact that mrMesh is always Delaunay.
-	 * This is a bit of a hack - ideally we would pass a shared pointer to the
-	 * mesh member itself, but this isn't possible at present. In future, we may
-	 * wish to consider changing mrMesh itself to be shared pointer.
-	 */
-    std::vector<Node<SPACE_DIM>*> temp_nodes;
-    std::vector<bool> boundary_node_flags;
-
-    for (unsigned i=0; i<this->GetNumNodes(); i++)
-    {
-        c_vector<double, SPACE_DIM> node_location = this->GetNode(i)->rGetLocation();
-        boundary_node_flags.push_back(this->GetNode(i)->IsBoundaryNode());
-        temp_nodes.push_back(new Node<SPACE_DIM>(i, node_location, false));
-    }
-
-    boost::shared_ptr<TetrahedralMesh<ELEMENT_DIM, SPACE_DIM> > p_mesh(new MutableMesh<ELEMENT_DIM, SPACE_DIM>(temp_nodes));
-
-    /*
-     * In constructing the mesh from temp_nodes, we lose information on which
-     * nodes are boundary nodes, so here we reinstate this.
-     */
-    for (unsigned i=0; i<this->GetNumNodes(); i++)
-    {
-        p_mesh->GetNode(i)->SetAsBoundaryNode(boundary_node_flags[i]);
-    }
-
-    return p_mesh;
+    return mpMutableMesh;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

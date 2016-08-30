@@ -137,7 +137,7 @@ const PottsMesh<DIM>& CaBasedCellPopulation<DIM>::rGetMesh() const
 }
 
 template<unsigned DIM>
-boost::shared_ptr<TetrahedralMesh<DIM, DIM> > CaBasedCellPopulation<DIM>::GetTetrahedralMeshForPdeModifier()
+TetrahedralMesh<DIM, DIM>* CaBasedCellPopulation<DIM>::GetTetrahedralMeshForPdeModifier()
 {
     std::vector<Node<DIM>*> temp_nodes;
 
@@ -151,8 +151,7 @@ boost::shared_ptr<TetrahedralMesh<DIM, DIM> > CaBasedCellPopulation<DIM>::GetTet
         cell_index++;
     }
 
-    boost::shared_ptr<TetrahedralMesh<DIM, DIM> > p_mesh(new MutableMesh<DIM,DIM>(temp_nodes));
-    return p_mesh;
+    return new MutableMesh<DIM,DIM>(temp_nodes);
 }
 
 template<unsigned DIM>
@@ -160,15 +159,14 @@ bool CaBasedCellPopulation<DIM>::IsPdeNodeAssociatedWithApoptoticCell(unsigned p
 {
     // pdeNodeIndex corresponds to the 'position' of the cell to interrogate in the vector of cells
 
-    typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
-    assert(pdeNodeIndex < this->GetNumRealCells());
+//    typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
+//    for (unsigned i=0; i<pdeNodeIndex; i++)
+//    {
+//        ++cell_iter;
+//    }
+//    bool is_cell_apoptotic = cell_iter->template HasCellProperty<ApoptoticCellProperty>();
+    bool is_cell_apoptotic = this->GetCellUsingLocationIndex(pdeNodeIndex)->template HasCellProperty<ApoptoticCellProperty>();
 
-    ///\todo #2687 Increment from 1, since we don't want to increment if pdeNodeIndex==0?
-    for (unsigned i=0; i<pdeNodeIndex; i++)
-    {
-        ++cell_iter;
-    }
-    bool is_cell_apoptotic = cell_iter->template HasCellProperty<ApoptoticCellProperty>();
     return is_cell_apoptotic;
 }
 

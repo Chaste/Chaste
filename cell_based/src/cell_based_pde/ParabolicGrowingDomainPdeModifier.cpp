@@ -73,7 +73,7 @@ void ParabolicGrowingDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellP
     UpdateSolutionVector(rCellPopulation);
 
     // Use CellBasedParabolicPdeSolver as cell wise PDE
-    CellBasedParabolicPdeSolver<DIM> solver(this->mpFeMesh.get(), mpPdeAndBcs->GetPde(), p_bcc.get());
+    CellBasedParabolicPdeSolver<DIM> solver(this->mpFeMesh, mpPdeAndBcs->GetPde(), p_bcc.get());
 
     ///\todo Investigate more than one PDE time step per spatial step (#2687)
     SimulationTime* p_simulation_time = SimulationTime::Instance();
@@ -96,12 +96,11 @@ void ParabolicGrowingDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellP
 template<unsigned DIM>
 void ParabolicGrowingDomainPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)
 {
+    AbstractGrowingDomainPdeModifier<DIM>::SetupSolve(rCellPopulation, outputDirectory);
+
     // Temporarily cache the variable name until we create an AbstractPdeAndBcs object
     // and move mpPdeAndBcs to the abstract class. See #2767, #2687
     this->mCachedDependentVariableName = mpPdeAndBcs->rGetDependentVariableName();
-
-    // Cache the output directory
-    this->mOutputDirectory = outputDirectory;
 
     // Setup a finite element mesh on which to save the initial condition
     this->GenerateFeMesh(rCellPopulation);

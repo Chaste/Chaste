@@ -288,11 +288,11 @@ public:
     /**
      * Overridden GetTetrahedralMeshForPdeModifier() method.
      *
-     * @return a shared pointer to a tetrahedral mesh whose nodes match those of the NodesOnlyMesh.
+     * @return a pointer to a tetrahedral mesh whose nodes match those of the NodesOnlyMesh.
      *
      * This method is called by AbstractGrowingDomainPdeModifier.
      */
-    virtual boost::shared_ptr<TetrahedralMesh<DIM, DIM> > GetTetrahedralMeshForPdeModifier();
+    virtual TetrahedralMesh<DIM, DIM>* GetTetrahedralMeshForPdeModifier();
 
     /**
      * @return the number of nodes in the cell population.

@@ -375,7 +375,6 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
              node_iter != p_mesh->GetNodeIteratorEnd();
              ++node_iter)
         {
-
             if (std::find(location_indices.begin(), location_indices.end(), node_iter->GetIndex())!=location_indices.end())
             {
                 TS_ASSERT_DELTA(non_trivial_pde.ComputeLinearInUCoeffInSourceTermAtNode(*node_iter), non_trivial_pde_coefficient, 1e-3);
@@ -392,11 +391,6 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         pde_handler.SetImposeBcsOnCoarseBoundary(false);
 
         simulator.SetCellBasedPdeHandler(&pde_handler);
-
-///\todo Refactor CellBasedPdeHandler as a simulation modifier (#2687)
-//        // Create a PDE modifier object using this PDE and BCs object
-//        MAKE_PTR_ARGS(CellBasedPdeHandler<2>, p_pde_modifier, (p_pde_and_bc, false)); // Don't impose BCs on coarse boundary
-//        simulator.AddSimulationModifier(p_pde_modifier);
 
         simulator.Solve();
 

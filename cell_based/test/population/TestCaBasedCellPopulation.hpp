@@ -537,8 +537,10 @@ public:
 
         cell_population.Update();
 
-        TS_ASSERT_EQUALS(cell_population.IsPdeNodeAssociatedWithApoptoticCell(0), true);
-        TS_ASSERT_EQUALS(cell_population.IsPdeNodeAssociatedWithApoptoticCell(1), false);
+        TS_ASSERT_THROWS_THIS(cell_population.IsPdeNodeAssociatedWithApoptoticCell(0),
+            "Location index input argument does not correspond to a Cell");
+        TS_ASSERT_EQUALS(cell_population.IsPdeNodeAssociatedWithApoptoticCell(12), true);
+        TS_ASSERT_EQUALS(cell_population.IsPdeNodeAssociatedWithApoptoticCell(13), false);
     }
 
     void TestAddCell() throw(Exception)
@@ -896,7 +898,7 @@ public:
 
         CaBasedCellPopulation<2u> cell_population(*p_mesh, cells, location_indices);
 
-        boost::shared_ptr<TetrahedralMesh<2,2> > p_tet_mesh = cell_population.GetTetrahedralMeshForPdeModifier();
+        TetrahedralMesh<2,2>* p_tet_mesh = cell_population.GetTetrahedralMeshForPdeModifier();
 
         // Check it has the correct number of nodes and elements
         TS_ASSERT_EQUALS(p_tet_mesh->GetNumNodes(), p_mesh->GetNumNodes());

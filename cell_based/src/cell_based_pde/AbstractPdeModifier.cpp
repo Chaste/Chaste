@@ -73,10 +73,17 @@ void AbstractPdeModifier<DIM>::UpdateAtEndOfOutputTimeStep(AbstractCellPopulatio
 
         p_vtk_mesh_writer->AddPointData(mCachedDependentVariableName,pde_solution);
 
-        p_vtk_mesh_writer->WriteFilesUsingMesh(*(mpFeMesh.get()));
+        p_vtk_mesh_writer->WriteFilesUsingMesh(*mpFeMesh);
         delete p_vtk_mesh_writer;
     }
 #endif //CHASTE_VTK
+}
+
+template<unsigned DIM>
+void AbstractPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)
+{
+    // Cache the output directory
+    this->mOutputDirectory = outputDirectory;
 }
 
 template<unsigned DIM>

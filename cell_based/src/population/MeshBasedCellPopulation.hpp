@@ -209,7 +209,7 @@ public:
      *
      * This method is called by AbstractGrowingDomainPdeModifier.
      */
-    virtual boost::shared_ptr<TetrahedralMesh<ELEMENT_DIM, SPACE_DIM> > GetTetrahedralMeshForPdeModifier();
+    virtual TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* GetTetrahedralMeshForPdeModifier();
 
     /** @return mUseAreaBasedDampingConstant. */
     bool UseAreaBasedDampingConstant();

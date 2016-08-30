@@ -225,13 +225,13 @@ public:
     AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rGetMesh();
 
     /**
-     * @return a shared pointer to a tetrahedral mesh, for use with a PDE modifier.
+     * @return a shared to a tetrahedral mesh, for use with a PDE modifier.
      * This method is called by AbstractGrowingDomainPdeModifier.
      *
      * As this method is pure virtual, it must be overridden
      * in subclasses.
      */
-    virtual boost::shared_ptr<TetrahedralMesh<ELEMENT_DIM, SPACE_DIM> > GetTetrahedralMeshForPdeModifier()=0;
+    virtual TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* GetTetrahedralMeshForPdeModifier()=0;
 
     /**
      * @param pdeNodeIndex index of a node in a tetrahedral mesh for use

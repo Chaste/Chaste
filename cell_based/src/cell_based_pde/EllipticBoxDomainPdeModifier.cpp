@@ -76,10 +76,10 @@ void EllipticBoxDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopula
 
     // When using a PDE mesh which doesn't coincide with the cells, we must set up the source terms before solving the PDE.
     // Pass in already updated CellPdeElementMap to speed up finding cells.
-    mpPdeAndBcs->SetUpSourceTermsForAveragedSourcePde(this->mpFeMesh.get(), &this->mCellPdeElementMap);
+    mpPdeAndBcs->SetUpSourceTermsForAveragedSourcePde(this->mpFeMesh, &this->mCellPdeElementMap);
 
     // Use SimpleLinearEllipticSolver as Averaged Source PDE
-    SimpleLinearEllipticSolver<DIM,DIM> solver(this->mpFeMesh.get(), mpPdeAndBcs->GetPde(), p_bcc.get());
+    SimpleLinearEllipticSolver<DIM,DIM> solver(this->mpFeMesh, mpPdeAndBcs->GetPde(), p_bcc.get());
 
     ///\todo Use initial guess when solving the system (#2687)
     Vec old_solution_copy = this->mSolution;
@@ -104,9 +104,6 @@ void EllipticBoxDomainPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DI
     // Temporarily cache the variable name until we create an AbstractPdeAndBcs object
     // and move mpPdeAndBcs to the abstract class. See #2767, #2687
     this->mCachedDependentVariableName = mpPdeAndBcs->rGetDependentVariableName();
-
-    // Cache the output directory
-    this->mOutputDirectory = outputDirectory;
 
     // Call these  methods to solve the PDE on the initial step and Output the results.
     UpdateAtEndOfTimeStep(rCellPopulation);
