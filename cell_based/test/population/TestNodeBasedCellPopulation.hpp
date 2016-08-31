@@ -613,8 +613,8 @@ public:
 
         node_based_cell_population.Update();
 
-        TS_ASSERT_EQUALS(node_based_cell_population.IsPdeNodeAssociatedWithApoptoticCell(0), true);
-        TS_ASSERT_EQUALS(node_based_cell_population.IsPdeNodeAssociatedWithApoptoticCell(1), false);
+        TS_ASSERT_EQUALS(node_based_cell_population.IsPdeNodeAssociatedWithNonApoptoticCell(0), false);
+        TS_ASSERT_EQUALS(node_based_cell_population.IsPdeNodeAssociatedWithNonApoptoticCell(1), true);
 
         unsigned num_removed;
         boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);

@@ -33,14 +33,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "AbstractPdeAndBoundaryConditions.hpp"
+#include "PdeAndBoundaryConditions.hpp"
+#include "PetscTools.hpp"
+#include "AveragedSourceEllipticPde.hpp"
+#include "AveragedSourceParabolicPde.hpp"
 
 template<unsigned DIM>
-AbstractPdeAndBoundaryConditions<DIM>::AbstractPdeAndBoundaryConditions(AbstractBoundaryCondition<DIM>* pBoundaryCondition,
+PdeAndBoundaryConditions<DIM>::PdeAndBoundaryConditions(AbstractLinearPde<DIM,DIM>* pPde,
+                                                                        AbstractBoundaryCondition<DIM>* pBoundaryCondition,
                                                                         bool isNeumannBoundaryCondition,
                                                                         Vec solution,
                                                                         bool deleteMemberPointersInDestructor)
-    : mpBoundaryCondition(pBoundaryCondition),
+    : mpPde(pPde),
+      mpBoundaryCondition(pBoundaryCondition),
       mIsNeumannBoundaryCondition(isNeumannBoundaryCondition),
       mSolution(NULL),
       mDeleteMemberPointersInDestructor(deleteMemberPointersInDestructor),
@@ -53,49 +58,62 @@ AbstractPdeAndBoundaryConditions<DIM>::AbstractPdeAndBoundaryConditions(Abstract
 }
 
 template<unsigned DIM>
-AbstractPdeAndBoundaryConditions<DIM>::~AbstractPdeAndBoundaryConditions()
+PdeAndBoundaryConditions<DIM>::~PdeAndBoundaryConditions()
 {
     // Avoid memory leaks if the object was loaded from an archive
     if (mDeleteMemberPointersInDestructor)
     {
         delete mpBoundaryCondition;
+        delete mpPde;
     }
 
     DestroySolution();
 }
 
 template<unsigned DIM>
-AbstractBoundaryCondition<DIM>* AbstractPdeAndBoundaryConditions<DIM>::GetBoundaryCondition() const
+const AbstractLinearPde<DIM,DIM>* PdeAndBoundaryConditions<DIM>::GetConstPde() const
+{
+    return mpPde;
+}
+
+template<unsigned DIM>
+AbstractLinearPde<DIM,DIM>* PdeAndBoundaryConditions<DIM>::GetPde() const
+{
+    return mpPde;
+}
+
+template<unsigned DIM>
+AbstractBoundaryCondition<DIM>* PdeAndBoundaryConditions<DIM>::GetBoundaryCondition() const
 {
     return mpBoundaryCondition;
 }
 
 template<unsigned DIM>
-Vec AbstractPdeAndBoundaryConditions<DIM>::GetSolution()
+Vec PdeAndBoundaryConditions<DIM>::GetSolution()
 {
     return mSolution;
 }
 
 template<unsigned DIM>
-Vec AbstractPdeAndBoundaryConditions<DIM>::GetSolution() const
+Vec PdeAndBoundaryConditions<DIM>::GetSolution() const
 {
     return mSolution;
 }
 
 template<unsigned DIM>
-void AbstractPdeAndBoundaryConditions<DIM>::SetSolution(Vec solution)
+void PdeAndBoundaryConditions<DIM>::SetSolution(Vec solution)
 {
     mSolution = solution;
 }
 
 template<unsigned DIM>
-bool AbstractPdeAndBoundaryConditions<DIM>::IsNeumannBoundaryCondition()
+bool PdeAndBoundaryConditions<DIM>::IsNeumannBoundaryCondition()
 {
     return mIsNeumannBoundaryCondition;
 }
 
 template<unsigned DIM>
-void AbstractPdeAndBoundaryConditions<DIM>::DestroySolution()
+void PdeAndBoundaryConditions<DIM>::DestroySolution()
 {
     if (mSolution)
     {
@@ -104,18 +122,44 @@ void AbstractPdeAndBoundaryConditions<DIM>::DestroySolution()
 }
 
 template<unsigned DIM>
-void AbstractPdeAndBoundaryConditions<DIM>::SetDependentVariableName(const std::string& rName)
+void PdeAndBoundaryConditions<DIM>::SetDependentVariableName(const std::string& rName)
 {
     mDependentVariableName = rName;
 }
 
 template<unsigned DIM>
-std::string& AbstractPdeAndBoundaryConditions<DIM>::rGetDependentVariableName()
+std::string& PdeAndBoundaryConditions<DIM>::rGetDependentVariableName()
 {
     return mDependentVariableName;
 }
 
+template<unsigned DIM>
+bool PdeAndBoundaryConditions<DIM>::HasAveragedSourcePde()
+{
+    return ((dynamic_cast<AveragedSourceEllipticPde<DIM>*>(mpPde) != NULL) ||
+            (dynamic_cast<AveragedSourceParabolicPde<DIM>*>(mpPde) != NULL));
+}
+
+template<unsigned DIM>
+void PdeAndBoundaryConditions<DIM>::SetUpSourceTermsForAveragedSourcePde(TetrahedralMesh<DIM,DIM>* pMesh, std::map<CellPtr, unsigned>* pCellPdeElementMap)
+{
+    assert(HasAveragedSourcePde());
+    if (dynamic_cast<AveragedSourceEllipticPde<DIM>*>(mpPde) != NULL)
+    {
+        static_cast<AveragedSourceEllipticPde<DIM>*>(mpPde)->SetupSourceTerms(*pMesh, pCellPdeElementMap);
+    }
+    else if (dynamic_cast<AveragedSourceParabolicPde<DIM>*>(mpPde) != NULL)
+    {
+        static_cast<AveragedSourceParabolicPde<DIM>*>(mpPde)->SetupSourceTerms(*pMesh, pCellPdeElementMap);
+    }
+}
+
 // Explicit instantiation
-template class AbstractPdeAndBoundaryConditions<1>;
-template class AbstractPdeAndBoundaryConditions<2>;
-template class AbstractPdeAndBoundaryConditions<3>;
+template class PdeAndBoundaryConditions<1>;
+template class PdeAndBoundaryConditions<2>;
+template class PdeAndBoundaryConditions<3>;
+
+// Serialization for Boost >= 1.36
+#include "SerializationExportWrapperForCpp.hpp"
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(PdeAndBoundaryConditions)
+

@@ -33,22 +33,26 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef ABSTRACTPDEANDBOUNDARYCONDITIONS_HPP_
-#define ABSTRACTPDEANDBOUNDARYCONDITIONS_HPP_
+#ifndef PDEANDBOUNDARYCONDITIONS_HPP_
+#define PDEANDBOUNDARYCONDITIONS_HPP_
 
 #include "ChasteSerialization.hpp"
-#include "ClassIsAbstract.hpp"
+#include <boost/serialization/base_object.hpp>
 
+#include "AbstractLinearPde.hpp"
 #include "AbstractBoundaryCondition.hpp"
+#include "ArchiveLocationInfo.hpp"
 #include "TetrahedralMesh.hpp"
 #include "Cell.hpp"
+#include "PetscTools.hpp"
+#include "FileFinder.hpp"
 
 /**
- * Abstract class storing shared functionality of EllipticPdeAndBoundaryConditions 
- * and ParabolicPdeAndBoundaryConditions.
+ * Abstract class storing shared functionality of PdeAndBoundaryConditions 
+ * and PdeAndBoundaryConditions.
  */
 template<unsigned DIM>
-class AbstractPdeAndBoundaryConditions
+class PdeAndBoundaryConditions
 {
 private:
 
@@ -63,13 +67,17 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        // Note that archiving of mSolution is handled by the methods save/load_construct_data
+        // Note that archiving of mpPde and mSolution is handled by the methods save/load_construct_data
+        archive & mpPde;
         archive & mpBoundaryCondition;
         archive & mIsNeumannBoundaryCondition;
         archive & mDependentVariableName;
     }
 
 protected:
+
+    /** Pointer to a linear elliptic PDE object. */
+    AbstractLinearPde<DIM,DIM>* mpPde;
 
     /** Pointer to a boundary condition object. */
     AbstractBoundaryCondition<DIM>* mpBoundaryCondition;
@@ -80,7 +88,7 @@ protected:
     /**
      * The solution to the PDE problem, for use as an initial guess when solving at the next time step.
      *
-     * \todo Why is there also an mSolution in AbstractPdeModifier? Can one of these be removed? (#2687)
+     * \todo Once CellBasedPdeHandler is replaced, remove this member and associated methods (#2687)
      */
     Vec mSolution;
 
@@ -98,6 +106,7 @@ public:
     /**
      * Constructor.
      *
+     * @param pPde A pointer to a linear PDE object (defaults to NULL)
      * @param pBoundaryCondition A pointer to an abstract boundary condition
      *     (defaults to NULL, corresponding to a constant boundary condition with value zero)
      * @param isNeumannBoundaryCondition Whether the boundary condition is Neumann (defaults to true)
@@ -105,7 +114,8 @@ public:
      * @param deleteMemberPointersInDestructor whether to delete member pointers in the destructor
      *     (defaults to false)
      */
-    AbstractPdeAndBoundaryConditions(AbstractBoundaryCondition<DIM>* pBoundaryCondition=NULL,
+    PdeAndBoundaryConditions(AbstractLinearPde<DIM,DIM>* pPde=NULL,
+                                     AbstractBoundaryCondition<DIM>* pBoundaryCondition=NULL,
                                      bool isNeumannBoundaryCondition=true,
                                      Vec solution=NULL,
                                      bool deleteMemberPointersInDestructor=false);
@@ -113,7 +123,17 @@ public:
     /**
      * Destructor.
      */
-    ~AbstractPdeAndBoundaryConditions();
+    ~PdeAndBoundaryConditions();
+
+    /**
+     * @return mpPde (used in archiving)
+     */
+    const AbstractLinearPde<DIM,DIM>* GetConstPde() const;
+
+    /**
+     * @return mpPde (used in archiving)
+     */
+    AbstractLinearPde<DIM,DIM>* GetPde() const;
 
     /**
      * @return mpBoundaryCondition
@@ -143,23 +163,9 @@ public:
     bool IsNeumannBoundaryCondition();
 
     /**
-     * @return whether the PDE is of type AveragedSourceParabolicPde
-     */
-    bool HasAveragedSourcePde();
-
-    /**
      * Call PetscTools::Destroy on mSolution.
      */
     void DestroySolution();
-
-    /**
-     * In the case where mpPde is of type AveragedSourceParabolicPde, set the source terms
-     * using the information in the given mesh.
-     *
-     * @param pMesh Pointer to a tetrahedral mesh
-     * @param pCellPdeElementMap map between cells and elements, from parabolic PDE modifiers
-     */
-    void SetUpSourceTermsForAveragedSourcePde(TetrahedralMesh<DIM,DIM>* pMesh, std::map<CellPtr, unsigned>* pCellPdeElementMap=NULL);
 
     /**
      * Set the name of the dependent variable.
@@ -174,9 +180,58 @@ public:
      * @return the name
      */
     std::string& rGetDependentVariableName();
+
+    /**
+     * @return whether the PDE has an averaged source
+     */
+    bool HasAveragedSourcePde();
+
+    /**
+     * In the case where the PDE has an averaged source, set the source terms
+     * using the information in the given mesh.
+     *
+     * @param pMesh Pointer to a tetrahedral mesh
+     * @param pCellPdeElementMap map between cells and elements
+     */
+    void SetUpSourceTermsForAveragedSourcePde(TetrahedralMesh<DIM,DIM>* pMesh, std::map<CellPtr, unsigned>* pCellPdeElementMap=NULL);
 };
 
+#include "SerializationExportWrapper.hpp"
 // Declare identifier for the serializer
-TEMPLATED_CLASS_IS_ABSTRACT_1_UNSIGNED(AbstractPdeAndBoundaryConditions)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(PdeAndBoundaryConditions)
 
-#endif /* ABSTRACTPDEANDBOUNDARYCONDITIONS_HPP_ */
+namespace boost
+{
+namespace serialization
+{
+template<class Archive, unsigned DIM>
+inline void save_construct_data(
+    Archive & ar, const PdeAndBoundaryConditions<DIM> * t, const unsigned int file_version)
+{
+    if (t->GetSolution())
+    {
+        std::string archive_filename = ArchiveLocationInfo::GetArchiveDirectory() + "solution.vec";
+        PetscTools::DumpPetscObject(t->GetSolution(), archive_filename);
+    }
+}
+
+template<class Archive, unsigned DIM>
+inline void load_construct_data(
+    Archive & ar, PdeAndBoundaryConditions<DIM> * t, const unsigned int file_version)
+{
+    Vec solution = NULL;
+
+    std::string archive_filename = ArchiveLocationInfo::GetArchiveDirectory() + "solution.vec";
+    FileFinder file_finder(archive_filename, RelativeTo::Absolute);
+
+    if (file_finder.Exists())
+    {
+        PetscTools::ReadPetscObject(solution, archive_filename);
+    }
+
+    ::new(t)PdeAndBoundaryConditions<DIM>(NULL, NULL, false, solution, true);
+}
+}
+} // namespace ...
+
+#endif /* PDEANDBOUNDARYCONDITIONS_HPP_ */

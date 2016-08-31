@@ -137,7 +137,7 @@ public:
         // Make the Pde and BCS
         CellwiseSourceEllipticPde<2> pde(cell_population, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
-        MAKE_PTR_ARGS(EllipticPdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
         p_pde_and_bc->SetDependentVariableName("oxygen");
 
         // Create a PDE modifier object using this PDE and BCs object
@@ -188,7 +188,7 @@ public:
         // Make the PDE and BCs
         CellwiseSourceEllipticPde<2> pde(cell_population, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
-        MAKE_PTR_ARGS(EllipticPdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
         p_pde_and_bc->SetDependentVariableName("oxygen");
 
         // Create a PDE modifier object using this PDE and BCs object
@@ -239,7 +239,7 @@ public:
         // Make the PDE and BCs
         CellwiseSourceEllipticPde<2> pde(cell_population, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
-        MAKE_PTR_ARGS(EllipticPdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
         p_pde_and_bc->SetDependentVariableName("oxygen");
 
         // Create a PDE modifier object using this PDE and BCs object
@@ -292,7 +292,7 @@ public:
         // Make the PDE and BCs
         CellwiseSourceEllipticPde<2> pde(cell_population, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
-        MAKE_PTR_ARGS(EllipticPdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
         p_pde_and_bc->SetDependentVariableName("oxygen");
 
         // Create a PDE modifier object using this PDE and BCs object
@@ -335,7 +335,7 @@ public:
         // Make the PDE and BCs
         CellwiseSourceEllipticPde<2> pde(cell_population, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
-        MAKE_PTR_ARGS(EllipticPdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
         p_pde_and_bc->SetDependentVariableName("oxygen");
 
         // Create a PDE modifier object using this PDE and BCs object
@@ -395,7 +395,7 @@ public:
         // Make the PDE and BCs
         CellwiseSourceEllipticPde<2> pde(cell_population, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
-        MAKE_PTR_ARGS(EllipticPdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
         p_pde_and_bc->SetDependentVariableName("oxygen");
 
         // Create a PDE modifier object using this PDE and BCs object
@@ -409,7 +409,7 @@ public:
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumAllCells(), 9u);
 
         // Test nothing's changed
-        AbstractCellPopulation<2, 2>::Iterator cell_iter=simulator.rGetCellPopulation().Begin();
+        AbstractCellPopulation<2, 2>::Iterator cell_iter = simulator.rGetCellPopulation().Begin();
         TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("oxygen"), 1, 1e-4);
         ++cell_iter;
         ++cell_iter;

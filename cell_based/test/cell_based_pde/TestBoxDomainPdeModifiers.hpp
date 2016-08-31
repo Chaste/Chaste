@@ -42,8 +42,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CheckpointArchiveTypes.hpp"
 #include "EllipticBoxDomainPdeModifier.hpp"
 #include "ParabolicBoxDomainPdeModifier.hpp"
-#include "EllipticPdeAndBoundaryConditions.hpp"
-#include "ParabolicPdeAndBoundaryConditions.hpp"
+#include "PdeAndBoundaryConditions.hpp"
+#include "PdeAndBoundaryConditions.hpp"
 #include "UniformSourceEllipticPde.hpp"
 #include "UniformSourceParabolicPde.hpp"
 #include "ConstBoundaryCondition.hpp"
@@ -62,7 +62,7 @@ public:
         // Make the PDE and BCs
         UniformSourceEllipticPde<2> pde(-0.1);
         ConstBoundaryCondition<2> bc(1.0);
-        MAKE_PTR_ARGS(EllipticPdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
         p_pde_and_bc->SetDependentVariableName("averaged quantity");
 
         // Make domain
@@ -71,7 +71,7 @@ public:
         ChasteCuboid<2> cuboid(lower, upper);
 
         // Create an elliptic PDE modifier object using this PDE and BCs object
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc, cuboid, 2.0));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc, &cuboid, 2.0));
 
         // Test that member variables are initialised correctly
         TS_ASSERT_EQUALS(p_pde_modifier->mpPdeAndBcs->rGetDependentVariableName(), "averaged quantity");
@@ -99,7 +99,7 @@ public:
         // Make the PDE and BCs
         UniformSourceParabolicPde<2> pde(-0.1);
         ConstBoundaryCondition<2> bc(1.0);
-        MAKE_PTR_ARGS(ParabolicPdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
         p_pde_and_bc->SetDependentVariableName("averaged quantity");
 
         // Make domain
@@ -108,7 +108,7 @@ public:
         ChasteCuboid<2> cuboid(lower, upper);
 
         // Create a parabolic PDE modifier object using this PDE and BCs object
-        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc, cuboid, 2.0));
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc, &cuboid, 2.0));
 
         // Test that member variables are initialised correctly
         TS_ASSERT_EQUALS(p_pde_modifier->mpPdeAndBcs->rGetDependentVariableName(), "averaged quantity");
@@ -143,7 +143,7 @@ public:
             // Make the PDE and BCs
             UniformSourceEllipticPde<2> pde(-0.1);
             ConstBoundaryCondition<2> bc(1.0);
-            MAKE_PTR_ARGS(EllipticPdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+            MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
             p_pde_and_bc->SetDependentVariableName("averaged quantity");
 
             // Make domain
@@ -152,7 +152,7 @@ public:
             ChasteCuboid<2> cuboid(lower, upper);
 
             // Initialise an elliptic PDE modifier object using this PDE and BCs object
-            AbstractCellBasedSimulationModifier<2,2>* const p_modifier = new EllipticBoxDomainPdeModifier<2>(p_pde_and_bc, cuboid, 2.0);
+            AbstractCellBasedSimulationModifier<2,2>* const p_modifier = new EllipticBoxDomainPdeModifier<2>(p_pde_and_bc, &cuboid, 2.0);
 
             // Create an output archive
             std::ofstream ofs(archive_filename.c_str());
@@ -160,6 +160,7 @@ public:
 
             // Serialize via pointer
             output_arch << p_modifier;
+
             delete p_modifier;
         }
 
@@ -175,6 +176,7 @@ public:
 
             // See whether we read out the correct variable name area
             std::string variable_name = (static_cast<EllipticBoxDomainPdeModifier<2>*>(p_modifier2))->mpPdeAndBcs->rGetDependentVariableName();
+
             TS_ASSERT_EQUALS(variable_name, "averaged quantity");
 
             delete p_modifier2;
@@ -193,7 +195,7 @@ public:
             // Make the PDE and BCs
             UniformSourceParabolicPde<2> pde(-0.1);
             ConstBoundaryCondition<2> bc(1.0);
-            MAKE_PTR_ARGS(ParabolicPdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+            MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
             p_pde_and_bc->SetDependentVariableName("averaged quantity");
 
             ///\todo #2687
@@ -207,7 +209,7 @@ public:
             ChasteCuboid<2> cuboid(lower, upper);
 
             // Initialise a parabolic PDE modifier object using this PDE and BCs object
-            AbstractCellBasedSimulationModifier<2,2>* const p_modifier = new ParabolicBoxDomainPdeModifier<2>(p_pde_and_bc, cuboid, 2.0);
+            AbstractCellBasedSimulationModifier<2,2>* const p_modifier = new ParabolicBoxDomainPdeModifier<2>(p_pde_and_bc, &cuboid, 2.0);
 
             // Create an output archive
             std::ofstream ofs(archive_filename.c_str());

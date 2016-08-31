@@ -41,9 +41,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/make_shared.hpp>
 
 template<unsigned DIM>
-AbstractBoxDomainPdeModifier<DIM>::AbstractBoxDomainPdeModifier()
-: AbstractPdeModifier<DIM>()
+AbstractBoxDomainPdeModifier<DIM>::AbstractBoxDomainPdeModifier(boost::shared_ptr<PdeAndBoundaryConditions<DIM> > pPdeAndBcs,
+                                                                ChasteCuboid<DIM>* pMeshCuboid,
+                                                                double stepSize)
+    : AbstractPdeModifier<DIM>(pPdeAndBcs),
+      mpMeshCuboid(pMeshCuboid),
+      mStepSize(stepSize)
 {
+    if (pMeshCuboid)
+    {
+        // We only need to generate mpFeMesh once, as it does not vary with time
+        this->GenerateFeMesh(*mpMeshCuboid, mStepSize);
+    }
 }
 
 template<unsigned DIM>
@@ -123,14 +132,14 @@ void AbstractBoxDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulation<DI
             solution_at_cell += nodal_value * weights(i);
         }
 
-        cell_iter->GetCellData()->SetItem(this->mCachedDependentVariableName, solution_at_cell);
+        cell_iter->GetCellData()->SetItem(this->mpPdeAndBcs->rGetDependentVariableName(), solution_at_cell);
 
         if (this->mOutputGradient)
         {
             // Now calculate the gradient of the solution and store this in CellVecData
             c_vector<double, DIM> solution_gradient = zero_vector<double>(DIM);
 
-            // Calculate the basis functions at any point (eg zero) in the element
+            // Calculate the basis functions at any point (e.g. zero) in the element
             c_matrix<double, DIM, DIM> jacobian, inverse_jacobian;
             double jacobian_det;
             this->mpFeMesh->GetInverseJacobianForElement(elem_index, jacobian, jacobian_det, inverse_jacobian);
@@ -151,16 +160,16 @@ void AbstractBoxDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulation<DI
             switch (DIM)
             {
     //            case 1:
-    //                cell_iter->GetCellData()->SetItem(this->mCachedDependentVariableName+"_grad_x", solution_gradient(0));
+    //                cell_iter->GetCellData()->SetItem(this->mpPdeAndBcs->rGetDependentVariableName()+"_grad_x", solution_gradient(0));
     //                break;
                 case 2:
-                    cell_iter->GetCellData()->SetItem(this->mCachedDependentVariableName+"_grad_x", solution_gradient(0));
-                    cell_iter->GetCellData()->SetItem(this->mCachedDependentVariableName+"_grad_y", solution_gradient(1));
+                    cell_iter->GetCellData()->SetItem(this->mpPdeAndBcs->rGetDependentVariableName()+"_grad_x", solution_gradient(0));
+                    cell_iter->GetCellData()->SetItem(this->mpPdeAndBcs->rGetDependentVariableName()+"_grad_y", solution_gradient(1));
                     break;
     //            case 3:
-    //                cell_iter->GetCellData()->SetItem(this->mCachedDependentVariableName+"_grad_x", solution_gradient(0));
-    //                cell_iter->GetCellData()->SetItem(this->mCachedDependentVariableName+"_grad_y", solution_gradient(1));
-    //                cell_iter->GetCellData()->SetItem(this->mCachedDependentVariableName+"_grad_z", solution_gradient(2));
+    //                cell_iter->GetCellData()->SetItem(this->mpPdeAndBcs->rGetDependentVariableName()+"_grad_x", solution_gradient(0));
+    //                cell_iter->GetCellData()->SetItem(this->mpPdeAndBcs->rGetDependentVariableName()+"_grad_y", solution_gradient(1));
+    //                cell_iter->GetCellData()->SetItem(this->mpPdeAndBcs->rGetDependentVariableName()+"_grad_z", solution_gradient(2));
     //                break;
                 default:
                     NEVER_REACHED;

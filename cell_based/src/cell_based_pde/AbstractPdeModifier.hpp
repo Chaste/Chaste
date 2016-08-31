@@ -37,10 +37,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define ABSTRACTPDEMODIFIER_HPP_
 
 #include "ChasteSerialization.hpp"
-#include <boost/serialization/base_object.hpp>
+#include "ClassIsAbstract.hpp"
 #include <boost/shared_ptr.hpp>
 
 #include "AbstractCellBasedSimulationModifier.hpp"
+#include "PdeAndBoundaryConditions.hpp"
 #include "TetrahedralMesh.hpp"
 
 /**
@@ -67,31 +68,27 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & boost::serialization::base_object<AbstractCellBasedSimulationModifier<DIM,DIM> >(*this);
+        archive & mpPdeAndBcs;
 
         // Note that archiving of mSolution is ~~~handled by the methods save/load_construct_data~~~ NOT YET DONE
         // archive & mpFeMesh;
         archive & mOutputDirectory;
-        archive & mCachedDependentVariableName;
         archive & mOutputGradient;
     }
 
 protected:
 
-    /** The solution to the PDE problem at the current time step. */
-    Vec mSolution; ///\todo NEED TO ARCHIVE THIS see AbstractPdeandBoundaryCondidtion (#2687)
+    /** Shared pointer to a PDE object with associated boundary conditions. */
+    boost::shared_ptr<PdeAndBoundaryConditions<DIM> > mpPdeAndBcs;
 
-    /** Shared pointer to the finite element mesh on which to solve the PDE. **/
+    /** The solution to the PDE problem at the current time step. */
+    Vec mSolution; ///\todo NEED TO ARCHIVE THIS see AbstractPdeandBoundaryCondition (#2687)
+
+    /** Pointer to the finite element mesh on which to solve the PDE. **/
     TetrahedralMesh<DIM,DIM>* mpFeMesh;  ///\todo #2687 NEED TO ARCHIVE THIS
 
     /** Store the output directory name. */
     std::string mOutputDirectory;
-
-    /**
-     * Caching the variable name.
-     *
-     * \todo Consider removing this member and moving mpPdeAndBcs up to this class (#2687)
-     */
-    std::string mCachedDependentVariableName;
 
     /** Whether or not to calculate and output the gradient of the solution. */
     bool mOutputGradient;
@@ -100,8 +97,10 @@ public:
 
     /**
      * Constructor.
+     *
+     * @param pPdeAndBcs a shared pointer to a PDE object with associated boundary conditions
      */
-    AbstractPdeModifier();
+    AbstractPdeModifier(boost::shared_ptr<PdeAndBoundaryConditions<DIM> > pPdeAndBcs=boost::shared_ptr<PdeAndBoundaryConditions<DIM> >());
 
     /**
      * Destructor.
@@ -109,7 +108,13 @@ public:
     virtual ~AbstractPdeModifier();
 
     /**
-     * Overridden UpdateAtEndOfTimeStep() method. Needs overwriting in child classes.
+     * @return mpPdeAndBcs.
+     */
+    const boost::shared_ptr<PdeAndBoundaryConditions<DIM> > GetPdeAndBcs() const;
+
+    /**
+     * UpdateAtEndOfTimeStep() method. Needs overwriting in child classes.
+     * \todo improve documentation (#2687)
      *
      * Specifies what to do in the simulation at the end of each time step.
      *
@@ -118,7 +123,8 @@ public:
     virtual void UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)=0;
 
     /**
-     * Overridden UpdateAtEndOfOutputTimeStep() method.
+     * UpdateAtEndOfOutputTimeStep() method.
+     * \todo improve documentation (#2687)
      *
      * Specifies what to do in the simulation at the end of each output timestep.
      *
@@ -127,7 +133,8 @@ public:
     virtual void UpdateAtEndOfOutputTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
 
     /**
-     * Overridden SetupSolve() method.
+     * SetupSolve() method.
+     * \todo improve documentation (#2687)
      *
      * Specifies what to do in the simulation before the start of the time loop. Needs overwriting in child classes
      *
@@ -137,8 +144,9 @@ public:
     virtual void SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory);
 
     /**
-     * Overridden OutputSimulationModifierParameters() method.
+     * OutputSimulationModifierParameters() method.
      * Output any simulation modifier parameters to file.
+     * \todo improve documentation (#2687)
      *
      * @param rParamsFile the file stream to which the parameters are output
      */

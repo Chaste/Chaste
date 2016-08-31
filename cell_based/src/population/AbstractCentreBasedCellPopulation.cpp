@@ -39,7 +39,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "StepSizeException.hpp"
 #include "Warnings.hpp"
 #include "WildTypeCellMutationState.hpp"
-#include "ApoptoticCellProperty.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractCentreBasedCellPopulation( AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
@@ -79,18 +78,6 @@ Node<SPACE_DIM>* AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetN
 {
     unsigned index = this->GetLocationIndexUsingCell(pCell);
     return this->GetNode(index);
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-bool AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::IsPdeNodeAssociatedWithApoptoticCell(unsigned pdeNodeIndex)
-{
-    bool is_cell_apoptotic = false;
-
-    if (this->IsCellAttachedToLocationIndex(pdeNodeIndex))
-    {
-        is_cell_apoptotic = this->GetCellUsingLocationIndex(pdeNodeIndex)->template HasCellProperty<ApoptoticCellProperty>();
-    }
-    return is_cell_apoptotic;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

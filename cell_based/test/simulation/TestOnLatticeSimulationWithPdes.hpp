@@ -123,7 +123,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         // Set up PDE and pass to simulation via handler (zero uptake to check analytic solution)
         AveragedSourceEllipticPde<2> pde(cell_population, 0.0);
         ConstBoundaryCondition<2> bc(1.0);
-        EllipticPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("nutrient");
 
         CellBasedPdeHandler<2> pde_handler(&cell_population);
@@ -172,7 +172,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         // Set up PDE and pass to simulation via handler (zero uptake to check analytic solution)
         AveragedSourceEllipticPde<2> pde(cell_population, 0.0);
         ConstBoundaryCondition<2> bc(1.0);
-        EllipticPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("nutrient");
 
         CellBasedPdeHandler<2> pde_handler(&cell_population);
@@ -275,12 +275,12 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         // Note even with uptake the PDE has U=0 as solution with zero neumann conditions.
         AveragedSourceEllipticPde<2> pde_1(cell_population, 0.0);
         ConstBoundaryCondition<2> bc_1(1.0);
-        EllipticPdeAndBoundaryConditions<2> pde_and_bc_1(&pde_1, &bc_1, false);
+        PdeAndBoundaryConditions<2> pde_and_bc_1(&pde_1, &bc_1, false);
         pde_and_bc_1.SetDependentVariableName("nutrient_dirichlet");
 
         AveragedSourceEllipticPde<2> pde_2(cell_population, 0.0);
         ConstBoundaryCondition<2> bc_2(0.0);
-        EllipticPdeAndBoundaryConditions<2> pde_and_bc_2(&pde_2, &bc_2, true);
+        PdeAndBoundaryConditions<2> pde_and_bc_2(&pde_2, &bc_2, true);
         pde_and_bc_2.SetDependentVariableName("nutrient_neumann");
 
         CellBasedPdeHandler<2> pde_handler(&cell_population);
@@ -362,36 +362,14 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
 
         CellwiseSourceEllipticPde<2> pde(cell_population, 0.0);
         ConstBoundaryCondition<2> bc(1.0);
-        EllipticPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("nutrient");
-
-        double pde_coefficient = 0.0;
-        TS_ASSERT_DELTA(pde.ComputeLinearInUCoeffInSourceTermAtNode(*p_mesh->GetNode(0)), pde_coefficient, 1e-3);
-
-        CellwiseSourceEllipticPde<2> non_trivial_pde(cell_population, 1.0);
-
-        double non_trivial_pde_coefficient = 1.0;
-        for (PottsMesh<2>::NodeIterator node_iter = p_mesh->GetNodeIteratorBegin();
-             node_iter != p_mesh->GetNodeIteratorEnd();
-             ++node_iter)
-        {
-            if (std::find(location_indices.begin(), location_indices.end(), node_iter->GetIndex())!=location_indices.end())
-            {
-                TS_ASSERT_DELTA(non_trivial_pde.ComputeLinearInUCoeffInSourceTermAtNode(*node_iter), non_trivial_pde_coefficient, 1e-3);
-            }
-            else
-            {
-                // No cell attached
-                TS_ASSERT_DELTA(non_trivial_pde.ComputeLinearInUCoeffInSourceTermAtNode(*node_iter), 0.0, 1e-3);
-            }
-        }
 
         CellBasedPdeHandler<2> pde_handler(&cell_population);
         pde_handler.AddPdeAndBc(&pde_and_bc);
         pde_handler.SetImposeBcsOnCoarseBoundary(false);
 
         simulator.SetCellBasedPdeHandler(&pde_handler);
-
         simulator.Solve();
 
         // Test solution is constant
@@ -400,7 +378,6 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
              ++cell_iter)
         {
             double analytic_solution = 1.0;
-            // Test that PDE solver is working correctly
             TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("nutrient"), analytic_solution, 1e-2);
         }
     }
@@ -441,7 +418,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
 
         CellwiseSourceEllipticPde<2> pde(cell_population, 0.0);
         ConstBoundaryCondition<2> bc(1.0);
-        EllipticPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("nutrient");
 
         CellBasedPdeHandler<2> pde_handler(&cell_population);
@@ -449,11 +426,6 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         pde_handler.SetImposeBcsOnCoarseBoundary(true);
 
         simulator.SetCellBasedPdeHandler(&pde_handler);
-
-///\todo Refactor CellBasedPdeHandler as a simulation modifier (#2687)
-//        // Create a PDE modifier object using this PDE and BCs object
-//        MAKE_PTR_ARGS(CellBasedPdeHandler<2>, p_pde_modifier, (p_pde_and_bc));
-//        simulator.AddSimulationModifier(p_pde_modifier);
 
         simulator.Solve();
 
@@ -502,7 +474,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         // Set up a PDE with mixed boundary conditions (use zero uptake to check analytic solution)
         AveragedSourceEllipticPde<2> pde(cell_population, 0.0);
         ConstBoundaryCondition<2> bc(1.0);
-        EllipticPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("nutrient");
 
         // Pass this to the simulation object via a PDE handler
@@ -571,7 +543,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         // Set up PDE and pass to simulation via handler (zero uptake to check analytic solution)
         AveragedSourceEllipticPde<2> pde(cell_population, 0.0);
         ConstBoundaryCondition<2> bc(1.0);
-        EllipticPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("nutrient");
 
         CellBasedPdeHandler<2> pde_handler(&cell_population);
@@ -623,7 +595,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         // Set up PDE and pass to simulation via handler (zero uptake to check analytic solution)
         AveragedSourceEllipticPde<2> pde(cell_population, 0.0);
         ConstBoundaryCondition<2> bc(1.0);
-        EllipticPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("nutrient");
 
         CellBasedPdeHandler<2> pde_handler(&cell_population);
@@ -731,12 +703,12 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         // Set up PDE and pass to simulation via handler (zero uptake to check analytic solution)
         AveragedSourceEllipticPde<2> pde_1(cell_population, 0.0);
         ConstBoundaryCondition<2> bc_1(1.0);
-        EllipticPdeAndBoundaryConditions<2> pde_and_bc_1(&pde_1, &bc_1, false);
+        PdeAndBoundaryConditions<2> pde_and_bc_1(&pde_1, &bc_1, false);
         pde_and_bc_1.SetDependentVariableName("quantity 1");
 
         AveragedSourceEllipticPde<2> pde_2(cell_population, 0.0);
         ConstBoundaryCondition<2> bc_2(1.0);
-        EllipticPdeAndBoundaryConditions<2> pde_and_bc_2(&pde_2, &bc_2, false);
+        PdeAndBoundaryConditions<2> pde_and_bc_2(&pde_2, &bc_2, false);
         pde_and_bc_2.SetDependentVariableName("quantity 2");
 
         CellBasedPdeHandler<2> pde_handler(&cell_population);
@@ -829,7 +801,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         double nutrient_uptake_rate=-0.1;
         AveragedSourceEllipticPde<2> pde(cell_population, nutrient_uptake_rate);
         ConstBoundaryCondition<2> bc(1.0);
-        EllipticPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("nutrient");
 
         CellBasedPdeHandler<2> pde_handler(&cell_population);

@@ -43,7 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/vector.hpp>
 
 #include "AbstractCellPopulation.hpp"
-#include "EllipticPdeAndBoundaryConditions.hpp"
+#include "PdeAndBoundaryConditions.hpp"
 #include "BoundaryConditionsContainer.hpp"
 #include "TetrahedralMesh.hpp"
 #include "ChasteCuboid.hpp"
@@ -97,7 +97,7 @@ protected:
     AbstractCellPopulation<DIM>* mpCellPopulation;
 
     /** Vector of pointers to linear elliptic PDE objects with additional boundary condition information. */
-    std::vector<EllipticPdeAndBoundaryConditions<DIM>*> mPdeAndBcCollection;
+    std::vector<PdeAndBoundaryConditions<DIM>*> mPdeAndBcCollection;
 
     /** A cache of where the results are going (used for VTK writer). */
     std::string mDirPath;
@@ -287,7 +287,7 @@ public:
      * @return the full boundary conditions container
      */
     virtual std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ConstructBoundaryConditionsContainer(
-            EllipticPdeAndBoundaryConditions<DIM>* pPdeAndBc,
+            PdeAndBoundaryConditions<DIM>* pPdeAndBc,
             TetrahedralMesh<DIM,DIM>* pMesh);
 
     /**
@@ -354,7 +354,7 @@ public:
      *
      * @param pPdeAndBc a pointer to a PdeAndBoundaryConditions object
      */
-    void AddPdeAndBc(EllipticPdeAndBoundaryConditions<DIM>* pPdeAndBc);
+    void AddPdeAndBc(PdeAndBoundaryConditions<DIM>* pPdeAndBc);
 
     /**
      * Output parameters to file.

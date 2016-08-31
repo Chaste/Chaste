@@ -38,10 +38,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
-#include <boost/shared_ptr.hpp>
 
 #include "AbstractBoxDomainPdeModifier.hpp"
-#include "ParabolicPdeAndBoundaryConditions.hpp"
 #include "BoundaryConditionsContainer.hpp"
 
 /**
@@ -69,30 +67,20 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & boost::serialization::base_object<AbstractBoxDomainPdeModifier<DIM> >(*this);
-        archive & mpPdeAndBcs;
     }
-
-    /** Shared pointer to a linear parabolic PDE object with associated boundary conditions. */
-    boost::shared_ptr<ParabolicPdeAndBoundaryConditions<DIM> > mpPdeAndBcs;
 
 public:
 
     /**
-     * Default Constructor.
-     *
-     * Only used in Archiving
-     */
-    ParabolicBoxDomainPdeModifier();
-
-
-    /**
      * Constructor.
      *
-     * @param pPdeAndBcs a shared pointer to a linear parabolic PDE object with associated boundary conditions
-     * @param meshCuboid the outer boundary for the FEM mesh
-     * @param stepSize the step size to be used in the FEM mesh (defaults to 1, i.e. the default cell size)
+     * @param pPdeAndBcs a shared pointer to a PDE object with associated boundary conditions
+     * @param pMeshCuboid pointer to a ChasteCuboid specifying the outer boundary for the FE mesh (defaults to NULL)
+     * @param stepSize the step size to be used in the FE mesh (defaults to 1.0, i.e. the default cell size)
      */
-    ParabolicBoxDomainPdeModifier(boost::shared_ptr<ParabolicPdeAndBoundaryConditions<DIM> > pPdeAndBcs, ChasteCuboid<DIM> meshCuboid, double stepSize = 1.0);
+    ParabolicBoxDomainPdeModifier(boost::shared_ptr<PdeAndBoundaryConditions<DIM> > pPdeAndBcs=boost::shared_ptr<PdeAndBoundaryConditions<DIM> >(),
+                                  ChasteCuboid<DIM>* pMeshCuboid=NULL,
+                                  double stepSize=1.0);
 
     /**
      * Destructor.

@@ -71,16 +71,15 @@ double CellwiseSourceParabolicPde<DIM>::ComputeSourceTerm(const ChastePoint<DIM>
 template<unsigned DIM>
 double CellwiseSourceParabolicPde<DIM>::ComputeSourceTermAtNode(const Node<DIM>& rNode, double u)
 {
-    double coefficient = 0.0;
+    double source_coefficient = 0.0;
 
-    bool is_cell_apoptotic = mrCellPopulation.IsPdeNodeAssociatedWithApoptoticCell(rNode.GetIndex());
-    if (!is_cell_apoptotic)
+    if (mrCellPopulation.IsPdeNodeAssociatedWithNonApoptoticCell(rNode.GetIndex()))
     {
-        coefficient = mSourceCoefficient;
+        source_coefficient = mSourceCoefficient;
     }
 
     // The source term is C*u
-    return coefficient*u;
+    return source_coefficient*u;
 }
 
 template<unsigned DIM>

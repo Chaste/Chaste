@@ -98,7 +98,7 @@ TetrahedralMesh<DIM,DIM>* CellBasedPdeHandler<DIM>::GetCoarsePdeMesh()
 }
 
 template<unsigned DIM>
-void CellBasedPdeHandler<DIM>::AddPdeAndBc(EllipticPdeAndBoundaryConditions<DIM>* pPdeAndBc)
+void CellBasedPdeHandler<DIM>::AddPdeAndBc(PdeAndBoundaryConditions<DIM>* pPdeAndBc)
 {
     if (!mPdeAndBcCollection.empty() && (pPdeAndBc->rGetDependentVariableName()==""))
     {
@@ -339,7 +339,7 @@ void CellBasedPdeHandler<DIM>::SolvePdeAndWriteResultsToFile(unsigned samplingTi
     for (unsigned pde_index=0; pde_index<mPdeAndBcCollection.size(); pde_index++)
     {
         // Get pointer to this PdeAndBoundaryConditions object
-        EllipticPdeAndBoundaryConditions<DIM>* p_pde_and_bc = mPdeAndBcCollection[pde_index];
+        PdeAndBoundaryConditions<DIM>* p_pde_and_bc = mPdeAndBcCollection[pde_index];
 
         // Set up boundary conditions
         std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc = ConstructBoundaryConditionsContainer(p_pde_and_bc, p_mesh);
@@ -388,7 +388,9 @@ void CellBasedPdeHandler<DIM>::SolvePdeAndWriteResultsToFile(unsigned samplingTi
             // Pass in already updated CellPdeElementMap to speed up finding cells.
             p_pde_and_bc->SetUpSourceTermsForAveragedSourcePde(p_mesh, &mCellPdeElementMap);
 
-            SimpleLinearEllipticSolver<DIM,DIM> solver(p_mesh, p_pde_and_bc->GetPde(), p_bcc.get());
+            SimpleLinearEllipticSolver<DIM,DIM> solver(p_mesh,
+                                                       static_cast<AbstractLinearEllipticPde<DIM,DIM>*>(p_pde_and_bc->GetPde()),
+                                                       p_bcc.get());
 
             // If we have an initial guess, use this when solving the system...
             if (is_previous_solution_size_correct)
@@ -403,7 +405,9 @@ void CellBasedPdeHandler<DIM>::SolvePdeAndWriteResultsToFile(unsigned samplingTi
         }
         else
         {
-            CellBasedEllipticPdeSolver<DIM> solver(p_mesh, p_pde_and_bc->GetPde(), p_bcc.get());
+            CellBasedEllipticPdeSolver<DIM> solver(p_mesh,
+                                                   static_cast<AbstractLinearEllipticPde<DIM,DIM>*>(p_pde_and_bc->GetPde()),
+                                                   p_bcc.get());
 
             // If we have an initial guess, use this...
             if (is_previous_solution_size_correct)
@@ -479,7 +483,7 @@ void CellBasedPdeHandler<DIM>::SolvePdeAndWriteResultsToFile(unsigned samplingTi
 
 template<unsigned DIM>
 std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > CellBasedPdeHandler<DIM>::ConstructBoundaryConditionsContainer(
-        EllipticPdeAndBoundaryConditions<DIM>* pPdeAndBc,
+        PdeAndBoundaryConditions<DIM>* pPdeAndBc,
         TetrahedralMesh<DIM,DIM>* pMesh)
 {
     std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc(new BoundaryConditionsContainer<DIM,DIM,1>(false));
@@ -603,7 +607,7 @@ void CellBasedPdeHandler<DIM>::WritePdeSolution(double time)
         {
             if (mpCoarsePdeMesh != NULL)
             {
-                EllipticPdeAndBoundaryConditions<DIM>* p_pde_and_bc = mPdeAndBcCollection[pde_index];
+                PdeAndBoundaryConditions<DIM>* p_pde_and_bc = mPdeAndBcCollection[pde_index];
                 assert(p_pde_and_bc->rGetDependentVariableName() != "");
 
 #ifdef CHASTE_VTK
@@ -768,7 +772,7 @@ double CellBasedPdeHandler<DIM>::GetPdeSolutionAtPoint(const c_vector<double,DIM
     {
         EXCEPTION("Tried to get the solution of a variable name: " + rVariable + ". There is no PDE with that variable.");
     }
-    EllipticPdeAndBoundaryConditions<DIM>* p_pde_and_bc = mPdeAndBcCollection[pde_index];
+    PdeAndBoundaryConditions<DIM>* p_pde_and_bc = mPdeAndBcCollection[pde_index];
 
     Element<DIM,DIM>* p_containing_element;
 

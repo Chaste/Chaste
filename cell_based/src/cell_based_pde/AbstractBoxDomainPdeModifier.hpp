@@ -66,6 +66,8 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & boost::serialization::base_object<AbstractPdeModifier<DIM> >(*this);
+        archive & mpMeshCuboid;
+        archive & mStepSize;
     }
 
 protected:
@@ -73,12 +75,30 @@ protected:
     /** Map between cells and the elements of the FE mesh containing them. */
     std::map<CellPtr, unsigned> mCellPdeElementMap;
 
+    /**
+     * Pointer to a ChasteCuboid storing the outer boundary for the FE mesh.
+     * Stored as a member to facilitate archiving.
+     */
+    ChasteCuboid<DIM>* mpMeshCuboid;
+
+    /**
+     * The step size to be used in the FE mesh.
+     * Stored as a member to facilitate archiving.
+     */
+    double mStepSize;
+
 public:
 
     /**
      * Constructor.
+     *
+     * @param pPdeAndBcs a shared pointer to a PDE object with associated boundary conditions
+     * @param pMeshCuboid pointer to a ChasteCuboid specifying the outer boundary for the FE mesh (defaults to NULL)
+     * @param stepSize the step size to be used in the FE mesh (defaults to 1.0, i.e. the default cell size)
      */
-    AbstractBoxDomainPdeModifier();
+    AbstractBoxDomainPdeModifier(boost::shared_ptr<PdeAndBoundaryConditions<DIM> > pPdeAndBcs=boost::shared_ptr<PdeAndBoundaryConditions<DIM> >(),
+                                 ChasteCuboid<DIM>* pMeshCuboid=NULL,
+                                 double stepSize=1.0);
 
     /**
      * Destructor.
@@ -100,8 +120,8 @@ public:
     /**
      * Helper method to generate the mesh.
      *
-     * @param meshCuboid the outer boundary for the FEM mesh.
-     * @param stepSize the step size to be used in the FEM mesh.
+     * @param meshCuboid the outer boundary for the FE mesh.
+     * @param stepSize the step size to be used in the FE mesh.
      */
     void GenerateFeMesh(ChasteCuboid<DIM> meshCuboid, double stepSize);
 

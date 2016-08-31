@@ -139,7 +139,6 @@ void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(CaBasedCellP
         // Store whether this cell is labelled
         bool cell_is_labelled = cell_iter->template HasCellProperty<CellLabel>();
 
-
         // Get this node's von Neumann neighbours (not Moore neighbours, since they must share an edge)
         std::set<unsigned> neighbour_node_indices = pCellPopulation->rGetMesh().GetVonNeumannNeighbouringNodeIndices(index);
 

@@ -57,7 +57,7 @@ CellBasedPdeHandlerOnCuboid<DIM>::~CellBasedPdeHandlerOnCuboid()
 
 template<unsigned DIM>
 std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > CellBasedPdeHandlerOnCuboid<DIM>::ConstructBoundaryConditionsContainer(
-        EllipticPdeAndBoundaryConditions<DIM>* pPdeAndBc,
+        PdeAndBoundaryConditions<DIM>* pPdeAndBc,
         TetrahedralMesh<DIM,DIM>* pMesh)
 {
     // Not using the inputs as there's only one BC

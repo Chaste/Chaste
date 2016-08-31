@@ -238,13 +238,13 @@ public:
      *         with a PDE modifier
      *
      * @return if a node, specified by its index in a tetrahedral mesh for use
-     *         with a PDE modifier, is associated with an apoptotic cell.
+     *         with a PDE modifier, is associated with a non-apoptotic cell.
      * This method can be called by PDE classes.
      *
      * As this method is pure virtual, it must be overridden
      * in subclasses.
      */
-    virtual bool IsPdeNodeAssociatedWithApoptoticCell(unsigned pdeNodeIndex)=0;
+    virtual bool IsPdeNodeAssociatedWithNonApoptoticCell(unsigned pdeNodeIndex);
 
     /**
      * @param pdeNodeIndex index of a node in a tetrahedral mesh for use
@@ -475,7 +475,7 @@ public:
      *
      * @return whether there is a cell attached.
      */
-    bool IsCellAttachedToLocationIndex(unsigned index);
+    virtual bool IsCellAttachedToLocationIndex(unsigned index);
 
     /**
      * Set the cell corresponding to a given location index.

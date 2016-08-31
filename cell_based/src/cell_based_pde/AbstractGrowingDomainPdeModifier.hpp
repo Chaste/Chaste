@@ -40,8 +40,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 
 #include "AbstractPdeModifier.hpp"
-#include "BoundaryConditionsContainer.hpp"
-#include "EllipticPdeAndBoundaryConditions.hpp"
 
 /**
  * A modifier class in which has the common functionality of solving a PDE on a Mesh defined by the tissue.
@@ -80,8 +78,10 @@ public:
 
     /**
      * Constructor.
+     *
+     * @param pPdeAndBcs a shared pointer to a PDE object with associated boundary conditions
      */
-    AbstractGrowingDomainPdeModifier();
+    AbstractGrowingDomainPdeModifier(boost::shared_ptr<PdeAndBoundaryConditions<DIM> > pPdeAndBcs=boost::shared_ptr<PdeAndBoundaryConditions<DIM> >());
 
     /**
      * Destructor.

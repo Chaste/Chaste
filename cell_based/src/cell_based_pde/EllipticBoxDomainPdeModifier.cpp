@@ -34,26 +34,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "EllipticBoxDomainPdeModifier.hpp"
-#include "TetrahedralMesh.hpp"
+#include "PdeAndBoundaryConditions.hpp"
 #include "SimpleLinearEllipticSolver.hpp"
 
 template<unsigned DIM>
-EllipticBoxDomainPdeModifier<DIM>::EllipticBoxDomainPdeModifier()
-    : AbstractBoxDomainPdeModifier<DIM>()
-{
-}
-
-template<unsigned DIM>
-EllipticBoxDomainPdeModifier<DIM>::EllipticBoxDomainPdeModifier(boost::shared_ptr<EllipticPdeAndBoundaryConditions<DIM> > pPdeAndBcs,
-                                                                ChasteCuboid<DIM> meshCuboid,
+EllipticBoxDomainPdeModifier<DIM>::EllipticBoxDomainPdeModifier(boost::shared_ptr<PdeAndBoundaryConditions<DIM> > pPdeAndBcs,
+                                                                ChasteCuboid<DIM>* pMeshCuboid,
                                                                 double stepSize)
-    : AbstractBoxDomainPdeModifier<DIM>(),
-      mpPdeAndBcs(pPdeAndBcs)
+    : AbstractBoxDomainPdeModifier<DIM>(pPdeAndBcs, pMeshCuboid, stepSize)
 {
     assert(DIM == 2);
-
-    // Generate mesh. Note only need to do this ones as the mesh is fixed.
-    this->GenerateFeMesh(meshCuboid, stepSize);
 }
 
 template<unsigned DIM>
@@ -76,10 +66,12 @@ void EllipticBoxDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopula
 
     // When using a PDE mesh which doesn't coincide with the cells, we must set up the source terms before solving the PDE.
     // Pass in already updated CellPdeElementMap to speed up finding cells.
-    mpPdeAndBcs->SetUpSourceTermsForAveragedSourcePde(this->mpFeMesh, &this->mCellPdeElementMap);
+    this->mpPdeAndBcs->SetUpSourceTermsForAveragedSourcePde(this->mpFeMesh, &this->mCellPdeElementMap);
 
     // Use SimpleLinearEllipticSolver as Averaged Source PDE
-    SimpleLinearEllipticSolver<DIM,DIM> solver(this->mpFeMesh, mpPdeAndBcs->GetPde(), p_bcc.get());
+    SimpleLinearEllipticSolver<DIM,DIM> solver(this->mpFeMesh,
+                                               static_cast<AbstractLinearEllipticPde<DIM,DIM>*>(this->mpPdeAndBcs->GetPde()),
+                                               p_bcc.get());
 
     ///\todo Use initial guess when solving the system (#2687)
     Vec old_solution_copy = this->mSolution;
@@ -101,10 +93,6 @@ void EllipticBoxDomainPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DI
 {
     AbstractBoxDomainPdeModifier<DIM>::SetupSolve(rCellPopulation,outputDirectory);
 
-    // Temporarily cache the variable name until we create an AbstractPdeAndBcs object
-    // and move mpPdeAndBcs to the abstract class. See #2767, #2687
-    this->mCachedDependentVariableName = mpPdeAndBcs->rGetDependentVariableName();
-
     // Call these  methods to solve the PDE on the initial step and Output the results.
     UpdateAtEndOfTimeStep(rCellPopulation);
     this->UpdateAtEndOfOutputTimeStep(rCellPopulation);
@@ -115,14 +103,15 @@ std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > EllipticBoxDomainPdeModif
 {
     std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc(new BoundaryConditionsContainer<DIM,DIM,1>(false));
 
-    // To be well-defined, elliptic PDE problems on Box domains require at least some Dirichlet boundary conditions
-    assert(!(mpPdeAndBcs->IsNeumannBoundaryCondition()));
+    // To be well-defined, elliptic PDE problems on box domains require at least some Dirichlet boundary conditions
+    ///\todo Replace this assertion with an exception in the PdeAndBoundaryConditions constructor
+    assert(!(this->mpPdeAndBcs->IsNeumannBoundaryCondition()));
 
     for (typename TetrahedralMesh<DIM,DIM>::BoundaryNodeIterator node_iter = this->mpFeMesh->GetBoundaryNodeIteratorBegin();
          node_iter != this->mpFeMesh->GetBoundaryNodeIteratorEnd();
          ++node_iter)
     {
-        p_bcc->AddDirichletBoundaryCondition(*node_iter, mpPdeAndBcs->GetBoundaryCondition());
+        p_bcc->AddDirichletBoundaryCondition(*node_iter, this->mpPdeAndBcs->GetBoundaryCondition());
     }
 
     return p_bcc;

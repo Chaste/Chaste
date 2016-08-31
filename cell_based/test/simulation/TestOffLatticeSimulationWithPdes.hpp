@@ -160,7 +160,7 @@ public:
 
         SimplePdeForTesting pde;
         ConstBoundaryCondition<2> bc(1.0);
-        EllipticPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("oxygen");
         pde_handler.AddPdeAndBc(&pde_and_bc);
 
@@ -255,7 +255,7 @@ public:
         // Set up PDE and pass to simulation via handler
         UniformSourceEllipticPde<2> pde(-0.1);
         ConstBoundaryCondition<2> bc(1.0);
-        EllipticPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("oxygen");
 
         CellBasedPdeHandler<2> pde_handler(&cell_population);
@@ -366,7 +366,7 @@ public:
         // Set up PDE and pass to simulation via handler
         CellwiseSourceEllipticPde<2> pde(cell_population, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
-        EllipticPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("oxygen");
 
         CellBasedPdeHandler<2> pde_handler(&cell_population);
@@ -454,14 +454,14 @@ public:
         // Set up first PDE and pass to handler
         CellwiseSourceEllipticPde<2> pde(cell_population, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
-        EllipticPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("oxygen");
         pde_handler.AddPdeAndBc(&pde_and_bc);
 
         // Set up second PDE and pass to handler
         CellwiseSourceEllipticPde<2> pde2(cell_population, -0.8);
         ConstBoundaryCondition<2> bc2(0.0);
-        EllipticPdeAndBoundaryConditions<2> pde_and_bc2(&pde2, &bc2, true);
+        PdeAndBoundaryConditions<2> pde_and_bc2(&pde2, &bc2, true);
         pde_and_bc2.SetDependentVariableName("dunno");
         pde_handler.AddPdeAndBc(&pde_and_bc2);
 
@@ -543,7 +543,7 @@ public:
         // Set up PDE and pass to simulation via handler
         UniformSourceEllipticPde<2> pde(-0.1);
         ConstBoundaryCondition<2> bc(1.0);
-        EllipticPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("oxygen");
 
         CellBasedPdeHandler<2> pde_handler(&cell_population);
@@ -649,13 +649,13 @@ public:
         // Set up PDE and pass to handler
         AveragedSourceEllipticPde<2> pde(cell_population, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
-        EllipticPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("oxygen");
         pde_handler.AddPdeAndBc(&pde_and_bc);
 
         // Set up second PDE and pass to handler
         AveragedSourceEllipticPde<2> pde2(cell_population, -0.5);
-        EllipticPdeAndBoundaryConditions<2> pde_and_bc2(&pde2, &bc, false);
+        PdeAndBoundaryConditions<2> pde_and_bc2(&pde2, &bc, false);
         pde_and_bc2.SetDependentVariableName("dunno");
         pde_handler.AddPdeAndBc(&pde_and_bc2);
 
@@ -806,7 +806,7 @@ public:
         // Set up PDE and pass to handler
         AveragedSourceEllipticPde<2> pde(cell_population, 0.0);
         ConstBoundaryCondition<2> bc(1.0);
-        EllipticPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("nutrient");
         pde_handler.AddPdeAndBc(&pde_and_bc);
 
@@ -895,7 +895,7 @@ public:
         // Set up PDE and pass to simulation via handler
         UniformSourceEllipticPde<2> pde(-0.1);
         ConstBoundaryCondition<2> bc(1.0);
-        EllipticPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("oxygen");
         CellBasedPdeHandler<2> pde_handler(&cell_population);
         pde_handler.AddPdeAndBc(&pde_and_bc);
@@ -993,7 +993,7 @@ public:
         // Set up PDE and pass to simulation via handler
         CellwiseSourceEllipticPde<2> pde(cell_population, -0.03);
         ConstBoundaryCondition<2> bc(1.0);
-        EllipticPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("oxygen");
 
         CellBasedPdeHandler<2> pde_handler(&cell_population);
@@ -1066,7 +1066,7 @@ public:
         // Set up PDE and pass to simulation via handler
         UniformSourceEllipticPde<3> pde(-0.03);
         ConstBoundaryCondition<3> bc(1.0);
-        EllipticPdeAndBoundaryConditions<3> pde_and_bc(&pde, &bc, false);
+        PdeAndBoundaryConditions<3> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("oxygen");
 
         CellBasedPdeHandler<3> pde_handler(&cell_population);
@@ -1135,7 +1135,7 @@ public:
         // Create PDE and pass to simulation via handler
         SimplePdeForTesting pde;
         FunctionalBoundaryCondition<2> functional_bc(&bc_func);
-        EllipticPdeAndBoundaryConditions<2> pde_and_bc(&pde, &functional_bc, false);
+        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &functional_bc, false);
         pde_and_bc.SetDependentVariableName("oxygen");
 
         CellBasedPdeHandler<2> pde_handler(&cell_population);
@@ -1195,7 +1195,7 @@ public:
         // Set up PDE and pass to simulation via handler
         CellwiseSourceEllipticPde<2> pde(cell_population, -0.03);
         ConstBoundaryCondition<2> bc(1.0);
-        EllipticPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
 
         CellBasedPdeHandler<2> pde_handler(&cell_population);
         pde_handler.AddPdeAndBc(&pde_and_bc);
@@ -1264,7 +1264,7 @@ public:
         // Set up PDE and pass to simulation via handler
         AveragedSourceEllipticPde<2> pde(cell_population, -1.0);
         ConstBoundaryCondition<2> bc(1.0);
-        EllipticPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("nutrient");
 
         CellBasedPdeHandler<2> pde_handler(&cell_population);
@@ -1326,7 +1326,7 @@ public:
         // Set up PDE and pass to simulation via handler (zero uptake to check analytic solution)
         AveragedSourceEllipticPde<2> pde(cell_population, 0.0);
         ConstBoundaryCondition<2> bc(1.0);
-        EllipticPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("nutrient");
 
         CellBasedPdeHandler<2> pde_handler(&cell_population);
@@ -1419,7 +1419,7 @@ public:
         // Set up PDE and pass to simulation via handler (zero uptake to check analytic solution)
         AveragedSourceEllipticPde<2> pde(cell_population, 0.0);
         ConstBoundaryCondition<2> bc(1.0);
-        EllipticPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("nutrient");
 
         CellBasedPdeHandler<2> pde_handler(&cell_population);
@@ -1536,7 +1536,7 @@ public:
         // Set up PDE and pass to simulation via handler (uniform uptake at each cell)
         VolumeDependentAveragedSourceEllipticPde<2> pde(cell_population, -0.01);
         ConstBoundaryCondition<2> bc(1.0);
-        EllipticPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("nutrient");
 
         CellBasedPdeHandler<2> pde_handler(&cell_population);
@@ -1626,7 +1626,7 @@ public:
         // Set up PDE and pass to simulation via handler
         AveragedSourceEllipticPde<1> pde(cell_population, -1.0);
         ConstBoundaryCondition<1> bc(0.0);
-        EllipticPdeAndBoundaryConditions<1> pde_and_bc(&pde, &bc, false);
+        PdeAndBoundaryConditions<1> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("nutrient");
 
         CellBasedPdeHandler<1> pde_handler(&cell_population);
@@ -1703,7 +1703,7 @@ public:
         // Set up PDE and pass to simulation via handler (uniform uptake at each cell)
         AveragedSourceEllipticPde<2> pde(cell_population, -0.01);
         ConstBoundaryCondition<2> bc(1.0);
-        EllipticPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("nutrient");
 
         CellBasedPdeHandler<2> pde_handler(&cell_population);
@@ -1775,7 +1775,7 @@ public:
         // Set up PDE and pass to simulation via handler (uniform uptake at each cell)
         AveragedSourceEllipticPde<3> pde(cell_population, -0.01);
         ConstBoundaryCondition<3> bc(1.0);
-        EllipticPdeAndBoundaryConditions<3> pde_and_bc(&pde, &bc, false);
+        PdeAndBoundaryConditions<3> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("nutrient");
 
         CellBasedPdeHandler<3> pde_handler(&cell_population);

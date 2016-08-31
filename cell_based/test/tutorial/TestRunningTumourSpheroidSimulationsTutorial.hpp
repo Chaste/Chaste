@@ -225,9 +225,9 @@ public:
 
         /*
          * To pass the PDE to our simulator, it must first be encapsulated in a
-         * {{{EllipticPdeAndBoundaryConditions}}} object, together with the boundary condition for
+         * {{{PdeAndBoundaryConditions}}} object, together with the boundary condition for
          * the PDE. The latter is specified by the second and third arguments of the
-         * {{{EllipticPdeAndBoundaryConditions}}} constructor below: the second argument defines the value
+         * {{{PdeAndBoundaryConditions}}} constructor below: the second argument defines the value
          * of the boundary condition and the third argument defines whether it is of Neumann type
          * (true) or Dirichlet type (false). Thus, in our case, we are a specifying no-flux
          * boundary condition. Note that we currently cannot impose more than one boundary
@@ -240,11 +240,11 @@ public:
          *
          * The {{{CellData}}} class, is used to stores the value of the current nutrient concentration for each cell.
          */
-        EllipticPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, is_neumann_bc);
+        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, is_neumann_bc);
         pde_and_bc.SetDependentVariableName("oxygen");
 
         /*
-         * After having created a {{{EllipticPdeAndBoundaryConditions}}} object, we then pass it
+         * After having created a {{{PdeAndBoundaryConditions}}} object, we then pass it
          * to a cell-based PDE handler object. This allows us to define any number of PDEs within
          * the cell-based simulation.
          */

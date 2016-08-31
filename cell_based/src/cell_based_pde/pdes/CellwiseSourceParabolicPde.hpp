@@ -55,11 +55,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * be set in the constructor.
  *
  * For a node of the finite element mesh with location x, the function rho(x)
- * equals zero if there is an apoptotic cell associated with x, and
- * one otherwise. Here, 'associated with' takes a different meaning for each
- * cell population class, and is encoded in the method IsPdeNodeAssociatedWithApoptoticCell().
- *
- * \todo add test suite for this class? (#2687)
+ * equals one if there is a non-apoptotic cell associated with x, and
+ * zero otherwise. Here, 'associated with' takes a different meaning for each
+ * cell population class, and is encoded in the method IsPdeNodeAssociatedWithNonApoptoticCell().
  */
 template<unsigned DIM>
 class CellwiseSourceParabolicPde : public AbstractLinearParabolicPde<DIM,DIM>

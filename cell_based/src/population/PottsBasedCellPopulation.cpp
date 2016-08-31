@@ -37,7 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MutableMesh.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "AbstractPottsUpdateRule.hpp"
-#include "ApoptoticCellProperty.hpp"
 #include "NodesOnlyMesh.hpp"
 #include "Exception.hpp"
 #include "CellPopulationElementWriter.hpp"
@@ -146,18 +145,6 @@ TetrahedralMesh<DIM, DIM>* PottsBasedCellPopulation<DIM>::GetTetrahedralMeshForP
     }
 
     return new MutableMesh<DIM, DIM>(temp_nodes);
-}
-
-template<unsigned DIM>
-bool PottsBasedCellPopulation<DIM>::IsPdeNodeAssociatedWithApoptoticCell(unsigned pdeNodeIndex)
-{
-    bool is_cell_apoptotic = false;
-
-    if (this->IsCellAttachedToLocationIndex(pdeNodeIndex))
-    {
-        is_cell_apoptotic = this->GetCellUsingLocationIndex(pdeNodeIndex)->template HasCellProperty<ApoptoticCellProperty>();
-    }
-    return is_cell_apoptotic;
 }
 
 template<unsigned DIM>

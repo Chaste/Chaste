@@ -38,11 +38,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
-#include <boost/shared_ptr.hpp>
 
 #include "AbstractBoxDomainPdeModifier.hpp"
 #include "BoundaryConditionsContainer.hpp"
-#include "EllipticPdeAndBoundaryConditions.hpp"
 
 /**
  * A modifier class in which an elliptic PDE is solved on a box domain and the results are stored in CellData.
@@ -69,29 +67,20 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & boost::serialization::base_object<AbstractBoxDomainPdeModifier<DIM> >(*this);
-        archive & mpPdeAndBcs;
     }
-
-    /** Shared pointer to a linear elliptic PDE object with associated boundary conditions. */
-    boost::shared_ptr<EllipticPdeAndBoundaryConditions<DIM> > mpPdeAndBcs;
 
 public:
 
     /**
-     * Default constructor.
-     *
-     * Only used in archiving.
-     */
-    EllipticBoxDomainPdeModifier();
-
-    /**
      * Constructor.
      *
-     * @param pPdeAndBcs a shared pointer to a linear elliptic PDE object with associated boundary conditions
-     * @param meshCuboid the outer boundary for the FEM mesh
-     * @param stepSize the step size to be used in the FEM mesh (defaults to 1, i.e. the default cell size)
+     * @param pPdeAndBcs a shared pointer to a PDE object with associated boundary conditions
+     * @param pMeshCuboid pointer to a ChasteCuboid specifying the outer boundary for the FE mesh (defaults to NULL)
+     * @param stepSize the step size to be used in the FE mesh (defaults to 1.0, i.e. the default cell size)
      */
-    EllipticBoxDomainPdeModifier(boost::shared_ptr<EllipticPdeAndBoundaryConditions<DIM> > pPdeAndBcs, ChasteCuboid<DIM> meshCuboid, double stepSize = 1.0);
+    EllipticBoxDomainPdeModifier(boost::shared_ptr<PdeAndBoundaryConditions<DIM> > pPdeAndBcs=boost::shared_ptr<PdeAndBoundaryConditions<DIM> >(),
+                                 ChasteCuboid<DIM>* pMeshCuboid=NULL,
+                                 double stepSize=1.0);
 
     /**
      * Destructor.

@@ -40,8 +40,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 
 #include "AbstractGrowingDomainPdeModifier.hpp"
-#include "ParabolicPdeAndBoundaryConditions.hpp"
-#include "TetrahedralMesh.hpp"
 #include "BoundaryConditionsContainer.hpp"
 
 /**
@@ -71,27 +69,16 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & boost::serialization::base_object<AbstractGrowingDomainPdeModifier<DIM> >(*this);
-        archive & mpPdeAndBcs;
     }
-
-    /** Shared pointer to a linear parabolic PDE object with associated boundary conditions. */
-    boost::shared_ptr<ParabolicPdeAndBoundaryConditions<DIM> > mpPdeAndBcs;
 
 public:
 
     /**
-     * Default constructor.
-     *
-     * Only used in archiving.
-     */
-    ParabolicGrowingDomainPdeModifier();
-
-    /**
      * Constructor.
      *
-     * @param pPdeAndBcs a shared pointer to a linear elliptic PDE object with associated boundary conditions
+     * @param pPdeAndBcs a shared pointer to a PDE object with associated boundary conditions
      */
-    ParabolicGrowingDomainPdeModifier(boost::shared_ptr<ParabolicPdeAndBoundaryConditions<DIM> > pPdeAndBcs);
+    ParabolicGrowingDomainPdeModifier(boost::shared_ptr<PdeAndBoundaryConditions<DIM> > pPdeAndBcs=boost::shared_ptr<PdeAndBoundaryConditions<DIM> >());
 
     /**
      * Destructor.

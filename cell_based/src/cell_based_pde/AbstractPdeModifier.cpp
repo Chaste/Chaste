@@ -38,11 +38,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ReplicatableVector.hpp"
 
 template<unsigned DIM>
-AbstractPdeModifier<DIM>::AbstractPdeModifier()
+AbstractPdeModifier<DIM>::AbstractPdeModifier(boost::shared_ptr<PdeAndBoundaryConditions<DIM> > pPdeAndBcs)
     : AbstractCellBasedSimulationModifier<DIM>(),
+      mpPdeAndBcs(pPdeAndBcs),
       mSolution(NULL),
       mOutputDirectory(""),
-      mCachedDependentVariableName(""),
       mOutputGradient(false)
 {
     assert(DIM == 2);
@@ -54,6 +54,12 @@ AbstractPdeModifier<DIM>::~AbstractPdeModifier()
 }
 
 template<unsigned DIM>
+const boost::shared_ptr<PdeAndBoundaryConditions<DIM> > AbstractPdeModifier<DIM>::GetPdeAndBcs() const
+{
+    return mpPdeAndBcs;
+}
+
+template<unsigned DIM>
 void AbstractPdeModifier<DIM>::UpdateAtEndOfOutputTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
 #ifdef CHASTE_VTK
@@ -61,7 +67,7 @@ void AbstractPdeModifier<DIM>::UpdateAtEndOfOutputTimeStep(AbstractCellPopulatio
     {
         std::ostringstream time_string;
         time_string << SimulationTime::Instance()->GetTimeStepsElapsed();
-        std::string results_file = "pde_results_" + mCachedDependentVariableName + "_" + time_string.str();
+        std::string results_file = "pde_results_" + mpPdeAndBcs->rGetDependentVariableName() + "_" + time_string.str();
         VtkMeshWriter<DIM,DIM>* p_vtk_mesh_writer = new VtkMeshWriter<DIM,DIM>(mOutputDirectory, results_file, false);
 
         ReplicatableVector solution_repl(mSolution);
@@ -71,7 +77,7 @@ void AbstractPdeModifier<DIM>::UpdateAtEndOfOutputTimeStep(AbstractCellPopulatio
            pde_solution.push_back(solution_repl[i]);
         }
 
-        p_vtk_mesh_writer->AddPointData(mCachedDependentVariableName,pde_solution);
+        p_vtk_mesh_writer->AddPointData(mpPdeAndBcs->rGetDependentVariableName(), pde_solution);
 
         p_vtk_mesh_writer->WriteFilesUsingMesh(*mpFeMesh);
         delete p_vtk_mesh_writer;

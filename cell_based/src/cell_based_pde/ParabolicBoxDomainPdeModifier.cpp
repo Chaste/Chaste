@@ -34,26 +34,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "ParabolicBoxDomainPdeModifier.hpp"
-#include "TetrahedralMesh.hpp"
 #include "SimpleLinearParabolicSolver.hpp"
 
 template<unsigned DIM>
-ParabolicBoxDomainPdeModifier<DIM>::ParabolicBoxDomainPdeModifier()
-    : AbstractBoxDomainPdeModifier<DIM>()
-{
-}
-
-template<unsigned DIM>
-ParabolicBoxDomainPdeModifier<DIM>::ParabolicBoxDomainPdeModifier(boost::shared_ptr<ParabolicPdeAndBoundaryConditions<DIM> > pPdeAndBcs,
-                                                                  ChasteCuboid<DIM> meshCuboid,
+ParabolicBoxDomainPdeModifier<DIM>::ParabolicBoxDomainPdeModifier(boost::shared_ptr<PdeAndBoundaryConditions<DIM> > pPdeAndBcs,
+                                                                  ChasteCuboid<DIM>* pMeshCuboid,
                                                                   double stepSize)
-    : AbstractBoxDomainPdeModifier<DIM>(),
-      mpPdeAndBcs(pPdeAndBcs)
+    : AbstractBoxDomainPdeModifier<DIM>(pPdeAndBcs, pMeshCuboid, stepSize)
 {
-    assert(DIM == 2);
-
-    // Generate mesh. Note only need to do this ones as the mesh is fixed.
-    this->GenerateFeMesh(meshCuboid, stepSize);
 }
 
 template<unsigned DIM>
@@ -76,10 +64,12 @@ void ParabolicBoxDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopul
 
     // When using a PDE mesh which doesn't coincide with the cells, we must set up the source terms before solving the PDE.
     // Pass in already updated CellPdeElementMap to speed up finding cells.
-    mpPdeAndBcs->SetUpSourceTermsForAveragedSourcePde(this->mpFeMesh, &this->mCellPdeElementMap);
+    this->mpPdeAndBcs->SetUpSourceTermsForAveragedSourcePde(this->mpFeMesh, &this->mCellPdeElementMap);
 
     // Use SimpleLinearParabolicSolver as averaged Source PDE
-    SimpleLinearParabolicSolver<DIM,DIM> solver(this->mpFeMesh, mpPdeAndBcs->GetPde(), p_bcc.get());
+    SimpleLinearParabolicSolver<DIM,DIM> solver(this->mpFeMesh,
+                                                static_cast<AbstractLinearParabolicPde<DIM,DIM>*>(this->mpPdeAndBcs->GetPde()),
+                                                p_bcc.get());
 
     ///\todo Investigate more than one PDE time step per spatial step (#2687)
     SimulationTime* p_simulation_time = SimulationTime::Instance();
@@ -104,10 +94,6 @@ void ParabolicBoxDomainPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,D
 {
     AbstractBoxDomainPdeModifier<DIM>::SetupSolve(rCellPopulation,outputDirectory);
 
-    // Temporarily cache the variable name until we create an AbstractPdeAndBcs object
-    // and move mpPdeAndBcs to the abstract class (see #2767)
-    this->mCachedDependentVariableName = mpPdeAndBcs->rGetDependentVariableName();
-
     // Copy the cell data to mSolution (this is the initial condition)
     SetupInitialSolutionVector(rCellPopulation);
 
@@ -120,24 +106,24 @@ std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ParabolicBoxDomainPdeModi
 {
     std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc(new BoundaryConditionsContainer<DIM,DIM,1>(false));
 
-    if (mpPdeAndBcs->IsNeumannBoundaryCondition())
+    if (this->mpPdeAndBcs->IsNeumannBoundaryCondition())
     {
         // Impose any Neumann boundary conditions
         for (typename TetrahedralMesh<DIM,DIM>::BoundaryElementIterator elem_iter = this->mpFeMesh->GetBoundaryElementIteratorBegin();
              elem_iter != this->mpFeMesh->GetBoundaryElementIteratorEnd();
              ++elem_iter)
         {
-            p_bcc->AddNeumannBoundaryCondition(*elem_iter, mpPdeAndBcs->GetBoundaryCondition());
+            p_bcc->AddNeumannBoundaryCondition(*elem_iter, this->mpPdeAndBcs->GetBoundaryCondition());
         }
     }
     else
     {
         // Impose any Dirichlet boundary conditions
         for (typename TetrahedralMesh<DIM,DIM>::BoundaryNodeIterator node_iter = this->mpFeMesh->GetBoundaryNodeIteratorBegin();
-                         node_iter != this->mpFeMesh->GetBoundaryNodeIteratorEnd();
-                         ++node_iter)
+             node_iter != this->mpFeMesh->GetBoundaryNodeIteratorEnd();
+             ++node_iter)
         {
-            p_bcc->AddDirichletBoundaryCondition(*node_iter, mpPdeAndBcs->GetBoundaryCondition());
+            p_bcc->AddDirichletBoundaryCondition(*node_iter, this->mpPdeAndBcs->GetBoundaryCondition());
         }
     }
 
@@ -147,16 +133,16 @@ std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ParabolicBoxDomainPdeModi
 template<unsigned DIM>
 void ParabolicBoxDomainPdeModifier<DIM>::SetupInitialSolutionVector(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
-    // Specify Homogeneous initial conditions based upon the values stored in CellData.
+    // Specify homogeneous initial conditions based upon the values stored in CellData.
     // Note need all the CellDataValues to be the same.
 
-    double initial_condition = rCellPopulation.Begin()->GetCellData()->GetItem(mpPdeAndBcs->rGetDependentVariableName());
+    double initial_condition = rCellPopulation.Begin()->GetCellData()->GetItem(this->mpPdeAndBcs->rGetDependentVariableName());
 
     for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
          cell_iter != rCellPopulation.End();
          ++cell_iter)
     {
-        double initial_condition_at_cell = cell_iter->GetCellData()->GetItem(mpPdeAndBcs->rGetDependentVariableName());
+        double initial_condition_at_cell = cell_iter->GetCellData()->GetItem(this->mpPdeAndBcs->rGetDependentVariableName());
         UNUSED_OPT(initial_condition_at_cell);
         assert(fabs(initial_condition_at_cell - initial_condition)<1e-12);
     }

@@ -39,12 +39,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MutableMesh.hpp"
 #include "AbstractCaUpdateRule.hpp"
 #include "AbstractCaSwitchingUpdateRule.hpp"
-#include "ApoptoticCellProperty.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "CellLocationIndexWriter.hpp"
 #include "ExclusionCaBasedDivisionRule.hpp"
 #include "NodesOnlyMesh.hpp"
 #include "Exception.hpp"
+#include "ApoptoticCellProperty.hpp"
 
 // Needed to convert mesh in order to write nodes to VTK (visualize as glyphs)
 #include "VtkMeshWriter.hpp"
@@ -152,22 +152,6 @@ TetrahedralMesh<DIM, DIM>* CaBasedCellPopulation<DIM>::GetTetrahedralMeshForPdeM
     }
 
     return new MutableMesh<DIM,DIM>(temp_nodes);
-}
-
-template<unsigned DIM>
-bool CaBasedCellPopulation<DIM>::IsPdeNodeAssociatedWithApoptoticCell(unsigned pdeNodeIndex)
-{
-    // pdeNodeIndex corresponds to the 'position' of the cell to interrogate in the vector of cells
-
-//    typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
-//    for (unsigned i=0; i<pdeNodeIndex; i++)
-//    {
-//        ++cell_iter;
-//    }
-//    bool is_cell_apoptotic = cell_iter->template HasCellProperty<ApoptoticCellProperty>();
-    bool is_cell_apoptotic = this->GetCellUsingLocationIndex(pdeNodeIndex)->template HasCellProperty<ApoptoticCellProperty>();
-
-    return is_cell_apoptotic;
 }
 
 template<unsigned DIM>
@@ -814,6 +798,22 @@ double CaBasedCellPopulation<DIM>::GetCellDataItemAtPdeNode(
     double value = cell_iter->GetCellData()->GetItem(rVariableName);
 
     return value;
+}
+
+template<unsigned DIM>
+bool CaBasedCellPopulation<DIM>::IsPdeNodeAssociatedWithNonApoptoticCell(unsigned pdeNodeIndex)
+{
+    // pdeNodeIndex corresponds to the 'position' of the cell to interrogate in the vector of cells
+    typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
+
+    assert(pdeNodeIndex < this->GetNumRealCells());
+    for (unsigned i=1; i<pdeNodeIndex; i++)
+    {
+        ++cell_iter;
+    }
+    bool is_cell_apoptotic = cell_iter->template HasCellProperty<ApoptoticCellProperty>();
+
+    return !is_cell_apoptotic;
 }
 
 // Explicit instantiation

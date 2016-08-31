@@ -40,7 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 #include "Timer.hpp"
-#include "ParabolicPdeAndBoundaryConditions.hpp"
+#include "PdeAndBoundaryConditions.hpp"
 #include "ConstBoundaryCondition.hpp"
 #include "UniformSourceParabolicPde.hpp"
 #include "FunctionalBoundaryCondition.hpp"
@@ -76,7 +76,7 @@ public:
 };
 
 /**
- * For use in TestParabolicPdeAndBoundaryConditions::TestWithBoundaryConditionVaryingInSpace.
+ * For use in TestPdeAndBoundaryConditions::TestWithBoundaryConditionVaryingInSpace.
  */
 double bc_func1(const ChastePoint<2>& p)
 {
@@ -84,7 +84,7 @@ double bc_func1(const ChastePoint<2>& p)
 }
 
 /**
- * For use in TestParabolicPdeAndBoundaryConditions::TestWithBoundaryConditionVaryingInTime.
+ * For use in TestPdeAndBoundaryConditions::TestWithBoundaryConditionVaryingInTime.
  */
 double bc_func2(const ChastePoint<2>& p)
 {
@@ -93,18 +93,18 @@ double bc_func2(const ChastePoint<2>& p)
     return value;
 }
 
-class TestParabolicPdeAndBoundaryConditions : public AbstractCellBasedWithTimingsTestSuite
+class TestPdeAndBoundaryConditions : public AbstractCellBasedWithTimingsTestSuite
 {
 public:
 
     void TestMethods() throw(Exception)
     {
-        // Create a ParabolicPdeAndBoundaryConditions object
+        // Create a PdeAndBoundaryConditions object
         HeatEquation<2> pde;
         ConstBoundaryCondition<2> bc(15.0);
         bool is_neumann_bc = false;
 
-        ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, is_neumann_bc);
+        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, is_neumann_bc);
 
         // Make sure it has no name
         TS_ASSERT_EQUALS(pde_and_bc.rGetDependentVariableName(), "");
@@ -122,7 +122,7 @@ public:
         bool solution_exists = pde_and_bc.GetSolution();
         TS_ASSERT_EQUALS(solution_exists, false);
 
-        AbstractLinearParabolicPde<2,2>* p_pde = pde_and_bc.GetPde();
+        AbstractLinearParabolicPde<2,2>* p_pde = static_cast<AbstractLinearParabolicPde<2,2>*>(pde_and_bc.GetPde());
         TS_ASSERT_EQUALS(p_pde, &pde);
 
         // Set mCurrentSolution
@@ -152,11 +152,11 @@ public:
 
     void TestMethodsNeumann() throw(Exception)
     {
-        // Create a ParabolicPdeAndBoundaryConditions object
+        // Create a PdeAndBoundaryConditions object
         HeatEquation<2> pde;
         ConstBoundaryCondition<2> bc(0.0);
 
-        ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc); // third argument defaults to Neumann
+        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc); // third argument defaults to Neumann
 
         // Test Get methods
         ChastePoint<2> point;
@@ -169,7 +169,7 @@ public:
         bool solution_exists = pde_and_bc.GetSolution();
         TS_ASSERT_EQUALS(solution_exists, false);
 
-        AbstractLinearParabolicPde<2,2>* p_pde = pde_and_bc.GetPde();
+        AbstractLinearParabolicPde<2,2>* p_pde = static_cast<AbstractLinearParabolicPde<2,2>*>(pde_and_bc.GetPde());
         TS_ASSERT_EQUALS(p_pde, &pde);
 
         // Set mCurrentSolution
@@ -199,12 +199,12 @@ public:
 
     void TestWithBoundaryConditionVaryingInSpace() throw(Exception)
     {
-        // Create a ParabolicPdeAndBoundaryConditions object with spatially varying boundary condition
+        // Create a PdeAndBoundaryConditions object with spatially varying boundary condition
         HeatEquation<2> pde;
         FunctionalBoundaryCondition<2> functional_bc(&bc_func1);
         bool is_neumann_bc = false;
 
-        ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &functional_bc, is_neumann_bc);
+        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &functional_bc, is_neumann_bc);
 
         ChastePoint<2> point1;
         point1.rGetLocation()[0] = 0.0;
@@ -231,12 +231,12 @@ public:
         SimulationTime* p_simulation_time = SimulationTime::Instance();
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(10.0, 2);
 
-        // Create a ParabolicPdeAndBoundaryConditions object with time-dependent boundary condition
+        // Create a PdeAndBoundaryConditions object with time-dependent boundary condition
         HeatEquation<2> pde;
         FunctionalBoundaryCondition<2> functional_bc(&bc_func2);
         bool is_neumann_bc = false;
 
-        ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &functional_bc, is_neumann_bc);
+        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &functional_bc, is_neumann_bc);
 
         ChastePoint<2> point;
         point.rGetLocation()[0] = 0.0;
@@ -256,10 +256,10 @@ public:
 
     void TestIn3d() throw(Exception)
     {
-        // Create a 3D ParabolicPdeAndBoundaryConditions object
+        // Create a 3D PdeAndBoundaryConditions object
         HeatEquation<3> pde;
         ConstBoundaryCondition<3> bc(0.0);
-        ParabolicPdeAndBoundaryConditions<3> pde_and_bc(&pde, &bc);
+        PdeAndBoundaryConditions<3> pde_and_bc(&pde, &bc);
 
         ChastePoint<3> point;
         point.rGetLocation()[0] = 0.0;
@@ -274,16 +274,16 @@ public:
     {
         OutputFileHandler handler("archive", false);
         handler.SetArchiveDirectory();
-        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "ParabolicPdeAndBoundaryConditions.arch";
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "PdeAndBoundaryConditions.arch";
 
         {
-            // Create a ParabolicPdeAndBoundaryConditions object
+            // Create a PdeAndBoundaryConditions object
             UniformSourceParabolicPde<2> pde(0.75);
             ConstBoundaryCondition<2> bc(2.45);
             bool is_neumann_bc = false;
 
-            ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, is_neumann_bc);
-            ParabolicPdeAndBoundaryConditions<2>* const p_const_pde_and_bc = &pde_and_bc;
+            PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, is_neumann_bc);
+            PdeAndBoundaryConditions<2>* const p_const_pde_and_bc = &pde_and_bc;
 
             // Archive the object
             std::ofstream ofs(archive_filename.c_str());
@@ -293,7 +293,7 @@ public:
         }
 
         {
-            ParabolicPdeAndBoundaryConditions<2>* p_pde_and_bc;
+            PdeAndBoundaryConditions<2>* p_pde_and_bc;
 
             // Create an input archive
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
@@ -308,7 +308,7 @@ public:
             ChastePoint<2> point;
             TS_ASSERT_DELTA(p_pde_and_bc->GetBoundaryCondition()->GetValue(point), 2.45, 1e-6);
 
-            AbstractLinearParabolicPde<2,2>* p_pde = p_pde_and_bc->GetPde();
+            AbstractLinearParabolicPde<2,2>* p_pde = static_cast<AbstractLinearParabolicPde<2,2>*>(p_pde_and_bc->GetPde());
             TS_ASSERT(dynamic_cast<UniformSourceParabolicPde<2>*>(p_pde) != NULL);
             TS_ASSERT_DELTA(static_cast<UniformSourceParabolicPde<2>*>(p_pde)->GetCoefficient(), 0.75, 1e-6);
 
@@ -321,15 +321,15 @@ public:
     {
         OutputFileHandler handler("archive", false);
         handler.SetArchiveDirectory();
-        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "ParabolicPdeAndBoundaryConditions.arch";
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "PdeAndBoundaryConditions.arch";
 
         {
-            // Create a ParabolicPdeAndBoundaryConditions object
+            // Create a PdeAndBoundaryConditions object
             UniformSourceParabolicPde<2> pde(0.75);
             ConstBoundaryCondition<2> bc(2.45);
             bool is_neumann_bc = false;
 
-            ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, is_neumann_bc);
+            PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, is_neumann_bc);
             pde_and_bc.SetDependentVariableName("quantity");
 
             std::vector<double> data(10);
@@ -341,7 +341,7 @@ public:
             Vec vector = PetscTools::CreateVec(data);
             pde_and_bc.SetSolution(vector);
 
-            ParabolicPdeAndBoundaryConditions<2>* const p_const_pde_and_bc = &pde_and_bc;
+            PdeAndBoundaryConditions<2>* const p_const_pde_and_bc = &pde_and_bc;
 
             // Archive the object
             std::ofstream ofs(archive_filename.c_str());
@@ -351,7 +351,7 @@ public:
         }
 
         {
-            ParabolicPdeAndBoundaryConditions<2>* p_pde_and_bc;
+            PdeAndBoundaryConditions<2>* p_pde_and_bc;
 
             // Create an input archive
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
@@ -367,7 +367,7 @@ public:
             ChastePoint<2> point;
             TS_ASSERT_DELTA(p_pde_and_bc->GetBoundaryCondition()->GetValue(point), 2.45, 1e-6);
 
-            AbstractLinearParabolicPde<2,2>* p_pde = p_pde_and_bc->GetPde();
+            AbstractLinearParabolicPde<2,2>* p_pde = static_cast<AbstractLinearParabolicPde<2,2>*>(p_pde_and_bc->GetPde());
             TS_ASSERT(dynamic_cast<UniformSourceParabolicPde<2>*>(p_pde) != NULL);
             TS_ASSERT_DELTA(static_cast<UniformSourceParabolicPde<2>*>(p_pde)->GetCoefficient(), 0.75, 1e-6);
 
