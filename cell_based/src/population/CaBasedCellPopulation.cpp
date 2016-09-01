@@ -807,7 +807,7 @@ bool CaBasedCellPopulation<DIM>::IsPdeNodeAssociatedWithNonApoptoticCell(unsigne
     typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
 
     assert(pdeNodeIndex < this->GetNumRealCells());
-    for (unsigned i=1; i<pdeNodeIndex; i++)
+    for (unsigned i=0; i<pdeNodeIndex; i++)
     {
         ++cell_iter;
     }

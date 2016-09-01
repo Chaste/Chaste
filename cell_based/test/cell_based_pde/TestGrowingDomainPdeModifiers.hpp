@@ -260,7 +260,7 @@ public:
 
         // Separate scope to write the archive
         {
-            // Make the Pde and BCS
+            // Make the PDE and BCs
             UniformSourceEllipticPde<2> pde(-0.1);
             ConstBoundaryCondition<2> bc(1.0);
             MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
@@ -305,13 +305,12 @@ public:
 
         // Separate scope to write the archive
         {
-            // Make the Pde and BCS
+            // Make the PDE and BCs
             UniformSourceParabolicPde<2> pde(-0.1);
             ConstBoundaryCondition<2> bc(1.0);
             MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
             p_pde_and_bc->SetDependentVariableName("averaged quantity");
 
-            ///\todo #2687
             // Make a dummy solution (because the archiver expects to be able to read/write PETSc Vecs)
             Vec vector = PetscTools::CreateAndSetVec(10, -42.0);
             p_pde_and_bc->SetSolution(vector);

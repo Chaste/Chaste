@@ -88,7 +88,7 @@ protected:
     /**
      * The solution to the PDE problem, for use as an initial guess when solving at the next time step.
      *
-     * \todo Once CellBasedPdeHandler is replaced, remove this member and associated methods (#2687)
+     * \todo Consider removing this member and associated methods (#2687)
      */
     Vec mSolution;
 

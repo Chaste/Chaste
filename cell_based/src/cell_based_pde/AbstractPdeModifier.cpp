@@ -43,7 +43,8 @@ AbstractPdeModifier<DIM>::AbstractPdeModifier(boost::shared_ptr<PdeAndBoundaryCo
       mpPdeAndBcs(pPdeAndBcs),
       mSolution(NULL),
       mOutputDirectory(""),
-      mOutputGradient(false)
+      mOutputGradient(false),
+      mOutputSolutionAtPdeNodes(false)
 {
     assert(DIM == 2);
 }
@@ -60,8 +61,77 @@ const boost::shared_ptr<PdeAndBoundaryConditions<DIM> > AbstractPdeModifier<DIM>
 }
 
 template<unsigned DIM>
+Vec AbstractPdeModifier<DIM>::GetSolution()
+{
+    return mSolution;
+}
+
+template<unsigned DIM>
+TetrahedralMesh<DIM,DIM>* AbstractPdeModifier<DIM>::GetFeMesh() const
+{
+    return mpFeMesh;
+}
+
+template<unsigned DIM>
+void AbstractPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)
+{
+    // Cache the output directory
+    this->mOutputDirectory = outputDirectory;
+
+    if (PetscTools::AmMaster())
+    {
+        OutputFileHandler output_file_handler(outputDirectory+"/", false);
+        mpVizPdeSolutionResultsFile = output_file_handler.OpenOutputFile("results.vizpdesolution");
+    }
+}
+
+template<unsigned DIM>
 void AbstractPdeModifier<DIM>::UpdateAtEndOfOutputTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
+    if (mOutputSolutionAtPdeNodes)
+    {
+        if (PetscTools::AmMaster())
+        {
+            (*mpVizPdeSolutionResultsFile) << SimulationTime::Instance()->GetTime() << "\t";
+
+            if (mpFeMesh != NULL)
+            {
+                assert(mpPdeAndBcs->rGetDependentVariableName() != "");
+
+                for (unsigned i=0; i<mpFeMesh->GetNumNodes(); i++)
+                {
+                    (*mpVizPdeSolutionResultsFile) << i << " ";
+                    c_vector<double,DIM> location = mpFeMesh->GetNode(i)->rGetLocation();
+                    for (unsigned k=0; k<DIM; k++)
+                    {
+                        (*mpVizPdeSolutionResultsFile) << location[k] << " ";
+                    }
+
+                    assert(mSolution != NULL);
+                    ReplicatableVector solution_repl(mSolution);
+                    (*mpVizPdeSolutionResultsFile) << solution_repl[i] << " ";
+                }
+            }
+            else // Not coarse mesh
+            {
+                for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
+                     cell_iter != rCellPopulation.End();
+                     ++cell_iter)
+                {
+                    unsigned node_index = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);
+                    (*mpVizPdeSolutionResultsFile) << node_index << " ";
+                    const c_vector<double,DIM>& position = rCellPopulation.GetLocationOfCellCentre(*cell_iter);
+                    for (unsigned i=0; i<DIM; i++)
+                    {
+                        (*mpVizPdeSolutionResultsFile) << position[i] << " ";
+                    }
+                    double solution = cell_iter->GetCellData()->GetItem(mpPdeAndBcs->rGetDependentVariableName());
+                    (*mpVizPdeSolutionResultsFile) << solution << " ";
+                }
+            }
+            (*mpVizPdeSolutionResultsFile) << "\n";
+        }
+    }
 #ifdef CHASTE_VTK
     if (DIM > 1)
     {
@@ -86,10 +156,12 @@ void AbstractPdeModifier<DIM>::UpdateAtEndOfOutputTimeStep(AbstractCellPopulatio
 }
 
 template<unsigned DIM>
-void AbstractPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)
+void AbstractPdeModifier<DIM>::UpdateAtEndOfSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
-    // Cache the output directory
-    this->mOutputDirectory = outputDirectory;
+    if (PetscTools::AmMaster())
+    {
+        mpVizPdeSolutionResultsFile->close();
+    }
 }
 
 template<unsigned DIM>
@@ -102,6 +174,12 @@ template<unsigned DIM>
 void AbstractPdeModifier<DIM>::SetOutputGradient(bool outputGradient)
 {
     mOutputGradient = outputGradient;
+}
+
+template<unsigned DIM>
+void AbstractPdeModifier<DIM>::SetOutputSolutionAtPdeNodes(bool outputSolutionAtPdeNodes)
+{
+    mOutputSolutionAtPdeNodes = outputSolutionAtPdeNodes;
 }
 
 template<unsigned DIM>

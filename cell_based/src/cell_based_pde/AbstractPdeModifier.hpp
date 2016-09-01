@@ -74,6 +74,7 @@ private:
         // archive & mpFeMesh;
         archive & mOutputDirectory;
         archive & mOutputGradient;
+        archive & mOutputSolutionAtPdeNodes;
     }
 
 protected:
@@ -92,6 +93,15 @@ protected:
 
     /** Whether or not to calculate and output the gradient of the solution. */
     bool mOutputGradient;
+
+    /**
+     * Whether to output the PDE solution at each node of the FE mesh at output time steps.
+     * Defaults to false.
+     */
+    bool mOutputSolutionAtPdeNodes;
+
+    /** File that the values of the PDE solution are written out to. */
+    out_stream mpVizPdeSolutionResultsFile;
 
 public:
 
@@ -113,27 +123,17 @@ public:
     const boost::shared_ptr<PdeAndBoundaryConditions<DIM> > GetPdeAndBcs() const;
 
     /**
-     * UpdateAtEndOfTimeStep() method. Needs overwriting in child classes.
-     * \todo improve documentation (#2687)
-     *
-     * Specifies what to do in the simulation at the end of each time step.
-     *
-     * @param rCellPopulation reference to the cell population
+     * @return mSolution.
      */
-    virtual void UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)=0;
+    Vec GetSolution();
 
     /**
-     * UpdateAtEndOfOutputTimeStep() method.
-     * \todo improve documentation (#2687)
-     *
-     * Specifies what to do in the simulation at the end of each output timestep.
-     *
-     * @param rCellPopulation reference to the cell population
+     * @return mpFeMesh.
      */
-    virtual void UpdateAtEndOfOutputTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
+    TetrahedralMesh<DIM,DIM>* GetFeMesh() const;
 
     /**
-     * SetupSolve() method.
+     * Overridden SetupSolve() method.
      * \todo improve documentation (#2687)
      *
      * Specifies what to do in the simulation before the start of the time loop. Needs overwriting in child classes
@@ -144,27 +144,63 @@ public:
     virtual void SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory);
 
     /**
-     * OutputSimulationModifierParameters() method.
-     * Output any simulation modifier parameters to file.
+     * UpdateAtEndOfTimeStep() method. Needs overwriting in child classes.
      * \todo improve documentation (#2687)
      *
-     * @param rParamsFile the file stream to which the parameters are output
+     * Specifies what to do in the simulation at the end of each time step.
+     *
+     * @param rCellPopulation reference to the cell population
      */
-    void OutputSimulationModifierParameters(out_stream& rParamsFile);
+    virtual void UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)=0;
 
     /**
-     * Whether to calculate and save the gradient of the solution to CellData.
+     * Overridden UpdateAtEndOfOutputTimeStep() method.
+     * \todo improve documentation (#2687)
+     *
+     * Specifies what to do in the simulation at the end of each output timestep.
+     *
+     * @param rCellPopulation reference to the cell population
+     */
+    virtual void UpdateAtEndOfOutputTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
+
+    /**
+     * Overridden UpdateAtEndOfSolve() method.
+     * \todo improve documentation (#2687)
+     * Specify what to do in the simulation at the end of each time loop.
+     *
+     * @param rCellPopulation reference to the cell population
+     */
+    virtual void UpdateAtEndOfSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
+
+    /**
+     * Set whether to calculate and save the gradient of the solution to CellData.
      *
      * @return mOutputGradient
      */
     bool GetOutputGradient();
 
     /**
-     * To set whether to calculate and save the gradient of the solution to CellData.
+     * Set whether to calculate and save the gradient of the solution to CellData.
      *
      * @param outputGradient whether to output the gradient
      */
     void SetOutputGradient(bool outputGradient);
+
+    /**
+     * Set mOutputSolutionAtPdeNodes.
+     *
+     * @param outputSolutionAtPdeNodes whether to output the PDE solution at each node of the FE mesh at output time steps
+     */
+    void SetOutputSolutionAtPdeNodes(bool outputSolutionAtPdeNodes);
+
+    /**
+     * Overridden OutputSimulationModifierParameters() method.
+     *
+     * Output any simulation modifier parameters to file.
+     *
+     * @param rParamsFile the file stream to which the parameters are output
+     */
+    void OutputSimulationModifierParameters(out_stream& rParamsFile);
 };
 
 #include "SerializationExportWrapper.hpp"

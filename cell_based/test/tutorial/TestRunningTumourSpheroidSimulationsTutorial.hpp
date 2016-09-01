@@ -98,12 +98,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*
  * The next three header files define: a PDE that describes how oxygen is transported via through the
  * domain via diffusion and is consumed by live cells; a constant-valued boundary condition to
- * associate with the PDE; and a PDE handler class, which is passed to the simulation object and
+ * associate with the PDE; and a PDE modifier class, which is passed to the simulation object and
  * handles the numerical solution of any PDEs.
  */
 #include "CellwiseSourceEllipticPde.hpp"
 #include "ConstBoundaryCondition.hpp"
-#include "CellBasedPdeHandler.hpp"
+#include "EllipticGrowingDomainPdeModifier.hpp"
 
 /*
  * We use an {{{OffLatticeSimulation}}}.
@@ -221,7 +221,7 @@ public:
          * (a Dirichlet boundary condition) below.
          */
         ConstBoundaryCondition<2> bc(1.0);
-        bool is_neumann_bc = true;
+        bool is_neumann_bc = false;
 
         /*
          * To pass the PDE to our simulator, it must first be encapsulated in a
@@ -229,7 +229,7 @@ public:
          * the PDE. The latter is specified by the second and third arguments of the
          * {{{PdeAndBoundaryConditions}}} constructor below: the second argument defines the value
          * of the boundary condition and the third argument defines whether it is of Neumann type
-         * (true) or Dirichlet type (false). Thus, in our case, we are a specifying no-flux
+         * (true) or Dirichlet type (false). Thus, in our case, we are a specifying a constant-value
          * boundary condition. Note that we currently cannot impose more than one boundary
          * condition for each PDE (so that e.g. we cannot impose a zero-flux boundary condition
          * on some part of the boundary and a fixed-value boundary condition on the rest), although
@@ -240,23 +240,21 @@ public:
          *
          * The {{{CellData}}} class, is used to stores the value of the current nutrient concentration for each cell.
          */
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, is_neumann_bc);
-        pde_and_bc.SetDependentVariableName("oxygen");
+        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, is_neumann_bc));
+        p_pde_and_bc->SetDependentVariableName("oxygen");
 
         /*
          * After having created a {{{PdeAndBoundaryConditions}}} object, we then pass it
-         * to a cell-based PDE handler object. This allows us to define any number of PDEs within
-         * the cell-based simulation.
+         * to a cell-based PDE modifier object.
          */
-        CellBasedPdeHandler<2> pde_handler(&cell_population);
-        pde_handler.AddPdeAndBc(&pde_and_bc);
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc));
 
         /*
          * We are now in a position to construct an {{{OffLatticeSimulationWithPdes}}} object,
-         * using the cell population. We then pass the PDE handler object to the simulation.
+         * using the cell population. We then pass the PDE modifier object to the simulation.
          */
         OffLatticeSimulation<2> simulator(cell_population);
-        simulator.SetCellBasedPdeHandler(&pde_handler);
+        simulator.AddSimulationModifier(p_pde_modifier);
 
         /*
          * We next set the output directory and end time.

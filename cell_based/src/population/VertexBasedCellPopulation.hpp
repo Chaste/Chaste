@@ -448,8 +448,7 @@ public:
     /**
      * Overridden IsPdeNodeAssociatedWithNonApoptoticCell() method.
      *
-     * @param pdeNodeIndex index of a node in a tetrahedral mesh for use
-     *         with a PDE modifier
+     * @param pdeNodeIndex inedx of a node in a tetrahedral mesh for use with a PDE modifier
      *
      * @return if a node, specified by its index in a tetrahedral mesh for use
      *         with a PDE modifier, is associated with a non-apoptotic cell.

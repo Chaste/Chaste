@@ -750,7 +750,7 @@ bool VertexBasedCellPopulation<DIM>::IsPdeNodeAssociatedWithNonApoptoticCell(uns
          * This node of the tetrahedral finite element mesh is in the centre of the element of the
          * vertex-based cell population, so we can use an offset to compute which cell to interrogate.
          */
-        non_apoptotic_cell_present = !(this->GetCellUsingLocationIndex(pdeNodeIndex- this->GetNumNodes())->template HasCellProperty<ApoptoticCellProperty>());
+        non_apoptotic_cell_present = !(this->GetCellUsingLocationIndex(pdeNodeIndex - this->GetNumNodes())->template HasCellProperty<ApoptoticCellProperty>());
     }
 
     return non_apoptotic_cell_present;

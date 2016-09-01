@@ -43,7 +43,6 @@ population/TestBuskeForces.hpp
 population/TestCaBasedCellPopulation.hpp
 population/TestCaBasedDivisionRules.hpp
 population/TestCaUpdateRules.hpp
-population/TestCellBasedPdeHandler.hpp
 population/TestCellKillers.hpp
 population/TestCellPopulationBoundaryConditions.hpp
 population/TestCellPopulationCountWriters.hpp

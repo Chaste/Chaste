@@ -62,9 +62,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AdhesionPottsUpdateRule.hpp"
 #include "Warnings.hpp"
 #include "SmartPointers.hpp"
-#include "CellBasedPdeHandlerOnCuboid.hpp"
-#include "CellBasedPdeHandler.hpp"
 #include "FileComparison.hpp"
+#include "EllipticBoxDomainPdeModifier.hpp"
+#include "EllipticGrowingDomainPdeModifier.hpp"
 
 class SimplePdeForTesting : public AbstractLinearEllipticPde<2,2>
 {
@@ -98,55 +98,6 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
 {
   public:
 
-    void TestPottsBasedWithoutCoarseMeshThrowsException() throw(Exception)
-    {
-        EXIT_IF_PARALLEL;
-
-        // Create a simple 2D PottsMesh
-        PottsMeshGenerator<2> generator(6, 2, 2, 6, 2, 2);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
-
-        // Create cells
-        std::vector<CellPtr> cells;
-        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
-
-        // Create cell population
-        PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
-
-        // Set up cell-based simulation
-        OnLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("TestPottsSimulationWithPdesThrowsException");
-        simulator.SetEndTime(0.1);
-
-        // Set up PDE and pass to simulation via handler (zero uptake to check analytic solution)
-        AveragedSourceEllipticPde<2> pde(cell_population, 0.0);
-        ConstBoundaryCondition<2> bc(1.0);
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("nutrient");
-
-        CellBasedPdeHandler<2> pde_handler(&cell_population);
-        pde_handler.AddPdeAndBc(&pde_and_bc);
-        pde_handler.SetImposeBcsOnCoarseBoundary(true);
-
-        simulator.SetCellBasedPdeHandler(&pde_handler);
-
-///\todo Refactor CellBasedPdeHandler as a simulation modifier (#2687)
-//        // Create a PDE modifier object using this PDE and BCs object
-//        MAKE_PTR_ARGS(CellBasedPdeHandler<2>, p_pde_modifier, (p_pde_and_bc, true));
-//        simulator.AddSimulationModifier(p_pde_modifier);
-
-        // Create update rules and pass to the simulation
-        MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule);
-        simulator.AddUpdateRule(p_volume_constraint_update_rule);
-        MAKE_PTR(AdhesionPottsUpdateRule<2>, p_adhesion_update_rule);
-        simulator.AddUpdateRule(p_adhesion_update_rule);
-
-        // Solve the system
-        TS_ASSERT_THROWS_THIS(simulator.Solve(), "Trying to solve a PDE on a cell population that doesn't have a mesh. Try calling UseCoarsePdeMesh().");
-    }
-
     void TestPottsBasedWithCoarseMesh() throw(Exception)
     {
         EXIT_IF_PARALLEL;
@@ -172,24 +123,18 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         // Set up PDE and pass to simulation via handler (zero uptake to check analytic solution)
         AveragedSourceEllipticPde<2> pde(cell_population, 0.0);
         ConstBoundaryCondition<2> bc(1.0);
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("nutrient");
+        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+        p_pde_and_bc->SetDependentVariableName("nutrient");
 
-        CellBasedPdeHandler<2> pde_handler(&cell_population);
-        pde_handler.AddPdeAndBc(&pde_and_bc);
-
-        ChastePoint<2> lower(0.0, 0.0);
-        ChastePoint<2> upper(50.0, 50.0);
+        ///\todo replace with ChasteCuboid<2> cuboid = cell_population.rGetMesh().CalculateBoundingBox() ? (#2687)
+        c_vector<double,2> centroid = cell_population.GetCentroidOfCellPopulation();
+        ChastePoint<2> lower(centroid(0)-25.0, centroid(1)-25.0);
+        ChastePoint<2> upper(centroid(0)+25.0, centroid(1)+25.0);
         ChasteCuboid<2> cuboid(lower, upper);
-        pde_handler.UseCoarsePdeMesh(10.0, cuboid, true);
-        pde_handler.SetImposeBcsOnCoarseBoundary(false);
 
-        simulator.SetCellBasedPdeHandler(&pde_handler);
-
-///\todo Refactor CellBasedPdeHandler as a simulation modifier (#2687)
-//        // Create a PDE modifier object using this PDE and BCs object
-//        MAKE_PTR_ARGS(CellBasedPdeHandler<2>, p_pde_modifier, (p_pde_and_bc, false, cuboid)); // Don't impose BCs on coarse boundary
-//        simulator.AddSimulationModifier(p_pde_modifier);
+        // Create a PDE modifier object using this PDE and BCs object and cuboid
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc, &cuboid));
+        simulator.AddSimulationModifier(p_pde_modifier);
 
         // Create update rules and pass to the simulation
         MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule);
@@ -221,7 +166,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
 
         // Find centre of coarse PDE mesh
         c_vector<double,2> centre_of_coarse_pde_mesh = zero_vector<double>(2);
-        TetrahedralMesh<2,2>* p_coarse_mesh = simulator.GetCellBasedPdeHandler()->GetCoarsePdeMesh();
+        TetrahedralMesh<2,2>* p_coarse_mesh = p_pde_modifier->GetFeMesh();
         for (unsigned i=0; i<p_coarse_mesh->GetNumNodes(); i++)
         {
             centre_of_coarse_pde_mesh += p_coarse_mesh->GetNode(i)->rGetLocation();
@@ -231,16 +176,6 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         // Test that the two centres match
         c_vector<double,2> centre_diff = centre_of_cell_population - centre_of_coarse_pde_mesh;
         TS_ASSERT_DELTA(norm_2(centre_diff), 0.0, 1e-4);
-
-        // Test FindCoarseElementContainingCell() and initialisation of mCellPdeElementMap
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-            cell_iter != cell_population.End();
-            ++cell_iter)
-        {
-            unsigned containing_element_index = simulator.GetCellBasedPdeHandler()->mCellPdeElementMap[*cell_iter];
-            TS_ASSERT_LESS_THAN(containing_element_index, p_coarse_mesh->GetNumElements());
-            TS_ASSERT_EQUALS(containing_element_index, simulator.GetCellBasedPdeHandler()->FindCoarseElementContainingCell(*cell_iter));
-        }
     }
 
     void TestCaBasedWithoutCoarseMesh() throw(Exception)
@@ -271,30 +206,18 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.SetDt(0.1);
         simulator.SetEndTime(1);
 
-        // Set up 2 PDEs (one with Dirichlet and one with Neumann BCs) and pass to simulation via handler (zero uptake to check analytic solution)
-        // Note even with uptake the PDE has U=0 as solution with zero neumann conditions.
-        AveragedSourceEllipticPde<2> pde_1(cell_population, 0.0);
-        ConstBoundaryCondition<2> bc_1(1.0);
-        PdeAndBoundaryConditions<2> pde_and_bc_1(&pde_1, &bc_1, false);
-        pde_and_bc_1.SetDependentVariableName("nutrient_dirichlet");
+        // Set up a PDE with Dirichlet BCs and pass to simulation via handler (zero uptake to check analytic solution)
+        AveragedSourceEllipticPde<2> pde(cell_population, 0.0);
+        ConstBoundaryCondition<2> bc(1.0);
 
-        AveragedSourceEllipticPde<2> pde_2(cell_population, 0.0);
-        ConstBoundaryCondition<2> bc_2(0.0);
-        PdeAndBoundaryConditions<2> pde_and_bc_2(&pde_2, &bc_2, true);
-        pde_and_bc_2.SetDependentVariableName("nutrient_neumann");
+        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+        p_pde_and_bc->SetDependentVariableName("nutrient");
 
-        CellBasedPdeHandler<2> pde_handler(&cell_population);
-        pde_handler.AddPdeAndBc(&pde_and_bc_1);
-        pde_handler.AddPdeAndBc(&pde_and_bc_2);
-        pde_handler.SetImposeBcsOnCoarseBoundary(false);
+        ChasteCuboid<2> cuboid = cell_population.rGetMesh().CalculateBoundingBox();
 
-        simulator.SetCellBasedPdeHandler(&pde_handler);
-
-///\todo Refactor CellBasedPdeHandler as a simulation modifier (#2687)
-///\todo Let other PDE simulation modifiers solve multiple PDEs (#2687)
-//        // Create a PDE modifier object using this PDE and BCs object
-//        MAKE_PTR_ARGS(CellBasedPdeHandler<2>, p_pde_modifier, (p_pde_and_bc, false)); // Don't impose BCs on coarse boundary
-//        simulator.AddSimulationModifier(p_pde_modifier);
+        // Create a PDE modifier object using this PDE and BCs object and cuboid
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc, &cuboid));
+        simulator.AddSimulationModifier(p_pde_modifier);
 
         // Create update rules and pass to the simulation
         MAKE_PTR(DiffusionCaUpdateRule<2>, p_diffusion_update_rule);
@@ -311,21 +234,20 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         {
             double analytic_solution = 1.0;
             // Test that PDE solver is working correctly
-            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("nutrient_dirichlet"), analytic_solution, 1e-2);
-            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("nutrient_neumann"), 0.0, 1e-2);
+            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("nutrient"), analytic_solution, 1e-2);
         }
 
         // Test coarse mesh has the same nodes as the PottsMesh
-        TetrahedralMesh<2,2>* p_coarse_mesh = simulator.GetCellBasedPdeHandler()->GetCoarsePdeMesh();
+        TetrahedralMesh<2,2>* p_coarse_mesh = p_pde_modifier->GetFeMesh();
 
         TS_ASSERT_EQUALS(p_coarse_mesh->GetNumNodes(),p_mesh->GetNumNodes());
-        TS_ASSERT_DELTA(p_coarse_mesh->GetWidth(0),p_mesh->GetWidth(0),1e-8);
-        TS_ASSERT_DELTA(p_coarse_mesh->GetWidth(1),p_mesh->GetWidth(1),1e-8);
+        TS_ASSERT_DELTA(p_coarse_mesh->GetWidth(0), p_mesh->GetWidth(0), 1e-8);
+        TS_ASSERT_DELTA(p_coarse_mesh->GetWidth(1), p_mesh->GetWidth(1), 1e-8);
 
         for (unsigned i=0; i<p_coarse_mesh->GetNumNodes(); i++)
         {
-            TS_ASSERT_DELTA(p_coarse_mesh->GetNode(i)->rGetLocation()[0],p_mesh->GetNode(i)->rGetLocation()[0],1e-8);
-            TS_ASSERT_DELTA(p_coarse_mesh->GetNode(i)->rGetLocation()[1],p_mesh->GetNode(i)->rGetLocation()[1],1e-8);
+            TS_ASSERT_DELTA(p_coarse_mesh->GetNode(i)->rGetLocation()[0], p_mesh->GetNode(i)->rGetLocation()[0], 1e-8);
+            TS_ASSERT_DELTA(p_coarse_mesh->GetNode(i)->rGetLocation()[1], p_mesh->GetNode(i)->rGetLocation()[1], 1e-8);
         }
     }
 
@@ -362,14 +284,13 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
 
         CellwiseSourceEllipticPde<2> pde(cell_population, 0.0);
         ConstBoundaryCondition<2> bc(1.0);
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("nutrient");
+        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+        p_pde_and_bc->SetDependentVariableName("nutrient");
 
-        CellBasedPdeHandler<2> pde_handler(&cell_population);
-        pde_handler.AddPdeAndBc(&pde_and_bc);
-        pde_handler.SetImposeBcsOnCoarseBoundary(false);
+        // Create a PDE modifier object using this PDE and BCs object
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc));
+        simulator.AddSimulationModifier(p_pde_modifier);
 
-        simulator.SetCellBasedPdeHandler(&pde_handler);
         simulator.Solve();
 
         // Test solution is constant
@@ -418,14 +339,12 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
 
         CellwiseSourceEllipticPde<2> pde(cell_population, 0.0);
         ConstBoundaryCondition<2> bc(1.0);
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("nutrient");
+        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+        p_pde_and_bc->SetDependentVariableName("nutrient");
 
-        CellBasedPdeHandler<2> pde_handler(&cell_population);
-        pde_handler.AddPdeAndBc(&pde_and_bc);
-        pde_handler.SetImposeBcsOnCoarseBoundary(true);
-
-        simulator.SetCellBasedPdeHandler(&pde_handler);
+        // Create a PDE modifier object using this PDE and BCs object
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc));
+        simulator.AddSimulationModifier(p_pde_modifier);
 
         simulator.Solve();
 
@@ -440,9 +359,6 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         }
     }
 
-    /*
-     * Note only solves one PDE
-     */
     void TestCaBasedWithoutCoarseMeshUsingPdeHandlerOnCuboid() throw(Exception)
     {
         EXIT_IF_PARALLEL;
@@ -474,19 +390,14 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         // Set up a PDE with mixed boundary conditions (use zero uptake to check analytic solution)
         AveragedSourceEllipticPde<2> pde(cell_population, 0.0);
         ConstBoundaryCondition<2> bc(1.0);
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("nutrient");
+        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+        p_pde_and_bc->SetDependentVariableName("nutrient");
 
-        // Pass this to the simulation object via a PDE handler
-        CellBasedPdeHandlerOnCuboid<2> pde_handler(&cell_population);
-        pde_handler.AddPdeAndBc(&pde_and_bc);
-        pde_handler.SetImposeBcsOnCoarseBoundary(false);
-        simulator.SetCellBasedPdeHandler(&pde_handler);
+        ChasteCuboid<2> cuboid = cell_population.rGetMesh().CalculateBoundingBox();
 
-///\todo Refactor CellBasedPdeHandler as a simulation modifier (#2687)
-//        // Create a PDE modifier object using this PDE and BCs object
-//        MAKE_PTR_ARGS(CellBasedPdeHandlerOnCuboid<2>, p_pde_modifier, (p_pde_and_bc, false)); // Don't impose BCs on coarse boundary
-//        simulator.AddSimulationModifier(p_pde_modifier);
+        // Create a PDE modifier object using this PDE and BCs object and cuboid
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc, &cuboid));
+        simulator.AddSimulationModifier(p_pde_modifier);
 
         // Solve the system
         simulator.Solve();
@@ -496,21 +407,12 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
              cell_iter != cell_population.End();
              ++cell_iter)
         {
-            c_vector<double, 2> cell_location = simulator.rGetCellPopulation().GetLocationOfCellCentre(*cell_iter);
-
-            if (cell_location[1] < 1e-6 || cell_location[1] > 9 - 1e-6)
-            {
-                TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("nutrient"),1.0, 1e-2);
-            }
-            else
-            {
-                TS_ASSERT_LESS_THAN(1.0,cell_iter->GetCellData()->GetItem("nutrient"));
-            }
+            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("nutrient"),1.0, 1e-2);
         }
     }
 
     /*
-     * This tests that a sensible error is thrown if the coarse mesh is too small/
+     * This tests that a sensible error is thrown if the coarse mesh is too small.
      */
     void TestCaBasedCellsOutsideMesh() throw(Exception)
     {
@@ -540,29 +442,19 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.SetDt(0.1);
         simulator.SetEndTime(1);
 
-        // Set up PDE and pass to simulation via handler (zero uptake to check analytic solution)
         AveragedSourceEllipticPde<2> pde(cell_population, 0.0);
         ConstBoundaryCondition<2> bc(1.0);
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("nutrient");
-
-        CellBasedPdeHandler<2> pde_handler(&cell_population);
-        pde_handler.AddPdeAndBc(&pde_and_bc);
-        pde_handler.SetImposeBcsOnCoarseBoundary(true);
+        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+        p_pde_and_bc->SetDependentVariableName("nutrient");
 
         // Create coarse mesh smaller than the PottsMesh
         ChastePoint<2> lower(0.0, 0.0);
         ChastePoint<2> upper(5.0, 5.0);
-
         ChasteCuboid<2> cuboid(lower, upper);
-        pde_handler.UseCoarsePdeMesh(1.0, cuboid);
 
-        simulator.SetCellBasedPdeHandler(&pde_handler);
-
-///\todo Refactor CellBasedPdeHandler as a simulation modifier (#2687)
-//        // Create a PDE modifier object using this PDE and BCs object
-//        MAKE_PTR_ARGS(CellBasedPdeHandler<2>, p_pde_modifier, (p_pde_and_bc, true, cuboid));
-//        simulator.AddSimulationModifier(p_pde_modifier);
+        // Create a PDE modifier object using this PDE and BCs object and cuboid
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc, &cuboid));
+        simulator.AddSimulationModifier(p_pde_modifier);
 
         // Solve the system
         TS_ASSERT_THROWS_THIS(simulator.Solve(), "Point [6,0] is not in mesh - all elements tested");
@@ -592,14 +484,10 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.SetOutputDirectory("TestCaBasedCellPopulationWithPdes");
         simulator.SetEndTime(0.1);
 
-        // Set up PDE and pass to simulation via handler (zero uptake to check analytic solution)
         AveragedSourceEllipticPde<2> pde(cell_population, 0.0);
         ConstBoundaryCondition<2> bc(1.0);
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("nutrient");
-
-        CellBasedPdeHandler<2> pde_handler(&cell_population);
-        pde_handler.AddPdeAndBc(&pde_and_bc);
+        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+        p_pde_and_bc->SetDependentVariableName("nutrient");
 
         // Create coarse mesh and centre it on the centre of the Potts Mesh
         c_vector<double,2> centre_of_potts_mesh = zero_vector<double>(2);
@@ -615,15 +503,11 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         lower.rGetLocation() -= translation;
         upper.rGetLocation() -= translation;
         ChasteCuboid<2> cuboid(lower, upper);
-        pde_handler.UseCoarsePdeMesh(1.0, cuboid);
-        pde_handler.SetImposeBcsOnCoarseBoundary(true);
 
-        simulator.SetCellBasedPdeHandler(&pde_handler);
+        // Create a PDE modifier object using this PDE and BCs object and cuboid
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc, &cuboid));
+        simulator.AddSimulationModifier(p_pde_modifier);
 
-///\todo Refactor CellBasedPdeHandler as a simulation modifier (#2687)
-//        // Create a PDE modifier object using this PDE and BCs object
-//        MAKE_PTR_ARGS(CellBasedPdeHandler<2>, p_pde_modifier, (p_pde_and_bc, true, cuboid));
-//        simulator.AddSimulationModifier(p_pde_modifier);
 
         // Create update rules and pass to the simulation
         MAKE_PTR(DiffusionCaUpdateRule<2>, p_diffusion_update_rule);
@@ -645,7 +529,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
 
         // Find centre of coarse PDE mesh
         c_vector<double,2> centre_of_coarse_pde_mesh = zero_vector<double>(2);
-        TetrahedralMesh<2,2>* p_coarse_mesh = simulator.GetCellBasedPdeHandler()->GetCoarsePdeMesh();
+        TetrahedralMesh<2,2>* p_coarse_mesh = p_pde_modifier->GetFeMesh();
         for (unsigned i=0; i<p_coarse_mesh->GetNumNodes(); i++)
         {
             centre_of_coarse_pde_mesh += p_coarse_mesh->GetNode(i)->rGetLocation();
@@ -655,16 +539,6 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
 
         // Test that the two centres match
         TS_ASSERT_DELTA(norm_2(centre_diff), 0.0, 1e-4);
-
-        // Test FindCoarseElementContainingCell() and initialisation of mCellPdeElementMap
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-            cell_iter != cell_population.End();
-            ++cell_iter)
-        {
-            unsigned containing_element_index = simulator.GetCellBasedPdeHandler()->mCellPdeElementMap[*cell_iter];
-            TS_ASSERT_LESS_THAN(containing_element_index, p_coarse_mesh->GetNumElements());
-            TS_ASSERT_EQUALS(containing_element_index, simulator.GetCellBasedPdeHandler()->FindCoarseElementContainingCell(*cell_iter));
-        }
 
         // Test solution is constant
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
@@ -700,32 +574,26 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.SetOutputDirectory("TestPottsBasedCellPopulationWithTwoPdes");
         simulator.SetEndTime(0.1);
 
-        // Set up PDE and pass to simulation via handler (zero uptake to check analytic solution)
         AveragedSourceEllipticPde<2> pde_1(cell_population, 0.0);
         ConstBoundaryCondition<2> bc_1(1.0);
-        PdeAndBoundaryConditions<2> pde_and_bc_1(&pde_1, &bc_1, false);
-        pde_and_bc_1.SetDependentVariableName("quantity 1");
+        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc_1, (&pde_1, &bc_1, false));
+        p_pde_and_bc_1->SetDependentVariableName("quantity_1");
 
         AveragedSourceEllipticPde<2> pde_2(cell_population, 0.0);
         ConstBoundaryCondition<2> bc_2(1.0);
-        PdeAndBoundaryConditions<2> pde_and_bc_2(&pde_2, &bc_2, false);
-        pde_and_bc_2.SetDependentVariableName("quantity 2");
+        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc_2, (&pde_2, &bc_2, false));
+        p_pde_and_bc_2->SetDependentVariableName("quantity_2");
 
-        CellBasedPdeHandler<2> pde_handler(&cell_population);
-        pde_handler.AddPdeAndBc(&pde_and_bc_1);
-        pde_handler.AddPdeAndBc(&pde_and_bc_2);
+        // Create coarse mesh smaller than the PottsMesh
         ChastePoint<2> lower(0.0, 0.0);
         ChastePoint<2> upper(50.0, 50.0);
         ChasteCuboid<2> cuboid(lower, upper);
-        pde_handler.UseCoarsePdeMesh(10.0, cuboid, true);
-        pde_handler.SetImposeBcsOnCoarseBoundary(true);
 
-        simulator.SetCellBasedPdeHandler(&pde_handler);
-
-///\todo Refactor CellBasedPdeHandler as a simulation modifier (#2687)
-//        // Create a PDE modifier object using this PDE and BCs object
-//        MAKE_PTR_ARGS(CellBasedPdeHandler<2>, p_pde_modifier, (p_pde_and_bc, true, cuboid));
-//        simulator.AddSimulationModifier(p_pde_modifier);
+        // Create a PDE modifier object using this PDE and BCs object and cuboid
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier_1, (p_pde_and_bc_1, &cuboid));
+        simulator.AddSimulationModifier(p_pde_modifier_1);
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier_2, (p_pde_and_bc_2, &cuboid));
+        simulator.AddSimulationModifier(p_pde_modifier_2);
 
         // Create update rules and pass to the simulation
         MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule);
@@ -744,25 +612,20 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
             double analytic_solution = 1.0;
 
             // Test that PDE solver is working correctly on both pdes
-            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("quantity 1"), analytic_solution, 1e-2);
-            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("quantity 2"), analytic_solution, 1e-2);
+            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("quantity_1"), analytic_solution, 1e-2);
+            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("quantity_2"), analytic_solution, 1e-2);
         }
 #ifdef CHASTE_VTK
-        //First file exists
-        FileFinder vtk_file("TestPottsBasedCellPopulationWithTwoPdes/results_from_time_0/pde_results_1.vtu", RelativeTo::ChasteTestOutput);
+        // First file exists
+        FileFinder vtk_file("TestPottsBasedCellPopulationWithTwoPdes/results_from_time_0/pde_results_quantity_1_0.vtu", RelativeTo::ChasteTestOutput);
         TS_ASSERT(vtk_file.Exists());
         // Check that the second VTK file for the solution has the dependent quantities
         OutputFileHandler handler("TestPottsBasedCellPopulationWithTwoPdes", false);
-        VtkMeshReader<3,3> vtk_reader(handler.GetOutputDirectoryFullPath()+"results_from_time_0/pde_results_2.vtu");
+        VtkMeshReader<3,3> vtk_reader(handler.GetOutputDirectoryFullPath()+"results_from_time_0/pde_results_quantity_2_0.vtu");
         std::vector<double> data1;
-        //There is no Oxygen
+        // There is no Oxygen
         TS_ASSERT_THROWS_CONTAINS(vtk_reader.GetPointData("Oxygen", data1), "No point data");
         TS_ASSERT(data1.empty());
-        vtk_reader.GetPointData("quantity 1", data1);
-        TS_ASSERT_EQUALS(data1.size(), 6u*6u);
-        std::vector<double> data2;
-        vtk_reader.GetPointData("quantity 2", data2);
-        TS_ASSERT_EQUALS(data1.size(), data2.size());
 #endif //CHASTE_VTK
     }
 
@@ -797,24 +660,18 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.SetSamplingTimestepMultiple(10);
         simulator.SetEndTime(10);
 
-        // Set up PDE and pass to simulation via handler
-        double nutrient_uptake_rate=-0.1;
+        double nutrient_uptake_rate = -0.1;
         AveragedSourceEllipticPde<2> pde(cell_population, nutrient_uptake_rate);
         ConstBoundaryCondition<2> bc(1.0);
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("nutrient");
+        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+        p_pde_and_bc->SetDependentVariableName("nutrient");
 
-        CellBasedPdeHandler<2> pde_handler(&cell_population);
-        pde_handler.AddPdeAndBc(&pde_and_bc);
+        ChasteCuboid<2> cuboid = cell_population.rGetMesh().CalculateBoundingBox();
 
-        pde_handler.SetImposeBcsOnCoarseBoundary(true);
-
-        simulator.SetCellBasedPdeHandler(&pde_handler);
-
-///\todo Refactor CellBasedPdeHandler as a simulation modifier (#2687)
-//        // Create a PDE modifier object using this PDE and BCs object
-//        MAKE_PTR_ARGS(CellBasedPdeHandler<2>, p_pde_modifier, (p_pde_and_bc, true));
-//        simulator.AddSimulationModifier(p_pde_modifier);
+        // Create a PDE modifier object using this PDE and BCs object and cuboid
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc, &cuboid));
+        p_pde_modifier->SetOutputSolutionAtPdeNodes(true);
+        simulator.AddSimulationModifier(p_pde_modifier);
 
         // Create update rules and pass to the simulation
         MAKE_PTR(DiffusionCaUpdateRule<2>, p_diffusion_update_rule);
@@ -824,17 +681,17 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         // Solve the system
         simulator.Solve();
 
-        //Test coarse mesh has the same nodes as the PottsMesh
-        TetrahedralMesh<2,2>* p_coarse_mesh = simulator.GetCellBasedPdeHandler()->GetCoarsePdeMesh();
+        // Test coarse mesh has the same nodes as the PottsMesh
+        TetrahedralMesh<2,2>* p_coarse_mesh = p_pde_modifier->GetFeMesh();
 
         TS_ASSERT_EQUALS(p_coarse_mesh->GetNumNodes(),p_mesh->GetNumNodes());
-        TS_ASSERT_DELTA(p_coarse_mesh->GetWidth(0),p_mesh->GetWidth(0),1e-8);
-        TS_ASSERT_DELTA(p_coarse_mesh->GetWidth(1),p_mesh->GetWidth(1),1e-8);
+        TS_ASSERT_DELTA(p_coarse_mesh->GetWidth(0), p_mesh->GetWidth(0), 1e-8);
+        TS_ASSERT_DELTA(p_coarse_mesh->GetWidth(1), p_mesh->GetWidth(1), 1e-8);
 
         for (unsigned i=0; i< p_coarse_mesh->GetNumNodes(); i++)
         {
-            TS_ASSERT_DELTA(p_coarse_mesh->GetNode(i)->rGetLocation()[0],p_mesh->GetNode(i)->rGetLocation()[0],1e-8);
-            TS_ASSERT_DELTA(p_coarse_mesh->GetNode(i)->rGetLocation()[1],p_mesh->GetNode(i)->rGetLocation()[1],1e-8);
+            TS_ASSERT_DELTA(p_coarse_mesh->GetNode(i)->rGetLocation()[0], p_mesh->GetNode(i)->rGetLocation()[0], 1e-8);
+            TS_ASSERT_DELTA(p_coarse_mesh->GetNode(i)->rGetLocation()[1], p_mesh->GetNode(i)->rGetLocation()[1], 1e-8);
         }
     }
 
@@ -845,9 +702,9 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         OutputFileHandler handler("TestOnLatticeSpheroidWithNutrient", false);
         std::string results_dir = handler.GetOutputDirectoryFullPath() + "results_from_time_0";
 
-        NumericFileComparison comp_nut(results_dir + "/results.vizcoarsepdesolution", "cell_based/test/data/TestOnLatticeSpheroidWithNutrient/results.vizcoarsepdesolution");
+        NumericFileComparison comp_nut(results_dir + "/results.vizpdesolution", "cell_based/test/data/TestOnLatticeSpheroidWithNutrient/results.vizpdesolution");
         TS_ASSERT(comp_nut.CompareFiles());
-        FileComparison( results_dir + "/results.vizcoarsepdesolution", "cell_based/test/data/TestOnLatticeSpheroidWithNutrient/results.vizcoarsepdesolution").CompareFiles();
+        FileComparison( results_dir + "/results.vizpdesolution", "cell_based/test/data/TestOnLatticeSpheroidWithNutrient/results.vizpdesolution").CompareFiles();
     }
 };
 

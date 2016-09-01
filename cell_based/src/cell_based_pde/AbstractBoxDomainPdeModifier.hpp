@@ -50,6 +50,7 @@ template<unsigned DIM>
 class AbstractBoxDomainPdeModifier : public AbstractPdeModifier<DIM>
 {
     friend class TestBoxDomainPdeModifiers;
+    friend class TestOffLatticeSimulationWithPdes;
 
 private:
 

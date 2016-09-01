@@ -89,11 +89,8 @@ private:
         {
             SimpleOxygenBasedCellCycleModel* p_cycle_model = new SimpleOxygenBasedCellCycleModel();
             p_cycle_model->SetDimension(2);
-            ///\todo Change thresholds if necessary (#2687)
-
             CellPtr p_cell(new Cell(p_state, p_cycle_model));
             p_cell->SetCellProliferativeType(p_transit_type);
-
             rCells.push_back(p_cell);
         }
      }
