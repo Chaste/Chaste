@@ -42,19 +42,13 @@ template<unsigned DIM>
 PdeAndBoundaryConditions<DIM>::PdeAndBoundaryConditions(AbstractLinearPde<DIM,DIM>* pPde,
                                                                         AbstractBoundaryCondition<DIM>* pBoundaryCondition,
                                                                         bool isNeumannBoundaryCondition,
-                                                                        Vec solution,
                                                                         bool deleteMemberPointersInDestructor)
     : mpPde(pPde),
       mpBoundaryCondition(pBoundaryCondition),
       mIsNeumannBoundaryCondition(isNeumannBoundaryCondition),
-      mSolution(NULL),
       mDeleteMemberPointersInDestructor(deleteMemberPointersInDestructor),
       mDependentVariableName("")
 {
-    if (solution)
-    {
-        mSolution = solution;
-    }
 }
 
 template<unsigned DIM>
@@ -66,8 +60,6 @@ PdeAndBoundaryConditions<DIM>::~PdeAndBoundaryConditions()
         delete mpBoundaryCondition;
         delete mpPde;
     }
-
-    DestroySolution();
 }
 
 template<unsigned DIM>
@@ -89,36 +81,9 @@ AbstractBoundaryCondition<DIM>* PdeAndBoundaryConditions<DIM>::GetBoundaryCondit
 }
 
 template<unsigned DIM>
-Vec PdeAndBoundaryConditions<DIM>::GetSolution()
-{
-    return mSolution;
-}
-
-template<unsigned DIM>
-Vec PdeAndBoundaryConditions<DIM>::GetSolution() const
-{
-    return mSolution;
-}
-
-template<unsigned DIM>
-void PdeAndBoundaryConditions<DIM>::SetSolution(Vec solution)
-{
-    mSolution = solution;
-}
-
-template<unsigned DIM>
 bool PdeAndBoundaryConditions<DIM>::IsNeumannBoundaryCondition()
 {
     return mIsNeumannBoundaryCondition;
-}
-
-template<unsigned DIM>
-void PdeAndBoundaryConditions<DIM>::DestroySolution()
-{
-    if (mSolution)
-    {
-        PetscTools::Destroy(mSolution);
-    }
 }
 
 template<unsigned DIM>

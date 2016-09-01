@@ -1,7 +1,7 @@
 cell/TestOdeBasedCellCycleModels.hpp
 cell/TestSimpleCellCycleModels.hpp
 cell/TestCell.hpp
-cell_based_pde/TestEllipticPdeAndBoundaryConditions.hpp
+cell_based_pde/TestPdeAndBoundaryConditions.hpp
 common/TestSimulationTime.hpp
 odes/TestAlarcon2004OxygenBasedCellCycleOdeSystem.hpp
 odes/TestTysonNovak2001OdeSystem.hpp

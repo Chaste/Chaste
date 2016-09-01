@@ -198,11 +198,6 @@ public:
             MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
             p_pde_and_bc->SetDependentVariableName("averaged quantity");
 
-            ///\todo #2687
-            // Make a dummy solution (because the archiver expects to be able to read/write PETSc Vecs).
-            Vec vector = PetscTools::CreateAndSetVec(10, -42.0);
-            p_pde_and_bc->SetSolution(vector);
-
             // Make domain
             ChastePoint<2> lower(-10.0, -10.0);
             ChastePoint<2> upper(10.0, 10.0);

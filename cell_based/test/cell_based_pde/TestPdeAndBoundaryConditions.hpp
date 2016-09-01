@@ -45,20 +45,25 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ConstBoundaryCondition.hpp"
 #include "UniformSourceEllipticPde.hpp"
 #include "FunctionalBoundaryCondition.hpp"
+#include "ReplicatableVector.hpp"
+#include "PetscTools.hpp"
 #include "MeshBasedCellPopulation.hpp"
 #include "NodesOnlyMesh.hpp"
 #include "NodeBasedCellPopulation.hpp"
 #include "AveragedSourceEllipticPde.hpp"
+#include "UniformSourceParabolicPde.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "CellsGenerator.hpp"
 #include "FixedG1GenerationalCellCycleModel.hpp"
-#include "ReplicatableVector.hpp"
 #include "PetscSetupAndFinalize.hpp"
-#include "PetscTools.hpp"
 #include "OutputFileHandler.hpp"
 #include "AbstractCellBasedWithTimingsTestSuite.hpp"
 #include "SmartPointers.hpp"
 #include "VolumeDependentAveragedSourceEllipticPde.hpp"
+#include "SmartPointers.hpp"
+
+// This test is always run sequentially (never in parallel)
+#include "FakePetscSetup.hpp"
 
 class Simple2dPdeForTesting : public AbstractLinearEllipticPde<2,2>
 {
@@ -76,25 +81,6 @@ public:
     c_matrix<double,2,2> ComputeDiffusionTerm(const ChastePoint<2>& )
     {
         return identity_matrix<double>(2);
-    }
-};
-
-class Simple3dPdeForTesting : public AbstractLinearEllipticPde<3,3>
-{
-public:
-    double ComputeConstantInUSourceTerm(const ChastePoint<3>&, Element<3,3>* pElement)
-    {
-        return -1.0;
-    }
-
-    double ComputeLinearInUCoeffInSourceTerm(const ChastePoint<3>&, Element<3,3>*)
-    {
-        return 0.0;
-    }
-
-    c_matrix<double,3,3> ComputeDiffusionTerm(const ChastePoint<3>& )
-    {
-        return identity_matrix<double>(3);
     }
 };
 
@@ -142,35 +128,8 @@ public:
         TS_ASSERT_DELTA(pde_and_bc.GetBoundaryCondition()->GetValue(point), 15.0, 1e-6);
         TS_ASSERT_EQUALS(pde_and_bc.IsNeumannBoundaryCondition(), false);
 
-        bool solution_exists = pde_and_bc.GetSolution();
-        TS_ASSERT_EQUALS(solution_exists, false);
-
         AbstractLinearEllipticPde<2,2>* p_pde = static_cast<AbstractLinearEllipticPde<2,2>*>(pde_and_bc.GetPde());
         TS_ASSERT_EQUALS(p_pde, &pde);
-
-        // Set mCurrentSolution
-        std::vector<double> data(10);
-        for (unsigned i=0; i<10; i++)
-        {
-            data[i] = i + 0.45;
-        }
-
-        Vec vector = PetscTools::CreateVec(data);
-        pde_and_bc.SetSolution(vector);
-
-        // Test mCurrentSolution has been correctly set
-        Vec solution =  pde_and_bc.GetSolution();
-        ReplicatableVector solution_repl(solution);
-
-        TS_ASSERT_EQUALS(solution_repl.GetSize(), 10u);
-        for (unsigned i=0; i<10; i++)
-        {
-            TS_ASSERT_DELTA(solution_repl[i], i + 0.45, 1e-12);
-        }
-
-        PetscInt size_of_solution = 0;
-        VecGetSize(pde_and_bc.GetSolution(), &size_of_solution);
-        TS_ASSERT_EQUALS(size_of_solution, 10);
 
         // Coverage
         TS_ASSERT_EQUALS(pde_and_bc.HasAveragedSourcePde(), false);
@@ -178,8 +137,8 @@ public:
 
     void TestMethodsNeumann() throw(Exception)
     {
-        // Create an PdeAndBoundaryConditions object
-        Simple2dPdeForTesting pde;
+        // Create a PdeAndBoundaryConditions object
+        UniformSourceParabolicPde<2> pde;
         ConstBoundaryCondition<2> bc(0.0);
 
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc); // third argument defaults to Neumann
@@ -191,39 +150,6 @@ public:
 
         TS_ASSERT_DELTA(pde_and_bc.GetBoundaryCondition()->GetValue(point), 0.0, 1e-6);
         TS_ASSERT_EQUALS(pde_and_bc.IsNeumannBoundaryCondition(), true);
-
-        bool solution_exists = pde_and_bc.GetSolution();
-        TS_ASSERT_EQUALS(solution_exists, false);
-
-        AbstractLinearEllipticPde<2,2>* p_pde = static_cast<AbstractLinearEllipticPde<2,2>*>(pde_and_bc.GetPde());
-        TS_ASSERT_EQUALS(p_pde, &pde);
-
-        // Set mCurrentSolution
-        std::vector<double> data(10);
-        for (unsigned i=0; i<10; i++)
-        {
-            data[i] = i + 0.45;
-        }
-
-        Vec vector = PetscTools::CreateVec(data);
-        pde_and_bc.SetSolution(vector);
-
-        // Test mCurrentSolution has been correctly set
-        Vec solution =  pde_and_bc.GetSolution();
-        ReplicatableVector solution_repl(solution);
-
-        TS_ASSERT_EQUALS(solution_repl.GetSize(), 10u);
-        for (unsigned i=0; i<10; i++)
-        {
-            TS_ASSERT_DELTA(solution_repl[i], i + 0.45, 1e-12);
-        }
-
-        PetscInt size_of_solution = 0;
-        VecGetSize(pde_and_bc.GetSolution(), &size_of_solution);
-        TS_ASSERT_EQUALS(size_of_solution, 10);
-
-        // Coverage
-        TS_ASSERT_EQUALS(pde_and_bc.HasAveragedSourcePde(), false);
     }
 
     void TestWithBoundaryConditionVaryingInSpace() throw(Exception)
@@ -281,22 +207,6 @@ public:
         // At t=10, the boundary condition should take the value 6.0
         p_simulation_time->IncrementTimeOneStep();
         TS_ASSERT_DELTA(pde_and_bc.GetBoundaryCondition()->GetValue(point), 6.0, 1e-6);
-    }
-
-    void TestIn3d() throw(Exception)
-    {
-        // Create a 3D PdeAndBoundaryConditions object
-        Simple3dPdeForTesting pde;
-        ConstBoundaryCondition<3> bc(0.0);
-        PdeAndBoundaryConditions<3> pde_and_bc(&pde, &bc);
-
-        ChastePoint<3> point;
-        point.rGetLocation()[0] = 0.0;
-        point.rGetLocation()[1] = 0.0;
-        point.rGetLocation()[2] = 1.0;
-
-        TS_ASSERT_DELTA(pde_and_bc.GetBoundaryCondition()->GetValue(point), 0.0, 1e-6);
-        TS_ASSERT_EQUALS(pde_and_bc.IsNeumannBoundaryCondition(), true);
     }
 
     void TestWithAveragedSourceEllipticPde() throw(Exception)
@@ -471,81 +381,35 @@ public:
         pde_and_bc.SetUpSourceTermsForAveragedSourcePde(&coarse_mesh);
     }
 
-    void TestArchivingWithoutSolution() throw(Exception)
+    void TestIn3d() throw(Exception)
     {
-        EXIT_IF_PARALLEL; // Avoid all processes writing the same archive and hence potential race condition
+        // Create a 3D PdeAndBoundaryConditions object
+        UniformSourceParabolicPde<3> pde;
+        ConstBoundaryCondition<3> bc(0.0);
+        PdeAndBoundaryConditions<3> pde_and_bc(&pde, &bc);
 
-        OutputFileHandler handler("archive", false);
-        handler.SetArchiveDirectory();
-        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "PdeAndBoundaryConditions.arch";
+        ChastePoint<3> point;
+        point.rGetLocation()[0] = 0.0;
+        point.rGetLocation()[1] = 0.0;
+        point.rGetLocation()[2] = 1.0;
 
-        {
-            // Create an PdeAndBoundaryConditions object
-            UniformSourceEllipticPde<2> pde(0.75);
-            ConstBoundaryCondition<2> bc(2.45);
-            bool is_neumann_bc = false;
-
-            PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, is_neumann_bc);
-            PdeAndBoundaryConditions<2>* const p_const_pde_and_bc = &pde_and_bc;
-
-            // Archive the object
-            std::ofstream ofs(archive_filename.c_str());
-            boost::archive::text_oarchive output_arch(ofs);
-
-            output_arch << p_const_pde_and_bc;
-        }
-
-        {
-            PdeAndBoundaryConditions<2>* p_pde_and_bc;
-
-            // Create an input archive
-            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
-            boost::archive::text_iarchive input_arch(ifs);
-
-            // Restore object from the archive
-            input_arch >> p_pde_and_bc;
-
-            // Test that the object was archived correctly
-            TS_ASSERT_EQUALS(p_pde_and_bc->IsNeumannBoundaryCondition(), false);
-
-            ChastePoint<2> point;
-            TS_ASSERT_DELTA(p_pde_and_bc->GetBoundaryCondition()->GetValue(point), 2.45, 1e-6);
-
-            AbstractLinearEllipticPde<2,2>* p_pde = static_cast<AbstractLinearEllipticPde<2,2>*>(p_pde_and_bc->GetPde());
-            TS_ASSERT(dynamic_cast<UniformSourceEllipticPde<2>*>(p_pde) != NULL);
-            TS_ASSERT_DELTA(static_cast<UniformSourceEllipticPde<2>*>(p_pde)->GetCoefficient(), 0.75, 1e-6);
-
-            // Avoid memory leaks
-            delete p_pde_and_bc;
-        }
+        TS_ASSERT_DELTA(pde_and_bc.GetBoundaryCondition()->GetValue(point), 0.0, 1e-6);
+        TS_ASSERT_EQUALS(pde_and_bc.IsNeumannBoundaryCondition(), true);
     }
 
-    void TestArchivingWithSolution() throw(Exception)
+    void TestArchiving() throw(Exception)
     {
-        EXIT_IF_PARALLEL; // Avoid all processes writing the same archive and hence potential race condition
-
         OutputFileHandler handler("archive", false);
         handler.SetArchiveDirectory();
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "PdeAndBoundaryConditions.arch";
 
         {
-            // Create an PdeAndBoundaryConditions object
-            UniformSourceEllipticPde<2> pde(0.75);
+            // Create a PdeAndBoundaryConditions object
+            UniformSourceParabolicPde<2> pde(0.75);
             ConstBoundaryCondition<2> bc(2.45);
             bool is_neumann_bc = false;
 
             PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, is_neumann_bc);
-            pde_and_bc.SetDependentVariableName("quantity");
-
-            std::vector<double> data(10);
-            for (unsigned i=0; i<10; i++)
-            {
-                data[i] = i + 0.45;
-            }
-
-            Vec vector = PetscTools::CreateVec(data);
-            pde_and_bc.SetSolution(vector);
-
             PdeAndBoundaryConditions<2>* const p_const_pde_and_bc = &pde_and_bc;
 
             // Archive the object
@@ -567,23 +431,13 @@ public:
 
             // Test that the object was archived correctly
             TS_ASSERT_EQUALS(p_pde_and_bc->IsNeumannBoundaryCondition(), false);
-            TS_ASSERT_EQUALS(p_pde_and_bc->rGetDependentVariableName(), "quantity");
 
             ChastePoint<2> point;
             TS_ASSERT_DELTA(p_pde_and_bc->GetBoundaryCondition()->GetValue(point), 2.45, 1e-6);
 
-            AbstractLinearEllipticPde<2,2>* p_pde = static_cast<AbstractLinearEllipticPde<2,2>*>(p_pde_and_bc->GetPde());
-            TS_ASSERT(dynamic_cast<UniformSourceEllipticPde<2>*>(p_pde) != NULL);
-            TS_ASSERT_DELTA(static_cast<UniformSourceEllipticPde<2>*>(p_pde)->GetCoefficient(), 0.75, 1e-6);
-
-            Vec solution = p_pde_and_bc->GetSolution();
-            ReplicatableVector solution_repl(solution);
-
-            TS_ASSERT_EQUALS(solution_repl.GetSize(), 10u);
-            for (unsigned i=0; i<10; i++)
-            {
-                TS_ASSERT_DELTA(solution_repl[i], i + 0.45, 1e-6);
-            }
+            AbstractLinearParabolicPde<2,2>* p_pde = static_cast<AbstractLinearParabolicPde<2,2>*>(p_pde_and_bc->GetPde());
+            TS_ASSERT(dynamic_cast<UniformSourceParabolicPde<2>*>(p_pde) != NULL);
+            TS_ASSERT_DELTA(static_cast<UniformSourceParabolicPde<2>*>(p_pde)->GetCoefficient(), 0.75, 1e-6);
 
             // Avoid memory leaks
             delete p_pde_and_bc;

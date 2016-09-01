@@ -311,10 +311,6 @@ public:
             MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
             p_pde_and_bc->SetDependentVariableName("averaged quantity");
 
-            // Make a dummy solution (because the archiver expects to be able to read/write PETSc Vecs)
-            Vec vector = PetscTools::CreateAndSetVec(10, -42.0);
-            p_pde_and_bc->SetSolution(vector);
-
             // Initialise a parabolic PDE modifier object using this PDE and BCs object
             AbstractCellBasedSimulationModifier<2,2>* const p_modifier = new ParabolicGrowingDomainPdeModifier<2>(p_pde_and_bc);
 

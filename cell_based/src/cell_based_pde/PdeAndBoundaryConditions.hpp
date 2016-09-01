@@ -67,7 +67,6 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        // Note that archiving of mpPde and mSolution is handled by the methods save/load_construct_data
         archive & mpPde;
         archive & mpBoundaryCondition;
         archive & mIsNeumannBoundaryCondition;
@@ -84,13 +83,6 @@ protected:
 
     /** Whether the boundary condition is Neumann (false corresponds to a Dirichlet boundary condition). */
     bool mIsNeumannBoundaryCondition;
-
-    /**
-     * The solution to the PDE problem, for use as an initial guess when solving at the next time step.
-     *
-     * \todo Consider removing this member and associated methods (#2687)
-     */
-    Vec mSolution;
 
     /** Whether to delete member pointers in the destructor (used in archiving). */
     bool mDeleteMemberPointersInDestructor;
@@ -110,14 +102,12 @@ public:
      * @param pBoundaryCondition A pointer to an abstract boundary condition
      *     (defaults to NULL, corresponding to a constant boundary condition with value zero)
      * @param isNeumannBoundaryCondition Whether the boundary condition is Neumann (defaults to true)
-     * @param solution A solution vector (defaults to NULL)
      * @param deleteMemberPointersInDestructor whether to delete member pointers in the destructor
      *     (defaults to false)
      */
     PdeAndBoundaryConditions(AbstractLinearPde<DIM,DIM>* pPde=NULL,
                                      AbstractBoundaryCondition<DIM>* pBoundaryCondition=NULL,
                                      bool isNeumannBoundaryCondition=true,
-                                     Vec solution=NULL,
                                      bool deleteMemberPointersInDestructor=false);
 
     /**
@@ -141,31 +131,9 @@ public:
     AbstractBoundaryCondition<DIM>* GetBoundaryCondition() const;
 
     /**
-     * @return mSolution
-     */
-    Vec GetSolution();
-
-    /**
-     * @return mSolution (used in archiving)
-     */
-    Vec GetSolution() const;
-
-    /**
-     * Set mSolution.
-     *
-     * @param solution the current solution
-     */
-    void SetSolution(Vec solution);
-
-    /**
      * @return mIsNeumannBoundaryCondition
      */
     bool IsNeumannBoundaryCondition();
-
-    /**
-     * Call PetscTools::Destroy on mSolution.
-     */
-    void DestroySolution();
 
     /**
      * Set the name of the dependent variable.
@@ -199,39 +167,5 @@ public:
 #include "SerializationExportWrapper.hpp"
 // Declare identifier for the serializer
 EXPORT_TEMPLATE_CLASS_SAME_DIMS(PdeAndBoundaryConditions)
-
-namespace boost
-{
-namespace serialization
-{
-template<class Archive, unsigned DIM>
-inline void save_construct_data(
-    Archive & ar, const PdeAndBoundaryConditions<DIM> * t, const unsigned int file_version)
-{
-    if (t->GetSolution())
-    {
-        std::string archive_filename = ArchiveLocationInfo::GetArchiveDirectory() + "solution.vec";
-        PetscTools::DumpPetscObject(t->GetSolution(), archive_filename);
-    }
-}
-
-template<class Archive, unsigned DIM>
-inline void load_construct_data(
-    Archive & ar, PdeAndBoundaryConditions<DIM> * t, const unsigned int file_version)
-{
-    Vec solution = NULL;
-
-    std::string archive_filename = ArchiveLocationInfo::GetArchiveDirectory() + "solution.vec";
-    FileFinder file_finder(archive_filename, RelativeTo::Absolute);
-
-    if (file_finder.Exists())
-    {
-        PetscTools::ReadPetscObject(solution, archive_filename);
-    }
-
-    ::new(t)PdeAndBoundaryConditions<DIM>(NULL, NULL, false, solution, true);
-}
-}
-} // namespace ...
 
 #endif /* PDEANDBOUNDARYCONDITIONS_HPP_ */
