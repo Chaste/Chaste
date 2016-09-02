@@ -53,6 +53,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PottsMesh.hpp"
 #include "CellsGenerator.hpp"
 #include "FixedG1GenerationalCellCycleModel.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
 #include "VertexBasedCellPopulation.hpp"
 #include "MeshBasedCellPopulation.hpp"
 #include "NodeBasedCellPopulation.hpp"
@@ -63,8 +64,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "UniformSourceParabolicPde.hpp"
 #include "ConstBoundaryCondition.hpp"
 #include "AveragedSourceEllipticPde.hpp"
+#include "AveragedSourceParabolicPde.hpp"
 #include "ArchiveOpener.hpp"
 #include "SmartPointers.hpp"
+#include "ReplicatableVector.hpp"
+#include "PetscTools.hpp"
 #include "AbstractCellBasedWithTimingsTestSuite.hpp"
 
 // This test is always run sequentially (never in parallel)
@@ -251,6 +255,58 @@ public:
         }
     }
 
+    void TestGrowingDomainPdeModifierExceptions() throw(Exception)
+    {
+        EXIT_IF_PARALLEL;
+
+        // Create a simple mesh
+        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_522_elements");
+        TetrahedralMesh<2,2> temp_mesh;
+        temp_mesh.ConstructFromMeshReader(mesh_reader);
+        temp_mesh.Scale(5.0,1.0);
+
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(temp_mesh, 1.5);
+
+        // Set up cells
+        std::vector<CellPtr> cells;
+        MAKE_PTR(WildTypeCellMutationState, p_state);
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        {
+            FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
+            p_model->SetDimension(2);
+
+            CellPtr p_cell(new Cell(p_state, p_model));
+            p_cell->SetCellProliferativeType(p_diff_type);
+            double birth_time = -RandomNumberGenerator::Instance()->ranf()*18.0;
+            p_cell->SetBirthTime(birth_time);
+
+            cells.push_back(p_cell);
+        }
+
+        // Set up cell population
+        NodeBasedCellPopulation<2> cell_population(mesh, cells);
+
+        AveragedSourceEllipticPde<2> pde(cell_population, -1.0);
+        ConstBoundaryCondition<2> bc(1.0);
+        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+        p_pde_and_bc->SetDependentVariableName("nutrient");
+
+        EllipticGrowingDomainPdeModifier<2> elliptic_pde_modifier(p_pde_and_bc);
+        TS_ASSERT_THROWS_THIS(elliptic_pde_modifier.SetupSolve(cell_population, "output_directory"),
+            "EllipticGrowingDomainPdeModifier cannot be used with an AveragedSourceEllipticPde. Use an EllipticBoxDomainPdeModifier instead.");
+
+        AveragedSourceParabolicPde<2> pde(cell_population, -1.0);
+        ConstBoundaryCondition<2> bc(1.0);
+        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
+        p_pde_and_bc->SetDependentVariableName("nutrient");
+
+        EllipticGrowingDomainPdeModifier<2> parabolic_pde_modifier(p_pde_and_bc, "output_directory");
+        TS_ASSERT_THROWS_THIS(parabolic_pde_modifier.SetupSolve(cell_population),
+            "ParabolicGrowingDomainPdeModifier cannot be used with an AveragedSourceParabolicPde. Use a ParaboliccBoxDomainPdeModifier instead.");
+    }
+
     void TestArchiveEllipticGrowingDomainPdeModifier() throw(Exception)
     {
         // Create a file for archiving
@@ -266,16 +322,23 @@ public:
             MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
             p_pde_and_bc->SetDependentVariableName("averaged quantity");
 
-            // Initialise an Elliptic PDE modifier object using this PDE and BCs object
-            AbstractCellBasedSimulationModifier<2,2>* const p_modifier = new EllipticGrowingDomainPdeModifier<2>(p_pde_and_bc);
+            // Initialise an elliptic PDE modifier object using this PDE and BCs object
+            std::vector<double> data(10);
+            for (unsigned i=0; i<10; i++)
+            {
+                data[i] = i + 0.45;
+            }
+            Vec vector = PetscTools::CreateVec(data);
+
+            EllipticGrowingDomainPdeModifier<2> modifier(p_pde_and_bc, vector);
 
             // Create an output archive
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
 
             // Serialize via pointer
+            AbstractCellBasedSimulationModifier<2,2>* const p_modifier = &modifier;
             output_arch << p_modifier;
-            delete p_modifier;
         }
 
         // Separate scope to read the archive
@@ -291,6 +354,15 @@ public:
             // See whether we read out the correct variable name area
             std::string variable_name = (static_cast<EllipticGrowingDomainPdeModifier<2>*>(p_modifier2))->mpPdeAndBcs->rGetDependentVariableName();
             TS_ASSERT_EQUALS(variable_name, "averaged quantity");
+
+            Vec solution = (static_cast<EllipticGrowingDomainPdeModifier<2>*>(p_modifier2))->GetSolution();
+            ReplicatableVector solution_repl(solution);
+
+            TS_ASSERT_EQUALS(solution_repl.GetSize(), 10u);
+            for (unsigned i=0; i<10; i++)
+            {
+                TS_ASSERT_DELTA(solution_repl[i], i + 0.45, 1e-6);
+            }
 
             delete p_modifier2;
         }
@@ -312,15 +384,22 @@ public:
             p_pde_and_bc->SetDependentVariableName("averaged quantity");
 
             // Initialise a parabolic PDE modifier object using this PDE and BCs object
-            AbstractCellBasedSimulationModifier<2,2>* const p_modifier = new ParabolicGrowingDomainPdeModifier<2>(p_pde_and_bc);
+            std::vector<double> data(10);
+            for (unsigned i=0; i<10; i++)
+            {
+                data[i] = i + 0.45;
+            }
+            Vec vector = PetscTools::CreateVec(data);
+
+            ParabolicGrowingDomainPdeModifier<2> modifier(p_pde_and_bc, vector);
 
             // Create an output archive
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
 
             // Serialize via pointer
+            AbstractCellBasedSimulationModifier<2,2>* const p_modifier = &modifier;
             output_arch << p_modifier;
-            delete p_modifier;
         }
 
         // Separate scope to read the archive
@@ -336,6 +415,15 @@ public:
             // See whether we read out the correct variable name
             std::string variable_name = (static_cast<ParabolicGrowingDomainPdeModifier<2>*>(p_modifier2))->mpPdeAndBcs->rGetDependentVariableName();
             TS_ASSERT_EQUALS(variable_name, "averaged quantity");
+
+            Vec solution = (static_cast<ParabolicGrowingDomainPdeModifier<2>*>(p_modifier2))->GetSolution();
+            ReplicatableVector solution_repl(solution);
+
+            TS_ASSERT_EQUALS(solution_repl.GetSize(), 10u);
+            for (unsigned i=0; i<10; i++)
+            {
+                TS_ASSERT_DELTA(solution_repl[i], i + 0.45, 1e-6);
+            }
 
             delete p_modifier2;
         }

@@ -44,6 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Version.hpp"
 #include "ExecutableSupport.hpp"
 #include "Exception.hpp"
+#include "AbstractPdeModifier.hpp"
 #include <typeinfo>
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -369,6 +370,16 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
     if (PetscTools::AmMaster())
     {
         mpVizSetupFile = output_file_handler.OpenOutputFile("results.vizsetup");
+
+        for (typename std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM> > >::iterator iter = mSimulationModifiers.begin();
+             iter != mSimulationModifiers.end();
+             ++iter)
+        {
+            if (boost::dynamic_pointer_cast<AbstractPdeModifier<SPACE_DIM> >(*iter))
+            {
+                *this->mpVizSetupFile << "PDE \n";
+            }
+        }
     }
 
     this->mrCellPopulation.SimulationSetupHook(this);

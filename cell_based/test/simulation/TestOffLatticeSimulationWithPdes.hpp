@@ -434,13 +434,6 @@ public:
         MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc));
         simulator.AddSimulationModifier(p_pde_modifier);
 
-        CellwiseSourceEllipticPde<2> pde2(cell_population, -0.8);
-        ConstBoundaryCondition<2> bc2(0.0);
-        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc2, (&pde2, &bc2, true));
-        p_pde_and_bc2->SetDependentVariableName("dunno");
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier2, (p_pde_and_bc2));
-        simulator.AddSimulationModifier(p_pde_modifier2);
-
         // Create a force law and pass it to the simulation
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
         p_linear_force->SetCutOffLength(1.5);
@@ -459,8 +452,6 @@ public:
         TS_ASSERT_DELTA(node_5_location[1], 1.1422, 1e-4);
         CellPtr p_cell_at_5 = simulator.rGetCellPopulation().GetCellUsingLocationIndex(5);
         TS_ASSERT_DELTA(p_cell_at_5->GetCellData()->GetItem("oxygen"), 0.9704, 1e-4);
-        TS_ASSERT_DELTA(p_cell_at_5->GetCellData()->GetItem("dunno"), 0.0000, 1e-4);
-        TS_ASSERT_LESS_THAN(p_cell_at_5->GetCellData()->GetItem("dunno"), p_cell_at_5->GetCellData()->GetItem("oxygen"));
     }
 
     void TestSpheroidStatistics() throw (Exception)
@@ -563,7 +554,7 @@ public:
         FileComparison(areas_results_file, "cell_based/test/data/TestSpheroidStatistics/cellpopulationareas.dat").CompareFiles();
 
         std::string results_dir = handler.GetOutputDirectoryFullPath() + "results_from_time_0/";
-        NumericFileComparison comparison(results_dir + "/radial_dist.dat", "cell_based/test/data/TestSpheroidStatistics/radial_dist.dat");
+        NumericFileComparison comparison(results_dir + "radial_dist.dat", "cell_based/test/data/TestSpheroidStatistics/radial_dist.dat");
         TS_ASSERT(comparison.CompareFiles(5e-3));
     }
 
@@ -613,15 +604,14 @@ public:
         MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc2, (&pde2, &bc, false));
         p_pde_and_bc2->SetDependentVariableName("dunno");
 
-        ///\todo replace with ChasteCuboid<2> cuboid = cell_population.rGetMesh().CalculateBoundingBox() ? (#2687)
         c_vector<double,2> centroid = cell_population.GetCentroidOfCellPopulation();
         ChastePoint<2> lower(centroid(0)-25.0, centroid(1)-25.0);
         ChastePoint<2> upper(centroid(0)+25.0, centroid(1)+25.0);
         ChasteCuboid<2> cuboid(lower, upper);
 
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc, &cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc, &cuboid, 10.0));
         simulator.AddSimulationModifier(p_pde_modifier);
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier2, (p_pde_and_bc2, &cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier2, (p_pde_and_bc2, &cuboid, 10.0));
         simulator.AddSimulationModifier(p_pde_modifier2);
 
         // Create a force law and pass it to the simulation
@@ -661,23 +651,24 @@ public:
 
         TS_ASSERT_EQUALS(pde_solution0.GetSize(), pde_solution1.GetSize());
 
-        // Test the nutrient concentration is equal to 1.0 at each coarse mesh node far from the cells
-        for (unsigned i=0; i<pde_solution0.GetSize(); i++)
-        {
-            c_vector<double,2> centre;
-            centre(0) = 2.5; // assuming 5 by 5 honeycomb mesh
-            centre(1) = 2.5;
-            c_vector<double,2> posn = p_coarse_mesh->GetNode(i)->rGetLocation();
-            double dist = norm_2(centre - posn);
-            double u0 = pde_solution0[i];
-            double u1 = pde_solution1[i];
-
-            if (dist > 4.0)
-            {
-                TS_ASSERT_DELTA(u0, 1.0, 1e-5);
-                TS_ASSERT_DELTA(u1, 1.0, 1e-5);
-            }
-        }
+///\todo Allow a coarse mesh to be used, but boundary conditions to be applied at the edge of the cell population (#2687)
+//        // Test the nutrient concentration is equal to 1.0 at each coarse mesh node far from the cells
+//        for (unsigned i=0; i<pde_solution0.GetSize(); i++)
+//        {
+//            c_vector<double,2> centre;
+//            centre(0) = 2.5; // assuming 5 by 5 honeycomb mesh
+//            centre(1) = 2.5;
+//            c_vector<double,2> posn = p_coarse_mesh->GetNode(i)->rGetLocation();
+//            double dist = norm_2(centre - posn);
+//            double u0 = pde_solution0[i];
+//            double u1 = pde_solution1[i];
+//
+//            if (dist > 4.0)
+//            {
+//                TS_ASSERT_DELTA(u0, 1.0, 1e-5);
+//                TS_ASSERT_DELTA(u1, 1.0, 1e-5);
+//            }
+//        }
 
         /*
          * Loop over cells, find the coarse mesh element containing it, then
@@ -1101,60 +1092,6 @@ public:
         FileComparison( results_dir + "cell_based_sim_with_pde_results.parameters", "cell_based/test/data/TestOffLatticeSimulationOutputParameters/cell_based_sim_with_pde_results.parameters").CompareFiles();
 
         ///\todo check output of simulator.OutputSimulationSetup();
-    }
-
-    void TestNodeBasedWithoutCoarseMeshThrowsException() throw(Exception)
-    {
-        EXIT_IF_PARALLEL;
-
-        // Create a simple mesh
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_522_elements");
-        TetrahedralMesh<2,2> temp_mesh;
-        temp_mesh.ConstructFromMeshReader(mesh_reader);
-        temp_mesh.Scale(5.0,1.0);
-
-        NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(temp_mesh, 1.5);
-
-        // Set up cells
-        std::vector<CellPtr> cells;
-        MAKE_PTR(WildTypeCellMutationState, p_state);
-        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
-        {
-            FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
-            p_model->SetDimension(2);
-
-            CellPtr p_cell(new Cell(p_state, p_model));
-            p_cell->SetCellProliferativeType(p_diff_type);
-            double birth_time = -RandomNumberGenerator::Instance()->ranf()*18.0;
-            p_cell->SetBirthTime(birth_time);
-
-            cells.push_back(p_cell);
-        }
-
-        // Set up cell population
-        NodeBasedCellPopulation<2> cell_population(mesh, cells);
-
-        // Set up cell-based simulation
-        OffLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("TestNodeBasedCellPopulationWithpoutCoarseMeshThrowsException");
-        simulator.SetEndTime(0.01);
-
-        AveragedSourceEllipticPde<2> pde(cell_population, -1.0);
-        ConstBoundaryCondition<2> bc(1.0);
-        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
-        p_pde_and_bc->SetDependentVariableName("nutrient");
-
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc));
-        simulator.AddSimulationModifier(p_pde_modifier);
-
-        // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
-        p_linear_force->SetCutOffLength(1.5);
-        simulator.AddForce(p_linear_force);
-
-        TS_ASSERT_THROWS_THIS(simulator.Solve(), "Trying to solve a PDE on a cell population that doesn't have a mesh. Try calling UseCoarsePdeMesh().");
     }
 
     void TestNodeBasedWithCoarseMesh() throw(Exception)

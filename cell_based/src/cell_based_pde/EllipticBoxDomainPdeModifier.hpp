@@ -41,6 +41,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractBoxDomainPdeModifier.hpp"
 #include "BoundaryConditionsContainer.hpp"
+#include "PetscTools.hpp"
+#include "FileFinder.hpp"
 
 /**
  * A modifier class in which an elliptic PDE is solved on a box domain and the results are stored in CellData.
@@ -74,13 +76,15 @@ public:
     /**
      * Constructor.
      *
-     * @param pPdeAndBcs a shared pointer to a PDE object with associated boundary conditions
+     * @param pPdeAndBcs shared pointer to a PDE object with associated boundary conditions (default to NULL)
      * @param pMeshCuboid pointer to a ChasteCuboid specifying the outer boundary for the FE mesh (defaults to NULL)
-     * @param stepSize the step size to be used in the FE mesh (defaults to 1.0, i.e. the default cell size)
+     * @param stepSize step size to be used in the FE mesh (defaults to 1.0, i.e. the default cell size)
+     * @param solution solution vector (defaults to NULL)
      */
     EllipticBoxDomainPdeModifier(boost::shared_ptr<PdeAndBoundaryConditions<DIM> > pPdeAndBcs=boost::shared_ptr<PdeAndBoundaryConditions<DIM> >(),
                                  ChasteCuboid<DIM>* pMeshCuboid=NULL,
-                                 double stepSize=1.0);
+                                 double stepSize=1.0,
+                                 Vec solution=NULL);
 
     /**
      * Destructor.
@@ -124,5 +128,39 @@ public:
 
 #include "SerializationExportWrapper.hpp"
 EXPORT_TEMPLATE_CLASS_SAME_DIMS(EllipticBoxDomainPdeModifier)
+
+namespace boost
+{
+namespace serialization
+{
+template<class Archive, unsigned DIM>
+inline void save_construct_data(
+    Archive & ar, const EllipticBoxDomainPdeModifier<DIM> * t, const unsigned int file_version)
+{
+    if (t->GetSolution())
+    {
+        std::string archive_filename = ArchiveLocationInfo::GetArchiveDirectory() + "solution.vec";
+        PetscTools::DumpPetscObject(t->GetSolution(), archive_filename);
+    }
+}
+
+template<class Archive, unsigned DIM>
+inline void load_construct_data(
+    Archive & ar, EllipticBoxDomainPdeModifier<DIM> * t, const unsigned int file_version)
+{
+    Vec solution = NULL;
+
+    std::string archive_filename = ArchiveLocationInfo::GetArchiveDirectory() + "solution.vec";
+    FileFinder file_finder(archive_filename, RelativeTo::Absolute);
+
+    if (file_finder.Exists())
+    {
+        PetscTools::ReadPetscObject(solution, archive_filename);
+    }
+
+    ::new(t)EllipticBoxDomainPdeModifier<DIM>(boost::shared_ptr<PdeAndBoundaryConditions<DIM> >(), NULL, 1.0, solution);
+}
+}
+} // namespace ...
 
 #endif /*ELLIPTICBOXDOMAINPDEMODIFIER_HPP_*/

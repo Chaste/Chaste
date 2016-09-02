@@ -79,9 +79,11 @@ public:
     /**
      * Constructor.
      *
-     * @param pPdeAndBcs a shared pointer to a PDE object with associated boundary conditions
+     * @param pPdeAndBcs shared pointer to a PDE object with associated boundary conditions (default to NULL)
+     * @param solution solution vector (defaults to NULL)
      */
-    AbstractGrowingDomainPdeModifier(boost::shared_ptr<PdeAndBoundaryConditions<DIM> > pPdeAndBcs=boost::shared_ptr<PdeAndBoundaryConditions<DIM> >());
+    AbstractGrowingDomainPdeModifier(boost::shared_ptr<PdeAndBoundaryConditions<DIM> > pPdeAndBcs=boost::shared_ptr<PdeAndBoundaryConditions<DIM> >(),
+                                     Vec solution=NULL);
 
     /**
      * Destructor.

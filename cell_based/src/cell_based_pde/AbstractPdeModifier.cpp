@@ -38,7 +38,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ReplicatableVector.hpp"
 
 template<unsigned DIM>
-AbstractPdeModifier<DIM>::AbstractPdeModifier(boost::shared_ptr<PdeAndBoundaryConditions<DIM> > pPdeAndBcs)
+AbstractPdeModifier<DIM>::AbstractPdeModifier(boost::shared_ptr<PdeAndBoundaryConditions<DIM> > pPdeAndBcs,
+                                              Vec solution)
     : AbstractCellBasedSimulationModifier<DIM>(),
       mpPdeAndBcs(pPdeAndBcs),
       mSolution(NULL),
@@ -46,7 +47,10 @@ AbstractPdeModifier<DIM>::AbstractPdeModifier(boost::shared_ptr<PdeAndBoundaryCo
       mOutputGradient(false),
       mOutputSolutionAtPdeNodes(false)
 {
-    assert(DIM == 2);
+    if (solution)
+    {
+        mSolution = solution;
+    }
 }
 
 template<unsigned DIM>
@@ -64,6 +68,18 @@ template<unsigned DIM>
 Vec AbstractPdeModifier<DIM>::GetSolution()
 {
     return mSolution;
+}
+
+template<unsigned DIM>
+Vec AbstractPdeModifier<DIM>::GetSolution() const
+{
+    return mSolution;
+}
+
+template<unsigned DIM>
+void AbstractPdeModifier<DIM>::SetSolution(Vec solution)
+{
+    mSolution = solution;
 }
 
 template<unsigned DIM>

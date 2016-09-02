@@ -39,8 +39,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned DIM>
 ParabolicBoxDomainPdeModifier<DIM>::ParabolicBoxDomainPdeModifier(boost::shared_ptr<PdeAndBoundaryConditions<DIM> > pPdeAndBcs,
                                                                   ChasteCuboid<DIM>* pMeshCuboid,
-                                                                  double stepSize)
-    : AbstractBoxDomainPdeModifier<DIM>(pPdeAndBcs, pMeshCuboid, stepSize)
+                                                                  double stepSize,
+                                                                  Vec solution)
+    : AbstractBoxDomainPdeModifier<DIM>(pPdeAndBcs, pMeshCuboid, stepSize, solution)
 {
 }
 

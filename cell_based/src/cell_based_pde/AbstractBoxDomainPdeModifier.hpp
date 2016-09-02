@@ -93,13 +93,15 @@ public:
     /**
      * Constructor.
      *
-     * @param pPdeAndBcs a shared pointer to a PDE object with associated boundary conditions
+     * @param pPdeAndBcs shared pointer to a PDE object with associated boundary conditions (default to NULL)
      * @param pMeshCuboid pointer to a ChasteCuboid specifying the outer boundary for the FE mesh (defaults to NULL)
-     * @param stepSize the step size to be used in the FE mesh (defaults to 1.0, i.e. the default cell size)
+     * @param stepSize step size to be used in the FE mesh (defaults to 1.0, i.e. the default cell size)
+     * @param solution solution vector (defaults to NULL)
      */
     AbstractBoxDomainPdeModifier(boost::shared_ptr<PdeAndBoundaryConditions<DIM> > pPdeAndBcs=boost::shared_ptr<PdeAndBoundaryConditions<DIM> >(),
                                  ChasteCuboid<DIM>* pMeshCuboid=NULL,
-                                 double stepSize=1.0);
+                                 double stepSize=1.0,
+                                 Vec solution=NULL);
 
     /**
      * Destructor.

@@ -43,8 +43,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned DIM>
 AbstractBoxDomainPdeModifier<DIM>::AbstractBoxDomainPdeModifier(boost::shared_ptr<PdeAndBoundaryConditions<DIM> > pPdeAndBcs,
                                                                 ChasteCuboid<DIM>* pMeshCuboid,
-                                                                double stepSize)
-    : AbstractPdeModifier<DIM>(pPdeAndBcs),
+                                                                double stepSize,
+                                                                Vec solution)
+    : AbstractPdeModifier<DIM>(pPdeAndBcs, solution),
       mpMeshCuboid(pMeshCuboid),
       mStepSize(stepSize)
 {
@@ -75,15 +76,15 @@ void AbstractBoxDomainPdeModifier<DIM>::GenerateFeMesh(ChasteCuboid<DIM> meshCub
     this->mpFeMesh = new TetrahedralMesh<DIM,DIM>();
     switch (DIM)
     {
-//        case 1:
-//            this->mpFeMesh->ConstructRegularSlabMesh(stepSize, meshCuboid.GetWidth(0));
-//            break;
+        case 1:
+            this->mpFeMesh->ConstructRegularSlabMesh(stepSize, meshCuboid.GetWidth(0));
+            break;
         case 2:
             this->mpFeMesh->ConstructRegularSlabMesh(stepSize, meshCuboid.GetWidth(0), meshCuboid.GetWidth(1));
             break;
-//        case 3:
-//            this->mpFeMesh->ConstructRegularSlabMesh(stepSize, meshCuboid.GetWidth(0), meshCuboid.GetWidth(1), meshCuboid.GetWidth(2));
-//            break;
+        case 3:
+            this->mpFeMesh->ConstructRegularSlabMesh(stepSize, meshCuboid.GetWidth(0), meshCuboid.GetWidth(1), meshCuboid.GetWidth(2));
+            break;
         default:
             NEVER_REACHED;
     }
@@ -159,18 +160,18 @@ void AbstractBoxDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulation<DI
 
             switch (DIM)
             {
-    //            case 1:
-    //                cell_iter->GetCellData()->SetItem(this->mpPdeAndBcs->rGetDependentVariableName()+"_grad_x", solution_gradient(0));
-    //                break;
+                case 1:
+                    cell_iter->GetCellData()->SetItem(this->mpPdeAndBcs->rGetDependentVariableName()+"_grad_x", solution_gradient(0));
+                    break;
                 case 2:
                     cell_iter->GetCellData()->SetItem(this->mpPdeAndBcs->rGetDependentVariableName()+"_grad_x", solution_gradient(0));
                     cell_iter->GetCellData()->SetItem(this->mpPdeAndBcs->rGetDependentVariableName()+"_grad_y", solution_gradient(1));
                     break;
-    //            case 3:
-    //                cell_iter->GetCellData()->SetItem(this->mpPdeAndBcs->rGetDependentVariableName()+"_grad_x", solution_gradient(0));
-    //                cell_iter->GetCellData()->SetItem(this->mpPdeAndBcs->rGetDependentVariableName()+"_grad_y", solution_gradient(1));
-    //                cell_iter->GetCellData()->SetItem(this->mpPdeAndBcs->rGetDependentVariableName()+"_grad_z", solution_gradient(2));
-    //                break;
+                case 3:
+                    cell_iter->GetCellData()->SetItem(this->mpPdeAndBcs->rGetDependentVariableName()+"_grad_x", solution_gradient(0));
+                    cell_iter->GetCellData()->SetItem(this->mpPdeAndBcs->rGetDependentVariableName()+"_grad_y", solution_gradient(1));
+                    cell_iter->GetCellData()->SetItem(this->mpPdeAndBcs->rGetDependentVariableName()+"_grad_z", solution_gradient(2));
+                    break;
                 default:
                     NEVER_REACHED;
             }

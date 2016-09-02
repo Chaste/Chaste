@@ -644,7 +644,6 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         cells_generator.GenerateBasic(cells, 4);
 
         std::vector<unsigned> location_indices;
-
         location_indices.push_back(55);
         location_indices.push_back(56);
         location_indices.push_back(65);
@@ -704,7 +703,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
 
         NumericFileComparison comp_nut(results_dir + "/results.vizpdesolution", "cell_based/test/data/TestOnLatticeSpheroidWithNutrient/results.vizpdesolution");
         TS_ASSERT(comp_nut.CompareFiles());
-        FileComparison( results_dir + "/results.vizpdesolution", "cell_based/test/data/TestOnLatticeSpheroidWithNutrient/results.vizpdesolution").CompareFiles();
+        FileComparison(results_dir + "/results.vizpdesolution", "cell_based/test/data/TestOnLatticeSpheroidWithNutrient/results.vizpdesolution").CompareFiles();
     }
 };
 

@@ -40,10 +40,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned DIM>
 EllipticBoxDomainPdeModifier<DIM>::EllipticBoxDomainPdeModifier(boost::shared_ptr<PdeAndBoundaryConditions<DIM> > pPdeAndBcs,
                                                                 ChasteCuboid<DIM>* pMeshCuboid,
-                                                                double stepSize)
-    : AbstractBoxDomainPdeModifier<DIM>(pPdeAndBcs, pMeshCuboid, stepSize)
+                                                                double stepSize,
+                                                                Vec solution)
+    : AbstractBoxDomainPdeModifier<DIM>(pPdeAndBcs, pMeshCuboid, stepSize, solution)
 {
-    assert(DIM == 2);
 }
 
 template<unsigned DIM>
@@ -93,7 +93,7 @@ void EllipticBoxDomainPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DI
 {
     AbstractBoxDomainPdeModifier<DIM>::SetupSolve(rCellPopulation,outputDirectory);
 
-    // Call these  methods to solve the PDE on the initial step and Output the results.
+    // Call these  methods to solve the PDE on the initial step and output the results
     UpdateAtEndOfTimeStep(rCellPopulation);
     this->UpdateAtEndOfOutputTimeStep(rCellPopulation);
 }

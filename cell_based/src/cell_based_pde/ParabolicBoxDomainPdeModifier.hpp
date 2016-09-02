@@ -74,13 +74,15 @@ public:
     /**
      * Constructor.
      *
-     * @param pPdeAndBcs a shared pointer to a PDE object with associated boundary conditions
+     * @param pPdeAndBcs shared pointer to a PDE object with associated boundary conditions (default to NULL)
      * @param pMeshCuboid pointer to a ChasteCuboid specifying the outer boundary for the FE mesh (defaults to NULL)
-     * @param stepSize the step size to be used in the FE mesh (defaults to 1.0, i.e. the default cell size)
+     * @param stepSize step size to be used in the FE mesh (defaults to 1.0, i.e. the default cell size)
+     * @param solution solution vector (defaults to NULL)
      */
     ParabolicBoxDomainPdeModifier(boost::shared_ptr<PdeAndBoundaryConditions<DIM> > pPdeAndBcs=boost::shared_ptr<PdeAndBoundaryConditions<DIM> >(),
                                   ChasteCuboid<DIM>* pMeshCuboid=NULL,
-                                  double stepSize=1.0);
+                                  double stepSize=1.0,
+                                  Vec solution=NULL);
 
     /**
      * Destructor.
@@ -133,5 +135,39 @@ public:
 
 #include "SerializationExportWrapper.hpp"
 EXPORT_TEMPLATE_CLASS_SAME_DIMS(ParabolicBoxDomainPdeModifier)
+
+namespace boost
+{
+namespace serialization
+{
+template<class Archive, unsigned DIM>
+inline void save_construct_data(
+    Archive & ar, const ParabolicBoxDomainPdeModifier<DIM> * t, const unsigned int file_version)
+{
+    if (t->GetSolution())
+    {
+        std::string archive_filename = ArchiveLocationInfo::GetArchiveDirectory() + "solution.vec";
+        PetscTools::DumpPetscObject(t->GetSolution(), archive_filename);
+    }
+}
+
+template<class Archive, unsigned DIM>
+inline void load_construct_data(
+    Archive & ar, ParabolicBoxDomainPdeModifier<DIM> * t, const unsigned int file_version)
+{
+    Vec solution = NULL;
+
+    std::string archive_filename = ArchiveLocationInfo::GetArchiveDirectory() + "solution.vec";
+    FileFinder file_finder(archive_filename, RelativeTo::Absolute);
+
+    if (file_finder.Exists())
+    {
+        PetscTools::ReadPetscObject(solution, archive_filename);
+    }
+
+    ::new(t)ParabolicBoxDomainPdeModifier<DIM>(boost::shared_ptr<PdeAndBoundaryConditions<DIM> >(), NULL, 1.0, solution);
+}
+}
+} // namespace ...
 
 #endif /*PARABOLICBOXDOMAINPDEMODIFIER_HPP_*/

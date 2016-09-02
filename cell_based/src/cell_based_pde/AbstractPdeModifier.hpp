@@ -69,9 +69,7 @@ private:
     {
         archive & boost::serialization::base_object<AbstractCellBasedSimulationModifier<DIM,DIM> >(*this);
         archive & mpPdeAndBcs;
-
-        // Note that archiving of mSolution is ~~~handled by the methods save/load_construct_data~~~ NOT YET DONE
-        // archive & mpFeMesh;
+        // Note that archiving of mSolution is handled by the methods save/load_construct_data
         archive & mOutputDirectory;
         archive & mOutputGradient;
         archive & mOutputSolutionAtPdeNodes;
@@ -108,9 +106,11 @@ public:
     /**
      * Constructor.
      *
-     * @param pPdeAndBcs a shared pointer to a PDE object with associated boundary conditions
+     * @param pPdeAndBcs shared pointer to a PDE object with associated boundary conditions (default to NULL)
+     * @param solution solution vector (defaults to NULL)
      */
-    AbstractPdeModifier(boost::shared_ptr<PdeAndBoundaryConditions<DIM> > pPdeAndBcs=boost::shared_ptr<PdeAndBoundaryConditions<DIM> >());
+    AbstractPdeModifier(boost::shared_ptr<PdeAndBoundaryConditions<DIM> > pPdeAndBcs=boost::shared_ptr<PdeAndBoundaryConditions<DIM> >(),
+                        Vec solution=NULL);
 
     /**
      * Destructor.
@@ -126,6 +126,18 @@ public:
      * @return mSolution.
      */
     Vec GetSolution();
+
+    /**
+     * @return mSolution (used in archiving)
+     */
+    Vec GetSolution() const;
+
+    /**
+     * Set mSolution.
+     *
+     * @param solution the present solution
+     */
+    void SetSolution(Vec solution);
 
     /**
      * @return mpFeMesh.

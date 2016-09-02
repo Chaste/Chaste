@@ -49,6 +49,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ConstBoundaryCondition.hpp"
 #include "ArchiveOpener.hpp"
 #include "SmartPointers.hpp"
+#include "ReplicatableVector.hpp"
+#include "PetscTools.hpp"
 #include "AbstractCellBasedWithTimingsTestSuite.hpp"
 
 // This test is always run sequentially (never in parallel)
@@ -152,16 +154,22 @@ public:
             ChasteCuboid<2> cuboid(lower, upper);
 
             // Initialise an elliptic PDE modifier object using this PDE and BCs object
-            AbstractCellBasedSimulationModifier<2,2>* const p_modifier = new EllipticBoxDomainPdeModifier<2>(p_pde_and_bc, &cuboid, 2.0);
+            std::vector<double> data(10);
+            for (unsigned i=0; i<10; i++)
+            {
+                data[i] = i + 0.45;
+            }
+            Vec vector = PetscTools::CreateVec(data);
+
+            EllipticBoxDomainPdeModifier<2> modifier(p_pde_and_bc, &cuboid, 2.0, vector);
 
             // Create an output archive
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
 
             // Serialize via pointer
+            AbstractCellBasedSimulationModifier<2,2>* const p_modifier = &modifier;
             output_arch << p_modifier;
-
-            delete p_modifier;
         }
 
         // Separate scope to read the archive
@@ -178,6 +186,15 @@ public:
             std::string variable_name = (static_cast<EllipticBoxDomainPdeModifier<2>*>(p_modifier2))->mpPdeAndBcs->rGetDependentVariableName();
 
             TS_ASSERT_EQUALS(variable_name, "averaged quantity");
+
+            Vec solution = (static_cast<EllipticBoxDomainPdeModifier<2>*>(p_modifier2))->GetSolution();
+            ReplicatableVector solution_repl(solution);
+
+            TS_ASSERT_EQUALS(solution_repl.GetSize(), 10u);
+            for (unsigned i=0; i<10; i++)
+            {
+                TS_ASSERT_DELTA(solution_repl[i], i + 0.45, 1e-6);
+            }
 
             delete p_modifier2;
         }
@@ -203,16 +220,23 @@ public:
             ChastePoint<2> upper(10.0, 10.0);
             ChasteCuboid<2> cuboid(lower, upper);
 
-            // Initialise a parabolic PDE modifier object using this PDE and BCs object
-            AbstractCellBasedSimulationModifier<2,2>* const p_modifier = new ParabolicBoxDomainPdeModifier<2>(p_pde_and_bc, &cuboid, 2.0);
+            // Initialise an elliptic PDE modifier object using this PDE and BCs object
+            std::vector<double> data(10);
+            for (unsigned i=0; i<10; i++)
+            {
+                data[i] = i + 0.45;
+            }
+            Vec vector = PetscTools::CreateVec(data);
+
+            ParabolicBoxDomainPdeModifier<2> modifier(p_pde_and_bc, &cuboid, 2.0, vector);
 
             // Create an output archive
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
 
             // Serialize via pointer
+            AbstractCellBasedSimulationModifier<2,2>* const p_modifier = &modifier;
             output_arch << p_modifier;
-            delete p_modifier;
         }
 
         // Separate scope to read the archive
@@ -228,6 +252,15 @@ public:
             // See whether we read out the correct variable name
             std::string variable_name = (static_cast<ParabolicBoxDomainPdeModifier<2>*>(p_modifier2))->mpPdeAndBcs->rGetDependentVariableName();
             TS_ASSERT_EQUALS(variable_name, "averaged quantity");
+
+            Vec solution = (static_cast<ParabolicBoxDomainPdeModifier<2>*>(p_modifier2))->GetSolution();
+            ReplicatableVector solution_repl(solution);
+
+            TS_ASSERT_EQUALS(solution_repl.GetSize(), 10u);
+            for (unsigned i=0; i<10; i++)
+            {
+                TS_ASSERT_DELTA(solution_repl[i], i + 0.45, 1e-6);
+            }
 
             delete p_modifier2;
         }

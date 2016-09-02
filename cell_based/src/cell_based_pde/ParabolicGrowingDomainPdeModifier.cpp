@@ -35,12 +35,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ParabolicGrowingDomainPdeModifier.hpp"
 #include "CellBasedParabolicPdeSolver.hpp"
+#include "AveragedSourceParabolicPde.hpp"
+#include "Exception.hpp"
 
 template<unsigned DIM>
-ParabolicGrowingDomainPdeModifier<DIM>::ParabolicGrowingDomainPdeModifier(boost::shared_ptr<PdeAndBoundaryConditions<DIM> > pPdeAndBcs)
-    : AbstractGrowingDomainPdeModifier<DIM>(pPdeAndBcs)
+ParabolicGrowingDomainPdeModifier<DIM>::ParabolicGrowingDomainPdeModifier(boost::shared_ptr<PdeAndBoundaryConditions<DIM> > pPdeAndBcs,
+                                                                          Vec solution)
+    : AbstractGrowingDomainPdeModifier<DIM>(pPdeAndBcs, solution)
 {
-    assert(DIM == 2);
 }
 
 template<unsigned DIM>
@@ -91,6 +93,11 @@ template<unsigned DIM>
 void ParabolicGrowingDomainPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)
 {
     AbstractGrowingDomainPdeModifier<DIM>::SetupSolve(rCellPopulation, outputDirectory);
+
+    if (dynamic_cast<AveragedSourceParabolicPde<DIM>*>(this->mpPdeAndBcs->GetPde()))
+    {
+        EXCEPTION("ParabolicGrowingDomainPdeModifier cannot be used with an AveragedSourceParabolicPde. Use a ParabolicBoxDomainPdeModifier instead.");
+    }
 
     // Setup a finite element mesh on which to save the initial condition
     this->GenerateFeMesh(rCellPopulation);

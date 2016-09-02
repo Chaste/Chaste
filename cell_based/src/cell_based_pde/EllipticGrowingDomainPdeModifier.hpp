@@ -76,9 +76,11 @@ public:
     /**
      * Constructor.
      *
-     * @param pPdeAndBcs shared pointer to a PDE object with associated boundary conditions.
+     * @param pPdeAndBcs shared pointer to a PDE object with associated boundary conditions (default to NULL)
+     * @param solution solution vector (defaults to NULL)
      */
-    EllipticGrowingDomainPdeModifier(boost::shared_ptr<PdeAndBoundaryConditions<DIM> > pPdeAndBcs=boost::shared_ptr<PdeAndBoundaryConditions<DIM> >());
+    EllipticGrowingDomainPdeModifier(boost::shared_ptr<PdeAndBoundaryConditions<DIM> > pPdeAndBcs=boost::shared_ptr<PdeAndBoundaryConditions<DIM> >(),
+                                     Vec solution=NULL);
 
     /**
      * Destructor.
@@ -122,5 +124,39 @@ public:
 
 #include "SerializationExportWrapper.hpp"
 EXPORT_TEMPLATE_CLASS_SAME_DIMS(EllipticGrowingDomainPdeModifier)
+
+namespace boost
+{
+namespace serialization
+{
+template<class Archive, unsigned DIM>
+inline void save_construct_data(
+    Archive & ar, const EllipticGrowingDomainPdeModifier<DIM> * t, const unsigned int file_version)
+{
+    if (t->GetSolution())
+    {
+        std::string archive_filename = ArchiveLocationInfo::GetArchiveDirectory() + "solution.vec";
+        PetscTools::DumpPetscObject(t->GetSolution(), archive_filename);
+    }
+}
+
+template<class Archive, unsigned DIM>
+inline void load_construct_data(
+    Archive & ar, EllipticGrowingDomainPdeModifier<DIM> * t, const unsigned int file_version)
+{
+    Vec solution = NULL;
+
+    std::string archive_filename = ArchiveLocationInfo::GetArchiveDirectory() + "solution.vec";
+    FileFinder file_finder(archive_filename, RelativeTo::Absolute);
+
+    if (file_finder.Exists())
+    {
+        PetscTools::ReadPetscObject(solution, archive_filename);
+    }
+
+    ::new(t)EllipticGrowingDomainPdeModifier<DIM>(boost::shared_ptr<PdeAndBoundaryConditions<DIM> >(), solution);
+}
+}
+} // namespace ...
 
 #endif /*ELLIPTICGROWINGDOMAINPDEMODIFIER_HPP_*/
