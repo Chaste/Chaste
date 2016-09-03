@@ -668,7 +668,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         ChasteCuboid<2> cuboid = cell_population.rGetMesh().CalculateBoundingBox();
 
         // Create a PDE modifier object using this PDE and BCs object and cuboid
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc, &cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc, &cuboid, 1.0));
         p_pde_modifier->SetOutputSolutionAtPdeNodes(true);
         simulator.AddSimulationModifier(p_pde_modifier);
 
