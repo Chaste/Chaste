@@ -69,6 +69,7 @@ private:
         archive & boost::serialization::base_object<AbstractPdeModifier<DIM> >(*this);
         archive & mpMeshCuboid;
         archive & mStepSize;
+        archive & mSetBcsOnBoxBoundary;
     }
 
 protected:
@@ -87,6 +88,12 @@ protected:
      * Stored as a member to facilitate archiving.
      */
     double mStepSize;
+
+    /**
+     * Whether to set the boundary condition on the edge of the box domain rather than the cell population.
+     * Default to true.
+     */
+    bool mSetBcsOnBoxBoundary;
 
 public:
 
@@ -107,6 +114,13 @@ public:
      * Destructor.
      */
     virtual ~AbstractBoxDomainPdeModifier();
+
+    /**
+     * Set mSetBcsOnCoarseBoundary.
+     *
+     * @param setBcsOnBoxBoundary whether to set the boundary condition on the edge of the box domain rather than the cell population
+     */
+    void SetBcsOnBoxBoundary(bool setBcsOnBoxBoundary);
 
     /**
      * Overridden SetupSolve() method.

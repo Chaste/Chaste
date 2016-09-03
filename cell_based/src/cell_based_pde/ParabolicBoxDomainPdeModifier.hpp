@@ -111,9 +111,11 @@ public:
     /**
      * Helper method to construct the boundary conditions container for the PDE.
      *
+     * @param rCellPopulation reference to the cell population
+     *
      * @return the full boundary conditions container
      */
-    virtual std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ConstructBoundaryConditionsContainer();
+    virtual std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ConstructBoundaryConditionsContainer(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
 
     /**
      * Helper method to initialise the PDE solution using the CellData.

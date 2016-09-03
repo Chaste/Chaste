@@ -47,7 +47,8 @@ AbstractBoxDomainPdeModifier<DIM>::AbstractBoxDomainPdeModifier(boost::shared_pt
                                                                 Vec solution)
     : AbstractPdeModifier<DIM>(pPdeAndBcs, solution),
       mpMeshCuboid(pMeshCuboid),
-      mStepSize(stepSize)
+      mStepSize(stepSize),
+      mSetBcsOnBoxBoundary(true)
 {
     if (pMeshCuboid)
     {
@@ -59,6 +60,12 @@ AbstractBoxDomainPdeModifier<DIM>::AbstractBoxDomainPdeModifier(boost::shared_pt
 template<unsigned DIM>
 AbstractBoxDomainPdeModifier<DIM>::~AbstractBoxDomainPdeModifier()
 {
+}
+
+template<unsigned DIM>
+void AbstractBoxDomainPdeModifier<DIM>::SetBcsOnBoxBoundary(bool setBcsOnBoxBoundary)
+{
+	mSetBcsOnBoxBoundary = setBcsOnBoxBoundary;
 }
 
 template<unsigned DIM>

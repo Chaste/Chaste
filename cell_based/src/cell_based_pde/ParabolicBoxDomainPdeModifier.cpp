@@ -59,7 +59,7 @@ template<unsigned DIM>
 void ParabolicBoxDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
     // Set up boundary conditions
-    std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc = ConstructBoundaryConditionsContainer();
+    std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc = ConstructBoundaryConditionsContainer(rCellPopulation);
 
     this->UpdateCellPdeElementMap(rCellPopulation);
 
@@ -103,8 +103,10 @@ void ParabolicBoxDomainPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,D
 }
 
 template<unsigned DIM>
-std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ParabolicBoxDomainPdeModifier<DIM>::ConstructBoundaryConditionsContainer()
+std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ParabolicBoxDomainPdeModifier<DIM>::ConstructBoundaryConditionsContainer(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
+	///\todo make use of mSetBcsOnBoxBoundary (#2687)
+
     std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc(new BoundaryConditionsContainer<DIM,DIM,1>(false));
 
     if (this->mpPdeAndBcs->IsNeumannBoundaryCondition())

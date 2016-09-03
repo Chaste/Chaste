@@ -610,8 +610,10 @@ public:
         ChasteCuboid<2> cuboid(lower, upper);
 
         MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc, &cuboid, 10.0));
+        p_pde_modifier->SetBcsOnBoxBoundary(false);
         simulator.AddSimulationModifier(p_pde_modifier);
         MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier2, (p_pde_and_bc2, &cuboid, 10.0));
+        p_pde_modifier2->SetBcsOnBoxBoundary(false);
         simulator.AddSimulationModifier(p_pde_modifier2);
 
         // Create a force law and pass it to the simulation
@@ -651,24 +653,23 @@ public:
 
         TS_ASSERT_EQUALS(pde_solution0.GetSize(), pde_solution1.GetSize());
 
-///\todo Allow a coarse mesh to be used, but boundary conditions to be applied at the edge of the cell population (#2687)
-//        // Test the nutrient concentration is equal to 1.0 at each coarse mesh node far from the cells
-//        for (unsigned i=0; i<pde_solution0.GetSize(); i++)
-//        {
-//            c_vector<double,2> centre;
-//            centre(0) = 2.5; // assuming 5 by 5 honeycomb mesh
-//            centre(1) = 2.5;
-//            c_vector<double,2> posn = p_coarse_mesh->GetNode(i)->rGetLocation();
-//            double dist = norm_2(centre - posn);
-//            double u0 = pde_solution0[i];
-//            double u1 = pde_solution1[i];
-//
-//            if (dist > 4.0)
-//            {
-//                TS_ASSERT_DELTA(u0, 1.0, 1e-5);
-//                TS_ASSERT_DELTA(u1, 1.0, 1e-5);
-//            }
-//        }
+        // Test the nutrient concentration is equal to 1.0 at each coarse mesh node far from the cells
+        for (unsigned i=0; i<pde_solution0.GetSize(); i++)
+        {
+            c_vector<double,2> centre;
+            centre(0) = 2.5; // assuming 5 by 5 honeycomb mesh
+            centre(1) = 2.5;
+            c_vector<double,2> posn = p_coarse_mesh->GetNode(i)->rGetLocation();
+            double dist = norm_2(centre - posn);
+            double u0 = pde_solution0[i];
+            double u1 = pde_solution1[i];
+
+            if (dist > 4.0)
+            {
+                TS_ASSERT_DELTA(u0, 1.0, 1e-5);
+                TS_ASSERT_DELTA(u1, 1.0, 1e-5);
+            }
+        }
 
         /*
          * Loop over cells, find the coarse mesh element containing it, then
@@ -738,7 +739,6 @@ public:
         MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
         p_pde_and_bc->SetDependentVariableName("nutrient");
 
-        ///\todo replace with ChasteCuboid<2> cuboid = cell_population.rGetMesh().CalculateBoundingBox() ? (#2687)
         c_vector<double,2> centroid = cell_population.GetCentroidOfCellPopulation();
         ChastePoint<2> lower(centroid(0)-25.0, centroid(1)-25.0);
         ChastePoint<2> upper(centroid(0)+25.0, centroid(1)+25.0);
@@ -1137,7 +1137,6 @@ public:
         MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
         p_pde_and_bc->SetDependentVariableName("nutrient");
 
-        ///\todo replace with ChasteCuboid<2> cuboid = cell_population.rGetMesh().CalculateBoundingBox() ? (#2687)
         c_vector<double,2> centroid = cell_population.GetCentroidOfCellPopulation();
         ChastePoint<2> lower(centroid(0)-25.0, centroid(1)-25.0);
         ChastePoint<2> upper(centroid(0)+25.0, centroid(1)+25.0);
@@ -1215,7 +1214,6 @@ public:
         MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
         p_pde_and_bc->SetDependentVariableName("nutrient");
 
-        ///\todo replace with ChasteCuboid<2> cuboid = cell_population.rGetMesh().CalculateBoundingBox() ? (#2687)
         c_vector<double,2> centroid = cell_population.GetCentroidOfCellPopulation();
         ChastePoint<2> lower(centroid(0)-25.0, centroid(1)-25.0);
         ChastePoint<2> upper(centroid(0)+25.0, centroid(1)+25.0);
@@ -1300,11 +1298,6 @@ public:
         // Set up cell population
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
 
-        // Set up cell data on the cell population
-        c_vector<double,2> centre_of_mesh;
-        centre_of_mesh[0] = 5.0;
-        centre_of_mesh[1] = 5.0;
-
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestCoarsePdeSolutionOnNodeBased");
@@ -1316,7 +1309,6 @@ public:
         MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
         p_pde_and_bc->SetDependentVariableName("nutrient");
 
-        ///\todo replace with ChasteCuboid<2> cuboid = cell_population.rGetMesh().CalculateBoundingBox() ? (#2687)
         c_vector<double,2> centroid = cell_population.GetCentroidOfCellPopulation();
         ChastePoint<2> lower(centroid(0)-25.0, centroid(1)-25.0);
         ChastePoint<2> upper(centroid(0)+25.0, centroid(1)+25.0);
@@ -1450,11 +1442,6 @@ public:
         // Set up cell population
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
 
-        // Set up cell data on the cell population
-        c_vector<double,2> centre_of_mesh;
-        centre_of_mesh[0] = 5.0;
-        centre_of_mesh[1] = 5.0;
-
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestCoarsePdeSolutionOnNodeBased2d");
@@ -1465,13 +1452,13 @@ public:
         MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
         p_pde_and_bc->SetDependentVariableName("nutrient");
 
-        ///\todo replace with ChasteCuboid<2> cuboid = cell_population.rGetMesh().CalculateBoundingBox() ? (#2687)
         c_vector<double,2> centroid = cell_population.GetCentroidOfCellPopulation();
         ChastePoint<2> lower(centroid(0)-25.0, centroid(1)-25.0);
         ChastePoint<2> upper(centroid(0)+25.0, centroid(1)+25.0);
         ChasteCuboid<2> cuboid(lower, upper);
 
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc, &cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc, &cuboid, 10.0));
+        p_pde_modifier->SetBcsOnBoxBoundary(false);
         simulator.AddSimulationModifier(p_pde_modifier);
 
         // Solve the system
@@ -1514,12 +1501,6 @@ public:
         // Set up cell population
         NodeBasedCellPopulation<3> cell_population(mesh, cells);
 
-        // Set up cell data on the cell population
-        c_vector<double,3> centre_of_mesh;
-        centre_of_mesh[0] = 5.0;
-        centre_of_mesh[1] = 5.0;
-        centre_of_mesh[2] = 5.0;
-
         // Set up cell-based simulation
         OffLatticeSimulation<3> simulator(cell_population);
         simulator.SetOutputDirectory("TestCoarsePdeSolutionOnNodeBased3d");
@@ -1530,13 +1511,13 @@ public:
         MAKE_PTR_ARGS(PdeAndBoundaryConditions<3>, p_pde_and_bc, (&pde, &bc, false));
         p_pde_and_bc->SetDependentVariableName("nutrient");
 
-        ///\todo replace with ChasteCuboid<3> cuboid = cell_population.rGetMesh().CalculateBoundingBox() ? (#2687)
         c_vector<double,3> centroid = cell_population.GetCentroidOfCellPopulation();
         ChastePoint<3> lower(centroid(0)-25.0, centroid(1)-25.0, centroid(2)-25.0);
         ChastePoint<3> upper(centroid(0)+25.0, centroid(1)+25.0, centroid(2)+25.0);
         ChasteCuboid<3> cuboid(lower, upper);
 
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<3>, p_pde_modifier, (p_pde_and_bc, &cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<3>, p_pde_modifier, (p_pde_and_bc, &cuboid, 10.0));
+        p_pde_modifier->SetBcsOnBoxBoundary(false);
         simulator.AddSimulationModifier(p_pde_modifier);
 
         // Solve the system
