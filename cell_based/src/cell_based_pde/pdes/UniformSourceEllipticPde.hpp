@@ -86,7 +86,7 @@ public:
     /**
      * Constructor.
      *
-     * @param sourceCeofficient the source term coefficient (defaults to 0.0)
+     * @param sourceCoefficient the source term coefficient (defaults to 0.0)
      */
     UniformSourceEllipticPde(double sourceCoefficient=0.0);
 
