@@ -68,7 +68,7 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & boost::serialization::base_object<AbstractCellBasedSimulationModifier<DIM,DIM> >(*this);
-        archive & mpPdeAndBcs;
+
         // Note that archiving of mSolution is handled by the methods save/load_construct_data
         archive & mOutputDirectory;
         archive & mOutputGradient;
@@ -76,9 +76,6 @@ private:
     }
 
 protected:
-
-    /** Shared pointer to a PDE object with associated boundary conditions. */
-    boost::shared_ptr<PdeAndBoundaryConditions<DIM> > mpPdeAndBcs;
 
     /** The solution to the PDE problem at the current time step. */
     Vec mSolution; ///\todo NEED TO ARCHIVE THIS see AbstractPdeandBoundaryCondition (#2687)
@@ -106,21 +103,24 @@ public:
     /**
      * Constructor.
      *
-     * @param pPdeAndBcs shared pointer to a PDE object with associated boundary conditions (default to NULL)
+     * @param pPde A pointer to a linear PDE object (defaults to NULL)
+     * @param pBoundaryCondition A pointer to an abstract boundary condition
+     *     (defaults to NULL, corresponding to a constant boundary condition with value zero)
+     * @param isNeumannBoundaryCondition Whether the boundary condition is Neumann (defaults to true)
+     * @param deleteMemberPointersInDestructor whether to delete member pointers in the destructor
+     *     (defaults to false)
      * @param solution solution vector (defaults to NULL)
      */
-    AbstractPdeModifier(boost::shared_ptr<PdeAndBoundaryConditions<DIM> > pPdeAndBcs=boost::shared_ptr<PdeAndBoundaryConditions<DIM> >(),
+    AbstractPdeModifier(AbstractLinearPde<DIM,DIM>* pPde=NULL,
+                        AbstractBoundaryCondition<DIM>* pBoundaryCondition=NULL,
+                        bool isNeumannBoundaryCondition=true,
+                        bool deleteMemberPointersInDestructor=false,
                         Vec solution=NULL);
 
     /**
      * Destructor.
      */
     virtual ~AbstractPdeModifier();
-
-    /**
-     * @return mpPdeAndBcs.
-     */
-    const boost::shared_ptr<PdeAndBoundaryConditions<DIM> > GetPdeAndBcs() const;
 
     /**
      * @return mSolution.

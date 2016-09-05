@@ -90,7 +90,7 @@ void EllipticGrowingDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPo
 
     // Use CellBasedEllipticPdeSolver as cell wise PDE
     CellBasedEllipticPdeSolver<DIM> solver(this->mpFeMesh,
-                                           static_cast<AbstractLinearEllipticPde<DIM,DIM>*>(this->mpPdeAndBcs->GetPde()),
+                                           static_cast<AbstractLinearEllipticPde<DIM,DIM>*>(this->GetPde()),
                                            p_bcc.get());
 
     // If we have an initial guess, use this when solving the system...
@@ -119,7 +119,7 @@ void EllipticGrowingDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPo
 template<unsigned DIM>
 void EllipticGrowingDomainPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)
 {
-    if (dynamic_cast<AveragedSourceEllipticPde<DIM>*>(this->mpPdeAndBcs->GetPde()))
+    if (dynamic_cast<AveragedSourceEllipticPde<DIM>*>(this->GetPde()))
     {
         EXCEPTION("EllipticGrowingDomainPdeModifier cannot be used with an AveragedSourceEllipticPde. Use an EllipticBoxDomainPdeModifier instead.");
     }
@@ -137,13 +137,13 @@ std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > EllipticGrowingDomainPdeM
     std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc(new BoundaryConditionsContainer<DIM,DIM,1>(false));
 
     // To be well-defined, elliptic PDE problems on growing domains require Dirichlet boundary conditions
-    assert(!(this->mpPdeAndBcs->IsNeumannBoundaryCondition()));
+    assert(!(this->IsNeumannBoundaryCondition()));
 
     for (typename TetrahedralMesh<DIM,DIM>::BoundaryNodeIterator node_iter = this->mpFeMesh->GetBoundaryNodeIteratorBegin();
          node_iter != this->mpFeMesh->GetBoundaryNodeIteratorEnd();
          ++node_iter)
     {
-        p_bcc->AddDirichletBoundaryCondition(*node_iter, this->mpPdeAndBcs->GetBoundaryCondition());
+        p_bcc->AddDirichletBoundaryCondition(*node_iter, this->GetBoundaryCondition());
     }
 
     return p_bcc;

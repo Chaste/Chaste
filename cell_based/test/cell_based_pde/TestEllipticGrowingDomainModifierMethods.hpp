@@ -95,11 +95,8 @@ public:
         CellwiseSourceEllipticPde<2> pde(cell_population, 1);
         ConstBoundaryCondition<2> bc(1.0);
 
-        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
-        p_pde_and_bc->SetDependentVariableName("variable");
-
-        // Create a PDE modifier object using this PDE and BCs object
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc));
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
+        p_pde_modifier->SetDependentVariableName("variable");
 
         // For coverage output the solution gradient
         p_pde_modifier->SetOutputGradient(true);
@@ -165,11 +162,9 @@ public:
         // Make the PDE and BCs
         CellwiseSourceEllipticPde<2> pde(cell_population, 1);
         ConstBoundaryCondition<2> bc(1.0);
-        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
-        p_pde_and_bc->SetDependentVariableName("variable");
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
+        p_pde_modifier->SetDependentVariableName("variable");
 
-        // Create a PDE modifier object using this PDE and BCs object
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc));
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseEllipticPdeWithMeshOnHeterogeneousDisk");
 
         // Test the solution against the exact solution
@@ -229,11 +224,9 @@ public:
         // Make the PDE and BCs
         CellwiseSourceEllipticPde<2> pde(cell_population, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
-        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
-        p_pde_and_bc->SetDependentVariableName("variable");
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
+        p_pde_modifier->SetDependentVariableName("variable");
 
-        // Create a PDE modifier object using this PDE and BCs object
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc));
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseEllipticPdeWithMeshOnSquare");
 
         // Test the solution at some fixed points to compare with other cell populations
@@ -241,18 +234,6 @@ public:
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[0], 10, 1e-4);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[1], 5.0*sqrt(3.0), 1e-4);
         TS_ASSERT_DELTA(p_cell_210->GetCellData()->GetItem("variable"), 0.4542, 1e-4);
-
-///\todo #2687
-//        // Seeing what's what
-//        boost::shared_ptr<TetrahedralMesh<2,2> > p_tet_mesh = cell_population.GetTetrahedralMeshForPdeModifier();
-//
-//        TS_ASSERT_EQUALS(p_tet_mesh->GetNumNodes(), cell_population.rGetMesh().GetNumNodes());
-//        TS_ASSERT_EQUALS(p_tet_mesh->GetNumElements(), cell_population.rGetMesh().GetNumElements());
-//        for (unsigned i=0; i<p_tet_mesh->GetNumNodes(); i++)
-//        {
-//            TS_ASSERT_DELTA(p_tet_mesh->GetNode(i)->rGetLocation()[0], cell_population.rGetMesh().GetNode(i)->rGetLocation()[0], 1e-6);
-//            TS_ASSERT_DELTA(p_tet_mesh->GetNode(i)->rGetLocation()[1], cell_population.rGetMesh().GetNode(i)->rGetLocation()[1], 1e-6);
-//        }
     }
 
     void TestNodeBasedSquareMonolayer() throw (Exception)
@@ -288,11 +269,9 @@ public:
         // Make the PDE and BCs
         CellwiseSourceEllipticPde<2> pde(cell_population, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
-        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
-        p_pde_and_bc->SetDependentVariableName("variable");
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
+        p_pde_modifier->SetDependentVariableName("variable");
 
-        // Create a PDE modifier object using this PDE and BCs object
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc));
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseEllipticPdeWithNodeOnSquare");
 
         // Test the solution at some fixed points to compare with other cell populations
@@ -341,11 +320,9 @@ public:
         // Make the PDE and BCs
         CellwiseSourceEllipticPde<2> pde(cell_population, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
-        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
-        p_pde_and_bc->SetDependentVariableName("variable");
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
+        p_pde_modifier->SetDependentVariableName("variable");
 
-        // Create a PDE modifier object using this PDE and BCs object
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc));
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseEllipticPdeWithVertexOnSquare");
 
         // Test the solution at some fixed points to compare with other cell populations
@@ -393,11 +370,9 @@ public:
         // Make the PDE and BCs
         CellwiseSourceEllipticPde<2> pde(cell_population, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
-        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
-        p_pde_and_bc->SetDependentVariableName("variable");
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
+        p_pde_modifier->SetDependentVariableName("variable");
 
-        // Create a PDE modifier object using this PDE and BCs object
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc));
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseEllipticPdeWithPottsOnSquare");
 
         // Test the solution at some fixed points to compare with other cell populations
@@ -451,11 +426,9 @@ public:
         // Make the PDE and BCs
         CellwiseSourceEllipticPde<2> pde(cell_population, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
-        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
-        p_pde_and_bc->SetDependentVariableName("variable");
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
+        p_pde_modifier->SetDependentVariableName("variable");
 
-        // Create a PDE modifier object using this PDE and BCs object
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc));
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseEllipticPdeWithCaOnSquare");
 
         // Test the solution at some fixed points to compare with other cell populations

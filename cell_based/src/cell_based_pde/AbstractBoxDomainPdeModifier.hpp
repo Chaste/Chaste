@@ -100,7 +100,12 @@ public:
     /**
      * Constructor.
      *
-     * @param pPdeAndBcs shared pointer to a PDE object with associated boundary conditions (default to NULL)
+     * @param pPde A pointer to a linear PDE object (defaults to NULL)
+     * @param pBoundaryCondition A pointer to an abstract boundary condition
+     *     (defaults to NULL, corresponding to a constant boundary condition with value zero)
+     * @param isNeumannBoundaryCondition Whether the boundary condition is Neumann (defaults to true)
+     * @param deleteMemberPointersInDestructor whether to delete member pointers in the destructor
+     *     (defaults to false)
      * @param pMeshCuboid pointer to a ChasteCuboid specifying the outer boundary for the FE mesh (defaults to NULL)
      * @param stepSize step size to be used in the FE mesh (defaults to 1.0, i.e. the default cell size)
      * @param solution solution vector (defaults to NULL)

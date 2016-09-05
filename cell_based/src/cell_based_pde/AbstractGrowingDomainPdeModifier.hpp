@@ -79,10 +79,18 @@ public:
     /**
      * Constructor.
      *
-     * @param pPdeAndBcs shared pointer to a PDE object with associated boundary conditions (default to NULL)
+     * @param pPde A pointer to a linear PDE object (defaults to NULL)
+     * @param pBoundaryCondition A pointer to an abstract boundary condition
+     *     (defaults to NULL, corresponding to a constant boundary condition with value zero)
+     * @param isNeumannBoundaryCondition Whether the boundary condition is Neumann (defaults to true)
+     * @param deleteMemberPointersInDestructor whether to delete member pointers in the destructor
+     *     (defaults to false)
      * @param solution solution vector (defaults to NULL)
      */
-    AbstractGrowingDomainPdeModifier(boost::shared_ptr<PdeAndBoundaryConditions<DIM> > pPdeAndBcs=boost::shared_ptr<PdeAndBoundaryConditions<DIM> >(),
+    AbstractGrowingDomainPdeModifier(AbstractLinearPde<DIM,DIM>* pPde=NULL,
+                                     AbstractBoundaryCondition<DIM>* pBoundaryCondition=NULL,
+                                     bool isNeumannBoundaryCondition=true,
+                                     bool deleteMemberPointersInDestructor=false,
                                      Vec solution=NULL);
 
     /**

@@ -41,7 +41,6 @@ template<unsigned DIM>
 AbstractPdeModifier<DIM>::AbstractPdeModifier(boost::shared_ptr<PdeAndBoundaryConditions<DIM> > pPdeAndBcs,
                                               Vec solution)
     : AbstractCellBasedSimulationModifier<DIM>(),
-      mpPdeAndBcs(pPdeAndBcs),
       mSolution(NULL),
       mOutputDirectory(""),
       mOutputGradient(false),
@@ -56,12 +55,6 @@ AbstractPdeModifier<DIM>::AbstractPdeModifier(boost::shared_ptr<PdeAndBoundaryCo
 template<unsigned DIM>
 AbstractPdeModifier<DIM>::~AbstractPdeModifier()
 {
-}
-
-template<unsigned DIM>
-const boost::shared_ptr<PdeAndBoundaryConditions<DIM> > AbstractPdeModifier<DIM>::GetPdeAndBcs() const
-{
-    return mpPdeAndBcs;
 }
 
 template<unsigned DIM>
@@ -112,7 +105,7 @@ void AbstractPdeModifier<DIM>::UpdateAtEndOfOutputTimeStep(AbstractCellPopulatio
 
             if (mpFeMesh != NULL)
             {
-                assert(mpPdeAndBcs->rGetDependentVariableName() != "");
+                assert(mDependentVariableName != "");
 
                 for (unsigned i=0; i<mpFeMesh->GetNumNodes(); i++)
                 {
@@ -141,7 +134,7 @@ void AbstractPdeModifier<DIM>::UpdateAtEndOfOutputTimeStep(AbstractCellPopulatio
                     {
                         (*mpVizPdeSolutionResultsFile) << position[i] << " ";
                     }
-                    double solution = cell_iter->GetCellData()->GetItem(mpPdeAndBcs->rGetDependentVariableName());
+                    double solution = cell_iter->GetCellData()->GetItem(mDependentVariableName);
                     (*mpVizPdeSolutionResultsFile) << solution << " ";
                 }
             }
@@ -153,7 +146,7 @@ void AbstractPdeModifier<DIM>::UpdateAtEndOfOutputTimeStep(AbstractCellPopulatio
     {
         std::ostringstream time_string;
         time_string << SimulationTime::Instance()->GetTimeStepsElapsed();
-        std::string results_file = "pde_results_" + mpPdeAndBcs->rGetDependentVariableName() + "_" + time_string.str();
+        std::string results_file = "pde_results_" + mDependentVariableName + "_" + time_string.str();
         VtkMeshWriter<DIM,DIM>* p_vtk_mesh_writer = new VtkMeshWriter<DIM,DIM>(mOutputDirectory, results_file, false);
 
         ReplicatableVector solution_repl(mSolution);
@@ -163,7 +156,7 @@ void AbstractPdeModifier<DIM>::UpdateAtEndOfOutputTimeStep(AbstractCellPopulatio
            pde_solution.push_back(solution_repl[i]);
         }
 
-        p_vtk_mesh_writer->AddPointData(mpPdeAndBcs->rGetDependentVariableName(), pde_solution);
+        p_vtk_mesh_writer->AddPointData(mDependentVariableName, pde_solution);
 
         p_vtk_mesh_writer->WriteFilesUsingMesh(*mpFeMesh);
         delete p_vtk_mesh_writer;

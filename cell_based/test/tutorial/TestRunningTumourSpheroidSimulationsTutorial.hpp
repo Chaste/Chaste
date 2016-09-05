@@ -225,9 +225,9 @@ public:
 
         /*
          * To pass the PDE to our simulator, it must first be encapsulated in a
-         * {{{PdeAndBoundaryConditions}}} object, together with the boundary condition for
+         * cell-based PDE modifier object, together with the boundary condition for
          * the PDE. The latter is specified by the second and third arguments of the
-         * {{{PdeAndBoundaryConditions}}} constructor below: the second argument defines the value
+         * constructor below: the second argument defines the value
          * of the boundary condition and the third argument defines whether it is of Neumann type
          * (true) or Dirichlet type (false). Thus, in our case, we are a specifying a constant-value
          * boundary condition. Note that we currently cannot impose more than one boundary
@@ -240,14 +240,8 @@ public:
          *
          * The {{{CellData}}} class, is used to stores the value of the current nutrient concentration for each cell.
          */
-        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, is_neumann_bc));
-        p_pde_and_bc->SetDependentVariableName("oxygen");
-
-        /*
-         * After having created a {{{PdeAndBoundaryConditions}}} object, we then pass it
-         * to a cell-based PDE modifier object.
-         */
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc));
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, is_neumann_bc));
+        p_pde_modifier->SetDependentVariableName("oxygen");
 
         /*
          * We are now in a position to construct an {{{OffLatticeSimulationWithPdes}}} object,

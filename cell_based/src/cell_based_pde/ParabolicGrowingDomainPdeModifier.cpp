@@ -68,7 +68,7 @@ void ParabolicGrowingDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellP
 
     // Use CellBasedParabolicPdeSolver as cell wise PDE
     CellBasedParabolicPdeSolver<DIM> solver(this->mpFeMesh,
-                                            static_cast<AbstractLinearParabolicPde<DIM,DIM>*>(this->mpPdeAndBcs->GetPde()),
+                                            static_cast<AbstractLinearParabolicPde<DIM,DIM>*>(mpPde),
                                             p_bcc.get());
 
     ///\todo Investigate more than one PDE time step per spatial step (#2687)
@@ -94,7 +94,7 @@ void ParabolicGrowingDomainPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<D
 {
     AbstractGrowingDomainPdeModifier<DIM>::SetupSolve(rCellPopulation, outputDirectory);
 
-    if (dynamic_cast<AveragedSourceParabolicPde<DIM>*>(this->mpPdeAndBcs->GetPde()))
+    if (dynamic_cast<AveragedSourceParabolicPde<DIM>*>(this->mpPde))
     {
         EXCEPTION("ParabolicGrowingDomainPdeModifier cannot be used with an AveragedSourceParabolicPde. Use a ParabolicBoxDomainPdeModifier instead.");
     }
@@ -114,14 +114,14 @@ std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ParabolicGrowingDomainPde
 {
     std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc(new BoundaryConditionsContainer<DIM,DIM,1>(false));
 
-    if (this->mpPdeAndBcs->IsNeumannBoundaryCondition())
+    if (this->IsNeumannBoundaryCondition())
     {
         // Impose any Neumann boundary conditions
         for (typename TetrahedralMesh<DIM,DIM>::BoundaryElementIterator elem_iter = this->mpFeMesh->GetBoundaryElementIteratorBegin();
              elem_iter != this->mpFeMesh->GetBoundaryElementIteratorEnd();
              ++elem_iter)
         {
-            p_bcc->AddNeumannBoundaryCondition(*elem_iter, this->mpPdeAndBcs->GetBoundaryCondition());
+            p_bcc->AddNeumannBoundaryCondition(*elem_iter, this->GetBoundaryCondition());
         }
     }
     else
@@ -131,7 +131,7 @@ std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ParabolicGrowingDomainPde
              node_iter != this->mpFeMesh->GetBoundaryNodeIteratorEnd();
              ++node_iter)
         {
-            p_bcc->AddDirichletBoundaryCondition(*node_iter, this->mpPdeAndBcs->GetBoundaryCondition());
+            p_bcc->AddDirichletBoundaryCondition(*node_iter, this->GetBoundaryCondition());
         }
     }
 
@@ -148,7 +148,7 @@ void ParabolicGrowingDomainPdeModifier<DIM>::UpdateSolutionVector(AbstractCellPo
     }
     this->mSolution = PetscTools::CreateAndSetVec(this->mpFeMesh->GetNumNodes(), 0.0);
 
-    std::string& variable_name = this->mpPdeAndBcs->rGetDependentVariableName();
+    std::string& variable_name = this->mDependentVariableName;
 
     for (typename TetrahedralMesh<DIM,DIM>::NodeIterator node_iter = this->mpFeMesh->GetNodeIteratorBegin();
          node_iter != this->mpFeMesh->GetNodeIteratorEnd();
@@ -160,8 +160,8 @@ void ParabolicGrowingDomainPdeModifier<DIM>::UpdateSolutionVector(AbstractCellPo
              ++node_iter)
         {
             unsigned node_index = node_iter->GetIndex();
-            bool dirichlet_bc_applies = (node_iter->IsBoundaryNode()) && (!(this->mpPdeAndBcs->IsNeumannBoundaryCondition()));
-            double boundary_value = this->mpPdeAndBcs->GetBoundaryCondition()->GetValue(node_iter->rGetLocation());
+            bool dirichlet_bc_applies = (node_iter->IsBoundaryNode()) && (!(this->IsNeumannBoundaryCondition()));
+            double boundary_value = this->GetBoundaryCondition()->GetValue(node_iter->rGetLocation());
 
             double solution_at_node = rCellPopulation.GetCellDataItemAtPdeNode(node_index, variable_name, dirichlet_bc_applies, boundary_value);
 

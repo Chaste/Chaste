@@ -44,8 +44,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CheckpointArchiveTypes.hpp"
 #include "EllipticGrowingDomainPdeModifier.hpp"
 #include "ParabolicGrowingDomainPdeModifier.hpp"
-#include "PdeAndBoundaryConditions.hpp"
-#include "PdeAndBoundaryConditions.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "MutableVertexMesh.hpp"
@@ -82,14 +80,11 @@ public:
         // Make the PDE and BCs
         UniformSourceEllipticPde<2> pde(-0.1);
         ConstBoundaryCondition<2> bc(1.0);
-        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
-        p_pde_and_bc->SetDependentVariableName("averaged quantity");
-
-        // Create an elliptic PDE modifier object using this PDE and BCs object
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc));
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
+        p_pde_modifier->SetDependentVariableName("averaged quantity");
 
         // Test that member variables are initialised correctly
-        TS_ASSERT_EQUALS(p_pde_modifier->mpPdeAndBcs->rGetDependentVariableName(), "averaged quantity");
+        TS_ASSERT_EQUALS(p_pde_modifier->rGetDependentVariableName(), "averaged quantity");
     }
 
     void TestParabolicConstructor() throw(Exception)
@@ -97,14 +92,11 @@ public:
         // Make the PDE and BCs
         UniformSourceParabolicPde<2> pde(-0.1);
         ConstBoundaryCondition<2> bc(1.0);
-        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
-        p_pde_and_bc->SetDependentVariableName("averaged quantity");
-
-        // Create a parabolic PDE modifier object using this PDE and BCs object
-        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc));
+        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
+        p_pde_modifier->SetDependentVariableName("averaged quantity");
 
         // Test that member variables are initialised correctly
-        TS_ASSERT_EQUALS(p_pde_modifier->mpPdeAndBcs->rGetDependentVariableName(), "averaged quantity");
+        TS_ASSERT_EQUALS(p_pde_modifier->rGetDependentVariableName(), "averaged quantity");
     }
 
     void TestMeshGeneration() throw(Exception)
@@ -112,14 +104,13 @@ public:
         // Create a PDE and BCs object to be used by all cell populations
         UniformSourceEllipticPde<2> pde(-0.1);
         ConstBoundaryCondition<2> bc(1.0);
-        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
-        p_pde_and_bc->SetDependentVariableName("averaged quantity");
 
         // Create a CellsGenerator to be used by all cell populations
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
 
-        // Create a PDE modifier object using this PDE and BCs object
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc));
+        // Create a PDE modifier object
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
+        p_pde_modifier->SetDependentVariableName("averaged quantity");
         {
             // Create a MeshBasedCellPopulation
             HoneycombMeshGenerator generator(10, 10, 0);
@@ -290,18 +281,14 @@ public:
 
         AveragedSourceEllipticPde<2> pde(cell_population, -1.0);
         ConstBoundaryCondition<2> bc(1.0);
-        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
-        p_pde_and_bc->SetDependentVariableName("nutrient");
-
-        EllipticGrowingDomainPdeModifier<2> elliptic_pde_modifier(p_pde_and_bc);
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
+        p_pde_modifier->SetDependentVariableName("nutrient");
         TS_ASSERT_THROWS_THIS(elliptic_pde_modifier.SetupSolve(cell_population, "output_directory"),
             "EllipticGrowingDomainPdeModifier cannot be used with an AveragedSourceEllipticPde. Use an EllipticBoxDomainPdeModifier instead.");
 
         AveragedSourceParabolicPde<2> pde2(cell_population, -1.0);
-        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc2, (&pde2, &bc, false));
-        p_pde_and_bc2->SetDependentVariableName("nutrient");
-
-        ParabolicGrowingDomainPdeModifier<2> parabolic_pde_modifier(p_pde_and_bc2);
+        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier2, (&pde2, &bc, false));
+        p_pde_modifier2->SetDependentVariableName("nutrient");
         TS_ASSERT_THROWS_THIS(parabolic_pde_modifier.SetupSolve(cell_population, "output_directory"),
             "ParabolicGrowingDomainPdeModifier cannot be used with an AveragedSourceParabolicPde. Use a ParabolicBoxDomainPdeModifier instead.");
     }
@@ -318,10 +305,8 @@ public:
             // Make the PDE and BCs
             UniformSourceEllipticPde<2> pde(-0.1);
             ConstBoundaryCondition<2> bc(1.0);
-            MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
-            p_pde_and_bc->SetDependentVariableName("averaged quantity");
 
-            // Initialise an elliptic PDE modifier object using this PDE and BCs object
+            // Initialise an elliptic PDE modifier object
             std::vector<double> data(10);
             for (unsigned i=0; i<10; i++)
             {
@@ -329,7 +314,8 @@ public:
             }
             Vec vector = PetscTools::CreateVec(data);
 
-            EllipticGrowingDomainPdeModifier<2> modifier(p_pde_and_bc, vector);
+            EllipticGrowingDomainPdeModifier<2> modifier(&pde, &bc, false, vector);
+            modifier.SetDependentVariableName("averaged quantity");
 
             // Create an output archive
             std::ofstream ofs(archive_filename.c_str());
@@ -351,7 +337,7 @@ public:
             input_arch >> p_modifier2;
 
             // See whether we read out the correct variable name area
-            std::string variable_name = (static_cast<EllipticGrowingDomainPdeModifier<2>*>(p_modifier2))->mpPdeAndBcs->rGetDependentVariableName();
+            std::string variable_name = (static_cast<EllipticGrowingDomainPdeModifier<2>*>(p_modifier2))->rGetDependentVariableName();
             TS_ASSERT_EQUALS(variable_name, "averaged quantity");
 
             Vec solution = (static_cast<EllipticGrowingDomainPdeModifier<2>*>(p_modifier2))->GetSolution();
@@ -379,10 +365,8 @@ public:
             // Make the PDE and BCs
             UniformSourceParabolicPde<2> pde(-0.1);
             ConstBoundaryCondition<2> bc(1.0);
-            MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
-            p_pde_and_bc->SetDependentVariableName("averaged quantity");
 
-            // Initialise a parabolic PDE modifier object using this PDE and BCs object
+            // Initialise a parabolic PDE modifier object
             std::vector<double> data(10);
             for (unsigned i=0; i<10; i++)
             {
@@ -390,7 +374,8 @@ public:
             }
             Vec vector = PetscTools::CreateVec(data);
 
-            ParabolicGrowingDomainPdeModifier<2> modifier(p_pde_and_bc, vector);
+            ParabolicGrowingDomainPdeModifier<2> modifier(&pde, &bc, false, vector);
+            modifier.SetDependentVariableName("averaged quantity");
 
             // Create an output archive
             std::ofstream ofs(archive_filename.c_str());
@@ -412,7 +397,7 @@ public:
             input_arch >> p_modifier2;
 
             // See whether we read out the correct variable name
-            std::string variable_name = (static_cast<ParabolicGrowingDomainPdeModifier<2>*>(p_modifier2))->mpPdeAndBcs->rGetDependentVariableName();
+            std::string variable_name = (static_cast<ParabolicGrowingDomainPdeModifier<2>*>(p_modifier2))->rGetDependentVariableName();
             TS_ASSERT_EQUALS(variable_name, "averaged quantity");
 
             Vec solution = (static_cast<ParabolicGrowingDomainPdeModifier<2>*>(p_modifier2))->GetSolution();

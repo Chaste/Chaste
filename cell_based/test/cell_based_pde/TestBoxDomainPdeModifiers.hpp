@@ -42,8 +42,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CheckpointArchiveTypes.hpp"
 #include "EllipticBoxDomainPdeModifier.hpp"
 #include "ParabolicBoxDomainPdeModifier.hpp"
-#include "PdeAndBoundaryConditions.hpp"
-#include "PdeAndBoundaryConditions.hpp"
 #include "UniformSourceEllipticPde.hpp"
 #include "UniformSourceParabolicPde.hpp"
 #include "ConstBoundaryCondition.hpp"
@@ -64,19 +62,17 @@ public:
         // Make the PDE and BCs
         UniformSourceEllipticPde<2> pde(-0.1);
         ConstBoundaryCondition<2> bc(1.0);
-        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
-        p_pde_and_bc->SetDependentVariableName("averaged quantity");
 
         // Make domain
         ChastePoint<2> lower(-10.0, -10.0);
         ChastePoint<2> upper(10.0, 10.0);
         ChasteCuboid<2> cuboid(lower, upper);
 
-        // Create an elliptic PDE modifier object using this PDE and BCs object
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc, &cuboid, 2.0));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, &cuboid, 2.0));
+        p_pde_modifier->SetDependentVariableName("averaged quantity");
 
         // Test that member variables are initialised correctly
-        TS_ASSERT_EQUALS(p_pde_modifier->mpPdeAndBcs->rGetDependentVariableName(), "averaged quantity");
+        TS_ASSERT_EQUALS(p_pde_modifier->rGetDependentVariableName(), "averaged quantity");
 
         // Check mesh
         TS_ASSERT_EQUALS(p_pde_modifier->mpFeMesh->GetNumNodes(),121u);
@@ -101,19 +97,17 @@ public:
         // Make the PDE and BCs
         UniformSourceParabolicPde<2> pde(-0.1);
         ConstBoundaryCondition<2> bc(1.0);
-        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
-        p_pde_and_bc->SetDependentVariableName("averaged quantity");
 
         // Make domain
         ChastePoint<2> lower(-10.0, -10.0);
         ChastePoint<2> upper(10.0, 10.0);
         ChasteCuboid<2> cuboid(lower, upper);
 
-        // Create a parabolic PDE modifier object using this PDE and BCs object
-        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc, &cuboid, 2.0));
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, &cuboid, 2.0));
+        p_pde_modifier->SetDependentVariableName("averaged quantity");
 
         // Test that member variables are initialised correctly
-        TS_ASSERT_EQUALS(p_pde_modifier->mpPdeAndBcs->rGetDependentVariableName(), "averaged quantity");
+        TS_ASSERT_EQUALS(p_pde_modifier->rGetDependentVariableName(), "averaged quantity");
 
         // Check mesh
         TS_ASSERT_EQUALS(p_pde_modifier->mpFeMesh->GetNumNodes(),121u);
@@ -145,15 +139,13 @@ public:
             // Make the PDE and BCs
             UniformSourceEllipticPde<2> pde(-0.1);
             ConstBoundaryCondition<2> bc(1.0);
-            MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
-            p_pde_and_bc->SetDependentVariableName("averaged quantity");
 
             // Make domain
             ChastePoint<2> lower(-10.0, -10.0);
             ChastePoint<2> upper(10.0, 10.0);
             ChasteCuboid<2> cuboid(lower, upper);
 
-            // Initialise an elliptic PDE modifier object using this PDE and BCs object
+            // Initialise an elliptic PDE modifier object
             std::vector<double> data(10);
             for (unsigned i=0; i<10; i++)
             {
@@ -161,7 +153,8 @@ public:
             }
             Vec vector = PetscTools::CreateVec(data);
 
-            EllipticBoxDomainPdeModifier<2> modifier(p_pde_and_bc, &cuboid, 2.0, vector);
+            EllipticBoxDomainPdeModifier<2> modifier(&pde, &bc, false, &cuboid, 2.0, vector);
+            modifier.SetDependentVariableName("averaged quantity");
 
             // Create an output archive
             std::ofstream ofs(archive_filename.c_str());
@@ -183,7 +176,7 @@ public:
             input_arch >> p_modifier2;
 
             // See whether we read out the correct variable name area
-            std::string variable_name = (static_cast<EllipticBoxDomainPdeModifier<2>*>(p_modifier2))->mpPdeAndBcs->rGetDependentVariableName();
+            std::string variable_name = (static_cast<EllipticBoxDomainPdeModifier<2>*>(p_modifier2))->rGetDependentVariableName();
 
             TS_ASSERT_EQUALS(variable_name, "averaged quantity");
 
@@ -212,15 +205,13 @@ public:
             // Make the PDE and BCs
             UniformSourceParabolicPde<2> pde(-0.1);
             ConstBoundaryCondition<2> bc(1.0);
-            MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
-            p_pde_and_bc->SetDependentVariableName("averaged quantity");
 
             // Make domain
             ChastePoint<2> lower(-10.0, -10.0);
             ChastePoint<2> upper(10.0, 10.0);
             ChasteCuboid<2> cuboid(lower, upper);
 
-            // Initialise an elliptic PDE modifier object using this PDE and BCs object
+            // Initialise a parabolic PDE modifier object
             std::vector<double> data(10);
             for (unsigned i=0; i<10; i++)
             {
@@ -228,7 +219,8 @@ public:
             }
             Vec vector = PetscTools::CreateVec(data);
 
-            ParabolicBoxDomainPdeModifier<2> modifier(p_pde_and_bc, &cuboid, 2.0, vector);
+            ParabolicBoxDomainPdeModifier<2> modifier(&pde, &bc, false, &cuboid, 2.0, vector);
+            modifier.SetDependentVariableName("averaged quantity");
 
             // Create an output archive
             std::ofstream ofs(archive_filename.c_str());
@@ -250,7 +242,7 @@ public:
             input_arch >> p_modifier2;
 
             // See whether we read out the correct variable name
-            std::string variable_name = (static_cast<ParabolicBoxDomainPdeModifier<2>*>(p_modifier2))->mpPdeAndBcs->rGetDependentVariableName();
+            std::string variable_name = (static_cast<ParabolicBoxDomainPdeModifier<2>*>(p_modifier2))->rGetDependentVariableName();
             TS_ASSERT_EQUALS(variable_name, "averaged quantity");
 
             Vec solution = (static_cast<ParabolicBoxDomainPdeModifier<2>*>(p_modifier2))->GetSolution();

@@ -159,10 +159,8 @@ public:
 
         SimplePdeForTesting pde;
         ConstBoundaryCondition<2> bc(1.0);
-        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
-        p_pde_and_bc->SetDependentVariableName("oxygen");
-
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc));
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
+        p_pde_modifier->SetDependentVariableName("oxygen");
         simulator.AddSimulationModifier(p_pde_modifier);
 
         /*
@@ -248,10 +246,8 @@ public:
 
         UniformSourceEllipticPde<2> pde(-0.1);
         ConstBoundaryCondition<2> bc(1.0);
-        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
-        p_pde_and_bc->SetDependentVariableName("oxygen");
-
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc));
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
+        p_pde_modifier->SetDependentVariableName("oxygen");
         simulator.AddSimulationModifier(p_pde_modifier);
 
         simulator.SetOutputDirectory("OffLatticeSimulationWithOxygen");
@@ -352,10 +348,8 @@ public:
 
         CellwiseSourceEllipticPde<2> pde(cell_population, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
-        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
-        p_pde_and_bc->SetDependentVariableName("oxygen");
-
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc));
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
+        p_pde_modifier->SetDependentVariableName("oxygen");
         simulator.AddSimulationModifier(p_pde_modifier);
 
         // Create a force law and pass it to the simulation
@@ -429,9 +423,8 @@ public:
 
         CellwiseSourceEllipticPde<2> pde(cell_population, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
-        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
-        p_pde_and_bc->SetDependentVariableName("oxygen");
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc));
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
+        p_pde_modifier->SetDependentVariableName("oxygen");
         simulator.AddSimulationModifier(p_pde_modifier);
 
         // Create a force law and pass it to the simulation
@@ -506,10 +499,8 @@ public:
 
         UniformSourceEllipticPde<2> pde(-0.1);
         ConstBoundaryCondition<2> bc(1.0);
-        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
-        p_pde_and_bc->SetDependentVariableName("oxygen");
-
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc));
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
+        p_pde_modifier->SetDependentVariableName("oxygen");
         simulator.AddSimulationModifier(p_pde_modifier);
 
         // Create a force law and pass it to the simulation
@@ -597,22 +588,20 @@ public:
 
         AveragedSourceEllipticPde<2> pde(cell_population, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
-        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
-        p_pde_and_bc->SetDependentVariableName("oxygen");
 
         AveragedSourceEllipticPde<2> pde2(cell_population, -0.5);
-        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc2, (&pde2, &bc, false));
-        p_pde_and_bc2->SetDependentVariableName("dunno");
 
         c_vector<double,2> centroid = cell_population.GetCentroidOfCellPopulation();
         ChastePoint<2> lower(centroid(0)-25.0, centroid(1)-25.0);
         ChastePoint<2> upper(centroid(0)+25.0, centroid(1)+25.0);
         ChasteCuboid<2> cuboid(lower, upper);
 
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc, &cuboid, 10.0));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, &cuboid, 10.0));
+        p_pde_modifier->SetDependentVariableName("oxygen");
         p_pde_modifier->SetBcsOnBoxBoundary(false);
         simulator.AddSimulationModifier(p_pde_modifier);
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier2, (p_pde_and_bc2, &cuboid, 10.0));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier2, (&pde2, &bc, false, &cuboid, 10.0));
+        p_pde_modifier2->SetDependentVariableName("dunno");
         p_pde_modifier2->SetBcsOnBoxBoundary(false);
         simulator.AddSimulationModifier(p_pde_modifier2);
 
@@ -736,15 +725,14 @@ public:
 
         AveragedSourceEllipticPde<2> pde(cell_population, 0.0);
         ConstBoundaryCondition<2> bc(1.0);
-        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
-        p_pde_and_bc->SetDependentVariableName("nutrient");
 
         c_vector<double,2> centroid = cell_population.GetCentroidOfCellPopulation();
         ChastePoint<2> lower(centroid(0)-25.0, centroid(1)-25.0);
         ChastePoint<2> upper(centroid(0)+25.0, centroid(1)+25.0);
         ChasteCuboid<2> cuboid(lower, upper);
 
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc, &cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, &cuboid));
+        p_pde_modifier->SetDependentVariableName("nutrient");
         simulator.AddSimulationModifier(p_pde_modifier);
 
         // Create a force law and pass it to the simulation
@@ -805,10 +793,8 @@ public:
 
         UniformSourceEllipticPde<2> pde(-0.1);
         ConstBoundaryCondition<2> bc(1.0);
-        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
-        p_pde_and_bc->SetDependentVariableName("oxygen");
-
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc));
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
+        p_pde_modifier->SetDependentVariableName("oxygen");
         simulator.AddSimulationModifier(p_pde_modifier);
 
         // Create a force law and pass it to the simulation
@@ -895,10 +881,8 @@ public:
 
         CellwiseSourceEllipticPde<2> pde(cell_population, -0.03);
         ConstBoundaryCondition<2> bc(1.0);
-        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
-        p_pde_and_bc->SetDependentVariableName("oxygen");
-
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc));
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
+        p_pde_modifier->SetDependentVariableName("oxygen");
         simulator.AddSimulationModifier(p_pde_modifier);
 
         // Create a force law and pass it to the simulation
@@ -959,10 +943,8 @@ public:
 
         UniformSourceEllipticPde<3> pde(-0.03);
         ConstBoundaryCondition<3> bc(1.0);
-        MAKE_PTR_ARGS(PdeAndBoundaryConditions<3>, p_pde_and_bc, (&pde, &bc, false));
-        p_pde_and_bc->SetDependentVariableName("oxygen");
-
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<3>, p_pde_modifier, (p_pde_and_bc));
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<3>, p_pde_modifier, (&pde, &bc, false));
+        p_pde_modifier->SetDependentVariableName("oxygen");
         simulator.AddSimulationModifier(p_pde_modifier);
 
         // Create a force law and pass it to the simulation
@@ -1019,10 +1001,8 @@ public:
 
         SimplePdeForTesting pde;
         FunctionalBoundaryCondition<2> functional_bc(&bc_func);
-        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &functional_bc, false));
-        p_pde_and_bc->SetDependentVariableName("oxygen");
-
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc));
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &functional_bc, false));
+        p_pde_modifier->SetDependentVariableName("oxygen");
         simulator.AddSimulationModifier(p_pde_modifier);
 
         double end_time = 0.5;
@@ -1071,10 +1051,8 @@ public:
         // Set up PDE and pass to simulation
         CellwiseSourceEllipticPde<2> pde(cell_population, -0.03);
         ConstBoundaryCondition<2> bc(1.0);
-        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
-        p_pde_and_bc->SetDependentVariableName("oxygen");
-
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc));
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
+        p_pde_modifier->SetDependentVariableName("oxygen");
         simulator.AddSimulationModifier(p_pde_modifier);
 
         // Create a force law and pass it to the simulation
@@ -1134,15 +1112,14 @@ public:
 
         AveragedSourceEllipticPde<2> pde(cell_population, 0.0);
         ConstBoundaryCondition<2> bc(1.0);
-        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
-        p_pde_and_bc->SetDependentVariableName("nutrient");
 
         c_vector<double,2> centroid = cell_population.GetCentroidOfCellPopulation();
         ChastePoint<2> lower(centroid(0)-25.0, centroid(1)-25.0);
         ChastePoint<2> upper(centroid(0)+25.0, centroid(1)+25.0);
         ChasteCuboid<2> cuboid(lower, upper);
 
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc, &cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, &cuboid));
+        p_pde_modifier->SetDependentVariableName("nutrient");
         simulator.AddSimulationModifier(p_pde_modifier);
 
         // Create a force law and pass it to the simulation
@@ -1211,15 +1188,13 @@ public:
         AveragedSourceEllipticPde<2> pde(cell_population, 0.0);
         ConstBoundaryCondition<2> bc(1.0);
 
-        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
-        p_pde_and_bc->SetDependentVariableName("nutrient");
-
         c_vector<double,2> centroid = cell_population.GetCentroidOfCellPopulation();
         ChastePoint<2> lower(centroid(0)-25.0, centroid(1)-25.0);
         ChastePoint<2> upper(centroid(0)+25.0, centroid(1)+25.0);
         ChasteCuboid<2> cuboid(lower, upper);
 
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc, &cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, &cuboid));
+        p_pde_modifier->SetDependentVariableName("nutrient");
         simulator.AddSimulationModifier(p_pde_modifier);
 
         // Create a force law and pass it to the simulation
@@ -1306,15 +1281,14 @@ public:
         // Set up PDE and pass to simulation (uniform uptake at each cell)
         VolumeDependentAveragedSourceEllipticPde<2> pde(cell_population, -0.01);
         ConstBoundaryCondition<2> bc(1.0);
-        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
-        p_pde_and_bc->SetDependentVariableName("nutrient");
 
         c_vector<double,2> centroid = cell_population.GetCentroidOfCellPopulation();
         ChastePoint<2> lower(centroid(0)-25.0, centroid(1)-25.0);
         ChastePoint<2> upper(centroid(0)+25.0, centroid(1)+25.0);
         ChasteCuboid<2> cuboid(lower, upper);
 
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc, &cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, &cuboid));
+        p_pde_modifier->SetDependentVariableName("nutrient");
         simulator.AddSimulationModifier(p_pde_modifier);
 
         // Solve the system
@@ -1389,13 +1363,13 @@ public:
 
         AveragedSourceEllipticPde<1> pde(cell_population, -1.0);
         ConstBoundaryCondition<1> bc(0.0);
-        MAKE_PTR_ARGS(PdeAndBoundaryConditions<1>, p_pde_and_bc, (&pde, &bc, false));
-        p_pde_and_bc->SetDependentVariableName("nutrient");
 
         ChastePoint<1> lower(0.0);
         ChastePoint<1> upper(2.0);
         ChasteCuboid<1> cuboid(lower, upper);
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<1>, p_pde_modifier, (p_pde_and_bc, &cuboid));
+
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<1>, p_pde_modifier, (&pde, &bc, false, &cuboid));
+        p_pde_modifier->SetDependentVariableName("nutrient");
         simulator.AddSimulationModifier(p_pde_modifier);
 
         simulator.SetOutputDirectory("TestCoarsePdeSolutionOnNodeBased1d");
@@ -1449,15 +1423,13 @@ public:
 
         AveragedSourceEllipticPde<2> pde(cell_population, -0.01);
         ConstBoundaryCondition<2> bc(1.0);
-        MAKE_PTR_ARGS(PdeAndBoundaryConditions<2>, p_pde_and_bc, (&pde, &bc, false));
-        p_pde_and_bc->SetDependentVariableName("nutrient");
-
         c_vector<double,2> centroid = cell_population.GetCentroidOfCellPopulation();
         ChastePoint<2> lower(centroid(0)-25.0, centroid(1)-25.0);
         ChastePoint<2> upper(centroid(0)+25.0, centroid(1)+25.0);
         ChasteCuboid<2> cuboid(lower, upper);
 
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde_and_bc, &cuboid, 10.0));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, &cuboid, 10.0));
+        p_pde_modifier->SetDependentVariableName("nutrient");
         p_pde_modifier->SetBcsOnBoxBoundary(false);
         simulator.AddSimulationModifier(p_pde_modifier);
 
@@ -1508,15 +1480,14 @@ public:
 
         AveragedSourceEllipticPde<3> pde(cell_population, -0.01);
         ConstBoundaryCondition<3> bc(1.0);
-        MAKE_PTR_ARGS(PdeAndBoundaryConditions<3>, p_pde_and_bc, (&pde, &bc, false));
-        p_pde_and_bc->SetDependentVariableName("nutrient");
 
         c_vector<double,3> centroid = cell_population.GetCentroidOfCellPopulation();
         ChastePoint<3> lower(centroid(0)-25.0, centroid(1)-25.0, centroid(2)-25.0);
         ChastePoint<3> upper(centroid(0)+25.0, centroid(1)+25.0, centroid(2)+25.0);
         ChasteCuboid<3> cuboid(lower, upper);
 
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<3>, p_pde_modifier, (p_pde_and_bc, &cuboid, 10.0));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<3>, p_pde_modifier, (&pde, &bc, false, &cuboid, 10.0));
+        p_pde_modifier->SetDependentVariableName("nutrient");
         p_pde_modifier->SetBcsOnBoxBoundary(false);
         simulator.AddSimulationModifier(p_pde_modifier);
 

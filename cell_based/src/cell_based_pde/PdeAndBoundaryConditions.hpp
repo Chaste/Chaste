@@ -106,9 +106,9 @@ public:
      *     (defaults to false)
      */
     PdeAndBoundaryConditions(AbstractLinearPde<DIM,DIM>* pPde=NULL,
-                                     AbstractBoundaryCondition<DIM>* pBoundaryCondition=NULL,
-                                     bool isNeumannBoundaryCondition=true,
-                                     bool deleteMemberPointersInDestructor=false);
+                             AbstractBoundaryCondition<DIM>* pBoundaryCondition=NULL,
+                             bool isNeumannBoundaryCondition=true,
+                             bool deleteMemberPointersInDestructor=false);
 
     /**
      * Destructor.

@@ -66,11 +66,11 @@ void EllipticBoxDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopula
 
     // When using a PDE mesh which doesn't coincide with the cells, we must set up the source terms before solving the PDE.
     // Pass in already updated CellPdeElementMap to speed up finding cells.
-    this->mpPdeAndBcs->SetUpSourceTermsForAveragedSourcePde(this->mpFeMesh, &this->mCellPdeElementMap);
+    this->SetUpSourceTermsForAveragedSourcePde(this->mpFeMesh, &this->mCellPdeElementMap);
 
     // Use SimpleLinearEllipticSolver as Averaged Source PDE
     SimpleLinearEllipticSolver<DIM,DIM> solver(this->mpFeMesh,
-                                               static_cast<AbstractLinearEllipticPde<DIM,DIM>*>(this->mpPdeAndBcs->GetPde()),
+                                               static_cast<AbstractLinearEllipticPde<DIM,DIM>*>(this->GetPde()),
                                                p_bcc.get());
 
     ///\todo Use initial guess when solving the system (#2687)
@@ -105,7 +105,7 @@ std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > EllipticBoxDomainPdeModif
 
     // To be well-defined, elliptic PDE problems on box domains require at least some Dirichlet boundary conditions
     ///\todo Replace this assertion with an exception in the PdeAndBoundaryConditions constructor
-    assert(!(this->mpPdeAndBcs->IsNeumannBoundaryCondition()));
+    assert(!(this->IsNeumannBoundaryCondition()));
 
 	if (!this->mSetBcsOnBoxBoundary)
 	{
@@ -138,7 +138,7 @@ std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > EllipticBoxDomainPdeModif
 			 iter != coarse_mesh_boundary_node_indices.end();
 			 ++iter)
 		{
-			p_bcc->AddDirichletBoundaryCondition(this->mpFeMesh->GetNode(*iter), this->mpPdeAndBcs->GetBoundaryCondition(), 0, false);
+			p_bcc->AddDirichletBoundaryCondition(this->mpFeMesh->GetNode(*iter), this->GetBoundaryCondition(), 0, false);
 		}
 	}
 	else // apply BC at boundary nodes of box domain FE mesh
@@ -147,7 +147,7 @@ std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > EllipticBoxDomainPdeModif
 			 node_iter != this->mpFeMesh->GetBoundaryNodeIteratorEnd();
 			 ++node_iter)
 		{
-			p_bcc->AddDirichletBoundaryCondition(*node_iter, this->mpPdeAndBcs->GetBoundaryCondition());
+			p_bcc->AddDirichletBoundaryCondition(*node_iter, this->GetBoundaryCondition());
 		}
 	}
 
