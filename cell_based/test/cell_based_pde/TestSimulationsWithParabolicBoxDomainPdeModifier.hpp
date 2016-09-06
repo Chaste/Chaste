@@ -144,7 +144,7 @@ public:
         ChastePoint<2> upper(7.0, 7.0);
         ChasteCuboid<2> cuboid(lower, upper);
 
-        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, &cuboid));
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, false, &cuboid));
         p_pde_modifier->SetDependentVariableName("oxygen");
         simulator.AddSimulationModifier(p_pde_modifier);
 
@@ -201,7 +201,7 @@ public:
         ChasteCuboid<2> cuboid(lower, upper);
 
         // Create a PDE modifier object
-        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, &cuboid));
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, false, &cuboid));
         p_pde_modifier->SetDependentVariableName("oxygen");
         simulator.AddSimulationModifier(p_pde_modifier);
 
@@ -257,7 +257,7 @@ public:
         ChastePoint<2> upper(7.0, 7.0);
         ChasteCuboid<2> cuboid(lower, upper);
 
-        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, &cuboid));
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, false, &cuboid));
         p_pde_modifier->SetDependentVariableName("oxygen");
         simulator.AddSimulationModifier(p_pde_modifier);
 
@@ -316,7 +316,7 @@ public:
         ChasteCuboid<2> cuboid(lower, upper);
 
         // Create a PDE modifier object
-        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, &cuboid));
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, false, &cuboid));
         p_pde_modifier->SetDependentVariableName("oxygen");
         simulator.AddSimulationModifier(p_pde_modifier);
 
@@ -375,7 +375,7 @@ public:
         ChastePoint<2> upper(7.0, 7.0);
         ChasteCuboid<2> cuboid(lower, upper);
 
-        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, &cuboid));
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, false, &cuboid));
         p_pde_modifier->SetDependentVariableName("oxygen");
         simulator.AddSimulationModifier(p_pde_modifier);
 
@@ -442,7 +442,7 @@ public:
         ChasteCuboid<2> cuboid(lower, upper);
 
         // Create a PDE modifier object
-        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, &cuboid));
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, false, &cuboid));
         p_pde_modifier->SetDependentVariableName("oxygen");
         simulator.AddSimulationModifier(p_pde_modifier);
 

@@ -39,9 +39,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 
 template<unsigned DIM>
-ParabolicGrowingDomainPdeModifier<DIM>::ParabolicGrowingDomainPdeModifier(boost::shared_ptr<PdeAndBoundaryConditions<DIM> > pPdeAndBcs,
+ParabolicGrowingDomainPdeModifier<DIM>::ParabolicGrowingDomainPdeModifier(AbstractLinearPde<DIM,DIM>* pPde,
+                                                                          AbstractBoundaryCondition<DIM>* pBoundaryCondition,
+                                                                          bool isNeumannBoundaryCondition,
+                                                                          bool deleteMemberPointersInDestructor,
                                                                           Vec solution)
-    : AbstractGrowingDomainPdeModifier<DIM>(pPdeAndBcs, solution)
+    : AbstractGrowingDomainPdeModifier<DIM>(pPde,
+    		                                pBoundaryCondition,
+    		                                isNeumannBoundaryCondition,
+    		                                deleteMemberPointersInDestructor,
+    		                                solution)
 {
 }
 
@@ -68,7 +75,7 @@ void ParabolicGrowingDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellP
 
     // Use CellBasedParabolicPdeSolver as cell wise PDE
     CellBasedParabolicPdeSolver<DIM> solver(this->mpFeMesh,
-                                            static_cast<AbstractLinearParabolicPde<DIM,DIM>*>(mpPde),
+                                            static_cast<AbstractLinearParabolicPde<DIM,DIM>*>(this->mpPde),
                                             p_bcc.get());
 
     ///\todo Investigate more than one PDE time step per spatial step (#2687)

@@ -162,7 +162,7 @@ inline void load_construct_data(
         PetscTools::ReadPetscObject(solution, archive_filename);
     }
 
-    ::new(t)EllipticGrowingDomainPdeModifier<DIM>(boost::shared_ptr<PdeAndBoundaryConditions<DIM> >(), solution);
+    ::new(t)EllipticGrowingDomainPdeModifier<DIM>(NULL, NULL, true, false, solution);
 }
 }
 } // namespace ...

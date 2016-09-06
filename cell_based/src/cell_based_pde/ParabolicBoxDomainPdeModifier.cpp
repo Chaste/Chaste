@@ -37,11 +37,20 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SimpleLinearParabolicSolver.hpp"
 
 template<unsigned DIM>
-ParabolicBoxDomainPdeModifier<DIM>::ParabolicBoxDomainPdeModifier(boost::shared_ptr<PdeAndBoundaryConditions<DIM> > pPdeAndBcs,
+ParabolicBoxDomainPdeModifier<DIM>::ParabolicBoxDomainPdeModifier(AbstractLinearPde<DIM,DIM>* pPde,
+                                                                  AbstractBoundaryCondition<DIM>* pBoundaryCondition,
+                                                                  bool isNeumannBoundaryCondition,
+                                                                  bool deleteMemberPointersInDestructor,
                                                                   ChasteCuboid<DIM>* pMeshCuboid,
                                                                   double stepSize,
                                                                   Vec solution)
-    : AbstractBoxDomainPdeModifier<DIM>(pPdeAndBcs, pMeshCuboid, stepSize, solution)
+    : AbstractBoxDomainPdeModifier<DIM>(pPde,
+    		                            pBoundaryCondition,
+    		                            isNeumannBoundaryCondition,
+    		                            deleteMemberPointersInDestructor,
+    		                            pMeshCuboid,
+    		                            stepSize,
+    		                            solution)
 {
 }
 

@@ -283,13 +283,13 @@ public:
         ConstBoundaryCondition<2> bc(1.0);
         MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
         p_pde_modifier->SetDependentVariableName("nutrient");
-        TS_ASSERT_THROWS_THIS(elliptic_pde_modifier.SetupSolve(cell_population, "output_directory"),
+        TS_ASSERT_THROWS_THIS(p_pde_modifier->SetupSolve(cell_population, "output_directory"),
             "EllipticGrowingDomainPdeModifier cannot be used with an AveragedSourceEllipticPde. Use an EllipticBoxDomainPdeModifier instead.");
 
         AveragedSourceParabolicPde<2> pde2(cell_population, -1.0);
         MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier2, (&pde2, &bc, false));
         p_pde_modifier2->SetDependentVariableName("nutrient");
-        TS_ASSERT_THROWS_THIS(parabolic_pde_modifier.SetupSolve(cell_population, "output_directory"),
+        TS_ASSERT_THROWS_THIS(p_pde_modifier2->SetupSolve(cell_population, "output_directory"),
             "ParabolicGrowingDomainPdeModifier cannot be used with an AveragedSourceParabolicPde. Use a ParabolicBoxDomainPdeModifier instead.");
     }
 

@@ -34,15 +34,23 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "EllipticBoxDomainPdeModifier.hpp"
-#include "PdeAndBoundaryConditions.hpp"
 #include "SimpleLinearEllipticSolver.hpp"
 
 template<unsigned DIM>
-EllipticBoxDomainPdeModifier<DIM>::EllipticBoxDomainPdeModifier(boost::shared_ptr<PdeAndBoundaryConditions<DIM> > pPdeAndBcs,
+EllipticBoxDomainPdeModifier<DIM>::EllipticBoxDomainPdeModifier(AbstractLinearPde<DIM,DIM>* pPde,
+                                                                AbstractBoundaryCondition<DIM>* pBoundaryCondition,
+                                                                bool isNeumannBoundaryCondition,
+                                                                bool deleteMemberPointersInDestructor,
                                                                 ChasteCuboid<DIM>* pMeshCuboid,
                                                                 double stepSize,
                                                                 Vec solution)
-    : AbstractBoxDomainPdeModifier<DIM>(pPdeAndBcs, pMeshCuboid, stepSize, solution)
+    : AbstractBoxDomainPdeModifier<DIM>(pPde,
+    		                            pBoundaryCondition,
+    	                             	isNeumannBoundaryCondition,
+    	                                deleteMemberPointersInDestructor,
+    		                            pMeshCuboid,
+    		                            stepSize,
+    		                            solution)
 {
 }
 
@@ -104,7 +112,7 @@ std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > EllipticBoxDomainPdeModif
     std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc(new BoundaryConditionsContainer<DIM,DIM,1>(false));
 
     // To be well-defined, elliptic PDE problems on box domains require at least some Dirichlet boundary conditions
-    ///\todo Replace this assertion with an exception in the PdeAndBoundaryConditions constructor
+    ///\todo Replace this assertion with an exception in the constructor
     assert(!(this->IsNeumannBoundaryCondition()));
 
 	if (!this->mSetBcsOnBoxBoundary)

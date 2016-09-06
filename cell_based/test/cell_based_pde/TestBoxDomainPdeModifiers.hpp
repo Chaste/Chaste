@@ -68,7 +68,7 @@ public:
         ChastePoint<2> upper(10.0, 10.0);
         ChasteCuboid<2> cuboid(lower, upper);
 
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, &cuboid, 2.0));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, false, &cuboid, 2.0));
         p_pde_modifier->SetDependentVariableName("averaged quantity");
 
         // Test that member variables are initialised correctly
@@ -103,7 +103,7 @@ public:
         ChastePoint<2> upper(10.0, 10.0);
         ChasteCuboid<2> cuboid(lower, upper);
 
-        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, &cuboid, 2.0));
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, false, &cuboid, 2.0));
         p_pde_modifier->SetDependentVariableName("averaged quantity");
 
         // Test that member variables are initialised correctly
@@ -153,7 +153,7 @@ public:
             }
             Vec vector = PetscTools::CreateVec(data);
 
-            EllipticBoxDomainPdeModifier<2> modifier(&pde, &bc, false, &cuboid, 2.0, vector);
+            EllipticBoxDomainPdeModifier<2> modifier(&pde, &bc, false, false, &cuboid, 2.0, vector);
             modifier.SetDependentVariableName("averaged quantity");
 
             // Create an output archive
@@ -219,7 +219,7 @@ public:
             }
             Vec vector = PetscTools::CreateVec(data);
 
-            ParabolicBoxDomainPdeModifier<2> modifier(&pde, &bc, false, &cuboid, 2.0, vector);
+            ParabolicBoxDomainPdeModifier<2> modifier(&pde, &bc, false, false, &cuboid, 2.0, vector);
             modifier.SetDependentVariableName("averaged quantity");
 
             // Create an output archive

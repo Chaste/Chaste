@@ -36,11 +36,21 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractPdeModifier.hpp"
 #include "VtkMeshWriter.hpp"
 #include "ReplicatableVector.hpp"
+#include "PetscTools.hpp"
+#include "AveragedSourceEllipticPde.hpp"
+#include "AveragedSourceParabolicPde.hpp"
 
 template<unsigned DIM>
-AbstractPdeModifier<DIM>::AbstractPdeModifier(boost::shared_ptr<PdeAndBoundaryConditions<DIM> > pPdeAndBcs,
+AbstractPdeModifier<DIM>::AbstractPdeModifier(AbstractLinearPde<DIM,DIM>* pPde,
+                                              AbstractBoundaryCondition<DIM>* pBoundaryCondition,
+                                              bool isNeumannBoundaryCondition,
+                                              bool deleteMemberPointersInDestructor,
                                               Vec solution)
     : AbstractCellBasedSimulationModifier<DIM>(),
+      mpPde(pPde),
+      mpBoundaryCondition(pBoundaryCondition),
+      mIsNeumannBoundaryCondition(isNeumannBoundaryCondition),
+      mDeleteMemberPointersInDestructor(deleteMemberPointersInDestructor),
       mSolution(NULL),
       mOutputDirectory(""),
       mOutputGradient(false),
@@ -55,6 +65,57 @@ AbstractPdeModifier<DIM>::AbstractPdeModifier(boost::shared_ptr<PdeAndBoundaryCo
 template<unsigned DIM>
 AbstractPdeModifier<DIM>::~AbstractPdeModifier()
 {
+}
+
+template<unsigned DIM>
+AbstractLinearPde<DIM,DIM>* AbstractPdeModifier<DIM>::GetPde() const
+{
+    return mpPde;
+}
+
+template<unsigned DIM>
+AbstractBoundaryCondition<DIM>* AbstractPdeModifier<DIM>::GetBoundaryCondition() const
+{
+    return mpBoundaryCondition;
+}
+
+template<unsigned DIM>
+bool AbstractPdeModifier<DIM>::IsNeumannBoundaryCondition()
+{
+    return mIsNeumannBoundaryCondition;
+}
+
+template<unsigned DIM>
+void AbstractPdeModifier<DIM>::SetDependentVariableName(const std::string& rName)
+{
+    mDependentVariableName = rName;
+}
+
+template<unsigned DIM>
+std::string& AbstractPdeModifier<DIM>::rGetDependentVariableName()
+{
+    return mDependentVariableName;
+}
+
+template<unsigned DIM>
+bool AbstractPdeModifier<DIM>::HasAveragedSourcePde()
+{
+    return ((dynamic_cast<AveragedSourceEllipticPde<DIM>*>(mpPde) != NULL) ||
+            (dynamic_cast<AveragedSourceParabolicPde<DIM>*>(mpPde) != NULL));
+}
+
+template<unsigned DIM>
+void AbstractPdeModifier<DIM>::SetUpSourceTermsForAveragedSourcePde(TetrahedralMesh<DIM,DIM>* pMesh, std::map<CellPtr, unsigned>* pCellPdeElementMap)
+{
+    assert(HasAveragedSourcePde());
+    if (dynamic_cast<AveragedSourceEllipticPde<DIM>*>(mpPde) != NULL)
+    {
+        static_cast<AveragedSourceEllipticPde<DIM>*>(mpPde)->SetupSourceTerms(*pMesh, pCellPdeElementMap);
+    }
+    else if (dynamic_cast<AveragedSourceParabolicPde<DIM>*>(mpPde) != NULL)
+    {
+        static_cast<AveragedSourceParabolicPde<DIM>*>(mpPde)->SetupSourceTerms(*pMesh, pCellPdeElementMap);
+    }
 }
 
 template<unsigned DIM>

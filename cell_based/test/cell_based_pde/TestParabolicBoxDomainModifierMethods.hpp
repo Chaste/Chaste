@@ -108,7 +108,7 @@ public:
         ChasteCuboid<2> cuboid(lower, upper);
 
         // Create a PDE modifier object
-        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, &cuboid));
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, false, &cuboid));
         p_pde_modifier->SetDependentVariableName("variable");
 
         // For coverage, output the solution gradient
@@ -174,7 +174,7 @@ public:
         ChasteCuboid<2> cuboid(lower, upper);
 
         // Create a PDE modifier object
-        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, true, &cuboid));
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, true, false, &cuboid));
         p_pde_modifier->SetDependentVariableName("variable");
         // Only difference from above test is the use of Neuman BCs here
 
@@ -242,7 +242,7 @@ public:
         ChasteCuboid<2> cuboid(lower, upper);
 
         // Create a PDE modifier object
-        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, &cuboid));
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, false, &cuboid));
         p_pde_modifier->SetDependentVariableName("variable");
 
         // For coverage, output the solution gradient
@@ -310,7 +310,7 @@ public:
         ChasteCuboid<2> cuboid(lower, upper);
 
         // Create a PDE modifier object
-        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, &cuboid));
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, false, &cuboid));
         p_pde_modifier->SetDependentVariableName("variable");
 
         // For coverage, output the solution gradient
@@ -377,7 +377,7 @@ public:
         ChasteCuboid<2> cuboid(lower, upper);
 
         // Create a PDE modifier object
-        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, &cuboid));
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, false, &cuboid));
         p_pde_modifier->SetDependentVariableName("variable");
 
         // For coverage, output the solution gradient
@@ -452,7 +452,7 @@ public:
         ChasteCuboid<2> cuboid(lower, upper);
 
         // Create a PDE modifier object
-        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, &cuboid));
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, false, &cuboid));
         p_pde_modifier->SetDependentVariableName("variable");
 
         // For coverage, output the solution gradient

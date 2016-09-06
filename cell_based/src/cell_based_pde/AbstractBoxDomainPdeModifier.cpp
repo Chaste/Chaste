@@ -48,7 +48,11 @@ AbstractBoxDomainPdeModifier<DIM>::AbstractBoxDomainPdeModifier(AbstractLinearPd
                                                                 ChasteCuboid<DIM>* pMeshCuboid,
                                                                 double stepSize,
                                                                 Vec solution)
-    : AbstractPdeModifier<DIM>(pPde,pBoundaryCondition, isNeumannBoundaryCondition, deleteMemberPointersInDestructor, solution),
+    : AbstractPdeModifier<DIM>(pPde,
+    		                   pBoundaryCondition,
+    		                   isNeumannBoundaryCondition,
+    		                   deleteMemberPointersInDestructor,
+    		                   solution),
       mpMeshCuboid(pMeshCuboid),
       mStepSize(stepSize),
       mSetBcsOnBoxBoundary(true)

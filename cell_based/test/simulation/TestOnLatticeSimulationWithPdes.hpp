@@ -130,7 +130,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         ChastePoint<2> upper(centroid(0)+25.0, centroid(1)+25.0);
         ChasteCuboid<2> cuboid(lower, upper);
 
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, &cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, false, &cuboid));
         p_pde_modifier->SetDependentVariableName("nutrient");
         simulator.AddSimulationModifier(p_pde_modifier);
 
@@ -210,7 +210,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
 
         ChasteCuboid<2> cuboid = cell_population.rGetMesh().CalculateBoundingBox();
 
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, &cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, false, &cuboid));
         p_pde_modifier->SetDependentVariableName("nutrient");
         simulator.AddSimulationModifier(p_pde_modifier);
 
@@ -381,7 +381,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         ConstBoundaryCondition<2> bc(1.0);
         ChasteCuboid<2> cuboid = cell_population.rGetMesh().CalculateBoundingBox();
 
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, &cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, false, &cuboid));
         p_pde_modifier->SetDependentVariableName("nutrient");
         simulator.AddSimulationModifier(p_pde_modifier);
 
@@ -436,7 +436,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         ChastePoint<2> upper(5.0, 5.0);
         ChasteCuboid<2> cuboid(lower, upper);
 
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, &cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, false, &cuboid));
         p_pde_modifier->SetDependentVariableName("nutrient");
         simulator.AddSimulationModifier(p_pde_modifier);
 
@@ -486,7 +486,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         upper.rGetLocation() -= translation;
         ChasteCuboid<2> cuboid(lower, upper);
 
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, &cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, false, &cuboid));
         p_pde_modifier->SetDependentVariableName("nutrient");
         simulator.AddSimulationModifier(p_pde_modifier);
 
@@ -566,10 +566,10 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         ChastePoint<2> upper(50.0, 50.0);
         ChasteCuboid<2> cuboid(lower, upper);
 
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier_1, (&pde_1, &bc_1, false, &cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier_1, (&pde_1, &bc_1, false, false, &cuboid));
         p_pde_modifier_1->SetDependentVariableName("quantity_1");
         simulator.AddSimulationModifier(p_pde_modifier_1);
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier_2, (&pde_2, &bc_2, false, &cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier_2, (&pde_2, &bc_2, false, false, &cuboid));
         p_pde_modifier_2->SetDependentVariableName("quantity_2");
         simulator.AddSimulationModifier(p_pde_modifier_2);
 
@@ -642,7 +642,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         ConstBoundaryCondition<2> bc(1.0);
         ChasteCuboid<2> cuboid = cell_population.rGetMesh().CalculateBoundingBox();
 
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, &cuboid, 1.0));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, false, &cuboid, 1.0));
         p_pde_modifier->SetDependentVariableName("nutrient");
         p_pde_modifier->SetOutputSolutionAtPdeNodes(true);
         simulator.AddSimulationModifier(p_pde_modifier);

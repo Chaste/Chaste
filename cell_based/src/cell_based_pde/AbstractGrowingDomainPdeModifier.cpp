@@ -46,7 +46,11 @@ AbstractGrowingDomainPdeModifier<DIM>::AbstractGrowingDomainPdeModifier(Abstract
                                                                         bool isNeumannBoundaryCondition,
                                                                         bool deleteMemberPointersInDestructor,
                                                                         Vec solution)
-    : AbstractPdeModifier<DIM>(pPde, pBoundaryCondition, isNeumannBoundaryCondition, deleteMemberPointersInDestructor, solution),
+    : AbstractPdeModifier<DIM>(pPde,
+    		                   pBoundaryCondition,
+    		                   isNeumannBoundaryCondition,
+    		                   deleteMemberPointersInDestructor,
+    		                   solution),
       mDeleteMesh(false)
 {
 }

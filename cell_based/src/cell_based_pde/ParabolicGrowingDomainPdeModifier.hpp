@@ -169,7 +169,7 @@ inline void load_construct_data(
         PetscTools::ReadPetscObject(solution, archive_filename);
     }
 
-    ::new(t)ParabolicGrowingDomainPdeModifier<DIM>(boost::shared_ptr<PdeAndBoundaryConditions<DIM> >(), solution);
+    ::new(t)ParabolicGrowingDomainPdeModifier<DIM>(NULL, NULL, true, false, solution);
 }
 }
 } // namespace ...

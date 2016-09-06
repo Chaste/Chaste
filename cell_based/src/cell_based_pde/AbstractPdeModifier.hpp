@@ -41,8 +41,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/shared_ptr.hpp>
 
 #include "AbstractCellBasedSimulationModifier.hpp"
-#include "PdeAndBoundaryConditions.hpp"
 #include "TetrahedralMesh.hpp"
+#include "AbstractLinearPde.hpp"
+#include "AbstractBoundaryCondition.hpp"
 
 /**
  * A modifier class in which has the common functionality of solving a PDE on an arbitrary mesh.
@@ -68,6 +69,10 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & boost::serialization::base_object<AbstractCellBasedSimulationModifier<DIM,DIM> >(*this);
+        archive & mpPde;
+        archive & mpBoundaryCondition;
+        archive & mIsNeumannBoundaryCondition;
+        archive & mDependentVariableName;
 
         // Note that archiving of mSolution is handled by the methods save/load_construct_data
         archive & mOutputDirectory;
@@ -77,8 +82,26 @@ private:
 
 protected:
 
+    /** Pointer to a linear PDE object. */
+    AbstractLinearPde<DIM,DIM>* mpPde;
+
+    /** Pointer to a boundary condition object. */
+    AbstractBoundaryCondition<DIM>* mpBoundaryCondition;
+
+    /** Whether the boundary condition is Neumann (false corresponds to a Dirichlet boundary condition). */
+    bool mIsNeumannBoundaryCondition;
+
+    /** Whether to delete member pointers in the destructor (used in archiving). */
+    bool mDeleteMemberPointersInDestructor;
+
+    /**
+     * For use in PDEs where we know what the quantity for which we are solving is called,
+     * e.g. oxygen concentration.
+     */
+    std::string mDependentVariableName;
+
     /** The solution to the PDE problem at the current time step. */
-    Vec mSolution; ///\todo NEED TO ARCHIVE THIS see AbstractPdeandBoundaryCondition (#2687)
+    Vec mSolution;
 
     /** Pointer to the finite element mesh on which to solve the PDE. **/
     TetrahedralMesh<DIM,DIM>* mpFeMesh;  ///\todo #2687 NEED TO ARCHIVE THIS
@@ -121,6 +144,49 @@ public:
      * Destructor.
      */
     virtual ~AbstractPdeModifier();
+
+    /**
+     * @return mpPde (used in archiving)
+     */
+    AbstractLinearPde<DIM,DIM>* GetPde() const;
+
+    /**
+     * @return mpBoundaryCondition
+     */
+    AbstractBoundaryCondition<DIM>* GetBoundaryCondition() const;
+
+    /**
+     * @return mIsNeumannBoundaryCondition
+     */
+    bool IsNeumannBoundaryCondition();
+
+    /**
+     * Set the name of the dependent variable.
+     *
+     * @param rName the name.
+     */
+    void SetDependentVariableName(const std::string& rName);
+
+    /**
+     * Get the name of the dependent variable.
+     *
+     * @return the name
+     */
+    std::string& rGetDependentVariableName();
+
+    /**
+     * @return whether the PDE has an averaged source
+     */
+    bool HasAveragedSourcePde();
+
+    /**
+     * In the case where the PDE has an averaged source, set the source terms
+     * using the information in the given mesh.
+     *
+     * @param pMesh Pointer to a tetrahedral mesh
+     * @param pCellPdeElementMap map between cells and elements
+     */
+    void SetUpSourceTermsForAveragedSourcePde(TetrahedralMesh<DIM,DIM>* pMesh, std::map<CellPtr, unsigned>* pCellPdeElementMap=NULL);
 
     /**
      * @return mSolution.

@@ -107,7 +107,7 @@ public:
         ChasteCuboid<2> cuboid(lower, upper);
 
         // Create a PDE modifier object
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, &cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, false, &cuboid));
         p_pde_modifier->SetDependentVariableName("variable");
 
         // For coverage output the solution gradient
@@ -164,7 +164,7 @@ public:
         ChasteCuboid<2> cuboid(lower, upper);
 
         // Create a PDE modifier object
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, &cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, false, &cuboid));
         p_pde_modifier->SetDependentVariableName("variable");
         p_pde_modifier->SetupSolve(cell_population,"TestAveragedBoxEllipticPdeWithNodeOnSquare");
 
@@ -218,7 +218,7 @@ public:
         ChasteCuboid<2> cuboid(lower, upper);
 
         // Create a PDE modifier object
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, &cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, false, &cuboid));
         p_pde_modifier->SetDependentVariableName("variable");
         p_pde_modifier->SetupSolve(cell_population,"TestAveragedBoxEllipticPdeWithVertexOnSquare");
 
@@ -271,7 +271,7 @@ public:
         ChasteCuboid<2> cuboid(lower, upper);
 
         // Create a PDE modifier object
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, &cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, false, &cuboid));
         p_pde_modifier->SetDependentVariableName("variable");
         p_pde_modifier->SetupSolve(cell_population,"TestAveragedBoxEllipticPdeWithPottsOnSquare");
 
@@ -332,7 +332,7 @@ public:
         ChasteCuboid<2> cuboid(lower, upper);
 
         // Create a PDE modifier object
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, &cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, false, &cuboid));
         p_pde_modifier->SetDependentVariableName("variable");
         p_pde_modifier->SetupSolve(cell_population,"TestAveragedBoxEllipticPdeWithCaOnSquare");
 

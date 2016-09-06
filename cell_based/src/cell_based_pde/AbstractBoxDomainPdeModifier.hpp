@@ -110,7 +110,10 @@ public:
      * @param stepSize step size to be used in the FE mesh (defaults to 1.0, i.e. the default cell size)
      * @param solution solution vector (defaults to NULL)
      */
-    AbstractBoxDomainPdeModifier(boost::shared_ptr<PdeAndBoundaryConditions<DIM> > pPdeAndBcs=boost::shared_ptr<PdeAndBoundaryConditions<DIM> >(),
+    AbstractBoxDomainPdeModifier(AbstractLinearPde<DIM,DIM>* pPde=NULL,
+                                 AbstractBoundaryCondition<DIM>* pBoundaryCondition=NULL,
+                                 bool isNeumannBoundaryCondition=true,
+                                 bool deleteMemberPointersInDestructor=false,
                                  ChasteCuboid<DIM>* pMeshCuboid=NULL,
                                  double stepSize=1.0,
                                  Vec solution=NULL);

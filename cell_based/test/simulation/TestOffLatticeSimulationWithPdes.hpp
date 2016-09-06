@@ -596,11 +596,11 @@ public:
         ChastePoint<2> upper(centroid(0)+25.0, centroid(1)+25.0);
         ChasteCuboid<2> cuboid(lower, upper);
 
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, &cuboid, 10.0));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, false, &cuboid, 10.0));
         p_pde_modifier->SetDependentVariableName("oxygen");
         p_pde_modifier->SetBcsOnBoxBoundary(false);
         simulator.AddSimulationModifier(p_pde_modifier);
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier2, (&pde2, &bc, false, &cuboid, 10.0));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier2, (&pde2, &bc, false, false, &cuboid, 10.0));
         p_pde_modifier2->SetDependentVariableName("dunno");
         p_pde_modifier2->SetBcsOnBoxBoundary(false);
         simulator.AddSimulationModifier(p_pde_modifier2);
@@ -731,7 +731,7 @@ public:
         ChastePoint<2> upper(centroid(0)+25.0, centroid(1)+25.0);
         ChasteCuboid<2> cuboid(lower, upper);
 
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, &cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, false, &cuboid));
         p_pde_modifier->SetDependentVariableName("nutrient");
         simulator.AddSimulationModifier(p_pde_modifier);
 
@@ -1118,7 +1118,7 @@ public:
         ChastePoint<2> upper(centroid(0)+25.0, centroid(1)+25.0);
         ChasteCuboid<2> cuboid(lower, upper);
 
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, &cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, false, &cuboid));
         p_pde_modifier->SetDependentVariableName("nutrient");
         simulator.AddSimulationModifier(p_pde_modifier);
 
@@ -1193,7 +1193,7 @@ public:
         ChastePoint<2> upper(centroid(0)+25.0, centroid(1)+25.0);
         ChasteCuboid<2> cuboid(lower, upper);
 
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, &cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, false, &cuboid));
         p_pde_modifier->SetDependentVariableName("nutrient");
         simulator.AddSimulationModifier(p_pde_modifier);
 
@@ -1287,7 +1287,7 @@ public:
         ChastePoint<2> upper(centroid(0)+25.0, centroid(1)+25.0);
         ChasteCuboid<2> cuboid(lower, upper);
 
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, &cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, false, &cuboid));
         p_pde_modifier->SetDependentVariableName("nutrient");
         simulator.AddSimulationModifier(p_pde_modifier);
 
@@ -1368,7 +1368,7 @@ public:
         ChastePoint<1> upper(2.0);
         ChasteCuboid<1> cuboid(lower, upper);
 
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<1>, p_pde_modifier, (&pde, &bc, false, &cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<1>, p_pde_modifier, (&pde, &bc, false, false, &cuboid));
         p_pde_modifier->SetDependentVariableName("nutrient");
         simulator.AddSimulationModifier(p_pde_modifier);
 
@@ -1428,7 +1428,7 @@ public:
         ChastePoint<2> upper(centroid(0)+25.0, centroid(1)+25.0);
         ChasteCuboid<2> cuboid(lower, upper);
 
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, &cuboid, 10.0));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, false, &cuboid, 10.0));
         p_pde_modifier->SetDependentVariableName("nutrient");
         p_pde_modifier->SetBcsOnBoxBoundary(false);
         simulator.AddSimulationModifier(p_pde_modifier);
@@ -1486,7 +1486,7 @@ public:
         ChastePoint<3> upper(centroid(0)+25.0, centroid(1)+25.0, centroid(2)+25.0);
         ChasteCuboid<3> cuboid(lower, upper);
 
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<3>, p_pde_modifier, (&pde, &bc, false, &cuboid, 10.0));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<3>, p_pde_modifier, (&pde, &bc, false, false, &cuboid, 10.0));
         p_pde_modifier->SetDependentVariableName("nutrient");
         p_pde_modifier->SetBcsOnBoxBoundary(false);
         simulator.AddSimulationModifier(p_pde_modifier);
