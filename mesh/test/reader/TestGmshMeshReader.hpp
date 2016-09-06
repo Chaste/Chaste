@@ -200,7 +200,7 @@ public:
         TS_ASSERT_DELTA(mesh.GetNode(4)->rGetLocation()[1], 0.5, 1e-15);
     }
 
-    void failingTestRead2d3dMeshes(void) throw(Exception)
+    void TestRead2d3dMeshes(void) throw(Exception)
     {
         READER_2D_3D reader("mesh/test/data/square_4_elements_nonplanar_gmsh.msh");  // As previous test, but the central node is elevated
         TetrahedralMesh<2,3> mesh;
