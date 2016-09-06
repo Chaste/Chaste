@@ -209,12 +209,12 @@ public:
         for (unsigned i =0; i<cells.size(); i++)
         {
             c_vector<double,2> cell_location = p_mesh->GetNode(i)->rGetLocation();
-            if (cell_location(0)<10.0)
+            if (cell_location(0) < 10.0)
             {
                 cells[i]->AddCellProperty(p_apoptotic_property);
             }
         }
-        TS_ASSERT_EQUALS(p_apoptotic_property->GetCellCount(),200u);
+        TS_ASSERT_EQUALS(p_apoptotic_property->GetCellCount(), 200u);
 
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 

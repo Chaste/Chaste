@@ -67,7 +67,7 @@ void EllipticGrowingDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPo
 {
     // Make sure the cell population is in a nice state
     ///\todo We should remove this line and modify stored test results accordingly, since Update() should only be called once per time step (#2687)
-    rCellPopulation.Update();
+//    rCellPopulation.Update();
 
     this->GenerateFeMesh(rCellPopulation);
 

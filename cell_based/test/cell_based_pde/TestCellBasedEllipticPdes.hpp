@@ -341,7 +341,7 @@ public:
 
             AveragedSourceEllipticPde<2>* p_static_cast_pde = static_cast<AveragedSourceEllipticPde<2>*>(p_pde);
             TS_ASSERT_DELTA(p_static_cast_pde->GetCoefficient(), 0.05, 1e-6);
-//            TS_ASSERT_EQUALS(p_static_cast_pde->rGetCellPopulation().GetNumRealCells(), 25u); ///\todo #2687
+            TS_ASSERT_EQUALS(p_static_cast_pde->mrCellPopulation.GetNumRealCells(), 25u);
 
             // Avoid memory leaks
             delete &(p_static_cast_pde->rGetCellPopulation());

@@ -124,7 +124,6 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         AveragedSourceEllipticPde<2> pde(cell_population, 0.0);
         ConstBoundaryCondition<2> bc(1.0);
 
-        ///\todo replace with ChasteCuboid<2> cuboid = cell_population.rGetMesh().CalculateBoundingBox() ? (#2687)
         c_vector<double,2> centroid = cell_population.GetCentroidOfCellPopulation();
         ChastePoint<2> lower(centroid(0)-25.0, centroid(1)-25.0);
         ChastePoint<2> upper(centroid(0)+25.0, centroid(1)+25.0);

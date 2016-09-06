@@ -122,7 +122,7 @@ public:
     virtual std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ConstructBoundaryConditionsContainer();
 
     /**
-     * Helper method to copy the CellData to the PDE solution
+     * Helper method to copy the CellData to the PDE solution.
      *
      * @param rCellPopulation reference to the cell population
      */

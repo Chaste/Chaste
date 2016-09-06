@@ -103,8 +103,8 @@ protected:
     /** The solution to the PDE problem at the current time step. */
     Vec mSolution;
 
-    /** Pointer to the finite element mesh on which to solve the PDE. **/
-    TetrahedralMesh<DIM,DIM>* mpFeMesh;  ///\todo #2687 NEED TO ARCHIVE THIS
+    /** Pointer to the finite element mesh on which to solve the PDE. */
+    TetrahedralMesh<DIM,DIM>* mpFeMesh;
 
     /** Store the output directory name. */
     std::string mOutputDirectory;
