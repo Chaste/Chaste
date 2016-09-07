@@ -175,6 +175,9 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
         double perimeter = 2.0 * (cell_height + cell_width);
         double node_spacing = perimeter / (double)numNodesPerCell;
 
+        // The height of the lamina is offset by a proportion of the cell height
+        double lam_hight = y_offset[1] - 0.05 * cell_height;
+
         unsigned num_lamina_nodes = (unsigned)floor(1.0 / node_spacing);
 
         std::vector<Node<2>*> nodes_this_elem;
@@ -182,7 +185,7 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
         for (unsigned node_idx = 0; node_idx < num_lamina_nodes; node_idx++)
         {
             // Calculate location of node
-            c_vector<double, 2> location = 0.97 * y_offset + ( 0.5 / num_lamina_nodes + double(node_idx) / num_lamina_nodes ) * x_unit;
+            c_vector<double, 2> location = lam_hight * y_unit + ( 0.5 / num_lamina_nodes + double(node_idx) / num_lamina_nodes ) * x_unit;
 
             // Create the new node
             Node<2>* p_node = new Node<2>(node_idx, location, true);
@@ -199,6 +202,11 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
     // Add the apical lamina, if there is one
     if (apicalLamina)
     {
+        if (randomYMult != 0.0)
+        {
+            EXCEPTION("Currently no random y variation allowed with an apical lamina")
+        }
+        
         //\todo: implement this
         NEVER_REACHED;
     }
