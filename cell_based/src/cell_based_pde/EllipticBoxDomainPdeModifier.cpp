@@ -149,7 +149,7 @@ std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > EllipticBoxDomainPdeModif
 			p_bcc->AddDirichletBoundaryCondition(this->mpFeMesh->GetNode(*iter), this->GetBoundaryCondition(), 0, false);
 		}
 	}
-	else // apply BC at boundary nodes of box domain FE mesh
+	else // Apply BC at boundary nodes of box domain FE mesh
 	{
 		for (typename TetrahedralMesh<DIM,DIM>::BoundaryNodeIterator node_iter = this->mpFeMesh->GetBoundaryNodeIteratorBegin();
 			 node_iter != this->mpFeMesh->GetBoundaryNodeIteratorEnd();

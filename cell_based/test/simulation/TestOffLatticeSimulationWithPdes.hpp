@@ -828,8 +828,8 @@ public:
         TS_ASSERT_DELTA(node_15_location[1], 2.6052, 1e-4);
 
         // Test the CellData result
-        TS_ASSERT_DELTA((p_simulator->rGetCellPopulation().GetCellUsingLocationIndex(5))->GetCellData()->GetItem("oxygen"), 0.9604, 1e-4);
-        TS_ASSERT_DELTA((p_simulator->rGetCellPopulation().GetCellUsingLocationIndex(15))->GetCellData()->GetItem("oxygen"), 0.9579, 1e-4);
+        TS_ASSERT_DELTA((p_simulator->rGetCellPopulation().GetCellUsingLocationIndex(5))->GetCellData()->GetItem("oxygen"), 0.9605, 1e-4);
+        TS_ASSERT_DELTA((p_simulator->rGetCellPopulation().GetCellUsingLocationIndex(15))->GetCellData()->GetItem("oxygen"), 0.9582, 1e-4);
 
         // Tidy up
         delete p_simulator;
