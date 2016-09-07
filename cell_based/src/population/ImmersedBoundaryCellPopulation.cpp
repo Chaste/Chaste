@@ -107,7 +107,7 @@ double ImmersedBoundaryCellPopulation<DIM>:: CalculateIntrinsicCellSize()
         average_intrinsic_size += mpImmersedBoundaryMesh->GetVolumeOfElement(elem_iter->GetIndex());
     }
 
-    return average_intrinsic_size / mpImmersedBoundaryMesh->GetNumElements();
+    return sqrt(average_intrinsic_size / mpImmersedBoundaryMesh->GetNumElements());
 }
 
 template<unsigned DIM>
