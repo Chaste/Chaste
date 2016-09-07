@@ -50,6 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellBasedTestSuite.hpp"
 #include "FakePetscSetup.hpp"
 
+///\todo move into cell_based/test/cell_based_pde and rename test suite (#2687)
 class TestPdesForOffLatticeSimulations : public AbstractCellBasedTestSuite
 {
 public:

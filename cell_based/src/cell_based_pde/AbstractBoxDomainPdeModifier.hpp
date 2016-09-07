@@ -124,11 +124,21 @@ public:
     virtual ~AbstractBoxDomainPdeModifier();
 
     /**
+     * @return mStepSize.
+     */
+    double GetStepSize();
+
+    /**
      * Set mSetBcsOnCoarseBoundary.
      *
      * @param setBcsOnBoxBoundary whether to set the boundary condition on the edge of the box domain rather than the cell population
      */
     void SetBcsOnBoxBoundary(bool setBcsOnBoxBoundary);
+
+    /**
+     * @return mSetBcsOnCoarseBoundary.
+     */
+    bool AreBcsSetOnBoxBoundary();
 
     /**
      * Overridden SetupSolve() method.

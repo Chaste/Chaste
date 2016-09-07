@@ -136,7 +136,7 @@ public:
 
         // Create a PDE modifier and pass it to the simulation Add this first so in place for SimpleTargetArea one (calls cell pop update)
 
-        // Make the PDE and BCs
+        // Create PDE and boundary condition objects
         CellwiseSourceParabolicPde<2> pde(cell_population, M_DUDT_COEFFICIENT,M_DIFFUSION_CONSTANT,M_UPTAKE_RATE);
         ConstBoundaryCondition<2> bc(1.0);
 
@@ -150,7 +150,7 @@ public:
 
         simulator.Solve();
 
-        // Test some simulation stats
+        // Test some simulation statistics
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumAllCells(), 9u); // No birth yet
 
         // Test nothing's changed
@@ -187,7 +187,7 @@ public:
 
         // Create a PDE modifier and pass it to the simulation Add this first so in place for SimpleTargetArea one (calls cell pop update)
 
-        // Make the PDE and BCs
+        // Create PDE and boundary condition objects
         CellwiseSourceParabolicPde<2> pde(cell_population, M_DUDT_COEFFICIENT,M_DIFFUSION_CONSTANT,M_UPTAKE_RATE);
         ConstBoundaryCondition<2> bc(1.0);
         MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
@@ -196,7 +196,7 @@ public:
 
         simulator.Solve();
 
-        // Test some simulation stats
+        // Test some simulation statistics
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumAllCells(), 9u); // No birth yet
 
         // Test nothing's changed
@@ -237,7 +237,7 @@ public:
 
         // Create a PDE modifier and pass it to the simulation Add this first so in place for SimpleTargetArea one (calls cell pop update)
 
-        // Make the PDE and BCs
+        // Create PDE and boundary condition objects
         CellwiseSourceParabolicPde<2> pde(cell_population, M_DUDT_COEFFICIENT,M_DIFFUSION_CONSTANT,M_UPTAKE_RATE);
         ConstBoundaryCondition<2> bc(1.0);
         MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
@@ -246,8 +246,8 @@ public:
 
         simulator.Solve();
 
-        // Test some simulation stats
-        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumAllCells(), 9u); //No birth yet
+        // Test some simulation statistics
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumAllCells(), 9u); // No births yet
 
         // Test nothing's changed
         std::vector<double> node_4_location = simulator.GetNodeLocation(4);
@@ -289,7 +289,7 @@ public:
 
         // Create a PDE modifier and pass it to the simulation Add this first so in place for SimpleTargetArea one (calls cell pop update)
 
-        // Make the PDE and BCs
+        // Create PDE and boundary condition objects
         CellwiseSourceParabolicPde<2> pde(cell_population, M_DUDT_COEFFICIENT,M_DIFFUSION_CONSTANT,M_UPTAKE_RATE);
         ConstBoundaryCondition<2> bc(1.0);
         MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
@@ -331,7 +331,7 @@ public:
 
         // Create a PDE modifier and pass it to the simulation Add this first so in place for SimpleTargetArea one (calls cell pop update)
 
-        // Make the PDE and BCs
+        // Create PDE and boundary condition objects
         CellwiseSourceParabolicPde<2> pde(cell_population, M_DUDT_COEFFICIENT,M_DIFFUSION_CONSTANT,M_UPTAKE_RATE);
         ConstBoundaryCondition<2> bc(1.0);
         MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
@@ -340,7 +340,7 @@ public:
 
         simulator.Solve();
 
-        // Test some simulation stats
+        // Test some simulation statistics
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumAllCells(), 9u); // No births yet
 
         // Test nothing's changed
@@ -383,14 +383,14 @@ public:
         simulator.SetSamplingTimestepMultiple(10);
         simulator.SetEndTime(M_TIME_FOR_SIMULATION);
 
-        // Adding update rule(s).
+        // Adding update rule
         MAKE_PTR(DiffusionCaUpdateRule<2u>, p_diffusion_update_rule);
         p_diffusion_update_rule->SetDiffusionParameter(0.1);
         simulator.AddUpdateRule(p_diffusion_update_rule);
 
         // Create a PDE modifier and pass it to the simulation Add this first so in place for SimpleTargetArea one (calls cell pop update)
 
-        // Make the PDE and BCs
+        // Create PDE and boundary condition objects
         CellwiseSourceParabolicPde<2> pde(cell_population, M_DUDT_COEFFICIENT, M_DIFFUSION_CONSTANT, M_UPTAKE_RATE);
         ConstBoundaryCondition<2> bc(1.0);
         MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
@@ -400,7 +400,7 @@ public:
         // Run simulation
         simulator.Solve();
 
-        // Test some simulation stats
+        // Test some simulation statistics
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumAllCells(), 9u); // No births yet
 
         // Test nothing's changed

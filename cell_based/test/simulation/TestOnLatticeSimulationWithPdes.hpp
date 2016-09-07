@@ -94,6 +94,8 @@ double bc_func(const ChastePoint<2>& p)
     return value;
 }
 
+///\todo move into cell_based/test/cell_based_pde (#2687)
+///\todo merge content into TestSimulationsWith*DomainPdeModifier and remove this test suite (#2687)
 class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestSuite
 {
   public:
@@ -120,17 +122,20 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.SetOutputDirectory("TestPottsBasedCellPopulationWithPdes");
         simulator.SetEndTime(0.1);
 
-        // Set up PDE and pass to simulation via handler (zero uptake to check analytic solution)
+        // Create PDE and boundary condition objects (zero uptake to check analytic solution)
         AveragedSourceEllipticPde<2> pde(cell_population, 0.0);
         ConstBoundaryCondition<2> bc(1.0);
 
+        // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         c_vector<double,2> centroid = cell_population.GetCentroidOfCellPopulation();
         ChastePoint<2> lower(centroid(0)-25.0, centroid(1)-25.0);
         ChastePoint<2> upper(centroid(0)+25.0, centroid(1)+25.0);
         ChasteCuboid<2> cuboid(lower, upper);
 
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
         MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, false, &cuboid));
         p_pde_modifier->SetDependentVariableName("nutrient");
+
         simulator.AddSimulationModifier(p_pde_modifier);
 
         // Create update rules and pass to the simulation
@@ -203,14 +208,17 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.SetDt(0.1);
         simulator.SetEndTime(1);
 
-        // Set up a PDE with Dirichlet BCs and pass to simulation via handler (zero uptake to check analytic solution)
+        // Create PDE and boundary condition objects (zero uptake to check analytic solution)
         AveragedSourceEllipticPde<2> pde(cell_population, 0.0);
         ConstBoundaryCondition<2> bc(1.0);
 
+        // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         ChasteCuboid<2> cuboid = cell_population.rGetMesh().CalculateBoundingBox();
 
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
         MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, false, &cuboid));
         p_pde_modifier->SetDependentVariableName("nutrient");
+
         simulator.AddSimulationModifier(p_pde_modifier);
 
         // Create update rules and pass to the simulation
@@ -276,10 +284,14 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.SetDt(0.1);
         simulator.SetEndTime(1);
 
+        // Create PDE and boundary condition objects
         CellwiseSourceEllipticPde<2> pde(cell_population, 0.0);
         ConstBoundaryCondition<2> bc(1.0);
+
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
         MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
         p_pde_modifier->SetDependentVariableName("nutrient");
+
         simulator.AddSimulationModifier(p_pde_modifier);
 
         simulator.Solve();
@@ -328,10 +340,14 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.SetDt(0.1);
         simulator.SetEndTime(1);
 
+        // Create PDE and boundary condition objects
         CellwiseSourceEllipticPde<2> pde(cell_population, 0.0);
         ConstBoundaryCondition<2> bc(1.0);
+
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
         MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
         p_pde_modifier->SetDependentVariableName("nutrient");
+
         simulator.AddSimulationModifier(p_pde_modifier);
 
         simulator.Solve();
@@ -375,13 +391,17 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.SetDt(0.1);
         simulator.SetEndTime(1);
 
-        // Set up a PDE with mixed boundary conditions (use zero uptake to check analytic solution)
+        // Create PDE and boundary condition objects (use zero uptake to check analytic solution)
         AveragedSourceEllipticPde<2> pde(cell_population, 0.0);
         ConstBoundaryCondition<2> bc(1.0);
+
+        // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         ChasteCuboid<2> cuboid = cell_population.rGetMesh().CalculateBoundingBox();
 
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
         MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, false, &cuboid));
         p_pde_modifier->SetDependentVariableName("nutrient");
+
         simulator.AddSimulationModifier(p_pde_modifier);
 
         // Solve the system
@@ -427,16 +447,19 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.SetDt(0.1);
         simulator.SetEndTime(1);
 
+        // Create PDE and boundary condition objects
         AveragedSourceEllipticPde<2> pde(cell_population, 0.0);
         ConstBoundaryCondition<2> bc(1.0);
 
-        // Create coarse mesh smaller than the PottsMesh
+        // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         ChastePoint<2> lower(0.0, 0.0);
         ChastePoint<2> upper(5.0, 5.0);
         ChasteCuboid<2> cuboid(lower, upper);
 
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
         MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, false, &cuboid));
         p_pde_modifier->SetDependentVariableName("nutrient");
+
         simulator.AddSimulationModifier(p_pde_modifier);
 
         // Solve the system
@@ -467,10 +490,11 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.SetOutputDirectory("TestCaBasedCellPopulationWithPdes");
         simulator.SetEndTime(0.1);
 
+        // Create PDE and boundary condition objects
         AveragedSourceEllipticPde<2> pde(cell_population, 0.0);
         ConstBoundaryCondition<2> bc(1.0);
 
-        // Create coarse mesh and centre it on the centre of the Potts Mesh
+        // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         c_vector<double,2> centre_of_potts_mesh = zero_vector<double>(2);
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
@@ -479,14 +503,15 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         centre_of_potts_mesh /= p_mesh->GetNumNodes();
         ChastePoint<2> lower(0.0, 0.0);
         ChastePoint<2> upper(5.0, 5.0);
-
         c_vector<double, 2> translation = 0.5*(lower.rGetLocation() + upper.rGetLocation()) - centre_of_potts_mesh;
         lower.rGetLocation() -= translation;
         upper.rGetLocation() -= translation;
         ChasteCuboid<2> cuboid(lower, upper);
 
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
         MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, false, &cuboid));
         p_pde_modifier->SetDependentVariableName("nutrient");
+
         simulator.AddSimulationModifier(p_pde_modifier);
 
         // Create update rules and pass to the simulation
@@ -554,22 +579,28 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.SetOutputDirectory("TestPottsBasedCellPopulationWithTwoPdes");
         simulator.SetEndTime(0.1);
 
+        // Create PDE and boundary condition objects
         AveragedSourceEllipticPde<2> pde_1(cell_population, 0.0);
         ConstBoundaryCondition<2> bc_1(1.0);
 
         AveragedSourceEllipticPde<2> pde_2(cell_population, 0.0);
         ConstBoundaryCondition<2> bc_2(1.0);
 
-        // Create coarse mesh smaller than the PottsMesh
+        // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         ChastePoint<2> lower(0.0, 0.0);
         ChastePoint<2> upper(50.0, 50.0);
         ChasteCuboid<2> cuboid(lower, upper);
 
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
         MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier_1, (&pde_1, &bc_1, false, false, &cuboid));
         p_pde_modifier_1->SetDependentVariableName("quantity_1");
+
         simulator.AddSimulationModifier(p_pde_modifier_1);
+
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
         MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier_2, (&pde_2, &bc_2, false, false, &cuboid));
         p_pde_modifier_2->SetDependentVariableName("quantity_2");
+
         simulator.AddSimulationModifier(p_pde_modifier_2);
 
         // Create update rules and pass to the simulation
@@ -636,14 +667,19 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.SetSamplingTimestepMultiple(10);
         simulator.SetEndTime(10);
 
+        // Create PDE and boundary condition objects
         double nutrient_uptake_rate = -0.1;
         AveragedSourceEllipticPde<2> pde(cell_population, nutrient_uptake_rate);
         ConstBoundaryCondition<2> bc(1.0);
+
+        // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         ChasteCuboid<2> cuboid = cell_population.rGetMesh().CalculateBoundingBox();
 
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
         MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, false, &cuboid, 1.0));
         p_pde_modifier->SetDependentVariableName("nutrient");
         p_pde_modifier->SetOutputSolutionAtPdeNodes(true);
+
         simulator.AddSimulationModifier(p_pde_modifier);
 
         // Create update rules and pass to the simulation

@@ -57,6 +57,7 @@ EllipticBoxDomainPdeModifier<DIM>::EllipticBoxDomainPdeModifier(AbstractLinearPd
 template<unsigned DIM>
 EllipticBoxDomainPdeModifier<DIM>::~EllipticBoxDomainPdeModifier()
 {
+    ///\todo (#2687) - move to abstract class
     // Destroy the most recent solution vector
     if (this->mSolution != NULL)
     {

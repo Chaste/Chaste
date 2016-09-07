@@ -59,6 +59,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
+///\todo rename test suite to TestEllipticGrowingDomainPdeModifier (#2687)
 /*
  * In this test suite we check the solution of the CellwisePdes against exact solutions.
  * In each case we are solving Laplacian U = f where f is constant in different regions.
@@ -91,10 +92,11 @@ public:
         // Set up simulation time for file output
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
-        // Make the PDE and BCs
+        // Create PDE and boundary condition objects
         CellwiseSourceEllipticPde<2> pde(cell_population, 1);
         ConstBoundaryCondition<2> bc(1.0);
 
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
         MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
         p_pde_modifier->SetDependentVariableName("variable");
 
@@ -159,9 +161,11 @@ public:
         // Set up simulation time for file output
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
-        // Make the PDE and BCs
+        // Create PDE and boundary condition objects
         CellwiseSourceEllipticPde<2> pde(cell_population, 1);
         ConstBoundaryCondition<2> bc(1.0);
+
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
         MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
         p_pde_modifier->SetDependentVariableName("variable");
 
@@ -221,9 +225,11 @@ public:
         // Set up simulation time for file output
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
-        // Make the PDE and BCs
+        // Create PDE and boundary condition objects
         CellwiseSourceEllipticPde<2> pde(cell_population, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
+
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
         MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
         p_pde_modifier->SetDependentVariableName("variable");
 
@@ -266,9 +272,11 @@ public:
         // Set up simulation time for file output
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
-        // Make the PDE and BCs
+        // Create PDE and boundary condition objects
         CellwiseSourceEllipticPde<2> pde(cell_population, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
+
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
         MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
         p_pde_modifier->SetDependentVariableName("variable");
 
@@ -317,9 +325,11 @@ public:
         // Set up simulation time for file output
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
-        // Make the PDE and BCs
+        // Create PDE and boundary condition objects
         CellwiseSourceEllipticPde<2> pde(cell_population, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
+
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
         MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
         p_pde_modifier->SetDependentVariableName("variable");
 
@@ -367,9 +377,11 @@ public:
         // Set up simulation time for file output
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
-        // Make the PDE and BCs
+        // Create PDE and boundary condition objects
         CellwiseSourceEllipticPde<2> pde(cell_population, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
+
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
         MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
         p_pde_modifier->SetDependentVariableName("variable");
 
@@ -423,9 +435,11 @@ public:
         // Set up simulation time for file output
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
-        // Make the PDE and BCs
+        // Create PDE and boundary condition objects
         CellwiseSourceEllipticPde<2> pde(cell_population, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
+
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
         MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
         p_pde_modifier->SetDependentVariableName("variable");
 

@@ -82,10 +82,16 @@ private:
 
 protected:
 
-    /** Pointer to a linear PDE object. */
+    /**
+     * Pointer to a linear PDE object.
+     * \todo consider making this a boost::shared_ptr (#2687)
+     */
     AbstractLinearPde<DIM,DIM>* mpPde;
 
-    /** Pointer to a boundary condition object. */
+    /**
+     * Pointer to a boundary condition object.
+     * \todo consider making this a boost::shared_ptr (#2687)
+     */
     AbstractBoundaryCondition<DIM>* mpBoundaryCondition;
 
     /** Whether the boundary condition is Neumann (false corresponds to a Dirichlet boundary condition). */

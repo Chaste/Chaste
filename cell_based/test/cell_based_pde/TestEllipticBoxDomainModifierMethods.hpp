@@ -60,6 +60,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
+///\todo rename test suite to TestEllipticBoxDomainPdeModifier (#2687)
 /*
  * In this test suite we check the solution of the AveragedPdes for each population type.
  * In each case we are solving Laplacian U = f where f is constant in different regions.
@@ -97,16 +98,16 @@ public:
         // Set up simulation time for file output
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
-        // Make the PDE and BCs
+        // Create PDE and boundary condition objects
         AveragedSourceEllipticPde<2> pde(cell_population, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
 
-        // Create domain
+        // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         ChastePoint<2> lower(-5.0, -5.0);
         ChastePoint<2> upper(15.0, 15.0);
         ChasteCuboid<2> cuboid(lower, upper);
 
-        // Create a PDE modifier object
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
         MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, false, &cuboid));
         p_pde_modifier->SetDependentVariableName("variable");
 
@@ -154,18 +155,19 @@ public:
         // Set up simulation time for file output
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
-        // Make the PDE and BCs
+        // Create PDE and boundary condition objects
         AveragedSourceEllipticPde<2> pde(cell_population, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
 
-        // Make domain
+        // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         ChastePoint<2> lower(-5.0, -5.0);
         ChastePoint<2> upper(15.0, 15.0);
         ChasteCuboid<2> cuboid(lower, upper);
 
-        // Create a PDE modifier object
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
         MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, false, &cuboid));
         p_pde_modifier->SetDependentVariableName("variable");
+
         p_pde_modifier->SetupSolve(cell_population,"TestAveragedBoxEllipticPdeWithNodeOnSquare");
 
         // Test the solution at some fixed points to compare with other cell populations
@@ -208,18 +210,19 @@ public:
         // Set up simulation time for file output
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
-        // Make the PDE and BCs
+        // Create PDE and boundary condition objects
         AveragedSourceEllipticPde<2> pde(cell_population, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
 
-        // Make domain
+        // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         ChastePoint<2> lower(-5.0, -5.0);
         ChastePoint<2> upper(15.0, 15.0);
         ChasteCuboid<2> cuboid(lower, upper);
 
-        // Create a PDE modifier object
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
         MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, false, &cuboid));
         p_pde_modifier->SetDependentVariableName("variable");
+
         p_pde_modifier->SetupSolve(cell_population,"TestAveragedBoxEllipticPdeWithVertexOnSquare");
 
         // Test the solution at some fixed points to compare with other cell populations
@@ -261,18 +264,19 @@ public:
         // Set up simulation time for file output
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
-        // Make the PDE and BCs
+        // Create PDE and boundary condition objects
         AveragedSourceEllipticPde<2> pde(cell_population, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
 
-        // Make domain
+        // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         ChastePoint<2> lower(-5.0, -5.0);
         ChastePoint<2> upper(15.0, 15.0);
         ChasteCuboid<2> cuboid(lower, upper);
 
-        // Create a PDE modifier object
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
         MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, false, &cuboid));
         p_pde_modifier->SetDependentVariableName("variable");
+
         p_pde_modifier->SetupSolve(cell_population,"TestAveragedBoxEllipticPdeWithPottsOnSquare");
 
         // Test the solution at some fixed points to compare with other cell populations
@@ -322,18 +326,19 @@ public:
         // Set up simulation time for file output
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
-        // Make the PDE and BCs
+        // Create PDE and boundary condition objects
         AveragedSourceEllipticPde<2> pde(cell_population, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
 
-        // Make domain
+        // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         ChastePoint<2> lower(-5.0, -5.0);
         ChastePoint<2> upper(15.0, 15.0);
         ChasteCuboid<2> cuboid(lower, upper);
 
-        // Create a PDE modifier object
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
         MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, false, &cuboid));
         p_pde_modifier->SetDependentVariableName("variable");
+
         p_pde_modifier->SetupSolve(cell_population,"TestAveragedBoxEllipticPdeWithCaOnSquare");
 
         // Test the solution at some fixed points to compare with other cell populations

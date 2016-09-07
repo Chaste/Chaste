@@ -65,6 +65,13 @@ AbstractPdeModifier<DIM>::AbstractPdeModifier(AbstractLinearPde<DIM,DIM>* pPde,
 template<unsigned DIM>
 AbstractPdeModifier<DIM>::~AbstractPdeModifier()
 {
+    ///\todo (#2687)
+    // Avoid memory leaks if the object was loaded from an archive
+    if (mDeleteMemberPointersInDestructor)
+    {
+        delete mpPde;
+        delete mpBoundaryCondition;
+    }
 }
 
 template<unsigned DIM>

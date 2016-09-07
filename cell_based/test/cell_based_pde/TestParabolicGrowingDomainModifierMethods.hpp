@@ -58,6 +58,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
+///\todo rename test suite to TestParabolicGrowingDomainPdeModifier (#2687)
 /*
  * In this test suite we check the solution of the CellwiseParabolicPdes
  * against exact solutions.
@@ -99,9 +100,11 @@ public:
         // Set up simulation time for file output
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(100.0, 10);
 
-        // Make the PDE and BCs
+        // Create PDE and boundary condition objects
         CellwiseSourceParabolicPde<2> pde(cell_population, 1, 1, 1);
         ConstBoundaryCondition<2> bc(1.0);
+
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
         MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
         p_pde_modifier->SetDependentVariableName("variable");
 
@@ -173,9 +176,11 @@ public:
         // Set up simulation time for file output
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(100.0, 10);
 
-        // Make the PDE and BCs
+        // Create PDE and boundary condition objects
         CellwiseSourceParabolicPde<2> pde(cell_population, 1, 1, 1);
         ConstBoundaryCondition<2> bc(1.0);
+
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
         MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
         p_pde_modifier->SetDependentVariableName("variable");
 
@@ -216,7 +221,6 @@ public:
         }
     }
 
-
     void TestMeshBasedMonolayerWithParabolicPdeAndNeumannBcs() throw (Exception)
     {
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_984_elements");
@@ -228,7 +232,7 @@ public:
         CellsGenerator<UniformCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_differentiated_type);
 
-        // Set initial condition for pde
+        // Set initial condition for PDE
         for (unsigned i=0; i<cells.size(); i++)
         {
             cells[i]->GetCellData()->SetItem("variable",1.0);
@@ -239,9 +243,11 @@ public:
         // Set up simulation time for file output
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(10.0, 10);
 
-        // Make the PDE and BCs
+        // Create PDE and boundary condition objects
         CellwiseSourceParabolicPde<2> pde(cell_population, 1, 1, 1);
         ConstBoundaryCondition<2> bc(1.0);
+
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
         MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, true));
         p_pde_modifier->SetDependentVariableName("variable");
 
@@ -284,13 +290,13 @@ public:
                        cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
         for (unsigned i =0; i<cells.size(); i++)
         {
-           c_vector<double,2> cell_location = p_mesh->GetNode(i)->rGetLocation();
-        if (cell_location(0)<10.0)
-        {
-            cells[i]->AddCellProperty(p_apoptotic_property);
-        }
-        // Set initial condition for pde
-        cells[i]->GetCellData()->SetItem("variable",1.0);
+            c_vector<double,2> cell_location = p_mesh->GetNode(i)->rGetLocation();
+            if (cell_location(0) < 10.0)
+            {
+                cells[i]->AddCellProperty(p_apoptotic_property);
+            }
+            // Set initial condition for PDE
+            cells[i]->GetCellData()->SetItem("variable", 1.0);
         }
         TS_ASSERT_EQUALS(p_apoptotic_property->GetCellCount(),200u);
 
@@ -299,9 +305,11 @@ public:
         // Set up simulation time for file output
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 10);
 
-        // Make the PDE and BCs
+        // Create PDE and boundary condition objects
         CellwiseSourceParabolicPde<2> pde(cell_population, 0.1, 1, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
+
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
         MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
         p_pde_modifier->SetDependentVariableName("variable");
 
@@ -309,10 +317,10 @@ public:
 
         // Run for 10 timesteps
         for (unsigned i=0; i<10; i++)
-           {
+        {
             SimulationTime::Instance()->IncrementTimeOneStep();
-               p_pde_modifier->UpdateAtEndOfTimeStep(cell_population);
-               p_pde_modifier->UpdateAtEndOfOutputTimeStep(cell_population);
+            p_pde_modifier->UpdateAtEndOfTimeStep(cell_population);
+            p_pde_modifier->UpdateAtEndOfOutputTimeStep(cell_population);
         }
 
         // Test the solution at some fixed points to compare with other cell populations
@@ -324,7 +332,6 @@ public:
 
     void TestNodeBasedSquareMonolayer() throw (Exception)
     {
-
         HoneycombMeshGenerator generator(20,20,0);
         MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
@@ -341,11 +348,11 @@ public:
         for (unsigned i =0; i<cells.size(); i++)
         {
             c_vector<double,2> cell_location = p_mesh->GetNode(i)->rGetLocation();
-            if (cell_location(0)<10.0)
+            if (cell_location(0) < 10.0)
             {
                 cells[i]->AddCellProperty(p_apoptotic_property);
             }
-            // Set initial condition for pde
+            // Set initial condition for PDE
             cells[i]->GetCellData()->SetItem("variable",1.0);
         }
         TS_ASSERT_EQUALS(p_apoptotic_property->GetCellCount(),200u);
@@ -355,9 +362,11 @@ public:
         // Set up simulation time for file output
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 10);
 
-        // Make the PDE and BCs
+        // Create PDE and boundary condition objects
         CellwiseSourceParabolicPde<2> pde(cell_population, 0.1, 1, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
+
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
         MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
         p_pde_modifier->SetDependentVariableName("variable");
 
@@ -417,9 +426,11 @@ public:
         // Set up simulation time for file output
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 10);
 
-        // Make the PDE and BCs
+        // Create PDE and boundary condition objects
         CellwiseSourceParabolicPde<2> pde(cell_population, 0.1, 1, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
+
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
         MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
         p_pde_modifier->SetDependentVariableName("variable");
 
@@ -437,9 +448,10 @@ public:
         CellPtr p_cell_210 = cell_population.GetCellUsingLocationIndex(210);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[0], 10, 1e-4);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[1], 5.0*sqrt(3.0), 1e-4);
-        TS_ASSERT_DELTA( p_cell_210->GetCellData()->GetItem("variable"), 0.6309, 1e-1); //low error as mesh is slightlty larger than for centre based models.
-          //Checking it doesn't change for this cell population
-          TS_ASSERT_DELTA(p_cell_210->GetCellData()->GetItem("variable"), 0.6618, 1e-4);
+        TS_ASSERT_DELTA( p_cell_210->GetCellData()->GetItem("variable"), 0.6309, 1e-1); // Low error as mesh is slightlty larger than for centre based models
+
+        // Checking it doesn't change for this cell population
+        TS_ASSERT_DELTA(p_cell_210->GetCellData()->GetItem("variable"), 0.6618, 1e-4);
     }
 
     void TestPottsBasedSquareMonolayer() throw (Exception)
@@ -456,17 +468,17 @@ public:
         CellsGenerator<UniformCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_differentiated_type);
 
-        // Make cells with x<10.0 apoptotic (so no source term)
+        // Make cells with x < 10.0 apoptotic (so no source term)
         boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
                         cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
         for (unsigned i =0; i<cells.size(); i++)
         {
             c_vector<double,2> cell_location = p_mesh->GetCentroidOfElement(i);
-            if (cell_location(0)<10.0)
+            if (cell_location(0) < 10.0)
             {
                 cells[i]->AddCellProperty(p_apoptotic_property);
             }
-            // Set initial condition for pde
+            // Set initial condition for PDE
             cells[i]->GetCellData()->SetItem("variable",1.0);
         }
         TS_ASSERT_EQUALS(p_apoptotic_property->GetCellCount(),200u);
@@ -476,9 +488,11 @@ public:
         // Set up simulation time for file output
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 10);
 
-        // Make the PDE and BCs
+        // Create PDE and boundary condition objects
         CellwiseSourceParabolicPde<2> pde(cell_population, 0.1, 1, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
+
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
         MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
         p_pde_modifier->SetDependentVariableName("variable");
 
@@ -532,7 +546,7 @@ public:
             {
                 cells[i]->AddCellProperty(p_apoptotic_property);
             }
-            // Set initial condition for pde
+            // Set initial condition for PDE
             cells[i]->GetCellData()->SetItem("variable", 1.0);
         }
         TS_ASSERT_EQUALS(p_apoptotic_property->GetCellCount(), 200u);
@@ -542,9 +556,11 @@ public:
         // Set up simulation time for file output
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 10);
 
-        // Make the PDE and BCs
+        // Create PDE and boundary condition objects
         CellwiseSourceParabolicPde<2> pde(cell_population, 0.1, 1, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
+
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
         MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
         p_pde_modifier->SetDependentVariableName("variable");
 

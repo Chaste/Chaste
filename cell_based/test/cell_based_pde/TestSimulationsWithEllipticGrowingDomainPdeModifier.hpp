@@ -131,11 +131,14 @@ public:
 
         // Create a pde modifier and pass it to the simulation Add this first so in place for SimpleTargetArea one (calls cell pop update)
 
-        // Make the Pde and BCS
+        // Create PDE and boundary condition objects
         CellwiseSourceEllipticPde<2> pde(cell_population, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
+
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
         MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
         p_pde_modifier->SetDependentVariableName("oxygen");
+
         simulator.AddSimulationModifier(p_pde_modifier);
 
         // A NagaiHondaForce has to be used together with an AbstractTargetAreaModifier
@@ -144,7 +147,7 @@ public:
 
         simulator.Solve();
 
-        // Test some simulation stats
+        // Test some simulation statistics
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumAllCells(), 9u); //No birth yet
 
         // Test nothing's changed
@@ -179,16 +182,19 @@ public:
         MAKE_PTR(RepulsionForce<2>, p_force);
         simulator.AddForce(p_force);
 
-        // Make the PDE and BCs
+        // Create PDE and boundary condition objects
         CellwiseSourceEllipticPde<2> pde(cell_population, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
+
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
         MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
         p_pde_modifier->SetDependentVariableName("oxygen");
+
         simulator.AddSimulationModifier(p_pde_modifier);
 
         simulator.Solve();
 
-        // Test some simulation stats
+        // Test some simulation statistics
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumAllCells(), 9u); // No birth yet
 
         // Test nothing's changed
@@ -227,16 +233,19 @@ public:
         p_force->SetCutOffLength(1.5);
         simulator.AddForce(p_force);
 
-        // Make the PDE and BCs
+        // Create PDE and boundary condition objects
         CellwiseSourceEllipticPde<2> pde(cell_population, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
+
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
         MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
         p_pde_modifier->SetDependentVariableName("oxygen");
+
         simulator.AddSimulationModifier(p_pde_modifier);
 
         simulator.Solve();
 
-        // Test some simulation stats
+        // Test some simulation statistics
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumAllCells(), 9u); // No birth yet
 
         // Test nothing's changed
@@ -277,11 +286,14 @@ public:
         p_force->SetCutOffLength(1.5);
         simulator.AddForce(p_force);
 
-        // Make the PDE and BCs
+        // Create PDE and boundary condition objects
         CellwiseSourceEllipticPde<2> pde(cell_population, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
+
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
         MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
         p_pde_modifier->SetDependentVariableName("oxygen");
+
         simulator.AddSimulationModifier(p_pde_modifier);
 
         TS_ASSERT_THROWS_THIS(simulator.Solve(),"Currently can't solve PDEs on meshes with ghost nodes");
@@ -317,16 +329,19 @@ public:
         MAKE_PTR(AdhesionPottsUpdateRule<2>, p_adhesion_update_rule);
         simulator.AddUpdateRule(p_adhesion_update_rule);
 
-        // Make the PDE and BCs
+        // Create PDE and boundary condition objects
         CellwiseSourceEllipticPde<2> pde(cell_population, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
+
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
         MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
         p_pde_modifier->SetDependentVariableName("oxygen");
+
         simulator.AddSimulationModifier(p_pde_modifier);
 
         simulator.Solve();
 
-        // Test some simulation stats
+        // Test some simulation statistics
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumAllCells(), 9u); //No birth yet
 
         // Test nothing's changed
@@ -374,17 +389,20 @@ public:
         p_diffusion_update_rule->SetDiffusionParameter(0.1);
         simulator.AddUpdateRule(p_diffusion_update_rule);
 
-        // Make the PDE and BCs
+        // Create PDE and boundary condition objects
         CellwiseSourceEllipticPde<2> pde(cell_population, -0.1);
         ConstBoundaryCondition<2> bc(1.0);
+
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
         MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
         p_pde_modifier->SetDependentVariableName("oxygen");
+
         simulator.AddSimulationModifier(p_pde_modifier);
 
         // Run simulation
         simulator.Solve();
 
-        // Test some simulation stats
+        // Test some simulation statistics
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumAllCells(), 9u);
 
         // Test nothing's changed

@@ -55,6 +55,7 @@ EllipticGrowingDomainPdeModifier<DIM>::EllipticGrowingDomainPdeModifier(Abstract
 template<unsigned DIM>
 EllipticGrowingDomainPdeModifier<DIM>::~EllipticGrowingDomainPdeModifier()
 {
+    ///\todo (#2687) - move to abstract class
     // Destroy the most recent solution vector
     if (this->mSolution != NULL)
     {

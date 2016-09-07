@@ -57,6 +57,7 @@ ParabolicBoxDomainPdeModifier<DIM>::ParabolicBoxDomainPdeModifier(AbstractLinear
 template<unsigned DIM>
 ParabolicBoxDomainPdeModifier<DIM>::~ParabolicBoxDomainPdeModifier()
 {
+    ///\todo (#2687) - move to abstract class
     // If we have used this modifier, then we will have created a solution vector
     if (this->mSolution)
     {

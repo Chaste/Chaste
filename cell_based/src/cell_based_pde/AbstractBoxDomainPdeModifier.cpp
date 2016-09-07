@@ -70,9 +70,21 @@ AbstractBoxDomainPdeModifier<DIM>::~AbstractBoxDomainPdeModifier()
 }
 
 template<unsigned DIM>
+double AbstractBoxDomainPdeModifier<DIM>::GetStepSize()
+{
+     return mStepSize;
+}
+
+template<unsigned DIM>
 void AbstractBoxDomainPdeModifier<DIM>::SetBcsOnBoxBoundary(bool setBcsOnBoxBoundary)
 {
 	mSetBcsOnBoxBoundary = setBcsOnBoxBoundary;
+}
+
+template<unsigned DIM>
+bool AbstractBoxDomainPdeModifier<DIM>::AreBcsSetOnBoxBoundary()
+{
+    return mSetBcsOnBoxBoundary;
 }
 
 template<unsigned DIM>

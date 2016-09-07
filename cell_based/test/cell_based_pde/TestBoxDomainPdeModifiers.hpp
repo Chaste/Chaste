@@ -54,37 +54,48 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
+/**
+ * \todo merge content of this test suite into TestEllipticBoxDomainModifierMethods and
+ * TestParabolicBoxDomainModifierMethods and remove this test suite (#2687)
+ */
 class TestBoxDomainPdeModifiers : public AbstractCellBasedWithTimingsTestSuite
 {
 public:
     void TestEllipticConstructor() throw(Exception)
     {
-        // Make the PDE and BCs
+        // Create PDE and boundary condition objects
         UniformSourceEllipticPde<2> pde(-0.1);
         ConstBoundaryCondition<2> bc(1.0);
 
-        // Make domain
+        // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         ChastePoint<2> lower(-10.0, -10.0);
         ChastePoint<2> upper(10.0, 10.0);
         ChasteCuboid<2> cuboid(lower, upper);
 
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
         MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, false, &cuboid, 2.0));
         p_pde_modifier->SetDependentVariableName("averaged quantity");
 
         // Test that member variables are initialised correctly
         TS_ASSERT_EQUALS(p_pde_modifier->rGetDependentVariableName(), "averaged quantity");
+        TS_ASSERT_DELTA(p_pde_modifier->GetStepSize(), 2.0, 1e-5);
+        TS_ASSERT_EQUALS(p_pde_modifier->AreBcsSetOnBoxBoundary(), false);
 
-        // Check mesh
-        TS_ASSERT_EQUALS(p_pde_modifier->mpFeMesh->GetNumNodes(),121u);
-        TS_ASSERT_EQUALS(p_pde_modifier->mpFeMesh->GetNumBoundaryNodes(),40u);
-        TS_ASSERT_EQUALS(p_pde_modifier->mpFeMesh->GetNumElements(),200u);
-        TS_ASSERT_EQUALS(p_pde_modifier->mpFeMesh->GetNumBoundaryElements(),40u);
+        // Coverage of some set and methods
+        p_pde_modifier->SetBcsOnBoxBoundary(true);
+        TS_ASSERT_EQUALS(p_pde_modifier->AreBcsSetOnBoxBoundary(), true);
+
+        // Check that the finite element mesh is correct
+        TS_ASSERT_EQUALS(p_pde_modifier->mpFeMesh->GetNumNodes(), 121u);
+        TS_ASSERT_EQUALS(p_pde_modifier->mpFeMesh->GetNumBoundaryNodes(), 40u);
+        TS_ASSERT_EQUALS(p_pde_modifier->mpFeMesh->GetNumElements(), 200u);
+        TS_ASSERT_EQUALS(p_pde_modifier->mpFeMesh->GetNumBoundaryElements(), 40u);
 
         ChasteCuboid<2> bounding_box = p_pde_modifier->mpFeMesh->CalculateBoundingBox();
-        TS_ASSERT_DELTA(bounding_box.rGetUpperCorner()[0],10,1e-5);
-        TS_ASSERT_DELTA(bounding_box.rGetUpperCorner()[1],10,1e-5);
-        TS_ASSERT_DELTA(bounding_box.rGetLowerCorner()[0],-10,1e-5);
-        TS_ASSERT_DELTA(bounding_box.rGetLowerCorner()[1],-10,1e-5);
+        TS_ASSERT_DELTA(bounding_box.rGetUpperCorner()[0],  10.0, 1e-5);
+        TS_ASSERT_DELTA(bounding_box.rGetUpperCorner()[1],  10.0, 1e-5);
+        TS_ASSERT_DELTA(bounding_box.rGetLowerCorner()[0], -10.0, 1e-5);
+        TS_ASSERT_DELTA(bounding_box.rGetLowerCorner()[1], -10.0, 1e-5);
 
         // Coverage
         TS_ASSERT_EQUALS(p_pde_modifier->GetOutputGradient(),false); // Defaults to false
@@ -94,15 +105,16 @@ public:
 
     void TestParabolicConstructor() throw(Exception)
     {
-        // Make the PDE and BCs
+        // Create PDE and boundary condition objects
         UniformSourceParabolicPde<2> pde(-0.1);
         ConstBoundaryCondition<2> bc(1.0);
 
-        // Make domain
+        // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         ChastePoint<2> lower(-10.0, -10.0);
         ChastePoint<2> upper(10.0, 10.0);
         ChasteCuboid<2> cuboid(lower, upper);
 
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
         MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, false, &cuboid, 2.0));
         p_pde_modifier->SetDependentVariableName("averaged quantity");
 
@@ -136,23 +148,22 @@ public:
 
         // Separate scope to write the archive
         {
-            // Make the PDE and BCs
+            // Create PDE and boundary condition objects
             UniformSourceEllipticPde<2> pde(-0.1);
             ConstBoundaryCondition<2> bc(1.0);
 
-            // Make domain
+            // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
             ChastePoint<2> lower(-10.0, -10.0);
             ChastePoint<2> upper(10.0, 10.0);
             ChasteCuboid<2> cuboid(lower, upper);
 
-            // Initialise an elliptic PDE modifier object
+            // Create a PDE modifier and set the name of the dependent variable in the PDE
             std::vector<double> data(10);
             for (unsigned i=0; i<10; i++)
             {
                 data[i] = i + 0.45;
             }
             Vec vector = PetscTools::CreateVec(data);
-
             EllipticBoxDomainPdeModifier<2> modifier(&pde, &bc, false, false, &cuboid, 2.0, vector);
             modifier.SetDependentVariableName("averaged quantity");
 
@@ -175,10 +186,10 @@ public:
 
             input_arch >> p_modifier2;
 
-            // See whether we read out the correct variable name area
-            std::string variable_name = (static_cast<EllipticBoxDomainPdeModifier<2>*>(p_modifier2))->rGetDependentVariableName();
-
-            TS_ASSERT_EQUALS(variable_name, "averaged quantity");
+            // Test that member variables are correct
+            TS_ASSERT_EQUALS((static_cast<EllipticBoxDomainPdeModifier<2>*>(p_modifier2))->rGetDependentVariableName(), "averaged quantity");
+            TS_ASSERT_DELTA((static_cast<EllipticBoxDomainPdeModifier<2>*>(p_modifier2))->GetStepSize(), 2.0, 1e-5);
+            TS_ASSERT_EQUALS((static_cast<EllipticBoxDomainPdeModifier<2>*>(p_modifier2))->AreBcsSetOnBoxBoundary(), false);
 
             Vec solution = (static_cast<EllipticBoxDomainPdeModifier<2>*>(p_modifier2))->GetSolution();
             ReplicatableVector solution_repl(solution);
@@ -202,23 +213,22 @@ public:
 
         // Separate scope to write the archive
         {
-            // Make the PDE and BCs
+            // Create PDE and boundary condition objects
             UniformSourceParabolicPde<2> pde(-0.1);
             ConstBoundaryCondition<2> bc(1.0);
 
-            // Make domain
+            // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
             ChastePoint<2> lower(-10.0, -10.0);
             ChastePoint<2> upper(10.0, 10.0);
             ChasteCuboid<2> cuboid(lower, upper);
 
-            // Initialise a parabolic PDE modifier object
+            // Create a PDE modifier and set the name of the dependent variable in the PDE
             std::vector<double> data(10);
             for (unsigned i=0; i<10; i++)
             {
                 data[i] = i + 0.45;
             }
             Vec vector = PetscTools::CreateVec(data);
-
             ParabolicBoxDomainPdeModifier<2> modifier(&pde, &bc, false, false, &cuboid, 2.0, vector);
             modifier.SetDependentVariableName("averaged quantity");
 
@@ -241,9 +251,10 @@ public:
 
             input_arch >> p_modifier2;
 
-            // See whether we read out the correct variable name
-            std::string variable_name = (static_cast<ParabolicBoxDomainPdeModifier<2>*>(p_modifier2))->rGetDependentVariableName();
-            TS_ASSERT_EQUALS(variable_name, "averaged quantity");
+            // Test that member variables are correct
+            TS_ASSERT_EQUALS((static_cast<ParabolicBoxDomainPdeModifier<2>*>(p_modifier2))->rGetDependentVariableName(), "averaged quantity");
+            TS_ASSERT_DELTA((static_cast<ParabolicBoxDomainPdeModifier<2>*>(p_modifier2))->GetStepSize(), 2.0, 1e-5);
+            TS_ASSERT_EQUALS((static_cast<ParabolicBoxDomainPdeModifier<2>*>(p_modifier2))->AreBcsSetOnBoxBoundary(), false);
 
             Vec solution = (static_cast<ParabolicBoxDomainPdeModifier<2>*>(p_modifier2))->GetSolution();
             ReplicatableVector solution_repl(solution);

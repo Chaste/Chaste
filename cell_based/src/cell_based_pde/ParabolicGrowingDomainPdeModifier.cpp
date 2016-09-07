@@ -55,7 +55,8 @@ ParabolicGrowingDomainPdeModifier<DIM>::ParabolicGrowingDomainPdeModifier(Abstra
 template<unsigned DIM>
 ParabolicGrowingDomainPdeModifier<DIM>::~ParabolicGrowingDomainPdeModifier()
 {
-    // It we have used this modifier, then we will have created a solution vector
+    ///\todo (#2687) - move to abstract class
+    // If we have used this modifier, then we will have created a solution vector
     if (this->mSolution)
     {
         PetscTools::Destroy(this->mSolution);
