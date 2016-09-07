@@ -204,9 +204,9 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
     {
         if (randomYMult != 0.0)
         {
-            EXCEPTION("Currently no random y variation allowed with an apical lamina")
+            EXCEPTION("Currently no random y variation allowed with an apical lamina");
         }
-        
+
         //\todo: implement this
         NEVER_REACHED;
     }
