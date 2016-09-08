@@ -37,58 +37,39 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTCELLBASEDELLIPTICPDES_HPP_
 
 #include <cxxtest/TestSuite.h>
-
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
-
 #include "ArchiveOpener.hpp"
 #include "ArchiveLocationInfo.hpp"
+#include "HoneycombMeshGenerator.hpp"
+#include "CellsGenerator.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
+#include "ApoptoticCellProperty.hpp"
+#include "MeshBasedCellPopulation.hpp"
+#include "NodeBasedCellPopulation.hpp"
 #include "UniformSourceEllipticPde.hpp"
 #include "CellwiseSourceEllipticPde.hpp"
 #include "AveragedSourceEllipticPde.hpp"
 #include "VolumeDependentAveragedSourceEllipticPde.hpp"
-#include "HoneycombMeshGenerator.hpp"
-#include "CellsGenerator.hpp"
-#include "FixedG1GenerationalCellCycleModel.hpp"
-#include "MeshBasedCellPopulation.hpp"
-#include "NodeBasedCellPopulation.hpp"
-#include "OutputFileHandler.hpp"
+#include "SmartPointers.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
-#include "PetscSetupAndFinalize.hpp"
 
 // This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
-/**
- * This test suite covers elliptic PDE classes.
- */
 class TestCellBasedEllipticPdes : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestCellwiseSourceEllipticPdeMethods() throw(Exception)
+    void TestUniformSourceEllipticPde()
     {
-        EXIT_IF_PARALLEL;
+        // Create PDE object
+        UniformSourceEllipticPde<2> pde(0.05);
 
-        // Set up cell population
-        HoneycombMeshGenerator generator(5, 5, 0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
-        std::vector<CellPtr> cells;
-        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
-        MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
-
-        // Create a PDE object
-        CellwiseSourceEllipticPde<2> pde(cell_population, 0.05);
-
-        // Test that the member variables have been initialised correctly
-        TS_ASSERT_EQUALS(&(pde.rGetCellPopulation()), &cell_population);
+        // Test that the member variable has been initialised correctly
         TS_ASSERT_DELTA(pde.GetCoefficient(), 0.05, 1e-6);
 
-        // Test methods
-        Node<2>* p_node = cell_population.GetNodeCorrespondingToCell(*(cell_population.Begin()));
-        TS_ASSERT_DELTA(pde.ComputeLinearInUCoeffInSourceTermAtNode(*p_node), 0.05, 1e-6);
-
+        // Test ComputeDiffusionTerm() method
         ChastePoint<2> point;
         c_matrix<double,2,2> diffusion_matrix = pde.ComputeDiffusionTerm(point);
         for (unsigned i=0; i<2; i++)
@@ -103,6 +84,99 @@ public:
                 TS_ASSERT_DELTA(diffusion_matrix(i,j), value, 1e-6);
             }
         }
+
+        // Test ComputeConstantInUSourceTerm() method
+        TS_ASSERT_DELTA(pde.ComputeConstantInUSourceTerm(point, NULL), 0.0, 1e-6);
+
+        // Test ComputeLinearInUCoeffInSourceTerm() method
+        HoneycombMeshGenerator generator(5, 5, 0);
+        TetrahedralMesh<2,2>* p_mesh = generator.GetMesh();
+        TS_ASSERT_DELTA(pde.ComputeLinearInUCoeffInSourceTerm(point, NULL), 0.05, 1e-6);
+        TS_ASSERT_DELTA(pde.ComputeLinearInUCoeffInSourceTerm(point, p_mesh->GetElement(0)), 0.05, 1e-6);
+    }
+
+    void TestUniformSourceEllipticPdeArchiving() throw(Exception)
+    {
+        FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
+        std::string archive_file = "UniformSourceEllipticPde.arch";
+        ArchiveLocationInfo::SetMeshFilename("UniformSourceEllipticPde");
+
+        {
+            // Create a PDE object
+            AbstractLinearEllipticPde<2,2>* const p_pde = new UniformSourceEllipticPde<2>(0.05);
+
+            // Create output archive and archive PDE object
+            ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
+            boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
+            (*p_arch) << p_pde;
+
+            delete p_pde;
+        }
+
+        {
+            AbstractLinearEllipticPde<2,2>* p_pde;
+
+            // Create an input archive and restore PDE object from archive
+            ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
+            boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
+            (*p_arch) >> p_pde;
+
+            // Test that the PDE and its member variable were archived correctly
+            TS_ASSERT(dynamic_cast<UniformSourceEllipticPde<2>*>(p_pde) != NULL);
+
+            UniformSourceEllipticPde<2>* p_static_cast_pde = static_cast<UniformSourceEllipticPde<2>*>(p_pde);
+            TS_ASSERT_DELTA(p_static_cast_pde->GetCoefficient(), 0.05, 1e-6);
+
+            delete p_pde;
+        }
+    }
+
+    void TestCellwiseSourceEllipticPde()
+    {
+        // Set up cell population
+        HoneycombMeshGenerator generator(5, 5, 0);
+        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
+
+        // Make one cell apoptotic
+        MAKE_PTR(ApoptoticCellProperty, p_apoptotic_state);
+        cells[0]->AddCellProperty(p_apoptotic_state);
+
+        MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+        // Create a PDE object
+        CellwiseSourceEllipticPde<2> pde(cell_population, 0.05);
+
+        // Test that the member variables have been initialised correctly
+        TS_ASSERT_EQUALS(&(pde.rGetCellPopulation()), &cell_population);
+        TS_ASSERT_DELTA(pde.GetCoefficient(), 0.05, 1e-6);
+
+        // Test ComputeDiffusionTerm() method
+        ChastePoint<2> point;
+        c_matrix<double,2,2> diffusion_matrix = pde.ComputeDiffusionTerm(point);
+        for (unsigned i=0; i<2; i++)
+        {
+            for (unsigned j=0; j<2; j++)
+            {
+                double value = 0.0;
+                if (i == j)
+                {
+                    value = 1.0;
+                }
+                TS_ASSERT_DELTA(diffusion_matrix(i,j), value, 1e-6);
+            }
+        }
+
+        // Test ComputeConstantInUSourceTerm() method
+        TS_ASSERT_DELTA(pde.ComputeConstantInUSourceTerm(point, NULL), 0.0, 1e-6);
+
+        Node<2>* p_node_0 = cell_population.GetNodeCorrespondingToCell(cell_population.GetCellUsingLocationIndex(0));
+        TS_ASSERT_DELTA(pde.ComputeLinearInUCoeffInSourceTermAtNode(*p_node_0), 0.0, 1e-6);
+
+        Node<2>* p_node_1 = cell_population.GetNodeCorrespondingToCell(cell_population.GetCellUsingLocationIndex(1));
+        TS_ASSERT_DELTA(pde.ComputeLinearInUCoeffInSourceTermAtNode(*p_node_1), 0.05, 1e-6);
     }
 
     void TestCellwiseSourceEllipticPdeArchiving() throw(Exception)
@@ -155,21 +229,31 @@ public:
         }
     }
 
-    void TestUniformSourceEllipticPdeMethods() throw(Exception)
+    void TestAveragedSourceEllipticPde()
     {
-        EXIT_IF_PARALLEL;
+        // Set up cell population
+        HoneycombMeshGenerator generator(5, 5, 0);
+        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
+        MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+        // For simplicity we create a very large coarse mesh, so we know that all cells are contained in one element
+        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_2_elements");
+        TetrahedralMesh<2,2> coarse_mesh;
+        coarse_mesh.ConstructFromMeshReader(mesh_reader);
+        coarse_mesh.Scale(10.0, 10.0);
 
         // Create a PDE object
-        UniformSourceEllipticPde<2> pde(0.05);
+        AveragedSourceEllipticPde<2> pde(cell_population, -1.0);
 
         // Test that the member variables have been initialised correctly
+        TS_ASSERT_EQUALS(&(pde.rGetCellPopulation()), &cell_population);
         TS_ASSERT_DELTA(pde.GetCoefficient(), 0.05, 1e-6);
 
+        // Test ComputeDiffusionTerm() method
         ChastePoint<2> point;
-
-        TS_ASSERT_DELTA(pde.ComputeConstantInUSourceTerm(point, NULL), 0.0, 1e-6);
-        TS_ASSERT_DELTA(pde.ComputeLinearInUCoeffInSourceTerm(point, NULL), 0.05, 1e-6);
-
         c_matrix<double,2,2> diffusion_matrix = pde.ComputeDiffusionTerm(point);
         for (unsigned i=0; i<2; i++)
         {
@@ -183,70 +267,19 @@ public:
                 TS_ASSERT_DELTA(diffusion_matrix(i,j), value, 1e-6);
             }
         }
-    }
 
-    void TestUniformSourceEllipticPdeArchiving() throw(Exception)
-    {
-        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
+        // Test ComputeLinearInUCoeffInSourceTerm() method
+        TS_ASSERT_DELTA(pde.ComputeLinearInUCoeffInSourceTerm(point,coarse_mesh.GetElement(0)), 0.0, 1e-6);
 
-        FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
-        std::string archive_file = "UniformSourceEllipticPde.arch";
-        ArchiveLocationInfo::SetMeshFilename("UniformSourceEllipticPde");
+        c_matrix <double, 2, 2> jacobian;
+        double det;
+        coarse_mesh.GetElement(1)->CalculateJacobian(jacobian, det);
+        TS_ASSERT_DELTA(pde.ComputeLinearInUCoeffInSourceTerm(point,coarse_mesh.GetElement(1)),
+                        -(cell_population.GetNumRealCells()/coarse_mesh.GetElement(1)->GetVolume(det)),
+                        1e-6);
 
-        {
-            // Create a PDE object
-            AbstractLinearEllipticPde<2,2>* const p_pde = new UniformSourceEllipticPde<2>(0.05);
-
-            // Create output archive and archive PDE object
-            ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
-            boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
-            (*p_arch) << p_pde;
-
-            delete p_pde;
-        }
-
-        {
-            AbstractLinearEllipticPde<2,2>* p_pde;
-
-            // Create an input archive and restore PDE object from archive
-            ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
-            boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
-            (*p_arch) >> p_pde;
-
-            // Test that the PDE and its member variables were archived correctly
-            TS_ASSERT(dynamic_cast<UniformSourceEllipticPde<2>*>(p_pde) != NULL);
-
-            UniformSourceEllipticPde<2>* p_static_cast_pde = static_cast<UniformSourceEllipticPde<2>*>(p_pde);
-            TS_ASSERT_DELTA(p_static_cast_pde->GetCoefficient(), 0.05, 1e-6);
-
-            delete p_pde;
-        }
-    }
-
-    void TestAveragedSourceEllipticPdeMethods() throw(Exception)
-    {
-        EXIT_IF_PARALLEL;
-
-        // Set up cell population
-        HoneycombMeshGenerator generator(5, 5, 0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
-        std::vector<CellPtr> cells;
-        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
-        MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
-
-        // Create a PDE object
-        AveragedSourceEllipticPde<2> pde(cell_population, 0.05);
-
-        // Test that the member variables have been initialised correctly
-        TS_ASSERT_EQUALS(&(pde.rGetCellPopulation()), &cell_population);
-        TS_ASSERT_DELTA(pde.GetCoefficient(), 0.05, 1e-6);
-
-        // For simplicity we create a very large coarse mesh, so we know that all cells are contained in one element
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_2_elements");
-        TetrahedralMesh<2,2> coarse_mesh;
-        coarse_mesh.ConstructFromMeshReader(mesh_reader);
-        coarse_mesh.Scale(10.0, 10.0);
+        // Test ComputeConstantInUSourceTerm() method
+        TS_ASSERT_DELTA(pde.ComputeConstantInUSourceTerm(point, NULL), 0.0, 1e-6);
 
         // Test SetupSourceTerms() when no map between cells and coarse mesh elements is supplied
         pde.SetupSourceTerms(coarse_mesh);
@@ -275,32 +308,10 @@ public:
         // Test GetUptakeRateForElement()
         TS_ASSERT_DELTA(pde.GetUptakeRateForElement(0), 0.5, 1e-6);
         TS_ASSERT_DELTA(pde.GetUptakeRateForElement(1), 0.0, 1e-6);
-
-        // Test other methods
-        ChastePoint<2> point;
-        TS_ASSERT_DELTA(pde.ComputeLinearInUCoeffInSourceTerm(point, coarse_mesh.GetElement(0)), 0.05*0.5, 1e-6);
-
-        TS_ASSERT_DELTA(pde.ComputeConstantInUSourceTerm(point, NULL), 0.0, 1e-6);
-
-        c_matrix<double,2,2> diffusion_matrix = pde.ComputeDiffusionTerm(point);
-        for (unsigned i=0; i<2; i++)
-        {
-            for (unsigned j=0; j<2; j++)
-            {
-                double value = 0.0;
-                if (i == j)
-                {
-                    value = 1.0;
-                }
-                TS_ASSERT_DELTA(diffusion_matrix(i,j), value, 1e-6);
-            }
-        }
     }
 
     void TestAveragedSourceEllipticPdeArchiving() throw(Exception)
     {
-        EXIT_IF_PARALLEL;
-
         // Set up simulation time
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
@@ -349,10 +360,8 @@ public:
         }
     }
 
-    void TestVolumeDependentAveragedSourceEllipticPdeMethods() throw(Exception)
+    void TestVolumeDependentAveragedSourceEllipticPde() throw(Exception)
     {
-        EXIT_IF_PARALLEL;
-
         // Create a cell population
         HoneycombMeshGenerator generator(5, 5, 0);
         MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
@@ -403,8 +412,6 @@ public:
 
     void TestVolumeDependentAveragedSourceEllipticPdeArchiving() throw(Exception)
     {
-        EXIT_IF_PARALLEL;
-
         // Set up simulation time
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 

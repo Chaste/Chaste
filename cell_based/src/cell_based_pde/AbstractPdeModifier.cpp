@@ -41,16 +41,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AveragedSourceParabolicPde.hpp"
 
 template<unsigned DIM>
-AbstractPdeModifier<DIM>::AbstractPdeModifier(AbstractLinearPde<DIM,DIM>* pPde,
-                                              AbstractBoundaryCondition<DIM>* pBoundaryCondition,
+AbstractPdeModifier<DIM>::AbstractPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde,
+                                              boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition,
                                               bool isNeumannBoundaryCondition,
-                                              bool deleteMemberPointersInDestructor,
                                               Vec solution)
     : AbstractCellBasedSimulationModifier<DIM>(),
       mpPde(pPde),
       mpBoundaryCondition(pBoundaryCondition),
       mIsNeumannBoundaryCondition(isNeumannBoundaryCondition),
-      mDeleteMemberPointersInDestructor(deleteMemberPointersInDestructor),
       mSolution(NULL),
       mOutputDirectory(""),
       mOutputGradient(false),
@@ -65,23 +63,16 @@ AbstractPdeModifier<DIM>::AbstractPdeModifier(AbstractLinearPde<DIM,DIM>* pPde,
 template<unsigned DIM>
 AbstractPdeModifier<DIM>::~AbstractPdeModifier()
 {
-    ///\todo (#2687)
-//    // Avoid memory leaks if the object was loaded from an archive
-//    if (mDeleteMemberPointersInDestructor)
-//    {
-//        delete mpPde;
-//        delete mpBoundaryCondition;
-//    }
 }
 
 template<unsigned DIM>
-AbstractLinearPde<DIM,DIM>* AbstractPdeModifier<DIM>::GetPde() const
+boost::shared_ptr<AbstractLinearPde<DIM,DIM> > AbstractPdeModifier<DIM>::GetPde()
 {
     return mpPde;
 }
 
 template<unsigned DIM>
-AbstractBoundaryCondition<DIM>* AbstractPdeModifier<DIM>::GetBoundaryCondition() const
+boost::shared_ptr<AbstractBoundaryCondition<DIM> > AbstractPdeModifier<DIM>::GetBoundaryCondition()
 {
     return mpBoundaryCondition;
 }
@@ -107,21 +98,21 @@ std::string& AbstractPdeModifier<DIM>::rGetDependentVariableName()
 template<unsigned DIM>
 bool AbstractPdeModifier<DIM>::HasAveragedSourcePde()
 {
-    return ((dynamic_cast<AveragedSourceEllipticPde<DIM>*>(mpPde) != NULL) ||
-            (dynamic_cast<AveragedSourceParabolicPde<DIM>*>(mpPde) != NULL));
+    return ((boost::dynamic_pointer_cast<AveragedSourceEllipticPde<DIM> >(mpPde) != NULL) ||
+            (boost::dynamic_pointer_cast<AveragedSourceParabolicPde<DIM> >(mpPde) != NULL));
 }
 
 template<unsigned DIM>
 void AbstractPdeModifier<DIM>::SetUpSourceTermsForAveragedSourcePde(TetrahedralMesh<DIM,DIM>* pMesh, std::map<CellPtr, unsigned>* pCellPdeElementMap)
 {
     assert(HasAveragedSourcePde());
-    if (dynamic_cast<AveragedSourceEllipticPde<DIM>*>(mpPde) != NULL)
+    if (boost::dynamic_pointer_cast<AveragedSourceEllipticPde<DIM> >(mpPde) != NULL)
     {
-        static_cast<AveragedSourceEllipticPde<DIM>*>(mpPde)->SetupSourceTerms(*pMesh, pCellPdeElementMap);
+        boost::static_pointer_cast<AveragedSourceEllipticPde<DIM> >(mpPde)->SetupSourceTerms(*pMesh, pCellPdeElementMap);
     }
-    else if (dynamic_cast<AveragedSourceParabolicPde<DIM>*>(mpPde) != NULL)
+    else if (boost::dynamic_pointer_cast<AveragedSourceParabolicPde<DIM> >(mpPde) != NULL)
     {
-        static_cast<AveragedSourceParabolicPde<DIM>*>(mpPde)->SetupSourceTerms(*pMesh, pCellPdeElementMap);
+        boost::static_pointer_cast<AveragedSourceParabolicPde<DIM> >(mpPde)->SetupSourceTerms(*pMesh, pCellPdeElementMap);
     }
 }
 
@@ -155,10 +146,13 @@ void AbstractPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCell
     // Cache the output directory
     this->mOutputDirectory = outputDirectory;
 
-    if (PetscTools::AmMaster())
+    if (mOutputSolutionAtPdeNodes)
     {
-        OutputFileHandler output_file_handler(outputDirectory+"/", false);
-        mpVizPdeSolutionResultsFile = output_file_handler.OpenOutputFile("results.vizpdesolution");
+        if (PetscTools::AmMaster())
+        {
+            OutputFileHandler output_file_handler(outputDirectory+"/", false);
+            mpVizPdeSolutionResultsFile = output_file_handler.OpenOutputFile("results.vizpdesolution");
+        }
     }
 }
 
@@ -235,9 +229,12 @@ void AbstractPdeModifier<DIM>::UpdateAtEndOfOutputTimeStep(AbstractCellPopulatio
 template<unsigned DIM>
 void AbstractPdeModifier<DIM>::UpdateAtEndOfSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
-    if (PetscTools::AmMaster())
+    if (mOutputSolutionAtPdeNodes)
     {
-        mpVizPdeSolutionResultsFile->close();
+        if (PetscTools::AmMaster())
+        {
+            mpVizPdeSolutionResultsFile->close();
+        }
     }
 }
 

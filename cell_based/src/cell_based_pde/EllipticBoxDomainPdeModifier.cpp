@@ -37,17 +37,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SimpleLinearEllipticSolver.hpp"
 
 template<unsigned DIM>
-EllipticBoxDomainPdeModifier<DIM>::EllipticBoxDomainPdeModifier(AbstractLinearPde<DIM,DIM>* pPde,
-                                                                AbstractBoundaryCondition<DIM>* pBoundaryCondition,
+EllipticBoxDomainPdeModifier<DIM>::EllipticBoxDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde,
+                                                                boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition,
                                                                 bool isNeumannBoundaryCondition,
-                                                                bool deleteMemberPointersInDestructor,
                                                                 ChasteCuboid<DIM>* pMeshCuboid,
                                                                 double stepSize,
                                                                 Vec solution)
     : AbstractBoxDomainPdeModifier<DIM>(pPde,
     		                            pBoundaryCondition,
     	                             	isNeumannBoundaryCondition,
-    	                                deleteMemberPointersInDestructor,
     		                            pMeshCuboid,
     		                            stepSize,
     		                            solution)
@@ -57,7 +55,6 @@ EllipticBoxDomainPdeModifier<DIM>::EllipticBoxDomainPdeModifier(AbstractLinearPd
 template<unsigned DIM>
 EllipticBoxDomainPdeModifier<DIM>::~EllipticBoxDomainPdeModifier()
 {
-    ///\todo (#2687) - move to abstract class
     // Destroy the most recent solution vector
     if (this->mSolution != NULL)
     {
@@ -79,16 +76,16 @@ void EllipticBoxDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopula
 
     // Use SimpleLinearEllipticSolver as Averaged Source PDE
     SimpleLinearEllipticSolver<DIM,DIM> solver(this->mpFeMesh,
-                                               static_cast<AbstractLinearEllipticPde<DIM,DIM>*>(this->GetPde()),
+                                               boost::static_pointer_cast<AbstractLinearEllipticPde<DIM,DIM> >(this->GetPde()).get(),
                                                p_bcc.get());
 
-    ///\todo Use initial guess when solving the system (#2687)
+    ///\todo Use initial guess when solving the system
     Vec old_solution_copy = this->mSolution;
     this->mSolution = solver.Solve();
 
     // Note that the linear solver creates a vector, so we have to keep a handle on the old one
     // in order to destroy it.
-    ///\todo #2687 This will change when initial guess is used.
+    ///\todo This will change when initial guess is used.
     /// On the first go round the vector has yet to be initialised, so we don't destroy it.
     if (old_solution_copy != NULL)
     {
@@ -147,7 +144,7 @@ std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > EllipticBoxDomainPdeModif
 			 iter != coarse_mesh_boundary_node_indices.end();
 			 ++iter)
 		{
-			p_bcc->AddDirichletBoundaryCondition(this->mpFeMesh->GetNode(*iter), this->GetBoundaryCondition(), 0, false);
+			p_bcc->AddDirichletBoundaryCondition(this->mpFeMesh->GetNode(*iter), this->mpBoundaryCondition.get(), 0, false);
 		}
 	}
 	else // Apply BC at boundary nodes of box domain FE mesh
@@ -156,7 +153,7 @@ std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > EllipticBoxDomainPdeModif
 			 node_iter != this->mpFeMesh->GetBoundaryNodeIteratorEnd();
 			 ++node_iter)
 		{
-			p_bcc->AddDirichletBoundaryCondition(*node_iter, this->GetBoundaryCondition());
+			p_bcc->AddDirichletBoundaryCondition(*node_iter, this->mpBoundaryCondition.get());
 		}
 	}
 

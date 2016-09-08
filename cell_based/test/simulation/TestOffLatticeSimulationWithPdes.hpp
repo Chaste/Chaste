@@ -161,10 +161,10 @@ public:
 
         // Create PDE and boundary condition objects
         SimplePdeForTesting pde;
-        ConstBoundaryCondition<2> bc(1.0);
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
         p_pde_modifier->SetDependentVariableName("oxygen");
 
         simulator.AddSimulationModifier(p_pde_modifier);
@@ -251,11 +251,11 @@ public:
         TS_ASSERT_EQUALS(simulator.GetIdentifier(), "OffLatticeSimulation-2-2");
 
         // Create PDE and boundary condition objects
-        UniformSourceEllipticPde<2> pde(-0.1);
-        ConstBoundaryCondition<2> bc(1.0);
+        MAKE_PTR_ARGS(UniformSourceEllipticPde<2>, p_pde, (-0.1));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
         p_pde_modifier->SetDependentVariableName("oxygen");
 
         simulator.AddSimulationModifier(p_pde_modifier);
@@ -357,11 +357,11 @@ public:
         simulator.SetEndTime(0.5);
 
         // Create PDE and boundary condition objects
-        CellwiseSourceEllipticPde<2> pde(cell_population, -0.1);
-        ConstBoundaryCondition<2> bc(1.0);
+        MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde, (cell_population, -0.1));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
         p_pde_modifier->SetDependentVariableName("oxygen");
 
         simulator.AddSimulationModifier(p_pde_modifier);
@@ -436,11 +436,11 @@ public:
         simulator.SetEndTime(0.5);
 
         // Create PDE and boundary condition objects
-        CellwiseSourceEllipticPde<2> pde(cell_population, -0.1);
-        ConstBoundaryCondition<2> bc(1.0);
+        MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde, (cell_population, -0.1));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
         p_pde_modifier->SetDependentVariableName("oxygen");
 
         simulator.AddSimulationModifier(p_pde_modifier);
@@ -516,11 +516,11 @@ public:
         simulator.SetEndTime(1.0/120.0);
 
         // Create PDE and boundary condition objects
-        UniformSourceEllipticPde<2> pde(-0.1);
-        ConstBoundaryCondition<2> bc(1.0);
+        MAKE_PTR_ARGS(UniformSourceEllipticPde<2>, p_pde(-0.1));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
         p_pde_modifier->SetDependentVariableName("oxygen");
 
         simulator.AddSimulationModifier(p_pde_modifier);
@@ -609,10 +609,10 @@ public:
         simulator.SetEndTime(0.05);
 
         // Create PDE and boundary condition objects
-        AveragedSourceEllipticPde<2> pde(cell_population, -0.1);
-        ConstBoundaryCondition<2> bc(1.0);
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, -0.1));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
-        AveragedSourceEllipticPde<2> pde2(cell_population, -0.5);
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde2, (cell_population, -0.5));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         c_vector<double,2> centroid = cell_population.GetCentroidOfCellPopulation();
@@ -621,14 +621,14 @@ public:
         ChasteCuboid<2> cuboid(lower, upper);
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, false, &cuboid, 10.0));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, &cuboid, 10.0));
         p_pde_modifier->SetDependentVariableName("oxygen");
         p_pde_modifier->SetBcsOnBoxBoundary(false);
 
         simulator.AddSimulationModifier(p_pde_modifier);
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier2, (&pde2, &bc, false, false, &cuboid, 10.0));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier2, (&pde2, &bc, false, &cuboid, 10.0));
         p_pde_modifier2->SetDependentVariableName("dunno");
         p_pde_modifier2->SetBcsOnBoxBoundary(false);
 
@@ -753,8 +753,8 @@ public:
         simulator.SetEndTime(0.05);
 
         // Create PDE and boundary condition objects
-        AveragedSourceEllipticPde<2> pde(cell_population, 0.0);
-        ConstBoundaryCondition<2> bc(1.0);
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, 0.0));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         c_vector<double,2> centroid = cell_population.GetCentroidOfCellPopulation();
@@ -763,7 +763,7 @@ public:
         ChasteCuboid<2> cuboid(lower, upper);
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, false, &cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, &cuboid));
         p_pde_modifier->SetDependentVariableName("nutrient");
 
         simulator.AddSimulationModifier(p_pde_modifier);
@@ -825,11 +825,11 @@ public:
         simulator.SetEndTime(0.2);
 
         // Create PDE and boundary condition objects
-        UniformSourceEllipticPde<2> pde(-0.1);
-        ConstBoundaryCondition<2> bc(1.0);
+        MAKE_PTR_ARGS(UniformSourceEllipticPde<2>, p_pde, (-0.1));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
         p_pde_modifier->SetDependentVariableName("oxygen");
 
         simulator.AddSimulationModifier(p_pde_modifier);
@@ -917,11 +917,11 @@ public:
         simulator.SetEndTime(end_time);
 
         // Create PDE and boundary condition objects
-        CellwiseSourceEllipticPde<2> pde(cell_population, -0.03);
-        ConstBoundaryCondition<2> bc(1.0);
+        MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde, (cell_population, -0.03));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
         p_pde_modifier->SetDependentVariableName("oxygen");
 
         simulator.AddSimulationModifier(p_pde_modifier);
@@ -983,11 +983,11 @@ public:
         simulator.SetEndTime(0.1);
 
         // Create PDE and boundary condition objects
-        UniformSourceEllipticPde<3> pde(-0.03);
-        ConstBoundaryCondition<3> bc(1.0);
+        MAKE_PTR_ARGS(UniformSourceEllipticPde<3>, p_pde, (-0.03));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<3>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<3>, p_pde_modifier, (&pde, &bc, false));
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<3>, p_pde_modifier, (p_pde, p_bc, false));
         p_pde_modifier->SetDependentVariableName("oxygen");
 
         simulator.AddSimulationModifier(p_pde_modifier);
@@ -1045,11 +1045,11 @@ public:
         simulator.SetOutputDirectory("TestUpdateAtEndOfTimeStepMethod");
 
         // Create PDE and boundary condition objects
-        SimplePdeForTesting pde;
-        FunctionalBoundaryCondition<2> functional_bc(&bc_func);
+        MAKE_PTR(SimplePdeForTesting, p_pde);
+        MAKE_PTR_ARGS(FunctionalBoundaryCondition<2, p_functional_bc, (&bc_func));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &functional_bc, false));
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_functional_bc, false));
         p_pde_modifier->SetDependentVariableName("oxygen");
 
         simulator.AddSimulationModifier(p_pde_modifier);
@@ -1098,11 +1098,11 @@ public:
         TS_ASSERT_EQUALS(simulator.GetIdentifier(), "OffLatticeSimulation-2-2");
 
         // Create PDE and boundary condition objects
-        CellwiseSourceEllipticPde<2> pde(cell_population, -0.03);
-        ConstBoundaryCondition<2> bc(1.0);
+        MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde(cell_population, -0.03));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
         p_pde_modifier->SetDependentVariableName("oxygen");
 
         simulator.AddSimulationModifier(p_pde_modifier);
@@ -1163,8 +1163,8 @@ public:
         simulator.SetEndTime(0.01);
 
         // Create PDE and boundary condition objects
-        AveragedSourceEllipticPde<2> pde(cell_population, 0.0);
-        ConstBoundaryCondition<2> bc(1.0);
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, 0.0));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         c_vector<double,2> centroid = cell_population.GetCentroidOfCellPopulation();
@@ -1173,7 +1173,7 @@ public:
         ChasteCuboid<2> cuboid(lower, upper);
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, false, &cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, &cuboid));
         p_pde_modifier->SetDependentVariableName("nutrient");
 
         simulator.AddSimulationModifier(p_pde_modifier);
@@ -1241,8 +1241,8 @@ public:
         simulator.SetEndTime(0.01);
 
         // Create PDE and boundary condition objects (zero uptake to check analytic solution)
-        AveragedSourceEllipticPde<2> pde(cell_population, 0.0);
-        ConstBoundaryCondition<2> bc(1.0);
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, 0.0));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         c_vector<double,2> centroid = cell_population.GetCentroidOfCellPopulation();
@@ -1251,7 +1251,7 @@ public:
         ChasteCuboid<2> cuboid(lower, upper);
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, false, &cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, &cuboid));
         p_pde_modifier->SetDependentVariableName("nutrient");
 
         simulator.AddSimulationModifier(p_pde_modifier);
@@ -1338,8 +1338,8 @@ public:
         simulator.SetEndTime(0.01);
 
         // Create PDE and boundary condition objects (uniform uptake at each cell)
-        VolumeDependentAveragedSourceEllipticPde<2> pde(cell_population, -0.01);
-        ConstBoundaryCondition<2> bc(1.0);
+        MAKE_PTR_ARGS(VolumeDependentAveragedSourceEllipticPde<2>, p_pde, (cell_population, -0.01));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         c_vector<double,2> centroid = cell_population.GetCentroidOfCellPopulation();
@@ -1348,7 +1348,7 @@ public:
         ChasteCuboid<2> cuboid(lower, upper);
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, false, &cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, &cuboid));
         p_pde_modifier->SetDependentVariableName("nutrient");
 
         simulator.AddSimulationModifier(p_pde_modifier);
@@ -1424,8 +1424,8 @@ public:
         simulator.SetEndTime(0.01);
 
         // Create PDE and boundary condition objects
-        AveragedSourceEllipticPde<1> pde(cell_population, -1.0);
-        ConstBoundaryCondition<1> bc(0.0);
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<1>, p_pde, (cell_population, -1.0));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<1>, p_bc, (0.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         ChastePoint<1> lower(0.0);
@@ -1433,7 +1433,7 @@ public:
         ChasteCuboid<1> cuboid(lower, upper);
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<1>, p_pde_modifier, (&pde, &bc, false, false, &cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<1>, p_pde_modifier, (p_pde, p_bc, false, &cuboid));
         p_pde_modifier->SetDependentVariableName("nutrient");
 
         simulator.AddSimulationModifier(p_pde_modifier);
@@ -1488,8 +1488,8 @@ public:
         simulator.SetEndTime(0.01);
 
         // Create PDE and boundary condition objects
-        AveragedSourceEllipticPde<2> pde(cell_population, -0.01);
-        ConstBoundaryCondition<2> bc(1.0);
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, -0.01));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         c_vector<double,2> centroid = cell_population.GetCentroidOfCellPopulation();
@@ -1498,7 +1498,7 @@ public:
         ChasteCuboid<2> cuboid(lower, upper);
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false, false, &cuboid, 10.0));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, &cuboid, 10.0));
         p_pde_modifier->SetDependentVariableName("nutrient");
         p_pde_modifier->SetBcsOnBoxBoundary(false);
 
@@ -1550,8 +1550,8 @@ public:
         simulator.SetEndTime(0.01);
 
         // Create PDE and boundary condition objects
-        AveragedSourceEllipticPde<3> pde(cell_population, -0.01);
-        ConstBoundaryCondition<3> bc(1.0);
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<3>, p_pde, (cell_population, -0.01));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<3>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         c_vector<double,3> centroid = cell_population.GetCentroidOfCellPopulation();
@@ -1560,7 +1560,7 @@ public:
         ChasteCuboid<3> cuboid(lower, upper);
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<3>, p_pde_modifier, (&pde, &bc, false, false, &cuboid, 10.0));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<3>, p_pde_modifier, (p_pde, p_bc, false, &cuboid, 10.0));
         p_pde_modifier->SetDependentVariableName("nutrient");
         p_pde_modifier->SetBcsOnBoxBoundary(false);
 

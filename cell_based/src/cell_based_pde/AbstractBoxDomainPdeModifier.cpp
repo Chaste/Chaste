@@ -41,17 +41,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/make_shared.hpp>
 
 template<unsigned DIM>
-AbstractBoxDomainPdeModifier<DIM>::AbstractBoxDomainPdeModifier(AbstractLinearPde<DIM,DIM>* pPde,
-                                                                AbstractBoundaryCondition<DIM>* pBoundaryCondition,
+AbstractBoxDomainPdeModifier<DIM>::AbstractBoxDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde,
+                                                                boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition,
                                                                 bool isNeumannBoundaryCondition,
-                                                                bool deleteMemberPointersInDestructor,
                                                                 ChasteCuboid<DIM>* pMeshCuboid,
                                                                 double stepSize,
                                                                 Vec solution)
     : AbstractPdeModifier<DIM>(pPde,
     		                   pBoundaryCondition,
     		                   isNeumannBoundaryCondition,
-    		                   deleteMemberPointersInDestructor,
     		                   solution),
       mpMeshCuboid(pMeshCuboid),
       mStepSize(stepSize),

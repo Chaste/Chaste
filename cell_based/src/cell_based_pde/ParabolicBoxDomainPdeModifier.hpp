@@ -43,14 +43,27 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "BoundaryConditionsContainer.hpp"
 
 /**
- * A modifier class in which a parabolic PDE is solved on a box domain and the results are stored in CellData.
+ * A modifier class in which a linear parabolic PDE coupled to a cell-based simulation
+ * is solved on a coarse domain.
  *
- * \todo Improve documentation (#2687)
+ * The finite element mesh used to solve the PDE numerically is a fixed tessellation of
+ * a cuboid (box), which must be supplied to the constructor. The value of the dependent
+ * variable is interpolated between coarse mesh nodes to obtain a value at each cell,
+ * which is stored and updated in a CellData item.
+ *
+ * At each time step the boundary condition supplied to the constructor may be imposed
+ * either on the boundary of the box domain, or on the boundary of the cell population
+ * (which is assumed to lie within the box domain). This choice can be made using the
+ * AbstractBoxDomainPdeModifier method SetBcsOnBoxBoundary(), which is inherited by this
+ * class.
+ *
+ * Examples of PDEs in the source folder that can be solved using this class are
+ * AveragedSourceParabolicPde and UniformSourceParabolicPde.
  */
 template<unsigned DIM>
 class ParabolicBoxDomainPdeModifier : public AbstractBoxDomainPdeModifier<DIM>
 {
-    friend class TestBoxDomainPdeModifiers;
+    friend class TestParabolicBoxDomainPdeModifier;
 
 private:
 
@@ -74,20 +87,17 @@ public:
     /**
      * Constructor.
      *
-     * @param pPde A pointer to a linear PDE object (defaults to NULL)
-     * @param pBoundaryCondition A pointer to an abstract boundary condition
+     * @param pPde A shared pointer to a linear PDE object (defaults to NULL)
+     * @param pBoundaryCondition A shared pointer to an abstract boundary condition
      *     (defaults to NULL, corresponding to a constant boundary condition with value zero)
      * @param isNeumannBoundaryCondition Whether the boundary condition is Neumann (defaults to true)
-     * @param deleteMemberPointersInDestructor whether to delete member pointers in the destructor
-     *     (defaults to false)
      * @param pMeshCuboid pointer to a ChasteCuboid specifying the outer boundary for the FE mesh (defaults to NULL)
      * @param stepSize step size to be used in the FE mesh (defaults to 1.0, i.e. the default cell size)
      * @param solution solution vector (defaults to NULL)
      */
-    ParabolicBoxDomainPdeModifier(AbstractLinearPde<DIM,DIM>* pPde=NULL,
-                                  AbstractBoundaryCondition<DIM>* pBoundaryCondition=NULL,
+    ParabolicBoxDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde=boost::shared_ptr<AbstractLinearPde<DIM,DIM> >(),
+                                  boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition=boost::shared_ptr<AbstractBoundaryCondition<DIM> >(),
                                   bool isNeumannBoundaryCondition=true,
-                                  bool deleteMemberPointersInDestructor=false,
                                   ChasteCuboid<DIM>* pMeshCuboid=NULL,
                                   double stepSize=1.0,
                                   Vec solution=NULL);
@@ -175,7 +185,12 @@ inline void load_construct_data(
         PetscTools::ReadPetscObject(solution, archive_filename);
     }
 
-    ::new(t)ParabolicBoxDomainPdeModifier<DIM>(NULL, NULL, true, false, NULL, 1.0, solution);
+    ::new(t)ParabolicBoxDomainPdeModifier<DIM>(boost::shared_ptr<AbstractLinearPde<DIM, DIM> >(),
+                                               boost::shared_ptr<AbstractBoundaryCondition<DIM> >(),
+                                               true,
+                                               NULL,
+                                               1.0,
+                                               solution);
 }
 }
 } // namespace ...

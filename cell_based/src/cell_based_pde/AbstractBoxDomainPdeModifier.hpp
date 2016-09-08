@@ -42,14 +42,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractPdeModifier.hpp"
 
 /**
- * A modifier class in which has the common functionality of solving a PDE on a Mesh defined by a Box larger than the tissue.
- * A growing spheroid or monolayer in a flow chamber for example.
- * The results are stored in CellData.
+ * An abstract modifier class containing functionality common to EllipticBoxDomainPdeModifier
+ * and ParabolicBoxDomainPdeModifier, which both solve a linear elliptic or parabolic PDE
+ * coupled to a cell-based simulation on a coarse domain.
  */
 template<unsigned DIM>
 class AbstractBoxDomainPdeModifier : public AbstractPdeModifier<DIM>
 {
-    friend class TestBoxDomainPdeModifiers;
+    friend class TestEllipticBoxDomainPdeModifier;
+    friend class TestParabolicBoxDomainPdeModifier;
     friend class TestOffLatticeSimulationWithPdes;
 
 private:
@@ -100,20 +101,17 @@ public:
     /**
      * Constructor.
      *
-     * @param pPde A pointer to a linear PDE object (defaults to NULL)
-     * @param pBoundaryCondition A pointer to an abstract boundary condition
+     * @param pPde A shared pointer to a linear PDE object (defaults to NULL)
+     * @param pBoundaryCondition A shared pointer to an abstract boundary condition
      *     (defaults to NULL, corresponding to a constant boundary condition with value zero)
      * @param isNeumannBoundaryCondition Whether the boundary condition is Neumann (defaults to true)
-     * @param deleteMemberPointersInDestructor whether to delete member pointers in the destructor
-     *     (defaults to false)
      * @param pMeshCuboid pointer to a ChasteCuboid specifying the outer boundary for the FE mesh (defaults to NULL)
      * @param stepSize step size to be used in the FE mesh (defaults to 1.0, i.e. the default cell size)
      * @param solution solution vector (defaults to NULL)
      */
-    AbstractBoxDomainPdeModifier(AbstractLinearPde<DIM,DIM>* pPde=NULL,
-                                 AbstractBoundaryCondition<DIM>* pBoundaryCondition=NULL,
+    AbstractBoxDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde=boost::shared_ptr<AbstractLinearPde<DIM,DIM> >(),
+                                 boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition=boost::shared_ptr<AbstractBoundaryCondition<DIM> >(),
                                  bool isNeumannBoundaryCondition=true,
-                                 bool deleteMemberPointersInDestructor=false,
                                  ChasteCuboid<DIM>* pMeshCuboid=NULL,
                                  double stepSize=1.0,
                                  Vec solution=NULL);

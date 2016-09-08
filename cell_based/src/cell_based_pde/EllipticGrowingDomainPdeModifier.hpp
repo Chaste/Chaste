@@ -43,16 +43,24 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "BoundaryConditionsContainer.hpp"
 
 /**
- * A modifier class in which an elliptic PDE is solved on a growing domain and the results are stored in CellData.
+ * A modifier class in which a linear elliptic PDE coupled to a cell-based simulation
+ * is solved on a growing domain. The value of the dependent variable at each cell is
+ * stored and updated in a CellData item.
  *
- * \todo #2760 How is the domain growing? More detail needed in this documentation.
+ * At each time step, the finite element mesh used to solve the PDE numerically
+ * is defined by the spatial domain associated with the cell population. The
+ * precise definition of this domain is implemented in the method
+ * GetTetrahedralMeshForPdeModifier(), which is overridden for each cell population
+ * class and is used in the AbstractGrowingDomainPdeModifier method GenerateFeMesh()
+ * that is inherited by this class.
  *
- * \todo Improve documentation (#2687)
+ * Examples of PDEs in the source folder that can be solved using this class are
+ * CellwiseSourceEllipticPde and UniformSourceEllipticPde.
  */
 template<unsigned DIM>
 class EllipticGrowingDomainPdeModifier : public AbstractGrowingDomainPdeModifier<DIM>
 {
-    friend class TestGrowingDomainPdeModifiers;
+    friend class TestEllipticGrowingDomainPdeModifier;
 
 private:
 
@@ -76,18 +84,15 @@ public:
     /**
      * Constructor.
      *
-     * @param pPde A pointer to a linear PDE object (defaults to NULL)
-     * @param pBoundaryCondition A pointer to an abstract boundary condition
+     * @param pPde A shared pointer to a linear PDE object (defaults to NULL)
+     * @param pBoundaryCondition A shared pointer to an abstract boundary condition
      *     (defaults to NULL, corresponding to a constant boundary condition with value zero)
      * @param isNeumannBoundaryCondition Whether the boundary condition is Neumann (defaults to true)
-     * @param deleteMemberPointersInDestructor whether to delete member pointers in the destructor
-     *     (defaults to false)
      * @param solution solution vector (defaults to NULL)
      */
-    EllipticGrowingDomainPdeModifier(AbstractLinearPde<DIM,DIM>* pPde=NULL,
-                                     AbstractBoundaryCondition<DIM>* pBoundaryCondition=NULL,
+    EllipticGrowingDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde=boost::shared_ptr<AbstractLinearPde<DIM,DIM> >(),
+                                     boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition=boost::shared_ptr<AbstractBoundaryCondition<DIM> >(),
                                      bool isNeumannBoundaryCondition=true,
-                                     bool deleteMemberPointersInDestructor=false,
                                      Vec solution=NULL);
 
     /**
@@ -162,7 +167,10 @@ inline void load_construct_data(
         PetscTools::ReadPetscObject(solution, archive_filename);
     }
 
-    ::new(t)EllipticGrowingDomainPdeModifier<DIM>(NULL, NULL, true, false, solution);
+    ::new(t)EllipticGrowingDomainPdeModifier<DIM>(boost::shared_ptr<AbstractLinearPde<DIM, DIM> >(),
+                                                  boost::shared_ptr<AbstractBoundaryCondition<DIM> >(),
+                                                  true,
+                                                  solution);
 }
 }
 } // namespace ...

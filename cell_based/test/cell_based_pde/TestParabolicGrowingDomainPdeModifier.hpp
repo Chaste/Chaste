@@ -33,20 +33,27 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef TESTPARABOLICGROWINGDOMAINMODIFIERMETHODS_HPP_
-#define TESTPARABOLICGROWINGDOMAINMODIFIERMETHODS_HPP_
+#ifndef TESTPARABOLICGROWINGDOMAINPDEMODIFIER_HPP_
+#define TESTPARABOLICGROWINGDOMAINPDEMODIFIER_HPP_
 
 #include <cxxtest/TestSuite.h>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+
+#include "CheckpointArchiveTypes.hpp"
 #include <boost/math/special_functions/bessel.hpp>
 #include "SmartPointers.hpp"
 #include "AbstractCellBasedWithTimingsTestSuite.hpp"
 #include "ParabolicGrowingDomainPdeModifier.hpp"
 #include "CellwiseSourceParabolicPde.hpp"
+#include "UniformSourceParabolicPde.hpp"
 #include "UniformCellCycleModel.hpp"
 #include "ApoptoticCellProperty.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 #include "CellsGenerator.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
+#include "AveragedSourceParabolicPde.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "NodeBasedCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
@@ -54,11 +61,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PottsBasedCellPopulation.hpp"
 #include "PottsMeshGenerator.hpp"
 #include "CaBasedCellPopulation.hpp"
+#include "ReplicatableVector.hpp"
 
 // This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
-///\todo rename test suite to TestParabolicGrowingDomainPdeModifier (#2687)
 /*
  * In this test suite we check the solution of the CellwiseParabolicPdes
  * against exact solutions.
@@ -67,9 +74,127 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * We solve unit disc where the steady state solutions are Bessels functions and logs.
  */
-class TestParabolicGrowingDomainModifierMethods : public AbstractCellBasedWithTimingsTestSuite
+class TestParabolicGrowingDomainPdeModifier : public AbstractCellBasedWithTimingsTestSuite
 {
 public:
+
+    void TestParabolicConstructor() throw(Exception)
+    {
+        // Create PDE and boundary condition objects
+        MAKE_PTR_ARGS(UniformSourceParabolicPde<2>, p_pde, (-0.1));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
+
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
+        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
+        p_pde_modifier->SetDependentVariableName("averaged quantity");
+
+        // Test that member variables are initialised correctly
+        TS_ASSERT_EQUALS(p_pde_modifier->rGetDependentVariableName(), "averaged quantity");
+    }
+
+    void TestGrowingDomainPdeModifierExceptions() throw(Exception)
+    {
+        EXIT_IF_PARALLEL;
+
+        // Create a simple mesh
+        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_522_elements");
+        TetrahedralMesh<2,2> temp_mesh;
+        temp_mesh.ConstructFromMeshReader(mesh_reader);
+        temp_mesh.Scale(5.0,1.0);
+
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(temp_mesh, 1.5);
+
+        // Set up cells
+        std::vector<CellPtr> cells;
+        MAKE_PTR(WildTypeCellMutationState, p_state);
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        {
+            FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
+            p_model->SetDimension(2);
+
+            CellPtr p_cell(new Cell(p_state, p_model));
+            p_cell->SetCellProliferativeType(p_diff_type);
+            double birth_time = -RandomNumberGenerator::Instance()->ranf()*18.0;
+            p_cell->SetBirthTime(birth_time);
+
+            cells.push_back(p_cell);
+        }
+
+        // Set up cell population
+        NodeBasedCellPopulation<2> cell_population(mesh, cells);
+
+        // Create PDE and boundary condition objects
+        MAKE_PTR_ARGS(AveragedSourceParabolicPde<2>, p_pde, (cell_population, -1.0));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
+
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
+        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
+        p_pde_modifier->SetDependentVariableName("nutrient");
+
+        TS_ASSERT_THROWS_THIS(p_pde_modifier->SetupSolve(cell_population, "output_directory"),
+            "ParabolicGrowingDomainPdeModifier cannot be used with an AveragedSourceParabolicPde. Use a ParabolicBoxDomainPdeModifier instead.");
+    }
+
+    void TestArchiveParabolicGrowingDomainPdeModifier() throw(Exception)
+    {
+        // Create a file for archiving
+        OutputFileHandler handler("archive", false);
+        handler.SetArchiveDirectory();
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "ParabolicGrowingDomainPdeModifier.arch";
+
+        // Separate scope to write the archive
+        {
+            // Create PDE and boundary condition objects
+            MAKE_PTR_ARGS(UniformSourceParabolicPde<2>, p_pde, (-0.1));
+            MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
+
+            // Create a PDE modifier and set the name of the dependent variable in the PDE
+            std::vector<double> data(10);
+            for (unsigned i=0; i<10; i++)
+            {
+                data[i] = i + 0.45;
+            }
+            Vec vector = PetscTools::CreateVec(data);
+            ParabolicGrowingDomainPdeModifier<2> modifier(p_pde, p_bc, false, vector);
+            modifier.SetDependentVariableName("averaged quantity");
+
+            // Create an output archive
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            // Serialize via pointer
+            AbstractCellBasedSimulationModifier<2,2>* const p_modifier = &modifier;
+            output_arch << p_modifier;
+        }
+
+        // Separate scope to read the archive
+        {
+            AbstractCellBasedSimulationModifier<2,2>* p_modifier2;
+
+            // Restore the modifier
+            std::ifstream ifs(archive_filename.c_str());
+            boost::archive::text_iarchive input_arch(ifs);
+
+            input_arch >> p_modifier2;
+
+            // See whether we read out the correct variable name
+            std::string variable_name = (static_cast<ParabolicGrowingDomainPdeModifier<2>*>(p_modifier2))->rGetDependentVariableName();
+            TS_ASSERT_EQUALS(variable_name, "averaged quantity");
+
+            Vec solution = (static_cast<ParabolicGrowingDomainPdeModifier<2>*>(p_modifier2))->GetSolution();
+            ReplicatableVector solution_repl(solution);
+
+            TS_ASSERT_EQUALS(solution_repl.GetSize(), 10u);
+            for (unsigned i=0; i<10; i++)
+            {
+                TS_ASSERT_DELTA(solution_repl[i], i + 0.45, 1e-6);
+            }
+
+            delete p_modifier2;
+        }
+    }
 
     /*
      * Here the exact steady state solution is
@@ -101,11 +226,11 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(100.0, 10);
 
         // Create PDE and boundary condition objects
-        CellwiseSourceParabolicPde<2> pde(cell_population, 1, 1, 1);
-        ConstBoundaryCondition<2> bc(1.0);
+        MAKE_PTR_ARGS(CellwiseSourceParabolicPde<2>, p_pde, (cell_population, 1, 1, 1));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
+        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
         p_pde_modifier->SetDependentVariableName("variable");
 
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseParabolicPdeWithMeshOnDisk");
@@ -177,11 +302,11 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(100.0, 10);
 
         // Create PDE and boundary condition objects
-        CellwiseSourceParabolicPde<2> pde(cell_population, 1, 1, 1);
-        ConstBoundaryCondition<2> bc(1.0);
+        MAKE_PTR_ARGS(CellwiseSourceParabolicPde<2>, p_pde, (cell_population, 1, 1, 1));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
+        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
         p_pde_modifier->SetDependentVariableName("variable");
 
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseParabolicPdeWithMeshOnHeterogeneousDisk");
@@ -244,11 +369,11 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(10.0, 10);
 
         // Create PDE and boundary condition objects
-        CellwiseSourceParabolicPde<2> pde(cell_population, 1, 1, 1);
-        ConstBoundaryCondition<2> bc(1.0);
+        MAKE_PTR_ARGS(CellwiseSourceParabolicPde<2>, p_pde, (cell_population, 1, 1, 1));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, true));
+        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, true));
         p_pde_modifier->SetDependentVariableName("variable");
 
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseParabolicPdeWithMeshNeumanBcs");
@@ -306,11 +431,11 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 10);
 
         // Create PDE and boundary condition objects
-        CellwiseSourceParabolicPde<2> pde(cell_population, 0.1, 1, -0.1);
-        ConstBoundaryCondition<2> bc(1.0);
+        MAKE_PTR_ARGS(CellwiseSourceParabolicPde<2>, p_pde, (cell_population, 0.1, 1, -0.1));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
+        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
         p_pde_modifier->SetDependentVariableName("variable");
 
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseParabolicPdeWithMeshOnSquare");
@@ -363,11 +488,11 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 10);
 
         // Create PDE and boundary condition objects
-        CellwiseSourceParabolicPde<2> pde(cell_population, 0.1, 1, -0.1);
-        ConstBoundaryCondition<2> bc(1.0);
+        MAKE_PTR_ARGS(CellwiseSourceParabolicPde<2>, p_pde, (cell_population, 0.1, 1, -0.1));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
+        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
         p_pde_modifier->SetDependentVariableName("variable");
 
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseParabolicPdeWithNodeOnSquare");
@@ -427,11 +552,11 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 10);
 
         // Create PDE and boundary condition objects
-        CellwiseSourceParabolicPde<2> pde(cell_population, 0.1, 1, -0.1);
-        ConstBoundaryCondition<2> bc(1.0);
+        MAKE_PTR_ARGS(CellwiseSourceParabolicPde<2>, p_pde, (cell_population, 0.1, 1, -0.1));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
+        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
         p_pde_modifier->SetDependentVariableName("variable");
 
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseParabolicPdeWithVertexOnSquare");
@@ -489,11 +614,11 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 10);
 
         // Create PDE and boundary condition objects
-        CellwiseSourceParabolicPde<2> pde(cell_population, 0.1, 1, -0.1);
-        ConstBoundaryCondition<2> bc(1.0);
+        MAKE_PTR_ARGS(CellwiseSourceParabolicPde<2>, p_pde, (cell_population, 0.1, 1, -0.1));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
+        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
         p_pde_modifier->SetDependentVariableName("variable");
 
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseParabolicPdeWithPottsOnSquare");
@@ -557,11 +682,11 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 10);
 
         // Create PDE and boundary condition objects
-        CellwiseSourceParabolicPde<2> pde(cell_population, 0.1, 1, -0.1);
-        ConstBoundaryCondition<2> bc(1.0);
+        MAKE_PTR_ARGS(CellwiseSourceParabolicPde<2>, p_pde, (cell_population, 0.1, 1, -0.1));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, false));
+        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
         p_pde_modifier->SetDependentVariableName("variable");
 
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseParabolicPdeWithCaOnSquare");
@@ -585,4 +710,4 @@ public:
     }
 };
 
-#endif /*TESTPARABOLICGROWINGDOMAINMODIFIERMETHODS_HPP_*/
+#endif /*TESTPARABOLICGROWINGDOMAINPDEMODIFIER_HPP_*/

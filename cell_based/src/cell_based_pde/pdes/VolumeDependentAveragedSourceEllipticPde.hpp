@@ -68,7 +68,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * The weighting assigned to each cell is given by the square of the radius of the
  * associated node, which is accessed using the GetRadius() method.
  *
- * \todo Consider creating a VolumeDependentAveragedSourceParabolicPde class (#2687)
+ * \todo Consider creating a VolumeDependentAveragedSourceParabolicPde class
  */
 template<unsigned DIM>
 class VolumeDependentAveragedSourceEllipticPde : public AveragedSourceEllipticPde<DIM>

@@ -37,17 +37,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SimpleLinearParabolicSolver.hpp"
 
 template<unsigned DIM>
-ParabolicBoxDomainPdeModifier<DIM>::ParabolicBoxDomainPdeModifier(AbstractLinearPde<DIM,DIM>* pPde,
-                                                                  AbstractBoundaryCondition<DIM>* pBoundaryCondition,
+ParabolicBoxDomainPdeModifier<DIM>::ParabolicBoxDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde,
+                                                                  boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition,
                                                                   bool isNeumannBoundaryCondition,
-                                                                  bool deleteMemberPointersInDestructor,
                                                                   ChasteCuboid<DIM>* pMeshCuboid,
                                                                   double stepSize,
                                                                   Vec solution)
     : AbstractBoxDomainPdeModifier<DIM>(pPde,
     		                            pBoundaryCondition,
     		                            isNeumannBoundaryCondition,
-    		                            deleteMemberPointersInDestructor,
     		                            pMeshCuboid,
     		                            stepSize,
     		                            solution)
@@ -57,7 +55,6 @@ ParabolicBoxDomainPdeModifier<DIM>::ParabolicBoxDomainPdeModifier(AbstractLinear
 template<unsigned DIM>
 ParabolicBoxDomainPdeModifier<DIM>::~ParabolicBoxDomainPdeModifier()
 {
-    ///\todo (#2687) - move to abstract class
     // If we have used this modifier, then we will have created a solution vector
     if (this->mSolution)
     {
@@ -79,10 +76,10 @@ void ParabolicBoxDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopul
 
     // Use SimpleLinearParabolicSolver as averaged Source PDE
     SimpleLinearParabolicSolver<DIM,DIM> solver(this->mpFeMesh,
-                                                static_cast<AbstractLinearParabolicPde<DIM,DIM>*>(this->GetPde()),
+                                                boost::static_pointer_cast<AbstractLinearParabolicPde<DIM,DIM> >(this->GetPde()).get(),
                                                 p_bcc.get());
 
-    ///\todo Investigate more than one PDE time step per spatial step (#2687)
+    ///\todo Investigate more than one PDE time step per spatial step
     SimulationTime* p_simulation_time = SimulationTime::Instance();
     double current_time = p_simulation_time->GetTime();
     double dt = p_simulation_time->GetTimeStep();
@@ -115,28 +112,33 @@ void ParabolicBoxDomainPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,D
 template<unsigned DIM>
 std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ParabolicBoxDomainPdeModifier<DIM>::ConstructBoundaryConditionsContainer(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
-	///\todo make use of mSetBcsOnBoxBoundary (#2687)
-
     std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc(new BoundaryConditionsContainer<DIM,DIM,1>(false));
 
-    if (this->IsNeumannBoundaryCondition())
+    if (!this->mSetBcsOnBoxBoundary)
     {
-        // Impose any Neumann boundary conditions
-        for (typename TetrahedralMesh<DIM,DIM>::BoundaryElementIterator elem_iter = this->mpFeMesh->GetBoundaryElementIteratorBegin();
-             elem_iter != this->mpFeMesh->GetBoundaryElementIteratorEnd();
-             ++elem_iter)
-        {
-            p_bcc->AddNeumannBoundaryCondition(*elem_iter, this->GetBoundaryCondition());
-        }
+        EXCEPTION("Boundary conditions cannot yet be set on the cell population boundary for a ParabolicBoxDomainPdeModifier");
     }
-    else
+    else // Apply BC at boundary nodes of box domain FE mesh
     {
-        // Impose any Dirichlet boundary conditions
-        for (typename TetrahedralMesh<DIM,DIM>::BoundaryNodeIterator node_iter = this->mpFeMesh->GetBoundaryNodeIteratorBegin();
-             node_iter != this->mpFeMesh->GetBoundaryNodeIteratorEnd();
-             ++node_iter)
+        if (this->IsNeumannBoundaryCondition())
         {
-            p_bcc->AddDirichletBoundaryCondition(*node_iter, this->GetBoundaryCondition());
+            // Impose any Neumann boundary conditions
+            for (typename TetrahedralMesh<DIM,DIM>::BoundaryElementIterator elem_iter = this->mpFeMesh->GetBoundaryElementIteratorBegin();
+                 elem_iter != this->mpFeMesh->GetBoundaryElementIteratorEnd();
+                 ++elem_iter)
+            {
+                p_bcc->AddNeumannBoundaryCondition(*elem_iter, this->mpBoundaryCondition.get());
+            }
+        }
+        else
+        {
+            // Impose any Dirichlet boundary conditions
+            for (typename TetrahedralMesh<DIM,DIM>::BoundaryNodeIterator node_iter = this->mpFeMesh->GetBoundaryNodeIteratorBegin();
+                 node_iter != this->mpFeMesh->GetBoundaryNodeIteratorEnd();
+                 ++node_iter)
+            {
+                p_bcc->AddDirichletBoundaryCondition(*node_iter, this->mpBoundaryCondition.get());
+            }
         }
     }
 

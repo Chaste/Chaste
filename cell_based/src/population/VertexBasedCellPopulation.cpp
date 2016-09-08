@@ -778,7 +778,7 @@ double VertexBasedCellPopulation<DIM>::GetCellDataItemAtPdeNode(
     }
     else
     {
-        ///\todo Work out a better way to do the nodes not associated with cells (#2687)
+        ///\todo Work out a better way to do the nodes not associated with cells
         if (dirichletBoundaryConditionApplies)
         {
             // We need to impose the Dirichlet boundaries again here as not represented in cell data

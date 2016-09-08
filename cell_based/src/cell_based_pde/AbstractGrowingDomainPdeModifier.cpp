@@ -41,15 +41,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "LinearBasisFunction.hpp"
 
 template<unsigned DIM>
-AbstractGrowingDomainPdeModifier<DIM>::AbstractGrowingDomainPdeModifier(AbstractLinearPde<DIM,DIM>* pPde,
-                                                                        AbstractBoundaryCondition<DIM>* pBoundaryCondition,
+AbstractGrowingDomainPdeModifier<DIM>::AbstractGrowingDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde,
+                                                                        boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition,
                                                                         bool isNeumannBoundaryCondition,
-                                                                        bool deleteMemberPointersInDestructor,
                                                                         Vec solution)
     : AbstractPdeModifier<DIM>(pPde,
     		                   pBoundaryCondition,
     		                   isNeumannBoundaryCondition,
-    		                   deleteMemberPointersInDestructor,
     		                   solution),
       mDeleteMesh(false)
 {
@@ -94,7 +92,7 @@ void AbstractGrowingDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulatio
     {
         unsigned tet_node_index = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);
 
-        ///\todo Consider how to remove dynamic_casts here (#2687)
+        ///\todo Consider how to remove dynamic_casts here
         if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL)
         {
             // Offset to relate elements in vertex mesh to nodes in tetrahedral mesh

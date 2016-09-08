@@ -211,7 +211,7 @@ public:
          * the cell located at (''x'',''y'') is a live cell, and zero if the cell has died due
          * to oxygen deprivation.
          */
-        CellwiseSourceEllipticPde<2> pde(cell_population, -0.03);
+        MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde, (cell_population, -0.03));
 
         /*
          * We also create a constant-valued boundary condition to associate with the PDE.
@@ -220,7 +220,7 @@ public:
          * (a Neumann boundary condition) or the value of the state variable at the boundary
          * (a Dirichlet boundary condition) below.
          */
-        ConstBoundaryCondition<2> bc(1.0);
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
         bool is_neumann_bc = false;
 
         /*
@@ -240,7 +240,7 @@ public:
          *
          * The {{{CellData}}} class, is used to stores the value of the current nutrient concentration for each cell.
          */
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde, &bc, is_neumann_bc));
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, is_neumann_bc));
         p_pde_modifier->SetDependentVariableName("oxygen");
 
         /*

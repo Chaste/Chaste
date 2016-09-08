@@ -39,15 +39,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 
 template<unsigned DIM>
-EllipticGrowingDomainPdeModifier<DIM>::EllipticGrowingDomainPdeModifier(AbstractLinearPde<DIM,DIM>* pPde,
-                                                                        AbstractBoundaryCondition<DIM>* pBoundaryCondition,
+EllipticGrowingDomainPdeModifier<DIM>::EllipticGrowingDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde,
+                                                                        boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition,
                                                                         bool isNeumannBoundaryCondition,
-                                                                        bool deleteMemberPointersInDestructor,
                                                                         Vec solution)
     : AbstractGrowingDomainPdeModifier<DIM>(pPde,
     		                                pBoundaryCondition,
     		                                isNeumannBoundaryCondition,
-    		                                deleteMemberPointersInDestructor,
     		                                solution)
 {
 }
@@ -55,7 +53,6 @@ EllipticGrowingDomainPdeModifier<DIM>::EllipticGrowingDomainPdeModifier(Abstract
 template<unsigned DIM>
 EllipticGrowingDomainPdeModifier<DIM>::~EllipticGrowingDomainPdeModifier()
 {
-    ///\todo (#2687) - move to abstract class
     // Destroy the most recent solution vector
     if (this->mSolution != NULL)
     {
@@ -93,7 +90,7 @@ void EllipticGrowingDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPo
 
     // Use CellBasedEllipticPdeSolver as cell wise PDE
     CellBasedEllipticPdeSolver<DIM> solver(this->mpFeMesh,
-                                           static_cast<AbstractLinearEllipticPde<DIM,DIM>*>(this->GetPde()),
+                                           boost::static_pointer_cast<AbstractLinearEllipticPde<DIM,DIM> >(this->GetPde()).get(),
                                            p_bcc.get());
 
     // If we have an initial guess, use this when solving the system...
@@ -122,7 +119,7 @@ void EllipticGrowingDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPo
 template<unsigned DIM>
 void EllipticGrowingDomainPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)
 {
-    if (dynamic_cast<AveragedSourceEllipticPde<DIM>*>(this->GetPde()))
+    if (boost::dynamic_pointer_cast<AveragedSourceEllipticPde<DIM> >(this->GetPde()))
     {
         EXCEPTION("EllipticGrowingDomainPdeModifier cannot be used with an AveragedSourceEllipticPde. Use an EllipticBoxDomainPdeModifier instead.");
     }
@@ -146,7 +143,7 @@ std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > EllipticGrowingDomainPdeM
          node_iter != this->mpFeMesh->GetBoundaryNodeIteratorEnd();
          ++node_iter)
     {
-        p_bcc->AddDirichletBoundaryCondition(*node_iter, this->GetBoundaryCondition());
+        p_bcc->AddDirichletBoundaryCondition(*node_iter, this->mpBoundaryCondition.get());
     }
 
     return p_bcc;

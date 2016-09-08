@@ -43,8 +43,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * A purpose-made elliptic solver that interpolates the source terms from node onto
  * Gauss points, as for a cell-based simulation with PDEs the source will only be
  * known at the cells (nodes), not the Gauss points.
- *
- * \todo Improve documentation (#2687)
  */
 template<unsigned DIM>
 class CellBasedEllipticPdeSolver : public SimpleLinearEllipticSolver<DIM, DIM>

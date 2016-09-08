@@ -39,15 +39,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 
 template<unsigned DIM>
-ParabolicGrowingDomainPdeModifier<DIM>::ParabolicGrowingDomainPdeModifier(AbstractLinearPde<DIM,DIM>* pPde,
-                                                                          AbstractBoundaryCondition<DIM>* pBoundaryCondition,
+ParabolicGrowingDomainPdeModifier<DIM>::ParabolicGrowingDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde,
+                                                                          boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition,
                                                                           bool isNeumannBoundaryCondition,
-                                                                          bool deleteMemberPointersInDestructor,
                                                                           Vec solution)
     : AbstractGrowingDomainPdeModifier<DIM>(pPde,
     		                                pBoundaryCondition,
     		                                isNeumannBoundaryCondition,
-    		                                deleteMemberPointersInDestructor,
     		                                solution)
 {
 }
@@ -55,7 +53,6 @@ ParabolicGrowingDomainPdeModifier<DIM>::ParabolicGrowingDomainPdeModifier(Abstra
 template<unsigned DIM>
 ParabolicGrowingDomainPdeModifier<DIM>::~ParabolicGrowingDomainPdeModifier()
 {
-    ///\todo (#2687) - move to abstract class
     // If we have used this modifier, then we will have created a solution vector
     if (this->mSolution)
     {
@@ -76,10 +73,10 @@ void ParabolicGrowingDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellP
 
     // Use CellBasedParabolicPdeSolver as cell wise PDE
     CellBasedParabolicPdeSolver<DIM> solver(this->mpFeMesh,
-                                            static_cast<AbstractLinearParabolicPde<DIM,DIM>*>(this->mpPde),
+                                            boost::static_pointer_cast<AbstractLinearParabolicPde<DIM,DIM> >(this->mpPde).get(),
                                             p_bcc.get());
 
-    ///\todo Investigate more than one PDE time step per spatial step (#2687)
+    ///\todo Investigate more than one PDE time step per spatial step
     SimulationTime* p_simulation_time = SimulationTime::Instance();
     double current_time = p_simulation_time->GetTime();
     double dt = p_simulation_time->GetTimeStep();
@@ -102,7 +99,7 @@ void ParabolicGrowingDomainPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<D
 {
     AbstractGrowingDomainPdeModifier<DIM>::SetupSolve(rCellPopulation, outputDirectory);
 
-    if (dynamic_cast<AveragedSourceParabolicPde<DIM>*>(this->mpPde))
+    if (boost::dynamic_pointer_cast<AveragedSourceParabolicPde<DIM> >(this->mpPde))
     {
         EXCEPTION("ParabolicGrowingDomainPdeModifier cannot be used with an AveragedSourceParabolicPde. Use a ParabolicBoxDomainPdeModifier instead.");
     }
@@ -129,7 +126,7 @@ std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ParabolicGrowingDomainPde
              elem_iter != this->mpFeMesh->GetBoundaryElementIteratorEnd();
              ++elem_iter)
         {
-            p_bcc->AddNeumannBoundaryCondition(*elem_iter, this->GetBoundaryCondition());
+            p_bcc->AddNeumannBoundaryCondition(*elem_iter, this->mpBoundaryCondition.get());
         }
     }
     else
@@ -139,7 +136,7 @@ std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ParabolicGrowingDomainPde
              node_iter != this->mpFeMesh->GetBoundaryNodeIteratorEnd();
              ++node_iter)
         {
-            p_bcc->AddDirichletBoundaryCondition(*node_iter, this->GetBoundaryCondition());
+            p_bcc->AddDirichletBoundaryCondition(*node_iter, this->mpBoundaryCondition.get());
         }
     }
 

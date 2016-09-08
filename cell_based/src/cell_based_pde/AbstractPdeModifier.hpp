@@ -46,10 +46,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractBoundaryCondition.hpp"
 
 /**
- * A modifier class in which has the common functionality of solving a PDE on an arbitrary mesh.
- * The results are stored in CellData.
- *
- * \todo Improve documentation (#2687)
+ * An abstract modifier class containing functionality common to AbstractBoxDomainPdeModifier,
+ * AbstractGrowingDomainPdeModifier and their subclasses, which solve a linear elliptic or
+ * parabolic PDE coupled to a cell-based simulation.
  */
 template<unsigned DIM>
 class AbstractPdeModifier : public AbstractCellBasedSimulationModifier<DIM,DIM>
@@ -83,22 +82,21 @@ private:
 protected:
 
     /**
-     * Pointer to a linear PDE object.
-     * \todo consider making this a boost::shared_ptr (#2687)
+     * Shared pointer to a linear PDE object.
      */
-    AbstractLinearPde<DIM,DIM>* mpPde;
+    boost::shared_ptr<AbstractLinearPde<DIM,DIM> > mpPde;
 
     /**
-     * Pointer to a boundary condition object.
-     * \todo consider making this a boost::shared_ptr (#2687)
+     * Shared pointer to a boundary condition object.
      */
-    AbstractBoundaryCondition<DIM>* mpBoundaryCondition;
+    boost::shared_ptr<AbstractBoundaryCondition<DIM> > mpBoundaryCondition;
 
-    /** Whether the boundary condition is Neumann (false corresponds to a Dirichlet boundary condition). */
+    /**
+     * Whether the boundary condition is Neumann (false corresponds to a Dirichlet boundary condition).
+     *
+     * \todo Generalize to allow mixed boundary conditions
+     */
     bool mIsNeumannBoundaryCondition;
-
-    /** Whether to delete member pointers in the destructor (used in archiving). */
-    bool mDeleteMemberPointersInDestructor;
 
     /**
      * For use in PDEs where we know what the quantity for which we are solving is called,
@@ -132,18 +130,15 @@ public:
     /**
      * Constructor.
      *
-     * @param pPde A pointer to a linear PDE object (defaults to NULL)
-     * @param pBoundaryCondition A pointer to an abstract boundary condition
+     * @param pPde A shared pointer to a linear PDE object (defaults to NULL)
+     * @param pBoundaryCondition A shared pointer to an abstract boundary condition
      *     (defaults to NULL, corresponding to a constant boundary condition with value zero)
      * @param isNeumannBoundaryCondition Whether the boundary condition is Neumann (defaults to true)
-     * @param deleteMemberPointersInDestructor whether to delete member pointers in the destructor
-     *     (defaults to false)
      * @param solution solution vector (defaults to NULL)
      */
-    AbstractPdeModifier(AbstractLinearPde<DIM,DIM>* pPde=NULL,
-                        AbstractBoundaryCondition<DIM>* pBoundaryCondition=NULL,
+    AbstractPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde=NULL,
+                        boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition=boost::shared_ptr<AbstractBoundaryCondition<DIM> >(),
                         bool isNeumannBoundaryCondition=true,
-                        bool deleteMemberPointersInDestructor=false,
                         Vec solution=NULL);
 
     /**
@@ -152,14 +147,14 @@ public:
     virtual ~AbstractPdeModifier();
 
     /**
-     * @return mpPde (used in archiving)
+     * @return mpPde
      */
-    AbstractLinearPde<DIM,DIM>* GetPde() const;
+    boost::shared_ptr<AbstractLinearPde<DIM,DIM> > GetPde();
 
     /**
      * @return mpBoundaryCondition
      */
-    AbstractBoundaryCondition<DIM>* GetBoundaryCondition() const;
+    boost::shared_ptr<AbstractBoundaryCondition<DIM> > GetBoundaryCondition();
 
     /**
      * @return mIsNeumannBoundaryCondition
@@ -218,9 +213,9 @@ public:
 
     /**
      * Overridden SetupSolve() method.
-     * \todo improve documentation (#2687)
      *
-     * Specifies what to do in the simulation before the start of the time loop. Needs overwriting in child classes
+     * Set mOutputDirectory and, if mOutputSolutionAtPdeNodes is set to true, open mpVizPdeSolutionResultsFile.
+     * This method is overridden in subclasses.
      *
      * @param rCellPopulation reference to the cell population
      * @param outputDirectory the output directory, relative to where Chaste output is stored
@@ -228,10 +223,9 @@ public:
     virtual void SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory);
 
     /**
-     * UpdateAtEndOfTimeStep() method. Needs overwriting in child classes.
-     * \todo improve documentation (#2687)
+     * Overridden UpdateAtEndOfTimeStep() method.
      *
-     * Specifies what to do in the simulation at the end of each time step.
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
      * @param rCellPopulation reference to the cell population
      */
@@ -239,9 +233,9 @@ public:
 
     /**
      * Overridden UpdateAtEndOfOutputTimeStep() method.
-     * \todo improve documentation (#2687)
      *
-     * Specifies what to do in the simulation at the end of each output timestep.
+     * Output the solution to the PDE at each cell to VTK and, if mOutputSolutionAtPdeNodes is set to true,
+     * output the solution to the PDE at each node of mpFeMesh to mpVizPdeSolutionResultsFile.
      *
      * @param rCellPopulation reference to the cell population
      */
@@ -249,8 +243,8 @@ public:
 
     /**
      * Overridden UpdateAtEndOfSolve() method.
-     * \todo improve documentation (#2687)
-     * Specify what to do in the simulation at the end of each time loop.
+     *
+     * If mOutputSolutionAtPdeNodes is set to true, close mpVizPdeSolutionResultsFile.
      *
      * @param rCellPopulation reference to the cell population
      */
