@@ -160,7 +160,7 @@ public:
         simulator.SetEndTime(2.0/120.0);
 
         // Create PDE and boundary condition objects
-        SimplePdeForTesting pde;
+        MAKE_PTR(SimplePdeForTesting, p_pde);
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
@@ -516,7 +516,7 @@ public:
         simulator.SetEndTime(1.0/120.0);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(UniformSourceEllipticPde<2>, p_pde(-0.1));
+        MAKE_PTR_ARGS(UniformSourceEllipticPde<2>, p_pde, (-0.1));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
@@ -628,7 +628,7 @@ public:
         simulator.AddSimulationModifier(p_pde_modifier);
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier2, (&pde2, &bc, false, &cuboid, 10.0));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier2, (p_pde2, p_bc, false, &cuboid, 10.0));
         p_pde_modifier2->SetDependentVariableName("dunno");
         p_pde_modifier2->SetBcsOnBoxBoundary(false);
 
@@ -1046,7 +1046,7 @@ public:
 
         // Create PDE and boundary condition objects
         MAKE_PTR(SimplePdeForTesting, p_pde);
-        MAKE_PTR_ARGS(FunctionalBoundaryCondition<2, p_functional_bc, (&bc_func));
+        MAKE_PTR_ARGS(FunctionalBoundaryCondition<2>, p_functional_bc, (&bc_func));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
         MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_functional_bc, false));
@@ -1098,7 +1098,7 @@ public:
         TS_ASSERT_EQUALS(simulator.GetIdentifier(), "OffLatticeSimulation-2-2");
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde(cell_population, -0.03));
+        MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde, (cell_population, -0.03));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
@@ -1382,7 +1382,7 @@ public:
             double det;
             p_coarse_mesh->GetElement(i)->CalculateJacobian(jacobian, det);
             double element_volume = p_coarse_mesh->GetElement(i)->GetVolume(det);
-            double uptake_rate = pde.GetUptakeRateForElement(i);
+            double uptake_rate = p_pde->GetUptakeRateForElement(i);
             double expected_uptake = 0.9*0.9*(cells_in_each_coarse_element[i]/element_volume);
 
             TS_ASSERT_DELTA(uptake_rate, expected_uptake, 1e-4);

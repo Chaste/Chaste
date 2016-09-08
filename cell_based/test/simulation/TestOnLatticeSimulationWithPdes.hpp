@@ -584,7 +584,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc_1, (1.0));
 
         MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde_2, (cell_population, 0.0));
-        CMAKE_PTR_ARGS(onstBoundaryCondition<2>, p_bc_2, (1.0));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc_2, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         ChastePoint<2> lower(0.0, 0.0);
