@@ -79,11 +79,11 @@ public:
         // Test that member variables are initialised correctly
         TS_ASSERT_EQUALS(p_pde_modifier->rGetDependentVariableName(), "averaged quantity");
         TS_ASSERT_DELTA(p_pde_modifier->GetStepSize(), 2.0, 1e-5);
-        TS_ASSERT_EQUALS(p_pde_modifier->AreBcsSetOnBoxBoundary(), false);
+        TS_ASSERT_EQUALS(p_pde_modifier->AreBcsSetOnBoxBoundary(), true);
 
         // Coverage of some set and methods
-        p_pde_modifier->SetBcsOnBoxBoundary(true);
-        TS_ASSERT_EQUALS(p_pde_modifier->AreBcsSetOnBoxBoundary(), true);
+        p_pde_modifier->SetBcsOnBoxBoundary(false);
+        TS_ASSERT_EQUALS(p_pde_modifier->AreBcsSetOnBoxBoundary(), false);
 
         // Check that the finite element mesh is correct
         TS_ASSERT_EQUALS(p_pde_modifier->mpFeMesh->GetNumNodes(), 121u);
@@ -189,7 +189,7 @@ public:
             // Test that member variables are correct
             TS_ASSERT_EQUALS((static_cast<EllipticBoxDomainPdeModifier<2>*>(p_modifier2))->rGetDependentVariableName(), "averaged quantity");
             TS_ASSERT_DELTA((static_cast<EllipticBoxDomainPdeModifier<2>*>(p_modifier2))->GetStepSize(), 2.0, 1e-5);
-            TS_ASSERT_EQUALS((static_cast<EllipticBoxDomainPdeModifier<2>*>(p_modifier2))->AreBcsSetOnBoxBoundary(), false);
+            TS_ASSERT_EQUALS((static_cast<EllipticBoxDomainPdeModifier<2>*>(p_modifier2))->AreBcsSetOnBoxBoundary(), true);
 
             Vec solution = (static_cast<EllipticBoxDomainPdeModifier<2>*>(p_modifier2))->GetSolution();
             ReplicatableVector solution_repl(solution);
@@ -254,7 +254,7 @@ public:
             // Test that member variables are correct
             TS_ASSERT_EQUALS((static_cast<ParabolicBoxDomainPdeModifier<2>*>(p_modifier2))->rGetDependentVariableName(), "averaged quantity");
             TS_ASSERT_DELTA((static_cast<ParabolicBoxDomainPdeModifier<2>*>(p_modifier2))->GetStepSize(), 2.0, 1e-5);
-            TS_ASSERT_EQUALS((static_cast<ParabolicBoxDomainPdeModifier<2>*>(p_modifier2))->AreBcsSetOnBoxBoundary(), false);
+            TS_ASSERT_EQUALS((static_cast<ParabolicBoxDomainPdeModifier<2>*>(p_modifier2))->AreBcsSetOnBoxBoundary(), true);
 
             Vec solution = (static_cast<ParabolicBoxDomainPdeModifier<2>*>(p_modifier2))->GetSolution();
             ReplicatableVector solution_repl(solution);
