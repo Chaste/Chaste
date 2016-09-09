@@ -196,16 +196,9 @@ public:
         }
     }
 
-    /*
-     * Here the exact steady state solution is
-     *
-     * u = J0(r)/J0(1)
-     * where J0 is the zeroth order bessel fn
-     */
-
     void TestMeshBasedMonolayerWithParabolicPde() throw (Exception)
     {
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_984_elements");
+        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_522_elements");
         MutableMesh<2,2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
@@ -214,7 +207,7 @@ public:
         CellsGenerator<UniformCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_differentiated_type);
 
-        // Set initial condition for pde
+        // Set initial condition for PDE
         for (unsigned i=0; i<cells.size(); i++)
         {
             cells[i]->GetCellData()->SetItem("variable",1.0);
@@ -223,7 +216,7 @@ public:
         MeshBasedCellPopulation<2> cell_population(mesh, cells);
 
         // Set up simulation time for file output
-        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(100.0, 10);
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(100.0, 4);
 
         // Create PDE and boundary condition objects
         MAKE_PTR_ARGS(CellwiseSourceParabolicPde<2>, p_pde, (cell_population, 1, 1, 1));
@@ -235,8 +228,8 @@ public:
 
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseParabolicPdeWithMeshOnDisk");
 
-        // Run for 100 timesteps
-        for (unsigned i=0; i<10; i++)
+        // Run for 4 time steps
+        for (unsigned i=0; i<4; i++)
         {
             SimulationTime::Instance()->IncrementTimeOneStep();
             p_pde_modifier->UpdateAtEndOfTimeStep(cell_population);
@@ -244,14 +237,16 @@ public:
          }
 
         /*
-         * Test the solution against the exact solution for the steady state.
+         * Test the solution against the exact solution,
+         *
+         * u(r,t) = J0(r)/J0(1),
+         *
+         * where J0 is the zeroth order Bessel function.
          */
-
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
-
             c_vector<double,2> cell_location = cell_population.GetLocationOfCellCentre(*cell_iter);
             double r = sqrt(cell_location(0)*cell_location(0) + cell_location(1)*cell_location(1));
             double u_exact = boost::math::cyl_bessel_j(0,r) / boost::math::cyl_bessel_j(0,1);
@@ -260,15 +255,6 @@ public:
         }
     }
 
-    /*
-     * Here the outer cells (r>1/2) are apoptotic so the  steady state solution is
-     *
-     * u = C*J0(r)  for r in [0,0.5]
-     *     A*ln(r) + 1 for r in [0.5,1]
-     *
-     *  where J0 is the zeroth order bessel fn and C and A are constants
-     *
-     */
     void TestMeshBasedHeterogeneousMonolayerWithParabolicPde() throw (Exception)
     {
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_984_elements");
@@ -287,19 +273,19 @@ public:
         {
             c_vector<double,2> cell_location = mesh.GetNode(i)->rGetLocation();
             double r = sqrt(cell_location(0)*cell_location(0) + cell_location(1)*cell_location(1));
-            if (r>0.5)
+            if (r > 0.5)
             {
                 cells[i]->AddCellProperty(p_apoptotic_property);
             }
 
-            // Set initial condition for pde
-            cells[i]->GetCellData()->SetItem("variable",1.0);
+            // Set initial condition for PDE
+            cells[i]->GetCellData()->SetItem("variable", 1.0);
         }
 
         MeshBasedCellPopulation<2> cell_population(mesh, cells);
 
         // Set up simulation time for file output
-        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(100.0, 10);
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(100.0, 2);
 
         // Create PDE and boundary condition objects
         MAKE_PTR_ARGS(CellwiseSourceParabolicPde<2>, p_pde, (cell_population, 1, 1, 1));
@@ -311,8 +297,8 @@ public:
 
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseParabolicPdeWithMeshOnHeterogeneousDisk");
 
-        // Run for 10 timesteps
-        for (unsigned i=0; i<10; i++)
+        // Run for 5 time steps
+        for (unsigned i=0; i<2; i++)
         {
             SimulationTime::Instance()->IncrementTimeOneStep();
             p_pde_modifier->UpdateAtEndOfTimeStep(cell_population);
@@ -320,13 +306,18 @@ public:
          }
 
         /*
-         * Test the solution against the exact steady state solution for the steady state
+         * Test the solution against the exact steady-state solution. Here the
+         * outer cells (r > 1/2) are apoptotic, so the steady-state solution is
+         *
+         * u(r) = C*J0(r)  for r in [0,0.5],
+         *        A*ln(r) + 1 for r in [0.5,1],
+         *
+         *  where J0 is the zeroth order Bessel function and C and A are constants.
          */
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
-
             c_vector<double,2> cell_location = cell_population.GetLocationOfCellCentre(*cell_iter);
             double r = sqrt(cell_location(0)*cell_location(0) + cell_location(1)*cell_location(1));
 
@@ -337,9 +328,9 @@ public:
             double C = -2*A/J105;
 
             double u_exact = C*boost::math::cyl_bessel_j(0,r);
-            if ( r> 0.5 )
+            if (r > 0.5)
             {
-                u_exact = A*log(r)+1.0;
+                u_exact = A*log(r) + 1.0;
             }
 
             TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("variable"), u_exact, 1e-2);
@@ -348,7 +339,7 @@ public:
 
     void TestMeshBasedMonolayerWithParabolicPdeAndNeumannBcs() throw (Exception)
     {
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_984_elements");
+        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_522_elements");
         MutableMesh<2,2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
@@ -360,13 +351,13 @@ public:
         // Set initial condition for PDE
         for (unsigned i=0; i<cells.size(); i++)
         {
-            cells[i]->GetCellData()->SetItem("variable",1.0);
+            cells[i]->GetCellData()->SetItem("variable", 1.0);
         }
 
         MeshBasedCellPopulation<2> cell_population(mesh, cells);
 
         // Set up simulation time for file output
-        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(10.0, 10);
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 10);
 
         // Create PDE and boundary condition objects
         MAKE_PTR_ARGS(CellwiseSourceParabolicPde<2>, p_pde, (cell_population, 1, 1, 1));
@@ -378,7 +369,7 @@ public:
 
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseParabolicPdeWithMeshNeumanBcs");
 
-        // Run for 10 timesteps
+        // Run for 5 time steps
         for (unsigned i=0; i<10; i++)
         {
             SimulationTime::Instance()->IncrementTimeOneStep();
@@ -386,23 +377,20 @@ public:
             p_pde_modifier->UpdateAtEndOfOutputTimeStep(cell_population);
          }
 
-        /*
-         * Test the solution against the an approximate constant solution.
-         */
-
+        // Test the solution against the approximate spatially uniform solution
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
-            double u_approx = 3071;
-            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("variable"), u_approx, 1.0);
+            double u_approx = 5.8;
+            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("variable"), u_approx, 0.5);
         }
     }
-    // Now test on a square with half apoptotic cells to compare all the population types
 
+    // Now test on a square with half apoptotic cells to compare all the population types
     void TestMeshBasedSquareMonolayer() throw (Exception)
     {
-        HoneycombMeshGenerator generator(20,20,0);
+        HoneycombMeshGenerator generator(6,6,0);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
@@ -410,25 +398,25 @@ public:
         CellsGenerator<UniformCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), p_differentiated_type);
 
-        // Make cells with x<10.0 apoptotic (so no source term)
+        // Make cells with x < 3.0 apoptotic (so no source term)
         boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
                        cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
         for (unsigned i =0; i<cells.size(); i++)
         {
             c_vector<double,2> cell_location = p_mesh->GetNode(i)->rGetLocation();
-            if (cell_location(0) < 10.0)
+            if (cell_location(0) < 3.0)
             {
                 cells[i]->AddCellProperty(p_apoptotic_property);
             }
             // Set initial condition for PDE
             cells[i]->GetCellData()->SetItem("variable", 1.0);
         }
-        TS_ASSERT_EQUALS(p_apoptotic_property->GetCellCount(),200u);
+        TS_ASSERT_EQUALS(p_apoptotic_property->GetCellCount(), 18u);
 
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Set up simulation time for file output
-        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 10);
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(10.0, 10);
 
         // Create PDE and boundary condition objects
         MAKE_PTR_ARGS(CellwiseSourceParabolicPde<2>, p_pde, (cell_population, 0.1, 1, -0.1));
@@ -440,7 +428,7 @@ public:
 
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseParabolicPdeWithMeshOnSquare");
 
-        // Run for 10 timesteps
+        // Run for 10 time steps
         for (unsigned i=0; i<10; i++)
         {
             SimulationTime::Instance()->IncrementTimeOneStep();
@@ -449,15 +437,15 @@ public:
         }
 
         // Test the solution at some fixed points to compare with other cell populations
-        CellPtr p_cell_210 = cell_population.GetCellUsingLocationIndex(210);
-        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[0], 10, 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[1], 5.0*sqrt(3.0), 1e-4);
-        TS_ASSERT_DELTA( p_cell_210->GetCellData()->GetItem("variable"), 0.6309, 1e-4);
+        CellPtr p_cell_14 = cell_population.GetCellUsingLocationIndex(14);
+        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_14)[0], 2.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_14)[1], sqrt(3.0), 1e-4);
+        TS_ASSERT_DELTA(p_cell_14->GetCellData()->GetItem("variable"), 0.9604, 1e-4);
     }
 
     void TestNodeBasedSquareMonolayer() throw (Exception)
     {
-        HoneycombMeshGenerator generator(20,20,0);
+        HoneycombMeshGenerator generator(6,6,0);
         MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
         p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
@@ -467,25 +455,25 @@ public:
         CellsGenerator<UniformCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), p_differentiated_type);
 
-        // Make cells with x<10.0 apoptotic (so no source term)
+        // Make cells with x < 3.0 apoptotic (so no source term)
         boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
                         cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
         for (unsigned i =0; i<cells.size(); i++)
         {
             c_vector<double,2> cell_location = p_mesh->GetNode(i)->rGetLocation();
-            if (cell_location(0) < 10.0)
+            if (cell_location(0) < 3.0)
             {
                 cells[i]->AddCellProperty(p_apoptotic_property);
             }
             // Set initial condition for PDE
-            cells[i]->GetCellData()->SetItem("variable",1.0);
+            cells[i]->GetCellData()->SetItem("variable", 1.0);
         }
-        TS_ASSERT_EQUALS(p_apoptotic_property->GetCellCount(),200u);
+        TS_ASSERT_EQUALS(p_apoptotic_property->GetCellCount(), 18u);
 
         NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Set up simulation time for file output
-        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 10);
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(10.0, 10);
 
         // Create PDE and boundary condition objects
         MAKE_PTR_ARGS(CellwiseSourceParabolicPde<2>, p_pde, (cell_population, 0.1, 1, -0.1));
@@ -506,13 +494,13 @@ public:
         }
 
         // Test the solution at some fixed points to compare with other cell populations
-        CellPtr p_cell_210 = cell_population.GetCellUsingLocationIndex(210);
-        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[0], 10, 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[1], 5.0*sqrt(3.0), 1e-4);
-        TS_ASSERT_DELTA( p_cell_210->GetCellData()->GetItem("variable"), 0.6309, 1e-2);
+        CellPtr p_cell_14 = cell_population.GetCellUsingLocationIndex(14);
+        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_14)[0], 2.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_14)[1], sqrt(3.0), 1e-4);
+        TS_ASSERT_DELTA(p_cell_14->GetCellData()->GetItem("variable"), 0.9550, 1e-4);
 
-        // Checking it doesn't change for this cell population
-        TS_ASSERT_DELTA(p_cell_210->GetCellData()->GetItem("variable"), 0.6296, 1e-4);
+        // Compare with the mesh-based cell population result
+        TS_ASSERT_DELTA(p_cell_14->GetCellData()->GetItem("variable"), 0.9604, 1e-1);
 
         // Clear memory
         delete p_mesh;
@@ -520,23 +508,23 @@ public:
 
     void TestVertexBasedSquareMonolayer() throw (Exception)
     {
-        HoneycombVertexMeshGenerator generator(20,20);
+        HoneycombVertexMeshGenerator generator(6,6);
         MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
 
-        p_mesh->Translate(-0.5,-sqrt(3.0)/3); // Shift so cells are on top of those in the above centre based tests.
+        p_mesh->Translate(-0.5,-sqrt(3.0)/3); // Shift so cells are on top of those in the above centre-based tests
 
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_differentiated_type);
         CellsGenerator<UniformCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_differentiated_type);
 
-        // Make cells with x<10.0 apoptotic (so no source term)
+        // Make cells with x < 3.0 apoptotic (so no source term)
         boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
                         cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
         for (unsigned i =0; i<cells.size(); i++)
         {
             c_vector<double,2> cell_location = p_mesh->GetCentroidOfElement(i);
-            if (cell_location(0) < 10.0)
+            if (cell_location(0) < 3.0)
             {
                 cells[i]->AddCellProperty(p_apoptotic_property);
             }
@@ -544,12 +532,12 @@ public:
             // Set initial condition for PDE
             cells[i]->GetCellData()->SetItem("variable",1.0);
         }
-        TS_ASSERT_EQUALS(p_apoptotic_property->GetCellCount(),200u);
+        TS_ASSERT_EQUALS(p_apoptotic_property->GetCellCount(), 18u);
 
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Set up simulation time for file output
-        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 10);
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(10.0, 10);
 
         // Create PDE and boundary condition objects
         MAKE_PTR_ARGS(CellwiseSourceParabolicPde<2>, p_pde, (cell_population, 0.1, 1, -0.1));
@@ -561,7 +549,7 @@ public:
 
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseParabolicPdeWithVertexOnSquare");
 
-        // Run for 10 timesteps
+        // Run for 10 time steps
         for (unsigned i=0; i<10; i++)
         {
             SimulationTime::Instance()->IncrementTimeOneStep();
@@ -570,48 +558,48 @@ public:
         }
 
         // Test the solution at some fixed points to compare with other cell populations
-        CellPtr p_cell_210 = cell_population.GetCellUsingLocationIndex(210);
-        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[0], 10, 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[1], 5.0*sqrt(3.0), 1e-4);
-        TS_ASSERT_DELTA( p_cell_210->GetCellData()->GetItem("variable"), 0.6309, 1e-1); // Low error as mesh is slightlty larger than for centre based models
+        CellPtr p_cell_14 = cell_population.GetCellUsingLocationIndex(14);
+        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_14)[0], 2.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_14)[1], sqrt(3.0), 1e-4);
+        TS_ASSERT_DELTA(p_cell_14->GetCellData()->GetItem("variable"), 0.9567, 1e-4);
 
-        // Checking it doesn't change for this cell population
-        TS_ASSERT_DELTA(p_cell_210->GetCellData()->GetItem("variable"), 0.6618, 1e-4);
+        // Compare with the mesh-based cell population result
+        TS_ASSERT_DELTA(p_cell_14->GetCellData()->GetItem("variable"), 0.9604, 1e-1);
     }
 
     void TestPottsBasedSquareMonolayer() throw (Exception)
     {
-        PottsMeshGenerator<2> generator(100, 20, 4, 100, 20, 4);
+        PottsMeshGenerator<2> generator(24, 6, 4, 24, 6, 4);
         PottsMesh<2>* p_mesh = generator.GetMesh();
 
-        // Translate and scale so cells are on top of those in the above centre based tests.
-        p_mesh->Translate(-11.5,-11.5);
-        p_mesh->Scale(0.25,0.25 *sqrt(3.0)*0.5);
+        // Scale so cells are on top of those in the above centre-based tests
+        p_mesh->Translate(-1.5, -1.5);
+        p_mesh->Scale(0.25, sqrt(3.0)*0.5*0.25);
 
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_differentiated_type);
         CellsGenerator<UniformCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_differentiated_type);
 
-        // Make cells with x < 10.0 apoptotic (so no source term)
+        // Make cells with x < 3.0 apoptotic (so no source term)
         boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
                         cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
         for (unsigned i =0; i<cells.size(); i++)
         {
             c_vector<double,2> cell_location = p_mesh->GetCentroidOfElement(i);
-            if (cell_location(0) < 10.0)
+            if (cell_location(0) < 3.0)
             {
                 cells[i]->AddCellProperty(p_apoptotic_property);
             }
             // Set initial condition for PDE
             cells[i]->GetCellData()->SetItem("variable",1.0);
         }
-        TS_ASSERT_EQUALS(p_apoptotic_property->GetCellCount(),200u);
+        TS_ASSERT_EQUALS(p_apoptotic_property->GetCellCount(), 18u);
 
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Set up simulation time for file output
-        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 10);
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(10.0, 10);
 
         // Create PDE and boundary condition objects
         MAKE_PTR_ARGS(CellwiseSourceParabolicPde<2>, p_pde, (cell_population, 0.1, 1, -0.1));
@@ -632,26 +620,26 @@ public:
         }
 
         // Test the solution at some fixed points to compare with other cell populations
-        CellPtr p_cell_210 = cell_population.GetCellUsingLocationIndex(210);
-        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[0], 10, 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[1], 5.0*sqrt(3.0), 1e-4);
-        TS_ASSERT_DELTA( p_cell_210->GetCellData()->GetItem("variable"), 0.6309, 2e-1); // Low error as mesh is slightly larger than for centre-based models
+        CellPtr p_cell_14 = cell_population.GetCellUsingLocationIndex(14);
+        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_14)[0], 2.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_14)[1], sqrt(3.0), 1e-4);
+        TS_ASSERT_DELTA(p_cell_14->GetCellData()->GetItem("variable"), 0.9503, 1e-4);
 
-        // Checking it doesn't change for this cell population
-        TS_ASSERT_DELTA(p_cell_210->GetCellData()->GetItem("variable"), 0.6086, 1e-4);
+        // Compare with the mesh-based cell population result
+        TS_ASSERT_DELTA(p_cell_14->GetCellData()->GetItem("variable"), 0.9604, 1e-1);
     }
 
     void TestCaBasedSquareMonolayer() throw (Exception)
     {
-        PottsMeshGenerator<2> generator(20, 0, 0, 20, 0, 0);
+        PottsMeshGenerator<2> generator(6, 0, 0, 6, 0, 0);
         PottsMesh<2>* p_mesh = generator.GetMesh();
 
         // Scale so cells are on top of those in the above centre-based tests
-        p_mesh->Scale(1.0,sqrt(3.0)*0.5);
+        p_mesh->Scale(1.0, 1.0*sqrt(3.0)*0.5);
 
         // Specify where cells lie
         std::vector<unsigned> location_indices;
-        for (unsigned i=0; i<400; i++)
+        for (unsigned i=0; i<36; i++)
         {
             location_indices.push_back(i);
         }
@@ -661,25 +649,25 @@ public:
         CellsGenerator<UniformCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, location_indices.size(), p_differentiated_type);
 
-        // Make cells with x<10.0 apoptotic (so no source term)
+        // Make cells with x < 3.0 apoptotic (so no source term)
         boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
                 cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
         for (unsigned i=0; i<cells.size(); i++)
         {
             c_vector<double,2> cell_location = p_mesh->GetNode(i)->rGetLocation();
-            if (cell_location(0) < 10.0)
+            if (cell_location(0) < 3.0)
             {
                 cells[i]->AddCellProperty(p_apoptotic_property);
             }
             // Set initial condition for PDE
             cells[i]->GetCellData()->SetItem("variable", 1.0);
         }
-        TS_ASSERT_EQUALS(p_apoptotic_property->GetCellCount(), 200u);
+        TS_ASSERT_EQUALS(p_apoptotic_property->GetCellCount(), 18u);
 
         CaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
 
         // Set up simulation time for file output
-        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 10);
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(10.0, 10);
 
         // Create PDE and boundary condition objects
         MAKE_PTR_ARGS(CellwiseSourceParabolicPde<2>, p_pde, (cell_population, 0.1, 1, -0.1));
@@ -700,13 +688,13 @@ public:
         }
 
         // Test the solution at some fixed points to compare with other cell populations
-        CellPtr p_cell_210 = cell_population.GetCellUsingLocationIndex(210);
-        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[0], 10, 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[1], 5.0*sqrt(3.0), 1e-4);
-        TS_ASSERT_DELTA( p_cell_210->GetCellData()->GetItem("variable"), 0.6309, 2e-1); // low error as mesh is slightly larger than for centre-based models
+        CellPtr p_cell_14 = cell_population.GetCellUsingLocationIndex(14);
+        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_14)[0], 2.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_14)[1], sqrt(3.0), 1e-4);
+        TS_ASSERT_DELTA(p_cell_14->GetCellData()->GetItem("variable"), 0.9503, 2e-3); // Low threshold as slightly different on Intel
 
-        // Checking it doesn't change for this cell population
-        TS_ASSERT_DELTA(p_cell_210->GetCellData()->GetItem("variable"), 0.6086, 2e-3);// Low threshold as slightly different on Intel
+        // Compare with the mesh-based cell population result (low error as mesh is slightly larger than for centre-based models)
+        TS_ASSERT_DELTA(p_cell_14->GetCellData()->GetItem("variable"), 0.9604, 1e-1);
     }
 };
 

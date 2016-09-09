@@ -58,7 +58,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * zero otherwise. Here, 'associated with' takes a different meaning for each
  * cell population class, and is encoded in the method IsPdeNodeAssociatedWithNonApoptoticCell().
  *
- * \todo make member names and methods consistent with those of CellwiseSourceParabolicPde (#2876)
+ * \todo make member names and methods consistent with those of CellwiseSourceParabolicPde (#2687)
  */
 template<unsigned DIM>
 class CellwiseSourceEllipticPde : public AbstractLinearEllipticPde<DIM,DIM>
