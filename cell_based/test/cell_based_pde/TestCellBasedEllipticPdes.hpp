@@ -246,7 +246,7 @@ public:
         coarse_mesh.Scale(10.0, 10.0);
 
         // Create a PDE object
-        AveragedSourceEllipticPde<2> pde(cell_population, -1.0);
+        AveragedSourceEllipticPde<2> pde(cell_population, 0.05);
 
         // Test that the member variables have been initialised correctly
         TS_ASSERT_EQUALS(&(pde.rGetCellPopulation()), &cell_population);
@@ -267,19 +267,6 @@ public:
                 TS_ASSERT_DELTA(diffusion_matrix(i,j), value, 1e-6);
             }
         }
-
-        // Test ComputeLinearInUCoeffInSourceTerm() method
-        TS_ASSERT_DELTA(pde.ComputeLinearInUCoeffInSourceTerm(point,coarse_mesh.GetElement(0)), 0.0, 1e-6);
-
-        c_matrix <double, 2, 2> jacobian;
-        double det;
-        coarse_mesh.GetElement(1)->CalculateJacobian(jacobian, det);
-        TS_ASSERT_DELTA(pde.ComputeLinearInUCoeffInSourceTerm(point,coarse_mesh.GetElement(1)),
-                        -(cell_population.GetNumRealCells()/coarse_mesh.GetElement(1)->GetVolume(det)),
-                        1e-6);
-
-        // Test ComputeConstantInUSourceTerm() method
-        TS_ASSERT_DELTA(pde.ComputeConstantInUSourceTerm(point, NULL), 0.0, 1e-6);
 
         // Test SetupSourceTerms() when no map between cells and coarse mesh elements is supplied
         pde.SetupSourceTerms(coarse_mesh);
@@ -304,6 +291,12 @@ public:
         pde.SetupSourceTerms(coarse_mesh, &cell_pde_element_map);
         TS_ASSERT_DELTA(pde.mCellDensityOnCoarseElements[0], 0.5, 1e-6);
         TS_ASSERT_DELTA(pde.mCellDensityOnCoarseElements[1], 0.0, 1e-6);
+
+        // Test ComputeLinearInUCoeffInSourceTerm() method
+        TS_ASSERT_DELTA(pde.ComputeLinearInUCoeffInSourceTerm(point,coarse_mesh.GetElement(0)), 0.05*0.5, 1e-6);
+
+        // Test ComputeConstantInUSourceTerm() method
+        TS_ASSERT_DELTA(pde.ComputeConstantInUSourceTerm(point, NULL), 0.0, 1e-6);
 
         // Test GetUptakeRateForElement()
         TS_ASSERT_DELTA(pde.GetUptakeRateForElement(0), 0.5, 1e-6);
