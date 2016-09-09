@@ -529,7 +529,7 @@ public:
 
         // Stops remeshing as not possible for 2d in 3d meshes
         simulator.SetUpdateCellPopulationRule(false);
-
+        // Run Simulation
         simulator.Solve();
 
         // Check that nodes are all sat at resting length (1.0) apart
