@@ -97,7 +97,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellProliferativeTypesCountWriter.hpp"
 #include "SmartPointers.hpp"
 #include "PetscSetupAndFinalize.hpp"
-#include "UniformlyDistributedGenerationBasedCellCycleModel.hpp"
+#include "UniformG1GenerationalCellCycleModel.hpp"
 /*
  * The next header file defines a simple subcellular reaction network model that includes the functionality
  * for solving each cell's Delta/Notch signalling ODE system at each time step, using information about neighbouring
@@ -135,7 +135,7 @@ public:
         HoneycombVertexMeshGenerator generator(5, 5);
         MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
 
-        /* We then create some cells, each with a cell-cycle model, {{{UniformlyDistributedGenerationBasedCellCycleModel}}} and a subcellular reaction network model
+        /* We then create some cells, each with a cell-cycle model, {{{UniformG1GenerationalCellCycleModel}}} and a subcellular reaction network model
          * {{{DeltaNotchSrnModel}}}, which
          * incorporates a Delta/Notch ODE system, here we use the hard coded initial conditions of 1.0 and 1.0.
          * In this example we choose to make each cell differentiated,
@@ -146,7 +146,7 @@ public:
 
         for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
         {
-            UniformlyDistributedGenerationBasedCellCycleModel* p_cc_model = new UniformlyDistributedGenerationBasedCellCycleModel();
+            UniformG1GenerationalCellCycleModel* p_cc_model = new UniformG1GenerationalCellCycleModel();
             p_cc_model->SetDimension(2);
 
             /* We choose to initialise the concentrations to random levels in each cell. */
@@ -233,7 +233,7 @@ public:
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            UniformlyDistributedGenerationBasedCellCycleModel* p_cc_model = new UniformlyDistributedGenerationBasedCellCycleModel();
+            UniformG1GenerationalCellCycleModel* p_cc_model = new UniformG1GenerationalCellCycleModel();
             p_cc_model->SetDimension(2);
 
             /* We choose to initialise the concentrations to random levels in each cell. */

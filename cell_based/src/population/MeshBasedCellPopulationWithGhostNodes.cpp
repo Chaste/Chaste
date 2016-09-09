@@ -34,18 +34,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
-#include "Warnings.hpp"
-
-// Cell writers
-#include "CellAgesWriter.hpp"
-#include "CellAncestorWriter.hpp"
-#include "CellProliferativePhasesWriter.hpp"
-#include "CellProliferativeTypesWriter.hpp"
-#include "CellVolumesWriter.hpp"
+#include "Exception.hpp"
 #include "CellLocationIndexWriter.hpp"
-
-// Cell population writers
-#include "CellMutationStatesCountWriter.hpp"
 
 template<unsigned DIM>
 MeshBasedCellPopulationWithGhostNodes<DIM>::MeshBasedCellPopulationWithGhostNodes(
@@ -89,15 +79,22 @@ MeshBasedCellPopulationWithGhostNodes<DIM>::MeshBasedCellPopulationWithGhostNode
 
 template<unsigned DIM>
 MeshBasedCellPopulationWithGhostNodes<DIM>::MeshBasedCellPopulationWithGhostNodes(MutableMesh<DIM, DIM>& rMesh,
-                                                                  double ghostSpringStiffness)
-             : MeshBasedCellPopulation<DIM,DIM>(rMesh),
-               mGhostSpringStiffness(ghostSpringStiffness)
+                                                                                  double ghostSpringStiffness)
+    : MeshBasedCellPopulation<DIM,DIM>(rMesh),
+      mGhostSpringStiffness(ghostSpringStiffness)
 {
 }
 
 template<unsigned DIM>
 MeshBasedCellPopulationWithGhostNodes<DIM>::~MeshBasedCellPopulationWithGhostNodes()
 {
+}
+
+template<unsigned DIM>
+TetrahedralMesh<DIM, DIM>* MeshBasedCellPopulationWithGhostNodes<DIM>::GetTetrahedralMeshForPdeModifier()
+{
+    EXCEPTION("Currently can't solve PDEs on meshes with ghost nodes");
+    return static_cast<TetrahedralMesh<DIM, DIM>*>(&(this->mrMesh));
 }
 
 template<unsigned DIM>
@@ -165,7 +162,7 @@ template<unsigned DIM>
 CellPtr MeshBasedCellPopulationWithGhostNodes<DIM>::AddCell(CellPtr pNewCell, CellPtr pParentCell)
 {
     // Add new cell to population
-	CellPtr p_created_cell = MeshBasedCellPopulation<DIM,DIM>::AddCell(pNewCell, pParentCell);
+    CellPtr p_created_cell = MeshBasedCellPopulation<DIM,DIM>::AddCell(pNewCell, pParentCell);
     assert(p_created_cell == pNewCell);
 
     // Update size of mIsGhostNode if necessary

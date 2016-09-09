@@ -99,7 +99,7 @@ public:
      * @return the node index for the daughter cell.
      */
     virtual unsigned CalculateDaughterNodeIndex(CellPtr pNewCell,
-    		                                    CellPtr pParentCell,
+                                                CellPtr pParentCell,
                                                 CaBasedCellPopulation<SPACE_DIM>& rCellPopulation);
 };
 

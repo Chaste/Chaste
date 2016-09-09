@@ -47,8 +47,6 @@ GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GmshMeshReader(std::string pathBaseName,
        mOrderOfElements(orderOfElements),
        mOrderOfBoundaryElements(orderOfBoundaryElements)
 {
-    assert(SPACE_DIM==ELEMENT_DIM); //There is no fundamental reason for this, but full testing of SPACE_DIM != ELEMENT_DIM would be required.
-
     // Only linear and quadratic elements
     assert(mOrderOfElements==1 || mOrderOfElements==2);
 
@@ -330,7 +328,7 @@ std::vector<double> GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextNode()
     unsigned node_index;
     line >> node_index >> ret_coords[0] >> ret_coords[1];
 
-    if(ELEMENT_DIM == 3)
+    if (SPACE_DIM == 3)
     {
         line >> ret_coords[2];
     }

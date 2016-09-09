@@ -47,7 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CaBasedCellPopulation.hpp"
 #include "VolumeConstraintPottsUpdateRule.hpp"
 #include "PottsMeshGenerator.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 #include "DiffusionCaUpdateRule.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
@@ -83,7 +83,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, 1);
 
         std::vector<unsigned> location_indices;
@@ -109,7 +109,7 @@ public:
         }
 
         // Test that we do not have any update rules present
-        TS_ASSERT_EQUALS(cell_population.rGetUpdateRuleCollection().empty(), true);
+        TS_ASSERT_EQUALS(cell_population.GetUpdateRuleCollection().empty(), true);
 
         // Test that the other member variables of this object are initialised correctly
         TS_ASSERT_EQUALS(cell_population.GetUpdateNodesInRandomOrder(), true);
@@ -141,7 +141,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, 3, p_diff_type);
 
         std::vector<unsigned> location_indices;
@@ -209,7 +209,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, 3);
 
         std::vector<unsigned> location_indices;
@@ -323,7 +323,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, 5u);
 
         std::vector<unsigned> location_indices;
@@ -487,7 +487,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, 2);
 
         std::vector<unsigned> location_indices;
@@ -511,6 +511,36 @@ public:
         TS_ASSERT_THROWS_NOTHING(cell_population.Update());
     }
 
+    void TestIsPdeNodeAssociatedWithApoptoticCell()
+    {
+        // Create a simple 2D PottsMesh
+        PottsMeshGenerator<2> generator(5, 0, 0, 5, 0, 0);
+        PottsMesh<2>* p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, 2);
+
+        std::vector<unsigned> location_indices;
+        location_indices.push_back(12);
+        location_indices.push_back(13);
+
+        // Create cell population
+        CaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
+
+        // Make one cell start apoptosis
+        if (PetscTools::AmMaster())
+        {
+            cell_population.GetCellUsingLocationIndex(12)->StartApoptosis();
+        }
+
+        cell_population.Update();
+
+        TS_ASSERT_EQUALS(cell_population.IsPdeNodeAssociatedWithApoptoticCell(0), true);
+        TS_ASSERT_EQUALS(cell_population.IsPdeNodeAssociatedWithApoptoticCell(1), false);
+    }
+
     void TestAddCell() throw(Exception)
     {
         // Create a simple 2D PottsMesh
@@ -519,7 +549,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, 1);
 
         std::vector<unsigned> location_indices;
@@ -535,7 +565,7 @@ public:
         // Create a new cell
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
-        FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+        FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
         CellPtr p_new_cell(new Cell(p_state, p_model));
         p_new_cell->SetCellProliferativeType(p_stem_type);
 
@@ -578,7 +608,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, 25);
 
         std::vector<unsigned> location_indices;
@@ -596,7 +626,7 @@ public:
         // Create a new cell
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
-        FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+        FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
         CellPtr p_new_cell(new Cell(p_state, p_model));
         p_new_cell->SetCellProliferativeType(p_stem_type);
 
@@ -607,13 +637,13 @@ public:
 
     void TestUpdateCellLocationsExceptions()
     {
-        // Create a simple 2D PottsMesh with one cells
+        // Create a simple 2D PottsMesh with one cell
         PottsMeshGenerator<2> generator(3, 0, 0, 3, 0, 0);
         PottsMesh<2>* p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, 1u);
 
         std::vector<unsigned> location_indices;
@@ -651,7 +681,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, 9);
 
         std::vector<unsigned> location_indices;
@@ -702,7 +732,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, 1);
 
         std::vector<unsigned> location_indices;
@@ -753,7 +783,7 @@ public:
 
             std::vector<CellPtr> cells;
             MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+            CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
             cells_generator.GenerateBasicRandom(cells, 40, p_diff_type);
 
             std::vector<unsigned> location_indices;
@@ -840,13 +870,45 @@ public:
             TS_ASSERT_EQUALS(p_static_population->GetIterateRandomlyOverUpdateRuleCollection(), true);
 
             // Test that the update rule has been archived correctly
-            std::vector<boost::shared_ptr<AbstractCaUpdateRule<2> > > update_rule_collection = p_static_population->rGetUpdateRuleCollection();
+            std::vector<boost::shared_ptr<AbstractUpdateRule<2> > > update_rule_collection = p_static_population->GetUpdateRuleCollection();
             TS_ASSERT_EQUALS(update_rule_collection.size(), 1u);
             TS_ASSERT_EQUALS((*update_rule_collection[0]).GetIdentifier(), "DiffusionCaUpdateRule-2");
 
             // Tidy up
             delete p_cell_population;
         }
+    }
+
+    void TestGetTetrahedralMeshForPdeModifier() throw(Exception)
+    {
+        PottsMeshGenerator<2> generator(3, 0, 0, 3, 0, 0);
+        PottsMesh<2>* p_mesh = generator.GetMesh();
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, 9);
+
+        std::vector<unsigned> location_indices;
+        for (unsigned i=0; i<9; i++)
+        {
+            location_indices.push_back(i);
+        }
+
+        CaBasedCellPopulation<2u> cell_population(*p_mesh, cells, location_indices);
+
+        TetrahedralMesh<2,2>* p_tet_mesh = cell_population.GetTetrahedralMeshForPdeModifier();
+
+        // Check it has the correct number of nodes and elements
+        TS_ASSERT_EQUALS(p_tet_mesh->GetNumNodes(), p_mesh->GetNumNodes());
+        TS_ASSERT_EQUALS(p_tet_mesh->GetNumElements(), 8u);
+
+        // Check some nodes have the correct locations
+        TS_ASSERT_DELTA(p_tet_mesh->GetNode(0)->rGetLocation()[0], 0.0, 1e-6);
+        TS_ASSERT_DELTA(p_tet_mesh->GetNode(0)->rGetLocation()[1], 0.0, 1e-6);
+        TS_ASSERT_DELTA(p_tet_mesh->GetNode(3)->rGetLocation()[0], 0.0, 1e-6);
+        TS_ASSERT_DELTA(p_tet_mesh->GetNode(3)->rGetLocation()[1], 1.0, 1e-6);
+        TS_ASSERT_DELTA(p_tet_mesh->GetNode(7)->rGetLocation()[0], 1.0, 1e-6);
+        TS_ASSERT_DELTA(p_tet_mesh->GetNode(7)->rGetLocation()[1], 2.0, 1e-6);
     }
 };
 

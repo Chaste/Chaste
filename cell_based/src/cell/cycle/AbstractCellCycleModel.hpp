@@ -222,14 +222,15 @@ public:
     /**
      * @return whether the cell is ready to divide.
      *
-     * It is pure virtual as needs to be defined in child classes.
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
      *
      * The intention is that this method is called precisely once at
      * each timestep of the simulation. However this does not appear
      * to always be the case at present, and so it can cope with more
      * unusual usage patterns.
      */
-    virtual bool ReadyToDivide() = 0 ;
+    virtual bool ReadyToDivide()=0;
 
     /**
      * Each cell-cycle model must be able to be reset 'after' a cell division.
@@ -255,6 +256,9 @@ public:
      *
      * Copy constructors are used to set all the member variables in the appropriate classes.
      *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     *
      * @return new cell-cycle model
      */
     virtual AbstractCellCycleModel* CreateCellCycleModel()=0;
@@ -266,7 +270,9 @@ public:
 
     /**
      * @return the typical cell cycle duration for a transit cell, in hours.
-     * This method must be declared in subclasses.
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
      *
      * #2788 Consider merging this with GetAverageStemCellCycleTime to GetAverageCellCycleDuration
      */
@@ -274,7 +280,9 @@ public:
 
     /**
      * @return the typical cell cycle duration for a stem cell, in hours.
-     * This method must be declared in subclasses.
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
      *
      * #2788 Consider merging this with GetAverageTransitCellCycleTime to GetAverageCellCycleDuration
      */

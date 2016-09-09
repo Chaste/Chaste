@@ -93,6 +93,9 @@ public:
     /**
      * Return a pair of vectors used to position the daughters of a dividing cell.
      *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     *
      * @param pParentCell  The cell to divide
      * @param rCellPopulation  The centre-based cell population
      *

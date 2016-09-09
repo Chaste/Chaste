@@ -98,6 +98,9 @@ public:
      * Return the vector that will divide the two halves of the existing cell
      * to form the boundary between parent and daughter cell.
      *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     *
      * @param pParentCell  The cell to divide
      * @param rCellPopulation  The vertex-based cell population
      * @return the division vector.

@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "OffLatticeSimulation.hpp"
 #include "RepulsionForce.hpp"
-#include "UniformlyDistributedCellCycleModel.hpp"
+#include "UniformCellCycleModel.hpp"
 #include "CellsGenerator.hpp"
 #include "PlaneBoundaryCondition.hpp"
 #include "PlaneBasedCellKiller.hpp"
@@ -98,7 +98,7 @@ public:
 
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
-        CellsGenerator<UniformlyDistributedCellCycleModel, 3> cells_generator;
+        CellsGenerator<UniformCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_transit_type);
 
         NodeBasedCellPopulation<3> node_based_cell_population(mesh, cells);

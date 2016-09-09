@@ -146,6 +146,9 @@ public:
      * for this population. If so, a stepSizeException is generated that contains
      * a warning/error message and a suggested smaller dt that should avoid the problem.
      *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     *
      * @param nodeIndex Index of the node in question (allows us to check whether this is a ghost or particle)
      * @param rDisplacement Movement vector of the node at this time step
      * @param dt Current time step size

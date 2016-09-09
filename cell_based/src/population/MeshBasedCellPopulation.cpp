@@ -43,16 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodesOnlyMesh.hpp"
 #include "Exception.hpp"
 #include "CellId.hpp"
-
-// Cell writers
-#include "CellAgesWriter.hpp"
-#include "CellAncestorWriter.hpp"
-#include "CellProliferativePhasesWriter.hpp"
-#include "CellProliferativeTypesWriter.hpp"
 #include "CellVolumesWriter.hpp"
-
-// Cell population writers
-#include "CellMutationStatesCountWriter.hpp"
 #include "CellPopulationElementWriter.hpp"
 #include "VoronoiDataWriter.hpp"
 #include "NodeVelocityWriter.hpp"
@@ -214,6 +205,12 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 const MutableMesh<ELEMENT_DIM,SPACE_DIM>& MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::rGetMesh() const
 {
     return *mpMutableMesh;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetTetrahedralMeshForPdeModifier()
+{
+    return mpMutableMesh;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

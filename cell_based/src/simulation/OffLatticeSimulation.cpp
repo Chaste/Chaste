@@ -38,8 +38,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cmath>
 #include <boost/make_shared.hpp>
 
-#include "VertexBasedCellPopulation.hpp"
-#include "T2SwapCellKiller.hpp"
 #include "CellBasedEventHandler.hpp"
 #include "LogFile.hpp"
 #include "Version.hpp"
@@ -57,15 +55,6 @@ OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::OffLatticeSimulation(AbstractCellPo
     if (!dynamic_cast<AbstractOffLatticeCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&rCellPopulation))
     {
         EXCEPTION("OffLatticeSimulations require a subclass of AbstractOffLatticeCellPopulation.");
-    }
-
-    if (bool(dynamic_cast<VertexBasedCellPopulation<SPACE_DIM>*>(&rCellPopulation)))
-    {
-        // For VertexBasedCellPopulations we automatically add a T2SwapCellKiller. In order to inhibit T2 swaps
-        // the user needs to set the threshold for T2 swaps in the mesh to 0.
-        VertexBasedCellPopulation<SPACE_DIM>* p_vertex_based_cell_population = dynamic_cast<VertexBasedCellPopulation<SPACE_DIM>*>(&rCellPopulation);
-        MAKE_PTR_ARGS(T2SwapCellKiller<SPACE_DIM>, p_t2_swap_cell_killer, (p_vertex_based_cell_population));
-        this->AddCellKiller(p_t2_swap_cell_killer);
     }
 }
 

@@ -84,7 +84,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WildTypeCellMutationState.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 #include "CellLabel.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
 #include "CellMutationStatesCountWriter.hpp"
 #include "OffLatticeSimulation.hpp"
@@ -376,7 +376,7 @@ public:
         {
             /* For each node we create a cell with our cell-cycle model and the wild-type cell mutation state.
              * We then add the property {{{MotileCellProperty}}} to a random selection of the cells, as follows. */
-            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+            FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
 
             CellPropertyCollection collection;
             if (RandomNumberGenerator::Instance()->ranf() < 0.2)

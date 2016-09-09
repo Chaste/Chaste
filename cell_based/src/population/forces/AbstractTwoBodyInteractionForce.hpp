@@ -103,7 +103,10 @@ public:
     /**
      * Calculates the force between two nodes.
      *
-     * Note that this assumes they are connected and is called by rCalculateVelocitiesOfEachNode()
+     * Note that this assumes they are connected and is called by rCalculateVelocitiesOfEachNode().
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
      *
      * @param nodeAGlobalIndex index of one neighbouring node
      * @param nodeBGlobalIndex index of the other neighbouring node

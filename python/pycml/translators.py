@@ -1924,7 +1924,17 @@ class CellMLToChasteTranslator(CellMLTranslator):
                 self.writeln('this->mVectorOutputNames[', i, ']', self.EQ_ASSIGN, '"', name, '"', self.STMT_END)
                 vector_outputs = cellml_metadata.find_variables(self.model, prop, name)
                 assert len(vector_outputs) > 0
-                vector_outputs.sort(key=lambda v: self.var_display_name(v))
+                if name == 'state_variable':
+                    # Special case to ensure the ordering as an output matches the state vector in the ODE system
+                    def get_state_index(v):
+                        """Find the index of the state variable corresponding to this variable, which may be units converted."""
+                        v = v.get_source_variable(recurse=True)
+                        if v.get_type() is VarTypes.Computed:
+                            v = v.get_dependencies()[0].get_dependencies()[0]
+                        return self.state_vars.index(v)
+                    vector_outputs.sort(key=get_state_index)
+                else:
+                    vector_outputs.sort(key=lambda v: self.var_display_name(v))
                 self.writeln('this->mVectorOutputsInfo[', i, '].resize(', len(vector_outputs), ');')
                 for j, output in enumerate(vector_outputs):
                     self.writeln('this->mVectorOutputsInfo[', i, '][', j, ']', self.EQ_ASSIGN,

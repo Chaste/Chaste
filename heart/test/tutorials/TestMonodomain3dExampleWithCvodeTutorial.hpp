@@ -158,7 +158,7 @@ public:
  * The rest of the test is almost identical to the non-CVODE cell case,
  * - just note the #ifdef tag and the comment about ODE timesteps.
  */
-class TestMonodomain3dExample : public CxxTest::TestSuite
+class TestMonodomain3dExampleWithCvodeTutorial : public CxxTest::TestSuite
 {
 public:
     void TestMonodomain3d() throw(Exception)

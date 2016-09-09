@@ -177,7 +177,7 @@ double AirwayBranch::GetRotationAngle()
 
     //Sometimes the bifurcations are co-planar, which leads to an undefined angle (0.0 or pi radians are valid).
     //For our purposes we consider this angle to be zero.
-    if(abs(rotation_factor) == 1.0)
+    if(fabs(rotation_factor) == 1.0)
     {
         return 0.0;
     }

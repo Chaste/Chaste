@@ -34,17 +34,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "PottsBasedCellPopulation.hpp"
+#include "MutableMesh.hpp"
 #include "RandomNumberGenerator.hpp"
-#include "Warnings.hpp"
+#include "AbstractPottsUpdateRule.hpp"
+#include "ApoptoticCellProperty.hpp"
+#include "NodesOnlyMesh.hpp"
+#include "Exception.hpp"
+#include "CellPopulationElementWriter.hpp"
+#include "CellIdWriter.hpp"
 
 // Needed to convert mesh in order to write nodes to VTK (visualize as glyphs)
 #include "VtkMeshWriter.hpp"
-#include "NodesOnlyMesh.hpp"
-#include "Exception.hpp"
-
-// Cell writers
-#include "CellPopulationElementWriter.hpp"
-#include "CellIdWriter.hpp"
 
 template<unsigned DIM>
 void PottsBasedCellPopulation<DIM>::Validate()
@@ -131,6 +131,36 @@ const PottsMesh<DIM>& PottsBasedCellPopulation<DIM>::rGetMesh() const
 }
 
 template<unsigned DIM>
+TetrahedralMesh<DIM, DIM>* PottsBasedCellPopulation<DIM>::GetTetrahedralMeshForPdeModifier()
+{
+    std::vector<Node<DIM>*> temp_nodes;
+
+    // Create nodes at the centre of the cells
+    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
+         cell_iter != this->End();
+         ++cell_iter)
+    {
+        unsigned index = this->GetLocationIndexUsingCell(*cell_iter);
+        c_vector<double, DIM> location = this->GetLocationOfCellCentre(*cell_iter);
+        temp_nodes.push_back(new Node<DIM>(index, location));
+    }
+
+    return new MutableMesh<DIM, DIM>(temp_nodes);
+}
+
+template<unsigned DIM>
+bool PottsBasedCellPopulation<DIM>::IsPdeNodeAssociatedWithApoptoticCell(unsigned pdeNodeIndex)
+{
+    bool is_cell_apoptotic = false;
+
+    if (this->IsCellAttachedToLocationIndex(pdeNodeIndex))
+    {
+        is_cell_apoptotic = this->GetCellUsingLocationIndex(pdeNodeIndex)->template HasCellProperty<ApoptoticCellProperty>();
+    }
+    return is_cell_apoptotic;
+}
+
+template<unsigned DIM>
 PottsElement<DIM>* PottsBasedCellPopulation<DIM>::GetElement(unsigned elementIndex)
 {
     return mpPottsMesh->GetElement(elementIndex);
@@ -196,24 +226,30 @@ unsigned PottsBasedCellPopulation<DIM>::RemoveDeadCells()
 {
     unsigned num_removed = 0;
 
-    for (std::list<CellPtr>::iterator it = this->mCells.begin();
-         it != this->mCells.end();
+    for (std::list<CellPtr>::iterator cell_iter = this->mCells.begin();
+         cell_iter != this->mCells.end();
          )
     {
-        if ((*it)->IsDead())
+        if ((*cell_iter)->IsDead())
         {
-            // Remove the element from the mesh
+            // Get the location index corresponding to this cell
+            unsigned location_index = this->GetLocationIndexUsingCell(*cell_iter);
+
+            // Use this to remove the cell from the population
+            mpPottsMesh->DeleteElement(location_index);
+
+            // Erase cell and update counter
+            cell_iter = this->mCells.erase(cell_iter);
             num_removed++;
-            mpPottsMesh->DeleteElement(this->GetLocationIndexUsingCell((*it)));
-            it = this->mCells.erase(it);
         }
         else
         {
-            ++it;
+            ++cell_iter;
         }
     }
     return num_removed;
 }
+
 template<unsigned DIM>
 void PottsBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
 {
@@ -236,7 +272,7 @@ void PottsBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
     if (this->mIterateRandomlyOverUpdateRuleCollection)
     {
         // Randomly permute mUpdateRuleCollection
-        p_gen->Shuffle(mUpdateRuleCollection);
+        p_gen->Shuffle(this->mUpdateRuleCollection);
     }
 
     for (unsigned i=0; i<num_nodes*mNumSweepsPerTimestep; i++)
@@ -285,11 +321,13 @@ void PottsBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
                 double delta_H = 0.0; // This is H_1-H_0.
 
                 // Now add contributions to the Hamiltonian from each AbstractPottsUpdateRule
-                for (typename std::vector<boost::shared_ptr<AbstractPottsUpdateRule<DIM> > >::iterator iter = mUpdateRuleCollection.begin();
-                     iter != mUpdateRuleCollection.end();
+                for (typename std::vector<boost::shared_ptr<AbstractUpdateRule<DIM> > >::iterator iter = this->mUpdateRuleCollection.begin();
+                     iter != this->mUpdateRuleCollection.end();
                      ++iter)
                 {
-                    delta_H += (*iter)->EvaluateHamiltonianContribution(neighbour_location_index, p_node->GetIndex(), *this);
+                    // This static cast is fine, since we assert the update rule must be a Potts update rule in AddUpdateRule()
+                    double dH = (boost::static_pointer_cast<AbstractPottsUpdateRule<DIM> >(*iter))->EvaluateHamiltonianContribution(neighbour_location_index, p_node->GetIndex(), *this);
+                    delta_H += dH;
                 }
 
                 // Generate a uniform random number to do the random motion
@@ -398,21 +436,10 @@ double PottsBasedCellPopulation<DIM>::GetWidth(const unsigned& rDimension)
 }
 
 template<unsigned DIM>
-void PottsBasedCellPopulation<DIM>::AddUpdateRule(boost::shared_ptr<AbstractPottsUpdateRule<DIM> > pUpdateRule)
+void PottsBasedCellPopulation<DIM>::AddUpdateRule(boost::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule)
 {
-    mUpdateRuleCollection.push_back(pUpdateRule);
-}
-
-template<unsigned DIM>
-void PottsBasedCellPopulation<DIM>::RemoveAllUpdateRules()
-{
-    mUpdateRuleCollection.clear();
-}
-
-template<unsigned DIM>
-const std::vector<boost::shared_ptr<AbstractPottsUpdateRule<DIM> > >& PottsBasedCellPopulation<DIM>::rGetUpdateRuleCollection() const
-{
-    return mUpdateRuleCollection;
+    assert(bool(dynamic_cast<AbstractPottsUpdateRule<DIM>*>(pUpdateRule.get())));
+    this->mUpdateRuleCollection.push_back(pUpdateRule);
 }
 
 template<unsigned DIM>
@@ -751,6 +778,18 @@ template<unsigned DIM>
 void PottsBasedCellPopulation<DIM>::WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile)
 {
     *pVizSetupFile << "PottsSimulation\n";
+}
+
+template<unsigned DIM>
+double PottsBasedCellPopulation<DIM>::GetCellDataItemAtPdeNode(
+    unsigned pdeNodeIndex,
+    std::string& rVariableName,
+    bool dirichletBoundaryConditionApplies,
+    double dirichletBoundaryValue)
+{
+    CellPtr p_cell = this->GetCellUsingLocationIndex(pdeNodeIndex);
+    double value = p_cell->GetCellData()->GetItem(rVariableName);
+    return value;
 }
 
 // Explicit instantiation

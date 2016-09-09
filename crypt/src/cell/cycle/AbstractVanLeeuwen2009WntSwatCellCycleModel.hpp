@@ -133,9 +133,11 @@ public:
     double GetNuclearBetaCateninLevel();
 
     /**
-     * Pure virtual method to be implemented in concrete classes, which
-     * should should allocate the mOdeSystem variable using the appropriate
+     * Allocate the mOdeSystem variable using the appropriate
      * hypothesis (one or two).
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
      *
      * @param wntConcentration Wnt concentration
      * @param pMutationState Mutation state

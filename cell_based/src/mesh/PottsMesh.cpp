@@ -42,8 +42,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned DIM>
 PottsMesh<DIM>::PottsMesh(std::vector<Node<DIM>*> nodes,
                           std::vector<PottsElement<DIM>*> pottsElements,
-                          std::vector< std::set<unsigned> > vonNeumannNeighbouringNodeIndices,
-                          std::vector< std::set<unsigned> > mooreNeighbouringNodeIndices)
+                          std::vector<std::set<unsigned> > vonNeumannNeighbouringNodeIndices,
+                          std::vector<std::set<unsigned> > mooreNeighbouringNodeIndices)
 {
     // Reset member variables and clear mNodes, mElements.
     Clear();
@@ -202,11 +202,12 @@ double PottsMesh<DIM>::GetSurfaceAreaOfElement(unsigned index)
     ///\todo not implemented in 3d yet
     assert(DIM==2 || DIM==3);
 
-    // Get pointer to this element
+    // Helper variables
     PottsElement<DIM>* p_element = GetElement(index);
+    unsigned num_nodes = p_element->GetNumNodes();
 
     double surface_area = 0.0;
-    for (unsigned node_index=0; node_index< p_element->GetNumNodes(); node_index++)
+    for (unsigned node_index=0; node_index<num_nodes; node_index++)
     {
         std::set<unsigned> neighbouring_node_indices = GetVonNeumannNeighbouringNodeIndices(p_element->GetNode(node_index)->GetIndex());
         unsigned local_edges = 2*DIM;
@@ -531,27 +532,28 @@ unsigned PottsMesh<DIM>::AddElement(PottsElement<DIM>* pNewElement)
 template<unsigned DIM>
 std::set<unsigned> PottsMesh<DIM>::GetNeighbouringElementIndices(unsigned elementIndex)
 {
-    // Get a pointer to this element
+    // Helper variables
     PottsElement<DIM>* p_element = this->GetElement(elementIndex);
+    unsigned num_nodes = p_element->GetNumNodes();
 
     // Create a set of neighbouring element indices
     std::set<unsigned> neighbouring_element_indices;
 
     // Loop over nodes owned by this element
-    for (unsigned local_index=0; local_index<p_element->GetNumNodes(); local_index++)
+    for (unsigned local_index=0; local_index<num_nodes; local_index++)
     {
         // Get a pointer to this node
         Node<DIM>* p_node = p_element->GetNode(local_index);
 
         // Find the indices of the elements owned by neighbours of this node
 
-        // Loop over neighbouring nodes. Only want Von Neuman neighbours  (i.e N,S,E,W) as need to share an edge
+        // Loop over neighbouring nodes. Only want Von Neuman neighbours (i.e N,S,E,W) as need to share an edge
         std::set<unsigned> neighbouring_node_indices = GetVonNeumannNeighbouringNodeIndices(p_node->GetIndex());
 
          // Iterate over these neighbouring nodes
          for (std::set<unsigned>::iterator neighbour_iter = neighbouring_node_indices.begin();
-               neighbour_iter != neighbouring_node_indices.end();
-               ++neighbour_iter)
+              neighbour_iter != neighbouring_node_indices.end();
+              ++neighbour_iter)
          {
              std::set<unsigned> neighbouring_node_containing_elem_indices = this->GetNode(*neighbour_iter)->rGetContainingElementIndices();
 
@@ -646,3 +648,4 @@ template class PottsMesh<3>;
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
 EXPORT_TEMPLATE_CLASS_SAME_DIMS(PottsMesh)
+

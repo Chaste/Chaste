@@ -39,6 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "StepSizeException.hpp"
 #include "Warnings.hpp"
 #include "WildTypeCellMutationState.hpp"
+#include "ApoptoticCellProperty.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractCentreBasedCellPopulation( AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
@@ -81,18 +82,43 @@ Node<SPACE_DIM>* AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetN
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::IsPdeNodeAssociatedWithApoptoticCell(unsigned pdeNodeIndex)
+{
+    bool is_cell_apoptotic = false;
+
+    if (this->IsCellAttachedToLocationIndex(pdeNodeIndex))
+    {
+        is_cell_apoptotic = this->GetCellUsingLocationIndex(pdeNodeIndex)->template HasCellProperty<ApoptoticCellProperty>();
+    }
+    return is_cell_apoptotic;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+double AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCellDataItemAtPdeNode(
+    unsigned pdeNodeIndex,
+    std::string& rVariableName,
+    bool dirichletBoundaryConditionApplies,
+    double dirichletBoundaryValue)
+{
+    CellPtr p_cell = this->GetCellUsingLocationIndex(pdeNodeIndex);
+    double value = p_cell->GetCellData()->GetItem(rVariableName);
+
+    return value;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 CellPtr AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddCell(CellPtr pNewCell, CellPtr pParentCell)
 {
-	// Calculate the locations of the two daughter cells
-	std::pair<c_vector<double, SPACE_DIM>, c_vector<double, SPACE_DIM> > positions = mpCentreBasedDivisionRule->CalculateCellDivisionVector(pParentCell, *this);
+    // Calculate the locations of the two daughter cells
+    std::pair<c_vector<double, SPACE_DIM>, c_vector<double, SPACE_DIM> > positions = mpCentreBasedDivisionRule->CalculateCellDivisionVector(pParentCell, *this);
 
-	c_vector<double, SPACE_DIM> parent_position = positions.first;
-	c_vector<double, SPACE_DIM> daughter_position = positions.second;
+    c_vector<double, SPACE_DIM> parent_position = positions.first;
+    c_vector<double, SPACE_DIM> daughter_position = positions.second;
 
-	// Set the parent cell to use this location
-	ChastePoint<SPACE_DIM> parent_point(parent_position);
-	unsigned node_index = this->GetLocationIndexUsingCell(pParentCell);
-	this->SetNode(node_index, parent_point);
+    // Set the parent cell to use this location
+    ChastePoint<SPACE_DIM> parent_point(parent_position);
+    unsigned node_index = this->GetLocationIndexUsingCell(pParentCell);
+    this->SetNode(node_index, parent_point);
 
     // Create a new node
     Node<SPACE_DIM>* p_new_node = new Node<SPACE_DIM>(this->GetNumNodes(), daughter_position, false); // never on boundary
