@@ -258,6 +258,9 @@ public:
         MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
         p_pde_modifier->SetDependentVariableName("oxygen");
 
+        // Output the PDE solution at each time step
+        p_pde_modifier->SetOutputSolutionAtPdeNodes(true);
+
         simulator.AddSimulationModifier(p_pde_modifier);
 
         simulator.SetOutputDirectory("OffLatticeSimulationWithOxygen");
