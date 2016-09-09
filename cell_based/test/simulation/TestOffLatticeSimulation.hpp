@@ -48,6 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellsGenerator.hpp"
 #include "FixedG1GenerationalCellCycleModel.hpp"
 #include "UniformCellCycleModel.hpp"
+#include "NoCellCycleModel.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
 #include "ChemotacticForce.hpp"
 #include "RandomCellKiller.hpp"
@@ -545,16 +546,15 @@ public:
     {
         EXIT_IF_PARALLEL;    // Cell population output doesn't work in parallel
 
-        // Load Mesh
+        // Load mesh
         TrianglesMeshReader<2,3> mesh_reader("cell_based/test/data/Square2dMeshIn3d/Square2dMeshIn3d");
         MutableMesh<2,3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
-        // Create cells
+        // Create cells (we use a NoCellCycleModel here for simplicity, since there is no proliferation)
         std::vector<CellPtr> cells;
-        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(),p_diff_type);
+        CellsGenerator<NoCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
 
         // Create a cell population
         MeshBasedCellPopulation<2,3> cell_population(mesh, cells);
