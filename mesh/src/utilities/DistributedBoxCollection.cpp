@@ -48,7 +48,7 @@ DistributedBoxCollection<DIM>::DistributedBoxCollection(double boxWidth, c_vecto
       mAreLocalBoxesSet(false),
       mCalculateNodeNeighbours(true)
 {
-    // Periodicity only works in 2d
+    // Periodicity only works in 2d see #2308
     if (isPeriodicInX)
     {
         assert(DIM==2);
