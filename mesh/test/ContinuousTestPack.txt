@@ -29,6 +29,7 @@ utilities/TestObsoleteBoxCollection.hpp
 utilities/TestPerElementWriter.hpp
 vertex/TestCylindrical2dVertexMesh.hpp
 vertex/TestCylindricalHoneycombVertexMeshGenerator.hpp
+vertex/TestHexagonalPrism3dVertexMeshGenerator.hpp
 vertex/TestHoneycombVertexMeshGenerator.hpp
 vertex/TestMutableVertexMesh.hpp
 vertex/TestMutableVertexMeshReMesh.hpp
