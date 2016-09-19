@@ -36,38 +36,179 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractPdeModifier.hpp"
 #include "VtkMeshWriter.hpp"
 #include "ReplicatableVector.hpp"
+#include "PetscTools.hpp"
+#include "AveragedSourceEllipticPde.hpp"
+#include "AveragedSourceParabolicPde.hpp"
 
 template<unsigned DIM>
-AbstractPdeModifier<DIM>::AbstractPdeModifier()
+AbstractPdeModifier<DIM>::AbstractPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde,
+                                              boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition,
+                                              bool isNeumannBoundaryCondition,
+                                              Vec solution)
     : AbstractCellBasedSimulationModifier<DIM>(),
-      mDeleteMesh(false),
+      mpPde(pPde),
+      mpBoundaryCondition(pBoundaryCondition),
+      mIsNeumannBoundaryCondition(isNeumannBoundaryCondition),
       mSolution(NULL),
-      mpFeMesh(NULL),
       mOutputDirectory(""),
-      mCachedDependentVariableName(""),
-      mOutputGradient(false)
+      mOutputGradient(false),
+      mOutputSolutionAtPdeNodes(false)
 {
-    assert(DIM == 2);
+    if (solution)
+    {
+        mSolution = solution;
+    }
 }
 
 template<unsigned DIM>
 AbstractPdeModifier<DIM>::~AbstractPdeModifier()
 {
-    if (this->mDeleteMesh)
+}
+
+template<unsigned DIM>
+boost::shared_ptr<AbstractLinearPde<DIM,DIM> > AbstractPdeModifier<DIM>::GetPde()
+{
+    return mpPde;
+}
+
+template<unsigned DIM>
+boost::shared_ptr<AbstractBoundaryCondition<DIM> > AbstractPdeModifier<DIM>::GetBoundaryCondition()
+{
+    return mpBoundaryCondition;
+}
+
+template<unsigned DIM>
+bool AbstractPdeModifier<DIM>::IsNeumannBoundaryCondition()
+{
+    return mIsNeumannBoundaryCondition;
+}
+
+template<unsigned DIM>
+void AbstractPdeModifier<DIM>::SetDependentVariableName(const std::string& rName)
+{
+    mDependentVariableName = rName;
+}
+
+template<unsigned DIM>
+std::string& AbstractPdeModifier<DIM>::rGetDependentVariableName()
+{
+    return mDependentVariableName;
+}
+
+template<unsigned DIM>
+bool AbstractPdeModifier<DIM>::HasAveragedSourcePde()
+{
+    return ((boost::dynamic_pointer_cast<AveragedSourceEllipticPde<DIM> >(mpPde) != NULL) ||
+            (boost::dynamic_pointer_cast<AveragedSourceParabolicPde<DIM> >(mpPde) != NULL));
+}
+
+template<unsigned DIM>
+void AbstractPdeModifier<DIM>::SetUpSourceTermsForAveragedSourcePde(TetrahedralMesh<DIM,DIM>* pMesh, std::map<CellPtr, unsigned>* pCellPdeElementMap)
+{
+    assert(HasAveragedSourcePde());
+    if (boost::dynamic_pointer_cast<AveragedSourceEllipticPde<DIM> >(mpPde) != NULL)
     {
-        delete mpFeMesh;
+        boost::static_pointer_cast<AveragedSourceEllipticPde<DIM> >(mpPde)->SetupSourceTerms(*pMesh, pCellPdeElementMap);
+    }
+    else if (boost::dynamic_pointer_cast<AveragedSourceParabolicPde<DIM> >(mpPde) != NULL)
+    {
+        boost::static_pointer_cast<AveragedSourceParabolicPde<DIM> >(mpPde)->SetupSourceTerms(*pMesh, pCellPdeElementMap);
+    }
+}
+
+template<unsigned DIM>
+Vec AbstractPdeModifier<DIM>::GetSolution()
+{
+    return mSolution;
+}
+
+template<unsigned DIM>
+Vec AbstractPdeModifier<DIM>::GetSolution() const
+{
+    return mSolution;
+}
+
+template<unsigned DIM>
+void AbstractPdeModifier<DIM>::SetSolution(Vec solution)
+{
+    mSolution = solution;
+}
+
+template<unsigned DIM>
+TetrahedralMesh<DIM,DIM>* AbstractPdeModifier<DIM>::GetFeMesh() const
+{
+    return mpFeMesh;
+}
+
+template<unsigned DIM>
+void AbstractPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)
+{
+    // Cache the output directory
+    this->mOutputDirectory = outputDirectory;
+
+    if (mOutputSolutionAtPdeNodes)
+    {
+        if (PetscTools::AmMaster())
+        {
+            OutputFileHandler output_file_handler(outputDirectory+"/", false);
+            mpVizPdeSolutionResultsFile = output_file_handler.OpenOutputFile("results.vizpdesolution");
+        }
     }
 }
 
 template<unsigned DIM>
 void AbstractPdeModifier<DIM>::UpdateAtEndOfOutputTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
+    if (mOutputSolutionAtPdeNodes)
+    {
+        if (PetscTools::AmMaster())
+        {
+            (*mpVizPdeSolutionResultsFile) << SimulationTime::Instance()->GetTime() << "\t";
+
+            if (mpFeMesh != NULL)
+            {
+                assert(mDependentVariableName != "");
+
+                for (unsigned i=0; i<mpFeMesh->GetNumNodes(); i++)
+                {
+                    (*mpVizPdeSolutionResultsFile) << i << " ";
+                    c_vector<double,DIM> location = mpFeMesh->GetNode(i)->rGetLocation();
+                    for (unsigned k=0; k<DIM; k++)
+                    {
+                        (*mpVizPdeSolutionResultsFile) << location[k] << " ";
+                    }
+
+                    assert(mSolution != NULL);
+                    ReplicatableVector solution_repl(mSolution);
+                    (*mpVizPdeSolutionResultsFile) << solution_repl[i] << " ";
+                }
+            }
+            else // Not coarse mesh
+            {
+                for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
+                     cell_iter != rCellPopulation.End();
+                     ++cell_iter)
+                {
+                    unsigned node_index = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);
+                    (*mpVizPdeSolutionResultsFile) << node_index << " ";
+                    const c_vector<double,DIM>& position = rCellPopulation.GetLocationOfCellCentre(*cell_iter);
+                    for (unsigned i=0; i<DIM; i++)
+                    {
+                        (*mpVizPdeSolutionResultsFile) << position[i] << " ";
+                    }
+                    double solution = cell_iter->GetCellData()->GetItem(mDependentVariableName);
+                    (*mpVizPdeSolutionResultsFile) << solution << " ";
+                }
+            }
+            (*mpVizPdeSolutionResultsFile) << "\n";
+        }
+    }
 #ifdef CHASTE_VTK
     if (DIM > 1)
     {
         std::ostringstream time_string;
         time_string << SimulationTime::Instance()->GetTimeStepsElapsed();
-        std::string results_file = "pde_results_" + mCachedDependentVariableName + "_" + time_string.str();
+        std::string results_file = "pde_results_" + mDependentVariableName + "_" + time_string.str();
         VtkMeshWriter<DIM,DIM>* p_vtk_mesh_writer = new VtkMeshWriter<DIM,DIM>(mOutputDirectory, results_file, false);
 
         ReplicatableVector solution_repl(mSolution);
@@ -77,12 +218,24 @@ void AbstractPdeModifier<DIM>::UpdateAtEndOfOutputTimeStep(AbstractCellPopulatio
            pde_solution.push_back(solution_repl[i]);
         }
 
-        p_vtk_mesh_writer->AddPointData(mCachedDependentVariableName,pde_solution);
+        p_vtk_mesh_writer->AddPointData(mDependentVariableName, pde_solution);
 
         p_vtk_mesh_writer->WriteFilesUsingMesh(*mpFeMesh);
         delete p_vtk_mesh_writer;
     }
 #endif //CHASTE_VTK
+}
+
+template<unsigned DIM>
+void AbstractPdeModifier<DIM>::UpdateAtEndOfSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
+{
+    if (mOutputSolutionAtPdeNodes)
+    {
+        if (PetscTools::AmMaster())
+        {
+            mpVizPdeSolutionResultsFile->close();
+        }
+    }
 }
 
 template<unsigned DIM>
@@ -95,6 +248,12 @@ template<unsigned DIM>
 void AbstractPdeModifier<DIM>::SetOutputGradient(bool outputGradient)
 {
     mOutputGradient = outputGradient;
+}
+
+template<unsigned DIM>
+void AbstractPdeModifier<DIM>::SetOutputSolutionAtPdeNodes(bool outputSolutionAtPdeNodes)
+{
+    mOutputSolutionAtPdeNodes = outputSolutionAtPdeNodes;
 }
 
 template<unsigned DIM>

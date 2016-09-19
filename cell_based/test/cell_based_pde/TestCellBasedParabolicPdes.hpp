@@ -352,7 +352,7 @@ public:
 
             ChastePoint<2> point;
 
-            TS_ASSERT_DELTA(p_static_cast_pde->mUptakeCoefficient, 0.3 , 1e-6);
+            TS_ASSERT_DELTA(p_static_cast_pde->mSourceCoefficient, 0.3 , 1e-6);
             TS_ASSERT_DELTA(p_static_cast_pde->ComputeDuDtCoefficientFunction(point), 0.1, 1e-6);
             c_matrix<double,2,2> diffusion_matrix = p_static_cast_pde->ComputeDiffusionTerm(point);
             for (unsigned i=0; i<2; i++)

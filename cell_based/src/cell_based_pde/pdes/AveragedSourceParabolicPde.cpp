@@ -41,11 +41,11 @@ template<unsigned DIM>
 AveragedSourceParabolicPde<DIM>::AveragedSourceParabolicPde(AbstractCellPopulation<DIM,DIM>& rCellPopulation,
                                                             double duDtCoefficient,
                                                             double diffusionCoefficient,
-                                                            double uptakeCoefficient)
+                                                            double sourceCoefficient)
     : mrCellPopulation(rCellPopulation),
       mDuDtCoefficient(duDtCoefficient),
       mDiffusionCoefficient(diffusionCoefficient),
-      mUptakeCoefficient(uptakeCoefficient)
+      mSourceCoefficient(sourceCoefficient)
 {
 }
 
@@ -111,7 +111,7 @@ template<unsigned DIM>
 double AveragedSourceParabolicPde<DIM>::ComputeSourceTerm(const ChastePoint<DIM>& rX, double u, Element<DIM,DIM>* pElement)
 {
     assert(!mCellDensityOnCoarseElements.empty());
-    double coefficient = mUptakeCoefficient * mCellDensityOnCoarseElements[pElement->GetIndex()];
+    double coefficient = mSourceCoefficient * mCellDensityOnCoarseElements[pElement->GetIndex()];
 
     // The source term is C*u
     return coefficient*u;

@@ -205,7 +205,7 @@ public:
     /**
      * Overridden GetTetrahedralMeshForPdeModifier() method.
      *
-     * @return a copy of mrMesh.
+     * @return a shared pointer to mpMutableMesh.
      *
      * This method is called by AbstractGrowingDomainPdeModifier.
      */

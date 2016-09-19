@@ -41,10 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Must be included before other cell_based headers
 #include "CellBasedSimulationArchiver.hpp"
 
-#include "CellwiseSourcePde.hpp"
-#include "ConstBoundaryCondition.hpp"
 #include "PetscSetupAndFinalize.hpp"
-#include "AveragedSourcePde.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "PottsMeshGenerator.hpp"
 #include "CellsGenerator.hpp"
@@ -67,7 +64,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellProliferativePhasesWriter.hpp"
 #include "CellMutationStatesWriter.hpp"
 #include "CellLabelWriter.hpp"
-#include "CellProliferativePhasesCountWriter.hpp"
 
 class TestOnLatticeSimulationWithCaBasedCellPopulation : public AbstractCellBasedWithTimingsTestSuite
 {

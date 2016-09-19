@@ -42,7 +42,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vector>
 
-#include "CellBasedPdeHandler.hpp"
 #include "AbstractCellKiller.hpp"
 #include "AbstractCellBasedSimulationModifier.hpp"
 #include "AbstractForce.hpp"
@@ -105,7 +104,6 @@ private:
         archive & mCellKillers;
         archive & mSimulationModifiers;
         archive & mSamplingTimestepMultiple;
-        archive & mpCellBasedPdeHandler;
     }
 
 protected:
@@ -172,11 +170,6 @@ protected:
      * of timesteps at which results are written to file.
      */
     unsigned mSamplingTimestepMultiple;
-
-    /**
-     * Pointer to a CellBasedPdeHandler object.
-     */
-    CellBasedPdeHandler<SPACE_DIM>* mpCellBasedPdeHandler;
 
     /**
      * Writes out special information about the mesh to the visualizer.
@@ -282,18 +275,6 @@ public:
      * This frees the cell population if it was created by de-serialization.
      */
     virtual ~AbstractCellBasedSimulation();
-
-    /**
-     * Set mpCellBasedPdeHandler
-     *
-     * @param pCellBasedPdeHandler pointer to a CellBasedPdeHandler object
-     */
-    void SetCellBasedPdeHandler(CellBasedPdeHandler<SPACE_DIM>* pCellBasedPdeHandler);
-
-    /**
-     * @return mpCellBasedPdeHandler
-     */
-    CellBasedPdeHandler<SPACE_DIM>* GetCellBasedPdeHandler();
 
     /**
      * Get a node's location (ONLY FOR TESTING).

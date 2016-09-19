@@ -43,11 +43,21 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractLinearParabolicPde.hpp"
 
 /**
- * A parabolic PDE that has a source at each non-apoptotic cell.
+ * A parabolic PDE to be solved numerically using the finite element method, for
+ * coupling to a cell-based simulation.
  *
- * \todo Improve documentation (#2687)
+ * The PDE takes the form
  *
- * \todo this is the parabolic version of CellwiseSourceEllipticPde; we should refactor the common functionality (#2687)
+ * c*du/dt = Grad.(D*Grad(u)) + k*u*rho(x),
+ *
+ * where the scalars c, D and k are specified by the members mDuDtCoefficient,
+ * mDiffusionCoefficient and mSourceCoefficient, respectively. Their values must
+ * be set in the constructor.
+ *
+ * For a node of the finite element mesh with location x, the function rho(x)
+ * equals one if there is a non-apoptotic cell associated with x, and
+ * zero otherwise. Here, 'associated with' takes a different meaning for each
+ * cell population class, and is encoded in the method IsPdeNodeAssociatedWithNonApoptoticCell().
  */
 template<unsigned DIM>
 class CellwiseSourceParabolicPde : public AbstractLinearParabolicPde<DIM,DIM>
@@ -70,7 +80,7 @@ private:
        archive & boost::serialization::base_object<AbstractLinearParabolicPde<DIM, DIM> >(*this);
        archive & mDuDtCoefficient;
        archive & mDiffusionCoefficient;
-       archive & mUptakeCoefficient;
+       archive & mSourceCoefficient;
     }
 
 protected:
@@ -85,7 +95,7 @@ protected:
     double mDiffusionCoefficient;
 
     /** Coefficient of the rate of uptake of the dependent variable by non-apoptotic cells. */
-    double mUptakeCoefficient;
+    double mSourceCoefficient;
 
 public:
 
@@ -95,12 +105,12 @@ public:
      * @param rCellPopulation reference to the cell population
      * @param duDtCoefficient rate of reaction (defaults to 1.0)
      * @param diffusionCoefficient rate of diffusion (defaults to 1.0)
-     * @param uptakeCoefficient coefficient of the rate of uptake of the dependent variable by non-apoptotic cells (defaults to 0.0)
+     * @param sourceCoefficient the source term coefficient (defaults to 0.0)
      */
     CellwiseSourceParabolicPde(AbstractCellPopulation<DIM, DIM>& rCellPopulation,
-                               double duDtCoefficient = 1.0,
-                               double diffusionCoefficient = 1.0,
-                               double uptakeCoefficient = 0.0);
+                               double duDtCoefficient=1.0,
+                               double diffusionCoefficient=1.0,
+                               double sourceCoefficient=0.0);
 
     /**
      * @return const reference to the cell population (used in archiving).

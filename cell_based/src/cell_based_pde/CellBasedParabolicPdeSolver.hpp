@@ -43,8 +43,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * A purpose-made parabolic solver that interpolates the source terms from node onto
  * Gauss points, as for a cell-based simulation with PDEs the source will only be
  * known at the cells (nodes), not the Gauss points.
- *
- * \todo NOTE THAT THIS IS THE PARABOLIC EQUIVALENT OF CellBasedParabolicPdeSolver and they should be refactored (#2687)
  */
 template<unsigned DIM>
 class CellBasedParabolicPdeSolver : public SimpleLinearParabolicSolver<DIM, DIM>
@@ -60,14 +58,12 @@ protected:
      * The SimpleLinearParabolicSolver version of this method is
      * overloaded using the interpolated source term.
      *
-     * \todo document each input argument (#2687)
-     *
-     * @param rPhi
-     * @param rGradPhi
-     * @param rX
-     * @param rU
-     * @param rGradU
-     * @param pElement
+     * @param rPhi The basis functions, rPhi(i) = phi_i, i=1..numBases
+     * @param rGradPhi Basis gradients, rGradPhi(i,j) = d(phi_j)/d(X_i)
+     * @param rX The point in space
+     * @param rU The unknown as a vector, u(i) = u_i
+     * @param rGradU The gradient of the unknown as a matrix, rGradU(i,j) = d(u_i)/d(X_j)
+     * @param pElement Pointer to the element
      *
      * @return vector term.
      */

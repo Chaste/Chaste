@@ -41,15 +41,31 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractBoxDomainPdeModifier.hpp"
 #include "BoundaryConditionsContainer.hpp"
-#include "PdeAndBoundaryConditions.hpp"
+#include "PetscTools.hpp"
+#include "FileFinder.hpp"
 
 /**
- * A modifier class in which an elliptic PDE is solved on a box domain and the results are stored in CellData.
+ * A modifier class in which a linear elliptic PDE coupled to a cell-based simulation
+ * is solved on a coarse domain.
+ *
+ * The finite element mesh used to solve the PDE numerically is a fixed tessellation of
+ * a cuboid (box), which must be supplied to the constructor. The value of the dependent
+ * variable is interpolated between coarse mesh nodes to obtain a value at each cell,
+ * which is stored and updated in a CellData item.
+ *
+ * At each time step the boundary condition supplied to the constructor may be imposed
+ * either on the boundary of the box domain, or on the boundary of the cell population
+ * (which is assumed to lie within the box domain). This choice can be made using the
+ * AbstractBoxDomainPdeModifier method SetBcsOnBoxBoundary(), which is inherited by this
+ * class.
+ *
+ * Examples of PDEs in the source folder that can be solved using this class are
+ * AveragedSourceEllipticPde, VolumeDependentAveragedSourceEllipticPde and UniformSourceEllipticPde.
  */
 template<unsigned DIM>
 class EllipticBoxDomainPdeModifier : public AbstractBoxDomainPdeModifier<DIM>
 {
-    friend class TestBoxDomainPdeModifiers;
+    friend class TestEllipticBoxDomainPdeModifier;
 
 private:
 
@@ -66,30 +82,27 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & boost::serialization::base_object<AbstractBoxDomainPdeModifier<DIM> >(*this);
-        archive & mpPdeAndBcs;
     }
-
-    /** Pointer to a linear elliptic PDE object with associated boundary conditions. */
-    ///\todo #2687 Memory-management of mpPdeAndBcs is not enabled. Suggest using a shared-pointer.
-    PdeAndBoundaryConditions<DIM>* mpPdeAndBcs;
 
 public:
 
     /**
-     * Default constructor.
-     *
-     * Only used in archiving.
-     */
-    EllipticBoxDomainPdeModifier();
-
-    /**
      * Constructor.
      *
-     * @param pPdeAndBcs a pointer to a linear elliptic PDE object with associated boundary conditions
-     * @param meshCuboid the outer boundary for the FEM mesh
-     * @param stepSize the step size to be used in the FEM mesh (defaults to 1, i.e. the default cell size)
+     * @param pPde A shared pointer to a linear PDE object (defaults to NULL)
+     * @param pBoundaryCondition A shared pointer to an abstract boundary condition
+     *     (defaults to NULL, corresponding to a constant boundary condition with value zero)
+     * @param isNeumannBoundaryCondition Whether the boundary condition is Neumann (defaults to true)
+     * @param pMeshCuboid pointer to a ChasteCuboid specifying the outer boundary for the FE mesh (defaults to NULL)
+     * @param stepSize step size to be used in the FE mesh (defaults to 1.0, i.e. the default cell size)
+     * @param solution solution vector (defaults to NULL)
      */
-    EllipticBoxDomainPdeModifier(PdeAndBoundaryConditions<DIM>* pPdeAndBcs, ChasteCuboid<DIM> meshCuboid, double stepSize = 1.0);
+    EllipticBoxDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde=boost::shared_ptr<AbstractLinearPde<DIM,DIM> >(),
+                                 boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition=boost::shared_ptr<AbstractBoundaryCondition<DIM> >(),
+                                 bool isNeumannBoundaryCondition=true,
+                                 ChasteCuboid<DIM>* pMeshCuboid=NULL,
+                                 double stepSize=1.0,
+                                 Vec solution=NULL);
 
     /**
      * Destructor.
@@ -118,9 +131,11 @@ public:
     /**
      * Helper method to construct the boundary conditions container for the PDE.
      *
+     * @param rCellPopulation reference to the cell population
+     *
      * @return the full boundary conditions container
      */
-    virtual std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ConstructBoundaryConditionsContainer();
+    virtual std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ConstructBoundaryConditionsContainer(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
 
     /**
      * Overridden OutputSimulationModifierParameters() method.
@@ -133,5 +148,44 @@ public:
 
 #include "SerializationExportWrapper.hpp"
 EXPORT_TEMPLATE_CLASS_SAME_DIMS(EllipticBoxDomainPdeModifier)
+
+namespace boost
+{
+namespace serialization
+{
+template<class Archive, unsigned DIM>
+inline void save_construct_data(
+    Archive & ar, const EllipticBoxDomainPdeModifier<DIM> * t, const unsigned int file_version)
+{
+    if (t->GetSolution())
+    {
+        std::string archive_filename = ArchiveLocationInfo::GetArchiveDirectory() + "solution.vec";
+        PetscTools::DumpPetscObject(t->GetSolution(), archive_filename);
+    }
+}
+
+template<class Archive, unsigned DIM>
+inline void load_construct_data(
+    Archive & ar, EllipticBoxDomainPdeModifier<DIM> * t, const unsigned int file_version)
+{
+    Vec solution = NULL;
+
+    std::string archive_filename = ArchiveLocationInfo::GetArchiveDirectory() + "solution.vec";
+    FileFinder file_finder(archive_filename, RelativeTo::Absolute);
+
+    if (file_finder.Exists())
+    {
+        PetscTools::ReadPetscObject(solution, archive_filename);
+    }
+
+    ::new(t)EllipticBoxDomainPdeModifier<DIM>(boost::shared_ptr<AbstractLinearPde<DIM, DIM> >(),
+                                              boost::shared_ptr<AbstractBoundaryCondition<DIM> >(),
+                                              true,
+                                              NULL,
+                                              1.0,
+                                              solution);
+}
+}
+} // namespace ...
 
 #endif /*ELLIPTICBOXDOMAINPDEMODIFIER_HPP_*/

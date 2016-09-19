@@ -45,8 +45,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * A simple parabolic PDE used in tests.
- *
- *  \todo more documentation of the class (#2687)
  */
 template <unsigned DIM>
 class SimpleUniformSourceParabolicPde : public AbstractLinearParabolicPde<DIM,DIM>

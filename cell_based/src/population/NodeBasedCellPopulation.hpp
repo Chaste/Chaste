@@ -288,7 +288,7 @@ public:
     /**
      * Overridden GetTetrahedralMeshForPdeModifier() method.
      *
-     * @return a tetrahedral mesh whose nodes match those of the NodesOnlyMesh.
+     * @return a pointer to a tetrahedral mesh whose nodes match those of the NodesOnlyMesh.
      *
      * This method is called by AbstractGrowingDomainPdeModifier.
      */

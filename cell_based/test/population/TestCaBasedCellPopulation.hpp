@@ -511,7 +511,7 @@ public:
         TS_ASSERT_THROWS_NOTHING(cell_population.Update());
     }
 
-    void TestIsPdeNodeAssociatedWithApoptoticCell()
+    void TestIsPdeNodeAssociatedWithNonApoptoticCell()
     {
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(5, 0, 0, 5, 0, 0);
@@ -537,8 +537,9 @@ public:
 
         cell_population.Update();
 
-        TS_ASSERT_EQUALS(cell_population.IsPdeNodeAssociatedWithApoptoticCell(0), true);
-        TS_ASSERT_EQUALS(cell_population.IsPdeNodeAssociatedWithApoptoticCell(1), false);
+        // Note: The nodes of the FE mesh have indices 0 and 1, corresponding to the cells with location indices 12 and 13 in the PottsMesh
+        TS_ASSERT_EQUALS(cell_population.IsPdeNodeAssociatedWithNonApoptoticCell(0), false);
+        TS_ASSERT_EQUALS(cell_population.IsPdeNodeAssociatedWithNonApoptoticCell(1), true);
     }
 
     void TestAddCell() throw(Exception)

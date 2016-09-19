@@ -45,6 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscTools.hpp"
 #include "SmartPointers.hpp"
 #include "CellAncestor.hpp"
+#include "ApoptoticCellProperty.hpp"
 
 // Cell writers
 #include "BoundaryNodeWriter.hpp"
@@ -821,6 +822,19 @@ std::pair<unsigned,unsigned> AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>::Crea
         ordered_pair.second = index1;
     }
     return ordered_pair;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::IsPdeNodeAssociatedWithNonApoptoticCell(unsigned pdeNodeIndex)
+{
+    bool non_apoptotic_cell_present = false;
+
+    if (IsCellAttachedToLocationIndex(pdeNodeIndex))
+    {
+        non_apoptotic_cell_present = !(GetCellUsingLocationIndex(pdeNodeIndex)->template HasCellProperty<ApoptoticCellProperty>());
+    }
+
+    return non_apoptotic_cell_present;
 }
 
 // Explicit instantiation

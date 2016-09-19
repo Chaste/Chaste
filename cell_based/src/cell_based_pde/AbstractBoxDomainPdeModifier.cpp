@@ -38,26 +38,58 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TetrahedralMesh.hpp"
 #include "ReplicatableVector.hpp"
 #include "LinearBasisFunction.hpp"
+#include <boost/make_shared.hpp>
 
 template<unsigned DIM>
-AbstractBoxDomainPdeModifier<DIM>::AbstractBoxDomainPdeModifier()
-: AbstractPdeModifier<DIM>()
+AbstractBoxDomainPdeModifier<DIM>::AbstractBoxDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde,
+                                                                boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition,
+                                                                bool isNeumannBoundaryCondition,
+                                                                ChasteCuboid<DIM>* pMeshCuboid,
+                                                                double stepSize,
+                                                                Vec solution)
+    : AbstractPdeModifier<DIM>(pPde,
+    		                   pBoundaryCondition,
+    		                   isNeumannBoundaryCondition,
+    		                   solution),
+      mpMeshCuboid(pMeshCuboid),
+      mStepSize(stepSize),
+      mSetBcsOnBoxBoundary(true)
 {
+    if (pMeshCuboid)
+    {
+        // We only need to generate mpFeMesh once, as it does not vary with time
+        this->GenerateFeMesh(*mpMeshCuboid, mStepSize);
+    }
 }
 
 template<unsigned DIM>
 AbstractBoxDomainPdeModifier<DIM>::~AbstractBoxDomainPdeModifier()
 {
-    // Avoid memory leaks
-    if (this->mpFeMesh != NULL)
-    {
-        delete this->mpFeMesh;
-    }
+}
+
+template<unsigned DIM>
+double AbstractBoxDomainPdeModifier<DIM>::GetStepSize()
+{
+     return mStepSize;
+}
+
+template<unsigned DIM>
+void AbstractBoxDomainPdeModifier<DIM>::SetBcsOnBoxBoundary(bool setBcsOnBoxBoundary)
+{
+	mSetBcsOnBoxBoundary = setBcsOnBoxBoundary;
+}
+
+template<unsigned DIM>
+bool AbstractBoxDomainPdeModifier<DIM>::AreBcsSetOnBoxBoundary()
+{
+    return mSetBcsOnBoxBoundary;
 }
 
 template<unsigned DIM>
 void AbstractBoxDomainPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)
 {
+    AbstractPdeModifier<DIM>::SetupSolve(rCellPopulation, outputDirectory);
+
     InitialiseCellPdeElementMap(rCellPopulation);
 }
 
@@ -65,18 +97,18 @@ template<unsigned DIM>
 void AbstractBoxDomainPdeModifier<DIM>::GenerateFeMesh(ChasteCuboid<DIM> meshCuboid, double stepSize)
 {
     // Create a regular coarse tetrahedral mesh
-    this->mpFeMesh = new TetrahedralMesh<DIM,DIM>;
+    this->mpFeMesh = new TetrahedralMesh<DIM,DIM>();
     switch (DIM)
     {
-//        case 1:
-//            this->mpFeMesh->ConstructRegularSlabMesh(stepSize, meshCuboid.GetWidth(0));
-//            break;
+        case 1:
+            this->mpFeMesh->ConstructRegularSlabMesh(stepSize, meshCuboid.GetWidth(0));
+            break;
         case 2:
             this->mpFeMesh->ConstructRegularSlabMesh(stepSize, meshCuboid.GetWidth(0), meshCuboid.GetWidth(1));
             break;
-//        case 3:
-//            this->mpFeMesh->ConstructRegularSlabMesh(stepSize, meshCuboid.GetWidth(0), meshCuboid.GetWidth(1), meshCuboid.GetWidth(2));
-//            break;
+        case 3:
+            this->mpFeMesh->ConstructRegularSlabMesh(stepSize, meshCuboid.GetWidth(0), meshCuboid.GetWidth(1), meshCuboid.GetWidth(2));
+            break;
         default:
             NEVER_REACHED;
     }
@@ -125,14 +157,14 @@ void AbstractBoxDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulation<DI
             solution_at_cell += nodal_value * weights(i);
         }
 
-        cell_iter->GetCellData()->SetItem(this->mCachedDependentVariableName, solution_at_cell);
+        cell_iter->GetCellData()->SetItem(this->mDependentVariableName, solution_at_cell);
 
         if (this->mOutputGradient)
         {
             // Now calculate the gradient of the solution and store this in CellVecData
             c_vector<double, DIM> solution_gradient = zero_vector<double>(DIM);
 
-            // Calculate the basis functions at any point (eg zero) in the element
+            // Calculate the basis functions at any point (e.g. zero) in the element
             c_matrix<double, DIM, DIM> jacobian, inverse_jacobian;
             double jacobian_det;
             this->mpFeMesh->GetInverseJacobianForElement(elem_index, jacobian, jacobian_det, inverse_jacobian);
@@ -152,18 +184,18 @@ void AbstractBoxDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulation<DI
 
             switch (DIM)
             {
-    //            case 1:
-    //                cell_iter->GetCellData()->SetItem(this->mCachedDependentVariableName+"_grad_x", solution_gradient(0));
-    //                break;
-                case 2:
-                    cell_iter->GetCellData()->SetItem(this->mCachedDependentVariableName+"_grad_x", solution_gradient(0));
-                    cell_iter->GetCellData()->SetItem(this->mCachedDependentVariableName+"_grad_y", solution_gradient(1));
+                case 1:
+                    cell_iter->GetCellData()->SetItem(this->mDependentVariableName+"_grad_x", solution_gradient(0));
                     break;
-    //            case 3:
-    //                cell_iter->GetCellData()->SetItem(this->mCachedDependentVariableName+"_grad_x", solution_gradient(0));
-    //                cell_iter->GetCellData()->SetItem(this->mCachedDependentVariableName+"_grad_y", solution_gradient(1));
-    //                cell_iter->GetCellData()->SetItem(this->mCachedDependentVariableName+"_grad_z", solution_gradient(2));
-    //                break;
+                case 2:
+                    cell_iter->GetCellData()->SetItem(this->mDependentVariableName+"_grad_x", solution_gradient(0));
+                    cell_iter->GetCellData()->SetItem(this->mDependentVariableName+"_grad_y", solution_gradient(1));
+                    break;
+                case 3:
+                    cell_iter->GetCellData()->SetItem(this->mDependentVariableName+"_grad_x", solution_gradient(0));
+                    cell_iter->GetCellData()->SetItem(this->mDependentVariableName+"_grad_y", solution_gradient(1));
+                    cell_iter->GetCellData()->SetItem(this->mDependentVariableName+"_grad_z", solution_gradient(2));
+                    break;
                 default:
                     NEVER_REACHED;
             }

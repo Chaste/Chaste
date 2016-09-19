@@ -185,23 +185,11 @@ public:
     /**
      * Overridden GetTetrahedralMeshForPdeModifier() method.
      *
-     * @return a tetrahedral mesh \todo #2687
+     * @return a pointer to a tetrahedral mesh
      *
      * This method is called by AbstractGrowingDomainPdeModifier.
      */
     virtual TetrahedralMesh<DIM, DIM>* GetTetrahedralMeshForPdeModifier();
-
-    /**
-     * Overridden IsPdeNodeAssociatedWithApoptoticCell() method.
-     *
-     * @param pdeNodeIndex index of a node in a tetrahedral mesh for use
-     *         with a PDE modifier
-     *
-     * @return if a node, specified by its index in a tetrahedral mesh for use
-     *         with a PDE modifier, is associated with an apoptotic cell.
-     * This method can be called by PDE classes.
-     */
-    virtual bool IsPdeNodeAssociatedWithApoptoticCell(unsigned pdeNodeIndex);
 
     /**
      * Get a particular PottsElement.

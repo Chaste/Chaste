@@ -33,73 +33,43 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "CellwiseSourcePde.hpp"
-#include "ApoptoticCellProperty.hpp"
-#include "Exception.hpp"
+#include "UniformSourceEllipticPde.hpp"
 
 template<unsigned DIM>
-CellwiseSourcePde<DIM>::CellwiseSourcePde(AbstractCellPopulation<DIM,DIM>& rCellPopulation, double coefficient)
-    : mrCellPopulation(rCellPopulation),
-      mCoefficient(coefficient)
+UniformSourceEllipticPde<DIM>::UniformSourceEllipticPde(double sourceCoefficient)
+    : mSourceCoefficient(sourceCoefficient)
 {
 }
 
 template<unsigned DIM>
-const AbstractCellPopulation<DIM,DIM>& CellwiseSourcePde<DIM>::rGetCellPopulation() const
+double UniformSourceEllipticPde<DIM>::GetCoefficient() const
 {
-    return mrCellPopulation;
+    return mSourceCoefficient;
 }
 
 template<unsigned DIM>
-double CellwiseSourcePde<DIM>::GetCoefficient() const
-{
-    return mCoefficient;
-}
-
-template<unsigned DIM>
-double CellwiseSourcePde<DIM>::ComputeConstantInUSourceTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement)
+double UniformSourceEllipticPde<DIM>::ComputeConstantInUSourceTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement)
 {
     return 0.0;
 }
 
 template<unsigned DIM>
-double CellwiseSourcePde<DIM>::ComputeLinearInUCoeffInSourceTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement)
+double UniformSourceEllipticPde<DIM>::ComputeLinearInUCoeffInSourceTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement)
 {
-    NEVER_REACHED;
-    return 0.0;
+    return mSourceCoefficient;
 }
 
 template<unsigned DIM>
-double CellwiseSourcePde<DIM>::ComputeLinearInUCoeffInSourceTermAtNode(const Node<DIM>& rNode)
-{
-    double coefficient = 0.0;
-
-    if (mrCellPopulation.IsCellAttachedToLocationIndex(rNode.GetIndex()))
-    {
-        CellPtr p_cell = mrCellPopulation.GetCellUsingLocationIndex(rNode.GetIndex());
-
-        bool cell_is_apoptotic = p_cell->HasCellProperty<ApoptoticCellProperty>();
-
-        if (!cell_is_apoptotic)
-        {
-            coefficient = mCoefficient;
-        }
-    }
-
-    return coefficient;
-}
-
-template<unsigned DIM>
-c_matrix<double,DIM,DIM> CellwiseSourcePde<DIM>::ComputeDiffusionTerm(const ChastePoint<DIM>& rX)
+c_matrix<double,DIM,DIM> UniformSourceEllipticPde<DIM>::ComputeDiffusionTerm(const ChastePoint<DIM>& rX)
 {
     return identity_matrix<double>(DIM);
 }
 
-///////// Explicit instantiation
-template class CellwiseSourcePde<1>;
-template class CellwiseSourcePde<2>;
-template class CellwiseSourcePde<3>;
+// Explicit instantiation
+template class UniformSourceEllipticPde<1>;
+template class UniformSourceEllipticPde<2>;
+template class UniformSourceEllipticPde<3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(CellwiseSourcePde)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(UniformSourceEllipticPde)

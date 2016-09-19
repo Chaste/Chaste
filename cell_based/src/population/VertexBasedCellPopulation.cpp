@@ -725,9 +725,9 @@ TetrahedralMesh<DIM, DIM>* VertexBasedCellPopulation<DIM>::GetTetrahedralMeshFor
 }
 
 template<unsigned DIM>
-bool VertexBasedCellPopulation<DIM>::IsPdeNodeAssociatedWithApoptoticCell(unsigned pdeNodeIndex)
+bool VertexBasedCellPopulation<DIM>::IsPdeNodeAssociatedWithNonApoptoticCell(unsigned pdeNodeIndex)
 {
-    bool is_cell_apoptotic = false;
+    bool non_apoptotic_cell_present = true;
 
     if (pdeNodeIndex < this->GetNumNodes())
     {
@@ -739,7 +739,7 @@ bool VertexBasedCellPopulation<DIM>::IsPdeNodeAssociatedWithApoptoticCell(unsign
         {
             if (this->GetCellUsingLocationIndex(*iter)->template HasCellProperty<ApoptoticCellProperty>() )
             {
-                is_cell_apoptotic = true;
+                non_apoptotic_cell_present = false;
                 break;
             }
         }
@@ -750,11 +750,12 @@ bool VertexBasedCellPopulation<DIM>::IsPdeNodeAssociatedWithApoptoticCell(unsign
          * This node of the tetrahedral finite element mesh is in the centre of the element of the
          * vertex-based cell population, so we can use an offset to compute which cell to interrogate.
          */
-        is_cell_apoptotic = this->GetCellUsingLocationIndex(pdeNodeIndex- this->GetNumNodes())->template HasCellProperty<ApoptoticCellProperty>();
+        non_apoptotic_cell_present = !(this->GetCellUsingLocationIndex(pdeNodeIndex - this->GetNumNodes())->template HasCellProperty<ApoptoticCellProperty>());
     }
 
-    return is_cell_apoptotic;
+    return non_apoptotic_cell_present;
 }
+
 template<unsigned DIM>
 double VertexBasedCellPopulation<DIM>::GetCellDataItemAtPdeNode(
         unsigned pdeNodeIndex,
@@ -777,7 +778,7 @@ double VertexBasedCellPopulation<DIM>::GetCellDataItemAtPdeNode(
     }
     else
     {
-        ///\todo Work out a better way to do the nodes not associated with cells (#2687)
+        ///\todo Work out a better way to do the nodes not associated with cells
         if (dirichletBoundaryConditionApplies)
         {
             // We need to impose the Dirichlet boundaries again here as not represented in cell data
