@@ -37,12 +37,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 #include "CheckpointArchiveTypes.hpp"
-#include "AbstractCellBasedTestSuite.hpp"
 #include "FakePetscSetup.hpp"
 #include "HexagonalPrism3dVertexMeshGenerator.hpp"
 #include "Debug.hpp"
 
-class TestHexagonalPrism3dVertexMeshGenerator : public AbstractCellBasedTestSuite
+class TestHexagonalPrism3dVertexMeshGenerator : public CxxTest::TestSuite
 {
 public:
     void TestRowOfThreeElements() throw (Exception)
