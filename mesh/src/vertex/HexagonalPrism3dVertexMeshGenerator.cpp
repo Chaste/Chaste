@@ -47,7 +47,6 @@ HexagonalPrism3dVertexMeshGenerator::HexagonalPrism3dVertexMeshGenerator(unsigne
     assert(elementHeight > 0.0);
 
     // First, create the lower and upper nodes, row by row in increasing x then y
-    ///\todo change side lengths
     unsigned lower_node_index = 0;
     unsigned num_lower_nodes = 2*(numElementsInXDirection + numElementsInXDirection*numElementsInYDirection + numElementsInYDirection);
 
@@ -624,6 +623,9 @@ HexagonalPrism3dVertexMeshGenerator::HexagonalPrism3dVertexMeshGenerator(unsigne
 //}
 
     mpMesh = new MutableVertexMesh<3,3>(nodes, elements);//cellRearrangementThreshold, t2Threshold); ///\todo
+
+    // Scale the mesh so that each element's area takes the value elementArea
+    mpMesh->Scale(sqrt(3.0)*elementSideLength, sqrt(3.0)*elementSideLength);
 }
 
 HexagonalPrism3dVertexMeshGenerator::~HexagonalPrism3dVertexMeshGenerator()

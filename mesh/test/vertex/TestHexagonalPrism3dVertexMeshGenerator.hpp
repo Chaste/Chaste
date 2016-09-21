@@ -73,7 +73,7 @@ public:
     void TestRowOfThreeElements() throw (Exception)
     {
         // Create a mesh comprising a row of three hexagonal prism elements in the x direction
-        HexagonalPrism3dVertexMeshGenerator generator(3, 1, 1.0, 1.0);
+        HexagonalPrism3dVertexMeshGenerator generator(3, 1, 5.0, 1.0);
         MutableVertexMesh<3,3>* p_mesh = generator.GetMesh();
 
         // Test that the mesh has the correct number of nodes, faces and elements
@@ -200,7 +200,7 @@ public:
     void TestThreeByThreeElements() throw (Exception)
     {
         // Create a mesh comprising a row of nine hexagonal prism elements (three in the x direction, three in the y direction)
-        HexagonalPrism3dVertexMeshGenerator generator(3, 3, 1.0, 2.0);
+        HexagonalPrism3dVertexMeshGenerator generator(3, 3, 2/sqrt(3), 2.0);
         MutableVertexMesh<3,3>* p_mesh = generator.GetMesh();
 
         // Test that the mesh has the correct number of nodes, faces and elements
@@ -434,7 +434,7 @@ public:
     void TestFourByFourElements() throw (Exception)
     {
         // Create a mesh
-        HexagonalPrism3dVertexMeshGenerator generator(4, 4, 1.0, 2.0);
+        HexagonalPrism3dVertexMeshGenerator generator(4, 4, 2.0, 2.0);
         MutableVertexMesh<3,3>* p_mesh = generator.GetMesh();
 
         // Test that the mesh has the correct number of nodes, faces and elements
