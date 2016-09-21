@@ -155,7 +155,7 @@ protected:
      *
      * @return whether to recheck the mesh again
      */
-    bool CheckForIntersections();
+    virtual bool CheckForIntersections();
 
     /**
      * Helper method for ReMesh(), called by CheckForSwapsFromShortEdges() when
