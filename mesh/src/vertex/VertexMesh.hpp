@@ -157,7 +157,7 @@ protected:
      *
      * @return if the point is included in the element.
      */
-    bool ElementIncludesPoint(const c_vector<double, SPACE_DIM>& rTestPoint, unsigned elementIndex);
+    virtual bool ElementIncludesPoint(const c_vector<double, SPACE_DIM>& rTestPoint, unsigned elementIndex);
 
     /**
      * Get the local index of a given element which is the start vertex of the edge

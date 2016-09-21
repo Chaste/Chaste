@@ -92,10 +92,10 @@ else:
     hdf5_lib = 'hdf5'
 
 dealii_path = None
-intel_path = None
-icpc = 'icpc'
+intel_path = '/scratch/Chaste/'
+#icpc = 'icpc'
 
-other_libpaths = []
+other_libpaths = ['/scratch/Chaste/composer_xe_2015/mkl/lib/intel64/']
 libs_for_petsc = ['petsccontrib', 'X11',
                   'HYPRE', 'spooles', 'superlu',
                   'umfpack', 'amd' # Both for Umfpack
@@ -129,6 +129,9 @@ if os.path.exists('/usr/lib/liblapack-3.so'):
     blas_lapack = ['lapack-3', 'blas-3']
 else:
     blas_lapack = ['lapack', 'blas']
+
+# blas_lapack_production = ['mkl_lapack', 'mkl', 'svml']
+blas_lapack_production = ['mkl_intel_lp64', 'mkl_core', 'mkl_sequential']
 
 tools = {'xsd': '/usr/bin/xsdcxx',
          'mpirun': '/usr/bin/mpirun.openmpi',
@@ -165,3 +168,6 @@ def Configure(prefs, build):
     if use_cvode:
         DetermineCvodeVersion('/usr/include')
         other_libraries.extend(['sundials_cvode', 'sundials_nvecserial'])
+
+    if build.CompilerType() == 'intel':
+        tools['mpicxx'] = 'OMPI_CXX=icpc ' + tools['mpicxx']
