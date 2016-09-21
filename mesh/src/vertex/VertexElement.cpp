@@ -58,6 +58,33 @@ VertexElement<ELEMENT_DIM, SPACE_DIM>::VertexElement(unsigned index,
     }
 }
 
+
+template<unsigned SPACE_DIM>
+class NodeLessThanYxz
+{
+public:
+    static const double DELTA_YXZ=1e-6;
+    bool operator() (const Node<SPACE_DIM>* pNode1, const Node<SPACE_DIM>* pNode2) const
+    {
+        const c_vector<double,SPACE_DIM> Loc1 (pNode1->rGetLocation());
+        const c_vector<double,SPACE_DIM> Loc2 (pNode2->rGetLocation());
+        bool result (false);
+        if (Loc1[1]<Loc2[1])
+        {
+            result = true;
+        }
+        else if (fabs(Loc1[1]-Loc2[1])<DELTA_YXZ && Loc1[0]<Loc2[0])
+        {
+            result = true;
+        }
+        else if (SPACE_DIM==3 && fabs(Loc1[0]-Loc2[0])<DELTA_YXZ && Loc1[2]<Loc2[2])
+        {
+            result = true;
+        }
+        return (result);
+    }
+};
+
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VertexElement<ELEMENT_DIM, SPACE_DIM>::VertexElement(unsigned index,
                                                      const std::vector<VertexElement<ELEMENT_DIM-1,SPACE_DIM>*>& rFaces,
@@ -70,7 +97,7 @@ VertexElement<ELEMENT_DIM, SPACE_DIM>::VertexElement(unsigned index,
     assert(mFaces.size() == mOrientations.size());
 
     // Make a set of nodes with mFaces
-    std::set<Node<SPACE_DIM>* > nodes_set;
+    std::set<Node<SPACE_DIM>*, NodeLessThanYxz<SPACE_DIM> > nodes_set;
     for (unsigned face_index=0; face_index<mFaces.size(); face_index++)
     {
         for (unsigned node_index=0; node_index<mFaces[face_index]->GetNumNodes(); node_index++)
@@ -80,7 +107,7 @@ VertexElement<ELEMENT_DIM, SPACE_DIM>::VertexElement(unsigned index,
     }
 
     // Populate mNodes
-    for (typename std::set< Node<SPACE_DIM>* >::iterator node_iter = nodes_set.begin();
+    for (typename std::set< Node<SPACE_DIM>*, NodeLessThanYxz<SPACE_DIM> >::iterator node_iter = nodes_set.begin();
          node_iter != nodes_set.end();
          ++node_iter)
     {

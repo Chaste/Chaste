@@ -39,11 +39,37 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CheckpointArchiveTypes.hpp"
 #include "FakePetscSetup.hpp"
 #include "HexagonalPrism3dVertexMeshGenerator.hpp"
-#include "Debug.hpp"
+
 
 class TestHexagonalPrism3dVertexMeshGenerator : public CxxTest::TestSuite
 {
 public:
+    void TestSingle() throw (Exception)
+    {
+        HexagonalPrism3dVertexMeshGenerator generator(1, 1, 1.0, 1.0);
+        MutableVertexMesh<3,3>* p_mesh = generator.GetMesh();
+        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 12u);
+        TS_ASSERT_EQUALS(p_mesh->GetNumFaces(), 8u);
+        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 1u);
+
+        VertexElement<3,3>* p_element_0 (p_mesh->GetElement(0));
+        TS_ASSERT_EQUALS(p_element_0->GetNumNodes(), 12u);
+        TS_ASSERT_EQUALS(p_element_0->GetNode(0)->GetIndex(), 0u);
+        TS_ASSERT_EQUALS(p_element_0->GetNode(1)->GetIndex(), 6u);
+        TS_ASSERT_EQUALS(p_element_0->GetNode(2)->GetIndex(), 1u);
+        TS_ASSERT_EQUALS(p_element_0->GetNode(3)->GetIndex(), 7u);
+        TS_ASSERT_EQUALS(p_element_0->GetNode(4)->GetIndex(), 2u);
+        TS_ASSERT_EQUALS(p_element_0->GetNode(5)->GetIndex(), 8u);
+        TS_ASSERT_EQUALS(p_element_0->GetNode(6)->GetIndex(), 3u);
+        TS_ASSERT_EQUALS(p_element_0->GetNode(7)->GetIndex(), 9u);
+        TS_ASSERT_EQUALS(p_element_0->GetNode(8)->GetIndex(), 4u);
+        TS_ASSERT_EQUALS(p_element_0->GetNode(9)->GetIndex(), 10u);
+        TS_ASSERT_EQUALS(p_element_0->GetNode(10)->GetIndex(), 5u);
+        TS_ASSERT_EQUALS(p_element_0->GetNode(11)->GetIndex(), 11u);
+
+    }
+
+
     void TestRowOfThreeElements() throw (Exception)
     {
         // Create a mesh comprising a row of three hexagonal prism elements in the x direction
@@ -156,6 +182,19 @@ public:
         TS_ASSERT_EQUALS(p_element_2->GetFace(5)->GetIndex(), 20u);
         TS_ASSERT_EQUALS(p_element_2->GetFace(6)->GetIndex(), 21u);
         TS_ASSERT_EQUALS(p_element_2->GetFace(7)->GetIndex(), 14u);
+
+        // Create a vertex mesh writer
+        VertexMeshWriter<3,3> vertex_mesh_writer("TestHexagonalPrism3dVertexMesh/RowOfThree", "vertex_mesh_3d_row_of_three");
+
+        std::vector<double> cell_ids;
+        for (unsigned id=0 ; id < p_mesh->GetNumElements() ; id++)
+        {
+            cell_ids.push_back(double(id));
+        }
+
+        vertex_mesh_writer.AddCellData("Cell IDs", cell_ids);
+        vertex_mesh_writer.WriteVtkUsingMesh(*p_mesh);
+
     }
 
     void TestThreeByThreeElements() throw (Exception)
@@ -378,6 +417,18 @@ public:
         TS_ASSERT_EQUALS(p_element_8->GetFace(5)->GetIndex(), 55u);
         TS_ASSERT_EQUALS(p_element_8->GetFace(6)->GetIndex(), 50u);
         TS_ASSERT_EQUALS(p_element_8->GetFace(7)->GetIndex(), 39u);
+
+        // Create a vertex mesh writer
+        VertexMeshWriter<3,3> vertex_mesh_writer2("TestHexagonalPrism3dVertexMesh/ThreeByThree", "vertex_mesh_3d_three_by_three");
+
+        std::vector<double> cell_ids;
+        for (unsigned id=0 ; id < p_mesh->GetNumElements() ; id++)
+        {
+            cell_ids.push_back(double(id));
+        }
+
+        vertex_mesh_writer2.AddCellData("Cell IDs", cell_ids);
+        vertex_mesh_writer2.WriteVtkUsingMesh(*p_mesh);
     }
 
     void TestFourByFourElements() throw (Exception)
@@ -469,6 +520,16 @@ public:
         TS_ASSERT_EQUALS(p_element_14->GetFace(5)->GetIndex(), 90u);
         TS_ASSERT_EQUALS(p_element_14->GetFace(6)->GetIndex(), 85u);
         TS_ASSERT_EQUALS(p_element_14->GetFace(7)->GetIndex(), 76u);
+
+        VertexMeshWriter<3,3> vertex_mesh_writer3("TestHexagonalPrism3dVertexMesh/FourByFour", "vertex_mesh_3d_four_by_four");
+        std::vector<double> cell_ids;
+        for (unsigned id=0 ; id < p_mesh->GetNumElements() ; id++)
+        {
+            cell_ids.push_back(double(id));
+        }
+
+        vertex_mesh_writer3.AddCellData("Cell IDs", cell_ids);
+        vertex_mesh_writer3.WriteVtkUsingMesh(*p_mesh);
     }
 
     void TestLargeMesh() throw (Exception)

@@ -589,29 +589,29 @@ HexagonalPrism3dVertexMeshGenerator::HexagonalPrism3dVertexMeshGenerator(unsigne
      * the element ordered anticlockwise and the local indices 6 to 11
      * correspond to the upper nodes in the element ordered anticlockwise.
      */
-    for (unsigned elem_index=0; elem_index<elements.size(); elem_index++)
-    {
-        VertexElement<3,3>* p_element = elements[elem_index];
-
-        std::vector<Node<3>*> temp_nodes;
-        for (unsigned temp_index=0; temp_index<p_element->GetNumNodes(); temp_index++)
-        {
-            temp_nodes.push_back(p_element->GetNode(temp_index));
-        }
-
-        // Node 0 already has the correct local index
-        p_element->UpdateNode(1, temp_nodes[4]);
-        p_element->UpdateNode(2, temp_nodes[8]);
-        p_element->UpdateNode(3, temp_nodes[10]);
-        p_element->UpdateNode(4, temp_nodes[6]);
-        p_element->UpdateNode(5, temp_nodes[2]);
-        p_element->UpdateNode(6, temp_nodes[1]);
-        p_element->UpdateNode(7, temp_nodes[5]);
-        p_element->UpdateNode(8, temp_nodes[9]);
-        p_element->UpdateNode(9, temp_nodes[11]);
-        p_element->UpdateNode(10, temp_nodes[7]);
-        p_element->UpdateNode(11, temp_nodes[3]);
-    }
+//    for (unsigned elem_index=0; elem_index<elements.size(); elem_index++)
+//    { //commented to try the order before reordering, because I suspect that the set sorting might have problem
+//        VertexElement<3,3>* p_element = elements[elem_index];
+//
+//        std::vector<Node<3>*> temp_nodes;
+//        for (unsigned temp_index=0; temp_index<p_element->GetNumNodes(); temp_index++)
+//        {
+//            temp_nodes.push_back(p_element->GetNode(temp_index));
+//        }
+//
+//        // Node 0 already has the correct local index
+//        p_element->UpdateNode(1, temp_nodes[4]);
+//        p_element->UpdateNode(2, temp_nodes[8]);
+//        p_element->UpdateNode(3, temp_nodes[10]);
+//        p_element->UpdateNode(4, temp_nodes[6]);
+//        p_element->UpdateNode(5, temp_nodes[2]);
+//        p_element->UpdateNode(6, temp_nodes[1]);
+//        p_element->UpdateNode(7, temp_nodes[5]);
+//        p_element->UpdateNode(8, temp_nodes[9]);
+//        p_element->UpdateNode(9, temp_nodes[11]);
+//        p_element->UpdateNode(10, temp_nodes[7]);
+//        p_element->UpdateNode(11, temp_nodes[3]);
+//    }
 
 //for (unsigned l=0; l<elements.size(); l++)
 //{
