@@ -94,8 +94,8 @@ double bc_func(const ChastePoint<2>& p)
     return value;
 }
 
-///\todo move into cell_based/test/cell_based_pde (#2687)
-///\todo merge content into TestSimulationsWith*DomainPdeModifier and remove this test suite (#2687)
+///\todo move into cell_based/test/cell_based_pde
+///\todo merge content into TestSimulationsWith*DomainPdeModifier and remove this test suite
 class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestSuite
 {
   public:
