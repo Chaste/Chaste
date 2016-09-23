@@ -623,7 +623,7 @@ public:
         CellPtr p_cell_14 = cell_population.GetCellUsingLocationIndex(14);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_14)[0], 2.0, 1e-4);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_14)[1], sqrt(3.0), 1e-4);
-        TS_ASSERT_DELTA(p_cell_14->GetCellData()->GetItem("variable"), 0.9503, 1e-4);
+        TS_ASSERT_DELTA(p_cell_14->GetCellData()->GetItem("variable"), 0.9503, 1.2e-3); // Intel optimised build has a slightly different result here
 
         // Compare with the mesh-based cell population result
         TS_ASSERT_DELTA(p_cell_14->GetCellData()->GetItem("variable"), 0.9604, 1e-1);
@@ -691,7 +691,7 @@ public:
         CellPtr p_cell_14 = cell_population.GetCellUsingLocationIndex(14);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_14)[0], 2.0, 1e-4);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_14)[1], sqrt(3.0), 1e-4);
-        TS_ASSERT_DELTA(p_cell_14->GetCellData()->GetItem("variable"), 0.9503, 2e-3); // Low threshold as slightly different on Intel
+        TS_ASSERT_DELTA(p_cell_14->GetCellData()->GetItem("variable"), 0.9503, 4e-3); // Low threshold as slightly different on Intel
 
         // Compare with the mesh-based cell population result (low error as mesh is slightly larger than for centre-based models)
         TS_ASSERT_DELTA(p_cell_14->GetCellData()->GetItem("variable"), 0.9604, 1e-1);
