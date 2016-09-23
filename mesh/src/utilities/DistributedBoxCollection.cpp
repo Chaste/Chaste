@@ -42,16 +42,22 @@ template<unsigned DIM>
 const double DistributedBoxCollection<DIM>::msFudge = 5e-14;
 
 template<unsigned DIM>
-DistributedBoxCollection<DIM>::DistributedBoxCollection(double boxWidth, c_vector<double, 2*DIM> domainSize, bool isPeriodicInX, int localRows)
+DistributedBoxCollection<DIM>::DistributedBoxCollection(double boxWidth, c_vector<double, 2*DIM> domainSize, bool isPeriodicInX, bool isPeriodicInY, bool isPeriodicInZ, int localRows)
     : mBoxWidth(boxWidth),
       mIsPeriodicInX(isPeriodicInX),
+      mIsPeriodicInY(isPeriodicInY),
+      mIsPeriodicInZ(isPeriodicInZ),
       mAreLocalBoxesSet(false),
       mCalculateNodeNeighbours(true)
 {
-    // Periodicity only works in 2d
-    if (isPeriodicInX)
+    // First need to check for non-implemented configurations
+    if ( isPeriodicInZ )
     {
-        assert(DIM==2);
+        EXCEPTION("Periodicity not yet configured in 3d. Can't have z periodicity.\n");
+    }
+    else if (isPeriodicInX || isPeriodicInY)
+    {
+        assert( DIM==2 );
     }
 
     // If the domain size is not 'divisible' (i.e. fmod(width, box_size) > 0.0) we swell the domain to enforce this.
@@ -403,6 +409,34 @@ bool DistributedBoxCollection<DIM>::GetIsPeriodicInX() const
 }
 
 template<unsigned DIM>
+bool DistributedBoxCollection<DIM>::GetIsPeriodicInY() const
+{
+    return mIsPeriodicInY;
+}
+
+template<unsigned DIM>
+bool DistributedBoxCollection<DIM>::GetIsPeriodicInZ() const
+{
+    return mIsPeriodicInZ;
+}
+
+template<unsigned DIM>
+c_vector<bool,DIM> DistributedBoxCollection<DIM>::GetIsPeriodicAllDims() const
+{
+    c_vector<bool, DIM> periodic_dims;
+    periodic_dims(0) = mIsPeriodicInX;
+    if (DIM > 1)
+    {
+        periodic_dims(1) = mIsPeriodicInY;
+    }
+    if (DIM>2)
+    {
+        periodic_dims(2) = mIsPeriodicInZ;
+    }
+    return periodic_dims;
+}
+
+template<unsigned DIM>
 unsigned DistributedBoxCollection<DIM>::GetNumRowsOfBoxes() const
 {
     return mpDistributedBoxStackFactory->GetHigh() - mpDistributedBoxStackFactory->GetLow();
@@ -572,6 +606,27 @@ void DistributedBoxCollection<DIM>::SetupLocalBoxesHalfOnly()
                             local_boxes.insert(global_index - mNumBoxesEachDirection(0) + 1);
                         }
                     }
+                    // If we're at the bottom of the domain, it is periodic in Y, and the process does not contain the upper boundary, need to add the uppermost row
+                    if ( bottom && mIsPeriodicInY && ( CalculateGridIndices(mMaxBoxIndex)[1] < (mNumBoxesEachDirection(1)-1) ) )
+                    {
+                        int below_box_i = global_index + (mNumBoxesEachDirection(1)-1)*mNumBoxesEachDirection(0);
+                        local_boxes.insert(below_box_i);
+                        if(!right)
+                        {
+                            local_boxes.insert(below_box_i+1);
+                        }
+                        if (mIsPeriodicInX)
+                        {
+                            if(left)
+                            {
+                                local_boxes.insert( (mNumBoxesEachDirection(0)*mNumBoxesEachDirection(1))-1);
+                            }
+                            if(right)
+                            {
+                                local_boxes.insert( (mNumBoxesEachDirection(1)-1)*mNumBoxesEachDirection(0) );
+                            }
+                        }
+                    }
 
                     // If we're not at the top of the domain insert boxes above
                     if(!top)
@@ -586,19 +641,46 @@ void DistributedBoxCollection<DIM>::SetupLocalBoxesHalfOnly()
                         {
                             local_boxes.insert(global_index + mNumBoxesEachDirection(0) - 1);
                         }
-                        else if ( (global_index % mNumBoxesEachDirection(0) == 0) && (mIsPeriodicInX) ) // If we're on the left edge but its periodic include the box on the far right and up one.
+                        else if ( (left) && (mIsPeriodicInX) ) // If we're on the left edge but its periodic include the box on the far right and up one.
                         {
                             local_boxes.insert(global_index +  2 * mNumBoxesEachDirection(0) - 1);
                         }
                     }
+                    // If we are at the top of the domain and it is periodic, add bottom row
+                    else if ( top && mIsPeriodicInY)
+                    {
+                        int above_box_i = global_index % mNumBoxesEachDirection(0);
+                        local_boxes.insert(above_box_i); // Above box
+                        if (!left)
+                        {
+                            local_boxes.insert(above_box_i-1);
+                        }
+                        if (!right)
+                        {
+                            local_boxes.insert(above_box_i+1);
+                        }
+                        // If we are on the right/left and periodic in X we also need to add the box on the bottom left/right edge of the domain
+                        if (mIsPeriodicInX)
+                        {
+                            if (left)
+                            {
+                                local_boxes.insert(mNumBoxesEachDirection(0)-1);
+                            }
+                            if (right)
+                            {
+                                local_boxes.insert(0);
+                            }
 
-                    // If we're not on the far right hand side inseryt box to the right
+                        }
+                    }
+
+                    // If we're not on the far right hand side insert box to the right
                     if(!right)
                     {
                         local_boxes.insert(global_index + 1);
                     }
                     // If we're on the right edge but it's periodic include the box on the far left of the domain
-                    else if ( (global_index % mNumBoxesEachDirection(0) == mNumBoxesEachDirection(0)-1) && (mIsPeriodicInX) )
+                    else if ( (right) && (mIsPeriodicInX) )
                     {
                         local_boxes.insert(global_index - mNumBoxesEachDirection(0) + 1);
                         // If we're also not on the top-most row, then insert the box above- on the far left of the domain
@@ -843,11 +925,25 @@ void DistributedBoxCollection<DIM>::SetupAllLocalBoxes()
                 {
                     local_boxes.insert(i-M);
                 }
+                else // Add periodic box if needed
+                {
+                    if(mIsPeriodicInY)
+                    {
+                        local_boxes.insert(i+(N-1)*M);
+                    }
+                }
 
                 // add the one above
                 if (!is_ymax[i])
                 {
                     local_boxes.insert(i+M);
+                }
+                else // Add periodic box if needed
+                {
+                    if(mIsPeriodicInY)
+                    {
+                        local_boxes.insert(i-(N-1)*M);
+                    }
                 }
 
                 // add the four corner boxes
@@ -887,6 +983,44 @@ void DistributedBoxCollection<DIM>::SetupAllLocalBoxes()
                     if ( (is_xmax[i]) && (!is_ymax[i]) )
                     {
                         local_boxes.insert(i+1);
+                    }
+                }
+                if(mIsPeriodicInY)
+                {
+                    if( (is_ymin[i]) && !(is_xmin[i]) )
+                    {
+                        local_boxes.insert(i+(N-1)*M-1);
+                    }
+                    if( (is_ymin[i]) && !(is_xmax[i]) )
+                    {
+                        local_boxes.insert(i+(N-1)*M+1);
+                    }
+                    if( (is_ymax[i]) && !(is_xmin[i]) )
+                    {
+                        local_boxes.insert(i-(N-1)*M-1);
+                    }
+                    if( (is_ymax[i]) && !(is_xmax[i]) )
+                    {
+                        local_boxes.insert(i-(N-1)*M+1);
+                    }
+                }
+                if(mIsPeriodicInX && mIsPeriodicInY)
+                {
+                    if( i==0 ) // Lower left corner
+                    {
+                        local_boxes.insert(M*N-1); // Add upper right corner
+                    }
+                    else if( i==(M-1) ) // Lower right corner
+                    {
+                        local_boxes.insert(M*(N-1)); // Add upper left corner
+                    }
+                    else if( i==(M*(N-1)) ) // Upper left corner
+                    {
+                        local_boxes.insert(M-1); // Add lower right corner
+                    }
+                    else if( i==(M*N-1) ) // Upper right corner
+                    {
+                        local_boxes.insert(0); // Lower left corner
                     }
                 }
 
@@ -1254,6 +1388,7 @@ template<unsigned DIM>
 void DistributedBoxCollection<DIM>::AddPairsFromBox(unsigned boxIndex,
                                                     std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs)
 {
+
     // Get the box
     Box<DIM>& r_box = rGetBox(boxIndex);
 
