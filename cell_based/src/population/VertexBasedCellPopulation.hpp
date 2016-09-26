@@ -70,12 +70,6 @@ private:
      */
     bool mDeleteMesh;
 
-    /**
-     * A static cast of the AbstractMesh from AbstractCellPopulation
-     * for use in this class
-     */
-    MutableVertexMesh<DIM, DIM>* mpMutableVertexMesh;
-
     /** Whether to output the locations of T1 swaps and T3 swaps to files. Defaults to true. */
     bool mOutputCellRearrangementLocations;
 
@@ -127,6 +121,14 @@ private:
      * Each VertexElement must have a CellPtr associated with it.
      */
     void Validate();
+
+protected:
+
+    /**
+     * A static cast of the AbstractMesh from AbstractCellPopulation
+     * for use in this class
+     */
+    MutableVertexMesh<DIM, DIM>* mpMutableVertexMesh;
 
 public:
 
