@@ -850,10 +850,10 @@ bool MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetOutputMeshInVtk()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile)
 {
-    if (dynamic_cast<Cylindrical2dMesh*>(&(this->mrMesh)))
-    {
-        *pVizSetupFile << "MeshWidth\t" << this->GetWidth(0) << "\n";
-    }
+//    if ( dynamic_cast<Cylindrical2dMesh*>(&(this->mrMesh)))
+//    {
+//        *pVizSetupFile << "MeshWidth\t" << this->GetWidth(0) << "\n";
+//    }
 }
 
 //////////////////////////////////////////////////////////////////////////////
