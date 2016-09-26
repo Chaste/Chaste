@@ -815,10 +815,10 @@ double VertexBasedCellPopulation<DIM>::GetDefaultTimeStep()
 template<unsigned DIM>
 void VertexBasedCellPopulation<DIM>::WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile)
 {
-    if (dynamic_cast<Cylindrical2dVertexMesh*>(&(this->mrMesh)))
-    {
-        *pVizSetupFile << "MeshWidth\t" << this->GetWidth(0) << "\n";
-    }
+//    if (dynamic_cast<Cylindrical2dVertexMesh*>(&(this->mrMesh)))
+//    {
+//        *pVizSetupFile << "MeshWidth\t" << this->GetWidth(0) << "\n";
+//    }
 }
 
 template<unsigned DIM>
