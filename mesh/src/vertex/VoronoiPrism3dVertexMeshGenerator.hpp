@@ -56,7 +56,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 class VoronoiPrism3dVertexMeshGenerator
 {
-    friend class TestVoronoiVertexMeshGenerator; //\todo
+    friend class TestVoronoiPrism3dVertexMeshGenerator;
 
 protected:
 
@@ -91,7 +91,7 @@ protected:
     int mMaxIntY;
 
     /** The requested average target area of elements in the mesh. */
-    double mElementTargetArea;  //\todo area or volume?
+    double mElementTargetApicalArea;
 
     /** The scaling factor necessary to ensure that the x-component of seed locations lies between 0.0 and 1.0. */
     double mMultiplierInX;
@@ -126,7 +126,8 @@ protected:
     /**
      * Helper method for the constructor.
      *
-     * @return A vector of centroids corresponding to the elements currently held in mpMesh
+     * @return A vector of 2D centroids (x and y components) corresponding to the elements currently held in mpMesh
+     * for the Voronoi relaxation.
      */
     std::vector<c_vector<double, 2> > GetElementCentroidsFromMesh();
 
@@ -186,9 +187,9 @@ public:
      */
     VoronoiPrism3dVertexMeshGenerator(unsigned numElementsX,
                                unsigned numElementsY,
-                               double elementHeightZ,
-                               unsigned numRelaxationSteps,
-                               double elementTargetArea=1.0);
+                               double elementHeightZ = 1,
+                               unsigned numRelaxationSteps = 0,
+                               double elementTargetApicalArea=1.0);
 
     /**
      * Null constructor for derived classes to call.
@@ -221,7 +222,7 @@ public:
     /**
      * @return A pointer to a 3D toroidal vertex mesh with periodic boundaries
      */
-    virtual Toroidal2dVertexMesh* GetToroidalMesh(); //\todo
+    virtual Toroidal2dVertexMesh* GetToroidalMesh();
 
     /**
      * @return A vector representing the polygon distribution of the generated mesh, triangles upwards
@@ -229,12 +230,12 @@ public:
     std::vector<double> GetPolygonDistribution();
 
     /**
-     * Computes the coefficient of variation of the areas of elements in the mesh, defined to be the sample standard
+     * Computes the coefficient of variation of the apical areas of elements in the mesh, defined to be the sample standard
      * deviation in area divided by the mean area.
      *
-     * @return The coefficient of variation of the area of elements in the mesh
+     * @return The coefficient of variation of the apical area of elements in the mesh
      */
-    double GetAreaCoefficientOfVariation();
+    double GetApicalAreaCoefficientOfVariation();
 
     /**
      * Call GenerateVoronoiMesh().

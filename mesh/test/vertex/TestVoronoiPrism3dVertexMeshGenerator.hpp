@@ -42,7 +42,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MutableVertexMesh.hpp"
 #include "Toroidal2dVertexMesh.hpp"
 #include "PetscSetupAndFinalize.hpp"
-//#include "FakePetscSetup.hpp"
 #include "Warnings.hpp"
 #include "Debug.hpp"
 
@@ -52,10 +51,64 @@ public:
 
     void TestSimplestMesh() throw(Exception)
     {
-        VoronoiPrism3dVertexMeshGenerator generator(10, 10, 1, 1, 1);
+        VoronoiPrism3dVertexMeshGenerator generator(10, 10, 1, 0);
+        MutableVertexMesh<3, 3>* p_mesh = generator.GetMesh();
+
+        VertexMeshWriter<3, 3> vertex_mesh_writer("TestVoronoiPrism3dVertexMesh/Test0Relax", "10x10 0relax");
+
+        std::vector<double> cell_ids;
+        for (unsigned id=0 ; id < p_mesh->GetNumElements() ; id++)
+        {
+            cell_ids.push_back(double(id));
+        }
+
+        vertex_mesh_writer.AddCellData("Cell IDs", cell_ids);
+        vertex_mesh_writer.WriteVtkUsingMesh(*p_mesh);
+
+    }
+
+    void TestSimplestMesh2Relaxation() throw(Exception)
+    {
+        VoronoiPrism3dVertexMeshGenerator generator(10, 10, 1, 2);
+        MutableVertexMesh<3, 3>* p_mesh = generator.GetMesh();
+
+        VertexMeshWriter<3, 3> vertex_mesh_writer("TestVoronoiPrism3dVertexMesh/Test2Relax", "10x10 2relax");
+
+        std::vector<double> cell_ids;
+        for (unsigned id=0 ; id < p_mesh->GetNumElements() ; id++)
+        {
+            cell_ids.push_back(double(id));
+        }
+
+        vertex_mesh_writer.AddCellData("Cell IDs", cell_ids);
+        vertex_mesh_writer.WriteVtkUsingMesh(*p_mesh);
+
+    }
+
+    void TestSimplestMesh6Relaxation() throw(Exception)
+    {
+        VoronoiPrism3dVertexMeshGenerator generator(10, 10, 1, 6);
         MutableVertexMesh<3,3>* p_mesh = generator.GetMesh();
 
-        VertexMeshWriter<3,3> vertex_mesh_writer("TestVoronoiPrism3dVertexMesh/SecondTest", "10x10");
+        VertexMeshWriter<3, 3> vertex_mesh_writer("TestVoronoiPrism3dVertexMesh/Test6Relax", "10x10 6relax");
+
+        std::vector<double> cell_ids;
+        for (unsigned id=0 ; id < p_mesh->GetNumElements() ; id++)
+        {
+            cell_ids.push_back(double(id));
+        }
+
+        vertex_mesh_writer.AddCellData("Cell IDs", cell_ids);
+        vertex_mesh_writer.WriteVtkUsingMesh(*p_mesh);
+
+    }
+
+    void TestSimplestMesh15Relaxation() throw(Exception)
+    {
+        VoronoiPrism3dVertexMeshGenerator generator(10, 10, 1, 15);
+        MutableVertexMesh<3,3>* p_mesh = generator.GetMesh();
+
+        VertexMeshWriter<3, 3> vertex_mesh_writer("TestVoronoiPrism3dVertexMesh/Test15Relax", "10x10 15relax");
 
         std::vector<double> cell_ids;
         for (unsigned id=0 ; id < p_mesh->GetNumElements() ; id++)
@@ -73,7 +126,7 @@ public:
         VoronoiPrism3dVertexMeshGenerator generator(20, 15, 3, 1, 1);
         MutableVertexMesh<3, 3>* p_mesh = generator.GetMesh();
 
-        VertexMeshWriter<3,3> vertex_mesh_writer("TestVoronoiPrism3dVertexMesh/BiggerTest", "20x15x3");
+        VertexMeshWriter<3, 3> vertex_mesh_writer("TestVoronoiPrism3dVertexMesh/BiggerTest", "20x15x3");
 
         std::vector<double> cell_ids;
         for (unsigned id=0 ; id < p_mesh->GetNumElements() ; id++)
@@ -89,68 +142,78 @@ public:
 
     void TestSimpleMesh() throw(Exception)
     {
-/*#if BOOST_VERSION >= 105200
 
-        // Generate a mesh that is 20 cells wide, 12 high, with 4 Lloyd's relaxation steps and target average element area 1.23
-        VoronoiPrism3dVertexMeshGenerator generator(20, 12, 4, 1.23);
-        MutableVertexMesh<2,2>* p_mesh_a = generator.GetMesh();
-        MutableVertexMesh<2,2>* p_mesh_b = generator.GetMeshAfterReMesh();
+        // Generate a mesh that is 20 cells wide in x, 12 cells wide in y, 1 unit high in Z,
+        // with 4 Lloyd's relaxation steps and target average element apical area 1.23
+        VoronoiPrism3dVertexMeshGenerator generator(20, 12, 1, 4, 1.23);
+        MutableVertexMesh<3, 3>* p_mesh_a = generator.GetMesh();
+        TS_ASSERT_THROWS_THIS(generator.GetMeshAfterReMesh(),
+                              "Remeshing has not been implemented in 3D (see #827 and #860)\n");
 
-        // Check basic mesh properties are correct
-        TS_ASSERT_EQUALS(p_mesh_a->GetNumNodes(), 550u);
+        TS_ASSERT_EQUALS(p_mesh_a->GetNumNodes(), 1096u);
         TS_ASSERT_EQUALS(p_mesh_a->GetNumElements(), 240u);
 
-        TS_ASSERT_EQUALS(p_mesh_b->GetNumNodes(), 550u);
-        TS_ASSERT_EQUALS(p_mesh_b->GetNumElements(), 240u);
-
         // Check average cell area is correct
-        double average_area = 0.0;
+        double average_voloume = 0.0;
         for (unsigned elem_idx = 0 ; elem_idx < p_mesh_a->GetNumElements() ; elem_idx++)
         {
-            average_area += p_mesh_a->GetVolumeOfElement(elem_idx);
+            average_voloume += p_mesh_a->GetVolumeOfElement(elem_idx);
         }
-        average_area /= double(p_mesh_a->GetNumElements());
+        average_voloume /= double(p_mesh_a->GetNumElements());
 
-        TS_ASSERT_DELTA(average_area, 1.23, 1e-6);
+        TS_ASSERT_DELTA(average_voloume, 1.23, 1e-6);
 
-#endif // BOOST_VERSION >= 105200
-*/    }
+        VertexMeshWriter<3, 3> vertex_mesh_writer("TestVoronoiPrism3dVertexMesh/SimpleMesh",
+                                                  "20x12x1 4relax ApicalArea1.23");
+
+        std::vector<double> cell_ids;
+        for (unsigned id=0 ; id < p_mesh_a->GetNumElements() ; id++)
+        {
+            cell_ids.push_back(double(id));
+        }
+
+        vertex_mesh_writer.AddCellData("Cell IDs", cell_ids);
+        vertex_mesh_writer.WriteVtkUsingMesh(*p_mesh_a);
+
+    }
 
     void TestBoundaryNodes() throw(Exception)
     {
-/*#if BOOST_VERSION >= 105200
+        // Generate a mesh that is 3 cells wide in x, 2 cells wide in y, 1 unit high in z, with 3 Lloyd's
+        // relaxation steps and target average element area 100.0
+        VoronoiPrism3dVertexMeshGenerator generator(3, 2, 5, 3, 100.0);
+        MutableVertexMesh<3,3>* p_mesh = generator.GetMesh();
 
-        // Generate a mesh that is 3 cells wide, 2 high, with 3 Lloyd's relaxation steps and target average element area 100.0
-        VoronoiPrism3dVertexMeshGenerator generator(3, 2, 3, 100.0);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        VertexMeshWriter<3, 3> vertex_mesh_writer("TestVoronoiPrism3dVertexMesh/RowOfThree",
+                                                  "3x2x5 3relax ApicalArea100");
+
+        std::vector<double> cell_ids;
+        for (unsigned id=0 ; id < p_mesh->GetNumElements() ; id++)
+        {
+            cell_ids.push_back(double(id));
+        }
+
+        vertex_mesh_writer.AddCellData("Cell IDs", cell_ids);
+        vertex_mesh_writer.WriteVtkUsingMesh(*p_mesh);
 
         // Check basic mesh properties are correct
-        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 23u);
+        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 44u);
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 6u);
 
-        // There should be three non-boundary nodes in this mesh (indices 1, 2, 11)
-        TS_ASSERT( !(p_mesh->GetNode(1u)->IsBoundaryNode()) );
-        TS_ASSERT( !(p_mesh->GetNode(2u)->IsBoundaryNode()) );
-        TS_ASSERT( !(p_mesh->GetNode(11u)->IsBoundaryNode()) );
-
-        // Check that there are exactly 20 boundary nodes
+        // Check if all nodes are boundary nodes
         unsigned num_boundary_nodes = 0;
-        for (unsigned node_idx = 0 ; node_idx < 23u ; node_idx++ )
+        for (unsigned node_idx = 0 ; node_idx < p_mesh->GetNumNodes() ; node_idx++ )
         {
             if (p_mesh->GetNode(node_idx)->IsBoundaryNode())
             {
                 num_boundary_nodes++;
             }
         }
-        TS_ASSERT_EQUALS(num_boundary_nodes, 20u);
-
-#endif // BOOST_VERSION >= 105200
-*/    }
+        TS_ASSERT_EQUALS(num_boundary_nodes, p_mesh->GetNumNodes());
+    }
 
     void TestConstructorExceptions() throw(Exception)
     {
-/*#if BOOST_VERSION >= 105200
-
         // Throws because first parameter < 2
         TS_ASSERT_THROWS_THIS(VoronoiPrism3dVertexMeshGenerator generator(1, 9, 2, 1.23),
                 "Need at least 2 by 2 cells");
@@ -159,19 +222,20 @@ public:
         TS_ASSERT_THROWS_THIS(VoronoiPrism3dVertexMeshGenerator generator(9, 1, 2, 1.23),
                 "Need at least 2 by 2 cells");
 
-        // Throws because fourth parameter <= 0.0
-        TS_ASSERT_THROWS_THIS(VoronoiPrism3dVertexMeshGenerator generator(9, 9, 2, -1.23),
-                "Specified target area must be strictly positive");
+        //Throws because third parameter <= 0.0
+        TS_ASSERT_THROWS_THIS(VoronoiPrism3dVertexMeshGenerator generator(9, 9, -2, 1.23),
+                              "Specified element height must be strictly positive");
 
-#endif // BOOST_VERSION >= 105200
-*/    }
+        // Throws because fifth parameter <= 0.0
+        TS_ASSERT_THROWS_THIS(VoronoiPrism3dVertexMeshGenerator generator(9, 9, 2, 4, -1.23),
+                              "Specified target apical area must be strictly positive");
 
-    void TestValidateSeedLocations() throw(Exception)
+    }
+
+    void TestValidateSeedLocations() throw(Exception) //todo maybe check again the tests
     {
-/*#if BOOST_VERSION >= 105200
-
         // The instance of the generator class
-        VoronoiPrism3dVertexMeshGenerator generator(3, 3, 0, 1.0);
+        VoronoiPrism3dVertexMeshGenerator generator(3, 3, 1.0, 0, 1.0);
 
         // A helper vector
         c_vector<double, 2> one_one;
@@ -242,9 +306,7 @@ public:
         TS_ASSERT_DELTA(points[0][1], 1.0, 1e-10);
         TS_ASSERT_DELTA(points[1][0], 1.5 / (sampling_multiplier * sqrt(2.0)), 1e-10);
         TS_ASSERT_DELTA(points[1][1], 1.5 / (sampling_multiplier * sqrt(2.0)), 1e-10);
-
-#endif // BOOST_VERSION >= 105200
-*/    }
+    }
 
     void TestGetToroidalMesh() throw(Exception)
     {
@@ -290,22 +352,36 @@ public:
 #endif // BOOST_VERSION >= 105200
 */    }
 
-    void TestGetPolygonDistributionAndAreaVariation() throw(Exception)
+    void TestGetPolygonDistributionAndAreaVariation() throw(Exception) //todo expand it
     {
-/*#if BOOST_VERSION >= 105200
-
         unsigned num_x = 3;
         unsigned num_y = 4;
+        double height_z =5;
         unsigned num_relaxation_steps = 1;
-        double area = 1.23;
+        double apical_area = 1.23;
 
-        VoronoiPrism3dVertexMeshGenerator generator(num_x, num_y, num_relaxation_steps, area);
+        VoronoiPrism3dVertexMeshGenerator generator(num_x, num_y, height_z, num_relaxation_steps, apical_area);
+        MutableVertexMesh<3, 3>* p_mesh = generator.GetMesh();
+
+        VertexMeshWriter<3, 3> vertex_mesh_writer("TestVoronoiPrism3dVertexMesh/PolygonDistributionAndStuff",
+                                                  "3x4x1 1relax");
+
+        std::vector<double> cell_ids;
+        for (unsigned id=0 ; id < p_mesh->GetNumElements() ; id++)
+        {
+            cell_ids.push_back(double(id));
+        }
+
+        vertex_mesh_writer.AddCellData("Cell IDs", cell_ids);
+        vertex_mesh_writer.WriteVtkUsingMesh(*p_mesh);
 
         // Get the polgyon distribution and check it
         std::vector<double> polygon_dist = generator.GetPolygonDistribution();
 
         TS_ASSERT(polygon_dist.size() > 0);
 
+        //for manual visual validation
+        MARK; PRINT_VECTOR(polygon_dist);
         double cumulative_proportion = 0.0;
         for (unsigned poly_idx = 0 ; poly_idx < polygon_dist.size() ; poly_idx++)
         {
@@ -315,55 +391,49 @@ public:
         TS_ASSERT_DELTA(cumulative_proportion, 1.0, 1e-6);
 
         // Get the area variation coefficient and check it
-        double area_variation = generator.GetAreaCoefficientOfVariation();
+        double area_variation = generator.GetApicalAreaCoefficientOfVariation();
 
-        TS_ASSERT_DELTA(area_variation, 0.3902318115, 1e-6);
-
-#endif // BOOST_VERSION >= 105200
-*/    }
+        TS_ASSERT_DELTA(area_variation, 0.32886, 1e-6);
+        VoronoiPrism3dVertexMeshGenerator generator2(num_x, num_y, height_z + 5, num_relaxation_steps, apical_area);    //todo get same seed
+        TS_ASSERT_DELTA(area_variation, generator2.GetApicalAreaCoefficientOfVariation(), 1e-6);
+    }
 
     void TestRefreshSeedsAndRegenerateMeshCoverage() throw(Exception)
     {
-/*#if BOOST_VERSION >= 105200
-
         unsigned num_x = 3;
         unsigned num_y = 4;
+        unsigned height_z = 3;
         unsigned num_relaxation_steps = 1;
         double area = 1.23;
 
-        VoronoiPrism3dVertexMeshGenerator generator(num_x, num_y, num_relaxation_steps, area);
+        VoronoiPrism3dVertexMeshGenerator generator(num_x, num_y, height_z, num_relaxation_steps, area);
 
         generator.RefreshSeedsAndRegenerateMesh();
-
-#endif // BOOST_VERSION >= 105200
-*/    }
+    }
 
     void TestSetAndGetMethods() throw(Exception)
     {
-/*#if BOOST_VERSION >= 105200
-
         unsigned num_x = 3;
         unsigned num_y = 4;
+        double height_z = 5;
         unsigned num_relaxation_steps = 1;
         double area = 1.23;
 
-        VoronoiPrism3dVertexMeshGenerator generator(num_x, num_y, num_relaxation_steps, area);
+        VoronoiPrism3dVertexMeshGenerator generator(num_x, num_y, height_z, num_relaxation_steps, area);
 
         generator.SetMaxExpectedNumSidesPerPolygon(5);
         TS_ASSERT_EQUALS(generator.GetMaxExpectedNumSidesPerPolygon(), 5u);
-
-#endif // BOOST_VERSION >= 105200
-*/    }
+    }
 
     void TestDummyClassCoverage()
     {
-/*#if BOOST_VERSION < 105200
+#if BOOST_VERSION < 105200
 
         TS_ASSERT_THROWS_THIS(VoronoiPrism3dVertexMeshGenerator generator,
                 "This is a dummy class. Build with Boost version 1.52 or above for functionality.");
         WARNING("Build with Boost version 1.52 or above for functionality.");
 #endif // BOOST_VERSION < 105200
-*/    }
+    }
 };
 
-#endif /*TESTVORONOIVERTEXMESHGENERATOR_HPP_*/
+#endif /*TESTVORONOIPRISM3DVERTEXMESHGENERATOR_HPP_*/

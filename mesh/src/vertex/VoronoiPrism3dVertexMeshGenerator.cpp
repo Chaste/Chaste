@@ -35,7 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "VoronoiPrism3dVertexMeshGenerator.hpp"
 #include <map>
-#include "Debug.hpp"
 
 #if BOOST_VERSION >= 105200
 
@@ -44,17 +43,17 @@ using boost::polygon::voronoi_diagram;
 typedef boost::polygon::point_data<int> boost_point;
 
 VoronoiPrism3dVertexMeshGenerator::VoronoiPrism3dVertexMeshGenerator(unsigned numElementsX,
-                                                       unsigned numElementsY,
-                                                       double elementHeightZ,
-                                                       unsigned numRelaxationSteps,
-                                                       double elementTargetArea)
+                                                                     unsigned numElementsY,
+                                                                     double elementHeightZ,
+                                                                     unsigned numRelaxationSteps,
+                                                                     double elementTargetApicalArea)
         : mpMesh(NULL),
           mpTorMesh(NULL),
           mNumElementsX(numElementsX),
           mNumElementsY(numElementsY),
           mElementHeightZ(elementHeightZ),
           mNumRelaxationSteps(numRelaxationSteps),
-          mElementTargetArea(elementTargetArea),
+          mElementTargetApicalArea(elementTargetApicalArea),
           mTol(1e-7),
           mMaxExpectedNumSidesPerPolygon(17)
 {
@@ -74,7 +73,7 @@ VoronoiPrism3dVertexMeshGenerator::~VoronoiPrism3dVertexMeshGenerator()
     }
 }
 
-void VoronoiPrism3dVertexMeshGenerator::GenerateVoronoiMesh()
+void VoronoiPrism3dVertexMeshGenerator::GenerateVoronoiMesh()   //todo ask below
 {
     /**
      * The initial points will be randomly distributed in the box [0.0, mMultiplierInX] x [0.0, mMultiplierInY], which
@@ -85,32 +84,30 @@ void VoronoiPrism3dVertexMeshGenerator::GenerateVoronoiMesh()
     // Get initial seed locations
     std::vector<c_vector<double, 2> > seed_locations = this->GetInitialPointLocations();
     this->ValidateSeedLocations(seed_locations);
-    MARK;
+
     // We now create the initial Voronoi tessellation. This method updates mpMesh.
     this->CreateVoronoiTessellation(seed_locations);
-    MARK;
+
     /**
      * Next, we perform the relaxation steps. The points used as seeds in the new Voronoi tessellation are the
      * centroids of the elements which are currently in the mesh.
      */
-//    for (unsigned relaxation = 0 ; relaxation < mNumRelaxationSteps ; relaxation++) //\todo change this one
-//    {
-//        seed_locations.clear();
-//        seed_locations = this->GetElementCentroidsFromMesh();
-//
-//        this->CreateVoronoiTessellation(seed_locations);
-//    }
+    for (unsigned relaxation = 0 ; relaxation < mNumRelaxationSteps ; relaxation++)
+    {
+        seed_locations.clear();
+        seed_locations = this->GetElementCentroidsFromMesh();
 
-    MARK;
+        this->CreateVoronoiTessellation(seed_locations);
+    }
+
     // We need to modify the node locations to achieve the correct target average element area
-    double scale_factor = double(mMaxNumElems) * sqrt(mElementTargetArea);  //\todo area or volume?
+    double scale_factor = double(mMaxNumElems) * sqrt(mElementTargetApicalArea);                //todo Apical area ok?
     for (unsigned node_idx = 0 ; node_idx < mpMesh->GetNumNodes() ; node_idx++)
     {
         c_vector<double, 3>& node_location = mpMesh->GetNode(node_idx)->rGetModifiableLocation();
         node_location[0] *= scale_factor;
         node_location[1] *= scale_factor;
     }
-    MARK;
 }
 
 MutableVertexMesh<3,3>* VoronoiPrism3dVertexMeshGenerator::GetMesh()
@@ -118,7 +115,7 @@ MutableVertexMesh<3,3>* VoronoiPrism3dVertexMeshGenerator::GetMesh()
     return mpMesh;
 }
 
-MutableVertexMesh<3,3>* VoronoiPrism3dVertexMeshGenerator::GetMeshAfterReMesh()
+MutableVertexMesh<3,3>* VoronoiPrism3dVertexMeshGenerator::GetMeshAfterReMesh() // todo no 3D remesh yet?
 {
     mpMesh->ReMesh();
     return mpMesh;
@@ -418,7 +415,7 @@ bool VoronoiPrism3dVertexMeshGenerator::CheckForCongruentNodes(MutableVertexMesh
     return true;
 }
 
-std::vector<c_vector<double, 2> > VoronoiPrism3dVertexMeshGenerator::GetInitialPointLocations()
+std::vector<c_vector<double, 2> > VoronoiPrism3dVertexMeshGenerator::GetInitialPointLocations() //todo maybe seed can be placed as parameter?
 {
     // Create a vector which contains mTotalNumElements spaces
     std::vector<c_vector<double, 2> > seed_points(mTotalNumElements);
@@ -438,8 +435,10 @@ std::vector<c_vector<double, 2> > VoronoiPrism3dVertexMeshGenerator::GetInitialP
     return seed_points;
 }
 
-std::vector<c_vector<double, 2> > VoronoiPrism3dVertexMeshGenerator::GetElementCentroidsFromMesh()  //\todo to change nodes<3> to node<2>
+std::vector<c_vector<double, 2> > VoronoiPrism3dVertexMeshGenerator::GetElementCentroidsFromMesh()
 {
+    // return a vector of 2D centroids as Voronoi tessellation is implemented on a 2D surface.
+    // for fully 3D purpose please change accordingly
     assert(mpMesh->GetNumElements() == mNumElementsX * mNumElementsY);
 
     std::vector<c_vector<double, 2> > element_centroids;
@@ -448,7 +447,11 @@ std::vector<c_vector<double, 2> > VoronoiPrism3dVertexMeshGenerator::GetElementC
     for (unsigned elem_idx = 0; elem_idx < mpMesh->GetNumElements(); elem_idx++)
     {
         // Get the current centroid of the element
-        c_vector<double, 2> this_centroid = mpMesh->GetCentroidOfElement(elem_idx);
+        c_vector<double, 3> this_centroid_3d = mpMesh->GetCentroidOfElement(elem_idx);
+        // As for Voronoi tessellation algorithm from boost, 2D seed is required.
+        c_vector<double, 2> this_centroid;
+        this_centroid[0] = this_centroid_3d[0];
+        this_centroid[1] = this_centroid_3d[1];
 
         /**
          * We cannot be certain the centroid is in the correct location: while the initial seed points are all located
@@ -482,15 +485,18 @@ std::vector<c_vector<double, 2> > VoronoiPrism3dVertexMeshGenerator::GetElementC
     return element_centroids;
 }
 
-void VoronoiPrism3dVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_vector<double, 2> >& rSeedLocations)
+void VoronoiPrism3dVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_vector<double, 2> >& rSeedLocations) //done, todo check if ppl understand what i mean
 {
-    // Clear the mesh nodes and elements, as they will be replaced in this method
+    // Clear the mesh nodes, faces and elements, as they will be replaced in this method
     std::vector<Node<3>*> lower_nodes;
     std::vector<Node<3>*> upper_nodes;
-    std::vector<bool> node_already_exist;
     std::vector<VertexElement<2, 3>*> faces;
     std::vector<VertexElement<3, 3>*> elements;
-    std::map<unsigned, std::vector<unsigned> > node_index_to_faces_index;
+
+    // these two containers are used to recycle created lateral faces
+    // map is chosen over vector as the number of nodes is not known a priori
+    std::vector<bool> does_node_already_exist;
+    std::map<unsigned, std::vector<unsigned> > node_to_lateral_face_indices;
 
     /**
      * We need to take the vector of locations and snap each element to an integer gridpoint (the boost Voronoi library
@@ -549,11 +555,11 @@ void VoronoiPrism3dVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_
      * tessellation.  This allows us to tag boundary nodes, by finding those nodes in outer voronoi cells that coincide
      * in location with the nodes we have already identified.
      */
-//    MARK; PRINT_VARIABLE("Going into voronoi boost stuff");
+
     // Construct the Voronoi tessellation of these 9 x mTotalNumElements points
     voronoi_diagram<double> vd;
     construct_voronoi(points.begin(), points.end(), &vd);
-//    MARK; PRINT_VARIABLE("Safety exit voronoi");
+
     // Loop over the cells in the voronoi diagram to find nodes for our mesh
     for (voronoi_diagram<double>::const_cell_iterator it = vd.cells().begin();
          it != vd.cells().end();
@@ -566,10 +572,10 @@ void VoronoiPrism3dVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_
         // (i.e. those cells in the central portion of the 3x3 tessellation of source points)
         if (cell.source_index() < rSeedLocations.size())
         {
-            // We create a vector of nodes, which will be used to create a MutableElement
+            // We create two vectors of nodes, which will be used to create a MutableElement
+            // two vectors are used so that we can save the time to figure out the indices for the pair of upper&lower nodes
             std::vector<Node<3>*> lower_nodes_this_elem;
             std::vector<Node<3>*> upper_nodes_this_elem;
-            //this vector to store the information whether the (lower) node of this element
 
             // Loop over the edges of the current cell
             const voronoi_diagram<double>::edge_type *edge = cell.incident_edge();
@@ -582,8 +588,8 @@ void VoronoiPrism3dVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_
                     double x_location = (edge->vertex0()->x()) / mSamplingMultiplier;
                     double y_location = (edge->vertex0()->y()) / mSamplingMultiplier;
 
-                    // Create a node at this location.  Default to non-boundary node; this will be updated later
-                    Node<3>* p_this_lower_node = new Node<3>(lower_nodes.size(), false, x_location, y_location, 0);
+                    // Create a node at this location. In 3D, every node is boundary nodes
+                    Node<3>* p_this_lower_node = new Node<3>(lower_nodes.size(), true, x_location, y_location, 0);
 
                     /**
                      * Check whether this node has already been created - all non-boundary nodes will be found twice
@@ -615,8 +621,7 @@ void VoronoiPrism3dVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_
                         // The node was already in nodes vector, and its index is the variable 'existing_node'
                         lower_nodes_this_elem.push_back(lower_nodes[existing_node_idx]);
                         upper_nodes_this_elem.push_back(upper_nodes[existing_node_idx]);
-
-                        node_already_exist[existing_node_idx]=true;
+                        does_node_already_exist[existing_node_idx] = true;
                         delete p_this_lower_node;
                     }
                     else
@@ -624,10 +629,11 @@ void VoronoiPrism3dVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_
                         // The node does not yet exist - we add it to the nodes vector
                         lower_nodes.push_back(p_this_lower_node);
                         lower_nodes_this_elem.push_back(p_this_lower_node);
-                        node_already_exist.push_back(false);
+                        does_node_already_exist.push_back(false);
 
-                        // Creating the corresponding upper node //\todo assuming nodes < mTotalNumElements*6
-                        Node<3>* p_this_upper_node = new Node<3>(upper_nodes.size()+mTotalNumElements*6, false, x_location, y_location, mElementHeightZ);
+                        // Creating the corresponding upper node
+                        // apperently, 2 nodes having the same index do not cause any problem yet \todo
+                        Node<3>* p_this_upper_node = new Node<3>(upper_nodes.size(), true, x_location, y_location, mElementHeightZ);
                         upper_nodes.push_back(p_this_upper_node);
                         upper_nodes_this_elem.push_back(p_this_upper_node);
                     }
@@ -638,65 +644,57 @@ void VoronoiPrism3dVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_
 
             } while (edge != cell.incident_edge());
 
-//            MARK; PRINT_VARIABLE(lower_nodes_this_elem.size());
-//            PRINT_VECTOR(node_already_exist);
-            for (unsigned iiii =0; iiii < lower_nodes_this_elem.size(); iiii++)
-            {
-//                PRINT_VARIABLE(lower_nodes_this_elem[iiii]->GetIndex());
-//                PRINT_VECTOR(lower_nodes_this_elem[iiii]->rGetLocation());
-            }
-            /**create faces and element. According to boost documentation, with `edge = edge->next()` as the method
-            to obtain nodes, the nodes should be in counter-clockwise order.
-            Upper and lower faces will be created as usual.
-            As for lateral faces, to avoid constant searches through the entire faces vector as to avoid creating the
-            exact same face twice, a vector of pairs which map the index of the (lower) node to its two adjecent lateral
-            faces will be used.
-            **/
-            unsigned numLowerNodes = lower_nodes_this_elem.size();
+            /**create faces and element.
+             * According to boost documentation, with `edge = edge->next()` we should obtain the nodes in counter-clockwise order.
+             * Upper and lower faces will be created as usual.
+             * As for lateral faces, to avoid constantly searching through the entire faces vector and also creating the
+             * exact same lateral face twice, a map which has the index of the (lower) node as key and a vector of its lateral face
+             * indices as value is used.
+            **/ //todo check if others understand what i'm trying to express
+
+            // initializing vectors which are required for the generation of the VertexElement<3, 3>
+            unsigned numLowerNodesThisElement = lower_nodes_this_elem.size();
             std::vector<VertexElement<2, 3>*> faces_this_elem;
             std::vector<bool> faces_orientation;
 
+            // Creating the lower face
             VertexElement<2, 3>* p_lower_face = new VertexElement<2, 3>(faces.size(), lower_nodes_this_elem);
             faces.push_back(p_lower_face);
             faces_this_elem.push_back(p_lower_face);
             faces_orientation.push_back(true);
 
+            // Creating the upper face
             VertexElement<2,3>* p_upper_face = new VertexElement<2,3>(faces.size(), upper_nodes_this_elem);
             faces.push_back(p_upper_face);
             faces_this_elem.push_back(p_upper_face);
             faces_orientation.push_back(true);
 
-            for (unsigned localNodeIndex=0; localNodeIndex<numLowerNodes; localNodeIndex++ )
+            // creating all the lateral faces in CCW
+            for (unsigned localNodeIndex=0; localNodeIndex<numLowerNodesThisElement; localNodeIndex++ )
             {
                 unsigned node1Index = lower_nodes_this_elem[localNodeIndex]->GetIndex();
-                unsigned node2Index = lower_nodes_this_elem[(localNodeIndex+1) % numLowerNodes]->GetIndex();
-//                MARK;PRINT_2_VARIABLES(localNodeIndex, faces_this_elem.size());
-                // the value in the map is called here because it will be used both in if & else statements.
-                // they are called as reference as they will be modified if they enter else statement.
-                std::vector<unsigned>& r_faces_index1 = node_index_to_faces_index[node1Index];
-                std::vector<unsigned>& r_faces_index2 = node_index_to_faces_index[node2Index];
+                unsigned node2Index = lower_nodes_this_elem[(localNodeIndex+1) % numLowerNodesThisElement]->GetIndex();
 
-                // (Wrong!!!)if both nodes already exist, this means that the lateral face that contains them has been created as well
-                // if both nodes already exist, the lateral face might have been created. so need to check.
-//                PRINT_2_VARIABLES(node1Index, node2Index);
+                // the values of the maps are called here because they will be used both existing and creating branch.
+                // they are called by reference as they will be modified if they enter creating branch.
+                std::vector<unsigned>& r_face1_indices = node_to_lateral_face_indices[node1Index];
+                std::vector<unsigned>& r_face2_indices = node_to_lateral_face_indices[node2Index];
+
+                // if both nodes already exist, the lateral face MIGHT have been created.
                 unsigned existingFaceIndex = UINT_MAX;
 
-                if (node_already_exist[node1Index] && node_already_exist[node2Index])
+                if (does_node_already_exist[node1Index] && does_node_already_exist[node2Index])
                 {
-//                    MARK; PRINT_VARIABLE("ENTERING checking if face exists statement");
-//                    PRINT_VECTOR(r_faces_index1);
-//                    PRINT_VECTOR(r_faces_index2);
-
+                    // now need to search for the same lateral face index in both vector
                     // not a too complicated and resource intensive (as r_faces_index vectors have length of at most 3 or 4
-                    // therefore not using function in <algorithm>
-
-                    for (unsigned i1 = 0; i1 < r_faces_index1.size(); i1++)
+                    // therefore not using existing function in <algorithm>
+                    for (unsigned i1 = 0; i1 < r_face1_indices.size(); i1++)
                     {
-                        for (unsigned i2 = 0; ( i2 < r_faces_index2.size() && existingFaceIndex==UINT_MAX ); i2++)
+                        for (unsigned i2 = 0; ( i2 < r_face2_indices.size() && existingFaceIndex==UINT_MAX ); i2++)
                         {
-                            if (r_faces_index1[i1] == r_faces_index2[i2])
+                            if (r_face1_indices[i1] == r_face2_indices[i2])
                             {
-                                existingFaceIndex = r_faces_index1[i1];
+                                existingFaceIndex = r_face1_indices[i1];
                                 break;
                             }
                         }
@@ -704,15 +702,15 @@ void VoronoiPrism3dVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_
 
                     if ( existingFaceIndex != UINT_MAX)// meaning it's found
                     {
-//                        PRINT_VARIABLE(existingFaceIndex);
                         faces_this_elem.push_back(faces[existingFaceIndex]);
+                        // face orientation is false as it was created by another element. CCW for another will be CW when
+                        // viewing from the other side as rotation is pseudovectorial
                         faces_orientation.push_back(false);
                     }
 
                 }
                 if (existingFaceIndex == UINT_MAX)
                 {
-//                    MARK; PRINT_VARIABLE("ENTERING creating face statement");
                     //create new lateral rectangular face
                     std::vector<Node<3>*> nodes_of_lateral_face;
                     nodes_of_lateral_face.push_back(lower_nodes[node1Index]);
@@ -721,140 +719,21 @@ void VoronoiPrism3dVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_
                     nodes_of_lateral_face.push_back(upper_nodes[node1Index]);
 
                     unsigned newFaceIndex = faces.size();
-                    VertexElement<2,3>* p_lateral_face = new VertexElement<2,3>(newFaceIndex, nodes_of_lateral_face);
+                    VertexElement<2, 3>* p_lateral_face = new VertexElement<2, 3>(newFaceIndex, nodes_of_lateral_face);
                     faces.push_back(p_lateral_face);
                     faces_this_elem.push_back(p_lateral_face);
                     faces_orientation.push_back(true);
 
-//                    MARK; //to check created face
-//                    PRINT_VARIABLE(p_lateral_face->GetIndex());
-                    for (unsigned j=0; j<4; j++)
-                    {
-//                        PRINT_VARIABLE(p_lateral_face->GetNode(j)->GetIndex());
-                    }
-
-                    //update node_index_to_faces_index
-                    unsigned i = 0;
-//                    MARK;
-//                    PRINT_VARIABLE("ENTERING UPDATE NODE_TO_FACES THING");
-
-                    for ( ; i < r_faces_index1.size(); i++)
-                    {
-                        if (r_faces_index1[i]==newFaceIndex)
-                        {
-                            break;
-                        }
-                    }
-                    // if newFaceIndex is not found in face_index1, then push_back
-                    if (i == r_faces_index1.size())
-                    {
-                        r_faces_index1.push_back(newFaceIndex);
-                    }
-
-                    i = 0;
-                    for ( ; i < r_faces_index2.size(); i++)
-                    {
-                        if (r_faces_index2[i]==newFaceIndex)
-                            break;
-                    }
-                    // if newFaceIndex is not found in face_index1, then push_back
-                    if (i == r_faces_index2.size())
-                    {
-                        r_faces_index2.push_back(newFaceIndex);
-                    }
+                    //update node_to_lateral_face_indices
+                    r_face1_indices.push_back(newFaceIndex);
+                    r_face2_indices.push_back(newFaceIndex);
                 }
 
             }
-//            MARK;PRINT_VARIABLE(lower_nodes.size());
-            /*for (unsigned ii=0; ii<node_index_to_faces_index.size(); ii++)
-            {
-                PRINT_VARIABLE(ii);
-                PRINT_VECTOR(node_index_to_faces_index[ii]);
-            }*/
-            //PRINT_VECTOR(node_already_exist);
-//            MARK;PRINT_4_VARIABLES(faces.size(),faces_this_elem.size(), faces_orientation.size(),elements.size());
-//            PRINT_VECTOR(faces_orientation);
             VertexElement<3, 3>* p_elem = new VertexElement<3, 3>(elements.size(), faces_this_elem, faces_orientation);
             elements.push_back( p_elem );
-//            PRINT_VARIABLE(elements.size());
         }
     }
-
-    // Loop over the cells in the voronoi diagram to identify boundary nodes
-    for (voronoi_diagram<double>::const_cell_iterator it = vd.cells().begin();
-         it != vd.cells().end();
-         ++it)
-    {
-        // Get a reference to the current cell
-        const voronoi_diagram<double>::cell_type& cell = *it;
-
-        // The cells we care about are exactly those whose source_index is greater than the size of the locations vector
-        // (i.e. those cells in the outside eight portions of the 3x3 tessellation of source points)
-        if (cell.source_index() >= rSeedLocations.size())
-        {
-            // Loop over the edges of the current cell
-            const voronoi_diagram<double>::edge_type *edge = cell.incident_edge();
-
-            do
-            {
-                /*
-                 * Break out of the do-while if there is an infinite edge; we needn't care about cells at the very edge.
-                 */
-                if (edge->is_infinite())
-                {
-                    break;
-                }
-
-                if (edge->is_primary())
-                {
-                    c_vector<double, 2> vertex_location;
-
-                    // Get the location of vertex0 of the current edge
-                    vertex_location[0] = (edge->vertex0()->x()) / mSamplingMultiplier;
-                    vertex_location[1] = (edge->vertex0()->y()) / mSamplingMultiplier;
-
-                    /*
-                     * Check whether this location coincides with one of our nodes; if it does, it must be a boundary
-                     * node
-                     */
-                    for (unsigned lower_node_idx = 0 ; lower_node_idx < lower_nodes.size() ; lower_node_idx++)
-                    {
-                        // Grab the existing node location
-                        const c_vector<double, 3>& r_existing_node_location = lower_nodes[lower_node_idx]->rGetLocation();
-
-                        // Equality here is determined entirely on coincidence of position
-                        // z-coordinates is ingored
-                        if ( fabs(r_existing_node_location[0] - vertex_location[0]) < DBL_EPSILON )
-                        {
-                            if ( fabs(r_existing_node_location[1] - vertex_location[1]) < DBL_EPSILON )
-                            {
-                                // If the locations match, tag the node as being on the boundary
-                                lower_nodes[lower_node_idx]->SetAsBoundaryNode(true);
-                                upper_nodes[lower_node_idx]->SetAsBoundaryNode(true);
-                            }
-                        }
-                    }
-                    // Move to the next edge
-                    edge = edge->next();
-                }
-
-            } while (edge != cell.incident_edge());
-        }
-    }
-
-//    testing purpose
-//    MARK; PRINT_VARIABLE(lower_nodes.size());
-//    for (unsigned i=0; i<lower_nodes.size();i++)
-//    {
-//        const c_vector<double, 3>& tmpvec (lower_nodes[i]->rGetLocation());
-//        std::cout << i << ", [" << tmpvec[0]*100 << ", " << tmpvec[1]*100 << ", " << tmpvec[2]*100 << "]" << std::endl << std::flush;
-//    }
-//    MARK; PRINT_VARIABLE(node_index_to_faces_index.size());
-//    for (unsigned i=0; i<node_index_to_faces_index.size();i++)
-//    {
-//        PRINT_VARIABLE(i);
-//        PRINT_VECTOR(node_index_to_faces_index[i]);
-//    }
 
     // Create a new mesh with the current vector of nodes and elements
     if (mpMesh)
@@ -865,26 +744,14 @@ void VoronoiPrism3dVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_
     // The index of upper nodes need to be modified.
     unsigned lowerNodeLength = lower_nodes.size();
     unsigned upperNodeLength = upper_nodes.size();
-    //just testing //\todo to remove this when stable
-    if (lowerNodeLength!=upperNodeLength)
-    {
-        throw ("omg, they are not the same!!!\n");
-    }
 
-//    MARK;
     for (unsigned upperRunningIndex=0; upperRunningIndex<upperNodeLength; upperRunningIndex++)
     {
         upper_nodes[upperRunningIndex]->rGetModifiableIndex() = lower_nodes.size();
+        // alternatively  if the upper nodes start with 0 as well
+        // upper_nodes[upperRunningIndex]->rGetModifiableIndex() += loweNodeLength;
         lower_nodes.push_back(upper_nodes[upperRunningIndex]);
-//        PRINT_VARIABLE(upper_nodes[upperRunningIndex]->GetIndex());
     }
-
-//    for testing //\todo remove when done
-//    MARK
-//    for (unsigned sth = 0; sth < lower_nodes.size(); sth++ )
-//    {
-//        std::cout << lower_nodes[sth]->GetIndex() << std::endl << std::flush;
-//    }
 
     mpMesh = new MutableVertexMesh<3,3>(lower_nodes, elements);
 }
@@ -902,9 +769,9 @@ void VoronoiPrism3dVertexMeshGenerator::ValidateInputAndSetMembers()
         EXCEPTION("Specified element height must be strictly positive");
     }
 
-    if ( mElementTargetArea <= 0.0 )
+    if ( mElementTargetApicalArea <= 0.0 )
     {
-        EXCEPTION("Specified target area must be strictly positive");
+        EXCEPTION("Specified target apical area must be strictly positive");
     }
 
     // The total number of elements requested
@@ -990,7 +857,7 @@ void VoronoiPrism3dVertexMeshGenerator::ValidateSeedLocations(std::vector<c_vect
     }
 }
 
-std::vector<double> VoronoiPrism3dVertexMeshGenerator::GetPolygonDistribution() //\todo later here might have something to to
+std::vector<double> VoronoiPrism3dVertexMeshGenerator::GetPolygonDistribution()     // todo expand n read pls
 {
     assert(mpMesh != NULL);
 
@@ -1009,11 +876,13 @@ std::vector<double> VoronoiPrism3dVertexMeshGenerator::GetPolygonDistribution() 
         unsigned num_nodes_this_elem = mpMesh->GetElement(elem_idx)->GetNumNodes();
 
         // All polygons are assumed to have 3, 4, 5, ..., mMaxExpectedNumSidesPerPolygon sides
+        // and since there should be an upper node for every lower node, it should be even number
+        assert(num_nodes_this_elem%2 == 0);     // todo check if the pairs is really lower and upper after simulation
         assert(num_nodes_this_elem > 2);
         assert(num_nodes_this_elem <= mMaxExpectedNumSidesPerPolygon);
 
         // Increment correct place in counter - triangles in place 0, squares in 1, etc
-        num_polygons[num_nodes_this_elem - 3]++;
+        num_polygons[num_nodes_this_elem/2 - 3]++;
     }
 
     // Loop over the vector of polygon numbers and calculate the distribution vector to return
@@ -1034,7 +903,7 @@ std::vector<double> VoronoiPrism3dVertexMeshGenerator::GetPolygonDistribution() 
     return polygon_dist;
 }
 
-double VoronoiPrism3dVertexMeshGenerator::GetAreaCoefficientOfVariation()   //\todo later
+double VoronoiPrism3dVertexMeshGenerator::GetApicalAreaCoefficientOfVariation()
 {
     assert(mpMesh != NULL);
 
@@ -1047,13 +916,13 @@ double VoronoiPrism3dVertexMeshGenerator::GetAreaCoefficientOfVariation()   //\t
     // Loop over elements in the mesh to get the contributions to the variance
     for (unsigned elem_idx = 0 ; elem_idx < num_elems ; elem_idx++)
     {
-        double deviation = mpMesh->GetVolumeOfElement(elem_idx) - mElementTargetArea;
+        double deviation = mpMesh->GetVolumeOfElement(elem_idx)/mElementHeightZ - mElementTargetApicalArea;
         var += deviation * deviation;
     }
 
     var /= static_cast<double>(num_elems - 1);
 
-    return sqrt(var) / mElementTargetArea;
+    return sqrt(var) / mElementTargetApicalArea;
 }
 
 void VoronoiPrism3dVertexMeshGenerator::RefreshSeedsAndRegenerateMesh()
