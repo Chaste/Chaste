@@ -130,7 +130,7 @@ public:
      *
      * @return mRate, the rate parameter of the distribution
      */
-    virtual double GetRate() const;
+    virtual double GetRate();
 
     /**
      * Set the rate parameter of the exponential distribution. For consistency,
