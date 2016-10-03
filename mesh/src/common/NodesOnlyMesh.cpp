@@ -475,12 +475,15 @@ void NodesOnlyMesh<SPACE_DIM>::EnlargeBoxCollection()
     c_vector<double, 2*SPACE_DIM> new_domain_size = current_domain_size;
 
     double fudge = 1e-14;
-    // We don't enlarge the x direction if periodic
-    unsigned d0 = ( mpBoxCollection->GetIsPeriodicInX() ) ? 1 : 0;
-    for (unsigned d=d0; d < SPACE_DIM; d++)
+    c_vector<bool, SPACE_DIM> is_periodic = mpBoxCollection->GetIsPeriodicAllDims();
+    for (unsigned d=0; d < SPACE_DIM; d++)
     {
-        new_domain_size[2*d] = current_domain_size[2*d] - (mMaximumInteractionDistance - fudge);
-        new_domain_size[2*d+1] = current_domain_size[2*d+1] + (mMaximumInteractionDistance - fudge);
+        // We don't enlarge in periodic directions
+        if ( !is_periodic(d) )
+        {
+            new_domain_size[2*d] = current_domain_size[2*d] - (mMaximumInteractionDistance - fudge);
+            new_domain_size[2*d+1] = current_domain_size[2*d+1] + (mMaximumInteractionDistance - fudge);
+        } 
     }
     SetUpBoxCollection(mMaximumInteractionDistance, new_domain_size, new_local_rows);
 }
@@ -493,9 +496,6 @@ bool NodesOnlyMesh<SPACE_DIM>::IsANodeCloseToDomainBoundary()
     int is_local_node_close = 0;
     c_vector<double, 2*SPACE_DIM> domain_boundary = mpBoxCollection->rGetDomainSize();
 
-    // We ignore the x direction if the domain is periodic in x
-    unsigned d0 = ( mpBoxCollection->GetIsPeriodicInX() ) ? 1 : 0;
-
     for (typename AbstractMesh<SPACE_DIM, SPACE_DIM>::NodeIterator node_iter = this->GetNodeIteratorBegin();
          node_iter != this->GetNodeIteratorEnd();
          ++node_iter)
@@ -503,10 +503,12 @@ bool NodesOnlyMesh<SPACE_DIM>::IsANodeCloseToDomainBoundary()
         // Note that we define this vector before setting it as otherwise the profiling build will break (see #2367)
         c_vector<double, SPACE_DIM> location;
         location = node_iter->rGetLocation();
-
-        for (unsigned d=d0; d<SPACE_DIM; d++)
+        // We need to ignore periodic dimensions
+        c_vector<bool, SPACE_DIM> is_periodic = mpBoxCollection->GetIsPeriodicAllDims();
+        for (unsigned d=0; d<SPACE_DIM; d++)
         {
-            if (location[d] < (domain_boundary[2*d] + mMinimumNodeDomainBoundarySeparation) ||  location[d] > (domain_boundary[2*d+1] - mMinimumNodeDomainBoundarySeparation))
+            if ( !is_periodic(d) && 
+                 ( location[d] < (domain_boundary[2*d] + mMinimumNodeDomainBoundarySeparation) ||  location[d] > (domain_boundary[2*d+1] - mMinimumNodeDomainBoundarySeparation) ) )
             {
                 is_local_node_close = 1;
                 break;
@@ -559,11 +561,11 @@ void NodesOnlyMesh<SPACE_DIM>::SetUpBoxCollection(const std::vector<Node<SPACE_D
 }
 
 template<unsigned SPACE_DIM>
-void NodesOnlyMesh<SPACE_DIM>::SetUpBoxCollection(double cutOffLength, c_vector<double, 2*SPACE_DIM> domainSize, int numLocalRows, bool isPeriodic)
+void NodesOnlyMesh<SPACE_DIM>::SetUpBoxCollection(double cutOffLength, c_vector<double, 2*SPACE_DIM> domainSize, int numLocalRows, bool isPeriodicInX, bool isPeriodicInY, bool isPeriodicInZ)
 {
      ClearBoxCollection();
 
-     mpBoxCollection = new DistributedBoxCollection<SPACE_DIM>(cutOffLength, domainSize, isPeriodic, numLocalRows);
+     mpBoxCollection = new DistributedBoxCollection<SPACE_DIM>(cutOffLength, domainSize, isPeriodicInX, isPeriodicInY, isPeriodicInZ, numLocalRows);
      mpBoxCollection->SetupLocalBoxesHalfOnly();
      mpBoxCollection->SetCalculateNodeNeighbours(mCalculateNodeNeighbours);
 }
