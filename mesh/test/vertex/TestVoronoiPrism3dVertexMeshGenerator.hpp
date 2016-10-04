@@ -65,6 +65,7 @@ public:
         vertex_mesh_writer.AddCellData("Cell IDs", cell_ids);
         vertex_mesh_writer.WriteVtkUsingMesh(*p_mesh);
 
+        ///\todo need to add a test here
     }
 
     void TestSimplestMesh2Relaxation() throw(Exception)
@@ -83,6 +84,7 @@ public:
         vertex_mesh_writer.AddCellData("Cell IDs", cell_ids);
         vertex_mesh_writer.WriteVtkUsingMesh(*p_mesh);
 
+        ///\todo need to add a test here
     }
 
     void TestSimplestMesh6Relaxation() throw(Exception)
@@ -101,6 +103,7 @@ public:
         vertex_mesh_writer.AddCellData("Cell IDs", cell_ids);
         vertex_mesh_writer.WriteVtkUsingMesh(*p_mesh);
 
+        ///\todo need to add a test here
     }
 
     void TestSimplestMesh15Relaxation() throw(Exception)
@@ -119,6 +122,7 @@ public:
         vertex_mesh_writer.AddCellData("Cell IDs", cell_ids);
         vertex_mesh_writer.WriteVtkUsingMesh(*p_mesh);
 
+        ///\todo need to add a test here
     }
 
     void TestGenerateAnotherOne() throw(Exception)
@@ -136,13 +140,12 @@ public:
 
         vertex_mesh_writer.AddCellData("Cell IDs", cell_ids);
         vertex_mesh_writer.WriteVtkUsingMesh(*p_mesh);
+
+        ///\todo need to add a test here
     }
-
-
 
     void TestSimpleMesh() throw(Exception)
     {
-
         // Generate a mesh that is 20 cells wide in x, 12 cells wide in y, 1 unit high in Z,
         // with 4 Lloyd's relaxation steps and target average element apical area 1.23
         VoronoiPrism3dVertexMeshGenerator generator(20, 12, 1, 4, 1.23);
@@ -175,6 +178,7 @@ public:
         vertex_mesh_writer.AddCellData("Cell IDs", cell_ids);
         vertex_mesh_writer.WriteVtkUsingMesh(*p_mesh_a);
 
+        ///\todo need to add a test here
     }
 
     void TestBoundaryNodes() throw(Exception)
@@ -209,6 +213,7 @@ public:
                 num_boundary_nodes++;
             }
         }
+
         TS_ASSERT_EQUALS(num_boundary_nodes, p_mesh->GetNumNodes());
     }
 
@@ -380,8 +385,6 @@ public:
 
         TS_ASSERT(polygon_dist.size() > 0);
 
-        //for manual visual validation
-        MARK; PRINT_VECTOR(polygon_dist);
         double cumulative_proportion = 0.0;
         for (unsigned poly_idx = 0 ; poly_idx < polygon_dist.size() ; poly_idx++)
         {
@@ -392,8 +395,8 @@ public:
 
         // Get the area variation coefficient and check it
         double area_variation = generator.GetApicalAreaCoefficientOfVariation();
-
         TS_ASSERT_DELTA(area_variation, 0.32886, 1e-6);
+
         VoronoiPrism3dVertexMeshGenerator generator2(num_x, num_y, height_z + 5, num_relaxation_steps, apical_area);    //todo get same seed
         TS_ASSERT_DELTA(area_variation, generator2.GetApicalAreaCoefficientOfVariation(), 1e-6);
     }
@@ -409,6 +412,8 @@ public:
         VoronoiPrism3dVertexMeshGenerator generator(num_x, num_y, height_z, num_relaxation_steps, area);
 
         generator.RefreshSeedsAndRegenerateMesh();
+
+        ///\todo need to add a test here
     }
 
     void TestSetAndGetMethods() throw(Exception)

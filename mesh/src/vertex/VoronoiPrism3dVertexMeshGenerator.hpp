@@ -40,7 +40,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 
 #include "MutableVertexMesh.hpp"
-#include "Toroidal2dVertexMesh.hpp"
 #include "RandomNumberGenerator.hpp"
 
 #include <boost/version.hpp>
@@ -49,8 +48,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "boost/polygon/voronoi.hpp"
 
 /**
- * Mesh generator that creates a 2D Voronoi tessellation using a number
- * of Lloyd's relaxation steps (http://en.wikipedia.org/wiki/Lloyd%27s_algorithm).
+ * Mesh generator that creates a 3D vertex mesh whose cross-section (in the xy plane) is a
+ * 2D Voronoi tessellation using a number of Lloyd's relaxation steps
+ * (http://en.wikipedia.org/wiki/Lloyd%27s_algorithm).
  *
  * NOTE: the user should delete the mesh after use to manage memory.
  */
@@ -62,9 +62,6 @@ protected:
 
     /** A pointer to the mesh that this class creates. */
     MutableVertexMesh<3,3>* mpMesh;
-
-    /** A pointer to a toroidal vertex mesh (allowing for doubly periodic boundaries), whose creation is optional. */
-    Toroidal2dVertexMesh* mpTorMesh;
 
     /** The number of elements requested across the mesh. */
     unsigned mNumElementsX;
@@ -218,11 +215,6 @@ public:
      * @return A pointer to a 3D mutable vertex mesh, after ReMesh() has been called to remove short edges
      */
     virtual MutableVertexMesh<3,3>* GetMeshAfterReMesh();
-
-    /**
-     * @return A pointer to a 3D toroidal vertex mesh with periodic boundaries
-     */
-    virtual Toroidal2dVertexMesh* GetToroidalMesh();
 
     /**
      * @return A vector representing the polygon distribution of the generated mesh, triangles upwards

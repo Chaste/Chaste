@@ -48,7 +48,6 @@ VoronoiPrism3dVertexMeshGenerator::VoronoiPrism3dVertexMeshGenerator(unsigned nu
                                                                      unsigned numRelaxationSteps,
                                                                      double elementTargetApicalArea)
         : mpMesh(NULL),
-          mpTorMesh(NULL),
           mNumElementsX(numElementsX),
           mNumElementsY(numElementsY),
           mElementHeightZ(elementHeightZ),
@@ -67,13 +66,9 @@ VoronoiPrism3dVertexMeshGenerator::~VoronoiPrism3dVertexMeshGenerator()
     {
         delete mpMesh;
     }
-    if (mpTorMesh)
-    {
-        delete mpTorMesh;
-    }
 }
 
-void VoronoiPrism3dVertexMeshGenerator::GenerateVoronoiMesh()   //todo ask below
+void VoronoiPrism3dVertexMeshGenerator::GenerateVoronoiMesh()   ///\todo ask below
 {
     /**
      * The initial points will be randomly distributed in the box [0.0, mMultiplierInX] x [0.0, mMultiplierInY], which
@@ -101,7 +96,7 @@ void VoronoiPrism3dVertexMeshGenerator::GenerateVoronoiMesh()   //todo ask below
     }
 
     // We need to modify the node locations to achieve the correct target average element area
-    double scale_factor = double(mMaxNumElems) * sqrt(mElementTargetApicalArea);                //todo Apical area ok?
+    double scale_factor = double(mMaxNumElems) * sqrt(mElementTargetApicalArea);
     for (unsigned node_idx = 0 ; node_idx < mpMesh->GetNumNodes() ; node_idx++)
     {
         c_vector<double, 3>& node_location = mpMesh->GetNode(node_idx)->rGetModifiableLocation();
@@ -115,210 +110,13 @@ MutableVertexMesh<3,3>* VoronoiPrism3dVertexMeshGenerator::GetMesh()
     return mpMesh;
 }
 
-MutableVertexMesh<3,3>* VoronoiPrism3dVertexMeshGenerator::GetMeshAfterReMesh() // todo no 3D remesh yet?
+MutableVertexMesh<3,3>* VoronoiPrism3dVertexMeshGenerator::GetMeshAfterReMesh()
 {
     mpMesh->ReMesh();
     return mpMesh;
 }
 
-Toroidal2dVertexMesh* VoronoiPrism3dVertexMeshGenerator::GetToroidalMesh()  //\todo much later
-{
-    /*
-     * METHOD OUTLINE:
-     *
-     * 1. Copy nodes and elements from mpMesh into a new MutableVertexMesh, so no data is shared between mpMesh and the
-     *    nodes and elements we will be working with.  There are no available copy constructors, so this is done from
-     *    scratch.
-     *
-     * 2. Identify which nodes on the boundary are congruent to each other.  This is done by recursively using the
-     *    helper function CheckForCongruentNodes().
-     *
-     * 3. Create mpTorMesh by copying the subset of remaining nodes and all elements in the new MutableVertexMesh.
-     *    Some elements have been modified to replace nodes by congruent partner nodes and some nodes have been deleted.
-     */
-
-    // The width and height of the mesh for periodicity purposes
-/*    double width  = mNumElementsX * sqrt(mElementTargetArea);
-    double height = mNumElementsY * sqrt(mElementTargetArea);
-
-    // We need to construct new nodes and elements so we don't have mpTorMesh sharing data with mpMesh
-    std::vector<Node<2>*> new_nodes(mpMesh->GetNumNodes());
-    std::vector<VertexElement<2,2>*> new_elems(mpMesh->GetNumElements());
-
-    // Copy nodes
-    for (unsigned node_counter = 0 ; node_counter < mpMesh->GetNumNodes() ; node_counter++)
-    {
-        Node<2>* p_node_to_copy = mpMesh->GetNode(node_counter);
-
-        // Get all the information about the node we are copying
-        unsigned            copy_index       = p_node_to_copy->GetIndex();
-        c_vector<double, 2> copy_location    = p_node_to_copy->rGetLocation();
-        bool                copy_is_boundary = p_node_to_copy->IsBoundaryNode();
-
-        // There should not be any 'gaps' in node numbering, but we will assert just to make sure
-        assert(copy_index < mpMesh->GetNumNodes());
-
-        // Create a new node and place it in index order. Every node in a periodic mesh is non-boundary.
-        new_nodes[copy_index] = new Node<2>(copy_index, copy_location, copy_is_boundary);
-    }
-
-    // Copy elements
-    for (unsigned elem_counter = 0; elem_counter < mpMesh->GetNumElements(); elem_counter++)
-    {
-        VertexElement<2,2>* p_elem_to_copy = mpMesh->GetElement(elem_counter);
-
-        // Get the information relating to the element we are copying
-        unsigned copy_index     = p_elem_to_copy->GetIndex();
-        unsigned copy_num_nodes = p_elem_to_copy->GetNumNodes();
-
-        // There should not be any 'gaps' in element numbering, but we will assert just to make sure
-        assert(copy_index < mpMesh->GetNumElements());
-
-        // The vertex element is created from a vector of nodes
-        std::vector<Node<2>*> nodes_this_elem;
-
-        // Loop through the nodes in p_elem_to_copy and add the corresponding nodes that we have already copied
-        for (unsigned node_local_idx = 0 ; node_local_idx < copy_num_nodes ; node_local_idx++)
-        {
-            Node<2>* p_local_node = p_elem_to_copy->GetNode(node_local_idx);
-            unsigned local_node_global_idx = p_local_node->GetIndex();
-            nodes_this_elem.push_back(new_nodes[local_node_global_idx]);
-        }
-
-        // Create a new node and place it in index order
-        new_elems[copy_index] = new VertexElement<2,2>(copy_index, nodes_this_elem);
-    }
-
-    // We can now create the mesh with new_elements and the subset of new_nodes
-    MutableVertexMesh<2,2>* p_temp_mesh = new MutableVertexMesh<2,2>(new_nodes, new_elems);
-*/
-    /*
-     * Recursively associate congruent nodes.
-     *
-     * For each node currently on the boundary, we loop through all other boundary nodes and check against all eight
-     * possible congruent locations.  If any one coincides, we replace the identified node with its congruent partner,
-     * delete and remove the identified node from the mesh, and start again from scratch.
-     *
-     * If a node has no congruent partners, we simply mark it as non-boundary, as it is then a node that needs to appear
-     * in the final toroidal mesh.
-     *
-     * This recursion is guaranteed to terminate as the number of boundary nodes decreases by precisely one each time
-     * CheckForCongruentNodes() is called, and CheckForCongruentNodes() returns false if there are no boundary nodes.
-     */
-/*    bool re_check = true;
-
-    while (re_check)
-    {
-        re_check = this->CheckForCongruentNodes(p_temp_mesh, width, height);
-    }
-
-    // We now copy the nodes and elements into a new toroidal mesh, and delete p_temp_mesh
-    new_nodes.clear();
-    new_nodes.resize(p_temp_mesh->GetNumNodes());
-
-    new_elems.clear();
-    new_elems.resize(p_temp_mesh->GetNumElements());
-
-    // Copy nodes
-    for (unsigned node_counter = 0 ; node_counter < p_temp_mesh->GetNumNodes() ; node_counter++)
-    {
-        Node<2>* p_node_to_copy = p_temp_mesh->GetNode(node_counter);
-
-        // Get all the information about the node we are copying
-        unsigned            copy_index       = p_node_to_copy->GetIndex();
-        c_vector<double, 2> copy_location    = p_node_to_copy->rGetLocation();
-
-        // No nodes should be boundary nodes
-        assert(!p_node_to_copy->IsBoundaryNode());
-
-        // There should not be any 'gaps' in node numbering, but we will assert just to make sure
-        assert(copy_index < p_temp_mesh->GetNumNodes());
-
-        // Create a new node and place it in index order. Every node in a periodic mesh is non-boundary.
-        new_nodes[copy_index] = new Node<2>(copy_index, copy_location, false);
-    }
-
-    // Copy elements
-    for (unsigned elem_counter = 0; elem_counter < p_temp_mesh->GetNumElements(); elem_counter++)
-    {
-        VertexElement<2,2>* p_elem_to_copy = p_temp_mesh->GetElement(elem_counter);
-
-        // Get the information relating to the element we are copying
-        unsigned copy_index     = p_elem_to_copy->GetIndex();
-        unsigned copy_num_nodes = p_elem_to_copy->GetNumNodes();
-
-        // There should not be any 'gaps' in element numbering, but we will assert just to make sure
-        assert(copy_index < p_temp_mesh->GetNumElements());
-
-        // The vertex element is created from a vector of nodes
-        std::vector<Node<2>*> nodes_this_elem;
-
-        // Loop through the nodes in p_elem_to_copy and add the corresponding nodes that we have already copied
-        for (unsigned node_local_idx = 0 ; node_local_idx < copy_num_nodes ; node_local_idx++)
-        {
-            Node<2>* p_local_node = p_elem_to_copy->GetNode(node_local_idx);
-
-            unsigned local_node_global_idx = p_local_node->GetIndex();
-
-            nodes_this_elem.push_back(new_nodes[local_node_global_idx]);
-        }
-
-        // Create a new node and place it in index order
-        new_elems[copy_index] = new VertexElement<2,2>(copy_index, nodes_this_elem);
-    }
-
-    delete p_temp_mesh;
-*/
-    /*
-     * We now create the mesh with new_elements and new_nodes.  We immediately call ReMesh() to tidy up any short edges.
-     *
-     * We then reposition all nodes to be within the box [0, width]x[0, height] to make mesh look nicer when visualised.
-     */
-/*    mpTorMesh = new Toroidal2dVertexMesh(width, height, new_nodes, new_elems);
-    mpTorMesh->ReMesh();
-
-    c_vector<double, 2> min_x_y;
-    min_x_y[0] = DBL_MAX;
-    min_x_y[1] = DBL_MAX;
-
-    // First loop is to calculate the correct offset, min_x_y
-    for (unsigned node_idx = 0 ; node_idx < mpTorMesh->GetNumNodes() ; node_idx++)
-    {
-        const c_vector<double, 2>& r_this_node_location = mpTorMesh->GetNode(node_idx)->rGetLocation();
-
-        if (r_this_node_location[0] < min_x_y[0])
-        {
-            min_x_y[0] = r_this_node_location[0];
-        }
-        if (r_this_node_location[1] < min_x_y[1])
-        {
-            min_x_y[1] = r_this_node_location[1];
-        }
-    }
-
-    // Second loop applies the offset, min_x_y, to each node in the mesh
-    for (unsigned node_idx = 0 ; node_idx < mpTorMesh->GetNumNodes() ; node_idx++)
-    {
-        mpTorMesh->GetNode(node_idx)->rGetModifiableLocation() -= min_x_y;
-    }
-
-    // Third loop is to reposition any nodes that are now outside the bounding rectangle
-    for (unsigned node_idx = 0 ; node_idx < mpTorMesh->GetNumNodes() ; node_idx++)
-    {
-        if (mpTorMesh->GetNode(node_idx)->rGetLocation()[0] >= width)
-        {
-            mpTorMesh->GetNode(node_idx)->rGetModifiableLocation()[0] -= width;
-        }
-        if (mpTorMesh->GetNode(node_idx)->rGetLocation()[1] >= height)
-        {
-            mpTorMesh->GetNode(node_idx)->rGetModifiableLocation()[1] -= height;
-        }
-    }
-*/
-    return mpTorMesh;
-}
-
-bool VoronoiPrism3dVertexMeshGenerator::CheckForCongruentNodes(MutableVertexMesh<2,2>* pMesh, double width, double height)  //\todo much later together with toroidalMesh
+bool VoronoiPrism3dVertexMeshGenerator::CheckForCongruentNodes(MutableVertexMesh<2,2>* pMesh, double width, double height)  ///\todo much later together with toroidalMesh
 {
     // First find all the current boundary nodes in pMesh
     std::vector<Node<2>*> boundary_nodes;
@@ -415,15 +213,10 @@ bool VoronoiPrism3dVertexMeshGenerator::CheckForCongruentNodes(MutableVertexMesh
     return true;
 }
 
-std::vector<c_vector<double, 2> > VoronoiPrism3dVertexMeshGenerator::GetInitialPointLocations() //todo maybe seed can be placed as parameter?
+std::vector<c_vector<double, 2> > VoronoiPrism3dVertexMeshGenerator::GetInitialPointLocations() ///\todo maybe seed can be placed as parameter?
 {
     // Create a vector which contains mTotalNumElements spaces
     std::vector<c_vector<double, 2> > seed_points(mTotalNumElements);
-
-    RandomNumberGenerator* p_rand_gen = RandomNumberGenerator::Instance();
-
-    //\todo remove this one test is done
-    p_rand_gen->Reseed(0);
 
     // Create the correct number of suitably scaled random numbers
     for (unsigned point_idx = 0 ; point_idx < mTotalNumElements ; point_idx++)
@@ -485,7 +278,7 @@ std::vector<c_vector<double, 2> > VoronoiPrism3dVertexMeshGenerator::GetElementC
     return element_centroids;
 }
 
-void VoronoiPrism3dVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_vector<double, 2> >& rSeedLocations) //done, todo check if ppl understand what i mean
+void VoronoiPrism3dVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_vector<double, 2> >& rSeedLocations)
 {
     // Clear the mesh nodes, faces and elements, as they will be replaced in this method
     std::vector<Node<3>*> lower_nodes;
@@ -493,8 +286,8 @@ void VoronoiPrism3dVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_
     std::vector<VertexElement<2, 3>*> faces;
     std::vector<VertexElement<3, 3>*> elements;
 
-    // these two containers are used to recycle created lateral faces
-    // map is chosen over vector as the number of nodes is not known a priori
+    // These two containers are used to recycle created lateral faces
+    // (map is chosen over vector as the number of nodes is not known a priori)
     std::vector<bool> does_node_already_exist;
     std::map<unsigned, std::vector<unsigned> > node_to_lateral_face_indices;
 
@@ -644,13 +437,14 @@ void VoronoiPrism3dVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_
 
             } while (edge != cell.incident_edge());
 
-            /**create faces and element.
+            /**
+             * Create faces and element.
              * According to boost documentation, with `edge = edge->next()` we should obtain the nodes in counter-clockwise order.
              * Upper and lower faces will be created as usual.
              * As for lateral faces, to avoid constantly searching through the entire faces vector and also creating the
              * exact same lateral face twice, a map which has the index of the (lower) node as key and a vector of its lateral face
              * indices as value is used.
-            **/ //todo check if others understand what i'm trying to express
+            **/ ///\todo check if others understand what i'm trying to express
 
             // initializing vectors which are required for the generation of the VertexElement<3, 3>
             unsigned numLowerNodesThisElement = lower_nodes_this_elem.size();
@@ -675,43 +469,43 @@ void VoronoiPrism3dVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_
                 unsigned node1Index = lower_nodes_this_elem[localNodeIndex]->GetIndex();
                 unsigned node2Index = lower_nodes_this_elem[(localNodeIndex+1) % numLowerNodesThisElement]->GetIndex();
 
-                // the values of the maps are called here because they will be used both existing and creating branch.
+                // The values of the maps are called here because they will be used both existing and creating branch.
                 // they are called by reference as they will be modified if they enter creating branch.
                 std::vector<unsigned>& r_face1_indices = node_to_lateral_face_indices[node1Index];
                 std::vector<unsigned>& r_face2_indices = node_to_lateral_face_indices[node2Index];
 
-                // if both nodes already exist, the lateral face MIGHT have been created.
-                unsigned existingFaceIndex = UINT_MAX;
+                // If both nodes already exist, the lateral face MIGHT have been created.
+                unsigned existing_face_index = UINT_MAX;
 
                 if (does_node_already_exist[node1Index] && does_node_already_exist[node2Index])
                 {
-                    // now need to search for the same lateral face index in both vector
+                    // Now need to search for the same lateral face index in both vector
                     // not a too complicated and resource intensive (as r_faces_index vectors have length of at most 3 or 4
                     // therefore not using existing function in <algorithm>
                     for (unsigned i1 = 0; i1 < r_face1_indices.size(); i1++)
                     {
-                        for (unsigned i2 = 0; ( i2 < r_face2_indices.size() && existingFaceIndex==UINT_MAX ); i2++)
+                        for (unsigned i2 = 0; ( i2 < r_face2_indices.size() && existing_face_index==UINT_MAX ); i2++)
                         {
                             if (r_face1_indices[i1] == r_face2_indices[i2])
                             {
-                                existingFaceIndex = r_face1_indices[i1];
+                                existing_face_index = r_face1_indices[i1];
                                 break;
                             }
                         }
                     }
 
-                    if ( existingFaceIndex != UINT_MAX)// meaning it's found
+                    if (existing_face_index != UINT_MAX) // meaning it's found
                     {
-                        faces_this_elem.push_back(faces[existingFaceIndex]);
-                        // face orientation is false as it was created by another element. CCW for another will be CW when
+                        faces_this_elem.push_back(faces[existing_face_index]);
+                        // Face orientation is false as it was created by another element. CCW for another will be CW when
                         // viewing from the other side as rotation is pseudovectorial
                         faces_orientation.push_back(false);
                     }
 
                 }
-                if (existingFaceIndex == UINT_MAX)
+                if (existing_face_index == UINT_MAX)
                 {
-                    //create new lateral rectangular face
+                    // Create new lateral rectangular face
                     std::vector<Node<3>*> nodes_of_lateral_face;
                     nodes_of_lateral_face.push_back(lower_nodes[node1Index]);
                     nodes_of_lateral_face.push_back(lower_nodes[node2Index]);
@@ -724,12 +518,12 @@ void VoronoiPrism3dVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_
                     faces_this_elem.push_back(p_lateral_face);
                     faces_orientation.push_back(true);
 
-                    //update node_to_lateral_face_indices
+                    // Update node_to_lateral_face_indices
                     r_face1_indices.push_back(newFaceIndex);
                     r_face2_indices.push_back(newFaceIndex);
                 }
-
             }
+
             VertexElement<3, 3>* p_elem = new VertexElement<3, 3>(elements.size(), faces_this_elem, faces_orientation);
             elements.push_back( p_elem );
         }
@@ -748,7 +542,7 @@ void VoronoiPrism3dVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_
     for (unsigned upperRunningIndex=0; upperRunningIndex<upperNodeLength; upperRunningIndex++)
     {
         upper_nodes[upperRunningIndex]->rGetModifiableIndex() = lower_nodes.size();
-        // alternatively  if the upper nodes start with 0 as well
+        // Alternatively if the upper nodes start with 0 as well
         // upper_nodes[upperRunningIndex]->rGetModifiableIndex() += loweNodeLength;
         lower_nodes.push_back(upper_nodes[upperRunningIndex]);
     }
@@ -877,7 +671,7 @@ std::vector<double> VoronoiPrism3dVertexMeshGenerator::GetPolygonDistribution() 
 
         // All polygons are assumed to have 3, 4, 5, ..., mMaxExpectedNumSidesPerPolygon sides
         // and since there should be an upper node for every lower node, it should be even number
-        assert(num_nodes_this_elem%2 == 0);     // todo check if the pairs is really lower and upper after simulation
+        assert(num_nodes_this_elem%2 == 0);     ///\todo check if the pairs is really lower and upper after simulation
         assert(num_nodes_this_elem > 2);
         assert(num_nodes_this_elem <= mMaxExpectedNumSidesPerPolygon);
 

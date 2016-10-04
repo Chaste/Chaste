@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2014, University of Oxford.
+Copyright (c) 2005-2016, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -40,6 +40,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 #include "MutableVertexMesh.hpp"
 
+/**
+ * Honeycomb mesh generator that creates a 3D 'prismatic honeycomb' mesh for use in vertex simulations.
+ *
+ * NOTE: the user should delete the mesh after use to manage memory.
+ */
 class HexagonalPrism3dVertexMeshGenerator
 {
 protected:
@@ -58,9 +63,9 @@ public:
      * @param elementHeight the height of each element in the z direction
      */
     HexagonalPrism3dVertexMeshGenerator(unsigned numElementsInXDirection,
-         unsigned numElementsInYDirection,
-         double elementSideLength,
-         double elementHeight);
+                                        unsigned numElementsInYDirection,
+                                        double elementSideLength,
+                                        double elementHeight);
 
     /**
      * Null constructor for derived classes to call.

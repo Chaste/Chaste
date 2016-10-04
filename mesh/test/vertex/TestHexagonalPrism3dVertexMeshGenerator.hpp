@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2014, University of Oxford.
+Copyright (c) 2005-2016, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -32,6 +32,7 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
+
 #ifndef TESTHEXAGONALPRISM3DVERTEXMESHGENERATOR_HPP_
 #define TESTHEXAGONALPRISM3DVERTEXMESHGENERATOR_HPP_
 
@@ -39,7 +40,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CheckpointArchiveTypes.hpp"
 #include "FakePetscSetup.hpp"
 #include "HexagonalPrism3dVertexMeshGenerator.hpp"
-
 
 class TestHexagonalPrism3dVertexMeshGenerator : public CxxTest::TestSuite
 {
@@ -66,9 +66,7 @@ public:
         TS_ASSERT_EQUALS(p_element_0->GetNode(9)->GetIndex(), 10u);
         TS_ASSERT_EQUALS(p_element_0->GetNode(10)->GetIndex(), 5u);
         TS_ASSERT_EQUALS(p_element_0->GetNode(11)->GetIndex(), 11u);
-
     }
-
 
     void TestRowOfThreeElements() throw (Exception)
     {
@@ -195,6 +193,7 @@ public:
         vertex_mesh_writer.AddCellData("Cell IDs", cell_ids);
         vertex_mesh_writer.WriteVtkUsingMesh(*p_mesh);
 
+        ///\todo need to add a test here
     }
 
     void TestThreeByThreeElements() throw (Exception)
@@ -429,6 +428,8 @@ public:
 
         vertex_mesh_writer2.AddCellData("Cell IDs", cell_ids);
         vertex_mesh_writer2.WriteVtkUsingMesh(*p_mesh);
+
+        ///\todo need to add a test here
     }
 
     void TestFourByFourElements() throw (Exception)
@@ -530,6 +531,8 @@ public:
 
         vertex_mesh_writer3.AddCellData("Cell IDs", cell_ids);
         vertex_mesh_writer3.WriteVtkUsingMesh(*p_mesh);
+
+        ///\todo need to add a test here
     }
 
     void TestLargeMesh() throw (Exception)
