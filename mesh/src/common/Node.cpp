@@ -156,12 +156,6 @@ c_vector<double, SPACE_DIM>& Node<SPACE_DIM>::rGetModifiableLocation()
 }
 
 template<unsigned SPACE_DIM>
-unsigned& Node<SPACE_DIM>::rGetModifiableIndex()
-{
-    return mIndex;
-}
-
-template<unsigned SPACE_DIM>
 unsigned Node<SPACE_DIM>::GetIndex() const
 {
     return mIndex;

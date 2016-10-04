@@ -241,11 +241,6 @@ public:
     c_vector<double, SPACE_DIM>& rGetModifiableLocation();
 
     /**
-     * @return the index of this node in the mesh. (modifiable)
-     */
-    unsigned& rGetModifiableIndex();
-
-    /**
      * @return the index of this node in the mesh.
      */
     unsigned GetIndex() const;

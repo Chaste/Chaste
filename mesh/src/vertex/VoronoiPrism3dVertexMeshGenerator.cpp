@@ -68,7 +68,7 @@ VoronoiPrism3dVertexMeshGenerator::~VoronoiPrism3dVertexMeshGenerator()
     }
 }
 
-void VoronoiPrism3dVertexMeshGenerator::GenerateVoronoiMesh()   ///\todo ask below
+void VoronoiPrism3dVertexMeshGenerator::GenerateVoronoiMesh()
 {
     /**
      * The initial points will be randomly distributed in the box [0.0, mMultiplierInX] x [0.0, mMultiplierInY], which
@@ -116,107 +116,12 @@ MutableVertexMesh<3,3>* VoronoiPrism3dVertexMeshGenerator::GetMeshAfterReMesh()
     return mpMesh;
 }
 
-bool VoronoiPrism3dVertexMeshGenerator::CheckForCongruentNodes(MutableVertexMesh<2,2>* pMesh, double width, double height)  ///\todo much later together with toroidalMesh
-{
-    // First find all the current boundary nodes in pMesh
-    std::vector<Node<2>*> boundary_nodes;
-    for (unsigned node_idx = 0 ; node_idx < pMesh->GetNumNodes() ; node_idx++)
-    {
-        Node<2>* p_node = pMesh->GetNode(node_idx);
-
-        if (p_node->IsBoundaryNode())
-        {
-            boundary_nodes.push_back(p_node);
-        }
-    }
-
-    // If there are no boundary nodes, return false (we're done checking congruencies)
-    if (boundary_nodes.empty())
-    {
-        return false;
-    }
-
-    // Otherwise, calculate the eight possible congruent locations for the current node
-    Node<2>* p_node_a = *(boundary_nodes.begin());
-    c_vector<double, 2> node_a_pos = p_node_a->rGetLocation();
-    std::vector<c_vector<double,2> > congruent_locations(8, node_a_pos);
-
-    congruent_locations[0][0] += width;
-
-    congruent_locations[1][1] += height;
-
-    congruent_locations[2][0] -= width;
-
-    congruent_locations[3][1] -= height;
-
-    congruent_locations[4][0] += width;
-    congruent_locations[4][1] += height;
-
-    congruent_locations[5][0] -= width;
-    congruent_locations[5][1] += height;
-
-    congruent_locations[6][0] -= width;
-    congruent_locations[6][1] -= height;
-
-    congruent_locations[7][0] += width;
-    congruent_locations[7][1] -= height;
-
-    // Loop over all other boundary nodes
-    for (unsigned node_b_counter = 0; node_b_counter < boundary_nodes.size(); node_b_counter++)
-    {
-        // Get the index of the current boundary node, and the corresponding node from the mesh
-        unsigned node_b_idx = boundary_nodes[node_b_counter]->GetIndex();
-        Node<2>* p_mesh_node_b = pMesh->GetNode(node_b_idx);
-
-        if (p_node_a == p_mesh_node_b)
-        {
-            continue;
-        }
-
-        c_vector<double, 2> node_b_pos = p_mesh_node_b->rGetLocation();
-
-        // Loop over the eight possible congruent locations and check for coincidence of location
-        for (unsigned pos = 0 ; pos < congruent_locations.size() ; pos++)
-        {
-            if (norm_inf(node_b_pos - congruent_locations[pos]) < mTol)
-            {
-                // Once we find a congruent location, we replace that node in all containing elements
-                std::set<unsigned> containing_elems = p_mesh_node_b->rGetContainingElementIndices();
-
-                assert(containing_elems.size() > 0);
-
-                for (std::set<unsigned>::iterator it = containing_elems.begin() ; it != containing_elems.end() ; ++it)
-                {
-                    VertexElement<2,2>* p_this_elem = pMesh->GetElement(*it);
-                    unsigned local_idx = p_this_elem->GetNodeLocalIndex(p_mesh_node_b->GetIndex());
-
-                    assert(local_idx < UINT_MAX);
-
-                    p_this_elem->AddNode(p_node_a, local_idx);
-                    p_this_elem->DeleteNode(local_idx);
-                }
-
-                // Delete the node_b and remove it from the mesh, and return true to start checking again from scratch
-                pMesh->DeleteNodePriorToReMesh(p_mesh_node_b->GetIndex());
-                pMesh->RemoveDeletedNodes();
-                return true;
-            }
-        }
-    }
-
-    /*
-     * If we have checked p_node_a against all node_b candidates and have not found a congruent location, p_node_a can
-     * be re-tagged as a non-boundary node, and so will not get checked again next time this function is called.
-     */
-    p_node_a->SetAsBoundaryNode(false);
-
-    return true;
-}
-
-std::vector<c_vector<double, 2> > VoronoiPrism3dVertexMeshGenerator::GetInitialPointLocations() ///\todo maybe seed can be placed as parameter?
+std::vector<c_vector<double, 2> > VoronoiPrism3dVertexMeshGenerator::GetInitialPointLocations()
 {
     // Create a vector which contains mTotalNumElements spaces
     std::vector<c_vector<double, 2> > seed_points(mTotalNumElements);
+
+    RandomNumberGenerator* p_rand_gen = RandomNumberGenerator::Instance();
 
     // Create the correct number of suitably scaled random numbers
     for (unsigned point_idx = 0 ; point_idx < mTotalNumElements ; point_idx++)
@@ -425,7 +330,7 @@ void VoronoiPrism3dVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_
                         does_node_already_exist.push_back(false);
 
                         // Creating the corresponding upper node
-                        // apperently, 2 nodes having the same index do not cause any problem yet \todo
+                        ///\todo check this - apperently, 2 nodes having the same index do not cause any problem yet
                         Node<3>* p_this_upper_node = new Node<3>(upper_nodes.size(), true, x_location, y_location, mElementHeightZ);
                         upper_nodes.push_back(p_this_upper_node);
                         upper_nodes_this_elem.push_back(p_this_upper_node);
@@ -444,9 +349,9 @@ void VoronoiPrism3dVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_
              * As for lateral faces, to avoid constantly searching through the entire faces vector and also creating the
              * exact same lateral face twice, a map which has the index of the (lower) node as key and a vector of its lateral face
              * indices as value is used.
-            **/ ///\todo check if others understand what i'm trying to express
+            **/
 
-            // initializing vectors which are required for the generation of the VertexElement<3, 3>
+            // Initializing vectors which are required for the generation of the VertexElement<3, 3>
             unsigned numLowerNodesThisElement = lower_nodes_this_elem.size();
             std::vector<VertexElement<2, 3>*> faces_this_elem;
             std::vector<bool> faces_orientation;
@@ -463,14 +368,14 @@ void VoronoiPrism3dVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_
             faces_this_elem.push_back(p_upper_face);
             faces_orientation.push_back(true);
 
-            // creating all the lateral faces in CCW
-            for (unsigned localNodeIndex=0; localNodeIndex<numLowerNodesThisElement; localNodeIndex++ )
+            // Creating all the lateral faces in CCW
+            for (unsigned localNodeIndex=0; localNodeIndex<numLowerNodesThisElement; ++localNodeIndex )
             {
                 unsigned node1Index = lower_nodes_this_elem[localNodeIndex]->GetIndex();
                 unsigned node2Index = lower_nodes_this_elem[(localNodeIndex+1) % numLowerNodesThisElement]->GetIndex();
 
                 // The values of the maps are called here because they will be used both existing and creating branch.
-                // they are called by reference as they will be modified if they enter creating branch.
+                // They are called by reference as they will be modified if they enter creating branch.
                 std::vector<unsigned>& r_face1_indices = node_to_lateral_face_indices[node1Index];
                 std::vector<unsigned>& r_face2_indices = node_to_lateral_face_indices[node2Index];
 
@@ -482,9 +387,9 @@ void VoronoiPrism3dVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_
                     // Now need to search for the same lateral face index in both vector
                     // not a too complicated and resource intensive (as r_faces_index vectors have length of at most 3 or 4
                     // therefore not using existing function in <algorithm>
-                    for (unsigned i1 = 0; i1 < r_face1_indices.size(); i1++)
+                    for (unsigned i1 = 0; i1 < r_face1_indices.size(); ++i1)
                     {
-                        for (unsigned i2 = 0; ( i2 < r_face2_indices.size() && existing_face_index==UINT_MAX ); i2++)
+                        for (unsigned i2 = 0; ( i2 < r_face2_indices.size() && existing_face_index==UINT_MAX ); ++i2)
                         {
                             if (r_face1_indices[i1] == r_face2_indices[i2])
                             {
@@ -536,12 +441,12 @@ void VoronoiPrism3dVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_
     }
     // Combine the upper and lower nodes by adding upper_nodes into lower_nodes.
     // The index of upper nodes need to be modified.
-    unsigned lowerNodeLength = lower_nodes.size();
+    // unsigned lowerNodeLength = lower_nodes.size();
     unsigned upperNodeLength = upper_nodes.size();
 
-    for (unsigned upperRunningIndex=0; upperRunningIndex<upperNodeLength; upperRunningIndex++)
+    for (unsigned upperRunningIndex=0; upperRunningIndex<upperNodeLength; ++upperRunningIndex)
     {
-        upper_nodes[upperRunningIndex]->rGetModifiableIndex() = lower_nodes.size();
+        upper_nodes[upperRunningIndex]->SetIndex(lower_nodes.size());
         // Alternatively if the upper nodes start with 0 as well
         // upper_nodes[upperRunningIndex]->rGetModifiableIndex() += loweNodeLength;
         lower_nodes.push_back(upper_nodes[upperRunningIndex]);
@@ -651,7 +556,7 @@ void VoronoiPrism3dVertexMeshGenerator::ValidateSeedLocations(std::vector<c_vect
     }
 }
 
-std::vector<double> VoronoiPrism3dVertexMeshGenerator::GetPolygonDistribution()     // todo expand n read pls
+std::vector<double> VoronoiPrism3dVertexMeshGenerator::GetPolygonDistribution()
 {
     assert(mpMesh != NULL);
 
@@ -673,7 +578,7 @@ std::vector<double> VoronoiPrism3dVertexMeshGenerator::GetPolygonDistribution() 
         // and since there should be an upper node for every lower node, it should be even number
         assert(num_nodes_this_elem%2 == 0);     ///\todo check if the pairs is really lower and upper after simulation
         assert(num_nodes_this_elem > 2);
-        assert(num_nodes_this_elem <= mMaxExpectedNumSidesPerPolygon);
+        assert(num_nodes_this_elem/2 <= mMaxExpectedNumSidesPerPolygon);
 
         // Increment correct place in counter - triangles in place 0, squares in 1, etc
         num_polygons[num_nodes_this_elem/2 - 3]++;

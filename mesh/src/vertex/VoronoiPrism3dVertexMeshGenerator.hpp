@@ -158,19 +158,6 @@ protected:
      */
     void ValidateSeedLocations(std::vector<c_vector<double, 2> >& rSeedLocations);
 
-    /**
-     * Helper method for GetToroidalMesh().
-     *
-     * Takes the first boundary node, A, and checks it for congruence in position with all other boundary nodes. If a
-     * congruent location is found, then A replaces the congruent node and this function returns true.  If none are
-     * found, A is tagged as no longer being a boundary node.
-     *
-     * @param pMesh a pointer to the MutableVertexMesh we are operating on
-     * @param width the periodic width of the mesh
-     * @param height the periodic height of the mesh
-     */
-    bool CheckForCongruentNodes(MutableVertexMesh<2,2>* pMesh, double width, double height);
-
 public:
 
     /**
