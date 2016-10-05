@@ -96,7 +96,7 @@ public:
      * @param numLocalRows the number of rows of the collection that this process should own.
      * @param isPeriodic whether the box collection should be periodic. Defaults to true.
      */
-    virtual void SetUpBoxCollection(double cutOffLength, c_vector<double, 2*2> domainSize, int numLocalRows = PETSC_DECIDE, bool isPeriodicInX = true, bool isPeriodicInY = false, bool isPeriodicInZ = false);
+    virtual void SetUpBoxCollection(double cutOffLength, c_vector<double, 2*2> domainSize, int numLocalRows = PETSC_DECIDE, bool isPeriodic = true);
 
     /**
      * Overridden GetVectorFromAtoB() method.
