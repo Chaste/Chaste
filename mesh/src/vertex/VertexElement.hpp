@@ -208,7 +208,7 @@ public:
     VertexElement<0, SPACE_DIM>* GetFace(unsigned index) const;
 
     /**
-     * @return whether the face with a given index is oriented clockwise.
+     * @return whether the face with a given index is oriented anti clockwise.
      *
      * @param index the index of the face
      */
