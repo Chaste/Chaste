@@ -403,6 +403,16 @@ public:
     virtual double GetSurfaceAreaOfElement(unsigned index);
 
     /**
+     * Compute the volume gradient of a 3D element at one of its nodes.
+     *
+     * @param pElement  pointer to a specified vertex element
+     * @param globalIndex  the global index of the node
+     *
+     * @return the gradient of the area of the element, evaluated at this node.
+     */
+    c_vector<double, SPACE_DIM> GetVolumeGradientofElementAtNode(VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement, unsigned globalIndex);
+
+    /**
      * Compute the area gradient of a 2D element at one of its nodes.
      *
      * N.B. This calls GetVectorFromAtoB(), which can be overridden
@@ -414,6 +424,19 @@ public:
      * @return the gradient of the area of the element, evaluated at this node.
      */
     c_vector<double, SPACE_DIM> GetAreaGradientOfElementAtNode(VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement, unsigned localIndex);
+
+    /**
+     * Compute the area gradient of a 3D face at one of its nodes.
+     *
+     * N.B. This calls GetVectorFromAtoB(), which can be overridden
+     * in daughter classes for non-Euclidean metrics.
+     *
+     * @param pFace  pointer to a specified vertex element
+     * @param localIndex  local index of a node in this element
+     *
+     * @return the gradient of the area of the element, evaluated at this node.
+     */
+    c_vector<double, SPACE_DIM> GetAreaGradientOfFaceAtNode(VertexElement<ELEMENT_DIM-1, SPACE_DIM>* pFace, unsigned localIndex);
 
     /**
      * Compute the gradient of the edge of a 2D element ending at its nodes.
@@ -429,6 +452,20 @@ public:
     c_vector<double, SPACE_DIM> GetPreviousEdgeGradientOfElementAtNode(VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement, unsigned localIndex);
 
     /**
+     * Compute the gradient of the edge of a 3D face ending at its nodes.
+     *
+     * N.B. This calls GetVectorFromAtoB(), which can be overridden
+     * in daughter classes for non-Euclidean metrics.
+     *
+     * @param pFace  pointer to a specified face in this element
+     * @param localIndex  local index of a node in this element
+     * @param faceOrientation  the orientation of the face (CCW = true)
+     *
+     * @return the gradient of the edge of the face of the element that ends at this node.
+     */
+    c_vector<double, SPACE_DIM> GetPreviousEdgeGradientOfElementAtNode(VertexElement<ELEMENT_DIM-1, SPACE_DIM>* pFace, unsigned localIndex, bool faceOrientation);
+
+    /**
      * Compute the gradient of the edge of a 2D element starting at its nodes.
      *
      * N.B. This calls GetVectorFromAtoB(), which can be overridden
@@ -440,6 +477,20 @@ public:
      * @return the gradient of the edge of the element that starts at this node.
      */
     c_vector<double, SPACE_DIM> GetNextEdgeGradientOfElementAtNode(VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement, unsigned localIndex);
+
+    /**
+     * Compute the gradient of the edge of a 3D face starting at its nodes.
+     *
+     * N.B. This calls GetVectorFromAtoB(), which can be overridden
+     * in daughter classes for non-Euclidean metrics.
+     *
+     * @param pFace  pointer to a specified face in this element
+     * @param localIndex  local index of a node in this element
+     * @param faceOrientation  the orientation of the face (CCW = true)
+     *
+     * @return the gradient of the edge of the face of the element that starts at this node.
+     */
+    c_vector<double, SPACE_DIM> GetNextEdgeGradientOfElementAtNode(VertexElement<ELEMENT_DIM-1, SPACE_DIM>* pFace, unsigned localIndex, bool faceOrientation);
 
     /**
      * Compute the gradient of the perimeter of a 2D element at its nodes.

@@ -55,6 +55,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WelikyOsterForce.hpp"
 #include "FarhadifarForce.hpp"
 #include "DiffusionForce.hpp"
+#include "MisraForce.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "ApcOneHitCellMutationState.hpp"
 #include "ApcTwoHitCellMutationState.hpp"
@@ -1828,6 +1829,13 @@ public:
         FarhadifarForce<2> farhadifar_force;
         TS_ASSERT_THROWS_THIS(farhadifar_force.AddForceContribution(cell_population),
                 "FarhadifarForce is to be used with a VertexBasedCellPopulation only");
+
+        NodesOnlyMesh<3>* p_nodes_only_mesh = new NodesOnlyMesh<3>();
+        NodeBasedCellPopulation<3> cell_population3(*p_nodes_only_mesh);
+        // Test that MisraForce throws the correct exception
+        MisraForce<3> misra_force;
+        TS_ASSERT_THROWS_THIS(misra_force.AddForceContribution(cell_population3),
+                        "MisraForce is to be used with a VertexBasedCellPopulation only");
 
         // Avoid memory leak
         for (unsigned i=0; i<nodes.size(); i++)

@@ -32,7 +32,7 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
-
+#include "Debug.hpp"
 #include "VertexMesh.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "UblasCustomFunctions.hpp"
@@ -711,7 +711,7 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetCentroidOfEle
             ///\todo compute centroid rather than centre of mass (see #1422)
             for (unsigned local_index=0; local_index<num_nodes; local_index++)
             {
-                centroid += p_element->GetNodeLocation(local_index);
+                centroid += p_element->GetNodeLocation(local_index);//PRINT_VARIABLE(p_element->GetNodeLocation(local_index));
             }
             centroid /= ((double) num_nodes);
         }
@@ -1559,6 +1559,205 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateAreaOfFace(VertexElement<ELE
     c_vector<double, SPACE_DIM> unit_normal;
     return CalculateUnitNormalToFaceWithArea(pFace, unit_normal);
 }
+
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetVolumeGradientofElementAtNode(VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement, unsigned globalIndex)
+{
+    ///\todo check this derivation again
+    // If I have done it correctly, it should look like
+    //
+    // sum_{j, such that face j containing node i} { 1/6*VectorProduct( C_j, r_{i+1} - r_{i-1}) + A_j/(3*n_j).
+    // where C_j (vector) is the centroid of face j, A_j (vector) is the area of face j,
+    // r_{i+1}/r_{i-1} is the next/previous node of node i in that face.
+
+    assert(SPACE_DIM==3 && ELEMENT_DIM==3);
+    c_vector<double, SPACE_DIM> volume_gradient = zero_vector<double>(3);
+
+    for (unsigned face_index=0; face_index<pElement->GetNumFaces(); ++face_index)
+    {
+        const VertexElement<ELEMENT_DIM-1, SPACE_DIM>* p_face = pElement->GetFace(face_index);
+        const bool face_orientation = pElement->FaceIsOrientatedAntiClockwise(face_index);
+        const unsigned this_local_index = p_face->GetNodeLocalIndex(globalIndex);
+        const unsigned num_nodes = p_face->GetNumNodes();
+        c_vector<double, SPACE_DIM> this_face_gradient_contribution = zero_vector<double>(3);
+
+        // if this face contains the node, it will be some number, not UINT_MAX. Second statement just as safety precaution
+        if ( this_local_index!=UINT_MAX && this_local_index<num_nodes)
+        {
+            const unsigned next_local_index = (this_local_index+1)%num_nodes;
+            const unsigned previous_local_index = (this_local_index-1+num_nodes)%num_nodes;
+            const c_vector<double, SPACE_DIM> previous_to_next = p_face->GetNodeLocation(next_local_index) - p_face->GetNodeLocation(previous_local_index);
+
+            // Simply just copied from GetCentroidOfElement as it cannot be utilise directly
+            c_vector<double, SPACE_DIM> face_centroid = zero_vector<double>(SPACE_DIM);
+            for (unsigned tmp_index=0; tmp_index<num_nodes; ++tmp_index)
+            {
+                face_centroid += p_face->GetNodeLocation(tmp_index);
+            }
+            face_centroid /= ((double) num_nodes);
+            this_face_gradient_contribution += VectorProduct(face_centroid, previous_to_next) / 6.0;
+
+            c_vector<double, 3> face_area = zero_vector<double>(3);
+            for (unsigned current_running_index=0; current_running_index<num_nodes; ++current_running_index)
+            {
+                // We add an extra num_nodes_in_element in the line below as otherwise this term can be negative, which breaks the % operator
+                const unsigned previous_running_index = (current_running_index+num_nodes-1)%num_nodes;
+
+                const c_vector<double, SPACE_DIM> current_node_relative_location = p_face->GetNodeLocation(current_running_index) - face_centroid;
+                const c_vector<double, SPACE_DIM> previous_node_relative_location = p_face->GetNodeLocation(previous_running_index) - face_centroid;
+
+                face_area += VectorProduct(current_node_relative_location, previous_node_relative_location) / 2.0;
+            }
+
+            this_face_gradient_contribution += face_area/(3.0*num_nodes);
+        }
+
+        // If it is oriented the other way, then r_{i+1} and r_{i-1} would be exchanged,
+        // and the face_area (vector) will have different sign.
+        if (face_orientation)
+        {
+            this_face_gradient_contribution *= -1.0;
+        }
+
+        volume_gradient += this_face_gradient_contribution;
+    }
+
+    return volume_gradient;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetAreaGradientOfFaceAtNode(VertexElement<ELEMENT_DIM-1,SPACE_DIM>* pFace, unsigned localIndex)
+{
+    // Luckily for us, since Area is a scalar quantity, the face orientation doesn't have effect on it
+    assert(SPACE_DIM==3);
+
+    const unsigned num_nodes_in_face = pFace->GetNumNodes();
+    c_vector<double, SPACE_DIM> area_gradient = zero_vector<double>(SPACE_DIM);
+
+    // Simply just copied from GetCentroidOfElement as it cannot be utilise directly
+    c_vector<double, SPACE_DIM> face_centroid = zero_vector<double>(SPACE_DIM);
+    for (unsigned tmp_index=0; tmp_index<num_nodes_in_face; ++tmp_index)
+    {
+        face_centroid += pFace->GetNodeLocation(tmp_index);
+    }
+    face_centroid /= ((double) num_nodes_in_face);
+
+    // Now we need to loop through all the sub area according to Misra's paper
+    // As in 3D, the area vector have x- and y-components, thus the simplified formula for 2D case is not used.
+    for (unsigned current_node_local_index=0; current_node_local_index<num_nodes_in_face; ++current_node_local_index)
+    {
+        // We add an extra num_nodes_in_element in the line below as otherwise this term can be negative, which breaks the % operator
+        const unsigned previous_node_local_index = (current_node_local_index+num_nodes_in_face-1)%num_nodes_in_face;
+
+        // We use relative location to the face_centroid rather than absolute location to simplify the calculations.
+        const c_vector<double, SPACE_DIM> current_node_relative_location = pFace->GetNodeLocation(current_node_local_index) - face_centroid;
+        const c_vector<double, SPACE_DIM> previous_node_relative_location = pFace->GetNodeLocation(previous_node_local_index) - face_centroid;
+
+        const c_vector<double, SPACE_DIM> sub_triangular_area = VectorProduct(current_node_relative_location, previous_node_relative_location) / 2.0;
+
+        ///\todo better implementation of antisymmetric Jacobian matrix with uBLAS
+        // I'm not quite sure if uBLAS can make use of the antisymmetric Jacobian matrix of sub__triangular_area
+        // I'll come back and improve on this later if I have the luxury of time to refactor and go through documentation of uBLAS.
+
+        // Axy indicates d/dy_i (A_x), where A_x is the x-component of the vector sub_triangular_area
+        //                             while d/dy_i is the PARTIAL derivative w.r.t y-component of the i-th node.
+        // Here I will add the contribution that every area has, for A_1 and A_2 in Misra paper I'll have a if-statement later.
+        double Axy = (current_node_relative_location[2] - previous_node_relative_location[2]) / (2.0*num_nodes_in_face);
+        double Ayz = (current_node_relative_location[0] - previous_node_relative_location[0]) / (2.0*num_nodes_in_face);
+        double Azx = (current_node_relative_location[1] - previous_node_relative_location[1]) / (2.0*num_nodes_in_face);
+
+        // For the case of A_1 in Misra's paper:
+        if (current_node_local_index == localIndex)
+        {
+            Axy += previous_node_relative_location[2] / 2.0;
+            Ayz += previous_node_relative_location[0] / 2.0;
+            Azx += previous_node_relative_location[1] / 2.0;
+        }
+        // For the case of A_2, rather than (aaa == (localIndex+1)%num_nodes_in_face)) I use
+        if (previous_node_local_index == localIndex)
+        {
+            Axy -= current_node_relative_location[2] / 2.0;
+            Ayz -= current_node_relative_location[0] / 2.0;
+            Azx -= current_node_relative_location[1] / 2.0;
+        }
+
+        // The following variables are not necessary, but in this way I could probably avoid long consideration and typo.
+        double Ayx = - Axy;
+        double Azy = - Ayz;
+        double Axz = - Azx;
+
+        c_vector<double, SPACE_DIM> tmp_vector;// a placeholder to make the operation clearer. could have been matrixMultiply(JA, A)
+        tmp_vector[0] =                              sub_triangular_area[1]*Ayx + sub_triangular_area[2]*Azx;
+        tmp_vector[1] = sub_triangular_area[0]*Axy                              + sub_triangular_area[2]*Azy;
+        tmp_vector[2] = sub_triangular_area[0]*Axz + sub_triangular_area[1]*Ayz                             ;
+
+        area_gradient += tmp_vector / norm_2(sub_triangular_area);
+    }
+
+    return area_gradient;
+}
+
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetNextEdgeGradientOfElementAtNode(VertexElement<ELEMENT_DIM-1, SPACE_DIM>* pFace, unsigned localIndex, bool faceOrientation)
+{
+    assert(SPACE_DIM==3);
+
+    // the next node will depend on how the face is oriented
+    unsigned num_nodes_in_face = pFace->GetNumNodes();
+    unsigned next_local_index;
+    if (faceOrientation)
+    {
+        next_local_index = (localIndex+1)%(num_nodes_in_face);
+    }
+    else
+    {
+        // We add an extra num_nodes_in_face in the line below as otherwise this term can be negative, which breaks the % operator
+        next_local_index = (localIndex-1+num_nodes_in_face)%(num_nodes_in_face);
+    }
+
+    unsigned this_global_index = pFace->GetNodeGlobalIndex(localIndex);
+    unsigned next_global_index = pFace->GetNodeGlobalIndex(next_local_index);
+
+    double next_edge_length = this->GetDistanceBetweenNodes(this_global_index, next_global_index);
+    assert(next_edge_length > DBL_EPSILON);
+
+    c_vector<double, SPACE_DIM> next_edge_gradient = this->GetVectorFromAtoB(pFace->GetNodeLocation(next_local_index), pFace->GetNodeLocation(localIndex))/next_edge_length;
+
+    return next_edge_gradient;
+}
+
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetPreviousEdgeGradientOfElementAtNode(VertexElement<ELEMENT_DIM-1, SPACE_DIM>* pFace, unsigned localIndex, bool faceOrientation)
+{
+    assert(SPACE_DIM==3);
+
+    unsigned num_nodes_in_face = pFace->GetNumNodes();
+    unsigned previous_local_index;
+    if (faceOrientation)
+    {
+        // We add an extra num_nodes_in_face in the line below as otherwise this term can be negative, which breaks the % operator
+        previous_local_index = (localIndex-1+num_nodes_in_face)%(num_nodes_in_face);
+    }
+    else
+    {
+        previous_local_index = (localIndex+1)%(num_nodes_in_face);
+    }
+
+    unsigned this_global_index = pFace->GetNodeGlobalIndex(localIndex);
+    unsigned previous_global_index = pFace->GetNodeGlobalIndex(previous_local_index);
+
+    double previous_edge_length = this->GetDistanceBetweenNodes(this_global_index, previous_global_index);
+    assert(previous_edge_length > DBL_EPSILON);
+
+    c_vector<double, SPACE_DIM> previous_edge_gradient = this->GetVectorFromAtoB(pFace->GetNodeLocation(previous_local_index), pFace->GetNodeLocation(localIndex))/previous_edge_length;
+
+    return previous_edge_gradient;
+}
+
+
 /// Specialization to avoid compiler error about zero-sized arrays
 #if defined(__xlC__)
 template<>

@@ -73,7 +73,8 @@ public:
             VoronoiPrism3dVertexMeshGenerator generator(x, y, 1, relax_step);
             MutableVertexMesh<3, 3>* p_mesh = generator.GetMesh();
 
-            VertexMeshWriter<3, 3> vertex_mesh_writer0("TestVoronoiPrism3dVertexMesh", "10x10 relaxation step: " + boost::lexical_cast<std::string>(relax_step), false);
+            VertexMeshWriter<3, 3> vertex_mesh_writer0("TestVoronoiPrism3dVertexMesh", "10x10 relaxation step: "
+                                                       + boost::lexical_cast<std::string>(relax_step), false);
             vertex_mesh_writer0.AddCellData("Cell IDs", cell_ids);
             vertex_mesh_writer0.WriteVtkUsingMesh(*p_mesh);
         }
