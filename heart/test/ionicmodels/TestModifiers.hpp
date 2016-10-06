@@ -208,8 +208,6 @@ public:
             delete p_time;
         }
      }
-
 };
-
 
 #endif //_TESTMODIFIERS_HPP_

@@ -349,6 +349,4 @@ public:
     VECTOR ComputeDerivedQuantitiesFromCurrentState(double time);
 };
 
-
-
 #endif /*ABSTRACTPARAMETERISEDSYSTEM_HPP_*/

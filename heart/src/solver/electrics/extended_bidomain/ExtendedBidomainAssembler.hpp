@@ -114,8 +114,6 @@ public:
      * Destructor.
      */
     virtual ~ExtendedBidomainAssembler();
-
 };
-
 
 #endif /*EXTENDEDBIDOMAINASSEMBLER_HPP_*/

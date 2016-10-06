@@ -137,9 +137,6 @@ public:
         TS_ASSERT_DELTA(delta, 0.9901, 1e-04);
         double mean_delta = dynamic_cast<DeltaNotchSrnModel*>(cell0->GetSrnModel())->GetMeanNeighbouringDelta();
         TS_ASSERT_DELTA(mean_delta, 1.0000, 1e-04);
-
-
-
     }
 
     void TestHeterogeneousDeltaNotchOnUntetheredTwoCellSystem()

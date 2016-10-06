@@ -33,7 +33,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-
 #include "AirwayBranch.hpp"
 #include "Exception.hpp"
 #include "UblasCustomFunctions.hpp"
@@ -56,7 +55,6 @@ std::list<Element<1,3>* > AirwayBranch::GetElements()
     return mElements;
 }
 
-
 double AirwayBranch::GetLength()
 {
     double length = 0.0;
@@ -64,9 +62,9 @@ double AirwayBranch::GetLength()
     c_matrix<double, 3, 1> jacobian; //not used
     double element_length = 0.0;
 
-    for(std::list<Element<1,3>* >::iterator iter = mElements.begin();
-        iter != mElements.end();
-        ++iter)
+    for (std::list<Element<1,3>*>::iterator iter = mElements.begin();
+         iter != mElements.end();
+         ++iter)
     {
         (*iter)->CalculateJacobian(jacobian, element_length);
         length += element_length;
@@ -83,14 +81,14 @@ double AirwayBranch::GetAverageRadius()
     c_matrix<double, 3, 1> jacobian; //not used
     double element_length = 0.0;
 
-    for(std::list<Element<1,3>* >::iterator iter = mElements.begin();
-        iter != mElements.end();
-        ++iter)
+    for (std::list<Element<1,3>* >::iterator iter = mElements.begin();
+         iter != mElements.end();
+         ++iter)
     {
         (*iter)->CalculateJacobian(jacobian, element_length);
         length += element_length;
 
-        if(mRadiusOnEdge)
+        if (mRadiusOnEdge)
         {
             radius += element_length*((*iter)->GetAttribute());
         }
@@ -110,14 +108,14 @@ double AirwayBranch::GetPoiseuilleResistance()
     c_matrix<double, 3, 1> jacobian; //not used
     double element_length = 0.0;
 
-    for(std::list<Element<1,3>* >::iterator iter = mElements.begin();
-        iter != mElements.end();
-        ++iter)
+    for (std::list<Element<1,3>*>::iterator iter = mElements.begin();
+         iter != mElements.end();
+         ++iter)
     {
         (*iter)->CalculateJacobian(jacobian, element_length);
 
         double radius = 0.0;
-        if(mRadiusOnEdge)
+        if (mRadiusOnEdge)
         {
             radius = (*iter)->GetAttribute();
         }
@@ -152,7 +150,7 @@ bool AirwayBranch::IsMajor()
 
 double AirwayBranch::GetBranchAngle()
 {
-    if(this->GetParent() == NULL)
+    if (this->GetParent() == NULL)
     {
         EXCEPTION("Insufficient airway tree structure to calculate branch angle.");
     }
@@ -165,7 +163,7 @@ double AirwayBranch::GetBranchAngle()
 
 double AirwayBranch::GetRotationAngle()
 {
-    if(this->GetParent() == NULL || this->GetParent()->GetSibling() == NULL || this->GetSibling() == NULL)
+    if (this->GetParent() == NULL || this->GetParent()->GetSibling() == NULL || this->GetSibling() == NULL)
     {
         EXCEPTION("Insufficient airway tree structure to calculate rotation angle.");
     }
@@ -175,9 +173,9 @@ double AirwayBranch::GetRotationAngle()
 
     double rotation_factor = inner_prod(n1,n2)/(norm_2(n1)*norm_2(n2));
 
-    //Sometimes the bifurcations are co-planar, which leads to an undefined angle (0.0 or pi radians are valid).
-    //For our purposes we consider this angle to be zero.
-    if(fabs(rotation_factor) == 1.0)
+    // Sometimes the bifurcations are co-planar, which leads to an undefined angle (0.0 or pi radians are valid).
+    // For our purposes we consider this angle to be zero.
+    if (fabs(rotation_factor) == 1.0)
     {
         return 0.0;
     }
@@ -196,7 +194,6 @@ void AirwayBranch::AddChild(AirwayBranch* pChild)
 {
     mAllChildren.push_back(pChild);
 }
-
 
 AirwayBranch* AirwayBranch::GetChildOne()
 {
@@ -250,13 +247,12 @@ void AirwayBranch::SetIndex(unsigned index)
 
 Node<3>* AirwayBranch::GetProximalNode()
 {
-    if(mElements.size() < 2)    // if we only have one element
+    if (mElements.size() < 2) // if we only have one element
     {
-        // assume for now nodes are ordered correctly.  \todo: make this more robust
+        // Assume for now nodes are ordered correctly.  ///\todo: make this more robust
         return mElements.front()->GetNode(0);
     }
-
-    else    // we have more than one element
+    else // we have more than one element
     {
         /**
          * We have this situation:
@@ -284,11 +280,11 @@ Node<3>* AirwayBranch::GetProximalNode()
         unsigned second_elem_node_1_global_idx = p_second_element->GetNode(1)->GetIndex();
 
         // Do logic check as described above
-        if(first_elem_node_1_global_idx == second_elem_node_0_global_idx)
+        if (first_elem_node_1_global_idx == second_elem_node_0_global_idx)
         {
             return p_first_element->GetNode(0);
         }
-        else if(first_elem_node_1_global_idx == second_elem_node_1_global_idx)
+        else if (first_elem_node_1_global_idx == second_elem_node_1_global_idx)
         {
             return p_first_element->GetNode(0);
         }
@@ -301,13 +297,12 @@ Node<3>* AirwayBranch::GetProximalNode()
 
 Node<3>* AirwayBranch::GetDistalNode()
 {
-    if(mElements.size() < 2)    // if we only have one element
+    if (mElements.size() < 2)    // if we only have one element
     {
-        // assume for now nodes are ordered correctly.  \todo: make this more robust
+        // Assume for now nodes are ordered correctly.  \todo: make this more robust
         return mElements.front()->GetNode(1);
     }
-
-    else    // we have more than one element
+    else // we have more than one element
     {
 
         /**
@@ -336,11 +331,11 @@ Node<3>* AirwayBranch::GetDistalNode()
         unsigned penultimate_elem_node_1_global_idx = p_penultimate_element->GetNode(1)->GetIndex();
 
         // Do logic check as described above
-        if(last_elem_node_0_global_idx == penultimate_elem_node_1_global_idx)
+        if (last_elem_node_0_global_idx == penultimate_elem_node_1_global_idx)
         {
             return p_last_element->GetNode(1);
         }
-        else if(last_elem_node_0_global_idx == penultimate_elem_node_0_global_idx)
+        else if (last_elem_node_0_global_idx == penultimate_elem_node_0_global_idx)
         {
             return p_last_element->GetNode(1);
         }
@@ -357,9 +352,9 @@ double AirwayBranch::GetBranchVolume()
 
     double volume = 0.0;
 
-    for(std::list<Element<1,3>* >::iterator iter = mElements.begin();
-            iter != mElements.end();
-            ++iter)
+    for (std::list<Element<1,3>* >::iterator iter = mElements.begin();
+         iter != mElements.end();
+         ++iter)
     {
         Element<1,3>* current_elem = *iter;
 
@@ -381,10 +376,9 @@ double AirwayBranch::GetBranchLateralSurfaceArea()
 
     double lateralSurfaceArea = 0.0;
 
-
-    for(std::list<Element<1,3>* >::iterator iter = mElements.begin();
-            iter != mElements.end();
-            ++iter)
+    for (std::list<Element<1,3>* >::iterator iter = mElements.begin();
+         iter != mElements.end();
+         ++iter)
     {
         Element<1,3>* current_elem = *iter;
 
@@ -407,9 +401,9 @@ c_vector<double, 3> AirwayBranch::GetBranchCentroid()
     c_vector<double, 3> centroid;
     centroid.clear();
 
-    for(std::list<Element<1,3>* >::iterator iter = mElements.begin();
-            iter != mElements.end();
-            ++iter)
+    for (std::list<Element<1,3>* >::iterator iter = mElements.begin();
+         iter != mElements.end();
+         ++iter)
     {
         Element<1,3>* current_elem = *iter;
 
@@ -439,4 +433,3 @@ bool AirwayBranch::IsTerminal()
 
     return p_distal_node->IsBoundaryNode();
 }
-

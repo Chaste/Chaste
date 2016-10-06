@@ -232,6 +232,7 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ReadNodesPerProcessorFile(const st
     delete this->mpDistributedVectorFactory;
     this->mpDistributedVectorFactory = new DistributedVectorFactory(this->GetNumNodes(), num_owned);
 }
+
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CheckIsConforming()
 {
@@ -306,7 +307,7 @@ double TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetSurfaceArea()
     assert(ELEMENT_DIM >= 1);
     const unsigned bound_element_dim = ELEMENT_DIM-1;
     assert(bound_element_dim < 3);
-    if ( bound_element_dim == 0)
+    if (bound_element_dim == 0)
     {
         return 0.0;
     }
@@ -320,7 +321,7 @@ double TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetSurfaceArea()
         it++;
     }
 
-    if ( bound_element_dim == 2)
+    if (bound_element_dim == 2)
     {
         mesh_surface /= 2.0;
     }
@@ -955,10 +956,7 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ImportFromMesher(MESHER_IO& mesher
     this->RefreshJacobianCachedData();
 }
 
-/////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////////////
-
 template class TetrahedralMesh<1,1>;
 template class TetrahedralMesh<1,2>;
 template class TetrahedralMesh<1,3>;

@@ -97,9 +97,9 @@ public:
         double y_threshold_for_S2 = mYExtent*0.5;
 
         AbstractCardiacCell* p_cell;
-        if ( x < x_threshold_for_S1 )
+        if (x < x_threshold_for_S1)
         {
-            if (y<y_threshold_for_S2)
+            if (y < y_threshold_for_S2)
             {
                 p_cell = new CellLuoRudy1991FromCellMLBackwardEuler(mpSolver, mpBothStimulus);
             }
@@ -108,7 +108,7 @@ public:
                 p_cell = new CellLuoRudy1991FromCellMLBackwardEuler(mpSolver, mpS1Stimulus);
             }
         }
-        else if ( (x < x_threshold_for_S2) && (y < y_threshold_for_S2) )
+        else if ((x < x_threshold_for_S2) && (y < y_threshold_for_S2))
         {
             p_cell = new CellLuoRudy1991FromCellMLBackwardEuler(mpSolver, mpS2Stimulus);
         }

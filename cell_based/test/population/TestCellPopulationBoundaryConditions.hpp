@@ -103,7 +103,6 @@ public:
 
             TS_ASSERT_EQUALS(boundary_condition.GetIdentifier(), "PlaneBoundaryCondition-2-3");
         }
-
     }
 
     void TestPlaneBoundaryConditionWithNodeBasedCellPopulation() throw(Exception)
@@ -328,9 +327,7 @@ public:
                 TS_ASSERT_DELTA(location[1], old_locations[&(*node_iter)][1], 1e-6);
             }
         }
-
     }
-
 
     void TestPlaneBoundaryConditionExceptions() throw(Exception)
     {

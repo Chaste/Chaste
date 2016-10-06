@@ -706,11 +706,10 @@ public:
         //sqrt(dx^2 + dy^2 + dz^2) where dx = dy = dz = 200.0
         double lobe_bound_size = sqrt(120000);
 
-        for(unsigned generation_number = 0; generation_number < generations.size(); ++generation_number)
+        for (unsigned generation_number = 0; generation_number < generations.size(); ++generation_number)
         {
             double scale_distance_limit = lobe_bound_size/30; //30 is the expected total number of generations
             TS_ASSERT_DELTA(generations[generation_number].GetDistributionRadius(), std::max(lobe_bound_size - scale_distance_limit*generation_number, 5.0), 1e-1);
-
         }
 
         double origin[3] = {0.0, 1.0, 0.0};
@@ -729,7 +728,7 @@ public:
 
         //Check that the number of distributed points becomes less with each generation
         unsigned previous_assigned_points = assigned_points;
-        for(unsigned generation_number = 1; generation_number < generations.size(); ++generation_number)
+        for (unsigned generation_number = 1; generation_number < generations.size(); ++generation_number)
         {
             generator.AddInitialApex(origin, direction, parent_direction, 10.0, generation_number);
 
@@ -766,7 +765,5 @@ private:
     }
 #endif
 };
-
-
 
 #endif /* TESTAIRWAYGENERATOR_HPP_ */

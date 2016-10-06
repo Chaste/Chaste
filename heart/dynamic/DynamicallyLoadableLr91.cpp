@@ -56,8 +56,6 @@ const double DynamicallyLoadableLr91::ionic_concentrations_Nao = 140.0;
 const double DynamicallyLoadableLr91::plateau_potassium_current_g_Kp = 0.0183;
 const double DynamicallyLoadableLr91::time_dependent_potassium_current_PR_NaK = 0.01833;
 
-
-
 /**
  * Constructor
  */
@@ -330,9 +328,6 @@ void DynamicallyLoadableLr91::VerifyStateVariables()
     }
     #undef COVERAGE_IGNORE
 }
-
-
-
 
 template<>
 void OdeSystemInformation<DynamicallyLoadableLr91>::Initialise(void)

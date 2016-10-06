@@ -294,8 +294,6 @@ private:
      * @param pElement The element to process
      */
     void CalculateElementProperties(Element<1,3>* pElement);
-
 };
-
 
 #endif // AIRWAY_TREE_WALKER

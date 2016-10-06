@@ -107,7 +107,6 @@ public:
      * @param rJacobianDeterminant the determinant of the Jacobian matrix
      */
     void GetWeightedDirectionForBoundaryElement(unsigned elementIndex, c_vector<double, SPACE_DIM>& rWeightedDirection, double& rJacobianDeterminant) const;
-
 };
 
 EXPORT_TEMPLATE_CLASS2(NonCachedTetrahedralMesh, 1, 1)

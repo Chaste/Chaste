@@ -34,18 +34,28 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "PlaneBoundaryCondition.hpp"
-#include "AbstractCentreBasedCellPopulation.hpp"
-#include "VertexBasedCellPopulation.hpp"
+#include "AbstractOffLatticeCellPopulation.hpp"
 #include "RandomNumberGenerator.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 PlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::PlaneBoundaryCondition(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>* pCellPopulation,
                                                     c_vector<double, SPACE_DIM> point,
                                                     c_vector<double, SPACE_DIM> normal)
-        : AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM>(pCellPopulation),
-          mPointOnPlane(point),
-          mUseJiggledNodesOnPlane(false)
+    : AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM>(pCellPopulation),
+      mPointOnPlane(point),
+      mUseJiggledNodesOnPlane(false)
 {
+    if (dynamic_cast<AbstractOffLatticeCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(pCellPopulation)==NULL)
+    {
+        EXCEPTION("PlaneBoundaryCondition requires a subclass of AbstractOffLatticeCellPopulation.");
+    }
+
+	// This method is not implemented in 1D
+    if (SPACE_DIM == 1)
+    {
+        EXCEPTION("PlaneBoundaryCondition is not implemented in 1D");
+    }
+
     assert(norm_2(normal) > 0.0);
     mNormalToPlane = normal/norm_2(normal);
 }
@@ -62,7 +72,6 @@ const c_vector<double, SPACE_DIM>& PlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>
     return mNormalToPlane;
 }
 
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void PlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::SetUseJiggledNodesOnPlane(bool useJiggledNodesOnPlane)
 {
@@ -78,83 +87,31 @@ bool PlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::GetUseJiggledNodesOnPlane()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void PlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::ImposeBoundaryCondition(const std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> >& rOldLocations)
 {
-    ///\todo Move this to constructor. If this is in the constructor then Exception always throws.
-    if (dynamic_cast<AbstractOffLatticeCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(this->mpCellPopulation)==NULL)
-    {
-        EXCEPTION("PlaneBoundaryCondition requires a subclass of AbstractOffLatticeCellPopulation.");
-    }
-
-    assert((dynamic_cast<AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(this->mpCellPopulation))
-            || (SPACE_DIM==ELEMENT_DIM && (dynamic_cast<VertexBasedCellPopulation<SPACE_DIM>*>(this->mpCellPopulation))) );
-
     // This is a magic number
     double max_jiggle = 1e-4;
 
-    if (SPACE_DIM != 1)
-    {
-        if (dynamic_cast<AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(this->mpCellPopulation))
-        {
-            for (typename AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>::Iterator cell_iter = this->mpCellPopulation->Begin();
-                 cell_iter != this->mpCellPopulation->End();
-                 ++cell_iter)
-            {
-                unsigned node_index = this->mpCellPopulation->GetLocationIndexUsingCell(*cell_iter);
-                Node<SPACE_DIM>* p_node = this->mpCellPopulation->GetNode(node_index);
+    // Iterate over all nodes and update their positions according to the boundary conditions
+	unsigned num_nodes = this->mpCellPopulation->GetNumNodes();
+	for (unsigned node_index=0; node_index<num_nodes; node_index++)
+	{
+		Node<SPACE_DIM>* p_node = this->mpCellPopulation->GetNode(node_index);
+		const c_vector<double, SPACE_DIM>& r_node_location = p_node->rGetLocation();
 
-                c_vector<double, SPACE_DIM> node_location = p_node->rGetLocation();
-
-                double signed_distance = inner_prod(node_location - mPointOnPlane, mNormalToPlane);
-                if (signed_distance > 0.0)
-                {
-                    // For the closest point on the plane we travel from node_location the signed_distance in the direction of -mNormalToPlane
-                    c_vector<double, SPACE_DIM> nearest_point;
-                    if (mUseJiggledNodesOnPlane)
-                    {
-                        nearest_point = node_location - (signed_distance+max_jiggle*RandomNumberGenerator::Instance()->ranf())*mNormalToPlane;
-                    }
-                    else
-                    {
-                        nearest_point = node_location - signed_distance*mNormalToPlane;
-                    }
-                    p_node->rGetModifiableLocation() = nearest_point;
-                }
-            }
-        }
-        else
-        {
-            assert(SPACE_DIM==ELEMENT_DIM);
-            assert(dynamic_cast<VertexBasedCellPopulation<SPACE_DIM>*>(this->mpCellPopulation));
-
-            // Iterate over all nodes and update their positions according to the boundary conditions
-            unsigned num_nodes = this->mpCellPopulation->GetNumNodes();
-            for (unsigned node_index=0; node_index<num_nodes; node_index++)
-            {
-                Node<SPACE_DIM>* p_node = this->mpCellPopulation->GetNode(node_index);
-                c_vector<double, SPACE_DIM> node_location = p_node->rGetLocation();
-
-                double signed_distance = inner_prod(node_location - mPointOnPlane, mNormalToPlane);
-                if (signed_distance > 0.0)
-                {
-                    // For the closest point on the plane we travel from node_location the signed_distance in the direction of -mNormalToPlane
-                    c_vector<double, SPACE_DIM> nearest_point;
-                    if (mUseJiggledNodesOnPlane)
-                    {
-                        nearest_point = node_location - (signed_distance+max_jiggle*RandomNumberGenerator::Instance()->ranf())*mNormalToPlane;
-                    }
-                    else
-                    {
-                        nearest_point = node_location - signed_distance*mNormalToPlane;
-                    }
-                    p_node->rGetModifiableLocation() = nearest_point;
-                }
-            }
-        }
-    }
-    else
-    {
-        // DIM == 1
-        NEVER_REACHED;
-        //PlaneBoundaryCondition::ImposeBoundaryCondition is not implemented in 1D
+		double signed_distance = inner_prod(r_node_location - mPointOnPlane, mNormalToPlane);
+		if (signed_distance > 0.0)
+		{
+			// For the closest point on the plane we travel from node_location the signed_distance in the direction of -mNormalToPlane
+			c_vector<double, SPACE_DIM> nearest_point;
+			if (mUseJiggledNodesOnPlane)
+			{
+				nearest_point = r_node_location - (signed_distance+max_jiggle*RandomNumberGenerator::Instance()->ranf())*mNormalToPlane;
+			}
+			else
+			{
+				nearest_point = r_node_location - signed_distance*mNormalToPlane;
+			}
+			p_node->rGetModifiableLocation() = nearest_point;
+		}
     }
 }
 
@@ -162,26 +119,18 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool PlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::VerifyBoundaryCondition()
 {
     bool condition_satisfied = true;
+	for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter = this->mpCellPopulation->Begin();
+		 cell_iter != this->mpCellPopulation->End();
+		 ++cell_iter)
+	{
+		c_vector<double, SPACE_DIM> cell_location = this->mpCellPopulation->GetLocationOfCellCentre(*cell_iter);
 
-    if (SPACE_DIM == 1)
-    {
-        EXCEPTION("PlaneBoundaryCondition is not implemented in 1D");
-    }
-    else
-    {
-        for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter = this->mpCellPopulation->Begin();
-             cell_iter != this->mpCellPopulation->End();
-             ++cell_iter)
-        {
-            c_vector<double, SPACE_DIM> cell_location = this->mpCellPopulation->GetLocationOfCellCentre(*cell_iter);
-
-            if (inner_prod(cell_location - mPointOnPlane, mNormalToPlane) > 0.0)
-            {
-                condition_satisfied = false;
-                break;
-            }
-        }
-    }
+		if (inner_prod(cell_location - mPointOnPlane, mNormalToPlane) > 0.0)
+		{
+			condition_satisfied = false;
+			break;
+		}
+	}
 
     return condition_satisfied;
 }

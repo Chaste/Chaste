@@ -70,7 +70,7 @@ public:
         else
         {
             p_model = new Kerchoffs2003ContractionModel;
-            if ( centroid[1] >= 0.05)
+            if (centroid[1] >= 0.05)
             {
                 static_cast<AbstractOdeBasedContractionModel*>(p_model)->SetParameter("tr", 25.0);
                 static_cast<AbstractOdeBasedContractionModel*>(p_model)->SetParameter("td", 25.0); // ms
@@ -205,7 +205,5 @@ public:
         delete p_mesh_m;
     }
 };
-
-
 
 #endif /* TESTABSTRACTCONTRACTIONCELLFACTORY_HPP_ */

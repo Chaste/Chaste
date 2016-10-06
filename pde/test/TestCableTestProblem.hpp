@@ -71,9 +71,6 @@ public:
     }
 };
 
-
-
-
 // solver
 template<unsigned DIM>
 class CableTestProblemSolver: public AbstractStaticLinearPdeSolver<DIM,DIM,1>
@@ -162,7 +159,7 @@ public:
             double y = p_node->rGetLocation()[1];
             double r = sqrt(x*x+y*y);
 
-            if(fabs(r-1)<1e-3)
+            if (fabs(r-1) < 1e-3)
             {
                 p_node->SetAsBoundaryNode(); // see comment above!
                 bcc.AddDirichletBoundaryCondition(p_node, p_zero_boundary_condition);
@@ -183,9 +180,8 @@ public:
             double y = current_node->GetPoint()[1];
             double r = sqrt(x*x+y*y);
 
-
             unsigned local_index = current_node->GetIndex() - mesh.GetDistributedVectorFactory()->GetLow();
-            if(r>0.1)
+            if (r > 0.1)
             {
                 // use a tolerance that is weighted by 1-r as accuracy will decrease as
                 // get closer to r=0 for which u=-infty. Visually the solution compared

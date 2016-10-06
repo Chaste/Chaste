@@ -129,8 +129,6 @@ public:
 
 public:
 
-
-
     void TestStimulatePlanein1D() throw(Exception)
     {
         ConvergeInVarious(PLANE);
@@ -213,8 +211,6 @@ public:
         TS_ASSERT_EQUALS(tester.MeshNum, 4u);
         HeartConfig::Instance()->Reset();
     }
-
-
 
     //Currently takes about 15 seconds to do mesh0, mesh1 and mesh2
     void Test3DSpace() throw(Exception)

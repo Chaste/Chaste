@@ -205,7 +205,7 @@ void CryptSimulationBoundaryCondition<DIM>::OutputCellPopulationBoundaryConditio
     AbstractCellPopulationBoundaryCondition<DIM>::OutputCellPopulationBoundaryConditionParameters(rParamsFile);
 }
 
-///////// Explicit instantiation
+// Explicit instantiation
 template class CryptSimulationBoundaryCondition<1>;
 template class CryptSimulationBoundaryCondition<2>;
 template class CryptSimulationBoundaryCondition<3>;

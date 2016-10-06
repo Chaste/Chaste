@@ -136,12 +136,12 @@ void BidomainTissue<SPACE_DIM>::CreateExtracellularConductivityTensors()
              iter != (this->mpMesh)->GetElementIteratorEnd();
              ++iter)
         {
-            // if element centroid is contained in the region
+            // If element centroid is contained in the region
             ChastePoint<SPACE_DIM> element_centroid(iter->CalculateCentroid());
             for (unsigned region_index=0; region_index< conductivities_heterogeneity_areas.size(); region_index++)
             {
-                // if element centroid is contained in the region
-              if ( conductivities_heterogeneity_areas[region_index]->DoesContain( element_centroid ) )
+                // If element centroid is contained in the region
+                if (conductivities_heterogeneity_areas[region_index]->DoesContain(element_centroid))
                 {
                     //We don't use ublas vector assignment here, because we might be getting a subvector of a 3-vector
                     for (unsigned i=0; i<SPACE_DIM; i++)
@@ -176,7 +176,7 @@ template <unsigned SPACE_DIM>
 const c_matrix<double, SPACE_DIM, SPACE_DIM>& BidomainTissue<SPACE_DIM>::rGetExtracellularConductivityTensor(unsigned elementIndex)
 {
     assert(mpExtracellularConductivityTensors);
-    if(this->mpConductivityModifier==NULL)
+    if (this->mpConductivityModifier==NULL)
     {
         return (*mpExtracellularConductivityTensors)[elementIndex];
     }
@@ -186,15 +186,10 @@ const c_matrix<double, SPACE_DIM, SPACE_DIM>& BidomainTissue<SPACE_DIM>::rGetExt
     }
 }
 
-
-/////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////
-
 template class BidomainTissue<1>;
 template class BidomainTissue<2>;
 template class BidomainTissue<3>;
-
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"

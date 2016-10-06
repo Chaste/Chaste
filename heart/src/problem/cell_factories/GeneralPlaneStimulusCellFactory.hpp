@@ -87,7 +87,6 @@ public:
             LOG(1, "Defined a GeneralPlaneStimulusCellFactory<"<<SPACE_DIM<<"> with SimpleStimulus("<<stimulusMagnitude<<","<< stimulusDuration<< ")\n");
         }
     }
-
 };
 
 #endif /*GENERALPLANESTIMULUSCELLFACTORY_HPP_*/

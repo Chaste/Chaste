@@ -200,7 +200,7 @@ void FineCoarseMeshPair<DIM>::ComputeFineElementsAndWeightsForCoarseQuadPoints(G
     mFineMeshElementsAndWeights.resize(quad_point_posns.Size());
 
     #define COVERAGE_IGNORE
-    if(CommandLineArguments::Instance()->OptionExists("-mesh_pair_verbose"))
+    if (CommandLineArguments::Instance()->OptionExists("-mesh_pair_verbose"))
     {
         std::cout << "\nComputing fine elements and weights for coarse quad points\n";
     }
@@ -211,7 +211,7 @@ void FineCoarseMeshPair<DIM>::ComputeFineElementsAndWeightsForCoarseQuadPoints(G
     for (unsigned i=0; i<quad_point_posns.Size(); i++)
     {
         #define COVERAGE_IGNORE
-        if(CommandLineArguments::Instance()->OptionExists("-mesh_pair_verbose"))
+        if (CommandLineArguments::Instance()->OptionExists("-mesh_pair_verbose"))
         {
             std::cout << "\t" << i << " of " << quad_point_posns.Size() << std::flush;
         }
@@ -250,7 +250,7 @@ void FineCoarseMeshPair<DIM>::ComputeFineElementsAndWeightsForCoarseNodes(bool s
     mFineMeshElementsAndWeights.resize(mrCoarseMesh.GetNumNodes());
 
     #define COVERAGE_IGNORE
-    if(CommandLineArguments::Instance()->OptionExists("-mesh_pair_verbose"))
+    if (CommandLineArguments::Instance()->OptionExists("-mesh_pair_verbose"))
     {
         std::cout << "\nComputing fine elements and weights for coarse nodes\n";
     }
@@ -261,7 +261,7 @@ void FineCoarseMeshPair<DIM>::ComputeFineElementsAndWeightsForCoarseNodes(bool s
     for (unsigned i=0; i<mrCoarseMesh.GetNumNodes(); i++)
     {
         #define COVERAGE_IGNORE
-        if(CommandLineArguments::Instance()->OptionExists("-mesh_pair_verbose"))
+        if (CommandLineArguments::Instance()->OptionExists("-mesh_pair_verbose"))
         {
             std::cout << "\t" << i << " of " << mrCoarseMesh.GetNumNodes() << std::flush;
         }
@@ -395,7 +395,7 @@ void FineCoarseMeshPair<DIM>::ComputeCoarseElementsForFineNodes(bool safeMode)
     }
 
     #define COVERAGE_IGNORE
-    if(CommandLineArguments::Instance()->OptionExists("-mesh_pair_verbose"))
+    if (CommandLineArguments::Instance()->OptionExists("-mesh_pair_verbose"))
     {
         std::cout << "\nComputing coarse elements for fine nodes\n";
     }
@@ -407,7 +407,7 @@ void FineCoarseMeshPair<DIM>::ComputeCoarseElementsForFineNodes(bool safeMode)
     for (unsigned i=0; i<mCoarseElementsForFineNodes.size(); i++)
     {
         #define COVERAGE_IGNORE
-        if(CommandLineArguments::Instance()->OptionExists("-mesh_pair_verbose"))
+        if (CommandLineArguments::Instance()->OptionExists("-mesh_pair_verbose"))
         {
             std::cout << "\t" << i << " of " << mCoarseElementsForFineNodes.size() << std::flush;
         }
@@ -434,7 +434,7 @@ void FineCoarseMeshPair<DIM>::ComputeCoarseElementsForFineElementCentroids(bool 
     }
 
     #define COVERAGE_IGNORE
-    if(CommandLineArguments::Instance()->OptionExists("-mesh_pair_verbose"))
+    if (CommandLineArguments::Instance()->OptionExists("-mesh_pair_verbose"))
     {
         std::cout << "\nComputing coarse elements for fine element centroids\n";
     }
@@ -447,7 +447,7 @@ void FineCoarseMeshPair<DIM>::ComputeCoarseElementsForFineElementCentroids(bool 
     for (unsigned i=0; i<mrFineMesh.GetNumElements(); i++)
     {
         #define COVERAGE_IGNORE
-        if(CommandLineArguments::Instance()->OptionExists("-mesh_pair_verbose"))
+        if (CommandLineArguments::Instance()->OptionExists("-mesh_pair_verbose"))
         {
             std::cout << "\t" << i << " of " << mrFineMesh.GetNumElements() << std::flush;
         }
@@ -586,6 +586,7 @@ void FineCoarseMeshPair<DIM>::ResetStatisticsVariables()
     mNotInMeshNearestElementWeights.clear();
     mStatisticsCounters.resize(2, 0u);
 }
+
 template<unsigned DIM>
 void FineCoarseMeshPair<DIM>::ShareFineElementData()
 {
@@ -630,6 +631,7 @@ void FineCoarseMeshPair<DIM>::ShareFineElementData()
         }
     }
 }
+
 template<unsigned DIM>
 void FineCoarseMeshPair<DIM>::ShareCoarseElementData()
 {
@@ -679,9 +681,7 @@ void FineCoarseMeshPair<DIM>::PrintStatistics()
     }
 }
 
-/////////////////////////////////////////////////////////////////////////////
-// Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
+///////// Explicit instantiation///////
 
 template class FineCoarseMeshPair<1>;
 template class FineCoarseMeshPair<2>;

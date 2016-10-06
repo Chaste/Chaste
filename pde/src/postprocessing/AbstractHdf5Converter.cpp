@@ -181,9 +181,9 @@ void AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>::GenerateListOfDatasets(const 
         // it is longer than the ending we are looking for ("_Unlimited") ...
         // ... AND it ends with the string we are looking for,
         // then erase it.
-        if ( (*(iter) == "Time") ||
-             ( ( iter->length() > ending.length() ) &&
-               ( 0 == iter->compare(iter->length() - ending.length(), ending.length(), ending) ) ) )
+        if ((*(iter) == "Time") ||
+            ((iter->length() > ending.length()) &&
+            (0 == iter->compare(iter->length() - ending.length(), ending.length(), ending))))
         {
             iter = mDatasetNames.erase(iter);
         }
@@ -236,11 +236,7 @@ herr_t op_func (hid_t loc_id, const char *name,
     return 0;
 }
 
-
-/////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////
-
 template class AbstractHdf5Converter<1,1>;
 template class AbstractHdf5Converter<1,2>;
 template class AbstractHdf5Converter<2,2>;

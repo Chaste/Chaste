@@ -303,8 +303,6 @@ public:
      */
     virtual void Solve(double time, double nextTime, double odeTimestep)=0;
 
-
-
     /**
      *  Compute the deformation gradient, and stretch in the fibre direction, for each element in the mesh.
      *  Note: using quadratic interpolation for position, the deformation gradients and stretches

@@ -146,7 +146,4 @@ public:
     ~OperatorSplittingMonodomainSolver();
 };
 
-
-
-
 #endif /* OPERATORSPLITTINGMONODOMAINSOLVER_HPP_ */

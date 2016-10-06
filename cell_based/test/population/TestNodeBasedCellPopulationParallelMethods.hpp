@@ -393,7 +393,6 @@ public:
             delete nodes[i];
         }
     }
-
 };
 
 #endif /*TESTNODEBASEDCELLPOPULATIONPARALLELMETHODS_HPP_*/

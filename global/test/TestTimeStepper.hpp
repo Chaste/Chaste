@@ -321,8 +321,6 @@ public:
         TS_ASSERT_EQUALS(stepper.GetTotalTimeStepsTaken(), 500u);
     }
 
-
-
     void TestArchiveTimeStepper()
     {
         OutputFileHandler handler("TestTimeStepper_Archive", false);
@@ -381,7 +379,6 @@ public:
             delete p_stepper;
         }
     }
-
 };
 
 #endif /*TESTTIMESTEPPER_HPP_*/

@@ -108,9 +108,7 @@ public:
      * @return a pointer to the singleton instance, creating it if necessary.
      */
     static boost::shared_ptr<OdeSystemInformation<ODE_SYSTEM> > Instance();
-
 };
-
 
 template<class ODE_SYSTEM>
 boost::shared_ptr<OdeSystemInformation<ODE_SYSTEM> > OdeSystemInformation<ODE_SYSTEM>::Instance()

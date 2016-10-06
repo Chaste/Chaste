@@ -322,7 +322,6 @@ public:
             delete p_node_1d;
         }
     }
-
 };
 
 #endif //_TESTNODE_HPP_

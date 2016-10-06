@@ -1239,7 +1239,6 @@ public:
         std::string stochastic_wnt_results_dir = output_file_handler.GetOutputDirectoryFullPath();
         FileComparison( stochastic_wnt_results_dir + "stochastic_wnt_results.parameters", "crypt/test/data/TestCellCycleModels/stochastic_wnt_results.parameters").CompareFiles();
     }
-
 };
 
 #endif /*TESTODEBASEDCELLCYCLEMODELSFORCRYPT_HPP_*/

@@ -56,15 +56,15 @@ void NhsModelWithBackwardSolver::CalculateCaTropAndZDerivatives(double calciumTr
 {
 //As in straight Nhs, we don't cover the exception code
 #define COVERAGE_IGNORE
-    if(calciumTroponin < 0)
+    if (calciumTroponin < 0)
     {
         EXCEPTION("CalciumTrop concentration went negative");
     }
-    if(z<0)
+    if (z<0)
     {
         EXCEPTION("z went negative");
     }
-    if(z>1)
+    if (z>1)
     {
         EXCEPTION("z became greater than 1");
     }
@@ -73,7 +73,7 @@ void NhsModelWithBackwardSolver::CalculateCaTropAndZDerivatives(double calciumTr
     double T0 = CalculateT0(z);
 
     double Ta;
-    if(Q>0)
+    if (Q>0)
     {
         Ta = T0*(1+(2+mA)*Q)/(1+Q);
     }
@@ -92,8 +92,6 @@ void NhsModelWithBackwardSolver::CalculateCaTropAndZDerivatives(double calciumTr
          - mAlphaR2 * pow(z,mNr) / (pow(z,mNr) + pow(mKZ,mNr));
 }
 
-
-
 void NhsModelWithBackwardSolver::CalculateBackwardEulerResidual(double calciumTroponin, double z, double Q,
                                                                 double& residualComponent1, double& residualComponent2)
 {
@@ -105,14 +103,10 @@ void NhsModelWithBackwardSolver::CalculateBackwardEulerResidual(double calciumTr
     residualComponent2 = z - mDt*dz - mTemporaryStateVariables[1];
 }
 
-
-
 NhsModelWithBackwardSolver::NhsModelWithBackwardSolver()
 {
     mTemporaryStateVariables.resize(5);
 }
-
-
 
 void NhsModelWithBackwardSolver::RunDoNotUpdate(double startTime, double endTime, double timestep)
 {
@@ -188,7 +182,7 @@ double NhsModelWithBackwardSolver::GetNextActiveTension()
     double T0 = CalculateT0(mTemporaryStateVariables[1]);
     double Q = mTemporaryStateVariables[2]+mTemporaryStateVariables[3]+mTemporaryStateVariables[4];
 
-    if(Q>0)
+    if (Q>0)
     {
         return T0*(1+(2+mA)*Q)/(1+Q);
     }

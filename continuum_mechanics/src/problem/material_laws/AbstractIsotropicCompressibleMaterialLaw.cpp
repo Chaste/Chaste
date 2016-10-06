@@ -139,10 +139,6 @@ void AbstractIsotropicCompressibleMaterialLaw<DIM>::ComputeStressAndStressDeriva
     }
 }
 
-////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-////////////////////////////////////////////////////////////////////////////////////
-
-//template class AbstractIsotropicCompressibleMaterialLaw<1>;
 template class AbstractIsotropicCompressibleMaterialLaw<2>;
 template class AbstractIsotropicCompressibleMaterialLaw<3>;

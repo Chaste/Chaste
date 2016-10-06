@@ -2003,7 +2003,6 @@ public:
         FileComparison comparer3(base + dir1 + file_name, base + dir2 + file_name);
         TS_ASSERT(comparer3.CompareFiles());
     }
-
 };
 
 #endif /*TESTHEARTCONFIG_HPP_*/

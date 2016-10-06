@@ -111,7 +111,6 @@ public:
      */
     GRL2IvpOdeSolver()
     {}
-
 };
 
 #include "SerializationExportWrapper.hpp"

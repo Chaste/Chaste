@@ -584,9 +584,9 @@ void VoronoiVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_vector<
                         const c_vector<double, 2>& r_existing_node_location = nodes[node_idx]->rGetLocation();
 
                         // Equality here is determined entirely on coincidence of position
-                        if ( fabs(r_existing_node_location[0] - p_this_node->rGetLocation()[0]) < DBL_EPSILON )
+                        if (fabs(r_existing_node_location[0] - p_this_node->rGetLocation()[0]) < DBL_EPSILON)
                         {
-                            if ( fabs(r_existing_node_location[1] - p_this_node->rGetLocation()[1]) < DBL_EPSILON )
+                            if (fabs(r_existing_node_location[1] - p_this_node->rGetLocation()[1]) < DBL_EPSILON)
                             {
                                 // If the nodes match, return the existing node index
                                 existing_node_idx = node_idx;
@@ -661,9 +661,9 @@ void VoronoiVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_vector<
                         const c_vector<double, 2>& r_existing_node_location = nodes[node_idx]->rGetLocation();
 
                         // Equality here is determined entirely on coincidence of position
-                        if ( fabs(r_existing_node_location[0] - vertex_location[0]) < DBL_EPSILON )
+                        if (fabs(r_existing_node_location[0] - vertex_location[0]) < DBL_EPSILON)
                         {
-                            if ( fabs(r_existing_node_location[1] - vertex_location[1]) < DBL_EPSILON )
+                            if (fabs(r_existing_node_location[1] - vertex_location[1]) < DBL_EPSILON)
                             {
                                 // If the locations match, tag the node as being on the boundary
                                 nodes[node_idx]->SetAsBoundaryNode(true);
@@ -689,12 +689,12 @@ void VoronoiVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_vector<
 void VoronoiVertexMeshGenerator::ValidateInputAndSetMembers()
 {
     // Validate inputs
-    if ( (mNumElementsX < 2) || (mNumElementsY < 2) )
+    if ((mNumElementsX < 2) || (mNumElementsY < 2))
     {
         EXCEPTION("Need at least 2 by 2 cells");
     }
 
-    if ( mElementTargetArea <= 0.0 )
+    if (mElementTargetArea <= 0.0)
     {
         EXCEPTION("Specified target area must be strictly positive");
     }

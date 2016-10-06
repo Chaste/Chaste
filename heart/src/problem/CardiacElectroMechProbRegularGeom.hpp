@@ -101,11 +101,11 @@ public:
 
         this->mpProblemDefinition = new ElectroMechanicsProblemDefinition<DIM>(*(this->mpMechanicsMesh));
 
-        // fix the nodes on x=0
+        // Fix the nodes on x=0
         std::vector<unsigned> fixed_nodes;
-        for(unsigned i=0; i<this->mpMechanicsMesh->GetNumNodes(); i++)
+        for (unsigned i=0; i<this->mpMechanicsMesh->GetNumNodes(); i++)
         {
-            if( fabs(this->mpMechanicsMesh->GetNode(i)->rGetLocation()[0])<1e-6)
+            if (fabs(this->mpMechanicsMesh->GetNode(i)->rGetLocation()[0])<1e-6)
             {
                 fixed_nodes.push_back(i);
             }

@@ -79,7 +79,7 @@ double StreeterFibreGenerator<SPACE_DIM>::GetAveragedThicknessLocalNode(
     Node<SPACE_DIM>* p_current_node = this->mpMesh->GetNode(nodeIndex);
 
     // Loop over the elements containing the given node
-    for(typename Node<SPACE_DIM>::ContainingElementIterator element_iterator = p_current_node->ContainingElementsBegin();
+    for (typename Node<SPACE_DIM>::ContainingElementIterator element_iterator = p_current_node->ContainingElementsBegin();
         element_iterator != p_current_node->ContainingElementsEnd();
         ++element_iterator)
     {
@@ -87,7 +87,7 @@ double StreeterFibreGenerator<SPACE_DIM>::GetAveragedThicknessLocalNode(
         Element<SPACE_DIM,SPACE_DIM>* p_containing_element = this->mpMesh->GetElement(*element_iterator);
 
        // Loop over the nodes of the element
-       for(unsigned node_local_index=0;
+       for (unsigned node_local_index=0;
            node_local_index<p_containing_element->GetNumNodes();
            node_local_index++)
        {
@@ -106,9 +106,6 @@ double StreeterFibreGenerator<SPACE_DIM>::GetAveragedThicknessLocalNode(
 
     return average/nodes_visited;
 }
-
-
-
 
 template<unsigned SPACE_DIM>
 double StreeterFibreGenerator<SPACE_DIM>::GetFibreMaxAngle(
@@ -446,7 +443,6 @@ void StreeterFibreGenerator<SPACE_DIM>::Visit(Element<SPACE_DIM, SPACE_DIM>* pEl
     rData[8] = rotated_longitude_direction[2];
 }
 
-
 template<unsigned SPACE_DIM>
 void StreeterFibreGenerator<SPACE_DIM>::SetApexToBase(const c_vector<double, SPACE_DIM>& apexToBase)
 {
@@ -475,9 +471,7 @@ void StreeterFibreGenerator<SPACE_DIM>::SetLogInfo(bool logInfo)
     mLogInfo = logInfo;
 }
 
-/////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////
 #define COVERAGE_IGNORE
 template class StreeterFibreGenerator<3>;
 #undef COVERAGE_IGNORE

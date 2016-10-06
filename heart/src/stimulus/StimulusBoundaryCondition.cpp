@@ -48,11 +48,7 @@ double StimulusBoundaryCondition<SPACE_DIM>::GetValue(const ChastePoint<SPACE_DI
     return mpStimulus->GetStimulus(PdeSimulationTime::GetTime());
 }
 
-
-/////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////
-
 template class StimulusBoundaryCondition<1>;
 template class StimulusBoundaryCondition<2>;
 template class StimulusBoundaryCondition<3>;

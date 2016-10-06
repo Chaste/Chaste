@@ -475,7 +475,7 @@ public:
         neighbours_should_be[2].insert(3);
         neighbours_should_be[3].insert(2);
         neighbours_should_be[4] = std::set<unsigned>();
-        for(unsigned i=0; i<nodes.size(); i++){
+        for (unsigned i=0; i<nodes.size(); i++){
             std::vector<unsigned> expected(neighbours_should_be[i].begin(), neighbours_should_be[i].end());
             TS_ASSERT_EQUALS(nodes[i]->rGetNeighbours(), expected);
         }
@@ -681,7 +681,7 @@ public:
         neighbours_should_be[8].insert(6);
         neighbours_should_be[8].insert(7);
         neighbours_should_be[9] = std::set<unsigned>();
-        for(unsigned i=0; i<nodes.size(); i++){
+        for (unsigned i=0; i<nodes.size(); i++){
             std::vector<unsigned> expected(neighbours_should_be[i].begin(), neighbours_should_be[i].end()); 
             TS_ASSERT_EQUALS(nodes[i]->rGetNeighbours(), expected);
         }
@@ -833,7 +833,7 @@ public:
         }
 
         // Check the neighbour lists
-        for(unsigned i=0; i<nodes.size(); i++){
+        for (unsigned i=0; i<nodes.size(); i++){
             std::vector<unsigned> expected(neighbours_should_be[i].begin(), neighbours_should_be[i].end()); 
             TS_ASSERT_EQUALS(nodes[i]->rGetNeighbours(), expected);
         }

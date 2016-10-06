@@ -376,10 +376,7 @@ void QuadraticBasisFunction<ELEMENT_DIM>::ComputeTransformedBasisFunctionDerivat
     rReturnValue = prod(trans(rInverseJacobian), rReturnValue);
 }
 
-//////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-//////////////////////////////////////////////////////////////////////
-
 template class QuadraticBasisFunction<1>;
 template class QuadraticBasisFunction<2>;
 template class QuadraticBasisFunction<3>;

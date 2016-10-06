@@ -105,8 +105,6 @@ public:
      * @param rSubsystems  the ODE systems used to construct the system we are providing information about.
      */
     static boost::shared_ptr<CombinedOdeSystemInformation> Instance(const std::vector<AbstractOdeSystem*>& rSubsystems);
-
 };
-
 
 #endif /*COMBINEDODESYSTEMINFORMATION_HPP_*/

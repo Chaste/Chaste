@@ -73,7 +73,6 @@ public:
                                   double** jacobian,
                                   double time,
                                   double timeStep) = 0;
-
 };
 
 #endif //_ABSTRACTODESYSTEMWITHANALYTICJACOBIAN_HPP_

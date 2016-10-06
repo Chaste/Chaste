@@ -263,14 +263,13 @@ unsigned DistributedBoxCollection<DIM>::CalculateContainingBox(Node<DIM>* pNode)
     return CalculateContainingBox(location);
 }
 
-
 template<unsigned DIM>
 unsigned DistributedBoxCollection<DIM>::CalculateContainingBox(c_vector<double, DIM>& rLocation)
 {
     // The node must lie inside the boundary of the box collection
     for (unsigned i=0; i<DIM; i++)
     {
-        if ( (rLocation[i] < mDomainSize(2*i)) || !(rLocation[i] < mDomainSize(2*i+1)) )
+        if ((rLocation[i] < mDomainSize(2*i)) || !(rLocation[i] < mDomainSize(2*i+1)))
         {
             EXCEPTION("The point provided is outside all of the boxes");
         }
@@ -347,7 +346,7 @@ template<unsigned DIM>
 Box<DIM>& DistributedBoxCollection<DIM>::rGetBox(unsigned boxIndex)
 {
     // Check first for local ownership
-    if(!(boxIndex<mMinBoxIndex) && !(mMaxBoxIndex<boxIndex))
+    if (!(boxIndex<mMinBoxIndex) && !(mMaxBoxIndex<boxIndex))
     {
         return mBoxes[boxIndex-mMinBoxIndex];
     }
@@ -560,45 +559,45 @@ void DistributedBoxCollection<DIM>::SetupLocalBoxesHalfOnly()
                     local_boxes.insert(global_index);
 
                     // If we're on the bottom of the process boundary, but not the bottom of the domain add boxes below
-                    if(!bottom && bottom_proc)
+                    if (!bottom && bottom_proc)
                     {
                         local_boxes.insert(global_index - mNumBoxesEachDirection(0));
-                        if(!left)
+                        if (!left)
                         {
                             local_boxes.insert(global_index - mNumBoxesEachDirection(0) - 1);
                         }
-                        if(!right)
+                        if (!right)
                         {
                             local_boxes.insert(global_index - mNumBoxesEachDirection(0) + 1);
                         }
                     }
 
                     // If we're not at the top of the domain insert boxes above
-                    if(!top)
+                    if (!top)
                     {
                         local_boxes.insert(global_index + mNumBoxesEachDirection(0));
 
-                        if(!right)
+                        if (!right)
                         {
                             local_boxes.insert(global_index + mNumBoxesEachDirection(0) + 1);
                         }
-                        if(!left)
+                        if (!left)
                         {
                             local_boxes.insert(global_index + mNumBoxesEachDirection(0) - 1);
                         }
-                        else if ( (global_index % mNumBoxesEachDirection(0) == 0) && (mIsPeriodicInX) ) // If we're on the left edge but its periodic include the box on the far right and up one.
+                        else if ((global_index % mNumBoxesEachDirection(0) == 0) && (mIsPeriodicInX)) // If we're on the left edge but its periodic include the box on the far right and up one.
                         {
                             local_boxes.insert(global_index +  2 * mNumBoxesEachDirection(0) - 1);
                         }
                     }
 
                     // If we're not on the far right hand side inseryt box to the right
-                    if(!right)
+                    if (!right)
                     {
                         local_boxes.insert(global_index + 1);
                     }
                     // If we're on the right edge but it's periodic include the box on the far left of the domain
-                    else if ( (global_index % mNumBoxesEachDirection(0) == mNumBoxesEachDirection(0)-1) && (mIsPeriodicInX) )
+                    else if ((global_index % mNumBoxesEachDirection(0) == mNumBoxesEachDirection(0)-1) && (mIsPeriodicInX))
                     {
                         local_boxes.insert(global_index - mNumBoxesEachDirection(0) + 1);
                         // If we're also not on the top-most row, then insert the box above- on the far left of the domain
@@ -637,44 +636,44 @@ void DistributedBoxCollection<DIM>::SetupLocalBoxesHalfOnly()
                     local_boxes.insert(global_index);
 
                     // If we're not on the front face, add appropriate boxes on the closer face
-                    if(!front)
+                    if (!front)
                     {
                         // If we're not on the top of the domain
-                        if(!top)
+                        if (!top)
                         {
                             local_boxes.insert( global_index - num_boxes_xy + mNumBoxesEachDirection(0) );
-                            if(!left)
+                            if (!left)
                             {
                                 local_boxes.insert( global_index - num_boxes_xy + mNumBoxesEachDirection(0) - 1);
                             }
-                            if(!right)
+                            if (!right)
                             {
                                 local_boxes.insert( global_index - num_boxes_xy + mNumBoxesEachDirection(0) + 1);
                             }
                         }
-                        if(!right)
+                        if (!right)
                         {
                             local_boxes.insert( global_index - num_boxes_xy + 1);
                         }
 
                         // If we are on the front of the process we have to add extra boxes as they are halos.
-                        if(proc_front)
+                        if (proc_front)
                         {
                             local_boxes.insert( global_index - num_boxes_xy );
 
-                            if(!left)
+                            if (!left)
                             {
                                 local_boxes.insert( global_index - num_boxes_xy - 1);
                             }
-                            if(!bottom)
+                            if (!bottom)
                             {
                                 local_boxes.insert( global_index - num_boxes_xy - mNumBoxesEachDirection(0));
 
-                                if(!left)
+                                if (!left)
                                 {
                                     local_boxes.insert( global_index - num_boxes_xy - mNumBoxesEachDirection(0) - 1);
                                 }
-                                if(!right)
+                                if (!right)
                                 {
                                     local_boxes.insert( global_index - num_boxes_xy - mNumBoxesEachDirection(0) + 1);
                                 }
@@ -682,62 +681,62 @@ void DistributedBoxCollection<DIM>::SetupLocalBoxesHalfOnly()
 
                         }
                     }
-                    if(!right)
+                    if (!right)
                     {
                         local_boxes.insert( global_index + 1);
                     }
                     // If we're not on the very top add boxes above
-                    if(!top)
+                    if (!top)
                     {
                         local_boxes.insert( global_index + mNumBoxesEachDirection(0));
 
-                        if(!right)
+                        if (!right)
                         {
                             local_boxes.insert( global_index + mNumBoxesEachDirection(0) + 1);
                         }
-                        if(!left)
+                        if (!left)
                         {
                             local_boxes.insert( global_index + mNumBoxesEachDirection(0) - 1);
                         }
                     }
 
                     // If we're not on the back add boxes behind
-                    if(!back)
+                    if (!back)
                     {
                         local_boxes.insert(global_index + num_boxes_xy);
 
-                        if(!right)
+                        if (!right)
                         {
                             local_boxes.insert(global_index + num_boxes_xy + 1);
                         }
-                        if(!top)
+                        if (!top)
                         {
                             local_boxes.insert(global_index + num_boxes_xy + mNumBoxesEachDirection(0));
-                            if(!right)
+                            if (!right)
                             {
                                 local_boxes.insert(global_index + num_boxes_xy + mNumBoxesEachDirection(0) + 1);
                             }
-                            if(!left)
+                            if (!left)
                             {
                                 local_boxes.insert(global_index + num_boxes_xy + mNumBoxesEachDirection(0) - 1);
                             }
                         }
                         // If we are on the back proc we should make sure we get everything in the face further back
-                        if(proc_back)
+                        if (proc_back)
                         {
-                            if(!left)
+                            if (!left)
                             {
                                 local_boxes.insert(global_index + num_boxes_xy - 1);
                             }
-                            if(!bottom)
+                            if (!bottom)
                             {
                                 local_boxes.insert(global_index + num_boxes_xy - mNumBoxesEachDirection(0));
 
-                                if(!left)
+                                if (!left)
                                 {
                                     local_boxes.insert(global_index + num_boxes_xy - mNumBoxesEachDirection(0) - 1);
                                 }
-                                if(!right)
+                                if (!right)
                                 {
                                     local_boxes.insert(global_index + num_boxes_xy - mNumBoxesEachDirection(0) + 1);
                                 }
@@ -755,8 +754,6 @@ void DistributedBoxCollection<DIM>::SetupLocalBoxesHalfOnly()
         mAreLocalBoxesSet=true;
     }
 }
-
-
 
 template<unsigned DIM>
 void DistributedBoxCollection<DIM>::SetupAllLocalBoxes()
@@ -819,7 +816,7 @@ void DistributedBoxCollection<DIM>::SetupAllLocalBoxes()
                 }
                 else // Add Periodic Box if needed
                 {
-                    if(mIsPeriodicInX)
+                    if (mIsPeriodicInX)
                     {
                         local_boxes.insert(i+M-1);
                     }
@@ -832,7 +829,7 @@ void DistributedBoxCollection<DIM>::SetupAllLocalBoxes()
                 }
                 else // Add Periodic Box if needed
                 {
-                    if(mIsPeriodicInX)
+                    if (mIsPeriodicInX)
                     {
                         local_boxes.insert(i-M+1);
                     }
@@ -852,39 +849,39 @@ void DistributedBoxCollection<DIM>::SetupAllLocalBoxes()
 
                 // add the four corner boxes
 
-                if ( (!is_xmin[i]) && (!is_ymin[i]) )
+                if ((!is_xmin[i]) && (!is_ymin[i]))
                 {
                     local_boxes.insert(i-1-M);
                 }
-                if ( (!is_xmin[i]) && (!is_ymax[i]) )
+                if ((!is_xmin[i]) && (!is_ymax[i]))
                 {
                     local_boxes.insert(i-1+M);
                 }
-                if ( (!is_xmax[i]) && (!is_ymin[i]) )
+                if ((!is_xmax[i]) && (!is_ymin[i]))
                 {
                     local_boxes.insert(i+1-M);
                 }
-                if ( (!is_xmax[i]) && (!is_ymax[i]) )
+                if ((!is_xmax[i]) && (!is_ymax[i]))
                 {
                     local_boxes.insert(i+1+M);
                 }
 
-                // Add Periodic Corner Boxes if needed
-                if(mIsPeriodicInX)
+                // Add periodic corner boxes if needed
+                if (mIsPeriodicInX)
                 {
-                    if( (is_xmin[i]) && (!is_ymin[i]) )
+                    if ((is_xmin[i]) && (!is_ymin[i]))
                     {
                         local_boxes.insert(i-1);
                     }
-                    if ( (is_xmin[i]) && (!is_ymax[i]) )
+                    if ((is_xmin[i]) && (!is_ymax[i]))
                     {
                         local_boxes.insert(i-1+2*M);
                     }
-                    if ( (is_xmax[i]) && (!is_ymin[i]) )
+                    if ((is_xmax[i]) && (!is_ymin[i]))
                     {
                         local_boxes.insert(i+1-2*M);
                     }
-                    if ( (is_xmax[i]) && (!is_ymax[i]) )
+                    if ((is_xmax[i]) && (!is_ymax[i]))
                     {
                         local_boxes.insert(i+1);
                     }
@@ -1030,42 +1027,42 @@ void DistributedBoxCollection<DIM>::SetupAllLocalBoxes()
 
                 // finally, the 8 corners are left
 
-                if ( (!is_xmin[i]) && (!is_ymin[i]) && (!is_zmin[i]) )
+                if ((!is_xmin[i]) && (!is_ymin[i]) && (!is_zmin[i]))
                 {
                     local_boxes.insert(i-1-M-M*N);
                 }
 
-                if ( (!is_xmin[i]) && (!is_ymin[i]) && (!is_zmax[i]) )
+                if ((!is_xmin[i]) && (!is_ymin[i]) && (!is_zmax[i]))
                 {
                     local_boxes.insert(i-1-M+M*N);
                 }
 
-                if ( (!is_xmin[i]) && (!is_ymax[i]) && (!is_zmin[i]) )
+                if ((!is_xmin[i]) && (!is_ymax[i]) && (!is_zmin[i]))
                 {
                     local_boxes.insert(i-1+M-M*N);
                 }
 
-                if ( (!is_xmin[i]) && (!is_ymax[i]) && (!is_zmax[i]) )
+                if ((!is_xmin[i]) && (!is_ymax[i]) && (!is_zmax[i]))
                 {
                     local_boxes.insert(i-1+M+M*N);
                 }
 
-                if ( (!is_xmax[i]) && (!is_ymin[i]) && (!is_zmin[i]) )
+                if ((!is_xmax[i]) && (!is_ymin[i]) && (!is_zmin[i]))
                 {
                     local_boxes.insert(i+1-M-M*N);
                 }
 
-                if ( (!is_xmax[i]) && (!is_ymin[i]) && (!is_zmax[i]) )
+                if ((!is_xmax[i]) && (!is_ymin[i]) && (!is_zmax[i]))
                 {
                     local_boxes.insert(i+1-M+M*N);
                 }
 
-                if ( (!is_xmax[i]) && (!is_ymax[i]) && (!is_zmin[i]) )
+                if ((!is_xmax[i]) && (!is_ymax[i]) && (!is_zmin[i]))
                 {
                     local_boxes.insert(i+1+M-M*N);
                 }
 
-                if ( (!is_xmax[i]) && (!is_ymax[i]) && (!is_zmax[i]) )
+                if ((!is_xmax[i]) && (!is_ymax[i]) && (!is_zmax[i]))
                 {
                     local_boxes.insert(i+1+M+M*N);
                 }
@@ -1162,7 +1159,7 @@ void DistributedBoxCollection<DIM>::CalculateNodePairs(std::vector<Node<DIM>*>& 
         AddPairsFromBox(box_index, rNodePairs);
     }
 
-    if(mCalculateNodeNeighbours)
+    if (mCalculateNodeNeighbours)
     {
         for (unsigned i = 0; i < rNodes.size(); i++)
         {
@@ -1205,7 +1202,7 @@ void DistributedBoxCollection<DIM>::CalculateInteriorNodePairs(std::vector<Node<
         }
     }
 
-    if(mCalculateNodeNeighbours)
+    if (mCalculateNodeNeighbours)
     {
         for (unsigned i = 0; i < rNodes.size(); i++)
         {
@@ -1233,7 +1230,7 @@ void DistributedBoxCollection<DIM>::CalculateBoundaryNodePairs(std::vector<Node<
         }
     }
 
-    if(mCalculateNodeNeighbours)
+    if (mCalculateNodeNeighbours)
     {
         for (unsigned i = 0; i < rNodes.size(); i++)
         {
@@ -1331,9 +1328,7 @@ std::vector<int> DistributedBoxCollection<DIM>::CalculateNumberOfNodesInEachStri
     return cell_numbers;
 }
 
-/////////////////////////////////////////////////////////////////////////////
-// Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
+///////// Explicit instantiation///////
 
 template class DistributedBoxCollection<1>;
 template class DistributedBoxCollection<2>;

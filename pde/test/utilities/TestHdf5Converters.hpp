@@ -255,8 +255,6 @@ public:
 #endif //CHASTE_VTK
     }
 
-
-
     /**
      * This tests the HDF5 to .txt converter using a 3D example
      * taken from a bidomain simulation.

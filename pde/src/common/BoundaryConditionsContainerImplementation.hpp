@@ -128,12 +128,11 @@ void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::AddPeriodic
     // will assume the periodic BC is to be applied to ALL unknowns, can't really imagine a
     // situation where this isn't going to be true. If necessary can easily change this method
     // to take in the index of the unknown
-    for(unsigned i=0; i<PROBLEM_DIM; i++)
+    for (unsigned i=0; i<PROBLEM_DIM; i++)
     {
         (*(this->mpPeriodicBcMap[i]))[pNode1] = pNode2;
     }
 }
-
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::AddNeumannBoundaryCondition( const BoundaryElement<ELEMENT_DIM-1, SPACE_DIM> * pBoundaryElement,
@@ -161,14 +160,14 @@ void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::AddNeumannB
 
     for (unsigned unknown=0; unknown<PROBLEM_DIM; unknown++)
     {
-        if (unknown==indexOfUnknown)
+        if (unknown == indexOfUnknown)
         {
             (*(mpNeumannMap[indexOfUnknown]))[pBoundaryElement] = pBoundaryCondition;
         }
         else
         {
             // If can't find pBoundaryElement in map[unknown]
-            if ( mpNeumannMap[unknown]->find(pBoundaryElement)==mpNeumannMap[unknown]->end() )
+            if (mpNeumannMap[unknown]->find(pBoundaryElement)==mpNeumannMap[unknown]->end())
             {
                 // Add zero bc to other unknowns (so all maps are in sync)
                 (*(mpNeumannMap[unknown]))[pBoundaryElement] = mpZeroBoundaryCondition;
@@ -420,8 +419,6 @@ void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::ApplyDirich
     HeartEventHandler::EndEvent(HeartEventHandler::DIRICHLET_BCS);
 }
 
-
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::ApplyPeriodicBcsToLinearProblem(LinearSystem& rLinearSystem,
                                                                                                      bool applyToMatrix,
@@ -437,17 +434,17 @@ void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::ApplyPeriod
         }
     }
 
-    if(!has_periodic_bcs)
+    if (!has_periodic_bcs)
     {
         return;
     }
 
-    if(applyToMatrix)
+    if (applyToMatrix)
     {
         std::vector<unsigned> rows_to_zero;
         for (unsigned index_of_unknown=0; index_of_unknown<PROBLEM_DIM; index_of_unknown++)
         {
-            for(typename std::map< const Node<SPACE_DIM> *, const Node<SPACE_DIM> * >::const_iterator iter = mpPeriodicBcMap[index_of_unknown]->begin();
+            for (typename std::map< const Node<SPACE_DIM> *, const Node<SPACE_DIM> * >::const_iterator iter = mpPeriodicBcMap[index_of_unknown]->begin();
                 iter != mpPeriodicBcMap[index_of_unknown]->end();
                 ++iter)
             {
@@ -461,7 +458,7 @@ void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::ApplyPeriod
 
         for (unsigned index_of_unknown=0; index_of_unknown<PROBLEM_DIM; index_of_unknown++)
         {
-            for(typename std::map< const Node<SPACE_DIM> *, const Node<SPACE_DIM> * >::const_iterator iter = mpPeriodicBcMap[index_of_unknown]->begin();
+            for (typename std::map< const Node<SPACE_DIM> *, const Node<SPACE_DIM> * >::const_iterator iter = mpPeriodicBcMap[index_of_unknown]->begin();
                 iter != mpPeriodicBcMap[index_of_unknown]->end();
                 ++iter)
             {
@@ -475,13 +472,13 @@ void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::ApplyPeriod
         }
     }
 
-    if(applyToRhsVector)
+    if (applyToRhsVector)
     {
         for (unsigned index_of_unknown=0; index_of_unknown<PROBLEM_DIM; index_of_unknown++)
         {
-            for(typename std::map< const Node<SPACE_DIM> *, const Node<SPACE_DIM> * >::const_iterator iter = mpPeriodicBcMap[index_of_unknown]->begin();
-                iter != mpPeriodicBcMap[index_of_unknown]->end();
-                ++iter)
+            for (typename std::map< const Node<SPACE_DIM> *, const Node<SPACE_DIM> * >::const_iterator iter = mpPeriodicBcMap[index_of_unknown]->begin();
+                 iter != mpPeriodicBcMap[index_of_unknown]->end();
+                 ++iter)
             {
                 unsigned node_index = iter->first->GetIndex();
                 unsigned row_index = PROBLEM_DIM*node_index + index_of_unknown;
@@ -490,7 +487,6 @@ void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::ApplyPeriod
         }
     }
 }
-
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::ApplyDirichletToNonlinearResidual(

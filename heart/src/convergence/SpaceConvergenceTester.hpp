@@ -118,7 +118,6 @@ public:
         double scaling = this->mMeshWidth/(double) mesh_size;
         return scaling;
     }
-
 };
 
 #endif /*SPACECONVERGENCETESTER_HPP_*/

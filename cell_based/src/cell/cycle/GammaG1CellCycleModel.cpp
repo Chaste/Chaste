@@ -74,8 +74,8 @@ AbstractCellCycleModel* GammaG1CellCycleModel::CreateCellCycleModel()
 
 void GammaG1CellCycleModel::SetG1Duration()
 {
-    if (    mpCell->GetCellProliferativeType()->IsType<StemCellProliferativeType>()
-         || mpCell->GetCellProliferativeType()->IsType<TransitCellProliferativeType>() )
+    if (mpCell->GetCellProliferativeType()->IsType<StemCellProliferativeType>()
+        || mpCell->GetCellProliferativeType()->IsType<TransitCellProliferativeType>() )
     {
         // Generate a gamma random number with mShape and mScale
         mG1Duration = RandomNumberGenerator::Instance()->GammaRandomDeviate(mShape, mScale);

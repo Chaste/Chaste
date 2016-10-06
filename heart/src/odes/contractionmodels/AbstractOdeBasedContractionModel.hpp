@@ -93,7 +93,7 @@ public:
     virtual void RunDoNotUpdate(double startTime, double endTime, double timeStep)
     {
         // save the state variables
-        if(mTemporaryStateVariables.size()>0)
+        if (mTemporaryStateVariables.size() > 0)
         {
             mTemporaryStateVariables.resize(mStateVariables.size());
         }
@@ -104,7 +104,7 @@ public:
 
         // put the solution in mTemporaryStateVariables and return the state variables to its
         // original state
-        for(unsigned i=0; i<mStateVariables.size(); i++)
+        for (unsigned i=0; i<mStateVariables.size(); i++)
         {
             double soln = mStateVariables[i];
             mStateVariables[i] = mTemporaryStateVariables[i];
@@ -121,7 +121,7 @@ public:
     void UpdateStateVariables()
     {
         // save the state variables
-        for(unsigned i=0; i<mStateVariables.size(); i++)
+        for (unsigned i=0; i<mStateVariables.size(); i++)
         {
             mStateVariables[i] = mTemporaryStateVariables[i];
         }

@@ -161,7 +161,6 @@ public:
      *  @param destinationNodeIndex target destination node
      */
     double SingleDistance(unsigned sourceNodeIndex, unsigned destinationNodeIndex);
-
 };
 
 #endif /*DISTANCEMAPCALCULATOR_HPP_*/

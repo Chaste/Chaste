@@ -67,8 +67,6 @@ public:
     }
 };
 
-
-
 class TestAbstractFeSurfaceIntegralAssembler : public CxxTest::TestSuite
 {
 public:

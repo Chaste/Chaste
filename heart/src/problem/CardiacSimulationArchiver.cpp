@@ -183,10 +183,7 @@ PROBLEM_CLASS* CardiacSimulationArchiver<PROBLEM_CLASS>::Migrate(const FileFinde
     return p_unarchived_simulation;
 }
 
-//
 // Explicit instantiation
-//
-
 template class CardiacSimulationArchiver<MonodomainProblem<1> >;
 template class CardiacSimulationArchiver<MonodomainProblem<2> >;
 template class CardiacSimulationArchiver<MonodomainProblem<3> >;

@@ -78,7 +78,6 @@ public:
      */
     void CleanTerminalsHueristic();
 
-
     /**
      * Removes any nodes from an airway tree that are not associated with elements.
      */
@@ -118,4 +117,5 @@ private:
      */
     void CleanElementUsingHorsfieldOrder(Element<1,3>* pElement, bool delete_me);
 };
-#endif //  MAJOR_AIRWAYS_CENTRE_LINES_CLEANER_HPP_
+
+#endif // MAJOR_AIRWAYS_CENTRE_LINES_CLEANER_HPP_

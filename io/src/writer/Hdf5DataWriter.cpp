@@ -328,7 +328,7 @@ void Hdf5DataWriter::OpenFile()
          * striped filesystem e.g. Lustre. Ideally this should match the chunk
          * size (see SetTargetChunkSize).
          */
-        if ( mAlignment != 0 )
+        if (mAlignment != 0)
         {
             H5Pset_alignment(fapl, 0, mAlignment);
         }
@@ -345,7 +345,7 @@ void Hdf5DataWriter::OpenFile()
         /*
         std::string command;
         // Turn on striping for directory, which the newly created HDF5 file will inherit.
-        if ( PetscTools::AmMaster() )
+        if (PetscTools::AmMaster())
         {
             // Increase stripe count
             command = "lfs setstripe --size 1M --count -1 "; // -1 means use all OSTs
@@ -360,7 +360,7 @@ void Hdf5DataWriter::OpenFile()
 
         /*
         // Turn off striping so other output files stay unstriped.
-        if ( PetscTools::AmMaster() )
+        if (PetscTools::AmMaster())
         {
             // Use one stripe
             command = "lfs setstripe --size 1M --count 1 ";
@@ -784,14 +784,14 @@ void Hdf5DataWriter::PutVector(int variableID, Vec petscVector)
         EXCEPTION("Vector size doesn't match fixed dimension");
     }
 
-    if ( mUseCache )
+    if (mUseCache)
     {
         if (mDatasetDims[2] != 1 )
         {
             //Covered by TestHdf5DataWriterMultipleColumnsCachedFails
             EXCEPTION("Cached writes must write all variables at once.");
         }
-        if ( ! mIsUnlimitedDimensionSet )
+        if (!mIsUnlimitedDimensionSet)
         {
             //Covered by TestHdf5DataWriterSingleColumnsCachedFails
             EXCEPTION("Cached writes require an unlimited dimension.");
@@ -847,7 +847,7 @@ void Hdf5DataWriter::PutVector(int variableID, Vec petscVector)
 
     if (mIsDataComplete)
     {
-        if ( mUseCache )
+        if (mUseCache)
         {
             //Covered by TestHdf5DataWriterSingleColumnCached
             mDataCache.insert(mDataCache.end(), p_petsc_vector, p_petsc_vector+mNumberOwned);
@@ -870,7 +870,7 @@ void Hdf5DataWriter::PutVector(int variableID, Vec petscVector)
             double* p_petsc_vector_incomplete;
             VecGetArray(output_petsc_vector, &p_petsc_vector_incomplete);
 
-            if ( mUseCache )
+            if (mUseCache)
             {
                 //Covered by TestHdf5DataWriterSingleIncompleteUsingMatrixCached
                 mDataCache.insert(mDataCache.end(), p_petsc_vector_incomplete, p_petsc_vector_incomplete+mNumberOwned);
@@ -889,7 +889,7 @@ void Hdf5DataWriter::PutVector(int variableID, Vec petscVector)
                 local_data[i] = p_petsc_vector[ mIncompleteNodeIndices[mOffset+i]-mLo ];
 
             }
-            if ( mUseCache )
+            if (mUseCache)
             {
                 //Covered by TestHdf5DataWriterFullFormatIncompleteCached
                 mDataCache.insert(mDataCache.end(), local_data.get(), local_data.get()+mNumberOwned);
@@ -928,14 +928,14 @@ void Hdf5DataWriter::PutStripedVector(std::vector<int> variableIDs, Vec petscVec
 
     const unsigned NUM_STRIPES=variableIDs.size();
 
-    if ( mUseCache )
+    if (mUseCache)
     {
-        if ( NUM_STRIPES != mDatasetDims[2] )
+        if (NUM_STRIPES != mDatasetDims[2])
         {
             //Covered by TestHdf5DataWriterFullFormatStripedIncompleteCached
             EXCEPTION("Cached writes must write all variables at once.");
         }
-        if ( ! mIsUnlimitedDimensionSet )
+        if (!mIsUnlimitedDimensionSet)
         {
             //Covered by TestHdf5DataWriterStripedNoTimeCachedFails
             EXCEPTION("Cached writes require an unlimited dimension.");
@@ -1011,7 +1011,7 @@ void Hdf5DataWriter::PutStripedVector(std::vector<int> variableIDs, Vec petscVec
 
     if (mIsDataComplete)
     {
-        if ( mUseCache )
+        if (mUseCache)
         {
             // Covered by TestHdf5DataWriterStripedCached
             mDataCache.insert(mDataCache.end(), p_petsc_vector, p_petsc_vector+mNumberOwned*NUM_STRIPES);
@@ -1036,7 +1036,7 @@ void Hdf5DataWriter::PutStripedVector(std::vector<int> variableIDs, Vec petscVec
                 double* p_petsc_vector_incomplete;
                 VecGetArray(output_petsc_vector, &p_petsc_vector_incomplete);
 
-                if ( mUseCache )
+                if (mUseCache)
                 {
                     //Covered by TestHdf5DataWriterFullFormatStripedIncompleteUsingMatrixCached
                     mDataCache.insert(mDataCache.end(), p_petsc_vector_incomplete, p_petsc_vector_incomplete+2*mNumberOwned);
@@ -1057,7 +1057,7 @@ void Hdf5DataWriter::PutStripedVector(std::vector<int> variableIDs, Vec petscVec
                     local_data[NUM_STRIPES*i+1] = p_petsc_vector[ local_node_number*NUM_STRIPES + 1];
                 }
 
-                if ( mUseCache )
+                if (mUseCache)
                 {
                     //Covered by TestHdf5DataWriterFullFormatStripedIncompleteCached
                     mDataCache.insert(mDataCache.end(), local_data.get(), local_data.get()+2*mNumberOwned);
@@ -1097,9 +1097,9 @@ void Hdf5DataWriter::WriteCache()
     // The HDF5 writes are collective which means that if a process has nothing to write from
     // its cache then it must still proceed in step with the other processes.
     bool any_nonempty_caches = PetscTools::ReplicateBool( !mDataCache.empty() );
-    if ( !any_nonempty_caches )
+    if (!any_nonempty_caches)
     {
-        // Nothing to do.
+        // Nothing to do
         return;
     }
 
@@ -1186,7 +1186,7 @@ void Hdf5DataWriter::Close()
         return; // Nothing to do...
     }
 
-    if ( mUseCache )
+    if (mUseCache)
     {
         WriteCache();
     }
@@ -1236,7 +1236,7 @@ void Hdf5DataWriter::AdvanceAlongUnlimitedDimension()
      * out when the chunk size == the cache size, because we might have started
      * part-way through a chunk.
      */
-    if ( mUseCache && (mCurrentTimeStep % mChunkSize[0] == 0))
+    if (mUseCache && (mCurrentTimeStep % mChunkSize[0] == 0))
     {
         WriteCache();
     }
@@ -1245,7 +1245,7 @@ void Hdf5DataWriter::AdvanceAlongUnlimitedDimension()
      * Extend the dataset (only reached when adding to an existing dataset,
      * or if mEstimatedUnlimitedLength hasn't been set and has defaulted to 1).
      */
-    if ( mCurrentTimeStep >= (long unsigned) mEstimatedUnlimitedLength )
+    if (mCurrentTimeStep >= (long unsigned) mEstimatedUnlimitedLength)
     {
         mDatasetDims[0]++;
         mNeedExtend = true;
@@ -1447,7 +1447,7 @@ void Hdf5DataWriter::SetChunkSize()
         while ( chunk_size_in_bytes < target_size_in_bytes && !all_one_chunk);
 
         // Go one step back if the target size has been exceeded
-        if ( chunk_size_in_bytes > target_size_in_bytes && !all_one_chunk )
+        if (chunk_size_in_bytes > target_size_in_bytes && !all_one_chunk)
         {
             target_size--;
             CalculateChunkDims(target_size, &chunk_size_in_bytes, &all_one_chunk);
@@ -1467,7 +1467,7 @@ void Hdf5DataWriter::SetChunkSize()
     mNumberOfChunks = CalculateNumberOfChunks();
 
     /*
-    if ( PetscTools::AmMaster() )
+    if (PetscTools::AmMaster())
     {
         std::cout << "Hdf5DataWriter dataset contains " << mNumberOfChunks << " chunks of " << chunk_size_in_bytes << " B." << std::endl;
     }

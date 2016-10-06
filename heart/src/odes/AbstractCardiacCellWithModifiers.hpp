@@ -181,7 +181,6 @@ public:
      * @param pNewModifier  The new modifier object to use.
      */
     void SetModifier(const std::string& rModifierName, boost::shared_ptr<AbstractModifier>& pNewModifier);
-
 };
 
 // Special case of archiving an abstract class that's templated over Chaste classes.

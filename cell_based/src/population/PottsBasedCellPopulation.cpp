@@ -301,9 +301,9 @@ void PottsBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
             std::set<unsigned> containing_elements = p_node->rGetContainingElementIndices();
             std::set<unsigned> neighbour_containing_elements = GetNode(neighbour_location_index)->rGetContainingElementIndices();
             // Only calculate Hamiltonian and update elements if the nodes are from different elements, or one is from the medium
-            if (    ( !containing_elements.empty() && neighbour_containing_elements.empty() )
-                 || ( containing_elements.empty() && !neighbour_containing_elements.empty() )
-                 || ( !containing_elements.empty() && !neighbour_containing_elements.empty() && *containing_elements.begin() != *neighbour_containing_elements.begin() ) )
+            if ((!containing_elements.empty() && neighbour_containing_elements.empty())
+                || (containing_elements.empty() && !neighbour_containing_elements.empty())
+                || (!containing_elements.empty() && !neighbour_containing_elements.empty() && *containing_elements.begin() != *neighbour_containing_elements.begin()))
             {
                 double delta_H = 0.0; // This is H_1-H_0.
 
@@ -463,8 +463,8 @@ void PottsBasedCellPopulation<DIM>::CreateMutableMesh()
     std::vector<Node<DIM>*> nodes;
     for (unsigned node_index=0; node_index<this->mrMesh.GetNumNodes(); node_index++)
     {
-      c_vector<double, DIM> location = this->mrMesh.GetNode(node_index)->rGetLocation();
-      nodes.push_back(new Node<DIM>(node_index, location));
+      const c_vector<double, DIM>& r_location = this->mrMesh.GetNode(node_index)->rGetLocation();
+      nodes.push_back(new Node<DIM>(node_index, r_location));
     }
 
     mpMutableMesh = new MutableMesh<DIM,DIM>(nodes);
@@ -645,45 +645,44 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDi
             {
                 std::set<unsigned> neighbouring_element_indices = this->rGetMesh().GetNode(*neighbour_iter)->rGetContainingElementIndices();
 
-                //if different cells add a line
-                if ( element_indices != neighbouring_element_indices)
+                // If different cells add a line
+                if (element_indices != neighbouring_element_indices)
                 {
                     std::vector<Node<2>*> element_nodes;
 
-                    c_vector<double, 2> node_location = this->mrMesh.GetNode(node_index)->rGetLocation();
-                    c_vector<double, 2> neighbour_node_location = this->mrMesh.GetNode(*neighbour_iter)->rGetLocation();
+                    const c_vector<double, 2>& r_node_location = this->mrMesh.GetNode(node_index)->rGetLocation();
+                    const c_vector<double, 2>& r_neighbour_node_location = this->mrMesh.GetNode(*neighbour_iter)->rGetLocation();
 
-                    c_vector<double, 2> unit_tangent = neighbour_node_location - node_location;
-
+                    c_vector<double, 2> unit_tangent = r_neighbour_node_location - r_node_location;
 
                     if (norm_2(unit_tangent) > 1.0) // It's a periodic neighbour
                     {
-                        c_vector<double, 2> mid_point = 0.5*(node_location + neighbour_node_location);
-                        if (unit_tangent(0)==0)
+                        c_vector<double, 2> mid_point = 0.5*(r_node_location + r_neighbour_node_location);
+                        if (unit_tangent(0) == 0)
                         {
-                            if (node_location(1) < neighbour_node_location (1))
+                            if (r_node_location(1) < r_neighbour_node_location(1))
                             {
-                                mid_point(1) = node_location(1) - 0.5;
+                                mid_point(1) = r_node_location(1) - 0.5;
                             }
                             else
                             {
-                                mid_point(1) = node_location(1) + 0.5;
+                                mid_point(1) = r_node_location(1) + 0.5;
                             }
                         }
                         else
                         {
-                            assert(unit_tangent(1)==0);
+                            assert(unit_tangent(1) == 0);
 
-                            if (node_location(0) < neighbour_node_location (0))
+                            if (r_node_location(0) < r_neighbour_node_location(0))
                             {
-                                mid_point(0) = node_location(0) - 0.5;
+                                mid_point(0) = r_node_location(0) - 0.5;
                             }
                             else
                             {
-                                mid_point(0) = node_location(0) + 0.5;
+                                mid_point(0) = r_node_location(0) + 0.5;
                             }
                         }
-                        assert(norm_2(unit_tangent)>0);
+                        assert(norm_2(unit_tangent) > 0);
                         unit_tangent = unit_tangent/norm_2(unit_tangent);
 
                         c_vector<double, DIM> unit_normal;
@@ -715,9 +714,9 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDi
                     }
                     else // Standard Neighbour
                     {
-                        c_vector<double, 2> mid_point = 0.5*(node_location + neighbour_node_location);
+                        c_vector<double, 2> mid_point = 0.5*(r_node_location + r_neighbour_node_location);
 
-                        assert(norm_2(unit_tangent)>0);
+                        assert(norm_2(unit_tangent) > 0);
                         unit_tangent = unit_tangent/norm_2(unit_tangent);
 
                         c_vector<double, 2> unit_normal;
@@ -745,11 +744,8 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDi
                         VertexElement<2,2>* p_element = new VertexElement<2,2>(outline_element_index, element_nodes);
                         outline_elements.push_back(p_element);
                         outline_element_index++;
-
                     }
-
                 }
-
             }
         }
         VertexMesh<2,2> cell_outline_mesh(outline_nodes,outline_elements);

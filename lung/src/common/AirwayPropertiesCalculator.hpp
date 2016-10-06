@@ -424,9 +424,6 @@ private:
      * @param pBranch The current branch
      */
     void RecursivelyCalculateUpstreamPoiseuilleResistances(AirwayBranch* pBranch);
-
-
 };
-
 
 #endif // AIRWAY_PROPERTIES_CALCULATOR

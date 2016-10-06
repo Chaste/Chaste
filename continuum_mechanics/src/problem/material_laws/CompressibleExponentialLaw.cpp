@@ -138,9 +138,6 @@ void CompressibleExponentialLaw<DIM>::ComputeStressAndStressDerivative(c_matrix<
     this->TransformStressAndStressDerivative(rT, rDTdE, computeDTdE);
 }
 
-////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-////////////////////////////////////////////////////////////////////////////////////
-
 template class CompressibleExponentialLaw<2>;
 template class CompressibleExponentialLaw<3>;

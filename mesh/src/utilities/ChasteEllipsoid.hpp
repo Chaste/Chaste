@@ -93,7 +93,6 @@ public:
 
     /** @return radii of the ellipsoid */
     const ChastePoint<SPACE_DIM>& rGetRadii() const;
-
 };
 
 // Declare identifier for the serializer

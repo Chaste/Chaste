@@ -87,8 +87,6 @@ public:
         TS_ASSERT(tester.Converged);
         TS_ASSERT_EQUALS(tester.MeshNum, 5u);
     }
-
-
 };
 
 #endif /*TESTCONVERGENCENEUMANNSTIMULUS_HPP_*/

@@ -231,8 +231,6 @@ public:
      */
     void PreSolveChecks();
 
-
-
     /**
      *  Called at beginning of each time step in the main time-loop in
      *  AbstractCardiacProblem::Solve(). Overloaded here to switch on

@@ -47,7 +47,7 @@ void Citations::Register(const char pCitation[], PetscBool* pSet)
     // (If PETSc is finalised after the first citation is registered we will probably switch implementation, but there's no way to avoid that.)
     if (!mUseChasteImplementation)
     {
-#if ( (PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5) || PETSC_VERSION_MAJOR>3 )
+#if ((PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5) || PETSC_VERSION_MAJOR>3)
         mUseChasteImplementation = !PetscTools::IsInitialised();
 #else
         mUseChasteImplementation = true;
@@ -56,7 +56,7 @@ void Citations::Register(const char pCitation[], PetscBool* pSet)
 
     if (!mUseChasteImplementation)
     {
-#if ( (PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5) || PETSC_VERSION_MAJOR>3 )
+#if ((PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5) || PETSC_VERSION_MAJOR>3)
         PetscCitationsRegister(pCitation, pSet);
 #endif
     }
@@ -72,12 +72,12 @@ void Citations::Print()
 {
     if (mUseChasteImplementation)
     {
-        if ( PetscTools::AmMaster() && CommandLineArguments::Instance()->OptionExists("-citations") )
+        if (PetscTools::AmMaster() && CommandLineArguments::Instance()->OptionExists("-citations"))
         {
             std::ostream * p_output = &(std::cout);
             bool writing_to_file = false;
 
-            if ( CommandLineArguments::Instance()->GetNumberOfArgumentsForOption("-citations")>0 )
+            if (CommandLineArguments::Instance()->GetNumberOfArgumentsForOption("-citations")>0)
             {
                 // We've got a file to write to - assume the user has given us something sensible!
                 writing_to_file = true;
@@ -97,7 +97,7 @@ void Citations::Print()
             /* Write footer */
             (*p_output) << "===========================================================================" << std::endl;
 
-            if ( writing_to_file )
+            if (writing_to_file)
             {
                 delete p_output;
             }

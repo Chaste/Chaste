@@ -202,7 +202,6 @@ private:
         archive & mAdditionalTimesReachedDeprecated;
         archive & mAdditionalTimesDeprecated;
     }
-
 };
 
 #include "SerializationExportWrapper.hpp"

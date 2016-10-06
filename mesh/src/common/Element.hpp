@@ -164,7 +164,6 @@ public:
      * @param strict whether the point must not be too close to an edge/face (defaults to false)
      */
     bool IncludesPoint(const ChastePoint<SPACE_DIM>& rTestPoint, bool strict=false);
-
 };
 
 #endif //_ELEMENT_HPP_

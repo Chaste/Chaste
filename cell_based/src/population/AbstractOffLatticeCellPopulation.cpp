@@ -107,10 +107,7 @@ void AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulat
     AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulationParameters(rParamsFile);
 }
 
-/////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////
-
 template class AbstractOffLatticeCellPopulation<1,1>;
 template class AbstractOffLatticeCellPopulation<1,2>;
 template class AbstractOffLatticeCellPopulation<2,2>;

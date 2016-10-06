@@ -69,13 +69,7 @@ c_vector<double,1*(ELEM_DIM+1)> MonodomainCorrectionTermAssembler<ELEM_DIM,SPACE
     return rPhi * (-Am) * ( ionic_sv_interp - this->mIionicInterp );
 }
 
-
-
-
-///////////////////////////////////////////////////////
-// explicit instantiation
-///////////////////////////////////////////////////////
-
+// Explicit instantiation
 template class MonodomainCorrectionTermAssembler<1,1>;
 template class MonodomainCorrectionTermAssembler<1,2>;
 template class MonodomainCorrectionTermAssembler<1,3>;

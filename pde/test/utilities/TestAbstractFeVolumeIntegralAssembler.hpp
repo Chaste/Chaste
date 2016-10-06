@@ -109,8 +109,6 @@ public:
     }
 };
 
-
-
 // Assembler which does both of the above
 template<unsigned DIM>
 class BasicVectorAndMatrixAssembler : public AbstractFeVolumeIntegralAssembler<DIM,DIM,1,true,true,NORMAL>
@@ -233,9 +231,6 @@ public:
         DoTestBasicVectorAssemblers<2>();
         DoTestBasicVectorAssemblers<3>();
     }
-
-
-
 
     // Test matrix assembly
     // only test the 1d one as here as more difficult to write down correct matrix on paper

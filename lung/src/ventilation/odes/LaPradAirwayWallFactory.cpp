@@ -53,13 +53,11 @@ LaPradAirwayWallFactory::LaPradAirwayWallFactory(bool useStrahlerOrder) : mpWalk
 
 LaPradAirwayWallFactory::~LaPradAirwayWallFactory()
 {
-    if(mpWalker)
+    if (mpWalker)
     {
         delete mpWalker;
     }
 }
-
-
 
 double LaPradAirwayWallFactory::Getk1ForGeneration(unsigned generation)
 {
@@ -85,7 +83,7 @@ LaPradAirwayWall* LaPradAirwayWallFactory::CreateAirwayWallForElement(Element<1,
 {
     unsigned order = 0;
 
-    if(mUseStrahlerOrder)
+    if (mUseStrahlerOrder)
     {
         order = mpWalker->GetElementStrahlerOrder(pElement);
     }
@@ -135,7 +133,7 @@ void LaPradAirwayWallFactory::SetMesh(AbstractTetrahedralMesh<1,3>* pMesh)
 
     mpWalker = new AirwayTreeWalker(*pMesh, 0u);
 
-    if(mUseStrahlerOrder)
+    if (mUseStrahlerOrder)
     {
         mMaxOrder = mpWalker->GetMaxElementStrahlerOrder();
     }

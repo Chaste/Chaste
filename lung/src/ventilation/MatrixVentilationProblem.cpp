@@ -165,8 +165,8 @@ void MatrixVentilationProblem::Assemble(bool dynamicReassemble)
          ++iter)
     {
         unsigned element_index = iter->GetIndex();
-        //Only assemble if the row for this element is locally owned
-        if ( (unsigned) lo <=  element_index && element_index < (unsigned) hi )
+        // Only assemble if the row for this element is locally owned
+        if ((unsigned) lo <=  element_index && element_index < (unsigned) hi)
         {
             /* Poiseuille flow gives:
              *  pressure_node_1 - pressure_node_2 - resistance * flux = 0
@@ -277,7 +277,6 @@ void MatrixVentilationProblem::GetSolutionAsFluxesAndPressures(std::vector<doubl
 //            max_scaled_flux = fabs(solution_vector_repl[i]);
 //            max_flux = rFluxesOnEdges[i];
 //        }
-
     }
 
     rPressuresOnNodes.resize(mMesh.GetNumNodes());
@@ -288,7 +287,6 @@ void MatrixVentilationProblem::GetSolutionAsFluxesAndPressures(std::vector<doubl
 //        {
 //            max_pressure = fabs(rPressuresOnNodes[i]);
 //        }
-
     }
 //    PRINT_5_VARIABLES(max_flux, max_scaled_flux, max_pressure, max_scaled_flux/max_pressure, max_flux/max_pressure);
 }

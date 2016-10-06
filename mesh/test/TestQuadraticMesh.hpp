@@ -621,8 +621,8 @@ public:
             BoundaryElement<1,2>* p_b_elem_read_back =  quad_mesh_read_back.GetBoundaryElement(b_elem);
             TS_ASSERT_EQUALS(p_b_elem_constructed->GetNumNodes(), p_b_elem_read_back->GetNumNodes());
         }
-
     }
+
     void TestConstructionConversionVersusConstruction2dWithStagger()
     {
         QuadraticMesh<2> quad_mesh_read_back;
@@ -670,7 +670,6 @@ public:
             BoundaryElement<1,2>* p_b_elem_read_back =  quad_mesh_read_back.GetBoundaryElement(b_elem);
             TS_ASSERT_EQUALS(p_b_elem_constructed->GetNumNodes(), p_b_elem_read_back->GetNumNodes());
         }
-
     }
 
     void TestConstructionConversionVersusConstruction3d()
@@ -724,9 +723,7 @@ public:
             BoundaryElement<2,3>* p_b_elem_read_back =  quad_mesh_read_back.GetBoundaryElement(b_elem);
             TS_ASSERT_EQUALS(p_b_elem_constructed->GetNumNodes(), p_b_elem_read_back->GetNumNodes());
         }
-
     }
-
 
     void TestLinearToQuadraticMeshConversion2d() throw(Exception)
     {
@@ -955,8 +952,6 @@ public:
         PetscMatTools::Finalise(matrix);
     }
 
-
-
     std::vector<unsigned> CalculateMatrixFill(AbstractTetrahedralMesh<2,2>& rMesh)
     {
         //Get some statistics about matrix fill
@@ -996,26 +991,23 @@ public:
         return global_hist;
     }
 
-
-
-
     void TestElementsContainedByNodes3d() throw (Exception)
     {
         QuadraticMesh<3> mesh;
         double h = 1.0;
         mesh.ConstructRegularSlabMesh(h, 2.0, 1.0, 1.0);
 
-        for(unsigned node_index = 0; node_index<mesh.GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index<mesh.GetNumNodes(); node_index++)
         {
             std::set<unsigned> elements = mesh.GetNode(node_index)->rGetContainingElementIndices();
-            for(std::set<unsigned>::iterator iter = elements.begin(); iter != elements.end(); iter++)
+            for (std::set<unsigned>::iterator iter = elements.begin(); iter != elements.end(); iter++)
             {
                 Element<3,3>* p_element = mesh.GetElement(*iter);
                 bool found_node = false;
-                for(unsigned i=0; i<p_element->GetNumNodes(); i++)
+                for (unsigned i=0; i<p_element->GetNumNodes(); i++)
                 {
                     unsigned this_node = p_element->GetNodeGlobalIndex(i);
-                    if(this_node==node_index)
+                    if (this_node == node_index)
                     {
                         found_node = true;
                     }
@@ -1024,14 +1016,14 @@ public:
             }
 
             std::set<unsigned> boundary_elements = mesh.GetNode(node_index)->rGetContainingBoundaryElementIndices();
-            for(std::set<unsigned>::iterator iter = boundary_elements.begin(); iter != boundary_elements.end(); iter++)
+            for (std::set<unsigned>::iterator iter = boundary_elements.begin(); iter != boundary_elements.end(); iter++)
             {
                 BoundaryElement<2,3>* p_element = mesh.GetBoundaryElement(*iter);
                 bool found_node = false;
-                for(unsigned i=0; i<p_element->GetNumNodes(); i++)
+                for (unsigned i=0; i<p_element->GetNumNodes(); i++)
                 {
                     unsigned this_node = p_element->GetNodeGlobalIndex(i);
-                    if(this_node==node_index)
+                    if (this_node == node_index)
                     {
                         found_node = true;
                     }

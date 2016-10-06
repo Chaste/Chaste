@@ -132,7 +132,7 @@ public:
 //        VtkMeshWriter<1,3> writer("TestAirwayRemesher", "Novartis002_remeshed");
 //        std::vector<double> radii(output_mesh_one.GetNumElements());
 //
-//        for(TetrahedralMesh<1,3>::ElementIterator iter = output_mesh_one.GetElementIteratorBegin();
+//        for (TetrahedralMesh<1,3>::ElementIterator iter = output_mesh_one.GetElementIteratorBegin();
 //            iter != output_mesh_one.GetElementIteratorEnd();
 //            ++iter)
 //        {
@@ -146,7 +146,5 @@ public:
 //        writer2.WriteFilesUsingMesh(output_mesh_one);
     }
 };
-
-
 
 #endif /* TESTAIRWAYREMESHER_HPP_ */

@@ -70,12 +70,12 @@ public:
     {
         double x = pNode->rGetLocation()[0];
         double y;
-        if(DIM==2)
+        if (DIM==2)
         {
             y = pNode->rGetLocation()[1];
         }
 
-        if (    (DIM==1 && fabs(x)<0.02+1e-6)
+        if ((DIM==1 && fabs(x)<0.02+1e-6)
              || (DIM==2 && fabs(x)<0.1+1e-6 && fabs(y)<0.1+1e-6) ) // 2D problem needs larger stimulus
         {
             return new CellLuoRudy1991FromCellML(this->mpSolver, this->mpStimulus);
@@ -103,7 +103,7 @@ public:
         AbstractCardiacCell* p_cell;
         ChastePoint<2> node_location = pNode->GetPoint();
 
-        if ( node_location[0]<0.1 && node_location[1]<0.1)
+        if (node_location[0]<0.1 && node_location[1]<0.1)
         {
             p_cell = new CellLuoRudy1991FromCellML(mpSolver, mpStim);
         }
@@ -134,7 +134,7 @@ public:
         HeartConfig::Instance()->SetSimulationDuration(4.0); //ms
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.01);
 
-        for(unsigned i=0; i<3; i++)
+        for (unsigned i=0; i<3; i++)
         {
             // ICI - ionic current interpolation - the default
             {
@@ -203,15 +203,15 @@ public:
                 final_solution_svit.ReplicatePetscVector(bidomain_problem.GetSolution());
             }
             double voltage_at_0_03_finest_mesh;
-            if(i==0) // finest mesh
+            if (i==0) // finest mesh
             {
-                for(unsigned j=0; j<final_solution_ici.GetSize(); j++)
+                for (unsigned j=0; j<final_solution_ici.GetSize(); j++)
                 {
                     // visually checked they agree at this mesh resolution, and chosen tolerance from results
                     TS_ASSERT_DELTA(final_solution_ici[j], final_solution_svi[j], 0.35);
                     TS_ASSERT_DELTA(final_solution_svit[j], final_solution_svi[j], 1e-8);
 
-                    if(j%2==0 /* just look at voltage */ && final_solution_ici[j]>-80)
+                    if (j%2==0 /* just look at voltage */ && final_solution_ici[j]>-80)
                     {
                         // shouldn't be exactly equal, as long as away from resting potential
                         TS_ASSERT_DIFFERS(final_solution_ici[j], final_solution_svi[j]);
@@ -221,7 +221,7 @@ public:
                 voltage_at_0_03_finest_mesh = final_solution_ici[600];
                 TS_ASSERT_DELTA(voltage_at_0_03_finest_mesh, -65.2218, 1e-2); //hardcoded value
             }
-            else if(i==1)
+            else if (i==1)
             {
                 double nci_voltage_at_0_03_middle_mesh = final_solution_ici[60];
                 double svi_voltage_at_0_03_middle_mesh = final_solution_svi[60];
@@ -321,7 +321,7 @@ public:
         {
             unsigned element_index = iter->GetIndex();
 
-            if ( element_index==10 || element_index==17 )
+            if (element_index==10 || element_index==17)
             {
                 iter->SetAttribute(HeartRegionCode::GetValidBathId());
             }

@@ -45,8 +45,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MatrixVentilationProblem.hpp"
 #include "Warnings.hpp"
 
-
-
 void LinearTimeBCs(AbstractVentilationProblem* pProblem, TimeStepper& rTimeStepper, const Node<3>& rNode)
 {
     double time = rTimeStepper.GetTime();
@@ -465,9 +463,9 @@ public:
 //        vtk_writer.AddPointData("Pressure", pressure);
 //
 //        std::vector<double> radii(problem.rGetMesh().GetNumElements());
-//        for(TetrahedralMesh<1,3>::ElementIterator iter = problem.rGetMesh().GetElementIteratorBegin();
-//            iter != problem.rGetMesh().GetElementIteratorEnd();
-//            ++iter)
+//        for (TetrahedralMesh<1,3>::ElementIterator iter = problem.rGetMesh().GetElementIteratorBegin();
+//             iter != problem.rGetMesh().GetElementIteratorEnd();
+//             ++iter)
 //        {
 //            radii[(*iter).GetIndex()] = (*iter).GetAttribute();
 //        }

@@ -49,14 +49,12 @@ ZeroNetChargeElectrodes<DIM>::ZeroNetChargeElectrodes(std::vector<std::pair<Abst
                                                           std::vector<double>& rEnds)
     : ElectrodesStimulusFactory<DIM>(rElectrodePairs, rStimulusMagnitudes, rDurations, rPeriods, rStarts, rEnds)
 {
-
 }
 
 template<unsigned DIM>
 ZeroNetChargeElectrodes<DIM>::~ZeroNetChargeElectrodes()
 {
 }
-
 
 template<unsigned DIM>
 boost::shared_ptr<AbstractStimulusFunction> ZeroNetChargeElectrodes<DIM>::CreateStimulusForNode(Node<DIM>* pNode)
@@ -80,12 +78,7 @@ boost::shared_ptr<AbstractStimulusFunction> ZeroNetChargeElectrodes<DIM>::Create
     return p_stimulus;
 }
 
-
-/////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////
-
 template class ZeroNetChargeElectrodes<1>;
 template class ZeroNetChargeElectrodes<2>;
 template class ZeroNetChargeElectrodes<3>;
-

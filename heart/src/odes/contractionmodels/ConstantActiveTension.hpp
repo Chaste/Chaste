@@ -113,10 +113,6 @@ public:
     {
         mConstantActiveTension = activeTension;
     }
-
 };
 
-
 #endif //_CONSTANTACTIVETENSION_HPP_
-
-

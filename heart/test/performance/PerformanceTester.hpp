@@ -162,7 +162,6 @@ public:
 private:
     unsigned mNumNodes;
     unsigned mNumElements;
-
 };
 
 ///Set static const on instantiation

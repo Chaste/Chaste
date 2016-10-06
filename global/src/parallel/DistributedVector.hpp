@@ -251,7 +251,6 @@ public:
         {
             return mpVec[index.Local*mStride + mStripe];
         }
-
     };
 
     /**
@@ -310,7 +309,6 @@ public:
         {
             return mpVec[mOffset + index.Local];
         }
-
     };
 
     /**

@@ -621,12 +621,10 @@ TetrahedralMesh<DIM, DIM>* VertexBasedCellPopulation<DIM>::GetTetrahedralMeshFor
 
         ///\todo will the nodes in mpMutableVertexMesh always have indices 0,1,2,...? (#2221)
         unsigned index = p_node->GetIndex();
-
-        c_vector<double, DIM> location = p_node->rGetLocation();
-
+        const c_vector<double, DIM>& r_location = p_node->rGetLocation();
         unsigned is_boundary_node = p_node->IsBoundaryNode() ? 1 : 0;
 
-        (*p_node_file) << index << "\t" << location[0] << "\t" << location[1] << "\t" << is_boundary_node << std::endl;
+        (*p_node_file) << index << "\t" << r_location[0] << "\t" << r_location[1] << "\t" << is_boundary_node << std::endl;
     }
 
     // Now write an additional node at each VertexElement's centroid

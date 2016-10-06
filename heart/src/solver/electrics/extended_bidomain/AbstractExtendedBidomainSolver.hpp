@@ -187,7 +187,6 @@ public:
      {
          return mpBoundaryConditions;
      }
-
 };
 
 #endif /*ABSTRACTEXTENDEDBIDOMAINSOLVER_HPP_*/

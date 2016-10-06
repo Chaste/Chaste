@@ -48,7 +48,6 @@ BoundaryElement<ELEMENT_DIM, SPACE_DIM>::BoundaryElement()
 {
 }
 
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 BoundaryElement<ELEMENT_DIM, SPACE_DIM>::BoundaryElement(unsigned index, const std::vector<Node<SPACE_DIM>*>& rNodes)
     : AbstractTetrahedralElement<ELEMENT_DIM, SPACE_DIM>(index, rNodes)
@@ -114,11 +113,7 @@ void BoundaryElement<ELEMENT_DIM, SPACE_DIM>::UpdateNode(const unsigned& rIndex,
     this->mNodes[rIndex]->AddBoundaryElement(this->mIndex);
 }
 
-
-/////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////////////
-
 template class BoundaryElement<0,1>;
 template class BoundaryElement<0,2>;
 template class BoundaryElement<1,2>;
