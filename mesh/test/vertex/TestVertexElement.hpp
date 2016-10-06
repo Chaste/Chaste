@@ -77,7 +77,7 @@ public:
         TS_ASSERT_EQUALS(element.GetNumFaces(), 0u);
         VertexElement<0,2>* p_face = element.GetFace(0);
         TS_ASSERT(!p_face);
-        TS_ASSERT_EQUALS(element.FaceIsOrientatedClockwise(0), false);
+        TS_ASSERT_EQUALS(element.FaceIsOrientatedAntiClockwise(0), false);
 
         // Test UpdateNode()
         Node<2>* p_node_2 = new Node<2>(2, false, 1.2, 1.3);
@@ -206,7 +206,7 @@ public:
         // Test orientations
         for (unsigned face_index=0; face_index<element.GetNumFaces(); face_index++)
         {
-            TS_ASSERT_EQUALS(element.FaceIsOrientatedClockwise(face_index), true);
+            TS_ASSERT_EQUALS(element.FaceIsOrientatedAntiClockwise(face_index), true);
         }
 
         // Tidy up
@@ -262,8 +262,8 @@ public:
         {
             TS_ASSERT_EQUALS(vertex_element.GetFace(face_index)->GetNumNodes(), 2u);
 
-            bool is_clockwise = (face_index==5) ? false : true;
-            TS_ASSERT_EQUALS(vertex_element.FaceIsOrientatedClockwise(face_index), is_clockwise);
+            bool is_anti_clockwise = (face_index==5) ? false : true;
+            TS_ASSERT_EQUALS(vertex_element.FaceIsOrientatedAntiClockwise(face_index), is_anti_clockwise);
         }
 
         // Tidy up

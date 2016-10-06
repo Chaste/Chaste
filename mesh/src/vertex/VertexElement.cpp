@@ -178,7 +178,7 @@ VertexElement<ELEMENT_DIM-1,  SPACE_DIM>* VertexElement<ELEMENT_DIM, SPACE_DIM>:
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-bool VertexElement<ELEMENT_DIM, SPACE_DIM>::FaceIsOrientatedClockwise(unsigned index) const
+bool VertexElement<ELEMENT_DIM, SPACE_DIM>::FaceIsOrientatedAntiClockwise(unsigned index) const
 {
     assert(index < mOrientations.size());
     return mOrientations[index];
@@ -213,7 +213,7 @@ VertexElement<0, SPACE_DIM>* VertexElement<1, SPACE_DIM>::GetFace(unsigned index
 }
 
 template<unsigned SPACE_DIM>
-bool VertexElement<1, SPACE_DIM>::FaceIsOrientatedClockwise(unsigned index) const
+bool VertexElement<1, SPACE_DIM>::FaceIsOrientatedAntiClockwise(unsigned index) const
 {
     return false;
 }

@@ -164,11 +164,11 @@ public:
     VertexElement<ELEMENT_DIM-1, SPACE_DIM>* GetFace(unsigned index) const;
 
     /**
-     * @return whether the face with a given index is oriented clockwise.
+     * @return whether the face with a given index is oriented anti clockwise.
      *
      * @param index the index of the face
      */
-    bool FaceIsOrientatedClockwise(unsigned index) const;
+    bool FaceIsOrientatedAntiClockwise(unsigned index) const;
 };
 
 
@@ -212,7 +212,7 @@ public:
      *
      * @param index the index of the face
      */
-    bool FaceIsOrientatedClockwise(unsigned index) const;
+    bool FaceIsOrientatedAntiClockwise(unsigned index) const;
 };
 
 #endif /*VERTEXELEMENT_HPP_*/
