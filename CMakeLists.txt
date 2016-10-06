@@ -737,7 +737,6 @@ add_custom_target(infrastructure
     COMMAND ${PYTHON_EXECUTABLE} ${Chaste_SOURCE_DIR}/python/infra/CheckForDuplicateFileNames.py
     COMMAND ${PYTHON_EXECUTABLE} ${Chaste_SOURCE_DIR}/python/infra/CheckForOrphanedTests.py
     COMMAND ${PYTHON_EXECUTABLE} ${Chaste_SOURCE_DIR}/python/infra/CheckSchemas.py
-    COMMAND ${PYTHON_EXECUTABLE} ${Chaste_SOURCE_DIR}/python/infra/CheckSemaphores.py
 
     WORKING_DIRECTORY ${Chaste_SOURCE_DIR}
     VERBATIM)
