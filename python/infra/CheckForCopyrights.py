@@ -190,7 +190,7 @@ py_lgpl_notice = """# This library is free software; you can redistribute it and
 # modify it under the terms of the GNU Lesser General Public
 # License as published by the Free Software Foundation; either
 # version 2.1 of the License, or (at your option) any later version.
-# 
+#
 # This library is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -210,7 +210,7 @@ def CheckForCopyrightNotice(findStrOrRe, fileIn):
 
 def UpdateFile(oldFilePath, newFilePath):
     """Replace the contents of oldFilePath with newFilePath.
-    
+
     This removes the old file and renames the new to match, but also
     transfers permissions etc.
     """
@@ -243,7 +243,7 @@ def HeadAppendStringInFile(appendString, filePath):
     UpdateFile(filePath, tempName)
     print 'Notice: applied copyright notice in ', filePath
 
-   
+
 def InspectFile(fileName):
     file_in = open(fileName)
     if fileName[-21:] == 'CheckForCopyrights.py':
@@ -260,7 +260,7 @@ def InspectFile(fileName):
         CheckForCopyrightNotice(xsd2_notice, file_in) or
         CheckForCopyrightNotice(xsd3_notice, file_in) or
         CheckForCopyrightNotice(triangle_notice, file_in) or
-        CheckForCopyrightNotice(tetgen_predicates_notice, file_in) or 
+        CheckForCopyrightNotice(tetgen_predicates_notice, file_in) or
         CheckForCopyrightNotice(tetgen_notice, file_in) or
         CheckForCopyrightNotice(py_lgpl_notice, file_in)):
         #print 'Found 3rd party notice in '+file_name
@@ -269,10 +269,10 @@ def InspectFile(fileName):
             return False
         else:
             return True
-    
+
     if valid_notice:
         return True
-    
+
     if CheckForCopyrightNotice(deprecated_notice, file_in):
         print 'Found deprecated copyright notice for', fileName
         if apply_update:
@@ -281,7 +281,7 @@ def InspectFile(fileName):
         else:
             print 'Fix this by doing:',sys.argv[0],'-update'
             return False
-        
+
     if CheckForCopyrightNotice(deprecated_notice_GPL, file_in):
         print 'Found deprecated GPL copyright notice for', fileName
         if apply_update:
@@ -290,7 +290,7 @@ def InspectFile(fileName):
         else:
             print 'Fix this by doing:',sys.argv[0],'-update'
             return False
-    
+
     print 'Found no copyright notice for', fileName
     if apply_new:
         if fileName[-3:] == '.py':
@@ -310,7 +310,7 @@ if __name__ == '__main__':
     exts = ['.cpp', '.hpp', '.py', '.java']
 
     # SCons files
-    # output.chaste files in acceptance tests (all Chaste executables should output the valid copyright notice) 
+    # output.chaste files in acceptance tests (all Chaste executables should output the valid copyright notice)
     # Version.cpp.in is the provenance file
     named_files = ['SConscript', 'SConstruct', 'output.chaste', 'Version.cpp.in']
 
@@ -322,10 +322,10 @@ if __name__ == '__main__':
     apply_new = '-new' in sys.argv
 
     chaste_dir = '.'
-    if '-dir' in sys.argv: 
+    if '-dir' in sys.argv:
         i = sys.argv.index('-dir')
         chaste_dir = os.path.realpath(sys.argv[i+1])
-    
+
     num_no_copyrights = 0
     num_copyrights = 0
     chaste_dir_len = len(os.path.join(chaste_dir, ''))
@@ -358,7 +358,7 @@ if __name__ == '__main__':
         print
         print "The next line is for the benefit of the test summary scripts."
         print "Failed",num_no_copyrights,"of",num_no_copyrights+num_copyrights,"tests"
-    
+
         # Return a non-zero exit code if orphans were found
         sys.exit(num_no_copyrights)
     else:
