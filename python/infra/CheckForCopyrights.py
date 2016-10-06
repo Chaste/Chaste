@@ -314,7 +314,7 @@ if __name__ == '__main__':
     # Version.cpp.in is the provenance file
     named_files = ['SConscript', 'SConstruct', 'output.chaste', 'Version.cpp.in']
 
-    dir_ignores = ['build', 'cxxtest', 'testoutput', 'doc', 'projects', 'hierwikiplugin']
+    dir_ignores = ['Debug', 'Release', 'build', 'cxxtest', 'testoutput', 'doc', 'projects', 'hierwikiplugin']
     startchar_ignores = ['_', '.']
     exclusions = ['python/pycml/enum.py', 'python/pycml/pyparsing.py', 'python/pycml/schematron.py']
 
