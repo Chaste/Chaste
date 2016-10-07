@@ -66,21 +66,21 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * As in previous cell-based Chaste tutorials, we begin by including the necessary header files.
  */
 #include <cxxtest/TestSuite.h>
-#include "CheckpointArchiveTypes.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
+#include "CheckpointArchiveTypes.hpp"
 
 /* The remaining header files define classes that will be used in the cell-based
  * simulation. We have encountered some of these header files in previous cell-based
  * Chaste tutorials. */
 #include "CellsGenerator.hpp"
 #include "OffLatticeSimulation.hpp"
-#include "TransitCellProliferativeType.hpp"
 #include "SmartPointers.hpp"
+#include "TransitCellProliferativeType.hpp"
 /* The next header file defines the cell cycle model. */
 #include "UniformG1GenerationalCellCycleModel.hpp"
 /* The next two header files define a helper class for generating suitable meshes: one planar and one periodic. */
-#include "HoneycombVertexMeshGenerator.hpp"
 #include "CylindricalHoneycombVertexMeshGenerator.hpp"
+#include "HoneycombVertexMeshGenerator.hpp"
 /* The next header file defines a vertex-based {{{CellPopulation}}} class.*/
 #include "VertexBasedCellPopulation.hpp"
 /* The next header file defines a force law for describing the mechanical interactions
@@ -123,8 +123,8 @@ public:
         * define the size of the mesh - we have chosen a mesh that is 2 elements (i.e.
         * cells) wide, and 2 elements high.
         */
-        HoneycombVertexMeshGenerator generator(2, 2);    // Parameters are: cells across, cells up
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        HoneycombVertexMeshGenerator generator(2, 2); // Parameters are: cells across, cells up
+        MutableVertexMesh<2, 2>* p_mesh = generator.GetMesh();
 
         /* Having created a mesh, we now create a {{{std::vector}}} of {{{CellPtr}}}s.
         * To do this, we use the `CellsGenerator` helper class, which is templated over the type
@@ -215,7 +215,7 @@ public:
          * Here the first and second arguments define the size of the mesh - we have chosen a mesh that
          * is 4 elements (i.e. cells) wide, and 4 elements high.
          */
-        CylindricalHoneycombVertexMeshGenerator generator(4, 4);    // Parameters are: cells across, cells up
+        CylindricalHoneycombVertexMeshGenerator generator(4, 4); // Parameters are: cells across, cells up
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
         /* Having created a mesh, we now create a {{{std::vector}}} of {{{CellPtr}}}s.
@@ -260,8 +260,8 @@ public:
          *
          * The first step is to define a point on the plane boundary and a normal to the plane.
          */
-        c_vector<double,2> point = zero_vector<double>(2);
-        c_vector<double,2> normal = zero_vector<double>(2);
+        c_vector<double, 2> point = zero_vector<double>(2);
+        c_vector<double, 2> normal = zero_vector<double>(2);
         normal(1) = -1.0;
         /* We can now make a pointer to a {{{PlaneBoundaryCondition}}} (passing the point
          * and normal to the plane) and pass it to the {{{OffLatticeSimulation}}}.*/
