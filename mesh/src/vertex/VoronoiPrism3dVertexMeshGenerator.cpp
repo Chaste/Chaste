@@ -375,7 +375,7 @@ void VoronoiPrism3dVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_
             VertexElement<2,3>* p_upper_face = new VertexElement<2,3>(faces.size(), upper_nodes_this_elem);
             // Attribute is added so that it can be identified in simulation (as basal, apical and lateral faces have different contributions)
             // 2.1 instead of 2.0 as it will be casted into unsigned for simpler comparison.
-            p_lower_face->AddElementAttribute(2.1);
+            p_upper_face->AddElementAttribute(2.1);
             faces.push_back(p_upper_face);
             faces_this_elem.push_back(p_upper_face);
             faces_orientation.push_back(false);
@@ -433,7 +433,7 @@ void VoronoiPrism3dVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_
                     VertexElement<2, 3>* p_lateral_face = new VertexElement<2, 3>(newFaceIndex, nodes_of_lateral_face);
                     // Attribute is added so that it can be identified in simulation (as basal, apical and lateral faces have different contributions)
                     // 3.1 instead of 3.0 as it will be casted into unsigned for simpler comparison.
-                    p_lower_face->AddElementAttribute(3.1);
+                    p_lateral_face->AddElementAttribute(3.1);
                     faces.push_back(p_lateral_face);
                     faces_this_elem.push_back(p_lateral_face);
                     faces_orientation.push_back(true);
