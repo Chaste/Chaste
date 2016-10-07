@@ -2282,10 +2282,10 @@ public:
          TS_ASSERT_DELTA(force.GetApicalLineTensionParameter(), 0.5, 1e-12);
          TS_ASSERT_DELTA(force.GetBasalSurfaceEnergyParameter(), 120, 1e-12);
 
-         force.SetVolumeCompressibilityParameter(100);
-         force.SetLateralSurfaceEnergyParameter(2.0);
-         force.SetApicalLineTensionParameter(1.0);
-         force.SetBasalSurfaceEnergyParameter(0.98);
+         force.SetVolumeCompressibilityParameter(1.0);  //value of 1 causes |force| = 0.15224
+         force.SetLateralSurfaceEnergyParameter(1.0);   //value of 1 causes |force| = 0.349798
+         force.SetApicalLineTensionParameter(1.0);      //value of 1 causes |force| = 0.312869
+         force.SetBasalSurfaceEnergyParameter(1.0);     //value of 1 causes |force| = 0.3090
 
          for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
          {
@@ -2294,13 +2294,27 @@ public:
 
          force.AddForceContribution(cell_population);
 
+         // All lower nodes first
          // The force on each node should be radially inward, with the same magnitude for all nodes
-         double force_magnitude = norm_2(cell_population.GetNode(0)->rGetAppliedForce());
+         double force_magnitude_lower = norm_2(cell_population.GetNode(0)->rGetAppliedForce());
          for (unsigned i=0; i<num_nodes; i++)
          {
              Node<3>* p_node = cell_population.GetNode(i);
              c_vector<double, 3> force = p_node->rGetAppliedForce();
-             TS_ASSERT_DELTA(norm_2(force), force_magnitude, 1e-4);
+             TS_ASSERT_DELTA(norm_2(force), force_magnitude_lower, 1e-4);
+
+             double dot_product = inner_prod(force, p_node->rGetLocation());
+             TS_ASSERT_LESS_THAN( dot_product , 0.0 );
+             TS_ASSERT_LESS_THAN(1,2);
+         }
+
+         // Now all the upper nodes
+         double force_magnitude_upper = norm_2(cell_population.GetNode(num_nodes)->rGetAppliedForce());
+         for (unsigned i=num_nodes; i<num_nodes*2; i++)
+         {
+             Node<3>* p_node = cell_population.GetNode(i);
+             c_vector<double, 3> force = p_node->rGetAppliedForce();
+             TS_ASSERT_DELTA(norm_2(force), force_magnitude_upper, 1e-4);
 
              double dot_product = inner_prod(force, p_node->rGetLocation());
              TS_ASSERT_LESS_THAN( dot_product , 0.0 );
