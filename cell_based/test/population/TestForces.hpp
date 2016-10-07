@@ -48,6 +48,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodeBasedCellPopulation.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
+#include "VoronoiPrism3dVertexMeshGenerator.hpp"
+#include "HexagonalPrism3dVertexMeshGenerator.hpp"
 #include "ChemotacticForce.hpp"
 #include "RepulsionForce.hpp"
 #include "NagaiHondaForce.hpp"
@@ -2170,6 +2172,160 @@ public:
             // Tidy up
             delete p_force;
         }
+    }
+
+    void TestMisraForceMethods() throw (Exception)
+    {
+        // This is the same test as for other vertex based forces. It comprises a sanity check that forces point in the right direction.
+        // Construct a 3D vertex mesh consisting of a single element
+        std::vector<Node<3>*> lower_nodes;
+        std::vector<Node<3>*> upper_nodes;
+        unsigned num_nodes = 20;
+        double z_height = 1.0;
+        std::vector<double> angles = std::vector<double>(num_nodes);
+
+        for (unsigned i=0; i<num_nodes; i++)
+        {
+            angles[i] = M_PI+2.0*M_PI*(double)(i)/(double)(num_nodes);
+            Node<3>* tmp_lower = new Node<3>(i, true, cos(angles[i]), sin(angles[i]), -z_height/2);
+            tmp_lower->AddNodeAttribute(1.1);
+            lower_nodes.push_back(tmp_lower);
+
+            Node<3>* tmp_upper = new Node<3>(i+num_nodes, true, cos(angles[i]), sin(angles[i]), z_height/2);
+            tmp_upper->AddNodeAttribute(2.1);
+            upper_nodes.push_back(tmp_upper);
+        }
+
+        // Copy and paste from VoronoiPrism3dVertexMeshGenerator
+        // Initializing vectors which are required for the generation of the VertexElement<3, 3>
+        std::vector<VertexElement<2, 3>*> faces;
+        std::vector<bool> faces_orientation;
+
+        // Creating the lower face
+        VertexElement<2, 3>* p_lower_face = new VertexElement<2, 3>(faces.size(), lower_nodes);
+        p_lower_face->AddElementAttribute(1.1);
+        faces.push_back(p_lower_face);
+        faces_orientation.push_back(true);
+
+        // Creating the upper face
+        VertexElement<2,3>* p_upper_face = new VertexElement<2,3>(faces.size(), upper_nodes);
+        p_upper_face->AddElementAttribute(2.1);
+        faces.push_back(p_upper_face);
+        faces_orientation.push_back(false);
+
+        // Creating all the lateral faces in CCW
+        for (unsigned local_node_index=0; local_node_index<num_nodes; ++local_node_index )
+        {
+            unsigned current_node_index = lower_nodes[local_node_index]->GetIndex();
+            unsigned next_node_index = lower_nodes[(local_node_index+1) % num_nodes]->GetIndex();
+
+            // Create new lateral rectangular face
+            std::vector<Node<3>*> nodes_of_lateral_face;
+            nodes_of_lateral_face.push_back(lower_nodes[current_node_index]);
+            nodes_of_lateral_face.push_back(lower_nodes[next_node_index]);
+            nodes_of_lateral_face.push_back(upper_nodes[next_node_index]);
+            nodes_of_lateral_face.push_back(upper_nodes[current_node_index]);
+
+            unsigned new_face_index = faces.size();
+            VertexElement<2, 3>* p_lateral_face = new VertexElement<2, 3>(new_face_index, nodes_of_lateral_face);
+            // Attribute is added so that it can be identified in simulation (as basal, apical and lateral faces have different contributions)
+            // 3.1 instead of 3.0 as it will be casted into unsigned for simpler comparison.
+            p_lateral_face->AddElementAttribute(3.1);
+            faces.push_back(p_lateral_face);
+            faces_orientation.push_back(true);
+        }
+
+        VertexElement<3, 3>* p_elem = new VertexElement<3, 3>(0, faces, faces_orientation);
+        std::vector<VertexElement<3,3>*> elements;
+        elements.push_back(p_elem);
+
+        for (unsigned upper_running_index=0; upper_running_index<num_nodes; ++upper_running_index)
+        {
+            lower_nodes.push_back(upper_nodes[upper_running_index]);
+        }
+
+         MutableVertexMesh<3,3> mesh(lower_nodes, elements);
+
+         // Set up the cell
+         std::vector<CellPtr> cells;
+//         MAKE_PTR(WildTypeCellMutationState, p_state);
+//         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+
+//         FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
+//         CellPtr p_cell(new Cell(p_state, p_model));
+//         p_cell->SetCellProliferativeType(p_diff_type);
+//         p_cell->SetBirthTime(-1.0);
+//         cells.push_back(p_cell);
+
+         // Create cell population
+         VertexBasedCellPopulation<3> cell_population(mesh, cells, false, false);
+         cell_population.InitialiseCells();
+
+         // Create a force system
+         MisraForce<3> force;
+
+         // Test get/set methods
+         TS_ASSERT_DELTA(force.GetVolumeCompressibilityParameter(), 100, 1e-12);
+         TS_ASSERT_DELTA(force.GetLateralSurfaceEnergyParameter(), 2.0, 1e-12);
+         TS_ASSERT_DELTA(force.GetApicalLineTensionParameter(), 1.0 , 1e-12);
+         TS_ASSERT_DELTA(force.GetBasalSurfaceEnergyParameter(), 0.98, 1e-12);
+         TS_ASSERT_DELTA(force.mTargetVolume, 1.0, 1e-12); // for time being
+
+         force.SetVolumeCompressibilityParameter(5.8);
+         force.SetLateralSurfaceEnergyParameter(17.9);
+         force.SetApicalLineTensionParameter(0.5);
+         force.SetBasalSurfaceEnergyParameter(120);
+
+
+         TS_ASSERT_DELTA(force.GetVolumeCompressibilityParameter(), 5.8, 1e-12);
+         TS_ASSERT_DELTA(force.GetLateralSurfaceEnergyParameter(), 17.9, 1e-12);
+         TS_ASSERT_DELTA(force.GetApicalLineTensionParameter(), 0.5, 1e-12);
+         TS_ASSERT_DELTA(force.GetBasalSurfaceEnergyParameter(), 120, 1e-12);
+
+         force.SetVolumeCompressibilityParameter(100);
+         force.SetLateralSurfaceEnergyParameter(2.0);
+         force.SetApicalLineTensionParameter(1.0);
+         force.SetBasalSurfaceEnergyParameter(0.98);
+
+         for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+         {
+             cell_population.GetNode(i)->ClearAppliedForce();
+         }
+
+         force.AddForceContribution(cell_population);
+
+         // The force on each node should be radially inward, with the same magnitude for all nodes
+         double force_magnitude = norm_2(cell_population.GetNode(0)->rGetAppliedForce());
+         for (unsigned i=0; i<num_nodes; i++)
+         {
+             Node<3>* p_node = cell_population.GetNode(i);
+             c_vector<double, 3> force = p_node->rGetAppliedForce();
+             TS_ASSERT_DELTA(norm_2(force), force_magnitude, 1e-4);
+
+             double dot_product = inner_prod(force, p_node->rGetLocation());
+             TS_ASSERT_LESS_THAN( dot_product , 0.0 );
+             TS_ASSERT_LESS_THAN(1,2);
+         }
+     }
+
+    void TestMisraForceWithMeshGenerator() throw (Exception)
+    {
+        // Well, just test run. Without actual validation of the value
+        VoronoiPrism3dVertexMeshGenerator generator(3, 2, 5, 3, 100.0);
+        MutableVertexMesh<3,3>* p_mesh = generator.GetMesh();
+        std::vector<CellPtr> cells;
+
+        VertexBasedCellPopulation<3> population(*p_mesh,cells, false, false);
+
+        MisraForce<3> force;
+        force.AddForceContribution(population);
+
+        HexagonalPrism3dVertexMeshGenerator generator2(1, 1, 1, 3);
+        MutableVertexMesh<3,3>* p_mesh2 = generator2.GetMesh();
+
+        VertexBasedCellPopulation<3> population2(*p_mesh2,cells, false, false);
+
+        TS_ASSERT_THROWS_ANYTHING(force.AddForceContribution(population2));
     }
 };
 
