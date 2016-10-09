@@ -46,7 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* HOW_TO_TAG General
  * Read and use parameters from the command line
  *
- * If your want to use parameters that are supplied in the command line, then
+ * If you want to use parameters that are supplied in the command line, then
  *  (i) add lines such as "double x = CommandLineArguments::Instance()->GetDoubleCorrespondingToOption("-myparam");" below
  *  (ii) use scons to compile but not run the test (see ChasteGuides/RunningBinariesFromCommandLine)
  *  (iii) run the compiled executable from the command line (see ChasteGuides/RunningBinariesFromCommandLine), with your parameter.
@@ -300,13 +300,12 @@ public:
     void TestCommandLineArgumentsParrotting() throw(Exception)
     {
         std::string verb = "--verbose";
-        if ( CommandLineArguments::Instance()->OptionExists(verb) )
+        if (CommandLineArguments::Instance()->OptionExists(verb))
         {
             bool is_verbose = CommandLineArguments::Instance()->GetBoolCorrespondingToOption(verb);
             std::cout << "You have successfully set "<< verb << " to take the value "<< is_verbose<<".\n";
         }
     }
-
 };
 
 #endif /*TESTCOMMANDLINEARGUMENTS_HPP_*/

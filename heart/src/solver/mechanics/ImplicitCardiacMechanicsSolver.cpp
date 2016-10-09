@@ -68,25 +68,22 @@ void ImplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::Solve(double time, d
     // assemble residual again (to solve the cell models implicitly again
     // using the correct value of the deformation x (in case this wasn't the
     // last thing that was done
-    if(this->GetNumNewtonIterations() > 0)
+    if (this->GetNumNewtonIterations() > 0)
     {
         this->AssembleSystem(true,false);
     }
 
     // now update state variables, and set lambda at last timestep. Note
     // stretches were set in AssembleOnElement
-    for(std::map<unsigned,DataAtQuadraturePoint>::iterator iter = this->mQuadPointToDataAtQuadPointMap.begin();
-        iter != this->mQuadPointToDataAtQuadPointMap.end();
-        iter++)
+    for (std::map<unsigned,DataAtQuadraturePoint>::iterator iter = this->mQuadPointToDataAtQuadPointMap.begin();
+         iter != this->mQuadPointToDataAtQuadPointMap.end();
+         iter++)
     {
         AbstractContractionModel* p_contraction_model = iter->second.ContractionModel;
         iter->second.StretchLastTimeStep = iter->second.Stretch;
         p_contraction_model->UpdateStateVariables();
     }
-
 }
-
-
 
 template<class ELASTICITY_SOLVER,unsigned DIM>
 void ImplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::GetActiveTensionAndTensionDerivs(double currentFibreStretch,
@@ -122,7 +119,7 @@ void ImplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::GetActiveTensionAndT
     {
         #define COVERAGE_IGNORE
         // if this failed during assembling the Jacobian this is a fatal error.
-        if(assembleJacobian)
+        if (assembleJacobian)
         {
             // probably shouldn't be able to get here
             EXCEPTION("Failure in solving contraction models using current stretches for assembling Jacobian");
@@ -138,7 +135,7 @@ void ImplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::GetActiveTensionAndT
     }
 
     // if assembling the Jacobian, numerically evaluate dTa/dlam & dTa/d(lamdot)
-    if(assembleJacobian)
+    if (assembleJacobian)
     {
         // get active tension for (lam+h,dlamdt)
         double h1 = std::max(1e-6, currentFibreStretch/100);
@@ -156,20 +153,16 @@ void ImplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::GetActiveTensionAndT
         rDerivActiveTensionWrtDLambdaDt = (active_tension_at_dlamdt_plus_h - rActiveTension)/h2;
     }
 
-    // increment the iterator
+    // Increment the iterator
     this->mMapIterator++;
-    if(this->mMapIterator==this->mQuadPointToDataAtQuadPointMap.end())
+    if (this->mMapIterator==this->mQuadPointToDataAtQuadPointMap.end())
     {
         this->mMapIterator = this->mQuadPointToDataAtQuadPointMap.begin();
     }
-
 }
 
-
-
+// Explicit instantiation
 template class ImplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<2>,2>;
 template class ImplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<3>,3>;
 template class ImplicitCardiacMechanicsSolver<CompressibleNonlinearElasticitySolver<2>,2>;
 template class ImplicitCardiacMechanicsSolver<CompressibleNonlinearElasticitySolver<3>,3>;
-
-

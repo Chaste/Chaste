@@ -139,19 +139,19 @@ public:
 
         bool some_node_depolarised = false;
         assert(final_voltage_normal.GetSize()==final_voltage_operator_splitting.GetSize());
-        for(unsigned j=0; j<final_voltage_normal.GetSize(); j++)
+        for (unsigned j=0; j<final_voltage_normal.GetSize(); j++)
         {
-            double tol=4.7;
+            double tol = 4.7;
 
             TS_ASSERT_DELTA(final_voltage_normal[j], final_voltage_operator_splitting[j], tol);
 
-            if(final_voltage_normal[j]>-80)
+            if (final_voltage_normal[j]>-80)
             {
                 // shouldn't be exactly equal, as long as away from resting potential
                 TS_ASSERT_DIFFERS(final_voltage_normal[j], final_voltage_operator_splitting[j]);
             }
 
-            if(final_voltage_normal[j]>0.0)
+            if (final_voltage_normal[j]>0.0)
             {
                 some_node_depolarised = true;
             }

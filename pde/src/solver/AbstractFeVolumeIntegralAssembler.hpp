@@ -249,8 +249,6 @@ AbstractFeVolumeIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_ASSEM
     mpQuadRule = new GaussianQuadratureRule<ELEMENT_DIM>(2);
 }
 
-
-
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM, bool CAN_ASSEMBLE_VECTOR, bool CAN_ASSEMBLE_MATRIX, InterpolationLevel INTERPOLATION_LEVEL>
 void AbstractFeVolumeIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_ASSEMBLE_VECTOR, CAN_ASSEMBLE_MATRIX, INTERPOLATION_LEVEL>::DoAssemble()
 {
@@ -299,7 +297,7 @@ void AbstractFeVolumeIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_
         Element<ELEMENT_DIM, SPACE_DIM>& r_element = *iter;
 
         // Test for ownership first, since it's pointless to test the criterion on something which we might know nothing about.
-        if ( r_element.GetOwnership() == true && ElementAssemblyCriterion(r_element)==true )
+        if (r_element.GetOwnership() == true && ElementAssemblyCriterion(r_element)==true)
         {
             AssembleOnElement(r_element, a_elem, b_elem);
 
@@ -379,7 +377,7 @@ void AbstractFeVolumeIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_
 
         BasisFunction::ComputeBasisFunctions(quad_point, phi);
 
-        if ( this->mAssembleMatrix || INTERPOLATION_LEVEL==NONLINEAR )
+        if (this->mAssembleMatrix || INTERPOLATION_LEVEL==NONLINEAR)
         {
             ComputeTransformedBasisFunctionDerivatives(quad_point, inverse_jacobian, grad_phi);
         }
@@ -435,7 +433,7 @@ void AbstractFeVolumeIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_
 
             // Allow the concrete version of the assembler to interpolate any desired quantities
             this->IncrementInterpolatedQuantities(phi(i), p_node);
-            if ( this->mAssembleMatrix || INTERPOLATION_LEVEL==NONLINEAR )
+            if (this->mAssembleMatrix || INTERPOLATION_LEVEL==NONLINEAR)
             {
                 this->IncrementInterpolatedGradientQuantities(grad_phi, i, p_node);
             }

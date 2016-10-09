@@ -114,7 +114,7 @@ unsigned AbstractCachedMeshReader<ELEMENT_DIM, SPACE_DIM>::GetMaxNodeIndex()
 
         for (unsigned i = 0; i < ELEMENT_DIM+1; i++)
         {
-            if ( indices[i] >  max_node_index)
+            if (indices[i] > max_node_index)
             {
                 max_node_index = indices[i];
             }
@@ -211,7 +211,6 @@ ElementData AbstractCachedMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextFaceData()
     return ret;
 }
 
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned AbstractCachedMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNumElements() const
 {
@@ -230,11 +229,7 @@ unsigned AbstractCachedMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNumFaces() const
     return mFaceData.size();
 }
 
-
-/////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////////////
-
 template class AbstractCachedMeshReader<1,1>;
 template class AbstractCachedMeshReader<1,2>;
 template class AbstractCachedMeshReader<1,3>;

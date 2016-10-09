@@ -147,6 +147,26 @@ public:
     Node<SPACE_DIM>* GetNodeCorrespondingToCell(CellPtr pCell);
 
     /**
+     * Overridden GetCellDataItemAtPdeNode() method.
+     *
+     * @param pdeNodeIndex index of a node in a tetrahedral mesh for use
+     *         with a PDE modifier
+     * @param rVariableName the name of the cell data item to get
+     * @param dirichletBoundaryConditionApplies where a Dirichlet boundary condition is used
+     *        (optional; defaults to false)
+     * @param dirichletBoundaryValue the value of the Dirichlet boundary condition, if used
+     *        (optional; defaults to 0.0)
+     *
+     * @return the value of a CellData item (interpolated if necessary) at a node,
+     *         specified by its index in a tetrahedral mesh for use with a PDE modifier.
+     * This method can be called by PDE modifier classes.
+     */
+    virtual double GetCellDataItemAtPdeNode(unsigned pdeNodeIndex,
+                                            std::string& rVariableName,
+                                            bool dirichletBoundaryConditionApplies=false,
+                                            double dirichletBoundaryValue=0.0);
+
+    /**
      * Add a new cell to the cell population.
      *
      * @param pNewCell  the cell to add
@@ -259,7 +279,8 @@ public:
     /**
      * Method to return the connected nodes in  a centre based simulation.
      *
-     * Overridden in sub classes to have correct functionality.
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
      *
      * @return Node pairs for force calculation.
      */

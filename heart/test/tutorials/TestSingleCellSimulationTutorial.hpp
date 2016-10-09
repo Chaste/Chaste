@@ -76,7 +76,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* Now we define the test class, which must inherit from {{{CxxTest::TestSuite}}}
  * as usual, and the (public) test method
  */
-class TestSingleCellTutorial : public CxxTest::TestSuite
+class TestSingleCellSimulationTutorial : public CxxTest::TestSuite
 {
 public:
     void TestShannonSimulation() throw(Exception)
@@ -271,4 +271,4 @@ public:
     }
 };
 
-#endif /*TESTANOTHERBIDOMAINSIMULATIONTUTORIAL_HPP_*/
+#endif /*TESTSINGLECELLSIMULATIONTUTORIAL_HPP_*/

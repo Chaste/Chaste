@@ -637,7 +637,7 @@ public:
         p_protorosette->CheckForRosettes();
 
         TS_ASSERT_EQUALS(p_ref_rosette->GetNumNodes(), p_rosette->GetNumNodes());
-        for( unsigned node_idx = 0 ; node_idx < p_ref_rosette->GetNumNodes() ; node_idx++ )
+        for ( unsigned node_idx = 0 ; node_idx < p_ref_rosette->GetNumNodes() ; node_idx++ )
         {
             Node<2>* current_ref_node = p_ref_rosette->GetNode(node_idx);
             Node<2>* current_node = p_rosette->GetNode(node_idx);
@@ -647,7 +647,7 @@ public:
         }
 
         TS_ASSERT_EQUALS(p_ref_protorosette->GetNumNodes(), p_protorosette->GetNumNodes());
-        for( unsigned node_idx = 0 ; node_idx < p_ref_protorosette->GetNumNodes() ; node_idx++ )
+        for ( unsigned node_idx = 0 ; node_idx < p_ref_protorosette->GetNumNodes() ; node_idx++ )
         {
             Node<2>* current_ref_node = p_ref_protorosette->GetNode(node_idx);
             Node<2>* current_node = p_protorosette->GetNode(node_idx);
@@ -668,7 +668,7 @@ public:
 
         // In the rosette mesh, all nodes should remain in the same place, except the new one
         TS_ASSERT_EQUALS(p_ref_rosette->GetNumNodes() + 1, p_rosette->GetNumNodes());
-        for( unsigned node_idx = 0 ; node_idx < p_ref_rosette->GetNumNodes() ; node_idx++ )
+        for ( unsigned node_idx = 0 ; node_idx < p_ref_rosette->GetNumNodes() ; node_idx++ )
         {
             Node<2>* current_ref_node = p_ref_rosette->GetNode(node_idx);
             Node<2>* current_node = p_rosette->GetNode(node_idx);
@@ -679,7 +679,7 @@ public:
 
         // In the protorosette mesh, all nodes should remain in the same place, except node 0 and the new one
         TS_ASSERT_EQUALS(p_ref_protorosette->GetNumNodes() + 1, p_protorosette->GetNumNodes());
-        for( unsigned node_idx = 1 ; node_idx < p_ref_protorosette->GetNumNodes() ; node_idx++ )
+        for ( unsigned node_idx = 1 ; node_idx < p_ref_protorosette->GetNumNodes() ; node_idx++ )
         {
             Node<2>* current_ref_node = p_ref_protorosette->GetNode(node_idx);
             Node<2>* current_node = p_protorosette->GetNode(node_idx);

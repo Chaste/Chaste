@@ -175,7 +175,7 @@ void ExecutableSupport::WriteMachineInfoFile(std::string fileBaseName)
     #define INFO_BUFFER_SIZE 32767
     TCHAR info_buffer[INFO_BUFFER_SIZE];
     DWORD buffer_char_count = INFO_BUFFER_SIZE;
-    if(!GetComputerName(info_buffer, &buffer_char_count))
+    if (!GetComputerName(info_buffer, &buffer_char_count))
         *out_file << "uname nodename = " << "Windows machine name is unknown" << std::endl;
     else
         *out_file << "uname nodename = " << info_buffer << std::endl;
@@ -187,35 +187,35 @@ void ExecutableSupport::WriteMachineInfoFile(std::string fileBaseName)
     GetVersionEx((OSVERSIONINFO*) &os_info);
     //Pivot around Windows Vista (dwMajorVersion >= 6)
     //See http://msdn.microsoft.com/en-us/library/ms724834%28v=vs.85%29.aspx for details
-    if(os_info.dwMajorVersion < 6)
+    if (os_info.dwMajorVersion < 6)
     { //earlier than Windows Vista
         *out_file << "uname release  = " << "Microsoft Windows Server 2003 R2 (or earlier)" << std::endl;
     }
     else {
         //reverse chronological order (simply add newer OS version to the top)
-        if(os_info.dwMajorVersion > 6)
+        if (os_info.dwMajorVersion > 6)
         {
             *out_file << "uname release  = " << "Microsoft Windows (Later than Microsoft Windows 8)" << std::endl;
         }
         else  //os_info.dwMajorVersion == 6
         {
-            if(os_info.dwMinorVersion == 2)
+            if (os_info.dwMinorVersion == 2)
             {
-                if(os_info.wProductType == VER_NT_WORKSTATION)
+                if (os_info.wProductType == VER_NT_WORKSTATION)
                     *out_file << "uname release  = " << "Microsoft Windows 8" << std::endl;
                 else
                     *out_file << "uname release  = " << "Microsoft Windows Server 2012" << std::endl;
             }
-            else if(os_info.dwMinorVersion == 1)
+            else if (os_info.dwMinorVersion == 1)
             {
-                if(os_info.wProductType == VER_NT_WORKSTATION)
+                if (os_info.wProductType == VER_NT_WORKSTATION)
                     *out_file << "uname release  = " << "Microsoft Windows 7" << std::endl;
                 else
                     *out_file << "uname release  = " << "Microsoft Windows Server 2008 R2" << std::endl;
             }
-            else if(os_info.dwMinorVersion == 0)
+            else if (os_info.dwMinorVersion == 0)
             {
-                if(os_info.wProductType == VER_NT_WORKSTATION)
+                if (os_info.wProductType == VER_NT_WORKSTATION)
                     *out_file << "uname release  = " << "Microsoft Windows Server 2008" << std::endl;
                 else
                     *out_file << "uname release  = " << "Microsoft Windows Vista" << std::endl;

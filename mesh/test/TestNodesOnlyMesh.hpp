@@ -290,7 +290,7 @@ public:
 
         // Test what happens if nodes move in initial collection.
         AbstractMesh<3,3>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
-        if ( node_iter != mesh.GetNodeIteratorEnd())
+        if (node_iter != mesh.GetNodeIteratorEnd())
         {
             c_vector<double, 3> initial_location = node_iter->rGetLocation();
             c_vector<double, 3> translation = scalar_vector<double>(3, -2.0*cut_off);
@@ -379,39 +379,39 @@ public:
         mesh.ConstructNodesWithoutMesh(nodes, 1.5);
 
         // These resuls will change when the nodes are distributed.
-        if(PetscTools::IsSequential())
+        if (PetscTools::IsSequential())
         {
             TS_ASSERT_EQUALS(mesh.GetNextAvailableIndex(), 4u);
         }
-        else if(PetscTools::GetNumProcs() == 2)
+        else if (PetscTools::GetNumProcs() == 2)
         {
-            if(PetscTools::GetMyRank() == 0)
+            if (PetscTools::GetMyRank() == 0)
             {
                 TS_ASSERT_EQUALS(mesh.GetNextAvailableIndex(), 4u);
             }
-            else if(PetscTools::GetMyRank() == 1)
+            else if (PetscTools::GetMyRank() == 1)
             {
                 TS_ASSERT_EQUALS(mesh.GetNextAvailableIndex(), 5u);
             }
         }
-        else if(PetscTools::GetNumProcs() == 3)
+        else if (PetscTools::GetNumProcs() == 3)
         {
-            if(PetscTools::GetMyRank() == 0)
+            if (PetscTools::GetMyRank() == 0)
             {
                 TS_ASSERT_EQUALS(mesh.GetNextAvailableIndex(), 6u);
             }
-            else if(PetscTools::GetMyRank() == 1)
+            else if (PetscTools::GetMyRank() == 1)
             {
                 TS_ASSERT_EQUALS(mesh.GetNextAvailableIndex(), 7u);
             }
-            else if(PetscTools::GetMyRank() == 2)
+            else if (PetscTools::GetMyRank() == 2)
             {
                 TS_ASSERT_EQUALS(mesh.GetNextAvailableIndex(), 2u);
             }
         }
 
         // Delete some nodes and make sure that their global indices become available.
-        if(mesh.mpBoxCollection->IsOwned(nodes[0]))
+        if (mesh.mpBoxCollection->IsOwned(nodes[0]))
         {
             mesh.DeleteNode(PetscTools::GetMyRank());
             TS_ASSERT_EQUALS(mesh.GetNextAvailableIndex(), PetscTools::GetMyRank());

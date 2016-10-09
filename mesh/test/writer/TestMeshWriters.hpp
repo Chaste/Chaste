@@ -917,7 +917,7 @@ public:
 
             //Add some node attributes to the mesh
             double node_attribute = 11.0;
-            for(TetrahedralMesh<1,1>::NodeIterator iter = mesh.GetNodeIteratorBegin();
+            for (TetrahedralMesh<1,1>::NodeIterator iter = mesh.GetNodeIteratorBegin();
                 iter != mesh.GetNodeIteratorEnd();
                 ++iter)
             {
@@ -927,7 +927,7 @@ public:
 
             //Add some element attributes to the mesh
             double element_attribute = 123.4;
-            for(TetrahedralMesh<1,1>::ElementIterator iter = mesh.GetElementIteratorBegin();
+            for (TetrahedralMesh<1,1>::ElementIterator iter = mesh.GetElementIteratorBegin();
                             iter != mesh.GetElementIteratorEnd();
                             ++iter)
             {
@@ -966,7 +966,7 @@ public:
             reader_mesh.ConstructFromMeshReader(mesh_reader_reader);
 
 
-            for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+            for (unsigned i=0; i<mesh.GetNumNodes(); i++)
             {
                 std::vector<double> orig_attr = mesh.GetNode(i)->rGetNodeAttributes();
                 std::vector<double> ascii_attr = ascii_mesh.GetNode(i)->rGetNodeAttributes();
@@ -986,7 +986,7 @@ public:
                     //TS_ASSERT_DELTA(orig_attr[attr_index], reader_attr[attr_index], 1e-15);
                 }
             }
-            for(unsigned i=0; i<mesh.GetNumElements(); i++)
+            for (unsigned i=0; i<mesh.GetNumElements(); i++)
             {
                 TS_ASSERT_DELTA(mesh.GetElement(i)->GetAttribute(), ascii_mesh.GetElement(i)->GetAttribute(), 0.4 + 1e-12);
                 TS_ASSERT_DELTA(mesh.GetElement(i)->GetAttribute(), bin_mesh.GetElement(i)->GetAttribute(), 1e-15);
@@ -1020,7 +1020,7 @@ public:
         types_to_compare.push_back("ele");
         types_to_compare.push_back("face");
 
-        for(unsigned i=0; i<files_to_compare.size(); i++)
+        for (unsigned i=0; i<files_to_compare.size(); i++)
         {
             for (unsigned j=0; j<types_to_compare.size(); j++)
             {
@@ -1048,7 +1048,6 @@ public:
             TS_ASSERT_EQUALS(sizeof(double), 8u);
          */
     }
-
 };
 
 #endif //_TESTMESHWRITERS_HPP_

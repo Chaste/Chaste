@@ -40,7 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CheckpointArchiveTypes.hpp"
 #include "ArchiveOpener.hpp"
 #include "CellsGenerator.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
 #include "VertexMeshWriter.hpp"
 #include "VertexBasedCellPopulation.hpp"
 #include "T2SwapCellKiller.hpp"
@@ -110,7 +110,7 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 6u);
 
         // Get a cell population
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         std::vector<CellPtr> cells;
         cells_generator.GenerateBasic(cells, vertex_mesh.GetNumElements(), std::vector<unsigned>());
         VertexBasedCellPopulation<2> cell_population(vertex_mesh, cells);
@@ -247,7 +247,7 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 6u);
 
         // Get a cell population
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         std::vector<CellPtr> cells;
         cells_generator.GenerateBasic(cells, vertex_mesh.GetNumElements(), std::vector<unsigned>());
         VertexBasedCellPopulation<2> cell_population(vertex_mesh, cells);
@@ -390,7 +390,7 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 10u);
 
         // Get a cell population
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         std::vector<CellPtr> cells;
         cells_generator.GenerateBasic(cells, vertex_mesh.GetNumElements(), std::vector<unsigned>());
         VertexBasedCellPopulation<2> cell_population(vertex_mesh, cells);
@@ -539,7 +539,7 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 10u);
 
         // Get a cell population
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         std::vector<CellPtr> cells;
         cells_generator.GenerateBasic(cells, vertex_mesh.GetNumElements(), std::vector<unsigned>());
         VertexBasedCellPopulation<2> cell_population(vertex_mesh, cells);
@@ -723,7 +723,7 @@ public:
          */
 
         // Get a cell population
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         std::vector<CellPtr> cells;
         cells_generator.GenerateBasic(cells, vertex_mesh.GetNumElements(), std::vector<unsigned>());
         VertexBasedCellPopulation<2> cell_population(vertex_mesh, cells);
@@ -771,7 +771,7 @@ public:
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
         MeshBasedCellPopulation<2> population(*p_mesh, cells);
@@ -794,7 +794,7 @@ public:
 
             std::vector<CellPtr> cells;
             MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+            CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
             cells_generator.GenerateBasic(cells, p_mesh->GetNumElements(), std::vector<unsigned>(), p_diff_type);
 
             VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);

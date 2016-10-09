@@ -95,10 +95,7 @@ Hdf5ToTxtConverter<ELEMENT_DIM, SPACE_DIM>::Hdf5ToTxtConverter(const FileFinder&
     PetscTools::Destroy(data);
 }
 
-/////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////
-
 template class Hdf5ToTxtConverter<1,1>;
 template class Hdf5ToTxtConverter<1,2>;
 template class Hdf5ToTxtConverter<2,2>;

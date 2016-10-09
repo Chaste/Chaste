@@ -147,10 +147,7 @@ Hdf5ToMeshalyzerConverter<ELEMENT_DIM,SPACE_DIM>::Hdf5ToMeshalyzerConverter(cons
     PetscTools::Barrier("Hdf5ToMeshalyzerConverter");
 }
 
-/////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////
-
 template class Hdf5ToMeshalyzerConverter<1,1>;
 template class Hdf5ToMeshalyzerConverter<1,2>;
 template class Hdf5ToMeshalyzerConverter<2,2>;

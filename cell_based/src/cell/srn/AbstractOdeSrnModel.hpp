@@ -51,6 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *  - based on AbstractOdeBasedCellCycleModel
  *
  * \todo #2752 Thoroughly document this class
+ *
  */
 class AbstractOdeSrnModel : public AbstractSrnModel, public CellCycleModelOdeHandler
 {

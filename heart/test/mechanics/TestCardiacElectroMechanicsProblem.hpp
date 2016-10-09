@@ -69,8 +69,6 @@ public:
     }
 };
 
-
-
 class TestCardiacElectroMechanicsProblem : public CxxTest::TestSuite
 {
 public:
@@ -152,9 +150,9 @@ public:
         fixed_node_locations.push_back(zero_vector<double>(2));
 
         // for the rest of the nodes, if they lie on X=0, fix x=0 but leave y free.
-        for(unsigned i=1 /*not 0*/; i<mechanics_mesh.GetNumNodes(); i++)
+        for (unsigned i=1 /*not 0*/; i<mechanics_mesh.GetNumNodes(); i++)
         {
-            if(fabs(mechanics_mesh.GetNode(i)->rGetLocation()[0])<1e-6)
+            if (fabs(mechanics_mesh.GetNode(i)->rGetLocation()[0])<1e-6)
             {
                 c_vector<double,2> new_position;
                 new_position(0) = 0.0;
@@ -200,7 +198,7 @@ public:
 
         std::cout << "Scale_factors = " << X_scale_factor << " " << Y_scale_factor << ", product = " << X_scale_factor*Y_scale_factor<<"\n";
 
-        for(unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
         {
             double X = mechanics_mesh.GetNode(i)->rGetLocation()[0];
             double Y = mechanics_mesh.GetNode(i)->rGetLocation()[1];
@@ -238,9 +236,9 @@ public:
         fixed_node_locations.push_back(zero_vector<double>(2));
 
         // for the rest of the nodes, if they lie on X=0, fix x=0 but leave y free.
-        for(unsigned i=1 /*not 0*/; i<mechanics_mesh.GetNumNodes(); i++)
+        for (unsigned i=1 /*not 0*/; i<mechanics_mesh.GetNumNodes(); i++)
         {
-            if(fabs(mechanics_mesh.GetNode(i)->rGetLocation()[0])<1e-6)
+            if (fabs(mechanics_mesh.GetNode(i)->rGetLocation()[0])<1e-6)
             {
                 c_vector<double,2> new_position;
                 new_position(0) = 0.0;
@@ -288,7 +286,7 @@ public:
 
         std::cout << "Scale_factors = " << X_scale_factor << " " << Y_scale_factor << ", product = " << X_scale_factor*Y_scale_factor<<"\n";
 
-        for(unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
         {
             double X = mechanics_mesh.GetNode(i)->rGetLocation()[0];
             double Y = mechanics_mesh.GetNode(i)->rGetLocation()[1];
@@ -308,7 +306,7 @@ public:
         TS_ASSERT_DELTA(problem.mInterpolatedCalciumConcs[0],0.001464,1e-6);
 
         //for the rest, we check that, at the end of this simulation, all quad nodes have V and Ca above a certain threshold
-        for(unsigned i = 0; i < quad_points; i++)
+        for (unsigned i = 0; i < quad_points; i++)
         {
             TS_ASSERT_LESS_THAN(9.2,problem.mInterpolatedVoltages[i]);
             TS_ASSERT_LESS_THAN(0.0014,problem.mInterpolatedCalciumConcs[i]);
@@ -340,9 +338,9 @@ public:
         std::vector<c_vector<double,2> > fixed_node_locations;
         fixed_nodes.push_back(0);
         fixed_node_locations.push_back(zero_vector<double>(2));
-        for(unsigned i=1 /*not 0*/; i<mechanics_mesh.GetNumNodes(); i++)
+        for (unsigned i=1 /*not 0*/; i<mechanics_mesh.GetNumNodes(); i++)
         {
-            if(fabs(mechanics_mesh.GetNode(i)->rGetLocation()[0])<1e-6)
+            if (fabs(mechanics_mesh.GetNode(i)->rGetLocation()[0])<1e-6)
             {
                 c_vector<double,2> new_position;
                 new_position(0) = 0.0;
@@ -390,7 +388,7 @@ public:
 
         std::cout << "Scale_factors = " << X_scale_factor << " " << Y_scale_factor << ", product = " << X_scale_factor*Y_scale_factor<<"\n";
 
-        for(unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
         {
             double X = mechanics_mesh.GetNode(i)->rGetLocation()[0];
             double Y = mechanics_mesh.GetNode(i)->rGetLocation()[1];
@@ -435,7 +433,7 @@ public:
         //store the original node positions
         std::vector<c_vector<double,2> > original_node_position;
         c_vector<double,2> pos = zero_vector<double>(2);
-        for(unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
         {
             pos(0) = mechanics_mesh.GetNode(i)->rGetLocation()[0];
             pos(1) = mechanics_mesh.GetNode(i)->rGetLocation()[1];
@@ -450,9 +448,9 @@ public:
         fixed_node_locations.push_back(zero_vector<double>(2));
 
         // for the rest of the nodes, if they lie on X=0, fix x=0 but leave y free.
-        for(unsigned i=1 /*not 0*/; i<mechanics_mesh.GetNumNodes(); i++)
+        for (unsigned i=1 /*not 0*/; i<mechanics_mesh.GetNumNodes(); i++)
         {
-            if(fabs(mechanics_mesh.GetNode(i)->rGetLocation()[0])<1e-6)
+            if (fabs(mechanics_mesh.GetNode(i)->rGetLocation()[0])<1e-6)
             {
                 c_vector<double,2> new_position;
                 new_position(0) = 0.0;
@@ -486,7 +484,7 @@ public:
         assert(fabs(mechanics_mesh.GetNode(8)->rGetLocation()[0] - 0.05)<1e-8);
         assert(fabs(mechanics_mesh.GetNode(8)->rGetLocation()[1] - 0.05)<1e-8);
 
-        for(unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
         {
             TS_ASSERT_DELTA( r_deformed_position[i](0), original_node_position[i](0), 1e-6);
             TS_ASSERT_DELTA( r_deformed_position[i](1), original_node_position[i](1), 1e-6);
@@ -522,7 +520,7 @@ public:
         //store the original node positions
         std::vector<c_vector<double,2> > original_node_position;
         c_vector<double,2> pos = zero_vector<double>(2);
-        for(unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
         {
             pos(0) = mechanics_mesh.GetNode(i)->rGetLocation()[0];
             pos(1) = mechanics_mesh.GetNode(i)->rGetLocation()[1];
@@ -537,9 +535,9 @@ public:
         fixed_node_locations.push_back(zero_vector<double>(2));
 
         // for the rest of the nodes, if they lie on X=0, fix x=0 but leave y free.
-        for(unsigned i=1 /*not 0*/; i<mechanics_mesh.GetNumNodes(); i++)
+        for (unsigned i=1 /*not 0*/; i<mechanics_mesh.GetNumNodes(); i++)
         {
-            if(fabs(mechanics_mesh.GetNode(i)->rGetLocation()[0])<1e-6)
+            if (fabs(mechanics_mesh.GetNode(i)->rGetLocation()[0])<1e-6)
             {
                 c_vector<double,2> new_position;
                 new_position(0) = 0.0;
@@ -573,7 +571,7 @@ public:
         assert(fabs(mechanics_mesh.GetNode(8)->rGetLocation()[0] - 0.05)<1e-8);
         assert(fabs(mechanics_mesh.GetNode(8)->rGetLocation()[1] - 0.05)<1e-8);
 
-        for(unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
         {
             TS_ASSERT_DELTA( r_deformed_position[i](0), original_node_position[i](0), 1e-6);
             TS_ASSERT_DELTA( r_deformed_position[i](1), original_node_position[i](1), 1e-6);
@@ -602,8 +600,6 @@ public:
 
         problem.SetWatchedPosition(pos);
 
-
-
         TS_ASSERT_THROWS_CONTAINS(problem.SetOutputDeformationGradientsAndStress(3.4),"not a multiple");
         problem.SetOutputDeformationGradientsAndStress(3.0);
 
@@ -629,8 +625,6 @@ public:
         TS_ASSERT(handler.FindFile("deformation/second_PK_0.stress").Exists());
         TS_ASSERT(handler.FindFile("deformation/second_PK_3.stress").Exists());
         TS_ASSERT(handler.FindFile("deformation/second_PK_6.stress").Exists());
-
-
 
         // coverage
 

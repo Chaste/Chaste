@@ -96,7 +96,6 @@ public:
         TS_ASSERT(std::isnan(ans));
 #endif
     }
-
 };
 
 #endif /*_TESTCWD_HPP_*/

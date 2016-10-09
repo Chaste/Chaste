@@ -70,7 +70,6 @@ protected:
         Timer::Print("Test elapsed");
         AbstractCellBasedTestSuite::tearDown();
     }
-
 };
 
 #endif /*ABSTRACTCELLBASEDWITHTIMINGSTESTSUITE_HPP_*/

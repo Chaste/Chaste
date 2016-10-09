@@ -115,7 +115,6 @@ public:
      * @return the size of the NodeMap.
      */
     unsigned GetSize();
-
 };
 
 #endif /*NODEMAP_HPP_*/

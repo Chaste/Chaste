@@ -193,7 +193,6 @@ void AbstractTetrahedralElement<ELEMENT_DIM, SPACE_DIM>::CalculateWeightedDirect
     }
 }
 
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> AbstractTetrahedralElement<ELEMENT_DIM, SPACE_DIM>::CalculateNormal()
 {
@@ -357,10 +356,7 @@ void AbstractTetrahedralElement<0, SPACE_DIM>::GetStiffnessMatrixGlobalIndices(u
     }
 }
 
-/////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////////////
-
 template class AbstractTetrahedralElement<0,1>;
 template class AbstractTetrahedralElement<1,1>;
 template class AbstractTetrahedralElement<0,2>;

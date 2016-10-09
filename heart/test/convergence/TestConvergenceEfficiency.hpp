@@ -76,7 +76,6 @@ public:
         TS_ASSERT_EQUALS(tester.MeshNum, 3u);
         HeartConfig::Instance()->Reset();
     }
-
 };
 
 #endif /*TESTCONVERGENCEEFFICIENCY_HPP_*/

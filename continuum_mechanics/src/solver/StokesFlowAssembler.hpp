@@ -135,7 +135,7 @@ private:
                                       * rGradQuadPhi(spatial_dim1, node_index2)
                                       * rGradQuadPhi(spatial_dim2, node_index1);
 
-                for(unsigned k=0; k<DIM; k++)
+                for (unsigned k=0; k<DIM; k++)
                 {
                     ret(index1,index2) +=   mu
                                           * (spatial_dim1==spatial_dim2)

@@ -329,7 +329,6 @@ public:
      * @param value  value to set it to.
      */
     void SetParameter(const std::string& rParameterName, double value);
-
 };
 
 CLASS_IS_ABSTRACT(AbstractCvodeCell)

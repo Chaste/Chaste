@@ -401,7 +401,6 @@ public:
         std::string single_ode_wnt_results_dir = output_file_handler.GetOutputDirectoryFullPath();
         FileComparison( single_ode_wnt_results_dir + "single_ode_wnt_results.parameters", "crypt/test/data/TestCellCycleModels/single_ode_wnt_results.parameters").CompareFiles();
     }
-
 };
 
 // Member initialisation

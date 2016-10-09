@@ -56,11 +56,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/foreach.hpp>
 
 #include "AbstractMesh.hpp"
+#include "TetrahedralMesh.hpp"
 #include "CellPropertyRegistry.hpp"
 #include "Identifiable.hpp"
 #include "AbstractCellPopulationCountWriter.hpp"
 #include "AbstractCellPopulationWriter.hpp"
 #include "AbstractCellWriter.hpp"
+
+// Forward declaration prevents circular include chain
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCellBasedSimulation;
 
 /**
  * An abstract facade class encapsulating a cell population.
@@ -221,6 +225,48 @@ public:
     AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rGetMesh();
 
     /**
+     * @return a shared to a tetrahedral mesh, for use with a PDE modifier.
+     * This method is called by AbstractGrowingDomainPdeModifier.
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     */
+    virtual TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* GetTetrahedralMeshForPdeModifier()=0;
+
+    /**
+     * @param pdeNodeIndex index of a node in a tetrahedral mesh for use with a PDE modifier
+     *
+     * @return if a node, specified by its index in a tetrahedral mesh for use
+     *         with a PDE modifier, is associated with a non-apoptotic cell.
+     * This method can be called by PDE classes.
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     */
+    virtual bool IsPdeNodeAssociatedWithNonApoptoticCell(unsigned pdeNodeIndex);
+
+    /**
+     * @param pdeNodeIndex index of a node in a tetrahedral mesh for use
+     *         with a PDE modifier
+     * @param rVariableName the name of the cell data item to get
+     * @param dirichletBoundaryConditionApplies where a Dirichlet boundary condition is used
+     *        (optional; defaults to false)
+     * @param dirichletBoundaryValue the value of the Dirichlet boundary condition, if used
+     *        (optional; defaults to 0.0)
+     *
+     * @return the value of a CellData item (interpolated if necessary) at a node,
+     *         specified by its index in a tetrahedral mesh for use with a PDE modifier.
+     * This method can be called by PDE modifier classes.
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     */
+    virtual double GetCellDataItemAtPdeNode(unsigned pdeNodeIndex,
+                                            std::string& rVariableName,
+                                            bool dirichletBoundaryConditionApplies=false,
+                                            double dirichletBoundaryValue=0.0)=0;
+
+    /**
      * @return reference to mCells.
      */
     std::list<CellPtr>& rGetCells();
@@ -327,6 +373,9 @@ public:
      * Remove the Nodes (for cell-centre) or VertexElements (for cell-vertex) which
      * have been marked as deleted and update the correspondence with Cells.
      *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     *
      * @param hasHadBirthsOrDeaths - a bool saying whether cell population has had Births Or Deaths
      */
     virtual void Update(bool hasHadBirthsOrDeaths=true)=0;
@@ -425,7 +474,7 @@ public:
      *
      * @return whether there is a cell attached.
      */
-    bool IsCellAttachedToLocationIndex(unsigned index);
+    virtual bool IsCellAttachedToLocationIndex(unsigned index);
 
     /**
      * Set the cell corresponding to a given location index.
@@ -569,24 +618,30 @@ public:
     virtual void WriteResultsToFiles(const std::string& rDirectory);
 
     /**
-     * A virtual method to accept a cell population writer so it can
-     * write data from this object to file.
+     * Accept a cell population writer so it can write data from this object to file.
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
      *
      * @param pPopulationWriter the population writer.
      */
     virtual void AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationWriter)=0;
 
     /**
-     * A virtual method to accept a cell population count writer so it can
-     * write data from this object to file.
+     * Accept a cell population count writer so it can write data from this object to file.
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
      *
      * @param pPopulationCountWriter the population count writer.
      */
     virtual void AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationCountWriter)=0;
 
     /**
-     * A virtual method to accept a cell writer so it can
-     * write data from this object to file.
+     * Accept a cell writer so it can write data from this object to file.
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
      *
      * @param pCellWriter the population writer.
      * @param pCell the cell whose data are being written.
@@ -609,6 +664,22 @@ public:
      * @param rParamsFile the file stream to which the parameters are output
      */
     virtual void OutputCellPopulationParameters(out_stream& rParamsFile)=0;
+
+    /**
+     * Empty hook method to provide the ability to specify some additional property 
+     * of a cell-based simulation object. 
+     *
+     * This method is called immediately prior to calling SetupSolve() within the 
+     * Solve() method in AbstractCellBasedSimulation.
+     *
+     * This method can be overridden, for example, to add a T2SwapCellKiller to the 
+     * simulation object in the case of a VertexBasedCellPopulation. This functionality 
+     * avoids the need for static or dynamic casts to specific cell population types 
+     * within simulation methods.
+     *
+     * @param pSimulation pointer to a cell-based simulation object
+     */
+    virtual void SimulationSetupHook(AbstractCellBasedSimulation<ELEMENT_DIM, SPACE_DIM>* pSimulation);
 
     /**
      * @return mOutputResultsForChasteVisualizer

@@ -600,7 +600,7 @@ public:
 
                 }
 
-                if ( time_series.back() != 0.0)
+                if (time_series.back() != 0.0)
                 {
                     // Simulation ran to completion
                     this->PopulatedResult=true;
@@ -632,7 +632,6 @@ public:
                 info_file.close();
             }
         }
-
     }
 
     void DisplayRun()

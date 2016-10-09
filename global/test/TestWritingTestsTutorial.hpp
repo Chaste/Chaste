@@ -116,12 +116,19 @@ public:
 };
 /*
  *
- * To run this code, copy it into a file (`TestWritingTests.hpp`, say, in the directory `global/test/`),
- * and run, either by running
+ * To run this code, first copy it into a file, say, called `TestWritingTests.hpp` in the directory `global/test/`.
+ * Second, add the full name of your new file to the relevant continuous test pack, say `[path/to/Chaste]/global/test/ContinuousTestPack.txt`.
+ * Third, from the command line, run
 {{{
 #!sh
-scons global/test/TestWritingTests.hpp
+cd [path/to/ChasteBuild]
+ccmake [path/to/Chaste]
 }}}
- * from the command line, or by creating a new "Make Target" in Eclipse using the above command.
+ * Then press `c` to configure, `e` to exit, and `g` to generate. Finally, run
+{{{
+#!sh
+make global
+ctest -V -R TestWritingTests
+}}}
  */
 #endif /*TESTWRITINGTESTTUTORIAL_HPP_*/

@@ -50,6 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 typedef GmshMeshReader<2,2> READER_2D;
 typedef GmshMeshReader<3,3> READER_3D;
+typedef GmshMeshReader<2,3> READER_2D_3D;
 
 class TestGmshMeshReader : public CxxTest::TestSuite
 {
@@ -193,6 +194,25 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 5u);
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 4u);
         TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 4u);
+        // Check area and middle node location
+        TS_ASSERT_DELTA(mesh.GetVolume(), 1.0, 1e-15);
+        TS_ASSERT_DELTA(mesh.GetNode(4)->rGetLocation()[0], 0.5, 1e-15);
+        TS_ASSERT_DELTA(mesh.GetNode(4)->rGetLocation()[1], 0.5, 1e-15);
+    }
+
+    void TestRead2d3dMeshes(void) throw(Exception)
+    {
+        READER_2D_3D reader("mesh/test/data/square_4_elements_nonplanar_gmsh.msh");  // As previous test, but the central node is elevated
+        TetrahedralMesh<2,3> mesh;
+        mesh.ConstructFromMeshReader(reader);
+        TS_ASSERT_EQUALS(mesh.GetNumNodes(), 5u);
+        TS_ASSERT_EQUALS(mesh.GetNumElements(), 4u);
+        TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 4u);
+        // Check area and middle node location
+        TS_ASSERT_DELTA(mesh.GetVolume(), /*1.0*/ sqrt(2), 1e-15);
+        TS_ASSERT_DELTA(mesh.GetNode(4)->rGetLocation()[0], 0.5, 1e-15);
+        TS_ASSERT_DELTA(mesh.GetNode(4)->rGetLocation()[1], 0.5, 1e-15);
+        TS_ASSERT_DELTA(mesh.GetNode(4)->rGetLocation()[2], 0.5, 1e-15);
     }
 
     void TestRead2dQuadraticMeshes(void) throw(Exception)

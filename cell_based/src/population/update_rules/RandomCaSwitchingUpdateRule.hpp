@@ -125,11 +125,11 @@ public:
     void SetSwitchingParameter(double switchingParameter);
 
     /**
-     * Overridden OutputSwitchingUpdateRuleParameters() method.
+     * Overridden OutputUpdateRuleParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputSwitchingUpdateRuleParameters(out_stream& rParamsFile);
+    void OutputUpdateRuleParameters(out_stream& rParamsFile);
 };
 
 #include "SerializationExportWrapper.hpp"

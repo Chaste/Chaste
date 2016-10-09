@@ -370,9 +370,7 @@ public:
      *  Only valid if mCompressibilityType==INCOMPRESSIBLE
      */
     std::vector<double>& rGetPressures();
-
 };
-
 
 template<unsigned DIM>
 AbstractContinuumMechanicsSolver<DIM>::AbstractContinuumMechanicsSolver(AbstractTetrahedralMesh<DIM, DIM>& rQuadMesh,
@@ -396,7 +394,7 @@ AbstractContinuumMechanicsSolver<DIM>::AbstractContinuumMechanicsSolver(Abstract
     QuadraticMesh<DIM>* p_quad_mesh = dynamic_cast<QuadraticMesh<DIM>* >(&rQuadMesh);
     DistributedQuadraticMesh<DIM>* p_distributed_quad_mesh = dynamic_cast<DistributedQuadraticMesh<DIM>* >(&rQuadMesh);
 
-    if(p_quad_mesh == NULL && p_distributed_quad_mesh == NULL)
+    if ((p_quad_mesh == NULL) && (p_distributed_quad_mesh == NULL))
     {
         EXCEPTION("Continuum mechanics solvers require a quadratic mesh");
     }
@@ -412,7 +410,7 @@ AbstractContinuumMechanicsSolver<DIM>::AbstractContinuumMechanicsSolver(Abstract
         mpOutputFileHandler = new OutputFileHandler(mOutputDirectory);
     }
 
-    // see dox for mProblemDimension
+    // See dox for mProblemDimension
     mProblemDimension = mCompressibilityType==COMPRESSIBLE ? DIM : DIM+1;
     mNumDofs = mProblemDimension*mrQuadMesh.GetNumNodes();
 
@@ -427,7 +425,6 @@ AbstractContinuumMechanicsSolver<DIM>::AbstractContinuumMechanicsSolver(Abstract
 
     mCurrentSolution.resize(mNumDofs, 0.0);
 }
-
 
 template<unsigned DIM>
 AbstractContinuumMechanicsSolver<DIM>::~AbstractContinuumMechanicsSolver()
@@ -536,7 +533,6 @@ void AbstractContinuumMechanicsSolver<DIM>::WriteCurrentPressureSolution(int cou
     PetscTools::Barrier("WritePressure");
 }
 
-
 template<unsigned DIM>
 void AbstractContinuumMechanicsSolver<DIM>::SetWriteOutput(bool writeOutput)
 {
@@ -567,7 +563,7 @@ void AbstractContinuumMechanicsSolver<DIM>::CreateVtkOutput(std::string spatialS
 
     //Output the element attribute as cell data.
     std::vector<double> element_attribute;
-    for(typename QuadraticMesh<DIM>::ElementIterator iter = this->mrQuadMesh.GetElementIteratorBegin();
+    for (typename QuadraticMesh<DIM>::ElementIterator iter = this->mrQuadMesh.GetElementIteratorBegin();
         iter != this->mrQuadMesh.GetElementIteratorEnd();
         ++iter)
     {
@@ -578,7 +574,6 @@ void AbstractContinuumMechanicsSolver<DIM>::CreateVtkOutput(std::string spatialS
     mesh_writer.WriteFilesUsingMesh(this->mrQuadMesh);
 #endif
 }
-
 
 template<unsigned DIM>
 std::vector<double>& AbstractContinuumMechanicsSolver<DIM>::rGetPressures()
@@ -594,7 +589,6 @@ std::vector<double>& AbstractContinuumMechanicsSolver<DIM>::rGetPressures()
     }
     return mPressureSolution;
 }
-
 
 template<unsigned DIM>
 void AbstractContinuumMechanicsSolver<DIM>::RemovePressureDummyValuesThroughLinearInterpolation()
@@ -616,13 +610,13 @@ void AbstractContinuumMechanicsSolver<DIM>::RemovePressureDummyValuesThroughLine
          iter != mrQuadMesh.GetElementIteratorEnd();
          ++iter)
     {
-        for(unsigned i=0; i<num_internal_nodes_per_element; i++)
+        for (unsigned i=0; i<num_internal_nodes_per_element; i++)
         {
             unsigned global_index;
             double left_val;
             double right_val;
 
-            if(DIM==2)
+            if (DIM == 2)
             {
                 global_index = iter->GetNodeGlobalIndex( internal_nodes_2d[i] );
                 unsigned vertex_0_global_index =iter->GetNodeGlobalIndex( neighbouring_vertices_2d[i][0] );
@@ -686,7 +680,7 @@ void AbstractContinuumMechanicsSolver<DIM>::ApplyDirichletBoundaryConditions(App
 
     if (applySymmetrically)
     {
-        if(mDirichletBoundaryConditionsVector==NULL)
+        if (mDirichletBoundaryConditionsVector == NULL)
         {
             VecDuplicate(mResidualVector, &mDirichletBoundaryConditionsVector);
         }
@@ -707,12 +701,12 @@ void AbstractContinuumMechanicsSolver<DIM>::ApplyDirichletBoundaryConditions(App
         {
             double dirichlet_val = mrProblemDefinition.rGetDirichletNodeValues()[i](j);
 
-            if(dirichlet_val != ContinuumMechanicsProblemDefinition<DIM>::FREE)
+            if (dirichlet_val != ContinuumMechanicsProblemDefinition<DIM>::FREE)
             {
                 double val;
                 unsigned dof_index = mProblemDimension*node_index+j;
 
-                if(type == LINEAR_PROBLEM)
+                if (type == LINEAR_PROBLEM)
                 {
                     val = dirichlet_val;
                 }
@@ -799,7 +793,6 @@ void AbstractContinuumMechanicsSolver<DIM>::ApplyDirichletBoundaryConditions(App
     }
 }
 
-
 template<unsigned DIM>
 void AbstractContinuumMechanicsSolver<DIM>::AddIdentityBlockForDummyPressureVariables(ApplyDirichletBcsType type)
 {
@@ -808,22 +801,22 @@ void AbstractContinuumMechanicsSolver<DIM>::AddIdentityBlockForDummyPressureVari
     int lo, hi;
     VecGetOwnershipRange(mResidualVector, &lo, &hi);
 
-    for(unsigned i=0; i<mrQuadMesh.GetNumNodes(); i++)
+    for (unsigned i=0; i<mrQuadMesh.GetNumNodes(); i++)
     {
-        if(mrQuadMesh.GetNode(i)->IsInternal())
+        if (mrQuadMesh.GetNode(i)->IsInternal())
         {
             unsigned row = (DIM+1)*i + DIM; // DIM+1 is the problem dimension
-            if(lo <= (int)row && (int)row < hi)
+            if (lo <= (int)row && (int)row < hi)
             {
-                if(type!=LINEAR_PROBLEM)
+                if (type!=LINEAR_PROBLEM)
                 {
                     PetscVecTools::SetElement(mResidualVector, row, mCurrentSolution[row]-0.0);
                 }
-                if(type!=NONLINEAR_PROBLEM_APPLY_TO_RESIDUAL_ONLY) // ie doing a whole linear system
+                if (type!=NONLINEAR_PROBLEM_APPLY_TO_RESIDUAL_ONLY) // ie doing a whole linear system
                 {
                     double rhs_vector_val = type==LINEAR_PROBLEM ? 0.0 : mCurrentSolution[row]-0.0;
                     PetscVecTools::SetElement(mLinearSystemRhsVector, row, rhs_vector_val);
-                    // this assumes the row is already zero, which is should be..
+                    // This assumes the row is already zero, which is should be..
                     PetscMatTools::SetElement(mSystemLhsMatrix, row, row, 1.0);
                     PetscMatTools::SetElement(mPreconditionMatrix, row, row, 1.0);
                 }
@@ -831,8 +824,6 @@ void AbstractContinuumMechanicsSolver<DIM>::AddIdentityBlockForDummyPressureVari
         }
     }
 }
-
-
 
 template<unsigned DIM>
 void AbstractContinuumMechanicsSolver<DIM>::AllocateMatrixMemory()
@@ -898,7 +889,7 @@ void AbstractContinuumMechanicsSolver<DIM>::AllocateMatrixMemory()
 
             if (mCompressibilityType==INCOMPRESSIBLE)
             {
-                if(!iter->IsInternal())
+                if (!iter->IsInternal())
                 {
                     num_non_zeros_each_row[mProblemDimension*i + 3] = num_non_zeros_upper_bound;
                 }
@@ -949,7 +940,7 @@ void AbstractContinuumMechanicsSolver<DIM>::AllocateMatrixMemory()
                 num_non_zeros_each_row_in_diag[i] = num_non_zeros_each_row[lo+i];
                 num_non_zeros_each_row_off_diag[i] = num_non_zeros_each_row[lo+i];
                 // In the on process ("diagonal block") there cannot be more non-zero columns specified than there are rows
-                if(num_non_zeros_each_row_in_diag[i] > local_size)
+                if (num_non_zeros_each_row_in_diag[i] > local_size)
                 {
                     num_non_zeros_each_row_in_diag[i] = local_size;
                 }

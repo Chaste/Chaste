@@ -731,6 +731,20 @@ if (Chaste_PROFILE_GPROF OR Chaste_PROFILE_GPERFTOOLS)
         VERBATIM)
 endif()
 
+##############################
+#     Infrastructure Tests   #
+##############################
+
+
+add_custom_target(infrastructure
+    COMMAND ${PYTHON_EXECUTABLE} ${Chaste_SOURCE_DIR}/python/infra/CheckForCopyrights.py
+    COMMAND ${PYTHON_EXECUTABLE} ${Chaste_SOURCE_DIR}/python/infra/CheckForDuplicateFileNames.py
+    COMMAND ${PYTHON_EXECUTABLE} ${Chaste_SOURCE_DIR}/python/infra/CheckForOrphanedTests.py
+    COMMAND ${PYTHON_EXECUTABLE} ${Chaste_SOURCE_DIR}/python/infra/CheckSchemas.py
+
+    WORKING_DIRECTORY ${Chaste_SOURCE_DIR}
+    VERBATIM)
+
 
 ####################
 #    PACKAGING     #

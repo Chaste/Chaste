@@ -224,7 +224,7 @@ public:
                 y = p_mesh->GetNode(i)->GetPoint().rGetLocation()[1];
             }
 
-            FixedDurationGenerationBasedCellCycleModel* p_cell_cycle_model = new FixedDurationGenerationBasedCellCycleModel;
+            FixedG1GenerationalCellCycleModel* p_cell_cycle_model = new FixedG1GenerationalCellCycleModel;
             p_cell_cycle_model->SetDimension(2);
 
             double typical_transit_cycle_time = p_cell_cycle_model->GetAverageTransitCellCycleTime();
@@ -397,7 +397,7 @@ public:
                 y = p_mesh->GetNode(i)->GetPoint().rGetLocation()[1];
             }
 
-            FixedDurationGenerationBasedCellCycleModel* p_cell_cycle_model = new FixedDurationGenerationBasedCellCycleModel;
+            FixedG1GenerationalCellCycleModel* p_cell_cycle_model = new FixedG1GenerationalCellCycleModel;
             p_cell_cycle_model->SetDimension(2);
 
             double typical_transit_cycle_time = p_cell_cycle_model->GetAverageTransitCellCycleTime();
@@ -509,7 +509,7 @@ public:
         MutableMesh<2,2> mesh(nodes);
 
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         MeshBasedCellPopulation<2> cell_population(mesh, cells);
@@ -557,7 +557,7 @@ public:
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel,2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel,2> cells_generator;
         cells_generator.GenerateGivenLocationIndices(cells, location_indices);
 
         MeshBasedCellPopulationWithGhostNodes<2> stretched_cell_population(*p_mesh, cells, location_indices);
@@ -587,7 +587,7 @@ public:
         std::vector<unsigned> location_indices2 = generator2.GetCellLocationIndices();
 
         std::vector<CellPtr> cells2;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel,2> cells_generator2;
+        CellsGenerator<FixedG1GenerationalCellCycleModel,2> cells_generator2;
         cells_generator2.GenerateGivenLocationIndices(cells2, location_indices2);
 
         MeshBasedCellPopulationWithGhostNodes<2> squashed_cell_population(*p_mesh2, cells2, location_indices2);
@@ -651,7 +651,7 @@ public:
 
             for (unsigned i=0; i<mesh.GetNumNodes(); i++)
             {
-                FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+                FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
                 CellPtr p_cell(new Cell(p_state, p_model));
                 p_cell->SetCellProliferativeType(p_stem_type);
                 p_cell->SetBirthTime(-50.0);
@@ -726,7 +726,7 @@ public:
         mesh.ConstructNodesWithoutMesh(nodes, 1.5);
 
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         NodeBasedCellPopulation<2> cell_population(mesh, cells);

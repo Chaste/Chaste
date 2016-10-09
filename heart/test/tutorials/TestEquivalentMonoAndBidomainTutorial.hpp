@@ -148,7 +148,7 @@ public:
 // *
 // * Now we can define the test class, which must inherit from {{{CxxTest::TestSuite}}}
 // * as described in the writing basic tests tutorial. */
-class TestRunningBidomainSimulationsTutorial : public CxxTest::TestSuite
+class TestEquivalentMonoAndBidomainTutorial : public CxxTest::TestSuite
 {
 // Tests should be public...
 public:

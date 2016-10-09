@@ -273,7 +273,7 @@ std::vector<double> PropagationPropertiesCalculator::CalculateAllConductionVeloc
         for (unsigned i = 0 ; i < number_of_aps;i++)
         {
             ///\todo remove magic number? (#1884)
-            if ( fabs(t_far[i] - t_near[i]) < 1e-8)
+            if (fabs(t_far[i] - t_near[i]) < 1e-8)
             {
                 // AP number i is happening at the same time at nodes globalNearNodeIndex and globalFarNodeIndex
                 conduction_velocities.push_back(0.0);

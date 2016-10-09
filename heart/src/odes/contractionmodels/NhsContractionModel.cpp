@@ -39,8 +39,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cmath>
 
-
-
 //
 // Model-scope constant parameters
 //
@@ -90,8 +88,6 @@ double NhsContractionModel::CalculateT0(double z)
 
     return z * mTref * (1+mBeta0*(mLambda-1)) / z_max;
 }
-
-
 
 /*
  * ============================== PUBLIC FUNCTIONS =====================================
@@ -160,15 +156,15 @@ void NhsContractionModel::EvaluateYDerivatives(double time,
 
     // check the state vars are in the expected range
     #define COVERAGE_IGNORE
-    if(calcium_troponin < 0)
+    if (calcium_troponin < 0)
     {
         EXCEPTION("CalciumTrop concentration went negative");
     }
-    if(z<0)
+    if (z<0)
     {
         EXCEPTION("z went negative");
     }
-    if(z>1)
+    if (z>1)
     {
         EXCEPTION("z became greater than 1");
     }
@@ -179,7 +175,7 @@ void NhsContractionModel::EvaluateYDerivatives(double time,
     double T0 = CalculateT0(z);
 
     double Ta;
-    if(Q>0)
+    if (Q>0)
     {
         Ta = T0*(1+(2+mA)*Q)/(1+Q);
     }
@@ -209,7 +205,7 @@ double NhsContractionModel::GetActiveTension()
     double T0 = CalculateT0(mStateVariables[1]);
     double Q = mStateVariables[2]+mStateVariables[3]+mStateVariables[4];
 
-    if(Q>0)
+    if (Q>0)
     {
         return T0*(1+(2+mA)*Q)/(1+Q);
     }

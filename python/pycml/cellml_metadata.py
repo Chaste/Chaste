@@ -317,7 +317,8 @@ class RdfProcessor(object):
             assert uri[0] == '#', "Annotation found on non-local URI"
             var_id = uri[1:] # Strip '#'
             var_objs = cellml_model.xml_xpath(u'*/cml:variable[@cmeta:id="%s"]' % var_id)
-            assert len(var_objs) == 1, "Didn't find a unique variable with ID " + var_id
+            assert len(var_objs) > 0, "Didn't find any variable with ID '" + var_id + "' when dereferencing annotation"
+            assert len(var_objs) == 1, "Found " + str(len(var_objs)) + " variables with ID '" + var_id + "' when dereferencing annotation - IDs should be unique"
             vars.append(var_objs[0])
         return vars
     

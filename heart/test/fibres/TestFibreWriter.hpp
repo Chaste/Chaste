@@ -206,12 +206,14 @@ private:
             file_finder_bin.CopyTo(file_finder_test_folder);
         }
     }
+
 public:
     void TestConvertFiles() throw (Exception)
     {
           ConvertToBinaryOrtho("heart/test/data/box_shaped_heart/", "box_heart", false);
           ConvertToBinaryAxi("heart/test/data/box_shaped_heart/", "box_heart", false);
     }
+
     void doNotTestReallyConvertFiles() throw (Exception)
     {
           ConvertToBinaryOrtho("heart/test/data/fibre_tests/", "downsampled", true);
@@ -219,8 +221,6 @@ public:
           ConvertToBinaryAxi("apps/texttest/weekly/Propagation3d/", "OxfordRabbitHeart_482um", true);
           //This one is dodgy... ConvertToBinaryAxi("notforrelease/test/data/simplified_very_low_res/", "heart_chaste2_renum_e_triangles", true);
     }
-
 };
-
 
 #endif /*TESTFIBREREADER_HPP_*/

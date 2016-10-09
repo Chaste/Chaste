@@ -259,8 +259,6 @@ public:
        }
    }
 
-
-
     void TestSigmoidalAcinarUnitInspiration() throw (Exception)
     {
         double viscosity = 1.92e-5;               //Pa s

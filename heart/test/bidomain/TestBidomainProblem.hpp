@@ -70,8 +70,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkVersion.h>
 #endif
 
-
-
 /**
  * This stimulus causes an exception to be thrown when normally a simple stimulus would activate.
  *
@@ -703,7 +701,7 @@ public:
         std::string files[6] = {"res_mesh.pts","res_mesh.cnnx","ChasteParameters.xml",
                                 "res_Phi_e.dat","res_V.dat","res_times.info"};
 
-        for(unsigned i=0; i<6; i++)
+        for (unsigned i=0; i<6; i++)
         {
             TS_ASSERT(handler.FindFile(files[i]).Exists());
         }
@@ -995,9 +993,7 @@ public:
         {
             TS_ASSERT_DELTA( obscure_at_5[time_step], 0.0044, 1e-3); //Does not change over time at this node
         }
-
     }
-
 
     /*
      * Simple bidomain simulation to test against in the archiving tests below
@@ -1043,7 +1039,6 @@ public:
         {
             mSolutionReplicated1d2ms.push_back(solution_replicated[index]);
         }
-
     }
 
     /*
@@ -1097,12 +1092,9 @@ public:
         boost::shared_ptr<SingleTraceOutputModifier> trace_5(new SingleTraceOutputModifier("trace_5.txt", new_index_for_5, 0.1));
         bidomain_problem.AddOutputModifier(trace_5);
 
-
-
         bidomain_problem.SetMesh(&mesh);
         bidomain_problem.Initialise();
         bidomain_problem.Solve();
-
 
         // Extra trace data
         OutputFileHandler handler1("BidomainUnpermuted1d", false);
@@ -1337,9 +1329,6 @@ public:
             delete p_bidomain_problem;
         }
     }
-
-
-
 };
 
 #endif /*TESTBIDOMAINPROBLEM_HPP_*/

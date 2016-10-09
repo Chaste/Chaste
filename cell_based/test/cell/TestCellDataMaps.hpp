@@ -47,7 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Cell.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "StemCellProliferativeType.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
 #include "CellPropertyRegistry.hpp"
 #include "CellVecData.hpp"
 #include "CellData.hpp"
@@ -68,7 +68,7 @@ public:
         boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
         boost::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
 
-        FixedDurationGenerationBasedCellCycleModel* p_cell_model = new FixedDurationGenerationBasedCellCycleModel();
+        FixedG1GenerationalCellCycleModel* p_cell_model = new FixedG1GenerationalCellCycleModel();
         CellPtr p_cell(new Cell(p_healthy_state, p_cell_model));
         p_cell->SetCellProliferativeType(p_type);
         p_cell->InitialiseCellCycleModel();
@@ -108,7 +108,7 @@ public:
         boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
         boost::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
 
-        FixedDurationGenerationBasedCellCycleModel* p_cell_model = new FixedDurationGenerationBasedCellCycleModel();
+        FixedG1GenerationalCellCycleModel* p_cell_model = new FixedG1GenerationalCellCycleModel();
         CellPtr p_cell(new Cell(p_healthy_state, p_cell_model));
         p_cell->SetCellProliferativeType(p_type);
         p_cell->InitialiseCellCycleModel();

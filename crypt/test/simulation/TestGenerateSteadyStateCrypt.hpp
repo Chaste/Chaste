@@ -38,6 +38,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 
+#include <cstring>
+
 // Must be included before any other cell_based or crypt headers
 #include "CellBasedSimulationArchiver.hpp"
 
@@ -50,6 +52,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "StochasticWntCellCycleModel.hpp"
 #include "SmartPointers.hpp"
 #include "CellMutationStatesCountWriter.hpp"
+#include "Version.hpp"
 #include "FakePetscSetup.hpp"
 
 class TestGenerateSteadyStateCrypt : public CxxTest::TestSuite
@@ -134,7 +137,7 @@ public:
         */
         for (double t=time_of_each_run; t<end_of_simulation+0.5; t += time_of_each_run)
         {
-            CryptSimulation2d* p_simulator = CellBasedSimulationArchiver<2, CryptSimulation2d>::Load("SteadyStateCrypt",t);
+            CryptSimulation2d* p_simulator = CellBasedSimulationArchiver<2, CryptSimulation2d>::Load("SteadyStateCrypt", t);
             p_simulator->SetEndTime(t+time_of_each_run);
             p_simulator->Solve();
             CellBasedSimulationArchiver<2, CryptSimulation2d>::Save(p_simulator);
@@ -143,11 +146,17 @@ public:
 
         {
             // Testing here that the number of cells at the end doesn't change
-            // Not that this number is from having cvode turned on
-            CryptSimulation2d* p_simulator = CellBasedSimulationArchiver<2, CryptSimulation2d>::Load("SteadyStateCrypt",end_of_simulation);
-            TS_ASSERT_EQUALS(p_simulator->rGetCellPopulation().GetNumRealCells(),474u); // With cvode
-            // TS_ASSERT_EQUALS(p_simulator->rGetCellPopulation().GetNumRealCells(),445); // Without cvode
-
+            CryptSimulation2d* p_simulator = CellBasedSimulationArchiver<2, CryptSimulation2d>::Load("SteadyStateCrypt", end_of_simulation);
+            unsigned expected_cell_count = 474u; // GccOpt with CVODE on
+            if (strstr(ChasteBuildInfo::GetCompilerType(), "ntel") != NULL)
+            {
+                expected_cell_count = 450u; // IntelProduction with CVODE on
+            }
+            else if (strstr(ChasteBuildInfo::GetBuildInformation(), "use-cvode=0") != NULL)
+            {
+                expected_cell_count = 445u; // GccOpt with CVODE off
+            }
+            TS_ASSERT_EQUALS(p_simulator->rGetCellPopulation().GetNumRealCells(), expected_cell_count);
             delete p_simulator;
         }
 

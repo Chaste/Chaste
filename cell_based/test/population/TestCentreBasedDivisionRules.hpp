@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HoneycombMeshGenerator.hpp"
 #include "CellsGenerator.hpp"
 #include "NodeBasedCellPopulation.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "RandomDirectionCentreBasedDivisionRule.hpp"
 #include "FixedCentreBasedDivisionRule.hpp"
@@ -76,7 +76,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 1> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 1> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         // Create a cell population
@@ -98,7 +98,7 @@ public:
         double angle_variance = 0.0;
         for (unsigned iteration = 0; iteration < 10000; iteration++)
         {
-        	std::pair<c_vector<double, 2>, c_vector<double, 2> > positions = p_division_rule->CalculateCellDivisionVector(p_cell0, cell_population);
+            std::pair<c_vector<double, 2>, c_vector<double, 2> > positions = p_division_rule->CalculateCellDivisionVector(p_cell0, cell_population);
             c_vector<double, 2> random_axis = positions.second - positions.first;
 
             // Each random vector should have norm equal to 0.5*0.3 = 0.15
@@ -140,7 +140,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 1> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 1> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         // Create a cell population

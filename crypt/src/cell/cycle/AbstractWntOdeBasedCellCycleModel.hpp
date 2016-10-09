@@ -132,8 +132,10 @@ public:
     void UpdateCellProliferativeType();
 
     /**
-     * This must be implemented by subclasses to change cell type to reflect
-     * current levels of beta-catenin.
+     * Change cell type to reflect current levels of beta-catenin.
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
      */
     virtual void ChangeCellProliferativeTypeDueToCurrentBetaCateninLevel()=0;
 

@@ -124,7 +124,7 @@ public:
 
         // Set up cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
 
         // Create cell population
@@ -187,7 +187,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
 
         // Create cell population
@@ -245,7 +245,7 @@ public:
 
         // Create cells, all differentiated
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true, 0.0, 0.0, 0.0, 0.0);
 
         // Create cell population
@@ -290,7 +290,7 @@ public:
 
         // Create cells: the bottom row have StemCellProliferativeType and the rest have DifferentiatedCellProliferativeType
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true, 0.8, 0.8, 0.8, 0.8);
 
         // Cell 1 should divide at time t=0.05
@@ -348,7 +348,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<UniformlyDistributedGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<UniformG1GenerationalCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
 
         // Create cell population
@@ -507,7 +507,7 @@ public:
 
         // Create cells: the bottom row have StemCellProliferativeType and the rest have DifferentiatedCellProliferativeType
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<UniformlyDistributedGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<UniformG1GenerationalCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true, 0.8, 0.8, 0.8, 0.8);
 
         // Create cell population
@@ -562,7 +562,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<UniformlyDistributedGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<UniformG1GenerationalCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
 
         // Create cell population
@@ -623,7 +623,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<UniformlyDistributedGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<UniformG1GenerationalCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
 
         // Create cell population
@@ -690,7 +690,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<UniformlyDistributedGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<UniformG1GenerationalCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
 
         // Create cell population
@@ -737,7 +737,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<UniformlyDistributedGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<UniformG1GenerationalCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
 
         // Create cell population

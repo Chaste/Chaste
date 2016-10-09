@@ -304,6 +304,4 @@ public :
     }
 };
 
-
-
 #endif /*CARDIACELECTROMECHANICSPROBLEM_HPP_*/

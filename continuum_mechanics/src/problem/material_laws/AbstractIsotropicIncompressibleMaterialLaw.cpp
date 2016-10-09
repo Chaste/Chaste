@@ -151,9 +151,6 @@ double AbstractIsotropicIncompressibleMaterialLaw<3>::GetZeroStrainPressure()
     return 2*Get_dW_dI1(3,3) + 4*Get_dW_dI2(3,3);
 }
 
-////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-////////////////////////////////////////////////////////////////////////////////////
-
 template class AbstractIsotropicIncompressibleMaterialLaw<2>;
 template class AbstractIsotropicIncompressibleMaterialLaw<3>;

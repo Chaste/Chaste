@@ -174,10 +174,6 @@ void AbstractMaterialLaw<DIM>::TransformStressAndStressDerivative(c_matrix<doubl
     }
 }
 
-////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-////////////////////////////////////////////////////////////////////////////////////
-
-//template class AbstractMaterialLaw<1>;
 template class AbstractMaterialLaw<2>;
 template class AbstractMaterialLaw<3>;

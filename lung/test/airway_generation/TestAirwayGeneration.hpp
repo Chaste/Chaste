@@ -185,6 +185,4 @@ private:
 #endif
 };
 
-
-
 #endif /* TESTAIRWAYGENERATOR_HPP_ */

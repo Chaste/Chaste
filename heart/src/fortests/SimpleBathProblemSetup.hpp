@@ -130,7 +130,7 @@ void SetCircularTissueIn2dMesh(MeshType* pMesh,
     {
         double x = it->CalculateCentroid()[0];
         double y = it->CalculateCentroid()[1];
-        if ( (x-centreX)*(x-centreX) + (y-centreY)*(y-centreY) > radius*radius )
+        if ((x-centreX)*(x-centreX) + (y-centreY)*(y-centreY) > radius*radius)
         {
             it->SetAttribute(HeartRegionCode::GetValidBathId());
         }

@@ -54,7 +54,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SimulationTime.hpp"
 #include "MutableMesh.hpp"
 #include "ChasteCuboid.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
 #include "MeshBasedCellPopulation.hpp"
 #include "ApcTwoHitCellMutationState.hpp"
 
@@ -94,7 +94,7 @@ public:
         boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
-            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+            FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
             CellPtr p_cell(new Cell(p_state, p_model));
 
             if (i==4 || i==5)
@@ -273,7 +273,7 @@ public:
         boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
-            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+            FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
             CellPtr p_cell(new Cell(p_state, p_model));
             p_cell->SetCellProliferativeType(p_stem_type);
             p_cell->SetBirthTime(-10.0);
@@ -354,7 +354,7 @@ public:
 
             for (unsigned i=0; i<mesh.GetNumNodes(); i++)
             {
-                FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+                FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
                 CellPtr p_cell(new Cell(p_state, p_model));
                 p_cell->SetCellProliferativeType(p_stem_type);
                 p_cell->SetBirthTime(-50.0);
@@ -415,7 +415,7 @@ private:
 
         for (unsigned i=0; i<rLocationIndices.size(); i++)
         {
-            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+            FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
 
             CellPtr p_cell;
             if (i==60)
@@ -566,7 +566,7 @@ public:
         mesh.ConstructNodesWithoutMesh(nodes, 1.5);
 
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         NodeBasedCellPopulation<2> cell_population(mesh, cells);

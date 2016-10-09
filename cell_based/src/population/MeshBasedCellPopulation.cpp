@@ -37,22 +37,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TrianglesMeshWriter.hpp"
 #include "VtkMeshWriter.hpp"
 #include "CellBasedEventHandler.hpp"
-#include "ApoptoticCellProperty.hpp"
 #include "Cylindrical2dMesh.hpp"
 #include "Cylindrical2dVertexMesh.hpp"
 #include "NodesOnlyMesh.hpp"
 #include "Exception.hpp"
 #include "CellId.hpp"
-
-// Cell writers
-#include "CellAgesWriter.hpp"
-#include "CellAncestorWriter.hpp"
-#include "CellProliferativePhasesWriter.hpp"
-#include "CellProliferativeTypesWriter.hpp"
 #include "CellVolumesWriter.hpp"
-
-// Cell population writers
-#include "CellMutationStatesCountWriter.hpp"
 #include "CellPopulationElementWriter.hpp"
 #include "VoronoiDataWriter.hpp"
 #include "NodeVelocityWriter.hpp"
@@ -120,7 +110,7 @@ bool MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::UseAreaBasedDampingConstant
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::SetAreaBasedDampingConstant(bool useAreaBasedDampingConstant)
 {
-    assert(SPACE_DIM==2);
+    assert(SPACE_DIM == 2);
     mUseAreaBasedDampingConstant = useAreaBasedDampingConstant;
 }
 
@@ -157,7 +147,7 @@ double MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetDampingConstant(unsign
          * is the damping constant if not using mUseAreaBasedDampingConstant
          */
 
-        assert(SPACE_DIM==2);
+        assert(SPACE_DIM == 2);
 
         double rest_length = 1.0;
         double d0 = mAreaBasedDampingConstantParameter;
@@ -214,6 +204,12 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 const MutableMesh<ELEMENT_DIM,SPACE_DIM>& MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::rGetMesh() const
 {
     return *mpMutableMesh;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetTetrahedralMeshForPdeModifier()
+{
+    return mpMutableMesh;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

@@ -111,7 +111,7 @@ private:
 
             QuadraticBasisFunction<DIM>::ComputeBasisFunctions(quad_point, phi);
 
-            if ( assembleMatrix )
+            if (assembleMatrix)
             {
                 QuadraticBasisFunction<DIM>::ComputeTransformedBasisFunctionDerivatives(quad_point, inverse_jacobian, grad_phi);
             }

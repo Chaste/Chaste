@@ -103,9 +103,9 @@ private:
     /* For efficiency, we will save the diffusion tensor that will be returned by one of the
      * class' methods as a member variable. The diffusion tensor which has to be returned
      * by the {{{GetDiffusionTensor}}} method in PDE classes is of the type
-     * {{{c_matrix<double,SIZE,SIZE>}}}, which is a u-blas matrix. We use ublas vectors
-     * and matrices where small vectors and matrices are needed. Note that ublas objects
-     * are only particularly efficient if optimisation is on ({{{scons build=GccOpt ...}}}).*/
+     * {{{c_matrix<double,SIZE,SIZE>}}}, which is a uBLAS matrix. We use uBLAS vectors
+     * and matrices where small vectors and matrices are needed. Note that uBLAS objects
+     * are only particularly efficient if optimisation is on (`CMAKE_BUILD_TYPE=Release``).*/
     c_matrix<double,2,2> mDiffusionTensor;
 
 public:
@@ -230,7 +230,7 @@ public:
             double y = mesh.GetNode(node_index)->GetPoint()[1];
 
             /* If x=1 or y=1... */
-            if ( (fabs(x-1.0) < 1e-6) || (fabs(y-1.0) < 1e-6) )
+            if ((fabs(x-1.0) < 1e-6) || (fabs(y-1.0) < 1e-6))
             {
                 /* ...associate the boundary condition with the surface element. */
                 bcc.AddNeumannBoundaryCondition(*surf_iter, p_zero_boundary_condition);

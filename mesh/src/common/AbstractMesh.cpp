@@ -141,6 +141,7 @@ DistributedVectorFactory* AbstractMesh<ELEMENT_DIM, SPACE_DIM>::GetDistributedVe
     }
     return mpDistributedVectorFactory;
 }
+
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractMesh<ELEMENT_DIM, SPACE_DIM>::SetDistributedVectorFactory(DistributedVectorFactory *pFactory)
 {
@@ -498,10 +499,7 @@ void AbstractMesh<ELEMENT_DIM, SPACE_DIM>::SetMeshHasChangedSinceLoading()
     mMeshFileBaseName = "";
 }
 
-/////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////////////
-
 template class AbstractMesh<1,1>;
 template class AbstractMesh<1,2>;
 template class AbstractMesh<1,3>;

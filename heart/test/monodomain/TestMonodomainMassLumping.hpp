@@ -100,7 +100,6 @@ public:
         {
             TS_ASSERT_DELTA(standard_solution[index], mass_lumping_solution[index], tolerance);
         }
-
     }
 
     void TestCompareCubePlaneStimulusOnlyPrecondLumping() throw(Exception)
@@ -156,10 +155,7 @@ public:
         {
             TS_ASSERT_DELTA(standard_solution[index], mass_lumping_solution[index], tolerance);
         }
-
     }
-
-
 };
 
 #endif /* TESTMONODOMAINMASSLUMPING_HPP_ */

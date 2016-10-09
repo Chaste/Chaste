@@ -41,7 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 #include "CellsGenerator.hpp"
 #include "HoneycombMeshGenerator.hpp"
@@ -103,7 +103,6 @@ public:
 
             TS_ASSERT_EQUALS(boundary_condition.GetIdentifier(), "PlaneBoundaryCondition-2-3");
         }
-
     }
 
     void TestPlaneBoundaryConditionWithNodeBasedCellPopulation() throw(Exception)
@@ -120,7 +119,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         // Create cell population
@@ -189,7 +188,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         // Create cell population
@@ -244,7 +243,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
 
         // Create cell population
@@ -328,9 +327,7 @@ public:
                 TS_ASSERT_DELTA(location[1], old_locations[&(*node_iter)][1], 1e-6);
             }
         }
-
     }
-
 
     void TestPlaneBoundaryConditionExceptions() throw(Exception)
     {
@@ -341,7 +338,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
         // Create cell population
@@ -370,7 +367,7 @@ public:
         mesh_1d.ConstructNodesWithoutMesh(generating_mesh_1d, 1.5);
 
         std::vector<CellPtr> cells_1d;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 1> cells_generator_1d;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 1> cells_generator_1d;
         cells_generator_1d.GenerateBasic(cells_1d, mesh_1d.GetNumNodes());
 
         NodeBasedCellPopulation<1> population_1d(mesh_1d, cells_1d);
@@ -386,7 +383,7 @@ public:
         mesh_2d.ConstructFromMeshReader(mesh_reader_2d);
 
         std::vector<CellPtr> cells_2d;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator_2d;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator_2d;
         cells_generator_2d.GenerateBasic(cells_2d, mesh_2d.GetNumNodes());
 
         MeshBasedCellPopulation<2> population_2d(mesh_2d, cells_2d);
@@ -405,7 +402,7 @@ public:
         mesh_3d.ConstructNodesWithoutMesh(generating_mesh_3d, 1.5);
 
         std::vector<CellPtr> cells_3d;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> cells_generator_3d;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 3> cells_generator_3d;
         cells_generator_3d.GenerateBasic(cells_3d, mesh_3d.GetNumNodes());
 
         NodeBasedCellPopulation<3> population_3d(mesh_3d, cells_3d);
@@ -524,7 +521,7 @@ public:
         mesh.ConstructNodesWithoutMesh(generating_mesh, 1.5);
 
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         NodeBasedCellPopulation<2> population(mesh, cells);
@@ -601,7 +598,7 @@ public:
         mesh.ConstructNodesWithoutMesh(generating_mesh, 1.5);
 
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         NodeBasedCellPopulation<2> population(mesh, cells);

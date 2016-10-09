@@ -268,7 +268,6 @@ public:
             delete p_mesh2;
         }
     }
-
 };
 
 #endif /*TESTNONCACHEDTETRAHEDRALMESH_HPP_*/

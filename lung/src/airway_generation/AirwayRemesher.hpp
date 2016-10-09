@@ -67,7 +67,6 @@ public:
      */
     void Remesh(MutableMesh<1,3>& rOutputMesh, double maximumResistance);
 
-
     /**
      * Creates a remeshed version of the underlying mesh.
      *
@@ -76,7 +75,6 @@ public:
      * @param rOutputMesh The mesh object to be written to.
      * @param maximumResistance The maximum allowed resistance of an element
      */
-
     void Remesh(MutableMesh<1,3>& rOutputMesh);
 
 private:
@@ -100,4 +98,5 @@ private:
      */
     AirwayPropertiesCalculator mCalculator;
 };
+
 #endif //  AIRWAY_REMESHER_HPP_

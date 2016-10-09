@@ -42,7 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/archive/text_iarchive.hpp>
 
 #include "CellsGenerator.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
 #include "MeshBasedCellPopulation.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "VertexBasedCellPopulation.hpp"
@@ -88,7 +88,7 @@ public:
 
             // Create cells
             std::vector<CellPtr> cells;
-            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+            CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
             cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
             // Create cell population
@@ -126,7 +126,7 @@ public:
             mesh.ConstructNodesWithoutMesh(generating_mesh, 1.2);
 
             std::vector<CellPtr> cells;
-            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+            CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
             cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
             // Create a cell population, with no ghost nodes at the moment
@@ -154,7 +154,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         // Create a cell population, with no ghost nodes at the moment
@@ -176,7 +176,7 @@ public:
 
         // Save starting positions
         std::vector<c_vector<double, 2> > old_posns(cell_population.GetNumNodes());
-        for(unsigned j=0; j<cell_population.GetNumNodes(); j++)
+        for (unsigned j=0; j<cell_population.GetNumNodes(); j++)
         {
             old_posns[j][0] = cell_population.GetNode(j)->rGetLocation()[0];
             old_posns[j][1] = cell_population.GetNode(j)->rGetLocation()[1];
@@ -185,7 +185,7 @@ public:
         // Update positions and check the answer   
         p_fe_method->UpdateAllNodePositions(dt);
 
-        for(unsigned j=0; j<cell_population.GetNumNodes(); j++)
+        for (unsigned j=0; j<cell_population.GetNumNodes(); j++)
         {
             c_vector<double, 2> actualLocation = cell_population.GetNode(j)->rGetLocation();
             
@@ -205,7 +205,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, location_indices.size());
 
         MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices);
@@ -226,7 +226,7 @@ public:
 
         // Save starting positions
         std::vector<c_vector<double, 2> > old_posns(cell_population.GetNumNodes());
-        for(unsigned j=0; j<cell_population.GetNumNodes(); j++)
+        for (unsigned j=0; j<cell_population.GetNumNodes(); j++)
         {
             old_posns[j][0] = cell_population.GetNode(j)->rGetLocation()[0];
             old_posns[j][1] = cell_population.GetNode(j)->rGetLocation()[1];
@@ -236,7 +236,7 @@ public:
         p_fe_method->UpdateAllNodePositions(dt);
 
         //Check the answer (for cell associated nodes only)
-        for(AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
             cell_iter != cell_population.End();
             ++cell_iter)
         {
@@ -263,7 +263,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
         NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
@@ -284,7 +284,7 @@ public:
 
         // Save starting positions
         std::vector<c_vector<double, 2> > old_posns(cell_population.GetNumNodes());
-        for(unsigned j=0; j<cell_population.GetNumNodes(); j++)
+        for (unsigned j=0; j<cell_population.GetNumNodes(); j++)
         {
             old_posns[j][0] = cell_population.GetNode(j)->rGetLocation()[0];
             old_posns[j][1] = cell_population.GetNode(j)->rGetLocation()[1];
@@ -293,7 +293,7 @@ public:
         // Update positions and check the answer   
         p_fe_method->UpdateAllNodePositions(dt);
 
-        for(unsigned j=0; j<cell_population.GetNumNodes(); j++)
+        for (unsigned j=0; j<cell_population.GetNumNodes(); j++)
         {
             c_vector<double, 2> actualLocation = cell_population.GetNode(j)->rGetLocation();
             
@@ -318,7 +318,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
         NodeBasedCellPopulationWithBuskeUpdate<2> cell_population(*p_mesh, cells);
@@ -339,7 +339,7 @@ public:
 
         // Save starting positions
         std::vector<c_vector<double, 2> > old_posns(cell_population.GetNumNodes());
-        for(unsigned j=0; j<cell_population.GetNumNodes(); j++)
+        for (unsigned j=0; j<cell_population.GetNumNodes(); j++)
         {
             old_posns[j][0] = cell_population.GetNode(j)->rGetLocation()[0];
             old_posns[j][1] = cell_population.GetNode(j)->rGetLocation()[1];
@@ -349,7 +349,7 @@ public:
         // Currently this throws an error as not set up correctly as it is in a simulation #2087   
         TS_ASSERT_THROWS_THIS(p_fe_method->UpdateAllNodePositions(dt),"You must provide a rowPreallocation argument for a large sparse system");
 
-        // for(unsigned j=0; j<cell_population.GetNumNodes(); j++)
+        // for (unsigned j=0; j<cell_population.GetNumNodes(); j++)
         // {
         //     c_vector<double, 2> actualLocation = cell_population.GetNode(j)->rGetLocation();
             
@@ -376,7 +376,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, location_indices.size());
 
 
@@ -398,7 +398,7 @@ public:
 
         // Save starting positions
         std::vector<c_vector<double, 2> > old_posns(cell_population.GetNumNodes());
-        for(unsigned j=0; j<cell_population.GetNumNodes(); j++)
+        for (unsigned j=0; j<cell_population.GetNumNodes(); j++)
         {
             old_posns[j][0] = cell_population.GetNode(j)->rGetLocation()[0];
             old_posns[j][1] = cell_population.GetNode(j)->rGetLocation()[1];
@@ -407,7 +407,7 @@ public:
         // Update positions and check the answer   
         p_fe_method->UpdateAllNodePositions(dt);
 
-        for(unsigned j=0; j<cell_population.GetNumNodes(); j++)
+        for (unsigned j=0; j<cell_population.GetNumNodes(); j++)
         {
             c_vector<double, 2> actualLocation = cell_population.GetNode(j)->rGetLocation();
             
@@ -430,7 +430,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
 
         // Create a cell population
@@ -452,7 +452,7 @@ public:
 
         // Save starting positions
         std::vector<c_vector<double, 2> > old_posns(cell_population.GetNumNodes());
-        for(unsigned j=0; j<cell_population.GetNumNodes(); j++)
+        for (unsigned j=0; j<cell_population.GetNumNodes(); j++)
         {
             old_posns[j][0] = cell_population.GetNode(j)->rGetLocation()[0];
             old_posns[j][1] = cell_population.GetNode(j)->rGetLocation()[1];
@@ -461,9 +461,8 @@ public:
         // Update positions and check the answer   
         p_fe_method->UpdateAllNodePositions(dt);
 
-        for(unsigned j=0; j<cell_population.GetNumNodes(); j++)
+        for (unsigned j=0; j<cell_population.GetNumNodes(); j++)
         {
-            
             c_vector<double, 2> actualLocation = cell_population.GetNode(j)->rGetLocation();
             
             double damping =  cell_population.GetDampingConstant(j);

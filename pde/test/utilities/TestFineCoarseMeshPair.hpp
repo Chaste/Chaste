@@ -431,11 +431,11 @@ public:
             double x = fine_mesh.GetNode(i)->rGetLocation()[0];
             double y = fine_mesh.GetNode(i)->rGetLocation()[1];
 
-            if ( x+y < 1.0 - 1e-5 )  // x+y < 1
+            if (x+y < 1.0 - 1e-5)  // x+y < 1
             {
                 TS_ASSERT_EQUALS(mesh_pair.rGetCoarseElementsForFineNodes()[i], lower_left_element_index);
             }
-            else if ( x+y > 1.0 + 1e-5 )  // x+y > 1
+            else if (x+y > 1.0 + 1e-5)  // x+y > 1
             {
                 TS_ASSERT_EQUALS(mesh_pair.rGetCoarseElementsForFineNodes()[i], upper_right_element_index);
             }

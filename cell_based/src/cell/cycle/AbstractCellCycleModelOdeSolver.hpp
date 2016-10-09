@@ -94,6 +94,9 @@ public:
 
     /**
      * @return whether the instance in existence and fully set up.
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
      */
     virtual bool IsSetUp()=0;
 
@@ -118,6 +121,9 @@ public:
 
     /**
      * Initialise the ODE solver.
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
      */
     virtual void Initialise()=0;
 

@@ -94,7 +94,6 @@ public:
      * @return  Magnitude of stimulus at time 'time'.
      */
     double GetStimulus(double time);
-
 };
 
 #include "SerializationExportWrapper.hpp"

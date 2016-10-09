@@ -207,7 +207,7 @@ void SurfaceAreaConstraintPottsUpdateRule<DIM>::OutputUpdateRuleParameters(out_s
     AbstractPottsUpdateRule<DIM>::OutputUpdateRuleParameters(rParamsFile);
 }
 
-///////// Explicit instantiation
+// Explicit instantiation
 template class SurfaceAreaConstraintPottsUpdateRule<1>;
 template class SurfaceAreaConstraintPottsUpdateRule<2>;
 template class SurfaceAreaConstraintPottsUpdateRule<3>;

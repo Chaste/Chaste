@@ -146,6 +146,4 @@ public:
     virtual ~MonodomainSolver();
 };
 
-
-
 #endif /*MONODOMAINSOLVER_HPP_*/

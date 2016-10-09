@@ -228,6 +228,7 @@ public:
         double timestep = solution.rGetTimes()[1] - solution.rGetTimes()[0];
         unsigned size = cell_props.GetMaxUpstrokeVelocities().size();
 
+        TS_ASSERT_EQUALS(size,4u);
         TS_ASSERT_DELTA(cell_props.GetMaxUpstrokeVelocities()[size-1], 418.4795, 0.001);
         TS_ASSERT_DELTA(cell_props.GetCycleLengths()[size-2], 1000.00, 0.01);//last apd is not finished, get cycle lengths from before
         TS_ASSERT_DELTA(cell_props.GetPeakPotentials()[size-1], 43.1665, 0.0001);
@@ -482,6 +483,81 @@ public:
             TS_ASSERT_DELTA(cell_properties.GetLastActionPotentialDuration(90), target_apd_90, tolerance);
         }
 
+        {
+            // This is a dataset with a small spike of about -52 mV followed by a full action potential.
+            // From a 0.5Hz pacing protocol.
+            FileFinder finder("heart/test/data/sample_APs/Tricky_alternans.dat", RelativeTo::ChasteSourceRoot);
+            TS_ASSERT_EQUALS(finder.IsFile(), true);
+            std::vector<double> voltages;
+            std::vector<double> times;
+            LoadMeshalyzerOutputTraces(finder, 22674, times, voltages);
+
+            //std::cout << "With -50 threshold:\n";
+            threshold = -50.0; // Last one above, first one below
+            {
+                CellProperties cell_properties(voltages, times, threshold);
+
+                std::vector<double> dV_dt_max = cell_properties.GetMaxUpstrokeVelocities();
+                TS_ASSERT_EQUALS(dV_dt_max.size(), 1u);
+
+                // This was failing, prompting ticket #2844
+                std::vector<double> apds = cell_properties.GetAllActionPotentialDurations(90);
+                TS_ASSERT_EQUALS(apds.size(), 1u);
+
+                TS_ASSERT_DELTA(apds[0], 209.4662, tolerance);
+
+                std::vector<double> peak_Vs = cell_properties.GetPeakPotentials();
+                TS_ASSERT_EQUALS(peak_Vs.size(), 1u);
+                TS_ASSERT_DELTA(peak_Vs[0], 20.742, tolerance);
+
+                std::vector<double> amplitudes = cell_properties.GetActionPotentialAmplitudes();
+                TS_ASSERT_EQUALS(amplitudes.size(), 1u);
+                TS_ASSERT_DELTA(amplitudes[0], 106.2128, tolerance);
+
+                std::vector<double> upstroke_times = cell_properties.GetTimesAtMaxUpstrokeVelocity();
+                TS_ASSERT_EQUALS(upstroke_times.size(), 1u);
+                TS_ASSERT_DELTA(upstroke_times[0], 2012.5, tolerance);
+
+                std::vector<double> resting_potentials = cell_properties.GetRestingPotentials();
+                TS_ASSERT_EQUALS(resting_potentials.size(), 1u);
+                TS_ASSERT_DELTA(resting_potentials[0], -85.4714, tolerance);
+            }
+
+            //std::cout << "With -60 threshold:\n";
+            threshold = -60.0; // Both above threshold - all these properties were already calculated OK
+            {
+                CellProperties cell_properties(voltages, times, threshold);
+
+                std::vector<double> dV_dt_max = cell_properties.GetMaxUpstrokeVelocities();
+                TS_ASSERT_EQUALS(dV_dt_max.size(), 2u);
+
+                std::vector<double> apds = cell_properties.GetAllActionPotentialDurations(90);
+                TS_ASSERT_EQUALS(apds.size(), 2u);
+
+                TS_ASSERT_DELTA(apds[0], 20.3029, tolerance);
+                TS_ASSERT_DELTA(apds[1], 209.4662, tolerance);
+
+                std::vector<double> peak_Vs = cell_properties.GetPeakPotentials();
+                TS_ASSERT_EQUALS(peak_Vs.size(), 2u);
+                TS_ASSERT_DELTA(peak_Vs[0], -52.03, tolerance);
+                TS_ASSERT_DELTA(peak_Vs[1], 20.742, tolerance);
+
+                std::vector<double> amplitudes = cell_properties.GetActionPotentialAmplitudes();
+                TS_ASSERT_EQUALS(amplitudes.size(), 2u);
+                TS_ASSERT_DELTA(amplitudes[0], 33.39, tolerance);
+                TS_ASSERT_DELTA(amplitudes[1], 106.2128, tolerance);
+
+                std::vector<double> upstroke_times = cell_properties.GetTimesAtMaxUpstrokeVelocity();
+                TS_ASSERT_EQUALS(upstroke_times.size(), 2u);
+                TS_ASSERT_DELTA(upstroke_times[0], 0, tolerance);
+                TS_ASSERT_DELTA(upstroke_times[1], 2012.5, tolerance);
+
+                std::vector<double> resting_potentials = cell_properties.GetRestingPotentials();
+                TS_ASSERT_EQUALS(resting_potentials.size(), 2u);
+                TS_ASSERT_DELTA(resting_potentials[0], -85.4714, tolerance);
+                TS_ASSERT_DELTA(resting_potentials[1], -85.4714, tolerance);
+            }
+        }
     }
 };
 

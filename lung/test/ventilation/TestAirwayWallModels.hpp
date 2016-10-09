@@ -95,7 +95,7 @@ public:
                 delete p_wall;
             }
 
-            for(unsigned element_index = 0; element_index < mesh.GetNumElements(); ++element_index)
+            for (unsigned element_index = 0; element_index < mesh.GetNumElements(); ++element_index)
             {
                 LambertAirwayWall* p_wall = factory.CreateAirwayWallForElement(mesh.GetElement(element_index));
 
@@ -154,7 +154,7 @@ public:
                 delete p_wall;
             }
 
-            for(unsigned element_index = 0; element_index < mesh.GetNumElements(); ++element_index)
+            for (unsigned element_index = 0; element_index < mesh.GetNumElements(); ++element_index)
             {
                 LambertAirwayWall* p_wall = factory.CreateAirwayWallForElement(mesh.GetElement(element_index));
 
@@ -189,17 +189,17 @@ public:
         double k2 = 0.5;
         double k3 = 10.;
 
-    	airway_wall.SetAirwayPressure(0.0);
-    	airway_wall.SetPleuralPressure(targetPressure);
-    	airway_wall.SetRIn(RIn);
-    	airway_wall.SetROut(ROut);
-    	airway_wall.Setk1(k1);
-    	airway_wall.Setk2(k2);
-    	airway_wall.Setk3(k3);	      
-    	
-	    //Validated against Matlab implementation
-	    airway_wall.SolveAndUpdateState(0.0, 0.0);
-	    TS_ASSERT_DELTA(airway_wall.GetLumenRadius(), 3.02842, 1e-3)
+        airway_wall.SetAirwayPressure(0.0);
+        airway_wall.SetPleuralPressure(targetPressure);
+        airway_wall.SetRIn(RIn);
+        airway_wall.SetROut(ROut);
+        airway_wall.Setk1(k1);
+        airway_wall.Setk2(k2);
+        airway_wall.Setk3(k3);
+
+        //Validated against Matlab implementation
+        airway_wall.SolveAndUpdateState(0.0, 0.0);
+        TS_ASSERT_DELTA(airway_wall.GetLumenRadius(), 3.02842, 1e-3)
 
         //Validated against Matlab implementation, consistent with plots in paper
         airway_wall.SolveAndUpdateState(0.0, 0.0);
@@ -208,12 +208,12 @@ public:
         airway_wall.SetPleuralPressure(-1000000);
         airway_wall.SolveAndUpdateState(0.0, 0.0);
 
-	    TS_ASSERT_DELTA(airway_wall.GetLumenRadius(), 3.4917, 1e-3)
-	    	    
-	    airway_wall.SetPleuralPressure(0.0);
-	    airway_wall.SolveAndUpdateState(0.0, 0.0);
-	    TS_ASSERT_DELTA(airway_wall.GetLumenRadius(), RIn, 1e-3)
-	       
+        TS_ASSERT_DELTA(airway_wall.GetLumenRadius(), 3.4917, 1e-3)
+
+        airway_wall.SetPleuralPressure(0.0);
+        airway_wall.SolveAndUpdateState(0.0, 0.0);
+        TS_ASSERT_DELTA(airway_wall.GetLumenRadius(), RIn, 1e-3)
+
     }
 
     
@@ -249,7 +249,7 @@ public:
                 delete p_wall;
             }
 
-            for(unsigned element_index = 0; element_index < mesh.GetNumElements(); ++element_index)
+            for (unsigned element_index = 0; element_index < mesh.GetNumElements(); ++element_index)
             {
                 LaPradAirwayWall* p_wall = factory.CreateAirwayWallForElement(mesh.GetElement(element_index));
 
@@ -291,7 +291,7 @@ public:
                 delete p_wall;
             }
 
-            for(unsigned element_index = 0; element_index < mesh.GetNumElements(); ++element_index)
+            for (unsigned element_index = 0; element_index < mesh.GetNumElements(); ++element_index)
             {
                 LaPradAirwayWall* p_wall = factory.CreateAirwayWallForElement(mesh.GetElement(element_index));
 
@@ -381,7 +381,7 @@ public:
                 delete p_wall;
             }
 
-            for(unsigned element_index = 0; element_index < mesh.GetNumElements(); ++element_index)
+            for (unsigned element_index = 0; element_index < mesh.GetNumElements(); ++element_index)
             {
                 HiornsAirwayWall* p_wall = factory.CreateAirwayWallForElement(mesh.GetElement(element_index));
 
@@ -424,7 +424,7 @@ public:
                 delete p_wall;
             }
 
-            for(unsigned element_index = 0; element_index < mesh.GetNumElements(); ++element_index)
+            for (unsigned element_index = 0; element_index < mesh.GetNumElements(); ++element_index)
             {
                 HiornsAirwayWall* p_wall = factory.CreateAirwayWallForElement(mesh.GetElement(element_index));
 

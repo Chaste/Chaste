@@ -39,8 +39,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cassert>
 #include "ContractionModelName.hpp"
 
-
-
 /**
  *  Struct storing the input parameters that might be used by a contraction model (excl stretch and stretch-rate,
  *  as these may be set several times using the current deformation guess by the implicit assembler, and time).

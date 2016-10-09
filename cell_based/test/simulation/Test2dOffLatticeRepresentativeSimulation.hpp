@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MeshBasedCellPopulation.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
 #include "HoneycombMeshGenerator.hpp"
-#include "UniformlyDistributedGenerationBasedCellCycleModel.hpp"
+#include "UniformG1GenerationalCellCycleModel.hpp"
 #include "RandomCellKiller.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "TransitCellProliferativeType.hpp"
@@ -78,7 +78,7 @@ public:
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
-            UniformlyDistributedGenerationBasedCellCycleModel* p_model = new UniformlyDistributedGenerationBasedCellCycleModel();
+            UniformG1GenerationalCellCycleModel* p_model = new UniformG1GenerationalCellCycleModel();
             p_model->SetMaxTransitGenerations(UINT_MAX);
             p_model->SetTransitCellG1Duration(1.0);
             p_model->SetStemCellG1Duration(1.0);

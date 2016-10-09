@@ -49,7 +49,7 @@ class AirwayBranch
 public:
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param radiusOnEdge Specifies whether radii are specified on nodes or on elements
      */
@@ -240,6 +240,5 @@ private:
     /** Flag to indicate whether airway radii are specified on nodes or edges */
     bool mRadiusOnEdge;
 };
-
 
 #endif // AIRWAY_BRANCH

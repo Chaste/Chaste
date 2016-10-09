@@ -114,9 +114,7 @@ public:
         TS_ASSERT_THROWS_THIS(mesh_reader2.GetFaceData(0), "Random access is only implemented in mesh readers for binary mesh files.");
         TS_ASSERT_THROWS_THIS(mesh_reader2.GetEdgeData(0), "Random access is only implemented in mesh readers for binary mesh files.");
         TS_ASSERT_THROWS_THIS(mesh_reader2.GetContainingElementIndices(0), "Ncl files are only implemented in mesh readers for binary mesh files.");
-
     }
-
 };
 
 #endif //_TESTMEMFEMMESHREADER_HPP_

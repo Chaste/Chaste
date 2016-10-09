@@ -133,7 +133,6 @@ void NodeBasedCellPopulationWithParticles<DIM>::SetParticles(const std::set<unsi
     NodeBasedCellPopulationWithParticles::Validate();
 }
 
-
 template<unsigned DIM>
 void NodeBasedCellPopulationWithParticles<DIM>::UpdateParticlesAfterReMesh(NodeMap& rMap)
 {
@@ -212,7 +211,6 @@ void NodeBasedCellPopulationWithParticles<DIM>::AcceptCellWritersAcrossPopulatio
         }
     }
 }
-
 
 template<unsigned DIM>
 void NodeBasedCellPopulationWithParticles<DIM>::WriteVtkResultsToFile(const std::string& rDirectory)

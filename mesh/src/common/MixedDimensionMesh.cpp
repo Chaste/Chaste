@@ -142,6 +142,7 @@ unsigned MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>::GetNumCableElements() const
 {
    return mNumCableElements;
 }
+
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>::GetNumLocalCableElements() const
 {
@@ -208,12 +209,7 @@ typename MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>::CableElementIterator MixedD
     return mCableElements.end();
 }
 
-
-
-/////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////////////
-
 template class MixedDimensionMesh<1,1>;
 template class MixedDimensionMesh<1,2>;
 template class MixedDimensionMesh<1,3>;

@@ -270,11 +270,11 @@ public:
            std::map<unsigned, AbstractAcinarUnit*>& r_acinar_map = problem.rGetAcinarUnitMap();
            double total_volume = r_acinar_map[2]->GetVolume() + r_acinar_map[3]->GetVolume();
 
-           if(min_total_volume > total_volume)
+           if (min_total_volume > total_volume)
            {
                min_total_volume = total_volume;
            }
-           if(max_total_volume < total_volume)
+           if (max_total_volume < total_volume)
            {
                max_total_volume = total_volume;
            }
@@ -353,8 +353,6 @@ public:
         std::cout << "Warning: This test needs a direct solver (UMFPACK or KLU) to execute correctly." << std::endl;
 #endif
     }
-
 };
-
 
 #endif /* TESTDYNAMICVENTILATION_HPP_ */

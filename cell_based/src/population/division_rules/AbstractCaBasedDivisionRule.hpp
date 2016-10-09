@@ -93,6 +93,9 @@ public:
     /**
      * Return whether there is room to divide at all.
      *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     *
      * @param pParentCell  The cell to divide
      * @param rCellPopulation  The CA-based cell population
      * @return if the site is available.
@@ -104,13 +107,16 @@ public:
      * Return the index for the Daughter node.
      * This method can be used to move cells out of the way as necessary.
      *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     *
      * @param pNewCell  The cell to new cell
      * @param pParentCell  The parent cell
      * @param rCellPopulation  The CA-based cell population
      * @return the node index for the daughter cell.
      */
     virtual unsigned CalculateDaughterNodeIndex(CellPtr pNewCell,
-    		                                    CellPtr pParentCell,
+                                                CellPtr pParentCell,
                                                 CaBasedCellPopulation<SPACE_DIM>& rCellPopulation)=0;
 
     /**

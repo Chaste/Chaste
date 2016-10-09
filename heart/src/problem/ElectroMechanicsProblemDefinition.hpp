@@ -353,7 +353,7 @@ public:
      */
     void SetNumIncrementsForInitialDeformation(unsigned numIncrements)
     {
-        if(numIncrements==0)
+        if (numIncrements==0)
         {
             EXCEPTION("Number of increments for initial deformation must be 1 or more");
         }

@@ -20,7 +20,7 @@ import time
 # Configuration
 maintainer_email = 'chaste-admin@maillist.ox.ac.uk'
 package_name = 'chaste-source'
-ubuntu_version = 'intrepid'
+ubuntu_version = 'precise'
 
 
 # Check that the cwd looks OK
@@ -29,28 +29,22 @@ if not os.path.exists(changelog):
     print >>sys.stderr, changelog, "file not found; are you in a Chaste working copy?"
     sys.exit(1)
 
-# Get the current revision
-rev = rev_str = os.popen('svnversion').read().strip()
-if rev[-1] == 'M':
-    rev_str = rev_str[:-1]
-try:
-    rev_int = int(rev_str)
-except ValueError:
-    print >>sys.stderr, "Revision", rev, "isn't an integer; is your working copy up-to-date?"
-    sys.exit(1)
+# Get the current commit details
+num_commits = int(os.popen('git rev-list HEAD | wc -l').read().strip())
+commit_sha = os.popen('git rev-parse HEAD').read().strip()
 
 # Find out where we're checked out from
-pipe = os.popen('svn info')
-for line in pipe:
-    if line.startswith('URL'):
-        url = line.split()[1]
-    elif line.startswith('Repository Root'):
-        repo = line.split(':', 1)[1].strip()
-pipe.close()
+tag = os.popen('git tag --points-at HEAD').readline().strip()
+branch = ''
+if not tag:
+    pipe = os.popen('git branch --contains HEAD')
+    for line in pipe:
+        if line.startswith('*'):
+            branch = line[1:].strip()
+            break
+    pipe.close()
 
-location = url[len(repo)+1:]
-
-print "Packaging", location, "from", url
+print "Packaging tag", tag, "branch", branch
 
 def release_version(version):
     """Ensure we have a version in the form n.m (not just n)."""
@@ -69,27 +63,25 @@ def version_as_int(version):
     return int(n)*1000 + int(m)
 
 # And now work out the version
-if location == 'trunk':
+if tag:
+    assert tag.startswith('release_')
+    package_version = release_version(tag[8:])
+    message = 'Package release %s of Chaste.' % package_version
+else:
     # Now we've got to be clever.  Look for the most recent release in tags.
     latest_release = '0.0'
-    cmd = 'svn ls -v -r %d %s/tags' % (rev_int, repo)
-    pipe = os.popen(cmd)
+    pipe = os.popen('git tag -l')
     for line in pipe:
-        tag = line.split()[-1]
+        tag = line.strip()
         if tag.startswith('release_'):
-            version = release_version(tag[8:-1])
+            version = release_version(tag[8:])
             if version_as_int(version) > version_as_int(latest_release):
                 latest_release = version
     pipe.close()
-    package_version = latest_release + '.' + rev_str
-    message = 'Package revision %s of Chaste.' % rev
+    package_version = '%s.9%d.r%s' % (latest_release, num_commits, commit_sha)
+    message = 'Package commit %s in Chaste %s.' % (commit_sha, latest_release)
     # Write version number for benefit of SCons
     open('ReleaseVersion.txt', 'w').write(package_version)
-else:
-    # location had better be tags/release_<version>
-    assert location.startswith('tags/release_')
-    package_version = release_version(location[13:])
-    message = 'Package release %s of Chaste.' % package_version
 
 print "Version is", package_version
 

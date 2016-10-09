@@ -46,11 +46,11 @@ Cylindrical2dNodesOnlyMesh::Cylindrical2dNodesOnlyMesh(double width)
 void Cylindrical2dNodesOnlyMesh::SetUpBoxCollection(double cutOffLength, c_vector<double, 2*2> domainSize, int numLocalRows, bool isPeriodic)
 {
     // Ensure that the width is a multiple of cut-off length
-    if( fmod( mWidth,cutOffLength ) > 1e-14 )
+    if (fmod( mWidth,cutOffLength ) > 1e-14)
     {
         EXCEPTION("The periodic width must be a multiple of cut off length.");
     }
-    else if ( mWidth/cutOffLength == 2.0 )
+    else if (mWidth/cutOffLength == 2.0)
     {
         // A width of two boxes gives different simulation results as some connections are considered twice.
         EXCEPTION( "The periodic domain width cannot be 2*CutOffLength." );
@@ -100,7 +100,7 @@ void Cylindrical2dNodesOnlyMesh::SetNode(unsigned nodeIndex, ChastePoint<2> poin
         double fudge_factor = 1e-14;
         // This is to ensure that the position is never equal to mWidth, which would be outside the box domain. 
         // This is due to the fact that mWidth-1e-16=mWidth
-        if ( new_x_coord > mWidth-fudge_factor )
+        if (new_x_coord > mWidth-fudge_factor)
         {
             new_x_coord = mWidth-fudge_factor;
         }
@@ -153,13 +153,13 @@ void Cylindrical2dNodesOnlyMesh::RefreshMesh()
     for (unsigned i=0; i<num_nodes; i++)
     {
         double& x_location = (mNodes[i]->rGetModifiableLocation())[0];
-        if ( x_location < 0.0 )
+        if (x_location < 0.0)
         {
-            x_location = fmod( x_location, mWidth) + mWidth;
+            x_location = fmod(x_location, mWidth) + mWidth;
         }
-        else if ( x_location >= mWidth )
+        else if (x_location >= mWidth)
         {
-            x_location = fmod( x_location, mWidth );
+            x_location = fmod(x_location, mWidth);
         }
     }
 

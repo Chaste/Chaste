@@ -84,7 +84,7 @@ public:
      *  cp /tmp/$USER/testoutput/SteadyStateCrypt/archive/?*_150.* crypt/test/data/SteadyStateCrypt/archive/
      *
      * OR to produce archives in CMake:
-     *  cmake BOOST_ROOT=/path/to/boost1.40 Chaste_USE_CVODE=OFF /path/to/Chaste
+     *  cmake -DBOOST_ROOT=/path/to/boost1.40 Chaste_USE_CVODE=OFF /path/to/Chaste
      *  make TestGenerateSteadyStateCrypt_simulation_Runner
      *  ctest -R TestGenerateSteadyStateCrypt
      *  cp /path/to/Chaste/testoutput/SteadyStateCrypt/archive/?*_150.* /path/to/Chaste/crypt/test/data/SteadyStateCrypt/archive/

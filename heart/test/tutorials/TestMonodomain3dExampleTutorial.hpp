@@ -82,7 +82,7 @@ public:
         double y = pNode->rGetLocation()[1];
         double z = pNode->rGetLocation()[2];
 
-        if ( (x<0.1+1e-6) && (y<0.1+1e-6) && (z<0.1+1e-6) )
+        if ((x<0.1+1e-6) && (y<0.1+1e-6) && (z<0.1+1e-6))
         {
             return new CellLuoRudy1991FromCellML(mpSolver, mpStimulus);
         }
@@ -94,7 +94,7 @@ public:
 };
 
 /* Now define the test */
-class TestMonodomain3dExample : public CxxTest::TestSuite
+class TestMonodomain3dExampleTutorial : public CxxTest::TestSuite
 {
 public:
     void TestMonodomain3d() throw(Exception)
@@ -150,7 +150,7 @@ public:
          * simulation however (hence the boolean being set to false).
          */
         bool partial_output = false;
-        if(partial_output)
+        if (partial_output)
         {
             std::vector<unsigned> nodes_to_be_output;
             nodes_to_be_output.push_back(0);

@@ -71,7 +71,7 @@ ColumnDataReader::ColumnDataReader(const std::string& rDirectory,
     else
     {
         // Add a trailing slash if needed
-        if ( !(*(rDirectory.end()-1) == '/'))
+        if (!(*(rDirectory.end()-1) == '/'))
         {
             directory = rDirectory + "/";
         }

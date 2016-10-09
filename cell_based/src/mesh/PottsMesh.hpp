@@ -335,9 +335,6 @@ public:
      */
     std::set<unsigned> GetNeighbouringElementIndices(unsigned elementIndex);
 
-
-
-
     //////////////////////////////////////////////////////////////////////
     //                         Nested classes                           //
     //////////////////////////////////////////////////////////////////////
@@ -433,6 +430,7 @@ typename PottsMesh<DIM>::PottsElementIterator PottsMesh<DIM>::GetElementIterator
 {
     return PottsElementIterator(*this, mElements.end());
 }
+
 template<unsigned DIM>
 PottsElement<DIM>& PottsMesh<DIM>::PottsElementIterator::operator*()
 {

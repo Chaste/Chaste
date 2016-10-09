@@ -151,8 +151,6 @@ public:
      * @return the unit of the Unlimited dimension (usually "msec").
      */
     std::string GetUnlimitedDimensionUnit();
-
-
 };
 
 #endif // ABSTRACTHDF5ACCESS_HPP_

@@ -715,10 +715,7 @@ public:
 
         TS_ASSERT_THROWS_THIS(bidomain_solver.SetRowForAverageOfPhiZeroed(4),
                 "Row for applying the constraint 'Average of phi_e = zero' should be every 3 rows");
-
     }
-
 };
 
 #endif /*TESTExtendedBidomainPROBLEM_HPP_*/
-

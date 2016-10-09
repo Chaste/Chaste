@@ -347,12 +347,12 @@ public:
             std::set<unsigned> containing_elements = p_mesh->GetNode(node_index)->rGetContainingElementIndices();
             unsigned num_containing_elements = containing_elements.size();
 
-            if ( (p_mesh->GetNode(node_index)->rGetLocation()[0] <= 0.0) ||
-                 (p_mesh->GetNode(node_index)->rGetLocation()[0] >= 5.0) ||
-                 (p_mesh->GetNode(node_index)->rGetLocation()[1] <= 0.0) ||
-                 (p_mesh->GetNode(node_index)->rGetLocation()[1] >= 3.0) ||
-                 (p_mesh->GetNode(node_index)->rGetLocation()[2] <= 0.0) ||
-                 (p_mesh->GetNode(node_index)->rGetLocation()[2] >= 3.0) )
+            if ((p_mesh->GetNode(node_index)->rGetLocation()[0] <= 0.0) ||
+                (p_mesh->GetNode(node_index)->rGetLocation()[0] >= 5.0) ||
+                (p_mesh->GetNode(node_index)->rGetLocation()[1] <= 0.0) ||
+                (p_mesh->GetNode(node_index)->rGetLocation()[1] >= 3.0) ||
+                (p_mesh->GetNode(node_index)->rGetLocation()[2] <= 0.0) ||
+                (p_mesh->GetNode(node_index)->rGetLocation()[2] >= 3.0))
             {
                 TS_ASSERT_EQUALS(num_containing_elements,0u);
             }
@@ -438,12 +438,12 @@ public:
 
             bool is_boundary_node;
 
-            if ( (p_mesh->GetNode(node_index)->rGetLocation()[0] <= 0.0) ||
-                 (p_mesh->GetNode(node_index)->rGetLocation()[0] >= domain_size - 1.0) ||
-                 (p_mesh->GetNode(node_index)->rGetLocation()[1] <= 0.0) ||
-                 (p_mesh->GetNode(node_index)->rGetLocation()[1] >= domain_size - 1.0) ||
-                 (p_mesh->GetNode(node_index)->rGetLocation()[2] <= 0.0) ||
-                 (p_mesh->GetNode(node_index)->rGetLocation()[2] >= domain_size - 1.0) )
+            if ((p_mesh->GetNode(node_index)->rGetLocation()[0] <= 0.0) ||
+                (p_mesh->GetNode(node_index)->rGetLocation()[0] >= domain_size - 1.0) ||
+                (p_mesh->GetNode(node_index)->rGetLocation()[1] <= 0.0) ||
+                (p_mesh->GetNode(node_index)->rGetLocation()[1] >= domain_size - 1.0) ||
+                (p_mesh->GetNode(node_index)->rGetLocation()[2] <= 0.0) ||
+                (p_mesh->GetNode(node_index)->rGetLocation()[2] >= domain_size - 1.0))
             {
                 TS_ASSERT_EQUALS(num_containing_elements,0u);
                 is_boundary_node = true;

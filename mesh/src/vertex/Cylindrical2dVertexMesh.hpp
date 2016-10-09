@@ -42,8 +42,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MutableVertexMesh.hpp"
 #include "Cylindrical2dMesh.hpp"
 
-
-
 /**
  * A subclass of MutableVertexMesh<2,2> for a rectangular mesh with
  * periodic left and right boundaries, representing a cylindrical geometry.

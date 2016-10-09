@@ -124,8 +124,10 @@ public:
     void UpdateTargetAreas(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
 
     /**
-     * Helper method to update the target area property of an individual cell. This method has to be
-     * overwritten in child classes.
+     * Helper method to update the target area property of an individual cell.
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
      *
      * @param pCell pointer to the cell
      */

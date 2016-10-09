@@ -202,7 +202,6 @@ public:
         delete mpRushLarsenCell;
         delete mpRushLarsenCellOpt;
     }
-
 };
 
 #endif // TESTRUSHLARSEN_HPP_

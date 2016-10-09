@@ -492,7 +492,6 @@ public:
         std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
 #endif //CHASTE_CVODE
     }
-
 };
 
 #endif //_TESTCVODEADAPTOR_HPP_

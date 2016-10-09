@@ -81,11 +81,7 @@ c_vector<double,2*(ELEM_DIM+1)> BidomainCorrectionTermAssembler<ELEM_DIM,SPACE_D
     return ret;
 }
 
-
-///////////////////////////////////////////////////////
-// explicit instantiation
-///////////////////////////////////////////////////////
-
+// Explicit instantiation
 template class BidomainCorrectionTermAssembler<1,1>;
 template class BidomainCorrectionTermAssembler<2,2>;
 template class BidomainCorrectionTermAssembler<3,3>;

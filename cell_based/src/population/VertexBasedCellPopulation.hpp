@@ -435,11 +435,46 @@ public:
     std::set<unsigned> GetNeighbouringNodeIndices(unsigned index);
 
     /**
-     * @return a tetrahedral mesh using the nodes in the VertexMesh
+     * Overridden GetTetrahedralMeshForPdeModifier() method.
+     *
+     * @return a pointer to a tetrahedral mesh using the nodes in the VertexMesh
      * as well as an additional node at the centre of each VertexElement.
-     * This method only works in 2D.
+     * At present, this method only works in 2D.
+     *
+     * This method is called by AbstractGrowingDomainPdeModifier.
      */
-    TetrahedralMesh<DIM, DIM>* GetTetrahedralMeshUsingVertexMesh();
+    virtual TetrahedralMesh<DIM, DIM>* GetTetrahedralMeshForPdeModifier();
+
+    /**
+     * Overridden IsPdeNodeAssociatedWithNonApoptoticCell() method.
+     *
+     * @param pdeNodeIndex inedx of a node in a tetrahedral mesh for use with a PDE modifier
+     *
+     * @return if a node, specified by its index in a tetrahedral mesh for use
+     *         with a PDE modifier, is associated with a non-apoptotic cell.
+     * This method can be called by PDE classes.
+     */
+    virtual bool IsPdeNodeAssociatedWithNonApoptoticCell(unsigned pdeNodeIndex);
+
+    /**
+     * Overridden GetCellDataItemAtPdeNode() method.
+     *
+     * @param pdeNodeIndex index of a node in a tetrahedral mesh for use
+     *         with a PDE modifier
+     * @param rVariableName the name of the cell data item to get
+     * @param dirichletBoundaryConditionApplies where a Dirichlet boundary condition is used
+     *        (optional; defaults to false)
+     * @param dirichletBoundaryValue the value of the Dirichlet boundary condition, if used
+     *        (optional; defaults to 0.0)
+     *
+     * @return the value of a CellData item (interpolated if necessary) at a node,
+     *         specified by its index in a tetrahedral mesh for use with a PDE modifier.
+     * This method can be called by PDE modifier classes.
+     */
+    virtual double GetCellDataItemAtPdeNode(unsigned pdeNodeIndex,
+                                            std::string& rVariableName,
+                                            bool dirichletBoundaryConditionApplies=false,
+                                            double dirichletBoundaryValue=0.0);
 
     /**
      * @return The Vertex division rule that is currently being used.
@@ -473,6 +508,21 @@ public:
      * @param pVizSetupFile a visualization setup file
      */
     virtual void WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile);
+
+    /**
+     * Overridden SimulationSetupHook() method.
+     * 
+     * Hook method to add a T2SwapCellKiller to a simulation object, which is always 
+     * required in the case of a VertexBasedCellPopulation. This functionality avoids 
+     * the need for static or dynamic casts to specific cell population types within 
+     * simulation methods.
+     * 
+     * Note: In order to inhibit T2 swaps, the user needs to set the threshold for T2 
+     * swaps in the MutableVertexMesh object mrMesh to 0, using the SetT2Threshold() method.
+     *
+     * @param pSimulation pointer to a cell-based simulation object
+     */
+    virtual void SimulationSetupHook(AbstractCellBasedSimulation<DIM, DIM>* pSimulation);
 };
 
 #include "SerializationExportWrapper.hpp"

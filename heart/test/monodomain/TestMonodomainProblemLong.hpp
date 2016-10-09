@@ -37,8 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _TESTMONODOMAINPROBLEMLONG_HPP_
 #define _TESTMONODOMAINPROBLEMLONG_HPP_
 
-
-
 #include <cxxtest/TestSuite.h>
 #include "TetrahedralMesh.hpp"
 #include <petscvec.h>

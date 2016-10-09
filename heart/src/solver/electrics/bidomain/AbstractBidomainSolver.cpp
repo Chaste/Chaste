@@ -74,7 +74,7 @@ void AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolve(Vec initi
     this->mpLinearSystem->SetKspType(HeartConfig::Instance()->GetKSPSolver());
 
     /// \todo: block preconditioners only make sense in Bidomain... Add some warning/error message
-    if(std::string("twolevelsblockdiagonal") == std::string(HeartConfig::Instance()->GetKSPPreconditioner()))
+    if (std::string("twolevelsblockdiagonal") == std::string(HeartConfig::Instance()->GetKSPPreconditioner()))
     {
         /// \todo: #1082 only works if you know about the whole mesh.
         TetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* p_mesh = dynamic_cast<TetrahedralMesh<ELEMENT_DIM,SPACE_DIM>*>(this->mpMesh);
@@ -82,7 +82,7 @@ void AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolve(Vec initi
         {
             boost::shared_ptr<std::vector<PetscInt> > p_bath_nodes(new std::vector<PetscInt>());
 
-            for(unsigned node_index=0; node_index<this->mpMesh->GetNumNodes(); node_index++)
+            for (unsigned node_index=0; node_index<this->mpMesh->GetNumNodes(); node_index++)
             {
                 if (HeartRegionCode::IsRegionBath( this->mpMesh->GetNode(node_index)->GetRegion() ))
                 {
@@ -119,8 +119,6 @@ void AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolve(Vec initi
     this->mpLinearSystem->SetUseFixedNumberIterations(HeartConfig::Instance()->GetUseFixedNumberIterationsLinearSolver(), HeartConfig::Instance()->GetEvaluateNumItsEveryNSolves());
 }
 
-
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>::PrepareForSetupLinearSystem(Vec existingSolution)
 {
@@ -150,7 +148,6 @@ Vec AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>::GenerateNullBasis() const
 
     return null_basis;
 }
-
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>::FinaliseLinearSystem(Vec existingSolution)
@@ -246,7 +243,7 @@ void AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>::CheckCompatibilityCondition(
     int mpi_ret = MPI_Allreduce(&local_sum, &global_sum, 1, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
     assert(mpi_ret == MPI_SUCCESS);
 
-    if(fabs(global_sum)>1e-6) // magic number! sum should really be a sum of zeros and exactly zero though anyway (or a-a+b-b+c-c.. etc in the case of electrodes)
+    if (fabs(global_sum)>1e-6) // magic number! sum should really be a sum of zeros and exactly zero though anyway (or a-a+b-b+c-c.. etc in the case of electrodes)
     {
         #define COVERAGE_IGNORE
         // shouldn't ever reach this line but useful to have the error printed out if you do
@@ -256,7 +253,6 @@ void AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>::CheckCompatibilityCondition(
     }
 #endif
 }
-
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>::AbstractBidomainSolver(
@@ -355,7 +351,7 @@ void AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>::FinaliseForBath(bool compute
      *  Explicitly checking it in non-production builds.
      */
 #ifndef NDEBUG
-    if(computeMatrix)
+    if (computeMatrix)
     {
         for (typename AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>::NodeIterator iter=this->mpMesh->GetNodeIteratorBegin();
              iter != this->mpMesh->GetNodeIteratorEnd();
@@ -401,13 +397,13 @@ void AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>::FinaliseForBath(bool compute
         {
             PetscInt index = 2*iter->GetIndex(); // assumes Vm and Phie are interleaved
 
-            if(computeMatrix)
+            if (computeMatrix)
             {
                 // put 1.0 on the diagonal
                 PetscMatTools::SetElement(this->mpLinearSystem->rGetLhsMatrix(), index, index, 1.0);
             }
 
-            if(computeVector)
+            if (computeVector)
             {
                 // zero rhs vector entry
                 PetscVecTools::SetElement(this->mpLinearSystem->rGetRhsVector(), index, 0.0);
@@ -416,10 +412,7 @@ void AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>::FinaliseForBath(bool compute
     }
 }
 
-///////////////////////////////////////////////////////
-// explicit instantiation
-///////////////////////////////////////////////////////
-
+// Explicit instantiation
 template class AbstractBidomainSolver<1,1>;
 template class AbstractBidomainSolver<2,2>;
 template class AbstractBidomainSolver<3,3>;

@@ -299,8 +299,6 @@ protected:
      * of a suitable class.  See for example the OdeSystemInformation class.
      */
     boost::shared_ptr<AbstractOdeSystemInformation> mpSystemInfo;
-
 };
-
 
 #endif /*ABSTRACTUNTEMPLATEDPARAMETERISEDSYSTEM_HPP_*/

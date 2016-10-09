@@ -164,7 +164,7 @@ public:
     c_matrix<double,2,2>& rCalculateModifiedConductivityTensor(unsigned elementIndex, const c_matrix<double,2,2>& rOriginalConductivity, unsigned domainIndex)
     {
         // Increase by factor of two for element 1
-        if ( elementIndex==1 )
+        if (elementIndex == 1)
         {
             for ( unsigned dim=0; dim<2; dim++)
             {
@@ -621,9 +621,9 @@ public:
             const c_matrix<double, 3, 3>& extra_tensor_after_archiving = p_extended_tissue->rGetExtracellularConductivityTensor(0);
 
             //check before archiving = after archiving
-            for(unsigned i=0; i<3; i++)
+            for (unsigned i=0; i<3; i++)
             {
-                for(unsigned j=0; j<3; j++)
+                for (unsigned j=0; j<3; j++)
                 {
                     TS_ASSERT_DELTA(intra_tensor_before_archiving(i,j), intra_tensor_after_archiving(i,j), 1e-9);
                     TS_ASSERT_DELTA(intra_tensor_second_cell_before_archiving(i,j), intra_tensor_second_cell_after_archiving(i,j), 1e-9);
@@ -722,7 +722,6 @@ public:
             delete p_extended_tissue;
         }
     }
-
 };
 
 #endif /*TESTEXTENDEDBIDOMAINTISSUE_HPP_*/

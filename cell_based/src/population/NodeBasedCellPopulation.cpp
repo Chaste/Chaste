@@ -34,16 +34,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "NodeBasedCellPopulation.hpp"
+#include "MutableMesh.hpp"
 #include "MathsCustomFunctions.hpp"
 #include "VtkMeshWriter.hpp"
-
-// Cell writers
-#include "CellAgesWriter.hpp"
-#include "CellAncestorWriter.hpp"
-#include "CellProliferativePhasesWriter.hpp"
-#include "CellProliferativeTypesWriter.hpp"
-#include "CellVolumesWriter.hpp"
-#include "CellMutationStatesWriter.hpp"
 
 template<unsigned DIM>
 NodeBasedCellPopulation<DIM>::NodeBasedCellPopulation(NodesOnlyMesh<DIM>& rMesh,
@@ -96,6 +89,22 @@ template<unsigned DIM>
 const NodesOnlyMesh<DIM>& NodeBasedCellPopulation<DIM>::rGetMesh() const
 {
     return *mpNodesOnlyMesh;
+}
+
+template<unsigned DIM>
+TetrahedralMesh<DIM, DIM>* NodeBasedCellPopulation<DIM>::GetTetrahedralMeshForPdeModifier()
+{
+    std::vector<Node<DIM>*> temp_nodes;
+
+    // Get the nodes of mpNodesOnlyMesh
+    for (typename AbstractMesh<DIM,DIM>::NodeIterator node_iter = mpNodesOnlyMesh->GetNodeIteratorBegin();
+         node_iter != mpNodesOnlyMesh->GetNodeIteratorEnd();
+         ++node_iter)
+    {
+        temp_nodes.push_back(new Node<DIM>(node_iter->GetIndex(), node_iter->rGetLocation()));
+    }
+
+    return new MutableMesh<DIM,DIM>(temp_nodes);
 }
 
 template<unsigned DIM>
@@ -499,7 +508,7 @@ double NodeBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
     unsigned num_cells = 0;
 
     // Get the location of this node
-    c_vector<double, DIM> node_i_location = GetNode(node_index)->rGetLocation();
+    const c_vector<double, DIM>& r_node_i_location = GetNode(node_index)->rGetLocation();
 
     // Get the set of node indices corresponding to this cell's neighbours
     std::set<unsigned> neighbouring_node_indices = GetNeighbouringNodeIndices(node_index);
@@ -524,7 +533,7 @@ double NodeBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
         Node<DIM>* p_node_j = this->GetNode(*iter);
 
         // Get the location of the neighbouring node
-        c_vector<double, DIM> node_j_location = p_node_j->rGetLocation();
+        const c_vector<double, DIM>& r_node_j_location = p_node_j->rGetLocation();
 
         double neighbouring_cell_radius = p_node_j->GetRadius();
 
@@ -532,7 +541,7 @@ double NodeBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
         assert(cell_radius+neighbouring_cell_radius<mpNodesOnlyMesh->GetMaximumInteractionDistance());
 
         // Calculate the distance between the two nodes and add to cell radius
-        double separation = norm_2(mpNodesOnlyMesh->GetVectorFromAtoB(node_j_location,node_i_location));
+        double separation = norm_2(mpNodesOnlyMesh->GetVectorFromAtoB(r_node_j_location, r_node_i_location));
 
         if (separation < cell_radius+neighbouring_cell_radius)
         {

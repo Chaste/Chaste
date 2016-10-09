@@ -164,8 +164,6 @@ public:
         TS_ASSERT_DELTA(fabs(fibre_orientations[5](1)), 0.3176, 1e-4);
         TS_ASSERT_DELTA(fabs(fibre_orientations[5](2)), 0.6704, 1e-4);
     }
-
-
 };
 
 #endif /*TESTPAPILLARYFIBRECALCULATOR_HPP_*/

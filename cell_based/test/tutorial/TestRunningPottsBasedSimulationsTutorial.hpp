@@ -68,7 +68,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellsGenerator.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 #include "SmartPointers.hpp"
-#include "UniformlyDistributedCellCycleModel.hpp"
+#include "UniformCellCycleModel.hpp"
 /* The next header file defines a helper class for generating a suitable mesh. */
 #include "PottsMeshGenerator.hpp"
 /* The next header file defines the class that simulates the evolution of an on lattice {{{CellPopulation}}}. */
@@ -118,14 +118,14 @@ public:
 
         /* Having created a mesh, we now create a {{{std::vector}}} of {{{CellPtr}}}s.
          * To do this, we the `CellsGenerator` helper class, which is templated over the type
-         * of cell model required (here {{{UniformlyDistributedCellCycleModel}}})
+         * of cell model required (here {{{UniformCellCycleModel}}})
          * and the dimension. We create an empty vector of cells and pass this into the
          * method along with the mesh. The second argument represents the size of that the vector
          * {{{cells}}} should become - one cell for each element. Third argument makes all cells
          * proliferate.*/
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
-        CellsGenerator<UniformlyDistributedCellCycleModel, 2> cells_generator;
+        CellsGenerator<UniformCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_transit_type);
 
         /* Now we have a mesh and a set of cells to go with it, we can create a {{{CellPopulation}}}.
@@ -181,12 +181,12 @@ public:
         /*
          * Finally we add the update rule to the simulator.
          */
-        simulator.AddPottsUpdateRule(p_volume_constraint_update_rule);
+        simulator.AddUpdateRule(p_volume_constraint_update_rule);
         /*
          * We repeat the process for any other update rules.
          */
         MAKE_PTR(AdhesionPottsUpdateRule<2>, p_adhesion_update_rule);
-        simulator.AddPottsUpdateRule(p_adhesion_update_rule);
+        simulator.AddUpdateRule(p_adhesion_update_rule);
 
         /* To run the simulation, we call {{{Solve()}}}. */
         simulator.Solve();
@@ -257,7 +257,7 @@ public:
          * the third argument is set to make all cells non-proliferative. */
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        CellsGenerator<UniformlyDistributedCellCycleModel, 2> cells_generator;
+        CellsGenerator<UniformCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
         /* Before we make a {{{CellPopulation}}} we make a boost shared pointer to a cell label and then assign this
@@ -292,7 +292,7 @@ public:
         MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule);
         p_volume_constraint_update_rule->SetMatureCellTargetVolume(16);
         p_volume_constraint_update_rule->SetDeformationEnergyParameter(0.2);
-        simulator.AddPottsUpdateRule(p_volume_constraint_update_rule);
+        simulator.AddUpdateRule(p_volume_constraint_update_rule);
 
         MAKE_PTR(DifferentialAdhesionPottsUpdateRule<2>, p_differential_adhesion_update_rule);
 
@@ -301,7 +301,7 @@ public:
         p_differential_adhesion_update_rule->SetCellCellAdhesionEnergyParameter(0.02);
         p_differential_adhesion_update_rule->SetLabelledCellBoundaryAdhesionEnergyParameter(0.16);
         p_differential_adhesion_update_rule->SetCellBoundaryAdhesionEnergyParameter(0.16);
-        simulator.AddPottsUpdateRule(p_differential_adhesion_update_rule);
+        simulator.AddUpdateRule(p_differential_adhesion_update_rule);
         /*
          * These parameters cause the cells to sort, for different values you can get different patterns.
          *
@@ -356,7 +356,7 @@ public:
          * the third argument is set to make all cells non-proliferative.*/
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        CellsGenerator<UniformlyDistributedCellCycleModel, 3> cells_generator;
+        CellsGenerator<UniformCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
         /* As for the 2D case before we make a {{{CellPopulation}}} we make a pointer to a cell label and then assign this
@@ -397,7 +397,7 @@ public:
          */
         p_volume_constraint_update_rule->SetMatureCellTargetVolume(8.0);
         p_volume_constraint_update_rule->SetDeformationEnergyParameter(0.2);
-        simulator.AddPottsUpdateRule(p_volume_constraint_update_rule);
+        simulator.AddUpdateRule(p_volume_constraint_update_rule);
 
         /*
          * We use the same differential adhesion parameters as in the 2D case.
@@ -408,7 +408,7 @@ public:
         p_differential_adhesion_update_rule->SetCellCellAdhesionEnergyParameter(0.02);
         p_differential_adhesion_update_rule->SetLabelledCellBoundaryAdhesionEnergyParameter(0.16);
         p_differential_adhesion_update_rule->SetCellBoundaryAdhesionEnergyParameter(0.16);
-        simulator.AddPottsUpdateRule(p_differential_adhesion_update_rule);
+        simulator.AddUpdateRule(p_differential_adhesion_update_rule);
 
         /* To run the simulation, we call {{{Solve()}}}. */
         simulator.Solve();

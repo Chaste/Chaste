@@ -75,7 +75,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * depend on the cell type. A simple cell-cycle model is defined as ''generation-based'' if it keeps track of the
  * generation of the corresponding cell, and sets the cell type according
  * to this. Our new cell-cycle model will inherit from this abstract class. */
-#include "AbstractSimpleGenerationBasedCellCycleModel.hpp"
+#include "AbstractSimpleGenerationalCellCycleModel.hpp"
 
 /* The remaining header files define classes that will be used in the cell-based
  * simulation test. We have encountered each of these header files in previous cell-based Chaste
@@ -101,13 +101,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * chosen such that the mean of the distribution, 1/λ, equals the mean
  * G1 duration as defined in the {{{AbstractCellCycleModel}}} class. We will also assume that
  * cells divide a certain number of generations before becoming differentiated. To implement this model we define a new cell-cycle model, {{{MyCellCycleModel}}},
- * which inherits from {{{AbstractSimpleGenerationBasedCellCycleModel}}} and
+ * which inherits from {{{AbstractSimpleGenerationalCellCycleModel}}} and
  * overrides the {{{SetG1Duration()}}} method.
  *
  * Note that usually this code would be separated out into a separate declaration in
  * a .hpp file and definition in a .cpp file.
  */
-class MyCellCycleModel : public AbstractSimpleGenerationBasedCellCycleModel
+class MyCellCycleModel : public AbstractSimpleGenerationalCellCycleModel
 {
 private:
 
@@ -115,7 +115,7 @@ private:
      * to archive (save or load) the cell-cycle model object in a cell-based simulation.
      * The code consists of a serialize method, in which we first archive the cell
      * cycle model using the serialization code defined in the base class
-     * {{{AbstractSimpleGenerationBasedCellCycleModel}}}. We then archive an instance
+     * {{{AbstractSimpleGenerationalCellCycleModel}}}. We then archive an instance
      * of the {{{RandomNumberGenerator}}} singleton class, which is used in the
      * {{{SetG1Duration()}}} method. Note that serialization of singleton objects
      * must be done with care. Before the object is serialized via a pointer, it must
@@ -125,7 +125,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractSimpleGenerationBasedCellCycleModel>(*this);
+        archive & boost::serialization::base_object<AbstractSimpleGenerationalCellCycleModel>(*this);
         RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
         archive & *p_gen;
         archive & p_gen;

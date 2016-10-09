@@ -41,8 +41,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *
  */
-#ifndef TESTSOLVINGMOREELASTICITYPROBLEMSTUTORIALS_HPP_
-#define TESTSOLVINGMOREELASTICITYPROBLEMSTUTORIALS_HPP_
+#ifndef TESTSOLVINGMOREELASTICITYPROBLEMSTUTORIAL_HPP_
+#define TESTSOLVINGMOREELASTICITYPROBLEMSTUTORIAL_HPP_
 
 /* == Introduction ==
  *
@@ -79,7 +79,7 @@ c_vector<double,2> MyTraction(c_vector<double,2>& rX, double time)
  */
 
 
-class TestSolvingMoreElasticityProblemsTutorials : public CxxTest::TestSuite
+class TestSolvingMoreElasticityProblemsTutorial : public CxxTest::TestSuite
 {
 public:
 
@@ -106,7 +106,7 @@ public:
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             /* If the node is on the Y=0 surface (the LHS) */
-            if ( fabs(mesh.GetNode(i)->rGetLocation()[1])<1e-6)
+            if (fabs(mesh.GetNode(i)->rGetLocation()[1]) < 1e-6)
             {
                 /* Add it to the list of fixed nodes */
                 fixed_nodes.push_back(i);
@@ -219,7 +219,7 @@ public:
         /* For the rest, if the node is on the Y=0 surface.. */
         for (unsigned i=1; i<mesh.GetNumNodes(); i++)
         {
-            if ( fabs(mesh.GetNode(i)->rGetLocation()[1])<1e-6)
+            if (fabs(mesh.GetNode(i)->rGetLocation()[1]) < 1e-6)
             {
                 /* ..add it to the list of fixed nodes.. */
                 fixed_nodes.push_back(i);
@@ -285,7 +285,7 @@ public:
               ++iter)
         {
             double Y = (*iter)->rGetLocation()[1];
-            if(Y < -0.9)
+            if (Y < -0.9)
             {
                 fixed_nodes.push_back((*iter)->GetIndex());
             }
@@ -304,7 +304,7 @@ public:
             ++iter)
         {
            BoundaryElement<1,2>* p_element = *iter;
-           if(p_element->CalculateCentroid()[1]<0.0)
+           if (p_element->CalculateCentroid()[1]<0.0)
            {
                boundary_elems.push_back(p_element);
            }
@@ -372,4 +372,4 @@ public:
     }
 };
 
-#endif // TESTSOLVINGMOREELASTICITYPROBLEMSTUTORIALS_HPP_
+#endif // TESTSOLVINGMOREELASTICITYPROBLEMSTUTORIAL_HPP_

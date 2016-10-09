@@ -286,6 +286,15 @@ public:
     const NodesOnlyMesh<DIM>& rGetMesh() const;
 
     /**
+     * Overridden GetTetrahedralMeshForPdeModifier() method.
+     *
+     * @return a pointer to a tetrahedral mesh whose nodes match those of the NodesOnlyMesh.
+     *
+     * This method is called by AbstractGrowingDomainPdeModifier.
+     */
+    virtual TetrahedralMesh<DIM, DIM>* GetTetrahedralMeshForPdeModifier();
+
+    /**
      * @return the number of nodes in the cell population.
      */
     unsigned GetNumNodes();

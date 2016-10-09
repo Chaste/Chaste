@@ -114,11 +114,11 @@ public:
      * @param k3 The parameter k3
      */
     void Setk3(double);
-	
-	/**
-	* Works out the difference between the pressure and the pressure needed to produce a particular radius
-	*/
-	double CalculatePressureRadiusResidual(double radius);
+
+    /**
+    * Works out the difference between the pressure and the pressure needed to produce a particular radius
+    */
+    double CalculatePressureRadiusResidual(double radius);
 
 private:
     /** The airway radius at zero transpulmonary pressure */
@@ -153,7 +153,6 @@ private:
 
     /** The parameter k3 from LaPrad et al. 2013 PLoS Comp Biol*/
     double mk3;
-
 };
 
 #endif /*LAPRADAIRWAYWALL_HPP_*/

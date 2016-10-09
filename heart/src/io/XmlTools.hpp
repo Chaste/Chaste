@@ -227,7 +227,6 @@ public:
      * @return path with spaces escaped
      */
     static std::string EscapeSpaces(const std::string& rPath);
-
 };
 
 #endif /* XMLTOOLS_HPP_ */

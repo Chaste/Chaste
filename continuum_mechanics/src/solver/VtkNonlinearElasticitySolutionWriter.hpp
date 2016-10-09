@@ -38,8 +38,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractNonlinearElasticitySolver.hpp"
 
-
-
 /**
  *  Class for write mechanics solutions to .vtu file (for visualisation in Paraview), including
  *  displacement, pressure if incompressible simulation, different strains, and (in future) stresses.
@@ -91,9 +89,4 @@ public:
     void Write();
 };
 
-
-
 #endif // VTKNONLINEARELASTICITYSOLUTIONWRITER_HPP_
-
-
-

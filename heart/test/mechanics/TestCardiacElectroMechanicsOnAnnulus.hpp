@@ -51,7 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // linear increase from 0 to 1KPa in 100ms
 double LinearPressureFunction(double t)
 {
-    if(t>=100)
+    if (t>=100)
     {
         return -1;
     }
@@ -84,7 +84,6 @@ public:
             return new CellLuoRudy1991FromCellML(mpSolver, mpZeroStimulus);
         }
     }
-
 };
 
 class TestCardiacElectroMechanicsOnAnnulus : public CxxTest::TestSuite
@@ -107,7 +106,7 @@ public:
 
         std::vector<unsigned> fixed_nodes;
         std::vector<c_vector<double,2> > fixed_node_locations;
-        for(unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
         {
             double x = mechanics_mesh.GetNode(i)->rGetLocation()[0];
             double y = mechanics_mesh.GetNode(i)->rGetLocation()[1];
@@ -206,7 +205,7 @@ public:
 
          std::vector<unsigned> fixed_nodes;
         std::vector<c_vector<double,2> > fixed_node_locations;
-        for(unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
         {
             double x = mechanics_mesh.GetNode(i)->rGetLocation()[0];
             double y = mechanics_mesh.GetNode(i)->rGetLocation()[1];

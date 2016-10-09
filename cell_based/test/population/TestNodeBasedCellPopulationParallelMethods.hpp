@@ -42,7 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodeBasedCellPopulation.hpp"
 #include "NodesOnlyMesh.hpp"
 #include "CellsGenerator.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
 #include "TrianglesMeshReader.hpp"
 #include "BetaCateninOneHitCellMutationState.hpp"
 #include "WildTypeCellMutationState.hpp"
@@ -89,7 +89,7 @@ private:
         mpNodesOnlyMesh->ConstructNodesWithoutMesh(nodes, 1.0);
 
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasic(cells, mpNodesOnlyMesh->GetNumNodes());
 
         mpNodeBasedCellPopulation = new NodeBasedCellPopulation<3>(*mpNodesOnlyMesh, cells);
@@ -278,7 +278,7 @@ public:
         // Create a cell.
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(TransitCellProliferativeType, p_type);
-        FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+        FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
 
         CellPtr p_cell(new Cell(p_state, p_model));
 
@@ -305,7 +305,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         for (unsigned i=0; i<cells.size(); i++)
@@ -393,7 +393,6 @@ public:
             delete nodes[i];
         }
     }
-
 };
 
 #endif /*TESTNODEBASEDCELLPOPULATIONPARALLELMETHODS_HPP_*/

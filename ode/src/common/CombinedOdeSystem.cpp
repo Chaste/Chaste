@@ -37,8 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CombinedOdeSystem.hpp"
 #include "CombinedOdeSystemInformation.hpp"
 
-
-
 CombinedOdeSystem::CombinedOdeSystem(std::vector<AbstractOdeSystem*> odeSystems)
     : AbstractOdeSystem(0) // will be set properly below
 {
