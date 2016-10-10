@@ -138,6 +138,8 @@ endif()
 option(Chaste_ENABLE_TESTING "Enable Chaste Testing" ON)
 option(Chaste_INSTALL_TESTS "Install Chaste Testing infrastructure" OFF)
 
+set(Chaste_PYCML_EXTRA_ARGS "" CACHE STRING "Add any extra arguments for PyCML here")
+
 #Some Chaste-specific #defines
 add_definitions(-DCHASTE_CMAKE)
 
