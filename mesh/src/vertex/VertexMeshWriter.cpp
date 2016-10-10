@@ -339,7 +339,7 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(VertexMesh<ELEMENT_DI
          ++iter)
     {
         vtkCell* p_cell;
-        if (SPACE_DIM == 2)
+        if (ELEMENT_DIM == 2)
         {
             p_cell = vtkPolygon::New();
         }
