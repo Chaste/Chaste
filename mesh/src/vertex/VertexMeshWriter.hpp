@@ -126,6 +126,14 @@ public:
     void WriteVtkUsingMesh(VertexMesh<ELEMENT_DIM, SPACE_DIM>& rMesh, std::string stamp="");
 
     /**
+     * Write VTK file using a mesh with element indices as cell ID.
+     *
+     * @param rMesh reference to the vertex-based mesh
+     * @param stamp is an optional stamp (like a time-stamp) to put into the name of the file
+     */
+    void WriteVtkUsingMeshWithCellId(VertexMesh<ELEMENT_DIM, SPACE_DIM>& rMesh, std::string stamp="");
+
+    /**
      * Populate mpVtkUnstructedMesh using a vertex-based mesh.
      * Called by WriteVtkUsingMesh().
      *

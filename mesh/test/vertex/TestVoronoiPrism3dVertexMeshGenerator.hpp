@@ -60,12 +60,6 @@ public:
         unsigned x = 10;
         unsigned y = 10;
 
-        std::vector<double> cell_ids;
-        for (unsigned id=0 ; id < x*y ; id++)
-        {
-            cell_ids.push_back(double(id));
-        }
-
         for (unsigned index=0; index< relax_steps.size(); ++index)
         {
             RESEED;
@@ -73,10 +67,9 @@ public:
             VoronoiPrism3dVertexMeshGenerator generator(x, y, 1, relax_step);
             MutableVertexMesh<3, 3>* p_mesh = generator.GetMesh();
 
-            VertexMeshWriter<3, 3> vertex_mesh_writer0("TestVoronoiPrism3dVertexMesh", "10x10 relaxation step: "
+            VertexMeshWriter<3, 3> vertex_mesh_writer("TestVoronoiPrism3dVertexMesh", "10x10 relaxation step: "
                                                        + boost::lexical_cast<std::string>(relax_step), false);
-            vertex_mesh_writer0.AddCellData("Cell IDs", cell_ids);
-            vertex_mesh_writer0.WriteVtkUsingMesh(*p_mesh);
+            vertex_mesh_writer.WriteVtkUsingMeshWithCellId(*p_mesh);
         }
     }
 
@@ -105,17 +98,7 @@ public:
 
         VertexMeshWriter<3, 3> vertex_mesh_writer("TestVoronoiPrism3dVertexMesh",
                                                   "20x12x1 4relax ApicalArea1.23", false);
-
-        std::vector<double> cell_ids;
-        for (unsigned id=0 ; id < p_mesh_a->GetNumElements() ; id++)
-        {
-            cell_ids.push_back(double(id));
-        }
-
-        vertex_mesh_writer.AddCellData("Cell IDs", cell_ids);
-        vertex_mesh_writer.WriteVtkUsingMesh(*p_mesh_a);
-
-        ///\todo need to add a test here
+        vertex_mesh_writer.WriteVtkUsingMeshWithCellId(*p_mesh_a);
     }
 
     void TestBoundaryNodes() throw(Exception)
@@ -254,15 +237,7 @@ public:
 
         VertexMeshWriter<3, 3> vertex_mesh_writer("TestVoronoiPrism3dVertexMesh",
                                                   "ForPolygonDistribution", false);
-
-        std::vector<double> cell_ids;
-        for (unsigned id=0 ; id < p_mesh->GetNumElements() ; id++)
-        {
-            cell_ids.push_back(double(id));
-        }
-
-        vertex_mesh_writer.AddCellData("Cell IDs", cell_ids);
-        vertex_mesh_writer.WriteVtkUsingMesh(*p_mesh);
+        vertex_mesh_writer.WriteVtkUsingMeshWithCellId(*p_mesh);
 
         // Get the polgyon distribution and check it
         std::vector<double> polygon_dist = generator.GetPolygonDistribution();

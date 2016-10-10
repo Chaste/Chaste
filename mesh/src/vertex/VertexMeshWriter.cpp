@@ -300,6 +300,19 @@ void VertexMeshWriter<2, 2>::WriteVtkUsingMesh(VertexMesh<2, 2>& rMesh, std::str
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteVtkUsingMeshWithCellId(VertexMesh<ELEMENT_DIM, SPACE_DIM>& rMesh, std::string stamp)
+{
+    std::vector<double> cell_ids;
+    for (unsigned id=0 ; id < rMesh.GetNumElements() ; id++)
+    {
+        cell_ids.push_back(double(id));
+    }
+
+    this->AddCellData("Cell IDs", cell_ids);
+    this->WriteVtkUsingMesh(rMesh);
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(VertexMesh<ELEMENT_DIM, SPACE_DIM>& rMesh)
 {
 #ifdef CHASTE_VTK
