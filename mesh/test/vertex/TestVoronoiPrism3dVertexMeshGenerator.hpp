@@ -75,30 +75,30 @@ public:
 
     void TestSimpleMesh() throw(Exception)
     {
-        // Generate a mesh that is 20 cells wide in x, 12 cells wide in y, 1 unit high in Z,
+        // Generate a mesh that is 20 cells wide in x, 12 cells wide in y, 2 unit high in Z,
         // with 4 Lloyd's relaxation steps and target average element apical area 1.23
         RESEED;
-        VoronoiPrism3dVertexMeshGenerator generator(20, 12, 1, 4, 1.23);
-        MutableVertexMesh<3, 3>* p_mesh_a = generator.GetMesh();
+        VoronoiPrism3dVertexMeshGenerator generator(20, 12, 2, 4, 1.23);
+        MutableVertexMesh<3, 3>* p_mesh = generator.GetMesh();
         TS_ASSERT_THROWS_THIS(generator.GetMeshAfterReMesh(),
                               "Remeshing has not been implemented in 3D (see #827 and #860)\n");
 
-        TS_ASSERT_EQUALS(p_mesh_a->GetNumNodes(), 1096u);
-        TS_ASSERT_EQUALS(p_mesh_a->GetNumElements(), 240u);
+        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 1096u);
+        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 240u);
 
         // Check average cell area is correct
         double average_voloume = 0.0;
-        for (unsigned elem_idx = 0 ; elem_idx < p_mesh_a->GetNumElements() ; elem_idx++)
+        for (unsigned elem_idx = 0 ; elem_idx < p_mesh->GetNumElements() ; elem_idx++)
         {
-            average_voloume += p_mesh_a->GetVolumeOfElement(elem_idx);
+            average_voloume += p_mesh->GetVolumeOfElement(elem_idx);
         }
-        average_voloume /= double(p_mesh_a->GetNumElements());
+        average_voloume /= double(p_mesh->GetNumElements());
 
-        TS_ASSERT_DELTA(average_voloume, 1.23, 1e-6);
+        TS_ASSERT_DELTA(average_voloume, 1.23*2, 1e-6);
 
         VertexMeshWriter<3, 3> vertex_mesh_writer("TestVoronoiPrism3dVertexMesh",
                                                   "20x12x1 4relax ApicalArea1.23", false);
-        vertex_mesh_writer.WriteVtkUsingMeshWithCellId(*p_mesh_a);
+        vertex_mesh_writer.WriteVtkUsingMeshWithCellId(*p_mesh);
     }
 
     void TestBoundaryNodes() throw(Exception)

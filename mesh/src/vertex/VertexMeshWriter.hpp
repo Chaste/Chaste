@@ -89,6 +89,7 @@ private:
 //Requires  "sudo aptitude install libvtk5-dev" or similar
 ///\todo Merge into VtkMeshWriter (#1076)
     vtkUnstructuredGrid* mpVtkUnstructedMesh;
+    vtkUnstructuredGrid* mpVtkFaceMesh;
 #endif //CHASTE_VTK
 
 public:
@@ -123,15 +124,16 @@ public:
      * @param rMesh reference to the vertex-based mesh
      * @param stamp is an optional stamp (like a time-stamp) to put into the name of the file
      */
-    void WriteVtkUsingMesh(VertexMesh<ELEMENT_DIM, SPACE_DIM>& rMesh, std::string stamp="");
+    void WriteVtkUsingMesh(const VertexMesh<ELEMENT_DIM, SPACE_DIM>& rMesh, std::string stamp="");
 
     /**
      * Write VTK file using a mesh with element indices as cell ID.
      *
      * @param rMesh reference to the vertex-based mesh
      * @param stamp is an optional stamp (like a time-stamp) to put into the name of the file
+     * @param useElementIdForFaceId is an optional argument for 3D elements
      */
-    void WriteVtkUsingMeshWithCellId(VertexMesh<ELEMENT_DIM, SPACE_DIM>& rMesh, std::string stamp="");
+    void WriteVtkUsingMeshWithCellId(const VertexMesh<ELEMENT_DIM, SPACE_DIM>& rMesh, std::string stamp="", bool useElementIdForFaceId=true);
 
     /**
      * Populate mpVtkUnstructedMesh using a vertex-based mesh.
@@ -139,7 +141,7 @@ public:
      *
      * @param rMesh reference to the vertex-based mesh
      */
-    void MakeVtkMesh(VertexMesh<ELEMENT_DIM, SPACE_DIM>& rMesh);
+    void MakeVtkMesh(const VertexMesh<ELEMENT_DIM, SPACE_DIM>& rMesh);
 
     /**
      * Add data to a future VTK file.
@@ -148,6 +150,14 @@ public:
      * @param dataPayload a pay-load of length (number of elements)
      */
     void AddCellData(std::string dataName, std::vector<double> dataPayload);
+
+    /**
+     * Add data to a future VTK file. (for 3D elements only)
+     *
+     * @param dataName a tag to go into the VTK file
+     * @param dataPayload a pay-load of length (number of faces)
+     */
+    void AddFaceData(std::string dataName, std::vector<double> dataPayload);
 
     /**
      * Add data to a future VTK file.

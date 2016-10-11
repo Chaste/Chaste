@@ -70,6 +70,7 @@ VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::VertexMeshWriter(const std::string& rD
 #ifdef CHASTE_VTK
      // Dubious, since we shouldn't yet know what any details of the mesh are.
      mpVtkUnstructedMesh = vtkUnstructuredGrid::New();
+     mpVtkFaceMesh = vtkUnstructuredGrid::New();
 #endif //CHASTE_VTK
 }
 
@@ -92,6 +93,7 @@ VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::~VertexMeshWriter()
 #ifdef CHASTE_VTK
      // Dubious, since we shouldn't yet know what any details of the mesh are.
      mpVtkUnstructedMesh->Delete(); // Reference counted
+     mpVtkFaceMesh->Delete();
 #endif //CHASTE_VTK
 }
 
@@ -205,7 +207,7 @@ ElementData VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextElement()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteVtkUsingMesh(VertexMesh<ELEMENT_DIM, SPACE_DIM>& rMesh, std::string stamp)
+void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteVtkUsingMesh(const VertexMesh<ELEMENT_DIM, SPACE_DIM>& rMesh, std::string stamp)
 {
 #ifdef CHASTE_VTK
     assert(SPACE_DIM==3 || SPACE_DIM == 2);
@@ -236,6 +238,24 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteVtkUsingMesh(VertexMesh<ELEM
     p_writer->SetFileName(vtk_file_name.c_str());
     //p_writer->PrintSelf(std::cout, vtkIndent());
     p_writer->Write();
+
+    // If we have 3D elements, we will write an additional mesh with faces for better visual effect.
+    if (ELEMENT_DIM==3)
+    {
+
+        // Recycling p_writer
+#if VTK_MAJOR_VERSION >= 6
+    p_writer->SetInputData(mpVtkFaceMesh);
+#else
+    p_writer->SetInput(mpVtkFaceMesh);
+#endif
+        // Cut off the extension and add "suffix" -_face_mesh to the output data
+        std::string vtk_face_file_name = vtk_file_name.substr(0, vtk_file_name.size()-4) + "_face_mesh.vtu";
+        p_writer->SetFileName(vtk_face_file_name.c_str());
+        //p_writer->PrintSelf(std::cout, vtkIndent());
+        p_writer->Write();
+    }
+
     p_writer->Delete(); // Reference counted
 #endif //CHASTE_VTK
 }
@@ -247,21 +267,21 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteVtkUsingMesh(VertexMesh<ELEM
  * @param stamp is an optional stamp (like a time-stamp) to put into the name of the file
  */
 template<>
-void VertexMeshWriter<2, 2>::WriteVtkUsingMesh(VertexMesh<2, 2>& rMesh, std::string stamp)
+void VertexMeshWriter<2, 2>::WriteVtkUsingMesh(const VertexMesh<2, 2>& rMesh, std::string stamp)
 {
 #ifdef CHASTE_VTK
     // Create VTK mesh
-    if (dynamic_cast<Toroidal2dVertexMesh*>(&rMesh))
+    if (dynamic_cast<const Toroidal2dVertexMesh*>(&rMesh))
     {
-        MutableVertexMesh<2, 2>* p_mesh_for_vtk = static_cast<Toroidal2dVertexMesh*>(&rMesh)->GetMeshForVtk();
+        const MutableVertexMesh<2, 2>* p_mesh_for_vtk = static_cast<const Toroidal2dVertexMesh*>(&rMesh)->GetMeshForVtk();
         MakeVtkMesh(*p_mesh_for_vtk);
 
         // Avoid memory leak
         delete p_mesh_for_vtk;
     }
-    else if (dynamic_cast<Cylindrical2dVertexMesh*>(&rMesh))
+    else if (dynamic_cast<const Cylindrical2dVertexMesh*>(&rMesh))
     {
-        MutableVertexMesh<2, 2>* p_mesh_for_vtk = static_cast<Cylindrical2dVertexMesh*>(&rMesh)->GetMeshForVtk();
+        const MutableVertexMesh<2, 2>* p_mesh_for_vtk = static_cast<const Cylindrical2dVertexMesh*>(&rMesh)->GetMeshForVtk();
         MakeVtkMesh(*p_mesh_for_vtk);
 
         // Avoid memory leak
@@ -300,20 +320,78 @@ void VertexMeshWriter<2, 2>::WriteVtkUsingMesh(VertexMesh<2, 2>& rMesh, std::str
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteVtkUsingMeshWithCellId(VertexMesh<ELEMENT_DIM, SPACE_DIM>& rMesh, std::string stamp)
+void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteVtkUsingMeshWithCellId(const VertexMesh<ELEMENT_DIM, SPACE_DIM>& rMesh, std::string stamp, bool useElementIdForFaceId)
 {
     std::vector<double> cell_ids;
-    for (unsigned id=0 ; id < rMesh.GetNumElements() ; id++)
+    for (unsigned id=0 ; id < rMesh.GetNumElements() ; ++id)
     {
         cell_ids.push_back(double(id));
     }
-
     this->AddCellData("Cell IDs", cell_ids);
     this->WriteVtkUsingMesh(rMesh);
 }
 
+// This function is written here as VertexMeshWriter<3, 3>::WriteVtkUsingMeshWithCellId( ... ) requires specialization
+// of AddFaceData( ... )
+template<>
+void VertexMeshWriter<3, 3>::AddFaceData(std::string dataName, std::vector<double> dataPayload)
+{
+#ifdef CHASTE_VTK
+
+    vtkDoubleArray* p_scalars = vtkDoubleArray::New();
+    p_scalars->SetName(dataName.c_str());
+    for (unsigned i=0; i<dataPayload.size(); i++)
+    {
+        p_scalars->InsertNextValue(dataPayload[i]);
+    }
+
+    vtkCellData* p_cell_data = mpVtkFaceMesh->GetCellData();
+    p_cell_data->AddArray(p_scalars);
+    p_scalars->Delete(); // Reference counte
+#endif //CHASTE_VTK
+}
+
+// Overload rather than if statement (ELEMENT_DIM==3) as there is no instantiation of VertexElement<0u, *>
+// and GetFace(unsigned) will have error
+template<>
+void VertexMeshWriter<3, 3>::WriteVtkUsingMeshWithCellId(const VertexMesh<3, 3>& rMesh, std::string stamp, bool useElementIdForFaceId)
+{
+    // Copied and pasted
+    std::vector<double> cell_ids;
+    for (unsigned id=0 ; id < rMesh.GetNumElements() ; ++id)
+    {
+        cell_ids.push_back(double(id));
+    }
+    this->AddCellData("Cell IDs", cell_ids);
+
+    std::vector<double> face_ids(rMesh.GetNumFaces());
+    // There are 2 kinds of default IDs that I implemented: using its own face id;
+    // using element id (overlapping lateral face might not look so nice with clipping and thresholding)
+    if (useElementIdForFaceId)
+    {
+        for (unsigned elem_index=0; elem_index<rMesh.GetNumElements(); ++elem_index)
+        {
+            VertexElement<3, 3>* p_elem = rMesh.GetElement(elem_index);
+            for (unsigned face_index=0; face_index<p_elem->GetNumFaces(); ++face_index)
+            {
+                face_ids[p_elem->GetFace(face_index)->GetIndex()] = double(elem_index);
+            }
+        }
+    }
+    else
+    {
+        for (unsigned id=0 ; id<rMesh.GetNumFaces() ; ++id)
+        {
+            face_ids[id] = double(id);
+        }
+    }
+    this->AddFaceData(useElementIdForFaceId ? "Cell IDs": "Face IDs", face_ids);
+
+    this->WriteVtkUsingMesh(rMesh);
+}
+
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(VertexMesh<ELEMENT_DIM, SPACE_DIM>& rMesh)
+void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(const VertexMesh<ELEMENT_DIM, SPACE_DIM>& rMesh)
 {
 #ifdef CHASTE_VTK
     // Make the Vtk mesh
@@ -333,11 +411,16 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(VertexMesh<ELEMENT_DI
     }
 
     mpVtkUnstructedMesh->SetPoints(p_pts);
-    p_pts->Delete(); // Reference counted
-    for (typename VertexMesh<ELEMENT_DIM,SPACE_DIM>::VertexElementIterator iter = rMesh.GetElementIteratorBegin();
-         iter != rMesh.GetElementIteratorEnd();
-         ++iter)
+    // There seems to be no apparent issue for 2 meshes to share the same points.
+    // So I'll do it this way for now.
+    if (ELEMENT_DIM==3)
     {
+        mpVtkFaceMesh->SetPoints(p_pts);
+    }
+    p_pts->Delete(); // Reference counted
+    for (unsigned elem_id=0; elem_id<rMesh.GetNumElements(); ++elem_id)
+    {
+        VertexElement<ELEMENT_DIM, SPACE_DIM>* iter = rMesh.GetElement(elem_id);
         vtkCell* p_cell;
         if (ELEMENT_DIM == 2)
         {
@@ -355,6 +438,27 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(VertexMesh<ELEMENT_DI
         }
         mpVtkUnstructedMesh->InsertNextCell(p_cell->GetCellType(), p_cell_id_list);
         p_cell->Delete(); // Reference counted
+    }
+
+    // For 3D elements, we create another VtkMesh with the faces, as it looks nicer in Paraview
+    // (otherwise 3D elements will have all of it faces triangulated when using the representation "Surface With Edges").
+    if (ELEMENT_DIM ==3 && SPACE_DIM==3)
+    {
+        const unsigned num_of_faces = rMesh.GetNumFaces();
+        for (unsigned face_index=0; face_index<num_of_faces; ++ face_index)
+        {
+            VertexElement<ELEMENT_DIM-1, SPACE_DIM>* p_face = rMesh.GetFace(face_index);
+            vtkCell* p_cell;
+            p_cell = vtkPolygon::New();
+            vtkIdList* p_cell_id_list = p_cell->GetPointIds();
+            p_cell_id_list->SetNumberOfIds(p_face->GetNumNodes());
+            for (unsigned j=0; j<p_face->GetNumNodes(); ++j)
+            {
+                p_cell_id_list->SetId(j, p_face->GetNodeGlobalIndex(j));
+            }
+            mpVtkFaceMesh->InsertNextCell(p_cell->GetCellType(), p_cell_id_list);
+            p_cell->Delete(); // Reference counted
+        }
     }
 #endif //CHASTE_VTK
 }

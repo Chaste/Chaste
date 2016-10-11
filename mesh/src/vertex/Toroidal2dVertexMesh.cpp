@@ -143,7 +143,7 @@ unsigned Toroidal2dVertexMesh::AddNode(Node<2>* pNewNode)
     return node_index;
 }
 
-MutableVertexMesh<2, 2>* Toroidal2dVertexMesh::GetMeshForVtk()
+MutableVertexMesh<2, 2>* Toroidal2dVertexMesh::GetMeshForVtk() const
 {
     unsigned num_nodes = GetNumNodes();
 
@@ -173,10 +173,9 @@ MutableVertexMesh<2, 2>* Toroidal2dVertexMesh::GetMeshForVtk()
     }
 
     // Iterate over elements
-    for (VertexMesh<2,2>::VertexElementIterator elem_iter = GetElementIteratorBegin();
-         elem_iter != GetElementIteratorEnd();
-         ++elem_iter)
+    for (unsigned elem_id=0; elem_id<GetNumElements(); ++elem_id)
     {
+        const VertexElement<2, 2>* elem_iter = GetElement(elem_id);
         unsigned elem_index = elem_iter->GetIndex();
         unsigned num_nodes_in_elem = elem_iter->GetNumNodes();
 

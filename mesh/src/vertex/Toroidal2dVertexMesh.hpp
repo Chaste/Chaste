@@ -162,7 +162,7 @@ public:
      *
      * @return a non-periodic vertex mesh
      */
-     MutableVertexMesh<2, 2>* GetMeshForVtk();
+     MutableVertexMesh<2, 2>* GetMeshForVtk() const;
 
      /**
       * Construct the mesh using a MeshReader.
