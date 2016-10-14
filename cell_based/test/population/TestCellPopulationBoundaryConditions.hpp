@@ -303,7 +303,10 @@ public:
         c_vector<double,2> point = zero_vector<double>(2);
         c_vector<double,2> normal = zero_vector<double>(2);
         normal(0) = 1.0;
-        TS_ASSERT_THROWS_THIS(PlaneBoundaryCondition<2> plane_boundary_condition(&potts_cell_population, point, normal),
+
+        PlaneBoundaryCondition<2> plane_boundary_condition(&potts_cell_population, point, normal);
+        std::map<Node<2>*, c_vector<double, 2> > old_locations;
+        TS_ASSERT_THROWS_THIS(plane_boundary_condition.ImposeBoundaryCondition(old_locations),
             "PlaneBoundaryCondition requires a subclass of AbstractOffLatticeCellPopulation.");
     }
 
