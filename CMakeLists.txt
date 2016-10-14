@@ -650,7 +650,7 @@ install(EXPORT chaste-targets
 if (Chaste_COVERAGE)
     # Copy LCOV config file across from the repository to the build directory.
     file(COPY ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc
-         DESTINATION ${Chaste_BINARY_DIR}/cmake/Config/lcovrc)
+         DESTINATION ${Chaste_BINARY_DIR}/cmake/Config)
          
     set(CTEST_COMMAND ctest)
     set(_outputname coverage)
