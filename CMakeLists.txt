@@ -648,9 +648,6 @@ install(EXPORT chaste-targets
 
 
 if (Chaste_COVERAGE)
-    # Copy LCOV config file across from the repository to the build directory.
-    file(COPY ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc
-         DESTINATION ${Chaste_BINARY_DIR}/cmake/Config)
          
     set(CTEST_COMMAND ctest)
     set(_outputname coverage)
@@ -663,7 +660,7 @@ if (Chaste_COVERAGE)
         COMMAND ${CTEST_COMMAND} "-L" "Continuous|Parallel" "--output-on-failure" 
 
 		# Capturing lcov counters and generating report
-		COMMAND ${LCOV_PATH} --no-external --directory . --capture --output-file ${_outputname}.info --config-file ${Chaste_BINARY_DIR}/cmake/Config/lcovrc
+		COMMAND ${LCOV_PATH} --no-external --directory . --capture --output-file ${_outputname}.info --config-file ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc
         COMMAND ${LCOV_PATH} --remove ${_outputname}.info /usr/* */fortests/* */3rdparty/* Debug/* cxxtest/* --output-file ${_outputname}.info.cleaned
 		COMMAND ${GENHTML_PATH} --no-function-coverage -o ${_outputname} ${_outputname}.info.cleaned
 		COMMAND ${CMAKE_COMMAND} -E remove ${_outputname}.info ${_outputname}.info.cleaned
