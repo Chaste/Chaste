@@ -105,13 +105,13 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
         archive & boost::serialization::base_object<AbstractOnLatticeCellPopulation<DIM> >(*this);
         archive & mSwitchingUpdateRuleCollection;
         archive & mLatticeCarryingCapacity;
         archive & mAvailableSpaces;
         archive & mpCaBasedDivisionRule;
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
     }
 
     /**
@@ -477,7 +477,7 @@ public:
 EXPORT_TEMPLATE_CLASS_SAME_DIMS(CaBasedCellPopulation)
 
 // No archiving yet so untested
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
 namespace boost
 {
 namespace serialization
@@ -511,6 +511,6 @@ inline void load_construct_data(
 }
 }
 } // namespace ...
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
 
 #endif /*CABASEDCELLPOPULATION_HPP_*/

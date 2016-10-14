@@ -116,11 +116,11 @@ void ReplicatableVector::Resize(unsigned size)
     }
     catch(std::bad_alloc &badAlloc)
     {
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
         std::cout << "Failed to allocate a ReplicatableVector of size " << size  << std::endl;
         PetscTools::ReplicateException(true);
         throw badAlloc;
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
     }
     PetscTools::ReplicateException(false);
 }

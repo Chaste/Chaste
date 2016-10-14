@@ -80,10 +80,10 @@ AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::AbstractCardiacTissue(
          * to the other processes.  Therefore, to avoid deadlock, we share this potential for error between
          * processes and throw an exception.
          */
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
         // This problem normally occurs on 3 or more processes, so we can't cover it - coverage only runs with 1 and 2 processes.
         EXCEPTION("No cells were assigned some process in AbstractCardiacTissue constructor. Advice: Make total number of processors no greater than number of nodes in the mesh");
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
     }
     unsigned ownership_range_low = mpDistributedVectorFactory->GetLow();
     mCellsDistributed.resize(num_local_nodes);
@@ -298,11 +298,11 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::CreateIntracellularConductivi
         }
         catch(std::bad_alloc &r_bad_alloc)
         {
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
             std::cout << "Failed to allocate std::vector of size " << num_local_elements << std::endl;
             PetscTools::ReplicateException(true);
             throw r_bad_alloc;
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
         }
         PetscTools::ReplicateException(false);
 

@@ -84,7 +84,7 @@ ExtendedBidomainTissue<SPACE_DIM>::ExtendedBidomainTissue(AbstractCardiacCellFac
     }
     catch (const Exception& e)
     {
-#define COVERAGE_IGNORE //don't really know how to cover this...
+// LCOV_EXCL_START //don't really know how to cover this...
         // Errors thrown creating cells will often be process-specific
         PetscTools::ReplicateException(true);
         // Should really do this for other processes too, but this is all we need
@@ -97,7 +97,7 @@ ExtendedBidomainTissue<SPACE_DIM>::ExtendedBidomainTissue(AbstractCardiacCellFac
             delete (*cell_iterator);
         }
         throw e;
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
     }
     PetscTools::ReplicateException(false);
 
@@ -181,10 +181,10 @@ void ExtendedBidomainTissue<SPACE_DIM>::CreateGGapConductivities()
     }
     catch (const Exception& e)
     {
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
         PetscTools::ReplicateException(true);
         throw e;
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
     }
     PetscTools::ReplicateException(false);
 }
@@ -249,11 +249,11 @@ void ExtendedBidomainTissue<SPACE_DIM>::CreateIntracellularConductivityTensorSec
         }
         catch(std::bad_alloc &badAlloc)
         {
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
             std::cout << "Failed to allocate std::vector of size " << num_elements << std::endl;
             PetscTools::ReplicateException(true);
             throw badAlloc;
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
         }
         PetscTools::ReplicateException(false);
 
@@ -384,11 +384,11 @@ void ExtendedBidomainTissue<SPACE_DIM>::CreateExtracellularConductivityTensors()
         }
         catch(std::bad_alloc &badAlloc)
         {
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
             std::cout << "Failed to allocate std::vector of size " << num_elements << std::endl;
             PetscTools::ReplicateException(true);
             throw badAlloc;
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
         }
         PetscTools::ReplicateException(false);
 
@@ -534,10 +534,10 @@ void ExtendedBidomainTissue<SPACE_DIM>::SolveCellSystems(Vec existingSolution, d
         }
         catch (Exception &e)
         {
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
             PetscTools::ReplicateException(true);
             throw e;
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
         }
 
         // update the Iionic and stimulus caches

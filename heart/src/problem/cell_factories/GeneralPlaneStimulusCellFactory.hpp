@@ -70,9 +70,9 @@ public:
     {
         if (useMeshWidthAsMag)
         {
-            #define COVERAGE_IGNORE
+            // LCOV_EXCL_START
             this->mpStimulus.reset(new SimpleStimulus(meshWidth, 0.5));
-            #undef COVERAGE_IGNORE
+            // LCOV_EXCL_STOP
         }
         else
         {

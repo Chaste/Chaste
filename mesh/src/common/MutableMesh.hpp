@@ -152,7 +152,7 @@ protected:
 
 private:
 
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
     /**
      * @return true if the mesh is Voronoi local to the given element.
      * Check whether any neighbouring node is inside the circumsphere of this element.
@@ -162,7 +162,7 @@ private:
      * circumsphere of the element, as a proportion of the circumsphere radius.
      */
     bool CheckIsVoronoi(Element<ELEMENT_DIM, SPACE_DIM>* pElement, double maxPenetration);
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
 
 public:
 
@@ -252,7 +252,7 @@ public:
      */
     void MoveMergeNode(unsigned index, unsigned targetIndex, bool concreteMove=true);
 
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
     /**
      * Delete a node from the mesh by finding an appropriate neighbour node
      * to merge it with.
@@ -267,7 +267,7 @@ public:
      * @param index The index of the element to be deleted
      */
     virtual void DeleteElement(unsigned index);
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
 
     /**
      * Mark a node as deleted. Note that this method DOES NOT deal with the
@@ -302,7 +302,7 @@ public:
      */
     void DeleteBoundaryNodeAt(unsigned index);
 
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
     /**
      * Re-index a mesh so that it has no deleted elements or nodes.
      *
@@ -310,7 +310,7 @@ public:
      * with indices of nodes in the new mesh.  This should be created with the correct size (NumAllNodes)
      */
     void ReIndex(NodeMap& map);
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
 
     /**
      * Re-mesh a mesh using triangle (via library calls) or tetgen
@@ -326,16 +326,16 @@ public:
      */
     void ReMesh();
 
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
     /**
      * Find edges in the mesh longer than the given cutoff length and split them creating new elements as required.
      * @param cutoffLength cutoff length for edge splitting
      * @return returns a vector of triples with pointers to the new node followed by pointers to the nodes defining the bisected edge.
      */
     std::vector<c_vector<unsigned, 5> > SplitLongEdges(double cutoffLength);
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
 
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
     /**
      * Splits an edge in two and create all the relevant new elements and nodes
      *
@@ -344,9 +344,9 @@ public:
      * @return the index of the new node
      */
     c_vector<unsigned, 3> SplitEdge(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB);
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
 
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
     /**
      * @return true if Voronoi.  Checks the entire mesh element by element and checks whether any neighbouring node
      * is inside the circumsphere of this element.
@@ -356,7 +356,7 @@ public:
      * circumsphere radius.
      */
     bool CheckIsVoronoi(double maxPenetration=0.0);
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
 };
 
 #include "SerializationExportWrapper.hpp"

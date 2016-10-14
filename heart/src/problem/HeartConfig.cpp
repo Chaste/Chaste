@@ -952,9 +952,9 @@ double HeartConfig::GetInterNodeSpace() const
             break;
         default:
             NEVER_REACHED;
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
             return 0.0; //To fool the compiler
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
     }
 }
 
@@ -1643,9 +1643,9 @@ const char* HeartConfig::GetKSPSolver() const
         case cp::ksp_solver_type::chebychev :
             return "chebychev";
     }
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
     EXCEPTION("Unknown ksp solver");
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
 }
 
 const char* HeartConfig::GetKSPPreconditioner() const
@@ -1673,9 +1673,9 @@ const char* HeartConfig::GetKSPPreconditioner() const
             return "none";
 
     }
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
     EXCEPTION("Unknown ksp preconditioner");
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
 }
 
 DistributedTetrahedralMeshPartitionType::type HeartConfig::GetMeshPartitioning() const
@@ -1692,9 +1692,9 @@ DistributedTetrahedralMeshPartitionType::type HeartConfig::GetMeshPartitioning()
         case cp::mesh_partitioning_type::petsc :
             return DistributedTetrahedralMeshPartitionType::PETSC_MAT_PARTITION;
     }
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
     EXCEPTION("Unknown mesh partitioning type");
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
 }
 
 bool HeartConfig::IsAdaptivityParametersPresent() const
@@ -3079,7 +3079,7 @@ void XmlTransforms::SetDefaultVisualizer(xercesc::DOMDocument* pDocument,
 /////////////////////////////////////////////////////////////////////
 // Explicit instantiation of the templated functions
 /////////////////////////////////////////////////////////////////////
-#define COVERAGE_IGNORE //These methods are covered above with DIM=1,2,3 but the instantiations may fail spuriously
+// LCOV_EXCL_START //These methods are covered above with DIM=1,2,3 but the instantiations may fail spuriously
 /**
  * \cond
  * Get Doxygen to ignore, since it's confused by explicit instantiation of templated methods
@@ -3110,7 +3110,7 @@ template void HeartConfig::SetPseudoEcgElectrodePositions(const std::vector<Chas
  * \endcond
  * Get Doxygen to ignore, since it's confused by explicit instantiation of templated methods
  */
-#undef COVERAGE_IGNORE //These methods are covered above with DIM=1,2,3 but the instantiations may fail spuriously
+// LCOV_EXCL_STOP //These methods are covered above with DIM=1,2,3 but the instantiations may fail spuriously
 
 
 // Serialization for Boost >= 1.36

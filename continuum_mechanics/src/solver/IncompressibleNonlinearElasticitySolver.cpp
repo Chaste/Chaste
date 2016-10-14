@@ -79,13 +79,13 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleSystem(bool assembleR
          iter != this->mrQuadMesh.GetElementIteratorEnd();
          ++iter)
     {
-        #define COVERAGE_IGNORE
+        // LCOV_EXCL_START
         // Note: if assembleJacobian only
         if (CommandLineArguments::Instance()->OptionExists("-mech_very_verbose") && assembleJacobian)
         {
             std::cout << "\r[" << PetscTools::GetMyRank() << "]: Element " << (*iter).GetIndex() << " of " << this->mrQuadMesh.GetNumElements() << std::flush;
         }
-        #undef COVERAGE_IGNORE
+        // LCOV_EXCL_STOP
 
         Element<DIM, DIM>& element = *iter;
 

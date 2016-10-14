@@ -422,10 +422,10 @@ void ColumnDataReader::PushColumnEntryFromLine(const std::string& rLine, int col
         }
         else
         {
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
            //  Clang Objective C++ (on Mac OSX) treats reading very small numbers (<2e-308) as an error but other compilers just round to zero
            d_value = 0.0;
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
         }
     }
     mValues.push_back(d_value);

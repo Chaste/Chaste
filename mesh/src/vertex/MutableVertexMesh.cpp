@@ -894,9 +894,9 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(VertexElementMap& rElemen
     }
     else // 3D
     {
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
         EXCEPTION("Remeshing has not been implemented in 3D (see #827 and #860)\n");
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
         ///\todo Implement ReMesh() in 3D (see #1422)
     }
 }

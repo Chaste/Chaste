@@ -541,9 +541,9 @@ void LinearParabolicPdeSystemWithCoupledOdeSystemSolver<ELEMENT_DIM, SPACE_DIM, 
     *mpVtkMetaFile << "</VTKFile>\n";
     mpVtkMetaFile->close();
 #else //CHASTE_VTK
-#define COVERAGE_IGNORE // We only test this in weekly builds
+// LCOV_EXCL_START // We only test this in weekly builds
     WARNING("VTK is not installed and is required for this functionality");
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
 #endif //CHASTE_VTK
 }
 

@@ -72,9 +72,9 @@ double ExponentialMaterialLaw<DIM>::Get_dW_dI2(double I1, double I2)
      * This is covered, but gcov doesn't see this as being covered
      * for some reason, maybe because of optimisations.
      */
-    #define COVERAGE_IGNORE
+    // LCOV_EXCL_START
     assert(DIM == 3);
-    #undef COVERAGE_IGNORE
+    // LCOV_EXCL_STOP
 
     return 0.0;
 }
@@ -92,9 +92,9 @@ double ExponentialMaterialLaw<DIM>::Get_d2W_dI2(double I1, double I2)
      * This is covered, but gcov doesn't see this as being covered
      * for some reason, maybe because of optimisations.
      */
-    #define COVERAGE_IGNORE
+    // LCOV_EXCL_START
     assert(DIM == 3);
-    #undef COVERAGE_IGNORE
+    // LCOV_EXCL_STOP
 
     return 0.0;
 }
@@ -106,9 +106,9 @@ double ExponentialMaterialLaw<DIM>::Get_d2W_dI1I2(double I1, double I2)
      * This is covered, but gcov doesn't see this as being covered
      * for some reason, maybe because of optimisations.
      */
-    #define COVERAGE_IGNORE
+    // LCOV_EXCL_START
     assert(DIM == 3);
-    #undef COVERAGE_IGNORE
+    // LCOV_EXCL_STOP
 
     return 0.0;
 }

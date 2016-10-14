@@ -96,9 +96,9 @@ TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::TrianglesMeshReader(std::string pat
     }
     else
     {
-        #define COVERAGE_IGNORE
+        // LCOV_EXCL_START
         assert(SPACE_DIM==ELEMENT_DIM);
-        #undef COVERAGE_IGNORE
+        // LCOV_EXCL_STOP
         mNodesPerElement = (ELEMENT_DIM+1)*(ELEMENT_DIM+2)/2;
     }
 
@@ -108,9 +108,9 @@ TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::TrianglesMeshReader(std::string pat
     }
     else
     {
-        #define COVERAGE_IGNORE
+        // LCOV_EXCL_START
         assert(SPACE_DIM==ELEMENT_DIM);
-        #undef COVERAGE_IGNORE
+        // LCOV_EXCL_STOP
         mNodesPerBoundaryElement = ELEMENT_DIM*(ELEMENT_DIM+1)/2;
     }
 

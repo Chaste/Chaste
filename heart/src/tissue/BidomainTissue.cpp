@@ -115,11 +115,11 @@ void BidomainTissue<SPACE_DIM>::CreateExtracellularConductivityTensors()
         }
         catch(std::bad_alloc &r_bad_alloc)
         {
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
             std::cout << "Failed to allocate std::vector of size " << num_local_elements << std::endl;
             PetscTools::ReplicateException(true);
             throw r_bad_alloc;
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
         }
         PetscTools::ReplicateException(false);
 

@@ -1076,7 +1076,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::CheckCellPointers()
         unsigned node_index = this->GetLocationIndexUsingCell(p_cell);
         std::cout << "Cell at node " << node_index << " addr " << p_cell << std::endl << std::flush;
         CellPtr p_cell_in_cell_population = this->GetCellUsingLocationIndex(node_index);
-#define COVERAGE_IGNORE //Debugging code.  Shouldn't fail under normal conditions
+// LCOV_EXCL_START //Debugging code.  Shouldn't fail under normal conditions
         if (p_cell_in_cell_population != p_cell)
         {
             std::cout << "  Mismatch with cell population" << std::endl << std::flush;
@@ -1092,7 +1092,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::CheckCellPointers()
     }
     UNUSED_OPT(res);
     assert(res);
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
 
     res = true;
     for (std::set<std::pair<CellPtr,CellPtr> >::iterator it1 = this->mMarkedSprings.begin();
@@ -1111,7 +1111,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::CheckCellPointers()
             unsigned node_index = this->GetLocationIndexUsingCell(p_cell);
             std::cout << "Cell at node " << node_index << " addr " << p_cell << std::endl << std::flush;
 
-#define COVERAGE_IGNORE //Debugging code.  Shouldn't fail under normal conditions
+// LCOV_EXCL_START //Debugging code.  Shouldn't fail under normal conditions
             // Check cell is alive
             if (p_cell->IsDead())
             {
@@ -1134,7 +1134,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::CheckCellPointers()
                 res = false;
             }
         }
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
     }
     assert(res);
 }

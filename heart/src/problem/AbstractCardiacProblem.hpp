@@ -849,14 +849,14 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::LoadExtraArchive
         {
             // If the mesh which was archived was a TetrahedralMesh then we have all the boundary conditions
             // in every process-specific archive.  We no longer test for this.
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
             if (!dynamic_cast<DistributedTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>*>(mpMesh) && orig_num_procs > 1)
             {
                 // The correct way to do this should be:
                 // p_bcc->LoadFromArchive(archive, mpMesh);
                 WARNING("Loading from a parallel archive which used a non-distributed mesh.  This scenario should work but is not fully tested.");
             }
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
             mpBoundaryConditionsContainer->MergeFromArchive(archive, mpMesh);
         }
     }

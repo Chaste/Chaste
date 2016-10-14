@@ -1421,9 +1421,9 @@ void AbstractNonlinearElasticitySolver<DIM>::AssembleOnBoundaryElementForPressur
         }
         else
         {
-            #define COVERAGE_IGNORE
+            // LCOV_EXCL_START
             assert( DIM!=3 || (fabs(weight(0))<1e-6) || (fabs(weight(1))<1e-6) || (fabs(weight(2))<1e-6)  || (fabs(weight(3))<1e-6) );
-            #undef COVERAGE_IGNORE
+            // LCOV_EXCL_STOP
         }
 
         // Now we can compute the grad_phi and then interpolate F
@@ -1818,9 +1818,9 @@ double AbstractNonlinearElasticitySolver<DIM>::TakeNewtonStep()
         // Throw an exception if the solver failed for any reason other than DIVERGED_ITS.
         // This is not covered as would be difficult to cover - requires a bad matrix to
         // assembled, for example.
-        #define COVERAGE_IGNORE
+        // LCOV_EXCL_START
         KSPEXCEPT(reason);
-        #undef COVERAGE_IGNORE
+        // LCOV_EXCL_STOP
     }
     else
     {
@@ -1830,9 +1830,9 @@ double AbstractNonlinearElasticitySolver<DIM>::TakeNewtonStep()
         // (Very difficult to cover in normal tests, requires relative and absolute ksp tols to be very small, there
         // is no interface for setting both of these. Could be covered by setting up a problem the solver
         // finds difficult to solve, but this would be overkill.)
-        #define COVERAGE_IGNORE
+        // LCOV_EXCL_START
         WARN_ONCE_ONLY("Linear solve (within a mechanics solve) didn't converge, but this may not stop nonlinear solve converging")
-        #undef COVERAGE_IGNORE
+        // LCOV_EXCL_STOP
     }
 
     // quit if no ksp iterations were done
@@ -1946,12 +1946,12 @@ double AbstractNonlinearElasticitySolver<DIM>::UpdateSolutionUsingLineSearch(Vec
         // The possible damping values have been manually temporarily altered to
         // get this code to be called, it appears to work correctly. Even if it
         // didn't tests wouldn't fail, they would just be v. slightly less efficient.
-        #define COVERAGE_IGNORE
+        // LCOV_EXCL_START
         // if we exited because we got to the end of the possible damping values, the
         // best one was the last one (excl the final index++ at the end)
         current_resid_norm = next_resid_norm;
         best_index = index-1;
-        #undef COVERAGE_IGNORE
+        // LCOV_EXCL_STOP
     }
     else
     {
@@ -1967,9 +1967,9 @@ double AbstractNonlinearElasticitySolver<DIM>::UpdateSolutionUsingLineSearch(Vec
     // Check out best was better than the original residual-norm
     if (initial_norm_resid < current_resid_norm && !full_first_step)
     {
-        #define COVERAGE_IGNORE
+        // LCOV_EXCL_START
         EXCEPTION("Residual does not appear to decrease in newton direction, quitting");
-        #undef COVERAGE_IGNORE
+        // LCOV_EXCL_STOP
     }
 
     // See documentation for SetTakeFullFirstNewtonStep()
@@ -2054,7 +2054,7 @@ void AbstractNonlinearElasticitySolver<DIM>::SolveNonSnes(double tol)
     {
         tol = NEWTON_REL_TOL*norm_resid;
 
-        #define COVERAGE_IGNORE // not going to have tests in cts for everything
+        // LCOV_EXCL_START // not going to have tests in cts for everything
         if (tol > MAX_NEWTON_ABS_TOL)
         {
             tol = MAX_NEWTON_ABS_TOL;
@@ -2063,7 +2063,7 @@ void AbstractNonlinearElasticitySolver<DIM>::SolveNonSnes(double tol)
         {
             tol = MIN_NEWTON_ABS_TOL;
         }
-        #undef COVERAGE_IGNORE
+        // LCOV_EXCL_STOP
     }
 
     if (this->mVerbose)
@@ -2101,17 +2101,17 @@ void AbstractNonlinearElasticitySolver<DIM>::SolveNonSnes(double tol)
         iteration_number++;
         if (iteration_number==20)
         {
-            #define COVERAGE_IGNORE
+            // LCOV_EXCL_START
             EXCEPTION("Not converged after 20 newton iterations, quitting");
-            #undef COVERAGE_IGNORE
+            // LCOV_EXCL_STOP
         }
     }
 
     if (norm_resid > tol)
     {
-        #define COVERAGE_IGNORE
+        // LCOV_EXCL_START
         EXCEPTION("Failed to converge");
-        #undef COVERAGE_IGNORE
+        // LCOV_EXCL_STOP
     }
 }
 
@@ -2182,7 +2182,7 @@ void AbstractNonlinearElasticitySolver<DIM>::SolveSnes()
     SNESConvergedReason reason;
     SNESGetConvergedReason(snes,&reason);
 
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
     if (err != 0)
     {
         std::stringstream err_stream;
@@ -2202,7 +2202,7 @@ void AbstractNonlinearElasticitySolver<DIM>::SolveSnes()
         SNESDestroy(PETSC_DESTROY_PARAM(snes));
         EXCEPTION("Nonlinear Solver did not converge. PETSc reason code: "+reason_stream.str()+" .");
     }
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
 
     PetscInt num_iters;
     SNESGetIterationNumber(snes,&num_iters);
