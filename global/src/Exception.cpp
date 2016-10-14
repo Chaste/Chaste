@@ -66,16 +66,12 @@ void Exception::SetMessage(const std::string& rMessage,
                            const std::string& rFilename, unsigned lineNumber)
 {
     // Strip off source root dir if exists
-    // Check only valid for cmake builds so ignore coverage here
-    // /todo #2656 - remove coverage ignore after cmake transition
-// LCOV_EXCL_START
     std::string filename(rFilename);
     const size_t root_dir_length = std::char_traits<char>::length(ChasteSourceRootDir());
     if (filename.compare(0,root_dir_length,ChasteSourceRootDir()) == 0)
     {
         filename.replace(0,root_dir_length,"./");
     }
-// LCOV_EXCL_STOP
 
     std::string posix_filename(ChastePosixPathFixer::ToPosix(fs::path(filename)));
     mShortMessage = rMessage;
