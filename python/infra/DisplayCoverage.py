@@ -155,9 +155,9 @@ def coverage_ignore(src_file):
         fp = open(os.path.join(src_file['dir'], src_file['file']))
         code = True
         for line in fp:
-            if line.find('#define COVERAGE_IGNORE') != -1:
+            if line.find('// LCOV_EXCL_START') != -1:
                 code = False
-            elif line.find('#undef COVERAGE_IGNORE') != -1:
+            elif line.find('// LCOV_EXCL_STOP') != -1:
                 code = True
             if code and (line.startswith('template') or line.startswith('class ')):
                 ignore = False
@@ -184,11 +184,11 @@ for src_file in src_files:
         for line in lines:
             count, line_no, src_line = line.split(':', 2)
             count, line_no = count.strip(), line_no.strip()
-            if src_line.find('#define COVERAGE_IGNORE') != -1:
+            if src_line.find('// LCOV_EXCL_START') != -1:
                 ignore = True
                 out_file.write("%9s:%5s:%s" % ('ignored', line_no, src_line))
                 break
-            elif src_line.find('#undef COVERAGE_IGNORE') != -1:
+            elif src_line.find('// LCOV_EXCL_STOP') != -1:
                 ignore = False
                 out_file.write("%9s:%5s:%s" % ('ignored', line_no, src_line))
                 break
