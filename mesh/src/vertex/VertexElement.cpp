@@ -34,7 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "VertexElement.hpp"
 #include <cassert>
-
+#include "Debug.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VertexElement<ELEMENT_DIM, SPACE_DIM>::VertexElement(unsigned index,
@@ -66,22 +66,34 @@ public:
     static const double DELTA_YXZ=1e-6;
     bool operator() (const Node<SPACE_DIM>* pNode1, const Node<SPACE_DIM>* pNode2) const
     {
-        const c_vector<double,SPACE_DIM> Loc1 (pNode1->rGetLocation());
-        const c_vector<double,SPACE_DIM> Loc2 (pNode2->rGetLocation());
+        const c_vector<double, SPACE_DIM> Loc1 (pNode1->rGetLocation());
+        const c_vector<double, SPACE_DIM> Loc2 (pNode2->rGetLocation());
         bool result (false);
-        if (Loc1[1]<Loc2[1])
+
+        // As double doesn't save the exact value, direct comparison could lead to error
+        // e.g. comparison of 0.50000000000000011 and 0.50000000000000044
+        std::vector<double> is_same(SPACE_DIM, false);
+        for ( unsigned i=0 ; i < SPACE_DIM ; ++i )
+            if ( fabs( Loc1[i] - Loc2[i] ) < DELTA_YXZ )
+                is_same[i] = true;
+
+        // Only if the two values aren't the same, the < comparison will make sense
+        if ( !is_same[1] && Loc1[1] < Loc2[1] )
         {
             result = true;
         }
-        else if (fabs(Loc1[1]-Loc2[1])<DELTA_YXZ && Loc1[0]<Loc2[0])
+        else if ( is_same[1] )
         {
-            result = true;
+            if ( !is_same[0] && Loc1[0] < Loc2[0] )
+            {
+                result = true;
+            }
+            else if ( SPACE_DIM==3 && is_same[0] && !is_same[2] && Loc1[2] < Loc2[2] )
+            {
+                result = true;
+            }
         }
-        else if (SPACE_DIM==3 && fabs(Loc1[0]-Loc2[0])<DELTA_YXZ && Loc1[2]<Loc2[2])
-        {
-            result = true;
-        }
-        return (result);
+        return result;
     }
 };
 
