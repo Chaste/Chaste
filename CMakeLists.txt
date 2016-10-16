@@ -651,7 +651,7 @@ if (Chaste_COVERAGE)
 
     # Should be able to specify the config file using --config-file for lcov, 
     # but genhtml then ignores this! So copy to somewhere they both read.
-    file(COPY ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc DESTINATION ~/)
+    file(COPY ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc DESTINATION ~)
     file(RENAME ~/lcovrc ~/.lcovrc) 
          
     set(CTEST_COMMAND ctest)
