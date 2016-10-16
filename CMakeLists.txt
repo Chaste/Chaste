@@ -648,6 +648,11 @@ install(EXPORT chaste-targets
 
 
 if (Chaste_COVERAGE)
+
+    # Should be able to specify the config file using --config-file for lcov, 
+    # but genhtml then ignores this! So copy to somewhere they both read.
+    file(COPY ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc 
+    DESTINATION ~/.lcovrc)
          
     set(CTEST_COMMAND ctest)
     set(_outputname coverage)
@@ -660,8 +665,8 @@ if (Chaste_COVERAGE)
         COMMAND ${CTEST_COMMAND} "-L" "Continuous|Parallel" "--output-on-failure" 
 
 		# Capturing lcov counters and generating report
-		COMMAND ${LCOV_PATH} --directory . --capture --output-file ${_outputname}.info --config-file ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc
-        COMMAND ${LCOV_PATH} --remove ${_outputname}.info /home/bob/petsc* /usr/* */fortests/* */3rdparty/* Debug/* cxxtest/* --output-file ${_outputname}.info.cleaned --config-file ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc
+		COMMAND ${LCOV_PATH} --directory . --capture --output-file ${_outputname}.info
+        COMMAND ${LCOV_PATH} --remove ${_outputname}.info /home/bob/petsc* /usr/* */fortests/* */3rdparty/* Debug/* cxxtest/* --output-file ${_outputname}.info.cleaned
 		COMMAND ${GENHTML_PATH} --no-function-coverage -o ${_outputname} ${_outputname}.info.cleaned
 		COMMAND ${CMAKE_COMMAND} -E remove ${_outputname}.info ${_outputname}.info.cleaned
 
