@@ -55,7 +55,7 @@ genhtml_highlight = 0
 
 # Include color legend in HTML output if non-zero (same as --legend option of
 # genhtml)
-genhtml_legend = 0
+genhtml_legend = 1
 
 # Use FILE as HTML prolog for generated pages (same as --html-prolog option of
 # genhtml)
@@ -127,6 +127,6 @@ lcov_list_width = 80
 lcov_list_truncate_max = 20
 
 # Specify the expression that should be used to ignore single lines.
-lcov_excl_line = NEVER_REACHED
+lcov_excl_line = NEVER_REACHED;
 
 
