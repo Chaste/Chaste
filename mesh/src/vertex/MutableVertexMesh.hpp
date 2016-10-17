@@ -312,6 +312,17 @@ protected:
      */
     c_vector<double, 2> WidenEdgeOrCorrectIntersectionLocationIfNecessary(unsigned indexA, unsigned indexB, c_vector<double,2> intersection);
 
+//    /**
+//     * Helper functional object for T1Swap in 2+1D, called by PerformT1Swap(...) as there is only class template
+//     * specialization but not function template specialization
+//     *  ///\todo write more
+//     */
+//    class Get2dNonLateralFaceWithNodes
+//    {
+//    public:
+//        VertexElement<2, SPACE_DIM>* operator()(unsigned ElemGlobalIndex, Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB);
+//    };
+
     /** Needed for serialization. */
     friend class boost::serialization::access;
 

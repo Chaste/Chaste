@@ -32,7 +32,7 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
-
+#include "Debug.hpp"
 #include "MutableVertexMesh.hpp"
 #include "UblasCustomFunctions.hpp"
 #include "Warnings.hpp"
@@ -1116,6 +1116,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                  *    A   B
                  * ---o---o---
                  */
+                ///\todo fail assertion for 3D
                 assert(pNodeA->IsBoundaryNode());
                 assert(pNodeB->IsBoundaryNode());
 
@@ -1127,6 +1128,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
             {
                 if (nodeA_elem_indices.size()==2 && nodeB_elem_indices.size()==2)
                 {
+                    ///\todo 3D will always ends up here, the other checkings become obsolete. unable to identify type effectively
                     if (pNodeA->IsBoundaryNode() && pNodeB->IsBoundaryNode())
                     {
                         /*
@@ -1207,6 +1209,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                      *  (1)    \ (2)
                      *          \
                      */
+                    ///\todo no point assertion with boundary
                     assert(pNodeA->IsBoundaryNode());
                     assert(pNodeB->IsBoundaryNode());
 
@@ -1263,6 +1266,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                          *  /        \                 \/
                          *                             C
                          */
+                        ///\todo obsolete 3D assertion
                         assert(pNodeA->IsBoundaryNode());
                         assert(pNodeB->IsBoundaryNode());
 
@@ -1441,12 +1445,20 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(Node<SPACE_DIM>* p
                                                               Node<SPACE_DIM>* pNodeB,
                                                               std::set<unsigned>& rElementsContainingNodes)
 {
+    NEVER_REACHED;
+}
+
+template<>
+void MutableVertexMesh<2, 2>::PerformT1Swap(Node<2>* pNodeA, Node<2>* pNodeB,
+                                            std::set<unsigned>& rElementsContainingNodes)
+
+{
     // First compute and store the location of the T1 swap, which is at the midpoint of nodes A and B
     double distance_between_nodes_CD = mCellRearrangementRatio*mCellRearrangementThreshold;
 
-    c_vector<double, SPACE_DIM> nodeA_location = pNodeA->rGetLocation();
-    c_vector<double, SPACE_DIM> nodeB_location = pNodeB->rGetLocation();
-    c_vector<double, SPACE_DIM> vector_AB = this->GetVectorFromAtoB(nodeA_location, nodeB_location);
+    c_vector<double, 2> nodeA_location = pNodeA->rGetLocation();
+    c_vector<double, 2> nodeB_location = pNodeB->rGetLocation();
+    c_vector<double, 2> vector_AB = this->GetVectorFromAtoB(nodeA_location, nodeB_location);
     mLocationsOfT1Swaps.push_back(nodeA_location + 0.5*vector_AB);
 
     double distance_AB = norm_2(vector_AB);
@@ -1484,12 +1496,13 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(Node<SPACE_DIM>* p
      */
 
     // Move nodes A and B to C and D respectively
-    c_vector<double, SPACE_DIM> vector_CD;
+    c_vector<double, 2> vector_CD =zero_vector<double>(2);
     vector_CD(0) = -vector_AB(1) * distance_between_nodes_CD / distance_AB;
     vector_CD(1) =  vector_AB(0) * distance_between_nodes_CD / distance_AB;
+    ///\todo normal of the shared lateral face should be used here.
 
-    c_vector<double, SPACE_DIM> nodeC_location = nodeA_location + 0.5*vector_AB - 0.5*vector_CD;
-    c_vector<double, SPACE_DIM> nodeD_location = nodeC_location + vector_CD;
+    c_vector<double, 2> nodeC_location = nodeA_location + 0.5*vector_AB - 0.5*vector_CD;
+    c_vector<double, 2> nodeD_location = nodeC_location + vector_CD;
 
     pNodeA->rGetModifiableLocation() = nodeC_location;
     pNodeB->rGetModifiableLocation() = nodeD_location;
@@ -1503,27 +1516,30 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(Node<SPACE_DIM>* p
          ++it)
     {
         // If, as in element 3 above, this element does not contain node A (now C)...
+        // Static cast to statisfy the compiler
+        VertexElement<2, 2>* p_this_elem = this->mElements[*it];
+
         if (nodeA_elem_indices.find(*it) == nodeA_elem_indices.end())
         {
             // ...then add it to the element just after node B (now D), going anticlockwise
-            unsigned nodeB_local_index = this->mElements[*it]->GetNodeLocalIndex(pNodeB->GetIndex());
+            unsigned nodeB_local_index = p_this_elem->GetNodeLocalIndex(pNodeB->GetIndex());
             assert(nodeB_local_index < UINT_MAX);
-
-            this->mElements[*it]->AddNode(pNodeA, nodeB_local_index);
+///\todo some modification /checking might be needed here
+            p_this_elem->AddNode(pNodeA, nodeB_local_index);
         }
         else if (nodeB_elem_indices.find(*it) == nodeB_elem_indices.end())
         {
             // Do similarly if the element does not contain node B (now D), as in element 4 above
-            unsigned nodeA_local_index = this->mElements[*it]->GetNodeLocalIndex(pNodeA->GetIndex());
+            unsigned nodeA_local_index = p_this_elem->GetNodeLocalIndex(pNodeA->GetIndex());
             assert(nodeA_local_index < UINT_MAX);
-
-            this->mElements[*it]->AddNode(pNodeB, nodeA_local_index);
+///\todo some modification /checking might be needed here
+            p_this_elem->AddNode(pNodeB, nodeA_local_index);
         }
         else
         {
             // If the element contains both nodes A and B (now C and D respectively)...
-            unsigned nodeA_local_index = this->mElements[*it]->GetNodeLocalIndex(pNodeA->GetIndex());
-            unsigned nodeB_local_index = this->mElements[*it]->GetNodeLocalIndex(pNodeB->GetIndex());
+            unsigned nodeA_local_index = p_this_elem->GetNodeLocalIndex(pNodeA->GetIndex());
+            unsigned nodeB_local_index = p_this_elem->GetNodeLocalIndex(pNodeB->GetIndex());
 
             assert(nodeA_local_index < UINT_MAX);
             assert(nodeB_local_index < UINT_MAX);
@@ -1532,8 +1548,8 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(Node<SPACE_DIM>* p
              * Locate local index of nodeA and nodeB and use the ordering to
              * identify the element, if nodeB_index > nodeA_index then element 4
              * and if nodeA_index > nodeB_index then element 2
-             */
-            unsigned nodeB_local_index_plus_one = (nodeB_local_index + 1)%(this->mElements[*it]->GetNumNodes());
+             */ ///\todo change to accomodate orientation, currently will have no problem as all are generated in CCW from top
+            unsigned nodeB_local_index_plus_one = (nodeB_local_index + 1)%(p_this_elem->GetNumNodes());
 
             if (nodeA_local_index == nodeB_local_index_plus_one)
             {
@@ -1541,21 +1557,21 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(Node<SPACE_DIM>* p
                  * In this case the local index of nodeA is the local index of
                  * nodeB plus one so we are in element 2 so we remove nodeB
                  */
-                this->mElements[*it]->DeleteNode(nodeB_local_index);
+                p_this_elem->DeleteNode(nodeB_local_index);
             }
             else
             {
-                assert(nodeB_local_index == (nodeA_local_index + 1)%(this->mElements[*it]->GetNumNodes())); // as A and B are next to each other
+                assert(nodeB_local_index == (nodeA_local_index + 1)%(p_this_elem->GetNumNodes())); // as A and B are next to each other
                 /*
                  * In this case the local index of nodeA is the local index of
                  * nodeB minus one so we are in element 4 so we remove nodeA
                  */
-                this->mElements[*it]->DeleteNode(nodeA_local_index);
+                p_this_elem->DeleteNode(nodeA_local_index);
             }
         }
     }
 
-    // Sort out boundary nodes
+    // Sort out boundary nodes  ///\todo boundary problem with 3D
     if (pNodeA->IsBoundaryNode() || pNodeB->IsBoundaryNode())
     {
         if (pNodeA->GetNumContainingElements() == 3)
@@ -1575,6 +1591,170 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(Node<SPACE_DIM>* p
             pNodeB->SetAsBoundaryNode(true);
         }
     }
+    ///\todo do apical and basal nodes swap together?
+}
+
+template<>
+void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
+                                            std::set<unsigned>& rElementsContainingNodes)
+{
+    // First compute and store the location of the T1 swap, which is at the midpoint of nodes A and B
+    double distance_between_nodes_CD = mCellRearrangementRatio*mCellRearrangementThreshold;
+
+    c_vector<double, 3> nodeA_location = pNodeA->rGetLocation();
+    c_vector<double, 3> nodeB_location = pNodeB->rGetLocation();
+    c_vector<double, 3> vector_AB = this->GetVectorFromAtoB(nodeA_location, nodeB_location);
+    mLocationsOfT1Swaps.push_back(nodeA_location + 0.5*vector_AB);
+
+    double distance_AB = norm_2(vector_AB);
+    if (distance_AB < 1e-10) ///\todo remove magic number? (see #1884 and #2401)
+    {
+        EXCEPTION("Nodes are too close together, this shouldn't happen");
+    }
+
+    /*
+     * Compute the locations of two new nodes C, D, placed on either side of the
+     * edge E_old formed by nodes A and B, such that the edge E_new formed by the
+     * new nodes is the perpendicular bisector of E_old, with |E_new| 'just larger'
+     * (mCellRearrangementRatio) than mThresholdDistance.
+     *
+     * We implement the following changes to the mesh:
+     *
+     * The element whose index was in nodeA_elem_indices but not nodeB_elem_indices,
+     * and the element whose index was in nodeB_elem_indices but not nodeA_elem_indices,
+     * should now both contain nodes A and B.
+     *
+     * The element whose index was in nodeA_elem_indices and nodeB_elem_indices, and which
+     * node C lies inside, should now only contain node A.
+     *
+     * The element whose index was in nodeA_elem_indices and nodeB_elem_indices, and which
+     * node D lies inside, should now only contain node B.
+     *
+     * Iterate over all elements involved and identify which element they are
+     * in the diagram then update the nodes as necessary.
+     *
+     *   \(1)/
+     *    \ / Node A
+     * (2) |   (4)     elements in brackets
+     *    / \ Node B
+     *   /(3)\
+     */
+
+    // Move nodes A and B to C and D respectively
+    c_vector<double, 3> vector_CD =zero_vector<double>(3);
+    vector_CD(0) = -vector_AB(1) * distance_between_nodes_CD / distance_AB;
+    vector_CD(1) =  vector_AB(0) * distance_between_nodes_CD / distance_AB;
+    ///\todo normal of the shared lateral face should be used here.
+
+    c_vector<double, 3> nodeC_location = nodeA_location + 0.5*vector_AB - 0.5*vector_CD;
+    c_vector<double, 3> nodeD_location = nodeC_location + vector_CD;
+
+    pNodeA->rGetModifiableLocation() = nodeC_location;
+    pNodeB->rGetModifiableLocation() = nodeD_location;
+
+    // Find the sets of elements containing nodes A and B
+    std::set<unsigned> nodeA_elem_indices = pNodeA->rGetContainingElementIndices();
+    std::set<unsigned> nodeB_elem_indices = pNodeB->rGetContainingElementIndices();
+
+    for (std::set<unsigned>::const_iterator it = rElementsContainingNodes.begin();
+         it != rElementsContainingNodes.end();
+         ++it)
+    {
+        // If, as in element 3 above, this element does not contain node A (now C)...
+        VertexElement<2, 3>* p_this_elem;
+        const unsigned node_type = unsigned (pNodeA->rGetNodeAttributes()[0]);
+        // Make sure both nodes are on the same side. ///\todo Lateral T1 swap not yet possible
+        assert( node_type == unsigned (pNodeB->rGetNodeAttributes()[0]) );
+        // It must be either a(n) apical or basal node
+        assert( node_type == 1u || node_type == 2u);
+        VertexElement<3, 3>& higher_elem = *(this->mElements[*it]);
+
+        for (unsigned face_index=0 ; face_index<higher_elem.GetNumFaces() ; ++face_index )
+        {
+            if ( unsigned (higher_elem.GetFace(face_index)->rGetElementAttributes()[0]) == node_type )
+            {
+                p_this_elem = higher_elem.GetFace(face_index);
+                break;
+            }
+        }
+
+        if (nodeA_elem_indices.find(*it) == nodeA_elem_indices.end())
+        {
+            // ...then add it to the element just after node B (now D), going anticlockwise
+            unsigned nodeB_local_index = p_this_elem->GetNodeLocalIndex(pNodeB->GetIndex());
+            assert(nodeB_local_index < UINT_MAX);
+///\todo some modification /checking might be needed here
+/// need to add face as well
+            p_this_elem->AddNode(pNodeA, nodeB_local_index);
+        }
+        else if (nodeB_elem_indices.find(*it) == nodeB_elem_indices.end())
+        {
+            // Do similarly if the element does not contain node B (now D), as in element 4 above
+            unsigned nodeA_local_index = p_this_elem->GetNodeLocalIndex(pNodeA->GetIndex());
+            assert(nodeA_local_index < UINT_MAX);
+///\todo some modification /checking might be needed here
+// need to add face as welll
+            p_this_elem->AddNode(pNodeB, nodeA_local_index);
+        }
+        else
+        {
+            // If the element contains both nodes A and B (now C and D respectively)...
+            unsigned nodeA_local_index = p_this_elem->GetNodeLocalIndex(pNodeA->GetIndex());
+            unsigned nodeB_local_index = p_this_elem->GetNodeLocalIndex(pNodeB->GetIndex());
+
+            assert(nodeA_local_index < UINT_MAX);
+            assert(nodeB_local_index < UINT_MAX);
+
+            /*
+             * Locate local index of nodeA and nodeB and use the ordering to
+             * identify the element, if nodeB_index > nodeA_index then element 4
+             * and if nodeA_index > nodeB_index then element 2
+             */ ///\todo change to accomodate orientation, currently will have no problem as all are generated in CCW from top
+            unsigned nodeB_local_index_plus_one = (nodeB_local_index + 1)%(p_this_elem->GetNumNodes());
+
+            if (nodeA_local_index == nodeB_local_index_plus_one)
+            {
+                /*
+                 * In this case the local index of nodeA is the local index of
+                 * nodeB plus one so we are in element 2 so we remove nodeB
+                 */
+                higher_elem.DeleteNode(nodeB_local_index);
+// higher elem need to delete face as well
+            }
+            else
+            {
+                assert(nodeB_local_index == (nodeA_local_index + 1)%(p_this_elem->GetNumNodes())); // as A and B are next to each other
+                /*
+                 * In this case the local index of nodeA is the local index of
+                 * nodeB minus one so we are in element 4 so we remove nodeA
+                 */
+                higher_elem.DeleteNode(nodeA_local_index);
+//higher elem need to delete face as well
+            }
+        }
+    }
+
+    // Sort out boundary nodes  ///\todo boundary problem with 3D
+    if (pNodeA->IsBoundaryNode() || pNodeB->IsBoundaryNode())
+    {
+        if (pNodeA->GetNumContainingElements() == 3)
+        {
+            pNodeA->SetAsBoundaryNode(false);
+        }
+        else
+        {
+            pNodeA->SetAsBoundaryNode(true);
+        }
+        if (pNodeB->GetNumContainingElements() == 3)
+        {
+            pNodeB->SetAsBoundaryNode(false);
+        }
+        else
+        {
+            pNodeB->SetAsBoundaryNode(true);
+        }
+    }
+    ///\todo do apical and basal nodes swap together?
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -3159,6 +3339,42 @@ c_vector<double, 2> MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::WidenEdgeOrCorrec
     }
     return intersection;
 }
+
+//template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+//VertexElement<2, SPACE_DIM>* MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::Get2dNonLateralFaceWithNodes(
+//        unsigned ElemGlobalIndex, Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB)
+//{
+//    if ( ELEMENT_DIM == 2 )
+//            {
+//                p_this_elem = this->mElements[*it];
+//            }
+//            else if ( ELEMENT_DIM == 3 )
+//            {
+//                const unsigned node_type = unsigned (pNodeA->rGetNodeAttributes()[0]);
+//                // Make sure both nodes are on the same side. ///\todo Lateral T1 swap not yet possible
+//                assert( node_type == unsigned (pNodeB->rGetNodeAttributes()[0]) );
+//                // It must be either a(n) apical or basal node
+//                assert( node_type == 1u || node_type == 2u);
+//                VertexElement<ELEMENT_DIM, SPACE_DIM>& higher_elem = *(this->mElements[*it]);
+//
+//                for (unsigned face_index=0 ; face_index<higher_elem.GetNumFaces() ; ++face_index )
+//                {
+//                    if ( unsigned (higher_elem.GetFace(face_index)->rGetElementAttributes()[0]) == node_type )
+//                    {
+//                        p_this_elem = higher_elem.GetFace(face_index);
+//                        break;
+//                    }
+//                }
+//            }
+//    NEVER_REACHED;
+//}
+//
+//template<unsigned SPACE_DIM>
+//VertexElement<2, SPACE_DIM>* MutableVertexMesh<2, SPACE_DIM>::Get2dNonLateralFaceWithNodes(
+//        unsigned ElemGlobalIndex, Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB)
+//{
+//    return this->mElements[*it];
+//}
 
 // Explicit instantiation
 template class MutableVertexMesh<1,1>;
