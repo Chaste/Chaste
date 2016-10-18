@@ -910,6 +910,9 @@ public:
         TS_ASSERT_DELTA(p_tet_mesh->GetNode(3)->rGetLocation()[1], 1.0, 1e-6);
         TS_ASSERT_DELTA(p_tet_mesh->GetNode(7)->rGetLocation()[0], 1.0, 1e-6);
         TS_ASSERT_DELTA(p_tet_mesh->GetNode(7)->rGetLocation()[1], 2.0, 1e-6);
+
+        // Tidy up
+        delete p_tet_mesh;
     }
 };
 
