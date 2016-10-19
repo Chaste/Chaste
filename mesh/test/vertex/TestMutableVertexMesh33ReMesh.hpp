@@ -70,6 +70,36 @@ public:
     }
 
 
+    void PrintMesh() const
+    {
+        for (unsigned i=0; i<mpMesh->GetNumElements(); ++i)
+        {
+            VertexElement<3,3>& elem = *(mpMesh->GetElement(i));
+            std::cout << "ELEMENT (" << i<< ") : " << elem.GetIndex() << std::endl;
+            std::cout << "number of Faces : " << elem.GetNumFaces() << " {  ";
+            for (unsigned j=0; j<elem.GetNumFaces(); ++j)
+            {
+                std::cout << elem.GetFace(j)->GetIndex() << "  ";
+            }
+            std::cout << "}" << std::endl;
+            std::cout << "number of Nodes : " << elem.GetNumNodes() << " {  ";
+            for (unsigned j=0; j<elem.GetNumNodes(); ++j)
+            {
+                std::cout << elem.GetNode(j)->GetIndex() << "  ";
+            }
+            std::cout << "}" << std::endl;
+
+            VertexElement<2,3>& basal = *(elem.GetFace(0));
+            std::cout << "Nodes for basal face " << basal.GetIndex() << " {  ";
+            for (unsigned j=0; j<basal.GetNumNodes(); ++j)
+            {
+                std::cout << basal.GetNode(j)->GetIndex() << "  ";
+            }
+            std::cout << "}" << std::endl;
+        }
+        std::cout << std::endl;
+    }
+
     void buildElementWith(const unsigned numNodesThis, const unsigned nodeIndicesThis[] )
     {
         // Initializing vectors which are required for the generation of the VertexElement<3, 3>
@@ -80,11 +110,14 @@ public:
 
         std::vector<Node<3>*> lower_nodes_this_elem(numNodesThis);
         std::vector<Node<3>*> upper_nodes_this_elem(numNodesThis);
+        std::vector<Node<3>*> all_nodes_this_elem(2*numNodesThis);
         // Populate lower&upper_nodes_this_elem
         for (unsigned j=0; j<numNodesThis; ++j)
         {
             lower_nodes_this_elem[j] = mLowerNodes[ nodeIndicesThis[j] ];
             upper_nodes_this_elem[j] = mUpperNodes[ nodeIndicesThis[j] ];
+            all_nodes_this_elem[j] = mLowerNodes[ nodeIndicesThis[j] ];
+            all_nodes_this_elem[j+numNodesThis] = mUpperNodes[ nodeIndicesThis[j] ];
         }
 
 
@@ -168,23 +201,18 @@ public:
             }
         }
 
-        VertexElement<3, 3>* p_elem = new VertexElement<3, 3>(mElements.size(), faces_this_elem, faces_orientation);
+        VertexElement<3, 3>* p_elem = new VertexElement<3, 3>(mElements.size(), faces_this_elem, faces_orientation, all_nodes_this_elem);
         mElements.push_back( p_elem );
     }
 
     ~MeshBuilderHelper()
     {
-        std::cout << "Destructorrr!!! \n";
         if (mpMesh)
-        {
             delete mpMesh;
-            std::cout << "mesh deleted!\n";
-        }
-
     }
 };
 
-class TestMutableVertexMeshReMesh : public CxxTest::TestSuite
+class TestMutableVertexMesh33ReMesh : public CxxTest::TestSuite
 {
 public:
 
@@ -209,9 +237,9 @@ public:
         nodes.push_back(new Node<3>(5, true, 0.5, 0.6, 0.0));
 
         unsigned node_indices_elem_0[3] = {2, 3, 5};
-        unsigned node_indices_elem_1[4] = {2, 5, 4, 1};
-        unsigned node_indices_elem_2[3] = {1, 4, 0};
-        unsigned node_indices_elem_3[4] = {0, 4, 5, 3};
+        unsigned node_indices_elem_1[4] = {4, 1, 2, 5};
+        unsigned node_indices_elem_2[3] = {0, 1, 4};
+        unsigned node_indices_elem_3[4] = {4, 5, 3, 0};
 
 
         MeshBuilderHelper builder(nodes);
@@ -224,48 +252,56 @@ public:
 
         VertexMeshWriter<3, 3> writer("ReMesh33", "First_T1", false);
         writer.WriteVtkUsingMeshWithCellId(vertex_mesh, "", false);
+        builder.PrintMesh();
 
-
-
-
-        // Set the threshold distance between vertices for a T1 swap as follows, to ease calculations
-        vertex_mesh.SetCellRearrangementThreshold(0.1*2.0/1.5);
-MARK
-        // Perform a T1 swap on nodes 4 and 5
-        vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(5), vertex_mesh.GetNode(4));
-
-VertexMeshWriter<3, 3> writer2("ReMesh33", "First_T1_swap", false);
+        // Set the threshold distance between vertices for a T1 swap as follows
+        // so that it will trigger CheckForSwapsFromShortEdges
+        vertex_mesh.SetCellRearrangementThreshold(0.3);
+        vertex_mesh.CheckForSwapsFromShortEdges();
+        VertexMeshWriter<3, 3> writer2("ReMesh33", "First_T1_swap", false);
         writer2.WriteVtkUsingMeshWithCellId(vertex_mesh, "", false);
 
-
-
         // Test that each moved node has the correct location following the rearrangement
-//        TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[0], 0.6, 1e-8);
-//        TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[1], 0.5, 1e-8);
-//        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[0], 0.4, 1e-3);
-//        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[1], 0.5, 1e-3);
-//
-//        // Test that each element contains the correct nodes following the rearrangement
-//        unsigned node_indices_element_0[4] = {2, 3, 5, 4};
-//        unsigned node_indices_element_1[3] = {2, 4, 1};
-//        unsigned node_indices_element_2[4] = {1, 4, 5, 0};
-//        unsigned node_indices_element_3[3] = {0, 5, 3};
-//        for (unsigned i=0; i<4; i++)
-//        {
-//            TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
-//            TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(i), node_indices_element_2[i]);
-//            if (i < 3)
-//            {
-//                TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(i), node_indices_element_1[i]);
-//                TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNodeGlobalIndex(i), node_indices_element_3[i]);
-//            }
-//        }
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[0], 0.725, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[1], 0.5, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[0], 0.275, 1e-3);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[1], 0.5, 1e-3);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(10)->rGetLocation()[0], 0.725, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(10)->rGetLocation()[1], 0.5, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(11)->rGetLocation()[0], 0.275, 1e-3);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(11)->rGetLocation()[1], 0.5, 1e-3);
 
+        // Test that each element contains the correct nodes following the rearrangement
+        unsigned node_indices_element_0[4] = {2, 3, 5, 4};
+        unsigned node_indices_element_1[3] = {4, 1, 2};
+        unsigned node_indices_element_2[4] = {0, 1, 4, 5};
+        unsigned node_indices_element_3[3] = {5, 3, 0};
+        for (unsigned i=0; i<4; i++)
+        {
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(i), node_indices_element_2[i]);
+            if (i < 3)
+            {
+                TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(i), node_indices_element_1[i]);
+                TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNodeGlobalIndex(i), node_indices_element_3[i]);
+            }
+        }
 
+        // Perform a T1 swap on nodes 4 and 5
+        vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(4), vertex_mesh.GetNode(5));
+        VertexMeshWriter<3, 3> writer3("ReMesh33", "Second_T1_swap", false);
+        writer3.WriteVtkUsingMeshWithCellId(vertex_mesh, "", false);
 
-
-
-
+        // Keep testing...
+        vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(5), vertex_mesh.GetNode(4));
+        vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(5), vertex_mesh.GetNode(4));
+        vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(5), vertex_mesh.GetNode(4));
+        vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(4), vertex_mesh.GetNode(5));
+        vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(4), vertex_mesh.GetNode(5));
+        vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(5), vertex_mesh.GetNode(4));
+        vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(4), vertex_mesh.GetNode(5));
+        vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(4), vertex_mesh.GetNode(5));
+        vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(5), vertex_mesh.GetNode(4));
 
 
 

@@ -67,6 +67,7 @@ class MutableVertexMesh : public VertexMesh<ELEMENT_DIM, SPACE_DIM>
     friend class TestMutableVertexMesh;
     friend class TestMutableVertexMeshReMesh;
     friend class TestMutableVertexMeshRosetteMethods;
+    friend class TestMutableVertexMesh33ReMesh;
 
 protected:
 
@@ -638,6 +639,9 @@ public:
      *
      * This method calls several other methods, in particular CheckForT2Swaps(), CheckForSwapsFromShortEdges()
      * and CheckForIntersections().
+     *
+     * For 3D, criteria for T1 swap according to Bielmeier et. al. (2016), which happens if both apical
+     * and basal edges are smaller than the threshold.
      *
      * @param rElementMap a VertexElementMap which associates the indices of VertexElements in the old mesh
      *                   with indices of VertexElements in the new mesh.  This should be created

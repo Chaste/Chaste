@@ -917,8 +917,14 @@ bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForSwapsFromShortEdges()
          ++elem_iter)
     {
         ///\todo Could we search more efficiently by just iterating over edges? (see #2401)
-
         unsigned num_nodes = elem_iter->GetNumNodes();
+        if (ELEMENT_DIM == 3)
+        {
+            // Since both apical and basal juction need to be less than threshold, it is done as follows:
+            // check only the edges at one side, if too short, then check for the edge at the other side.
+            assert (num_nodes%2 == 0);
+            num_nodes /= 2;
+        }
         assert(num_nodes > 0);
 
         // Loop over the nodes contained in this element
@@ -935,6 +941,22 @@ bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForSwapsFromShortEdges()
             // If the nodes are too close together...
             if (distance_between_nodes < mCellRearrangementThreshold)
             {
+                if (ELEMENT_DIM == 3)
+                {
+                    // according to Bielmeier, T1 swap if both are smaller than Threshold
+                    assert(this->GetNumAllNodes()%2 == 0);
+                    const unsigned half_num_nodes_in_mesh = this->GetNumNodes()/2;
+                    const unsigned opposite_node_1_index = elem_iter->GetNode(local_index + num_nodes)->GetIndex();
+                    const unsigned opposite_node_2_index = elem_iter->GetNode(local_index_plus_one + num_nodes)->GetIndex();
+                    assert(opposite_node_1_index == p_current_node->GetIndex() + half_num_nodes_in_mesh);
+                    assert(opposite_node_2_index ==  p_anticlockwise_node->GetIndex() + half_num_nodes_in_mesh);
+                    const double distance_between_nodes = this->GetDistanceBetweenNodes(opposite_node_1_index, opposite_node_2_index);
+                    // so if the other side is still longer than threshold, nothing shall be done. Thus continue.
+                    if (distance_between_nodes > mCellRearrangementThreshold)
+                    {
+                        continue;
+                    }
+                }
                 // ...then check if any triangular elements are shared by these nodes...
                 std::set<unsigned> elements_of_node_a = p_current_node->rGetContainingElementIndices();
                 std::set<unsigned> elements_of_node_b = p_anticlockwise_node->rGetContainingElementIndices();
@@ -1687,21 +1709,25 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
             // Element 3 is found (contains B but not A)
             // Save variables for later use.
             p_elem_3 = p_elem;
-            elem_3_swap_face_index = node_b_local_index;
+            elem_3_swap_face_index = node_b_local_index + 1;
 
             // Add respective nodes to the non-lateral faces
             p_this_face->FaceAddNode(pNodeA, node_b_local_index);
             p_other_face->FaceAddNode(p_node_x, node_b_local_index);
+            p_elem->AddNode(pNodeA, p_elem->GetNodeLocalIndex(node_b_index));
+            p_elem->AddNode(p_node_x, p_elem->GetNodeLocalIndex(p_node_y->GetIndex()));
         }
         else if (node_b_local_index == UINT_MAX)
         {
             assert(node_a_local_index < UINT_MAX);
             // Now we have element 1, similar operations as element 3.
             p_elem_1 = p_elem;
-            elem_1_swap_face_index = node_a_local_index;
+            elem_1_swap_face_index = node_a_local_index + 1;
 
             p_this_face->FaceAddNode(pNodeB, node_a_local_index);
             p_other_face->FaceAddNode(p_node_y, node_a_local_index);
+            p_elem->AddNode(pNodeB, p_elem->GetNodeLocalIndex(node_a_index));
+            p_elem->AddNode(p_node_y, p_elem->GetNodeLocalIndex(p_node_x->GetIndex()));
         }
         else
         {
@@ -1724,10 +1750,6 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
                 swap_face_local_index = node_b_local_index + 2;
                 orientation_face_swap_2 = p_elem->FaceIsOrientatedAntiClockwise(swap_face_local_index);
 
-                // Apical and basal faces are rather straight forward.
-                p_this_face->FaceDeleteNode(node_b_local_index);
-                p_other_face->FaceDeleteNode(node_b_local_index);
-
                 // Lateral face between element 2 and 3 need node-reassignment.
                 // Its face index is the previous face of swap face (ignoring the apical&basal)
                 VertexElement<2, 3>* p_lateral_face_23 = p_elem->GetFace((node_b_local_index-1)%p_this_face->GetNumNodes() + 2);
@@ -1739,8 +1761,15 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
                 // only 4 nodes, and pair nodes should be just next to each other in ring.
                 assert( node_b_lateral_local_index + node_y_lateral_local_index == 3 );
 
+                // Apical and basal faces are rather straight forward.
+                p_this_face->FaceDeleteNode(node_b_local_index);
+                p_other_face->FaceDeleteNode(node_b_local_index);
+
                 p_lateral_face_23->FaceUpdateNode(node_b_lateral_local_index, pNodeA);
                 p_lateral_face_23->FaceUpdateNode(node_y_lateral_local_index, p_node_x);
+
+                p_elem->DeleteNode(p_elem->GetNodeLocalIndex(node_b_index));
+                p_elem->DeleteNode(p_elem->GetNodeLocalIndex(p_node_y->GetIndex()));
             }
             else
             {
@@ -1751,9 +1780,6 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
                 swap_face_local_index = node_a_local_index + 2;
                 orientation_face_swap_4 = p_elem->FaceIsOrientatedAntiClockwise(swap_face_local_index);
 
-                p_this_face->FaceDeleteNode(node_a_local_index);
-                p_other_face->FaceDeleteNode(node_a_local_index);
-
                 VertexElement<2, 3>* p_lateral_face_14 = p_elem->GetFace((node_a_local_index-1)%p_this_face->GetNumNodes() + 2);
                 assert(p_lateral_face_14->GetNodeLocalIndex(node_a_index) != UINT_MAX);
 
@@ -1761,8 +1787,14 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
                 const unsigned lateral_x_local_index = p_lateral_face_14->GetNodeLocalIndex(p_node_x->GetIndex());
                 assert( lateral_a_local_index + lateral_x_local_index == 3);
 
+                p_this_face->FaceDeleteNode(node_a_local_index);
+                p_other_face->FaceDeleteNode(node_a_local_index);
+
                 p_lateral_face_14->FaceUpdateNode(lateral_a_local_index, pNodeB);
                 p_lateral_face_14->FaceUpdateNode(lateral_x_local_index, p_node_y);
+
+                p_elem->DeleteNode(p_elem->GetNodeLocalIndex(node_a_index));
+                p_elem->DeleteNode(p_elem->GetNodeLocalIndex(p_node_x->GetIndex()));
             }
             // After getting the index, we can now settle the swap face.
             if ( p_lateral_swap_face == NULL )
