@@ -34,7 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "VertexElement.hpp"
 #include <cassert>
-#include "Debug.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VertexElement<ELEMENT_DIM, SPACE_DIM>::VertexElement(unsigned index,
@@ -57,7 +56,6 @@ VertexElement<ELEMENT_DIM, SPACE_DIM>::VertexElement(unsigned index,
         this->RegisterWithNodes();
     }
 }
-
 
 template<unsigned SPACE_DIM>
 class NodeLessThanYxz
@@ -196,6 +194,123 @@ bool VertexElement<ELEMENT_DIM, SPACE_DIM>::FaceIsOrientatedAntiClockwise(unsign
     return mOrientations[index];
 }
 
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VertexElement<ELEMENT_DIM, SPACE_DIM>::FaceUpdateNode(const unsigned& rIndex, Node<SPACE_DIM>* pNode)
+{
+    assert(rIndex < this->mNodes.size());
+
+    // Update the node at this location
+    this->mNodes[rIndex] = pNode;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VertexElement<ELEMENT_DIM, SPACE_DIM>::FaceDeleteNode(const unsigned& rIndex)
+{
+    assert(rIndex < this->mNodes.size());
+
+    // Remove the node at rIndex (removes node from element)
+    this->mNodes.erase(this->mNodes.begin() + rIndex);
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VertexElement<ELEMENT_DIM, SPACE_DIM>::FaceAddNode(Node<SPACE_DIM>* pNode, const unsigned& rIndex)
+{
+    assert(rIndex < this->mNodes.size());
+
+    // Add pNode to rIndex+1 element of mNodes pushing the others up
+    this->mNodes.insert(this->mNodes.begin() + rIndex+1,  pNode);
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VertexElement<ELEMENT_DIM, SPACE_DIM>::DeleteFace(const unsigned& rIndex)
+{
+    assert(rIndex < this->mFaces.size());
+
+    // Remove the face and orientation at rIndex (removes face from element)
+    this->mFaces.erase(this->mFaces.begin() + rIndex);
+    this->mOrientations.erase(this->mOrientations.begin() + rIndex);
+
+    assert(mFaces.size() == mOrientations.size());
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VertexElement<ELEMENT_DIM, SPACE_DIM>::AddFace(VertexElement<ELEMENT_DIM-1, SPACE_DIM>* pFace,
+                                                    bool& Orientation,const unsigned& rIndex)
+{
+    assert(rIndex < this->mFaces.size());
+
+    // Add pFace to rIndex+1 element of mFaces pushing the others up
+    this->mFaces.insert(this->mFaces.begin() + rIndex+1,  pFace);
+    this->mOrientations.insert(this->mOrientations.begin() +rIndex+1, Orientation);
+
+    assert(mFaces.size() == mOrientations.size());
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+c_vector<double, SPACE_DIM> VertexElement<ELEMENT_DIM, SPACE_DIM>::GetCentroid() const
+{
+    unsigned num_nodes = this->GetNumNodes();
+
+    c_vector<double, SPACE_DIM> centroid = zero_vector<double>(SPACE_DIM);
+
+    switch (SPACE_DIM)
+    {
+        case 2:
+        {
+            double centroid_x = 0;
+            double centroid_y = 0;
+
+            // Note that we cannot use GetVolumeOfElement() below as it returns the absolute, rather than signed, area
+            double element_signed_area = 0.0;
+
+            // Map the first vertex to the origin and employ GetVectorFromAtoB() to allow for periodicity
+            c_vector<double, SPACE_DIM> first_node_location = this->GetNodeLocation(0);
+            c_vector<double, SPACE_DIM> pos_1 = zero_vector<double>(SPACE_DIM);
+
+            // Loop over vertices
+            for (unsigned local_index=0; local_index<num_nodes; local_index++)
+            {
+                c_vector<double, SPACE_DIM> next_node_location = this->GetNodeLocation((local_index+1)%num_nodes);
+                c_vector<double, SPACE_DIM> pos_2 = next_node_location - first_node_location;
+
+                double this_x = pos_1[0];
+                double this_y = pos_1[1];
+                double next_x = pos_2[0];
+                double next_y = pos_2[1];
+
+                double signed_area_term = this_x*next_y - this_y*next_x;
+
+                centroid_x += (this_x + next_x)*signed_area_term;
+                centroid_y += (this_y + next_y)*signed_area_term;
+                element_signed_area += 0.5*signed_area_term;
+
+                pos_1 = pos_2;
+            }
+
+            assert(element_signed_area != 0.0);
+
+            // Finally, map back and employ GetVectorFromAtoB() to allow for periodicity
+            centroid = first_node_location;
+            centroid(0) += centroid_x / (6.0*element_signed_area);
+            centroid(1) += centroid_y / (6.0*element_signed_area);
+        }
+        break;
+        case 3:
+        {
+            ///\todo compute centroid rather than centre of mass (see #1422)
+            for (unsigned local_index=0; local_index<num_nodes; ++local_index)
+            {
+                centroid += this->GetNodeLocation(local_index);//PRINT_VARIABLE(p_element->GetNodeLocation(local_index));
+            }
+            centroid /= ((double) num_nodes);
+        }
+        break;
+        default:
+            NEVER_REACHED;
+    }
+    return centroid;
+}
+
 //////////////////////////////////////////////////////////////////////
 //                  Specialization for 1d elements                  //
 //                                                                  //
@@ -230,6 +345,11 @@ bool VertexElement<1, SPACE_DIM>::FaceIsOrientatedAntiClockwise(unsigned index) 
     return false;
 }
 
+template<unsigned SPACE_DIM>
+c_vector<double, SPACE_DIM> VertexElement<1, SPACE_DIM>::GetCentroid() const
+{
+    return 0.5*(this->GetNodeLocation(0) + this->GetNodeLocation(1));
+}
 
 /////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation

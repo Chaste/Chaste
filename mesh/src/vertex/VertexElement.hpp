@@ -169,6 +169,55 @@ public:
      * @param index the index of the face
      */
     bool FaceIsOrientatedAntiClockwise(unsigned index) const;
+
+    /**
+     * Method for faces. Update node at the given index.
+     *
+     * @param rIndex is an local index to which node to change
+     * @param pNode is a pointer to the replacement node
+     */
+    void FaceUpdateNode(const unsigned& rIndex, Node<SPACE_DIM>* pNode);
+
+    /**
+     * Method for faces. Delete a node with given local index.
+     *
+     * @param rIndex is the local index of the node to remove
+     */
+    void FaceDeleteNode(const unsigned& rIndex);
+
+    /**
+     * Method for faces. Add a node to the element between nodes at rIndex and rIndex+1.
+     *
+     * @param rIndex the local index of the node after which the new node is added
+     * @param pNode a pointer to the new node
+     */
+    void FaceAddNode(Node<SPACE_DIM>* pNode, const unsigned& rIndex);
+
+    /**
+     * Delete a face of an element with given local index. This method will
+     * remove the corresponding face orientation as well.
+     *
+     * @param rIndex is the local index of the face to remove
+     */
+    void DeleteFace(const unsigned& rIndex);
+
+    /**
+     * Add a face of an element with given local index. This method will
+     * add the corresponding face orientation as well.
+     *
+     * @param pFace is the face to add
+     * @param Orientation is the orientation of pFace
+     * @param rIndex is the local index of the face to add
+     */
+    void AddFace(VertexElement<ELEMENT_DIM-1, SPACE_DIM>* pFace, bool& Orientation,const unsigned& rIndex);
+
+    /**
+     * Compute the centroid of an element. Exact same function as VertexMesh::GetCentroidOfElement(const unsigned&)
+     * but it has been added so that it is accessible for faces as well
+     *
+     * @return centroid of the VertexElement.
+     */
+    c_vector<double, SPACE_DIM> GetCentroid() const;
 };
 
 
@@ -213,6 +262,14 @@ public:
      * @param index the index of the face
      */
     bool FaceIsOrientatedAntiClockwise(unsigned index) const;
+
+    /**
+     * Compute the centroid of an element. Exact same function as VertexMesh::GetCentroidOfElement(const unsigned&)
+     * but it has been added so that it is accessible for faces as well
+     *
+     * @return centroid of the VertexElement.
+     */
+    c_vector<double, SPACE_DIM> GetCentroid() const;
 };
 
 #endif /*VERTEXELEMENT_HPP_*/

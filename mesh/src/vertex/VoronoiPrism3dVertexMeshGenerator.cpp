@@ -399,7 +399,7 @@ void VoronoiPrism3dVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_
                     // Now need to search for the same lateral face index in both vector
                     // not a too complicated and resource intensive (as r_faces_index vectors have length of at most 3 or 4
                     // therefore not using existing function in <algorithm>
-                    for (unsigned i1 = 0; i1 < r_face1_indices.size(); ++i1)
+                    for (unsigned i1 = 0; i1 < r_face1_indices.size() && existing_face_index==UINT_MAX; ++i1)
                     {
                         for (unsigned i2 = 0; ( i2 < r_face2_indices.size() && existing_face_index==UINT_MAX ); ++i2)
                         {

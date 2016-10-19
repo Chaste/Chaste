@@ -1530,6 +1530,7 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateUnitNormalToFaceWithArea(Ver
     // Reset the answer
     rNormal = zero_vector<double>(SPACE_DIM);
 
+    ///\todo maybe calculate w.r.t. centroid rather than v0, as this might affect Element<2,3> with non-even face.
     c_vector<double, SPACE_DIM> v_minus_v0 = this->GetVectorFromAtoB(pFace->GetNode(0)->rGetLocation(), pFace->GetNode(1)->rGetLocation());
     for (unsigned local_index=2; local_index<pFace->GetNumNodes(); local_index++)
     {
@@ -1589,13 +1590,7 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetVolumeGradien
             const unsigned previous_local_index = (this_local_index-1+num_nodes)%num_nodes;
             const c_vector<double, SPACE_DIM> previous_to_next = p_face->GetNodeLocation(next_local_index) - p_face->GetNodeLocation(previous_local_index);
 
-            // Simply just copied from GetCentroidOfElement as it cannot be utilise directly
-            c_vector<double, SPACE_DIM> face_centroid = zero_vector<double>(SPACE_DIM);
-            for (unsigned tmp_index=0; tmp_index<num_nodes; ++tmp_index)
-            {
-                face_centroid += p_face->GetNodeLocation(tmp_index);
-            }
-            face_centroid /= ((double) num_nodes);
+            c_vector<double, SPACE_DIM> face_centroid = p_face->GetCentroid();
             this_face_gradient_contribution += VectorProduct(face_centroid, previous_to_next) / 6.0;
 
             c_vector<double, 3> face_area = zero_vector<double>(3);
@@ -1634,14 +1629,7 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetAreaGradientO
 
     const unsigned num_nodes_in_face = pFace->GetNumNodes();
     c_vector<double, SPACE_DIM> area_gradient = zero_vector<double>(SPACE_DIM);
-
-    // Simply just copied from GetCentroidOfElement as it cannot be utilise directly
-    c_vector<double, SPACE_DIM> face_centroid = zero_vector<double>(SPACE_DIM);
-    for (unsigned tmp_index=0; tmp_index<num_nodes_in_face; ++tmp_index)
-    {
-        face_centroid += pFace->GetNodeLocation(tmp_index);
-    }
-    face_centroid /= ((double) num_nodes_in_face);
+    c_vector<double, SPACE_DIM> face_centroid = pFace->GetCentroid();
 
     // Now we need to loop through all the sub area according to Misra's paper
     // As in 3D, the area vector have x- and y-components, thus the simplified formula for 2D case is not used.
@@ -1697,6 +1685,16 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetAreaGradientO
 
     return area_gradient;
 }
+
+// to satisfy the compiler. Tried to just specialize only ELEMENT_DIM but didn't work out
+//template<unsigned SPACE_DIM>
+//c_vector<double, SPACE_DIM> VertexMesh<1, SPACE_DIM>::GetAreaGradientOfFaceAtNode(VertexElement<0,SPACE_DIM>* pFace, unsigned localIndex) {NEVER_REACHED;}
+template<>
+c_vector<double, 1> VertexMesh<1, 1>::GetAreaGradientOfFaceAtNode(VertexElement<0,1>* pFace, unsigned localIndex) {NEVER_REACHED;}
+template<>
+c_vector<double, 2> VertexMesh<1, 2>::GetAreaGradientOfFaceAtNode(VertexElement<0,2>* pFace, unsigned localIndex) {NEVER_REACHED;}
+template<>
+c_vector<double, 3> VertexMesh<1, 3>::GetAreaGradientOfFaceAtNode(VertexElement<0,3>* pFace, unsigned localIndex) {NEVER_REACHED;}
 
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

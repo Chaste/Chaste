@@ -232,12 +232,12 @@ public:
         vertex_mesh.SetCellRearrangementThreshold(0.1*2.0/1.5);
 MARK
         // Perform a T1 swap on nodes 4 and 5
-        vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(4), vertex_mesh.GetNode(5));
-        vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(10), vertex_mesh.GetNode(11));
-MARK; TRACE("Finish IdentifySwapType")
+        vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(5), vertex_mesh.GetNode(4));
 
 VertexMeshWriter<3, 3> writer2("ReMesh33", "First_T1_swap", false);
         writer2.WriteVtkUsingMeshWithCellId(vertex_mesh, "", false);
+
+
 
         // Test that each moved node has the correct location following the rearrangement
 //        TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[0], 0.6, 1e-8);
