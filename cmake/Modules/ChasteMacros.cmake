@@ -229,9 +229,8 @@ macro(Chaste_ADD_TEST _testTargetName _filename)
     endif()
     set_property(TEST ${_testTargetName} PROPERTY PROCESSORS ${num_cpus})
     if (python)
-        set(python_path ${Chaste_BINARY_DIR}/python/pycml $ENV{PYTHONPATH})
         set_property(TEST ${_testTargetName} PROPERTY
-            ENVIRONMENT PYTHONPATH=${python_path}
+            ENVIRONMENT "PYTHONPATH=$ENV{PYTHONPATH}:${Chaste_BINARY_DIR}/python/pycml"
             )
     endif()
 
