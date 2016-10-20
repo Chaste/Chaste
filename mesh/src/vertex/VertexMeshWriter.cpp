@@ -250,7 +250,8 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteVtkUsingMesh(const VertexMes
     p_writer->SetInput(mpVtkFaceMesh);
 #endif
         // Cut off the extension and add "suffix" -_face_mesh to the output data
-        std::string vtk_face_file_name = vtk_file_name.substr(0, vtk_file_name.size()-4) + "_face_mesh.vtu";
+        std::string vtk_face_file_name = this->mpOutputFileHandler->GetOutputDirectoryFullPath()
+                                       + this->mBaseName + "_FaceMesh" + ((stamp=="")?"":("_"+stamp)) + ".vtu";
         p_writer->SetFileName(vtk_face_file_name.c_str());
         //p_writer->PrintSelf(std::cout, vtkIndent());
         p_writer->Write();
@@ -328,7 +329,7 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteVtkUsingMeshWithCellId(const
         cell_ids.push_back(double(id));
     }
     this->AddCellData("Cell IDs", cell_ids);
-    this->WriteVtkUsingMesh(rMesh);
+    this->WriteVtkUsingMesh(rMesh, stamp);
 }
 
 // This function is written here as VertexMeshWriter<3, 3>::WriteVtkUsingMeshWithCellId( ... ) requires specialization
@@ -357,10 +358,10 @@ template<>
 void VertexMeshWriter<3, 3>::WriteVtkUsingMeshWithCellId(const VertexMesh<3, 3>& rMesh, std::string stamp, bool useElementIdForFaceId)
 {
     // Copied and pasted
-    std::vector<double> cell_ids;
+    std::vector<double> cell_ids(rMesh.GetNumElements());
     for (unsigned id=0 ; id < rMesh.GetNumElements() ; ++id)
     {
-        cell_ids.push_back(double(id));
+        cell_ids[id] = double(id);
     }
     this->AddCellData("Cell IDs", cell_ids);
 
@@ -387,7 +388,7 @@ void VertexMeshWriter<3, 3>::WriteVtkUsingMeshWithCellId(const VertexMesh<3, 3>&
     }
     this->AddFaceData(useElementIdForFaceId ? "Cell IDs": "Face IDs", face_ids);
 
-    this->WriteVtkUsingMesh(rMesh);
+    this->WriteVtkUsingMesh(rMesh, stamp);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

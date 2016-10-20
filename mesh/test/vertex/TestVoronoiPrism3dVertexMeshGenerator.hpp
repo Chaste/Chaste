@@ -37,7 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTVORONOIPRISM3DVERTEXMESHGENERATOR_HPP_
 
 #include <cxxtest/TestSuite.h>
-
+#include "Debug.hpp"
 #include "VoronoiPrism3dVertexMeshGenerator.hpp"
 #include "MutableVertexMesh.hpp"
 #include "PetscSetupAndFinalize.hpp"
@@ -122,8 +122,16 @@ public:
                 num_boundary_nodes++;
             }
         }
+        TS_ASSERT_EQUALS(num_boundary_nodes, 36u);
 
-        TS_ASSERT_EQUALS(num_boundary_nodes, p_mesh->GetNumNodes());
+        TS_ASSERT_EQUALS(p_mesh->GetNode(0)->IsBoundaryNode(), false);
+        TS_ASSERT_EQUALS(p_mesh->GetNode(7)->IsBoundaryNode(), false);
+        TS_ASSERT_EQUALS(p_mesh->GetNode(11)->IsBoundaryNode(), false);
+        TS_ASSERT_EQUALS(p_mesh->GetNode(13)->IsBoundaryNode(), false);
+        TS_ASSERT_EQUALS(p_mesh->GetNode(22)->IsBoundaryNode(), false);
+        TS_ASSERT_EQUALS(p_mesh->GetNode(29)->IsBoundaryNode(), false);
+        TS_ASSERT_EQUALS(p_mesh->GetNode(33)->IsBoundaryNode(), false);
+        TS_ASSERT_EQUALS(p_mesh->GetNode(35)->IsBoundaryNode(), false);
     }
 
     void TestConstructorExceptions() throw(Exception)

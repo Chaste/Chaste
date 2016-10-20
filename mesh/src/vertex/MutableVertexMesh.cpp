@@ -918,13 +918,6 @@ bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForSwapsFromShortEdges()
     {
         ///\todo Could we search more efficiently by just iterating over edges? (see #2401)
         unsigned num_nodes = elem_iter->GetNumNodes();
-        if (ELEMENT_DIM == 3)
-        {
-            // Since both apical and basal juction need to be less than threshold, it is done as follows:
-            // check only the edges at one side, if too short, then check for the edge at the other side.
-            assert (num_nodes%2 == 0);
-            num_nodes /= 2;
-        }
         assert(num_nodes > 0);
 
         // Loop over the nodes contained in this element
@@ -941,22 +934,6 @@ bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForSwapsFromShortEdges()
             // If the nodes are too close together...
             if (distance_between_nodes < mCellRearrangementThreshold)
             {
-                if (ELEMENT_DIM == 3)
-                {
-                    // according to Bielmeier, T1 swap if both are smaller than Threshold
-                    assert(this->GetNumAllNodes()%2 == 0);
-                    const unsigned half_num_nodes_in_mesh = this->GetNumNodes()/2;
-                    const unsigned opposite_node_1_index = elem_iter->GetNode(local_index + num_nodes)->GetIndex();
-                    const unsigned opposite_node_2_index = elem_iter->GetNode(local_index_plus_one + num_nodes)->GetIndex();
-                    assert(opposite_node_1_index == p_current_node->GetIndex() + half_num_nodes_in_mesh);
-                    assert(opposite_node_2_index ==  p_anticlockwise_node->GetIndex() + half_num_nodes_in_mesh);
-                    const double distance_between_nodes = this->GetDistanceBetweenNodes(opposite_node_1_index, opposite_node_2_index);
-                    // so if the other side is still longer than threshold, nothing shall be done. Thus continue.
-                    if (distance_between_nodes > mCellRearrangementThreshold)
-                    {
-                        continue;
-                    }
-                }
                 // ...then check if any triangular elements are shared by these nodes...
                 std::set<unsigned> elements_of_node_a = p_current_node->rGetContainingElementIndices();
                 std::set<unsigned> elements_of_node_b = p_anticlockwise_node->rGetContainingElementIndices();
@@ -988,6 +965,73 @@ bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForSwapsFromShortEdges()
         }
     }
 
+    return false;
+}
+
+template<>
+bool MutableVertexMesh<3, 3>::CheckForSwapsFromShortEdges()
+{
+    const unsigned numFaces = this->GetNumFaces();
+    // Loop over elements to check for T1 swaps
+    for (unsigned face_index=0 ; face_index<numFaces ; ++face_index)
+    {
+        // We search more efficiently by just iterating over edges (lateral faces)
+        VertexElement<2, 3>* p_face = this->GetFace(face_index);
+        const unsigned face_type = unsigned ( p_face->rGetElementAttributes()[0] );
+        if ( 3u != face_type )
+        {
+            continue;
+        }
+
+        assert(p_face->GetNumNodes() == 4);
+        Node<3>* p_current_node = p_face->GetNode(0);
+        Node<3>* p_next_node = p_face->GetNode(1);
+        assert( unsigned(p_current_node->rGetNodeAttributes()[0]) == unsigned(p_next_node->rGetNodeAttributes()[0]) );
+
+        // Find distance between nodes
+        double distance_between_nodes = this->GetDistanceBetweenNodes(p_current_node->GetIndex(), p_next_node->GetIndex());
+        // If the nodes are too close together...
+        if (distance_between_nodes < mCellRearrangementThreshold)
+        {
+            const unsigned other_current_node_index = p_face->GetNodeGlobalIndex(3);
+            const unsigned other_next_node_index = p_face->GetNodeGlobalIndex(2);
+            const double distance_between_other_nodes = this->GetDistanceBetweenNodes(other_current_node_index, other_next_node_index);
+            // so if the other side is still longer than threshold, nothing shall be done. Thus continue.
+            if (distance_between_other_nodes > mCellRearrangementThreshold)
+            {
+                continue;
+            }
+
+            // ...then check if any triangular elements are shared by these nodes...
+            const std::set<unsigned> elements_of_node_a = p_current_node->rGetContainingElementIndices();
+            const std::set<unsigned> elements_of_node_b = p_next_node->rGetContainingElementIndices();
+
+            std::set<unsigned> shared_elements;
+            std::set_intersection(elements_of_node_a.begin(), elements_of_node_a.end(),
+                    elements_of_node_b.begin(), elements_of_node_b.end(),
+                    std::inserter(shared_elements, shared_elements.begin()));
+
+            bool both_nodes_share_triangular_element = false;
+            for (std::set<unsigned>::const_iterator it = shared_elements.begin();
+                    it != shared_elements.end();
+                    ++it)
+            {
+                if (this->GetElement(*it)->GetNumNodes()/2 <= 3)
+                {
+                    both_nodes_share_triangular_element = true;
+                    break;
+                }
+            }
+
+            // ...and if none are, then perform the required type of swap and halt the search, returning true
+            if (!both_nodes_share_triangular_element)
+            {
+                ///\todo Could have pass down the p_face as the p_lateral_swap_face, but much more modifications
+                IdentifySwapType(p_current_node, p_next_node);
+                return true;
+            }
+        }
+    }
     return false;
 }
 
@@ -1094,8 +1138,8 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB)
 {
     // Find the sets of elements containing nodes A and B
-    std::set<unsigned> nodeA_elem_indices = pNodeA->rGetContainingElementIndices();
-    std::set<unsigned> nodeB_elem_indices = pNodeB->rGetContainingElementIndices();
+    const std::set<unsigned> nodeA_elem_indices = pNodeA->rGetContainingElementIndices();
+    const std::set<unsigned> nodeB_elem_indices = pNodeB->rGetContainingElementIndices();
 
     // Form the set union
     std::set<unsigned> all_indices, temp_union_set;
@@ -1261,18 +1305,28 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                     // There must be only one such element
                     assert(element_B_not_A.size() == 1);
 
-                    VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element_A_not_B = this->mElements[*element_A_not_B.begin()];
-                    VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element_B_not_A = this->mElements[*element_B_not_A.begin()];
+                    const VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element_A_not_B = this->mElements[*element_A_not_B.begin()];
+                    const VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element_B_not_A = this->mElements[*element_B_not_A.begin()];
 
-                    unsigned local_index_1 = p_element_A_not_B->GetNodeLocalIndex(pNodeA->GetIndex());
-                    unsigned next_node_1 = p_element_A_not_B->GetNodeGlobalIndex((local_index_1 + 1)%(p_element_A_not_B->GetNumNodes()));
-                    unsigned previous_node_1 = p_element_A_not_B->GetNodeGlobalIndex(
-                            (local_index_1 + p_element_A_not_B->GetNumNodes() - 1)%(p_element_A_not_B->GetNumNodes()));
-                    unsigned local_index_2 = p_element_B_not_A->GetNodeLocalIndex(pNodeB->GetIndex());
-                    unsigned next_node_2 = p_element_B_not_A->GetNodeGlobalIndex(
-                            (local_index_2 + 1)%(p_element_B_not_A->GetNumNodes()));
-                    unsigned previous_node_2 = p_element_B_not_A->GetNodeGlobalIndex(
-                            (local_index_2 + p_element_B_not_A->GetNumNodes() - 1)%(p_element_B_not_A->GetNumNodes()));
+                    unsigned num_nodes_a_not_b = p_element_A_not_B->GetNumNodes();
+                    unsigned num_nodes_b_not_a = p_element_B_not_A->GetNumNodes();
+                    // Special for 3D.
+                    if (ELEMENT_DIM == 3u)
+                    {
+                        assert( num_nodes_a_not_b%2 == 0 );
+                        assert( num_nodes_b_not_a%2 == 0 );
+                        num_nodes_a_not_b /= 2;
+                        num_nodes_b_not_a /= 2;
+                    }
+                    const unsigned local_index_1 = p_element_A_not_B->GetNodeLocalIndex(pNodeA->GetIndex());
+                    const unsigned next_node_1 = p_element_A_not_B->GetNodeGlobalIndex((local_index_1 + 1)%(num_nodes_a_not_b));
+                    const unsigned previous_node_1 = p_element_A_not_B->GetNodeGlobalIndex(
+                                   (local_index_1 + num_nodes_a_not_b - 1)%(num_nodes_a_not_b));
+                    const unsigned local_index_2 = p_element_B_not_A->GetNodeLocalIndex(pNodeB->GetIndex());
+                    const unsigned next_node_2 = p_element_B_not_A->GetNodeGlobalIndex(
+                                   (local_index_2 + 1)%(num_nodes_b_not_a));
+                    const unsigned previous_node_2 = p_element_B_not_A->GetNodeGlobalIndex(
+                                   (local_index_2 + num_nodes_b_not_a - 1)%(num_nodes_b_not_a));
 
                     if (next_node_1 == previous_node_2 || next_node_2 == previous_node_1)
                      {
@@ -1316,7 +1370,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                              EXCEPTION("Triangular element next to triangular void, not implemented yet.");
                         }
 
-                        if(p_element_A_not_B->GetNumNodes() == 3u || p_element_B_not_A->GetNumNodes() == 3u)
+                        if(num_nodes_a_not_b == 3u || num_nodes_b_not_a == 3u)
                         {
                             /**
                              * If this is true then one of the elements adjacent to the triangular void
@@ -1466,7 +1520,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformNodeMerge(Node<SPACE_DIM>
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB,
-                                            std::set<unsigned>& rElementsContainingNodes)
+                                                              std::set<unsigned>& rElementsContainingNodes)
 
 {
     // First compute and store the location of the T1 swap, which is at the midpoint of nodes A and B
@@ -1664,6 +1718,7 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
 
     // Compute and store the location of the T1 swap, which is at the midpoint of nodes A and B
     mLocationsOfT1Swaps.push_back(pNodeA->rGetLocation() + 0.5*vector_AB);
+    mLocationsOfT1Swaps.push_back(p_node_x->rGetLocation() + 0.5*vector_XY);
 
     // Find the type of nodes and make sure both nodes are on the same side.
     const unsigned node_type = unsigned (pNodeA->rGetNodeAttributes()[0]);
@@ -1672,16 +1727,21 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
 
     /*
      * Now we are going to iterate and make necessary changes to the elements and faces.
-     * However, element 1 and 3 would need to add the swap face, which could not be identified
-     * a-priori. Thus, several variables are declared so that they are accessible later.
+     * Since not elements are present in all the T1 Swap, several variables are declared
+     * with default value so that they are accessible for all.
+     * Since swap face could not be identified a-priori, elements 1 and 3 are stored for
+     * the use after loop.
      */
-    VertexElement<3, 3>* p_elem_1;
-    VertexElement<3, 3>* p_elem_3;
-    unsigned elem_1_swap_face_index;
-    unsigned elem_3_swap_face_index;
-    VertexElement<2, 3>* p_lateral_swap_face = NULL;
-    bool orientation_face_swap_2;
-    bool orientation_face_swap_4;
+    VertexElement<3, 3>* p_elem_1 (NULL);
+    VertexElement<3, 3>* p_elem_3 (NULL);
+    unsigned elem_1_swap_face_index (UINT_MAX);
+    unsigned elem_3_swap_face_index (UINT_MAX);
+    VertexElement<2, 3>* p_lateral_swap_face (NULL);
+    VertexElement<2, 3>* p_lateral_face_23 (NULL);
+    VertexElement<2, 3>* p_lateral_face_14 (NULL);
+    // Default set as false to handle the case for void.
+    bool orientation_face_swap_2 (false);
+    bool orientation_face_swap_4 (false);
     for (std::set<unsigned>::const_iterator it = rElementsContainingNodes.begin();
          it != rElementsContainingNodes.end();
          ++it)
@@ -1692,10 +1752,13 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
         // p_this_face contains A or B, while p_other_face X or Y.
         VertexElement<2, 3>* p_this_face = p_elem->GetFace(node_type-1);
         VertexElement<2, 3>* p_other_face = p_elem->GetFace(2-node_type);
+        const unsigned face_num_nodes = p_this_face->GetNumNodes();
         // Better to be safe than sorry, hence a double check.
+        assert( face_num_nodes == p_other_face->GetNumNodes() );
         assert( node_type == unsigned (p_this_face->rGetElementAttributes()[0]) );
         assert( 3-node_type == unsigned (p_other_face->rGetElementAttributes()[0]) );
 
+        // Frequent use variables.
         const unsigned node_a_local_index = p_this_face->GetNodeLocalIndex(node_a_index);
         const unsigned node_b_local_index = p_this_face->GetNodeLocalIndex(node_b_index);
         // As apical and basal faces are created with different nodes but in the same order,
@@ -1706,97 +1769,188 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
         if (node_a_local_index == UINT_MAX)
         {
             assert(node_b_local_index < UINT_MAX);
-            // Element 3 is found (contains B but not A)
-            // Save variables for later use.
-            p_elem_3 = p_elem;
-            elem_3_swap_face_index = node_b_local_index + 1;
+            /*
+             * Element 3 is found (contains B but not A). For element 3, we need to:
+             * I    change add nodes for apical and basal faces;
+             * II   change nodes for lateral_23 if it isn't done yet;
+             * III  for element add nodes
+             * IV   and add face (which will be done later).
+             *
+             * Basically order of operations do not matter, as necessary values have been stored.
+             */
 
-            // Add respective nodes to the non-lateral faces
+            // Part I
             p_this_face->FaceAddNode(pNodeA, node_b_local_index);
             p_other_face->FaceAddNode(p_node_x, node_b_local_index);
-            p_elem->AddNode(pNodeA, p_elem->GetNodeLocalIndex(node_b_index));
-            p_elem->AddNode(p_node_x, p_elem->GetNodeLocalIndex(p_node_y->GetIndex()));
-        }
-        else if (node_b_local_index == UINT_MAX)
-        {
-            assert(node_a_local_index < UINT_MAX);
-            // Now we have element 1, similar operations as element 3.
-            p_elem_1 = p_elem;
-            elem_1_swap_face_index = node_a_local_index + 1;
 
-            p_this_face->FaceAddNode(pNodeB, node_a_local_index);
-            p_other_face->FaceAddNode(p_node_y, node_a_local_index);
-            p_elem->AddNode(pNodeB, p_elem->GetNodeLocalIndex(node_a_index));
-            p_elem->AddNode(p_node_y, p_elem->GetNodeLocalIndex(p_node_x->GetIndex()));
-        }
-        else
-        {
-            assert(node_a_local_index < UINT_MAX);
-            assert(node_b_local_index < UINT_MAX);
-            // So now we are left with element 2 and 4, which contain both nodes.
-
-            // Again, declaring variable for later use (within this for-loop).
-            unsigned swap_face_local_index;
-            /*
-             * Locate local index of nodeA and nodeB and use the ordering to
-             * identify the element, if nodeB_index > nodeA_index then element 4
-             * and if nodeA_index > nodeB_index then element 2
-             */
-            const unsigned node_b_local_index_plus_one = (node_b_local_index + 1)%(p_this_face->GetNumNodes());
-            if (node_a_local_index == node_b_local_index_plus_one)
+            // Part II
+            if (p_lateral_face_23 == NULL)
             {
-                // Swap face is located between A and B, and in element 2, assuming CCW from top,
-                // it has the similar face index as node B.
-                swap_face_local_index = node_b_local_index + 2;
-                orientation_face_swap_2 = p_elem->FaceIsOrientatedAntiClockwise(swap_face_local_index);
-
-                // Lateral face between element 2 and 3 need node-reassignment.
-                // Its face index is the previous face of swap face (ignoring the apical&basal)
-                VertexElement<2, 3>* p_lateral_face_23 = p_elem->GetFace((node_b_local_index-1)%p_this_face->GetNumNodes() + 2);
-                assert(p_lateral_face_23->GetNodeLocalIndex(node_b_index) != UINT_MAX);
-
+                // In CCW lateral_face_23 is next to node B.
+                p_lateral_face_23 = p_elem->GetFace(node_b_local_index + 2);
+                assert( p_lateral_face_23->GetNodeLocalIndex(node_b_index) != UINT_MAX );
                 const unsigned node_b_lateral_local_index = p_lateral_face_23->GetNodeLocalIndex(node_b_index);
                 const unsigned node_y_lateral_local_index = p_lateral_face_23->GetNodeLocalIndex(p_node_y->GetIndex());
                 // Assuming the generator do the right work, lateral faces should have
                 // only 4 nodes, and pair nodes should be just next to each other in ring.
                 assert( node_b_lateral_local_index + node_y_lateral_local_index == 3 );
-
-                // Apical and basal faces are rather straight forward.
-                p_this_face->FaceDeleteNode(node_b_local_index);
-                p_other_face->FaceDeleteNode(node_b_local_index);
-
                 p_lateral_face_23->FaceUpdateNode(node_b_lateral_local_index, pNodeA);
                 p_lateral_face_23->FaceUpdateNode(node_y_lateral_local_index, p_node_x);
-
-                p_elem->DeleteNode(p_elem->GetNodeLocalIndex(node_b_index));
-                p_elem->DeleteNode(p_elem->GetNodeLocalIndex(p_node_y->GetIndex()));
             }
             else
             {
-                // as in element 4, B is the next node of A.
-                assert(node_b_local_index == (node_a_local_index + 1)%(p_this_face->GetNumNodes()));
+                assert( p_lateral_face_23->GetIndex() == p_elem->GetFace(node_b_local_index + 2)->GetIndex() );
+            }
 
-                // Similar operation as element 2 but with different nodes.
-                swap_face_local_index = node_a_local_index + 2;
-                orientation_face_swap_4 = p_elem->FaceIsOrientatedAntiClockwise(swap_face_local_index);
+            // Part III
+            p_elem->AddNode(pNodeA, p_elem->GetNodeLocalIndex(node_b_index));
+            p_elem->AddNode(p_node_x, p_elem->GetNodeLocalIndex(p_node_y->GetIndex()));
 
-                VertexElement<2, 3>* p_lateral_face_14 = p_elem->GetFace((node_a_local_index-1)%p_this_face->GetNumNodes() + 2);
-                assert(p_lateral_face_14->GetNodeLocalIndex(node_a_index) != UINT_MAX);
+            // Part IV: store variables
+            p_elem_3 = p_elem;
+            // Add one because in add face there is another +1 (consider apical&basal). Without %num_apical_nodes
+            // so that it will be inserted at the end rather than the looped first position.
+            elem_3_swap_face_index = node_b_local_index + 1;
+        }
+        else if (node_b_local_index == UINT_MAX)
+        {
+            assert(node_a_local_index < UINT_MAX);
+            /*
+             * Element 1 is found (contains A but not B). For element 1, we need to:
+             * I    change add nodes for apical and basal faces;
+             * II   change nodes for lateral_14 if it isn't done yet;
+             * III  for element add nodes
+             * IV   and add face (which will be done later).
+             */
 
-                const unsigned lateral_a_local_index = p_lateral_face_14->GetNodeLocalIndex(node_a_index);
-                const unsigned lateral_x_local_index = p_lateral_face_14->GetNodeLocalIndex(p_node_x->GetIndex());
-                assert( lateral_a_local_index + lateral_x_local_index == 3);
+            // Part I
+            p_this_face->FaceAddNode(pNodeB, node_a_local_index);
+            p_other_face->FaceAddNode(p_node_y, node_a_local_index);
 
+            // Part II
+            if (p_lateral_face_14 == NULL)
+            {
+                // In CCW lateral_face_14 is next to node B.
+                p_lateral_face_14 = p_elem->GetFace(node_a_local_index + 2);
+                assert( p_lateral_face_14->GetNodeLocalIndex(node_a_index) != UINT_MAX );
+                const unsigned node_a_lateral_local_index = p_lateral_face_14->GetNodeLocalIndex(node_a_index);
+                const unsigned node_x_lateral_local_index = p_lateral_face_14->GetNodeLocalIndex(p_node_x->GetIndex());
+                // Assuming the generator do the right work, lateral faces should have
+                // only 4 nodes, and pair nodes should be just next to each other in ring.
+                assert( node_a_lateral_local_index + node_x_lateral_local_index == 3 );
+                p_lateral_face_14->FaceUpdateNode(node_a_lateral_local_index, pNodeB);
+                p_lateral_face_14->FaceUpdateNode(node_x_lateral_local_index, p_node_y);
+            }
+            else
+            {
+                assert( p_lateral_face_14->GetIndex() == p_elem->GetFace(node_a_local_index + 2)->GetIndex() );
+            }
+
+            // Part III
+            p_elem->AddNode(pNodeB, p_elem->GetNodeLocalIndex(node_a_index));
+            p_elem->AddNode(p_node_y, p_elem->GetNodeLocalIndex(p_node_x->GetIndex()));
+
+            // Part IV: store variables
+            p_elem_1 = p_elem;
+            // Add one because in add face there is another +1 (consider apical&basal). Without %num_apical_nodes
+            // so that it will be inserted at the end rather than the looped first position.
+            elem_1_swap_face_index = node_a_local_index + 1;
+        }
+        else
+        {
+            assert(node_a_local_index < UINT_MAX);
+            assert(node_b_local_index < UINT_MAX);
+
+            /*
+             * Now we have element 2(4). Changes to be made here:
+             * I    delete nodes on apical basal faces;
+             * II   change nodes on lateral_23 (lateral_14) if not yet done;
+             * III  for element delete nodes
+             * IV   and delete swap face.
+             *
+             * Basically the order of operations do not matter, as necessary values have been stored.
+             * Operation IV for both elements are almost the same. It is done at the very end
+             * as swap face could not be identified beforehand.
+             */
+            // Declaration for storing variables.
+            unsigned swap_face_local_index;
+
+            /*
+             * Locate local index of nodeA and nodeB and use the ordering to
+             * identify the element, if nodeB_index > nodeA_index then element 4
+             * and if nodeA_index > nodeB_index then element 2
+             */
+            const unsigned node_b_local_index_plus_one = (node_b_local_index + 1)%face_num_nodes;
+            if (node_a_local_index == node_b_local_index_plus_one)
+            {
+                // Now we have element 2
+                // Part I Apical and basal faces are rather straight forward.
+                p_this_face->FaceDeleteNode(node_b_local_index);
+                p_other_face->FaceDeleteNode(node_b_local_index);
+
+                // Part II
+                if (p_lateral_face_23 == NULL)
+                {
+                    // Its face index is the previous face of swap face (ignoring the apical&basal)
+                    p_lateral_face_23 = p_elem->GetFace((node_b_local_index-1)%face_num_nodes + 2);
+                    assert(p_lateral_face_23->GetNodeLocalIndex(node_b_index) != UINT_MAX);
+                    const unsigned node_b_lateral_local_index = p_lateral_face_23->GetNodeLocalIndex(node_b_index);
+                    const unsigned node_y_lateral_local_index = p_lateral_face_23->GetNodeLocalIndex(p_node_y->GetIndex());
+                    // Assuming the generator do the right work, lateral faces should have
+                    // only 4 nodes, and pair nodes should be just next to each other in ring.
+                    assert( node_b_lateral_local_index + node_y_lateral_local_index == 3 );
+                    p_lateral_face_23->FaceUpdateNode(node_b_lateral_local_index, pNodeA);
+                    p_lateral_face_23->FaceUpdateNode(node_y_lateral_local_index, p_node_x);
+                }
+                else
+                {
+                    assert( p_lateral_face_23->GetIndex() == p_elem->GetFace((node_b_local_index-1)%face_num_nodes + 2)->GetIndex() );
+                }
+
+                // Part III
+                p_elem->DeleteNode(p_elem->GetNodeLocalIndex(node_b_index));
+                p_elem->DeleteNode(p_elem->GetNodeLocalIndex(p_node_y->GetIndex()));
+
+                // Part IV storing variables.
+                // Swap face is located between A and B, and in element 2, assuming CCW from top,
+                // it has the similar face index as node B.
+                swap_face_local_index = node_b_local_index + 2;
+                orientation_face_swap_2 = p_elem->FaceIsOrientatedAntiClockwise(swap_face_local_index);
+            }
+            else
+            {
+                // As in element 4, B is the next node of A.
+                assert(node_b_local_index == (node_a_local_index + 1)%face_num_nodes);
+
+                // Part I
                 p_this_face->FaceDeleteNode(node_a_local_index);
                 p_other_face->FaceDeleteNode(node_a_local_index);
 
-                p_lateral_face_14->FaceUpdateNode(lateral_a_local_index, pNodeB);
-                p_lateral_face_14->FaceUpdateNode(lateral_x_local_index, p_node_y);
+                // Part II
+                if (p_lateral_face_14 == NULL)
+                {
+                    p_lateral_face_14 = p_elem->GetFace((node_a_local_index-1)%face_num_nodes + 2);
+                    assert(p_lateral_face_14->GetNodeLocalIndex(node_a_index) != UINT_MAX);
+                    const unsigned lateral_a_local_index = p_lateral_face_14->GetNodeLocalIndex(node_a_index);
+                    const unsigned lateral_x_local_index = p_lateral_face_14->GetNodeLocalIndex(p_node_x->GetIndex());
+                    assert( lateral_a_local_index + lateral_x_local_index == 3);
+                    p_lateral_face_14->FaceUpdateNode(lateral_a_local_index, pNodeB);
+                    p_lateral_face_14->FaceUpdateNode(lateral_x_local_index, p_node_y);
+                }
+                else
+                {
+                    assert( p_lateral_face_14->GetIndex() == p_elem->GetFace((node_a_local_index-1)%face_num_nodes + 2)->GetIndex() );
+                }
 
+                // Part III
                 p_elem->DeleteNode(p_elem->GetNodeLocalIndex(node_a_index));
                 p_elem->DeleteNode(p_elem->GetNodeLocalIndex(p_node_x->GetIndex()));
+
+                // Part IV
+                swap_face_local_index = node_a_local_index + 2;
+                orientation_face_swap_4 = p_elem->FaceIsOrientatedAntiClockwise(swap_face_local_index);
             }
-            // After getting the index, we can now settle the swap face.
+            // Part IV of both elements 2 and 4.
             if ( p_lateral_swap_face == NULL )
                 p_lateral_swap_face = p_elem->GetFace(swap_face_local_index);
             else
@@ -1805,16 +1959,30 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
             // Make sure we have the right swap face which contains both A and B.
             assert(p_lateral_swap_face->GetNodeLocalIndex(node_a_index) != UINT_MAX);
             assert(p_lateral_swap_face->GetNodeLocalIndex(node_b_index) != UINT_MAX);
-
             p_elem->DeleteFace(swap_face_local_index);
         }
     }
     // Make sure the orientation obtained is correct
     assert( orientation_face_swap_2 != orientation_face_swap_4 );
 
+    // Part IV for elements 1 and 3.
     // As element 3 is on the same side of element 2, it will have the orientation from element 2.
-    p_elem_3->AddFace(p_lateral_swap_face, orientation_face_swap_2, elem_3_swap_face_index);
-    p_elem_1->AddFace(p_lateral_swap_face, orientation_face_swap_4, elem_1_swap_face_index);
+    if (p_elem_3 != NULL)
+    {
+        p_elem_3->AddFace(p_lateral_swap_face, orientation_face_swap_2, elem_3_swap_face_index);
+    }
+    if (p_elem_1 != NULL)
+    {
+        p_elem_1->AddFace(p_lateral_swap_face, orientation_face_swap_4, elem_1_swap_face_index);
+    }
+
+    // In the case where only elements 2 and 4 exist, after T1 swap the lateral_swap_face doesn't
+    // belong to any element. Delete to prevent memory leak.
+    if (rElementsContainingNodes.size() == 2)
+    {
+//        delete p_lateral_swap_face;
+        this->mFaces.erase(this->mFaces.begin() + p_lateral_swap_face->GetIndex());
+    }
 
     // Now since we know the lateral swap face, we can move the nodes using the face normal.
     c_vector<double, 3> vector_CD;
@@ -1830,33 +1998,36 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
     // Move nodes A and B to C and D respectively
     pNodeA->rGetModifiableLocation() += 0.5*vector_AB - 0.5*vector_CD;
     pNodeB->rGetModifiableLocation() += -0.5*vector_AB + 0.5*vector_CD;
-
     // Change coordinates of p_node_x and p_node_y
     p_node_x->rGetModifiableLocation() += 0.5*vector_XY - 0.5*vector_CD;
     p_node_y->rGetModifiableLocation() += -0.5*vector_XY + 0.5*vector_CD;
 
-
-    // Sort out boundary nodes  ///\todo boundary problem with 3D
+    // Sort out boundary nodes
     if (pNodeA->IsBoundaryNode() || pNodeB->IsBoundaryNode())
     {
         if (pNodeA->GetNumContainingElements() == 3)
         {
             pNodeA->SetAsBoundaryNode(false);
+            p_node_x->SetAsBoundaryNode(false);
         }
         else
         {
             pNodeA->SetAsBoundaryNode(true);
+            p_node_x->SetAsBoundaryNode(true);
         }
         if (pNodeB->GetNumContainingElements() == 3)
         {
             pNodeB->SetAsBoundaryNode(false);
+            p_node_y->SetAsBoundaryNode(false);
         }
         else
         {
             pNodeB->SetAsBoundaryNode(true);
+            p_node_y->SetAsBoundaryNode(true);
         }
     }
 }
+
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformIntersectionSwap(Node<SPACE_DIM>* pNode, unsigned elementIndex)

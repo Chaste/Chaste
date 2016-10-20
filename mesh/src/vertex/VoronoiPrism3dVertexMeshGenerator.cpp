@@ -286,8 +286,8 @@ void VoronoiPrism3dVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_
                     double x_location = (edge->vertex0()->x()) / mSamplingMultiplier;
                     double y_location = (edge->vertex0()->y()) / mSamplingMultiplier;
 
-                    // Create a node at this location. In 3D, every node is boundary nodes
-                    Node<3>* p_this_lower_node = new Node<3>(lower_nodes.size(), true, x_location, y_location, 0);
+                    // Create a node at this location. Default to non-boundary node; this will be updated later
+                    Node<3>* p_this_lower_node = new Node<3>(lower_nodes.size(), false, x_location, y_location, 0);
                     // Attribute is added so that it can be identified in simulation (as basal and apical has different forces)
                     // 1.1 instead of 1.0 as it will be casted into unsigned for simpler comparison.
                     p_this_lower_node->AddNodeAttribute(1.1);
@@ -334,7 +334,7 @@ void VoronoiPrism3dVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_
 
                         // Creating the corresponding upper node
                         ///\todo check this - apperently, 2 nodes having the same index do not cause any problem yet
-                        Node<3>* p_this_upper_node = new Node<3>(upper_nodes.size(), true, x_location, y_location, mElementHeightZ);
+                        Node<3>* p_this_upper_node = new Node<3>(upper_nodes.size(), false, x_location, y_location, mElementHeightZ);
                         // Attribute is added so that it can be identified in simulation (as basal and apical has different forces)
                         // 2.1 instead of 2.0 as it will be casted into unsigned for simpler comparison.
                         p_this_upper_node->AddNodeAttribute(2.1);
@@ -446,6 +446,68 @@ void VoronoiPrism3dVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_
 
             VertexElement<3, 3>* p_elem = new VertexElement<3, 3>(elements.size(), faces_this_elem, faces_orientation);
             elements.push_back( p_elem );
+        }
+    }
+
+
+    // Loop over the cells in the voronoi diagram to identify boundary nodes
+    for (voronoi_diagram<double>::const_cell_iterator it = vd.cells().begin();
+            it != vd.cells().end();
+            ++it)
+    {
+        // Get a reference to the current cell
+        const voronoi_diagram<double>::cell_type& cell = *it;
+
+        // The cells we care about are exactly those whose source_index is greater than the size of the locations vector
+        // (i.e. those cells in the outside eight portions of the 3x3 tessellation of source points)
+        if (cell.source_index() >= rSeedLocations.size())
+        {
+            // Loop over the edges of the current cell
+            const voronoi_diagram<double>::edge_type *edge = cell.incident_edge();
+
+            do
+            {
+                /*
+                 * Break out of the do-while if there is an infinite edge; we needn't care about cells at the very edge.
+                 */
+                if (edge->is_infinite())
+                {
+                    break;
+                }
+
+                if (edge->is_primary())
+                {
+                    c_vector<double, 2> vertex_location;
+
+                    // Get the location of vertex0 of the current edge
+                    vertex_location[0] = (edge->vertex0()->x()) / mSamplingMultiplier;
+                    vertex_location[1] = (edge->vertex0()->y()) / mSamplingMultiplier;
+
+                    /*
+                     * Check whether this location coincides with one of our nodes; if it does, it must be a boundary
+                     * node
+                     */
+                    for (unsigned node_idx = 0 ; node_idx < lower_nodes.size() ; node_idx++)
+                    {
+                        // Grab the existing node location
+                        const c_vector<double, 3>& r_existing_node_location = lower_nodes[node_idx]->rGetLocation();
+
+                        // Equality here is determined entirely on coincidence of position
+                        if ( fabs(r_existing_node_location[0] - vertex_location[0]) < DBL_EPSILON )
+                        {
+                            if ( fabs(r_existing_node_location[1] - vertex_location[1]) < DBL_EPSILON )
+                            {
+                                // If the locations match, tag the node as being on the boundary
+                                lower_nodes[node_idx]->SetAsBoundaryNode(true);
+                                upper_nodes[node_idx]->SetAsBoundaryNode(true);
+                            }
+                        }
+                    }
+                    // Move to the next edge
+                    edge = edge->next();
+                }
+
+            } while (edge != cell.incident_edge());
         }
     }
 

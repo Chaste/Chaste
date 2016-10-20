@@ -2,7 +2,7 @@
 #define TESTMUTABLEVERTEXMESH33REMESH_HPP_
 
 #include <cxxtest/TestSuite.h>
-#include "Debug.hpp"
+
 #include "VertexMeshWriter.hpp"
 #include "FileComparison.hpp"
 #include "Warnings.hpp"
@@ -10,6 +10,8 @@
 
 //This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
+
+#define OUTPUT_NAME "ReMesh33"
 
 // I need some helper function here. otherwise just the code to generate mesh would be too much!!
 /**
@@ -22,6 +24,7 @@
 class MeshBuilderHelper
 {
 private:
+    std::string mName;
     unsigned mNumLowerNodes;
     std::vector<Node<3>*> mLowerNodes;
     std::vector<Node<3>*> mUpperNodes;
@@ -30,12 +33,19 @@ private:
     std::vector<VertexElement<2, 3>*> mFaces;
     std::vector<VertexElement<3, 3>*> mElements;
     MutableVertexMesh<3, 3>* mpMesh;
+    VertexMeshWriter<3, 3>* mpWriter;
 
 public:
-    MeshBuilderHelper(std::vector<Node<3>*>& rLowerNodes, unsigned zHeight = 1)
-                :mNumLowerNodes(rLowerNodes.size()),
-                 mLowerNodes(rLowerNodes),
-                 mpMesh(NULL)
+    MeshBuilderHelper(const std::vector<Node<3>*>& rLowerNodes, std::string Name, unsigned zHeight = 1)
+                        : mName(Name),
+                          mNumLowerNodes(rLowerNodes.size()),
+                          mLowerNodes(rLowerNodes),
+                          mUpperNodes(mNumLowerNodes),
+                          mNodeToLateralFaceIndices(mNumLowerNodes),
+                          mFaces(),
+                          mElements(),
+                          mpMesh(NULL),
+                          mpWriter(NULL)
     {
         // mUpperNodes uses copy constructor, need some updates
         for (unsigned i=0; i<mNumLowerNodes; ++i)
@@ -43,16 +53,17 @@ public:
             mLowerNodes[i]->AddNodeAttribute(1.1);
 
             c_vector<double, 3> tmp = mLowerNodes[i]->rGetLocation();
-            Node<3>* p_node_tmp = new Node<3>(i+mNumLowerNodes, true, tmp[0], tmp[1], tmp[2] + zHeight);
+            Node<3>* p_node_tmp = new Node<3>(i+mNumLowerNodes, mLowerNodes[i]->IsBoundaryNode(),
+                    tmp[0], tmp[1], tmp[2] + zHeight);
             p_node_tmp->AddNodeAttribute(2.1);
-            mUpperNodes.push_back(p_node_tmp);
+            mUpperNodes[i] = p_node_tmp;
         }
-        mNodeToLateralFaceIndices.reserve(mNumLowerNodes);
-
-        // just checking, not sure if they copy the pointer address or actually copy the real nodes
-        assert(mLowerNodes[0]->GetIndex()==0);
     }
 
+    void MakeMeshUsing2dMesh(std::vector<Node<2>*>& inNodes)
+    {
+        ///\todo
+    }
 
     MutableVertexMesh<3, 3>* GenerateMesh()
     {
@@ -68,7 +79,6 @@ public:
         mpMesh = new MutableVertexMesh<3, 3>(mLowerNodes, mElements);
         return mpMesh;
     }
-
 
     void PrintMesh() const
     {
@@ -100,18 +110,31 @@ public:
         std::cout << std::endl;
     }
 
+    void WriteVtk(std::string AdditionalTag = "")
+    {
+        if (mpWriter == NULL)
+        {
+            mpWriter = new VertexMeshWriter<3, 3>(OUTPUT_NAME, mName, false);
+        }
+        else
+        {
+            // current workaround
+            delete mpWriter;
+            mpWriter = new VertexMeshWriter<3, 3>(OUTPUT_NAME, mName, false);
+        }
+        mpWriter->WriteVtkUsingMeshWithCellId(*mpMesh, AdditionalTag, false);
+    }
+
     void buildElementWith(const unsigned numNodesThis, const unsigned nodeIndicesThis[] )
     {
         // Initializing vectors which are required for the generation of the VertexElement<3, 3>
         std::vector<VertexElement<2, 3>*> faces_this_elem;
         std::vector<bool> faces_orientation;
-//        unsigned nums = sizeof(nodeIndicesThis)/sizeof(*nodeIndicesThis);
-//PRINT_3_VARIABLES(sizeof(nodeIndicesThis), sizeof(*nodeIndicesThis), nums);
 
         std::vector<Node<3>*> lower_nodes_this_elem(numNodesThis);
         std::vector<Node<3>*> upper_nodes_this_elem(numNodesThis);
         std::vector<Node<3>*> all_nodes_this_elem(2*numNodesThis);
-        // Populate lower&upper_nodes_this_elem
+        // Populate lower & upper_nodes_this_elem
         for (unsigned j=0; j<numNodesThis; ++j)
         {
             lower_nodes_this_elem[j] = mLowerNodes[ nodeIndicesThis[j] ];
@@ -119,7 +142,6 @@ public:
             all_nodes_this_elem[j] = mLowerNodes[ nodeIndicesThis[j] ];
             all_nodes_this_elem[j+numNodesThis] = mUpperNodes[ nodeIndicesThis[j] ];
         }
-
 
         // Creating the lower face
         VertexElement<2, 3>* p_lower_face = new VertexElement<2, 3>(mFaces.size(), lower_nodes_this_elem);
@@ -176,7 +198,6 @@ public:
                 faces_orientation.push_back(false);
             }
 
-
             if (existing_face_index == UINT_MAX)
             {
                 // Create new lateral rectangular face
@@ -194,13 +215,11 @@ public:
                 mFaces.push_back(p_lateral_face);
                 faces_this_elem.push_back(p_lateral_face);
                 faces_orientation.push_back(true);
-
                 // Update node_to_lateral_face_indices
                 r_face1_indices.push_back(newFaceIndex);
                 r_face2_indices.push_back(newFaceIndex);
             }
         }
-
         VertexElement<3, 3>* p_elem = new VertexElement<3, 3>(mElements.size(), faces_this_elem, faces_orientation, all_nodes_this_elem);
         mElements.push_back( p_elem );
     }
@@ -209,6 +228,8 @@ public:
     {
         if (mpMesh)
             delete mpMesh;
+        if (mpWriter)
+            delete mpWriter;
     }
 };
 
@@ -216,7 +237,7 @@ class TestMutableVertexMesh33ReMesh : public CxxTest::TestSuite
 {
 public:
 
-    void TestPerformT1SwapAndIdentifySwapType() throw(Exception)
+    void TestCheckForSwapsAndIdentifySwapType() throw(Exception)
     {
         /*
          * Create a mesh comprising six nodes contained in two triangle and two rhomboid elements, as shown below.
@@ -233,43 +254,43 @@ public:
         nodes.push_back(new Node<3>(1, true,  1.0, 0.0, 0.0));
         nodes.push_back(new Node<3>(2, true,  1.0, 1.0, 0.0));
         nodes.push_back(new Node<3>(3, true,  0.0, 1.0, 0.0));
-        nodes.push_back(new Node<3>(4, true, 0.5, 0.4, 0.0));
-        nodes.push_back(new Node<3>(5, true, 0.5, 0.6, 0.0));
+        nodes.push_back(new Node<3>(4, false, 0.5, 0.4, 0.0));
+        nodes.push_back(new Node<3>(5, false, 0.5, 0.6, 0.0));
 
         unsigned node_indices_elem_0[3] = {2, 3, 5};
         unsigned node_indices_elem_1[4] = {4, 1, 2, 5};
         unsigned node_indices_elem_2[3] = {0, 1, 4};
         unsigned node_indices_elem_3[4] = {4, 5, 3, 0};
 
-
-        MeshBuilderHelper builder(nodes);
+        const double height = 1;
+        MeshBuilderHelper builder(nodes, "T1SwapWith4Elements", height);
         builder.buildElementWith(3, node_indices_elem_0);
         builder.buildElementWith(4, node_indices_elem_1);
         builder.buildElementWith(3, node_indices_elem_2);
         builder.buildElementWith(4, node_indices_elem_3);
         // A reference variable as mesh is noncopyable
         MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
-
-        VertexMeshWriter<3, 3> writer("ReMesh33", "First_T1", false);
-        writer.WriteVtkUsingMeshWithCellId(vertex_mesh, "", false);
-        builder.PrintMesh();
+        builder.WriteVtk("Before");
 
         // Set the threshold distance between vertices for a T1 swap as follows
         // so that it will trigger CheckForSwapsFromShortEdges
         vertex_mesh.SetCellRearrangementThreshold(0.3);
         vertex_mesh.CheckForSwapsFromShortEdges();
-        VertexMeshWriter<3, 3> writer2("ReMesh33", "First_T1_swap", false);
-        writer2.WriteVtkUsingMeshWithCellId(vertex_mesh, "", false);
+        builder.WriteVtk("AfterOnce");
 
         // Test that each moved node has the correct location following the rearrangement
         TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[0], 0.725, 1e-8);
         TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[1], 0.5, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[2], 0 , 1e-8);
         TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[0], 0.275, 1e-3);
         TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[1], 0.5, 1e-3);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[2], 0 , 1e-8);
         TS_ASSERT_DELTA(vertex_mesh.GetNode(10)->rGetLocation()[0], 0.725, 1e-8);
         TS_ASSERT_DELTA(vertex_mesh.GetNode(10)->rGetLocation()[1], 0.5, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(10)->rGetLocation()[2], 1 , 1e-8);
         TS_ASSERT_DELTA(vertex_mesh.GetNode(11)->rGetLocation()[0], 0.275, 1e-3);
         TS_ASSERT_DELTA(vertex_mesh.GetNode(11)->rGetLocation()[1], 0.5, 1e-3);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(11)->rGetLocation()[2], 1 , 1e-8);
 
         // Test that each element contains the correct nodes following the rearrangement
         unsigned node_indices_element_0[4] = {2, 3, 5, 4};
@@ -287,10 +308,31 @@ public:
             }
         }
 
+        // Set the threshold distance between vertices for a T1 swap as follows, to ease calculations
+        vertex_mesh.SetCellRearrangementThreshold(0.1*2.0/1.5);
         // Perform a T1 swap on nodes 4 and 5
         vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(4), vertex_mesh.GetNode(5));
-        VertexMeshWriter<3, 3> writer3("ReMesh33", "Second_T1_swap", false);
-        writer3.WriteVtkUsingMeshWithCellId(vertex_mesh, "", false);
+        builder.WriteVtk("AfterTwice");
+
+        // Test that each element has the correct area and perimeter following the rearrangement
+        TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(0), 0.2, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(1), 0.3,1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(2), 0.2, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(3), 0.3, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(0), 1.0+0.2*sqrt(41.0)+2*0.2, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(1), 1.2+0.2*sqrt(41.0)+2*0.3, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(2), 1.0+0.2*sqrt(41.0)+2*0.2, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(3), 1.2+0.2*sqrt(41.0)+2*0.3, 1e-6);
+
+        // Test T1 swap location tracking
+        std::vector< c_vector<double, 3> > t1_locations = vertex_mesh.GetLocationsOfT1Swaps();
+        TS_ASSERT_EQUALS(t1_locations.size(), 4u);
+        for (unsigned i=0 ; i<4 ; ++i)
+        {
+            TS_ASSERT_DELTA(t1_locations[i][0], 0.5, 1e-6);
+            TS_ASSERT_DELTA(t1_locations[i][1], 0.5, 1e-6);
+            TS_ASSERT_DELTA(t1_locations[i][2], i%2, 1e-6);
+        }
 
         // Keep testing...
         vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(5), vertex_mesh.GetNode(4));
@@ -302,19 +344,472 @@ public:
         vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(4), vertex_mesh.GetNode(5));
         vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(4), vertex_mesh.GetNode(5));
         vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(5), vertex_mesh.GetNode(4));
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumFaces(), 17u);
 
+    }
 
+    void TestPerformT1SwapOnBoundary() throw(Exception)
+    {
+        /*
+         * Create a mesh comprising six nodes contained in three elements such that all nodes are
+         * boundary nodes, as shown below. We will test that that a T1 swap is correctly implemented.
+         *  _____
+         * |\   /
+         * | \ /
+         * |  |
+         * | / \
+         * |/___\
+         */
+        std::vector<Node<3>*> nodes;
+        nodes.push_back(new Node<3>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<3>(1, true, 1.0, 0.0));
+        nodes.push_back(new Node<3>(2, true, 1.0, 1.0));
+        nodes.push_back(new Node<3>(3, true, 0.0, 1.0));
+        nodes.push_back(new Node<3>(4, true, 0.5, 0.4));
+        nodes.push_back(new Node<3>(5, true, 0.5, 0.6));
 
+        unsigned node_indices_elem_0[3] = {2, 3, 5};
+        unsigned node_indices_elem_1[3] = {1, 4, 0};
+        unsigned node_indices_elem_2[4] = {0, 4, 5, 3};
 
+        const double height = 1;
+        MeshBuilderHelper builder(nodes, "T1SwapWithOnBoundary", height);
+        builder.buildElementWith(3, node_indices_elem_0);
+        builder.buildElementWith(3, node_indices_elem_1);
+        builder.buildElementWith(4, node_indices_elem_2);
+        // A reference variable as mesh is noncopyable
+        MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
+        builder.WriteVtk("Before");
 
+        // Set the threshold distance between vertices for a T1 swap as follows, to ease calculations
+        vertex_mesh.SetCellRearrangementThreshold(0.1*2.0/1.5);
+        // Perform a T1 swap on nodes 5 and 4 (this way round to ensure coverage of boundary node tracking)
+        vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(5), vertex_mesh.GetNode(4));
+        builder.WriteVtk("After");
 
+        // Test that each moved node has the correct location following the rearrangement
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[0], 0.6, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[1], 0.5, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[2], 0.0 , 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[0], 0.4, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[1], 0.5, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[2], 0.0 , 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(10)->rGetLocation()[0], 0.6, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(10)->rGetLocation()[1], 0.5, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(10)->rGetLocation()[2], 1.0 , 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(11)->rGetLocation()[0], 0.4, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(11)->rGetLocation()[1], 0.5, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(11)->rGetLocation()[2], 1.0 , 1e-8);
 
+        // Test that each element contains the correct number nodes following the rearrangement
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 8u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 8u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNumNodes(), 6u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumFaces(), 6u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumFaces(), 6u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNumFaces(), 5u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumFaces(), 14u);
 
+        // Test that each element contains the correct nodes following the rearrangement
+        unsigned node_indices_element_0[4] = {2, 3, 5, 4};
+        unsigned node_indices_element_1[4] = {1, 4, 5, 0};
+        unsigned node_indices_element_2[4] = {0, 5, 3};
+        for (unsigned i=0; i<4; i++)
+        {
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(i), node_indices_element_1[i]);
+            if (i < 3)
+            {
+                TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(i), node_indices_element_2[i]);
+            }
+        }
 
+        // Test that each element has the correct area and perimeter following the rearrangement
+        TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(0), 0.3, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(1), 0.3, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(2), 0.2, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(0), 1.2+0.2*sqrt(41.0)+2*0.3, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(1), 1.2+0.2*sqrt(41.0)+2*0.3, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(2), 1.0+0.2*sqrt(41.0)+2*0.2, 1e-6);
 
+        // Test that the correct nodes are labelled as boundary nodes following the rearrangement
+        for (unsigned i=0; i<vertex_mesh.GetNumNodes(); i++)
+        {
+            bool expected_boundary_node = !(i==5 || i==11);
+            TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), expected_boundary_node);
+        }
+    }
 
+    void TestPerformT1SwapOnBoundary2() throw(Exception)
+            {
+        /*
+         * Create a mesh comprising six nodes contained in three elements such that all but one node
+         * are boundary nodes, as shown below. We will test that that a T1 swap is correctly implemented.
+         *
+         * |\   /|
+         * | \ / |
+         * |  |  |
+         * | / \ |
+         * |/___\|
+         */
+        std::vector<Node<3>*> nodes;
+        nodes.push_back(new Node<3>(0, true,  0.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(1, true,  1.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(2, true,  1.0, 1.0, 0.0));
+        nodes.push_back(new Node<3>(3, true,  0.0, 1.0, 0.0));
+        nodes.push_back(new Node<3>(4, false, 0.5, 0.4, 0.0));
+        nodes.push_back(new Node<3>(5, true, 0.5, 0.6, 0.0));
 
+        unsigned node_indices_elem_0[4] = {1, 2, 5, 4};
+        unsigned node_indices_elem_1[3] = {1, 4, 0};
+        unsigned node_indices_elem_2[4] = {0, 4, 5, 3};
 
+        const double height = 1;
+        MeshBuilderHelper builder(nodes, "T1SwapWithOnBoundary2", height);
+        builder.buildElementWith(4, node_indices_elem_0);
+        builder.buildElementWith(3, node_indices_elem_1);
+        builder.buildElementWith(4, node_indices_elem_2);
+        // A reference variable as mesh is noncopyable
+        MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
+        builder.WriteVtk("Before");
+
+        // Set the threshold distance between vertices for a T1 swap as follows, to ease calculations
+        vertex_mesh.SetCellRearrangementThreshold(0.1*2.0/1.5);
+
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 3u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 12u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumFaces(), 14u);
+
+        // Perform a T1 swap on nodes 5 and 4 (this way round to ensure coverage of boundary node tracking)
+        vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(5), vertex_mesh.GetNode(4));
+        builder.WriteVtk("After");
+
+        // Test that each moved node has the correct location following the rearrangement
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[0], 0.6, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[1], 0.5, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[2], 0.0 , 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[0], 0.4, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[1], 0.5, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[2], 0.0 , 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(10)->rGetLocation()[0], 0.6, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(10)->rGetLocation()[1], 0.5, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(10)->rGetLocation()[2], 1.0 , 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(11)->rGetLocation()[0], 0.4, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(11)->rGetLocation()[1], 0.5, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(11)->rGetLocation()[2], 1.0 , 1e-8);
+
+        // Test that each element contains the correct number nodes following the rearrangement
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 6u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 8u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNumNodes(), 6u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumFaces(), 5u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumFaces(), 6u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNumFaces(), 5u);
+
+        // Test that each element contains the correct nodes following the rearrangement
+        unsigned node_indices_element_0[3] = {1, 2, 4};
+        unsigned node_indices_element_1[4] = {1, 4, 5, 0};
+        unsigned node_indices_element_2[3] = {0, 5, 3};
+        for (unsigned i=0; i<4; i++)
+        {
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(i), node_indices_element_1[i]);
+            if (i < 3)
+            {
+                TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
+                TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(i), node_indices_element_2[i]);
+            }
+        }
+
+        // Test that each element has the correct area and perimeter following the rearrangement
+        TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(0), 0.2, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(1), 0.3, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(2), 0.2, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(0), 1.0+0.2*sqrt(41.0)+2*0.2, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(1), 1.2+0.2*sqrt(41.0)+2*0.3, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(2), 1.0+0.2*sqrt(41.0)+2*0.2, 1e-6);
+
+        // Test that the correct nodes are labelled as boundary nodes following the rearrangement
+        for (unsigned i=0; i<vertex_mesh.GetNumNodes(); i++)
+        {
+            TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), true);
+        }
+    }
+
+    void TestPerformT1SwapWhenVoidForms() throw(Exception)
+    {
+        /*
+         * Create a mesh containing six nodes containing in two elements. We will test that
+         * a T1 swap is correctly performed in the case where a void forms as a result of
+         * the rearrangement, as shown below.
+         *
+         * |\   /|     |\      /|
+         * | \ / |     | \    / |
+         * |  |  |  => | /    \ |
+         * | / \ |     |/      \|
+         * |/   \|
+         */
+        std::vector<Node<3>*> nodes;
+        nodes.push_back(new Node<3>(0, true, 0.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(1, true, 1.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(2, true, 1.0, 1.0, 0.0));
+        nodes.push_back(new Node<3>(3, true, 0.0, 1.0, 0.0));
+        nodes.push_back(new Node<3>(4, true, 0.5, 0.4, 0.0));
+        nodes.push_back(new Node<3>(5, true, 0.5, 0.6, 0.0));
+
+        unsigned node_indices_elem_0[4] = {0, 4, 5, 3};
+        unsigned node_indices_elem_1[4] = {4, 1, 2, 5};
+        const double height = 1;
+        MeshBuilderHelper builder(nodes, "T1SwapWhenVoidForms", height);
+        builder.buildElementWith(4, node_indices_elem_0);
+        builder.buildElementWith(4, node_indices_elem_1);
+        // A reference variable as mesh is noncopyable
+        MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
+        builder.WriteVtk("Before");
+
+        // Set the threshold distance between vertices for a T1 swap as follows, to ease calculations
+        vertex_mesh.SetCellRearrangementThreshold(0.1*2.0/1.5);
+        // Perform a T1 swap on nodes 5 and 4.
+        vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(5), vertex_mesh.GetNode(4));
+        builder.WriteVtk("After");
+
+        // Test that each moved node has the correct location following the rearrangement
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[0], 0.6, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[1], 0.5, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[2], 0.0 , 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[0], 0.4, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[1], 0.5, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[2], 0.0 , 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(10)->rGetLocation()[0], 0.6, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(10)->rGetLocation()[1], 0.5, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(10)->rGetLocation()[2], 1.0 , 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(11)->rGetLocation()[0], 0.4, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(11)->rGetLocation()[1], 0.5, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(11)->rGetLocation()[2], 1.0 , 1e-8);
+
+        // Test that each element contains the correct number of nodes following the rearrangement
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 6u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 6u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumFaces(), 5u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumFaces(), 5u);
+
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 2u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 12u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumFaces(), 10u);
+
+        // Test that each element contains the correct nodes following the rearrangement
+        unsigned node_indices_element_0[3] = {0, 5, 3};
+        unsigned node_indices_element_1[3] = {4, 1, 2};
+        for (unsigned i=0; i<3; i++)
+        {
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(i), node_indices_element_1[i]);
+        }
+
+        // Test that each element has the correct area and perimeter following the rearrangement
+        TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(0), 0.2, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(1), 0.2, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(0), 1.0+0.2*sqrt(41.0)+2*0.2, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(1), 1.0+0.2*sqrt(41.0)+2*0.2, 1e-6);
+
+        // Test that the correct nodes are labelled as boundary nodes following the rearrangement
+        for (unsigned i=0; i<vertex_mesh.GetNumNodes(); i++)
+        {
+            TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), true);
+        }
+    }
+
+    void TestPerformT1SwapExceptions() throw(Exception)
+    {
+        /*
+         * Create a mesh comprising six nodes containing in two triangle and two rhomboid elements,
+         * where two nodes (those with indices 4 and 5) have the same location. We will test that
+         * trying to perform a T1 swap on these nodes throws the correct exception.
+         */
+        std::vector<Node<3>*> nodes;
+        nodes.push_back(new Node<3>(0, true, 0.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(1, true, 1.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(2, true, 1.0, 1.0, 0.0));
+        nodes.push_back(new Node<3>(3, true, 0.0, 1.0, 0.0));
+        nodes.push_back(new Node<3>(4, true, 0.5, 0.5, 0.0));
+        nodes.push_back(new Node<3>(5, true, 0.5, 0.5, 0.0));
+
+        unsigned node_indices_elem_0[3] = {2, 3, 5};
+        unsigned node_indices_elem_1[4] = {2, 5, 4, 1};
+        unsigned node_indices_elem_2[3] = {1, 4, 0};
+        unsigned node_indices_elem_3[4] = {0, 4, 5, 3};
+
+        const double height = 1;
+        MeshBuilderHelper builder(nodes, "T1SwapWith4Elements", height);
+        builder.buildElementWith(3, node_indices_elem_0);
+        builder.buildElementWith(4, node_indices_elem_1);
+        builder.buildElementWith(3, node_indices_elem_2);
+        builder.buildElementWith(4, node_indices_elem_3);
+        // A reference variable as mesh is noncopyable
+        MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
+
+        // Set the threshold distance between vertices for a T1 swap as follows, to ease calculations
+        vertex_mesh.SetCellRearrangementThreshold(0.1*2.0/1.5);
+
+        // Test that trying to perform a T1 swap on nodes 4 and 5 throws the correct exception
+        TS_ASSERT_THROWS_THIS(vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(4), vertex_mesh.GetNode(5)), "Nodes are too close together, this shouldn't happen");
+    }
+
+    void TestDoNotPerforT1SwapWithRemovingEdgeFromTriangularElement() throw(Exception)
+    {
+        /**
+         * In this test we check that a T1 swap does not occur if one of the elements is triangular
+         * and would loose an edge by swapping nodes. The mesh looks like this
+         *
+         *       ______________
+         *      |\             |
+         *      | \ _________  |
+         *      |  |          \| ...where the funny shaped element in the middle is supposed to be
+         *      |  |_________ /|    a very long triangle that has the third vertex on the right hand boundary.
+         *      | /            |
+         *      |/_____________|
+         */
+        std::vector<Node<3>*> nodes;
+        nodes.push_back(new Node<3>(0, true,  0.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(1, true,  2.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(2, true,  2.0, 2.0, 0.0));
+        nodes.push_back(new Node<3>(3, true,  0.0, 2.0, 0.0));
+        nodes.push_back(new Node<3>(4, false, 0.3, 0.95, 0.0));
+        nodes.push_back(new Node<3>(5, true, 2.0, 1.0, 0.0));
+        nodes.push_back(new Node<3>(6, false, 0.3, 1.05, 0.0));
+
+        unsigned node_indices_elem_0[4] = {0, 1, 5, 4};
+        unsigned node_indices_elem_1[4] = {5, 2, 3, 6};
+        unsigned node_indices_elem_2[4] = {0, 4, 6, 3};
+        unsigned node_indices_elem_3[3] = { 4, 5, 6};
+
+        const double height = 1;
+        MeshBuilderHelper builder(nodes, "NoT1SwapWithTriangularPrism", height);
+        builder.buildElementWith(4, node_indices_elem_0);
+        builder.buildElementWith(4, node_indices_elem_1);
+        builder.buildElementWith(4, node_indices_elem_2);
+        builder.buildElementWith(3, node_indices_elem_3);
+        // A reference variable as mesh is noncopyable
+        MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
+        builder.WriteVtk("Before");
+
+        // Ensure that the inner edge will be considered for a swap
+        vertex_mesh.SetCellRearrangementThreshold(0.11);
+
+        // Check for T1 swaps and carry them out if allowed - the short edge should not swap!
+        vertex_mesh.CheckForSwapsFromShortEdges();
+        builder.WriteVtk("After");
+
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNumNodes(), 6u);
+
+        // Test that each element still contains the correct nodes following the rearrangement
+        for (unsigned i=0; i<4; i++)
+        {
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_elem_0[i]);
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(i), node_indices_elem_1[i]);
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(i), node_indices_elem_2[i]);
+            if (i < 3)
+            {
+                TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNodeGlobalIndex(i), node_indices_elem_3[i]);
+            }
+        }
+    }
+
+    void TestExceptionForVoidRemovalWithRemovingEdgeFromTriangularElement() throw(Exception)
+    {
+        /**
+         * In this test we check that void removal does not occur if one of the adjacent elements is triangular
+         * and would loose an edge by swapping nodes. The code should throw and exception in this case.
+         * The mesh looks like this
+         *
+         *       ______________./This corner is not a node.
+         *      |\      1      |
+         *      | \ _________  |
+         *      |  |   void   \| ...where elements 1, and 2 are triangles that share the right hand vertex
+         *      |  |_________ /|    with the triangular void in the middle.
+         *      | /     2      |
+         *      |/_____________|.This corner is not a node either.
+         */
+        std::vector<Node<3>*> nodes;
+        nodes.push_back(new Node<3>(0, true,  0.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(1, true,  0.0, 2.0, 0.0));
+        nodes.push_back(new Node<3>(2, true, 0.3, 0.95, 0.0));
+        nodes.push_back(new Node<3>(3, true, 2.0, 1.0, 0.0));
+        nodes.push_back(new Node<3>(4, true, 0.3, 1.05, 0.0));
+
+        std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2;
+        unsigned node_indices_elem_0[4] = {0, 2, 4, 1};
+        unsigned node_indices_elem_1[3] = {1, 4, 3};
+        unsigned node_indices_elem_2[3] = {0, 3, 2};
+
+        const double height = 1;
+        MeshBuilderHelper builder(nodes, "NoT1SwapWithTriangularVoid", height);
+        builder.buildElementWith(4, node_indices_elem_0);
+        builder.buildElementWith(3, node_indices_elem_1);
+        builder.buildElementWith(3, node_indices_elem_2);
+        // A reference variable as mesh is noncopyable
+        MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
+        builder.WriteVtk("Before");
+
+        // Ensure that the inner edge will be considered for a swap
+        vertex_mesh.SetCellRearrangementThreshold(0.11);
+        builder.WriteVtk("After");
+
+        // Check for possible swaps and carry them out if allowed - the short edge should not swap and
+        // the void should not be removed!
+        TS_ASSERT_THROWS_THIS(vertex_mesh.CheckForSwapsFromShortEdges(),
+                "Triangular element next to triangular void, not implemented yet.");
+    }
+
+    void TestReMeshForT1Swaps() throw(Exception)
+    {
+        /*
+         * Read in a vertex mesh that contains several pairs of nodes that are close enough for
+         * T1 swaps to be performed, as shown below. The mesh consists of six elements and all
+         * T1 swaps are performed on all horizontal edges. We will test that the ReMesh() method
+         * correctly performs T1 swaps for internal and boundary elements, and correctly updates
+         * which nodes are labelled as boundary nodes.
+         *
+         *      /\    /\
+         *     /  \__/  \
+         *    /   /  \   \
+         *    \__/\__/\__/
+         *    /  \/  \/  \
+         *    \   \__/   /
+         *     \  /  \  /
+         *      \/    \/
+         */
+        VertexMeshReader<2,2> mesh_reader("cell_based/test/data/TestMutableVertexMesh/vertex_remesh_T1");
+        MutableVertexMesh<2,2> vertex_mesh;
+//        MeshBuilderHelper builder
+
+        vertex_mesh.ConstructFromMeshReader(mesh_reader);
+        vertex_mesh.SetCellRearrangementThreshold(0.1);
+
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 8u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 22u);
+
+        // Calls ReMesh() to identify and perform any T1 swaps
+        vertex_mesh.ReMesh();
+
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 8u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 22u);
+
+        std::string dirname = "TestVertexMeshReMesh";
+        std::string mesh_filename = "vertex_remesh_T1";
+
+        // Save the mesh data using mesh writers
+        VertexMeshWriter<2,2> mesh_writer(dirname, mesh_filename, false);
+        mesh_writer.WriteFilesUsingMesh(vertex_mesh);
+
+        // Check the positions are updated correctly
+        OutputFileHandler handler("TestVertexMeshReMesh", false);
+        std::string results_file1 = handler.GetOutputDirectoryFullPath() + "vertex_remesh_T1.node";
+        std::string results_file2 = handler.GetOutputDirectoryFullPath() + "vertex_remesh_T1.cell";
+
+        FileComparison comparer1(results_file1, "cell_based/test/data/TestMutableVertexMesh/vertex_remesh_T1_after_remesh.node");
+        TS_ASSERT(comparer1.CompareFiles());
+        FileComparison comparer2(results_file2, "cell_based/test/data/TestMutableVertexMesh/vertex_remesh_T1_after_remesh.cell");
+        TS_ASSERT(comparer2.CompareFiles());
     }
 };
 
