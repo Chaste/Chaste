@@ -1456,8 +1456,9 @@ public:
         TS_ASSERT_EQUALS(p_element_4->GetNodeGlobalIndex(1), 2u);
         TS_ASSERT_EQUALS(p_element_4->GetNodeGlobalIndex(2), 6u);
 
-        // Avoid memory leak
+        // Avoid memory leaks
         delete p_vertex_mesh;
+        delete p_tetrahedral_mesh;
     }
 
     void TestGetCellDataItemAtPdeNode() throw (Exception)

@@ -47,10 +47,10 @@ std::string GetCurrentWorkingDirectory()
     }
     catch (...)
     {
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
         // Not sure what could cause this, but just in case...
         EXCEPTION("Unable to determine current working directory");
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
     }
     return cwd.string();
 }

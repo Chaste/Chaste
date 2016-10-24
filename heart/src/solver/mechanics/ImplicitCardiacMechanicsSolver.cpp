@@ -117,7 +117,7 @@ void ImplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::GetActiveTensionAndT
     }
     catch (Exception&)
     {
-        #define COVERAGE_IGNORE
+        // LCOV_EXCL_START
         // if this failed during assembling the Jacobian this is a fatal error.
         if (assembleJacobian)
         {
@@ -131,7 +131,7 @@ void ImplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::GetActiveTensionAndT
                   << "Setting active tension to infinity (DBL_MAX) so that the residual(-norm) is also infinite\n" << std::flush;
         assert(0); // just to see if we ever get here, can be removed..
         return;
-        #undef COVERAGE_IGNORE
+        // LCOV_EXCL_STOP
     }
 
     // if assembling the Jacobian, numerically evaluate dTa/dlam & dTa/d(lamdot)

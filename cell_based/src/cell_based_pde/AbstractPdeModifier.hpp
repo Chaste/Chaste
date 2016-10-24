@@ -200,13 +200,6 @@ public:
     Vec GetSolution() const;
 
     /**
-     * Set mSolution.
-     *
-     * @param solution the present solution
-     */
-    void SetSolution(Vec solution);
-
-    /**
      * @return mpFeMesh.
      */
     TetrahedralMesh<DIM,DIM>* GetFeMesh() const;

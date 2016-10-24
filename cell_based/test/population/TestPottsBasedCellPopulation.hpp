@@ -775,6 +775,9 @@ public:
         TS_ASSERT_DELTA(p_tet_mesh->GetNode(1)->rGetLocation()[1], 0.5, 1e-6);
         TS_ASSERT_DELTA(p_tet_mesh->GetNode(2)->rGetLocation()[0], 0.5, 1e-6);
         TS_ASSERT_DELTA(p_tet_mesh->GetNode(2)->rGetLocation()[1], 2.5, 1e-6);
+
+        // Tidy up
+        delete p_tet_mesh;
     }
 
     void TestGetCellDataItemAtPdeNode() throw (Exception)

@@ -85,13 +85,13 @@ void CompressibleNonlinearElasticitySolver<DIM>::AssembleSystem(bool assembleRes
 
         if (element.GetOwnership() == true)
         {
-            #define COVERAGE_IGNORE
+            // LCOV_EXCL_START
             // note: if assembleJacobian only
             if (CommandLineArguments::Instance()->OptionExists("-mech_very_verbose") && assembleJacobian)
             {
                 std::cout << "\r[" << PetscTools::GetMyRank() << "]: Element " << (*iter).GetIndex() << " of " << this->mrQuadMesh.GetNumElements() << std::flush;
             }
-            #undef COVERAGE_IGNORE
+            // LCOV_EXCL_STOP
 
             AssembleOnElement(element, a_elem, a_elem_precond, b_elem, assembleResidual, assembleJacobian);
 

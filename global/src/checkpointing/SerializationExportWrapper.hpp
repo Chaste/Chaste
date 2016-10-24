@@ -34,7 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /// gcov doesn't like this file...
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
 
 /**
  * @file
@@ -420,4 +420,4 @@ template<class T> struct pack<void (T)> {
 #endif // Long if!
 #endif // !defined(CHASTE_CLASS_EXPORT) || defined(CHASTE_SERIALIZATION_CPP)
 
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP

@@ -94,7 +94,7 @@ private:
     }
 
 protected:
-#define COVERAGE_IGNORE // Avoid prototypes being treated as code by gcov
+// LCOV_EXCL_START // Avoid prototypes being treated as code by gcov
 
     /**
      * Pointer to a VertexMesh object that stores the Voronoi tessellation that is dual to
@@ -145,7 +145,7 @@ protected:
     /** Node pairs for force calculations. */
     std::vector< std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>* > > mNodePairs;
 
-#undef COVERAGE_IGNORE // Avoid prototypes being treated as code by gcov
+// LCOV_EXCL_STOP // Avoid prototypes being treated as code by gcov
 
     /**
      * Update mIsGhostNode if required by a remesh.
@@ -161,7 +161,7 @@ protected:
     virtual void Validate();
 
 public:
-#define COVERAGE_IGNORE // Avoid prototypes being treated as code by gcov
+// LCOV_EXCL_START // Avoid prototypes being treated as code by gcov
 
     /**
      * Create a new cell population facade from a mesh and collection of cells.
@@ -601,7 +601,7 @@ public:
     void SetRestLength(unsigned indexA, unsigned indexB, double restLength);
 
 };
-#undef COVERAGE_IGNORE // Avoid prototypes being treated as code by gcov
+// LCOV_EXCL_STOP // Avoid prototypes being treated as code by gcov
 
 #include "SerializationExportWrapper.hpp"
 EXPORT_TEMPLATE_CLASS_ALL_DIMS(MeshBasedCellPopulation)

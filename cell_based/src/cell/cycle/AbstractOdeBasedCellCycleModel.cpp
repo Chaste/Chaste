@@ -90,11 +90,11 @@ bool AbstractOdeBasedCellCycleModel::ReadyToDivide()
             {
                 if (mpOdeSystem->rGetStateVariables()[i] < -DBL_EPSILON)
                 {
-                    #define COVERAGE_IGNORE
+                    // LCOV_EXCL_START
                     EXCEPTION("A protein concentration " << i << " has gone negative (" <<
                               mpOdeSystem->rGetStateVariables()[i] << ")\n"
                               << "Chaste predicts that the CellCycleModel numerical method is probably unstable.");
-                    #undef COVERAGE_IGNORE
+                    // LCOV_EXCL_STOP
                 }
             }
             if (mReadyToDivide)

@@ -106,7 +106,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
         archive & boost::serialization::base_object<AbstractOnLatticeCellPopulation<DIM> >(*this);
 
         /*
@@ -119,7 +119,7 @@ private:
         archive & mTemperature;
         archive & mNumSweepsPerTimestep;
 
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
     }
 
     /**

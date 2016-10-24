@@ -71,9 +71,9 @@ MemfemMeshReader<ELEMENT_DIM, SPACE_DIM>::MemfemMeshReader(const std::string& rP
     {
         // ignored from coverage because otherwise would have to create files
         // for a bad mesh just to test this line
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
         EXCEPTION("Number of nodes does not match expected number declared in header");
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
     }
 
     // Open element file and store the lines as a vector of strings (minus the comments)
@@ -94,9 +94,9 @@ MemfemMeshReader<ELEMENT_DIM, SPACE_DIM>::MemfemMeshReader(const std::string& rP
     {
         // Ignored from coverage because otherwise we would have to create files
         // for a bad mesh just to test this line
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
         EXCEPTION("Number of elements does not match expected number declared in header");
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
     }
 
     // Open boundary face file and store the lines as a vector of strings (minus the comments)

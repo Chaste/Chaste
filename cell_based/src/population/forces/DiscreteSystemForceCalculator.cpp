@@ -199,12 +199,12 @@ std::vector<double> DiscreteSystemForceCalculator::GetSamplingAngles(unsigned in
 
         // Calculate sampling angles in the range (-pi,pi]
 
-        #define COVERAGE_IGNORE
+        // LCOV_EXCL_START
         if (alpha_minus_epsilon <= -M_PI)
         {
             alpha_minus_epsilon += 2*M_PI;
         }
-        #undef COVERAGE_IGNORE
+        // LCOV_EXCL_STOP
         sampling_angles[i] = alpha_minus_epsilon;
 
         assert(sampling_angles[i] <= M_PI);

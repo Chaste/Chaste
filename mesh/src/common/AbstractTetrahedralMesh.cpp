@@ -720,7 +720,7 @@ unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMaximumNodeCo
 
     if (this->mNodes.size() == 0u)
     {
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
         /*
          * Coverage of this block requires a mesh regular slab mesh with the number of
          * elements in the primary dimension less than (num_procs - 1), e.g. a 1D mesh
@@ -732,7 +732,7 @@ unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMaximumNodeCo
 
         // This process owns no nodes and thus owns none of the mesh
         return (1u);
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
     }
 
     unsigned nodes_per_element = this->mElements[0]->GetNumNodes(); //Usually ELEMENT_DIM+1, except in Quadratic case

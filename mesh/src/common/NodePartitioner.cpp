@@ -78,9 +78,9 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::PetscMatrixPartitioning(AbstractMe
 
     if (!PetscTools::HasParMetis()) //We must have ParMetis support compiled into Petsc
     {
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
         WARN_ONCE_ONLY("PETSc support for ParMetis is not installed.");
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
     }
 
     unsigned num_nodes = rMeshReader.GetNumNodes();

@@ -114,10 +114,10 @@ void ExecutableSupport::InitializePetsc(int* pArgc, char*** pArgv)
     // Set default output folder
     if (!mOutputDirectory.IsPathSet())
     {
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
         //depends on order of calls.  Extract to method?
         mOutputDirectory.SetPath("", RelativeTo::ChasteTestOutput);
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
     }
 }
 
@@ -155,10 +155,10 @@ void ExecutableSupport::WriteMachineInfoFile(std::string fileBaseName)
 {
     if (!mOutputDirectory.IsPathSet())
     {
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
         //depends on order of calls.  Extract to method?
         mOutputDirectory.SetPath("", RelativeTo::ChasteTestOutput);
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
     }
     OutputFileHandler out_file_handler(mOutputDirectory, false);
     std::stringstream file_name;
@@ -316,10 +316,10 @@ void ExecutableSupport::WriteProvenanceInfoFile()
 {
     if (!mOutputDirectory.IsPathSet())
     {
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
         //depends on order of calls.  Extract to method?
         mOutputDirectory.SetPath("", RelativeTo::ChasteTestOutput);
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
     }
     OutputFileHandler out_file_handler(mOutputDirectory, false);
     out_stream out_file = out_file_handler.OpenOutputFile("provenance_info_", PetscTools::GetMyRank(), ".txt");
@@ -353,11 +353,11 @@ void ExecutableSupport::GetBuildInfo(std::string& rInfo)
     output << "\t\t<Projects>\n";
     BOOST_FOREACH(const StringPair& r_project_version, ChasteBuildInfo::rGetProjectVersions())
     {
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
         // No projects are checked out for continuous builds normally!
         output<< "\t\t\t<Name>" << r_project_version.first << "</Name><Version>"
                  << r_project_version.second << "</Version>\n";
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
     }
     output << "\t\t</Projects>\n";
     output << "\t</ProvenanceInfo>\n";
@@ -432,10 +432,10 @@ void ExecutableSupport::PrintError(const std::string& rMessage, bool masterOnly)
     // Write the error message to file
     if (!mOutputDirectory.IsPathSet())
     {
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
         //depends on order of calls.  Extract to method?
         mOutputDirectory.SetPath("", RelativeTo::ChasteTestOutput);
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
     }
     OutputFileHandler out_file_handler(mOutputDirectory, false);
     out_stream out_file = out_file_handler.OpenOutputFile("chaste_errors_", PetscTools::GetMyRank(), ".txt", std::ios::out | std::ios::app);

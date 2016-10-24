@@ -624,7 +624,7 @@ void CaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirec
     time << num_timesteps;
 
     // Store the number of cells for which to output data to VTK
-    unsigned num_cells = this->GetNumAllCells();
+    unsigned num_cells = this->GetNumRealCells();
 
     // When outputting any CellData, we assume that the first cell is representative of all cells
     unsigned num_cell_data_items = 0u;
@@ -655,8 +655,8 @@ void CaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirec
     // Populate a vector of nodes associated with cell locations, by iterating through the list of cells
     std::vector<Node<DIM>*> nodes;
     unsigned node_index = 0;
-    for (std::list<CellPtr>::iterator cell_iter = this->mCells.begin();
-         cell_iter != this->mCells.end();
+    for (typename AbstractCellPopulation<DIM,DIM>::Iterator cell_iter = this->Begin();
+         cell_iter != this->End();
          ++cell_iter)
     {
         // Get the location index of this cell and update the counter number_of_cells_at_site
@@ -709,8 +709,8 @@ void CaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirec
 
         // Loop over cells
         unsigned cell_index = 0;
-        for (std::list<CellPtr>::iterator cell_iter = this->mCells.begin();
-             cell_iter != this->mCells.end();
+        for (typename AbstractCellPopulation<DIM,DIM>::Iterator cell_iter = this->Begin();
+             cell_iter != this->End();
              ++cell_iter)
         {
             // Populate the vector of VTK cell data

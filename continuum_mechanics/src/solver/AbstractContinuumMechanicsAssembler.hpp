@@ -399,13 +399,13 @@ void AbstractContinuumMechanicsAssembler<DIM,CAN_ASSEMBLE_VECTOR,CAN_ASSEMBLE_MA
         // Test for ownership first, since it's pointless to test the criterion on something which we might know nothing about.
         if (r_element.GetOwnership() == true  /*&& ElementAssemblyCriterion(r_element)==true*/)
         {
-            #define COVERAGE_IGNORE
+            // LCOV_EXCL_START
             // note: if assemble matrix only
             if (CommandLineArguments::Instance()->OptionExists("-mech_very_verbose") && this->mAssembleMatrix)
             {
                 std::cout << "\r[" << PetscTools::GetMyRank() << "]: Element " << r_element.GetIndex() << " of " << mpMesh->GetNumElements() << std::flush;
             }
-            #undef COVERAGE_IGNORE
+            // LCOV_EXCL_STOP
 
             AssembleOnElement(r_element, a_elem, b_elem);
 

@@ -70,41 +70,6 @@ class TestCellPopulationBoundaryConditions : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestPlaneBoundaryConditionConstructor() throw(Exception)
-    {
-        // Note we dont pass a cell population in as we are just checking that the objects are created properly.
-        {
-            // Set up cell population boundary condition in 2D
-            c_vector<double,2> point = zero_vector<double>(2);
-            point(0) = 2.0;
-            c_vector<double,2> normal = zero_vector<double>(2);
-            normal(0) = -1.0;
-            PlaneBoundaryCondition<2> boundary_condition(NULL, point, normal);
-
-            TS_ASSERT_EQUALS(boundary_condition.GetIdentifier(), "PlaneBoundaryCondition-2-2");
-        }
-        {
-            // Set up cell population boundary condition in 3D
-            c_vector<double,3> point = zero_vector<double>(3);
-            point(0) = 2.0;
-            c_vector<double,3> normal = zero_vector<double>(3);
-            normal(0) = -1.0;
-            PlaneBoundaryCondition<3> boundary_condition(NULL, point, normal);
-
-            TS_ASSERT_EQUALS(boundary_condition.GetIdentifier(), "PlaneBoundaryCondition-3-3");
-        }
-        {
-            // Set up cell population boundary condition on a surface
-            c_vector<double,3> point = zero_vector<double>(3);
-            point(0) = 2.0;
-            c_vector<double,3> normal = zero_vector<double>(3);
-            normal(0) = -1.0;
-            PlaneBoundaryCondition<2,3> boundary_condition(NULL, point, normal);
-
-            TS_ASSERT_EQUALS(boundary_condition.GetIdentifier(), "PlaneBoundaryCondition-2-3");
-        }
-    }
-
     void TestPlaneBoundaryConditionWithNodeBasedCellPopulation() throw(Exception)
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
@@ -167,11 +132,6 @@ public:
 
         // Test VerifyBoundaryCondition() method
         TS_ASSERT_EQUALS(boundary_condition.VerifyBoundaryCondition(), true);
-
-        // For coverage, test VerifyBoundaryCondition() method in the case DIM = 1
-        PlaneBoundaryCondition<1> plane_boundary_condition_1d(NULL, zero_vector<double>(1), unit_vector<double>(1,0));
-        TS_ASSERT_THROWS_THIS(plane_boundary_condition_1d.VerifyBoundaryCondition(),
-                              "PlaneBoundaryCondition is not implemented in 1D");
     }
 
     void TestPlaneBoundaryConditionWithNodeBasedCellPopulationAndJiggledNodes() throw(Exception)
@@ -294,11 +254,6 @@ public:
         // Test VerifyBoundaryCondition() method
         TS_ASSERT_EQUALS(boundary_condition.VerifyBoundaryCondition(), true);
 
-        // For coverage, test VerifyBoundaryCondition() method in the case DIM == 1
-        PlaneBoundaryCondition<1> plane_boundary_condition_1d(NULL, zero_vector<double>(1), unit_vector<double>(1,0));
-        TS_ASSERT_THROWS_THIS(plane_boundary_condition_1d.VerifyBoundaryCondition(),
-                              "PlaneBoundaryCondition is not implemented in 1D");
-
         // Now test with the jiggled nodes for coverage
         x_boundary = 0.8;
         point(0) = x_boundary;
@@ -348,11 +303,10 @@ public:
         c_vector<double,2> point = zero_vector<double>(2);
         c_vector<double,2> normal = zero_vector<double>(2);
         normal(0) = 1.0;
-        //TS_ASSERT_THROWS_THIS(PlaneBoundaryCondition<2> plane_boundary_condition(&potts_cell_population, point, normal),
-        //    "PlaneBoundaryCondition require a subclass of AbstractOffLatticeCellPopulation.");
-        PlaneBoundaryCondition<2> boundary_condition(&potts_cell_population, point, normal);
-        std::map<Node<2>*, c_vector<double,2> > old_locations;
-        TS_ASSERT_THROWS_THIS(boundary_condition.ImposeBoundaryCondition(old_locations),
+
+        PlaneBoundaryCondition<2> plane_boundary_condition(&potts_cell_population, point, normal);
+        std::map<Node<2>*, c_vector<double, 2> > old_locations;
+        TS_ASSERT_THROWS_THIS(plane_boundary_condition.ImposeBoundaryCondition(old_locations),
             "PlaneBoundaryCondition requires a subclass of AbstractOffLatticeCellPopulation.");
     }
 
@@ -465,35 +419,51 @@ public:
     {
         EXIT_IF_PARALLEL;    // We cannot archive parallel cell based simulations yet.
         // Set up singleton classes
-        OutputFileHandler handler("archive", false); // don't erase contents of folder
-        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "PlaneBoundaryCondition.arch";
+
+        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
+        TetrahedralMesh<2,2> generating_mesh;
+        generating_mesh.ConstructFromMeshReader(mesh_reader);
+
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(generating_mesh, 1.5);
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+
+        NodeBasedCellPopulation<2> population(mesh, cells);
+
+        FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
+        std::string archive_file = "PlaneBoundaryCondition.arch";
+        ArchiveLocationInfo::SetMeshFilename("PlaneBoundaryCondition");
 
         {
             // Create an output archive
-            PlaneBoundaryCondition<2> boundary_condition(NULL, zero_vector<double>(2), unit_vector<double>(2,1));
+            PlaneBoundaryCondition<2> boundary_condition(&population, zero_vector<double>(2), unit_vector<double>(2,1));
 
             TS_ASSERT_DELTA(boundary_condition.rGetPointOnPlane()[0], 0.0, 1e-6);
             TS_ASSERT_DELTA(boundary_condition.rGetPointOnPlane()[1], 0.0, 1e-6);
             TS_ASSERT_DELTA(boundary_condition.rGetNormalToPlane()[0], 0.0, 1e-6);
             TS_ASSERT_DELTA(boundary_condition.rGetNormalToPlane()[1], 1.0, 1e-6);
 
-            std::ofstream ofs(archive_filename.c_str());
-            boost::archive::text_oarchive output_arch(ofs);
+            // Create an output archive
+            ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
+            boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
 
             // Serialize via pointer
             AbstractCellPopulationBoundaryCondition<2>* const p_boundary_condition = &boundary_condition;
-            output_arch << p_boundary_condition;
+            (*p_arch) << p_boundary_condition;
         }
 
         {
             // Create an input archive
-            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
-            boost::archive::text_iarchive input_arch(ifs);
+            ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
+            boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
 
             AbstractCellPopulationBoundaryCondition<2,2>* p_boundary_condition;
 
             // Restore from the archive
-            input_arch >> p_boundary_condition;
+            (*p_arch) >> p_boundary_condition;
 
             // Test we have restored the plane geometry correctly
             TS_ASSERT_DELTA(static_cast<PlaneBoundaryCondition<2>*>(p_boundary_condition)->rGetPointOnPlane()[0], 0.0, 1e-6);
@@ -502,6 +472,7 @@ public:
             TS_ASSERT_DELTA(static_cast<PlaneBoundaryCondition<2>*>(p_boundary_condition)->rGetNormalToPlane()[1], 1.0, 1e-6);
 
             // Tidy up
+            delete p_boundary_condition->mpCellPopulation;
             delete p_boundary_condition;
        }
     }
@@ -515,7 +486,6 @@ public:
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
         TetrahedralMesh<2,2> generating_mesh;
         generating_mesh.ConstructFromMeshReader(mesh_reader);
-        ArchiveLocationInfo::SetMeshFilename("mesh");
 
         NodesOnlyMesh<2> mesh;
         mesh.ConstructNodesWithoutMesh(generating_mesh, 1.5);
@@ -573,8 +543,20 @@ public:
         std::string output_directory = "TestCellBoundaryConditionsOutputParameters";
         OutputFileHandler output_file_handler(output_directory, false);
 
+        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
+        TetrahedralMesh<2,2> generating_mesh;
+        generating_mesh.ConstructFromMeshReader(mesh_reader);
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(generating_mesh, 1.5);
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+
+        NodeBasedCellPopulation<2> population(mesh, cells);
+
         // Test with PlaneBoundaryCondition
-        PlaneBoundaryCondition<2> plane_boundary_condition(NULL, zero_vector<double>(2), unit_vector<double>(2,1));
+        PlaneBoundaryCondition<2> plane_boundary_condition(&population, zero_vector<double>(2), unit_vector<double>(2,1));
         TS_ASSERT_EQUALS(plane_boundary_condition.GetIdentifier(), "PlaneBoundaryCondition-2-2");
 
         out_stream plane_boundary_condition_parameter_file = output_file_handler.OpenOutputFile("plane_results.parameters");
@@ -591,17 +573,6 @@ public:
         }
 
         // Test with SphereGeometryBoundaryCondition
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
-        TetrahedralMesh<2,2> generating_mesh;
-        generating_mesh.ConstructFromMeshReader(mesh_reader);
-        NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(generating_mesh, 1.5);
-
-        std::vector<CellPtr> cells;
-        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
-
-        NodeBasedCellPopulation<2> population(mesh, cells);
         c_vector<double,2> centre = zero_vector<double>(2);
 
         SphereGeometryBoundaryCondition<2> sphere_boundary_condition(&population, centre, 0.56, 1e-3);

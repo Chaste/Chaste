@@ -245,11 +245,11 @@ void AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>::CheckCompatibilityCondition(
 
     if (fabs(global_sum)>1e-6) // magic number! sum should really be a sum of zeros and exactly zero though anyway (or a-a+b-b+c-c.. etc in the case of electrodes)
     {
-        #define COVERAGE_IGNORE
+        // LCOV_EXCL_START
         // shouldn't ever reach this line but useful to have the error printed out if you do
         //std::cout << "Sum of b_{2i+1} = " << global_sum << " (should be zero for compatibility)\n";
         EXCEPTION("Linear system does not satisfy compatibility constraint!");
-        #undef COVERAGE_IGNORE
+        // LCOV_EXCL_STOP
     }
 #endif
 }

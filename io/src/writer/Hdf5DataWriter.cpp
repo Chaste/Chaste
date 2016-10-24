@@ -198,10 +198,10 @@ Hdf5DataWriter::Hdf5DataWriter(DistributedVectorFactory& rVectorFactory,
             attribute_id = H5Aopen_name(mVariablesDatasetId, "IsDataComplete");
             if (attribute_id < 0)
             {
-    #define COVERAGE_IGNORE
+    // LCOV_EXCL_START
                 // Old format, before we added the attribute.
                 EXCEPTION("Extending old-format files isn't supported.");
-    #undef COVERAGE_IGNORE
+    // LCOV_EXCL_STOP
             }
             else
             {

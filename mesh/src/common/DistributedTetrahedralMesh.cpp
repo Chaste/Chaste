@@ -119,10 +119,10 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ComputeMeshPartitioning
     if (mPartitioning == DistributedTetrahedralMeshPartitionType::PETSC_MAT_PARTITION && !PetscTools::HasParMetis())
     {
         // The following warning can only be reproduced on machines which do not have the PETSc/parMETIS interface.
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
         WARNING("PETSc/parMETIS partitioning requires PETSc to be configured with parMETIS as an option.  Current install has PETSc and parMETIS installed independently.  Switching to parMETIS");
         mPartitioning = DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY;
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
     }
     ///\todo #1293 add a timing event for the partitioning
     if (mPartitioning==DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY && PetscTools::IsParallel())
@@ -1618,10 +1618,10 @@ ChasteCuboid<SPACE_DIM> DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::Calc
     }
     catch (Exception& e)
     {
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
         PetscTools::ReplicateException(true);
         throw e;
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
     }
 
     PetscTools::ReplicateException(false);

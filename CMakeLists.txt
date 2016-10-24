@@ -138,6 +138,8 @@ endif()
 option(Chaste_ENABLE_TESTING "Enable Chaste Testing" ON)
 option(Chaste_INSTALL_TESTS "Install Chaste Testing infrastructure" OFF)
 
+set(Chaste_PYCML_EXTRA_ARGS "" CACHE STRING "Add any extra arguments for PyCML here")
+
 #Some Chaste-specific #defines
 add_definitions(-DCHASTE_CMAKE)
 
@@ -650,6 +652,7 @@ install(EXPORT chaste-targets
 
 
 if (Chaste_COVERAGE)
+         
     set(CTEST_COMMAND ctest)
     set(_outputname coverage)
 	ADD_CUSTOM_TARGET(coverage
@@ -661,9 +664,9 @@ if (Chaste_COVERAGE)
         COMMAND ${CTEST_COMMAND} "-L" "Continuous|Parallel" "--output-on-failure" 
 
 		# Capturing lcov counters and generating report
-		COMMAND ${LCOV_PATH} --directory . --capture --output-file ${_outputname}.info
-        COMMAND ${LCOV_PATH} --remove ${_outputname}.info /usr/* */fortests/* */3rdparty/* Debug/* cxxtest/* --output-file ${_outputname}.info.cleaned
-		COMMAND ${GENHTML_PATH} --no-function-coverage -o ${_outputname} ${_outputname}.info.cleaned
+		COMMAND ${LCOV_PATH} --config-file ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc --directory . --capture --output-file ${_outputname}.info
+        COMMAND ${LCOV_PATH} --config-file ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc --remove ${_outputname}.info /home/bob/petsc* /usr/* */fortests/* */3rdparty/* Debug/* cxxtest/* --output-file ${_outputname}.info.cleaned
+		COMMAND ${GENHTML_PATH} --config-file ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc --no-function-coverage -o ${_outputname} ${_outputname}.info.cleaned
 		COMMAND ${CMAKE_COMMAND} -E remove ${_outputname}.info ${_outputname}.info.cleaned
 
         DEPENDS Continuous Parallel
