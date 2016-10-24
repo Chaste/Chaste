@@ -62,7 +62,6 @@ population/TestT2SwapCellKiller.hpp
 population/TestVertexBasedCellPopulation.hpp
 population/TestVertexBasedDivisionRules.hpp
 simulation/TestDeltaNotchModifier.hpp
-simulation/TestFarhadifarTypeModifier.hpp
 simulation/TestImmersedBoundaryPdeSolveMethods.hpp
 simulation/TestImmersedBoundarySimulationModifier.hpp
 simulation/TestNumericalMethods.hpp
