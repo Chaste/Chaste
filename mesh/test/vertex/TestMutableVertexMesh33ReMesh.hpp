@@ -2,7 +2,7 @@
 #define TESTMUTABLEVERTEXMESH33REMESH_HPP_
 
 #include <cxxtest/TestSuite.h>
-
+#include "Debug.hpp"
 #include "VertexMeshWriter.hpp"
 #include "FileComparison.hpp"
 #include "Warnings.hpp"
@@ -36,7 +36,7 @@ private:
     VertexMeshWriter<3, 3>* mpWriter;
 
 public:
-    MeshBuilderHelper(const std::vector<Node<3>*>& rLowerNodes, std::string Name, unsigned zHeight = 1)
+    MeshBuilderHelper(const std::vector<Node<3>*>& rLowerNodes, const std::string& Name, const unsigned zHeight = 1)
                         : mName(Name),
                           mNumLowerNodes(rLowerNodes.size()),
                           mLowerNodes(rLowerNodes),
@@ -52,7 +52,7 @@ public:
         {
             mLowerNodes[i]->AddNodeAttribute(1.1);
 
-            c_vector<double, 3> tmp = mLowerNodes[i]->rGetLocation();
+            const c_vector<double, 3> tmp = mLowerNodes[i]->rGetLocation();
             Node<3>* p_node_tmp = new Node<3>(i+mNumLowerNodes, mLowerNodes[i]->IsBoundaryNode(),
                     tmp[0], tmp[1], tmp[2] + zHeight);
             p_node_tmp->AddNodeAttribute(2.1);
@@ -60,9 +60,52 @@ public:
         }
     }
 
-    void MakeMeshUsing2dMesh(std::vector<Node<2>*>& inNodes)
+    MeshBuilderHelper(const std::string& Name)
+    : mName(Name),
+      mNumLowerNodes(0),
+      mLowerNodes(),
+      mUpperNodes(),
+      mNodeToLateralFaceIndices(),
+      mFaces(),
+      mElements(),
+      mpMesh(NULL),
+      mpWriter(NULL)
+    {}
+
+    MutableVertexMesh<3, 3>* MakeMeshUsing2dMesh(const MutableVertexMesh<2, 2>& mesh2, const double zHeight=1)
     {
-        ///\todo
+        mNumLowerNodes = mesh2.GetNumNodes();
+        mLowerNodes.resize(mNumLowerNodes);
+        mUpperNodes.resize(mNumLowerNodes);
+        mNodeToLateralFaceIndices.resize(mNumLowerNodes);
+
+        for (unsigned i=0 ; i<mNumLowerNodes ; ++i)
+        {
+            const Node<2>* p_2node = mesh2.GetNode(i);
+            assert( i == p_2node->GetIndex() );
+            const c_vector<double, 2> loc = p_2node->rGetLocation();
+            const bool is_boundary = p_2node->IsBoundaryNode();
+            Node<3>* p_lower = new Node<3>(i, is_boundary, loc[0], loc[1], 0);
+            Node<3>* p_upper = new Node<3>(i+mNumLowerNodes, is_boundary, loc[0], loc[1], zHeight);
+            p_lower->AddNodeAttribute(1.1);
+            p_upper->AddNodeAttribute(2.1);
+            mLowerNodes[i] = p_lower;
+            mUpperNodes[i] = p_upper;
+        }
+        mElements.reserve(mesh2.GetNumElements());
+
+        const unsigned num_elem = mesh2.GetNumElements();
+        for (unsigned elem_index=0 ; elem_index<num_elem ; ++elem_index)
+        {
+            const VertexElement<2, 2>* p_2elem = mesh2.GetElement(elem_index);
+            std::vector<unsigned> node_index_this_elem;
+            for (unsigned i=0 ; i<p_2elem->GetNumNodes() ; ++i)
+            {
+                node_index_this_elem.push_back( p_2elem->GetNode(i)->GetIndex() );
+            }
+            this->buildElementWith(node_index_this_elem);
+        }
+        return this->GenerateMesh();
     }
 
     MutableVertexMesh<3, 3>* GenerateMesh()
@@ -110,7 +153,7 @@ public:
         std::cout << std::endl;
     }
 
-    void WriteVtk(std::string AdditionalTag = "")
+    void WriteVtk(const std::string& AdditionalTag = "")
     {
         if (mpWriter == NULL)
         {
@@ -127,20 +170,29 @@ public:
 
     void buildElementWith(const unsigned numNodesThis, const unsigned nodeIndicesThis[] )
     {
+        std::vector<unsigned> node_indices_this_elem(numNodesThis);
+        for (unsigned id=0 ; id<numNodesThis ;  node_indices_this_elem[id] = nodeIndicesThis[id], ++id);
+
+        buildElementWith(node_indices_this_elem);
+    }
+
+    void buildElementWith(const std::vector<unsigned>& nodeIndicesThisElem)
+    {
+        const unsigned num_nodes_this_elem = nodeIndicesThisElem.size();
         // Initializing vectors which are required for the generation of the VertexElement<3, 3>
         std::vector<VertexElement<2, 3>*> faces_this_elem;
         std::vector<bool> faces_orientation;
 
-        std::vector<Node<3>*> lower_nodes_this_elem(numNodesThis);
-        std::vector<Node<3>*> upper_nodes_this_elem(numNodesThis);
-        std::vector<Node<3>*> all_nodes_this_elem(2*numNodesThis);
+        std::vector<Node<3>*> lower_nodes_this_elem(num_nodes_this_elem);
+        std::vector<Node<3>*> upper_nodes_this_elem(num_nodes_this_elem);
+        std::vector<Node<3>*> all_nodes_this_elem(2*num_nodes_this_elem);
         // Populate lower & upper_nodes_this_elem
-        for (unsigned j=0; j<numNodesThis; ++j)
+        for (unsigned j=0; j<num_nodes_this_elem; ++j)
         {
-            lower_nodes_this_elem[j] = mLowerNodes[ nodeIndicesThis[j] ];
-            upper_nodes_this_elem[j] = mUpperNodes[ nodeIndicesThis[j] ];
-            all_nodes_this_elem[j] = mLowerNodes[ nodeIndicesThis[j] ];
-            all_nodes_this_elem[j+numNodesThis] = mUpperNodes[ nodeIndicesThis[j] ];
+            lower_nodes_this_elem[j] = mLowerNodes[ nodeIndicesThisElem[j] ];
+            upper_nodes_this_elem[j] = mUpperNodes[ nodeIndicesThisElem[j] ];
+            all_nodes_this_elem[j] = mLowerNodes[ nodeIndicesThisElem[j] ];
+            all_nodes_this_elem[j+num_nodes_this_elem] = mUpperNodes[ nodeIndicesThisElem[j] ];
         }
 
         // Creating the lower face
@@ -162,10 +214,10 @@ public:
         faces_orientation.push_back(false);
 
         // Creating all the lateral faces in CCW
-        for (unsigned local_node_index=0; local_node_index<numNodesThis; ++local_node_index )
+        for (unsigned local_node_index=0; local_node_index<num_nodes_this_elem; ++local_node_index )
         {
-            unsigned node1Index = nodeIndicesThis[local_node_index];
-            unsigned node2Index = nodeIndicesThis[(local_node_index+1) % numNodesThis];
+            unsigned node1Index = nodeIndicesThisElem[local_node_index];
+            unsigned node2Index = nodeIndicesThisElem[(local_node_index+1) % num_nodes_this_elem];
 
             // The values of the maps are called here because they will be used both existing and creating branch.
             // They are called by reference as they will be modified if they enter creating branch.
@@ -779,37 +831,39 @@ public:
          *      \/    \/
          */
         VertexMeshReader<2,2> mesh_reader("cell_based/test/data/TestMutableVertexMesh/vertex_remesh_T1");
-        MutableVertexMesh<2,2> vertex_mesh;
-//        MeshBuilderHelper builder
+        MutableVertexMesh<2,2> vertex_2mesh;
+        vertex_2mesh.ConstructFromMeshReader(mesh_reader);
+        vertex_2mesh.SetCellRearrangementThreshold(0.1);
 
-        vertex_mesh.ConstructFromMeshReader(mesh_reader);
-        vertex_mesh.SetCellRearrangementThreshold(0.1);
+        MeshBuilderHelper builder("TestReMesh");
+        MutableVertexMesh<3, 3>& vertex_mesh = *(builder.MakeMeshUsing2dMesh(vertex_2mesh) );
+        builder.WriteVtk("");
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 8u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 22u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 44u);
 
         // Calls ReMesh() to identify and perform any T1 swaps
         vertex_mesh.ReMesh();
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 8u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 22u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 44u);
 
         std::string dirname = "TestVertexMeshReMesh";
         std::string mesh_filename = "vertex_remesh_T1";
 
         // Save the mesh data using mesh writers
         VertexMeshWriter<2,2> mesh_writer(dirname, mesh_filename, false);
-        mesh_writer.WriteFilesUsingMesh(vertex_mesh);
-
-        // Check the positions are updated correctly
-        OutputFileHandler handler("TestVertexMeshReMesh", false);
-        std::string results_file1 = handler.GetOutputDirectoryFullPath() + "vertex_remesh_T1.node";
-        std::string results_file2 = handler.GetOutputDirectoryFullPath() + "vertex_remesh_T1.cell";
-
-        FileComparison comparer1(results_file1, "cell_based/test/data/TestMutableVertexMesh/vertex_remesh_T1_after_remesh.node");
-        TS_ASSERT(comparer1.CompareFiles());
-        FileComparison comparer2(results_file2, "cell_based/test/data/TestMutableVertexMesh/vertex_remesh_T1_after_remesh.cell");
-        TS_ASSERT(comparer2.CompareFiles());
+//        mesh_writer.WriteFilesUsingMesh(vertex_mesh);
+//
+//        // Check the positions are updated correctly
+//        OutputFileHandler handler("TestVertexMeshReMesh", false);
+//        std::string results_file1 = handler.GetOutputDirectoryFullPath() + "vertex_remesh_T1.node";
+//        std::string results_file2 = handler.GetOutputDirectoryFullPath() + "vertex_remesh_T1.cell";
+//
+//        FileComparison comparer1(results_file1, "cell_based/test/data/TestMutableVertexMesh/vertex_remesh_T1_after_remesh.node");
+//        TS_ASSERT(comparer1.CompareFiles());
+//        FileComparison comparer2(results_file2, "cell_based/test/data/TestMutableVertexMesh/vertex_remesh_T1_after_remesh.cell");
+//        TS_ASSERT(comparer2.CompareFiles());
     }
 };
 
