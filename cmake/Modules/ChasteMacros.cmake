@@ -609,8 +609,8 @@ macro(Chaste_DO_TEST_COMMON component)
                     set_property(TEST ${testTargetName} PROPERTY LABELS ${myLabels})
                 endif()
 
-                # add dependencies to component and type targets
-                if (NOT ${component} STREQUAL python)
+                # add dependencies to component and type targets. Do not include the python component or tests in Python files
+                if ((NOT ${component} STREQUAL python) AND (NOT (${filename} MATCHES ".py$")))
                     add_dependencies(${component} ${exeTargetName})
                     add_dependencies(${type} ${exeTargetName})
                 endif()
