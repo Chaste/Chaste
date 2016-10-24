@@ -2,7 +2,7 @@
 #define TESTMUTABLEVERTEXMESH33REMESH_HPP_
 
 #include <cxxtest/TestSuite.h>
-#include "Debug.hpp"
+
 #include "VertexMeshWriter.hpp"
 #include "FileComparison.hpp"
 #include "Warnings.hpp"
@@ -11,7 +11,7 @@
 //This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
-#define OUTPUT_NAME "ReMesh33"
+#define OUTPUT_NAME "TestMutableVertexMesh33ReMesh"
 
 // I need some helper function here. otherwise just the code to generate mesh would be too much!!
 /**
@@ -833,7 +833,6 @@ public:
         VertexMeshReader<2,2> mesh_reader("cell_based/test/data/TestMutableVertexMesh/vertex_remesh_T1");
         MutableVertexMesh<2,2> vertex_2mesh;
         vertex_2mesh.ConstructFromMeshReader(mesh_reader);
-        vertex_2mesh.SetCellRearrangementThreshold(0.1);
 
         MeshBuilderHelper builder("TestReMesh");
         MutableVertexMesh<3, 3>& vertex_mesh = *(builder.MakeMeshUsing2dMesh(vertex_2mesh) );
@@ -843,27 +842,29 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 44u);
 
         // Calls ReMesh() to identify and perform any T1 swaps
+        vertex_mesh.SetCellRearrangementThreshold(0.1);
         vertex_mesh.ReMesh();
+        builder.WriteVtk("after_remesh");
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 8u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 44u);
 
-        std::string dirname = "TestVertexMeshReMesh";
+        std::string dirname = OUTPUT_NAME + std::string("/T1_Remesh");
         std::string mesh_filename = "vertex_remesh_T1";
 
         // Save the mesh data using mesh writers
-        VertexMeshWriter<2,2> mesh_writer(dirname, mesh_filename, false);
-//        mesh_writer.WriteFilesUsingMesh(vertex_mesh);
-//
-//        // Check the positions are updated correctly
-//        OutputFileHandler handler("TestVertexMeshReMesh", false);
-//        std::string results_file1 = handler.GetOutputDirectoryFullPath() + "vertex_remesh_T1.node";
-//        std::string results_file2 = handler.GetOutputDirectoryFullPath() + "vertex_remesh_T1.cell";
-//
-//        FileComparison comparer1(results_file1, "cell_based/test/data/TestMutableVertexMesh/vertex_remesh_T1_after_remesh.node");
-//        TS_ASSERT(comparer1.CompareFiles());
-//        FileComparison comparer2(results_file2, "cell_based/test/data/TestMutableVertexMesh/vertex_remesh_T1_after_remesh.cell");
-//        TS_ASSERT(comparer2.CompareFiles());
+        VertexMeshWriter<3,3> mesh_writer(dirname, mesh_filename, false);
+        mesh_writer.WriteFilesUsingMesh(vertex_mesh);
+
+        // Check the positions are updated correctly
+        OutputFileHandler handler(dirname, false);
+        std::string results_file1 = handler.GetOutputDirectoryFullPath() + "vertex_remesh_T1.node";
+        std::string results_file2 = handler.GetOutputDirectoryFullPath() + "vertex_remesh_T1.cell";
+
+        FileComparison comparer1(results_file1, "cell_based/test/data/TestMutableVertexMesh/vertex33_remesh_T1_after_remesh.node");
+        TS_ASSERT(comparer1.CompareFiles());
+        FileComparison comparer2(results_file2, "cell_based/test/data/TestMutableVertexMesh/vertex33_remesh_T1_after_remesh.cell");
+        TS_ASSERT(comparer2.CompareFiles());
     }
 };
 

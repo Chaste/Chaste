@@ -80,8 +80,8 @@ public:
         RESEED;
         VoronoiPrism3dVertexMeshGenerator generator(20, 12, 2, 4, 1.23);
         MutableVertexMesh<3, 3>* p_mesh = generator.GetMesh();
-        TS_ASSERT_THROWS_THIS(generator.GetMeshAfterReMesh(),
-                              "Remeshing has not been implemented in 3D (see #827 and #860)\n");
+//        TS_ASSERT_THROWS_THIS(generator.GetMeshAfterReMesh(),
+//                              "Remeshing has not been implemented in 3D (see #827 and #860)\n");
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 1096u);
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 240u);

@@ -628,6 +628,11 @@ public:
     void RemoveDeletedNodesAndElements(VertexElementMap& rElementMap);
 
     /**
+     * Helper method for ReMesh(). Removes the deleted faces from the mesh and relabels the face indices.
+     */
+    void RemoveDeletedFaces();
+
+    /**
      * Helper method for ReMesh(). Removes the deleted nodes from the mesh and relabels the node indices.
      */
     void RemoveDeletedNodes();

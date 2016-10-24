@@ -818,6 +818,11 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RemoveDeletedNodesAndElements(Ve
 
     // Remove deleted nodes
     RemoveDeletedNodes();
+
+    if (ELEMENT_DIM == 3)
+    {
+        RemoveDeletedFaces();
+    }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -852,13 +857,52 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RemoveDeletedNodes()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RemoveDeletedFaces()
+{
+#define COVERAGE_IGNORE
+        EXCEPTION("Thou shalt not pass! Only 3D elements should have faces");
+#undef COVERAGE_IGNORE
+}
+
+template<>
+void MutableVertexMesh<3, 3>::RemoveDeletedFaces()
+{
+    // Remove any nodes that have been marked for deletion and store all other nodes in a temporary structure
+    std::vector<VertexElement<2, 3>*> live_faces;
+    for (unsigned i=0; i<this->mFaces.size(); i++)
+    {
+        if (this->mFaces[i]->IsDeleted())
+        {
+            delete this->mFaces[i];
+        }
+        else
+        {
+            live_faces.push_back(this->mFaces[i]);
+        }
+    }
+
+    // Sanity check
+//    assert(mDeletedNodeIndices.size() == this->mFaces.size() - live_faces.size());
+
+    // Repopulate the nodes vector and reset the list of deleted node indices
+    this->mFaces = live_faces;
+//    mDeletedNodeIndices.clear();
+
+    // Finally, reset the node indices to run from zero
+    for (unsigned i=0; i<this->mFaces.size(); i++)
+    {
+        this->mFaces[i]->SetIndex(i);
+    }
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(VertexElementMap& rElementMap)
 {
     // Make sure that we are in the correct dimension - this code will be eliminated at compile time
     assert(SPACE_DIM==2 || SPACE_DIM==3);
-    assert(ELEMENT_DIM == SPACE_DIM);
+    assert(ELEMENT_DIM <= SPACE_DIM);
 
-    if (SPACE_DIM == 2)
+    if (ELEMENT_DIM == 2)
     {
         // Make sure the map is big enough
         rElementMap.Resize(this->GetNumAllElements());
@@ -894,10 +938,24 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(VertexElementMap& rElemen
     }
     else // 3D
     {
-#define COVERAGE_IGNORE
-        EXCEPTION("Remeshing has not been implemented in 3D (see #827 and #860)\n");
-#undef COVERAGE_IGNORE
-        ///\todo Implement ReMesh() in 3D (see #1422)
+        rElementMap.Resize(this->GetNumAllElements());
+        //remove and relabel all the elements, nodes, and faces
+        RemoveDeletedNodesAndElements(rElementMap);
+
+        ///\todo need a way to identify if it is a Bielmeier mesh
+        if (this->GetNumNodes()%2 == 0)
+        {
+            bool recheck_mesh = true;
+            while (recheck_mesh == true)
+            {
+                // We check for any short edges and perform swaps if necessary and possible.
+                recheck_mesh = CheckForSwapsFromShortEdges();
+            }
+
+            RemoveDeletedNodes();
+            RemoveDeletedFaces();
+        }
+
     }
 }
 
