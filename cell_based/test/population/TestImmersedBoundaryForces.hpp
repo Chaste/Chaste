@@ -42,7 +42,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CheckpointArchiveTypes.hpp"
 #include "FileComparison.hpp"
 #include "CellsGenerator.hpp"
-#include "UniformlyDistributedCellCycleModel.hpp"
 
 // Includes from projects/ImmersedBoundary
 #include "ImmersedBoundaryCellCellInteractionForce.hpp"

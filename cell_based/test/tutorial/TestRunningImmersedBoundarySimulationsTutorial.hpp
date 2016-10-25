@@ -57,7 +57,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DifferentiatedCellProliferativeType.hpp"
 #include "OffLatticeSimulation.hpp"
 #include "SmartPointers.hpp"
-#include "UniformlyDistributedCellCycleModel.hpp"
+#include "UniformCellCycleModel.hpp"
 
 /* Required for the immersed boundary functionality */
 #include "ImmersedBoundaryCellCellInteractionForce.hpp"
@@ -104,11 +104,11 @@ public:
 
         /* We now generate a collection of cells. We do this by using a {{{CellsGenerator}}} and we specify the
          * proliferative behaviour of the cell by choosing a {{{CellCycleModel}}}. Here we choose an
-         * {{{UniformlyDistributedCellCycleModel}}} which does not allow proliferation. For an immersed boundary
+         * {{{UniformCellCycleModel}}} which does not allow proliferation. For an immersed boundary
          * simulation we need as may cells as elements in the mesh. */
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        CellsGenerator<UniformlyDistributedCellCycleModel, 2> cells_generator;
+        CellsGenerator<UniformCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
         /* We now create a {{{CellPopulation}}} object (passing in the mesh and cells) to connect the mesh and the cells

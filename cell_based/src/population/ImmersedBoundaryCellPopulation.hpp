@@ -399,6 +399,48 @@ public:
     std::set<unsigned> GetNeighbouringNodeIndices(unsigned index);
 
     /**
+     * Overridden GetTetrahedralMeshForPdeModifier() method.
+     *
+     * @return a pointer to a tetrahedral mesh using the nodes in the VertexMesh
+     * as well as an additional node at the centre of each VertexElement.
+     * At present, this method only works in 2D.
+     *
+     * This method is called by AbstractGrowingDomainPdeModifier.
+     */
+    virtual TetrahedralMesh<DIM, DIM>* GetTetrahedralMeshForPdeModifier();
+
+    /**
+     * Overridden IsPdeNodeAssociatedWithNonApoptoticCell() method.
+     *
+     * @param pdeNodeIndex inedx of a node in a tetrahedral mesh for use with a PDE modifier
+     *
+     * @return if a node, specified by its index in a tetrahedral mesh for use
+     *         with a PDE modifier, is associated with a non-apoptotic cell.
+     * This method can be called by PDE classes.
+     */
+    virtual bool IsPdeNodeAssociatedWithNonApoptoticCell(unsigned pdeNodeIndex);
+
+    /**
+     * Overridden GetCellDataItemAtPdeNode() method.
+     *
+     * @param pdeNodeIndex index of a node in a tetrahedral mesh for use
+     *         with a PDE modifier
+     * @param rVariableName the name of the cell data item to get
+     * @param dirichletBoundaryConditionApplies where a Dirichlet boundary condition is used
+     *        (optional; defaults to false)
+     * @param dirichletBoundaryValue the value of the Dirichlet boundary condition, if used
+     *        (optional; defaults to 0.0)
+     *
+     * @return the value of a CellData item (interpolated if necessary) at a node,
+     *         specified by its index in a tetrahedral mesh for use with a PDE modifier.
+     * This method can be called by PDE modifier classes.
+     */
+    virtual double GetCellDataItemAtPdeNode(unsigned pdeNodeIndex,
+                                            std::string& rVariableName,
+                                            bool dirichletBoundaryConditionApplies=false,
+                                            double dirichletBoundaryValue=0.0);
+
+    /**
      * @return The vertex division rule that is currently being used.
      */
     boost::shared_ptr<AbstractVertexBasedDivisionRule<DIM> > GetVertexBasedDivisionRule();

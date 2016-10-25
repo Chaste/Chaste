@@ -60,12 +60,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellsGenerator.hpp"
 #include "CellVolumesWriter.hpp"
 #include "CheckpointArchiveTypes.hpp"
-#include "DiagonalVertexBasedDivisionRule.hpp"
+#include "FixedVertexBasedDivisionRule.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 #include "FileComparison.hpp"
 #include "OffLatticeSimulation.hpp"
 #include "SmartPointers.hpp"
-#include "UniformlyDistributedCellCycleModel.hpp"
+#include "UniformCellCycleModel.hpp"
 
 // Includes from Immersed Boundary
 #include "ImmersedBoundaryMesh.hpp"
@@ -91,7 +91,7 @@ public:
 
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        CellsGenerator<UniformlyDistributedCellCycleModel, 2> cells_generator;
+        CellsGenerator<UniformCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
         ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
@@ -126,7 +126,7 @@ public:
 
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        CellsGenerator<UniformlyDistributedCellCycleModel, 2> cells_generator;
+        CellsGenerator<UniformCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
         ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
@@ -190,63 +190,6 @@ public:
         TS_ASSERT_DELTA(cell_population.GetNode(0)->rGetLocation()[1], new_location[1], 1e-12);
     }
 
-    ///\todo Test AddNode(), UpdateNodeLocations(), AddCell(), RemoveDeadCells(), IsCellAssociatedWithADeletedLocation() and Update()
-
-    void TestVertexBasedDivisionRuleMethods() throw (Exception)
-    {
-        // Create an immersed boundary cell population object
-        ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.2, 2.0, 0.15, true);
-        ImmersedBoundaryMesh<2,2>* p_mesh = gen.GetMesh();
-
-        std::vector<CellPtr> cells;
-        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        CellsGenerator<UniformlyDistributedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
-
-        ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
-        CellPtr p_cell_0 = *(cell_population.Begin());
-
-        // Test GetVertexBasedDivisionRule() correctly returns a ShortAxisVertexBasedDivisionRule
-        boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_rule = cell_population.GetVertexBasedDivisionRule();
-        TS_ASSERT(p_rule != NULL);
-        ///\todo The following lines throw an error if uncommented, since CalculateCellDivisionVector() requires a VertexBasedCellPopulation
-//        c_vector<double, 2> division_vector = p_rule->CalculateCellDivisionVector(p_cell_0, cell_population);
-//        TS_ASSERT_DELTA(division_vector[0], 1.0, 1e-6);
-//        TS_ASSERT_DELTA(division_vector[1], 1.0, 1e-6);
-
-        // Set the division rule for our population to be the diagonal division rule
-        boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_rule_to_set(new DiagonalVertexBasedDivisionRule<2>());
-        cell_population.SetVertexBasedDivisionRule(p_rule_to_set);
-
-        // Test GetVertexBasedDivisionRule() now correctly returns a DiagonalVertexBasedDivisionRule
-        boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_new_rule = cell_population.GetVertexBasedDivisionRule();
-        TS_ASSERT(p_new_rule != NULL);
-        ///\todo The following lines throw an error if uncommented, since CalculateCellDivisionVector() requires a VertexBasedCellPopulation
-//        c_vector<double, 2> new_division_vector = p_new_rule->CalculateCellDivisionVector(p_cell_0, cell_population);
-//        TS_ASSERT_DELTA(new_division_vector[0], 1.0, 1e-9);
-//        TS_ASSERT_DELTA(new_division_vector[1], 1.0, 1e-9);
-    }
-
-    void TestCalculateCellDivisionVector() throw (Exception)
-    {
-        // Create an immersed boundary cell population object
-        ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.2, 2.0, 0.15, true);
-        ImmersedBoundaryMesh<2,2>* p_mesh = gen.GetMesh();
-
-        std::vector<CellPtr> cells;
-        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        CellsGenerator<UniformlyDistributedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
-
-        ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
-        CellPtr p_cell_0 = *(cell_population.Begin());
-
-        // Test CalculateCellDivisionVector() returns the correct vector
-        c_vector<double, 2> division_vector = cell_population.CalculateCellDivisionVector(p_cell_0);
-        TS_ASSERT_DELTA(division_vector[0], 1.0, 1e-6);
-        TS_ASSERT_DELTA(division_vector[1], 0.0, 1e-6);
-    }
-
     ///\todo Check output files by eye too
     void TestWritersWithImmersedBoundaryCellPopulation() throw (Exception)
     {
@@ -265,7 +208,7 @@ public:
         std::vector<CellPtr> cells;
         for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
         {
-            UniformlyDistributedCellCycleModel* p_model = new UniformlyDistributedCellCycleModel();
+            UniformCellCycleModel* p_model = new UniformCellCycleModel();
 
             CellPtr p_cell(new Cell(p_wildtype, p_model));
             if (elem_index%3 == 0)

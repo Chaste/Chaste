@@ -48,7 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "OffLatticeSimulation.hpp"
 #include "SmartPointers.hpp"
-#include "UniformlyDistributedCellCycleModel.hpp"
+#include "UniformCellCycleModel.hpp"
 
 // Includes from Immersed Boundary
 #include "ImmersedBoundaryMesh.hpp"
@@ -121,7 +121,7 @@ public:
         MutableVertexMesh<2,2>* p_vertex_mesh = vertex_generator.GetMesh();
         std::vector<CellPtr> vertex_cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        CellsGenerator<UniformlyDistributedCellCycleModel, 2> vertex_cells_generator;
+        CellsGenerator<UniformCellCycleModel, 2> vertex_cells_generator;
         vertex_cells_generator.GenerateBasicRandom(vertex_cells, p_vertex_mesh->GetNumElements(), p_diff_type);
         VertexBasedCellPopulation<2> vertex_cell_population(*p_vertex_mesh, vertex_cells);
 
@@ -132,7 +132,7 @@ public:
         ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.2, 2.0, 0.15, true);
         ImmersedBoundaryMesh<2,2>* p_mesh = gen.GetMesh();
         std::vector<CellPtr> cells;
-        CellsGenerator<UniformlyDistributedCellCycleModel, 2> cells_generator;
+        CellsGenerator<UniformCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
         ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
 
@@ -166,7 +166,7 @@ public:
 
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        CellsGenerator<UniformlyDistributedCellCycleModel, 2> cells_generator;
+        CellsGenerator<UniformCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
         ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
 
@@ -266,7 +266,7 @@ public:
         ImmersedBoundaryMesh<2,2>* p_mesh = gen.GetMesh();
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        CellsGenerator<UniformlyDistributedCellCycleModel, 2> cells_generator;
+        CellsGenerator<UniformCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
         ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
 
