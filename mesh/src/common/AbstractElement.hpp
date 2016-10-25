@@ -116,7 +116,7 @@ public:
      * @param pOldNode  pointer to the current node
      * @param pNewNode  pointer to the replacement node
      */
-    void ReplaceNode(Node<SPACE_DIM>* pOldNode, Node<SPACE_DIM>* pNewNode);
+    virtual void ReplaceNode(Node<SPACE_DIM>* pOldNode, Node<SPACE_DIM>* pNewNode);
 
     /**
      * Mark the element as having been removed from the mesh.

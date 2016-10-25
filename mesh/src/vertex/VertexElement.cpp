@@ -147,6 +147,21 @@ VertexElement<ELEMENT_DIM, SPACE_DIM>::~VertexElement()
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VertexElement<ELEMENT_DIM, SPACE_DIM>::ReplaceNode(Node<SPACE_DIM>* pOldNode, Node<SPACE_DIM>* pNewNode)
+{
+    // first call the function implementated in abstract Element to rnt
+    AbstractElement<ELEMENT_DIM, SPACE_DIM>::ReplaceNode(pOldNode, pNewNode);
+
+    for (unsigned face_index=0 ; face_index<mFaces.size() ; ++face_index)
+    {
+        VertexElement<ELEMENT_DIM-1, SPACE_DIM>& r_face = *(mFaces[face_index]);
+        const unsigned node_local_index = r_face.GetNodeLocalIndex(pOldNode->GetIndex());
+        if ( node_local_index != UINT_MAX )
+            r_face.FaceUpdateNode(node_local_index, pNewNode);
+    }
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned VertexElement<ELEMENT_DIM, SPACE_DIM>::GetNumFaces() const
 {
     return mFaces.size();
@@ -213,6 +228,17 @@ void VertexElement<ELEMENT_DIM, SPACE_DIM>::FaceDeleteNode(const unsigned& rInde
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VertexElement<ELEMENT_DIM, SPACE_DIM>::FaceDeleteNode(const Node<SPACE_DIM>* pNode)
+{
+    const unsigned node_local_index = this->GetNodeLocalIndex(pNode->GetIndex());
+    if (node_local_index == UINT_MAX)
+    {
+        EXCEPTION("Node is not in face and cannot be deleted!");
+    }
+    FaceDeleteNode(node_local_index);
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VertexElement<ELEMENT_DIM, SPACE_DIM>::FaceAddNode(Node<SPACE_DIM>* pNode, const unsigned& rIndex)
 {
     assert(rIndex < this->mNodes.size());
@@ -231,6 +257,13 @@ void VertexElement<ELEMENT_DIM, SPACE_DIM>::DeleteFace(const unsigned& rIndex)
     this->mOrientations.erase(this->mOrientations.begin() + rIndex);
 
     assert(mFaces.size() == mOrientations.size());
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VertexElement<ELEMENT_DIM, SPACE_DIM>::MarkFaceAsDeleted()
+{
+    // Mark element as deleted
+    this->mIsDeleted = true;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

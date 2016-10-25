@@ -99,6 +99,9 @@ protected:
     std::vector<unsigned> mDeletedNodeIndices;
 
     /** Indices of elements that have been deleted. These indices can be reused when adding new elements. */
+    std::vector<unsigned> mDeletedFaceIndices;
+
+    /** Indices of elements that have been deleted. These indices can be reused when adding new elements. */
     std::vector<unsigned> mDeletedElementIndices;
 
     /**
@@ -489,6 +492,11 @@ public:
      * @return the number of Nodes in the mesh.
      */
     unsigned GetNumNodes() const;
+
+    /**
+     * @return the number of lower dimension VertexElements in the mesh.
+     */
+    unsigned GetNumFaces() const;
 
     /**
      * @return the number of VertexElements in the mesh.

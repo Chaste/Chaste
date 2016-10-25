@@ -242,7 +242,6 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteVtkUsingMesh(const VertexMes
     // If we have 3D elements, we will write an additional mesh with faces for better visual effect.
     if (ELEMENT_DIM==3)
     {
-
         // Recycling p_writer
 #if VTK_MAJOR_VERSION >= 6
     p_writer->SetInputData(mpVtkFaceMesh);
@@ -359,9 +358,12 @@ void VertexMeshWriter<3, 3>::WriteVtkUsingMeshWithCellId(const VertexMesh<3, 3>&
 {
     // Copied and pasted
     std::vector<double> cell_ids(rMesh.GetNumElements());
-    for (unsigned id=0 ; id < rMesh.GetNumElements() ; ++id)
+    for (unsigned i=0 ; i < rMesh.GetNumAllElements() ; ++i)
     {
-        cell_ids[id] = double(id);
+        const VertexElement<3, 3>* p_elem = rMesh.GetElement(i);
+        if (p_elem->IsDeleted())
+            continue;
+        cell_ids[i] = double(p_elem->GetIndex());
     }
     this->AddCellData("Cell IDs", cell_ids);
 
@@ -370,9 +372,12 @@ void VertexMeshWriter<3, 3>::WriteVtkUsingMeshWithCellId(const VertexMesh<3, 3>&
     // using element id (overlapping lateral face might not look so nice with clipping and thresholding)
     if (useElementIdForFaceId)
     {
-        for (unsigned elem_index=0; elem_index<rMesh.GetNumElements(); ++elem_index)
+        for (unsigned i=0; i<rMesh.GetNumAllElements(); ++i)
         {
-            VertexElement<3, 3>* p_elem = rMesh.GetElement(elem_index);
+            const VertexElement<3, 3>* p_elem = rMesh.GetElement(i);
+            if (p_elem->IsDeleted())
+                continue;
+            const unsigned elem_index = p_elem->GetIndex();
             for (unsigned face_index=0; face_index<p_elem->GetNumFaces(); ++face_index)
             {
                 face_ids[p_elem->GetFace(face_index)->GetIndex()] = double(elem_index);
@@ -381,9 +386,12 @@ void VertexMeshWriter<3, 3>::WriteVtkUsingMeshWithCellId(const VertexMesh<3, 3>&
     }
     else
     {
-        for (unsigned id=0 ; id<rMesh.GetNumFaces() ; ++id)
+        for (unsigned i=0 ; i<rMesh.GetNumAllFaces() ; ++i)
         {
-            face_ids[id] = double(id);
+            const VertexElement<2, 3>* p_face = rMesh.GetFace(i);
+            if (p_face->IsDeleted())
+                continue;
+            face_ids[i] = double(p_face->GetIndex());
         }
     }
     this->AddFaceData(useElementIdForFaceId ? "Cell IDs": "Face IDs", face_ids);
@@ -398,9 +406,12 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(const VertexMesh<ELEM
     // Make the Vtk mesh
     vtkPoints* p_pts = vtkPoints::New(VTK_DOUBLE);
     p_pts->GetData()->SetName("Vertex positions");
-    for (unsigned node_num=0; node_num<rMesh.GetNumNodes(); node_num++)
+    for (unsigned node_num=0; node_num<rMesh.GetNumAllNodes(); node_num++)
     {
-        c_vector<double, SPACE_DIM> position = rMesh.GetNode(node_num)->rGetLocation();
+        if (rMesh.GetNode(node_num)->IsDeleted())
+            continue;
+
+        const c_vector<double, SPACE_DIM> position = rMesh.GetNode(node_num)->rGetLocation();
         if (SPACE_DIM==2)
         {
             p_pts->InsertPoint(node_num, position[0], position[1], 0.0);
@@ -419,9 +430,13 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(const VertexMesh<ELEM
         mpVtkFaceMesh->SetPoints(p_pts);
     }
     p_pts->Delete(); // Reference counted
-    for (unsigned elem_id=0; elem_id<rMesh.GetNumElements(); ++elem_id)
+    for (unsigned elem_id=0; elem_id<rMesh.GetNumAllElements(); ++elem_id)
     {
-        VertexElement<ELEMENT_DIM, SPACE_DIM>* iter = rMesh.GetElement(elem_id);
+        VertexElement<ELEMENT_DIM, SPACE_DIM>* p_elem = rMesh.GetElement(elem_id);
+        // Skip over deleted elements
+        if (p_elem->IsDeleted())
+            continue;
+
         vtkCell* p_cell;
         if (ELEMENT_DIM == 2)
         {
@@ -432,10 +447,10 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(const VertexMesh<ELEM
             p_cell = vtkConvexPointSet::New();
         }
         vtkIdList* p_cell_id_list = p_cell->GetPointIds();
-        p_cell_id_list->SetNumberOfIds(iter->GetNumNodes());
-        for (unsigned j=0; j<iter->GetNumNodes(); ++j)
+        p_cell_id_list->SetNumberOfIds(p_elem->GetNumNodes());
+        for (unsigned j=0; j<p_elem->GetNumNodes(); ++j)
         {
-            p_cell_id_list->SetId(j, iter->GetNodeGlobalIndex(j));
+            p_cell_id_list->SetId(j, p_elem->GetNodeGlobalIndex(j));
         }
         mpVtkUnstructedMesh->InsertNextCell(p_cell->GetCellType(), p_cell_id_list);
         p_cell->Delete(); // Reference counted
@@ -445,10 +460,13 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(const VertexMesh<ELEM
     // (otherwise 3D elements will have all of it faces triangulated when using the representation "Surface With Edges").
     if (ELEMENT_DIM ==3 && SPACE_DIM==3)
     {
-        const unsigned num_of_faces = rMesh.GetNumFaces();
+        const unsigned num_of_faces = rMesh.GetNumAllFaces();
         for (unsigned face_index=0; face_index<num_of_faces; ++ face_index)
         {
             VertexElement<ELEMENT_DIM-1, SPACE_DIM>* p_face = rMesh.GetFace(face_index);
+            // Skip over deleted faces
+            if (p_face->IsDeleted())
+                continue;
             vtkCell* p_cell;
             p_cell = vtkPolygon::New();
             vtkIdList* p_cell_id_list = p_cell->GetPointIds();

@@ -260,6 +260,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::Clear()
 {
     mDeletedNodeIndices.clear();
+    mDeletedFaceIndices.clear();
     mDeletedElementIndices.clear();
 
     VertexMesh<ELEMENT_DIM, SPACE_DIM>::Clear();
@@ -269,6 +270,12 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::GetNumNodes() const
 {
     return this->mNodes.size() - mDeletedNodeIndices.size();
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::GetNumFaces() const
+{
+    return this->mFaces.size() - mDeletedFaceIndices.size();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -829,30 +836,76 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RemoveDeletedNodes()
 {
     // Remove any nodes that have been marked for deletion and store all other nodes in a temporary structure
-    std::vector<Node<SPACE_DIM>*> live_nodes;
-    for (unsigned i=0; i<this->mNodes.size(); i++)
+    if (ELEMENT_DIM!=3)
     {
-        if (this->mNodes[i]->IsDeleted())
+        std::vector<Node<SPACE_DIM>*> live_nodes;
+        for (unsigned i=0; i<this->mNodes.size(); i++)
         {
-            delete this->mNodes[i];
+            if (this->mNodes[i]->IsDeleted())
+            {
+                delete this->mNodes[i];
+            }
+            else
+            {
+                live_nodes.push_back(this->mNodes[i]);
+            }
         }
-        else
+
+        // Sanity check
+        assert(mDeletedNodeIndices.size() == this->mNodes.size() - live_nodes.size());
+
+        // Repopulate the nodes vector and reset the list of deleted node indices
+        this->mNodes = live_nodes;
+        mDeletedNodeIndices.clear();
+
+        // Finally, reset the node indices to run from zero
+        for (unsigned i=0; i<this->mNodes.size(); i++)
         {
-            live_nodes.push_back(this->mNodes[i]);
+            this->mNodes[i]->SetIndex(i);
         }
     }
-
-    // Sanity check
-    assert(mDeletedNodeIndices.size() == this->mNodes.size() - live_nodes.size());
-
-    // Repopulate the nodes vector and reset the list of deleted node indices
-    this->mNodes = live_nodes;
-    mDeletedNodeIndices.clear();
-
-    // Finally, reset the node indices to run from zero
-    for (unsigned i=0; i<this->mNodes.size(); i++)
+    else
     {
-        this->mNodes[i]->SetIndex(i);
+        // Some additional features to make sure all the basal nodes are ahead of the apical nodes.
+        // Separate the codes from non-3D for better readability
+        ///\todo actually should be a way to identify 2D+1 mesh, not just ELEMENT_DIM==3
+        std::vector<Node<SPACE_DIM>*> live_lower_nodes;
+        std::vector<Node<SPACE_DIM>*> live_upper_nodes;
+        for (unsigned i=0; i<this->mNodes.size(); i++)
+        {
+            Node<SPACE_DIM>* p_node_i = this->mNodes[i];
+            if (p_node_i->IsDeleted())
+            {
+                delete p_node_i;
+            }
+            else
+            {
+
+                const unsigned node_i_type = unsigned(p_node_i->rGetNodeAttributes()[0]);
+                if (ELEMENT_DIM==2 || ( node_i_type == 1u ) )
+                    live_lower_nodes.push_back(p_node_i);
+                else
+                {
+                    assert (node_i_type == 2u);
+                    live_upper_nodes.push_back(p_node_i);
+                }
+            }
+        }
+
+        // Sanity check
+        assert(mDeletedNodeIndices.size() == this->mNodes.size() - live_lower_nodes.size() - live_upper_nodes.size());
+        assert(live_lower_nodes.size() == live_upper_nodes.size());
+
+        // Repopulate the nodes vector and reset the list of deleted node indices
+        this->mNodes = live_lower_nodes;
+        this->mNodes.insert(this->mNodes.end(), live_upper_nodes.begin(), live_upper_nodes.end());
+        mDeletedNodeIndices.clear();
+
+        // Finally, reset the node indices to run from zero
+        for (unsigned i=0; i<this->mNodes.size(); i++)
+        {
+            this->mNodes[i]->SetIndex(i);
+        }
     }
 }
 
@@ -882,11 +935,11 @@ void MutableVertexMesh<3, 3>::RemoveDeletedFaces()
     }
 
     // Sanity check
-//    assert(mDeletedNodeIndices.size() == this->mFaces.size() - live_faces.size());
+    assert(mDeletedFaceIndices.size() == this->mFaces.size() - live_faces.size());
 
     // Repopulate the nodes vector and reset the list of deleted node indices
     this->mFaces = live_faces;
-//    mDeletedNodeIndices.clear();
+    mDeletedFaceIndices.clear();
 
     // Finally, reset the node indices to run from zero
     for (unsigned i=0; i<this->mFaces.size(); i++)
@@ -1574,8 +1627,6 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformNodeMerge(Node<SPACE_DIM>
     mDeletedNodeIndices.push_back(node_B_index);
 }
 
-
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB,
                                                               std::set<unsigned>& rElementsContainingNodes)
@@ -2038,8 +2089,8 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
     // belong to any element. Delete to prevent memory leak.
     if (rElementsContainingNodes.size() == 2)
     {
-//        delete p_lateral_swap_face;
-        this->mFaces.erase(this->mFaces.begin() + p_lateral_swap_face->GetIndex());
+        mDeletedFaceIndices.push_back(p_lateral_swap_face->GetIndex());
+        p_lateral_swap_face->MarkFaceAsDeleted();
     }
 
     // Now since we know the lateral swap face, we can move the nodes using the face normal.
@@ -2260,8 +2311,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT2Swap(VertexElement<ELEM
     assert(rElement.GetNumNodes() == 3);
 
     // Note that we define this vector before setting it, as otherwise the profiling build will break (see #2367)
-    c_vector<double, SPACE_DIM> new_node_location;
-    new_node_location = this->GetCentroidOfElement(rElement.GetIndex());
+    const c_vector<double, SPACE_DIM> new_node_location = this->GetCentroidOfElement(rElement.GetIndex());
     mLastT2SwapLocation = new_node_location;
 
     // Create a new node at the element's centroid; this will be a boundary node if any existing nodes were on the boundary
@@ -2316,6 +2366,124 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT2Swap(VertexElement<ELEM
     rElement.GetNode(0)->MarkAsDeleted();
     rElement.GetNode(1)->MarkAsDeleted();
     rElement.GetNode(2)->MarkAsDeleted();
+
+    mDeletedElementIndices.push_back(rElement.GetIndex());
+    rElement.MarkAsDeleted();
+}
+
+template<>
+void MutableVertexMesh<3, 3>::PerformT2Swap(VertexElement<3,3>& rElement)
+{
+    // The given element must be triangular for us to be able to perform a T2 swap on it
+    assert(rElement.GetNumNodes() == 6);
+
+    VertexElement<2, 3>& r_face1 ( *(rElement.GetFace(0)) );
+    VertexElement<2, 3>& r_face2 ( *(rElement.GetFace(1)) );
+    // Note that we define this vector before setting it, as otherwise the profiling build will break (see #2367)
+    const c_vector<double, 3> new_node_location1 (r_face1.GetCentroid());
+    const c_vector<double, 3> new_node_location2 (r_face2.GetCentroid());
+    mLastT2SwapLocation = new_node_location1;
+
+    // Create a new node at the element's centroid; this will be a boundary node if any existing nodes were on the boundary
+    bool is_node_on_boundary = false;
+    for (unsigned i=0; i<3; i++)
+    {
+        if (r_face1.GetNode(i)->IsBoundaryNode())
+        {
+            is_node_on_boundary = true;
+            break;
+        }
+    }
+
+    Node<3>* p_new_node1 = new Node<3>(GetNumNodes(), new_node_location1, is_node_on_boundary);
+    p_new_node1->AddNodeAttribute(r_face1.rGetElementAttributes()[0]);
+    Node<3>* p_new_node2 = new Node<3>(GetNumNodes(), new_node_location2, is_node_on_boundary);
+    p_new_node2->AddNodeAttribute(r_face2.rGetElementAttributes()[0]);
+    unsigned new_node1_global_index = this->AddNode(p_new_node1);
+    this->AddNode(p_new_node2);
+
+    // Loop over each of the three nodes contained in r_face1
+    for (unsigned i=0; i<r_face1.GetNumNodes(); i++)
+    {
+        // For each node, find the set of other elements containing it
+        Node<3>* p_node1 = r_face1.GetNode(i);
+        Node<3>* p_node2 = r_face2.GetNode(i);
+        std::set<unsigned> containing_elements = p_node1->rGetContainingElementIndices();
+        containing_elements.erase(rElement.GetIndex());
+
+        // For each of these elements...
+        for (std::set<unsigned>::const_iterator elem_iter = containing_elements.begin(); elem_iter != containing_elements.end(); ++elem_iter)
+        {
+            VertexElement<3, 3>* p_this_elem = this->GetElement(*elem_iter);
+
+            // ...throw an exception if the element is triangular...
+            if (p_this_elem->GetNumNodes() < 8)
+            {
+                EXCEPTION("One of the neighbours of a small triangular element is also a triangle - dealing with this has not been implemented yet");
+            }
+
+            if (p_this_elem->GetNodeLocalIndex(new_node1_global_index) == UINT_MAX)
+            {
+                // Replace old node with new node for the element and faces (implemented in VE::ReplaceNode(...))
+                p_this_elem->ReplaceNode(p_node1, p_new_node1);
+                p_this_elem->ReplaceNode(p_node2, p_new_node2);
+            }
+            else
+            {
+                const unsigned node1_index = p_node1->GetIndex();
+                const unsigned node2_index = p_node2->GetIndex();
+                // For this case, we will delete the extra old node from the element and faces
+                // and also remove the face from the element.
+                // Operation for faces: I apical & basal faces will just remove the extra old node
+                // II the lateral face not belong to the deleted element needs to update nodes
+                // III the lateral face belong to the deleted element need to be remove from the registry of neighbouring element
+                p_this_elem->DeleteNode(p_this_elem->GetNodeLocalIndex(node1_index));
+                p_this_elem->DeleteNode(p_this_elem->GetNodeLocalIndex(node2_index));
+                // Operation I
+                p_this_elem->GetFace(0)->FaceDeleteNode(p_node1);
+                p_this_elem->GetFace(1)->FaceDeleteNode(p_node2);
+
+                // Operation II and III To update another face and remove the extra face
+                for (unsigned face_index=2 ; face_index<p_this_elem->GetNumFaces() ; ++face_index)
+                {
+                    VertexElement<2, 3>* p_face = p_this_elem->GetFace(face_index);
+                    const unsigned node1_local_index = p_face->GetNodeLocalIndex(node1_index);
+                    if (node1_local_index != UINT_MAX)
+                    {
+                        if (p_face->GetNodeLocalIndex(new_node1_global_index) == UINT_MAX)
+                        {
+                            // Operation II
+                            p_face->FaceUpdateNode(node1_local_index, p_new_node1);
+                            const unsigned node2_local_index = p_face->GetNodeLocalIndex(node2_index);
+                            p_face->FaceUpdateNode(node2_local_index, p_new_node2);
+                        }
+                        else
+                        {
+                            // Operation III
+                            p_this_elem->DeleteFace(face_index);
+                            // To compensate the changes in NumFaces
+                            --face_index;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Now we will settle the mesh
+    // Loop over faces to delete them from the mesh
+    for (unsigned i=0; i<rElement.GetNumFaces(); ++i)
+    {
+        mDeletedFaceIndices.push_back(rElement.GetFace(i)->GetIndex());
+        rElement.GetFace(i)->MarkFaceAsDeleted();
+    }
+
+    // We also have to mark pElement, pElement->GetNode(0), pElement->GetNode(1), and pElement->GetNode(2) as deleted
+    for (unsigned i=0; i<rElement.GetNumNodes(); ++i)
+    {
+        mDeletedNodeIndices.push_back(rElement.GetNodeGlobalIndex(i));
+        rElement.GetNode(i)->MarkAsDeleted();
+    }
 
     mDeletedElementIndices.push_back(rElement.GetIndex());
     rElement.MarkAsDeleted();

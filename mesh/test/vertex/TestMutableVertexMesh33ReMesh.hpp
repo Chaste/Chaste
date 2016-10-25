@@ -123,9 +123,10 @@ public:
         return mpMesh;
     }
 
-    void PrintMesh() const
+    void PrintMesh(const bool allElements=false) const
     {
-        for (unsigned i=0; i<mpMesh->GetNumElements(); ++i)
+        const unsigned num_elems = allElements ? mpMesh->GetNumAllElements() : mpMesh->GetNumElements();
+        for (unsigned i=0; i<num_elems; ++i)
         {
             VertexElement<3,3>& elem = *(mpMesh->GetElement(i));
             std::cout << "ELEMENT (" << i<< ") : " << elem.GetIndex() << std::endl;
@@ -788,7 +789,6 @@ public:
         nodes.push_back(new Node<3>(3, true, 2.0, 1.0, 0.0));
         nodes.push_back(new Node<3>(4, true, 0.3, 1.05, 0.0));
 
-        std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2;
         unsigned node_indices_elem_0[4] = {0, 2, 4, 1};
         unsigned node_indices_elem_1[3] = {1, 4, 3};
         unsigned node_indices_elem_2[3] = {0, 3, 2};
@@ -865,6 +865,88 @@ public:
         TS_ASSERT(comparer1.CompareFiles());
         FileComparison comparer2(results_file2, "cell_based/test/data/TestMutableVertexMesh/vertex33_remesh_T1_after_remesh.cell");
         TS_ASSERT(comparer2.CompareFiles());
+    }
+
+    void TestPerformT2Swap() throw(Exception)
+    {
+        /*
+         * Create a mesh comprising six nodes contained in three trapezium element and
+         * a central triangle element, as shown below. We will test that a T2 swap
+         * correctly removes the triangle element from the mesh.
+         *
+         *      /|\
+         *     / | \
+         *    /  |  \    (the triangular element has index zero)
+         *   /2 /_\ 1\
+         *  /  /   \  \
+         * /__/__3__\__\
+         */
+        std::vector<Node<3>*> nodes;
+        nodes.push_back(new Node<3>(0, true, 0.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(1, true, 1.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(2, true, 0.5, 0.5, 0.0));
+        nodes.push_back(new Node<3>(3, false, 0.4, 0.2, 0.0));
+        nodes.push_back(new Node<3>(4, false, 0.6, 0.2, 0.0));
+        nodes.push_back(new Node<3>(5, false, 0.5, 0.3, 0.0));
+
+        unsigned node_indices_elem_0[3] = {3, 4, 5};
+        unsigned node_indices_elem_1[4] = {1, 2, 5, 4};
+        unsigned node_indices_elem_2[4] = {2, 0, 3, 5};
+        unsigned node_indices_elem_3[4] = {0, 1, 4, 3};
+
+        const double height = 1;
+        MeshBuilderHelper builder(nodes, "PerformT2Swap", height);
+        builder.buildElementWith(3, node_indices_elem_0);
+        builder.buildElementWith(4, node_indices_elem_1);
+        builder.buildElementWith(4, node_indices_elem_2);
+        builder.buildElementWith(4, node_indices_elem_3);
+        // A reference variable as mesh is noncopyable
+        MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
+        builder.WriteVtk("Before");
+
+        // Perform a T2 swap on the central triangle element
+        VertexElement<3, 3>* p_element_0 = vertex_mesh.GetElement(0);
+        c_vector<double, 3> centroid_of_element_0_before_swap = vertex_mesh.GetCentroidOfElement(0);
+        vertex_mesh.PerformT2Swap(*p_element_0);
+
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 3u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 8u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumFaces(), 12u);
+
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumAllElements(), 4u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumAllNodes(), 14u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumAllFaces(), 17u);
+
+        for (unsigned j=1; j<4; j++)
+        {
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(j)->GetNumNodes(), 6u);
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(j)->GetNodeGlobalIndex(0), j%3);
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(j)->GetNodeGlobalIndex(1), (j+1)%3);
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(j)->GetNodeGlobalIndex(2), 12u);
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(j)->GetNumFaces(), 5u);
+        }
+
+        // Test boundary property of nodes. All are boundary nodes except node 3.
+        for (unsigned i=0; i<vertex_mesh.GetNumAllNodes(); i++)
+        {
+            bool expected_boundary_node = i==0 || i==1 || i==2 || i==6 || i==7 || i==8;
+            TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), expected_boundary_node);
+        }
+
+        // Test the location of the new node:
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(12)->rGetLocation()[0], centroid_of_element_0_before_swap[0], 1e-10);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(12)->rGetLocation()[1], centroid_of_element_0_before_swap[1], 1e-10);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(12)->rGetLocation()[2], 0.0, 1e-10);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(13)->rGetLocation()[0], centroid_of_element_0_before_swap[0], 1e-10);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(13)->rGetLocation()[1], centroid_of_element_0_before_swap[1], 1e-10);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(13)->rGetLocation()[2], 1.0, 1e-10);
+        // Test the tracking of the T2 swap location:
+        TS_ASSERT_DELTA(vertex_mesh.GetLastT2SwapLocation()[0], centroid_of_element_0_before_swap[0], 1e-10);
+        TS_ASSERT_DELTA(vertex_mesh.GetLastT2SwapLocation()[1], centroid_of_element_0_before_swap[1], 1e-10);
+
+        VertexElementMap map(vertex_mesh.GetNumElements());
+        vertex_mesh.RemoveDeletedNodesAndElements(map);
+        builder.WriteVtk("AfterRemove");
     }
 };
 

@@ -297,6 +297,11 @@ public:
     virtual unsigned GetNumFaces() const;
 
     /**
+     * @return the number of lower dimension VertexElements in the mesh, including those marked as deleted.
+     */
+    unsigned GetNumAllFaces() const;
+
+    /**
      * @param index  the global index of a specified vertex element.
      *
      * @return a pointer to the vertex element

@@ -145,6 +145,15 @@ public:
     ~VertexElement();
 
     /**
+     * Replace one of the nodes in this element with another. Override method in AbstractElement
+     * to replace nodes of the faces as well.
+     *
+     * @param pOldNode  pointer to the current node
+     * @param pNewNode  pointer to the replacement node
+     */
+    void ReplaceNode(Node<SPACE_DIM>* pOldNode, Node<SPACE_DIM>* pNewNode);
+
+    /**
      * @return the number of faces owned by this element.
      */
     unsigned GetNumFaces() const;
@@ -186,6 +195,13 @@ public:
     void FaceDeleteNode(const unsigned& rIndex);
 
     /**
+     * Method for faces. Delete a node.
+     *
+     * @param rIndex is the local index of the node to remove
+     */
+    void FaceDeleteNode(const Node<SPACE_DIM>* pNode);
+
+    /**
      * Method for faces. Add a node to the element between nodes at rIndex and rIndex+1.
      *
      * @param rIndex the local index of the node after which the new node is added
@@ -200,6 +216,12 @@ public:
      * @param rIndex is the local index of the face to remove
      */
     void DeleteFace(const unsigned& rIndex);
+
+    /**
+     * Mark a face as having been removed from the mesh.
+     * Doesn't notify nodes and element that it has been removed.
+     */
+    void MarkFaceAsDeleted();
 
     /**
      * Add a face of an element with given local index. This method will
@@ -270,6 +292,11 @@ public:
      * @return centroid of the VertexElement.
      */
     c_vector<double, SPACE_DIM> GetCentroid() const;
+
+    /**
+     * Dummy function to satisfy compiler.
+     */
+    void FaceUpdateNode(const unsigned& rIndex, Node<SPACE_DIM>* pNode) {NEVER_REACHED;}
 };
 
 #endif /*VERTEXELEMENT_HPP_*/

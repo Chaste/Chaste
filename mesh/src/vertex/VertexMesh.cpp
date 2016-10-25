@@ -627,13 +627,17 @@ unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetNumAllElements() const
     return mElements.size();
 }
 
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetNumFaces() const
 {
     return mFaces.size();
 }
 
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetNumAllFaces() const
+{
+    return mFaces.size();
+}
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VertexElement<ELEMENT_DIM, SPACE_DIM>* VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetElement(unsigned index) const
