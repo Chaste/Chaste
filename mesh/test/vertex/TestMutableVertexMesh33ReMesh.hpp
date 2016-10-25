@@ -2,7 +2,7 @@
 #define TESTMUTABLEVERTEXMESH33REMESH_HPP_
 
 #include <cxxtest/TestSuite.h>
-
+#include "Debug.hpp"
 #include "VertexMeshWriter.hpp"
 #include "FileComparison.hpp"
 #include "Warnings.hpp"
@@ -25,6 +25,7 @@ class MeshBuilderHelper
 {
 private:
     std::string mName;
+    std::string mAdditionalPath;
     unsigned mNumLowerNodes;
     std::vector<Node<3>*> mLowerNodes;
     std::vector<Node<3>*> mUpperNodes;
@@ -36,8 +37,10 @@ private:
     VertexMeshWriter<3, 3>* mpWriter;
 
 public:
-    MeshBuilderHelper(const std::vector<Node<3>*>& rLowerNodes, const std::string& Name, const unsigned zHeight = 1)
+    MeshBuilderHelper(const std::vector<Node<3>*>& rLowerNodes, const std::string& AdditionalPath = "",
+                      const std::string& Name = "mesh",const unsigned zHeight = 1)
                         : mName(Name),
+                          mAdditionalPath("/" + AdditionalPath),
                           mNumLowerNodes(rLowerNodes.size()),
                           mLowerNodes(rLowerNodes),
                           mUpperNodes(mNumLowerNodes),
@@ -60,8 +63,9 @@ public:
         }
     }
 
-    MeshBuilderHelper(const std::string& Name)
+    MeshBuilderHelper(const std::string& AdditionalPath = "", const std::string& Name = "mesh")
     : mName(Name),
+      mAdditionalPath("/" + AdditionalPath),
       mNumLowerNodes(0),
       mLowerNodes(),
       mUpperNodes(),
@@ -158,13 +162,13 @@ public:
     {
         if (mpWriter == NULL)
         {
-            mpWriter = new VertexMeshWriter<3, 3>(OUTPUT_NAME, mName, false);
+            mpWriter = new VertexMeshWriter<3, 3>(OUTPUT_NAME + mAdditionalPath, mName, false);
         }
         else
         {
             // current workaround
             delete mpWriter;
-            mpWriter = new VertexMeshWriter<3, 3>(OUTPUT_NAME, mName, false);
+            mpWriter = new VertexMeshWriter<3, 3>(OUTPUT_NAME + mAdditionalPath, mName, false);
         }
         mpWriter->WriteVtkUsingMeshWithCellId(*mpMesh, AdditionalTag, false);
     }
@@ -315,8 +319,7 @@ public:
         unsigned node_indices_elem_2[3] = {0, 1, 4};
         unsigned node_indices_elem_3[4] = {4, 5, 3, 0};
 
-        const double height = 1;
-        MeshBuilderHelper builder(nodes, "T1SwapWith4Elements", height);
+        MeshBuilderHelper builder(nodes, "T1SwapWith4Elements");
         builder.buildElementWith(3, node_indices_elem_0);
         builder.buildElementWith(4, node_indices_elem_1);
         builder.buildElementWith(3, node_indices_elem_2);
@@ -398,7 +401,109 @@ public:
         vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(4), vertex_mesh.GetNode(5));
         vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(5), vertex_mesh.GetNode(4));
         TS_ASSERT_EQUALS(vertex_mesh.GetNumFaces(), 17u);
+    }
 
+    void TestNoT1SwapWhenOneIsTooLong() throw(Exception)
+    {
+        /*
+         * Create a mesh comprising six nodes contained in two triangle and two rhomboid elements, as shown below.
+         * We will test that that a T1 swap doesn't occur when max(l1,l2)>mCellRearrangementThreshold.
+         *  _____
+         * |\   /|
+         * | \ / |
+         * |  |  |
+         * | / \ |
+         * |/___\|
+         */
+        std::vector<Node<3>*> nodes;
+        nodes.push_back(new Node<3>(0, true,  0.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(1, true,  1.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(2, true,  1.0, 1.0, 0.0));
+        nodes.push_back(new Node<3>(3, true,  0.0, 1.0, 0.0));
+        nodes.push_back(new Node<3>(4, false, 0.5, 0.4, 0.0));
+        nodes.push_back(new Node<3>(5, false, 0.5, 0.6, 0.0));
+
+        unsigned node_indices_elem_0[3] = {2, 3, 5};
+        unsigned node_indices_elem_1[4] = {4, 1, 2, 5};
+        unsigned node_indices_elem_2[3] = {0, 1, 4};
+        unsigned node_indices_elem_3[4] = {4, 5, 3, 0};
+
+        MeshBuilderHelper builder(nodes, "T1NoSwap");
+        builder.buildElementWith(3, node_indices_elem_0);
+        builder.buildElementWith(4, node_indices_elem_1);
+        builder.buildElementWith(3, node_indices_elem_2);
+        builder.buildElementWith(4, node_indices_elem_3);
+        // A reference variable as mesh is noncopyable
+        MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
+
+        // Set the threshold distance between vertices for a T1 swap as follows
+        // so that it will not trigger CheckForSwapsFromShortEdges
+        vertex_mesh.GetNode(11)->rGetModifiableLocation()[1] = 0.62;
+        vertex_mesh.SetCellRearrangementThreshold(0.21);
+        vertex_mesh.CheckForSwapsFromShortEdges();
+        // Test that each moved node has the correct location following the rearrangement
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[0], 0.5, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[1], 0.6, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[2], 0.0, 1e-8);
+
+        vertex_mesh.GetNode(4)->rGetModifiableLocation()[1] = 0.36;
+        vertex_mesh.SetCellRearrangementThreshold(0.23);
+        vertex_mesh.CheckForSwapsFromShortEdges();
+        // Test that each moved node has the correct location following the rearrangement
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[0], 0.5, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[1], 0.6, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[2], 0.0, 1e-8);
+
+        vertex_mesh.SetCellRearrangementThreshold(0.25);
+        vertex_mesh.CheckForSwapsFromShortEdges();
+    }
+
+    void TestT1SwapNonEvenFace() throw(Exception)
+    {
+        /*
+         * Create a mesh comprising six nodes contained in two triangle and two rhomboid elements, as shown below.
+         * We will test that that a T1 swap doesn't occur when max(l1,l2)>mCellRearrangementThreshold.
+         *  _____
+         * |\   /|
+         * | \ / |
+         * |  |  |
+         * | / \ |
+         * |/___\|
+         */
+        std::vector<Node<3>*> nodes;
+        nodes.push_back(new Node<3>(0, true,  0.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(1, true,  1.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(2, true,  1.0, 1.0, 0.0));
+        nodes.push_back(new Node<3>(3, true,  0.0, 1.0, 0.0));
+        nodes.push_back(new Node<3>(4, false, 0.5, 0.4, 0.0));
+        nodes.push_back(new Node<3>(5, false, 0.5, 0.6, 0.0));
+
+        unsigned node_indices_elem_0[3] = {2, 3, 5};
+        unsigned node_indices_elem_1[4] = {4, 1, 2, 5};
+        unsigned node_indices_elem_2[3] = {0, 1, 4};
+        unsigned node_indices_elem_3[4] = {4, 5, 3, 0};
+
+        MeshBuilderHelper builder(nodes, "T1SwapNonEvenFace");
+        builder.buildElementWith(3, node_indices_elem_0);
+        builder.buildElementWith(4, node_indices_elem_1);
+        builder.buildElementWith(3, node_indices_elem_2);
+        builder.buildElementWith(4, node_indices_elem_3);
+        // A reference variable as mesh is noncopyable
+        MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
+//        vertex_mesh.GetNode(11)->rGetModifiableLocation()[0] = 0.45;
+        vertex_mesh.GetNode(4)->rGetModifiableLocation()[0] = 0.45;
+        builder.WriteVtk("Before");
+
+        // Set the threshold distance between vertices for a T1 swap as follows
+        // so that it will trigger CheckForSwapsFromShortEdges
+        vertex_mesh.SetCellRearrangementThreshold(0.3);
+        vertex_mesh.CheckForSwapsFromShortEdges();
+        builder.WriteVtk("After");
+
+        // Test that each moved node has the correct location following the rearrangement
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[0], 0.2518, 1e-4);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[1], 0.5278, 1e-4);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[2], 0.0055, 1e-4);
     }
 
     void TestPerformT1SwapOnBoundary() throw(Exception)
@@ -425,8 +530,7 @@ public:
         unsigned node_indices_elem_1[3] = {1, 4, 0};
         unsigned node_indices_elem_2[4] = {0, 4, 5, 3};
 
-        const double height = 1;
-        MeshBuilderHelper builder(nodes, "T1SwapWithOnBoundary", height);
+        MeshBuilderHelper builder(nodes, "T1SwapOnBoundary");
         builder.buildElementWith(3, node_indices_elem_0);
         builder.buildElementWith(3, node_indices_elem_1);
         builder.buildElementWith(4, node_indices_elem_2);
@@ -517,8 +621,7 @@ public:
         unsigned node_indices_elem_1[3] = {1, 4, 0};
         unsigned node_indices_elem_2[4] = {0, 4, 5, 3};
 
-        const double height = 1;
-        MeshBuilderHelper builder(nodes, "T1SwapWithOnBoundary2", height);
+        MeshBuilderHelper builder(nodes, "T1SwapOnBoundary2");
         builder.buildElementWith(4, node_indices_elem_0);
         builder.buildElementWith(3, node_indices_elem_1);
         builder.buildElementWith(4, node_indices_elem_2);
@@ -611,8 +714,8 @@ public:
 
         unsigned node_indices_elem_0[4] = {0, 4, 5, 3};
         unsigned node_indices_elem_1[4] = {4, 1, 2, 5};
-        const double height = 1;
-        MeshBuilderHelper builder(nodes, "T1SwapWhenVoidForms", height);
+
+        MeshBuilderHelper builder(nodes, "T1SwapWhenVoidForms");
         builder.buildElementWith(4, node_indices_elem_0);
         builder.buildElementWith(4, node_indices_elem_1);
         // A reference variable as mesh is noncopyable
@@ -691,8 +794,7 @@ public:
         unsigned node_indices_elem_2[3] = {1, 4, 0};
         unsigned node_indices_elem_3[4] = {0, 4, 5, 3};
 
-        const double height = 1;
-        MeshBuilderHelper builder(nodes, "T1SwapWith4Elements", height);
+        MeshBuilderHelper builder(nodes, "T1SwapExceptions");
         builder.buildElementWith(3, node_indices_elem_0);
         builder.buildElementWith(4, node_indices_elem_1);
         builder.buildElementWith(3, node_indices_elem_2);
@@ -735,22 +837,19 @@ public:
         unsigned node_indices_elem_2[4] = {0, 4, 6, 3};
         unsigned node_indices_elem_3[3] = { 4, 5, 6};
 
-        const double height = 1;
-        MeshBuilderHelper builder(nodes, "NoT1SwapWithTriangularPrism", height);
+        MeshBuilderHelper builder(nodes, "T1NoSwapWithTriangularPrism");
         builder.buildElementWith(4, node_indices_elem_0);
         builder.buildElementWith(4, node_indices_elem_1);
         builder.buildElementWith(4, node_indices_elem_2);
         builder.buildElementWith(3, node_indices_elem_3);
         // A reference variable as mesh is noncopyable
         MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
-        builder.WriteVtk("Before");
 
         // Ensure that the inner edge will be considered for a swap
         vertex_mesh.SetCellRearrangementThreshold(0.11);
 
         // Check for T1 swaps and carry them out if allowed - the short edge should not swap!
         vertex_mesh.CheckForSwapsFromShortEdges();
-        builder.WriteVtk("After");
 
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNumNodes(), 6u);
 
@@ -793,18 +892,15 @@ public:
         unsigned node_indices_elem_1[3] = {1, 4, 3};
         unsigned node_indices_elem_2[3] = {0, 3, 2};
 
-        const double height = 1;
-        MeshBuilderHelper builder(nodes, "NoT1SwapWithTriangularVoid", height);
+        MeshBuilderHelper builder(nodes, "NoT1SwapWithTriangularVoid");
         builder.buildElementWith(4, node_indices_elem_0);
         builder.buildElementWith(3, node_indices_elem_1);
         builder.buildElementWith(3, node_indices_elem_2);
         // A reference variable as mesh is noncopyable
         MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
-        builder.WriteVtk("Before");
 
         // Ensure that the inner edge will be considered for a swap
         vertex_mesh.SetCellRearrangementThreshold(0.11);
-        builder.WriteVtk("After");
 
         // Check for possible swaps and carry them out if allowed - the short edge should not swap and
         // the void should not be removed!
@@ -834,9 +930,9 @@ public:
         MutableVertexMesh<2,2> vertex_2mesh;
         vertex_2mesh.ConstructFromMeshReader(mesh_reader);
 
-        MeshBuilderHelper builder("TestReMesh");
+        MeshBuilderHelper builder("T1SwapReMesh");
         MutableVertexMesh<3, 3>& vertex_mesh = *(builder.MakeMeshUsing2dMesh(vertex_2mesh) );
-        builder.WriteVtk("");
+        builder.WriteVtk("Before");
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 8u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 44u);
@@ -844,7 +940,7 @@ public:
         // Calls ReMesh() to identify and perform any T1 swaps
         vertex_mesh.SetCellRearrangementThreshold(0.1);
         vertex_mesh.ReMesh();
-        builder.WriteVtk("after_remesh");
+        builder.WriteVtk("After");
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 8u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 44u);
@@ -894,8 +990,7 @@ public:
         unsigned node_indices_elem_2[4] = {2, 0, 3, 5};
         unsigned node_indices_elem_3[4] = {0, 1, 4, 3};
 
-        const double height = 1;
-        MeshBuilderHelper builder(nodes, "PerformT2Swap", height);
+        MeshBuilderHelper builder(nodes, "T2Swap");
         builder.buildElementWith(3, node_indices_elem_0);
         builder.buildElementWith(4, node_indices_elem_1);
         builder.buildElementWith(4, node_indices_elem_2);
@@ -908,6 +1003,7 @@ public:
         VertexElement<3, 3>* p_element_0 = vertex_mesh.GetElement(0);
         c_vector<double, 3> centroid_of_element_0_before_swap = vertex_mesh.GetCentroidOfElement(0);
         vertex_mesh.PerformT2Swap(*p_element_0);
+//MARK        builder.WriteVtk("AfterSwap");
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 3u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 8u);
