@@ -910,8 +910,10 @@ public:
         }
 
         // Test boundary property of nodes. All are boundary nodes.
-        for (unsigned i=0; i<vertex_mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<vertex_mesh.GetNumAllNodes(); ++i)
         {
+            if (vertex_mesh.GetNode(i)->IsDeleted())
+                continue;
             TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), true);
         }
 
@@ -974,8 +976,10 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh2.GetElement(1)->GetNodeGlobalIndex(2), 5u);
 
         // Test boundary property of nodes. All are boundary nodes.
-        for (unsigned i=0; i<vertex_mesh2.GetNumNodes(); i++)
+        for (unsigned i=0; i<vertex_mesh2.GetNumAllNodes(); ++i)
         {
+            if (vertex_mesh2.GetNode(i)->IsDeleted())
+                continue;
             TS_ASSERT_EQUALS(vertex_mesh2.GetNode(i)->IsBoundaryNode(), true);
         }
     }
@@ -1015,9 +1019,6 @@ public:
         vertex_elements.push_back(new VertexElement<2,2>(3, nodes_elem_3));
 
         MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements, 0.1);
-
-        // Set the threshold distance between vertices for a T1 swap as follows, to ease calculations
-        vertex_mesh.SetCellRearrangementThreshold(0.1);
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 4u);
 
