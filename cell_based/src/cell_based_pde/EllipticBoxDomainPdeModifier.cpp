@@ -34,26 +34,22 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "EllipticBoxDomainPdeModifier.hpp"
-#include "TetrahedralMesh.hpp"
 #include "SimpleLinearEllipticSolver.hpp"
 
 template<unsigned DIM>
-EllipticBoxDomainPdeModifier<DIM>::EllipticBoxDomainPdeModifier()
-    : AbstractBoxDomainPdeModifier<DIM>()
+EllipticBoxDomainPdeModifier<DIM>::EllipticBoxDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde,
+                                                                boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition,
+                                                                bool isNeumannBoundaryCondition,
+                                                                ChasteCuboid<DIM>* pMeshCuboid,
+                                                                double stepSize,
+                                                                Vec solution)
+    : AbstractBoxDomainPdeModifier<DIM>(pPde,
+    		                            pBoundaryCondition,
+    	                             	isNeumannBoundaryCondition,
+    		                            pMeshCuboid,
+    		                            stepSize,
+    		                            solution)
 {
-}
-
-template<unsigned DIM>
-EllipticBoxDomainPdeModifier<DIM>::EllipticBoxDomainPdeModifier(PdeAndBoundaryConditions<DIM>* pPdeAndBcs,
-                                                                ChasteCuboid<DIM> meshCuboid,
-                                                                double stepSize)
-    : AbstractBoxDomainPdeModifier<DIM>(),
-      mpPdeAndBcs(pPdeAndBcs)
-{
-    assert(DIM == 2);
-
-    // Generate mesh. Note only need to do this ones as the mesh is fixed.
-    this->GenerateFeMesh(meshCuboid, stepSize);
 }
 
 template<unsigned DIM>
@@ -70,24 +66,26 @@ template<unsigned DIM>
 void EllipticBoxDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
     // Set up boundary conditions
-    std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc = ConstructBoundaryConditionsContainer();
+    std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc = ConstructBoundaryConditionsContainer(rCellPopulation);
 
     this->UpdateCellPdeElementMap(rCellPopulation);
 
-    // When using a PDE mesh which doesnt coincide with the cells, we must set up the source terms before solving the PDE.
+    // When using a PDE mesh which doesn't coincide with the cells, we must set up the source terms before solving the PDE.
     // Pass in already updated CellPdeElementMap to speed up finding cells.
-    mpPdeAndBcs->SetUpSourceTermsForAveragedSourcePde(this->mpFeMesh, &this->mCellPdeElementMap);
+    this->SetUpSourceTermsForAveragedSourcePde(this->mpFeMesh, &this->mCellPdeElementMap);
 
     // Use SimpleLinearEllipticSolver as Averaged Source PDE
-    SimpleLinearEllipticSolver<DIM,DIM> solver(this->mpFeMesh, mpPdeAndBcs->GetPde(), p_bcc.get());
+    SimpleLinearEllipticSolver<DIM,DIM> solver(this->mpFeMesh,
+                                               boost::static_pointer_cast<AbstractLinearEllipticPde<DIM,DIM> >(this->GetPde()).get(),
+                                               p_bcc.get());
 
-    ///\todo Use initial guess when solving the system (#2687)
+    ///\todo Use initial guess when solving the system
     Vec old_solution_copy = this->mSolution;
     this->mSolution = solver.Solve();
 
     // Note that the linear solver creates a vector, so we have to keep a handle on the old one
     // in order to destroy it.
-    ///\todo #2687 This will change when initial guess is used.
+    ///\todo This will change when initial guess is used.
     /// On the first go round the vector has yet to be initialised, so we don't destroy it.
     if (old_solution_copy != NULL)
     {
@@ -101,32 +99,63 @@ void EllipticBoxDomainPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DI
 {
     AbstractBoxDomainPdeModifier<DIM>::SetupSolve(rCellPopulation,outputDirectory);
 
-    // Temporarily cache the variable name until we create an AbstractPdeAndBcs object
-    // and move mpPdeAndBcs to the abstract class. See #2767
-    this->mCachedDependentVariableName = mpPdeAndBcs->rGetDependentVariableName();
-
-    // Cache the output directory
-    this->mOutputDirectory = outputDirectory;
-
-    // Call these  methods to solve the PDE on the initial step and Output the results.
+    // Call these  methods to solve the PDE on the initial step and output the results
     UpdateAtEndOfTimeStep(rCellPopulation);
     this->UpdateAtEndOfOutputTimeStep(rCellPopulation);
 }
 
 template<unsigned DIM>
-std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > EllipticBoxDomainPdeModifier<DIM>::ConstructBoundaryConditionsContainer()
+std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > EllipticBoxDomainPdeModifier<DIM>::ConstructBoundaryConditionsContainer(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
     std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc(new BoundaryConditionsContainer<DIM,DIM,1>(false));
 
-    // To be well-defined, elliptic PDE problems on Box domains require at least some Dirichlet boundary conditions
-    assert(!(mpPdeAndBcs->IsNeumannBoundaryCondition()));
+    // To be well-defined, elliptic PDE problems on box domains require at least some Dirichlet boundary conditions
+    ///\todo Replace this assertion with an exception in the constructor
+    assert(!(this->IsNeumannBoundaryCondition()));
 
-    for (typename TetrahedralMesh<DIM,DIM>::BoundaryNodeIterator node_iter = this->mpFeMesh->GetBoundaryNodeIteratorBegin();
-         node_iter != this->mpFeMesh->GetBoundaryNodeIteratorEnd();
-         ++node_iter)
-    {
-        p_bcc->AddDirichletBoundaryCondition(*node_iter, mpPdeAndBcs->GetBoundaryCondition());
-    }
+	if (!this->mSetBcsOnBoxBoundary)
+	{
+		// Get the set of coarse element indices that contain cells
+		std::set<unsigned> coarse_element_indices_in_map;
+		for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
+			 cell_iter != rCellPopulation.End();
+			 ++cell_iter)
+		{
+			coarse_element_indices_in_map.insert(this->mCellPdeElementMap[*cell_iter]);
+		}
+
+		// Find the node indices associated with elements whose indices are NOT in the set coarse_element_indices_in_map
+		std::set<unsigned> coarse_mesh_boundary_node_indices;
+		for (unsigned i=0; i<this->mpFeMesh->GetNumElements(); i++)
+		{
+			if (coarse_element_indices_in_map.find(i) == coarse_element_indices_in_map.end())
+			{
+				Element<DIM,DIM>* p_element = this->mpFeMesh->GetElement(i);
+				for (unsigned j=0; j<DIM+1; j++)
+				{
+					unsigned node_index = p_element->GetNodeGlobalIndex(j);
+					coarse_mesh_boundary_node_indices.insert(node_index);
+				}
+			}
+		}
+
+		// Apply boundary condition to the nodes in the set coarse_mesh_boundary_node_indices
+		for (std::set<unsigned>::iterator iter = coarse_mesh_boundary_node_indices.begin();
+			 iter != coarse_mesh_boundary_node_indices.end();
+			 ++iter)
+		{
+			p_bcc->AddDirichletBoundaryCondition(this->mpFeMesh->GetNode(*iter), this->mpBoundaryCondition.get(), 0, false);
+		}
+	}
+	else // Apply BC at boundary nodes of box domain FE mesh
+	{
+		for (typename TetrahedralMesh<DIM,DIM>::BoundaryNodeIterator node_iter = this->mpFeMesh->GetBoundaryNodeIteratorBegin();
+			 node_iter != this->mpFeMesh->GetBoundaryNodeIteratorEnd();
+			 ++node_iter)
+		{
+			p_bcc->AddDirichletBoundaryCondition(*node_iter, this->mpBoundaryCondition.get());
+		}
+	}
 
     return p_bcc;
 }

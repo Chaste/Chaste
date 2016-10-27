@@ -209,7 +209,4 @@ public:
     }
 };
 
-
-
-
 #endif /*ABSTRACTBIDOMAINSOLVER_HPP_*/

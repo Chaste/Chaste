@@ -88,7 +88,6 @@ public:
      */
     HeunIvpOdeSolver()
     {}
-
 };
 
 #include "SerializationExportWrapper.hpp"

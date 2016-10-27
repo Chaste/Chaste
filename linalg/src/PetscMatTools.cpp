@@ -211,9 +211,9 @@ void PetscMatTools::ZeroRowsAndColumnsWithValueOnDiagonal(Mat matrix, std::vecto
         MatGetRow(matrix, row, &num_cols, &cols, PETSC_NULL);
 
         // see which of these cols are in the list of cols to be zeroed
-        for(PetscInt i=0; i<num_cols; i++)
+        for (PetscInt i=0; i<num_cols; i++)
         {
-            if(std::binary_search(rowColIndices.begin(), rowColIndices.end(), cols[i]))
+            if (std::binary_search(rowColIndices.begin(), rowColIndices.end(), cols[i]))
             {
                 cols_to_zero_per_row[row-lo].push_back(cols[i]);
             }
@@ -228,11 +228,11 @@ void PetscMatTools::ZeroRowsAndColumnsWithValueOnDiagonal(Mat matrix, std::vecto
     {
         unsigned num_cols_to_zero_this_row = cols_to_zero_per_row[row-lo].size();
 
-        if(num_cols_to_zero_this_row>0)
+        if (num_cols_to_zero_this_row>0)
         {
             PetscInt* cols_to_zero = new PetscInt[num_cols_to_zero_this_row];
             double* zeros = new double[num_cols_to_zero_this_row];
-            for(unsigned i=0; i<num_cols_to_zero_this_row; i++)
+            for (unsigned i=0; i<num_cols_to_zero_this_row; i++)
             {
                 cols_to_zero[i] = cols_to_zero_per_row[row-lo][i];
                 zeros[i] = 0.0;

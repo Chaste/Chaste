@@ -49,8 +49,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscTools.hpp"
 #include "PetscSetupAndFinalize.hpp"
 
-
-
 class PointStimulusHeartCellFactory : public AbstractCardiacCellFactory<3>
 {
 private:
@@ -75,8 +73,6 @@ public:
         }
     }
 };
-
-
 
 class TestBidomainHeart : public CxxTest::TestSuite
 {

@@ -182,7 +182,6 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetWeightedDirectionForBou
     mBoundaryElements[SolveBoundaryElementMapping(elementIndex)]->CalculateWeightedDirection(rWeightedDirection, rJacobianDeterminant );
 }
 
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CheckOutwardNormals()
 {
@@ -380,9 +379,6 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRectangularMesh(u
 
     this->RefreshMesh();
 }
-
-
-
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructCuboid(unsigned width,
@@ -595,9 +591,9 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRegularSlabMesh(d
         //Note here that in ELEMENT_DIM > 1 cases there may be a zero height or depth - in which case we don't need to use relative comparisons
         // Doing relative comparisons with zero is okay - if we avoid division by zero.
         // However, it's best not to test whether " fabs( 0.0 - 0.0) > DBL_EPSILON*0.0 "
-        if (  fabs (actual_width_x - width) > DBL_EPSILON*width
+        if (fabs (actual_width_x - width) > DBL_EPSILON*width
             ||( height!= 0.0 &&  fabs (actual_width_y - height) > DBL_EPSILON*height)
-            ||( depth != 0.0 &&  fabs (actual_width_z - depth) > DBL_EPSILON*depth ) )
+            ||( depth != 0.0 &&  fabs (actual_width_z - depth) > DBL_EPSILON*depth ))
         {
             EXCEPTION("Space step does not divide the size of the mesh");
         }
@@ -724,7 +720,7 @@ unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMaximumNodeCo
 
     if (this->mNodes.size() == 0u)
     {
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
         /*
          * Coverage of this block requires a mesh regular slab mesh with the number of
          * elements in the primary dimension less than (num_procs - 1), e.g. a 1D mesh
@@ -736,7 +732,7 @@ unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMaximumNodeCo
 
         // This process owns no nodes and thus owns none of the mesh
         return (1u);
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
     }
 
     unsigned nodes_per_element = this->mElements[0]->GetNumNodes(); //Usually ELEMENT_DIM+1, except in Quadratic case
@@ -1039,8 +1035,6 @@ unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetContainingElementIn
     EXCEPTION(ss.str());
 }
 
-
-
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetNearestElementIndexFromTestElements(const ChastePoint<SPACE_DIM>& rTestPoint,
                                                                                                  std::set<unsigned> testElements)
@@ -1073,10 +1067,7 @@ unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetNearestElementIndex
     return closest_index;
 }
 
-/////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////////////
-
 template class AbstractTetrahedralMesh<1,1>;
 template class AbstractTetrahedralMesh<1,2>;
 template class AbstractTetrahedralMesh<1,3>;

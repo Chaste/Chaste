@@ -58,11 +58,6 @@ AbstractUntemplatedConvergenceTester::AbstractUntemplatedConvergenceTester()
 {
 }
 
-
-
-
-
 AbstractUntemplatedConvergenceTester::~AbstractUntemplatedConvergenceTester()
 {
 }
-

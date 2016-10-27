@@ -168,8 +168,6 @@ public:
     }
 
 /// Note: Neumann intracellular stimuli won't work with bidomain (no solution to PDEs) (unless nodes are grounded)
-
-
 };
 
 #endif //_TESTNEUMANNSTIMULUS_HPP_

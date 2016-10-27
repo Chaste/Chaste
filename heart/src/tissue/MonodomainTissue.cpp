@@ -49,18 +49,12 @@ MonodomainTissue<ELEMENT_DIM,SPACE_DIM>::MonodomainTissue(AbstractTetrahedralMes
 {
 }
 
-
-
-/////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////
-
 template class MonodomainTissue<1,1>;
 template class MonodomainTissue<1,2>;
 template class MonodomainTissue<1,3>;
 template class MonodomainTissue<2,2>;
 template class MonodomainTissue<3,3>;
-
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"

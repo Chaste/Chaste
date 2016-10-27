@@ -49,6 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellLabel.hpp"
 #include "FixedG1GenerationalCellCycleModel.hpp"
 #include "UniformG1GenerationalCellCycleModel.hpp"
+#include "NoCellCycleModel.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "PottsBasedCellPopulation.hpp"
 #include "NodeBasedCellPopulation.hpp"
@@ -134,11 +135,10 @@ public:
         PottsMeshGenerator<2> generator(6, 2, 2, 6, 2, 2);
         PottsMesh<2>* p_mesh = generator.GetMesh();
 
-        // Create cells
+        // Create cells (we use a NoCellCycleModel here for simplicity, since there is no proliferation)
         std::vector<CellPtr> cells;
-        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
+        CellsGenerator<NoCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
 
         // Create cell population
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);

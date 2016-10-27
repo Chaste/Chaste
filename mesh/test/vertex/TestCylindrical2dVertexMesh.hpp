@@ -359,11 +359,8 @@ public:
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
         Cylindrical2dMesh* p_delaunay_mesh = generator.GetCylindricalMesh();
 
-
         TrianglesMeshWriter<2,2> mesh_writer("TestVertexMeshWriters", "DelaunayMesh", false);
         TS_ASSERT_THROWS_NOTHING(mesh_writer.WriteFilesUsingMesh(*p_delaunay_mesh));
-
-
 
         TS_ASSERT_EQUALS(p_delaunay_mesh->GetWidth(0), 3u);
         TS_ASSERT_EQUALS(p_delaunay_mesh->CheckIsVoronoi(), true);

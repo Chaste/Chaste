@@ -81,7 +81,7 @@ public:
         // Test that an index has been assigned to each branch sequentially
         std::vector<AirwayBranch*> branches = properties_calculator.GetBranches();
         TS_ASSERT_EQUALS(branches.size(), 123893u);
-        for(unsigned branch_idx = 0 ; branch_idx < branches.size() ; branch_idx++)
+        for (unsigned branch_idx = 0 ; branch_idx < branches.size() ; branch_idx++)
         {
             TS_ASSERT_EQUALS(branch_idx, branches[branch_idx]->GetIndex());
         }

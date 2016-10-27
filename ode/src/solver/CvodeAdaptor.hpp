@@ -311,7 +311,6 @@ public:
      * in its attempt to reach the next output time.
      */
     long int GetMaxSteps();
-
 };
 
 #include "SerializationExportWrapper.hpp"

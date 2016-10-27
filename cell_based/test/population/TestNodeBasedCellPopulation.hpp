@@ -613,8 +613,8 @@ public:
 
         node_based_cell_population.Update();
 
-        TS_ASSERT_EQUALS(node_based_cell_population.IsPdeNodeAssociatedWithApoptoticCell(0), true);
-        TS_ASSERT_EQUALS(node_based_cell_population.IsPdeNodeAssociatedWithApoptoticCell(1), false);
+        TS_ASSERT_EQUALS(node_based_cell_population.IsPdeNodeAssociatedWithNonApoptoticCell(0), false);
+        TS_ASSERT_EQUALS(node_based_cell_population.IsPdeNodeAssociatedWithNonApoptoticCell(1), true);
 
         unsigned num_removed;
         boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
@@ -1589,6 +1589,9 @@ public:
         TS_ASSERT_DELTA(p_tet_mesh->GetNode(1)->rGetLocation()[1], 0.0, 1e-6);
         TS_ASSERT_DELTA(p_tet_mesh->GetNode(2)->rGetLocation()[0], 1.0, 1e-6);
         TS_ASSERT_DELTA(p_tet_mesh->GetNode(2)->rGetLocation()[1], 1.0, 1e-6);
+
+        // Tidy up
+        delete p_tet_mesh;
     }
 
     void TestGetCellDataItemAtPdeNode() throw (Exception)

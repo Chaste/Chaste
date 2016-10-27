@@ -98,10 +98,7 @@ std::vector<AbstractChasteRegion<SPACE_DIM>* > AbstractStimulusFactory<ELEMENT_D
     return mGroundedRegions;
 }
 
-/////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////
-
 template class AbstractStimulusFactory<1,1>;
 template class AbstractStimulusFactory<2,2>;
 template class AbstractStimulusFactory<3,3>;

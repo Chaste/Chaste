@@ -78,7 +78,6 @@ void AbstractExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolve(V
     }
 }
 
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::PrepareForSetupLinearSystem(Vec existingSolution)
 {
@@ -109,7 +108,6 @@ Vec AbstractExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::GenerateNullBasis() c
     dist_null_basis.Restore();
     return nullbasis;
 }
-
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::FinaliseLinearSystem(Vec existingSolution)
@@ -191,13 +189,13 @@ void AbstractExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::CheckCompatibilityCo
     int mpi_ret = MPI_Allreduce(&local_sum, &global_sum, 1, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
     assert(mpi_ret == MPI_SUCCESS);
 
-    if(fabs(global_sum)>1e-6) // magic number! sum should really be a sum of zeros and exactly zero though anyway (or a-a+b-b+c-c.. etc in the case of electrodes)
+    if (fabs(global_sum)>1e-6) // magic number! sum should really be a sum of zeros and exactly zero though anyway (or a-a+b-b+c-c.. etc in the case of electrodes)
     {
-        #define COVERAGE_IGNORE
+        // LCOV_EXCL_START
         // shouldn't ever reach this line but useful to have the error printed out if you do
         std::cout << "Sum of b_{every 3 items} = " << global_sum << " (should be zero for compatibility)\n";
         EXCEPTION("Linear system does not satisfy compatibility constraint!");
-        #undef COVERAGE_IGNORE
+        // LCOV_EXCL_STOP
     }
 #endif
 }
@@ -268,7 +266,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::SetRowForAverageOfPhiZeroed(unsigned row)
 {
     // Row should be every 3 entries, starting from zero...
-    if ( ((row-2)%3 != 0) && row!=INT_MAX)
+    if (((row-2)%3 != 0) && row!=INT_MAX)
     {
         EXCEPTION("Row for applying the constraint 'Average of phi_e = zero' should be every 3 rows");
     }
@@ -276,10 +274,7 @@ void AbstractExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::SetRowForAverageOfPh
     mRowForAverageOfPhiZeroed = row;
 }
 
-/////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////
-
 template class AbstractExtendedBidomainSolver<1,1>;
 template class AbstractExtendedBidomainSolver<2,2>;
 template class AbstractExtendedBidomainSolver<3,3>;

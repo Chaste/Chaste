@@ -330,7 +330,6 @@ public:
             delete p_pde;
         }
     }
-
 };
 
 #endif // TESTPDETESTCLASSES_HPP_

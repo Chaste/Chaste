@@ -129,7 +129,6 @@ void Node<SPACE_DIM>::SetAsBoundaryNode(bool value)
     mIsBoundaryNode = value;
 }
 
-
 template<unsigned SPACE_DIM>
 ChastePoint<SPACE_DIM> Node<SPACE_DIM>::GetPoint() const
 {
@@ -447,11 +446,7 @@ unsigned Node<SPACE_DIM>::GetRegion() const
     return region;
 }
 
-
-//////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-//////////////////////////////////////////////////////////////////////////
-
 template class Node<1>;
 template class Node<2>;
 template class Node<3>;

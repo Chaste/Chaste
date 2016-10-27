@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VoronoiDataWriter.hpp"
 #include "CellMutationStatesWriter.hpp"
 #include "EllipticBoxDomainPdeModifier.hpp"
-#include "CellwiseSourceEllipticPde.hpp"
+#include "AveragedSourceEllipticPde.hpp"
 #include "VolumeTrackingModifier.hpp"
 #include "SimpleOxygenBasedCellCycleModel.hpp"
 #include "OffLatticeSimulation.hpp"
@@ -89,11 +89,8 @@ private:
         {
             SimpleOxygenBasedCellCycleModel* p_cycle_model = new SimpleOxygenBasedCellCycleModel();
             p_cycle_model->SetDimension(2);
-            ///\todo Change thresholds if necessary (#2687)
-
             CellPtr p_cell(new Cell(p_state, p_cycle_model));
             p_cell->SetCellProliferativeType(p_transit_type);
-
             rCells.push_back(p_cell);
         }
      }
@@ -132,21 +129,21 @@ public:
 
         // Create Modifiers and pass to simulation
 
-        // Create a pde modifier and pass it to the simulation Add this first so in place for SimpleTargetArea one (calls cell pop update)
+        // Create a PDE modifier and pass it to the simulation Add this first so in place for SimpleTargetArea one (calls cell pop update)
 
-        // Make the PDE and BCs
-        AveragedSourcePde<2> pde(cell_population, -0.1);
-        ConstBoundaryCondition<2> bc(1.0);
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("oxygen");
+        // Create PDE and boundary condition objects
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, -0.1));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
-        // Make domain
+        // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         ChastePoint<2> lower(-5.0, -5.0);
         ChastePoint<2> upper(15.0, 15.0);
         ChasteCuboid<2> cuboid(lower, upper);
 
-        // Create a PDE modifier object using this PDE and BCs object and cuboid
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc,cuboid));
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, &cuboid));
+        p_pde_modifier->SetDependentVariableName("oxygen");
+
         simulator.AddSimulationModifier(p_pde_modifier);
 
         // A NagaiHondaForce has to be used together with an AbstractTargetAreaModifier
@@ -155,7 +152,7 @@ public:
 
         simulator.Solve();
 
-        // Test some simulation stats
+        // Test some simulation statistics
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumAllCells(), 25u); //No birth yet
 
         // Test new locations and concentrations (i.e that the results haven't changed since last revision.)
@@ -190,24 +187,24 @@ public:
         MAKE_PTR(RepulsionForce<2>, p_force);
         simulator.AddForce(p_force);
 
-        // Make the PDE and BCs
-        AveragedSourcePde<2> pde(cell_population, -0.1);
-        ConstBoundaryCondition<2> bc(1.0);
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("oxygen");
+        // Create PDE and boundary condition objects
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, -0.1));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
-        // Make domain
+        // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         ChastePoint<2> lower(-5.0, -5.0);
         ChastePoint<2> upper(15.0, 15.0);
         ChasteCuboid<2> cuboid(lower, upper);
 
-        // Create a PDE modifier object using this PDE and BCs object and cuboid
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc,cuboid));
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, &cuboid));
+        p_pde_modifier->SetDependentVariableName("oxygen");
+
         simulator.AddSimulationModifier(p_pde_modifier);
 
         simulator.Solve();
 
-        // Test some simulation stats
+        // Test some simulation statistics
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumAllCells(), 25u); // No birth yet
 
         // Test new locations and concentrations (i.e that the results haven't changed since last revision.)
@@ -246,24 +243,24 @@ public:
         p_force->SetCutOffLength(1.5);
         simulator.AddForce(p_force);
 
-        // Make the PDE and BCs
-        AveragedSourcePde<2> pde(cell_population, -0.1);
-        ConstBoundaryCondition<2> bc(1.0);
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("oxygen");
+        // Create PDE and boundary condition objects
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, -0.1));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
-        // Make domain
+        // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         ChastePoint<2> lower(-5.0, -5.0);
         ChastePoint<2> upper(15.0, 15.0);
         ChasteCuboid<2> cuboid(lower, upper);
 
-        // Create a PDE modifier object using this PDE and BCs object and cuboid
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc,cuboid));
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, &cuboid));
+        p_pde_modifier->SetDependentVariableName("oxygen");
+
         simulator.AddSimulationModifier(p_pde_modifier);
 
         simulator.Solve();
 
-        // Test some simulation stats
+        // Test some simulation statistics
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumAllCells(), 25u); // No birth yet
 
         // Test new locations and concentrations (i.e that the results haven't changed since last revision.)
@@ -304,24 +301,24 @@ public:
         p_force->SetCutOffLength(1.5);
         simulator.AddForce(p_force);
 
-        // Make the PDE and BCs
-        AveragedSourcePde<2> pde(cell_population, -0.1);
-        ConstBoundaryCondition<2> bc(1.0);
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("oxygen");
+        // Create PDE and boundary condition objects
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, -0.1));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
-        // Make domain
+        // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         ChastePoint<2> lower(-5.0, -5.0);
         ChastePoint<2> upper(15.0, 15.0);
         ChasteCuboid<2> cuboid(lower, upper);
 
-        // Create a PDE modifier object using this PDE and BCs object and cuboid
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc,cuboid));
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, &cuboid));
+        p_pde_modifier->SetDependentVariableName("oxygen");
+
         simulator.AddSimulationModifier(p_pde_modifier);
 
         simulator.Solve();
 
-        // Test some simulation stats
+        // Test some simulation statistics
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumAllCells(), 25u); // No birth yet
 
         // Test new locations and concentrations (i.e that the results haven't changed since last revision.)
@@ -363,25 +360,25 @@ public:
         MAKE_PTR(AdhesionPottsUpdateRule<2>, p_adhesion_update_rule);
         simulator.AddUpdateRule(p_adhesion_update_rule);
 
-        // Make the PDE and BCs
-        AveragedSourcePde<2> pde(cell_population, -0.1);
-        ConstBoundaryCondition<2> bc(1.0);
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("oxygen");
+        // Create PDE and boundary condition objects
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, -0.1));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
-        // Make domain
+        // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         ChastePoint<2> lower(-5.0, -5.0);
         ChastePoint<2> upper(15.0, 15.0);
         ChasteCuboid<2> cuboid(lower, upper);
 
-        // Create a PDE modifier object using this PDE and BCs object and cuboid
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc,cuboid));
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, &cuboid));
+        p_pde_modifier->SetDependentVariableName("oxygen");
+
         simulator.AddSimulationModifier(p_pde_modifier);
 
         simulator.Solve();
 
-        // Test some simulation stats
-        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumAllCells(), 25u); //No birth yet
+        // Test some simulation statistics
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumAllCells(), 25u); // No birth yet
 
         // Test new locations and concentrations (i.e that the results haven't changed since last revision.)
         TS_ASSERT_DELTA( (simulator.rGetCellPopulation().GetCellUsingLocationIndex(1))->GetCellData()->GetItem("oxygen"), 0.6606, 1e-4);
@@ -429,25 +426,25 @@ public:
         p_diffusion_update_rule->SetDiffusionParameter(0.1);
         simulator.AddUpdateRule(p_diffusion_update_rule);
 
-        // Make the PDE and BCs
-        AveragedSourcePde<2> pde(cell_population, -0.1);
-        ConstBoundaryCondition<2> bc(1.0);
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("oxygen");
+        // Create PDE and boundary condition objects
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, -0.1));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
-        // Make domain
+        // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         ChastePoint<2> lower(-5.0, -5.0);
         ChastePoint<2> upper(15.0, 15.0);
         ChasteCuboid<2> cuboid(lower, upper);
 
-        // Create a PDE modifier object using this PDE and BCs object and cuboid
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc,cuboid));
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, &cuboid));
+        p_pde_modifier->SetDependentVariableName("oxygen");
+
         simulator.AddSimulationModifier(p_pde_modifier);
 
         // Run simulation
         simulator.Solve();
 
-        // Test some simulation stats
+        // Test some simulation statistics
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumAllCells(), 25u);
 
         // Test new locations and concentrations (i.e that the results haven't changed since last revision.)

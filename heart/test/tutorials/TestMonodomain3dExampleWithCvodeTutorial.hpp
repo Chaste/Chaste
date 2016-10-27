@@ -130,7 +130,7 @@ public:
          * '''NB:''' this will use more memory than the standard approach of sharing one solver
          * object between all of the action potential models on a processor.
          */
-        if ( (x<0.1+1e-6) && (y<0.1+1e-6) && (z<0.1+1e-6) )
+        if ((x<0.1+1e-6) && (y<0.1+1e-6) && (z<0.1+1e-6))
         {
             p_cell = new CellLuoRudy1991FromCellMLCvode(p_empty_solver, mpStimulus);
         }
@@ -198,7 +198,7 @@ public:
         monodomain_problem.SetMesh( &mesh );
 
         bool partial_output = false;
-        if(partial_output)
+        if (partial_output)
         {
             std::vector<unsigned> nodes_to_be_output;
             nodes_to_be_output.push_back(0);

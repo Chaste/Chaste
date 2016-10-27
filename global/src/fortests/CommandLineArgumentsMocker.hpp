@@ -74,7 +74,6 @@ private:
     int* mpNumOldArgs;
     /** The location of the old arguments */
     char*** mpOldArgs;
-
 };
 
 #endif // COMMANDLINEARGUMENTSMOCKER_HPP_

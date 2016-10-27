@@ -61,7 +61,7 @@ private:
 
     double ComputeTimeStep(double currentTime, Vec currentSolution)
     {
-        if(currentTime < mThresholdTime)
+        if (currentTime < mThresholdTime)
         {
             return 0.01; // ms
         }
@@ -70,7 +70,6 @@ private:
             return 1;
         }
     }
-
 
 public:
     FixedTimeAdaptivityController(double thresholdTime)
@@ -222,7 +221,6 @@ public:
                 TS_FAIL(e.GetShortMessage());
             }
         }
-
     }
 };
 

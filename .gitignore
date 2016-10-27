@@ -15,12 +15,15 @@ core.*
 *.avi
 *.patch
 *.log
+/*_generator*.arch
+# Last one is ApPredict lookup tables
 
 # A useful folder name to collect lots of local-only files
 _local/
 
 # Temporary build folders for dynamically loaded models
 /heart/dynamic/tmp_*_*
+/heart/dynamic/luo_rudy_1991_dyn.*
 
 # Local hostconfig
 /python/hostconfig/local.py

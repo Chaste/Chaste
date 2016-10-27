@@ -51,7 +51,6 @@ public:
      * @return  a POSIX string representation of path
      */
     static std::string ToPosix(const fs::path path);
-
 };
 
 #endif// POSIXPATHFIXER_HPP_

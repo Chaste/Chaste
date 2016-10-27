@@ -329,32 +329,31 @@ public:
 
         MonodomainTissue<1> monodomain_tissue( &cell_factory, true );
 
-
-        if ( PetscTools::GetNumProcs() == 1 )
+        if (PetscTools::GetNumProcs() == 1)
         {
-            TS_ASSERT_EQUALS( mesh.GetNumHaloNodes(), 0u );
+            TS_ASSERT_EQUALS(mesh.GetNumHaloNodes(), 0u);
         }
         else
         {
-            if ( PetscTools::AmMaster() || PetscTools::AmTopMost() )
+            if (PetscTools::AmMaster() || PetscTools::AmTopMost())
             {
-                TS_ASSERT_EQUALS( mesh.GetNumHaloNodes(), 1u );
+                TS_ASSERT_EQUALS(mesh.GetNumHaloNodes(), 1u);
             }
             else
             {
-                TS_ASSERT_EQUALS( mesh.GetNumHaloNodes(), 2u );
+                TS_ASSERT_EQUALS(mesh.GetNumHaloNodes(), 2u);
             }
         }
 
         for (DistributedTetrahedralMesh<1,1>::HaloNodeIterator it=mesh.GetHaloNodeIteratorBegin();
-                it != mesh.GetHaloNodeIteratorEnd();
-                ++it)
+             it != mesh.GetHaloNodeIteratorEnd();
+             ++it)
         {
             AbstractCardiacCellInterface* cell = monodomain_tissue.GetCardiacCellOrHaloCell( (*it)->GetIndex() );
             TS_ASSERT_DELTA(cell->GetStimulus(0.001),0,1e-10);
         }
 
-        if ( PetscTools::AmMaster() )
+        if (PetscTools::AmMaster())
         {
             // Master owns node 0
             AbstractCardiacCellInterface* cell = monodomain_tissue.GetCardiacCellOrHaloCell(0);
@@ -551,8 +550,8 @@ public:
             AbstractCardiacCellInterface* p_purkinje_cell = tissue.GetPurkinjeCell(global_index);
             double y = current_node->rGetLocation()[1];
 
-            // cable nodes are on y=0.05 (we don't test by index because indices may be permuted in parallel).
-            if( fabs(y-0.05) < 1e-8 )
+            // Cable nodes are on y=0.05 (we don't test by index because indices may be permuted in parallel).
+            if (fabs(y-0.05) < 1e-8)
             {
                 TS_ASSERT(dynamic_cast<CellDiFrancescoNoble1985FromCellML*>(p_purkinje_cell) != nullptr);
             }
@@ -605,7 +604,7 @@ public:
                 double y = current_node->rGetLocation()[1];
 
                 // cable nodes are on y=0.05 (we don't test by index because indices may be permuted in parallel).
-                if( fabs(y-0.05) < 1e-8 )
+                if (fabs(y-0.05) < 1e-8)
                 {
                     TS_ASSERT(dynamic_cast<CellDiFrancescoNoble1985FromCellML*>(p_purkinje_cell) != nullptr);
                 }
@@ -657,7 +656,5 @@ public:
         delete p_problem;
     }
 };
-
-
 
 #endif //_TESTMONODOMAINTISSUE_HPP_

@@ -58,7 +58,7 @@ public:
         mesh.ConstructFromMeshReader(mesh_reader);
 
         //Assign valid radii
-        for(unsigned node_index = 0; node_index < mesh.GetNumNodes(); ++node_index)
+        for (unsigned node_index = 0; node_index < mesh.GetNumNodes(); ++node_index)
         {
             mesh.GetNode(node_index)->rGetNodeAttributes()[0] = 1.0;
         }
@@ -91,7 +91,7 @@ public:
         mesh.ConstructFromMeshReader(mesh_reader);
 
         //Assign valid radii
-        for(unsigned node_index = 0; node_index < mesh.GetNumNodes(); ++node_index)
+        for (unsigned node_index = 0; node_index < mesh.GetNumNodes(); ++node_index)
         {
             mesh.GetNode(node_index)->AddNodeAttribute(1.0);
         }
@@ -123,7 +123,7 @@ public:
             mesh.ConstructFromMeshReader(mesh_reader);
 
             //Assign valid radii
-            for(unsigned node_index = 0; node_index < mesh.GetNumNodes(); ++node_index)
+            for (unsigned node_index = 0; node_index < mesh.GetNumNodes(); ++node_index)
             {
                  mesh.GetNode(node_index)->rGetNodeAttributes()[0] = 1.0;
             }
@@ -158,7 +158,7 @@ public:
             mesh.ConstructFromMeshReader(mesh_reader);
 
             //Assign valid radii
-            for(unsigned node_index = 0; node_index < mesh.GetNumNodes(); ++node_index)
+            for (unsigned node_index = 0; node_index < mesh.GetNumNodes(); ++node_index)
             {
                  mesh.GetNode(node_index)->rGetNodeAttributes()[0] = 1.0;
             }
@@ -193,8 +193,8 @@ public:
         MutableMesh<1,3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
-        //Assign valid radii
-        for(unsigned node_index = 0; node_index < mesh.GetNumNodes(); ++node_index)
+        // Assign valid radii
+        for (unsigned node_index = 0; node_index < mesh.GetNumNodes(); ++node_index)
         {
           mesh.GetNode(node_index)->rGetNodeAttributes()[0] = 1.0;
         }
@@ -208,9 +208,6 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 4u);
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 3u);
     }
-
 };
-
-
 
 #endif /* TESTMAJORAIRWAYSCENTRELINESCLEANER_HPP_ */

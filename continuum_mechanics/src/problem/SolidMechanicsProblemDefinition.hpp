@@ -199,7 +199,4 @@ public:
     }
 };
 
-
-
-
 #endif /* SOLIDMECHANICSPROBLEMDEFINITION_HPP_ */

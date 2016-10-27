@@ -166,9 +166,7 @@ namespace boost
             ar >> p_stimulus;
             ::new(t)CML_noble_varghese_kohl_noble_1998_basic_with_sac(p_solver, p_stimulus);
         }
-
     }
-
 }
 
 #endif

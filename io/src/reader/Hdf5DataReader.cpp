@@ -236,7 +236,7 @@ std::vector<double> Hdf5DataReader::GetVariableOverTime(const std::string& rVari
                 break;
             }
         }
-        if ( node_index == mIncompleteNodeIndices.size())
+        if (node_index == mIncompleteNodeIndices.size())
         {
             EXCEPTION("The incomplete dataset '" << mDatasetName << "' does not contain info of node " << nodeIndex);
         }

@@ -39,7 +39,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "StepSizeException.hpp"
 #include "Warnings.hpp"
 #include "WildTypeCellMutationState.hpp"
-#include "ApoptoticCellProperty.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractCentreBasedCellPopulation( AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
@@ -82,18 +81,6 @@ Node<SPACE_DIM>* AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetN
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-bool AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::IsPdeNodeAssociatedWithApoptoticCell(unsigned pdeNodeIndex)
-{
-    bool is_cell_apoptotic = false;
-
-    if (this->IsCellAttachedToLocationIndex(pdeNodeIndex))
-    {
-        is_cell_apoptotic = this->GetCellUsingLocationIndex(pdeNodeIndex)->template HasCellProperty<ApoptoticCellProperty>();
-    }
-    return is_cell_apoptotic;
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCellDataItemAtPdeNode(
     unsigned pdeNodeIndex,
     std::string& rVariableName,
@@ -122,6 +109,7 @@ CellPtr AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddCell(CellP
 
     // Create a new node
     Node<SPACE_DIM>* p_new_node = new Node<SPACE_DIM>(this->GetNumNodes(), daughter_position, false); // never on boundary
+    p_new_node->ClearAppliedForce(); // Incase velocity is ouptut on the same timestep as the cell has divided
     unsigned new_node_index = this->AddNode(p_new_node); // use copy constructor so it doesn't matter that new_node goes out of scope
 
     // Update cells vector

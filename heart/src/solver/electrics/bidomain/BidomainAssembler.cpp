@@ -103,12 +103,7 @@ BidomainAssembler<ELEMENT_DIM,SPACE_DIM>::BidomainAssembler(
     assert(pTissue != nullptr);
 }
 
-
-
-///////////////////////////////////////////////////////
-// explicit instantiation
-///////////////////////////////////////////////////////
-
+// Explicit instantiation
 template class BidomainAssembler<1,1>;
 template class BidomainAssembler<2,2>;
 template class BidomainAssembler<3,3>;

@@ -254,9 +254,6 @@ public:
             delete p_loaded_stim;
         }
     }
-
-
 };
-
 
 #endif //_TESTRESTITUTIONCELLSTIMULI_HPP_

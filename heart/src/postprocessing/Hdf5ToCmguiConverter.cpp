@@ -220,10 +220,7 @@ void Hdf5ToCmguiConverter<ELEMENT_DIM,SPACE_DIM>::WriteCmguiScript()
     }
 }
 
-/////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////
-
 template class Hdf5ToCmguiConverter<1,1>;
 template class Hdf5ToCmguiConverter<1,2>;
 template class Hdf5ToCmguiConverter<2,2>;

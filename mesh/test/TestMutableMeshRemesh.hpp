@@ -667,8 +667,6 @@ public:
         TS_ASSERT_DELTA(mesh.GetVolume(), volume, 1e-6);
     }
 
-
-
     void TestSplitLongEdges()
     {
         {

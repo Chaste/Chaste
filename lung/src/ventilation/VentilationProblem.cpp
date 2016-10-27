@@ -68,9 +68,6 @@ VentilationProblem::VentilationProblem(const std::string& rMeshDirFilePath, unsi
     Initialise();
 }
 
-
-
-
 void VentilationProblem::Initialise()
 {
     mFlux.resize(mMesh.GetNumElements());
@@ -80,7 +77,6 @@ void VentilationProblem::Initialise()
         WARNING("Nodes in this mesh do not appear in graph order.  Some solvers may be inefficient.");
     }
 }
-
 
 VentilationProblem::~VentilationProblem()
 {
@@ -112,16 +108,15 @@ void VentilationProblem::SolveDirectFromFlux()
     {
         // Unset internal fluxes
         for (AbstractTetrahedralMesh<1,3>::ElementIterator iter = mMesh.GetElementIteratorBegin();
-                  iter != mMesh.GetElementIteratorEnd();
-                  ++iter)
+             iter != mMesh.GetElementIteratorEnd();
+             ++iter)
         {
             // Note that this won't reset the root
-            if ( !((*iter).GetNode(0)->IsBoundaryNode()) && !((*iter).GetNode(1)->IsBoundaryNode()) )
+            if (!((*iter).GetNode(0)->IsBoundaryNode()) && !((*iter).GetNode(1)->IsBoundaryNode()))
             {
                 mFlux[ (*iter).GetIndex() ] = 0.0;
             }
         }
-
     }
     bool some_flux_zero;
     bool all_flux_zero;
@@ -235,7 +230,7 @@ void VentilationProblem::SetupIterativeSolver()
     VecCreateSeq(PETSC_COMM_SELF, terminal_index, &mTerminalPressureChangeVector);
 
     KSPCreate(PETSC_COMM_SELF, &mTerminalKspSolver);
-#if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5 )
+#if (PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5)
     KSPSetOperators(mTerminalKspSolver, mTerminalInteractionMatrix, mTerminalInteractionMatrix);
 #else
     KSPSetOperators(mTerminalKspSolver, mTerminalInteractionMatrix, mTerminalInteractionMatrix, SAME_PRECONDITIONER);
@@ -445,8 +440,6 @@ void VentilationProblem::SolveIterativelyFromPressure()
         double* p_terminal_flux_change_vector;
         VecGetArray(mTerminalFluxChangeVector, &p_terminal_flux_change_vector);
 
-
-
         for (unsigned terminal=0; terminal<num_terminals; terminal++)
         {
             double estimated_terminal_flux_change=p_terminal_flux_change_vector[terminal];
@@ -497,7 +490,7 @@ void VentilationProblem::SolveIterativelyFromPressure()
             SolveDirectFromFlux();
         }
     }
-    if(!converged)
+    if (!converged)
     {
         NEVER_REACHED;
     }
@@ -551,8 +544,6 @@ void VentilationProblem::SetFluxAtBoundaryNode(const Node<3>& rNode, double flux
     mFlux[edge_index] = flux;
 }
 
-
-
 void VentilationProblem::Solve()
 {
     if (mFluxGivenAtInflow && !mFluxGivenAtOutflow)
@@ -564,9 +555,7 @@ void VentilationProblem::Solve()
         SolveIterativelyFromPressure();
         //SolveFromPressureWithSnes();
     }
-
 }
-
 
 void VentilationProblem::GetSolutionAsFluxesAndPressures(std::vector<double>& rFluxesOnEdges,
                                                          std::vector<double>& rPressuresOnNodes)
@@ -574,10 +563,3 @@ void VentilationProblem::GetSolutionAsFluxesAndPressures(std::vector<double>& rF
     rFluxesOnEdges = mFlux;
     rPressuresOnNodes = mPressure;
 }
-
-
-
-
-
-
-

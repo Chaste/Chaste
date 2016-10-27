@@ -112,9 +112,9 @@ public: // Tests should be public!
         airways_mesh_reader.GetPointData("radius", node_radii);
         std::vector<double> terminal_marker;
         airways_mesh_reader.GetPointData("start_id", terminal_marker);
-        for(TetrahedralMesh<1,3>::NodeIterator iter = airways_mesh.GetNodeIteratorBegin();
-            iter != airways_mesh.GetNodeIteratorEnd();
-            ++iter)
+        for (TetrahedralMesh<1,3>::NodeIterator iter = airways_mesh.GetNodeIteratorBegin();
+             iter != airways_mesh.GetNodeIteratorEnd();
+             ++iter)
         {
             iter->AddNodeAttribute(node_radii[iter->GetIndex()]);
             iter->AddNodeAttribute(fmod(terminal_marker[iter->GetIndex()],2));

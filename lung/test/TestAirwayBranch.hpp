@@ -119,7 +119,7 @@ public:
         AirwayBranch branch_two;
         AirwayBranch branch_three;
 
-        for(unsigned i = 0; i < 10; ++i)
+        for (unsigned i = 0; i < 10; ++i)
         {
             branch_one.AddElement(mesh.GetElement(i));
             branch_two.AddElement(mesh.GetElement(10 + i));
@@ -208,7 +208,7 @@ public:
         bool proximal_in_first_elem = proximal_is_node_0 || proximal_is_node_1;
         TS_ASSERT_EQUALS(proximal_in_first_elem, true);
 
-        if(proximal_is_node_0)
+        if (proximal_is_node_0)
         {
             p_first_elem_non_proximal = p_first_elem_node_1;
         }
@@ -223,7 +223,7 @@ public:
         bool distal_in_last_elem = distsal_is_node_0 || distsal_is_node_1;
         TS_ASSERT_EQUALS(distal_in_last_elem, true);
 
-        if(distsal_is_node_0)
+        if (distsal_is_node_0)
         {
             p_last_elem_non_distal = p_last_elem_node_1;
         }

@@ -190,9 +190,6 @@ public:
             TS_ASSERT_DELTA(epi_bounding_box.rGetLowerCorner()[i], 0.0, 1e-10);
             TS_ASSERT_DELTA(endo_bounding_box.rGetUpperCorner()[i], 5.0, 1e-10);
         }
-
-
-
     }
 
     void TestCalculateRelativeWallPositionWithThreeSurfaces() throw(Exception)
@@ -210,7 +207,7 @@ public:
         for (unsigned index=low_index; index<high_index; index++)
         {
             // Get the nodes at cube face considered to be epi (at both external faces)
-            if (  (fabs(mesh.GetNode(index)->rGetLocation()[0]) < 1e-6)
+            if ((fabs(mesh.GetNode(index)->rGetLocation()[0]) < 1e-6)
                 ||(fabs(mesh.GetNode(index)->rGetLocation()[0]-8.0) < 1e-6))
             {
                 epi_face.push_back(index);
@@ -301,7 +298,7 @@ public:
         for (unsigned index=low_index; index<high_index; index++)
         {
             // Get the nodes at cube face considered to be epi (at both external faces)
-            if (  (fabs(mesh.GetNode(index)->rGetLocation()[0]) < 1e-6)
+            if ((fabs(mesh.GetNode(index)->rGetLocation()[0]) < 1e-6)
                 ||(fabs(mesh.GetNode(index)->rGetLocation()[0]-30.0) < 1e-6))
             {
                 epi_face.push_back(index);

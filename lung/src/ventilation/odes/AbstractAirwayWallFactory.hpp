@@ -108,8 +108,6 @@ public:
     {
         return mpMesh;
     }
-
 };
 
 #endif /*ABSTRACTAIRWAYWALLFACTORY_HPP_*/
-

@@ -59,8 +59,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 #include <fstream>
 
-
-
 class ICC_Cell_factory : public AbstractCardiacCellFactory<1>
 {
 public:

@@ -33,25 +33,33 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef AVERAGEDSOURCEPDE_HPP_
-#define AVERAGEDSOURCEPDE_HPP_
+#ifndef UNIFORMSOURCEELLIPTICPDE_HPP_
+#define UNIFORMSOURCEELLIPTICPDE_HPP_
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
-#include <boost/serialization/vector.hpp>
 
-#include "AbstractCellPopulation.hpp"
-#include "TetrahedralMesh.hpp"
 #include "AbstractLinearEllipticPde.hpp"
 
 /**
- *  An Elliptic PDE which calculates the source term by adding the number of cells
- *  in the element containing that point and scaling by the element area.
+ * An elliptic PDE to be solved numerically using the finite element method, for
+ * coupling to a cell-based simulation.
+ *
+ * The PDE takes the form
+ *
+ * Grad.(Grad(u)) + k = 0,
+ *
+ * where the scalar k is specified by the member mSourceCoefficient, whose value
+ * must be set in the constructor.
+ *
+ * Thus, there is no direct coupling between the cell-based simulation and the
+ * terms of the PDE; here, the cell population just defines the spatial domain
+ * on which to solve the PDE.
  */
 template<unsigned DIM>
-class AveragedSourcePde : public AbstractLinearEllipticPde<DIM,DIM>
+class UniformSourceEllipticPde : public AbstractLinearEllipticPde<DIM,DIM>
 {
-    friend class TestCellBasedPdes;
+    friend class TestCellBasedEllipticPdes;
 
 private:
 
@@ -67,54 +75,31 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
        archive & boost::serialization::base_object<AbstractLinearEllipticPde<DIM, DIM> >(*this);
-       archive & mCoefficient;
-       archive & mCellDensityOnCoarseElements;
+       archive & mSourceCoefficient;
     }
 
-protected:
-
-    /** The cell population member. */
-    AbstractCellPopulation<DIM>& mrCellPopulation;
-
-    /** Coefficient of consumption of nutrient by cells. */
-    double mCoefficient;
-
-    /** Vector of averaged cell densities on elements of the coarse mesh. */
-    std::vector<double> mCellDensityOnCoarseElements;
+    /** Coefficient of source term. */
+    double mSourceCoefficient;
 
 public:
 
     /**
      * Constructor.
      *
-     * @param rCellPopulation reference to the cell population
-     * @param coefficient the coefficient of consumption of nutrient by cells (defaults to 0.0)
+     * @param sourceCoefficient the source term coefficient (defaults to 0.0)
      */
-    AveragedSourcePde(AbstractCellPopulation<DIM>& rCellPopulation, double coefficient=0.0);
+    UniformSourceEllipticPde(double sourceCoefficient=0.0);
 
     /**
-     * @return const reference to the cell population (used in archiving).
-     */
-    const AbstractCellPopulation<DIM>& rGetCellPopulation() const;
-
-    /**
-     * @return mCoefficient
+     * @return mSourceCoefficient
      */
     double GetCoefficient() const;
-
-    /**
-     * Set up the source terms.
-     *
-     * @param rCoarseMesh reference to the coarse mesh
-     * @param pCellPdeElementMap optional pointer to the map from cells to coarse elements
-     */
-    void virtual SetupSourceTerms(TetrahedralMesh<DIM,DIM>& rCoarseMesh, std::map<CellPtr, unsigned>* pCellPdeElementMap=nullptr);
 
     /**
      * Overridden ComputeConstantInUSourceTerm() method.
      *
      * @param rX The point in space
-     * @param pElement the element
+     * @param pElement The element
      *
      * @return the constant in u part of the source term, i.e g(x) in
      *  Div(D Grad u)  +  f(x)u + g(x) = 0.
@@ -140,49 +125,9 @@ public:
      * @return a matrix.
      */
     c_matrix<double,DIM,DIM> ComputeDiffusionTerm(const ChastePoint<DIM>& rX);
-
-    /**
-     * @return the uptake rate.
-     *
-     * @param elementIndex the element we wish to return the uptake rate for
-     */
-    double GetUptakeRateForElement(unsigned elementIndex);
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(AveragedSourcePde)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(UniformSourceEllipticPde)
 
-namespace boost
-{
-namespace serialization
-{
-/**
- * Serialize information required to construct an AveragedSourcePde.
- */
-template<class Archive, unsigned DIM>
-inline void save_construct_data(
-    Archive & ar, const AveragedSourcePde<DIM>* t, const unsigned int file_version)
-{
-    // Save data required to construct instance
-    const AbstractCellPopulation<DIM>* p_cell_population = &(t->rGetCellPopulation());
-    ar & p_cell_population;
-}
-
-/**
- * De-serialize constructor parameters and initialise an AveragedSourcePde.
- */
-template<class Archive, unsigned DIM>
-inline void load_construct_data(
-    Archive & ar, AveragedSourcePde<DIM>* t, const unsigned int file_version)
-{
-    // Retrieve data from archive required to construct new instance
-    AbstractCellPopulation<DIM>* p_cell_population;
-    ar >> p_cell_population;
-
-    // Invoke inplace constructor to initialise instance
-    ::new(t)AveragedSourcePde<DIM>(*p_cell_population);
-}
-}
-} // namespace ...
-
-#endif /*AVERAGEDSOURCEPDE_HPP_*/
+#endif /*UNIFORMSOURCEELLIPTICPDE_HPP_*/

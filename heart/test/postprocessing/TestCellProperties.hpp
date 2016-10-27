@@ -557,9 +557,7 @@ public:
                 TS_ASSERT_DELTA(resting_potentials[0], -85.4714, tolerance);
                 TS_ASSERT_DELTA(resting_potentials[1], -85.4714, tolerance);
             }
-
         }
-
     }
 };
 

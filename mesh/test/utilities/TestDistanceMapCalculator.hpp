@@ -42,8 +42,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscSetupAndFinalize.hpp"
 #include "RandomNumberGenerator.hpp"
 
-
-
 class TestDistanceMapCalculator : public CxxTest::TestSuite
 {
 public:
@@ -93,9 +91,6 @@ public:
             }
         }
     }
-
-
-
 
     void TestDistancesToCorner() throw (Exception)
     {
@@ -326,7 +321,6 @@ public:
             TS_ASSERT_EQUALS(parallel_distances[index], DBL_MAX);
         }
     }
-
 };
 
 #endif /*TESTDISTANCEMAPCALCULATOR_*/

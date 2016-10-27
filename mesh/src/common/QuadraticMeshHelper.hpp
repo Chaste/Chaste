@@ -191,7 +191,6 @@ public:
                               unsigned internalNode0, unsigned internalNode1, unsigned internalNode2,
                               unsigned offset,
                               bool reverse);
-
 };
 
 #endif // QUADRATICMESHHELPER_HPP_

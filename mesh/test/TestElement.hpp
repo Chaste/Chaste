@@ -1024,7 +1024,6 @@ public:
         p_element->SetAttribute(3);
         TS_ASSERT_EQUALS(p_element->GetUnsignedAttribute(), 3u);
     }
-
 };
 
 #endif //_TESTELEMENT_HPP_

@@ -80,10 +80,10 @@ AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::AbstractCardiacTissue(
          * to the other processes.  Therefore, to avoid deadlock, we share this potential for error between
          * processes and throw an exception.
          */
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
         // This problem normally occurs on 3 or more processes, so we can't cover it - coverage only runs with 1 and 2 processes.
         EXCEPTION("No cells were assigned some process in AbstractCardiacTissue constructor. Advice: Make total number of processors no greater than number of nodes in the mesh");
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
     }
     unsigned ownership_range_low = mpDistributedVectorFactory->GetLow();
     mCellsDistributed.resize(num_local_nodes);
@@ -164,7 +164,7 @@ AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::AbstractCardiacTissue(
     }
     HeartEventHandler::EndEvent(HeartEventHandler::COMMUNICATION);
 
-    if(HeartConfig::Instance()->IsMeshProvided() && HeartConfig::Instance()->GetLoadMesh())
+    if (HeartConfig::Instance()->IsMeshProvided() && HeartConfig::Instance()->GetLoadMesh())
     {
         mFibreFilePathNoExtension = HeartConfig::Instance()->GetMeshName();
     }
@@ -298,11 +298,11 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::CreateIntracellularConductivi
         }
         catch(std::bad_alloc &r_bad_alloc)
         {
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
             std::cout << "Failed to allocate std::vector of size " << num_local_elements << std::endl;
             PetscTools::ReplicateException(true);
             throw r_bad_alloc;
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
         }
         PetscTools::ReplicateException(false);
 
@@ -324,7 +324,7 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::CreateIntracellularConductivi
             ChastePoint<SPACE_DIM> element_centroid(it->CalculateCentroid());
             for (unsigned region_index=0; region_index< conductivities_heterogeneity_areas.size(); region_index++)
             {
-                if ( conductivities_heterogeneity_areas[region_index]->DoesContain(element_centroid) )
+                if (conductivities_heterogeneity_areas[region_index]->DoesContain(element_centroid))
                 {
                     //We don't use ublas vector assignment here, because we might be getting a subvector of a 3-vector
                     for (unsigned i=0; i<SPACE_DIM; i++)
@@ -404,13 +404,13 @@ AbstractCardiacCellInterface* AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::GetC
     // First search the halo
     if ((node_position=mHaloGlobalToLocalIndexMap.find(globalIndex)) != mHaloGlobalToLocalIndexMap.end())
     {
-        //Found a halo node
+        // Found a halo node
         return mHaloCellsDistributed[node_position->second];
     }
     // Then search the owned node
-    if ( mpDistributedVectorFactory->IsGlobalIndexLocal(globalIndex)  )
+    if (mpDistributedVectorFactory->IsGlobalIndexLocal(globalIndex))
     {
-        //Found an owned node
+        // Found an owned node
         return mCellsDistributed[globalIndex - mpDistributedVectorFactory->GetLow()];
     }
     // Not here
@@ -462,7 +462,7 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SetUpHaloCells(AbstractCardia
 template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
 void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SolveCellSystems(Vec existingSolution, double time, double nextTime, bool updateVoltage)
 {
-    if(mHasPurkinje)
+    if (mHasPurkinje)
     {
         // can't do Purkinje and operator splitting
         assert(!updateVoltage);
@@ -511,7 +511,7 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SolveCellSystems(Vec existing
                     {
                         // Try an 'emergency' reset if this is a CVODE cell.
                         // See #2594 for why we think this may be necessary.
-                        if(dynamic_cast<AbstractCvodeCell*>(mCellsDistributed[index.Local]))
+                        if (dynamic_cast<AbstractCvodeCell*>(mCellsDistributed[index.Local]))
                         {
                             // Reset the CVODE cell, this leads to a call to CVodeReInit.
                             static_cast<AbstractCvodeCell*>(mCellsDistributed[index.Local])->ResetSolver();
@@ -611,8 +611,6 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SolveCellSystems(Vec existing
         }
     }
 
-
-
     PetscTools::ReplicateException(false);
     HeartEventHandler::EndEvent(HeartEventHandler::SOLVE_ODES);
 
@@ -692,7 +690,7 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SolveCellSystems(Vec existing
     }
 
     HeartEventHandler::BeginEvent(HeartEventHandler::COMMUNICATION);
-    if ( mDoCacheReplication )
+    if (mDoCacheReplication)
     {
         ReplicateCaches();
     }
@@ -785,11 +783,7 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SetConductivityModifier(Abstr
     mpConductivityModifier = pModifier;
 }
 
-
-/////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////
-
 template class AbstractCardiacTissue<1,1>;
 template class AbstractCardiacTissue<1,2>;
 template class AbstractCardiacTissue<1,3>;

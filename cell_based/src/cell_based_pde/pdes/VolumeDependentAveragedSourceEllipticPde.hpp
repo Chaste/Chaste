@@ -33,25 +33,47 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef VOLUMEDEPENDENTAVERAGEDSOURCEPDE_HPP_
-#define VOLUMEDEPENDENTAVERAGEDSOURCEPDE_HPP_
+#ifndef VOLUMEDEPENDENTAVERAGEDSOURCEELLIPTICPDE_HPP_
+#define VOLUMEDEPENDENTAVERAGEDSOURCEELLIPTICPDE_HPP_
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
 #include "NodeBasedCellPopulation.hpp"
-#include "AveragedSourcePde.hpp"
+#include "AveragedSourceEllipticPde.hpp"
 #include "TetrahedralMesh.hpp"
 #include "AbstractLinearEllipticPde.hpp"
 
 /**
- *  A PDE which calculates the source term by adding the number of cells
- *  in the element containing that point and scaling by the element area.
+ * An elliptic PDE to be solved numerically using the finite element method, for
+ * coupling to a cell-based simulation.
+ *
+ * This class inherits from AveragedSourceEllipticPde and may only be used with
+ * a NodeBasedCellPopulation, since it assumes that each cell is associated with
+ * a Node object.
+ *
+ * The PDE takes the form
+ *
+ * Grad.(D*Grad(u)) + k*u*rho(x) = 0,
+ *
+ * where the scalars D and k are specified by the members mDiffusionCoefficient and
+ * mSourceCoefficient, respectively. Their values must be set in the constructor.
+ *
+ * The function rho(x) denotes the local density of non-apoptotic cells. This
+ * quantity is computed for each element of a 'coarse' finite element mesh that is
+ * passed to the method SetupSourceTerms() and stored in the member mCellDensityOnCoarseElements.
+ *
+ * For a point x, rho(x) is a weighted sum of the non-apoptotic cells whose centres
+ * lie in each finite element containing that point, scaled by the area of that element.
+ * The weighting assigned to each cell is given by the square of the radius of the
+ * associated node, which is accessed using the GetRadius() method.
+ *
+ * \todo Consider creating a VolumeDependentAveragedSourceParabolicPde class
  */
 template<unsigned DIM>
-class VolumeDependentAveragedSourcePde : public AveragedSourcePde<DIM>
+class VolumeDependentAveragedSourceEllipticPde : public AveragedSourceEllipticPde<DIM>
 {
-    friend class TestCellBasedPdes;
+    friend class TestCellBasedEllipticPdes;
 
 private:
 
@@ -66,10 +88,10 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-       archive & boost::serialization::base_object<AveragedSourcePde<DIM> >(*this);
+       archive & boost::serialization::base_object<AveragedSourceEllipticPde<DIM> >(*this);
     }
 
-    /** Static cast of the NodeBasedCellPopulation. **/
+    /** Static cast of the NodeBasedCellPopulation. */
     NodeBasedCellPopulation<DIM>* mpStaticCastCellPopulation;
 
 public:
@@ -80,7 +102,7 @@ public:
      * @param rCellPopulation reference to the cell population
      * @param coefficient the coefficient of consumption of nutrient by cells (defaults to 0.0)
      */
-    VolumeDependentAveragedSourcePde(AbstractCellPopulation<DIM>& rCellPopulation, double coefficient=0.0);
+    VolumeDependentAveragedSourceEllipticPde(AbstractCellPopulation<DIM>& rCellPopulation, double coefficient=0.0);
 
     /**
      * Set up the source terms.
@@ -92,18 +114,18 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(VolumeDependentAveragedSourcePde)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(VolumeDependentAveragedSourceEllipticPde)
 
 namespace boost
 {
 namespace serialization
 {
 /**
- * Serialize information required to construct a VolumeDependentAveragedSourcePde.
+ * Serialize information required to construct a VolumeDependentAveragedSourceEllipticPde.
  */
 template<class Archive, unsigned DIM>
 inline void save_construct_data(
-    Archive & ar, const VolumeDependentAveragedSourcePde<DIM>* t, const unsigned int file_version)
+    Archive & ar, const VolumeDependentAveragedSourceEllipticPde<DIM>* t, const unsigned int file_version)
 {
     // Save data required to construct instance
     const AbstractCellPopulation<DIM>* p_cell_population = &(t->rGetCellPopulation());
@@ -111,20 +133,20 @@ inline void save_construct_data(
 }
 
 /**
- * De-serialize constructor parameters and initialise a VolumeDependentAveragedSourcePde.
+ * De-serialize constructor parameters and initialise a VolumeDependentAveragedSourceEllipticPde.
  */
 template<class Archive, unsigned DIM>
 inline void load_construct_data(
-    Archive & ar, VolumeDependentAveragedSourcePde<DIM>* t, const unsigned int file_version)
+    Archive & ar, VolumeDependentAveragedSourceEllipticPde<DIM>* t, const unsigned int file_version)
 {
     // Retrieve data from archive required to construct new instance
     AbstractCellPopulation<DIM>* p_cell_population;
     ar >> p_cell_population;
 
     // Invoke inplace constructor to initialise instance
-    ::new(t)VolumeDependentAveragedSourcePde<DIM>(*p_cell_population);
+    ::new(t)VolumeDependentAveragedSourceEllipticPde<DIM>(*p_cell_population);
 }
 }
 } // namespace ...
 
-#endif /*VOLUMEDEPENDENTAVERAGEDSOURCEPDE_HPP_*/
+#endif /*VOLUMEDEPENDENTAVERAGEDSOURCEELLIPTICPDE_HPP_*/

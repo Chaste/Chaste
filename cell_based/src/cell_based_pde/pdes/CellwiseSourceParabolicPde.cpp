@@ -40,11 +40,11 @@ template<unsigned DIM>
 CellwiseSourceParabolicPde<DIM>::CellwiseSourceParabolicPde(AbstractCellPopulation<DIM,DIM>& rCellPopulation,
                                                             double duDtCoefficient,
                                                             double diffusionCoefficient,
-                                                            double uptakeCoefficient)
+                                                            double sourceCoefficient)
     : mrCellPopulation(rCellPopulation),
       mDuDtCoefficient(duDtCoefficient),
       mDiffusionCoefficient(diffusionCoefficient),
-      mUptakeCoefficient(uptakeCoefficient)
+      mSourceCoefficient(sourceCoefficient)
 {
 }
 
@@ -60,7 +60,6 @@ double CellwiseSourceParabolicPde<DIM>::ComputeDuDtCoefficientFunction(const Cha
     return mDuDtCoefficient;
 }
 
-
 template<unsigned DIM>
 double CellwiseSourceParabolicPde<DIM>::ComputeSourceTerm(const ChastePoint<DIM>& rX, double u, Element<DIM,DIM>* pElement)
 {
@@ -71,16 +70,15 @@ double CellwiseSourceParabolicPde<DIM>::ComputeSourceTerm(const ChastePoint<DIM>
 template<unsigned DIM>
 double CellwiseSourceParabolicPde<DIM>::ComputeSourceTermAtNode(const Node<DIM>& rNode, double u)
 {
-    double coefficient = 0.0;
+    double source_coefficient = 0.0;
 
-    bool is_cell_apoptotic = mrCellPopulation.IsPdeNodeAssociatedWithApoptoticCell(rNode.GetIndex());
-    if (!is_cell_apoptotic)
+    if (mrCellPopulation.IsPdeNodeAssociatedWithNonApoptoticCell(rNode.GetIndex()))
     {
-        coefficient = mUptakeCoefficient;
+        source_coefficient = mSourceCoefficient;
     }
 
     // The source term is C*u
-    return coefficient*u;
+    return source_coefficient*u;
 }
 
 template<unsigned DIM>

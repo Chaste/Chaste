@@ -91,7 +91,7 @@ void PCBlockDiagonal::PCBlockDiagonalCreate(KSP& rKspObject)
     KSPGetPC(rKspObject, &mPetscPCObject);
 
     Mat system_matrix, dummy;
-#if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5 )
+#if (PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5)
     KSPGetOperators(rKspObject, &system_matrix, &dummy);
 #else
     MatStructure flag;
@@ -218,8 +218,7 @@ void PCBlockDiagonal::PCBlockDiagonalSetUp()
     // Stop supressing error
     PetscPopErrorHandler();
 
-
-#if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR<=5 )
+#if (PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR<=5)
     PetscTools::SetOption("-pc_hypre_type", "euclid");
     PetscTools::SetOption("-pc_hypre_euclid_levels", "0");
 #else
@@ -230,8 +229,7 @@ void PCBlockDiagonal::PCBlockDiagonalSetUp()
     PetscTools::SetOption("-pc_hypre_boomeramg_coarsen_type", "HMIS");
 #endif
 
-
-#if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5 )
+#if (PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5)
     // Attempt to emulate SAME_PRECONDITIONER below
     PCSetReusePreconditioner(mPCContext.PC_amg_A11, PETSC_TRUE);
     PCSetOperators(mPCContext.PC_amg_A11, mPCContext.A11_matrix_subblock, mPCContext.A11_matrix_subblock);
@@ -291,7 +289,7 @@ void PCBlockDiagonal::PCBlockDiagonalSetUp()
 //     PetscTools::SetOption("-sub_pc_hypre_boomeramg_max_iter", "1");
 //     PetscTools::SetOption("-sub_pc_hypre_boomeramg_strong_threshold", "0.0");
 
-#if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5 )
+#if (PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5)
     // Attempt to emulate SAME_PRECONDITIONER below
     PCSetReusePreconditioner(mPCContext.PC_amg_A22, PETSC_TRUE);
     PCSetOperators(mPCContext.PC_amg_A22, mPCContext.A22_matrix_subblock, mPCContext.A22_matrix_subblock);

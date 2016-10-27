@@ -85,7 +85,6 @@ public:
      * @param numberOfPulses  The number of pulses to perform at each pacing cycle length
      */
     SteadyStateRestitutionStimulus(double magnitude, double stimulusDuration, double startTime, std::vector<double> pacingCycleLengths, unsigned numberOfPulses);
-
 };
 
 #include "SerializationExportWrapper.hpp"

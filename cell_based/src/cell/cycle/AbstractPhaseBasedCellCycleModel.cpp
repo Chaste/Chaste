@@ -85,8 +85,8 @@ bool AbstractPhaseBasedCellCycleModel::ReadyToDivide()
     if (!mReadyToDivide)
     {
         UpdateCellCyclePhase();
-        if ( (mCurrentCellCyclePhase != G_ZERO_PHASE) &&
-             (GetAge() >= GetMDuration() + GetG1Duration() + GetSDuration() + GetG2Duration()) )
+        if ((mCurrentCellCyclePhase != G_ZERO_PHASE) &&
+            (GetAge() >= GetMDuration() + GetG1Duration() + GetSDuration() + GetG2Duration()))
         {
             mReadyToDivide = true;
         }

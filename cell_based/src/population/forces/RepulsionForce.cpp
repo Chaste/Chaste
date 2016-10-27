@@ -63,8 +63,8 @@ void RepulsionForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCel
         Node<DIM>* p_node_b = pair.second;
 
         // Get the node locations
-        c_vector<double, DIM> node_a_location = p_node_a->rGetLocation();
-        c_vector<double, DIM> node_b_location =  p_node_b->rGetLocation();
+        const c_vector<double, DIM>& r_node_a_location = p_node_a->rGetLocation();
+        const c_vector<double, DIM>& r_node_b_location = p_node_b->rGetLocation();
 
         // Get the node radii
         double node_a_radius = p_node_a->GetRadius();
@@ -73,7 +73,7 @@ void RepulsionForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCel
         // Get the unit vector parallel to the line joining the two nodes
         c_vector<double, DIM> unit_difference;
 
-        unit_difference = (static_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation))->rGetMesh().GetVectorFromAtoB(node_a_location, node_b_location);
+        unit_difference = (static_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation))->rGetMesh().GetVectorFromAtoB(r_node_a_location, r_node_b_location);
 
         // Calculate the value of the rest length
         double rest_length = node_a_radius+node_b_radius;

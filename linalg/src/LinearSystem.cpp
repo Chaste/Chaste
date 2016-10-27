@@ -284,7 +284,7 @@ LinearSystem::~LinearSystem()
 #if (PETSC_VERSION_MAJOR == 3) //PETSc 3.x.x
     if (mpConvergenceTestContext)
     {
-#if ( PETSC_VERSION_MINOR >= 5 ) //PETSc 3.5 or later
+#if (PETSC_VERSION_MINOR >= 5) //PETSc 3.5 or later
         KSPConvergedDefaultDestroy(mpConvergenceTestContext);
 #else
         KSPDefaultConvergedDestroy(mpConvergenceTestContext);
@@ -697,7 +697,7 @@ Vec LinearSystem::Solve(Vec lhsGuess)
 
         const bool is_small = (mSize <= 6); ///\todo This is a magic number.  Do we want a warning here?
 
-#if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR >= 5 ) //PETSc 3.5 or later
+#if (PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR >= 5) //PETSc 3.5 or later
         if (mMatrixIsConstant && (!is_small))
         {
             // Attempt to emulate SAME_PRECONDITIONER below
@@ -726,15 +726,15 @@ Vec LinearSystem::Solve(Vec lhsGuess)
             // Setting null space in the KSP was deprecated in PETSc 3.6, but setting the null space
             // for the matrix appeared in PETSc 3.3 so 3.3, 3.4, 3.5 can do either
 
-            PETSCEXCEPT( MatSetNullSpace(mLhsMatrix, mMatNullSpace) );
+            PETSCEXCEPT(MatSetNullSpace(mLhsMatrix, mMatNullSpace));
 #else
-            PETSCEXCEPT( KSPSetNullSpace(mKspSolver, mMatNullSpace) );
+            PETSCEXCEPT(KSPSetNullSpace(mKspSolver, mMatNullSpace));
 #endif
         }
 
         if (mPrecondMatrixIsNotLhs)
         {
-#if ( PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 5 ) //PETSc 3.5 or later
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 5) //PETSc 3.5 or later
             KSPSetOperators(mKspSolver, mLhsMatrix, mPrecondMatrix);
 #else
             KSPSetOperators(mKspSolver, mLhsMatrix, mPrecondMatrix, preconditioner_over_successive_calls);
@@ -742,7 +742,7 @@ Vec LinearSystem::Solve(Vec lhsGuess)
         }
         else
         {
-#if ( PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 5 ) //PETSc 3.5 or later
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 5) //PETSc 3.5 or later
             KSPSetOperators(mKspSolver, mLhsMatrix, mLhsMatrix);
 #else
             KSPSetOperators(mKspSolver, mLhsMatrix, mLhsMatrix, preconditioner_over_successive_calls);
@@ -1051,13 +1051,13 @@ Vec LinearSystem::Solve(Vec lhsGuess)
 #if (PETSC_VERSION_MAJOR == 3) //PETSc 3.x.x
             if (!mpConvergenceTestContext)
             {
-    #if ( PETSC_VERSION_MINOR >= 5 ) //PETSc 3.5 or later
+    #if (PETSC_VERSION_MINOR >= 5) //PETSc 3.5 or later
                 KSPConvergedDefaultCreate(&mpConvergenceTestContext);
     #else
                 KSPDefaultConvergedCreate(&mpConvergenceTestContext);
     #endif
             }
-    #if ( PETSC_VERSION_MINOR >= 5 ) //PETSc 3.5 or later
+    #if (PETSC_VERSION_MINOR >= 5) //PETSc 3.5 or later
             // From PETSc 3.5, KSPDefaultConverged became KSPConvergedDefault.
             KSPSetConvergenceTest(mKspSolver, KSPConvergedDefault, &mpConvergenceTestContext, PETSC_NULL);
     #else

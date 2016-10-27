@@ -56,7 +56,7 @@ typedef boost::shared_ptr<Cell> CellPtr;
  *
  * SRN models are noncopyable since cells are noncopyable.
  *
- * \todo #2752 Thoroughly document this class (including, for example, what SRN stands for!)
+ * \todo #2752 Thoroughly document this class
  */
 class AbstractSrnModel : public Identifiable
 {

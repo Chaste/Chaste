@@ -70,9 +70,9 @@ public:
     {
         if (useMeshWidthAsMag)
         {
-            #define COVERAGE_IGNORE
+            // LCOV_EXCL_START
             this->mpStimulus.reset(new SimpleStimulus(meshWidth, 0.5));
-            #undef COVERAGE_IGNORE
+            // LCOV_EXCL_STOP
         }
         else
         {
@@ -87,7 +87,6 @@ public:
             LOG(1, "Defined a GeneralPlaneStimulusCellFactory<"<<SPACE_DIM<<"> with SimpleStimulus("<<stimulusMagnitude<<","<< stimulusDuration<< ")\n");
         }
     }
-
 };
 
 #endif /*GENERALPLANESTIMULUSCELLFACTORY_HPP_*/

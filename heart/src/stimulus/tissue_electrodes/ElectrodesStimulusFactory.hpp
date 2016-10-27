@@ -183,7 +183,6 @@ public:
      * @param grounded : true if second electrode is grounded
      */
     void GroundSecondElectrode(bool grounded);
-
 };
 
 #endif /*ELECTRODESSTIMULSUFACTORY_HPP_*/

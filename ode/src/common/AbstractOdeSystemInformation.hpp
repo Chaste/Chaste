@@ -332,8 +332,6 @@ public:
      * @param rName  the attribute name.
      */
     double GetAttribute(const std::string& rName) const;
-
 };
-
 
 #endif /*_ABSTRACTODESYSTEMINFORMATION_HPP_*/

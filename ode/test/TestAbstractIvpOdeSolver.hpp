@@ -320,9 +320,6 @@ public:
         NumericFileComparison comparer(OutputFileHandler::GetChasteTestOutputDirectory() + "OdeSolution/ParameterisedOde.dat",
                                        "ode/test/data/ParameterisedOde.dat");
         TS_ASSERT(comparer.CompareFiles(1e-6));
-
-
-
     }
 
     void TestLastTimeStep()

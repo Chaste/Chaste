@@ -201,9 +201,6 @@ private:
             mpFile2 = nullptr;
         }
     }
-
 };
-
-
 
 #endif // ABSTRACTFILECOMPARISON_HPP_

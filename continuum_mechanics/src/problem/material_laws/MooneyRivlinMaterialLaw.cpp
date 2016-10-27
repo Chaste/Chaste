@@ -48,9 +48,9 @@ double MooneyRivlinMaterialLaw<DIM>::Get_dW_dI2(double I1, double I2)
      * This is covered, but gcov doesn't see this as being covered
      * for some reason, maybe because of optimisations.
      */
-    #define COVERAGE_IGNORE
+    // LCOV_EXCL_START
     assert(DIM == 3);
-    #undef COVERAGE_IGNORE
+    // LCOV_EXCL_STOP
     return mC2;
 }
 
@@ -67,9 +67,9 @@ double MooneyRivlinMaterialLaw<DIM>::Get_d2W_dI2(double I1, double I2)
      * This is covered, but gcov doesn't see this as being covered
      * for some reason, maybe because of optimisations.
      */
-    #define COVERAGE_IGNORE
+    // LCOV_EXCL_START
     assert(DIM == 3);
-    #undef COVERAGE_IGNORE
+    // LCOV_EXCL_STOP
     return 0.0;
 }
 
@@ -80,9 +80,9 @@ double MooneyRivlinMaterialLaw<DIM>::Get_d2W_dI1I2(double I1, double I2)
      * This is covered, but gcov doesn't see this as being covered
      * for some reason, maybe because of optimisations.
      */
-    #define COVERAGE_IGNORE
+    // LCOV_EXCL_START
     assert(DIM == 3);
-    #undef COVERAGE_IGNORE
+    // LCOV_EXCL_STOP
     return 0.0;
 }
 
@@ -126,9 +126,6 @@ void MooneyRivlinMaterialLaw<DIM>::ScaleMaterialParameters(double scaleFactor)
     mC2 /= scaleFactor;
 }
 
-////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-////////////////////////////////////////////////////////////////////////////////////
-
 template class MooneyRivlinMaterialLaw<2>;
 template class MooneyRivlinMaterialLaw<3>;

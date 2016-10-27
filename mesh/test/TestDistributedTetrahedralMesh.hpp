@@ -74,15 +74,15 @@ private:
             {
                 break;
             }
-            if ( !(line[0] == '#' || line[0] == '!' || line.substr(0, 10) == "Group name") )
+            if (!(line[0] == '#' || line[0] == '!' || line.substr(0, 10) == "Group name"))
             {
                 //Even though both files were created with the same build, they may have slightly different creation
                 //times in their provenance line (so we ignore it).
                 rSetOfLines.insert(line);
             }
         }
-
     }
+
     void ComparePermutedFiles(const std::string& rFilePath1, const std::string& rFilePath2)
     {
         if (!PetscTools::AmMaster())
@@ -160,8 +160,6 @@ private:
         {
             TS_ASSERT_EQUALS(prev_node->GetIndex()+1, current_node->GetIndex())
         }
-
-
 
         /*
          * All the nodes have been assigned
@@ -301,13 +299,10 @@ private:
         {
             // A partitioner may allocate no nodes to a partition if the mesh is small and there are many processes
             // Look out for "You just increased the maxndoms"
-            TS_ASSERT( 0u == total_nodes_this_process );
-            TS_ASSERT( 0u == total_elements_this_process );
-            TS_ASSERT( 0u == total_b_elements_this_process );
+            TS_ASSERT(0u == total_nodes_this_process);
+            TS_ASSERT(0u == total_elements_this_process);
+            TS_ASSERT(0u == total_b_elements_this_process);
         }
-
-
-
     }
 
 public:
@@ -608,7 +603,7 @@ public:
         unsigned probe_node_1 = 0u;
         unsigned probe_node_2 = 8u;
 
-        if ( PetscTools::IsParallel() )//need to figure out where they end up in permutation
+        if (PetscTools::IsParallel())//need to figure out where they end up in permutation
         {
             TS_ASSERT(mesh.rGetNodePermutation().size() > 0);
             probe_node_1 = mesh.rGetNodePermutation()[probe_node_1];
@@ -1059,7 +1054,7 @@ public:
         // restore from a single processor archive
         {
             FileFinder archive_dir("mesh/test/data/distributed_mesh_archive", RelativeTo::ChasteSourceRoot);
-            if ( PetscTools::IsSequential() )
+            if (PetscTools::IsSequential())
             {
                 ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(
                         archive_dir, "distributed_tetrahedral_mesh.arch");
@@ -1265,8 +1260,8 @@ private:
                 TS_ASSERT_THROWS_CONTAINS(constructedMesh.GetBoundaryElement(i), "does not belong to processor");
             }
         }
-
     }
+
 public:
     void TestConstructLinearMesh()
     {
@@ -1608,9 +1603,6 @@ public:
         TS_ASSERT_EQUALS(constructed_mesh.GetNearestNodeIndex(outside_mesh), base_mesh.GetNearestNodeIndex(outside_mesh));
         TS_ASSERT_EQUALS(constructed_mesh.GetNearestNodeIndex(within_mesh), base_mesh.GetNearestNodeIndex(within_mesh));
         TS_ASSERT_EQUALS(constructed_mesh.GetNearestNodeIndex(origin_mesh), base_mesh.GetNearestNodeIndex(origin_mesh));
-
-
-
     }
 
     void TestNearestNodeIndex2D()
@@ -2000,7 +1992,6 @@ public:
             FileComparison comparer(generated_parallel,generated_sequential);
             TS_ASSERT(comparer.CompareFiles());
         }
-
     }
 
     void TestEfficientParallelWriting3D()

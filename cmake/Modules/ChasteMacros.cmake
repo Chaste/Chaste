@@ -106,7 +106,7 @@ macro(Chaste_DO_CELLML output_sources cellml_file dynamic)
     endif()
 
     add_custom_command(OUTPUT ${output_files_hpp} ${output_files_cpp} 
-        COMMAND "${PYTHON_EXECUTABLE}" ${Chaste_PYTHON_DIR}/ConvertCellModel.py ${pycml_args} ${cellml_file}
+        COMMAND "${PYTHON_EXECUTABLE}" ${Chaste_PYTHON_DIR}/ConvertCellModel.py ${pycml_args} ${Chaste_PYCML_EXTRA_ARGS} ${cellml_file}
         DEPENDS ${depends}
         COMMENT "Processing CellML file ${cellml_file_rel}" 
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
@@ -231,9 +231,8 @@ macro(Chaste_ADD_TEST _testTargetName _filename)
     endif()
     set_property(TEST ${_testTargetName} PROPERTY PROCESSORS ${num_cpus})
     if (python)
-        set(python_path ${Chaste_BINARY_DIR}/python/pycml $ENV{PYTHONPATH})
         set_property(TEST ${_testTargetName} PROPERTY
-            ENVIRONMENT PYTHONPATH=${python_path}
+            ENVIRONMENT "PYTHONPATH=$ENV{PYTHONPATH}:${Chaste_BINARY_DIR}/python/pycml"
             )
     endif()
 
@@ -618,8 +617,8 @@ macro(Chaste_DO_TEST_COMMON component)
                     set_property(TEST ${testTargetName} PROPERTY LABELS ${myLabels})
                 endif()
 
-                # add dependencies to component and type targets
-                if (NOT ${component} STREQUAL python)
+                # add dependencies to component and type targets. Do not include the python component or tests in Python files
+                if ((NOT ${component} STREQUAL python) AND (NOT (${filename} MATCHES ".py$")))
                     add_dependencies(${component} ${exeTargetName})
                     add_dependencies(${type} ${exeTargetName})
                 endif()

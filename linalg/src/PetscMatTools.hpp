@@ -251,7 +251,7 @@ public:
             }
         }
 
-        if ( num_rows_owned == MATRIX_SIZE)
+        if (num_rows_owned == MATRIX_SIZE)
         {
             MatSetValues(matrix,
                          num_rows_owned,

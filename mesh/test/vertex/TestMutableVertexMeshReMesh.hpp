@@ -1841,7 +1841,7 @@ public:
         {
             for (unsigned j=0; j<vertex_mesh.GetElement(1)->GetNumNodes(); j++)
             {
-                if ( (vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i)) == (vertex_mesh.GetElement(1)->GetNodeGlobalIndex(j)))
+                if ((vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i)) == (vertex_mesh.GetElement(1)->GetNodeGlobalIndex(j)))
                 {
                     num_common_vertices++;
                     TS_ASSERT(vertex_mesh.GetNode(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i))->IsBoundaryNode());
@@ -2057,7 +2057,7 @@ public:
         {
             for (unsigned j=0; j<vertex_mesh.GetElement(1)->GetNumNodes(); j++)
             {
-                if ( (vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i)) == (vertex_mesh.GetElement(1)->GetNodeGlobalIndex(j)))
+                if ((vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i)) == (vertex_mesh.GetElement(1)->GetNodeGlobalIndex(j)))
                 {
                     num_common_vertices++;
                     TS_ASSERT(vertex_mesh.GetNode(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i))->IsBoundaryNode());
@@ -2079,7 +2079,7 @@ public:
         {
             for (unsigned j=0; j<vertex_mesh.GetElement(1)->GetNumNodes(); j++)
             {
-                if ( (vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i)) == (vertex_mesh.GetElement(1)->GetNodeGlobalIndex(j)))
+                if ((vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i)) == (vertex_mesh.GetElement(1)->GetNodeGlobalIndex(j)))
                 {
                     num_common_vertices++;
                     TS_ASSERT(vertex_mesh.GetNode(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i))->IsBoundaryNode());

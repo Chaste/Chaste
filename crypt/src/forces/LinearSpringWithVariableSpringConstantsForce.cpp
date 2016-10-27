@@ -301,11 +301,10 @@ void LinearSpringWithVariableSpringConstantsForce<DIM>::OutputForceParameters(ou
     GeneralisedLinearSpringForce<DIM>::OutputForceParameters(rParamsFile);
 }
 
-///////// Explicit instantiation
+// Explicit instantiation
 template class LinearSpringWithVariableSpringConstantsForce<1>;
 template class LinearSpringWithVariableSpringConstantsForce<2>;
 template class LinearSpringWithVariableSpringConstantsForce<3>;
-
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"

@@ -119,11 +119,11 @@ public:
 
         //Check that the correct number of points have been distributed
         typedef std::pair<AirwayGenerator*, LungLocation> pair_type;
-        for(std::vector<pair_type>::iterator iter = generator.mLobeGenerators.begin();
+        for (std::vector<pair_type>::iterator iter = generator.mLobeGenerators.begin();
             iter != generator.mLobeGenerators.end();
             ++iter)
         {
-            if(iter->second == LEFT) //Two lung lobes, therefore half the number of points are expected
+            if (iter->second == LEFT) //Two lung lobes, therefore half the number of points are expected
             {
                 TS_ASSERT_DELTA(iter->first->GetPointCloud()->GetNumberOfPoints(), 25, 2);
             }
@@ -170,11 +170,11 @@ public:
 
         //Check that the correct number of points have been distributed
         typedef std::pair<AirwayGenerator*, LungLocation> pair_type;
-        for(std::vector<pair_type>::iterator iter = generator.mLobeGenerators.begin();
+        for (std::vector<pair_type>::iterator iter = generator.mLobeGenerators.begin();
             iter != generator.mLobeGenerators.end();
             ++iter)
         {
-            if(iter->second == LEFT) //Two lung lobes, therefore half the number of points are expected
+            if (iter->second == LEFT) //Two lung lobes, therefore half the number of points are expected
             {
                 TS_ASSERT_DELTA(iter->first->GetPointCloud()->GetNumberOfPoints(), 50, 6);
             }
@@ -287,9 +287,6 @@ private:
         return triangle_filter->GetOutput();
     }
 #endif
-
 };
-
-
 
 #endif /* TESTMULTILOBEAIRWAYGENERATOR_HPP_ */

@@ -34,27 +34,26 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "ParabolicGrowingDomainPdeModifier.hpp"
-#include "TetrahedralMesh.hpp"
 #include "CellBasedParabolicPdeSolver.hpp"
+#include "AveragedSourceParabolicPde.hpp"
+#include "Exception.hpp"
 
 template<unsigned DIM>
-ParabolicGrowingDomainPdeModifier<DIM>::ParabolicGrowingDomainPdeModifier()
-    : AbstractGrowingDomainPdeModifier<DIM>()
+ParabolicGrowingDomainPdeModifier<DIM>::ParabolicGrowingDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde,
+                                                                          boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition,
+                                                                          bool isNeumannBoundaryCondition,
+                                                                          Vec solution)
+    : AbstractGrowingDomainPdeModifier<DIM>(pPde,
+    		                                pBoundaryCondition,
+    		                                isNeumannBoundaryCondition,
+    		                                solution)
 {
-}
-
-template<unsigned DIM>
-ParabolicGrowingDomainPdeModifier<DIM>::ParabolicGrowingDomainPdeModifier(ParabolicPdeAndBoundaryConditions<DIM>* pPdeAndBcs)
-    : AbstractGrowingDomainPdeModifier<DIM>(),
-      mpPdeAndBcs(pPdeAndBcs)
-{
-    assert(DIM == 2);
 }
 
 template<unsigned DIM>
 ParabolicGrowingDomainPdeModifier<DIM>::~ParabolicGrowingDomainPdeModifier()
 {
-    // It we have used this modifier, then we will have created a solution vector
+    // If we have used this modifier, then we will have created a solution vector
     if (this->mSolution)
     {
         PetscTools::Destroy(this->mSolution);
@@ -73,9 +72,11 @@ void ParabolicGrowingDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellP
     UpdateSolutionVector(rCellPopulation);
 
     // Use CellBasedParabolicPdeSolver as cell wise PDE
-    CellBasedParabolicPdeSolver<DIM> solver(this->mpFeMesh, mpPdeAndBcs->GetPde(), p_bcc.get());
+    CellBasedParabolicPdeSolver<DIM> solver(this->mpFeMesh,
+                                            boost::static_pointer_cast<AbstractLinearParabolicPde<DIM,DIM> >(this->mpPde).get(),
+                                            p_bcc.get());
 
-    ///\todo Investigate more than one PDE time step per spatial step (#2687)
+    ///\todo Investigate more than one PDE time step per spatial step
     SimulationTime* p_simulation_time = SimulationTime::Instance();
     double current_time = p_simulation_time->GetTime();
     double dt = p_simulation_time->GetTimeStep();
@@ -96,12 +97,12 @@ void ParabolicGrowingDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellP
 template<unsigned DIM>
 void ParabolicGrowingDomainPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)
 {
-    // Temporarily cache the variable name until we create an AbstractPdeAndBcs object
-    // and move mpPdeAndBcs to the abstract class. See #2767
-    this->mCachedDependentVariableName = mpPdeAndBcs->rGetDependentVariableName();
+    AbstractGrowingDomainPdeModifier<DIM>::SetupSolve(rCellPopulation, outputDirectory);
 
-    // Cache the output directory
-    this->mOutputDirectory = outputDirectory;
+    if (boost::dynamic_pointer_cast<AveragedSourceParabolicPde<DIM> >(this->mpPde))
+    {
+        EXCEPTION("ParabolicGrowingDomainPdeModifier cannot be used with an AveragedSourceParabolicPde. Use a ParabolicBoxDomainPdeModifier instead.");
+    }
 
     // Setup a finite element mesh on which to save the initial condition
     this->GenerateFeMesh(rCellPopulation);
@@ -118,14 +119,14 @@ std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ParabolicGrowingDomainPde
 {
     std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc(new BoundaryConditionsContainer<DIM,DIM,1>(false));
 
-    if (mpPdeAndBcs->IsNeumannBoundaryCondition())
+    if (this->IsNeumannBoundaryCondition())
     {
         // Impose any Neumann boundary conditions
         for (typename TetrahedralMesh<DIM,DIM>::BoundaryElementIterator elem_iter = this->mpFeMesh->GetBoundaryElementIteratorBegin();
              elem_iter != this->mpFeMesh->GetBoundaryElementIteratorEnd();
              ++elem_iter)
         {
-            p_bcc->AddNeumannBoundaryCondition(*elem_iter, mpPdeAndBcs->GetBoundaryCondition());
+            p_bcc->AddNeumannBoundaryCondition(*elem_iter, this->mpBoundaryCondition.get());
         }
     }
     else
@@ -135,7 +136,7 @@ std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ParabolicGrowingDomainPde
              node_iter != this->mpFeMesh->GetBoundaryNodeIteratorEnd();
              ++node_iter)
         {
-            p_bcc->AddDirichletBoundaryCondition(*node_iter, mpPdeAndBcs->GetBoundaryCondition());
+            p_bcc->AddDirichletBoundaryCondition(*node_iter, this->mpBoundaryCondition.get());
         }
     }
 
@@ -152,7 +153,7 @@ void ParabolicGrowingDomainPdeModifier<DIM>::UpdateSolutionVector(AbstractCellPo
     }
     this->mSolution = PetscTools::CreateAndSetVec(this->mpFeMesh->GetNumNodes(), 0.0);
 
-    std::string& variable_name = mpPdeAndBcs->rGetDependentVariableName();
+    std::string& variable_name = this->mDependentVariableName;
 
     for (typename TetrahedralMesh<DIM,DIM>::NodeIterator node_iter = this->mpFeMesh->GetNodeIteratorBegin();
          node_iter != this->mpFeMesh->GetNodeIteratorEnd();
@@ -164,8 +165,8 @@ void ParabolicGrowingDomainPdeModifier<DIM>::UpdateSolutionVector(AbstractCellPo
              ++node_iter)
         {
             unsigned node_index = node_iter->GetIndex();
-            bool dirichlet_bc_applies = (node_iter->IsBoundaryNode()) && (!mpPdeAndBcs->IsNeumannBoundaryCondition());
-            double boundary_value = mpPdeAndBcs->GetBoundaryCondition()->GetValue(node_iter->rGetLocation());
+            bool dirichlet_bc_applies = (node_iter->IsBoundaryNode()) && (!(this->IsNeumannBoundaryCondition()));
+            double boundary_value = this->GetBoundaryCondition()->GetValue(node_iter->rGetLocation());
 
             double solution_at_node = rCellPopulation.GetCellDataItemAtPdeNode(node_index, variable_name, dirichlet_bc_applies, boundary_value);
 

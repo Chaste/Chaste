@@ -294,9 +294,6 @@ private:
         }
     }
 
-
-
-
 public:
 
     /*
@@ -402,8 +399,6 @@ public:
             TS_ASSERT_DELTA(result_repl[2*i+1], result_1unknown_repl[i], 1e-6);
         }
     }
-
-
 
     /* Solve the real coupled pde
      *

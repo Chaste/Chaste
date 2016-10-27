@@ -37,7 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TrianglesMeshWriter.hpp"
 #include "VtkMeshWriter.hpp"
 #include "CellBasedEventHandler.hpp"
-#include "ApoptoticCellProperty.hpp"
 #include "Cylindrical2dMesh.hpp"
 #include "Cylindrical2dVertexMesh.hpp"
 #include "NodesOnlyMesh.hpp"
@@ -111,7 +110,7 @@ bool MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::UseAreaBasedDampingConstant
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::SetAreaBasedDampingConstant(bool useAreaBasedDampingConstant)
 {
-    assert(SPACE_DIM==2);
+    assert(SPACE_DIM == 2);
     mUseAreaBasedDampingConstant = useAreaBasedDampingConstant;
 }
 
@@ -148,7 +147,7 @@ double MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetDampingConstant(unsign
          * is the damping constant if not using mUseAreaBasedDampingConstant
          */
 
-        assert(SPACE_DIM==2);
+        assert(SPACE_DIM == 2);
 
         double rest_length = 1.0;
         double d0 = mAreaBasedDampingConstantParameter;
@@ -1077,7 +1076,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::CheckCellPointers()
         unsigned node_index = this->GetLocationIndexUsingCell(p_cell);
         std::cout << "Cell at node " << node_index << " addr " << p_cell << std::endl << std::flush;
         CellPtr p_cell_in_cell_population = this->GetCellUsingLocationIndex(node_index);
-#define COVERAGE_IGNORE //Debugging code.  Shouldn't fail under normal conditions
+// LCOV_EXCL_START //Debugging code.  Shouldn't fail under normal conditions
         if (p_cell_in_cell_population != p_cell)
         {
             std::cout << "  Mismatch with cell population" << std::endl << std::flush;
@@ -1093,7 +1092,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::CheckCellPointers()
     }
     UNUSED_OPT(res);
     assert(res);
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
 
     res = true;
     for (std::set<std::pair<CellPtr,CellPtr> >::iterator it1 = this->mMarkedSprings.begin();
@@ -1112,7 +1111,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::CheckCellPointers()
             unsigned node_index = this->GetLocationIndexUsingCell(p_cell);
             std::cout << "Cell at node " << node_index << " addr " << p_cell << std::endl << std::flush;
 
-#define COVERAGE_IGNORE //Debugging code.  Shouldn't fail under normal conditions
+// LCOV_EXCL_START //Debugging code.  Shouldn't fail under normal conditions
             // Check cell is alive
             if (p_cell->IsDead())
             {
@@ -1135,7 +1134,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::CheckCellPointers()
                 res = false;
             }
         }
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
     }
     assert(res);
 }

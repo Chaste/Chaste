@@ -244,8 +244,6 @@ public:
         TS_ASSERT_DELTA(error1/error2, pow(2,order), 1.5e-1);
     }
 
-
-
     //Test the order of the method by comparing two solutions using dt/2 for the second.
     void TestOrderOnSimpleSystem()
     {

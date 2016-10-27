@@ -125,11 +125,6 @@ public:
         std::cout << "CVODE must be enabled for the steady state runner to work." << std::endl;
 #endif //_CHASTE_CVODE
     }
-
 };
 
-
 #endif //_TESTSTEADYSTATERUNNER_HPP_
-
-
-

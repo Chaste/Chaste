@@ -212,7 +212,7 @@ private:
 
 protected:
 
-#undef COVERAGE_IGNORE // Avoid prototypes being treated as code by gcov
+// LCOV_EXCL_STOP // Avoid prototypes being treated as code by gcov
     /**
      * Update mIsParticle if required by a remesh.
      *
@@ -288,7 +288,7 @@ public:
     /**
      * Overridden GetTetrahedralMeshForPdeModifier() method.
      *
-     * @return a tetrahedral mesh whose nodes match those of the NodesOnlyMesh.
+     * @return a pointer to a tetrahedral mesh whose nodes match those of the NodesOnlyMesh.
      *
      * This method is called by AbstractGrowingDomainPdeModifier.
      */

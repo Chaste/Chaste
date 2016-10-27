@@ -37,11 +37,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef POLEZEROMATERIALLAW_HPP_
 #define POLEZEROMATERIALLAW_HPP_
 
-
 #include "AbstractIncompressibleMaterialLaw.hpp"
 #include "Exception.hpp"
-
-
 
 /**
  *  Pole-zero material law, as stated in: "Computational mechanics of the heart: from

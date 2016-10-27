@@ -84,7 +84,7 @@ ExtendedBidomainTissue<SPACE_DIM>::ExtendedBidomainTissue(AbstractCardiacCellFac
     }
     catch (const Exception& e)
     {
-#define COVERAGE_IGNORE //don't really know how to cover this...
+// LCOV_EXCL_START //don't really know how to cover this...
         // Errors thrown creating cells will often be process-specific
         PetscTools::ReplicateException(true);
         // Should really do this for other processes too, but this is all we need
@@ -97,7 +97,7 @@ ExtendedBidomainTissue<SPACE_DIM>::ExtendedBidomainTissue(AbstractCardiacCellFac
             delete (*cell_iterator);
         }
         throw e;
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
     }
     PetscTools::ReplicateException(false);
 
@@ -169,10 +169,10 @@ void ExtendedBidomainTissue<SPACE_DIM>::CreateGGapConductivities()
             Node<SPACE_DIM>* p_node = this->mpMesh->GetNode(global_index);
             mGgapDistributed[local_index] = mGGap;//assign default uniform value everywhere first
 
-            //then change where and if necessary
+            // Then change where and if necessary
             for (unsigned het_index = 0; het_index < mGgapHeterogeneityRegions.size(); het_index++)
             {
-                if ( mGgapHeterogeneityRegions[het_index]->DoesContain ( p_node->GetPoint() ) )
+                if (mGgapHeterogeneityRegions[het_index]->DoesContain(p_node->GetPoint()))
                 {
                     mGgapDistributed[local_index] = mGgapValues[het_index];
                 }
@@ -181,10 +181,10 @@ void ExtendedBidomainTissue<SPACE_DIM>::CreateGGapConductivities()
     }
     catch (const Exception& e)
     {
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
         PetscTools::ReplicateException(true);
         throw e;
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
     }
     PetscTools::ReplicateException(false);
 }
@@ -249,11 +249,11 @@ void ExtendedBidomainTissue<SPACE_DIM>::CreateIntracellularConductivityTensorSec
         }
         catch(std::bad_alloc &badAlloc)
         {
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
             std::cout << "Failed to allocate std::vector of size " << num_elements << std::endl;
             PetscTools::ReplicateException(true);
             throw badAlloc;
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
         }
         PetscTools::ReplicateException(false);
 
@@ -273,9 +273,9 @@ void ExtendedBidomainTissue<SPACE_DIM>::CreateIntracellularConductivityTensorSec
             ChastePoint<SPACE_DIM> element_centroid(it->CalculateCentroid());
             for (unsigned region_index=0; region_index< conductivities_heterogeneity_areas.size(); region_index++)
             {
-                if ( conductivities_heterogeneity_areas[region_index]->DoesContain(element_centroid) )
+                if (conductivities_heterogeneity_areas[region_index]->DoesContain(element_centroid))
                 {
-                    //We don't use ublas vector assignment here, because we might be getting a subvector of a 3-vector
+                    // We don't use ublas vector assignment here, because we might be getting a subvector of a 3-vector
                     for (unsigned i=0; i<SPACE_DIM; i++)
                     {
                         hetero_intra_conductivities[local_element_index][i] = intra_h_conductivities[region_index][i];
@@ -384,11 +384,11 @@ void ExtendedBidomainTissue<SPACE_DIM>::CreateExtracellularConductivityTensors()
         }
         catch(std::bad_alloc &badAlloc)
         {
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
             std::cout << "Failed to allocate std::vector of size " << num_elements << std::endl;
             PetscTools::ReplicateException(true);
             throw badAlloc;
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
         }
         PetscTools::ReplicateException(false);
 
@@ -408,10 +408,10 @@ void ExtendedBidomainTissue<SPACE_DIM>::CreateExtracellularConductivityTensors()
             ChastePoint<SPACE_DIM> element_centroid(iter->CalculateCentroid());
             for (unsigned region_index=0; region_index< conductivities_heterogeneity_areas.size(); region_index++)
             {
-                // if element centroid is contained in the region
-                if ( conductivities_heterogeneity_areas[region_index]->DoesContain( element_centroid ) )
+                // If element centroid is contained in the region
+                if (conductivities_heterogeneity_areas[region_index]->DoesContain(element_centroid))
                 {
-                    //We don't use ublas vector assignment here, because we might be getting a subvector of a 3-vector
+                    // We don't use ublas vector assignment here, because we might be getting a subvector of a 3-vector
                     for (unsigned i=0; i<SPACE_DIM; i++)
                     {
                         hetero_extra_conductivities[local_element_index][i] = extra_h_conductivities[region_index][i];
@@ -534,10 +534,10 @@ void ExtendedBidomainTissue<SPACE_DIM>::SolveCellSystems(Vec existingSolution, d
         }
         catch (Exception &e)
         {
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
             PetscTools::ReplicateException(true);
             throw e;
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
         }
 
         // update the Iionic and stimulus caches
@@ -548,7 +548,7 @@ void ExtendedBidomainTissue<SPACE_DIM>::SolveCellSystems(Vec existingSolution, d
     HeartEventHandler::EndEvent(HeartEventHandler::SOLVE_ODES);
 
     HeartEventHandler::BeginEvent(HeartEventHandler::COMMUNICATION);
-    if ( this->mDoCacheReplication )
+    if (this->mDoCacheReplication)
     {
         this->ReplicateCaches();
         ReplicateAdditionalCaches();//extended bidomain specific caches
@@ -670,10 +670,7 @@ void ExtendedBidomainTissue<SPACE_DIM>::SetCmSecondCell(double value)
     mCmSecondCell = value;
 }
 
-/////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////
-
 template class ExtendedBidomainTissue<1>;
 template class ExtendedBidomainTissue<2>;
 template class ExtendedBidomainTissue<3>;

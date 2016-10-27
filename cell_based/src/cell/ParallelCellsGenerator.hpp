@@ -74,7 +74,6 @@ public:
                                 std::vector<CellPtr>& cells,
                                 NodesOnlyMesh<DIM>& mesh,
                                 boost::shared_ptr<AbstractCellProperty> pCellProliferativeType=boost::shared_ptr<AbstractCellProperty>());
-
 };
 
 // Implementation

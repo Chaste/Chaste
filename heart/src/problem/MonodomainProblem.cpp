@@ -136,18 +136,12 @@ void MonodomainProblem<ELEMENT_DIM, SPACE_DIM>::WriteOneStep(double time, Vec vo
     AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,1>::WriteExtraVariablesOneStep();
 }
 
-
-/////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////
-
 template class MonodomainProblem<1,1>;
 template class MonodomainProblem<1,2>;
 template class MonodomainProblem<1,3>;
 template class MonodomainProblem<2,2>;
 template class MonodomainProblem<3,3>;
-
-
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"

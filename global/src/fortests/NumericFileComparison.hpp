@@ -168,10 +168,10 @@ public:
             // If that assertion tripped...
             if (failures > 0u && !mSuppressOutput)
             {
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
                 // Report the paths to the files
                 TS_TRACE("Files " + mFilename1 + " and " + mFilename2 + " numerically differ.");
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
             }
         }
 

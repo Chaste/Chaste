@@ -36,21 +36,21 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "UniformSourceParabolicPde.hpp"
 
 template <unsigned DIM>
-UniformSourceParabolicPde<DIM>::UniformSourceParabolicPde(double coefficient)
-    : mCoefficient(coefficient)
+UniformSourceParabolicPde<DIM>::UniformSourceParabolicPde(double sourceCoefficient)
+    : mSourceCoefficient(sourceCoefficient)
 {
 }
 
 template<unsigned DIM>
 double UniformSourceParabolicPde<DIM>::GetCoefficient() const
 {
-    return mCoefficient;
+    return mSourceCoefficient;
 }
 
 template<unsigned DIM>
 double UniformSourceParabolicPde<DIM>::ComputeSourceTerm(const ChastePoint<DIM>& rX, double u, Element<DIM,DIM>* pElement)
 {
-    return mCoefficient;
+    return mSourceCoefficient;
 }
 
 template<unsigned DIM>

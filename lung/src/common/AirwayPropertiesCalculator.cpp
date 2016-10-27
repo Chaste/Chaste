@@ -44,7 +44,7 @@ AirwayPropertiesCalculator::AirwayPropertiesCalculator(TetrahedralMesh<1,3>& rAi
                                                            mWalker(mAirwaysMesh, mOutletNodeIndex),
                                                            mRadiusOnEdge(radiusOnEdge)
 {
-    //Get the head element & process
+    // Get the head element & process
     Node<3>* p_node = mAirwaysMesh.GetNode(mOutletNodeIndex);
     Element<1,3>* p_element = mAirwaysMesh.GetElement(*(p_node->ContainingElementsBegin()));
 
@@ -59,28 +59,27 @@ AirwayPropertiesCalculator::AirwayPropertiesCalculator(TetrahedralMesh<1,3>& rAi
 
 AirwayPropertiesCalculator::~AirwayPropertiesCalculator()
 {
-    for(std::vector<AirwayBranch*>::iterator iter = mBranches.begin();
-        iter != mBranches.end();
-        ++iter)
+    for (std::vector<AirwayBranch*>::iterator iter = mBranches.begin();
+         iter != mBranches.end();
+         ++iter)
     {
         delete (*iter);
     }
 }
 
-
 void AirwayPropertiesCalculator::SetupBranches(Element<1,3>* pElement, AirwayBranch* pBranch)
 {
     pBranch->AddElement(pElement);
 
-    if(mWalker.GetNumberOfChildElements(pElement) == 0u)
+    if (mWalker.GetNumberOfChildElements(pElement) == 0u)
     {
         return;
     }
-    else if(mWalker.GetNumberOfChildElements(pElement) == 1u)
+    else if (mWalker.GetNumberOfChildElements(pElement) == 1u)
     {
         SetupBranches(mWalker.GetChildElements(pElement)[0], pBranch);
     }
-    else //if(mWalker.GetNumberOfChildElements(pElement) >= 2u)
+    else // if (mWalker.GetNumberOfChildElements(pElement) >= 2u)
     {
         AirwayBranch* p_child_branch_one = new AirwayBranch(mRadiusOnEdge);
         AirwayBranch* p_child_branch_two = new AirwayBranch(mRadiusOnEdge);
@@ -94,7 +93,7 @@ void AirwayPropertiesCalculator::SetupBranches(Element<1,3>* pElement, AirwayBra
         pBranch->SetChildTwo(p_child_branch_two);
 
         // Hack to add correct indices to branch.
-        // \todo: add indexing to constructor
+        ///\todo: add indexing to constructor
         mBranches.push_back(p_child_branch_one);
         p_child_branch_one->SetIndex(mBranches.size()-1);
         mBranches.push_back(p_child_branch_two);
@@ -104,18 +103,18 @@ void AirwayPropertiesCalculator::SetupBranches(Element<1,3>* pElement, AirwayBra
         SetupBranches(mWalker.GetChildElements(pElement)[1], p_child_branch_two);
     }
 
-    if(mWalker.GetNumberOfChildElements(pElement) >= 3u)
+    if (mWalker.GetNumberOfChildElements(pElement) >= 3u)
     {
-        //std::cout << "Warning: Trifurcation detected. Third (and higher) branch will be ignored when calculating statistics. " << std::endl;
+        // std::cout << "Warning: Trifurcation detected. Third (and higher) branch will be ignored when calculating statistics. " << std::endl;
 
-        for(unsigned extra_branch = 2; extra_branch < mWalker.GetNumberOfChildElements(pElement); ++extra_branch)
+        for (unsigned extra_branch = 2; extra_branch < mWalker.GetNumberOfChildElements(pElement); ++extra_branch)
         {
             AirwayBranch* p_child_branch = new AirwayBranch(mRadiusOnEdge);
             p_child_branch->SetParent(pBranch);
             pBranch->AddChild(p_child_branch);
 
             // Hack to add unique index to branch
-            // \todo: add indexing to constructor
+            ///\todo: add indexing to constructor
             mBranches.push_back(p_child_branch);
             p_child_branch->SetIndex(mBranches.size()-1);
 
@@ -283,14 +282,14 @@ unsigned AirwayPropertiesCalculator::GetMaximumTerminalGeneration()
 {
     unsigned max_generation = 0;
 
-    for(std::vector<AirwayBranch*>::iterator iter = mBranches.begin();
-        iter != mBranches.end();
-        ++iter)
+    for (std::vector<AirwayBranch*>::iterator iter = mBranches.begin();
+         iter != mBranches.end();
+         ++iter)
     {
         if ((*iter)->IsTerminal())
         {
             unsigned generation = mWalker.GetElementGeneration((*iter)->GetElements().front());
-            if(generation > max_generation)
+            if (generation > max_generation)
             {
                 max_generation = generation;
             }
@@ -304,14 +303,14 @@ unsigned AirwayPropertiesCalculator::GetMinimumTerminalGeneration()
 {
     unsigned min_generation = std::numeric_limits<unsigned>::max();
 
-    for(std::vector<AirwayBranch*>::iterator iter = mBranches.begin();
-        iter != mBranches.end();
-        ++iter)
+    for (std::vector<AirwayBranch*>::iterator iter = mBranches.begin();
+         iter != mBranches.end();
+         ++iter)
     {
         if ((*iter)->IsTerminal())
         {
             unsigned generation = mWalker.GetElementGeneration((*iter)->GetElements().front());
-            if(generation < min_generation)
+            if (generation < min_generation)
             {
                 min_generation = generation;
             }
@@ -326,9 +325,9 @@ unsigned AirwayPropertiesCalculator::GetMeanTerminalGeneration()
     unsigned mean_generation = 0;
     unsigned terminal_branches_count = 0;
 
-    for(std::vector<AirwayBranch*>::iterator iter = mBranches.begin();
-        iter != mBranches.end();
-        ++iter)
+    for (std::vector<AirwayBranch*>::iterator iter = mBranches.begin();
+         iter != mBranches.end();
+         ++iter)
     {
         if ((*iter)->IsTerminal())
         {
@@ -385,9 +384,9 @@ void AirwayPropertiesCalculator::CalculateBranchProperties()
     mLengthOneOverLengthTwoSpread = 0.0;
     unsigned lengthOneOverLengthTwoCount = 0u;
 
-    for(std::vector<AirwayBranch*>::iterator iter = mBranches.begin();
-        iter != mBranches.end();
-        ++iter)
+    for (std::vector<AirwayBranch*>::iterator iter = mBranches.begin();
+         iter != mBranches.end();
+         ++iter)
     {
         bool is_major = (*iter)->IsMajor();
         double length = (*iter)->GetLength();
@@ -397,7 +396,7 @@ void AirwayPropertiesCalculator::CalculateBranchProperties()
 
         mLengthOverDiameterMean += length/diameter;
 
-        if((*iter)->GetParent() != nullptr)
+        if ((*iter)->GetParent() != NULL)
         {
             double theta = (*iter)->GetBranchAngle();
             double parent_diameter = 2*(*iter)->GetParent()->GetAverageRadius();
@@ -407,30 +406,30 @@ void AirwayPropertiesCalculator::CalculateBranchProperties()
 
             mThetaMean += theta;
 
-            if(parent_diameter > 4.0)
+            if (parent_diameter > 4.0)
             {
                 mThetaParentDiameterGreaterThan4mm += theta;
                 thetaParentDiameterGreaterThan4mmCount++;
             }
-            else if(parent_diameter < 4.0 && parent_diameter > 3.0)
+            else if (parent_diameter < 4.0 && parent_diameter > 3.0)
             {
                 mThetaParentDiameter4mmTo3mm += theta;
                 thetaParentDiameter4mmTo3mmCount++;
             }
-            else if(parent_diameter < 3.0 && parent_diameter > 2.0)
+            else if (parent_diameter < 3.0 && parent_diameter > 2.0)
             {
                 mThetaParentDiameter3mmTo2mm += theta;
                 thetaParentDiameter3mmTo2mmCount++;
             }
-            else if(parent_diameter < 2.0 && parent_diameter > 1.0)
+            else if (parent_diameter < 2.0 && parent_diameter > 1.0)
             {
                 mThetaParentDiameter2mmTo1mm += theta;
                 thetaParentDiameter2mmTo1mmCount++;
             }
 
-            if((*iter)->GetSibling() != nullptr)
+            if ((*iter)->GetSibling() != NULL)
             {
-                if(is_major)
+                if (is_major)
                 {
                     mThetaMajorBranches += theta;
                     mLengthOverDiameterMajorChildMean += length/diameter;
@@ -446,20 +445,20 @@ void AirwayPropertiesCalculator::CalculateBranchProperties()
                     minorBranchesCount++;
                 }
 
-                if(length < (*iter)->GetSibling()->GetLength())
+                if (length < (*iter)->GetSibling()->GetLength())
                 {
                     mLengthOneOverLengthTwoMean += length/(*iter)->GetSibling()->GetLength();
                     lengthOneOverLengthTwoCount++;
                 }
             }
 
-            if((*iter)->GetParent() != nullptr && length < (*iter)->GetParent()->GetLength())
+            if ((*iter)->GetParent() != NULL && length < (*iter)->GetParent()->GetLength())
             {
                 lengthOverParentLengthLessThanOneCount++;
             }
         }
 
-        if((*iter)->GetParent() != nullptr && (*iter)->GetParent()->GetSibling() != nullptr && (*iter)->GetSibling() != nullptr)
+        if ((*iter)->GetParent() != NULL && (*iter)->GetParent()->GetSibling() != NULL && (*iter)->GetSibling() != NULL)
         {
             mPhiMean += (*iter)->GetRotationAngle();
             phiMeanCount++;
@@ -468,34 +467,34 @@ void AirwayPropertiesCalculator::CalculateBranchProperties()
 
     mThetaMean /= (mBranches.size() - 1);
 
-    if(thetaParentDiameterGreaterThan4mmCount > 0u)
+    if (thetaParentDiameterGreaterThan4mmCount > 0u)
     {
         mThetaParentDiameterGreaterThan4mm /= thetaParentDiameterGreaterThan4mmCount;
     }
 
-    if(thetaParentDiameter4mmTo3mmCount > 0u)
+    if (thetaParentDiameter4mmTo3mmCount > 0u)
     {
         mThetaParentDiameter4mmTo3mm /= thetaParentDiameter4mmTo3mmCount;
     }
 
-    if(thetaParentDiameter3mmTo2mmCount > 0u)
+    if (thetaParentDiameter3mmTo2mmCount > 0u)
     {
         mThetaParentDiameter3mmTo2mm /= thetaParentDiameter3mmTo2mmCount;
     }
 
-    if(thetaParentDiameter2mmTo1mmCount > 0u)
+    if (thetaParentDiameter2mmTo1mmCount > 0u)
     {
         mThetaParentDiameter2mmTo1mm /= thetaParentDiameter2mmTo1mmCount;
     }
 
-    if(majorBranchesCount > 0u)
+    if (majorBranchesCount > 0u)
     {
         mThetaMajorBranches /= majorBranchesCount;
         mLengthOverDiameterMajorChildMean /= majorBranchesCount;
         mMajorDiameterOverParentDiameterMean /= majorBranchesCount;
     }
 
-    if(minorBranchesCount > 0u)
+    if (minorBranchesCount > 0u)
     {
         mThetaMinorBranches /= minorBranchesCount;
         mLengthOverDiameterMinorChildMean /= minorBranchesCount;
@@ -503,24 +502,24 @@ void AirwayPropertiesCalculator::CalculateBranchProperties()
         mMinorDiameterOverParentDiameterMean /= minorBranchesCount;
     }
 
-    if(phiMeanCount > 0u)
+    if (phiMeanCount > 0u)
     {
         mPhiMean /= phiMeanCount;
     }
 
-    if(mBranches.size() > 0u)
+    if (mBranches.size() > 0u)
     {
         mLengthOverDiameterMean /= mBranches.size();
     }
 
-    if((mBranches.size() - 1) > 0u)
+    if ((mBranches.size() - 1) > 0u)
     {
         mDiameterOverParentDiameterMean /= (mBranches.size() - 1);
         mLengthOverLengthParentMean /= (mBranches.size() - 1);
         mPercentageLengthOverParentLengthLessThanOne = ((double)lengthOverParentLengthLessThanOneCount)/((double)(mBranches.size() - 1));
     }
 
-    if(lengthOneOverLengthTwoCount > 0u)
+    if (lengthOneOverLengthTwoCount > 0u)
     {
         mLengthOneOverLengthTwoMean /= lengthOneOverLengthTwoCount;
     }
@@ -564,7 +563,7 @@ void AirwayPropertiesCalculator::CalculateSubtreeProperties()
     UNUSED_OPT(total_centroid);
 
     // Correct centroid by undoing volume-weighting
-    for(unsigned branch_idx = 0 ; branch_idx < num_branches ; branch_idx ++)
+    for (unsigned branch_idx = 0 ; branch_idx < num_branches ; branch_idx ++)
     {
         mTotalSubtreeCentroid[branch_idx] /= mTotalSubtreeBranchVolume[branch_idx];
     }
@@ -597,7 +596,7 @@ double AirwayPropertiesCalculator::RecursivelyCalculateSubtreeLength(AirwayBranc
     std::vector<AirwayBranch*> all_children = pBranch->GetAllChildren();
 
     // Loop over all children.  If there are no children, the loop will not be executed.
-    for(unsigned child_branch_idx = 0 ; child_branch_idx < all_children.size() ; child_branch_idx++)
+    for (unsigned child_branch_idx = 0 ; child_branch_idx < all_children.size() ; child_branch_idx++)
     {
         mTotalSubtreeBranchLength[pBranch->GetIndex()] += RecursivelyCalculateSubtreeLength(all_children[child_branch_idx]);
     }
@@ -613,7 +612,7 @@ double AirwayPropertiesCalculator::RecursivelyCalculateSubtreeVolume(AirwayBranc
     std::vector<AirwayBranch*> all_children = pBranch->GetAllChildren();
 
     // Loop over all children.  If there are no children, the loop will not be executed.
-    for(unsigned child_branch_idx = 0 ; child_branch_idx < all_children.size() ; child_branch_idx++)
+    for (unsigned child_branch_idx = 0 ; child_branch_idx < all_children.size() ; child_branch_idx++)
     {
         mTotalSubtreeBranchVolume[pBranch->GetIndex()] += RecursivelyCalculateSubtreeVolume(all_children[child_branch_idx]);
     }
@@ -629,7 +628,7 @@ double AirwayPropertiesCalculator::RecursivelyCalculateSubtreeLateralSurfaceArea
     std::vector<AirwayBranch*> all_children = pBranch->GetAllChildren();
 
     // Loop over all children.  If there are no children, the loop will not be executed.
-    for(unsigned child_branch_idx = 0 ; child_branch_idx < all_children.size() ; child_branch_idx++)
+    for (unsigned child_branch_idx = 0 ; child_branch_idx < all_children.size() ; child_branch_idx++)
     {
         mTotalSubtreeBranchLateralSurfaceArea[pBranch->GetIndex()] += RecursivelyCalculateSubtreeLateralSurfaceArea(all_children[child_branch_idx]);
     }
@@ -645,7 +644,7 @@ double AirwayPropertiesCalculator::RecursivelyCalculateSubtreePoiseuilleResistan
     std::vector<AirwayBranch*> all_children = pBranch->GetAllChildren();
 
     // Only carry on with recursion if there are children
-    if(!all_children.empty())
+    if (!all_children.empty())
     {
         // If there are children, currently we assume there are exactly two
         assert(all_children.size() == 2);
@@ -669,7 +668,7 @@ c_vector<double, 3> AirwayPropertiesCalculator::RecursivelyCalculateSubtreeCentr
     std::vector<AirwayBranch*> all_children = pBranch->GetAllChildren();
 
     // Loop over all children.  If there are no children, the loop will not be executed.
-    for(unsigned child_branch_idx = 0 ; child_branch_idx < all_children.size() ; child_branch_idx++)
+    for (unsigned child_branch_idx = 0 ; child_branch_idx < all_children.size() ; child_branch_idx++)
     {
         mTotalSubtreeCentroid[pBranch->GetIndex()] += RecursivelyCalculateSubtreeCentroid(all_children[child_branch_idx]);
     }
@@ -683,7 +682,7 @@ void AirwayPropertiesCalculator::RecursivelyCalculateUpstreamLengths(AirwayBranc
     unsigned current_index = pBranch->GetIndex();
 
     // If current branch is trachea, there is nothing upstream, so just need current branch data
-    if( pBranch->GetParent() == nullptr )
+    if (pBranch->GetParent() == NULL)
     {
         mUpstreamPathBranchLengths[current_index] = pBranch->GetLength();
     }
@@ -694,11 +693,11 @@ void AirwayPropertiesCalculator::RecursivelyCalculateUpstreamLengths(AirwayBranc
     }
 
     // Recursively calculate correct value for each child branch
-    if( pBranch->GetChildOne() != nullptr )
+    if (pBranch->GetChildOne() != NULL)
     {
         RecursivelyCalculateUpstreamLengths(pBranch->GetChildOne());
     }
-    if( pBranch->GetChildTwo() != nullptr )
+    if (pBranch->GetChildTwo() != NULL)
     {
         RecursivelyCalculateUpstreamLengths(pBranch->GetChildTwo());
     }
@@ -708,7 +707,7 @@ void AirwayPropertiesCalculator::RecursivelyCalculateUpstreamVolumes(AirwayBranc
     unsigned current_index = pBranch->GetIndex();
 
     // If current branch is trachea, there is nothing upstream, so just need current branch data
-    if( pBranch->GetParent() == nullptr )
+    if (pBranch->GetParent() == NULL)
     {
         mUpstreamPathBranchVolumes[current_index] = pBranch->GetBranchVolume();
     }
@@ -719,11 +718,11 @@ void AirwayPropertiesCalculator::RecursivelyCalculateUpstreamVolumes(AirwayBranc
     }
 
     // Recursively calculate correct value for each child branch
-    if( pBranch->GetChildOne() != nullptr )
+    if (pBranch->GetChildOne() != NULL)
     {
         RecursivelyCalculateUpstreamVolumes(pBranch->GetChildOne());
     }
-    if( pBranch->GetChildTwo() != nullptr )
+    if (pBranch->GetChildTwo() != NULL)
     {
         RecursivelyCalculateUpstreamVolumes(pBranch->GetChildTwo());
     }
@@ -733,7 +732,7 @@ void AirwayPropertiesCalculator::RecursivelyCalculateUpstreamLateralSurfaceAreas
     unsigned current_index = pBranch->GetIndex();
 
     // If current branch is trachea, there is nothing upstream, so just need current branch data
-    if( pBranch->GetParent() == nullptr )
+    if (pBranch->GetParent() == NULL)
     {
         mUpstreamPathBranchLateralSurfaceAreas[current_index] = pBranch->GetBranchLateralSurfaceArea();
     }
@@ -744,11 +743,11 @@ void AirwayPropertiesCalculator::RecursivelyCalculateUpstreamLateralSurfaceAreas
     }
 
     // Recursively calculate correct value for each child branch
-    if( pBranch->GetChildOne() != nullptr )
+    if (pBranch->GetChildOne() != NULL)
     {
         RecursivelyCalculateUpstreamLateralSurfaceAreas(pBranch->GetChildOne());
     }
-    if( pBranch->GetChildTwo() != nullptr )
+    if (pBranch->GetChildTwo() != NULL)
     {
         RecursivelyCalculateUpstreamLateralSurfaceAreas(pBranch->GetChildTwo());
     }
@@ -759,7 +758,7 @@ void AirwayPropertiesCalculator::RecursivelyCalculateUpstreamPoiseuilleResistanc
     unsigned current_index = pBranch->GetIndex();
 
     // If current branch is trachea, there is nothing upstream, so just need current branch data
-    if( pBranch->GetParent() == nullptr )
+    if (pBranch->GetParent() == NULL)
     {
         mUpstreamPathPoiseuilleResistances[current_index] = pBranch->GetPoiseuilleResistance();
     }
@@ -770,11 +769,11 @@ void AirwayPropertiesCalculator::RecursivelyCalculateUpstreamPoiseuilleResistanc
     }
 
     // Recursively calculate correct value for each child branch
-    if( pBranch->GetChildOne() != nullptr )
+    if (pBranch->GetChildOne() != NULL)
     {
         RecursivelyCalculateUpstreamPoiseuilleResistances(pBranch->GetChildOne());
     }
-    if( pBranch->GetChildTwo() != nullptr )
+    if (pBranch->GetChildTwo() != NULL)
     {
         RecursivelyCalculateUpstreamPoiseuilleResistances(pBranch->GetChildTwo());
     }

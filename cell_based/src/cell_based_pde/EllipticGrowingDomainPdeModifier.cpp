@@ -34,21 +34,20 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "EllipticGrowingDomainPdeModifier.hpp"
-#include "TetrahedralMesh.hpp"
-#include "CellBasedPdeSolver.hpp"
+#include "CellBasedEllipticPdeSolver.hpp"
+#include "AveragedSourceEllipticPde.hpp"
+#include "Exception.hpp"
 
 template<unsigned DIM>
-EllipticGrowingDomainPdeModifier<DIM>::EllipticGrowingDomainPdeModifier()
-    : AbstractGrowingDomainPdeModifier<DIM>()
+EllipticGrowingDomainPdeModifier<DIM>::EllipticGrowingDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde,
+                                                                        boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition,
+                                                                        bool isNeumannBoundaryCondition,
+                                                                        Vec solution)
+    : AbstractGrowingDomainPdeModifier<DIM>(pPde,
+    		                                pBoundaryCondition,
+    		                                isNeumannBoundaryCondition,
+    		                                solution)
 {
-}
-
-template<unsigned DIM>
-EllipticGrowingDomainPdeModifier<DIM>::EllipticGrowingDomainPdeModifier(PdeAndBoundaryConditions<DIM>* pPdeAndBcs)
-    : AbstractGrowingDomainPdeModifier<DIM>(),
-      mpPdeAndBcs(pPdeAndBcs)
-{
-    assert(DIM == 2);
 }
 
 template<unsigned DIM>
@@ -66,37 +65,68 @@ void EllipticGrowingDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPo
 {
     this->GenerateFeMesh(rCellPopulation);
 
+    // If the solution at the previous timestep exists...
+    PetscInt previous_solution_size = 0;
+    if (this->mSolution)
+    {
+        VecGetSize(this->mSolution, &previous_solution_size);
+    }
+
+    // ...then record whether it is the correct size...
+    bool is_previous_solution_size_correct = (previous_solution_size == (int)this->mpFeMesh->GetNumNodes());
+
+    // ...and if it is, store it as an initial guess for the PDE solver
+    Vec initial_guess;
+    if (is_previous_solution_size_correct)
+    {
+        // This Vec is copied by the solver's Solve() method, so must be deleted here too
+        VecDuplicate(this->mSolution, &initial_guess);
+        VecCopy(this->mSolution, initial_guess);
+        PetscTools::Destroy(this->mSolution);
+    }
+
     // Add the BCs to the BCs container
     std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc = this->ConstructBoundaryConditionsContainer();
 
-    // Use CellBasedPdeSolver as cell wise PDE
-    CellBasedPdeSolver<DIM> solver(this->mpFeMesh, mpPdeAndBcs->GetPde(), p_bcc.get());
+    // Use CellBasedEllipticPdeSolver as cell wise PDE
+    CellBasedEllipticPdeSolver<DIM> solver(this->mpFeMesh,
+                                           boost::static_pointer_cast<AbstractLinearEllipticPde<DIM,DIM> >(this->GetPde()).get(),
+                                           p_bcc.get());
 
-    ///\todo Use initial guess when solving the system (#2687)
-    Vec old_solution_copy = this->mSolution;
-    this->mSolution = solver.Solve();
-    // Note that the linear solver creates a vector, so we have to keep a handle on the old one
-    // in order to destroy it.
-    ///\todo #2687 This will change when initial guess is used.
-    /// On the first go round the vector has yet to be initialised, so we don't destroy it.
-    if (old_solution_copy != NULL)
+    // If we have an initial guess, use this when solving the system...
+    if (is_previous_solution_size_correct)
     {
-        PetscTools::Destroy(old_solution_copy);
+        this->mSolution = solver.Solve(initial_guess);
+        PetscTools::Destroy(initial_guess);
     }
+    else // ...otherwise do not supply one
+    {
+        // The solver creates a Vec, so we have to keep a handle on the old one to destroy it
+        Vec old_solution_copy = this->mSolution;
+
+        this->mSolution = solver.Solve();
+
+        // On the first go round the vector has yet to be initialised, so we don't destroy it
+        if (old_solution_copy != NULL)
+        {
+            PetscTools::Destroy(old_solution_copy);
+        }
+    }
+
     this->UpdateCellData(rCellPopulation);
 }
 
 template<unsigned DIM>
 void EllipticGrowingDomainPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)
 {
-    // Temporarily cache the variable name until we create an AbstractPdeAndBcs object
-    // and move mpPdeAndBcs to the abstract class. See #2767
-    this->mCachedDependentVariableName = mpPdeAndBcs->rGetDependentVariableName();
+    if (boost::dynamic_pointer_cast<AveragedSourceEllipticPde<DIM> >(this->GetPde()))
+    {
+        EXCEPTION("EllipticGrowingDomainPdeModifier cannot be used with an AveragedSourceEllipticPde. Use an EllipticBoxDomainPdeModifier instead.");
+    }
 
-    // Cache the output directory
-    this->mOutputDirectory = outputDirectory;
+    AbstractGrowingDomainPdeModifier<DIM>::SetupSolve(rCellPopulation, outputDirectory);
 
-    // Call these  methods to solve the PDE on the initial step and Output the results.
+    // Call these methods to solve the PDE on the initial step and output the results
     UpdateAtEndOfTimeStep(rCellPopulation);
     this->UpdateAtEndOfOutputTimeStep(rCellPopulation);
 }
@@ -107,13 +137,13 @@ std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > EllipticGrowingDomainPdeM
     std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc(new BoundaryConditionsContainer<DIM,DIM,1>(false));
 
     // To be well-defined, elliptic PDE problems on growing domains require Dirichlet boundary conditions
-    assert(!(mpPdeAndBcs->IsNeumannBoundaryCondition()));
+    assert(!(this->IsNeumannBoundaryCondition()));
 
     for (typename TetrahedralMesh<DIM,DIM>::BoundaryNodeIterator node_iter = this->mpFeMesh->GetBoundaryNodeIteratorBegin();
          node_iter != this->mpFeMesh->GetBoundaryNodeIteratorEnd();
          ++node_iter)
     {
-        p_bcc->AddDirichletBoundaryCondition(*node_iter, mpPdeAndBcs->GetBoundaryCondition());
+        p_bcc->AddDirichletBoundaryCondition(*node_iter, this->mpBoundaryCondition.get());
     }
 
     return p_bcc;
@@ -134,4 +164,3 @@ template class EllipticGrowingDomainPdeModifier<3>;
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
 EXPORT_TEMPLATE_CLASS_SAME_DIMS(EllipticGrowingDomainPdeModifier)
-

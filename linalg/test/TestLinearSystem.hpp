@@ -236,8 +236,6 @@ public:
         }
     }
 
-
-
     void TestAddingNonzeroesLater()
     {
         // Make a linear system from which the vector becomes a template to use in a later constructor
@@ -323,7 +321,7 @@ public:
         {
             for (int col=0; col<5; col++)
             {
-                if ( (col>=2) || (row>=2) )
+                if ((col>=2) || (row>=2))
                 {
                     // The altered values
                     if (row != col)

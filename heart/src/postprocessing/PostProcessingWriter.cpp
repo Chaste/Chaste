@@ -156,7 +156,6 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WritePostProcessingFiles()
     }
 }
 
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::~PostProcessingWriter()
 {
@@ -184,7 +183,7 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteOutputDataToHdf5(const s
      * dataset doesn't exist yet and needs creating. If it is NOT in define mode, it means the dataset
      * exists, so we'll empty it and calculate new postprocessing data. */
     int apd_id;
-    if ( writer.IsInDefineMode() )
+    if (writer.IsInDefineMode())
     {
         apd_id = writer.DefineVariable(rDatasetName, rDatasetUnit);
         writer.DefineFixedDimension(mrMesh.GetNumNodes());
@@ -438,18 +437,18 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteVariablesOverTimeAtNodes
             {
                 unsigned node_index = rNodeIndices[requested_index];
 
-                //handle permutation, if any
-                if ( (mrMesh.rGetNodePermutation().size() != 0) &&
-                      !HeartConfig::Instance()->GetOutputUsingOriginalNodeOrdering() )
+                // Handle permutation, if any
+                if ((mrMesh.rGetNodePermutation().size() != 0) &&
+                    !HeartConfig::Instance()->GetOutputUsingOriginalNodeOrdering())
                 {
                     node_index = mrMesh.rGetNodePermutation()[ rNodeIndices[requested_index] ];
                 }
 
-                //grab the data from the hdf5 file.
+                // Grab the data from the hdf5 file.
                 std::vector<double> time_series = mpDataReader->GetVariableOverTime(variable_names[name_index], node_index);
                 assert ( time_series.size() == mpDataReader->GetUnlimitedDimensionValues().size());
 
-                //fill the output_data data structure
+                // Fill the output_data data structure
                 for (unsigned time_step = 0; time_step < time_series.size(); time_step++)
                 {
                     output_data[time_step][requested_index] = time_series[time_step];
@@ -503,11 +502,7 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteGenericFileToMeshalyzer(
     PetscTools::EndRoundRobin();
 }
 
-
-/////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////
-
 template class PostProcessingWriter<1,1>;
 template class PostProcessingWriter<1,2>;
 template class PostProcessingWriter<2,2>;

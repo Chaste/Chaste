@@ -123,8 +123,6 @@ public :
      */
     void RunDoNotUpdate(double startTime, double endTime, double timestep);
 
-
-
     /**
      *  @return the active tension corresponding to the stored state variables computed
      *  from the last RunDoNotUpdate(), ie the active tension at the next time.

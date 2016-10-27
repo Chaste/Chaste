@@ -301,10 +301,7 @@ bool MutableElement<1, SPACE_DIM>::IsElementOnBoundary() const
     return is_element_on_boundary;
 }
 
-/////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////////////
-
 template class MutableElement<1,1>;
 template class MutableElement<1,2>;
 template class MutableElement<1,3>;

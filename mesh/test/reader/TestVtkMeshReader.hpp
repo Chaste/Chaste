@@ -424,7 +424,7 @@ public:
 
         // Check first element has the right nodes
         DistributedTetrahedralMesh<3,3>::ElementIterator it = mesh.GetElementIteratorBegin();
-        if ( mesh.GetDistributedVectorFactory()->IsGlobalIndexLocal(47) )
+        if (mesh.GetDistributedVectorFactory()->IsGlobalIndexLocal(47))
         {
             //Owner of node 47 has to own (or part own) element 0
             TS_ASSERT_EQUALS((it)->GetIndex(), 0U);

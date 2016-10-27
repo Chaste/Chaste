@@ -354,10 +354,7 @@ void LinearBasisFunction<ELEMENT_DIM>::ComputeTransformedBasisFunctionDerivative
     rReturnValue = prod(trans(rInverseJacobian), rReturnValue);
 }
 
-//////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-//////////////////////////////////////////////////////////////////////
-
 template class LinearBasisFunction<1>;
 template class LinearBasisFunction<2>;
 template class LinearBasisFunction<3>;

@@ -137,6 +137,3 @@ void SimpleBalloonAcinarUnit::SetCompliance(double ca)
 {
     mCa = ca;
 }
-
-
-

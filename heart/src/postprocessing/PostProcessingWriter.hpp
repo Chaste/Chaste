@@ -238,7 +238,6 @@ private:
      * @return  A string version of the number without minuses or decimal points.
      */
     std::string ConvertToHdf5FriendlyString(double threshold);
-
 };
 
 #endif /*POSTPROCESSINGWRITER_HPP_*/

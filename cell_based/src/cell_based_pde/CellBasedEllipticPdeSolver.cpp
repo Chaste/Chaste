@@ -33,25 +33,25 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "CellBasedPdeSolver.hpp"
+#include "CellBasedEllipticPdeSolver.hpp"
 #include "TetrahedralMesh.hpp"
 #include "SimpleLinearEllipticSolver.hpp"
 
 template<unsigned DIM>
-CellBasedPdeSolver<DIM>::CellBasedPdeSolver(TetrahedralMesh<DIM,DIM>* pMesh,
+CellBasedEllipticPdeSolver<DIM>::CellBasedEllipticPdeSolver(TetrahedralMesh<DIM,DIM>* pMesh,
                               AbstractLinearEllipticPde<DIM,DIM>* pPde,
                               BoundaryConditionsContainer<DIM,DIM,1>* pBoundaryConditions)
-     : SimpleLinearEllipticSolver<DIM, DIM>(pMesh, pPde, pBoundaryConditions)
+    : SimpleLinearEllipticSolver<DIM, DIM>(pMesh, pPde, pBoundaryConditions)
 {
 }
 
 template<unsigned DIM>
-CellBasedPdeSolver<DIM>::~CellBasedPdeSolver()
+CellBasedEllipticPdeSolver<DIM>::~CellBasedEllipticPdeSolver()
 {
 }
 
 template<unsigned DIM>
-c_vector<double, 1*(DIM+1)> CellBasedPdeSolver<DIM>::ComputeVectorTerm(
+c_vector<double, 1*(DIM+1)> CellBasedEllipticPdeSolver<DIM>::ComputeVectorTerm(
         c_vector<double, DIM+1>& rPhi,
         c_matrix<double, DIM, DIM+1>& rGradPhi,
         ChastePoint<DIM>& rX,
@@ -63,7 +63,7 @@ c_vector<double, 1*(DIM+1)> CellBasedPdeSolver<DIM>::ComputeVectorTerm(
 }
 
 template<unsigned DIM>
-c_matrix<double, 1*(DIM+1), 1*(DIM+1)> CellBasedPdeSolver<DIM>::ComputeMatrixTerm(
+c_matrix<double, 1*(DIM+1), 1*(DIM+1)> CellBasedEllipticPdeSolver<DIM>::ComputeMatrixTerm(
         c_vector<double, DIM+1>& rPhi,
         c_matrix<double, DIM, DIM+1>& rGradPhi,
         ChastePoint<DIM>& rX,
@@ -86,21 +86,21 @@ c_matrix<double, 1*(DIM+1), 1*(DIM+1)> CellBasedPdeSolver<DIM>::ComputeMatrixTer
 }
 
 template<unsigned DIM>
-void CellBasedPdeSolver<DIM>::ResetInterpolatedQuantities()
+void CellBasedEllipticPdeSolver<DIM>::ResetInterpolatedQuantities()
 {
     mConstantInUSourceTerm = 0;
     mLinearInUCoeffInSourceTerm = 0;
 }
 
 template<unsigned DIM>
-void CellBasedPdeSolver<DIM>::IncrementInterpolatedQuantities(double phiI, const Node<DIM>* pNode)
+void CellBasedEllipticPdeSolver<DIM>::IncrementInterpolatedQuantities(double phiI, const Node<DIM>* pNode)
 {
     mConstantInUSourceTerm += phiI * this->mpEllipticPde->ComputeConstantInUSourceTermAtNode(*pNode);
     mLinearInUCoeffInSourceTerm += phiI * this->mpEllipticPde->ComputeLinearInUCoeffInSourceTermAtNode(*pNode);
 }
 
 template<unsigned DIM>
-void CellBasedPdeSolver<DIM>::InitialiseForSolve(Vec initialSolution)
+void CellBasedEllipticPdeSolver<DIM>::InitialiseForSolve(Vec initialSolution)
 {
     // Linear system created here
     SimpleLinearEllipticSolver<DIM,DIM>::InitialiseForSolve(initialSolution);
@@ -109,7 +109,6 @@ void CellBasedPdeSolver<DIM>::InitialiseForSolve(Vec initialSolution)
 }
 
 // Explicit instantiation
-
-template class CellBasedPdeSolver<1>;
-template class CellBasedPdeSolver<2>;
-template class CellBasedPdeSolver<3>;
+template class CellBasedEllipticPdeSolver<1>;
+template class CellBasedEllipticPdeSolver<2>;
+template class CellBasedEllipticPdeSolver<3>;

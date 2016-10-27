@@ -213,7 +213,6 @@ public:
      * @param pDataReader  An HDF5 data reader to use (needed if the existing one is deleted and a new one opened)
      */
     void SetHdf5DataReader(Hdf5DataReader* pDataReader);
-
 };
 
 #endif //_PROPAGATIONPROPERTIESCALCULATOR_HPP_

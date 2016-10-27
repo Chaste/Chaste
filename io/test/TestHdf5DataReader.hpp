@@ -664,8 +664,6 @@ public:
     }
 };
 
-
-
 /************************************************************
 
   Operator function.  Prints the name and type of the object

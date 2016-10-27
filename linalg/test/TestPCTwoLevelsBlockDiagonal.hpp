@@ -295,7 +295,7 @@ public:
 //        for (unsigned i=0; i<mesh.GetNumElements(); i++)
 //        {
 //            double x = mesh.GetElement(i)->CalculateCentroid()[0];
-//            if ( (x<0.1) || (x>0.9) )
+//            if ((x<0.1) || (x>0.9))
 //            {
 //                mesh.GetElement(i)->SetAttribute(HeartRegionCode::GetValidBathId());
 //            }

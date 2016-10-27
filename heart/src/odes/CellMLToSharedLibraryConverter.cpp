@@ -57,8 +57,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         code;                   \
     } catch (...) {}
 
-
-
 /** Set the .so suffix */
 #ifdef __APPLE__
 //Mac OSX
@@ -171,10 +169,10 @@ void CellMLToSharedLibraryConverter::ConvertCellmlToSo(const std::string& rCellm
             folder_name << "dynamic/tmp_" << getpid() << "_" << time(nullptr);
 
 #ifdef CHASTE_CMAKE ///todo: #2656 - ignoring all cmake-specific code, revise after cmake transition
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
             tmp_folder.SetPath(component_dir.GetAbsolutePath() + "/" + folder_name.str(), RelativeTo::Absolute);
             build_folder.SetPath(component_dir.GetAbsolutePath() + "/" + folder_name.str(), RelativeTo::Absolute);
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
 #else
             tmp_folder.SetPath(component_dir.GetAbsolutePath() + "/" + folder_name.str(), RelativeTo::Absolute);
             build_folder.SetPath(component_dir.GetAbsolutePath() + "/build/" + ChasteBuildDirName() + "/" + folder_name.str(), RelativeTo::Absolute);
@@ -199,7 +197,7 @@ void CellMLToSharedLibraryConverter::ConvertCellmlToSo(const std::string& rCellm
             }
 
 #ifdef CHASTE_CMAKE ///todo: #2656 - ignoring all cmake-specific code, revise after cmake transition
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
             std::string cmake_lists_filename = tmp_folder.GetAbsolutePath() + "/CMakeLists.txt";
             std::ofstream cmake_lists_filestream(cmake_lists_filename.c_str());
             cmake_lists_filestream << "cmake_minimum_required(VERSION 2.8.10)\n" <<
@@ -222,7 +220,7 @@ void CellMLToSharedLibraryConverter::ConvertCellmlToSo(const std::string& rCellm
             EXPECT0(chdir, tmp_folder.GetAbsolutePath());
             EXPECT0(system, "cmake" + cmake_args + " .");
             EXPECT0(system, "cmake --build . --config " + ChasteBuildType());
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
 #else
             // Change to Chaste source folder
             EXPECT0(chdir, chaste_root.GetAbsolutePath());

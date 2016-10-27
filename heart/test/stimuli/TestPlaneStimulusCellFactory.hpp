@@ -89,8 +89,8 @@ public:
             delete p_cell1;
             delete p_cell2;
         }
-
     }
+
     void TestHeartGeometryIntoCellFactory() throw(Exception)
     {
         TetrahedralMesh<2,2> mesh;

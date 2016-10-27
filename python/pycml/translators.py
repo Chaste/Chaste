@@ -1267,7 +1267,7 @@ class CellMLTranslator(object):
                     nodes_used.update(var_nodes)
                 self.output_table_index_checking(key, idx)
                 if self.config.options.check_lt_bounds:
-                    self.writeln('#define COVERAGE_IGNORE', indent=False)
+                    self.writeln('// LCOV_EXCL_START', indent=False)
                     self.writeln('if (_oob_', idx, ')')
                     if time_name is None:
                         dump_state_args = 'rY'
@@ -1275,7 +1275,7 @@ class CellMLTranslator(object):
                         dump_state_args = 'rY, ' + time_name
                     self.writeln('EXCEPTION(DumpState("', self.var_display_name(key[-1]),
                                  ' outside lookup table range", ', dump_state_args,'));', indent_offset=1)
-                    self.writeln('#undef COVERAGE_IGNORE', indent=False)
+                    self.writeln('// LCOV_EXCL_STOP', indent=False)
                 self.output_table_index_generation_code(key, idx)
         self.writeln()
         return nodes_used
@@ -1289,13 +1289,13 @@ class CellMLTranslator(object):
             self.writeln('bool _oob_', idx, self.EQ_ASSIGN, 'false', self.STMT_END)
             self.writeln('if (', varname, '>', max, ' || ', varname, '<', min, ')')
             self.open_block()
-            self.writeln('#define COVERAGE_IGNORE', indent=False)
+            self.writeln('// LCOV_EXCL_START', indent=False)
             if self.constrain_table_indices:
                 self.writeln('if (', varname, '>', max, ') ', varname, self.EQ_ASSIGN, max, self.STMT_END)
                 self.writeln('else ', varname, self.EQ_ASSIGN, min, self.STMT_END)
             else:
                 self.writeln('_oob_', idx, self.EQ_ASSIGN, 'true', self.STMT_END)
-            self.writeln('#undef COVERAGE_IGNORE', indent=False)
+            self.writeln('// LCOV_EXCL_STOP', indent=False)
             self.close_block(blank_line=False)
     
     def output_table_index_generation_code(self, key, idx):
@@ -2159,13 +2159,13 @@ class CellMLToChasteTranslator(CellMLTranslator):
             self.close_block()
             # And check the indexes
             if self.config.options.check_lt_bounds:
-                self.writeln('#define COVERAGE_IGNORE', indent=False)
+                self.writeln('// LCOV_EXCL_START', indent=False)
                 self.writeln('bool CheckIndex', idx, '(double& ', varname, ')')
                 self.open_block()
                 self.output_table_index_checking(key, idx, call_method=False)
                 self.writeln('return _oob_', idx, self.STMT_END)
                 self.close_block(blank_line=False)
-                self.writeln('#undef COVERAGE_IGNORE\n', indent=False)
+                self.writeln('// LCOV_EXCL_STOP\n', indent=False)
     
     def output_table_index_checking(self, key, idx, call_method=True):
         """Override base class method to call the methods on the lookup table class if needed."""

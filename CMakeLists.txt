@@ -144,6 +144,8 @@ endif()
 option(Chaste_ENABLE_TESTING "Enable Chaste Testing" ON)
 option(Chaste_INSTALL_TESTS "Install Chaste Testing infrastructure" OFF)
 
+set(Chaste_PYCML_EXTRA_ARGS "" CACHE STRING "Add any extra arguments for PyCML here")
+
 #Some Chaste-specific #defines
 add_definitions(-DCHASTE_CMAKE)
 
@@ -652,6 +654,7 @@ install(EXPORT chaste-targets
 
 
 if (Chaste_COVERAGE)
+         
     set(CTEST_COMMAND ctest)
     set(_outputname coverage)
 	ADD_CUSTOM_TARGET(coverage
@@ -663,9 +666,9 @@ if (Chaste_COVERAGE)
         COMMAND ${CTEST_COMMAND} "-L" "Continuous|Parallel" "--output-on-failure" 
 
 		# Capturing lcov counters and generating report
-		COMMAND ${LCOV_PATH} --directory . --capture --output-file ${_outputname}.info
-        COMMAND ${LCOV_PATH} --remove ${_outputname}.info /usr/* */fortests/* */3rdparty/* Debug/* cxxtest/* --output-file ${_outputname}.info.cleaned
-		COMMAND ${GENHTML_PATH} --no-function-coverage -o ${_outputname} ${_outputname}.info.cleaned
+		COMMAND ${LCOV_PATH} --config-file ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc --directory . --capture --output-file ${_outputname}.info
+        COMMAND ${LCOV_PATH} --config-file ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc --remove ${_outputname}.info /home/bob/petsc* /usr/* */fortests/* */3rdparty/* Debug/* cxxtest/* --output-file ${_outputname}.info.cleaned
+		COMMAND ${GENHTML_PATH} --config-file ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc --no-function-coverage -o ${_outputname} ${_outputname}.info.cleaned
 		COMMAND ${CMAKE_COMMAND} -E remove ${_outputname}.info ${_outputname}.info.cleaned
 
         DEPENDS Continuous Parallel
@@ -732,6 +735,20 @@ if (Chaste_PROFILE_GPROF OR Chaste_PROFILE_GPERFTOOLS)
         WORKING_DIRECTORY ${Chaste_BINARY_DIR}
         VERBATIM)
 endif()
+
+##############################
+#     Infrastructure Tests   #
+##############################
+
+
+add_custom_target(infrastructure
+    COMMAND ${PYTHON_EXECUTABLE} ${Chaste_SOURCE_DIR}/python/infra/CheckForCopyrights.py
+    COMMAND ${PYTHON_EXECUTABLE} ${Chaste_SOURCE_DIR}/python/infra/CheckForDuplicateFileNames.py
+    COMMAND ${PYTHON_EXECUTABLE} ${Chaste_SOURCE_DIR}/python/infra/CheckForOrphanedTests.py
+    COMMAND ${PYTHON_EXECUTABLE} ${Chaste_SOURCE_DIR}/python/infra/CheckSchemas.py
+
+    WORKING_DIRECTORY ${Chaste_SOURCE_DIR}
+    VERBATIM)
 
 
 ####################

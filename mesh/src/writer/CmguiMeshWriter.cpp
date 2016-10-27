@@ -184,12 +184,12 @@ std::vector<boost::shared_ptr<std::ofstream> > CmguiMeshWriter<ELEMENT_DIM, SPAC
         std::string elem_file_name = mRegionNames[region_index] + ".exelem";
 
         boost::shared_ptr<std::ofstream> p_output_file(new std::ofstream((directory+elem_file_name).c_str(), GetOpenMode(append)));
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
         if (!p_output_file->is_open())
         {
             EXCEPTION("Could not open file \"" + elem_file_name + "\" in " + directory);
         }
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
 
         // NOTE THAT one could simply do:
         //
@@ -330,7 +330,7 @@ void CmguiMeshWriter<ELEMENT_DIM, SPACE_DIM>::AppendLocalDataToFiles()
          iter != this->mpDistributedMesh->GetElementIteratorEnd();
          ++iter)
     {
-        if ( this->mpDistributedMesh->CalculateDesignatedOwnershipOfElement(iter->GetIndex()))
+        if (this->mpDistributedMesh->CalculateDesignatedOwnershipOfElement(iter->GetIndex()))
         {
             assert(iter->GetUnsignedAttribute() < mRegionNames.size());//segfault guard
 
@@ -372,10 +372,7 @@ std::ios_base::openmode CmguiMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetOpenMode(boo
     return mode;
 }
 
-/////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////////////
-
 template class CmguiMeshWriter<1,1>;
 template class CmguiMeshWriter<1,2>;
 template class CmguiMeshWriter<1,3>;

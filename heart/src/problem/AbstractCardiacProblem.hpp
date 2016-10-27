@@ -37,8 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ABSTRACTCARDIACPROBLEM_HPP_
 #define ABSTRACTCARDIACPROBLEM_HPP_
 
-
-
 #include <string>
 #include <vector>
 #include <cassert>
@@ -233,7 +231,7 @@ private:
             archive & element_dim;
             archive & space_dim;
             archive & problem_dim;
-            if ( (element_dim != ELEMENT_DIM) ||(space_dim != SPACE_DIM) ||(problem_dim != PROBLEM_DIM) )
+            if ((element_dim != ELEMENT_DIM) ||(space_dim != SPACE_DIM) ||(problem_dim != PROBLEM_DIM))
             {
                 /*If we carry on from this point then the mesh produced by unarchiving from the
                  * archive is templated as AbstractTetrahedralMesh<element_dim, space_dim>
@@ -436,8 +434,6 @@ protected:
 
     /** Adaptivity controller (defaults to nullptr). */
     AbstractTimeAdaptivityController* mpTimeAdaptivityController;
-
-
 
     /**
      * Subclasses must override this method to create a PDE object of the appropriate type.
@@ -750,8 +746,6 @@ public:
     virtual void SetUpAdditionalStoppingTimes(std::vector<double>& rAdditionalStoppingTimes)
     {}
 
-
-
     ///\todo #1704 add default adaptivity controller and allow the user just to call with true
     // and no controller, in which case the default is used.
 
@@ -855,14 +849,14 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::LoadExtraArchive
         {
             // If the mesh which was archived was a TetrahedralMesh then we have all the boundary conditions
             // in every process-specific archive.  We no longer test for this.
-#define COVERAGE_IGNORE
-            if(!dynamic_cast<DistributedTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>*>(mpMesh) && orig_num_procs > 1)
+// LCOV_EXCL_START
+            if (!dynamic_cast<DistributedTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>*>(mpMesh) && orig_num_procs > 1)
             {
                 // The correct way to do this should be:
                 // p_bcc->LoadFromArchive(archive, mpMesh);
                 WARNING("Loading from a parallel archive which used a non-distributed mesh.  This scenario should work but is not fully tested.");
             }
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
             mpBoundaryConditionsContainer->MergeFromArchive(archive, mpMesh);
         }
     }

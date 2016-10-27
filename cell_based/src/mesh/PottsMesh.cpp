@@ -49,7 +49,7 @@ PottsMesh<DIM>::PottsMesh(std::vector<Node<DIM>*> nodes,
     Clear();
 
     // Verify the same size of nodes and neighbour information.
-    if ( (vonNeumannNeighbouringNodeIndices.size() != nodes.size()) || (mooreNeighbouringNodeIndices.size() != nodes.size()) )
+    if ((vonNeumannNeighbouringNodeIndices.size() != nodes.size()) || (mooreNeighbouringNodeIndices.size() != nodes.size()))
     {
         EXCEPTION("Nodes and neighbour information for a Potts mesh need to be the same length.");
     }
@@ -269,7 +269,6 @@ void PottsMesh<DIM>::RemoveDeletedElements()
     }
     mDeletedElementIndices.clear();
 }
-
 
 template<unsigned DIM>
 void PottsMesh<DIM>::DeleteNode(unsigned index)

@@ -81,8 +81,6 @@ public:
      : AbstractSteadyStateRunner(pModel),
        mTwoPaceScan(twoPaces)
     {};
-
-
 };
 
 #endif // CHASTE_CVODE

@@ -110,13 +110,13 @@ void CellProperties::CalculateProperties()
                     current_resting_value = prev_v;
                     found_a_flat_bit=true;
                 }
-                else if(prev_v < current_resting_value && !found_a_flat_bit)
+                else if (prev_v < current_resting_value && !found_a_flat_bit)
                 {
                     current_resting_value = prev_v;
                 }
 
                 // If we cross the threshold, this counts as an AP
-                if ( v>mThreshold && prev_v <= mThreshold )
+                if (v>mThreshold && prev_v <= mThreshold)
                 {
                     //register the resting value and re-initialise the minimum velocity
                     mRestingValues.push_back(current_resting_value);
@@ -163,21 +163,21 @@ void CellProperties::CalculateProperties()
 
                 // If we cross the threshold again, the AP is over
                 // and we register all the parameters.
-                if ( v<mThreshold && prev_v >= mThreshold )
+                if (v<mThreshold && prev_v >= mThreshold)
                 {
-                    //register peak value for this AP
+                    // Register peak value for this AP
                     mPeakValues.push_back(current_peak);
-                    //Re-initialise the current_peak.
+                    // Re-initialise the current_peak.
                     current_peak = mThreshold;
 
-                    //register maximum upstroke velocity for this AP
+                    // Register maximum upstroke velocity for this AP
                     mMaxUpstrokeVelocities.push_back(max_upstroke_velocity);
-                    //re-initialise max_upstroke_velocity
+                    // Re-initialise max_upstroke_velocity
                     max_upstroke_velocity = -DBL_MAX;
 
-                    //register time when maximum upstroke velocity occurred for this AP
+                    // Register time when maximum upstroke velocity occurred for this AP
                     mTimesAtMaxUpstrokeVelocity.push_back(current_time_of_upstroke_velocity);
-                    //re-initialise current_time_of_upstroke_velocity=t;
+                    // Re-initialise current_time_of_upstroke_velocity=t;
                     current_time_of_upstroke_velocity = 0.0;
 
                     mCounterOfPlateauDepolarisations.push_back(counter_of_plateau_depolarisations);

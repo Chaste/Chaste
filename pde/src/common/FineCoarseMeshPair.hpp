@@ -416,7 +416,6 @@ public:
      * @return the coarse mesh
      */
     const AbstractTetrahedralMesh<DIM, DIM>& GetCoarseMesh() const;
-
 };
 
 #endif /*FINECOARSEMESHPAIR_HPP_*/

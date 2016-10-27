@@ -115,7 +115,7 @@ public:
 
 //        // fibres going from (1,0) at X=0 to (1,1)-direction at X=1
 //        // the fibres file was created with the code (inside a class that owns a mesh)
-//        for(unsigned elem_index=0; elem_index<mechanics_mesh.GetNumElements(); elem_index++)
+//        for (unsigned elem_index=0; elem_index<mechanics_mesh.GetNumElements(); elem_index++)
 //        {
 //            double X = mechanics_mesh.GetElement(elem_index)->CalculateCentroid()[0];
 //            double theta = M_PI*X/4;
@@ -137,8 +137,6 @@ public:
         MechanicsEventHandler::Headings();
         MechanicsEventHandler::Report();
     }
-
-
 
     void Test3d() throw(Exception)
     {
@@ -226,8 +224,6 @@ public:
                                                   &cell_factory,
                                                   &problem_defn,
                                                   "TestCardiacElectroMech3dTwistingCube");
-
-
 
         problem.Solve();
 
@@ -332,7 +328,7 @@ public:
         *p_Y1_file << mechanics_mesh.GetNumElements() << "\n";
         *p_Y2_file << mechanics_mesh.GetNumElements() << "\n";
         *p_Z_file  << mechanics_mesh.GetNumElements() << "\n";
-        for(unsigned i=0; i<mechanics_mesh.GetNumElements(); i++)
+        for (unsigned i=0; i<mechanics_mesh.GetNumElements(); i++)
         {
             //double X = mechanics_mesh.GetElement(i)->CalculateCentroid()(0);
             *p_X_file  << "1 0 0 0 1 0 0 0 1\n";
@@ -389,9 +385,9 @@ public:
         }
 
         // test the two results are identical
-        for(unsigned i=0; i<r_deformed_position_no_fibres.size(); i++)
+        for (unsigned i=0; i<r_deformed_position_no_fibres.size(); i++)
         {
-            for(unsigned j=0; j<3; j++)
+            for (unsigned j=0; j<3; j++)
             {
                 TS_ASSERT_DELTA(r_deformed_position_no_fibres[i](j), r_deformed_position_fibres_alongX[i](j), 1e-8);
             }
@@ -457,9 +453,9 @@ public:
 
 
         // test the two results are identical
-        for(unsigned i=0; i<r_deformed_position_no_fibres.size(); i++)
+        for (unsigned i=0; i<r_deformed_position_no_fibres.size(); i++)
         {
-            for(unsigned j=0; j<3; j++)
+            for (unsigned j=0; j<3; j++)
             {
                 TS_ASSERT_DELTA(r_deformed_position_fibres_alongY1[i](j), r_deformed_position_fibres_alongY2[i](j), 1e-8);
             }
@@ -532,9 +528,9 @@ public:
 //             ++iter)
 //        {
 //            c_vector<double,3> centroid =(*iter)->CalculateCentroid();
-//            if (    (fabs(centroid[1])<1e-4)
+//            if ((fabs(centroid[1])<1e-4)
 //                 && (centroid[0] < 0.05)
-//                 && (centroid[2] < 0.05) )
+//                 && (centroid[2] < 0.05))
 //            {
 //                BoundaryElement<2,3>* p_element = *iter;
 //                impact_region.push_back(p_element);

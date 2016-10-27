@@ -129,6 +129,4 @@ inline void load_construct_data(
 }
 } // namespace ...
 
-
-
 #endif /* GOLDBETER1991ODESYSTEM_HPP_ */

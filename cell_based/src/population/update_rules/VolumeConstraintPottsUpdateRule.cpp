@@ -133,7 +133,7 @@ void VolumeConstraintPottsUpdateRule<DIM>::OutputUpdateRuleParameters(out_stream
     AbstractPottsUpdateRule<DIM>::OutputUpdateRuleParameters(rParamsFile);
 }
 
-///////// Explicit instantiation
+// Explicit instantiation
 template class VolumeConstraintPottsUpdateRule<1>;
 template class VolumeConstraintPottsUpdateRule<2>;
 template class VolumeConstraintPottsUpdateRule<3>;

@@ -99,10 +99,6 @@ void QuadraticMesh<DIM>::ConstructLinearMesh(unsigned numElemX)
     this->RefreshMesh();
 }
 
-
-
-
-
 template<unsigned DIM>
 void QuadraticMesh<DIM>::ConstructRectangularMesh(unsigned numElemX, unsigned numElemY, bool stagger)
 {
@@ -207,7 +203,7 @@ Node<DIM>* QuadraticMesh<DIM>::MakeNewInternalNode(unsigned& rIndex, c_vector<do
             //Outside the box so don't do anything
             return nullptr;
         }
-        if ( (rLocation[dim] == 0.0) || (rLocation[dim] == rTop[dim]) )
+        if ((rLocation[dim] == 0.0) || (rLocation[dim] == rTop[dim]))
         {
             boundary = true;
         }
@@ -341,7 +337,6 @@ void QuadraticMesh<DIM>::ConstructCuboid(unsigned numElemX, unsigned numElemY, u
                 MakeNewInternalNode(node_index, node_pos, top);
             }
         }
-
     }
     CountVertices();
     for (typename AbstractTetrahedralMesh<DIM,DIM>::ElementIterator iter = this->GetElementIteratorBegin();
@@ -354,10 +349,10 @@ void QuadraticMesh<DIM>::ConstructCuboid(unsigned numElemX, unsigned numElemY, u
          * i.e. internal node with local index 4 is half-way between vertex nodes
          * with local indices 0 and 1.
          */
-         unsigned v0=iter->GetNodeGlobalIndex(0);
-         unsigned v1=iter->GetNodeGlobalIndex(1);
-         unsigned v2=iter->GetNodeGlobalIndex(2);
-         unsigned v3=iter->GetNodeGlobalIndex(3);
+         unsigned v0 = iter->GetNodeGlobalIndex(0);
+         unsigned v1 = iter->GetNodeGlobalIndex(1);
+         unsigned v2 = iter->GetNodeGlobalIndex(2);
+         unsigned v3 = iter->GetNodeGlobalIndex(3);
          unsigned internal_index;
 
          //4
@@ -401,19 +396,15 @@ void QuadraticMesh<DIM>::ConstructCuboid(unsigned numElemX, unsigned numElemY, u
             (*iter)->AddNode(this->mNodes[new_node_index]);
             this->mNodes[new_node_index]->AddBoundaryElement((*iter)->GetIndex());
         }
-
     }
     this->RefreshMesh();
 }
-
-
 
 template<unsigned DIM>
 unsigned QuadraticMesh<DIM>::GetNumVertices() const
 {
     return mNumVertices;
 }
-
 
 template<unsigned DIM>
 void QuadraticMesh<DIM>::ConstructFromLinearMeshReader(AbstractMeshReader<DIM, DIM>& rMeshReader)
@@ -464,7 +455,6 @@ void QuadraticMesh<DIM>::ConstructFromLinearMeshReader(AbstractMeshReader<DIM, D
     }
 }
 
-
 template<unsigned DIM>
 void QuadraticMesh<DIM>::ConstructFromMeshReader(AbstractMeshReader<DIM, DIM>& rAbsMeshReader)
 {
@@ -488,9 +478,7 @@ void QuadraticMesh<DIM>::ConstructFromMeshReader(AbstractMeshReader<DIM, DIM>& r
     QuadraticMeshHelper<DIM>::CheckBoundaryElements(this);
 }
 
-/////////////////////////////////////////////////////////////////////////////
-// Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
+///////// Explicit instantiation///////
 
 
 template class QuadraticMesh<1>;

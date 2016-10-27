@@ -50,7 +50,7 @@ DistanceMapCalculator<ELEMENT_DIM, SPACE_DIM>::DistanceMapCalculator(
     mNumNodes = mrMesh.GetNumNodes();
 
     DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* p_distributed_mesh = dynamic_cast<DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>*>(&mrMesh);
-    if ( PetscTools::IsSequential() || p_distributed_mesh == nullptr)
+    if (PetscTools::IsSequential() || p_distributed_mesh == NULL)
     {
         // It's a non-distributed mesh
         mLo = 0;
@@ -247,7 +247,7 @@ bool DistanceMapCalculator<ELEMENT_DIM, SPACE_DIM>::WorkOnLocalQueue(std::vector
                         double updated_distance = rNodeDistances[current_node_index] +
                                                   norm_2(p_neighbour_node->rGetLocation() - p_current_node->rGetLocation())
                                                   - current_heuristic + neighbour_heuristic;
-                        if ( updated_distance < rNodeDistances[neighbour_node_index] * (1.0-2*DBL_EPSILON) )
+                        if (updated_distance < rNodeDistances[neighbour_node_index] * (1.0-2*DBL_EPSILON))
                         {
                             rNodeDistances[neighbour_node_index] = updated_distance;
                             PushLocal(updated_distance, neighbour_node_index);
@@ -312,10 +312,7 @@ double DistanceMapCalculator<ELEMENT_DIM, SPACE_DIM>::SingleDistance(unsigned so
     return distances[targetNodeIndex];
 }
 
-/////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////
-
 template class DistanceMapCalculator<1, 1>;
 template class DistanceMapCalculator<1, 2>;
 template class DistanceMapCalculator<2, 2>;

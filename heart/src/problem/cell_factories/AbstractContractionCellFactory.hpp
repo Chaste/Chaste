@@ -36,9 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ABSTRACTCONTRACTIONCELLFACTORY_HPP_
 #define ABSTRACTCONTRACTIONCELLFACTORY_HPP_
 
-
-
-
 #include "AbstractContractionModel.hpp"
 #include "QuadraticMesh.hpp"
 
@@ -117,9 +114,6 @@ public:
      * Destructor
      */
     virtual ~AbstractContractionCellFactory(){};
-
-
 };
-
 
 #endif /* ABSTRACTCONTRACTIONCELLFACTORY_HPP_ */

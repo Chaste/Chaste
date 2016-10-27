@@ -77,10 +77,7 @@ double ElementAttributes<ELEMENT_DIM, SPACE_DIM>::GetFirstAttribute()
     return(mAttributes[0]);
 }
 
-//////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-//////////////////////////////////////////////////////////////////////////
-
 template class ElementAttributes<0,1>;
 template class ElementAttributes<1,1>;
 template class ElementAttributes<0,2>;

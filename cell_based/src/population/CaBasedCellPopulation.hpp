@@ -105,13 +105,13 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
         archive & boost::serialization::base_object<AbstractOnLatticeCellPopulation<DIM> >(*this);
         archive & mSwitchingUpdateRuleCollection;
         archive & mLatticeCarryingCapacity;
         archive & mAvailableSpaces;
         archive & mpCaBasedDivisionRule;
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
     }
 
     /**
@@ -195,23 +195,11 @@ public:
     /**
      * Overridden GetTetrahedralMeshForPdeModifier() method.
      *
-     * @return a tetrahedral mesh \todo #2687
+     * @return a pointer to a tetrahedral mesh, for use with a PDE modifier.
      *
      * This method is called by AbstractGrowingDomainPdeModifier.
      */
     virtual TetrahedralMesh<DIM, DIM>* GetTetrahedralMeshForPdeModifier();
-
-    /**
-     * Overridden IsPdeNodeAssociatedWithApoptoticCell() method.
-     *
-     * @param pdeNodeIndex index of a node in a tetrahedral mesh for use
-     *         with a PDE modifier
-     *
-     * @return if a node, specified by its index in a tetrahedral mesh for use
-     *         with a PDE modifier, is associated with an apoptotic cell.
-     * This method can be called by PDE classes.
-     */
-    virtual bool IsPdeNodeAssociatedWithApoptoticCell(unsigned pdeNodeIndex);
 
     /**
      * Overridden GetNode() method.
@@ -472,13 +460,24 @@ public:
                                             std::string& rVariableName,
                                             bool dirichletBoundaryConditionApplies=false,
                                             double dirichletBoundaryValue=0.0);
+
+    /**
+     * Overridden IsPdeNodeAssociatedWithNonApoptoticCell() method.
+     *
+     * @param pdeNodeIndex index of a node in a tetrahedral mesh for use with a PDE modifier
+     *
+     * @return if a node, specified by its index in a tetrahedral mesh for use
+     *         with a PDE modifier, is associated with a non-apoptotic cell.
+     * This method can be called by PDE classes.
+     */
+    virtual bool IsPdeNodeAssociatedWithNonApoptoticCell(unsigned pdeNodeIndex);
 };
 
 #include "SerializationExportWrapper.hpp"
 EXPORT_TEMPLATE_CLASS_SAME_DIMS(CaBasedCellPopulation)
 
 // No archiving yet so untested
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
 namespace boost
 {
 namespace serialization
@@ -512,6 +511,6 @@ inline void load_construct_data(
 }
 }
 } // namespace ...
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
 
 #endif /*CABASEDCELLPOPULATION_HPP_*/

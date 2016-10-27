@@ -101,7 +101,7 @@ public:
         // The number of times is 1000, no point going through them all
         // only go through every 100th (note the "i+=100" in the for loop)
         assert(fine_reader.GetUnlimitedDimensionValues().size()==1001u);
-        for(unsigned i=1; i<fine_reader.GetUnlimitedDimensionValues().size(); i+=100)
+        for (unsigned i=1; i<fine_reader.GetUnlimitedDimensionValues().size(); i+=100)
         {
             fine_reader.GetVariableOverNodes(voltage_fine, "V", i);
             coarse_reader.GetVariableOverNodes(voltage_coarse, "V", i);
@@ -119,7 +119,7 @@ public:
 
             // check fine_repl[10] != fine_repl[11] *for some time*, else the above
             // check is invalid
-            if(fabs(fine_repl[10] - fine_repl[11]) > 1e-6)
+            if (fabs(fine_repl[10] - fine_repl[11]) > 1e-6)
             {
                 invalid = false;
             }
@@ -217,7 +217,7 @@ public:
         bool invalid_2 = true;//see below
 
         TS_ASSERT_EQUALS(fine_reader.GetUnlimitedDimensionValues().size(), 101u);
-        for(unsigned i=1; i<fine_reader.GetUnlimitedDimensionValues().size(); i++)
+        for (unsigned i=1; i<fine_reader.GetUnlimitedDimensionValues().size(); i++)
         {
             fine_reader.GetVariableOverNodes(voltage_fine, "V", i);
             fine_reader.GetVariableOverNodes(phi_e_fine, "Phi_e", i);
@@ -249,7 +249,7 @@ public:
 
             // check fine_repl[10] != fine_repl[11] *for some time*, else the above
             // check is invalid
-            if( (fabs(fine_repl[10] - fine_repl[11]) > 1e-6) )
+            if ((fabs(fine_repl[10] - fine_repl[11]) > 1e-6))
             {
                 invalid_1 = false;
             }

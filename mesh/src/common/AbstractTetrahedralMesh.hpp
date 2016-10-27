@@ -472,8 +472,6 @@ public:
      */
     virtual void ConstructLinearMesh(unsigned width);
 
-
-
     /**
      * Construct a 2D rectangular grid on [0,width]x[0,height].
      *
@@ -491,8 +489,6 @@ public:
      */
     virtual void ConstructRectangularMesh(unsigned width, unsigned height, bool stagger=true);
 
-
-
     /** Construct a 3D cuboid grid on [0,width]x[0,height]x[0,depth].
      *
      * @param width  width of the mesh (in the x-direction)
@@ -505,8 +501,6 @@ public:
      * Overridden in DistributedTetrahedralMesh
      */
     virtual void ConstructCuboid(unsigned width, unsigned height, unsigned depth);
-
-
 
     /**
      *  Create a 1D mesh on [0, width], 2D mesh on [0, width]x[0 height] with staggering or
@@ -629,12 +623,9 @@ public:
      unsigned GetNearestElementIndexFromTestElements(const ChastePoint<SPACE_DIM>& rTestPoint,
                                                      std::set<unsigned> testElements);
 
-
-
     //////////////////////////////////////////////////////////////////////
     //                         Nested classes                           //
     //////////////////////////////////////////////////////////////////////
-
 
     /**
      * A smart iterator over the elements in the mesh.
@@ -704,7 +695,6 @@ public:
          */
         inline bool IsAllowedElement();
     };
-
 };
 
 TEMPLATED_CLASS_IS_ABSTRACT_2_UNSIGNED(AbstractTetrahedralMesh)
@@ -811,7 +801,5 @@ bool AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ElementIterator::IsAllowed
 {
     return !(mSkipDeletedElements && (*this)->IsDeleted());
 }
-
-
 
 #endif /*ABSTRACTTETRAHEDRALMESH_HPP_*/

@@ -114,10 +114,10 @@ void ExecutableSupport::InitializePetsc(int* pArgc, char*** pArgv)
     // Set default output folder
     if (!mOutputDirectory.IsPathSet())
     {
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
         //depends on order of calls.  Extract to method?
         mOutputDirectory.SetPath("", RelativeTo::ChasteTestOutput);
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
     }
 }
 
@@ -155,10 +155,10 @@ void ExecutableSupport::WriteMachineInfoFile(std::string fileBaseName)
 {
     if (!mOutputDirectory.IsPathSet())
     {
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
         //depends on order of calls.  Extract to method?
         mOutputDirectory.SetPath("", RelativeTo::ChasteTestOutput);
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
     }
     OutputFileHandler out_file_handler(mOutputDirectory, false);
     std::stringstream file_name;
@@ -175,7 +175,7 @@ void ExecutableSupport::WriteMachineInfoFile(std::string fileBaseName)
     #define INFO_BUFFER_SIZE 32767
     TCHAR info_buffer[INFO_BUFFER_SIZE];
     DWORD buffer_char_count = INFO_BUFFER_SIZE;
-    if(!GetComputerName(info_buffer, &buffer_char_count))
+    if (!GetComputerName(info_buffer, &buffer_char_count))
         *out_file << "uname nodename = " << "Windows machine name is unknown" << std::endl;
     else
         *out_file << "uname nodename = " << info_buffer << std::endl;
@@ -187,35 +187,35 @@ void ExecutableSupport::WriteMachineInfoFile(std::string fileBaseName)
     GetVersionEx((OSVERSIONINFO*) &os_info);
     //Pivot around Windows Vista (dwMajorVersion >= 6)
     //See http://msdn.microsoft.com/en-us/library/ms724834%28v=vs.85%29.aspx for details
-    if(os_info.dwMajorVersion < 6)
+    if (os_info.dwMajorVersion < 6)
     { //earlier than Windows Vista
         *out_file << "uname release  = " << "Microsoft Windows Server 2003 R2 (or earlier)" << std::endl;
     }
     else {
         //reverse chronological order (simply add newer OS version to the top)
-        if(os_info.dwMajorVersion > 6)
+        if (os_info.dwMajorVersion > 6)
         {
             *out_file << "uname release  = " << "Microsoft Windows (Later than Microsoft Windows 8)" << std::endl;
         }
         else  //os_info.dwMajorVersion == 6
         {
-            if(os_info.dwMinorVersion == 2)
+            if (os_info.dwMinorVersion == 2)
             {
-                if(os_info.wProductType == VER_NT_WORKSTATION)
+                if (os_info.wProductType == VER_NT_WORKSTATION)
                     *out_file << "uname release  = " << "Microsoft Windows 8" << std::endl;
                 else
                     *out_file << "uname release  = " << "Microsoft Windows Server 2012" << std::endl;
             }
-            else if(os_info.dwMinorVersion == 1)
+            else if (os_info.dwMinorVersion == 1)
             {
-                if(os_info.wProductType == VER_NT_WORKSTATION)
+                if (os_info.wProductType == VER_NT_WORKSTATION)
                     *out_file << "uname release  = " << "Microsoft Windows 7" << std::endl;
                 else
                     *out_file << "uname release  = " << "Microsoft Windows Server 2008 R2" << std::endl;
             }
-            else if(os_info.dwMinorVersion == 0)
+            else if (os_info.dwMinorVersion == 0)
             {
-                if(os_info.wProductType == VER_NT_WORKSTATION)
+                if (os_info.wProductType == VER_NT_WORKSTATION)
                     *out_file << "uname release  = " << "Microsoft Windows Server 2008" << std::endl;
                 else
                     *out_file << "uname release  = " << "Microsoft Windows Vista" << std::endl;
@@ -316,10 +316,10 @@ void ExecutableSupport::WriteProvenanceInfoFile()
 {
     if (!mOutputDirectory.IsPathSet())
     {
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
         //depends on order of calls.  Extract to method?
         mOutputDirectory.SetPath("", RelativeTo::ChasteTestOutput);
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
     }
     OutputFileHandler out_file_handler(mOutputDirectory, false);
     out_stream out_file = out_file_handler.OpenOutputFile("provenance_info_", PetscTools::GetMyRank(), ".txt");
@@ -353,11 +353,11 @@ void ExecutableSupport::GetBuildInfo(std::string& rInfo)
     output << "\t\t<Projects>\n";
     BOOST_FOREACH(const StringPair& r_project_version, ChasteBuildInfo::rGetProjectVersions())
     {
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
         // No projects are checked out for continuous builds normally!
         output<< "\t\t\t<Name>" << r_project_version.first << "</Name><Version>"
                  << r_project_version.second << "</Version>\n";
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
     }
     output << "\t\t</Projects>\n";
     output << "\t</ProvenanceInfo>\n";
@@ -432,10 +432,10 @@ void ExecutableSupport::PrintError(const std::string& rMessage, bool masterOnly)
     // Write the error message to file
     if (!mOutputDirectory.IsPathSet())
     {
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
         //depends on order of calls.  Extract to method?
         mOutputDirectory.SetPath("", RelativeTo::ChasteTestOutput);
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
     }
     OutputFileHandler out_file_handler(mOutputDirectory, false);
     out_stream out_file = out_file_handler.OpenOutputFile("chaste_errors_", PetscTools::GetMyRank(), ".txt", std::ios::out | std::ios::app);

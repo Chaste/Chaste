@@ -49,8 +49,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Set up and run basic bidomain simulations
  */
 
-
-
 /*
  * = An example showing how to run bidomain simulations =
  *
@@ -259,7 +257,7 @@ public:
          * will mention how to do parallel access).
          */
         ReplicatableVector res_repl(bidomain_problem.GetSolution());
-        for(unsigned i=0; i<res_repl.GetSize(); i++)
+        for (unsigned i=0; i<res_repl.GetSize(); i++)
         {
         //    std::cout << res_repl[i] << "\n";
         }

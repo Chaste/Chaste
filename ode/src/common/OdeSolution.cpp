@@ -306,9 +306,7 @@ void OdeSolution::WriteToFile(std::string directoryName,
     writer.Close();
 }
 
-//
 // Explicit instantiation
-//
 
 /**
  * \cond

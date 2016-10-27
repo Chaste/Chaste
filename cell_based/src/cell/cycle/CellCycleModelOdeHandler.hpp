@@ -203,7 +203,6 @@ public:
      *
      */
     void SetProteinConcentrationsForTestsOnly(double lastTime, std::vector<double> proteinConcentrations);
-
 };
 
 #endif /*CELLCYCLEMODELODEHANDLER_HPP_*/

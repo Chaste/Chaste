@@ -53,14 +53,11 @@ LambertAirwayWallFactory::LambertAirwayWallFactory(bool useStrahlerOrder) : mpWa
 
 LambertAirwayWallFactory::~LambertAirwayWallFactory()
 {
-    if(mpWalker)
+    if (mpWalker)
     {
         delete mpWalker;
     }
 }
-
-
-
 
 double LambertAirwayWallFactory::GetAlpha0ForGeneration(unsigned generation)
 {
@@ -82,22 +79,11 @@ double LambertAirwayWallFactory::GetN2ForGeneration(unsigned generation)
     return mN2[generation];
 }
 
-
-
-
-
-
-
-
-
-
-
-
 LambertAirwayWall* LambertAirwayWallFactory::CreateAirwayWallForElement(Element<1,3>* pElement)
 {
     unsigned order = 0;
 
-    if(mUseStrahlerOrder)
+    if (mUseStrahlerOrder)
     {
         order = mpWalker->GetElementStrahlerOrder(pElement);
     }
@@ -105,7 +91,6 @@ LambertAirwayWall* LambertAirwayWallFactory::CreateAirwayWallForElement(Element<
     {
         order = mpWalker->GetElementHorsfieldOrder(pElement);
     }
-
 
     //We linearly interpolate the generation data on to the corresponding order
     double generation_factor = (mMaxOrder - order)*mMaxGeneration/(mMaxOrder-1);
@@ -149,7 +134,7 @@ void LambertAirwayWallFactory::SetMesh(AbstractTetrahedralMesh<1,3>* pMesh)
 
     mpWalker = new AirwayTreeWalker(*pMesh, 0u);
 
-    if(mUseStrahlerOrder)
+    if (mUseStrahlerOrder)
     {
         mMaxOrder = mpWalker->GetMaxElementStrahlerOrder();
     }

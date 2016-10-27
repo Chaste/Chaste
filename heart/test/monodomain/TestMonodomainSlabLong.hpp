@@ -98,6 +98,4 @@ public:
     }
 };
 
-
-
 #endif //_TESTMONODOMAINSLABLONG_HPP_

@@ -94,7 +94,7 @@ void PCLDUFactorisation::PCLDUFactorisationCreate(KSP& rKspObject)
     KSPGetPC(rKspObject, &mPetscPCObject);
 
     Mat system_matrix, dummy;
-#if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5 )
+#if (PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5)
     KSPGetOperators(rKspObject, &system_matrix, &dummy);
 #else
     MatStructure flag;
@@ -252,7 +252,7 @@ void PCLDUFactorisation::PCLDUFactorisationSetUp()
      * Set up preconditioner for block A11
      */
     PCCreate(PETSC_COMM_WORLD, &(mPCContext.PC_amg_A11));
-#if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5 )
+#if (PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5)
     // Attempt to emulate SAME_PRECONDITIONER below
     PCSetReusePreconditioner(mPCContext.PC_amg_A11, PETSC_TRUE);
     PCSetOperators(mPCContext.PC_amg_A11, mPCContext.A11_matrix_subblock, mPCContext.A11_matrix_subblock);
@@ -276,7 +276,7 @@ void PCLDUFactorisation::PCLDUFactorisationSetUp()
     // Stop supressing error
     PetscPopErrorHandler();
 
-#if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR<=5 )
+#if (PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR<=5)
     PetscTools::SetOption("-pc_hypre_type", "euclid");
     PetscTools::SetOption("-pc_hypre_euclid_levels", "0");
 #else
@@ -312,7 +312,7 @@ void PCLDUFactorisation::PCLDUFactorisationSetUp()
      * Set up amg preconditioner for block A22
      */
     PCCreate(PETSC_COMM_WORLD, &(mPCContext.PC_amg_A22));
-#if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5 )
+#if (PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5)
     // Attempt to emulate SAME_PRECONDITIONER below
     PCSetReusePreconditioner(mPCContext.PC_amg_A22, PETSC_TRUE);
     PCSetOperators(mPCContext.PC_amg_A22, mPCContext.A22_matrix_subblock, mPCContext.A22_matrix_subblock);

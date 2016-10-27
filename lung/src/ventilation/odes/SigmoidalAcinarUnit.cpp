@@ -177,7 +177,3 @@ void SigmoidalAcinarUnit::SetD(double d)
 {
     mD = d;
 }
-
-
-
-

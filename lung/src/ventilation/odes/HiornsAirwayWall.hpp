@@ -177,7 +177,6 @@ private:
     
     /** The parameter A from Hiorns et al. 2014 Biophys J*/
     double mA;
-
 };
 
 #endif /*HIORNSAIRWAYWALL_HPP_*/

@@ -45,6 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscTools.hpp"
 #include "SmartPointers.hpp"
 #include "CellAncestor.hpp"
+#include "ApoptoticCellProperty.hpp"
 
 // Cell writers
 #include "BoundaryNodeWriter.hpp"
@@ -272,7 +273,7 @@ std::vector<unsigned> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCellCyc
      * Note that in parallel with a poor partition a process could end up with zero cells
      * in which case the calculation should be skipped since `this->Begin()` is not defined.
      */
-    if ( GetNumAllCells() > 0u)
+    if (GetNumAllCells() > 0u)
     {
         if (dynamic_cast<AbstractPhaseBasedCellCycleModel*>((*(this->Begin()))->GetCellCycleModel()) == nullptr)
         {
@@ -280,28 +281,28 @@ std::vector<unsigned> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCellCyc
         }
 
         for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter = this->Begin();
-                cell_iter != this->End();
-                ++cell_iter)
+             cell_iter != this->End();
+             ++cell_iter)
         {
             switch (static_cast<AbstractPhaseBasedCellCycleModel*>((*cell_iter)->GetCellCycleModel())->GetCurrentCellCyclePhase())
             {
-            case G_ZERO_PHASE:
-                cell_cycle_phase_count[0]++;
-                break;
-            case G_ONE_PHASE:
-                cell_cycle_phase_count[1]++;
-                break;
-            case S_PHASE:
-                cell_cycle_phase_count[2]++;
-                break;
-            case G_TWO_PHASE:
-                cell_cycle_phase_count[3]++;
-                break;
-            case M_PHASE:
-                cell_cycle_phase_count[4]++;
-                break;
-            default:
-                NEVER_REACHED;
+                case G_ZERO_PHASE:
+                    cell_cycle_phase_count[0]++;
+                    break;
+                case G_ONE_PHASE:
+                    cell_cycle_phase_count[1]++;
+                    break;
+                case S_PHASE:
+                    cell_cycle_phase_count[2]++;
+                    break;
+                case G_TWO_PHASE:
+                    cell_cycle_phase_count[3]++;
+                    break;
+                case M_PHASE:
+                    cell_cycle_phase_count[4]++;
+                    break;
+                default:
+                    NEVER_REACHED;
             }
         }
     }
@@ -437,6 +438,7 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetDefaultCellMutationState
         mutations_and_proliferative_types.push_back(p_registry->Get<StemCellProliferativeType>());
         mutations_and_proliferative_types.push_back(p_registry->Get<TransitCellProliferativeType>());
         mutations_and_proliferative_types.push_back(p_registry->Get<DifferentiatedCellProliferativeType>());
+
         // Parallel process with no cells won't have the default property, so add it in
         mutations_and_proliferative_types.push_back(p_registry->Get<DefaultCellProliferativeType>());
         p_registry->SpecifyOrdering(mutations_and_proliferative_types);
@@ -821,6 +823,19 @@ std::pair<unsigned,unsigned> AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>::Crea
         ordered_pair.second = index1;
     }
     return ordered_pair;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::IsPdeNodeAssociatedWithNonApoptoticCell(unsigned pdeNodeIndex)
+{
+    bool non_apoptotic_cell_present = false;
+
+    if (IsCellAttachedToLocationIndex(pdeNodeIndex))
+    {
+        non_apoptotic_cell_present = !(GetCellUsingLocationIndex(pdeNodeIndex)->template HasCellProperty<ApoptoticCellProperty>());
+    }
+
+    return non_apoptotic_cell_present;
 }
 
 // Explicit instantiation

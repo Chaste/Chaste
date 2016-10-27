@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef _TESTCELLBASEDPDESOLVER_HPP_
-#define _TESTCELLBASEDPDESOLVER_HPP_
+#ifndef _TESTCELLBASEDELLIPTICPDESOLVER_HPP_
+#define _TESTCELLBASEDELLIPTICPDESOLVER_HPP_
 
 #include "UblasCustomFunctions.hpp"
 
@@ -45,12 +45,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pde/test/pdes/SimplePoissonEquation.hpp>
 
 #include "SimpleLinearEllipticSolver.hpp"
-#include "CellBasedPdeSolver.hpp"
+#include "CellBasedEllipticPdeSolver.hpp"
 #include "TrianglesMeshReader.hpp"
 #include "PetscSetupAndFinalize.hpp"
 #include "ConstBoundaryCondition.hpp"
 
-class TestCellBasedPdeSolver : public CxxTest::TestSuite
+class TestCellBasedEllipticPdeSolver : public CxxTest::TestSuite
 {
 public:
 
@@ -74,7 +74,7 @@ public:
 
         // Create PDE solvers
         SimpleLinearEllipticSolver<2,2> simple_solver(&mesh, &pde, &bcc);
-        CellBasedPdeSolver<2> pde_solver(&mesh, &pde, &bcc);
+        CellBasedEllipticPdeSolver<2> pde_solver(&mesh, &pde, &bcc);
 
         Vec simple_result = simple_solver.Solve();
         Vec pde_result = pde_solver.Solve();
@@ -93,4 +93,4 @@ public:
     }
 };
 
-#endif //_TESTCELLBASEDPDESOLVER_HPP_
+#endif //_TESTCELLBASEDELLIPTICPDESOLVER_HPP_

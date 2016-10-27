@@ -98,9 +98,6 @@ public:
     }
 };
 
-
-
-
 class TestBidomainWithBathLong : public CxxTest::TestSuite
 {
 public:
@@ -127,7 +124,7 @@ public:
             double x = mesh.GetElement(i)->CalculateCentroid()[0];
             double y = mesh.GetElement(i)->CalculateCentroid()[1];
             double z = mesh.GetElement(i)->CalculateCentroid()[2];
-            if( sqrt((x-0.05)*(x-0.05) + (y-0.05)*(y-0.05) + (z-0.05)*(z-0.05)) > 0.04 )
+            if (sqrt((x-0.05)*(x-0.05) + (y-0.05)*(y-0.05) + (z-0.05)*(z-0.05)) > 0.04)
             {
                 mesh.GetElement(i)->SetAttribute(HeartRegionCode::GetValidBathId());
             }
@@ -181,7 +178,7 @@ public:
         {
             double x = mesh.GetElement(i)->CalculateCentroid()[0];
             double y = mesh.GetElement(i)->CalculateCentroid()[1];
-            if( sqrt((x-0.05)*(x-0.05) + (y-0.05)*(y-0.05)) > 0.02 )
+            if (sqrt((x-0.05)*(x-0.05) + (y-0.05)*(y-0.05)) > 0.02)
             {
                 mesh.GetElement(i)->SetAttribute(HeartRegionCode::GetValidBathId());
             }
@@ -206,10 +203,10 @@ public:
          * We are checking the last time step. This test will only make sure that an upstroke is triggered.
          * We ran longer simulation for 350 ms and a nice AP was observed.
          */
-        for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             // test V = 0 for all bath nodes
-            if(mesh.GetNode(i)->GetRegion()==1) // bath
+            if (mesh.GetNode(i)->GetRegion()==1) // bath
             {
                 TS_ASSERT_DELTA(sol_repl[2*i], 0.0, 1e-12);
             }
@@ -245,12 +242,12 @@ public:
         mesh.ConstructFromMeshReader(reader);
 
         // Set everything outside a central sphere (radius 0.4) to be bath
-        for(unsigned i=0; i<mesh.GetNumElements(); i++)
+        for (unsigned i=0; i<mesh.GetNumElements(); i++)
         {
             double x = mesh.GetElement(i)->CalculateCentroid()[0];
             double y = mesh.GetElement(i)->CalculateCentroid()[1];
             double z = mesh.GetElement(i)->CalculateCentroid()[2];
-            if( sqrt((x-0.1)*(x-0.1) + (y-0.1)*(y-0.1) + (z-0.1)*(z-0.1)) > 0.03)
+            if (sqrt((x-0.1)*(x-0.1) + (y-0.1)*(y-0.1) + (z-0.1)*(z-0.1)) > 0.03)
             {
                 mesh.GetElement(i)->SetAttribute(1);
             }

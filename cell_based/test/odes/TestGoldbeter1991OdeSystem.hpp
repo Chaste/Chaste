@@ -59,14 +59,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
-
-
 /*
  * Basic tests only - no archiving test
  *
  */
-
-
 class TestGoldbeter1991OdeSystem : public CxxTest::TestSuite
 {
 public:

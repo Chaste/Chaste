@@ -138,6 +138,4 @@ public:
     c_matrix<double,SPACE_DIM,SPACE_DIM>& operator[](const unsigned global_index);
 };
 
-
-
 #endif /*ABSTRACTCONDUCTIVITYTENSORS_HPP_*/

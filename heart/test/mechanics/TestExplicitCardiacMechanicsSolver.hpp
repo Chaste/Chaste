@@ -148,14 +148,14 @@ public:
         impl_solver.Initialise();
 
         double dt = 0.25;
-        for(double t=0; t<3; t+=dt)
+        for (double t=0; t<3; t+=dt)
         {
             expl_solver.Solve(t,t+dt,dt);
             impl_solver.Solve(t,t+dt,dt);
 
             // computations should be identical
             TS_ASSERT_EQUALS(expl_solver.GetNumNewtonIterations(), impl_solver.GetNumNewtonIterations());
-            for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+            for (unsigned i=0; i<mesh.GetNumNodes(); i++)
             {
                 TS_ASSERT_DELTA(expl_solver.rGetDeformedPosition()[i](0),  impl_solver.rGetDeformedPosition()[i](0), 1e-9);
                 TS_ASSERT_DELTA(expl_solver.rGetDeformedPosition()[i](1),  impl_solver.rGetDeformedPosition()[i](1), 1e-9);
@@ -213,7 +213,7 @@ public:
         double t1 = 0.25; // to be quite quick (min stretch ~=0.88), make this 5/4 (?) say for min stretch < 0.7
         double dt = 0.025;
 
-        for(double t=t0; t<t1; t+=dt)
+        for (double t=t0; t<t1; t+=dt)
         {
             //std::cout << "\n **** t = " << t << " ****\n" << std::flush;
 
@@ -228,7 +228,7 @@ public:
             impl_solver.WriteCurrentSpatialSolution("solution","nodes",counter);
 
             // the solutions turn out to be very close to each other
-            for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+            for (unsigned i=0; i<mesh.GetNumNodes(); i++)
             {
                 TS_ASSERT_DELTA(expl_solver.rGetDeformedPosition()[i](0),  impl_solver.rGetDeformedPosition()[i](0), 2e-3);
                 TS_ASSERT_DELTA(expl_solver.rGetDeformedPosition()[i](1),  impl_solver.rGetDeformedPosition()[i](1), 2e-3);
@@ -369,7 +369,7 @@ public:
         y[2] = -0.0077;
         y[3] = 0.0;
 
-        for(unsigned i=0; i < tension_fractions.size();i++)
+        for (unsigned i=0; i < tension_fractions.size();i++)
         {
             problem_defn.SetApplyIsotropicCrossFibreTension(true,tension_fractions[i]);
 
@@ -595,11 +595,10 @@ public:
             TS_ASSERT_DELTA(solver.rGetDeformedPosition()[nodes[node]](2), z[node], 1e-3);
         }
 
-        // tidy up memory
+        // Tidy up memory
         delete p_fine_mesh;
         delete p_pair;
     }
-
 };
 
 #endif /*TESTEXPLICITCARDIACMECHANICSSOLVER_HPP_*/

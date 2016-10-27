@@ -98,7 +98,7 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::MakeVtkMesh()
         {
             p_cell = vtkTetra::New();
         }
-        else if(ELEMENT_DIM == 3 && current_element.size() == 10)
+        else if (ELEMENT_DIM == 3 && current_element.size() == 10)
         {
             p_cell = vtkQuadraticTetra::New();
         }
@@ -285,7 +285,7 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddTensorCellData(std::string dataNam
     p_vectors->SetNumberOfComponents(SPACE_DIM*SPACE_DIM);
     for (unsigned i=0; i<dataPayload.size(); i++)
     {
-        if(SPACE_DIM == 2)
+        if (SPACE_DIM == 2)
         {
             p_vectors->InsertNextValue(dataPayload[i](0)); //a11
             p_vectors->InsertNextValue(dataPayload[i](1)); //a12
@@ -321,7 +321,7 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddTensorCellData(std::string dataNam
     p_vectors->SetNumberOfComponents(SPACE_DIM*SPACE_DIM);
     for (unsigned i=0; i<dataPayload.size(); i++)
     {
-        if(SPACE_DIM == 2)
+        if (SPACE_DIM == 2)
         {
             p_vectors->InsertNextValue(dataPayload[i](0,0)); //a11
             p_vectors->InsertNextValue(dataPayload[i](0,1)); //a12
@@ -516,7 +516,7 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddTensorPointData(std::string dataNa
     p_vectors->SetNumberOfComponents(SPACE_DIM*SPACE_DIM);
     for (unsigned i=0; i<dataPayload.size(); i++)
     {
-        if(SPACE_DIM == 2)
+        if (SPACE_DIM == 2)
         {
             p_vectors->InsertNextValue(dataPayload[i](0,0)); //a11
             p_vectors->InsertNextValue(dataPayload[i](0,1)); //a12
@@ -597,11 +597,11 @@ void VtkMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(
       AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>& rMesh,
       bool keepOriginalElementIndexing)
 {
-    //Have we got a parallel mesh?
+    // Have we got a parallel mesh?
     this->mpDistributedMesh = dynamic_cast<DistributedTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* >(&rMesh);
     this->mpMixedMesh = dynamic_cast<MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>* >(&rMesh);
 
-    if ( PetscTools::IsSequential() || !mWriteParallelFiles || (this->mpDistributedMesh == nullptr && mpNodesOnlyMesh == nullptr) )
+    if (PetscTools::IsSequential() || !mWriteParallelFiles || (this->mpDistributedMesh == NULL && mpNodesOnlyMesh == NULL))
     {
         AbstractTetrahedralMeshWriter<ELEMENT_DIM,SPACE_DIM>::WriteFilesUsingMesh( rMesh,keepOriginalElementIndexing );
     }
@@ -748,10 +748,7 @@ void VtkMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(
     }
 }
 
-/////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////////////
-
 template class VtkMeshWriter<1,1>;
 template class VtkMeshWriter<1,2>;
 template class VtkMeshWriter<1,3>;

@@ -225,7 +225,7 @@ public:
     AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rGetMesh();
 
     /**
-     * @return a tetrahedral mesh for use with a PDE modifier.
+     * @return a shared to a tetrahedral mesh, for use with a PDE modifier.
      * This method is called by AbstractGrowingDomainPdeModifier.
      *
      * As this method is pure virtual, it must be overridden
@@ -234,17 +234,16 @@ public:
     virtual TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* GetTetrahedralMeshForPdeModifier()=0;
 
     /**
-     * @param pdeNodeIndex index of a node in a tetrahedral mesh for use
-     *         with a PDE modifier
+     * @param pdeNodeIndex index of a node in a tetrahedral mesh for use with a PDE modifier
      *
      * @return if a node, specified by its index in a tetrahedral mesh for use
-     *         with a PDE modifier, is associated with an apoptotic cell.
+     *         with a PDE modifier, is associated with a non-apoptotic cell.
      * This method can be called by PDE classes.
      *
      * As this method is pure virtual, it must be overridden
      * in subclasses.
      */
-    virtual bool IsPdeNodeAssociatedWithApoptoticCell(unsigned pdeNodeIndex)=0;
+    virtual bool IsPdeNodeAssociatedWithNonApoptoticCell(unsigned pdeNodeIndex);
 
     /**
      * @param pdeNodeIndex index of a node in a tetrahedral mesh for use
@@ -475,7 +474,7 @@ public:
      *
      * @return whether there is a cell attached.
      */
-    bool IsCellAttachedToLocationIndex(unsigned index);
+    virtual bool IsCellAttachedToLocationIndex(unsigned index);
 
     /**
      * Set the cell corresponding to a given location index.

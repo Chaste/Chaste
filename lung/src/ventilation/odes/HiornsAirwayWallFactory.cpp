@@ -66,15 +66,11 @@ HiornsAirwayWallFactory::HiornsAirwayWallFactory(bool useStrahlerOrder) : mpWalk
 
 HiornsAirwayWallFactory::~HiornsAirwayWallFactory()
 {
-    if(mpWalker)
+    if (mpWalker)
     {
         delete mpWalker;
     }
 }
-
-
-
-
 
 double HiornsAirwayWallFactory::GetmuForGeneration(unsigned generation)
 {
@@ -102,13 +98,11 @@ double HiornsAirwayWallFactory::GetAlpha0ForGeneration(unsigned generation)
     return mAlpha0[generation];
 }
 
-
-
 HiornsAirwayWall* HiornsAirwayWallFactory::CreateAirwayWallForElement(Element<1,3>* pElement)
 {
     unsigned order = 0;
 
-    if(mUseStrahlerOrder)
+    if (mUseStrahlerOrder)
     {
         order = mpWalker->GetElementStrahlerOrder(pElement);
     }
@@ -168,7 +162,7 @@ void HiornsAirwayWallFactory::SetMesh(AbstractTetrahedralMesh<1,3>* pMesh)
 
     mpWalker = new AirwayTreeWalker(*pMesh, 0u);
 
-    if(mUseStrahlerOrder)
+    if (mUseStrahlerOrder)
     {
         mMaxOrder = mpWalker->GetMaxElementStrahlerOrder();
     }
