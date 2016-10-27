@@ -60,56 +60,56 @@ public:
         // Test member variables are correctly initialised
         TS_ASSERT_EQUALS(arrays.HasActiveSources(), true);
         TS_ASSERT_EQUALS(arrays.GetMesh()->GetNumNodes(), 583u);
-        TS_ASSERT_EQUALS(arrays.GetMesh()->GetNumElements(), 6u);
+        TS_ASSERT_EQUALS(arrays.GetMesh()->GetNumElements(), 5u);
 
         // Test that each multi_array member has the correct shape
         TS_ASSERT_EQUALS(arrays.rGetModifiableForceGrids().shape()[0], 2u);
-        TS_ASSERT_EQUALS(arrays.rGetModifiableForceGrids().shape()[1], 256u);
-        TS_ASSERT_EQUALS(arrays.rGetModifiableForceGrids().shape()[2], 256u);
+        TS_ASSERT_EQUALS(arrays.rGetModifiableForceGrids().shape()[1], 128u);
+        TS_ASSERT_EQUALS(arrays.rGetModifiableForceGrids().shape()[2], 128u);
 
         TS_ASSERT_EQUALS(arrays.rGetModifiableRightHandSideGrids().shape()[0], 3u);
-        TS_ASSERT_EQUALS(arrays.rGetModifiableRightHandSideGrids().shape()[1], 256u);
-        TS_ASSERT_EQUALS(arrays.rGetModifiableRightHandSideGrids().shape()[2], 256u);
+        TS_ASSERT_EQUALS(arrays.rGetModifiableRightHandSideGrids().shape()[1], 128u);
+        TS_ASSERT_EQUALS(arrays.rGetModifiableRightHandSideGrids().shape()[2], 128u);
 
-        TS_ASSERT_EQUALS(arrays.rGetOperator1().shape()[0], 256u);
-        TS_ASSERT_EQUALS(arrays.rGetOperator1().shape()[1], 129u);
-        TS_ASSERT_EQUALS(arrays.rGetOperator2().shape()[0], 256u);
-        TS_ASSERT_EQUALS(arrays.rGetOperator2().shape()[1], 129u);
+        TS_ASSERT_EQUALS(arrays.rGetOperator1().shape()[0], 128u);
+        TS_ASSERT_EQUALS(arrays.rGetOperator1().shape()[1], 65u);
+        TS_ASSERT_EQUALS(arrays.rGetOperator2().shape()[0], 128u);
+        TS_ASSERT_EQUALS(arrays.rGetOperator2().shape()[1], 65u);
 
         TS_ASSERT_EQUALS(arrays.rGetModifiableFourierGrids().shape()[0], 3u);
-        TS_ASSERT_EQUALS(arrays.rGetModifiableFourierGrids().shape()[1], 256u);
-        TS_ASSERT_EQUALS(arrays.rGetModifiableFourierGrids().shape()[2], 129u);
-        TS_ASSERT_EQUALS(arrays.rGetModifiablePressureGrid().shape()[0], 256u);
-        TS_ASSERT_EQUALS(arrays.rGetModifiablePressureGrid().shape()[1], 129u);
+        TS_ASSERT_EQUALS(arrays.rGetModifiableFourierGrids().shape()[1], 128u);
+        TS_ASSERT_EQUALS(arrays.rGetModifiableFourierGrids().shape()[2], 65u);
+        TS_ASSERT_EQUALS(arrays.rGetModifiablePressureGrid().shape()[0], 128u);
+        TS_ASSERT_EQUALS(arrays.rGetModifiablePressureGrid().shape()[1], 65u);
 
-        TS_ASSERT_EQUALS(arrays.rGetSin2x().size(), 256u);
-        TS_ASSERT_EQUALS(arrays.rGetSin2y().size(), 129u);
+        TS_ASSERT_EQUALS(arrays.rGetSin2x().size(), 128u);
+        TS_ASSERT_EQUALS(arrays.rGetSin2y().size(), 65u);
 
         // Expected values of sin(x) and sin(2x), used below
         std::vector<double> sin_x;
         std::vector<double> sin_2x;
-        for (unsigned i=0; i<256; i++)
+        for (unsigned i = 0; i < 128; i++)
         {
-            sin_x.push_back(sin(M_PI * (double) i / 256));
-            sin_2x.push_back(sin(2 * M_PI * (double) i / 256));
+            sin_x.push_back(sin(M_PI * (double) i / 128));
+            sin_2x.push_back(sin(2 * M_PI * (double) i / 128));
         }
 
         // Test that mSin2x and mSin2y are correctly initialised
-        for (unsigned i=0; i<256; i++)
+        for (unsigned i=0; i<128; i++)
         {
             TS_ASSERT_DELTA(arrays.rGetSin2x()[i], sin_2x[i], 1e-4);
         }
-        for (unsigned j=0; j<129; j++)
+        for (unsigned j=0; j<65; j++)
         {
             TS_ASSERT_DELTA(arrays.rGetSin2y()[j], sin_2x[j], 1e-4);
         }
 
-        for (unsigned i=0; i<256; i++)
+        for (unsigned i=0; i<128; i++)
         {
-            for (unsigned j=0; j<129; j++)
+            for (unsigned j=0; j<65; j++)
             {
-                TS_ASSERT_DELTA(arrays.rGetOperator1()[i][j], 0.5*256*256*(sin_2x[i]*sin_2x[i] + sin_2x[j]*sin_2x[j]), 1e-4);
-                TS_ASSERT_DELTA(arrays.rGetOperator2()[i][j], 1.0 + 2.0*256*256*(sin_x[i]*sin_x[i] + sin_x[j]*sin_x[j]), 1e-4);
+                TS_ASSERT_DELTA(arrays.rGetOperator1()[i][j], 0.5*128*128*(sin_2x[i]*sin_2x[i] + sin_2x[j]*sin_2x[j]), 1e-4);
+                TS_ASSERT_DELTA(arrays.rGetOperator2()[i][j], 1.0 + 2.0*128*128*(sin_x[i]*sin_x[i] + sin_x[j]*sin_x[j]), 1e-4);
             }
         }
 
