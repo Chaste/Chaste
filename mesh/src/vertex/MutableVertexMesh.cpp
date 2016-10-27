@@ -1299,7 +1299,8 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
 
                 PerformNodeMerge(pNodeA, pNodeB);
                 RemoveDeletedNodes();
-                RemoveDeletedFaces();
+                if (ELEMENT_DIM==3u)
+                    RemoveDeletedFaces();
                 break;
             }
             case 2:
