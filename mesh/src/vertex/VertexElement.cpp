@@ -210,21 +210,74 @@ bool VertexElement<ELEMENT_DIM, SPACE_DIM>::FaceIsOrientatedAntiClockwise(unsign
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VertexElement<ELEMENT_DIM, SPACE_DIM>::FaceUpdateNode(const unsigned& rIndex, Node<SPACE_DIM>* pNode)
+unsigned VertexElement<ELEMENT_DIM, SPACE_DIM>::MonolayerElementDeleteNodes(const Node<SPACE_DIM>* pApicalNode1,
+        const Node<SPACE_DIM>* pBasalNode1, Node<SPACE_DIM>* pApicalNode2, Node<SPACE_DIM>* pBasalNode2)
 {
-    assert(rIndex < this->mNodes.size());
+    NEVER_REACHED;
+}
 
-    // Update the node at this location
-    this->mNodes[rIndex] = pNode;
+template<>
+unsigned VertexElement<3, 3>::MonolayerElementDeleteNodes(const Node<3>* pApicalNodeDelete,
+        const Node<3>* pBasalNodeDelete, Node<3>* pApicalNodeStay, Node<3>* pBasalNodeStay)
+{
+    const unsigned apical_node_delete_index = pApicalNodeDelete->GetIndex();
+    const unsigned basal_node_delete_index = pBasalNodeDelete->GetIndex();
+    const unsigned apical_node_stay_index = pApicalNodeStay->GetIndex();
+
+    // We will delete the node1's from the element and faces and also remove the face from the element.
+    // Operation for faces: I apical & basal faces will just remove the node1's
+    // II the lateral face not belong to the deleted element needs to update node1's to node2's
+    // III the lateral face belong to the deleted element need to be remove from the registry of neighbouring element
+    this->DeleteNode(this->GetNodeLocalIndex(apical_node_delete_index));
+    this->DeleteNode(this->GetNodeLocalIndex(basal_node_delete_index));
+    // Operation I
+    this->GetFace(0)->FaceDeleteNode(pBasalNodeDelete);
+    this->GetFace(1)->FaceDeleteNode(pApicalNodeDelete);
+
+    unsigned delete_lateral_face_index(UINT_MAX);
+    // Operation II and III To update another face and remove the extra face
+    for (unsigned face_index=2 ; face_index<this->GetNumFaces() ; ++face_index)
+    {
+        VertexElement<2, 3>* p_face = this->GetFace(face_index);
+        const unsigned apical_node1_local_index = p_face->GetNodeLocalIndex(apical_node_delete_index);
+        if (apical_node1_local_index != UINT_MAX)
+        {
+            if (p_face->GetNodeLocalIndex(apical_node_stay_index) == UINT_MAX)
+            {
+                // Operation II
+                p_face->FaceUpdateNode(apical_node1_local_index, pApicalNodeStay);
+                const unsigned basal_node1_local_index = p_face->GetNodeLocalIndex(basal_node_delete_index);
+                p_face->FaceUpdateNode(basal_node1_local_index, pBasalNodeStay);
+            }
+            else
+            {
+                // Operation III
+                delete_lateral_face_index = p_face->GetIndex();
+                this->DeleteFace(face_index);
+                // To compensate the changes in NumFaces
+                --face_index;
+            }
+        }
+    }
+    return delete_lateral_face_index;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VertexElement<ELEMENT_DIM, SPACE_DIM>::FaceDeleteNode(const unsigned& rIndex)
+void VertexElement<ELEMENT_DIM, SPACE_DIM>::FaceUpdateNode(const unsigned Index, Node<SPACE_DIM>* pNode)
 {
-    assert(rIndex < this->mNodes.size());
+    assert(Index < this->mNodes.size());
+
+    // Update the node at this location
+    this->mNodes[Index] = pNode;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VertexElement<ELEMENT_DIM, SPACE_DIM>::FaceDeleteNode(const unsigned Index)
+{
+    assert(Index < this->mNodes.size());
 
     // Remove the node at rIndex (removes node from element)
-    this->mNodes.erase(this->mNodes.begin() + rIndex);
+    this->mNodes.erase(this->mNodes.begin() + Index);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -239,12 +292,12 @@ void VertexElement<ELEMENT_DIM, SPACE_DIM>::FaceDeleteNode(const Node<SPACE_DIM>
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VertexElement<ELEMENT_DIM, SPACE_DIM>::FaceAddNode(Node<SPACE_DIM>* pNode, const unsigned& rIndex)
+void VertexElement<ELEMENT_DIM, SPACE_DIM>::FaceAddNode(Node<SPACE_DIM>* pNode, const unsigned Index)
 {
-    assert(rIndex < this->mNodes.size());
+    assert(Index < this->mNodes.size());
 
     // Add pNode to rIndex+1 element of mNodes pushing the others up
-    this->mNodes.insert(this->mNodes.begin() + rIndex+1,  pNode);
+    this->mNodes.insert(this->mNodes.begin() + Index+1,  pNode);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

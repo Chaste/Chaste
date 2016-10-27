@@ -1299,6 +1299,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
 
                 PerformNodeMerge(pNodeA, pNodeB);
                 RemoveDeletedNodes();
+                RemoveDeletedFaces();
                 break;
             }
             case 2:
@@ -1625,6 +1626,73 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformNodeMerge(Node<SPACE_DIM>
     assert(!(this->mNodes[node_B_index]->IsDeleted()));
     this->mNodes[node_B_index]->MarkAsDeleted();
     mDeletedNodeIndices.push_back(node_B_index);
+}
+
+template<>
+void MutableVertexMesh<3, 3>::PerformNodeMerge(Node<3>* pNodeA, Node<3>* pNodeB)
+{
+    // Specialization for monolayer
+    // Find the sets of elements containing each of the nodes, sorted by index
+    std::set<unsigned> nodeA_elem_indices = pNodeA->rGetContainingElementIndices();
+    std::set<unsigned> nodeB_elem_indices = pNodeB->rGetContainingElementIndices();
+    // Set NodeB as the one with less elements
+    if (nodeA_elem_indices.size() < nodeB_elem_indices.size())
+    {
+        std::swap(pNodeA, pNodeB);
+        swap(nodeA_elem_indices, nodeB_elem_indices);
+    }
+
+    const unsigned node_b_index = pNodeB->GetIndex();
+    const unsigned node_type = static_cast<unsigned>(pNodeA->rGetNodeAttributes()[0]);
+    assert( node_type == static_cast<unsigned>(pNodeB->rGetNodeAttributes()[0]) );
+    Node<3>* p_node_x = this->GetNode(pNodeA->GetIndex() + this->GetNumNodes()/2);
+    Node<3>* p_node_y = this->GetNode(node_b_index + this->GetNumNodes()/2);
+
+    // Move node A and X to the respective mid-points
+    pNodeA->rGetModifiableLocation() += 0.5 * this->GetVectorFromAtoB(pNodeA->rGetLocation(), pNodeB->rGetLocation());
+    p_node_x->rGetModifiableLocation() += 0.5 * this->GetVectorFromAtoB(p_node_x->rGetLocation(), p_node_y->rGetLocation());
+
+    // Update the elements previously containing node B to contain node A
+    for (std::set<unsigned>::const_iterator it = nodeB_elem_indices.begin(); it != nodeB_elem_indices.end(); ++it)
+    {
+        // Find the local index of node B in this element
+        VertexElement<3, 3>* p_this_elem = this->mElements[*it];
+        const unsigned node_b_local_index = p_this_elem->GetNodeLocalIndex(node_b_index);
+        assert(node_b_local_index < UINT_MAX); // this element contains node B
+
+        /*
+         * If this element already contains node A(X), then just remove node B(Y).
+         * Otherwise replace it with node A(X) in the element and remove it from mNodes and
+         * also remove the lateral face shared by nodes ABXY from mFaces.
+         */
+        if (nodeA_elem_indices.count(*it) != 0)
+        {
+            unsigned delete_lateral_face_index(UINT_MAX);
+            if (node_type == 2u)
+            {
+                delete_lateral_face_index = p_this_elem->MonolayerElementDeleteNodes(pNodeB, p_node_y, pNodeA, p_node_x);
+            } else
+            {
+                assert(node_type == 1u);
+                delete_lateral_face_index = p_this_elem->MonolayerElementDeleteNodes(p_node_y, pNodeB, p_node_x, pNodeA);
+            }
+            assert(delete_lateral_face_index != UINT_MAX);
+            this->mFaces[delete_lateral_face_index]->MarkFaceAsDeleted();
+            mDeletedFaceIndices.push_back(delete_lateral_face_index);
+        }
+        else
+        {
+            // Replace node B with node A in this element
+            p_this_elem->UpdateNode(node_b_local_index, pNodeA);
+        }
+    }
+
+    assert(!(pNodeB->IsDeleted()));
+    pNodeB->MarkAsDeleted();
+    mDeletedNodeIndices.push_back(node_b_index);
+    assert(!(p_node_y->IsDeleted()));
+    p_node_y->MarkAsDeleted();
+    mDeletedNodeIndices.push_back(p_node_y->GetIndex());
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -2375,40 +2443,40 @@ template<>
 void MutableVertexMesh<3, 3>::PerformT2Swap(VertexElement<3,3>& rElement)
 {
     // The given element must be triangular for us to be able to perform a T2 swap on it
-    assert(rElement.GetNumNodes() == 6);
+    assert(rElement.GetNumNodes() >= 6);
 
-    VertexElement<2, 3>& r_face1 ( *(rElement.GetFace(0)) );
-    VertexElement<2, 3>& r_face2 ( *(rElement.GetFace(1)) );
+    VertexElement<2, 3>& r_basal_face ( *(rElement.GetFace(0)) );
+    VertexElement<2, 3>& r_apical_face ( *(rElement.GetFace(1)) );
     // Note that we define this vector before setting it, as otherwise the profiling build will break (see #2367)
-    const c_vector<double, 3> new_node_location1 (r_face1.GetCentroid());
-    const c_vector<double, 3> new_node_location2 (r_face2.GetCentroid());
-    mLastT2SwapLocation = new_node_location1;
+    const c_vector<double, 3> new_basal_node_location (r_basal_face.GetCentroid());
+    const c_vector<double, 3> new_apical_node_location (r_apical_face.GetCentroid());
+    mLastT2SwapLocation = new_basal_node_location;
 
     // Create a new node at the element's centroid; this will be a boundary node if any existing nodes were on the boundary
     bool is_node_on_boundary = false;
     for (unsigned i=0; i<3; i++)
     {
-        if (r_face1.GetNode(i)->IsBoundaryNode())
+        if (r_basal_face.GetNode(i)->IsBoundaryNode())
         {
             is_node_on_boundary = true;
             break;
         }
     }
 
-    Node<3>* p_new_node1 = new Node<3>(GetNumNodes(), new_node_location1, is_node_on_boundary);
-    p_new_node1->AddNodeAttribute(r_face1.rGetElementAttributes()[0]);
-    Node<3>* p_new_node2 = new Node<3>(GetNumNodes(), new_node_location2, is_node_on_boundary);
-    p_new_node2->AddNodeAttribute(r_face2.rGetElementAttributes()[0]);
-    unsigned new_node1_global_index = this->AddNode(p_new_node1);
-    this->AddNode(p_new_node2);
+    Node<3>* p_new_basal_node = new Node<3>(GetNumNodes(), new_basal_node_location, is_node_on_boundary);
+    p_new_basal_node->AddNodeAttribute(1.1);
+    Node<3>* p_new_apical_node = new Node<3>(GetNumNodes(), new_apical_node_location, is_node_on_boundary);
+    p_new_apical_node->AddNodeAttribute(2.1);
+    unsigned new_basal_node_index = this->AddNode(p_new_basal_node);
+    this->AddNode(p_new_apical_node);
 
     // Loop over each of the three nodes contained in r_face1
-    for (unsigned i=0; i<r_face1.GetNumNodes(); i++)
+    for (unsigned i=0; i<r_basal_face.GetNumNodes(); ++i)
     {
         // For each node, find the set of other elements containing it
-        Node<3>* p_node1 = r_face1.GetNode(i);
-        Node<3>* p_node2 = r_face2.GetNode(i);
-        std::set<unsigned> containing_elements = p_node1->rGetContainingElementIndices();
+        Node<3>* p_tmp_basal_node = r_basal_face.GetNode(i);
+        Node<3>* p_tmp_apical_node = r_apical_face.GetNode(i);
+        std::set<unsigned> containing_elements = p_tmp_basal_node->rGetContainingElementIndices();
         containing_elements.erase(rElement.GetIndex());
 
         // For each of these elements...
@@ -2422,50 +2490,15 @@ void MutableVertexMesh<3, 3>::PerformT2Swap(VertexElement<3,3>& rElement)
                 EXCEPTION("One of the neighbours of a small triangular element is also a triangle - dealing with this has not been implemented yet");
             }
 
-            if (p_this_elem->GetNodeLocalIndex(new_node1_global_index) == UINT_MAX)
+            if (p_this_elem->GetNodeLocalIndex(new_basal_node_index) == UINT_MAX)
             {
                 // Replace old node with new node for the element and faces (implemented in VE::ReplaceNode(...))
-                p_this_elem->ReplaceNode(p_node1, p_new_node1);
-                p_this_elem->ReplaceNode(p_node2, p_new_node2);
+                p_this_elem->ReplaceNode(p_tmp_basal_node, p_new_basal_node);
+                p_this_elem->ReplaceNode(p_tmp_apical_node, p_new_apical_node);
             }
             else
             {
-                const unsigned node1_index = p_node1->GetIndex();
-                const unsigned node2_index = p_node2->GetIndex();
-                // For this case, we will delete the extra old node from the element and faces
-                // and also remove the face from the element.
-                // Operation for faces: I apical & basal faces will just remove the extra old node
-                // II the lateral face not belong to the deleted element needs to update nodes
-                // III the lateral face belong to the deleted element need to be remove from the registry of neighbouring element
-                p_this_elem->DeleteNode(p_this_elem->GetNodeLocalIndex(node1_index));
-                p_this_elem->DeleteNode(p_this_elem->GetNodeLocalIndex(node2_index));
-                // Operation I
-                p_this_elem->GetFace(0)->FaceDeleteNode(p_node1);
-                p_this_elem->GetFace(1)->FaceDeleteNode(p_node2);
-
-                // Operation II and III To update another face and remove the extra face
-                for (unsigned face_index=2 ; face_index<p_this_elem->GetNumFaces() ; ++face_index)
-                {
-                    VertexElement<2, 3>* p_face = p_this_elem->GetFace(face_index);
-                    const unsigned node1_local_index = p_face->GetNodeLocalIndex(node1_index);
-                    if (node1_local_index != UINT_MAX)
-                    {
-                        if (p_face->GetNodeLocalIndex(new_node1_global_index) == UINT_MAX)
-                        {
-                            // Operation II
-                            p_face->FaceUpdateNode(node1_local_index, p_new_node1);
-                            const unsigned node2_local_index = p_face->GetNodeLocalIndex(node2_index);
-                            p_face->FaceUpdateNode(node2_local_index, p_new_node2);
-                        }
-                        else
-                        {
-                            // Operation III
-                            p_this_elem->DeleteFace(face_index);
-                            // To compensate the changes in NumFaces
-                            --face_index;
-                        }
-                    }
-                }
+                p_this_elem->MonolayerElementDeleteNodes(p_tmp_apical_node, p_tmp_basal_node, p_new_apical_node, p_new_basal_node);
             }
         }
     }

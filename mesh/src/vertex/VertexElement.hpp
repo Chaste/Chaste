@@ -180,19 +180,35 @@ public:
     bool FaceIsOrientatedAntiClockwise(unsigned index) const;
 
     /**
+     * Method for monolayer element. Delete ApicalNode1 and BasalNode1.
+     * This method will delete nodes from the element, apical & basal face,
+     * update lateral face and return the index of the face which contains all
+     * four nodes (does NOT mark it as deleted).
+     *
+     * @param pApicalNodeDelete is the pointer of apical node which will be removed.
+     * @param pBasalNodeDelete is the pointer of basal node which will be removed.
+     * @param pApicalNodeStay is the pointer of apical node which serve as reference to identify the lateral face.
+     * @param pBasalNodeStay is the pointer of basal node similar to pApicalNode2.
+     *
+     * @return the global index of the face which contains all 4 nodes.
+     */
+    unsigned MonolayerElementDeleteNodes(const Node<SPACE_DIM>* pApicalNodeDelete, const Node<SPACE_DIM>* pBasalNodeDelete,
+                                        Node<SPACE_DIM>* pApicalNodeStay, Node<SPACE_DIM>* pBasalNodeStay);
+
+    /**
      * Method for faces. Update node at the given index.
      *
-     * @param rIndex is an local index to which node to change
+     * @param Index is an local index to which node to change
      * @param pNode is a pointer to the replacement node
      */
-    void FaceUpdateNode(const unsigned& rIndex, Node<SPACE_DIM>* pNode);
+    void FaceUpdateNode(const unsigned Index, Node<SPACE_DIM>* pNode);
 
     /**
      * Method for faces. Delete a node with given local index.
      *
-     * @param rIndex is the local index of the node to remove
+     * @param Index is the local index of the node to remove
      */
-    void FaceDeleteNode(const unsigned& rIndex);
+    void FaceDeleteNode(const unsigned Index);
 
     /**
      * Method for faces. Delete a node.
@@ -202,12 +218,12 @@ public:
     void FaceDeleteNode(const Node<SPACE_DIM>* pNode);
 
     /**
-     * Method for faces. Add a node to the element between nodes at rIndex and rIndex+1.
+     * Method for faces. Add a node to the element between nodes at Index and Index+1.
      *
-     * @param rIndex the local index of the node after which the new node is added
+     * @param Index the local index of the node after which the new node is added
      * @param pNode a pointer to the new node
      */
-    void FaceAddNode(Node<SPACE_DIM>* pNode, const unsigned& rIndex);
+    void FaceAddNode(Node<SPACE_DIM>* pNode, const unsigned Index);
 
     /**
      * Delete a face of an element with given local index. This method will
