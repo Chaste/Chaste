@@ -57,6 +57,10 @@ public:
         ImmersedBoundaryMesh<2,2>* p_mesh = gen.GetMesh();
         ImmersedBoundary2dArrays<2> arrays(p_mesh, 0.123, 0.246, true);
 
+        // The default array size is set in the ImmersedBoundaryMesh class to 128
+        TS_ASSERT_EQUALS(p_mesh->GetNumGridPtsX(), 128u);
+        TS_ASSERT_EQUALS(p_mesh->GetNumGridPtsY(), 128u);
+
         // Test member variables are correctly initialised
         TS_ASSERT_EQUALS(arrays.HasActiveSources(), true);
         TS_ASSERT_EQUALS(arrays.GetMesh()->GetNumNodes(), 583u);
