@@ -99,7 +99,7 @@ public:
 
             for (unsigned i = 0; i < 16; i++)
             {
-                double theta = 2.0 * M_PI * (double)i / 16.0;
+                double theta = 2.0 * M_PI * (double)i / 17.0;
 
                 c_vector<double, 2> axis;
                 axis[0] = cos(theta);
@@ -130,13 +130,11 @@ public:
             double hand_calculated_skewness = -0.5656854249;
 
             // Test that the skewness is equal to the hand calculated value
-            TS_ASSERT_DELTA(p_mesh->GetSkewnessOfElementMassDistributionAboutAxis(0, axis) - hand_calculated_skewness,
-                            0.0, 1e-9);
+            TS_ASSERT_DELTA(p_mesh->GetSkewnessOfElementMassDistributionAboutAxis(0, axis) - hand_calculated_skewness, 0.0, 1e-9);
 
             // If we flip the axis, the skewness should be minus what it was before
             axis[1] = -1.0;
-            TS_ASSERT_DELTA(p_mesh->GetSkewnessOfElementMassDistributionAboutAxis(0, axis) + hand_calculated_skewness,
-                            0.0, 1e-9);
+            TS_ASSERT_DELTA(p_mesh->GetSkewnessOfElementMassDistributionAboutAxis(0, axis) + hand_calculated_skewness, 0.0, 1e-9);
         }
     }
 };
