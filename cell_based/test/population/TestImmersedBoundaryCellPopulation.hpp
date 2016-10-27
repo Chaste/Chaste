@@ -132,14 +132,14 @@ public:
         ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Test that GetNumElements() and GetNumNodes() return the correct values
-        TS_ASSERT_EQUALS(cell_population.GetNumElements(), 6u); ///\todo Is this 6, not 5, because of the basement lamina?
+        TS_ASSERT_EQUALS(cell_population.GetNumElements(), 5u);
         TS_ASSERT_EQUALS(cell_population.GetNumNodes(), 583u);
 
         // Test that rGetMesh() returns the mesh correctly
         ImmersedBoundaryMesh<2, 2>& r_mesh = cell_population.rGetMesh();
         TS_ASSERT_EQUALS(r_mesh.GetNumNodes(), 583u);
-        TS_ASSERT_EQUALS(r_mesh.GetNumGridPtsX(), 256u);
-        TS_ASSERT_EQUALS(r_mesh.GetNumGridPtsY(), 256u);
+        TS_ASSERT_EQUALS(r_mesh.GetNumGridPtsX(), 128u);
+        TS_ASSERT_EQUALS(r_mesh.GetNumGridPtsY(), 128u);
         TS_ASSERT_DELTA(r_mesh.GetCharacteristicNodeSpacing(), 0.0115, 1e-4);
         TS_ASSERT_DELTA(r_mesh.GetSpacingRatio(), 2.9610, 1e-4);
 
