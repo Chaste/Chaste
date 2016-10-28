@@ -54,7 +54,7 @@ def release_version(version):
     elif len(parts) < 2:
         version = version + '.0'
     elif len(parts) > 2:
-        raise ValueError('Too many version components')
+        version = '.'.join(parts[:2])
     return version
 
 def version_as_int(version):
