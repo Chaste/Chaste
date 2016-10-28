@@ -32,7 +32,7 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
-
+#include "Debug.hpp"
 #include "AbstractForce.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -48,8 +48,9 @@ AbstractForce<ELEMENT_DIM, SPACE_DIM>::~AbstractForce()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractForce<ELEMENT_DIM, SPACE_DIM>::OutputForceInfo(out_stream& rParamsFile)
 {
+MARK
     std::string force_type = GetIdentifier();
-
+MARK; PRINT_VARIABLE(force_type)
     *rParamsFile << "\t\t<" << force_type << ">\n";
     OutputForceParameters(rParamsFile);
     *rParamsFile << "\t\t</" << force_type << ">\n";

@@ -117,12 +117,10 @@ public:
         // Combine the upper and lower nodes by adding upper_nodes into lower_nodes.
         // The index of upper nodes need to be modified.
         // unsigned lowerNodeLength = lower_nodes.size();
-        unsigned upperNodeLength = mUpperNodes.size();
+        assert ( mUpperNodes.size() == mLowerNodes.size() );
 
-        for (unsigned upperRunningIndex=0; upperRunningIndex<upperNodeLength; ++upperRunningIndex)
-        {
-            mLowerNodes.push_back(mUpperNodes[upperRunningIndex]);
-        }
+        mLowerNodes.insert(this->mLowerNodes.end(), mUpperNodes.begin(), mUpperNodes.end());
+
         mpMesh = new MutableVertexMesh<3, 3>(mLowerNodes, mElements);
         return mpMesh;
     }

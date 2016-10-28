@@ -444,7 +444,9 @@ void VoronoiPrism3dVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_
                 }
             }
 
-            VertexElement<3, 3>* p_elem = new VertexElement<3, 3>(elements.size(), faces_this_elem, faces_orientation);
+            lower_nodes_this_elem.insert(lower_nodes_this_elem.end(), upper_nodes_this_elem.begin(), upper_nodes_this_elem.end());
+            // Use the contructor with std::vector<Node> so that the output will be cleaner
+            VertexElement<3, 3>* p_elem = new VertexElement<3, 3>(elements.size(), faces_this_elem, faces_orientation, lower_nodes_this_elem);
             elements.push_back( p_elem );
         }
     }

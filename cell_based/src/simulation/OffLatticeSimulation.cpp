@@ -32,7 +32,7 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
-
+#include "Debug.hpp"
 #include "OffLatticeSimulation.hpp"
 
 #include <cmath>
@@ -224,17 +224,19 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::SetupSolve()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::OutputAdditionalSimulationSetup(out_stream& rParamsFile)
 {
+MARK
     // Loop over forces
     *rParamsFile << "\n\t<Forces>\n";
     for (typename std::vector<boost::shared_ptr<AbstractForce<ELEMENT_DIM,SPACE_DIM> > >::iterator iter = mForceCollection.begin();
          iter != mForceCollection.end();
          ++iter)
     {
+MARK
         // Output force details
         (*iter)->OutputForceInfo(rParamsFile);
     }
     *rParamsFile << "\t</Forces>\n";
-
+MARK
     // Loop over cell population boundary conditions
     *rParamsFile << "\n\t<CellPopulationBoundaryConditions>\n";
     for (typename std::vector<boost::shared_ptr<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM> > >::iterator iter = mBoundaryConditions.begin();
