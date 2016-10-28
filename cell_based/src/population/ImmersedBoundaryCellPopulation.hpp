@@ -197,6 +197,15 @@ public:
     ImmersedBoundaryElement<DIM, DIM>* GetElement(unsigned elementIndex);
 
     /**
+     * Get a particular ImmersedBoundaryElement representing a lamina.
+     *
+     * @param laminaIndex the global index of the lamina
+     *
+     * @return a pointer to the lamina.
+     */
+    ImmersedBoundaryElement<DIM - 1, DIM>* GetLamina(unsigned laminaIndex);
+
+    /**
      * @return the number of ImmersedBoundaryElements in the cell population.
      */
     unsigned GetNumElements();

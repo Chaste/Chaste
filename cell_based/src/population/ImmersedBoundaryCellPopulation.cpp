@@ -135,6 +135,12 @@ ImmersedBoundaryElement<DIM, DIM>* ImmersedBoundaryCellPopulation<DIM>::GetEleme
 }
 
 template<unsigned DIM>
+ImmersedBoundaryElement<DIM - 1, DIM>* ImmersedBoundaryCellPopulation<DIM>::GetLamina(unsigned laminaIndex)
+{
+    return mpImmersedBoundaryMesh->GetLamina(laminaIndex);
+}
+
+template<unsigned DIM>
 unsigned ImmersedBoundaryCellPopulation<DIM>::GetNumNodes()
 {
     return this->mrMesh.GetNumNodes();
