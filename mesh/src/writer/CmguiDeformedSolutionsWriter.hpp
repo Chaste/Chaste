@@ -160,7 +160,5 @@ public:
                        unsigned finalCounter);
 };
 
-
-
 #endif /*CMGUIDEFORMEDSOLUTIONSWRITER_HPP_*/
 

@@ -170,8 +170,6 @@ public:
             TS_ASSERT(comparer.CompareFiles());
         }
 
-
-
         ChastePoint<1> bad_probe_electrode(0.0021132486540519);
         PseudoEcgCalculator<1,1,1> bad_calculator (mesh,
                                                    bad_probe_electrode,
@@ -279,7 +277,6 @@ public:
             pseudo_ecg = calculator.ComputePseudoEcgAtOneTimeStep(k);
             TS_ASSERT_DELTA(pseudo_ecg, diff_coeff*expected_result,1e-6);
         }
-
     }
 
     /**
@@ -301,11 +298,11 @@ public:
         TetrahedralMesh<1,1> mesh;
         mesh.ConstructFromMeshReader(reader);
 
-        // set the x<0.25 and x>0.75 regions as the bath region
-        for(unsigned i=0; i<mesh.GetNumElements(); i++)
+        // Set the x<0.25 and x>0.75 regions as the bath region
+        for (unsigned i=0; i<mesh.GetNumElements(); i++)
         {
             double x = mesh.GetElement(i)->CalculateCentroid()[0];
-            if( (x<0.25) || (x>0.75) )
+            if ((x<0.25) || (x>0.75))
             {
                 mesh.GetElement(i)->SetAttribute(HeartRegionCode::GetValidBathId());
             }

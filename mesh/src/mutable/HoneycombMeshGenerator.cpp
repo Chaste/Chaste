@@ -115,12 +115,12 @@ HoneycombMeshGenerator::HoneycombMeshGenerator(unsigned numNodesAlongWidth, unsi
             double y = y0 + vertical_spacing*(double)i;
 
             // Avoid floating point errors which upset OffLatticeSimulation
-            if ( (y<0.0) && (y>-1e-12) )
+            if ((y<0.0) && (y>-1e-12))
             {
                 // Difficult to cover - just corrects floating point errors that have occurred from time to time!
-                #define COVERAGE_IGNORE
+                // LCOV_EXCL_START
                 y = 0.0;
-                #undef COVERAGE_IGNORE
+                // LCOV_EXCL_STOP
             }
 
             (*p_node_file) << node++ << "\t" << x << "\t" << y << "\t" << boundary << std::endl;

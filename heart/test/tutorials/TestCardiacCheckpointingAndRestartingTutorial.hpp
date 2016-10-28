@@ -96,8 +96,6 @@ public:
         CardiacSimulationArchiver<BidomainProblem<2> >::Save(bidomain_problem, "BidomainCheckpointingTutorial/saved_simulation");
     }
 
-
-
     /* This is how to restart the test. */
     void TestRestarting() throw(Exception)
     {

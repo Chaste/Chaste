@@ -168,10 +168,7 @@ void NodeAttributes<SPACE_DIM>::SetRadius(double radius)
     mRadius = radius;
 }
 
-//////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-//////////////////////////////////////////////////////////////////////////
-
 template class NodeAttributes<1>;
 template class NodeAttributes<2>;
 template class NodeAttributes<3>;

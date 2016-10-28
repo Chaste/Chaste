@@ -1770,7 +1770,7 @@ public:
              * iteration there should be a flush (despite only having a half-
              * full cache).
              */
-            if ( time_step == 19 )
+            if (time_step == 19)
             {
                 TS_ASSERT_EQUALS(writer.mDataCache.size(), 0u);
             }

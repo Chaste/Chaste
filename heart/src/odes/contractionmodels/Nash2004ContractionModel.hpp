@@ -144,6 +144,4 @@ public:
     }
 };
 
-
-
 #endif /*NASH2004CONTRACTIONMODEL_HPP_*/

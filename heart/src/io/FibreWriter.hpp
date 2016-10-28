@@ -105,7 +105,6 @@ public:
      * (set to write ascii files in the constructor)
      */
      void SetWriteFileAsBinary();
-
 };
 
 #endif /*FIBREWRITER_HPP_*/

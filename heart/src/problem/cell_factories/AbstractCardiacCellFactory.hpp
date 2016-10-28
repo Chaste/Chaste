@@ -154,8 +154,6 @@ public:
      * @return the HeartGeometryInformation object
      */
     HeartGeometryInformation<SPACE_DIM>* GetHeartGeometryInformation();
-
 };
 
 #endif /*ABSTRACTCARDIACCELLFACTORY_HPP_*/
-

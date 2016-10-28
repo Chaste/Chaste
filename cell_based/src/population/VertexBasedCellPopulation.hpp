@@ -437,7 +437,7 @@ public:
     /**
      * Overridden GetTetrahedralMeshForPdeModifier() method.
      *
-     * @return a tetrahedral mesh using the nodes in the VertexMesh
+     * @return a pointer to a tetrahedral mesh using the nodes in the VertexMesh
      * as well as an additional node at the centre of each VertexElement.
      * At present, this method only works in 2D.
      *
@@ -446,16 +446,15 @@ public:
     virtual TetrahedralMesh<DIM, DIM>* GetTetrahedralMeshForPdeModifier();
 
     /**
-     * Overridden IsPdeNodeAssociatedWithApoptoticCell() method.
+     * Overridden IsPdeNodeAssociatedWithNonApoptoticCell() method.
      *
-     * @param pdeNodeIndex index of a node in a tetrahedral mesh for use
-     *         with a PDE modifier
+     * @param pdeNodeIndex inedx of a node in a tetrahedral mesh for use with a PDE modifier
      *
      * @return if a node, specified by its index in a tetrahedral mesh for use
-     *         with a PDE modifier, is associated with an apoptotic cell.
+     *         with a PDE modifier, is associated with a non-apoptotic cell.
      * This method can be called by PDE classes.
      */
-    virtual bool IsPdeNodeAssociatedWithApoptoticCell(unsigned pdeNodeIndex);
+    virtual bool IsPdeNodeAssociatedWithNonApoptoticCell(unsigned pdeNodeIndex);
 
     /**
      * Overridden GetCellDataItemAtPdeNode() method.

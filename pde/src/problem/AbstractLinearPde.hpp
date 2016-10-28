@@ -32,29 +32,21 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
-
-#ifndef SIMPLEUNIFORMSOURCEPDE_HPP_
-#define SIMPLEUNIFORMSOURCEPDE_HPP_
+#ifndef _ABSTRACTLINEARPDE_HPP_
+#define _ABSTRACTLINEARPDE_HPP_
 
 #include "ChasteSerialization.hpp"
-#include <boost/serialization/base_object.hpp>
+#include "ClassIsAbstract.hpp"
 
-#include "AbstractLinearEllipticPde.hpp"
-
-/**
- *  A simple nutrient PDE which is not directly coupled to the cell population.
- */
-template<unsigned DIM>
-class SimpleUniformSourcePde : public AbstractLinearEllipticPde<DIM,DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM = ELEMENT_DIM>
+class AbstractLinearPde
 {
-    friend class TestCellBasedPdes;
-
 private:
 
-    /** Needed for serialization.*/
+    /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
-     * Serialize the PDE and its member variables.
+     * Serialize the PDE object.
      *
      * @param archive the archive
      * @param version the current version of this class
@@ -62,60 +54,23 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-       archive & boost::serialization::base_object<AbstractLinearEllipticPde<DIM, DIM> >(*this);
-       archive & mCoefficient;
     }
-
-    /** Coefficient of consumption of nutrient by cells. */
-    double mCoefficient;
 
 public:
 
     /**
      * Constructor.
-     *
-     * @param coefficient the coefficient of consumption of nutrient by cells (defaults to 0.0)
      */
-    SimpleUniformSourcePde(double coefficient=0.0);
+    AbstractLinearPde()
+    {}
 
     /**
-     * @return mCoefficient
+     * Destructor.
      */
-    double GetCoefficient() const;
-
-    /**
-     * Overridden ComputeConstantInUSourceTerm() method.
-     *
-     * @param rX The point in space
-     * @param pElement The element
-     *
-     * @return the constant in u part of the source term, i.e g(x) in
-     *  Div(D Grad u)  +  f(x)u + g(x) = 0.
-     */
-    double ComputeConstantInUSourceTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement);
-
-    /**
-     * Overridden ComputeLinearInUCoeffInSourceTerm() method.
-     *
-     * @param rX The point in space
-     * @param pElement the element
-     *
-     * @return the coefficient of u in the linear part of the source term, i.e f(x) in
-     *  Div(D Grad u)  +  f(x)u + g(x) = 0.
-     */
-    double ComputeLinearInUCoeffInSourceTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement);
-
-    /**
-     * Overridden ComputeDiffusionTerm() method.
-     *
-     * @param rX The point in space at which the diffusion term is computed
-     *
-     * @return a matrix.
-     */
-    c_matrix<double,DIM,DIM> ComputeDiffusionTerm(const ChastePoint<DIM>& rX);
+    virtual ~AbstractLinearPde()
+    {}
 };
 
-#include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(SimpleUniformSourcePde)
+TEMPLATED_CLASS_IS_ABSTRACT_2_UNSIGNED(AbstractLinearPde)
 
-#endif /*SIMPLEUNIFORMSOURCEPDE_HPP_*/
+#endif //_ABSTRACTLINEARPDE_HPP_

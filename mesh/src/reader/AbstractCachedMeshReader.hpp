@@ -127,7 +127,6 @@ public:
      *  i.e. they use the same iterator.
      */
     ElementData GetNextFaceData();
-
 };
 
 #endif /*ABSTRACTCACHEDMESHREADER_HPP_*/

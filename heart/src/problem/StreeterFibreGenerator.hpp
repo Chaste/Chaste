@@ -158,8 +158,6 @@ public:
                          const std::string& rLeftVentricleFile,
                          bool indexFromZero);
 
-
-
     /**
      * Set the direction from apex to base
      * @param apexToBase  is a non-zero vector.  It will be stored in normalised form

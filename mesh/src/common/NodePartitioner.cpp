@@ -45,11 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "petscao.h"
 #include "petscmat.h"
 
-
 #include <parmetis.h>
-
-
-
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::DumbPartitioning(AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
@@ -82,9 +78,9 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::PetscMatrixPartitioning(AbstractMe
 
     if (!PetscTools::HasParMetis()) //We must have ParMetis support compiled into Petsc
     {
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
         WARN_ONCE_ONLY("PETSc support for ParMetis is not installed.");
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
     }
 
     unsigned num_nodes = rMeshReader.GetNumNodes();
@@ -110,7 +106,7 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::PetscMatrixPartitioning(AbstractMe
     ///\todo #1216 change the number 54 below (row nonzero allocation) to be nonmagic
     PetscTools::SetupMat(connectivity_matrix, num_nodes, num_nodes, 54, PETSC_DECIDE, PETSC_DECIDE, false);
 
-    if ( ! rMeshReader.IsFileFormatBinary() )
+    if (!rMeshReader.IsFileFormatBinary())
     {
         // Advance the file pointer to the first element I own
         for (unsigned element_index = 0; element_index < first_local_element; element_index++)
@@ -131,7 +127,7 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::PetscMatrixPartitioning(AbstractMe
     {
         ElementData element_data;
 
-        if ( rMeshReader.IsFileFormatBinary() )
+        if (rMeshReader.IsFileFormatBinary())
         {
             element_data = rMeshReader.GetElementData(first_local_element + element_index);
         }
@@ -338,7 +334,7 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::GeometricPartitioning(AbstractMesh
             does_contain *= boundary_check;
         }
 
-        if(does_contain)
+        if (does_contain)
         {
             node_ownership[node] = 1;
             rNodesOwned.insert(node);
@@ -372,23 +368,14 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::GeometricPartitioning(AbstractMesh
                 rNodePermutation.push_back(node);
             }
         }
-
     }
     assert(rNodePermutation.size() == num_nodes);
 }
 
-////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////////////
-
 template class NodePartitioner<1,1>;
 template class NodePartitioner<1,2>;
 template class NodePartitioner<1,3>;
 template class NodePartitioner<2,2>;
 template class NodePartitioner<2,3>;
 template class NodePartitioner<3,3>;
-
-
-
-
-

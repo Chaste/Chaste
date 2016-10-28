@@ -40,18 +40,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 
 #include "AbstractPdeModifier.hpp"
-#include "BoundaryConditionsContainer.hpp"
-#include "PdeAndBoundaryConditions.hpp"
 
 /**
- * A modifier class in which has the common functionality of solving a PDE on a Mesh defined by the tissue.
- * A growing spheroid or monolayer for example.
- * The results are stored in CellData.
+ * An abstract modifier class containing functionality common to EllipticGrowingDomainPdeModifier
+ * and ParabolicGrowingDomainPdeModifier, which both solve a linear elliptic or parabolic PDE
+ * coupled to a cell-based simulation on an evolving domain defined by the cell population.
  */
 template<unsigned DIM>
 class AbstractGrowingDomainPdeModifier : public AbstractPdeModifier<DIM>
 {
-    friend class TestGrowingDomainPdeModifiers;
+    friend class TestEllipticGrowingDomainPdeModifier;
+    friend class TestParabolicGrowingDomainPdeModifier;
 
 private:
 
@@ -70,12 +69,27 @@ private:
         archive & boost::serialization::base_object<AbstractPdeModifier<DIM> >(*this);
     }
 
+    /**
+     * Whether to delete the mesh when we are destroyed.
+     * Needed if to free memory if creating meshes.
+     */
+    bool mDeleteMesh;
+
 public:
 
     /**
      * Constructor.
+     *
+     * @param pPde A shared pointer to a linear PDE object (defaults to NULL)
+     * @param pBoundaryCondition A shared pointer to an abstract boundary condition
+     *     (defaults to NULL, corresponding to a constant boundary condition with value zero)
+     * @param isNeumannBoundaryCondition Whether the boundary condition is Neumann (defaults to true)
+     * @param solution solution vector (defaults to NULL)
      */
-    AbstractGrowingDomainPdeModifier();
+    AbstractGrowingDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde=boost::shared_ptr<AbstractLinearPde<DIM,DIM> >(),
+                                     boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition=boost::shared_ptr<AbstractBoundaryCondition<DIM> >(),
+                                     bool isNeumannBoundaryCondition=true,
+                                     Vec solution=NULL);
 
     /**
      * Destructor.

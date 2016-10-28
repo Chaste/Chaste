@@ -111,9 +111,9 @@ void AbstractMaterialLaw<DIM>::Compute2ndPiolaKirchoffStress(c_matrix<double,DIM
 template<unsigned DIM>
 void AbstractMaterialLaw<DIM>::ScaleMaterialParameters(double scaleFactor)
 {
-    #define COVERAGE_IGNORE
+    // LCOV_EXCL_START
     EXCEPTION("[the material law you are using]::ScaleMaterialParameters() has not been implemented\n");
-    #undef COVERAGE_IGNORE
+    // LCOV_EXCL_STOP
 }
 
 template<unsigned DIM>
@@ -174,10 +174,6 @@ void AbstractMaterialLaw<DIM>::TransformStressAndStressDerivative(c_matrix<doubl
     }
 }
 
-////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-////////////////////////////////////////////////////////////////////////////////////
-
-//template class AbstractMaterialLaw<1>;
 template class AbstractMaterialLaw<2>;
 template class AbstractMaterialLaw<3>;

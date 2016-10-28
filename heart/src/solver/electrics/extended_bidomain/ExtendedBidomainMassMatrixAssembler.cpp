@@ -71,12 +71,7 @@ c_matrix<double,3*(DIM+1),3*(DIM+1)> ExtendedBidomainMassMatrixAssembler<DIM>::C
     return ret;
 }
 
-
-
-///////////////////////////////////////////////////////
-// explicit instantiation
-///////////////////////////////////////////////////////
-
+// Explicit instantiation
 template class ExtendedBidomainMassMatrixAssembler<1>;
 template class ExtendedBidomainMassMatrixAssembler<2>;
 template class ExtendedBidomainMassMatrixAssembler<3>;

@@ -144,7 +144,6 @@ public:
         WARNING("This one will get printed " << one << " time");
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
     }
-
 };
 
 #endif //_TESTWARNINGS_HPP_

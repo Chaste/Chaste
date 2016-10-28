@@ -52,9 +52,9 @@ void AbstractIsotropicCompressibleMaterialLaw<DIM>::ComputeStressAndStressDeriva
      * This is covered, but gcov doesn't see this as being covered
      * for some reason, maybe because of optimisations.
      */
-    #define COVERAGE_IGNORE
+    // LCOV_EXCL_START
     assert((DIM==2) || (DIM==3));
-    #undef COVERAGE_IGNORE
+    // LCOV_EXCL_STOP
 
     assert(pressure==0.0);
 
@@ -139,10 +139,6 @@ void AbstractIsotropicCompressibleMaterialLaw<DIM>::ComputeStressAndStressDeriva
     }
 }
 
-////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-////////////////////////////////////////////////////////////////////////////////////
-
-//template class AbstractIsotropicCompressibleMaterialLaw<1>;
 template class AbstractIsotropicCompressibleMaterialLaw<2>;
 template class AbstractIsotropicCompressibleMaterialLaw<3>;

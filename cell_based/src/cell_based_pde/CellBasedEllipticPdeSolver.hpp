@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef CELLBASEDPDESOLVER_HPP_
-#define CELLBASEDPDESOLVER_HPP_
+#ifndef CELLBASEDELLIPTICPDESOLVER_HPP_
+#define CELLBASEDELLIPTICPDESOLVER_HPP_
 
 #include "SimpleLinearEllipticSolver.hpp"
 #include "TetrahedralMesh.hpp"
@@ -45,8 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * known at the cells (nodes), not the Gauss points.
  */
 template<unsigned DIM>
-class CellBasedPdeSolver
-    : public SimpleLinearEllipticSolver<DIM, DIM>
+class CellBasedEllipticPdeSolver : public SimpleLinearEllipticSolver<DIM, DIM>
 {
 private:
 
@@ -62,12 +61,12 @@ protected:
      * The SimpleLinearEllipticSolver version of this method is
      * overloaded using the interpolated source term.
      *
-     * @param rPhi
-     * @param rGradPhi
-     * @param rX
-     * @param rU
-     * @param rGradU
-     * @param pElement
+     * @param rPhi The basis functions, rPhi(i) = phi_i, i=1..numBases
+     * @param rGradPhi Basis gradients, rGradPhi(i,j) = d(phi_j)/d(X_i)
+     * @param rX The point in space
+     * @param rU The unknown as a vector, u(i) = u_i
+     * @param rGradU The gradient of the unknown as a matrix, rGradU(i,j) = d(u_i)/d(X_j)
+     * @param pElement Pointer to the element
      *
      * @return vector term.
      */
@@ -130,14 +129,14 @@ public:
      * @param pPde pointer to the PDE
      * @param pBoundaryConditions pointer to the boundary conditions
      */
-    CellBasedPdeSolver(TetrahedralMesh<DIM,DIM>* pMesh,
-                                       AbstractLinearEllipticPde<DIM,DIM>* pPde,
-                                       BoundaryConditionsContainer<DIM,DIM,1>* pBoundaryConditions);
+    CellBasedEllipticPdeSolver(TetrahedralMesh<DIM,DIM>* pMesh,
+                       AbstractLinearEllipticPde<DIM,DIM>* pPde,
+                       BoundaryConditionsContainer<DIM,DIM,1>* pBoundaryConditions);
 
     /**
      * Destructor.
      */
-    virtual ~CellBasedPdeSolver();
+    virtual ~CellBasedEllipticPdeSolver();
 };
 
-#endif /*CELLBASEDPDESOLVER_HPP_*/
+#endif /*CELLBASEDELLIPTICPDESOLVER_HPP_*/

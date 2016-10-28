@@ -334,8 +334,6 @@ public:
         unsigned small_locals =  factory.GetHigh() - factory.GetLow();
         VecCreateMPI(PETSC_COMM_WORLD, 2*small_locals, 10, &parallel_layout);
 
-
-
         PetscInt lo, hi;
         VecGetOwnershipRange(parallel_layout, &lo, &hi);
 

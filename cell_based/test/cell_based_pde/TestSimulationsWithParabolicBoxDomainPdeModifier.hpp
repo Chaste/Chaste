@@ -46,7 +46,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellMutationStatesWriter.hpp"
 #include "ParabolicBoxDomainPdeModifier.hpp"
 #include "AveragedSourceParabolicPde.hpp"
-#include "ParabolicPdeAndBoundaryConditions.hpp"
 #include "SimpleOxygenBasedCellCycleModel.hpp"
 #include "OffLatticeSimulation.hpp"
 #include "OnLatticeSimulation.hpp"
@@ -93,13 +92,9 @@ private:
         {
             SimpleOxygenBasedCellCycleModel* p_cycle_model = new SimpleOxygenBasedCellCycleModel();
             p_cycle_model->SetDimension(2);
-            ///\todo Change thresholds if necessary (#2687)
-
             CellPtr p_cell(new Cell(p_state, p_cycle_model));
             p_cell->SetCellProliferativeType(p_transit_type);
-
             p_cell->GetCellData()->SetItem("oxygen",1.0);
-
             rCells.push_back(p_cell);
         }
      }
@@ -140,19 +135,19 @@ public:
 
         // Create a PDE modifier and pass it to the simulation Add this first so in place for SimpleTargetArea one (calls cell pop update)
 
-        // Make the PDE and BCs
-        AveragedSourceParabolicPde<2> pde(cell_population, M_DUDT_COEFFICIENT,M_DIFFUSION_CONSTANT,M_UPTAKE_RATE);
-        ConstBoundaryCondition<2> bc(1.0);
-        ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("oxygen");
+        // Create PDE and boundary condition objects
+        MAKE_PTR_ARGS(AveragedSourceParabolicPde<2>, p_pde, (cell_population, M_DUDT_COEFFICIENT,M_DIFFUSION_CONSTANT,M_UPTAKE_RATE));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
-        // Make domain
+        // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         ChastePoint<2> lower(-3.0, -3.0);
         ChastePoint<2> upper(7.0, 7.0);
         ChasteCuboid<2> cuboid(lower, upper);
 
-        // Create a PDE modifier object using this PDE and BCs object
-        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc,cuboid));
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, &cuboid));
+        p_pde_modifier->SetDependentVariableName("oxygen");
+
         simulator.AddSimulationModifier(p_pde_modifier);
 
         // A NagaiHondaForce has to be used together with an AbstractTargetAreaModifier
@@ -161,7 +156,7 @@ public:
 
         simulator.Solve();
 
-        // Test some simulation stats
+        // Test some simulation statistics
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumAllCells(), 9u); // No birth yet
 
         // Test nothing's changed
@@ -170,7 +165,7 @@ public:
         TS_ASSERT_DELTA(node_5_location[1], 0.3625, 1e-4);
 
         // Note this is cell associated with element 5 not node 5
-        TS_ASSERT_DELTA( (simulator.rGetCellPopulation().GetCellUsingLocationIndex(5))->GetCellData()->GetItem("oxygen"), 0.9120, 1e-4);
+        TS_ASSERT_DELTA((simulator.rGetCellPopulation().GetCellUsingLocationIndex(5))->GetCellData()->GetItem("oxygen"), 0.9120, 1e-4);
     }
 
     void TestParabolicBoxDomainPdeModifierWithNodeBasedMonolayer() throw (Exception)
@@ -198,24 +193,24 @@ public:
 
         // Create a PDE modifier and pass it to the simulation Add this first so in place for SimpleTargetArea one (calls cell pop update)
 
-        // Make the PDE and BCs
-        AveragedSourceParabolicPde<2> pde(cell_population, M_DUDT_COEFFICIENT,M_DIFFUSION_CONSTANT,M_UPTAKE_RATE);
-        ConstBoundaryCondition<2> bc(1.0);
-        ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("oxygen");
+        // Create PDE and boundary condition objects
+        MAKE_PTR_ARGS(AveragedSourceParabolicPde<2>, p_pde, (cell_population, M_DUDT_COEFFICIENT,M_DIFFUSION_CONSTANT,M_UPTAKE_RATE));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
-        // Make domain
+        // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         ChastePoint<2> lower(-3.0, -3.0);
         ChastePoint<2> upper(7.0, 7.0);
         ChasteCuboid<2> cuboid(lower, upper);
 
-        // Create a PDE modifier object using this PDE and BCs object
-        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc,cuboid));
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, &cuboid));
+        p_pde_modifier->SetDependentVariableName("oxygen");
+
         simulator.AddSimulationModifier(p_pde_modifier);
 
         simulator.Solve();
 
-        // Test some simulation stats
+        // Test some simulation statistics
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumAllCells(), 9u); // No birth yet
 
         // Test nothing's changed
@@ -256,25 +251,25 @@ public:
 
         // Create a PDE modifier and pass it to the simulation Add this first so in place for SimpleTargetArea one (calls cell pop update)
 
-        // Make the PDE and BCs
-        AveragedSourceParabolicPde<2> pde(cell_population, M_DUDT_COEFFICIENT,M_DIFFUSION_CONSTANT,M_UPTAKE_RATE);
-        ConstBoundaryCondition<2> bc(1.0);
-        ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("oxygen");
+        // Create PDE and boundary condition objects
+        MAKE_PTR_ARGS(AveragedSourceParabolicPde<2>, p_pde, (cell_population, M_DUDT_COEFFICIENT,M_DIFFUSION_CONSTANT,M_UPTAKE_RATE));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
-        // Make domain
+        // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         ChastePoint<2> lower(-3.0, -3.0);
         ChastePoint<2> upper(7.0, 7.0);
         ChasteCuboid<2> cuboid(lower, upper);
 
-        // Create a PDE modifier object using this PDE and BCs object
-        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc,cuboid));
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, &cuboid));
+        p_pde_modifier->SetDependentVariableName("oxygen");
+
         simulator.AddSimulationModifier(p_pde_modifier);
 
         simulator.Solve();
 
-        // Test some simulation stats
-        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumAllCells(), 9u); //No birth yet
+        // Test some simulation statistics
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumAllCells(), 9u); // No birth yet
 
         // Test nothing's changed
         std::vector<double> node_4_location = simulator.GetNodeLocation(4);
@@ -316,28 +311,28 @@ public:
 
         // Create a PDE modifier and pass it to the simulation Add this first so in place for SimpleTargetArea one (calls cell pop update)
 
-        // Make the PDE and BCs
-        AveragedSourceParabolicPde<2> pde(cell_population, M_DUDT_COEFFICIENT,M_DIFFUSION_CONSTANT,M_UPTAKE_RATE);
-        ConstBoundaryCondition<2> bc(1.0);
-        ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("oxygen");
+        // Create PDE and boundary condition objects
+        MAKE_PTR_ARGS(AveragedSourceParabolicPde<2>, p_pde, (cell_population, M_DUDT_COEFFICIENT,M_DIFFUSION_CONSTANT,M_UPTAKE_RATE));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
-        // Make domain
+        // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         ChastePoint<2> lower(-3.0, -3.0);
         ChastePoint<2> upper(7.0, 7.0);
         ChasteCuboid<2> cuboid(lower, upper);
 
-        // Create a PDE modifier object using this PDE and BCs object
-        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc,cuboid));
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, &cuboid));
+        p_pde_modifier->SetDependentVariableName("oxygen");
+
         simulator.AddSimulationModifier(p_pde_modifier);
 
         simulator.Solve();
 
-        // Test some simulation stats
-        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumAllCells(), 9u); //No birth yet
+        // Test some simulation statistics
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumAllCells(), 9u); // No birth yet
 
         // Test nothing's changed
-        std::vector<double> node_4_location = simulator.GetNodeLocation(20+4); //Note this is real node 4
+        std::vector<double> node_4_location = simulator.GetNodeLocation(20+4); // Note this is real node 4
         TS_ASSERT_DELTA(node_4_location[0], 1.5, 1e-4);
         TS_ASSERT_DELTA(node_4_location[1], sqrt(3.0)/2.0, 1e-4);
         TS_ASSERT_DELTA( (simulator.rGetCellPopulation().GetCellUsingLocationIndex(20+4))->GetCellData()->GetItem("oxygen"), 0.8783, 1e-4);
@@ -377,24 +372,24 @@ public:
 
         // Create a PDE modifier and pass it to the simulation Add this first so in place for SimpleTargetArea one (calls cell pop update)
 
-        // Make the PDE and BCs
-        AveragedSourceParabolicPde<2> pde(cell_population, M_DUDT_COEFFICIENT,M_DIFFUSION_CONSTANT,M_UPTAKE_RATE);
-        ConstBoundaryCondition<2> bc(1.0);
-        ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("oxygen");
+        // Create PDE and boundary condition objects
+        MAKE_PTR_ARGS(AveragedSourceParabolicPde<2>, p_pde, (cell_population, M_DUDT_COEFFICIENT,M_DIFFUSION_CONSTANT,M_UPTAKE_RATE));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
-        // Make domain
+        // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         ChastePoint<2> lower(-3.0, -3.0);
         ChastePoint<2> upper(7.0, 7.0);
         ChasteCuboid<2> cuboid(lower, upper);
 
-        // Create a PDE modifier object using this PDE and BCs object
-        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc,cuboid));
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, &cuboid));
+        p_pde_modifier->SetDependentVariableName("oxygen");
+
         simulator.AddSimulationModifier(p_pde_modifier);
 
         simulator.Solve();
 
-        // Test some simulation stats
+        // Test some simulation statistics
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumAllCells(), 9u); // No births yet
 
         // Test nothing's changed
@@ -438,32 +433,31 @@ public:
         simulator.SetSamplingTimestepMultiple(10);
         simulator.SetEndTime(M_TIME_FOR_SIMULATION);
 
-        // Adding update rule(s).
+        // Adding update rule
         MAKE_PTR(DiffusionCaUpdateRule<2u>, p_diffusion_update_rule);
         p_diffusion_update_rule->SetDiffusionParameter(0.1);
         simulator.AddUpdateRule(p_diffusion_update_rule);
 
         // Create a PDE modifier and pass it to the simulation Add this first so in place for SimpleTargetArea one (calls cell pop update)
 
-        // Make the PDE and BCs
-        AveragedSourceParabolicPde<2> pde(cell_population, M_DUDT_COEFFICIENT,M_DIFFUSION_CONSTANT,M_UPTAKE_RATE);
-        ConstBoundaryCondition<2> bc(1.0);
-        ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("oxygen");
+        // Create PDE and boundary condition objects
+        MAKE_PTR_ARGS(AveragedSourceParabolicPde<2>, p_pde, (cell_population, M_DUDT_COEFFICIENT,M_DIFFUSION_CONSTANT,M_UPTAKE_RATE));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
-        // Make domain
+        // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         ChastePoint<2> lower(-3.0, -3.0);
         ChastePoint<2> upper(7.0, 7.0);
         ChasteCuboid<2> cuboid(lower, upper);
 
-        // Create a PDE modifier object using this PDE and BCs object
-        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc,cuboid));
+        // Create a PDE modifier object
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, &cuboid));
+        p_pde_modifier->SetDependentVariableName("oxygen");
         simulator.AddSimulationModifier(p_pde_modifier);
 
         // Run simulation
         simulator.Solve();
 
-        // Test some simulation stats
+        // Test some simulation statistics
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumAllCells(), 9u); // No births yet
 
         // Test nothing's changed

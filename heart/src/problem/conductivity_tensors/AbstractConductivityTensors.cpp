@@ -127,10 +127,7 @@ c_matrix<double,SPACE_DIM,SPACE_DIM>& AbstractConductivityTensors<ELEMENT_DIM,SP
     }
 }
 
-/////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////
-
 template class AbstractConductivityTensors<1,1>;
 template class AbstractConductivityTensors<1,2>;
 template class AbstractConductivityTensors<1,3>;

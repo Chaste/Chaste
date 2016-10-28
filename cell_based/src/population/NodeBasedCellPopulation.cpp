@@ -508,7 +508,7 @@ double NodeBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
     unsigned num_cells = 0;
 
     // Get the location of this node
-    c_vector<double, DIM> node_i_location = GetNode(node_index)->rGetLocation();
+    const c_vector<double, DIM>& r_node_i_location = GetNode(node_index)->rGetLocation();
 
     // Get the set of node indices corresponding to this cell's neighbours
     std::set<unsigned> neighbouring_node_indices = GetNeighbouringNodeIndices(node_index);
@@ -533,7 +533,7 @@ double NodeBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
         Node<DIM>* p_node_j = this->GetNode(*iter);
 
         // Get the location of the neighbouring node
-        c_vector<double, DIM> node_j_location = p_node_j->rGetLocation();
+        const c_vector<double, DIM>& r_node_j_location = p_node_j->rGetLocation();
 
         double neighbouring_cell_radius = p_node_j->GetRadius();
 
@@ -541,7 +541,7 @@ double NodeBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
         assert(cell_radius+neighbouring_cell_radius<mpNodesOnlyMesh->GetMaximumInteractionDistance());
 
         // Calculate the distance between the two nodes and add to cell radius
-        double separation = norm_2(mpNodesOnlyMesh->GetVectorFromAtoB(node_j_location,node_i_location));
+        double separation = norm_2(mpNodesOnlyMesh->GetVectorFromAtoB(r_node_j_location, r_node_i_location));
 
         if (separation < cell_radius+neighbouring_cell_radius)
         {

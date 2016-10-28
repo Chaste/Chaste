@@ -131,10 +131,7 @@ public:
         {
             TS_ASSERT_DELTA(standard_solution[index], mass_lumping_solution[index], tolerance);
         }
-
     }
-
 };
-
 
 #endif /* TESTMONODOMAINMASSLUMPINGLONG_HPP_ */

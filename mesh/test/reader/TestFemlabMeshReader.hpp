@@ -247,7 +247,6 @@ public:
 
         delete mpFemlabMeshReader;
     }
-
 };
 
 #endif //_TESTFEMLABMESHREADER_HPP_

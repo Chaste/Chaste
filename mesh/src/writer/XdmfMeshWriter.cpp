@@ -287,7 +287,7 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteXdmfMasterFile(unsigned number
     DOMText* p_time_text = p_DOM_document->createTextNode(X(time_stream.str()));
     p_time_dataitem_element->appendChild(p_time_text);
 
-    for(unsigned t=0; t<mNumberOfTimePoints; ++t)
+    for (unsigned t=0; t<mNumberOfTimePoints; ++t)
     {
         DOMElement* p_grid_collection_element =  p_DOM_document->createElement(X("Grid"));
         p_grid_collection_element->setAttribute(X("CollectionType"), X("Spatial"));
@@ -379,10 +379,7 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteXdmfMasterFile(unsigned number
 #endif // _MSC_VER
 }
 
-/////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////////////
-
 template class XdmfMeshWriter<1,1>;
 template class XdmfMeshWriter<1,2>;
 template class XdmfMeshWriter<1,3>;

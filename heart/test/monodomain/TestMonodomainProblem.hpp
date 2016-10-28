@@ -339,7 +339,6 @@ public:
         {
             TS_ASSERT_DELTA(voltage_replicated[index], mVoltageReplicated1d2ms[index], 5e-3);
         }
-
     }
 
     // Same as TestMonodomainProblem1D, except the 1D mesh is embedded in 3D space.
@@ -434,7 +433,6 @@ public:
         {
             TS_ASSERT_DELTA(voltage_replicated[index], mVoltageReplicated1d2ms[index],  5e-3);
         }
-
     }
 
     // Solve on a 2D 1mm by 1mm mesh (space step = 0.1mm), stimulating the left
@@ -527,9 +525,7 @@ public:
                 TS_ASSERT_DELTA(voltage_replicated[i], -59.6488, 5e-4);
             }
         }
-
     }
-
 
     // Solve on a 2D 1mm by 1mm mesh (space step = 0.1mm), stimulating in the
     // very centre of the mesh.

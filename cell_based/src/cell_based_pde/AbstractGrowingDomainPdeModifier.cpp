@@ -41,30 +41,39 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "LinearBasisFunction.hpp"
 
 template<unsigned DIM>
-AbstractGrowingDomainPdeModifier<DIM>::AbstractGrowingDomainPdeModifier()
-    : AbstractPdeModifier<DIM>()
+AbstractGrowingDomainPdeModifier<DIM>::AbstractGrowingDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde,
+                                                                        boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition,
+                                                                        bool isNeumannBoundaryCondition,
+                                                                        Vec solution)
+    : AbstractPdeModifier<DIM>(pPde,
+    		                   pBoundaryCondition,
+    		                   isNeumannBoundaryCondition,
+    		                   solution),
+      mDeleteMesh(false)
 {
 }
 
 template<unsigned DIM>
 AbstractGrowingDomainPdeModifier<DIM>::~AbstractGrowingDomainPdeModifier()
 {
+    if (mDeleteMesh)
+    {
+        delete this->mpFeMesh;
+    }
 }
 
 template<unsigned DIM>
 void AbstractGrowingDomainPdeModifier<DIM>::GenerateFeMesh(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
-    ///\todo Improve memory management, e.g. by making mpFeMesh a shared_ptr (#2687)
-
-    if (this->mDeleteMesh)
+    if (mDeleteMesh)
     {
         // If a mesh has been created on a previous time-step then we need to tidy it up
         assert(this->mpFeMesh != NULL);
         delete this->mpFeMesh;
     }
+    mDeleteMesh = (dynamic_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation) == NULL);
 
     // Get the finite element mesh via the cell population
-    this->mDeleteMesh = (dynamic_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation) == NULL);
     this->mpFeMesh = rCellPopulation.GetTetrahedralMeshForPdeModifier();
 }
 
@@ -83,6 +92,7 @@ void AbstractGrowingDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulatio
     {
         unsigned tet_node_index = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);
 
+        ///\todo Consider how to remove dynamic_casts here
         if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL)
         {
             // Offset to relate elements in vertex mesh to nodes in tetrahedral mesh
@@ -98,7 +108,7 @@ void AbstractGrowingDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulatio
 
         double solution_at_node = solution_repl[tet_node_index];
 
-        cell_iter->GetCellData()->SetItem(this->mCachedDependentVariableName, solution_at_node);
+        cell_iter->GetCellData()->SetItem(this->mDependentVariableName, solution_at_node);
 
         if (this->mOutputGradient)
         {
@@ -135,21 +145,20 @@ void AbstractGrowingDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulatio
             // Divide by number of containing elements
             solution_gradient /= p_tet_node->GetNumContainingElements();
 
-            ///\todo Investigate why the lines below are commented (#2687)
             switch (DIM)
             {
-    //            case 1:
-    //                cell_iter->GetCellData()->SetItem(this->mCachedDependentVariableName+"_grad_x", solution_gradient(0));
-    //                break;
-                case 2:
-                    cell_iter->GetCellData()->SetItem(this->mCachedDependentVariableName+"_grad_x", solution_gradient(0));
-                    cell_iter->GetCellData()->SetItem(this->mCachedDependentVariableName+"_grad_y", solution_gradient(1));
+                case 1:
+                    cell_iter->GetCellData()->SetItem(this->mDependentVariableName+"_grad_x", solution_gradient(0));
                     break;
-    //            case 3:
-    //                cell_iter->GetCellData()->SetItem(this->mCachedDependentVariableName+"_grad_x", solution_gradient(0));
-    //                cell_iter->GetCellData()->SetItem(this->mCachedDependentVariableName+"_grad_y", solution_gradient(1));
-    //                cell_iter->GetCellData()->SetItem(this->mCachedDependentVariableName+"_grad_z", solution_gradient(2));
-    //                break;
+                case 2:
+                    cell_iter->GetCellData()->SetItem(this->mDependentVariableName+"_grad_x", solution_gradient(0));
+                    cell_iter->GetCellData()->SetItem(this->mDependentVariableName+"_grad_y", solution_gradient(1));
+                    break;
+                case 3:
+                    cell_iter->GetCellData()->SetItem(this->mDependentVariableName+"_grad_x", solution_gradient(0));
+                    cell_iter->GetCellData()->SetItem(this->mDependentVariableName+"_grad_y", solution_gradient(1));
+                    cell_iter->GetCellData()->SetItem(this->mDependentVariableName+"_grad_z", solution_gradient(2));
+                    break;
                 default:
                     NEVER_REACHED;
             }

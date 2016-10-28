@@ -77,7 +77,6 @@ ElementData AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextEdgeData()
     return GetNextFaceData();
 }
 
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::vector<double> AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNode(unsigned index)
 {
@@ -275,7 +274,6 @@ void AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::ElementIterator::CacheData(unsi
     mIndex = index;
 }
 
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 typename AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::NodeIterator
     AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNodeIteratorBegin()
@@ -372,11 +370,7 @@ void AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::NodeIterator::CacheData(unsigne
     mIndex = index;
 }
 
-
-/////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////////////
-
 template class AbstractMeshReader<0,1>;
 template class AbstractMeshReader<1,1>;
 template class AbstractMeshReader<1,2>;

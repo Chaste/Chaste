@@ -91,7 +91,6 @@ public:
      * Destructor
      */
     ~ZeroNetChargeElectrodes();
-
 };
 
 #endif /*ZERONETCHARGEELECTRODES_HPP_*/

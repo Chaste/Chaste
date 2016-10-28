@@ -116,11 +116,11 @@ void ReplicatableVector::Resize(unsigned size)
     }
     catch(std::bad_alloc &badAlloc)
     {
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
         std::cout << "Failed to allocate a ReplicatableVector of size " << size  << std::endl;
         PetscTools::ReplicateException(true);
         throw badAlloc;
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
     }
     PetscTools::ReplicateException(false);
 }
@@ -175,7 +175,7 @@ void ReplicatableVector::ReplicatePetscVector(Vec vec)
 
     // Replicate the data
 //PETSc-3.x.x or PETSc-2.3.3
-#if ( (PETSC_VERSION_MAJOR == 3) || (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 3 && PETSC_VERSION_SUBMINOR == 3)) //2.3.3 or 3.x.x
+#if ((PETSC_VERSION_MAJOR == 3) || (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 3 && PETSC_VERSION_SUBMINOR == 3)) //2.3.3 or 3.x.x
     VecScatterBegin(mToAll, vec, mReplicated, INSERT_VALUES, SCATTER_FORWARD);
     VecScatterEnd  (mToAll, vec, mReplicated, INSERT_VALUES, SCATTER_FORWARD);
 #else

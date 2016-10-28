@@ -42,14 +42,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractPdeModifier.hpp"
 
 /**
- * A modifier class in which has the common functionality of solving a PDE on a Mesh defined by a Box larger than the tissue.
- * A growing spheroid or monolayer in a flow chamber for example.
- * The results are stored in CellData.
+ * An abstract modifier class containing functionality common to EllipticBoxDomainPdeModifier
+ * and ParabolicBoxDomainPdeModifier, which both solve a linear elliptic or parabolic PDE
+ * coupled to a cell-based simulation on a coarse domain.
  */
 template<unsigned DIM>
 class AbstractBoxDomainPdeModifier : public AbstractPdeModifier<DIM>
 {
-    friend class TestBoxDomainPdeModifiers;
+    friend class TestEllipticBoxDomainPdeModifier;
+    friend class TestParabolicBoxDomainPdeModifier;
+    friend class TestOffLatticeSimulationWithPdes;
 
 private:
 
@@ -66,6 +68,9 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & boost::serialization::base_object<AbstractPdeModifier<DIM> >(*this);
+        archive & mpMeshCuboid;
+        archive & mStepSize;
+        archive & mSetBcsOnBoxBoundary;
     }
 
 protected:
@@ -73,17 +78,65 @@ protected:
     /** Map between cells and the elements of the FE mesh containing them. */
     std::map<CellPtr, unsigned> mCellPdeElementMap;
 
+    /**
+     * Pointer to a ChasteCuboid storing the outer boundary for the FE mesh.
+     * Stored as a member to facilitate archiving.
+     */
+    ChasteCuboid<DIM>* mpMeshCuboid;
+
+    /**
+     * The step size to be used in the FE mesh.
+     * Stored as a member to facilitate archiving.
+     */
+    double mStepSize;
+
+    /**
+     * Whether to set the boundary condition on the edge of the box domain rather than the cell population.
+     * Default to true.
+     */
+    bool mSetBcsOnBoxBoundary;
+
 public:
 
     /**
      * Constructor.
+     *
+     * @param pPde A shared pointer to a linear PDE object (defaults to NULL)
+     * @param pBoundaryCondition A shared pointer to an abstract boundary condition
+     *     (defaults to NULL, corresponding to a constant boundary condition with value zero)
+     * @param isNeumannBoundaryCondition Whether the boundary condition is Neumann (defaults to true)
+     * @param pMeshCuboid pointer to a ChasteCuboid specifying the outer boundary for the FE mesh (defaults to NULL)
+     * @param stepSize step size to be used in the FE mesh (defaults to 1.0, i.e. the default cell size)
+     * @param solution solution vector (defaults to NULL)
      */
-    AbstractBoxDomainPdeModifier();
+    AbstractBoxDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde=boost::shared_ptr<AbstractLinearPde<DIM,DIM> >(),
+                                 boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition=boost::shared_ptr<AbstractBoundaryCondition<DIM> >(),
+                                 bool isNeumannBoundaryCondition=true,
+                                 ChasteCuboid<DIM>* pMeshCuboid=NULL,
+                                 double stepSize=1.0,
+                                 Vec solution=NULL);
 
     /**
      * Destructor.
      */
     virtual ~AbstractBoxDomainPdeModifier();
+
+    /**
+     * @return mStepSize.
+     */
+    double GetStepSize();
+
+    /**
+     * Set mSetBcsOnCoarseBoundary.
+     *
+     * @param setBcsOnBoxBoundary whether to set the boundary condition on the edge of the box domain rather than the cell population
+     */
+    void SetBcsOnBoxBoundary(bool setBcsOnBoxBoundary);
+
+    /**
+     * @return mSetBcsOnCoarseBoundary.
+     */
+    bool AreBcsSetOnBoxBoundary();
 
     /**
      * Overridden SetupSolve() method.
@@ -100,8 +153,8 @@ public:
     /**
      * Helper method to generate the mesh.
      *
-     * @param meshCuboid the outer boundary for the FEM mesh.
-     * @param stepSize the step size to be used in the FEM mesh.
+     * @param meshCuboid the outer boundary for the FE mesh.
+     * @param stepSize the step size to be used in the FE mesh.
      */
     void GenerateFeMesh(ChasteCuboid<DIM> meshCuboid, double stepSize);
 

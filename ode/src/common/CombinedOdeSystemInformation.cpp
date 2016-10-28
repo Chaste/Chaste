@@ -119,7 +119,7 @@ CombinedOdeSystemInformation::CombinedOdeSystemInformation(const std::vector<boo
     mInitialised = true;
 }
 
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
 void CombinedOdeSystemInformation::Initialise()
 {
     // does nothing; work done in constructor
@@ -128,4 +128,4 @@ void CombinedOdeSystemInformation::Initialise()
 
 /** Definition of the instance static member. */
 std::vector<struct CombinedOdeSystemInformation::InstancePointers> CombinedOdeSystemInformation::msInstances;
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP

@@ -39,12 +39,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MutableMesh.hpp"
 #include "AbstractCaUpdateRule.hpp"
 #include "AbstractCaSwitchingUpdateRule.hpp"
-#include "ApoptoticCellProperty.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "CellLocationIndexWriter.hpp"
 #include "ExclusionCaBasedDivisionRule.hpp"
 #include "NodesOnlyMesh.hpp"
 #include "Exception.hpp"
+#include "ApoptoticCellProperty.hpp"
 
 // Needed to convert mesh in order to write nodes to VTK (visualize as glyphs)
 #include "VtkMeshWriter.hpp"
@@ -152,23 +152,6 @@ TetrahedralMesh<DIM, DIM>* CaBasedCellPopulation<DIM>::GetTetrahedralMeshForPdeM
     }
 
     return new MutableMesh<DIM,DIM>(temp_nodes);
-}
-
-template<unsigned DIM>
-bool CaBasedCellPopulation<DIM>::IsPdeNodeAssociatedWithApoptoticCell(unsigned pdeNodeIndex)
-{
-    // pdeNodeIndex corresponds to the 'position' of the cell to interrogate in the vector of cells
-
-    typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
-    assert(pdeNodeIndex < this->GetNumRealCells());
-
-    ///\todo #2687 Increment from 1, since we don't want to increment if pdeNodeIndex==0?
-    for (unsigned i=0; i<pdeNodeIndex; i++)
-    {
-        ++cell_iter;
-    }
-    bool is_cell_apoptotic = cell_iter->template HasCellProperty<ApoptoticCellProperty>();
-    return is_cell_apoptotic;
 }
 
 template<unsigned DIM>
@@ -641,7 +624,7 @@ void CaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirec
     time << num_timesteps;
 
     // Store the number of cells for which to output data to VTK
-    unsigned num_cells = this->GetNumAllCells();
+    unsigned num_cells = this->GetNumRealCells();
 
     // When outputting any CellData, we assume that the first cell is representative of all cells
     unsigned num_cell_data_items = 0u;
@@ -672,8 +655,8 @@ void CaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirec
     // Populate a vector of nodes associated with cell locations, by iterating through the list of cells
     std::vector<Node<DIM>*> nodes;
     unsigned node_index = 0;
-    for (std::list<CellPtr>::iterator cell_iter = this->mCells.begin();
-         cell_iter != this->mCells.end();
+    for (typename AbstractCellPopulation<DIM,DIM>::Iterator cell_iter = this->Begin();
+         cell_iter != this->End();
          ++cell_iter)
     {
         // Get the location index of this cell and update the counter number_of_cells_at_site
@@ -726,8 +709,8 @@ void CaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirec
 
         // Loop over cells
         unsigned cell_index = 0;
-        for (std::list<CellPtr>::iterator cell_iter = this->mCells.begin();
-             cell_iter != this->mCells.end();
+        for (typename AbstractCellPopulation<DIM,DIM>::Iterator cell_iter = this->Begin();
+             cell_iter != this->End();
              ++cell_iter)
         {
             // Populate the vector of VTK cell data
@@ -815,6 +798,22 @@ double CaBasedCellPopulation<DIM>::GetCellDataItemAtPdeNode(
     double value = cell_iter->GetCellData()->GetItem(rVariableName);
 
     return value;
+}
+
+template<unsigned DIM>
+bool CaBasedCellPopulation<DIM>::IsPdeNodeAssociatedWithNonApoptoticCell(unsigned pdeNodeIndex)
+{
+    // pdeNodeIndex corresponds to the 'position' of the cell to interrogate in the vector of cells
+    typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
+
+    assert(pdeNodeIndex < this->GetNumRealCells());
+    for (unsigned i=0; i<pdeNodeIndex; i++)
+    {
+        ++cell_iter;
+    }
+    bool is_cell_apoptotic = cell_iter->template HasCellProperty<ApoptoticCellProperty>();
+
+    return !is_cell_apoptotic;
 }
 
 // Explicit instantiation

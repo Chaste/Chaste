@@ -68,7 +68,6 @@ public:
      */
     virtual ~LambertAirwayWallFactory();
 
-
     /**
      * @return a newly airway wall object for the given node.
      *
@@ -77,35 +76,12 @@ public:
      */
     virtual LambertAirwayWall* CreateAirwayWallForElement(Element<1,3>* pElement);
   
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-double GetAlpha0ForGeneration(unsigned generation);
-double GetAlpha0PrimeForGeneration(unsigned generation);  
-double GetN1ForGeneration(unsigned generation);
-double GetN2ForGeneration(unsigned generation);
-
-
-
-
-
-
-
-
-
-
-
-
+    double GetAlpha0ForGeneration(unsigned generation);
+    double GetAlpha0PrimeForGeneration(unsigned generation);
+    double GetN1ForGeneration(unsigned generation);
+    double GetN2ForGeneration(unsigned generation);
 
     /**
-     *
      * @param time The current time in seconds
      * @param pNode Pointer to node object.
      * @return The pleural pressure at the given node at the given time
@@ -132,7 +108,6 @@ double GetN2ForGeneration(unsigned generation);
     /** The number of generations in the Lambert data. Nb generation number starts at 0! */
     static const double mMaxGeneration;
 
-
 private:
     /** Walker to determine order of airway elements */
     AirwayTreeWalker* mpWalker;
@@ -142,8 +117,6 @@ private:
 
     /** The largest order in the airway tree*/
     double mMaxOrder;
-
 };
 
 #endif /*LAMBERTAIRWAYWALLFACTORY_HPP_*/
-

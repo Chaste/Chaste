@@ -136,7 +136,6 @@ public:
             delete p_mock_euler;
         }
     }
-
 };
 
 #endif //_TESTMOCKEULERIVPODESOLVER_HPP_

@@ -105,7 +105,6 @@ public:
      * @return the size of the nodes list
      */
     unsigned GetSize() const;
-
 };
 
 // Declare identifier for the serializer

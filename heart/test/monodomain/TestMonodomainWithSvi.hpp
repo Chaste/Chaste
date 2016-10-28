@@ -75,13 +75,12 @@ public:
     {
         double x = pNode->rGetLocation()[0];
         double y;
-        if(DIM==2)
+        if (DIM==2)
         {
             y = pNode->rGetLocation()[1];
         }
 
-        if (    (DIM==1 && fabs(x)<0.02+1e-6)
-             || (DIM==2 && fabs(x)<0.02+1e-6 && fabs(y)<0.02+1e-6) )
+        if ((DIM==1 && fabs(x)<0.02+1e-6) || (DIM==2 && fabs(x)<0.02+1e-6 && fabs(y)<0.02+1e-6))
         {
             return new CellLuoRudy1991FromCellML(this->mpSolver, this->mpStimulus);
         }
@@ -91,8 +90,6 @@ public:
         }
     }
 };
-
-
 
 // stimulate a block of cells (an interval in 1d, a block in a corner in 2d)
 #ifdef CHASTE_CVODE
@@ -114,14 +111,13 @@ public:
     {
         double x = pNode->rGetLocation()[0];
         double y;
-        if(DIM==2)
+        if (DIM==2)
         {
             y = pNode->rGetLocation()[1];
         }
 
         AbstractCvodeCell* p_cell;
-        if (    (DIM==1 && fabs(x)<0.02+1e-6)
-             || (DIM==2 && fabs(x)<0.02+1e-6 && fabs(y)<0.02+1e-6) )
+        if ((DIM==1 && fabs(x)<0.02+1e-6) || (DIM==2 && fabs(x)<0.02+1e-6 && fabs(y)<0.02+1e-6))
         {
             p_cell =  new CellLuoRudy1991FromCellMLCvode(this->mpSolver, this->mpStimulus);
         }
@@ -152,11 +148,11 @@ public:
     AbstractCardiacCell* CreateCardiacCellForTissueNode(Node<1>* pNode)
     {
         double x = pNode->rGetLocation()[0];
-        if ( x<0.15 )
+        if (x < 0.15)
         {
             return new CellLuoRudy1991FromCellML(this->mpSolver, this->mpStimulus);
         }
-        else if (x < 0.65 )
+        else if (x < 0.65)
         {
             return new CellMahajan2008FromCellML(this->mpSolver, this->mpZeroStimulus);
         }
@@ -191,7 +187,7 @@ public:
         HeartConfig::Instance()->SetSimulationDuration(4.0); //ms
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.01);
 
-        for(unsigned i=0; i<3; i++)
+        for (unsigned i=0; i<3; i++)
         {
             // ICI - ionic current interpolation - the default
             {
@@ -271,14 +267,14 @@ public:
 //                std::cout << "conduction_vel_svi = " << conduction_vel_svi[i] << "\n";
             }
 
-            if(i==0) // finest mesh
+            if (i==0) // finest mesh
             {
-                for(unsigned j=0; j<final_voltage_ici.GetSize(); j++)
+                for (unsigned j=0; j<final_voltage_ici.GetSize(); j++)
                 {
                     // visually checked they agree at this mesh resolution, and chosen tolerance from results
                     TS_ASSERT_DELTA(final_voltage_ici[j], final_voltage_svi[j], 0.3);
 
-                    if(final_voltage_ici[j]>-80)
+                    if (final_voltage_ici[j]>-80)
                     {
                         // shouldn't be exactly equal, as long as away from resting potential
                         TS_ASSERT_DIFFERS(final_voltage_ici[j], final_voltage_svi[j]);
@@ -290,7 +286,7 @@ public:
                 TS_ASSERT_DELTA(svi_voltage_at_0_03_finest_mesh, 11.0067, 2e-4); //hardcoded value from fine svi
                 TS_ASSERT_DELTA(ici_voltage_at_0_03_finest_mesh, 11.0067, 1.2e-1); //hardcoded value from fine svi
             }
-            else if(i==1)
+            else if (i==1)
             {
                 double ici_voltage_at_0_03_middle_mesh = final_voltage_ici[ probe_node_index[i] ];
                 double svi_voltage_at_0_03_middle_mesh = final_voltage_svi[ probe_node_index[i] ];
@@ -572,7 +568,6 @@ public:
             "Assertion tripped: !std::isnan(i_ionic)");
 #endif // NDEBUG
     }
-
 };
 
 #endif /*TESTMONODOMAINWITHSVI_HPP_*/

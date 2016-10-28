@@ -133,10 +133,8 @@ HeartGeometryInformation<SPACE_DIM>* AbstractCardiacCellFactory<ELEMENT_DIM,SPAC
     }
     return mpHeartGeometryInformation;
 }
-/////////////////////////////////////////////////////////////////////
-// Explicit instantiation
-/////////////////////////////////////////////////////////////////////
 
+// Explicit instantiation
 template class AbstractCardiacCellFactory<1,1>;
 template class AbstractCardiacCellFactory<1,2>;
 template class AbstractCardiacCellFactory<1,3>;

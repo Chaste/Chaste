@@ -33,73 +33,51 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "CellwiseSourcePde.hpp"
-#include "ApoptoticCellProperty.hpp"
-#include "Exception.hpp"
+#include "NoCellCycleModel.hpp"
 
-template<unsigned DIM>
-CellwiseSourcePde<DIM>::CellwiseSourcePde(AbstractCellPopulation<DIM,DIM>& rCellPopulation, double coefficient)
-    : mrCellPopulation(rCellPopulation),
-      mCoefficient(coefficient)
+NoCellCycleModel::NoCellCycleModel()
+    : AbstractCellCycleModel()
 {
 }
 
-template<unsigned DIM>
-const AbstractCellPopulation<DIM,DIM>& CellwiseSourcePde<DIM>::rGetCellPopulation() const
+NoCellCycleModel::NoCellCycleModel(const NoCellCycleModel& rModel)
+   : AbstractCellCycleModel(rModel)
 {
-    return mrCellPopulation;
+    /*
+     * There are no member variables defined in this class to initialize.
+     *
+     * The member variables mBirthTime, mReadyToDivide and mDimension
+     * are initialized in the AbstractCellCycleModel constructor.
+     */
 }
 
-template<unsigned DIM>
-double CellwiseSourcePde<DIM>::GetCoefficient() const
+bool NoCellCycleModel::ReadyToDivide()
 {
-    return mCoefficient;
+    return false;
 }
 
-template<unsigned DIM>
-double CellwiseSourcePde<DIM>::ComputeConstantInUSourceTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement)
+AbstractCellCycleModel* NoCellCycleModel::CreateCellCycleModel()
 {
-    return 0.0;
+    return new NoCellCycleModel(*this);
 }
 
-template<unsigned DIM>
-double CellwiseSourcePde<DIM>::ComputeLinearInUCoeffInSourceTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement)
+double NoCellCycleModel::GetAverageTransitCellCycleTime()
 {
-    NEVER_REACHED;
-    return 0.0;
+    return DBL_MAX;
 }
 
-template<unsigned DIM>
-double CellwiseSourcePde<DIM>::ComputeLinearInUCoeffInSourceTermAtNode(const Node<DIM>& rNode)
+double NoCellCycleModel::GetAverageStemCellCycleTime()
 {
-    double coefficient = 0.0;
-
-    if (mrCellPopulation.IsCellAttachedToLocationIndex(rNode.GetIndex()))
-    {
-        CellPtr p_cell = mrCellPopulation.GetCellUsingLocationIndex(rNode.GetIndex());
-
-        bool cell_is_apoptotic = p_cell->HasCellProperty<ApoptoticCellProperty>();
-
-        if (!cell_is_apoptotic)
-        {
-            coefficient = mCoefficient;
-        }
-    }
-
-    return coefficient;
+    return DBL_MAX;
 }
 
-template<unsigned DIM>
-c_matrix<double,DIM,DIM> CellwiseSourcePde<DIM>::ComputeDiffusionTerm(const ChastePoint<DIM>& rX)
+void NoCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
 {
-    return identity_matrix<double>(DIM);
+    // No new parameters to output, so just call method on direct parent class
+    AbstractCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
 }
-
-///////// Explicit instantiation
-template class CellwiseSourcePde<1>;
-template class CellwiseSourcePde<2>;
-template class CellwiseSourcePde<3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(CellwiseSourcePde)
+CHASTE_CLASS_EXPORT(NoCellCycleModel)
+

@@ -291,7 +291,6 @@ public:
         TS_ASSERT_EQUALS(wall_thickness_file.IsFile(), true);
         TS_ASSERT_EQUALS(averaged_thickness_file.IsFile(), true);
     }
-
 };
 
 #endif /*TESTSTREETERFIBREGENERATOR_HPP_*/

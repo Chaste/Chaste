@@ -100,8 +100,6 @@ protected:
     // the parent AbstractAssemblerSolverHybrid assumes natural Neumann BCs and uses a
     // NaturalNeumannSurfaceTermAssembler for assembling this part of the vector.
 
-
-
     /**
      * Delegate to AbstractAssemblerSolverHybrid::SetupGivenLinearSystem.
      *  @param currentSolution The current solution which can be used in setting up

@@ -137,8 +137,6 @@ public:
         TS_ASSERT_EQUALS(tester.PdeTimeStep, 0.02);
     }
 
-
-
     void TestSpaceConvergenceMonoIn1DWithRelativeTolerance() throw(Exception)
     {
         SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, MonodomainProblem<1>, 1, 1> tester;

@@ -40,11 +40,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Must be included before other cell_based headers
 #include "CellBasedSimulationArchiver.hpp"
-
-#include "CellwiseSourcePde.hpp"
-#include "ConstBoundaryCondition.hpp"
-#include "PetscSetupAndFinalize.hpp"
-#include "AveragedSourcePde.hpp"
+#ifdef CHASTE_VTK
+#define _BACKWARD_BACKWARD_WARNING_H 1 //Cut out the strstream deprecated warning for now (gcc4.3)
+#include <vtkXMLUnstructuredGridReader.h>
+#include <vtkUnstructuredGrid.h>
+#endif //CHASTE_VTK
 #include "HoneycombMeshGenerator.hpp"
 #include "PottsMeshGenerator.hpp"
 #include "CellsGenerator.hpp"
@@ -67,7 +67,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellProliferativePhasesWriter.hpp"
 #include "CellMutationStatesWriter.hpp"
 #include "CellLabelWriter.hpp"
-#include "CellProliferativePhasesCountWriter.hpp"
+#include "PetscSetupAndFinalize.hpp"
 
 class TestOnLatticeSimulationWithCaBasedCellPopulation : public AbstractCellBasedWithTimingsTestSuite
 {
@@ -365,7 +365,8 @@ public:
         cell_population.AddCellWriter<CellProliferativeTypesWriter>();
         cell_population.AddCellWriter<CellProliferativePhasesWriter>();
 
-        // update all cells in population to prescribe an initial oxygen concentration and apoptosis time
+        // Assign roughly half the cells to undergo apoptotis. Set their location index as
+        // a cell data item to check ordering in output VTK file
         std::list<CellPtr> cells2 = cell_population.rGetCells();
         std::list<CellPtr>::iterator it;
         RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
@@ -377,6 +378,7 @@ public:
             {
                 (*it)->AddCellProperty(CellPropertyRegistry::Instance()->Get<ApoptoticCellProperty>());
             }
+            (*it)->GetCellData()->SetItem("Location Index For Test", double(cell_population.GetLocationIndexUsingCell((*it))));
         }
 
         // Set up cell-based simulation
@@ -394,10 +396,34 @@ public:
         // Run simulation
         simulator.Solve();
 
-        // Test no deaths and some births
+        // Test no births and some deaths
         TS_ASSERT_EQUALS(simulator.GetNumBirths(), 0u);
         TS_ASSERT(simulator.GetNumDeaths() > 0);
 
+        #ifdef CHASTE_VTK
+            // Check that the ordering in the vtk file is correct
+            OutputFileHandler output_file_handler("TestCaMonolayerWithApoptoticCellKiller", false);
+            std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+
+            // Read in the final timepoint
+            FileFinder vtk_file2(results_dir + "results_from_time_0/results_5.vtu", RelativeTo::Absolute);
+            TS_ASSERT(vtk_file2.Exists());
+            vtkSmartPointer<vtkXMLUnstructuredGridReader> p_reader = vtkSmartPointer<vtkXMLUnstructuredGridReader>::New();
+            p_reader->SetFileName(vtk_file2.GetAbsolutePath().c_str());
+            p_reader->Update();
+
+            // The point index should be the same as the entry in the "Location Index For Test" array at this stage.
+            vtkSmartPointer<vtkUnstructuredGrid> p_grid = p_reader->GetOutput();
+            unsigned counter = 0;
+            for (typename CaBasedCellPopulation<2>::Iterator cell_iter = cell_population.Begin(); cell_iter != cell_population.End(); ++cell_iter)
+            {
+                unsigned location_index = cell_population.GetLocationIndexUsingCell(*cell_iter);
+                TS_ASSERT(counter < unsigned(p_grid->GetNumberOfPoints()));
+                TS_ASSERT_EQUALS(location_index, unsigned(p_grid->GetPointData()->GetArray("Location Index For Test")->GetTuple1(counter)));
+                counter++;
+            }
+
+        #endif //CHASTE_VTK
     }
 
     void TestCaMonolayerWithRandomSwitching() throw (Exception)

@@ -230,7 +230,7 @@ public:
             double y = mesh.GetNode(node_index)->GetPoint()[1];
 
             /* If x=1 or y=1... */
-            if ( (fabs(x-1.0) < 1e-6) || (fabs(y-1.0) < 1e-6) )
+            if ((fabs(x-1.0) < 1e-6) || (fabs(y-1.0) < 1e-6))
             {
                 /* ...associate the boundary condition with the surface element. */
                 bcc.AddNeumannBoundaryCondition(*surf_iter, p_zero_boundary_condition);

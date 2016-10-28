@@ -65,13 +65,13 @@ public:
 
         NodePartitioner<2, 2>::DumbPartitioning(mesh, nodes_owned);
 
-        if(PetscTools::GetNumProcs() == 1)
+        if (PetscTools::GetNumProcs() == 1)
         {
             TS_ASSERT_EQUALS(nodes_owned.size(), 289u);
         }
-        else if(PetscTools::GetNumProcs() == 2)
+        else if (PetscTools::GetNumProcs() == 2)
         {
-            if(PetscTools::GetMyRank() == 0 )
+            if (PetscTools::GetMyRank() == 0)
             {
                 TS_ASSERT_EQUALS(nodes_owned.size(), 145u);
             }
@@ -80,13 +80,13 @@ public:
                 TS_ASSERT_EQUALS(nodes_owned.size(), 144u);
             }
         }
-        else if(PetscTools::GetNumProcs() == 3)
+        else if (PetscTools::GetNumProcs() == 3)
         {
-            if(PetscTools::GetMyRank() == 0 )
+            if (PetscTools::GetMyRank() == 0 )
             {
                 TS_ASSERT_EQUALS(nodes_owned.size(), 97u);
             }
-            else if(PetscTools::GetMyRank() == 1 )
+            else if (PetscTools::GetMyRank() == 1 )
             {
                 TS_ASSERT_EQUALS(nodes_owned.size(), 96u);
             }
@@ -101,7 +101,7 @@ public:
     {
         EXIT_IF_SEQUENTIAL //Doesn't make sense to try and partition in sequential
 
-        if(!PetscTools::HasParMetis())
+        if (!PetscTools::HasParMetis())
         {
             std::cout << "\n\nWarning: PETSc support for ParMetis is not installed. Mesh partitioning not tested." << std::endl;
             return;
@@ -125,7 +125,7 @@ public:
         typedef NodePartitioner<2, 2> Partitioner2D;
         Partitioner2D::PetscMatrixPartitioning(mesh_reader, nodes_permutation, nodes_owned, processor_offset);
 
-        if(PetscTools::GetNumProcs() != 2)
+        if (PetscTools::GetNumProcs() != 2)
         {
             return;
         }
@@ -137,7 +137,7 @@ public:
         // and check that all the nodes are within a certain distance of the centre of mass.
         c_vector<double,2> centre_of_mass = zero_vector<double>(2);
         unsigned counter = 0;
-        for(std::set<unsigned>::iterator iter = nodes_owned.begin();
+        for (std::set<unsigned>::iterator iter = nodes_owned.begin();
             iter != nodes_owned.end();
             ++iter)
         {
@@ -152,7 +152,7 @@ public:
         centre_of_mass(0) /= counter;
         centre_of_mass(1) /= counter;
 
-        for(std::set<unsigned>::iterator iter = nodes_owned.begin();
+        for (std::set<unsigned>::iterator iter = nodes_owned.begin();
                     iter != nodes_owned.end();
                     ++iter)
         {
@@ -169,7 +169,7 @@ public:
         //ss << "res_" << PetscTools::GetNumProcs() << "_" << PetscTools::GetMyRank() << ".txt";
         //out_stream p_file = handler.OpenOutputFile(ss.str());
         //
-        //for(std::set<unsigned>::iterator iter = nodes_owned.begin();
+        //for (std::set<unsigned>::iterator iter = nodes_owned.begin();
         //    iter != nodes_owned.end();
         //    ++iter)
         //{
@@ -454,8 +454,6 @@ public:
         }
         delete p_mesh;
     }
-
 };
-
 
 #endif // TESTDISTRIBUTEDQUADRATICMESH_HPP_

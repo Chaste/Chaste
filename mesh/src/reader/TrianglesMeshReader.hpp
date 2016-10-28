@@ -347,7 +347,6 @@ private:
      * @param rNodeIndices  The nodes we have read in.
      */
     void EnsureIndexingFromZero(std::vector<unsigned>& rNodeIndices);
-
 };
 
 #endif //_TRIANGLESMESHREADER_HPP_

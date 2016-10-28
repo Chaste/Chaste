@@ -170,8 +170,6 @@ public :
         TS_ASSERT_DELTA( nhs_system.rGetStateVariables()[4],  20.6006, 1e-2 );
     }
 
-
-
     /*
      *  A test which couples the NHS model with the Lr91 model, via CaI
      *
@@ -220,7 +218,7 @@ public :
 
 
         // time loop
-        for(double current_time = 0; current_time<end_time; current_time+=HeartConfig::Instance()->GetOdeTimeStep())
+        for (double current_time = 0; current_time<end_time; current_time+=HeartConfig::Instance()->GetOdeTimeStep())
         {
             // solve electrophys model
             electrophys_model.Compute(current_time, current_time+HeartConfig::Instance()->GetOdeTimeStep());
@@ -242,7 +240,7 @@ public :
             // cellular mechanics models and send to electrophy model
             TS_ASSERT_EQUALS(has_Ca_trop, false);//NOTE - The following code is never activated....
 
-            if(has_Ca_trop)
+            if (has_Ca_trop)
             {
                 std::vector<double>& electrophys_model_state_vars = electrophys_model.rGetStateVariables();
                 electrophys_model_state_vars[Ca_trop_index] = cellmech_model.GetCalciumTroponinValue();
@@ -325,7 +323,7 @@ public :
         std::vector<double> Q2;
         std::vector<double> Q3;
         // time loop
-        for(double current_time = 0; current_time<end_time; current_time+=HeartConfig::Instance()->GetOdeTimeStep())
+        for (double current_time = 0; current_time<end_time; current_time+=HeartConfig::Instance()->GetOdeTimeStep())
         {
             // solve electrophys model
             electrophys_model.Compute(current_time, current_time+HeartConfig::Instance()->GetOdeTimeStep());
@@ -351,7 +349,7 @@ public :
             // cellular mechanics models and send to electrophy model
 
             TS_ASSERT_EQUALS(has_Ca_trop, false);//NOTE - The following code is never activated....
-            if(has_Ca_trop)
+            if (has_Ca_trop)
             {
                 std::vector<double>& electrophys_model_state_vars = electrophys_model.rGetStateVariables();
                 electrophys_model_state_vars[Ca_trop_index] = cellmech_model.GetCalciumTroponinValue();
@@ -412,7 +410,7 @@ public :
         //  ==> bad things will happen (?) around and above this..
         double stretch[3] = {0.9,1.0,1.1};
 
-        for(unsigned run=0; run<3; run++)
+        for (unsigned run=0; run<3; run++)
         {
             boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
             CellLuoRudy1991FromCellML electrophys_model(p_solver, p_stimulus);
@@ -424,7 +422,7 @@ public :
             std::vector<double> active_tensions;
 
             // time loop
-            for(double current_time = 0; current_time<end_time; current_time+=HeartConfig::Instance()->GetOdeTimeStep())
+            for (double current_time = 0; current_time<end_time; current_time+=HeartConfig::Instance()->GetOdeTimeStep())
             {
                 // solve electrophys model
                 electrophys_model.Compute(current_time, current_time+HeartConfig::Instance()->GetOdeTimeStep());
@@ -446,7 +444,7 @@ public :
 
             }
 
-            if(run==0)
+            if (run==0)
             {
                 data.push_back(times);
             }
@@ -529,7 +527,7 @@ public :
         // mentioned above
         double stretch[3] = {1.6/1.9/*=0.842*/, 1.0, 2.2/1.9/*=1.158*/};
 
-        for(unsigned run=0; run<3; run++)
+        for (unsigned run=0; run<3; run++)
         {
             Kerchoffs2003ContractionModel kerchoffs_model;
             TS_ASSERT_EQUALS(kerchoffs_model.IsStretchDependent(), true);
@@ -549,13 +547,13 @@ public :
             times.push_back(stepper.GetTime());
             active_tensions.push_back(kerchoffs_model.GetActiveTension());
 
-            while(!stepper.IsTimeAtEnd())
+            while (!stepper.IsTimeAtEnd())
             {
                 // specify a step-change voltage since this model gets activated
                 // at V=0 and deactivated at V=-70
                 // Specify 300ms of activity - the resultant force should be
                 // non-zero for greater than 300ms..
-                if( (stepper.GetTime()>100) && (stepper.GetTime()<400) )
+                if ((stepper.GetTime()>100) && (stepper.GetTime()<400))
                 {
                     input_params.voltage = 50;
                 }
@@ -574,7 +572,7 @@ public :
                 stepper.AdvanceOneTimeStep();
             }
 
-            if(run==0)
+            if (run==0)
             {
                 data.push_back(times);
             }
@@ -610,10 +608,10 @@ public :
 
         TimeStepper stepper(0, 600, 1.0);  //ms
 
-        while(!stepper.IsTimeAtEnd())
+        while (!stepper.IsTimeAtEnd())
         {
-            // specify a step-change voltage since this model gets activated at V=0 and deactivated at V=-70
-            if( (stepper.GetTime()>0) && (stepper.GetTime()<500) )
+            // Specify a step-change voltage since this model gets activated at V=0 and deactivated at V=-70
+            if ((stepper.GetTime()>0) && (stepper.GetTime()<500))
             {
                 input_params.voltage = 50;
             }
@@ -693,7 +691,7 @@ public :
         double dt = 0.01;
 
         // time loop
-        for(double time = 0; time<end_time; time+=dt)
+        for (double time = 0; time<end_time; time+=dt)
         {
             // solve electrophys model
             electrophys_model.Compute(time, time+dt);

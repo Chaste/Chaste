@@ -60,8 +60,6 @@ typedef enum InterpolationLevel_
     NONLINEAR
 } InterpolationLevel;
 
-
-
 /**
  *   A base class for AbstractFeVolumeIntegralAssembler (the main abstract assembler class), AbstractSurfaceFeObjectAssembler, and
  *   AbstractCableFeObjectAssembler.

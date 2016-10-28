@@ -259,7 +259,6 @@ public:
      * @return a pointer to #mpVtkUnstructuredGrid
      */
     vtkUnstructuredGrid* OutputMeshAsVtkUnstructuredGrid();
-
 };
 
 #endif/*CHASTE_VTK*/

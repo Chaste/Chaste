@@ -144,7 +144,7 @@ void CellwiseDataGradient<DIM>::SetupGradients(AbstractCellPopulation<DIM>& rCel
             //        unsigned adjacent_node_global_index = r_adjacent_elem.GetNodeGlobalIndex(local_node_index);
             //
             //        // If not a ghost node and not the node we started with
-            //        if (    !(pCellPopulation->IsGhostNode(adjacent_node_global_index))
+            //        if (!(pCellPopulation->IsGhostNode(adjacent_node_global_index))
             //             && adjacent_node_global_index != node_global_index )
             //        {
             //
@@ -180,7 +180,7 @@ void CellwiseDataGradient<DIM>::SetupGradients(AbstractCellPopulation<DIM>& rCel
     }
 }
 
-///////// Explicit instantiation
+// Explicit instantiation
 template class CellwiseDataGradient<1>;
 template class CellwiseDataGradient<2>;
 template class CellwiseDataGradient<3>;

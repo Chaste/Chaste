@@ -53,17 +53,17 @@ MatrixVentilationProblem::MatrixVentilationProblem(const std::string& rMeshDirFi
     mpLinearSystem->SetAbsoluteTolerance(1e-5);
 
 #ifdef LUNG_USE_UMFPACK
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
     mpLinearSystem->SetPcType("lu");
     PetscTools::SetOption("-pc_factor_mat_solver_package", "umfpack");
     mpLinearSystem->SetKspType("gmres");
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
 #elif LUNG_USE_KLU
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
     mpLinearSystem->SetPcType("lu");
     PetscTools::SetOption("-pc_factor_mat_solver_package", "klu");
     mpLinearSystem->SetKspType("gmres");
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
 #else
     mpLinearSystem->SetPcType("jacobi");
     PetscTools::SetOption("-ksp_diagonal_scale","");
@@ -165,8 +165,8 @@ void MatrixVentilationProblem::Assemble(bool dynamicReassemble)
          ++iter)
     {
         unsigned element_index = iter->GetIndex();
-        //Only assemble if the row for this element is locally owned
-        if ( (unsigned) lo <=  element_index && element_index < (unsigned) hi )
+        // Only assemble if the row for this element is locally owned
+        if ((unsigned) lo <=  element_index && element_index < (unsigned) hi)
         {
             /* Poiseuille flow gives:
              *  pressure_node_1 - pressure_node_2 - resistance * flux = 0
@@ -277,7 +277,6 @@ void MatrixVentilationProblem::GetSolutionAsFluxesAndPressures(std::vector<doubl
 //            max_scaled_flux = fabs(solution_vector_repl[i]);
 //            max_flux = rFluxesOnEdges[i];
 //        }
-
     }
 
     rPressuresOnNodes.resize(mMesh.GetNumNodes());
@@ -288,7 +287,6 @@ void MatrixVentilationProblem::GetSolutionAsFluxesAndPressures(std::vector<doubl
 //        {
 //            max_pressure = fabs(rPressuresOnNodes[i]);
 //        }
-
     }
 //    PRINT_5_VARIABLES(max_flux, max_scaled_flux, max_pressure, max_scaled_flux/max_pressure, max_flux/max_pressure);
 }

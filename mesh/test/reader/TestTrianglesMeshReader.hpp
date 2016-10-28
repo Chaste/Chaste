@@ -248,8 +248,6 @@ public:
                               "File contains incomplete data: unexpected end of file.");
     }
 
-
-
     void TestGetNextNodeWithNodeAttributes() throw(Exception)
     {
         TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_12_elements_with_node_attributes");
@@ -989,7 +987,6 @@ public:
         // The second node has a missing attribute
         TS_ASSERT_THROWS_CONTAINS(mesh_reader.GetNextNode(),"Error in reading attribute");
     }
-
 };
 
 #endif //_TESTTRIANGLESMESHREADER_HPP_

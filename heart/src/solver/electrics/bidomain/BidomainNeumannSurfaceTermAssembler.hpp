@@ -38,8 +38,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractFeSurfaceIntegralAssembler.hpp"
 
-
-
 /**
  *  Assembler which sets up the surface integral integrals for the bidomain equations, assuming
  *  that the boundary conditions are written:  div(sigma_i grad phi_i) . n = g1  and
@@ -86,8 +84,6 @@ public:
     {
     }
 };
-
-
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, 2*ELEMENT_DIM> BidomainNeumannSurfaceTermAssembler<ELEMENT_DIM, SPACE_DIM>::ComputeVectorSurfaceTerm(

@@ -199,12 +199,12 @@ std::vector<double> DiscreteSystemForceCalculator::GetSamplingAngles(unsigned in
 
         // Calculate sampling angles in the range (-pi,pi]
 
-        #define COVERAGE_IGNORE
+        // LCOV_EXCL_START
         if (alpha_minus_epsilon <= -M_PI)
         {
             alpha_minus_epsilon += 2*M_PI;
         }
-        #undef COVERAGE_IGNORE
+        // LCOV_EXCL_STOP
         sampling_angles[i] = alpha_minus_epsilon;
 
         assert(sampling_angles[i] <= M_PI);
@@ -293,8 +293,8 @@ std::vector<double> DiscreteSystemForceCalculator::GetExtremalAngles(unsigned in
 
     for (unsigned i=0; i<n; i++)
     {
-        if ( ( tangential_force[i%n]>0 && tangential_force[(i+1)%n]<0 ) ||
-             ( tangential_force[i%n]<0 && tangential_force[(i+1)%n]>0 ) )
+        if ((tangential_force[i%n]>0 && tangential_force[(i+1)%n]<0)
+            || (tangential_force[i%n]<0 && tangential_force[(i+1)%n]>0))
         {
             double next_extremal_angle;
 

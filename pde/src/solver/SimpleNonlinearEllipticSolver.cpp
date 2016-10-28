@@ -97,7 +97,6 @@ c_vector<double,1*(ELEMENT_DIM+1)> SimpleNonlinearEllipticSolver<ELEMENT_DIM,SPA
     return ret;
 }
 
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 SimpleNonlinearEllipticSolver<ELEMENT_DIM,SPACE_DIM>::SimpleNonlinearEllipticSolver(
                               AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
@@ -109,10 +108,7 @@ SimpleNonlinearEllipticSolver<ELEMENT_DIM,SPACE_DIM>::SimpleNonlinearEllipticSol
     assert(pPde!=NULL);
 }
 
-//////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-//////////////////////////////////////////////////////////////////////
-
 template class SimpleNonlinearEllipticSolver<1,1>;
 template class SimpleNonlinearEllipticSolver<2,2>;
 template class SimpleNonlinearEllipticSolver<3,3>;

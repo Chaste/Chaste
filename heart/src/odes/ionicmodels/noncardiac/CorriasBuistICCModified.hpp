@@ -307,9 +307,7 @@ namespace boost
             ar >> p_stimulus;
             ::new(t)CorriasBuistICCModified(p_solver, p_stimulus);
         }
-
     }
-
 }
 
 #endif // CorriasBuistICCModified_HPP_

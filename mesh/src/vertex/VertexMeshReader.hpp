@@ -190,8 +190,6 @@ public:
      *         This method should only be called in 3D.
      */
     VertexElementData GetNextElementDataWithFaces();
-
 };
-
 
 #endif /*VERTEXMESHREADER2D_HPP_*/

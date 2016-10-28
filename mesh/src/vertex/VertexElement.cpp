@@ -437,10 +437,7 @@ c_vector<double, SPACE_DIM> VertexElement<1, SPACE_DIM>::GetCentroid() const
     return 0.5*(this->GetNodeLocation(0) + this->GetNodeLocation(1));
 }
 
-/////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////////////
-
 template class VertexElement<1,1>;
 template class VertexElement<1,2>;
 template class VertexElement<1,3>;

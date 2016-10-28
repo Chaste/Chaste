@@ -37,9 +37,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 
 template<unsigned DIM>
-CellwiseSourceEllipticPde<DIM>::CellwiseSourceEllipticPde(AbstractCellPopulation<DIM,DIM>& rCellPopulation, double coefficient)
+CellwiseSourceEllipticPde<DIM>::CellwiseSourceEllipticPde(AbstractCellPopulation<DIM,DIM>& rCellPopulation, double sourceCoefficient)
     : mrCellPopulation(rCellPopulation),
-      mCoefficient(coefficient)
+      mSourceCoefficient(sourceCoefficient)
 {
 }
 
@@ -52,7 +52,7 @@ const AbstractCellPopulation<DIM,DIM>& CellwiseSourceEllipticPde<DIM>::rGetCellP
 template<unsigned DIM>
 double CellwiseSourceEllipticPde<DIM>::GetCoefficient() const
 {
-    return mCoefficient;
+    return mSourceCoefficient;
 }
 
 template<unsigned DIM>
@@ -71,15 +71,14 @@ double CellwiseSourceEllipticPde<DIM>::ComputeLinearInUCoeffInSourceTerm(const C
 template<unsigned DIM>
 double CellwiseSourceEllipticPde<DIM>::ComputeLinearInUCoeffInSourceTermAtNode(const Node<DIM>& rNode)
 {
-    double coefficient = 0.0;
+    double source_coefficient = 0.0;
 
-    bool is_cell_apoptotic = mrCellPopulation.IsPdeNodeAssociatedWithApoptoticCell(rNode.GetIndex());
-    if (!is_cell_apoptotic)
+    if (mrCellPopulation.IsPdeNodeAssociatedWithNonApoptoticCell(rNode.GetIndex()))
     {
-        coefficient = mCoefficient;
+        source_coefficient = mSourceCoefficient;
     }
 
-    return coefficient;
+    return source_coefficient;
 }
 
 template<unsigned DIM>

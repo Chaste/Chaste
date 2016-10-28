@@ -2138,8 +2138,6 @@ public:
         TS_ASSERT_DELTA(norm_1(voronoi_mesh.GetNode(0u)->rGetLocation() - voronoi_mesh.GetNode(11u)->rGetLocation()),   0.0, DBL_EPSILON);
         TS_ASSERT_DELTA(norm_1(voronoi_mesh.GetNode(0u)->rGetLocation() - voronoi_mesh.GetNode(14u)->rGetLocation()),   0.0, DBL_EPSILON);
 
-
-
         TS_ASSERT_EQUALS(voronoi_mesh.GetNumFaces(), 32u);
         TS_ASSERT_DELTA(voronoi_mesh.CalculateAreaOfFace(voronoi_mesh.GetFace(0u)), 2.7556, 1e-4); //Degenerate quad (is triangle)
         TS_ASSERT_DELTA(voronoi_mesh.CalculateAreaOfFace(voronoi_mesh.GetFace(1u)), 2.7556, 1e-4); //Five point, but is triangle
@@ -2159,8 +2157,6 @@ public:
         }
         TS_ASSERT_DELTA(volume, 31.5, 1e-4); // Agrees with Paraview
     }
-
-
 };
 
 #endif /*TESTVERTEXMESH_HPP_*/

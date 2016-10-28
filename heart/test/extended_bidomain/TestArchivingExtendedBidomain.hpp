@@ -257,8 +257,6 @@ private:
         HeartEventHandler::Report();
     }
 
-
-
     void Run2DSimulationSaveAfterThreemilliSecondsIntraStim(FileFinder archive_dir, std::string archive_file) throw (Exception)
     {
         SetupParameters();

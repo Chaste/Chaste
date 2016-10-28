@@ -44,7 +44,7 @@ std::vector<unsigned> NonlinearElasticityTools<DIM>::GetNodesByComponentValue(Te
     double tol = 1e-8;
     for (unsigned i=0; i<rMesh.GetNumNodes(); i++)
     {
-        if ( fabs(rMesh.GetNode(i)->rGetLocation()[component] - value)<1e-8)
+        if (fabs(rMesh.GetNode(i)->rGetLocation()[component] - value)<1e-8)
         {
             fixed_nodes.push_back(i);
         }
@@ -58,10 +58,6 @@ std::vector<unsigned> NonlinearElasticityTools<DIM>::GetNodesByComponentValue(Te
     return fixed_nodes;
 }
 
-////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-////////////////////////////////////////////////////////////////////////////////////
-
-//template class NonlinearElasticityTools<1>;
 template class NonlinearElasticityTools<2>;
 template class NonlinearElasticityTools<3>;

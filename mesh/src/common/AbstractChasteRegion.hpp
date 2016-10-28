@@ -96,7 +96,6 @@ public:
      */
 
     virtual bool DoesContain(const ChastePoint<SPACE_DIM>& rPointToCheck) const = 0;
-
 };
 
 TEMPLATED_CLASS_IS_ABSTRACT_1_UNSIGNED(AbstractChasteRegion)

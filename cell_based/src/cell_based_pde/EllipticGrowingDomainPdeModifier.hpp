@@ -41,17 +41,26 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractGrowingDomainPdeModifier.hpp"
 #include "BoundaryConditionsContainer.hpp"
-#include "PdeAndBoundaryConditions.hpp"
 
 /**
- * A modifier class in which an elliptic PDE is solved on a growing domain and the results are stored in CellData.
+ * A modifier class in which a linear elliptic PDE coupled to a cell-based simulation
+ * is solved on a growing domain. The value of the dependent variable at each cell is
+ * stored and updated in a CellData item.
  *
- * \todo #2760 How is the domain growing? More detail needed in this documentation.
+ * At each time step, the finite element mesh used to solve the PDE numerically
+ * is defined by the spatial domain associated with the cell population. The
+ * precise definition of this domain is implemented in the method
+ * GetTetrahedralMeshForPdeModifier(), which is overridden for each cell population
+ * class and is used in the AbstractGrowingDomainPdeModifier method GenerateFeMesh()
+ * that is inherited by this class.
+ *
+ * Examples of PDEs in the source folder that can be solved using this class are
+ * CellwiseSourceEllipticPde and UniformSourceEllipticPde.
  */
 template<unsigned DIM>
 class EllipticGrowingDomainPdeModifier : public AbstractGrowingDomainPdeModifier<DIM>
 {
-    friend class TestGrowingDomainPdeModifiers;
+    friend class TestEllipticGrowingDomainPdeModifier;
 
 private:
 
@@ -68,29 +77,23 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & boost::serialization::base_object<AbstractGrowingDomainPdeModifier<DIM> >(*this);
-
-        archive & mpPdeAndBcs;
     }
-
-    /** Pointer to a linear elliptic PDE object with associated boundary conditions. */
-    ///\todo #2687 Memory-management of mpPdeAndBcs is not enabled. Suggest using a shared-pointer.
-    PdeAndBoundaryConditions<DIM>* mpPdeAndBcs;
 
 public:
 
     /**
-     * Default constructor.
-     *
-     * Only used in archiving.
-     */
-    EllipticGrowingDomainPdeModifier();
-
-    /**
      * Constructor.
      *
-     * @param pPdeAndBcs an optional pointer to a linear elliptic PDE object with associated boundary conditions.
+     * @param pPde A shared pointer to a linear PDE object (defaults to NULL)
+     * @param pBoundaryCondition A shared pointer to an abstract boundary condition
+     *     (defaults to NULL, corresponding to a constant boundary condition with value zero)
+     * @param isNeumannBoundaryCondition Whether the boundary condition is Neumann (defaults to true)
+     * @param solution solution vector (defaults to NULL)
      */
-    EllipticGrowingDomainPdeModifier(PdeAndBoundaryConditions<DIM>* pPdeAndBcs);
+    EllipticGrowingDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde=boost::shared_ptr<AbstractLinearPde<DIM,DIM> >(),
+                                     boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition=boost::shared_ptr<AbstractBoundaryCondition<DIM> >(),
+                                     bool isNeumannBoundaryCondition=true,
+                                     Vec solution=NULL);
 
     /**
      * Destructor.
@@ -134,5 +137,42 @@ public:
 
 #include "SerializationExportWrapper.hpp"
 EXPORT_TEMPLATE_CLASS_SAME_DIMS(EllipticGrowingDomainPdeModifier)
+
+namespace boost
+{
+namespace serialization
+{
+template<class Archive, unsigned DIM>
+inline void save_construct_data(
+    Archive & ar, const EllipticGrowingDomainPdeModifier<DIM> * t, const unsigned int file_version)
+{
+    if (t->GetSolution())
+    {
+        std::string archive_filename = ArchiveLocationInfo::GetArchiveDirectory() + "solution.vec";
+        PetscTools::DumpPetscObject(t->GetSolution(), archive_filename);
+    }
+}
+
+template<class Archive, unsigned DIM>
+inline void load_construct_data(
+    Archive & ar, EllipticGrowingDomainPdeModifier<DIM> * t, const unsigned int file_version)
+{
+    Vec solution = NULL;
+
+    std::string archive_filename = ArchiveLocationInfo::GetArchiveDirectory() + "solution.vec";
+    FileFinder file_finder(archive_filename, RelativeTo::Absolute);
+
+    if (file_finder.Exists())
+    {
+        PetscTools::ReadPetscObject(solution, archive_filename);
+    }
+
+    ::new(t)EllipticGrowingDomainPdeModifier<DIM>(boost::shared_ptr<AbstractLinearPde<DIM, DIM> >(),
+                                                  boost::shared_ptr<AbstractBoundaryCondition<DIM> >(),
+                                                  true,
+                                                  solution);
+}
+}
+} // namespace ...
 
 #endif /*ELLIPTICGROWINGDOMAINPDEMODIFIER_HPP_*/

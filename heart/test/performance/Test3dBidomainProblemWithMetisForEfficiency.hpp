@@ -37,9 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TEST3DBIDOMAINWITHMETISFOREFFICIENCY_HPP_
 #define TEST3DBIDOMAINWITHMETISFOREFFICIENCY_HPP_
 
-
-
-
 #include <cxxtest/TestSuite.h>
 #include "MonodomainProblem.hpp"
 #include "BidomainProblem.hpp"

@@ -53,7 +53,7 @@ void LambertAirwayWall::SolveAndUpdateState(double tStart, double tEnd)
 
     double ri2 = 0.0;
 
-    if(transpulmonary_pressure <= 0.0)
+    if (transpulmonary_pressure <= 0.0)
     {
         ri2 = mRi*mRi*std::pow(1 - transpulmonary_pressure/mP1, -mN1);
         //std::cout << "here " << transpulmonary_pressure << " " << mP1 << " " <<  transpulmonary_pressure/mP1 << " " << mN1 << " " << ri2 << std::endl;;

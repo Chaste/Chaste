@@ -86,6 +86,4 @@ public:
                                       MonodomainTissue<ELEM_DIM,SPACE_DIM>* pTissue);
 };
 
-
-
 #endif /*MONODOMAINCORRECTIONTERM_HPP_*/

@@ -162,9 +162,6 @@ public:
      *
      */
     void WritePseudoEcg();
-
 };
 
 #endif //_PSEUDOECGALCALCULATOR_HPP_
-
-

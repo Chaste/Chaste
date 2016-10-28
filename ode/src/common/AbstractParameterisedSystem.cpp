@@ -147,8 +147,7 @@ VECTOR AbstractParameterisedSystem<VECTOR>::GetStateVariables()
 template<typename VECTOR>
 void AbstractParameterisedSystem<VECTOR>::SetStateVariables(const VECTOR& rStateVariables)
 {
-
-    if ( mNumberOfStateVariables != GetVectorSize(rStateVariables) )
+    if (mNumberOfStateVariables != GetVectorSize(rStateVariables))
     {
         EXCEPTION("The size of the passed in vector must be that of the number of state variables.");
     }
@@ -179,7 +178,7 @@ double AbstractParameterisedSystem<VECTOR>::GetStateVariable(const std::string& 
 template<typename VECTOR>
 void AbstractParameterisedSystem<VECTOR>::SetStateVariable(unsigned index, double newValue)
 {
-    if ( mNumberOfStateVariables <= index )
+    if (mNumberOfStateVariables <= index)
     {
         EXCEPTION("The index passed in must be less than the number of state variables.");
     }
@@ -191,7 +190,6 @@ void AbstractParameterisedSystem<VECTOR>::SetStateVariable(const std::string& rN
 {
     SetStateVariable(GetStateVariableIndex(rName), newValue);
 }
-
 
 //
 // Initial condition methods
@@ -366,9 +364,7 @@ VECTOR AbstractParameterisedSystem<VECTOR>::ComputeDerivedQuantitiesFromCurrentS
 }
 
 
-////////////////////////////////////////////////////////////////////////////////////
-// Explicit instantiation
-////////////////////////////////////////////////////////////////////////////////////
+//////////////// Explicit instantiation//////////////
 
 template class AbstractParameterisedSystem<std::vector<double> >;
 #ifdef CHASTE_CVODE

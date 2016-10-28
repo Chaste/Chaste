@@ -207,9 +207,7 @@ public:
      * @return the Carbon Monoxide scale factor
      */
     double GetCarbonMonoxideScaleFactor();
-
 };
-
 
 // Needs to be included last
 #include "SerializationExportWrapper.hpp"
@@ -239,9 +237,7 @@ namespace boost
             ar >> p_stimulus;
             ::new(t)CorriasBuistSMCModified(p_solver, p_stimulus);
         }
-
     }
-
 }
 
 #endif // CorriasBuistSMCModified_HPP_

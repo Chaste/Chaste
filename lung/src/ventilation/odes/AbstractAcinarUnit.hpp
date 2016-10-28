@@ -129,8 +129,6 @@ public:
      * @return the current volume of the acinus
      */
     virtual double GetVolume() = 0;
-
 };
-
 
 #endif /*ABSTRACTACINARUNIT_HPP_*/

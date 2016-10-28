@@ -57,5 +57,6 @@ if failing_tests:
         print "   ", test
     print "The next line is for the benefit of the test summary scripts."
     print "Failed", len(failing_tests), "of", len(failing_tests), "tests"
+    sys.exit(len(failing_tests))
 else:
     print "Infrastructure test passed ok."

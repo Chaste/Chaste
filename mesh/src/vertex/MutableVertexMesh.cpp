@@ -991,6 +991,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(VertexElementMap& rElemen
     }
     else // 3D
     {
+//<<<<<<< HEAD
         rElementMap.Resize(this->GetNumAllElements());
         //remove and relabel all the elements, nodes, and faces
         RemoveDeletedNodesAndElements(rElementMap);
@@ -1009,6 +1010,12 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(VertexElementMap& rElemen
             RemoveDeletedFaces();
         }
 
+//=======
+//// LCOV_EXCL_START
+//        EXCEPTION("Remeshing has not been implemented in 3D (see #827 and #860)\n");
+//// LCOV_EXCL_STOP
+//        ///\todo Implement ReMesh() in 3D (see #1422)
+//>>>>>>> develop
     }
 }
 
@@ -1483,7 +1490,11 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                              EXCEPTION("Triangular element next to triangular void, not implemented yet.");
                         }
 
+//<<<<<<< HEAD
                         if(num_nodes_a_not_b == 3u || num_nodes_b_not_a == 3u)
+//=======
+//                        if (p_element_A_not_B->GetNumNodes() == 3u || p_element_B_not_A->GetNumNodes() == 3u)
+//>>>>>>> develop
                         {
                             /**
                              * If this is true then one of the elements adjacent to the triangular void
@@ -2651,8 +2662,8 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
                 // The two elements must have an edge in common.  Find whether the common edge is the same as the
                 // edge that is merged onto.
 
-                if ( ( common_vertex_indices[0]==vertexA_index && common_vertex_indices[1]==vertexB_index ) ||
-                        ( common_vertex_indices[1]==vertexA_index && common_vertex_indices[0]==vertexB_index ) )
+                if ((common_vertex_indices[0]==vertexA_index && common_vertex_indices[1]==vertexB_index) ||
+                    (common_vertex_indices[1]==vertexA_index && common_vertex_indices[0]==vertexB_index))
                 {
                     /*
                      * Due to a previous T3 swap the situation looks like this.
@@ -3492,7 +3503,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformProtorosetteResolution(No
          elem_index_iter != protorosette_node_containing_elem_indices.end();
          ++elem_index_iter)
     {
-        if ( (*elem_index_iter != elem_a_idx) && (*elem_index_iter != elem_b_idx) && (*elem_index_iter != elem_d_idx) )
+        if ((*elem_index_iter != elem_a_idx) && (*elem_index_iter != elem_b_idx) && (*elem_index_iter != elem_d_idx))
         {
             elem_c_idx = *elem_index_iter;
         }

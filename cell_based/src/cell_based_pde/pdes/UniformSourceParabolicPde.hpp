@@ -42,9 +42,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractLinearParabolicPde.hpp"
 
 /**
- * A simple parabolic PDE used in tests.
+ * An elliptic PDE to be solved numerically using the finite element method, for
+ * coupling to a cell-based simulation.
  *
- * Has a simple constant source.
+ * The PDE takes the form
+ *
+ * du/dt = Grad.(Grad(u)) + k,
+ *
+ * where the scalar k is specified by the member mSourceCoefficient, whose value
+ * must be set in the constructor.
+ *
+ * Thus, there is no direct coupling between the cell-based simulation and the
+ * terms of the PDE; here, the cell population just defines the spatial domain
+ * on which to solve the PDE.
  */
 template <unsigned DIM>
 class UniformSourceParabolicPde : public AbstractLinearParabolicPde<DIM,DIM>
@@ -65,23 +75,23 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
        archive & boost::serialization::base_object<AbstractLinearParabolicPde<DIM,DIM> >(*this);
-       archive & mCoefficient;
+       archive & mSourceCoefficient;
     }
 
     /** Constant source term (rate of production) of the dependent variable. */
-    double mCoefficient;
+    double mSourceCoefficient;
 
 public:
 
     /**
      * Constructor.
      *
-     * @param coefficient the source term (rate of production) of the dependent variable (defaults to 0.0)
+     * @param sourceCoefficient the source term coefficient (defaults to 0.0)
      */
-    UniformSourceParabolicPde(double coefficient=0.0);
+    UniformSourceParabolicPde(double sourceCoefficient=0.0);
 
     /**
-     * @return mCoefficient
+     * @return mSourceCoefficient
      */
     double GetCoefficient() const;
 

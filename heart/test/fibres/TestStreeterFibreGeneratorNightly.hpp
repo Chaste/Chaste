@@ -86,8 +86,6 @@ private:
         }
     }
 
-
-
 public:
     void TestSimpleOrthotropic() throw (Exception)
     {

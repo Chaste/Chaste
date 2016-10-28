@@ -113,8 +113,6 @@ void OdeSystemInformation<SimpleOde2>::Initialise()
     this->mInitialised = true;
 }
 
-
-
 /**
  * The following classes are used in the solution of
  * x'=x-y+z, y'=y-z, z'=2y-z

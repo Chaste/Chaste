@@ -216,8 +216,6 @@ public:
                                        bool applyToMatrix = true,
                                        bool applyToRhsVector = true);
 
-
-
     /**
      *  Alter the given linear system to satisfy periodic boundary conditions.
      *

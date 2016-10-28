@@ -283,10 +283,10 @@ std::pair<RealType, int> generate_int_float_pair(Engine& eng, boost::mpl::true_)
     int bucket = 0;
     // process as many full digits as possible into the int part
     for(std::size_t i = 0; i < w/m; ++i) {
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
         base_unsigned u = generate_one_digit(eng, m);
         bucket = (bucket << m) | u;
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
     }
     RealType r;
 
@@ -298,18 +298,18 @@ std::pair<RealType, int> generate_int_float_pair(Engine& eng, boost::mpl::true_)
         const RealType mult = RealType(1)/RealType(base_unsigned(1) << (m - w%m));
         // zero out unused bits
         if (m - w%m > digits) {
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
             u &= ~(base_unsigned(1) << (m - digits));
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
         }
         r = RealType(u >> (w%m)) * mult;
     }
     for(std::size_t i = m - w%m; i + m < digits; ++i) {
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
         base_unsigned u = generate_one_digit(eng, m);
         r += u;
         r *= RealType(0.5)/RealType(base_unsigned(1) << (m - 1));
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
     }
     if (m - w%m < digits)
     {
@@ -370,9 +370,9 @@ struct unit_normal_distribution
         boost::exponential_distribution<RealType> exponential;
         boost::variate_generator<Engine& , boost::exponential_distribution<RealType> > var_exponential(eng, exponential);
         const RealType tail_start = RealType(normal_table<double>::table_x[1]);
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
         for(;;) {
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
             RealType x = var_exponential()/tail_start;
             RealType y = var_exponential();
             if(2*y > x*x) return x + tail_start;

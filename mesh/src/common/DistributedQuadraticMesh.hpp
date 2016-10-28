@@ -97,11 +97,6 @@ public:
      * @param rMeshReader the mesh reader
      */
     void ConstructFromMeshReader(AbstractMeshReader<DIM,DIM>& rMeshReader);
-
-private:
-
-protected:
-
 };
 
 #include "SerializationExportWrapper.hpp"

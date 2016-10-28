@@ -196,8 +196,6 @@ public:
             }
         }// close for loop
     }//close void Test2dSimulations
-
 };
 
 #endif /* TESTLONGPOSTPROCESSING_HPP_ */
-

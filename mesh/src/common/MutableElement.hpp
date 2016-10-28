@@ -155,9 +155,7 @@ public:
      * @return whether or not the element is on the boundary.
      */
     bool IsElementOnBoundary() const;
-
 };
-
 
 //////////////////////////////////////////////////////////////////////
 //                  Specialization for 1d elements                  //

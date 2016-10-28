@@ -121,7 +121,6 @@ public:
      * @param voltageVec  the solution vector to write
      */
     virtual void WriteOneStep(double time, Vec voltageVec);
-
 };
 
 #include "SerializationExportWrapper.hpp" // Must be last

@@ -74,8 +74,8 @@ void ExponentialG1GenerationalCellCycleModel::SetG1Duration()
 {
     RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
 
-    if (    mpCell->GetCellProliferativeType()->IsType<StemCellProliferativeType>()
-            || mpCell->GetCellProliferativeType()->IsType<TransitCellProliferativeType>() )
+    if (mpCell->GetCellProliferativeType()->IsType<StemCellProliferativeType>()
+        || mpCell->GetCellProliferativeType()->IsType<TransitCellProliferativeType>() )
     {
         // Generate an exponential random number with mScale
         mG1Duration = p_gen->ExponentialRandomDeviate(mRate);

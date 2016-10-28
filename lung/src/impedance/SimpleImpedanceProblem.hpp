@@ -230,7 +230,6 @@ private:
      * @return The element inertance
      */
     double CalculateElementInertance(double radius, double length);
-
 };
 
 #endif /* SIMPLEIMPEDANCEPROBLEM_HPP_ */

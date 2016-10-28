@@ -174,7 +174,6 @@ public:
 
         PetscTools::Destroy(result);
     }
-
 };
 
 #endif //_TESTSIMPLELINEARELLIPTICSOLVER_HPP_

@@ -544,7 +544,7 @@ void Cylindrical2dMesh::CorrectNonPeriodicMesh()
     std::set<unsigned> temp_left_hand_side_elements = mLeftPeriodicBoundaryElementIndices;
     std::set<unsigned> temp_right_hand_side_elements = mRightPeriodicBoundaryElementIndices;
 
-//    if ( (mLeftPeriodicBoundaryElementIndices.size()!=mRightPeriodicBoundaryElementIndices.size())
+//    if ((mLeftPeriodicBoundaryElementIndices.size()!=mRightPeriodicBoundaryElementIndices.size())
 //            || (temp_left_hand_side_elements.size() <= 2)
 //            || (temp_right_hand_side_elements.size() <= 2) )
 //    {
@@ -586,9 +586,9 @@ void Cylindrical2dMesh::CorrectNonPeriodicMesh()
 
             for (unsigned i=0; i<3; i++)
             {
-                if ( (corresponding_element_node_indices[i] != p_corresponding_element->GetNodeGlobalIndex(0)) &&
-                     (corresponding_element_node_indices[i] != p_corresponding_element->GetNodeGlobalIndex(1)) &&
-                     (corresponding_element_node_indices[i] != p_corresponding_element->GetNodeGlobalIndex(2)) )
+                if ((corresponding_element_node_indices[i] != p_corresponding_element->GetNodeGlobalIndex(0)) &&
+                    (corresponding_element_node_indices[i] != p_corresponding_element->GetNodeGlobalIndex(1)) &&
+                    (corresponding_element_node_indices[i] != p_corresponding_element->GetNodeGlobalIndex(2)) )
                 {
                     is_corresponding_node = false;
                     break;
@@ -755,11 +755,11 @@ void Cylindrical2dMesh::GenerateVectorsOfElementsStraddlingPeriodicBoundaries()
             }
         }
 
-        if ( (number_of_left_image_nodes == 0) && (number_of_right_image_nodes == 1 || number_of_right_image_nodes == 2) )
+        if ((number_of_left_image_nodes == 0) && (number_of_right_image_nodes == 1 || number_of_right_image_nodes == 2) )
         {
             incidences_of_zero_left_image_nodes++;
         }
-        if ( (number_of_right_image_nodes == 0) && (number_of_left_image_nodes == 1 || number_of_left_image_nodes == 2) )
+        if ((number_of_right_image_nodes == 0) && (number_of_left_image_nodes == 1 || number_of_left_image_nodes == 2) )
         {
             incidences_of_zero_right_image_nodes++;
         }

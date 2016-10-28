@@ -52,6 +52,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SimpleOxygenBasedCellCycleModel.hpp"
 #include "StochasticOxygenBasedCellCycleModel.hpp"
 #include "ContactInhibitionCellCycleModel.hpp"
+#include "NoCellCycleModel.hpp"
 #include "OutputFileHandler.hpp"
 #include "CheckReadyToDivideAndPhaseIsUpdated.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
@@ -73,6 +74,35 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestSimpleCellCycleModels : public AbstractCellBasedTestSuite
 {
 public:
+
+    void TestNoCellCycleModel() throw(Exception)
+    {
+        // Test constructor
+        TS_ASSERT_THROWS_NOTHING(NoCellCycleModel cell_cycle_model);
+
+        // Test methods
+        NoCellCycleModel* p_model = new NoCellCycleModel;
+        TS_ASSERT_DELTA(p_model->GetAverageStemCellCycleTime(), DBL_MAX, 1e-6);
+        TS_ASSERT_DELTA(p_model->GetAverageTransitCellCycleTime(), DBL_MAX, 1e-6);
+        TS_ASSERT_EQUALS(p_model->ReadyToDivide(), false);
+
+        // Test the cell-cycle model works correctly with a cell
+        MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
+        MAKE_PTR(StemCellProliferativeType, p_stem_type);
+
+        CellPtr p_cell(new Cell(p_healthy_state, p_model));
+        p_cell->SetCellProliferativeType(p_stem_type);
+        p_cell->InitialiseCellCycleModel();
+
+        SimulationTime* p_simulation_time = SimulationTime::Instance();
+        p_simulation_time->SetEndTimeAndNumberOfTimeSteps(10.0, 10);
+
+        for (unsigned i=0; i<10; i++)
+        {
+            p_simulation_time->IncrementTimeOneStep();
+            TS_ASSERT_EQUALS(p_cell->ReadyToDivide(), false);
+        }
+    }
 
     void TestBernoulliTrialCellCycleModel() throw(Exception)
     {
@@ -939,6 +969,52 @@ public:
         TS_ASSERT_DELTA(p_cell_model2->GetG2Duration(), 1e20, 1e-4);
     }
 
+    void TestArchiveNoCellCycleModel() throw (Exception)
+    {
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "NoCellCycleModel.arch";
+
+        {
+            // We must set up SimulationTime to avoid memory leaks
+            SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
+
+            // As usual, we archive via a pointer to the most abstract class possible
+            AbstractCellCycleModel* const p_model = new NoCellCycleModel;
+
+            p_model->SetDimension(2);
+            p_model->SetBirthTime(-1.0);
+
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            output_arch << p_model;
+
+            delete p_model;
+            SimulationTime::Destroy();
+        }
+
+        {
+            // We must set SimulationTime::mStartTime here to avoid tripping an assertion
+            SimulationTime::Instance()->SetStartTime(0.0);
+
+            AbstractCellCycleModel* p_model2;
+
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            input_arch >> p_model2;
+
+            // Check private data has been restored correctly
+            TS_ASSERT_DELTA(p_model2->GetBirthTime(), -1.0, 1e-12);
+            TS_ASSERT_DELTA(p_model2->GetAge(), 1.0, 1e-12);
+            TS_ASSERT_EQUALS(p_model2->GetDimension(), 2u);
+            TS_ASSERT_EQUALS(p_model2->ReadyToDivide(), false);
+
+            // Avoid memory leaks
+            delete p_model2;
+        }
+    }
+
     void TestArchiveBernoulliTrialCellCycleModel() throw (Exception)
     {
         OutputFileHandler handler("archive", false);
@@ -1398,6 +1474,22 @@ public:
     {
         std::string output_directory = "TestCellCycleModelOutputParameters";
         OutputFileHandler output_file_handler(output_directory, false);
+
+        // Test with NoCellCycleModel
+        NoCellCycleModel no_model;
+        TS_ASSERT_EQUALS(no_model.GetIdentifier(), "NoCellCycleModel");
+
+        out_stream no_model_parameter_file = output_file_handler.OpenOutputFile("no_model_results.parameters");
+        no_model.OutputCellCycleModelParameters(no_model_parameter_file);
+        no_model_parameter_file->close();
+
+        {
+            FileFinder generated_file = output_file_handler.FindFile("no_model_results.parameters");
+            FileFinder reference_file("cell_based/test/data/TestCellCycleModels/no_model_results.parameters",
+                                      RelativeTo::ChasteSourceRoot);
+            FileComparison comparer(generated_file,reference_file);
+            TS_ASSERT(comparer.CompareFiles());
+        }
 
         // Test with BernoulliTrialCellCycleModel
         BernoulliTrialCellCycleModel random_division_cell_cycle_model;

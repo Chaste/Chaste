@@ -49,11 +49,11 @@ template<unsigned DIM>
 double UblasMatrixInfinityNorm(c_matrix<double,DIM,DIM> mat)
 {
     double ret = fabs(mat(0,0));
-    for(unsigned i=0; i<DIM; i++)
+    for (unsigned i=0; i<DIM; i++)
     {
-        for(unsigned j=0; j<DIM; j++)
+        for (unsigned j=0; j<DIM; j++)
         {
-            if( fabs(mat(i,j)) > ret )
+            if (fabs(mat(i,j)) > ret)
             {
                 ret = fabs(mat(i,j));
             }
@@ -61,7 +61,6 @@ double UblasMatrixInfinityNorm(c_matrix<double,DIM,DIM> mat)
     }
     return ret;
 }
-
 
 class TestFibreReader : public CxxTest::TestSuite
 {
@@ -442,8 +441,6 @@ public:
             }
         }
     }
-
 };
-
 
 #endif /*TESTFIBREREADER_HPP_*/
