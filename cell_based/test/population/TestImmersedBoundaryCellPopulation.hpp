@@ -78,6 +78,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // This test is never run in parallel
 #include "FakePetscSetup.hpp"
 
+#include "Debug.hpp"
+
 ///\todo Vary the cell population geometry across tests
 class TestImmersedBoundaryCellPopulation : public AbstractCellBasedTestSuite
 {
@@ -141,14 +143,15 @@ public:
         TS_ASSERT_EQUALS(r_mesh.GetNumGridPtsX(), 128u);
         TS_ASSERT_EQUALS(r_mesh.GetNumGridPtsY(), 128u);
         TS_ASSERT_DELTA(r_mesh.GetCharacteristicNodeSpacing(), 0.0115, 1e-4);
-        TS_ASSERT_DELTA(r_mesh.GetSpacingRatio(), 2.9610, 1e-4);
+        TS_ASSERT_DELTA(r_mesh.GetSpacingRatio(), 1.4805, 1e-4);
 
         // Test that GetElement() returns an element correctly
         ImmersedBoundaryElement<2, 2>* p_element_0 = cell_population.GetElement(0);
-        TS_ASSERT_EQUALS(p_element_0->GetNumNodes(), 83u);
+        TS_ASSERT_EQUALS(p_element_0->GetNumNodes(), 100u);
 
-        // Note: we cannot yet test the corner nodes or average node spacing of this element;
-        //       these are set in the ImmersedBoundaryMesh method DivideElement()
+        // Test that GetElement() returns the lamina correctly
+        ImmersedBoundaryElement<1, 2>* p_lamina_0 = cell_population.GetLamina(0);
+        TS_ASSERT_EQUALS(p_lamina_0->GetNumNodes(), 83u);
 
         // Test that GetElementCorrespondingToCell() returns an element correctly
         CellPtr p_cell_0 = *(cell_population.Begin());
@@ -159,23 +162,23 @@ public:
         Node<2>* p_node_3 = cell_population.GetNode(3);
         TS_ASSERT_EQUALS(p_node_3->IsBoundaryNode(), true);
         TS_ASSERT_DELTA(p_node_3->rGetLocation()[0], 0.0421, 1e-4);
-        TS_ASSERT_DELTA(p_node_3->rGetLocation()[1], 0.2910, 1e-4);
+        TS_ASSERT_DELTA(p_node_3->rGetLocation()[1], 0.2800, 1e-4);
 
         // Test GetLocationOfCellCentre() returns the correct location
         c_vector<double, 2> cell_0_centre = cell_population.GetLocationOfCellCentre(p_cell_0);
-        TS_ASSERT_DELTA(cell_0_centre[0], 0.0, 1e-6);
-        TS_ASSERT_DELTA(cell_0_centre[1], 0.0, 1e-6);
+        TS_ASSERT_DELTA(cell_0_centre[0], 0.1950, 1e-6);
+        TS_ASSERT_DELTA(cell_0_centre[1], 0.505641, 1e-6);
 
         ///\todo Test GetNeighbouringNodeIndices() and GetNeighbouringLocationIndices() and implement these methods
 
         // Test GetWidth() returns the correct values
         TS_ASSERT_DELTA(cell_population.GetWidth(0), 0.9891, 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetWidth(1), 0.4371, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetWidth(1), 0.4481, 1e-4);
 
         // Test GetVolumeOfCell() returns the correct value
         CellPtr p_cell_1 = *(++(cell_population.Begin()));
         double cell_1_volume = cell_population.GetVolumeOfCell(p_cell_1);
-        TS_ASSERT_DELTA(cell_1_volume, 0.0769, 1e-4);
+        TS_ASSERT_DELTA(cell_1_volume, 0.0774, 1e-4);
 
         ///\todo With this mesh generator, does cell 0 correspond to the basement lamina?
 
@@ -303,22 +306,6 @@ public:
         FileComparison(results_dir + "cellmutationstates.dat", "cell_based/test/data/TestImmersedBoundaryPopulationWriters/cellmutationstates.dat").CompareFiles();
         FileComparison(results_dir + "cellcyclephases.dat", "cell_based/test/data/TestImmersedBoundaryPopulationWriters/cellcyclephases.dat").CompareFiles();
         FileComparison(results_dir + "celltypes.dat", "cell_based/test/data/TestImmersedBoundaryPopulationWriters/celltypes.dat").CompareFiles();
-
-        // Test the GetCellMutationStateCount function
-        std::vector<unsigned> cell_mutation_states = cell_population.GetCellMutationStateCount();
-        TS_ASSERT_EQUALS(cell_mutation_states.size(), 4u);
-        TS_ASSERT_EQUALS(cell_mutation_states[0], 3u);
-        TS_ASSERT_EQUALS(cell_mutation_states[1], 1u);
-        TS_ASSERT_EQUALS(cell_mutation_states[2], 1u);
-        TS_ASSERT_EQUALS(cell_mutation_states[3], 1u);
-
-        // Test the GetCellProliferativeTypeCount() function
-        std::vector<unsigned> cell_types = cell_population.GetCellProliferativeTypeCount();
-        TS_ASSERT_EQUALS(cell_types.size(), 4u);
-        TS_ASSERT_EQUALS(cell_types[0], 2u);
-        TS_ASSERT_EQUALS(cell_types[1], 2u);
-        TS_ASSERT_EQUALS(cell_types[2], 2u);
-        TS_ASSERT_EQUALS(cell_types[3], 0u);
 
         // Test that the cell population parameters are output correctly
         out_stream parameter_file = output_file_handler.OpenOutputFile("results.parameters");
