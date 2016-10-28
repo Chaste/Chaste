@@ -522,20 +522,24 @@ def ExeName(env, exePath):
     return os.path.join(dirpath, pre+name+suf)
 
 
-def GetPathRevision(path, asInt):
-    """Use svnversion to get the revision number of the given path.
+def GetPathRevision(path):
+    """Use svnversion or git, as appropriate, to get the revision number of the given path.
 
-    If asInt is set, then return the highest complete revision number in the string.
     Returns a pair (revision, is_locally_modified).
+    For svn repositories, the revision is just the svn revision number, as a string.
+    For git repositories, we return "0xSHA1", i.e. treating the hash for the latest commit
+    as a hexadecimal number.
     """
-    version_pipe = os.popen("svnversion " + path)
-    revision = version_pipe.read().strip()
-    if version_pipe.close():
-        revision = 'Unknown'
-        modified = False
-    else:
+    if os.path.exists(os.path.join(path, '.git')):
+        # Git repo
+        commit_sha = subprocess.check_output(['git', 'rev-parse', 'HEAD']).strip()
+        retcode = subprocess.call(['git', 'diff-index', '--quiet', 'HEAD', '--'])
+        revision = '0x' + commit_sha
+        modified = (retcode != 0)
+    elif os.path.exists(os.path.join(path, '.svn')):
+        # Subversion repo
+        revision = subprocess.check_output(['svnversion', path]).strip()
         modified = revision[-1] in 'MSP'
-    if asInt:
         try:
             # Extract upper end of range, and store modified flag
             while revision[-1] in 'MSP':
@@ -543,16 +547,19 @@ def GetPathRevision(path, asInt):
             revision = int(revision[1+revision.rfind(':'):])
         except:
             revision = 'UINT_MAX'
+    else:
+        revision, modified = 'Unknown', False
     return (revision, modified)
 
-def GetProjectVersions(projectsRoot, revision=None):
+def GetProjectVersions(projectsRoot, default_revision=None):
     """Return C++ code filling in the project versions map."""
     code = ""
     for entry in sorted(os.listdir(projectsRoot)):
         entry_path = os.path.join(projectsRoot, entry)
         if entry[0] != '.' and os.path.isdir(entry_path):
-            if revision is None:
-                revision, _ = GetPathRevision(entry_path, False)
+            revision, _ = GetPathRevision(entry_path)
+            if revision == 'Unknown' and default_revision:
+                revision = default_revision
             code += '%sversions["%s"] = "%s";\n' % (' '*8, entry, revision)
     return code
 
@@ -564,11 +571,20 @@ def GetVersionCpp(templateFilePath, env):
     if os.path.exists(version_file):
         # Extract just the revision number from the file.
         full_version = open(version_file).read().strip()
-        chaste_revision = int(full_version[1+full_version.rfind('.'):])
-        project_revisions = str(chaste_revision)
+        last_component = full_version[1+full_version.rfind('.'):]
+        if last_component[0] == 'r':
+            # It's a git SHA
+            chaste_revision = '0x' + last_component[1:]
+        else:
+            # It's an svn revision number
+            chaste_revision = last_component
+        default_revision_for_projects = chaste_revision
     else:
-        chaste_revision, wc_modified = GetPathRevision(chaste_root, True)
-        project_revisions = None
+        chaste_revision, wc_modified = GetPathRevision(chaste_root)
+        default_revision_for_projects = None
+    if chaste_revision[:2] == '0x':
+        chaste_revision = chaste_revision[:10] # We can't fit more than 8 hex digits in a 32-bit unsigned reliably
+
     time_format = "%a, %d %b %Y %H:%M:%S +0000"
     build_time = time.strftime(time_format, time.gmtime())
     compiler_type = env['build'].CompilerType()
@@ -594,7 +610,7 @@ def GetVersionCpp(templateFilePath, env):
              'chaste_root': chaste_root,
              'revision': chaste_revision,
              'wc_modified': str(wc_modified).lower(),
-             'project_versions': GetProjectVersions(os.path.join(chaste_root, 'projects'), project_revisions),
+             'project_versions': GetProjectVersions(os.path.join(chaste_root, 'projects'), default_revision_for_projects),
              'licence': licence,
              'time_format': time_format,
              'time_size': len(build_time)+1,
