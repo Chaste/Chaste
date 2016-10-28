@@ -4,6 +4,7 @@ Priority: extra
 Maintainer: Chaste Team <chaste-admin@maillist.ox.ac.uk>
 Build-Depends: debhelper (>= 5)
 Standards-Version: 3.7.2
+Vcs-Browser: https://chaste.cs.ox.ac.uk/trac
 
 Package: chaste-source
 Architecture: all
