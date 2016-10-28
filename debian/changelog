@@ -1,3 +1,9 @@
+chaste-source (3.4.93224.rea10412117df767b9f0bc0f88fa1cc5aaef9d160) precise; urgency=low
+
+  * Package commit ea10412117df767b9f0bc0f88fa1cc5aaef9d160 in Chaste 3.4.
+
+ -- Chaste Team <chaste-admin@maillist.ox.ac.uk>  Fri, 28 Oct 2016 13:34:09 +0000
+
 chaste-source (3.4.93221.r9616683962b91916de365e1204de168821cbcfd7) precise; urgency=low
 
   * Package commit 9616683962b91916de365e1204de168821cbcfd7 in Chaste 3.4.
