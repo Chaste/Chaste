@@ -1,4 +1,4 @@
-# Copyright (c) 2005-2016, University of Oxford.
+B# Copyright (c) 2005-2016, University of Oxford.
 # All rights reserved.
 # 
 # University of Oxford means the Chancellor, Masters and Scholars of the
@@ -703,7 +703,7 @@ add_custom_target(doxygen_coverage
 if (Chaste_MEMORY_TESTING)
     set(CTEST_COMMAND ctest)
     add_custom_target(memtest
-        COMMAND ${CTEST_COMMAND} "-L" Continuous "--output-on-failure" 
+        COMMAND ${CTEST_COMMAND} "-j6" "-L" Continuous "--output-on-failure" 
         COMMAND ${PYTHON_EXECUTABLE} "${Chaste_SOURCE_DIR}/cmake/process_valgrind_output.py" "${Chaste_MEMORY_TESTING_OUTPUT_DIR}"
         DEPENDS Continuous
         WORKING_DIRECTORY ${Chaste_BINARY_DIR}
