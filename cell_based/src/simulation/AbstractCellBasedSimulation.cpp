@@ -495,23 +495,14 @@ MARK
         // Increment simulation time here, so results files look sensible
         p_simulation_time->IncrementTimeOneStep();
 
-<<<<<<< Updated upstream
-=======
         // If any PDEs have been defined, solve them and store their solution in results files
-        if (mpCellBasedPdeHandler != NULL)
-        {
-            CellBasedEventHandler::BeginEvent(CellBasedEventHandler::PDE);
-            mpCellBasedPdeHandler->SolvePdeAndWriteResultsToFile(this->mSamplingTimestepMultiple);
-            CellBasedEventHandler::EndEvent(CellBasedEventHandler::PDE);
-        }
-MARK
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
+//        if (mpCellBasedPdeHandler != NULL)
+//        {
+//            CellBasedEventHandler::BeginEvent(CellBasedEventHandler::PDE);
+//            mpCellBasedPdeHandler->SolvePdeAndWriteResultsToFile(this->mSamplingTimestepMultiple);
+//            CellBasedEventHandler::EndEvent(CellBasedEventHandler::PDE);
+//        }
+
         // Call UpdateAtEndOfTimeStep() on each modifier
         CellBasedEventHandler::BeginEvent(CellBasedEventHandler::UPDATESIMULATION);
         for (typename std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM> > >::iterator iter = mSimulationModifiers.begin();
