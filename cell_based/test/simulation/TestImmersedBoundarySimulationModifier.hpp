@@ -137,11 +137,11 @@ public:
         ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
 
         TS_ASSERT_THROWS_NOTHING(modifier.SetupConstantMemberVariables(cell_population));
-        TS_ASSERT_EQUALS(modifier.mNumGridPtsX, 256u);
-        TS_ASSERT_EQUALS(modifier.mNumGridPtsY, 256u);
-        TS_ASSERT_DELTA(modifier.mGridSpacingX, 0.0039, 1e-4);
-        TS_ASSERT_DELTA(modifier.mGridSpacingY, 0.0039, 1e-4);
-        TS_ASSERT_DELTA(modifier.mFftNorm, 65536.0, 1e-6);
+        TS_ASSERT_EQUALS(modifier.mNumGridPtsX, 128u);
+        TS_ASSERT_EQUALS(modifier.mNumGridPtsY, 128u);
+        TS_ASSERT_DELTA(modifier.mGridSpacingX, 1.0/128.0, 1e-6);
+        TS_ASSERT_DELTA(modifier.mGridSpacingY, 1.0/128.0, 1e-6);
+        TS_ASSERT_DELTA(modifier.mFftNorm, 128.0 * 128.0, 1e-6);
         TS_ASSERT(modifier.mpArrays != NULL);
         TS_ASSERT(modifier.mpFftInterface != NULL);
     }
@@ -287,11 +287,10 @@ public:
         // Note: testing of the force calculations themselves occurs in TestImmersedBoundaryForces
         modifier.AddImmersedBoundaryForceContributions();
 
-        TS_ASSERT_DELTA(p_mesh->GetNode(0)->rGetAppliedForce()[0], -125.2290, 1e-3);
-        TS_ASSERT_DELTA(p_mesh->GetNode(0)->rGetAppliedForce()[1], 6352.7140, 1e-3);
-
-        TS_ASSERT_DELTA(p_mesh->GetNode(5)->rGetAppliedForce()[0], -1235.1356, 1e-3);
-        TS_ASSERT_DELTA(p_mesh->GetNode(5)->rGetAppliedForce()[1], 16800.5590, 1e-3);
+        TS_ASSERT_DELTA(p_mesh->GetNode(0)->rGetAppliedForce()[0], -1.28057e-09, 1e-3);
+        TS_ASSERT_DELTA(p_mesh->GetNode(0)->rGetAppliedForce()[1], 0.0, 1e-3);
+        TS_ASSERT_DELTA(p_mesh->GetNode(5)->rGetAppliedForce()[0], -2.32831e-10, 1e-3);
+        TS_ASSERT_DELTA(p_mesh->GetNode(5)->rGetAppliedForce()[1], 0.0, 1e-3);
     }
 };
 
