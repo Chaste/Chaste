@@ -37,25 +37,25 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define IMMERSEDBOUNDARYMESH_HPP_
 
 // Forward declaration prevents circular include chain
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class ImmersedBoundaryMeshWriter;
 
+#include <algorithm>
 #include <iostream>
 #include <map>
-#include <algorithm>
 
-#include "ChasteSerialization.hpp"
-#include <boost/serialization/vector.hpp>
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/split_member.hpp>
+#include <boost/serialization/vector.hpp>
+#include "ChasteSerialization.hpp"
 
 #include "AbstractMesh.hpp"
 #include "ArchiveLocationInfo.hpp"
+#include "FluidSource.hpp"
+#include "ImmersedBoundaryArray.hpp"
+#include "ImmersedBoundaryElement.hpp"
 #include "ImmersedBoundaryMeshReader.hpp"
 #include "ImmersedBoundaryMeshWriter.hpp"
-#include "ImmersedBoundaryElement.hpp"
-#include "ImmersedBoundaryArray.hpp"
-#include "FluidSource.hpp"
 
 /**
  * An immersed boundary mesh class, in which elements may contain different numbers of nodes.
@@ -63,13 +63,12 @@ class ImmersedBoundaryMeshWriter;
  *
  * This class allows immersed boundary simulations.
  */
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class ImmersedBoundaryMesh : public AbstractMesh<ELEMENT_DIM, SPACE_DIM>
 {
     friend class TestImmersedBoundaryMesh;
 
 protected:
-
     /** Number of grid points in x direction */
     unsigned mNumGridPtsX;
 
@@ -97,7 +96,7 @@ protected:
     /** Vector of pointers to ImmersedBoundaryElements. */
     std::vector<ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>*> mElements;
 
-    std::vector<ImmersedBoundaryElement<ELEMENT_DIM-1, SPACE_DIM>*> mLaminas;
+    std::vector<ImmersedBoundaryElement<ELEMENT_DIM - 1, SPACE_DIM>*> mLaminas;
 
     /** Vector of fluid sources related to elements. */
     std::vector<FluidSource<SPACE_DIM>*> mElementFluidSources;
@@ -145,7 +144,7 @@ protected:
      *
      * @return the index of the new element
      */
-    unsigned DivideElement(ImmersedBoundaryElement<ELEMENT_DIM,SPACE_DIM>* pElement,
+    unsigned DivideElement(ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>* pElement,
                            unsigned nodeAIndex,
                            unsigned nodeBIndex,
                            c_vector<double, SPACE_DIM> centroid,
@@ -161,15 +160,15 @@ protected:
      * @param archive the archive
      * @param version the current version of this class
      */
-    template<class Archive>
-    void save(Archive & archive, const unsigned int version) const
+    template <class Archive>
+    void save(Archive& archive, const unsigned int version) const
     {
-        archive & boost::serialization::base_object<AbstractMesh<ELEMENT_DIM,SPACE_DIM> >(*this);
+        archive& boost::serialization::base_object<AbstractMesh<ELEMENT_DIM, SPACE_DIM> >(*this);
 
         // Create a mesh writer pointing to the correct file and directory
         ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM> mesh_writer(ArchiveLocationInfo::GetArchiveRelativePath(),
-                                                             ArchiveLocationInfo::GetMeshFilename(),
-                                                             false);
+                                                                       ArchiveLocationInfo::GetMeshFilename(),
+                                                                       false);
         mesh_writer.WriteFilesUsingMesh(*(const_cast<ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>*>(this)));
     }
 
@@ -179,18 +178,17 @@ protected:
      * @param archive the archive
      * @param version the current version of this class
      */
-    template<class Archive>
-    void load(Archive & archive, const unsigned int version)
+    template <class Archive>
+    void load(Archive& archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractMesh<ELEMENT_DIM,SPACE_DIM> >(*this);
+        archive& boost::serialization::base_object<AbstractMesh<ELEMENT_DIM, SPACE_DIM> >(*this);
 
-        ImmersedBoundaryMeshReader<ELEMENT_DIM,SPACE_DIM> mesh_reader(ArchiveLocationInfo::GetArchiveDirectory() + ArchiveLocationInfo::GetMeshFilename());
+        ImmersedBoundaryMeshReader<ELEMENT_DIM, SPACE_DIM> mesh_reader(ArchiveLocationInfo::GetArchiveDirectory() + ArchiveLocationInfo::GetMeshFilename());
         this->ConstructFromMeshReader(mesh_reader);
     }
     BOOST_SERIALIZATION_SPLIT_MEMBER()
 
 public:
-
     /** Forward declaration of element iterator. */
     class ImmersedBoundaryElementIterator;
 
@@ -202,7 +200,7 @@ public:
      *
      * @param skipDeletedElements whether to include deleted elements
      */
-    inline ImmersedBoundaryElementIterator GetElementIteratorBegin(bool skipDeletedElements=true);
+    inline ImmersedBoundaryElementIterator GetElementIteratorBegin(bool skipDeletedElements = true);
 
     /**
      * @return an iterator to one past the last element in the mesh.
@@ -214,7 +212,7 @@ public:
      *
      * @param skipDeletedLaminas whether to include deleted laminas
      */
-    inline ImmersedBoundaryLaminaIterator GetLaminaIteratorBegin(bool skipDeletedLaminas=true);
+    inline ImmersedBoundaryLaminaIterator GetLaminaIteratorBegin(bool skipDeletedLaminas = true);
 
     /**
      * @return an iterator to one past the last element in the mesh.
@@ -231,9 +229,9 @@ public:
      */
     ImmersedBoundaryMesh(std::vector<Node<SPACE_DIM>*> nodes,
                          std::vector<ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>*> elements,
-                         std::vector<ImmersedBoundaryElement<ELEMENT_DIM-1, SPACE_DIM>*> laminas=std::vector<ImmersedBoundaryElement<ELEMENT_DIM-1, SPACE_DIM>*>(),
-                         unsigned numGridPtsX=128,
-                         unsigned numGridPtsY=128);
+                         std::vector<ImmersedBoundaryElement<ELEMENT_DIM - 1, SPACE_DIM>*> laminas = std::vector<ImmersedBoundaryElement<ELEMENT_DIM - 1, SPACE_DIM>*>(),
+                         unsigned numGridPtsX = 128,
+                         unsigned numGridPtsY = 128);
 
     /**
      * Default constructor for use by serializer.
@@ -372,7 +370,7 @@ public:
      *
      * @return a pointer to the immersed boundary lamina
      */
-    ImmersedBoundaryElement<ELEMENT_DIM-1, SPACE_DIM>* GetLamina(unsigned index) const;
+    ImmersedBoundaryElement<ELEMENT_DIM - 1, SPACE_DIM>* GetLamina(unsigned index) const;
 
     /**
      * Compute the centroid of an element.
@@ -396,7 +394,7 @@ public:
      *
      * @param rMeshReader the mesh reader
      */
-    void ConstructFromMeshReader(AbstractMeshReader<ELEMENT_DIM,SPACE_DIM>& rMeshReader);
+    void ConstructFromMeshReader(AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>& rMeshReader);
 
     /**
      * Delete mNodes, mFaces and mElements.
@@ -432,7 +430,7 @@ public:
      * @param recalculate whether or not to recalculate the value
      * @return the average node spacing of the element
      */
-    double GetAverageNodeSpacingOfElement(unsigned index, bool recalculate=true);
+    double GetAverageNodeSpacingOfElement(unsigned index, bool recalculate = true);
 
     /**
      * Compute the average node spacing of a lamina.
@@ -441,7 +439,7 @@ public:
      * @param recalculate whether or not to recalculate the value
      * @return the average node spacing of the lamina
      */
-    double GetAverageNodeSpacingOfLamina(unsigned index, bool recalculate=true);
+    double GetAverageNodeSpacingOfLamina(unsigned index, bool recalculate = true);
 
     /**
      * Compute the second moments and product moment of area for a given 2D element
@@ -554,9 +552,9 @@ public:
      *
      * @return the index of the new element
      */
-    unsigned DivideElementAlongGivenAxis(ImmersedBoundaryElement<ELEMENT_DIM,SPACE_DIM>* pElement,
+    unsigned DivideElementAlongGivenAxis(ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>* pElement,
                                          c_vector<double, SPACE_DIM> axisOfDivision,
-                                         bool placeOriginalElementBelow=false);
+                                         bool placeOriginalElementBelow = false);
 
     /**
      * Divide an element along its short axis.
@@ -566,9 +564,8 @@ public:
      *
      * @return the index of the new element
      */
-    unsigned DivideElementAlongShortAxis(ImmersedBoundaryElement<ELEMENT_DIM,SPACE_DIM>* pElement,
-                                         bool placeOriginalElementBelow=false);
-
+    unsigned DivideElementAlongShortAxis(ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>* pElement,
+                                         bool placeOriginalElementBelow = false);
 
     /**
      * @return mElementDivisionSpacing
@@ -623,15 +620,15 @@ public:
          * @param skipDeletedElements whether to include deleted elements
          */
         ImmersedBoundaryElementIterator(ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
-                        typename std::vector<ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM> *>::iterator elementIter,
-                        bool skipDeletedElements=true);
+                                        typename std::vector<ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>*>::iterator elementIter,
+                                        bool skipDeletedElements = true);
 
     private:
         /** The mesh we're iterating over. */
         ImmersedBoundaryMesh& mrMesh;
 
         /** The actual element iterator. */
-        typename std::vector<ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM> *>::iterator mElementIter;
+        typename std::vector<ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>*>::iterator mElementIter;
 
         /** Whether to skip deleted elements. */
         bool mSkipDeletedElements;
@@ -660,13 +657,13 @@ public:
          * @return reference
          * Make sure to use a reference for the result to avoid copying laminas unnecessarily.
          */
-        inline ImmersedBoundaryElement<ELEMENT_DIM-1, SPACE_DIM>& operator*();
+        inline ImmersedBoundaryElement<ELEMENT_DIM - 1, SPACE_DIM>& operator*();
 
         /**
          * Member access from a pointer.
          * @return pointer
          */
-        inline ImmersedBoundaryElement<ELEMENT_DIM-1, SPACE_DIM>* operator->();
+        inline ImmersedBoundaryElement<ELEMENT_DIM - 1, SPACE_DIM>* operator->();
 
         /**
          * Comparison not-equal-to.
@@ -692,15 +689,15 @@ public:
          * @param skipDeletedLaminas whether to include deleted laminas
          */
         ImmersedBoundaryLaminaIterator(ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
-                                        typename std::vector<ImmersedBoundaryElement<ELEMENT_DIM-1, SPACE_DIM> *>::iterator laminaIter,
-                                        bool skipDeletedLaminas=true);
+                                       typename std::vector<ImmersedBoundaryElement<ELEMENT_DIM - 1, SPACE_DIM>*>::iterator laminaIter,
+                                       bool skipDeletedLaminas = true);
 
     private:
         /** The mesh we're iterating over. */
         ImmersedBoundaryMesh& mrMesh;
 
         /** The actual lamina iterator. */
-        typename std::vector<ImmersedBoundaryElement<ELEMENT_DIM-1, SPACE_DIM> *>::iterator mLaminaIter;
+        typename std::vector<ImmersedBoundaryElement<ELEMENT_DIM - 1, SPACE_DIM>*>::iterator mLaminaIter;
 
         /** Whether to skip deleted laminas. */
         bool mSkipDeletedLaminas;
@@ -726,59 +723,58 @@ EXPORT_TEMPLATE_CLASS_ALL_DIMS(ImmersedBoundaryMesh)
 // ImmersedBoundaryElementIterator class implementation - most methods are inlined    //
 ////////////////////////////////////////////////////////////////////////////////////////
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 typename ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryElementIterator ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetElementIteratorBegin(
-        bool skipDeletedElements)
+    bool skipDeletedElements)
 {
     return ImmersedBoundaryElementIterator(*this, mElements.begin(), skipDeletedElements);
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 typename ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryElementIterator ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetElementIteratorEnd()
 {
     return ImmersedBoundaryElementIterator(*this, mElements.end());
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryElementIterator::operator*()
 {
     assert(!IsAtEnd());
     return **mElementIter;
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>* ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryElementIterator::operator->()
 {
     assert(!IsAtEnd());
     return *mElementIter;
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryElementIterator::operator!=(const typename ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryElementIterator& rOther)
 {
     return mElementIter != rOther.mElementIter;
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 typename ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryElementIterator& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryElementIterator::operator++()
 {
     do
     {
         ++mElementIter;
-    }
-    while (!IsAtEnd() && !IsAllowedElement());
+    } while (!IsAtEnd() && !IsAllowedElement());
 
     return (*this);
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryElementIterator::ImmersedBoundaryElementIterator(
-        ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
-        typename std::vector<ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM> *>::iterator elementIter,
-        bool skipDeletedElements)
-    : mrMesh(rMesh),
-      mElementIter(elementIter),
-      mSkipDeletedElements(skipDeletedElements)
+    ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
+    typename std::vector<ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>*>::iterator elementIter,
+    bool skipDeletedElements)
+        : mrMesh(rMesh),
+          mElementIter(elementIter),
+          mSkipDeletedElements(skipDeletedElements)
 {
     if (mrMesh.mElements.empty())
     {
@@ -795,13 +791,13 @@ ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryElementIterator::I
     }
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryElementIterator::IsAtEnd()
 {
     return mElementIter == mrMesh.mElements.end();
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryElementIterator::IsAllowedElement()
 {
     return !(mSkipDeletedElements && (*this)->IsDeleted());
@@ -811,56 +807,55 @@ bool ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryElementIterat
 // ImmersedBoundaryLaminaIterator class implementation - most methods are inlined    //
 ///////////////////////////////////////////////////////////////////////////////////////
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 typename ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryLaminaIterator ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetLaminaIteratorBegin(
-        bool skipDeletedLaminas)
+    bool skipDeletedLaminas)
 {
     return ImmersedBoundaryLaminaIterator(*this, mLaminas.begin(), skipDeletedLaminas);
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 typename ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryLaminaIterator ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetLaminaIteratorEnd()
 {
     return ImmersedBoundaryLaminaIterator(*this, mLaminas.end());
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-ImmersedBoundaryElement<ELEMENT_DIM-1, SPACE_DIM>& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryLaminaIterator::operator*()
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+ImmersedBoundaryElement<ELEMENT_DIM - 1, SPACE_DIM>& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryLaminaIterator::operator*()
 {
     assert(!IsAtEnd());
     return **mLaminaIter;
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-ImmersedBoundaryElement<ELEMENT_DIM-1, SPACE_DIM>* ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryLaminaIterator::operator->()
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+ImmersedBoundaryElement<ELEMENT_DIM - 1, SPACE_DIM>* ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryLaminaIterator::operator->()
 {
     assert(!IsAtEnd());
     return *mLaminaIter;
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryLaminaIterator::operator!=(const typename ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryLaminaIterator& rOther)
 {
     return mLaminaIter != rOther.mLaminaIter;
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 typename ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryLaminaIterator& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryLaminaIterator::operator++()
 {
     do
     {
         ++mLaminaIter;
-    }
-    while (!IsAtEnd() && !IsAllowedLamina());
+    } while (!IsAtEnd() && !IsAllowedLamina());
 
     return (*this);
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryLaminaIterator::ImmersedBoundaryLaminaIterator(
-        ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
-        typename std::vector<ImmersedBoundaryElement<ELEMENT_DIM-1, SPACE_DIM> *>::iterator laminaIter,
-        bool skipDeletedLaminas)
+    ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
+    typename std::vector<ImmersedBoundaryElement<ELEMENT_DIM - 1, SPACE_DIM>*>::iterator laminaIter,
+    bool skipDeletedLaminas)
         : mrMesh(rMesh),
           mLaminaIter(laminaIter),
           mSkipDeletedLaminas(skipDeletedLaminas)
@@ -880,13 +875,13 @@ ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryLaminaIterator::Im
     }
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryLaminaIterator::IsAtEnd()
 {
     return mLaminaIter == mrMesh.mLaminas.end();
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryLaminaIterator::IsAllowedLamina()
 {
     return !(mSkipDeletedLaminas && (*this)->IsDeleted());
