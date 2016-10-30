@@ -37,8 +37,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTIMMERSEDBOUNDARYMESH_HPP_
 
 // Needed for test framework
-#include <cxxtest/cxxtest/TestSuite.h>
+#include <cxxtest/TestSuite.h>
 
+#include "ImmersedBoundaryHoneycombMeshGenerator.hpp"
 #include "ImmersedBoundaryMesh.hpp"
 
 // This test is never run in parallel
@@ -47,55 +48,94 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestImmersedBoundaryMesh : public CxxTest::TestSuite
 {
 public:
-
     void TestSolveNodeAndElementMapping() throw(Exception)
     {
     }
 
     void TestClear() throw(Exception)
     {
-
     }
 
     void TestSetupFluidVelocityGrids() throw(Exception)
     {
-
     }
 
     void TestArchiving() throw(Exception)
     {
-
     }
 
     void TestElementIterator() throw(Exception)
     {
-
     }
 
     void TestSetAndGetMethods() throw(Exception)
     {
-
     }
 
     void TestGetVectorFromAtoB() throw(Exception)
     {
+        // Create a small mesh
+        ImmersedBoundaryHoneycombMeshGenerator gen(1, 1, 3, 0.1, 0.3);
+        ImmersedBoundaryMesh<2, 2>* p_mesh = gen.GetMesh();
 
+        // Two helper vectors
+        c_vector<double, 2> x_unit = unit_vector<double>(2, 0);
+        c_vector<double, 2> y_unit = unit_vector<double>(2, 1);
+
+        c_vector<double, 2> point_a;
+        c_vector<double, 2> point_b;
+        c_vector<double, 2> vec_a2b;
+
+        // Immersed boundary meshes are always doubly-periodic on the square [0, 1] x [0, 1]
+
+        // Regular cases where periodicity plays no part
+        point_a = 0.0 * x_unit;
+        point_b = 0.3 * x_unit + 0.4 * y_unit;
+        vec_a2b = p_mesh->GetVectorFromAtoB(point_a, point_b);
+
+        TS_ASSERT_DELTA(vec_a2b[0], point_b[0], 1e-6);
+        TS_ASSERT_DELTA(vec_a2b[1], point_b[1], 1e-6);
+        TS_ASSERT_DELTA(norm_2(vec_a2b), 0.5, 1e-6);
+
+        // x-periodicity
+        point_a = 0.2 * x_unit;
+        point_b = 0.8 * x_unit;
+        vec_a2b = p_mesh->GetVectorFromAtoB(point_a, point_b);
+
+        TS_ASSERT_DELTA(vec_a2b[0], -0.4, 1e-6);
+        TS_ASSERT_DELTA(vec_a2b[1], 0.0, 1e-6);
+
+        // y-periodicity
+        point_a = 0.2 * y_unit;
+        point_b = 0.8 * y_unit;
+        vec_a2b = p_mesh->GetVectorFromAtoB(point_a, point_b);
+
+        TS_ASSERT_DELTA(vec_a2b[0], 0.0, 1e-6);
+        TS_ASSERT_DELTA(vec_a2b[1], -0.4, 1e-6);
+
+        // x and y-periodicity
+        point_a = 0.1 * x_unit + 0.1 * y_unit;
+        point_b = 0.9 * x_unit + 0.9 * y_unit;
+        vec_a2b = p_mesh->GetVectorFromAtoB(point_a, point_b);
+
+        TS_ASSERT_DELTA(vec_a2b[0], -0.2, 1e-6);
+        TS_ASSERT_DELTA(vec_a2b[1], -0.2, 1e-6);
     }
 
     void TestGetSkewnessOfElementMassDistributionAboutAxis() throw(Exception)
     {
         // A square should have no skewness about any axis
         {
-            std::vector <Node<2>*> nodes;
+            std::vector<Node<2>*> nodes;
             nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
             nodes.push_back(new Node<2>(1, true, 0.1, 0.0));
             nodes.push_back(new Node<2>(2, true, 0.1, 0.1));
             nodes.push_back(new Node<2>(3, true, 0.0, 0.1));
 
-            std::vector < ImmersedBoundaryElement < 2, 2 > * > elems;
+            std::vector<ImmersedBoundaryElement<2, 2>*> elems;
             elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
 
-            ImmersedBoundaryMesh<2, 2> *p_mesh = new ImmersedBoundaryMesh<2, 2>(nodes, elems);
+            ImmersedBoundaryMesh<2, 2>* p_mesh = new ImmersedBoundaryMesh<2, 2>(nodes, elems);
 
             for (unsigned i = 0; i < 16; i++)
             {
@@ -108,20 +148,20 @@ public:
                 TS_ASSERT_DELTA(p_mesh->GetSkewnessOfElementMassDistributionAboutAxis(0, axis), 0.0, 1e-12);
             }
 
-            delete(p_mesh);
+            delete (p_mesh);
         }
 
         // A triangle should have skewness
         {
-            std::vector <Node<2>*> nodes;
+            std::vector<Node<2>*> nodes;
             nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
             nodes.push_back(new Node<2>(1, true, 0.1, 0.0));
             nodes.push_back(new Node<2>(2, true, 0.1, 0.1));
 
-            std::vector < ImmersedBoundaryElement < 2, 2 > * > elems;
+            std::vector<ImmersedBoundaryElement<2, 2>*> elems;
             elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
 
-            ImmersedBoundaryMesh<2, 2> *p_mesh = new ImmersedBoundaryMesh<2, 2>(nodes, elems);
+            ImmersedBoundaryMesh<2, 2>* p_mesh = new ImmersedBoundaryMesh<2, 2>(nodes, elems);
 
             c_vector<double, 2> axis;
             axis[0] = 0.0;
