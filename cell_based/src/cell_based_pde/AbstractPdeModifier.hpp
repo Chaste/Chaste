@@ -125,6 +125,11 @@ protected:
     /** File that the values of the PDE solution are written out to. */
     out_stream mpVizPdeSolutionResultsFile;
 
+    /**
+     * Whether to delete the finite element mesh when we are destroyed.
+     */
+    bool mDeleteFeMesh;
+
 public:
 
     /**

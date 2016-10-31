@@ -55,11 +55,6 @@ ParabolicBoxDomainPdeModifier<DIM>::ParabolicBoxDomainPdeModifier(boost::shared_
 template<unsigned DIM>
 ParabolicBoxDomainPdeModifier<DIM>::~ParabolicBoxDomainPdeModifier()
 {
-    // If we have used this modifier, then we will have created a solution vector
-    if (this->mSolution)
-    {
-        PetscTools::Destroy(this->mSolution);
-    }
 }
 
 template<unsigned DIM>

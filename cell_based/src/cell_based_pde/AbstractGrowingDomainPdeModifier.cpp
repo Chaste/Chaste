@@ -48,30 +48,27 @@ AbstractGrowingDomainPdeModifier<DIM>::AbstractGrowingDomainPdeModifier(boost::s
     : AbstractPdeModifier<DIM>(pPde,
     		                   pBoundaryCondition,
     		                   isNeumannBoundaryCondition,
-    		                   solution),
-      mDeleteMesh(false)
+    		                   solution)
 {
 }
 
 template<unsigned DIM>
 AbstractGrowingDomainPdeModifier<DIM>::~AbstractGrowingDomainPdeModifier()
 {
-    if (mDeleteMesh)
-    {
-        delete this->mpFeMesh;
-    }
 }
 
 template<unsigned DIM>
 void AbstractGrowingDomainPdeModifier<DIM>::GenerateFeMesh(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
-    if (mDeleteMesh)
+    if (this->mDeleteFeMesh)
     {
         // If a mesh has been created on a previous time-step then we need to tidy it up
         assert(this->mpFeMesh != NULL);
         delete this->mpFeMesh;
     }
-    mDeleteMesh = (dynamic_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation) == NULL);
+
+    ///\todo We should only set mDeleteFeMesh once, not every time step (#2687, #2863)
+    this->mDeleteFeMesh = (dynamic_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation) == NULL);
 
     // Get the finite element mesh via the cell population
     this->mpFeMesh = rCellPopulation.GetTetrahedralMeshForPdeModifier();

@@ -59,6 +59,7 @@ AbstractBoxDomainPdeModifier<DIM>::AbstractBoxDomainPdeModifier(boost::shared_pt
     {
         // We only need to generate mpFeMesh once, as it does not vary with time
         this->GenerateFeMesh(*mpMeshCuboid, mStepSize);
+        this->mDeleteFeMesh = true;
     }
 }
 

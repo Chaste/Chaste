@@ -52,7 +52,8 @@ AbstractPdeModifier<DIM>::AbstractPdeModifier(boost::shared_ptr<AbstractLinearPd
       mSolution(NULL),
       mOutputDirectory(""),
       mOutputGradient(false),
-      mOutputSolutionAtPdeNodes(false)
+      mOutputSolutionAtPdeNodes(false),
+      mDeleteFeMesh(false)
 {
     if (solution)
     {
@@ -63,6 +64,14 @@ AbstractPdeModifier<DIM>::AbstractPdeModifier(boost::shared_ptr<AbstractLinearPd
 template<unsigned DIM>
 AbstractPdeModifier<DIM>::~AbstractPdeModifier()
 {
+    if (mDeleteFeMesh)
+    {
+        delete mpFeMesh;
+    }
+    if (mSolution)
+    {
+        PetscTools::Destroy(mSolution);
+    }
 }
 
 template<unsigned DIM>

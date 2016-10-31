@@ -55,11 +55,6 @@ EllipticBoxDomainPdeModifier<DIM>::EllipticBoxDomainPdeModifier(boost::shared_pt
 template<unsigned DIM>
 EllipticBoxDomainPdeModifier<DIM>::~EllipticBoxDomainPdeModifier()
 {
-    // Destroy the most recent solution vector
-    if (this->mSolution != NULL)
-    {
-        PetscTools::Destroy(this->mSolution);
-    }
 }
 
 template<unsigned DIM>
