@@ -32,7 +32,7 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
-#include "Debug.hpp"
+
 #include <boost/bind.hpp>
 #include <boost/mem_fn.hpp>
 
@@ -705,7 +705,7 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulationInfo(ou
             first_cell_with_unique_CCM.push_back((*cell_iter));
         }
     }
-MARK
+
     // Loop over unique cell-cycle models
     for (unsigned i=0; i<first_cell_with_unique_CCM.size(); i++)
     {
@@ -713,7 +713,6 @@ MARK
         first_cell_with_unique_CCM[i]->GetCellCycleModel()->OutputCellCycleModelInfo(rParamsFile);
     }
     *rParamsFile << "\t</CellCycleModels>\n";
-MARK
     *rParamsFile << "\n";
     *rParamsFile << "\t<SrnModels>\n";
 
@@ -736,14 +735,14 @@ MARK
             first_cell_with_unique_SRN.push_back((*cell_iter));
         }
     }
-MARK
+
     // Loop over unique SRN models
     for (unsigned i=0; i<first_cell_with_unique_SRN.size(); i++)
     {
         // Output SRN model details
         first_cell_with_unique_SRN[i]->GetSrnModel()->OutputSrnModelInfo(rParamsFile);
     }
-MARK
+
     *rParamsFile << "\t</SrnModels>\n";
 }
 

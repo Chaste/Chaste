@@ -2,7 +2,7 @@
 #define TESTMUTABLEVERTEXMESH33REMESH_HPP_
 
 #include <cxxtest/TestSuite.h>
-#include "Debug.hpp"
+
 #include "VertexMeshWriter.hpp"
 #include "FileComparison.hpp"
 #include "Warnings.hpp"

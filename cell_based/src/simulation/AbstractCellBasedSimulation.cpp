@@ -305,7 +305,7 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
 {
     CellBasedEventHandler::BeginEvent(CellBasedEventHandler::EVERYTHING);
     CellBasedEventHandler::BeginEvent(CellBasedEventHandler::SETUP);
-MARK
+
     // Set up the simulation time
     SimulationTime* p_simulation_time = SimulationTime::Instance();
     double current_time = p_simulation_time->GetTime();
@@ -316,7 +316,7 @@ MARK
     {
         EXCEPTION("SetEndTime has not yet been called.");
     }
-MARK
+
     /*
      * Note that mDt is used here for "ideal time step". If this step doesn't divide the time remaining
      * then a *different* time step will be taken by the time-stepper. The real time-step (used in the
@@ -340,7 +340,7 @@ MARK
             p_simulation_time->SetEndTimeAndNumberOfTimeSteps(mEndTime, num_time_steps);
         }
     }
-MARK
+
     if (mOutputDirectory == "")
     {
         EXCEPTION("OutputDirectory not set");
@@ -352,14 +352,14 @@ MARK
 
     std::string results_directory = mOutputDirectory +"/results_from_time_" + time_string.str();
     mSimulationOutputDirectory = results_directory;
-MARK
+
     // Set up simulation
 
     // Create output files for the visualizer
     OutputFileHandler output_file_handler(results_directory+"/", true);
 
     mrCellPopulation.OpenWritersFiles(output_file_handler);
-MARK
+
     if (mOutputDivisionLocations)
     {
         mpDivisionLocationFile = output_file_handler.OpenOutputFile("divisions.dat");
@@ -369,7 +369,7 @@ MARK
         OutputFileHandler output_file_handler2(this->mSimulationOutputDirectory+"/", false);
         mpCellVelocitiesFile = output_file_handler2.OpenOutputFile("cellvelocities.dat");
     }
-MARK
+
     if (PetscTools::AmMaster())
     {
         mpVizSetupFile = output_file_handler.OpenOutputFile("results.vizsetup");
@@ -385,9 +385,9 @@ MARK
     }
 
     this->mrCellPopulation.SimulationSetupHook(this);
-MARK
+
     SetupSolve();
-MARK
+
     // Call SetupSolve() on each modifier
     for (typename std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM> > >::iterator iter = mSimulationModifiers.begin();
          iter != mSimulationModifiers.end();
@@ -395,7 +395,7 @@ MARK
     {
         (*iter)->SetupSolve(this->mrCellPopulation,this->mSimulationOutputDirectory);
     }
-MARK
+
     /*
      * Age the cells to the correct time. Note that cells are created with
      * negative birth times so that some are initially almost ready to divide.
@@ -412,7 +412,7 @@ MARK
         cell_iter->ReadyToDivide();
     }
     LOG(1, "\tdone\n");
-MARK
+
     // Write initial conditions to file for the visualizer
     WriteVisualizerSetupFile();
 
@@ -422,22 +422,22 @@ MARK
     }
 
     mrCellPopulation.WriteResultsToFiles(results_directory+"/");
-MARK
-MARK    OutputSimulationSetup();
-MARK    CellBasedEventHandler::EndEvent(CellBasedEventHandler::SETUP);
-TRACE("Starting main time loop")
+
+    OutputSimulationSetup();
+    CellBasedEventHandler::EndEvent(CellBasedEventHandler::SETUP);
+
     // Enter main time loop
     while (!( p_simulation_time->IsFinished() || StoppingEventHasOccurred() ) )
     {
         LOG(1, "--TIME = " << p_simulation_time->GetTime() << "\n");
-MARK
+
         // This function calls DoCellRemoval(), DoCellBirth() and CellPopulation::Update()
         UpdateCellPopulation();
 
         // Store whether we are sampling results at the current timestep
         SimulationTime* p_time = SimulationTime::Instance();
         bool at_sampling_timestep = (p_time->GetTimeStepsElapsed()%this->mSamplingTimestepMultiple == 0);
-PRINT_VARIABLE(p_time->GetTimeStepsElapsed())
+
         /*
          * If required, store the current locations of cell centres. Note that we need to
          * use a std::map between cells and locations, rather than (say) a std::vector with
@@ -458,7 +458,7 @@ PRINT_VARIABLE(p_time->GetTimeStepsElapsed())
 
         // Update cell locations and topology
         UpdateCellLocationsAndTopology();
-MARK
+
         // Now write cell velocities to file if required
         if (mOutputCellVelocities && at_sampling_timestep)
         {
@@ -488,7 +488,7 @@ MARK
             }
             *mpCellVelocitiesFile << "\n";
         }
-MARK
+
         // Update the assignment of cells to processes.
         mrCellPopulation.UpdateCellProcessLocation();
 
@@ -518,7 +518,7 @@ MARK
         if (p_simulation_time->GetTimeStepsElapsed()%mSamplingTimestepMultiple == 0)// should be at_sampling_timestep !
         {
             mrCellPopulation.WriteResultsToFiles(results_directory+"/");
-MARK
+
             // Call UpdateAtEndOfOutputTimeStep() on each modifier
             for (typename std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM> > >::iterator iter = mSimulationModifiers.begin();
                  iter != mSimulationModifiers.end();
@@ -531,7 +531,7 @@ MARK
     }
 
     LOG(1, "--END TIME = " << p_simulation_time->GetTime() << "\n");
-MARK
+
     /*
      * Carry out a final update so that cell population is coherent with new cell positions.
      * Note that cell birth and death still need to be checked because they may be spatially
@@ -641,11 +641,11 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::OutputSimulationSetup()
 {
     OutputFileHandler output_file_handler(this->mSimulationOutputDirectory + "/", false);
-TRACE("Simulation setup")
+
     // Output machine information
     ExecutableSupport::SetOutputDirectory(output_file_handler.GetOutputDirectoryFullPath());
     ExecutableSupport::WriteMachineInfoFile("system_info");
-MARK
+
     if (PetscTools::AmMaster())
     {
         // Output Chaste provenance information
@@ -657,7 +657,7 @@ MARK
 
         // Output simulation parameter and setup details
         out_stream parameter_file = output_file_handler.OpenOutputFile("results.parameters");
-MARK
+
         // Output simulation details
         std::string simulation_type = GetIdentifier();
 
@@ -666,10 +666,10 @@ MARK
         OutputSimulationParameters(parameter_file);
         *parameter_file << "\t</" << simulation_type << ">\n";
         *parameter_file << "\n";
-MARK
+
         // Output cell population details (includes cell-cycle model details)
         mrCellPopulation.OutputCellPopulationInfo(parameter_file);
-MARK
+
         // Loop over cell killers
         *parameter_file << "\n\t<CellKillers>\n";
         for (typename std::vector<boost::shared_ptr<AbstractCellKiller<SPACE_DIM> > >::iterator iter = mCellKillers.begin();
@@ -680,7 +680,7 @@ MARK
             (*iter)->OutputCellKillerInfo(parameter_file);
         }
         *parameter_file << "\t</CellKillers>\n";
-MARK
+
         // Iterate over simulationmodifiers
         *parameter_file << "\n\t<SimulationModifiers>\n";
         for (typename std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM> > >::iterator iter = mSimulationModifiers.begin();
@@ -691,10 +691,10 @@ MARK
             (*iter)->OutputSimulationModifierInfo(parameter_file);
         }
         *parameter_file << "\t</SimulationModifiers>\n";
-MARK
+
         // This is used to output information about subclasses
         OutputAdditionalSimulationSetup(parameter_file);
-MARK
+
         *parameter_file << "\n</Chaste>\n";
         parameter_file->close();
     }
