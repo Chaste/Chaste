@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef TESTVERTEXMESH33UNIAXIALLOAD_HPP_
-#define TESTVERTEXMESH33UNIAXIALLOAD_HPP_
+#ifndef TESTVERTEXMESH33HORIZONTALSTRETCH_HPP_
+#define TESTVERTEXMESH33HORIZONTALSTRETCH_HPP_
 
 #include "Debug.hpp"
 #include <cxxtest/TestSuite.h>
@@ -173,18 +173,18 @@ EXPORT_TEMPLATE_CLASS1(HorizontalStretchForce,3)
 EXPORT_TEMPLATE_CLASS1(HorizontalStretchForce,3)
 
 
-class TestVertexMesh33UniaxialLoad : public AbstractCellBasedTestSuite
+class TestVertexMesh33HorizontalStretch : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestVertexMesh33UiaxialLoad() throw (Exception)
+    void TestVertexMesh33HorizontalStretch() throw (Exception)
     {
         // Make a mesh of 10x5
         const unsigned z_height = 1;
         const unsigned target_area = 1;
         VoronoiPrism3dVertexMeshGenerator generator(5, 5, z_height, 5, target_area);
         MutableVertexMesh<3,3>* p_mesh = generator.GetMeshAfterReMesh();
-        VertexMeshWriter<3, 3> vertex_mesh_writer("TestUniaxialLoad/Test1", "InitialMesh", false);
+        VertexMeshWriter<3, 3> vertex_mesh_writer("TestVertexMesh33HorizontalStretch/Test1", "InitialMesh", false);
         vertex_mesh_writer.WriteVtkUsingMeshWithCellId(*p_mesh);
 
         std::vector<CellPtr> cells;
@@ -228,7 +228,7 @@ MARK
         const unsigned target_area = 1;
         VoronoiPrism3dVertexMeshGenerator generator(7, 3, z_height, 5, target_area);
         MutableVertexMesh<3,3>* p_mesh = generator.GetMeshAfterReMesh();
-        VertexMeshWriter<3, 3> vertex_mesh_writer("TestUniaxialLoad/Test2", "InitialMesh", false);
+        VertexMeshWriter<3, 3> vertex_mesh_writer("TestVertexMesh33HorizontalStretch/Test2", "InitialMesh", false);
         vertex_mesh_writer.WriteVtkUsingMeshWithCellId(*p_mesh);
 
         std::vector<CellPtr> cells;
@@ -261,4 +261,4 @@ MARK
     }
 };
 
-#endif /*TESTVERTEXMESH33UNIAXIALLOAD_HPP_*/
+#endif /*TESTVERTEXMESH33HORIZONTALSTRETCH_HPP_*/
