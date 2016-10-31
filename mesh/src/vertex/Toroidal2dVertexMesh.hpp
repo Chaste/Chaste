@@ -122,7 +122,7 @@ public:
      *
      * @return the vector from location1 to location2
      */
-    c_vector<double, 2> GetVectorFromAtoB(const c_vector<double, 2>& rLocation1, const c_vector<double, 2>& rLocation2);
+    c_vector<double, 2> GetVectorFromAtoB(const c_vector<double, 2>& rLocation1, const c_vector<double, 2>& rLocation2) const;
 
     /**
      * Overridden SetNode() method.

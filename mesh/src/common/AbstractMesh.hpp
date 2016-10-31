@@ -304,7 +304,7 @@ public:
      * @return c_vector from location A to location B.
      */
     virtual c_vector<double, SPACE_DIM> GetVectorFromAtoB(const c_vector<double, SPACE_DIM>& rLocationA,
-                                                          const c_vector<double, SPACE_DIM>& rLocationB);
+                                                          const c_vector<double, SPACE_DIM>& rLocationB) const;
 
     /**
      * Return the distance between two nodes.

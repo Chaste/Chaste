@@ -306,14 +306,14 @@ public:
      *
      * @return a pointer to the vertex element
      */
-    VertexElement<ELEMENT_DIM, SPACE_DIM>* GetElement(unsigned index) const;
+    VertexElement<ELEMENT_DIM, SPACE_DIM>* GetElement(const unsigned index) const;
 
     /**
      * @param index  the global index of a specified face.
      *
      * @return a pointer to the face
      */
-    VertexElement<ELEMENT_DIM-1, SPACE_DIM>* GetFace(unsigned index) const;
+    VertexElement<ELEMENT_DIM-1, SPACE_DIM>* GetFace(const unsigned index) const;
 
     /**
      * Compute the centroid of an element.
@@ -330,7 +330,7 @@ public:
      *
      * @return (centroid_x, centroid_y).
      */
-    virtual c_vector<double, SPACE_DIM> GetCentroidOfElement(unsigned index);
+    virtual c_vector<double, SPACE_DIM> GetCentroidOfElement(const unsigned index) const;
 
     /**
      * Construct the mesh using a MeshReader.
@@ -383,7 +383,7 @@ public:
      * @return c_vector from location A to location B.
      */
     virtual c_vector<double, SPACE_DIM> GetVectorFromAtoB(const c_vector<double, SPACE_DIM>& rLocationA,
-                                                          const c_vector<double, SPACE_DIM>& rLocationB);
+                                                          const c_vector<double, SPACE_DIM>& rLocationB) const;
 
     /**
      * Get the volume (or area in 2D, or length in 1D) of an element.
@@ -415,7 +415,7 @@ public:
      *
      * @return the gradient of the area of the element, evaluated at this node.
      */
-    c_vector<double, SPACE_DIM> GetVolumeGradientofElementAtNode(VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement, unsigned globalIndex);
+    c_vector<double, SPACE_DIM> GetVolumeGradientofElementAtNode(const VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement, const unsigned globalIndex) const;
 
     /**
      * Compute the area gradient of a 2D element at one of its nodes.
@@ -441,7 +441,7 @@ public:
      *
      * @return the gradient of the area of the element, evaluated at this node.
      */
-    c_vector<double, SPACE_DIM> GetAreaGradientOfFaceAtNode(VertexElement<ELEMENT_DIM-1, SPACE_DIM>* pFace, unsigned localIndex);
+    c_vector<double, SPACE_DIM> GetAreaGradientOfFaceAtNode(const VertexElement<ELEMENT_DIM-1, SPACE_DIM>* pFace, const unsigned localIndex) const;
 
     /**
      * Compute the gradient of the edge of a 2D element ending at its nodes.
@@ -537,7 +537,7 @@ public:
      *
      * @return (Ixx,Iyy,Ixy).
      */
-    virtual c_vector<double, 3> CalculateMomentsOfElement(unsigned index);
+    virtual c_vector<double, 3> CalculateMomentsOfElement(const unsigned index) const;
 
     /**
      * @return the length of the edge separating two given elements in 2D.
@@ -570,7 +570,7 @@ public:
      *
      * @return the area
      */
-    double CalculateUnitNormalToFaceWithArea(VertexElement<ELEMENT_DIM-1, SPACE_DIM>* pFace, c_vector<double, SPACE_DIM>& rNormal);
+    double CalculateUnitNormalToFaceWithArea(const VertexElement<ELEMENT_DIM-1, SPACE_DIM>* pFace, c_vector<double, SPACE_DIM>& rNormal) const;
 
     /**
      * Get the area of a given face in 3D.  Uses CalculateUnitNormalToFaceWithArea
@@ -581,7 +581,7 @@ public:
      *
      * @return the area
      */
-    virtual double CalculateAreaOfFace(VertexElement<ELEMENT_DIM-1, SPACE_DIM>* pFace);
+    virtual double CalculateAreaOfFace(const VertexElement<ELEMENT_DIM-1, SPACE_DIM>* pFace) const;
 
     /**
      * Compute the direction of the shortest principal axis passing through the centroid,
@@ -608,7 +608,7 @@ public:
      *
      * @return a unit vector giving the direction of the short axis
      */
-    c_vector<double, SPACE_DIM> GetShortAxisOfElement(unsigned index);
+    c_vector<double, SPACE_DIM> GetShortAxisOfElement(const unsigned index) const;
 
     /**
      * Given a node, find a set containing the indices of its neighbouring nodes.

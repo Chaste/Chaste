@@ -632,14 +632,14 @@ VertexElement<ELEMENT_DIM, SPACE_DIM>* VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetEl
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-VertexElement<ELEMENT_DIM-1, SPACE_DIM>* VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetFace(unsigned index) const
+VertexElement<ELEMENT_DIM-1, SPACE_DIM>* VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetFace(const unsigned index) const
 {
     assert(index < mFaces.size());
     return mFaces[index];
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetCentroidOfElement(unsigned index)
+c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetCentroidOfElement(const unsigned index) const
 {
     VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = GetElement(index);
     unsigned num_nodes = p_element->GetNumNodes();
@@ -1019,7 +1019,7 @@ void VertexMesh<3,3>::ConstructFromMeshReader(AbstractMeshReader<3,3>& rMeshRead
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetVectorFromAtoB(
-    const c_vector<double, SPACE_DIM>& rLocationA, const c_vector<double, SPACE_DIM>& rLocationB)
+    const c_vector<double, SPACE_DIM>& rLocationA, const c_vector<double, SPACE_DIM>& rLocationB) const
 {
     c_vector<double, SPACE_DIM> vector;
     if (mpDelaunayMesh)
@@ -1312,7 +1312,7 @@ unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetLocalIndexForElementEdgeClosestT
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-c_vector<double, 3> VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMomentsOfElement(unsigned index)
+c_vector<double, 3> VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMomentsOfElement(const unsigned index) const
 {
     assert(SPACE_DIM == 2);
 
@@ -1366,7 +1366,7 @@ c_vector<double, 3> VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMomentsOfElemen
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetShortAxisOfElement(unsigned index)
+c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetShortAxisOfElement(const unsigned index) const
 {
     assert(SPACE_DIM == 2);
 
@@ -1493,7 +1493,7 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetPerimeterGrad
 //////////////////////////////////////////////////////////////////////
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateUnitNormalToFaceWithArea(VertexElement<ELEMENT_DIM-1, SPACE_DIM>* pFace, c_vector<double, SPACE_DIM>& rNormal)
+double VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateUnitNormalToFaceWithArea(const VertexElement<ELEMENT_DIM-1, SPACE_DIM>* pFace, c_vector<double, SPACE_DIM>& rNormal) const
 {
     assert(SPACE_DIM == 3);
     // As we are in 3D, the face must have at least three vertices,
@@ -1522,7 +1522,7 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateUnitNormalToFaceWithArea(Ver
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateAreaOfFace(VertexElement<ELEMENT_DIM-1, SPACE_DIM>* pFace)
+double VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateAreaOfFace(const VertexElement<ELEMENT_DIM-1, SPACE_DIM>* pFace) const
 {
     assert(SPACE_DIM == 3);
 
@@ -1531,10 +1531,8 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateAreaOfFace(VertexElement<ELE
     return CalculateUnitNormalToFaceWithArea(pFace, unit_normal);
 }
 
-//<<<<<<< HEAD
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetVolumeGradientofElementAtNode(VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement, unsigned globalIndex)
+c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetVolumeGradientofElementAtNode(const VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement, const unsigned globalIndex) const
 {
     ///\todo check this derivation again
     // If I have done it correctly, it should look like
@@ -1593,7 +1591,7 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetVolumeGradien
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetAreaGradientOfFaceAtNode(VertexElement<ELEMENT_DIM-1,SPACE_DIM>* pFace, unsigned localIndex)
+c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetAreaGradientOfFaceAtNode(const VertexElement<ELEMENT_DIM-1,SPACE_DIM>* pFace, const unsigned localIndex) const
 {
     // Luckily for us, since Area is a scalar quantity, the face orientation doesn't have effect on it
     assert(SPACE_DIM==3);
@@ -1661,12 +1659,11 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetAreaGradientO
 //template<unsigned SPACE_DIM>
 //c_vector<double, SPACE_DIM> VertexMesh<1, SPACE_DIM>::GetAreaGradientOfFaceAtNode(VertexElement<0,SPACE_DIM>* pFace, unsigned localIndex) {NEVER_REACHED;}
 template<>
-c_vector<double, 1> VertexMesh<1, 1>::GetAreaGradientOfFaceAtNode(VertexElement<0,1>* pFace, unsigned localIndex) {NEVER_REACHED;}
+c_vector<double, 1> VertexMesh<1, 1>::GetAreaGradientOfFaceAtNode(const VertexElement<0,1>* pFace, const unsigned localIndex) const {NEVER_REACHED;}
 template<>
-c_vector<double, 2> VertexMesh<1, 2>::GetAreaGradientOfFaceAtNode(VertexElement<0,2>* pFace, unsigned localIndex) {NEVER_REACHED;}
+c_vector<double, 2> VertexMesh<1, 2>::GetAreaGradientOfFaceAtNode(const VertexElement<0,2>* pFace, const unsigned localIndex) const {NEVER_REACHED;}
 template<>
-c_vector<double, 3> VertexMesh<1, 3>::GetAreaGradientOfFaceAtNode(VertexElement<0,3>* pFace, unsigned localIndex) {NEVER_REACHED;}
-
+c_vector<double, 3> VertexMesh<1, 3>::GetAreaGradientOfFaceAtNode(const VertexElement<0,3>* pFace, const unsigned localIndex) const {NEVER_REACHED;}
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetNextEdgeGradientOfElementAtNode(VertexElement<ELEMENT_DIM-1, SPACE_DIM>* pFace, unsigned localIndex, bool faceOrientation)

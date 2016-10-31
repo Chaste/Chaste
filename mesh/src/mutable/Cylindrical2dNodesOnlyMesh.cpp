@@ -124,7 +124,7 @@ unsigned Cylindrical2dNodesOnlyMesh::AddNode(Node<2>* pNewNode)
 
 }
 
-c_vector<double, 2> Cylindrical2dNodesOnlyMesh::GetVectorFromAtoB(const c_vector<double, 2>& rLocation1, const c_vector<double, 2>& rLocation2)
+c_vector<double, 2> Cylindrical2dNodesOnlyMesh::GetVectorFromAtoB(const c_vector<double, 2>& rLocation1, const c_vector<double, 2>& rLocation2) const
 {
     c_vector<double, 2> vector = rLocation2 - rLocation1;
     vector[0] = fmod(vector[0], mWidth);

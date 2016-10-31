@@ -467,7 +467,7 @@ void Cylindrical2dMesh::DeleteHaloNodes()
     }
 }
 
-c_vector<double, 2> Cylindrical2dMesh::GetVectorFromAtoB(const c_vector<double, 2>& rLocation1, const c_vector<double, 2>& rLocation2)
+c_vector<double, 2> Cylindrical2dMesh::GetVectorFromAtoB(const c_vector<double, 2>& rLocation1, const c_vector<double, 2>& rLocation2) const
 {
     assert(mWidth > 0.0);
 
