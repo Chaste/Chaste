@@ -416,7 +416,7 @@ void VoronoiPrism3dVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_
                         faces_this_elem.push_back(faces[existing_face_index]);
                         // Face orientation is false as it was created by another element. CCW for another will be CW when
                         // viewing from the other side as rotation is pseudovectorial
-                        faces_orientation.push_back(false);
+                        faces_orientation.push_back(true);
                     }
 
                 }
@@ -436,7 +436,7 @@ void VoronoiPrism3dVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_
                     p_lateral_face->AddElementAttribute(3.1);
                     faces.push_back(p_lateral_face);
                     faces_this_elem.push_back(p_lateral_face);
-                    faces_orientation.push_back(true);
+                    faces_orientation.push_back(false);
 
                     // Update node_to_lateral_face_indices
                     r_face1_indices.push_back(newFaceIndex);

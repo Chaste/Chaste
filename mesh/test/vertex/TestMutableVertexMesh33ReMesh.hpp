@@ -250,7 +250,7 @@ public:
                 faces_this_elem.push_back(mFaces[existing_face_index]);
                 // Face orientation is false as it was created by another element. CCW for another will be CW when
                 // viewing from the other side as rotation is pseudovectorial
-                faces_orientation.push_back(false);
+                faces_orientation.push_back(true);
             }
 
             if (existing_face_index == UINT_MAX)
@@ -269,7 +269,7 @@ public:
                 p_lateral_face->AddElementAttribute(3.1);
                 mFaces.push_back(p_lateral_face);
                 faces_this_elem.push_back(p_lateral_face);
-                faces_orientation.push_back(true);
+                faces_orientation.push_back(false);
                 // Update node_to_lateral_face_indices
                 r_face1_indices.push_back(newFaceIndex);
                 r_face2_indices.push_back(newFaceIndex);
