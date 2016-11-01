@@ -40,7 +40,7 @@ template<unsigned DIM>
 EllipticBoxDomainPdeModifier<DIM>::EllipticBoxDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde,
                                                                 boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition,
                                                                 bool isNeumannBoundaryCondition,
-                                                                ChasteCuboid<DIM>* pMeshCuboid,
+                                                                boost::shared_ptr<ChasteCuboid<DIM> > pMeshCuboid,
                                                                 double stepSize,
                                                                 Vec solution)
     : AbstractBoxDomainPdeModifier<DIM>(pPde,
@@ -70,22 +70,19 @@ void EllipticBoxDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopula
     this->SetUpSourceTermsForAveragedSourcePde(this->mpFeMesh, &this->mCellPdeElementMap);
 
     // Use SimpleLinearEllipticSolver as Averaged Source PDE
+    ///\todo allow other PDE classes to be used with this modifier
     SimpleLinearEllipticSolver<DIM,DIM> solver(this->mpFeMesh,
                                                boost::static_pointer_cast<AbstractLinearEllipticPde<DIM,DIM> >(this->GetPde()).get(),
                                                p_bcc.get());
 
-    ///\todo Use initial guess when solving the system
+    ///\todo Use solution at previous time step as an initial guess for Solve()
     Vec old_solution_copy = this->mSolution;
     this->mSolution = solver.Solve();
-
-    // Note that the linear solver creates a vector, so we have to keep a handle on the old one
-    // in order to destroy it.
-    ///\todo This will change when initial guess is used.
-    /// On the first go round the vector has yet to be initialised, so we don't destroy it.
     if (old_solution_copy != NULL)
     {
         PetscTools::Destroy(old_solution_copy);
     }
+
     this->UpdateCellData(rCellPopulation);
 }
 
