@@ -213,7 +213,9 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
-        ChasteCuboid<2> cuboid = cell_population.rGetMesh().CalculateBoundingBox();
+        ChastePoint<2> lower = cell_population.rGetMesh().CalculateBoundingBox().rGetLowerCorner();
+        ChastePoint<2> upper = cell_population.rGetMesh().CalculateBoundingBox().rGetUpperCorner();
+        MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
         MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
