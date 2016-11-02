@@ -47,9 +47,9 @@ AbstractGrowingDomainPdeModifier<DIM>::AbstractGrowingDomainPdeModifier(boost::s
                                                                         bool isNeumannBoundaryCondition,
                                                                         Vec solution)
     : AbstractPdeModifier<DIM>(pPde,
-    		                   pBoundaryCondition,
-    		                   isNeumannBoundaryCondition,
-    		                   solution)
+                                pBoundaryCondition,
+                                isNeumannBoundaryCondition,
+                                solution)
 {
 }
 
@@ -67,11 +67,16 @@ void AbstractGrowingDomainPdeModifier<DIM>::GenerateFeMesh(AbstractCellPopulatio
         assert(this->mpFeMesh != NULL);
         delete this->mpFeMesh;
     }
+    else
+    {
+        ///\todo We should only set mDeleteFeMesh once, not every time step (#2687, #2863)
+        // This placement assumes that if this->mDeleteFeMesh is false it is unitializaed and needs to
+        // be checked. If true is has been checked elsewhere.
+        this->mDeleteFeMesh = (dynamic_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation) == NULL);
+    }
 
-    ///\todo We should only set mDeleteFeMesh once, not every time step (#2687, #2863)
-    this->mDeleteFeMesh = (dynamic_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation) == NULL);
-
-    // Get the finite element mesh via the cell population
+    // Get the finite element mesh via the cell population. Set to NULL first in case mesh generation fails.
+    this->mpFeMesh = NULL;
     this->mpFeMesh = rCellPopulation.GetTetrahedralMeshForPdeModifier();
 }
 

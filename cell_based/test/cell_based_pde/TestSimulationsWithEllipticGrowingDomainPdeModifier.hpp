@@ -70,6 +70,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellsGenerator.hpp"
 #include "NoCellCycleModel.hpp"
 #include "RandomCellKiller.hpp"
+#include "Debug.hpp"
 
 // This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
@@ -418,7 +419,7 @@ public:
         TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("oxygen"), 0.9753, 1e-4);
     }
 
-    void TestNoExceptionWithPdeAndCellKiller() throw(Exception)
+    void TestExceptionWithPdeAndCellKiller() throw(Exception)
     {
         std::vector<Node<3>*> nodes;
         nodes.push_back(new Node<3>(0u,  false,  0.5, 0.0, 0.0));
@@ -441,8 +442,8 @@ public:
 
         OffLatticeSimulation<3> simulator(cell_population);
         simulator.SetOutputDirectory("TestExceptionWithPdeAndCellKiller");
-        simulator.SetSamplingTimestepMultiple(12);
-        simulator.SetEndTime(1.0);
+        simulator.SetSamplingTimestepMultiple(100);
+        simulator.SetEndTime(6.0);
 
         MAKE_PTR_ARGS(CellwiseSourceEllipticPde<3>, p_pde, (cell_population, -0.03));
         MAKE_PTR_ARGS(ConstBoundaryCondition<3>, p_bc, (1.0));
@@ -453,7 +454,9 @@ public:
         MAKE_PTR_ARGS(RandomCellKiller<3>, p_cell_killer, (&cell_population, 0.01));
         simulator.AddCellKiller(p_cell_killer);
 
-        simulator.Solve();
+        // Eventually the number of cells will be less than the spatial dimension and an exception
+        // will be thrown.
+        TS_ASSERT_THROWS_THIS(simulator.Solve(), "The number of nodes must exceed the spatial dimension.");
     }
 };
 

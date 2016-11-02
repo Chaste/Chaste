@@ -64,7 +64,7 @@ AbstractPdeModifier<DIM>::AbstractPdeModifier(boost::shared_ptr<AbstractLinearPd
 template<unsigned DIM>
 AbstractPdeModifier<DIM>::~AbstractPdeModifier()
 {
-    if (mDeleteFeMesh)
+    if (mDeleteFeMesh and mpFeMesh!=NULL)
     {
         delete mpFeMesh;
     }
