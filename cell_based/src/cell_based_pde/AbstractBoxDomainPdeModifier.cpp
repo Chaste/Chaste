@@ -48,9 +48,9 @@ AbstractBoxDomainPdeModifier<DIM>::AbstractBoxDomainPdeModifier(boost::shared_pt
                                                                 double stepSize,
                                                                 Vec solution)
     : AbstractPdeModifier<DIM>(pPde,
-    		                   pBoundaryCondition,
-    		                   isNeumannBoundaryCondition,
-    		                   solution),
+                               pBoundaryCondition,
+                               isNeumannBoundaryCondition,
+                               solution),
       mpMeshCuboid(pMeshCuboid),
       mStepSize(stepSize),
       mSetBcsOnBoxBoundary(true)
