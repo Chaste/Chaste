@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexBasedCellPopulation.hpp"
 #include "MeshBasedCellPopulation.hpp"
 #include "CaBasedCellPopulation.hpp"
+#include "NodeBasedCellPopulation.hpp"
 #include "ReplicatableVector.hpp"
 #include "LinearBasisFunction.hpp"
 
@@ -83,6 +84,7 @@ void AbstractGrowingDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulatio
     // Local cell index used by the CA simulation
     unsigned cell_index = 0;
 
+    unsigned index_in_solution_repl = 0;
     for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
          cell_iter != rCellPopulation.End();
          ++cell_iter)
@@ -95,12 +97,16 @@ void AbstractGrowingDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulatio
             // Offset to relate elements in vertex mesh to nodes in tetrahedral mesh
             tet_node_index += rCellPopulation.GetNumNodes();
         }
-
-        if (dynamic_cast<CaBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL)
+        else if (dynamic_cast<CaBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL)
         {
             // Here local cell index corresponds to tet node
             tet_node_index = cell_index;
             cell_index++;
+        }
+        else if (dynamic_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL)
+        {
+            tet_node_index = index_in_solution_repl;
+            index_in_solution_repl++;
         }
 
         double solution_at_node = solution_repl[tet_node_index];

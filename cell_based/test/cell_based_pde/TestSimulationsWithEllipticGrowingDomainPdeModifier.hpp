@@ -418,7 +418,7 @@ public:
         TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("oxygen"), 0.9753, 1e-4);
     }
 
-    void xTestExceptionWithPdeAndCellKiller() throw(Exception)
+    void TestNoExceptionWithPdeAndCellKiller() throw(Exception)
     {
         std::vector<Node<3>*> nodes;
         nodes.push_back(new Node<3>(0u,  false,  0.5, 0.0, 0.0));
