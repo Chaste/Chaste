@@ -67,6 +67,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SurfaceAreaConstraintPottsUpdateRule.hpp"
 #include "CaBasedCellPopulation.hpp"
 #include "DiffusionCaUpdateRule.hpp"
+#include "CellsGenerator.hpp"
+#include "NoCellCycleModel.hpp"
+#include "RandomCellKiller.hpp"
 
 // This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
@@ -413,6 +416,44 @@ public:
         ++cell_iter;
         ++cell_iter;
         TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("oxygen"), 0.9753, 1e-4);
+    }
+
+    void xTestExceptionWithPdeAndCellKiller() throw(Exception)
+    {
+        std::vector<Node<3>*> nodes;
+        nodes.push_back(new Node<3>(0u,  false,  0.5, 0.0, 0.0));
+        nodes.push_back(new Node<3>(1u,  false,  -0.5, 0.0, 0.0));
+        nodes.push_back(new Node<3>(2u,  false,  0.0, 0.5, 0.0));
+        nodes.push_back(new Node<3>(3u,  false,  0.0, -0.5, 0.0));
+        nodes.push_back(new Node<3>(4u,  false,  0.0, 0.0, 0.5));
+        NodesOnlyMesh<3> mesh;
+        mesh.ConstructNodesWithoutMesh(nodes, 1.5);
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<NoCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+        for (unsigned i=0; i<cells.size(); i++)
+        {
+            cells[i]->GetCellData()->SetItem("oxygen", 1.0);
+        }
+
+        NodeBasedCellPopulation<3> cell_population(mesh, cells);
+
+        OffLatticeSimulation<3> simulator(cell_population);
+        simulator.SetOutputDirectory("TestExceptionWithPdeAndCellKiller");
+        simulator.SetSamplingTimestepMultiple(12);
+        simulator.SetEndTime(1.0);
+
+        MAKE_PTR_ARGS(CellwiseSourceEllipticPde<3>, p_pde, (cell_population, -0.03));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<3>, p_bc, (1.0));
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<3>, p_pde_modifier, (p_pde, p_bc, false));
+        p_pde_modifier->SetDependentVariableName("oxygen");
+        simulator.AddSimulationModifier(p_pde_modifier);
+
+        MAKE_PTR_ARGS(RandomCellKiller<3>, p_cell_killer, (&cell_population, 0.01));
+        simulator.AddCellKiller(p_cell_killer);
+
+        simulator.Solve();
     }
 };
 
