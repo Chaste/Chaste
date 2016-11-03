@@ -954,7 +954,7 @@ void MeshBasedCellPopulation<2>::CreateVoronoiTessellation()
 
     // Check if the mesh associated with this cell population is periodic
     bool is_mesh_periodic = false;
-    if (dynamic_cast<Cylindrical2dMesh*>(&mrMesh))
+    if (bool(dynamic_cast<Cylindrical2dMesh*>(&mrMesh)))
     {
         is_mesh_periodic = true;
         mpVoronoiTessellation = new Cylindrical2dVertexMesh(static_cast<Cylindrical2dMesh &>(this->mrMesh));
