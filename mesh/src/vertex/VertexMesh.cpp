@@ -1534,6 +1534,12 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateAreaOfFace(const VertexEleme
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetVolumeGradientofElementAtNode(const VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement, const unsigned globalIndex) const
 {
+    NEVER_REACHED;
+}
+
+template<>
+c_vector<double, 3> VertexMesh<3, 3>::GetVolumeGradientofElementAtNode(const VertexElement<3, 3>* pElement, const unsigned globalIndex) const
+{
     ///\todo check this derivation again
     ///\todo I miss out a minus sign somewhere (as shown by simulation). Current quick fix is times -1.0 at the very end
     // If I have done it correctly, it should look like
@@ -1542,25 +1548,24 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetVolumeGradien
     // where C_j (vector) is the centroid of face j, A_j (vector) is the area of face j,
     // r_{i+1}/r_{i-1} is the next/previous node of node i in that face.
 
-    assert(SPACE_DIM==3 && ELEMENT_DIM==3);
-    c_vector<double, SPACE_DIM> volume_gradient = zero_vector<double>(3);
+    c_vector<double, 3> volume_gradient = zero_vector<double>(3);
 
     for (unsigned face_index=0; face_index<pElement->GetNumFaces(); ++face_index)
     {
-        const VertexElement<ELEMENT_DIM-1, SPACE_DIM>* p_face = pElement->GetFace(face_index);
+        const VertexElement<2, 3>* p_face = pElement->GetFace(face_index);
         const bool face_orientation = pElement->FaceIsOrientatedAntiClockwise(face_index);
         const unsigned node_local_index = p_face->GetNodeLocalIndex(globalIndex);
         const unsigned num_nodes = p_face->GetNumNodes();
-        c_vector<double, SPACE_DIM> this_face_gradient_contribution = zero_vector<double>(3);
+        c_vector<double, 3> this_face_gradient_contribution = zero_vector<double>(3);
 
         // if this face contains the node, it will be some number, not UINT_MAX. Second statement just as safety precaution
         if ( node_local_index!=UINT_MAX && node_local_index<num_nodes)
         {
             const unsigned next_local_index = (node_local_index+1)%num_nodes;
             const unsigned previous_local_index = (node_local_index-1+num_nodes)%num_nodes;
-            const c_vector<double, SPACE_DIM> previous_to_next = p_face->GetNodeLocation(next_local_index) - p_face->GetNodeLocation(previous_local_index);
+            const c_vector<double, 3> previous_to_next = p_face->GetNodeLocation(next_local_index) - p_face->GetNodeLocation(previous_local_index);
 
-            c_vector<double, SPACE_DIM> face_centroid = p_face->GetCentroid();
+            c_vector<double, 3> face_centroid = p_face->GetCentroid();
             this_face_gradient_contribution += VectorProduct(face_centroid, previous_to_next) / 6.0;
 
             c_vector<double, 3> face_area = zero_vector<double>(3);
@@ -1569,8 +1574,8 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetVolumeGradien
                 // We add an extra num_nodes_in_element in the line below as otherwise this term can be negative, which breaks the % operator
                 const unsigned previous_running_index = (current_running_index+num_nodes-1)%num_nodes;
 
-                const c_vector<double, SPACE_DIM> current_node_relative_location = p_face->GetNodeLocation(current_running_index) - face_centroid;
-                const c_vector<double, SPACE_DIM> previous_node_relative_location = p_face->GetNodeLocation(previous_running_index) - face_centroid;
+                const c_vector<double, 3> current_node_relative_location = p_face->GetNodeLocation(current_running_index) - face_centroid;
+                const c_vector<double, 3> previous_node_relative_location = p_face->GetNodeLocation(previous_running_index) - face_centroid;
 
                 face_area += VectorProduct(current_node_relative_location, previous_node_relative_location) / 2.0;
             }
