@@ -156,7 +156,6 @@ void GeneralMonolayerVertexMeshForce<DIM>::AddForceContribution(AbstractCellPopu
              it != neighbour_node_indices.end();
              ++it)
         {
-
             Node<DIM>* p_neighbour_node = p_cell_population->GetNode(*it);
             const c_vector<double, DIM> edge_gradient = (p_this_node->rGetLocation() - p_neighbour_node->rGetLocation())/norm_2(p_this_node->rGetLocation() - p_neighbour_node->rGetLocation());
             ab_edge_contribution -= edge_gradient*(node_type==1u ? mBasalEdgeParameter : mApicalEdgeParameter);

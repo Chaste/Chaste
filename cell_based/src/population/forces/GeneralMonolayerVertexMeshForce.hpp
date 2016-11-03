@@ -43,19 +43,6 @@ class GeneralMonolayerVertexMeshForce : public AbstractForce<DIM>
 {
 private:
 
-    double mTargetApicalArea;
-    double mApicalareaParameter;
-    double mApicalEdgeParameter;
-
-    double mTargetBasalArea;
-    double mBasalareaParameter;
-    double mBasalEdgeParameter;
-
-    double mLateralEdgeParameter;
-
-    double mTargetVolume;
-    double mVolumeParameter;
-
     friend class boost::serialization::access;
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
@@ -72,11 +59,25 @@ private:
         archive & mVolumeParameter;
     }
 
+protected:
+
+    double mTargetApicalArea;
+    double mApicalareaParameter;
+    double mApicalEdgeParameter;
+
+    double mTargetBasalArea;
+    double mBasalareaParameter;
+    double mBasalEdgeParameter;
+
+    double mLateralEdgeParameter;
+
+    double mTargetVolume;
+    double mVolumeParameter;
 
 public:
     GeneralMonolayerVertexMeshForce();
 
-    void AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation);
+    virtual void AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation);
 
     void SetApicalParameter(const double lineParameter, const double areaParameter=0, const double targetArea=0);
 
