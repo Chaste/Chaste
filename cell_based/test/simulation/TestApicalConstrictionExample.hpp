@@ -322,6 +322,74 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 100u);
         TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
+
+    void TestApicalConstrictionVoronoi() throw (Exception)
+    {
+        // Make a mesh of 10x10
+        const double z_height = 1;
+        const double target_area = 1;
+        const unsigned num_cells_x = 10;
+        const unsigned num_cells_y = 10;
+        // There seems to be a bug somewhere in voronoiprism3dVertexMeshGenerator....
+        VoronoiPrism3dVertexMeshGenerator generator(num_cells_x, num_cells_y, z_height, 5, target_area);
+        MutableVertexMesh<3,3>* p_mesh = generator.GetMeshAfterReMesh();
+//        HoneycombVertexMeshGenerator generator(num_cells_x, num_cells_y, false, 0.1, 0.01, target_area);
+//        VoronoiVertexMeshGenerator generator(num_cells_x, num_cells_y, 5, target_area);
+//        MutableVertexMesh<2, 2>& vertex_2mesh = *(generator.GetMesh());
+//        MeshBuilderHelper builder("ApicalConstriction");
+//        MutableVertexMesh<3, 3>* p_mesh = builder.MakeMeshUsing2dMesh(vertex_2mesh);
+//        builder.WriteVtk(OUTPUT_NAME,"Before");
+
+        char tmp_name[50];
+        sprintf(tmp_name, "TestApicalConstrictionExample/VoronoiTest%dx%d", num_cells_x, num_cells_y);
+        VertexMeshWriter<3, 3> vertex_mesh_writer(tmp_name, "InitialMesh", false);
+        vertex_mesh_writer.WriteVtkUsingMeshWithCellId(*p_mesh);
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<NoCellCycleModel, 3> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
+        VertexBasedCellPopulation<3> cell_population(*p_mesh, cells);
+        cell_population.AddCellWriter<CellLabelWriter>();
+
+
+        // Label a few cells near the centre of the population
+        c_vector<double, 3> population_centre;
+        population_centre(0) = 0.5*p_mesh->GetWidth(0);
+        population_centre(1) = 0.5*p_mesh->GetWidth(1);
+        population_centre(2) = 0.5*p_mesh->GetWidth(2);
+
+        for (AbstractCellPopulation<3>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
+        {
+            c_vector<double, 3> cell_location = cell_population.GetLocationOfCellCentre(*cell_iter);
+            c_vector<double, 3> dist = cell_location - population_centre;
+            if (dist(0)*dist(0) + dist(1)*dist(1) < 2.0*2.0)
+            {
+                boost::shared_ptr<AbstractCellProperty> p_label = cell_population.GetCellPropertyRegistry()->Get<CellLabel>();
+                cell_iter->AddCellProperty(p_label);
+            }
+        }
+
+        OffLatticeSimulation<3> simulator(cell_population);
+        simulator.SetOutputDirectory(tmp_name);
+        simulator.SetSamplingTimestepMultiple(10);
+        const double end_time = 4;
+        simulator.SetEndTime(end_time);
+
+        MAKE_PTR(PatternedApicalConstrictionForce<3>, p_force3);
+        p_force3->SetApicalParameter(10, 10, 1);
+        p_force3->SetBasalParameter(10, 10, 1);
+        p_force3->SetLateralParameter(4);
+        p_force3->SetVolumeParameter(200, 1);
+        p_force3->SetPatternedApicalParameter(20, 20, 0.5);
+        simulator.AddForce(p_force3);
+
+        simulator.Solve();
+
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 100u);
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
+    }
 };
 
 #endif /*TESTAPICALCONSTRICTIONEXAMPLE_HPP_*/
