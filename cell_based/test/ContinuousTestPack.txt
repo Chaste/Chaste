@@ -47,6 +47,7 @@ population/TestCellwiseDataGradient.hpp
 population/TestCellWriters.hpp
 population/TestCentreBasedDivisionRules.hpp
 population/TestDiscreteSystemForceCalculator.hpp
+population/TestFindingGeneralMonolayerVertexMeshForceParameter.hpp
 population/TestForces.hpp
 population/TestMeshBasedCellPopulation.hpp
 population/TestMeshBasedCellPopulationWithGhostNodes.hpp

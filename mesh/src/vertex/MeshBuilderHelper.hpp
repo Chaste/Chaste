@@ -73,6 +73,8 @@ public:
 
     MutableVertexMesh<3, 3>* MakeMeshUsing2dMesh(const MutableVertexMesh<2, 2>& mesh2, const double zHeight=1);
 
+    MutableVertexMesh<3, 3>* MakeNewMeshUsing2dMesh(const MutableVertexMesh<2, 2>& mesh2, const double zHeight=1);
+
     MutableVertexMesh<3, 3>* GenerateMesh();
 
     void PrintMesh(const bool allElements = false) const;
@@ -82,6 +84,8 @@ public:
     void BuildElementWith(const unsigned numNodesThis, const unsigned nodeIndicesThis[]);
 
     void BuildElementWith(const std::vector<unsigned>& nodeIndicesThisElem);
+
+    void ClearStoredMeshObjects();
 };
 
 #endif /*MESHBUILDERHELPER_HPP_*/

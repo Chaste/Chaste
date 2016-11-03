@@ -126,6 +126,12 @@ MutableVertexMesh<3, 3>* MeshBuilderHelper::MakeMeshUsing2dMesh(const MutableVer
     return this->GenerateMesh();
 }
 
+MutableVertexMesh<3, 3>* MeshBuilderHelper::MakeNewMeshUsing2dMesh(const MutableVertexMesh<2, 2>& mesh2, const double zHeight)
+{
+    ClearStoredMeshObjects();
+    return MakeMeshUsing2dMesh(mesh2,zHeight);
+}
+
 MutableVertexMesh<3, 3>* MeshBuilderHelper::GenerateMesh()
 {
     // Combine the upper and lower nodes by adding upper_nodes into lower_nodes.
@@ -329,4 +335,15 @@ void MeshBuilderHelper::BuildElementWith(const std::vector<unsigned>& nodeIndice
     }
     VertexElement<3, 3>* p_elem = new VertexElement<3, 3>(mElements.size(), faces_this_elem, faces_orientation, all_nodes_this_elem);
     mElements.push_back(p_elem);
+}
+
+void MeshBuilderHelper::ClearStoredMeshObjects()
+{
+    mLowerNodes.clear();
+    mUpperNodes.clear();
+    mNodeToLateralFaceIndices.clear();
+    mFaces.clear();
+    mElements.clear();
+    if (mpMesh)
+        delete mpMesh;
 }
