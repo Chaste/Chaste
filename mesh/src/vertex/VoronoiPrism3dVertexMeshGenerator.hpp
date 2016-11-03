@@ -165,8 +165,8 @@ public:
      *
      * @param numElementsX  The number of elements requested across the mesh
      * @param numElementsY  The number of elements requested up the mesh
-     * @param elementHeightZ    The height of element in Z direction
-     * @param numRelaxationSteps  The number of Lloyd's Relaxation steps in the Voronoi iteration
+     * @param elementHeightZ    The height of element in Z direction (defaults to 1)
+     * @param numRelaxationSteps  The number of Lloyd's Relaxation steps in the Voronoi iteration (defaults to 0)
      * @param elementTargetArea The requested average target area of elements in the mesh (defaults to 1.0)
      */
     VoronoiPrism3dVertexMeshGenerator(unsigned numElementsX,

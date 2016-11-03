@@ -38,18 +38,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned DIM>
 GeneralMonolayerVertexMeshForce<DIM>::GeneralMonolayerVertexMeshForce()
-: AbstractForce<DIM>(),
-  mTargetApicalArea(0),
-  mApicalAreaParameter(0),
-  mApicalEdgeParameter(0),
-  mTargetBasalArea(0),
-  mBasalAreaParameter(0),
-  mBasalEdgeParameter(0),
-  mLateralEdgeParameter(0),
-  mTargetVolume(0),
-  mVolumeParameter(0)
-  {
-  }
+    : AbstractForce<DIM>(),
+      mTargetApicalArea(0),
+      mApicalareaParameter(0),
+      mApicalEdgeParameter(0),
+      mTargetBasalArea(0),
+      mBasalareaParameter(0),
+      mBasalEdgeParameter(0),
+      mLateralEdgeParameter(0),
+      mTargetVolume(0),
+      mVolumeParameter(0)
+{
+}
 
 template<unsigned DIM>
 void GeneralMonolayerVertexMeshForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation)
@@ -92,7 +92,7 @@ void GeneralMonolayerVertexMeshForce<DIM>::AddForceContribution(AbstractCellPopu
         c_vector<double, DIM> lateral_edge_contribution = zero_vector<double>(DIM);
         c_vector<double, DIM> volume_contribution = zero_vector<double>(DIM);
 
-        // a variable to store such that the apical/basal edge forces are not counted twice for non-boundary edges.
+        // A variable to store such that the apical/basal edge forces are not counted twice for non-boundary edges.
         std::set<unsigned> neighbour_node_indices;
 
         // Find the indices of the elements owned by this node
@@ -100,8 +100,8 @@ void GeneralMonolayerVertexMeshForce<DIM>::AddForceContribution(AbstractCellPopu
 
         // Iterate over these elements
         for (std::set<unsigned>::iterator iter = containing_elem_indices.begin();
-                iter != containing_elem_indices.end();
-                ++iter)
+             iter != containing_elem_indices.end();
+             ++iter)
         {
             // Get this element, its index and its number of nodes
             VertexElement<DIM, DIM>* p_element = p_cell_population->GetElement(*iter);
@@ -113,17 +113,17 @@ void GeneralMonolayerVertexMeshForce<DIM>::AddForceContribution(AbstractCellPopu
                 VertexElement<DIM-1,DIM>* p_tmp_face = p_element->GetFace(face_index);
                 switch (unsigned(p_tmp_face->rGetElementAttributes()[0]))
                 {
-                case 1:
-                    assert(face_index == 0);
-                    break;
-                case 2:
-                    assert(face_index == 1);
-                    break;
-                case 3:
-                    lateral_faces.push_back(p_tmp_face);
-                    break;
-                default:
-                    NEVER_REACHED;
+                    case 1:
+                        assert(face_index == 0);
+                        break;
+                    case 2:
+                        assert(face_index == 1);
+                        break;
+                    case 3:
+                        lateral_faces.push_back(p_tmp_face);
+                        break;
+                    default:
+                        NEVER_REACHED;
                 }
             }
 
@@ -140,19 +140,21 @@ void GeneralMonolayerVertexMeshForce<DIM>::AddForceContribution(AbstractCellPopu
             // Calculating apical face contribution
             if (node_type == 2)
             {
-                apical_face_contribution -= mApicalAreaParameter*ab_face_gradient*(apical_areas[elem_index] - mTargetApicalArea);
+                apical_face_contribution -= mApicalareaParameter*ab_face_gradient*(apical_areas[elem_index] - mTargetApicalArea);
             }
             // Computing basal face contribution
             if (node_type == 1)
             {
-                basal_face_contribution -= mBasalAreaParameter*ab_face_gradient*(basal_areas[elem_index] - mTargetBasalArea);
+                basal_face_contribution -= mBasalareaParameter*ab_face_gradient*(basal_areas[elem_index] - mTargetBasalArea);
             }
             const unsigned num_nodes_in_ab_face = p_ab_face->GetNumNodes();
             neighbour_node_indices.insert(p_ab_face->GetNodeGlobalIndex((local_node_index_in_ab_face+1)%num_nodes_in_ab_face));
             neighbour_node_indices.insert(p_ab_face->GetNodeGlobalIndex((local_node_index_in_ab_face-1+num_nodes_in_ab_face)%num_nodes_in_ab_face));
         }
 
-        for(std::set<unsigned>::iterator it = neighbour_node_indices.begin(); it!=neighbour_node_indices.end() ; ++it)
+        for (std::set<unsigned>::iterator it = neighbour_node_indices.begin();
+             it != neighbour_node_indices.end();
+             ++it)
         {
 
             Node<DIM>* p_neighbour_node = p_cell_population->GetNode(*it);
@@ -172,48 +174,48 @@ void GeneralMonolayerVertexMeshForce<DIM>::AddForceContribution(AbstractCellPopu
 }
 
 template<unsigned DIM>
-void GeneralMonolayerVertexMeshForce<DIM>::SetApicalParameter(const double LineParameter, const double AreaParameter, const double TargetArea)
+void GeneralMonolayerVertexMeshForce<DIM>::SetApicalParameter(const double lineParameter, const double areaParameter, const double targetArea)
 {
-    mTargetApicalArea = TargetArea;
-    mApicalAreaParameter = AreaParameter;
-    mApicalEdgeParameter = LineParameter;
+    mTargetApicalArea = targetArea;
+    mApicalareaParameter = areaParameter;
+    mApicalEdgeParameter = lineParameter;
 }
 
 template<unsigned DIM>
-void GeneralMonolayerVertexMeshForce<DIM>::SetBasalParameter(const double LineParameter, const double AreaParameter, const double TargetArea)
+void GeneralMonolayerVertexMeshForce<DIM>::SetBasalParameter(const double lineParameter, const double areaParameter, const double targetArea)
 {
-    mTargetBasalArea = TargetArea;
-    mBasalAreaParameter = AreaParameter;
-    mBasalEdgeParameter = LineParameter;
+    mTargetBasalArea = targetArea;
+    mBasalareaParameter = areaParameter;
+    mBasalEdgeParameter = lineParameter;
 }
 
 template<unsigned DIM>
-void GeneralMonolayerVertexMeshForce<DIM>::SetLateralParameter(const double Parameter)
+void GeneralMonolayerVertexMeshForce<DIM>::SetLateralParameter(const double parameter)
 {
-    mLateralEdgeParameter = Parameter;
+    mLateralEdgeParameter = parameter;
 }
 
 template<unsigned DIM>
-void GeneralMonolayerVertexMeshForce<DIM>::SetVolumeParameter(const double VolumeParameter, const double TargetVolume)
+void GeneralMonolayerVertexMeshForce<DIM>::SetVolumeParameter(const double volumeParameter, const double targetVolume)
 {
-    mTargetVolume = TargetVolume;
-    mVolumeParameter = VolumeParameter;
+    mTargetVolume = targetVolume;
+    mVolumeParameter = volumeParameter;
 }
 
 template<unsigned DIM>
 void GeneralMonolayerVertexMeshForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<TargetApicalArea>" << mTargetApicalArea << "</TargetApicalArea>\n";
-    *rParamsFile << "\t\t\t<mApicalAreaParameter>" << mApicalAreaParameter << "</mApicalAreaParameter>\n";
-    *rParamsFile << "\t\t\t<mApicalEdgeParameter>" << mApicalEdgeParameter << "</mApicalEdgeParameter>\n";
+    *rParamsFile << "\t\t\t<ApicalareaParameter>" << mApicalareaParameter << "</ApicalareaParameter>\n";
+    *rParamsFile << "\t\t\t<ApicalEdgeParameter>" << mApicalEdgeParameter << "</ApicalEdgeParameter>\n";
 
-    *rParamsFile << "\t\t\t<mTargetBasalArea>" << mTargetBasalArea << "</mTargetBasalArea>\n";
-    *rParamsFile << "\t\t\t<mBasalAreaParameter>" << mBasalAreaParameter << "</mBasalAreaParameter>\n";
-    *rParamsFile << "\t\t\t<mBasalEdgeParameter>" << mBasalEdgeParameter << "</mBasalEdgeParameter>\n";
+    *rParamsFile << "\t\t\t<TargetBasalArea>" << mTargetBasalArea << "</TargetBasalArea>\n";
+    *rParamsFile << "\t\t\t<BasalareaParameter>" << mBasalareaParameter << "</BasalareaParameter>\n";
+    *rParamsFile << "\t\t\t<BasalEdgeParameter>" << mBasalEdgeParameter << "</BasalEdgeParameter>\n";
 
-    *rParamsFile << "\t\t\t<mLateralEdgeParameter>" << mLateralEdgeParameter << "</mLateralEdgeParameter>\n";
-    *rParamsFile << "\t\t\t<mTargetVolume>" << mTargetVolume << "</mTargetVolume>\n";
-    *rParamsFile << "\t\t\t<mVolumeParameter>" << mVolumeParameter << "</mVolumeParameter>\n";
+    *rParamsFile << "\t\t\t<LateralEdgeParameter>" << mLateralEdgeParameter << "</LateralEdgeParameter>\n";
+    *rParamsFile << "\t\t\t<TargetVolume>" << mTargetVolume << "</TargetVolume>\n";
+    *rParamsFile << "\t\t\t<VolumeParameter>" << mVolumeParameter << "</VolumeParameter>\n";
 
     AbstractForce<3>::OutputForceParameters(rParamsFile);
 }

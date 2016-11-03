@@ -67,7 +67,6 @@ void MisraForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCellPop
     const unsigned num_nodes = p_cell_population->GetNumNodes();
     const unsigned num_elements = p_cell_population->GetNumElements();
 
-
     // Begin by computing the volumes of each element in the mesh, to avoid having to do this multiple times
     std::vector<double> element_volumes(num_elements);
     for (unsigned elem_index = 0; elem_index<num_elements; ++elem_index)
@@ -81,10 +80,10 @@ void MisraForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCellPop
     for (unsigned node_global_index=0; node_global_index<num_nodes; node_global_index++)
     {
         Node<DIM>* p_this_node = p_cell_population->GetNode(node_global_index);
-        assert(node_global_index==p_this_node->GetIndex());
+        assert(node_global_index == p_this_node->GetIndex());
+
         // Get the type of node. 1=basal; 2=apical
         const unsigned node_type = unsigned(p_this_node->rGetNodeAttributes()[0]);
-
 
         /*
          * The force on this Node is given by the gradient of the total free
@@ -104,7 +103,6 @@ void MisraForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCellPop
 
         // A helper variable so that "non-boundary" lateral face will not be counted twice
         std::set<unsigned> counted_lateral_face_indices;
-
 
         // Find the indices of the elements owned by this node
         const std::set<unsigned> containing_elem_indices = p_this_node->rGetContainingElementIndices();
@@ -127,18 +125,18 @@ void MisraForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCellPop
                 VertexElement<DIM-1,DIM>* p_tmp_face = p_element->GetFace(face_index);
                 switch (unsigned(p_tmp_face->rGetElementAttributes()[0]))
                 {
-                case 1:
-                    p_basal_face = p_tmp_face;
-                    break;
-                case 2:
-                    p_apical_face = p_tmp_face;
-                    apical_face_orientation = p_element->FaceIsOrientatedAntiClockwise(face_index);
-                    break;
-                case 3:
-                    lateral_faces.push_back(p_tmp_face);
-                    break;
-                default:
-                    NEVER_REACHED;
+                    case 1:
+                        p_basal_face = p_tmp_face;
+                        break;
+                    case 2:
+                        p_apical_face = p_tmp_face;
+                        apical_face_orientation = p_element->FaceIsOrientatedAntiClockwise(face_index);
+                        break;
+                    case 3:
+                        lateral_faces.push_back(p_tmp_face);
+                        break;
+                    default:
+                        NEVER_REACHED;
                 }
             }
 
@@ -181,7 +179,7 @@ void MisraForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCellPop
             }
 
             // Computing basal face contribution
-            if (node_type == 1 )
+            if (node_type == 1)
             {
                 const unsigned localBasalNodeIndex = p_basal_face->GetNodeLocalIndex(node_global_index);
                 const c_vector<double, DIM> basal_face_gradient = rMesh.GetAreaGradientOfFaceAtNode(p_basal_face, localBasalNodeIndex);

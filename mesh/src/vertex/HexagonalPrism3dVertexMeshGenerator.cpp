@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2014, University of Oxford.
+Copyright (c) 2005-2016, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -35,7 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "HexagonalPrism3dVertexMeshGenerator.hpp"
 
-
 HexagonalPrism3dVertexMeshGenerator::HexagonalPrism3dVertexMeshGenerator(unsigned numElementsInXDirection,
     unsigned numElementsInYDirection,
     double elementSideLength,
@@ -55,7 +54,7 @@ HexagonalPrism3dVertexMeshGenerator::HexagonalPrism3dVertexMeshGenerator(unsigne
     // On each first row we have numElementsInXDirection nodes, all of which are boundary nodes
     for (unsigned i=0; i<numElementsInXDirection; i++)
     {
-        double x = i+0.5;
+        double x = i + 0.5;
         double y = 0.0;
 
         // Lower node

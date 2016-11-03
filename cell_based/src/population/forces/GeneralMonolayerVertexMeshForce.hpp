@@ -44,11 +44,11 @@ class GeneralMonolayerVertexMeshForce : public AbstractForce<DIM>
 private:
 
     double mTargetApicalArea;
-    double mApicalAreaParameter;
+    double mApicalareaParameter;
     double mApicalEdgeParameter;
 
     double mTargetBasalArea;
-    double mBasalAreaParameter;
+    double mBasalareaParameter;
     double mBasalEdgeParameter;
 
     double mLateralEdgeParameter;
@@ -62,10 +62,10 @@ private:
     {
         archive & boost::serialization::base_object<AbstractForce<DIM> >(*this);
         archive & mTargetApicalArea;
-        archive & mApicalAreaParameter;
+        archive & mApicalareaParameter;
         archive & mApicalEdgeParameter;
         archive & mTargetBasalArea;
-        archive & mBasalAreaParameter;
+        archive & mBasalareaParameter;
         archive & mBasalEdgeParameter;
         archive & mLateralEdgeParameter;
         archive & mTargetVolume;
@@ -78,13 +78,13 @@ public:
 
     void AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation);
 
-    void SetApicalParameter(const double LineParameter, const double AreaParameter=0, const double TargetArea=0);
+    void SetApicalParameter(const double lineParameter, const double areaParameter=0, const double targetArea=0);
 
-    void SetBasalParameter(const double LineParameter, const double AreaParameter=0, const double TargetArea=0);
+    void SetBasalParameter(const double lineParameter, const double areaParameter=0, const double targetArea=0);
 
-    void SetLateralParameter(const double Parameter);
+    void SetLateralParameter(const double parameter);
 
-    void SetVolumeParameter(const double VolumeParameter, const double TargetVolume=0);
+    void SetVolumeParameter(const double volumeParameter, const double targetVolume=0);
 
     void OutputForceParameters(out_stream& rParamsFile);
 };

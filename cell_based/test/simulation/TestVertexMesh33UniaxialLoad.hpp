@@ -89,11 +89,11 @@ private:
 
 public:
     /**
-     * default constructor
+     * Default constructor.
      */
     HorizontalStretchForce(const double ForceMagnitude=1, const double RelativeWidth=0.1)
-    : mForceMagnitude(ForceMagnitude),
-      mRelativeWidth(RelativeWidth)
+        : mForceMagnitude(ForceMagnitude),
+          mRelativeWidth(RelativeWidth)
     {
     }
 
@@ -102,8 +102,9 @@ public:
     }
 
     /**
-     * Adding force contributions to the Populations
-     * @param rCellPopulation
+     * Overridden AddForceContribution() method.
+     *
+     * @param rCellPopulation reference to the cell population
      */
     virtual void AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation)
     {
@@ -484,7 +485,7 @@ public:
     void TestVertexMesh33UiaxialLoad() throw (Exception)
     {
         // Make a mesh of 10x5
-        const double z_height = 1;
+//        const double z_height = 1;
         const double target_area = 1;
         const unsigned num_cells_x = 11;
         const unsigned num_cells_y = 5;

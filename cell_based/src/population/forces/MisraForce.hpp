@@ -49,12 +49,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * A force class for use in Vertex-based simulations. This force is based on the
  * Energy function proposed by Misra et al in Biophysical Journal, 2016, 17, 1670-1678.
  */
-
-
 template<unsigned DIM>
 class MisraForce : public AbstractForce<DIM>
 {
-friend class TestForces;
+    friend class TestForces;
 
 private:
 
@@ -102,7 +100,7 @@ protected:
      * Temporary placeholder for target volume. (temporary value before GrowthModifier is implimented.
      */
     double mTargetVolume;
-    // \todo allow prepattern and eventually curved surfaces.
+    ///\todo allow prepattern and eventually curved surfaces.
 
 public:
 
@@ -125,7 +123,6 @@ public:
      * @param rCellPopulation reference to the cell population
      */
     virtual void AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation);
-
 
     /**
      * Get the line tension parameter for the edge between two given nodes.

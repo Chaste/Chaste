@@ -135,7 +135,7 @@ std::vector<c_vector<double, 2> > VoronoiPrism3dVertexMeshGenerator::GetInitialP
 
 std::vector<c_vector<double, 2> > VoronoiPrism3dVertexMeshGenerator::GetElementCentroidsFromMesh()
 {
-    // return a vector of 2D centroids as Voronoi tessellation is implemented on a 2D surface.
+    // Return a vector of 2D centroids as Voronoi tessellation is implemented on a 2D surface.
     // for fully 3D purpose please change accordingly
     assert(mpMesh->GetNumElements() == mNumElementsX * mNumElementsY);
 
@@ -295,7 +295,7 @@ void VoronoiPrism3dVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_
                     /**
                      * Check whether this node has already been created - all non-boundary nodes will be found twice
                      *
-                     * When the Voronoi Tessellation has been created, there is no simple way to iterate over the Voronoi vertices
+                     * When the Voronoi tessellation has been created, there is no simple way to iterate over the Voronoi vertices
                      * without double-counting some.  We therefore loop through the vector of nodes and checks for equality (of position)
                      * with the new node (p_this_node).  If an 'equal' node is found, the following finds the index of that node.
                      */
@@ -399,9 +399,9 @@ void VoronoiPrism3dVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_
                     // Now need to search for the same lateral face index in both vector
                     // not a too complicated and resource intensive (as r_faces_index vectors have length of at most 3 or 4
                     // therefore not using existing function in <algorithm>
-                    for (unsigned i1 = 0; i1 < r_face1_indices.size() && existing_face_index==UINT_MAX; ++i1)
+                    for (unsigned i1 = 0; (i1 < r_face1_indices.size() && existing_face_index==UINT_MAX); ++i1)
                     {
-                        for (unsigned i2 = 0; ( i2 < r_face2_indices.size() && existing_face_index==UINT_MAX ); ++i2)
+                        for (unsigned i2 = 0; (i2 < r_face2_indices.size() && existing_face_index==UINT_MAX); ++i2)
                         {
                             if (r_face1_indices[i1] == r_face2_indices[i2])
                             {
@@ -445,17 +445,17 @@ void VoronoiPrism3dVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_
             }
 
             lower_nodes_this_elem.insert(lower_nodes_this_elem.end(), upper_nodes_this_elem.begin(), upper_nodes_this_elem.end());
+
             // Use the contructor with std::vector<Node> so that the output will be cleaner
             VertexElement<3, 3>* p_elem = new VertexElement<3, 3>(elements.size(), faces_this_elem, faces_orientation, lower_nodes_this_elem);
             elements.push_back( p_elem );
         }
     }
 
-
-    // Loop over the cells in the voronoi diagram to identify boundary nodes
+    // Loop over the cells in the Voronoi diagram to identify boundary nodes
     for (voronoi_diagram<double>::const_cell_iterator it = vd.cells().begin();
-            it != vd.cells().end();
-            ++it)
+         it != vd.cells().end();
+         ++it)
     {
         // Get a reference to the current cell
         const voronoi_diagram<double>::cell_type& cell = *it;
@@ -505,6 +505,7 @@ void VoronoiPrism3dVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_
                             }
                         }
                     }
+
                     // Move to the next edge
                     edge = edge->next();
                 }
