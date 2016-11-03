@@ -103,29 +103,30 @@ VertexElement<ELEMENT_DIM, SPACE_DIM>::VertexElement(unsigned index,
       mFaces(rFaces),
       mOrientations(rOrientations)
 {
-    // Each face must have an associated orientation
-    assert(mFaces.size() == mOrientations.size());
-
-    // Make a set of nodes with mFaces
-    std::set<Node<SPACE_DIM>*, NodeLessThanYxz<SPACE_DIM> > nodes_set;
-    for (unsigned face_index=0; face_index<mFaces.size(); face_index++)
-    {
-        for (unsigned node_index=0; node_index<mFaces[face_index]->GetNumNodes(); node_index++)
-        {
-            nodes_set.insert(mFaces[face_index]->GetNode(node_index));
-        }
-    }
-
-    // Populate mNodes
-    for (typename std::set< Node<SPACE_DIM>*, NodeLessThanYxz<SPACE_DIM> >::iterator node_iter = nodes_set.begin();
-         node_iter != nodes_set.end();
-         ++node_iter)
-    {
-         this->mNodes.push_back(*node_iter);
-    }
-
-    // Register element with nodes
-    this->RegisterWithNodes();
+EXCEPTION("THIS CONSTRUCTOR SHOULD NOT BE USED YET")
+//    // Each face must have an associated orientation
+//    assert(mFaces.size() == mOrientations.size());
+//
+//    // Make a set of nodes with mFaces
+//    std::set<Node<SPACE_DIM>*, NodeLessThanYxz<SPACE_DIM> > nodes_set;
+//    for (unsigned face_index=0; face_index<mFaces.size(); face_index++)
+//    {
+//        for (unsigned node_index=0; node_index<mFaces[face_index]->GetNumNodes(); node_index++)
+//        {
+//            nodes_set.insert(mFaces[face_index]->GetNode(node_index));
+//        }
+//    }
+//
+//    // Populate mNodes
+//    for (typename std::set< Node<SPACE_DIM>*, NodeLessThanYxz<SPACE_DIM> >::iterator node_iter = nodes_set.begin();
+//         node_iter != nodes_set.end();
+//         ++node_iter)
+//    {
+//         this->mNodes.push_back(*node_iter);
+//    }
+//
+//    // Register element with nodes
+//    this->RegisterWithNodes();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
