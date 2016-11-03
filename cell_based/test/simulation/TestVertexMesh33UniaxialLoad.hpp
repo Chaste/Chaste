@@ -522,12 +522,12 @@ public:
 //        p_force->SetVolumeCompressibilityParameter(30);
 //        simulator.AddForce(p_force);
         MAKE_PTR(GeneralMonolayerVertexMeshForce<3>, p_force3);
-        p_force3->SetApicalParameter(5, 5, 1);
-        p_force3->SetBasalParameter(5, 5, 1);
-        p_force3->SetLateralParameter(2);
-        p_force3->SetVolumeParameter(100, 1);
+        p_force3->SetApicalParameter(10, 10, 1);
+        p_force3->SetBasalParameter(10, 10, 1);
+        p_force3->SetLateralParameter(4);
+        p_force3->SetVolumeParameter(200, 1);
         simulator.AddForce(p_force3);
-        MAKE_PTR_ARGS(HorizontalStretchForce<3>, p_force2, (2));
+        MAKE_PTR_ARGS(HorizontalStretchForce<3>, p_force2, (1));
         simulator.AddForce(p_force2);
 
             simulator.Solve();
