@@ -53,11 +53,6 @@ EllipticGrowingDomainPdeModifier<DIM>::EllipticGrowingDomainPdeModifier(boost::s
 template<unsigned DIM>
 EllipticGrowingDomainPdeModifier<DIM>::~EllipticGrowingDomainPdeModifier()
 {
-    // Destroy the most recent solution vector
-    if (this->mSolution != NULL)
-    {
-        PetscTools::Destroy(this->mSolution);
-    }
 }
 
 template<unsigned DIM>

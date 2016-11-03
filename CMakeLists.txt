@@ -42,31 +42,13 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/overrides.cmake)
 project(Chaste)
 
 include(ChasteBuildTypes)
-include(ChasteCompilerFlags)
-include(ChasteMacros)
 
-set (Chaste_VERSION_MAJOR 3 CACHE STRING "Chaste major version number")
-set (Chaste_VERSION_MINOR 4 CACHE STRING "Chaste minor version number")
-
-set(Chaste_NUM_CPUS_TEST 1 CACHE STRING  "Number of cpus to use when running tests.")
-
-option(Chaste_VERBOSE OFF "Provide extra information when building Chaste")
+option(Chaste_ERROR_ON_WARNING "Error on compiler warnings" ON)
+option(Chaste_VERBOSE "Provide extra information when building Chaste" OFF)
 if (Chaste_VERBOSE AND MSVC)
     set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "/VERBOSE")
     set(CMAKE_C_FLAGS ${CMAKE_CXX_FLAGS} "/VERBOSE")
 endif()
-
-option(Chaste_USE_VTK "Compile Chaste with VTK support" ON)
-option(Chaste_USE_CVODE "Compile Chaste with CVODE support" ON)
-
-if (NOT (WIN32 OR CYGWIN))
-    option(Chaste_USE_XERCES "Compile Chaste with XERCES and XSD support" ON)
-else()
-    option(Chaste_USE_XERCES "Compile Chaste with XERCES and XSD support" OFF)
-endif()
-
-option(Chaste_USE_PETSC_PARMETIS "Prefer to compile Chaste with PARMETIS library used by PETSc" ON)
-option(Chaste_USE_PETSC_HDF5 "Prefer to compile Chaste with HDF5 library used by PETSc" ON)
 if (UNIX)
     option(Chaste_MEMORY_TESTING "Run tests using valgrind for memory testing" OFF)
     set(Chaste_MEMORY_TESTING_OUTPUT_DIR ${Chaste_BINARY_DIR}/memtest)
@@ -88,9 +70,31 @@ if (UNIX)
         set(CMAKE_BUILD_TYPE "Debug")
     endif()
 endif()
+include(ChasteCompilerFlags)
+
+include(ChasteMacros)
+
+set (Chaste_VERSION_MAJOR 3 CACHE STRING "Chaste major version number")
+set (Chaste_VERSION_MINOR 4 CACHE STRING "Chaste minor version number")
+
+set(Chaste_NUM_CPUS_TEST 1 CACHE STRING  "Number of cpus to use when running tests.")
+
+
+option(Chaste_USE_VTK "Compile Chaste with VTK support" ON)
+option(Chaste_USE_CVODE "Compile Chaste with CVODE support" ON)
+
+if (NOT (WIN32 OR CYGWIN))
+    option(Chaste_USE_XERCES "Compile Chaste with XERCES and XSD support" ON)
+else()
+    option(Chaste_USE_XERCES "Compile Chaste with XERCES and XSD support" OFF)
+endif()
+
+option(Chaste_USE_PETSC_PARMETIS "Prefer to compile Chaste with PARMETIS library used by PETSc" ON)
+option(Chaste_USE_PETSC_HDF5 "Prefer to compile Chaste with HDF5 library used by PETSc" ON)
+
 option(Chaste_UPDATE_PROVENANCE "Update build timestamp. Disable to prevent re-linking of all Chaste libraries" ON)
 
-option(RUN_TESTS OFF "This option simply runs Chaste tests. You should also set the test family.")
+option(RUN_TESTS "This option simply runs Chaste tests. You should also set the test family." OFF)
 set(TEST_FAMILY "Continuous" CACHE STRING "The name of the test family, e.g, Continuous, Failing, Nightly, Parallel etc.")
 set(TestPackTypes "Continuous;Failing;Nightly;Parallel;Production;Weekly;Profile;ProfileAssembly;ExtraSimulations")
 
@@ -661,8 +665,8 @@ if (Chaste_COVERAGE)
 
 		# Capturing lcov counters and generating report
 		COMMAND ${LCOV_PATH} --config-file ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc --directory . --capture --output-file ${_outputname}.info
-        COMMAND ${LCOV_PATH} --config-file ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc --remove ${_outputname}.info /home/bob/petsc* /usr/* */fortests/* */3rdparty/* Debug/* cxxtest/* --output-file ${_outputname}.info.cleaned
-		COMMAND ${GENHTML_PATH} --config-file ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc --no-function-coverage -o ${_outputname} ${_outputname}.info.cleaned
+        COMMAND ${LCOV_PATH} --config-file ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc --remove ${_outputname}.info /home/bob/petsc* /usr/* */test/* */3rdparty/* Debug/* cxxtest/* --output-file ${_outputname}.info.cleaned
+		COMMAND ${GENHTML_PATH} --title "Chaste Coverage Results for commit ${Chaste_REVISION}" --config-file ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc --no-function-coverage -o ${_outputname} ${_outputname}.info.cleaned
 		COMMAND ${CMAKE_COMMAND} -E remove ${_outputname}.info ${_outputname}.info.cleaned
 
         DEPENDS Continuous Parallel
@@ -703,7 +707,7 @@ add_custom_target(doxygen_coverage
 if (Chaste_MEMORY_TESTING)
     set(CTEST_COMMAND ctest)
     add_custom_target(memtest
-        COMMAND ${CTEST_COMMAND} "-L" Continuous "--output-on-failure" 
+        COMMAND ${CTEST_COMMAND} "-j6" "-L" Continuous "--output-on-failure" 
         COMMAND ${PYTHON_EXECUTABLE} "${Chaste_SOURCE_DIR}/cmake/process_valgrind_output.py" "${Chaste_MEMORY_TESTING_OUTPUT_DIR}"
         DEPENDS Continuous
         WORKING_DIRECTORY ${Chaste_BINARY_DIR}
