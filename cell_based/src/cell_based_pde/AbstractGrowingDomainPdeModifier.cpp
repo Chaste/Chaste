@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexBasedCellPopulation.hpp"
 #include "MeshBasedCellPopulation.hpp"
 #include "CaBasedCellPopulation.hpp"
+#include "NodeBasedCellPopulation.hpp"
 #include "ReplicatableVector.hpp"
 #include "LinearBasisFunction.hpp"
 
@@ -46,34 +47,36 @@ AbstractGrowingDomainPdeModifier<DIM>::AbstractGrowingDomainPdeModifier(boost::s
                                                                         bool isNeumannBoundaryCondition,
                                                                         Vec solution)
     : AbstractPdeModifier<DIM>(pPde,
-    		                   pBoundaryCondition,
-    		                   isNeumannBoundaryCondition,
-    		                   solution),
-      mDeleteMesh(false)
+                                pBoundaryCondition,
+                                isNeumannBoundaryCondition,
+                                solution)
 {
 }
 
 template<unsigned DIM>
 AbstractGrowingDomainPdeModifier<DIM>::~AbstractGrowingDomainPdeModifier()
 {
-    if (mDeleteMesh)
-    {
-        delete this->mpFeMesh;
-    }
 }
 
 template<unsigned DIM>
 void AbstractGrowingDomainPdeModifier<DIM>::GenerateFeMesh(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
-    if (mDeleteMesh)
+    if (this->mDeleteFeMesh)
     {
         // If a mesh has been created on a previous time-step then we need to tidy it up
         assert(this->mpFeMesh != NULL);
         delete this->mpFeMesh;
     }
-    mDeleteMesh = (dynamic_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation) == NULL);
+    else
+    {
+        ///\todo We should only set mDeleteFeMesh once, not every time step (#2687, #2863)
+        // This placement assumes that if this->mDeleteFeMesh is false it is unitializaed and needs to
+        // be checked. If true is has been checked elsewhere.
+        this->mDeleteFeMesh = (dynamic_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation) == NULL);
+    }
 
-    // Get the finite element mesh via the cell population
+    // Get the finite element mesh via the cell population. Set to NULL first in case mesh generation fails.
+    this->mpFeMesh = NULL;
     this->mpFeMesh = rCellPopulation.GetTetrahedralMeshForPdeModifier();
 }
 
@@ -86,6 +89,7 @@ void AbstractGrowingDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulatio
     // Local cell index used by the CA simulation
     unsigned cell_index = 0;
 
+    unsigned index_in_solution_repl = 0;
     for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
          cell_iter != rCellPopulation.End();
          ++cell_iter)
@@ -98,12 +102,16 @@ void AbstractGrowingDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulatio
             // Offset to relate elements in vertex mesh to nodes in tetrahedral mesh
             tet_node_index += rCellPopulation.GetNumNodes();
         }
-
-        if (dynamic_cast<CaBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL)
+        else if (dynamic_cast<CaBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL)
         {
             // Here local cell index corresponds to tet node
             tet_node_index = cell_index;
             cell_index++;
+        }
+        else if (dynamic_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL)
+        {
+            tet_node_index = index_in_solution_repl;
+            index_in_solution_repl++;
         }
 
         double solution_at_node = solution_repl[tet_node_index];
