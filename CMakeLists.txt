@@ -661,7 +661,11 @@ if (Chaste_COVERAGE)
 		${LCOV_PATH} --directory . --zerocounters
 
 		# Run tests
-        COMMAND ${CTEST_COMMAND} "-L" "Continuous|Parallel" "--output-on-failure" 
+        # runs the following, ignoring errors:
+        #    COMMAND ${CTEST_COMMAND} "-L" "Continuous|Parallel" "--output-on-failure" 
+        COMMAND ${CMAKE_COMMAND} 
+            "-DChaste_BINARY_DIR=${Chaste_BINARY_DIR}"
+            "-P" "${Chaste_SOURCE_DIR}/cmake/Modules/ChasteRunCoverageTests.cmake"
 
 		# Capturing lcov counters and generating report
 		COMMAND ${LCOV_PATH} --config-file ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc --directory . --capture --output-file ${_outputname}.info
