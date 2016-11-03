@@ -39,6 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 #include "ClassIsAbstract.hpp"
+#include "Identifiable.hpp"
 
 class BaseClass
 {
@@ -97,6 +98,26 @@ public:
         archive & boost::serialization::base_object<ChildClass>(*this);
         archive & mSubTag;
     }
+};
+
+/**
+ * This is an identifiable child class which has not been registered for serialization.
+ * It is to cover the warnings given when a class cannot be identified.
+ */
+class BadIdentifiable : public Identifiable
+{
+public:
+
+    BadIdentifiable() : Identifiable()
+    {
+
+    }
+
+    ~BadIdentifiable()
+    {
+
+    }
+
 };
 
 #include "SerializationExportWrapper.hpp"
