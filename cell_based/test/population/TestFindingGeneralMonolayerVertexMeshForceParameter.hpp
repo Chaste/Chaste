@@ -68,7 +68,7 @@ class TestFindingGeneralMonolayerVertexMeshForceParameter : public AbstractCellB
 {
 public:
 
-    void AllTests()
+    void TestAll()
     {
         const double z_height = 1;
         const double target_area = 1;
