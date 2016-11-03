@@ -98,7 +98,9 @@ public:
     {
     }
 
-    void SetPatternedApicalParameter(const double patternedTargetApicalArea, const double patternedApicalareaParameter, const double patternedApicalEdgeParameter)
+    void SetPatternedApicalParameter(const double patternedApicalEdgeParameter,
+                                     const double patternedApicalareaParameter,
+                                     const double patternedTargetApicalArea)
     {
         mPatternedTargetApicalArea = patternedTargetApicalArea;
         mPatternedApicalareaParameter = patternedApicalareaParameter;
@@ -312,12 +314,12 @@ public:
         p_force3->SetBasalParameter(10, 10, 1);
         p_force3->SetLateralParameter(4);
         p_force3->SetVolumeParameter(200, 1);
-        p_force3->SetPatternedApicalParameter(8, 10, 1);
+        p_force3->SetPatternedApicalParameter(20, 20, 0.5);
         simulator.AddForce(p_force3);
 
         simulator.Solve();
 
-        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 25u);
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 100u);
         TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
 };
