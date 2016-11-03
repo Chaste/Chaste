@@ -103,7 +103,7 @@ VertexElement<ELEMENT_DIM, SPACE_DIM>::VertexElement(unsigned index,
       mFaces(rFaces),
       mOrientations(rOrientations)
 {
-EXCEPTION("THIS CONSTRUCTOR SHOULD NOT BE USED YET")
+EXCEPTION("THIS CONSTRUCTOR SHOULD NOT BE USED YET");
 //    // Each face must have an associated orientation
 //    assert(mFaces.size() == mOrientations.size());
 //
