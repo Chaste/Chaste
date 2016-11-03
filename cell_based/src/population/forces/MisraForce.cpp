@@ -71,8 +71,7 @@ void MisraForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCellPop
     std::vector<double> element_volumes(num_elements);
     for (unsigned elem_index = 0; elem_index<num_elements; ++elem_index)
     {
-        const VertexElement<DIM, DIM>* p_elem = p_cell_population->GetElement(elem_index);
-        assert(elem_index == p_elem->GetIndex());
+        assert(elem_index == p_cell_population->GetElement(elem_index)->GetIndex());
         element_volumes[elem_index] = rMesh.GetVolumeOfElement(elem_index);
     }
 
@@ -115,9 +114,9 @@ void MisraForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCellPop
             // Get this element, its index and its number of nodes
             VertexElement<DIM, DIM>* p_element = p_cell_population->GetElement(*iter);
             std::vector<VertexElement<DIM-1, DIM>*> lateral_faces;
-            VertexElement<DIM-1,DIM>* p_basal_face;
-            VertexElement<DIM-1,DIM>* p_apical_face;
-            bool apical_face_orientation;
+            VertexElement<DIM-1,DIM>* p_basal_face = NULL;
+            VertexElement<DIM-1,DIM>* p_apical_face = NULL;
+            bool apical_face_orientation = false;
 
             // Populate the pointers/vector to different types of face
             for (unsigned face_index=0; face_index<p_element->GetNumFaces(); ++face_index)

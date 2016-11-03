@@ -55,9 +55,9 @@ MeshBuilderHelper::MeshBuilderHelper(const std::vector<Node<3>*>& rLowerNodes,
     {
         mLowerNodes[i]->AddNodeAttribute(1.1);
 
-        const c_vector<double, 3> tmp = mLowerNodes[i]->rGetLocation();
-        Node<3>* p_node_tmp = new Node<3>(i+mNumLowerNodes, mLowerNodes[i]->IsBoundaryNode(),
-                tmp[0], tmp[1], tmp[2] + zHeight);
+        c_vector<double, 3> tmp;
+        tmp = mLowerNodes[i]->rGetLocation();
+        Node<3>* p_node_tmp = new Node<3>(i+mNumLowerNodes, mLowerNodes[i]->IsBoundaryNode(), tmp[0], tmp[1], tmp[2] + zHeight);
         p_node_tmp->AddNodeAttribute(2.1);
         mUpperNodes[i] = p_node_tmp;
     }
@@ -100,8 +100,9 @@ MutableVertexMesh<3, 3>* MeshBuilderHelper::MakeMeshUsing2dMesh(const MutableVer
     for (unsigned i=0 ; i<mNumLowerNodes ; ++i)
     {
         const Node<2>* p_2node = mesh2.GetNode(i);
-        assert( i == p_2node->GetIndex() );
-        const c_vector<double, 2> loc = p_2node->rGetLocation();
+        assert(i == p_2node->GetIndex());
+        c_vector<double, 2> loc;
+        loc = p_2node->rGetLocation();
         const bool is_boundary = p_2node->IsBoundaryNode();
         Node<3>* p_lower = new Node<3>(i, is_boundary, loc[0], loc[1], 0);
         Node<3>* p_upper = new Node<3>(i+mNumLowerNodes, is_boundary, loc[0], loc[1], zHeight);
