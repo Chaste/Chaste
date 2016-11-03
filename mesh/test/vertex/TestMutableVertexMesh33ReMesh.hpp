@@ -2,7 +2,7 @@
 #define TESTMUTABLEVERTEXMESH33REMESH_HPP_
 
 #include <cxxtest/TestSuite.h>
-
+#include "Debug.hpp"
 #include "VertexMeshWriter.hpp"
 #include "FileComparison.hpp"
 #include "Warnings.hpp"
@@ -10,6 +10,10 @@
 
 //This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
+
+#define PRINT_MESH          MARK//builder.PrintMesh(true);
+#define PRINT_REMESH        MARK//builder.PrintMesh(true);TRACE("REMESH");vertex_mesh.ReMesh();builder.PrintMesh(true);
+
 
 #define OUTPUT_NAME "TestMutableVertexMesh33ReMesh"
 
@@ -127,18 +131,26 @@ public:
 
     void PrintMesh(const bool allElements=false) const
     {
+        const std::string TAB = "    " ;
+        std::cout <<"=================================================================================" << std::endl;
         const unsigned num_elems = allElements ? mpMesh->GetNumAllElements() : mpMesh->GetNumElements();
         for (unsigned i=0; i<num_elems; ++i)
         {
             VertexElement<3,3>& elem = *(mpMesh->GetElement(i));
-            std::cout << "ELEMENT (" << i<< ") : " << elem.GetIndex() << std::endl;
-            std::cout << "number of Faces : " << elem.GetNumFaces() << " {  ";
+            std::cout << "ELEMENT (" << i<< ") : " << elem.GetIndex() << (elem.IsDeleted()?" (DELETED)": "") << std::endl;
+            std::cout << TAB << "number of Faces : " << elem.GetNumFaces() << " {";
             for (unsigned j=0; j<elem.GetNumFaces(); ++j)
             {
-                std::cout << elem.GetFace(j)->GetIndex() << "  ";
+                std::cout << std::setw(3) << elem.GetFace(j)->GetIndex() << "  ";
             }
             std::cout << "}" << std::endl;
-            std::cout << "number of Nodes : " << elem.GetNumNodes() << " {  ";
+            std::cout << TAB << "Face oriented.. : " << elem.GetNumFaces() << " {";
+            for (unsigned j=0; j<elem.GetNumFaces(); ++j)
+            {
+                std::cout << std::setw(3) << elem.FaceIsOrientatedAntiClockwise(j) << "  ";
+            }
+            std::cout << "}" << std::endl;
+            std::cout << TAB << "number of Nodes : " << elem.GetNumNodes() << " {  ";
             for (unsigned j=0; j<elem.GetNumNodes(); ++j)
             {
                 std::cout << elem.GetNode(j)->GetIndex() << "  ";
@@ -146,14 +158,44 @@ public:
             std::cout << "}" << std::endl;
 
             VertexElement<2,3>& basal = *(elem.GetFace(0));
-            std::cout << "Nodes for basal face " << basal.GetIndex() << " {  ";
+            std::cout << TAB << "Nodes for basal face " << basal.GetIndex() << " {  ";
             for (unsigned j=0; j<basal.GetNumNodes(); ++j)
             {
                 std::cout << basal.GetNode(j)->GetIndex() << "  ";
             }
-            std::cout << "}" << std::endl;
+            std::cout << "}" << std::endl << "---------------------------------------------------------" << std::endl;
         }
-        std::cout << std::endl;
+        std::cout <<"***************************************************************" << std::endl;
+
+        const unsigned num_faces = allElements ? mpMesh->GetNumAllFaces() : mpMesh->GetNumFaces();
+        for (unsigned i=0; i<num_faces; ++i)
+        {
+            VertexElement<2, 3>& face = *(mpMesh->GetFace(i));
+            std::cout << "FACE (" << i<< ") : " << face.GetIndex() << (face.IsDeleted()?" (DELETED)": "") << std::endl;
+            std::cout << TAB << "Face Attribute : " << face.rGetElementAttributes()[0] << (face.IsElementOnBoundary()?" (BOUNDARY)": "") << std::endl;
+            std::cout << TAB << "number of Nodes : " << face.GetNumNodes() << " {  ";
+            for (unsigned j=0; j<face.GetNumNodes(); ++j)
+            {
+                std::cout << face.GetNode(j)->GetIndex() << "  ";
+            }
+            std::cout << "}" << std::endl << "---------------------------------------------------------" << std::endl;
+        }
+        std::cout <<"***************************************************************" << std::endl;
+
+        const unsigned num_nodes = allElements ? mpMesh->GetNumAllNodes() : mpMesh->GetNumNodes();
+        for (unsigned i=0; i<num_nodes; ++i)
+        {
+            Node<3>& node = *(mpMesh->GetNode(i));
+            std::set<unsigned> set_tmp = node.rGetContainingElementIndices();
+            std::cout << "NODE (" << i<< ") : " << node.GetIndex() << (node.IsDeleted()?" (DELETED)": "") << std::endl;
+            std::cout << TAB << "Node Attribute : " << node.rGetNodeAttributes()[0] << (node.IsBoundaryNode()?" (BOUNDARY)": "") << std::endl;
+            std::cout << TAB << "number of Elements : " << set_tmp.size() << " {  ";
+            for (std::set<unsigned>::iterator it=set_tmp.begin(); it != set_tmp.end(); ++it)
+            {
+                std::cout << *it << "  ";
+            }
+            std::cout << "}" << std::endl << "---------------------------------------------------------" << std::endl;
+        }
     }
 
     void WriteVtk(const std::string& AdditionalTag = "")
@@ -325,12 +367,14 @@ public:
         // A reference variable as mesh is noncopyable
         MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
         builder.WriteVtk("Before");
+PRINT_MESH
 
         // Set the threshold distance between vertices for a T1 swap as follows
         // so that it will trigger CheckForSwapsFromShortEdges
         vertex_mesh.SetCellRearrangementThreshold(0.3);
         vertex_mesh.CheckForSwapsFromShortEdges();
         builder.WriteVtk("AfterOnce");
+PRINT_MESH
 
         // Test that each moved node has the correct location following the rearrangement
         TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[0], 0.725, 1e-8);
@@ -367,6 +411,7 @@ public:
         // Perform a T1 swap on nodes 4 and 5
         vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(4), vertex_mesh.GetNode(5));
         builder.WriteVtk("AfterTwice");
+PRINT_REMESH
 
         // Test that each element has the correct area and perimeter following the rearrangement
         TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(0), 0.2, 1e-6);
@@ -433,12 +478,15 @@ public:
         builder.buildElementWith(4, node_indices_elem_3);
         // A reference variable as mesh is noncopyable
         MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
+PRINT_MESH
 
         // Set the threshold distance between vertices for a T1 swap as follows
         // so that it will not trigger CheckForSwapsFromShortEdges
         vertex_mesh.GetNode(11)->rGetModifiableLocation()[1] = 0.62;
         vertex_mesh.SetCellRearrangementThreshold(0.21);
         vertex_mesh.CheckForSwapsFromShortEdges();
+PRINT_MESH
+
         // Test that each moved node has the correct location following the rearrangement
         TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[0], 0.5, 1e-8);
         TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[1], 0.6, 1e-8);
@@ -454,6 +502,7 @@ public:
 
         vertex_mesh.SetCellRearrangementThreshold(0.25);
         vertex_mesh.CheckForSwapsFromShortEdges();
+PRINT_MESH
     }
 
     void TestT1SwapNonEvenFace() throw(Exception)
@@ -491,12 +540,14 @@ public:
 //        vertex_mesh.GetNode(11)->rGetModifiableLocation()[0] = 0.45;
         vertex_mesh.GetNode(4)->rGetModifiableLocation()[0] = 0.45;
         builder.WriteVtk("Before");
+PRINT_MESH
 
         // Set the threshold distance between vertices for a T1 swap as follows
         // so that it will trigger CheckForSwapsFromShortEdges
         vertex_mesh.SetCellRearrangementThreshold(0.3);
         vertex_mesh.CheckForSwapsFromShortEdges();
         builder.WriteVtk("After");
+PRINT_REMESH
 
         // Test that each moved node has the correct location following the rearrangement
         TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[0], 0.2518, 1e-4);
@@ -535,12 +586,14 @@ public:
         // A reference variable as mesh is noncopyable
         MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
         builder.WriteVtk("Before");
+PRINT_MESH
 
         // Set the threshold distance between vertices for a T1 swap as follows, to ease calculations
         vertex_mesh.SetCellRearrangementThreshold(0.1*2.0/1.5);
         // Perform a T1 swap on nodes 5 and 4 (this way round to ensure coverage of boundary node tracking)
         vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(5), vertex_mesh.GetNode(4));
         builder.WriteVtk("After");
+PRINT_REMESH
 
         // Test that each moved node has the correct location following the rearrangement
         TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[0], 0.6, 1e-8);
@@ -626,6 +679,7 @@ public:
         // A reference variable as mesh is noncopyable
         MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
         builder.WriteVtk("Before");
+PRINT_MESH
 
         // Set the threshold distance between vertices for a T1 swap as follows, to ease calculations
         vertex_mesh.SetCellRearrangementThreshold(0.1*2.0/1.5);
@@ -637,6 +691,7 @@ public:
         // Perform a T1 swap on nodes 5 and 4 (this way round to ensure coverage of boundary node tracking)
         vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(5), vertex_mesh.GetNode(4));
         builder.WriteVtk("After");
+PRINT_REMESH
 
         // Test that each moved node has the correct location following the rearrangement
         TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[0], 0.6, 1e-8);
@@ -719,12 +774,14 @@ public:
         // A reference variable as mesh is noncopyable
         MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
         builder.WriteVtk("Before");
+PRINT_MESH
 
         // Set the threshold distance between vertices for a T1 swap as follows, to ease calculations
         vertex_mesh.SetCellRearrangementThreshold(0.1*2.0/1.5);
         // Perform a T1 swap on nodes 5 and 4.
         vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(5), vertex_mesh.GetNode(4));
         builder.WriteVtk("After");
+PRINT_REMESH
 
         // Test that each moved node has the correct location following the rearrangement
         TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[0], 0.6, 1e-8);
@@ -931,6 +988,7 @@ public:
         MeshBuilderHelper builder("T1SwapReMesh");
         MutableVertexMesh<3, 3>& vertex_mesh = *(builder.MakeMeshUsing2dMesh(vertex_2mesh) );
         builder.WriteVtk("Before");
+PRINT_MESH
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 8u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 44u);
@@ -939,6 +997,7 @@ public:
         vertex_mesh.SetCellRearrangementThreshold(0.1);
         vertex_mesh.ReMesh();
         builder.WriteVtk("After");
+PRINT_MESH
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 8u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 44u);
@@ -996,12 +1055,13 @@ public:
         // A reference variable as mesh is noncopyable
         MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
         builder.WriteVtk("Before");
+PRINT_MESH
 
         // Perform a T2 swap on the central triangle element
         VertexElement<3, 3>* p_element_0 = vertex_mesh.GetElement(0);
         c_vector<double, 3> centroid_of_element_0_before_swap = vertex_mesh.GetCentroidOfElement(0);
         vertex_mesh.PerformT2Swap(*p_element_0);
-//MARK        builder.WriteVtk("AfterSwap");
+PRINT_MESH
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 3u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 8u);
@@ -1042,6 +1102,7 @@ public:
         VertexElementMap map(vertex_mesh.GetNumElements());
         vertex_mesh.RemoveDeletedNodesAndElements(map);
         builder.WriteVtk("AfterRemove");
+PRINT_REMESH
     }
 
     void TestPerformT2SwapOnBoundary() throw(Exception)
@@ -1077,7 +1138,7 @@ public:
         // A reference variable as mesh is noncopyable
         MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
         builder.WriteVtk("Before");
-
+PRINT_MESH
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 3u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 12u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumFaces(), 14u);
@@ -1085,6 +1146,7 @@ public:
         // Perform a T2 swap on the central triangle element
         VertexElement<3,3>* p_element_0 = vertex_mesh.GetElement(0);
         vertex_mesh.PerformT2Swap(*p_element_0);
+PRINT_MESH
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 2u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 8u);
@@ -1114,6 +1176,8 @@ public:
         VertexElementMap map(vertex_mesh.GetNumElements());
         vertex_mesh.RemoveDeletedNodesAndElements(map);
         builder.WriteVtk("AfterRemove");
+        TRACE("Remove deleted nodes and elements")
+PRINT_REMESH
     }
 
     void TestPerformT2OnBoundary2() throw(Exception)
@@ -1146,6 +1210,7 @@ public:
         // A reference variable as mesh is noncopyable
         MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
         builder.WriteVtk("Before");
+PRINT_MESH
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 2u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 10u);
@@ -1154,6 +1219,7 @@ public:
         // Perform a T2 swap on the central triangle element
         VertexElement<3,3>* p_element_0 = vertex_mesh.GetElement(0);
         vertex_mesh.PerformT2Swap(*p_element_0);
+PRINT_MESH
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 1u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 6u);
@@ -1183,6 +1249,8 @@ public:
         VertexElementMap map(vertex_mesh.GetNumElements());
         vertex_mesh.RemoveDeletedNodesAndElements(map);
         builder.WriteVtk("AfterRemove");
+        TRACE("Remove deleted nodes and elements")
+PRINT_REMESH
     }
 
     void TestT2SwapsDontOccurWithTriangularNeighbours() throw(Exception)
@@ -1259,6 +1327,7 @@ public:
         // A reference variable as mesh is noncopyable
         MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
         builder.WriteVtk("Before");
+PRINT_MESH
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 5u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 18u);
@@ -1268,6 +1337,7 @@ public:
         VertexElement<3, 3>* p_element_3 = vertex_mesh.GetElement(3);
         c_vector<double, 3> centroid_of_element_3_before_swap = vertex_mesh.GetCentroidOfElement(3);
         vertex_mesh.PerformT2Swap(*p_element_3);
+PRINT_MESH
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 4u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 14u);
@@ -1311,6 +1381,8 @@ public:
         VertexElementMap map(vertex_mesh.GetNumElements());
         vertex_mesh.RemoveDeletedNodesAndElements(map);
         builder.WriteVtk("AfterRemove");
+        TRACE("Remove deleted nodes and elements")
+PRINT_REMESH
     }
 
     void TestPerformT2SwapWithRosettes2() throw(Exception)
@@ -1344,6 +1416,7 @@ public:
         // A reference variable as mesh is noncopyable
         MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
         builder.WriteVtk("Before");
+PRINT_MESH
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 5u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 24u);
@@ -1353,6 +1426,7 @@ public:
         VertexElement<3, 3>* p_element_4 = vertex_mesh.GetElement(4);
         c_vector<double, 3> centroid_of_element_4_before_swap = vertex_mesh.GetCentroidOfElement(3);
         vertex_mesh.PerformT2Swap(*p_element_4);
+PRINT_MESH
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 4u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 18u);
@@ -1377,6 +1451,8 @@ public:
         VertexElementMap map(vertex_mesh.GetNumElements());
         vertex_mesh.RemoveDeletedNodesAndElements(map);
         builder.WriteVtk("AfterRemove");
+        TRACE("Remove deleted nodes and elements")
+PRINT_REMESH
     }
 
     void TestPerformNodeMerge() throw(Exception)

@@ -32,7 +32,7 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
-
+#include "Debug.hpp"
 #include "MutableVertexMesh.hpp"
 #include "UblasCustomFunctions.hpp"
 #include "Warnings.hpp"
@@ -1089,14 +1089,14 @@ bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForSwapsFromShortEdges()
 template<>
 bool MutableVertexMesh<3, 3>::CheckForSwapsFromShortEdges()
 {
-    const unsigned numFaces = this->GetNumFaces();
+    const unsigned numFaces = this->GetNumAllFaces();
     // Loop over elements to check for T1 swaps
     for (unsigned face_index=0 ; face_index<numFaces ; ++face_index)
     {
         // We search more efficiently by just iterating over edges (lateral faces)
         VertexElement<2, 3>* p_face = this->GetFace(face_index);
         const unsigned face_type = unsigned ( p_face->rGetElementAttributes()[0] );
-        if ( 3u != face_type )
+        if ( 3u != face_type  || p_face->IsDeleted())
         {
             continue;
         }
@@ -1145,7 +1145,14 @@ bool MutableVertexMesh<3, 3>::CheckForSwapsFromShortEdges()
             if (!both_nodes_share_triangular_element)
             {
                 ///\todo Could have pass down the p_face as the p_lateral_swap_face, but much more modifications
-                IdentifySwapType(p_current_node, p_next_node);
+                try
+                {
+                    IdentifySwapType(p_current_node, p_next_node);
+                }catch (int x)
+                {
+                    assert(x == 44);
+                    return false;
+                }
                 return true;
             }
         }
@@ -1284,6 +1291,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
          * This case is handled in a separate method to allow child classes to implement different
          * functionality for high-order-junction remodelling events (see #2664).
          */
+MARK
         this->HandleHighOrderJunctions(pNodeA, pNodeB);
     }
     else // each node is contained in at most three elements
@@ -1300,6 +1308,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                  *    A   B
                  * ---o---o---
                  */
+MARK; TRACE("Node Merge")
                 ///\todo fail assertion for 3D
                 assert(pNodeA->IsBoundaryNode());
                 assert(pNodeB->IsBoundaryNode());
@@ -1327,7 +1336,8 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                          *    / \ Node B
                          *   /   \
                          */
-                         PerformT1Swap(pNodeA, pNodeB,all_indices);
+MARK; TRACE("T1 froming void")
+                        PerformT1Swap(pNodeA, pNodeB,all_indices);
                     }
                     else if (pNodeA->IsBoundaryNode() || pNodeB->IsBoundaryNode())
                     {
@@ -1373,8 +1383,13 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                      * the single boundary node will travel from element 1 to element 2, but still remain a single node.
                      * I.e. we would not reduce the total number of nodes in this situation.
                      */
-                    PerformNodeMerge(pNodeA, pNodeB);
+//MARK; TRACE("DANGER")
+//TRACE("Supressed for now")
+                    throw 44;
+//                    PerformNodeMerge(pNodeA, pNodeB);
                     RemoveDeletedNodes();
+                    if (ELEMENT_DIM==3u)
+                        RemoveDeletedFaces();
                 }
                 break;
             }
@@ -1505,7 +1520,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                              */
                              EXCEPTION("Triangular element next to triangular void, not implemented yet.");
                         }
-
+MARK; TRACE("VOID Removal")
                         PerformVoidRemoval(pNodeA, pNodeB, this->mNodes[nodeC_index]);
                     }
                     else
@@ -1523,7 +1538,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                          */
                         assert(pNodeA->IsBoundaryNode());
                         assert(pNodeB->IsBoundaryNode());
-
+MARK; TRACE("T1 with 3 elements")
                         PerformT1Swap(pNodeA, pNodeB, all_indices);
                     }
                 } // from else if (nodeA_elem_indices.size()==2 && nodeB_elem_indices.size()==2)
@@ -1548,6 +1563,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                          *    / (2)\                    /(2) \
                          *   /      \                  /      \
                          */
+MARK; TRACE("T1 with 3 elements")
                         PerformT1Swap(pNodeA, pNodeB, all_indices);
                     }
                     else
@@ -1586,11 +1602,13 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                  */
                 if (mProtorosetteFormationProbability > RandomNumberGenerator::Instance()->ranf())
                 {
+MARK
                     this->PerformNodeMerge(pNodeA, pNodeB);
                     this->RemoveDeletedNodes();
                 }
                 else
                 {
+MARK; TRACE("Normal T1")
                     this->PerformT1Swap(pNodeA, pNodeB, all_indices);
                 }
                 break;
@@ -1643,6 +1661,8 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformNodeMerge(Node<SPACE_DIM>
 template<>
 void MutableVertexMesh<3, 3>::PerformNodeMerge(Node<3>* pNodeA, Node<3>* pNodeB)
 {
+MARK; TRACE("Perform Node Merge")
+PRINT_2_VARIABLES(pNodeA->GetIndex(), pNodeB->GetIndex())
     // Specialization for monolayer
     // Find the sets of elements containing each of the nodes, sorted by index
     std::set<unsigned> nodeA_elem_indices = pNodeA->rGetContainingElementIndices();
@@ -1882,6 +1902,12 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
      *    / \ Node B
      *   /(3)\
      */
+MARK; TRACE("Enter T1swap")
+PRINT_3_VARIABLES(pNodeA->GetIndex(), pNodeB->GetIndex(), rElementsContainingNodes.size())
+for (std::set<unsigned>::iterator it=rElementsContainingNodes.begin(); it!=rElementsContainingNodes.end(); ++it)
+{
+    PRINT_3_VARIABLES(*it, this->GetElement(*it)->GetIndex(), this->GetElement(*it)->GetNumNodes());
+}
 
     // Initialize some values that are commonly used.
     const unsigned node_a_index = pNodeA->GetIndex();
@@ -1928,9 +1954,12 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
     VertexElement<2, 3>* p_lateral_swap_face (NULL);
     VertexElement<2, 3>* p_lateral_face_23 (NULL);
     VertexElement<2, 3>* p_lateral_face_14 (NULL);
-    // Default set as false to handle the case for void.
-    bool orientation_face_swap_2 (false);
-    bool orientation_face_swap_4 (false);
+    // Not possible to set default value as for the case of void, as the lateral face could
+    // oriented either way.
+    bool orientation_face_swap_2 (true);
+    bool orientation_face_swap_4 (true);
+    unsigned record_for_face_swap_24 (0);
+
     for (std::set<unsigned>::const_iterator it = rElementsContainingNodes.begin();
          it != rElementsContainingNodes.end();
          ++it)
@@ -2105,6 +2134,7 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
                 // it has the similar face index as node B.
                 swap_face_local_index = node_b_local_index + 2;
                 orientation_face_swap_2 = p_elem->FaceIsOrientatedAntiClockwise(swap_face_local_index);
+                record_for_face_swap_24 += 2u;
             }
             else
             {
@@ -2138,6 +2168,7 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
                 // Part IV
                 swap_face_local_index = node_a_local_index + 2;
                 orientation_face_swap_4 = p_elem->FaceIsOrientatedAntiClockwise(swap_face_local_index);
+                record_for_face_swap_24 += 4u;
             }
             // Part IV of both elements 2 and 4.
             if ( p_lateral_swap_face == NULL )
@@ -2152,7 +2183,23 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
         }
     }
     // Make sure the orientation obtained is correct
-    assert( orientation_face_swap_2 != orientation_face_swap_4 );
+    switch (record_for_face_swap_24)
+    {
+    case 6u :
+        assert(orientation_face_swap_2 != orientation_face_swap_4);
+        break;
+    case 4u :
+        orientation_face_swap_2 = !orientation_face_swap_4;
+        break;
+    case 2u :
+        orientation_face_swap_4 = !orientation_face_swap_2;
+        break;
+    case 0u :
+        NEVER_REACHED;
+        break;
+    default:
+        NEVER_REACHED;
+    }
 
     // Part IV for elements 1 and 3.
     // As element 3 is on the same side of element 2, it will have the orientation from element 2.
@@ -2454,6 +2501,9 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT2Swap(VertexElement<ELEM
 template<>
 void MutableVertexMesh<3, 3>::PerformT2Swap(VertexElement<3,3>& rElement)
 {
+MARK; TRACE("Perform Node Merge")
+PRINT_2_VARIABLES(rElement.GetIndex(), rElement.GetNumNodes())
+
     // The given element must be triangular for us to be able to perform a T2 swap on it
     assert(rElement.GetNumNodes() >= 6);
 
@@ -3244,6 +3294,8 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformVoidRemoval(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB, Node<SPACE_DIM>* pNodeC)
 {
+MARK; TRACE("Perform Void Removal, imcoplete work")
+PRINT_2_VARIABLES(pNodeA->GetIndex(), pNodeB->GetIndex())
     // Calculate void centroid
     c_vector<double, SPACE_DIM> nodes_midpoint = pNodeA->rGetLocation()
             + this->GetVectorFromAtoB(pNodeA->rGetLocation(), pNodeB->rGetLocation()) / 3.0

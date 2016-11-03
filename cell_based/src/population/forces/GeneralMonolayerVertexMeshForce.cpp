@@ -92,11 +92,6 @@ void GeneralMonolayerVertexMeshForce<DIM>::AddForceContribution(AbstractCellPopu
         c_vector<double, DIM> lateral_edge_contribution = zero_vector<double>(DIM);
         c_vector<double, DIM> volume_contribution = zero_vector<double>(DIM);
 
-        const unsigned opposite_node_index = node_index + num_nodes/2*(node_type==1u?1:-1);
-        const Node<DIM>* p_opposite_node = p_cell_population->GetNode(opposite_node_index);
-        const c_vector<double, DIM> edge_gradient = (p_this_node->rGetLocation() - p_opposite_node->rGetLocation())/norm_2(p_this_node->rGetLocation() - p_opposite_node->rGetLocation());
-        lateral_edge_contribution -= edge_gradient*mLateralEdgeParameter;
-
         // a variable to store such that the apical/basal edge forces are not counted twice for non-boundary edges.
         std::set<unsigned> neighbour_node_indices;
 
@@ -164,6 +159,11 @@ void GeneralMonolayerVertexMeshForce<DIM>::AddForceContribution(AbstractCellPopu
             const c_vector<double, DIM> edge_gradient = (p_this_node->rGetLocation() - p_neighbour_node->rGetLocation())/norm_2(p_this_node->rGetLocation() - p_neighbour_node->rGetLocation());
             ab_edge_contribution -= edge_gradient*(node_type==1u ? mBasalEdgeParameter : mApicalEdgeParameter);
         }
+
+        const unsigned opposite_node_index = node_index + num_nodes/2*(node_type==1u?1:-1);
+        const Node<DIM>* p_opposite_node = p_cell_population->GetNode(opposite_node_index);
+        const c_vector<double, DIM> edge_gradient = (p_this_node->rGetLocation() - p_opposite_node->rGetLocation())/norm_2(p_this_node->rGetLocation() - p_opposite_node->rGetLocation());
+        lateral_edge_contribution -= edge_gradient*mLateralEdgeParameter*(containing_elem_indices.size());
 
         c_vector<double, DIM> force_on_node = basal_face_contribution + ab_edge_contribution + apical_face_contribution
                 + lateral_edge_contribution + volume_contribution;
