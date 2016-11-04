@@ -414,7 +414,8 @@ endmacro(Chaste_DO_PROJECT)
 # process the apps folder
 ##########################################################
 macro(Chaste_DO_APPS_COMMON component)
-    include_directories("${Chaste_THIRD_PARTY_INCLUDE_DIRS}" "${Chaste_INCLUDE_DIRS}" "${CXXTEST_INCLUDES}")
+    include_directories("${Chaste_THIRD_PARTY_INCLUDE_DIRS}" "${Chaste_INCLUDE_DIRS}")
+    include_directories(SYSTEM "${CXXTEST_INCLUDES}")
     file(GLOB_RECURSE Chaste_${component}_APPS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} src/*.cpp)
     foreach(app ${Chaste_${component}_APPS})
         string(REGEX REPLACE ".*/([a-zA-Z0-9_]+)[.]cpp" "\\1" appName "${app}")
@@ -509,7 +510,8 @@ macro(Chaste_DO_TEST_COMMON component)
 
     # Figure out include path for tests
     header_dirs("${CMAKE_CURRENT_SOURCE_DIR}" Chaste_${component}_TEST_DIRS)
-    include_directories(${Chaste_${component}_TEST_DIRS} ${CXXTEST_INCLUDES})
+    include_directories(${Chaste_${component}_TEST_DIRS})
+    include_directories(SYSTEM "${CXXTEST_INCLUDES}")
 
     # Make test library if sources exist
     set(COMPONENT_LIBRARIES chaste_${component})
