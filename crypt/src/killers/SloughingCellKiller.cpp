@@ -92,7 +92,8 @@ void SloughingCellKiller<DIM>::CheckAndLabelCellsForApoptosisOrDeath()
                  cell_iter != this->mpCellPopulation->End();
                  ++cell_iter)
             {
-                c_vector<double, 2> location = this->mpCellPopulation->GetLocationOfCellCentre(*cell_iter);
+                c_vector<double, 2> location;
+                location = this->mpCellPopulation->GetLocationOfCellCentre(*cell_iter);
                 double x = location[0];
                 double y = location[1];
 

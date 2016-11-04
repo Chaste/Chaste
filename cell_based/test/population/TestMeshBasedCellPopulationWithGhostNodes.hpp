@@ -839,7 +839,8 @@ public:
         for (unsigned node_index=0; node_index<mesh.GetNumNodes(); node_index++)
         {
             // If this node is sufficiently close to the centre of the mesh, then create a cell for it
-            c_vector<double, 2> node_location = mesh.GetNode(node_index)->rGetLocation();
+            c_vector<double, 2> node_location;
+            node_location = mesh.GetNode(node_index)->rGetLocation();
             if (node_location(0) <= 3)
             {
                 FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
@@ -867,7 +868,8 @@ public:
             unsigned elem_index = elem_iter->GetIndex();
             unsigned node_index = cell_population.GetVoronoiTessellation()->GetDelaunayNodeIndexCorrespondingToVoronoiElementIndex(elem_index);
 
-            c_vector<double, 2> node_location = cell_population.GetNode(node_index)->rGetLocation();
+            c_vector<double, 2> node_location;
+            node_location = cell_population.GetNode(node_index)->rGetLocation();
             bool should_be_ghost_node = (node_location(0) > 3);
 
             TS_ASSERT_EQUALS(cell_population.IsGhostNode(node_index), should_be_ghost_node);
@@ -899,7 +901,8 @@ public:
         for (unsigned node_index=0; node_index<mesh.GetNumNodes(); node_index++)
         {
             // If this node is sufficiently close to the centre of the mesh, then create a cell for it
-            c_vector<double, 3> node_location = mesh.GetNode(node_index)->rGetLocation();
+            c_vector<double, 3> node_location;
+            node_location = mesh.GetNode(node_index)->rGetLocation();
             if (node_location(0) <= 3)
             {
                 FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
@@ -928,7 +931,8 @@ public:
             unsigned elem_index = elem_iter->GetIndex();
             unsigned node_index = cell_population.GetVoronoiTessellation()->GetDelaunayNodeIndexCorrespondingToVoronoiElementIndex(elem_index);
 
-            c_vector<double, 3> node_location = cell_population.GetNode(node_index)->rGetLocation();
+            c_vector<double, 3> node_location;
+            node_location = cell_population.GetNode(node_index)->rGetLocation();
             bool should_be_ghost_node = (node_location(0) > 3);
 
             TS_ASSERT_EQUALS(cell_population.IsGhostNode(node_index), should_be_ghost_node);

@@ -124,7 +124,8 @@ public:
             if (!(*cell_iter)->IsDead())
             {
                 Node<2>* p_node = cell_population.GetNodeCorrespondingToCell(*cell_iter);
-                c_vector<double, 2> location = p_node->rGetLocation();
+                c_vector<double, 2> location;
+                location = p_node->rGetLocation();
                 old_locations.insert(location[0] + location[1]*1000);
             }
         }
@@ -140,7 +141,8 @@ public:
         {
             TS_ASSERT_EQUALS((*cell_iter)->IsDead(), false);
             Node<2>* p_node = cell_population.GetNodeCorrespondingToCell(*cell_iter);
-            c_vector<double, 2> location = p_node->rGetLocation();
+            c_vector<double, 2> location;
+            location = p_node->rGetLocation();
             new_locations.insert(location[0] + location[1]*1000);
         }
 
@@ -227,7 +229,8 @@ public:
             if (!(*cell_iter)->IsDead())
             {
                 Node<2>* p_node = cell_population.GetNodeCorrespondingToCell(*cell_iter);
-                c_vector<double, 2> location = p_node->rGetLocation();
+                c_vector<double, 2> location;
+                location = p_node->rGetLocation();
                 old_locations.insert(location[0] + location[1]*1000);
             }
         }
@@ -243,7 +246,8 @@ public:
         {
             TS_ASSERT_EQUALS((*cell_iter)->IsDead(), false);
             Node<2>* p_node = cell_population.GetNodeCorrespondingToCell(*cell_iter);
-            c_vector<double, 2> location = p_node->rGetLocation();
+            c_vector<double, 2> location;
+            location = p_node->rGetLocation();
             new_locations.insert(location[0] + location[1]*1000);
         }
 
@@ -316,7 +320,8 @@ public:
             if (!(*cell_iter)->IsDead())
             {
                 Node<2>* p_node = cell_population.GetNodeCorrespondingToCell(*cell_iter);
-                c_vector<double, 2> location = p_node->rGetLocation();
+                c_vector<double, 2> location;
+                location = p_node->rGetLocation();
                 old_locations.insert(location[0] + location[1]*1000);
             }
         }
@@ -332,7 +337,8 @@ public:
         {
             TS_ASSERT_EQUALS((*cell_iter)->IsDead(), false);
             Node<2>* p_node = cell_population.GetNodeCorrespondingToCell(*cell_iter);
-            c_vector<double, 2> location = p_node->rGetLocation();
+            c_vector<double, 2> location;
+            location = p_node->rGetLocation();
             new_locations.insert(location[0] + location[1]*1000);
         }
 
@@ -535,7 +541,6 @@ public:
              ++cell_iter)
         {
             bool should_be_dead = (cell_population.GetLocationIndexUsingCell(*cell_iter) == 3);
-
             TS_ASSERT_EQUALS(cell_iter->IsDead(), should_be_dead);
         }
 

@@ -117,7 +117,8 @@ public:
              ++cell_iter)
         {
             Node<2>* p_node = cell_population.GetNodeCorrespondingToCell(*cell_iter);
-            c_vector<double, 2> location = p_node->rGetLocation();
+            c_vector<double, 2> location;
+            location = p_node->rGetLocation();
             if (old_locations[p_node][0] < 2.0)
             {
                 TS_ASSERT_DELTA(2.0, location[0], 1e-6);
@@ -225,8 +226,8 @@ public:
         std::map<Node<2>*, c_vector<double,2> > old_locations;
 
         for (MutableVertexMesh<2,2>::NodeIterator node_iter = cell_population.rGetMesh().GetNodeIteratorBegin();
-                node_iter != cell_population.rGetMesh().GetNodeIteratorEnd();
-                ++node_iter)
+             node_iter != cell_population.rGetMesh().GetNodeIteratorEnd();
+             ++node_iter)
         {
             old_locations[&(*node_iter)] = node_iter->rGetLocation();
         }
@@ -235,10 +236,11 @@ public:
 
         // Test that all nodes satisfy the boundary condition
         for (MutableVertexMesh<2,2>::NodeIterator node_iter = cell_population.rGetMesh().GetNodeIteratorBegin();
-                node_iter != cell_population.rGetMesh().GetNodeIteratorEnd();
-                ++node_iter)
+             node_iter != cell_population.rGetMesh().GetNodeIteratorEnd();
+             ++node_iter)
         {
-            c_vector<double, 2> location = node_iter->rGetLocation();
+            c_vector<double, 2> location;
+            location = node_iter->rGetLocation();
             if (old_locations[&(*node_iter)][0] < x_boundary)
             {
                 TS_ASSERT_DELTA(x_boundary, location[0], 1e-6);
@@ -267,10 +269,11 @@ public:
 
         // Test that all nodes satisfy the jiggled boundary condition
         for (MutableVertexMesh<2,2>::NodeIterator node_iter = cell_population.rGetMesh().GetNodeIteratorBegin();
-                node_iter != cell_population.rGetMesh().GetNodeIteratorEnd();
-                ++node_iter)
+             node_iter != cell_population.rGetMesh().GetNodeIteratorEnd();
+             ++node_iter)
         {
-            c_vector<double, 2> location = node_iter->rGetLocation();
+            c_vector<double, 2> location;
+            location = node_iter->rGetLocation();
             if (old_locations[&(*node_iter)][0] < x_boundary)
             {
                 TS_ASSERT_LESS_THAN(x_boundary, location[0]);// note strict inequality

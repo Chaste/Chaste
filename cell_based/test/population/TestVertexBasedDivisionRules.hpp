@@ -110,11 +110,13 @@ public:
         // Get the division rule back from the population
         boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule = cell_population.GetVertexBasedDivisionRule();
 
-        c_vector<double, 2> division_vector = boost::static_pointer_cast<FixedVertexBasedDivisionRule<2> >(p_division_rule)->rGetDivisionVector();
+        c_vector<double, 2> division_vector;
+        division_vector = boost::static_pointer_cast<FixedVertexBasedDivisionRule<2> >(p_division_rule)->rGetDivisionVector();
         TS_ASSERT_DELTA(division_vector(0), 0.8, 1e-6);
         TS_ASSERT_DELTA(division_vector(1), 0.6, 1e-6);
 
-        c_vector<double, 2> division_vector_again = p_division_rule->CalculateCellDivisionVector(p_cell0, cell_population);
+        c_vector<double, 2> division_vector_again;
+        division_vector_again = p_division_rule->CalculateCellDivisionVector(p_cell0, cell_population);
         TS_ASSERT_DELTA(division_vector_again(0), 0.8, 1e-6);
         TS_ASSERT_DELTA(division_vector_again(1), 0.6, 1e-6);
     }
@@ -276,7 +278,8 @@ public:
 
             TS_ASSERT(dynamic_cast<FixedVertexBasedDivisionRule<2>*>(p_division_rule.get()));
 
-            c_vector<double, 2> location = (dynamic_cast<FixedVertexBasedDivisionRule<2>*>(p_division_rule.get()))->rGetDivisionVector();
+            c_vector<double, 2> location;
+            location = (dynamic_cast<FixedVertexBasedDivisionRule<2>*>(p_division_rule.get()))->rGetDivisionVector();
             TS_ASSERT_DELTA(location[0], 5.0/13.0, 1e-6);
             TS_ASSERT_DELTA(location[1], 12.0/13.0, 1e-6);
         }
