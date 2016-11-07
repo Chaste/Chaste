@@ -498,13 +498,10 @@ public:
 //    void CheckAnalyticJacobian(realtype time, N_Vector y, N_Vector ydot,
 //                               CHASTE_CVODE_DENSE_MATRIX jacobian,
 //                               N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
-
 };
 
 CLASS_IS_ABSTRACT(AbstractCvodeSystem)
- BOOST_CLASS_VERSION(AbstractCvodeSystem, 1u)
+BOOST_CLASS_VERSION(AbstractCvodeSystem, 1u)
 
 #endif //_ABSTRACTCVODESYSTEM_HPP_
 #endif // CHASTE_CVODE
-
-

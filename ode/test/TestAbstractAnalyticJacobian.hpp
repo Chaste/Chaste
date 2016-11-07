@@ -106,7 +106,6 @@ public:
         delete[] jacobian[1];
         delete[] jacobian;
     }
-
 };
 
 #endif //_TESTABSTRACTANALYTICJACOBIAN_HPP_

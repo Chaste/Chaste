@@ -114,6 +114,9 @@ unsigned AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::DoCellBirth()
                 // Check if there is room into which the cell may divide
                 if (mrCellPopulation.IsRoomToDivide(*cell_iter))
                 {
+                    // Store parent ID for output if required
+                    unsigned parent_cell_id = cell_iter->GetCellId();
+
                     // Create a new cell
                     CellPtr p_new_cell = cell_iter->Divide();
 
@@ -144,7 +147,7 @@ unsigned AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::DoCellBirth()
                         {
                             *mpDivisionLocationFile << cell_location[i] << "\t";
                         }
-                        *mpDivisionLocationFile << "\t" << cell_age << "\n";
+                        *mpDivisionLocationFile << "\t" << cell_age << "\t" << parent_cell_id << "\t" << cell_iter->GetCellId() << "\t" << p_new_cell->GetCellId() << "\n";
                     }
 
                     // Add the new cell to the cell population

@@ -123,8 +123,6 @@ public:
                                 "heart/test/data/PseudoEcg/ValidPseudoEcg.dat");
         TS_ASSERT(comparer.CompareFiles());
     }
-
 };
-
 
 #endif /*TESTPSEUDOECGCALCULATORNIGHTLY_HPP_*/

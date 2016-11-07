@@ -166,10 +166,7 @@ Hdf5ToVtkConverter<ELEMENT_DIM, SPACE_DIM>::Hdf5ToVtkConverter(const FileFinder&
 #endif //CHASTE_VTK
 }
 
-/////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////
-
 template class Hdf5ToVtkConverter<1,1>;
 template class Hdf5ToVtkConverter<1,2>;
 template class Hdf5ToVtkConverter<2,2>;

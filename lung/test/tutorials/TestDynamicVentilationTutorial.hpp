@@ -214,9 +214,9 @@ public: // Tests should be public!
         std::map<unsigned, AbstractAcinarUnit*>& acinar_map = problem.rGetAcinarUnitMap();
         double lung_volume = 0;
 
-        for(std::map<unsigned, AbstractAcinarUnit*>::iterator iter = acinar_map.begin();
-            iter != acinar_map.end();
-            ++iter)
+        for (std::map<unsigned, AbstractAcinarUnit*>::iterator iter = acinar_map.begin();
+             iter != acinar_map.end();
+             ++iter)
         {
             lung_volume += iter->second->GetVolume();
         }

@@ -484,7 +484,7 @@ public:
         // restore from a single processor archive
         {
             FileFinder archive_dir("mesh/test/data/mixed_mesh_archive", RelativeTo::ChasteSourceRoot);
-            if ( PetscTools::IsSequential() )
+            if (PetscTools::IsSequential())
             {
                 ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
                 boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();

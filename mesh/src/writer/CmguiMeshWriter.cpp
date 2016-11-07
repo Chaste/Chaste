@@ -330,7 +330,7 @@ void CmguiMeshWriter<ELEMENT_DIM, SPACE_DIM>::AppendLocalDataToFiles()
          iter != this->mpDistributedMesh->GetElementIteratorEnd();
          ++iter)
     {
-        if ( this->mpDistributedMesh->CalculateDesignatedOwnershipOfElement(iter->GetIndex()))
+        if (this->mpDistributedMesh->CalculateDesignatedOwnershipOfElement(iter->GetIndex()))
         {
             assert(iter->GetUnsignedAttribute() < mRegionNames.size());//segfault guard
 
@@ -372,10 +372,7 @@ std::ios_base::openmode CmguiMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetOpenMode(boo
     return mode;
 }
 
-/////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////////////
-
 template class CmguiMeshWriter<1,1>;
 template class CmguiMeshWriter<1,2>;
 template class CmguiMeshWriter<1,3>;

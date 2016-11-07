@@ -95,7 +95,7 @@ public:
                 delete p_wall;
             }
 
-            for(unsigned element_index = 0; element_index < mesh.GetNumElements(); ++element_index)
+            for (unsigned element_index = 0; element_index < mesh.GetNumElements(); ++element_index)
             {
                 LambertAirwayWall* p_wall = factory.CreateAirwayWallForElement(mesh.GetElement(element_index));
 
@@ -154,7 +154,7 @@ public:
                 delete p_wall;
             }
 
-            for(unsigned element_index = 0; element_index < mesh.GetNumElements(); ++element_index)
+            for (unsigned element_index = 0; element_index < mesh.GetNumElements(); ++element_index)
             {
                 LambertAirwayWall* p_wall = factory.CreateAirwayWallForElement(mesh.GetElement(element_index));
 
@@ -249,7 +249,7 @@ public:
                 delete p_wall;
             }
 
-            for(unsigned element_index = 0; element_index < mesh.GetNumElements(); ++element_index)
+            for (unsigned element_index = 0; element_index < mesh.GetNumElements(); ++element_index)
             {
                 LaPradAirwayWall* p_wall = factory.CreateAirwayWallForElement(mesh.GetElement(element_index));
 
@@ -291,7 +291,7 @@ public:
                 delete p_wall;
             }
 
-            for(unsigned element_index = 0; element_index < mesh.GetNumElements(); ++element_index)
+            for (unsigned element_index = 0; element_index < mesh.GetNumElements(); ++element_index)
             {
                 LaPradAirwayWall* p_wall = factory.CreateAirwayWallForElement(mesh.GetElement(element_index));
 
@@ -381,7 +381,7 @@ public:
                 delete p_wall;
             }
 
-            for(unsigned element_index = 0; element_index < mesh.GetNumElements(); ++element_index)
+            for (unsigned element_index = 0; element_index < mesh.GetNumElements(); ++element_index)
             {
                 HiornsAirwayWall* p_wall = factory.CreateAirwayWallForElement(mesh.GetElement(element_index));
 
@@ -424,7 +424,7 @@ public:
                 delete p_wall;
             }
 
-            for(unsigned element_index = 0; element_index < mesh.GetNumElements(); ++element_index)
+            for (unsigned element_index = 0; element_index < mesh.GetNumElements(); ++element_index)
             {
                 HiornsAirwayWall* p_wall = factory.CreateAirwayWallForElement(mesh.GetElement(element_index));
 

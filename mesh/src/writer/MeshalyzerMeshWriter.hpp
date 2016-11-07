@@ -121,7 +121,6 @@ public:
      * Destructor.
      */
     virtual ~MeshalyzerMeshWriter();
-
 };
 
 #endif //_MESHALYZERMESHWRITER_HPP_

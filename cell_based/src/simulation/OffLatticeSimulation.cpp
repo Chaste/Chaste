@@ -109,8 +109,8 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellLocationsAndTopology
         std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> > old_node_locations;
 
         for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = this->mrCellPopulation.rGetMesh().GetNodeIteratorBegin();
-            node_iter != this->mrCellPopulation.rGetMesh().GetNodeIteratorEnd();
-            ++node_iter)
+             node_iter != this->mrCellPopulation.rGetMesh().GetNodeIteratorEnd();
+             ++node_iter)
         {
             old_node_locations[&(*node_iter)] = (node_iter)->rGetLocation();
         }

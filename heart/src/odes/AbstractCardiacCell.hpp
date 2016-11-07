@@ -404,7 +404,6 @@ public:
      * \note  This \e must be implemented by fast/slow cardiac cell subclasses.
      */
     virtual unsigned GetNumSlowValues();
-
 };
 
 CLASS_IS_ABSTRACT(AbstractCardiacCell)

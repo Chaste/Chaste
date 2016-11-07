@@ -161,7 +161,7 @@ std::vector<std::vector<unsigned> > MemfemMeshReader<ELEMENT_DIM, SPACE_DIM>::To
         const std::string& r_line_of_data = *the_iterator;
         std::stringstream line_stream(r_line_of_data);
 
-        if ( readHeader == false || the_iterator != rRawData.begin() )
+        if (readHeader == false || the_iterator != rRawData.begin())
         {
             std::vector<unsigned> current_indices;
 
@@ -181,10 +181,7 @@ std::vector<std::vector<unsigned> > MemfemMeshReader<ELEMENT_DIM, SPACE_DIM>::To
     return tokenized_data;
 }
 
-/////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////////////
-
 template class MemfemMeshReader<1,1>;
 template class MemfemMeshReader<1,2>;
 template class MemfemMeshReader<1,3>;

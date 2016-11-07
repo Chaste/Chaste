@@ -71,9 +71,7 @@ unsigned CuboidMeshConstructor<ELEMENT_DIM, SPACE_DIM>::GetNumNodes()
     return mNumNodes;
 }
 
-//////////////////////////////////////////////////////////////////////////
-// Explicit instantiation
-//////////////////////////////////////////////////////////////////////////
+////// Explicit instantiation////
 
 template class CuboidMeshConstructor<1>;
 template class CuboidMeshConstructor<2>;

@@ -118,7 +118,7 @@ class MutableMesh : public TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>
 
         // If ELEMENT_DIM=SPACEDIM Do a remesh after archiving has finished to get right number of boundary nodes etc.
         // NOTE - Subclasses must archive their member variables BEFORE calling this method.
-        if(ELEMENT_DIM==SPACE_DIM)
+        if (ELEMENT_DIM == SPACE_DIM)
         {
             NodeMap map(this->GetNumNodes());
             this->ReMesh(map);

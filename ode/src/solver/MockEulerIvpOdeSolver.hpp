@@ -108,7 +108,6 @@ public:
      */
     virtual ~MockEulerIvpOdeSolver()
     {}
-
 };
 
 #include "SerializationExportWrapper.hpp"

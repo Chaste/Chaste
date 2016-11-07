@@ -95,7 +95,7 @@ void ActivationOutputModifier::ProcessSolutionAtTimeStep(double time, Vec soluti
     for (unsigned local_index=0; local_index < mLocalSize; local_index++)
     {
         double v = p_solution[local_index*problemDim];
-        if(v > mThreshold && mFirstActivitationTimes[local_index] < 0.0)
+        if (v > mThreshold && mFirstActivitationTimes[local_index] < 0.0)
         {
             mFirstActivitationTimes[local_index] = time;
         }

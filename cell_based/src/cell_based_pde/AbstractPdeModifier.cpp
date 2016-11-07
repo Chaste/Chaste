@@ -172,10 +172,10 @@ void AbstractPdeModifier<DIM>::UpdateAtEndOfOutputTimeStep(AbstractCellPopulatio
                 for (unsigned i=0; i<mpFeMesh->GetNumNodes(); i++)
                 {
                     (*mpVizPdeSolutionResultsFile) << i << " ";
-                    c_vector<double,DIM> location = mpFeMesh->GetNode(i)->rGetLocation();
+                    const c_vector<double,DIM>& r_location = mpFeMesh->GetNode(i)->rGetLocation();
                     for (unsigned k=0; k<DIM; k++)
                     {
-                        (*mpVizPdeSolutionResultsFile) << location[k] << " ";
+                        (*mpVizPdeSolutionResultsFile) << r_location[k] << " ";
                     }
 
                     assert(mSolution != NULL);

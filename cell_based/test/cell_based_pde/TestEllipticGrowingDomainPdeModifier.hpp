@@ -460,7 +460,7 @@ public:
             double C = -2*A/J105;
 
             double u_exact = C*boost::math::cyl_bessel_j(0,r);
-            if ( r> 0.5 )
+            if (r > 0.5)
             {
                 u_exact = A*log(r)+1.0;
             }

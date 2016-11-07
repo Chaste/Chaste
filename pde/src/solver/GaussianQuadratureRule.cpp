@@ -284,10 +284,7 @@ GaussianQuadratureRule<ELEMENT_DIM>::GaussianQuadratureRule(unsigned quadratureO
     EXCEPTION("Gauss quadrature rule not available for this dimension.");
 }
 
-//////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-//////////////////////////////////////////////////////////////////////
-
 template class GaussianQuadratureRule<0>;
 template class GaussianQuadratureRule<1>;
 template class GaussianQuadratureRule<2>;

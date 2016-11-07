@@ -98,6 +98,4 @@ public:
                                     AbstractCardiacTissue<ELEM_DIM,SPACE_DIM>* pTissue);
 };
 
-
-
 #endif /*ABSTRACTCORRECTIONTERMASSEMBLER_HPP_*/

@@ -33,8 +33,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-
-
 #include "BidomainMassMatrixAssembler.hpp"
 #include "HeartRegionCodes.hpp"
 
@@ -66,12 +64,7 @@ c_matrix<double,2*(DIM+1),2*(DIM+1)> BidomainMassMatrixAssembler<DIM>::ComputeMa
     return ret;
 }
 
-
-
-///////////////////////////////////////////////////////
-// explicit instantiation
-///////////////////////////////////////////////////////
-
+// Explicit instantiation
 template class BidomainMassMatrixAssembler<1>;
 template class BidomainMassMatrixAssembler<2>;
 template class BidomainMassMatrixAssembler<3>;

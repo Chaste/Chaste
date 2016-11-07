@@ -100,7 +100,6 @@ public:
             TS_ASSERT_DELTA(single_vm[index], multiple_vm[index], 1e-8);
             TS_ASSERT_DELTA(single_phie[index], multiple_phie[index], 1e-8);
         }
-
     }
 
     void TestCheckpointingGeneratesMultipleDirectories() throw(Exception)

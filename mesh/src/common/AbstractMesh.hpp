@@ -519,8 +519,6 @@ public:
          */
         inline bool IsAllowedNode();
     };
-
-
 };
 
 TEMPLATED_CLASS_IS_ABSTRACT_2_UNSIGNED(AbstractMesh)

@@ -703,6 +703,4 @@ public:
  }
  } // namespace ...
 
-
-
 #endif /*EXTENDEDBIDOMAINTISSUE_HPP_*/

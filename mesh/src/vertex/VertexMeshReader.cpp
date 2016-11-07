@@ -181,7 +181,6 @@ ElementData VertexMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextElementData()
     return element_data;
 }
 
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VertexElementData VertexMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextElementDataWithFaces()
 {
@@ -350,9 +349,7 @@ void VertexMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextLineFromStream(std::ifstre
     while (line_is_blank);
 }
 
-/////////////////////////////////////////////////////////////////////////////
-// Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
+///////// Explicit instantiation///////
 
 template class VertexMeshReader<1,1>;
 template class VertexMeshReader<1,2>;

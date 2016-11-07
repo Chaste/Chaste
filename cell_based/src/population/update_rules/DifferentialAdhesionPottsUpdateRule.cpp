@@ -54,11 +54,11 @@ DifferentialAdhesionPottsUpdateRule<DIM>::~DifferentialAdhesionPottsUpdateRule()
 template<unsigned DIM>
 double DifferentialAdhesionPottsUpdateRule<DIM>::GetCellCellAdhesionEnergy(CellPtr pCellA, CellPtr pCellB)
 {
-    if ( pCellA->HasCellProperty<CellLabel>() && pCellB->HasCellProperty<CellLabel>() )
+    if (pCellA->HasCellProperty<CellLabel>() && pCellB->HasCellProperty<CellLabel>())
     {
         return GetLabelledCellLabelledCellAdhesionEnergyParameter();
     }
-    else if ( pCellA->HasCellProperty<CellLabel>() || pCellB->HasCellProperty<CellLabel>() )
+    else if (pCellA->HasCellProperty<CellLabel>() || pCellB->HasCellProperty<CellLabel>())
     {
         return GetLabelledCellCellAdhesionEnergyParameter();
     }
@@ -128,7 +128,7 @@ void DifferentialAdhesionPottsUpdateRule<DIM>::OutputUpdateRuleParameters(out_st
     AdhesionPottsUpdateRule<DIM>::OutputUpdateRuleParameters(rParamsFile);
 }
 
-///////// Explicit instantiation
+// Explicit instantiation
 template class DifferentialAdhesionPottsUpdateRule<1>;
 template class DifferentialAdhesionPottsUpdateRule<2>;
 template class DifferentialAdhesionPottsUpdateRule<3>;

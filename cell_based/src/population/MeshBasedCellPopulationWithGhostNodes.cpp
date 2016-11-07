@@ -138,17 +138,16 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::SetGhostNodes(const std::set<un
     Validate();
 }
 
-
 template<unsigned DIM>
 c_vector<double, DIM> MeshBasedCellPopulationWithGhostNodes<DIM>::CalculateForceBetweenGhostNodes(const unsigned& rNodeAGlobalIndex, const unsigned& rNodeBGlobalIndex)
 {
     assert(rNodeAGlobalIndex != rNodeBGlobalIndex);
     c_vector<double, DIM> unit_difference;
-    c_vector<double, DIM> node_a_location = this->GetNode(rNodeAGlobalIndex)->rGetLocation();
-    c_vector<double, DIM> node_b_location = this->GetNode(rNodeBGlobalIndex)->rGetLocation();
+    const c_vector<double, DIM>& r_node_a_location = this->GetNode(rNodeAGlobalIndex)->rGetLocation();
+    const c_vector<double, DIM>& r_node_b_location = this->GetNode(rNodeBGlobalIndex)->rGetLocation();
 
     // There is reason not to subtract one position from the other (cylindrical meshes)
-    unit_difference = this->mrMesh.GetVectorFromAtoB(node_a_location, node_b_location);
+    unit_difference = this->mrMesh.GetVectorFromAtoB(r_node_a_location, r_node_b_location);
 
     double distance_between_nodes = norm_2(unit_difference);
     unit_difference /= distance_between_nodes;

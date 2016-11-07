@@ -56,11 +56,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 void FpeSignalToAbort(int sig_num, siginfo_t* info, void* context )
 {
-       if ( info->si_code == FPE_FLTDIV)
+       if (info->si_code == FPE_FLTDIV)
        {
            std::cerr << "SIGFPE: floating point exception was divide by zero.\n";
        }
-       else if ( info->si_code == FPE_FLTINV)
+       else if (info->si_code == FPE_FLTINV)
        {
            std::cerr << "SIGFPE: floating point exception was an invalid operation (like 0.0/0.0).\n";
        }
@@ -71,7 +71,7 @@ void FpeSignalToAbort(int sig_num, siginfo_t* info, void* context )
 }
 #endif
 
-#if ( PETSC_VERSION_MAJOR<3 || PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR<5 )
+#if (PETSC_VERSION_MAJOR<3 || PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR<5)
 /*
  * If using older an older PETSc (pre-3.2) include some citations here from a more recent version.
  * (The following are from 3.5.2)
@@ -126,12 +126,11 @@ void PetscSetupUtils::InitialisePetsc()
     PetscTools::ResetCache();
 }
 
-
 void PetscSetupUtils::CommonSetup()
 {
     InitialisePetsc();
 
-#if ( PETSC_VERSION_MAJOR<3 || PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR<5 )
+#if (PETSC_VERSION_MAJOR<3 || PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR<5)
     // Add some PETSc citations if we're not using the built-in citation mechanisms
     Citations::Register(PetscCitation1, &PetscCite1);
     Citations::Register(PetscCitation2, &PetscCite2);

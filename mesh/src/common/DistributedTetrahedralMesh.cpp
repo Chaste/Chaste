@@ -155,13 +155,13 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ComputeMeshPartitioning
             NodePartitioner<ELEMENT_DIM, SPACE_DIM>::DumbPartitioning(*this, rNodesOwned);
         }
 
-        if ( rMeshReader.HasNclFile() )
+        if (rMeshReader.HasNclFile())
         {
             // Form a set of all the element indices we are going to own
             // (union of the sets from the lines in the NCL file)
-            for ( std::set<unsigned>::iterator iter=rNodesOwned.begin();
-                  iter!=rNodesOwned.end();
-                  ++iter )
+            for (std::set<unsigned>::iterator iter = rNodesOwned.begin();
+                 iter != rNodesOwned.end();
+                 ++iter)
             {
                 std::vector<unsigned> containing_elements = rMeshReader.GetContainingElementIndices( *iter );
                 rElementsOwned.insert( containing_elements.begin(), containing_elements.end() );
@@ -171,11 +171,11 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ComputeMeshPartitioning
             // Then read all the data into a node_index set
             std::set<unsigned> node_index_set;
 
-            for ( std::set<unsigned>::iterator iter=rElementsOwned.begin();
-                  iter!=rElementsOwned.end();
-                  ++iter )
+            for (std::set<unsigned>::iterator iter = rElementsOwned.begin();
+                 iter != rElementsOwned.end();
+                 ++iter)
             {
-                ElementData element_data = rMeshReader.GetElementData( *iter );
+                ElementData element_data = rMeshReader.GetElementData(*iter);
                 node_index_set.insert( element_data.NodeIndices.begin(), element_data.NodeIndices.end() );
             }
 
@@ -253,7 +253,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader
     this->mElements.reserve(elements_owned.size());
     this->mNodes.reserve(nodes_owned.size());
 
-    if ( rMeshReader.IsFileFormatBinary() )
+    if (rMeshReader.IsFileFormatBinary())
     {
         ///\todo #1930 We should use a reader set iterator for this bit now.
         ///\todo #1730 and we should be able to combine ASCII branch
@@ -263,13 +263,13 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader
                       node_it != rMeshReader.GetNodeIteratorEnd();
                       ++node_it)
         {
-            //Loop over wholly-owned nodes
+            // Loop over wholly-owned nodes
             unsigned global_node_index = node_it.GetIndex();
             coords = *node_it;
             RegisterNode(global_node_index);
             Node<SPACE_DIM>* p_node = new Node<SPACE_DIM>(global_node_index, coords, false);
 
-//Node attributes in binary format are not yet supported, see #1730
+// Node attributes in binary format are not yet supported, see #1730
 //            for (unsigned i = 0; i < rMeshReader.GetNodeAttributes().size(); i++)
 //            {
 //                double attribute = rMeshReader.GetNodeAttributes()[i];
@@ -279,10 +279,10 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader
             this->mNodes.push_back(p_node);
         }
         for (typename AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_it = rMeshReader.GetNodeIteratorBegin(halo_nodes_owned);
-                      node_it != rMeshReader.GetNodeIteratorEnd();
-                      ++node_it)
+             node_it != rMeshReader.GetNodeIteratorEnd();
+             ++node_it)
         {
-            //Loop over halo-owned nodes
+            // Loop over halo-owned nodes
             unsigned global_node_index = node_it.GetIndex();
             coords = *node_it;
             RegisterHaloNode(global_node_index);
@@ -435,7 +435,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader
 
         unsigned num_owned;
         unsigned rank = PetscTools::GetMyRank();
-        if ( !PetscTools::AmTopMost() )
+        if (!PetscTools::AmTopMost())
         {
             num_owned =  proc_offsets[rank+1]-proc_offsets[rank];
         }
@@ -705,7 +705,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructLinearMesh(uns
     }
 
     // Hook to pick up when we are using a geometric partition.
-    if(mPartitioning == DistributedTetrahedralMeshPartitionType::GEOMETRIC)
+    if (mPartitioning == DistributedTetrahedralMeshPartitionType::GEOMETRIC)
     {
         if (!mpSpaceRegion)
         {
@@ -822,7 +822,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRectangularMes
     }
 
     // Hook to pick up when we are using a geometric partition.
-    if(mPartitioning == DistributedTetrahedralMeshPartitionType::GEOMETRIC)
+    if (mPartitioning == DistributedTetrahedralMeshPartitionType::GEOMETRIC)
     {
         if (!mpSpaceRegion)
         {
@@ -1025,7 +1025,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructCuboid(unsigne
     }
 
     // Hook to pick up when we are using a geometric partition.
-    if(mPartitioning == DistributedTetrahedralMeshPartitionType::GEOMETRIC)
+    if (mPartitioning == DistributedTetrahedralMeshPartitionType::GEOMETRIC)
     {
         if (!mpSpaceRegion)
         {
@@ -1340,7 +1340,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
     boost::scoped_array<idxtype> eind(new idxtype[num_local_elements*(ELEMENT_DIM+1)]);
     boost::scoped_array<idxtype> eptr(new idxtype[num_local_elements+1]);
 
-    if ( rMeshReader.IsFileFormatBinary() && first_local_element > 0)
+    if (rMeshReader.IsFileFormatBinary() && first_local_element > 0)
     {
         // Advance the file pointer to the first element before the ones I own.
         rMeshReader.GetElementData(first_local_element - 1);
@@ -1510,7 +1510,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
              * For each node in this element, check whether it hasn't been assigned to another processor yet.
              * If so, assign it to the owner of the element. Otherwise, consider it halo.
              */
-            if ( global_node_partition[*node_it] == UNASSIGNED_NODE )
+            if (global_node_partition[*node_it] == UNASSIGNED_NODE)
             {
                 if (element_owner == local_proc_index)
                 {
@@ -1725,17 +1725,13 @@ typename DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::HaloNodeIterator Di
     return mHaloNodes.end();
 }
 
-/////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////////////
-
 template class DistributedTetrahedralMesh<1,1>;
 template class DistributedTetrahedralMesh<1,2>;
 template class DistributedTetrahedralMesh<1,3>;
 template class DistributedTetrahedralMesh<2,2>;
 template class DistributedTetrahedralMesh<2,3>;
 template class DistributedTetrahedralMesh<3,3>;
-
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"

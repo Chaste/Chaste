@@ -76,10 +76,7 @@ void NonCachedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetWeightedDirectionForBo
 }
 
 
-/////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////////////
-
 template class NonCachedTetrahedralMesh<3,3>;
 template class NonCachedTetrahedralMesh<2,2>;
 template class NonCachedTetrahedralMesh<1,1>;

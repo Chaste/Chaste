@@ -138,6 +138,8 @@ endif()
 option(Chaste_ENABLE_TESTING "Enable Chaste Testing" ON)
 option(Chaste_INSTALL_TESTS "Install Chaste Testing infrastructure" OFF)
 
+set(Chaste_PYCML_EXTRA_ARGS "" CACHE STRING "Add any extra arguments for PyCML here")
+
 #Some Chaste-specific #defines
 add_definitions(-DCHASTE_CMAKE)
 
@@ -726,6 +728,20 @@ if (Chaste_PROFILE_GPROF OR Chaste_PROFILE_GPERFTOOLS)
         WORKING_DIRECTORY ${Chaste_BINARY_DIR}
         VERBATIM)
 endif()
+
+##############################
+#     Infrastructure Tests   #
+##############################
+
+
+add_custom_target(infrastructure
+    COMMAND ${PYTHON_EXECUTABLE} ${Chaste_SOURCE_DIR}/python/infra/CheckForCopyrights.py
+    COMMAND ${PYTHON_EXECUTABLE} ${Chaste_SOURCE_DIR}/python/infra/CheckForDuplicateFileNames.py
+    COMMAND ${PYTHON_EXECUTABLE} ${Chaste_SOURCE_DIR}/python/infra/CheckForOrphanedTests.py
+    COMMAND ${PYTHON_EXECUTABLE} ${Chaste_SOURCE_DIR}/python/infra/CheckSchemas.py
+
+    WORKING_DIRECTORY ${Chaste_SOURCE_DIR}
+    VERBATIM)
 
 
 ####################

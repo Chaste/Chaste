@@ -185,8 +185,6 @@ public:
             }
         }
     }
-
-
 };
 
 #endif /*TESTQUADRATUREPOINTSGROUP_HPP_*/

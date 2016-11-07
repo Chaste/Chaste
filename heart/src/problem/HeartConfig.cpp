@@ -546,7 +546,7 @@ FileFinder HeartConfig::GetParametersFilePath()
 void HeartConfig::UpdateParametersFromResumeSimulation(boost::shared_ptr<cp::chaste_parameters_type> pResumeParameters)
 {
     // Check for user foolishness
-    if ( (pResumeParameters->ResumeSimulation()->SpaceDimension() != HeartConfig::Instance()->GetSpaceDimension())
+    if ((pResumeParameters->ResumeSimulation()->SpaceDimension() != HeartConfig::Instance()->GetSpaceDimension())
          ||(pResumeParameters->ResumeSimulation()->Domain() != HeartConfig::Instance()->GetDomain()))
     {
         EXCEPTION("Problem type and space dimension should match when restarting a simulation.");
@@ -829,7 +829,7 @@ void HeartConfig::GetIonicModelRegions(std::vector<boost::shared_ptr<AbstractCha
 
             ionicModels.push_back(ionic_model_region.IonicModel());
         }
-        else if(ionic_model_region.Location().EpiLayer().present() || ionic_model_region.Location().MidLayer().present() || ionic_model_region.Location().EndoLayer().present() )
+        else if (ionic_model_region.Location().EpiLayer().present() || ionic_model_region.Location().MidLayer().present() || ionic_model_region.Location().EndoLayer().present() )
         {
             ///\todo When this is implemented, then we require an example in ChasteParametersFullFormat.xml
             EXCEPTION("Definition of transmural layers is not yet supported for defining different ionic models, please use cuboids instead");
@@ -840,7 +840,6 @@ void HeartConfig::GetIonicModelRegions(std::vector<boost::shared_ptr<AbstractCha
         }
     }
 }
-
 
 bool HeartConfig::IsMeshProvided() const
 {
@@ -1100,7 +1099,7 @@ void HeartConfig::GetStimuli(std::vector<boost::shared_ptr<AbstractStimulusFunct
             }
             rStimuliApplied.push_back( stim );
         }
-        else if(stimulus.Location().EpiLayer().present() || stimulus.Location().MidLayer().present() || stimulus.Location().EndoLayer().present() )
+        else if (stimulus.Location().EpiLayer().present() || stimulus.Location().MidLayer().present() || stimulus.Location().EndoLayer().present() )
         {
             EXCEPTION("Definition of transmural layers is not yet supported for specifying stimulated areas, please use cuboids instead");
         }
@@ -1110,7 +1109,6 @@ void HeartConfig::GetStimuli(std::vector<boost::shared_ptr<AbstractStimulusFunct
         }
     }
 }
-
 
 template<unsigned DIM>
 void HeartConfig::GetCellHeterogeneities(std::vector<boost::shared_ptr<AbstractChasteRegion<DIM> > >& rCellHeterogeneityRegions,
@@ -1225,7 +1223,7 @@ void HeartConfig::GetCellHeterogeneities(std::vector<boost::shared_ptr<AbstractC
     //set the flag for request of transmural layers
     mUserAskedForCellularTransmuralHeterogeneities = user_asking_for_transmural_layers;
 
-    if ( mUserAskedForCellularTransmuralHeterogeneities )
+    if (mUserAskedForCellularTransmuralHeterogeneities )
     {
         // cuboids/ellipsoids and layers at the same time are not yet supported
         if (user_asked_for_cuboids_or_ellipsoids )
@@ -1364,7 +1362,6 @@ void HeartConfig::GetConductivityHeterogeneities(
             GetExtracellularConductivities(extra_conductivities);
             rExtraConductivities.push_back(extra_conductivities);
         }
-
     }
 }
 
@@ -2015,7 +2012,7 @@ void HeartConfig::SetDefaultIonicModel(const cp::ionic_models_available_type& rI
 
 void HeartConfig::SetSlabDimensions(double x, double y, double z, double inter_node_space)
 {
-    if ( ! mpParameters->Simulation()->Mesh().present())
+    if (!mpParameters->Simulation()->Mesh().present())
     {
         XSD_CREATE_WITH_FIXED_ATTR(cp::mesh_type, mesh_to_load, "cm");
         mpParameters->Simulation()->Mesh().set(mesh_to_load);
@@ -2027,7 +2024,7 @@ void HeartConfig::SetSlabDimensions(double x, double y, double z, double inter_n
 
 void HeartConfig::SetSheetDimensions(double x, double y, double inter_node_space)
 {
-    if ( ! mpParameters->Simulation()->Mesh().present())
+    if (!mpParameters->Simulation()->Mesh().present())
     {
         XSD_CREATE_WITH_FIXED_ATTR(cp::mesh_type, mesh_to_load, "cm");
         mpParameters->Simulation()->Mesh().set(mesh_to_load);
@@ -2039,7 +2036,7 @@ void HeartConfig::SetSheetDimensions(double x, double y, double inter_node_space
 
 void HeartConfig::SetFibreLength(double x, double inter_node_space)
 {
-    if ( ! mpParameters->Simulation()->Mesh().present())
+    if (!mpParameters->Simulation()->Mesh().present())
     {
         XSD_CREATE_WITH_FIXED_ATTR(cp::mesh_type, mesh_to_load, "cm");
         mpParameters->Simulation()->Mesh().set(mesh_to_load);
@@ -2051,7 +2048,7 @@ void HeartConfig::SetFibreLength(double x, double inter_node_space)
 
 void HeartConfig::SetMeshFileName(std::string meshPrefix, cp::media_type fibreDefinition)
 {
-    if ( ! mpParameters->Simulation()->Mesh().present())
+    if (!mpParameters->Simulation()->Mesh().present())
     {
         XSD_CREATE_WITH_FIXED_ATTR(cp::mesh_type, mesh_to_load, "cm");
         mpParameters->Simulation()->Mesh().set(mesh_to_load);
@@ -2196,7 +2193,7 @@ void HeartConfig::SetOutputFilenamePrefix(const std::string& rOutputFilenamePref
 
 void HeartConfig::SetOutputVariables(const std::vector<std::string>& rOutputVariables)
 {
-    if ( ! mpParameters->Simulation()->OutputVariables().present())
+    if (!mpParameters->Simulation()->OutputVariables().present())
     {
         cp::output_variables_type variables_requested;
         mpParameters->Simulation()->OutputVariables().set(variables_requested);
@@ -2204,7 +2201,7 @@ void HeartConfig::SetOutputVariables(const std::vector<std::string>& rOutputVari
 
     XSD_SEQUENCE_TYPE(cp::output_variables_type::Var)&
         var_type_sequence = mpParameters->Simulation()->OutputVariables()->Var();
-    //Erase or create a sequence
+    // Erase or create a sequence
     var_type_sequence.clear();
 
     for (unsigned i=0; i<rOutputVariables.size(); i++)
@@ -2400,12 +2397,12 @@ void HeartConfig::CheckTimeSteps() const
         EXCEPTION("Printing time-step should not be smaller than PDE time-step");
     }
 
-    if ( !Divides(GetPdeTimeStep(), GetPrintingTimeStep()) )
+    if (!Divides(GetPdeTimeStep(), GetPrintingTimeStep()))
     {
         EXCEPTION("Printing time-step should be a multiple of PDE time step");
     }
 
-    if ( GetOdeTimeStep() > GetPdeTimeStep() )
+    if (GetOdeTimeStep() > GetPdeTimeStep())
     {
         EXCEPTION("Ode time-step should not be greater than PDE time-step");
     }
@@ -2417,13 +2414,12 @@ void HeartConfig::CheckTimeSteps() const
             EXCEPTION("Checkpoint time-step should be positive");
         }
 
-        if ( !Divides(GetPrintingTimeStep(), GetCheckpointTimestep()) )
+        if (!Divides(GetPrintingTimeStep(), GetCheckpointTimestep()))
         {
             EXCEPTION("Checkpoint time-step should be a multiple of printing time-step");
         }
     }
 }
-
 
 void HeartConfig::SetUseRelativeTolerance(double relativeTolerance)
 {
@@ -2450,22 +2446,22 @@ void HeartConfig::SetKSPSolver(const char* kspSolver, bool warnOfChange)
     }
 
     /* Note that changes in these conditions need to be reflected in the Doxygen*/
-    if ( strcmp(kspSolver, "gmres") == 0)
+    if (strcmp(kspSolver, "gmres") == 0)
     {
         mpParameters->Numerical().KSPSolver().set(cp::ksp_solver_type::gmres);
         return;
     }
-    if ( strcmp(kspSolver, "cg") == 0)
+    if (strcmp(kspSolver, "cg") == 0)
     {
         mpParameters->Numerical().KSPSolver().set(cp::ksp_solver_type::cg);
         return;
     }
-    if ( strcmp(kspSolver, "symmlq") == 0)
+    if (strcmp(kspSolver, "symmlq") == 0)
     {
         mpParameters->Numerical().KSPSolver().set(cp::ksp_solver_type::symmlq);
         return;
     }
-    if ( strcmp(kspSolver, "chebychev") == 0)
+    if (strcmp(kspSolver, "chebychev") == 0)
     {
         mpParameters->Numerical().KSPSolver().set(cp::ksp_solver_type::chebychev);
         return;
@@ -2477,47 +2473,47 @@ void HeartConfig::SetKSPSolver(const char* kspSolver, bool warnOfChange)
 void HeartConfig::SetKSPPreconditioner(const char* kspPreconditioner)
 {
     /* Note that changes in these conditions need to be reflected in the Doxygen*/
-    if ( strcmp(kspPreconditioner, "jacobi") == 0)
+    if (strcmp(kspPreconditioner, "jacobi") == 0)
     {
         mpParameters->Numerical().KSPPreconditioner().set(cp::ksp_preconditioner_type::jacobi);
         return;
     }
-    if ( strcmp(kspPreconditioner, "bjacobi") == 0)
+    if (strcmp(kspPreconditioner, "bjacobi") == 0)
     {
         mpParameters->Numerical().KSPPreconditioner().set(cp::ksp_preconditioner_type::bjacobi);
         return;
     }
-    if ( strcmp(kspPreconditioner, "hypre") == 0)
+    if (strcmp(kspPreconditioner, "hypre") == 0)
     {
         mpParameters->Numerical().KSPPreconditioner().set(cp::ksp_preconditioner_type::hypre);
         return;
     }
-    if ( strcmp(kspPreconditioner, "ml") == 0)
+    if (strcmp(kspPreconditioner, "ml") == 0)
     {
         mpParameters->Numerical().KSPPreconditioner().set(cp::ksp_preconditioner_type::ml);
         return;
     }
-    if ( strcmp(kspPreconditioner, "spai") == 0)
+    if (strcmp(kspPreconditioner, "spai") == 0)
     {
         mpParameters->Numerical().KSPPreconditioner().set(cp::ksp_preconditioner_type::spai);
         return;
     }
-    if ( strcmp(kspPreconditioner, "twolevelsblockdiagonal") == 0)
+    if (strcmp(kspPreconditioner, "twolevelsblockdiagonal") == 0)
     {
         mpParameters->Numerical().KSPPreconditioner().set(cp::ksp_preconditioner_type::twolevelsblockdiagonal);
         return;
     }
-    if ( strcmp(kspPreconditioner, "blockdiagonal") == 0)
+    if (strcmp(kspPreconditioner, "blockdiagonal") == 0)
     {
         mpParameters->Numerical().KSPPreconditioner().set(cp::ksp_preconditioner_type::blockdiagonal);
         return;
     }
-    if ( strcmp(kspPreconditioner, "ldufactorisation") == 0)
+    if (strcmp(kspPreconditioner, "ldufactorisation") == 0)
     {
         mpParameters->Numerical().KSPPreconditioner().set(cp::ksp_preconditioner_type::ldufactorisation);
         return;
     }
-    if ( strcmp(kspPreconditioner, "none") == 0)
+    if (strcmp(kspPreconditioner, "none") == 0)
     {
         mpParameters->Numerical().KSPPreconditioner().set(cp::ksp_preconditioner_type::none);
         return;
@@ -2529,22 +2525,22 @@ void HeartConfig::SetKSPPreconditioner(const char* kspPreconditioner)
 void HeartConfig::SetMeshPartitioning(const char* meshPartioningMethod)
 {
     /* Note that changes in these conditions need to be reflected in the Doxygen*/
-    if ( strcmp(meshPartioningMethod, "dumb") == 0)
+    if (strcmp(meshPartioningMethod, "dumb") == 0)
     {
         mpParameters->Numerical().MeshPartitioning().set(cp::mesh_partitioning_type::dumb);
         return;
     }
-    if ( strcmp(meshPartioningMethod, "metis") == 0)
+    if (strcmp(meshPartioningMethod, "metis") == 0)
     {
         mpParameters->Numerical().MeshPartitioning().set(cp::mesh_partitioning_type::metis);
         return;
     }
-    if ( strcmp(meshPartioningMethod, "parmetis") == 0)
+    if (strcmp(meshPartioningMethod, "parmetis") == 0)
     {
         mpParameters->Numerical().MeshPartitioning().set(cp::mesh_partitioning_type::parmetis);
         return;
     }
-    if ( strcmp(meshPartioningMethod, "petsc") == 0)
+    if (strcmp(meshPartioningMethod, "petsc") == 0)
     {
         mpParameters->Numerical().MeshPartitioning().set(cp::mesh_partitioning_type::petsc);
         return;
@@ -2807,8 +2803,6 @@ void HeartConfig::SetUseStateVariableInterpolation(bool useStateVariableInterpol
     }
 }
 
-
-
 bool HeartConfig::HasDrugDose() const
 {
     return mpParameters->Physiological().ApplyDrug().present();
@@ -2884,8 +2878,6 @@ void HeartConfig::SetIc50Value(const std::string& rCurrentName, double ic50, dou
         ic50_seq.push_back(ic50_elt);
     }
 }
-
-
 
 void HeartConfig::SetUseMassLumping(bool useMassLumping)
 {

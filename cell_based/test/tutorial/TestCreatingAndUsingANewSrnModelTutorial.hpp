@@ -142,7 +142,6 @@ public:
         {
             SetStateVariables(stateVariables);
         }
-
     }
 
     void EvaluateYDerivatives(double time, const std::vector<double>& rY,

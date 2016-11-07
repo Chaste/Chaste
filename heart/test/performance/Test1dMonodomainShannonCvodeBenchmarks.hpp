@@ -90,7 +90,6 @@ public:
 
         return p_cell;
     }
-
 };
 
 #ifdef CHASTE_CVODE
@@ -352,9 +351,7 @@ public:
             TS_ASSERT(CompareBenchmarkResults(fe_node_100, cvode_node_100, 0.4)); // Only 0.2 -- 0.4mV difference with CVODE
         }
 #endif // CHASTE_CVODE
-
     }
-
 };
 
 #endif /*TEST1DMONODOMAINSHANNONCVODEBENCHMARKS_HPP_*/

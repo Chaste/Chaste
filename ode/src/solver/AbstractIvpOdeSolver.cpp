@@ -54,7 +54,7 @@ void AbstractIvpOdeSolver::SolveAndUpdateStateVariable(AbstractOdeSystem* pAbstr
                                                        double endTime,
                                                        double timeStep)
 {
-    if (   (pAbstractOdeSystem->rGetStateVariables().size()!=pAbstractOdeSystem->GetNumberOfStateVariables())
+    if ((pAbstractOdeSystem->rGetStateVariables().size()!=pAbstractOdeSystem->GetNumberOfStateVariables())
         || (pAbstractOdeSystem->rGetStateVariables().size()==0) )
     {
         EXCEPTION("SolveAndUpdateStateVariable() called but the state variable vector in the ODE system is not set up");

@@ -179,8 +179,6 @@ public:
             TS_ASSERT_DELTA(extracellular_potential[index], 0, 1.0);
         }
     }
-
 };
-
 
 #endif /*TESTBIDOMAIN3D_HPP_*/

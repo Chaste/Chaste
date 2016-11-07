@@ -293,8 +293,8 @@ std::vector<double> DiscreteSystemForceCalculator::GetExtremalAngles(unsigned in
 
     for (unsigned i=0; i<n; i++)
     {
-        if ( ( tangential_force[i%n]>0 && tangential_force[(i+1)%n]<0 ) ||
-             ( tangential_force[i%n]<0 && tangential_force[(i+1)%n]>0 ) )
+        if ((tangential_force[i%n]>0 && tangential_force[(i+1)%n]<0)
+            || (tangential_force[i%n]<0 && tangential_force[(i+1)%n]>0))
         {
             double next_extremal_angle;
 

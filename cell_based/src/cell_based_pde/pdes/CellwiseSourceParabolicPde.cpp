@@ -60,7 +60,6 @@ double CellwiseSourceParabolicPde<DIM>::ComputeDuDtCoefficientFunction(const Cha
     return mDuDtCoefficient;
 }
 
-
 template<unsigned DIM>
 double CellwiseSourceParabolicPde<DIM>::ComputeSourceTerm(const ChastePoint<DIM>& rX, double u, Element<DIM,DIM>* pElement)
 {

@@ -88,7 +88,6 @@ public:
      */
     RungeKutta2IvpOdeSolver()
     {}
-
 };
 
 #include "SerializationExportWrapper.hpp"

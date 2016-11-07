@@ -283,7 +283,7 @@ public:
            TS_ASSERT_EQUALS(p_data_clamp_cell->mExperimentalTimes.size(), times.size());
            TS_ASSERT_EQUALS(p_data_clamp_cell->mExperimentalVoltages.size(), voltages.size());
 
-           for(unsigned i=0; i<times.size(); i++)
+           for (unsigned i=0; i<times.size(); i++)
            {
                TS_ASSERT_DELTA(p_data_clamp_cell->mExperimentalTimes[i], times[i], 1e-12);
                TS_ASSERT_DELTA(p_data_clamp_cell->mExperimentalVoltages[i], voltages[i], 1e-12);

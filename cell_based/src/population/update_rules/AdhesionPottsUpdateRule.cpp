@@ -197,7 +197,7 @@ void AdhesionPottsUpdateRule<DIM>::OutputUpdateRuleParameters(out_stream& rParam
     AbstractPottsUpdateRule<DIM>::OutputUpdateRuleParameters(rParamsFile);
 }
 
-///////// Explicit instantiation
+// Explicit instantiation
 template class AdhesionPottsUpdateRule<1>;
 template class AdhesionPottsUpdateRule<2>;
 template class AdhesionPottsUpdateRule<3>;

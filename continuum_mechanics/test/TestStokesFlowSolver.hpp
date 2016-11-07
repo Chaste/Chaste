@@ -100,7 +100,7 @@ public:
 
             StokesFlowSolver<2> solver(mesh, problem_defn, "SimpleStokesFlow");
 
-            if(run==1)
+            if (run==1)
             {
                 // see comment above TS_ASSERTs, below
                 solver.SetKspAbsoluteTolerance(1e-12);
@@ -385,9 +385,6 @@ public:
         }
     }
 
-
-
-
     /*
      * Solution is u = [20xy^3, 5x^4-5y^4], p = 60x^2y-20y^3+const.
      * Dirichlet BC applied on all 4 sides so pressure is not fully defined.
@@ -400,7 +397,7 @@ public:
         std::vector<unsigned> num_elem(num_runs);
 
         // set up a mesh on [-1 1]x[-1 1]
-        for(unsigned run=0; run<num_runs; run++)
+        for (unsigned run=0; run<num_runs; run++)
         {
             num_elem[run] = SmallPow(2u, run+1u);
             QuadraticMesh<2> mesh(2.0/num_elem[run], 2.0, 2.0);
@@ -482,7 +479,7 @@ public:
         }
 
         std::cout << "Num_elements Linf_error_flow Linf_error_p\n";
-        for(unsigned i=0; i<num_runs; i++)
+        for (unsigned i=0; i<num_runs; i++)
         {
             std::cout << num_elem[i] << " " << L_inf_error_flow[i] << " " << L_inf_error_p[i] << "\n";
         }
@@ -500,7 +497,7 @@ public:
         double res_flow[5] = { 1.51032, 0.250461, 0.0368664, 0.00464591, 0.000625753 };
         double res_p[5] = { 14.3527, 5.12699, 1.95504, 0.576949, 0.155241};
         assert(num_runs <= 5);
-        for(unsigned i=0; i<num_runs; i++)
+        for (unsigned i=0; i<num_runs; i++)
         {
             TS_ASSERT_DELTA( L_inf_error_flow[i], res_flow[i], 1e-3);
             TS_ASSERT_DELTA( L_inf_error_p[i], res_p[i], 1e-3);
@@ -575,7 +572,7 @@ public:
         std::vector<c_vector<double,2> >& r_flow = solver.rGetVelocities();
         std::vector<double>& r_pressures = solver.rGetPressures();
 
-        for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             min_u = std::min(min_u, r_flow[i](0));
             max_u = std::max(max_u, r_flow[i](0));
@@ -601,11 +598,11 @@ public:
         TS_ASSERT_DELTA(max_v,  0.075, 5e-3);
 
         // find a node in the interior for which u and v both not small
-        for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             double x = mesh.GetNode(i)->rGetLocation()[0];
             double y = mesh.GetNode(i)->rGetLocation()[1];
-            if(fabs(x-0.3)<1e-6 && fabs(y-0.6)<1e-6)
+            if (fabs(x-0.3)<1e-6 && fabs(y-0.6)<1e-6)
             {
                 //at this node raf's solver returns (-0.033649 0.04652)
                 TS_ASSERT_DELTA(r_flow[i](0), -0.035, 1e-3);
@@ -677,7 +674,7 @@ public:
         double value;
         for (unsigned i=0; i<r_pressures.size(); i++)
         {
-            if(first)
+            if (first)
             {
                 value = r_pressures[i];
                 first = false;
@@ -739,12 +736,12 @@ public:
 
         std::vector<c_vector<double,3> >& r_solution = solver.rGetVelocities();
 
-        for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             double x = mesh.GetNode(i)->rGetLocation()[0];
             double y = mesh.GetNode(i)->rGetLocation()[1];
             double z = mesh.GetNode(i)->rGetLocation()[2];
-            if((fabs(x-0.6)<1e-6) && (fabs(y-0.6)<1e-6) && (fabs(z-0.6)<1e-6))
+            if ((fabs(x-0.6)<1e-6) && (fabs(y-0.6)<1e-6) && (fabs(z-0.6)<1e-6))
             {
                 TS_ASSERT_DELTA(r_solution[i](0), -8.5990e-03, 1e-4);
                 TS_ASSERT_DELTA(r_solution[i](1),  1.1331e-04, 1e-5);

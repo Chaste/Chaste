@@ -354,8 +354,6 @@ void RemoveAll(const fs::path& rPath)
     fs::remove(rPath);
 }
 
-
-
 void FileFinder::PrivateRemove(bool dangerous) const
 {
     // Test for bad paths

@@ -50,8 +50,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Exception.hpp"
 
-
-
 xsd::cxx::xml::dom::auto_ptr<xercesc::DOMDocument> XmlTools::ReadXmlFile(
     const std::string& rFileName,
     const ::xsd::cxx::tree::properties<char>& rProps,

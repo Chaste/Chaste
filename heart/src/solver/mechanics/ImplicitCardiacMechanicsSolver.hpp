@@ -119,6 +119,4 @@ public:
     void Solve(double time, double nextTime, double odeTimestep);
 };
 
-
-
 #endif /*IMPLICITCARDIACMECHANICSSOLVER_HPP_*/

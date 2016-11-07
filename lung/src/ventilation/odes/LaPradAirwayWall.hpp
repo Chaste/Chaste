@@ -153,7 +153,6 @@ private:
 
     /** The parameter k3 from LaPrad et al. 2013 PLoS Comp Biol*/
     double mk3;
-
 };
 
 #endif /*LAPRADAIRWAYWALL_HPP_*/

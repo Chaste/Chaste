@@ -118,7 +118,7 @@ AbstractCardiacCellInterface* HeartConfigRelatedCellFactory<SPACE_DIM>::CreateCe
          ionic_model_region_index < mIonicModelRegions.size();
          ++ionic_model_region_index)
     {
-        if ( mIonicModelRegions[ionic_model_region_index]->DoesContain(this->GetMesh()->GetNode(nodeIndex)->GetPoint()) )
+        if (mIonicModelRegions[ionic_model_region_index]->DoesContain(this->GetMesh()->GetNode(nodeIndex)->GetPoint()))
         {
             ionic_model = mIonicModelsDefined[ionic_model_region_index];
             break;
@@ -246,7 +246,6 @@ AbstractCardiacCellInterface* HeartConfigRelatedCellFactory<SPACE_DIM>::CreateCe
     return p_cell;
 }
 
-
 template<unsigned SPACE_DIM>
 void HeartConfigRelatedCellFactory<SPACE_DIM>::SetCellParameters(AbstractCardiacCellInterface* pCell,
                                                                  unsigned nodeIndex)
@@ -256,7 +255,7 @@ void HeartConfigRelatedCellFactory<SPACE_DIM>::SetCellParameters(AbstractCardiac
          ht_index < mCellHeterogeneityAreas.size();
          ++ht_index)
     {
-        if ( mCellHeterogeneityAreas[ht_index]->DoesContain(this->GetMesh()->GetNode(nodeIndex)->GetPoint()) )
+        if (mCellHeterogeneityAreas[ht_index]->DoesContain(this->GetMesh()->GetNode(nodeIndex)->GetPoint()))
         {
             try
             {
@@ -301,7 +300,7 @@ void HeartConfigRelatedCellFactory<SPACE_DIM>::SetCellParameters(AbstractCardiac
          ht_index < mCellHeterogeneityAreas.size();
          ++ht_index)
     {
-        if ( mCellHeterogeneityAreas[ht_index]->DoesContain(this->GetMesh()->GetNode(nodeIndex)->GetPoint()) )
+        if (mCellHeterogeneityAreas[ht_index]->DoesContain(this->GetMesh()->GetNode(nodeIndex)->GetPoint()))
         {
             for (std::map<std::string, double>::iterator param_it = mParameterSettings[ht_index].begin();
                  param_it != mParameterSettings[ht_index].end();
@@ -313,7 +312,6 @@ void HeartConfigRelatedCellFactory<SPACE_DIM>::SetCellParameters(AbstractCardiac
     }
 }
 
-
 template<unsigned SPACE_DIM>
 void HeartConfigRelatedCellFactory<SPACE_DIM>::SetCellIntracellularStimulus(AbstractCardiacCellInterface* pCell,
                                                                             unsigned nodeIndex)
@@ -324,14 +322,13 @@ void HeartConfigRelatedCellFactory<SPACE_DIM>::SetCellIntracellularStimulus(Abst
          stimulus_index < mStimuliApplied.size();
          ++stimulus_index)
     {
-        if ( mStimulatedAreas[stimulus_index]->DoesContain(this->GetMesh()->GetNode(nodeIndex)->GetPoint()) )
+        if (mStimulatedAreas[stimulus_index]->DoesContain(this->GetMesh()->GetNode(nodeIndex)->GetPoint()))
         {
             node_specific_stimulus->AddStimulus(mStimuliApplied[stimulus_index]);
         }
     }
     pCell->SetIntracellularStimulusFunction(node_specific_stimulus);
 }
-
 
 template<unsigned SPACE_DIM>
 AbstractCardiacCellInterface* HeartConfigRelatedCellFactory<SPACE_DIM>::CreateCardiacCellForTissueNode(Node<SPACE_DIM>* pNode)
@@ -343,7 +340,7 @@ AbstractCardiacCellInterface* HeartConfigRelatedCellFactory<SPACE_DIM>::CreateCa
          stimulus_index < mStimuliApplied.size();
          ++stimulus_index)
     {
-        if ( mStimulatedAreas[stimulus_index]->DoesContain(pNode->GetPoint()) )
+        if (mStimulatedAreas[stimulus_index]->DoesContain(pNode->GetPoint()))
         {
             node_specific_stimulus->AddStimulus(mStimuliApplied[stimulus_index]);
         }

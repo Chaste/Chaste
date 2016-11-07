@@ -153,8 +153,6 @@ public:
      * @param rPressuresOnNodes The component of the mSolution Vec which represents pressures (this vector is resized)
      */
     void GetSolutionAsFluxesAndPressures(std::vector<double>& rFluxesOnEdges, std::vector<double>& rPressuresOnNodes);
-
-
 };
 
 #endif /* MATRIXVENTILATIONPROBLEM_HPP_ */

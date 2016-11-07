@@ -380,7 +380,6 @@ public:
                             );
             t.AdvanceOneTimeStep();
         }
-
     }
 
     void TestComplicatedStimulus()
@@ -538,7 +537,6 @@ public:
             delete p_multiple;
         }
     }
-
 };
 
 #endif /*TESTSTIMULUS_HPP_*/

@@ -106,7 +106,7 @@ public:
         // Set up simulation
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestOutputNodeAndCellVelocitiesAndDivisionLocations");
-        simulator.SetEndTime(0.5);
+        simulator.SetEndTime(1.0);
 
         // Create a force law and pass it to the simulation
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);

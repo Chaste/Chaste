@@ -82,7 +82,7 @@ public:
      */
     double GetViscosity()
     {
-        if(mMu < 0.0)
+        if (mMu < 0.0)
         {
             EXCEPTION("Viscosity hasn't been set yet (for the Stokes' flow problem)");
         }

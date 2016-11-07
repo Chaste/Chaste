@@ -148,6 +148,4 @@ public:
     MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>* GetMixedDimensionMesh();
 };
 
-
-
 #endif // ABSTRACTPURKINJECELLFACTORY_HPP_

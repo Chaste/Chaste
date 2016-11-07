@@ -81,8 +81,6 @@ public:
     }
 };
 
-
-
 class TestSimpleLinearEllipticSolver : public CxxTest::TestSuite
 {
 public:
@@ -698,17 +696,17 @@ public:
 
         // Boundary conditions
         BoundaryConditionsContainer<2,2,1> bcc;
-        for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             double x = mesh.GetNode(i)->rGetLocation()[0];
             double y = mesh.GetNode(i)->rGetLocation()[1];
-            if(fabs(x)<1e-6)
+            if (fabs(x) < 1e-6)
             {
-                for(unsigned j=0; j<mesh.GetNumNodes(); j++)
+                for (unsigned j=0; j<mesh.GetNumNodes(); j++)
                 {
                     double x2 = mesh.GetNode(j)->rGetLocation()[0];
                     double y2 = mesh.GetNode(j)->rGetLocation()[1];
-                    if( (fabs(x2-width)<1e-6) && (fabs(y-y2)<1e-6) )
+                    if ((fabs(x2-width)<1e-6) && (fabs(y-y2)<1e-6))
                     {
                         std::pair<unsigned,unsigned> pair;
                         pair.first = i;
@@ -720,7 +718,7 @@ public:
                 }
             }
 
-            if( (fabs(x-0.5)<1e-6) && (fabs(y)<1e-6) )
+            if ((fabs(x-0.5)<1e-6) && (fabs(y)<1e-6))
             {
                 ConstBoundaryCondition<2>* p_boundary_condition = new ConstBoundaryCondition<2>(0.0);
                 bcc.AddDirichletBoundaryCondition(mesh.GetNode(i), p_boundary_condition);
@@ -736,7 +734,7 @@ public:
         ReplicatableVector res_repl(result);
         OutputFileHandler handler("PeriodicBcs");
         out_stream p_file = handler.OpenOutputFile("result.txt");
-        for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             *p_file << mesh.GetNode(i)->rGetLocation()[0] << " " << mesh.GetNode(i)->rGetLocation()[1] << " " << res_repl[i] << "\n";
         }
@@ -744,7 +742,7 @@ public:
 
         // test the periodicity has been enforced
         assert(identified_nodes.size()>0);
-        for(unsigned i=0; i<identified_nodes.size(); i++)
+        for (unsigned i=0; i<identified_nodes.size(); i++)
         {
             TS_ASSERT_DELTA(res_repl[identified_nodes[i].first], res_repl[identified_nodes[i].second], 1e-8);
         }
@@ -831,13 +829,13 @@ private:
             double r = (*node_iter)->rGetLocation()[0];
             double z = (*node_iter)->rGetLocation()[1];
 
-            if( fabs(r-R) < 1e-6)
+            if (fabs(r-R) < 1e-6)
             {
                 //std::cout << "Applying R=0 BC" << std::endl;
                 bcc.AddDirichletBoundaryCondition(*node_iter, p_boundary_condition_1);
             }
 
-            if( fabs(z) < 1e-6 )
+            if (fabs(z) < 1e-6)
             {
                 //std::cout << "Applying 1-r^2 BC" << std::endl;
                 ConstBoundaryCondition<2>* p_boundary_condition_2 = new ConstBoundaryCondition<2>(1 - r*r);

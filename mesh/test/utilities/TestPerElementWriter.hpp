@@ -120,7 +120,6 @@ public:
         NumericFileComparison(handler.GetOutputDirectoryFullPath() + "/centroid_indexed.dat",
                               "mesh/test/data/TestUtilities/centroid_indexed.dat").CompareFiles();
     }
-
 };
 
 #endif //_TESTPERELEMENTWRITER_HPP_

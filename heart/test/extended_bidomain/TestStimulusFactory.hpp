@@ -510,7 +510,7 @@ public:
         {
             if (mesh.GetDistributedVectorFactory()->IsGlobalIndexLocal(node_index))
             {
-                if ( grounded_regions[0]->DoesContain(mesh.GetNode(node_index)->GetPoint() ) )
+                if (grounded_regions[0]->DoesContain(mesh.GetNode(node_index)->GetPoint()))
                 {
                     unsigned node = mesh.GetNode(node_index)->GetIndex();
                     std::vector<double> phi_e_extended = reader_extended.GetVariableOverTime("Phi_e", node);

@@ -74,7 +74,6 @@ void CellDataItemWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, Abstra
     *this->mpOutStream << value << " ";
 }
 
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::string CellDataItemWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataVariableName() const
 {

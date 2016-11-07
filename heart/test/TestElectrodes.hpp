@@ -71,12 +71,12 @@ public:
 
         boost::shared_ptr<BoundaryConditionsContainer<2,2,2> > p_bcc = electrodes.GetBoundaryConditionsContainer();
 
-        for(DistributedTetrahedralMesh<2,2>::BoundaryElementIterator iter
+        for (DistributedTetrahedralMesh<2,2>::BoundaryElementIterator iter
            = mesh.GetBoundaryElementIteratorBegin();
            iter != mesh.GetBoundaryElementIteratorEnd();
            iter++)
         {
-            if ( fabs((*iter)->CalculateCentroid()[0] - 0.0) < 1e-6 )
+            if (fabs((*iter)->CalculateCentroid()[0] - 0.0) < 1e-6)
             {
                 double value = p_bcc->GetNeumannBCValue(*iter,(*iter)->CalculateCentroid(),1);
                 TS_ASSERT_DELTA(value,magnitude,1e-12);
@@ -143,20 +143,19 @@ public:
 
         boost::shared_ptr<BoundaryConditionsContainer<2,2,2> >  p_bcc = electrodes.GetBoundaryConditionsContainer();
 
-        for(DistributedTetrahedralMesh<2,2>::BoundaryElementIterator iter
+        for (DistributedTetrahedralMesh<2,2>::BoundaryElementIterator iter
                 = mesh.GetBoundaryElementIteratorBegin();
            iter != mesh.GetBoundaryElementIteratorEnd();
            iter++)
         {
-            if ( fabs((*iter)->CalculateCentroid()[0] - 0.0) < 1e-6 )
+            if (fabs((*iter)->CalculateCentroid()[0] - 0.0) < 1e-6)
             {
                 double value = p_bcc->GetNeumannBCValue(*iter,(*iter)->CalculateCentroid(),1);
 
                 TS_ASSERT_DELTA(value,magnitude,1e-12);
             }
 
-
-            if ( fabs((*iter)->CalculateCentroid()[0] - 10.0) < 1e-6 )
+            if (fabs((*iter)->CalculateCentroid()[0] - 10.0) < 1e-6)
             {
                 double value = p_bcc->GetNeumannBCValue(*iter,(*iter)->CalculateCentroid(),1);
                 TS_ASSERT_DELTA(value,-magnitude,1e-12);
@@ -206,20 +205,19 @@ public:
 
         boost::shared_ptr<BoundaryConditionsContainer<2,2,2> >  p_bcc = electrodes.GetBoundaryConditionsContainer();
 
-        for(DistributedTetrahedralMesh<2,2>::BoundaryElementIterator iter
+        for (DistributedTetrahedralMesh<2,2>::BoundaryElementIterator iter
                 = mesh.GetBoundaryElementIteratorBegin();
            iter != mesh.GetBoundaryElementIteratorEnd();
            iter++)
         {
-            if ( fabs((*iter)->CalculateCentroid()[0] - 0.0) < 1e-6 )
+            if (fabs((*iter)->CalculateCentroid()[0] - 0.0) < 1e-6)
             {
                 double value = p_bcc->GetNeumannBCValue(*iter,(*iter)->CalculateCentroid(),1);
 
                 TS_ASSERT_DELTA(value,flux_in_magnitude,1e-12);
             }
 
-
-            if ( fabs((*iter)->CalculateCentroid()[0] - 10.0) < 1e-6 )
+            if (fabs((*iter)->CalculateCentroid()[0] - 10.0) < 1e-6)
             {
                 double value = p_bcc->GetNeumannBCValue(*iter,(*iter)->CalculateCentroid(),1);
                 TS_ASSERT_DELTA(value,-flux_out_magnitude,1e-12);
@@ -239,12 +237,12 @@ public:
 
         boost::shared_ptr<BoundaryConditionsContainer<3,3,2> >  p_bcc = electrodes.GetBoundaryConditionsContainer();
 
-        for(DistributedTetrahedralMesh<3,3>::BoundaryElementIterator iter
+        for (DistributedTetrahedralMesh<3,3>::BoundaryElementIterator iter
                 = mesh.GetBoundaryElementIteratorBegin();
            iter != mesh.GetBoundaryElementIteratorEnd();
            iter++)
         {
-            if ( fabs((*iter)->CalculateCentroid()[1] - 0.0) < 1e-6 )
+            if (fabs((*iter)->CalculateCentroid()[1] - 0.0) < 1e-6)
             {
                 double value = p_bcc->GetNeumannBCValue(*iter,(*iter)->CalculateCentroid(),1);
 
@@ -279,29 +277,25 @@ public:
 
         boost::shared_ptr<BoundaryConditionsContainer<3,3,2> > p_bcc = electrodes.GetBoundaryConditionsContainer();
 
-        for(DistributedTetrahedralMesh<3,3>::BoundaryElementIterator iter
+        for (DistributedTetrahedralMesh<3,3>::BoundaryElementIterator iter
                 = mesh.GetBoundaryElementIteratorBegin();
            iter != mesh.GetBoundaryElementIteratorEnd();
            iter++)
         {
-            if ( fabs((*iter)->CalculateCentroid()[1] - 0.0) < 1e-6 )
+            if (fabs((*iter)->CalculateCentroid()[1] - 0.0) < 1e-6)
             {
                 double value = p_bcc->GetNeumannBCValue(*iter,(*iter)->CalculateCentroid(),1);
 
                 TS_ASSERT_DELTA(value,magnitude,1e-12);
             }
 
-
-            if ( fabs((*iter)->CalculateCentroid()[1] - 10.0) < 1e-6 )
+            if (fabs((*iter)->CalculateCentroid()[1] - 10.0) < 1e-6)
             {
                 double value = p_bcc->GetNeumannBCValue(*iter,(*iter)->CalculateCentroid(),1);
                 TS_ASSERT_DELTA(value,-magnitude,1e-12);
             }
         }
     }
-
 };
-
-
 
 #endif /*TESTELECTRODES_HPP_*/

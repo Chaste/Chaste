@@ -70,7 +70,6 @@ c_vector<double,1*(ELEMENT_DIM+1)> SimpleLinearEllipticSolver<ELEMENT_DIM,SPACE_
     return mpEllipticPde->ComputeConstantInUSourceTerm(rX, pElement) * rPhi;
 }
 
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 SimpleLinearEllipticSolver<ELEMENT_DIM,SPACE_DIM>::SimpleLinearEllipticSolver(
                                   AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
@@ -91,10 +90,7 @@ void SimpleLinearEllipticSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolve(Vec i
     this->mpLinearSystem->SetKspType("cg");
 }
 
-//////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-//////////////////////////////////////////////////////////////////////
-
 template class SimpleLinearEllipticSolver<1,1>;
 template class SimpleLinearEllipticSolver<1,2>;
 template class SimpleLinearEllipticSolver<1,3>;

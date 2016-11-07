@@ -58,11 +58,7 @@ BidomainWithBathProblem<DIM>::~BidomainWithBathProblem()
 #include "SerializationExportWrapperForCpp.hpp"
 EXPORT_TEMPLATE_CLASS_SAME_DIMS(BidomainWithBathProblem)
 
-/////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////
-
 template class BidomainWithBathProblem<1>;
 template class BidomainWithBathProblem<2>;
 template class BidomainWithBathProblem<3>;
-

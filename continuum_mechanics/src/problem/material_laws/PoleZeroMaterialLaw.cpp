@@ -89,7 +89,6 @@ PoleZeroMaterialLaw<DIM>::PoleZeroMaterialLaw(std::vector<std::vector<double> > 
     SetParameters(k,a,b);
 }
 
-
 template<unsigned DIM>
 void PoleZeroMaterialLaw<DIM>::ComputeStressAndStressDerivative(c_matrix<double,DIM,DIM>& rC,
                                                                 c_matrix<double,DIM,DIM>& rInvC,
@@ -192,9 +191,6 @@ void PoleZeroMaterialLaw<DIM>::ScaleMaterialParameters(double scaleFactor)
     }
 }
 
-////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-////////////////////////////////////////////////////////////////////////////////////
-
 template class PoleZeroMaterialLaw<2>;
 template class PoleZeroMaterialLaw<3>;

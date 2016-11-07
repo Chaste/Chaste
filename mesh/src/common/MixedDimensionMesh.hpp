@@ -165,10 +165,7 @@ public:
      * (for consistency with STL iterators).
      */
     CableElementIterator GetCableElementIteratorEnd() const;
-
-
 };
-
 
 #include "SerializationExportWrapper.hpp"
 EXPORT_TEMPLATE_CLASS_ALL_DIMS(MixedDimensionMesh)

@@ -431,10 +431,7 @@ void QuadraticMeshHelper<DIM>::HelperMethod2(AbstractTetrahedralMesh<DIM, DIM>* 
 }
 #undef COVERAGE_IGNORE /// \todo These helper methods aren't properly covered
 
-/////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////////////
-
 template class QuadraticMeshHelper<1>;
 template class QuadraticMeshHelper<2>;
 template class QuadraticMeshHelper<3>;

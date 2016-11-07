@@ -57,8 +57,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         code;                   \
     } catch (...) {}
 
-
-
 /** Set the .so suffix */
 #ifdef __APPLE__
 //Mac OSX

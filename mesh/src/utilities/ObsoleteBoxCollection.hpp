@@ -225,8 +225,6 @@ public:
     {
         return true;
     }
-
-
 };
 
 #endif /*OBSOLETEBOXCOLLECTION_HPP_*/

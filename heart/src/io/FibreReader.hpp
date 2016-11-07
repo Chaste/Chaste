@@ -186,7 +186,6 @@ public:
     {
         return mFileIsBinary;
     }
-
 };
 
 #endif /*FIBREREADER_HPP_*/

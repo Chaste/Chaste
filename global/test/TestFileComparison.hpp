@@ -158,8 +158,6 @@ public:
 
         TS_ASSERT_EQUALS(FileComparison(base_file, modified_file, CalledCollectively, SuppressOutput).CompareFiles(0, false), expected_fail_result);
     }
-
-
 };
 
 #endif /*TESTFILECOMPARISON_HPP_*/

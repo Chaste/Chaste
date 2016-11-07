@@ -121,8 +121,6 @@ private:
      */
     void SetupLinearSystem(Vec currentSolution, bool computeMatrix);
 
-
-
 public:
     /**
      * Constructor

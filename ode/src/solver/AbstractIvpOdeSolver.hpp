@@ -163,7 +163,6 @@ public:
      * Virtual destructor since we have virtual methods.
      */
     virtual ~AbstractIvpOdeSolver();
-
 };
 
 CLASS_IS_ABSTRACT(AbstractIvpOdeSolver)

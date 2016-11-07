@@ -89,6 +89,4 @@ public:
     std::set< Element<DIM,DIM>* >& rGetElementsContained();
 };
 
-
-
 #endif /*BOX_HPP_*/

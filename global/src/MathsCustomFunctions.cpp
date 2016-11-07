@@ -136,7 +136,7 @@ bool Divides(double smallerNumber, double largerNumber)
 
 unsigned CeilDivide(unsigned numerator, unsigned denominator)
 {
-    if( numerator==0u )
+    if (numerator == 0u)
     {
         return 0u;
     }

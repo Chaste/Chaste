@@ -302,7 +302,7 @@ void AbstractBackwardEulerCardiacCell<SIZE>::SolveAndUpdateState(double tStart, 
 {
     TimeStepper stepper(tStart, tEnd, mDt);
 
-    while(!stepper.IsTimeAtEnd())
+    while (!stepper.IsTimeAtEnd())
     {
         double time = stepper.GetTime();
 
@@ -318,8 +318,6 @@ void AbstractBackwardEulerCardiacCell<SIZE>::SolveAndUpdateState(double tStart, 
         stepper.AdvanceOneTimeStep();
     }
 }
-
-
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -477,7 +475,7 @@ public:
     {
         TimeStepper stepper(tStart, tEnd, mDt);
 
-        while(!stepper.IsTimeAtEnd())
+        while (!stepper.IsTimeAtEnd())
         {
             double time = stepper.GetTime();
 
@@ -487,7 +485,7 @@ public:
             // Compute other state variables
             ComputeOneStepExceptVoltage(time);
 
-            // check gating variables are still in range
+            // Check gating variables are still in range
             VerifyStateVariables();
 
             stepper.AdvanceOneTimeStep();
@@ -565,8 +563,6 @@ void DumpJacobianToFile(double time, const double rCurrentGuess[SIZE], double rJ
     (*p_file) << std::endl;
 }
 #endif
-
-
 
 TEMPLATED_CLASS_IS_ABSTRACT_1_UNSIGNED(AbstractBackwardEulerCardiacCell)
 

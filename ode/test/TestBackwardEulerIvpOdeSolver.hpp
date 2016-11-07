@@ -273,7 +273,6 @@ public:
             delete p_backward_euler;
         }
     }
-
 };
 
 #endif /*TESTBACKWARDEULERIVPODESOLVER_HPP_*/

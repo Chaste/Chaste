@@ -288,7 +288,6 @@ public:
      *
      * EMPTYLINE
      */
-
 };
 
 #endif /*TESTRUNNINGTUMOURSPHEROIDSIMULATIONSTUTORIAL_HPP_*/

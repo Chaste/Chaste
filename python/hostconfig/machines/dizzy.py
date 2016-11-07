@@ -273,7 +273,7 @@ def Configure(prefs, build):
         elif prefs['cvode'] == '2.6':
             cvode_path = BASE+'cvode_2_6'
         elif prefs['cvode'] == '2.7':
-                cvode_path = BASE+'cvode_2_7'
+            cvode_path = BASE+'cvode_2_7'
         elif prefs['cvode'] == '2.8':
             if os.path.exists('/opt/cvode-libs') and build.CompilerType() == 'intel':
                 # CVODE 2.8.1 (Sundials 2.6.1) specially downloaded and compiled with intel optimisations on this machine,
@@ -282,6 +282,8 @@ def Configure(prefs, build):
                 cvode_path = '/opt/cvode-libs'
             else:
             	cvode_path = BASE+'cvode_2_8'
+        elif prefs['cvode'] == '2.9':
+            cvode_path = BASE+'cvode_2_9'
         else:
             raise ValueError('Unsupported CVODE version "%s" requested' % prefs['cvode'])
         cvode_inc = os.path.join(cvode_path, 'include')

@@ -107,8 +107,6 @@ public:
      * @return  the mesh used to create the acinar.
      */
     AbstractTetrahedralMesh<1,3>* GetMesh();
-
 };
 
 #endif /*ABSTRACTACINARUNITFACTORY_HPP_*/
-

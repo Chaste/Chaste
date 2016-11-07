@@ -33,19 +33,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-
-
-
 #ifndef VOLTAGEINTERPOLATERONTOMECHANICSMESH_HPP_
 #define VOLTAGEINTERPOLATERONTOMECHANICSMESH_HPP_
-
 
 #include <vector>
 #include <string>
 #include "UblasIncludes.hpp"
 #include "TetrahedralMesh.hpp"
 #include "QuadraticMesh.hpp"
-
 
 /**
  *  Very simple one-method class which can be used to convert the voltage from an electrics

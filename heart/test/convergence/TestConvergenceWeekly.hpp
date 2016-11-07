@@ -159,7 +159,6 @@ public:
         TS_ASSERT_EQUALS(tester.MeshNum, 4u);
         HeartConfig::Instance()->Reset();
     }
-
 };
 
 #endif /*TESTCONVERGENCEWEEKLY_HPP_*/

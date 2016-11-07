@@ -91,7 +91,7 @@ AbstractVentilationProblem::Initialise()
         assert( iter->rGetElementAttributes()[SEGMENT_LENGTH] == length);
 
         // Check for intermediate nodes
-        if ( walker.GetChildElementIndices(&*iter).size() == 1u)
+        if (walker.GetChildElementIndices(&*iter).size() == 1u)
         {
             intermediate_nodes = true;
         }
@@ -104,7 +104,7 @@ AbstractVentilationProblem::Initialise()
         for (std::vector<AirwayBranch*>::iterator branch_it=branches.begin(); branch_it != branches.end(); branch_it++)
         {
             std::list<Element<1,3>* > branch_elements = (*branch_it)->GetElements();
-            if ( branch_elements.size() > 1u)
+            if (branch_elements.size() > 1u)
             {
                 double branch_length = (*branch_it)->GetLength();
 
@@ -160,7 +160,7 @@ double AbstractVentilationProblem::CalculateResistance(Element<1,3>& rElement, b
     length *= mLengthScaling;
 
     double resistance = 8.0*mViscosity*length/(M_PI*SmallPow(radius, 4));
-    if ( usePedley )
+    if (usePedley)
     {
         /* Pedley et al. 1970
          * http://dx.doi.org/10.1016/0034-5687(70)90094-0
