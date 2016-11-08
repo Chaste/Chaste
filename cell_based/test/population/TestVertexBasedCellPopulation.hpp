@@ -1433,7 +1433,8 @@ public:
         for (unsigned i=0; i<3; i++)
         {
             Node<2>* p_tetrahedral_node = p_tetrahedral_mesh->GetNode(i+5);
-            c_vector<double,2> tetrahedral_node_location = p_tetrahedral_node->rGetLocation();
+            c_vector<double,2> tetrahedral_node_location;
+            tetrahedral_node_location = p_tetrahedral_node->rGetLocation();
             c_vector<double,2> vertex_element_centroid = p_vertex_mesh->GetCentroidOfElement(i);
 
             TS_ASSERT_DELTA(tetrahedral_node_location[0], vertex_element_centroid[0], 1e-3);

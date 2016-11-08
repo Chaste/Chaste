@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/map.hpp>
 
+#include "SmartPointers.hpp"
 #include "PetscTools.hpp"
 #include "DistributedBoxCollection.hpp"
 #include "MutableMesh.hpp"
@@ -210,6 +211,19 @@ public:
      * @param maxInteractionDistance the distance that defines node neighbours in CalculateNodePairs.
      */
     void ConstructNodesWithoutMesh(const std::vector<Node<SPACE_DIM>*>& rNodes, double maxInteractionDistance);
+
+    /**
+     * Construct the mesh using only nodes. No mesh is created, but the nodes are stored.
+     * The original vector of nodes is deep-copied: new node objects are made with are
+     * independent of the pointers in the input so that they can be safely deleted.
+     *
+     * If this is the only way of constructing a mesh of this type, then we can be certain that
+     * elements and boundary elements are always unused.
+     *
+     * @param rNodes a vector of shared pointers to nodes.
+     * @param maxInteractionDistance the distance that defines node neighbours in CalculateNodePairs.
+     */
+    void ConstructNodesWithoutMesh(const std::vector<boost::shared_ptr<Node<SPACE_DIM> > >& rNodes, double maxInteractionDistance);
 
     /**
      * A Helper method to enable you to construct a nodes-only mesh by stripping the nodes

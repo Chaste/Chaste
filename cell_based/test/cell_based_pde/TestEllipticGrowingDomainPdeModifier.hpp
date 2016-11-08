@@ -419,11 +419,12 @@ public:
         // Make cells with r<1/2 apoptotic (so no source term)
         boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
                 cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
-        for (unsigned i =0; i<cells.size(); i++)
+        for (unsigned i=0; i<cells.size(); i++)
         {
-            c_vector<double,2> cell_location = mesh.GetNode(i)->rGetLocation();
+            c_vector<double,2> cell_location;
+            cell_location = mesh.GetNode(i)->rGetLocation();
             double r = sqrt(cell_location(0)*cell_location(0) + cell_location(1)*cell_location(1));
-            if (r>0.5)
+            if (r > 0.5)
             {
                 cells[i]->AddCellProperty(p_apoptotic_property);
             }
@@ -483,9 +484,10 @@ public:
         // Make cells with x<10.0 apoptotic (so no source term)
         boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
                 cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
-        for (unsigned i =0; i<cells.size(); i++)
+        for (unsigned i=0; i<cells.size(); i++)
         {
-            c_vector<double,2> cell_location = p_mesh->GetNode(i)->rGetLocation();
+            c_vector<double,2> cell_location;
+            cell_location = p_mesh->GetNode(i)->rGetLocation();
             if (cell_location(0) < 10.0)
             {
                 cells[i]->AddCellProperty(p_apoptotic_property);
@@ -530,10 +532,11 @@ public:
         // Make cells with x<10.0 apoptotic (so no source term)
         boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
                 cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
-        for (unsigned i =0; i<cells.size(); i++)
+        for (unsigned i=0; i<cells.size(); i++)
         {
-            c_vector<double,2> cell_location = p_mesh->GetNode(i)->rGetLocation();
-            if (cell_location(0)<10.0)
+            c_vector<double,2> cell_location;
+            cell_location = p_mesh->GetNode(i)->rGetLocation();
+            if (cell_location(0) < 10.0)
             {
                 cells[i]->AddCellProperty(p_apoptotic_property);
             }
@@ -583,10 +586,11 @@ public:
         // Make cells with x<10.0 apoptotic (so no source term)
         boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
                 cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
-        for (unsigned i =0; i<cells.size(); i++)
+        for (unsigned i=0; i<cells.size(); i++)
         {
-            c_vector<double,2> cell_location = p_mesh->GetCentroidOfElement(i);
-            if (cell_location(0)<10.0)
+            c_vector<double,2> cell_location;
+            cell_location = p_mesh->GetCentroidOfElement(i);
+            if (cell_location(0) < 10.0)
             {
                 cells[i]->AddCellProperty(p_apoptotic_property);
             }
@@ -635,10 +639,11 @@ public:
         // Make cells with x<10.0 apoptotic (so no source term)
         boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
                 cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
-        for (unsigned i =0; i<cells.size(); i++)
+        for (unsigned i=0; i<cells.size(); i++)
         {
-            c_vector<double,2> cell_location = p_mesh->GetCentroidOfElement(i);
-            if (cell_location(0)<10.0)
+            c_vector<double,2> cell_location;
+            cell_location = p_mesh->GetCentroidOfElement(i);
+            if (cell_location(0) < 10.0)
             {
                 cells[i]->AddCellProperty(p_apoptotic_property);
             }
@@ -693,10 +698,11 @@ public:
         // Make cells with x<10.0 apoptotic (so no source term)
         boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
                 cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
-        for (unsigned i =0; i<cells.size(); i++)
+        for (unsigned i=0; i<cells.size(); i++)
         {
-            c_vector<double,2> cell_location = p_mesh->GetNode(i)->rGetLocation();
-            if (cell_location(0)<10.0)
+            c_vector<double,2> cell_location;
+            cell_location = p_mesh->GetNode(i)->rGetLocation();
+            if (cell_location(0) < 10.0)
             {
                 cells[i]->AddCellProperty(p_apoptotic_property);
             }

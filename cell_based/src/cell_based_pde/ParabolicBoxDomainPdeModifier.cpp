@@ -40,7 +40,7 @@ template<unsigned DIM>
 ParabolicBoxDomainPdeModifier<DIM>::ParabolicBoxDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde,
                                                                   boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition,
                                                                   bool isNeumannBoundaryCondition,
-                                                                  ChasteCuboid<DIM>* pMeshCuboid,
+                                                                  boost::shared_ptr<ChasteCuboid<DIM> > pMeshCuboid,
                                                                   double stepSize,
                                                                   Vec solution)
     : AbstractBoxDomainPdeModifier<DIM>(pPde,
@@ -55,11 +55,6 @@ ParabolicBoxDomainPdeModifier<DIM>::ParabolicBoxDomainPdeModifier(boost::shared_
 template<unsigned DIM>
 ParabolicBoxDomainPdeModifier<DIM>::~ParabolicBoxDomainPdeModifier()
 {
-    // If we have used this modifier, then we will have created a solution vector
-    if (this->mSolution)
-    {
-        PetscTools::Destroy(this->mSolution);
-    }
 }
 
 template<unsigned DIM>

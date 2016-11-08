@@ -1244,8 +1244,8 @@ class Protocol(processors.ModelModifier):
             # Special case for linear interpolation on a data file
             rhs = self._add_interpolation(expr, lhs, rhs)
         orig_defn_kw = u'original_definition' # References the original definition if it appears as a variable on the new RHS
-        if not self._identify_referenced_variables(expr, check_optional=True, special_name=orig_defn_kw):
-            # Some optional variables weren't present in the model, so we can't use this equation.
+        def handle_unusable_expr():
+            """Some optional variables weren't present in the model, so we can't use this equation."""
             print >>sys.stderr, "Warning: optional model variables missing, so not using model interface equation:"
             if hasattr(expr, 'loc'):
                 print >>sys.stderr, "  ", expr.loc
@@ -1259,7 +1259,8 @@ class Protocol(processors.ModelModifier):
                         if output_spec['prefixed_name'] == vname and not output_spec['optional']:
                             raise ProtocolError("At least one optional variable required to override the definition of model output '%s' was not found and has no default value." % vname)
             self.inputs.remove(expr)
-            return
+        if not self._identify_referenced_variables(expr, check_optional=True, special_name=orig_defn_kw):
+            return handle_unusable_expr()
         # Determine if the original_definition keyword occurs on the RHS, and check that all numbers have units
         orig_defn_refs = []
         def find_refs(elt):
@@ -1269,6 +1270,15 @@ class Protocol(processors.ModelModifier):
             elif isinstance(elt, mathml_cn):
                 if not hasattr(elt, u'units'):
                     raise ProtocolError("All numbers in model equations must have units; '%s' does not." % unicode(elt))
+                if elt.units.startswith('units_of('):
+                    # Figure out the units of the variable referred to
+                    vname = elt.units[9:-1]
+                    assert ':' in vname
+                    var = self._lookup_ontology_term(vname, check_optional=True)
+                    if var is None:
+                        return handle_unusable_expr()
+                    print 'units_of(): using', var.units, 'from', var, 'for', elt.units
+                    elt.units = var.units
             else:
                 for child in elt.xml_element_children():
                     find_refs(child)

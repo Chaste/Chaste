@@ -479,7 +479,7 @@ public:
         // Create a cell population
         NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
 
-        unsigned num_removed;
+        unsigned num_removed = 0;
 
         if (PetscTools::AmMaster())
         {

@@ -144,7 +144,8 @@ public:
         }
 
         // Move a node along the x-axis and calculate the force exerted on a neighbour
-        c_vector<double,2> old_point = p_mesh->GetNode(59)->rGetLocation();
+        c_vector<double,2> old_point;
+        old_point = p_mesh->GetNode(59)->rGetLocation();
         ChastePoint<2> new_point;
         new_point.rGetLocation()[0] = old_point[0]+0.5;
         new_point.rGetLocation()[1] = old_point[1];
@@ -351,7 +352,8 @@ public:
 
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            c_vector<double,3> old_point = mesh.GetNode(i)->rGetLocation();
+            c_vector<double,3> old_point;
+            old_point = mesh.GetNode(i)->rGetLocation();
             ChastePoint<3> new_point;
             new_point.rGetLocation()[0] = scale_factor*old_point[0];
             new_point.rGetLocation()[1] = scale_factor*old_point[1];
@@ -453,7 +455,8 @@ public:
         }
 
         // Move a node along the x-axis and calculate the force exerted on a neighbour
-        c_vector<double,2> old_point = p_mesh->GetNode(59)->rGetLocation();
+        c_vector<double,2> old_point;
+        old_point = p_mesh->GetNode(59)->rGetLocation();
         ChastePoint<2> new_point;
         new_point.rGetLocation()[0] = old_point[0]+0.5;
         new_point.rGetLocation()[1] = old_point[1];
@@ -1601,15 +1604,16 @@ public:
 
         force.AddForceContribution(cell_population);
 
-        c_vector<double, 2> applied_force_0 = cell_population.rGetMesh().GetNode(0)->rGetAppliedForce();
-        c_vector<double, 2> applied_force_1 = cell_population.rGetMesh().GetNode(1)->rGetAppliedForce();
+        c_vector<double, 2> applied_force_0;
+        applied_force_0 = cell_population.rGetMesh().GetNode(0)->rGetAppliedForce();
+        c_vector<double, 2> applied_force_1;
+        applied_force_1 = cell_population.rGetMesh().GetNode(1)->rGetAppliedForce();
 
         // If this is a Farhadifar force, this will be the force at the vertices
         TS_ASSERT_DELTA(applied_force_0[0], 3.44, 1e-10);
         TS_ASSERT_DELTA(applied_force_0[1], 3.44, 1e-10);
         TS_ASSERT_DELTA(applied_force_1[0], 0.0, 1e-10);
         TS_ASSERT_DELTA(applied_force_1[1], 6.76, 1e-10);
-
     }
 
     void TestFarhadifarForceInSimulation() throw(Exception)
