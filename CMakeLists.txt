@@ -665,6 +665,7 @@ if (Chaste_COVERAGE)
         #    COMMAND ${CTEST_COMMAND} "-L" "Continuous|Parallel" "--output-on-failure" 
         COMMAND ${CMAKE_COMMAND} 
             "-DChaste_BINARY_DIR=${Chaste_BINARY_DIR}"
+            "-DCTEST_COMMAND=${CTEST_COMMAND}"
             "-P" "${Chaste_SOURCE_DIR}/cmake/Modules/ChasteRunCoverageTests.cmake"
 
 		# Capturing lcov counters and generating report
