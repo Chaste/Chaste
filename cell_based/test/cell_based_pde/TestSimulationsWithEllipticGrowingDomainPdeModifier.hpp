@@ -456,6 +456,12 @@ public:
         // Eventually the number of cells will be less than the spatial dimension and an exception
         // will be thrown.
         TS_ASSERT_THROWS_THIS(simulator.Solve(), "The number of nodes must exceed the spatial dimension.");
+
+        // Avoid memory leaks
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            delete nodes[i];
+        }
     }
 };
 

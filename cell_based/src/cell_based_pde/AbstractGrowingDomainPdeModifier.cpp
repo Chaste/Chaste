@@ -63,15 +63,15 @@ void AbstractGrowingDomainPdeModifier<DIM>::GenerateFeMesh(AbstractCellPopulatio
 {
     if (this->mDeleteFeMesh)
     {
-        // If a mesh has been created on a previous time-step then we need to tidy it up
+        // If a mesh has been created on a previous time step then we need to tidy it up
         assert(this->mpFeMesh != NULL);
         delete this->mpFeMesh;
     }
     else
     {
         ///\todo We should only set mDeleteFeMesh once, not every time step (#2687, #2863)
-        // This placement assumes that if this->mDeleteFeMesh is false it is unitializaed and needs to
-        // be checked. If true is has been checked elsewhere.
+        // This placement assumes that if this->mDeleteFeMesh is false it is uninitialised and needs to
+        // be checked. If true, it has been checked elsewhere.
         this->mDeleteFeMesh = (dynamic_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation) == NULL);
     }
 
