@@ -354,8 +354,10 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
                                                                                 c_vector<double, SPACE_DIM> axisOfDivision,
                                                                                 bool placeOriginalElementBelow)
 {
+    // LCOV_EXCL_START
     assert(SPACE_DIM == 2);
     assert(ELEMENT_DIM == SPACE_DIM);
+    // LCOV_EXCL_STOP
 
     // Get the centroid of the element
     c_vector<double, SPACE_DIM> centroid = this->GetCentroidOfElement(pElement->GetIndex());
@@ -539,8 +541,10 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongShortAxis(VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement,
                                                                                 bool placeOriginalElementBelow)
 {
+    // LCOV_EXCL_START
     assert(SPACE_DIM == 2);
     assert(ELEMENT_DIM == SPACE_DIM);
+    // LCOV_EXCL_STOP
 
     c_vector<double, SPACE_DIM> short_axis = this->GetShortAxisOfElement(pElement->GetIndex());
 
@@ -554,8 +558,10 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElement(VertexElement<
                                                                   unsigned nodeBIndex,
                                                                   bool placeOriginalElementBelow)
 {
+    // LCOV_EXCL_START
     assert(SPACE_DIM == 2);
     assert(ELEMENT_DIM == SPACE_DIM);
+    // LCOV_EXCL_STOP
 
     // Sort nodeA and nodeB such that nodeBIndex > nodeAindex
     assert(nodeBIndex != nodeAIndex);
@@ -677,7 +683,9 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElement(VertexElement<
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DeleteElementPriorToReMesh(unsigned index)
 {
+    // LCOV_EXCL_START
     assert(SPACE_DIM == 2);
+    // LCOV_EXCL_STOP
 
     // Mark any nodes that are contained only in this element as deleted
     for (unsigned i=0; i<this->mElements[index]->GetNumNodes(); i++)
@@ -855,8 +863,10 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(VertexElementMap& rElementMap)
 {
     // Make sure that we are in the correct dimension - this code will be eliminated at compile time
+    // LCOV_EXCL_START
     assert(SPACE_DIM==2 || SPACE_DIM==3);
     assert(ELEMENT_DIM == SPACE_DIM);
+    // LCOV_EXCL_STOP
 
     if (SPACE_DIM == 2)
     {
@@ -1580,8 +1590,10 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(Node<SPACE_DIM>* p
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformIntersectionSwap(Node<SPACE_DIM>* pNode, unsigned elementIndex)
 {
+    // LCOV_EXCL_START
     assert(SPACE_DIM == 2);
     assert(ELEMENT_DIM == SPACE_DIM);
+    // LCOV_EXCL_STOP
 
     VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = this->GetElement(elementIndex);
     unsigned num_nodes = p_element->GetNumNodes();
@@ -1814,8 +1826,11 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT2Swap(VertexElement<ELEM
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* pNode, unsigned elementIndex)
 {
+    // LCOV_EXCL_START
     assert(SPACE_DIM == 2);
     assert(ELEMENT_DIM == SPACE_DIM);
+    // LCOV_EXCL_STOP
+
     assert(pNode->IsBoundaryNode());
 
     // Store the index of the elements containing the intersecting node

@@ -494,7 +494,9 @@ template<unsigned DIM>
 double NodeBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
 {
     // Not implemented or tested in 1D
+    // LCOV_EXCL_START
     assert(DIM==2 ||DIM==3);
+    // LCOV_EXCL_STOP
 
     // Get node index corresponding to this cell
     unsigned node_index = this->GetLocationIndexUsingCell(pCell);

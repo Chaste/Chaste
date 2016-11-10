@@ -478,6 +478,12 @@ public:
             }
         }
 
+        // Coverage
+        WntConcentration<2>::Instance()->SetConstantWntValueForTesting(5.0);
+        c_vector<double, 2> gradient = WntConcentration<2>::Instance()->GetWntGradient(*(crypt.Begin()));
+        TS_ASSERT_DELTA(gradient[0], 0.0, 1e-6);
+        TS_ASSERT_DELTA(gradient[1], 0.0, 1e-6);
+
         WntConcentration<2>::Destroy();
     }
 

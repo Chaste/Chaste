@@ -200,7 +200,9 @@ template<unsigned DIM>
 double PottsMesh<DIM>::GetSurfaceAreaOfElement(unsigned index)
 {
     ///\todo not implemented in 3d yet
+    // LCOV_EXCL_START
     assert(DIM==2 || DIM==3);
+    // LCOV_EXCL_STOP
 
     // Helper variables
     PottsElement<DIM>* p_element = GetElement(index);

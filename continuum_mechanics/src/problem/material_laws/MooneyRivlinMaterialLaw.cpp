@@ -95,7 +95,9 @@ double MooneyRivlinMaterialLaw<DIM>::GetC1()
 template<unsigned DIM>
 double MooneyRivlinMaterialLaw<DIM>::GetC2()
 {
-    assert(DIM==3);
+    // LCOV_EXCL_START
+    assert(DIM == 3);
+    // LCOV_EXCL_STOP
     return mC2;
 }
 

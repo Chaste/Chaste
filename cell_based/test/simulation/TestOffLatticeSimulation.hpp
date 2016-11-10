@@ -1148,10 +1148,10 @@ public:
         MAKE_PTR(VolumeTrackingModifier<2>, p_modifier);
         simulator.AddSimulationModifier(p_modifier);
 
-        // Check there is a modifier and its the correct type
+        // Check there is a modifier and it's the correct type
         std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<2> > >::iterator iter = simulator.GetSimulationModifiers()->begin();
         TS_ASSERT(boost::static_pointer_cast<VolumeTrackingModifier<2> >(*iter));
-        TS_ASSERT_EQUALS(simulator.GetSimulationModifiers()->size(),1u);
+        TS_ASSERT_EQUALS(simulator.GetSimulationModifiers()->size(), 1u);
 
         simulator.Solve();
 
