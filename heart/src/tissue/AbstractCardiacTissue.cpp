@@ -55,6 +55,7 @@ AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::AbstractCardiacTissue(
             bool exchangeHalos)
     : mpMesh(pCellFactory->GetMesh()),
       mpDistributedVectorFactory(mpMesh->GetDistributedVectorFactory()),
+	  mpConductivityModifier(NULL),
       mHasPurkinje(false),
       mDoCacheReplication(true),
       mMeshUnarchived(false),
