@@ -669,10 +669,10 @@ if (Chaste_COVERAGE)
             "-P" "${Chaste_SOURCE_DIR}/cmake/Modules/ChasteRunCoverageTests.cmake"
 
 		# Capturing lcov counters and generating report
-		COMMAND ${LCOV_PATH} --config-file ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc --directory . --capture --output-file ${_outputname}.info
-        COMMAND ${LCOV_PATH} --config-file ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc --remove ${_outputname}.info /home/bob/petsc* /usr/* */test/* */3rdparty/* Debug/* cxxtest/* --output-file ${_outputname}.info.cleaned
-		COMMAND ${GENHTML_PATH} --title "Chaste Coverage Results for commit ${Chaste_REVISION}" --config-file ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc --no-function-coverage -o ${_outputname} ${_outputname}.info.cleaned
-		COMMAND ${CMAKE_COMMAND} -E remove ${_outputname}.info ${_outputname}.info.cleaned
+        COMMAND ${LCOV_PATH} --config-file ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc --directory . --capture --output-file ${_outputname}.info
+        COMMAND ${LCOV_PATH} --config-file ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc --remove ${_outputname}.info /home/bob/petsc* /usr/* */fortests/* */test/* */3rdparty/* Debug/* cxxtest/* --output-file ${_outputname}.info.cleaned
+        COMMAND ${GENHTML_PATH} --title "Chaste Coverage Results for commit "${Chaste_REVISION} --config-file ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc --no-function-coverage -o ${_outputname} ${_outputname}.info.cleaned
+        COMMAND ${CMAKE_COMMAND} -E remove ${_outputname}.info ${_outputname}.info.cleaned
 
         DEPENDS Continuous Parallel
         WORKING_DIRECTORY ${Chaste_BINARY_DIR}
