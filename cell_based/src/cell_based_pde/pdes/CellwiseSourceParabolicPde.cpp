@@ -60,12 +60,14 @@ double CellwiseSourceParabolicPde<DIM>::ComputeDuDtCoefficientFunction(const Cha
     return mDuDtCoefficient;
 }
 
+// LCOV_EXCL_START
 template<unsigned DIM>
 double CellwiseSourceParabolicPde<DIM>::ComputeSourceTerm(const ChastePoint<DIM>& rX, double u, Element<DIM,DIM>* pElement)
 {
     NEVER_REACHED;
     return 0.0;
 }
+// LCOV_EXCL_STOP
 
 template<unsigned DIM>
 double CellwiseSourceParabolicPde<DIM>::ComputeSourceTermAtNode(const Node<DIM>& rNode, double u)

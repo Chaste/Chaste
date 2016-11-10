@@ -117,12 +117,14 @@ double AveragedSourceParabolicPde<DIM>::ComputeSourceTerm(const ChastePoint<DIM>
     return coefficient*u;
 }
 
+// LCOV_EXCL_START
 template<unsigned DIM>
 double AveragedSourceParabolicPde<DIM>::ComputeSourceTermAtNode(const Node<DIM>& rNode, double u)
 {
     NEVER_REACHED;
     return 0.0;
 }
+// LCOV_EXCL_STOP
 
 template<unsigned DIM>
 c_matrix<double,DIM,DIM> AveragedSourceParabolicPde<DIM>::ComputeDiffusionTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement)

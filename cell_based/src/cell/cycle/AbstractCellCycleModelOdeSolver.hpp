@@ -102,8 +102,11 @@ public:
 
     /**
      * Reset the instance.
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
      */
-    virtual void Reset();
+    virtual void Reset()=0;
 
     /**
      * Call mpOdeSolver->SolveAndUpdateStateVariable.

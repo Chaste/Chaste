@@ -1616,6 +1616,9 @@ public:
         cell_population.GetCellUsingLocationIndex(0)->GetCellData()->SetItem(var_name, 3.14);
 
         TS_ASSERT_DELTA(cell_population.GetCellDataItemAtPdeNode(0,var_name), 3.14, 1e-6);
+
+        // Coverage of GetOutputResultsForChasteVisualizer()
+        TS_ASSERT_EQUALS(cell_population.GetOutputResultsForChasteVisualizer(), true);
     }
 };
 

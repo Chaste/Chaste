@@ -122,7 +122,9 @@ void PlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::ImposeBoundaryCondition(cons
         }
         else
         {
-            assert(SPACE_DIM==ELEMENT_DIM);
+            // LCOV_EXCL_START
+            assert(SPACE_DIM == ELEMENT_DIM);
+            // LCOV_EXCL_STOP
             assert(dynamic_cast<VertexBasedCellPopulation<SPACE_DIM>*>(this->mpCellPopulation));
 
             // Iterate over all nodes and update their positions according to the boundary conditions

@@ -387,6 +387,36 @@ public:
         element_writer.CloseFile();
 
         FileComparison(results_dir + "results.vizelements", "cell_based/test/data/TestCellPopulationWriters/results.vizelements_twice").CompareFiles();
+
+        // Test the correct exception is thrown if using a NodeBasedCellPopulation
+        std::vector<Node<2>* > nodes;
+        nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, false, 1.0, 1.0));
+        NodesOnlyMesh<2> nodes_only_mesh;
+        nodes_only_mesh.ConstructNodesWithoutMesh(nodes, 1.5);
+        std::vector<CellPtr> node_based_cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> node_based_generator;
+        node_based_generator.GenerateBasic(node_based_cells, nodes_only_mesh.GetNumNodes());
+        NodeBasedCellPopulation<2> node_based_cell_population(nodes_only_mesh, node_based_cells);
+
+        TS_ASSERT_THROWS_THIS(element_writer.Visit(&node_based_cell_population),
+            "CellPopulationElementWriter cannot be used with a NodeBasedCellPopulation");
+
+        // Test the correct exception is thrown if using a CaBasedCellPopulation
+        PottsMeshGenerator<2> ca_based_generator(4, 0, 0, 4, 0, 0);
+        PottsMesh<2>* p_ca_based_mesh = ca_based_generator.GetMesh();
+        std::vector<CellPtr> ca_based_cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> ca_based_cells_generator;
+        ca_based_cells_generator.GenerateBasic(ca_based_cells, 4);
+        std::vector<unsigned> location_indices;
+        location_indices.push_back(7);
+        location_indices.push_back(11);
+        location_indices.push_back(12);
+        location_indices.push_back(13);
+        CaBasedCellPopulation<2> ca_based_cell_population(*p_ca_based_mesh, ca_based_cells, location_indices);
+
+        TS_ASSERT_THROWS_THIS(element_writer.Visit(&ca_based_cell_population),
+            "CellPopulationElementWriter cannot be used with a CaBasedCellPopulation");
     }
 
     void TestCellPopulationElementWriterArchiving() throw (Exception)
@@ -987,6 +1017,40 @@ public:
         vertex_based_writer.CloseFile();
 
         FileComparison(vertex_based_results_dir + "nodevelocities.dat", "cell_based/test/data/TestCellPopulationWriters/nodevelocities_vertex.dat").CompareFiles();
+
+    }
+
+    void TestNodeVelocityWriterExceptions() throw (Exception)
+    {
+        EXIT_IF_PARALLEL;
+
+        // Test the correct exception is thrown if using a CaBasedCellPopulation
+        PottsMeshGenerator<2> ca_based_generator(4, 0, 0, 4, 0, 0);
+        PottsMesh<2>* p_ca_based_mesh = ca_based_generator.GetMesh();
+        std::vector<CellPtr> ca_based_cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> ca_based_cells_generator;
+        ca_based_cells_generator.GenerateBasic(ca_based_cells, 4);
+        std::vector<unsigned> location_indices;
+        location_indices.push_back(7);
+        location_indices.push_back(11);
+        location_indices.push_back(12);
+        location_indices.push_back(13);
+        CaBasedCellPopulation<2> ca_based_cell_population(*p_ca_based_mesh, ca_based_cells, location_indices);
+
+        NodeVelocityWriter<2,2> node_velocity_writer;
+        TS_ASSERT_THROWS_THIS(node_velocity_writer.Visit(&ca_based_cell_population),
+            "NodeVelocityWriter cannot be used with a CaBasedCellPopulation");
+
+        // Test the correct exception is thrown if using a PottsBasedCellPopulation
+        PottsMeshGenerator<2> potts_based_generator(4, 1, 2, 4, 1, 2);
+        PottsMesh<2>* p_potts_based_mesh = potts_based_generator.GetMesh();
+        std::vector<CellPtr> potts_based_cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> potts_based_cells_generator;
+        potts_based_cells_generator.GenerateBasic(potts_based_cells, p_potts_based_mesh->GetNumElements());
+        PottsBasedCellPopulation<2> potts_based_cell_population(*p_potts_based_mesh, potts_based_cells);
+
+        TS_ASSERT_THROWS_THIS(node_velocity_writer.Visit(&potts_based_cell_population),
+            "NodeVelocityWriter cannot be used with a PottsBasedCellPopulation");
     }
 
     void TestNodeVelocityWriterArchiving() throw (Exception)

@@ -230,7 +230,8 @@ public:
     virtual void UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)=0;
 
     /**
-     * Overridden UpdateAtEndOfOutputTimeStep() method.
+     * Overridden UpdateAtEndOfOutputTimeStep() method,
+     * after UpdateAtEndOfTimeStep() has been called.
      *
      * Output the solution to the PDE at each cell to VTK and, if mOutputSolutionAtPdeNodes is set to true,
      * output the solution to the PDE at each node of mpFeMesh to mpVizPdeSolutionResultsFile.

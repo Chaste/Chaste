@@ -64,7 +64,9 @@ LinearSpringWithVariableSpringConstantsForce<DIM>::~LinearSpringWithVariableSpri
 template<unsigned DIM>
 void LinearSpringWithVariableSpringConstantsForce<DIM>::SetEdgeBasedSpringConstant(bool useEdgeBasedSpringConstant)
 {
+    // LCOV_EXCL_START
     assert(DIM == 2);
+    // LCOV_EXCL_STOP
     mUseEdgeBasedSpringConstant = useEdgeBasedSpringConstant;
 }
 

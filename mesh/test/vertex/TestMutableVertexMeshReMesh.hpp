@@ -2707,6 +2707,7 @@ public:
 
         // Merge intersection to maintain non-overlapping elements
         vertex_mesh.SetCheckForInternalIntersections(true);
+        TS_ASSERT_EQUALS(vertex_mesh.GetCheckForInternalIntersections(), true);
         vertex_mesh.CheckForIntersections();
 
         // Test that each moved node has the correct location following the rearrangement
