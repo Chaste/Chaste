@@ -389,7 +389,7 @@ unsigned PottsMesh<DIM>::DivideElement(PottsElement<DIM>* pElement,
                                        bool placeOriginalElementBelow)
 {
     /// Not implemented in 1d
-    assert(DIM==2 || DIM==3);
+    assert(DIM==2 || DIM==3); // LCOV_EXCL_LINE
 
     // Store the number of nodes in the element (this changes when nodes are deleted from the element)
     unsigned num_nodes = pElement->GetNumNodes();

@@ -963,15 +963,18 @@ void MeshBasedCellPopulation<2>::CreateVoronoiTessellation()
         mpVoronoiTessellation = new VertexMesh<2, 2>(static_cast<MutableMesh<2, 2> &>((this->mrMesh)), is_mesh_periodic);
     }
 }
+
 /**
  * Can't tessellate 2d meshes in 3d space yet.
  */
+// LCOV_EXCL_START
 template<>
 void MeshBasedCellPopulation<2,3>::CreateVoronoiTessellation()
 {
     // We don't allow tessellation yet.
     NEVER_REACHED;
 }
+// LCOV_EXCL_STOP
 
 /**
  * The cylindrical mesh is only defined in 2D, hence there is
@@ -989,34 +992,41 @@ void MeshBasedCellPopulation<3>::CreateVoronoiTessellation()
  * The VoronoiTessellation class is only defined in 2D or 3D, hence there
  * are two definitions to this method (one templated and one not).
  */
+// LCOV_EXCL_START
 template<>
 void MeshBasedCellPopulation<1, 1>::CreateVoronoiTessellation()
 {
     // No 1D Voronoi tessellation
     NEVER_REACHED;
 }
+// LCOV_EXCL_STOP
+
 
 /**
  * The VoronoiTessellation class is only defined in 2D or 3D, hence there
  * are two definitions to this method (one templated and one not).
  */
+// LCOV_EXCL_START
 template<>
 void MeshBasedCellPopulation<1, 2>::CreateVoronoiTessellation()
 {
     // No 1D Voronoi tessellation
     NEVER_REACHED;
 }
+// LCOV_EXCL_STOP
 
 /**
  * The VoronoiTessellation class is only defined in 2D or 3D, hence there
  * are two definitions to this method (one templated and one not).
  */
+// LCOV_EXCL_START
 template<>
 void MeshBasedCellPopulation<1, 3>::CreateVoronoiTessellation()
 {
     // No 1D Voronoi tessellation
     NEVER_REACHED;
 }
+// LCOV_EXCL_STOP
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VertexMesh<ELEMENT_DIM,SPACE_DIM>* MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetVoronoiTessellation()

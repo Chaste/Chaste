@@ -46,11 +46,13 @@ bool NoCellCycleModel::ReadyToDivide()
     return false;
 }
 
+// LCOV_EXCL_START
 AbstractCellCycleModel* NoCellCycleModel::CreateCellCycleModel()
 {
     NEVER_REACHED;
     return NULL;
 }
+// LCOV_EXCL_STOP
 
 double NoCellCycleModel::GetAverageTransitCellCycleTime()
 {

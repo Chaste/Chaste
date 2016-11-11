@@ -52,12 +52,14 @@ AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractOffLatticeCell
 {
 }
 
+// LCOV_EXCL_START
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>::UpdateNodeLocations(double dt)
 {
   // This method is deprecated by the NumericalMethod class hierarchy; the only population that calls this method is the NodeBasedCellPopulationWithBuskeUpdate.
   NEVER_REACHED;
 }
+// LCOV_EXCL_STOP
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetDampingConstantNormal(double dampingConstantNormal)
