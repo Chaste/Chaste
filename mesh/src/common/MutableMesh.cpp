@@ -676,9 +676,7 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(NodeMap& map)
 {
     // Make sure that we are in the correct dimension - this code will be eliminated at compile time
-    // LCOV_EXCL_START
-    assert( ELEMENT_DIM == SPACE_DIM );
-    // LCOV_EXCL_STOP
+    assert( ELEMENT_DIM == SPACE_DIM ); // LCOV_EXCL_LINE
 
     // Avoid some triangle/tetgen errors: need at least four
     // nodes for tetgen, and at least three for triangle

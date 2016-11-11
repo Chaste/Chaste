@@ -42,10 +42,8 @@ c_vector<double, SPACE_DIM> CryptVertexBasedDivisionRule<SPACE_DIM>::CalculateCe
     CellPtr pParentCell,
     VertexBasedCellPopulation<SPACE_DIM>& rCellPopulation)
 {
-    // LCOV_EXCL_START
-    assert(SPACE_DIM == 2);
-    // LCOV_EXCL_STOP
-
+    assert(SPACE_DIM == 2); // LCOV_EXCL_LINE
+    
     c_vector<double, SPACE_DIM> axis_of_division;
 
     double random_angle = 2.0*M_PI*RandomNumberGenerator::Instance()->ranf();

@@ -53,10 +53,8 @@ CellPopulationAreaWriter<ELEMENT_DIM, SPACE_DIM>::CellPopulationAreaWriter()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellPopulationAreaWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
-    // LCOV_EXCL_START
-    assert(SPACE_DIM==2 || SPACE_DIM==3);
-    // LCOV_EXCL_STOP
-
+    assert(SPACE_DIM==2 || SPACE_DIM==3); // LCOV_EXCL_LINE
+    
     VertexMesh<ELEMENT_DIM, SPACE_DIM>* voronoi_tessellation = pCellPopulation->GetVoronoiTessellation();
 
     assert (voronoi_tessellation != NULL);

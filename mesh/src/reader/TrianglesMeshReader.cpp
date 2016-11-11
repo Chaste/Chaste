@@ -96,9 +96,7 @@ TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::TrianglesMeshReader(std::string pat
     }
     else
     {
-        // LCOV_EXCL_START
-        assert(SPACE_DIM==ELEMENT_DIM);
-        // LCOV_EXCL_STOP
+        assert(SPACE_DIM==ELEMENT_DIM); // LCOV_EXCL_LINE
         mNodesPerElement = (ELEMENT_DIM+1)*(ELEMENT_DIM+2)/2;
     }
 
@@ -108,9 +106,7 @@ TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::TrianglesMeshReader(std::string pat
     }
     else
     {
-        // LCOV_EXCL_START
-        assert(SPACE_DIM==ELEMENT_DIM);
-        // LCOV_EXCL_STOP
+        assert(SPACE_DIM==ELEMENT_DIM); // LCOV_EXCL_LINE
         mNodesPerBoundaryElement = ELEMENT_DIM*(ELEMENT_DIM+1)/2;
     }
 

@@ -70,9 +70,7 @@ public:
     {
         if (useMeshWidthAsMag)
         {
-            // LCOV_EXCL_START
             this->mpStimulus.reset(new SimpleStimulus(meshWidth, 0.5));
-            // LCOV_EXCL_STOP
         }
         else
         {

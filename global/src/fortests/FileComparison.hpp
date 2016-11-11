@@ -267,10 +267,8 @@ public:
             // If that assertion tripped...
             if (failures > 0u && !mSuppressOutput)
             {
-// LCOV_EXCL_START
                 // Report the paths to the files
                 TS_TRACE("Files " + mFilename1 + " and " + mFilename2 + " differ.");
-// LCOV_EXCL_STOP
             }
         }
 

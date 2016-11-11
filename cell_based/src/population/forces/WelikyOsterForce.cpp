@@ -52,9 +52,7 @@ template<unsigned DIM>
 void WelikyOsterForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation)
 {
     // Make sure that we are in the correct dimension - this code will be eliminated at compile time
-    // LCOV_EXCL_START
-    assert(DIM == 2); // this method only works in 2D at present
-    // LCOV_EXCL_STOP
+    assert(DIM == 2); // LCOV_EXCL_LINE // this method only works in 2D at present
 
     // Throw an exception message if not using a VertexBasedCellPopulation
     if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation) == NULL)

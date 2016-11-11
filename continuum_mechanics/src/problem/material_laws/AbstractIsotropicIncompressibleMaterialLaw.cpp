@@ -49,14 +49,8 @@ void AbstractIsotropicIncompressibleMaterialLaw<DIM>::ComputeStressAndStressDeri
         FourthOrderTensor<DIM,DIM,DIM,DIM>&   rDTdE,
         bool                      computeDTdE)
 {
-    /*
-     * This is covered, but gcov doesn't see this as being covered
-     * for some reason, maybe because of optimisations.
-     */
-    // LCOV_EXCL_START
-    assert((DIM==2) || (DIM==3));
-    // LCOV_EXCL_STOP
-
+    assert((DIM==2) || (DIM==3)); // LCOV_EXCL_LINE
+    
     static c_matrix<double,DIM,DIM> identity = identity_matrix<double>(DIM);
 
     double I1 = Trace(rC);

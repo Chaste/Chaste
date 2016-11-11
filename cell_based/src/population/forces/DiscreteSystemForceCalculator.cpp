@@ -198,13 +198,10 @@ std::vector<double> DiscreteSystemForceCalculator::GetSamplingAngles(unsigned in
         double alpha_plus_pi_plus_epsilon = alpha + M_PI + mEpsilon;
 
         // Calculate sampling angles in the range (-pi,pi]
-
-        // LCOV_EXCL_START
         if (alpha_minus_epsilon <= -M_PI)
         {
             alpha_minus_epsilon += 2*M_PI;
-        }
-        // LCOV_EXCL_STOP
+        }        
         sampling_angles[i] = alpha_minus_epsilon;
 
         assert(sampling_angles[i] <= M_PI);

@@ -66,10 +66,7 @@ void PottsElement<DIM>::AddNode(Node<DIM>* pNode,  const unsigned& rIndex)
 template<unsigned DIM>
 double PottsElement<DIM>::GetAspectRatio()
 {
-    // LCOV_EXCL_START
-    assert(DIM == 2);
-    // LCOV_EXCL_STOP
-
+    assert(DIM == 2); // LCOV_EXCL_LINE
     assert(this->GetNumNodes() != 0);
 
     if (this->GetNumNodes() <= 2)
