@@ -105,10 +105,12 @@ void MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader(Abstrac
                 {
                     nodes.push_back(this->GetNodeOrHaloNode(element_data.NodeIndices[j]) );
                 }
+                // LCOV_EXCL_START
                 catch (Exception&)
                 {
                     NEVER_REACHED;
                 }
+                // LCOV_EXCL_STOP
             }
 
             Element<1u, SPACE_DIM>* p_element = new Element<1u,SPACE_DIM>(element_index, nodes, false);

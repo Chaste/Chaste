@@ -262,7 +262,7 @@ void QuadraticMeshHelper<DIM>::AddNodeToBoundaryElement(AbstractTetrahedralMesh<
                                                         BoundaryElement<DIM-1,DIM>* pBoundaryElement,
                                                         Node<DIM>* pNode)
 {
-    assert(DIM > 1);
+    assert(DIM > 1); // LCOV_EXCL_LINE
 
     // Add node to the boundary node list
     if (!pNode->IsBoundaryNode())
@@ -280,7 +280,7 @@ void QuadraticMeshHelper<DIM>::AddNodeToBoundaryElement(AbstractTetrahedralMesh<
                                                         Element<DIM,DIM>* pElement,
                                                         unsigned internalNode)
 {
-    assert(DIM > 1);
+    assert(DIM > 1); // LCOV_EXCL_LINE
     assert(internalNode >= DIM+1);
     assert(internalNode < (DIM+1)*(DIM+2)/2);
     Node<DIM>* p_internal_node = pElement->GetNode(internalNode);
@@ -293,7 +293,7 @@ void QuadraticMeshHelper<DIM>::AddExtraBoundaryNodes(AbstractTetrahedralMesh<DIM
                                                      Element<DIM,DIM>* pElement,
                                                      unsigned nodeIndexOppositeToFace)
 {
-    assert(DIM!=1);
+    assert(DIM!=1); // LCOV_EXCL_LINE
     if (DIM==2)
     {
         assert(nodeIndexOppositeToFace<3);

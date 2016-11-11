@@ -696,7 +696,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ReorderNodes()
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructLinearMesh(unsigned width)
 {
-    assert(ELEMENT_DIM == 1);
+    assert(ELEMENT_DIM == 1); 	// LCOV_EXCL_LINE
 
      //Check that there are enough nodes to make the parallelisation worthwhile
     if (width==0)
@@ -813,8 +813,8 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructLinearMesh(uns
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRectangularMesh(unsigned width, unsigned height, bool stagger)
 {
-    assert(SPACE_DIM == 2);
-    assert(ELEMENT_DIM == 2);
+    assert(SPACE_DIM == 2); 	// LCOV_EXCL_LINE
+    assert(ELEMENT_DIM == 2); 	// LCOV_EXCL_LINE
     //Check that there are enough nodes to make the parallelisation worthwhile
     if (height==0)
     {
@@ -1016,8 +1016,8 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructCuboid(unsigne
         unsigned height,
         unsigned depth)
 {
-    assert(SPACE_DIM == 3);
-    assert(ELEMENT_DIM == 3);
+    assert(SPACE_DIM == 3); 	// LCOV_EXCL_LINE
+    assert(ELEMENT_DIM == 3); 	// LCOV_EXCL_LINE
     //Check that there are enough nodes to make the parallelisation worthwhile
     if (depth==0)
     {
@@ -1307,7 +1307,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
         std::vector<unsigned>& rProcessorsOffset)
 {
     assert(PetscTools::IsParallel());
-    assert(ELEMENT_DIM==2 || ELEMENT_DIM==3); // Metis works with triangles and tetras
+    assert(ELEMENT_DIM==2 || ELEMENT_DIM==3); // LCOV_EXCL_LINE // Metis works with triangles and tetras
 
     const unsigned num_elements = rMeshReader.GetNumElements();
     const unsigned num_procs = PetscTools::GetNumProcs();
@@ -1616,13 +1616,14 @@ ChasteCuboid<SPACE_DIM> DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::Calc
         my_minimum_point=my_box.rGetLowerCorner();
         my_maximum_point=my_box.rGetUpperCorner();
     }
+    // LCOV_EXCL_START
     catch (Exception& e)
     {
-// LCOV_EXCL_START
         PetscTools::ReplicateException(true);
         throw e;
-// LCOV_EXCL_STOP
+
     }
+    // LCOV_EXCL_STOP
 
     PetscTools::ReplicateException(false);
 
