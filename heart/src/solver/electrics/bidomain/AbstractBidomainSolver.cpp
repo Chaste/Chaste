@@ -94,7 +94,7 @@ void AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolve(Vec initi
         }
         else
         {
-            TERMINATE("Two levels block diagonal only works with TetrahedralMesh and p=1");
+            TERMINATE("Two levels block diagonal only works with TetrahedralMesh and p=1"); // LCOV_EXCL_LINE
         }
     }
     else

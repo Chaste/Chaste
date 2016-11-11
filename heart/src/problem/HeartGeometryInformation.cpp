@@ -262,7 +262,8 @@ HeartRegionType HeartGeometryInformation<SPACE_DIM>::GetHeartRegion(unsigned nod
         }
     }
 
-    return UNKNOWN;
+    NEVER_REACHED;
+    return UNKNOWN; // LCOV_EXCL_LINE
 }
 
 template<unsigned SPACE_DIM>

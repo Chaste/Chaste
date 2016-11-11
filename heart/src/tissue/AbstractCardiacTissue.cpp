@@ -600,16 +600,18 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SolveCellSystems(Vec existing
                 UpdatePurkinjeCaches(index.Global, index.Local, nextTime);
             }
         }
-        catch (Exception&)
+        // LCOV_EXCL_START
+        catch (Exception& e)
         {
             ///\todo #2017 This code will be needed in the future, not being covered now.
             /// Add a test which covers this, e.g.  by doing a simulation with a bad stimulus for one of the
             /// Purkinje cells - stimulating with the wrong choice of sign say.
 
             NEVER_REACHED;
-            //PetscTools::ReplicateException(true);
-            //throw e;
+            PetscTools::ReplicateException(true);
+            throw e;
         }
+        // LCOV_EXCL_STOP
     }
 
     PetscTools::ReplicateException(false);
