@@ -1401,6 +1401,38 @@ unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::DivideElement(ImmersedBou
     return new_elem_idx;
 }
 
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh()
+{
+    // Iterate over elements and remesh each one
+    for (typename ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryElementIterator elem_it = this->GetElementIteratorBegin();
+         elem_it != this->GetElementIteratorEnd();
+         ++elem_it)
+    {
+        ReMeshElement(&*elem_it);
+    }
+
+    // Iterate over laminas and remesh each one
+    for (typename ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryLaminaIterator lam_it = this->GetLaminaIteratorBegin();
+         lam_it != this->GetLaminaIteratorEnd();
+         ++lam_it)
+    {
+        ReMeshLamina(&*lam_it);
+    }
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ReMeshElement(ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>* pElement)
+{
+    std::cout << (pElement->GetIndex()) << std::endl;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ReMeshLamina(ImmersedBoundaryElement<ELEMENT_DIM - 1, SPACE_DIM>* pLamina)
+{
+    std::cout << (pLamina->GetIndex()) << std::endl;
+}
+
 // Explicit instantiation
 template class ImmersedBoundaryMesh<1, 1>;
 template class ImmersedBoundaryMesh<1, 2>;
