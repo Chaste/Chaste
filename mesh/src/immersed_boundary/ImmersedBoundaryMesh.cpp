@@ -1424,7 +1424,36 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh()
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ReMeshElement(ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>* pElement)
 {
-    std::cout << (pElement->GetIndex()) << std::endl;
+    unsigned num_nodes = pElement->GetNumNodes();
+
+    // Calculate cumulative distances
+    double total_dist = 0.0;
+    std::vector<double> dist_between_nodes(num_nodes);
+    for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
+    {
+        // Distance between current node and the next one, including wrap-around at end
+        double local_dist = this->GetDistanceBetweenNodes(node_idx, (node_idx + 1) % num_nodes);
+
+        total_dist += local_dist;
+        dist_between_nodes[node_idx] = local_dist;
+    }
+
+    double node_spacing = total_dist / num_nodes;
+    double target_dist;
+    double cumulative_dist = dist_between_nodes[0];
+    unsigned running_idx = 1;
+    for (unsigned node_idx = 1; node_idx < num_nodes; node_idx++)
+    {
+        target_dist = node_spacing * node_idx;
+
+        while (cumulative_dist < target_dist)
+        {
+            cumulative_dist += dist_between_nodes[running_idx];
+            running_idx++;
+        }
+
+
+    }
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
