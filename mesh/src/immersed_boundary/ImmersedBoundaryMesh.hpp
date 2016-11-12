@@ -578,6 +578,25 @@ public:
     void SetElementDivisionSpacing(double elementDivisionSpacing);
 
     /**
+     * ReMesh method that evenly redistributes nodes around each element and lamina.
+     */
+    void ReMesh();
+
+    /**
+     * ReMesh method that evenly redistributes nodes around a specific element.
+     *
+     * @param pElement the element to remesh
+     */
+    void ReMeshElement(ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>* pElement);
+
+    /**
+     * ReMesh method that evenly redistributes nodes along a specific lamina.
+     *
+     * @param pLamina the lamina to remesh
+     */
+    void ReMeshLamina(ImmersedBoundaryElement<ELEMENT_DIM - 1, SPACE_DIM>* pLamina);
+
+    /**
      * A smart iterator over the elements in the mesh.
      */
     class ImmersedBoundaryElementIterator
