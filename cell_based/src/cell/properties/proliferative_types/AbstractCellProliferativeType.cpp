@@ -36,11 +36,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellProliferativeType.hpp"
 #include "Exception.hpp"
 
+// LCOV_EXCL_START
 AbstractCellProliferativeType::AbstractCellProliferativeType()
 {
-    // Subclasses should always call the other constructor.
+    // Subclasses should always call the other constructor
     NEVER_REACHED;
 }
+// LCOV_EXCL_STOP
 
 AbstractCellProliferativeType::AbstractCellProliferativeType(unsigned colour)
     : AbstractCellProperty(),

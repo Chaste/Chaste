@@ -1329,8 +1329,10 @@ public:
         PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
         PottsMesh<2>* p_mesh = generator.GetMesh();
 
-        c_vector<double, 2> old_location1 = p_mesh->GetNode(4)->rGetLocation();
-        c_vector<double, 2> old_location2 = p_mesh->GetNode(9)->rGetLocation();
+        c_vector<double, 2> old_location1;
+        old_location1 = p_mesh->GetNode(4)->rGetLocation();
+        c_vector<double, 2> old_location2;
+        old_location2 = p_mesh->GetNode(9)->rGetLocation();
 
         // Set translation vector
         c_vector<double, 2> trans_vec;
@@ -1339,8 +1341,10 @@ public:
 
         // Translate
         p_mesh->Translate(trans_vec);
-        c_vector<double, 2> new_location1 = p_mesh->GetNode(4)->rGetLocation();
-        c_vector<double, 2> new_location2 = p_mesh->GetNode(9)->rGetLocation();
+        c_vector<double, 2> new_location1;
+        new_location1 = p_mesh->GetNode(4)->rGetLocation();
+        c_vector<double, 2> new_location2;
+        new_location2 = p_mesh->GetNode(9)->rGetLocation();
 
         // Spot check a couple of nodes
         TS_ASSERT_DELTA(new_location1[0], old_location1[0] + 2.0, 1e-6);

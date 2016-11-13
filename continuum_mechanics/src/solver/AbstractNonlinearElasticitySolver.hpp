@@ -1421,9 +1421,7 @@ void AbstractNonlinearElasticitySolver<DIM>::AssembleOnBoundaryElementForPressur
         }
         else
         {
-            // LCOV_EXCL_START
-            assert( DIM!=3 || (fabs(weight(0))<1e-6) || (fabs(weight(1))<1e-6) || (fabs(weight(2))<1e-6)  || (fabs(weight(3))<1e-6) );
-            // LCOV_EXCL_STOP
+            assert( DIM!=3 || (fabs(weight(0))<1e-6) || (fabs(weight(1))<1e-6) || (fabs(weight(2))<1e-6)  || (fabs(weight(3))<1e-6) ); // LCOV_EXCL_LINE
         }
 
         // Now we can compute the grad_phi and then interpolate F

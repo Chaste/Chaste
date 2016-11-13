@@ -117,7 +117,8 @@ public:
              ++cell_iter)
         {
             Node<2>* p_node = cell_population.GetNodeCorrespondingToCell(*cell_iter);
-            c_vector<double, 2> location = p_node->rGetLocation();
+            c_vector<double, 2> location;
+            location = p_node->rGetLocation();
             if (old_locations[p_node][0] < 2.0)
             {
                 TS_ASSERT_DELTA(2.0, location[0], 1e-6);
@@ -225,8 +226,8 @@ public:
         std::map<Node<2>*, c_vector<double,2> > old_locations;
 
         for (MutableVertexMesh<2,2>::NodeIterator node_iter = cell_population.rGetMesh().GetNodeIteratorBegin();
-                node_iter != cell_population.rGetMesh().GetNodeIteratorEnd();
-                ++node_iter)
+             node_iter != cell_population.rGetMesh().GetNodeIteratorEnd();
+             ++node_iter)
         {
             old_locations[&(*node_iter)] = node_iter->rGetLocation();
         }
@@ -235,10 +236,11 @@ public:
 
         // Test that all nodes satisfy the boundary condition
         for (MutableVertexMesh<2,2>::NodeIterator node_iter = cell_population.rGetMesh().GetNodeIteratorBegin();
-                node_iter != cell_population.rGetMesh().GetNodeIteratorEnd();
-                ++node_iter)
+             node_iter != cell_population.rGetMesh().GetNodeIteratorEnd();
+             ++node_iter)
         {
-            c_vector<double, 2> location = node_iter->rGetLocation();
+            c_vector<double, 2> location;
+            location = node_iter->rGetLocation();
             if (old_locations[&(*node_iter)][0] < x_boundary)
             {
                 TS_ASSERT_DELTA(x_boundary, location[0], 1e-6);
@@ -267,10 +269,11 @@ public:
 
         // Test that all nodes satisfy the jiggled boundary condition
         for (MutableVertexMesh<2,2>::NodeIterator node_iter = cell_population.rGetMesh().GetNodeIteratorBegin();
-                node_iter != cell_population.rGetMesh().GetNodeIteratorEnd();
-                ++node_iter)
+             node_iter != cell_population.rGetMesh().GetNodeIteratorEnd();
+             ++node_iter)
         {
-            c_vector<double, 2> location = node_iter->rGetLocation();
+            c_vector<double, 2> location;
+            location = node_iter->rGetLocation();
             if (old_locations[&(*node_iter)][0] < x_boundary)
             {
                 TS_ASSERT_LESS_THAN(x_boundary, location[0]);// note strict inequality
@@ -308,6 +311,29 @@ public:
         std::map<Node<2>*, c_vector<double, 2> > old_locations;
         TS_ASSERT_THROWS_THIS(plane_boundary_condition.ImposeBoundaryCondition(old_locations),
             "PlaneBoundaryCondition requires a subclass of AbstractOffLatticeCellPopulation.");
+
+        // Test the correct exception is thrown in 1D
+        std::vector<Node<1>*> nodes;
+        nodes.push_back(new Node<1>(0, true,  0.0));
+        nodes.push_back(new Node<1>(1, false, 1.0));
+        NodesOnlyMesh<1> nodes_only_mesh;
+        nodes_only_mesh.ConstructNodesWithoutMesh(nodes, 1.5);
+        std::vector<CellPtr> node_based_cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator_1d;
+        cells_generator_1d.GenerateBasicRandom(node_based_cells, nodes_only_mesh.GetNumNodes(), p_diff_type);
+        NodeBasedCellPopulation<1> node_based_cell_population(nodes_only_mesh, node_based_cells);
+
+        c_vector<double,1> point_1d = zero_vector<double>(1);
+        c_vector<double,1> normal_1d = zero_vector<double>(1);
+        normal_1d(0) = 1.0;
+        PlaneBoundaryCondition<1> plane_bc_1d(&node_based_cell_population, point_1d, normal_1d);
+        TS_ASSERT_THROWS_THIS(plane_bc_1d.VerifyBoundaryCondition(),
+            "PlaneBoundaryCondition is not implemented in 1D");
+
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+        	delete nodes[i];
+        }
     }
 
     void TestSphereGeometryBoundaryCondition() throw (Exception)

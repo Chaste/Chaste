@@ -53,11 +53,6 @@ ParabolicGrowingDomainPdeModifier<DIM>::ParabolicGrowingDomainPdeModifier(boost:
 template<unsigned DIM>
 ParabolicGrowingDomainPdeModifier<DIM>::~ParabolicGrowingDomainPdeModifier()
 {
-    // If we have used this modifier, then we will have created a solution vector
-    if (this->mSolution)
-    {
-        PetscTools::Destroy(this->mSolution);
-    }
 }
 
 template<unsigned DIM>

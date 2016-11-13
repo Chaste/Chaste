@@ -97,6 +97,9 @@ public:
      * By default calls the base class version; it is defined here so that specializations can override it.
      */
     virtual bool IsAdaptive();
+
+    /** Reset the instance. */
+    void Reset();
 };
 
 /** Definition of the instance static member. */
@@ -154,6 +157,11 @@ bool CellCycleModelOdeSolver<CELL_CYCLE_MODEL, ODE_SOLVER>::IsAdaptive()
     return AbstractCellCycleModelOdeSolver::IsAdaptive();
 }
 
+template<class CELL_CYCLE_MODEL, class ODE_SOLVER>
+void CellCycleModelOdeSolver<CELL_CYCLE_MODEL, ODE_SOLVER>::Reset()
+{
+    ///\todo Consider whether Reset() could be moved to the abstract class
+}
 
 /**
  * Specialization for BackwardEulerIvpOdeSolver, whose constructor requires

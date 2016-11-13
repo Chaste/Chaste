@@ -45,9 +45,9 @@ void OdeSystemInformation<Nash2004ContractionModel>::Initialise()
     // TestContractionModels and it will fail] [also see the call of
     //   this->mpSystemInfo = OdeSystemInformation<Nash2004ContractionModel>::Instance()
     // in this class' constructor], but for some reason gcov doesn't see it.
-    // LCOV_EXCL_START
+	// testing whether the new version does...
     this->mVariableNames.push_back("Ta");
     this->mVariableUnits.push_back("kPa");
     this->mInitialised = true;
-    // LCOV_EXCL_STOP
+
 }

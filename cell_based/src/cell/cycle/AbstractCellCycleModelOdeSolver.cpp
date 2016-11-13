@@ -46,10 +46,6 @@ AbstractCellCycleModelOdeSolver::~AbstractCellCycleModelOdeSolver()
 {
 }
 
-void AbstractCellCycleModelOdeSolver::Reset()
-{
-}
-
 void AbstractCellCycleModelOdeSolver::SolveAndUpdateStateVariable(AbstractOdeSystem* pAbstractOdeSystem,
                                                                   double startTime,
                                                                   double endTime,

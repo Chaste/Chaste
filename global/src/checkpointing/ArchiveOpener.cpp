@@ -92,9 +92,7 @@ ArchiveOpener<boost::archive::text_iarchive, std::ifstream>::ArchiveOpener(
         else
         {
             // We don't understand the exception, so we shouldn't continue
-// LCOV_EXCL_START
-            throw boost_exception;
-// LCOV_EXCL_STOP
+            throw boost_exception; // LCOV_EXCL_LINE
         }
     }
 

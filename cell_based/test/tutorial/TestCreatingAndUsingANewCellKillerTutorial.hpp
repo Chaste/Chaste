@@ -123,7 +123,8 @@ public:
             cell_iter != this->mpCellPopulation->End();
             ++cell_iter)
         {
-            c_vector<double, 2> location = this->mpCellPopulation->GetLocationOfCellCentre(*cell_iter);
+            c_vector<double, 2> location;
+            location = this->mpCellPopulation->GetLocationOfCellCentre(*cell_iter);
 
             if (pow(location[0]/20, 2) + pow(location[1]/10, 2) > 1.0)
             {

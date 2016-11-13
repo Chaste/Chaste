@@ -1597,7 +1597,7 @@ public:
         constructor1.Construct(mesh1, 1, 1.0);
         TS_ASSERT_EQUALS(constructor1.GetWidth(), 1.0);
         TS_ASSERT_EQUALS(mesh1.GetNumNodes(), 9u);
-        TS_ASSERT( mesh1.CheckIsConforming() );
+        TS_ASSERT(mesh1.CheckIsConforming());
 
         CuboidMeshConstructor<2> constructor2;
         TetrahedralMesh<2,2> mesh2;
@@ -1613,6 +1613,8 @@ public:
         TetrahedralMesh<1,3> mesh4;
         constructor4.Construct(mesh4, 1, 1.0);
         TS_ASSERT_EQUALS(mesh4.GetNumNodes(), 9u);
+
+        TS_ASSERT_EQUALS(constructor4.GetNumNodes(), 9u);
     }
 
     void TestMeshStoresFilename() throw(Exception)

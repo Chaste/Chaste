@@ -84,10 +84,10 @@ public:
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         ChastePoint<2> lower(-10.0, -10.0);
         ChastePoint<2> upper(10.0, 10.0);
-        ChasteCuboid<2> cuboid(lower, upper);
+        MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, &cuboid, 2.0));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid, 2.0));
         p_pde_modifier->SetDependentVariableName("averaged quantity");
 
         // Test that member variables are initialised correctly
@@ -133,7 +133,7 @@ public:
             // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
             ChastePoint<2> lower(-10.0, -10.0);
             ChastePoint<2> upper(10.0, 10.0);
-            ChasteCuboid<2> cuboid(lower, upper);
+            MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
 
             // Create a PDE modifier and set the name of the dependent variable in the PDE
             std::vector<double> data(10);
@@ -142,7 +142,7 @@ public:
                 data[i] = i + 0.45;
             }
             Vec vector = PetscTools::CreateVec(data);
-            EllipticBoxDomainPdeModifier<2> modifier(p_pde, p_bc, false, &cuboid, 2.0, vector);
+            EllipticBoxDomainPdeModifier<2> modifier(p_pde, p_bc, false, p_cuboid, 2.0, vector);
             modifier.SetDependentVariableName("averaged quantity");
 
             // Create an output archive
@@ -195,10 +195,11 @@ public:
         // Make cells with x<5.0 apoptotic (so no source term)
         boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
                 cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
-        for (unsigned i =0; i<cells.size(); i++)
+        for (unsigned i=0; i<cells.size(); i++)
         {
-            c_vector<double,2> cell_location = p_mesh->GetNode(i)->rGetLocation();
-            if (cell_location(0)<5.0)
+            c_vector<double,2> cell_location;
+            cell_location = p_mesh->GetNode(i)->rGetLocation();
+            if (cell_location(0) < 5.0)
             {
                 cells[i]->AddCellProperty(p_apoptotic_property);
             }
@@ -217,10 +218,10 @@ public:
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         ChastePoint<2> lower(-5.0, -5.0);
         ChastePoint<2> upper(15.0, 15.0);
-        ChasteCuboid<2> cuboid(lower, upper);
+        MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, &cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
         p_pde_modifier->SetDependentVariableName("variable");
 
         // For coverage output the solution gradient
@@ -252,10 +253,11 @@ public:
         // Make cells with x<5.0 apoptotic (so no source term)
         boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
                 cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
-        for (unsigned i =0; i<cells.size(); i++)
+        for (unsigned i=0; i<cells.size(); i++)
         {
-            c_vector<double,2> cell_location = p_mesh->GetNode(i)->rGetLocation();
-            if (cell_location(0)<5.0)
+            c_vector<double,2> cell_location;
+            cell_location = p_mesh->GetNode(i)->rGetLocation();
+            if (cell_location(0) < 5.0)
             {
                 cells[i]->AddCellProperty(p_apoptotic_property);
             }
@@ -274,10 +276,10 @@ public:
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         ChastePoint<2> lower(-5.0, -5.0);
         ChastePoint<2> upper(15.0, 15.0);
-        ChasteCuboid<2> cuboid(lower, upper);
+        MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, &cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
         p_pde_modifier->SetDependentVariableName("variable");
 
         p_pde_modifier->SetupSolve(cell_population,"TestAveragedBoxEllipticPdeWithNodeOnSquare");
@@ -307,10 +309,11 @@ public:
         // Make cells with x<5.0 apoptotic (so no source term)
         boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
                 cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
-        for (unsigned i =0; i<cells.size(); i++)
+        for (unsigned i=0; i<cells.size(); i++)
         {
-            c_vector<double,2> cell_location = p_mesh->GetCentroidOfElement(i);
-            if (cell_location(0)<5.0)
+            c_vector<double,2> cell_location;
+            cell_location = p_mesh->GetCentroidOfElement(i);
+            if (cell_location(0) < 5.0)
             {
                 cells[i]->AddCellProperty(p_apoptotic_property);
             }
@@ -329,10 +332,10 @@ public:
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         ChastePoint<2> lower(-5.0, -5.0);
         ChastePoint<2> upper(15.0, 15.0);
-        ChasteCuboid<2> cuboid(lower, upper);
+        MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, &cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
         p_pde_modifier->SetDependentVariableName("variable");
 
         p_pde_modifier->SetupSolve(cell_population,"TestAveragedBoxEllipticPdeWithVertexOnSquare");
@@ -361,10 +364,11 @@ public:
         // Make cells with x<5.0 apoptotic (so no source term)
         boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
                 cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
-        for (unsigned i =0; i<cells.size(); i++)
+        for (unsigned i=0; i<cells.size(); i++)
         {
-            c_vector<double,2> cell_location = p_mesh->GetCentroidOfElement(i);
-            if (cell_location(0)<5.0)
+            c_vector<double,2> cell_location;
+            cell_location = p_mesh->GetCentroidOfElement(i);
+            if (cell_location(0) < 5.0)
             {
                 cells[i]->AddCellProperty(p_apoptotic_property);
             }
@@ -383,10 +387,10 @@ public:
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         ChastePoint<2> lower(-5.0, -5.0);
         ChastePoint<2> upper(15.0, 15.0);
-        ChasteCuboid<2> cuboid(lower, upper);
+        MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, &cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
         p_pde_modifier->SetDependentVariableName("variable");
 
         p_pde_modifier->SetupSolve(cell_population,"TestAveragedBoxEllipticPdeWithPottsOnSquare");
@@ -423,10 +427,11 @@ public:
         // Make cells with x<5.0 apoptotic (so no source term)
         boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
                 cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
-        for (unsigned i =0; i<cells.size(); i++)
+        for (unsigned i=0; i<cells.size(); i++)
         {
-            c_vector<double,2> cell_location = p_mesh->GetNode(i)->rGetLocation();
-            if (cell_location(0)<5.0)
+            c_vector<double,2> cell_location;
+            cell_location = p_mesh->GetNode(i)->rGetLocation();
+            if (cell_location(0) < 5.0)
             {
                 cells[i]->AddCellProperty(p_apoptotic_property);
             }
@@ -445,10 +450,10 @@ public:
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         ChastePoint<2> lower(-5.0, -5.0);
         ChastePoint<2> upper(15.0, 15.0);
-        ChasteCuboid<2> cuboid(lower, upper);
+        MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, &cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
         p_pde_modifier->SetDependentVariableName("variable");
 
         p_pde_modifier->SetupSolve(cell_population,"TestAveragedBoxEllipticPdeWithCaOnSquare");
@@ -460,6 +465,98 @@ public:
         TS_ASSERT_DELTA(p_cell_0->GetCellData()->GetItem("variable"), 0.8605, 1e-1); // Testing against off-lattice models
 
         TS_ASSERT_DELTA(p_cell_0->GetCellData()->GetItem("variable"), 0.8513, 1e-4); // Testing against on-lattice models
+    }
+
+    void TestEllipticBoxDomainPdeModifierIn1d() throw(Exception)
+    {
+        // Create mesh
+        std::vector<Node<1>*> nodes;
+        nodes.push_back(new Node<1>(0, true,  0.0));
+        nodes.push_back(new Node<1>(1, false, 1.0));
+        nodes.push_back(new Node<1>(2, false, 2.0));
+        nodes.push_back(new Node<1>(3, false, 3.0));
+        nodes.push_back(new Node<1>(4, true,  4.0));
+
+        NodesOnlyMesh<1> mesh;
+        mesh.ConstructNodesWithoutMesh(nodes, 1.5);
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_differentiated_type);
+        CellsGenerator<UniformCellCycleModel, 1> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_differentiated_type);
+
+        // Set up cell population
+        NodeBasedCellPopulation<1> cell_population(mesh, cells);
+
+        // Set up simulation time for file output
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
+
+        // Create PDE and boundary condition objects
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<1>, p_pde, (cell_population, -0.1));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<1>, p_bc, (1.0));
+
+        // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
+        ChastePoint<1> lower(-5.0);
+        ChastePoint<1> upper(15.0);
+        MAKE_PTR_ARGS(ChasteCuboid<1>, p_cuboid, (lower, upper));
+
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<1>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
+        p_pde_modifier->SetDependentVariableName("variable");
+
+        p_pde_modifier->SetupSolve(cell_population,"TestEllipticBoxDomainPdeModifierIn1d");
+
+
+        // Test the solution at some fixed points to compare with other cell populations
+        CellPtr p_cell_2 = cell_population.GetCellUsingLocationIndex(2);
+        TS_ASSERT_DELTA(p_cell_2->GetCellData()->GetItem("variable"), 0.3172, 1e-2);
+
+        // Clear memory
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            delete nodes[i];
+        }
+    }
+
+    void TestEllipticBoxDomainPdeModifierIn3d() throw(Exception)
+    {
+        // Create a simple mesh
+        TetrahedralMesh<3,3> temp_mesh;
+        temp_mesh.ConstructCuboid(3,3,3);
+        NodesOnlyMesh<3> mesh;
+        mesh.ConstructNodesWithoutMesh(temp_mesh, 1.5);
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_differentiated_type);
+        CellsGenerator<UniformCellCycleModel, 3> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_differentiated_type);
+
+        // Set up cell population
+        NodeBasedCellPopulation<3> cell_population(mesh, cells);
+
+        // Set up simulation time for file output
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
+
+        // Create PDE and boundary condition objects
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<3>, p_pde, (cell_population, -0.1));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<3>, p_bc, (1.0));
+
+        // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
+        ChastePoint<3> lower(-5.0, -5.0, -5.0);
+        ChastePoint<3> upper(15.0, 15.0, 15.0);
+        MAKE_PTR_ARGS(ChasteCuboid<3>, p_cuboid, (lower, upper));
+
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<3>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
+        p_pde_modifier->SetDependentVariableName("variable");
+
+        p_pde_modifier->SetupSolve(cell_population,"TestEllipticBoxDomainPdeModifierIn3d");
+
+        // Test the solution at some fixed points to compare with other cell populations
+        CellPtr p_cell_62 = cell_population.GetCellUsingLocationIndex(13);
+        TS_ASSERT_DELTA(p_cell_62->GetCellData()->GetItem("variable"), 0.8841, 1e-2);
     }
 };
 

@@ -34,21 +34,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "NoCellCycleModel.hpp"
+#include "Exception.hpp"
 
 NoCellCycleModel::NoCellCycleModel()
     : AbstractCellCycleModel()
 {
-}
-
-NoCellCycleModel::NoCellCycleModel(const NoCellCycleModel& rModel)
-   : AbstractCellCycleModel(rModel)
-{
-    /*
-     * There are no member variables defined in this class to initialize.
-     *
-     * The member variables mBirthTime, mReadyToDivide and mDimension
-     * are initialized in the AbstractCellCycleModel constructor.
-     */
 }
 
 bool NoCellCycleModel::ReadyToDivide()
@@ -56,10 +46,13 @@ bool NoCellCycleModel::ReadyToDivide()
     return false;
 }
 
+// LCOV_EXCL_START
 AbstractCellCycleModel* NoCellCycleModel::CreateCellCycleModel()
 {
-    return new NoCellCycleModel(*this);
+    NEVER_REACHED;
+    return NULL;
 }
+// LCOV_EXCL_STOP
 
 double NoCellCycleModel::GetAverageTransitCellCycleTime()
 {
@@ -80,4 +73,3 @@ void NoCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
 CHASTE_CLASS_EXPORT(NoCellCycleModel)
-

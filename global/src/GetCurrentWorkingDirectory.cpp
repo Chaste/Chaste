@@ -45,12 +45,12 @@ std::string GetCurrentWorkingDirectory()
     {
         cwd = fs::current_path();
     }
+// LCOV_EXCL_START
     catch (...)
     {
-// LCOV_EXCL_START
-        // Not sure what could cause this, but just in case...
+        // Not sure what could cause this, so not covered, but just in case...
         EXCEPTION("Unable to determine current working directory");
-// LCOV_EXCL_STOP
     }
+// LCOV_EXCL_STOP
     return cwd.string();
 }

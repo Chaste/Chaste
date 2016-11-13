@@ -234,7 +234,8 @@ public:
 
 
         // Now move cell so the cells have no neighboursthen they both run to a homogeneous steady state (note here mean delta=0)
-        c_vector<double,2> old_point = static_cast<NodesOnlyMesh<2>* >(&(simulator.rGetCellPopulation().rGetMesh()))->GetNode(1)->rGetLocation();
+        c_vector<double,2> old_point;
+        old_point = static_cast<NodesOnlyMesh<2>* >(&(simulator.rGetCellPopulation().rGetMesh()))->GetNode(1)->rGetLocation();
         ChastePoint<2> new_point;
         new_point.rGetLocation()[0] = old_point[0]+2.0;
         new_point.rGetLocation()[1] = old_point[1];

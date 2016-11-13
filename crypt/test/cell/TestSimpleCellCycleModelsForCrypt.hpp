@@ -290,6 +290,7 @@ public:
         p_cell_model_1d->SetUseCellProliferativeTypeDependentG1Duration();
 
         TS_ASSERT_EQUALS(p_cell_model_1d->GetDimension(), 1u);
+        TS_ASSERT_EQUALS(p_cell_model_1d->GetUseCellProliferativeTypeDependentG1Duration(), true);
 
         CellPtr p_stem_cell_1d(new Cell(p_healthy_state, p_cell_model_1d));
         p_stem_cell_1d->SetCellProliferativeType(p_stem_type);

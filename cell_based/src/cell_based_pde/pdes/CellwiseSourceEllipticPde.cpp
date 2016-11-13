@@ -61,12 +61,14 @@ double CellwiseSourceEllipticPde<DIM>::ComputeConstantInUSourceTerm(const Chaste
     return 0.0;
 }
 
+// LCOV_EXCL_START
 template<unsigned DIM>
 double CellwiseSourceEllipticPde<DIM>::ComputeLinearInUCoeffInSourceTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement)
 {
     NEVER_REACHED;
     return 0.0;
 }
+// LCOV_EXCL_STOP
 
 template<unsigned DIM>
 double CellwiseSourceEllipticPde<DIM>::ComputeLinearInUCoeffInSourceTermAtNode(const Node<DIM>& rNode)

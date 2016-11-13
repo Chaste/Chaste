@@ -405,7 +405,7 @@ void VertexMesh<ELEMENT_DIM, SPACE_DIM>::GenerateVerticesFromElementCircumcentre
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetEdgeLength(unsigned elementIndex1, unsigned elementIndex2)
 {
-    assert(SPACE_DIM == 2);
+    assert(SPACE_DIM == 2);    // LCOV_EXCL_LINE - code will be removed at compile time
 
     std::set<unsigned> node_indices_1;
     for (unsigned i=0; i<mElements[elementIndex1]->GetNumNodes(); i++)
@@ -440,7 +440,7 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetEdgeLength(unsigned elementIndex1,
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetElongationShapeFactorOfElement(unsigned index)
 {
-    assert(SPACE_DIM == 2);
+    assert(SPACE_DIM == 2);    // LCOV_EXCL_LINE - code will be removed at compile time
 
     c_vector<double, 3> moments = CalculateMomentsOfElement(index);
 
@@ -545,7 +545,7 @@ unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetVoronoiElementIndexCorresponding
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetRosetteRankOfElement(unsigned index)
 {
-    assert(SPACE_DIM == 2 || SPACE_DIM == 3);
+    assert(SPACE_DIM == 2 || SPACE_DIM == 3);    // LCOV_EXCL_LINE - code will be removed at compile time
 
     // Get pointer to this element
     VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = GetElement(index);
@@ -1027,7 +1027,7 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetVectorFromAto
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetVolumeOfElement(unsigned index)
 {
-    assert(SPACE_DIM == 2 || SPACE_DIM == 3);
+    assert(SPACE_DIM == 2 || SPACE_DIM == 3);    // LCOV_EXCL_LINE - code will be removed at compile time
 
     // Get pointer to this element
     VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = GetElement(index);
@@ -1064,7 +1064,6 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetVolumeOfElement(unsigned index)
             // Get pointer to face
             VertexElement<ELEMENT_DIM-1, SPACE_DIM>* p_face = p_element->GetFace(face_index);
 
-
             // Calculate the area of the face and get unit normal to this face
             c_vector<double, SPACE_DIM> unit_normal;
             double face_area = CalculateUnitNormalToFaceWithArea(p_face, unit_normal);
@@ -1086,7 +1085,7 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetVolumeOfElement(unsigned index)
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetSurfaceAreaOfElement(unsigned index)
 {
-    assert(SPACE_DIM == 2 || SPACE_DIM == 3);
+    assert(SPACE_DIM == 2 || SPACE_DIM == 3);    // LCOV_EXCL_LINE - code will be removed at compile time
 
     // Get pointer to this element
     VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = GetElement(index);
@@ -1122,8 +1121,8 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetSurfaceAreaOfElement(unsigned inde
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool VertexMesh<ELEMENT_DIM, SPACE_DIM>::ElementIncludesPoint(const c_vector<double, SPACE_DIM>& rTestPoint, unsigned elementIndex)
 {
-    assert(SPACE_DIM == 2);
-    assert(ELEMENT_DIM == SPACE_DIM);
+    assert(SPACE_DIM == 2);   			 // LCOV_EXCL_LINE - code will be removed at compile time
+    assert(ELEMENT_DIM == SPACE_DIM);    // LCOV_EXCL_LINE - code will be removed at compile time
 
     // Get the element
     VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = GetElement(elementIndex);
@@ -1242,8 +1241,8 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetLocalIndexForElementEdgeClosestToPoint(const c_vector<double, SPACE_DIM>& rTestPoint, unsigned elementIndex)
 {
     // Make sure that we are in the correct dimension - this code will be eliminated at compile time
-    assert(SPACE_DIM == 2);
-    assert(ELEMENT_DIM == SPACE_DIM);
+    assert(SPACE_DIM == 2);    				// LCOV_EXCL_LINE - code will be removed at compile time
+    assert(ELEMENT_DIM == SPACE_DIM);   	// LCOV_EXCL_LINE - code will be removed at compile time
 
     // Get the element
     VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = GetElement(elementIndex);
@@ -1305,7 +1304,7 @@ unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetLocalIndexForElementEdgeClosestT
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, 3> VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMomentsOfElement(unsigned index)
 {
-    assert(SPACE_DIM == 2);
+    assert(SPACE_DIM == 2);    // LCOV_EXCL_LINE - code will be removed at compile time
 
     // Define helper variables
     VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = GetElement(index);
@@ -1359,7 +1358,7 @@ c_vector<double, 3> VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMomentsOfElemen
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetShortAxisOfElement(unsigned index)
 {
-    assert(SPACE_DIM == 2);
+    assert(SPACE_DIM == 2);    // LCOV_EXCL_LINE - code will be removed at compile time
 
     c_vector<double, SPACE_DIM> short_axis = zero_vector<double>(SPACE_DIM);
 
@@ -1409,7 +1408,7 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetShortAxisOfEl
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetAreaGradientOfElementAtNode(VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement, unsigned localIndex)
 {
-    assert(SPACE_DIM==2);
+    assert(SPACE_DIM == 2);    // LCOV_EXCL_LINE - code will be removed at compile time
 
     unsigned num_nodes_in_element = pElement->GetNumNodes();
     unsigned next_local_index = (localIndex+1)%num_nodes_in_element;
@@ -1432,7 +1431,7 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetAreaGradientO
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetPreviousEdgeGradientOfElementAtNode(VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement, unsigned localIndex)
 {
-    assert(SPACE_DIM==2);
+    assert(SPACE_DIM == 2);    // LCOV_EXCL_LINE - code will be removed at compile time
 
     unsigned num_nodes_in_element = pElement->GetNumNodes();
 
@@ -1453,7 +1452,7 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetPreviousEdgeG
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetNextEdgeGradientOfElementAtNode(VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement, unsigned localIndex)
 {
-    assert(SPACE_DIM==2);
+    assert(SPACE_DIM == 2);     // LCOV_EXCL_LINE - code will be removed at compile time
 
     unsigned next_local_index = (localIndex+1)%(pElement->GetNumNodes());
 
@@ -1471,7 +1470,7 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetNextEdgeGradi
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetPerimeterGradientOfElementAtNode(VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement, unsigned localIndex)
 {
-    assert(SPACE_DIM==2);
+    assert(SPACE_DIM==2); // LCOV_EXCL_LINE
 
     c_vector<double, SPACE_DIM> previous_edge_gradient = GetPreviousEdgeGradientOfElementAtNode(pElement, localIndex);
     c_vector<double, SPACE_DIM> next_edge_gradient = GetNextEdgeGradientOfElementAtNode(pElement, localIndex);
@@ -1486,9 +1485,10 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetPerimeterGrad
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateUnitNormalToFaceWithArea(VertexElement<ELEMENT_DIM-1, SPACE_DIM>* pFace, c_vector<double, SPACE_DIM>& rNormal)
 {
-    assert(SPACE_DIM == 3);
-    // As we are in 3D, the face must have at least three vertices,
-    assert( pFace->GetNumNodes() >= 3u );
+    assert(SPACE_DIM == 3);    // LCOV_EXCL_LINE - code will be removed at compile time
+
+    // As we are in 3D, the face must have at least three vertices
+    assert(pFace->GetNumNodes() >= 3u);
 
     // Reset the answer
     rNormal = zero_vector<double>(SPACE_DIM);
@@ -1514,7 +1514,7 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateUnitNormalToFaceWithArea(Ver
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateAreaOfFace(VertexElement<ELEMENT_DIM-1, SPACE_DIM>* pFace)
 {
-    assert(SPACE_DIM == 3);
+    assert(SPACE_DIM == 3);    // LCOV_EXCL_LINE - code will be removed at compile time
 
     // Get the unit normal to the plane of this face
     c_vector<double, SPACE_DIM> unit_normal;
