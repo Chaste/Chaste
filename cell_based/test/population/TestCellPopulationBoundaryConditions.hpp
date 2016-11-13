@@ -329,6 +329,11 @@ public:
         PlaneBoundaryCondition<1> plane_bc_1d(&node_based_cell_population, point_1d, normal_1d);
         TS_ASSERT_THROWS_THIS(plane_bc_1d.VerifyBoundaryCondition(),
             "PlaneBoundaryCondition is not implemented in 1D");
+
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+        	delete nodes[i];
+        }
     }
 
     void TestSphereGeometryBoundaryCondition() throw (Exception)

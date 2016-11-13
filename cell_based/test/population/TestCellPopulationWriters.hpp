@@ -402,6 +402,11 @@ public:
         TS_ASSERT_THROWS_THIS(element_writer.Visit(&node_based_cell_population),
             "CellPopulationElementWriter cannot be used with a NodeBasedCellPopulation");
 
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+        	delete nodes[i];
+        }
+
         // Test the correct exception is thrown if using a CaBasedCellPopulation
         PottsMeshGenerator<2> ca_based_generator(4, 0, 0, 4, 0, 0);
         PottsMesh<2>* p_ca_based_mesh = ca_based_generator.GetMesh();
