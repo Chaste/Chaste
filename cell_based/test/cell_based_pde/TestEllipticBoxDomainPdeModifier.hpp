@@ -505,12 +505,14 @@ public:
         MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<1>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
         p_pde_modifier->SetDependentVariableName("variable");
 
-        p_pde_modifier->SetupSolve(cell_population,"TestEllipticBoxDomainPdeModifierIn1d");
+        p_pde_modifier->SetOutputGradient(true);
 
+        p_pde_modifier->SetupSolve(cell_population,"TestEllipticBoxDomainPdeModifierIn1d");
 
         // Test the solution at some fixed points to compare with other cell populations
         CellPtr p_cell_2 = cell_population.GetCellUsingLocationIndex(2);
         TS_ASSERT_DELTA(p_cell_2->GetCellData()->GetItem("variable"), 0.3172, 1e-2);
+        TS_ASSERT_DELTA(p_cell_2->GetCellData()->GetItem("variable_grad_x"), -0.0250, 1e-2);
 
         // Clear memory
         for (unsigned i=0; i<nodes.size(); i++)
@@ -552,11 +554,16 @@ public:
         MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<3>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
         p_pde_modifier->SetDependentVariableName("variable");
 
+        p_pde_modifier->SetOutputGradient(true);
+
         p_pde_modifier->SetupSolve(cell_population,"TestEllipticBoxDomainPdeModifierIn3d");
 
         // Test the solution at some fixed points to compare with other cell populations
         CellPtr p_cell_62 = cell_population.GetCellUsingLocationIndex(13);
         TS_ASSERT_DELTA(p_cell_62->GetCellData()->GetItem("variable"), 0.8841, 1e-2);
+        TS_ASSERT_DELTA(p_cell_62->GetCellData()->GetItem("variable_grad_x"), -0.0117, 1e-2);
+        TS_ASSERT_DELTA(p_cell_62->GetCellData()->GetItem("variable_grad_y"), 0.0510, 1e-2);
+        TS_ASSERT_DELTA(p_cell_62->GetCellData()->GetItem("variable_grad_z"), -0.0435, 1e-2);
     }
 };
 

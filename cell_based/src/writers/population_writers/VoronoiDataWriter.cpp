@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodeBasedCellPopulation.hpp"
 #include "PottsBasedCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
+#include "Exception.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VoronoiDataWriter<ELEMENT_DIM, SPACE_DIM>::VoronoiDataWriter()
@@ -81,21 +82,25 @@ void VoronoiDataWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<EL
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VoronoiDataWriter<ELEMENT_DIM, SPACE_DIM>::Visit(CaBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
+    EXCEPTION("VoronoiDataWriter cannot be used with a CaBasedCellPopulation");
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VoronoiDataWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
+    EXCEPTION("VoronoiDataWriter cannot be used with a NodeBasedCellPopulation");
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VoronoiDataWriter<ELEMENT_DIM, SPACE_DIM>::Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
+    EXCEPTION("VoronoiDataWriter cannot be used with a PottsBasedCellPopulation");
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VoronoiDataWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
+    EXCEPTION("VoronoiDataWriter cannot be used with a VertexBasedCellPopulation");
 }
 
 // Explicit instantiation

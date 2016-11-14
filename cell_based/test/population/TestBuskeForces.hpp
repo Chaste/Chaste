@@ -65,14 +65,16 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         // Create a simple mesh
-        HoneycombMeshGenerator generator(2, 1, 0);
-        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        std::vector<Node<2>* > nodes;
+        nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, false, 1.0, 0.0));
+        nodes.push_back(new Node<2>(2, false, 1.0, 10.0));
 
-        // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(*p_generating_mesh, 2.5);
+        mesh.ConstructNodesWithoutMesh(nodes, 1.5);
         mesh.GetNode(0)->SetRadius(1.0);
         mesh.GetNode(1)->SetRadius(1.0);
+        mesh.GetNode(2)->SetRadius(1.0);
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -128,6 +130,15 @@ public:
 
             TS_ASSERT_DELTA(cell_population.GetNode(1)->rGetAppliedForce()[0], -analytical_force_magnitude, 1e-4);
             TS_ASSERT_DELTA(cell_population.GetNode(1)->rGetAppliedForce()[1], 0.0, 1e-4);
+
+            TS_ASSERT_DELTA(cell_population.GetNode(2)->rGetAppliedForce()[0], 0.0, 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(2)->rGetAppliedForce()[1], 0.0, 1e-4);
+        }
+
+        // Clean up
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            delete nodes[i];
         }
     }
 
@@ -138,14 +149,16 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         // Create a simple mesh
-        HoneycombMeshGenerator generator(2, 1, 0);
-        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        std::vector<Node<2>* > nodes;
+        nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, false, 1.0, 0.0));
+        nodes.push_back(new Node<2>(2, false, 1.0, 10.0));
 
-        // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(*p_generating_mesh, 2.5);
+        mesh.ConstructNodesWithoutMesh(nodes, 2.5);
         mesh.GetNode(0)->SetRadius(1.0);
         mesh.GetNode(1)->SetRadius(1.0);
+        mesh.GetNode(2)->SetRadius(1.0);
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -202,6 +215,15 @@ public:
 
             TS_ASSERT_DELTA(cell_population.GetNode(1)->rGetAppliedForce()[0], -analytical_force_magnitude, 1e-4);
             TS_ASSERT_DELTA(cell_population.GetNode(1)->rGetAppliedForce()[1], 0.0, 1e-4);
+
+            TS_ASSERT_DELTA(cell_population.GetNode(2)->rGetAppliedForce()[0], 0.0, 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(2)->rGetAppliedForce()[1], 0.0, 1e-4);
+        }
+
+        // Clean up
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            delete nodes[i];
         }
     }
 
