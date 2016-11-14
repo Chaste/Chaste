@@ -101,7 +101,7 @@ TetrahedralMesh<DIM, DIM>* NodeBasedCellPopulation<DIM>::GetTetrahedralMeshForPd
          node_iter != mpNodesOnlyMesh->GetNodeIteratorEnd();
          ++node_iter)
     {
-        temp_nodes.push_back(new Node<DIM>(node_iter->GetIndex(), node_iter->rGetLocation()));
+        temp_nodes.push_back(new Node<DIM>(node_iter->GetIndex(), node_iter->rGetLocation(), node_iter->IsBoundaryNode()));
     }
 
     return new MutableMesh<DIM,DIM>(temp_nodes);

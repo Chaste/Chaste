@@ -696,7 +696,7 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(NodeMap& map)
             this->mpDistributedVectorFactory = new DistributedVectorFactory(this->GetNumNodes());
         }
     }
-    if (SPACE_DIM==1)
+    if (SPACE_DIM == 1)
     {
         // Store the node locations
         std::vector<c_vector<double, SPACE_DIM> > old_node_locations;
@@ -721,11 +721,13 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(NodeMap& map)
         // Construct the nodes and boundary nodes
         for (unsigned node_index=0; node_index<old_node_locations.size(); node_index++)
         {
-            Node<SPACE_DIM>* p_node = new Node<SPACE_DIM>(node_index, old_node_locations[node_index], false);
+            // As we're in 1D, the boundary nodes are simply at either end of the mesh
+            bool is_boundary_node = (node_index==0 || node_index==old_node_locations.size()-1);
+
+            Node<SPACE_DIM>* p_node = new Node<SPACE_DIM>(node_index, old_node_locations[node_index], is_boundary_node);
             this->mNodes.push_back(p_node);
 
-            // As we're in 1D, the boundary nodes are simply at either end of the mesh
-            if (node_index==0 || node_index==old_node_locations.size()-1)
+            if (is_boundary_node)
             {
                 this->mBoundaryNodes.push_back(p_node);
             }
