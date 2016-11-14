@@ -676,9 +676,7 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(NodeMap& map)
 {
     // Make sure that we are in the correct dimension - this code will be eliminated at compile time
-    // LCOV_EXCL_START
-    assert( ELEMENT_DIM == SPACE_DIM );
-    // LCOV_EXCL_STOP
+    assert( ELEMENT_DIM == SPACE_DIM ); // LCOV_EXCL_LINE
 
     // Avoid some triangle/tetgen errors: need at least four
     // nodes for tetgen, and at least three for triangle
@@ -815,8 +813,8 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh()
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::vector<c_vector<unsigned, 5> > MutableMesh<ELEMENT_DIM, SPACE_DIM>::SplitLongEdges(double cutoffLength)
 {
-    assert(ELEMENT_DIM == 2);
-    assert(SPACE_DIM == 3);
+    assert(ELEMENT_DIM == 2); 	// LCOV_EXCL_LINE
+    assert(SPACE_DIM == 3); 	// LCOV_EXCL_LINE
 
     std::vector<c_vector<unsigned, 5> > history;
 
@@ -992,7 +990,7 @@ c_vector<unsigned, 3> MutableMesh<ELEMENT_DIM, SPACE_DIM>::SplitEdge(Node<SPACE_
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool MutableMesh<ELEMENT_DIM, SPACE_DIM>::CheckIsVoronoi(Element<ELEMENT_DIM, SPACE_DIM>* pElement, double maxPenetration)
 {
-    assert(ELEMENT_DIM == SPACE_DIM);
+    assert(ELEMENT_DIM == SPACE_DIM); 	// LCOV_EXCL_LINE
     unsigned num_nodes = pElement->GetNumNodes();
     std::set<unsigned> neighbouring_elements_indices;
     std::set< Element<ELEMENT_DIM,SPACE_DIM> *> neighbouring_elements;

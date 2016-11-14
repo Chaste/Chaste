@@ -145,6 +145,7 @@ public:
         TS_ASSERT_EQUALS(properties[0]->IsType<WildTypeCellMutationState>(), true);
         TS_ASSERT_EQUALS(properties[1]->IsType<ApcOneHitCellMutationState>(), true);
         TS_ASSERT_EQUALS(properties[2]->IsType<ApoptoticCellProperty>(), true);
+        TS_ASSERT_EQUALS((boost::static_pointer_cast<ApoptoticCellProperty>(properties[2]))->GetColour(), 6u);
         TS_ASSERT_EQUALS(properties[3]->IsType<CellLabel>(), true);
         p_instance->Clear();
     }

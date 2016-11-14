@@ -650,7 +650,6 @@ install(EXPORT chaste-targets
 #    COVERAGE      #
 ####################
 
-
 if (Chaste_COVERAGE)
          
     set(CTEST_COMMAND ctest)
@@ -661,14 +660,21 @@ if (Chaste_COVERAGE)
 		${LCOV_PATH} --directory . --zerocounters
 
 		# Run tests
-        COMMAND ${CTEST_COMMAND} "-L" "Continuous|Parallel" "--output-on-failure" 
-
-		# Capturing lcov counters and generating report
-		COMMAND ${LCOV_PATH} --config-file ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc --directory . --capture --output-file ${_outputname}.info
-        COMMAND ${LCOV_PATH} --config-file ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc --remove ${_outputname}.info /home/bob/petsc* /usr/* */test/* */3rdparty/* Debug/* cxxtest/* --output-file ${_outputname}.info.cleaned
-		COMMAND ${GENHTML_PATH} --config-file ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc --no-function-coverage -o ${_outputname} ${_outputname}.info.cleaned
-		COMMAND ${CMAKE_COMMAND} -E remove ${_outputname}.info ${_outputname}.info.cleaned
-
+        # runs the following, ignoring errors:
+        #    COMMAND ${CTEST_COMMAND} "-L" "Continuous|Parallel" "--output-on-failure" 
+        COMMAND ${CMAKE_COMMAND} 
+            "-DChaste_BINARY_DIR=${Chaste_BINARY_DIR}"
+            "-DCTEST_COMMAND=${CTEST_COMMAND}"
+            "-P" "${Chaste_SOURCE_DIR}/cmake/Modules/ChasteRunCoverageTests.cmake"
+            
+        # Capturing lcov counters and generating report
+        COMMAND ${LCOV_PATH} --config-file ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc --directory . --capture --output-file ${_outputname}.info
+        COMMAND ${LCOV_PATH} --config-file ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc --remove ${_outputname}.info /home/bob/petsc* /usr/* */fortests/* */test/* */3rdparty/* Debug/* cxxtest/* --output-file ${_outputname}.info.cleaned
+        set(_page_title "\"Chaste Coverage Results for commit ${Chaste_REVISION}\"")
+        COMMAND ${GENHTML_PATH} --title "${_page_title}" --config-file ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc --no-function-coverage -o ${_outputname} ${_outputname}.info.cleaned
+        COMMAND ${CMAKE_COMMAND} -E remove ${_outputname}.info ${_outputname}.info.cleaned
+        COMMAND ${PYTHON_EXECUTABLE} "${Chaste_SOURCE_DIR}/cmake/process_coverage_output.py" "${_outputname}"
+        
         DEPENDS Continuous Parallel
         WORKING_DIRECTORY ${Chaste_BINARY_DIR}
 		COMMENT "Resetting code coverage counters to zero.\nProcessing code coverage counters and generating report."

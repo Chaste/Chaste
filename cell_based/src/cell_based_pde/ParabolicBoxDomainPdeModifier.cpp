@@ -40,7 +40,7 @@ template<unsigned DIM>
 ParabolicBoxDomainPdeModifier<DIM>::ParabolicBoxDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde,
                                                                   boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition,
                                                                   bool isNeumannBoundaryCondition,
-                                                                  ChasteCuboid<DIM>* pMeshCuboid,
+                                                                  boost::shared_ptr<ChasteCuboid<DIM> > pMeshCuboid,
                                                                   double stepSize,
                                                                   Vec solution)
     : AbstractBoxDomainPdeModifier<DIM>(pPde,

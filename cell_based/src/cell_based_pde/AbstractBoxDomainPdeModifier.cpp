@@ -44,13 +44,13 @@ template<unsigned DIM>
 AbstractBoxDomainPdeModifier<DIM>::AbstractBoxDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde,
                                                                 boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition,
                                                                 bool isNeumannBoundaryCondition,
-                                                                ChasteCuboid<DIM>* pMeshCuboid,
+                                                                boost::shared_ptr<ChasteCuboid<DIM> > pMeshCuboid,
                                                                 double stepSize,
                                                                 Vec solution)
     : AbstractPdeModifier<DIM>(pPde,
-    		                   pBoundaryCondition,
-    		                   isNeumannBoundaryCondition,
-    		                   solution),
+                               pBoundaryCondition,
+                               isNeumannBoundaryCondition,
+                               solution),
       mpMeshCuboid(pMeshCuboid),
       mStepSize(stepSize),
       mSetBcsOnBoxBoundary(true)
@@ -58,7 +58,7 @@ AbstractBoxDomainPdeModifier<DIM>::AbstractBoxDomainPdeModifier(boost::shared_pt
     if (pMeshCuboid)
     {
         // We only need to generate mpFeMesh once, as it does not vary with time
-        this->GenerateFeMesh(*mpMeshCuboid, mStepSize);
+        this->GenerateFeMesh(mpMeshCuboid, mStepSize);
         this->mDeleteFeMesh = true;
     }
 }
@@ -95,28 +95,28 @@ void AbstractBoxDomainPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DI
 }
 
 template<unsigned DIM>
-void AbstractBoxDomainPdeModifier<DIM>::GenerateFeMesh(ChasteCuboid<DIM> meshCuboid, double stepSize)
+void AbstractBoxDomainPdeModifier<DIM>::GenerateFeMesh(boost::shared_ptr<ChasteCuboid<DIM> > pMeshCuboid, double stepSize)
 {
     // Create a regular coarse tetrahedral mesh
     this->mpFeMesh = new TetrahedralMesh<DIM,DIM>();
     switch (DIM)
     {
         case 1:
-            this->mpFeMesh->ConstructRegularSlabMesh(stepSize, meshCuboid.GetWidth(0));
+            this->mpFeMesh->ConstructRegularSlabMesh(stepSize, pMeshCuboid->GetWidth(0));
             break;
         case 2:
-            this->mpFeMesh->ConstructRegularSlabMesh(stepSize, meshCuboid.GetWidth(0), meshCuboid.GetWidth(1));
+            this->mpFeMesh->ConstructRegularSlabMesh(stepSize, pMeshCuboid->GetWidth(0), pMeshCuboid->GetWidth(1));
             break;
         case 3:
-            this->mpFeMesh->ConstructRegularSlabMesh(stepSize, meshCuboid.GetWidth(0), meshCuboid.GetWidth(1), meshCuboid.GetWidth(2));
+            this->mpFeMesh->ConstructRegularSlabMesh(stepSize, pMeshCuboid->GetWidth(0), pMeshCuboid->GetWidth(1), pMeshCuboid->GetWidth(2));
             break;
         default:
             NEVER_REACHED;
     }
 
     // Get centroid of meshCuboid
-    ChastePoint<DIM> upper = meshCuboid.rGetUpperCorner();
-    ChastePoint<DIM> lower = meshCuboid.rGetLowerCorner();
+    ChastePoint<DIM> upper = pMeshCuboid->rGetUpperCorner();
+    ChastePoint<DIM> lower = pMeshCuboid->rGetLowerCorner();
     c_vector<double,DIM> centre_of_cuboid = 0.5*(upper.rGetLocation() + lower.rGetLocation());
 
     // Find the centre of the PDE mesh

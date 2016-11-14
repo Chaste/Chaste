@@ -94,12 +94,6 @@ void AbstractCellCycleModel::ResetForDivision()
     mBirthTime = SimulationTime::Instance()->GetTime();
 }
 
-bool AbstractCellCycleModel::ReadyToDivide()
-{
-    // Currently not used as all CCMs inherit from AbstractPhaseBasedCellCycleModel
-    NEVER_REACHED;
-}
-
 void AbstractCellCycleModel::SetDimension(unsigned dimension)
 {
     if (dimension != 1 && dimension !=2 && dimension != 3 && dimension != UNSIGNED_UNSET)

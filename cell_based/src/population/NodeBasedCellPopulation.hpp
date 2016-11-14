@@ -212,7 +212,6 @@ private:
 
 protected:
 
-// LCOV_EXCL_STOP // Avoid prototypes being treated as code by gcov
     /**
      * Update mIsParticle if required by a remesh.
      *

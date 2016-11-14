@@ -218,7 +218,8 @@ public:
             {
                 unsigned node_index = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);
 
-                c_vector<double, 2> location = rCellPopulation.GetLocationOfCellCentre(*cell_iter);
+                c_vector<double, 2> location;
+                location = rCellPopulation.GetLocationOfCellCentre(*cell_iter);
                 c_vector<double, 2> force = -1.0 * mStrength * location;
                 rCellPopulation.GetNode(node_index)->AddAppliedForceContribution(force);
             }

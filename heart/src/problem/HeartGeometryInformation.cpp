@@ -262,7 +262,8 @@ HeartRegionType HeartGeometryInformation<SPACE_DIM>::GetHeartRegion(unsigned nod
         }
     }
 
-    return UNKNOWN;
+    NEVER_REACHED;
+    return UNKNOWN; // LCOV_EXCL_LINE
 }
 
 template<unsigned SPACE_DIM>
@@ -317,7 +318,7 @@ double HeartGeometryInformation<SPACE_DIM>::GetDistanceToEndo(unsigned nodeIndex
 
     // gcc wants to see a return statement at the end of the method.
     NEVER_REACHED;
-    return 0.0;
+    return 0.0; // LCOV_EXCL_LINE
 }
 
 template<unsigned SPACE_DIM>
