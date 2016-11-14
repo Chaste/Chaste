@@ -345,7 +345,7 @@ void OdeSystemInformation<DynamicallyLoadableLr91>::Initialise(void)
     this->mVariableUnits.push_back("");
     this->mInitialConditions.push_back(0.00187018);
 
-    this->mVariableNames.push_back("CaI");
+    this->mVariableNames.push_back("cytosolic_calcium_concentration");
     this->mVariableUnits.push_back("mMol");
     this->mInitialConditions.push_back(0.0002);
 
