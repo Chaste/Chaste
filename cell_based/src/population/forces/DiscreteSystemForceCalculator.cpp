@@ -325,3 +325,8 @@ std::vector<double> DiscreteSystemForceCalculator::GetExtremalAngles(unsigned in
 
     return extremal_angles;
 }
+
+void DiscreteSystemForceCalculator::SetEpsilon(double epsilon)
+{
+    mEpsilon = epsilon;
+}
