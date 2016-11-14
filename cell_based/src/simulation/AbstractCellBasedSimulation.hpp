@@ -249,11 +249,12 @@ protected:
      * Helper method to output additional simulations parameters and information defined in
      * subclasses to file.
      *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputAdditionalSimulationSetup(out_stream& rParamsFile)
-    {
-    }
+    virtual void OutputAdditionalSimulationSetup(out_stream& rParamsFile)=0;
 
 public:
 

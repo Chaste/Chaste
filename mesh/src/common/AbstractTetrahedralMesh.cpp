@@ -244,7 +244,7 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CheckOutwardNormals()
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructLinearMesh(unsigned width)
 {
-    assert(ELEMENT_DIM == 1);
+    assert(ELEMENT_DIM == 1); 	// LCOV_EXCL_LINE
 
     for (unsigned node_index=0; node_index<=width; node_index++)
     {
@@ -276,8 +276,8 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructLinearMesh(unsign
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRectangularMesh(unsigned width, unsigned height, bool stagger)
 {
-    assert(SPACE_DIM == 2);
-    assert(ELEMENT_DIM == 2);
+    assert(SPACE_DIM == 2); 	// LCOV_EXCL_LINE
+    assert(ELEMENT_DIM == 2); 	// LCOV_EXCL_LINE
 
     //Construct the nodes
     unsigned node_index=0;
@@ -385,8 +385,8 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructCuboid(unsigned w
         unsigned height,
         unsigned depth)
 {
-    assert(SPACE_DIM == 3);
-    assert(ELEMENT_DIM == 3);
+    assert(SPACE_DIM == 3); 	// LCOV_EXCL_LINE
+    assert(ELEMENT_DIM == 3); 	// LCOV_EXCL_LINE
     //Construct the nodes
 
     unsigned node_index = 0;
@@ -618,7 +618,7 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRegularSlabMeshWi
         unsigned dimension, double spaceStep,
         double width, double height, double depth)
 {
-    assert(ELEMENT_DIM == SPACE_DIM);
+    assert(ELEMENT_DIM == SPACE_DIM); 	// LCOV_EXCL_LINE
     if (dimension >= SPACE_DIM)
     {
         EXCEPTION("Cannot split on non-existent dimension");
@@ -1040,7 +1040,7 @@ unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetNearestElementIndex
                                                                                                  std::set<unsigned> testElements)
 {
     assert(testElements.size() > 0);
-    EXCEPT_IF_NOT(ELEMENT_DIM == SPACE_DIM); // CalculateInterpolationWeights hits an assertion otherwise
+    EXCEPT_IF_NOT(ELEMENT_DIM == SPACE_DIM); // LCOV_EXCL_LINE // CalculateInterpolationWeights hits an assertion otherwise
 
     double max_min_weight = -std::numeric_limits<double>::infinity();
     unsigned closest_index = 0;

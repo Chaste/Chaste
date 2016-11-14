@@ -213,10 +213,12 @@ std::string OutputFileHandler::MakeFoldersAndReturnFullPath(const std::string& r
                 }
             }
         }
+        // LCOV_EXCL_START
         catch (const fs::filesystem_error& e)
         {
             TERMINATE("Error making test output folder: " << e.what());
         }
+        // LCOV_EXCL_STOP
     }
 
     // Wait for master to finish before going on to use the directory.
@@ -294,10 +296,12 @@ FileFinder OutputFileHandler::CopyFileTo(const FileFinder& rSourceFile) const
         {
             fs::copy_file(from_path, to_path);
         }
+        // LCOV_EXCL_START
         catch (const fs::filesystem_error& e)
         {
             TERMINATE("Error copying file '" << rSourceFile.GetAbsolutePath() << "': " << e.what());
         }
+        // LCOV_EXCL_STOP
     }
     PetscTools::Barrier("OutputFileHandler::CopyFileTo");
     return FileFinder(to_path.string(), RelativeTo::Absolute);

@@ -114,14 +114,15 @@ void ReplicatableVector::Resize(unsigned size)
     {
         mpData = new double[mSize];
     }
+// LCOV_EXCL_START
     catch(std::bad_alloc &badAlloc)
     {
-// LCOV_EXCL_START
         std::cout << "Failed to allocate a ReplicatableVector of size " << size  << std::endl;
         PetscTools::ReplicateException(true);
         throw badAlloc;
-// LCOV_EXCL_STOP
     }
+// LCOV_EXCL_STOP
+
     PetscTools::ReplicateException(false);
 }
 

@@ -115,6 +115,8 @@ private:
         OdeSolution solution2 = pCell->Compute(0.0, 60.0);
         solution2.WriteToFile("TestIonicModels", "DynamicallyLoadableLr91GetIIonic", "ms", 100, false, 4);
 
+        // For coverage
+        TS_ASSERT_DELTA(pCell->GetIntracellularCalciumConcentration(), 0.0012, 1e-4);
         TS_ASSERT_DELTA(pCell->GetIIonic(), 1.9411, tolerance);
     }
 

@@ -49,11 +49,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Needed to convert mesh in order to write nodes to VTK (visualize as glyphs)
 #include "VtkMeshWriter.hpp"
 
+// LCOV_EXCL_START
 template<unsigned DIM>
 void CaBasedCellPopulation<DIM>::Validate()
 {
     NEVER_REACHED;
 }
+// LCOV_EXCL_STOP
 
 template<unsigned DIM>
 CaBasedCellPopulation<DIM>::CaBasedCellPopulation(PottsMesh<DIM>& rMesh,

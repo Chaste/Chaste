@@ -350,11 +350,13 @@ AbstractCardiacCellInterface* HeartConfigRelatedCellFactory<SPACE_DIM>::CreateCa
     return CreateCellWithIntracellularStimulus(node_specific_stimulus, node_index);
 }
 
+// LCOV_EXCL_START
 template<unsigned SPACE_DIM>
 void HeartConfigRelatedCellFactory<SPACE_DIM>::FillInCellularTransmuralAreas()
 {
     NEVER_REACHED;
 }
+// LCOV_EXCL_STOP
 
 template<>
 void HeartConfigRelatedCellFactory<3u>::FillInCellularTransmuralAreas()

@@ -758,12 +758,6 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDi
 }
 
 template<unsigned DIM>
-void PottsBasedCellPopulation<DIM>::WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile)
-{
-    *pVizSetupFile << "PottsSimulation\n";
-}
-
-template<unsigned DIM>
 double PottsBasedCellPopulation<DIM>::GetCellDataItemAtPdeNode(
     unsigned pdeNodeIndex,
     std::string& rVariableName,
