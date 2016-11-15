@@ -1452,12 +1452,16 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ReMeshElement(ImmersedBoundar
     unsigned previous_region = pElement->GetNode(0)->GetRegion();
     for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
     {
-        double local_dist = this->GetDistanceBetweenNodes(node_idx, (node_idx + 1) % num_nodes);
+        unsigned this_global_idx = pElement->GetNode(node_idx)->GetIndex();
+        unsigned next_global_idx = pElement->GetNode((node_idx + 1) % num_nodes)->GetIndex();
+
+        double local_dist = this->GetDistanceBetweenNodes(this_global_idx, next_global_idx);
         distances[node_idx] = local_dist;
 
         old_locations[node_idx] = c_vector<double, SPACE_DIM>(pElement->GetNode(node_idx)->rGetLocation());
 
         total_dist += local_dist;
+
 
         // If the region has changed, add this change to the region vectors
         if (pElement->GetNode(node_idx)->GetRegion() != previous_region)
@@ -1470,7 +1474,6 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ReMeshElement(ImmersedBoundar
         }
     }
 
-    PRINT_VARIABLE(region_changes.size());
 
     bool multiple_regions = region_changes.size() > 0;
 
@@ -1478,60 +1481,71 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ReMeshElement(ImmersedBoundar
     unsigned start_idx = multiple_regions ? region_changes[0] : 0;
     unsigned end_idx = start_idx + num_nodes;
 
-//
-//    // Process the cumulative distances between regions so as to
-//    if (multiple_regions)
-//    {
-//
-//    }
-//
-//    PRINT_VECTOR(distances);
-//
-//    // Calculate new locations for nodes. Location at start_idx will remain unchanged.
-//    std::vector<c_vector<double, SPACE_DIM> > new_locations(num_nodes);
-//    new_locations[0] = c_vector<double, SPACE_DIM>(pElement->GetNode(start_idx)->rGetLocation());
-//
-//    double node_spacing = cumulative_dists.back() / num_nodes;
-//
-//    PRINT_2_VARIABLES(cumulative_dists.back(), node_spacing);
-//    PRINT_2_VARIABLES(this->GetSurfaceAreaOfElement(pElement->GetIndex()), this->GetSurfaceAreaOfElement(pElement->GetIndex()) / num_nodes);
-//
-//    unsigned running_idx = 1;  // index in old locations
-////    unsigned running_region = pElement->GetNode(start_idx)->GetRegion();
-//
-//    for (unsigned idx = 1; idx < num_nodes; idx++)
-//    {
-//        double target_dist = node_spacing * idx;
-//
-//        while (target_dist > cumulative_dists[running_idx])
-//        {
-//            running_idx++;
-//        }
-//
-//        // Cumulative distance around the old shape is now at least the target distance, so the new location lies
-//        // somewhere between the nodes at running_idx and running_idx-1
-//        double extra_dist = target_dist - cumulative_dists[running_idx - 1];
-//        double seg_length = cumulative_dists[running_idx] - cumulative_dists[running_idx - 1];
-//        double ratio = extra_dist / seg_length;
-//
-//        const c_vector<double, SPACE_DIM>& r_a = pElement->GetNode((start_idx + running_idx - 1) % num_nodes)->rGetLocation();
-//        const c_vector<double, SPACE_DIM>& r_b = pElement->GetNode((start_idx + running_idx) % num_nodes)->rGetLocation();
-//
-//        new_locations[idx] = r_a + ratio * this->GetVectorFromAtoB(r_a, r_b);
-//
-//
-//
-//    }
-//
-//    for (unsigned idx = 0; idx < num_nodes; idx++)
-//    {
-//        PRINT_VECTOR(new_locations[idx]);
-//    }
-//
-////    pElement->GetNode(node_idx)->SetPoint(ChastePoint<SPACE_DIM>(new_location_a));
-//
+
+    /*
+     * Process the cumulative distances between regions so as to have the following, for each region i:
+     *
+     * region_changes[i]:   the index of the first node in the new region
+     * region_at_change[i]: the region number in that new region
+     * region_dists[i]:     the cumulative length of boundary in the new region
+     */
+    if (multiple_regions)
+    {
+        // There must be at least two changes in region in a closed boundary with more than one region
+        assert(region_changes.size() > 1);
+
+        for (unsigned region_idx = 0 ; region_idx < region_changes.size() - 1 ; region_idx++)
+        {
+            region_dists[region_idx] = region_dists[region_idx + 1] - region_dists[region_idx];
+        }
+
+        region_dists.back() = total_dist;
+    }
+    else // one one region, which we can represent in the following way:
+    {
+        region_changes.push_back(0);
+        region_at_change.push_back(pElement->GetNode(0)->GetRegion());
+        region_dists.push_back(total_dist);
+    }
+
+    double node_spacing = total_dist / num_nodes;
+
+//    PRINT_2_VARIABLES(total_dist, node_spacing);
+//    PRINT_2_VARIABLES(this->GetSurfaceAreaOfElement(pElement->GetIndex()), GetSurfaceAreaOfElement(pElement->GetIndex()) / num_nodes);
+
+    double cumulative_dist = 0.0;
+
+    for (unsigned new_idx = 1 + start_idx, old_idx = start_idx, region_idx = 0; new_idx < end_idx; new_idx++)
+    {
+//        PRINT_3_VARIABLES(new_idx, old_idx, region_idx);
+
+        double target_dist = node_spacing * (new_idx - start_idx);
+
+        while (target_dist > cumulative_dist)
+        {
+//            PRINT_3_VARIABLES("\t", target_dist, cumulative_dist);
+            cumulative_dist += distances[old_idx % num_nodes];
+            old_idx++;
+
+            while (cumulative_dist > region_dists[region_idx])
+            {
+                region_idx++;
+            }
+        }
 
 
+        // Cumulative distance around the old shape is now at least the target distance, so the new location lies
+        // somewhere between the nodes at old_idx and old_idx-1
+        double extra_dist = cumulative_dist - target_dist;
+        double ratio = extra_dist / distances[(old_idx - 1) % num_nodes];
+
+        c_vector<double, SPACE_DIM>& r_a = old_locations[(old_idx - 1) % num_nodes];
+        c_vector<double, SPACE_DIM>& r_b = old_locations[(old_idx) % num_nodes];
+
+        Node<SPACE_DIM>* p_node = pElement->GetNode(new_idx % num_nodes);
+        p_node->SetPoint(ChastePoint<SPACE_DIM>(r_b + ratio * this->GetVectorFromAtoB(r_b, r_a)));
+        p_node->SetRegion(region_at_change[region_idx]);
+    }
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
