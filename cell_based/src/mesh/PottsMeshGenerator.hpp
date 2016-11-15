@@ -91,13 +91,6 @@ public:
                        bool isPeriodicInZ = false);
 
     /**
-     * Null constructor for derived classes to call.
-     */
-    PottsMeshGenerator()
-    {
-    }
-
-    /**
      * Destructor - deletes the mesh object and pointer.
      */
     virtual ~PottsMeshGenerator();
