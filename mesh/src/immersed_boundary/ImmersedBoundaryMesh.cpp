@@ -1441,96 +1441,95 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ReMeshElement(ImmersedBoundar
 
 
     unsigned num_nodes = pElement->GetNumNodes();
+    double total_dist = 0.0;
 
     // Calculate distances between nodes, and where region numbers change
-    std::vector<double> distances(num_nodes, 0.0);  // distances[i] is dist between node i and node i+1
-    std::vector<unsigned> regions_changes;
+    std::vector<double> distances(num_nodes);  // distances[i] is dist between node i and node i+1
+    std::vector<unsigned> region_changes;
     std::vector<unsigned> region_at_change;
+    std::vector<double> region_dists;
+    std::vector<c_vector<double, SPACE_DIM> > old_locations(num_nodes);
     unsigned previous_region = pElement->GetNode(0)->GetRegion();
     for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
     {
-        distances[node_idx] = this->GetDistanceBetweenNodes(node_idx, (node_idx + 1) % num_nodes);
+        double local_dist = this->GetDistanceBetweenNodes(node_idx, (node_idx + 1) % num_nodes);
+        distances[node_idx] = local_dist;
+
+        old_locations[node_idx] = c_vector<double, SPACE_DIM>(pElement->GetNode(node_idx)->rGetLocation());
+
+        total_dist += local_dist;
 
         // If the region has changed, add this change to the region vectors
         if (pElement->GetNode(node_idx)->GetRegion() != previous_region)
         {
             previous_region = pElement->GetNode(node_idx)->GetRegion();
 
-            regions_changes.push_back(node_idx);
+            region_changes.push_back(node_idx);
             region_at_change.push_back(previous_region);
+            region_dists.push_back(total_dist);
         }
     }
 
-    // Are there corners in this element?  If so, record where they are
-    unsigned num_corners = pElement->rGetCornerNodes().size();
-    std::vector<unsigned> corner_indices;
-    std::vector<unsigned> corner_regions;
-    for (unsigned corner_idx = 0 ; corner_idx < num_corners ; corner_idx++)
-    {
-        corner_indices.push_back(pElement->rGetCornerNodes()[corner_idx]->GetIndex());
-        corner_regions.push_back(pElement->GetNode(corner_indices.back())->GetRegion());
-    }
+    PRINT_VARIABLE(region_changes.size());
 
-    // Start at first corner, if defined, else at 0
-    unsigned start_idx = num_corners > 0 ? pElement->rGetCornerNodes()[0]->GetIndex() : 0;
+    bool multiple_regions = region_changes.size() > 0;
+
+    // Are there any region changes in this element?  If so, start from the first region change, else at node 0
+    unsigned start_idx = multiple_regions ? region_changes[0] : 0;
     unsigned end_idx = start_idx + num_nodes;
 
-    // Calculate cumulative distances.  Create vector with zero in the first position
-    std::vector<double> cumulative_dists(1, 0.0);
-    cumulative_dists.reserve(num_nodes + 1);
-    for (unsigned node_idx = start_idx; node_idx < end_idx; node_idx++)
-    {
-        unsigned here = node_idx % num_nodes;
-        unsigned next = (here + 1) % num_nodes;
-
-        cumulative_dists.push_back(cumulative_dists.back() + this->GetDistanceBetweenNodes(here, next));
-    }
-
-    PRINT_VECTOR(cumulative_dists);
-
-    // Calculate new locations for nodes. Location at start_idx will remain unchanged.
-    std::vector<c_vector<double, SPACE_DIM> > new_locations(num_nodes);
-    new_locations[0] = c_vector<double, SPACE_DIM>(pElement->GetNode(start_idx)->rGetLocation());
-
-    double node_spacing = cumulative_dists.back() / num_nodes;
-
-    PRINT_2_VARIABLES(cumulative_dists.back(), node_spacing);
-    PRINT_2_VARIABLES(this->GetSurfaceAreaOfElement(pElement->GetIndex()), this->GetSurfaceAreaOfElement(pElement->GetIndex()) / num_nodes);
-
-    unsigned running_idx = 1;  // index in old locations
-//    unsigned running_region = pElement->GetNode(start_idx)->GetRegion();
-
-    for (unsigned idx = 1; idx < num_nodes; idx++)
-    {
-        double target_dist = node_spacing * idx;
-
-        while (target_dist > cumulative_dists[running_idx])
-        {
-            running_idx++;
-        }
-
-        // Cumulative distance around the old shape is now at least the target distance, so the new location lies
-        // somewhere between the nodes at running_idx and running_idx-1
-        double extra_dist = target_dist - cumulative_dists[running_idx - 1];
-        double seg_length = cumulative_dists[running_idx] - cumulative_dists[running_idx - 1];
-        double ratio = extra_dist / seg_length;
-
-        const c_vector<double, SPACE_DIM>& r_a = pElement->GetNode((start_idx + running_idx - 1) % num_nodes)->rGetLocation();
-        const c_vector<double, SPACE_DIM>& r_b = pElement->GetNode((start_idx + running_idx) % num_nodes)->rGetLocation();
-
-        new_locations[idx] = r_a + ratio * this->GetVectorFromAtoB(r_a, r_b);
-
-
-
-    }
-
-    for (unsigned idx = 0; idx < num_nodes; idx++)
-    {
-        PRINT_VECTOR(new_locations[idx]);
-    }
-
-//    pElement->GetNode(node_idx)->SetPoint(ChastePoint<SPACE_DIM>(new_location_a));
-
+//
+//    // Process the cumulative distances between regions so as to
+//    if (multiple_regions)
+//    {
+//
+//    }
+//
+//    PRINT_VECTOR(distances);
+//
+//    // Calculate new locations for nodes. Location at start_idx will remain unchanged.
+//    std::vector<c_vector<double, SPACE_DIM> > new_locations(num_nodes);
+//    new_locations[0] = c_vector<double, SPACE_DIM>(pElement->GetNode(start_idx)->rGetLocation());
+//
+//    double node_spacing = cumulative_dists.back() / num_nodes;
+//
+//    PRINT_2_VARIABLES(cumulative_dists.back(), node_spacing);
+//    PRINT_2_VARIABLES(this->GetSurfaceAreaOfElement(pElement->GetIndex()), this->GetSurfaceAreaOfElement(pElement->GetIndex()) / num_nodes);
+//
+//    unsigned running_idx = 1;  // index in old locations
+////    unsigned running_region = pElement->GetNode(start_idx)->GetRegion();
+//
+//    for (unsigned idx = 1; idx < num_nodes; idx++)
+//    {
+//        double target_dist = node_spacing * idx;
+//
+//        while (target_dist > cumulative_dists[running_idx])
+//        {
+//            running_idx++;
+//        }
+//
+//        // Cumulative distance around the old shape is now at least the target distance, so the new location lies
+//        // somewhere between the nodes at running_idx and running_idx-1
+//        double extra_dist = target_dist - cumulative_dists[running_idx - 1];
+//        double seg_length = cumulative_dists[running_idx] - cumulative_dists[running_idx - 1];
+//        double ratio = extra_dist / seg_length;
+//
+//        const c_vector<double, SPACE_DIM>& r_a = pElement->GetNode((start_idx + running_idx - 1) % num_nodes)->rGetLocation();
+//        const c_vector<double, SPACE_DIM>& r_b = pElement->GetNode((start_idx + running_idx) % num_nodes)->rGetLocation();
+//
+//        new_locations[idx] = r_a + ratio * this->GetVectorFromAtoB(r_a, r_b);
+//
+//
+//
+//    }
+//
+//    for (unsigned idx = 0; idx < num_nodes; idx++)
+//    {
+//        PRINT_VECTOR(new_locations[idx]);
+//    }
+//
+////    pElement->GetNode(node_idx)->SetPoint(ChastePoint<SPACE_DIM>(new_location_a));
+//
 
 
 }
