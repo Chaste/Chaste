@@ -804,12 +804,12 @@ std::set<unsigned> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetNeighbouringElementInd
     return neighbouring_element_indices;
 }
 
-
 /// \cond Get Doxygen to ignore, since it's confused by these templates
 template<>
 void VertexMesh<1,1>::ConstructFromMeshReader(AbstractMeshReader<1,1>& rMeshReader)
 /// \endcond Get Doxygen to ignore, since it's confused by these templates
 {
+    EXCEPTION("VertexMesh<1,1>::ConstructFromMeshReader() is not implemented");
 }
 
 /// \cond Get Doxygen to ignore, since it's confused by these templates
@@ -817,6 +817,7 @@ template<>
 void VertexMesh<1,2>::ConstructFromMeshReader(AbstractMeshReader<1,2>& rMeshReader)
 /// \endcond Get Doxygen to ignore, since it's confused by these templates
 {
+    EXCEPTION("VertexMesh<1,2>::ConstructFromMeshReader() is not implemented");
 }
 
 /// \cond Get Doxygen to ignore, since it's confused by these templates
@@ -824,6 +825,7 @@ template<>
 void VertexMesh<1,3>::ConstructFromMeshReader(AbstractMeshReader<1,3>& rMeshReader)
 /// \endcond Get Doxygen to ignore, since it's confused by these templates
 {
+    EXCEPTION("VertexMesh<1,3>::ConstructFromMeshReader() is not implemented");
 }
 
 /// \cond Get Doxygen to ignore, since it's confused by these templates
@@ -831,6 +833,7 @@ template<>
 void VertexMesh<2,3>::ConstructFromMeshReader(AbstractMeshReader<2,3>& rMeshReader)
 /// \endcond Get Doxygen to ignore, since it's confused by these templates
 {
+    EXCEPTION("VertexMesh<2,3>::ConstructFromMeshReader() is not implemented");
 }
 
 /// \cond Get Doxygen to ignore, since it's confused by these templates
