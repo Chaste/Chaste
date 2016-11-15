@@ -134,7 +134,7 @@ public:
     void WriteResultsToFile(std::string simulationOutputDirectory);
 
     /**
-     * Set #Epsilon.
+     * Set #mEpsilon.
      *
      * @param epsilon the new value of mEpsilon
      */
