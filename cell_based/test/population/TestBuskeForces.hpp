@@ -71,7 +71,7 @@ public:
         nodes.push_back(new Node<2>(2, false, 1.0, 10.0));
 
         NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(nodes, 1.5);
+        mesh.ConstructNodesWithoutMesh(nodes, 20.0);
         mesh.GetNode(0)->SetRadius(1.0);
         mesh.GetNode(1)->SetRadius(1.0);
         mesh.GetNode(2)->SetRadius(1.0);
@@ -100,7 +100,7 @@ public:
         TS_ASSERT_DELTA(buske_adhesive_force.GetCutOffLength(), 1.5, 1e-6);
         TS_ASSERT_DELTA(buske_adhesive_force.GetAdhesionEnergyParameter(), 1.0, 1e-6);
 
-        buske_adhesive_force.SetCutOffLength(DBL_MAX);
+        buske_adhesive_force.SetCutOffLength(5.0);
         buske_adhesive_force.SetAdhesionEnergyParameter(200);
 
         // Test node force calculation
@@ -155,7 +155,7 @@ public:
         nodes.push_back(new Node<2>(2, false, 1.0, 10.0));
 
         NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(nodes, 2.5);
+        mesh.ConstructNodesWithoutMesh(nodes, 20.0);
         mesh.GetNode(0)->SetRadius(1.0);
         mesh.GetNode(1)->SetRadius(1.0);
         mesh.GetNode(2)->SetRadius(1.0);
@@ -184,7 +184,7 @@ public:
         TS_ASSERT_DELTA(buske_elastic_force.GetCutOffLength(), 1.5, 1e-6);
         TS_ASSERT_DELTA(buske_elastic_force.GetDeformationEnergyParameter(), 1.0, 1e-6);
 
-        buske_elastic_force.SetCutOffLength(DBL_MAX);
+        buske_elastic_force.SetCutOffLength(5.0);
         buske_elastic_force.SetDeformationEnergyParameter(4.0/3.0);
 
         // Test node force calculation
