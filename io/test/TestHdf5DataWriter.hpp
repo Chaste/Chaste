@@ -270,6 +270,10 @@ public:
         DistributedVectorFactory factory(number_nodes);
 
         Hdf5DataWriter writer(factory, "TestHdf5DataWriter", "hdf5_test_multi_column", false);
+
+        // Coverage
+        TS_ASSERT_EQUALS(writer.GetUsingCache(), false);
+
         writer.DefineFixedDimension(number_nodes);
 
         int node_id = writer.DefineVariable("Node","dimensionless");
