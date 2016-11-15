@@ -157,13 +157,6 @@ bool CompareDoubles::IsNearZero(double number, double tolerance)
     return fabs(number) <= fabs(tolerance);
 }
 
-/**
- * Divide two non-negative floating point numbers, avoiding overflow and underflow.
- * @param numerator  the number to be divided
- * @param divisor  the number to divide by
- */
-double SafeDivide(double numerator, double divisor);
-
 double SafeDivide(double numerator, double divisor)
 {
     // Avoid overflow
@@ -179,7 +172,6 @@ double SafeDivide(double numerator, double divisor)
     }
 
     return numerator/divisor;
-
 }
 
 bool CompareDoubles::WithinRelativeTolerance(double number1, double number2, double tolerance)
