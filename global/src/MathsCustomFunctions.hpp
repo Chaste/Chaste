@@ -90,7 +90,8 @@ unsigned CeilDivide(unsigned numerator, unsigned denominator);
 double Signum(double value);
 
 /**
- * Divide two non-negative floating point numbers, avoiding overflow and underflow.
+ * @return the results of dividing two non-negative floating point numbers, avoiding overflow and underflow.
+ *
  * @param numerator  the number to be divided
  * @param divisor  the number to divide by
  */
