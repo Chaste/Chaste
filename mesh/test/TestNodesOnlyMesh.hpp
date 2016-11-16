@@ -399,6 +399,10 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 0u);
         TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 0u);
         TS_ASSERT_EQUALS(mesh.GetNumAllNodes(), num_boxes);
+
+        // Coverage of rGetInitiallyOwnedNodes()
+        std::vector<bool>& r_nodes = mesh.rGetInitiallyOwnedNodes();
+        TS_ASSERT_EQUALS(r_nodes.size(), 5u);
     }
 
     void TestGetNextAvailableIndex()
