@@ -1547,8 +1547,18 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ReMeshElement(ImmersedBoundar
         c_vector<double, SPACE_DIM>& r_a = old_locations[(old_idx - 1) % num_nodes];
         c_vector<double, SPACE_DIM>& r_b = old_locations[(old_idx) % num_nodes];
 
+        // Calculate new point, and account for periodicity
+        c_vector<double, SPACE_DIM> new_location = r_b + ratio * this->GetVectorFromAtoB(r_b, r_a);
+        for (unsigned dim = 0; dim < SPACE_DIM; dim++)
+        {
+            if (new_location[dim] < 0.0 || new_location[dim] >= 1.0)
+            {
+                new_location[dim] = fmod(new_location[dim] + 1.0, 1.0);
+            }
+        }
+
         Node<SPACE_DIM>* p_node = pElement->GetNode(new_idx % num_nodes);
-        p_node->SetPoint(ChastePoint<SPACE_DIM>(r_b + ratio * this->GetVectorFromAtoB(r_b, r_a)));
+        p_node->SetPoint(ChastePoint<SPACE_DIM>(new_location));
         p_node->SetRegion(region_at_change[region_idx]);
     }
 }
@@ -1613,7 +1623,17 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ReMeshLamina(ImmersedBoundary
         c_vector<double, SPACE_DIM>& r_a = old_locations[old_idx - 1];
         c_vector<double, SPACE_DIM>& r_b = old_locations[(old_idx) % num_nodes];
 
-        pLamina->GetNode(new_idx)->SetPoint(ChastePoint<SPACE_DIM>(r_b + ratio * this->GetVectorFromAtoB(r_b, r_a)));
+        // Calculate new point, and account for periodicity
+        c_vector<double, SPACE_DIM> new_location = r_b + ratio * this->GetVectorFromAtoB(r_b, r_a);
+        for (unsigned dim = 0; dim < SPACE_DIM; dim++)
+        {
+            if (new_location[dim] < 0.0 || new_location[dim] >= 1.0)
+            {
+                new_location[dim] = fmod(new_location[dim] + 1.0, 1.0);
+            }
+        }
+
+        pLamina->GetNode(new_idx)->SetPoint(ChastePoint<SPACE_DIM>(new_location));
     }
 }
 
