@@ -1447,7 +1447,7 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ReMeshElement(ImmersedBoundar
 
     // Two vectors the same length as teh number of nodes
     std::vector<c_vector<double, SPACE_DIM> > old_locations(num_nodes);
-    std::vector<double> distances(num_nodes);  // distances[i] is dist between node i and node i+1
+    std::vector<double> distances(num_nodes); // distances[i] is dist between node i and node i+1
 
     /*
      * Need to store information about node region changes, which we do as illustrated in the following example:
@@ -1503,7 +1503,7 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ReMeshElement(ImmersedBoundar
         // There must be at least two changes in region in a closed boundary with more than one region
         assert(region_changes.size() > 1);
 
-        for (unsigned region_idx = 0 ; region_idx < region_changes.size() - 1 ; region_idx++)
+        for (unsigned region_idx = 0; region_idx < region_changes.size() - 1; region_idx++)
         {
             region_dists[region_idx] = region_dists[region_idx + 1] - region_dists[region_idx];
         }
@@ -1571,7 +1571,7 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ReMeshLamina(ImmersedBoundary
 
     // Two vectors the same length as teh number of nodes
     std::vector<c_vector<double, SPACE_DIM> > old_locations(num_nodes);
-    std::vector<double> distances(num_nodes);  // distances[i] is dist between node i and node i+1
+    std::vector<double> distances(num_nodes); // distances[i] is dist between node i and node i+1
 
     double total_dist = 0.0;
     for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
@@ -1587,7 +1587,7 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ReMeshLamina(ImmersedBoundary
         // Store a copy of the node location: this allows us to directly update nodes positions in the next loop
         old_locations[node_idx] = c_vector<double, SPACE_DIM>(pLamina->GetNode(node_idx)->rGetLocation());
     }
-    
+
     // Loop through nodes and update their locations
     double node_spacing = total_dist / num_nodes;
     double cumulative_dist = 0.0;
