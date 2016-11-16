@@ -1553,8 +1553,65 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ReMeshElement(ImmersedBoundar
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ReMeshLamina(ImmersedBoundaryElement<ELEMENT_DIM - 1, SPACE_DIM>* pLamina)
 {
-    std::cout << (pLamina->GetIndex()) << std::endl;
     assert(SPACE_DIM == 2);
+
+    /*
+     * This is a specialisation of ReMeshElement() which, because there will only be one region for the entire lamina,
+     * can be simplified significantly.
+     *
+     * Re-position nodes along the lamina so as to have them evenly spaced along the boundary. We proceed as follows:
+     *
+     * 1. Loop through all nodes and gather necessary information: a record of the current node locations and the
+     *    distances between nodes.
+     *
+     * 2. Reposition each node to be a target distance from the previous, by linear interpolation along the lamina.
+     */
+
+    unsigned num_nodes = pLamina->GetNumNodes();
+
+    // Two vectors the same length as teh number of nodes
+    std::vector<c_vector<double, SPACE_DIM> > old_locations(num_nodes);
+    std::vector<double> distances(num_nodes);  // distances[i] is dist between node i and node i+1
+
+    double total_dist = 0.0;
+    for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
+    {
+        // Global indices of the node at this local index, and the next one
+        unsigned this_global_idx = pLamina->GetNode(node_idx)->GetIndex();
+        unsigned next_global_idx = pLamina->GetNode((node_idx + 1) % num_nodes)->GetIndex();
+
+        double local_dist = this->GetDistanceBetweenNodes(this_global_idx, next_global_idx);
+        distances[node_idx] = local_dist;
+        total_dist += local_dist;
+
+        // Store a copy of the node location: this allows us to directly update nodes positions in the next loop
+        old_locations[node_idx] = c_vector<double, SPACE_DIM>(pLamina->GetNode(node_idx)->rGetLocation());
+    }
+    
+    // Loop through nodes and update their locations
+    double node_spacing = total_dist / num_nodes;
+    double cumulative_dist = 0.0;
+
+    for (unsigned new_idx = 1, old_idx = 0; new_idx < num_nodes; new_idx++)
+    {
+        double target_dist = node_spacing * new_idx;
+
+        while (target_dist > cumulative_dist)
+        {
+            cumulative_dist += distances[old_idx % num_nodes];
+            old_idx++;
+        }
+
+        // Cumulative distance around the old shape is now at least the target distance, so the new location lies
+        // somewhere between the nodes at old_idx and old_idx-1
+        double extra_dist = cumulative_dist - target_dist;
+        double ratio = extra_dist / distances[old_idx - 1];
+
+        c_vector<double, SPACE_DIM>& r_a = old_locations[old_idx - 1];
+        c_vector<double, SPACE_DIM>& r_b = old_locations[(old_idx) % num_nodes];
+
+        pLamina->GetNode(new_idx)->SetPoint(ChastePoint<SPACE_DIM>(r_b + ratio * this->GetVectorFromAtoB(r_b, r_a)));
+    }
 }
 
 // Explicit instantiation
