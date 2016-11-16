@@ -177,6 +177,166 @@ public:
             TS_ASSERT_DELTA(p_mesh->GetSkewnessOfElementMassDistributionAboutAxis(0, axis) + hand_calculated_skewness, 0.0, 1e-9);
         }
     }
+
+    void TestReMeshElement() throw(Exception)
+    {
+        // ReMeshElement where nothing should change, no regions involved
+        {
+            std::vector<Node<2>*> nodes;
+            nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+            nodes.push_back(new Node<2>(1, true, 0.1, 0.0));
+            nodes.push_back(new Node<2>(2, true, 0.1, 0.1));
+            nodes.push_back(new Node<2>(3, true, 0.0, 0.1));
+
+            std::vector<ImmersedBoundaryElement<2, 2>*> elems;
+            elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
+
+            ImmersedBoundaryMesh<2, 2>* p_mesh = new ImmersedBoundaryMesh<2, 2>(nodes, elems);
+
+            unsigned num_nodes = p_mesh->GetElement(0)->GetNumNodes();
+
+            // Get locations before ReMesh
+            std::vector<double> old_pos;
+            for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
+            {
+                old_pos.push_back(norm_2(p_mesh->GetElement(0)->GetNode(node_idx)->rGetLocation()));
+            }
+
+            p_mesh->ReMesh();
+
+            for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
+            {
+                TS_ASSERT_DELTA(old_pos[node_idx], norm_2(p_mesh->GetElement(0)->GetNode(node_idx)->rGetLocation()), 1e-12);
+            }
+
+            delete p_mesh;
+        }
+
+        // ReMeshElement where nothing should change, with regions involved
+        {
+            std::vector<Node<2>*> nodes;
+            nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+            nodes.push_back(new Node<2>(1, true, 0.1, 0.0));
+            nodes.push_back(new Node<2>(2, true, 0.1, 0.1));
+            nodes.push_back(new Node<2>(3, true, 0.0, 0.1));
+
+            std::vector<ImmersedBoundaryElement<2, 2>*> elems;
+            elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
+
+            ImmersedBoundaryMesh<2, 2>* p_mesh = new ImmersedBoundaryMesh<2, 2>(nodes, elems);
+
+            unsigned num_nodes = p_mesh->GetElement(0)->GetNumNodes();
+
+            p_mesh->GetElement(0)->GetNode(0)->SetRegion(1);
+            p_mesh->GetElement(0)->GetNode(1)->SetRegion(1);
+            p_mesh->GetElement(0)->GetNode(2)->SetRegion(2);
+            p_mesh->GetElement(0)->GetNode(3)->SetRegion(2);
+
+            // Get locations before ReMesh
+            std::vector<double> old_pos;
+            std::vector<unsigned> old_regions;
+            for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
+            {
+                old_pos.push_back(norm_2(p_mesh->GetElement(0)->GetNode(node_idx)->rGetLocation()));
+                old_regions.push_back(p_mesh->GetElement(0)->GetNode(node_idx)->GetRegion());
+            }
+
+            p_mesh->ReMesh();
+
+            for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
+            {
+                TS_ASSERT_DELTA(old_pos[node_idx], norm_2(p_mesh->GetElement(0)->GetNode(node_idx)->rGetLocation()), 1e-12);
+                TS_ASSERT_EQUALS(old_regions[node_idx], p_mesh->GetElement(0)->GetNode(node_idx)->GetRegion());
+            }
+
+            delete p_mesh;
+        }
+
+        // ReMeshElement where positions should change, no regions involved
+        {
+            std::vector<Node<2>*> nodes;
+            nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+            nodes.push_back(new Node<2>(1, true, 0.1, 0.0));
+            nodes.push_back(new Node<2>(2, true, 0.1, 0.1));
+
+            std::vector<ImmersedBoundaryElement<2, 2>*> elems;
+            elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
+
+            ImmersedBoundaryMesh<2, 2>* p_mesh = new ImmersedBoundaryMesh<2, 2>(nodes, elems);
+
+            p_mesh->ReMesh();
+
+            double cumulative_dist = 0.2 + sqrt(0.02);
+            double node_spacing = cumulative_dist / 3.0;
+            double epsilon = node_spacing - 0.1;
+
+            // First node should not move
+            TS_ASSERT_DELTA(p_mesh->GetElement(0)->GetNode(0)->rGetLocation()[0], 0.0, 1e-12);
+            TS_ASSERT_DELTA(p_mesh->GetElement(0)->GetNode(0)->rGetLocation()[1], 0.0, 1e-12);
+
+            // Second node up back edge slightly
+            TS_ASSERT_DELTA(p_mesh->GetElement(0)->GetNode(1)->rGetLocation()[0], 0.1, 1e-12);
+            TS_ASSERT_DELTA(p_mesh->GetElement(0)->GetNode(1)->rGetLocation()[1], epsilon, 1e-12);
+
+            // Third node down diagonal towards (0,0)
+            TS_ASSERT_DELTA(p_mesh->GetElement(0)->GetNode(2)->rGetLocation()[0], 0.1 - 0.2 * epsilon / sqrt(0.02), 1e-12);
+            TS_ASSERT_DELTA(p_mesh->GetElement(0)->GetNode(2)->rGetLocation()[1], 0.1 - 0.2 * epsilon / sqrt(0.02), 1e-12);
+
+            delete p_mesh;
+        }
+
+        // ReMeshElement where positions should change, with regions involved
+        {
+            std::vector<Node<2>*> nodes;
+            nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+            nodes.push_back(new Node<2>(1, true, 0.1, 0.0));
+            nodes.push_back(new Node<2>(2, true, 0.1, 0.1));
+            nodes.push_back(new Node<2>(3, true, 0.0, 0.1));
+            nodes.push_back(new Node<2>(4, true, 0.0, 0.03));
+
+            std::vector<ImmersedBoundaryElement<2, 2>*> elems;
+            elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
+
+            ImmersedBoundaryMesh<2, 2>* p_mesh = new ImmersedBoundaryMesh<2, 2>(nodes, elems);
+
+            p_mesh->GetElement(0)->GetNode(0)->SetRegion(1);
+            p_mesh->GetElement(0)->GetNode(1)->SetRegion(1);
+            p_mesh->GetElement(0)->GetNode(2)->SetRegion(2);
+            p_mesh->GetElement(0)->GetNode(3)->SetRegion(2);
+            p_mesh->GetElement(0)->GetNode(4)->SetRegion(1);
+
+            p_mesh->ReMesh();
+
+            // Third node should not move
+            TS_ASSERT_DELTA(p_mesh->GetElement(0)->GetNode(2)->rGetLocation()[0], 0.1, 1e-12);
+            TS_ASSERT_DELTA(p_mesh->GetElement(0)->GetNode(2)->rGetLocation()[1], 0.1, 1e-12);
+
+            // Fourth moves towards third
+            TS_ASSERT_DELTA(p_mesh->GetElement(0)->GetNode(3)->rGetLocation()[0], 0.02, 1e-12);
+            TS_ASSERT_DELTA(p_mesh->GetElement(0)->GetNode(3)->rGetLocation()[1], 0.1, 1e-12);
+
+            // Fifth moves towards fourth
+            TS_ASSERT_DELTA(p_mesh->GetElement(0)->GetNode(4)->rGetLocation()[0], 0.0, 1e-12);
+            TS_ASSERT_DELTA(p_mesh->GetElement(0)->GetNode(4)->rGetLocation()[1], 0.04, 1e-12);
+
+            // First moves towards second
+            TS_ASSERT_DELTA(p_mesh->GetElement(0)->GetNode(0)->rGetLocation()[0], 0.04, 1e-12);
+            TS_ASSERT_DELTA(p_mesh->GetElement(0)->GetNode(0)->rGetLocation()[1], 0.0, 1e-12);
+
+            // Second moves towards third
+            TS_ASSERT_DELTA(p_mesh->GetElement(0)->GetNode(1)->rGetLocation()[0], 0.1, 1e-12);
+            TS_ASSERT_DELTA(p_mesh->GetElement(0)->GetNode(1)->rGetLocation()[1], 0.02, 1e-12);
+
+            // Due to reposition of nodes, node 4 should now be part of region 2
+            TS_ASSERT_EQUALS(p_mesh->GetElement(0)->GetNode(0)->GetRegion(), 1u)
+            TS_ASSERT_EQUALS(p_mesh->GetElement(0)->GetNode(1)->GetRegion(), 1u)
+            TS_ASSERT_EQUALS(p_mesh->GetElement(0)->GetNode(2)->GetRegion(), 2u)
+            TS_ASSERT_EQUALS(p_mesh->GetElement(0)->GetNode(3)->GetRegion(), 2u)
+            TS_ASSERT_EQUALS(p_mesh->GetElement(0)->GetNode(4)->GetRegion(), 2u)
+
+            delete p_mesh;
+        }
+    }
 };
 
 #endif /*TESTIMMERSEDBOUNDARYMESH_HPP_*/
