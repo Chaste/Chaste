@@ -1424,6 +1424,8 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh()
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ReMeshElement(ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>* pElement)
 {
+    assert(SPACE_DIM == 2);
+
     /*
      * Method outline:
      *
@@ -1552,6 +1554,7 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ReMeshLamina(ImmersedBoundaryElement<ELEMENT_DIM - 1, SPACE_DIM>* pLamina)
 {
     std::cout << (pLamina->GetIndex()) << std::endl;
+    assert(SPACE_DIM == 2);
 }
 
 // Explicit instantiation
