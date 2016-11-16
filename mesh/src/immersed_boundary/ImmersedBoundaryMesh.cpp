@@ -1504,14 +1504,16 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ReMeshElement(ImmersedBoundar
         // There must be at least two changes in region in a closed boundary with more than one region
         assert(region_changes.size() > 1);
 
+        double region_offset = region_dists[0];
+
         for (unsigned region_idx = 0; region_idx < region_changes.size() - 1; region_idx++)
         {
             // Subtract an additional fudge factor of 1e-15 so that, if nodes are already evenly spaced, the regions
             // do not get offset by one place due to a strict equality in position
-            region_dists[region_idx] = region_dists[region_idx + 1] - region_dists[region_idx] - 1e-15;
+            region_dists[region_idx] = region_dists[region_idx + 1] - region_offset - 1e-15;
         }
 
-        region_dists.back() = total_dist;
+        region_dists.back() = total_dist - 1e-15;
     }
     else // one one region, which we can represent in the following way:
     {
