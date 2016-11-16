@@ -71,11 +71,6 @@ def IsTestFile(test_dir, test_file_path):
     #print test_dir, test_file, test_ext, is_test
     return is_test
     
-def IsInTestPack(test_dir, test_file_path, pack_name):
-    assert IsTestFile(test_dir, test_file_path)
-    """Does the given file live in a given test suite?"""
-    
-
 test_packs  = set()  # Names of test packs found
 orphans     = set()  # Names of any orphaned test files
 found_tests = set()  # Names of tests found in test packs
