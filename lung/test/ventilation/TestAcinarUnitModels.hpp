@@ -350,7 +350,7 @@ public:
 
         // Coverage
         TS_ASSERT_DELTA(acinus.GetFlow(), 0.0, 1e-6);
-        TS_ASSERT_DELTA(acinus.GetStretchRatio(), 1.26 1e-6);
+        TS_ASSERT_DELTA(acinus.GetStretchRatio(), 1.26, 1e-6);
 
         // Test against corresponding ODE
         double viscosity = 1.92e-5;               //Pa s
