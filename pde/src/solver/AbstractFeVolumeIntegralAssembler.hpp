@@ -139,6 +139,7 @@ protected:
      * @param rGradU The gradient of the unknown as a matrix, rGradU(i,j) = d(u_i)/d(X_j).
      * @param pElement Pointer to the element.
      */
+    // LCOV_EXCL_START
     virtual c_matrix<double,PROBLEM_DIM*(ELEMENT_DIM+1),PROBLEM_DIM*(ELEMENT_DIM+1)> ComputeMatrixTerm(
         c_vector<double, ELEMENT_DIM+1>& rPhi,
         c_matrix<double, SPACE_DIM, ELEMENT_DIM+1>& rGradPhi,
@@ -152,6 +153,7 @@ protected:
         NEVER_REACHED;
         return zero_matrix<double>(PROBLEM_DIM*(ELEMENT_DIM+1),PROBLEM_DIM*(ELEMENT_DIM+1));
     }
+    // LCOV_EXCL_STOP
 
     /**
      * @return the vector to be added to element stiffness vector
@@ -172,6 +174,7 @@ protected:
      * @param rGradU The gradient of the unknown as a matrix, rGradU(i,j) = d(u_i)/d(X_j)
      * @param pElement Pointer to the element
      */
+    // LCOV_EXCL_START
     virtual c_vector<double,PROBLEM_DIM*(ELEMENT_DIM+1)> ComputeVectorTerm(
         c_vector<double, ELEMENT_DIM+1>& rPhi,
         c_matrix<double, SPACE_DIM, ELEMENT_DIM+1>& rGradPhi,
@@ -185,6 +188,7 @@ protected:
         NEVER_REACHED;
         return zero_vector<double>(PROBLEM_DIM*(ELEMENT_DIM+1));
     }
+    // LCOV_EXCL_STOP
 
 
     /**

@@ -657,7 +657,7 @@ void LinearSystem::SetPcType(const char* pcType, boost::shared_ptr<std::vector<P
 
             if (!mpBathNodes)
             {
-                TERMINATE("You must provide a list of bath nodes when using TwoLevelsBlockDiagonalPC");
+                TERMINATE("You must provide a list of bath nodes when using TwoLevelsBlockDiagonalPC"); // LCOV_EXCL_LINE
             }
             mpTwoLevelsBlockDiagonalPC = new PCTwoLevelsBlockDiagonal(mKspSolver, *mpBathNodes);
         }
@@ -809,7 +809,7 @@ Vec LinearSystem::Solve(Vec lhsGuess)
             {
                 if (!mpBathNodes)
                 {
-                    TERMINATE("You must provide a list of bath nodes when using TwoLevelsBlockDiagonalPC");
+                    TERMINATE("You must provide a list of bath nodes when using TwoLevelsBlockDiagonalPC"); // LCOV_EXCL_LINE
                 }
                 mpTwoLevelsBlockDiagonalPC = new PCTwoLevelsBlockDiagonal(mKspSolver, *mpBathNodes);
 #ifdef TRACE_KSP

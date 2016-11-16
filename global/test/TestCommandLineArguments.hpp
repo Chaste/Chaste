@@ -161,9 +161,9 @@ public:
         CommandLineArguments::Instance()->p_argv = &new_argv;
 
         // Test OptionExists()
-        TS_ASSERT(CommandLineArguments::Instance()->OptionExists("-myoption"));
+        TS_ASSERT_EQUALS(CommandLineArguments::Instance()->OptionExists("-myoption"), true);
 
-        TS_ASSERT( ! CommandLineArguments::Instance()->OptionExists("-asddsgijdfgokgfgurgher") );
+        TS_ASSERT_EQUALS(CommandLineArguments::Instance()->OptionExists("-asddsgijdfgokgfgurgher"), false);
 
         TS_ASSERT_THROWS_THIS(CommandLineArguments::Instance()->OptionExists("-42"),
                 "A command line option must begin with '-' followed by a non-numeric character.");
@@ -173,6 +173,9 @@ public:
 
         TS_ASSERT_THROWS_THIS(CommandLineArguments::Instance()->GetStringsCorrespondingToOption("-mynonsense"),
                 "Command line option '-mynonsense' does not exist");
+
+        // Test GetNumberOfArgumentsForOption()
+        TS_ASSERT_EQUALS(CommandLineArguments::Instance()->GetNumberOfArgumentsForOption("-myoption", false), 0);
 
         // Test GetValueCorrespondingToOption()
         char* val = CommandLineArguments::Instance()->GetValueCorrespondingToOption("-myintval");

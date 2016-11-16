@@ -463,6 +463,27 @@ public:
 
         TS_ASSERT_EQUALS(mesh2.GetElement(0)->GetUnsignedAttribute(), 76u);
         TS_ASSERT_EQUALS(mesh2.GetElement(1)->GetUnsignedAttribute(), 89u);
+
+        // Test the correct exception is thrown in other cases
+        VertexMeshReader<1,1> mesh_reader_11("mesh/test/data/TestVertexMesh/vertex_mesh_with_attributes");
+        VertexMesh<1,1> mesh_11;
+        TS_ASSERT_THROWS_THIS(mesh_11.ConstructFromMeshReader(mesh_reader_11),
+            "VertexMesh<1,1>::ConstructFromMeshReader() is not implemented");
+
+        VertexMeshReader<1,2> mesh_reader_12("mesh/test/data/TestVertexMesh/vertex_mesh_with_attributes");
+        VertexMesh<1,2> mesh_12;
+        TS_ASSERT_THROWS_THIS(mesh_12.ConstructFromMeshReader(mesh_reader_12),
+            "VertexMesh<1,2>::ConstructFromMeshReader() is not implemented");
+
+        VertexMeshReader<1,3> mesh_reader_13("mesh/test/data/TestVertexMesh/vertex_mesh_with_attributes");
+        VertexMesh<1,3> mesh_13;
+        TS_ASSERT_THROWS_THIS(mesh_13.ConstructFromMeshReader(mesh_reader_13),
+            "VertexMesh<1,3>::ConstructFromMeshReader() is not implemented");
+
+        VertexMeshReader<2,3> mesh_reader_23("mesh/test/data/TestVertexMesh/vertex_mesh_with_attributes");
+        VertexMesh<2,3> mesh_23;
+        TS_ASSERT_THROWS_THIS(mesh_23.ConstructFromMeshReader(mesh_reader_23),
+            "VertexMesh<2,3>::ConstructFromMeshReader() is not implemented");
     }
 
     void TestMeshConstructionFromMeshReaderIndexedFromOne()

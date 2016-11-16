@@ -132,6 +132,13 @@ public:
      * @param simulationOutputDirectory the output directory, relative to where Chaste output is stored
      */
     void WriteResultsToFile(std::string simulationOutputDirectory);
+
+    /**
+     * Set #mEpsilon.
+     *
+     * @param epsilon the new value of mEpsilon
+     */
+    void SetEpsilon(double epsilon);
 };
 
 #endif /*DISCRETESYSTEMFORCECALCULATOR_HPP_*/

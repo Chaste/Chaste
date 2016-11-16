@@ -188,15 +188,16 @@ public:
         // Make cells with x<5.0 apoptotic (so no source term)
         boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
                        cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
-        for (unsigned i =0; i<cells.size(); i++)
+        for (unsigned i=0; i<cells.size(); i++)
         {
-           c_vector<double,2> cell_location = p_mesh->GetNode(i)->rGetLocation();
-        if (cell_location(0)<5.0)
-        {
-            cells[i]->AddCellProperty(p_apoptotic_property);
-        }
-        // Set initial condition for pde
-        cells[i]->GetCellData()->SetItem("variable",1.0);
+            c_vector<double,2> cell_location;
+            cell_location = p_mesh->GetNode(i)->rGetLocation();
+            if (cell_location(0) < 5.0)
+            {
+                cells[i]->AddCellProperty(p_apoptotic_property);
+            }
+            // Set initial condition for PDE
+            cells[i]->GetCellData()->SetItem("variable",1.0);
         }
         TS_ASSERT_EQUALS(p_apoptotic_property->GetCellCount(), 50u);
 
@@ -261,9 +262,10 @@ public:
         // Make cells with x<5.0 apoptotic (so no source term)
         boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
             cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
-        for (unsigned i =0; i<cells.size(); i++)
+        for (unsigned i=0; i<cells.size(); i++)
         {
-           c_vector<double,2> cell_location = p_mesh->GetNode(i)->rGetLocation();
+            c_vector<double,2> cell_location;
+            cell_location = p_mesh->GetNode(i)->rGetLocation();
             if (cell_location(0) < 5.0)
             {
                 cells[i]->AddCellProperty(p_apoptotic_property);
@@ -329,14 +331,15 @@ public:
         // Make cells with x<5.0 apoptotic (so no source term)
         boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
                         cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
-        for (unsigned i =0; i<cells.size(); i++)
+        for (unsigned i=0; i<cells.size(); i++)
         {
-            c_vector<double,2> cell_location = p_mesh->GetNode(i)->rGetLocation();
-            if (cell_location(0)<5.0)
+            c_vector<double,2> cell_location;
+            cell_location = p_mesh->GetNode(i)->rGetLocation();
+            if (cell_location(0) < 5.0)
             {
                 cells[i]->AddCellProperty(p_apoptotic_property);
             }
-            // Set initial condition for pde
+            // Set initial condition for PDE
             cells[i]->GetCellData()->SetItem("variable",1.0);
         }
         TS_ASSERT_EQUALS(p_apoptotic_property->GetCellCount(), 50u);
@@ -398,7 +401,8 @@ public:
                         cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
         for (unsigned i=0; i<cells.size(); i++)
         {
-            c_vector<double,2> cell_location = p_mesh->GetCentroidOfElement(i);
+            c_vector<double,2> cell_location;
+            cell_location = p_mesh->GetCentroidOfElement(i);
             if (cell_location(0) < 5.0)
             {
                 cells[i]->AddCellProperty(p_apoptotic_property);
@@ -465,7 +469,8 @@ public:
                         cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
         for (unsigned i=0; i<cells.size(); i++)
         {
-            c_vector<double,2> cell_location = p_mesh->GetCentroidOfElement(i);
+            c_vector<double,2> cell_location;
+            cell_location = p_mesh->GetCentroidOfElement(i);
             if (cell_location(0) < 5.0)
             {
                 cells[i]->AddCellProperty(p_apoptotic_property);
@@ -539,9 +544,10 @@ public:
         // Make cells with x<5.0 apoptotic (so no source term)
         boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
             cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
-        for (unsigned i =0; i<cells.size(); i++)
+        for (unsigned i=0; i<cells.size(); i++)
         {
-            c_vector<double,2> cell_location = p_mesh->GetNode(i)->rGetLocation();
+            c_vector<double,2> cell_location;
+            cell_location = p_mesh->GetNode(i)->rGetLocation();
             if (cell_location(0) < 5.0)
             {
                 cells[i]->AddCellProperty(p_apoptotic_property);

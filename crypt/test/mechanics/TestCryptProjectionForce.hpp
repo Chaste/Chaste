@@ -496,7 +496,8 @@ public:
 
         // Move a node along the x-axis and calculate the force exerted on a neighbour
         {
-            c_vector<double,2> old_point = p_mesh->GetNode(59)->rGetLocation();
+            c_vector<double,2> old_point;
+            old_point = p_mesh->GetNode(59)->rGetLocation();
             ChastePoint<2> new_point;
             new_point.rGetLocation()[0] = old_point[0]+0.5;
             new_point.rGetLocation()[1] = old_point[1];

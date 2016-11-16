@@ -1,6 +1,5 @@
-/*
 
-Copyright (c) 2005-2016, University of Oxford.
+"""Copyright (c) 2005-2016, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -30,68 +29,37 @@ GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
 LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+"""
 
-*/
+import re
+import sys
 
-#include "ExponentialMaterialLaw.hpp"
+if __name__ == "__main__":
+    ok = False
 
-template<unsigned DIM>
-ExponentialMaterialLaw<DIM>::ExponentialMaterialLaw(double a, double b)
-    : mA(a),
-      mB(b)
-{
-    assert(DIM==2 || DIM==3);
-    if (a < 0.0)
-    {
-        EXCEPTION("a must be positive");
-    }
-}
+    genhtml_output = open(sys.argv[1]+'/index.html', "r")
+    table_cell_counter=0
+    match_counter=0;
+    for line in genhtml_output:
+        #print line
+        if table_cell_counter > 0:
+            table_cell_counter = table_cell_counter + 1
+        if re.match('(.*)headerItem(.*)Lines(.*)',line):
+            # This line gives the header of the table in the top right of the genhtml index page.
+            # It should only match one line in the entire file.            
+            table_cell_counter = 1
+            match_counter = match_counter + 1
+        if table_cell_counter == 4:
+            # If we go down 4 lines we get to the 
+            if re.match('(.*)headerCovTableEntryHi(.*)',line):
+                ok = True
 
-template<unsigned DIM>
-double ExponentialMaterialLaw<DIM>::GetA()
-{
-    return mA;
-}
-
-template<unsigned DIM>
-double ExponentialMaterialLaw<DIM>::GetB()
-{
-    return mB;
-}
-
-template<unsigned DIM>
-double ExponentialMaterialLaw<DIM>::Get_dW_dI1(double I1, double I2)
-{
-    return mA * mB * exp(mB*(I1-DIM));
-}
-
-template<unsigned DIM>
-double ExponentialMaterialLaw<DIM>::Get_dW_dI2(double I1, double I2)
-{
-    assert(DIM == 3); // LCOV_EXCL_LINE
-    return 0.0;
-}
-
-template<unsigned DIM>
-double ExponentialMaterialLaw<DIM>::Get_d2W_dI1(double I1, double I2)
-{
-    return mA * mB * mB * exp(mB*(I1-DIM));
-}
-
-template<unsigned DIM>
-double ExponentialMaterialLaw<DIM>::Get_d2W_dI2(double I1, double I2)
-{
-    assert(DIM == 3); // LCOV_EXCL_LINE
-    return 0.0;
-}
-
-template<unsigned DIM>
-double ExponentialMaterialLaw<DIM>::Get_d2W_dI1I2(double I1, double I2)
-{
-    assert(DIM == 3); // LCOV_EXCL_LINE
-    return 0.0;
-}
-
-// Explicit instantiation
-template class ExponentialMaterialLaw<2>;
-template class ExponentialMaterialLaw<3>;
+    if match_counter is not 1:
+        print('Did not find a match for coverage summary line, or found more than one match. process_coverage_output.py needs tweaking!')
+        sys.exit(2)
+        
+    if not ok:
+        print('Coverage is not 100% - failing coverage test.')
+        sys.exit(1)
+    else:
+        print('Coverage 100% - test passed.')

@@ -91,6 +91,19 @@ void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const std::vector<Node<
 }
 
 template<unsigned SPACE_DIM>
+void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const std::vector<boost::shared_ptr<Node<SPACE_DIM> > >& rNodes, double maxInteractionDistance)
+{
+    // This is not efficient. It should replace the corresponding raw ptr method if SetUpBoxCollection and Chaste Cuboid methods are changed to take shared ptrs.
+    std::vector<Node<SPACE_DIM>*> temp_nodes(rNodes.size());
+    for(unsigned idx=0; idx<rNodes.size(); idx++)
+    {
+        temp_nodes[idx] = rNodes[idx].get();
+    }
+
+    ConstructNodesWithoutMesh(temp_nodes, maxInteractionDistance);
+}
+
+template<unsigned SPACE_DIM>
 void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const AbstractMesh<SPACE_DIM,SPACE_DIM>& rGeneratingMesh, double maxInteractionDistance)
 {
     ConstructNodesWithoutMesh(rGeneratingMesh.mNodes, maxInteractionDistance);

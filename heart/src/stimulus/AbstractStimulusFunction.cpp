@@ -42,8 +42,10 @@ AbstractStimulusFunction::~AbstractStimulusFunction()
 {
 }
 
+// LCOV_EXCL_START
 void AbstractStimulusFunction::Clear()
 {
     //Needed in one or more derived classes
     NEVER_REACHED;
 }
+// LCOV_EXCL_STOP

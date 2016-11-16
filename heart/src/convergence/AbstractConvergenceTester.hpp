@@ -487,13 +487,13 @@ public:
                     // LCOV_EXCL_STOP
                     ConductionVelocity  = ppc.CalculateConductionVelocity(first_quadrant_node,third_quadrant_node,0.5*mesh_width);
                 }
+                // LCOV_EXCL_START
                 catch (Exception e)
                 {
-                    // LCOV_EXCL_START
                     std::cout << "Warning - this run threw an exception in calculating propagation.  Check convergence results\n";
                     std::cout << e.GetMessage() << std::endl;
-                    // LCOV_EXCL_STOP
                 }
+                // LCOV_EXCL_STOP
                 double cond_velocity_error = 1e10;
                 double apd90_first_qn_error = 1e10;
                 double apd90_third_qn_error = 1e10;

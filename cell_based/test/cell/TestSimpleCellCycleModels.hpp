@@ -111,14 +111,14 @@ public:
         BernoulliTrialCellCycleModel* p_diff_model = new BernoulliTrialCellCycleModel;
         BernoulliTrialCellCycleModel* p_transit_model = new BernoulliTrialCellCycleModel;
 
-        TS_ASSERT_DELTA(p_transit_model->GetDivisionProbability(),0.1,1e-9);
-        TS_ASSERT_DELTA(p_transit_model->GetMinimumDivisionAge(),1.0,1e-9);
+        TS_ASSERT_DELTA(p_transit_model->GetDivisionProbability(), 0.1, 1e-9);
+        TS_ASSERT_DELTA(p_transit_model->GetMinimumDivisionAge(), 1.0, 1e-9);
 
         // Change parameters for this model
         p_transit_model->SetDivisionProbability(0.5);
         p_transit_model->SetMinimumDivisionAge(0.1);
-        TS_ASSERT_DELTA(p_transit_model->GetDivisionProbability(),0.5,1e-9);
-        TS_ASSERT_DELTA(p_transit_model->GetMinimumDivisionAge(),0.1,1e-9);
+        TS_ASSERT_DELTA(p_transit_model->GetDivisionProbability(), 0.5, 1e-9);
+        TS_ASSERT_DELTA(p_transit_model->GetMinimumDivisionAge(), 0.1, 1e-9);
 
         MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
@@ -141,7 +141,7 @@ public:
             p_simulation_time->IncrementTimeOneStep();
 
             // The division time below is taken from the first random number generated
-            if (i< 33)
+            if (i < 33)
             {
                 TS_ASSERT_EQUALS(p_transit_cell->ReadyToDivide(), false);
             }
@@ -153,6 +153,17 @@ public:
         }
         TS_ASSERT_DELTA(p_transit_model->GetAge(), p_simulation_time->GetTime(), 1e-9);
         TS_ASSERT_DELTA(p_diff_model->GetAge(), p_simulation_time->GetTime(), 1e-9);
+
+        // Check that cell division correctly resets the cell cycle phase
+        CellPtr p_transit_cell2 = p_transit_cell->Divide();
+        BernoulliTrialCellCycleModel* p_transit_model2 = static_cast <BernoulliTrialCellCycleModel*>(p_transit_cell2->GetCellCycleModel());
+
+        TS_ASSERT_EQUALS(p_transit_model2->ReadyToDivide(), false);
+        TS_ASSERT_DELTA(p_transit_model2->GetDivisionProbability(), 0.5, 1e-9);
+        TS_ASSERT_DELTA(p_transit_model2->GetMinimumDivisionAge(), 0.1, 1e-9);
+
+        TS_ASSERT_DELTA(p_transit_model2->GetAverageTransitCellCycleTime(), 2.0, 1e-9);
+        TS_ASSERT_DELTA(p_transit_model2->GetAverageStemCellCycleTime(), 2.0, 1e-9);
     }
 
     void TestFixedG1GenerationalCellCycleModel() throw(Exception)
@@ -961,6 +972,7 @@ public:
 
         // Coverage
         p_cell_model2->SetMinimumGapDuration(1e20);
+        TS_ASSERT_DELTA(p_cell_model2->GetMinimumGapDuration(), 1e20, 1e-4);
 
         CellPtr p_cell2(new Cell(p_state, p_cell_model2));
         p_cell2->SetCellProliferativeType(p_stem_type);

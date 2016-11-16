@@ -1816,8 +1816,10 @@ public:
         unsigned edge_closest_to_7_global_index = vertex_mesh.GetElement(0)->GetNode(edge_closest_to_7_local_index)->GetIndex();
         TS_ASSERT_EQUALS(edge_closest_to_7_global_index, 8u);
 
-        c_vector<double,2> location_node_6_before_swap = vertex_mesh.GetNode(6)->rGetLocation();
-        c_vector<double,2> location_node_8_before_swap = vertex_mesh.GetNode(8)->rGetLocation();
+        c_vector<double,2> location_node_6_before_swap;
+        location_node_6_before_swap = vertex_mesh.GetNode(6)->rGetLocation();
+        c_vector<double,2> location_node_8_before_swap;
+        location_node_8_before_swap = vertex_mesh.GetNode(8)->rGetLocation();
 
         // We perform the next swap:
         TS_ASSERT(vertex_mesh.CheckForIntersections());
@@ -2706,6 +2708,7 @@ public:
 
         // Merge intersection to maintain non-overlapping elements
         vertex_mesh.SetCheckForInternalIntersections(true);
+        TS_ASSERT_EQUALS(vertex_mesh.GetCheckForInternalIntersections(), true);
         vertex_mesh.CheckForIntersections();
 
         // Test that each moved node has the correct location following the rearrangement

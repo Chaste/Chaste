@@ -47,10 +47,10 @@ public:
         unsigned node_indices_elem_3[4] = {4, 5, 3, 0};
 
         MeshBuilderHelper builder(nodes, "T1SwapWith4Elements");
-        builder.buildElementWith(3, node_indices_elem_0);
-        builder.buildElementWith(4, node_indices_elem_1);
-        builder.buildElementWith(3, node_indices_elem_2);
-        builder.buildElementWith(4, node_indices_elem_3);
+        builder.BuildElementWith(3, node_indices_elem_0);
+        builder.BuildElementWith(4, node_indices_elem_1);
+        builder.BuildElementWith(3, node_indices_elem_2);
+        builder.BuildElementWith(4, node_indices_elem_3);
         // A reference variable as mesh is noncopyable
         MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
         builder.WriteVtk(OUTPUT_NAME,"Before");
@@ -159,10 +159,10 @@ PRINT_REMESH
         unsigned node_indices_elem_3[4] = {4, 5, 3, 0};
 
         MeshBuilderHelper builder(nodes, "T1NoSwap");
-        builder.buildElementWith(3, node_indices_elem_0);
-        builder.buildElementWith(4, node_indices_elem_1);
-        builder.buildElementWith(3, node_indices_elem_2);
-        builder.buildElementWith(4, node_indices_elem_3);
+        builder.BuildElementWith(3, node_indices_elem_0);
+        builder.BuildElementWith(4, node_indices_elem_1);
+        builder.BuildElementWith(3, node_indices_elem_2);
+        builder.BuildElementWith(4, node_indices_elem_3);
         // A reference variable as mesh is noncopyable
         MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
 PRINT_MESH
@@ -218,10 +218,10 @@ PRINT_MESH
         unsigned node_indices_elem_3[4] = {4, 5, 3, 0};
 
         MeshBuilderHelper builder(nodes, "T1SwapNonEvenFace");
-        builder.buildElementWith(3, node_indices_elem_0);
-        builder.buildElementWith(4, node_indices_elem_1);
-        builder.buildElementWith(3, node_indices_elem_2);
-        builder.buildElementWith(4, node_indices_elem_3);
+        builder.BuildElementWith(3, node_indices_elem_0);
+        builder.BuildElementWith(4, node_indices_elem_1);
+        builder.BuildElementWith(3, node_indices_elem_2);
+        builder.BuildElementWith(4, node_indices_elem_3);
         // A reference variable as mesh is noncopyable
         MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
 //        vertex_mesh.GetNode(11)->rGetModifiableLocation()[0] = 0.45;
@@ -267,9 +267,9 @@ PRINT_REMESH
         unsigned node_indices_elem_2[4] = {0, 4, 5, 3};
 
         MeshBuilderHelper builder(nodes, "T1SwapOnBoundary");
-        builder.buildElementWith(3, node_indices_elem_0);
-        builder.buildElementWith(3, node_indices_elem_1);
-        builder.buildElementWith(4, node_indices_elem_2);
+        builder.BuildElementWith(3, node_indices_elem_0);
+        builder.BuildElementWith(3, node_indices_elem_1);
+        builder.BuildElementWith(4, node_indices_elem_2);
         // A reference variable as mesh is noncopyable
         MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
         builder.WriteVtk(OUTPUT_NAME,"Before");
@@ -360,9 +360,9 @@ PRINT_REMESH
         unsigned node_indices_elem_2[4] = {0, 4, 5, 3};
 
         MeshBuilderHelper builder(nodes, "T1SwapOnBoundary2");
-        builder.buildElementWith(4, node_indices_elem_0);
-        builder.buildElementWith(3, node_indices_elem_1);
-        builder.buildElementWith(4, node_indices_elem_2);
+        builder.BuildElementWith(4, node_indices_elem_0);
+        builder.BuildElementWith(3, node_indices_elem_1);
+        builder.BuildElementWith(4, node_indices_elem_2);
         // A reference variable as mesh is noncopyable
         MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
         builder.WriteVtk(OUTPUT_NAME,"Before");
@@ -456,8 +456,8 @@ PRINT_REMESH
         unsigned node_indices_elem_1[4] = {4, 1, 2, 5};
 
         MeshBuilderHelper builder(nodes, "T1SwapWhenVoidForms");
-        builder.buildElementWith(4, node_indices_elem_0);
-        builder.buildElementWith(4, node_indices_elem_1);
+        builder.BuildElementWith(4, node_indices_elem_0);
+        builder.BuildElementWith(4, node_indices_elem_1);
         // A reference variable as mesh is noncopyable
         MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
         builder.WriteVtk(OUTPUT_NAME,"Before");
@@ -537,10 +537,10 @@ PRINT_REMESH
         unsigned node_indices_elem_3[4] = {0, 4, 5, 3};
 
         MeshBuilderHelper builder(nodes, "T1SwapExceptions");
-        builder.buildElementWith(3, node_indices_elem_0);
-        builder.buildElementWith(4, node_indices_elem_1);
-        builder.buildElementWith(3, node_indices_elem_2);
-        builder.buildElementWith(4, node_indices_elem_3);
+        builder.BuildElementWith(3, node_indices_elem_0);
+        builder.BuildElementWith(4, node_indices_elem_1);
+        builder.BuildElementWith(3, node_indices_elem_2);
+        builder.BuildElementWith(4, node_indices_elem_3);
         // A reference variable as mesh is noncopyable
         MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
 
@@ -580,10 +580,10 @@ PRINT_REMESH
         unsigned node_indices_elem_3[3] = { 4, 5, 6};
 
         MeshBuilderHelper builder(nodes, "T1NoSwapWithTriangularPrism");
-        builder.buildElementWith(4, node_indices_elem_0);
-        builder.buildElementWith(4, node_indices_elem_1);
-        builder.buildElementWith(4, node_indices_elem_2);
-        builder.buildElementWith(3, node_indices_elem_3);
+        builder.BuildElementWith(4, node_indices_elem_0);
+        builder.BuildElementWith(4, node_indices_elem_1);
+        builder.BuildElementWith(4, node_indices_elem_2);
+        builder.BuildElementWith(3, node_indices_elem_3);
         // A reference variable as mesh is noncopyable
         MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
 
@@ -635,9 +635,9 @@ PRINT_REMESH
         unsigned node_indices_elem_2[3] = {0, 3, 2};
 
         MeshBuilderHelper builder(nodes, "NoT1SwapWithTriangularVoid");
-        builder.buildElementWith(4, node_indices_elem_0);
-        builder.buildElementWith(3, node_indices_elem_1);
-        builder.buildElementWith(3, node_indices_elem_2);
+        builder.BuildElementWith(4, node_indices_elem_0);
+        builder.BuildElementWith(3, node_indices_elem_1);
+        builder.BuildElementWith(3, node_indices_elem_2);
         // A reference variable as mesh is noncopyable
         MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
 
@@ -735,10 +735,10 @@ PRINT_MESH
         unsigned node_indices_elem_3[4] = {0, 1, 4, 3};
 
         MeshBuilderHelper builder(nodes, "T2Swap");
-        builder.buildElementWith(3, node_indices_elem_0);
-        builder.buildElementWith(4, node_indices_elem_1);
-        builder.buildElementWith(4, node_indices_elem_2);
-        builder.buildElementWith(4, node_indices_elem_3);
+        builder.BuildElementWith(3, node_indices_elem_0);
+        builder.BuildElementWith(4, node_indices_elem_1);
+        builder.BuildElementWith(4, node_indices_elem_2);
+        builder.BuildElementWith(4, node_indices_elem_3);
         // A reference variable as mesh is noncopyable
         MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
         builder.WriteVtk(OUTPUT_NAME,"Before");
@@ -819,9 +819,9 @@ PRINT_REMESH
         unsigned node_indices_elem_2[4] = {2, 0, 3, 5};
 
         MeshBuilderHelper builder(nodes, "T2SwapOnBoundary");
-        builder.buildElementWith(3, node_indices_elem_0);
-        builder.buildElementWith(4, node_indices_elem_1);
-        builder.buildElementWith(4, node_indices_elem_2);
+        builder.BuildElementWith(3, node_indices_elem_0);
+        builder.BuildElementWith(4, node_indices_elem_1);
+        builder.BuildElementWith(4, node_indices_elem_2);
         // A reference variable as mesh is noncopyable
         MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
         builder.WriteVtk(OUTPUT_NAME,"Before");
@@ -892,8 +892,8 @@ PRINT_REMESH
         const unsigned node_indices_elem_1[4] = {0, 1, 4, 3};
 
         MeshBuilderHelper builder(nodes, "T2SwapOnBoundary2");
-        builder.buildElementWith(3, node_indices_elem_0);
-        builder.buildElementWith(4, node_indices_elem_1);
+        builder.BuildElementWith(3, node_indices_elem_0);
+        builder.BuildElementWith(4, node_indices_elem_1);
         // A reference variable as mesh is noncopyable
         MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
         builder.WriteVtk(OUTPUT_NAME,"Before");
@@ -958,10 +958,10 @@ PRINT_REMESH
         const unsigned node_indices_elem_3[4] = {0, 1, 4, 3};
 
         MeshBuilderHelper builder(nodes, "T2NoSwapWithTriangularNeighbours");
-        builder.buildElementWith(3, node_indices_elem_0);
-        builder.buildElementWith(3, node_indices_elem_1);
-        builder.buildElementWith(4, node_indices_elem_2);
-        builder.buildElementWith(4, node_indices_elem_3);
+        builder.BuildElementWith(3, node_indices_elem_0);
+        builder.BuildElementWith(3, node_indices_elem_1);
+        builder.BuildElementWith(4, node_indices_elem_2);
+        builder.BuildElementWith(4, node_indices_elem_3);
         // A reference variable as mesh is noncopyable
         MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
 
@@ -1006,11 +1006,11 @@ PRINT_REMESH
         const unsigned node_indices_elem_4[5] = {4, 5, 8, 7, 6};
 
         MeshBuilderHelper builder(nodes, "T2SwapWithRosette");
-        builder.buildElementWith(4, node_indices_elem_0);
-        builder.buildElementWith(4, node_indices_elem_1);
-        builder.buildElementWith(4, node_indices_elem_2);
-        builder.buildElementWith(3, node_indices_elem_3);
-        builder.buildElementWith(5, node_indices_elem_4);
+        builder.BuildElementWith(4, node_indices_elem_0);
+        builder.BuildElementWith(4, node_indices_elem_1);
+        builder.BuildElementWith(4, node_indices_elem_2);
+        builder.BuildElementWith(3, node_indices_elem_3);
+        builder.BuildElementWith(5, node_indices_elem_4);
         // A reference variable as mesh is noncopyable
         MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
         builder.WriteVtk(OUTPUT_NAME,"Before");
@@ -1095,11 +1095,11 @@ PRINT_REMESH
         const unsigned node_indices_elem_4[4] = {8, 9, 10, 11};
 
         MeshBuilderHelper builder(nodes, "T2SwapWithRosette2");
-        builder.buildElementWith(5, node_indices_elem_0);
-        builder.buildElementWith(5, node_indices_elem_1);
-        builder.buildElementWith(5, node_indices_elem_2);
-        builder.buildElementWith(5, node_indices_elem_3);
-        builder.buildElementWith(4, node_indices_elem_4);
+        builder.BuildElementWith(5, node_indices_elem_0);
+        builder.BuildElementWith(5, node_indices_elem_1);
+        builder.BuildElementWith(5, node_indices_elem_2);
+        builder.BuildElementWith(5, node_indices_elem_3);
+        builder.BuildElementWith(4, node_indices_elem_4);
         // A reference variable as mesh is noncopyable
         MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
         builder.WriteVtk(OUTPUT_NAME,"Before");
@@ -1164,7 +1164,7 @@ PRINT_REMESH
 
         const unsigned node_indices_elem_0[5] = {0, 3, 4, 1, 2};
         MeshBuilderHelper builder(nodes, "NodeMerge");
-        builder.buildElementWith(5, node_indices_elem_0);
+        builder.BuildElementWith(5, node_indices_elem_0);
         // A reference variable as mesh is noncopyable
         MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
         builder.WriteVtk(OUTPUT_NAME,"Before");

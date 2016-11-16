@@ -90,6 +90,13 @@ unsigned CeilDivide(unsigned numerator, unsigned denominator);
 double Signum(double value);
 
 /**
+ * Divide two non-negative floating point numbers, avoiding overflow and underflow.
+ * @param numerator  the number to be divided
+ * @param divisor  the number to divide by
+ */
+double SafeDivide(double numerator, double divisor);
+
+/**
  * Utility static methods for comparing floating point numbers, based on
  * boost/test/floating_point_comparison.hpp.
  */

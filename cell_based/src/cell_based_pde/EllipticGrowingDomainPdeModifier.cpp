@@ -133,7 +133,6 @@ std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > EllipticGrowingDomainPdeM
 
     // To be well-defined, elliptic PDE problems on growing domains require Dirichlet boundary conditions
     assert(!(this->IsNeumannBoundaryCondition()));
-
     for (typename TetrahedralMesh<DIM,DIM>::BoundaryNodeIterator node_iter = this->mpFeMesh->GetBoundaryNodeIteratorBegin();
          node_iter != this->mpFeMesh->GetBoundaryNodeIteratorEnd();
          ++node_iter)

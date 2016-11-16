@@ -591,7 +591,7 @@ template<unsigned DIM>
 TetrahedralMesh<DIM, DIM>* VertexBasedCellPopulation<DIM>::GetTetrahedralMeshForPdeModifier()
 {
     // This method only works in 2D sequential
-    assert(DIM == 2);
+    assert(DIM == 2);						// LCOV_EXCL_LINE - disappears at compile time.
     assert(PetscTools::IsSequential());
 
     unsigned num_vertex_nodes = mpMutableVertexMesh->GetNumNodes();
@@ -813,7 +813,7 @@ double VertexBasedCellPopulation<DIM>::GetDefaultTimeStep()
 template<unsigned DIM>
 void VertexBasedCellPopulation<DIM>::WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile)
 {
-    if (dynamic_cast<Cylindrical2dVertexMesh*>(&(this->mrMesh)))
+    if (bool(dynamic_cast<Cylindrical2dVertexMesh*>(&(this->mrMesh))))
     {
         *pVizSetupFile << "MeshWidth\t" << this->GetWidth(0) << "\n";
     }
