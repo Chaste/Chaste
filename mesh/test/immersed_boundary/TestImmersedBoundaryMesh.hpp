@@ -41,6 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ImmersedBoundaryHoneycombMeshGenerator.hpp"
 #include "ImmersedBoundaryMesh.hpp"
+#include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
 
 // This test is never run in parallel
 #include "FakePetscSetup.hpp"
@@ -175,6 +176,122 @@ public:
             // If we flip the axis, the skewness should be minus what it was before
             axis[1] = -1.0;
             TS_ASSERT_DELTA(p_mesh->GetSkewnessOfElementMassDistributionAboutAxis(0, axis) + hand_calculated_skewness, 0.0, 1e-9);
+        }
+    }
+
+    void TestReMesh() throw(Exception)
+    {
+        /*
+         * In this test, we generate a mesh with multiple elements and lamina, in which nodes are already evenly spaced.
+         * We simply check that none of the node locations or regions are altered in a ReMesh.
+         *
+         * The specific ReMeshElements and ReMeshLaminas methods are tested separately.
+         */
+
+        std::vector<Node<2>*> nodes;
+
+        std::vector<Node<2>*> nodes_elem1;
+        std::vector<Node<2>*> nodes_elem2;
+        std::vector<Node<2>*> nodes_elem3;
+
+        std::vector<Node<2>*> nodes_lam1;
+        std::vector<Node<2>*> nodes_lam2;
+
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 0.1, 0.0));
+        nodes.push_back(new Node<2>(2, true, 0.05, 0.05 * sqrt(3)));
+
+        nodes.push_back(new Node<2>(3, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(4, true, 0.1, 0.0));
+        nodes.push_back(new Node<2>(5, true, 0.1, 0.1));
+        nodes.push_back(new Node<2>(6, true, 0.0, 0.1));
+
+        nodes.push_back(new Node<2>(7, true, 0.5 + 0.1 * cos(0.0 * M_PI / 8.0), 0.5 + 0.1 * sin(0.0 * M_PI / 8.0)));
+        nodes.push_back(new Node<2>(8, true, 0.5 + 0.1 * cos(2.0 * M_PI / 8.0), 0.5 + 0.1 * sin(2.0 * M_PI / 8.0)));
+        nodes.push_back(new Node<2>(9, true, 0.5 + 0.1 * cos(4.0 * M_PI / 8.0), 0.5 + 0.1 * sin(4.0 * M_PI / 8.0)));
+        nodes.push_back(new Node<2>(10, true, 0.5 + 0.1 * cos(6.0 * M_PI / 8.0), 0.5 + 0.1 * sin(6.0 * M_PI / 8.0)));
+        nodes.push_back(new Node<2>(11, true, 0.5 + 0.1 * cos(8.0 * M_PI / 8.0), 0.5 + 0.1 * sin(8.0 * M_PI / 8.0)));
+        nodes.push_back(new Node<2>(12, true, 0.5 + 0.1 * cos(10.0 * M_PI / 8.0), 0.5 + 0.1 * sin(10.0 * M_PI / 8.0)));
+        nodes.push_back(new Node<2>(13, true, 0.5 + 0.1 * cos(12.0 * M_PI / 8.0), 0.5 + 0.1 * sin(12.0 * M_PI / 8.0)));
+        nodes.push_back(new Node<2>(14, true, 0.5 + 0.1 * cos(14.0 * M_PI / 8.0), 0.5 + 0.1 * sin(14.0 * M_PI / 8.0)));
+
+        nodes.push_back(new Node<2>(15, true, 0.1, 0.3));
+        nodes.push_back(new Node<2>(16, true, 0.3, 0.3));
+        nodes.push_back(new Node<2>(17, true, 0.5, 0.3));
+        nodes.push_back(new Node<2>(18, true, 0.7, 0.3));
+        nodes.push_back(new Node<2>(19, true, 0.9, 0.3));
+
+        nodes.push_back(new Node<2>(20, true, 0.2, 0.2));
+        nodes.push_back(new Node<2>(21, true, 0.2, 0.7));
+
+        // Triangle
+        nodes_elem1.push_back(nodes[0]);
+        nodes_elem1.push_back(nodes[1]);
+        nodes_elem1.push_back(nodes[2]);
+
+        // Square
+        nodes_elem2.push_back(nodes[3]);
+        nodes_elem2.push_back(nodes[4]);
+        nodes_elem2.push_back(nodes[5]);
+        nodes_elem2.push_back(nodes[6]);
+
+        // Octagon
+        nodes_elem3.push_back(nodes[7]);
+        nodes_elem3.push_back(nodes[8]);
+        nodes_elem3.push_back(nodes[9]);
+        nodes_elem3.push_back(nodes[10]);
+        nodes_elem3.push_back(nodes[11]);
+        nodes_elem3.push_back(nodes[12]);
+        nodes_elem3.push_back(nodes[13]);
+        nodes_elem3.push_back(nodes[14]);
+
+        // Lam 1 (x varies)
+        nodes_lam1.push_back(nodes[15]);
+        nodes_lam1.push_back(nodes[16]);
+        nodes_lam1.push_back(nodes[17]);
+        nodes_lam1.push_back(nodes[18]);
+        nodes_lam1.push_back(nodes[19]);
+
+        // Lam 2 (y varies)
+        nodes_lam2.push_back(nodes[20]);
+        nodes_lam2.push_back(nodes[21]);
+
+        std::vector<ImmersedBoundaryElement<2, 2>*> elems;
+        elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes_elem1));
+        elems.push_back(new ImmersedBoundaryElement<2, 2>(1, nodes_elem2));
+        elems.push_back(new ImmersedBoundaryElement<2, 2>(2, nodes_elem3));
+
+        std::vector<ImmersedBoundaryElement<1, 2>*> lams;
+        lams.push_back(new ImmersedBoundaryElement<1, 2>(0, nodes_lam1));
+        lams.push_back(new ImmersedBoundaryElement<1, 2>(1, nodes_lam2));
+
+        ImmersedBoundaryMesh<2, 2>* p_mesh = new ImmersedBoundaryMesh<2, 2>(nodes, elems, lams);
+
+        // Label every node uniquely by region
+        for (unsigned node_idx = 0; node_idx < p_mesh->GetNumNodes(); node_idx++)
+        {
+            p_mesh->GetNode(node_idx)->SetRegion(node_idx);
+        }
+
+        // Make a copy of the node locations and regions prior to ReMesh
+        std::vector<c_vector<double, 2> > old_locations(p_mesh->GetNumNodes());
+        for (unsigned node_idx = 0; node_idx < p_mesh->GetNumNodes(); node_idx++)
+        {
+            const c_vector<double, 2> this_location = p_mesh->GetNode(node_idx)->rGetLocation();
+            old_locations[node_idx][0] = this_location[0];
+            old_locations[node_idx][1] = this_location[1];
+        }
+
+        // Second ReMesh - node locations should remain largely unchanged and regions should be the same
+        p_mesh->ReMesh();
+
+        // Verify everything's still the same
+        for (unsigned node_idx = 0; node_idx < p_mesh->GetNumNodes(); node_idx++)
+        {
+            TS_ASSERT_DELTA(old_locations[node_idx][0], p_mesh->GetNode(node_idx)->rGetLocation()[0], 1e-12);
+            TS_ASSERT_DELTA(old_locations[node_idx][1], p_mesh->GetNode(node_idx)->rGetLocation()[1], 1e-12);
+
+            TS_ASSERT_EQUALS(node_idx, p_mesh->GetNode(node_idx)->GetRegion());
         }
     }
 
