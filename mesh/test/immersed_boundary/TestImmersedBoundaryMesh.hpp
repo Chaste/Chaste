@@ -328,11 +328,85 @@ public:
             TS_ASSERT_DELTA(p_mesh->GetElement(0)->GetNode(1)->rGetLocation()[1], 0.02, 1e-12);
 
             // Due to reposition of nodes, node 4 should now be part of region 2
-            TS_ASSERT_EQUALS(p_mesh->GetElement(0)->GetNode(0)->GetRegion(), 1u)
-            TS_ASSERT_EQUALS(p_mesh->GetElement(0)->GetNode(1)->GetRegion(), 1u)
-            TS_ASSERT_EQUALS(p_mesh->GetElement(0)->GetNode(2)->GetRegion(), 2u)
-            TS_ASSERT_EQUALS(p_mesh->GetElement(0)->GetNode(3)->GetRegion(), 2u)
-            TS_ASSERT_EQUALS(p_mesh->GetElement(0)->GetNode(4)->GetRegion(), 2u)
+            TS_ASSERT_EQUALS(p_mesh->GetElement(0)->GetNode(0)->GetRegion(), 1u);
+            TS_ASSERT_EQUALS(p_mesh->GetElement(0)->GetNode(1)->GetRegion(), 1u);
+            TS_ASSERT_EQUALS(p_mesh->GetElement(0)->GetNode(2)->GetRegion(), 2u);
+            TS_ASSERT_EQUALS(p_mesh->GetElement(0)->GetNode(3)->GetRegion(), 2u);
+            TS_ASSERT_EQUALS(p_mesh->GetElement(0)->GetNode(4)->GetRegion(), 2u);
+
+            delete p_mesh;
+        }
+    }
+
+    void TestReMeshLamina() throw(Exception)
+    {
+        // ReMeshLamina where nothing should change
+        {
+            std::vector<Node<2>*> nodes;
+            nodes.push_back(new Node<2>(0, true, 0.1, 0.3));
+            nodes.push_back(new Node<2>(1, true, 0.3, 0.3));
+            nodes.push_back(new Node<2>(2, true, 0.5, 0.3));
+            nodes.push_back(new Node<2>(3, true, 0.7, 0.3));
+            nodes.push_back(new Node<2>(4, true, 0.9, 0.3));
+
+            std::vector<ImmersedBoundaryElement<2, 2>*> elems; // empty, for constructor
+            std::vector<ImmersedBoundaryElement<1, 2>*> lams;
+            lams.push_back(new ImmersedBoundaryElement<1, 2>(0, nodes));
+
+            ImmersedBoundaryMesh<2, 2>* p_mesh = new ImmersedBoundaryMesh<2, 2>(nodes, elems, lams);
+
+            unsigned num_nodes = p_mesh->GetLamina(0)->GetNumNodes();
+
+            // Get locations before ReMesh
+            std::vector<double> old_pos;
+            for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
+            {
+                old_pos.push_back(norm_2(p_mesh->GetLamina(0)->GetNode(node_idx)->rGetLocation()));
+            }
+
+            p_mesh->ReMesh();
+
+            for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
+            {
+                TS_ASSERT_DELTA(old_pos[node_idx], norm_2(p_mesh->GetLamina(0)->GetNode(node_idx)->rGetLocation()), 1e-12);
+            }
+
+            delete p_mesh;
+        }
+
+        // ReMeshLamina where nothing should change
+        {
+            std::vector<Node<2>*> nodes;
+            nodes.push_back(new Node<2>(0, true, 0.1, 0.3));
+            nodes.push_back(new Node<2>(1, true, 0.32, 0.3));
+            nodes.push_back(new Node<2>(2, true, 0.53, 0.3));
+            nodes.push_back(new Node<2>(3, true, 0.64, 0.3));
+            nodes.push_back(new Node<2>(4, true, 0.88, 0.3));
+
+            std::vector<ImmersedBoundaryElement<2, 2>*> elems; // empty, for constructor
+            std::vector<ImmersedBoundaryElement<1, 2>*> lams;
+            lams.push_back(new ImmersedBoundaryElement<1, 2>(0, nodes));
+
+            ImmersedBoundaryMesh<2, 2>* p_mesh = new ImmersedBoundaryMesh<2, 2>(nodes, elems, lams);
+
+            unsigned num_nodes = p_mesh->GetLamina(0)->GetNumNodes();
+
+            p_mesh->ReMesh();
+
+            TS_ASSERT_DELTA(p_mesh->GetLamina(0)->GetNode(0)->rGetLocation()[0], 0.1, 1e-12);
+            TS_ASSERT_DELTA(p_mesh->GetLamina(0)->GetNode(0)->rGetLocation()[1], 0.3, 1e-12);
+
+            TS_ASSERT_DELTA(p_mesh->GetLamina(0)->GetNode(1)->rGetLocation()[0], 0.3, 1e-12);
+            TS_ASSERT_DELTA(p_mesh->GetLamina(0)->GetNode(1)->rGetLocation()[1], 0.3, 1e-12);
+
+            TS_ASSERT_DELTA(p_mesh->GetLamina(0)->GetNode(2)->rGetLocation()[0], 0.5, 1e-12);
+            TS_ASSERT_DELTA(p_mesh->GetLamina(0)->GetNode(2)->rGetLocation()[1], 0.3, 1e-12);
+
+            TS_ASSERT_DELTA(p_mesh->GetLamina(0)->GetNode(3)->rGetLocation()[0], 0.7, 1e-12);
+            TS_ASSERT_DELTA(p_mesh->GetLamina(0)->GetNode(3)->rGetLocation()[1], 0.3, 1e-12);
+
+            TS_ASSERT_DELTA(p_mesh->GetLamina(0)->GetNode(4)->rGetLocation()[0], 0.9, 1e-12);
+            TS_ASSERT_DELTA(p_mesh->GetLamina(0)->GetNode(4)->rGetLocation()[1], 0.3, 1e-12);
 
             delete p_mesh;
         }
