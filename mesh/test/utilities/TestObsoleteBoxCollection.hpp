@@ -129,8 +129,11 @@ public:
         domain_size(1) = 20.15;
 
         ObsoleteBoxCollection<1> box_collection(cut_off_length, domain_size);
-
         box_collection.SetupAllLocalBoxes();
+
+        // Coverage of IsOwned()
+        TS_ASSERT_EQUALS(box_collection.IsOwned(NULL), true);
+        TS_ASSERT_EQUALS(box_collection.IsOwned(0), true);
 
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {

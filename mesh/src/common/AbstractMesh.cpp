@@ -126,7 +126,7 @@ void AbstractMesh<ELEMENT_DIM, SPACE_DIM>::ReadNodesPerProcessorFile(const std::
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractMesh<ELEMENT_DIM, SPACE_DIM>::SetElementOwnerships()
 {
-    //Does nothing, since an AbstractMesh has no elements
+    // Does nothing, since an AbstractMesh has no elements
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

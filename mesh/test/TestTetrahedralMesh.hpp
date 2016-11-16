@@ -1041,8 +1041,10 @@ public:
         TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNode(1)->GetIndex(), 3u);  // 3 is 3
         TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNode(2)->GetIndex(), 11u); // 11 was 8
         TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNode(3)->GetIndex(), 1u);  // 1 was 0
-    }
 
+        // Coverage of GetNodeFromPrePermutationIndex()
+        TS_ASSERT_EQUALS(mesh.GetNodeFromPrePermutationIndex(11)->GetIndex(), 9u);
+    }
 
     void TestClear() throw(Exception)
     {

@@ -134,6 +134,9 @@ public:
 
             time_stepper.AdvanceOneTimeStep();
         }
+
+        // Coverage
+        TS_ASSERT_THROWS_NOTHING(factory.GetMesh());
 #else
         std::cout << "Warning: This test needs a direct solver (UMFPACK or KLU) to execute correctly." << std::endl;
 #endif

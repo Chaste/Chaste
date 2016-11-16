@@ -231,6 +231,9 @@ public:
         // as we only have a NOT-equals operator defined on the iterator).
         bool iter_is_not_at_end = (iter != empty_mesh.GetNodeIteratorEnd());
         TS_ASSERT_EQUALS(iter_is_not_at_end, false);
+
+        // Coverage of AbstractMesh::SetElementOwnerships()
+        TS_ASSERT_THROWS_NOTHING(empty_mesh.SetElementOwnerships());
     }
 
     void TestVertexElementIterator() throw (Exception)
