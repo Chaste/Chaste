@@ -333,7 +333,7 @@ void VoronoiPrism3dVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_
                         does_node_already_exist.push_back(false);
 
                         // Creating the corresponding upper node
-                        ///\todo check this - apperently, 2 nodes having the same index do not cause any problem yet
+                        ///\todo check this - apparently, 2 nodes having the same index do not cause any problem yet #2850
                         Node<3>* p_this_upper_node = new Node<3>(upper_nodes.size(), false, x_location, y_location, mElementHeightZ);
                         // Attribute is added so that it can be identified in simulation (as basal and apical has different forces)
                         // 2.1 instead of 2.0 as it will be casted into unsigned for simpler comparison.
@@ -656,7 +656,7 @@ std::vector<double> VoronoiPrism3dVertexMeshGenerator::GetPolygonDistribution()
 
         // All polygons are assumed to have 3, 4, 5, ..., mMaxExpectedNumSidesPerPolygon sides
         // and since there should be an upper node for every lower node, it should be even number
-        assert(num_nodes_this_elem%2 == 0);     ///\todo check if the pairs is really lower and upper after simulation
+        assert(num_nodes_this_elem%2 == 0);     ///\todo check if the pairs is really lower and upper after simulation #2850
         assert(num_nodes_this_elem > 2);
         assert(num_nodes_this_elem/2 <= mMaxExpectedNumSidesPerPolygon);
 

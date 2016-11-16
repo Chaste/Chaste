@@ -33,9 +33,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "MeshBuilderHelper.hpp"
+#include "Helper3dVertexMeshBuilder.hpp"
 
-MeshBuilderHelper::MeshBuilderHelper(const std::vector<Node<3>*>& rLowerNodes,
+Helper3dVertexMeshBuilder::Helper3dVertexMeshBuilder(const std::vector<Node<3>*>& rLowerNodes,
                                      const std::string& additionalPath,
                                      const std::string& name,
                                      const unsigned zHeight)
@@ -63,7 +63,7 @@ MeshBuilderHelper::MeshBuilderHelper(const std::vector<Node<3>*>& rLowerNodes,
     }
 }
 
-MeshBuilderHelper::MeshBuilderHelper(const std::string& additionalPath,
+Helper3dVertexMeshBuilder::Helper3dVertexMeshBuilder(const std::string& additionalPath,
                                      const std::string& name)
     : mName(name),
       mAdditionalPath("/" + additionalPath),
@@ -78,7 +78,7 @@ MeshBuilderHelper::MeshBuilderHelper(const std::string& additionalPath,
 {
 }
 
-MeshBuilderHelper::~MeshBuilderHelper()
+Helper3dVertexMeshBuilder::~Helper3dVertexMeshBuilder()
 {
     if (mpMesh)
     {
@@ -90,7 +90,7 @@ MeshBuilderHelper::~MeshBuilderHelper()
     }
 }
 
-MutableVertexMesh<3, 3>* MeshBuilderHelper::MakeMeshUsing2dMesh(const MutableVertexMesh<2, 2>& mesh2, const double zHeight)
+MutableVertexMesh<3, 3>* Helper3dVertexMeshBuilder::MakeMeshUsing2dMesh(const MutableVertexMesh<2, 2>& mesh2, const double zHeight)
 {
     mNumLowerNodes = mesh2.GetNumNodes();
     mLowerNodes.resize(mNumLowerNodes);
@@ -127,13 +127,13 @@ MutableVertexMesh<3, 3>* MeshBuilderHelper::MakeMeshUsing2dMesh(const MutableVer
     return this->GenerateMesh();
 }
 
-MutableVertexMesh<3, 3>* MeshBuilderHelper::MakeNewMeshUsing2dMesh(const MutableVertexMesh<2, 2>& mesh2, const double zHeight)
+MutableVertexMesh<3, 3>* Helper3dVertexMeshBuilder::MakeNewMeshUsing2dMesh(const MutableVertexMesh<2, 2>& mesh2, const double zHeight)
 {
     ClearStoredMeshObjects();
     return MakeMeshUsing2dMesh(mesh2,zHeight);
 }
 
-MutableVertexMesh<3, 3>* MeshBuilderHelper::GenerateMesh()
+MutableVertexMesh<3, 3>* Helper3dVertexMeshBuilder::GenerateMesh()
 {
     // Combine the upper and lower nodes by adding upper_nodes into lower_nodes.
     // The index of upper nodes need to be modified.
@@ -146,7 +146,7 @@ MutableVertexMesh<3, 3>* MeshBuilderHelper::GenerateMesh()
     return mpMesh;
 }
 
-void MeshBuilderHelper::PrintMesh(const bool allElements) const
+void Helper3dVertexMeshBuilder::PrintMesh(const bool allElements) const
 {
     const std::string TAB = "    " ;
     std::cout <<"=================================================================================" << std::endl;
@@ -215,7 +215,7 @@ void MeshBuilderHelper::PrintMesh(const bool allElements) const
     }
 }
 
-void MeshBuilderHelper::WriteVtk(const std::string& outputName, const std::string& additionalTag)
+void Helper3dVertexMeshBuilder::WriteVtk(const std::string& outputName, const std::string& additionalTag)
 {
     if (mpWriter == NULL)
     {
@@ -227,10 +227,10 @@ void MeshBuilderHelper::WriteVtk(const std::string& outputName, const std::strin
         delete mpWriter;
         mpWriter = new VertexMeshWriter<3, 3>(outputName + mAdditionalPath, mName, false);
     }
-    mpWriter->WriteVtkUsingMeshWithCellId(*mpMesh, additionalTag, false); ///\todo change to true to write with face index for devugging
+    mpWriter->WriteVtkUsingMeshWithCellId(*mpMesh, additionalTag, false); ///\todo change to true to write with face index for debugging #2850
 }
 
-void MeshBuilderHelper::BuildElementWith(const unsigned numNodesThis, const unsigned nodeIndicesThis[])
+void Helper3dVertexMeshBuilder::BuildElementWith(const unsigned numNodesThis, const unsigned nodeIndicesThis[])
 {
     std::vector<unsigned> node_indices_this_elem(numNodesThis);
     for (unsigned id=0 ; id<numNodesThis ;  node_indices_this_elem[id] = nodeIndicesThis[id], ++id);
@@ -238,7 +238,7 @@ void MeshBuilderHelper::BuildElementWith(const unsigned numNodesThis, const unsi
     BuildElementWith(node_indices_this_elem);
 }
 
-void MeshBuilderHelper::BuildElementWith(const std::vector<unsigned>& nodeIndicesThisElem)
+void Helper3dVertexMeshBuilder::BuildElementWith(const std::vector<unsigned>& nodeIndicesThisElem)
 {
     const unsigned num_nodes_this_elem = nodeIndicesThisElem.size();
     // Initializing vectors which are required for the generation of the VertexElement<3, 3>
@@ -338,7 +338,7 @@ void MeshBuilderHelper::BuildElementWith(const std::vector<unsigned>& nodeIndice
     mElements.push_back(p_elem);
 }
 
-void MeshBuilderHelper::ClearStoredMeshObjects()
+void Helper3dVertexMeshBuilder::ClearStoredMeshObjects()
 {
     mLowerNodes.clear();
     mUpperNodes.clear();

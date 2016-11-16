@@ -46,11 +46,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 
 /**
- * A force class for use in Vertex-based simulations. This force is based on the
+ * A force class for use in vertex-based simulations. This force is based on the
  * Energy function proposed by Farhadifar et al in  Curr. Biol., 2007, 17, 2095-2104.
  */
-
-
 template<unsigned DIM>
 class FarhadifarForce : public AbstractForce<DIM>
 {
@@ -98,7 +96,6 @@ protected:
      */
     double mBoundaryLineTensionParameter;
 
-
 public:
 
     /**
@@ -114,7 +111,7 @@ public:
     /**
      * Overridden AddForceContribution() method.
      *
-     * Calculates the force on each node in the vertex-based cell population based on the energy function
+     * Calculates the force on each node in the vertex-based cell population based on the energy function in
      * Farhadifar's model.
      *
      * @param rCellPopulation reference to the cell population

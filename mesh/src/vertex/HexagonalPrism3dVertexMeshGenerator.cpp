@@ -140,7 +140,7 @@ HexagonalPrism3dVertexMeshGenerator::HexagonalPrism3dVertexMeshGenerator(unsigne
         p_upper_node->AddNodeAttribute(1.0);
         nodes[upper_node_index] = p_upper_node;
 
-        lower_node_index++; ///\todo remove this line?
+        lower_node_index++; ///\todo remove this line? #2850
     }
 
     unsigned num_lower_faces = numElementsInXDirection*numElementsInYDirection;
@@ -403,7 +403,7 @@ HexagonalPrism3dVertexMeshGenerator::HexagonalPrism3dVertexMeshGenerator(unsigne
     }
 
     // Create vector of face orientations
-    ///\todo think carefully about whether all faces are oriented anticlockwise
+    ///\todo think carefully about whether all faces are oriented anticlockwise #2850
     std::vector<bool> face_orientations;
     for (unsigned i=0; i<faces.size(); i++)
     {
@@ -621,7 +621,7 @@ HexagonalPrism3dVertexMeshGenerator::HexagonalPrism3dVertexMeshGenerator(unsigne
 //    }
 //}
 
-    mpMesh = new MutableVertexMesh<3,3>(nodes, elements);//cellRearrangementThreshold, t2Threshold); ///\todo
+    mpMesh = new MutableVertexMesh<3,3>(nodes, elements);//cellRearrangementThreshold, t2Threshold); ///\todo #2850
 
     // Scale the mesh so that each element's area takes the value elementArea
     mpMesh->Scale(sqrt(3.0)*elementSideLength, sqrt(3.0)*elementSideLength);

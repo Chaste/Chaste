@@ -35,9 +35,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "MisraForce.hpp"
 
-template<unsigned DIM>
-MisraForce<DIM>::MisraForce()
-   : AbstractForce<DIM>(),
+MisraForce::MisraForce()
+   : AbstractForce<3>(),
      mApicalLineTensionParameter(1.0), // These parameters are average values in Misra's paper
      mLateralSurfaceEnergyParameter(2.0),
      mBasalSurfaceEnergyParameter(0.98),
@@ -46,24 +45,22 @@ MisraForce<DIM>::MisraForce()
 {
 }
 
-template<unsigned DIM>
-MisraForce<DIM>::~MisraForce()
+MisraForce::~MisraForce()
 {
 }
 
-template<unsigned DIM>
-void MisraForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation)
+void MisraForce::AddForceContribution(AbstractCellPopulation<3>& rCellPopulation)
 {
     // Throw an exception message if not using a VertexBasedCellPopulation
     ///\todo check whether this line influences profiling tests - if so, we should remove it.
-    if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation) == NULL)
+    if (dynamic_cast<VertexBasedCellPopulation<3>*>(&rCellPopulation) == NULL)
     {
         EXCEPTION("MisraForce is to be used with a VertexBasedCellPopulation only");
     }
 
     // Define some helper variables
-    VertexBasedCellPopulation<DIM>* p_cell_population = static_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation);
-    MutableVertexMesh<DIM, DIM>& rMesh = p_cell_population->rGetMesh();
+    VertexBasedCellPopulation<3>* p_cell_population = static_cast<VertexBasedCellPopulation<3>*>(&rCellPopulation);
+    MutableVertexMesh<3,3>& rMesh = p_cell_population->rGetMesh();
     const unsigned num_nodes = p_cell_population->GetNumNodes();
     const unsigned num_elements = p_cell_population->GetNumElements();
 
@@ -78,7 +75,7 @@ void MisraForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCellPop
     // Iterate over nodes in the cell population
     for (unsigned node_global_index=0; node_global_index<num_nodes; node_global_index++)
     {
-        Node<DIM>* p_this_node = p_cell_population->GetNode(node_global_index);
+        Node<3>* p_this_node = p_cell_population->GetNode(node_global_index);
         assert(node_global_index == p_this_node->GetIndex());
 
         // Get the type of node. 1=basal; 2=apical
@@ -95,10 +92,10 @@ void MisraForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCellPop
          * of the CellPtrs containing it, we can just consider the contributions
          * to the free energy gradient from each of these CellPtrs.
          */
-        c_vector<double, DIM> volume_elasticity_contribution = zero_vector<double>(DIM);
-        c_vector<double, DIM> basal_face_contribution = zero_vector<double>(DIM);
-        c_vector<double, DIM> apical_line_tension_contribution = zero_vector<double>(DIM);
-        c_vector<double, DIM> lateral_face_contribution = zero_vector<double>(DIM);
+        c_vector<double, 3> volume_elasticity_contribution = zero_vector<double>(3);
+        c_vector<double, 3> basal_face_contribution = zero_vector<double>(3);
+        c_vector<double, 3> apical_line_tension_contribution = zero_vector<double>(3);
+        c_vector<double, 3> lateral_face_contribution = zero_vector<double>(3);
 
         // A helper variable so that "non-boundary" lateral face will not be counted twice
         std::set<unsigned> counted_lateral_face_indices;
@@ -112,16 +109,16 @@ void MisraForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCellPop
              ++iter)
         {
             // Get this element, its index and its number of nodes
-            VertexElement<DIM, DIM>* p_element = p_cell_population->GetElement(*iter);
-            std::vector<VertexElement<DIM-1, DIM>*> lateral_faces;
-            VertexElement<DIM-1,DIM>* p_basal_face = NULL;
-            VertexElement<DIM-1,DIM>* p_apical_face = NULL;
+            VertexElement<3,3>* p_element = p_cell_population->GetElement(*iter);
+            std::vector<VertexElement<2, 3>*> lateral_faces;
+            VertexElement<2,3>* p_basal_face = NULL;
+            VertexElement<2,3>* p_apical_face = NULL;
             bool apical_face_orientation = false;
 
             // Populate the pointers/vector to different types of face
             for (unsigned face_index=0; face_index<p_element->GetNumFaces(); ++face_index)
             {
-                VertexElement<DIM-1,DIM>* p_tmp_face = p_element->GetFace(face_index);
+                VertexElement<2,3>* p_tmp_face = p_element->GetFace(face_index);
                 switch (unsigned(p_tmp_face->rGetElementAttributes()[0]))
                 {
                     case 1:
@@ -142,7 +139,7 @@ void MisraForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCellPop
             const unsigned elem_index = p_element->GetIndex();
 
             // Calculating volume contribution
-            c_vector<double, DIM> element_volume_gradient = rMesh.GetVolumeGradientofElementAtNode(p_element, node_global_index);
+            c_vector<double, 3> element_volume_gradient = rMesh.GetVolumeGradientofElementAtNode(p_element, node_global_index);
 
             // Add the force contribution from this cell's volume compressibility (note the minus sign)
             volume_elasticity_contribution -= GetVolumeCompressibilityParameter()*(element_volumes[elem_index] - mTargetVolume)*element_volume_gradient;
@@ -158,10 +155,10 @@ void MisraForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCellPop
 
                 // Get the previous and next nodes in this element
                 const unsigned previous_apical_node_index = (num_apical_nodes+local_apical_node_index-1)%num_apical_nodes;
-                Node<DIM>* p_previous_apical_node = p_apical_face->GetNode(previous_apical_node_index);
+                Node<3>* p_previous_apical_node = p_apical_face->GetNode(previous_apical_node_index);
 
                 const unsigned next_apical_node_index = (local_apical_node_index+1)%num_apical_nodes;
-                Node<DIM>* p_next_apical_node = p_apical_face->GetNode(next_apical_node_index);
+                Node<3>* p_next_apical_node = p_apical_face->GetNode(next_apical_node_index);
 
                 // Compute the apical line tension parameter for each of these edges - be aware that this is half of the actual
                 // value for internal edges since we are looping over each of the internal edges twice
@@ -169,8 +166,8 @@ void MisraForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCellPop
                 const double next_edge_line_tension_parameter = GetApicalLineTensionParameter(p_this_node, p_next_apical_node, *p_cell_population);
 
                 // Compute the gradient of each these edges, computed at the present node
-                const c_vector<double, DIM> previous_edge_gradient = rMesh.GetPreviousEdgeGradientOfElementAtNode(p_apical_face, local_apical_node_index, apical_face_orientation);
-                const c_vector<double, DIM> next_edge_gradient = rMesh.GetNextEdgeGradientOfElementAtNode(p_apical_face, local_apical_node_index, apical_face_orientation);
+                const c_vector<double, 3> previous_edge_gradient = rMesh.GetPreviousEdgeGradientOfElementAtNode(p_apical_face, local_apical_node_index, apical_face_orientation);
+                const c_vector<double, 3> next_edge_gradient = rMesh.GetNextEdgeGradientOfElementAtNode(p_apical_face, local_apical_node_index, apical_face_orientation);
 
                 // Add the force contribution from cell-cell and cell-boundary line tension (note the minus sign)
                 apical_line_tension_contribution -= previous_edge_line_tension_parameter*previous_edge_gradient
@@ -181,7 +178,7 @@ void MisraForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCellPop
             if (node_type == 1)
             {
                 const unsigned localBasalNodeIndex = p_basal_face->GetNodeLocalIndex(node_global_index);
-                const c_vector<double, DIM> basal_face_gradient = rMesh.GetAreaGradientOfFaceAtNode(p_basal_face, localBasalNodeIndex);
+                const c_vector<double, 3> basal_face_gradient = rMesh.GetAreaGradientOfFaceAtNode(p_basal_face, localBasalNodeIndex);
 
                 basal_face_contribution -= GetBasalSurfaceEnergyParameter() * basal_face_gradient;
             }
@@ -189,7 +186,7 @@ void MisraForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCellPop
             // Compute lateral surface contribution
             for (unsigned local_lateral_face_index = 0; local_lateral_face_index<lateral_faces.size(); ++local_lateral_face_index)
             {
-                VertexElement<DIM-1, DIM>* p_lateral_face = lateral_faces[local_lateral_face_index];
+                VertexElement<2,3>* p_lateral_face = lateral_faces[local_lateral_face_index];
                 bool lateral_face_has_node = false;
 
                 // Check if this lateral face contains this node
@@ -216,7 +213,7 @@ void MisraForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCellPop
                     {
                         const unsigned local_lateral_node_index = p_lateral_face->GetNodeLocalIndex(node_global_index);
 
-                        const c_vector<double, DIM> lateral_face_gradient = rMesh.GetAreaGradientOfFaceAtNode(p_lateral_face, local_lateral_node_index);
+                        const c_vector<double, 3> lateral_face_gradient = rMesh.GetAreaGradientOfFaceAtNode(p_lateral_face, local_lateral_node_index);
                         lateral_face_contribution -= GetLateralSurfaceEnergyParameter() * lateral_face_gradient;
 
                         // Update counted_lateral_face_indices and an assertion
@@ -227,14 +224,13 @@ void MisraForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCellPop
             }
         }
 
-        c_vector<double, DIM> force_on_node = volume_elasticity_contribution + lateral_face_contribution
+        c_vector<double, 3> force_on_node = volume_elasticity_contribution + lateral_face_contribution
                                               + apical_line_tension_contribution + basal_face_contribution;
         p_this_node->AddAppliedForceContribution(force_on_node);
     }
 }
 
-template<unsigned DIM>
-double MisraForce<DIM>::GetApicalLineTensionParameter(Node<DIM>* pNodeA, Node<DIM>* pNodeB, VertexBasedCellPopulation<DIM>& rVertexCellPopulation) const
+double MisraForce::GetApicalLineTensionParameter(Node<3>* pNodeA, Node<3>* pNodeB, VertexBasedCellPopulation<3>& rVertexCellPopulation) const
 {
     // Find the indices of the elements owned by each node
     std::set<unsigned> elements_containing_nodeA = pNodeA->rGetContainingElementIndices();
@@ -264,68 +260,57 @@ double MisraForce<DIM>::GetApicalLineTensionParameter(Node<DIM>* pNodeA, Node<DI
     return line_tension_parameter_in_calculation;
 }
 
-template<unsigned DIM>
-double MisraForce<DIM>::GetVolumeCompressibilityParameter() const
+double MisraForce::GetVolumeCompressibilityParameter() const
 {
     return mVolumeCompressibilityParameter;
 }
 
-template<unsigned DIM>
-double MisraForce<DIM>::GetLateralSurfaceEnergyParameter() const
+double MisraForce::GetLateralSurfaceEnergyParameter() const
 {
     return mLateralSurfaceEnergyParameter;
 }
 
-template<unsigned DIM>
-double MisraForce<DIM>::GetApicalLineTensionParameter() const
+double MisraForce::GetApicalLineTensionParameter() const
 {
     return mApicalLineTensionParameter;
 }
 
-template<unsigned DIM>
-double MisraForce<DIM>::GetBoundaryLineTensionParameter() const
+double MisraForce::GetBoundaryLineTensionParameter() const
 {
     return mApicalLineTensionParameter;
 }
 
-template<unsigned DIM>
-double MisraForce<DIM>::GetBasalSurfaceEnergyParameter() const
+double MisraForce::GetBasalSurfaceEnergyParameter() const
 {
     return mBasalSurfaceEnergyParameter;
 }
 
-template<unsigned DIM>
-void MisraForce<DIM>::SetVolumeCompressibilityParameter(double volumeCompressibilityParameter)
+void MisraForce::SetVolumeCompressibilityParameter(double volumeCompressibilityParameter)
 {
     mVolumeCompressibilityParameter = volumeCompressibilityParameter;
 }
 
-template<unsigned DIM>
-void MisraForce<DIM>::SetLateralSurfaceEnergyParameter(double LateralSurfaceEnergyParameter)
+void MisraForce::SetLateralSurfaceEnergyParameter(double LateralSurfaceEnergyParameter)
 {
     mLateralSurfaceEnergyParameter = LateralSurfaceEnergyParameter;
 }
 
-template<unsigned DIM>
-void MisraForce<DIM>::SetBasalSurfaceEnergyParameter(double BasalSurfaceEnergyParameter)
+void MisraForce::SetBasalSurfaceEnergyParameter(double BasalSurfaceEnergyParameter)
 {
     mBasalSurfaceEnergyParameter = BasalSurfaceEnergyParameter;
 }
 
-template<unsigned DIM>
-void MisraForce<DIM>::SetApicalLineTensionParameter(double apicalLineTensionParameter)
+void MisraForce::SetApicalLineTensionParameter(double apicalLineTensionParameter)
 {
     mApicalLineTensionParameter = apicalLineTensionParameter;
 }
 
-template<unsigned DIM>
-void MisraForce<DIM>::SetTargetVolume(double targetVolume)
+void MisraForce::SetTargetVolume(double targetVolume)
 {
     mTargetVolume = targetVolume;
 }
 
-template<unsigned DIM>
-void MisraForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
+void MisraForce::OutputForceParameters(out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<ApicalLineTensionParameter>" << mApicalLineTensionParameter << "</ApicalLineTensionParameter>\n";
     *rParamsFile << "\t\t\t<LateralSurfaceEnergyParameter>" << mLateralSurfaceEnergyParameter << "</LateralSurfaceEnergyParameter>\n";
@@ -333,13 +318,9 @@ void MisraForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
     *rParamsFile << "\t\t\t<VolumeCompressibilityParameter>" << mVolumeCompressibilityParameter << "</VolumeCompressibilityParameter>\n";
 
     // Call method on direct parent class
-    AbstractForce<DIM>::OutputForceParameters(rParamsFile);
+    AbstractForce<3>::OutputForceParameters(rParamsFile);
 }
-
-// Explicit instantiation
-///\todo template class MisraForce<2>;
-template class MisraForce<3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS1(MisraForce,3)
+CHASTE_CLASS_EXPORT(MisraForce)

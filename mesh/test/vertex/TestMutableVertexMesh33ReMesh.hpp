@@ -7,7 +7,7 @@
 #include "FileComparison.hpp"
 #include "Warnings.hpp"
 #include "MutableVertexMesh.hpp"
-#include "MeshBuilderHelper.hpp"
+#include "Helper3dVertexMeshBuilder.hpp"
 
 // This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
@@ -46,7 +46,7 @@ public:
         unsigned node_indices_elem_2[3] = {0, 1, 4};
         unsigned node_indices_elem_3[4] = {4, 5, 3, 0};
 
-        MeshBuilderHelper builder(nodes, "T1SwapWith4Elements");
+        Helper3dVertexMeshBuilder builder(nodes, "T1SwapWith4Elements");
         builder.BuildElementWith(3, node_indices_elem_0);
         builder.BuildElementWith(4, node_indices_elem_1);
         builder.BuildElementWith(3, node_indices_elem_2);
@@ -158,7 +158,7 @@ PRINT_REMESH
         unsigned node_indices_elem_2[3] = {0, 1, 4};
         unsigned node_indices_elem_3[4] = {4, 5, 3, 0};
 
-        MeshBuilderHelper builder(nodes, "T1NoSwap");
+        Helper3dVertexMeshBuilder builder(nodes, "T1NoSwap");
         builder.BuildElementWith(3, node_indices_elem_0);
         builder.BuildElementWith(4, node_indices_elem_1);
         builder.BuildElementWith(3, node_indices_elem_2);
@@ -217,7 +217,7 @@ PRINT_MESH
         unsigned node_indices_elem_2[3] = {0, 1, 4};
         unsigned node_indices_elem_3[4] = {4, 5, 3, 0};
 
-        MeshBuilderHelper builder(nodes, "T1SwapNonEvenFace");
+        Helper3dVertexMeshBuilder builder(nodes, "T1SwapNonEvenFace");
         builder.BuildElementWith(3, node_indices_elem_0);
         builder.BuildElementWith(4, node_indices_elem_1);
         builder.BuildElementWith(3, node_indices_elem_2);
@@ -266,7 +266,7 @@ PRINT_REMESH
         unsigned node_indices_elem_1[3] = {1, 4, 0};
         unsigned node_indices_elem_2[4] = {0, 4, 5, 3};
 
-        MeshBuilderHelper builder(nodes, "T1SwapOnBoundary");
+        Helper3dVertexMeshBuilder builder(nodes, "T1SwapOnBoundary");
         builder.BuildElementWith(3, node_indices_elem_0);
         builder.BuildElementWith(3, node_indices_elem_1);
         builder.BuildElementWith(4, node_indices_elem_2);
@@ -359,7 +359,7 @@ PRINT_REMESH
         unsigned node_indices_elem_1[3] = {1, 4, 0};
         unsigned node_indices_elem_2[4] = {0, 4, 5, 3};
 
-        MeshBuilderHelper builder(nodes, "T1SwapOnBoundary2");
+        Helper3dVertexMeshBuilder builder(nodes, "T1SwapOnBoundary2");
         builder.BuildElementWith(4, node_indices_elem_0);
         builder.BuildElementWith(3, node_indices_elem_1);
         builder.BuildElementWith(4, node_indices_elem_2);
@@ -455,7 +455,7 @@ PRINT_REMESH
         unsigned node_indices_elem_0[4] = {0, 4, 5, 3};
         unsigned node_indices_elem_1[4] = {4, 1, 2, 5};
 
-        MeshBuilderHelper builder(nodes, "T1SwapWhenVoidForms");
+        Helper3dVertexMeshBuilder builder(nodes, "T1SwapWhenVoidForms");
         builder.BuildElementWith(4, node_indices_elem_0);
         builder.BuildElementWith(4, node_indices_elem_1);
         // A reference variable as mesh is noncopyable
@@ -536,7 +536,7 @@ PRINT_REMESH
         unsigned node_indices_elem_2[3] = {1, 4, 0};
         unsigned node_indices_elem_3[4] = {0, 4, 5, 3};
 
-        MeshBuilderHelper builder(nodes, "T1SwapExceptions");
+        Helper3dVertexMeshBuilder builder(nodes, "T1SwapExceptions");
         builder.BuildElementWith(3, node_indices_elem_0);
         builder.BuildElementWith(4, node_indices_elem_1);
         builder.BuildElementWith(3, node_indices_elem_2);
@@ -579,7 +579,7 @@ PRINT_REMESH
         unsigned node_indices_elem_2[4] = {0, 4, 6, 3};
         unsigned node_indices_elem_3[3] = { 4, 5, 6};
 
-        MeshBuilderHelper builder(nodes, "T1NoSwapWithTriangularPrism");
+        Helper3dVertexMeshBuilder builder(nodes, "T1NoSwapWithTriangularPrism");
         builder.BuildElementWith(4, node_indices_elem_0);
         builder.BuildElementWith(4, node_indices_elem_1);
         builder.BuildElementWith(4, node_indices_elem_2);
@@ -634,7 +634,7 @@ PRINT_REMESH
         unsigned node_indices_elem_1[3] = {1, 4, 3};
         unsigned node_indices_elem_2[3] = {0, 3, 2};
 
-        MeshBuilderHelper builder(nodes, "NoT1SwapWithTriangularVoid");
+        Helper3dVertexMeshBuilder builder(nodes, "NoT1SwapWithTriangularVoid");
         builder.BuildElementWith(4, node_indices_elem_0);
         builder.BuildElementWith(3, node_indices_elem_1);
         builder.BuildElementWith(3, node_indices_elem_2);
@@ -672,7 +672,7 @@ PRINT_REMESH
         MutableVertexMesh<2, 2> vertex_2mesh;
         vertex_2mesh.ConstructFromMeshReader(mesh_reader);
 
-        MeshBuilderHelper builder("T1SwapReMesh");
+        Helper3dVertexMeshBuilder builder("T1SwapReMesh");
         MutableVertexMesh<3, 3>& vertex_mesh = *(builder.MakeMeshUsing2dMesh(vertex_2mesh) );
         builder.WriteVtk(OUTPUT_NAME,"Before");
 PRINT_MESH
@@ -734,7 +734,7 @@ PRINT_MESH
         unsigned node_indices_elem_2[4] = {2, 0, 3, 5};
         unsigned node_indices_elem_3[4] = {0, 1, 4, 3};
 
-        MeshBuilderHelper builder(nodes, "T2Swap");
+        Helper3dVertexMeshBuilder builder(nodes, "T2Swap");
         builder.BuildElementWith(3, node_indices_elem_0);
         builder.BuildElementWith(4, node_indices_elem_1);
         builder.BuildElementWith(4, node_indices_elem_2);
@@ -818,7 +818,7 @@ PRINT_REMESH
         unsigned node_indices_elem_1[4] = {1, 2, 5, 4};
         unsigned node_indices_elem_2[4] = {2, 0, 3, 5};
 
-        MeshBuilderHelper builder(nodes, "T2SwapOnBoundary");
+        Helper3dVertexMeshBuilder builder(nodes, "T2SwapOnBoundary");
         builder.BuildElementWith(3, node_indices_elem_0);
         builder.BuildElementWith(4, node_indices_elem_1);
         builder.BuildElementWith(4, node_indices_elem_2);
@@ -891,7 +891,7 @@ PRINT_REMESH
         const unsigned node_indices_elem_0[3] = {2, 3, 4};
         const unsigned node_indices_elem_1[4] = {0, 1, 4, 3};
 
-        MeshBuilderHelper builder(nodes, "T2SwapOnBoundary2");
+        Helper3dVertexMeshBuilder builder(nodes, "T2SwapOnBoundary2");
         builder.BuildElementWith(3, node_indices_elem_0);
         builder.BuildElementWith(4, node_indices_elem_1);
         // A reference variable as mesh is noncopyable
@@ -957,7 +957,7 @@ PRINT_REMESH
         const unsigned node_indices_elem_2[4] = {2, 0, 3, 5};
         const unsigned node_indices_elem_3[4] = {0, 1, 4, 3};
 
-        MeshBuilderHelper builder(nodes, "T2NoSwapWithTriangularNeighbours");
+        Helper3dVertexMeshBuilder builder(nodes, "T2NoSwapWithTriangularNeighbours");
         builder.BuildElementWith(3, node_indices_elem_0);
         builder.BuildElementWith(3, node_indices_elem_1);
         builder.BuildElementWith(4, node_indices_elem_2);
@@ -1005,7 +1005,7 @@ PRINT_REMESH
         const unsigned node_indices_elem_3[3] = {3, 4, 6};
         const unsigned node_indices_elem_4[5] = {4, 5, 8, 7, 6};
 
-        MeshBuilderHelper builder(nodes, "T2SwapWithRosette");
+        Helper3dVertexMeshBuilder builder(nodes, "T2SwapWithRosette");
         builder.BuildElementWith(4, node_indices_elem_0);
         builder.BuildElementWith(4, node_indices_elem_1);
         builder.BuildElementWith(4, node_indices_elem_2);
@@ -1094,7 +1094,7 @@ PRINT_REMESH
         const unsigned node_indices_elem_3[5] = {6, 7, 11, 10, 5};
         const unsigned node_indices_elem_4[4] = {8, 9, 10, 11};
 
-        MeshBuilderHelper builder(nodes, "T2SwapWithRosette2");
+        Helper3dVertexMeshBuilder builder(nodes, "T2SwapWithRosette2");
         builder.BuildElementWith(5, node_indices_elem_0);
         builder.BuildElementWith(5, node_indices_elem_1);
         builder.BuildElementWith(5, node_indices_elem_2);
@@ -1163,7 +1163,7 @@ PRINT_REMESH
         nodes.push_back(new Node<3>(4, true, 0.6, 0.0));
 
         const unsigned node_indices_elem_0[5] = {0, 3, 4, 1, 2};
-        MeshBuilderHelper builder(nodes, "NodeMerge");
+        Helper3dVertexMeshBuilder builder(nodes, "NodeMerge");
         builder.BuildElementWith(5, node_indices_elem_0);
         // A reference variable as mesh is noncopyable
         MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();

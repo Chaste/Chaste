@@ -41,8 +41,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellBasedTestSuite.hpp"
 
 #include "CheckpointArchiveTypes.hpp"
-#include "AbstractForce.hpp"
 
+#include "PatternedApicalConstrictionForce.hpp"
 #include "VoronoiPrism3dVertexMeshGenerator.hpp"
 #include "VoronoiVertexMeshGenerator.hpp"
 #include "VertexBasedCellPopulation.hpp"
@@ -51,205 +51,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NoCellCycleModel.hpp"
 #include "SmartPointers.hpp"
 #include "OffLatticeSimulation.hpp"
-
+#include "HoneycombVertexMeshGenerator.hpp"
+#include "Helper3dVertexMeshBuilder.hpp"
+#include "CellLabel.hpp"
+#include "CellLabelWriter.hpp"
 #include "FakePetscSetup.hpp"
 
-#include "GeneralMonolayerVertexMeshForce.hpp"
-
 #define OUTPUT_NAME "TestApicalConstrictionExample/InitialMesh"
-#define ADDFORCEPARAMETER p_force3->SetVolumeParameter(0.8, 10);
+#define ADDFORCEPARAMETER p_force3->SetVolumeParameters(0.8, 10);
 #define CURRENT_TEST std::string("Volume2")
 #define END_TIME 0.5
 
-#include "HoneycombVertexMeshGenerator.hpp"
-#include "MeshBuilderHelper.hpp"
-#include "CellLabel.hpp"
-#include "CellLabelWriter.hpp"
-
-template<unsigned DIM>
-class PatternedApicalConstrictionForce : public GeneralMonolayerVertexMeshForce<DIM>
-{
-private:
-
-    friend class boost::serialization::access;
-    template<class Archive>
-    void serialize(Archive & archive, const unsigned int version)
-    {
-        archive & boost::serialization::base_object<GeneralMonolayerVertexMeshForce<DIM> >(*this);
-    }
-
-    double mPatternedTargetApicalArea;
-    double mPatternedApicalareaParameter;
-    double mPatternedApicalEdgeParameter;
-
-public:
-    /**
-     * Default constructor.
-     */
-    PatternedApicalConstrictionForce()
-        : GeneralMonolayerVertexMeshForce<DIM>(),
-          mPatternedTargetApicalArea(0.0),
-          mPatternedApicalareaParameter(0.0),
-          mPatternedApicalEdgeParameter(0.0)
-    {
-    }
-
-    virtual ~PatternedApicalConstrictionForce()
-    {
-    }
-
-    void SetPatternedApicalParameter(const double patternedApicalEdgeParameter,
-                                     const double patternedApicalareaParameter,
-                                     const double patternedTargetApicalArea)
-    {
-        mPatternedTargetApicalArea = patternedTargetApicalArea;
-        mPatternedApicalareaParameter = patternedApicalareaParameter;
-        mPatternedApicalEdgeParameter = patternedApicalEdgeParameter;
-    }
-
-    virtual void AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation)
-    {
-        c_vector<double, DIM> force = zero_vector<double>(DIM);
-        if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation) == NULL)
-        {
-            EXCEPTION("PatternedApicalConstrictionForce is to be used with a VertexBasedCellPopulation only");
-        }
-
-        // Define some helper variables
-        VertexBasedCellPopulation<DIM>* p_cell_population = static_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation);
-        MutableVertexMesh<DIM, DIM>& rMesh = p_cell_population->rGetMesh();
-        const unsigned num_nodes = p_cell_population->GetNumNodes();
-        const unsigned num_elements = p_cell_population->GetNumElements();
-
-        // Begin by computing the volumes of each element in the mesh, to avoid having to do this multiple times
-        std::vector<double> element_volumes(num_elements);
-        std::vector<double> apical_areas(num_elements);
-        std::vector<double> basal_areas(num_elements);
-        for (unsigned elem_index = 0 ; elem_index<num_elements ; ++elem_index)
-        {
-            const VertexElement<DIM, DIM>* p_elem = p_cell_population->GetElement(elem_index);
-            assert(elem_index == p_elem->GetIndex());
-            element_volumes[elem_index] = rMesh.GetVolumeOfElement(elem_index);
-            apical_areas[elem_index] = rMesh.CalculateAreaOfFace(p_elem->GetFace(1));
-            basal_areas[elem_index] = rMesh.CalculateAreaOfFace(p_elem->GetFace(0));
-        }
-
-        // Iterate over nodes in the cell population
-        for (unsigned node_index=0 ; node_index<num_nodes ; node_index++)
-        {
-            Node<DIM>* p_this_node = p_cell_population->GetNode(node_index);
-            assert(node_index == p_this_node->GetIndex());
-            // Get the type of node. 1=basal; 2=apical
-            const unsigned node_type = unsigned(p_this_node->rGetNodeAttributes()[0]);
-            c_vector<double, DIM> basal_face_contribution = zero_vector<double>(DIM);
-            c_vector<double, DIM> ab_edge_contribution = zero_vector<double>(DIM);
-            c_vector<double, DIM> apical_face_contribution = zero_vector<double>(DIM);
-            c_vector<double, DIM> lateral_edge_contribution = zero_vector<double>(DIM);
-            c_vector<double, DIM> volume_contribution = zero_vector<double>(DIM);
-
-            // A variable to store such that the apical/basal edge forces are not counted twice for non-boundary edges.
-            std::set<unsigned> neighbour_node_indices;
-
-            // Find the indices of the elements owned by this node
-            const std::set<unsigned> containing_elem_indices = p_this_node->rGetContainingElementIndices();
-
-            // Iterate over these elements
-            for (std::set<unsigned>::iterator iter = containing_elem_indices.begin();
-                 iter != containing_elem_indices.end();
-                 ++iter)
-            {
-                // Get this element, its index and its number of nodes
-                VertexElement<DIM, DIM>* p_element = p_cell_population->GetElement(*iter);
-                std::vector<VertexElement<DIM-1, DIM>*> lateral_faces;
-
-                // Populate the pointers/vector to different types of face
-                for (unsigned face_index=0; face_index<p_element->GetNumFaces(); ++face_index)
-                {
-                    VertexElement<DIM-1,DIM>* p_tmp_face = p_element->GetFace(face_index);
-                    switch (unsigned(p_tmp_face->rGetElementAttributes()[0]))
-                    {
-                        case 1:
-                            assert(face_index == 0);
-                            break;
-                        case 2:
-                            assert(face_index == 1);
-                            break;
-                        case 3:
-                            lateral_faces.push_back(p_tmp_face);
-                            break;
-                        default:
-                            NEVER_REACHED;
-                    }
-                }
-
-                const unsigned elem_index = p_element->GetIndex();
-
-                // Calculating volume contribution
-                c_vector<double, DIM> element_volume_gradient = rMesh.GetVolumeGradientofElementAtNode(p_element, node_index);
-                // Add the force contribution from this cell's volume compressibility (note the minus sign)
-                volume_contribution -= this->mVolumeParameter*element_volume_gradient*(element_volumes[elem_index] - this->mTargetVolume);
-                // Pointer to the face having the same type as the node
-                const VertexElement<DIM-1, DIM>* p_ab_face = p_element->GetFace(node_type - 1);
-                const unsigned local_node_index_in_ab_face = p_ab_face->GetNodeLocalIndex(node_index);
-                const c_vector<double, DIM> ab_face_gradient = rMesh.GetAreaGradientOfFaceAtNode(p_ab_face, local_node_index_in_ab_face);
-                // Calculating apical face contribution
-                if (node_type == 2)
-                {
-                    bool cell_is_labelled = p_cell_population->GetCellUsingLocationIndex(elem_index)->template HasCellProperty<CellLabel>();
-                    double apical_target_area = cell_is_labelled ? mPatternedTargetApicalArea : this->mTargetApicalArea;
-                    double apical_area_parameter = cell_is_labelled ? mPatternedApicalareaParameter : this->mApicalareaParameter;
-
-                    apical_face_contribution -= apical_area_parameter*ab_face_gradient*(apical_areas[elem_index] - apical_target_area);
-                }
-                // Computing basal face contribution
-                if (node_type == 1)
-                {
-                    basal_face_contribution -= this->mBasalareaParameter*ab_face_gradient*(basal_areas[elem_index] - this->mTargetBasalArea);
-                }
-                const unsigned num_nodes_in_ab_face = p_ab_face->GetNumNodes();
-                neighbour_node_indices.insert(p_ab_face->GetNodeGlobalIndex((local_node_index_in_ab_face+1)%num_nodes_in_ab_face));
-                neighbour_node_indices.insert(p_ab_face->GetNodeGlobalIndex((local_node_index_in_ab_face-1+num_nodes_in_ab_face)%num_nodes_in_ab_face));
-            }
-
-            for (std::set<unsigned>::iterator it = neighbour_node_indices.begin();
-                 it != neighbour_node_indices.end();
-                 ++it)
-            {
-                Node<DIM>* p_neighbour_node = p_cell_population->GetNode(*it);
-                const c_vector<double, DIM> edge_gradient = (p_this_node->rGetLocation() - p_neighbour_node->rGetLocation())/norm_2(p_this_node->rGetLocation() - p_neighbour_node->rGetLocation());
-                ab_edge_contribution -= edge_gradient*(node_type==1u ? this->mBasalEdgeParameter : this->mApicalEdgeParameter);
-            }
-
-            const unsigned opposite_node_index = node_index + num_nodes/2*(node_type==1u?1:-1);
-            const Node<DIM>* p_opposite_node = p_cell_population->GetNode(opposite_node_index);
-            const c_vector<double, DIM> edge_gradient = (p_this_node->rGetLocation() - p_opposite_node->rGetLocation())/norm_2(p_this_node->rGetLocation() - p_opposite_node->rGetLocation());
-            lateral_edge_contribution -= edge_gradient*this->mLateralEdgeParameter*(containing_elem_indices.size());
-
-            c_vector<double, DIM> force_on_node = basal_face_contribution + ab_edge_contribution + apical_face_contribution
-                    + lateral_edge_contribution + volume_contribution;
-            p_this_node->AddAppliedForceContribution(force_on_node);
-        }
-    }
-
-    /**
-     * For the compiler now
-     * @param rParamsFile
-     */
-    virtual void OutputForceParameters(out_stream& rParamsFile)
-    {
-        *rParamsFile << "\t\t\t<PatternedTargetApicalArea>" << mPatternedTargetApicalArea << "</PatternedTargetApicalArea>\n";
-        *rParamsFile << "\t\t\t<PatternedApicalareaParameter>" << mPatternedApicalareaParameter << "</PatternedApicalareaParameter>\n";
-        *rParamsFile << "\t\t\t<PatternedApicalEdgeParameter>" << mPatternedApicalEdgeParameter << "</PatternedApicalEdgeParameter>\n";
-
-        // Call method on direct parent class
-        GeneralMonolayerVertexMeshForce<DIM>::OutputForceParameters(rParamsFile);
-    }
-};
-
-#include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS1(PatternedApicalConstrictionForce,3)
-#include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS1(PatternedApicalConstrictionForce,3)
 
 class TestApicalConstrictionExample : public AbstractCellBasedTestSuite
 {
@@ -268,7 +80,7 @@ public:
         HoneycombVertexMeshGenerator generator(num_cells_x, num_cells_y, false, 0.1, 0.01, target_area);
 //        VoronoiVertexMeshGenerator generator(num_cells_x, num_cells_y, 5, target_area);
         MutableVertexMesh<2, 2>& vertex_2mesh = *(generator.GetMesh());
-        MeshBuilderHelper builder("ApicalConstriction");
+        Helper3dVertexMeshBuilder builder("ApicalConstriction");
         MutableVertexMesh<3, 3>* p_mesh = builder.MakeMeshUsing2dMesh(vertex_2mesh);
         builder.WriteVtk(OUTPUT_NAME,"Before");
 
@@ -309,11 +121,11 @@ public:
         const double end_time = 4;
         simulator.SetEndTime(end_time);
 
-        MAKE_PTR(PatternedApicalConstrictionForce<3>, p_force3);
-        p_force3->SetApicalParameter(10, 10, 1);
-        p_force3->SetBasalParameter(10, 10, 1);
+        MAKE_PTR(PatternedApicalConstrictionForce, p_force3);
+        p_force3->SetApicalParameters(10, 10, 1);
+        p_force3->SetBasalParameters(10, 10, 1);
         p_force3->SetLateralParameter(4);
-        p_force3->SetVolumeParameter(200, 1);
+        p_force3->SetVolumeParameters(200, 1);
         p_force3->SetPatternedApicalParameter(20, 20, 0.5);
         simulator.AddForce(p_force3);
 
@@ -336,7 +148,7 @@ public:
 //        HoneycombVertexMeshGenerator generator(num_cells_x, num_cells_y, false, 0.1, 0.01, target_area);
 //        VoronoiVertexMeshGenerator generator(num_cells_x, num_cells_y, 5, target_area);
 //        MutableVertexMesh<2, 2>& vertex_2mesh = *(generator.GetMesh());
-//        MeshBuilderHelper builder("ApicalConstriction");
+//        Helper3dVertexMeshBuilder builder("ApicalConstriction");
 //        MutableVertexMesh<3, 3>* p_mesh = builder.MakeMeshUsing2dMesh(vertex_2mesh);
 //        builder.WriteVtk(OUTPUT_NAME,"Before");
 
@@ -378,10 +190,10 @@ public:
         simulator.SetEndTime(end_time);
 
         MAKE_PTR(PatternedApicalConstrictionForce<3>, p_force3);
-        p_force3->SetApicalParameter(10, 10, 1);
-        p_force3->SetBasalParameter(10, 10, 1);
+        p_force3->SetApicalParameters(10, 10, 1);
+        p_force3->SetBasalParameters(10, 10, 1);
         p_force3->SetLateralParameter(4);
-        p_force3->SetVolumeParameter(200, 1);
+        p_force3->SetVolumeParameters(200, 1);
         p_force3->SetPatternedApicalParameter(20, 20, 0.5);
         simulator.AddForce(p_force3);
 

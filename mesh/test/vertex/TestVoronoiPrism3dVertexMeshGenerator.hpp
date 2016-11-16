@@ -151,10 +151,9 @@ public:
         // Throws because fifth parameter <= 0.0
         TS_ASSERT_THROWS_THIS(VoronoiPrism3dVertexMeshGenerator generator(9, 9, 2, 4, -1.23),
                               "Specified target apical area must be strictly positive");
-
     }
 
-    void TestValidateSeedLocations() throw(Exception) ///\todo maybe check again the tests
+    void TestValidateSeedLocations() throw(Exception) ///\todo maybe check again the tests #2850
     {
         RESEED;
         // The instance of the generator class
@@ -282,7 +281,7 @@ public:
 
         generator.RefreshSeedsAndRegenerateMesh();
 
-        ///\todo need to add a test here
+        ///\todo need to add a test here #2850
     }
 
     void TestSetAndGetMethods() throw(Exception)

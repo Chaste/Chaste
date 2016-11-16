@@ -1838,8 +1838,9 @@ public:
 
         NodesOnlyMesh<3>* p_nodes_only_mesh = new NodesOnlyMesh<3>();
         NodeBasedCellPopulation<3> cell_population3(*p_nodes_only_mesh);
+
         // Test that MisraForce throws the correct exception
-        MisraForce<3> misra_force;
+        MisraForce misra_force;
         TS_ASSERT_THROWS_THIS(misra_force.AddForceContribution(cell_population3),
                         "MisraForce is to be used with a VertexBasedCellPopulation only");
 
@@ -2266,7 +2267,7 @@ public:
          cell_population.InitialiseCells();
 
          // Create a force system
-         MisraForce<3> force;
+         MisraForce force;
 
          // Test get/set methods
          TS_ASSERT_DELTA(force.GetVolumeCompressibilityParameter(), 100, 1e-12);
@@ -2335,7 +2336,7 @@ public:
 
         VertexBasedCellPopulation<3> population(*p_mesh,cells, false, false);
 
-        MisraForce<3> force;
+        MisraForce force;
         force.AddForceContribution(population);
 
         HexagonalPrism3dVertexMeshGenerator generator2(1, 1, 1, 3);

@@ -55,10 +55,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FakePetscSetup.hpp"
 
 #include "GeneralMonolayerVertexMeshForce.hpp"
-#include "MeshBuilderHelper.hpp"
+#include "Helper3dVertexMeshBuilder.hpp"
 
 #define OUTPUT_NAME "TestUniaxialLoad"
-#define ADDFORCEPARAMETER p_force3->SetVolumeParameter(0.8, 10);
+#define ADDFORCEPARAMETER p_force3->SetVolumeParameters(0.8, 10);
 #define CURRENT_TEST std::string("Volume2")
 #define END_TIME 0.5
 
@@ -76,7 +76,7 @@ public:
         const unsigned num_cells_y = 5;
         HoneycombVertexMeshGenerator generator(num_cells_x, num_cells_y, false, 0.1, 0.01, target_area);
         MutableVertexMesh<2, 2>& vertex_2mesh = *(generator.GetMesh());
-        MeshBuilderHelper builder("TestForceParameter");
+        Helper3dVertexMeshBuilder builder("TestForceParameter");
 
         std::vector<CellPtr> cells;
         CellsGenerator<NoCellCycleModel, 3> cells_generator;
@@ -99,11 +99,11 @@ MARK; TRACE("Volume vs Lateral")
             const double end_time = 0.1;
             simulator.SetEndTime(end_time);
 
-            MAKE_PTR(GeneralMonolayerVertexMeshForce<3>, p_force3);
-//            p_force3->SetApicalParameter(10, 10, 1);
-//            p_force3->SetBasalParameter(10, 10, 1);
+            MAKE_PTR(GeneralMonolayerVertexMeshForce, p_force3);
+//            p_force3->SetApicalParameters(10, 10, 1);
+//            p_force3->SetBasalParameters(10, 10, 1);
             p_force3->SetLateralParameter(i);
-            p_force3->SetVolumeParameter(100, z_height*target_area);
+            p_force3->SetVolumeParameters(100, z_height*target_area);
             simulator.AddForce(p_force3);
 
             simulator.Solve();
@@ -143,8 +143,8 @@ MARK; TRACE("Apical line vs apical area")
             const double end_time = 1;
             simulator.SetEndTime(end_time);
 
-            MAKE_PTR(GeneralMonolayerVertexMeshForce<3>, p_force3);
-            p_force3->SetApicalParameter(15, i, 1);
+            MAKE_PTR(GeneralMonolayerVertexMeshForce, p_force3);
+            p_force3->SetApicalParameters(15, i, 1);
             simulator.AddForce(p_force3);
 
             simulator.Solve();
@@ -184,9 +184,9 @@ MARK; TRACE("Apical line vs apical area")
             const double end_time = 0.1;
             simulator.SetEndTime(end_time);
 
-            MAKE_PTR(GeneralMonolayerVertexMeshForce<3>, p_force3);
-            p_force3->SetApicalParameter(10, i, 1);
-            p_force3->SetVolumeParameter(100, z_height*target_area);
+            MAKE_PTR(GeneralMonolayerVertexMeshForce, p_force3);
+            p_force3->SetApicalParameters(10, i, 1);
+            p_force3->SetVolumeParameters(100, z_height*target_area);
             simulator.AddForce(p_force3);
             simulator.Solve();
 

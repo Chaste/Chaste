@@ -33,19 +33,22 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef MESHBUILDERHELPER_HPP_
-#define MESHBUILDERHELPER_HPP_
+#ifndef HELPER3DVERTEXMESHBUILDER_HPP_
+#define HELPER3DVERTEXMESHBUILDER_HPP_
 
 #include "MutableVertexMesh.hpp"
 #include "VertexMeshWriter.hpp"
 
+///\todo document class (#2850)
+
 /*
+ *
  * nodeIndicesThisElem  array of global node indices which belongs to this to-be-created element in CCW
  * rLowerNodes  all the lower nodes
  * rUpperNodes  maybe all the upper nodes, if nothing here, it will be populated
  * rExistingFaces  all the created lateral faces so that no repeating faces, non-const as newly created face will be push back
  */
-class MeshBuilderHelper
+class Helper3dVertexMeshBuilder
 {
 private:
     std::string mName;
@@ -61,15 +64,18 @@ private:
     VertexMeshWriter<3, 3>* mpWriter;
 
 public:
-    MeshBuilderHelper(const std::vector<Node<3>*>& rLowerNodes,
+    Helper3dVertexMeshBuilder(const std::vector<Node<3>*>& rLowerNodes,
                       const std::string& additionalPath = "",
                       const std::string& name = "mesh",
                       const unsigned zHeight = 1);
 
-    MeshBuilderHelper(const std::string& additionalPath = "",
+    Helper3dVertexMeshBuilder(const std::string& additionalPath = "",
                       const std::string& name = "mesh");
 
-    ~MeshBuilderHelper();
+    /**
+     * Destructor.
+     */
+    ~Helper3dVertexMeshBuilder();
 
     MutableVertexMesh<3, 3>* MakeMeshUsing2dMesh(const MutableVertexMesh<2, 2>& mesh2, const double zHeight=1);
 
@@ -88,4 +94,4 @@ public:
     void ClearStoredMeshObjects();
 };
 
-#endif /*MESHBUILDERHELPER_HPP_*/
+#endif /*HELPER3DVERTEXMESHBUILDER_HPP_*/

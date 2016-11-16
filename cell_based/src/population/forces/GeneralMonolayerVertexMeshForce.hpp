@@ -38,8 +38,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractForce.hpp"
 
-template<unsigned DIM>
-class GeneralMonolayerVertexMeshForce : public AbstractForce<DIM>
+/**
+ * \todo Define this class and write down energy expression (#2850)
+ */
+class GeneralMonolayerVertexMeshForce : public AbstractForce<3>
 {
 private:
 
@@ -47,12 +49,12 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractForce<DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractForce<3> >(*this);
         archive & mTargetApicalArea;
-        archive & mApicalareaParameter;
+        archive & mApicalAreaParameter;
         archive & mApicalEdgeParameter;
         archive & mTargetBasalArea;
-        archive & mBasalareaParameter;
+        archive & mBasalAreaParameter;
         archive & mBasalEdgeParameter;
         archive & mLateralEdgeParameter;
         archive & mTargetVolume;
@@ -61,35 +63,126 @@ private:
 
 protected:
 
+    ///\todo #2850 Consider target area/volume growth in 3D
+
+    /**
+     * Target area for each cell's apical surface.
+     * Initialised to 0 in the constructor.
+     */
     double mTargetApicalArea;
-    double mApicalareaParameter;
+
+    /**
+     * Strength of each cell's apical surface area term in the energy expression.
+     * Initialised to 0 in the constructor.
+     */
+    double mApicalAreaParameter;
+
+    /**
+     * Strength of each apical cell-cell interface length term in the energy expression.
+     * Initialised to 0 in the constructor.
+     */
     double mApicalEdgeParameter;
 
+    /**
+     * Target area for each cell's basal surface.
+     * Initialised to 0 in the constructor.
+     */
     double mTargetBasalArea;
-    double mBasalareaParameter;
+
+    /**
+     * Strength of each cell's basal surface area term in the energy expression.
+     * Initialised to 0 in the constructor.
+     */
+    double mBasalAreaParameter;
+
+    /**
+     * Strength of each basal cell-cell interface length term in the energy expression.
+     * Initialised to 0 in the constructor.
+     */
     double mBasalEdgeParameter;
 
+    /**
+     * Strength of each lateral (apico-basal) cell-cell interface length term in the energy expression.
+     * Initialised to 0 in the constructor.
+     */
     double mLateralEdgeParameter;
 
+    /**
+     * Target volume for each cell.
+     * Initialised to 0 in the constructor.
+     */
     double mTargetVolume;
+
+    /**
+     * Strength of each cell's volume term in the energy expression.
+     * Initialised to 0 in the constructor.
+     */
     double mVolumeParameter;
 
 public:
+
+    /**
+     * Constuctor.
+     */
     GeneralMonolayerVertexMeshForce();
 
+    /**
+     * Destructor.
+     */
+    virtual ~GeneralMonolayerVertexMeshForce();
+
+    /**
+     * Overridden AddForceContribution() method.
+     *
+     * Calculate the force on each node in the vertex-based cell population based on the energy expression.
+     *
+     * @param rCellPopulation reference to the cell population
+     */
     virtual void AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation);
 
-    void SetApicalParameter(const double lineParameter, const double areaParameter=0, const double targetArea=0);
+    /**
+     * Set mApicalEdgeParameter, mApicalAreaParameter and mTargetApicalArea.
+     *
+     * @param lineParameter the new value of mApicalEdgeParameter
+     * @param areaParameter the new value of mApicalAreaParameter (defaults to 0)
+     * @param targetArea the new value of mTargetApicalArea (defaults to 0)
+     */
+    void SetApicalParameters(const double lineParameter, const double areaParameter=0, const double targetArea=0);
 
-    void SetBasalParameter(const double lineParameter, const double areaParameter=0, const double targetArea=0);
+    /**
+     * Set mBasalEdgeParameter, mBasalAreaParameter and mTargetBasalArea.
+     *
+     * @param lineParameter the new value of mBasalEdgeParameter
+     * @param areaParameter the new value of mBasalAreaParameter (defaults to 0)
+     * @param targetArea the new value of mTargetBasalArea (defaults to 0)
+     */
+    void SetBasalParameters(const double lineParameter, const double areaParameter=0, const double targetArea=0);
 
+    /**
+     * Set mLateralEdgeParameter.
+     *
+     * @param parameter the new value of mLateralEdgeParameter
+     */
     void SetLateralParameter(const double parameter);
 
-    void SetVolumeParameter(const double volumeParameter, const double targetVolume=0);
+    /**
+     * Set mVolumeParameter and mTargetVolume.
+     *
+     * @param volumeParameter the new value of mVolumeParameter
+     * @param targetVolume the new value of mTargetVolume (defaults to 0)
+     */
+    void SetVolumeParameters(const double volumeParameter, const double targetVolume=0);
 
+    /**
+     * Overridden OutputForceParameters() method.
+     *
+     * @param rParamsFile the file stream to which the parameters are output
+     */
     void OutputForceParameters(out_stream& rParamsFile);
 };
+
+// Declare identifier for the serializer
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS1(GeneralMonolayerVertexMeshForce,3)
+CHASTE_CLASS_EXPORT(MisraForce)
 
 #endif /*GENERALMONOLAYERVERTEXMESHFORCE_HPP_*/

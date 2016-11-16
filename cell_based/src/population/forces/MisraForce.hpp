@@ -46,11 +46,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 
 /**
- * A force class for use in Vertex-based simulations. This force is based on the
- * Energy function proposed by Misra et al in Biophysical Journal, 2016, 17, 1670-1678.
+ * A force class for use in vertex-based model simulations. This force is based on the
+ * energy function proposed by Misra et al in the following paper:
+ *
+ * Mahim Misra, Basile Audoly, Ioannis G. Kevrekidis & Stanislav Y. Shvartsman.
+ * Shape transformations of epithelial shells.
+ * Biophysical Journal, 110(7):1670-1678 (2016).
+ * http://dx.doi.org/10.1016/j.bpj.2016.03.009
  */
-template<unsigned DIM>
-class MisraForce : public AbstractForce<DIM>
+class MisraForce : public AbstractForce<3>
 {
     friend class TestForces;
 
@@ -67,7 +71,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractForce<DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractForce<3> >(*this);
         archive & mApicalLineTensionParameter;
         archive & mLateralSurfaceEnergyParameter;
         archive & mBasalSurfaceEnergyParameter;
@@ -77,30 +81,35 @@ private:
 protected:
 
     /**
-     * The strength of the apical edge term in the model. Corresponds to sigma in Misra's paper.
+     * The strength of the apical edge term in the model. Corresponds to sigma in Misra et al's paper.
+     * Initialised to 1.0 in the constructor.
      */
     double mApicalLineTensionParameter;
 
     /**
-     * The strength of the lateral surface term in the model. Corresponds to alpha in Misra's paper.
+     * The strength of the lateral surface term in the model. Corresponds to alpha in Misra et al's paper.
+     * Initialised to 2.0 in the constructor.
      */
     double mLateralSurfaceEnergyParameter;
 
     /**
-     * The strength of the basal surface term in the model. Corresponds to gamma in Misra's paper.
+     * The strength of the basal surface term in the model. Corresponds to gamma in Misra et al's paper.
+     * Initialised to 0.98 in the constructor.
      */
     double mBasalSurfaceEnergyParameter;
 
     /**
-     * The strength of the volume deviation term in the model. Corresponds to Beta in Misra's paper.
+     * The strength of the volume deviation term in the model. Corresponds to Beta in Misra et al's paper.
+     * Initialised to 100.0 in the constructor.
      */
     double mVolumeCompressibilityParameter;
 
     /**
-     * Temporary placeholder for target volume. (temporary value before GrowthModifier is implimented.
+     * Temporary placeholder for target volume. (temporary value before GrowthModifier is implemented) ///\todo #2850
+     * Initialised to 1.0 in the constructor.
      */
     double mTargetVolume;
-    ///\todo allow prepattern and eventually curved surfaces.
+    ///\todo allow prepattern and eventually curved surfaces.  #2850
 
 public:
 
@@ -117,12 +126,11 @@ public:
     /**
      * Overridden AddForceContribution() method.
      *
-     * Calculates the force on each node in the vertex-based cell population based on the energy function
-     * Farhadifar's model.
+     * Calculate the force on each node in the vertex-based cell population based on the energy function in Misra et al's paper.
      *
      * @param rCellPopulation reference to the cell population
      */
-    virtual void AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation);
+    virtual void AddForceContribution(AbstractCellPopulation<3>& rCellPopulation);
 
     /**
      * Get the line tension parameter for the edge between two given nodes.
@@ -133,7 +141,7 @@ public:
      *
      * @return the line tension parameter for this edge.
      */
-    virtual double GetApicalLineTensionParameter(Node<DIM>* pNodeA, Node<DIM>* pNodeB, VertexBasedCellPopulation<DIM>& rVertexCellPopulation) const;
+    virtual double GetApicalLineTensionParameter(Node<3>* pNodeA, Node<3>* pNodeB, VertexBasedCellPopulation<3>& rVertexCellPopulation) const;
 
     /**
      * @return mVolumeElasticityParameter
@@ -153,7 +161,7 @@ public:
     /**
      * @return mBoundaryLineTensionParameter
      */
-    double GetBoundaryLineTensionParameter() const;   //FIXME do we really need this?
+    double GetBoundaryLineTensionParameter() const;   ///\todo do we really need this? #2850
 
     /**
      * @return mBasalSurfaceEnergyParameter
@@ -189,7 +197,8 @@ public:
     void SetBasalSurfaceEnergyParameter(double basalSurfaceEnergyParameter);
 
     /**
-     * Set mTargetVolume
+     * Set mTargetVolume.
+     *
      * @param targetVolume the new value of mTargetVolume
      */
     void SetTargetVolume(double targetVolume);
@@ -202,7 +211,8 @@ public:
     void OutputForceParameters(out_stream& rParamsFile);
 };
 
+// Declare identifier for the serializer
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS1(MisraForce,3)
+CHASTE_CLASS_EXPORT(MisraForce)
 
 #endif /*MISRAFORCE_HPP_*/

@@ -836,7 +836,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RemoveDeletedNodes()
 {
     // Remove any nodes that have been marked for deletion and store all other nodes in a temporary structure
-    if (ELEMENT_DIM!=3)
+    if (ELEMENT_DIM != 3)
     {
         std::vector<Node<SPACE_DIM>*> live_nodes;
         for (unsigned i=0; i<this->mNodes.size(); i++)
@@ -868,7 +868,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RemoveDeletedNodes()
     {
         // Some additional features to make sure all the basal nodes are ahead of the apical nodes.
         // Separate the codes from non-3D for better readability
-        ///\todo actually should be a way to identify 2D+1 mesh, not just ELEMENT_DIM==3
+        ///\todo actually should be a way to identify 2D+1 mesh, not just ELEMENT_DIM==3 #2850
         std::vector<Node<SPACE_DIM>*> live_lower_nodes;
         std::vector<Node<SPACE_DIM>*> live_upper_nodes;
         for (unsigned i=0; i<this->mNodes.size(); i++)
@@ -995,7 +995,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(VertexElementMap& rElemen
         //remove and relabel all the elements, nodes, and faces
         RemoveDeletedNodesAndElements(rElementMap);
 
-        ///\todo need a way to identify if it is a Bielmeier mesh
+        ///\todo need a way to identify if it is a Bielmeier mesh #2850
         if (this->GetNumNodes()%2 == 0)
         {
             bool recheck_mesh = true;
@@ -1136,7 +1136,7 @@ bool MutableVertexMesh<3, 3>::CheckForSwapsFromShortEdges()
             // ...and if none are, then perform the required type of swap and halt the search, returning true
             if (!both_nodes_share_triangular_element)
             {
-                ///\todo Could have pass down the p_face as the p_lateral_swap_face, but much more modifications
+                ///\todo Could have pass down the p_face as the p_lateral_swap_face, but much more modifications #2850
                 try
                 {
                     IdentifySwapType(p_current_node, p_next_node);
@@ -1301,7 +1301,7 @@ MARK
                  * ---o---o---
                  */
 MARK; TRACE("Node Merge")
-                ///\todo fail assertion for 3D
+                ///\todo fail assertion for 3D #2850
                 assert(pNodeA->IsBoundaryNode());
                 assert(pNodeB->IsBoundaryNode());
 
@@ -1315,7 +1315,7 @@ MARK; TRACE("Node Merge")
             {
                 if (nodeA_elem_indices.size()==2 && nodeB_elem_indices.size()==2)
                 {
-                    ///\todo 3D will always ends up here, the other checkings become obsolete. unable to identify type effectively
+                    ///\todo 3D will always ends up here, the other checkings become obsolete. unable to identify type effectively #2850
                     if (pNodeA->IsBoundaryNode() && pNodeB->IsBoundaryNode())
                     {
                         /*
@@ -1835,7 +1835,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(Node<SPACE_DIM>* p
         }
     }
 
-    // Sort out boundary nodes  ///\todo boundary problem with 3D
+    // Sort out boundary nodes  ///\todo boundary problem with 3D #2850
     if (pNodeA->IsBoundaryNode() || pNodeB->IsBoundaryNode())
     {
         if (pNodeA->GetNumContainingElements() == 3)
@@ -3925,6 +3925,7 @@ c_vector<double, 2> MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::WidenEdgeOrCorrec
     return intersection;
 }
 
+///\todo #2850
 //template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 //VertexElement<2, SPACE_DIM>* MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::Get2dNonLateralFaceWithNodes(
 //        unsigned ElemGlobalIndex, Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB)
