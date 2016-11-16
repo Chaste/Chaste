@@ -1420,75 +1420,82 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh()
         ReMeshLamina(&*lam_it);
     }
 }
-#include "Debug.hpp"
+
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ReMeshElement(ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>* pElement)
 {
-
     /*
      * Method outline:
      *
-     * Re-position nodes around the element so as to have them evenly spaced along the boundary.  If the element has
-     * corners, we start from the first corner, else from the node with index 0, and this starting node is assumed to
-     * not move.
+     * Re-position nodes around the element so as to have them evenly spaced along the boundary.  We keep track of the
+     * node regions, so that individual regions remain the same size after a re-mesh, but regions will not necessarily
+     * retain the same numbers of nodes.  We proceed as follows:
      *
-     * 1. Find the cumulative distance at each node around the element, and keep track of where the transitions between
-     *    node regions lie.
+     * 1. Loop through all nodes and gather necessary information: a record of the current node locations, the distances
+     *    between nodes, and information on node regions.
      *
-     * 2. Reposition each node to be a target distance from the previous, by linearly interpolating the correct location
-     *    around the original shape.
+     * 2. Decide on the start index (chosen either to be the first node after the first region-change, or node 0 if
+     *    there are no regions) and post-process the region information to be more useful.
+     *
+     * 3. Reposition each node to be a target distance from the previous, by linear interpolation around the original
+     *    shape, and calculate the correct region information.
      */
 
-
     unsigned num_nodes = pElement->GetNumNodes();
-    double total_dist = 0.0;
 
-    // Calculate distances between nodes, and where region numbers change
+    // Two vectors the same length as teh number of nodes
+    std::vector<c_vector<double, SPACE_DIM> > old_locations(num_nodes);
     std::vector<double> distances(num_nodes);  // distances[i] is dist between node i and node i+1
+
+    /*
+     * Need to store information about node region changes, which we do as illustrated in the following example:
+     *
+     *   Node idx:         0 1 2 3 4 5 6 7 8 9 ...
+     *   Node region:      0 0 0 0 3 3 5 5 5 5 ...
+     *   region_changes:           ^   ^           ... record the first index after region changes (i.e. {4, 6, ...})
+     *   region_at_change:         3   5           ... record the region number at the changes (i.e. {3, 5, ...})
+     *   region_dists:     |<---->|
+     *                     |<-------->|
+     *                     |<---------------...    ... record the cumulative dists from node 0 at which regions change
+     */
     std::vector<unsigned> region_changes;
     std::vector<unsigned> region_at_change;
     std::vector<double> region_dists;
-    std::vector<c_vector<double, SPACE_DIM> > old_locations(num_nodes);
-    unsigned previous_region = pElement->GetNode(0)->GetRegion();
+
+    // Initialise the region of node 0, and the total distance (which will be accumulated through the loop)
+    unsigned this_region = pElement->GetNode(0)->GetRegion();
+    double total_dist = 0.0;
+
     for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
     {
+        // Global indices of the node at this local index, and the next one
         unsigned this_global_idx = pElement->GetNode(node_idx)->GetIndex();
         unsigned next_global_idx = pElement->GetNode((node_idx + 1) % num_nodes)->GetIndex();
 
         double local_dist = this->GetDistanceBetweenNodes(this_global_idx, next_global_idx);
         distances[node_idx] = local_dist;
-
-        old_locations[node_idx] = c_vector<double, SPACE_DIM>(pElement->GetNode(node_idx)->rGetLocation());
-
         total_dist += local_dist;
 
+        // Store a copy of the node location: this allows us to directly update nodes positions in the next loop
+        old_locations[node_idx] = c_vector<double, SPACE_DIM>(pElement->GetNode(node_idx)->rGetLocation());
 
         // If the region has changed, add this change to the region vectors
-        if (pElement->GetNode(node_idx)->GetRegion() != previous_region)
+        if (pElement->GetNode(node_idx)->GetRegion() != this_region)
         {
-            previous_region = pElement->GetNode(node_idx)->GetRegion();
+            this_region = pElement->GetNode(node_idx)->GetRegion();
 
             region_changes.push_back(node_idx);
-            region_at_change.push_back(previous_region);
+            region_at_change.push_back(this_region);
             region_dists.push_back(total_dist);
         }
     }
 
-
-    bool multiple_regions = region_changes.size() > 0;
-
     // Are there any region changes in this element?  If so, start from the first region change, else at node 0
+    bool multiple_regions = region_changes.size() > 0;
     unsigned start_idx = multiple_regions ? region_changes[0] : 0;
     unsigned end_idx = start_idx + num_nodes;
 
-
-    /*
-     * Process the cumulative distances between regions so as to have the following, for each region i:
-     *
-     * region_changes[i]:   the index of the first node in the new region
-     * region_at_change[i]: the region number in that new region
-     * region_dists[i]:     the cumulative length of boundary in the new region
-     */
+    // Process region_dists so that region_dists[i] is the cumulative distance, offset from start of the first region
     if (multiple_regions)
     {
         // There must be at least two changes in region in a closed boundary with more than one region
@@ -1508,22 +1515,16 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ReMeshElement(ImmersedBoundar
         region_dists.push_back(total_dist);
     }
 
+    // Loop through nodes and update their locations and region information
     double node_spacing = total_dist / num_nodes;
-
-//    PRINT_2_VARIABLES(total_dist, node_spacing);
-//    PRINT_2_VARIABLES(this->GetSurfaceAreaOfElement(pElement->GetIndex()), GetSurfaceAreaOfElement(pElement->GetIndex()) / num_nodes);
-
     double cumulative_dist = 0.0;
 
     for (unsigned new_idx = 1 + start_idx, old_idx = start_idx, region_idx = 0; new_idx < end_idx; new_idx++)
     {
-//        PRINT_3_VARIABLES(new_idx, old_idx, region_idx);
-
         double target_dist = node_spacing * (new_idx - start_idx);
 
         while (target_dist > cumulative_dist)
         {
-//            PRINT_3_VARIABLES("\t", target_dist, cumulative_dist);
             cumulative_dist += distances[old_idx % num_nodes];
             old_idx++;
 
@@ -1532,7 +1533,6 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ReMeshElement(ImmersedBoundar
                 region_idx++;
             }
         }
-
 
         // Cumulative distance around the old shape is now at least the target distance, so the new location lies
         // somewhere between the nodes at old_idx and old_idx-1
