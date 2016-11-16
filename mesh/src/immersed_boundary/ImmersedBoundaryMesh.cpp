@@ -1471,8 +1471,9 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ReMeshElement(ImmersedBoundar
     for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
     {
         // Global indices of the node at this local index, and the next one
+        unsigned next_local_idx = (node_idx + 1) % num_nodes;
         unsigned this_global_idx = pElement->GetNode(node_idx)->GetIndex();
-        unsigned next_global_idx = pElement->GetNode((node_idx + 1) % num_nodes)->GetIndex();
+        unsigned next_global_idx = pElement->GetNode(next_local_idx)->GetIndex();
 
         double local_dist = this->GetDistanceBetweenNodes(this_global_idx, next_global_idx);
         distances[node_idx] = local_dist;
@@ -1481,12 +1482,12 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ReMeshElement(ImmersedBoundar
         // Store a copy of the node location: this allows us to directly update nodes positions in the next loop
         old_locations[node_idx] = c_vector<double, SPACE_DIM>(pElement->GetNode(node_idx)->rGetLocation());
 
-        // If the region has changed, add this change to the region vectors
-        if (pElement->GetNode(node_idx)->GetRegion() != this_region)
+        // If the region is changing, add this change to the region vectors
+        if (pElement->GetNode(next_local_idx)->GetRegion() != this_region)
         {
-            this_region = pElement->GetNode(node_idx)->GetRegion();
+            this_region = pElement->GetNode(next_local_idx)->GetRegion();
 
-            region_changes.push_back(node_idx);
+            region_changes.push_back(next_local_idx);
             region_at_change.push_back(this_region);
             region_dists.push_back(total_dist);
         }
@@ -1505,7 +1506,9 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ReMeshElement(ImmersedBoundar
 
         for (unsigned region_idx = 0; region_idx < region_changes.size() - 1; region_idx++)
         {
-            region_dists[region_idx] = region_dists[region_idx + 1] - region_dists[region_idx];
+            // Subtract an additional fudge factor of 1e-15 so that, if nodes are already evenly spaced, the regions
+            // do not get offset by one place due to a strict equality in position
+            region_dists[region_idx] = region_dists[region_idx + 1] - region_dists[region_idx] - 1e-15;
         }
 
         region_dists.back() = total_dist;
@@ -1530,7 +1533,7 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ReMeshElement(ImmersedBoundar
             cumulative_dist += distances[old_idx % num_nodes];
             old_idx++;
 
-            while (cumulative_dist > region_dists[region_idx])
+            while (target_dist > region_dists[region_idx])
             {
                 region_idx++;
             }
