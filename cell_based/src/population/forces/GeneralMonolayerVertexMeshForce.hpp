@@ -138,7 +138,7 @@ public:
      *
      * @param rCellPopulation reference to the cell population
      */
-    virtual void AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation);
+    virtual void AddForceContribution(AbstractCellPopulation<3>& rCellPopulation);
 
     /**
      * Set mApicalEdgeParameter, mApicalAreaParameter and mTargetApicalArea.
@@ -183,6 +183,6 @@ public:
 
 // Declare identifier for the serializer
 #include "SerializationExportWrapper.hpp"
-CHASTE_CLASS_EXPORT(MisraForce)
+CHASTE_CLASS_EXPORT(GeneralMonolayerVertexMeshForce)
 
 #endif /*GENERALMONOLAYERVERTEXMESHFORCE_HPP_*/

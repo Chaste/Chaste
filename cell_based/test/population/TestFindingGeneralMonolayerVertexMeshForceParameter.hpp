@@ -36,7 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TESTFINDINGGENERALMONOLAYERVERTEXMESHFORCEPARAMETER_HPP_
 #define TESTFINDINGGENERALMONOLAYERVERTEXMESHFORCEPARAMETER_HPP_
 
-#include "Debug.hpp"
 #include <cxxtest/TestSuite.h>
 #include "AbstractCellBasedTestSuite.hpp"
 
@@ -81,7 +80,6 @@ public:
         std::vector<CellPtr> cells;
         CellsGenerator<NoCellCycleModel, 3> cells_generator;
 
-MARK; TRACE("Volume vs Lateral")
         // Testing for lateral to volume parameter ratio
         char name_pattern_lateral_volume[] ("TestUniaxialLoad/TestForceParameter/VolumeVsLateral/param=%.2f");
         for (unsigned i=0; i<30; i+=3)
@@ -115,8 +113,6 @@ MARK; TRACE("Volume vs Lateral")
                 elem_volumes.push_back(cell_population.rGetMesh().GetVolumeOfElement(elem_id));
                 sum_elem_volume += cell_population.rGetMesh().GetVolumeOfElement(elem_id);
             }
-            PRINT_VARIABLE(sum_elem_volume/elem_volumes.size())
-            PRINT_VECTOR(elem_volumes)
 
             TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), num_cells_x*num_cells_y);
             TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
@@ -125,7 +121,6 @@ MARK; TRACE("Volume vs Lateral")
             SimulationTime::Instance()->SetStartTime(0.0);
         }
 
-MARK; TRACE("Apical line vs apical area")
         // Testing for apical line to apical area
         char name_pattern_apical[] ("TestUniaxialLoad/TestForceParameter/ApicalLineVsArea/param=%.2f");
         for (unsigned i=1; i<30; i+=3)
@@ -156,8 +151,6 @@ MARK; TRACE("Apical line vs apical area")
                 elem_volumes.push_back(cell_population.rGetMesh().GetVolumeOfElement(elem_id));
                 sum_elem_volume += cell_population.rGetMesh().GetVolumeOfElement(elem_id);
             }
-            PRINT_VARIABLE(sum_elem_volume/elem_volumes.size())
-            PRINT_VECTOR(elem_volumes)
 
             TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), num_cells_x*num_cells_y);
             TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
@@ -166,7 +159,6 @@ MARK; TRACE("Apical line vs apical area")
             SimulationTime::Instance()->SetStartTime(0.0);
         }
 
-        MARK; TRACE("Apical plus volume")
         // Testing for apical line to apical area
         char name_pattern_apical_volume[] ("TestUniaxialLoad/TestForceParameter/ApicalVsVolume/param=%.2f");
         for (unsigned i=1; i<30; i+=3)
@@ -197,8 +189,6 @@ MARK; TRACE("Apical line vs apical area")
                 elem_volumes.push_back(cell_population.rGetMesh().GetVolumeOfElement(elem_id));
                 sum_elem_volume += cell_population.rGetMesh().GetVolumeOfElement(elem_id);
             }
-            PRINT_VARIABLE(sum_elem_volume/elem_volumes.size())
-            PRINT_VECTOR(elem_volumes)
 
             TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), num_cells_x*num_cells_y);
             TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);

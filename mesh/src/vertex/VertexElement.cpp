@@ -392,7 +392,7 @@ c_vector<double, SPACE_DIM> VertexElement<ELEMENT_DIM, SPACE_DIM>::GetCentroid()
             ///\todo compute centroid rather than centre of mass (see #1422)
             for (unsigned local_index=0; local_index<num_nodes; ++local_index)
             {
-                centroid += this->GetNodeLocation(local_index);//PRINT_VARIABLE(p_element->GetNodeLocation(local_index));
+                centroid += this->GetNodeLocation(local_index);
             }
             centroid /= ((double) num_nodes);
         }

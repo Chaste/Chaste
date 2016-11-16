@@ -36,7 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TESTAPICALCONSTRICTIONEXAMPLE_HPP_
 #define TESTAPICALCONSTRICTIONEXAMPLE_HPP_
 
-#include "Debug.hpp"
 #include <cxxtest/TestSuite.h>
 #include "AbstractCellBasedTestSuite.hpp"
 
@@ -61,7 +60,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define ADDFORCEPARAMETER p_force3->SetVolumeParameters(0.8, 10);
 #define CURRENT_TEST std::string("Volume2")
 #define END_TIME 0.5
-
 
 class TestApicalConstrictionExample : public AbstractCellBasedTestSuite
 {

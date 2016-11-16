@@ -33,13 +33,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef PATTERNEDAPICALCONSTRICTIONFORCE_HPP_
-#define PATTERNEDAPICALCONSTRICTIONFORCE_HPP_
+#ifndef HORIZONTALSTRETCHFORCE_HPP_
+#define HORIZONTALSTRETCHFORCE_HPP_
 
-#include "GeneralMonolayerVertexMeshForce.hpp"
+#include "AbstractForce.hpp"
 
 ///\todo document class (#2850)
-class PatternedApicalConstrictionForce : public GeneralMonolayerVertexMeshForce
+template<unsigned DIM>
+class HorizontalStretchForce : public AbstractForce<DIM>
 {
 private:
 
@@ -47,69 +48,64 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<GeneralMonolayerVertexMeshForce >(*this);
+        archive & boost::serialization::base_object<AbstractForce<DIM> >(*this);
+        archive & mForceMagnitude;
+        archive & mRelativeWidth;
     }
 
     /**
-     * Target area for each patterned cell's apical surface.
-     * Initialised to 0 in the constructor.
+     * Internal variable to save the magnitude.
+     * Initialised to 1.0 in the constructor.
      */
-    double mPatternedTargetApicalArea;
+    double mForceMagnitude;
 
     /**
-     * Strength of each patterned cell's apical surface area term in the energy expression.
-     * Initialised to 0 in the constructor.
+     * The relative width from the boundary upon with the force is acting.
+     * Initialised to 1.0 in the constructor.
      */
-    double mPatternedApicalAreaParameter;
-
-    /**
-     * Strength of each patterned apical cell-cell interface length term in the energy expression.
-     * Initialised to 0 in the constructor.
-     */
-    double mPatternedApicalEdgeParameter;
+    double mRelativeWidth;
 
 public:
-
     /**
-     * Constuctor.
+     * Constructor.
      */
-    PatternedApicalConstrictionForce();
+    HorizontalStretchForce();
 
     /**
      * Destructor.
      */
-    virtual ~PatternedApicalConstrictionForce();
+    virtual ~HorizontalStretchForce();
 
     /**
-     * Set mPatternedTargetApicalArea, mPatternedApicalAreaParameter and mPatternedApicalEdgeParameter.
+     * Set mForceMagnitude.
      *
-     * @param patternedApicalEdgeParameter the new value of mPatternedTargetApicalArea
-     * @param patternedApicalAreaParameter the new value of mPatternedApicalAreaParameter
-     * @param patternedTargetApicalArea the new value of mPatternedApicalEdgeParameter
+     * @param forceMagnitude the new value of mForceMagnitude
      */
-    void SetPatternedApicalParameter(const double patternedApicalEdgeParameter,
-                                     const double patternedApicalAreaParameter,
-                                     const double patternedTargetApicalArea);
+    void SetForceMagnitude(double forceMagnitude);
+
+    /**
+     * Set mRelativeWidth.
+     *
+     * @param relativeWidth the new value of mRelativeWidth
+     */
+    void SetRelativeWidth(double relativeWidth);
 
     /**
      * Overridden AddForceContribution() method.
      *
-     * Calculate the force on each node in the vertex-based cell population based on the energy expression.
-     *
      * @param rCellPopulation reference to the cell population
      */
-    virtual void AddForceContribution(AbstractCellPopulation<3>& rCellPopulation);
+    virtual void AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation);
 
     /**
-     * Overridden OutputForceParameters() method.
-     *
-     * @param rParamsFile the file stream to which the parameters are output
+     * For the compiler now
+     * @param rParamsFile
      */
     virtual void OutputForceParameters(out_stream& rParamsFile);
 };
 
 // Declare identifier for the serializer
 #include "SerializationExportWrapper.hpp"
-CHASTE_CLASS_EXPORT(PatternedApicalConstrictionForce)
+EXPORT_TEMPLATE_CLASS1(HorizontalStretchForce,3)
 
-#endif /*PATTERNEDAPICALCONSTRICTIONFORCE_HPP_*/
+#endif /*HORIZONTALSTRETCHFORCE_HPP_*/

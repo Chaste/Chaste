@@ -457,17 +457,6 @@ public:
             }
         }
 
-        // Test that each element has the correct number of nodes and faces
-//        for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
-//        {
-//            if (p_mesh->GetElement(elem_index)->GetNumNodes() != 12)
-//            {
-//                PRINT_VARIABLE(elem_index);
-//            }
-//            TS_ASSERT_EQUALS(p_mesh->GetElement(elem_index)->GetNumNodes(), 12u);
-//            TS_ASSERT_EQUALS(p_mesh->GetElement(elem_index)->GetNumFaces(), 8u);
-//        }
-
         // Test the element 10 has the correct nodes and faces
         VertexElement<3,3>* p_element_10 = p_mesh->GetElement(10);
 

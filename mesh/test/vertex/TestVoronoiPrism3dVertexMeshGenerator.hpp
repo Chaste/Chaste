@@ -37,7 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTVORONOIPRISM3DVERTEXMESHGENERATOR_HPP_
 
 #include <cxxtest/TestSuite.h>
-#include "Debug.hpp"
+
 #include "VoronoiPrism3dVertexMeshGenerator.hpp"
 #include "MutableVertexMesh.hpp"
 #include "PetscSetupAndFinalize.hpp"

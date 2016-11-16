@@ -160,7 +160,7 @@ void GeneralMonolayerVertexMeshForce::AddForceContribution(AbstractCellPopulatio
             neighbour_node_indices.insert(p_ab_face->GetNodeGlobalIndex((local_node_index_in_ab_face-1+num_nodes_in_ab_face)%num_nodes_in_ab_face));
         }
 
-        c_vector<double, 3>& r_node_location = p_this_node->rGetLocation();
+        const c_vector<double, 3>& r_node_location = p_this_node->rGetLocation();
 
         for (std::set<unsigned>::iterator it = neighbour_node_indices.begin();
              it != neighbour_node_indices.end();
@@ -172,7 +172,7 @@ void GeneralMonolayerVertexMeshForce::AddForceContribution(AbstractCellPopulatio
         }
 
         const unsigned opposite_node_index = node_index + num_nodes/2*(node_type==1u?1:-1);
-        c_vector<double, 3>& r_opposite_node_location = p_cell_population->GetNode(opposite_node_index)->rGetLocation();
+        const c_vector<double, 3>& r_opposite_node_location = p_cell_population->GetNode(opposite_node_index)->rGetLocation();
         const c_vector<double, 3> edge_gradient = (r_node_location- r_opposite_node_location)/norm_2(r_node_location - r_opposite_node_location);
         lateral_edge_contribution -= edge_gradient*mLateralEdgeParameter*(containing_elem_indices.size());
 

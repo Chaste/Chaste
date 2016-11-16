@@ -2,7 +2,7 @@
 #define TESTMUTABLEVERTEXMESH33REMESH_HPP_
 
 #include <cxxtest/TestSuite.h>
-#include "Debug.hpp"
+
 #include "VertexMeshWriter.hpp"
 #include "FileComparison.hpp"
 #include "Warnings.hpp"
@@ -11,9 +11,6 @@
 
 // This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
-
-#define PRINT_MESH          MARK//builder.PrintMesh(true);
-#define PRINT_REMESH        MARK//builder.PrintMesh(true);TRACE("REMESH");vertex_mesh.ReMesh();builder.PrintMesh(true);
 
 #define OUTPUT_NAME "TestMutableVertexMesh33ReMesh"
 
@@ -54,14 +51,12 @@ public:
         // A reference variable as mesh is noncopyable
         MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
         builder.WriteVtk(OUTPUT_NAME,"Before");
-PRINT_MESH
 
         // Set the threshold distance between vertices for a T1 swap as follows
         // so that it will trigger CheckForSwapsFromShortEdges
         vertex_mesh.SetCellRearrangementThreshold(0.3);
         vertex_mesh.CheckForSwapsFromShortEdges();
         builder.WriteVtk(OUTPUT_NAME,"AfterOnce");
-PRINT_MESH
 
         // Test that each moved node has the correct location following the rearrangement
         TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[0], 0.725, 1e-8);
@@ -98,7 +93,6 @@ PRINT_MESH
         // Perform a T1 swap on nodes 4 and 5
         vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(4), vertex_mesh.GetNode(5));
         builder.WriteVtk(OUTPUT_NAME,"AfterTwice");
-PRINT_REMESH
 
         // Test that each element has the correct area and perimeter following the rearrangement
         TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(0), 0.2, 1e-6);
@@ -165,14 +159,14 @@ PRINT_REMESH
         builder.BuildElementWith(4, node_indices_elem_3);
         // A reference variable as mesh is noncopyable
         MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
-PRINT_MESH
+
 
         // Set the threshold distance between vertices for a T1 swap as follows
         // so that it will not trigger CheckForSwapsFromShortEdges
         vertex_mesh.GetNode(11)->rGetModifiableLocation()[1] = 0.62;
         vertex_mesh.SetCellRearrangementThreshold(0.21);
         vertex_mesh.CheckForSwapsFromShortEdges();
-PRINT_MESH
+
 
         // Test that each moved node has the correct location following the rearrangement
         TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[0], 0.5, 1e-8);
@@ -189,7 +183,7 @@ PRINT_MESH
 
         vertex_mesh.SetCellRearrangementThreshold(0.25);
         vertex_mesh.CheckForSwapsFromShortEdges();
-PRINT_MESH
+
     }
 
     void TestT1SwapNonEvenFace() throw(Exception)
@@ -227,14 +221,12 @@ PRINT_MESH
 //        vertex_mesh.GetNode(11)->rGetModifiableLocation()[0] = 0.45;
         vertex_mesh.GetNode(4)->rGetModifiableLocation()[0] = 0.45;
         builder.WriteVtk(OUTPUT_NAME,"Before");
-PRINT_MESH
 
         // Set the threshold distance between vertices for a T1 swap as follows
         // so that it will trigger CheckForSwapsFromShortEdges
         vertex_mesh.SetCellRearrangementThreshold(0.3);
         vertex_mesh.CheckForSwapsFromShortEdges();
         builder.WriteVtk(OUTPUT_NAME,"After");
-PRINT_REMESH
 
         // Test that each moved node has the correct location following the rearrangement
         TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[0], 0.2518, 1e-4);
@@ -273,14 +265,12 @@ PRINT_REMESH
         // A reference variable as mesh is noncopyable
         MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
         builder.WriteVtk(OUTPUT_NAME,"Before");
-PRINT_MESH
 
         // Set the threshold distance between vertices for a T1 swap as follows, to ease calculations
         vertex_mesh.SetCellRearrangementThreshold(0.1*2.0/1.5);
         // Perform a T1 swap on nodes 5 and 4 (this way round to ensure coverage of boundary node tracking)
         vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(5), vertex_mesh.GetNode(4));
         builder.WriteVtk(OUTPUT_NAME,"After");
-PRINT_REMESH
 
         // Test that each moved node has the correct location following the rearrangement
         TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[0], 0.6, 1e-8);
@@ -336,7 +326,7 @@ PRINT_REMESH
     }
 
     void TestPerformT1SwapOnBoundary2() throw(Exception)
-            {
+    {
         /*
          * Create a mesh comprising six nodes contained in three elements such that all but one node
          * are boundary nodes, as shown below. We will test that that a T1 swap is correctly implemented.
@@ -363,10 +353,10 @@ PRINT_REMESH
         builder.BuildElementWith(4, node_indices_elem_0);
         builder.BuildElementWith(3, node_indices_elem_1);
         builder.BuildElementWith(4, node_indices_elem_2);
+
         // A reference variable as mesh is noncopyable
         MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
         builder.WriteVtk(OUTPUT_NAME,"Before");
-PRINT_MESH
 
         // Set the threshold distance between vertices for a T1 swap as follows, to ease calculations
         vertex_mesh.SetCellRearrangementThreshold(0.1*2.0/1.5);
@@ -378,7 +368,6 @@ PRINT_MESH
         // Perform a T1 swap on nodes 5 and 4 (this way round to ensure coverage of boundary node tracking)
         vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(5), vertex_mesh.GetNode(4));
         builder.WriteVtk(OUTPUT_NAME,"After");
-PRINT_REMESH
 
         // Test that each moved node has the correct location following the rearrangement
         TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[0], 0.6, 1e-8);
@@ -461,14 +450,12 @@ PRINT_REMESH
         // A reference variable as mesh is noncopyable
         MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
         builder.WriteVtk(OUTPUT_NAME,"Before");
-PRINT_MESH
 
         // Set the threshold distance between vertices for a T1 swap as follows, to ease calculations
         vertex_mesh.SetCellRearrangementThreshold(0.1*2.0/1.5);
         // Perform a T1 swap on nodes 5 and 4.
         vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(5), vertex_mesh.GetNode(4));
         builder.WriteVtk("After");
-PRINT_REMESH
 
         // Test that each moved node has the correct location following the rearrangement
         TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[0], 0.6, 1e-8);
@@ -675,7 +662,7 @@ PRINT_REMESH
         Helper3dVertexMeshBuilder builder("T1SwapReMesh");
         MutableVertexMesh<3, 3>& vertex_mesh = *(builder.MakeMeshUsing2dMesh(vertex_2mesh) );
         builder.WriteVtk(OUTPUT_NAME,"Before");
-PRINT_MESH
+
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 8u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 44u);
@@ -684,7 +671,7 @@ PRINT_MESH
         vertex_mesh.SetCellRearrangementThreshold(0.1);
         vertex_mesh.ReMesh();
         builder.WriteVtk(OUTPUT_NAME,"After");
-PRINT_MESH
+
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 8u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 44u);
@@ -742,13 +729,13 @@ PRINT_MESH
         // A reference variable as mesh is noncopyable
         MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
         builder.WriteVtk(OUTPUT_NAME,"Before");
-PRINT_MESH
+
 
         // Perform a T2 swap on the central triangle element
         VertexElement<3, 3>* p_element_0 = vertex_mesh.GetElement(0);
         c_vector<double, 3> centroid_of_element_0_before_swap = vertex_mesh.GetCentroidOfElement(0);
         vertex_mesh.PerformT2Swap(*p_element_0);
-PRINT_MESH
+
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 3u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 8u);
@@ -789,7 +776,6 @@ PRINT_MESH
         VertexElementMap map(vertex_mesh.GetNumElements());
         vertex_mesh.RemoveDeletedNodesAndElements(map);
         builder.WriteVtk(OUTPUT_NAME,"AfterRemove");
-PRINT_REMESH
     }
 
     void TestPerformT2SwapOnBoundary() throw(Exception)
@@ -825,7 +811,7 @@ PRINT_REMESH
         // A reference variable as mesh is noncopyable
         MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
         builder.WriteVtk(OUTPUT_NAME,"Before");
-PRINT_MESH
+
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 3u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 12u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumFaces(), 14u);
@@ -833,7 +819,7 @@ PRINT_MESH
         // Perform a T2 swap on the central triangle element
         VertexElement<3,3>* p_element_0 = vertex_mesh.GetElement(0);
         vertex_mesh.PerformT2Swap(*p_element_0);
-PRINT_MESH
+
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 2u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 8u);
@@ -863,8 +849,6 @@ PRINT_MESH
         VertexElementMap map(vertex_mesh.GetNumElements());
         vertex_mesh.RemoveDeletedNodesAndElements(map);
         builder.WriteVtk(OUTPUT_NAME,"AfterRemove");
-        TRACE("Remove deleted nodes and elements")
-PRINT_REMESH
     }
 
     void TestPerformT2OnBoundary2() throw(Exception)
@@ -897,7 +881,6 @@ PRINT_REMESH
         // A reference variable as mesh is noncopyable
         MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
         builder.WriteVtk(OUTPUT_NAME,"Before");
-PRINT_MESH
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 2u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 10u);
@@ -906,7 +889,6 @@ PRINT_MESH
         // Perform a T2 swap on the central triangle element
         VertexElement<3,3>* p_element_0 = vertex_mesh.GetElement(0);
         vertex_mesh.PerformT2Swap(*p_element_0);
-PRINT_MESH
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 1u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 6u);
@@ -936,8 +918,6 @@ PRINT_MESH
         VertexElementMap map(vertex_mesh.GetNumElements());
         vertex_mesh.RemoveDeletedNodesAndElements(map);
         builder.WriteVtk(OUTPUT_NAME,"AfterRemove");
-        TRACE("Remove deleted nodes and elements")
-PRINT_REMESH
     }
 
     void TestT2SwapsDontOccurWithTriangularNeighbours() throw(Exception)
@@ -1014,7 +994,6 @@ PRINT_REMESH
         // A reference variable as mesh is noncopyable
         MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
         builder.WriteVtk(OUTPUT_NAME,"Before");
-PRINT_MESH
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 5u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 18u);
@@ -1024,8 +1003,6 @@ PRINT_MESH
         VertexElement<3, 3>* p_element_3 = vertex_mesh.GetElement(3);
         c_vector<double, 3> centroid_of_element_3_before_swap = vertex_mesh.GetCentroidOfElement(3);
         vertex_mesh.PerformT2Swap(*p_element_3);
-PRINT_MESH
-
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 4u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 14u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumFaces(), 18u);
@@ -1068,8 +1045,6 @@ PRINT_MESH
         VertexElementMap map(vertex_mesh.GetNumElements());
         vertex_mesh.RemoveDeletedNodesAndElements(map);
         builder.WriteVtk(OUTPUT_NAME,"AfterRemove");
-        TRACE("Remove deleted nodes and elements")
-PRINT_REMESH
     }
 
     void TestPerformT2SwapWithRosettes2() throw(Exception)
@@ -1100,10 +1075,10 @@ PRINT_REMESH
         builder.BuildElementWith(5, node_indices_elem_2);
         builder.BuildElementWith(5, node_indices_elem_3);
         builder.BuildElementWith(4, node_indices_elem_4);
+
         // A reference variable as mesh is noncopyable
         MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
         builder.WriteVtk(OUTPUT_NAME,"Before");
-PRINT_MESH
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 5u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 24u);
@@ -1113,7 +1088,6 @@ PRINT_MESH
         VertexElement<3, 3>* p_element_4 = vertex_mesh.GetElement(4);
         c_vector<double, 3> centroid_of_element_4_before_swap = vertex_mesh.GetCentroidOfElement(3);
         vertex_mesh.PerformT2Swap(*p_element_4);
-PRINT_MESH
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 4u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 18u);
@@ -1138,8 +1112,6 @@ PRINT_MESH
         VertexElementMap map(vertex_mesh.GetNumElements());
         vertex_mesh.RemoveDeletedNodesAndElements(map);
         builder.WriteVtk(OUTPUT_NAME,"AfterRemove");
-        TRACE("Remove deleted nodes and elements")
-PRINT_REMESH
     }
 
     void TestPerformNodeMerge() throw(Exception)

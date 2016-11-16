@@ -36,7 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TESTVERTEXMESH33UNIAXIALLOAD_HPP_
 #define TESTVERTEXMESH33UNIAXIALLOAD_HPP_
 
-#include "Debug.hpp"
 #include <cxxtest/TestSuite.h>
 #include "AbstractCellBasedTestSuite.hpp"
 
@@ -63,115 +62,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define END_TIME 0.5
 
 #include "HoneycombVertexMeshGenerator.hpp"
-template<unsigned DIM>
-class HorizontalStretchForce : public AbstractForce<DIM>
-{
-private:
-
-    friend class boost::serialization::access;
-    template<class Archive>
-    void serialize(Archive & archive, const unsigned int version)
-    {
-        archive & boost::serialization::base_object<AbstractForce<DIM> >(*this);
-        archive & mForceMagnitude;
-        archive & mRelativeWidth;
-    }
-
-    /**
-     * Internal variable to save the magnitude
-     */
-    double mForceMagnitude;
-
-    /**
-     * The relative width from the boundary upon with the force is acting
-     */
-    double mRelativeWidth;
-
-public:
-    /**
-     * Default constructor.
-     */
-    HorizontalStretchForce(const double ForceMagnitude=1, const double RelativeWidth=0.1)
-        : mForceMagnitude(ForceMagnitude),
-          mRelativeWidth(RelativeWidth)
-    {
-    }
-
-    virtual ~HorizontalStretchForce()
-    {
-    }
-
-    /**
-     * Overridden AddForceContribution() method.
-     *
-     * @param rCellPopulation reference to the cell population
-     */
-    virtual void AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation)
-    {
-        // Throw an exception message if not using a VertexBasedCellPopulation
-        ///\todo check whether this line influences profiling tests - if so, we should remove it.
-        if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation) == NULL)
-        {
-            EXCEPTION("MisraForce is to be used with a VertexBasedCellPopulation only");
-        }
-
-        // Define some helper variables
-        VertexBasedCellPopulation<DIM>* p_cell_population = static_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation);
-        MutableVertexMesh<DIM, DIM>& rMesh = p_cell_population->rGetMesh();
-
-        const unsigned num_nodes = p_cell_population->GetNumNodes();
-        c_vector<double, DIM> force_in_positive_y = zero_vector<double>(DIM);
-        force_in_positive_y[0] = mForceMagnitude;
-        c_vector<double, DIM> force_in_negative_y = -force_in_positive_y;
-
-        ChasteCuboid<DIM> bounding_box_tmp = rMesh.CalculateBoundingBox();
-        const double min_x = bounding_box_tmp.rGetLowerCorner()[0];
-        const double max_x = bounding_box_tmp.rGetUpperCorner()[0];
-        assert(max_x > min_x);
-        const double width_x = max_x - min_x;
-        const double width = width_x*mRelativeWidth;
-        const double left_bound = min_x + width;
-        const double right_bound = max_x - width;
-        // could have built two more Cuboids to check if the point is inside,
-        // but will have a lot of wrapping which reduce efficiency.
-        // Iterate over nodes in the cell population
-        for (unsigned node_global_index=0; node_global_index<num_nodes; ++node_global_index)
-        {
-            Node<3>* p_this_node = p_cell_population->GetNode(node_global_index);
- //            if ( ! p_this_node->IsBoundaryNode())
- //                continue;
-            const double loc_x = p_this_node->rGetLocation()[0];
-            if (loc_x < left_bound)
-            {
-                p_this_node->ClearAppliedForce();
-                p_this_node->AddAppliedForceContribution(force_in_negative_y);
-            }
-            else if (loc_x > right_bound)
-            {
-                p_this_node->ClearAppliedForce();
-                p_this_node->AddAppliedForceContribution(force_in_positive_y);
-            }
-        }
-    }
-
-    /**
-     * For the compiler now
-     * @param rParamsFile
-     */
-    virtual void OutputForceParameters(out_stream& rParamsFile)
-    {
-        *rParamsFile << "\t\t\t<ForceMagnitude>" << mForceMagnitude << "</ForceMagnitude>\n";
-        *rParamsFile << "\t\t\t<RelativeWidth>" << mRelativeWidth << "</RelativeWidth>\n";
-
-        // Call method on direct parent class
-        AbstractForce<DIM>::OutputForceParameters(rParamsFile);
-    }
-};
-
-#include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS1(HorizontalStretchForce,3)
-#include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS1(HorizontalStretchForce,3)
+#include "HorizontalStretchForce.hpp"
 
 class TestVertexMesh33UniaxialLoad : public AbstractCellBasedTestSuite
 {
@@ -216,7 +107,9 @@ public:
         p_force3->SetLateralParameter(8);
         p_force3->SetVolumeParameters(350, 1);
         simulator.AddForce(p_force3);
-        MAKE_PTR_ARGS(HorizontalStretchForce<3>, p_force2, (1, 0.15));
+        MAKE_PTR(HorizontalStretchForce<3>, p_force2);
+        p_force2->SetForceMagnitude(1.0);
+        p_force2->SetRelativeWidth(0.15);
         simulator.AddForce(p_force2);
 
             simulator.Solve();

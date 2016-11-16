@@ -35,6 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "PatternedApicalConstrictionForce.hpp"
 #include "VertexBasedCellPopulation.hpp"
+#include "CellLabel.hpp"
 
 PatternedApicalConstrictionForce::PatternedApicalConstrictionForce()
     : GeneralMonolayerVertexMeshForce(),

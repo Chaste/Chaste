@@ -610,17 +610,6 @@ HexagonalPrism3dVertexMeshGenerator::HexagonalPrism3dVertexMeshGenerator(unsigne
 //        p_element->UpdateNode(10, temp_nodes[7]);
 //        p_element->UpdateNode(11, temp_nodes[3]);
 //    }
-
-//for (unsigned l=0; l<elements.size(); l++)
-//{
-//    PRINT_VARIABLE(elements[l]->GetIndex());
-//    PRINT_VARIABLE(elements[l]->GetNumFaces());
-//    for (unsigned m=0; m<elements[l]->GetNumFaces(); m++)
-//    {
-//        PRINT_VARIABLE(elements[l]->GetFace(m)->GetIndex());
-//    }
-//}
-
     mpMesh = new MutableVertexMesh<3,3>(nodes, elements);//cellRearrangementThreshold, t2Threshold); ///\todo #2850
 
     // Scale the mesh so that each element's area takes the value elementArea

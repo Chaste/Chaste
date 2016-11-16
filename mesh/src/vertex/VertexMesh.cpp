@@ -695,7 +695,7 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetCentroidOfEle
             ///\todo compute centroid rather than centre of mass (see #1422)
             for (unsigned local_index=0; local_index<num_nodes; local_index++)
             {
-                centroid += p_element->GetNodeLocation(local_index);//PRINT_VARIABLE(p_element->GetNodeLocation(local_index));
+                centroid += p_element->GetNodeLocation(local_index);
             }
             centroid /= ((double) num_nodes);
         }
