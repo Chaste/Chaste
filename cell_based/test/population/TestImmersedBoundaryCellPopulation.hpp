@@ -118,6 +118,10 @@ public:
 
         cell_population.SetIfPopulationHasActiveSources(true);
         TS_ASSERT_EQUALS(cell_population.DoesPopulationHaveActiveSources(), true);
+
+        TS_ASSERT_EQUALS(cell_population.GetReMeshFrequency(), UINT_MAX);
+        cell_population.SetReMeshFrequency(5u);
+        TS_ASSERT_EQUALS(cell_population.GetReMeshFrequency(), 5u);
     }
 
     void TestMeshMethods() throw(Exception)

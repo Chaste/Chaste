@@ -49,7 +49,8 @@ ImmersedBoundaryCellPopulation<DIM>::ImmersedBoundaryCellPopulation(ImmersedBoun
         : AbstractOffLatticeCellPopulation<DIM>(rMesh, rCells, locationIndices),
           mDeleteMesh(deleteMesh),
           mIntrinsicSpacing(0.01),
-          mPopulationHasActiveSources(false)
+          mPopulationHasActiveSources(false),
+          mReMeshFrequency(UINT_MAX)
 {
     mpImmersedBoundaryMesh = static_cast<ImmersedBoundaryMesh<DIM, DIM>*>(&(this->mrMesh));
     mpVertexBasedDivisionRule.reset(new ShortAxisVertexBasedDivisionRule<DIM>());
@@ -165,6 +166,18 @@ template <unsigned DIM>
 double ImmersedBoundaryCellPopulation<DIM>::GetInteractionDistance()
 {
     return mInteractionDistance;
+}
+
+template <unsigned DIM>
+void ImmersedBoundaryCellPopulation<DIM>::SetReMeshFrequency(unsigned newFrequency)
+{
+    mReMeshFrequency = newFrequency;
+}
+
+template <unsigned DIM>
+unsigned ImmersedBoundaryCellPopulation<DIM>::GetReMeshFrequency()
+{
+    return mReMeshFrequency;
 }
 
 template <unsigned DIM>
@@ -420,6 +433,12 @@ void ImmersedBoundaryCellPopulation<DIM>::UpdateNodeLocations(double dt)
             // Move the node
             combined_sources[source_idx]->rGetModifiableLocation() = source_location;
         }
+    }
+
+    // Finally, call ReMesh if required
+    if (SimulationTime::Instance()->GetTimeStepsElapsed() % mReMeshFrequency == 0)
+    {
+        mpImmersedBoundaryMesh->ReMesh();
     }
 }
 
