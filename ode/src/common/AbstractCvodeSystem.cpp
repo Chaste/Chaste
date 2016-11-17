@@ -44,6 +44,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CvodeAdaptor.hpp" // For CvodeErrorHandler
 
 // CVODE headers
+#include <cvode/cvode.h>
+#include <sundials/sundials_nvector.h>
 #include <cvode/cvode_dense.h>
 
 

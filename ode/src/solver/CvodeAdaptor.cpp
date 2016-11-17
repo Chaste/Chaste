@@ -42,6 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MathsCustomFunctions.hpp" // For tolerance check.
 
 // CVODE headers
+#include <sundials/sundials_nvector.h>
 #include <cvode/cvode_dense.h>
 
 
