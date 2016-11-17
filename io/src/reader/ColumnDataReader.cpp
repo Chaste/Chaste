@@ -42,12 +42,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ColumnDataReader.hpp"
 #include "ColumnDataConstants.hpp"
 
-#include <fstream>
 #include <sstream>
 #include <iomanip>
-#include <cassert>
-#include <climits>
-#include <cctype> //for isdigit
 #include "OutputFileHandler.hpp"
 #include "Exception.hpp"
 

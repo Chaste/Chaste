@@ -36,10 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Hdf5DataReader.hpp"
 #include "Exception.hpp"
 #include "OutputFileHandler.hpp"
-#include "PetscTools.hpp"
-
-#include <cassert>
-#include <algorithm>
 
 Hdf5DataReader::Hdf5DataReader(const std::string& rDirectory,
                                const std::string& rBaseName,

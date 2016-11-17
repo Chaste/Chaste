@@ -43,9 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Hdf5DataWriter.hpp"
 
-#include "Exception.hpp"
 #include "OutputFileHandler.hpp"
-#include "PetscTools.hpp"
 #include "Version.hpp"
 #include "MathsCustomFunctions.hpp"
 

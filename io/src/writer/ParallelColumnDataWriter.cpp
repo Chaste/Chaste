@@ -34,7 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "ParallelColumnDataWriter.hpp"
-#include "Exception.hpp"
 #include "DistributedVectorFactory.hpp"
 
 ParallelColumnDataWriter::ParallelColumnDataWriter(const std::string& rDirectory,
