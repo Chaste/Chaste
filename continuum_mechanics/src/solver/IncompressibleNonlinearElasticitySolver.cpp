@@ -45,8 +45,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "IncompressibleNonlinearElasticitySolver.hpp"
 #include "LinearBasisFunction.hpp"
-#include "QuadraticBasisFunction.hpp"
-#include <algorithm>
 
 template<size_t DIM>
 void IncompressibleNonlinearElasticitySolver<DIM>::AssembleSystem(bool assembleResidual,

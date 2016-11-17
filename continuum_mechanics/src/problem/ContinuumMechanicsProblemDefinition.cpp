@@ -36,8 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <limits>
 
 #include "ContinuumMechanicsProblemDefinition.hpp"
-#include "AbstractIncompressibleMaterialLaw.hpp"
-#include "AbstractCompressibleMaterialLaw.hpp"
 
 
 template<unsigned DIM>

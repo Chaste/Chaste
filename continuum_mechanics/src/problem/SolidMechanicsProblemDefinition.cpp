@@ -35,8 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "SolidMechanicsProblemDefinition.hpp"
-#include "AbstractIncompressibleMaterialLaw.hpp"
-#include "AbstractCompressibleMaterialLaw.hpp"
 
 template<unsigned DIM>
 SolidMechanicsProblemDefinition<DIM>::SolidMechanicsProblemDefinition(AbstractTetrahedralMesh<DIM,DIM>& rMesh)
