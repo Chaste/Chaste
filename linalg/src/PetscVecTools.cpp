@@ -35,10 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "PetscVecTools.hpp"
 #include "PetscTools.hpp"
-#include <petscviewer.h>
-#include <cassert>
-#include "DistributedVectorFactory.hpp"
-#include "DistributedVector.hpp"
 #include "PetscException.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////

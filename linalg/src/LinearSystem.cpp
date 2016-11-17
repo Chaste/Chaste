@@ -35,16 +35,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "LinearSystem.hpp"
 
-#include <iostream>
-#include <cassert>
-#include <algorithm>
 #include <boost/scoped_array.hpp>
 
 #include "PetscException.hpp"
-#include "OutputFileHandler.hpp"
-#include "PetscTools.hpp"
 #include "HeartEventHandler.hpp"
-#include "Timer.hpp"
 #include "Warnings.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////

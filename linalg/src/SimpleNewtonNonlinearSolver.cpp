@@ -34,9 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "SimpleNewtonNonlinearSolver.hpp"
-#include <iostream>
-#include <cassert>
-#include "Exception.hpp"
 
 SimpleNewtonNonlinearSolver::SimpleNewtonNonlinearSolver()
         : mTolerance(1e-5),
