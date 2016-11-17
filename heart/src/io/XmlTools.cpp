@@ -38,6 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 
 #include <xercesc/dom/DOM.hpp>
+#include <xercesc/util/QName.hpp>
 
 #include <xsd/cxx/xml/sax/std-input-source.hxx>
 #include <xsd/cxx/xml/dom/bits/error-handler-proxy.hxx>
