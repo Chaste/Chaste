@@ -510,7 +510,7 @@ void ImmersedBoundaryCellPopulation<DIM>::AcceptPopulationCountWriter(boost::sha
 template <unsigned DIM>
 void ImmersedBoundaryCellPopulation<DIM>::AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell)
 {
-    //pCellWriter->VisitCell(pCell, this);
+    pCellWriter->VisitCell(pCell, this);
 }
 
 template <unsigned DIM>
@@ -569,7 +569,7 @@ void ImmersedBoundaryCellPopulation<DIM>::WriteVtkResultsToFile(const std::strin
              lam_iter != mpImmersedBoundaryMesh->GetLaminaIteratorEnd();
              ++lam_iter)
         {
-            vtk_cell_data.push_back(DOUBLE_UNSET);
+            vtk_cell_data.push_back(-1.0);
         }
 
         mesh_writer.AddCellData((*cell_writer_iter)->GetVtkCellDataName(), vtk_cell_data);
