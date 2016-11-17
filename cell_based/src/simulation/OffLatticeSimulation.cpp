@@ -35,6 +35,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "OffLatticeSimulation.hpp"
 
+#include <boost/make_shared.hpp>
+
 #include "CellBasedEventHandler.hpp"
 #include "ForwardEulerNumericalMethod.hpp"
 #include "StepSizeException.hpp"
