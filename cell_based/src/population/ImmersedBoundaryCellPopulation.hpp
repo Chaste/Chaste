@@ -93,6 +93,9 @@ private:
     /** The distance over which cell-cell interactions occur */
     double mInteractionDistance;
 
+    /** Call ReMesh every ReMeshFrequency number of time steps */
+    unsigned mReMeshFrequency;
+
     /**
      * Overridden WriteVtkResultsToFile() method.
      *
@@ -226,6 +229,16 @@ public:
      * @return the cell-cell interaction distance.
      */
     double GetInteractionDistance();
+
+    /**
+     * @param newFrequency the new ReMesh frequency.
+     */
+    void SetReMeshFrequency(unsigned newFrequency);
+
+    /**
+     * @return mReMeshFrequency.
+     */
+    unsigned GetReMeshFrequency();
 
     /**
      * @return the intrinsic node spacing
