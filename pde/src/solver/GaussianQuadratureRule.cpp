@@ -37,7 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "GaussianQuadratureRule.hpp"
 #include "Exception.hpp"
-#include "UblasCustomFunctions.hpp"
 
 template<unsigned ELEMENT_DIM>
 const ChastePoint<ELEMENT_DIM>& GaussianQuadratureRule<ELEMENT_DIM>::rGetQuadPoint(unsigned index) const

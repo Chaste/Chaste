@@ -35,8 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "UblasCustomFunctions.hpp"
 #include "LinearBasisFunction.hpp"
-#include "ChastePoint.hpp"
-#include <cassert>
 
 /**
  * Compute a basis function at a point within an element (3d case).

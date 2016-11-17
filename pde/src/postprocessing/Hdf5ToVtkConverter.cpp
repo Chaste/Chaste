@@ -35,13 +35,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "UblasCustomFunctions.hpp"
 #include "Hdf5ToVtkConverter.hpp"
-#include "PetscTools.hpp"
-#include "Exception.hpp"
 #include "ReplicatableVector.hpp"
-#include "DistributedVector.hpp"
-#include "DistributedVectorFactory.hpp"
 #include "VtkMeshWriter.hpp"
-#include "GenericMeshReader.hpp"
 #include "DistributedTetrahedralMesh.hpp"
 #include "Warnings.hpp"
 
