@@ -36,43 +36,31 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AirwayGenerator.hpp"
 
 #include <cmath>
-#include <cfloat>
 #include <algorithm>
 #include <sstream>
 
 #include "VtkMeshReader.hpp"
 #include "TrianglesMeshWriter.hpp"
 #include "TetrahedralMesh.hpp"
-#include "OutputFileHandler.hpp"
 #include <UblasIncludes.hpp>
 #include <boost/numeric/ublas/vector_proxy.hpp>
 
 #ifdef CHASTE_VTK
 
 #define _BACKWARD_BACKWARD_WARNING_H 1 //Cut out the strstream deprecated warning for now (gcc4.3)
-#include "vtkVersion.h"
 
 #if ((VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
 
-#include "vtkGeometryFilter.h"
-#include "vtkDoubleArray.h"
 #include "vtkPlane.h"
-#include "vtkPoints.h"
-#include "vtkPointData.h"
 #include "vtkPolyVertex.h"
 #include "vtkMassProperties.h"
 #include "vtkMath.h"
 #include "vtkTableBasedClipDataSet.h"
 #include "vtkCellArray.h"
 #include "vtkLine.h"
-#include "vtkUnsignedIntArray.h"
-#include "vtkUnstructuredGrid.h"
-#include "vtkMassProperties.h"
 #include "vtkPolyDataConnectivityFilter.h"
 #include "vtkXMLUnstructuredGridWriter.h"
-#include "vtkAppendFilter.h"
 #include "vtkCleanPolyData.h"
-#include "vtkSelectEnclosedPoints.h"
 
 AirwayGenerator::AirwayGenerator(vtkSmartPointer<vtkPolyData> LobeSurface,
                                  double branchLengthLimit,

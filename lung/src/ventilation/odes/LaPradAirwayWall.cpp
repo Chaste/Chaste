@@ -40,8 +40,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "BoostTolerance.hpp"
 #include "LaPradAirwayWall.hpp"
-#include "MathsCustomFunctions.hpp"
-#include "Exception.hpp"
 
 LaPradAirwayWall::LaPradAirwayWall() : mTargetPressure(0),
                                        mRIn(0),

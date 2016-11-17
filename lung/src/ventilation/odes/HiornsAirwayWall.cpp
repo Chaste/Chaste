@@ -40,8 +40,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "BoostTolerance.hpp"
 #include "HiornsAirwayWall.hpp"
-#include "MathsCustomFunctions.hpp"
-#include "Exception.hpp"
 
 
 HiornsAirwayWall::HiornsAirwayWall() : mTargetPressure(0),

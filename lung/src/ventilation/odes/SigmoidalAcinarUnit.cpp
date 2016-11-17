@@ -38,7 +38,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 #include <cstdlib>
 #include <cassert>
-#include "MathsCustomFunctions.hpp"
 
 
 SigmoidalAcinarUnit::SigmoidalAcinarUnit() : mQ(0.0),

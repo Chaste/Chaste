@@ -37,7 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 #include <assert.h>
 #include <iostream>
-#include <complex>
 #include <algorithm>
 
 ImpedancePostProcessor::ImpedancePostProcessor(std::vector<double>& rFrequencies,

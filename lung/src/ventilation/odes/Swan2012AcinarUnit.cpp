@@ -34,7 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "Swan2012AcinarUnit.hpp"
-#include "MathsCustomFunctions.hpp"
 #include <cmath>
 #include <iostream>
 

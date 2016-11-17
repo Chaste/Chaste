@@ -34,7 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "AirwayBranch.hpp"
-#include "Exception.hpp"
 #include "UblasCustomFunctions.hpp"
 
 AirwayBranch::AirwayBranch(bool radiusOnEdge) : mpChildOne(NULL),

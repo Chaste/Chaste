@@ -34,9 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "SimpleBalloonExplicitAcinarUnit.hpp"
-#include <cmath>
-#include <iostream>
-#include <cstdlib>
 
 
 SimpleBalloonExplicitAcinarUnit::SimpleBalloonExplicitAcinarUnit() : mQ(0.0),

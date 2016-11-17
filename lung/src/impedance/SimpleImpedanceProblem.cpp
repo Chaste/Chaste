@@ -34,10 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "SimpleImpedanceProblem.hpp"
-#include "TrianglesMeshReader.hpp"
-#include "ReplicatableVector.hpp"
-
-#include <cmath>
 
 SimpleImpedanceProblem::SimpleImpedanceProblem(TetrahedralMesh<1,3>& rAirwaysMesh, unsigned rootIndex)
     : mrMesh(rAirwaysMesh),

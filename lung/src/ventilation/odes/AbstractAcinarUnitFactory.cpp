@@ -34,7 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "AbstractAcinarUnitFactory.hpp"
-#include "AbstractAcinarUnit.hpp"
 
 //void AbstractAcinarUnitFactory::FinaliseAcinarUnitCreation(
 //    std::vector< AbstractAcinarUnit* >* pAcinarUnitsDistributed,
