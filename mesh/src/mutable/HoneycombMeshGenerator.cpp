@@ -36,12 +36,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "HoneycombMeshGenerator.hpp"
 
-#include <boost/foreach.hpp>
-#include "TrianglesMeshReader.hpp"
-#include "OutputFileHandler.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "MathsCustomFunctions.hpp"
-#include "ChasteSyscalls.hpp"
 
 HoneycombMeshGenerator::HoneycombMeshGenerator(unsigned numNodesAlongWidth, unsigned numNodesAlongLength, unsigned ghosts, double scaleFactor)
   : mpMesh(NULL),

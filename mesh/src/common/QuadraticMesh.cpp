@@ -34,8 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "QuadraticMesh.hpp"
-#include "OutputFileHandler.hpp"
-#include "TrianglesMeshReader.hpp"
 #include "Warnings.hpp"
 #include "QuadraticMeshHelper.hpp"
 

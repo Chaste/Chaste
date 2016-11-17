@@ -43,9 +43,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DistributedTetrahedralMesh.hpp"
 #include "MixedDimensionMesh.hpp"
 #include "Version.hpp"
-#include "Exception.hpp"
-
-#include <mpi.h> // For MPI_Send, MPI_Recv
 
 const char* MeshEventHandler::EventName[] = { "Tri write","BinTri write","VTK write","PVTK write", "node write", "ele write", "face write", "ncl write", "comm1","comm2","Total"};
 

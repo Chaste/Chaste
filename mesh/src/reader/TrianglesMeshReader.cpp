@@ -37,7 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 
 #include "TrianglesMeshReader.hpp"
-#include "Exception.hpp"
 
 static const char* NODES_FILE_EXTENSION = ".node";
 static const char* ELEMENTS_FILE_EXTENSION = ".ele";

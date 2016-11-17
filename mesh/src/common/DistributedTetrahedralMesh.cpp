@@ -35,29 +35,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "DistributedTetrahedralMesh.hpp"
 
-#include <cassert>
-#include <sstream>
-#include <string>
-#include <iterator>
-#include <algorithm>
-#include <boost/scoped_array.hpp>
-
-#include "Exception.hpp"
-#include "Element.hpp"
-#include "BoundaryElement.hpp"
-
-#include "PetscTools.hpp"
-#include "DistributedVectorFactory.hpp"
-#include "OutputFileHandler.hpp"
 #include "NodePartitioner.hpp"
 
 #include "RandomNumberGenerator.hpp"
 
-#include "Timer.hpp"
 #include "TetrahedralMesh.hpp"
 #include "Warnings.hpp"
- 
-#include "petscao.h"
+
 #include <parmetis.h>
 #if (PARMETIS_MAJOR_VERSION >= 4) //ParMETIS 4.x and above
 //Redefine the index type so that we can still use the old name "idxtype"

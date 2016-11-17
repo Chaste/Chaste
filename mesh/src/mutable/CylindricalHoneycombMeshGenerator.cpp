@@ -35,10 +35,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "CylindricalHoneycombMeshGenerator.hpp"
 
-#include <boost/foreach.hpp>
 #include "RandomNumberGenerator.hpp"
 #include "MathsCustomFunctions.hpp"
-#include "ChasteSyscalls.hpp"
 
 CylindricalHoneycombMeshGenerator::CylindricalHoneycombMeshGenerator(unsigned numNodesAlongWidth, unsigned numNodesAlongLength, unsigned ghosts, double scaleFactor)
 {

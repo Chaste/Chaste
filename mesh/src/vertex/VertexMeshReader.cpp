@@ -33,9 +33,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 #include "VertexMeshReader.hpp"
-#include "Exception.hpp"
-
-#include <sstream>
 
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

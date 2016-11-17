@@ -37,7 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cstring>
 
 #include "MutableMesh.hpp"
-#include "OutputFileHandler.hpp"
 
 //Jonathan Shewchuk's triangle and Hang Si's tetgen
 #define REAL double

@@ -38,14 +38,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 #include "NodePartitioner.hpp"
 #include "PetscMatTools.hpp"
-#include "PetscTools.hpp"
 #include "Timer.hpp"
 #include "TrianglesMeshReader.hpp"
 #include "Warnings.hpp"
-#include "petscao.h"
-#include "petscmat.h"
-
-#include <parmetis.h>
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::DumbPartitioning(AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,

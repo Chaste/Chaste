@@ -41,7 +41,6 @@ TrianglesMeshWriter<2,2> mesh_writer("Cylindrical2dMeshDebug", "mesh", false);
 mesh_writer.WriteFilesUsingMesh(*this);
 */
 #include "Cylindrical2dMesh.hpp"
-#include "Exception.hpp"
 
 Cylindrical2dMesh::Cylindrical2dMesh(double width)
   : MutableMesh<2,2>(),

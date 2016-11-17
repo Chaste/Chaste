@@ -33,8 +33,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 #include "DistributedBoxCollection.hpp"
-#include "Exception.hpp"
-#include "MathsCustomFunctions.hpp"
 #include "Warnings.hpp"
 
 // Static member for "fudge factor" is instantiated here

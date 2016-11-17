@@ -34,7 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "MutableElement.hpp"
 #include "RandomNumberGenerator.hpp"
-#include <cassert>
 
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

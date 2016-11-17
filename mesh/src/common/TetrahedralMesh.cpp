@@ -35,18 +35,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "TetrahedralMesh.hpp"
 
-#include <iostream>
-#include <cassert>
-#include <sstream>
 #include <map>
-#include <limits>
 
-#include "BoundaryElement.hpp"
-#include "Element.hpp"
-#include "Exception.hpp"
-#include "Node.hpp"
-#include "OutputFileHandler.hpp"
-#include "PetscTools.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "Warnings.hpp"
 
