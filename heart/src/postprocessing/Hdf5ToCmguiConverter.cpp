@@ -35,15 +35,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Hdf5ToCmguiConverter.hpp"
 #include "CmguiMeshWriter.hpp"
-#include "UblasCustomFunctions.hpp"
 #include "HeartConfig.hpp"
-#include "PetscTools.hpp"
-#include "Exception.hpp"
 #include "ReplicatableVector.hpp"
-#include "DistributedVector.hpp"
-#include "DistributedVectorFactory.hpp"
 #include "Version.hpp"
-#include "GenericMeshReader.hpp"
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void Hdf5ToCmguiConverter<ELEMENT_DIM,SPACE_DIM>::Write(std::string type)

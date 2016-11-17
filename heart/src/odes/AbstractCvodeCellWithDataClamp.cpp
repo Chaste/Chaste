@@ -40,10 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cmath>
 
 #include "AbstractCvodeCellWithDataClamp.hpp"
-#include "Exception.hpp"
 #include "HeartConfig.hpp"
-#include "VectorHelperFunctions.hpp"
-#include <algorithm>
 
 
 AbstractCvodeCellWithDataClamp::AbstractCvodeCellWithDataClamp(boost::shared_ptr<AbstractIvpOdeSolver> pSolver/* unused */,

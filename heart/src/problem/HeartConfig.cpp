@@ -41,10 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HeartConfig.hpp"
 #include "ArchiveLocationInfo.hpp"
 #include "OutputFileHandler.hpp"
-#include "Exception.hpp"
-#include "ChastePoint.hpp"
 #include "Version.hpp"
-#include "AbstractChasteRegion.hpp"
 #include "HeartFileFinder.hpp"
 #include "Warnings.hpp"
 
@@ -53,14 +50,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SimpleStimulus.hpp"
 #include "RegularStimulus.hpp"
 
-#include <string>
-#include <istream>
-#include <fstream>
-#include <cassert>
-#include <map>
-
 #include "XmlTools.hpp"
-#include <xsd/cxx/tree/exceptions.hxx>
+
 using namespace xsd::cxx::tree;
 
 // Coping with changes to XSD interface
@@ -115,7 +106,6 @@ using namespace xsd::cxx::tree;
         location.set(empty_item);              \
     }
 
-#include <boost/current_function.hpp>
 /**
  * This macro gives a friendly-ish exception method if you call a Get method that is
  * missing structure up the tree.

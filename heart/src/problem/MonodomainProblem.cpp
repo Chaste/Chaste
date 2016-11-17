@@ -35,8 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "MonodomainProblem.hpp"
 
-#include "Exception.hpp"
-#include "ReplicatableVector.hpp"
 #include "MonodomainSolver.hpp"
 #include "OperatorSplittingMonodomainSolver.hpp"
 

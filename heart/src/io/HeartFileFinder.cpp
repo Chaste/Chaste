@@ -34,7 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "HeartFileFinder.hpp"
-#include "Exception.hpp"
 
 
 HeartFileFinder::HeartFileFinder(const cp::path_type& rPath)

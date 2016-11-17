@@ -35,8 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractLookupTableCollection.hpp"
 
-#include <cmath>
-
 AbstractLookupTableCollection::AbstractLookupTableCollection()
     : mDt(0.0)
 {

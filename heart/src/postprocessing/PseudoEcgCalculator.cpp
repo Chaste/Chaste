@@ -36,9 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PseudoEcgCalculator.hpp"
 #include "HeartRegionCodes.hpp"
 #include "HeartConfig.hpp"
-#include "PetscTools.hpp"
 #include "Version.hpp"
-#include <iostream>
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 double PseudoEcgCalculator<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM> ::GetIntegrand(ChastePoint<SPACE_DIM>& rX,

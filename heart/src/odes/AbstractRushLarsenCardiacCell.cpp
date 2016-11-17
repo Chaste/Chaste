@@ -35,11 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractRushLarsenCardiacCell.hpp"
 
-#include <cassert>
-#include <cmath>
-
-#include "Exception.hpp"
-#include "OdeSolution.hpp"
 #include "TimeStepper.hpp"
 
 AbstractRushLarsenCardiacCell::AbstractRushLarsenCardiacCell(unsigned numberOfStateVariables,

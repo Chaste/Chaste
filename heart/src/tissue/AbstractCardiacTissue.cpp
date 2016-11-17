@@ -35,16 +35,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractCardiacTissue.hpp"
 
-#include <boost/scoped_array.hpp>
-
-#include "DistributedVector.hpp"
 #include "AxisymmetricConductivityTensors.hpp"
 #include "OrthotropicConductivityTensors.hpp"
-#include "Exception.hpp"
-#include "ChastePoint.hpp"
-#include "AbstractChasteRegion.hpp"
 #include "HeartEventHandler.hpp"
-#include "PetscTools.hpp"
 #include "PetscVecTools.hpp"
 #include "AbstractCvodeCell.hpp"
 #include "Warnings.hpp"

@@ -37,8 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PropagationPropertiesCalculator.hpp"
 #include "CellProperties.hpp"
 #include "Exception.hpp"
-#include <sstream>
-#include "HeartEventHandler.hpp"
 
 PropagationPropertiesCalculator::PropagationPropertiesCalculator(Hdf5DataReader* pDataReader,
                                                                  const std::string voltageName)

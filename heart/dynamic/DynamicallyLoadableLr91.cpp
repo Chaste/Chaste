@@ -34,9 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "DynamicallyLoadableLr91.hpp"
 #include "OdeSystemInformation.hpp"
-#include <cmath>
 //#include <iostream>
-#include "Exception.hpp"
 
 
 //

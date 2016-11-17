@@ -36,11 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ExtendedBidomainProblem.hpp"
 #include "ExtendedBidomainSolver.hpp"
-#include "AbstractDynamicLinearPdeSolver.hpp"
-#include "HeartConfig.hpp"
-#include "Exception.hpp"
-#include "DistributedVector.hpp"
-#include "ReplicatableVector.hpp"
 
 template<unsigned DIM>
 ExtendedBidomainProblem<DIM>::ExtendedBidomainProblem(

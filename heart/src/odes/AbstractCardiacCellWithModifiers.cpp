@@ -34,7 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "AbstractCardiacCellWithModifiers.hpp"
-#include "AbstractCvodeCellWithDataClamp.hpp"
 #include "DummyModifier.hpp"
 
 template<class CARDIAC_CELL>

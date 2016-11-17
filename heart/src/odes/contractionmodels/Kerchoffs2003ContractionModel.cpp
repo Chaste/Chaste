@@ -35,9 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "Kerchoffs2003ContractionModel.hpp"
-#include "Exception.hpp"
-#include "TimeStepper.hpp"
-#include <iostream>
 
 const double Kerchoffs2003ContractionModel::a6 = 2.0; // 1/um
 const double Kerchoffs2003ContractionModel::a7 = 1.5; // um

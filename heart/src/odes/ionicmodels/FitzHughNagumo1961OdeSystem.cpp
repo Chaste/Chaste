@@ -34,7 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "FitzHughNagumo1961OdeSystem.hpp"
 #include "OdeSystemInformation.hpp"
-#include <cmath>
 
 //
 // Model-scope constant parameters

@@ -36,17 +36,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "UblasCustomFunctions.hpp"
 #include "HeartConfig.hpp"
 #include "PostProcessingWriter.hpp"
-#include "PetscTools.hpp"
-#include "OutputFileHandler.hpp"
 #include "DistanceMapCalculator.hpp"
 #include "PseudoEcgCalculator.hpp"
 #include "Version.hpp"
-#include "HeartEventHandler.hpp"
 #include "Hdf5DataWriter.hpp"
-#include "Hdf5ToMeshalyzerConverter.hpp"
-#include "Hdf5ToVtkConverter.hpp"
-
-#include <iostream>
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::PostProcessingWriter(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>& rMesh,

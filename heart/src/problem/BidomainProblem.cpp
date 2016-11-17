@@ -36,10 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "BidomainProblem.hpp"
 #include "BidomainSolver.hpp"
-#include "HeartConfig.hpp"
-#include "Exception.hpp"
-#include "DistributedVector.hpp"
-#include "ReplicatableVector.hpp"
 
 template <unsigned DIM>
 void BidomainProblem<DIM>::AnalyseMeshForBath()

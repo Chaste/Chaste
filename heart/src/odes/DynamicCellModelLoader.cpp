@@ -37,9 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractDynamicallyLoadableEntity.hpp"
 
 #include <dlfcn.h>  // For dealing with .so files
-#include <cassert>
-
-#include "Exception.hpp"
 
 DynamicCellModelLoaderPtr DynamicCellModelLoader::Create(const std::string& rLoadableModulePath)
 {

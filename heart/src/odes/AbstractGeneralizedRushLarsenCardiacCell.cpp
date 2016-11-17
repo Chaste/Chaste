@@ -44,10 +44,6 @@ and the MITACS/Mprime Canadian Network of Centres of Excellence.
 */
 
 #include "AbstractGeneralizedRushLarsenCardiacCell.hpp"
-#include <cassert>
-#include <cmath>
-#include "Exception.hpp"
-#include "OdeSolution.hpp"
 #include "TimeStepper.hpp"
 
 AbstractGeneralizedRushLarsenCardiacCell::AbstractGeneralizedRushLarsenCardiacCell(unsigned numberOfStateVariables,

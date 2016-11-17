@@ -35,23 +35,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "CardiacElectroMechanicsProblem.hpp"
 
-#include "OutputFileHandler.hpp"
-#include "ReplicatableVector.hpp"
-#include "HeartConfig.hpp"
-#include "LogFile.hpp"
-#include "ChastePoint.hpp"
-#include "Element.hpp"
-#include "BoundaryConditionsContainer.hpp"
-#include "AbstractDynamicLinearPdeSolver.hpp"
-#include "TimeStepper.hpp"
-#include "TrianglesMeshWriter.hpp"
-#include "Hdf5ToMeshalyzerConverter.hpp"
 #include "Hdf5ToCmguiConverter.hpp"
-#include "MeshalyzerMeshWriter.hpp"
-#include "PetscTools.hpp"
 #include "ImplicitCardiacMechanicsSolver.hpp"
 #include "ExplicitCardiacMechanicsSolver.hpp"
-#include "CmguiDeformedSolutionsWriter.hpp"
 #include "VoltageInterpolaterOntoMechanicsMesh.hpp"
 #include "BidomainProblem.hpp"
 

@@ -35,13 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "HeartGeometryInformation.hpp"
 
-#include <cmath>
-#include <fstream>
-#include <sstream>
-#include "OutputFileHandler.hpp"
-#include "Exception.hpp"
-#include "PetscTools.hpp"
-
 // Area of the septum considered to belong to the each ventricle (relative to 1)
 template<unsigned SPACE_DIM>
 const double HeartGeometryInformation<SPACE_DIM>::LEFT_SEPTUM_SIZE = 2.0/3.0;

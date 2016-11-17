@@ -35,19 +35,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractCardiacProblem.hpp"
 
-#include "GenericMeshReader.hpp"
-#include "Exception.hpp"
-#include "HeartConfig.hpp"
-#include "HeartEventHandler.hpp"
-#include "TimeStepper.hpp"
-#include "PetscTools.hpp"
-#include "DistributedVector.hpp"
 #include "ProgressReporter.hpp"
-#include "LinearSystem.hpp"
 #include "PostProcessingWriter.hpp"
 #include "Hdf5ToMeshalyzerConverter.hpp"
 #include "Hdf5ToCmguiConverter.hpp"
-#include "Hdf5ToVtkConverter.hpp"
 
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>

@@ -35,12 +35,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ExtendedBidomainTissue.hpp"
 
-#include "DistributedVector.hpp"
 #include "OrthotropicConductivityTensors.hpp"
 #include "AxisymmetricConductivityTensors.hpp"
-#include "AbstractStimulusFunction.hpp"
-#include "ChastePoint.hpp"
-#include "AbstractChasteRegion.hpp"
 #include "HeartEventHandler.hpp"
 
 template <unsigned SPACE_DIM>

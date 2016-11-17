@@ -34,11 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "NhsModelWithBackwardSolver.hpp"
-#include <iostream>
-#include <cmath>
 #include "LogFile.hpp"
-#include "Exception.hpp"
-#include "TimeStepper.hpp"
 
 const double NhsModelWithBackwardSolver::mTolerance = 1e-10;
 

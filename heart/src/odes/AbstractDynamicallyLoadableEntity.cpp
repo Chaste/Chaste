@@ -35,8 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractDynamicallyLoadableEntity.hpp"
 
-#include "DynamicModelLoaderRegistry.hpp"
-
 void AbstractDynamicallyLoadableEntity::SetLoader(DynamicCellModelLoaderPtr pLoader)
 {
     mpLoader = pLoader;

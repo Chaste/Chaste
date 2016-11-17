@@ -44,8 +44,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OutputFileHandler.hpp"
 #include "ArchiveLocationInfo.hpp"
 #include "DistributedVectorFactory.hpp"
-#include "PetscTools.hpp"
-#include "FileFinder.hpp"
 
 #include "MonodomainProblem.hpp"
 #include "BidomainProblem.hpp"

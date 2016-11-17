@@ -34,7 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "HeartRegionCodes.hpp"
 #include "HeartConfig.hpp"
-#include <cassert>
 
 
 HeartRegionType HeartRegionCode::GetValidTissueId()

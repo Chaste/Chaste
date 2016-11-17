@@ -37,8 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NonPhysiologicalContractionModel.hpp"
 #include <math.h>
 
-#include <iostream>
-
 NonPhysiologicalContractionModel::NonPhysiologicalContractionModel(unsigned option)
     : AbstractAlgebraicContractionModel()
 {

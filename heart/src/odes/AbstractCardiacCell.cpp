@@ -34,11 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "AbstractCardiacCell.hpp"
 
-#include <cassert>
-#include <iostream>
-
 #include "HeartConfig.hpp"
-#include "Exception.hpp"
 
 AbstractCardiacCell::AbstractCardiacCell(boost::shared_ptr<AbstractIvpOdeSolver> pOdeSolver,
                                          unsigned numberOfStateVariables,

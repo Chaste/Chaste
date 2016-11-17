@@ -38,15 +38,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 
 #include <xercesc/dom/DOM.hpp>
-#include <xercesc/util/PlatformUtils.hpp>
-#include <xercesc/util/QName.hpp>
-#include <xercesc/util/XMLUniDefs.hpp> // chLatin_*
-#include <xercesc/framework/Wrapper4InputSource.hpp>
-#include <xercesc/validators/common/Grammar.hpp>
 
 #include <xsd/cxx/xml/sax/std-input-source.hxx>
 #include <xsd/cxx/xml/dom/bits/error-handler-proxy.hxx>
-#include <xsd/cxx/tree/exceptions.hxx>
 
 #include "Exception.hpp"
 

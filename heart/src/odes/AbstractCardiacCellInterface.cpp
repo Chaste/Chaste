@@ -35,7 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "HeartConfig.hpp" // First for Boost 1.33/PETSc 2.2
 #include "AbstractCardiacCellInterface.hpp"
-#include "Exception.hpp"
 
 #include "Citations.hpp"
 static PetscBool CardiacCellChasteCite = PETSC_FALSE;

@@ -35,11 +35,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "BidomainTissue.hpp"
 
-#include "DistributedVector.hpp"
 #include "AxisymmetricConductivityTensors.hpp"
 #include "OrthotropicConductivityTensors.hpp"
-#include "ChastePoint.hpp"
-#include "AbstractChasteRegion.hpp"
 
 template <unsigned SPACE_DIM>
 BidomainTissue<SPACE_DIM>::BidomainTissue(

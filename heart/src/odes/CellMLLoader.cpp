@@ -35,7 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "CellMLLoader.hpp"
 
-#include <algorithm>
 #include "EulerIvpOdeSolver.hpp"
 
 CellMLLoader::CellMLLoader(const FileFinder& rCellMLFile, const OutputFileHandler& rOutputFileHandler, const std::vector<std::string>& rOptions)

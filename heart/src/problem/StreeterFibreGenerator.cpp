@@ -37,11 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "StreeterFibreGenerator.hpp"
 
-#include <cmath>
-#include <fstream>
-#include <sstream>
-#include "OutputFileHandler.hpp"
-#include "Exception.hpp"
 //#include "HeartRegionCodes.hpp"
 
 // Add the citation for original Streeter paper.

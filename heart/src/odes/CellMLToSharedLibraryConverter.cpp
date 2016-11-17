@@ -35,20 +35,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "CellMLToSharedLibraryConverter.hpp"
 
-#include <sstream>
-#include <fstream>      // for std::ofstream
 #include <sys/stat.h> // For mkdir()
-#include <ctime>
-#include <cstring> // For strerror()
-#include <cerrno> // For errno
 
 #include <boost/foreach.hpp>
 
-#include "ChasteSyscalls.hpp"
-#include "Exception.hpp"
-#include "Warnings.hpp"
 #include "ChasteBuildRoot.hpp"
-#include "PetscTools.hpp"
 #include "DynamicModelLoaderRegistry.hpp"
 #include "GetCurrentWorkingDirectory.hpp"
 
