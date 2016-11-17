@@ -1,4 +1,6 @@
+TestDebug.hpp
 TestDistributedVector.hpp
+TestExecutableSupport.hpp
 TestGenericEventHandler.hpp
 TestOutputFileHandler.hpp
 TestReplicatableVector.hpp
