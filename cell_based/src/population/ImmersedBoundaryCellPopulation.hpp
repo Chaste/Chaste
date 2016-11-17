@@ -37,15 +37,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define IMMERSEDBOUNDARYCELLPOPULATION_HPP_
 
 #include "AbstractOffLatticeCellPopulation.hpp"
-#include "ImmersedBoundaryMesh.hpp"
 #include "AbstractVertexBasedDivisionRule.hpp"
+#include "ImmersedBoundaryMesh.hpp"
 
-#include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/set.hpp>
 #include <boost/serialization/vector.hpp>
+#include "ChasteSerialization.hpp"
 
-template<unsigned DIM> class AbstractVertexBasedDivisionRule; // Circular definition
+template <unsigned DIM>
+class AbstractVertexBasedDivisionRule; // Circular definition
 
 /**
  * A facade class encapsulating an immersed boundary cell population.
@@ -53,11 +54,10 @@ template<unsigned DIM> class AbstractVertexBasedDivisionRule; // Circular defini
  * Contains a group of cells and maintains the associations
  * between CellPtrs and elements in the ImmersedBoundaryMesh.
  */
-template<unsigned DIM>
+template <unsigned DIM>
 class ImmersedBoundaryCellPopulation : public AbstractOffLatticeCellPopulation<DIM>
 {
 private:
-
     /**
      * This test uses the private constructor to simplify testing.
      */
@@ -115,11 +115,11 @@ private:
      * @param archive the archive
      * @param version the current version of this class
      */
-    template<class Archive>
-    void serialize(Archive & archive, const unsigned int version)
+    template <class Archive>
+    void serialize(Archive& archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractOffLatticeCellPopulation<DIM> >(*this);
-        archive & mpVertexBasedDivisionRule;
+        archive& boost::serialization::base_object<AbstractOffLatticeCellPopulation<DIM> >(*this);
+        archive& mpVertexBasedDivisionRule;
     }
 
     /**
@@ -141,7 +141,6 @@ private:
     void Validate();
 
 public:
-
     /**
      * Create a new cell population facade from a mesh and collection of cells.
      *
@@ -155,10 +154,10 @@ public:
      * @param locationIndices an optional vector of location indices that correspond to real cells
      */
     ImmersedBoundaryCellPopulation(ImmersedBoundaryMesh<DIM, DIM>& rMesh,
-            std::vector<CellPtr>& rCells,
-            bool deleteMesh=false,
-            bool validate=true,
-            const std::vector<unsigned> locationIndices=std::vector<unsigned>());
+                                   std::vector<CellPtr>& rCells,
+                                   bool deleteMesh = false,
+                                   bool validate = true,
+                                   const std::vector<unsigned> locationIndices = std::vector<unsigned>());
 
     /**
      * Constructor for use by boost serialization ONLY!
@@ -324,7 +323,7 @@ public:
      * @param pParentCell pointer to a parent cell (if required)
      * @return address of cell as it appears in the cell list (internal of this method uses a copy constructor along the way)
      */
-    CellPtr AddCell(CellPtr pNewCell, CellPtr pParentCell=CellPtr());
+    CellPtr AddCell(CellPtr pNewCell, CellPtr pParentCell = CellPtr());
 
     /**
      * Remove all cells labelled as dead.
@@ -353,7 +352,7 @@ public:
      * @param hasHadBirthsOrDeaths - a bool saying whether cell population has had Births Or Deaths
      * not needed in this cell population class
      */
-    void Update(bool hasHadBirthsOrDeaths=true);
+    void Update(bool hasHadBirthsOrDeaths = true);
 
     /**
      * Overridden OpenWritersFiles() method.
@@ -459,8 +458,8 @@ public:
      */
     virtual double GetCellDataItemAtPdeNode(unsigned pdeNodeIndex,
                                             std::string& rVariableName,
-                                            bool dirichletBoundaryConditionApplies=false,
-                                            double dirichletBoundaryValue=0.0);
+                                            bool dirichletBoundaryConditionApplies = false,
+                                            double dirichletBoundaryValue = 0.0);
 
     /**
      * @return The vertex division rule that is currently being used.
@@ -493,7 +492,7 @@ public:
      * @param displacement Movement vector of the node at this time step
      * @param dt Current time step size
      */
-    virtual void CheckForStepSizeException(unsigned nodeIndex, c_vector<double,DIM>& displacement, double dt);
+    virtual void CheckForStepSizeException(unsigned nodeIndex, c_vector<double, DIM>& displacement, double dt);
 
     /**
      * Overridden GetDefaultTimeStep() method.
@@ -513,36 +512,36 @@ EXPORT_TEMPLATE_CLASS_SAME_DIMS(ImmersedBoundaryCellPopulation)
 
 namespace boost
 {
-    namespace serialization
-    {
+namespace serialization
+{
     /**
      * Serialize information required to construct a ImmersedBoundaryCellPopulation.
      */
-    template<class Archive, unsigned DIM>
+    template <class Archive, unsigned DIM>
     inline void save_construct_data(
-            Archive & ar, const ImmersedBoundaryCellPopulation<DIM> * t, const unsigned int file_version)
+        Archive& ar, const ImmersedBoundaryCellPopulation<DIM>* t, const unsigned int file_version)
     {
         // Save data required to construct instance
-        const ImmersedBoundaryMesh<DIM,DIM>* p_mesh = &(t->rGetMesh());
-        ar & p_mesh;
+        const ImmersedBoundaryMesh<DIM, DIM>* p_mesh = &(t->rGetMesh());
+        ar& p_mesh;
     }
 
     /**
      * De-serialize constructor parameters and initialise a ImmersedBoundaryCellPopulation.
      * Loads the mesh from separate files.
      */
-    template<class Archive, unsigned DIM>
+    template <class Archive, unsigned DIM>
     inline void load_construct_data(
-            Archive & ar, ImmersedBoundaryCellPopulation<DIM> * t, const unsigned int file_version)
+        Archive& ar, ImmersedBoundaryCellPopulation<DIM>* t, const unsigned int file_version)
     {
         // Retrieve data from archive required to construct new instance
-        ImmersedBoundaryMesh<DIM,DIM>* p_mesh;
+        ImmersedBoundaryMesh<DIM, DIM>* p_mesh;
         ar >> p_mesh;
 
         // Invoke inplace constructor to initialise instance
-        ::new(t)ImmersedBoundaryCellPopulation<DIM>(*p_mesh);
+        ::new (t) ImmersedBoundaryCellPopulation<DIM>(*p_mesh);
     }
-    }
+}
 } // namespace ...
 
 #endif /*IMMERSEDBOUNDARYCELLPOPULATION_HPP_*/
