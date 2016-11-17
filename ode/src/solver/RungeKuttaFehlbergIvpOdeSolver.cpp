@@ -34,10 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "RungeKuttaFehlbergIvpOdeSolver.hpp"
-#include <cmath>
-#include <cfloat>
-#include <iostream>
-#include "Exception.hpp"
 
 /*
  * PROTECTED FUNCTIONS =========================================================

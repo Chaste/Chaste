@@ -37,16 +37,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "CvodeAdaptor.hpp"
 
-#include "Exception.hpp"
 #include "TimeStepper.hpp"
 #include "VectorHelperFunctions.hpp"
 #include "MathsCustomFunctions.hpp" // For tolerance check.
 
-#include <iostream>
-#include <sstream>
-
 // CVODE headers
-#include <sundials/sundials_nvector.h>
 #include <cvode/cvode_dense.h>
 
 

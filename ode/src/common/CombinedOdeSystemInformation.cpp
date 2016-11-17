@@ -36,8 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "CombinedOdeSystemInformation.hpp"
 
-#include <cassert>
-
 boost::shared_ptr<CombinedOdeSystemInformation> CombinedOdeSystemInformation::Instance(const std::vector<AbstractOdeSystem*>& rSubsystems)
 {
     // Get the information for the subsystems

@@ -35,8 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractOneStepIvpOdeSolver.hpp"
 #include "TimeStepper.hpp"
-#include "Exception.hpp"
-#include <cmath>
 
 OdeSolution AbstractOneStepIvpOdeSolver::Solve(AbstractOdeSystem* pOdeSystem,
                                                std::vector<double>& rYValues,

@@ -35,7 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ParameterisedCvode.hpp"
 #include "OdeSystemInformation.hpp"
-#include "VectorHelperFunctions.hpp"
 
 #ifdef CHASTE_CVODE
 bool ParameterisedCvode::fakeSecondParameter = false;

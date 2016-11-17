@@ -34,7 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "AbstractOdeSystem.hpp"
-#include "Exception.hpp"
 
 AbstractOdeSystem::AbstractOdeSystem(unsigned numberOfStateVariables)
     : AbstractParameterisedSystem<std::vector<double> >(numberOfStateVariables),

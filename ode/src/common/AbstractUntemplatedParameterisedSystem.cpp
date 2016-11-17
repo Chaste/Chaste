@@ -37,7 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "Exception.hpp"
-#include "VectorHelperFunctions.hpp"
 
 
 AbstractUntemplatedParameterisedSystem::AbstractUntemplatedParameterisedSystem(unsigned numberOfStateVariables)

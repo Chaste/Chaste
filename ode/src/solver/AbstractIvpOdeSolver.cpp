@@ -36,9 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractIvpOdeSolver.hpp"
 
-#include <climits>
-#include "Exception.hpp"
-
 AbstractIvpOdeSolver::AbstractIvpOdeSolver()
     : mStoppingEventOccurred(false),
       mStoppingTime(DBL_MAX)
