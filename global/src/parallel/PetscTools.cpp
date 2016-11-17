@@ -37,7 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 #include "Warnings.hpp"
 #include <iostream>
-#include <sstream>
 #include <cassert>
 #include <cstring> // For strcmp etc. Needed in gcc-4.3
 

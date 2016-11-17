@@ -34,7 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "Citations.hpp"
-#include "PetscTools.hpp"
 
 // Initialise 'member' variables
 std::vector<const char *> Citations::mCitations;

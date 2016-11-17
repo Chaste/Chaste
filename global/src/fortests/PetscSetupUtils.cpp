@@ -37,18 +37,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <petsc.h>
 #include <cstdlib>
-#include <cassert>
 #include <cstring>
 #include <iostream>
 
 #include "ChasteBuildRoot.hpp"
 #include "ChasteSyscalls.hpp"
 #include "Citations.hpp"
-#include "CommandLineArguments.hpp"
-#include "Exception.hpp"
 #include "GetCurrentWorkingDirectory.hpp"
 #include "PetscException.hpp"
-#include "PetscTools.hpp"
 
 #ifdef TEST_FOR_FPE
 #include <fenv.h>

@@ -42,9 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 #include "LogFile.hpp"
 #include "BoostFilesystem.hpp"
-#include "FileFinder.hpp"
 #include "PosixPathFixer.hpp"
-#include "GetCurrentWorkingDirectory.hpp"
 
 Warnings* Warnings::mpInstance = NULL;
 

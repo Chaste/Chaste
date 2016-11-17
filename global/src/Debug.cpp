@@ -37,7 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // If you ever need backtrace in Windows then the RTFM begins at "CaptureStackBackTrace"
 #ifndef _MSC_VER
 #include <execinfo.h>     //For backtrace
-#include <unistd.h>       // For memory profiling
 #include <sys/resource.h> // For memory profiling
 #endif//_MSC_VER
 //#include <cxxabi.h> // For demangling C++ C-style names

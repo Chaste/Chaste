@@ -55,11 +55,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 typedef std::pair<std::string, std::string> StringPair;
 
 #include "CommandLineArguments.hpp"
-#include "Exception.hpp"
 #include "PetscTools.hpp"
 #include "PetscSetupUtils.hpp"
 #include "PetscException.hpp"
-#include "ChasteSerialization.hpp"
 
 #ifdef CHASTE_VTK
 #define _BACKWARD_BACKWARD_WARNING_H 1 //Cut out the strstream deprecated warning for now (gcc4.3)

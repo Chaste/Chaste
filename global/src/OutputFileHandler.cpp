@@ -36,15 +36,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OutputFileHandler.hpp"
 
 #include <cstdlib>
-#include <fstream>
 #include <sstream>
 
 #include "ArchiveLocationInfo.hpp"
-#include "BoostFilesystem.hpp"
 #include "Exception.hpp"
-#include "FileFinder.hpp"
-#include "GetCurrentWorkingDirectory.hpp"
-#include "PetscTools.hpp"
 
 
 const std::string OutputFileHandler::SIG_FILE_NAME(".chaste_deletable_folder");

@@ -35,8 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ArchiveLocationInfo.hpp"
 
-#include <sstream>
-
 #include "Exception.hpp"
 #include "OutputFileHandler.hpp"
 

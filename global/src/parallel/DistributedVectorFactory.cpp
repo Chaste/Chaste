@@ -36,7 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cassert>
 
 #include "DistributedVectorFactory.hpp"
-#include "PetscTools.hpp"
 
 // Initialise static data
 bool DistributedVectorFactory::msCheckNumberOfProcessesOnLoad = true;

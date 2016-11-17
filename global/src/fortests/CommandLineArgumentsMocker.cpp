@@ -34,7 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <boost/algorithm/string.hpp>
-#include <cstring>
 
 #include "CommandLineArguments.hpp"
 #include "CommandLineArgumentsMocker.hpp"

@@ -43,7 +43,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ArchiveOpener.hpp"
 #include "ArchiveLocationInfo.hpp"
 #include "ProcessSpecificArchive.hpp"
-#include "Exception.hpp"
 #include "OutputFileHandler.hpp"
 
 /**

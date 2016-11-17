@@ -37,7 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cmath>
 
 #include "TimeStepper.hpp"
-#include "Exception.hpp"
 #include "MathsCustomFunctions.hpp"
 
 TimeStepper::TimeStepper(double startTime, double endTime, double dt, bool enforceConstantTimeStep, std::vector<double> additionalTimes)

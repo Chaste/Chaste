@@ -35,9 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "FileFinder.hpp"
 
-#include <cassert>
-
-#include "BoostFilesystem.hpp"
 #include "ChasteBuildRoot.hpp"
 #include "Exception.hpp"
 #include "GetCurrentWorkingDirectory.hpp"
