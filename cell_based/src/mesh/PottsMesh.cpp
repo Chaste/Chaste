@@ -35,8 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "PottsMesh.hpp"
 #include "RandomNumberGenerator.hpp"
-#include "UblasCustomFunctions.hpp"
-#include <list>
 
 
 template<unsigned DIM>

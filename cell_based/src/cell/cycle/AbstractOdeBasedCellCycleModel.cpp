@@ -34,9 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "AbstractOdeBasedCellCycleModel.hpp"
-#include <iostream>
-#include <cassert>
-#include "Exception.hpp"
 
 AbstractOdeBasedCellCycleModel::AbstractOdeBasedCellCycleModel(double lastTime,
                                                                boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)

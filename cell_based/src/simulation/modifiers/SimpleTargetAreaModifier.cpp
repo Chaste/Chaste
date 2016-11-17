@@ -35,7 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "SimpleTargetAreaModifier.hpp"
 #include "AbstractPhaseBasedCellCycleModel.hpp"
-#include "SimulationTime.hpp"
 #include "ApoptoticCellProperty.hpp"
 
 template<unsigned DIM>

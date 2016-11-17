@@ -36,7 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PlaneBoundaryCondition.hpp"
 #include "AbstractCentreBasedCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
-#include "RandomNumberGenerator.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 PlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::PlaneBoundaryCondition(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>* pCellPopulation,

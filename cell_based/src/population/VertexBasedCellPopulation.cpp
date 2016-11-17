@@ -34,11 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "VertexBasedCellPopulation.hpp"
-#include <boost/foreach.hpp>
-#include "VertexMeshWriter.hpp"
 #include "Warnings.hpp"
-#include "ChasteSyscalls.hpp"
-#include "IsNan.hpp"
 #include "ShortAxisVertexBasedDivisionRule.hpp"
 #include "StepSizeException.hpp"
 #include "WildTypeCellMutationState.hpp"

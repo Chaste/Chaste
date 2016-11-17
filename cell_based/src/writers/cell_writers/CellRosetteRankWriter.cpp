@@ -36,7 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellRosetteRankWriter.hpp"
 #include "AbstractCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
-#include "Exception.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 CellRosetteRankWriter<ELEMENT_DIM, SPACE_DIM>::CellRosetteRankWriter()

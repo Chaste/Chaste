@@ -34,7 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "CellwiseSourceParabolicPde.hpp"
-#include "Exception.hpp"
 
 template<unsigned DIM>
 CellwiseSourceParabolicPde<DIM>::CellwiseSourceParabolicPde(AbstractCellPopulation<DIM,DIM>& rCellPopulation,
