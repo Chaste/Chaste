@@ -33,7 +33,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 #include "RadialSloughingCellKiller.hpp"
-#include "AbstractCentreBasedCellPopulation.hpp"
 
 RadialSloughingCellKiller::RadialSloughingCellKiller(AbstractCellPopulation<2>* pCellPopulation, c_vector<double,2> centre, double radius)
     : AbstractCellKiller<2>(pCellPopulation),

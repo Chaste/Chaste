@@ -33,8 +33,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 #include "SloughingCellKiller.hpp"
-#include "AbstractCentreBasedCellPopulation.hpp"
-#include "Exception.hpp"
 
 template<unsigned DIM>
 SloughingCellKiller<DIM>::SloughingCellKiller(AbstractCellPopulation<DIM>* pCrypt, double sloughHeight, bool sloughSides, double sloughWidth)

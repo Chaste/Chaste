@@ -34,7 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "CryptSimulation1d.hpp"
-#include "WntConcentration.hpp"
 #include "SmartPointers.hpp"
 
 CryptSimulation1d::CryptSimulation1d(AbstractCellPopulation<1>& rCellPopulation,

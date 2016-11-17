@@ -135,5 +135,4 @@ void StochasticWntCellCycleModel::OutputCellCycleModelParameters(out_stream& rPa
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
 CHASTE_CLASS_EXPORT(StochasticWntCellCycleModel)
-#include "CellCycleModelOdeSolverExportWrapper.hpp"
 EXPORT_CELL_CYCLE_MODEL_ODE_SOLVER(StochasticWntCellCycleModel)

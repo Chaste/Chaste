@@ -34,7 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "CellBetaCateninWriter.hpp"
-#include "AbstractCellPopulation.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 CellBetaCateninWriter<ELEMENT_DIM, SPACE_DIM>::CellBetaCateninWriter()

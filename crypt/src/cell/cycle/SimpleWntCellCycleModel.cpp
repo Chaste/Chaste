@@ -34,7 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "SimpleWntCellCycleModel.hpp"
-#include "Exception.hpp"
 #include "StemCellProliferativeType.hpp"
 #include "TransitCellProliferativeType.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
