@@ -34,11 +34,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "PottsBasedCellPopulation.hpp"
-#include "MutableMesh.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "AbstractPottsUpdateRule.hpp"
 #include "NodesOnlyMesh.hpp"
-#include "Exception.hpp"
 #include "CellPopulationElementWriter.hpp"
 #include "CellIdWriter.hpp"
 

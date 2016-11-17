@@ -34,11 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "PottsElement.hpp"
 #include "RandomNumberGenerator.hpp"
-#include <cassert>
-#include "Exception.hpp"
-#include "UblasCustomFunctions.hpp"
-#include "petscsys.h"
-#include "petscblaslapack.h"
 
 
 template<unsigned DIM>

@@ -36,8 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SimpleOxygenBasedCellCycleModel.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "ApoptoticCellProperty.hpp"
-#include "CellPropertyRegistry.hpp"
-#include "Exception.hpp"
 
 SimpleOxygenBasedCellCycleModel::SimpleOxygenBasedCellCycleModel()
     : mCurrentHypoxicDuration(0.0),

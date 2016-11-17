@@ -34,7 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "NoCellCycleModel.hpp"
-#include "Exception.hpp"
 
 NoCellCycleModel::NoCellCycleModel()
     : AbstractCellCycleModel()

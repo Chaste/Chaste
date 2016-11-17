@@ -34,7 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "Goldbeter1991SrnModel.hpp"
-#include "AbstractOdeSrnModel.hpp"
 
 Goldbeter1991SrnModel::Goldbeter1991SrnModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
     : AbstractOdeSrnModel(3, pOdeSolver)

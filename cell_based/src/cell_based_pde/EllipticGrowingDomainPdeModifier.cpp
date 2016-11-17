@@ -36,7 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "EllipticGrowingDomainPdeModifier.hpp"
 #include "CellBasedEllipticPdeSolver.hpp"
 #include "AveragedSourceEllipticPde.hpp"
-#include "Exception.hpp"
 
 template<unsigned DIM>
 EllipticGrowingDomainPdeModifier<DIM>::EllipticGrowingDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde,

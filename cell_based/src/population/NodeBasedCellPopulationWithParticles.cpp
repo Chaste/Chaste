@@ -34,7 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "NodeBasedCellPopulationWithParticles.hpp"
-#include "Warnings.hpp"
 #include "VtkMeshWriter.hpp"
 #include "CellAgesWriter.hpp"
 #include "CellAncestorWriter.hpp"

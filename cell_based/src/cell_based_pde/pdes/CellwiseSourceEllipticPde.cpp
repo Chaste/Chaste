@@ -34,7 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "CellwiseSourceEllipticPde.hpp"
-#include "Exception.hpp"
 
 template<unsigned DIM>
 CellwiseSourceEllipticPde<DIM>::CellwiseSourceEllipticPde(AbstractCellPopulation<DIM,DIM>& rCellPopulation, double sourceCoefficient)

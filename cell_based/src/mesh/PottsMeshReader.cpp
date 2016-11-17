@@ -34,9 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "PottsMeshReader.hpp"
-#include "Exception.hpp"
-
-#include <sstream>
 
 template<unsigned SPACE_DIM>
 PottsMeshReader<SPACE_DIM>::PottsMeshReader(std::string pathBaseName)

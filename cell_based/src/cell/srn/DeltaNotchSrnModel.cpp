@@ -35,8 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "DeltaNotchSrnModel.hpp"
 
-#include <cassert>
-
 DeltaNotchSrnModel::DeltaNotchSrnModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
     : AbstractOdeSrnModel(2, pOdeSolver)
 {

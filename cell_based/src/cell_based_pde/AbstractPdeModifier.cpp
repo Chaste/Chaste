@@ -36,7 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractPdeModifier.hpp"
 #include "VtkMeshWriter.hpp"
 #include "ReplicatableVector.hpp"
-#include "PetscTools.hpp"
 #include "AveragedSourceEllipticPde.hpp"
 #include "AveragedSourceParabolicPde.hpp"
 

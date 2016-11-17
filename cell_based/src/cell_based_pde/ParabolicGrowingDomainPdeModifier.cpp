@@ -36,7 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ParabolicGrowingDomainPdeModifier.hpp"
 #include "CellBasedParabolicPdeSolver.hpp"
 #include "AveragedSourceParabolicPde.hpp"
-#include "Exception.hpp"
 
 template<unsigned DIM>
 ParabolicGrowingDomainPdeModifier<DIM>::ParabolicGrowingDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde,

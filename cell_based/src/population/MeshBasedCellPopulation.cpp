@@ -34,13 +34,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "MeshBasedCellPopulation.hpp"
-#include "TrianglesMeshWriter.hpp"
 #include "VtkMeshWriter.hpp"
 #include "CellBasedEventHandler.hpp"
 #include "Cylindrical2dMesh.hpp"
 #include "Cylindrical2dVertexMesh.hpp"
 #include "NodesOnlyMesh.hpp"
-#include "Exception.hpp"
 #include "CellId.hpp"
 #include "CellVolumesWriter.hpp"
 #include "CellPopulationElementWriter.hpp"

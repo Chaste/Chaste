@@ -36,9 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OnLatticeSimulation.hpp"
 #include "AbstractOnLatticeCellPopulation.hpp"
 #include "CellBasedEventHandler.hpp"
-#include "LogFile.hpp"
-#include "Version.hpp"
-#include "ExecutableSupport.hpp"
 
 template<unsigned DIM>
 OnLatticeSimulation<DIM>::OnLatticeSimulation(AbstractCellPopulation<DIM>& rCellPopulation,

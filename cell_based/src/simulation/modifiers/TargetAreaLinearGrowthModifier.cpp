@@ -34,7 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "TargetAreaLinearGrowthModifier.hpp"
-#include "SimulationTime.hpp"
 #include "ApoptoticCellProperty.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 #include "AbstractPhaseBasedCellCycleModel.hpp"
