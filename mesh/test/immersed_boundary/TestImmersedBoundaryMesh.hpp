@@ -38,6 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Needed for test framework
 #include <cxxtest/TestSuite.h>
+#include "ImmersedBoundaryEnumerations.hpp"
 
 #include "ImmersedBoundaryHoneycombMeshGenerator.hpp"
 #include "ImmersedBoundaryMesh.hpp"
@@ -527,6 +528,86 @@ public:
 
             delete p_mesh;
         }
+    }
+
+    void TestNodesInDifferentElementOrLamina() throw(Exception)
+    {
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true, 0.1, 0.1));
+        nodes.push_back(new Node<2>(1, true, 0.1, 0.3));
+        nodes.push_back(new Node<2>(2, true, 0.1, 0.5));
+
+        nodes.push_back(new Node<2>(3, true, 0.1, 0.1));
+        nodes.push_back(new Node<2>(4, true, 0.3, 0.1));
+        nodes.push_back(new Node<2>(5, true, 0.5, 0.1));
+
+        nodes.push_back(new Node<2>(6, true, 0.1, 0.1));
+        nodes.push_back(new Node<2>(7, true, 0.2, 0.1));
+        nodes.push_back(new Node<2>(8, true, 0.2, 0.2));
+
+        nodes.push_back(new Node<2>(9, true, 0.1, 0.1));
+        nodes.push_back(new Node<2>(10, true, 0.2, 0.1));
+        nodes.push_back(new Node<2>(11, true, 0.2, 0.2));
+
+        for (unsigned i = 0; i < 5; i++)
+        {
+            nodes[i]->SetRegion(LAMINA_REGION);
+        }
+
+        std::vector<Node<2>*> nodes_lam1;
+        nodes_lam1.push_back(nodes[0]);
+        nodes_lam1.push_back(nodes[1]);
+        nodes_lam1.push_back(nodes[2]);
+
+        std::vector<Node<2>*> nodes_lam2;
+        nodes_lam2.push_back(nodes[3]);
+        nodes_lam2.push_back(nodes[4]);
+        nodes_lam2.push_back(nodes[5]);
+
+        std::vector<Node<2>*> nodes_elem1;
+        nodes_elem1.push_back(nodes[6]);
+        nodes_elem1.push_back(nodes[7]);
+        nodes_elem1.push_back(nodes[8]);
+
+        std::vector<Node<2>*> nodes_elem2;
+        nodes_elem2.push_back(nodes[9]);
+        nodes_elem2.push_back(nodes[10]);
+        nodes_elem2.push_back(nodes[11]);
+
+
+        std::vector<ImmersedBoundaryElement<1, 2>*> lams;
+        lams.push_back(new ImmersedBoundaryElement<1, 2>(0, nodes_lam1));
+        lams.push_back(new ImmersedBoundaryElement<1, 2>(1, nodes_lam2));
+
+        std::vector<ImmersedBoundaryElement<2, 2>*> elems;
+        elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes_elem1));
+        elems.push_back(new ImmersedBoundaryElement<2, 2>(1, nodes_elem2));
+
+        ImmersedBoundaryMesh<2, 2>* p_mesh = new ImmersedBoundaryMesh<2, 2>(nodes, elems, lams);
+
+        // Lamina 0 and Elem 0
+        TS_ASSERT(p_mesh->NodesInDifferentElementOrLamina(p_mesh->GetNode(0), p_mesh->GetNode(6)));
+
+        // Lamina 0 and Elem 1
+        TS_ASSERT(p_mesh->NodesInDifferentElementOrLamina(p_mesh->GetNode(0), p_mesh->GetNode(9)));
+
+        // Lamina 1 and Elem 0
+        TS_ASSERT(p_mesh->NodesInDifferentElementOrLamina(p_mesh->GetNode(3), p_mesh->GetNode(6)));
+
+        // Lamina 1 and Elem 1
+        TS_ASSERT(p_mesh->NodesInDifferentElementOrLamina(p_mesh->GetNode(3), p_mesh->GetNode(9)));
+
+        // Lamina 0 and Lamina 0
+        TS_ASSERT(p_mesh->NodesInDifferentElementOrLamina(p_mesh->GetNode(0), p_mesh->GetNode(1)));
+
+        // Lamina 1 and Lamina 1
+        TS_ASSERT(p_mesh->NodesInDifferentElementOrLamina(p_mesh->GetNode(3), p_mesh->GetNode(4)));
+
+        // Elem 0 and Elem 0
+        TS_ASSERT(!p_mesh->NodesInDifferentElementOrLamina(p_mesh->GetNode(6), p_mesh->GetNode(7)));
+
+        // Elem 1 and Elem 1
+        TS_ASSERT(!p_mesh->NodesInDifferentElementOrLamina(p_mesh->GetNode(9), p_mesh->GetNode(10)));
     }
 };
 

@@ -597,6 +597,15 @@ public:
     void ReMeshLamina(ImmersedBoundaryElement<ELEMENT_DIM - 1, SPACE_DIM>* pLamina);
 
     /**
+     * Determine whether two nodes belong to the same element, or the same lamina
+     *
+     * @param pNodeA a pointer to a node
+     * @param pNodeB a pointer to a different node
+     * @return whether the two nodes belong to the same element or lamina
+     */
+    bool NodesInDifferentElementOrLamina(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB);
+
+    /**
      * A smart iterator over the elements in the mesh.
      */
     class ImmersedBoundaryElementIterator

@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "RandomNumberGenerator.hpp"
 #include "UblasCustomFunctions.hpp"
 #include "Warnings.hpp"
+#include "ImmersedBoundaryEnumerations.hpp"
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryMesh(std::vector<Node<SPACE_DIM>*> nodes,
@@ -1638,6 +1639,22 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ReMeshLamina(ImmersedBoundary
         pLamina->GetNode(new_idx)->SetPoint(ChastePoint<SPACE_DIM>(new_location));
     }
 }
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::NodesInDifferentElementOrLamina(Node<SPACE_DIM>* pNodeA,
+                                                                                   Node<SPACE_DIM>* pNodeB)
+{
+    // If neither are lamina nodes, we can just check equality of first containing element indices
+    if (pNodeA->GetRegion() != LAMINA_REGION && pNodeB->GetRegion() != LAMINA_REGION)
+    {
+        return *(pNodeA->ContainingElementsBegin()) != *(pNodeB->ContainingElementsBegin());
+    }
+    else // either one or both nodes is in lamina; assume that two laminas never interact
+    {
+        return true;
+    }
+}
+
 
 // Explicit instantiation
 template class ImmersedBoundaryMesh<1, 1>;
