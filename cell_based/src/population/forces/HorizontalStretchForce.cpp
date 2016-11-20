@@ -37,10 +37,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexBasedCellPopulation.hpp"
 
 template<unsigned DIM>
-HorizontalStretchForce<DIM>::HorizontalStretchForce()
+HorizontalStretchForce<DIM>::HorizontalStretchForce(const double ForceMagnitude, const double RelativeWidth)
     : AbstractForce<DIM>(),
-      mForceMagnitude(1.0),
-      mRelativeWidth(0.1)
+      mForceMagnitude(ForceMagnitude),
+      mRelativeWidth(RelativeWidth)
 {
 }
 
@@ -93,7 +93,7 @@ void HorizontalStretchForce<DIM>::AddForceContribution(AbstractCellPopulation<DI
     // Iterate over nodes in the cell population
     for (unsigned node_global_index=0; node_global_index<num_nodes; ++node_global_index)
     {
-        Node<3>* p_this_node = p_cell_population->GetNode(node_global_index);
+        Node<DIM>* p_this_node = p_cell_population->GetNode(node_global_index);
 //            if ( ! p_this_node->IsBoundaryNode())
 //                continue;
         const double loc_x = p_this_node->rGetLocation()[0];
@@ -120,6 +120,10 @@ void HorizontalStretchForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
     AbstractForce<DIM>::OutputForceParameters(rParamsFile);
 }
 
+template class HorizontalStretchForce<1>;
+template class HorizontalStretchForce<2>;
+template class HorizontalStretchForce<3>;
+
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-CHASTE_CLASS_EXPORT(HorizontalStretchForce)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(HorizontalStretchForce)

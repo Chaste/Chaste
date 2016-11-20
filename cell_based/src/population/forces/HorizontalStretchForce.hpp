@@ -61,7 +61,7 @@ private:
 
     /**
      * The relative width from the boundary upon with the force is acting.
-     * Initialised to 1.0 in the constructor.
+     * Initialised to 0.1 in the constructor.
      */
     double mRelativeWidth;
 
@@ -69,7 +69,7 @@ public:
     /**
      * Constructor.
      */
-    HorizontalStretchForce();
+    HorizontalStretchForce(const double ForceMagnitude=1, const double RelativeWidth=0.1);
 
     /**
      * Destructor.
@@ -106,6 +106,6 @@ public:
 
 // Declare identifier for the serializer
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS1(HorizontalStretchForce,3)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(HorizontalStretchForce)
 
 #endif /*HORIZONTALSTRETCHFORCE_HPP_*/
