@@ -187,7 +187,7 @@ public:
         const double end_time = 4;
         simulator.SetEndTime(end_time);
 
-        MAKE_PTR(PatternedApicalConstrictionForce<3>, p_force3);
+        MAKE_PTR(PatternedApicalConstrictionForce, p_force3);
         p_force3->SetApicalParameters(10, 10, 1);
         p_force3->SetBasalParameters(10, 10, 1);
         p_force3->SetLateralParameter(4);

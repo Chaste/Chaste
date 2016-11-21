@@ -2082,7 +2082,7 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
                 if (p_lateral_face_23 == NULL)
                 {
                     // Its face index is the previous face of swap face (ignoring the apical&basal)
-                    p_lateral_face_23 = p_elem->GetFace((node_b_local_index-1)%face_num_nodes + 2);
+                    p_lateral_face_23 = p_elem->GetFace((node_b_local_index-1+face_num_nodes)%face_num_nodes + 2);
                     assert(p_lateral_face_23->GetNodeLocalIndex(node_b_index) != UINT_MAX);
                     const unsigned node_b_lateral_local_index = p_lateral_face_23->GetNodeLocalIndex(node_b_index);
                     const unsigned node_y_lateral_local_index = p_lateral_face_23->GetNodeLocalIndex(p_node_y->GetIndex());
@@ -2094,7 +2094,7 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
                 }
                 else
                 {
-                    assert( p_lateral_face_23->GetIndex() == p_elem->GetFace((node_b_local_index-1)%face_num_nodes + 2)->GetIndex() );
+                    assert( p_lateral_face_23->GetIndex() == p_elem->GetFace((node_b_local_index-1+face_num_nodes)%face_num_nodes + 2)->GetIndex() );
                 }
 
                 // Part III
@@ -2120,7 +2120,7 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
                 // Part II
                 if (p_lateral_face_14 == NULL)
                 {
-                    p_lateral_face_14 = p_elem->GetFace((node_a_local_index-1)%face_num_nodes + 2);
+                    p_lateral_face_14 = p_elem->GetFace((node_a_local_index-1+face_num_nodes)%face_num_nodes + 2);
                     assert(p_lateral_face_14->GetNodeLocalIndex(node_a_index) != UINT_MAX);
                     const unsigned lateral_a_local_index = p_lateral_face_14->GetNodeLocalIndex(node_a_index);
                     const unsigned lateral_x_local_index = p_lateral_face_14->GetNodeLocalIndex(p_node_x->GetIndex());
@@ -2130,7 +2130,7 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
                 }
                 else
                 {
-                    assert( p_lateral_face_14->GetIndex() == p_elem->GetFace((node_a_local_index-1)%face_num_nodes + 2)->GetIndex() );
+                    assert( p_lateral_face_14->GetIndex() == p_elem->GetFace((node_a_local_index-1+face_num_nodes)%face_num_nodes + 2)->GetIndex() );
                 }
 
                 // Part III
