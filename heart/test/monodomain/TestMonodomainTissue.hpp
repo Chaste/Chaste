@@ -153,7 +153,7 @@ public:
         
         // Coverage
         TS_ASSERT_THROWS_THIS(cell_factory.FillInCellularTransmuralAreas(),
-              "To get here you have probably asked for Epi/Mid/Endo CllularHeterogeneities in your HeartConfig "
+              "To get here you have probably asked for Epi/Mid/Endo CellularHeterogeneities in your HeartConfig "
 			  "options or configuration .xml file, to use this you will need to provide a method"
 			  " `FillInCellularTransmuralAreas()` in your cell factory to override this one.");
 
