@@ -196,6 +196,12 @@ public:
                                         Node<SPACE_DIM>* pApicalNodeStay, Node<SPACE_DIM>* pBasalNodeStay);
 
     /**
+     * Method for monolayer element to rearrange faces and nodes such that they
+     * are in the correct order according to the order of the basal nodes.
+     */
+    void MonolayerElementRearrangeFacesNodes();
+
+    /**
      * Method for faces. Update node at the given index.
      *
      * @param Index is an local index to which node to change
@@ -313,6 +319,7 @@ public:
      * Dummy function to satisfy compiler.
      */
     void FaceUpdateNode(const unsigned& rIndex, Node<SPACE_DIM>* pNode) {NEVER_REACHED;}
+    void MonolayerElementRearrangeFacesNodes() {NEVER_REACHED;}
 };
 
 #endif /*VERTEXELEMENT_HPP_*/

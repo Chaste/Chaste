@@ -265,8 +265,66 @@ unsigned VertexElement<3, 3>::MonolayerElementDeleteNodes(const Node<3>* pApical
             }
         }
     }
+    this->MonolayerElementRearrangeFacesNodes();
+
     return delete_lateral_face_index;
 }
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VertexElement<ELEMENT_DIM, SPACE_DIM>::MonolayerElementRearrangeFacesNodes()
+{
+    const VertexElement<ELEMENT_DIM-1, SPACE_DIM>* p_basal = mFaces[0];
+    const VertexElement<ELEMENT_DIM-1, SPACE_DIM>* p_apical = mFaces[1];
+    const unsigned num_face_nodes = p_basal->GetNumNodes();
+    std::vector<int> stored_indices;
+    // First check and rearrange nodes if necessary
+    for (unsigned node_local_index=0; node_local_index<num_face_nodes; ++node_local_index)
+    {
+        const unsigned elem_node_global_index = this->GetNodeGlobalIndex(node_local_index);
+        const unsigned face_node_global_index = p_basal->GetNodeGlobalIndex(node_local_index);
+        if (elem_node_global_index != face_node_global_index)
+        {
+            stored_indices.push_back(this->GetNodeLocalIndex(face_node_global_index));
+            this->mNodes[node_local_index] = p_basal->GetNode(node_local_index);
+            this->mNodes[node_local_index+num_face_nodes] = p_apical->GetNode(node_local_index);
+        }
+        else
+        {
+            stored_indices.push_back(-1);
+        }
+    }
+    // sanity check
+    ///\todo make sure the non -1 in stored_indices form a cycle
+
+    // then check and rearrange faces if necessary
+    bool is_faces_in_order = true;
+    std::vector<VertexElement<ELEMENT_DIM-1, SPACE_DIM>*> tmp_lateral_faces(num_face_nodes);
+    std::vector<bool> tmp_lateral_orientations(num_face_nodes);
+    for (unsigned elem_face_index=2; elem_face_index<this->GetNumFaces(); ++ elem_face_index)
+    {
+        VertexElement<ELEMENT_DIM-1, SPACE_DIM>* p_lateral_face = mFaces[elem_face_index];
+        const unsigned first_node_local_index = this->GetNodeLocalIndex(p_lateral_face->GetNodeGlobalIndex(0));
+        const unsigned second_node_local_index = this->GetNodeLocalIndex(p_lateral_face->GetNodeGlobalIndex(1));
+        assert(first_node_local_index!=UINT_MAX && second_node_local_index!=UINT_MAX);
+
+        const unsigned proper_face_index = (mOrientations[elem_face_index] ? second_node_local_index : first_node_local_index) + 2;
+        tmp_lateral_faces[proper_face_index-2] = p_lateral_face;
+        tmp_lateral_orientations[proper_face_index-2] = mOrientations[elem_face_index];
+        if (proper_face_index != elem_face_index)
+        {
+            is_faces_in_order = false;
+        }
+    }
+    if (!is_faces_in_order)
+    {
+        for (unsigned lateral_face_index=0; lateral_face_index<tmp_lateral_faces.size(); ++lateral_face_index)
+        {
+            mFaces[lateral_face_index+2] = tmp_lateral_faces[lateral_face_index];
+            mOrientations[lateral_face_index+2] = tmp_lateral_orientations[lateral_face_index];
+        }
+    }
+}
+
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VertexElement<ELEMENT_DIM, SPACE_DIM>::FaceUpdateNode(const unsigned Index, Node<SPACE_DIM>* pNode)
