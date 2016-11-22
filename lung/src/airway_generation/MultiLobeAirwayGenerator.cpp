@@ -33,10 +33,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "MultiLobeAirwayGenerator.hpp"
+
 #include <boost/foreach.hpp>
 #include <map>
 
+#ifdef CHASTE_VTK // This include is here to prevent a define conflict for HZ in vtkPointLocator (brought in by VtkMeshWriter includes)
+#include <vtkPointLocator.h>
+#endif //CHASTE_VTK
+
+#include "MultiLobeAirwayGenerator.hpp"
 #include "VtkMeshWriter.hpp"
 #include "VtkMeshReader.hpp"
 #include "CmguiMeshWriter.hpp"
