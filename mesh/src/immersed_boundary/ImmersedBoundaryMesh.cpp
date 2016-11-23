@@ -770,6 +770,35 @@ void ImmersedBoundaryMesh<2, 2>::ConstructFromMeshReader(AbstractMeshReader<2, 2
         this->mNodes.push_back(new Node<2>(node_idx, node_data, is_boundary_node));
     }
 
+    // Add laminas
+    rIBMeshReader.Reset();
+    mLaminas.reserve(num_laminas);
+    for (unsigned lam_idx = 0; lam_idx < num_laminas; lam_idx++)
+    {
+        // Get the data for this element
+        ImmersedBoundaryElementData lamina_data = rIBMeshReader.GetNextImmersedBoundaryLaminaData();
+
+        // Get the nodes owned by this element
+        std::vector<Node<2>*> nodes;
+        unsigned num_nodes_in_lamina = lamina_data.NodeIndices.size();
+        for (unsigned node_idx = 0; node_idx < num_nodes_in_lamina; node_idx++)
+        {
+            assert(lamina_data.NodeIndices[node_idx] < this->mNodes.size());
+            nodes.push_back(this->mNodes[lamina_data.NodeIndices[node_idx]]);
+        }
+
+        // Use nodes and index to construct this element
+        ImmersedBoundaryElement<1, 2>* p_lamina = new ImmersedBoundaryElement<1, 2>(lam_idx, nodes);
+        mLaminas.push_back(p_lamina);
+
+        if (rIBMeshReader.GetNumLaminaAttributes() > 0)
+        {
+            assert(rIBMeshReader.GetNumLaminaAttributes() == 1);
+            unsigned attribute_value = lamina_data.AttributeValue;
+            p_lamina->SetAttribute(attribute_value);
+        }
+    }
+
     // Add elements
     rIBMeshReader.Reset();
     mElements.reserve(num_elements);
