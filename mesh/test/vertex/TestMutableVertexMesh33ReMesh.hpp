@@ -3,7 +3,6 @@
 
 #include <cxxtest/TestSuite.h>
 
-#include "VertexMeshWriter.hpp"
 #include "FileComparison.hpp"
 #include "Warnings.hpp"
 #include "MutableVertexMesh.hpp"
@@ -17,6 +16,146 @@
 class TestMutableVertexMesh33ReMesh : public CxxTest::TestSuite
 {
 public:
+
+    void TestPerformNodeMerge() throw(Exception)
+    {
+        /*
+         * Create a mesh comprising a single triangular element, as shown below.
+         * We will test that the nodes marked with an x are merged correctly.
+         *
+         *      /|
+         *     / |
+         *    /  |
+         *   /   |
+         *  /    |
+         *  --xx-
+         */
+        std::vector<Node<3>*> nodes;
+        nodes.push_back(new Node<3>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<3>(1, true, 1.0, 0.0));
+        nodes.push_back(new Node<3>(2, true, 1.0, 1.0));
+        nodes.push_back(new Node<3>(3, true, 0.4, 0.0));
+        nodes.push_back(new Node<3>(4, true, 0.6, 0.0));
+
+        const unsigned node_indices_elem_0[5] = {0, 3, 4, 1, 2};
+        Helper3dVertexMeshBuilder builder(nodes, "NodeMerge");
+        builder.BuildElementWith(5, node_indices_elem_0);
+        // A reference variable as mesh is noncopyable
+        MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
+        builder.WriteVtk(OUTPUT_NAME,"Before");
+
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 1u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 10u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumFaces(), 7u);
+
+        // Merge nodes 3 and 4
+        vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(3), vertex_mesh.GetNode(4));
+        builder.WriteVtk(OUTPUT_NAME,"After");
+
+        // Test the mesh is correctly updated
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 1u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 8u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumFaces(), 6u);
+
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumAllNodes(), 8u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumAllFaces(), 6u);
+
+        // Test the correct nodes are boundary nodes
+        for (unsigned i=0; i<vertex_mesh.GetNumNodes(); i++)
+        {
+            TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), true);
+        }
+
+        // Test the merged node is in the correct place
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(3)->rGetLocation()[0], 0.5, 1e-3);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(3)->rGetLocation()[1], 0.0, 1e-3);
+
+        // Test the elements own the correct nodes
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 8u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumFaces(), 6u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(0), 0u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(1), 3u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(2), 1u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(3), 2u);
+
+        // Test the element's area and perimeter are computed correctly
+        TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(0), 0.5, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(0), 2+sqrt(2.0) + 1.0, 1e-6);
+    }
+
+    void TestPerformNodeMergeWhenLowIndexNodeMustBeAddedToElement() throw(Exception)
+    {
+        /**
+         * Create a mesh comprising two square elements, as shown below. We will test that the
+         * nodes marked with an x are merged correctly. We will test node merging in the case
+         * where, when the elements previously containing the high-index node are updated to
+         * contain the low-index node, at least one of these elements did not already contain
+         * the low-index node.
+         *
+         *   -----x-x---
+         *  |     |     |
+         *  |     |     |
+         *   ----- -----
+         *
+         * \todo I think this should be a T1 swap (see #1263)
+         */
+        std::vector<Node<3>*> nodes;
+        nodes.push_back(new Node<3>(0, true, 0.00, 0.00));
+        nodes.push_back(new Node<3>(1, true, 1.00, 0.00));
+        nodes.push_back(new Node<3>(2, true, 2.00, 0.00));
+        nodes.push_back(new Node<3>(3, true, 2.00, 1.00));
+        nodes.push_back(new Node<3>(4, true, 1.01, 1.00));
+        nodes.push_back(new Node<3>(5, true, 1.00, 1.00));
+        nodes.push_back(new Node<3>(6, true, 0.00, 2.00));
+
+        unsigned node_indices_elem_0[4] = {0, 1, 5, 6};
+        unsigned node_indices_elem_1[5] = {1, 2, 3, 4, 5};
+        Helper3dVertexMeshBuilder builder(nodes, "NodeMergeWhenLowIndexNodeMustBeAddedToElement");
+        builder.BuildElementWith(4, node_indices_elem_0);
+        builder.BuildElementWith(5, node_indices_elem_1);
+        // A reference variable as mesh is noncopyable
+        MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
+        builder.WriteVtk(OUTPUT_NAME,"Before");
+
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 2u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 14u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumFaces(), 12u);
+
+        // Merge nodes 4 and 5
+        vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(4), vertex_mesh.GetNode(5));
+        builder.WriteVtk(OUTPUT_NAME,"After");
+
+        // Test the mesh is correctly updated
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 2u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 12u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumFaces(), 11u);
+
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumAllNodes(), 12u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumAllFaces(), 11u);
+
+        // Test the correct nodes are boundary nodes
+        for (unsigned i=0; i<vertex_mesh.GetNumNodes(); i++)
+        {
+            TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), true);
+        }
+
+        // Test that the moved node has the correct location following the rearrangement
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[0], 1.005, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[1], 1.0, 1e-8);
+
+        // Test the elements own the correct nodes
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 8u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumFaces(), 6u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 8u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumFaces(), 6u);
+        unsigned node_indices_element_0[4] = {0, 1, 4, 5};
+        unsigned node_indices_element_1[4] = {1, 2, 3, 4};
+        for (unsigned i=0; i<4; i++)
+        {
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(i), node_indices_element_1[i]);
+        }
+    }
 
     void TestCheckForSwapsAndIdentifySwapType() throw(Exception)
     {
@@ -449,13 +588,13 @@ public:
         builder.BuildElementWith(4, node_indices_elem_1);
         // A reference variable as mesh is noncopyable
         MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
-        builder.WriteVtk(OUTPUT_NAME,"Before");
+        builder.WriteVtk(OUTPUT_NAME, "Before");
 
         // Set the threshold distance between vertices for a T1 swap as follows, to ease calculations
         vertex_mesh.SetCellRearrangementThreshold(0.1*2.0/1.5);
         // Perform a T1 swap on nodes 5 and 4.
         vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(5), vertex_mesh.GetNode(4));
-        builder.WriteVtk("After");
+        builder.WriteVtk(OUTPUT_NAME, "After");
 
         // Test that each moved node has the correct location following the rearrangement
         TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[0], 0.6, 1e-8);
@@ -1047,138 +1186,86 @@ public:
         builder.WriteVtk(OUTPUT_NAME,"AfterRemove");
     }
 
-    void TestPerformT2SwapWithRosettes2() throw(Exception)
-    {
-        std::vector<Node<3>*> nodes;
-        nodes.push_back(new Node<3>(0, true,  0.0, 0.0));
-        nodes.push_back(new Node<3>(1, true,  1.0, 0.0));
-        nodes.push_back(new Node<3>(2, true,  2.0, 0.0));
-        nodes.push_back(new Node<3>(3, true, 2.0, 1.0));
-        nodes.push_back(new Node<3>(4, true, 2.0, 2.0));
-        nodes.push_back(new Node<3>(5, true, 1.0, 2.0));
-        nodes.push_back(new Node<3>(6, true, 0.0, 2.0));
-        nodes.push_back(new Node<3>(7, true, 0.0, 1.0));
-        nodes.push_back(new Node<3>(8, false, 1.0, 0.8));
-        nodes.push_back(new Node<3>(9, false, 1.2, 1.0));
-        nodes.push_back(new Node<3>(10, false, 1.0, 1.2));
-        nodes.push_back(new Node<3>(11, false, 0.8, 1.0));
-
-        const unsigned node_indices_elem_0[5] = {0, 1, 8, 11, 7};
-        const unsigned node_indices_elem_1[5] = {2, 3, 9, 8, 1};
-        const unsigned node_indices_elem_2[5] = {4, 5, 10, 9, 3};
-        const unsigned node_indices_elem_3[5] = {6, 7, 11, 10, 5};
-        const unsigned node_indices_elem_4[4] = {8, 9, 10, 11};
-
-        Helper3dVertexMeshBuilder builder(nodes, "T2SwapWithRosette2");
-        builder.BuildElementWith(5, node_indices_elem_0);
-        builder.BuildElementWith(5, node_indices_elem_1);
-        builder.BuildElementWith(5, node_indices_elem_2);
-        builder.BuildElementWith(5, node_indices_elem_3);
-        builder.BuildElementWith(4, node_indices_elem_4);
-
-        // A reference variable as mesh is noncopyable
-        MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
-        builder.WriteVtk(OUTPUT_NAME,"Before");
-
-        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 5u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 24u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetNumFaces(), 26u);
-
-        // Perform a T2 swap on the central triangle element
-        VertexElement<3, 3>* p_element_4 = vertex_mesh.GetElement(4);
-        c_vector<double, 3> centroid_of_element_4_before_swap = vertex_mesh.GetCentroidOfElement(3);
-        vertex_mesh.PerformT2Swap(*p_element_4);
-
-        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 4u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 18u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetNumFaces(), 20u);
-
-        TS_ASSERT_EQUALS(vertex_mesh.GetNumAllElements(), 5u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetNumAllNodes(), 26u);
-
-        for (unsigned i=0 ; i<4 ; ++i)
-        {
-            TS_ASSERT_EQUALS(vertex_mesh.GetElement(i)->GetNumNodes(), 8u);
-            TS_ASSERT_EQUALS(vertex_mesh.GetElement(i)->GetNumFaces(), 6u);
-            TS_ASSERT_EQUALS(vertex_mesh.GetElement(i)->GetNodeGlobalIndex(0), i*2);
-            TS_ASSERT_EQUALS(vertex_mesh.GetElement(i)->GetNodeGlobalIndex(1), i*2+1);
-            TS_ASSERT_EQUALS(vertex_mesh.GetElement(i)->GetNodeGlobalIndex(2), 24u);
-            TS_ASSERT_EQUALS(vertex_mesh.GetElement(i)->GetNodeGlobalIndex(3), (i*2-1+8)%8);
-        }
-
-        TS_ASSERT_EQUALS(vertex_mesh.GetNode(24)->IsBoundaryNode(), false);
-        TS_ASSERT_EQUALS(vertex_mesh.GetNode(25)->IsBoundaryNode(), false);
-
-        VertexElementMap map(vertex_mesh.GetNumElements());
-        vertex_mesh.RemoveDeletedNodesAndElements(map);
-        builder.WriteVtk(OUTPUT_NAME,"AfterRemove");
-    }
-
-    void TestPerformNodeMerge() throw(Exception)
-    {
-        /*
-         * Create a mesh comprising a single triangular element, as shown below.
-         * We will test that the nodes marked with an x are merged correctly.
-         *
-         *      /|
-         *     / |
-         *    /  |
-         *   /   |
-         *  /    |
-         *  --xx-
-         */
-        std::vector<Node<3>*> nodes;
-        nodes.push_back(new Node<3>(0, true, 0.0, 0.0));
-        nodes.push_back(new Node<3>(1, true, 1.0, 0.0));
-        nodes.push_back(new Node<3>(2, true, 1.0, 1.0));
-        nodes.push_back(new Node<3>(3, true, 0.4, 0.0));
-        nodes.push_back(new Node<3>(4, true, 0.6, 0.0));
-
-        const unsigned node_indices_elem_0[5] = {0, 3, 4, 1, 2};
-        Helper3dVertexMeshBuilder builder(nodes, "NodeMerge");
-        builder.BuildElementWith(5, node_indices_elem_0);
-        // A reference variable as mesh is noncopyable
-        MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
-        builder.WriteVtk(OUTPUT_NAME,"Before");
-
-        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 1u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 10u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetNumFaces(), 7u);
-
-        // Merge nodes 3 and 4
-        vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(3), vertex_mesh.GetNode(4));
-        builder.WriteVtk(OUTPUT_NAME,"After");
-
-        // Test the mesh is correctly updated
-        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 1u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 8u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetNumFaces(), 6u);
-
-        TS_ASSERT_EQUALS(vertex_mesh.GetNumAllNodes(), 8u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetNumAllFaces(), 6u);
-
-        // Test the correct nodes are boundary nodes
-        for (unsigned i=0; i<vertex_mesh.GetNumNodes(); i++)
-        {
-            TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), true);
-        }
-
-        // Test the merged node is in the correct place
-        TS_ASSERT_DELTA(vertex_mesh.GetNode(3)->rGetLocation()[0], 0.5, 1e-3);
-        TS_ASSERT_DELTA(vertex_mesh.GetNode(3)->rGetLocation()[1], 0.0, 1e-3);
-
-        // Test the elements own the correct nodes
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 8u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumFaces(), 6u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(0), 0u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(1), 3u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(2), 1u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(3), 2u);
-
-        // Test the element's area and perimeter are computed correctly
-        TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(0), 0.5, 1e-6);
-        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(0), 2+sqrt(2.0) + 1.0, 1e-6);
-    }
+/// Commented this test as T2 Swap should only happen to triangular prism
+/// element in vertex model
+//    void TestPerformT2SwapWithRosettes2() throw(Exception)
+//    {
+//        /* Create a mesh containing a smaller square element.
+//         * Test that a T2 swap correctly removes the triangular element
+//         * from the mesh and create rosette out of it.
+//         *  ___________
+//         *  |    |    |
+//         *  |    |    |
+//         *  |___/ \___|
+//         *  |   \ /   |
+//         *  |    |    |
+//         *  |____|____|
+//         */
+//
+//        std::vector<Node<3>*> nodes;
+//        nodes.push_back(new Node<3>(0, true,  0.0, 0.0));
+//        nodes.push_back(new Node<3>(1, true,  1.0, 0.0));
+//        nodes.push_back(new Node<3>(2, true,  2.0, 0.0));
+//        nodes.push_back(new Node<3>(3, true, 2.0, 1.0));
+//        nodes.push_back(new Node<3>(4, true, 2.0, 2.0));
+//        nodes.push_back(new Node<3>(5, true, 1.0, 2.0));
+//        nodes.push_back(new Node<3>(6, true, 0.0, 2.0));
+//        nodes.push_back(new Node<3>(7, true, 0.0, 1.0));
+//        nodes.push_back(new Node<3>(8, false, 1.0, 0.8));
+//        nodes.push_back(new Node<3>(9, false, 1.2, 1.0));
+//        nodes.push_back(new Node<3>(10, false, 1.0, 1.2));
+//        nodes.push_back(new Node<3>(11, false, 0.8, 1.0));
+//
+//        const unsigned node_indices_elem_0[5] = {0, 1, 8, 11, 7};
+//        const unsigned node_indices_elem_1[5] = {2, 3, 9, 8, 1};
+//        const unsigned node_indices_elem_2[5] = {4, 5, 10, 9, 3};
+//        const unsigned node_indices_elem_3[5] = {6, 7, 11, 10, 5};
+//        const unsigned node_indices_elem_4[4] = {8, 9, 10, 11};
+//
+//        Helper3dVertexMeshBuilder builder(nodes, "T2SwapWithRosette2");
+//        builder.BuildElementWith(5, node_indices_elem_0);
+//        builder.BuildElementWith(5, node_indices_elem_1);
+//        builder.BuildElementWith(5, node_indices_elem_2);
+//        builder.BuildElementWith(5, node_indices_elem_3);
+//        builder.BuildElementWith(4, node_indices_elem_4);
+//
+//        // A reference variable as mesh is noncopyable
+//        MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
+//        builder.WriteVtk(OUTPUT_NAME,"Before");
+//
+//        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 5u);
+//        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 24u);
+//        TS_ASSERT_EQUALS(vertex_mesh.GetNumFaces(), 26u);
+//
+//        // Perform a T2 swap on the central triangle element
+//        VertexElement<3, 3>* p_element_4 = vertex_mesh.GetElement(4);
+//        c_vector<double, 3> centroid_of_element_4_before_swap = vertex_mesh.GetCentroidOfElement(3);
+//        vertex_mesh.PerformT2Swap(*p_element_4);
+//
+//        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 4u);
+//        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 18u);
+//        TS_ASSERT_EQUALS(vertex_mesh.GetNumFaces(), 20u);
+//
+//        TS_ASSERT_EQUALS(vertex_mesh.GetNumAllElements(), 5u);
+//        TS_ASSERT_EQUALS(vertex_mesh.GetNumAllNodes(), 26u);
+//
+//        for (unsigned i=0 ; i<4 ; ++i)
+//        {
+//            TS_ASSERT_EQUALS(vertex_mesh.GetElement(i)->GetNumNodes(), 8u);
+//            TS_ASSERT_EQUALS(vertex_mesh.GetElement(i)->GetNumFaces(), 6u);
+//            TS_ASSERT_EQUALS(vertex_mesh.GetElement(i)->GetNodeGlobalIndex(0), i*2);
+//            TS_ASSERT_EQUALS(vertex_mesh.GetElement(i)->GetNodeGlobalIndex(1), i*2+1);
+//            TS_ASSERT_EQUALS(vertex_mesh.GetElement(i)->GetNodeGlobalIndex(2), 24u);
+//            TS_ASSERT_EQUALS(vertex_mesh.GetElement(i)->GetNodeGlobalIndex(3), (i*2-1+8)%8);
+//        }
+//
+//        TS_ASSERT_EQUALS(vertex_mesh.GetNode(24)->IsBoundaryNode(), false);
+//        TS_ASSERT_EQUALS(vertex_mesh.GetNode(25)->IsBoundaryNode(), false);
+//
+//        VertexElementMap map(vertex_mesh.GetNumElements());
+//        vertex_mesh.RemoveDeletedNodesAndElements(map);
+//        builder.WriteVtk(OUTPUT_NAME,"AfterRemove");
+//    }
 };
 
 #endif /*TESTMUTABLEVERTEXMESH33REMESH_HPP_*/

@@ -36,33 +36,22 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TESTVERTEXMESH33UNIAXIALLOAD_HPP_
 #define TESTVERTEXMESH33UNIAXIALLOAD_HPP_
 
-#include <cxxtest/TestSuite.h>
 #include "AbstractCellBasedTestSuite.hpp"
 
-#include "CheckpointArchiveTypes.hpp"
-#include "AbstractForce.hpp"
-
-#include "VoronoiPrism3dVertexMeshGenerator.hpp"
+#include "Helper3dVertexMeshBuilder.hpp"
 #include "VoronoiVertexMeshGenerator.hpp"
-#include "VertexBasedCellPopulation.hpp"
+#include "HoneycombVertexMeshGenerator.hpp"
 #include "CellsGenerator.hpp"
-#include "DifferentiatedCellProliferativeType.hpp"
 #include "NoCellCycleModel.hpp"
+#include "VertexBasedCellPopulation.hpp"
 #include "SmartPointers.hpp"
+#include "GeneralMonolayerVertexMeshForce.hpp"
+#include "HorizontalStretchForce.hpp"
 #include "OffLatticeSimulation.hpp"
+#include <boost/lexical_cast.hpp>
 
 #include "FakePetscSetup.hpp"
 
-#include "GeneralMonolayerVertexMeshForce.hpp"
-#include "Helper3dVertexMeshBuilder.hpp"
-
-#define OUTPUT_NAME "TestUniaxialLoad/InitialMesh"
-#define ADDFORCEPARAMETER p_force3->SetVolumeParameters(0.8, 10);
-#define CURRENT_TEST std::string("Volume2")
-#define END_TIME 0.5
-
-#include "HoneycombVertexMeshGenerator.hpp"
-#include "HorizontalStretchForce.hpp"
 
 class TestVertexMesh33UniaxialLoad : public AbstractCellBasedTestSuite
 {
@@ -71,24 +60,20 @@ public:
     void TestVertexMesh33UiaxialLoad() throw (Exception)
     {
         // Make a mesh of 10x5
-//        const double z_height = 1;
+        const double z_height = 1;
         const double target_area = 1;
-        const unsigned num_cells_x = 11;
-        const unsigned num_cells_y = 10;
-        // There seems to be a bug somewhere in voronoiprism3dVertexMeshGenerator....
-//        VoronoiPrism3dVertexMeshGenerator generator(num_cells_x, num_cells_y, z_height, 5, target_area);
-//        MutableVertexMesh<3,3>* p_mesh = generator.GetMeshAfterReMesh();
+        const unsigned num_cells_x = 10;
+        const unsigned num_cells_y = 5;
+        const double end_time = 12;
+
+        std::string output_filename = "TestUniaxialLoad/HoneyTest" + boost::lexical_cast<std::string>(num_cells_x)
+                                    + "x" + boost::lexical_cast<std::string>(num_cells_y);
         HoneycombVertexMeshGenerator generator(num_cells_x, num_cells_y, false, 0.1, 0.01, target_area);
 //        VoronoiVertexMeshGenerator generator(num_cells_x, num_cells_y, 5, target_area);
         MutableVertexMesh<2, 2>& vertex_2mesh = *(generator.GetMesh());
-        Helper3dVertexMeshBuilder builder("UniaxialLoad");
-        MutableVertexMesh<3, 3>* p_mesh = builder.MakeMeshUsing2dMesh(vertex_2mesh);
-        builder.WriteVtk(OUTPUT_NAME,"Before");
-
-        char tmp_name[50];
-        sprintf(tmp_name, "TestUniaxialLoad/HoneyTest%dx%d", num_cells_x, num_cells_y);
-        VertexMeshWriter<3, 3> vertex_mesh_writer(tmp_name, "InitialMesh", false);
-        vertex_mesh_writer.WriteVtkUsingMeshWithCellId(*p_mesh);
+        Helper3dVertexMeshBuilder builder;
+        MutableVertexMesh<3, 3>* p_mesh = builder.MakeMeshUsing2dMesh(vertex_2mesh, z_height);
+        builder.WriteVtk(output_filename, "InitialMesh");
 
         std::vector<CellPtr> cells;
         CellsGenerator<NoCellCycleModel, 3> cells_generator;
@@ -96,9 +81,8 @@ public:
         VertexBasedCellPopulation<3> cell_population(*p_mesh, cells);
 
         OffLatticeSimulation<3> simulator(cell_population);
-        simulator.SetOutputDirectory(tmp_name);
+        simulator.SetOutputDirectory(output_filename);
         simulator.SetSamplingTimestepMultiple(10);
-        const double end_time = 7;
         simulator.SetEndTime(end_time);
 
         MAKE_PTR(GeneralMonolayerVertexMeshForce, p_force3);
@@ -112,7 +96,7 @@ public:
         p_force2->SetRelativeWidth(0.15);
         simulator.AddForce(p_force2);
 
-            simulator.Solve();
+        simulator.Solve();
 
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), num_cells_x*num_cells_y);
         TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);

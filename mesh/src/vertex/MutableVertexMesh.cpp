@@ -2475,7 +2475,7 @@ template<>
 void MutableVertexMesh<3, 3>::PerformT2Swap(VertexElement<3,3>& rElement)
 {
     // The given element must be triangular for us to be able to perform a T2 swap on it
-    assert(rElement.GetNumNodes() >= 6);
+    assert(rElement.GetNumNodes() == 6);
 
     VertexElement<2, 3>& r_basal_face ( *(rElement.GetFace(0)) );
     VertexElement<2, 3>& r_apical_face ( *(rElement.GetFace(1)) );
@@ -2524,7 +2524,7 @@ void MutableVertexMesh<3, 3>::PerformT2Swap(VertexElement<3,3>& rElement)
 
             if (p_this_elem->GetNodeLocalIndex(new_basal_node_index) == UINT_MAX)
             {
-                // Replace old node with new node for the element and faces (implemented in VE::ReplaceNode(...))
+                // Replace old node with new node for the element and faces
                 p_this_elem->ReplaceNode(p_tmp_basal_node, p_new_basal_node);
                 p_this_elem->ReplaceNode(p_tmp_apical_node, p_new_apical_node);
             }
