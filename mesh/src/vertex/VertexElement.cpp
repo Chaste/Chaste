@@ -58,6 +58,7 @@ VertexElement<ELEMENT_DIM, SPACE_DIM>::VertexElement(unsigned index,
     }
 }
 
+///\todo remove this part as MonolayerElementRearrangeFacesNodes() should to the proper work. #2850
 template<unsigned SPACE_DIM>
 class NodeLessThanYxz
 {
@@ -108,10 +109,10 @@ VertexElement<ELEMENT_DIM, SPACE_DIM>::VertexElement(unsigned index,
       mFaces(rFaces),
       mOrientations(rOrientations)
 {
-//EXCEPTION("THIS CONSTRUCTOR SHOULD NOT BE USED YET"); ///\todo #2850
     // Each face must have an associated orientation
     assert(mFaces.size() == mOrientations.size());
 
+    ///\todo remove this part as MonolayerElementRearrangeFacesNodes() should to the proper work. #2850
     // Make a set of nodes with mFaces
     std::set<Node<SPACE_DIM>*, NodeLessThanYxz<SPACE_DIM> > nodes_set;
     for (unsigned face_index=0; face_index<mFaces.size(); face_index++)
@@ -130,6 +131,7 @@ VertexElement<ELEMENT_DIM, SPACE_DIM>::VertexElement(unsigned index,
          this->mNodes.push_back(*node_iter);
     }
 
+    this->MonolayerElementRearrangeFacesNodes();
     // Register element with nodes
     this->RegisterWithNodes();
 }

@@ -69,7 +69,6 @@ MonolayerVertexMeshGenerator::MonolayerVertexMeshGenerator(const std::vector<Nod
     }
 }
 
-
 MonolayerVertexMeshGenerator::~MonolayerVertexMeshGenerator()
 {
     if (mpMesh)
