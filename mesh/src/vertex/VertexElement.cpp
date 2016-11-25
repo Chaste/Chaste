@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "VertexElement.hpp"
 #include <cassert>
+#include <algorithm>
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VertexElement<ELEMENT_DIM, SPACE_DIM>::VertexElement(unsigned index,
@@ -215,59 +216,69 @@ bool VertexElement<ELEMENT_DIM, SPACE_DIM>::FaceIsOrientatedAntiClockwise(unsign
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-unsigned VertexElement<ELEMENT_DIM, SPACE_DIM>::MonolayerElementDeleteNodes(const Node<SPACE_DIM>* pApicalNode1,
+std::vector<unsigned> VertexElement<ELEMENT_DIM, SPACE_DIM>::MonolayerElementDeleteNodes(const Node<SPACE_DIM>* pApicalNode1,
         const Node<SPACE_DIM>* pBasalNode1, Node<SPACE_DIM>* pApicalNode2, Node<SPACE_DIM>* pBasalNode2)
 {
     NEVER_REACHED;
 }
 
 template<>
-unsigned VertexElement<3, 3>::MonolayerElementDeleteNodes(const Node<3>* pApicalNodeDelete,
+std::vector<unsigned> VertexElement<3, 3>::MonolayerElementDeleteNodes(const Node<3>* pApicalNodeDelete,
         const Node<3>* pBasalNodeDelete, Node<3>* pApicalNodeStay, Node<3>* pBasalNodeStay)
 {
     const unsigned apical_node_delete_index = pApicalNodeDelete->GetIndex();
     const unsigned basal_node_delete_index = pBasalNodeDelete->GetIndex();
-    const unsigned apical_node_stay_index = pApicalNodeStay->GetIndex();
+    const unsigned basal_node_stay_index = pBasalNodeStay->GetIndex();
 
+    VertexElement<2, 3>* p_basal_face = this->GetFace(0);
+    const unsigned num_basal_nodes = p_basal_face->GetNumNodes();
+    const unsigned basal_node_stay_local_index = p_basal_face->GetNodeLocalIndex(basal_node_stay_index);
+    const unsigned basal_node_delete_local_index = p_basal_face->GetNodeLocalIndex(basal_node_delete_index);
+    unsigned earlier_local_index = std::min(basal_node_stay_local_index, basal_node_delete_local_index);
+    unsigned later_local_index = std::max(basal_node_stay_local_index, basal_node_delete_local_index);
+
+    if (earlier_local_index == 0u && later_local_index == num_basal_nodes-1)
+    {
+        std::swap(earlier_local_index, later_local_index);
+    }
+
+    std::vector<unsigned> return_vector;
+    const VertexElement<2, 3>* p_delete_lateral_face = this->GetFace(earlier_local_index+2);
+    return_vector.push_back(p_delete_lateral_face->GetIndex());
+    return_vector.push_back(this->FaceIsOrientatedAntiClockwise(earlier_local_index+2));
+    VertexElement<2, 3>* p_earlier_lateral_face = this->GetFace((earlier_local_index-1+num_basal_nodes)%num_basal_nodes+2);
+    VertexElement<2, 3>* p_later_lateral_face = this->GetFace(later_local_index+2);
     // We will delete the node1's from the element and faces and also remove the face from the element.
     // Operation for faces: I apical & basal faces will just remove the node1's
     // II the lateral face not belong to the deleted element needs to update node1's to node2's
-    // III the lateral face belong to the deleted element need to be remove from the registry of neighbouring element
-    this->DeleteNode(this->GetNodeLocalIndex(apical_node_delete_index));
-    this->DeleteNode(this->GetNodeLocalIndex(basal_node_delete_index));
+    // III the element remove the nodes and face
+
     // Operation I
     this->GetFace(0)->FaceDeleteNode(pBasalNodeDelete);
     this->GetFace(1)->FaceDeleteNode(pApicalNodeDelete);
 
-    unsigned delete_lateral_face_index(UINT_MAX);
-    // Operation II and III To update another face and remove the extra face
-    for (unsigned face_index=2 ; face_index<this->GetNumFaces() ; ++face_index)
+    // Operation II
+    VertexElement<2, 3>* p_lateral_II = (earlier_local_index==basal_node_delete_local_index ? p_earlier_lateral_face : p_later_lateral_face);
+    if (p_lateral_II->GetNodeLocalIndex(apical_node_delete_index)!=UINT_MAX)
     {
-        VertexElement<2, 3>* p_face = this->GetFace(face_index);
-        const unsigned apical_node1_local_index = p_face->GetNodeLocalIndex(apical_node_delete_index);
-        if (apical_node1_local_index != UINT_MAX)
-        {
-            if (p_face->GetNodeLocalIndex(apical_node_stay_index) == UINT_MAX)
-            {
-                // Operation II
-                p_face->FaceUpdateNode(apical_node1_local_index, pApicalNodeStay);
-                const unsigned basal_node1_local_index = p_face->GetNodeLocalIndex(basal_node_delete_index);
-                p_face->FaceUpdateNode(basal_node1_local_index, pBasalNodeStay);
-            }
-            else
-            {
-                // Operation III
-                delete_lateral_face_index = p_face->GetIndex();
-                this->DeleteFace(face_index);
-
-                // To compensate the changes in NumFaces
-                --face_index;
-            }
-        }
+        assert(p_lateral_II->GetNodeLocalIndex(basal_node_delete_index)!=UINT_MAX);
+        p_lateral_II->FaceUpdateNode(p_lateral_II->GetNodeLocalIndex(apical_node_delete_index), pApicalNodeStay);
+        p_lateral_II->FaceUpdateNode(p_lateral_II->GetNodeLocalIndex(basal_node_delete_index), pBasalNodeStay);
     }
+    else
+    {
+        assert(p_lateral_II->GetNodeGlobalIndex(0) == p_lateral_II->GetNodeGlobalIndex(1));
+    }
+
+    // Operation III
+    this->DeleteNode(this->GetNodeLocalIndex(apical_node_delete_index));
+    this->DeleteNode(this->GetNodeLocalIndex(basal_node_delete_index));
+    this->DeleteFace(earlier_local_index+2);
+
+
     this->MonolayerElementRearrangeFacesNodes();
 
-    return delete_lateral_face_index;
+    return return_vector;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -324,7 +335,6 @@ void VertexElement<ELEMENT_DIM, SPACE_DIM>::MonolayerElementRearrangeFacesNodes(
         }
     }
 }
-
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VertexElement<ELEMENT_DIM, SPACE_DIM>::FaceUpdateNode(const unsigned Index, Node<SPACE_DIM>* pNode)

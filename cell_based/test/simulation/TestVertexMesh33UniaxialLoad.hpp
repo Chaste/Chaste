@@ -38,9 +38,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractCellBasedTestSuite.hpp"
 
-#include "Helper3dVertexMeshBuilder.hpp"
 #include "VoronoiVertexMeshGenerator.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
+#include "MonolayerVertexMeshGenerator.hpp"
 #include "CellsGenerator.hpp"
 #include "NoCellCycleModel.hpp"
 #include "VertexBasedCellPopulation.hpp"
@@ -55,23 +55,58 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class TestVertexMesh33UniaxialLoad : public AbstractCellBasedTestSuite
 {
+private:
+    static const double z_height = 1;
+    static const double target_area = 1;
+    static const unsigned num_cells_x = 10;
+    static const unsigned num_cells_y = 5;
+    static const double end_time = 12;
+
 public:
-
-    void TestVertexMesh33UiaxialLoad() throw (Exception)
+    void TestOnHexagonalMesh() throw (Exception)
     {
-        // Make a mesh of 10x5
-        const double z_height = 1;
-        const double target_area = 1;
-        const unsigned num_cells_x = 10;
-        const unsigned num_cells_y = 5;
-        const double end_time = 12;
-
         std::string output_filename = "TestUniaxialLoad/HoneyTest" + boost::lexical_cast<std::string>(num_cells_x)
                                     + "x" + boost::lexical_cast<std::string>(num_cells_y);
         HoneycombVertexMeshGenerator generator(num_cells_x, num_cells_y, false, 0.1, 0.01, target_area);
-//        VoronoiVertexMeshGenerator generator(num_cells_x, num_cells_y, 5, target_area);
         MutableVertexMesh<2, 2>& vertex_2mesh = *(generator.GetMesh());
-        Helper3dVertexMeshBuilder builder;
+        MonolayerVertexMeshGenerator builder;
+        MutableVertexMesh<3, 3>* p_mesh = builder.MakeMeshUsing2dMesh(vertex_2mesh, z_height);
+        builder.WriteVtk(output_filename, "InitialMesh");
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<NoCellCycleModel, 3> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
+        VertexBasedCellPopulation<3> cell_population(*p_mesh, cells);
+
+        OffLatticeSimulation<3> simulator(cell_population);
+        simulator.SetOutputDirectory(output_filename);
+        simulator.SetSamplingTimestepMultiple(10);
+        simulator.SetEndTime(end_time);
+
+        MAKE_PTR(GeneralMonolayerVertexMeshForce, p_force3);
+        p_force3->SetApicalParameters(20, 20, 0.7);
+        p_force3->SetBasalParameters(20, 20, 0.7);
+        p_force3->SetLateralParameter(8);
+        p_force3->SetVolumeParameters(350, 1);
+        simulator.AddForce(p_force3);
+        MAKE_PTR(HorizontalStretchForce<3>, p_force2);
+        p_force2->SetForceMagnitude(1.0);
+        p_force2->SetRelativeWidth(0.15);
+        simulator.AddForce(p_force2);
+
+        simulator.Solve();
+
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), num_cells_x*num_cells_y);
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
+    }
+
+        void TestOnVoronoiMesh() throw (Exception)
+    {
+        std::string output_filename = "TestUniaxialLoad/VoronoiTest" + boost::lexical_cast<std::string>(num_cells_x)
+                                    + "x" + boost::lexical_cast<std::string>(num_cells_y);
+        VoronoiVertexMeshGenerator generator(num_cells_x, num_cells_y, 5, target_area);
+        MutableVertexMesh<2, 2>& vertex_2mesh = *(generator.GetMesh());
+        MonolayerVertexMeshGenerator builder;
         MutableVertexMesh<3, 3>* p_mesh = builder.MakeMeshUsing2dMesh(vertex_2mesh, z_height);
         builder.WriteVtk(output_filename, "InitialMesh");
 

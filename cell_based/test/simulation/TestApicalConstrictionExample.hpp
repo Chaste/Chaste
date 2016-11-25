@@ -42,6 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CheckpointArchiveTypes.hpp"
 
 #include "PatternedApicalConstrictionForce.hpp"
+#include "MonolayerVertexMeshGenerator.hpp"
 #include "VoronoiPrism3dVertexMeshGenerator.hpp"
 #include "VoronoiVertexMeshGenerator.hpp"
 #include "VertexBasedCellPopulation.hpp"
@@ -51,15 +52,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SmartPointers.hpp"
 #include "OffLatticeSimulation.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
-#include "Helper3dVertexMeshBuilder.hpp"
 #include "CellLabel.hpp"
 #include "CellLabelWriter.hpp"
 #include "FakePetscSetup.hpp"
 
 #define OUTPUT_NAME "TestApicalConstrictionExample/InitialMesh"
-#define ADDFORCEPARAMETER p_force3->SetVolumeParameters(0.8, 10);
-#define CURRENT_TEST std::string("Volume2")
-#define END_TIME 0.5
+
 
 class TestApicalConstrictionExample : public AbstractCellBasedTestSuite
 {
@@ -78,7 +76,7 @@ public:
         HoneycombVertexMeshGenerator generator(num_cells_x, num_cells_y, false, 0.1, 0.01, target_area);
 //        VoronoiVertexMeshGenerator generator(num_cells_x, num_cells_y, 5, target_area);
         MutableVertexMesh<2, 2>& vertex_2mesh = *(generator.GetMesh());
-        Helper3dVertexMeshBuilder builder("ApicalConstriction");
+        MonolayerVertexMeshGenerator builder("ApicalConstriction");
         MutableVertexMesh<3, 3>* p_mesh = builder.MakeMeshUsing2dMesh(vertex_2mesh);
         builder.WriteVtk(OUTPUT_NAME,"Before");
 

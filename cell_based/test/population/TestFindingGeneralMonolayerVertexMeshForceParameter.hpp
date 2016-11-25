@@ -42,6 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CheckpointArchiveTypes.hpp"
 #include "AbstractForce.hpp"
 
+#include "MonolayerVertexMeshGenerator.hpp"
 #include "VoronoiPrism3dVertexMeshGenerator.hpp"
 #include "VoronoiVertexMeshGenerator.hpp"
 #include "VertexBasedCellPopulation.hpp"
@@ -54,7 +55,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FakePetscSetup.hpp"
 
 #include "GeneralMonolayerVertexMeshForce.hpp"
-#include "Helper3dVertexMeshBuilder.hpp"
 
 #define OUTPUT_NAME "TestUniaxialLoad"
 #define ADDFORCEPARAMETER p_force3->SetVolumeParameters(0.8, 10);
@@ -75,7 +75,7 @@ public:
         const unsigned num_cells_y = 5;
         HoneycombVertexMeshGenerator generator(num_cells_x, num_cells_y, false, 0.1, 0.01, target_area);
         MutableVertexMesh<2, 2>& vertex_2mesh = *(generator.GetMesh());
-        Helper3dVertexMeshBuilder builder("TestForceParameter");
+        MonolayerVertexMeshGenerator builder("TestForceParameter");
 
         std::vector<CellPtr> cells;
         CellsGenerator<NoCellCycleModel, 3> cells_generator;

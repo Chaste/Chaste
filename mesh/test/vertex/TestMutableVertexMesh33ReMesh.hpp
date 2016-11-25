@@ -6,7 +6,7 @@
 #include "FileComparison.hpp"
 #include "Warnings.hpp"
 #include "MutableVertexMesh.hpp"
-#include "Helper3dVertexMeshBuilder.hpp"
+#include "MonolayerVertexMeshGenerator.hpp"
 
 // This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
@@ -38,11 +38,11 @@ public:
         nodes.push_back(new Node<3>(4, true, 0.6, 0.0));
 
         const unsigned node_indices_elem_0[5] = {0, 3, 4, 1, 2};
-        Helper3dVertexMeshBuilder builder(nodes, "NodeMerge");
+        MonolayerVertexMeshGenerator builder(nodes, "NodeMerge");
         builder.BuildElementWith(5, node_indices_elem_0);
         // A reference variable as mesh is noncopyable
         MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
-        builder.WriteVtk(OUTPUT_NAME,"Before");
+        builder.WriteVtkWithSubfolder(OUTPUT_NAME,"Before");
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 1u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 10u);
@@ -50,7 +50,7 @@ public:
 
         // Merge nodes 3 and 4
         vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(3), vertex_mesh.GetNode(4));
-        builder.WriteVtk(OUTPUT_NAME,"After");
+        builder.WriteVtkWithSubfolder(OUTPUT_NAME,"After");
 
         // Test the mesh is correctly updated
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 1u);
@@ -110,12 +110,12 @@ public:
 
         unsigned node_indices_elem_0[4] = {0, 1, 5, 6};
         unsigned node_indices_elem_1[5] = {1, 2, 3, 4, 5};
-        Helper3dVertexMeshBuilder builder(nodes, "NodeMergeWhenLowIndexNodeMustBeAddedToElement");
+        MonolayerVertexMeshGenerator builder(nodes, "NodeMergeWhenLowIndexNodeMustBeAddedToElement");
         builder.BuildElementWith(4, node_indices_elem_0);
         builder.BuildElementWith(5, node_indices_elem_1);
         // A reference variable as mesh is noncopyable
         MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
-        builder.WriteVtk(OUTPUT_NAME,"Before");
+        builder.WriteVtkWithSubfolder(OUTPUT_NAME,"Before");
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 2u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 14u);
@@ -123,7 +123,7 @@ public:
 
         // Merge nodes 4 and 5
         vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(4), vertex_mesh.GetNode(5));
-        builder.WriteVtk(OUTPUT_NAME,"After");
+        builder.WriteVtkWithSubfolder(OUTPUT_NAME,"After");
 
         // Test the mesh is correctly updated
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 2u);
@@ -182,20 +182,20 @@ public:
         unsigned node_indices_elem_2[3] = {0, 1, 4};
         unsigned node_indices_elem_3[4] = {4, 5, 3, 0};
 
-        Helper3dVertexMeshBuilder builder(nodes, "T1SwapWith4Elements");
+        MonolayerVertexMeshGenerator builder(nodes, "T1SwapWith4Elements");
         builder.BuildElementWith(3, node_indices_elem_0);
         builder.BuildElementWith(4, node_indices_elem_1);
         builder.BuildElementWith(3, node_indices_elem_2);
         builder.BuildElementWith(4, node_indices_elem_3);
         // A reference variable as mesh is noncopyable
         MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
-        builder.WriteVtk(OUTPUT_NAME,"Before");
+        builder.WriteVtkWithSubfolder(OUTPUT_NAME,"Before");
 
         // Set the threshold distance between vertices for a T1 swap as follows
         // so that it will trigger CheckForSwapsFromShortEdges
         vertex_mesh.SetCellRearrangementThreshold(0.3);
         vertex_mesh.CheckForSwapsFromShortEdges();
-        builder.WriteVtk(OUTPUT_NAME,"AfterOnce");
+        builder.WriteVtkWithSubfolder(OUTPUT_NAME,"AfterOnce");
 
         // Test that each moved node has the correct location following the rearrangement
         TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[0], 0.725, 1e-8);
@@ -231,7 +231,7 @@ public:
         vertex_mesh.SetCellRearrangementThreshold(0.1*2.0/1.5);
         // Perform a T1 swap on nodes 4 and 5
         vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(4), vertex_mesh.GetNode(5));
-        builder.WriteVtk(OUTPUT_NAME,"AfterTwice");
+        builder.WriteVtkWithSubfolder(OUTPUT_NAME,"AfterTwice");
 
         // Test that each element has the correct area and perimeter following the rearrangement
         TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(0), 0.2, 1e-6);
@@ -291,7 +291,7 @@ public:
         unsigned node_indices_elem_2[3] = {0, 1, 4};
         unsigned node_indices_elem_3[4] = {4, 5, 3, 0};
 
-        Helper3dVertexMeshBuilder builder(nodes, "T1NoSwap");
+        MonolayerVertexMeshGenerator builder(nodes, "T1NoSwap");
         builder.BuildElementWith(3, node_indices_elem_0);
         builder.BuildElementWith(4, node_indices_elem_1);
         builder.BuildElementWith(3, node_indices_elem_2);
@@ -350,7 +350,7 @@ public:
         unsigned node_indices_elem_2[3] = {0, 1, 4};
         unsigned node_indices_elem_3[4] = {4, 5, 3, 0};
 
-        Helper3dVertexMeshBuilder builder(nodes, "T1SwapNonEvenFace");
+        MonolayerVertexMeshGenerator builder(nodes, "T1SwapNonEvenFace");
         builder.BuildElementWith(3, node_indices_elem_0);
         builder.BuildElementWith(4, node_indices_elem_1);
         builder.BuildElementWith(3, node_indices_elem_2);
@@ -359,13 +359,13 @@ public:
         MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
 //        vertex_mesh.GetNode(11)->rGetModifiableLocation()[0] = 0.45;
         vertex_mesh.GetNode(4)->rGetModifiableLocation()[0] = 0.45;
-        builder.WriteVtk(OUTPUT_NAME,"Before");
+        builder.WriteVtkWithSubfolder(OUTPUT_NAME,"Before");
 
         // Set the threshold distance between vertices for a T1 swap as follows
         // so that it will trigger CheckForSwapsFromShortEdges
         vertex_mesh.SetCellRearrangementThreshold(0.3);
         vertex_mesh.CheckForSwapsFromShortEdges();
-        builder.WriteVtk(OUTPUT_NAME,"After");
+        builder.WriteVtkWithSubfolder(OUTPUT_NAME,"After");
 
         // Test that each moved node has the correct location following the rearrangement
         TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[0], 0.2518, 1e-4);
@@ -397,19 +397,19 @@ public:
         unsigned node_indices_elem_1[3] = {1, 4, 0};
         unsigned node_indices_elem_2[4] = {0, 4, 5, 3};
 
-        Helper3dVertexMeshBuilder builder(nodes, "T1SwapOnBoundary");
+        MonolayerVertexMeshGenerator builder(nodes, "T1SwapOnBoundary");
         builder.BuildElementWith(3, node_indices_elem_0);
         builder.BuildElementWith(3, node_indices_elem_1);
         builder.BuildElementWith(4, node_indices_elem_2);
         // A reference variable as mesh is noncopyable
         MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
-        builder.WriteVtk(OUTPUT_NAME,"Before");
+        builder.WriteVtkWithSubfolder(OUTPUT_NAME,"Before");
 
         // Set the threshold distance between vertices for a T1 swap as follows, to ease calculations
         vertex_mesh.SetCellRearrangementThreshold(0.1*2.0/1.5);
         // Perform a T1 swap on nodes 5 and 4 (this way round to ensure coverage of boundary node tracking)
         vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(5), vertex_mesh.GetNode(4));
-        builder.WriteVtk(OUTPUT_NAME,"After");
+        builder.WriteVtkWithSubfolder(OUTPUT_NAME,"After");
 
         // Test that each moved node has the correct location following the rearrangement
         TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[0], 0.6, 1e-8);
@@ -488,14 +488,14 @@ public:
         unsigned node_indices_elem_1[3] = {1, 4, 0};
         unsigned node_indices_elem_2[4] = {0, 4, 5, 3};
 
-        Helper3dVertexMeshBuilder builder(nodes, "T1SwapOnBoundary2");
+        MonolayerVertexMeshGenerator builder(nodes, "T1SwapOnBoundary2");
         builder.BuildElementWith(4, node_indices_elem_0);
         builder.BuildElementWith(3, node_indices_elem_1);
         builder.BuildElementWith(4, node_indices_elem_2);
 
         // A reference variable as mesh is noncopyable
         MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
-        builder.WriteVtk(OUTPUT_NAME,"Before");
+        builder.WriteVtkWithSubfolder(OUTPUT_NAME,"Before");
 
         // Set the threshold distance between vertices for a T1 swap as follows, to ease calculations
         vertex_mesh.SetCellRearrangementThreshold(0.1*2.0/1.5);
@@ -506,7 +506,7 @@ public:
 
         // Perform a T1 swap on nodes 5 and 4 (this way round to ensure coverage of boundary node tracking)
         vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(5), vertex_mesh.GetNode(4));
-        builder.WriteVtk(OUTPUT_NAME,"After");
+        builder.WriteVtkWithSubfolder(OUTPUT_NAME,"After");
 
         // Test that each moved node has the correct location following the rearrangement
         TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[0], 0.6, 1e-8);
@@ -583,18 +583,18 @@ public:
         unsigned node_indices_elem_0[4] = {0, 4, 5, 3};
         unsigned node_indices_elem_1[4] = {4, 1, 2, 5};
 
-        Helper3dVertexMeshBuilder builder(nodes, "T1SwapWhenVoidForms");
+        MonolayerVertexMeshGenerator builder(nodes, "T1SwapWhenVoidForms");
         builder.BuildElementWith(4, node_indices_elem_0);
         builder.BuildElementWith(4, node_indices_elem_1);
         // A reference variable as mesh is noncopyable
         MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
-        builder.WriteVtk(OUTPUT_NAME, "Before");
+        builder.WriteVtkWithSubfolder(OUTPUT_NAME, "Before");
 
         // Set the threshold distance between vertices for a T1 swap as follows, to ease calculations
         vertex_mesh.SetCellRearrangementThreshold(0.1*2.0/1.5);
         // Perform a T1 swap on nodes 5 and 4.
         vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(5), vertex_mesh.GetNode(4));
-        builder.WriteVtk(OUTPUT_NAME, "After");
+        builder.WriteVtkWithSubfolder(OUTPUT_NAME, "After");
 
         // Test that each moved node has the correct location following the rearrangement
         TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[0], 0.6, 1e-8);
@@ -662,7 +662,7 @@ public:
         unsigned node_indices_elem_2[3] = {1, 4, 0};
         unsigned node_indices_elem_3[4] = {0, 4, 5, 3};
 
-        Helper3dVertexMeshBuilder builder(nodes, "T1SwapExceptions");
+        MonolayerVertexMeshGenerator builder(nodes, "T1SwapExceptions");
         builder.BuildElementWith(3, node_indices_elem_0);
         builder.BuildElementWith(4, node_indices_elem_1);
         builder.BuildElementWith(3, node_indices_elem_2);
@@ -705,7 +705,7 @@ public:
         unsigned node_indices_elem_2[4] = {0, 4, 6, 3};
         unsigned node_indices_elem_3[3] = { 4, 5, 6};
 
-        Helper3dVertexMeshBuilder builder(nodes, "T1NoSwapWithTriangularPrism");
+        MonolayerVertexMeshGenerator builder(nodes, "T1NoSwapWithTriangularPrism");
         builder.BuildElementWith(4, node_indices_elem_0);
         builder.BuildElementWith(4, node_indices_elem_1);
         builder.BuildElementWith(4, node_indices_elem_2);
@@ -760,7 +760,7 @@ public:
         unsigned node_indices_elem_1[3] = {1, 4, 3};
         unsigned node_indices_elem_2[3] = {0, 3, 2};
 
-        Helper3dVertexMeshBuilder builder(nodes, "NoT1SwapWithTriangularVoid");
+        MonolayerVertexMeshGenerator builder(nodes, "NoT1SwapWithTriangularVoid");
         builder.BuildElementWith(4, node_indices_elem_0);
         builder.BuildElementWith(3, node_indices_elem_1);
         builder.BuildElementWith(3, node_indices_elem_2);
@@ -798,9 +798,9 @@ public:
         MutableVertexMesh<2, 2> vertex_2mesh;
         vertex_2mesh.ConstructFromMeshReader(mesh_reader);
 
-        Helper3dVertexMeshBuilder builder("T1SwapReMesh");
+        MonolayerVertexMeshGenerator builder("T1SwapReMesh");
         MutableVertexMesh<3, 3>& vertex_mesh = *(builder.MakeMeshUsing2dMesh(vertex_2mesh) );
-        builder.WriteVtk(OUTPUT_NAME,"Before");
+        builder.WriteVtkWithSubfolder(OUTPUT_NAME,"Before");
 
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 8u);
@@ -809,7 +809,7 @@ public:
         // Calls ReMesh() to identify and perform any T1 swaps
         vertex_mesh.SetCellRearrangementThreshold(0.1);
         vertex_mesh.ReMesh();
-        builder.WriteVtk(OUTPUT_NAME,"After");
+        builder.WriteVtkWithSubfolder(OUTPUT_NAME,"After");
 
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 8u);
@@ -860,14 +860,14 @@ public:
         unsigned node_indices_elem_2[4] = {2, 0, 3, 5};
         unsigned node_indices_elem_3[4] = {0, 1, 4, 3};
 
-        Helper3dVertexMeshBuilder builder(nodes, "T2Swap");
+        MonolayerVertexMeshGenerator builder(nodes, "T2Swap");
         builder.BuildElementWith(3, node_indices_elem_0);
         builder.BuildElementWith(4, node_indices_elem_1);
         builder.BuildElementWith(4, node_indices_elem_2);
         builder.BuildElementWith(4, node_indices_elem_3);
         // A reference variable as mesh is noncopyable
         MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
-        builder.WriteVtk(OUTPUT_NAME,"Before");
+        builder.WriteVtkWithSubfolder(OUTPUT_NAME,"Before");
 
 
         // Perform a T2 swap on the central triangle element
@@ -914,7 +914,7 @@ public:
 
         VertexElementMap map(vertex_mesh.GetNumElements());
         vertex_mesh.RemoveDeletedNodesAndElements(map);
-        builder.WriteVtk(OUTPUT_NAME,"AfterRemove");
+        builder.WriteVtkWithSubfolder(OUTPUT_NAME,"AfterRemove");
     }
 
     void TestPerformT2SwapOnBoundary() throw(Exception)
@@ -943,13 +943,13 @@ public:
         unsigned node_indices_elem_1[4] = {1, 2, 5, 4};
         unsigned node_indices_elem_2[4] = {2, 0, 3, 5};
 
-        Helper3dVertexMeshBuilder builder(nodes, "T2SwapOnBoundary");
+        MonolayerVertexMeshGenerator builder(nodes, "T2SwapOnBoundary");
         builder.BuildElementWith(3, node_indices_elem_0);
         builder.BuildElementWith(4, node_indices_elem_1);
         builder.BuildElementWith(4, node_indices_elem_2);
         // A reference variable as mesh is noncopyable
         MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
-        builder.WriteVtk(OUTPUT_NAME,"Before");
+        builder.WriteVtkWithSubfolder(OUTPUT_NAME,"Before");
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 3u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 12u);
@@ -987,7 +987,7 @@ public:
 
         VertexElementMap map(vertex_mesh.GetNumElements());
         vertex_mesh.RemoveDeletedNodesAndElements(map);
-        builder.WriteVtk(OUTPUT_NAME,"AfterRemove");
+        builder.WriteVtkWithSubfolder(OUTPUT_NAME,"AfterRemove");
     }
 
     void TestPerformT2OnBoundary2() throw(Exception)
@@ -1014,12 +1014,12 @@ public:
         const unsigned node_indices_elem_0[3] = {2, 3, 4};
         const unsigned node_indices_elem_1[4] = {0, 1, 4, 3};
 
-        Helper3dVertexMeshBuilder builder(nodes, "T2SwapOnBoundary2");
+        MonolayerVertexMeshGenerator builder(nodes, "T2SwapOnBoundary2");
         builder.BuildElementWith(3, node_indices_elem_0);
         builder.BuildElementWith(4, node_indices_elem_1);
         // A reference variable as mesh is noncopyable
         MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
-        builder.WriteVtk(OUTPUT_NAME,"Before");
+        builder.WriteVtkWithSubfolder(OUTPUT_NAME,"Before");
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 2u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 10u);
@@ -1056,7 +1056,7 @@ public:
 
         VertexElementMap map(vertex_mesh.GetNumElements());
         vertex_mesh.RemoveDeletedNodesAndElements(map);
-        builder.WriteVtk(OUTPUT_NAME,"AfterRemove");
+        builder.WriteVtkWithSubfolder(OUTPUT_NAME,"AfterRemove");
     }
 
     void TestT2SwapsDontOccurWithTriangularNeighbours() throw(Exception)
@@ -1076,7 +1076,7 @@ public:
         const unsigned node_indices_elem_2[4] = {2, 0, 3, 5};
         const unsigned node_indices_elem_3[4] = {0, 1, 4, 3};
 
-        Helper3dVertexMeshBuilder builder(nodes, "T2NoSwapWithTriangularNeighbours");
+        MonolayerVertexMeshGenerator builder(nodes, "T2NoSwapWithTriangularNeighbours");
         builder.BuildElementWith(3, node_indices_elem_0);
         builder.BuildElementWith(3, node_indices_elem_1);
         builder.BuildElementWith(4, node_indices_elem_2);
@@ -1124,7 +1124,7 @@ public:
         const unsigned node_indices_elem_3[3] = {3, 4, 6};
         const unsigned node_indices_elem_4[5] = {4, 5, 8, 7, 6};
 
-        Helper3dVertexMeshBuilder builder(nodes, "T2SwapWithRosette");
+        MonolayerVertexMeshGenerator builder(nodes, "T2SwapWithRosette");
         builder.BuildElementWith(4, node_indices_elem_0);
         builder.BuildElementWith(4, node_indices_elem_1);
         builder.BuildElementWith(4, node_indices_elem_2);
@@ -1132,7 +1132,7 @@ public:
         builder.BuildElementWith(5, node_indices_elem_4);
         // A reference variable as mesh is noncopyable
         MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
-        builder.WriteVtk(OUTPUT_NAME,"Before");
+        builder.WriteVtkWithSubfolder(OUTPUT_NAME,"Before");
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 5u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 18u);
@@ -1183,7 +1183,7 @@ public:
 
         VertexElementMap map(vertex_mesh.GetNumElements());
         vertex_mesh.RemoveDeletedNodesAndElements(map);
-        builder.WriteVtk(OUTPUT_NAME,"AfterRemove");
+        builder.WriteVtkWithSubfolder(OUTPUT_NAME,"AfterRemove");
     }
 
 /// Commented this test as T2 Swap should only happen to triangular prism
@@ -1231,7 +1231,7 @@ public:
 //
 //        // A reference variable as mesh is noncopyable
 //        MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
-//        builder.WriteVtk(OUTPUT_NAME,"Before");
+//        builder.WriteVtkWithSubfolder(OUTPUT_NAME,"Before");
 //
 //        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 5u);
 //        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 24u);
@@ -1264,7 +1264,7 @@ public:
 //
 //        VertexElementMap map(vertex_mesh.GetNumElements());
 //        vertex_mesh.RemoveDeletedNodesAndElements(map);
-//        builder.WriteVtk(OUTPUT_NAME,"AfterRemove");
+//        builder.WriteVtkWithSubfolder(OUTPUT_NAME,"AfterRemove");
 //    }
 };
 

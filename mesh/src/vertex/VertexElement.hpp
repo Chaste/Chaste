@@ -190,9 +190,9 @@ public:
      * @param pApicalNodeStay is the pointer of apical node which serve as reference to identify the lateral face.
      * @param pBasalNodeStay is the pointer of basal node similar to pApicalNode2.
      *
-     * @return the global index of the face which contains all 4 nodes.
+     * @return the global index of the face which contains all 4 nodes and its orientation
      */
-    unsigned MonolayerElementDeleteNodes(const Node<SPACE_DIM>* pApicalNodeDelete, const Node<SPACE_DIM>* pBasalNodeDelete,
+    std::vector<unsigned> MonolayerElementDeleteNodes(const Node<SPACE_DIM>* pApicalNodeDelete, const Node<SPACE_DIM>* pBasalNodeDelete,
                                         Node<SPACE_DIM>* pApicalNodeStay, Node<SPACE_DIM>* pBasalNodeStay);
 
     /**
