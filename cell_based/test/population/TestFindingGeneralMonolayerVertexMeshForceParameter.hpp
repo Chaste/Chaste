@@ -87,7 +87,8 @@ public:
             char tmp_name[100];
             sprintf(tmp_name, name_pattern_lateral_volume, double(i));
 
-            MutableVertexMesh<3, 3>* p_mesh = builder.MakeNewMeshUsing2dMesh(vertex_2mesh, z_height);
+            builder.ClearStoredMeshObjects();
+            MutableVertexMesh<3, 3>* p_mesh = builder.MakeMeshUsing2dMesh(vertex_2mesh, z_height);
             cells_generator.GenerateBasicRandom(cells, num_cells_x*num_cells_y);
             VertexBasedCellPopulation<3> cell_population(*p_mesh, cells);
 
@@ -128,7 +129,8 @@ public:
             char tmp_name[100];
             sprintf(tmp_name, name_pattern_apical, double(i));
 
-            MutableVertexMesh<3, 3>* p_mesh = builder.MakeNewMeshUsing2dMesh(vertex_2mesh, z_height);
+            builder.ClearStoredMeshObjects();
+            MutableVertexMesh<3, 3>* p_mesh = builder.MakeMeshUsing2dMesh(vertex_2mesh, z_height);
             cells_generator.GenerateBasicRandom(cells, num_cells_x*num_cells_y);
             VertexBasedCellPopulation<3> cell_population(*p_mesh, cells);
 
@@ -166,7 +168,8 @@ public:
             char tmp_name[100];
             sprintf(tmp_name, name_pattern_apical_volume, double(i));
 
-            MutableVertexMesh<3, 3>* p_mesh = builder.MakeNewMeshUsing2dMesh(vertex_2mesh, z_height);
+            builder.ClearStoredMeshObjects();
+            MutableVertexMesh<3, 3>* p_mesh = builder.MakeMeshUsing2dMesh(vertex_2mesh, z_height);
             cells_generator.GenerateBasicRandom(cells, num_cells_x*num_cells_y);
             VertexBasedCellPopulation<3> cell_population(*p_mesh, cells);
 
