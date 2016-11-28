@@ -533,16 +533,20 @@ public:
         // Create cell population
         CaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
 
-        // Make one cell start apoptosis
+
+
+        // Make one cell start apoptosis on the master process
+        bool expected_result = true;
         if (PetscTools::AmMaster())
         {
             cell_population.GetCellUsingLocationIndex(12)->StartApoptosis();
+            expected_result = false;
         }
 
         cell_population.Update();
 
         // Note: The nodes of the FE mesh have indices 0 and 1, corresponding to the cells with location indices 12 and 13 in the PottsMesh
-        TS_ASSERT_EQUALS(cell_population.IsPdeNodeAssociatedWithNonApoptoticCell(0), false);
+        TS_ASSERT_EQUALS(cell_population.IsPdeNodeAssociatedWithNonApoptoticCell(0), expected_result);
         TS_ASSERT_EQUALS(cell_population.IsPdeNodeAssociatedWithNonApoptoticCell(1), true);
     }
 
