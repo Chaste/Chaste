@@ -212,7 +212,6 @@ private:
 
 protected:
 
-#undef COVERAGE_IGNORE // Avoid prototypes being treated as code by gcov
     /**
      * Update mIsParticle if required by a remesh.
      *

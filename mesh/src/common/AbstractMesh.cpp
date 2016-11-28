@@ -115,17 +115,18 @@ Node<SPACE_DIM>* AbstractMesh<ELEMENT_DIM, SPACE_DIM>::GetNodeFromPrePermutation
     }
 }
 
+// LCOV_EXCL_START
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractMesh<ELEMENT_DIM, SPACE_DIM>::ReadNodesPerProcessorFile(const std::string& rNodesPerProcessorFile)
 {
     NEVER_REACHED;
 }
-
+// LCOV_EXCL_STOP
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractMesh<ELEMENT_DIM, SPACE_DIM>::SetElementOwnerships()
 {
-    //Does nothing, since an AbstractMesh has no elements
+    // Does nothing, since an AbstractMesh has no elements
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -156,11 +157,13 @@ void AbstractMesh<ELEMENT_DIM, SPACE_DIM>::SetDistributedVectorFactory(Distribut
     mpDistributedVectorFactory = pFactory;
 }
 
+// LCOV_EXCL_START
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractMesh<ELEMENT_DIM, SPACE_DIM>::PermuteNodes()
 {
     NEVER_REACHED;
 }
+// LCOV_EXCL_STOP
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::BoundaryNodeIterator AbstractMesh<ELEMENT_DIM, SPACE_DIM>::GetBoundaryNodeIteratorBegin() const
@@ -386,7 +389,7 @@ void AbstractMesh<ELEMENT_DIM, SPACE_DIM>::Rotate(c_matrix<double , SPACE_DIM, S
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractMesh<ELEMENT_DIM, SPACE_DIM>::Rotate(c_vector<double,3> axis, double angle)
 {
-    assert(SPACE_DIM == 3);
+    assert(SPACE_DIM == 3); // LCOV_EXCL_LINE
     double norm = norm_2(axis);
     c_vector<double,3> unit_axis=axis/norm;
 

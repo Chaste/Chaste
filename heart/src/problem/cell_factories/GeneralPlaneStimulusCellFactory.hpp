@@ -70,9 +70,7 @@ public:
     {
         if (useMeshWidthAsMag)
         {
-            #define COVERAGE_IGNORE
             this->mpStimulus.reset(new SimpleStimulus(meshWidth, 0.5));
-            #undef COVERAGE_IGNORE
         }
         else
         {

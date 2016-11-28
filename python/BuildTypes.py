@@ -469,7 +469,7 @@ class Coverage(GccDebug):
             s = 'Output unrecognised'
         else:
             if status.startswith('ignore_'):
-                s = 'Unterminated COVERAGE_IGNORE block. '
+                s = 'Unterminated LCOV_EXCL_START block. '
                 status = status[7:]
             else:
                 s = ''

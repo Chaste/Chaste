@@ -36,7 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractAcinarUnitFactory.hpp"
 #include "AbstractAcinarUnit.hpp"
 
-
 //void AbstractAcinarUnitFactory::FinaliseAcinarUnitCreation(
 //    std::vector< AbstractAcinarUnit* >* pAcinarUnitsDistributed,
 //    unsigned lo,
@@ -72,9 +71,3 @@ AbstractTetrahedralMesh<1,3>* AbstractAcinarUnitFactory::GetMesh()
     }
     return mpMesh;
 }
-
-double AbstractAcinarUnitFactory::GetPleuralPressureForNode(double time, Node<3>* pNode)
-{
-    return 0.0;
-}
-

@@ -289,14 +289,16 @@ c_vector<double, PROBLEM_DIM*(ELEMENT_DIM+1)> LinearParabolicPdeSystemWithCouple
     Element<ELEMENT_DIM, SPACE_DIM>* pElement)
 {
     double timestep_inverse = PdeSimulationTime::GetPdeTimeStepInverse();
-    c_vector<double, PROBLEM_DIM*(ELEMENT_DIM+1)> vector_term = zero_vector<double>(PROBLEM_DIM*(ELEMENT_DIM+1));
+    c_vector<double, PROBLEM_DIM*(ELEMENT_DIM+1)> vector_term;
+    vector_term = zero_vector<double>(PROBLEM_DIM*(ELEMENT_DIM+1));
 
     // Loop over PDEs and populate vector_term
     for (unsigned pde_index=0; pde_index<PROBLEM_DIM; pde_index++)
     {
         double this_dudt_coefficient = mpPdeSystem->ComputeDuDtCoefficientFunction(rX, pde_index);
         double this_source_term = mpPdeSystem->ComputeSourceTerm(rX, rU, mInterpolatedOdeStateVariables, pde_index);
-        c_vector<double, ELEMENT_DIM+1> this_vector_term = (this_source_term + timestep_inverse*this_dudt_coefficient*rU(pde_index))* rPhi;
+        c_vector<double, ELEMENT_DIM+1> this_vector_term;
+        this_vector_term = (this_source_term + timestep_inverse*this_dudt_coefficient*rU(pde_index))* rPhi;
 
         for (unsigned i=0; i<ELEMENT_DIM+1; i++)
         {
@@ -541,9 +543,9 @@ void LinearParabolicPdeSystemWithCoupledOdeSystemSolver<ELEMENT_DIM, SPACE_DIM, 
     *mpVtkMetaFile << "</VTKFile>\n";
     mpVtkMetaFile->close();
 #else //CHASTE_VTK
-#define COVERAGE_IGNORE // We only test this in weekly builds
+// LCOV_EXCL_START // We only test this in weekly builds
     WARNING("VTK is not installed and is required for this functionality");
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
 #endif //CHASTE_VTK
 }
 

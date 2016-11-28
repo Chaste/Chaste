@@ -283,12 +283,12 @@ unsigned VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetNumFaceAttributes() const
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::Reset()
 {
-    mNodesRead=0;
-    mElementsRead=0;
-    mFacesRead=0;
-    mBoundaryFacesRead=0;
-    mBoundaryFacesSkipped=0;
-    mCableElementsRead=0;
+    mNodesRead = 0;
+    mElementsRead = 0;
+    mFacesRead = 0;
+    mBoundaryFacesRead = 0;
+    mBoundaryFacesSkipped = 0;
+    mCableElementsRead = 0;
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>

@@ -34,13 +34,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "MeshBasedCellPopulation.hpp"
-#include "TrianglesMeshWriter.hpp"
 #include "VtkMeshWriter.hpp"
 #include "CellBasedEventHandler.hpp"
 #include "Cylindrical2dMesh.hpp"
 #include "Cylindrical2dVertexMesh.hpp"
 #include "NodesOnlyMesh.hpp"
-#include "Exception.hpp"
 #include "CellId.hpp"
 #include "CellVolumesWriter.hpp"
 #include "CellPopulationElementWriter.hpp"
@@ -110,7 +108,7 @@ bool MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::UseAreaBasedDampingConstant
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::SetAreaBasedDampingConstant(bool useAreaBasedDampingConstant)
 {
-    assert(SPACE_DIM == 2);
+    assert(SPACE_DIM == 2); // LCOV_EXCL_LINE
     mUseAreaBasedDampingConstant = useAreaBasedDampingConstant;
 }
 
@@ -146,9 +144,8 @@ double MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetDampingConstant(unsign
          * where d0, d1 are parameters, A is the cell's area, and old_damping_const
          * is the damping constant if not using mUseAreaBasedDampingConstant
          */
-
-        assert(SPACE_DIM == 2);
-
+		assert(SPACE_DIM == 2); // LCOV_EXCL_LINE
+        
         double rest_length = 1.0;
         double d0 = mAreaBasedDampingConstantParameter;
 
@@ -447,8 +444,8 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::DivideLongSprings(double springDivisionThreshold)
 {
     // Only implemented for 2D elements
-    assert(ELEMENT_DIM==2);
-
+    assert(ELEMENT_DIM == 2); // LCOV_EXCL_LINE
+    
     std::vector<c_vector<unsigned, 5> > new_nodes;
     new_nodes = rGetMesh().SplitLongEdges(springDivisionThreshold);
 
@@ -954,7 +951,7 @@ void MeshBasedCellPopulation<2>::CreateVoronoiTessellation()
 
     // Check if the mesh associated with this cell population is periodic
     bool is_mesh_periodic = false;
-    if (dynamic_cast<Cylindrical2dMesh*>(&mrMesh))
+    if (bool(dynamic_cast<Cylindrical2dMesh*>(&mrMesh)))
     {
         is_mesh_periodic = true;
         mpVoronoiTessellation = new Cylindrical2dVertexMesh(static_cast<Cylindrical2dMesh &>(this->mrMesh));
@@ -964,15 +961,18 @@ void MeshBasedCellPopulation<2>::CreateVoronoiTessellation()
         mpVoronoiTessellation = new VertexMesh<2, 2>(static_cast<MutableMesh<2, 2> &>((this->mrMesh)), is_mesh_periodic);
     }
 }
+
 /**
  * Can't tessellate 2d meshes in 3d space yet.
  */
+// LCOV_EXCL_START
 template<>
 void MeshBasedCellPopulation<2,3>::CreateVoronoiTessellation()
 {
     // We don't allow tessellation yet.
     NEVER_REACHED;
 }
+// LCOV_EXCL_STOP
 
 /**
  * The cylindrical mesh is only defined in 2D, hence there is
@@ -990,34 +990,41 @@ void MeshBasedCellPopulation<3>::CreateVoronoiTessellation()
  * The VoronoiTessellation class is only defined in 2D or 3D, hence there
  * are two definitions to this method (one templated and one not).
  */
+// LCOV_EXCL_START
 template<>
 void MeshBasedCellPopulation<1, 1>::CreateVoronoiTessellation()
 {
     // No 1D Voronoi tessellation
     NEVER_REACHED;
 }
+// LCOV_EXCL_STOP
+
 
 /**
  * The VoronoiTessellation class is only defined in 2D or 3D, hence there
  * are two definitions to this method (one templated and one not).
  */
+// LCOV_EXCL_START
 template<>
 void MeshBasedCellPopulation<1, 2>::CreateVoronoiTessellation()
 {
     // No 1D Voronoi tessellation
     NEVER_REACHED;
 }
+// LCOV_EXCL_STOP
 
 /**
  * The VoronoiTessellation class is only defined in 2D or 3D, hence there
  * are two definitions to this method (one templated and one not).
  */
+// LCOV_EXCL_START
 template<>
 void MeshBasedCellPopulation<1, 3>::CreateVoronoiTessellation()
 {
     // No 1D Voronoi tessellation
     NEVER_REACHED;
 }
+// LCOV_EXCL_STOP
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VertexMesh<ELEMENT_DIM,SPACE_DIM>* MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetVoronoiTessellation()
@@ -1076,7 +1083,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::CheckCellPointers()
         unsigned node_index = this->GetLocationIndexUsingCell(p_cell);
         std::cout << "Cell at node " << node_index << " addr " << p_cell << std::endl << std::flush;
         CellPtr p_cell_in_cell_population = this->GetCellUsingLocationIndex(node_index);
-#define COVERAGE_IGNORE //Debugging code.  Shouldn't fail under normal conditions
+// LCOV_EXCL_START //Debugging code.  Shouldn't fail under normal conditions
         if (p_cell_in_cell_population != p_cell)
         {
             std::cout << "  Mismatch with cell population" << std::endl << std::flush;
@@ -1092,7 +1099,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::CheckCellPointers()
     }
     UNUSED_OPT(res);
     assert(res);
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
 
     res = true;
     for (std::set<std::pair<CellPtr,CellPtr> >::iterator it1 = this->mMarkedSprings.begin();
@@ -1111,7 +1118,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::CheckCellPointers()
             unsigned node_index = this->GetLocationIndexUsingCell(p_cell);
             std::cout << "Cell at node " << node_index << " addr " << p_cell << std::endl << std::flush;
 
-#define COVERAGE_IGNORE //Debugging code.  Shouldn't fail under normal conditions
+// LCOV_EXCL_START //Debugging code.  Shouldn't fail under normal conditions
             // Check cell is alive
             if (p_cell->IsDead())
             {
@@ -1134,7 +1141,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::CheckCellPointers()
                 res = false;
             }
         }
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
     }
     assert(res);
 }
@@ -1152,6 +1159,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::SetAreaBasedDampingConstant
     mAreaBasedDampingConstantParameter = areaBasedDampingConstantParameter;
 }
 
+// LCOV_EXCL_START
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::vector< std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>* > >& MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::rGetNodePairs()
 {
@@ -1159,6 +1167,7 @@ std::vector< std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>* > >& MeshBasedCellPopu
     NEVER_REACHED;
     return mNodePairs;
 }
+// LCOV_EXCL_STOP
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::OutputCellPopulationParameters(out_stream& rParamsFile)

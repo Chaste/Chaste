@@ -99,7 +99,7 @@ void ActivationOutputModifier::ProcessSolutionAtTimeStep(double time, Vec soluti
         {
             mFirstActivitationTimes[local_index] = time;
         }
-#define COVERAGE_IGNORE // Continuous tests are not long enough to allow recover
+// LCOV_EXCL_START // Continuous tests are not long enough to allow recover
         else if (mFirstActivitationTimes[local_index] >= 0.0 && mFirstRecoveryTimes[local_index] < 0.0 && v < mThreshold)
         {
             ///\todo #2570 Add to a longer running test
@@ -113,7 +113,7 @@ void ActivationOutputModifier::ProcessSolutionAtTimeStep(double time, Vec soluti
         {
             mSecondRecoveryTimes[local_index] = time;
         }
-#undef COVERAGE_IGNORE // Continuous tests are not long enough to allow recover
+// LCOV_EXCL_STOP // Continuous tests are not long enough to allow recover
     }
     VecRestoreArray(solution, &p_solution);
 }

@@ -55,7 +55,7 @@ AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::AbstractCardiacTissue(
             bool exchangeHalos)
     : mpMesh(pCellFactory->GetMesh()),
       mpDistributedVectorFactory(mpMesh->GetDistributedVectorFactory()),
-      mpConductivityModifier(NULL),
+	  mpConductivityModifier(NULL),
       mHasPurkinje(false),
       mDoCacheReplication(true),
       mMeshUnarchived(false),
@@ -80,10 +80,10 @@ AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::AbstractCardiacTissue(
          * to the other processes.  Therefore, to avoid deadlock, we share this potential for error between
          * processes and throw an exception.
          */
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
         // This problem normally occurs on 3 or more processes, so we can't cover it - coverage only runs with 1 and 2 processes.
         EXCEPTION("No cells were assigned some process in AbstractCardiacTissue constructor. Advice: Make total number of processors no greater than number of nodes in the mesh");
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
     }
     unsigned ownership_range_low = mpDistributedVectorFactory->GetLow();
     mCellsDistributed.resize(num_local_nodes);
@@ -296,14 +296,15 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::CreateIntracellularConductivi
             assert(hetero_intra_conductivities.size()==0);
             hetero_intra_conductivities.resize(num_local_elements, intra_conductivities);
         }
+        // LCOV_EXCL_START
         catch(std::bad_alloc &r_bad_alloc)
         {
-#define COVERAGE_IGNORE
             std::cout << "Failed to allocate std::vector of size " << num_local_elements << std::endl;
             PetscTools::ReplicateException(true);
             throw r_bad_alloc;
-#undef COVERAGE_IGNORE
         }
+        // LCOV_EXCL_STOP
+
         PetscTools::ReplicateException(false);
 
         std::vector<boost::shared_ptr<AbstractChasteRegion<SPACE_DIM> > > conductivities_heterogeneity_areas;
@@ -599,16 +600,18 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SolveCellSystems(Vec existing
                 UpdatePurkinjeCaches(index.Global, index.Local, nextTime);
             }
         }
-        catch (Exception&)
+        // LCOV_EXCL_START
+        catch (Exception& e)
         {
             ///\todo #2017 This code will be needed in the future, not being covered now.
             /// Add a test which covers this, e.g.  by doing a simulation with a bad stimulus for one of the
             /// Purkinje cells - stimulating with the wrong choice of sign say.
 
             NEVER_REACHED;
-            //PetscTools::ReplicateException(true);
-            //throw e;
+            PetscTools::ReplicateException(true);
+            throw e;
         }
+        // LCOV_EXCL_STOP
     }
 
     PetscTools::ReplicateException(false);

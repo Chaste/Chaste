@@ -119,10 +119,10 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ComputeMeshPartitioning
     if (mPartitioning == DistributedTetrahedralMeshPartitionType::PETSC_MAT_PARTITION && !PetscTools::HasParMetis())
     {
         // The following warning can only be reproduced on machines which do not have the PETSc/parMETIS interface.
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
         WARNING("PETSc/parMETIS partitioning requires PETSc to be configured with parMETIS as an option.  Current install has PETSc and parMETIS installed independently.  Switching to parMETIS");
         mPartitioning = DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY;
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
     }
     ///\todo #1293 add a timing event for the partitioning
     if (mPartitioning==DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY && PetscTools::IsParallel())
@@ -696,7 +696,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ReorderNodes()
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructLinearMesh(unsigned width)
 {
-    assert(ELEMENT_DIM == 1);
+    assert(ELEMENT_DIM == 1); 	// LCOV_EXCL_LINE
 
      //Check that there are enough nodes to make the parallelisation worthwhile
     if (width==0)
@@ -813,8 +813,8 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructLinearMesh(uns
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRectangularMesh(unsigned width, unsigned height, bool stagger)
 {
-    assert(SPACE_DIM == 2);
-    assert(ELEMENT_DIM == 2);
+    assert(SPACE_DIM == 2); 	// LCOV_EXCL_LINE
+    assert(ELEMENT_DIM == 2); 	// LCOV_EXCL_LINE
     //Check that there are enough nodes to make the parallelisation worthwhile
     if (height==0)
     {
@@ -1016,8 +1016,8 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructCuboid(unsigne
         unsigned height,
         unsigned depth)
 {
-    assert(SPACE_DIM == 3);
-    assert(ELEMENT_DIM == 3);
+    assert(SPACE_DIM == 3); 	// LCOV_EXCL_LINE
+    assert(ELEMENT_DIM == 3); 	// LCOV_EXCL_LINE
     //Check that there are enough nodes to make the parallelisation worthwhile
     if (depth==0)
     {
@@ -1307,7 +1307,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
         std::vector<unsigned>& rProcessorsOffset)
 {
     assert(PetscTools::IsParallel());
-    assert(ELEMENT_DIM==2 || ELEMENT_DIM==3); // Metis works with triangles and tetras
+    assert(ELEMENT_DIM==2 || ELEMENT_DIM==3); // LCOV_EXCL_LINE // Metis works with triangles and tetras
 
     const unsigned num_elements = rMeshReader.GetNumElements();
     const unsigned num_procs = PetscTools::GetNumProcs();
@@ -1616,13 +1616,14 @@ ChasteCuboid<SPACE_DIM> DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::Calc
         my_minimum_point=my_box.rGetLowerCorner();
         my_maximum_point=my_box.rGetUpperCorner();
     }
+    // LCOV_EXCL_START
     catch (Exception& e)
     {
-#define COVERAGE_IGNORE
         PetscTools::ReplicateException(true);
         throw e;
-#undef COVERAGE_IGNORE
+
     }
+    // LCOV_EXCL_STOP
 
     PetscTools::ReplicateException(false);
 

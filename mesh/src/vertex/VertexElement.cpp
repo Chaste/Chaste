@@ -46,7 +46,7 @@ VertexElement<ELEMENT_DIM, SPACE_DIM>::VertexElement(unsigned index,
       mOrientations(rOrientations)
 {
     // This constructor should only be used in 3D
-    assert(SPACE_DIM == 3);
+    assert(SPACE_DIM == 3);    // LCOV_EXCL_LINE - code will be removed at compile time
 
     // Each face must have an associated orientation
     assert(mFaces.size() == mOrientations.size());

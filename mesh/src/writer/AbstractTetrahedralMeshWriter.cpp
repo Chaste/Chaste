@@ -641,6 +641,7 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingParal
     }
 }
 
+// LCOV_EXCL_START
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::CreateFilesWithHeaders()
 {
@@ -648,7 +649,10 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::CreateFilesWithHeade
     // parallel write for whichever visualiser you are writing for.
     NEVER_REACHED;
 }
+// LCOV_EXCL_STOP
 
+
+// LCOV_EXCL_START
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::AppendLocalDataToFiles()
 {
@@ -656,7 +660,10 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::AppendLocalDataToFil
     // parallel write for whichever visualiser you are writing for.
     NEVER_REACHED;
 }
+// LCOV_EXCL_STOP
 
+
+// LCOV_EXCL_START
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesFooter()
 {
@@ -664,6 +671,7 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesFooter()
     // parallel write for whichever visualiser you are writing for.
     NEVER_REACHED;
 }
+// LCOV_EXCL_STOP
 
 // Explicit instantiation
 template class AbstractTetrahedralMeshWriter<1,1>;

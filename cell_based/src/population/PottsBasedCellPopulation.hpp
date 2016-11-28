@@ -106,7 +106,6 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-#define COVERAGE_IGNORE
         archive & boost::serialization::base_object<AbstractOnLatticeCellPopulation<DIM> >(*this);
 
         /*
@@ -118,8 +117,6 @@ private:
 
         archive & mTemperature;
         archive & mNumSweepsPerTimestep;
-
-#undef COVERAGE_IGNORE
     }
 
     /**
@@ -408,15 +405,6 @@ public:
      * @return the Mutable Mesh
      */
     MutableMesh<DIM,DIM>* GetMutableMesh();
-
-    /**
-     * Overridden WriteDataToVisualizerSetupFile() method.
-     * Write any data necessary to a visualization setup file.
-     * Used by AbstractCellBasedSimulation::WriteVisualizerSetupFile().
-     * 
-     * @param pVizSetupFile a visualization setup file
-     */
-    virtual void WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile);
 
     /**
      * Overridden AddUpdateRule() method.

@@ -34,10 +34,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "MatrixVentilationProblem.hpp"
-
 #include "ReplicatableVector.hpp"
 #include "Warnings.hpp"
-//#include "Debug.hpp"
 
 MatrixVentilationProblem::MatrixVentilationProblem(const std::string& rMeshDirFilePath, unsigned rootIndex)
     : AbstractVentilationProblem(rMeshDirFilePath, rootIndex),
@@ -53,17 +51,17 @@ MatrixVentilationProblem::MatrixVentilationProblem(const std::string& rMeshDirFi
     mpLinearSystem->SetAbsoluteTolerance(1e-5);
 
 #ifdef LUNG_USE_UMFPACK
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
     mpLinearSystem->SetPcType("lu");
     PetscTools::SetOption("-pc_factor_mat_solver_package", "umfpack");
     mpLinearSystem->SetKspType("gmres");
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
 #elif LUNG_USE_KLU
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
     mpLinearSystem->SetPcType("lu");
     PetscTools::SetOption("-pc_factor_mat_solver_package", "klu");
     mpLinearSystem->SetKspType("gmres");
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
 #else
     mpLinearSystem->SetPcType("jacobi");
     PetscTools::SetOption("-ksp_diagonal_scale","");

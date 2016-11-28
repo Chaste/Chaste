@@ -125,6 +125,11 @@ protected:
     /** File that the values of the PDE solution are written out to. */
     out_stream mpVizPdeSolutionResultsFile;
 
+    /**
+     * Whether to delete the finite element mesh when we are destroyed.
+     */
+    bool mDeleteFeMesh;
+
 public:
 
     /**
@@ -200,13 +205,6 @@ public:
     Vec GetSolution() const;
 
     /**
-     * Set mSolution.
-     *
-     * @param solution the present solution
-     */
-    void SetSolution(Vec solution);
-
-    /**
      * @return mpFeMesh.
      */
     TetrahedralMesh<DIM,DIM>* GetFeMesh() const;
@@ -232,7 +230,8 @@ public:
     virtual void UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)=0;
 
     /**
-     * Overridden UpdateAtEndOfOutputTimeStep() method.
+     * Overridden UpdateAtEndOfOutputTimeStep() method,
+     * after UpdateAtEndOfTimeStep() has been called.
      *
      * Output the solution to the PDE at each cell to VTK and, if mOutputSolutionAtPdeNodes is set to true,
      * output the solution to the PDE at each node of mpFeMesh to mpVizPdeSolutionResultsFile.

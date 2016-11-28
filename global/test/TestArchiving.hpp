@@ -48,6 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/shared_ptr.hpp>
 
 #include "OutputFileHandler.hpp"
+#include "Warnings.hpp"
 #include "ClassOfSimpleVariables.hpp"
 #include "ForTestArchiving.hpp"
 //This test is always run sequentially (never in parallel)
@@ -433,6 +434,20 @@ public:
             TS_ASSERT(dynamic_cast<ChildClass*>(p_base.get()));
             TS_ASSERT(dynamic_cast<SubChildClass*>(p_base.get()));
         }
+    }
+
+    void TestUndentifiableClass() throw(Exception)
+    {
+        // This Identifiable child class is not registered for serialization, it is expected to give a warning when GetIdentifiable is called.
+        BadIdentifiable bad_indentifiable;
+
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
+        std::string class_name = bad_indentifiable.GetIdentifier();
+        TS_ASSERT_EQUALS(class_name, "UnknownClass-ReflectionFailed");
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
+
+        // Clean up
+        Warnings::QuietDestroy();
     }
 };
 

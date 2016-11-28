@@ -676,9 +676,7 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(NodeMap& map)
 {
     // Make sure that we are in the correct dimension - this code will be eliminated at compile time
-    #define COVERAGE_IGNORE
-    assert( ELEMENT_DIM == SPACE_DIM );
-    #undef COVERAGE_IGNORE
+    assert( ELEMENT_DIM == SPACE_DIM ); // LCOV_EXCL_LINE
 
     // Avoid some triangle/tetgen errors: need at least four
     // nodes for tetgen, and at least three for triangle
@@ -698,7 +696,7 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(NodeMap& map)
             this->mpDistributedVectorFactory = new DistributedVectorFactory(this->GetNumNodes());
         }
     }
-    if (SPACE_DIM==1)
+    if (SPACE_DIM == 1)
     {
         // Store the node locations
         std::vector<c_vector<double, SPACE_DIM> > old_node_locations;
@@ -723,11 +721,13 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(NodeMap& map)
         // Construct the nodes and boundary nodes
         for (unsigned node_index=0; node_index<old_node_locations.size(); node_index++)
         {
-            Node<SPACE_DIM>* p_node = new Node<SPACE_DIM>(node_index, old_node_locations[node_index], false);
+            // As we're in 1D, the boundary nodes are simply at either end of the mesh
+            bool is_boundary_node = (node_index==0 || node_index==old_node_locations.size()-1);
+
+            Node<SPACE_DIM>* p_node = new Node<SPACE_DIM>(node_index, old_node_locations[node_index], is_boundary_node);
             this->mNodes.push_back(p_node);
 
-            // As we're in 1D, the boundary nodes are simply at either end of the mesh
-            if (node_index==0 || node_index==old_node_locations.size()-1)
+            if (is_boundary_node)
             {
                 this->mBoundaryNodes.push_back(p_node);
             }
@@ -815,8 +815,8 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh()
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::vector<c_vector<unsigned, 5> > MutableMesh<ELEMENT_DIM, SPACE_DIM>::SplitLongEdges(double cutoffLength)
 {
-    assert(ELEMENT_DIM == 2);
-    assert(SPACE_DIM == 3);
+    assert(ELEMENT_DIM == 2); 	// LCOV_EXCL_LINE
+    assert(SPACE_DIM == 3); 	// LCOV_EXCL_LINE
 
     std::vector<c_vector<unsigned, 5> > history;
 
@@ -992,7 +992,7 @@ c_vector<unsigned, 3> MutableMesh<ELEMENT_DIM, SPACE_DIM>::SplitEdge(Node<SPACE_
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool MutableMesh<ELEMENT_DIM, SPACE_DIM>::CheckIsVoronoi(Element<ELEMENT_DIM, SPACE_DIM>* pElement, double maxPenetration)
 {
-    assert(ELEMENT_DIM == SPACE_DIM);
+    assert(ELEMENT_DIM == SPACE_DIM); 	// LCOV_EXCL_LINE
     unsigned num_nodes = pElement->GetNumNodes();
     std::set<unsigned> neighbouring_elements_indices;
     std::set< Element<ELEMENT_DIM,SPACE_DIM> *> neighbouring_elements;

@@ -43,6 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <algorithm>
 
+#include "SmartPointers.hpp"
 #include "UblasCustomFunctions.hpp"
 #include "NodesOnlyMesh.hpp"
 #include "VtkMeshWriter.hpp"
@@ -94,6 +95,44 @@ public:
         {
             delete nodes[i];
         }
+    }
+
+    void TestConstructNodesWithoutMeshSharedPtr()
+    {
+        std::vector<boost::shared_ptr<Node<3> > > nodes;
+        nodes.push_back(boost::shared_ptr<Node<3> > (new Node<3>(0, true,  0.0, 0.0, 0.0)));
+        nodes.push_back(boost::shared_ptr<Node<3> > (new Node<3>(1, false, 1.0, 0.0, 0.0)));
+        nodes.push_back(boost::shared_ptr<Node<3> > (new Node<3>(2, false, 0.0, 1.0, 0.0)));
+        nodes.push_back(boost::shared_ptr<Node<3> > (new Node<3>(3, false, 1.0, 1.0, 0.0)));
+        nodes.push_back(boost::shared_ptr<Node<3> > (new Node<3>(4, false, 0.0, 0.0, 1.0)));
+        nodes.push_back(boost::shared_ptr<Node<3> > (new Node<3>(5, false, 1.0, 0.0, 1.0)));
+        nodes.push_back(boost::shared_ptr<Node<3> > (new Node<3>(6, false, 0.0, 1.0, 1.0)));
+        nodes.push_back(boost::shared_ptr<Node<3> > (new Node<3>(7, false, 1.0, 1.0, 1.0)));
+
+        NodesOnlyMesh<3> mesh;
+        mesh.ConstructNodesWithoutMesh(nodes, 1.5);
+
+        unsigned num_nodes = PetscTools::AmMaster() ? 8 : 0;    // All nodes will lie on the master process.
+        TS_ASSERT_EQUALS(mesh.GetNumNodes(), num_nodes);
+        TS_ASSERT_EQUALS(mesh.GetNumElements(), 0u);
+        TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 0u);
+        TS_ASSERT_EQUALS(mesh.GetNumAllNodes(), num_nodes);
+
+        // Check that the nodes mapping is set up correctly
+        if (PetscTools::AmMaster())
+        {
+            for (unsigned i=0; i<nodes.size(); i+=PetscTools::GetNumProcs())
+            {
+                TS_ASSERT(!(mesh.mNodesMapping.find(i) == mesh.mNodesMapping.end()));
+                TS_ASSERT_EQUALS(mesh.SolveNodeMapping(i), mesh.mNodesMapping[i]);
+            }
+        }
+
+        TS_ASSERT_THROWS_CONTAINS(mesh.SolveNodeMapping(8*PetscTools::GetNumProcs() + PetscTools::GetMyRank() + 1), " does not belong to process ");
+
+        // Cover being able to set the maximum interation distance.
+        mesh.SetMaximumInteractionDistance(5.0);
+        TS_ASSERT_DELTA(mesh.GetMaximumInteractionDistance(), 5.0, 1e-4);
     }
 
     void TestCalculateBoundingBox() throw (Exception)
@@ -360,6 +399,10 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 0u);
         TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 0u);
         TS_ASSERT_EQUALS(mesh.GetNumAllNodes(), num_boxes);
+
+        // Coverage of rGetInitiallyOwnedNodes()
+        std::vector<bool>& r_nodes = mesh.rGetInitiallyOwnedNodes();
+        TS_ASSERT_EQUALS(r_nodes.size(), 5u);
     }
 
     void TestGetNextAvailableIndex()

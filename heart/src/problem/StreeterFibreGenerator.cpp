@@ -244,7 +244,7 @@ void StreeterFibreGenerator<SPACE_DIM>::PreWriteCalculations(OutputFileHandler& 
                 break;
 
             case HeartGeometryInformation<SPACE_DIM>::UNKNOWN:
-                #define COVERAGE_IGNORE
+                // LCOV_EXCL_START
                 std::cerr << "Wrong distances node: " << node_index << "\t"
                           << "Epi " << mpGeometryInfo->rGetDistanceMapEpicardium()[node_index] << "\t"
                           << "RV " << mpGeometryInfo->rGetDistanceMapRightVentricle()[node_index] << "\t"
@@ -255,7 +255,7 @@ void StreeterFibreGenerator<SPACE_DIM>::PreWriteCalculations(OutputFileHandler& 
                 dist_epi = 1;
                 dist_endo = 0;
                 break;
-                #undef COVERAGE_IGNORE
+                // LCOV_EXCL_STOP
 
             default:
                 NEVER_REACHED;
@@ -265,13 +265,13 @@ void StreeterFibreGenerator<SPACE_DIM>::PreWriteCalculations(OutputFileHandler& 
 
         if (std::isnan(mWallThickness[node_index]))
         {
-            #define COVERAGE_IGNORE
+            // LCOV_EXCL_START
             /*
              *  A node contained on both epicardium and lv (or rv) surfaces has wall thickness 0/0.
              *  By setting its value to 0 we consider it contained only on the lv (or rv) surface.
              */
             mWallThickness[node_index] = 0;
-            #undef COVERAGE_IGNORE
+            // LCOV_EXCL_STOP
         }
 
         if (logInfo)
@@ -472,6 +472,6 @@ void StreeterFibreGenerator<SPACE_DIM>::SetLogInfo(bool logInfo)
 }
 
 // Explicit instantiation
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
 template class StreeterFibreGenerator<3>;
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP

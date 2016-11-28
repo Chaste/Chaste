@@ -36,7 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractPdeModifier.hpp"
 #include "VtkMeshWriter.hpp"
 #include "ReplicatableVector.hpp"
-#include "PetscTools.hpp"
 #include "AveragedSourceEllipticPde.hpp"
 #include "AveragedSourceParabolicPde.hpp"
 
@@ -52,7 +51,8 @@ AbstractPdeModifier<DIM>::AbstractPdeModifier(boost::shared_ptr<AbstractLinearPd
       mSolution(NULL),
       mOutputDirectory(""),
       mOutputGradient(false),
-      mOutputSolutionAtPdeNodes(false)
+      mOutputSolutionAtPdeNodes(false),
+      mDeleteFeMesh(false)
 {
     if (solution)
     {
@@ -63,6 +63,14 @@ AbstractPdeModifier<DIM>::AbstractPdeModifier(boost::shared_ptr<AbstractLinearPd
 template<unsigned DIM>
 AbstractPdeModifier<DIM>::~AbstractPdeModifier()
 {
+    if (mDeleteFeMesh and mpFeMesh!=NULL)
+    {
+        delete mpFeMesh;
+    }
+    if (mSolution)
+    {
+        PetscTools::Destroy(mSolution);
+    }
 }
 
 template<unsigned DIM>
@@ -129,12 +137,6 @@ Vec AbstractPdeModifier<DIM>::GetSolution() const
 }
 
 template<unsigned DIM>
-void AbstractPdeModifier<DIM>::SetSolution(Vec solution)
-{
-    mSolution = solution;
-}
-
-template<unsigned DIM>
 TetrahedralMesh<DIM,DIM>* AbstractPdeModifier<DIM>::GetFeMesh() const
 {
     return mpFeMesh;
@@ -165,41 +167,23 @@ void AbstractPdeModifier<DIM>::UpdateAtEndOfOutputTimeStep(AbstractCellPopulatio
         {
             (*mpVizPdeSolutionResultsFile) << SimulationTime::Instance()->GetTime() << "\t";
 
-            if (mpFeMesh != NULL)
-            {
-                assert(mDependentVariableName != "");
+            assert(mpFeMesh != NULL);
+            assert(mDependentVariableName != "");
 
-                for (unsigned i=0; i<mpFeMesh->GetNumNodes(); i++)
-                {
-                    (*mpVizPdeSolutionResultsFile) << i << " ";
-                    const c_vector<double,DIM>& r_location = mpFeMesh->GetNode(i)->rGetLocation();
-                    for (unsigned k=0; k<DIM; k++)
-                    {
-                        (*mpVizPdeSolutionResultsFile) << r_location[k] << " ";
-                    }
-
-                    assert(mSolution != NULL);
-                    ReplicatableVector solution_repl(mSolution);
-                    (*mpVizPdeSolutionResultsFile) << solution_repl[i] << " ";
-                }
-            }
-            else // Not coarse mesh
+            for (unsigned i=0; i<mpFeMesh->GetNumNodes(); i++)
             {
-                for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
-                     cell_iter != rCellPopulation.End();
-                     ++cell_iter)
+                (*mpVizPdeSolutionResultsFile) << i << " ";
+                const c_vector<double,DIM>& r_location = mpFeMesh->GetNode(i)->rGetLocation();
+                for (unsigned k=0; k<DIM; k++)
                 {
-                    unsigned node_index = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);
-                    (*mpVizPdeSolutionResultsFile) << node_index << " ";
-                    const c_vector<double,DIM>& position = rCellPopulation.GetLocationOfCellCentre(*cell_iter);
-                    for (unsigned i=0; i<DIM; i++)
-                    {
-                        (*mpVizPdeSolutionResultsFile) << position[i] << " ";
-                    }
-                    double solution = cell_iter->GetCellData()->GetItem(mDependentVariableName);
-                    (*mpVizPdeSolutionResultsFile) << solution << " ";
+                    (*mpVizPdeSolutionResultsFile) << r_location[k] << " ";
                 }
+
+                assert(mSolution != NULL);
+                ReplicatableVector solution_repl(mSolution);
+                (*mpVizPdeSolutionResultsFile) << solution_repl[i] << " ";
             }
+
             (*mpVizPdeSolutionResultsFile) << "\n";
         }
     }

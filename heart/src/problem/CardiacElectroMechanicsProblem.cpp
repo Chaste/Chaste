@@ -80,7 +80,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::DetermineWatchedNodes()
 
     if (min_dist > 1e-8)
     {
-        #define COVERAGE_IGNORE
+        // LCOV_EXCL_START
         std::cout << "ERROR: Could not find an electrics node very close to requested watched location - "
                   << "min distance was " << min_dist << " for node " << node_index
                   << " at location " << pos << std::flush;;
@@ -88,7 +88,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::DetermineWatchedNodes()
         //// the following causes a seg fault for some reason (!!???!!!)
         //EXCEPTION("Could not find an electrics node very close to requested watched location");
         NEVER_REACHED;
-        #undef COVERAGE_IGNORE
+        // LCOV_EXCL_STOP
     }
     else
     {
@@ -120,7 +120,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::DetermineWatchedNodes()
 
     if (min_dist > 1e-8)
     {
-        #define COVERAGE_IGNORE
+        // LCOV_EXCL_START
         std::cout << "ERROR: Could not find a mechanics node very close to requested watched location - "
                   << "min distance was " << min_dist << " for node " << node_index
                   << " at location " << pos_at_min;
@@ -128,7 +128,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::DetermineWatchedNodes()
         //// the following causes a seg fault for some reason (!!???!!!)
         //EXCEPTION("Could not find a mechanics node very close to requested watched location");
         NEVER_REACHED;
-        #undef COVERAGE_IGNORE
+        // LCOV_EXCL_STOP
     }
     else
     {
@@ -556,12 +556,12 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
     ////////////////////////////////////////////////////////////////
 
     LOG(2, "\nSolving for initial deformation");
-    #define COVERAGE_IGNORE
+    // LCOV_EXCL_START
     if (verbose_during_solve)
     {
         std::cout << "\n\n ** Solving for initial deformation\n";
     }
-    #undef COVERAGE_IGNORE
+    // LCOV_EXCL_STOP
 
     mpMechanicsSolver->SetWriteOutput(false);
 
@@ -577,12 +577,12 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
     unsigned total_newton_iters = 0;
     for (unsigned index=1; index<=mpProblemDefinition->GetNumIncrementsForInitialDeformation(); index++)
     {
-        #define COVERAGE_IGNORE
+        // LCOV_EXCL_START
         if (verbose_during_solve)
         {
             std::cout << "    Increment " << index << " of " << mpProblemDefinition->GetNumIncrementsForInitialDeformation() << "\n";
         }
-        #undef COVERAGE_IGNORE
+        // LCOV_EXCL_STOP
 
         if (mpProblemDefinition->GetTractionBoundaryConditionType()==PRESSURE_ON_DEFORMED)
         {
@@ -650,13 +650,13 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
     while (!stepper.IsTimeAtEnd())
     {
         LOG(2, "\nCurrent time = " << stepper.GetTime());
-        #define COVERAGE_IGNORE
+        // LCOV_EXCL_START
         if (verbose_during_solve)
         {
             // also output time to screen as newton solve information will be output
             std::cout << "\n\n ** Current time = " << stepper.GetTime() << "\n";
         }
-        #undef COVERAGE_IGNORE
+        // LCOV_EXCL_STOP
 
         /////////////////////////////////////////////////////////////////////////////////////
         ////

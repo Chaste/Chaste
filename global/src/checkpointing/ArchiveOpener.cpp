@@ -92,9 +92,7 @@ ArchiveOpener<boost::archive::text_iarchive, std::ifstream>::ArchiveOpener(
         else
         {
             // We don't understand the exception, so we shouldn't continue
-#define COVERAGE_IGNORE
-            throw boost_exception;
-#undef COVERAGE_IGNORE
+            throw boost_exception; // LCOV_EXCL_LINE
         }
     }
 
@@ -172,13 +170,13 @@ ArchiveOpener<boost::archive::text_oarchive, std::ofstream>::ArchiveOpener(
 #else
         mpCommonStream = new std::ofstream("/dev/null", std::ios::binary | std::ios::trunc);
 #endif
-        #define COVERAGE_IGNORE
+        // LCOV_EXCL_START
         if (!mpCommonStream->is_open())
         {
             delete mpCommonStream;
             EXCEPTION("Failed to open dummy archive file '/dev/null' for writing");
         }
-        #undef COVERAGE_IGNORE
+        // LCOV_EXCL_STOP
     }
     mpCommonArchive = new boost::archive::text_oarchive(*mpCommonStream);
 

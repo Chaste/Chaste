@@ -34,9 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "AbstractOdeBasedPhaseBasedCellCycleModel.hpp"
-#include <iostream>
-#include <cassert>
-#include "Exception.hpp"
 
 AbstractOdeBasedPhaseBasedCellCycleModel::AbstractOdeBasedPhaseBasedCellCycleModel(double lastTime,
                                                                boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
@@ -111,11 +108,11 @@ void AbstractOdeBasedPhaseBasedCellCycleModel::UpdateCellCyclePhase()
             {
                 if (mpOdeSystem->rGetStateVariables()[i] < -DBL_EPSILON)
                 {
-                    #define COVERAGE_IGNORE
+                    // LCOV_EXCL_START
                     EXCEPTION("A protein concentration " << i << " has gone negative (" <<
                               mpOdeSystem->rGetStateVariables()[i] << ")\n"
                               << "Chaste predicts that the CellCycleModel numerical method is probably unstable.");
-                    #undef COVERAGE_IGNORE
+                    // LCOV_EXCL_STOP
                 }
             }
 

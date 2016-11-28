@@ -262,7 +262,8 @@ HeartRegionType HeartGeometryInformation<SPACE_DIM>::GetHeartRegion(unsigned nod
         }
     }
 
-    return UNKNOWN;
+    NEVER_REACHED;
+    return UNKNOWN; // LCOV_EXCL_LINE
 }
 
 template<unsigned SPACE_DIM>
@@ -293,7 +294,7 @@ double HeartGeometryInformation<SPACE_DIM>::GetDistanceToEndo(unsigned nodeIndex
                 break;
 
             case UNKNOWN:
-                #define COVERAGE_IGNORE
+                // LCOV_EXCL_START
                 std::cerr << "Wrong distances node: " << nodeIndex << "\t"
                           << "Epi " << mDistMapEpicardium[nodeIndex] << "\t"
                           << "RV " << mDistMapRightVentricle[nodeIndex] << "\t"
@@ -303,7 +304,7 @@ double HeartGeometryInformation<SPACE_DIM>::GetDistanceToEndo(unsigned nodeIndex
                 // Make wall_thickness=0 as in Martin's code
                 return 0.0;
                 break;
-                #undef COVERAGE_IGNORE
+                // LCOV_EXCL_STOP
 
             default:
                 NEVER_REACHED;
@@ -317,7 +318,7 @@ double HeartGeometryInformation<SPACE_DIM>::GetDistanceToEndo(unsigned nodeIndex
 
     // gcc wants to see a return statement at the end of the method.
     NEVER_REACHED;
-    return 0.0;
+    return 0.0; // LCOV_EXCL_LINE
 }
 
 template<unsigned SPACE_DIM>

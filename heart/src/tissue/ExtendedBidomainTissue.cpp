@@ -82,9 +82,9 @@ ExtendedBidomainTissue<SPACE_DIM>::ExtendedBidomainTissue(AbstractCardiacCellFac
                                                      this->mpDistributedVectorFactory->GetLow(),
                                                      this->mpDistributedVectorFactory->GetHigh());
     }
+    // LCOV_EXCL_START //don't really know how to cover this...
     catch (const Exception& e)
     {
-#define COVERAGE_IGNORE //don't really know how to cover this...
         // Errors thrown creating cells will often be process-specific
         PetscTools::ReplicateException(true);
         // Should really do this for other processes too, but this is all we need
@@ -97,8 +97,8 @@ ExtendedBidomainTissue<SPACE_DIM>::ExtendedBidomainTissue(AbstractCardiacCellFac
             delete (*cell_iterator);
         }
         throw e;
-#undef COVERAGE_IGNORE
     }
+    // LCOV_EXCL_STOP
     PetscTools::ReplicateException(false);
 
     HeartEventHandler::BeginEvent(HeartEventHandler::COMMUNICATION);
@@ -179,13 +179,14 @@ void ExtendedBidomainTissue<SPACE_DIM>::CreateGGapConductivities()
             }
         }
     }
+    // LCOV_EXCL_START
     catch (const Exception& e)
     {
-#define COVERAGE_IGNORE
         PetscTools::ReplicateException(true);
         throw e;
-#undef COVERAGE_IGNORE
     }
+    // LCOV_EXCL_STOP
+
     PetscTools::ReplicateException(false);
 }
 
@@ -247,14 +248,16 @@ void ExtendedBidomainTissue<SPACE_DIM>::CreateIntracellularConductivityTensorSec
             assert(hetero_intra_conductivities.size()==0);
             hetero_intra_conductivities.resize(num_elements, intra_conductivities);
         }
+        // LCOV_EXCL_START
         catch(std::bad_alloc &badAlloc)
         {
-#define COVERAGE_IGNORE
+
             std::cout << "Failed to allocate std::vector of size " << num_elements << std::endl;
             PetscTools::ReplicateException(true);
             throw badAlloc;
-#undef COVERAGE_IGNORE
         }
+        // LCOV_EXCL_STOP
+
         PetscTools::ReplicateException(false);
 
         std::vector<boost::shared_ptr<AbstractChasteRegion<SPACE_DIM> > > conductivities_heterogeneity_areas;
@@ -382,14 +385,15 @@ void ExtendedBidomainTissue<SPACE_DIM>::CreateExtracellularConductivityTensors()
             //initialise with the values of teh default conductivity tensor
             hetero_extra_conductivities.resize(num_elements, extra_conductivities);
         }
+        // LCOV_EXCL_START
         catch(std::bad_alloc &badAlloc)
         {
-#define COVERAGE_IGNORE
             std::cout << "Failed to allocate std::vector of size " << num_elements << std::endl;
             PetscTools::ReplicateException(true);
             throw badAlloc;
-#undef COVERAGE_IGNORE
         }
+        // LCOV_EXCL_STOP
+
         PetscTools::ReplicateException(false);
 
         std::vector<boost::shared_ptr<AbstractChasteRegion<SPACE_DIM> > > conductivities_heterogeneity_areas;
@@ -532,13 +536,13 @@ void ExtendedBidomainTissue<SPACE_DIM>::SolveCellSystems(Vec existingSolution, d
             this->mCellsDistributed[index.Local]->ComputeExceptVoltage(time, nextTime);
             mCellsDistributedSecondCell[index.Local]->ComputeExceptVoltage(time, nextTime);
         }
+        // LCOV_EXCL_START
         catch (Exception &e)
         {
-#define COVERAGE_IGNORE
             PetscTools::ReplicateException(true);
             throw e;
-#undef COVERAGE_IGNORE
         }
+        // LCOV_EXCL_STOP
 
         // update the Iionic and stimulus caches
         this->UpdateCaches(index.Global, index.Local, nextTime);//in parent class

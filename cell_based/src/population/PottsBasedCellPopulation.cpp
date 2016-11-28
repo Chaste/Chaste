@@ -34,11 +34,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "PottsBasedCellPopulation.hpp"
-#include "MutableMesh.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "AbstractPottsUpdateRule.hpp"
 #include "NodesOnlyMesh.hpp"
-#include "Exception.hpp"
 #include "CellPopulationElementWriter.hpp"
 #include "CellIdWriter.hpp"
 
@@ -755,12 +753,6 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDi
         outline_mesh_writer.WriteFilesUsingMesh(cell_outline_mesh);
     }
 #endif //CHASTE_VTK
-}
-
-template<unsigned DIM>
-void PottsBasedCellPopulation<DIM>::WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile)
-{
-    *pVizSetupFile << "PottsSimulation\n";
 }
 
 template<unsigned DIM>

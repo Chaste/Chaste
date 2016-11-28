@@ -97,7 +97,7 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetNumNodes(), p_mesh->GetNumNodes());
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), location_indices.size());
 
-        ///\todo this doesnt do anything as there aren't any cells!
+        ///\todo this doesn't do anything as there aren't any cells!
         TS_ASSERT_EQUALS(cells.size(), 0u);
         AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
         for (unsigned i=0; i<cells.size(); i++)
@@ -163,7 +163,7 @@ public:
 
         cells_generator.GenerateBasicRandom(cells, 3, p_diff_type);
 
-           // Change the initial cell location to avoid the above exception
+        // Change the initial cell location to avoid the above exception
         location_indices[2] = 1u;
 
         // Test that the correct exception is thrown when we try to create a cell population with validate = true (there is no validation in the case of a CaBasedCellPopulation)
@@ -219,6 +219,10 @@ public:
 
         // Create cell population
         CaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices, 2);
+
+        // Coverage
+        Node<2>* p_node = cell_population.GetNodeCorrespondingToCell(*(cell_population.Begin()));
+        TS_ASSERT_EQUALS(p_node->GetIndex(), 0u);
 
         // Check cells are in the correct location
         TS_ASSERT(cell_population.IsCellAttachedToLocationIndex(0));
@@ -910,6 +914,9 @@ public:
         TS_ASSERT_DELTA(p_tet_mesh->GetNode(3)->rGetLocation()[1], 1.0, 1e-6);
         TS_ASSERT_DELTA(p_tet_mesh->GetNode(7)->rGetLocation()[0], 1.0, 1e-6);
         TS_ASSERT_DELTA(p_tet_mesh->GetNode(7)->rGetLocation()[1], 2.0, 1e-6);
+
+        // Tidy up
+        delete p_tet_mesh;
     }
 };
 

@@ -115,9 +115,9 @@ void ImplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::GetActiveTensionAndT
         p_contraction_model->RunDoNotUpdate(this->mCurrentTime,this->mNextTime,this->mOdeTimestep);
         rActiveTension = p_contraction_model->GetNextActiveTension();
     }
+    // LCOV_EXCL_START
     catch (Exception&)
     {
-        #define COVERAGE_IGNORE
         // if this failed during assembling the Jacobian this is a fatal error.
         if (assembleJacobian)
         {
@@ -129,10 +129,10 @@ void ImplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::GetActiveTensionAndT
         rActiveTension = DBL_MAX;
         std::cout << "WARNING: could not solve contraction model with this stretch and stretch rate. "
                   << "Setting active tension to infinity (DBL_MAX) so that the residual(-norm) is also infinite\n" << std::flush;
-        assert(0); // just to see if we ever get here, can be removed..
+        NEVER_REACHED;
         return;
-        #undef COVERAGE_IGNORE
     }
+    // LCOV_EXCL_STOP
 
     // if assembling the Jacobian, numerically evaluate dTa/dlam & dTa/d(lamdot)
     if (assembleJacobian)

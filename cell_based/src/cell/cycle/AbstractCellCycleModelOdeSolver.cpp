@@ -35,7 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractCellCycleModelOdeSolver.hpp"
 #include "CvodeAdaptor.hpp"
-#include "Exception.hpp"
 
 AbstractCellCycleModelOdeSolver::AbstractCellCycleModelOdeSolver()
     : mSizeOfOdeSystem(UNSIGNED_UNSET)
@@ -43,10 +42,6 @@ AbstractCellCycleModelOdeSolver::AbstractCellCycleModelOdeSolver()
 }
 
 AbstractCellCycleModelOdeSolver::~AbstractCellCycleModelOdeSolver()
-{
-}
-
-void AbstractCellCycleModelOdeSolver::Reset()
 {
 }
 

@@ -198,13 +198,10 @@ std::vector<double> DiscreteSystemForceCalculator::GetSamplingAngles(unsigned in
         double alpha_plus_pi_plus_epsilon = alpha + M_PI + mEpsilon;
 
         // Calculate sampling angles in the range (-pi,pi]
-
-        #define COVERAGE_IGNORE
         if (alpha_minus_epsilon <= -M_PI)
         {
             alpha_minus_epsilon += 2*M_PI;
-        }
-        #undef COVERAGE_IGNORE
+        }        
         sampling_angles[i] = alpha_minus_epsilon;
 
         assert(sampling_angles[i] <= M_PI);
@@ -327,4 +324,9 @@ std::vector<double> DiscreteSystemForceCalculator::GetExtremalAngles(unsigned in
     }
 
     return extremal_angles;
+}
+
+void DiscreteSystemForceCalculator::SetEpsilon(double epsilon)
+{
+    mEpsilon = epsilon;
 }

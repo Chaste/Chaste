@@ -479,7 +479,7 @@ public:
         // Create a cell population
         NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
 
-        unsigned num_removed;
+        unsigned num_removed = 0;
 
         if (PetscTools::AmMaster())
         {
@@ -1589,6 +1589,9 @@ public:
         TS_ASSERT_DELTA(p_tet_mesh->GetNode(1)->rGetLocation()[1], 0.0, 1e-6);
         TS_ASSERT_DELTA(p_tet_mesh->GetNode(2)->rGetLocation()[0], 1.0, 1e-6);
         TS_ASSERT_DELTA(p_tet_mesh->GetNode(2)->rGetLocation()[1], 1.0, 1e-6);
+
+        // Tidy up
+        delete p_tet_mesh;
     }
 
     void TestGetCellDataItemAtPdeNode() throw (Exception)
@@ -1613,6 +1616,9 @@ public:
         cell_population.GetCellUsingLocationIndex(0)->GetCellData()->SetItem(var_name, 3.14);
 
         TS_ASSERT_DELTA(cell_population.GetCellDataItemAtPdeNode(0,var_name), 3.14, 1e-6);
+
+        // Coverage of GetOutputResultsForChasteVisualizer()
+        TS_ASSERT_EQUALS(cell_population.GetOutputResultsForChasteVisualizer(), true);
     }
 };
 

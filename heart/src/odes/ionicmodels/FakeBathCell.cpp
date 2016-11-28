@@ -48,11 +48,12 @@ FakeBathCell::~FakeBathCell()
 {
 }
 
-// This method should never be called (it would be a waste of time!)
+// LCOV_EXCL_START  // This method should never be called (it would be a waste of time!)
 void FakeBathCell::EvaluateYDerivatives(double time, const std::vector<double> &rY, std::vector<double> &rDY)
 {
     NEVER_REACHED;
 }
+// LCOV_EXCL_STOP
 
 double FakeBathCell::GetIIonic(const std::vector<double>* pStateVariables)
 {

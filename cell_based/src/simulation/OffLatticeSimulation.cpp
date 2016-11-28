@@ -35,16 +35,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "OffLatticeSimulation.hpp"
 
-#include <cmath>
 #include <boost/make_shared.hpp>
 
 #include "CellBasedEventHandler.hpp"
-#include "LogFile.hpp"
-#include "Version.hpp"
-#include "ExecutableSupport.hpp"
 #include "ForwardEulerNumericalMethod.hpp"
 #include "StepSizeException.hpp"
-#include "SmartPointers.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::OffLatticeSimulation(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation,

@@ -118,7 +118,7 @@ Vec SimplePetscNonlinearSolver::Solve(PetscErrorCode (*pComputeResidual)(SNES,Ve
 
     SNESConvergedReason reason;
     SNESGetConvergedReason(snes,&reason);
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
     if (reason < 0)
     {
         std::stringstream reason_stream;
@@ -128,7 +128,7 @@ Vec SimplePetscNonlinearSolver::Solve(PetscErrorCode (*pComputeResidual)(SNES,Ve
         EXCEPTION("Nonlinear Solver did not converge. PETSc reason code:"
                   +reason_stream.str()+" .");
     }
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
     SNESDestroy(PETSC_DESTROY_PARAM(snes));
 
     return x;

@@ -36,11 +36,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellMutationState.hpp"
 #include "Exception.hpp"
 
+// LCOV_EXCL_START
 AbstractCellMutationState::AbstractCellMutationState()
 {
-    // Subclasses should always call the other constructor.
+    // Subclasses should always call the other constructor
     NEVER_REACHED;
 }
+// LCOV_EXCL_STOP
 
 AbstractCellMutationState::AbstractCellMutationState(unsigned colour)
     : AbstractCellProperty(),

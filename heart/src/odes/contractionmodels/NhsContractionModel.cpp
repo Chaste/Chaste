@@ -155,7 +155,7 @@ void NhsContractionModel::EvaluateYDerivatives(double time,
     const double& Q3 = rY[4];
 
     // check the state vars are in the expected range
-    #define COVERAGE_IGNORE
+    // LCOV_EXCL_START
     if (calcium_troponin < 0)
     {
         EXCEPTION("CalciumTrop concentration went negative");
@@ -168,7 +168,7 @@ void NhsContractionModel::EvaluateYDerivatives(double time,
     {
         EXCEPTION("z became greater than 1");
     }
-    #undef COVERAGE_IGNORE
+    // LCOV_EXCL_STOP
 
 
     double Q = Q1 + Q2 + Q3;

@@ -50,12 +50,9 @@ void AbstractIsotropicCompressibleMaterialLaw<DIM>::ComputeStressAndStressDeriva
 {
     /*
      * This is covered, but gcov doesn't see this as being covered
-     * for some reason, maybe because of optimisations.
+     * because it runs at compile time checking templates I think.
      */
-    #define COVERAGE_IGNORE
-    assert((DIM==2) || (DIM==3));
-    #undef COVERAGE_IGNORE
-
+    assert((DIM==2) || (DIM==3)); // LCOV_EXCL_LINE
     assert(pressure==0.0);
 
     static c_matrix<double,DIM,DIM> identity = identity_matrix<double>(DIM);

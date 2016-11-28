@@ -34,11 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "VertexBasedCellPopulation.hpp"
-#include <boost/foreach.hpp>
-#include "VertexMeshWriter.hpp"
 #include "Warnings.hpp"
-#include "ChasteSyscalls.hpp"
-#include "IsNan.hpp"
 #include "ShortAxisVertexBasedDivisionRule.hpp"
 #include "StepSizeException.hpp"
 #include "WildTypeCellMutationState.hpp"
@@ -591,7 +587,7 @@ template<unsigned DIM>
 TetrahedralMesh<DIM, DIM>* VertexBasedCellPopulation<DIM>::GetTetrahedralMeshForPdeModifier()
 {
     // This method only works in 2D sequential
-    assert(DIM == 2);
+    assert(DIM == 2);						// LCOV_EXCL_LINE - disappears at compile time.
     assert(PetscTools::IsSequential());
 
     unsigned num_vertex_nodes = mpMutableVertexMesh->GetNumNodes();

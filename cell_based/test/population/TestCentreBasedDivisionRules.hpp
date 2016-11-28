@@ -147,7 +147,8 @@ public:
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
 
         CellPtr p_cell0 = cell_population.GetCellUsingLocationIndex(0);
-        c_vector<double, 2> expected_parent_location = cell_population.GetLocationOfCellCentre(p_cell0);
+        c_vector<double, 2> expected_parent_location;
+        expected_parent_location = cell_population.GetLocationOfCellCentre(p_cell0);
 
         c_vector<double, 2> expected_daughter_location;
         expected_daughter_location[0] = 1.2;
@@ -168,11 +169,13 @@ public:
         // Check that the division rule returns the correct pair of vectors
         std::pair<c_vector<double, 2>, c_vector<double, 2> > positions = p_division_rule->CalculateCellDivisionVector(p_cell0, cell_population);
 
-        c_vector<double, 2> parent_location = positions.first;
+        c_vector<double, 2> parent_location;
+        parent_location = positions.first;
         TS_ASSERT_DELTA(parent_location[0], expected_parent_location[0], 1e-6);
         TS_ASSERT_DELTA(parent_location[1], expected_parent_location[1], 1e-6);
 
-        c_vector<double, 2> daughter_location = positions.second;
+        c_vector<double, 2> daughter_location;
+        daughter_location = positions.second;
         TS_ASSERT_DELTA(daughter_location[0], expected_daughter_location[0], 1e-6);
         TS_ASSERT_DELTA(daughter_location[1], expected_daughter_location[1], 1e-6);
     }
@@ -233,7 +236,8 @@ public:
             typedef FixedCentreBasedDivisionRule<2,2> FixedRule;
             TS_ASSERT(dynamic_cast<FixedRule*>(p_division_rule.get()));
 
-            c_vector<double, 2> location = (dynamic_cast<FixedRule*>(p_division_rule.get()))->rGetDaughterLocation();
+            c_vector<double, 2> location;
+            location = (dynamic_cast<FixedRule*>(p_division_rule.get()))->rGetDaughterLocation();
             TS_ASSERT_DELTA(location[0], -0.73, 1e-6);
             TS_ASSERT_DELTA(location[1], 5.82, 1e-6);
         }

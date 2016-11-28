@@ -81,12 +81,13 @@ public:
     virtual unsigned GetNumberOfAcini();
 
     /**
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
      * @param time The current time in seconds
      * @param pNode Pointer to node object.
      * @return The pleural pressure at the given node at the given time
      */
-    virtual double GetPleuralPressureForNode(double time, Node<3>* pNode);
+    virtual double GetPleuralPressureForNode(double time, Node<3>* pNode)=0;
 
     /**
      * Default constructor.
