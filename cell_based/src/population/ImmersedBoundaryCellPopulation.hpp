@@ -90,6 +90,9 @@ private:
     /** Whether the simulation has active fluid sources */
     bool mPopulationHasActiveSources;
 
+    /** Whether to output node regions to VTK */
+    bool mOutputNodeRegionToVtk;
+
     /** The distance over which cell-cell interactions occur */
     double mInteractionDistance;
 

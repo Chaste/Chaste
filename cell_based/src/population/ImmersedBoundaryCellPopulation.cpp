@@ -50,6 +50,7 @@ ImmersedBoundaryCellPopulation<DIM>::ImmersedBoundaryCellPopulation(ImmersedBoun
           mDeleteMesh(deleteMesh),
           mIntrinsicSpacing(0.01),
           mPopulationHasActiveSources(false),
+          mOutputNodeRegionToVtk(false),
           mReMeshFrequency(UINT_MAX)
 {
     mpImmersedBoundaryMesh = static_cast<ImmersedBoundaryMesh<DIM, DIM>*>(&(this->mrMesh));
@@ -623,6 +624,19 @@ void ImmersedBoundaryCellPopulation<DIM>::WriteVtkResultsToFile(const std::strin
     for (unsigned var = 0; var < num_cell_data_items; var++)
     {
         mesh_writer.AddCellData(cell_data_names[var], cell_data[var]);
+    }
+
+    // Write node regions
+    if (mOutputNodeRegionToVtk)
+    {
+        std::vector<double> node_regions;
+        for (typename ImmersedBoundaryMesh<DIM, DIM>::NodeIterator node_iter = mpImmersedBoundaryMesh->GetNodeIteratorBegin();
+             node_iter != mpImmersedBoundaryMesh->GetNodeIteratorEnd();
+             ++node_iter)
+        {
+            node_regions.push_back(static_cast<double>(node_iter->GetRegion()));
+        }
+        mesh_writer.AddPointData("Node Regions", node_regions);
     }
 
     unsigned num_timesteps = SimulationTime::Instance()->GetTimeStepsElapsed();
