@@ -642,7 +642,6 @@ public:
         TS_ASSERT_EQUALS(new_element_index, 0u);
     }
 
-
     void TestDivideVertexElementAbove() throw(Exception)
     {
         // Make four nodes
