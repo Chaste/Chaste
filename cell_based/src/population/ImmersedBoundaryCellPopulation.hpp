@@ -483,8 +483,17 @@ public:
 
     /**
      * Set whether the population has active sources
+     *
+     * @param hasActiveSources whether the population has active sources
      */
     void SetIfPopulationHasActiveSources(bool hasActiveSources);
+
+    /**
+     * Set whether to output node regions to vtk
+     *
+     * @param outputNodeRegionsToVtk whether to output node regions to vtk
+     */
+    void SetOutputNodeRegionToVtk(bool outputNodeRegionsToVtk);
 
     /**
      * Checks whether a given node displacement violates the movement threshold

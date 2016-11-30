@@ -941,6 +941,12 @@ void ImmersedBoundaryCellPopulation<DIM>::SetIfPopulationHasActiveSources(bool h
 }
 
 template <unsigned DIM>
+void ImmersedBoundaryCellPopulation<DIM>::SetOutputNodeRegionToVtk(bool outputNodeRegionsToVtk)
+{
+    mOutputNodeRegionToVtk = outputNodeRegionsToVtk;
+}
+
+template <unsigned DIM>
 double ImmersedBoundaryCellPopulation<DIM>::GetDefaultTimeStep()
 {
     return 0.002;
