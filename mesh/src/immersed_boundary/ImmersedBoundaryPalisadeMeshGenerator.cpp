@@ -52,7 +52,7 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
     assert(numNodesPerCell > 3);
     assert(ellipseExponent > 0.0);
     assert(cellAspectRatio > 0.0); // aspect ratio is cell height / cell width
-    assert(fabs(randomYMult < 2.0));
+    assert(fabs(randomYMult) < 2.0);
 
     // Helper vectors
     unit_vector<double> x_unit(2,0);
