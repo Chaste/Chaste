@@ -307,7 +307,7 @@ void VertexElement<ELEMENT_DIM, SPACE_DIM>::MonolayerElementRearrangeFacesNodes(
         }
     }
     // sanity check
-    ///\todo make sure the non -1 in stored_indices form a cycle
+    ///\todo #2850 make sure the non -1 in stored_indices form a cycle
 
     // then check and rearrange faces if necessary
     bool is_faces_in_order = true;
@@ -336,6 +336,7 @@ void VertexElement<ELEMENT_DIM, SPACE_DIM>::MonolayerElementRearrangeFacesNodes(
             mOrientations[lateral_face_index+2] = tmp_lateral_orientations[lateral_face_index];
         }
     }
+    ///\todo #2850 redo mOrientation
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
