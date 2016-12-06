@@ -41,8 +41,8 @@ ImmersedBoundaryMembraneElasticityForce<DIM>::ImmersedBoundaryMembraneElasticity
       mpMesh(NULL),
       mSpringConstant(1e6),
       mRestLengthMultiplier(0.5),
-      mBasementSpringConstantModifier(5.0),
-      mBasementRestLengthModifier(0.5)
+      mBasementSpringConstantModifier(1.0),
+      mBasementRestLengthModifier(1.0)
 {
 }
 
