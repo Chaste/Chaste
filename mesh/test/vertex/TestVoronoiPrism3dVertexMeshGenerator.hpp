@@ -39,6 +39,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 
 #include "VoronoiPrism3dVertexMeshGenerator.hpp"
+#include "HoneycombVertexMeshGenerator.hpp"
+#include "MonolayerVertexMeshGenerator.hpp"
 #include "MutableVertexMesh.hpp"
 #include "PetscSetupAndFinalize.hpp"
 #include "Warnings.hpp"
@@ -47,10 +49,30 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //a shortcut for the lazy me
 #define RESEED RandomNumberGenerator* p_rand_gen = RandomNumberGenerator::Instance();p_rand_gen->Reseed(0);
 
+#include "MonolayerVertexMeshCustomFunctions.hpp"
 
 class TestVoronoiPrism3dVertexMeshGenerator : public CxxTest::TestSuite
 {
 public:
+
+    void TestCylindricalMesh() throw(Exception)
+    {
+        const unsigned x = 4;
+        const unsigned y = 3;
+        const double a = 2;
+        const double length = 3*sqrt(3)*y+sqrt(3);
+        const double radius = a/M_PI/2*x;
+        HoneycombVertexMeshGenerator generator(x, y, false, 0.1, 0.01, 2*sqrt(3));
+        MutableVertexMesh<2, 2>& vertex_2mesh = *(generator.GetMesh());
+        MonolayerVertexMeshGenerator builder("Cylinder");
+        builder.MakeMeshUsing2dMesh(vertex_2mesh);
+        builder.WriteVtk("TestVoronoiPrism3dVertexMesh", "Initial");
+        builder.PrintMesh();
+
+        builder.ConvertMeshToCylinder(2*x, 1, radius, 1, 1);
+        builder.WriteVtk("TestVoronoiPrism3dVertexMesh", "After");
+        builder.PrintMesh();
+    }
 
     void TestSimplestMeshForRelaxation() throw(Exception)
     {

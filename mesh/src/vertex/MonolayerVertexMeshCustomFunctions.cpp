@@ -70,7 +70,7 @@ std::set<unsigned> GetSharedElements(const Node<3>* pNodeA, const Node<3>* pNode
  */
 bool IsFaceOnBoundary(VertexElement<2, 3>* pFace)
 {
-    assert(IsLateralFace(pFace));     // LCOV_EXCL_LINE
+//    assert(IsLateralFace(pFace));     // LCOV_EXCL_LINE
     bool is_element_on_boundary = true;
     for (unsigned i=0; i<pFace->GetNumNodes(); ++i)
     {
@@ -203,27 +203,18 @@ unsigned MonolayerGetNumNodes(const VertexElement<3, 3>* pElement)
     unsigned num_nodes = pElement->GetNumNodes();
     assert(num_nodes%2 == 0);   // LCOV_EXCL_LINE
     num_nodes /= 2;
-    assert(num_nodes == GetApicalFace(pElement)->GetNumNodes);  // LCOV_EXCL_LINE
-    assert(num_nodes == GetBasalFace(pElement)->GetNumNodes);  // LCOV_EXCL_LINE
+    assert(num_nodes == GetApicalFace(pElement)->GetNumNodes());  // LCOV_EXCL_LINE
+    assert(num_nodes == GetBasalFace(pElement)->GetNumNodes());  // LCOV_EXCL_LINE
     return num_nodes;
 }
 
-/**
- * Get the lateral face that is contained by this element and contains the two
- * given nodes. pElement is required as node only contains the index, but not the
- * pointer of the elements.
- *
- * @param pElement
- * @param nodeIndexA
- * @param nodeIndexB
- * @return
- */
 std::vector<unsigned> GetLateralFace(const VertexElement<3, 3>* pElement, const unsigned nodeIndexA, const unsigned nodeIndexB)
 {
     std::vector<unsigned> return_vector;
     for (unsigned face_local_index=2; face_local_index<pElement->GetNumFaces(); ++face_local_index)
     {
         VertexElement<2, 3>* p_tmp_face = pElement->GetFace(face_local_index);
+
         if (ElementHasNode(p_tmp_face, nodeIndexA) && ElementHasNode(p_tmp_face, nodeIndexB))
         {
             return_vector.push_back(p_tmp_face->GetIndex());
@@ -232,18 +223,15 @@ std::vector<unsigned> GetLateralFace(const VertexElement<3, 3>* pElement, const 
             break;
         }
     }
-    assert(return_vector.size()==3);    // LCOV_EXCL_LINE
+
+    if (return_vector.size() == 0)
+    {
+        return_vector.push_back(UINT_MAX);
+    }
+    else
+    {
+        assert(return_vector.size() == 3);  // LCOV_EXCL_LINE
+    }
     return return_vector;
 }
-
-
-
-
-
-
-/// === some implementations that need the declaration
-
-
-
-
 

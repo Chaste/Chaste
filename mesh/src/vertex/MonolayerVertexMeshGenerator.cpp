@@ -34,7 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "MonolayerVertexMeshGenerator.hpp"
-
+#include "MonolayerVertexMeshCustomFunctions.hpp"
 #include <algorithm>
 
 MonolayerVertexMeshGenerator::MonolayerVertexMeshGenerator(const std::string& name)
@@ -236,6 +236,205 @@ MutableVertexMesh<3, 3>* MonolayerVertexMeshGenerator::GenerateMesh()
     return mpMesh;
 }
 
+MutableVertexMesh<3, 3>* MonolayerVertexMeshGenerator::ConvertMeshToCylinder(const double widthX,
+        const double widthY, const double radius, const double thickness, const double length)
+{
+    const double mTol = 1e-6;
+    // normal mesh should already exist before call of this function.
+    if (mpMesh == NULL)
+    {
+        EXCEPTION("No mesh available. Please generate flat mesh before using this function.");
+    }
+
+    /**
+     * Outline:
+     * I    first find the (boundary) nodes which are located along the 'glue' line.
+     *      Replace nodes and mark one as deleted.
+     * II   Update the (boundary) faces along the 'glue' line and delete the faces as well.
+     * III  Convert the coordinates to 'pseudo'-cylindrical and update their new coordinates.
+     */
+
+    // Operation I
+    std::vector<Node<3>*> boundary_nodes;
+    for (unsigned node_index=0; node_index<mpMesh->GetNumAllNodes(); ++node_index)
+    {
+        Node<3>* node_tmp = mpMesh->GetNode(node_index);
+        if (!node_tmp->IsBoundaryNode())
+        {
+            continue;
+        }
+        else
+        {
+            boundary_nodes.push_back(node_tmp);
+        }
+    }
+
+    // Store the nodes and faces on the go, but mark them as deleted only after all modifications
+    // are completed as otherwise we might not be able to call the nodes from the mesh due to node mapping.
+    std::vector<Node<3>*> deleted_nodes;
+    std::vector<Node<3>*> glued_nodes;
+    std::vector<VertexElement<2, 3>*> deleted_faces;
+
+    // Iterate over the boundary nodes and find the pair of congruent nodes.
+    for (unsigned index_a=0; index_a<boundary_nodes.size(); ++index_a)
+    {
+        Node<3>* node_a = boundary_nodes[index_a];
+        // Skip over identified nodes for efficiency
+        if (node_a == NULL)
+        {
+            continue;
+        }
+        const c_vector<double, 3> location_a = node_a->rGetLocation();
+
+        for (unsigned index_b=index_a+1; index_b<boundary_nodes.size(); ++index_b)
+        {
+            Node<3>* node_b = boundary_nodes[index_b];
+            if (node_b == NULL)
+            {
+                continue;
+            }
+            const c_vector<double, 3> location_b = node_b->rGetLocation();
+            // Avoid warning on -Wmaybe-uninitialized
+            c_vector<double, 3> a_to_b;
+            a_to_b = location_b - location_a;
+
+            // as they are double precision floating number, their absolute values are compared
+            if (abs(abs(a_to_b[0]) - widthX)<mTol && abs(a_to_b[1])<mTol && abs(a_to_b[2])<mTol)
+            {
+                // for simplicity just delete the node b
+                boundary_nodes[index_a] = NULL;
+                boundary_nodes[index_b] = NULL;
+                glued_nodes.push_back(node_a);
+                deleted_nodes.push_back(node_b);
+
+                const std::set<unsigned> elements_of_b = node_b->rGetContainingElementIndices();
+                for (std::set<unsigned>::iterator it=elements_of_b.begin(); it!=elements_of_b.end(); ++it)
+                {
+                    VertexElement<3, 3>* elem_tmp = mpMesh->GetElement(*it);
+                    elem_tmp->ReplaceNode(node_b, node_a);
+                }
+
+                // Break the loop as the congruent node is found.
+                break;
+            }
+        }
+    }
+
+    // Operation II
+    std::vector<VertexElement<2, 3>*> boundary_faces;
+    std::vector<std::set<unsigned> > nodes_for_boundary_face;
+    for (unsigned face_index=0; face_index<mpMesh->GetNumFaces(); ++face_index)
+    {
+        VertexElement<2, 3>* face_tmp = mpMesh->GetFace(face_index);
+        if (!IsLateralFace(face_tmp) || !IsFaceOnBoundary(face_tmp))
+        {
+            continue;
+        }
+        else
+        {
+            assert(face_tmp->GetNumNodes()==4u);
+            std::set<unsigned> tmp_set;
+            // save only the basal nodes
+            for (unsigned i=0; i<2u; ++i)
+            {
+                tmp_set.insert(face_tmp->GetNodeGlobalIndex(i));
+            }
+            boundary_faces.push_back(face_tmp);
+            nodes_for_boundary_face.push_back(tmp_set);
+        }
+    }
+
+    for (unsigned index_a=0; index_a<boundary_faces.size(); ++index_a)
+    {
+        VertexElement<2, 3>* p_face_a = boundary_faces[index_a];
+        if (p_face_a == NULL)
+        {
+            continue;
+        }
+
+        for (unsigned index_b=index_a+1; index_b<boundary_faces.size(); ++index_b)
+        {
+            if (boundary_faces[index_b] == NULL)
+            {
+                continue;
+            }
+
+            VertexElement<2, 3>* p_face_b = boundary_faces[index_b];
+
+            if (nodes_for_boundary_face[index_a] == nodes_for_boundary_face[index_b])
+            {
+                boundary_faces[index_a] = NULL;
+                boundary_faces[index_b] = NULL;
+                deleted_faces.push_back(p_face_b);
+
+                std::set<unsigned> elem_a_index = p_face_a->rGetContainingElementIndices();
+                assert(elem_a_index.size() == 1);
+                VertexElement<3, 3>* p_elem_a = mpMesh->GetElement(*elem_a_index.begin());
+                ///\todo: #2850 get face orientation
+                std::vector<unsigned> v_tmp = GetLateralFace(p_elem_a, p_face_a->GetNodeGlobalIndex(0), p_face_a->GetNodeGlobalIndex(1));
+                assert(v_tmp[0] != UINT_MAX);
+                const bool face_orientation_a = v_tmp[1];
+
+                std::set<unsigned> elem_b_index = p_face_b->rGetContainingElementIndices();
+                assert(elem_b_index.size() == 1);
+                VertexElement<3, 3>* p_elem_b = mpMesh->GetElement(*elem_b_index.begin());
+                v_tmp = GetLateralFace(p_elem_b, p_face_b->GetNodeGlobalIndex(0), p_face_b->GetNodeGlobalIndex(1));
+                assert(v_tmp[0] == p_face_b->GetIndex());
+                const unsigned index_tmp = v_tmp[2];
+
+                p_elem_b->ReplaceFace(index_tmp, p_face_a, !face_orientation_a);
+                p_elem_b->MonolayerElementRearrangeFacesNodes();
+                //MARK
+                // Break the loop as the congruent node is found.
+                break;
+            }
+        }
+    }
+
+    for (unsigned ind=0; ind<glued_nodes.size(); ++ind)
+    {
+        // Since it is still during its creation, there should be no higher order junctions
+        if (glued_nodes[ind]->GetNumContainingElements() > 2)
+        {
+            glued_nodes[ind]->SetAsBoundaryNode(false);
+        }
+    }
+
+    for (unsigned ind=0; ind<deleted_nodes.size(); ++ind)
+    {
+        mpMesh->DeleteNodePriorToReMesh(deleted_nodes[ind]->GetIndex());
+    }
+
+    for (unsigned ind=0; ind<deleted_faces.size(); ++ind)
+    {
+        mpMesh->DeleteFacePriorToReMesh(deleted_faces[ind]->GetIndex());
+    }
+    mpMesh->ReMesh();
+
+    // Operation III
+    assert(mpMesh->GetNumNodes()%2 == 0);   // LCOV_EXCL_LINE
+    const unsigned half_num_nodes = mpMesh->GetNumNodes()/2;
+
+    for (unsigned node_index=0; node_index<half_num_nodes; ++node_index)
+    {
+        Node<3>* basal_node = mpMesh->GetNode(node_index);
+        c_vector<double, 3>& basal_position_ref = basal_node->rGetModifiableLocation();
+        basal_position_ref[1] = length*basal_position_ref[1]/widthY;
+        const double basal_theta = 2*M_PI*basal_position_ref[0]/widthX;
+        basal_position_ref[0] = radius*cos(basal_theta);
+        basal_position_ref[2] = radius*sin(basal_theta);
+
+        Node<3>* apical_node = mpMesh->GetNode(node_index+half_num_nodes);
+        c_vector<double, 3>& apical_position_ref = apical_node->rGetModifiableLocation();
+        apical_position_ref[1] = length*apical_position_ref[1]/widthY;
+        const double apical_theta = apical_position_ref[0]/widthX*2*M_PI;
+        apical_position_ref[0] = (radius+thickness)*cos(apical_theta);
+        apical_position_ref[2] = (radius+thickness)*sin(apical_theta);
+    }
+    return mpMesh;
+}
+
+
 void MonolayerVertexMeshGenerator::ClearStoredMeshObjects()
 {
     mBasalNodes.clear();
@@ -319,7 +518,15 @@ void MonolayerVertexMeshGenerator::PrintMesh(const bool printDeletedObjects) con
     {
         VertexElement<2, 3>& face = *(mpMesh->GetFace(i));
         std::cout << "FACE (" << i<< ") : " << face.GetIndex() << (face.IsDeleted()?" (DELETED)": "") << std::endl;
-        std::cout << TAB << "Face Attribute : " << face.rGetElementAttributes()[0] << (face.IsElementOnBoundary()?" (BOUNDARY)": "") << std::endl;
+        std::cout << TAB << "Face Attribute : " << face.rGetElementAttributes()[0] << (IsFaceOnBoundary(&face)?" (BOUNDARY)": "") << std::endl;
+
+        std::set<unsigned> set_tmp = face.rGetContainingElementIndices();
+        std::cout << TAB << "number of Elements : " << set_tmp.size() << " {  ";
+        for (std::set<unsigned>::iterator it=set_tmp.begin(); it != set_tmp.end(); ++it)
+        {
+            std::cout << *it << "  ";
+        }
+        std::cout << "}" << std::endl;
 
         std::cout << TAB << "number of Nodes : " << face.GetNumNodes() << " {  ";
         for (unsigned j=0; j<face.GetNumNodes(); ++j)

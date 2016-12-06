@@ -69,6 +69,11 @@ private:
      */
     std::vector<bool> mOrientations;
 
+    /**
+     * Set of indices of elements containing this face.
+     */
+    std::set<unsigned> mContainingElementIndices;
+
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
@@ -166,6 +171,20 @@ public:
     void AddFace(VertexElement<ELEMENT_DIM-1, SPACE_DIM>* pFace);
 
     /**
+     * Delete a face of an element with given local index. This method will
+     * remove the corresponding face orientation as well.
+     *
+     * @param rIndex is the local index of the face to remove
+     */
+    void DeleteFace(const unsigned& rIndex);
+
+    /**
+     * Replace old face with the new face and its orientation
+     */
+    void ReplaceFace(const unsigned oldFaceLocalIndex, VertexElement<SPACE_DIM-1, ELEMENT_DIM>* pNewFace,
+                     const bool newFaceOrientation);
+
+    /**
      * @param index the global index of a specified face
      *
      * @return a pointer to the face
@@ -232,14 +251,6 @@ public:
     void FaceAddNode(Node<SPACE_DIM>* pNode, const unsigned Index);
 
     /**
-     * Delete a face of an element with given local index. This method will
-     * remove the corresponding face orientation as well.
-     *
-     * @param rIndex is the local index of the face to remove
-     */
-    void DeleteFace(const unsigned& rIndex);
-
-    /**
      * Mark a face as having been removed from the mesh.
      * Doesn't notify nodes and element that it has been removed.
      */
@@ -253,7 +264,7 @@ public:
      * @param Orientation is the orientation of pFace
      * @param rIndex is the local index of the face to add
      */
-    void AddFace(VertexElement<ELEMENT_DIM-1, SPACE_DIM>* pFace, bool& Orientation,const unsigned& rIndex);
+    void AddFace(VertexElement<ELEMENT_DIM-1, SPACE_DIM>* pFace, bool Orientation,const unsigned& rIndex);
 
     /**
      * Compute the centroid of an element. Exact same function as VertexMesh::GetCentroidOfElement(const unsigned&)
@@ -262,6 +273,23 @@ public:
      * @return centroid of the VertexElement.
      */
     c_vector<double, SPACE_DIM> GetCentroid() const;
+
+    /**
+     *  @return the number of elements in the mesh that contain this face.
+     */
+    unsigned GetNumContainingElements() const;
+
+    /**
+     * @return a set of indices of elements containing this face.
+     */
+    std::set<unsigned>& rGetContainingElementIndices();
+
+    /**
+     * face will add element index into its registry.
+     * @param elementIndex  the index of the element
+     */
+    void RegisterElement(const unsigned elementIndex);
+
 };
 
 
@@ -320,6 +348,8 @@ public:
      */
     void FaceUpdateNode(const unsigned& rIndex, Node<SPACE_DIM>* pNode) {NEVER_REACHED;}
     void MonolayerElementRearrangeFacesNodes() {NEVER_REACHED;}
+    std::set<unsigned>& rGetContainingElementIndices() {NEVER_REACHED;}
+    void MarkFaceAsDeleted() {NEVER_REACHED;}
 };
 
 #endif /*VERTEXELEMENT_HPP_*/

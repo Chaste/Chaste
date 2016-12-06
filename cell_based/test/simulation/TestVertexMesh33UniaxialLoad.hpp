@@ -52,6 +52,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "FakePetscSetup.hpp"
 
+#include "Debug.hpp"
 
 class TestVertexMesh33UniaxialLoad : public AbstractCellBasedTestSuite
 {
@@ -134,6 +135,56 @@ public:
         simulator.Solve();
 
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), num_cells_x*num_cells_y);
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
+    }
+
+    void TestCheckForceCalculation()
+    {
+        const unsigned x = 4;
+        const unsigned y = 5;
+        const double a = 2;
+        const double length = 3*sqrt(3)*y+sqrt(3);
+        const double radius = a/M_PI/2*x;
+        HoneycombVertexMeshGenerator generator(x, y, false, 0.1, 0.01, 2*sqrt(3));
+        MutableVertexMesh<2, 2>& vertex_2mesh = *(generator.GetMesh());
+        MonolayerVertexMeshGenerator builder;
+        MutableVertexMesh<3, 3>* p_mesh = builder.MakeMeshUsing2dMesh(vertex_2mesh);
+        std::string output_filename = "TestUniaxialLoad/CylinderTest_CheckForce" + boost::lexical_cast<std::string>(x)
+                                                                    + "x" + boost::lexical_cast<std::string>(y);
+        builder.WriteVtk(output_filename, "InitialMesh");
+
+        builder.ConvertMeshToCylinder(2*x, 1, radius, 0.5, 1);
+        builder.WriteVtk(output_filename, "After");
+PRINT_VECTOR(p_mesh->GetNode(0)->rGetLocation())
+PRINT_VECTOR(p_mesh->GetNode(48)->rGetLocation())
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<NoCellCycleModel, 3> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
+        VertexBasedCellPopulation<3> cell_population(*p_mesh, cells);
+
+        OffLatticeSimulation<3> simulator(cell_population);
+        simulator.SetOutputDirectory(output_filename);
+        simulator.SetSamplingTimestepMultiple(1);
+        simulator.SetEndTime(1);
+
+        MAKE_PTR(GeneralMonolayerVertexMeshForce, p_force3);
+        p_force3->SetApicalParameters(20, 20, 0.7);
+        p_force3->SetBasalParameters(20, 20, 0.7);
+        p_force3->SetLateralParameter(20);
+        p_force3->SetVolumeParameters(350, 3);
+        simulator.AddForce(p_force3);
+        MAKE_PTR(HorizontalStretchForce<3>, p_force2);
+        p_force2->SetForceMagnitude(1.0);
+        p_force2->SetRelativeWidth(0.15);
+        //        simulator.AddForce(p_force2);
+
+        simulator.Solve();
+
+PRINT_VECTOR(p_mesh->GetNode(0)->rGetLocation())
+PRINT_VECTOR(p_mesh->GetNode(48)->rGetLocation())
+
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), x*y);
         TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
 };

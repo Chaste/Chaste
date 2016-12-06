@@ -51,6 +51,12 @@ VertexElement<ELEMENT_DIM, SPACE_DIM>::VertexElement(unsigned index,
     // Each face must have an associated orientation
     assert(mFaces.size() == mOrientations.size());
 
+    assert(mContainingElementIndices.size() == 0);
+    for (unsigned face_index=0; face_index<mFaces.size(); ++face_index)
+    {
+        mFaces[face_index]->rGetContainingElementIndices().insert(index);
+    }
+
     if (SPACE_DIM == ELEMENT_DIM)
     {
         // Register element with nodes
@@ -204,7 +210,16 @@ void VertexElement<ELEMENT_DIM, SPACE_DIM>::AddFace(VertexElement<ELEMENT_DIM-1,
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-VertexElement<ELEMENT_DIM-1,  SPACE_DIM>* VertexElement<ELEMENT_DIM, SPACE_DIM>::GetFace(unsigned index) const
+void VertexElement<ELEMENT_DIM, SPACE_DIM>::ReplaceFace(const unsigned oldFaceLocalIndex,
+        VertexElement<SPACE_DIM-1, ELEMENT_DIM>* pNewFace, const bool newFaceOrientation)
+{
+NEVER_REACHED;
+}
+
+
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+VertexElement<ELEMENT_DIM-1, SPACE_DIM>* VertexElement<ELEMENT_DIM, SPACE_DIM>::GetFace(unsigned index) const
 {
     assert(index < mFaces.size());
     return mFaces[index];
@@ -382,6 +397,11 @@ void VertexElement<ELEMENT_DIM, SPACE_DIM>::DeleteFace(const unsigned& rIndex)
 {
     assert(rIndex < this->mFaces.size());
 
+    // Tidy up the registry of the face
+    std::set<unsigned>& tmp_set = this->mFaces[rIndex]->rGetContainingElementIndices();
+    assert(tmp_set.find(this->GetIndex()) != tmp_set.end());
+    tmp_set.erase(tmp_set.find(this->GetIndex()));
+
     // Remove the face and orientation at rIndex (removes face from element)
     this->mFaces.erase(this->mFaces.begin() + rIndex);
     this->mOrientations.erase(this->mOrientations.begin() + rIndex);
@@ -398,16 +418,8 @@ void VertexElement<ELEMENT_DIM, SPACE_DIM>::MarkFaceAsDeleted()
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VertexElement<ELEMENT_DIM, SPACE_DIM>::AddFace(VertexElement<ELEMENT_DIM-1, SPACE_DIM>* pFace,
-                                                    bool& Orientation,const unsigned& rIndex)
-{
-    assert(rIndex < this->mFaces.size());
-
-    // Add pFace to rIndex+1 element of mFaces pushing the others up
-    this->mFaces.insert(this->mFaces.begin() + rIndex+1,  pFace);
-    this->mOrientations.insert(this->mOrientations.begin() +rIndex+1, Orientation);
-
-    assert(mFaces.size() == mOrientations.size());
-}
+                                                    bool Orientation,const unsigned& rIndex)
+{NEVER_REACHED;}
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> VertexElement<ELEMENT_DIM, SPACE_DIM>::GetCentroid() const
@@ -474,6 +486,55 @@ c_vector<double, SPACE_DIM> VertexElement<ELEMENT_DIM, SPACE_DIM>::GetCentroid()
     return centroid;
 }
 
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned VertexElement<ELEMENT_DIM, SPACE_DIM>::GetNumContainingElements() const { NEVER_REACHED; }
+
+template<>
+unsigned VertexElement<2, 3>::GetNumContainingElements() const
+{
+    return mContainingElementIndices.size();
+}
+
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+std::set<unsigned>& VertexElement<ELEMENT_DIM, SPACE_DIM>::rGetContainingElementIndices() { NEVER_REACHED; }
+
+template<>
+std::set<unsigned>& VertexElement<2, 3>::rGetContainingElementIndices()
+{
+    return mContainingElementIndices;
+}
+
+template<>
+void VertexElement<3, 3>::AddFace(VertexElement<2, 3>* pFace, bool Orientation,const unsigned& rIndex)
+{
+    assert(rIndex < this->mFaces.size());
+
+    // Add pFace to rIndex+1 element of mFaces pushing the others up
+    this->mFaces.insert(this->mFaces.begin() + rIndex+1,  pFace);
+    this->mOrientations.insert(this->mOrientations.begin() +rIndex+1, Orientation);
+
+    assert(mFaces.size() == mOrientations.size());
+
+    pFace->rGetContainingElementIndices().insert(this->GetIndex());
+}
+
+template<>
+void VertexElement<3, 3>::ReplaceFace(const unsigned oldFaceLocalIndex,
+        VertexElement<2, 3>* pNewFace, const bool newFaceOrientation)
+{
+    assert(oldFaceLocalIndex < this->mFaces.size());
+
+    this->DeleteFace(oldFaceLocalIndex);
+    this->AddFace(pNewFace, newFaceOrientation, oldFaceLocalIndex-1);
+}
+
+
+
+
+
+
+
 //////////////////////////////////////////////////////////////////////
 //                  Specialization for 1d elements                  //
 //                                                                  //
@@ -513,6 +574,7 @@ c_vector<double, SPACE_DIM> VertexElement<1, SPACE_DIM>::GetCentroid() const
 {
     return 0.5*(this->GetNodeLocation(0) + this->GetNodeLocation(1));
 }
+
 
 // Explicit instantiation
 template class VertexElement<1,1>;

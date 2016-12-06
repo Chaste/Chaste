@@ -156,6 +156,9 @@ public:
      */
     MutableVertexMesh<3, 3>* GenerateMesh();
 
+    MutableVertexMesh<3, 3>* ConvertMeshToCylinder(const double widthX, const double widthY,
+            const double radius, const double thickness, const double length);
+
     /**
      * Clear all mesh objects stored within the class.
      */

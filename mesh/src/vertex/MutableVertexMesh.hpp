@@ -553,6 +553,15 @@ public:
     void DeleteElementPriorToReMesh(unsigned index);
 
     /**
+     * Mark a given face as deleted. Note that this method DOES NOT deal with the
+     * associated elements and nodes and therefore should only be called immediately
+     * prior to a ReMesh() being called.
+     *
+     * @param index The index of the node to delete
+     */
+    void DeleteFacePriorToReMesh(unsigned index);
+
+    /**
      * Mark a given node as deleted. Note that this method DOES NOT deal with the
      * associated elements and therefore should only be called immediately prior
      * to a ReMesh() being called.

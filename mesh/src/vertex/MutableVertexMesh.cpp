@@ -1097,6 +1097,16 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DeleteElementPriorToReMesh(unsig
     mDeletedElementIndices.push_back(index);
 }
 
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DeleteFacePriorToReMesh(unsigned index) {NEVER_REACHED;}
+
+template<>
+void MutableVertexMesh<3, 3>::DeleteFacePriorToReMesh(unsigned index)
+{
+    this->mFaces[index]->MarkFaceAsDeleted();
+    mDeletedFaceIndices.push_back(index);
+}
+
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DeleteNodePriorToReMesh(unsigned index)
@@ -1276,9 +1286,8 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RemoveDeletedNodes()
             }
             else
             {
-
                 const unsigned node_i_type = unsigned(p_node_i->rGetNodeAttributes()[0]);
-                if (ELEMENT_DIM==2 || ( node_i_type == 1u ) )
+                if ( node_i_type == 1u )
                     live_lower_nodes.push_back(p_node_i);
                 else
                 {
@@ -1307,13 +1316,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RemoveDeletedNodes()
 
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RemoveDeletedFaces()
-{
-#define COVERAGE_IGNORE
-        EXCEPTION("Thou shalt not pass! Only 3D elements should have faces");
-#undef COVERAGE_IGNORE
-}
-
+void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RemoveDeletedFaces() {NEVER_REACHED;}
 
 template<>
 void MutableVertexMesh<3, 3>::RemoveDeletedFaces()
