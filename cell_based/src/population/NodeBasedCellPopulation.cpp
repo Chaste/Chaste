@@ -538,7 +538,7 @@ double NodeBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
         double neighbouring_cell_radius = p_node_j->GetRadius();
 
         // If this throws then you may not be considering all cell interactions use a larger cut off length
-        assert(cell_radius+neighbouring_cell_radius<mpNodesOnlyMesh->GetMaximumInteractionDistance());
+        assert(cell_radius+neighbouring_cell_radius <= mpNodesOnlyMesh->GetMaximumInteractionDistance());
 
         // Calculate the distance between the two nodes and add to cell radius
         double separation = norm_2(mpNodesOnlyMesh->GetVectorFromAtoB(r_node_j_location, r_node_i_location));
@@ -560,7 +560,7 @@ double NodeBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
     {
         averaged_cell_radius /= num_cells;
     }
-    assert(averaged_cell_radius < mpNodesOnlyMesh->GetMaximumInteractionDistance()/2.0);
+    assert(averaged_cell_radius <= mpNodesOnlyMesh->GetMaximumInteractionDistance()/2.0);
 
     cell_radius = averaged_cell_radius;
 
