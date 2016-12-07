@@ -51,7 +51,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteSerialization.hpp"
 #include "SerializableSingleton.hpp"
 #include "RandomNumberGenerator.hpp"
-#include <boost/serialization/split_member.hpp>
 
 /**
  * This is a helper class for FixedSequenceCellCycleModel. It comprises a singleton class
@@ -113,6 +112,7 @@ private:
     	archive & mCellCycleTimes;
     	archive & mCurrentIndex;
     	archive & mRate;
+    	archive & mVectorCreated;
     }
 
 protected:
