@@ -45,9 +45,21 @@ class VertexElement;
 
 #include <set>
 #include <vector>
+#include <iostream>
 
 /// ===============================================================
 /// Some function that can be added into trunk and relevant for all
+
+template<typename C>
+void PrintContainer(C container)
+{
+    for (typename C::const_iterator _it = container.begin(); _it!=container.end(); ++_it)
+    {
+        std::cout << *(_it==container.begin()?"{":",") << *_it;
+    }
+    std::cout << "}" << std::endl << std::flush;
+}
+
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool ElementHasNode(const VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement, const unsigned nodeIndex);
 
@@ -111,6 +123,9 @@ unsigned MonolayerGetNumNodes(const VertexElement<3, 3>* pElement);
  */
 std::vector<unsigned> GetLateralFace(const VertexElement<3, 3>* pElement, const unsigned nodeIndexA, const unsigned nodeIndexB);
 
+bool GetFaceOrientation(const VertexElement<3, 3>* pElement, const unsigned faceIndex);
+
+//void AddPairNode(VertexElement<3, 3>* pElement, const unsigned index, Node<3>* pBasalNode, Node<3>* pApicalNode);
 
 
 #endif /* MONOLAYERVERTEXMESHCUSTOMFUNCTIONS_HPP_ */

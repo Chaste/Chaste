@@ -869,12 +869,10 @@ public:
         MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
         builder.WriteVtkWithSubfolder(OUTPUT_NAME,"Before");
 
-
         // Perform a T2 swap on the central triangle element
         VertexElement<3, 3>* p_element_0 = vertex_mesh.GetElement(0);
         c_vector<double, 3> centroid_of_element_0_before_swap = vertex_mesh.GetCentroidOfElement(0);
         vertex_mesh.PerformT2Swap(*p_element_0);
-
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 3u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 8u);
@@ -1184,6 +1182,34 @@ public:
         VertexElementMap map(vertex_mesh.GetNumElements());
         vertex_mesh.RemoveDeletedNodesAndElements(map);
         builder.WriteVtkWithSubfolder(OUTPUT_NAME,"AfterRemove");
+    }
+
+    void TestDivideElement() throw(Exception)
+    {
+        std::vector<Node<3>*> nodes;
+        nodes.push_back(new Node<3>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<3>(1, true, 1.0, 0.0));
+        nodes.push_back(new Node<3>(2, true, 1.0, 1.0));
+        nodes.push_back(new Node<3>(3, true, 0.0, 1.0));
+        nodes.push_back(new Node<3>(4, true, 1.0, 2.0));
+        nodes.push_back(new Node<3>(5, true, 0.0, 2.0));
+
+        const unsigned node_indices_elem_0[4] = {0, 1, 2, 3};
+        const unsigned node_indices_elem_1[4] = {2, 4, 5, 3};
+
+        MonolayerVertexMeshGenerator builder(nodes, "Division");
+        builder.BuildElementWith(4, node_indices_elem_0);
+        builder.BuildElementWith(4, node_indices_elem_1);
+        // A reference variable as mesh is noncopyable
+        MutableVertexMesh<3, 3>* p_mesh = builder.GenerateMesh();
+        builder.WriteVtk("DivideElement", "Initial");
+        builder.PrintMesh();
+        c_vector<double, 3> axis_of_division = zero_vector<double>(3);
+        axis_of_division[0] = 1;
+        p_mesh->DivideElementAlongGivenAxis(p_mesh->GetElement(0), axis_of_division);
+        p_mesh->ReMesh();
+        builder.WriteVtk("DivideElement", "After");
+        builder.PrintMesh();
     }
 
 /// Commented this test as T2 Swap should only happen to triangular prism

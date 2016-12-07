@@ -43,6 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /// ===============================================================
 /// Some function that can be added into trunk and relevant for all
+
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool ElementHasNode(const VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement, const unsigned nodeIndex)
 {
@@ -70,7 +71,14 @@ std::set<unsigned> GetSharedElements(const Node<3>* pNodeA, const Node<3>* pNode
  */
 bool IsFaceOnBoundary(VertexElement<2, 3>* pFace)
 {
-//    assert(IsLateralFace(pFace));     // LCOV_EXCL_LINE
+    ///\todo: #2850 cannot handle such case
+    /*
+     * The new node is boundary node if the 2 nodes are boundary nodes and the elements don't look like
+     *   ___A___
+     *  |   |   |
+     *  |___|___|
+     *      B
+     */
     bool is_element_on_boundary = true;
     for (unsigned i=0; i<pFace->GetNumNodes(); ++i)
     {
@@ -235,3 +243,39 @@ std::vector<unsigned> GetLateralFace(const VertexElement<3, 3>* pElement, const 
     return return_vector;
 }
 
+bool GetFaceOrientation(const VertexElement<3, 3>* pElement, const unsigned faceIndex)
+{
+    bool face_orientation;
+    bool face_found (false);
+    for (unsigned face_index = 0; face_index<pElement->GetNumFaces(); ++face_index)
+    {
+        if (faceIndex == pElement->GetFace(face_index)->GetIndex())
+        {
+            face_orientation = pElement->FaceIsOrientatedAntiClockwise(face_index);
+            face_found = true;
+            break;
+        }
+    }
+    assert(face_found);
+    return face_orientation;
+}
+
+//void AddPairNode(VertexElement<3, 3>* pElement, const unsigned index, Node<3>* pBasalNode, Node<3>* pApicalNode)
+//{
+//    const unsigned num_nodes = MonolayerGetNumNodes(pElement);
+//    unsigned smaller_index = index;
+//    if (index>num_nodes)
+//    {
+//        smaller_index -= num_nodes;
+//        assert(smaller_index < num_nodes);
+//    }
+//
+//    GetBasalFace(pElement)->FaceAddNode(pBasalNode, smaller_index);
+//    GetApicalFace(pElement)->FaceAddNode(pApicalNode, smaller_index);
+//
+//    // Add the apical node first so that I don't changes its indices.
+//    pElement->AddNode(pApicalNode, smaller_index+num_nodes);
+//    pElement->AddNode(pBasalNode, smaller_index);
+//
+//    // NOTE: I doesn't rearrange here because there is still a missing face.
+//}

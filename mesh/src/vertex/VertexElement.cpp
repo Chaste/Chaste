@@ -284,7 +284,9 @@ std::vector<unsigned> VertexElement<3, 3>::MonolayerElementDeleteNodes(const Nod
     }
     else
     {
-        assert(p_lateral_II->GetNodeGlobalIndex(0) == p_lateral_II->GetNodeGlobalIndex(1));
+        assert(p_lateral_II->GetNodeGlobalIndex(0) == p_lateral_II->GetNodeGlobalIndex(1) ||
+               p_lateral_II->GetNodeGlobalIndex(0) == basal_node_stay_index ||
+               p_lateral_II->GetNodeGlobalIndex(1) == basal_node_stay_index);
     }
 
     // Operation III

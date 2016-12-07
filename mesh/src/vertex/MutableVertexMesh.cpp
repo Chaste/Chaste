@@ -38,6 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MonolayerVertexMeshCustomFunctions.hpp"
 #include "Warnings.hpp"
 #include "LogFile.hpp"
+#include <algorithm>
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::MutableVertexMesh(std::vector<Node<SPACE_DIM>*> nodes,
@@ -543,395 +544,6 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
     return new_element_index;
 }
 
-template<>
-unsigned MutableVertexMesh<3, 3>::DivideElementAlongGivenAxis(VertexElement<3, 3>* pElement,
-                                                              c_vector<double, 3> axisOfDivision,
-                                                              bool placeOriginalElementBelow)
-{
-    // Get the centroid of the element
-    c_vector<double, 3> centroid = pElement->GetCentroid();
-    VertexElement<2, 3>* p_apical_face = GetApicalFace(pElement);
-    VertexElement<2, 3>* p_basal_face = GetBasalFace(pElement);
-
-    /*
-     * Find which edges the axis of division crosses by finding any node
-     * that lies on the opposite side of the plane of division to its next
-     * neighbour.
-     *
-     * Plane of division is the plane that passes through the centroid of element
-     * and its normal is parallel to axis of division. Signed distance of a point
-     * from a plane can be calculated using d = inner_prod(r-c,n), where
-     * r is the position vector of the point,
-     * c is the position vector of a point in the plane,
-     * n is the (normalized) normal vector of the plane.
-     * When points lie at the opposite site of the plane, the signed distances will
-     * have different parity.
-     */
-    std::vector<unsigned> intersecting_apical_nodes;
-    std::vector<unsigned> intersecting_basal_nodes;
-    unsigned num_nodes = MonolayerGetNumNodes(pElement);
-    bool is_current_apical_node_on_normal_side = (inner_prod(this->GetVectorFromAtoB(centroid, p_apical_face->GetNodeLocation(0)), axisOfDivision) >= 0);
-    bool is_current_basal_node_on_normal_side = (inner_prod(this->GetVectorFromAtoB(centroid, p_basal_face->GetNodeLocation(0)), axisOfDivision) >= 0);
-    for (unsigned i=0; i<num_nodes; i++)
-    {
-        bool is_next_apical_node_on_normal_side = (inner_prod(this->GetVectorFromAtoB(centroid, p_apical_face->GetNodeLocation((i+1)%num_nodes)), axisOfDivision) >= 0);
-        bool is_next_basal_node_on_normal_side = (inner_prod(this->GetVectorFromAtoB(centroid, p_basal_face->GetNodeLocation((i+1)%num_nodes)), axisOfDivision) >= 0);
-        if (is_current_apical_node_on_normal_side != is_next_apical_node_on_normal_side)
-        {
-            intersecting_apical_nodes.push_back(i);
-        }
-        if (is_current_basal_node_on_normal_side != is_next_basal_node_on_normal_side)
-        {
-            intersecting_basal_nodes.push_back(i);
-        }
-        is_current_apical_node_on_normal_side = is_next_apical_node_on_normal_side;
-        is_current_basal_node_on_normal_side = is_next_basal_node_on_normal_side;
-    }
-
-    // If the axis of division does not cross two edges then we cannot proceed
-    if (intersecting_apical_nodes.size() != 2 || intersecting_basal_nodes.size() != 2)
-    {
-        EXCEPTION("Cannot proceed with element division: the given axis of division does not cross two edges of the element");
-    }
-    if (intersecting_apical_nodes[0]!=intersecting_basal_nodes[0] || intersecting_apical_nodes[1]!=intersecting_basal_nodes[1])
-    {
-        ///\todo #2850 proceed with element division even with such case
-        EXCEPTION("Cannot proceed with element division: the plane of division splits apical and basal faces at different locations.");
-    }
-
-    std::vector<unsigned> division_node_global_indices;
-
-    unsigned nodes_added = 0;
-    // Find the intersections between the axis of division and the element edges
-    for (unsigned i=0; i<intersecting_apical_nodes.size(); ++i)
-    {
-        /*
-         * Get pointers to the nodes forming the edge into which one new node will be inserted.
-         *
-         * Note that when we use the first entry of intersecting nodes to add a node,
-         * we change the local index of the second entry of intersecting_nodes in
-         * pElement, so must account for this by moving one entry further on.
-         */
-        Node<3>* p_apical_node_a = pElement->GetNode((intersecting_apical_nodes[i]+nodes_added)%num_nodes);
-        Node<3>* p_apical_node_b = pElement->GetNode((intersecting_apical_nodes[i]+nodes_added+1)%num_nodes);
-        Node<3>* p_basal_node_a = pElement->GetNode((intersecting_basal_nodes[i]+nodes_added)%num_nodes);
-        Node<3>* p_basal_node_b = pElement->GetNode((intersecting_basal_nodes[i]+nodes_added+1)%num_nodes);
-
-        // Calculate apical position of the intersection
-        c_vector<double, 3> position_apical_a = p_apical_node_a->rGetLocation();
-        c_vector<double, 3> position_apical_b = p_apical_node_b->rGetLocation();
-        c_vector<double, 3> apical_a_to_b = this->GetVectorFromAtoB(position_apical_a, position_apical_b);
-        c_vector<double, 3> apical_intersection;
-        if (norm_2(apical_a_to_b) < 2.0*mCellRearrangementRatio*mCellRearrangementThreshold)
-        {
-            WARNING("Edge is too small for normal division; putting node in the middle of a and b. There may be T1 swaps straight away.");
-            ///\todo or should we move a and b apart, it may interfere with neighbouring edges? (see #1399 and #2401)
-            apical_intersection = position_apical_a + 0.5*apical_a_to_b;
-        }
-        else
-        {
-            /*
-             * Find the location of the intersection.
-             * Equation of line is r = r_a + t*v;
-             * v is the vector from a to b, can be override by subclasses for different metric.
-             * Equation of division plane is inner_prod(r-c,n) = 0;
-             */
-            apical_intersection = position_apical_a + apical_a_to_b/inner_prod(apical_a_to_b,axisOfDivision)
-                           *inner_prod(this->GetVectorFromAtoB(position_apical_a, centroid),axisOfDivision);
-
-            /*
-             * If then new node is too close to one of the edge nodes, then reposition it
-             * a distance mCellRearrangementRatio*mCellRearrangementThreshold further along the edge.
-             */
-            c_vector<double, 3> a_to_intersection = this->GetVectorFromAtoB(position_apical_a, apical_intersection);
-            c_vector<double, 3> b_to_intersection = this->GetVectorFromAtoB(position_apical_b, apical_intersection);
-            if (norm_2(a_to_intersection) < mCellRearrangementThreshold)
-            {
-                assert(norm_2(b_to_intersection) > mCellRearrangementThreshold); // LCOV_EXCL_LINE
-                apical_intersection = position_apical_a + mCellRearrangementRatio*mCellRearrangementThreshold*apical_a_to_b/norm_2(apical_a_to_b);
-            }
-            if (norm_2(b_to_intersection) < mCellRearrangementThreshold)
-            {
-                assert(norm_2(a_to_intersection) > mCellRearrangementThreshold); // LCOV_EXCL_LINE
-                apical_intersection = position_apical_b - mCellRearrangementRatio*mCellRearrangementThreshold*apical_a_to_b/norm_2(apical_a_to_b);
-            }
-        }
-
-        // Calculate basal position of the intersection
-        c_vector<double, 3> position_basal_a = p_basal_node_a->rGetLocation();
-        c_vector<double, 3> position_basal_b = p_basal_node_b->rGetLocation();
-        c_vector<double, 3> basal_a_to_b = this->GetVectorFromAtoB(position_basal_a, position_basal_b);
-        c_vector<double, 3> basal_intersection;
-        if (norm_2(basal_a_to_b) < 2.0*mCellRearrangementRatio*mCellRearrangementThreshold)
-        {
-            WARNING("Edge is too small for normal division; putting node in the middle of a and b. There may be T1 swaps straight away.");
-            ///\todo or should we move a and b apart, it may interfere with neighbouring edges? (see #1399 and #2401)
-            basal_intersection = position_basal_a + 0.5*basal_a_to_b;
-        }
-        else
-        {
-            /*
-             * Find the location of the intersection.
-             * Equation of line is r = r_a + t*v;
-             * v is the vector from a to b, can be override by subclasses for different metric.
-             * Equation of division plane is inner_prod(r-c,n) = 0;
-             */
-            basal_intersection = position_basal_a + basal_a_to_b/inner_prod(basal_a_to_b,axisOfDivision)
-                           *inner_prod(this->GetVectorFromAtoB(position_basal_a, centroid),axisOfDivision);
-
-            /*
-             * If then new node is too close to one of the edge nodes, then reposition it
-             * a distance mCellRearrangementRatio*mCellRearrangementThreshold further along the edge.
-             */
-            c_vector<double, 3> a_to_intersection = this->GetVectorFromAtoB(position_basal_a, basal_intersection);
-            c_vector<double, 3> b_to_intersection = this->GetVectorFromAtoB(position_basal_b, basal_intersection);
-            if (norm_2(a_to_intersection) < mCellRearrangementThreshold)
-            {
-                assert(norm_2(b_to_intersection) > mCellRearrangementThreshold); // LCOV_EXCL_LINE
-                basal_intersection = position_basal_a + mCellRearrangementRatio*mCellRearrangementThreshold*basal_a_to_b/norm_2(basal_a_to_b);
-            }
-            if (norm_2(b_to_intersection) < mCellRearrangementThreshold)
-            {
-                assert(norm_2(a_to_intersection) > mCellRearrangementThreshold); // LCOV_EXCL_LINE
-                basal_intersection = position_basal_b - mCellRearrangementRatio*mCellRearrangementThreshold*basal_a_to_b/norm_2(basal_a_to_b);
-            }
-        }
-
-
-        // Find common elements
-        const std::set<unsigned> shared_elements = GetSharedElements(p_apical_node_a, p_apical_node_b);
-        std::vector<unsigned> tmp_vector = GetLateralFace(this->GetElement(*shared_elements.begin()),
-                                                          p_basal_node_a->GetIndex(), p_basal_node_b->GetIndex());
-        VertexElement<2, 3>* shared_face = this->GetFace(tmp_vector[0]);
-        /*
-         * The new node is boundary node if the 2 nodes are boundary nodes and the elements don't look like
-         *   ___A___
-         *  |   |   |
-         *  |___|___|
-         *      B
-         */
-        // Find the indices of the elements owned by each node on the edge into which one new node will be inserted
-        std::set<unsigned> elems_containing_node_A = p_apical_node_a->rGetContainingElementIndices();
-        std::set<unsigned> elems_containing_node_B = p_apical_node_b->rGetContainingElementIndices();
-        bool is_boundary = false;
-        if (p_apical_node_a->IsBoundaryNode() && p_apical_node_b->IsBoundaryNode())
-        {
-            if (elems_containing_node_A.size() != 2 ||
-                elems_containing_node_B.size() != 2 ||
-                elems_containing_node_A != elems_containing_node_B)
-            {
-                is_boundary = true;
-            }
-        }
-        ///\todo #2850 use this to assign is_boundary
-//        assert(is_boundary == IsFaceOnBoundary(shared_face));   // LCOV_EXCL_LINE
-
-        // Add a new node to the mesh at the location of the intersection
-        Node<3>* p_new_apical_node = new Node<3>(0, apical_intersection, is_boundary);
-        SetNodeAsApical(p_new_apical_node);
-        Node<3>* p_new_basal_node = new Node<3>(0, basal_intersection, is_boundary);
-        SetNodeAsBasal(p_new_basal_node);
-        unsigned new_apical_node_index = this->AddNode(p_new_apical_node);
-        unsigned new_basal_node_index = this->AddNode(p_new_basal_node);
-        ++nodes_added;
-
-        /*
-         * Create lateral face such that they have the same orientation as shared_face
-         * (View from the at the lateral face)
-         *   3_________________2
-         *   |      shared     |
-         *   |_________________|
-         *   0                 1
-         *
-         *      (new apical)
-         *   3________v________2
-         *   | shared |  new   |
-         *   |________|________|
-         *   0        ^        1
-         *       (new basal)
-         */
-        std::vector<Node<3>*> new_lateral_face_nodes(4);
-        new_lateral_face_nodes[0] = p_new_basal_node;
-        new_lateral_face_nodes[1] = shared_face->GetNode(1);
-        new_lateral_face_nodes[2] = shared_face->GetNode(2);
-        new_lateral_face_nodes[3] = p_new_apical_node;
-        shared_face->FaceUpdateNode(1, p_new_basal_node);
-        shared_face->FaceUpdateNode(2, p_new_apical_node);
-
-        const unsigned new_lateral_face_index = (this->mFaces).size();
-        VertexElement<2, 3>* p_new_lateral_face = new VertexElement<2, 3>(new_lateral_face_index, new_lateral_face_nodes);
-        SetFaceAsLateral(p_new_lateral_face);
-        // For time being, where faces doesn't register with nodes and elements (as in have set of indices),
-        // I'll just push back directly.
-        this->mFaces.push_back(p_new_lateral_face);
-
-
-        // Now make sure the new nodes and face are added to all neighbouring elements
-        for (std::set<unsigned>::iterator iter = shared_elements.begin();
-             iter != shared_elements.end(); ++iter)
-        {
-            VertexElement<3, 3>* p_element = this->GetElement(*iter);
-            VertexElement<2, 3>* p_basal_face = GetBasalFace(p_element);
-
-            // Find which node has the lower local index in this element
-            unsigned node_a_local_index = p_element->GetNodeLocalIndex(p_apical_node_a->GetIndex());
-            unsigned node_b_local_index = p_element->GetNodeLocalIndex(p_apical_node_b->GetIndex());
-
-            unsigned index = node_b_local_index;
-
-            // If node B has a higher index then use node A's index...
-            if (node_b_local_index > node_a_local_index)
-            {
-                index = node_a_local_index;
-
-                // ...unless nodes A and B share the element's last edge
-                if ((node_a_local_index == 0) && (node_b_local_index == num_nodes-1))
-                {
-                    index = node_b_local_index;
-                }
-            }
-            else if ((node_b_local_index == 0) && (node_a_local_index == num_nodes-1))
-            {
-                // ...otherwise use node B's index, unless nodes A and B share the element's last edge
-                index = node_a_local_index;
-            }
-
-            // Add new node to this element
-            this->GetElement(*iter)->AddNode(this->GetNode(new_apical_node_index), index);
-        }
-
-        // Store index of new node
-        division_node_global_indices.push_back(new_apical_node_index);
-    }
-
-    // Now call DivideElement() to divide the element using the new nodes
-    unsigned nodeAIndex = pElement->GetNodeLocalIndex(division_node_global_indices[0]);
-    unsigned nodeBIndex = pElement->GetNodeLocalIndex(division_node_global_indices[1]);
-
-    // From here onward is from DivideElement(...)
-//    unsigned new_element_index = DivideElement(pElement, nodeAIndex, nodeBIndex, placeOriginalElementBelow);
-//    assert(SPACE_DIM == 2);             // LCOV_EXCL_LINE
-//    assert(ELEMENT_DIM == SPACE_DIM);   // LCOV_EXCL_LINE
-
-    // Sort nodeA and nodeB such that nodeBIndex > nodeAindex
-    assert(nodeBIndex != nodeAIndex);
-    unsigned node1_index = (nodeAIndex < nodeBIndex) ? nodeAIndex : nodeBIndex; // low index
-    unsigned node2_index = (nodeAIndex < nodeBIndex) ? nodeBIndex : nodeAIndex; // high index
-
-    // Store the number of nodes in the element (this changes when nodes are deleted from the element)
-//    unsigned num_nodes = num_nodes;
-
-    // Copy the nodes in this element
-    std::vector<Node<3>*> nodes_elem;
-    for (unsigned i=0; i<num_nodes; i++)
-    {
-        nodes_elem.push_back(pElement->GetNode(i));
-    }
-
-    // Get the index of the new element
-    unsigned new_element_index;
-    if (mDeletedElementIndices.empty())
-    {
-        new_element_index = this->mElements.size();
-    }
-    else
-    {
-        new_element_index = mDeletedElementIndices.back();
-        mDeletedElementIndices.pop_back();
-        delete this->mElements[new_element_index];
-    }
-
-    // Add the new element to the mesh
-    AddElement(new VertexElement<3,3>(new_element_index, nodes_elem));
-
-    /**
-     * Remove the correct nodes from each element. If placeOriginalElementBelow is true,
-     * place the original element below (in the y direction) the new element; otherwise,
-     * place it above.
-     */
-
-    // Find lowest element
-    ///\todo this could be more efficient (see #2401)
-    double height_midpoint_1 = 0.0;
-    double height_midpoint_2 = 0.0;
-    unsigned counter_1 = 0;
-    unsigned counter_2 = 0;
-
-    for (unsigned i=0; i<num_nodes; i++)
-    {
-        if (i>=node1_index && i<=node2_index)
-        {
-            height_midpoint_1 += pElement->GetNode(i)->rGetLocation()[1];
-            counter_1++;
-        }
-        if (i<=node1_index || i>=node2_index)
-        {
-            height_midpoint_2 += pElement->GetNode(i)->rGetLocation()[1];
-            counter_2++;
-        }
-    }
-    height_midpoint_1 /= (double)counter_1;
-    height_midpoint_2 /= (double)counter_2;
-
-    for (unsigned i=num_nodes; i>0; i--)
-    {
-        if (i-1 < node1_index || i-1 > node2_index)
-        {
-            if (height_midpoint_1 < height_midpoint_2)
-            {
-                if (placeOriginalElementBelow)
-                {
-                    pElement->DeleteNode(i-1);
-                }
-                else
-                {
-                    this->mElements[new_element_index]->DeleteNode(i-1);
-                }
-            }
-            else
-            {
-                if (placeOriginalElementBelow)
-                {
-                    this->mElements[new_element_index]->DeleteNode(i-1);
-                }
-                else
-                {
-                    pElement->DeleteNode(i-1);
-                }
-            }
-        }
-        else if (i-1 > node1_index && i-1 < node2_index)
-        {
-            if (height_midpoint_1 < height_midpoint_2)
-            {
-                if (placeOriginalElementBelow)
-                {
-                    this->mElements[new_element_index]->DeleteNode(i-1);
-                }
-                else
-                {
-                    pElement->DeleteNode(i-1);
-                }
-            }
-            else
-            {
-                if (placeOriginalElementBelow)
-                {
-                    pElement->DeleteNode(i-1);
-                }
-                else
-                {
-                    this->mElements[new_element_index]->DeleteNode(i-1);
-                }
-            }
-        }
-    }
-
-    return new_element_index;
-
-    return new_element_index;
-}
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongShortAxis(VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement,
                                                                                 bool placeOriginalElementBelow)
@@ -944,7 +556,6 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongShortAxis(
     unsigned new_element_index = DivideElementAlongGivenAxis(pElement, short_axis, placeOriginalElementBelow);
     return new_element_index;
 }
-
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElement(VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement,
@@ -1072,6 +683,390 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElement(VertexElement<
     return new_element_index;
 }
 
+template<>
+unsigned MutableVertexMesh<3, 3>::DivideElement(VertexElement<3,3>* pElement,
+                                                unsigned nodeALocalIndex,
+                                                unsigned nodeBLocalIndex,
+                                                bool placeOriginalElementBelow)
+{
+    // Sort nodeA and nodeB such that nodeBIndex > nodeAindex
+    assert(nodeBLocalIndex != nodeALocalIndex);
+    unsigned node1_local_index = (nodeALocalIndex < nodeBLocalIndex) ? nodeALocalIndex : nodeBLocalIndex; // low index
+    unsigned node2_local_index = (nodeALocalIndex < nodeBLocalIndex) ? nodeBLocalIndex : nodeALocalIndex; // high index
+
+    VertexElement<2, 3>* p_basal_face = GetBasalFace(pElement);
+    Node<3>* p_basal_node1 = pElement->GetNode(node1_local_index);
+    Node<3>* p_basal_node2 = pElement->GetNode(node2_local_index);
+    assert(IsBasalNode(p_basal_node1) && IsBasalNode(p_basal_node2));
+
+    VertexElement<2, 3>* p_apical_face = GetApicalFace(pElement);
+    Node<3>* p_apical_node1 = p_apical_face->GetNode(node1_local_index);
+    Node<3>* p_apical_node2 = p_apical_face->GetNode(node2_local_index);
+
+    // Create new element
+    std::vector<VertexElement<2, 3>*> new_elem_faces;
+    std::vector<bool> new_elem_orientations;
+
+    // Make new element with nodes between node1 and node2
+    std::vector<Node<3>*> new_elem_basal_nodes;
+    std::vector<Node<3>*> new_elem_apical_nodes;
+    for (unsigned node_index=node1_local_index; node_index<=node2_local_index; ++node_index)
+    {
+        new_elem_basal_nodes.push_back(p_basal_face->GetNode(node_index));
+        new_elem_apical_nodes.push_back(p_apical_face->GetNode(node_index));
+    }
+    VertexElement<2, 3>* p_new_basal_face = new VertexElement<2, 3>((this->mFaces).size(), new_elem_basal_nodes);
+    SetFaceAsBasal(p_new_basal_face);
+    this->mFaces.push_back(p_new_basal_face);
+    new_elem_faces.push_back(p_new_basal_face);
+    new_elem_orientations.push_back(true);
+    VertexElement<2, 3>* p_new_apical_face = new VertexElement<2, 3>((this->mFaces).size(), new_elem_apical_nodes);
+    SetFaceAsBasal(p_new_apical_face);
+    this->mFaces.push_back(p_new_apical_face);
+    new_elem_faces.push_back(p_new_apical_face);
+    new_elem_orientations.push_back(false);
+
+    for (unsigned face_index=node1_local_index; face_index<node2_local_index; ++face_index)
+    {
+        new_elem_faces.push_back(pElement->GetFace(face_index+2));
+        new_elem_orientations.push_back(pElement->FaceIsOrientatedAntiClockwise(face_index+2));
+    }
+    std::vector<Node<3>*> new_lateral_face_nodes(4);
+    new_lateral_face_nodes[0] = p_basal_node1;
+    new_lateral_face_nodes[1] = p_basal_node2;
+    new_lateral_face_nodes[2] = p_apical_node2;
+    new_lateral_face_nodes[3] = p_apical_node1;
+    ///\todo: #2850 AddFace method for MutableVertexMesh
+    VertexElement<2, 3>* p_new_lateral_face = new VertexElement<2, 3>((this->mFaces).size(), new_lateral_face_nodes);
+    SetFaceAsLateral(p_new_lateral_face);
+    this->mFaces.push_back(p_new_lateral_face);
+    new_elem_faces.push_back(p_new_lateral_face);
+    new_elem_orientations.push_back(true);
+    // Create new element
+    ///\todo: #2850 why don't just do this in AddElement, just like AddNode?
+    // Get the index of the new element
+    unsigned new_element_index;
+    if (mDeletedElementIndices.empty())
+    {
+        new_element_index = this->mElements.size();
+    }
+    else
+    {
+        new_element_index = mDeletedElementIndices.back();
+        mDeletedElementIndices.pop_back();
+        delete this->mElements[new_element_index];
+    }
+    new_elem_basal_nodes.insert(new_elem_basal_nodes.end(), new_elem_apical_nodes.begin(), new_elem_apical_nodes.end());
+    // Add the new element to the mesh
+    this->AddElement(new VertexElement<3,3>(new_element_index, new_elem_faces, new_elem_orientations, new_elem_basal_nodes));
+
+
+    // Remove extra nodes and faces from original element
+    for (unsigned node_index=1; node_index<new_elem_apical_nodes.size()-1; ++node_index)
+    {
+        pElement->DeleteNode(pElement->GetNodeLocalIndex(new_elem_basal_nodes[node_index]->GetIndex()));
+        pElement->DeleteNode(pElement->GetNodeLocalIndex(new_elem_apical_nodes[node_index]->GetIndex()));
+        p_basal_face->FaceDeleteNode(new_elem_basal_nodes[node_index]);
+        p_apical_face->FaceDeleteNode(new_elem_apical_nodes[node_index]);
+    }
+    for (unsigned face_index=node2_local_index-1; face_index>=node1_local_index; --face_index)
+    {
+        pElement->DeleteFace(face_index+2);
+    }
+    pElement->AddFace(p_new_lateral_face, false, node1_local_index-1+2);
+    pElement->MonolayerElementRearrangeFacesNodes();
+    return new_element_index;
+}
+
+template<>
+unsigned MutableVertexMesh<3, 3>::DivideElementAlongGivenAxis(VertexElement<3, 3>* pElement,
+                                                              c_vector<double, 3> axisOfDivision,
+                                                              bool placeOriginalElementBelow)
+{
+    // Get the centroid of the element
+    const c_vector<double, 3> centroid = pElement->GetCentroid();
+    const VertexElement<2, 3>* p_apical_face = GetApicalFace(pElement);
+    const VertexElement<2, 3>* p_basal_face = GetBasalFace(pElement);
+    /*
+     * Find which edges the axis of division crosses by finding any node
+     * that lies on the opposite side of the plane of division to its next
+     * neighbour.
+     *
+     * Plane of division is the plane that passes through the centroid of element
+     * and its normal is parallel to axis of division. Signed distance of a point
+     * from a plane can be calculated using d = inner_prod(r-c,n), where
+     * r is the position vector of the point,
+     * c is the position vector of a point in the plane,
+     * n is the (normalized) normal vector of the plane.
+     * When points lie at the opposite site of the plane, the signed distances will
+     * have different parity.
+     */
+    std::vector<unsigned> intersecting_apical_nodes;
+    std::vector<unsigned> intersecting_basal_nodes;
+    const unsigned half_num_nodes = MonolayerGetNumNodes(pElement);
+    bool is_current_apical_node_on_normal_side = (inner_prod(this->GetVectorFromAtoB(centroid, p_apical_face->GetNodeLocation(0)), axisOfDivision) >= 0);
+    bool is_current_basal_node_on_normal_side = (inner_prod(this->GetVectorFromAtoB(centroid, p_basal_face->GetNodeLocation(0)), axisOfDivision) >= 0);
+    for (unsigned i=0; i<half_num_nodes; i++)
+    {
+        bool is_next_apical_node_on_normal_side = (inner_prod(this->GetVectorFromAtoB(centroid, p_apical_face->GetNodeLocation((i+1)%half_num_nodes)), axisOfDivision) >= 0);
+        bool is_next_basal_node_on_normal_side = (inner_prod(this->GetVectorFromAtoB(centroid, p_basal_face->GetNodeLocation((i+1)%half_num_nodes)), axisOfDivision) >= 0);
+        if (is_current_apical_node_on_normal_side != is_next_apical_node_on_normal_side)
+        {
+            intersecting_apical_nodes.push_back(i);
+        }
+        if (is_current_basal_node_on_normal_side != is_next_basal_node_on_normal_side)
+        {
+            intersecting_basal_nodes.push_back(i);
+        }
+        is_current_apical_node_on_normal_side = is_next_apical_node_on_normal_side;
+        is_current_basal_node_on_normal_side = is_next_basal_node_on_normal_side;
+    }
+
+    // If the axis of division does not cross two edges then we cannot proceed
+    if (intersecting_apical_nodes.size() != 2 || intersecting_basal_nodes.size() != 2)
+    {
+        EXCEPTION("Cannot proceed with element division: the given axis of division does not cross two edges of the element");
+    }
+    if (intersecting_apical_nodes[0]!=intersecting_basal_nodes[0] || intersecting_apical_nodes[1]!=intersecting_basal_nodes[1])
+    {
+        ///\todo #2850 proceed with element division even with such case
+        EXCEPTION("Cannot proceed with element division: the plane of division splits apical and basal faces at different locations.");
+    }
+
+    std::vector<Node<3>*> division_nodes;
+
+    unsigned nodes_added = 0;
+    // Find the intersections between the axis of division and the element edges
+    for (unsigned i=0; i<intersecting_apical_nodes.size(); ++i)
+    {
+        /*
+         * Get pointers to the nodes forming the edge into which one new node will be inserted.
+         *
+         * Note that when we use the first entry of intersecting nodes to add a node,
+         * we change the local index of the second entry of intersecting_nodes in
+         * pElement, so must account for this by moving one entry further on.
+         */
+        Node<3>* p_apical_node_a = p_apical_face->GetNode((intersecting_apical_nodes[i]+nodes_added)%(half_num_nodes+nodes_added));
+        Node<3>* p_apical_node_b = p_apical_face->GetNode((intersecting_apical_nodes[i]+nodes_added+1)%(half_num_nodes+nodes_added));
+        const Node<3>* p_basal_node_a = p_basal_face->GetNode((intersecting_basal_nodes[i]+nodes_added)%(half_num_nodes+nodes_added));
+        const Node<3>* p_basal_node_b = p_basal_face->GetNode((intersecting_basal_nodes[i]+nodes_added+1)%(half_num_nodes+nodes_added));
+
+        // Calculate apical position of the intersection
+        c_vector<double, 3> position_apical_a = p_apical_node_a->rGetLocation();
+        c_vector<double, 3> position_apical_b = p_apical_node_b->rGetLocation();
+        c_vector<double, 3> apical_a_to_b = this->GetVectorFromAtoB(position_apical_a, position_apical_b);
+        c_vector<double, 3> apical_intersection;
+        if (norm_2(apical_a_to_b) < 2.0*mCellRearrangementRatio*mCellRearrangementThreshold)
+        {
+            WARNING("Edge is too small for normal division; putting node in the middle of a and b. There may be T1 swaps straight away.");
+            ///\todo or should we move a and b apart, it may interfere with neighbouring edges? (see #1399 and #2401)
+            apical_intersection = position_apical_a + 0.5*apical_a_to_b;
+        }
+        else
+        {
+            /*
+             * Find the location of the intersection.
+             * Equation of line is r = r_a + t*v;
+             * v is the vector from a to b, can be override by subclasses for different metric.
+             * Equation of division plane is inner_prod(r-c,n) = 0;
+             */
+            apical_intersection = position_apical_a + apical_a_to_b/inner_prod(apical_a_to_b,axisOfDivision)
+                           *inner_prod(this->GetVectorFromAtoB(position_apical_a, centroid),axisOfDivision);
+
+            /*
+             * If then new node is too close to one of the edge nodes, then reposition it
+             * a distance mCellRearrangementRatio*mCellRearrangementThreshold further along the edge.
+             */
+            c_vector<double, 3> a_to_intersection = this->GetVectorFromAtoB(position_apical_a, apical_intersection);
+            c_vector<double, 3> b_to_intersection = this->GetVectorFromAtoB(position_apical_b, apical_intersection);
+            if (norm_2(a_to_intersection) < mCellRearrangementThreshold)
+            {
+                assert(norm_2(b_to_intersection) > mCellRearrangementThreshold); // LCOV_EXCL_LINE
+                apical_intersection = position_apical_a + mCellRearrangementRatio*mCellRearrangementThreshold*apical_a_to_b/norm_2(apical_a_to_b);
+            }
+            if (norm_2(b_to_intersection) < mCellRearrangementThreshold)
+            {
+                assert(norm_2(a_to_intersection) > mCellRearrangementThreshold); // LCOV_EXCL_LINE
+                apical_intersection = position_apical_b - mCellRearrangementRatio*mCellRearrangementThreshold*apical_a_to_b/norm_2(apical_a_to_b);
+            }
+        }
+
+        // Calculate basal position of the intersection
+        c_vector<double, 3> position_basal_a = p_basal_node_a->rGetLocation();
+        c_vector<double, 3> position_basal_b = p_basal_node_b->rGetLocation();
+        c_vector<double, 3> basal_a_to_b = this->GetVectorFromAtoB(position_basal_a, position_basal_b);
+        c_vector<double, 3> basal_intersection;
+        if (norm_2(basal_a_to_b) < 2.0*mCellRearrangementRatio*mCellRearrangementThreshold)
+        {
+            WARNING("Edge is too small for normal division; putting node in the middle of a and b. There may be T1 swaps straight away.");
+            ///\todo or should we move a and b apart, it may interfere with neighbouring edges? (see #1399 and #2401)
+            basal_intersection = position_basal_a + 0.5*basal_a_to_b;
+        }
+        else
+        {
+            /*
+             * Find the location of the intersection.
+             * Equation of line is r = r_a + t*v;
+             * v is the vector from a to b, can be override by subclasses for different metric.
+             * Equation of division plane is inner_prod(r-c,n) = 0;
+             */
+            basal_intersection = position_basal_a + basal_a_to_b/inner_prod(basal_a_to_b,axisOfDivision)
+                           *inner_prod(this->GetVectorFromAtoB(position_basal_a, centroid),axisOfDivision);
+
+            /*
+             * If then new node is too close to one of the edge nodes, then reposition it
+             * a distance mCellRearrangementRatio*mCellRearrangementThreshold further along the edge.
+             */
+            c_vector<double, 3> a_to_intersection = this->GetVectorFromAtoB(position_basal_a, basal_intersection);
+            c_vector<double, 3> b_to_intersection = this->GetVectorFromAtoB(position_basal_b, basal_intersection);
+            if (norm_2(a_to_intersection) < mCellRearrangementThreshold)
+            {
+                assert(norm_2(b_to_intersection) > mCellRearrangementThreshold); // LCOV_EXCL_LINE
+                basal_intersection = position_basal_a + mCellRearrangementRatio*mCellRearrangementThreshold*basal_a_to_b/norm_2(basal_a_to_b);
+            }
+            if (norm_2(b_to_intersection) < mCellRearrangementThreshold)
+            {
+                assert(norm_2(a_to_intersection) > mCellRearrangementThreshold); // LCOV_EXCL_LINE
+                basal_intersection = position_basal_b - mCellRearrangementRatio*mCellRearrangementThreshold*basal_a_to_b/norm_2(basal_a_to_b);
+            }
+        }
+
+        // Find common elements
+        ///\todo: #2850 get better method to get shared face, when node register face.
+        const std::set<unsigned> shared_elements = GetSharedElements(p_apical_node_a, p_apical_node_b);
+        assert(shared_elements.size()!=0);
+        const std::vector<unsigned> tmp_vector = GetLateralFace(this->GetElement(*shared_elements.begin()),
+                                                          p_basal_node_a->GetIndex(), p_basal_node_b->GetIndex());
+        assert(tmp_vector[0]!=UINT_MAX);
+        VertexElement<2, 3>* shared_face = this->GetFace(tmp_vector[0]);
+        /*
+         * The new node is boundary node if the 2 nodes are boundary nodes and the elements don't look like
+         *   ___A___
+         *  |   |   |
+         *  |___|___|
+         *      B
+         */
+        // Find the indices of the elements owned by each node on the edge into which one new node will be inserted
+        const std::set<unsigned> elems_containing_node_A = p_apical_node_a->rGetContainingElementIndices();
+        const std::set<unsigned> elems_containing_node_B = p_apical_node_b->rGetContainingElementIndices();
+        bool is_boundary = false;
+        if (p_apical_node_a->IsBoundaryNode() && p_apical_node_b->IsBoundaryNode())
+        {
+            if (elems_containing_node_A.size() != 2 ||
+                elems_containing_node_B.size() != 2 ||
+                elems_containing_node_A != elems_containing_node_B)
+            {
+                is_boundary = true;
+            }
+        }
+
+        ///\todo #2850 use this to assign is_boundary
+//        assert(is_boundary == IsFaceOnBoundary(shared_face));   // LCOV_EXCL_LINE
+
+        // Add a new node to the mesh at the location of the intersection
+        Node<3>* p_new_basal_node = new Node<3>(0, basal_intersection, is_boundary);
+        SetNodeAsBasal(p_new_basal_node);
+        Node<3>* p_new_apical_node = new Node<3>(0, apical_intersection, is_boundary);
+        SetNodeAsApical(p_new_apical_node);
+        this->AddNode(p_new_basal_node);
+        this->AddNode(p_new_apical_node);
+
+        /*
+         * Create lateral face such that they have the same orientation as shared_face
+         * (View from the at the lateral face)
+         *   3_________________2
+         *   |      shared     |
+         *   |_________________|
+         *   0                 1
+         *
+         *      (new apical)
+         *   3________v________2
+         *   | shared |  new   |
+         *   |________|________|
+         *   0        ^        1
+         *       (new basal)
+         */
+        std::vector<Node<3>*> new_lateral_face_nodes(4);
+        new_lateral_face_nodes[0] = p_new_basal_node;
+        new_lateral_face_nodes[1] = shared_face->GetNode(1);
+        new_lateral_face_nodes[2] = shared_face->GetNode(2);
+        new_lateral_face_nodes[3] = p_new_apical_node;
+        shared_face->FaceUpdateNode(1, p_new_basal_node);
+        shared_face->FaceUpdateNode(2, p_new_apical_node);
+        ++nodes_added;
+        ///\todo: #2850 AddFace method for MutableVertexMesh
+        const unsigned new_lateral_face_index = (this->mFaces).size();
+        VertexElement<2, 3>* p_new_lateral_face = new VertexElement<2, 3>(new_lateral_face_index, new_lateral_face_nodes);
+        SetFaceAsLateral(p_new_lateral_face);
+        // For time being, where faces doesn't register with nodes and elements (as in have set of indices),
+        // I'll just push back directly.
+        this->mFaces.push_back(p_new_lateral_face);
+
+        // Now make sure the new nodes and face are added to all neighbouring elements
+        for (std::set<unsigned>::iterator iter = shared_elements.begin();
+             iter != shared_elements.end(); ++iter)
+        {
+            VertexElement<3, 3>* p_this_element = this->GetElement(*iter);
+            VertexElement<2, 3>* p_this_basal_face = GetBasalFace(p_this_element);
+            VertexElement<2, 3>* p_this_apical_face = GetApicalFace(p_this_element);
+            const unsigned this_half_num_nodes = MonolayerGetNumNodes(p_this_element);
+
+            // Find which node has the lower local index in this element
+            unsigned node_a_local_index = p_this_apical_face->GetNodeLocalIndex(p_apical_node_a->GetIndex());
+            unsigned node_b_local_index = p_this_apical_face->GetNodeLocalIndex(p_apical_node_b->GetIndex());
+
+//PRINT_5_VARIABLES(node_a_local_index, node_b_local_index, this_half_num_nodes, p_this_apical_face->GetNumNodes(), p_this_basal_face->GetNumNodes())
+//std::vector<unsigned> apicalFaceNodes, basalFaceNodes;
+//for (unsigned i=0; i<p_this_apical_face->GetNumNodes(); ++i)
+//{
+//    apicalFaceNodes.push_back(p_this_apical_face->GetNodeGlobalIndex(i));
+//    basalFaceNodes.push_back(p_this_basal_face->GetNodeGlobalIndex(i));
+//}
+//PRINT_VECTOR(apicalFaceNodes)
+//PRINT_VECTOR(basalFaceNodes)
+
+
+            // Get the 'lower' index in CCW direction.
+            unsigned index (UINT_MAX);
+            if (abs(node_a_local_index-node_b_local_index) == 1)
+            {
+                index = std::min(node_a_local_index, node_b_local_index);
+            }
+            else
+            {
+                assert(std::min(node_a_local_index, node_b_local_index) == 0);
+                index = std::max(node_a_local_index, node_b_local_index);
+                assert(index == this_half_num_nodes-1);
+            }
+
+            // Add new node to this element
+            p_this_basal_face->FaceAddNode(p_new_basal_node, index);
+            p_this_apical_face->FaceAddNode(p_new_apical_node, index);
+
+            // Add the apical node first so that I don't changes its indices.
+            p_this_element->AddNode(p_new_apical_node, index+this_half_num_nodes);
+            p_this_element->AddNode(p_new_basal_node, index);
+
+            // New face will have the same orientation as the old one.
+            p_this_element->AddFace(p_new_lateral_face, GetFaceOrientation(p_this_element, shared_face->GetIndex()), index+2);
+
+            p_this_element->MonolayerElementRearrangeFacesNodes();
+        }
+
+        // Store index of new node
+        division_nodes.push_back(p_new_basal_node);
+    }
+
+    // Calling remesh to tidy up the node indices
+    this->ReMesh();
+    // Now call DivideElement() to divide the element using the new nodes
+    unsigned new_element_index = DivideElement(pElement,
+                                               pElement->GetNodeLocalIndex(division_nodes[0]->GetIndex()),
+                                               pElement->GetNodeLocalIndex(division_nodes[1]->GetIndex()),
+                                               placeOriginalElementBelow);
+
+    return new_element_index;
+}
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DeleteElementPriorToReMesh(unsigned index)
