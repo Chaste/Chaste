@@ -133,10 +133,28 @@ public:
     /**
      * Write VTK file using a mesh.
      *
-     * @param rMesh reference to the vertex-based mesh
+     * @param rMesh reference to the immersed boundary mesh
      * @param stamp is an optional stamp (like a time-stamp) to put into the name of the file
      */
     void WriteVtkUsingMesh(ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>& rMesh, std::string stamp="");
+
+    /**
+     * Write SVG file using a mesh.
+     *
+     * @param rMesh reference to the immersed boundary mesh
+     * @param stamp is an optional stamp (like a time-stamp) to put into the name of the file
+     */
+    void WriteSvgUsingMesh(ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>& rMesh, std::string stamp);
+
+    /**
+     *  Add a node to an SVG file.
+     *
+     *  @param rSvgFile reference to the svg file stream
+     *  @param location the location of the point to add to the svg file
+     *  @param region the region, for setting output style
+     *  @param rad the radius to represent the node
+     */
+    void AddPointToSvgFile(out_stream& rSvgFile, c_vector<double, SPACE_DIM> location, unsigned region, double rad);
 
     /**
      * Populate mpVtkUnstructedMesh using a vertex-based mesh.
