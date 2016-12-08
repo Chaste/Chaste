@@ -57,13 +57,15 @@ struct MeshWriterIterators
 // Implementation
 ///////////////////////////////////////////////////////////////////////////////////
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryMeshWriter(const std::string& rDirectory,
-        const std::string& rBaseName,
-        const bool clearOutputDir)
+                                                                               const std::string& rBaseName,
+                                                                               const bool clearOutputDir)
         : AbstractMeshWriter<ELEMENT_DIM, SPACE_DIM>(rDirectory, rBaseName, clearOutputDir),
           mpMesh(NULL),
-          mpIters(new MeshWriterIterators<ELEMENT_DIM, SPACE_DIM>)
+          mpIters(new MeshWriterIterators<ELEMENT_DIM, SPACE_DIM>),
+          mSvgWidth(1000.0),
+          mSvgHeight(1000.0)
 {
     mpIters->pNodeIter = NULL;
     mpIters->pElemIter = NULL;
@@ -209,21 +211,21 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteSvgUsingMesh(Immer
     svg_file_name += ".svg";
 
     // Image attributes
-    double img_w = 1600.0;
-    double img_h = 900.0;
-    double node_rad = rMesh.GetAverageNodeSpacingOfElement(0, false) * 0.25 * img_w;
+    mSvgWidth = 1600.0;
+    mSvgHeight = 900.0;
+    double node_rad = rMesh.GetAverageNodeSpacingOfElement(0, false) * 0.25 * mSvgWidth;
 
     // Define colours
-    std::string bg_col = "#AAA";
-    std::string region0_col = "#495AA5";
-    std::string region1_col = "#495AA5";
-    std::string region2_col = "#495AA5";
-    std::string region3_col = "#495AA5";
-    std::string region4_col = "#495AA5";
-    std::string region5_col = "#495AA5";
-    std::string region6_col = "#495AA5";
-    std::string region7_col = "#495AA5";
-    std::string region8_col = "#495AA5";
+    std::string bg_col = "darkgray";
+    std::string region0_col = "darkred";
+    std::string region1_col = "crimson";
+    std::string region2_col = "darkmagenta";
+    std::string region3_col = "darkorchid";
+    std::string region4_col = "darkblue";
+    std::string region5_col = "blue";
+    std::string region6_col = "#000";
+    std::string region7_col = "#333";
+    std::string region8_col = "#FFF";
 
     out_stream svg_file = this->mpOutputFileHandler->OpenOutputFile(svg_file_name);
 
@@ -234,8 +236,8 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteSvgUsingMesh(Immer
                 << "xmlns=\"http://www.w3.org/2000/svg\" "
                 << "xmlns:xlink=\"http://www.w3.org/1999/xlink\" "
                 << "x=\"0px\" y=\"0px\" "
-                << "viewBox=\"0 0 " << img_w << " " << img_h << "\" "
-                << "style=\"enable-background:new 0 0 " << img_w << " " << img_h << ";\" "
+                << "viewBox=\"0 0 " << mSvgWidth << " " << mSvgHeight << "\" "
+                << "style=\"enable-background:new 0 0 " << mSvgWidth << " " << mSvgHeight << ";\" "
                 << "xml:space=\"preserve\">" << std::endl;
 
     // Add text/css style for elements
@@ -253,14 +255,14 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteSvgUsingMesh(Immer
     (*svg_file) << "</style>" << std::endl;
 
     // Add background rectangle
-    (*svg_file) << "<rect class=\"bg_rect\" width=\"" << img_w << "\" height=\"" << img_h << "\"/>" << std::endl;
+    (*svg_file) << "<rect class=\"bg_rect\" width=\"" << mSvgWidth << "\" height=\"" << mSvgHeight << "\"/>" << std::endl;
 
     // Add all nodes to the svg file
     for (typename AbstractMesh<ELEMENT_DIM,SPACE_DIM>::NodeIterator it = rMesh.GetNodeIteratorBegin();
          it != rMesh.GetNodeIteratorEnd();
          ++it)
     {
-        AddPointToSvgFile(svg_file, img_w * it->rGetLocation(), it->GetRegion(), node_rad);
+        AddPointToSvgFile(svg_file, it->rGetLocation(), it->GetRegion(), node_rad);
     }
 
     (*svg_file) << "<circle class=\"node_0\" cx=\"" << 123.4 << "\" cy=\"" << 234.5 << "\" r=\"" << 6.78 << "\"/>" << std::endl;
@@ -275,14 +277,28 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteSvgUsingMesh(Immer
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddPointToSvgFile(out_stream& rSvgFile, c_vector<double, SPACE_DIM> location, unsigned region, double rad)
 {
+    double scaled_x = location[0] * mSvgWidth;
+    double scaled_y = (1.0 - location[1]) * mSvgWidth - 0.5 * (mSvgWidth - mSvgHeight);
+
     (*rSvgFile) << "<circle class=\"node_" << region << "\" "
-                << "cx=\"" << location[0] << "\" "
-                << "cy=\"" << location[1] << "\" "
+                << "cx=\"" << scaled_x << "\" "
+                << "cy=\"" << scaled_y << "\" "
                 << "r=\"" << rad << "\"/>" << std::endl;
 
-    if (location[0] < rad)
+    // Account for possible wrap-around of glyph
+    if (scaled_x < rad)
     {
-
+        (*rSvgFile) << "<circle class=\"node_" << region << "\" "
+                    << "cx=\"" << scaled_x + mSvgWidth << "\" "
+                    << "cy=\"" << scaled_y << "\" "
+                    << "r=\"" << rad << "\"/>" << std::endl;
+    }
+    else if (scaled_x > mSvgWidth - rad)
+    {
+        (*rSvgFile) << "<circle class=\"node_" << region << "\" "
+                    << "cx=\"" << scaled_x - mSvgWidth << "\" "
+                    << "cy=\"" << scaled_y << "\" "
+                    << "r=\"" << rad << "\"/>" << std::endl;
     }
 }
 
