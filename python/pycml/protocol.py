@@ -613,6 +613,14 @@ class Protocol(processors.ModelModifier):
 #                     print 'Magic units for', var, 'defined by', defn, defn.get_units()
                     units = self.add_units(defn.get_units().extract())
                     var.units = units.name
+                elif isinstance(var, tuple):
+                    # It's an ODE; check the dependent var only
+                    (dep_var, indep_var) = var
+                    if dep_var.get_units() is self.magic_units:
+                        defn = expr.eq.rhs
+                        rhs_units = defn.get_units().extract()
+                        units = self.add_units(rhs_units.simplify(indep_var.get_units().extract()))
+                        dep_var.units = units.name
     
     def _check_equation_lhs(self, expr):
         """Check whether the variable on the LHS of a new equation exists, or whether we can create it.
