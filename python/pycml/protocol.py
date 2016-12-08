@@ -614,7 +614,7 @@ class Protocol(processors.ModelModifier):
                     units = self.add_units(defn.get_units().extract())
                     var.units = units.name
                 elif isinstance(var, tuple):
-                    # It's an ODE; check the dependent var only
+                    # It's an ODE; check the dependent var only
                     (dep_var, indep_var) = var
                     if dep_var.get_units() is self.magic_units:
                         defn = expr.eq.rhs
