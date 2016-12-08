@@ -98,11 +98,8 @@ private:
     /** Vector containing number of cell parts */
     std::vector<unsigned> mNumCellParts;
 
-    /** Width in pixels of SVG files */
-    double mSvgWidth;
-
-    /** Height in pixels of SVG files */
-    double mSvgHeight;
+    /** Width and height in pixels of SVG files */
+    double mSvgSize;
 
 #ifdef CHASTE_VTK
 //Requires  "sudo aptitude install libvtk5-dev" or similar

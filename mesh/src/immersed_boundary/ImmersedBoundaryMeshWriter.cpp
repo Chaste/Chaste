@@ -64,8 +64,7 @@ ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryMeshWriter(c
         : AbstractMeshWriter<ELEMENT_DIM, SPACE_DIM>(rDirectory, rBaseName, clearOutputDir),
           mpMesh(NULL),
           mpIters(new MeshWriterIterators<ELEMENT_DIM, SPACE_DIM>),
-          mSvgWidth(1000.0),
-          mSvgHeight(1000.0)
+          mSvgSize(1600.0)
 {
     mpIters->pNodeIter = NULL;
     mpIters->pElemIter = NULL;
@@ -211,9 +210,7 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteSvgUsingMesh(Immer
     svg_file_name += ".svg";
 
     // Image attributes
-    mSvgWidth = 1600.0;
-    mSvgHeight = 900.0;
-    double node_rad = rMesh.GetAverageNodeSpacingOfElement(0, false) * 0.25 * mSvgWidth;
+    double node_rad = rMesh.GetAverageNodeSpacingOfElement(0, false) * 0.25 * mSvgSize;
 
     // Define colours
     std::string bg_col = "darkgray";
@@ -236,8 +233,8 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteSvgUsingMesh(Immer
                 << "xmlns=\"http://www.w3.org/2000/svg\" "
                 << "xmlns:xlink=\"http://www.w3.org/1999/xlink\" "
                 << "x=\"0px\" y=\"0px\" "
-                << "viewBox=\"0 0 " << mSvgWidth << " " << mSvgHeight << "\" "
-                << "style=\"enable-background:new 0 0 " << mSvgWidth << " " << mSvgHeight << ";\" "
+                << "viewBox=\"0 0 " << mSvgSize << " " << mSvgSize << "\" "
+                << "style=\"enable-background:new 0 0 " << mSvgSize << " " << mSvgSize << ";\" "
                 << "xml:space=\"preserve\">" << std::endl;
 
     // Add text/css style for elements
@@ -255,7 +252,7 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteSvgUsingMesh(Immer
     (*svg_file) << "</style>" << std::endl;
 
     // Add background rectangle
-    (*svg_file) << "<rect class=\"bg_rect\" width=\"" << mSvgWidth << "\" height=\"" << mSvgHeight << "\"/>" << std::endl;
+    (*svg_file) << "<rect class=\"bg_rect\" width=\"" << mSvgSize << "\" height=\"" << mSvgSize << "\"/>" << std::endl;
 
     // Add all nodes to the svg file
     for (typename AbstractMesh<ELEMENT_DIM,SPACE_DIM>::NodeIterator it = rMesh.GetNodeIteratorBegin();
@@ -277,27 +274,43 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteSvgUsingMesh(Immer
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddPointToSvgFile(out_stream& rSvgFile, c_vector<double, SPACE_DIM> location, unsigned region, double rad)
 {
-    double scaled_x = location[0] * mSvgWidth;
-    double scaled_y = (1.0 - location[1]) * mSvgWidth - 0.5 * (mSvgWidth - mSvgHeight);
+    double scaled_x = location[0] * mSvgSize;
+    double scaled_y = (1.0 - location[1]) * mSvgSize;
 
     (*rSvgFile) << "<circle class=\"node_" << region << "\" "
                 << "cx=\"" << scaled_x << "\" "
                 << "cy=\"" << scaled_y << "\" "
                 << "r=\"" << rad << "\"/>" << std::endl;
 
-    // Account for possible wrap-around of glyph
+    // Account for possible wrap-around of glyph in x
     if (scaled_x < rad)
     {
         (*rSvgFile) << "<circle class=\"node_" << region << "\" "
-                    << "cx=\"" << scaled_x + mSvgWidth << "\" "
+                    << "cx=\"" << scaled_x + mSvgSize << "\" "
                     << "cy=\"" << scaled_y << "\" "
                     << "r=\"" << rad << "\"/>" << std::endl;
     }
-    else if (scaled_x > mSvgWidth - rad)
+    else if (scaled_x > mSvgSize - rad)
     {
         (*rSvgFile) << "<circle class=\"node_" << region << "\" "
-                    << "cx=\"" << scaled_x - mSvgWidth << "\" "
+                    << "cx=\"" << scaled_x - mSvgSize << "\" "
                     << "cy=\"" << scaled_y << "\" "
+                    << "r=\"" << rad << "\"/>" << std::endl;
+    }
+
+    // Account for possible wrap-around of glyph in y
+    if (scaled_y < rad)
+    {
+        (*rSvgFile) << "<circle class=\"node_" << region << "\" "
+                    << "cx=\"" << scaled_x << "\" "
+                    << "cy=\"" << scaled_y + mSvgSize << "\" "
+                    << "r=\"" << rad << "\"/>" << std::endl;
+    }
+    else if (scaled_y > mSvgSize - rad)
+    {
+        (*rSvgFile) << "<circle class=\"node_" << region << "\" "
+                    << "cx=\"" << scaled_x << "\" "
+                    << "cy=\"" << scaled_y - mSvgSize << "\" "
                     << "r=\"" << rad << "\"/>" << std::endl;
     }
 }
