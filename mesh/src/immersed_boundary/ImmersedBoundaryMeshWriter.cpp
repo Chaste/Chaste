@@ -262,8 +262,6 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteSvgUsingMesh(Immer
         AddPointToSvgFile(svg_file, it->rGetLocation(), it->GetRegion(), node_rad);
     }
 
-    (*svg_file) << "<circle class=\"node_0\" cx=\"" << 123.4 << "\" cy=\"" << 234.5 << "\" r=\"" << 6.78 << "\"/>" << std::endl;
-
     // Close svg tag
     (*svg_file) << "</svg>" << std::endl;
 
