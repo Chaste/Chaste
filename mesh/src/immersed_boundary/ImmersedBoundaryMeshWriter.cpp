@@ -210,7 +210,7 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteSvgUsingMesh(Immer
     svg_file_name += ".svg";
 
     // Image attributes
-    double node_rad = rMesh.GetAverageNodeSpacingOfElement(0, false) * 0.25 * mSvgSize;
+    double node_rad = rMesh.GetAverageNodeSpacingOfElement(0, false) * 0.35 * mSvgSize;
 
     // Define colours
     std::string bg_col = "darkgray";
