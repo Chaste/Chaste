@@ -1340,6 +1340,16 @@ class Protocol(processors.ModelModifier):
         if orig_defn_refs:
             raise ProtocolError("Cannot assign to the %s keyword." % orig_defn_kw)
         find_refs(rhs)
+        def get_orig_defn(var):
+            """Find and store the original definition before removing it."""
+            orig_defn = var.get_all_expr_dependencies()
+            if orig_defn:
+                assert len(orig_defn) == 1
+                orig_defn = list(orig_defn[0].operands())[1] # Take the RHS of the defining ODE
+            else:
+                # It had better be a constant originally with initial_value
+                orig_defn = mathml_cn.create_new(var, var.initial_value, var.units)
+            return orig_defn
         # Figure out what's on the LHS of the assignment
         if lhs.localName == u'ci':
             # Straight assignment to variable
@@ -1358,13 +1368,7 @@ class Protocol(processors.ModelModifier):
 #                     traceback.print_exc()
 #                     raise ProtocolError("No suitable value found for clamped variable " + unicode(lhs))
             if orig_defn_refs:
-                # Store the original definition before removing it
-                orig_defn = assigned_var.get_all_expr_dependencies()
-                if orig_defn:
-                    orig_defn = list(orig_defn[0].operands())[1] # Take the RHS of the defining expression
-                else:
-                     # It should be a constant var; represent its value in a <cn>
-                    orig_defn = mathml_cn.create_new(assigned_var, assigned_var.initial_value, assigned_var.units)
+                orig_defn = get_orig_defn(assigned_var)
             self.remove_definition(assigned_var, keep_initial_value=clamping)
             if clamping:
                 self.inputs.remove(expr) # The equation isn't actually used in this case
@@ -1380,9 +1384,7 @@ class Protocol(processors.ModelModifier):
             cname, dep_var_name = self._split_name(unicode(dep_var))
             dep_var = self.model.get_variable_by_name(cname, dep_var_name)
             if orig_defn_refs:
-                orig_defn = dep_var.get_all_expr_dependencies()
-                assert len(orig_defn) == 1
-                orig_defn = list(orig_defn[0].operands())[1] # Take the RHS of the defining ODE
+                orig_defn = get_orig_defn(dep_var)
             self.remove_definition(dep_var, keep_initial_value=True)
             self.add_expr_to_comp(cname, expr)
             indep_name = self._split_name(unicode(lhs.bvar.ci))
@@ -1413,10 +1415,11 @@ class Protocol(processors.ModelModifier):
         all_outputs = self.outputs | self._vector_outputs
         if all_outputs:
             # Remove parts of the model that aren't needed
-            needed_nodes = self.model.calculate_extended_dependencies(all_outputs,
-                                                                      state_vars_depend_on_odes=True)
+            needed_nodes = all_outputs.copy()
             needed_nodes.update([input for input in self.inputs
-                                 if isinstance(input, (mathml_apply, cellml_variable))])
+                                 if isinstance(input, cellml_variable)])
+            needed_nodes = self.model.calculate_extended_dependencies(needed_nodes,
+                                                                      state_vars_depend_on_odes=True)
             for node in self.model.get_assignments()[:]:
                 if node not in needed_nodes:
                     if isinstance(node, cellml_variable):
