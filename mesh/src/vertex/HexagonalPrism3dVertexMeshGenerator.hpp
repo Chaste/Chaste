@@ -36,8 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef HEXAGONALPRISM3DVERTEXMESHGENERATOR_HPP_
 #define HEXAGONALPRISM3DVERTEXMESHGENERATOR_HPP_
 
-#include <cmath>
-#include <vector>
 #include "MutableVertexMesh.hpp"
 
 /**
@@ -59,12 +57,12 @@ public:
      *
      * @param numElementsInXDirection he number of rows of elements in the x direction
      * @param numElementsInYDirection the number of rows of elements in the y direction
-     * @param elementSideLength the side length of each element in the xy plane
+     * @param elementApicalArea the apical area of each element
      * @param elementHeight the height of each element in the z direction
      */
     HexagonalPrism3dVertexMeshGenerator(unsigned numElementsInXDirection,
                                         unsigned numElementsInYDirection,
-                                        double elementSideLength,
+                                        double elementApicalArea,
                                         double elementHeight);
 
     /**
