@@ -321,6 +321,38 @@ unsigned Node<SPACE_DIM>::GetNumBoundaryElements() const
 }
 
 //////////////////////////////////////////////////////////////////////////
+// Tracking faces which contain this node as a vertex
+//////////////////////////////////////////////////////////////////////////
+
+template<unsigned SPACE_DIM>
+void Node<SPACE_DIM>::AddFace(const unsigned index)
+{
+    mFaceIndices.insert(index);
+}
+
+template<unsigned SPACE_DIM>
+void Node<SPACE_DIM>::RemoveFace(const unsigned index)
+{
+    unsigned count = mFaceIndices.erase(index);
+    if (count == 0)
+    {
+        EXCEPTION("Tried to remove an index which was not in the set");
+    }
+}
+
+template<unsigned SPACE_DIM>
+std::set<unsigned>& Node<SPACE_DIM>::rGetContainingFaceIndices()
+{
+    return mFaceIndices;
+}
+
+template<unsigned SPACE_DIM>
+unsigned Node<SPACE_DIM>::GetNumContainingFaces() const
+{
+    return mFaceIndices.size();
+}
+
+//////////////////////////////////////////////////////////////////////////
 // Tracking neighbours of the node
 //////////////////////////////////////////////////////////////////////////
 

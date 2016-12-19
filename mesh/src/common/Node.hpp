@@ -83,6 +83,9 @@ private:
     /** Set of indices of elements containing this node as a vertex. */
     std::set<unsigned> mElementIndices;
 
+    /** Set of indices of faces containing this node as a vertex. */
+    std::set<unsigned> mFaceIndices;
+
     /** Set of indices of boundary elements containing this node as a vertex. */
     std::set<unsigned> mBoundaryElementIndices;
 
@@ -265,6 +268,20 @@ public:
     void RemoveElement(unsigned index);
 
     /**
+     * Add a face that contains this node.
+     *
+     * @param index of the face to add.
+     */
+    void AddFace(const unsigned index);
+
+    /**
+     * Remove a face that contains this node.
+     *
+     * @param index of the face to be removed.
+     */
+    void RemoveFace(const unsigned index);
+
+    /**
      * Remove an boundary element that contains this node.
      *
      * @param index of the boundary element to be removed.
@@ -325,6 +342,11 @@ public:
     std::set<unsigned>& rGetContainingElementIndices();
 
     /**
+     * @return a set of indices of faces containing this node as a vertex.
+     */
+    std::set<unsigned>& rGetContainingFaceIndices();
+
+    /**
      * @return a vector containing the node attributes.
      */
     std::vector<double>& rGetNodeAttributes();
@@ -348,6 +370,11 @@ public:
      * @return the number of elements in the mesh that contain this node.
      */
     unsigned GetNumContainingElements() const;
+
+    /**
+     * @return the number of faces in the mesh that contain this node.
+     */
+    unsigned GetNumContainingFaces() const;
 
     /**
      * @return the number of boundary elements in the mesh that contain this node.
