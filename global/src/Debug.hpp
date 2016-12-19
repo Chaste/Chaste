@@ -164,6 +164,38 @@ void PrintMemory();
           std::cout << (_i==0?"":",") << v[_i]; } \
       std::cout << "}" << std::endl << std::flush; }
 
+/** Helper function for PRINT_CONTAINER that convert a container to string.
+ *  I'll just leave it in .hpp because if it were to put into .cpp, it need to be instantiated.
+ * @param container
+ * @return container as a string
+ */
+template<typename C>
+std::string ContainerToString(C container)
+{
+    std::ostringstream oss;
+    oss << "{";
+    for (typename C::const_iterator _it = container.begin(); _it!=container.end(); ++_it)
+    {
+        oss << *_it << ",";
+    }
+    std::string return_string (oss.str());
+    if (container.size() == 0)
+    {
+        return_string += "}";
+    }
+    else
+    {
+        return_string[return_string.size()-1] = '}';
+    }
+    return return_string;
+}
+
+/** Display a container of c++ standard library.
+ * @param c */
+#define PRINT_CONTAINER(c) \
+    { std::cout << FormDebugHead() << #c " = " << ContainerToString(c) << std::endl << std::flush; }
+
+
 /** (For debugging on a seriously large number of processes)
  * Show the mark that we have reached this line of code, but do it in process order, which
  * is important if we suspect that one or more processes are missing.

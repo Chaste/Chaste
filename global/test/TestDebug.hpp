@@ -107,6 +107,15 @@ public:
         vec[3] = 3.1;
         PRINT_VECTOR(vec);
 
+        std::set<double> s(vec.rbegin(), vec.rend());
+        s.insert(5.4);
+        s.insert(2.7);
+        s.insert(-1.5);
+        std::list<double> l (s.rbegin(), s.rend());
+        PRINT_CONTAINER(vec);
+        PRINT_CONTAINER(s);
+        PRINT_CONTAINER(l);
+
         MARK; // Something like: "DEBUG: ./global/test/TestDebug.hpp at line 110"
         MARK_IN_ORDER; // Something like: "DEBUG: proc 0 ./global/test/TestDebug.hpp at line 111" etc
         MARK_ON_PROCESS(1); // In serial there is no output.  In parallel, something like: "DEBUG: proc 1: ./global/test/TestDebug.hpp at line 112"
