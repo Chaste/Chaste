@@ -35,12 +35,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "MonolayerVertexMeshGenerator.hpp"
 #include "MonolayerVertexMeshCustomFunctions.hpp"
+#include "VertexMeshWriter.hpp"
 #include <algorithm>
+#include <iostream>             // PrintMesh
+#include <iomanip>              // PrintMesh
 
-MonolayerVertexMeshGenerator::MonolayerVertexMeshGenerator(const std::string& name)
+MonolayerVertexMeshGenerator::MonolayerVertexMeshGenerator(const std::string& name, const bool callDestructor)
     : mName(name),
       mpMesh(NULL),
-      mpWriter(NULL)
+      mCallDestructor(callDestructor)
 {
 }
 
@@ -52,32 +55,28 @@ MonolayerVertexMeshGenerator::MonolayerVertexMeshGenerator(const std::vector<Nod
       mApicalNodes(mBasalNodes.size()),
       mNodeLateralFaceMap(mBasalNodes.size()),
       mpMesh(NULL),
-      mpWriter(NULL)
+      mCallDestructor(true)
 {
     const unsigned num_lower_nodes = mBasalNodes.size();
     for (unsigned node_index=0; node_index<num_lower_nodes; ++node_index)
     {
-        mBasalNodes[node_index]->AddNodeAttribute(1.1);
+        SetNodeAsBasal(mBasalNodes[node_index]);
 
         // Generate new apical nodes for each basal node
         c_vector<double, 3> tmp_location;
         tmp_location = mBasalNodes[node_index]->rGetLocation();
         Node<3>* p_node_tmp = new Node<3>(node_index+num_lower_nodes, mBasalNodes[node_index]->IsBoundaryNode(),
                                           tmp_location[0], tmp_location[1], tmp_location[2] + zHeight);
-        p_node_tmp->AddNodeAttribute(2.1);
+        SetNodeAsApical(p_node_tmp);
         mApicalNodes[node_index] = p_node_tmp;
     }
 }
 
 MonolayerVertexMeshGenerator::~MonolayerVertexMeshGenerator()
 {
-    if (mpMesh)
+    if (mpMesh && mCallDestructor)
     {
         delete mpMesh;
-    }
-    if (mpWriter)
-    {
-        delete mpWriter;
     }
 }
 
@@ -98,8 +97,8 @@ MutableVertexMesh<3, 3>* MonolayerVertexMeshGenerator::MakeMeshUsing2dMesh(const
         const bool is_boundary = p_2node->IsBoundaryNode();
         Node<3>* p_lower = new Node<3>(i, is_boundary, loc[0], loc[1], 0);
         Node<3>* p_upper = new Node<3>(i+num_lower_nodes, is_boundary, loc[0], loc[1], zHeight);
-        p_lower->AddNodeAttribute(1.1);
-        p_upper->AddNodeAttribute(2.1);
+        SetNodeAsBasal(p_lower);
+        SetNodeAsApical(p_upper);
         mBasalNodes[i] = p_lower;
         mApicalNodes[i] = p_upper;
     }
@@ -122,11 +121,7 @@ MutableVertexMesh<3, 3>* MonolayerVertexMeshGenerator::MakeMeshUsing2dMesh(const
 void MonolayerVertexMeshGenerator::BuildElementWith(const unsigned numBasalNodes,
                                                     const unsigned basalNodeIndices[])
 {
-    std::vector<unsigned> node_indices_this_elem(numBasalNodes);
-    for (unsigned id=0 ; id<numBasalNodes ; ++id)
-    {
-        node_indices_this_elem[id] = basalNodeIndices[id];
-    }
+    std::vector<unsigned> node_indices_this_elem(basalNodeIndices, basalNodeIndices+numBasalNodes);
 
     BuildElementWith(node_indices_this_elem);
 }
@@ -154,7 +149,7 @@ void MonolayerVertexMeshGenerator::BuildElementWith(const std::vector<unsigned>&
     VertexElement<2, 3>* p_lower_face = new VertexElement<2, 3>(mFaces.size(), lower_nodes_this_elem);
     // Attribute is added so that it can be identified in simulation (as basal, apical and lateral faces have different contributions)
     // 1.1 instead of 1.0 as it will be casted into unsigned for simpler comparison.
-    p_lower_face->AddElementAttribute(1.1);
+    SetFaceAsBasal(p_lower_face);
     mFaces.push_back(p_lower_face);
     faces_this_elem.push_back(p_lower_face);
     faces_orientation.push_back(true);
@@ -163,7 +158,7 @@ void MonolayerVertexMeshGenerator::BuildElementWith(const std::vector<unsigned>&
     VertexElement<2,3>* p_upper_face = new VertexElement<2,3>(mFaces.size(), upper_nodes_this_elem);
     // Attribute is added so that it can be identified in simulation (as basal, apical and lateral faces have different contributions)
     // 2.1 instead of 2.0 as it will be casted into unsigned for simpler comparison.
-    p_upper_face->AddElementAttribute(2.1);
+    SetFaceAsApical(p_upper_face);
     mFaces.push_back(p_upper_face);
     faces_this_elem.push_back(p_upper_face);
     faces_orientation.push_back(false);
@@ -210,7 +205,7 @@ void MonolayerVertexMeshGenerator::BuildElementWith(const std::vector<unsigned>&
             VertexElement<2, 3>* p_lateral_face = new VertexElement<2, 3>(newFaceIndex, nodes_of_lateral_face);
             // Attribute is added so that it can be identified in simulation (as basal, apical and lateral faces have different contributions)
             // 3.1 instead of 3.0 as it will be casted into unsigned for simpler comparison.
-            p_lateral_face->AddElementAttribute(3.1);
+            SetFaceAsLateral(p_lateral_face);
             mFaces.push_back(p_lateral_face);
             faces_this_elem.push_back(p_lateral_face);
             faces_orientation.push_back(false);
@@ -220,6 +215,7 @@ void MonolayerVertexMeshGenerator::BuildElementWith(const std::vector<unsigned>&
         }
     }
     VertexElement<3, 3>* p_elem = new VertexElement<3, 3>(mElements.size(), faces_this_elem, faces_orientation, all_nodes_this_elem);
+    SetElementAsMonolayer(p_elem);
     mElements.push_back(p_elem);
 }
 
@@ -367,7 +363,7 @@ MutableVertexMesh<3, 3>* MonolayerVertexMeshGenerator::ConvertMeshToCylinder(con
                 boundary_faces[index_b] = NULL;
                 deleted_faces.push_back(p_face_b);
 
-                std::set<unsigned> elem_a_index = p_face_a->rGetContainingElementIndices();
+                std::set<unsigned> elem_a_index = p_face_a->rFaceGetContainingElementIndices();
                 assert(elem_a_index.size() == 1);
                 VertexElement<3, 3>* p_elem_a = mpMesh->GetElement(*elem_a_index.begin());
                 ///\todo: #2850 get face orientation
@@ -375,7 +371,7 @@ MutableVertexMesh<3, 3>* MonolayerVertexMeshGenerator::ConvertMeshToCylinder(con
                 assert(v_tmp[0] != UINT_MAX);
                 const bool face_orientation_a = v_tmp[1];
 
-                std::set<unsigned> elem_b_index = p_face_b->rGetContainingElementIndices();
+                std::set<unsigned> elem_b_index = p_face_b->rFaceGetContainingElementIndices();
                 assert(elem_b_index.size() == 1);
                 VertexElement<3, 3>* p_elem_b = mpMesh->GetElement(*elem_b_index.begin());
                 v_tmp = GetLateralFace(p_elem_b, p_face_b->GetNodeGlobalIndex(0), p_face_b->GetNodeGlobalIndex(1));
@@ -449,28 +445,22 @@ void MonolayerVertexMeshGenerator::ClearStoredMeshObjects()
 void MonolayerVertexMeshGenerator::WriteVtk(const std::string& outputFile, const std::string& additionalTag,
                                             const bool usingFaceId)
 {
-    if (mpWriter != NULL)
-    {
-        delete mpWriter;
-    }
-    mpWriter = new VertexMeshWriter<3, 3>(outputFile, mName, false);
-    mpWriter->WriteVtkUsingMeshWithCellId(*mpMesh, additionalTag, usingFaceId);
+    VertexMeshWriter<3, 3> writer (outputFile, mName, false);
+    writer.WriteVtkUsingMeshWithCellId(*mpMesh, additionalTag, usingFaceId);
 }
 
 void MonolayerVertexMeshGenerator::WriteVtkWithSubfolder(const std::string& outputFile,
                                                          const std::string& additionalTag,
                                                          const bool usingFaceId)
 {
-    if (mpWriter != NULL)
-    {
-        delete mpWriter;
-    }
-    mpWriter = new VertexMeshWriter<3, 3>(outputFile+"/"+mName, mName, false);
-    mpWriter->WriteVtkUsingMeshWithCellId(*mpMesh, additionalTag, usingFaceId);
+    VertexMeshWriter<3, 3> writer (outputFile+"/"+mName, mName, false);
+    writer.WriteVtkUsingMeshWithCellId(*mpMesh, additionalTag, usingFaceId);
 }
 
 void MonolayerVertexMeshGenerator::PrintMesh(const bool printDeletedObjects) const
 {
+
+    const std::string MonolayerValueToName[4] = {"","Basal", "Apical", "Lateral"};
     const std::string TAB = "    " ;
 
     std::cout <<"=================================================================================" << std::endl;
@@ -518,9 +508,9 @@ void MonolayerVertexMeshGenerator::PrintMesh(const bool printDeletedObjects) con
     {
         VertexElement<2, 3>& face = *(mpMesh->GetFace(i));
         std::cout << "FACE (" << i<< ") : " << face.GetIndex() << (face.IsDeleted()?" (DELETED)": "") << std::endl;
-        std::cout << TAB << "Face Attribute : " << face.rGetElementAttributes()[0] << (IsFaceOnBoundary(&face)?" (BOUNDARY)": "") << std::endl;
+        std::cout << TAB << "Face Attribute : " << MonolayerValueToName[GetFaceType(&face)] << (IsFaceOnBoundary(&face)?" (BOUNDARY)": "") << std::endl;
 
-        std::set<unsigned> set_tmp = face.rGetContainingElementIndices();
+        std::set<unsigned> set_tmp = face.rFaceGetContainingElementIndices();
         std::cout << TAB << "number of Elements : " << set_tmp.size() << " {  ";
         for (std::set<unsigned>::iterator it=set_tmp.begin(); it != set_tmp.end(); ++it)
         {
@@ -542,11 +532,20 @@ void MonolayerVertexMeshGenerator::PrintMesh(const bool printDeletedObjects) con
     for (unsigned i=0; i<num_nodes; ++i)
     {
         Node<3>& node = *(mpMesh->GetNode(i));
-        std::set<unsigned> set_tmp = node.rGetContainingElementIndices();
         std::cout << "NODE (" << i<< ") : " << node.GetIndex() << (node.IsDeleted()?" (DELETED)": "") << std::endl;
-        std::cout << TAB << "Node Attribute : " << node.rGetNodeAttributes()[0] << (node.IsBoundaryNode()?" (BOUNDARY)": "") << std::endl;
+        std::cout << TAB << "Node Attribute : " << MonolayerValueToName[GetNodeType(&node)] << (node.IsBoundaryNode()?" (BOUNDARY)": "") << std::endl;
+
+        std::set<unsigned> set_tmp = node.rGetContainingElementIndices();
         std::cout << TAB << "number of Elements : " << set_tmp.size() << " {  ";
         for (std::set<unsigned>::iterator it=set_tmp.begin(); it != set_tmp.end(); ++it)
+        {
+            std::cout << *it << "  ";
+        }
+        std::cout << "}" << std::endl;
+
+        std::set<unsigned> face_tmp = node.rGetContainingFaceIndices();
+        std::cout << TAB << "number of Faces : " << face_tmp.size() << " {  ";
+        for (std::set<unsigned>::iterator it=face_tmp.begin(); it != face_tmp.end(); ++it)
         {
             std::cout << *it << "  ";
         }

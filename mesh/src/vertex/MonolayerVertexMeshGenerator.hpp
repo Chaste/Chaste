@@ -37,7 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MONOLAYERVERTEXMESHGENERATOR_HPP_
 
 #include "MutableVertexMesh.hpp"
-#include "VertexMeshWriter.hpp"
 #include <set>
 
 /**
@@ -90,9 +89,10 @@ protected:
     MutableVertexMesh<3, 3>* mpMesh;
 
     /**
-     * A pointer for mesh writer.
+     * It should be set as false only if its instance is used within other class.
+     * (Shared pointer would have been nicer.)
      */
-    VertexMeshWriter<3, 3>* mpWriter;
+    bool mCallDestructor;
 
 public:
 
@@ -100,8 +100,10 @@ public:
      * Default constructor of this class. It does basically nothing.
      *
      * @param name  the name given to this instance.
+     * @param callDestructor  If mpMesh should be deleted upon call of destructor. It should be set as false
+     *        only if its instance is used within other class. (Shared pointer would have been nicer.)
      */
-    MonolayerVertexMeshGenerator(const std::string& name = "mesh");
+    MonolayerVertexMeshGenerator(const std::string& name = "mesh", const bool callDestructor = true);
 
     /**
      * Constructor that will take basal nodes and create corresponding
@@ -156,6 +158,16 @@ public:
      */
     MutableVertexMesh<3, 3>* GenerateMesh();
 
+    /**
+     * Change the current monolayer mesh to a cylinder mesh that looks like a tube
+     *
+     * @param widthX  width in the x direction of the original mesh
+     * @param widthY  width in the x direction of the original mesh
+     * @param radius  the radius of the cylinder mesh
+     * @param thickness  thickness of the cylinder mesh
+     * @param length  the length of the clinder mesh
+     * @return  the pointer of newly created cylinder mesh
+     */
     MutableVertexMesh<3, 3>* ConvertMeshToCylinder(const double widthX, const double widthY,
             const double radius, const double thickness, const double length);
 
@@ -166,6 +178,7 @@ public:
 
     /**
      * Output a .vtu data for visualization using Paraview.
+     *
      * @param outputFile  the directory of the output data
      * @param additionalTag  optional tag which will be append at the end of the data name
      * @param usingFaceId  whether to write mesh with face ID on it. By default writing with
@@ -177,6 +190,7 @@ public:
     /**
      * Alternative to output a .vtu data for visualization using Paraview. A subfolder which
      * has the same name as this class will be created to have a tidier file system.
+     *
      * @param outputFile  the directory of the output data
      * @param additionalTag  optional tag which will be append at the end of the data name
      * @param usingFaceId  whether to write mesh with face ID on it. By default writing with
