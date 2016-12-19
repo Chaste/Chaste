@@ -45,6 +45,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscSetupAndFinalize.hpp"
 #include <boost/lexical_cast.hpp>
 
+#include "Debug.hpp"
+
 //a shortcut for the lazy me
 #define RESEED RandomNumberGenerator* p_rand_gen = RandomNumberGenerator::Instance();p_rand_gen->Reseed(0);
 
@@ -54,9 +56,20 @@ class TestVoronoiPrism3dVertexMeshGenerator : public CxxTest::TestSuite
 {
 public:
 
+//    void TestCylindricalMesh() throw(Exception)
+//    {
+//        const unsigned x = 4;
+//        const unsigned y = 3;
+//        const double a = 2;
+//        const double length = 3*sqrt(3)*y+sqrt(3);
+//        const double radius = a/M_PI/2*x;
+//        HoneycombVertexMeshGenerator generator(x, y, false, 0.1, 0.01, 2*sqrt(3));
 //        MutableVertexMesh<2, 2>& vertex_2mesh = *(generator.GetMesh());
+//        MonolayerVertexMeshGenerator builder("Cylinder");
 //        builder.MakeMeshUsing2dMesh(vertex_2mesh);
 //        builder.WriteVtk("TestVoronoiPrism3dVertexMesh", "Initial");
+////        builder.PrintMesh();
+//
 //        builder.ConvertMeshToCylinder(2*x, 1, radius, 1, 1);
 //        builder.WriteVtk("TestVoronoiPrism3dVertexMesh", "After");
 ////        builder.PrintMesh();
@@ -69,6 +82,7 @@ public:
         std::vector<unsigned> relax_steps(vv, vv+4);
         unsigned x = 10;
         unsigned y = 10;
+MARK
 
         for (unsigned index=0; index< relax_steps.size(); ++index)
         {
@@ -76,11 +90,13 @@ public:
             unsigned relax_step = relax_steps[index];
             VoronoiPrism3dVertexMeshGenerator generator(x, y, 1, relax_step);
             MutableVertexMesh<3, 3>* p_mesh = generator.GetMesh();
+MARK
 
             VertexMeshWriter<3, 3> vertex_mesh_writer("TestVoronoiPrism3dVertexMesh", "10x10 relaxation step: "
                                                        + boost::lexical_cast<std::string>(relax_step), false);
             vertex_mesh_writer.WriteVtkUsingMeshWithCellId(*p_mesh);
         }
+MARK
     }
 
     void TestSimpleMesh() throw(Exception)

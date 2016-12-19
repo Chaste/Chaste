@@ -45,6 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "PetscSetupAndFinalize.hpp"
 
+
 class TestVertexElement : public CxxTest::TestSuite
 {
 public:
@@ -564,6 +565,5 @@ public:
             delete nodes[i];
         }
     }
-
 };
 #endif /*TESTVERTEXELEMENT_HPP_*/

@@ -65,6 +65,22 @@ std::set<unsigned> GetSharedElements(const Node<3>* pNodeA, const Node<3>* pNode
     return shared_elements;
 }
 
+std::set<unsigned> GetSharedFaces(const Node<3>* pNodeA, const Node<3>* pNodeB)
+{
+    Node<3>* p_node_a = const_cast<Node<3>*>(pNodeA);
+    Node<3>* p_node_b = const_cast<Node<3>*>(pNodeB);
+    std::set<unsigned> elems_with_node_a = p_node_a->rGetContainingFaceIndices();
+    std::set<unsigned> elems_with_node_b = p_node_b->rGetContainingFaceIndices();
+
+    std::set<unsigned> shared_faces;
+    std::set_intersection(elems_with_node_a.begin(), elems_with_node_a.end(),
+                          elems_with_node_b.begin(),elems_with_node_b.end(),
+                          std::inserter(shared_faces, shared_faces.begin()));
+
+    return shared_faces;
+}
+
+
 /**
  * Face is only considered a boundary face when all nodes are boundary nodes.
  * @return
@@ -95,16 +111,9 @@ bool IsFaceOnBoundary(VertexElement<2, 3>* pFace)
 
 /// ===============================================================
 /// Functions for monolayer
-namespace Monolayer
-{
-    const double SetBasalValue = 1.1;
-    const double SetApicalValue = 2.1;
-    const double SetLateralValue = 3.1;
 
-    const int BasalValue = 1;
-    const int ApicalValue = 2;
-    const int LateralValue = 3;
-}
+
+
 
 void SetNodeAsApical(Node<3>* pNode)
 {
@@ -118,7 +127,7 @@ void SetNodeAsBasal(Node<3>* pNode)
     pNode->AddNodeAttribute(Monolayer::SetBasalValue);
 }
 
-unsigned GetNodeType(const Node<3>* pNode)
+Monolayer::v_type GetNodeType(const Node<3>* pNode)
 {
     /* implemented const node as there is no modication for this
      * function. However, there isn't suitable const function for
@@ -126,7 +135,7 @@ unsigned GetNodeType(const Node<3>* pNode)
      */
     Node<3>* p_non_const_node = const_cast<Node<3>*>(pNode);
     assert(p_non_const_node->GetNumNodeAttributes() == 1u);    // LCOV_EXCL_LINE
-    return unsigned(p_non_const_node->rGetNodeAttributes()[0]);
+    return Monolayer::v_type(p_non_const_node->rGetNodeAttributes()[0]);
 }
 
 bool IsApicalNode(const Node<3>* pNode)
@@ -160,16 +169,18 @@ void SetFaceAsLateral(VertexElement<2, 3>* pFace)
     pFace->AddElementAttribute(Monolayer::SetLateralValue);
 }
 
-unsigned GetFaceType(const VertexElement<2, 3>* pFace)
+Monolayer::v_type GetFaceType(const VertexElement<2, 3>* pFace)
 {
     /* implemented const node as there is no modication for this
      * function. However, there isn't suitable const function for
      * ElementAttribute and hence required a const_cast
      */
-    VertexElement<2, 3>* p_non_const_node = const_cast<VertexElement<2, 3>*>(pFace);
-    assert(p_non_const_node->GetNumElementAttributes() == 1u);    // LCOV_EXCL_LINE
-    return unsigned(p_non_const_node->rGetElementAttributes()[0]);
+    VertexElement<2, 3>* p_non_const_face = const_cast<VertexElement<2, 3>*>(pFace);
+    assert(p_non_const_face->GetNumElementAttributes() == 1u);    // LCOV_EXCL_LINE
+    return Monolayer::v_type(p_non_const_face->rGetElementAttributes()[0]);
 }
+
+
 
 bool IsApicalFace(const VertexElement<2, 3>* pFace)
 {
@@ -185,6 +196,32 @@ bool IsLateralFace(const VertexElement<2, 3>* pFace)
 {
     return GetFaceType(pFace)==Monolayer::LateralValue;
 }
+
+void SetElementAsMonolayer(VertexElement<3, 3>* pElement)
+{
+    assert(pElement->GetNumElementAttributes() == 0u);    // LCOV_EXCL_LINE
+    pElement->AddElementAttribute(Monolayer::SetElementValue);
+    pElement->MonolayerElementRearrangeFacesNodes();
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool IsMonolayerElement(const VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement)
+{
+    if (ELEMENT_DIM!=3 || SPACE_DIM!=3)
+    {
+        return false;
+    }
+    else
+    {
+        VertexElement<ELEMENT_DIM, SPACE_DIM>* p_non_const_elem = const_cast<VertexElement<ELEMENT_DIM, SPACE_DIM>*>(pElement);
+        return (p_non_const_elem->GetNumElementAttributes() == 1u) &&
+               (Monolayer::v_type(p_non_const_elem->rGetElementAttributes()[0]) == Monolayer::ElementValue);
+    }
+}
+// Template instantiation is for the compiler
+template bool IsMonolayerElement<2, 2>(const VertexElement<2, 2>* pElement);
+template bool IsMonolayerElement<2, 3>(const VertexElement<2, 3>* pElement);
+template bool IsMonolayerElement<3, 3>(const VertexElement<3, 3>* pElement);
 
 
 VertexElement<2, 3>* GetApicalFace(const VertexElement<3, 3>* pElement)
@@ -259,6 +296,9 @@ bool GetFaceOrientation(const VertexElement<3, 3>* pElement, const unsigned face
     assert(face_found);
     return face_orientation;
 }
+
+
+
 
 //void AddPairNode(VertexElement<3, 3>* pElement, const unsigned index, Node<3>* pBasalNode, Node<3>* pApicalNode)
 //{

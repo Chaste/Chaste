@@ -721,7 +721,7 @@ unsigned MutableVertexMesh<3, 3>::DivideElement(VertexElement<3,3>* pElement,
     new_elem_faces.push_back(p_new_basal_face);
     new_elem_orientations.push_back(true);
     VertexElement<2, 3>* p_new_apical_face = new VertexElement<2, 3>((this->mFaces).size(), new_elem_apical_nodes);
-    SetFaceAsBasal(p_new_apical_face);
+    SetFaceAsApical(p_new_apical_face);
     this->mFaces.push_back(p_new_apical_face);
     new_elem_faces.push_back(p_new_apical_face);
     new_elem_orientations.push_back(false);

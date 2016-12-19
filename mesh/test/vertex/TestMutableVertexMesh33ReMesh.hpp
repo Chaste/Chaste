@@ -7,7 +7,7 @@
 #include "Warnings.hpp"
 #include "MutableVertexMesh.hpp"
 #include "MonolayerVertexMeshGenerator.hpp"
-
+#include "Debug.hpp"
 // This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 

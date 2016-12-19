@@ -32,7 +32,7 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  */
-
+#include "Debug.hpp"
 #include "GeneralMonolayerVertexMeshForce.hpp"
 #include "VertexBasedCellPopulation.hpp"
 
@@ -80,6 +80,9 @@ void GeneralMonolayerVertexMeshForce::AddForceContribution(AbstractCellPopulatio
         apical_areas[elem_index] = rMesh.CalculateAreaOfFace(p_elem->GetFace(1));
         basal_areas[elem_index] = rMesh.CalculateAreaOfFace(p_elem->GetFace(0));
     }
+PRINT_VECTOR(element_volumes)
+PRINT_VECTOR(apical_areas)
+PRINT_VECTOR(basal_areas)
 
     // Iterate over nodes in the cell population
     for (unsigned node_index = 0; node_index < num_nodes; node_index++)

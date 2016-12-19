@@ -45,25 +45,17 @@ class VertexElement;
 
 #include <set>
 #include <vector>
-#include <iostream>
+
 
 /// ===============================================================
 /// Some function that can be added into trunk and relevant for all
-
-template<typename C>
-void PrintContainer(C container)
-{
-    for (typename C::const_iterator _it = container.begin(); _it!=container.end(); ++_it)
-    {
-        std::cout << *(_it==container.begin()?"{":",") << *_it;
-    }
-    std::cout << "}" << std::endl << std::flush;
-}
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool ElementHasNode(const VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement, const unsigned nodeIndex);
 
 std::set<unsigned> GetSharedElements(const Node<3>* pNodeA, const Node<3>* pNodeB);
+
+std::set<unsigned> GetSharedFaces(const Node<3>* pNodeA, const Node<3>* pNodeB);
 
 /**
  * Face is only considered a boundary face when all nodes are boundary nodes.
@@ -74,11 +66,26 @@ bool IsFaceOnBoundary(VertexElement<2, 3>* pFace);
 /// ===============================================================
 /// Functions for monolayer
 
+namespace Monolayer
+{
+    typedef unsigned v_type;
+
+    const double SetBasalValue = 1.1;
+    const double SetApicalValue = 2.1;
+    const double SetLateralValue = 3.1;
+    const double SetElementValue = 4.1;
+
+    const v_type BasalValue = 1;
+    const v_type ApicalValue = 2;
+    const v_type LateralValue = 3;
+    const v_type ElementValue = 4;
+}
+
 void SetNodeAsApical(Node<3>* pNode);
 
 void SetNodeAsBasal(Node<3>* pNode);
 
-unsigned GetNodeType(const Node<3>* pNode);
+Monolayer::v_type GetNodeType(const Node<3>* pNode);
 
 bool IsApicalNode(const Node<3>* pNode);
 
@@ -92,13 +99,20 @@ void SetFaceAsBasal(VertexElement<2, 3>* pFace);
 
 void SetFaceAsLateral(VertexElement<2, 3>* pFace);
 
-unsigned GetFaceType(const VertexElement<2, 3>* pFace);
+Monolayer::v_type GetFaceType(const VertexElement<2, 3>* pFace);
 
 bool IsApicalFace(const VertexElement<2, 3>* pFace);
 
 bool IsBasalFace(const VertexElement<2, 3>* pFace);
 
 bool IsLateralFace(const VertexElement<2, 3>* pFace);
+
+
+void SetElementAsMonolayer(VertexElement<3, 3>* pElement);
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool IsMonolayerElement(const VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement);
+
 
 VertexElement<2, 3>* GetApicalFace(const VertexElement<3, 3>* pElement);
 
@@ -124,6 +138,7 @@ unsigned MonolayerGetNumNodes(const VertexElement<3, 3>* pElement);
 std::vector<unsigned> GetLateralFace(const VertexElement<3, 3>* pElement, const unsigned nodeIndexA, const unsigned nodeIndexB);
 
 bool GetFaceOrientation(const VertexElement<3, 3>* pElement, const unsigned faceIndex);
+
 
 //void AddPairNode(VertexElement<3, 3>* pElement, const unsigned index, Node<3>* pBasalNode, Node<3>* pApicalNode);
 
