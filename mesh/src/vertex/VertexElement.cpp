@@ -33,9 +33,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 #include "VertexElement.hpp"
-#include <cassert>
-#include <algorithm>
 
+#include <cassert>
+#include <algorithm>                                // std::swap, std::min, std::max
+#include "MonolayerVertexMeshCustomFunctions.hpp"
+#include "Debug.hpp"
+
+
+//////////////////////////////////////////////////
+///       Constructors and destructors         ///
+//////////////////////////////////////////////////
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VertexElement<ELEMENT_DIM, SPACE_DIM>::VertexElement(unsigned index,
                                                      const std::vector<VertexElement<ELEMENT_DIM-1,SPACE_DIM>*>& rFaces,
@@ -46,66 +53,28 @@ VertexElement<ELEMENT_DIM, SPACE_DIM>::VertexElement(unsigned index,
       mOrientations(rOrientations)
 {
     // This constructor should only be used in 3D
-    assert(SPACE_DIM == 3);    // LCOV_EXCL_LINE - code will be removed at compile time
+//    assert(ELEMENT_DIM == 3 && SPACE_DIM == 3);    // LCOV_EXCL_LINE
 
     // Each face must have an associated orientation
     assert(mFaces.size() == mOrientations.size());
 
-    assert(mContainingElementIndices.size() == 0);
+    // Register element&nodes with faces
+    assert(mFaceContainingElementIndices.size() == 0);
     for (unsigned face_index=0; face_index<mFaces.size(); ++face_index)
     {
-        mFaces[face_index]->rGetContainingElementIndices().insert(index);
+        VertexElement<ELEMENT_DIM-1,SPACE_DIM>* p_face = mFaces[face_index];
+        p_face->FaceAddElement(index);
+        // Register face with nodes
+        p_face->RegisterFaceWithNodes();
     }
 
+    ///\todo: #2850Need to remove this with mesh<2,3>
     if (SPACE_DIM == ELEMENT_DIM)
     {
         // Register element with nodes
         this->RegisterWithNodes();
     }
 }
-
-///\todo remove this part as MonolayerElementRearrangeFacesNodes() should to the proper work. #2850
-template<unsigned SPACE_DIM>
-class NodeLessThanYxz
-{
-public:
-    static const double DELTA_YXZ=1e-6;
-    bool operator() (const Node<SPACE_DIM>* pNode1, const Node<SPACE_DIM>* pNode2) const
-    {
-        const c_vector<double, SPACE_DIM>& location1 = pNode1->rGetLocation();
-        const c_vector<double, SPACE_DIM>& location2 = pNode2->rGetLocation();
-        bool result = false;
-
-        // As double doesn't save the exact value, direct comparison could lead to error
-        // e.g. comparison of 0.50000000000000011 and 0.50000000000000044
-        std::vector<double> is_same(SPACE_DIM, false);
-        for (unsigned i=0; i < SPACE_DIM; i++)
-        {
-            if (fabs(location1[i] - location2[i]) < DELTA_YXZ)
-            {
-                is_same[i] = true;
-            }
-        }
-
-        // Only if the two values aren't the same, the < comparison will make sense
-        if (!is_same[1] && (location1[1] < location2[1]))
-        {
-            result = true;
-        }
-        else if (is_same[1])
-        {
-            if (!is_same[0] && location1[0] < location2[0])
-            {
-                result = true;
-            }
-            else if ((SPACE_DIM == 3) && is_same[0] && !is_same[2] && (location1[2] < location2[2]))
-            {
-                result = true;
-            }
-        }
-        return result;
-    }
-};
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VertexElement<ELEMENT_DIM, SPACE_DIM>::VertexElement(unsigned index,
@@ -118,10 +87,17 @@ VertexElement<ELEMENT_DIM, SPACE_DIM>::VertexElement(unsigned index,
     // Each face must have an associated orientation
     assert(mFaces.size() == mOrientations.size());
 
-    ///\todo remove this part as MonolayerElementRearrangeFacesNodes() should to the proper work. #2850
+    // Register element&nodes with faces
+    assert(mFaceContainingElementIndices.size() == 0);
+    for (unsigned face_index=0; face_index<mFaces.size(); ++face_index)
+    {
+        mFaces[face_index]->FaceAddElement(index);
+        mFaces[face_index]->RegisterFaceWithNodes();
+    }
+
     // Make a set of nodes with mFaces
-    std::set<Node<SPACE_DIM>*, NodeLessThanYxz<SPACE_DIM> > nodes_set;
-    for (unsigned face_index=0; face_index<mFaces.size(); face_index++)
+    std::set<Node<SPACE_DIM>*> nodes_set;
+    for (unsigned face_index=0; face_index<mFaces.size(); ++face_index)
     {
         for (unsigned node_index=0; node_index<mFaces[face_index]->GetNumNodes(); node_index++)
         {
@@ -130,14 +106,13 @@ VertexElement<ELEMENT_DIM, SPACE_DIM>::VertexElement(unsigned index,
     }
 
     // Populate mNodes
-    for (typename std::set< Node<SPACE_DIM>*, NodeLessThanYxz<SPACE_DIM> >::iterator node_iter = nodes_set.begin();
+    for (typename std::set< Node<SPACE_DIM>*>::iterator node_iter = nodes_set.begin();
          node_iter != nodes_set.end();
          ++node_iter)
     {
          this->mNodes.push_back(*node_iter);
     }
 
-    this->MonolayerElementRearrangeFacesNodes();
     // Register element with nodes
     this->RegisterWithNodes();
 }
@@ -174,254 +149,6 @@ void VertexElement<ELEMENT_DIM, SPACE_DIM>::ReplaceNode(Node<SPACE_DIM>* pOldNod
             r_face.FaceUpdateNode(node_local_index, pNewNode);
     }
 }
-
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-unsigned VertexElement<ELEMENT_DIM, SPACE_DIM>::GetNumFaces() const
-{
-    return mFaces.size();
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VertexElement<ELEMENT_DIM, SPACE_DIM>::AddFace(VertexElement<ELEMENT_DIM-1,SPACE_DIM>* pFace)
-{
-    // Add pFace to the end of mFaces
-    this->mFaces.push_back(pFace);
-
-    // Create a set of indices of nodes currently owned by this element
-    std::set<unsigned> node_indices;
-    for (unsigned local_index=0; local_index<this->GetNumNodes(); local_index++)
-    {
-        node_indices.insert(this->GetNodeGlobalIndex(local_index));
-    }
-
-    // Loop over nodes owned by pFace
-    unsigned end_index = this->GetNumNodes()-1;
-    for (unsigned local_index=0; local_index<pFace->GetNumNodes(); local_index++)
-    {
-        // If this node is not already owned by this element...
-        unsigned global_index = pFace->GetNodeGlobalIndex(local_index);
-        if (node_indices.find(global_index) == node_indices.end())
-        {
-            // ... then add it to the element (and vice versa)
-            this->AddNode(pFace->GetNode(local_index), end_index);
-            end_index++;
-        }
-    }
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VertexElement<ELEMENT_DIM, SPACE_DIM>::ReplaceFace(const unsigned oldFaceLocalIndex,
-        VertexElement<SPACE_DIM-1, ELEMENT_DIM>* pNewFace, const bool newFaceOrientation)
-{
-NEVER_REACHED;
-}
-
-
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-VertexElement<ELEMENT_DIM-1, SPACE_DIM>* VertexElement<ELEMENT_DIM, SPACE_DIM>::GetFace(unsigned index) const
-{
-    assert(index < mFaces.size());
-    return mFaces[index];
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-bool VertexElement<ELEMENT_DIM, SPACE_DIM>::FaceIsOrientatedAntiClockwise(unsigned index) const
-{
-    assert(index < mOrientations.size());
-    return mOrientations[index];
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-std::vector<unsigned> VertexElement<ELEMENT_DIM, SPACE_DIM>::MonolayerElementDeleteNodes(const Node<SPACE_DIM>* pApicalNode1,
-        const Node<SPACE_DIM>* pBasalNode1, Node<SPACE_DIM>* pApicalNode2, Node<SPACE_DIM>* pBasalNode2)
-{
-    NEVER_REACHED;
-}
-
-template<>
-std::vector<unsigned> VertexElement<3, 3>::MonolayerElementDeleteNodes(const Node<3>* pApicalNodeDelete,
-        const Node<3>* pBasalNodeDelete, Node<3>* pApicalNodeStay, Node<3>* pBasalNodeStay)
-{
-    const unsigned apical_node_delete_index = pApicalNodeDelete->GetIndex();
-    const unsigned basal_node_delete_index = pBasalNodeDelete->GetIndex();
-    const unsigned basal_node_stay_index = pBasalNodeStay->GetIndex();
-
-    VertexElement<2, 3>* p_basal_face = this->GetFace(0);
-    const unsigned num_basal_nodes = p_basal_face->GetNumNodes();
-    const unsigned basal_node_stay_local_index = p_basal_face->GetNodeLocalIndex(basal_node_stay_index);
-    const unsigned basal_node_delete_local_index = p_basal_face->GetNodeLocalIndex(basal_node_delete_index);
-    unsigned earlier_local_index = std::min(basal_node_stay_local_index, basal_node_delete_local_index);
-    unsigned later_local_index = std::max(basal_node_stay_local_index, basal_node_delete_local_index);
-
-    if (earlier_local_index == 0u && later_local_index == num_basal_nodes-1)
-    {
-        std::swap(earlier_local_index, later_local_index);
-    }
-
-    std::vector<unsigned> return_vector;
-    const VertexElement<2, 3>* p_delete_lateral_face = this->GetFace(earlier_local_index+2);
-    return_vector.push_back(p_delete_lateral_face->GetIndex());
-    return_vector.push_back(this->FaceIsOrientatedAntiClockwise(earlier_local_index+2));
-    VertexElement<2, 3>* p_earlier_lateral_face = this->GetFace((earlier_local_index-1+num_basal_nodes)%num_basal_nodes+2);
-    VertexElement<2, 3>* p_later_lateral_face = this->GetFace(later_local_index+2);
-    // We will delete the node1's from the element and faces and also remove the face from the element.
-    // Operation for faces: I apical & basal faces will just remove the node1's
-    // II the lateral face not belong to the deleted element needs to update node1's to node2's
-    // III the element remove the nodes and face
-
-    // Operation I
-    this->GetFace(0)->FaceDeleteNode(pBasalNodeDelete);
-    this->GetFace(1)->FaceDeleteNode(pApicalNodeDelete);
-
-    // Operation II
-    VertexElement<2, 3>* p_lateral_II = (earlier_local_index==basal_node_delete_local_index ? p_earlier_lateral_face : p_later_lateral_face);
-    if (p_lateral_II->GetNodeLocalIndex(apical_node_delete_index)!=UINT_MAX)
-    {
-        assert(p_lateral_II->GetNodeLocalIndex(basal_node_delete_index)!=UINT_MAX);
-        p_lateral_II->FaceUpdateNode(p_lateral_II->GetNodeLocalIndex(apical_node_delete_index), pApicalNodeStay);
-        p_lateral_II->FaceUpdateNode(p_lateral_II->GetNodeLocalIndex(basal_node_delete_index), pBasalNodeStay);
-    }
-    else
-    {
-        assert(p_lateral_II->GetNodeGlobalIndex(0) == p_lateral_II->GetNodeGlobalIndex(1) ||
-               p_lateral_II->GetNodeGlobalIndex(0) == basal_node_stay_index ||
-               p_lateral_II->GetNodeGlobalIndex(1) == basal_node_stay_index);
-    }
-
-    // Operation III
-    this->DeleteNode(this->GetNodeLocalIndex(apical_node_delete_index));
-    this->DeleteNode(this->GetNodeLocalIndex(basal_node_delete_index));
-    this->DeleteFace(earlier_local_index+2);
-
-
-    this->MonolayerElementRearrangeFacesNodes();
-
-    return return_vector;
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VertexElement<ELEMENT_DIM, SPACE_DIM>::MonolayerElementRearrangeFacesNodes()
-{
-    const VertexElement<ELEMENT_DIM-1, SPACE_DIM>* p_basal = mFaces[0];
-    const VertexElement<ELEMENT_DIM-1, SPACE_DIM>* p_apical = mFaces[1];
-    const unsigned num_face_nodes = p_basal->GetNumNodes();
-    std::vector<int> stored_indices;
-    // First check and rearrange nodes if necessary
-    for (unsigned node_local_index=0; node_local_index<num_face_nodes; ++node_local_index)
-    {
-        const unsigned elem_node_global_index = this->GetNodeGlobalIndex(node_local_index);
-        const unsigned face_node_global_index = p_basal->GetNodeGlobalIndex(node_local_index);
-        if (elem_node_global_index != face_node_global_index)
-        {
-            stored_indices.push_back(this->GetNodeLocalIndex(face_node_global_index));
-            this->mNodes[node_local_index] = p_basal->GetNode(node_local_index);
-            this->mNodes[node_local_index+num_face_nodes] = p_apical->GetNode(node_local_index);
-        }
-        else
-        {
-            stored_indices.push_back(-1);
-        }
-    }
-    // sanity check
-    ///\todo #2850 make sure the non -1 in stored_indices form a cycle
-
-    // then check and rearrange faces if necessary
-    bool is_faces_in_order = true;
-    std::vector<VertexElement<ELEMENT_DIM-1, SPACE_DIM>*> tmp_lateral_faces(num_face_nodes);
-    std::vector<bool> tmp_lateral_orientations(num_face_nodes);
-    for (unsigned elem_face_index=2; elem_face_index<this->GetNumFaces(); ++ elem_face_index)
-    {
-        VertexElement<ELEMENT_DIM-1, SPACE_DIM>* p_lateral_face = mFaces[elem_face_index];
-        const unsigned first_node_local_index = this->GetNodeLocalIndex(p_lateral_face->GetNodeGlobalIndex(0));
-        const unsigned second_node_local_index = this->GetNodeLocalIndex(p_lateral_face->GetNodeGlobalIndex(1));
-        assert(first_node_local_index!=UINT_MAX && second_node_local_index!=UINT_MAX);
-
-        const unsigned proper_face_index = (mOrientations[elem_face_index] ? second_node_local_index : first_node_local_index) + 2;
-        tmp_lateral_faces[proper_face_index-2] = p_lateral_face;
-        tmp_lateral_orientations[proper_face_index-2] = mOrientations[elem_face_index];
-        if (proper_face_index != elem_face_index)
-        {
-            is_faces_in_order = false;
-        }
-    }
-    if (!is_faces_in_order)
-    {
-        for (unsigned lateral_face_index=0; lateral_face_index<tmp_lateral_faces.size(); ++lateral_face_index)
-        {
-            mFaces[lateral_face_index+2] = tmp_lateral_faces[lateral_face_index];
-            mOrientations[lateral_face_index+2] = tmp_lateral_orientations[lateral_face_index];
-        }
-    }
-    ///\todo #2850 redo mOrientation
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VertexElement<ELEMENT_DIM, SPACE_DIM>::FaceUpdateNode(const unsigned Index, Node<SPACE_DIM>* pNode)
-{
-    assert(Index < this->mNodes.size());
-
-    // Update the node at this location
-    this->mNodes[Index] = pNode;
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VertexElement<ELEMENT_DIM, SPACE_DIM>::FaceDeleteNode(const unsigned Index)
-{
-    assert(Index < this->mNodes.size());
-
-    // Remove the node at rIndex (removes node from element)
-    this->mNodes.erase(this->mNodes.begin() + Index);
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VertexElement<ELEMENT_DIM, SPACE_DIM>::FaceDeleteNode(const Node<SPACE_DIM>* pNode)
-{
-    const unsigned node_local_index = this->GetNodeLocalIndex(pNode->GetIndex());
-    if (node_local_index == UINT_MAX)
-    {
-        EXCEPTION("Node is not in face and cannot be deleted!");
-    }
-    FaceDeleteNode(node_local_index);
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VertexElement<ELEMENT_DIM, SPACE_DIM>::FaceAddNode(Node<SPACE_DIM>* pNode, const unsigned Index)
-{
-    assert(Index < this->mNodes.size());
-
-    // Add pNode to rIndex+1 element of mNodes pushing the others up
-    this->mNodes.insert(this->mNodes.begin() + Index+1,  pNode);
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VertexElement<ELEMENT_DIM, SPACE_DIM>::DeleteFace(const unsigned& rIndex)
-{
-    assert(rIndex < this->mFaces.size());
-
-    // Tidy up the registry of the face
-    std::set<unsigned>& tmp_set = this->mFaces[rIndex]->rGetContainingElementIndices();
-    assert(tmp_set.find(this->GetIndex()) != tmp_set.end());
-    tmp_set.erase(tmp_set.find(this->GetIndex()));
-
-    // Remove the face and orientation at rIndex (removes face from element)
-    this->mFaces.erase(this->mFaces.begin() + rIndex);
-    this->mOrientations.erase(this->mOrientations.begin() + rIndex);
-
-    assert(mFaces.size() == mOrientations.size());
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VertexElement<ELEMENT_DIM, SPACE_DIM>::MarkFaceAsDeleted()
-{
-    // Mark element as deleted
-    this->mIsDeleted = true;
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VertexElement<ELEMENT_DIM, SPACE_DIM>::AddFace(VertexElement<ELEMENT_DIM-1, SPACE_DIM>* pFace,
-                                                    bool Orientation,const unsigned& rIndex)
-{NEVER_REACHED;}
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> VertexElement<ELEMENT_DIM, SPACE_DIM>::GetCentroid() const
@@ -489,23 +216,74 @@ c_vector<double, SPACE_DIM> VertexElement<ELEMENT_DIM, SPACE_DIM>::GetCentroid()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-unsigned VertexElement<ELEMENT_DIM, SPACE_DIM>::GetNumContainingElements() const { NEVER_REACHED; }
-
-template<>
-unsigned VertexElement<2, 3>::GetNumContainingElements() const
+void VertexElement<ELEMENT_DIM, SPACE_DIM>::MarkAsDeleted()
 {
-    return mContainingElementIndices.size();
+    this->MutableElement<ELEMENT_DIM, SPACE_DIM>::MarkAsDeleted();
+
+    // Update faces in the element so they know they are not contained by it
+    for (unsigned i=0; i<this->GetNumFaces(); i++)
+    {
+        this->mFaces[i]->FaceRemoveElement(this->mIndex);
+    }
 }
 
+//////////////////////////////////////////////////
+///        Element manipulate faces            ///
+//////////////////////////////////////////////////
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned VertexElement<ELEMENT_DIM, SPACE_DIM>::GetNumFaces() const
+{
+    return mFaces.size();
+}
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-std::set<unsigned>& VertexElement<ELEMENT_DIM, SPACE_DIM>::rGetContainingElementIndices() { NEVER_REACHED; }
-
-template<>
-std::set<unsigned>& VertexElement<2, 3>::rGetContainingElementIndices()
+VertexElement<ELEMENT_DIM-1, SPACE_DIM>* VertexElement<ELEMENT_DIM, SPACE_DIM>::GetFace(unsigned index) const
 {
-    return mContainingElementIndices;
+    assert(index < mFaces.size());
+    return mFaces[index];
 }
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool VertexElement<ELEMENT_DIM, SPACE_DIM>::FaceIsOrientatedAntiClockwise(unsigned index) const
+{
+    assert(index < mOrientations.size());
+    return mOrientations[index];
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VertexElement<ELEMENT_DIM, SPACE_DIM>::AddFace(VertexElement<ELEMENT_DIM-1,SPACE_DIM>* pFace)
+{
+    // Add pFace to the end of mFaces
+    this->mFaces.push_back(pFace);
+    pFace->FaceAddElement(this->mIndex);
+    pFace->RegisterFaceWithNodes();
+
+    // Create a set of indices of nodes currently owned by this element
+    std::set<unsigned> node_indices;
+    for (unsigned local_index=0; local_index<this->GetNumNodes(); local_index++)
+    {
+        node_indices.insert(this->GetNodeGlobalIndex(local_index));
+    }
+
+    // Loop over nodes owned by pFace
+    unsigned end_index = this->GetNumNodes()-1;
+    for (unsigned local_index=0; local_index<pFace->GetNumNodes(); local_index++)
+    {
+        // If this node is not already owned by this element...
+        unsigned global_index = pFace->GetNodeGlobalIndex(local_index);
+        if (node_indices.find(global_index) == node_indices.end())
+        {
+            // ... then add it to the element (and vice versa)
+            this->AddNode(pFace->GetNode(local_index), end_index);
+            end_index++;
+        }
+    }
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VertexElement<ELEMENT_DIM, SPACE_DIM>::AddFace(VertexElement<ELEMENT_DIM-1, SPACE_DIM>* pFace,
+                                                    bool Orientation,const unsigned& rIndex)
+{NEVER_REACHED;}
 
 template<>
 void VertexElement<3, 3>::AddFace(VertexElement<2, 3>* pFace, bool Orientation,const unsigned& rIndex)
@@ -518,8 +296,29 @@ void VertexElement<3, 3>::AddFace(VertexElement<2, 3>* pFace, bool Orientation,c
 
     assert(mFaces.size() == mOrientations.size());
 
-    pFace->rGetContainingElementIndices().insert(this->GetIndex());
+    pFace->FaceAddElement(this->mIndex);
+    pFace->RegisterFaceWithNodes();
 }
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VertexElement<ELEMENT_DIM, SPACE_DIM>::DeleteFace(const unsigned& rIndex)
+{
+    assert(rIndex < this->mFaces.size());
+
+    // Remove element from the registry of the face
+    mFaces[rIndex]->FaceRemoveElement(this->mIndex);
+
+    // Remove the face and orientation at rIndex (removes face from element)
+    this->mFaces.erase(this->mFaces.begin() + rIndex);
+    this->mOrientations.erase(this->mOrientations.begin() + rIndex);
+
+    assert(mFaces.size() == mOrientations.size());
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VertexElement<ELEMENT_DIM, SPACE_DIM>::ReplaceFace(const unsigned oldFaceLocalIndex,
+        VertexElement<ELEMENT_DIM-1, SPACE_DIM>* pNewFace, const bool newFaceOrientation)
+{NEVER_REACHED;}
 
 template<>
 void VertexElement<3, 3>::ReplaceFace(const unsigned oldFaceLocalIndex,
@@ -527,13 +326,311 @@ void VertexElement<3, 3>::ReplaceFace(const unsigned oldFaceLocalIndex,
 {
     assert(oldFaceLocalIndex < this->mFaces.size());
 
-    this->DeleteFace(oldFaceLocalIndex);
-    this->AddFace(pNewFace, newFaceOrientation, oldFaceLocalIndex-1);
+    // Remove element from the registry of the face
+    this->mFaces[oldFaceLocalIndex]->FaceRemoveElement(this->mIndex);
+
+    // Update the face at this location
+    this->mFaces[oldFaceLocalIndex] = pNewFace;
+    this->mOrientations[oldFaceLocalIndex] = newFaceOrientation;
+
+    // Add the element to the registry of the face
+    pNewFace->FaceAddElement(this->mIndex);
 }
 
 
+//////////////////////////////////////////////////////////////////////////
+///                   Functions for monolayer elements                 ///
+//////////////////////////////////////////////////////////////////////////
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VertexElement<ELEMENT_DIM, SPACE_DIM>::MonolayerElementRearrangeFacesNodes()
+{
+    NEVER_REACHED;
+}
+
+template<>
+void VertexElement<3, 3>::MonolayerElementRearrangeFacesNodes()
+{
+MARK
+
+    const VertexElement<2, 3>* p_basal = GetBasalFace(this);
+    const VertexElement<2, 3>* p_apical = GetApicalFace(this);
+    const unsigned num_face_nodes = p_basal->GetNumNodes();
+
+    if (num_face_nodes*2!=this->GetNumNodes() || num_face_nodes!=p_apical->GetNumNodes() ||
+        num_face_nodes+2 != mFaces.size() || mFaces.size() != mOrientations.size())
+    {
+        EXCEPTION("Monolayer element has flaw!");
+    }
+
+PRINT_4_VARIABLES(this->mIndex, p_basal->GetIndex(), p_apical->GetIndex(), num_face_nodes)
+
+    // Rearrange nodes of lateral faces such that the first two nodes are the basal nodes.
+    // It is assumed that the nodes are in certain cyclic order, but doesn't make unordered nodes
+    // into cyclic order. (say cyclic order is [1,2,3,4], this will sort out [3,2,1,4] but not [3,2,4,1].
+
+std::vector<unsigned> lateral_face_indices;
+std::vector<unsigned> first_node_global_indices;
+std::vector<unsigned> second_node_global_indices;
+for (unsigned elem_face_index=2; elem_face_index<this->GetNumFaces(); ++ elem_face_index)
+{
+    VertexElement<2, 3>* p_lateral_face = mFaces[elem_face_index];
+    lateral_face_indices.push_back(p_lateral_face->GetIndex());
+    first_node_global_indices.push_back(p_lateral_face->GetNodeGlobalIndex(0));
+    second_node_global_indices.push_back(p_lateral_face->GetNodeGlobalIndex(1));
+}
+std::vector<unsigned> right_node_indices, wrong_node_indices;
+for (unsigned i=0; i<num_face_nodes; ++i)
+    right_node_indices.push_back(p_basal->GetNodeGlobalIndex(i));
+for (unsigned i=0; i<2*num_face_nodes; ++i)
+    wrong_node_indices.push_back(this->GetNodeGlobalIndex(i));
+PRINT_CONTAINER(right_node_indices)
+PRINT_CONTAINER(wrong_node_indices)
+PRINT_CONTAINER(lateral_face_indices)
+PRINT_CONTAINER(first_node_global_indices)
+PRINT_CONTAINER(second_node_global_indices)
 
 
+
+    std::vector<int> stored_indices;
+    // First check and rearrange nodes if necessary
+    for (unsigned node_local_index=0; node_local_index<num_face_nodes; ++node_local_index)
+    {
+        const unsigned elem_node_global_index = this->GetNodeGlobalIndex(node_local_index);
+        const unsigned face_node_global_index = p_basal->GetNodeGlobalIndex(node_local_index);
+        if (elem_node_global_index != face_node_global_index)
+        {
+            stored_indices.push_back(this->GetNodeLocalIndex(face_node_global_index));
+            this->mNodes[node_local_index] = p_basal->GetNode(node_local_index);
+            this->mNodes[node_local_index+num_face_nodes] = p_apical->GetNode(node_local_index);
+        }
+        else
+        {
+            stored_indices.push_back(-1);
+        }
+    }
+PRINT_CONTAINER(stored_indices)
+    // sanity check
+    ///\todo #2850 make sure the non -1 in stored_indices form a cycle
+
+    // then check and rearrange faces if necessary
+    bool is_faces_in_order = true;
+    std::vector<VertexElement<2, 3>*> tmp_lateral_faces(num_face_nodes);
+    std::vector<bool> tmp_lateral_orientations(num_face_nodes);
+PRINT_CONTAINER(tmp_lateral_orientations)
+    for (unsigned elem_face_index=2; elem_face_index<this->GetNumFaces(); ++ elem_face_index)
+    {
+        VertexElement<2, 3>* p_lateral_face = mFaces[elem_face_index];
+        const unsigned first_node_local_index = this->GetNodeLocalIndex(p_lateral_face->GetNodeGlobalIndex(0));
+        const unsigned second_node_local_index = this->GetNodeLocalIndex(p_lateral_face->GetNodeGlobalIndex(1));
+        assert(first_node_local_index!=UINT_MAX && second_node_local_index!=UINT_MAX);
+
+        const unsigned proper_face_index = (mOrientations[elem_face_index] ? second_node_local_index : first_node_local_index) + 2;
+        tmp_lateral_faces[proper_face_index-2] = p_lateral_face;
+        tmp_lateral_orientations[proper_face_index-2] = mOrientations[elem_face_index];
+        if (proper_face_index != elem_face_index)
+        {
+            is_faces_in_order = false;
+        }
+    }
+    if (!is_faces_in_order)
+    {
+        for (unsigned lateral_face_index=0; lateral_face_index<tmp_lateral_faces.size(); ++lateral_face_index)
+        {
+            mFaces[lateral_face_index+2] = tmp_lateral_faces[lateral_face_index];
+            mOrientations[lateral_face_index+2] = tmp_lateral_orientations[lateral_face_index];
+        }
+    }
+    ///\todo #2850 redo mOrientation
+MARK
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+std::vector<unsigned> VertexElement<ELEMENT_DIM, SPACE_DIM>::MonolayerElementDeleteNodes(
+                      const Node<SPACE_DIM>* pApicalNode1, const Node<SPACE_DIM>* pBasalNode1,
+                      Node<SPACE_DIM>* pApicalNode2, Node<SPACE_DIM>* pBasalNode2)
+{
+    NEVER_REACHED;
+}
+
+template<>
+std::vector<unsigned> VertexElement<3, 3>::MonolayerElementDeleteNodes(const Node<3>* pApicalNodeDelete,
+        const Node<3>* pBasalNodeDelete, Node<3>* pApicalNodeStay, Node<3>* pBasalNodeStay)
+{
+    const unsigned apical_node_delete_index = pApicalNodeDelete->GetIndex();
+    const unsigned basal_node_delete_index = pBasalNodeDelete->GetIndex();
+    const unsigned basal_node_stay_index = pBasalNodeStay->GetIndex();
+
+    VertexElement<2, 3>* p_basal_face = GetBasalFace(this);
+    const unsigned num_basal_nodes = p_basal_face->GetNumNodes();
+    const unsigned basal_node_stay_local_index = p_basal_face->GetNodeLocalIndex(basal_node_stay_index);
+    const unsigned basal_node_delete_local_index = p_basal_face->GetNodeLocalIndex(basal_node_delete_index);
+    unsigned earlier_local_index = std::min(basal_node_stay_local_index, basal_node_delete_local_index);
+    unsigned later_local_index = std::max(basal_node_stay_local_index, basal_node_delete_local_index);
+
+    if (earlier_local_index == 0u && later_local_index == num_basal_nodes-1)
+    {
+        std::swap(earlier_local_index, later_local_index);
+    }
+
+    std::vector<unsigned> return_vector;
+    const VertexElement<2, 3>* p_delete_lateral_face = this->GetFace(earlier_local_index+2);
+    return_vector.push_back(p_delete_lateral_face->GetIndex());
+    return_vector.push_back(this->FaceIsOrientatedAntiClockwise(earlier_local_index+2));
+    VertexElement<2, 3>* p_earlier_lateral_face = this->GetFace((earlier_local_index-1+num_basal_nodes)%num_basal_nodes+2);
+    VertexElement<2, 3>* p_later_lateral_face = this->GetFace(later_local_index+2);
+    // We will delete the node1's from the element and faces and also remove the face from the element.
+    // Operation for faces: I apical & basal faces will just remove the node1's
+    // II the lateral face not belong to the deleted element needs to update node1's to node2's
+    // III the element remove the nodes and face
+
+    // Operation I
+    GetBasalFace(this)->FaceDeleteNode(pBasalNodeDelete);
+    GetApicalFace(this)->FaceDeleteNode(pApicalNodeDelete);
+
+    // Operation II
+    VertexElement<2, 3>* p_lateral_II = (earlier_local_index==basal_node_delete_local_index ? p_earlier_lateral_face : p_later_lateral_face);
+    if (p_lateral_II->GetNodeLocalIndex(apical_node_delete_index)!=UINT_MAX)
+    {
+        assert(p_lateral_II->GetNodeLocalIndex(basal_node_delete_index)!=UINT_MAX);
+        p_lateral_II->FaceUpdateNode(p_lateral_II->GetNodeLocalIndex(apical_node_delete_index), pApicalNodeStay);
+        p_lateral_II->FaceUpdateNode(p_lateral_II->GetNodeLocalIndex(basal_node_delete_index), pBasalNodeStay);
+    }
+    else
+    {
+        assert(p_lateral_II->GetNodeGlobalIndex(0) == p_lateral_II->GetNodeGlobalIndex(1) ||
+               p_lateral_II->GetNodeGlobalIndex(0) == basal_node_stay_index ||
+               p_lateral_II->GetNodeGlobalIndex(1) == basal_node_stay_index);
+    }
+
+    // Operation III
+    this->DeleteNode(this->GetNodeLocalIndex(apical_node_delete_index));
+    this->DeleteNode(this->GetNodeLocalIndex(basal_node_delete_index));
+    this->DeleteFace(earlier_local_index+2);
+
+
+    this->MonolayerElementRearrangeFacesNodes();
+
+    return return_vector;
+}
+
+
+//////////////////////////////////////////////////////////////////////////
+///            Implementation of faces (similar to element)            ///
+//////////////////////////////////////////////////////////////////////////
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VertexElement<ELEMENT_DIM, SPACE_DIM>::FaceResetIndex(unsigned index)
+{
+    for (unsigned i=0; i<this->GetNumNodes(); ++i)
+    {
+       this->mNodes[i]->RemoveFace(this->mIndex);
+    }
+    this->mIndex = index;
+    this->RegisterFaceWithNodes();
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VertexElement<ELEMENT_DIM, SPACE_DIM>::FaceAddNode(Node<SPACE_DIM>* pNode, const unsigned Index)
+{
+    assert(Index < this->mNodes.size());
+
+    // Add pNode to Index+1 face of mNodes pushing the others up
+    this->mNodes.insert(this->mNodes.begin() + Index+1,  pNode);
+
+    // Add face to this node
+    pNode->AddFace(this->mIndex);
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VertexElement<ELEMENT_DIM, SPACE_DIM>::FaceDeleteNode(const unsigned Index)
+{
+    assert(Index < this->mNodes.size());
+
+    // Remove face from the node at this location
+    this->mNodes[Index]->RemoveFace(this->mIndex);
+
+    // Remove the node at Index (removes node from face)
+    this->mNodes.erase(this->mNodes.begin() + Index);
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VertexElement<ELEMENT_DIM, SPACE_DIM>::FaceDeleteNode(const Node<SPACE_DIM>* pNode)
+{
+    const unsigned node_local_index = this->GetNodeLocalIndex(pNode->GetIndex());
+    if (node_local_index == UINT_MAX)
+    {
+        EXCEPTION("Node is not in face and cannot be deleted!");
+    }
+    FaceDeleteNode(node_local_index);
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VertexElement<ELEMENT_DIM, SPACE_DIM>::FaceUpdateNode(const unsigned Index, Node<SPACE_DIM>* pNode)
+{
+    assert(Index < this->mNodes.size());
+
+    // Remove it from the node at this location
+    this->mNodes[Index]->RemoveFace(this->mIndex);
+
+    // Update the node at this location
+    this->mNodes[Index] = pNode;
+
+    // Add face to this node
+    pNode->AddFace(this->mIndex);
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VertexElement<ELEMENT_DIM, SPACE_DIM>::RegisterFaceWithNodes()
+{
+    for (unsigned i=0; i<this->mNodes.size(); ++i)
+    {
+        this->mNodes[i]->AddFace(this->mIndex);
+    }
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VertexElement<ELEMENT_DIM, SPACE_DIM>::MarkFaceAsDeleted()
+{
+    // Mark face as deleted
+    this->mIsDeleted = true;
+
+    // Update nodes in the face so they know they are not contained by it
+    for (unsigned i=0; i<this->GetNumNodes(); i++)
+    {
+        this->mNodes[i]->RemoveFace(this->mIndex);
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////////////
+///               Tracking element which contain this face             ///
+//////////////////////////////////////////////////////////////////////////
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VertexElement<ELEMENT_DIM, SPACE_DIM>::FaceAddElement(unsigned elementIndex)
+{
+    mFaceContainingElementIndices.insert(elementIndex);
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VertexElement<ELEMENT_DIM, SPACE_DIM>::FaceRemoveElement(unsigned elementIndex)
+{
+    unsigned count = mFaceContainingElementIndices.erase(elementIndex);
+    if (count == 0)
+    {
+        EXCEPTION("Tried to remove an index which was not in the set");
+    }
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+std::set<unsigned>& VertexElement<ELEMENT_DIM, SPACE_DIM>::rFaceGetContainingElementIndices()
+{
+    return mFaceContainingElementIndices;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned VertexElement<ELEMENT_DIM, SPACE_DIM>::FaceGetNumContainingElements() const
+{
+    return mFaceContainingElementIndices.size();
+}
 
 
 
@@ -574,8 +671,134 @@ bool VertexElement<1, SPACE_DIM>::FaceIsOrientatedAntiClockwise(unsigned index) 
 template<unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> VertexElement<1, SPACE_DIM>::GetCentroid() const
 {
+    if (this->GetNumNodes() != 2u)
+    {
+        EXCEPTION("1D line should only has 2 nodes!");
+    }
     return 0.5*(this->GetNodeLocation(0) + this->GetNodeLocation(1));
 }
+
+
+template<unsigned SPACE_DIM>
+void VertexElement<1, SPACE_DIM>::AddFace(VertexElement<0, SPACE_DIM>* pFace)
+{
+    NEVER_REACHED;
+}
+template<unsigned SPACE_DIM>
+void VertexElement<1, SPACE_DIM>::AddFace(VertexElement<0, SPACE_DIM>* pFace, bool Orientation,const unsigned& rIndex)
+{
+    NEVER_REACHED;
+}
+template<unsigned SPACE_DIM>
+void VertexElement<1, SPACE_DIM>::DeleteFace(const unsigned& rIndex)
+{
+    NEVER_REACHED;
+}
+template<unsigned SPACE_DIM>
+void VertexElement<1, SPACE_DIM>::ReplaceFace(const unsigned oldFaceLocalIndex,
+        VertexElement<0, SPACE_DIM>* pNewFace, const bool newFaceOrientation)
+{
+    NEVER_REACHED;
+}
+template<unsigned SPACE_DIM>
+std::vector<unsigned> VertexElement<1, SPACE_DIM>::MonolayerElementDeleteNodes(const Node<SPACE_DIM>* pApicalNodeDelete,
+            const Node<SPACE_DIM>* pBasalNodeDelete, Node<SPACE_DIM>* pApicalNodeStay, Node<SPACE_DIM>* pBasalNodeStay)
+{
+    NEVER_REACHED;
+}
+template<unsigned SPACE_DIM>
+void VertexElement<1, SPACE_DIM>::MonolayerElementRearrangeFacesNodes()
+{
+    NEVER_REACHED;
+}
+
+template <unsigned SPACE_DIM>
+void VertexElement<1, SPACE_DIM>::FaceResetIndex(unsigned index)
+{
+    for (unsigned i=0; i<this->GetNumNodes(); ++i)
+    {
+       this->mNodes[i]->RemoveFace(this->mIndex);
+    }
+    this->mIndex = index;
+    this->RegisterFaceWithNodes();
+}
+
+template<unsigned SPACE_DIM>
+void VertexElement<1, SPACE_DIM>::FaceAddNode(Node<SPACE_DIM>* pNode, const unsigned Index)
+{
+    NEVER_REACHED;
+}
+template<unsigned SPACE_DIM>
+void VertexElement<1, SPACE_DIM>::FaceDeleteNode(const unsigned Index)
+{
+    NEVER_REACHED;
+}
+template<unsigned SPACE_DIM>
+void VertexElement<1, SPACE_DIM>::FaceDeleteNode(const Node<SPACE_DIM>* pNode)
+{
+    NEVER_REACHED;
+}
+template<unsigned SPACE_DIM>
+void VertexElement<1, SPACE_DIM>::FaceUpdateNode(const unsigned Index, Node<SPACE_DIM>* pNode)
+{
+    NEVER_REACHED;
+}
+
+template<unsigned SPACE_DIM>
+void VertexElement<1, SPACE_DIM>::RegisterFaceWithNodes()
+{
+    for (unsigned i=0; i<this->mNodes.size(); i++)
+    {
+        this->mNodes[i]->AddFace(this->mIndex);
+    }
+}
+
+template<unsigned SPACE_DIM>
+void VertexElement<1, SPACE_DIM>::MarkFaceAsDeleted()
+{
+    // Mark face as deleted
+    this->mIsDeleted = true;
+
+    // Update nodes in the face so they know they are not contained by it
+    for (unsigned i=0; i<this->GetNumNodes(); i++)
+    {
+        this->mNodes[i]->RemoveFace(this->mIndex);
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////////////
+///               Tracking element which contain this face             ///
+//////////////////////////////////////////////////////////////////////////
+template<unsigned SPACE_DIM>
+void VertexElement<1, SPACE_DIM>::FaceAddElement(const unsigned elementIndex)
+{
+    mFaceContainingElementIndices.insert(elementIndex);
+}
+
+template<unsigned SPACE_DIM>
+void VertexElement<1, SPACE_DIM>::FaceRemoveElement(const unsigned elementIndex)
+{
+    unsigned count = mFaceContainingElementIndices.erase(elementIndex);
+    if (count == 0)
+    {
+        EXCEPTION("Tried to remove an index which was not in the set");
+    }
+}
+
+template<unsigned SPACE_DIM>
+unsigned VertexElement<1, SPACE_DIM>::FaceGetNumContainingElements() const
+{
+    return mFaceContainingElementIndices.size();
+}
+
+template<unsigned SPACE_DIM>
+std::set<unsigned>& VertexElement<1, SPACE_DIM>::rFaceGetContainingElementIndices()
+{
+    return mFaceContainingElementIndices;
+}
+
+
 
 
 // Explicit instantiation

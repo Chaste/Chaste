@@ -72,7 +72,7 @@ private:
     /**
      * Set of indices of elements containing this face.
      */
-    std::set<unsigned> mContainingElementIndices;
+    std::set<unsigned> mFaceContainingElementIndices;
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
@@ -93,6 +93,7 @@ private:
         // This needs to be first so that MeshBasedCellPopulation::Validate() doesn't go mental.
         archive & mFaces;
         archive & mOrientations;
+        archive & mFaceContainingElementIndices;
         archive & boost::serialization::base_object<MutableElement<ELEMENT_DIM, SPACE_DIM> >(*this);
     }
 
@@ -159,30 +160,25 @@ public:
     void ReplaceNode(Node<SPACE_DIM>* pOldNode, Node<SPACE_DIM>* pNewNode);
 
     /**
+     * Compute the centroid of an element. Exact same function as VertexMesh::GetCentroidOfElement(const unsigned&)
+     * but it has been added so that it is accessible for faces as well
+     *
+     * @return centroid of the VertexElement.
+     */
+    c_vector<double, SPACE_DIM> GetCentroid() const;
+
+    /**
+     * Overridden MarkAsDeleted() method.
+     *
+     * Mark an element as having been removed from the mesh.
+     * Also notify nodes and faces in the element that it has been removed.
+     */
+    void MarkAsDeleted();
+
+    /**
      * @return the number of faces owned by this element.
      */
     unsigned GetNumFaces() const;
-
-    /**
-     * Add a face to the element.
-     *
-     * @param pFace a pointer to the new face
-     */
-    void AddFace(VertexElement<ELEMENT_DIM-1, SPACE_DIM>* pFace);
-
-    /**
-     * Delete a face of an element with given local index. This method will
-     * remove the corresponding face orientation as well.
-     *
-     * @param rIndex is the local index of the face to remove
-     */
-    void DeleteFace(const unsigned& rIndex);
-
-    /**
-     * Replace old face with the new face and its orientation
-     */
-    void ReplaceFace(const unsigned oldFaceLocalIndex, VertexElement<SPACE_DIM-1, ELEMENT_DIM>* pNewFace,
-                     const bool newFaceOrientation);
 
     /**
      * @param index the global index of a specified face
@@ -197,6 +193,37 @@ public:
      * @param index the index of the face
      */
     bool FaceIsOrientatedAntiClockwise(unsigned index) const;
+
+    /**
+     * Add a face to the element.
+     *
+     * @param pFace a pointer to the new face
+     */
+    void AddFace(VertexElement<ELEMENT_DIM-1, SPACE_DIM>* pFace);
+
+    /**
+     * Add a face of an element with given local index. This method will
+     * add the corresponding face orientation as well.
+     *
+     * @param pFace is the face to add
+     * @param Orientation is the orientation of pFace
+     * @param rIndex is the local index of the face to add
+     */
+    void AddFace(VertexElement<ELEMENT_DIM-1, SPACE_DIM>* pFace, bool Orientation,const unsigned& rIndex);
+
+    /**
+     * Delete a face of an element with given local index. This method will
+     * remove the corresponding face orientation as well.
+     *
+     * @param rIndex is the local index of the face to remove
+     */
+    void DeleteFace(const unsigned& rIndex);
+
+    /**
+     * Replace old face with the new face and its orientation
+     */
+    void ReplaceFace(const unsigned oldFaceLocalIndex, VertexElement<ELEMENT_DIM-1, SPACE_DIM>* pNewFace,
+                     const bool newFaceOrientation);
 
     /**
      * Method for monolayer element. Delete ApicalNode1 and BasalNode1.
@@ -221,12 +248,19 @@ public:
     void MonolayerElementRearrangeFacesNodes();
 
     /**
-     * Method for faces. Update node at the given index.
+     * Reset the global index of the face and update its nodes.
      *
-     * @param Index is an local index to which node to change
-     * @param pNode is a pointer to the replacement node
+     * @param index the new global index
      */
-    void FaceUpdateNode(const unsigned Index, Node<SPACE_DIM>* pNode);
+    void FaceResetIndex(unsigned index);
+
+    /**
+     * Method for faces. Add a node to the element between nodes at Index and Index+1.
+     *
+     * @param Index the local index of the node after which the new node is added
+     * @param pNode a pointer to the new node
+     */
+    void FaceAddNode(Node<SPACE_DIM>* pNode, const unsigned Index);
 
     /**
      * Method for faces. Delete a node with given local index.
@@ -243,12 +277,18 @@ public:
     void FaceDeleteNode(const Node<SPACE_DIM>* pNode);
 
     /**
-     * Method for faces. Add a node to the element between nodes at Index and Index+1.
+     * Method for faces. Update node at the given index.
      *
-     * @param Index the local index of the node after which the new node is added
-     * @param pNode a pointer to the new node
+     * @param Index is an local index to which node to change
+     * @param pNode is a pointer to the replacement node
      */
-    void FaceAddNode(Node<SPACE_DIM>* pNode, const unsigned Index);
+    void FaceUpdateNode(const unsigned Index, Node<SPACE_DIM>* pNode);
+
+    /**
+     * Informs all nodes forming this face that they are in this face.
+     * Called normally together with FaceAddElement to do the registry together.
+     */
+    void RegisterFaceWithNodes();
 
     /**
      * Mark a face as having been removed from the mesh.
@@ -256,40 +296,29 @@ public:
      */
     void MarkFaceAsDeleted();
 
-    /**
-     * Add a face of an element with given local index. This method will
-     * add the corresponding face orientation as well.
-     *
-     * @param pFace is the face to add
-     * @param Orientation is the orientation of pFace
-     * @param rIndex is the local index of the face to add
-     */
-    void AddFace(VertexElement<ELEMENT_DIM-1, SPACE_DIM>* pFace, bool Orientation,const unsigned& rIndex);
-
-    /**
-     * Compute the centroid of an element. Exact same function as VertexMesh::GetCentroidOfElement(const unsigned&)
-     * but it has been added so that it is accessible for faces as well
-     *
-     * @return centroid of the VertexElement.
-     */
-    c_vector<double, SPACE_DIM> GetCentroid() const;
-
-    /**
-     *  @return the number of elements in the mesh that contain this face.
-     */
-    unsigned GetNumContainingElements() const;
-
-    /**
-     * @return a set of indices of elements containing this face.
-     */
-    std::set<unsigned>& rGetContainingElementIndices();
 
     /**
      * face will add element index into its registry.
      * @param elementIndex  the index of the element
      */
-    void RegisterElement(const unsigned elementIndex);
+    void FaceAddElement(const unsigned elementIndex);
 
+    /**
+     * Remove a element that contains this face.
+     *
+     * @param elementIndex
+     */
+    void FaceRemoveElement(const unsigned elementIndex);
+
+    /**
+     *  @return the number of elements in the mesh that contain this face.
+     */
+    unsigned FaceGetNumContainingElements() const;
+
+    /**
+     * @return a set of indices of elements containing this face.
+     */
+    std::set<unsigned>& rFaceGetContainingElementIndices();
 };
 
 
@@ -306,6 +335,35 @@ public:
 template<unsigned SPACE_DIM>
 class VertexElement<1, SPACE_DIM> : public MutableElement<1,SPACE_DIM>
 {
+
+private:
+    /**
+     * Set of indices of elements containing this face.
+     */
+    std::set<unsigned> mFaceContainingElementIndices;
+
+    /** Needed for serialization. */
+    friend class boost::serialization::access;
+    /**
+     * Serialize the object and its member variables.
+     *
+     * Note that serialization of the mesh and cells is handled by load/save_construct_data.
+     *
+     * Note also that member data related to writers is not saved - output must
+     * be set up again by the caller after a restart.
+     *
+     * @param archive the archive
+     * @param version the current version of this class
+     */
+    template<class Archive>
+    void serialize(Archive & archive, const unsigned int version)
+    {
+        // This needs to be first so that MeshBasedCellPopulation::Validate() doesn't go mental.
+        archive & mFaceContainingElementIndices;
+        archive & boost::serialization::base_object<MutableElement<1, SPACE_DIM> >(*this);
+    }
+
+
 public:
 
     /**
@@ -344,12 +402,27 @@ public:
     c_vector<double, SPACE_DIM> GetCentroid() const;
 
     /**
-     * Dummy function to satisfy compiler.
+     * Dummy function declarations to satisfy compiler.
      */
-    void FaceUpdateNode(const unsigned& rIndex, Node<SPACE_DIM>* pNode) {NEVER_REACHED;}
-    void MonolayerElementRearrangeFacesNodes() {NEVER_REACHED;}
-    std::set<unsigned>& rGetContainingElementIndices() {NEVER_REACHED;}
-    void MarkFaceAsDeleted() {NEVER_REACHED;}
+    void AddFace(VertexElement<0, SPACE_DIM>* pFace);
+    void AddFace(VertexElement<0, SPACE_DIM>* pFace, bool Orientation,const unsigned& rIndex);
+    void DeleteFace(const unsigned& rIndex);
+    void ReplaceFace(const unsigned oldFaceLocalIndex, VertexElement<0, SPACE_DIM>* pNewFace,
+                     const bool newFaceOrientation);
+    std::vector<unsigned> MonolayerElementDeleteNodes(const Node<SPACE_DIM>* pApicalNodeDelete, const Node<SPACE_DIM>* pBasalNodeDelete,
+                                        Node<SPACE_DIM>* pApicalNodeStay, Node<SPACE_DIM>* pBasalNodeStay);
+    void MonolayerElementRearrangeFacesNodes();
+    void FaceResetIndex(unsigned index);
+    void FaceAddNode(Node<SPACE_DIM>* pNode, const unsigned Index);
+    void FaceDeleteNode(const unsigned Index);
+    void FaceDeleteNode(const Node<SPACE_DIM>* pNode);
+    void FaceUpdateNode(const unsigned Index, Node<SPACE_DIM>* pNode);
+    void RegisterFaceWithNodes();
+    void MarkFaceAsDeleted();
+    void FaceAddElement(const unsigned elementIndex);
+    void FaceRemoveElement(const unsigned elementIndex);
+    unsigned FaceGetNumContainingElements() const;
+    std::set<unsigned>& rFaceGetContainingElementIndices();
 };
 
 #endif /*VERTEXELEMENT_HPP_*/
