@@ -67,6 +67,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexMeshWriter.hpp"
 #include "MutableVertexMesh.hpp"
 #include <cmath>                                    // for atan2
+#include "MonolayerVertexMeshGenerator.hpp"
+
 
 class GeodesicSphereBuilder
 {
@@ -74,11 +76,6 @@ private:
     unsigned mDepth;
     static const double X = 0.525731112119133606;
     static const double Z = 0.850650808352039932;
-
-    c_vector<double,3> normalise(const c_vector<double,3>& v)
-    {
-        return v/norm_2(v);
-    }
 
     class SortWithIndex
     {
@@ -94,7 +91,12 @@ public:
     std::vector<VertexElement<1,3>*> mEdges;
     std::vector<VertexElement<2,3>*> mFaces;
 
-    GeodesicSphereBuilder()
+    c_vector<double,3> normalise(const c_vector<double,3>& v)
+                {
+        return v/norm_2(v);
+                }
+
+    GeodesicSphereBuilder(const unsigned numDivision=0u)
     : mDepth(0)
     {
         const double vdata[12][3] = {
@@ -130,7 +132,7 @@ public:
 //PRINT_3_VARIABLES(i, tindices[i][ja], tindices[i][jb])
 //PRINT_CONTAINER(node_a_edges)
 //PRINT_CONTAINER(node_b_edges)
-                std::set<unsigned> shared_edge = GetSharedFaces(node_a, node_b);
+                std::set<unsigned> shared_edge = GetSharedFaceIndices(node_a, node_b);
 
                 unsigned current_edge_index = UINT_MAX;
                 if (shared_edge.size() == 0)
@@ -153,8 +155,16 @@ public:
 
                 this_face_edges.push_back(mEdges[current_edge_index]);
             }
-assert(mFaces.size() == i);
+            assert(mFaces.size() == i);
             mFaces.push_back(new VertexElement<2,3>(mFaces.size(), this_face_edges, this_face_orientations, this_face_nodes));
+        }
+
+PRINT_3_VARIABLES(mNodes.size(), mEdges.size(), mFaces.size());
+
+        for (unsigned i=0; i<numDivision; ++i)
+        {
+            SubDivide();
+PRINT_3_VARIABLES(mNodes.size(), mEdges.size(), mFaces.size());
         }
     }
 
@@ -165,8 +175,8 @@ assert(mFaces.size() == i);
         const unsigned num_old_faces = mFaces.size();
         if (num_old_nodes+num_old_faces-num_old_edges != 2)
         {
-TRACE("EXCEPTION EULER IS THE BOSS")
-            EXCEPTION("Breaking Euler's Polyhedron Formula!");
+            TRACE("EXCEPTION EULER IS THE BOSS")
+                            EXCEPTION("Breaking Euler's Polyhedron Formula!");
         }
 
         // For sanity check later
@@ -188,27 +198,27 @@ TRACE("EXCEPTION EULER IS THE BOSS")
         // Creating new faces and edges
         for (unsigned old_face_index=0; old_face_index<num_old_faces; ++old_face_index)
         {
-            /*
-             *           1
-             *           /\
-             *          /  \
-             *         /  b \
-             *      0'/______\2'
-             *       /\      /\
-             *      /  \  d /  \
-             *     /  c \  /  a \
-             *    /______\/______\
-             *   2        1'      0
-             */
+                /*
+                 *           1
+                 *           /\
+                 *          /  \
+                 *         /  b \
+                 *      0'/______\2'
+                 *       /\      /\
+                 *      /  \  d /  \
+                 *     /  c \  /  a \
+                 *    /______\/______\
+                 *   2        1'      0
+                 */
             VertexElement<2, 3>* p_face = mFaces[old_face_index];
-assert(old_face_index == p_face->GetIndex());
+            assert(old_face_index == p_face->GetIndex());
 
             Node<3>* old_nodes[3] = {p_face->GetNode(0), p_face->GetNode(1), p_face->GetNode(2)};
             std::vector<Node<3>*> mid_nodes(3);
             for (unsigned i=0; i<3; ++i)
             {
                 const std::set<unsigned> shared_edge =
-                        GetSharedFaces(old_nodes[cyc[i][0]], old_nodes[cyc[i][1]]);
+                        GetSharedFaceIndices(old_nodes[cyc[i][0]], old_nodes[cyc[i][1]]);
                 assert(shared_edge.size() == 1);
                 assert(*(shared_edge.begin()) == p_face->GetFace(i)->GetIndex());
                 mid_nodes[cyc[i][2]] = map_edge_to_new_nodes[*(shared_edge.begin())];
@@ -236,7 +246,7 @@ assert(old_face_index == p_face->GetIndex());
                 std::vector<bool> this_orientation(3);
                 for (unsigned j=0; j<3; ++j)
                 {
-                    const std::set<unsigned> shared_edge = GetSharedFaces(this_face_nodes[cyc[j][0]], this_face_nodes[cyc[j][1]]);
+                    const std::set<unsigned> shared_edge = GetSharedFaceIndices(this_face_nodes[cyc[j][0]], this_face_nodes[cyc[j][1]]);
                     VertexElement<1,3>* p_tmp_edge;
                     if (shared_edge.size() == 0)
                     {
@@ -259,14 +269,14 @@ assert(old_face_index == p_face->GetIndex());
                 if (i<3)
                 {
                     mFaces.push_back(new VertexElement<2,3>(mFaces.size(), this_face_edges,
-                                     this_orientation, this_face_nodes));
+                            this_orientation, this_face_nodes));
                 }
                 else
                 {
                     p_face->MarkAsDeleted();
                     delete p_face;
                     mFaces[old_face_index] = new VertexElement<2,3>(old_face_index, this_face_edges,
-                                                                    this_orientation, this_face_nodes);
+                            this_orientation, this_face_nodes);
                 }
             }
         }
@@ -289,9 +299,8 @@ assert(old_face_index == p_face->GetIndex());
         mEdges.resize(num_new_edges);
 
         assert(mFaces.size() == num_new_faces);
-MARK
+MARK;
     }
-
 
     MutableVertexMesh<2, 3>* GetDual()
     {
@@ -315,7 +324,7 @@ MARK
             std::vector<Node<3>*> unsorted_this_dual_face_nodes(this_num_dual_nodes);
             std::vector<std::pair<double, unsigned> > angles_with_index;
             unsorted_this_dual_face_nodes[0] = dual_nodes[this_dual_node_global_indices[0]];
-//            angles_with_index.push_back(std::make_pair(0.0, 0));
+            //            angles_with_index.push_back(std::make_pair(0.0, 0));
 
             // Create orthonormal basis with the face normal, first dual node location of the face.
             // e1 is obtained by Gram-Schmidt process.
@@ -338,14 +347,14 @@ MARK
             std::sort(angles_with_index.begin(), angles_with_index.end(), SortWithIndex());
             std::vector<Node<3>*> this_dual_face_nodes(this_num_dual_nodes);
 
-std::vector<double> Debug_anglesss;
+            std::vector<double> Debug_anglesss;
             for (unsigned iii=0; iii<this_num_dual_nodes; ++iii)
             {
                 this_dual_face_nodes[iii] = unsorted_this_dual_face_nodes[angles_with_index[iii].second];
 
-Debug_anglesss.push_back(angles_with_index[iii].first);
+                Debug_anglesss.push_back(angles_with_index[iii].first);
             }
-PRINT_VECTOR(Debug_anglesss);
+//PRINT_VECTOR(Debug_anglesss);
 
             dual_faces[dual_face_index] = new VertexElement<2, 3>(dual_face_index, this_dual_face_nodes);
         }
@@ -354,6 +363,8 @@ PRINT_VECTOR(Debug_anglesss);
         return new MutableVertexMesh<2,3>(dual_nodes, dual_faces);
     }
 };
+
+
 
 
 
@@ -366,8 +377,14 @@ public:
         GeodesicSphereBuilder builder;
         {
             MutableVertexMesh<2, 3>* p_mesh = new MutableVertexMesh<2, 3>(builder.mNodes, builder.mFaces);
-            VertexMeshWriter<2, 3> Writer("ShpericalMesh", "Geodesic_0Division", false);
+            VertexMeshWriter<2, 3> Writer("SphericalMesh", "Geodesic_0Division", false);
             Writer.WriteVtkUsingMeshWithCellId(*p_mesh);
+
+//            MonolayerVertexMeshGenerator sBuilder("trii");
+//            MutableVertexMesh<3,3>* pp_mesh33 = sBuilder.MakeSphericalMesh33(p_mesh, 5, 0.5);
+//            sBuilder.WriteVtk("SphericalMesh", "0");
+
+//            delete p_mesh;
         }
         PRINT_3_VARIABLES(builder.mNodes.size(), builder.mEdges.size(), builder.mFaces.size())
 
@@ -388,8 +405,15 @@ public:
 
         {
             MutableVertexMesh<2,3>* pp_mesh = builder.GetDual();
-            VertexMeshWriter<2, 3> Writer("ShpericalMesh", "Geodesic_0Dual", false);
+            VertexMeshWriter<2, 3> Writer("SphericalMesh", "Geodesic_0Dual", false);
             Writer.WriteVtkUsingMeshWithCellId(*pp_mesh);
+
+            MonolayerVertexMeshGenerator sBuilder("ssss");
+            MutableVertexMesh<3,3>* pp_mesh33 = sBuilder.MakeSphericalMesh33(pp_mesh, 5, 0.5);
+            sBuilder.WriteVtk("SphericalMesh", "0");
+
+//            delete pp_mesh;
+//            delete pp_mesh33;
         }
 
 
@@ -399,8 +423,14 @@ public:
         PRINT_3_VARIABLES(builder.mNodes.size(), builder.mEdges.size(), builder.mFaces.size())
         {
             MutableVertexMesh<2, 3>* p_mesh = new MutableVertexMesh<2, 3>(builder.mNodes, builder.mFaces);
-            VertexMeshWriter<2, 3> Writer("ShpericalMesh", "Geodesic_1Divison", false);
+            VertexMeshWriter<2, 3> Writer("SphericalMesh", "Geodesic_1Divison", false);
             Writer.WriteVtkUsingMeshWithCellId(*p_mesh);
+
+//            MonolayerVertexMeshGenerator sBuilder("trii", false);
+//            MutableVertexMesh<3,3>* pp_mesh33 = sBuilder.MakeSphericalMesh33(p_mesh, 5, 0.5);
+//            sBuilder.WriteVtk("SphericalMesh", "1");
+
+//            delete p_mesh;
         }
 
         unsigned iii = 0;
@@ -429,8 +459,15 @@ public:
         }
         {
             MutableVertexMesh<2,3>* pp_mesh = builder.GetDual();
-            VertexMeshWriter<2, 3> Writer("ShpericalMesh", "Geodesic_1Dual", false);
+            VertexMeshWriter<2, 3> Writer("SphericalMesh", "Geodesic_1Dual", false);
             Writer.WriteVtkUsingMeshWithCellId(*pp_mesh);
+
+            MonolayerVertexMeshGenerator sBuilder("ssss");
+            MutableVertexMesh<3,3>* pp_mesh33 = sBuilder.MakeSphericalMesh33(pp_mesh, 5, 0.5);
+            sBuilder.WriteVtk("SphericalMesh", "1");
+
+//            delete pp_mesh;
+//            delete pp_mesh33;
         }
 
 
@@ -440,8 +477,10 @@ public:
         PRINT_3_VARIABLES(builder.mNodes.size(), builder.mEdges.size(), builder.mFaces.size())
         {
             MutableVertexMesh<2, 3>* p_mesh = new MutableVertexMesh<2, 3>(builder.mNodes, builder.mFaces);
-            VertexMeshWriter<2, 3> Writer("ShpericalMesh", "Geodesic_2Division", false);
+            VertexMeshWriter<2, 3> Writer("SphericalMesh", "Geodesic_2Division", false);
             Writer.WriteVtkUsingMeshWithCellId(*p_mesh);
+
+//            delete p_mesh;
         }
 
         iii = 0;
@@ -470,19 +509,28 @@ public:
         }
         {
             MutableVertexMesh<2,3>* pp_mesh = builder.GetDual();
-            VertexMeshWriter<2, 3> Writer("ShpericalMesh", "Geodesic_2Dual", false);
+            VertexMeshWriter<2, 3> Writer("SphericalMesh", "Geodesic_2Dual", false);
             Writer.WriteVtkUsingMeshWithCellId(*pp_mesh);
+
+            MonolayerVertexMeshGenerator sBuilder("ssss");
+            MutableVertexMesh<3,3>* pp_mesh33 = sBuilder.MakeSphericalMesh33(pp_mesh, 5, 0.5);
+            sBuilder.WriteVtk("SphericalMesh", "2");
+
+//            delete pp_mesh;
+//            delete pp_mesh33;
         }
 
-
+MARK
 
 
         builder.SubDivide();
         PRINT_3_VARIABLES(builder.mNodes.size(), builder.mEdges.size(), builder.mFaces.size())
         {
             MutableVertexMesh<2, 3>* p_mesh = new MutableVertexMesh<2, 3>(builder.mNodes, builder.mFaces);
-            VertexMeshWriter<2, 3> Writer("ShpericalMesh", "Geodesic_3Divison", false);
+            VertexMeshWriter<2, 3> Writer("SphericalMesh", "Geodesic_3Divison", false);
             Writer.WriteVtkUsingMeshWithCellId(*p_mesh);
+
+//            delete p_mesh;
         }
 
         iii = 0;
@@ -511,11 +559,17 @@ public:
         }
         {
             MutableVertexMesh<2,3>* pp_mesh = builder.GetDual();
-            VertexMeshWriter<2, 3> Writer("ShpericalMesh", "Geodesic_3Dual", false);
+            VertexMeshWriter<2, 3> Writer("SphericalMesh", "Geodesic_3Dual", false);
             Writer.WriteVtkUsingMeshWithCellId(*pp_mesh);
+
+            MonolayerVertexMeshGenerator sBuilder("ssss");
+            MutableVertexMesh<3,3>* pp_mesh33 = sBuilder.MakeSphericalMesh33(pp_mesh, 5, 0.5);
+            sBuilder.WriteVtk("SphericalMesh", "3");
+
+//            delete pp_mesh;
+//            delete pp_mesh33;
         }
     }
-
 
     void TestMakeNormalMesh()
     {

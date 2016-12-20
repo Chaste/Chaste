@@ -53,9 +53,9 @@ class VertexElement;
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool ElementHasNode(const VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement, const unsigned nodeIndex);
 
-std::set<unsigned> GetSharedElements(const Node<3>* pNodeA, const Node<3>* pNodeB);
+std::set<unsigned> GetSharedElementIndices(const Node<3>* pNodeA, const Node<3>* pNodeB);
 
-std::set<unsigned> GetSharedFaces(const Node<3>* pNodeA, const Node<3>* pNodeB);
+std::set<unsigned> GetSharedFaceIndices(const Node<3>* pNodeA, const Node<3>* pNodeB);
 
 /**
  * Face is only considered a boundary face when all nodes are boundary nodes.

@@ -933,7 +933,7 @@ unsigned MutableVertexMesh<3, 3>::DivideElementAlongGivenAxis(VertexElement<3, 3
 
         // Find common elements
         ///\todo: #2850 get better method to get shared face, when node register face.
-        const std::set<unsigned> shared_elements = GetSharedElements(p_apical_node_a, p_apical_node_b);
+        const std::set<unsigned> shared_elements = GetSharedElementIndices(p_apical_node_a, p_apical_node_b);
         assert(shared_elements.size()!=0);
         const std::vector<unsigned> tmp_vector = GetLateralFace(this->GetElement(*shared_elements.begin()),
                                                           p_basal_node_a->GetIndex(), p_basal_node_b->GetIndex());

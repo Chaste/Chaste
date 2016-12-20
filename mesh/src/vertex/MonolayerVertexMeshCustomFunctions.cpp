@@ -50,7 +50,7 @@ bool ElementHasNode(const VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement, const
     return pElement->GetNodeLocalIndex(nodeIndex)!=UINT_MAX;
 }
 
-std::set<unsigned> GetSharedElements(const Node<3>* pNodeA, const Node<3>* pNodeB)
+std::set<unsigned> GetSharedElementIndices(const Node<3>* pNodeA, const Node<3>* pNodeB)
 {
     Node<3>* p_node_a = const_cast<Node<3>*>(pNodeA);
     Node<3>* p_node_b = const_cast<Node<3>*>(pNodeB);
@@ -65,7 +65,7 @@ std::set<unsigned> GetSharedElements(const Node<3>* pNodeA, const Node<3>* pNode
     return shared_elements;
 }
 
-std::set<unsigned> GetSharedFaces(const Node<3>* pNodeA, const Node<3>* pNodeB)
+std::set<unsigned> GetSharedFaceIndices(const Node<3>* pNodeA, const Node<3>* pNodeB)
 {
     Node<3>* p_node_a = const_cast<Node<3>*>(pNodeA);
     Node<3>* p_node_b = const_cast<Node<3>*>(pNodeB);

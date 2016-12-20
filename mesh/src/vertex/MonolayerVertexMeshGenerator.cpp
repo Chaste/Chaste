@@ -40,6 +40,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>             // PrintMesh
 #include <iomanip>              // PrintMesh
 
+#include "Debug.hpp"
+
 MonolayerVertexMeshGenerator::MonolayerVertexMeshGenerator(const std::string& name, const bool callDestructor)
     : mName(name),
       mpMesh(NULL),
@@ -53,7 +55,6 @@ MonolayerVertexMeshGenerator::MonolayerVertexMeshGenerator(const std::vector<Nod
     : mName(name),
       mBasalNodes(rLowerNodes),
       mApicalNodes(mBasalNodes.size()),
-      mNodeLateralFaceMap(mBasalNodes.size()),
       mpMesh(NULL),
       mCallDestructor(true)
 {
@@ -86,7 +87,6 @@ MutableVertexMesh<3, 3>* MonolayerVertexMeshGenerator::MakeMeshUsing2dMesh(const
     const unsigned num_lower_nodes = mesh2d.GetNumNodes();
     mBasalNodes.resize(num_lower_nodes);
     mApicalNodes.resize(num_lower_nodes);
-    mNodeLateralFaceMap.resize(num_lower_nodes);
 
     for (unsigned i=0 ; i<num_lower_nodes ; ++i)
     {
@@ -121,7 +121,8 @@ MutableVertexMesh<3, 3>* MonolayerVertexMeshGenerator::MakeMeshUsing2dMesh(const
 void MonolayerVertexMeshGenerator::BuildElementWith(const unsigned numBasalNodes,
                                                     const unsigned basalNodeIndices[])
 {
-    std::vector<unsigned> node_indices_this_elem(basalNodeIndices, basalNodeIndices+numBasalNodes);
+    // Setting parameter for the call of the function BuildElementWith(vector)
+    const std::vector<unsigned> node_indices_this_elem(basalNodeIndices, basalNodeIndices+numBasalNodes);
 
     BuildElementWith(node_indices_this_elem);
 }
@@ -169,30 +170,32 @@ void MonolayerVertexMeshGenerator::BuildElementWith(const std::vector<unsigned>&
         unsigned node1Index = basalNodeIndices[local_node_index];
         unsigned node2Index = basalNodeIndices[(local_node_index+1) % num_nodes_this_elem];
 
-        // The values of the maps are called here because they will be used both existing and creating branch.
-        // They are called by reference as they will be modified if they enter creating branch.
-        std::set<unsigned>& r_face1_indices = mNodeLateralFaceMap[node1Index];
-        std::set<unsigned>& r_face2_indices = mNodeLateralFaceMap[node2Index];
 
-        // If both nodes already exist, the lateral face MIGHT have been created.
-        std::vector<unsigned> common_index;
-        // Now need to search for the same lateral face index in both sets
-        std::set_intersection(r_face1_indices.begin(), r_face1_indices.end(),
-                              r_face2_indices.begin(), r_face2_indices.end(),
-                              std::back_inserter(common_index));
+        const std::set<unsigned> shared_face_indices = GetSharedFaceIndices(mBasalNodes[node1Index], mBasalNodes[node2Index]);
 
-        assert(common_index.size()<=1);
-        unsigned existing_face_index = common_index.size()==0 ? UINT_MAX : common_index[0];
-
-        if (existing_face_index != UINT_MAX) // meaning it's found
+        assert(shared_face_indices.size()<=2);
+        VertexElement<2, 3>* p_shared_lateral_face = NULL;
+        for (std::set<unsigned>::const_iterator set_it=shared_face_indices.begin();
+             set_it!=shared_face_indices.end(); ++set_it)
         {
-            faces_this_elem.push_back(mFaces[existing_face_index]);
+            VertexElement<2, 3>* p_tmp_face = mFaces[*set_it];
+            if (IsLateralFace(p_tmp_face))
+            {
+                assert(p_shared_lateral_face == NULL);
+                p_shared_lateral_face = p_tmp_face;
+            }
+        }
+
+
+        if (p_shared_lateral_face != NULL) // meaning it's found
+        {
+            faces_this_elem.push_back(p_shared_lateral_face);
             // Face orientation is false as it was created by another element. CCW for another will be CW when
             // viewing from the other side as rotation is pseudovectorial
             faces_orientation.push_back(true);
         }
 
-        if (existing_face_index == UINT_MAX)
+        if (p_shared_lateral_face == NULL)
         {
             // Create new lateral rectangular face
             std::vector<Node<3>*> nodes_of_lateral_face;
@@ -203,15 +206,11 @@ void MonolayerVertexMeshGenerator::BuildElementWith(const std::vector<unsigned>&
 
             unsigned newFaceIndex = mFaces.size();
             VertexElement<2, 3>* p_lateral_face = new VertexElement<2, 3>(newFaceIndex, nodes_of_lateral_face);
-            // Attribute is added so that it can be identified in simulation (as basal, apical and lateral faces have different contributions)
-            // 3.1 instead of 3.0 as it will be casted into unsigned for simpler comparison.
             SetFaceAsLateral(p_lateral_face);
+
             mFaces.push_back(p_lateral_face);
             faces_this_elem.push_back(p_lateral_face);
             faces_orientation.push_back(false);
-            // Update node_to_lateral_face_indices
-            r_face1_indices.insert(newFaceIndex);
-            r_face2_indices.insert(newFaceIndex);
         }
     }
     VertexElement<3, 3>* p_elem = new VertexElement<3, 3>(mElements.size(), faces_this_elem, faces_orientation, all_nodes_this_elem);
@@ -435,7 +434,6 @@ void MonolayerVertexMeshGenerator::ClearStoredMeshObjects()
 {
     mBasalNodes.clear();
     mApicalNodes.clear();
-    mNodeLateralFaceMap.clear();
     mFaces.clear();
     mElements.clear();
     if (mpMesh)
@@ -551,5 +549,51 @@ void MonolayerVertexMeshGenerator::PrintMesh(const bool printDeletedObjects) con
         }
         std::cout << "}" << std::endl << "---------------------------------------------------------" << std::endl;
     }
+}
+
+
+MutableVertexMesh<3, 3>* MonolayerVertexMeshGenerator::MakeSphericalMesh33(const MutableVertexMesh<2, 3>* p_mesh_23,
+                                                                  const double radius, const double thickness)
+{
+
+    const unsigned num_lower_nodes = p_mesh_23->GetNumNodes();
+    mBasalNodes.resize(num_lower_nodes);
+    mApicalNodes.resize(num_lower_nodes);
+
+    MARK
+    for (unsigned i=0 ; i<num_lower_nodes ; ++i)
+    {
+        const Node<3>* p_node_23 = p_mesh_23->GetNode(i);
+        assert(i == p_node_23->GetIndex());
+        c_vector<double, 3> loc;
+        loc = p_node_23->rGetLocation();
+        if (std::abs(norm_2(loc)-1) < 1e-6)
+        {
+PRINT_VECTOR(loc);
+        }
+        const bool is_boundary = p_node_23->IsBoundaryNode();
+        assert(is_boundary == false);
+        Node<3>* p_lower = new Node<3>(i, loc*radius, is_boundary);
+        Node<3>* p_upper = new Node<3>(i+num_lower_nodes, loc*(radius+thickness), is_boundary);
+        SetNodeAsBasal(p_lower);
+        SetNodeAsApical(p_upper);
+        mBasalNodes[i] = p_lower;
+        mApicalNodes[i] = p_upper;
+    }
+    mElements.reserve(p_mesh_23->GetNumElements());
+    MARK
+    const unsigned num_elem = p_mesh_23->GetNumElements();
+    for (unsigned elem_index=0 ; elem_index<num_elem ; ++elem_index)
+    {
+        const VertexElement<2, 3>* p_2elem = p_mesh_23->GetElement(elem_index);
+        std::vector<unsigned> node_index_this_elem;
+        for (unsigned i=0 ; i<p_2elem->GetNumNodes() ; ++i)
+        {
+            node_index_this_elem.push_back( p_2elem->GetNode(i)->GetIndex() );
+        }
+        this->BuildElementWith(node_index_this_elem);
+    }
+    MARK
+    return this->GenerateMesh();
 }
 

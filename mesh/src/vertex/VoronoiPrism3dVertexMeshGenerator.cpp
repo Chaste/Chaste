@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "VoronoiPrism3dVertexMeshGenerator.hpp"
+#include "MonolayerVertexMeshCustomFunctions.hpp"
 #include <map>
 
 #if BOOST_VERSION >= 105200
@@ -448,6 +449,7 @@ void VoronoiPrism3dVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_
 
             // Use the contructor with std::vector<Node> so that the output will be cleaner
             VertexElement<3, 3>* p_elem = new VertexElement<3, 3>(elements.size(), faces_this_elem, faces_orientation, lower_nodes_this_elem);
+//            SetElementAsMonolayer(p_elem);
             elements.push_back( p_elem );
         }
     }

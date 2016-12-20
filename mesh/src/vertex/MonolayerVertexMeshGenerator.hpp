@@ -64,16 +64,6 @@ protected:
     std::vector<Node<3>*> mApicalNodes;
 
     /**
-     * A helper variables that tell to which lateral faces does a node belongs
-     * so that face will not be created twice during mesh-generation.
-     * Since the number of nodes is known a-priori, we can use a vector of sets
-     * for this map.
-     * This couldn't not be a local variable of a function as element might be
-     * generated seperately.
-     */
-    std::vector<std::set<unsigned> > mNodeLateralFaceMap;
-
-    /**
      * A vector storing generated faces.
      */
     std::vector<VertexElement<2, 3>*> mFaces;
@@ -170,6 +160,9 @@ public:
      */
     MutableVertexMesh<3, 3>* ConvertMeshToCylinder(const double widthX, const double widthY,
             const double radius, const double thickness, const double length);
+
+    MutableVertexMesh<3, 3>* MakeSphericalMesh33(const MutableVertexMesh<2, 3>* p_mesh_23, const double radius,
+                                        const double thickness);
 
     /**
      * Clear all mesh objects stored within the class.

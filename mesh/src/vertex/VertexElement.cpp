@@ -52,8 +52,9 @@ VertexElement<ELEMENT_DIM, SPACE_DIM>::VertexElement(unsigned index,
       mFaces(rFaces),
       mOrientations(rOrientations)
 {
-    // This constructor should only be used in 3D
-//    assert(ELEMENT_DIM == 3 && SPACE_DIM == 3);    // LCOV_EXCL_LINE
+    // This constructor should be used on <2,3> and <3,3> mesh
+    // <2,3> mesh is used currently for geodesic sphere
+    assert(ELEMENT_DIM >= 2 && SPACE_DIM == 3);    // LCOV_EXCL_LINE
 
     // Each face must have an associated orientation
     assert(mFaces.size() == mOrientations.size());
@@ -62,17 +63,23 @@ VertexElement<ELEMENT_DIM, SPACE_DIM>::VertexElement(unsigned index,
     assert(mFaceContainingElementIndices.size() == 0);
     for (unsigned face_index=0; face_index<mFaces.size(); ++face_index)
     {
-        VertexElement<ELEMENT_DIM-1,SPACE_DIM>* p_face = mFaces[face_index];
-        p_face->FaceAddElement(index);
-        // Register face with nodes
-        p_face->RegisterFaceWithNodes();
+        mFaces[face_index]->FaceAddElement(index);
+        mFaces[face_index]->RegisterFaceWithNodes();
     }
 
-    ///\todo: #2850Need to remove this with mesh<2,3>
-    if (SPACE_DIM == ELEMENT_DIM)
+    // Register element with nodes
+    this->RegisterWithNodes();
+
+    // A simple sanity check
+    if (ELEMENT_DIM == 3)
     {
-        // Register element with nodes
-        this->RegisterWithNodes();
+        unsigned edge_2x = 0;
+        for (unsigned face_index=0; face_index<mFaces.size(); ++face_index)
+        {
+            edge_2x+=mFaces[face_index]->GetNumNodes();
+        }
+        assert(edge_2x%2 == 0);                                     // LCOV_EXCL_LINE
+        assert(mFaces.size()+this->GetNumNodes()-edge_2x/2 == 2);   // LCOV_EXCL_LINE
     }
 }
 
@@ -115,6 +122,18 @@ VertexElement<ELEMENT_DIM, SPACE_DIM>::VertexElement(unsigned index,
 
     // Register element with nodes
     this->RegisterWithNodes();
+
+    // A simple sanity check
+    if (ELEMENT_DIM == 3)
+    {
+        unsigned edge_2x = 0;
+        for (unsigned face_index=0; face_index<mFaces.size(); ++face_index)
+        {
+            edge_2x+=mFaces[face_index]->GetNumNodes();
+        }
+        assert(edge_2x%2 == 0);                                     // LCOV_EXCL_LINE
+        assert(mFaces.size()+this->GetNumNodes()-edge_2x/2 == 2);         // LCOV_EXCL_LINE
+    }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
