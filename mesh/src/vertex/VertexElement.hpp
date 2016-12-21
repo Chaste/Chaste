@@ -181,11 +181,19 @@ public:
     unsigned GetNumFaces() const;
 
     /**
-     * @param index the global index of a specified face
+     * @param index the local index of a specified face
      *
      * @return a pointer to the face
      */
-    VertexElement<ELEMENT_DIM-1, SPACE_DIM>* GetFace(unsigned index) const;
+    VertexElement<ELEMENT_DIM-1, SPACE_DIM>* GetFace(unsigned localIndex) const;
+
+    /** Calculate the local index of a face given a global index
+     * if face is not contained in element return UINT_MAX.
+     *
+     * @param globalIndex the global index of the face
+     * @return local_index.
+     */
+    unsigned GetFaceLocalIndex(unsigned globalIndex) const;
 
     /**
      * @return whether the face with a given index is oriented anti clockwise.
@@ -246,6 +254,13 @@ public:
      * are in the correct order according to the order of the basal nodes.
      */
     void MonolayerElementRearrangeFacesNodes();
+
+    /**
+     * Method for lateral face of monolayer element to rearrange its nodes such that the
+     * basal nodes are always the at the beginning.
+     * This function is called in MonolayerElementRearrangeFacesNodes
+     */
+    void LateralFaceRearrangeNodes();
 
     /**
      * Reset the global index of the face and update its nodes.
@@ -385,6 +400,13 @@ public:
      * @return a pointer to the face
      */
     VertexElement<0, SPACE_DIM>* GetFace(unsigned index) const;
+
+    /**
+     * @param index the global index of a specified face
+     *
+     * @return the local index of the face
+     */
+    unsigned GetFaceLocalIndex(unsigned globalIndex) const;
 
     /**
      * @return whether the face with a given index is oriented anti clockwise.

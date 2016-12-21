@@ -41,6 +41,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VoronoiVertexMeshGenerator.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "MonolayerVertexMeshGenerator.hpp"
+
+#include "GeodesicSphere23Generator.hpp"
+
 #include "CellsGenerator.hpp"
 #include "NoCellCycleModel.hpp"
 #include "VertexBasedCellPopulation.hpp"
@@ -373,6 +376,55 @@ PRINT_VECTOR(p_mesh->GetNode(48)->rGetLocation())
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 55u);
         TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 20.0, 1e-10);
     }
+
+
+    void TestOnSphere() throw (Exception)
+   {
+        const double s_end_time = 1;
+        std::string output_filename = "TestUniaxialLoad/SphereTest" + boost::lexical_cast<std::string>(num_cells_x)
+                                    + "x" + boost::lexical_cast<std::string>(num_cells_y);
+        GeodesicSphere23Generator builder;
+        builder.SubDivide();    // n=42
+        builder.SubDivide();    // n=162
+
+
+        MutableVertexMesh<2,3>* p_dual_mesh = builder.GetDual();
+        VertexMeshWriter<2, 3> Writer(output_filename, "Geodesic_Dual", false);
+        Writer.WriteVtkUsingMeshWithCellId(*p_dual_mesh);
+
+        const unsigned radius = sqrt(p_dual_mesh->GetNumElements()*target_area/4/M_PI);
+        MonolayerVertexMeshGenerator sBuilder;
+        MutableVertexMesh<3,3>* p_mesh = sBuilder.MakeSphericalMesh33(p_dual_mesh, 5, 0.5);
+        sBuilder.WriteVtk(output_filename, "InitialMesh");
+
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<NoCellCycleModel, 3> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
+        VertexBasedCellPopulation<3> cell_population(*p_mesh, cells);
+
+        OffLatticeSimulation<3> simulator(cell_population);
+        simulator.SetOutputDirectory(output_filename);
+        simulator.SetSamplingTimestepMultiple(10);
+        simulator.SetEndTime(s_end_time);
+
+        MAKE_PTR(GeneralMonolayerVertexMeshForce, p_force3);
+        p_force3->SetApicalParameters(20, 20, 0.7);
+        p_force3->SetBasalParameters(20, 20, 0.7);
+        p_force3->SetLateralParameter(8);
+        p_force3->SetVolumeParameters(350, 1);
+        simulator.AddForce(p_force3);
+//        MAKE_PTR(HorizontalStretchForce<3>, p_force2);
+//        p_force2->SetForceMagnitude(1.0);
+//        p_force2->SetRelativeWidth(0.15);
+//        simulator.AddForce(p_force2);
+
+        simulator.Solve();
+
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 162u);
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), s_end_time, 1e-10);
+   }
+
 };
 
 #endif /*TESTVERTEXMESH33UNIAXIALLOAD_HPP_*/

@@ -256,10 +256,26 @@ unsigned VertexElement<ELEMENT_DIM, SPACE_DIM>::GetNumFaces() const
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-VertexElement<ELEMENT_DIM-1, SPACE_DIM>* VertexElement<ELEMENT_DIM, SPACE_DIM>::GetFace(unsigned index) const
+VertexElement<ELEMENT_DIM-1, SPACE_DIM>* VertexElement<ELEMENT_DIM, SPACE_DIM>::GetFace(unsigned localIndex) const
 {
-    assert(index < mFaces.size());
-    return mFaces[index];
+    assert(localIndex < mFaces.size());
+    return mFaces[localIndex];
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned VertexElement<ELEMENT_DIM, SPACE_DIM>::GetFaceLocalIndex(unsigned globalIndex) const
+{
+    unsigned local_index = UINT_MAX;
+    for (unsigned i=0; i<this->mFaces.size(); i++)
+    {
+        if (this->mFaces[i]->GetIndex() == globalIndex)
+        {
+            local_index = i;
+            break;
+        }
+    }
+
+    return local_index;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -360,6 +376,24 @@ void VertexElement<3, 3>::ReplaceFace(const unsigned oldFaceLocalIndex,
 //////////////////////////////////////////////////////////////////////////
 ///                   Functions for monolayer elements                 ///
 //////////////////////////////////////////////////////////////////////////
+///
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VertexElement<ELEMENT_DIM, SPACE_DIM>::LateralFaceRearrangeNodes()
+{
+    NEVER_REACHED;
+}
+
+template<>
+void VertexElement<2, 3>::LateralFaceRearrangeNodes()
+{
+
+    for (unsigned i=0; i<this->GetNumNodes(); ++i)
+    {
+
+    }
+}
+
+
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VertexElement<ELEMENT_DIM, SPACE_DIM>::MonolayerElementRearrangeFacesNodes()
 {
@@ -679,6 +713,12 @@ template<unsigned SPACE_DIM>
 VertexElement<0, SPACE_DIM>* VertexElement<1, SPACE_DIM>::GetFace(unsigned index) const
 {
     return NULL;
+}
+
+template<unsigned SPACE_DIM>
+unsigned VertexElement<1, SPACE_DIM>::GetFaceLocalIndex(unsigned globalIndex) const
+{
+    NEVER_REACHED;
 }
 
 template<unsigned SPACE_DIM>

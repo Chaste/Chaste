@@ -201,6 +201,48 @@ void SetElementAsMonolayer(VertexElement<3, 3>* pElement)
 {
     assert(pElement->GetNumElementAttributes() == 0u);    // LCOV_EXCL_LINE
     pElement->AddElementAttribute(Monolayer::SetElementValue);
+
+    for (unsigned i=0; i<pElement->GetNumNodes(); ++i)
+    {
+        if (pElement->GetNode(i)->GetNumNodeAttributes() == 0u)
+        {
+            NEVER_REACHED;
+        }
+    }
+
+    for (unsigned i=0; i<pElement->GetNumFaces(); ++i)
+    {
+        if (pElement->GetFace(i)->GetNumElementAttributes() == 0u)
+        {
+            VertexElement<2, 3>* p_face = pElement->GetFace(i);
+            std::set<Monolayer::v_type> node_vals;
+            for (unsigned j=0; j<p_face->GetNumNodes(); ++j)
+            {
+                node_vals.insert(GetNodeType(p_face->GetNode(j)));
+            }
+
+            if (node_vals.size() == 2)
+            {
+                SetFaceAsLateral(p_face);
+            }
+            else
+            {
+                assert(node_vals.size() == 1);
+                switch (*(node_vals.begin()))
+                {
+                case Monolayer::ApicalValue :
+                    SetFaceAsApical(p_face);
+                    break;
+                case Monolayer::BasalValue :
+                    SetFaceAsBasal(p_face);
+                    break;
+                default:
+                    NEVER_REACHED;
+                }
+            }
+        }
+    }
+
     pElement->MonolayerElementRearrangeFacesNodes();
 }
 
@@ -227,14 +269,35 @@ template bool IsMonolayerElement<3, 3>(const VertexElement<3, 3>* pElement);
 VertexElement<2, 3>* GetApicalFace(const VertexElement<3, 3>* pElement)
 {
     VertexElement<2, 3>* p_face = pElement->GetFace(1);
-    assert(IsApicalFace(p_face));   // LCOV_EXCL_LINE
+    if (!IsApicalFace(p_face))
+    {
+        for (unsigned i=0; i<pElement->GetNumFaces(); ++i)
+        {
+            if (IsApicalFace(pElement->GetFace(i)))
+            {
+                p_face = pElement->GetFace(i);
+                break;
+            }
+        }
+    }
+
+    assert(IsApicalFace(p_face));       // LCOV_EXCL_LINE
     return p_face;
 }
 
 VertexElement<2, 3>* GetBasalFace(const VertexElement<3, 3>* pElement)
 {
-    VertexElement<2, 3>* p_face = pElement->GetFace(0);
-    assert(IsBasalFace(p_face));   // LCOV_EXCL_LINE
+    VertexElement<2, 3>* p_face (NULL);
+    for (unsigned i=0; i<pElement->GetNumFaces(); ++i)
+    {
+        if (IsBasalFace(pElement->GetFace(i)))
+        {
+            p_face = pElement->GetFace(i);
+            break;
+        }
+    }
+
+    assert(p_face!=NULL && IsBasalFace(p_face));        // LCOV_EXCL_LINE
     return p_face;
 }
 
