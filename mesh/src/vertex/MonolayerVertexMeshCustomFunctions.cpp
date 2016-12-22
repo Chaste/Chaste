@@ -40,6 +40,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <set>
 #include <algorithm>
 
+#include <iostream>             // PrintElement
+#include <iomanip>              // PrintElement
+
+#include "Debug.hpp"
 
 /// ===============================================================
 /// Some function that can be added into trunk and relevant for all
@@ -80,12 +84,108 @@ std::set<unsigned> GetSharedFaceIndices(const Node<3>* pNodeA, const Node<3>* pN
     return shared_faces;
 }
 
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void PrintElement(const VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement)
+{
+    NEVER_REACHED;
+}
+
+template <>
+void PrintElement(const VertexElement<3, 3>* pElement)
+{
+    const std::string MonolayerValueToName[4] = {"","Basal", "Apical", "Lateral"};
+    const std::string TAB = "    " ;
+
+    std::cout <<"=================================================================================" << std::endl;
+    // Printing out each elements
+    std::cout << "ELEMENT: " << pElement->GetIndex() << (pElement->IsDeleted()?" (DELETED)": "") << std::endl;
+
+    std::cout << TAB << "number of Faces : " << pElement->GetNumFaces() << " {";
+    for (unsigned j=0; j<pElement->GetNumFaces(); ++j)
+    {
+        std::cout << std::setw(3) << pElement->GetFace(j)->GetIndex() << "  ";
+    }
+    std::cout << "}" << std::endl;
+
+    std::cout << TAB << "Face oriented.. : " << pElement->GetNumFaces() << " {";
+    for (unsigned j=0; j<pElement->GetNumFaces(); ++j)
+    {
+        std::cout << std::setw(3) << pElement->FaceIsOrientatedAntiClockwise(j) << "  ";
+    }
+    std::cout << "}" << std::endl;
+
+    std::cout << TAB << "number of Nodes : " << pElement->GetNumNodes() << " {  ";
+    for (unsigned j=0; j<pElement->GetNumNodes(); ++j)
+    {
+        std::cout << pElement->GetNode(j)->GetIndex() << "  ";
+    }
+    std::cout << "}" << std::endl;
+
+    VertexElement<2,3>& basal = *(pElement->GetFace(0));
+    std::cout << TAB << "Nodes for basal face " << basal.GetIndex() << " {  ";
+    for (unsigned j=0; j<basal.GetNumNodes(); ++j)
+    {
+        std::cout << basal.GetNode(j)->GetIndex() << "  ";
+    }
+    std::cout << "}" << std::endl << "---------------------------------------------------------" << std::endl;
+
+    std::cout <<"***************************************************************" << std::endl;
+    // Now printing all faces
+    for (unsigned i=0; i<pElement->GetNumFaces(); ++i)
+    {
+        VertexElement<2, 3>* p_face = pElement->GetFace(i);
+        std::cout << "FACE (" << i<< ") : " << p_face->GetIndex() << (p_face->IsDeleted()?" (DELETED)": "") << std::endl;
+        std::cout << TAB << "Face Attribute : " << MonolayerValueToName[GetFaceType(p_face)] << (IsFaceOnBoundary(p_face)?" (BOUNDARY)": "") << std::endl;
+
+        std::set<unsigned> set_tmp = p_face->rFaceGetContainingElementIndices();
+        std::cout << TAB << "number of Elements : " << set_tmp.size() << " {  ";
+        for (std::set<unsigned>::iterator it=set_tmp.begin(); it != set_tmp.end(); ++it)
+        {
+            std::cout << *it << "  ";
+        }
+        std::cout << "}" << std::endl;
+
+        std::cout << TAB << "number of Nodes : " << p_face->GetNumNodes() << " {  ";
+        for (unsigned j=0; j<p_face->GetNumNodes(); ++j)
+        {
+            std::cout << p_face->GetNode(j)->GetIndex() << "  ";
+        }
+        std::cout << "}" << std::endl << "---------------------------------------------------------" << std::endl;
+    }
+
+    std::cout <<"***************************************************************" << std::endl;
+    //Now printing all the nodes
+    for (unsigned i=0; i<pElement->GetNumNodes(); ++i)
+    {
+        Node<3>* p_node = pElement->GetNode(i);
+        std::cout << "NODE (" << i<< ") : " << p_node->GetIndex() << (p_node->IsDeleted()?" (DELETED)": "") << std::endl;
+        std::cout << TAB << "Node Attribute : " << MonolayerValueToName[GetNodeType(p_node)] << (p_node->IsBoundaryNode()?" (BOUNDARY)": "") << std::endl;
+
+        std::set<unsigned> set_tmp = p_node->rGetContainingElementIndices();
+        std::cout << TAB << "number of Elements : " << set_tmp.size() << " {  ";
+        for (std::set<unsigned>::iterator it=set_tmp.begin(); it != set_tmp.end(); ++it)
+        {
+            std::cout << *it << "  ";
+        }
+        std::cout << "}" << std::endl;
+
+        std::set<unsigned> face_tmp = p_node->rGetContainingFaceIndices();
+        std::cout << TAB << "number of Faces : " << face_tmp.size() << " {  ";
+        for (std::set<unsigned>::iterator it=face_tmp.begin(); it != face_tmp.end(); ++it)
+        {
+            std::cout << *it << "  ";
+        }
+        std::cout << "}" << std::endl << "---------------------------------------------------------" << std::endl;
+    }
+
+}
+
 
 /**
  * Face is only considered a boundary face when all nodes are boundary nodes.
  * @return
  */
-bool IsFaceOnBoundary(VertexElement<2, 3>* pFace)
+bool IsFaceOnBoundary(const VertexElement<2, 3>* pFace)
 {
     ///\todo: #2850 cannot handle such case
     /*
@@ -244,6 +344,7 @@ void SetElementAsMonolayer(VertexElement<3, 3>* pElement)
     }
 
     pElement->MonolayerElementRearrangeFacesNodes();
+MARK
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

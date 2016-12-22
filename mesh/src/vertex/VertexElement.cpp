@@ -35,7 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexElement.hpp"
 
 #include <cassert>
-#include <algorithm>                                // std::swap, std::min, std::max
+#include <algorithm>                                // std::swap, std::min, std::max, std::rotate
 #include "MonolayerVertexMeshCustomFunctions.hpp"
 #include "Debug.hpp"
 
@@ -376,7 +376,6 @@ void VertexElement<3, 3>::ReplaceFace(const unsigned oldFaceLocalIndex,
 //////////////////////////////////////////////////////////////////////////
 ///                   Functions for monolayer elements                 ///
 //////////////////////////////////////////////////////////////////////////
-///
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VertexElement<ELEMENT_DIM, SPACE_DIM>::LateralFaceRearrangeNodes()
 {
@@ -386,11 +385,46 @@ void VertexElement<ELEMENT_DIM, SPACE_DIM>::LateralFaceRearrangeNodes()
 template<>
 void VertexElement<2, 3>::LateralFaceRearrangeNodes()
 {
+    if (!IsLateralFace(this))
+    {
+        EXCEPTION("This function should be only called by lateral face.");
+    }
 
+    // Store the local indices of basal nodes for later use
+    unsigned min_cyc_index = UINT_MAX;
+    unsigned second_index = UINT_MAX;
     for (unsigned i=0; i<this->GetNumNodes(); ++i)
     {
-
+        if (IsBasalNode(this->GetNode(i)))
+        {
+            if (min_cyc_index == UINT_MAX)
+            {
+                min_cyc_index = i;
+            }
+            else
+            {
+                assert(second_index == UINT_MAX);
+                second_index = i;
+            }
+        }
     }
+
+    /*
+     * if {0,num_nodes-1}, then the min should be actually num_nodes-1
+     * other cases of {i, i+1}, just remain as they are.
+     *
+     * Then rotate mNodes accordingly.
+     */
+    if (min_cyc_index == 0u && second_index == this->GetNumNodes()-1)
+    {
+        min_cyc_index = second_index;
+    }
+    else
+    {
+        assert(min_cyc_index+1 == second_index);
+    }
+
+    std::rotate(this->mNodes.begin(), this->mNodes.begin()+min_cyc_index, this->mNodes.end());
 }
 
 
@@ -404,16 +438,48 @@ template<>
 void VertexElement<3, 3>::MonolayerElementRearrangeFacesNodes()
 {
 MARK
+PrintElement(this);
 
     const VertexElement<2, 3>* p_basal = GetBasalFace(this);
     const VertexElement<2, 3>* p_apical = GetApicalFace(this);
-    const unsigned num_face_nodes = p_basal->GetNumNodes();
 
+    const unsigned num_face_nodes = p_basal->GetNumNodes();
     if (num_face_nodes*2!=this->GetNumNodes() || num_face_nodes!=p_apical->GetNumNodes() ||
         num_face_nodes+2 != mFaces.size() || mFaces.size() != mOrientations.size())
     {
         EXCEPTION("Monolayer element has flaw!");
     }
+
+    // Check and change basal and apical faces to 0th and 1st position respectively
+    if (this->GetFace(0)->GetIndex() != p_basal->GetIndex())
+    {
+        const unsigned tmp_index = this->GetFaceLocalIndex(p_basal->GetIndex());
+        assert(tmp_index != UINT_MAX);
+        std::swap(this->mFaces[0], this->mFaces[tmp_index]);
+
+        const bool tmp = this->mOrientations[0];
+        this->mOrientations[0] = this->mOrientations[tmp_index];
+        this->mOrientations[tmp_index] = tmp;
+    }
+    if (this->GetFace(1)->GetIndex() != p_apical->GetIndex())
+    {
+        const unsigned tmp_index = this->GetFaceLocalIndex(p_apical->GetIndex());
+        assert(tmp_index != UINT_MAX);
+        std::swap(this->mFaces[1], this->mFaces[tmp_index]);
+
+        const bool tmp = this->mOrientations[1];
+        this->mOrientations[1] = this->mOrientations[tmp_index];
+        this->mOrientations[tmp_index] = tmp;
+    }
+
+    // Tidy up the nodes of the lateral faces
+    for (unsigned i=2; i<this->GetNumFaces(); ++i)
+    {
+        this->GetFace(i)->LateralFaceRearrangeNodes();
+    }
+
+
+PrintElement(this);
 
 PRINT_4_VARIABLES(this->mIndex, p_basal->GetIndex(), p_apical->GetIndex(), num_face_nodes)
 

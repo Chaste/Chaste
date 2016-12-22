@@ -57,11 +57,14 @@ std::set<unsigned> GetSharedElementIndices(const Node<3>* pNodeA, const Node<3>*
 
 std::set<unsigned> GetSharedFaceIndices(const Node<3>* pNodeA, const Node<3>* pNodeB);
 
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void PrintElement(const VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement);
+
 /**
  * Face is only considered a boundary face when all nodes are boundary nodes.
  * @return
  */
-bool IsFaceOnBoundary(VertexElement<2, 3>* pFace);
+bool IsFaceOnBoundary(const VertexElement<2, 3>* pFace);
 
 /// ===============================================================
 /// Functions for monolayer

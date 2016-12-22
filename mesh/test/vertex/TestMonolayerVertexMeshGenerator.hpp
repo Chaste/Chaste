@@ -360,107 +360,107 @@ MARK
     }
 
 
-//    void TestMonolayerRearrangement()
-//    {
-//MARK
-//        // Make 8 nodes to assign to a cube element
-//        std::vector<Node<3>*> nodes;
-//        nodes.push_back(new Node<3>(0, false, 0.0, 0.0, 0.0));
-//        nodes.push_back(new Node<3>(1, false, 1.0, 0.0, 0.0));
-//        nodes.push_back(new Node<3>(2, false, 0.0, 1.0, 0.0));
-//        nodes.push_back(new Node<3>(3, false, 1.0, 1.0, 0.0));
-//        nodes.push_back(new Node<3>(4, false, 0.0, 0.0, 1.0));
-//        nodes.push_back(new Node<3>(5, false, 1.0, 0.0, 1.0));
-//        nodes.push_back(new Node<3>(6, false, 0.0, 1.0, 1.0));
-//        nodes.push_back(new Node<3>(7, false, 1.0, 1.0, 1.0));
-//        for (unsigned i=0; i<4; ++i)
-//        {
-//            SetNodeAsBasal(nodes[i]);
-//            SetNodeAsApical(nodes[i+4]);
-//        }
-//
-//        std::vector<Node<3>*> nodes_face_0, nodes_face_1, nodes_face_2, nodes_face_3, nodes_face_4, nodes_face_5;
-//
-//        // Make 6 square faces out of these nodes
-//        nodes_face_0.push_back(nodes[0]);
-//        nodes_face_0.push_back(nodes[1]);
-//        nodes_face_0.push_back(nodes[3]);
-//        nodes_face_0.push_back(nodes[2]);
-//
-//        nodes_face_1.push_back(nodes[3]);
-//        nodes_face_1.push_back(nodes[7]);
-//        nodes_face_1.push_back(nodes[6]);
-//        nodes_face_1.push_back(nodes[2]);
-//
-//        nodes_face_2.push_back(nodes[7]);
-//        nodes_face_2.push_back(nodes[5]);
-//        nodes_face_2.push_back(nodes[1]);
-//        nodes_face_2.push_back(nodes[3]);
-//
-//        nodes_face_3.push_back(nodes[0]);
-//        nodes_face_3.push_back(nodes[4]);
-//        nodes_face_3.push_back(nodes[6]);
-//        nodes_face_3.push_back(nodes[2]);
-//
-//        nodes_face_4.push_back(nodes[1]);
-//        nodes_face_4.push_back(nodes[5]);
-//        nodes_face_4.push_back(nodes[4]);
-//        nodes_face_4.push_back(nodes[0]);
-//
-//        nodes_face_5.push_back(nodes[4]);
-//        nodes_face_5.push_back(nodes[5]);
-//        nodes_face_5.push_back(nodes[7]);
-//        nodes_face_5.push_back(nodes[6]);
-//
-//        std::vector<VertexElement<2,3>*> faces;
-//        faces.push_back(new VertexElement<2,3>(0, nodes_face_0));
-//        faces.push_back(new VertexElement<2,3>(1, nodes_face_1));
-//        faces.push_back(new VertexElement<2,3>(2, nodes_face_2));
-//        faces.push_back(new VertexElement<2,3>(3, nodes_face_3));
-//        faces.push_back(new VertexElement<2,3>(4, nodes_face_4));
-//        faces.push_back(new VertexElement<2,3>(5, nodes_face_5));
-//
-//        std::vector<bool> orientations(faces.size());
-//        for (unsigned i=0; i<faces.size(); i++)
-//        {
-//            orientations[i] = true;
-//        }
-//
-//        // Make a cube element out of these faces
-//        VertexElement<3,3> element(0, faces, orientations);
-//        SetElementAsMonolayer(&element);
-//
-//        TS_ASSERT_EQUALS(element.GetNumNodes(), 8u);
-//        TS_ASSERT_EQUALS(element.GetNumFaces(), 6u);
-//
-//        TS_ASSERT_EQUALS(element.GetIndex(), 0u);
-//
-//        // Test the position of some random nodes
-//        TS_ASSERT_DELTA(element.GetFace(0)->GetNode(0)->rGetLocation()[0], 0.0, 1e-6);
-//        TS_ASSERT_DELTA(element.GetFace(0)->GetNode(0)->rGetLocation()[1], 0.0, 1e-6);
-//        TS_ASSERT_DELTA(element.GetFace(0)->GetNode(0)->rGetLocation()[2], 0.0, 1e-6);
-//
-//        TS_ASSERT_DELTA(element.GetFace(5)->GetNode(2)->rGetLocation()[0], 0.0, 1e-6);
-//        TS_ASSERT_DELTA(element.GetFace(5)->GetNode(2)->rGetLocation()[1], 0.0, 1e-6);
-//        TS_ASSERT_DELTA(element.GetFace(5)->GetNode(2)->rGetLocation()[2], 1.0, 1e-6);
-//
-//        // Test orientations
-//        for (unsigned face_index=0; face_index<element.GetNumFaces(); face_index++)
-//        {
-//            TS_ASSERT_EQUALS(element.FaceIsOrientatedAntiClockwise(face_index), true);
-//        }
-//
-//        // Tidy up
-//        for (unsigned i=0; i<nodes.size(); i++)
-//        {
-//            delete nodes[i];
-//        }
-//        for (unsigned i=0; i<faces.size(); i++)
-//        {
-//            delete faces[i];
-//        }
-//
-//    }
+    void TestMonolayerRearrangement()
+    {
+MARK
+        // Make 8 nodes to assign to a cube element
+        std::vector<Node<3>*> nodes;
+        nodes.push_back(new Node<3>(0, false, 0.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(1, false, 1.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(2, false, 0.0, 1.0, 0.0));
+        nodes.push_back(new Node<3>(3, false, 1.0, 1.0, 0.0));
+        nodes.push_back(new Node<3>(4, false, 0.0, 0.0, 1.0));
+        nodes.push_back(new Node<3>(5, false, 1.0, 0.0, 1.0));
+        nodes.push_back(new Node<3>(6, false, 0.0, 1.0, 1.0));
+        nodes.push_back(new Node<3>(7, false, 1.0, 1.0, 1.0));
+        for (unsigned i=0; i<4; ++i)
+        {
+            SetNodeAsBasal(nodes[i]);
+            SetNodeAsApical(nodes[i+4]);
+        }
+
+        std::vector<Node<3>*> nodes_face_0, nodes_face_1, nodes_face_2, nodes_face_3, nodes_face_4, nodes_face_5;
+
+        // Make 6 square faces out of these nodes
+        nodes_face_0.push_back(nodes[0]);
+        nodes_face_0.push_back(nodes[1]);
+        nodes_face_0.push_back(nodes[3]);
+        nodes_face_0.push_back(nodes[2]);
+
+        nodes_face_1.push_back(nodes[3]);
+        nodes_face_1.push_back(nodes[7]);
+        nodes_face_1.push_back(nodes[6]);
+        nodes_face_1.push_back(nodes[2]);
+
+        nodes_face_2.push_back(nodes[7]);
+        nodes_face_2.push_back(nodes[5]);
+        nodes_face_2.push_back(nodes[1]);
+        nodes_face_2.push_back(nodes[3]);
+
+        nodes_face_3.push_back(nodes[0]);
+        nodes_face_3.push_back(nodes[4]);
+        nodes_face_3.push_back(nodes[6]);
+        nodes_face_3.push_back(nodes[2]);
+
+        nodes_face_4.push_back(nodes[1]);
+        nodes_face_4.push_back(nodes[5]);
+        nodes_face_4.push_back(nodes[4]);
+        nodes_face_4.push_back(nodes[0]);
+
+        nodes_face_5.push_back(nodes[4]);
+        nodes_face_5.push_back(nodes[5]);
+        nodes_face_5.push_back(nodes[7]);
+        nodes_face_5.push_back(nodes[6]);
+
+        std::vector<VertexElement<2,3>*> faces;
+        faces.push_back(new VertexElement<2,3>(0, nodes_face_0));
+        faces.push_back(new VertexElement<2,3>(1, nodes_face_1));
+        faces.push_back(new VertexElement<2,3>(2, nodes_face_2));
+        faces.push_back(new VertexElement<2,3>(3, nodes_face_3));
+        faces.push_back(new VertexElement<2,3>(4, nodes_face_4));
+        faces.push_back(new VertexElement<2,3>(5, nodes_face_5));
+
+        std::vector<bool> orientations(faces.size());
+        for (unsigned i=0; i<faces.size(); ++i)
+        {
+            orientations[i] = true;
+        }
+
+        // Make a cube element out of these faces
+        VertexElement<3,3> element(0, faces, orientations);
+        SetElementAsMonolayer(&element);
+
+        TS_ASSERT_EQUALS(element.GetNumNodes(), 8u);
+        TS_ASSERT_EQUALS(element.GetNumFaces(), 6u);
+
+        TS_ASSERT_EQUALS(element.GetIndex(), 0u);
+
+        // Test the position of some random nodes
+        TS_ASSERT_DELTA(element.GetFace(0)->GetNode(0)->rGetLocation()[0], 0.0, 1e-6);
+        TS_ASSERT_DELTA(element.GetFace(0)->GetNode(0)->rGetLocation()[1], 0.0, 1e-6);
+        TS_ASSERT_DELTA(element.GetFace(0)->GetNode(0)->rGetLocation()[2], 0.0, 1e-6);
+
+        TS_ASSERT_DELTA(element.GetFace(5)->GetNode(2)->rGetLocation()[0], 0.0, 1e-6);
+        TS_ASSERT_DELTA(element.GetFace(5)->GetNode(2)->rGetLocation()[1], 0.0, 1e-6);
+        TS_ASSERT_DELTA(element.GetFace(5)->GetNode(2)->rGetLocation()[2], 1.0, 1e-6);
+
+        // Test orientations
+        for (unsigned face_index=0; face_index<element.GetNumFaces(); face_index++)
+        {
+            TS_ASSERT_EQUALS(element.FaceIsOrientatedAntiClockwise(face_index), true);
+        }
+
+        // Tidy up
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            delete nodes[i];
+        }
+        for (unsigned i=0; i<faces.size(); i++)
+        {
+            delete faces[i];
+        }
+
+    }
 
 };
 
