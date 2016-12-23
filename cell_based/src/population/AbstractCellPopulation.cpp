@@ -34,15 +34,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <boost/bind.hpp>
-#include <boost/mem_fn.hpp>
 
 #include <algorithm>
 #include <functional>
 
 #include "AbstractCellPopulation.hpp"
 #include "AbstractPhaseBasedCellCycleModel.hpp"
-#include "Exception.hpp"
-#include "PetscTools.hpp"
 #include "SmartPointers.hpp"
 #include "CellAncestor.hpp"
 #include "ApoptoticCellProperty.hpp"

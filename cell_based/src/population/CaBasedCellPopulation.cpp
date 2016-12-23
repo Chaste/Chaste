@@ -43,7 +43,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellLocationIndexWriter.hpp"
 #include "ExclusionCaBasedDivisionRule.hpp"
 #include "NodesOnlyMesh.hpp"
-#include "Exception.hpp"
 #include "ApoptoticCellProperty.hpp"
 
 // Needed to convert mesh in order to write nodes to VTK (visualize as glyphs)

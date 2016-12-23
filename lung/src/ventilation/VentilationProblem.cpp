@@ -35,8 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "VentilationProblem.hpp"
 #include "Warnings.hpp"
-//#include "Debug.hpp"
-//#include "Timer.hpp"
 
 /**
  * Helper function for varying terminal fluxes in order to match terminal pressure boundary conditions

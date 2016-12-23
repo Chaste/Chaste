@@ -35,7 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AveragedSourceParabolicPde.hpp"
 #include "ApoptoticCellProperty.hpp"
-#include "Exception.hpp"
 
 template<unsigned DIM>
 AveragedSourceParabolicPde<DIM>::AveragedSourceParabolicPde(AbstractCellPopulation<DIM,DIM>& rCellPopulation,

@@ -34,7 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "NodeBasedCellPopulation.hpp"
-#include "MutableMesh.hpp"
 #include "MathsCustomFunctions.hpp"
 #include "VtkMeshWriter.hpp"
 
@@ -101,7 +100,7 @@ TetrahedralMesh<DIM, DIM>* NodeBasedCellPopulation<DIM>::GetTetrahedralMeshForPd
          node_iter != mpNodesOnlyMesh->GetNodeIteratorEnd();
          ++node_iter)
     {
-        temp_nodes.push_back(new Node<DIM>(node_iter->GetIndex(), node_iter->rGetLocation()));
+        temp_nodes.push_back(new Node<DIM>(node_iter->GetIndex(), node_iter->rGetLocation(), node_iter->IsBoundaryNode()));
     }
 
     return new MutableMesh<DIM,DIM>(temp_nodes);
@@ -741,22 +740,6 @@ void NodeBasedCellPopulation<DIM>::DeleteMovedCell(unsigned index)
         }
     }
 }
-
-/**
- * This null deleter is for the next method, SendCellsToNeighbourProcesses so we can make a
- * shared_ptr copy of mCellsToSendx without it actually being deleted when the pointer goes out of scope.
- * We need a shared pointer to send it because ObjectCommunicator only sends/recvs shared pointers to
- * avoid memory management problems.
- */
-struct null_deleter
-{
-    /**
-     * The delete operation that does nothing.
-     */
-    void operator()(void const *) const
-    {
-    }
-};
 
 template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::SendCellsToNeighbourProcesses()

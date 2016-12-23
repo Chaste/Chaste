@@ -38,7 +38,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Warnings.hpp"
 #include "AirwayTreeWalker.hpp"
 #include "AirwayPropertiesCalculator.hpp"
-//#include "Debug.hpp"
 
 AbstractVentilationProblem::AbstractVentilationProblem(const std::string& rMeshDirFilePath, unsigned rootIndex)
     : mOutletNodeIndex(rootIndex),

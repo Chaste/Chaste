@@ -35,7 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AveragedSourceEllipticPde.hpp"
 #include "ApoptoticCellProperty.hpp"
-#include "PetscTools.hpp"
 
 template<unsigned DIM>
 AveragedSourceEllipticPde<DIM>::AveragedSourceEllipticPde(AbstractCellPopulation<DIM>& rCellPopulation,

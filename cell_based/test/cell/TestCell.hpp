@@ -73,6 +73,9 @@ public:
 
     void TestCellConstructor() throw(Exception)
     {
+        // Coverage
+        TS_ASSERT_THROWS_NOTHING(null_deleter());
+
         // Set up SimulationTime
         SimulationTime* p_simulation_time = SimulationTime::Instance();
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(200, 20);

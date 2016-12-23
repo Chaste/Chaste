@@ -34,7 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "FixedVertexBasedDivisionRule.hpp"
-#include "Exception.hpp"
 
 template <unsigned SPACE_DIM>
 FixedVertexBasedDivisionRule<SPACE_DIM>::FixedVertexBasedDivisionRule(c_vector<double, SPACE_DIM>& rDivisionVector)

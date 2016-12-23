@@ -142,6 +142,9 @@ public:
         boost::shared_ptr<RkSolver> p_solver2 = RkSolver::Instance();
         TS_ASSERT_EQUALS(p_solver, p_solver2);
 
+        // Coverage
+        TS_ASSERT_THROWS_NOTHING(p_solver->Reset());
+
         p_solver->Initialise();
 
         // Check the solver can be called for a simple ODE system

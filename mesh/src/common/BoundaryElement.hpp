@@ -53,8 +53,8 @@ class BoundaryElement : public AbstractTetrahedralElement<ELEMENT_DIM, SPACE_DIM
 {
 protected:
     /**
-     *  (Protected) constructor that does take in nodes. Only available
-     *  to subclasses. Calling code should use one of the other constructors.
+     * (Protected) constructor that does take in nodes. Only available
+     * to subclasses. Calling code should use one of the other constructors.
      */
     BoundaryElement();
 

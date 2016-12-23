@@ -37,9 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractMeshWriter.hpp"
 #include "PetscTools.hpp"
 
-///////////////////////////////////////////////////////////////////////////////////
-// Implementation
-///////////////////////////////////////////////////////////////////////////////////
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractMeshWriter<ELEMENT_DIM, SPACE_DIM>::AbstractMeshWriter(const std::string& rDirectory,
                                                                const std::string& rBaseName,
@@ -89,41 +86,40 @@ unsigned AbstractMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNumCableElements()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::vector<double> AbstractMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextNode()
 {
-    assert(mpMeshReader!=NULL);
+    assert(mpMeshReader != NULL);
     return mpMeshReader->GetNextNode();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ElementData AbstractMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextElement()
 {
-    assert(mpMeshReader!=NULL);
+    assert(mpMeshReader != NULL);
     return mpMeshReader->GetNextElementData();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ElementData AbstractMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextBoundaryElement()
 {
-    assert(mpMeshReader!=NULL);
+    assert(mpMeshReader != NULL);
     return mpMeshReader->GetNextFaceData();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ElementData AbstractMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextCableElement()
 {
-    assert(mpMeshReader!=NULL);
+    assert(mpMeshReader != NULL);
     return mpMeshReader->GetNextCableElementData();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMeshReader(
-        AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>& rMeshReader)
+void AbstractMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMeshReader(AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>& rMeshReader)
 {
     mpMeshReader = &rMeshReader;
     mNumNodes = mpMeshReader->GetNumNodes();
     mNumElements = mpMeshReader->GetNumElements();
     mNumBoundaryElements = mpMeshReader->GetNumFaces();
 
-    ///Only triangles mesh readers know about cable elements
+    // Only triangles mesh readers know about cable elements
     mNumCableElements = mpMeshReader->GetNumCableElements();
 
     if (PetscTools::AmMaster())
