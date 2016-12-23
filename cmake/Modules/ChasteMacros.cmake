@@ -414,7 +414,7 @@ endmacro(Chaste_DO_PROJECT)
 # process the apps folder
 ##########################################################
 macro(Chaste_DO_APPS_COMMON component)
-    include_directories("${Chaste_THIRD_PARTY_INCLUDE_DIRS}" "${Chaste_INCLUDE_DIRS}")
+    include_directories(SYSTEM "${Chaste_THIRD_PARTY_INCLUDE_DIRS}" "${Chaste_INCLUDE_DIRS}")
     include_directories(SYSTEM "${CXXTEST_INCLUDES}")
     file(GLOB_RECURSE Chaste_${component}_APPS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} src/*.cpp)
     foreach(app ${Chaste_${component}_APPS})

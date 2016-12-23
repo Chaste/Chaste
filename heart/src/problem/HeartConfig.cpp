@@ -1128,7 +1128,7 @@ void HeartConfig::GetCellHeterogeneities(std::vector<boost::shared_ptr<AbstractC
             = mpParameters->Simulation()->CellHeterogeneities()->CellHeterogeneity();
 
     bool user_supplied_negative_value = false;
-    bool user_asking_for_transmural_layers = false;
+    mUserAskedForCellularTransmuralHeterogeneities = false; // overwritten with true below if necessary
     bool user_asked_for_cuboids_or_ellipsoids = false;
     unsigned counter_of_heterogeneities = 0;
 
@@ -1163,7 +1163,7 @@ void HeartConfig::GetCellHeterogeneities(std::vector<boost::shared_ptr<AbstractC
         {
             mEpiFraction  =  ht.Location().EpiLayer().get();
 
-            user_asking_for_transmural_layers = true;
+            mUserAskedForCellularTransmuralHeterogeneities = true;
             if (mEpiFraction <0)
             {
                 user_supplied_negative_value=true;
@@ -1174,7 +1174,7 @@ void HeartConfig::GetCellHeterogeneities(std::vector<boost::shared_ptr<AbstractC
         {
             mEndoFraction  =  ht.Location().EndoLayer().get();
 
-            user_asking_for_transmural_layers = true;
+            mUserAskedForCellularTransmuralHeterogeneities = true;
             if (mEndoFraction <0)
             {
                 user_supplied_negative_value=true;
@@ -1185,7 +1185,7 @@ void HeartConfig::GetCellHeterogeneities(std::vector<boost::shared_ptr<AbstractC
         {
             mMidFraction  =  ht.Location().MidLayer().get();
 
-            user_asking_for_transmural_layers = true;
+            mUserAskedForCellularTransmuralHeterogeneities = true;
             if (mMidFraction <0)
             {
                 user_supplied_negative_value=true;
@@ -1219,9 +1219,6 @@ void HeartConfig::GetCellHeterogeneities(std::vector<boost::shared_ptr<AbstractC
 
         counter_of_heterogeneities++;
     }
-
-    //set the flag for request of transmural layers
-    mUserAskedForCellularTransmuralHeterogeneities = user_asking_for_transmural_layers;
 
     if (mUserAskedForCellularTransmuralHeterogeneities )
     {
