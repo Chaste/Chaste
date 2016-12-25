@@ -236,24 +236,27 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteSvgUsingMesh(Immer
     (*svg_file) << "<svg version=\"1.1\" baseProfile=\"full\" width=\""
                 << mSvgSize <<"px\" height=\"" << mSvgSize << "px\" "
                 << "viewBox=\"0 0 " << mSvgSize << " " << mSvgSize << "\" "
-                << "xmlns=\"http://www.w3.org/2000/svg\">" << std::endl;
+                << "xmlns=\"http://www.w3.org/2000/svg\">" << "\n";
 
     // Add text/css style for elements
-    (*svg_file) << "<style type=\"text/css\">" << std::endl;
-    (*svg_file) << "\t.bg_rect{fill:" << bg_col << ";}" << std::endl;
-    (*svg_file) << "\t.node_0{fill:" << region0_col << ";}" << std::endl;
-    (*svg_file) << "\t.node_1{fill:" << region1_col << ";}" << std::endl;
-    (*svg_file) << "\t.node_2{fill:" << region2_col << ";}" << std::endl;
-    (*svg_file) << "\t.node_3{fill:" << region3_col << ";}" << std::endl;
-    (*svg_file) << "\t.node_4{fill:" << region4_col << ";}" << std::endl;
-    (*svg_file) << "\t.node_5{fill:" << region5_col << ";}" << std::endl;
-    (*svg_file) << "\t.node_6{fill:" << region6_col << ";}" << std::endl;
-    (*svg_file) << "\t.node_7{fill:" << region7_col << ";}" << std::endl;
-    (*svg_file) << "\t.node_8{fill:" << region8_col << ";}" << std::endl;
-    (*svg_file) << "</style>" << std::endl;
+    (*svg_file) << "<style type=\"text/css\">" << "\n"
+                << "\t.bg_rect{fill:" << bg_col << ";}" << "\n"
+                << "\t.node_0{fill:" << region0_col << ";}" << "\n"
+                << "\t.node_1{fill:" << region1_col << ";}" << "\n"
+                << "\t.node_2{fill:" << region2_col << ";}" << "\n"
+                << "\t.node_3{fill:" << region3_col << ";}" << "\n"
+                << "\t.node_4{fill:" << region4_col << ";}" << "\n"
+                << "\t.node_5{fill:" << region5_col << ";}" << "\n"
+                << "\t.node_6{fill:" << region6_col << ";}" << "\n"
+                << "\t.node_7{fill:" << region7_col << ";}" << "\n"
+                << "\t.node_8{fill:" << region8_col << ";}" << "\n"
+                << "\t.glyph_0{fill:" << glyph0_col << ";}" << "\n"
+                << "\t.glyph_1{fill:" << glyph1_col << ";}" << "\n"
+                << "\t.glyph_2{fill:" << glyph2_col << ";}" << "\n"
+                << "</style>" << "\n";
 
     // Add background rectangle
-    (*svg_file) << "<rect class=\"bg_rect\" width=\"" << mSvgSize << "\" height=\"" << mSvgSize << "\"/>" << std::endl;
+    (*svg_file) << "<rect class=\"bg_rect\" width=\"" << mSvgSize << "\" height=\"" << mSvgSize << "\"/>" << "\n";
 
     // Add all nodes to the svg file
     for (typename AbstractMesh<ELEMENT_DIM,SPACE_DIM>::NodeIterator it = rMesh.GetNodeIteratorBegin();
@@ -264,7 +267,7 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteSvgUsingMesh(Immer
     }
 
     // Close svg tag
-    (*svg_file) << "</svg>" << std::endl;
+    (*svg_file) << "</svg>" << "\n";
 
     // Close svg file
     svg_file->close();
@@ -279,7 +282,7 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddPointToSvgFile(out_s
     (*rSvgFile) << "<circle class=\"node_" << region << "\" "
                 << "cx=\"" << scaled_x << "\" "
                 << "cy=\"" << scaled_y << "\" "
-                << "r=\"" << rad << "\"/>" << std::endl;
+                << "r=\"" << rad << "\"/>" << "\n";
 
     // Account for possible wrap-around of glyph in x
     if (scaled_x < rad)
@@ -287,14 +290,14 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddPointToSvgFile(out_s
         (*rSvgFile) << "<circle class=\"node_" << region << "\" "
                     << "cx=\"" << scaled_x + mSvgSize << "\" "
                     << "cy=\"" << scaled_y << "\" "
-                    << "r=\"" << rad << "\"/>" << std::endl;
+                    << "r=\"" << rad << "\"/>" << "\n";
     }
     else if (scaled_x > mSvgSize - rad)
     {
         (*rSvgFile) << "<circle class=\"node_" << region << "\" "
                     << "cx=\"" << scaled_x - mSvgSize << "\" "
                     << "cy=\"" << scaled_y << "\" "
-                    << "r=\"" << rad << "\"/>" << std::endl;
+                    << "r=\"" << rad << "\"/>" << "\n";
     }
 
     // Account for possible wrap-around of glyph in y
@@ -303,14 +306,14 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddPointToSvgFile(out_s
         (*rSvgFile) << "<circle class=\"node_" << region << "\" "
                     << "cx=\"" << scaled_x << "\" "
                     << "cy=\"" << scaled_y + mSvgSize << "\" "
-                    << "r=\"" << rad << "\"/>" << std::endl;
+                    << "r=\"" << rad << "\"/>" << "\n";
     }
     else if (scaled_y > mSvgSize - rad)
     {
         (*rSvgFile) << "<circle class=\"node_" << region << "\" "
                     << "cx=\"" << scaled_x << "\" "
                     << "cy=\"" << scaled_y - mSvgSize << "\" "
-                    << "r=\"" << rad << "\"/>" << std::endl;
+                    << "r=\"" << rad << "\"/>" << "\n";
     }
 }
 
