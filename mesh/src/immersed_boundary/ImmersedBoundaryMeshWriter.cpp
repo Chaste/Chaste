@@ -214,15 +214,18 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteSvgUsingMesh(Immer
 
     // Define colours
     std::string bg_col = "darkgray";
-    std::string region0_col = "darkred";
-    std::string region1_col = "crimson";
-    std::string region2_col = "darkmagenta";
-    std::string region3_col = "darkorchid";
-    std::string region4_col = "darkblue";
-    std::string region5_col = "blue";
-    std::string region6_col = "#000";
-    std::string region7_col = "#333";
-    std::string region8_col = "#FFF";
+    std::string region0_col = "#990000"; // dark red
+    std::string region1_col = "#cc0000"; // light red
+    std::string region2_col = "#e68a00"; // dark orange
+    std::string region3_col = "#ff9900"; // light orange
+    std::string region4_col = "#006666"; // dark teal
+    std::string region5_col = "#009999"; // light teal
+    std::string region6_col = "#000099"; // dark blue
+    std::string region7_col = "#0000cc"; // light blue
+    std::string region8_col = "#FFFFFF"; // white
+    std::string glyph0_col = "DarkRed"; // white
+    std::string glyph1_col = "DarkBlue"; // white
+    std::string glyph2_col = "DarkGreen"; // white
 
     out_stream svg_file = this->mpOutputFileHandler->OpenOutputFile(svg_file_name);
 
