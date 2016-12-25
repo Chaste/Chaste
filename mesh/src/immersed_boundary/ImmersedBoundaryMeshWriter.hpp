@@ -160,6 +160,18 @@ public:
     void AddPointToSvgFile(out_stream& rSvgFile, c_vector<double, SPACE_DIM> location, unsigned region, double rad);
 
     /**
+     *  Add an elliptical glyph to an SVG file.
+     *
+     *  @param rSvgFile reference to the svg file stream
+     *  @param location the location of the centre of the glyph to add to the svg file
+     *  @param region the region, for setting output style
+     *  @param rad the radius to represent the node
+     *  @param elongation the ellipse elongation
+     *  @param angle the angle, to the nearest degree, to rotate the glyph by
+     */
+    void AddGlyphToSvgFile(out_stream& rSvgFile, c_vector<double, SPACE_DIM> location, unsigned region, double rad, double elongation, int angle);
+
+    /**
      * Populate mpVtkUnstructedMesh using a vertex-based mesh.
      * Called by WriteVtkUsingMesh().
      *

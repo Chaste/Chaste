@@ -211,6 +211,7 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteSvgUsingMesh(Immer
 
     // Image attributes
     double node_rad = rMesh.GetAverageNodeSpacingOfElement(0, false) * 0.35 * mSvgSize;
+    double glyph_rad = 0.005 * mSvgSize;
 
     // Define colours
     std::string bg_col = "darkgray";
@@ -266,6 +267,23 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteSvgUsingMesh(Immer
         AddPointToSvgFile(svg_file, it->rGetLocation(), it->GetRegion(), node_rad);
     }
 
+    // Add all nodes to the svg file
+    if (rMesh.GetElement(0)->GetNumElementAttributes() > 2)
+    {
+        for (typename ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryElementIterator it = rMesh.GetElementIteratorBegin();
+             it != rMesh.GetElementIteratorEnd();
+             ++it)
+        {
+            c_vector<double, 2> short_axis = rMesh.GetShortAxisOfElement(it->GetIndex());
+            int angle = static_cast<int>(atan2(short_axis[1], short_axis[0]) * 180.0 / M_PI);
+
+            AddGlyphToSvgFile(svg_file, rMesh.GetCentroidOfElement(it->GetIndex()),
+                              (unsigned)std::floor(it->GetIndex() / 4.0), glyph_rad,
+                              rMesh.GetElongationShapeFactorOfElement(it->GetIndex()),
+                              angle);
+        }
+    }
+
     // Close svg tag
     (*svg_file) << "</svg>" << "\n";
 
@@ -314,6 +332,67 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddPointToSvgFile(out_s
                     << "cx=\"" << scaled_x << "\" "
                     << "cy=\"" << scaled_y - mSvgSize << "\" "
                     << "r=\"" << rad << "\"/>" << "\n";
+    }
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddGlyphToSvgFile(out_stream& rSvgFile,
+                                                                           c_vector<double, SPACE_DIM> location,
+                                                                           unsigned region,
+                                                                           double rad,
+                                                                           double elongation,
+                                                                           int angle)
+{
+    double scaled_x = location[0] * mSvgSize;
+    double scaled_y = (1.0 - location[1]) * mSvgSize;
+
+    double max_size = std::max(rad, rad * elongation);
+
+    (*rSvgFile) << "<ellipse class=\"glyph_" << region << "\" "
+                << "transform=\"translate(" << scaled_x << " " << scaled_y
+                << ") rotate(" << angle << ")\" "
+                << "rx=\"" << rad << "\" "
+                << "ry=\"" << elongation * rad << "\""
+                << "/>" << "\n";
+
+    // Account for possible wrap-around of glyph in x
+    if (scaled_x < max_size)
+    {
+        (*rSvgFile) << "<ellipse class=\"glyph_" << region << "\" "
+                    << "transform=\"translate(" << scaled_x + mSvgSize << " " << scaled_y
+                    << ") rotate(" << angle << ")\" "
+                    << "rx=\"" << rad << "\" "
+                    << "ry=\"" << elongation * rad << "\""
+                    << "/>" << "\n";
+    }
+    else if (scaled_x > mSvgSize - max_size)
+    {
+        (*rSvgFile) << "<ellipse class=\"glyph_" << region << "\" "
+                    << "transform=\"translate(" << scaled_x - mSvgSize << " " << scaled_y
+                    << ") rotate(" << angle << ")\" "
+                    << "rx=\"" << rad << "\" "
+                    << "ry=\"" << elongation * rad << "\""
+                    << "/>" << "\n";
+    }
+
+    // Account for possible wrap-around of glyph in y
+    if (scaled_y < max_size)
+    {
+        (*rSvgFile) << "<ellipse class=\"glyph_" << region << "\" "
+                    << "transform=\"translate(" << scaled_x << " " << scaled_y + mSvgSize
+                    << ") rotate(" << angle << ")\" "
+                    << "rx=\"" << rad << "\" "
+                    << "ry=\"" << elongation * rad << "\""
+                    << "/>" << "\n";
+    }
+    else if (scaled_y > mSvgSize - max_size)
+    {
+        (*rSvgFile) << "<ellipse class=\"glyph_" << region << "\" "
+                    << "transform=\"translate(" << scaled_x << " " << scaled_y - mSvgSize
+                    << ") rotate(" << angle << ")\" "
+                    << "rx=\"" << rad << "\" "
+                    << "ry=\"" << elongation * rad << "\""
+                    << "/>" << "\n";
     }
 }
 
