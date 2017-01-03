@@ -1,7 +1,7 @@
 
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -374,6 +374,8 @@ Vec AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::Solve()
         bool timestep_changed = false;
 
         PdeSimulationTime::SetTime(stepper.GetTime());
+
+        std::cout << "Time = " << stepper.GetTime() << std::endl << std::flush;
 
         // Determine timestep to use
         double new_dt;
