@@ -1593,7 +1593,7 @@ c_vector<double, 3> VertexMesh<3, 3>::GetVolumeGradientofElementAtNode(const Ver
         volume_gradient += this_face_gradient_contribution;
     }
 
-    return volume_gradient * -1.0; ///\fixme the -1.0
+    return volume_gradient; // * -1.0; ///\fixme the -1.0
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

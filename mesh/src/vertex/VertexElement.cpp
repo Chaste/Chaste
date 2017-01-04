@@ -35,9 +35,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexElement.hpp"
 
 #include <cassert>
-#include <algorithm>                                // std::swap, std::min, std::max, std::rotate
+#include <algorithm>                                // std::swap, std::min, std::max, std::rotate, std::copy
+#include "UblasCustomFunctions.hpp"                 // VectorProduct
 #include "MonolayerVertexMeshCustomFunctions.hpp"
 #include "Debug.hpp"
+
 
 
 //////////////////////////////////////////////////
@@ -437,12 +439,10 @@ void VertexElement<ELEMENT_DIM, SPACE_DIM>::MonolayerElementRearrangeFacesNodes(
 template<>
 void VertexElement<3, 3>::MonolayerElementRearrangeFacesNodes()
 {
-MARK
-PrintElement(this);
-
     const VertexElement<2, 3>* p_basal = GetBasalFace(this);
     const VertexElement<2, 3>* p_apical = GetApicalFace(this);
 
+    // Some sanity check.
     const unsigned num_face_nodes = p_basal->GetNumNodes();
     if (num_face_nodes*2!=this->GetNumNodes() || num_face_nodes!=p_apical->GetNumNodes() ||
         num_face_nodes+2 != mFaces.size() || mFaces.size() != mOrientations.size())
@@ -472,95 +472,114 @@ PrintElement(this);
         this->mOrientations[tmp_index] = tmp;
     }
 
+    // Check and rearrange nodes if necessary
+    std::vector<Node<3>*> elem_nodes(2*num_face_nodes);
+    std::vector<Node<3>*> face_nodes(2*num_face_nodes);
+    for (unsigned local_index=0; local_index<num_face_nodes; ++local_index)
+    {
+        elem_nodes[local_index] = this->GetNode(local_index);
+        elem_nodes[local_index+num_face_nodes] = this->GetNode(local_index+num_face_nodes);
+
+        face_nodes[local_index] = p_basal->GetNode(local_index);
+        face_nodes[local_index+num_face_nodes] = p_apical->GetNode(local_index);
+    }
+    // If nodes in element are not in proper order, they are rearranged
+    if (elem_nodes != face_nodes)
+    {
+        std::set<unsigned> tmp_elem_node_indices;
+        std::set<unsigned> tmp_face_node_indices;
+        for (unsigned local_index=0; local_index<2*num_face_nodes; ++local_index)
+        {
+            tmp_elem_node_indices.insert(elem_nodes[local_index]->GetIndex());
+            tmp_face_node_indices.insert(face_nodes[local_index]->GetIndex());
+        }
+
+        // Make sure the nodes are the same.
+        if (tmp_elem_node_indices != tmp_face_node_indices)
+        {
+            NEVER_REACHED;
+        }
+
+        this->mNodes = face_nodes;
+    }
+
     // Tidy up the nodes of the lateral faces
+    /*
+     * Rearrange nodes of lateral faces such that the first two nodes are the basal nodes.
+     * It is assumed that the nodes are in certain cyclic order, but doesn't make unordered nodes
+     * into cyclic order. (say cyclic order is [1,2,3,4], this will sort out [3,4,1,2] but not [3,2,4,1].
+     */
     for (unsigned i=2; i<this->GetNumFaces(); ++i)
     {
         this->GetFace(i)->LateralFaceRearrangeNodes();
     }
 
+    // Check and rearrange faces if necessary
+    std::vector<unsigned> elem_lateral_indices(num_face_nodes);
+    std::vector<unsigned> node_lateral_indices(num_face_nodes);
 
-PrintElement(this);
-
-PRINT_4_VARIABLES(this->mIndex, p_basal->GetIndex(), p_apical->GetIndex(), num_face_nodes)
-
-    // Rearrange nodes of lateral faces such that the first two nodes are the basal nodes.
-    // It is assumed that the nodes are in certain cyclic order, but doesn't make unordered nodes
-    // into cyclic order. (say cyclic order is [1,2,3,4], this will sort out [3,2,1,4] but not [3,2,4,1].
-
-std::vector<unsigned> lateral_face_indices;
-std::vector<unsigned> first_node_global_indices;
-std::vector<unsigned> second_node_global_indices;
-for (unsigned elem_face_index=2; elem_face_index<this->GetNumFaces(); ++ elem_face_index)
-{
-    VertexElement<2, 3>* p_lateral_face = mFaces[elem_face_index];
-    lateral_face_indices.push_back(p_lateral_face->GetIndex());
-    first_node_global_indices.push_back(p_lateral_face->GetNodeGlobalIndex(0));
-    second_node_global_indices.push_back(p_lateral_face->GetNodeGlobalIndex(1));
-}
-std::vector<unsigned> right_node_indices, wrong_node_indices;
-for (unsigned i=0; i<num_face_nodes; ++i)
-    right_node_indices.push_back(p_basal->GetNodeGlobalIndex(i));
-for (unsigned i=0; i<2*num_face_nodes; ++i)
-    wrong_node_indices.push_back(this->GetNodeGlobalIndex(i));
-PRINT_CONTAINER(right_node_indices)
-PRINT_CONTAINER(wrong_node_indices)
-PRINT_CONTAINER(lateral_face_indices)
-PRINT_CONTAINER(first_node_global_indices)
-PRINT_CONTAINER(second_node_global_indices)
-
-
-
-    std::vector<int> stored_indices;
-    // First check and rearrange nodes if necessary
-    for (unsigned node_local_index=0; node_local_index<num_face_nodes; ++node_local_index)
+    for (unsigned local_index=0; local_index<num_face_nodes; ++local_index)
     {
-        const unsigned elem_node_global_index = this->GetNodeGlobalIndex(node_local_index);
-        const unsigned face_node_global_index = p_basal->GetNodeGlobalIndex(node_local_index);
-        if (elem_node_global_index != face_node_global_index)
-        {
-            stored_indices.push_back(this->GetNodeLocalIndex(face_node_global_index));
-            this->mNodes[node_local_index] = p_basal->GetNode(node_local_index);
-            this->mNodes[node_local_index+num_face_nodes] = p_apical->GetNode(node_local_index);
-        }
-        else
-        {
-            stored_indices.push_back(-1);
-        }
+        elem_lateral_indices[local_index] = this->mFaces[local_index+2]->GetIndex();
+
+        std::vector<unsigned> shared_face_indices = GetLateralFace(this, this->mNodes[local_index]->GetIndex(),
+                                                                   this->mNodes[local_index+1]->GetIndex());
+        assert(shared_face_indices[0] != UINT_MAX);
+        node_lateral_indices[local_index] = shared_face_indices[0];
     }
-PRINT_CONTAINER(stored_indices)
-    // sanity check
-    ///\todo #2850 make sure the non -1 in stored_indices form a cycle
 
-    // then check and rearrange faces if necessary
-    bool is_faces_in_order = true;
-    std::vector<VertexElement<2, 3>*> tmp_lateral_faces(num_face_nodes);
-    std::vector<bool> tmp_lateral_orientations(num_face_nodes);
-PRINT_CONTAINER(tmp_lateral_orientations)
-    for (unsigned elem_face_index=2; elem_face_index<this->GetNumFaces(); ++ elem_face_index)
+    // If nodes in element are not in proper order, they will be rearranged
+    if (elem_lateral_indices != node_lateral_indices)
     {
-        VertexElement<2, 3>* p_lateral_face = mFaces[elem_face_index];
-        const unsigned first_node_local_index = this->GetNodeLocalIndex(p_lateral_face->GetNodeGlobalIndex(0));
-        const unsigned second_node_local_index = this->GetNodeLocalIndex(p_lateral_face->GetNodeGlobalIndex(1));
-        assert(first_node_local_index!=UINT_MAX && second_node_local_index!=UINT_MAX);
+        std::set<unsigned> tmp_elem_lateral_indices (elem_lateral_indices.begin(), elem_lateral_indices.end());
+        std::set<unsigned> tmp_node_lateral_indices (node_lateral_indices.begin(), node_lateral_indices.end());
 
-        const unsigned proper_face_index = (mOrientations[elem_face_index] ? second_node_local_index : first_node_local_index) + 2;
-        tmp_lateral_faces[proper_face_index-2] = p_lateral_face;
-        tmp_lateral_orientations[proper_face_index-2] = mOrientations[elem_face_index];
-        if (proper_face_index != elem_face_index)
+        // Make sure the lateral faces are the same.
+        if (tmp_elem_lateral_indices != tmp_node_lateral_indices)
         {
-            is_faces_in_order = false;
+            NEVER_REACHED;
         }
+
+        // Store the faces and their orientations in new order temporarily
+        std::vector<VertexElement<2, 3>*> new_faces;
+        std::vector<bool> new_orientations;
+
+        for (unsigned lateral_index=0; lateral_index<node_lateral_indices.size(); ++lateral_index)
+        {
+            const unsigned lateral_global_index = node_lateral_indices[lateral_index];
+            const unsigned lateral_local_index = this->GetFaceLocalIndex(lateral_global_index);
+            VertexElement<2, 3>* p_tmp_face = this->mFaces[lateral_local_index];
+            const bool tmp_orientation = this->mOrientations[lateral_local_index];
+            assert(p_tmp_face->GetIndex() == lateral_global_index);
+
+            new_faces.push_back(p_tmp_face);
+            new_orientations.push_back(tmp_orientation);
+        }
+
+        std::copy(new_faces.begin(), new_faces.end(), this->mFaces.begin()+2);
+        std::copy(new_orientations.begin(), new_orientations.end(), this->mOrientations.begin()+2);
     }
-    if (!is_faces_in_order)
+
+    // Check Orientation
+    const c_vector<double, 3> elem_centroid = this->GetCentroid();
+    for (unsigned face_index=0; face_index<this->GetNumFaces(); ++face_index)
     {
-        for (unsigned lateral_face_index=0; lateral_face_index<tmp_lateral_faces.size(); ++lateral_face_index)
+        const VertexElement<2, 3>* p_face = this->GetFace(face_index);
+        c_vector<double, 3> face_centroid = p_face->GetCentroid();
+        c_vector<double, 3> face_normal = zero_vector<double>(3);
+
+        // Calculation w.r.t. centroid so that it will not be affected by uneven surface.
+        c_vector<double, 3> v_minus_c0 = p_face->GetNode(0)->rGetLocation() - face_centroid;
+        for (unsigned node_index=1; node_index<=p_face->GetNumNodes(); ++node_index)
         {
-            mFaces[lateral_face_index+2] = tmp_lateral_faces[lateral_face_index];
-            mOrientations[lateral_face_index+2] = tmp_lateral_orientations[lateral_face_index];
+            c_vector<double, 3> vnext_minus_c0 = p_face->GetNode(node_index%p_face->GetNumNodes())->rGetLocation() - face_centroid;
+            face_normal += VectorProduct(v_minus_c0, vnext_minus_c0);
+            v_minus_c0 = vnext_minus_c0;
         }
+
+        this->mOrientations[face_index] = inner_prod(face_normal, face_centroid-elem_centroid)<0;
     }
     ///\todo #2850 redo mOrientation
-MARK
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

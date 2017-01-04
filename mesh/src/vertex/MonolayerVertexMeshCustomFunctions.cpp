@@ -39,6 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexElement.hpp"
 #include <set>
 #include <algorithm>
+#include <string>
 
 #include <iostream>             // PrintElement
 #include <iomanip>              // PrintElement

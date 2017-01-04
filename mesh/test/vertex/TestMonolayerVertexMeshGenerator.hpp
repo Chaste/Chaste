@@ -44,7 +44,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VoronoiVertexMeshGenerator.hpp"       // Make Mesh from 2D Mesh
 #include "HoneycombVertexMeshGenerator.hpp"     // Make Mesh from 2D Mesh
 
-#include <algorithm>
+
+
 #include "Debug.hpp"
 
 #include "FakePetscSetup.hpp"
@@ -57,322 +58,19 @@ class TestMonolayerVertexMeshGenerator : public CxxTest::TestSuite
 {
 public:
 
-    void TestGeodesicShpere()
-    {
-        GeodesicSphere23Generator builder;
-        {
-            MutableVertexMesh<2, 3>* p_mesh = new MutableVertexMesh<2, 3>(builder.mNodes, builder.mFaces);
-            VertexMeshWriter<2, 3> Writer("SphericalMesh", "Geodesic_0Division", false);
-            Writer.WriteVtkUsingMeshWithCellId(*p_mesh);
-
-//            MonolayerVertexMeshGenerator sBuilder("trii");
-//            MutableVertexMesh<3,3>* pp_mesh33 = sBuilder.MakeSphericalMesh33(p_mesh, 5, 0.5);
-//            sBuilder.WriteVtk("SphericalMesh", "0");
-
-//            delete p_mesh;
-        }
-        PRINT_3_VARIABLES(builder.mNodes.size(), builder.mEdges.size(), builder.mFaces.size())
-
-        for (unsigned i=0; i<builder.mNodes.size(); ++i)
-        {
-            TS_ASSERT_EQUALS(builder.mNodes[i]->GetNumContainingFaces(), 5);
-        }
-        for (unsigned i=0; i<builder.mEdges.size(); ++i)
-        {
-            TS_ASSERT_EQUALS(builder.mEdges[i]->FaceGetNumContainingElements(), 2);
-            TS_ASSERT_EQUALS(builder.mEdges[i]->GetNumNodes(), 2);
-        }
-        for (unsigned i=0; i<builder.mFaces.size(); ++i)
-        {
-            TS_ASSERT_EQUALS(builder.mFaces[i]->GetNumNodes(), 3);
-            TS_ASSERT_EQUALS(builder.mFaces[i]->GetNumFaces(), 3);
-        }
-
-        {
-            MutableVertexMesh<2,3>* pp_mesh = builder.GetDual();
-            VertexMeshWriter<2, 3> Writer("SphericalMesh", "Geodesic_0Dual", false);
-            Writer.WriteVtkUsingMeshWithCellId(*pp_mesh);
-
-            MonolayerVertexMeshGenerator sBuilder("ssss");
-            MutableVertexMesh<3,3>* pp_mesh33 = sBuilder.MakeSphericalMesh33(pp_mesh, 5, 0.5);
-            sBuilder.WriteVtk("SphericalMesh", "0");
-
-//            delete pp_mesh;
-//            delete pp_mesh33;
-        }
-
-
-
-
-        builder.SubDivide();
-        PRINT_3_VARIABLES(builder.mNodes.size(), builder.mEdges.size(), builder.mFaces.size())
-        {
-            MutableVertexMesh<2, 3>* p_mesh = new MutableVertexMesh<2, 3>(builder.mNodes, builder.mFaces);
-            VertexMeshWriter<2, 3> Writer("SphericalMesh", "Geodesic_1Divison", false);
-            Writer.WriteVtkUsingMeshWithCellId(*p_mesh);
-
-//            MonolayerVertexMeshGenerator sBuilder("trii", false);
-//            MutableVertexMesh<3,3>* pp_mesh33 = sBuilder.MakeSphericalMesh33(p_mesh, 5, 0.5);
-//            sBuilder.WriteVtk("SphericalMesh", "1");
-
-//            delete p_mesh;
-        }
-
-        unsigned iii = 0;
-        for (unsigned i=0; i<builder.mNodes.size(); ++i)
-        {
-            TS_ASSERT_DELTA(builder.mNodes[i]->GetNumContainingElements(), 5.5, 0.51);
-            TS_ASSERT_DELTA(builder.mNodes[i]->GetNumContainingFaces(), 5.5, 0.51);
-            TS_ASSERT_EQUALS(builder.mNodes[i]->GetNumContainingFaces(), builder.mNodes[i]->GetNumContainingElements());
-            if (builder.mNodes[i]->GetNumContainingElements() == 5)
-            {
-                ++iii;
-            }
-        }
-        TS_ASSERT_EQUALS(iii, 12);
-        for (unsigned i=30; i<builder.mEdges.size(); ++i)
-        {
-            if (builder.mEdges[i]==NULL)
-                continue;
-            TS_ASSERT_EQUALS(builder.mEdges[i]->FaceGetNumContainingElements(), 2);
-            TS_ASSERT_EQUALS(builder.mEdges[i]->GetNumNodes(), 2);
-        }
-        for (unsigned i=0; i<builder.mFaces.size(); ++i)
-        {
-            TS_ASSERT_EQUALS(builder.mFaces[i]->GetNumNodes(), 3);
-            TS_ASSERT_EQUALS(builder.mFaces[i]->GetNumFaces(), 3);
-        }
-        {
-            MutableVertexMesh<2,3>* pp_mesh = builder.GetDual();
-            VertexMeshWriter<2, 3> Writer("SphericalMesh", "Geodesic_1Dual", false);
-            Writer.WriteVtkUsingMeshWithCellId(*pp_mesh);
-
-            MonolayerVertexMeshGenerator sBuilder("ssss");
-            MutableVertexMesh<3,3>* pp_mesh33 = sBuilder.MakeSphericalMesh33(pp_mesh, 5, 0.5);
-            sBuilder.WriteVtk("SphericalMesh", "1");
-
-//            delete pp_mesh;
-//            delete pp_mesh33;
-        }
-
-
-
-
-        builder.SubDivide();
-        PRINT_3_VARIABLES(builder.mNodes.size(), builder.mEdges.size(), builder.mFaces.size())
-        {
-            MutableVertexMesh<2, 3>* p_mesh = new MutableVertexMesh<2, 3>(builder.mNodes, builder.mFaces);
-            VertexMeshWriter<2, 3> Writer("SphericalMesh", "Geodesic_2Division", false);
-            Writer.WriteVtkUsingMeshWithCellId(*p_mesh);
-
-//            delete p_mesh;
-        }
-
-        iii = 0;
-        for (unsigned i=0; i<builder.mNodes.size(); ++i)
-        {
-            TS_ASSERT_DELTA(builder.mNodes[i]->GetNumContainingElements(), 5.5, 0.51);
-            TS_ASSERT_DELTA(builder.mNodes[i]->GetNumContainingFaces(), 5.5, 0.51);
-            TS_ASSERT_EQUALS(builder.mNodes[i]->GetNumContainingFaces(), builder.mNodes[i]->GetNumContainingElements());
-            if (builder.mNodes[i]->GetNumContainingElements() == 5)
-            {
-                ++iii;
-            }
-        }
-        TS_ASSERT_EQUALS(iii, 12);
-        for (unsigned i=30; i<builder.mEdges.size(); ++i)
-        {
-            if (builder.mEdges[i]==NULL)
-                continue;
-            TS_ASSERT_EQUALS(builder.mEdges[i]->FaceGetNumContainingElements(), 2);
-            TS_ASSERT_EQUALS(builder.mEdges[i]->GetNumNodes(), 2);
-        }
-        for (unsigned i=0; i<builder.mFaces.size(); ++i)
-        {
-            TS_ASSERT_EQUALS(builder.mFaces[i]->GetNumNodes(), 3);
-            TS_ASSERT_EQUALS(builder.mFaces[i]->GetNumFaces(), 3);
-        }
-        {
-            MutableVertexMesh<2,3>* pp_mesh = builder.GetDual();
-            VertexMeshWriter<2, 3> Writer("SphericalMesh", "Geodesic_2Dual", false);
-            Writer.WriteVtkUsingMeshWithCellId(*pp_mesh);
-
-            MonolayerVertexMeshGenerator sBuilder("ssss");
-            MutableVertexMesh<3,3>* pp_mesh33 = sBuilder.MakeSphericalMesh33(pp_mesh, 5, 0.5);
-            sBuilder.WriteVtk("SphericalMesh", "2");
-
-//            delete pp_mesh;
-//            delete pp_mesh33;
-        }
-
-MARK
-
-
-        builder.SubDivide();
-        PRINT_3_VARIABLES(builder.mNodes.size(), builder.mEdges.size(), builder.mFaces.size())
-        {
-            MutableVertexMesh<2, 3>* p_mesh = new MutableVertexMesh<2, 3>(builder.mNodes, builder.mFaces);
-            VertexMeshWriter<2, 3> Writer("SphericalMesh", "Geodesic_3Divison", false);
-            Writer.WriteVtkUsingMeshWithCellId(*p_mesh);
-
-//            delete p_mesh;
-        }
-
-        iii = 0;
-        for (unsigned i=0; i<builder.mNodes.size(); ++i)
-        {
-            TS_ASSERT_DELTA(builder.mNodes[i]->GetNumContainingElements(), 5.5, 0.51);
-            TS_ASSERT_DELTA(builder.mNodes[i]->GetNumContainingFaces(), 5.5, 0.51);
-            TS_ASSERT_EQUALS(builder.mNodes[i]->GetNumContainingFaces(), builder.mNodes[i]->GetNumContainingElements());
-            if (builder.mNodes[i]->GetNumContainingElements() == 5)
-            {
-                ++iii;
-            }
-        }
-        TS_ASSERT_EQUALS(iii, 12);
-        for (unsigned i=30; i<builder.mEdges.size(); ++i)
-        {
-            if (builder.mEdges[i]==NULL)
-                continue;
-            TS_ASSERT_EQUALS(builder.mEdges[i]->FaceGetNumContainingElements(), 2);
-            TS_ASSERT_EQUALS(builder.mEdges[i]->GetNumNodes(), 2);
-        }
-        for (unsigned i=0; i<builder.mFaces.size(); ++i)
-        {
-            TS_ASSERT_EQUALS(builder.mFaces[i]->GetNumNodes(), 3);
-            TS_ASSERT_EQUALS(builder.mFaces[i]->GetNumFaces(), 3);
-        }
-        {
-            MutableVertexMesh<2,3>* pp_mesh = builder.GetDual();
-            VertexMeshWriter<2, 3> Writer("SphericalMesh", "Geodesic_3Dual", false);
-            Writer.WriteVtkUsingMeshWithCellId(*pp_mesh);
-
-            MonolayerVertexMeshGenerator sBuilder("ssss");
-            MutableVertexMesh<3,3>* pp_mesh33 = sBuilder.MakeSphericalMesh33(pp_mesh, 5, 0.5);
-            sBuilder.WriteVtk("SphericalMesh", "3");
-
-//            delete pp_mesh;
-//            delete pp_mesh33;
-        }
-    }
-
-    void TestMakeNormalMesh()
-    {
-        /** Create a mesh comprising six nodes contained in two triangle and two rhomboid elements, as shown below.
-        * We will test that that a T1 swap of the two central nodes is correctly implemented.
-        *  _____
-        * |\   /|
-        * | \ / |
-        * |  |  |
-        * | / \ |
-        * |/___\|
-        */
-        std::vector<Node<3>*> nodes;
-        nodes.push_back(new Node<3>(0, true,  0.0, 0.0, 0.0));
-        nodes.push_back(new Node<3>(1, true,  1.0, 0.0, 0.0));
-        nodes.push_back(new Node<3>(2, true,  1.0, 1.0, 0.0));
-        nodes.push_back(new Node<3>(3, true,  0.0, 1.0, 0.0));
-        nodes.push_back(new Node<3>(4, false, 0.5, 0.4, 0.0));
-        nodes.push_back(new Node<3>(5, false, 0.5, 0.6, 0.0));
-
-        unsigned node_indices_elem_0[3] = {2, 3, 5};
-        unsigned node_indices_elem_1[4] = {4, 1, 2, 5};
-        unsigned node_indices_elem_2[3] = {0, 1, 4};
-        unsigned node_indices_elem_3[4] = {4, 5, 3, 0};
-
-        MonolayerVertexMeshGenerator builder(nodes, "T1SwapWith4Elements");
-        builder.BuildElementWith(3, node_indices_elem_0);
-        builder.BuildElementWith(4, node_indices_elem_1);
-        builder.BuildElementWith(3, node_indices_elem_2);
-        builder.BuildElementWith(4, node_indices_elem_3);
-        // A reference variable as mesh is noncopyable
-        MutableVertexMesh<3, 3>* p_mesh = builder.GenerateMesh();
-        builder.WriteVtkWithSubfolder("TestMonolayerGenerator");
-        builder.WriteVtk("TestMonolayerGenerator");
-        builder.PrintMesh();
-
-        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 12u);
-        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 4u);
-        TS_ASSERT_EQUALS(p_mesh->GetNumFaces(), 17u);
-
-        const unsigned num_lateral_faces = p_mesh->GetNumFaces() - 2*p_mesh->GetNumElements();
-
-        TS_ASSERT_EQUALS(p_mesh->GetNumNodes()/2+p_mesh->GetNumElements()+1-num_lateral_faces, 2u);
-
-        for (unsigned i=0; i<p_mesh->GetNumElements(); ++i)
-        {
-            VertexElement<3, 3>* p_elem = p_mesh->GetElement(i);
-            std::vector<unsigned> node_indices;
-            for (unsigned j=0; j<p_elem->GetNumNodes()/2; ++j)
-            {
-                node_indices.push_back(p_elem->GetNodeGlobalIndex(j));
-            }
-            PRINT_CONTAINER(node_indices)
-//            TS_ASSERT(std::equal(node_indices.begin(), node_indices.begin(), node_indices_elem_1));
-        }
-    }
-
-    void TestCreateMeshFrom2dMesh()
-    {
-        const double z_height(3.14);
-        HoneycombVertexMeshGenerator generator2 (5, 5, false, 1, 1, 7);
-        MutableVertexMesh<2, 2>* p_mesh2 = generator2.GetMesh();
-        MonolayerVertexMeshGenerator generator;
-        MutableVertexMesh<3, 3>* p_mesh = generator.MakeMeshUsing2dMesh(*p_mesh2, z_height);
-
-        TS_ASSERT_EQUALS(p_mesh2->GetNumNodes()*2, p_mesh->GetNumNodes());
-        TS_ASSERT_EQUALS(p_mesh2->GetNumElements(), p_mesh->GetNumElements());
-        const unsigned num_lateral_faces = p_mesh->GetNumFaces() - 2*p_mesh2->GetNumElements();
-
-        TS_ASSERT_EQUALS(p_mesh2->GetNumNodes()+p_mesh2->GetNumElements()+1-num_lateral_faces, 2u);
-
-        // Check if nodes are created properly (their location)
-        for (unsigned i=0; i<p_mesh2->GetNumNodes(); ++i)
-        {
-            c_vector<double, 2> loc2 = p_mesh2->GetNode(i)->rGetLocation();
-            c_vector<double, 3> loc_basal = p_mesh->GetNode(i)->rGetLocation();
-            c_vector<double, 3> loc_apical = p_mesh->GetNode(i+p_mesh2->GetNumNodes())->rGetLocation();
-
-            TS_ASSERT(IsBasalNode(p_mesh->GetNode(i)));
-            TS_ASSERT(IsApicalNode(p_mesh->GetNode(i+p_mesh2->GetNumNodes())));
-            TS_ASSERT_DELTA(loc_basal[0], loc2[0], 1e-6);
-            TS_ASSERT_DELTA(loc_basal[1], loc2[1], 1e-6);
-            TS_ASSERT_DELTA(loc_basal[2], 0, 1e-6);
-
-            TS_ASSERT_DELTA(loc_apical[0], loc2[0], 1e-6);
-            TS_ASSERT_DELTA(loc_apical[1], loc2[1], 1e-6);
-            TS_ASSERT_DELTA(loc_apical[2], z_height, 1e-6);
-        }
-
-        for (unsigned i=0; i<p_mesh2->GetNumElements(); ++i)
-        {
-            VertexElement<2, 2>* p_elem2 = p_mesh2->GetElement(i);
-            VertexElement<3, 3>* p_elem = p_mesh->GetElement(i);
-            std::set<unsigned> node_indices2;
-            std::set<unsigned> node_indices;
-            for (unsigned j=0; j<p_elem2->GetNumNodes(); ++j)
-            {
-                node_indices2.insert(p_elem2->GetNodeGlobalIndex(j));
-                node_indices.insert(p_elem->GetNodeGlobalIndex(j));
-            }
-            TS_ASSERT_EQUALS(node_indices, node_indices2);
-        }
-    }
-
-
     void TestMonolayerRearrangement()
     {
-MARK
+        MARK
         // Make 8 nodes to assign to a cube element
         std::vector<Node<3>*> nodes;
-        nodes.push_back(new Node<3>(0, false, 0.0, 0.0, 0.0));
-        nodes.push_back(new Node<3>(1, false, 1.0, 0.0, 0.0));
-        nodes.push_back(new Node<3>(2, false, 0.0, 1.0, 0.0));
-        nodes.push_back(new Node<3>(3, false, 1.0, 1.0, 0.0));
-        nodes.push_back(new Node<3>(4, false, 0.0, 0.0, 1.0));
-        nodes.push_back(new Node<3>(5, false, 1.0, 0.0, 1.0));
-        nodes.push_back(new Node<3>(6, false, 0.0, 1.0, 1.0));
-        nodes.push_back(new Node<3>(7, false, 1.0, 1.0, 1.0));
+        nodes.push_back(new Node<3>(0, true, 0.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(1, true, 1.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(2, true, 0.0, 1.0, 0.0));
+        nodes.push_back(new Node<3>(3, true, 1.0, 1.0, 0.0));
+        nodes.push_back(new Node<3>(4, true, 0.0, 0.0, 1.0));
+        nodes.push_back(new Node<3>(5, true, 1.0, 0.0, 1.0));
+        nodes.push_back(new Node<3>(6, true, 0.0, 1.0, 1.0));
+        nodes.push_back(new Node<3>(7, true, 1.0, 1.0, 1.0));
         for (unsigned i=0; i<4; ++i)
         {
             SetNodeAsBasal(nodes[i]);
@@ -430,24 +128,38 @@ MARK
         VertexElement<3,3> element(0, faces, orientations);
         SetElementAsMonolayer(&element);
 
+        PrintElement(&element);
+
+        TS_ASSERT_EQUALS(element.GetIndex(), 0u);
         TS_ASSERT_EQUALS(element.GetNumNodes(), 8u);
         TS_ASSERT_EQUALS(element.GetNumFaces(), 6u);
 
-        TS_ASSERT_EQUALS(element.GetIndex(), 0u);
+        // Test the node arrangements
+        const unsigned true_node_indices[4] {0,1,3,2};
+        for (unsigned local_index=0; local_index<element.GetNumNodes()/2; ++local_index)
+        {
+            TS_ASSERT_EQUALS(element.GetNodeGlobalIndex(local_index), true_node_indices[local_index]);
+            TS_ASSERT_EQUALS(element.GetNodeGlobalIndex(local_index+4), true_node_indices[local_index]+4);
+        }
 
-        // Test the position of some random nodes
-        TS_ASSERT_DELTA(element.GetFace(0)->GetNode(0)->rGetLocation()[0], 0.0, 1e-6);
-        TS_ASSERT_DELTA(element.GetFace(0)->GetNode(0)->rGetLocation()[1], 0.0, 1e-6);
-        TS_ASSERT_DELTA(element.GetFace(0)->GetNode(0)->rGetLocation()[2], 0.0, 1e-6);
-
-        TS_ASSERT_DELTA(element.GetFace(5)->GetNode(2)->rGetLocation()[0], 0.0, 1e-6);
-        TS_ASSERT_DELTA(element.GetFace(5)->GetNode(2)->rGetLocation()[1], 0.0, 1e-6);
-        TS_ASSERT_DELTA(element.GetFace(5)->GetNode(2)->rGetLocation()[2], 1.0, 1e-6);
+        // Check if faces are in proper order.
+        TS_ASSERT(IsBasalFace(element.GetFace(0)));
+        TS_ASSERT(IsApicalFace(element.GetFace(1)));
+        for (unsigned face_index=2; face_index<element.GetNumFaces(); ++face_index)
+        {
+            TS_ASSERT(IsLateralFace(element.GetFace(face_index)));
+        }
+        const unsigned true_face_indices[6] {0,5,4,2,1,3};
+        for (unsigned local_index=0; local_index<element.GetNumFaces(); ++local_index)
+        {
+            TS_ASSERT_EQUALS(element.GetFace(local_index)->GetIndex(), true_face_indices[local_index]);
+        }
 
         // Test orientations
-        for (unsigned face_index=0; face_index<element.GetNumFaces(); face_index++)
+        const bool true_orientations[6] {1,0,0,0,1,0};
+        for (unsigned face_index=0; face_index<element.GetNumFaces(); ++face_index)
         {
-            TS_ASSERT_EQUALS(element.FaceIsOrientatedAntiClockwise(face_index), true);
+            TS_ASSERT_EQUALS(element.FaceIsOrientatedAntiClockwise(face_index), true_orientations[face_index]);
         }
 
         // Tidy up
@@ -459,7 +171,308 @@ MARK
         {
             delete faces[i];
         }
+    }
 
+    void TestGeodesicShpere()
+    {
+        GeodesicSphere23Generator builder;
+        {
+            MutableVertexMesh<2, 3>* p_mesh = new MutableVertexMesh<2, 3>(builder.mNodes, builder.mFaces);
+            VertexMeshWriter<2, 3> Writer("SphericalMesh", "Geodesic_0Division", false);
+            Writer.WriteVtkUsingMeshWithCellId(*p_mesh);
+
+            //            MonolayerVertexMeshGenerator sBuilder("trii");
+            //            MutableVertexMesh<3,3>* pp_mesh33 = sBuilder.MakeSphericalMesh33(p_mesh, 5, 0.5);
+            //            sBuilder.WriteVtk("SphericalMesh", "0");
+
+            //            delete p_mesh;
+        }
+        PRINT_3_VARIABLES(builder.mNodes.size(), builder.mEdges.size(), builder.mFaces.size())
+
+        for (unsigned i=0; i<builder.mNodes.size(); ++i)
+        {
+            TS_ASSERT_EQUALS(builder.mNodes[i]->GetNumContainingFaces(), 5);
+        }
+        for (unsigned i=0; i<builder.mEdges.size(); ++i)
+        {
+            TS_ASSERT_EQUALS(builder.mEdges[i]->FaceGetNumContainingElements(), 2);
+            TS_ASSERT_EQUALS(builder.mEdges[i]->GetNumNodes(), 2);
+        }
+        for (unsigned i=0; i<builder.mFaces.size(); ++i)
+        {
+            TS_ASSERT_EQUALS(builder.mFaces[i]->GetNumNodes(), 3);
+            TS_ASSERT_EQUALS(builder.mFaces[i]->GetNumFaces(), 3);
+        }
+
+        {
+            MutableVertexMesh<2,3>* pp_mesh = builder.GetDual();
+            VertexMeshWriter<2, 3> Writer("SphericalMesh", "Geodesic_0Dual", false);
+            Writer.WriteVtkUsingMeshWithCellId(*pp_mesh);
+
+            MonolayerVertexMeshGenerator sBuilder("ssss");
+            MutableVertexMesh<3,3>* pp_mesh33 = sBuilder.MakeSphericalMesh33(pp_mesh, 5, 0.5);
+            sBuilder.WriteVtk("SphericalMesh", "0");
+
+            //            delete pp_mesh;
+            //            delete pp_mesh33;
+        }
+
+
+
+
+        builder.SubDivide();
+        PRINT_3_VARIABLES(builder.mNodes.size(), builder.mEdges.size(), builder.mFaces.size())
+        {
+            MutableVertexMesh<2, 3>* p_mesh = new MutableVertexMesh<2, 3>(builder.mNodes, builder.mFaces);
+            VertexMeshWriter<2, 3> Writer("SphericalMesh", "Geodesic_1Divison", false);
+            Writer.WriteVtkUsingMeshWithCellId(*p_mesh);
+
+            //            MonolayerVertexMeshGenerator sBuilder("trii", false);
+            //            MutableVertexMesh<3,3>* pp_mesh33 = sBuilder.MakeSphericalMesh33(p_mesh, 5, 0.5);
+            //            sBuilder.WriteVtk("SphericalMesh", "1");
+
+            //            delete p_mesh;
+        }
+
+        unsigned iii = 0;
+        for (unsigned i=0; i<builder.mNodes.size(); ++i)
+        {
+            TS_ASSERT_DELTA(builder.mNodes[i]->GetNumContainingElements(), 5.5, 0.51);
+            TS_ASSERT_DELTA(builder.mNodes[i]->GetNumContainingFaces(), 5.5, 0.51);
+            TS_ASSERT_EQUALS(builder.mNodes[i]->GetNumContainingFaces(), builder.mNodes[i]->GetNumContainingElements());
+            if (builder.mNodes[i]->GetNumContainingElements() == 5)
+            {
+                ++iii;
+            }
+        }
+        TS_ASSERT_EQUALS(iii, 12);
+        for (unsigned i=30; i<builder.mEdges.size(); ++i)
+        {
+            if (builder.mEdges[i]==NULL)
+                continue;
+            TS_ASSERT_EQUALS(builder.mEdges[i]->FaceGetNumContainingElements(), 2);
+            TS_ASSERT_EQUALS(builder.mEdges[i]->GetNumNodes(), 2);
+        }
+        for (unsigned i=0; i<builder.mFaces.size(); ++i)
+        {
+            TS_ASSERT_EQUALS(builder.mFaces[i]->GetNumNodes(), 3);
+            TS_ASSERT_EQUALS(builder.mFaces[i]->GetNumFaces(), 3);
+        }
+        {
+            MutableVertexMesh<2,3>* pp_mesh = builder.GetDual();
+            VertexMeshWriter<2, 3> Writer("SphericalMesh", "Geodesic_1Dual", false);
+            Writer.WriteVtkUsingMeshWithCellId(*pp_mesh);
+
+            MonolayerVertexMeshGenerator sBuilder("ssss");
+            MutableVertexMesh<3,3>* pp_mesh33 = sBuilder.MakeSphericalMesh33(pp_mesh, 5, 0.5);
+            sBuilder.WriteVtk("SphericalMesh", "1");
+
+            //            delete pp_mesh;
+            //            delete pp_mesh33;
+        }
+
+
+
+
+        builder.SubDivide();
+        PRINT_3_VARIABLES(builder.mNodes.size(), builder.mEdges.size(), builder.mFaces.size())
+        {
+            MutableVertexMesh<2, 3>* p_mesh = new MutableVertexMesh<2, 3>(builder.mNodes, builder.mFaces);
+            VertexMeshWriter<2, 3> Writer("SphericalMesh", "Geodesic_2Division", false);
+            Writer.WriteVtkUsingMeshWithCellId(*p_mesh);
+
+            //            delete p_mesh;
+        }
+
+        iii = 0;
+        for (unsigned i=0; i<builder.mNodes.size(); ++i)
+        {
+            TS_ASSERT_DELTA(builder.mNodes[i]->GetNumContainingElements(), 5.5, 0.51);
+            TS_ASSERT_DELTA(builder.mNodes[i]->GetNumContainingFaces(), 5.5, 0.51);
+            TS_ASSERT_EQUALS(builder.mNodes[i]->GetNumContainingFaces(), builder.mNodes[i]->GetNumContainingElements());
+            if (builder.mNodes[i]->GetNumContainingElements() == 5)
+            {
+                ++iii;
+            }
+        }
+        TS_ASSERT_EQUALS(iii, 12);
+        for (unsigned i=30; i<builder.mEdges.size(); ++i)
+        {
+            if (builder.mEdges[i]==NULL)
+                continue;
+            TS_ASSERT_EQUALS(builder.mEdges[i]->FaceGetNumContainingElements(), 2);
+            TS_ASSERT_EQUALS(builder.mEdges[i]->GetNumNodes(), 2);
+        }
+        for (unsigned i=0; i<builder.mFaces.size(); ++i)
+        {
+            TS_ASSERT_EQUALS(builder.mFaces[i]->GetNumNodes(), 3);
+            TS_ASSERT_EQUALS(builder.mFaces[i]->GetNumFaces(), 3);
+        }
+        {
+            MutableVertexMesh<2,3>* pp_mesh = builder.GetDual();
+            VertexMeshWriter<2, 3> Writer("SphericalMesh", "Geodesic_2Dual", false);
+            Writer.WriteVtkUsingMeshWithCellId(*pp_mesh);
+
+            MonolayerVertexMeshGenerator sBuilder("ssss");
+            MutableVertexMesh<3,3>* pp_mesh33 = sBuilder.MakeSphericalMesh33(pp_mesh, 5, 0.5);
+            sBuilder.WriteVtk("SphericalMesh", "2");
+
+            //            delete pp_mesh;
+            //            delete pp_mesh33;
+        }
+
+        MARK
+
+
+        builder.SubDivide();
+        PRINT_3_VARIABLES(builder.mNodes.size(), builder.mEdges.size(), builder.mFaces.size())
+        {
+            MutableVertexMesh<2, 3>* p_mesh = new MutableVertexMesh<2, 3>(builder.mNodes, builder.mFaces);
+            VertexMeshWriter<2, 3> Writer("SphericalMesh", "Geodesic_3Divison", false);
+            Writer.WriteVtkUsingMeshWithCellId(*p_mesh);
+
+            //            delete p_mesh;
+        }
+
+        iii = 0;
+        for (unsigned i=0; i<builder.mNodes.size(); ++i)
+        {
+            TS_ASSERT_DELTA(builder.mNodes[i]->GetNumContainingElements(), 5.5, 0.51);
+            TS_ASSERT_DELTA(builder.mNodes[i]->GetNumContainingFaces(), 5.5, 0.51);
+            TS_ASSERT_EQUALS(builder.mNodes[i]->GetNumContainingFaces(), builder.mNodes[i]->GetNumContainingElements());
+            if (builder.mNodes[i]->GetNumContainingElements() == 5)
+            {
+                ++iii;
+            }
+        }
+        TS_ASSERT_EQUALS(iii, 12);
+        for (unsigned i=30; i<builder.mEdges.size(); ++i)
+        {
+            if (builder.mEdges[i]==NULL)
+                continue;
+            TS_ASSERT_EQUALS(builder.mEdges[i]->FaceGetNumContainingElements(), 2);
+            TS_ASSERT_EQUALS(builder.mEdges[i]->GetNumNodes(), 2);
+        }
+        for (unsigned i=0; i<builder.mFaces.size(); ++i)
+        {
+            TS_ASSERT_EQUALS(builder.mFaces[i]->GetNumNodes(), 3);
+            TS_ASSERT_EQUALS(builder.mFaces[i]->GetNumFaces(), 3);
+        }
+        {
+            MutableVertexMesh<2,3>* pp_mesh = builder.GetDual();
+            VertexMeshWriter<2, 3> Writer("SphericalMesh", "Geodesic_3Dual", false);
+            Writer.WriteVtkUsingMeshWithCellId(*pp_mesh);
+
+            MonolayerVertexMeshGenerator sBuilder("ssss");
+            MutableVertexMesh<3,3>* pp_mesh33 = sBuilder.MakeSphericalMesh33(pp_mesh, 5, 0.5);
+            sBuilder.WriteVtk("SphericalMesh", "3");
+
+            //            delete pp_mesh;
+            //            delete pp_mesh33;
+        }
+    }
+
+    void TestMakeNormalMesh()
+    {
+        /** Create a mesh comprising six nodes contained in two triangle and two rhomboid elements, as shown below.
+         * We will test that that a T1 swap of the two central nodes is correctly implemented.
+         *  _____
+         * |\   /|
+         * | \ / |
+         * |  |  |
+         * | / \ |
+         * |/___\|
+         */
+        std::vector<Node<3>*> nodes;
+        nodes.push_back(new Node<3>(0, true,  0.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(1, true,  1.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(2, true,  1.0, 1.0, 0.0));
+        nodes.push_back(new Node<3>(3, true,  0.0, 1.0, 0.0));
+        nodes.push_back(new Node<3>(4, false, 0.5, 0.4, 0.0));
+        nodes.push_back(new Node<3>(5, false, 0.5, 0.6, 0.0));
+
+        unsigned node_indices_elem_0[3] = {2, 3, 5};
+        unsigned node_indices_elem_1[4] = {4, 1, 2, 5};
+        unsigned node_indices_elem_2[3] = {0, 1, 4};
+        unsigned node_indices_elem_3[4] = {4, 5, 3, 0};
+
+        MonolayerVertexMeshGenerator builder(nodes, "T1SwapWith4Elements");
+        builder.BuildElementWith(3, node_indices_elem_0);
+        builder.BuildElementWith(4, node_indices_elem_1);
+        builder.BuildElementWith(3, node_indices_elem_2);
+        builder.BuildElementWith(4, node_indices_elem_3);
+        // A reference variable as mesh is noncopyable
+        MutableVertexMesh<3, 3>* p_mesh = builder.GenerateMesh();
+        builder.WriteVtkWithSubfolder("TestMonolayerGenerator");
+        builder.WriteVtk("TestMonolayerGenerator");
+        builder.PrintMesh();
+
+        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 12u);
+        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 4u);
+        TS_ASSERT_EQUALS(p_mesh->GetNumFaces(), 17u);
+
+        const unsigned num_lateral_faces = p_mesh->GetNumFaces() - 2*p_mesh->GetNumElements();
+
+        TS_ASSERT_EQUALS(p_mesh->GetNumNodes()/2+p_mesh->GetNumElements()+1-num_lateral_faces, 2u);
+
+        for (unsigned i=0; i<p_mesh->GetNumElements(); ++i)
+        {
+            VertexElement<3, 3>* p_elem = p_mesh->GetElement(i);
+            std::vector<unsigned> node_indices;
+            for (unsigned j=0; j<p_elem->GetNumNodes()/2; ++j)
+            {
+                node_indices.push_back(p_elem->GetNodeGlobalIndex(j));
+            }
+            PRINT_CONTAINER(node_indices)
+            //            TS_ASSERT(std::equal(node_indices.begin(), node_indices.begin(), node_indices_elem_1));
+        }
+    }
+
+    void TestCreateMeshFrom2dMesh()
+    {
+        const double z_height(3.14);
+        HoneycombVertexMeshGenerator generator2 (5, 5, false, 1, 1, 7);
+        MutableVertexMesh<2, 2>* p_mesh2 = generator2.GetMesh();
+        MonolayerVertexMeshGenerator generator;
+        MutableVertexMesh<3, 3>* p_mesh = generator.MakeMeshUsing2dMesh(*p_mesh2, z_height);
+
+        TS_ASSERT_EQUALS(p_mesh2->GetNumNodes()*2, p_mesh->GetNumNodes());
+        TS_ASSERT_EQUALS(p_mesh2->GetNumElements(), p_mesh->GetNumElements());
+        const unsigned num_lateral_faces = p_mesh->GetNumFaces() - 2*p_mesh2->GetNumElements();
+
+        TS_ASSERT_EQUALS(p_mesh2->GetNumNodes()+p_mesh2->GetNumElements()+1-num_lateral_faces, 2u);
+
+        // Check if nodes are created properly (their location)
+        for (unsigned i=0; i<p_mesh2->GetNumNodes(); ++i)
+        {
+            c_vector<double, 2> loc2 = p_mesh2->GetNode(i)->rGetLocation();
+            c_vector<double, 3> loc_basal = p_mesh->GetNode(i)->rGetLocation();
+            c_vector<double, 3> loc_apical = p_mesh->GetNode(i+p_mesh2->GetNumNodes())->rGetLocation();
+
+            TS_ASSERT(IsBasalNode(p_mesh->GetNode(i)));
+            TS_ASSERT(IsApicalNode(p_mesh->GetNode(i+p_mesh2->GetNumNodes())));
+            TS_ASSERT_DELTA(loc_basal[0], loc2[0], 1e-6);
+            TS_ASSERT_DELTA(loc_basal[1], loc2[1], 1e-6);
+            TS_ASSERT_DELTA(loc_basal[2], 0, 1e-6);
+
+            TS_ASSERT_DELTA(loc_apical[0], loc2[0], 1e-6);
+            TS_ASSERT_DELTA(loc_apical[1], loc2[1], 1e-6);
+            TS_ASSERT_DELTA(loc_apical[2], z_height, 1e-6);
+        }
+
+        for (unsigned i=0; i<p_mesh2->GetNumElements(); ++i)
+        {
+            VertexElement<2, 2>* p_elem2 = p_mesh2->GetElement(i);
+            VertexElement<3, 3>* p_elem = p_mesh->GetElement(i);
+            std::set<unsigned> node_indices2;
+            std::set<unsigned> node_indices;
+            for (unsigned j=0; j<p_elem2->GetNumNodes(); ++j)
+            {
+                node_indices2.insert(p_elem2->GetNodeGlobalIndex(j));
+                node_indices.insert(p_elem->GetNodeGlobalIndex(j));
+            }
+            TS_ASSERT_EQUALS(node_indices, node_indices2);
+        }
     }
 
 };
