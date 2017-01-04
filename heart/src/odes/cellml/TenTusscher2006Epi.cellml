@@ -2664,9 +2664,23 @@ http://www.CellML.org/
       <variable name="K_up" units="millimolar" initial_value="0.00025"/>
       <variable name="V_leak" units="millimolar_per_millisecond" initial_value="0.00036"/>
       <variable name="Vmax_up" units="millimolar_per_millisecond" initial_value="0.006375"/>
-      <variable name="Ca_i_bufc" units="millimolar"/>
+      <variable name="Ca_i_bufc" units="millimolar" cmeta:id="cytosolic_calcium_flux_scaling_from_intrinsic_buffers">
+         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+            <rdf:Description rdf:about="#cytosolic_calcium_flux_scaling_from_intrinsic_buffers">
+               <modifiable-parameter xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#">yes</modifiable-parameter>
+               <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#cytosolic_calcium_flux_scaling_from_intrinsic_buffers"/>
+            </rdf:Description>
+         </rdf:RDF>
+      </variable>
       <variable name="Ca_sr_bufsr" units="millimolar"/>
-      <variable name="Ca_ss_bufss" units="millimolar"/>
+      <variable name="Ca_ss_bufss" units="millimolar" cmeta:id="submembrane_space_calcium_flux_scaling_from_intrinsic_buffers">
+         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+            <rdf:Description rdf:about="#submembrane_space_calcium_flux_scaling_from_intrinsic_buffers">
+               <modifiable-parameter xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#">yes</modifiable-parameter>
+               <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#submembrane_space_calcium_flux_scaling_from_intrinsic_buffers"/>
+            </rdf:Description>
+         </rdf:RDF>
+      </variable>
       <variable name="Buf_c" units="millimolar" initial_value="0.2"/>
       <variable name="K_buf_c" units="millimolar" initial_value="0.001"/>
       <variable name="Buf_sr" units="millimolar" initial_value="10"/>

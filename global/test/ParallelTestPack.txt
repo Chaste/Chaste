@@ -1,3 +1,4 @@
+TestArchivingHelperClasses.hpp
 TestDebug.hpp
 TestDistributedVector.hpp
 TestExecutableSupport.hpp
