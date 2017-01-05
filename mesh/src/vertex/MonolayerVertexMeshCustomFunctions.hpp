@@ -33,9 +33,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-
 #ifndef MONOLAYERVERTEXMESHCUSTOMFUNCTIONS_HPP_
 #define MONOLAYERVERTEXMESHCUSTOMFUNCTIONS_HPP_
+
+#include <set>
+#include <vector>
 
 // Forward declaration prevents circular include chain
 template<unsigned DIM>
@@ -43,32 +45,65 @@ class Node;
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class VertexElement;
 
-#include <set>
-#include <vector>
 
+/////////////////////////////////////////////////////////
+///      Some function that are relevant for all      ///
+/////////////////////////////////////////////////////////
 
-/// ===============================================================
-/// Some function that can be added into trunk and relevant for all
-
+/**
+ * A simple function to check if an element or a face has a particular node.
+ * @param pElement  the element that might have the node
+ * @param nodeIndex  the global index of that particular node
+ * @return boolean, if node is in the element
+ */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool ElementHasNode(const VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement, const unsigned nodeIndex);
 
+/**
+ * A simple function to get the element index/indices which own(s) both nodes.
+ * @param pNodeA  node number 1
+ * @param pNodeB  node number 2
+ * @return  index of elements that contain both nodes
+ */
 std::set<unsigned> GetSharedElementIndices(const Node<3>* pNodeA, const Node<3>* pNodeB);
 
+/**
+ * A simple function to get the face index/indices which own(s) both nodes.
+ * @param pNodeA  node number 1
+ * @param pNodeB  node number 2
+ * @return  index of faces that contain both nodes
+ */
 std::set<unsigned> GetSharedFaceIndices(const Node<3>* pNodeA, const Node<3>* pNodeB);
 
+/**
+ * Output element, its faces and nodes in terminal
+ * (adapted from MonolayerVertexMeshGenerator::PrintMesh()).
+ * @param pElement pointer of the element which will be inspected.
+ */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void PrintElement(const VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement);
 
 /**
- * Face is only considered a boundary face when all nodes are boundary nodes.
- * @return
+ * A face is on boundary when it contains only one element.
+ * @param pFace  pointer of the face
+ * @return if the face is on boundary
  */
 bool IsFaceOnBoundary(const VertexElement<2, 3>* pFace);
 
-/// ===============================================================
-/// Functions for monolayer
 
+
+///////////////////////////////////////////////////////////////////////////////////
+///                       Functions for monolayer classes                       ///
+///////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Define some variables within a namespace that will be used by monolayer
+ * classes for better readability and prevent variable name conflicts.
+ *
+ * Note that setter values are different from reference value because nodes
+ * and elements store attributes as double, but comparison of double is slightly
+ * more troublesome than the comparison of integer types.
+ */
 namespace Monolayer
 {
     typedef unsigned v_type;
@@ -84,63 +119,145 @@ namespace Monolayer
     const v_type ElementValue = 4;
 }
 
+///////////////////////////////////
+///     Functions for nodes     ///
+///////////////////////////////////
+
+/**
+ * Set a node as an apical node.
+ * @param pNode  pointer of a new apical node
+ */
 void SetNodeAsApical(Node<3>* pNode);
 
+/**
+ * Set a node as a basal node.
+ * @param pNode  pointer of a new basal node
+ */
 void SetNodeAsBasal(Node<3>* pNode);
 
+/**
+ * Getter function for node type. For more details on node type,
+ * refer to `namespace Monolayer`.
+ * @param pNode  pointer of the interested node
+ * @return  the type of node (apical/basal)
+ */
 Monolayer::v_type GetNodeType(const Node<3>* pNode);
 
+/**
+ * @param pNode  pointer of a node
+ * @return  whether this node is an apical node
+ */
 bool IsApicalNode(const Node<3>* pNode);
 
+/**
+ * @param pNode  pointer of a node
+ * @return  whether this node is a basal node
+ */
 bool IsBasalNode(const Node<3>* pNode);
 
 
-// VertexElement
+//////////////////////////////////
+///     Functions for face     ///
+//////////////////////////////////
+
+/**
+ * Set a face as an apical face.
+ * @param pFace  pointer of a new apical face
+ */
 void SetFaceAsApical(VertexElement<2, 3>* pFace);
 
+/**
+ * Set a face as a basal face.
+ * @param pFace  pointer of a new apical face
+ */
 void SetFaceAsBasal(VertexElement<2, 3>* pFace);
 
+/**
+ * Set a face as a lateral face.
+ * @param pFace  pointer of a new lateral face
+ */
 void SetFaceAsLateral(VertexElement<2, 3>* pFace);
 
+/**
+ * Getter function for face type. For more details on face type,
+ * refer to `namespace Monolayer`.
+ * @param pFace  pointer of the face of interest
+ * @return  the type of face (apical/basal/lateral)
+ */
 Monolayer::v_type GetFaceType(const VertexElement<2, 3>* pFace);
 
+/**
+ * @param pFace  pointer of a face
+ * @return  whether this face is an apical face
+ */
 bool IsApicalFace(const VertexElement<2, 3>* pFace);
 
+/**
+ * @param pFace  pointer of a face
+ * @return  whether this face is a basal face
+ */
 bool IsBasalFace(const VertexElement<2, 3>* pFace);
 
+/**
+ * @param pFace  pointer of a face
+ * @return  whether this face is a lateral face
+ */
 bool IsLateralFace(const VertexElement<2, 3>* pFace);
 
 
+////////////////////////////////////////////
+///     Functions for Vertex Element     ///
+////////////////////////////////////////////
+
+/**
+ * Set an element as a monolayer element. This function will at the same time assign
+ * its faces their respective types if it hasn't been done. Besides, it will call
+ * `VertexElement::MonolayerElementRearrangeFacesNodes` so that other operations can
+ * be done more efficiently.
+ * @param pElement  pointer of a new monolayer element
+ */
 void SetElementAsMonolayer(VertexElement<3, 3>* pElement);
 
+/**
+ * @param pElement  pointer of an element
+ * @return  whether this element is within a monolayer tissue
+ */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool IsMonolayerElement(const VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement);
 
-
+/**
+ * @param pElement  pointer of an element
+ * @return  pointer of the apical face of the input element
+ */
 VertexElement<2, 3>* GetApicalFace(const VertexElement<3, 3>* pElement);
 
+/**
+ * @param pElement  pointer of an element
+ * @return  pointer of the basal face of the input element
+ */
 VertexElement<2, 3>* GetBasalFace(const VertexElement<3, 3>* pElement);
 
 /**
- * Get half the number of nodes of a monolayer vertex element
- * to eliminate /2 everywhere in the code.
- * @param pElement
+ * Get half the number of nodes of a monolayer element (which is much useful than
+ * the actual number of nodes in many cases)
+ * @param pElement  pointer of an element
  */
-unsigned MonolayerGetNumNodes(const VertexElement<3, 3>* pElement);
+unsigned MonolayerGetHalfNumNodes(const VertexElement<3, 3>* pElement);
 
 /**
  * Get the lateral face that is contained by this element and contains the two
- * given nodes. pElement is required as node only contains the index, but not the
- * pointer of the elements.
- *
- * @param pElement
- * @param nodeIndexA
- * @param nodeIndexB
- * @return
+ * given nodes. pElement is required by this function as the nodes don't have the
+ * pointer of the faces but only its indices.
+ * (Function which work with the mesh would be even better)
+ * @param pElement  pointer of the element
+ * @param nodeIndexA  global index of node A
+ * @param nodeIndexB  global index of node B
+ * @return  if the nodes doesn't share lateral face, it will return a vector with one
+ *          element with UINT_MAX
+ *          else, the return vector = {face_global_index, face_orientation, face_local_index}
  */
-std::vector<unsigned> GetLateralFace(const VertexElement<3, 3>* pElement, const unsigned nodeIndexA, const unsigned nodeIndexB);
-
-bool GetFaceOrientation(const VertexElement<3, 3>* pElement, const unsigned faceIndex);
+std::vector<unsigned> GetLateralFace(const VertexElement<3, 3>* pElement, const unsigned nodeIndexA,
+                                     const unsigned nodeIndexB);
 
 
 //void AddPairNode(VertexElement<3, 3>* pElement, const unsigned index, Node<3>* pBasalNode, Node<3>* pApicalNode);

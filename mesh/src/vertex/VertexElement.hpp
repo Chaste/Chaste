@@ -185,7 +185,7 @@ public:
      *
      * @return a pointer to the face
      */
-    VertexElement<ELEMENT_DIM-1, SPACE_DIM>* GetFace(unsigned localIndex) const;
+    VertexElement<ELEMENT_DIM-1, SPACE_DIM>* GetFace(const unsigned localIndex) const;
 
     /** Calculate the local index of a face given a global index
      * if face is not contained in element return UINT_MAX.
@@ -193,14 +193,20 @@ public:
      * @param globalIndex the global index of the face
      * @return local_index.
      */
-    unsigned GetFaceLocalIndex(unsigned globalIndex) const;
+    unsigned GetFaceLocalIndex(const unsigned globalIndex) const;
 
     /**
      * @return whether the face with a given index is oriented anti clockwise.
      *
-     * @param index the index of the face
+     * @param localIndex the local index of the face
      */
-    bool FaceIsOrientatedAntiClockwise(unsigned index) const;
+    bool FaceIsOrientatedAntiClockwise(const unsigned localIndex) const;
+
+    /**
+     * @param globalIndex  the global index of the face
+     * @return  whether the face is oriented anti clockwise
+     */
+    bool GetFaceOrientationWithGlobalIndex(const unsigned globalIndex) const;
 
     /**
      * Add a face to the element.
@@ -250,8 +256,19 @@ public:
                                         Node<SPACE_DIM>* pApicalNodeStay, Node<SPACE_DIM>* pBasalNodeStay);
 
     /**
-     * Method for monolayer element to rearrange faces and nodes such that they
-     * are in the correct order according to the order of the basal nodes.
+     * Method for monolayer element to rearrange faces and nodes so that
+     * other operations can be done more efficiently (e.g. no need to loop
+     * through to find the next face of a node etc.)
+     *
+     * 'Correct order' is defined as such:
+     * (1) basal face will be at the first place;
+     * (2) apical face will come second;
+     * (3) basal nodes come first before apical nodes, and in the same order as basal and apical face;
+     * (4) lateral faces are adjusted by LateralFaceRearrangeNodes;
+     * (5) lateral faces (after basal and apical faces) have the same order as the nodes, where
+     *     lateral_faces[i] contains nodes[i] and nodes[i+1].
+     * Assumption:  nodes within the faces are already in cyclic order;
+     *              the nodes in apical and basal faces are synchronised.
      */
     void MonolayerElementRearrangeFacesNodes();
 

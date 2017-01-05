@@ -37,23 +37,25 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Node.hpp"
 #include "VertexElement.hpp"
-#include <set>
+
 #include <algorithm>
 #include <string>
 
 #include <iostream>             // PrintElement
 #include <iomanip>              // PrintElement
 
-#include "Debug.hpp"
 
-/// ===============================================================
-/// Some function that can be added into trunk and relevant for all
+/////////////////////////////////////////////////////////
+///      Some function that are relevant for all      ///
+/////////////////////////////////////////////////////////
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool ElementHasNode(const VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement, const unsigned nodeIndex)
 {
     return pElement->GetNodeLocalIndex(nodeIndex)!=UINT_MAX;
 }
+// Template instantiation is for the compiler
+template bool ElementHasNode(const VertexElement<3, 3>* pElement, const unsigned nodeIndex);
 
 std::set<unsigned> GetSharedElementIndices(const Node<3>* pNodeA, const Node<3>* pNodeB)
 {
@@ -181,40 +183,20 @@ void PrintElement(const VertexElement<3, 3>* pElement)
 
 }
 
-
-/**
- * Face is only considered a boundary face when all nodes are boundary nodes.
- * @return
- */
 bool IsFaceOnBoundary(const VertexElement<2, 3>* pFace)
 {
-    ///\todo: #2850 cannot handle such case
-    /*
-     * The new node is boundary node if the 2 nodes are boundary nodes and the elements don't look like
-     *   ___A___
-     *  |   |   |
-     *  |___|___|
-     *      B
-     */
-    bool is_element_on_boundary = true;
-    for (unsigned i=0; i<pFace->GetNumNodes(); ++i)
-    {
-        if (!pFace->GetNode(i)->IsBoundaryNode())
-        {
-            is_element_on_boundary = false;
-            break;
-        }
-    }
-
-    return is_element_on_boundary;
+    return pFace->FaceGetNumContainingElements()==1;
 }
 
 
-/// ===============================================================
-/// Functions for monolayer
+///////////////////////////////////////////////////////////////////////////////////
+///                       Functions for monolayer classes                       ///
+///////////////////////////////////////////////////////////////////////////////////
 
 
-
+///////////////////////////////////
+///     Functions for nodes     ///
+///////////////////////////////////
 
 void SetNodeAsApical(Node<3>* pNode)
 {
@@ -236,7 +218,7 @@ Monolayer::v_type GetNodeType(const Node<3>* pNode)
      */
     Node<3>* p_non_const_node = const_cast<Node<3>*>(pNode);
     assert(p_non_const_node->GetNumNodeAttributes() == 1u);    // LCOV_EXCL_LINE
-    return Monolayer::v_type(p_non_const_node->rGetNodeAttributes()[0]);
+    return static_cast<Monolayer::v_type>(p_non_const_node->rGetNodeAttributes()[0]);
 }
 
 bool IsApicalNode(const Node<3>* pNode)
@@ -250,8 +232,10 @@ bool IsBasalNode(const Node<3>* pNode)
 }
 
 
+//////////////////////////////////
+///     Functions for face     ///
+//////////////////////////////////
 
-// VertexElement
 void SetFaceAsApical(VertexElement<2, 3>* pFace)
 {
     assert(pFace->GetNumElementAttributes() == 0u);    // LCOV_EXCL_LINE
@@ -278,10 +262,8 @@ Monolayer::v_type GetFaceType(const VertexElement<2, 3>* pFace)
      */
     VertexElement<2, 3>* p_non_const_face = const_cast<VertexElement<2, 3>*>(pFace);
     assert(p_non_const_face->GetNumElementAttributes() == 1u);    // LCOV_EXCL_LINE
-    return Monolayer::v_type(p_non_const_face->rGetElementAttributes()[0]);
+    return static_cast<Monolayer::v_type>(p_non_const_face->rGetElementAttributes()[0]);
 }
-
-
 
 bool IsApicalFace(const VertexElement<2, 3>* pFace)
 {
@@ -297,6 +279,11 @@ bool IsLateralFace(const VertexElement<2, 3>* pFace)
 {
     return GetFaceType(pFace)==Monolayer::LateralValue;
 }
+
+
+////////////////////////////////////////////
+///     Functions for Vertex Element     ///
+////////////////////////////////////////////
 
 void SetElementAsMonolayer(VertexElement<3, 3>* pElement)
 {
@@ -345,7 +332,6 @@ void SetElementAsMonolayer(VertexElement<3, 3>* pElement)
     }
 
     pElement->MonolayerElementRearrangeFacesNodes();
-MARK
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -403,23 +389,32 @@ VertexElement<2, 3>* GetBasalFace(const VertexElement<3, 3>* pElement)
     return p_face;
 }
 
-/**
- * Get half the number of nodes of a monolayer vertex element
- * to eliminate /2 everywhere in the code.
- * @param pElement
- */
-unsigned MonolayerGetNumNodes(const VertexElement<3, 3>* pElement)
+unsigned MonolayerGetHalfNumNodes(const VertexElement<3, 3>* pElement)
 {
+    if (!IsMonolayerElement(pElement))
+    {
+        NEVER_REACHED;
+    }
+
     unsigned num_nodes = pElement->GetNumNodes();
-    assert(num_nodes%2 == 0);   // LCOV_EXCL_LINE
+    if (num_nodes%2 != 0)
+    {
+        NEVER_REACHED;
+    }
     num_nodes /= 2;
-    assert(num_nodes == GetApicalFace(pElement)->GetNumNodes());  // LCOV_EXCL_LINE
-    assert(num_nodes == GetBasalFace(pElement)->GetNumNodes());  // LCOV_EXCL_LINE
+
+    if (num_nodes != GetApicalFace(pElement)->GetNumNodes()
+       || num_nodes != GetBasalFace(pElement)->GetNumNodes())
+    {
+        NEVER_REACHED;
+    }
+
     return num_nodes;
 }
 
 std::vector<unsigned> GetLateralFace(const VertexElement<3, 3>* pElement, const unsigned nodeIndexA, const unsigned nodeIndexB)
 {
+    ///\todo #2850 think which will be the more effective way to find lateral face
     std::vector<unsigned> return_vector;
     for (unsigned face_local_index=2; face_local_index<pElement->GetNumFaces(); ++face_local_index)
     {
@@ -445,42 +440,3 @@ std::vector<unsigned> GetLateralFace(const VertexElement<3, 3>* pElement, const 
     return return_vector;
 }
 
-bool GetFaceOrientation(const VertexElement<3, 3>* pElement, const unsigned faceIndex)
-{
-    bool face_orientation;
-    bool face_found (false);
-    for (unsigned face_index = 0; face_index<pElement->GetNumFaces(); ++face_index)
-    {
-        if (faceIndex == pElement->GetFace(face_index)->GetIndex())
-        {
-            face_orientation = pElement->FaceIsOrientatedAntiClockwise(face_index);
-            face_found = true;
-            break;
-        }
-    }
-    assert(face_found);
-    return face_orientation;
-}
-
-
-
-
-//void AddPairNode(VertexElement<3, 3>* pElement, const unsigned index, Node<3>* pBasalNode, Node<3>* pApicalNode)
-//{
-//    const unsigned num_nodes = MonolayerGetNumNodes(pElement);
-//    unsigned smaller_index = index;
-//    if (index>num_nodes)
-//    {
-//        smaller_index -= num_nodes;
-//        assert(smaller_index < num_nodes);
-//    }
-//
-//    GetBasalFace(pElement)->FaceAddNode(pBasalNode, smaller_index);
-//    GetApicalFace(pElement)->FaceAddNode(pApicalNode, smaller_index);
-//
-//    // Add the apical node first so that I don't changes its indices.
-//    pElement->AddNode(pApicalNode, smaller_index+num_nodes);
-//    pElement->AddNode(pBasalNode, smaller_index);
-//
-//    // NOTE: I doesn't rearrange here because there is still a missing face.
-//}

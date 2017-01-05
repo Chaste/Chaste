@@ -38,8 +38,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <algorithm>                                // std::swap, std::min, std::max, std::rotate, std::copy
 #include "UblasCustomFunctions.hpp"                 // VectorProduct
 #include "MonolayerVertexMeshCustomFunctions.hpp"
-#include "Debug.hpp"
-
 
 
 //////////////////////////////////////////////////
@@ -258,14 +256,14 @@ unsigned VertexElement<ELEMENT_DIM, SPACE_DIM>::GetNumFaces() const
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-VertexElement<ELEMENT_DIM-1, SPACE_DIM>* VertexElement<ELEMENT_DIM, SPACE_DIM>::GetFace(unsigned localIndex) const
+VertexElement<ELEMENT_DIM-1, SPACE_DIM>* VertexElement<ELEMENT_DIM, SPACE_DIM>::GetFace(const unsigned localIndex) const
 {
     assert(localIndex < mFaces.size());
     return mFaces[localIndex];
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-unsigned VertexElement<ELEMENT_DIM, SPACE_DIM>::GetFaceLocalIndex(unsigned globalIndex) const
+unsigned VertexElement<ELEMENT_DIM, SPACE_DIM>::GetFaceLocalIndex(const unsigned globalIndex) const
 {
     unsigned local_index = UINT_MAX;
     for (unsigned i=0; i<this->mFaces.size(); i++)
@@ -281,10 +279,26 @@ unsigned VertexElement<ELEMENT_DIM, SPACE_DIM>::GetFaceLocalIndex(unsigned globa
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-bool VertexElement<ELEMENT_DIM, SPACE_DIM>::FaceIsOrientatedAntiClockwise(unsigned index) const
+bool VertexElement<ELEMENT_DIM, SPACE_DIM>::FaceIsOrientatedAntiClockwise(const unsigned localIndex) const
 {
-    assert(index < mOrientations.size());
-    return mOrientations[index];
+    assert(localIndex < mOrientations.size());
+    return mOrientations[localIndex];
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool VertexElement<ELEMENT_DIM, SPACE_DIM>::GetFaceOrientationWithGlobalIndex(const unsigned globalIndex) const
+{
+    const unsigned local_index = this->GetFaceLocalIndex(globalIndex);
+    if (local_index == UINT_MAX)
+    {
+        NEVER_REACHED;
+    }
+    if (local_index >= this->mFaces.size())
+    {
+        NEVER_REACHED;
+    }
+
+    return mOrientations[local_index];
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -428,7 +442,6 @@ void VertexElement<2, 3>::LateralFaceRearrangeNodes()
 
     std::rotate(this->mNodes.begin(), this->mNodes.begin()+min_cyc_index, this->mNodes.end());
 }
-
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VertexElement<ELEMENT_DIM, SPACE_DIM>::MonolayerElementRearrangeFacesNodes()
@@ -579,7 +592,8 @@ void VertexElement<3, 3>::MonolayerElementRearrangeFacesNodes()
 
         this->mOrientations[face_index] = inner_prod(face_normal, face_centroid-elem_centroid)<0;
     }
-    ///\todo #2850 redo mOrientation
+
+    ///\todo: #2850 remove the both assumptions of this function (refer to hpp)
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -772,11 +786,11 @@ unsigned VertexElement<ELEMENT_DIM, SPACE_DIM>::FaceGetNumContainingElements() c
 
 
 
-//////////////////////////////////////////////////////////////////////
-//                  Specialization for 1d elements                  //
-//                                                                  //
-//                 1d elements are just edges (lines)               //
-//////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
+///                  Specialization for 1d elements                  ///
+///                                                                  ///
+///                 1d elements are just edges (lines)               ///
+////////////////////////////////////////////////////////////////////////
 
 /**
  * Specialization for 1d elements so we don't get errors from Boost on some

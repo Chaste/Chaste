@@ -803,7 +803,7 @@ unsigned MutableVertexMesh<3, 3>::DivideElementAlongGivenAxis(VertexElement<3, 3
      */
     std::vector<unsigned> intersecting_apical_nodes;
     std::vector<unsigned> intersecting_basal_nodes;
-    const unsigned half_num_nodes = MonolayerGetNumNodes(pElement);
+    const unsigned half_num_nodes = MonolayerGetHalfNumNodes(pElement);
     bool is_current_apical_node_on_normal_side = (inner_prod(this->GetVectorFromAtoB(centroid, p_apical_face->GetNodeLocation(0)), axisOfDivision) >= 0);
     bool is_current_basal_node_on_normal_side = (inner_prod(this->GetVectorFromAtoB(centroid, p_basal_face->GetNodeLocation(0)), axisOfDivision) >= 0);
     for (unsigned i=0; i<half_num_nodes; i++)
@@ -1009,7 +1009,7 @@ unsigned MutableVertexMesh<3, 3>::DivideElementAlongGivenAxis(VertexElement<3, 3
             VertexElement<3, 3>* p_this_element = this->GetElement(*iter);
             VertexElement<2, 3>* p_this_basal_face = GetBasalFace(p_this_element);
             VertexElement<2, 3>* p_this_apical_face = GetApicalFace(p_this_element);
-            const unsigned this_half_num_nodes = MonolayerGetNumNodes(p_this_element);
+            const unsigned this_half_num_nodes = MonolayerGetHalfNumNodes(p_this_element);
 
             // Find which node has the lower local index in this element
             unsigned node_a_local_index = p_this_apical_face->GetNodeLocalIndex(p_apical_node_a->GetIndex());
@@ -1048,7 +1048,7 @@ unsigned MutableVertexMesh<3, 3>::DivideElementAlongGivenAxis(VertexElement<3, 3
             p_this_element->AddNode(p_new_basal_node, index);
 
             // New face will have the same orientation as the old one.
-            p_this_element->AddFace(p_new_lateral_face, GetFaceOrientation(p_this_element, shared_face->GetIndex()), index+2);
+            p_this_element->AddFace(p_new_lateral_face, p_this_element->GetFaceOrientationWithGlobalIndex(shared_face->GetIndex()), index+2);
 
             p_this_element->MonolayerElementRearrangeFacesNodes();
         }
@@ -1393,8 +1393,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(VertexElementMap& rElemen
         //remove and relabel all the elements, nodes, and faces
         RemoveDeletedNodesAndElements(rElementMap);
 
-        ///\todo need a way to identify if it is a Bielmeier mesh #2850
-        if (this->GetNumNodes()%2 == 0)
+        if (IsMonolayerElement(this->GetElement(0)))
         {
             bool recheck_mesh = true;
             while (recheck_mesh == true)

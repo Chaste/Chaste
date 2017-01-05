@@ -31,6 +31,7 @@ vertex/TestCylindrical2dVertexMesh.hpp
 vertex/TestCylindricalHoneycombVertexMeshGenerator.hpp
 vertex/TestHexagonalPrism3dVertexMeshGenerator.hpp
 vertex/TestHoneycombVertexMeshGenerator.hpp
+vertex/TestMonolayerVertexMeshCustomFunctions.hpp
 vertex/TestMonolayerVertexMeshGenerator.hpp
 vertex/TestMutableVertexMesh.hpp
 vertex/TestMutableVertexMesh33ReMesh.hpp
