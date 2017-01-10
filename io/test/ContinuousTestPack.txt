@@ -1,6 +1,0 @@
-TestColumnDataReaderWriter.hpp
-TestHdf5DataReader.hpp
-TestHdf5DataWriter.hpp
-TestParallelColumnDataReaderWriter.hpp
-TestParallelWriterPerformance.hpp
-TestSimpleDataWriter.hpp

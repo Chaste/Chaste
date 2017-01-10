@@ -1,4 +1,0 @@
-tutorials/TestAirwayGenerationTutorial.hpp
-tutorials/TestDynamicVentilationTutorial.hpp
-tutorials/TestSimpleImpedanceProblemTutorial.hpp
-tutorials/TestStaticVentilationTutorial.hpp
