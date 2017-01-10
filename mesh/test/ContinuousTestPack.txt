@@ -8,4 +8,5 @@ immersed_boundary/TestImmersedBoundaryMesh.hpp
 immersed_boundary/TestImmersedBoundaryMeshReader.hpp
 immersed_boundary/TestImmersedBoundaryMeshWriter.hpp
 immersed_boundary/TestImmersedBoundaryPalisadeMeshGenerator.hpp
+utilities/TestSuperellipseGenerator.hpp
 immersed_boundary/TestGenerateFftwWisdom.hpp
