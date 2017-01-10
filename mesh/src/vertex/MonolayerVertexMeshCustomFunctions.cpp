@@ -55,6 +55,11 @@ bool ElementHasNode(const VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement, const
     return pElement->GetNodeLocalIndex(nodeIndex)!=UINT_MAX;
 }
 // Template instantiation is for the compiler
+template bool ElementHasNode(const VertexElement<1, 1>* pElement, const unsigned nodeIndex);
+template bool ElementHasNode(const VertexElement<1, 2>* pElement, const unsigned nodeIndex);
+template bool ElementHasNode(const VertexElement<1, 3>* pElement, const unsigned nodeIndex);
+template bool ElementHasNode(const VertexElement<2, 2>* pElement, const unsigned nodeIndex);
+template bool ElementHasNode(const VertexElement<2, 3>* pElement, const unsigned nodeIndex);
 template bool ElementHasNode(const VertexElement<3, 3>* pElement, const unsigned nodeIndex);
 
 std::set<unsigned> GetSharedElementIndices(const Node<3>* pNodeA, const Node<3>* pNodeB)

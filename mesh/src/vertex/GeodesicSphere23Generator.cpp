@@ -7,6 +7,8 @@
 
 #include "GeodesicSphere23Generator.hpp"
 
+#include <utility>              // for pair
+#include <set>
 #include <algorithm>            // sort
 #include "UblasCustomFunctions.hpp"
 #include "MonolayerVertexMeshCustomFunctions.hpp"
@@ -14,9 +16,22 @@
 
 #include "Debug.hpp"
 
+
+class SortWithIndex
+{
+public:
+    bool operator()(const std::pair<double, unsigned>& a, const std::pair<double, unsigned>& b) const
+    {
+        return a.first < b.first;
+    }
+};
+
 GeodesicSphere23Generator::GeodesicSphere23Generator(const unsigned numDivision)
 : mDepth(0)
 {
+    const double X = 0.525731112119133606;
+    const double Z = 0.850650808352039932;
+
     const double vdata[12][3] = {
             {-X, 0.0, Z}, { X, 0.0, Z }, { -X, 0.0, -Z }, { X, 0.0, -Z },
             { 0.0, Z, X }, { 0.0, Z, -X }, { 0.0, -Z, X }, { 0.0, -Z, -X },
@@ -110,7 +125,10 @@ void GeodesicSphere23Generator::SubDivide()
         map_edge_to_new_nodes[i] = p_tmp_node;
         mNodes.push_back(p_tmp_node);
     }
-    assert(mNodes.size() == num_new_total_nodes);
+    if (mNodes.size() != num_new_total_nodes) 
+    {
+        NEVER_REACHED;
+    }
 
     const unsigned cyc[3][3] = {{0,1,2},{1,2,0},{2,0,1}};
     // Creating new faces and edges
@@ -129,7 +147,10 @@ void GeodesicSphere23Generator::SubDivide()
          *   2        1'      0
          */
         VertexElement<2, 3>* p_face = mFaces[old_face_index];
-        assert(old_face_index == p_face->GetIndex());
+        if (old_face_index != p_face->GetIndex()) 
+        {
+            NEVER_REACHED;
+        }
 
         Node<3>* old_nodes[3] = {p_face->GetNode(0), p_face->GetNode(1), p_face->GetNode(2)};
         std::vector<Node<3>*> mid_nodes(3);
@@ -137,8 +158,14 @@ void GeodesicSphere23Generator::SubDivide()
         {
             const std::set<unsigned> shared_edge =
                     GetSharedFaceIndices(old_nodes[cyc[i][0]], old_nodes[cyc[i][1]]);
-            assert(shared_edge.size() == 1);
-            assert(*(shared_edge.begin()) == p_face->GetFace(i)->GetIndex());
+            if (shared_edge.size() != 1) 
+            {
+                NEVER_REACHED;
+            }
+            if(*(shared_edge.begin()) != p_face->GetFace(i)->GetIndex()) 
+            {
+                NEVER_REACHED;
+            }
             mid_nodes[cyc[i][2]] = map_edge_to_new_nodes[*(shared_edge.begin())];
         }
 
@@ -178,7 +205,10 @@ void GeodesicSphere23Generator::SubDivide()
                 }
                 else
                 {
-                    assert(shared_edge.size() == 1);
+                    if (shared_edge.size() != 1) 
+                    {
+                        NEVER_REACHED;
+                    }
                     p_tmp_edge = mEdges[*(shared_edge.begin())];
                 }
                 this_face_edges[j] = p_tmp_edge;
@@ -212,11 +242,17 @@ void GeodesicSphere23Generator::SubDivide()
 
     for (unsigned i=num_new_edges, j=0; i<mEdges.size(); ++i, ++j)
     {
-        assert(mEdges[i]->GetIndex() == j);
+        if (mEdges[i]->GetIndex() != j) 
+        {
+            NEVER_REACHED;
+        }
     }
     mEdges.resize(num_new_edges);
 
-    assert(mFaces.size() == num_new_faces);
+    if (mFaces.size() != num_new_faces) 
+    {
+        NEVER_REACHED;
+    }
     MARK;
 }
 
