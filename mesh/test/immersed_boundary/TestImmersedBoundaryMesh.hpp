@@ -507,8 +507,6 @@ public:
 
             ImmersedBoundaryMesh<2, 2>* p_mesh = new ImmersedBoundaryMesh<2, 2>(nodes, elems, lams);
 
-            unsigned num_nodes = p_mesh->GetLamina(0)->GetNumNodes();
-
             p_mesh->ReMesh();
 
             TS_ASSERT_DELTA(p_mesh->GetLamina(0)->GetNode(0)->rGetLocation()[0], 0.1, 1e-12);
