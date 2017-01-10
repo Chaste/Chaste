@@ -380,7 +380,7 @@ PRINT_VECTOR(p_mesh->GetNode(48)->rGetLocation())
 
     void TestOnSphere() throw (Exception)
    {
-        const double s_end_time = 1;
+        const double s_end_time = 2;
         std::string output_filename = "TestUniaxialLoad/SphereTest" + boost::lexical_cast<std::string>(num_cells_x)
                                     + "x" + boost::lexical_cast<std::string>(num_cells_y);
         GeodesicSphere23Generator builder;
@@ -412,7 +412,7 @@ PRINT_VECTOR(p_mesh->GetNode(48)->rGetLocation())
         p_force3->SetApicalParameters(20, 20, 0.7);
         p_force3->SetBasalParameters(20, 20, 0.7);
         p_force3->SetLateralParameter(8);
-        p_force3->SetVolumeParameters(350, 1);
+        p_force3->SetVolumeParameters(350, 2);
         simulator.AddForce(p_force3);
 //        MAKE_PTR(HorizontalStretchForce<3>, p_force2);
 //        p_force2->SetForceMagnitude(1.0);

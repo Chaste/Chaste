@@ -758,8 +758,9 @@ unsigned MutableVertexMesh<3, 3>::DivideElement(VertexElement<3,3>* pElement,
     }
     new_elem_basal_nodes.insert(new_elem_basal_nodes.end(), new_elem_apical_nodes.begin(), new_elem_apical_nodes.end());
     // Add the new element to the mesh
-    this->AddElement(new VertexElement<3,3>(new_element_index, new_elem_faces, new_elem_orientations, new_elem_basal_nodes));
-
+    VertexElement<3,3>* p_new_elem = new VertexElement<3,3>(new_element_index, new_elem_faces, new_elem_orientations, new_elem_basal_nodes);
+    SetElementAsMonolayer(p_new_elem);
+    this->AddElement(p_new_elem);
 
     // Remove extra nodes and faces from original element
     for (unsigned node_index=1; node_index<new_elem_apical_nodes.size()-1; ++node_index)

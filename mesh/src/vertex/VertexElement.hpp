@@ -430,7 +430,7 @@ public:
      *
      * @param index the index of the face
      */
-    bool FaceIsOrientatedAntiClockwise(unsigned index) const;
+    bool FaceIsOrientatedAntiClockwise(const unsigned index) const;
 
     /**
      * Compute the centroid of an element. Exact same function as VertexMesh::GetCentroidOfElement(const unsigned&)

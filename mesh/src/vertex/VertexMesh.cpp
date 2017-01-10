@@ -36,6 +36,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexMesh.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "UblasCustomFunctions.hpp"
+#include "MonolayerVertexMeshCustomFunctions.hpp"
+
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexMesh(std::vector<Node<SPACE_DIM>*> nodes,
                                                std::vector<VertexElement<ELEMENT_DIM,SPACE_DIM>*> vertexElements)
@@ -275,7 +277,8 @@ VertexMesh<3,3>::VertexMesh(TetrahedralMesh<3,3>& rMesh)
                                   node_b_element_indices.end(),
                                   std::inserter(edge_element_indices, edge_element_indices.begin()));
 
-            c_vector<double,3> edge_vector = p_node_b->rGetLocation() - p_node_a->rGetLocation();
+            c_vector<double,3> edge_vector;
+            edge_vector = p_node_b->rGetLocation() - p_node_a->rGetLocation();
             c_vector<double,3> mid_edge = edge_vector*0.5 + p_node_a->rGetLocation();
 
             unsigned element0_index = *(edge_element_indices.begin());
@@ -1531,6 +1534,119 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateAreaOfFace(const VertexEleme
     return CalculateUnitNormalToFaceWithArea(pFace, unit_normal);
 }
 
+template<>
+c_vector<double, 3> VertexMesh<3, 3>::GetShortAxisOfElement(const unsigned index) const
+{
+    if (!IsMonolayerElement(this->GetElement(index)))
+    {
+        NEVER_REACHED;
+    }
+
+    VertexElement<2, 3>* p_face = GetBasalFace(GetElement(index));
+    c_vector<double, 3> unit_normal;
+    CalculateUnitNormalToFaceWithArea(p_face, unit_normal);
+    c_vector<double, 3> e1 = Create_c_vector(unit_normal[1], -unit_normal[0], 0);
+    c_vector<double, 3> e2 = VectorProduct(unit_normal, e1);
+    e1 /= norm_2(e1);
+    e2 /= norm_2(e2);
+
+    // Calculate the moments of the element about its centroid (recall that I_xx and I_yy must be non-negative)
+    unsigned num_nodes = p_face->GetNumNodes();
+    c_vector<double, 3> moments = zero_vector<double>(3);
+
+    // Since we compute I_xx, I_yy and I_xy about the centroid, we must shift each vertex accordingly
+    c_vector<double, 3> face_centroid = p_face->GetCentroid();
+
+    c_vector<double, 3> this_node_location = p_face->GetNodeLocation(0);
+    c_vector<double, 3> pos_1_3 = this->GetVectorFromAtoB(face_centroid, this_node_location);
+    c_vector<double, 2> pos_1 = Create_c_vector(inner_prod(pos_1_3,e1), inner_prod(pos_1_3,e2));
+
+    for (unsigned local_index=0; local_index<num_nodes; local_index++)
+    {
+        unsigned next_index = (local_index+1)%num_nodes;
+        c_vector<double, 3> next_node_location = p_face->GetNodeLocation(next_index);
+        c_vector<double, 3> pos_2_3 = this->GetVectorFromAtoB(face_centroid, next_node_location);
+        c_vector<double, 2> pos_2 = Create_c_vector(inner_prod(pos_2_3,e1), inner_prod(pos_2_3,e2));
+
+        double signed_area_term = pos_1(0)*pos_2(1) - pos_2(0)*pos_1(1);
+        // Ixx
+        moments(0) += (pos_1(1)*pos_1(1) + pos_1(1)*pos_2(1) + pos_2(1)*pos_2(1) ) * signed_area_term;
+
+        // Iyy
+        moments(1) += (pos_1(0)*pos_1(0) + pos_1(0)*pos_2(0) + pos_2(0)*pos_2(0)) * signed_area_term;
+
+        // Ixy
+        moments(2) += (pos_1(0)*pos_2(1) + 2*pos_1(0)*pos_1(1) + 2*pos_2(0)*pos_2(1) + pos_2(0)*pos_1(1)) * signed_area_term;
+
+        pos_1 = pos_2;
+    }
+
+    moments(0) /= 12;
+    moments(1) /= 12;
+    moments(2) /= 24;
+
+    /*
+     * If the nodes owned by the element were supplied in a clockwise rather
+     * than anticlockwise manner, or if this arose as a result of enforcing
+     * periodicity, then our computed quantities will be the wrong sign, so
+     * we need to fix this.
+     */
+    if (moments(0) < 0.0)
+    {
+        moments(0) = -moments(0);
+        moments(1) = -moments(1);
+        moments(2) = -moments(2);
+    }
+
+    double short_axis_e1;
+    double short_axis_e2;
+    // If the principal moments are equal...
+    double discriminant = (moments(0) - moments(1))*(moments(0) - moments(1)) + 4.0*moments(2)*moments(2);
+    if (fabs(discriminant) < 1e-10) ///\todo remove magic number? (see #1884 and #2401)
+    {
+        // ...then every axis through the centroid is a principal axis, so return a random unit vector
+        short_axis_e1 = RandomNumberGenerator::Instance()->ranf();
+        short_axis_e2 = sqrt(1.0 - short_axis_e1*short_axis_e1);
+    }
+    else
+    {
+        // If the product of inertia is zero, then the coordinate axes are the principal axes
+        if (moments(2) == 0.0)
+        {
+            if (moments(0) < moments(1))
+            {
+                short_axis_e1 = 0.0;
+                short_axis_e2 = 1.0;
+            }
+            else
+            {
+                short_axis_e1 = 1.0;
+                short_axis_e2 = 0.0;
+            }
+        }
+        else
+        {
+            // Otherwise we find the eigenvector of the inertia matrix corresponding to the largest eigenvalue
+            double lambda = 0.5*(moments(0) + moments(1) + sqrt(discriminant));
+
+            short_axis_e1 = 1.0;
+            short_axis_e2 = (moments(0) - lambda)/moments(2);
+        }
+    }
+
+    c_vector<double, 3> return_v = short_axis_e1*e1 + short_axis_e2*e2;
+    return_v /= norm_2(return_v);
+
+
+    PRINT_CONTAINER(unit_normal)
+    PRINT_CONTAINER(e1)
+    PRINT_CONTAINER(e2)
+    PRINT_CONTAINER(return_v)
+
+
+    return return_v;
+}
+
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetVolumeGradientofElementAtNode(const VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement, const unsigned globalIndex) const
 {
@@ -1550,6 +1666,8 @@ c_vector<double, 3> VertexMesh<3, 3>::GetVolumeGradientofElementAtNode(const Ver
 
     c_vector<double, 3> volume_gradient = zero_vector<double>(3);
 
+    const std::set<unsigned> face_indices = this->GetNode(globalIndex)->rGetContainingFaceIndices();
+
     for (unsigned face_index=0; face_index<pElement->GetNumFaces(); ++face_index)
     {
         const VertexElement<2, 3>* p_face = pElement->GetFace(face_index);
@@ -1561,9 +1679,11 @@ c_vector<double, 3> VertexMesh<3, 3>::GetVolumeGradientofElementAtNode(const Ver
         // if this face contains the node, it will be some number, not UINT_MAX. Second statement just as safety precaution
         if ( node_local_index!=UINT_MAX && node_local_index<num_nodes)
         {
+            assert(face_indices.count(p_face->GetIndex())>0);
             const unsigned next_local_index = (node_local_index+1)%num_nodes;
             const unsigned previous_local_index = (node_local_index-1+num_nodes)%num_nodes;
-            const c_vector<double, 3> previous_to_next = p_face->GetNodeLocation(next_local_index) - p_face->GetNodeLocation(previous_local_index);
+            c_vector<double, 3> previous_to_next;
+            previous_to_next = p_face->GetNodeLocation(next_local_index) - p_face->GetNodeLocation(previous_local_index);
 
             c_vector<double, 3> face_centroid = p_face->GetCentroid();
             this_face_gradient_contribution += VectorProduct(face_centroid, previous_to_next) / 6.0;
@@ -1574,8 +1694,10 @@ c_vector<double, 3> VertexMesh<3, 3>::GetVolumeGradientofElementAtNode(const Ver
                 // We add an extra num_nodes_in_element in the line below as otherwise this term can be negative, which breaks the % operator
                 const unsigned previous_running_index = (current_running_index+num_nodes-1)%num_nodes;
 
-                const c_vector<double, 3> current_node_relative_location = p_face->GetNodeLocation(current_running_index) - face_centroid;
-                const c_vector<double, 3> previous_node_relative_location = p_face->GetNodeLocation(previous_running_index) - face_centroid;
+                c_vector<double, 3> current_node_relative_location;
+                current_node_relative_location = p_face->GetNodeLocation(current_running_index) - face_centroid;
+                c_vector<double, 3> previous_node_relative_location;
+                previous_node_relative_location = p_face->GetNodeLocation(previous_running_index) - face_centroid;
 
                 face_area += VectorProduct(current_node_relative_location, previous_node_relative_location) / 2.0;
             }
@@ -1585,7 +1707,7 @@ c_vector<double, 3> VertexMesh<3, 3>::GetVolumeGradientofElementAtNode(const Ver
 
         // If it is oriented the other way, then r_{i+1} and r_{i-1} would be exchanged,
         // and the face_area (vector) will have different sign.
-        if (face_orientation)
+        if (!face_orientation)
         {
             this_face_gradient_contribution *= -1.0;
         }
@@ -1593,14 +1715,17 @@ c_vector<double, 3> VertexMesh<3, 3>::GetVolumeGradientofElementAtNode(const Ver
         volume_gradient += this_face_gradient_contribution;
     }
 
-    return volume_gradient; // * -1.0; ///\fixme the -1.0
+    return volume_gradient;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetAreaGradientOfFaceAtNode(const VertexElement<ELEMENT_DIM-1,SPACE_DIM>* pFace, const unsigned localIndex) const
 {
     // Luckily for us, since Area is a scalar quantity, the face orientation doesn't have effect on it
-    assert(SPACE_DIM==3);
+    if (SPACE_DIM!=3)
+    {
+        NEVER_REACHED;
+    }
 
     const unsigned num_nodes_in_face = pFace->GetNumNodes();
     c_vector<double, SPACE_DIM> area_gradient = zero_vector<double>(SPACE_DIM);
@@ -1614,8 +1739,10 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetAreaGradientO
         const unsigned previous_node_local_index = (current_node_local_index+num_nodes_in_face-1)%num_nodes_in_face;
 
         // We use relative location to the face_centroid rather than absolute location to simplify the calculations.
-        const c_vector<double, SPACE_DIM> current_node_relative_location = pFace->GetNodeLocation(current_node_local_index) - face_centroid;
-        const c_vector<double, SPACE_DIM> previous_node_relative_location = pFace->GetNodeLocation(previous_node_local_index) - face_centroid;
+        c_vector<double, SPACE_DIM> current_node_relative_location;
+        current_node_relative_location = pFace->GetNodeLocation(current_node_local_index) - face_centroid;
+        c_vector<double, SPACE_DIM> previous_node_relative_location;
+        previous_node_relative_location = pFace->GetNodeLocation(previous_node_local_index) - face_centroid;
 
         const c_vector<double, SPACE_DIM> sub_triangular_area = VectorProduct(current_node_relative_location, previous_node_relative_location) / 2.0;
 

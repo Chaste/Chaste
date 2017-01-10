@@ -32,7 +32,6 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  */
-#include "Debug.hpp"
 #include "GeneralMonolayerVertexMeshForce.hpp"
 #include "VertexBasedCellPopulation.hpp"
 
@@ -80,9 +79,6 @@ void GeneralMonolayerVertexMeshForce::AddForceContribution(AbstractCellPopulatio
         apical_areas[elem_index] = rMesh.CalculateAreaOfFace(p_elem->GetFace(1));
         basal_areas[elem_index] = rMesh.CalculateAreaOfFace(p_elem->GetFace(0));
     }
-PRINT_VECTOR(element_volumes)
-PRINT_VECTOR(apical_areas)
-PRINT_VECTOR(basal_areas)
 
     // Iterate over nodes in the cell population
     for (unsigned node_index = 0; node_index < num_nodes; node_index++)
@@ -112,27 +108,6 @@ PRINT_VECTOR(basal_areas)
         {
             // Get this element, its index and its number of nodes
             VertexElement<3, 3>* p_element = p_cell_population->GetElement(*iter);
-            std::vector<VertexElement<2,3>*> lateral_faces;
-
-            // Populate the pointers/vector to different types of face
-            for (unsigned face_index = 0; face_index < p_element->GetNumFaces(); ++face_index)
-            {
-                VertexElement<2,3>* p_tmp_face = p_element->GetFace(face_index);
-                switch (unsigned(p_tmp_face->rGetElementAttributes()[0]))
-                {
-                    case 1:
-                        assert(face_index == 0);
-                        break;
-                    case 2:
-                        assert(face_index == 1);
-                        break;
-                    case 3:
-                        lateral_faces.push_back(p_tmp_face);
-                        break;
-                    default:
-                        NEVER_REACHED;
-                }
-            }
 
             const unsigned elem_index = p_element->GetIndex();
 

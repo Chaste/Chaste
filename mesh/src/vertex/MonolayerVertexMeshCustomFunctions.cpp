@@ -349,6 +349,9 @@ bool IsMonolayerElement(const VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement)
     }
 }
 // Template instantiation is for the compiler
+template bool IsMonolayerElement<1, 1>(const VertexElement<1, 1>* pElement);
+template bool IsMonolayerElement<1, 2>(const VertexElement<1, 2>* pElement);
+template bool IsMonolayerElement<1, 3>(const VertexElement<1, 3>* pElement);
 template bool IsMonolayerElement<2, 2>(const VertexElement<2, 2>* pElement);
 template bool IsMonolayerElement<2, 3>(const VertexElement<2, 3>* pElement);
 template bool IsMonolayerElement<3, 3>(const VertexElement<3, 3>* pElement);

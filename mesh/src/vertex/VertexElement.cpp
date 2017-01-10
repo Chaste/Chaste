@@ -34,7 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "VertexElement.hpp"
 
-#include <cassert>
 #include <algorithm>                                // std::swap, std::min, std::max, std::rotate, std::copy
 #include "UblasCustomFunctions.hpp"                 // VectorProduct
 #include "MonolayerVertexMeshCustomFunctions.hpp"
@@ -452,6 +451,11 @@ void VertexElement<ELEMENT_DIM, SPACE_DIM>::MonolayerElementRearrangeFacesNodes(
 template<>
 void VertexElement<3, 3>::MonolayerElementRearrangeFacesNodes()
 {
+    if (!IsMonolayerElement(this))
+    {
+        NEVER_REACHED;
+    }
+
     const VertexElement<2, 3>* p_basal = GetBasalFace(this);
     const VertexElement<2, 3>* p_apical = GetApicalFace(this);
 
@@ -821,7 +825,7 @@ unsigned VertexElement<1, SPACE_DIM>::GetFaceLocalIndex(unsigned globalIndex) co
 }
 
 template<unsigned SPACE_DIM>
-bool VertexElement<1, SPACE_DIM>::FaceIsOrientatedAntiClockwise(unsigned index) const
+bool VertexElement<1, SPACE_DIM>::FaceIsOrientatedAntiClockwise(const unsigned index) const
 {
     return false;
 }
