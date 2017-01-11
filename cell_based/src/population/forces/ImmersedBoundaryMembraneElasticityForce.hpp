@@ -38,17 +38,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
-#include "Exception.hpp"
 
 #include "AbstractImmersedBoundaryForce.hpp"
 #include "ImmersedBoundaryCellPopulation.hpp"
-#include "ImmersedBoundaryMesh.hpp"
 
 #include <iostream>
 
 /**
- * A force class for use in Vertex-based simulations. This force is based on the
- * Energy function proposed by Farhadifar et al in  Curr. Biol., 2007, 17, 2095-2104.
+ * A force class for use in immersed boundary simulations. This force implements elastic links between adjacent nodes
+ * in each immersed boundary.
  */
 template<unsigned DIM>
 class ImmersedBoundaryMembraneElasticityForce : public AbstractImmersedBoundaryForce<DIM>
@@ -67,138 +65,84 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & boost::serialization::base_object<AbstractImmersedBoundaryForce<DIM> >(*this);
-        archive & mSpringConstant;
-        archive & mRestLengthMultiplier;
-        archive & mBasementSpringConstantModifier;
-        archive & mBasementRestLengthModifier;
+        archive & mElementSpringConst;
+        archive & mElementRestLength;
+        archive & mLaminaSpringConst;
+        archive & mLaminaRestLength;
     }
 
-protected:
+    /** The spring constant associated with each element */
+    double mElementSpringConst;
 
-    /** The immersed boundary mesh. */
-    ImmersedBoundaryMesh<DIM,DIM>* mpMesh;
+    /** The rest length associated with each element as a fraction of the average node spacing */
+    double mElementRestLength;
 
-    /** How far through the element attributes vector we are when this constructor is called. */
-    unsigned mReferenceLocationInAttributesVector;
+    /** The spring constant associated with each lamina */
+    double mLaminaSpringConst;
+
+    /** The rest length associated with each lamina as a fraction of the average node spacing */
+    double mLaminaRestLength;
 
     /**
-     * The membrane spring constant associated with each element.
+     * Helper method for AddImmersedBoundaryForceContribution.
+     * Calculates forces, and can accept either an element or a lamina
      *
-     * Initialised to 1e6 in the constructor.
+     * @tparam ELEMENT_DIM either DIM or DIM-1 depending on whether receiving an element or a lamina
+     * @param rElement the element or lamina add forces to
+     * @param rCellPopulation the immersed boundary cell population
      */
-    double mSpringConstant;
-
-    /**
-     * The membrane rest length associated with each element.
-     *
-     * Initialised to 0.5 in the constructor.
-     */
-    double mRestLengthMultiplier;
-
-    /**
-     * The multiplicative quantity by which we alter the spring constant of the basement lamina, if present.
-     *
-     * Initialised to 5 in the constructor.
-     *
-     * \todo Add get/set methods?
-     */
-    double mBasementSpringConstantModifier;
-
-    /**
-     * The multiplicative quantity by which we alter the rest length of the basement lamina, if present.
-     *
-     * Initialised to 0.5 in the constructor.
-     *
-     * \todo Add get/set methods?
-     */
-    double mBasementRestLengthModifier;
-
-    /**
-     * A value needed to calculate elastic forces, set every time step in AddImmersedBoundaryForceContribution()
-     */
-    double mIntrinsicSpacingSquared;
-
-    /** Whether the elements have corners tagged. */
-    bool mElementsHaveCorners;
-
-    template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-    void CalculateForcesOnElement(ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>& rElement);
-
-    /** Vector containing locations of apical and basal rest-lengths in the element attribute vectors. */
-    std::vector<unsigned> mRestLengthLocationsInAttributeVector;
-
-    /**
-     * @param elemIndex index of the element to retrieve apical length of
-     * @return apical length of the specified element
-     */
-    double GetApicalLengthForElement(unsigned elemIndex);
-
-    /**
-     * @param elemIndex index of the element to retrieve basal length of
-     * @return basal length of the specified element
-     */
-    double GetBasalLengthForElement(unsigned elemIndex);
-
-    /*
-     * We calculate the 'corners' of each element, in order to alter behaviour on apical, lateral, and basal regions
-     * separately. Corners are stored as four consecutive element attributes, numbered sequentially clockwise from the
-     * apical left-hand corner.
-     */
-    void TagApicalAndBasalLengths();
+    template <unsigned ELEMENT_DIM>
+    void CalculateForcesOnElement(ImmersedBoundaryElement<ELEMENT_DIM, DIM>& rElement,
+                                  ImmersedBoundaryCellPopulation<DIM>& rCellPopulation,
+                                  double intrinsicSpacingSquared);
 
 public:
 
-    /**
-     * Constructor.
-     */
+    /** Constructor */
     ImmersedBoundaryMembraneElasticityForce();
 
-    /**
-     * Destructor.
-     */
+    /** Destructor */
     virtual ~ImmersedBoundaryMembraneElasticityForce();
 
     /**
      * Overridden AddImmersedBoundaryForceContribution() method.
-     *
-     * Calculates the force on each node in the immersed boundary cell population as a result of cell-cell interactions.
+     * Calculates basic elasticity in the membrane of each immersed boundary as a result of interactions.
      *
      * @param rNodePairs reference to a vector set of node pairs between which to contribute the force
      * @param rCellPopulation reference to the cell population
      */
     void AddImmersedBoundaryForceContribution(std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs,
-            ImmersedBoundaryCellPopulation<DIM>& rCellPopulation);
-
-    /**
-     * Set #mSpringConstant.
-     *
-     * @param new value of the spring constant
-     */
-    void SetSpringConstant(double springConstant);
-
-    /**
-     * @return #mSpringConstant.
-     */
-    double GetSpringConstant();
-
-    /**
-     * Set #mRestLength.
-     *
-     * @param new value of the rest length
-     */
-    void SetRestLengthMultiplier(double restLengthMultiplier);
-
-    /**
-     * @return #mRestLength.
-     */
-    double GetRestLengthMultiplier();
+                                              ImmersedBoundaryCellPopulation<DIM>& rCellPopulation);
 
     /**
      * Overridden OutputImmersedBoundaryForceParameters() method.
-     *
      * @param rParamsFile the file stream to which the parameters are output
      */
     void OutputImmersedBoundaryForceParameters(out_stream& rParamsFile);
+
+    /** @return mElementSpringConst */
+    double GetElementSpringConst() const;
+
+    /** @param elementSpringConst the new value of mElementSpringConst */
+    void SetElementSpringConst(double elementSpringConst);
+
+    /** @return mElementRestLength */
+    double GetElementRestLength() const;
+
+    /** @param elementRestLength the new value of mElementRestLength */
+    void SetElementRestLength(double elementRestLength);
+
+    /** @return mLaminaSpringConst */
+    double GetLaminaSpringConst() const;
+
+    /** @param laminaSpringConst the new value of mLaminaSpringConst */
+    void SetLaminaSpringConst(double laminaSpringConst);
+
+    /** @return mLaminaRestLength */
+    double GetLaminaRestLength() const;
+
+    /** @param laminaRestLength the new value of mLaminaRestLength */
+    void SetLaminaRestLength(double laminaRestLength);
 };
 
 #include "SerializationExportWrapper.hpp"
