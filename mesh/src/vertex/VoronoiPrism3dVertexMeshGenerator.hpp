@@ -36,14 +36,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef VORONOIPRISM3DVERTEXMESHGENERATOR_HPP_
 #define VORONOIPRISM3DVERTEXMESHGENERATOR_HPP_
 
-#include <cmath>
 #include <vector>
-
 #include "MutableVertexMesh.hpp"
-#include "RandomNumberGenerator.hpp"
 
 #include <boost/version.hpp>
-
 #if BOOST_VERSION >= 105200
 #include "boost/polygon/voronoi.hpp"
 
@@ -51,17 +47,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Mesh generator that creates a 3D vertex mesh whose cross-section (in the xy plane) is a
  * 2D Voronoi tessellation using a number of Lloyd's relaxation steps
  * (http://en.wikipedia.org/wiki/Lloyd%27s_algorithm).
- *
- * NOTE: the user should delete the mesh after use to manage memory.
  */
 class VoronoiPrism3dVertexMeshGenerator
 {
     friend class TestVoronoiPrism3dVertexMeshGenerator;
 
 protected:
-
     /** A pointer to the mesh that this class creates. */
-    MutableVertexMesh<3,3>* mpMesh;
+    MutableVertexMesh<3, 3>* mpMesh;
 
     /** The number of elements requested across the mesh. */
     unsigned mNumElementsX;
@@ -72,35 +65,11 @@ protected:
     /** The height of elements in Z direction. */
     double mElementHeightZ;
 
-    /** The total number of elements requested in the mesh. */
-    unsigned mTotalNumElements;
-
     /** The number of Lloyd's relaxation steps requested in the Voronoi iteration. */
     unsigned mNumRelaxationSteps;
 
-    /** The number of elements requested across or up the mesh, whichever is greater. */
-    unsigned mMaxNumElems;
-
-    /** The maximum integer position in the x-direction that a seed point could occupy after discretisation.  */
-    int mMaxIntX;
-
-    /** The maximum integer position in the y-direction that a seed point could occupy after discretisation. */
-    int mMaxIntY;
-
     /** The requested average target area of elements in the mesh. */
     double mElementTargetApicalArea;
-
-    /** The scaling factor necessary to ensure that the x-component of seed locations lies between 0.0 and 1.0. */
-    double mMultiplierInX;
-
-    /** The scaling factor necessary to ensure that the y-component of seed locations lies between 0.0 and 1.0. */
-    double mMultiplierInY;
-
-    /** A floating point representation of MAX_INT/2 */
-    double mSamplingMultiplier;
-
-    /** The floating-point tolerance used for checking equality of node locations. */
-    double mTol;
 
     /**
      * The maximum expected number of sides any polygon will have.
@@ -109,57 +78,7 @@ protected:
      */
     unsigned mMaxExpectedNumSidesPerPolygon;
 
-    /**
-     * Helper method for the constructor.
-     *
-     * Produces a vector of random seed points, with some validation, that lie in the rectangle
-     * [0.0, mMultiplierInX] x [0.0, mMultiplierInY]. These seeds are used for the initial
-     * Voronoi diagram construction, before any steps of Lloyd's relaxation.
-     *
-     * @return A vector of seed points
-     */
-    std::vector<c_vector<double, 2> > GetInitialPointLocations();
-
-    /**
-     * Helper method for the constructor.
-     *
-     * @return A vector of 2D centroids (x and y components) corresponding to the elements currently held in mpMesh
-     * for the Voronoi relaxation.
-     */
-    std::vector<c_vector<double, 2> > GetElementCentroidsFromMesh();
-
-    /**
-     * Helper method for the constructor.
-     *
-     * Takes seed locations and updates mpMesh with Nodes and VertexElements corresponding to a
-     * Voronoi diagram derived from the seed points. Boundary effects are eliminated by considering a 3x3 tessellation
-     * of the seed points and only keeping those Voronoi cells corresponding to seed points in the centre tile.
-     * Each seed point must lie in [0.0, mMultiplierInX] x [0.0, mMultiplierInY] for the tessellation to be valid.
-     *
-     * @param rSeedLocations A vector of seed locations for Voronoi cells
-     */
-    void CreateVoronoiTessellation(std::vector<c_vector<double, 2> >& rSeedLocations);
-
-    /**
-     * Helper method for the constructor.
-     *
-     * Validates the input parameters, and sets up remaining member variables.
-     */
-    void ValidateInputAndSetMembers();
-
-    /**
-     * Helper method for the constructor.
-     *
-     * Validates the initial random seed locations, making minute adjustments to seed locations if two points would be
-     * mapped to the same integer lattice point after discretisation. This functionality is in a separate method to allow effective
-     * unit testing.
-     *
-     * @param rSeedLocations The vector of random seed locations
-     */
-    void ValidateSeedLocations(std::vector<c_vector<double, 2> >& rSeedLocations);
-
 public:
-
     /**
      * Constructor.
      *
@@ -170,10 +89,10 @@ public:
      * @param elementTargetArea The requested average target area of elements in the mesh (defaults to 1.0)
      */
     VoronoiPrism3dVertexMeshGenerator(unsigned numElementsX,
-                               unsigned numElementsY,
-                               double elementHeightZ = 1,
-                               unsigned numRelaxationSteps = 0,
-                               double elementTargetApicalArea=1.0);
+                                      unsigned numElementsY,
+                                      double elementHeightZ = 1,
+                                      unsigned numRelaxationSteps = 0,
+                                      double elementTargetApicalArea = 1.0);
 
     /**
      * Null constructor for derived classes to call.
@@ -196,12 +115,12 @@ public:
     /**
      * @return A pointer to a 3D mutable vertex mesh
      */
-    virtual MutableVertexMesh<3,3>* GetMesh();
+    virtual MutableVertexMesh<3, 3>* GetMesh();
 
     /**
      * @return A pointer to a 3D mutable vertex mesh, after ReMesh() has been called to remove short edges
      */
-    virtual MutableVertexMesh<3,3>* GetMeshAfterReMesh();
+    virtual MutableVertexMesh<3, 3>* GetMeshAfterReMesh();
 
     /**
      * @return A vector representing the polygon distribution of the generated mesh, triangles upwards
@@ -247,7 +166,6 @@ public:
 class VoronoiPrism3dVertexMeshGenerator
 {
 public:
-
     /**
      * Fake constructor.
      */

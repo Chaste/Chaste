@@ -36,12 +36,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef VORONOIVERTEXMESHGENERATOR_HPP_
 #define VORONOIVERTEXMESHGENERATOR_HPP_
 
-#include <cmath>
 #include <vector>
 
 #include "MutableVertexMesh.hpp"
 #include "Toroidal2dVertexMesh.hpp"
-#include "RandomNumberGenerator.hpp"
 
 #include <boost/version.hpp>
 
@@ -51,8 +49,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * Mesh generator that creates a 2D Voronoi tessellation using a number
  * of Lloyd's relaxation steps (http://en.wikipedia.org/wiki/Lloyd%27s_algorithm).
- *
- * NOTE: the user should delete the mesh after use to manage memory.
  */
 class VoronoiVertexMeshGenerator
 {

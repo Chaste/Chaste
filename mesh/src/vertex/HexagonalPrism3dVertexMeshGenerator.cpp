@@ -39,16 +39,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MonolayerVertexMeshGenerator.hpp"
 
 HexagonalPrism3dVertexMeshGenerator::HexagonalPrism3dVertexMeshGenerator(unsigned numElementsInXDirection,
-    unsigned numElementsInYDirection,
-    double elementApicalArea,
-    double elementHeight)
+                                                                         unsigned numElementsInYDirection,
+                                                                         double elementApicalArea,
+                                                                         double elementHeight)
 {
     assert(numElementsInXDirection > 0);
     assert(numElementsInYDirection > 0);
     assert(elementApicalArea > 0.0);
     assert(elementHeight > 0.0);
 
-    HoneycombVertexMeshGenerator generator2 (numElementsInXDirection, numElementsInYDirection, false, 1, 1, elementApicalArea);
+    HoneycombVertexMeshGenerator generator2(numElementsInXDirection, numElementsInYDirection, false, 1, 1, elementApicalArea);
     MutableVertexMesh<2, 2>* p_mesh2 = generator2.GetMesh();
     MonolayerVertexMeshGenerator generator("", false);
     mpMesh = generator.MakeMeshUsing2dMesh(*p_mesh2, elementHeight);
@@ -59,7 +59,7 @@ HexagonalPrism3dVertexMeshGenerator::~HexagonalPrism3dVertexMeshGenerator()
     delete mpMesh;
 }
 
-MutableVertexMesh<3,3>* HexagonalPrism3dVertexMeshGenerator::GetMesh()
+MutableVertexMesh<3, 3>* HexagonalPrism3dVertexMeshGenerator::GetMesh()
 {
     return mpMesh;
 }
