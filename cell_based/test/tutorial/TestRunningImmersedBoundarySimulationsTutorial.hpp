@@ -127,10 +127,11 @@ public:
         simulator.SetNumericalMethod(boost::make_shared<ForwardEulerNumericalMethod<2,2> >());
         simulator.GetNumericalMethod()->SetUseUpdateNodeLocation(true);
 
+        double dt = 0.01;
         simulator.SetOutputDirectory("TestImmersedBoundaryDemoTutorial");
-        simulator.SetDt(0.01);
+        simulator.SetDt(dt);
         simulator.SetSamplingTimestepMultiple(10);
-        simulator.SetEndTime(10.0);
+        simulator.SetEndTime(100.0 * dt);
 
         /* All of the machinery for the immersed boundary method is handled in the following {{{SimulationModifier}}}.
          * Here, we create a 'shared pointer' to an {{{ImmersedBoundarySimulationModifier}}} object and pass it to the
