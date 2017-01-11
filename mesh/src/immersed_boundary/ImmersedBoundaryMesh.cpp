@@ -1498,11 +1498,6 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ReMeshElement(ImmersedBoundar
     unsigned this_region = pElement->GetNode(0)->GetRegion();
     double total_dist = 0.0;
 
-    //\todo remove this (by doing better region handling)
-    double top_height = 0.0;
-    double bottom_height = 1.0;
-    c_vector<double, SPACE_DIM> centroid = this->GetCentroidOfElement(pElement->GetIndex());
-
     for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
     {
         // Global indices of the node at this local index, and the next one
@@ -1517,15 +1512,6 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ReMeshElement(ImmersedBoundar
         // Store a copy of the node location: this allows us to directly update nodes positions in the next loop
         old_locations[node_idx] = c_vector<double, SPACE_DIM>(pElement->GetNode(node_idx)->rGetLocation());
 
-        if (old_locations[node_idx][1] > top_height)
-        {
-            top_height = old_locations[node_idx][1];
-        }
-        else if(old_locations[node_idx][1] < bottom_height)
-        {
-            bottom_height = old_locations[node_idx][1];
-        }
-
         // If the region is changing, add this change to the region vectors
         if (pElement->GetNode(next_local_idx)->GetRegion() != this_region)
         {
@@ -1537,13 +1523,8 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ReMeshElement(ImmersedBoundar
         }
     }
 
-    double cell_height = top_height - bottom_height;
-    double apical_cutoff = bottom_height + 0.9 * cell_height;
-    double peri_cutoff = bottom_height + 0.8 * cell_height;
-    double basal_cutoff = bottom_height + 0.1 * cell_height;
-
     // Are there any region changes in this element?  If so, start from the first region change, else at node 0
-    bool multiple_regions = false;//region_changes.size() > 0;
+    bool multiple_regions = region_changes.size() > 0;
     unsigned start_idx = multiple_regions ? region_changes[0] : 0;
     unsigned end_idx = start_idx + num_nodes;
 
@@ -1610,49 +1591,7 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ReMeshElement(ImmersedBoundar
 
         Node<SPACE_DIM>* p_node = pElement->GetNode(new_idx % num_nodes);
         p_node->SetPoint(ChastePoint<SPACE_DIM>(new_location));
-//        p_node->SetRegion(region_at_change[region_idx]);
-
-        //\todo remove this (by doing better region handling)
-        double left_right = this->GetVectorFromAtoB(new_location, centroid)[0];
-
-        if (left_right < 0)
-        {
-            if (new_location[1] > apical_cutoff)
-            {
-                p_node->SetRegion(RIGHT_APICAL_REGION);
-            }
-            else if (new_location[1] > peri_cutoff)
-            {
-                p_node->SetRegion(RIGHT_PERIAPICAL_REGION);
-            }
-            else if (new_location[1] > basal_cutoff)
-            {
-                p_node->SetRegion(RIGHT_LATERAL_REGION);
-            }
-            else
-            {
-                p_node->SetRegion(RIGHT_BASAL_REGION);
-            }
-        }
-        else
-        {
-            if (new_location[1] > apical_cutoff)
-            {
-                p_node->SetRegion(LEFT_APICAL_REGION);
-            }
-            else if (new_location[1] > peri_cutoff)
-            {
-                p_node->SetRegion(LEFT_PERIAPICAL_REGION);
-            }
-            else if (new_location[1] > basal_cutoff)
-            {
-                p_node->SetRegion(LEFT_LATERAL_REGION);
-            }
-            else
-            {
-                p_node->SetRegion(LEFT_BASAL_REGION);
-            }
-        }
+        p_node->SetRegion(region_at_change[region_idx]);
     }
 }
 
