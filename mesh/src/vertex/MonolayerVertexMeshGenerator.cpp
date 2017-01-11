@@ -274,7 +274,7 @@ MutableVertexMesh<3, 3>* MonolayerVertexMeshGenerator::ConvertMeshToCylinder(con
     for (unsigned index_a=0; index_a<boundary_nodes.size(); ++index_a)
     {
         Node<3>* node_a = boundary_nodes[index_a];
-        // Skip over identified nodes for efficiency
+        // Skip over identified nodes
         if (node_a == NULL)
         {
             continue;
@@ -349,12 +349,11 @@ MutableVertexMesh<3, 3>* MonolayerVertexMeshGenerator::ConvertMeshToCylinder(con
 
         for (unsigned index_b=index_a+1; index_b<boundary_faces.size(); ++index_b)
         {
-            if (boundary_faces[index_b] == NULL)
+            VertexElement<2, 3>* p_face_b = boundary_faces[index_b];
+            if (p_face_b == NULL)
             {
                 continue;
             }
-
-            VertexElement<2, 3>* p_face_b = boundary_faces[index_b];
 
             if (nodes_for_boundary_face[index_a] == nodes_for_boundary_face[index_b])
             {
@@ -362,24 +361,26 @@ MutableVertexMesh<3, 3>* MonolayerVertexMeshGenerator::ConvertMeshToCylinder(con
                 boundary_faces[index_b] = NULL;
                 deleted_faces.push_back(p_face_b);
 
-                std::set<unsigned> elem_a_index = p_face_a->rFaceGetContainingElementIndices();
-                assert(elem_a_index.size() == 1);
-                VertexElement<3, 3>* p_elem_a = mpMesh->GetElement(*elem_a_index.begin());
-                ///\todo: #2850 get face orientation
-                std::vector<unsigned> v_tmp = GetLateralFace(p_elem_a, p_face_a->GetNodeGlobalIndex(0), p_face_a->GetNodeGlobalIndex(1));
-                assert(v_tmp[0] != UINT_MAX);
-                const bool face_orientation_a = v_tmp[1];
-
+                if (p_face_a->FaceGetNumContainingElements() != 1)
+                {
+                    NEVER_REACHED;
+                }
                 std::set<unsigned> elem_b_index = p_face_b->rFaceGetContainingElementIndices();
-                assert(elem_b_index.size() == 1);
+                if (elem_b_index.size() != 1)
+                {
+                    NEVER_REACHED;
+                }
                 VertexElement<3, 3>* p_elem_b = mpMesh->GetElement(*elem_b_index.begin());
-                v_tmp = GetLateralFace(p_elem_b, p_face_b->GetNodeGlobalIndex(0), p_face_b->GetNodeGlobalIndex(1));
-                assert(v_tmp[0] == p_face_b->GetIndex());
-                const unsigned index_tmp = v_tmp[2];
-
-                p_elem_b->ReplaceFace(index_tmp, p_face_a, !face_orientation_a);
+                const unsigned face_b_local_index = p_elem_b->GetFaceLocalIndex(p_face_b->GetIndex());
+                if (face_b_local_index == UINT_MAX)
+                {   
+                    NEVER_REACHED;
+                }
+                
+                // Simply assign face orientation as MonolayerElementRearrangeFacesNodes will settle it.
+                p_elem_b->ReplaceFace(face_b_local_index, p_face_a, false);
                 p_elem_b->MonolayerElementRearrangeFacesNodes();
-                //MARK
+                
                 // Break the loop as the congruent node is found.
                 break;
             }
@@ -395,11 +396,11 @@ MutableVertexMesh<3, 3>* MonolayerVertexMeshGenerator::ConvertMeshToCylinder(con
         }
     }
 
+    // Remove deleted nodes and faces.
     for (unsigned ind=0; ind<deleted_nodes.size(); ++ind)
     {
         mpMesh->DeleteNodePriorToReMesh(deleted_nodes[ind]->GetIndex());
     }
-
     for (unsigned ind=0; ind<deleted_faces.size(); ++ind)
     {
         mpMesh->DeleteFacePriorToReMesh(deleted_faces[ind]->GetIndex());
@@ -416,16 +417,19 @@ MutableVertexMesh<3, 3>* MonolayerVertexMeshGenerator::ConvertMeshToCylinder(con
         c_vector<double, 3>& basal_position_ref = basal_node->rGetModifiableLocation();
         basal_position_ref[1] = length*basal_position_ref[1]/widthY;
         const double basal_theta = 2*M_PI*basal_position_ref[0]/widthX;
-        basal_position_ref[0] = radius*cos(basal_theta);
-        basal_position_ref[2] = radius*sin(basal_theta);
+        basal_position_ref[0] = radius*sin(basal_theta);
+        basal_position_ref[2] = radius*cos(basal_theta);
 
         Node<3>* apical_node = mpMesh->GetNode(node_index+half_num_nodes);
         c_vector<double, 3>& apical_position_ref = apical_node->rGetModifiableLocation();
         apical_position_ref[1] = length*apical_position_ref[1]/widthY;
         const double apical_theta = apical_position_ref[0]/widthX*2*M_PI;
-        apical_position_ref[0] = (radius+thickness)*cos(apical_theta);
-        apical_position_ref[2] = (radius+thickness)*sin(apical_theta);
+        apical_position_ref[0] = (radius+thickness)*sin(apical_theta);
+        apical_position_ref[2] = (radius+thickness)*cos(apical_theta);
     }
+
+    for (unsigned i=0; i<mpMesh->GetNumElements(); mpMesh->GetElement(i++)->MonolayerElementRearrangeFacesNodes());
+    
     return mpMesh;
 }
 

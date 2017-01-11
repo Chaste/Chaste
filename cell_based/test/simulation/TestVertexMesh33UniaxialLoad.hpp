@@ -65,8 +65,8 @@ class TestVertexMesh33UniaxialLoad : public AbstractCellBasedTestSuite
 private:
     static const double z_height = 1;
     static const double target_area = 1;
-    static const unsigned num_cells_x = 9;
-    static const unsigned num_cells_y = 5;
+    const unsigned num_cells_x = 9;
+    const unsigned num_cells_y = 5;
     static const double end_time = 1;
 
 public:
@@ -144,51 +144,54 @@ public:
         TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
 
-//    void TestCylindricalMesh()
-//    {
-//        const unsigned x = 4;
-//        const unsigned y = 4;
-//        const double a = 2;
-//        const double length = 3*sqrt(3)*y+sqrt(3);
-//        const double radius = a/M_PI/2*x;
-//        HoneycombVertexMeshGenerator generator(x, y, false, 0.1, 0.01, 2*sqrt(3));
-//        MutableVertexMesh<2, 2>& vertex_2mesh = *(generator.GetMesh());
-//        MonolayerVertexMeshGenerator builder;
-//        MutableVertexMesh<3, 3>* p_mesh = builder.MakeMeshUsing2dMesh(vertex_2mesh);
-//        std::string output_filename = "TestUniaxialLoad/CylinderTest_SmallVolume" + boost::lexical_cast<std::string>(x)
-//                                            + "x" + boost::lexical_cast<std::string>(y);
-//        builder.WriteVtk(output_filename, "InitialMesh");
-//
-//        builder.ConvertMeshToCylinder(2*x, 1, radius, 1, 1);
-//        builder.WriteVtk(output_filename, "After");
-//
-//        std::vector<CellPtr> cells;
-//        CellsGenerator<NoCellCycleModel, 3> cells_generator;
-//        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
-//        VertexBasedCellPopulation<3> cell_population(*p_mesh, cells);
-//
-//        OffLatticeSimulation<3> simulator(cell_population);
-//        simulator.SetOutputDirectory(output_filename);
-//        simulator.SetSamplingTimestepMultiple(10);
-//        simulator.SetEndTime(end_time);
-//
-//        MAKE_PTR(GeneralMonolayerVertexMeshForce, p_force3);
-//        p_force3->SetApicalParameters(20, 20, 0.7);
-//        p_force3->SetBasalParameters(20, 20, 0.7);
-//        p_force3->SetLateralParameter(8);
-//        p_force3->SetVolumeParameters(100, 1);
-//        simulator.AddForce(p_force3);
-//        MAKE_PTR(HorizontalStretchForce<3>, p_force2);
-//        p_force2->SetForceMagnitude(1.0);
-//        p_force2->SetRelativeWidth(0.15);
-////        simulator.AddForce(p_force2);
-//
-//        simulator.Solve();
-//
-//        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), x*y);
-//        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
-//    }
-//
+    void TestCylindricalMesh()
+    {
+        const unsigned x = 8;
+        const unsigned y = 2;
+        const double a = 2;
+        const double length = 3 * sqrt(3) * y + sqrt(3);
+        const double radius = a / M_PI / 2 * x;
+        HoneycombVertexMeshGenerator generator(x, y, false, 0.1, 0.01, 2 * sqrt(3));
+        MutableVertexMesh<2, 2>& vertex_2mesh = *(generator.GetMesh());
+        MonolayerVertexMeshGenerator builder;
+        MutableVertexMesh<3, 3>* p_mesh = builder.MakeMeshUsing2dMesh(vertex_2mesh);
+        std::string output_filename = "TestUniaxialLoad/CylinderTest_SmallVolume" + boost::lexical_cast<std::string>(x)
+            + "x" + boost::lexical_cast<std::string>(y);
+        builder.WriteVtk(output_filename, "InitialMesh");
+
+        builder.ConvertMeshToCylinder(2 * x, 1, radius, 0.5, 1);
+        builder.WriteVtk(output_filename, "After");
+
+        builder.PrintMesh();
+        {
+            std::vector<double> volumes;
+            for (unsigned i=0; i<p_mesh->GetNumElements(); volumes.push_back(p_mesh->GetVolumeOfElement(i++)));
+            PRINT_CONTAINER(volumes)
+        }
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<NoCellCycleModel, 3> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
+        VertexBasedCellPopulation<3> cell_population(*p_mesh, cells);
+
+        OffLatticeSimulation<3> simulator(cell_population);
+        simulator.SetOutputDirectory(output_filename);
+        simulator.SetSamplingTimestepMultiple(10);
+        simulator.SetEndTime(end_time);
+
+        MAKE_PTR(GeneralMonolayerVertexMeshForce, p_force3);
+        // p_force3->SetApicalParameters(20, 20, 0.7);
+        // p_force3->SetBasalParameters(20, 20, 0.7);
+        // p_force3->SetLateralParameter(8);
+        p_force3->SetVolumeParameters(100, 1);
+        simulator.AddForce(p_force3);
+
+        simulator.Solve();
+
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), x * y);
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
+    }
+
     void TestCellGrowth() throw (Exception)
     {
         // Make a mesh of 10x10
@@ -212,7 +215,6 @@ public:
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         CellsGenerator<UniformG1GenerationalCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_transit_type);
-
         VertexBasedCellPopulation<3> cell_population(*p_mesh, cells);
 
         OffLatticeSimulation<3> simulator(cell_population);
@@ -255,8 +257,11 @@ public:
         sBuilder.WriteVtk(output_filename, "InitialMesh");
 
         std::vector<CellPtr> cells;
-        CellsGenerator<NoCellCycleModel, 3> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
+        // CellsGenerator<NoCellCycleModel, 3> cells_generator;
+        // cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
+        CellsGenerator<UniformG1GenerationalCellCycleModel, 3> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_transit_type);
         VertexBasedCellPopulation<3> cell_population(*p_mesh, cells);
 
         OffLatticeSimulation<3> simulator(cell_population);
@@ -277,7 +282,7 @@ public:
 
         simulator.Solve();
 
-        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 162u);
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 176u);
         TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), s_end_time, 1e-10);
     }
 
@@ -329,13 +334,11 @@ public:
         TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
         TS_ASSERT_DELTA(p_mesh->GetVolumeOfElement(0), target_volume, 0.05);
 
-
         simulator.SetEndTime(end_time*2);
         p_force3->SetVolumeParameters(350, target_volume/2);
         simulator.Solve();
         TS_ASSERT_DELTA(p_mesh->GetVolumeOfElement(0), target_volume/2, 0.05);
     }
-
 };
 
 #endif /*TESTVERTEXMESH33UNIAXIALLOAD_HPP_*/

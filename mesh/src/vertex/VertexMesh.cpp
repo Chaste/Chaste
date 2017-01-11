@@ -1539,6 +1539,10 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateAreaOfFace(const VertexEleme
 template<>
 c_vector<double, 3> VertexMesh<3, 3>::GetShortAxisOfElement(const unsigned index) const
 {
+    /*
+    *   For now the return vector will be the normal of plane spanned by the the normal
+    *   of basal face's short-axis and its face normal.
+    */ ///\todo: #2850
     if (!IsMonolayerElement(this->GetElement(index)))
     {
         NEVER_REACHED;
@@ -1636,7 +1640,7 @@ c_vector<double, 3> VertexMesh<3, 3>::GetShortAxisOfElement(const unsigned index
         }
     }
 
-    c_vector<double, 3> return_v = short_axis_e1*e1 + short_axis_e2*e2;
+    c_vector<double, 3> return_v = short_axis_e1*e2 + short_axis_e2*e1;
     return_v /= norm_2(return_v);
 
 

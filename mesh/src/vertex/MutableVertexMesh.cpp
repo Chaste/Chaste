@@ -831,7 +831,9 @@ unsigned MutableVertexMesh<3, 3>::DivideElementAlongGivenAxis(VertexElement<3, 3
     if (intersecting_apical_nodes[0]!=intersecting_basal_nodes[0] || intersecting_apical_nodes[1]!=intersecting_basal_nodes[1])
     {
         ///\todo #2850 proceed with element division even with such case
-        EXCEPTION("Cannot proceed with element division: the plane of division splits apical and basal faces at different locations.");
+        WARNING("Cannot proceed with element division: the plane of division splits apical and basal faces at different locations.");
+
+        intersecting_apical_nodes = intersecting_basal_nodes;
     }
 
     std::vector<Node<3>*> division_nodes;
