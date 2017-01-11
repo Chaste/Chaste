@@ -42,7 +42,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractImmersedBoundaryForce.hpp"
 #include "ImmersedBoundaryCellPopulation.hpp"
 
-#include <iostream>
 
 /**
  * A force class for use in immersed boundary simulations. This force implements elastic links between adjacent nodes
