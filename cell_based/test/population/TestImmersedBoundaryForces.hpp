@@ -121,8 +121,10 @@ public:
             boost::archive::text_oarchive output_arch(ofs);
 
             // Set member variables
-            force.SetSpringConstant(1.2);
-            force.SetRestLengthMultiplier(7.8);
+            force.SetElementSpringConst(1.23);
+            force.SetElementRestLength(2.34);
+            force.SetLaminaSpringConst(3.45);
+            force.SetLaminaRestLength(4.56);
 
             // Serialize via pointer to most abstract class possible
             AbstractImmersedBoundaryForce<2>* const p_force = &force;
@@ -140,8 +142,10 @@ public:
             input_arch >> p_force;
 
             // Check member variables have been correctly archived
-            TS_ASSERT_DELTA(static_cast<ImmersedBoundaryMembraneElasticityForce<2>*>(p_force)->GetSpringConstant(), 1.2, 1e-6);
-            TS_ASSERT_DELTA(static_cast<ImmersedBoundaryMembraneElasticityForce<2>*>(p_force)->GetRestLengthMultiplier(), 7.8, 1e-6);
+            TS_ASSERT_DELTA(static_cast<ImmersedBoundaryMembraneElasticityForce<2>*>(p_force)->GetElementSpringConst(), 1.23, 1e-6);
+            TS_ASSERT_DELTA(static_cast<ImmersedBoundaryMembraneElasticityForce<2>*>(p_force)->GetElementRestLength(), 2.34, 1e-6);
+            TS_ASSERT_DELTA(static_cast<ImmersedBoundaryMembraneElasticityForce<2>*>(p_force)->GetLaminaSpringConst(), 3.45, 1e-6);
+            TS_ASSERT_DELTA(static_cast<ImmersedBoundaryMembraneElasticityForce<2>*>(p_force)->GetLaminaRestLength(), 4.56, 1e-6);
 
             // Tidy up
             delete p_force;
@@ -176,8 +180,10 @@ public:
 
         // Test with ImmersedBoundaryMembraneElasticityForce
         ImmersedBoundaryMembraneElasticityForce<2> membrane_force;
-        membrane_force.SetSpringConstant(1.2);
-        membrane_force.SetRestLengthMultiplier(7.8);
+        membrane_force.SetElementSpringConst(5.67);
+        membrane_force.SetElementRestLength(6.78);
+        membrane_force.SetLaminaSpringConst(7.89);
+        membrane_force.SetLaminaRestLength(8.91);
 
         TS_ASSERT_EQUALS(membrane_force.GetIdentifier(), "ImmersedBoundaryMembraneElasticityForce-2");
 
