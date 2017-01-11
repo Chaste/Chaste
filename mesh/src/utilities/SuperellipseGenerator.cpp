@@ -41,6 +41,8 @@ SuperellipseGenerator::SuperellipseGenerator(unsigned numPoints,
                                              double height,
                                              double botLeftX,
                                              double botLeftY)
+        : mTargetNodeSpacing(DOUBLE_UNSET),
+          mHeightOfTopSurface(botLeftY + height)
 {
     // Validate input
     assert(numPoints > 1);
@@ -135,35 +137,41 @@ SuperellipseGenerator::SuperellipseGenerator(unsigned numPoints,
     }
 
     /*
-     * Calculate the height of the top surface.  We loop through the points looking at the change in x and change in y
-     * from the previous point.  The first difference in which the absolute change in x is greater than the absolute
-     * change in y will be the point with maximal curvature.
+     * If the exponent is at least 1, we return the default value which is the y-coord with largest value.
+     *
+     * If the exponent is less than 1, the top surface is defined as the height at which maximum curvature is attained.
+     * We loop through the points looking at the change in x and change in y from the previous point.  The first
+     * difference in which the absolute change in x is greater than the absolute change in y will be the point with
+     * maximal curvature, for a superellipse.
      */
-    double delta_x = fabs(mPoints[0][0] - mPoints[1][0]);
-    double delta_y = fabs(mPoints[0][1] - mPoints[1][1]);
-
-    // The following should always hold, for an exponent less than 1.0
-    if (delta_x > delta_y)
+    if (ellipseExponent < 1.0)
     {
-        NEVER_REACHED;
-    }
+        double delta_x = fabs(mPoints[0][0] - mPoints[1][0]);
+        double delta_y = fabs(mPoints[0][1] - mPoints[1][1]);
 
-    for (unsigned i = 1; i < numPoints; i++)
-    {
-        delta_x = fabs(mPoints[i][0] - mPoints[i-1][0]);
-        delta_y = fabs(mPoints[i][1] - mPoints[i-1][1]);
-
+        // The following should always hold, for an exponent less than 1.0
         if (delta_x > delta_y)
         {
-            mHeightOfTopSurface = 0.5 * (mPoints[i][1] + mPoints[i-1][1]);
-
-            break;
+            NEVER_REACHED;
         }
 
-        // We should meet this condition before being half way through the list
-        if (i == unsigned(numPoints / 2.0))
+        for (unsigned i = 1; i < numPoints; i++)
         {
-            NEVER_REACHED;
+            delta_x = fabs(mPoints[i][0] - mPoints[i - 1][0]);
+            delta_y = fabs(mPoints[i][1] - mPoints[i - 1][1]);
+
+            if (delta_x > delta_y)
+            {
+                mHeightOfTopSurface = 0.5 * (mPoints[i][1] + mPoints[i - 1][1]);
+
+                break;
+            }
+
+            // We should meet this condition before being half way through the list
+            if (i == unsigned(numPoints / 2.0))
+            {
+                NEVER_REACHED;
+            }
         }
     }
 
