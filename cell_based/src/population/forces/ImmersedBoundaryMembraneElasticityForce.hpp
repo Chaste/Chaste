@@ -36,8 +36,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef IMMERSEDBOUNDARYMEMBRANEELASTICITYFORCE_HPP_
 #define IMMERSEDBOUNDARYMEMBRANEELASTICITYFORCE_HPP_
 
-#include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
+#include "ChasteSerialization.hpp"
 
 #include "AbstractImmersedBoundaryForce.hpp"
 #include "ImmersedBoundaryCellPopulation.hpp"
@@ -48,11 +48,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * A force class for use in immersed boundary simulations. This force implements elastic links between adjacent nodes
  * in each immersed boundary.
  */
-template<unsigned DIM>
+template <unsigned DIM>
 class ImmersedBoundaryMembraneElasticityForce : public AbstractImmersedBoundaryForce<DIM>
 {
 private:
-
     friend class boost::serialization::access;
     /**
      * Boost Serialization method for archiving/checkpointing.
@@ -61,14 +60,14 @@ private:
      * @param archive  The boost archive.
      * @param version  The current version of this class.
      */
-    template<class Archive>
-    void serialize(Archive & archive, const unsigned int version)
+    template <class Archive>
+    void serialize(Archive& archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractImmersedBoundaryForce<DIM> >(*this);
-        archive & mElementSpringConst;
-        archive & mElementRestLength;
-        archive & mLaminaSpringConst;
-        archive & mLaminaRestLength;
+        archive& boost::serialization::base_object<AbstractImmersedBoundaryForce<DIM> >(*this);
+        archive& mElementSpringConst;
+        archive& mElementRestLength;
+        archive& mLaminaSpringConst;
+        archive& mLaminaRestLength;
     }
 
     /** The spring constant associated with each element */
@@ -97,7 +96,6 @@ private:
                                   double intrinsicSpacingSquared);
 
 public:
-
     /** Constructor */
     ImmersedBoundaryMembraneElasticityForce();
 

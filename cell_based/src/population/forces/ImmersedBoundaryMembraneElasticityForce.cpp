@@ -43,10 +43,9 @@ ImmersedBoundaryMembraneElasticityForce<DIM>::ImmersedBoundaryMembraneElasticity
           mLaminaSpringConst(1e6),
           mLaminaRestLength(0.5)
 {
-
 }
 
-template<unsigned DIM>
+template <unsigned DIM>
 ImmersedBoundaryMembraneElasticityForce<DIM>::~ImmersedBoundaryMembraneElasticityForce()
 {
 }
@@ -105,7 +104,7 @@ void ImmersedBoundaryMembraneElasticityForce<DIM>::CalculateForcesOnElement(Imme
     double rest_length = 0.0;
 
     // Determine if we're in a lamina or not
-    if(ELEMENT_DIM < DIM)
+    if (ELEMENT_DIM < DIM)
     {
         node_spacing = rCellPopulation.rGetMesh().GetAverageNodeSpacingOfLamina(elem_idx, false);
 
@@ -148,7 +147,7 @@ void ImmersedBoundaryMembraneElasticityForce<DIM>::CalculateForcesOnElement(Imme
     }
 }
 
-template<unsigned DIM>
+template <unsigned DIM>
 void ImmersedBoundaryMembraneElasticityForce<DIM>::OutputImmersedBoundaryForceParameters(out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<ElementSpringConstant>" << mElementSpringConst << "</ElementSpringConstant>\n";
