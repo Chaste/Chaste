@@ -140,6 +140,18 @@ public:
         TS_ASSERT_DELTA(gen_square.GetTargetNodeSpacing(), 4.0 / double(num_points), 1e-6);
     }
 
+    void TestGetHeightOfTopSurface() throw(Exception)
+    {
+        //\todo implement this test
+        {
+            // case 1: exponent >= 1
+        }
+        {
+            // case 2: exponent < 1
+        }
+
+    }
+
     void TestGetPointsAsChastePoints() throw(Exception)
     {
         unsigned num_points = 123;
