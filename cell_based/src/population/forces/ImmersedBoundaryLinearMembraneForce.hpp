@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef IMMERSEDBOUNDARYMEMBRANEELASTICITYFORCE_HPP_
-#define IMMERSEDBOUNDARYMEMBRANEELASTICITYFORCE_HPP_
+#ifndef IMMERSEDBOUNDARYLINEARMEMBRANEFORCE_HPP_
+#define IMMERSEDBOUNDARYLINEARMEMBRANEFORCE_HPP_
 
 #include <boost/serialization/base_object.hpp>
 #include "ChasteSerialization.hpp"
@@ -42,13 +42,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractImmersedBoundaryForce.hpp"
 #include "ImmersedBoundaryCellPopulation.hpp"
 
-
 /**
  * A force class for use in immersed boundary simulations. This force implements elastic links between adjacent nodes
  * in each immersed boundary.
  */
 template <unsigned DIM>
-class ImmersedBoundaryMembraneElasticityForce : public AbstractImmersedBoundaryForce<DIM>
+class ImmersedBoundaryLinearMembraneForce : public AbstractImmersedBoundaryForce<DIM>
 {
 private:
     friend class boost::serialization::access;
@@ -96,10 +95,10 @@ private:
 
 public:
     /** Constructor */
-    ImmersedBoundaryMembraneElasticityForce();
+    ImmersedBoundaryLinearMembraneForce();
 
     /** Destructor */
-    virtual ~ImmersedBoundaryMembraneElasticityForce();
+    virtual ~ImmersedBoundaryLinearMembraneForce();
 
     /**
      * Overridden AddImmersedBoundaryForceContribution() method.
@@ -143,6 +142,6 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(ImmersedBoundaryMembraneElasticityForce)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(ImmersedBoundaryLinearMembraneForce)
 
-#endif /*IMMERSEDBOUNDARYMEMBRANEELASTICITYFORCE_HPP_*/
+#endif /*IMMERSEDBOUNDARYLINEARMEMBRANEFORCE_HPP_*/

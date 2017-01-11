@@ -72,7 +72,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ImmersedBoundaryCellPopulation.hpp"
 #include "ImmersedBoundarySimulationModifier.hpp"
 #include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
-#include "ImmersedBoundaryMembraneElasticityForce.hpp"
+#include "ImmersedBoundaryLinearMembraneForce.hpp"
 #include "ImmersedBoundaryCellCellInteractionForce.hpp"
 
 // This test is never run in parallel

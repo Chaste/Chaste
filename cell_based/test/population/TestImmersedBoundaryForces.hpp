@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Includes from projects/ImmersedBoundary
 #include "ImmersedBoundaryCellCellInteractionForce.hpp"
-#include "ImmersedBoundaryMembraneElasticityForce.hpp"
+#include "ImmersedBoundaryLinearMembraneForce.hpp"
 #include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
 
 // This test is never run in parallel
@@ -103,19 +103,19 @@ public:
         }
     }
 
-    void TestImmersedBoundaryMembraneElasticityForce() throw (Exception)
+    void TestImmersedBoundaryLinearMembraneForce() throw (Exception)
     {
         ///\todo Test this class
     }
 
-    void TestArchivingOfImmersedBoundaryMembraneElasticityForce() throw (Exception)
+    void TestArchivingOfImmersedBoundaryLinearMembraneForce() throw (Exception)
     {
         EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
         OutputFileHandler handler("archive", false);
-        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "ImmersedBoundaryMembraneElasticityForce.arch";
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "ImmersedBoundaryLinearMembraneForce.arch";
 
         {
-            ImmersedBoundaryMembraneElasticityForce<2> force;
+            ImmersedBoundaryLinearMembraneForce<2> force;
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
@@ -142,10 +142,10 @@ public:
             input_arch >> p_force;
 
             // Check member variables have been correctly archived
-            TS_ASSERT_DELTA(static_cast<ImmersedBoundaryMembraneElasticityForce<2>*>(p_force)->GetElementSpringConst(), 1.23, 1e-6);
-            TS_ASSERT_DELTA(static_cast<ImmersedBoundaryMembraneElasticityForce<2>*>(p_force)->GetElementRestLength(), 2.34, 1e-6);
-            TS_ASSERT_DELTA(static_cast<ImmersedBoundaryMembraneElasticityForce<2>*>(p_force)->GetLaminaSpringConst(), 3.45, 1e-6);
-            TS_ASSERT_DELTA(static_cast<ImmersedBoundaryMembraneElasticityForce<2>*>(p_force)->GetLaminaRestLength(), 4.56, 1e-6);
+            TS_ASSERT_DELTA(static_cast<ImmersedBoundaryLinearMembraneForce<2>*>(p_force)->GetElementSpringConst(), 1.23, 1e-6);
+            TS_ASSERT_DELTA(static_cast<ImmersedBoundaryLinearMembraneForce<2>*>(p_force)->GetElementRestLength(), 2.34, 1e-6);
+            TS_ASSERT_DELTA(static_cast<ImmersedBoundaryLinearMembraneForce<2>*>(p_force)->GetLaminaSpringConst(), 3.45, 1e-6);
+            TS_ASSERT_DELTA(static_cast<ImmersedBoundaryLinearMembraneForce<2>*>(p_force)->GetLaminaRestLength(), 4.56, 1e-6);
 
             // Tidy up
             delete p_force;
@@ -178,14 +178,14 @@ public:
             TS_ASSERT(comparer.CompareFiles());
         }
 
-        // Test with ImmersedBoundaryMembraneElasticityForce
-        ImmersedBoundaryMembraneElasticityForce<2> membrane_force;
+        // Test with ImmersedBoundaryLinearMembraneForce
+        ImmersedBoundaryLinearMembraneForce<2> membrane_force;
         membrane_force.SetElementSpringConst(5.67);
         membrane_force.SetElementRestLength(6.78);
         membrane_force.SetLaminaSpringConst(7.89);
         membrane_force.SetLaminaRestLength(8.91);
 
-        TS_ASSERT_EQUALS(membrane_force.GetIdentifier(), "ImmersedBoundaryMembraneElasticityForce-2");
+        TS_ASSERT_EQUALS(membrane_force.GetIdentifier(), "ImmersedBoundaryLinearMembraneForce-2");
 
         out_stream membrane_force_parameter_file = output_file_handler.OpenOutputFile("ib_membrane.parameters");
         membrane_force.OutputImmersedBoundaryForceParameters(membrane_force_parameter_file);

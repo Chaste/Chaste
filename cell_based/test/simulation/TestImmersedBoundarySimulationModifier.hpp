@@ -55,7 +55,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ImmersedBoundaryCellPopulation.hpp"
 #include "ImmersedBoundarySimulationModifier.hpp"
 #include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
-#include "ImmersedBoundaryMembraneElasticityForce.hpp"
+#include "ImmersedBoundaryLinearMembraneForce.hpp"
 #include "ImmersedBoundaryCellCellInteractionForce.hpp"
 
 // This test is never run in parallel
@@ -275,7 +275,7 @@ public:
         modifier.SetupConstantMemberVariables(cell_population);
 
         // Add two immersed boundary force objects to the simulation modifier
-        MAKE_PTR(ImmersedBoundaryMembraneElasticityForce<2>, p_boundary_force);
+        MAKE_PTR(ImmersedBoundaryLinearMembraneForce<2>, p_boundary_force);
         modifier.AddImmersedBoundaryForce(p_boundary_force);
         p_boundary_force->SetElementSpringConst(1.0 * 1e7);
         p_boundary_force->SetLaminaSpringConst(1.0 * 1e7);

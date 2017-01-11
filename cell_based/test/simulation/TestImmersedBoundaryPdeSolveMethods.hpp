@@ -58,7 +58,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ImmersedBoundarySimulationModifier.hpp"
 #include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
 #include "SuperellipseGenerator.hpp"
-#include "ImmersedBoundaryMembraneElasticityForce.hpp"
+#include "ImmersedBoundaryLinearMembraneForce.hpp"
 
 // This test is never run in parallel
 #include "FakePetscSetup.hpp"
@@ -106,7 +106,7 @@ public:
 //        simulator.AddSimulationModifier(p_mod);
 //
 //        // Add force laws
-//        MAKE_PTR(ImmersedBoundaryMembraneElasticityForce<2>, p_boundary_force);
+//        MAKE_PTR(ImmersedBoundaryLinearMembraneForce<2>, p_boundary_force);
 //        p_mod->AddImmersedBoundaryForce(p_boundary_force);
 //
 //        /*

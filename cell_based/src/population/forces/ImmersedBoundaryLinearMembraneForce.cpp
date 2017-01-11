@@ -33,10 +33,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "ImmersedBoundaryMembraneElasticityForce.hpp"
+#include "ImmersedBoundaryLinearMembraneForce.hpp"
 
 template <unsigned DIM>
-ImmersedBoundaryMembraneElasticityForce<DIM>::ImmersedBoundaryMembraneElasticityForce()
+ImmersedBoundaryLinearMembraneForce<DIM>::ImmersedBoundaryLinearMembraneForce()
         : AbstractImmersedBoundaryForce<DIM>(),
           mElementSpringConst(1e6),
           mElementRestLength(0.5),
@@ -46,13 +46,13 @@ ImmersedBoundaryMembraneElasticityForce<DIM>::ImmersedBoundaryMembraneElasticity
 }
 
 template <unsigned DIM>
-ImmersedBoundaryMembraneElasticityForce<DIM>::~ImmersedBoundaryMembraneElasticityForce()
+ImmersedBoundaryLinearMembraneForce<DIM>::~ImmersedBoundaryLinearMembraneForce()
 {
 }
 
 template <unsigned DIM>
-void ImmersedBoundaryMembraneElasticityForce<DIM>::AddImmersedBoundaryForceContribution(std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs,
-                                                                                        ImmersedBoundaryCellPopulation<DIM>& rCellPopulation)
+void ImmersedBoundaryLinearMembraneForce<DIM>::AddImmersedBoundaryForceContribution(std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs,
+                                                                                    ImmersedBoundaryCellPopulation<DIM>& rCellPopulation)
 {
     // Data common across the entire cell population
     double intrinsicSpacingSquared = rCellPopulation.GetIntrinsicSpacing() * rCellPopulation.GetIntrinsicSpacing();
@@ -76,9 +76,9 @@ void ImmersedBoundaryMembraneElasticityForce<DIM>::AddImmersedBoundaryForceContr
 
 template <unsigned DIM>
 template <unsigned ELEMENT_DIM>
-void ImmersedBoundaryMembraneElasticityForce<DIM>::CalculateForcesOnElement(ImmersedBoundaryElement<ELEMENT_DIM, DIM>& rElement,
-                                                                            ImmersedBoundaryCellPopulation<DIM>& rCellPopulation,
-                                                                            double intrinsicSpacingSquared)
+void ImmersedBoundaryLinearMembraneForce<DIM>::CalculateForcesOnElement(ImmersedBoundaryElement<ELEMENT_DIM, DIM>& rElement,
+                                                                        ImmersedBoundaryCellPopulation<DIM>& rCellPopulation,
+                                                                        double intrinsicSpacingSquared)
 {
     // Get index and number of nodes of current element
     unsigned elem_idx = rElement.GetIndex();
@@ -148,7 +148,7 @@ void ImmersedBoundaryMembraneElasticityForce<DIM>::CalculateForcesOnElement(Imme
 }
 
 template <unsigned DIM>
-void ImmersedBoundaryMembraneElasticityForce<DIM>::OutputImmersedBoundaryForceParameters(out_stream& rParamsFile)
+void ImmersedBoundaryLinearMembraneForce<DIM>::OutputImmersedBoundaryForceParameters(out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<ElementSpringConstant>" << mElementSpringConst << "</ElementSpringConstant>\n";
     *rParamsFile << "\t\t\t<ElementRestLength>" << mElementRestLength << "</ElementRestLength>\n";
@@ -160,58 +160,58 @@ void ImmersedBoundaryMembraneElasticityForce<DIM>::OutputImmersedBoundaryForcePa
 }
 
 template <unsigned DIM>
-double ImmersedBoundaryMembraneElasticityForce<DIM>::GetElementSpringConst() const
+double ImmersedBoundaryLinearMembraneForce<DIM>::GetElementSpringConst() const
 {
     return mElementSpringConst;
 }
 
 template <unsigned DIM>
-void ImmersedBoundaryMembraneElasticityForce<DIM>::SetElementSpringConst(double elementSpringConst)
+void ImmersedBoundaryLinearMembraneForce<DIM>::SetElementSpringConst(double elementSpringConst)
 {
     mElementSpringConst = elementSpringConst;
 }
 
 template <unsigned DIM>
-double ImmersedBoundaryMembraneElasticityForce<DIM>::GetElementRestLength() const
+double ImmersedBoundaryLinearMembraneForce<DIM>::GetElementRestLength() const
 {
     return mElementRestLength;
 }
 
 template <unsigned DIM>
-void ImmersedBoundaryMembraneElasticityForce<DIM>::SetElementRestLength(double elementRestLength)
+void ImmersedBoundaryLinearMembraneForce<DIM>::SetElementRestLength(double elementRestLength)
 {
     mElementRestLength = elementRestLength;
 }
 
 template <unsigned DIM>
-double ImmersedBoundaryMembraneElasticityForce<DIM>::GetLaminaSpringConst() const
+double ImmersedBoundaryLinearMembraneForce<DIM>::GetLaminaSpringConst() const
 {
     return mLaminaSpringConst;
 }
 
 template <unsigned DIM>
-void ImmersedBoundaryMembraneElasticityForce<DIM>::SetLaminaSpringConst(double laminaSpringConst)
+void ImmersedBoundaryLinearMembraneForce<DIM>::SetLaminaSpringConst(double laminaSpringConst)
 {
     mLaminaSpringConst = laminaSpringConst;
 }
 
 template <unsigned DIM>
-double ImmersedBoundaryMembraneElasticityForce<DIM>::GetLaminaRestLength() const
+double ImmersedBoundaryLinearMembraneForce<DIM>::GetLaminaRestLength() const
 {
     return mLaminaRestLength;
 }
 
 template <unsigned DIM>
-void ImmersedBoundaryMembraneElasticityForce<DIM>::SetLaminaRestLength(double laminaRestLength)
+void ImmersedBoundaryLinearMembraneForce<DIM>::SetLaminaRestLength(double laminaRestLength)
 {
     mLaminaRestLength = laminaRestLength;
 }
 
 // Explicit instantiation
-template class ImmersedBoundaryMembraneElasticityForce<1>;
-template class ImmersedBoundaryMembraneElasticityForce<2>;
-template class ImmersedBoundaryMembraneElasticityForce<3>;
+template class ImmersedBoundaryLinearMembraneForce<1>;
+template class ImmersedBoundaryLinearMembraneForce<2>;
+template class ImmersedBoundaryLinearMembraneForce<3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(ImmersedBoundaryMembraneElasticityForce)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(ImmersedBoundaryLinearMembraneForce)
