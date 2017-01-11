@@ -67,6 +67,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ImmersedBoundarySimulationModifier.hpp"
 #include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
 
+/* Required for setting up the numerical method */
+#include "ForwardEulerNumericalMethod.hpp"
+#include <boost/make_shared.hpp>
+
 /*
 // This test is never run in parallel */
 #include "FakePetscSetup.hpp"
@@ -118,8 +122,10 @@ public:
         /* We now create an {{{OffLatticeSimulation}}} object and pass in the {{{CellPopulation}}}. We also set some
          * options for the simulation like output directory, output multiple (so we don't visualize every timestep),
          * and end time.
-         */
+         * Additionally, we tell the numerical method that we want the cell population to update node locations.*/
         OffLatticeSimulation<2> simulator(cell_population);
+        simulator.SetNumericalMethod(boost::make_shared<ForwardEulerNumericalMethod<2,2> >());
+        simulator.GetNumericalMethod()->SetUseUpdateNodeLocation(true);
 
         simulator.SetOutputDirectory("TestImmersedBoundaryDemoTutorial");
         simulator.SetDt(0.01);
