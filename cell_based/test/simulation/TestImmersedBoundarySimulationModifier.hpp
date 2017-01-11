@@ -277,7 +277,8 @@ public:
         // Add two immersed boundary force objects to the simulation modifier
         MAKE_PTR(ImmersedBoundaryMembraneElasticityForce<2>, p_boundary_force);
         modifier.AddImmersedBoundaryForce(p_boundary_force);
-        p_boundary_force->SetSpringConstant(1.0 * 1e7);
+        p_boundary_force->SetElementSpringConst(1.0 * 1e7);
+        p_boundary_force->SetLaminaSpringConst(1.0 * 1e7);
 
         MAKE_PTR(ImmersedBoundaryCellCellInteractionForce<2>, p_cell_cell_force);
         modifier.AddImmersedBoundaryForce(p_cell_cell_force);
