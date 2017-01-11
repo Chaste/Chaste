@@ -193,8 +193,8 @@ SuperellipseGenerator::SuperellipseGenerator(unsigned numPoints,
         mPoints[point] += offset;
 
         // Check we're in the right place
-        assert( (mPoints[point][0] > botLeftX - 1e-10) && (mPoints[point][0] < botLeftX + width + 1e-10) );
-        assert( (mPoints[point][1] > botLeftY - 1e-10) && (mPoints[point][1] < botLeftY + height + 1e-10) );
+        assert((mPoints[point][0] > botLeftX - 1e-10) && (mPoints[point][0] < botLeftX + width + 1e-10));
+        assert((mPoints[point][1] > botLeftY - 1e-10) && (mPoints[point][1] < botLeftY + height + 1e-10));
     }
 }
 
