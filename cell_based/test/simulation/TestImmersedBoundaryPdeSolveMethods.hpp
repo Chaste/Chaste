@@ -94,7 +94,7 @@ public:
 //
 //        std::vector<CellPtr> cells;
 //        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-//        CellsGenerator<UniformlyDistributedCellCycleModel, 2> cells_generator;
+//        CellsGenerator<UniformCellCycleModel, 2> cells_generator;
 //        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 //
 //        ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
@@ -503,7 +503,7 @@ public:
 //
 //        std::vector<CellPtr> cells;
 //        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-//        CellsGenerator<UniformlyDistributedCellCycleModel, 2> cells_generator;
+//        CellsGenerator<UniformCellCycleModel, 2> cells_generator;
 //        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 //
 //        ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);

@@ -104,7 +104,7 @@ public:
         // Add force law
         MAKE_PTR(ImmersedBoundaryLinearMembraneForce<2>, p_boundary_force);
         p_main_modifier->AddImmersedBoundaryForce(p_boundary_force);
-        p_boundary_force->SetSpringConstant(1e8);
+        p_boundary_force->SetElementSpringConst(1e8);
 
         // Set simulation properties
         double dt = 0.01;
@@ -154,7 +154,7 @@ public:
         // Add force law
         MAKE_PTR(ImmersedBoundaryLinearMembraneForce<2>, p_boundary_force);
         p_main_modifier->AddImmersedBoundaryForce(p_boundary_force);
-        p_boundary_force->SetSpringConstant(1e8);
+        p_boundary_force->SetElementSpringConst(1e8);
 
         // Set simulation properties
         double dt = 0.01;
