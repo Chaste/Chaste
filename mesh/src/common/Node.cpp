@@ -276,7 +276,7 @@ void Node<SPACE_DIM>::RemoveElement(unsigned index)
     unsigned count = mElementIndices.erase(index);
     if (count == 0)
     {
-        EXCEPTION("Tried to remove an index which was not in the set");
+        EXCEPTION("Tried to remove an element index from node which was not in the set");
     }
 }
 
@@ -286,7 +286,7 @@ void Node<SPACE_DIM>::RemoveBoundaryElement(unsigned index)
     unsigned count = mBoundaryElementIndices.erase(index);
     if (count == 0)
     {
-        EXCEPTION("Tried to remove an index which was not in the set");
+        EXCEPTION("Tried to remove an element index from node which was not in the set");
     }
 }
 
@@ -336,7 +336,7 @@ void Node<SPACE_DIM>::RemoveFace(const unsigned index)
     unsigned count = mFaceIndices.erase(index);
     if (count == 0)
     {
-        EXCEPTION("Tried to remove an index which was not in the set");
+        EXCEPTION("Tried to remove a face index from node which was not in the set");
     }
 }
 

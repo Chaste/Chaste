@@ -32,6 +32,7 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  */
+
 #include "GeneralMonolayerVertexMeshForce.hpp"
 #include "VertexBasedCellPopulation.hpp"
 
@@ -107,15 +108,16 @@ void GeneralMonolayerVertexMeshForce::AddForceContribution(AbstractCellPopulatio
              ++iter)
         {
             // Get this element, its index and its number of nodes
-            VertexElement<3, 3>* p_element = p_cell_population->GetElement(*iter);
-
+            const VertexElement<3, 3>* p_element = p_cell_population->GetElement(*iter);
             const unsigned elem_index = p_element->GetIndex();
 
             // Calculating volume contribution
-            c_vector<double, 3> element_volume_gradient = rMesh.GetVolumeGradientofElementAtNode(p_element, node_index);
-
-            // Add the force contribution from this cell's volume compressibility (note the minus sign)
-            volume_contribution -= mVolumeParameter*element_volume_gradient*(element_volumes[elem_index] - mTargetVolume);
+            if (fabs(mVolumeParameter)>1e-5)
+            {
+                c_vector<double, 3> element_volume_gradient = rMesh.GetVolumeGradientofElementAtNode(p_element, node_index);
+                // Add the force contribution from this cell's volume compressibility (note the minus sign)
+                volume_contribution -= mVolumeParameter*element_volume_gradient*(element_volumes[elem_index] - mTargetVolume);
+            }
 
             // Pointer to the face having the same type as the node
             const VertexElement<2, 3>* p_ab_face = p_element->GetFace(node_type - 1);

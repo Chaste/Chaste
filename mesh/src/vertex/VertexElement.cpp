@@ -772,7 +772,7 @@ void VertexElement<ELEMENT_DIM, SPACE_DIM>::FaceRemoveElement(unsigned elementIn
     unsigned count = mFaceContainingElementIndices.erase(elementIndex);
     if (count == 0)
     {
-        EXCEPTION("Tried to remove an index which was not in the set");
+        EXCEPTION("Tried to remove an element index from face which was not in the set");
     }
 }
 
@@ -944,7 +944,7 @@ void VertexElement<1, SPACE_DIM>::FaceRemoveElement(const unsigned elementIndex)
     unsigned count = mFaceContainingElementIndices.erase(elementIndex);
     if (count == 0)
     {
-        EXCEPTION("Tried to remove an index which was not in the set");
+        EXCEPTION("Tried to remove an element index from face which was not in the set");
     }
 }
 

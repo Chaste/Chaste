@@ -65,8 +65,8 @@ class TestVertexMesh33UniaxialLoad : public AbstractCellBasedTestSuite
 private:
     static const double z_height = 1;
     static const double target_area = 1;
-    const unsigned num_cells_x = 9;
-    const unsigned num_cells_y = 5;
+    static const unsigned num_cells_x = 9;
+    static const unsigned num_cells_y = 5;
     static const double end_time = 1;
 
 public:
@@ -91,15 +91,15 @@ public:
         simulator.SetEndTime(end_time);
 
         MAKE_PTR(GeneralMonolayerVertexMeshForce, p_force3);
-//        p_force3->SetApicalParameters(20, 20, 0.7);
-//        p_force3->SetBasalParameters(20, 20, 0.7);
-//        p_force3->SetLateralParameter(8);
-        p_force3->SetVolumeParameters(350, 0.1);
+        //        p_force3->SetApicalParameters(20, 20, 0.7);
+        //        p_force3->SetBasalParameters(20, 20, 0.7);
+        //        p_force3->SetLateralParameter(8);
+        p_force3->SetVolumeParameters(350, target_area * 0.8);
         simulator.AddForce(p_force3);
         MAKE_PTR(HorizontalStretchForce<3>, p_force2);
         p_force2->SetForceMagnitude(1.0);
         p_force2->SetRelativeWidth(0.15);
-//        simulator.AddForce(p_force2);
+        //        simulator.AddForce(p_force2);
 
         simulator.Solve();
 
@@ -189,57 +189,6 @@ public:
 //        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
 //    }
 //
-
-    void TestCheckForceCalculation()
-    {
-        const unsigned x = 4;
-        const unsigned y = 5;
-        const double a = 2;
-        const double length = 3*sqrt(3)*y+sqrt(3);
-        const double radius = a/M_PI/2*x;
-        HoneycombVertexMeshGenerator generator(x, y, false, 0.1, 0.01, 2*sqrt(3));
-        MutableVertexMesh<2, 2>& vertex_2mesh = *(generator.GetMesh());
-        MonolayerVertexMeshGenerator builder;
-        MutableVertexMesh<3, 3>* p_mesh = builder.MakeMeshUsing2dMesh(vertex_2mesh);
-        std::string output_filename = "TestUniaxialLoad/CylinderTest_CheckForce" + boost::lexical_cast<std::string>(x)
-                                                                    + "x" + boost::lexical_cast<std::string>(y);
-        builder.WriteVtk(output_filename, "InitialMesh");
-
-        builder.ConvertMeshToCylinder(2*x, 1, radius, 0.5, 1);
-        builder.WriteVtk(output_filename, "After");
-PRINT_VECTOR(p_mesh->GetNode(0)->rGetLocation())
-PRINT_VECTOR(p_mesh->GetNode(48)->rGetLocation())
-
-        std::vector<CellPtr> cells;
-        CellsGenerator<NoCellCycleModel, 3> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
-        VertexBasedCellPopulation<3> cell_population(*p_mesh, cells);
-
-        OffLatticeSimulation<3> simulator(cell_population);
-        simulator.SetOutputDirectory(output_filename);
-        simulator.SetSamplingTimestepMultiple(1);
-        simulator.SetEndTime(1);
-
-        MAKE_PTR(GeneralMonolayerVertexMeshForce, p_force3);
-        p_force3->SetApicalParameters(20, 20, 0.7);
-        p_force3->SetBasalParameters(20, 20, 0.7);
-        p_force3->SetLateralParameter(20);
-        p_force3->SetVolumeParameters(350, 3);
-        simulator.AddForce(p_force3);
-        MAKE_PTR(HorizontalStretchForce<3>, p_force2);
-        p_force2->SetForceMagnitude(1.0);
-        p_force2->SetRelativeWidth(0.15);
-        //        simulator.AddForce(p_force2);
-
-        simulator.Solve();
-
-PRINT_VECTOR(p_mesh->GetNode(0)->rGetLocation())
-PRINT_VECTOR(p_mesh->GetNode(48)->rGetLocation())
-
-        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), x*y);
-        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
-    }
-
     void TestCellGrowth() throw (Exception)
     {
         // Make a mesh of 10x10
@@ -257,7 +206,7 @@ PRINT_VECTOR(p_mesh->GetNode(48)->rGetLocation())
         MutableVertexMesh<2, 2>& vertex_2mesh = *(generator.GetMesh());
         MonolayerVertexMeshGenerator builder("CellGrowth");
         MutableVertexMesh<3, 3>* p_mesh = builder.MakeMeshUsing2dMesh(vertex_2mesh);
-        builder.WriteVtk(output_filename,"Before");
+        builder.WriteVtk(output_filename, "Before");
 
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
@@ -282,32 +231,28 @@ PRINT_VECTOR(p_mesh->GetNode(48)->rGetLocation())
         p_force2->SetRelativeWidth(0.15);
         simulator.AddForce(p_force2);
 
-        /* Finally we call the {{{Solve}}} method on the simulation to run the simulation.*/
         simulator.Solve();
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 55u);
         TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 20.0, 1e-10);
     }
 
-
     void TestOnSphere() throw (Exception)
-   {
+    {
         const double s_end_time = 2;
         std::string output_filename = "TestUniaxialLoad/SphereTest" + boost::lexical_cast<std::string>(num_cells_x)
                                     + "x" + boost::lexical_cast<std::string>(num_cells_y);
         GeodesicSphere23Generator builder;
-        builder.SubDivide();    // n=42
-        builder.SubDivide();    // n=162
+        builder.SubDivide(); // n=42
+        builder.SubDivide(); // n=162
 
-
-        MutableVertexMesh<2,3>* p_dual_mesh = builder.GetDual();
+        MutableVertexMesh<2, 3>* p_dual_mesh = builder.GetDual();
         VertexMeshWriter<2, 3> Writer(output_filename, "Geodesic_Dual", false);
         Writer.WriteVtkUsingMeshWithCellId(*p_dual_mesh);
 
         const unsigned radius = sqrt(p_dual_mesh->GetNumElements()*target_area/4/M_PI);
         MonolayerVertexMeshGenerator sBuilder;
-        MutableVertexMesh<3,3>* p_mesh = sBuilder.MakeSphericalMesh33(p_dual_mesh, 5, 0.5);
+        MutableVertexMesh<3, 3>* p_mesh = sBuilder.MakeSphericalMesh33(p_dual_mesh, 5, 0.5);
         sBuilder.WriteVtk(output_filename, "InitialMesh");
-
 
         std::vector<CellPtr> cells;
         CellsGenerator<NoCellCycleModel, 3> cells_generator;
@@ -325,16 +270,71 @@ PRINT_VECTOR(p_mesh->GetNode(48)->rGetLocation())
         p_force3->SetLateralParameter(8);
         p_force3->SetVolumeParameters(350, 2);
         simulator.AddForce(p_force3);
-//        MAKE_PTR(HorizontalStretchForce<3>, p_force2);
-//        p_force2->SetForceMagnitude(1.0);
-//        p_force2->SetRelativeWidth(0.15);
-//        simulator.AddForce(p_force2);
+        // MAKE_PTR(HorizontalStretchForce<3>, p_force2);
+        // p_force2->SetForceMagnitude(1.0);
+        // p_force2->SetRelativeWidth(0.15);
+        // simulator.AddForce(p_force2);
 
         simulator.Solve();
 
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 162u);
         TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), s_end_time, 1e-10);
-   }
+    }
+
+    void TestSingleCube()
+    {
+        /*
+         * Create a mesh with a square element, as shown below.
+         *  _____
+         * |     |
+         * |     |
+         * |_____|
+         */
+        std::string output_filename = "TestUniaxialLoad/SingleCubeTest";
+        const double end_time = 4;
+        const double target_volume = 3;
+
+        std::vector<Node<3>*> nodes;
+        nodes.push_back(new Node<3>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<3>(1, true, 1.0, 0.0));
+        nodes.push_back(new Node<3>(2, true, 0.0, 1.0));
+        nodes.push_back(new Node<3>(3, true, 1.0, 1.0));
+        const unsigned node_indices_elem_0[4] = { 0, 1, 3, 2 };
+
+        MonolayerVertexMeshGenerator builder(nodes, "TestGradientDeviation");
+        builder.BuildElementWith(4, node_indices_elem_0);
+        // A reference variable as mesh is noncopyable
+        MutableVertexMesh<3, 3>* p_mesh = builder.GenerateMesh();
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<NoCellCycleModel, 3> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
+        VertexBasedCellPopulation<3> cell_population(*p_mesh, cells);
+
+        OffLatticeSimulation<3> simulator(cell_population);
+        simulator.SetOutputDirectory(output_filename);
+        simulator.SetSamplingTimestepMultiple(10);
+        simulator.SetEndTime(end_time);
+
+        MAKE_PTR(GeneralMonolayerVertexMeshForce, p_force3);
+        // p_force3->SetApicalParameters(20, 20, 0.7);
+        // p_force3->SetBasalParameters(20, 20, 0.7);
+        // p_force3->SetLateralParameter(8);
+        p_force3->SetVolumeParameters(350, target_volume);
+        simulator.AddForce(p_force3);
+
+        simulator.Solve();
+
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 1);
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
+        TS_ASSERT_DELTA(p_mesh->GetVolumeOfElement(0), target_volume, 0.05);
+
+
+        simulator.SetEndTime(end_time*2);
+        p_force3->SetVolumeParameters(350, target_volume/2);
+        simulator.Solve();
+        TS_ASSERT_DELTA(p_mesh->GetVolumeOfElement(0), target_volume/2, 0.05);
+    }
 
 };
 
