@@ -75,9 +75,10 @@ public:
             boost::archive::text_oarchive output_arch(ofs);
 
             // Set member variables
-            force.SetSpringConstant(1.2);
-            force.SetRestLength(3.4);
-            force.UseMorsePotential();
+            force.SetSpringConst(1.23);
+            force.SetRestLength(2.34);
+            force.SetLaminaSpringConstMult(3.45);
+            force.SetLaminaRestLengthMult(4.56);
 
             // Serialize via pointer to most abstract class possible
             AbstractImmersedBoundaryForce<2>* const p_force = &force;
@@ -96,10 +97,10 @@ public:
             ImmersedBoundaryLinearInteractionForce<2>* p_derived_force = static_cast<ImmersedBoundaryLinearInteractionForce<2>*>(p_force);
 
             // Check member variables have been correctly archived
-            TS_ASSERT_DELTA(p_derived_force->GetSpringConstant(), 1.2, 1e-6);
-            TS_ASSERT_DELTA(p_derived_force->GetRestLength(), 3.4, 1e-6);
-            TS_ASSERT_EQUALS(p_derived_force->IsLinearSpringLaw(), false);
-            TS_ASSERT_EQUALS(p_derived_force->IsMorsePotential(), true);
+            TS_ASSERT_DELTA(p_derived_force->GetSpringConst(), 1.23, 1e-6);
+            TS_ASSERT_DELTA(p_derived_force->GetRestLength(), 2.34, 1e-6);
+            TS_ASSERT_DELTA(p_derived_force->GetLaminaSpringConstMult(), 3.45, 1e-6);
+            TS_ASSERT_DELTA(p_derived_force->GetLaminaRestLengthMult(), 4.56, 1e-6);
 
             // Tidy up
             delete p_force;
@@ -265,50 +266,74 @@ public:
         OutputFileHandler output_file_handler(output_directory, false);
 
         // Test with ImmersedBoundaryLinearInteractionForce
-        ImmersedBoundaryLinearInteractionForce<2> cell_cell_force;
-        cell_cell_force.SetSpringConstant(1.2);
-        cell_cell_force.SetRestLength(3.4);
-        cell_cell_force.UseMorsePotential();
-
-        TS_ASSERT_EQUALS(cell_cell_force.GetIdentifier(), "ImmersedBoundaryLinearInteractionForce-2");
-
-        out_stream cell_cell_force_parameter_file = output_file_handler.OpenOutputFile("ib_cell_cell.parameters");
-        cell_cell_force.OutputImmersedBoundaryForceParameters(cell_cell_force_parameter_file);
-        cell_cell_force_parameter_file->close();
-
         {
-            FileFinder generated_file = output_file_handler.FindFile("ib_cell_cell.parameters");
-            FileFinder reference_file("cell_based/test/data/TestForces/ib_cell_cell.parameters",
-                                      RelativeTo::ChasteSourceRoot);
-            FileComparison comparer(generated_file,reference_file);
-            TS_ASSERT(comparer.CompareFiles());
+            ImmersedBoundaryLinearInteractionForce<2> cell_cell_force;
+            cell_cell_force.SetSpringConst(1.23);
+            cell_cell_force.SetRestLength(2.34);
+            cell_cell_force.SetLaminaSpringConstMult(3.45);
+            cell_cell_force.SetLaminaRestLengthMult(4.56);
+
+            TS_ASSERT_EQUALS(cell_cell_force.GetIdentifier(), "ImmersedBoundaryLinearInteractionForce-2");
+
+            out_stream cell_cell_force_parameter_file = output_file_handler.OpenOutputFile("ib_linear_int.parameters");
+            cell_cell_force.OutputImmersedBoundaryForceParameters(cell_cell_force_parameter_file);
+            cell_cell_force_parameter_file->close();
+
+            {
+                FileFinder generated_file = output_file_handler.FindFile("ib_linear_int.parameters");
+                FileFinder reference_file("cell_based/test/data/TestForces/ib_linear_int.parameters",
+                                          RelativeTo::ChasteSourceRoot);
+                FileComparison comparer(generated_file, reference_file);
+                TS_ASSERT(comparer.CompareFiles());
+            }
         }
 
         // Test with ImmersedBoundaryLinearMembraneForce
-        ImmersedBoundaryLinearMembraneForce<2> membrane_force;
-        membrane_force.SetElementSpringConst(5.67);
-        membrane_force.SetElementRestLength(6.78);
-        membrane_force.SetLaminaSpringConst(7.89);
-        membrane_force.SetLaminaRestLength(8.91);
-
-        TS_ASSERT_EQUALS(membrane_force.GetIdentifier(), "ImmersedBoundaryLinearMembraneForce-2");
-
-        out_stream membrane_force_parameter_file = output_file_handler.OpenOutputFile("ib_membrane.parameters");
-        membrane_force.OutputImmersedBoundaryForceParameters(membrane_force_parameter_file);
-        membrane_force_parameter_file->close();
-
         {
-            FileFinder generated_file = output_file_handler.FindFile("ib_membrane.parameters");
-            FileFinder reference_file("cell_based/test/data/TestForces/ib_membrane.parameters",
-                                      RelativeTo::ChasteSourceRoot);
-            FileComparison comparer(generated_file,reference_file);
-            TS_ASSERT(comparer.CompareFiles());
+            ImmersedBoundaryLinearMembraneForce<2> membrane_force;
+            membrane_force.SetElementSpringConst(5.67);
+            membrane_force.SetElementRestLength(6.78);
+            membrane_force.SetLaminaSpringConst(7.89);
+            membrane_force.SetLaminaRestLength(8.91);
+
+            TS_ASSERT_EQUALS(membrane_force.GetIdentifier(), "ImmersedBoundaryLinearMembraneForce-2");
+
+            out_stream membrane_force_parameter_file = output_file_handler.OpenOutputFile("ib_linear_mem.parameters");
+            membrane_force.OutputImmersedBoundaryForceParameters(membrane_force_parameter_file);
+            membrane_force_parameter_file->close();
+
+            {
+                FileFinder generated_file = output_file_handler.FindFile("ib_linear_mem.parameters");
+                FileFinder reference_file("cell_based/test/data/TestForces/ib_linear_mem.parameters",
+                                          RelativeTo::ChasteSourceRoot);
+                FileComparison comparer(generated_file, reference_file);
+                TS_ASSERT(comparer.CompareFiles());
+            }
         }
 
-        // For coverage of AbstractImmersedBoundaryForce::OutputImmersedBoundaryForceInfo()
-        out_stream other_file = output_file_handler.OpenOutputFile("other_file.parameters");
-        membrane_force.OutputImmersedBoundaryForceInfo(other_file);
-        other_file->close();
+        // Test with ImmersedBoundaryMorseMembraneForce
+        {
+            ImmersedBoundaryMorseMembraneForce<2> membrane_force;
+            membrane_force.SetElementWellDepth(1.23);
+            membrane_force.SetElementRestLength(2.34);
+            membrane_force.SetLaminaWellDepth(3.45);
+            membrane_force.SetLaminaRestLength(4.56);
+            membrane_force.SetWellWidth(5.67);
+
+            TS_ASSERT_EQUALS(membrane_force.GetIdentifier(), "ImmersedBoundaryMorseMembraneForce-2");
+
+            out_stream membrane_force_parameter_file = output_file_handler.OpenOutputFile("ib_morse_mem.parameters");
+            membrane_force.OutputImmersedBoundaryForceParameters(membrane_force_parameter_file);
+            membrane_force_parameter_file->close();
+
+            {
+                FileFinder generated_file = output_file_handler.FindFile("ib_morse_mem.parameters");
+                FileFinder reference_file("cell_based/test/data/TestForces/ib_morse_mem.parameters",
+                                          RelativeTo::ChasteSourceRoot);
+                FileComparison comparer(generated_file, reference_file);
+                TS_ASSERT(comparer.CompareFiles());
+            }
+        }
     }
 };
 
