@@ -121,38 +121,41 @@ public:
         {
             ImmersedBoundaryMorseInteractionForce<2> force;
 
-//            std::ofstream ofs(archive_filename.c_str());
-//            boost::archive::text_oarchive output_arch(ofs);
-//
-//            // Set member variables
-//            force.SetSpringConstant(1.2);
-//            force.SetRestLength(3.4);
-//            force.UseMorsePotential();
-//
-//            // Serialize via pointer to most abstract class possible
-//            AbstractImmersedBoundaryForce<2>* const p_force = &force;
-//            output_arch << p_force;
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            // Set member variables
+            force.SetWellDepth(1.23);
+            force.SetRestLength(2.34);
+            force.SetLaminaWellDepthMult(3.45);
+            force.SetLaminaRestLengthMult(4.56);
+            force.SetWellWidth(5.67);
+
+            // Serialize via pointer to most abstract class possible
+            AbstractImmersedBoundaryForce<2>* const p_force = &force;
+            output_arch << p_force;
         }
 
         {
-//            AbstractImmersedBoundaryForce<2>* p_force;
-//
-//            // Create an input archive
-//            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
-//            boost::archive::text_iarchive input_arch(ifs);
-//
-//            // Restore from the archive
-//            input_arch >> p_force;
-//            ImmersedBoundaryLinearInteractionForce<2>* p_derived_force = static_cast<ImmersedBoundaryLinearInteractionForce<2>*>(p_force);
-//
-//            // Check member variables have been correctly archived
-//            TS_ASSERT_DELTA(p_derived_force->GetSpringConstant(), 1.2, 1e-6);
-//            TS_ASSERT_DELTA(p_derived_force->GetRestLength(), 3.4, 1e-6);
-//            TS_ASSERT_EQUALS(p_derived_force->IsLinearSpringLaw(), false);
-//            TS_ASSERT_EQUALS(p_derived_force->IsMorsePotential(), true);
-//
-//            // Tidy up
-//            delete p_force;
+            AbstractImmersedBoundaryForce<2>* p_force;
+
+            // Create an input archive
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            // Restore from the archive
+            input_arch >> p_force;
+            ImmersedBoundaryMorseInteractionForce<2>* p_derived_force = static_cast<ImmersedBoundaryMorseInteractionForce<2>*>(p_force);
+
+            // Check member variables have been correctly archived
+            TS_ASSERT_DELTA(p_derived_force->GetWellDepth(), 1.23, 1e-6);
+            TS_ASSERT_DELTA(p_derived_force->GetRestLength(), 2.34, 1e-6);
+            TS_ASSERT_DELTA(p_derived_force->GetLaminaWellDepthMult(), 3.45, 1e-6);
+            TS_ASSERT_DELTA(p_derived_force->GetLaminaRestLengthMult(), 4.56, 1e-6);
+            TS_ASSERT_DELTA(p_derived_force->GetWellWidth(), 5.67, 1e-6);
+
+            // Tidy up
+            delete p_force;
         }
     }
 
