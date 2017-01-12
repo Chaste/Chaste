@@ -149,7 +149,7 @@ public:
 
         MAKE_PTR(ImmersedBoundaryLinearInteractionForce<2>, p_cell_cell_force);
         p_main_modifier->AddImmersedBoundaryForce(p_cell_cell_force);
-        p_cell_cell_force->SetSpringConstant(1.0 * 1e6);
+        p_cell_cell_force->SetSpringConst(1.0 * 1e6);
 
         /* Finally we call the {{{Solve}}} method on the simulation to run the simulation.*/
         simulator.Solve();

@@ -282,7 +282,7 @@ public:
 
         MAKE_PTR(ImmersedBoundaryLinearInteractionForce<2>, p_cell_cell_force);
         modifier.AddImmersedBoundaryForce(p_cell_cell_force);
-        p_cell_cell_force->SetSpringConstant(1.0 * 1e6);
+        p_cell_cell_force->SetSpringConst(1.0 * 1e6);
 
         // Test AddImmersedBoundaryForceContributions() returns the correct applied force on some nodes
         // Note: testing of the force calculations themselves occurs in TestImmersedBoundaryForces

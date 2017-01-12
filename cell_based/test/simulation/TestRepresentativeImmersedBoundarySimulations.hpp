@@ -162,7 +162,7 @@ public:
 
         MAKE_PTR(ImmersedBoundaryLinearInteractionForce<2>, p_cell_cell_force);
         p_main_modifier->AddImmersedBoundaryForce(p_cell_cell_force);
-        p_cell_cell_force->SetSpringConstant(1.0 * 1e6);
+        p_cell_cell_force->SetSpringConst(1.0 * 1e6);
 
         // Set simulation properties
         double dt = 0.01;
@@ -214,7 +214,7 @@ public:
 
         MAKE_PTR(ImmersedBoundaryLinearInteractionForce<2>, p_cell_cell_force);
         p_main_modifier->AddImmersedBoundaryForce(p_cell_cell_force);
-        p_cell_cell_force->SetSpringConstant(1.0 * 1e6);
+        p_cell_cell_force->SetSpringConst(1.0 * 1e6);
 
         // Set simulation properties
         double dt = 0.01;
