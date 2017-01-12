@@ -71,7 +71,7 @@ private:
         archive& mWellWidth;
     }
 
-    /** The spring constant associated with each element */
+    /** The basic interaction strength */
     double mElementWellDepth;
 
     /** The rest length associated with each element as a fraction of the average node spacing */

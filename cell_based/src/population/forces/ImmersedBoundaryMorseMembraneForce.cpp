@@ -103,6 +103,7 @@ void ImmersedBoundaryMorseMembraneForce<DIM>::CalculateForcesOnElement(ImmersedB
     double node_spacing = 0.0;
     double well_depth = 0.0;
     double rest_length = 0.0;
+    double well_width = mWellWidth;
 
     // Determine if we're in a lamina or not
     if (ELEMENT_DIM < DIM)
@@ -111,6 +112,7 @@ void ImmersedBoundaryMorseMembraneForce<DIM>::CalculateForcesOnElement(ImmersedB
 
         well_depth = mLaminaWellDepth * intrinsicSpacingSquared / (node_spacing * node_spacing);
         rest_length = mLaminaRestLength * node_spacing;
+        well_width *= node_spacing;
     }
     else // regular element
     {
@@ -118,6 +120,7 @@ void ImmersedBoundaryMorseMembraneForce<DIM>::CalculateForcesOnElement(ImmersedB
 
         well_depth = mElementWellDepth * intrinsicSpacingSquared / (node_spacing * node_spacing);
         rest_length = mElementRestLength * node_spacing;
+        well_width *= node_spacing;
     }
 
     // Loop over nodes and calculate the force exerted on node i+1 by node i
@@ -131,8 +134,8 @@ void ImmersedBoundaryMorseMembraneForce<DIM>::CalculateForcesOnElement(ImmersedB
                                                                                rElement.GetNodeLocation(next_idx));
         double normed_dist = norm_2(force_to_next[node_idx]);
 
-        double morse_exp = exp((rest_length - normed_dist) / mWellWidth);
-        force_to_next[node_idx] *= 2.0 * mWellWidth * well_depth * morse_exp * (1.0 - morse_exp) / normed_dist;
+        double morse_exp = exp((rest_length - normed_dist) / well_width);
+        force_to_next[node_idx] *= 2.0 * well_width * well_depth * morse_exp * (1.0 - morse_exp) / normed_dist;
     }
 
     // Add the contributions of springs adjacent to each node
