@@ -105,7 +105,7 @@ public:
      * @param rCellPopulation reference to the cell population
      */
     void AddImmersedBoundaryForceContribution(std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs,
-            ImmersedBoundaryCellPopulation<DIM>& rCellPopulation);
+                                              ImmersedBoundaryCellPopulation<DIM>& rCellPopulation);
 
     /**
      * Overridden OutputImmersedBoundaryForceParameters() method.
