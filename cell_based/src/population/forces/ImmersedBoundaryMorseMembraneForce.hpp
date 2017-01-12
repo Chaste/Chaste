@@ -43,8 +43,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ImmersedBoundaryCellPopulation.hpp"
 
 /**
- * A force class for use in immersed boundary simulations. This force implements elastic links between adjacent nodes
- * in each immersed boundary.
+ * A force class for use in immersed boundary simulations. This force implements Morse-potential-like links between
+ * adjacent nodes in each immersed boundary. https://en.wikipedia.org/wiki/Morse_potential
+ * The well width is a constant interaction strength, the rest length is an equilibrium bond distance, and the well
+ * width is a parameter governing the profile of the curve.
  */
 template <unsigned DIM>
 class ImmersedBoundaryMorseMembraneForce : public AbstractImmersedBoundaryForce<DIM>
@@ -62,23 +64,27 @@ private:
     void serialize(Archive& archive, const unsigned int version)
     {
         archive& boost::serialization::base_object<AbstractImmersedBoundaryForce<DIM> >(*this);
-        archive& mElementSpringConst;
+        archive& mElementWellDepth;
         archive& mElementRestLength;
-        archive& mLaminaSpringConst;
+        archive& mLaminaWellDepth;
         archive& mLaminaRestLength;
+        archive& mWellWidth;
     }
 
     /** The spring constant associated with each element */
-    double mElementSpringConst;
+    double mElementWellDepth;
 
     /** The rest length associated with each element as a fraction of the average node spacing */
     double mElementRestLength;
 
     /** The spring constant associated with each lamina */
-    double mLaminaSpringConst;
+    double mLaminaWellDepth;
 
     /** The rest length associated with each lamina as a fraction of the average node spacing */
     double mLaminaRestLength;
+
+    /** The well width as a fraction of the average node spacing in either an element or lamina */
+    double mWellWidth;
 
     /**
      * Helper method for AddImmersedBoundaryForceContribution.
@@ -116,11 +122,11 @@ public:
      */
     void OutputImmersedBoundaryForceParameters(out_stream& rParamsFile);
 
-    /** @return mElementSpringConst */
-    double GetElementSpringConst() const;
+    /** @return mElementWellDepth */
+    double GetElementWellDepth() const;
 
-    /** @param elementSpringConst the new value of mElementSpringConst */
-    void SetElementSpringConst(double elementSpringConst);
+    /** @param elementWellDepth the new value of mElementWellDepth */
+    void SetElementWellDepth(double elementWellDepth);
 
     /** @return mElementRestLength */
     double GetElementRestLength() const;
@@ -128,17 +134,23 @@ public:
     /** @param elementRestLength the new value of mElementRestLength */
     void SetElementRestLength(double elementRestLength);
 
-    /** @return mLaminaSpringConst */
-    double GetLaminaSpringConst() const;
+    /** @return mLaminaWellDepth */
+    double GetLaminaWellDepth() const;
 
-    /** @param laminaSpringConst the new value of mLaminaSpringConst */
-    void SetLaminaSpringConst(double laminaSpringConst);
+    /** @param laminaWellDepth the new value of mLaminaWellDepth */
+    void SetLaminaWellDepth(double laminaWellDepth);
 
     /** @return mLaminaRestLength */
     double GetLaminaRestLength() const;
 
     /** @param laminaRestLength the new value of mLaminaRestLength */
     void SetLaminaRestLength(double laminaRestLength);
+
+    /** @return mWellWidth */
+    double GetWellWidth() const;
+
+    /** @param wellWidth the new value of mWellWidth */
+    void SetWellWidth(double wellWidth);
 };
 
 #include "SerializationExportWrapper.hpp"
