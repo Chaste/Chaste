@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef IMMERSEDBOUNDARYLINEARINTERACTIONFORCE_HPP_
-#define IMMERSEDBOUNDARYLINEARINTERACTIONFORCE_HPP_
+#ifndef IMMERSEDBOUNDARYMORSEINTERACTIONFORCE_HPP_
+#define IMMERSEDBOUNDARYMORSEINTERACTIONFORCE_HPP_
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
@@ -47,11 +47,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 
 /**
- * A force class for use in immersed boundary simulations. This force implements elastic links between nodes in
- * adjacent immersed boundaries.
+ * A force class for use in immersed boundary simulations. This force implements Morse-potential-like links between
+ * nodes in adjacent immersed boundaries. https://en.wikipedia.org/wiki/Morse_potential
+ * The well width is a constant interaction strength, the rest length is an equilibrium bond distance, and the well
+ * width is a parameter governing the profile of the curve.
  */
 template<unsigned DIM>
-class ImmersedBoundaryLinearInteractionForce : public AbstractImmersedBoundaryForce<DIM>
+class ImmersedBoundaryMorseInteractionForce : public AbstractImmersedBoundaryForce<DIM>
 {
 private:
 
@@ -109,12 +111,12 @@ public:
     /**
      * Constructor.
      */
-    ImmersedBoundaryLinearInteractionForce();
+    ImmersedBoundaryMorseInteractionForce();
 
     /**
      * Destructor.
      */
-    virtual ~ImmersedBoundaryLinearInteractionForce();
+    virtual ~ImmersedBoundaryMorseInteractionForce();
 
     /**
      * Overridden AddImmersedBoundaryForceContribution() method.
@@ -195,6 +197,6 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(ImmersedBoundaryLinearInteractionForce)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(ImmersedBoundaryMorseInteractionForce)
 
-#endif /*IMMERSEDBOUNDARYLINEARINTERACTIONFORCE_HPP_*/
+#endif /*IMMERSEDBOUNDARYMORSEINTERACTIONFORCE_HPP_*/

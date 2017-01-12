@@ -45,6 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Includes from projects/ImmersedBoundary
 #include "ImmersedBoundaryLinearInteractionForce.hpp"
+#include "ImmersedBoundaryMorseInteractionForce.hpp"
 #include "ImmersedBoundaryLinearMembraneForce.hpp"
 #include "ImmersedBoundaryMorseMembraneForce.hpp"
 #include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
@@ -102,6 +103,55 @@ public:
 
             // Tidy up
             delete p_force;
+        }
+    }
+
+    void TestImmersedBoundaryMorseInteractionForceMethods() throw (Exception)
+    {
+        ///\todo Test this class
+    }
+
+    void TestArchivingOfImmersedBoundaryMorseInteractionForce() throw (Exception)
+    {
+        EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "ImmersedBoundaryLinearInteractionForce.arch";
+
+        {
+            ImmersedBoundaryMorseInteractionForce<2> force;
+
+//            std::ofstream ofs(archive_filename.c_str());
+//            boost::archive::text_oarchive output_arch(ofs);
+//
+//            // Set member variables
+//            force.SetSpringConstant(1.2);
+//            force.SetRestLength(3.4);
+//            force.UseMorsePotential();
+//
+//            // Serialize via pointer to most abstract class possible
+//            AbstractImmersedBoundaryForce<2>* const p_force = &force;
+//            output_arch << p_force;
+        }
+
+        {
+//            AbstractImmersedBoundaryForce<2>* p_force;
+//
+//            // Create an input archive
+//            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+//            boost::archive::text_iarchive input_arch(ifs);
+//
+//            // Restore from the archive
+//            input_arch >> p_force;
+//            ImmersedBoundaryLinearInteractionForce<2>* p_derived_force = static_cast<ImmersedBoundaryLinearInteractionForce<2>*>(p_force);
+//
+//            // Check member variables have been correctly archived
+//            TS_ASSERT_DELTA(p_derived_force->GetSpringConstant(), 1.2, 1e-6);
+//            TS_ASSERT_DELTA(p_derived_force->GetRestLength(), 3.4, 1e-6);
+//            TS_ASSERT_EQUALS(p_derived_force->IsLinearSpringLaw(), false);
+//            TS_ASSERT_EQUALS(p_derived_force->IsMorsePotential(), true);
+//
+//            // Tidy up
+//            delete p_force;
         }
     }
 
