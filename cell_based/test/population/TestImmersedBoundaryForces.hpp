@@ -46,6 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Includes from projects/ImmersedBoundary
 #include "ImmersedBoundaryCellCellInteractionForce.hpp"
 #include "ImmersedBoundaryLinearMembraneForce.hpp"
+#include "ImmersedBoundaryMorseMembraneForce.hpp"
 #include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
 
 // This test is never run in parallel
@@ -146,6 +147,60 @@ public:
             TS_ASSERT_DELTA(static_cast<ImmersedBoundaryLinearMembraneForce<2>*>(p_force)->GetElementRestLength(), 2.34, 1e-6);
             TS_ASSERT_DELTA(static_cast<ImmersedBoundaryLinearMembraneForce<2>*>(p_force)->GetLaminaSpringConst(), 3.45, 1e-6);
             TS_ASSERT_DELTA(static_cast<ImmersedBoundaryLinearMembraneForce<2>*>(p_force)->GetLaminaRestLength(), 4.56, 1e-6);
+
+            // Tidy up
+            delete p_force;
+        }
+    }
+
+    void TestImmersedBoundaryMorseMembraneForce() throw (Exception)
+    {
+        ///\todo Test this class
+    }
+
+    void TestArchivingOfImmersedBoundaryMorseMembraneForce() throw (Exception)
+    {
+        EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "ImmersedBoundaryMorseMembraneForce.arch";
+
+        {
+            ImmersedBoundaryMorseMembraneForce<2> force;
+
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            // Set member variables
+            force.SetElementWellDepth(1.23);
+            force.SetElementRestLength(2.34);
+            force.SetLaminaWellDepth(3.45);
+            force.SetLaminaRestLength(4.56);
+            force.SetWellWidth(5.67);
+
+            // Serialize via pointer to most abstract class possible
+            AbstractImmersedBoundaryForce<2>* const p_force = &force;
+            output_arch << p_force;
+        }
+
+        {
+            AbstractImmersedBoundaryForce<2>* p_force;
+
+            // Create an input archive
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            // Restore from the archive
+            input_arch >> p_force;
+
+            ImmersedBoundaryMorseMembraneForce<2>* p_derived_force = static_cast<ImmersedBoundaryMorseMembraneForce<2>*>(p_force);
+
+            // Check member variables have been correctly archived
+            TS_ASSERT_DELTA(p_derived_force->GetElementWellDepth(), 1.23, 1e-6);
+            TS_ASSERT_DELTA(p_derived_force->GetElementRestLength(), 2.34, 1e-6);
+            TS_ASSERT_DELTA(p_derived_force->GetLaminaWellDepth(), 3.45, 1e-6);
+            TS_ASSERT_DELTA(p_derived_force->GetLaminaRestLength(), 4.56, 1e-6);
+            TS_ASSERT_DELTA(p_derived_force->GetLaminaRestLength(), 4.56, 1e-6);
+            TS_ASSERT_DELTA(p_derived_force->GetWellWidth(), 5.67, 1e-6);
 
             // Tidy up
             delete p_force;
