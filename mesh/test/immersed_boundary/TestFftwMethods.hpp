@@ -42,6 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Chaste includes
 #include "RandomNumberGenerator.hpp"
 #include "FileFinder.hpp"
+#include "Warnings.hpp"
 
 // Needed for immersed boundary simulations
 #include <complex>
@@ -68,11 +69,17 @@ public:
 
         // Verify the file can be found in its default location
         std::string wisdom_path = file_finder.GetAbsolutePath();
-        TS_ASSERT(file_finder.IsFile());
 
-        // 1 means it's read correctly, 0 indicates a failure
-        int wisdom_flag = fftw_import_wisdom_from_filename(wisdom_path.c_str());
-        TS_ASSERT_EQUALS(wisdom_flag, 1);
+        if (file_finder.IsFile())
+        {
+            // 1 means it's read correctly, 0 indicates a failure
+            int wisdom_flag = fftw_import_wisdom_from_filename(wisdom_path.c_str());
+            TS_ASSERT_EQUALS(wisdom_flag, 1);
+        }
+        else
+        {
+            WARNING("fftw wisdom file not found; simulation setup may take a long time.")
+        }
     }
 
     void Test2DR2C2R() throw(Exception)
