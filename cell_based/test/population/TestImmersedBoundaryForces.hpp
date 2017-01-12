@@ -92,12 +92,13 @@ public:
 
             // Restore from the archive
             input_arch >> p_force;
+            ImmersedBoundaryCellCellInteractionForce<2>* p_derived_force = static_cast<ImmersedBoundaryCellCellInteractionForce<2>*>(p_force);
 
             // Check member variables have been correctly archived
-            TS_ASSERT_DELTA(static_cast<ImmersedBoundaryCellCellInteractionForce<2>*>(p_force)->GetSpringConstant(), 1.2, 1e-6);
-            TS_ASSERT_DELTA(static_cast<ImmersedBoundaryCellCellInteractionForce<2>*>(p_force)->GetRestLength(), 3.4, 1e-6);
-            TS_ASSERT_EQUALS(static_cast<ImmersedBoundaryCellCellInteractionForce<2>*>(p_force)->IsLinearSpringLaw(), false);
-            TS_ASSERT_EQUALS(static_cast<ImmersedBoundaryCellCellInteractionForce<2>*>(p_force)->IsMorsePotential(), true);
+            TS_ASSERT_DELTA(p_derived_force->GetSpringConstant(), 1.2, 1e-6);
+            TS_ASSERT_DELTA(p_derived_force->GetRestLength(), 3.4, 1e-6);
+            TS_ASSERT_EQUALS(p_derived_force->IsLinearSpringLaw(), false);
+            TS_ASSERT_EQUALS(p_derived_force->IsMorsePotential(), true);
 
             // Tidy up
             delete p_force;
@@ -141,12 +142,13 @@ public:
 
             // Restore from the archive
             input_arch >> p_force;
+            ImmersedBoundaryLinearMembraneForce<2>* p_derived_force = static_cast<ImmersedBoundaryLinearMembraneForce<2>*>(p_force);
 
             // Check member variables have been correctly archived
-            TS_ASSERT_DELTA(static_cast<ImmersedBoundaryLinearMembraneForce<2>*>(p_force)->GetElementSpringConst(), 1.23, 1e-6);
-            TS_ASSERT_DELTA(static_cast<ImmersedBoundaryLinearMembraneForce<2>*>(p_force)->GetElementRestLength(), 2.34, 1e-6);
-            TS_ASSERT_DELTA(static_cast<ImmersedBoundaryLinearMembraneForce<2>*>(p_force)->GetLaminaSpringConst(), 3.45, 1e-6);
-            TS_ASSERT_DELTA(static_cast<ImmersedBoundaryLinearMembraneForce<2>*>(p_force)->GetLaminaRestLength(), 4.56, 1e-6);
+            TS_ASSERT_DELTA(p_derived_force->GetElementSpringConst(), 1.23, 1e-6);
+            TS_ASSERT_DELTA(p_derived_force->GetElementRestLength(), 2.34, 1e-6);
+            TS_ASSERT_DELTA(p_derived_force->GetLaminaSpringConst(), 3.45, 1e-6);
+            TS_ASSERT_DELTA(p_derived_force->GetLaminaRestLength(), 4.56, 1e-6);
 
             // Tidy up
             delete p_force;
@@ -191,7 +193,6 @@ public:
 
             // Restore from the archive
             input_arch >> p_force;
-
             ImmersedBoundaryMorseMembraneForce<2>* p_derived_force = static_cast<ImmersedBoundaryMorseMembraneForce<2>*>(p_force);
 
             // Check member variables have been correctly archived
