@@ -36,8 +36,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef IMMERSEDBOUNDARYMORSEINTERACTIONFORCE_HPP_
 #define IMMERSEDBOUNDARYMORSEINTERACTIONFORCE_HPP_
 
-#include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
+#include "ChasteSerialization.hpp"
 #include "Exception.hpp"
 
 #include "AbstractImmersedBoundaryForce.hpp"
@@ -52,11 +52,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * The well width is a constant interaction strength, the rest length is an equilibrium bond distance, and the well
  * width is a parameter governing the profile of the curve.
  */
-template<unsigned DIM>
+template <unsigned DIM>
 class ImmersedBoundaryMorseInteractionForce : public AbstractImmersedBoundaryForce<DIM>
 {
 private:
-
     friend class boost::serialization::access;
     /**
      * Boost Serialization method for archiving/checkpointing.
@@ -65,49 +64,33 @@ private:
      * @param archive  The boost archive.
      * @param version  The current version of this class.
      */
-    template<class Archive>
-    void serialize(Archive & archive, const unsigned int version)
+    template <class Archive>
+    void serialize(Archive& archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractImmersedBoundaryForce<DIM> >(*this);
-        archive & mSpringConst;
-        archive & mRestLength;
-        archive & mLinearSpring;
-        archive & mMorse;
+        archive& boost::serialization::base_object<AbstractImmersedBoundaryForce<DIM> >(*this);
+        archive& mWellDepth;
+        archive& mRestLength;
+        archive& mLaminaWellDepthMult;
+        archive& mLaminaRestLengthMult;
+        archive& mWellWidth;
     }
 
-protected:
+    /** The basic interaction strength */
+    double mWellDepth;
 
-    /** The immersed boundary mesh. */
-    ImmersedBoundaryMesh<DIM,DIM>* mpMesh;
-
-    /**
-     * The cell-cell spring constant.
-     *
-     * Initialised to 1e3 in the constructor.
-     */
-    double mSpringConst;
-
-    /**
-     * The cell-cell rest length.
-     *
-     * Initialised to 0.25 times the cell interaction distance in the constructor.
-     */
+    /** The basic rest length associated with interactions, as a fraction of cell population's interaction distance */
     double mRestLength;
 
-    /** The number of transmembrane proteins represented in this force class. */
-    unsigned mNumProteins;
+    /** Multiplicative factor to change strength of interactions involving a lamina node */
+    double mLaminaWellDepthMult;
 
-    /** Whether to use linear spring forces. */
-    bool mLinearSpring;
+    /** Multiplicative factor to change equilibrium length of interactions involving a lamina node */
+    double mLaminaRestLengthMult;
 
-    /** Whether to use a force derived from the Morse potential. */
-    bool mMorse;
-
-    /** A vector storing in which position of the node attributes vector each protein is represented. */
-    std::vector<unsigned> mProteinNodeAttributeLocations;
+    /** The well width as a fraction of the cell population's interaction distance */
+    double mWellWidth;
 
 public:
-
     /**
      * Constructor.
      */
@@ -127,66 +110,7 @@ public:
      * @param rCellPopulation reference to the cell population
      */
     void AddImmersedBoundaryForceContribution(std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs,
-            ImmersedBoundaryCellPopulation<DIM>& rCellPopulation);
-
-    /**
-     * @return mProteinNodeAttributeLocations
-     */
-    const std::vector<unsigned>& rGetProteinNodeAttributeLocations() const;
-
-    /**
-     * Helper method for the constructor.
-     *
-     * Initializes the levels of each protein.
-     */
-    void InitializeProteinLevels();
-
-    /**
-     * Helper method for AddImmersedBoundaryForceContribution().
-     *
-     * Updates the levels of each protein at each timestep.
-     */
-    void UpdateProteinLevels();
-
-    /**
-     * Set the spring constant.
-     */
-    void SetSpringConstant(double springConst);
-
-    /**
-     * @return #mSpringConst
-     */
-    double GetSpringConstant();
-
-    /**
-     * Set the rest length.
-     */
-    void SetRestLength(double restLength);
-
-    /**
-     * @return #mRestLength
-     */
-    double GetRestLength();
-
-    /**
-     * Set the force law to linear spring (default)
-     */
-    void UseLinearSpringLaw();
-
-    /**
-     * Set the force law to be based on the Morse potential
-     */
-    void UseMorsePotential();
-
-    /**
-     * @return #mLinearSpring
-     */
-    bool IsLinearSpringLaw();
-
-    /**
-     * @return #mMorse
-     */
-    bool IsMorsePotential();
+                                              ImmersedBoundaryCellPopulation<DIM>& rCellPopulation);
 
     /**
      * Overridden OutputImmersedBoundaryForceParameters() method.
@@ -194,6 +118,36 @@ public:
      * @param rParamsFile the file stream to which the parameters are output
      */
     void OutputImmersedBoundaryForceParameters(out_stream& rParamsFile);
+
+    /** @return mWellDepth */
+    double GetWellDepth() const;
+
+    /** @param wellDepth the new value of mWellDepth */
+    void SetWellDepth(double wellDepth);
+
+    /** @return mRestLength */
+    double GetRestLength() const;
+
+    /** @param restLength the new value of mRestLength */
+    void SetRestLength(double restLength);
+
+    /** @return mLaminaWellDepthMult */
+    double GetLaminaWellDepthMult() const;
+
+    /** @param laminaWellDepthMult the new value of mLaminaWellDepthMult */
+    void SetLaminaWellDepthMult(double laminaWellDepthMult);
+
+    /** @return mLaminaRestLengthMult */
+    double GetLaminaRestLengthMult() const;
+
+    /** @param laminaRestLengthMult the new value of mLaminaRestLengthMult */
+    void SetLaminaRestLengthMult(double laminaRestLengthMult);
+
+    /** @return mWellWidth */
+    double GetWellWidth() const;
+
+    /** @param wellWidth the new value of mWellWidth */
+    void SetWellWidth(double wellWidth);
 };
 
 #include "SerializationExportWrapper.hpp"
