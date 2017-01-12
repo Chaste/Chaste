@@ -39,16 +39,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Needed for test framework
 #include <cxxtest/TestSuite.h>
 
+#include "CellsGenerator.hpp"
 #include "CheckpointArchiveTypes.hpp"
 #include "FileComparison.hpp"
-#include "CellsGenerator.hpp"
 
-// Includes from projects/ImmersedBoundary
+// Immersed boundary forces tested in this test suite
 #include "ImmersedBoundaryLinearInteractionForce.hpp"
-#include "ImmersedBoundaryMorseInteractionForce.hpp"
 #include "ImmersedBoundaryLinearMembraneForce.hpp"
+#include "ImmersedBoundaryMorseInteractionForce.hpp"
 #include "ImmersedBoundaryMorseMembraneForce.hpp"
-#include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
 
 // This test is never run in parallel
 #include "FakePetscSetup.hpp"
@@ -285,6 +284,30 @@ public:
             {
                 FileFinder generated_file = output_file_handler.FindFile("ib_linear_int.parameters");
                 FileFinder reference_file("cell_based/test/data/TestForces/ib_linear_int.parameters",
+                                          RelativeTo::ChasteSourceRoot);
+                FileComparison comparer(generated_file, reference_file);
+                TS_ASSERT(comparer.CompareFiles());
+            }
+        }
+
+        // Test with ImmersedBoundaryMorseInteractionForce
+        {
+            ImmersedBoundaryMorseInteractionForce<2> cell_cell_force;
+            cell_cell_force.SetWellDepth(1.23);
+            cell_cell_force.SetRestLength(2.34);
+            cell_cell_force.SetLaminaWellDepthMult(3.45);
+            cell_cell_force.SetLaminaRestLengthMult(4.56);
+            cell_cell_force.SetWellWidth(5.67);
+
+            TS_ASSERT_EQUALS(cell_cell_force.GetIdentifier(), "ImmersedBoundaryMorseInteractionForce-2");
+
+            out_stream cell_cell_force_parameter_file = output_file_handler.OpenOutputFile("ib_morse_int.parameters");
+            cell_cell_force.OutputImmersedBoundaryForceParameters(cell_cell_force_parameter_file);
+            cell_cell_force_parameter_file->close();
+
+            {
+                FileFinder generated_file = output_file_handler.FindFile("ib_morse_int.parameters");
+                FileFinder reference_file("cell_based/test/data/TestForces/ib_morse_int.parameters",
                                           RelativeTo::ChasteSourceRoot);
                 FileComparison comparer(generated_file, reference_file);
                 TS_ASSERT(comparer.CompareFiles());
