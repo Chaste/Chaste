@@ -17,6 +17,8 @@
 
 class GeodesicSphere23Generator
 {
+    friend class TestMonolayerVertexMeshGenerator;
+    
 private:
     unsigned mDepth;
     std::vector<Node<3>*> mNodes;

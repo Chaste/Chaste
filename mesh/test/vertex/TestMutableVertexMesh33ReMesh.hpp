@@ -1203,13 +1203,12 @@ public:
         // A reference variable as mesh is noncopyable
         MutableVertexMesh<3, 3>* p_mesh = builder.GenerateMesh();
         builder.WriteVtk("DivideElement", "Initial");
-        builder.PrintMesh();
+
         c_vector<double, 3> axis_of_division = zero_vector<double>(3);
         axis_of_division[0] = 1;
         p_mesh->DivideElementAlongGivenAxis(p_mesh->GetElement(0), axis_of_division);
         p_mesh->ReMesh();
         builder.WriteVtk("DivideElement", "After");
-        builder.PrintMesh();
     }
 
 /// Commented this test as T2 Swap should only happen to triangular prism

@@ -405,7 +405,7 @@ public:
         MutableVertexMesh<3, 3>* p_mesh = builder.GenerateMesh();
         builder.WriteVtkWithSubfolder("TestMonolayerGenerator");
         builder.WriteVtk("TestMonolayerGenerator");
-        builder.PrintMesh();
+        PrintMesh(p_mesh);
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 12u);
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 4u);

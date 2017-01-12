@@ -192,13 +192,6 @@ public:
     void WriteVtkWithSubfolder(const std::string& outputFile, const std::string& additionalTag = "",
                                const bool usingFaceId = false);
 
-    /**
-     * Prints out the elements, nodes and faces in verbose mode.
-     * Mainly for debugging purpose.
-     *
-     * @param printDeletedObjects  whether to include deleted objects (false by default)
-     */
-    void PrintMesh(const bool printDeletedObjects = false) const;
 };
 
 #endif /*MONOLAYERVERTEXMESHGENERATOR_HPP_*/

@@ -53,6 +53,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OffLatticeSimulation.hpp"
 #include <boost/lexical_cast.hpp>
 
+// Cell writers
+#include "CellIdWriter.hpp"
+#include "CellLabelWriter.hpp"
+#include "CellVolumesWriter.hpp"
+
 #include "FakePetscSetup.hpp"
 
 #include "Debug.hpp"
@@ -84,6 +89,8 @@ public:
         CellsGenerator<NoCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
         VertexBasedCellPopulation<3> cell_population(*p_mesh, cells);
+        cell_population.AddCellWriter<CellIdWriter>();
+        cell_population.AddCellWriter<CellVolumesWriter>();
 
         OffLatticeSimulation<3> simulator(cell_population);
         simulator.SetOutputDirectory(output_filename);
@@ -121,6 +128,8 @@ public:
         CellsGenerator<NoCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
         VertexBasedCellPopulation<3> cell_population(*p_mesh, cells);
+        cell_population.AddCellWriter<CellIdWriter>();
+        cell_population.AddCellWriter<CellVolumesWriter>();
 
         OffLatticeSimulation<3> simulator(cell_population);
         simulator.SetOutputDirectory(output_filename);
@@ -162,7 +171,6 @@ public:
         builder.ConvertMeshToCylinder(2 * x, 1, radius, 0.5, 1);
         builder.WriteVtk(output_filename, "After");
 
-        builder.PrintMesh();
         {
             std::vector<double> volumes;
             for (unsigned i=0; i<p_mesh->GetNumElements(); volumes.push_back(p_mesh->GetVolumeOfElement(i++)));
@@ -173,6 +181,8 @@ public:
         CellsGenerator<NoCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
         VertexBasedCellPopulation<3> cell_population(*p_mesh, cells);
+        cell_population.AddCellWriter<CellIdWriter>();
+        cell_population.AddCellWriter<CellVolumesWriter>();
 
         OffLatticeSimulation<3> simulator(cell_population);
         simulator.SetOutputDirectory(output_filename);
@@ -216,6 +226,8 @@ public:
         CellsGenerator<UniformG1GenerationalCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_transit_type);
         VertexBasedCellPopulation<3> cell_population(*p_mesh, cells);
+        cell_population.AddCellWriter<CellIdWriter>();
+        cell_population.AddCellWriter<CellVolumesWriter>();
 
         OffLatticeSimulation<3> simulator(cell_population);
         simulator.SetOutputDirectory(output_filename);
@@ -263,7 +275,9 @@ public:
         CellsGenerator<UniformG1GenerationalCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_transit_type);
         VertexBasedCellPopulation<3> cell_population(*p_mesh, cells);
-
+        cell_population.AddCellWriter<CellIdWriter>();
+        cell_population.AddCellWriter<CellVolumesWriter>();
+        
         OffLatticeSimulation<3> simulator(cell_population);
         simulator.SetOutputDirectory(output_filename);
         simulator.SetSamplingTimestepMultiple(10);

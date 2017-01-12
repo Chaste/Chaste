@@ -44,6 +44,8 @@ template<unsigned DIM>
 class Node;
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class VertexElement;
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+class MutableVertexMesh;
 
 
 /////////////////////////////////////////////////////////
@@ -82,6 +84,14 @@ std::set<unsigned> GetSharedFaceIndices(const Node<3>* pNodeA, const Node<3>* pN
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void PrintElement(const VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement);
+
+/**
+ * Prints out the elements, nodes and faces in verbose mode.
+ * Mainly for debugging purpose.
+ *
+ * @param printDeletedObjects  whether to include deleted objects (false by default)
+ */
+void PrintMesh(const MutableVertexMesh<3, 3>* pMesh, const bool printDeletedObjects = false);
 
 /**
  * A face is on boundary when it contains only one element.

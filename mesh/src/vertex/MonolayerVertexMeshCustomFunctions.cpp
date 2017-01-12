@@ -37,10 +37,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Node.hpp"
 #include "VertexElement.hpp"
+#include "MutableVertexMesh.hpp"
 
 #include <algorithm>
 #include <string>
 
+#include <iostream>             // PrintMesh
 #include <iostream>             // PrintElement
 #include <iomanip>              // PrintElement
 
@@ -186,6 +188,98 @@ void PrintElement(const VertexElement<3, 3>* pElement)
         std::cout << "}" << std::endl << "---------------------------------------------------------" << std::endl;
     }
 
+}
+
+void PrintMesh(const MutableVertexMesh<3, 3>* pMesh, const bool printDeletedObjects)
+{
+    const std::string MonolayerValueToName[4] = {"","Basal", "Apical", "Lateral"};
+    const std::string TAB = "    " ;
+
+    std::cout <<"=================================================================================" << std::endl;
+    // Printing out each elements
+    const unsigned num_elems = printDeletedObjects ? pMesh->GetNumAllElements() : pMesh->GetNumElements();
+    for (unsigned i=0; i<num_elems; ++i)
+    {        VertexElement<3,3>& elem = *(pMesh->GetElement(i));
+        std::cout << "ELEMENT (" << i<< ") : " << elem.GetIndex() << (elem.IsDeleted()?" (DELETED)": "") << std::endl;
+        std::cout << TAB << "number of Faces : " << elem.GetNumFaces() << " {";
+        for (unsigned j=0; j<elem.GetNumFaces(); ++j)
+        {
+            std::cout << std::setw(3) << elem.GetFace(j)->GetIndex() << "  ";
+        }
+        std::cout << "}" << std::endl;
+
+        std::cout << TAB << "Face oriented.. : " << elem.GetNumFaces() << " {";
+        for (unsigned j=0; j<elem.GetNumFaces(); ++j)
+        {
+            std::cout << std::setw(3) << elem.FaceIsOrientatedAntiClockwise(j) << "  ";
+        }
+        std::cout << "}" << std::endl;
+
+        std::cout << TAB << "number of Nodes : " << elem.GetNumNodes() << " {  ";
+        for (unsigned j=0; j<elem.GetNumNodes(); ++j)
+        {
+            std::cout << elem.GetNode(j)->GetIndex() << "  ";
+        }
+        std::cout << "}" << std::endl;
+
+        VertexElement<2,3>& basal = *(elem.GetFace(0));
+        std::cout << TAB << "Nodes for basal face " << basal.GetIndex() << " {  ";
+        for (unsigned j=0; j<basal.GetNumNodes(); ++j)
+        {
+            std::cout << basal.GetNode(j)->GetIndex() << "  ";
+        }
+        std::cout << "}" << std::endl << "---------------------------------------------------------" << std::endl;
+    }
+
+    std::cout <<"***************************************************************" << std::endl;
+    // Now printing all faces
+    const unsigned num_faces = printDeletedObjects ? pMesh->GetNumAllFaces() : pMesh->GetNumFaces();
+    for (unsigned i=0; i<num_faces; ++i)
+    {        VertexElement<2, 3>& face = *(pMesh->GetFace(i));
+        std::cout << "FACE (" << i<< ") : " << face.GetIndex() << (face.IsDeleted()?" (DELETED)": "") << std::endl;
+        std::cout << TAB << "Face Attrbute : " << MonolayerValueToName[GetFaceType(&face)] << (IsFaceOnBoundary(&face)?" (BOUNDARY)": "") << std::endl;
+
+        std::set<unsigned> set_tmp = face.rFaceGetContainingElementIndices();
+        std::cout << TAB << "number of Elements : " << set_tmp.size() << " {  ";
+        for (std::set<unsigned>::iterator it=set_tmp.begin(); it != set_tmp.end(); ++it)
+        {
+            std::cout << *it << "  ";
+        }
+        std::cout << "}" << std::endl;
+
+        std::cout << TAB << "number of Nodes : " << face.GetNumNodes() << " {  ";
+        for (unsigned j=0; j<face.GetNumNodes(); ++j)
+        {
+            std::cout << face.GetNode(j)->GetIndex() << "  ";
+        }
+        std::cout << "}" << std::endl << "---------------------------------------------------------" << std::endl;
+    }
+
+    std::cout <<"***************************************************************" << std::endl;
+    //Now printing all the nodes
+    const unsigned num_nodes = printDeletedObjects ? pMesh->GetNumAllNodes() : pMesh->GetNumNodes();
+    for (unsigned i=0; i<num_nodes; ++i)
+    {
+        Node<3>* p_node = pMesh->GetNode(i);
+        std::cout << "NODE (" << i<< ") : " << p_node->GetIndex() << (p_node->IsDeleted()?" (DELETED)": "") << std::endl;
+        std::cout << TAB << "Node Attribute : " << MonolayerValueToName[GetNodeType(p_node)] << (p_node->IsBoundaryNode()?" (BOUNDARY)": "") << std::endl;
+
+        std::set<unsigned> set_tmp = p_node->rGetContainingElementIndices();
+        std::cout << TAB << "number of Elements : " << set_tmp.size() << " {  ";
+        for (std::set<unsigned>::iterator it=set_tmp.begin(); it != set_tmp.end(); ++it)
+        {
+            std::cout << *it << "  ";
+        }
+        std::cout << "}" << std::endl;
+
+        std::set<unsigned> face_tmp = p_node->rGetContainingFaceIndices();
+        std::cout << TAB << "number of Faces : " << face_tmp.size() << " {  ";
+        for (std::set<unsigned>::iterator it=face_tmp.begin(); it != face_tmp.end(); ++it)
+        {
+            std::cout << *it << "  ";
+        }
+        std::cout << "}" << std::endl << "---------------------------------------------------------" << std::endl;
+    }
 }
 
 bool IsFaceOnBoundary(const VertexElement<2, 3>* pFace)
