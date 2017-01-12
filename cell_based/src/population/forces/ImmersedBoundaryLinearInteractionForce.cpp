@@ -34,15 +34,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "ImmersedBoundaryLinearInteractionForce.hpp"
-#include "ImmersedBoundaryElement.hpp"
+#include "ImmersedBoundaryEnumerations.hpp"
 
-template<unsigned DIM>
+template <unsigned DIM>
 ImmersedBoundaryLinearInteractionForce<DIM>::ImmersedBoundaryLinearInteractionForce()
         : AbstractImmersedBoundaryForce<DIM>(),
-          mpMesh(NULL),
           mSpringConst(1e3),
-          mRestLength(DOUBLE_UNSET),
-          mNumProteins(3)
+          mRestLength(0.25),
+          mLaminaSpringConstMult(1.0),
+          mLaminaRestLengthMult(1.0)
 {
 }
 
@@ -51,191 +51,94 @@ ImmersedBoundaryLinearInteractionForce<DIM>::~ImmersedBoundaryLinearInteractionF
 {
 }
 
-template<unsigned DIM>
+template <unsigned DIM>
 void ImmersedBoundaryLinearInteractionForce<DIM>::AddImmersedBoundaryForceContribution(std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs,
-        ImmersedBoundaryCellPopulation<DIM>& rCellPopulation)
+                                                                                       ImmersedBoundaryCellPopulation<DIM>& rCellPopulation)
 {
-    /*
-     * This force class calculates the force between pairs of nodes in different immersed boundaries.  Each node must
-     * therefore store a dimensionless parameter representing the quantity of different transmembrane proteins at that
-     * location.  We attach these quantities as node attributes, and keep track of where in the node attributes vector
-     * each protein concentration is stored.
-     */
-
-    // This will be triggered only once - during simulation set up
-    if (mProteinNodeAttributeLocations.empty())
-    {
-        mpMesh = &(rCellPopulation.rGetMesh());
-
-        mRestLength = 0.25 * rCellPopulation.GetInteractionDistance();
-
-        // First verify that all nodes have the same number of attributes
-        unsigned num_node_attributes = rCellPopulation.GetNode(0)->GetNumNodeAttributes();
-        for (unsigned node_idx = 0; node_idx < rCellPopulation.GetNumNodes(); node_idx++ )
-        {
-            if (num_node_attributes != rCellPopulation.GetNode(node_idx)->GetNumNodeAttributes())
-            {
-                EXCEPTION("All nodes must have the same number of attributes to use this force class.");
-            }
-        }
-
-        // Set up the number of proteins and keep track of where they will be stored in the node attributes vector
-        for (unsigned protein_idx = 0; protein_idx < mNumProteins; protein_idx++)
-        {
-            mProteinNodeAttributeLocations.push_back(num_node_attributes + protein_idx);
-        }
-
-        // Add protein attributes to each node
-        for (unsigned node_idx = 0; node_idx < rCellPopulation.GetNumNodes(); node_idx++)
-        {
-            for (unsigned protein_idx = 0; protein_idx < mNumProteins; protein_idx++)
-            {
-                rCellPopulation.GetNode(node_idx)->AddNodeAttribute(0.0);
-            }
-        }
-
-        // Initialize protein levels
-        InitializeProteinLevels();
-    }
-
-    UpdateProteinLevels();
-
-    // Helper variables for loop
-    unsigned e_cad_idx = mProteinNodeAttributeLocations[0];
-    unsigned p_cad_idx = mProteinNodeAttributeLocations[1];
-    unsigned integrin_idx = mProteinNodeAttributeLocations[2];
-
-    double normed_dist;
-    double protein_mult;
-
-    // The spring constant will be scaled by an amount determined by the intrinsic spacing
-    double intrinsic_spacing = rCellPopulation.GetIntrinsicSpacing();
-    double node_a_elem_spacing;
-    double node_b_elem_spacing;
-    double elem_spacing;
-
-    // The effective spring constant will be a scaled version of mSpringConst
-    double effective_spring_const;
-
-    c_vector<double, DIM> vector_between_nodes;
-    c_vector<double, DIM> force_a_to_b;
-    c_vector<double, DIM> force_b_to_a;
-
-    Node<DIM>* p_node_a;
-    Node<DIM>* p_node_b;
-
-    // If using Morse potential, this can be pre-calculated
-    double well_width = 0.25 * rCellPopulation.GetInteractionDistance();
-
-    // Loop over all pairs of nodes that might be interacting
     for (unsigned pair = 0; pair < rNodePairs.size(); pair++)
     {
-        /*
-         * Interactions only occur between different elements.  Since each node is only ever in a single cell, we can
-         * test equality of the first ContainingElement.
-         */
-        if ( *(rNodePairs[pair].first->ContainingElementsBegin()) !=
-             *(rNodePairs[pair].second->ContainingElementsBegin()) )
+        // Interactions only exist between pairs of nodes that are not in the same boundary / lamina
+        if (rCellPopulation.rGetMesh().NodesInDifferentElementOrLamina(rNodePairs[pair].first, rNodePairs[pair].second))
         {
-            p_node_a = rNodePairs[pair].first;
-            p_node_b = rNodePairs[pair].second;
+            Node<DIM>* p_node_a = rNodePairs[pair].first;
+            Node<DIM>* p_node_b = rNodePairs[pair].second;
 
-            std::vector<double>& r_a_attribs = p_node_a->rGetNodeAttributes();
-            std::vector<double>& r_b_attribs = p_node_b->rGetNodeAttributes();
+            c_vector<double, DIM> vec_a2b = rCellPopulation.rGetMesh().GetVectorFromAtoB(p_node_a->rGetLocation(),
+                                                                                         p_node_b->rGetLocation());
+            double normed_dist = norm_2(vec_a2b);
 
-            vector_between_nodes = mpMesh->GetVectorFromAtoB(p_node_a->rGetLocation(), p_node_b->rGetLocation());
-            normed_dist = norm_2(vector_between_nodes);
-
+            // Force non-zero only within interaction distance, by definition
             if (normed_dist < rCellPopulation.GetInteractionDistance())
             {
-                // Get the element spacing for each of the nodes concerned and calculate the effective spring constant
-                node_a_elem_spacing = mpMesh->GetAverageNodeSpacingOfElement(*(p_node_a->rGetContainingElementIndices().begin()), false);
-                node_b_elem_spacing = mpMesh->GetAverageNodeSpacingOfElement(*(p_node_b->rGetContainingElementIndices().begin()), false);
-                elem_spacing = 0.5 * (node_a_elem_spacing + node_b_elem_spacing);
+                // Need the average spacing of the containing element; this depends on whether it's a lamina or element
+                bool a_lamina = p_node_a->GetRegion() == LAMINA_REGION;
+                bool b_lamina = p_node_b->GetRegion() == LAMINA_REGION;
 
-                effective_spring_const = mSpringConst * elem_spacing / intrinsic_spacing;
+                unsigned a_idx = *(p_node_a->ContainingElementsBegin());
+                unsigned b_idx = *(p_node_b->ContainingElementsBegin());
 
-                // The protein multiplier is a function of the levels of each protein in the current and comparison nodes
-                protein_mult = std::min(r_a_attribs[e_cad_idx], r_b_attribs[e_cad_idx]) +
-                               std::min(r_a_attribs[p_cad_idx], r_b_attribs[p_cad_idx]) +
-                               std::max(r_a_attribs[integrin_idx], r_b_attribs[integrin_idx]);
+                double node_a_elem_spacing = a_lamina ? rCellPopulation.rGetMesh().GetAverageNodeSpacingOfLamina(a_idx, false)
+                                                      : rCellPopulation.rGetMesh().GetAverageNodeSpacingOfElement(a_idx, false);
+
+                double node_b_elem_spacing = b_lamina ? rCellPopulation.rGetMesh().GetAverageNodeSpacingOfLamina(b_idx, false)
+                                                      : rCellPopulation.rGetMesh().GetAverageNodeSpacingOfElement(b_idx, false);
+
+                double elem_spacing = 0.5 * (node_a_elem_spacing + node_b_elem_spacing);
+
+                double eff_spring_const = mSpringConst * elem_spacing / rCellPopulation.GetIntrinsicSpacing();
+                double eff_rest_length = mRestLength * rCellPopulation.GetInteractionDistance();
+
+                if (a_lamina || b_lamina)
+                {
+                    eff_spring_const *= mLaminaSpringConstMult;
+                    eff_rest_length *= mLaminaRestLengthMult;
+                }
 
                 /*
                  * We must scale each applied force by a factor of elem_spacing / local spacing, so that forces
                  * balance when spread to the grid later (where the multiplicative factor is the local spacing)
                  */
+                vec_a2b *= eff_spring_const * (normed_dist - eff_rest_length) / normed_dist;
 
-                if (mLinearSpring)
-                {
-                    vector_between_nodes *=
-                            effective_spring_const * protein_mult * (normed_dist - mRestLength) / normed_dist;
-                }
-                else // Morse potential
-                {
-                    double morse_exp = exp((mRestLength - normed_dist) / well_width);
-                    vector_between_nodes *= 2.0 * well_width * effective_spring_const * protein_mult * morse_exp *
-                                            (1.0 - morse_exp) / normed_dist;
+                c_vector<double, DIM> force_a2b = vec_a2b * (elem_spacing / node_a_elem_spacing);
+                p_node_a->AddAppliedForceContribution(force_a2b);
 
-                }
-
-                force_a_to_b = vector_between_nodes * elem_spacing / node_a_elem_spacing;
-                p_node_a->AddAppliedForceContribution(force_a_to_b);
-
-                force_b_to_a = -1.0 * vector_between_nodes * elem_spacing / node_b_elem_spacing;
-                p_node_b->AddAppliedForceContribution(force_b_to_a);
+                c_vector<double, DIM> force_b2a = vec_a2b * (-1.0 * elem_spacing / node_b_elem_spacing);
+                p_node_b->AddAppliedForceContribution(force_b2a);
             }
         }
     }
 }
 
+
 template<unsigned DIM>
-const std::vector<unsigned>& ImmersedBoundaryLinearInteractionForce<DIM>::rGetProteinNodeAttributeLocations() const
+void ImmersedBoundaryLinearInteractionForce<DIM>::OutputImmersedBoundaryForceParameters(out_stream& rParamsFile)
 {
-    return mProteinNodeAttributeLocations;
+    *rParamsFile << "\t\t\t<SpringConstant>" << mSpringConst << "</SpringConstant>\n";
+    *rParamsFile << "\t\t\t<RestLength>" << mRestLength << "</RestLength>\n";
+    *rParamsFile << "\t\t\t<LaminaSpringConstMult>" << mLaminaSpringConstMult << "</LaminaSpringConstMult>\n";
+    *rParamsFile << "\t\t\t<LaminaRestLengthMult>" << mLaminaRestLengthMult << "</LaminaRestLengthMult>\n";
+
+    // Call method on direct parent class
+    AbstractImmersedBoundaryForce<DIM>::OutputImmersedBoundaryForceParameters(rParamsFile);
 }
 
 template<unsigned DIM>
-void ImmersedBoundaryLinearInteractionForce<DIM>::InitializeProteinLevels()
+double ImmersedBoundaryLinearInteractionForce<DIM>::GetSpringConst() const
 {
-    /*
-     * We are thinking of the following proteins:
-     *  * 0: E-cadherin
-     *  * 1: P-cadherin
-     *  * 2: Integrins
-     */
-    for (unsigned elem_idx = 0; elem_idx < mpMesh->GetNumElements(); elem_idx++)
-    {
-        double e_cad = 1.0;
-        double p_cad = 0.0;
-        double integrin = 0.0;
-
-        for (unsigned node_idx = 0; node_idx < mpMesh->GetElement(elem_idx)->GetNumNodes(); node_idx++)
-        {
-            std::vector<double>& r_node_attributes = mpMesh->GetElement(elem_idx)->GetNode(node_idx)->rGetNodeAttributes();
-
-            r_node_attributes[mProteinNodeAttributeLocations[0]] += e_cad;
-            r_node_attributes[mProteinNodeAttributeLocations[1]] += p_cad;
-            r_node_attributes[mProteinNodeAttributeLocations[2]] += integrin;
-        }
-    }
+    return mSpringConst;
 }
 
 template<unsigned DIM>
-void ImmersedBoundaryLinearInteractionForce<DIM>::UpdateProteinLevels()
-{
-    ///\todo Do something in this method?
-}
-
-template<unsigned DIM>
-void ImmersedBoundaryLinearInteractionForce<DIM>::SetSpringConstant(double springConst)
+void ImmersedBoundaryLinearInteractionForce<DIM>::SetSpringConst(double springConst)
 {
     mSpringConst = springConst;
 }
 
 template<unsigned DIM>
-double ImmersedBoundaryLinearInteractionForce<DIM>::GetSpringConstant()
+double ImmersedBoundaryLinearInteractionForce<DIM>::GetRestLength() const
 {
-    return mSpringConst;
+    return mRestLength;
 }
 
 template<unsigned DIM>
@@ -245,48 +148,27 @@ void ImmersedBoundaryLinearInteractionForce<DIM>::SetRestLength(double restLengt
 }
 
 template<unsigned DIM>
-double ImmersedBoundaryLinearInteractionForce<DIM>::GetRestLength()
+double ImmersedBoundaryLinearInteractionForce<DIM>::GetLaminaSpringConstMult() const
 {
-    return mRestLength;
+    return mLaminaSpringConstMult;
 }
 
 template<unsigned DIM>
-void ImmersedBoundaryLinearInteractionForce<DIM>::UseLinearSpringLaw()
+void ImmersedBoundaryLinearInteractionForce<DIM>::SetLaminaSpringConstMult(double laminaSpringConstMult)
 {
-    mLinearSpring = true;
-    mMorse = false;
+    mLaminaSpringConstMult = laminaSpringConstMult;
 }
 
 template<unsigned DIM>
-void ImmersedBoundaryLinearInteractionForce<DIM>::UseMorsePotential()
+double ImmersedBoundaryLinearInteractionForce<DIM>::GetLaminaRestLengthMult() const
 {
-    mLinearSpring = false;
-    mMorse = true;
+    return mLaminaRestLengthMult;
 }
 
 template<unsigned DIM>
-bool ImmersedBoundaryLinearInteractionForce<DIM>::IsLinearSpringLaw()
+void ImmersedBoundaryLinearInteractionForce<DIM>::SetLaminaRestLengthMult(double laminaRestLengthMult)
 {
-    return mLinearSpring;
-}
-
-template<unsigned DIM>
-bool ImmersedBoundaryLinearInteractionForce<DIM>::IsMorsePotential()
-{
-    return mMorse;
-}
-
-template<unsigned DIM>
-void ImmersedBoundaryLinearInteractionForce<DIM>::OutputImmersedBoundaryForceParameters(out_stream& rParamsFile)
-{
-    *rParamsFile << "\t\t\t<SpringConst>" << mSpringConst << "</SpringConst>\n";
-    *rParamsFile << "\t\t\t<RestLength>" << mRestLength << "</RestLength>\n";
-    *rParamsFile << "\t\t\t<NumProteins>" << mNumProteins << "</NumProteins>\n";
-    *rParamsFile << "\t\t\t<LinearSpring>" << mLinearSpring << "</LinearSpring>\n";
-    *rParamsFile << "\t\t\t<Morse>" << mMorse << "</Morse>\n";
-
-    // Call method on direct parent class
-    AbstractImmersedBoundaryForce<DIM>::OutputImmersedBoundaryForceParameters(rParamsFile);
+    mLaminaRestLengthMult = laminaRestLengthMult;
 }
 
 // Explicit instantiation

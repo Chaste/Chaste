@@ -48,7 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * A force class for use in immersed boundary simulations. This force implements elastic links between nodes in
- * adjacent immersed boundaries.
+ * adjacent immersed boundary.
  */
 template<unsigned DIM>
 class ImmersedBoundaryLinearInteractionForce : public AbstractImmersedBoundaryForce<DIM>
@@ -69,40 +69,21 @@ private:
         archive & boost::serialization::base_object<AbstractImmersedBoundaryForce<DIM> >(*this);
         archive & mSpringConst;
         archive & mRestLength;
-        archive & mLinearSpring;
-        archive & mMorse;
+        archive & mLaminaSpringConstMult;
+        archive & mLaminaRestLengthMult;
     }
 
-protected:
-
-    /** The immersed boundary mesh. */
-    ImmersedBoundaryMesh<DIM,DIM>* mpMesh;
-
-    /**
-     * The cell-cell spring constant.
-     *
-     * Initialised to 1e3 in the constructor.
-     */
+    /** The basic spring constant associated with interactions */
     double mSpringConst;
 
-    /**
-     * The cell-cell rest length.
-     *
-     * Initialised to 0.25 times the cell interaction distance in the constructor.
-     */
+    /** The basic rest length associated with interactions, as a fraction of cell population's interaction distance */
     double mRestLength;
 
-    /** The number of transmembrane proteins represented in this force class. */
-    unsigned mNumProteins;
+    /** Multiplicative factor to change strength of interactions involving a lamina node */
+    double mLaminaSpringConstMult;
 
-    /** Whether to use linear spring forces. */
-    bool mLinearSpring;
-
-    /** Whether to use a force derived from the Morse potential. */
-    bool mMorse;
-
-    /** A vector storing in which position of the node attributes vector each protein is represented. */
-    std::vector<unsigned> mProteinNodeAttributeLocations;
+    /** Multiplicative factor to change equilibrium length of interactions involving a lamina node */
+    double mLaminaRestLengthMult;
 
 public:
 
@@ -118,7 +99,6 @@ public:
 
     /**
      * Overridden AddImmersedBoundaryForceContribution() method.
-     *
      * Calculates the force on each node in the immersed boundary cell population as a result of cell-cell interactions.
      *
      * @param rNodePairs reference to a vector set of node pairs between which to contribute the force
@@ -128,70 +108,34 @@ public:
             ImmersedBoundaryCellPopulation<DIM>& rCellPopulation);
 
     /**
-     * @return mProteinNodeAttributeLocations
-     */
-    const std::vector<unsigned>& rGetProteinNodeAttributeLocations() const;
-
-    /**
-     * Helper method for the constructor.
-     *
-     * Initializes the levels of each protein.
-     */
-    void InitializeProteinLevels();
-
-    /**
-     * Helper method for AddImmersedBoundaryForceContribution().
-     *
-     * Updates the levels of each protein at each timestep.
-     */
-    void UpdateProteinLevels();
-
-    /**
-     * Set the spring constant.
-     */
-    void SetSpringConstant(double springConst);
-
-    /**
-     * @return #mSpringConst
-     */
-    double GetSpringConstant();
-
-    /**
-     * Set the rest length.
-     */
-    void SetRestLength(double restLength);
-
-    /**
-     * @return #mRestLength
-     */
-    double GetRestLength();
-
-    /**
-     * Set the force law to linear spring (default)
-     */
-    void UseLinearSpringLaw();
-
-    /**
-     * Set the force law to be based on the Morse potential
-     */
-    void UseMorsePotential();
-
-    /**
-     * @return #mLinearSpring
-     */
-    bool IsLinearSpringLaw();
-
-    /**
-     * @return #mMorse
-     */
-    bool IsMorsePotential();
-
-    /**
      * Overridden OutputImmersedBoundaryForceParameters() method.
-     *
      * @param rParamsFile the file stream to which the parameters are output
      */
     void OutputImmersedBoundaryForceParameters(out_stream& rParamsFile);
+
+    /** @return mSpringConst */
+    double GetSpringConst() const;
+
+    /** @param springConst the new value of mSpringConst */
+    void SetSpringConst(double springConst);
+
+    /** @return mRestLength */
+    double GetRestLength() const;
+
+    /** @param restLength the new value of mRestLength */
+    void SetRestLength(double restLength);
+
+    /** @return mLaminaSpringConstMult */
+    double GetLaminaSpringConstMult() const;
+
+    /** @param laminaSpringConstMult the new value of mLaminaSpringConstMult */
+    void SetLaminaSpringConstMult(double laminaSpringConstMult);
+
+    /** @return mLaminaRestLengthMult */
+    double GetLaminaRestLengthMult() const;
+
+    /** @param laminaRestLengthMult the new value of mLaminaRestLengthMult */
+    void SetLaminaRestLengthMult(double laminaRestLengthMult);
 };
 
 #include "SerializationExportWrapper.hpp"
