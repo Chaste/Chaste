@@ -40,14 +40,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 
 // Chaste includes
-#include "RandomNumberGenerator.hpp"
 #include "FileFinder.hpp"
+#include "RandomNumberGenerator.hpp"
 #include "Warnings.hpp"
 
 // Needed for immersed boundary simulations
+#include <boost/multi_array.hpp>
 #include <complex>
 #include <fftw3.h>
-#include <boost/multi_array.hpp>
 
 // This test is never run in parallel
 #include "FakePetscSetup.hpp"
@@ -61,7 +61,6 @@ typedef boost::multi_array<double, 3> real_array_3d;
 class TestFftwMethods : public CxxTest::TestSuite
 {
 public:
-
     void TestLoadWisdom() throw(Exception)
     {
         std::string wisdom_filename = "fftw.wisdom";
@@ -110,7 +109,7 @@ public:
         fftw_plan plan_b;
         plan_b = fftw_plan_dft_c2r_2d(size, size, p_complex_data, p_real_output, FFTW_ESTIMATE);
 
-        for (unsigned i=0; i < size; i++)
+        for (unsigned i = 0; i < size; i++)
         {
             for (unsigned j = 0; j < size; j++)
             {
@@ -125,11 +124,11 @@ public:
         fftw_execute(plan_b);
         fftw_destroy_plan(plan_b);
 
-        for (unsigned i=0; i < size; i++)
+        for (unsigned i = 0; i < size; i++)
         {
             for (unsigned j = 0; j < size; j++)
             {
-                TS_ASSERT_DELTA(original_data[i][j], real_output[i][j]/norm, 1e-15);
+                TS_ASSERT_DELTA(original_data[i][j], real_output[i][j] / norm, 1e-15);
             }
         }
     }
