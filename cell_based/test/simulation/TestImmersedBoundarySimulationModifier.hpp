@@ -56,7 +56,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ImmersedBoundarySimulationModifier.hpp"
 #include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
 #include "ImmersedBoundaryLinearMembraneForce.hpp"
-#include "ImmersedBoundaryCellCellInteractionForce.hpp"
+#include "ImmersedBoundaryLinearInteractionForce.hpp"
 
 // This test is never run in parallel
 #include "FakePetscSetup.hpp"
@@ -280,7 +280,7 @@ public:
         p_boundary_force->SetElementSpringConst(1.0 * 1e7);
         p_boundary_force->SetLaminaSpringConst(1.0 * 1e7);
 
-        MAKE_PTR(ImmersedBoundaryCellCellInteractionForce<2>, p_cell_cell_force);
+        MAKE_PTR(ImmersedBoundaryLinearInteractionForce<2>, p_cell_cell_force);
         modifier.AddImmersedBoundaryForce(p_cell_cell_force);
         p_cell_cell_force->SetSpringConstant(1.0 * 1e6);
 

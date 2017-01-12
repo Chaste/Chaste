@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellsGenerator.hpp"
 
 // Includes from projects/ImmersedBoundary
-#include "ImmersedBoundaryCellCellInteractionForce.hpp"
+#include "ImmersedBoundaryLinearInteractionForce.hpp"
 #include "ImmersedBoundaryLinearMembraneForce.hpp"
 #include "ImmersedBoundaryMorseMembraneForce.hpp"
 #include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
@@ -56,19 +56,19 @@ class TestImmersedBoundaryForces : public CxxTest::TestSuite
 {
 public:
 
-    void TestImmersedBoundaryCellCellInteractionForceMethods() throw (Exception)
+    void TestImmersedBoundaryLinearInteractionForceMethods() throw (Exception)
     {
         ///\todo Test this class
     }
 
-    void TestArchivingOfImmersedBoundaryCellCellInteractionForce() throw (Exception)
+    void TestArchivingOfImmersedBoundaryLinearInteractionForce() throw (Exception)
     {
         EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
         OutputFileHandler handler("archive", false);
-        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "ImmersedBoundaryCellCellInteractionForce.arch";
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "ImmersedBoundaryLinearInteractionForce.arch";
 
         {
-            ImmersedBoundaryCellCellInteractionForce<2> force;
+            ImmersedBoundaryLinearInteractionForce<2> force;
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
@@ -92,7 +92,7 @@ public:
 
             // Restore from the archive
             input_arch >> p_force;
-            ImmersedBoundaryCellCellInteractionForce<2>* p_derived_force = static_cast<ImmersedBoundaryCellCellInteractionForce<2>*>(p_force);
+            ImmersedBoundaryLinearInteractionForce<2>* p_derived_force = static_cast<ImmersedBoundaryLinearInteractionForce<2>*>(p_force);
 
             // Check member variables have been correctly archived
             TS_ASSERT_DELTA(p_derived_force->GetSpringConstant(), 1.2, 1e-6);
@@ -214,13 +214,13 @@ public:
         std::string output_directory = "TestForcesOutputParameters";
         OutputFileHandler output_file_handler(output_directory, false);
 
-        // Test with ImmersedBoundaryCellCellInteractionForce
-        ImmersedBoundaryCellCellInteractionForce<2> cell_cell_force;
+        // Test with ImmersedBoundaryLinearInteractionForce
+        ImmersedBoundaryLinearInteractionForce<2> cell_cell_force;
         cell_cell_force.SetSpringConstant(1.2);
         cell_cell_force.SetRestLength(3.4);
         cell_cell_force.UseMorsePotential();
 
-        TS_ASSERT_EQUALS(cell_cell_force.GetIdentifier(), "ImmersedBoundaryCellCellInteractionForce-2");
+        TS_ASSERT_EQUALS(cell_cell_force.GetIdentifier(), "ImmersedBoundaryLinearInteractionForce-2");
 
         out_stream cell_cell_force_parameter_file = output_file_handler.OpenOutputFile("ib_cell_cell.parameters");
         cell_cell_force.OutputImmersedBoundaryForceParameters(cell_cell_force_parameter_file);

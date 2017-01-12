@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef IMMERSEDBOUNDARYCELLCELLINTERACTIONFORCE_HPP_
-#define IMMERSEDBOUNDARYCELLCELLINTERACTIONFORCE_HPP_
+#ifndef IMMERSEDBOUNDARYLINEARINTERACTIONFORCE_HPP_
+#define IMMERSEDBOUNDARYLINEARINTERACTIONFORCE_HPP_
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
@@ -51,7 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * energy function proposed by Farhadifar et al in  Curr. Biol., 2007, 17, 2095-2104.
  */
 template<unsigned DIM>
-class ImmersedBoundaryCellCellInteractionForce : public AbstractImmersedBoundaryForce<DIM>
+class ImmersedBoundaryLinearInteractionForce : public AbstractImmersedBoundaryForce<DIM>
 {
 private:
 
@@ -109,12 +109,12 @@ public:
     /**
      * Constructor.
      */
-    ImmersedBoundaryCellCellInteractionForce();
+    ImmersedBoundaryLinearInteractionForce();
 
     /**
      * Destructor.
      */
-    virtual ~ImmersedBoundaryCellCellInteractionForce();
+    virtual ~ImmersedBoundaryLinearInteractionForce();
 
     /**
      * Overridden AddImmersedBoundaryForceContribution() method.
@@ -195,6 +195,6 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(ImmersedBoundaryCellCellInteractionForce)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(ImmersedBoundaryLinearInteractionForce)
 
-#endif /*IMMERSEDBOUNDARYCELLCELLINTERACTIONFORCE_HPP_*/
+#endif /*IMMERSEDBOUNDARYLINEARINTERACTIONFORCE_HPP_*/

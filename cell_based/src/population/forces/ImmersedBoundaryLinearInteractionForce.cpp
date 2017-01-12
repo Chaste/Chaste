@@ -33,11 +33,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "ImmersedBoundaryCellCellInteractionForce.hpp"
+#include "ImmersedBoundaryLinearInteractionForce.hpp"
 #include "ImmersedBoundaryElement.hpp"
 
 template<unsigned DIM>
-ImmersedBoundaryCellCellInteractionForce<DIM>::ImmersedBoundaryCellCellInteractionForce()
+ImmersedBoundaryLinearInteractionForce<DIM>::ImmersedBoundaryLinearInteractionForce()
         : AbstractImmersedBoundaryForce<DIM>(),
           mpMesh(NULL),
           mSpringConst(1e3),
@@ -47,12 +47,12 @@ ImmersedBoundaryCellCellInteractionForce<DIM>::ImmersedBoundaryCellCellInteracti
 }
 
 template<unsigned DIM>
-ImmersedBoundaryCellCellInteractionForce<DIM>::~ImmersedBoundaryCellCellInteractionForce()
+ImmersedBoundaryLinearInteractionForce<DIM>::~ImmersedBoundaryLinearInteractionForce()
 {
 }
 
 template<unsigned DIM>
-void ImmersedBoundaryCellCellInteractionForce<DIM>::AddImmersedBoundaryForceContribution(std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs,
+void ImmersedBoundaryLinearInteractionForce<DIM>::AddImmersedBoundaryForceContribution(std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs,
         ImmersedBoundaryCellPopulation<DIM>& rCellPopulation)
 {
     /*
@@ -189,13 +189,13 @@ void ImmersedBoundaryCellCellInteractionForce<DIM>::AddImmersedBoundaryForceCont
 }
 
 template<unsigned DIM>
-const std::vector<unsigned>& ImmersedBoundaryCellCellInteractionForce<DIM>::rGetProteinNodeAttributeLocations() const
+const std::vector<unsigned>& ImmersedBoundaryLinearInteractionForce<DIM>::rGetProteinNodeAttributeLocations() const
 {
     return mProteinNodeAttributeLocations;
 }
 
 template<unsigned DIM>
-void ImmersedBoundaryCellCellInteractionForce<DIM>::InitializeProteinLevels()
+void ImmersedBoundaryLinearInteractionForce<DIM>::InitializeProteinLevels()
 {
     /*
      * We are thinking of the following proteins:
@@ -221,63 +221,63 @@ void ImmersedBoundaryCellCellInteractionForce<DIM>::InitializeProteinLevels()
 }
 
 template<unsigned DIM>
-void ImmersedBoundaryCellCellInteractionForce<DIM>::UpdateProteinLevels()
+void ImmersedBoundaryLinearInteractionForce<DIM>::UpdateProteinLevels()
 {
     ///\todo Do something in this method?
 }
 
 template<unsigned DIM>
-void ImmersedBoundaryCellCellInteractionForce<DIM>::SetSpringConstant(double springConst)
+void ImmersedBoundaryLinearInteractionForce<DIM>::SetSpringConstant(double springConst)
 {
     mSpringConst = springConst;
 }
 
 template<unsigned DIM>
-double ImmersedBoundaryCellCellInteractionForce<DIM>::GetSpringConstant()
+double ImmersedBoundaryLinearInteractionForce<DIM>::GetSpringConstant()
 {
     return mSpringConst;
 }
 
 template<unsigned DIM>
-void ImmersedBoundaryCellCellInteractionForce<DIM>::SetRestLength(double restLength)
+void ImmersedBoundaryLinearInteractionForce<DIM>::SetRestLength(double restLength)
 {
     mRestLength = restLength;
 }
 
 template<unsigned DIM>
-double ImmersedBoundaryCellCellInteractionForce<DIM>::GetRestLength()
+double ImmersedBoundaryLinearInteractionForce<DIM>::GetRestLength()
 {
     return mRestLength;
 }
 
 template<unsigned DIM>
-void ImmersedBoundaryCellCellInteractionForce<DIM>::UseLinearSpringLaw()
+void ImmersedBoundaryLinearInteractionForce<DIM>::UseLinearSpringLaw()
 {
     mLinearSpring = true;
     mMorse = false;
 }
 
 template<unsigned DIM>
-void ImmersedBoundaryCellCellInteractionForce<DIM>::UseMorsePotential()
+void ImmersedBoundaryLinearInteractionForce<DIM>::UseMorsePotential()
 {
     mLinearSpring = false;
     mMorse = true;
 }
 
 template<unsigned DIM>
-bool ImmersedBoundaryCellCellInteractionForce<DIM>::IsLinearSpringLaw()
+bool ImmersedBoundaryLinearInteractionForce<DIM>::IsLinearSpringLaw()
 {
     return mLinearSpring;
 }
 
 template<unsigned DIM>
-bool ImmersedBoundaryCellCellInteractionForce<DIM>::IsMorsePotential()
+bool ImmersedBoundaryLinearInteractionForce<DIM>::IsMorsePotential()
 {
     return mMorse;
 }
 
 template<unsigned DIM>
-void ImmersedBoundaryCellCellInteractionForce<DIM>::OutputImmersedBoundaryForceParameters(out_stream& rParamsFile)
+void ImmersedBoundaryLinearInteractionForce<DIM>::OutputImmersedBoundaryForceParameters(out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<SpringConst>" << mSpringConst << "</SpringConst>\n";
     *rParamsFile << "\t\t\t<RestLength>" << mRestLength << "</RestLength>\n";
@@ -290,10 +290,10 @@ void ImmersedBoundaryCellCellInteractionForce<DIM>::OutputImmersedBoundaryForceP
 }
 
 // Explicit instantiation
-template class ImmersedBoundaryCellCellInteractionForce<1>;
-template class ImmersedBoundaryCellCellInteractionForce<2>;
-template class ImmersedBoundaryCellCellInteractionForce<3>;
+template class ImmersedBoundaryLinearInteractionForce<1>;
+template class ImmersedBoundaryLinearInteractionForce<2>;
+template class ImmersedBoundaryLinearInteractionForce<3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(ImmersedBoundaryCellCellInteractionForce)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(ImmersedBoundaryLinearInteractionForce)

@@ -60,7 +60,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "UniformCellCycleModel.hpp"
 
 /* Required for the immersed boundary functionality */
-#include "ImmersedBoundaryCellCellInteractionForce.hpp"
+#include "ImmersedBoundaryLinearInteractionForce.hpp"
 #include "ImmersedBoundaryCellPopulation.hpp"
 #include "ImmersedBoundaryLinearMembraneForce.hpp"
 #include "ImmersedBoundaryMesh.hpp"
@@ -140,14 +140,14 @@ public:
         simulator.AddSimulationModifier(p_main_modifier);
 
         /* We now associate an {{{ImmersedBoundaryLinearMembraneForce}}} and
-         * {{{ImmersedBoundaryCellCellInteractionForce}}} to the {{{SimulationModifier}}} which
+         * {{{ImmersedBoundaryLinearInteractionForce}}} to the {{{SimulationModifier}}} which
          * handles the membrane elasticity forces.  These are created in a similar manner as above.*/
         MAKE_PTR(ImmersedBoundaryLinearMembraneForce<2>, p_boundary_force);
         p_main_modifier->AddImmersedBoundaryForce(p_boundary_force);
         p_boundary_force->SetElementSpringConst(0.5 * 1e8);
         p_boundary_force->SetLaminaSpringConst(1.0 * 1e8);
 
-        MAKE_PTR(ImmersedBoundaryCellCellInteractionForce<2>, p_cell_cell_force);
+        MAKE_PTR(ImmersedBoundaryLinearInteractionForce<2>, p_cell_cell_force);
         p_main_modifier->AddImmersedBoundaryForce(p_cell_cell_force);
         p_cell_cell_force->SetSpringConstant(1.0 * 1e6);
 
