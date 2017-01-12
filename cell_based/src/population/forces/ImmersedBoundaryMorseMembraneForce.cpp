@@ -155,6 +155,7 @@ void ImmersedBoundaryMorseMembraneForce<DIM>::OutputImmersedBoundaryForceParamet
     *rParamsFile << "\t\t\t<ElementRestLength>" << mElementRestLength << "</ElementRestLength>\n";
     *rParamsFile << "\t\t\t<LaminaWellDepth>" << mLaminaWellDepth << "</LaminaWellDepth>\n";
     *rParamsFile << "\t\t\t<LaminaRestLength>" << mLaminaRestLength << "</LaminaRestLength>\n";
+    *rParamsFile << "\t\t\t<WellWidth>" << mWellWidth << "</WellWidth>\n";
 
     // Call method on direct parent class
     AbstractImmersedBoundaryForce<DIM>::OutputImmersedBoundaryForceParameters(rParamsFile);
