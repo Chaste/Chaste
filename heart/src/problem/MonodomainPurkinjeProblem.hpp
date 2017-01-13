@@ -62,8 +62,10 @@ class MonodomainPurkinjeProblem : public AbstractCardiacProblem<ELEMENT_DIM, SPA
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)  // LCOV_EXCL_LINE
     {
-        NEVER_REACHED;
-        // If you do try and use this, you probably need to uncomment the empty constructor in the .cpp too.
+        NEVER_REACHED; // If you remove this NEVER_REACHED, then:
+        // please remove the //LCOV exclude above and the ones around the default constructor in the .cpp too!
+
+
 //        archive & mPurkinjeVoltageColumnId;
 //        archive & boost::serialization::base_object<AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, 2> >(*this);
     }

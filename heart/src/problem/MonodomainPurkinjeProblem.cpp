@@ -97,12 +97,14 @@ MonodomainPurkinjeProblem<ELEMENT_DIM, SPACE_DIM>::MonodomainPurkinjeProblem(Abs
 }
 
 
-//template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-//MonodomainPurkinjeProblem<ELEMENT_DIM, SPACE_DIM>::MonodomainPurkinjeProblem()
-//    : AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, 2>()
-//{
-//}
-
+// LCOV_EXCL_START
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+MonodomainPurkinjeProblem<ELEMENT_DIM, SPACE_DIM>::MonodomainPurkinjeProblem()
+    : AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, 2>(),
+	  mPurkinjeVoltageColumnId(UNSIGNED_UNSET)
+{
+}
+// LCOV_EXCL_STOP
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 MonodomainPurkinjeProblem<ELEMENT_DIM, SPACE_DIM>::~MonodomainPurkinjeProblem()
