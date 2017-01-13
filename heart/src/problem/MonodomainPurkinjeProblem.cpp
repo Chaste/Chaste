@@ -91,16 +91,17 @@ Vec MonodomainPurkinjeProblem<ELEMENT_DIM, SPACE_DIM>::CreateInitialCondition()
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 MonodomainPurkinjeProblem<ELEMENT_DIM, SPACE_DIM>::MonodomainPurkinjeProblem(AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>* pCellFactory)
-        : AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, 2>(pCellFactory)
+        : AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, 2>(pCellFactory),
+		  mPurkinjeVoltageColumnId(UNSIGNED_UNSET)
 {
 }
 
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-MonodomainPurkinjeProblem<ELEMENT_DIM, SPACE_DIM>::MonodomainPurkinjeProblem()
-    : AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, 2>()
-{
-}
+//template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+//MonodomainPurkinjeProblem<ELEMENT_DIM, SPACE_DIM>::MonodomainPurkinjeProblem()
+//    : AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, 2>()
+//{
+//}
 
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -128,10 +129,8 @@ void MonodomainPurkinjeProblem<ELEMENT_DIM, SPACE_DIM>::WriteInfo(double time)
     // avoid printing 1e-320 etc
     if(fabs(v_purk_min)<1e-20)
     {
-#define COVERAGE_IGNORE
         // It's very hard to hit this, as you'd need the whole Purkinje system to be activated
-        v_purk_min = 0.0;
-#undef COVERAGE_IGNORE
+        v_purk_min = 0.0; // LCOV_EXCL_LINE
     }
 
     if(fabs(v_purk_max)<1e-20)

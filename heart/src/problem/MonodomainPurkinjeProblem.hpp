@@ -50,6 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM = ELEMENT_DIM>
 class MonodomainPurkinjeProblem : public AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, 2>
 {
+
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
@@ -59,9 +60,10 @@ class MonodomainPurkinjeProblem : public AbstractCardiacProblem<ELEMENT_DIM, SPA
      * \todo Serialization of Purkinje problems is untested
      */
     template<class Archive>
-    void serialize(Archive & archive, const unsigned int version)
+    void serialize(Archive & archive, const unsigned int version)  // LCOV_EXCL_LINE
     {
         NEVER_REACHED;
+        // If you do try and use this, you probably need to uncomment the empty constructor in the .cpp too.
 //        archive & mPurkinjeVoltageColumnId;
 //        archive & boost::serialization::base_object<AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, 2> >(*this);
     }
