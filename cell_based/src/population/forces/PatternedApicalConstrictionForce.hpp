@@ -42,12 +42,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class PatternedApicalConstrictionForce : public GeneralMonolayerVertexMeshForce
 {
 private:
-
     friend class boost::serialization::access;
-    template<class Archive>
-    void serialize(Archive & archive, const unsigned int version)
+    template <class Archive>
+    void serialize(Archive& archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<GeneralMonolayerVertexMeshForce >(*this);
+        archive& boost::serialization::base_object<GeneralMonolayerVertexMeshForce>(*this);
     }
 
     /**
@@ -69,7 +68,6 @@ private:
     double mPatternedApicalEdgeParameter;
 
 public:
-
     /**
      * Constuctor.
      */

@@ -39,18 +39,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractForce.hpp"
 
 ///\todo document class (#2850)
-template<unsigned DIM>
+template <unsigned DIM>
 class HorizontalStretchForce : public AbstractForce<DIM>
 {
 private:
-
     friend class boost::serialization::access;
-    template<class Archive>
-    void serialize(Archive & archive, const unsigned int version)
+    template <class Archive>
+    void serialize(Archive& archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractForce<DIM> >(*this);
-        archive & mForceMagnitude;
-        archive & mRelativeWidth;
+        archive& boost::serialization::base_object<AbstractForce<DIM> >(*this);
+        archive& mForceMagnitude;
+        archive& mRelativeWidth;
     }
 
     /**
@@ -69,7 +68,7 @@ public:
     /**
      * Constructor.
      */
-    HorizontalStretchForce(const double ForceMagnitude=1, const double RelativeWidth=0.1);
+    HorizontalStretchForce(const double ForceMagnitude = 1, const double RelativeWidth = 0.1);
 
     /**
      * Destructor.

@@ -41,6 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VoronoiVertexMeshGenerator.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "MonolayerVertexMeshGenerator.hpp"
+#include "MonolayerVertexMeshCustomFunctions.hpp"
 
 #include "GeodesicSphere23Generator.hpp"
 
@@ -75,10 +76,10 @@ private:
     static const double end_time = 1;
 
 public:
-    void TestOnHexagonalMesh() throw (Exception)
+    void TestOnHexagonalMesh() throw(Exception)
     {
         std::string output_filename = "TestUniaxialLoad/HoneyTest" + boost::lexical_cast<std::string>(num_cells_x)
-                                    + "x" + boost::lexical_cast<std::string>(num_cells_y);
+            + "x" + boost::lexical_cast<std::string>(num_cells_y);
         HoneycombVertexMeshGenerator generator(num_cells_x, num_cells_y, false, 0.1, 0.01, target_area);
         MutableVertexMesh<2, 2>& vertex_2mesh = *(generator.GetMesh());
         MonolayerVertexMeshGenerator builder;
@@ -110,14 +111,14 @@ public:
 
         simulator.Solve();
 
-        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), num_cells_x*num_cells_y);
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), num_cells_x * num_cells_y);
         TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
 
-    void TestOnVoronoiMesh() throw (Exception)
+    void TestOnVoronoiMesh() throw(Exception)
     {
         std::string output_filename = "TestUniaxialLoad/VoronoiTest" + boost::lexical_cast<std::string>(num_cells_x)
-                                    + "x" + boost::lexical_cast<std::string>(num_cells_y);
+            + "x" + boost::lexical_cast<std::string>(num_cells_y);
         VoronoiVertexMeshGenerator generator(num_cells_x, num_cells_y, 5, target_area);
         MutableVertexMesh<2, 2>& vertex_2mesh = *(generator.GetMesh());
         MonolayerVertexMeshGenerator builder;
@@ -149,7 +150,7 @@ public:
 
         simulator.Solve();
 
-        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), num_cells_x*num_cells_y);
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), num_cells_x * num_cells_y);
         TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
 
@@ -171,9 +172,11 @@ public:
         builder.ConvertMeshToCylinder(2 * x, 1, radius, 0.5, 1);
         builder.WriteVtk(output_filename, "After");
 
+        PrintMesh(p_mesh);
         {
             std::vector<double> volumes;
-            for (unsigned i=0; i<p_mesh->GetNumElements(); volumes.push_back(p_mesh->GetVolumeOfElement(i++)));
+            for (unsigned i = 0; i < p_mesh->GetNumElements(); volumes.push_back(p_mesh->GetVolumeOfElement(i++)))
+                ;
             PRINT_CONTAINER(volumes)
         }
 
@@ -202,7 +205,7 @@ public:
         TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
 
-    void TestCellGrowth() throw (Exception)
+    void TestCellGrowth() throw(Exception)
     {
         // Make a mesh of 10x10
         //        const double z_height = 1;
@@ -210,7 +213,7 @@ public:
         const unsigned num_cells_x = 6;
         const unsigned num_cells_y = 3;
         std::string output_filename = "TestCellDivision/HoneyTest" + boost::lexical_cast<std::string>(num_cells_x)
-                                            + "x" + boost::lexical_cast<std::string>(num_cells_y);
+            + "x" + boost::lexical_cast<std::string>(num_cells_y);
         // There seems to be a bug somewhere in voronoiprism3dVertexMeshGenerator....
         //        VoronoiPrism3dVertexMeshGenerator generator(num_cells_x, num_cells_y, z_height, 5, target_area);
         //        MutableVertexMesh<3,3>* p_mesh = generator.GetMeshAfterReMesh();
@@ -250,11 +253,11 @@ public:
         TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 20.0, 1e-10);
     }
 
-    void TestOnSphere() throw (Exception)
+    void TestOnSphere() throw(Exception)
     {
         const double s_end_time = 2;
         std::string output_filename = "TestUniaxialLoad/SphereTest" + boost::lexical_cast<std::string>(num_cells_x)
-                                    + "x" + boost::lexical_cast<std::string>(num_cells_y);
+            + "x" + boost::lexical_cast<std::string>(num_cells_y);
         GeodesicSphere23Generator builder;
         builder.SubDivide(); // n=42
         builder.SubDivide(); // n=162
@@ -263,7 +266,7 @@ public:
         VertexMeshWriter<2, 3> Writer(output_filename, "Geodesic_Dual", false);
         Writer.WriteVtkUsingMeshWithCellId(*p_dual_mesh);
 
-        const unsigned radius = sqrt(p_dual_mesh->GetNumElements()*target_area/4/M_PI);
+        const unsigned radius = sqrt(p_dual_mesh->GetNumElements() * target_area / 4 / M_PI);
         MonolayerVertexMeshGenerator sBuilder;
         MutableVertexMesh<3, 3>* p_mesh = sBuilder.MakeSphericalMesh33(p_dual_mesh, 5, 0.5);
         sBuilder.WriteVtk(output_filename, "InitialMesh");
@@ -277,7 +280,7 @@ public:
         VertexBasedCellPopulation<3> cell_population(*p_mesh, cells);
         cell_population.AddCellWriter<CellIdWriter>();
         cell_population.AddCellWriter<CellVolumesWriter>();
-        
+
         OffLatticeSimulation<3> simulator(cell_population);
         simulator.SetOutputDirectory(output_filename);
         simulator.SetSamplingTimestepMultiple(10);
@@ -348,10 +351,10 @@ public:
         TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
         TS_ASSERT_DELTA(p_mesh->GetVolumeOfElement(0), target_volume, 0.05);
 
-        simulator.SetEndTime(end_time*2);
-        p_force3->SetVolumeParameters(350, target_volume/2);
+        simulator.SetEndTime(end_time * 2);
+        p_force3->SetVolumeParameters(350, target_volume / 2);
         simulator.Solve();
-        TS_ASSERT_DELTA(p_mesh->GetVolumeOfElement(0), target_volume/2, 0.05);
+        TS_ASSERT_DELTA(p_mesh->GetVolumeOfElement(0), target_volume / 2, 0.05);
     }
 };
 

@@ -36,12 +36,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MisraForce.hpp"
 
 MisraForce::MisraForce()
-   : AbstractForce<3>(),
-     mApicalLineTensionParameter(1.0), // These parameters are average values in Misra's paper
-     mLateralSurfaceEnergyParameter(2.0),
-     mBasalSurfaceEnergyParameter(0.98),
-     mVolumeCompressibilityParameter(100),
-     mTargetVolume(1.0)
+        : AbstractForce<3>(),
+          mApicalLineTensionParameter(1.0), // These parameters are average values in Misra's paper
+          mLateralSurfaceEnergyParameter(2.0),
+          mBasalSurfaceEnergyParameter(0.98),
+          mVolumeCompressibilityParameter(100),
+          mTargetVolume(1.0)
 {
 }
 
@@ -60,20 +60,20 @@ void MisraForce::AddForceContribution(AbstractCellPopulation<3>& rCellPopulation
 
     // Define some helper variables
     VertexBasedCellPopulation<3>* p_cell_population = static_cast<VertexBasedCellPopulation<3>*>(&rCellPopulation);
-    MutableVertexMesh<3,3>& rMesh = p_cell_population->rGetMesh();
+    MutableVertexMesh<3, 3>& rMesh = p_cell_population->rGetMesh();
     const unsigned num_nodes = p_cell_population->GetNumNodes();
     const unsigned num_elements = p_cell_population->GetNumElements();
 
     // Begin by computing the volumes of each element in the mesh, to avoid having to do this multiple times
     std::vector<double> element_volumes(num_elements);
-    for (unsigned elem_index = 0; elem_index<num_elements; ++elem_index)
+    for (unsigned elem_index = 0; elem_index < num_elements; ++elem_index)
     {
         assert(elem_index == p_cell_population->GetElement(elem_index)->GetIndex());
         element_volumes[elem_index] = rMesh.GetVolumeOfElement(elem_index);
     }
 
     // Iterate over nodes in the cell population
-    for (unsigned node_global_index=0; node_global_index<num_nodes; node_global_index++)
+    for (unsigned node_global_index = 0; node_global_index < num_nodes; node_global_index++)
     {
         Node<3>* p_this_node = p_cell_population->GetNode(node_global_index);
         assert(node_global_index == p_this_node->GetIndex());
@@ -109,16 +109,16 @@ void MisraForce::AddForceContribution(AbstractCellPopulation<3>& rCellPopulation
              ++iter)
         {
             // Get this element, its index and its number of nodes
-            VertexElement<3,3>* p_element = p_cell_population->GetElement(*iter);
+            VertexElement<3, 3>* p_element = p_cell_population->GetElement(*iter);
             std::vector<VertexElement<2, 3>*> lateral_faces;
-            VertexElement<2,3>* p_basal_face = NULL;
-            VertexElement<2,3>* p_apical_face = NULL;
+            VertexElement<2, 3>* p_basal_face = NULL;
+            VertexElement<2, 3>* p_apical_face = NULL;
             bool apical_face_orientation = false;
 
             // Populate the pointers/vector to different types of face
-            for (unsigned face_index=0; face_index<p_element->GetNumFaces(); ++face_index)
+            for (unsigned face_index = 0; face_index < p_element->GetNumFaces(); ++face_index)
             {
-                VertexElement<2,3>* p_tmp_face = p_element->GetFace(face_index);
+                VertexElement<2, 3>* p_tmp_face = p_element->GetFace(face_index);
                 switch (unsigned(p_tmp_face->rGetElementAttributes()[0]))
                 {
                     case 1:
@@ -142,7 +142,7 @@ void MisraForce::AddForceContribution(AbstractCellPopulation<3>& rCellPopulation
             c_vector<double, 3> element_volume_gradient = rMesh.GetVolumeGradientofElementAtNode(p_element, node_global_index);
 
             // Add the force contribution from this cell's volume compressibility (note the minus sign)
-            volume_elasticity_contribution -= GetVolumeCompressibilityParameter()*(element_volumes[elem_index] - mTargetVolume)*element_volume_gradient;
+            volume_elasticity_contribution -= GetVolumeCompressibilityParameter() * (element_volumes[elem_index] - mTargetVolume) * element_volume_gradient;
 
             // Calculating apical line tension contribution
             ///\todo Maybe a refactoring similar to lateral will eliminate the trouble of getting previous and next
@@ -154,10 +154,10 @@ void MisraForce::AddForceContribution(AbstractCellPopulation<3>& rCellPopulation
                 const unsigned local_apical_node_index = p_apical_face->GetNodeLocalIndex(node_global_index);
 
                 // Get the previous and next nodes in this element
-                const unsigned previous_apical_node_index = (num_apical_nodes+local_apical_node_index-1)%num_apical_nodes;
+                const unsigned previous_apical_node_index = (num_apical_nodes + local_apical_node_index - 1) % num_apical_nodes;
                 Node<3>* p_previous_apical_node = p_apical_face->GetNode(previous_apical_node_index);
 
-                const unsigned next_apical_node_index = (local_apical_node_index+1)%num_apical_nodes;
+                const unsigned next_apical_node_index = (local_apical_node_index + 1) % num_apical_nodes;
                 Node<3>* p_next_apical_node = p_apical_face->GetNode(next_apical_node_index);
 
                 // Compute the apical line tension parameter for each of these edges - be aware that this is half of the actual
@@ -170,8 +170,8 @@ void MisraForce::AddForceContribution(AbstractCellPopulation<3>& rCellPopulation
                 const c_vector<double, 3> next_edge_gradient = rMesh.GetNextEdgeGradientOfElementAtNode(p_apical_face, local_apical_node_index, apical_face_orientation);
 
                 // Add the force contribution from cell-cell and cell-boundary line tension (note the minus sign)
-                apical_line_tension_contribution -= previous_edge_line_tension_parameter*previous_edge_gradient
-                                                    + next_edge_line_tension_parameter*next_edge_gradient;
+                apical_line_tension_contribution -= previous_edge_line_tension_parameter * previous_edge_gradient
+                    + next_edge_line_tension_parameter * next_edge_gradient;
             }
 
             // Computing basal face contribution
@@ -184,13 +184,13 @@ void MisraForce::AddForceContribution(AbstractCellPopulation<3>& rCellPopulation
             }
 
             // Compute lateral surface contribution
-            for (unsigned local_lateral_face_index = 0; local_lateral_face_index<lateral_faces.size(); ++local_lateral_face_index)
+            for (unsigned local_lateral_face_index = 0; local_lateral_face_index < lateral_faces.size(); ++local_lateral_face_index)
             {
-                VertexElement<2,3>* p_lateral_face = lateral_faces[local_lateral_face_index];
+                VertexElement<2, 3>* p_lateral_face = lateral_faces[local_lateral_face_index];
                 bool lateral_face_has_node = false;
 
                 // Check if this lateral face contains this node
-                for (unsigned local_lateral_node_index=0; local_lateral_node_index<p_lateral_face->GetNumNodes(); ++local_lateral_node_index)
+                for (unsigned local_lateral_node_index = 0; local_lateral_node_index < p_lateral_face->GetNumNodes(); ++local_lateral_node_index)
                 {
                     if (node_global_index == p_lateral_face->GetNodeGlobalIndex(local_lateral_node_index))
                     {
@@ -200,14 +200,14 @@ void MisraForce::AddForceContribution(AbstractCellPopulation<3>& rCellPopulation
                 }
 
                 ///\todo remove this one when the following assertion never have problem.
-                assert( lateral_face_has_node == (p_lateral_face->GetNodeLocalIndex(node_global_index)!=UINT_MAX));
+                assert(lateral_face_has_node == (p_lateral_face->GetNodeLocalIndex(node_global_index) != UINT_MAX));
 
                 // Proceed to force contribution if this lateral face has that particular node
                 if (lateral_face_has_node)
                 {
                     // Some temporary variables so the code would be more comprehensible
                     const unsigned lateralFaceGlobalIndex = p_lateral_face->GetIndex();
-                    const bool isLateralFaceCounted = counted_lateral_face_indices.find(lateralFaceGlobalIndex)!=counted_lateral_face_indices.end();
+                    const bool isLateralFaceCounted = counted_lateral_face_indices.find(lateralFaceGlobalIndex) != counted_lateral_face_indices.end();
 
                     if (!isLateralFaceCounted)
                     {
@@ -225,7 +225,7 @@ void MisraForce::AddForceContribution(AbstractCellPopulation<3>& rCellPopulation
         }
 
         c_vector<double, 3> force_on_node = volume_elasticity_contribution + lateral_face_contribution
-                                              + apical_line_tension_contribution + basal_face_contribution;
+            + apical_line_tension_contribution + basal_face_contribution;
         p_this_node->AddAppliedForceContribution(force_on_node);
     }
 }
@@ -249,7 +249,7 @@ double MisraForce::GetApicalLineTensionParameter(Node<3>* pNodeA, Node<3>* pNode
 
     // Since each internal edge is visited twice in the loop above, we have to use half the line tension parameter
     // for each visit.
-    double line_tension_parameter_in_calculation = GetApicalLineTensionParameter()/2.0;
+    double line_tension_parameter_in_calculation = GetApicalLineTensionParameter() / 2.0;
 
     // If the edge corresponds to a single element, then the cell is on the boundary
     if (shared_elements.size() == 1)

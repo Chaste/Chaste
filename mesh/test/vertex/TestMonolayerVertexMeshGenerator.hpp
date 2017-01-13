@@ -41,28 +41,24 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MonolayerVertexMeshGenerator.hpp"
 #include "MonolayerVertexMeshCustomFunctions.hpp"
 
-#include "VoronoiVertexMeshGenerator.hpp"       // Make Mesh from 2D Mesh
-#include "HoneycombVertexMeshGenerator.hpp"     // Make Mesh from 2D Mesh
-
-
+#include "VoronoiVertexMeshGenerator.hpp" // Make Mesh from 2D Mesh
+#include "HoneycombVertexMeshGenerator.hpp" // Make Mesh from 2D Mesh
 
 #include "Debug.hpp"
 
 #include "FakePetscSetup.hpp"
 
-
 #include "GeodesicSphere23Generator.hpp"
-
 
 class TestMonolayerVertexMeshGenerator : public CxxTest::TestSuite
 {
 public:
-
     void TestMonolayerRearrangement()
     {
         MARK
-        // Make 8 nodes to assign to a cube element
-        std::vector<Node<3>*> nodes;
+            // Make 8 nodes to assign to a cube element
+            std::vector<Node<3>*>
+                nodes;
         nodes.push_back(new Node<3>(0, true, 0.0, 0.0, 0.0));
         nodes.push_back(new Node<3>(1, true, 1.0, 0.0, 0.0));
         nodes.push_back(new Node<3>(2, true, 0.0, 1.0, 0.0));
@@ -71,13 +67,13 @@ public:
         nodes.push_back(new Node<3>(5, true, 1.0, 0.0, 1.0));
         nodes.push_back(new Node<3>(6, true, 0.0, 1.0, 1.0));
         nodes.push_back(new Node<3>(7, true, 1.0, 1.0, 1.0));
-        for (unsigned i=0; i<4; ++i)
+        for (unsigned i = 0; i < 4; ++i)
         {
             SetNodeAsBasal(nodes[i]);
-            SetNodeAsApical(nodes[i+4]);
+            SetNodeAsApical(nodes[i + 4]);
         }
 
-        std::vector<Node<3>*> nodes_face_0, nodes_face_1, nodes_face_2, nodes_face_3, nodes_face_4, nodes_face_5;
+        std::vector<Node<3> *> nodes_face_0, nodes_face_1, nodes_face_2, nodes_face_3, nodes_face_4, nodes_face_5;
 
         // Make 6 square faces out of these nodes
         nodes_face_0.push_back(nodes[0]);
@@ -110,22 +106,22 @@ public:
         nodes_face_5.push_back(nodes[7]);
         nodes_face_5.push_back(nodes[6]);
 
-        std::vector<VertexElement<2,3>*> faces;
-        faces.push_back(new VertexElement<2,3>(0, nodes_face_0));
-        faces.push_back(new VertexElement<2,3>(1, nodes_face_1));
-        faces.push_back(new VertexElement<2,3>(2, nodes_face_2));
-        faces.push_back(new VertexElement<2,3>(3, nodes_face_3));
-        faces.push_back(new VertexElement<2,3>(4, nodes_face_4));
-        faces.push_back(new VertexElement<2,3>(5, nodes_face_5));
+        std::vector<VertexElement<2, 3>*> faces;
+        faces.push_back(new VertexElement<2, 3>(0, nodes_face_0));
+        faces.push_back(new VertexElement<2, 3>(1, nodes_face_1));
+        faces.push_back(new VertexElement<2, 3>(2, nodes_face_2));
+        faces.push_back(new VertexElement<2, 3>(3, nodes_face_3));
+        faces.push_back(new VertexElement<2, 3>(4, nodes_face_4));
+        faces.push_back(new VertexElement<2, 3>(5, nodes_face_5));
 
         std::vector<bool> orientations(faces.size());
-        for (unsigned i=0; i<faces.size(); ++i)
+        for (unsigned i = 0; i < faces.size(); ++i)
         {
             orientations[i] = true;
         }
 
         // Make a cube element out of these faces
-        VertexElement<3,3> element(0, faces, orientations);
+        VertexElement<3, 3> element(0, faces, orientations);
         SetElementAsMonolayer(&element);
 
         PrintElement(&element);
@@ -135,39 +131,39 @@ public:
         TS_ASSERT_EQUALS(element.GetNumFaces(), 6u);
 
         // Test the node arrangements
-        const unsigned true_node_indices[4] {0,1,3,2};
-        for (unsigned local_index=0; local_index<element.GetNumNodes()/2; ++local_index)
+        const unsigned true_node_indices[4]{ 0, 1, 3, 2 };
+        for (unsigned local_index = 0; local_index < element.GetNumNodes() / 2; ++local_index)
         {
             TS_ASSERT_EQUALS(element.GetNodeGlobalIndex(local_index), true_node_indices[local_index]);
-            TS_ASSERT_EQUALS(element.GetNodeGlobalIndex(local_index+4), true_node_indices[local_index]+4);
+            TS_ASSERT_EQUALS(element.GetNodeGlobalIndex(local_index + 4), true_node_indices[local_index] + 4);
         }
 
         // Check if faces are in proper order.
         TS_ASSERT(IsBasalFace(element.GetFace(0)));
         TS_ASSERT(IsApicalFace(element.GetFace(1)));
-        for (unsigned face_index=2; face_index<element.GetNumFaces(); ++face_index)
+        for (unsigned face_index = 2; face_index < element.GetNumFaces(); ++face_index)
         {
             TS_ASSERT(IsLateralFace(element.GetFace(face_index)));
         }
-        const unsigned true_face_indices[6] {0,5,4,2,1,3};
-        for (unsigned local_index=0; local_index<element.GetNumFaces(); ++local_index)
+        const unsigned true_face_indices[6]{ 0, 5, 4, 2, 1, 3 };
+        for (unsigned local_index = 0; local_index < element.GetNumFaces(); ++local_index)
         {
             TS_ASSERT_EQUALS(element.GetFace(local_index)->GetIndex(), true_face_indices[local_index]);
         }
 
         // Test orientations
-        const bool true_orientations[6] {1,0,0,0,1,0};
-        for (unsigned face_index=0; face_index<element.GetNumFaces(); ++face_index)
+        const bool true_orientations[6]{ 1, 0, 0, 0, 1, 0 };
+        for (unsigned face_index = 0; face_index < element.GetNumFaces(); ++face_index)
         {
             TS_ASSERT_EQUALS(element.FaceIsOrientatedAntiClockwise(face_index), true_orientations[face_index]);
         }
 
         // Tidy up
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i < nodes.size(); i++)
         {
             delete nodes[i];
         }
-        for (unsigned i=0; i<faces.size(); i++)
+        for (unsigned i = 0; i < faces.size(); i++)
         {
             delete faces[i];
         }
@@ -189,36 +185,33 @@ public:
         }
         PRINT_3_VARIABLES(builder.mNodes.size(), builder.mEdges.size(), builder.mFaces.size())
 
-        for (unsigned i=0; i<builder.mNodes.size(); ++i)
+        for (unsigned i = 0; i < builder.mNodes.size(); ++i)
         {
             TS_ASSERT_EQUALS(builder.mNodes[i]->GetNumContainingFaces(), 5);
         }
-        for (unsigned i=0; i<builder.mEdges.size(); ++i)
+        for (unsigned i = 0; i < builder.mEdges.size(); ++i)
         {
             TS_ASSERT_EQUALS(builder.mEdges[i]->FaceGetNumContainingElements(), 2);
             TS_ASSERT_EQUALS(builder.mEdges[i]->GetNumNodes(), 2);
         }
-        for (unsigned i=0; i<builder.mFaces.size(); ++i)
+        for (unsigned i = 0; i < builder.mFaces.size(); ++i)
         {
             TS_ASSERT_EQUALS(builder.mFaces[i]->GetNumNodes(), 3);
             TS_ASSERT_EQUALS(builder.mFaces[i]->GetNumFaces(), 3);
         }
 
         {
-            MutableVertexMesh<2,3>* pp_mesh = builder.GetDual();
+            MutableVertexMesh<2, 3>* pp_mesh = builder.GetDual();
             VertexMeshWriter<2, 3> Writer("SphericalMesh", "Geodesic_0Dual", false);
             Writer.WriteVtkUsingMeshWithCellId(*pp_mesh);
 
             MonolayerVertexMeshGenerator sBuilder("ssss");
-            MutableVertexMesh<3,3>* pp_mesh33 = sBuilder.MakeSphericalMesh33(pp_mesh, 5, 0.5);
+            MutableVertexMesh<3, 3>* pp_mesh33 = sBuilder.MakeSphericalMesh33(pp_mesh, 5, 0.5);
             sBuilder.WriteVtk("SphericalMesh", "0");
 
             //            delete pp_mesh;
             //            delete pp_mesh33;
         }
-
-
-
 
         builder.SubDivide();
         PRINT_3_VARIABLES(builder.mNodes.size(), builder.mEdges.size(), builder.mFaces.size())
@@ -235,7 +228,7 @@ public:
         }
 
         unsigned iii = 0;
-        for (unsigned i=0; i<builder.mNodes.size(); ++i)
+        for (unsigned i = 0; i < builder.mNodes.size(); ++i)
         {
             TS_ASSERT_DELTA(builder.mNodes[i]->GetNumContainingElements(), 5.5, 0.51);
             TS_ASSERT_DELTA(builder.mNodes[i]->GetNumContainingFaces(), 5.5, 0.51);
@@ -246,33 +239,30 @@ public:
             }
         }
         TS_ASSERT_EQUALS(iii, 12);
-        for (unsigned i=30; i<builder.mEdges.size(); ++i)
+        for (unsigned i = 30; i < builder.mEdges.size(); ++i)
         {
-            if (builder.mEdges[i]==NULL)
+            if (builder.mEdges[i] == NULL)
                 continue;
             TS_ASSERT_EQUALS(builder.mEdges[i]->FaceGetNumContainingElements(), 2);
             TS_ASSERT_EQUALS(builder.mEdges[i]->GetNumNodes(), 2);
         }
-        for (unsigned i=0; i<builder.mFaces.size(); ++i)
+        for (unsigned i = 0; i < builder.mFaces.size(); ++i)
         {
             TS_ASSERT_EQUALS(builder.mFaces[i]->GetNumNodes(), 3);
             TS_ASSERT_EQUALS(builder.mFaces[i]->GetNumFaces(), 3);
         }
         {
-            MutableVertexMesh<2,3>* pp_mesh = builder.GetDual();
+            MutableVertexMesh<2, 3>* pp_mesh = builder.GetDual();
             VertexMeshWriter<2, 3> Writer("SphericalMesh", "Geodesic_1Dual", false);
             Writer.WriteVtkUsingMeshWithCellId(*pp_mesh);
 
             MonolayerVertexMeshGenerator sBuilder("ssss");
-            MutableVertexMesh<3,3>* pp_mesh33 = sBuilder.MakeSphericalMesh33(pp_mesh, 5, 0.5);
+            MutableVertexMesh<3, 3>* pp_mesh33 = sBuilder.MakeSphericalMesh33(pp_mesh, 5, 0.5);
             sBuilder.WriteVtk("SphericalMesh", "1");
 
             //            delete pp_mesh;
             //            delete pp_mesh33;
         }
-
-
-
 
         builder.SubDivide();
         PRINT_3_VARIABLES(builder.mNodes.size(), builder.mEdges.size(), builder.mFaces.size())
@@ -285,7 +275,7 @@ public:
         }
 
         iii = 0;
-        for (unsigned i=0; i<builder.mNodes.size(); ++i)
+        for (unsigned i = 0; i < builder.mNodes.size(); ++i)
         {
             TS_ASSERT_DELTA(builder.mNodes[i]->GetNumContainingElements(), 5.5, 0.51);
             TS_ASSERT_DELTA(builder.mNodes[i]->GetNumContainingFaces(), 5.5, 0.51);
@@ -296,25 +286,25 @@ public:
             }
         }
         TS_ASSERT_EQUALS(iii, 12);
-        for (unsigned i=30; i<builder.mEdges.size(); ++i)
+        for (unsigned i = 30; i < builder.mEdges.size(); ++i)
         {
-            if (builder.mEdges[i]==NULL)
+            if (builder.mEdges[i] == NULL)
                 continue;
             TS_ASSERT_EQUALS(builder.mEdges[i]->FaceGetNumContainingElements(), 2);
             TS_ASSERT_EQUALS(builder.mEdges[i]->GetNumNodes(), 2);
         }
-        for (unsigned i=0; i<builder.mFaces.size(); ++i)
+        for (unsigned i = 0; i < builder.mFaces.size(); ++i)
         {
             TS_ASSERT_EQUALS(builder.mFaces[i]->GetNumNodes(), 3);
             TS_ASSERT_EQUALS(builder.mFaces[i]->GetNumFaces(), 3);
         }
         {
-            MutableVertexMesh<2,3>* pp_mesh = builder.GetDual();
+            MutableVertexMesh<2, 3>* pp_mesh = builder.GetDual();
             VertexMeshWriter<2, 3> Writer("SphericalMesh", "Geodesic_2Dual", false);
             Writer.WriteVtkUsingMeshWithCellId(*pp_mesh);
 
             MonolayerVertexMeshGenerator sBuilder("ssss");
-            MutableVertexMesh<3,3>* pp_mesh33 = sBuilder.MakeSphericalMesh33(pp_mesh, 5, 0.5);
+            MutableVertexMesh<3, 3>* pp_mesh33 = sBuilder.MakeSphericalMesh33(pp_mesh, 5, 0.5);
             sBuilder.WriteVtk("SphericalMesh", "2");
 
             //            delete pp_mesh;
@@ -323,8 +313,7 @@ public:
 
         MARK
 
-
-        builder.SubDivide();
+            builder.SubDivide();
         PRINT_3_VARIABLES(builder.mNodes.size(), builder.mEdges.size(), builder.mFaces.size())
         {
             MutableVertexMesh<2, 3>* p_mesh = new MutableVertexMesh<2, 3>(builder.mNodes, builder.mFaces);
@@ -335,7 +324,7 @@ public:
         }
 
         iii = 0;
-        for (unsigned i=0; i<builder.mNodes.size(); ++i)
+        for (unsigned i = 0; i < builder.mNodes.size(); ++i)
         {
             TS_ASSERT_DELTA(builder.mNodes[i]->GetNumContainingElements(), 5.5, 0.51);
             TS_ASSERT_DELTA(builder.mNodes[i]->GetNumContainingFaces(), 5.5, 0.51);
@@ -346,25 +335,25 @@ public:
             }
         }
         TS_ASSERT_EQUALS(iii, 12);
-        for (unsigned i=30; i<builder.mEdges.size(); ++i)
+        for (unsigned i = 30; i < builder.mEdges.size(); ++i)
         {
-            if (builder.mEdges[i]==NULL)
+            if (builder.mEdges[i] == NULL)
                 continue;
             TS_ASSERT_EQUALS(builder.mEdges[i]->FaceGetNumContainingElements(), 2);
             TS_ASSERT_EQUALS(builder.mEdges[i]->GetNumNodes(), 2);
         }
-        for (unsigned i=0; i<builder.mFaces.size(); ++i)
+        for (unsigned i = 0; i < builder.mFaces.size(); ++i)
         {
             TS_ASSERT_EQUALS(builder.mFaces[i]->GetNumNodes(), 3);
             TS_ASSERT_EQUALS(builder.mFaces[i]->GetNumFaces(), 3);
         }
         {
-            MutableVertexMesh<2,3>* pp_mesh = builder.GetDual();
+            MutableVertexMesh<2, 3>* pp_mesh = builder.GetDual();
             VertexMeshWriter<2, 3> Writer("SphericalMesh", "Geodesic_3Dual", false);
             Writer.WriteVtkUsingMeshWithCellId(*pp_mesh);
 
             MonolayerVertexMeshGenerator sBuilder("ssss");
-            MutableVertexMesh<3,3>* pp_mesh33 = sBuilder.MakeSphericalMesh33(pp_mesh, 5, 0.5);
+            MutableVertexMesh<3, 3>* pp_mesh33 = sBuilder.MakeSphericalMesh33(pp_mesh, 5, 0.5);
             sBuilder.WriteVtk("SphericalMesh", "3");
 
             //            delete pp_mesh;
@@ -384,17 +373,17 @@ public:
          * |/___\|
          */
         std::vector<Node<3>*> nodes;
-        nodes.push_back(new Node<3>(0, true,  0.0, 0.0, 0.0));
-        nodes.push_back(new Node<3>(1, true,  1.0, 0.0, 0.0));
-        nodes.push_back(new Node<3>(2, true,  1.0, 1.0, 0.0));
-        nodes.push_back(new Node<3>(3, true,  0.0, 1.0, 0.0));
+        nodes.push_back(new Node<3>(0, true, 0.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(1, true, 1.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(2, true, 1.0, 1.0, 0.0));
+        nodes.push_back(new Node<3>(3, true, 0.0, 1.0, 0.0));
         nodes.push_back(new Node<3>(4, false, 0.5, 0.4, 0.0));
         nodes.push_back(new Node<3>(5, false, 0.5, 0.6, 0.0));
 
-        unsigned node_indices_elem_0[3] = {2, 3, 5};
-        unsigned node_indices_elem_1[4] = {4, 1, 2, 5};
-        unsigned node_indices_elem_2[3] = {0, 1, 4};
-        unsigned node_indices_elem_3[4] = {4, 5, 3, 0};
+        unsigned node_indices_elem_0[3] = { 2, 3, 5 };
+        unsigned node_indices_elem_1[4] = { 4, 1, 2, 5 };
+        unsigned node_indices_elem_2[3] = { 0, 1, 4 };
+        unsigned node_indices_elem_3[4] = { 4, 5, 3, 0 };
 
         MonolayerVertexMeshGenerator builder(nodes, "T1SwapWith4Elements");
         builder.BuildElementWith(3, node_indices_elem_0);
@@ -411,15 +400,15 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 4u);
         TS_ASSERT_EQUALS(p_mesh->GetNumFaces(), 17u);
 
-        const unsigned num_lateral_faces = p_mesh->GetNumFaces() - 2*p_mesh->GetNumElements();
+        const unsigned num_lateral_faces = p_mesh->GetNumFaces() - 2 * p_mesh->GetNumElements();
 
-        TS_ASSERT_EQUALS(p_mesh->GetNumNodes()/2+p_mesh->GetNumElements()+1-num_lateral_faces, 2u);
+        TS_ASSERT_EQUALS(p_mesh->GetNumNodes() / 2 + p_mesh->GetNumElements() + 1 - num_lateral_faces, 2u);
 
-        for (unsigned i=0; i<p_mesh->GetNumElements(); ++i)
+        for (unsigned i = 0; i < p_mesh->GetNumElements(); ++i)
         {
             VertexElement<3, 3>* p_elem = p_mesh->GetElement(i);
             std::vector<unsigned> node_indices;
-            for (unsigned j=0; j<p_elem->GetNumNodes()/2; ++j)
+            for (unsigned j = 0; j < p_elem->GetNumNodes() / 2; ++j)
             {
                 node_indices.push_back(p_elem->GetNodeGlobalIndex(j));
             }
@@ -431,26 +420,26 @@ public:
     void TestCreateMeshFrom2dMesh()
     {
         const double z_height(3.14);
-        HoneycombVertexMeshGenerator generator2 (5, 5, false, 1, 1, 7);
+        HoneycombVertexMeshGenerator generator2(5, 5, false, 1, 1, 7);
         MutableVertexMesh<2, 2>* p_mesh2 = generator2.GetMesh();
         MonolayerVertexMeshGenerator generator;
         MutableVertexMesh<3, 3>* p_mesh = generator.MakeMeshUsing2dMesh(*p_mesh2, z_height);
 
-        TS_ASSERT_EQUALS(p_mesh2->GetNumNodes()*2, p_mesh->GetNumNodes());
+        TS_ASSERT_EQUALS(p_mesh2->GetNumNodes() * 2, p_mesh->GetNumNodes());
         TS_ASSERT_EQUALS(p_mesh2->GetNumElements(), p_mesh->GetNumElements());
-        const unsigned num_lateral_faces = p_mesh->GetNumFaces() - 2*p_mesh2->GetNumElements();
+        const unsigned num_lateral_faces = p_mesh->GetNumFaces() - 2 * p_mesh2->GetNumElements();
 
-        TS_ASSERT_EQUALS(p_mesh2->GetNumNodes()+p_mesh2->GetNumElements()+1-num_lateral_faces, 2u);
+        TS_ASSERT_EQUALS(p_mesh2->GetNumNodes() + p_mesh2->GetNumElements() + 1 - num_lateral_faces, 2u);
 
         // Check if nodes are created properly (their location)
-        for (unsigned i=0; i<p_mesh2->GetNumNodes(); ++i)
+        for (unsigned i = 0; i < p_mesh2->GetNumNodes(); ++i)
         {
             c_vector<double, 2> loc2 = p_mesh2->GetNode(i)->rGetLocation();
             c_vector<double, 3> loc_basal = p_mesh->GetNode(i)->rGetLocation();
-            c_vector<double, 3> loc_apical = p_mesh->GetNode(i+p_mesh2->GetNumNodes())->rGetLocation();
+            c_vector<double, 3> loc_apical = p_mesh->GetNode(i + p_mesh2->GetNumNodes())->rGetLocation();
 
             TS_ASSERT(IsBasalNode(p_mesh->GetNode(i)));
-            TS_ASSERT(IsApicalNode(p_mesh->GetNode(i+p_mesh2->GetNumNodes())));
+            TS_ASSERT(IsApicalNode(p_mesh->GetNode(i + p_mesh2->GetNumNodes())));
             TS_ASSERT_DELTA(loc_basal[0], loc2[0], 1e-6);
             TS_ASSERT_DELTA(loc_basal[1], loc2[1], 1e-6);
             TS_ASSERT_DELTA(loc_basal[2], 0, 1e-6);
@@ -460,13 +449,13 @@ public:
             TS_ASSERT_DELTA(loc_apical[2], z_height, 1e-6);
         }
 
-        for (unsigned i=0; i<p_mesh2->GetNumElements(); ++i)
+        for (unsigned i = 0; i < p_mesh2->GetNumElements(); ++i)
         {
             VertexElement<2, 2>* p_elem2 = p_mesh2->GetElement(i);
             VertexElement<3, 3>* p_elem = p_mesh->GetElement(i);
             std::set<unsigned> node_indices2;
             std::set<unsigned> node_indices;
-            for (unsigned j=0; j<p_elem2->GetNumNodes(); ++j)
+            for (unsigned j = 0; j < p_elem2->GetNumNodes(); ++j)
             {
                 node_indices2.insert(p_elem2->GetNodeGlobalIndex(j));
                 node_indices.insert(p_elem->GetNodeGlobalIndex(j));
@@ -474,7 +463,6 @@ public:
             TS_ASSERT_EQUALS(node_indices, node_indices2);
         }
     }
-
 };
 
 #endif /* TESTMONOLAYERVERTEXMESHGENERATOR_HPP_ */

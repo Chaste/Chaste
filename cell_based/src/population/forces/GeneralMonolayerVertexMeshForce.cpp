@@ -37,16 +37,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexBasedCellPopulation.hpp"
 
 GeneralMonolayerVertexMeshForce::GeneralMonolayerVertexMeshForce()
-    : AbstractForce<3>(),
-      mTargetApicalArea(0),
-      mApicalAreaParameter(0),
-      mApicalEdgeParameter(0),
-      mTargetBasalArea(0),
-      mBasalAreaParameter(0),
-      mBasalEdgeParameter(0),
-      mLateralEdgeParameter(0),
-      mTargetVolume(0),
-      mVolumeParameter(0)
+        : AbstractForce<3>(),
+          mTargetApicalArea(0),
+          mApicalAreaParameter(0),
+          mApicalEdgeParameter(0),
+          mTargetBasalArea(0),
+          mBasalAreaParameter(0),
+          mBasalEdgeParameter(0),
+          mLateralEdgeParameter(0),
+          mTargetVolume(0),
+          mVolumeParameter(0)
 {
 }
 
@@ -72,7 +72,7 @@ void GeneralMonolayerVertexMeshForce::AddForceContribution(AbstractCellPopulatio
     std::vector<double> element_volumes(num_elements);
     std::vector<double> apical_areas(num_elements);
     std::vector<double> basal_areas(num_elements);
-    for (unsigned elem_index = 0; elem_index<num_elements; ++elem_index)
+    for (unsigned elem_index = 0; elem_index < num_elements; ++elem_index)
     {
         const VertexElement<3, 3>* p_elem = p_cell_population->GetElement(elem_index);
         assert(elem_index == p_elem->GetIndex());
@@ -82,7 +82,7 @@ void GeneralMonolayerVertexMeshForce::AddForceContribution(AbstractCellPopulatio
     }
 
     // Iterate over nodes in the cell population
-    for (unsigned node_index = 0; node_index < num_nodes; node_index++)
+    for (unsigned node_index = 0; node_index < num_nodes; ++node_index)
     {
         Node<3>* p_this_node = p_cell_population->GetNode(node_index);
 
@@ -112,11 +112,11 @@ void GeneralMonolayerVertexMeshForce::AddForceContribution(AbstractCellPopulatio
             const unsigned elem_index = p_element->GetIndex();
 
             // Calculating volume contribution
-            if (fabs(mVolumeParameter)>1e-5)
+            if (fabs(mVolumeParameter) > 1e-5)
             {
                 c_vector<double, 3> element_volume_gradient = rMesh.GetVolumeGradientofElementAtNode(p_element, node_index);
                 // Add the force contribution from this cell's volume compressibility (note the minus sign)
-                volume_contribution -= mVolumeParameter*element_volume_gradient*(element_volumes[elem_index] - mTargetVolume);
+                volume_contribution -= mVolumeParameter * element_volume_gradient * (element_volumes[elem_index] - mTargetVolume);
             }
 
             // Pointer to the face having the same type as the node
@@ -127,17 +127,17 @@ void GeneralMonolayerVertexMeshForce::AddForceContribution(AbstractCellPopulatio
             // Calculating apical face contribution
             if (node_type == 2)
             {
-                apical_face_contribution -= mApicalAreaParameter*ab_face_gradient*(apical_areas[elem_index] - mTargetApicalArea);
+                apical_face_contribution -= mApicalAreaParameter * ab_face_gradient * (apical_areas[elem_index] - mTargetApicalArea);
             }
 
             // Computing basal face contribution
             if (node_type == 1)
             {
-                basal_face_contribution -= mBasalAreaParameter*ab_face_gradient*(basal_areas[elem_index] - mTargetBasalArea);
+                basal_face_contribution -= mBasalAreaParameter * ab_face_gradient * (basal_areas[elem_index] - mTargetBasalArea);
             }
             const unsigned num_nodes_in_ab_face = p_ab_face->GetNumNodes();
-            neighbour_node_indices.insert(p_ab_face->GetNodeGlobalIndex((local_node_index_in_ab_face+1)%num_nodes_in_ab_face));
-            neighbour_node_indices.insert(p_ab_face->GetNodeGlobalIndex((local_node_index_in_ab_face-1+num_nodes_in_ab_face)%num_nodes_in_ab_face));
+            neighbour_node_indices.insert(p_ab_face->GetNodeGlobalIndex((local_node_index_in_ab_face + 1) % num_nodes_in_ab_face));
+            neighbour_node_indices.insert(p_ab_face->GetNodeGlobalIndex((local_node_index_in_ab_face - 1 + num_nodes_in_ab_face) % num_nodes_in_ab_face));
         }
 
         const c_vector<double, 3>& r_node_location = p_this_node->rGetLocation();
@@ -147,17 +147,17 @@ void GeneralMonolayerVertexMeshForce::AddForceContribution(AbstractCellPopulatio
              ++it)
         {
             Node<3>* p_neighbour_node = p_cell_population->GetNode(*it);
-            const c_vector<double, 3> edge_gradient = (r_node_location - p_neighbour_node->rGetLocation())/norm_2(p_this_node->rGetLocation() - p_neighbour_node->rGetLocation());
-            ab_edge_contribution -= edge_gradient*(node_type==1u ? mBasalEdgeParameter : mApicalEdgeParameter);
+            const c_vector<double, 3> edge_gradient = (r_node_location - p_neighbour_node->rGetLocation()) / norm_2(p_this_node->rGetLocation() - p_neighbour_node->rGetLocation());
+            ab_edge_contribution -= edge_gradient * (node_type == 1u ? mBasalEdgeParameter : mApicalEdgeParameter);
         }
 
-        const unsigned opposite_node_index = node_index + num_nodes/2*(node_type==1u?1:-1);
+        const unsigned opposite_node_index = node_index + num_nodes / 2 * (node_type == 1u ? 1 : -1);
         const c_vector<double, 3>& r_opposite_node_location = p_cell_population->GetNode(opposite_node_index)->rGetLocation();
-        const c_vector<double, 3> edge_gradient = (r_node_location- r_opposite_node_location)/norm_2(r_node_location - r_opposite_node_location);
-        lateral_edge_contribution -= edge_gradient*mLateralEdgeParameter*(containing_elem_indices.size());
+        const c_vector<double, 3> edge_gradient = (r_node_location - r_opposite_node_location) / norm_2(r_node_location - r_opposite_node_location);
+        lateral_edge_contribution -= edge_gradient * mLateralEdgeParameter * (containing_elem_indices.size());
 
         c_vector<double, 3> force_on_node = basal_face_contribution + ab_edge_contribution + apical_face_contribution
-                + lateral_edge_contribution + volume_contribution;
+            + lateral_edge_contribution + volume_contribution;
         p_this_node->AddAppliedForceContribution(force_on_node);
     }
 }

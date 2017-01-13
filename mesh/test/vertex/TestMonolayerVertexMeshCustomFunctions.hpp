@@ -49,8 +49,6 @@ using boost::assign::list_of;
 
 #include "FakePetscSetup.hpp"
 
-
-
 #include <boost/lexical_cast.hpp>
 
 #include "Debug.hpp"
@@ -58,7 +56,6 @@ using boost::assign::list_of;
 class TestMonolayerVertexMeshCustomFunctions : public CxxTest::TestSuite
 {
 public:
-
     void TestElementHasNode()
     {
         Node<3> n18(18);
@@ -98,10 +95,10 @@ public:
         nodes.push_back(new Node<3>(8, true, 1.0, 2.0));
         nodes.push_back(new Node<3>(9, true, 2.0, 2.0));
         nodes.push_back(new Node<3>(10, true, 2.5, 2.0));
-        const unsigned node_indices_elem_0[4] = {0, 1, 4, 3};
-        const unsigned node_indices_elem_1[4] = {1, 2, 5, 4};
-        const unsigned node_indices_elem_2[5] = {4, 5, 6, 9, 8};
-        const unsigned node_indices_elem_3[4] = {6, 7, 10, 9};
+        const unsigned node_indices_elem_0[4] = { 0, 1, 4, 3 };
+        const unsigned node_indices_elem_1[4] = { 1, 2, 5, 4 };
+        const unsigned node_indices_elem_2[5] = { 4, 5, 6, 9, 8 };
+        const unsigned node_indices_elem_3[4] = { 6, 7, 10, 9 };
 
         MonolayerVertexMeshGenerator builder(nodes, "TestGetSharedElementnFaceIndices");
         builder.BuildElementWith(4, node_indices_elem_0);
@@ -110,7 +107,7 @@ public:
         builder.BuildElementWith(4, node_indices_elem_3);
         // A reference variable as mesh is noncopyable
         MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
-        builder.WriteVtkWithSubfolder("MonolayerCustomFunctions","Before");
+        builder.WriteVtkWithSubfolder("MonolayerCustomFunctions", "Before");
 
         // Test some random node pairs
         std::set<unsigned> elems_tmp, faces_tmp;
@@ -166,22 +163,21 @@ public:
 
         // Test for boundary faces
         const std::set<unsigned> non_boundary_indices = list_of(3)(10)(14);
-        for (unsigned face_index=0; face_index<vertex_mesh.GetNumFaces(); ++face_index)
+        for (unsigned face_index = 0; face_index < vertex_mesh.GetNumFaces(); ++face_index)
         {
-            const VertexElement<2,3>* p_face = vertex_mesh.GetFace(face_index);
-            TS_ASSERT_EQUALS(IsFaceOnBoundary(p_face), non_boundary_indices.count(face_index)==0);
+            const VertexElement<2, 3>* p_face = vertex_mesh.GetFace(face_index);
+            TS_ASSERT_EQUALS(IsFaceOnBoundary(p_face), non_boundary_indices.count(face_index) == 0);
         }
     }
-
 
     void SomeForce(MutableVertexMesh<3, 3>& vertex_mesh, double dt = 0.1)
     {
         c_vector<double, 3> force = zero_vector<double>(3);
 
         double mVolumeParameter = 1, mTargetVolume = 0.5,
-        mApicalAreaParameter=0, mTargetApicalArea=0, mApicalEdgeParameter=0,
-        mBasalAreaParameter=0, mTargetBasalArea=0, mBasalEdgeParameter=0,
-        mLateralEdgeParameter=0;
+               mApicalAreaParameter = 0, mTargetApicalArea = 0, mApicalEdgeParameter = 0,
+               mBasalAreaParameter = 0, mTargetBasalArea = 0, mBasalEdgeParameter = 0,
+               mLateralEdgeParameter = 0;
 
         // Define some helper variables
         const unsigned num_nodes = vertex_mesh.GetNumNodes();
@@ -191,7 +187,7 @@ public:
         std::vector<double> element_volumes(num_elements);
         std::vector<double> apical_areas(num_elements);
         std::vector<double> basal_areas(num_elements);
-        for (unsigned elem_index = 0; elem_index<num_elements; ++elem_index)
+        for (unsigned elem_index = 0; elem_index < num_elements; ++elem_index)
         {
             const VertexElement<3, 3>* p_elem = vertex_mesh.GetElement(elem_index);
             assert(elem_index == p_elem->GetIndex());
@@ -224,8 +220,8 @@ public:
 
             // Iterate over these elements
             for (std::set<unsigned>::const_iterator iter = containing_elem_indices.begin();
-                    iter != containing_elem_indices.end();
-                    ++iter)
+                 iter != containing_elem_indices.end();
+                 ++iter)
             {
                 // Get this element, its index and its number of nodes
                 VertexElement<3, 3>* p_element = vertex_mesh.GetElement(*iter);
@@ -236,27 +232,25 @@ public:
                 c_vector<double, 3> element_volume_gradient = vertex_mesh.GetVolumeGradientofElementAtNode(p_element, global_index);
 
                 // Add the force contribution from this cell's volume compressibility (note the minus sign)
-                volume_contribution -= mVolumeParameter*element_volume_gradient*(element_volumes[elem_index] - mTargetVolume);
+                volume_contribution -= mVolumeParameter * element_volume_gradient * (element_volumes[elem_index] - mTargetVolume);
 
-
-// {
-// const double k(std::abs(element_volume_gradient[0]));
-// PRINT_4_VARIABLES(element_volumes[elem_index], mTargetVolume, p_this_node->GetIndex(), k)
-// PRINT_CONTAINER(element_volume_gradient/k);
-// PRINT_CONTAINER(volume_contribution)
-// }
-
+                // {
+                // const double k(std::abs(element_volume_gradient[0]));
+                // PRINT_4_VARIABLES(element_volumes[elem_index], mTargetVolume, p_this_node->GetIndex(), k)
+                // PRINT_CONTAINER(element_volume_gradient/k);
+                // PRINT_CONTAINER(volume_contribution)
+                // }
             }
 
             c_vector<double, 3> force_on_node = basal_face_contribution + ab_edge_contribution + apical_face_contribution
-                    + lateral_edge_contribution + volume_contribution;
+                + lateral_edge_contribution + volume_contribution;
             p_this_node->AddAppliedForceContribution(force_on_node);
         }
 
         for (unsigned global_index = 0; global_index < num_nodes; ++global_index)
         {
             Node<3>* p_this_node = vertex_mesh.GetNode(global_index);
-            p_this_node->rGetModifiableLocation() += p_this_node->rGetAppliedForce()*dt;
+            p_this_node->rGetModifiableLocation() += p_this_node->rGetAppliedForce() * dt;
             p_this_node->ClearAppliedForce();
         }
     }
@@ -275,7 +269,7 @@ public:
         nodes.push_back(new Node<3>(1, true, 1.0, 0.0));
         nodes.push_back(new Node<3>(2, true, 0.0, 1.0));
         nodes.push_back(new Node<3>(3, true, 1.0, 1.0));
-        const unsigned node_indices_elem_0[4] = {0, 1, 3, 2};
+        const unsigned node_indices_elem_0[4] = { 0, 1, 3, 2 };
 
         MonolayerVertexMeshGenerator builder(nodes, "TestGradientDeviation");
         builder.BuildElementWith(4, node_indices_elem_0);
@@ -284,26 +278,19 @@ public:
 
         PrintElement(vertex_mesh.GetElement(0));
 
-        for (unsigned i=0; i<vertex_mesh.GetNumNodes(); ++i)
-            vertex_mesh.GetNode(i)->rGetModifiableLocation()[2] +=5;
+        for (unsigned i = 0; i < vertex_mesh.GetNumNodes(); ++i)
+            vertex_mesh.GetNode(i)->rGetModifiableLocation()[2] += 5;
 
-        builder.WriteVtkWithSubfolder("MonolayerCustomFunctions","Before");
+        builder.WriteVtkWithSubfolder("MonolayerCustomFunctions", "Before");
 
-
-
-        for (unsigned t=0; t<50; ++t)
+        for (unsigned t = 0; t < 50; ++t)
         {
             SomeForce(vertex_mesh);
             builder.WriteVtkWithSubfolder("MonolayerCustomFunctions", "time_" + boost::lexical_cast<std::string>(t));
 
-            PRINT_2_VARIABLES(t,vertex_mesh.GetVolumeOfElement(0));
+            PRINT_2_VARIABLES(t, vertex_mesh.GetVolumeOfElement(0));
         }
-
-
-
-
     }
-
 };
 
 #endif /* TESTMONOLAYERVERTEXMESHCUSTOMFUNCTIONS_HPP_ */

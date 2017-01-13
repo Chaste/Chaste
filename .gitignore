@@ -56,3 +56,6 @@ _local/
 # Built exes in /apps/src/
 /apps/src/Chaste
 /apps/src/MeshConvert
+
+# Misc from VSCode
+*.json

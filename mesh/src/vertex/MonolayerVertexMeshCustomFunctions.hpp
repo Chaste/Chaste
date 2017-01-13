@@ -40,13 +40,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 
 // Forward declaration prevents circular include chain
-template<unsigned DIM>
+template <unsigned DIM>
 class Node;
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class VertexElement;
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class MutableVertexMesh;
-
 
 /////////////////////////////////////////////////////////
 ///      Some function that are relevant for all      ///
@@ -58,7 +57,7 @@ class MutableVertexMesh;
  * @param nodeIndex  the global index of that particular node
  * @return boolean, if node is in the element
  */
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool ElementHasNode(const VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement, const unsigned nodeIndex);
 
 /**
@@ -82,7 +81,7 @@ std::set<unsigned> GetSharedFaceIndices(const Node<3>* pNodeA, const Node<3>* pN
  * (adapted from MonolayerVertexMeshGenerator::PrintMesh()).
  * @param pElement pointer of the element which will be inspected.
  */
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void PrintElement(const VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement);
 
 /**
@@ -100,8 +99,6 @@ void PrintMesh(const MutableVertexMesh<3, 3>* pMesh, const bool printDeletedObje
  */
 bool IsFaceOnBoundary(const VertexElement<2, 3>* pFace);
 
-
-
 ///////////////////////////////////////////////////////////////////////////////////
 ///                       Functions for monolayer classes                       ///
 ///////////////////////////////////////////////////////////////////////////////////
@@ -116,17 +113,17 @@ bool IsFaceOnBoundary(const VertexElement<2, 3>* pFace);
  */
 namespace Monolayer
 {
-    typedef unsigned v_type;
+typedef unsigned v_type;
 
-    const double SetBasalValue = 1.1;
-    const double SetApicalValue = 2.1;
-    const double SetLateralValue = 3.1;
-    const double SetElementValue = 4.1;
+const double SetBasalValue = 1.1;
+const double SetApicalValue = 2.1;
+const double SetLateralValue = 3.1;
+const double SetElementValue = 4.1;
 
-    const v_type BasalValue = 1;
-    const v_type ApicalValue = 2;
-    const v_type LateralValue = 3;
-    const v_type ElementValue = 4;
+const v_type BasalValue = 1;
+const v_type ApicalValue = 2;
+const v_type LateralValue = 3;
+const v_type ElementValue = 4;
 }
 
 ///////////////////////////////////
@@ -164,7 +161,6 @@ bool IsApicalNode(const Node<3>* pNode);
  * @return  whether this node is a basal node
  */
 bool IsBasalNode(const Node<3>* pNode);
-
 
 //////////////////////////////////
 ///     Functions for face     ///
@@ -214,7 +210,6 @@ bool IsBasalFace(const VertexElement<2, 3>* pFace);
  */
 bool IsLateralFace(const VertexElement<2, 3>* pFace);
 
-
 ////////////////////////////////////////////
 ///     Functions for Vertex Element     ///
 ////////////////////////////////////////////
@@ -232,7 +227,7 @@ void SetElementAsMonolayer(VertexElement<3, 3>* pElement);
  * @param pElement  pointer of an element
  * @return  whether this element is within a monolayer tissue
  */
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool IsMonolayerElement(const VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement);
 
 /**
@@ -269,8 +264,6 @@ unsigned MonolayerGetHalfNumNodes(const VertexElement<3, 3>* pElement);
 std::vector<unsigned> GetLateralFace(const VertexElement<3, 3>* pElement, const unsigned nodeIndexA,
                                      const unsigned nodeIndexB);
 
-
 //void AddPairNode(VertexElement<3, 3>* pElement, const unsigned index, Node<3>* pBasalNode, Node<3>* pApicalNode);
-
 
 #endif /* MONOLAYERVERTEXMESHCUSTOMFUNCTIONS_HPP_ */

@@ -46,7 +46,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class MonolayerVertexMeshGenerator
 {
 protected:
-
     /**
      * Name of this instance. When writing vtk file, the name will be added at
      * the very beginning.
@@ -85,7 +84,6 @@ protected:
     bool mCallDestructor;
 
 public:
-
     /**
      * Default constructor of this class. It does basically nothing.
      *
@@ -122,7 +120,7 @@ public:
      * @return  a pointer of the monolayer vertex mesh.
      */
     MutableVertexMesh<3, 3>* MakeMeshUsing2dMesh(const MutableVertexMesh<2, 2>& mesh2d,
-                                                 const double zHeight=1);
+                                                 const double zHeight = 1);
 
     /**
      * Builds individual element with given basal node indices.
@@ -158,11 +156,11 @@ public:
      * @param length  the length of the clinder mesh
      * @return  the pointer of newly created cylinder mesh
      */
-    MutableVertexMesh<3, 3>* ConvertMeshToCylinder(const double widthX, const double widthY,
-            const double radius, const double thickness, const double length);
+    MutableVertexMesh<3, 3>* ConvertMeshToCylinder(const double widthX, const double widthY, const double radius,
+                                                   const double thickness, const double length);
 
     MutableVertexMesh<3, 3>* MakeSphericalMesh33(const MutableVertexMesh<2, 3>* p_mesh_23, const double radius,
-                                        const double thickness);
+                                                 const double thickness);
 
     /**
      * Clear all mesh objects stored within the class.
@@ -191,7 +189,6 @@ public:
      */
     void WriteVtkWithSubfolder(const std::string& outputFile, const std::string& additionalTag = "",
                                const bool usingFaceId = false);
-
 };
 
 #endif /*MONOLAYERVERTEXMESHGENERATOR_HPP_*/

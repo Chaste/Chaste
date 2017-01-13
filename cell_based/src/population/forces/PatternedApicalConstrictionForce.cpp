@@ -38,10 +38,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellLabel.hpp"
 
 PatternedApicalConstrictionForce::PatternedApicalConstrictionForce()
-    : GeneralMonolayerVertexMeshForce(),
-      mPatternedTargetApicalArea(0.0),
-      mPatternedApicalAreaParameter(0.0),
-      mPatternedApicalEdgeParameter(0.0)
+        : GeneralMonolayerVertexMeshForce(),
+          mPatternedTargetApicalArea(0.0),
+          mPatternedApicalAreaParameter(0.0),
+          mPatternedApicalEdgeParameter(0.0)
 {
 }
 
@@ -67,7 +67,7 @@ void PatternedApicalConstrictionForce::AddForceContribution(AbstractCellPopulati
     std::vector<double> element_volumes(num_elements);
     std::vector<double> apical_areas(num_elements);
     std::vector<double> basal_areas(num_elements);
-    for (unsigned elem_index = 0 ; elem_index<num_elements ; ++elem_index)
+    for (unsigned elem_index = 0; elem_index < num_elements; ++elem_index)
     {
         const VertexElement<3, 3>* p_elem = p_cell_population->GetElement(elem_index);
         assert(elem_index == p_elem->GetIndex());
@@ -77,7 +77,7 @@ void PatternedApicalConstrictionForce::AddForceContribution(AbstractCellPopulati
     }
 
     // Iterate over nodes in the cell population
-    for (unsigned node_index=0 ; node_index<num_nodes ; node_index++)
+    for (unsigned node_index = 0; node_index < num_nodes; node_index++)
     {
         Node<3>* p_this_node = p_cell_population->GetNode(node_index);
         assert(node_index == p_this_node->GetIndex());
@@ -106,9 +106,9 @@ void PatternedApicalConstrictionForce::AddForceContribution(AbstractCellPopulati
             std::vector<VertexElement<2, 3>*> lateral_faces;
 
             // Populate the pointers/vector to different types of face
-            for (unsigned face_index=0; face_index<p_element->GetNumFaces(); ++face_index)
+            for (unsigned face_index = 0; face_index < p_element->GetNumFaces(); ++face_index)
             {
-                VertexElement<2,3>* p_tmp_face = p_element->GetFace(face_index);
+                VertexElement<2, 3>* p_tmp_face = p_element->GetFace(face_index);
                 switch (unsigned(p_tmp_face->rGetElementAttributes()[0]))
                 {
                     case 1:
@@ -130,7 +130,7 @@ void PatternedApicalConstrictionForce::AddForceContribution(AbstractCellPopulati
             // Calculating volume contribution
             c_vector<double, 3> element_volume_gradient = rMesh.GetVolumeGradientofElementAtNode(p_element, node_index);
             // Add the force contribution from this cell's volume compressibility (note the minus sign)
-            volume_contribution -= this->mVolumeParameter*element_volume_gradient*(element_volumes[elem_index] - this->mTargetVolume);
+            volume_contribution -= this->mVolumeParameter * element_volume_gradient * (element_volumes[elem_index] - this->mTargetVolume);
             // Pointer to the face having the same type as the node
             const VertexElement<2, 3>* p_ab_face = p_element->GetFace(node_type - 1);
             const unsigned local_node_index_in_ab_face = p_ab_face->GetNodeLocalIndex(node_index);
@@ -142,16 +142,16 @@ void PatternedApicalConstrictionForce::AddForceContribution(AbstractCellPopulati
                 double apical_target_area = cell_is_labelled ? mPatternedTargetApicalArea : this->mTargetApicalArea;
                 double apical_area_parameter = cell_is_labelled ? mPatternedApicalAreaParameter : this->mApicalAreaParameter;
 
-                apical_face_contribution -= apical_area_parameter*ab_face_gradient*(apical_areas[elem_index] - apical_target_area);
+                apical_face_contribution -= apical_area_parameter * ab_face_gradient * (apical_areas[elem_index] - apical_target_area);
             }
             // Computing basal face contribution
             if (node_type == 1)
             {
-                basal_face_contribution -= this->mBasalAreaParameter*ab_face_gradient*(basal_areas[elem_index] - this->mTargetBasalArea);
+                basal_face_contribution -= this->mBasalAreaParameter * ab_face_gradient * (basal_areas[elem_index] - this->mTargetBasalArea);
             }
             const unsigned num_nodes_in_ab_face = p_ab_face->GetNumNodes();
-            neighbour_node_indices.insert(p_ab_face->GetNodeGlobalIndex((local_node_index_in_ab_face+1)%num_nodes_in_ab_face));
-            neighbour_node_indices.insert(p_ab_face->GetNodeGlobalIndex((local_node_index_in_ab_face-1+num_nodes_in_ab_face)%num_nodes_in_ab_face));
+            neighbour_node_indices.insert(p_ab_face->GetNodeGlobalIndex((local_node_index_in_ab_face + 1) % num_nodes_in_ab_face));
+            neighbour_node_indices.insert(p_ab_face->GetNodeGlobalIndex((local_node_index_in_ab_face - 1 + num_nodes_in_ab_face) % num_nodes_in_ab_face));
         }
 
         for (std::set<unsigned>::iterator it = neighbour_node_indices.begin();
@@ -159,24 +159,24 @@ void PatternedApicalConstrictionForce::AddForceContribution(AbstractCellPopulati
              ++it)
         {
             Node<3>* p_neighbour_node = p_cell_population->GetNode(*it);
-            const c_vector<double, 3> edge_gradient = (p_this_node->rGetLocation() - p_neighbour_node->rGetLocation())/norm_2(p_this_node->rGetLocation() - p_neighbour_node->rGetLocation());
-            ab_edge_contribution -= edge_gradient*(node_type==1u ? this->mBasalEdgeParameter : this->mApicalEdgeParameter);
+            const c_vector<double, 3> edge_gradient = (p_this_node->rGetLocation() - p_neighbour_node->rGetLocation()) / norm_2(p_this_node->rGetLocation() - p_neighbour_node->rGetLocation());
+            ab_edge_contribution -= edge_gradient * (node_type == 1u ? this->mBasalEdgeParameter : this->mApicalEdgeParameter);
         }
 
-        const unsigned opposite_node_index = node_index + num_nodes/2*(node_type==1u?1:-1);
+        const unsigned opposite_node_index = node_index + num_nodes / 2 * (node_type == 1u ? 1 : -1);
         const Node<3>* p_opposite_node = p_cell_population->GetNode(opposite_node_index);
-        const c_vector<double, 3> edge_gradient = (p_this_node->rGetLocation() - p_opposite_node->rGetLocation())/norm_2(p_this_node->rGetLocation() - p_opposite_node->rGetLocation());
-        lateral_edge_contribution -= edge_gradient*this->mLateralEdgeParameter*(containing_elem_indices.size());
+        const c_vector<double, 3> edge_gradient = (p_this_node->rGetLocation() - p_opposite_node->rGetLocation()) / norm_2(p_this_node->rGetLocation() - p_opposite_node->rGetLocation());
+        lateral_edge_contribution -= edge_gradient * this->mLateralEdgeParameter * (containing_elem_indices.size());
 
         c_vector<double, 3> force_on_node = basal_face_contribution + ab_edge_contribution + apical_face_contribution
-                + lateral_edge_contribution + volume_contribution;
+            + lateral_edge_contribution + volume_contribution;
         p_this_node->AddAppliedForceContribution(force_on_node);
     }
 }
 
 void PatternedApicalConstrictionForce::SetPatternedApicalParameter(const double patternedApicalEdgeParameter,
-                                 const double patternedApicalAreaParameter,
-                                 const double patternedTargetApicalArea)
+                                                                   const double patternedApicalAreaParameter,
+                                                                   const double patternedTargetApicalArea)
 {
     mPatternedTargetApicalArea = patternedTargetApicalArea;
     mPatternedApicalAreaParameter = patternedApicalAreaParameter;

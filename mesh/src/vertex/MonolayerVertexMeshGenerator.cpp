@@ -41,30 +41,30 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Debug.hpp"
 
 MonolayerVertexMeshGenerator::MonolayerVertexMeshGenerator(const std::string& name, const bool callDestructor)
-    : mName(name),
-      mpMesh(NULL),
-      mCallDestructor(callDestructor)
+        : mName(name),
+          mpMesh(NULL),
+          mCallDestructor(callDestructor)
 {
 }
 
 MonolayerVertexMeshGenerator::MonolayerVertexMeshGenerator(const std::vector<Node<3>*>& rLowerNodes,
                                                            const std::string& name,
                                                            const unsigned zHeight)
-    : mName(name),
-      mBasalNodes(rLowerNodes),
-      mApicalNodes(mBasalNodes.size()),
-      mpMesh(NULL),
-      mCallDestructor(true)
+        : mName(name),
+          mBasalNodes(rLowerNodes),
+          mApicalNodes(mBasalNodes.size()),
+          mpMesh(NULL),
+          mCallDestructor(true)
 {
     const unsigned num_lower_nodes = mBasalNodes.size();
-    for (unsigned node_index=0; node_index<num_lower_nodes; ++node_index)
+    for (unsigned node_index = 0; node_index < num_lower_nodes; ++node_index)
     {
         SetNodeAsBasal(mBasalNodes[node_index]);
 
         // Generate new apical nodes for each basal node
         c_vector<double, 3> tmp_location;
         tmp_location = mBasalNodes[node_index]->rGetLocation();
-        Node<3>* p_node_tmp = new Node<3>(node_index+num_lower_nodes, mBasalNodes[node_index]->IsBoundaryNode(),
+        Node<3>* p_node_tmp = new Node<3>(node_index + num_lower_nodes, mBasalNodes[node_index]->IsBoundaryNode(),
                                           tmp_location[0], tmp_location[1], tmp_location[2] + zHeight);
         SetNodeAsApical(p_node_tmp);
         mApicalNodes[node_index] = p_node_tmp;
@@ -86,7 +86,7 @@ MutableVertexMesh<3, 3>* MonolayerVertexMeshGenerator::MakeMeshUsing2dMesh(const
     mBasalNodes.resize(num_lower_nodes);
     mApicalNodes.resize(num_lower_nodes);
 
-    for (unsigned i=0 ; i<num_lower_nodes ; ++i)
+    for (unsigned i = 0; i < num_lower_nodes; ++i)
     {
         const Node<2>* p_2node = mesh2d.GetNode(i);
         assert(i == p_2node->GetIndex());
@@ -94,7 +94,7 @@ MutableVertexMesh<3, 3>* MonolayerVertexMeshGenerator::MakeMeshUsing2dMesh(const
         loc = p_2node->rGetLocation();
         const bool is_boundary = p_2node->IsBoundaryNode();
         Node<3>* p_lower = new Node<3>(i, is_boundary, loc[0], loc[1], 0);
-        Node<3>* p_upper = new Node<3>(i+num_lower_nodes, is_boundary, loc[0], loc[1], zHeight);
+        Node<3>* p_upper = new Node<3>(i + num_lower_nodes, is_boundary, loc[0], loc[1], zHeight);
         SetNodeAsBasal(p_lower);
         SetNodeAsApical(p_upper);
         mBasalNodes[i] = p_lower;
@@ -103,13 +103,13 @@ MutableVertexMesh<3, 3>* MonolayerVertexMeshGenerator::MakeMeshUsing2dMesh(const
     mElements.reserve(mesh2d.GetNumElements());
 
     const unsigned num_elem = mesh2d.GetNumElements();
-    for (unsigned elem_index=0 ; elem_index<num_elem ; ++elem_index)
+    for (unsigned elem_index = 0; elem_index < num_elem; ++elem_index)
     {
         const VertexElement<2, 2>* p_2elem = mesh2d.GetElement(elem_index);
         std::vector<unsigned> node_index_this_elem;
-        for (unsigned i=0 ; i<p_2elem->GetNumNodes() ; ++i)
+        for (unsigned i = 0; i < p_2elem->GetNumNodes(); ++i)
         {
-            node_index_this_elem.push_back( p_2elem->GetNode(i)->GetIndex() );
+            node_index_this_elem.push_back(p_2elem->GetNode(i)->GetIndex());
         }
         this->BuildElementWith(node_index_this_elem);
     }
@@ -120,7 +120,7 @@ void MonolayerVertexMeshGenerator::BuildElementWith(const unsigned numBasalNodes
                                                     const unsigned basalNodeIndices[])
 {
     // Setting parameter for the call of the function BuildElementWith(vector)
-    const std::vector<unsigned> node_indices_this_elem(basalNodeIndices, basalNodeIndices+numBasalNodes);
+    const std::vector<unsigned> node_indices_this_elem(basalNodeIndices, basalNodeIndices + numBasalNodes);
 
     BuildElementWith(node_indices_this_elem);
 }
@@ -134,14 +134,14 @@ void MonolayerVertexMeshGenerator::BuildElementWith(const std::vector<unsigned>&
 
     std::vector<Node<3>*> lower_nodes_this_elem(num_nodes_this_elem);
     std::vector<Node<3>*> upper_nodes_this_elem(num_nodes_this_elem);
-    std::vector<Node<3>*> all_nodes_this_elem(2*num_nodes_this_elem);
+    std::vector<Node<3>*> all_nodes_this_elem(2 * num_nodes_this_elem);
     // Populate lower & upper_nodes_this_elem
-    for (unsigned j=0; j<num_nodes_this_elem; ++j)
+    for (unsigned j = 0; j < num_nodes_this_elem; ++j)
     {
-        lower_nodes_this_elem[j] = mBasalNodes[ basalNodeIndices[j] ];
-        upper_nodes_this_elem[j] = mApicalNodes[ basalNodeIndices[j] ];
-        all_nodes_this_elem[j] = mBasalNodes[ basalNodeIndices[j] ];
-        all_nodes_this_elem[j+num_nodes_this_elem] = mApicalNodes[ basalNodeIndices[j] ];
+        lower_nodes_this_elem[j] = mBasalNodes[basalNodeIndices[j]];
+        upper_nodes_this_elem[j] = mApicalNodes[basalNodeIndices[j]];
+        all_nodes_this_elem[j] = mBasalNodes[basalNodeIndices[j]];
+        all_nodes_this_elem[j + num_nodes_this_elem] = mApicalNodes[basalNodeIndices[j]];
     }
 
     // Creating the lower face
@@ -154,7 +154,7 @@ void MonolayerVertexMeshGenerator::BuildElementWith(const std::vector<unsigned>&
     faces_orientation.push_back(true);
 
     // Creating the upper face
-    VertexElement<2,3>* p_upper_face = new VertexElement<2,3>(mFaces.size(), upper_nodes_this_elem);
+    VertexElement<2, 3>* p_upper_face = new VertexElement<2, 3>(mFaces.size(), upper_nodes_this_elem);
     // Attribute is added so that it can be identified in simulation (as basal, apical and lateral faces have different contributions)
     // 2.1 instead of 2.0 as it will be casted into unsigned for simpler comparison.
     SetFaceAsApical(p_upper_face);
@@ -163,18 +163,17 @@ void MonolayerVertexMeshGenerator::BuildElementWith(const std::vector<unsigned>&
     faces_orientation.push_back(false);
 
     // Creating all the lateral faces in CCW
-    for (unsigned local_node_index=0; local_node_index<num_nodes_this_elem; ++local_node_index )
+    for (unsigned local_node_index = 0; local_node_index < num_nodes_this_elem; ++local_node_index)
     {
         unsigned node1Index = basalNodeIndices[local_node_index];
-        unsigned node2Index = basalNodeIndices[(local_node_index+1) % num_nodes_this_elem];
-
+        unsigned node2Index = basalNodeIndices[(local_node_index + 1) % num_nodes_this_elem];
 
         const std::set<unsigned> shared_face_indices = GetSharedFaceIndices(mBasalNodes[node1Index], mBasalNodes[node2Index]);
 
-        assert(shared_face_indices.size()<=2);
+        assert(shared_face_indices.size() <= 2);
         VertexElement<2, 3>* p_shared_lateral_face = NULL;
-        for (std::set<unsigned>::const_iterator set_it=shared_face_indices.begin();
-             set_it!=shared_face_indices.end(); ++set_it)
+        for (std::set<unsigned>::const_iterator set_it = shared_face_indices.begin();
+             set_it != shared_face_indices.end(); ++set_it)
         {
             VertexElement<2, 3>* p_tmp_face = mFaces[*set_it];
             if (IsLateralFace(p_tmp_face))
@@ -183,7 +182,6 @@ void MonolayerVertexMeshGenerator::BuildElementWith(const std::vector<unsigned>&
                 p_shared_lateral_face = p_tmp_face;
             }
         }
-
 
         if (p_shared_lateral_face != NULL) // meaning it's found
         {
@@ -229,8 +227,8 @@ MutableVertexMesh<3, 3>* MonolayerVertexMeshGenerator::GenerateMesh()
     return mpMesh;
 }
 
-MutableVertexMesh<3, 3>* MonolayerVertexMeshGenerator::ConvertMeshToCylinder(const double widthX,
-        const double widthY, const double radius, const double thickness, const double length)
+MutableVertexMesh<3, 3>* MonolayerVertexMeshGenerator::ConvertMeshToCylinder(const double widthX, const double widthY, const double radius,
+                                                                             const double thickness, const double length)
 {
     const double mTol = 1e-6;
     // normal mesh should already exist before call of this function.
@@ -249,7 +247,7 @@ MutableVertexMesh<3, 3>* MonolayerVertexMeshGenerator::ConvertMeshToCylinder(con
 
     // Operation I
     std::vector<Node<3>*> boundary_nodes;
-    for (unsigned node_index=0; node_index<mpMesh->GetNumAllNodes(); ++node_index)
+    for (unsigned node_index = 0; node_index < mpMesh->GetNumAllNodes(); ++node_index)
     {
         Node<3>* node_tmp = mpMesh->GetNode(node_index);
         if (!node_tmp->IsBoundaryNode())
@@ -269,7 +267,7 @@ MutableVertexMesh<3, 3>* MonolayerVertexMeshGenerator::ConvertMeshToCylinder(con
     std::vector<VertexElement<2, 3>*> deleted_faces;
 
     // Iterate over the boundary nodes and find the pair of congruent nodes.
-    for (unsigned index_a=0; index_a<boundary_nodes.size(); ++index_a)
+    for (unsigned index_a = 0; index_a < boundary_nodes.size(); ++index_a)
     {
         Node<3>* node_a = boundary_nodes[index_a];
         // Skip over identified nodes
@@ -279,7 +277,7 @@ MutableVertexMesh<3, 3>* MonolayerVertexMeshGenerator::ConvertMeshToCylinder(con
         }
         const c_vector<double, 3> location_a = node_a->rGetLocation();
 
-        for (unsigned index_b=index_a+1; index_b<boundary_nodes.size(); ++index_b)
+        for (unsigned index_b = index_a + 1; index_b < boundary_nodes.size(); ++index_b)
         {
             Node<3>* node_b = boundary_nodes[index_b];
             if (node_b == NULL)
@@ -292,7 +290,7 @@ MutableVertexMesh<3, 3>* MonolayerVertexMeshGenerator::ConvertMeshToCylinder(con
             a_to_b = location_b - location_a;
 
             // as they are double precision floating number, their absolute values are compared
-            if (abs(abs(a_to_b[0]) - widthX)<mTol && abs(a_to_b[1])<mTol && abs(a_to_b[2])<mTol)
+            if (abs(abs(a_to_b[0]) - widthX) < mTol && abs(a_to_b[1]) < mTol && abs(a_to_b[2]) < mTol)
             {
                 // for simplicity just delete the node b
                 boundary_nodes[index_a] = NULL;
@@ -301,7 +299,7 @@ MutableVertexMesh<3, 3>* MonolayerVertexMeshGenerator::ConvertMeshToCylinder(con
                 deleted_nodes.push_back(node_b);
 
                 const std::set<unsigned> elements_of_b = node_b->rGetContainingElementIndices();
-                for (std::set<unsigned>::iterator it=elements_of_b.begin(); it!=elements_of_b.end(); ++it)
+                for (std::set<unsigned>::iterator it = elements_of_b.begin(); it != elements_of_b.end(); ++it)
                 {
                     VertexElement<3, 3>* elem_tmp = mpMesh->GetElement(*it);
                     elem_tmp->ReplaceNode(node_b, node_a);
@@ -316,7 +314,7 @@ MutableVertexMesh<3, 3>* MonolayerVertexMeshGenerator::ConvertMeshToCylinder(con
     // Operation II
     std::vector<VertexElement<2, 3>*> boundary_faces;
     std::vector<std::set<unsigned> > nodes_for_boundary_face;
-    for (unsigned face_index=0; face_index<mpMesh->GetNumFaces(); ++face_index)
+    for (unsigned face_index = 0; face_index < mpMesh->GetNumFaces(); ++face_index)
     {
         VertexElement<2, 3>* face_tmp = mpMesh->GetFace(face_index);
         if (!IsLateralFace(face_tmp) || !IsFaceOnBoundary(face_tmp))
@@ -325,10 +323,10 @@ MutableVertexMesh<3, 3>* MonolayerVertexMeshGenerator::ConvertMeshToCylinder(con
         }
         else
         {
-            assert(face_tmp->GetNumNodes()==4u);
+            assert(face_tmp->GetNumNodes() == 4u);
             std::set<unsigned> tmp_set;
             // save only the basal nodes
-            for (unsigned i=0; i<2u; ++i)
+            for (unsigned i = 0; i < 2u; ++i)
             {
                 tmp_set.insert(face_tmp->GetNodeGlobalIndex(i));
             }
@@ -337,7 +335,7 @@ MutableVertexMesh<3, 3>* MonolayerVertexMeshGenerator::ConvertMeshToCylinder(con
         }
     }
 
-    for (unsigned index_a=0; index_a<boundary_faces.size(); ++index_a)
+    for (unsigned index_a = 0; index_a < boundary_faces.size(); ++index_a)
     {
         VertexElement<2, 3>* p_face_a = boundary_faces[index_a];
         if (p_face_a == NULL)
@@ -345,7 +343,7 @@ MutableVertexMesh<3, 3>* MonolayerVertexMeshGenerator::ConvertMeshToCylinder(con
             continue;
         }
 
-        for (unsigned index_b=index_a+1; index_b<boundary_faces.size(); ++index_b)
+        for (unsigned index_b = index_a + 1; index_b < boundary_faces.size(); ++index_b)
         {
             VertexElement<2, 3>* p_face_b = boundary_faces[index_b];
             if (p_face_b == NULL)
@@ -371,21 +369,21 @@ MutableVertexMesh<3, 3>* MonolayerVertexMeshGenerator::ConvertMeshToCylinder(con
                 VertexElement<3, 3>* p_elem_b = mpMesh->GetElement(*elem_b_index.begin());
                 const unsigned face_b_local_index = p_elem_b->GetFaceLocalIndex(p_face_b->GetIndex());
                 if (face_b_local_index == UINT_MAX)
-                {   
+                {
                     NEVER_REACHED;
                 }
-                
+
                 // Simply assign face orientation as MonolayerElementRearrangeFacesNodes will settle it.
                 p_elem_b->ReplaceFace(face_b_local_index, p_face_a, false);
                 p_elem_b->MonolayerElementRearrangeFacesNodes();
-                
+
                 // Break the loop as the congruent node is found.
                 break;
             }
         }
     }
 
-    for (unsigned ind=0; ind<glued_nodes.size(); ++ind)
+    for (unsigned ind = 0; ind < glued_nodes.size(); ++ind)
     {
         // Since it is still during its creation, there should be no higher order junctions
         if (glued_nodes[ind]->GetNumContainingElements() > 2)
@@ -395,42 +393,42 @@ MutableVertexMesh<3, 3>* MonolayerVertexMeshGenerator::ConvertMeshToCylinder(con
     }
 
     // Remove deleted nodes and faces.
-    for (unsigned ind=0; ind<deleted_nodes.size(); ++ind)
+    for (unsigned ind = 0; ind < deleted_nodes.size(); ++ind)
     {
         mpMesh->DeleteNodePriorToReMesh(deleted_nodes[ind]->GetIndex());
     }
-    for (unsigned ind=0; ind<deleted_faces.size(); ++ind)
+    for (unsigned ind = 0; ind < deleted_faces.size(); ++ind)
     {
         mpMesh->DeleteFacePriorToReMesh(deleted_faces[ind]->GetIndex());
     }
     mpMesh->ReMesh();
 
     // Operation III
-    assert(mpMesh->GetNumNodes()%2 == 0);   // LCOV_EXCL_LINE
-    const unsigned half_num_nodes = mpMesh->GetNumNodes()/2;
+    assert(mpMesh->GetNumNodes() % 2 == 0); // LCOV_EXCL_LINE
+    const unsigned half_num_nodes = mpMesh->GetNumNodes() / 2;
 
-    for (unsigned node_index=0; node_index<half_num_nodes; ++node_index)
+    for (unsigned node_index = 0; node_index < half_num_nodes; ++node_index)
     {
         Node<3>* basal_node = mpMesh->GetNode(node_index);
         c_vector<double, 3>& basal_position_ref = basal_node->rGetModifiableLocation();
-        basal_position_ref[1] = length*basal_position_ref[1]/widthY;
-        const double basal_theta = 2*M_PI*basal_position_ref[0]/widthX;
-        basal_position_ref[0] = radius*sin(basal_theta);
-        basal_position_ref[2] = radius*cos(basal_theta);
+        basal_position_ref[1] = length * basal_position_ref[1] / widthY;
+        const double basal_theta = 2 * M_PI * basal_position_ref[0] / widthX;
+        basal_position_ref[0] = radius * sin(basal_theta);
+        basal_position_ref[2] = radius * cos(basal_theta);
 
-        Node<3>* apical_node = mpMesh->GetNode(node_index+half_num_nodes);
+        Node<3>* apical_node = mpMesh->GetNode(node_index + half_num_nodes);
         c_vector<double, 3>& apical_position_ref = apical_node->rGetModifiableLocation();
-        apical_position_ref[1] = length*apical_position_ref[1]/widthY;
-        const double apical_theta = apical_position_ref[0]/widthX*2*M_PI;
-        apical_position_ref[0] = (radius+thickness)*sin(apical_theta);
-        apical_position_ref[2] = (radius+thickness)*cos(apical_theta);
+        apical_position_ref[1] = length * apical_position_ref[1] / widthY;
+        const double apical_theta = apical_position_ref[0] / widthX * 2 * M_PI;
+        apical_position_ref[0] = (radius + thickness) * sin(apical_theta);
+        apical_position_ref[2] = (radius + thickness) * cos(apical_theta);
     }
 
-    for (unsigned i=0; i<mpMesh->GetNumElements(); mpMesh->GetElement(i++)->MonolayerElementRearrangeFacesNodes());
-    
+    for (unsigned i = 0; i < mpMesh->GetNumElements(); mpMesh->GetElement(i++)->MonolayerElementRearrangeFacesNodes())
+        ;
+
     return mpMesh;
 }
-
 
 void MonolayerVertexMeshGenerator::ClearStoredMeshObjects()
 {
@@ -445,7 +443,7 @@ void MonolayerVertexMeshGenerator::ClearStoredMeshObjects()
 void MonolayerVertexMeshGenerator::WriteVtk(const std::string& outputFile, const std::string& additionalTag,
                                             const bool usingFaceId)
 {
-    VertexMeshWriter<3, 3> writer (outputFile, mName, false);
+    VertexMeshWriter<3, 3> writer(outputFile, mName, false);
     writer.WriteVtkUsingMeshWithCellId(*mpMesh, additionalTag, usingFaceId);
 }
 
@@ -453,52 +451,48 @@ void MonolayerVertexMeshGenerator::WriteVtkWithSubfolder(const std::string& outp
                                                          const std::string& additionalTag,
                                                          const bool usingFaceId)
 {
-    VertexMeshWriter<3, 3> writer (outputFile+"/"+mName, mName, false);
+    VertexMeshWriter<3, 3> writer(outputFile + "/" + mName, mName, false);
     writer.WriteVtkUsingMeshWithCellId(*mpMesh, additionalTag, usingFaceId);
 }
 
 MutableVertexMesh<3, 3>* MonolayerVertexMeshGenerator::MakeSphericalMesh33(const MutableVertexMesh<2, 3>* p_mesh_23,
-                                                                  const double radius, const double thickness)
+                                                                           const double radius, const double thickness)
 {
 
     const unsigned num_lower_nodes = p_mesh_23->GetNumNodes();
     mBasalNodes.resize(num_lower_nodes);
     mApicalNodes.resize(num_lower_nodes);
 
-    MARK
-    for (unsigned i=0 ; i<num_lower_nodes ; ++i)
+    MARK for (unsigned i = 0; i < num_lower_nodes; ++i)
     {
         const Node<3>* p_node_23 = p_mesh_23->GetNode(i);
         assert(i == p_node_23->GetIndex());
         c_vector<double, 3> loc;
         loc = p_node_23->rGetLocation();
-        if (std::abs(norm_2(loc)-1) < 1e-6)
+        if (std::abs(norm_2(loc) - 1) < 1e-6)
         {
-PRINT_VECTOR(loc);
+            PRINT_VECTOR(loc);
         }
         const bool is_boundary = p_node_23->IsBoundaryNode();
         assert(is_boundary == false);
-        Node<3>* p_lower = new Node<3>(i, loc*radius, is_boundary);
-        Node<3>* p_upper = new Node<3>(i+num_lower_nodes, loc*(radius+thickness), is_boundary);
+        Node<3>* p_lower = new Node<3>(i, loc * radius, is_boundary);
+        Node<3>* p_upper = new Node<3>(i + num_lower_nodes, loc * (radius + thickness), is_boundary);
         SetNodeAsBasal(p_lower);
         SetNodeAsApical(p_upper);
         mBasalNodes[i] = p_lower;
         mApicalNodes[i] = p_upper;
     }
     mElements.reserve(p_mesh_23->GetNumElements());
-    MARK
-    const unsigned num_elem = p_mesh_23->GetNumElements();
-    for (unsigned elem_index=0 ; elem_index<num_elem ; ++elem_index)
+    MARK const unsigned num_elem = p_mesh_23->GetNumElements();
+    for (unsigned elem_index = 0; elem_index < num_elem; ++elem_index)
     {
         const VertexElement<2, 3>* p_2elem = p_mesh_23->GetElement(elem_index);
         std::vector<unsigned> node_index_this_elem;
-        for (unsigned i=0 ; i<p_2elem->GetNumNodes() ; ++i)
+        for (unsigned i = 0; i < p_2elem->GetNumNodes(); ++i)
         {
-            node_index_this_elem.push_back( p_2elem->GetNode(i)->GetIndex() );
+            node_index_this_elem.push_back(p_2elem->GetNode(i)->GetIndex());
         }
         this->BuildElementWith(node_index_this_elem);
     }
-    MARK
-    return this->GenerateMesh();
+    MARK return this->GenerateMesh();
 }
-

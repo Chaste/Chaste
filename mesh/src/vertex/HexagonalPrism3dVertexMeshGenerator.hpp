@@ -46,12 +46,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class HexagonalPrism3dVertexMeshGenerator
 {
 protected:
-
     /** A pointer to the mesh that this class creates. */
-    MutableVertexMesh<3,3>* mpMesh;
+    MutableVertexMesh<3, 3>* mpMesh;
 
 public:
-
     /**
      * Constructor.
      *
@@ -80,7 +78,7 @@ public:
     /**
      * @return a 3D mesh whose elements are hexagonal prisms
      */
-    virtual MutableVertexMesh<3,3>* GetMesh();
+    virtual MutableVertexMesh<3, 3>* GetMesh();
 };
 
 #endif /*HEXAGONALPRISM3DVERTEXMESHGENERATOR_HPP_*/

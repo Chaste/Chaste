@@ -14,25 +14,23 @@
 #include "MutableVertexMesh.hpp"
 #include "UblasCustomFunctions.hpp"
 
-
 class GeodesicSphere23Generator
 {
     friend class TestMonolayerVertexMeshGenerator;
-    
+
 private:
     unsigned mDepth;
     std::vector<Node<3>*> mNodes;
-    std::vector<VertexElement<1,3>*> mEdges;
-    std::vector<VertexElement<2,3>*> mFaces;
+    std::vector<VertexElement<1, 3>*> mEdges;
+    std::vector<VertexElement<2, 3>*> mFaces;
 
 public:
-    
-    c_vector<double,3> normalise(const c_vector<double,3>& v)
+    c_vector<double, 3> normalise(const c_vector<double, 3>& v)
     {
-        return v/norm_2(v);
+        return v / norm_2(v);
     }
 
-    GeodesicSphere23Generator(const unsigned numDivision=0u);
+    GeodesicSphere23Generator(const unsigned numDivision = 0u);
 
     void SubDivide();
 

@@ -58,12 +58,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define OUTPUT_NAME "TestApicalConstrictionExample/InitialMesh"
 
-
 class TestApicalConstrictionExample : public AbstractCellBasedTestSuite
 {
 public:
-
-    void TestApicalConstriction() throw (Exception)
+    void TestApicalConstriction() throw(Exception)
     {
         // Make a mesh of 10x10
 //        const double z_height = 1;
@@ -78,7 +76,7 @@ public:
         MutableVertexMesh<2, 2>& vertex_2mesh = *(generator.GetMesh());
         MonolayerVertexMeshGenerator builder("ApicalConstriction");
         MutableVertexMesh<3, 3>* p_mesh = builder.MakeMeshUsing2dMesh(vertex_2mesh);
-        builder.WriteVtk(OUTPUT_NAME,"Before");
+        builder.WriteVtk(OUTPUT_NAME, "Before");
 
         char tmp_name[50];
         sprintf(tmp_name, "TestApicalConstrictionExample/HoneyTest%dx%d", num_cells_x, num_cells_y);
@@ -91,12 +89,11 @@ public:
         VertexBasedCellPopulation<3> cell_population(*p_mesh, cells);
         cell_population.AddCellWriter<CellLabelWriter>();
 
-
         // Label a few cells near the centre of the population
         c_vector<double, 3> population_centre;
-        population_centre(0) = 0.5*p_mesh->GetWidth(0);
-        population_centre(1) = 0.5*p_mesh->GetWidth(1);
-        population_centre(2) = 0.5*p_mesh->GetWidth(2);
+        population_centre(0) = 0.5 * p_mesh->GetWidth(0);
+        population_centre(1) = 0.5 * p_mesh->GetWidth(1);
+        population_centre(2) = 0.5 * p_mesh->GetWidth(2);
 
         for (AbstractCellPopulation<3>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
@@ -104,7 +101,7 @@ public:
         {
             c_vector<double, 3> cell_location = cell_population.GetLocationOfCellCentre(*cell_iter);
             c_vector<double, 3> dist = cell_location - population_centre;
-            if (dist(0)*dist(0) + dist(1)*dist(1) < 2.0*2.0)
+            if (dist(0) * dist(0) + dist(1) * dist(1) < 2.0 * 2.0)
             {
                 boost::shared_ptr<AbstractCellProperty> p_label = cell_population.GetCellPropertyRegistry()->Get<CellLabel>();
                 cell_iter->AddCellProperty(p_label);
@@ -131,7 +128,7 @@ public:
         TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
 
-    void TestApicalConstrictionVoronoi() throw (Exception)
+    void TestApicalConstrictionVoronoi() throw(Exception)
     {
         // Make a mesh of 10x10
         const double z_height = 1;
@@ -140,13 +137,13 @@ public:
         const unsigned num_cells_y = 10;
         // There seems to be a bug somewhere in voronoiprism3dVertexMeshGenerator....
         VoronoiPrism3dVertexMeshGenerator generator(num_cells_x, num_cells_y, z_height, 5, target_area);
-        MutableVertexMesh<3,3>* p_mesh = generator.GetMeshAfterReMesh();
 //        HoneycombVertexMeshGenerator generator(num_cells_x, num_cells_y, false, 0.1, 0.01, target_area);
 //        VoronoiVertexMeshGenerator generator(num_cells_x, num_cells_y, 5, target_area);
 //        MutableVertexMesh<2, 2>& vertex_2mesh = *(generator.GetMesh());
 //        Helper3dVertexMeshBuilder builder("ApicalConstriction");
 //        MutableVertexMesh<3, 3>* p_mesh = builder.MakeMeshUsing2dMesh(vertex_2mesh);
 //        builder.WriteVtk(OUTPUT_NAME,"Before");
+        MutableVertexMesh<3, 3>* p_mesh = generator.GetMeshAfterReMesh();
 
         char tmp_name[50];
         sprintf(tmp_name, "TestApicalConstrictionExample/VoronoiTest%dx%d", num_cells_x, num_cells_y);
@@ -159,12 +156,11 @@ public:
         VertexBasedCellPopulation<3> cell_population(*p_mesh, cells);
         cell_population.AddCellWriter<CellLabelWriter>();
 
-
         // Label a few cells near the centre of the population
         c_vector<double, 3> population_centre;
-        population_centre(0) = 0.5*p_mesh->GetWidth(0);
-        population_centre(1) = 0.5*p_mesh->GetWidth(1);
-        population_centre(2) = 0.5*p_mesh->GetWidth(2);
+        population_centre(0) = 0.5 * p_mesh->GetWidth(0);
+        population_centre(1) = 0.5 * p_mesh->GetWidth(1);
+        population_centre(2) = 0.5 * p_mesh->GetWidth(2);
 
         for (AbstractCellPopulation<3>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
@@ -172,7 +168,7 @@ public:
         {
             c_vector<double, 3> cell_location = cell_population.GetLocationOfCellCentre(*cell_iter);
             c_vector<double, 3> dist = cell_location - population_centre;
-            if (dist(0)*dist(0) + dist(1)*dist(1) < 2.0*2.0)
+            if (dist(0) * dist(0) + dist(1) * dist(1) < 2.0 * 2.0)
             {
                 boost::shared_ptr<AbstractCellProperty> p_label = cell_population.GetCellPropertyRegistry()->Get<CellLabel>();
                 cell_iter->AddCellProperty(p_label);

@@ -44,25 +44,23 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class GeneralMonolayerVertexMeshForce : public AbstractForce<3>
 {
 private:
-
     friend class boost::serialization::access;
-    template<class Archive>
-    void serialize(Archive & archive, const unsigned int version)
+    template <class Archive>
+    void serialize(Archive& archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractForce<3> >(*this);
-        archive & mTargetApicalArea;
-        archive & mApicalAreaParameter;
-        archive & mApicalEdgeParameter;
-        archive & mTargetBasalArea;
-        archive & mBasalAreaParameter;
-        archive & mBasalEdgeParameter;
-        archive & mLateralEdgeParameter;
-        archive & mTargetVolume;
-        archive & mVolumeParameter;
+        archive& boost::serialization::base_object<AbstractForce<3> >(*this);
+        archive& mTargetApicalArea;
+        archive& mApicalAreaParameter;
+        archive& mApicalEdgeParameter;
+        archive& mTargetBasalArea;
+        archive& mBasalAreaParameter;
+        archive& mBasalEdgeParameter;
+        archive& mLateralEdgeParameter;
+        archive& mTargetVolume;
+        archive& mVolumeParameter;
     }
 
 protected:
-
     ///\todo #2850 Consider target area/volume growth in 3D
 
     /**
@@ -120,7 +118,6 @@ protected:
     double mVolumeParameter;
 
 public:
-
     /**
      * Constuctor.
      */
@@ -147,7 +144,7 @@ public:
      * @param areaParameter the new value of mApicalAreaParameter (defaults to 0)
      * @param targetArea the new value of mTargetApicalArea (defaults to 0)
      */
-    void SetApicalParameters(const double lineParameter, const double areaParameter=0, const double targetArea=0);
+    void SetApicalParameters(const double lineParameter, const double areaParameter = 0, const double targetArea = 0);
 
     /**
      * Set mBasalEdgeParameter, mBasalAreaParameter and mTargetBasalArea.
@@ -156,7 +153,7 @@ public:
      * @param areaParameter the new value of mBasalAreaParameter (defaults to 0)
      * @param targetArea the new value of mTargetBasalArea (defaults to 0)
      */
-    void SetBasalParameters(const double lineParameter, const double areaParameter=0, const double targetArea=0);
+    void SetBasalParameters(const double lineParameter, const double areaParameter = 0, const double targetArea = 0);
 
     /**
      * Set mLateralEdgeParameter.
@@ -171,7 +168,7 @@ public:
      * @param volumeParameter the new value of mVolumeParameter
      * @param targetVolume the new value of mTargetVolume (defaults to 0)
      */
-    void SetVolumeParameters(const double volumeParameter, const double targetVolume=0);
+    void SetVolumeParameters(const double volumeParameter, const double targetVolume = 0);
 
     /**
      * Overridden OutputForceParameters() method.

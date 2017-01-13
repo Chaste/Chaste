@@ -47,15 +47,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * VertexElement can have a variable number of nodes associated
  * with it.
  */
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class VertexElement : public MutableElement<ELEMENT_DIM, SPACE_DIM>
 {
 private:
-
     /**
      * Faces of the VertexElement, which should be distinct.
      */
-    std::vector<VertexElement<ELEMENT_DIM-1, SPACE_DIM>*> mFaces;
+    std::vector<VertexElement<ELEMENT_DIM - 1, SPACE_DIM>*> mFaces;
 
     /**
      * How each face is oriented. From the perspective of the centre
@@ -87,18 +86,17 @@ private:
      * @param archive the archive
      * @param version the current version of this class
      */
-    template<class Archive>
-    void serialize(Archive & archive, const unsigned int version)
+    template <class Archive>
+    void serialize(Archive& archive, const unsigned int version)
     {
         // This needs to be first so that MeshBasedCellPopulation::Validate() doesn't go mental.
-        archive & mFaces;
-        archive & mOrientations;
-        archive & mFaceContainingElementIndices;
-        archive & boost::serialization::base_object<MutableElement<ELEMENT_DIM, SPACE_DIM> >(*this);
+        archive& mFaces;
+        archive& mOrientations;
+        archive& mFaceContainingElementIndices;
+        archive& boost::serialization::base_object<MutableElement<ELEMENT_DIM, SPACE_DIM> >(*this);
     }
 
 public:
-
     /**
      * Constructor.
      *
@@ -107,7 +105,7 @@ public:
      * @param rOrientations vector of orientations of the faces associated with the element
      */
     VertexElement(unsigned index,
-                  const std::vector<VertexElement<ELEMENT_DIM-1, SPACE_DIM>*>& rFaces,
+                  const std::vector<VertexElement<ELEMENT_DIM - 1, SPACE_DIM>*>& rFaces,
                   const std::vector<bool>& rOrientations);
 
     /**
@@ -141,7 +139,7 @@ public:
      * @param rNodes vector of Nodes associated with the element
      */
     VertexElement(unsigned index,
-                  const std::vector<VertexElement<ELEMENT_DIM-1, SPACE_DIM>*>& rFaces,
+                  const std::vector<VertexElement<ELEMENT_DIM - 1, SPACE_DIM>*>& rFaces,
                   const std::vector<bool>& rOrientations,
                   const std::vector<Node<SPACE_DIM>*>& rNodes);
 
@@ -185,7 +183,7 @@ public:
      *
      * @return a pointer to the face
      */
-    VertexElement<ELEMENT_DIM-1, SPACE_DIM>* GetFace(const unsigned localIndex) const;
+    VertexElement<ELEMENT_DIM - 1, SPACE_DIM>* GetFace(const unsigned localIndex) const;
 
     /** Calculate the local index of a face given a global index
      * if face is not contained in element return UINT_MAX.
@@ -213,7 +211,7 @@ public:
      *
      * @param pFace a pointer to the new face
      */
-    void AddFace(VertexElement<ELEMENT_DIM-1, SPACE_DIM>* pFace);
+    void AddFace(VertexElement<ELEMENT_DIM - 1, SPACE_DIM>* pFace);
 
     /**
      * Add a face of an element with given local index. This method will
@@ -223,7 +221,7 @@ public:
      * @param Orientation is the orientation of pFace
      * @param rIndex is the local index of the face to add
      */
-    void AddFace(VertexElement<ELEMENT_DIM-1, SPACE_DIM>* pFace, bool Orientation,const unsigned& rIndex);
+    void AddFace(VertexElement<ELEMENT_DIM - 1, SPACE_DIM>* pFace, bool Orientation, const unsigned& rIndex);
 
     /**
      * Delete a face of an element with given local index. This method will
@@ -236,7 +234,7 @@ public:
     /**
      * Replace old face with the new face and its orientation
      */
-    void ReplaceFace(const unsigned oldFaceLocalIndex, VertexElement<ELEMENT_DIM-1, SPACE_DIM>* pNewFace,
+    void ReplaceFace(const unsigned oldFaceLocalIndex, VertexElement<ELEMENT_DIM - 1, SPACE_DIM>* pNewFace,
                      const bool newFaceOrientation);
 
     /**
@@ -253,7 +251,7 @@ public:
      * @return the global index of the face which contains all 4 nodes and its orientation
      */
     std::vector<unsigned> MonolayerElementDeleteNodes(const Node<SPACE_DIM>* pApicalNodeDelete, const Node<SPACE_DIM>* pBasalNodeDelete,
-                                        Node<SPACE_DIM>* pApicalNodeStay, Node<SPACE_DIM>* pBasalNodeStay);
+                                                      Node<SPACE_DIM>* pApicalNodeStay, Node<SPACE_DIM>* pBasalNodeStay);
 
     /**
      * Method for monolayer element to rearrange faces and nodes so that
@@ -328,7 +326,6 @@ public:
      */
     void MarkFaceAsDeleted();
 
-
     /**
      * face will add element index into its registry.
      * @param elementIndex  the index of the element
@@ -353,7 +350,6 @@ public:
     std::set<unsigned>& rFaceGetContainingElementIndices();
 };
 
-
 //////////////////////////////////////////////////////////////////////
 //                  Specialization for 1d elements                  //
 //                                                                  //
@@ -364,8 +360,8 @@ public:
  * Specialization for 1d elements so we don't get errors from Boost on some
  * compilers.
  */
-template<unsigned SPACE_DIM>
-class VertexElement<1, SPACE_DIM> : public MutableElement<1,SPACE_DIM>
+template <unsigned SPACE_DIM>
+class VertexElement<1, SPACE_DIM> : public MutableElement<1, SPACE_DIM>
 {
 
 private:
@@ -387,17 +383,15 @@ private:
      * @param archive the archive
      * @param version the current version of this class
      */
-    template<class Archive>
-    void serialize(Archive & archive, const unsigned int version)
+    template <class Archive>
+    void serialize(Archive& archive, const unsigned int version)
     {
         // This needs to be first so that MeshBasedCellPopulation::Validate() doesn't go mental.
-        archive & mFaceContainingElementIndices;
-        archive & boost::serialization::base_object<MutableElement<1, SPACE_DIM> >(*this);
+        archive& mFaceContainingElementIndices;
+        archive& boost::serialization::base_object<MutableElement<1, SPACE_DIM> >(*this);
     }
 
-
 public:
-
     /**
      * Constructor which takes in a vector of nodes.
      *
@@ -444,12 +438,12 @@ public:
      * Dummy function declarations to satisfy compiler.
      */
     void AddFace(VertexElement<0, SPACE_DIM>* pFace);
-    void AddFace(VertexElement<0, SPACE_DIM>* pFace, bool Orientation,const unsigned& rIndex);
+    void AddFace(VertexElement<0, SPACE_DIM>* pFace, bool Orientation, const unsigned& rIndex);
     void DeleteFace(const unsigned& rIndex);
     void ReplaceFace(const unsigned oldFaceLocalIndex, VertexElement<0, SPACE_DIM>* pNewFace,
                      const bool newFaceOrientation);
     std::vector<unsigned> MonolayerElementDeleteNodes(const Node<SPACE_DIM>* pApicalNodeDelete, const Node<SPACE_DIM>* pBasalNodeDelete,
-                                        Node<SPACE_DIM>* pApicalNodeStay, Node<SPACE_DIM>* pBasalNodeStay);
+                                                      Node<SPACE_DIM>* pApicalNodeStay, Node<SPACE_DIM>* pBasalNodeStay);
     void MonolayerElementRearrangeFacesNodes();
     void FaceResetIndex(unsigned index);
     void FaceAddNode(Node<SPACE_DIM>* pNode, const unsigned Index);

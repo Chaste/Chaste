@@ -59,7 +59,6 @@ class MisraForce : public AbstractForce<3>
     friend class TestForces;
 
 private:
-
     friend class boost::serialization::access;
     /**
      * Boost Serialization method for archiving/checkpointing.
@@ -68,18 +67,17 @@ private:
      * @param archive  The boost archive.
      * @param version  The current version of this class.
      */
-    template<class Archive>
-    void serialize(Archive & archive, const unsigned int version)
+    template <class Archive>
+    void serialize(Archive& archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractForce<3> >(*this);
-        archive & mApicalLineTensionParameter;
-        archive & mLateralSurfaceEnergyParameter;
-        archive & mBasalSurfaceEnergyParameter;
-        archive & mVolumeCompressibilityParameter;
+        archive& boost::serialization::base_object<AbstractForce<3> >(*this);
+        archive& mApicalLineTensionParameter;
+        archive& mLateralSurfaceEnergyParameter;
+        archive& mBasalSurfaceEnergyParameter;
+        archive& mVolumeCompressibilityParameter;
     }
 
 protected:
-
     /**
      * The strength of the apical edge term in the model. Corresponds to sigma in Misra et al's paper.
      * Initialised to 1.0 in the constructor.
@@ -112,7 +110,6 @@ protected:
     ///\todo allow prepattern and eventually curved surfaces.  #2850
 
 public:
-
     /**
      * Constructor.
      */
@@ -161,7 +158,7 @@ public:
     /**
      * @return mBoundaryLineTensionParameter
      */
-    double GetBoundaryLineTensionParameter() const;   ///\todo do we really need this? #2850
+    double GetBoundaryLineTensionParameter() const; ///\todo do we really need this? #2850
 
     /**
      * @return mBasalSurfaceEnergyParameter
