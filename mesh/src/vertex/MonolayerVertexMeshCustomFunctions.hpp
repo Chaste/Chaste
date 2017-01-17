@@ -77,6 +77,16 @@ std::set<unsigned> GetSharedElementIndices(const Node<3>* pNodeA, const Node<3>*
 std::set<unsigned> GetSharedFaceIndices(const Node<3>* pNodeA, const Node<3>* pNodeB);
 
 /**
+ * A simple function to get the lateral face which owns both nodes.
+ * @param pMesh  pointer of the mesh (this is necessary because nodes only have the indices, could be easier with weak pointer)
+ * @param pNodeA  node number 1
+ * @param pNodeB  node number 2
+ * @return  index of faces that contain both nodes
+ */
+VertexElement<2, 3>* GetSharedLateralFace(const MutableVertexMesh<3, 3>* pMesh,
+                                          const Node<3>* pNodeA, const Node<3>* pNodeB);
+
+/**
  * Output element, its faces and nodes in terminal
  * (adapted from MonolayerVertexMeshGenerator::PrintMesh()).
  * @param pElement pointer of the element which will be inspected.

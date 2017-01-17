@@ -73,7 +73,7 @@ private:
     static const double target_area = 1;
     const unsigned num_cells_x = 9;
     const unsigned num_cells_y = 5;
-    static const double end_time = 0.1;
+    static const double end_time = 0.01;
 
 public:
     void TestOnHexagonalMesh() throw(Exception)
@@ -170,22 +170,22 @@ public:
             + "x" + boost::lexical_cast<std::string>(y);
         builder.WriteVtk(output_filename, "InitialMesh");
 
-        builder.ConvertMeshToCylinder(2 * x, 1, radius, 0.5, 1);
-        builder.WriteVtk(output_filename, "After");
+        builder.ConvertMeshToCylinder(2 * x, 1, radius*0.8, 1.5, 1);
 
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); ++i)
+        for (unsigned i = 0; i < p_mesh->GetNumNodes(); ++i)
         {
-            c_vector<double,3>& tmp_loc = p_mesh->GetNode(i)->rGetModifiableLocation();
+            c_vector<double, 3>& tmp_loc = p_mesh->GetNode(i)->rGetModifiableLocation();
             double xx = tmp_loc[0];
             tmp_loc[0] = tmp_loc[1];
             tmp_loc[1] = -xx;
         }
-        for (unsigned i=0; i<p_mesh->GetNumElements(); ++i)
+        for (unsigned i = 0; i < p_mesh->GetNumElements(); ++i)
         {
             p_mesh->GetElement(i)->MonolayerElementRearrangeFacesNodes();
         }
+        builder.WriteVtk(output_filename, "After");
 
-        PRINT_2_VARIABLES(p_mesh->GetVolumeOfElement(0), p_mesh->GetVolumeOfElement(5))
+        PRINT_4_VARIABLES(p_mesh->GetVolumeOfElement(0), p_mesh->GetVolumeOfElement(5), p_mesh->CalculateAreaOfFace(p_mesh->GetFace(0)), p_mesh->CalculateAreaOfFace(p_mesh->GetFace(1)))
 
         std::vector<CellPtr> cells;
         CellsGenerator<NoCellCycleModel, 3> cells_generator;
@@ -203,13 +203,13 @@ public:
         simulator.SetEndTime(c_end_time);
 
         MAKE_PTR(GeneralMonolayerVertexMeshForce, p_force3);
-        // p_force3->SetApicalParameters(20, 20, 0.7);
-        // p_force3->SetBasalParameters(20, 20, 0.7);
-        // p_force3->SetLateralParameter(8);
-        p_force3->SetVolumeParameters(100, 1);
+        p_force3->SetApicalParameters(5, 5, 0.7);
+        p_force3->SetBasalParameters(5, 5, 0.7);
+        p_force3->SetLateralParameter(7);
+        p_force3->SetVolumeParameters(100, 6);
         simulator.AddForce(p_force3);
         MAKE_PTR(HorizontalStretchForce<3>, p_force2);
-        p_force2->SetForceMagnitude(0.2);
+        p_force2->SetForceMagnitude(1);
         p_force2->SetRelativeWidth(0.15);
         simulator.AddForce(p_force2);
 
@@ -265,7 +265,7 @@ public:
 
     void TestOnSphere() throw(Exception)
     {
-        const double s_end_time = 2;
+        const double s_end_time = 0.2;
         std::string output_filename = "TestUniaxialLoad/SphereTest" + boost::lexical_cast<std::string>(num_cells_x)
             + "x" + boost::lexical_cast<std::string>(num_cells_y);
         GeodesicSphere23Generator builder;

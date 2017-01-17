@@ -546,7 +546,7 @@ void VertexElement<3, 3>::MonolayerElementRearrangeFacesNodes()
         node_lateral_indices[local_index] = shared_face_indices[0];
     }
 
-    // If nodes in element are not in proper order, they will be rearranged
+    // If faces in element are not in proper order, they will be rearranged
     if (elem_lateral_indices != node_lateral_indices)
     {
         std::set<unsigned> tmp_elem_lateral_indices(elem_lateral_indices.begin(), elem_lateral_indices.end());

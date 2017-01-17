@@ -93,6 +93,31 @@ std::set<unsigned> GetSharedFaceIndices(const Node<3>* pNodeA, const Node<3>* pN
     return shared_faces;
 }
 
+VertexElement<2, 3>* GetSharedLateralFace(const MutableVertexMesh<3, 3>* pMesh,
+                                          const Node<3>* pNodeA, const Node<3>* pNodeB)
+{
+    std::set<unsigned> shared_face_ids = GetSharedFaceIndices(pNodeA, pNodeB);
+    std::vector<unsigned> shared_lateral_face_ids;
+    for (std::set<unsigned>::const_iterator it = shared_face_ids.begin();
+         it != shared_face_ids.end(); ++it)
+    {
+        if (IsLateralFace(pMesh->GetFace(*it)))
+        {
+            shared_lateral_face_ids.push_back(*it);
+        }
+    }
+
+    switch (shared_lateral_face_ids.size())
+    {
+        case 0:
+            return NULL;
+        case 1:
+            return pMesh->GetFace(shared_lateral_face_ids[0]);
+        default:
+            NEVER_REACHED;
+    }
+}
+
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void PrintElement(const VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement)
 {
