@@ -2566,7 +2566,9 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
     if (rElementsContainingNodes.size() == 2)
     {
         if (p_lateral_swap_face->FaceGetNumContainingElements() != 0)
+        {
             NEVER_REACHED;
+        }
         this->DeleteFacePriorToReMesh(p_lateral_swap_face->GetIndex());
     }
 
