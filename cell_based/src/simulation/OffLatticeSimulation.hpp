@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -201,6 +201,13 @@ public:
      * @param rParamsFile the file stream to which the parameters are output
      */
     virtual void OutputSimulationParameters(out_stream& rParamsFile);
+
+    /**
+     * Directly access the forces attached to this simulation, to allow their manipulation after archiving.
+     *
+     * @return mForceCollection the vector of pointers to forces attached to this simulation
+     */
+    const std::vector<boost::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > >& rGetForceCollection() const;
 };
 
 // Serialization for Boost >= 1.36
