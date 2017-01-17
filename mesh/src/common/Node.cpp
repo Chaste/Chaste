@@ -42,7 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Constructors
 //////////////////////////////////////////////////////////////////////////
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 void Node<SPACE_DIM>::CommonConstructor(unsigned index, bool isBoundaryNode)
 {
     mIndex = index;
@@ -52,31 +52,31 @@ void Node<SPACE_DIM>::CommonConstructor(unsigned index, bool isBoundaryNode)
     mpNodeAttributes = NULL;
 }
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 Node<SPACE_DIM>::Node(unsigned index, ChastePoint<SPACE_DIM> point, bool isBoundaryNode)
 {
     mLocation = point.rGetLocation();
     CommonConstructor(index, isBoundaryNode);
 }
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 Node<SPACE_DIM>::Node(unsigned index, std::vector<double> coords, bool isBoundaryNode)
 {
-    for (unsigned i=0; i<SPACE_DIM; i++)
+    for (unsigned i = 0; i < SPACE_DIM; i++)
     {
         mLocation(i) = coords.at(i);
     }
     CommonConstructor(index, isBoundaryNode);
 }
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 Node<SPACE_DIM>::Node(unsigned index, c_vector<double, SPACE_DIM> location, bool isBoundaryNode)
 {
     mLocation = location;
     CommonConstructor(index, isBoundaryNode);
 }
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 Node<SPACE_DIM>::Node(unsigned index, bool isBoundaryNode, double v1, double v2, double v3)
 {
     mLocation[0] = v1;
@@ -91,17 +91,17 @@ Node<SPACE_DIM>::Node(unsigned index, bool isBoundaryNode, double v1, double v2,
     CommonConstructor(index, isBoundaryNode);
 }
 
-template<unsigned SPACE_DIM>
-Node<SPACE_DIM>::Node(unsigned index, double *location, bool isBoundaryNode)
+template <unsigned SPACE_DIM>
+Node<SPACE_DIM>::Node(unsigned index, double* location, bool isBoundaryNode)
 {
-    for (unsigned i=0; i<SPACE_DIM; i++)
+    for (unsigned i = 0; i < SPACE_DIM; i++)
     {
         mLocation(i) = location[i];
     }
     CommonConstructor(index, isBoundaryNode);
 }
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 Node<SPACE_DIM>::~Node()
 {
     delete mpNodeAttributes;
@@ -111,31 +111,31 @@ Node<SPACE_DIM>::~Node()
 // Methods dealing with node location
 //////////////////////////////////////////////////////////////////////////
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 void Node<SPACE_DIM>::SetPoint(ChastePoint<SPACE_DIM> point)
 {
     mLocation = point.rGetLocation();
 }
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 void Node<SPACE_DIM>::SetIndex(unsigned index)
 {
     mIndex = index;
 }
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 void Node<SPACE_DIM>::SetAsBoundaryNode(bool value)
 {
     mIsBoundaryNode = value;
 }
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 ChastePoint<SPACE_DIM> Node<SPACE_DIM>::GetPoint() const
 {
     return ChastePoint<SPACE_DIM>(mLocation);
 }
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 const c_vector<double, SPACE_DIM>& Node<SPACE_DIM>::rGetLocation() const
 {
     // This assert statement is a useful warning: when new nodes are created we overwrite previously deleted nodes if there are any.
@@ -147,26 +147,26 @@ const c_vector<double, SPACE_DIM>& Node<SPACE_DIM>::rGetLocation() const
     return mLocation;
 }
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM>& Node<SPACE_DIM>::rGetModifiableLocation()
 {
     assert(!mIsDeleted);
     return mLocation;
 }
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 unsigned Node<SPACE_DIM>::GetIndex() const
 {
     return mIndex;
 }
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 bool Node<SPACE_DIM>::IsBoundaryNode() const
 {
     return mIsBoundaryNode;
 }
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 void Node<SPACE_DIM>::AddNodeAttribute(double attribute)
 {
     ConstructNodeAttributes();
@@ -174,7 +174,7 @@ void Node<SPACE_DIM>::AddNodeAttribute(double attribute)
     mpNodeAttributes->AddAttribute(attribute);
 }
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 std::vector<double>& Node<SPACE_DIM>::rGetNodeAttributes()
 {
     CheckForNodeAttributes();
@@ -182,7 +182,7 @@ std::vector<double>& Node<SPACE_DIM>::rGetNodeAttributes()
     return mpNodeAttributes->rGetAttributes();
 }
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 unsigned Node<SPACE_DIM>::GetNumNodeAttributes()
 {
     unsigned num_attributes;
@@ -198,13 +198,13 @@ unsigned Node<SPACE_DIM>::GetNumNodeAttributes()
     return num_attributes;
 }
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 bool Node<SPACE_DIM>::HasNodeAttributes()
 {
     return (mpNodeAttributes != NULL);
 }
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM>& Node<SPACE_DIM>::rGetAppliedForce()
 {
     CheckForNodeAttributes();
@@ -212,7 +212,7 @@ c_vector<double, SPACE_DIM>& Node<SPACE_DIM>::rGetAppliedForce()
     return mpNodeAttributes->rGetAppliedForce();
 }
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 void Node<SPACE_DIM>::ClearAppliedForce()
 {
     ConstructNodeAttributes();
@@ -220,7 +220,7 @@ void Node<SPACE_DIM>::ClearAppliedForce()
     mpNodeAttributes->ClearAppliedForce();
 }
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 void Node<SPACE_DIM>::AddAppliedForceContribution(const c_vector<double, SPACE_DIM>& forceContribution)
 {
     ConstructNodeAttributes();
@@ -228,7 +228,7 @@ void Node<SPACE_DIM>::AddAppliedForceContribution(const c_vector<double, SPACE_D
     mpNodeAttributes->AddAppliedForceContribution(forceContribution);
 }
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 bool Node<SPACE_DIM>::IsParticle()
 {
     CheckForNodeAttributes();
@@ -236,7 +236,7 @@ bool Node<SPACE_DIM>::IsParticle()
     return mpNodeAttributes->IsParticle();
 }
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 void Node<SPACE_DIM>::SetIsParticle(bool isParticle)
 {
     ConstructNodeAttributes();
@@ -244,7 +244,7 @@ void Node<SPACE_DIM>::SetIsParticle(bool isParticle)
     mpNodeAttributes->SetIsParticle(isParticle);
 }
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 double Node<SPACE_DIM>::GetRadius()
 {
     CheckForNodeAttributes();
@@ -252,7 +252,7 @@ double Node<SPACE_DIM>::GetRadius()
     return mpNodeAttributes->GetRadius();
 }
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 void Node<SPACE_DIM>::SetRadius(double radius)
 {
     ConstructNodeAttributes();
@@ -264,57 +264,57 @@ void Node<SPACE_DIM>::SetRadius(double radius)
 // Tracking (boundary) elements which contain this node as a vertex
 //////////////////////////////////////////////////////////////////////////
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 void Node<SPACE_DIM>::AddElement(unsigned index)
 {
     mElementIndices.insert(index);
 }
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 void Node<SPACE_DIM>::RemoveElement(unsigned index)
 {
     unsigned count = mElementIndices.erase(index);
     if (count == 0)
     {
-        EXCEPTION("Tried to remove an element index from node which was not in the set");
+        EXCEPTION("Tried to remove an element index(" << index << ") from node(" << this->GetIndex() << ") which was not in the set");
     }
 }
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 void Node<SPACE_DIM>::RemoveBoundaryElement(unsigned index)
 {
     unsigned count = mBoundaryElementIndices.erase(index);
     if (count == 0)
     {
-        EXCEPTION("Tried to remove an element index from node which was not in the set");
+        EXCEPTION("Tried to remove an element index(" << index << ") from node(" << this->GetIndex() << ") which was not in the set");
     }
 }
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 void Node<SPACE_DIM>::AddBoundaryElement(unsigned index)
 {
     mBoundaryElementIndices.insert(index);
 }
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 std::set<unsigned>& Node<SPACE_DIM>::rGetContainingElementIndices()
 {
     return mElementIndices;
 }
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 std::set<unsigned>& Node<SPACE_DIM>::rGetContainingBoundaryElementIndices()
 {
     return mBoundaryElementIndices;
 }
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 unsigned Node<SPACE_DIM>::GetNumContainingElements() const
 {
     return mElementIndices.size();
 }
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 unsigned Node<SPACE_DIM>::GetNumBoundaryElements() const
 {
     return mBoundaryElementIndices.size();
@@ -324,29 +324,29 @@ unsigned Node<SPACE_DIM>::GetNumBoundaryElements() const
 // Tracking faces which contain this node as a vertex
 //////////////////////////////////////////////////////////////////////////
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 void Node<SPACE_DIM>::AddFace(const unsigned index)
 {
     mFaceIndices.insert(index);
 }
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 void Node<SPACE_DIM>::RemoveFace(const unsigned index)
 {
     unsigned count = mFaceIndices.erase(index);
     if (count == 0)
     {
-        EXCEPTION("Tried to remove a face index from node which was not in the set");
+        EXCEPTION("Tried to remove a face index(" << index << ") from node(" << this->GetIndex() << ") which was not in the set");
     }
 }
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 std::set<unsigned>& Node<SPACE_DIM>::rGetContainingFaceIndices()
 {
     return mFaceIndices;
 }
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 unsigned Node<SPACE_DIM>::GetNumContainingFaces() const
 {
     return mFaceIndices.size();
@@ -356,7 +356,7 @@ unsigned Node<SPACE_DIM>::GetNumContainingFaces() const
 // Tracking neighbours of the node
 //////////////////////////////////////////////////////////////////////////
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 void Node<SPACE_DIM>::AddNeighbour(unsigned index)
 {
     ConstructNodeAttributes();
@@ -364,7 +364,7 @@ void Node<SPACE_DIM>::AddNeighbour(unsigned index)
     return mpNodeAttributes->AddNeighbour(index);
 }
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 void Node<SPACE_DIM>::ClearNeighbours()
 {
     ConstructNodeAttributes();
@@ -372,7 +372,7 @@ void Node<SPACE_DIM>::ClearNeighbours()
     mpNodeAttributes->ClearNeighbours();
 }
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 void Node<SPACE_DIM>::RemoveDuplicateNeighbours()
 {
     CheckForNodeAttributes();
@@ -380,7 +380,7 @@ void Node<SPACE_DIM>::RemoveDuplicateNeighbours()
     mpNodeAttributes->RemoveDuplicateNeighbours();
 }
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 bool Node<SPACE_DIM>::NeighboursIsEmpty()
 {
     CheckForNodeAttributes();
@@ -388,7 +388,7 @@ bool Node<SPACE_DIM>::NeighboursIsEmpty()
     return mpNodeAttributes->NeighboursIsEmpty();
 }
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 void Node<SPACE_DIM>::SetNeighboursSetUp(bool flag)
 {
     ConstructNodeAttributes();
@@ -396,7 +396,7 @@ void Node<SPACE_DIM>::SetNeighboursSetUp(bool flag)
     mpNodeAttributes->SetNeighboursSetUp(flag);
 };
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 bool Node<SPACE_DIM>::GetNeighboursSetUp()
 {
     CheckForNodeAttributes();
@@ -404,7 +404,7 @@ bool Node<SPACE_DIM>::GetNeighboursSetUp()
     return mpNodeAttributes->GetNeighboursSetUp();
 };
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 std::vector<unsigned>& Node<SPACE_DIM>::rGetNeighbours()
 {
     CheckForNodeAttributes();
@@ -416,7 +416,7 @@ std::vector<unsigned>& Node<SPACE_DIM>::rGetNeighbours()
 // Methods dealing with some node flags (deleted, region)
 //////////////////////////////////////////////////////////////////////////
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 void Node<SPACE_DIM>::CheckForNodeAttributes() const
 {
     if (mpNodeAttributes == NULL)
@@ -425,7 +425,7 @@ void Node<SPACE_DIM>::CheckForNodeAttributes() const
     }
 }
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 void Node<SPACE_DIM>::ConstructNodeAttributes()
 {
     if (mpNodeAttributes == NULL)
@@ -434,38 +434,38 @@ void Node<SPACE_DIM>::ConstructNodeAttributes()
     }
 }
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 void Node<SPACE_DIM>::MarkAsDeleted()
 {
     mIsDeleted = true;
 }
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 bool Node<SPACE_DIM>::IsDeleted() const
 {
     return mIsDeleted;
 }
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 void Node<SPACE_DIM>::MarkAsInternal()
 {
     mIsInternal = true;
 }
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 bool Node<SPACE_DIM>::IsInternal() const
 {
     return mIsInternal;
 }
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 void Node<SPACE_DIM>::SetRegion(unsigned region)
 {
     ConstructNodeAttributes();
     mpNodeAttributes->SetRegion(region);
 }
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 unsigned Node<SPACE_DIM>::GetRegion() const
 {
     unsigned region = 0;

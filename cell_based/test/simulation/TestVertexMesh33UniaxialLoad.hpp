@@ -73,7 +73,7 @@ private:
     static const double target_area = 1;
     const unsigned num_cells_x = 9;
     const unsigned num_cells_y = 5;
-    static const double end_time = 1;
+    static const double end_time = 0.1;
 
 public:
     void TestOnHexagonalMesh() throw(Exception)
@@ -156,8 +156,9 @@ public:
 
     void TestCylindricalMesh()
     {
-        const unsigned x = 8;
-        const unsigned y = 2;
+        const unsigned x = 10;
+        const unsigned y = 11;
+        const double c_end_time = 5;
         const double a = 2;
         const double length = 3 * sqrt(3) * y + sqrt(3);
         const double radius = a / M_PI / 2 * x;
@@ -172,17 +173,26 @@ public:
         builder.ConvertMeshToCylinder(2 * x, 1, radius, 0.5, 1);
         builder.WriteVtk(output_filename, "After");
 
-        PrintMesh(p_mesh);
+        for (unsigned i=0; i<p_mesh->GetNumNodes(); ++i)
         {
-            std::vector<double> volumes;
-            for (unsigned i = 0; i < p_mesh->GetNumElements(); volumes.push_back(p_mesh->GetVolumeOfElement(i++)))
-                ;
-            PRINT_CONTAINER(volumes)
+            c_vector<double,3>& tmp_loc = p_mesh->GetNode(i)->rGetModifiableLocation();
+            double xx = tmp_loc[0];
+            tmp_loc[0] = tmp_loc[1];
+            tmp_loc[1] = -xx;
         }
+        for (unsigned i=0; i<p_mesh->GetNumElements(); ++i)
+        {
+            p_mesh->GetElement(i)->MonolayerElementRearrangeFacesNodes();
+        }
+
+        PRINT_2_VARIABLES(p_mesh->GetVolumeOfElement(0), p_mesh->GetVolumeOfElement(5))
 
         std::vector<CellPtr> cells;
         CellsGenerator<NoCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
+        // MAKE_PTR(TransitCellProliferativeType, p_transit_type);
+        // CellsGenerator<UniformG1GenerationalCellCycleModel, 3> cells_generator;
+        // cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_transit_type);
         VertexBasedCellPopulation<3> cell_population(*p_mesh, cells);
         cell_population.AddCellWriter<CellIdWriter>();
         cell_population.AddCellWriter<CellVolumesWriter>();
@@ -190,7 +200,7 @@ public:
         OffLatticeSimulation<3> simulator(cell_population);
         simulator.SetOutputDirectory(output_filename);
         simulator.SetSamplingTimestepMultiple(10);
-        simulator.SetEndTime(end_time);
+        simulator.SetEndTime(c_end_time);
 
         MAKE_PTR(GeneralMonolayerVertexMeshForce, p_force3);
         // p_force3->SetApicalParameters(20, 20, 0.7);
@@ -198,11 +208,15 @@ public:
         // p_force3->SetLateralParameter(8);
         p_force3->SetVolumeParameters(100, 1);
         simulator.AddForce(p_force3);
+        MAKE_PTR(HorizontalStretchForce<3>, p_force2);
+        p_force2->SetForceMagnitude(0.2);
+        p_force2->SetRelativeWidth(0.15);
+        simulator.AddForce(p_force2);
 
         simulator.Solve();
 
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), x * y);
-        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), c_end_time, 1e-10);
     }
 
     void TestCellGrowth() throw(Exception)
@@ -214,11 +228,7 @@ public:
         const unsigned num_cells_y = 3;
         std::string output_filename = "TestCellDivision/HoneyTest" + boost::lexical_cast<std::string>(num_cells_x)
             + "x" + boost::lexical_cast<std::string>(num_cells_y);
-        // There seems to be a bug somewhere in voronoiprism3dVertexMeshGenerator....
-        //        VoronoiPrism3dVertexMeshGenerator generator(num_cells_x, num_cells_y, z_height, 5, target_area);
-        //        MutableVertexMesh<3,3>* p_mesh = generator.GetMeshAfterReMesh();
         HoneycombVertexMeshGenerator generator(num_cells_x, num_cells_y, false, 0.1, 0.01, target_area);
-        //        VoronoiVertexMeshGenerator generator(num_cells_x, num_cells_y, 5, target_area);
         MutableVertexMesh<2, 2>& vertex_2mesh = *(generator.GetMesh());
         MonolayerVertexMeshGenerator builder("CellGrowth");
         MutableVertexMesh<3, 3>* p_mesh = builder.MakeMeshUsing2dMesh(vertex_2mesh);
@@ -235,7 +245,7 @@ public:
         OffLatticeSimulation<3> simulator(cell_population);
         simulator.SetOutputDirectory(output_filename);
         simulator.SetSamplingTimestepMultiple(200);
-        simulator.SetEndTime(20.0);
+        simulator.SetEndTime(end_time);
 
         MAKE_PTR(GeneralMonolayerVertexMeshForce, p_force3);
         p_force3->SetApicalParameters(20, 20, 0.7);
@@ -250,7 +260,7 @@ public:
 
         simulator.Solve();
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 55u);
-        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 20.0, 1e-10);
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
 
     void TestOnSphere() throw(Exception)

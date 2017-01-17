@@ -1312,16 +1312,18 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RemoveDeletedNodes()
     }
 }
 
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RemoveDeletedFaces()
+{
+    NEVER_REACHED;
+}
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RemoveDeletedFaces() {NEVER_REACHED;}
-
-template<>
+template <>
 void MutableVertexMesh<3, 3>::RemoveDeletedFaces()
 {
     // Remove any nodes that have been marked for deletion and store all other nodes in a temporary structure
     std::vector<VertexElement<2, 3>*> live_faces;
-    for (unsigned i=0; i<this->mFaces.size(); i++)
+    for (unsigned i = 0; i < this->mFaces.size(); ++i)
     {
         if (this->mFaces[i]->IsDeleted())
         {
@@ -1341,14 +1343,13 @@ void MutableVertexMesh<3, 3>::RemoveDeletedFaces()
     mDeletedFaceIndices.clear();
 
     // Finally, reset the node indices to run from zero
-    for (unsigned i=0; i<this->mFaces.size(); i++)
+    for (unsigned i = 0; i < this->mFaces.size(); ++i)
     {
-        this->mFaces[i]->SetIndex(i);
+        this->mFaces[i]->FaceResetIndex(i);
     }
 }
 
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(VertexElementMap& rElementMap)
 {
     // Make sure that we are in the correct dimension - this code will be eliminated at compile time
