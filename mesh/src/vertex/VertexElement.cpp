@@ -436,9 +436,9 @@ void VertexElement<2, 3>::LateralFaceRearrangeNodes()
     {
         min_cyc_index = second_index;
     }
-    else
+    else if (min_cyc_index + 1 != second_index)
     {
-        assert(min_cyc_index + 1 == second_index);
+        NEVER_REACHED;
     }
 
     std::rotate(this->mNodes.begin(), this->mNodes.begin() + min_cyc_index, this->mNodes.end());

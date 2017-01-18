@@ -336,8 +336,12 @@ public:
         // Set the threshold distance between vertices for a T1 swap as follows
         // so that it will not trigger CheckForSwapsFromShortEdges
         vertex_mesh.GetNode(11)->rGetModifiableLocation()[1] = 0.62;
+        builder.WriteVtkWithSubfolder(OUTPUT_NAME, "Initial_1");
         vertex_mesh.SetCellRearrangementThreshold(0.21);
+        MARK;
+        TRACE("*****************Check 1*****************");
         vertex_mesh.CheckForSwapsFromShortEdges();
+        builder.WriteVtkWithSubfolder(OUTPUT_NAME, "After_1");
 
         // Test that each moved node has the correct location following the rearrangement
         TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[0], 0.5, 1e-8);
@@ -345,8 +349,12 @@ public:
         TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[2], 0.0, 1e-8);
 
         vertex_mesh.GetNode(4)->rGetModifiableLocation()[1] = 0.36;
+        builder.WriteVtkWithSubfolder(OUTPUT_NAME, "Initial_2");
         vertex_mesh.SetCellRearrangementThreshold(0.23);
+        MARK;
+        TRACE("*****************Check 2*****************");
         vertex_mesh.CheckForSwapsFromShortEdges();
+        builder.WriteVtkWithSubfolder(OUTPUT_NAME, "After_2");
         // Test that each moved node has the correct location following the rearrangement
         TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[0], 0.5, 1e-8);
         TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[1], 0.6, 1e-8);
@@ -354,6 +362,11 @@ public:
 
         vertex_mesh.SetCellRearrangementThreshold(0.25);
         vertex_mesh.CheckForSwapsFromShortEdges();
+        builder.WriteVtkWithSubfolder(OUTPUT_NAME, "After_3");
+        // Test that each moved node has the correct location following the rearrangement
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[0], 0.3125, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[1], 0.48, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[2], 0.0, 1e-8);
     }
 
     void TestT1SwapNonEvenFace() throw(Exception)
@@ -1239,86 +1252,86 @@ public:
         builder.WriteVtk("DivideElement", "After");
     }
 
-/// Commented this test as T2 Swap should only happen to triangular prism
-/// element in vertex model
-//    void TestPerformT2SwapWithRosettes2() throw(Exception)
-//    {
-//        /* Create a mesh containing a smaller square element.
-//         * Test that a T2 swap correctly removes the triangular element
-//         * from the mesh and create rosette out of it.
-//         *  ___________
-//         *  |    |    |
-//         *  |    |    |
-//         *  |___/ \___|
-//         *  |   \ /   |
-//         *  |    |    |
-//         *  |____|____|
-//         */
-//
-//        std::vector<Node<3>*> nodes;
-//        nodes.push_back(new Node<3>(0, true,  0.0, 0.0));
-//        nodes.push_back(new Node<3>(1, true,  1.0, 0.0));
-//        nodes.push_back(new Node<3>(2, true,  2.0, 0.0));
-//        nodes.push_back(new Node<3>(3, true, 2.0, 1.0));
-//        nodes.push_back(new Node<3>(4, true, 2.0, 2.0));
-//        nodes.push_back(new Node<3>(5, true, 1.0, 2.0));
-//        nodes.push_back(new Node<3>(6, true, 0.0, 2.0));
-//        nodes.push_back(new Node<3>(7, true, 0.0, 1.0));
-//        nodes.push_back(new Node<3>(8, false, 1.0, 0.8));
-//        nodes.push_back(new Node<3>(9, false, 1.2, 1.0));
-//        nodes.push_back(new Node<3>(10, false, 1.0, 1.2));
-//        nodes.push_back(new Node<3>(11, false, 0.8, 1.0));
-//
-//        const unsigned node_indices_elem_0[5] = {0, 1, 8, 11, 7};
-//        const unsigned node_indices_elem_1[5] = {2, 3, 9, 8, 1};
-//        const unsigned node_indices_elem_2[5] = {4, 5, 10, 9, 3};
-//        const unsigned node_indices_elem_3[5] = {6, 7, 11, 10, 5};
-//        const unsigned node_indices_elem_4[4] = {8, 9, 10, 11};
-//
-//        Helper3dVertexMeshBuilder builder(nodes, "T2SwapWithRosette2");
-//        builder.BuildElementWith(5, node_indices_elem_0);
-//        builder.BuildElementWith(5, node_indices_elem_1);
-//        builder.BuildElementWith(5, node_indices_elem_2);
-//        builder.BuildElementWith(5, node_indices_elem_3);
-//        builder.BuildElementWith(4, node_indices_elem_4);
-//
-//        // A reference variable as mesh is noncopyable
-//        MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
-//        builder.WriteVtkWithSubfolder(OUTPUT_NAME,"Before");
-//
-//        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 5u);
-//        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 24u);
-//        TS_ASSERT_EQUALS(vertex_mesh.GetNumFaces(), 26u);
-//
-//        // Perform a T2 swap on the central triangle element
-//        VertexElement<3, 3>* p_element_4 = vertex_mesh.GetElement(4);
-//        c_vector<double, 3> centroid_of_element_4_before_swap = vertex_mesh.GetCentroidOfElement(3);
-//        vertex_mesh.PerformT2Swap(*p_element_4);
-//
-//        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 4u);
-//        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 18u);
-//        TS_ASSERT_EQUALS(vertex_mesh.GetNumFaces(), 20u);
-//
-//        TS_ASSERT_EQUALS(vertex_mesh.GetNumAllElements(), 5u);
-//        TS_ASSERT_EQUALS(vertex_mesh.GetNumAllNodes(), 26u);
-//
-//        for (unsigned i=0 ; i<4 ; ++i)
-//        {
-//            TS_ASSERT_EQUALS(vertex_mesh.GetElement(i)->GetNumNodes(), 8u);
-//            TS_ASSERT_EQUALS(vertex_mesh.GetElement(i)->GetNumFaces(), 6u);
-//            TS_ASSERT_EQUALS(vertex_mesh.GetElement(i)->GetNodeGlobalIndex(0), i*2);
-//            TS_ASSERT_EQUALS(vertex_mesh.GetElement(i)->GetNodeGlobalIndex(1), i*2+1);
-//            TS_ASSERT_EQUALS(vertex_mesh.GetElement(i)->GetNodeGlobalIndex(2), 24u);
-//            TS_ASSERT_EQUALS(vertex_mesh.GetElement(i)->GetNodeGlobalIndex(3), (i*2-1+8)%8);
-//        }
-//
-//        TS_ASSERT_EQUALS(vertex_mesh.GetNode(24)->IsBoundaryNode(), false);
-//        TS_ASSERT_EQUALS(vertex_mesh.GetNode(25)->IsBoundaryNode(), false);
-//
-//        VertexElementMap map(vertex_mesh.GetNumElements());
-//        vertex_mesh.RemoveDeletedNodesAndElements(map);
-//        builder.WriteVtkWithSubfolder(OUTPUT_NAME,"AfterRemove");
-//    }
+    // // Commented this test as T2 Swap should only happen to triangular prism
+    // // element in vertex model
+    // void TestPerformT2SwapWithRosettes2() throw(Exception)
+    // {
+    //     /* Create a mesh containing a smaller square element.
+    //         * Test that a T2 swap correctly removes the triangular element
+    //         * from the mesh and create rosette out of it.
+    //         *  ___________
+    //         *  |    |    |
+    //         *  |    |    |
+    //         *  |___/ \___|
+    //         *  |   \ /   |
+    //         *  |    |    |
+    //         *  |____|____|
+    //         */
+
+    //     std::vector<Node<3>*> nodes;
+    //     nodes.push_back(new Node<3>(0, true, 0.0, 0.0));
+    //     nodes.push_back(new Node<3>(1, true, 1.0, 0.0));
+    //     nodes.push_back(new Node<3>(2, true, 2.0, 0.0));
+    //     nodes.push_back(new Node<3>(3, true, 2.0, 1.0));
+    //     nodes.push_back(new Node<3>(4, true, 2.0, 2.0));
+    //     nodes.push_back(new Node<3>(5, true, 1.0, 2.0));
+    //     nodes.push_back(new Node<3>(6, true, 0.0, 2.0));
+    //     nodes.push_back(new Node<3>(7, true, 0.0, 1.0));
+    //     nodes.push_back(new Node<3>(8, false, 1.0, 0.8));
+    //     nodes.push_back(new Node<3>(9, false, 1.2, 1.0));
+    //     nodes.push_back(new Node<3>(10, false, 1.0, 1.2));
+    //     nodes.push_back(new Node<3>(11, false, 0.8, 1.0));
+
+    //     const unsigned node_indices_elem_0[5] = { 0, 1, 8, 11, 7 };
+    //     const unsigned node_indices_elem_1[5] = { 2, 3, 9, 8, 1 };
+    //     const unsigned node_indices_elem_2[5] = { 4, 5, 10, 9, 3 };
+    //     const unsigned node_indices_elem_3[5] = { 6, 7, 11, 10, 5 };
+    //     const unsigned node_indices_elem_4[4] = { 8, 9, 10, 11 };
+
+    //     Helper3dVertexMeshBuilder builder(nodes, "T2SwapWithRosette2");
+    //     builder.BuildElementWith(5, node_indices_elem_0);
+    //     builder.BuildElementWith(5, node_indices_elem_1);
+    //     builder.BuildElementWith(5, node_indices_elem_2);
+    //     builder.BuildElementWith(5, node_indices_elem_3);
+    //     builder.BuildElementWith(4, node_indices_elem_4);
+
+    //     // A reference variable as mesh is noncopyable
+    //     MutableVertexMesh<3, 3>& vertex_mesh = *builder.GenerateMesh();
+    //     builder.WriteVtkWithSubfolder(OUTPUT_NAME, "Before");
+
+    //     TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 5u);
+    //     TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 24u);
+    //     TS_ASSERT_EQUALS(vertex_mesh.GetNumFaces(), 26u);
+
+    //     // Perform a T2 swap on the central triangle element
+    //     VertexElement<3, 3>* p_element_4 = vertex_mesh.GetElement(4);
+    //     c_vector<double, 3> centroid_of_element_4_before_swap = vertex_mesh.GetCentroidOfElement(3);
+    //     vertex_mesh.PerformT2Swap(*p_element_4);
+
+    //     TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 4u);
+    //     TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 18u);
+    //     TS_ASSERT_EQUALS(vertex_mesh.GetNumFaces(), 20u);
+
+    //     TS_ASSERT_EQUALS(vertex_mesh.GetNumAllElements(), 5u);
+    //     TS_ASSERT_EQUALS(vertex_mesh.GetNumAllNodes(), 26u);
+
+    //     for (unsigned i = 0; i < 4; ++i)
+    //     {
+    //         TS_ASSERT_EQUALS(vertex_mesh.GetElement(i)->GetNumNodes(), 8u);
+    //         TS_ASSERT_EQUALS(vertex_mesh.GetElement(i)->GetNumFaces(), 6u);
+    //         TS_ASSERT_EQUALS(vertex_mesh.GetElement(i)->GetNodeGlobalIndex(0), i * 2);
+    //         TS_ASSERT_EQUALS(vertex_mesh.GetElement(i)->GetNodeGlobalIndex(1), i * 2 + 1);
+    //         TS_ASSERT_EQUALS(vertex_mesh.GetElement(i)->GetNodeGlobalIndex(2), 24u);
+    //         TS_ASSERT_EQUALS(vertex_mesh.GetElement(i)->GetNodeGlobalIndex(3), (i * 2 - 1 + 8) % 8);
+    //     }
+
+    //     TS_ASSERT_EQUALS(vertex_mesh.GetNode(24)->IsBoundaryNode(), false);
+    //     TS_ASSERT_EQUALS(vertex_mesh.GetNode(25)->IsBoundaryNode(), false);
+
+    //     VertexElementMap map(vertex_mesh.GetNumElements());
+    //     vertex_mesh.RemoveDeletedNodesAndElements(map);
+    //     builder.WriteVtkWithSubfolder(OUTPUT_NAME, "AfterRemove");
+    // }
 };
 
 #endif /*TESTMUTABLEVERTEXMESH33REMESH_HPP_*/
