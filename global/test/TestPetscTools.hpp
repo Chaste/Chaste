@@ -414,13 +414,6 @@ public:
         // Should get thrown by all processes as exception is replicated.
         TS_ASSERT_THROWS_CONTAINS(TRY_IF_MASTER(EXCEPTION("master; bailing out")),
                 "; bailing out"); // both the replicated and original should contain this phrase
-                
-        // Nasty asymmetric assertion - this is a temporary test to see if Buildbot stalls on parallel assertions.
-        if (PetscTools::AmMaster())
-        {
-            assert(PetscTools::IsSequential());
-        }
-                
     }
 };
 
