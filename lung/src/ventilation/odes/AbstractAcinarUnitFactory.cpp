@@ -69,5 +69,5 @@ AbstractTetrahedralMesh<1,3>* AbstractAcinarUnitFactory::GetMesh()
     {
         EXCEPTION("The mesh object has not been set in the acinar unit factory");
     }
-    return mpMesh;
+    return mpMesh;  // LCOV_EXCL_LINE // Avoid compiler warning
 }
