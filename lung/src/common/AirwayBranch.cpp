@@ -276,8 +276,10 @@ Node<3>* AirwayBranch::GetProximalNode()
 
         // Get necessary global indices
         unsigned first_elem_node_1_global_idx = p_first_element->GetNode(1)->GetIndex();
+        UNUSED_OPT(first_elem_node_1_global_idx);
         unsigned second_elem_node_0_global_idx = p_second_element->GetNode(0)->GetIndex();
-
+        UNUSED_OPT(second_elem_node_0_global_idx);
+        
         // In case of failure, there's a problem with node ordering in the mesh: look at commented code below.
         assert(first_elem_node_1_global_idx == second_elem_node_0_global_idx);
         return p_first_element->GetNode(0);
@@ -331,7 +333,9 @@ Node<3>* AirwayBranch::GetDistalNode()
 
         // Get necessary global indices
         unsigned last_elem_node_0_global_idx = p_last_element->GetNode(0)->GetIndex();
+        UNUSED_OPT(last_elem_node_0_global_idx);
         unsigned penultimate_elem_node_1_global_idx = p_penultimate_element->GetNode(1)->GetIndex();
+        UNUSED_OPT(penultimate_elem_node_1_global_idx);
 
         // In case of failure, there's a problem with node ordering in the mesh: look at commented code below.
         assert(last_elem_node_0_global_idx == penultimate_elem_node_1_global_idx);
