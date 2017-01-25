@@ -130,7 +130,7 @@ public:
 
         // Create a vertex mesh writer
         VertexMeshWriter<3, 3> vertex_mesh_writer("TestHexagonalPrism3dVertexMesh/RowOfThree", "vertex_mesh_3d_row_of_three");
-        vertex_mesh_writer.WriteVtkUsingMeshWithCellId(*p_mesh);
+        vertex_mesh_writer.WriteVtkUsingMesh(*p_mesh);
     }
 
     void TestThreeByThreeElements() throw(Exception)
@@ -194,7 +194,7 @@ public:
 
         // Create a vertex mesh writer
         VertexMeshWriter<3, 3> vertex_mesh_writer("TestHexagonalPrism3dVertexMesh/ThreeByThree", "vertex_mesh_3d_three_by_three");
-        vertex_mesh_writer.WriteVtkUsingMeshWithCellId(*p_mesh);
+        vertex_mesh_writer.WriteVtkUsingMesh(*p_mesh);
     }
 
     void TestFourByFourElements() throw(Exception)
@@ -255,7 +255,7 @@ public:
 
         // Create a vertex mesh writer
         VertexMeshWriter<3, 3> vertex_mesh_writer3("TestHexagonalPrism3dVertexMesh/FourByFour", "vertex_mesh_3d_four_by_four");
-        vertex_mesh_writer3.WriteVtkUsingMeshWithCellId(*p_mesh);
+        vertex_mesh_writer3.WriteVtkUsingMesh(*p_mesh);
     }
 
     void TestLargeMesh() throw(Exception)

@@ -67,8 +67,8 @@ std::set<unsigned> GetSharedElementIndices(const Node<3>* pNodeA, const Node<3>*
 {
     Node<3>* p_node_a = const_cast<Node<3>*>(pNodeA);
     Node<3>* p_node_b = const_cast<Node<3>*>(pNodeB);
-    std::set<unsigned> elems_with_node_a = p_node_a->rGetContainingElementIndices();
-    std::set<unsigned> elems_with_node_b = p_node_b->rGetContainingElementIndices();
+    const std::set<unsigned>& elems_with_node_a = p_node_a->rGetContainingElementIndices();
+    const std::set<unsigned>& elems_with_node_b = p_node_b->rGetContainingElementIndices();
 
     std::set<unsigned> shared_elements;
     std::set_intersection(elems_with_node_a.begin(), elems_with_node_a.end(),
@@ -82,8 +82,8 @@ std::set<unsigned> GetSharedFaceIndices(const Node<3>* pNodeA, const Node<3>* pN
 {
     Node<3>* p_node_a = const_cast<Node<3>*>(pNodeA);
     Node<3>* p_node_b = const_cast<Node<3>*>(pNodeB);
-    std::set<unsigned> elems_with_node_a = p_node_a->rGetContainingFaceIndices();
-    std::set<unsigned> elems_with_node_b = p_node_b->rGetContainingFaceIndices();
+    const std::set<unsigned>& elems_with_node_a = p_node_a->rGetContainingFaceIndices();
+    const std::set<unsigned>& elems_with_node_b = p_node_b->rGetContainingFaceIndices();
 
     std::set<unsigned> shared_faces;
     std::set_intersection(elems_with_node_a.begin(), elems_with_node_a.end(),
@@ -93,10 +93,47 @@ std::set<unsigned> GetSharedFaceIndices(const Node<3>* pNodeA, const Node<3>* pN
     return shared_faces;
 }
 
+VertexElement<2, 3>* GetSharedLateralFace(const VertexElement<3, 3>* pElemA,
+                                          const VertexElement<3, 3>* pElemB)
+{
+    if (pElemA == NULL || pElemB == NULL)
+    {
+        return NULL;
+    }
+
+    std::set<unsigned> s1, s2, s_return;
+    for (unsigned i = 0; i < pElemA->GetNumFaces(); ++i)
+    {
+        if (IsLateralFace(pElemA->GetFace(i)))
+        {
+            s1.insert(pElemA->GetFace(i)->GetIndex());
+        }
+    }
+    for (unsigned i = 0; i < pElemB->GetNumFaces(); ++i)
+    {
+        if (IsLateralFace(pElemB->GetFace(i)))
+        {
+            s2.insert(pElemB->GetFace(i)->GetIndex());
+        }
+    }
+    std::set_intersection(s1.begin(), s1.end(), s2.begin(), s2.end(),
+                          std::inserter(s_return, s_return.begin()));
+
+    switch (s_return.size())
+    {
+        case 0:
+            return NULL;
+        case 1:
+            return pElemA->GetFace(pElemA->GetFaceLocalIndex(*(s_return.begin())));
+        default:
+            NEVER_REACHED;
+    }
+}
+
 VertexElement<2, 3>* GetSharedLateralFace(const MutableVertexMesh<3, 3>* pMesh,
                                           const Node<3>* pNodeA, const Node<3>* pNodeB)
 {
-    std::set<unsigned> shared_face_ids = GetSharedFaceIndices(pNodeA, pNodeB);
+    const std::set<unsigned> shared_face_ids = GetSharedFaceIndices(pNodeA, pNodeB);
     std::vector<unsigned> shared_lateral_face_ids;
     for (std::set<unsigned>::const_iterator it = shared_face_ids.begin();
          it != shared_face_ids.end(); ++it)
@@ -214,6 +251,36 @@ void PrintElement(const VertexElement<3, 3>* pElement)
         std::cout << "}" << std::endl
                   << "---------------------------------------------------------" << std::endl;
     }
+}
+
+template <>
+void PrintElement(const VertexElement<2, 3>* pFace)
+{
+    const std::string MonolayerValueToName[4] = { "", "Basal", "Apical", "Lateral" };
+    const std::string TAB = "    ";
+
+    std::cout << "=================================================================================" << std::endl;
+
+    std::cout << "FACE: " << pFace->GetIndex() << " (" << MonolayerValueToName[GetFaceType(pFace)] << ") "
+              << (pFace->IsDeleted() ? " (DELETED)" : "") << std::endl;
+
+    const std::set<unsigned>& s_elems = (const_cast<VertexElement<2, 3>*>(pFace))->rFaceGetContainingElementIndices();
+    std::cout << TAB << "number of Elements : " << pFace->FaceGetNumContainingElements() << " {";
+    for (std::set<unsigned>::const_iterator it = s_elems.begin();
+         it != s_elems.end(); ++it)
+    {
+        std::cout << std::setw(3) << *it << "  ";
+    }
+    std::cout << "}" << std::endl;
+
+    std::cout << TAB << "number of Nodes : " << pFace->GetNumNodes() << " {  ";
+    for (unsigned j = 0; j < pFace->GetNumNodes(); ++j)
+    {
+        std::cout << pFace->GetNode(j)->GetIndex() << "  ";
+    }
+    std::cout << "}" << std::endl;
+
+    std::cout << "=================================================================================" << std::endl;
 }
 
 void PrintMesh(const MutableVertexMesh<3, 3>* pMesh, const bool printDeletedObjects)
@@ -338,6 +405,12 @@ void SetNodeAsBasal(Node<3>* pNode)
     pNode->AddNodeAttribute(Monolayer::SetBasalValue);
 }
 
+void SetNodeAsLateral(Node<3>* pNode)
+{
+    assert(pNode->GetNumNodeAttributes() == 0u); // LCOV_EXCL_LINE
+    pNode->AddNodeAttribute(Monolayer::SetLateralValue);
+}
+
 Monolayer::v_type GetNodeType(const Node<3>* pNode)
 {
     /* implemented const node as there is no modication for this
@@ -357,6 +430,11 @@ bool IsApicalNode(const Node<3>* pNode)
 bool IsBasalNode(const Node<3>* pNode)
 {
     return GetNodeType(pNode) == Monolayer::BasalValue;
+}
+
+bool IsLateralNode(const Node<3>* pNode)
+{
+    return GetNodeType(pNode) == Monolayer::LateralValue;
 }
 
 //////////////////////////////////
@@ -565,4 +643,18 @@ std::vector<unsigned> GetLateralFace(const VertexElement<3, 3>* pElement, const 
         assert(return_vector.size() == 3); // LCOV_EXCL_LINE
     }
     return return_vector;
+}
+
+std::vector<Node<3>*> GetLateralNode(const VertexElement<3, 3>* pElement)
+{
+    std::vector<Node<3>*> return_v;
+    for (int i = pElement->GetNumNodes() - 1; i >= 0; --i)
+    {
+        if (IsLateralNode(pElement->GetNode(i)))
+        {
+            return_v.push_back(pElement->GetNode(i));
+        }
+    }
+
+    return return_v;
 }

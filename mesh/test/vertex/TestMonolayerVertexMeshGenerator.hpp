@@ -175,7 +175,7 @@ public:
         {
             MutableVertexMesh<2, 3>* p_mesh = new MutableVertexMesh<2, 3>(builder.mNodes, builder.mFaces);
             VertexMeshWriter<2, 3> Writer("SphericalMesh", "Geodesic_0Division", false);
-            Writer.WriteVtkUsingMeshWithCellId(*p_mesh);
+            Writer.WriteVtkUsingMesh(*p_mesh);
 
             //            MonolayerVertexMeshGenerator sBuilder("trii");
             //            MutableVertexMesh<3,3>* pp_mesh33 = sBuilder.MakeSphericalMesh33(p_mesh, 5, 0.5);
@@ -203,7 +203,7 @@ public:
         {
             MutableVertexMesh<2, 3>* pp_mesh = builder.GetDual();
             VertexMeshWriter<2, 3> Writer("SphericalMesh", "Geodesic_0Dual", false);
-            Writer.WriteVtkUsingMeshWithCellId(*pp_mesh);
+            Writer.WriteVtkUsingMesh(*pp_mesh);
 
             MonolayerVertexMeshGenerator sBuilder("ssss");
             MutableVertexMesh<3, 3>* pp_mesh33 = sBuilder.MakeSphericalMesh33(pp_mesh, 5, 0.5);
@@ -218,7 +218,7 @@ public:
         {
             MutableVertexMesh<2, 3>* p_mesh = new MutableVertexMesh<2, 3>(builder.mNodes, builder.mFaces);
             VertexMeshWriter<2, 3> Writer("SphericalMesh", "Geodesic_1Divison", false);
-            Writer.WriteVtkUsingMeshWithCellId(*p_mesh);
+            Writer.WriteVtkUsingMesh(*p_mesh);
 
             //            MonolayerVertexMeshGenerator sBuilder("trii", false);
             //            MutableVertexMesh<3,3>* pp_mesh33 = sBuilder.MakeSphericalMesh33(p_mesh, 5, 0.5);
@@ -254,7 +254,7 @@ public:
         {
             MutableVertexMesh<2, 3>* pp_mesh = builder.GetDual();
             VertexMeshWriter<2, 3> Writer("SphericalMesh", "Geodesic_1Dual", false);
-            Writer.WriteVtkUsingMeshWithCellId(*pp_mesh);
+            Writer.WriteVtkUsingMesh(*pp_mesh);
 
             MonolayerVertexMeshGenerator sBuilder("ssss");
             MutableVertexMesh<3, 3>* pp_mesh33 = sBuilder.MakeSphericalMesh33(pp_mesh, 5, 0.5);
@@ -269,7 +269,7 @@ public:
         {
             MutableVertexMesh<2, 3>* p_mesh = new MutableVertexMesh<2, 3>(builder.mNodes, builder.mFaces);
             VertexMeshWriter<2, 3> Writer("SphericalMesh", "Geodesic_2Division", false);
-            Writer.WriteVtkUsingMeshWithCellId(*p_mesh);
+            Writer.WriteVtkUsingMesh(*p_mesh);
 
             //            delete p_mesh;
         }
@@ -301,7 +301,7 @@ public:
         {
             MutableVertexMesh<2, 3>* pp_mesh = builder.GetDual();
             VertexMeshWriter<2, 3> Writer("SphericalMesh", "Geodesic_2Dual", false);
-            Writer.WriteVtkUsingMeshWithCellId(*pp_mesh);
+            Writer.WriteVtkUsingMesh(*pp_mesh);
 
             MonolayerVertexMeshGenerator sBuilder("ssss");
             MutableVertexMesh<3, 3>* pp_mesh33 = sBuilder.MakeSphericalMesh33(pp_mesh, 5, 0.5);
@@ -318,7 +318,7 @@ public:
         {
             MutableVertexMesh<2, 3>* p_mesh = new MutableVertexMesh<2, 3>(builder.mNodes, builder.mFaces);
             VertexMeshWriter<2, 3> Writer("SphericalMesh", "Geodesic_3Divison", false);
-            Writer.WriteVtkUsingMeshWithCellId(*p_mesh);
+            Writer.WriteVtkUsingMesh(*p_mesh);
 
             //            delete p_mesh;
         }
@@ -350,7 +350,7 @@ public:
         {
             MutableVertexMesh<2, 3>* pp_mesh = builder.GetDual();
             VertexMeshWriter<2, 3> Writer("SphericalMesh", "Geodesic_3Dual", false);
-            Writer.WriteVtkUsingMeshWithCellId(*pp_mesh);
+            Writer.WriteVtkUsingMesh(*pp_mesh);
 
             MonolayerVertexMeshGenerator sBuilder("ssss");
             MutableVertexMesh<3, 3>* pp_mesh33 = sBuilder.MakeSphericalMesh33(pp_mesh, 5, 0.5);

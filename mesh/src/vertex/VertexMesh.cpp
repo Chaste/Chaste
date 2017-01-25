@@ -1662,8 +1662,6 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetVolumeGradien
 template<>
 c_vector<double, 3> VertexMesh<3, 3>::GetVolumeGradientofElementAtNode(const VertexElement<3, 3>* pElement, const unsigned globalIndex) const
 {
-    ///\todo check this derivation again
-    ///\todo I miss out a minus sign somewhere (as shown by simulation). Current quick fix is times -1.0 at the very end
     // If I have done it correctly, it should look like
     //
     // sum_{j, such that face j containing node i} { 1/6*VectorProduct( C_j, r_{i+1} - r_{i-1}) + A_j/(3*n_j).
@@ -1863,8 +1861,6 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetPreviousEdgeG
 }
 
 
-//=======
-//>>>>>>> develop
 /// Specialization to avoid compiler error about zero-sized arrays
 #if defined(__xlC__)
 template<>

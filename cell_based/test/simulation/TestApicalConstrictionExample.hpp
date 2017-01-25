@@ -81,7 +81,7 @@ public:
         char tmp_name[50];
         sprintf(tmp_name, "TestApicalConstrictionExample/HoneyTest%dx%d", num_cells_x, num_cells_y);
         VertexMeshWriter<3, 3> vertex_mesh_writer(tmp_name, "InitialMesh", false);
-        vertex_mesh_writer.WriteVtkUsingMeshWithCellId(*p_mesh);
+        vertex_mesh_writer.WriteVtkUsingMesh(*p_mesh);
 
         std::vector<CellPtr> cells;
         CellsGenerator<NoCellCycleModel, 3> cells_generator;
@@ -148,7 +148,7 @@ public:
         char tmp_name[50];
         sprintf(tmp_name, "TestApicalConstrictionExample/VoronoiTest%dx%d", num_cells_x, num_cells_y);
         VertexMeshWriter<3, 3> vertex_mesh_writer(tmp_name, "InitialMesh", false);
-        vertex_mesh_writer.WriteVtkUsingMeshWithCellId(*p_mesh);
+        vertex_mesh_writer.WriteVtkUsingMesh(*p_mesh);
 
         std::vector<CellPtr> cells;
         CellsGenerator<NoCellCycleModel, 3> cells_generator;

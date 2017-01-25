@@ -77,11 +77,20 @@ std::set<unsigned> GetSharedElementIndices(const Node<3>* pNodeA, const Node<3>*
 std::set<unsigned> GetSharedFaceIndices(const Node<3>* pNodeA, const Node<3>* pNodeB);
 
 /**
+ * A simple function to get the lateral face which is owned by both elements.
+ * @param pElemA  element number 1
+ * @param pElemB  element number 2
+ * @return  pointer of face that is owned by both elements.
+ */
+VertexElement<2, 3>* GetSharedLateralFace(const VertexElement<3, 3>* pElemA,
+                                          const VertexElement<3, 3>* pElemB);
+
+/**
  * A simple function to get the lateral face which owns both nodes.
  * @param pMesh  pointer of the mesh (this is necessary because nodes only have the indices, could be easier with weak pointer)
  * @param pNodeA  node number 1
  * @param pNodeB  node number 2
- * @return  index of faces that contain both nodes
+ * @return  pointer of face that contain both nodes
  */
 VertexElement<2, 3>* GetSharedLateralFace(const MutableVertexMesh<3, 3>* pMesh,
                                           const Node<3>* pNodeA, const Node<3>* pNodeB);
@@ -153,6 +162,12 @@ void SetNodeAsApical(Node<3>* pNode);
 void SetNodeAsBasal(Node<3>* pNode);
 
 /**
+ * Set a node as a basal node.
+ * @param pNode  pointer of a new lateral node
+ */
+void SetNodeAsLateral(Node<3>* pNode);
+
+/**
  * Getter function for node type. For more details on node type,
  * refer to `namespace Monolayer`.
  * @param pNode  pointer of the interested node
@@ -171,6 +186,13 @@ bool IsApicalNode(const Node<3>* pNode);
  * @return  whether this node is a basal node
  */
 bool IsBasalNode(const Node<3>* pNode);
+
+/**
+ * @param pNode  pointer of a node
+ * @return  whether this node is a lateral node
+ */
+bool IsLateralNode(const Node<3>* pNode);
+
 
 //////////////////////////////////
 ///     Functions for face     ///
@@ -273,6 +295,12 @@ unsigned MonolayerGetHalfNumNodes(const VertexElement<3, 3>* pElement);
  */
 std::vector<unsigned> GetLateralFace(const VertexElement<3, 3>* pElement, const unsigned nodeIndexA,
                                      const unsigned nodeIndexB);
+
+/**
+ * Get "lateral" node or interface node of asynchronous T1 Swap.
+ * return empty vector if no such node exists.
+ */
+std::vector<Node<3>*> GetLateralNode(const VertexElement<3, 3>* pElement);
 
 //void AddPairNode(VertexElement<3, 3>* pElement, const unsigned index, Node<3>* pBasalNode, Node<3>* pApicalNode);
 

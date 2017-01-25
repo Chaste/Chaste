@@ -344,29 +344,14 @@ public:
         builder.WriteVtkWithSubfolder(OUTPUT_NAME, "After_1");
 
         // Test that each moved node has the correct location following the rearrangement
-        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[0], 0.5, 1e-8);
-        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[1], 0.6, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[0], 0.3425, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[1], 0.5, 1e-8);
         TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[2], 0.0, 1e-8);
 
         vertex_mesh.GetNode(4)->rGetModifiableLocation()[1] = 0.36;
         builder.WriteVtkWithSubfolder(OUTPUT_NAME, "Initial_2");
         vertex_mesh.SetCellRearrangementThreshold(0.23);
         MARK;
-        TRACE("*****************Check 2*****************");
-        vertex_mesh.CheckForSwapsFromShortEdges();
-        builder.WriteVtkWithSubfolder(OUTPUT_NAME, "After_2");
-        // Test that each moved node has the correct location following the rearrangement
-        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[0], 0.5, 1e-8);
-        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[1], 0.6, 1e-8);
-        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[2], 0.0, 1e-8);
-
-        vertex_mesh.SetCellRearrangementThreshold(0.25);
-        vertex_mesh.CheckForSwapsFromShortEdges();
-        builder.WriteVtkWithSubfolder(OUTPUT_NAME, "After_3");
-        // Test that each moved node has the correct location following the rearrangement
-        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[0], 0.3125, 1e-8);
-        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[1], 0.48, 1e-8);
-        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[2], 0.0, 1e-8);
     }
 
     void TestT1SwapNonEvenFace() throw(Exception)

@@ -72,7 +72,7 @@ public:
             VertexMeshWriter<3, 3> vertex_mesh_writer("TestVoronoiPrism3dVertexMesh", "10x10 relaxation step: "
                                                           + boost::lexical_cast<std::string>(relax_step),
                                                       false);
-            vertex_mesh_writer.WriteVtkUsingMeshWithCellId(*p_mesh);
+            vertex_mesh_writer.WriteVtkUsingMesh(*p_mesh);
         }
     }
 
@@ -99,7 +99,7 @@ public:
 
         VertexMeshWriter<3, 3> vertex_mesh_writer("TestVoronoiPrism3dVertexMesh",
                                                   "20x12x1 4relax ApicalArea1.23", false);
-        vertex_mesh_writer.WriteVtkUsingMeshWithCellId(*p_mesh);
+        vertex_mesh_writer.WriteVtkUsingMesh(*p_mesh);
     }
 
     void TestBoundaryNodes() throw(Exception)
@@ -166,7 +166,7 @@ public:
 
         VertexMeshWriter<3, 3> vertex_mesh_writer("TestVoronoiPrism3dVertexMesh",
                                                   "ForPolygonDistribution", false);
-        vertex_mesh_writer.WriteVtkUsingMeshWithCellId(*p_mesh);
+        vertex_mesh_writer.WriteVtkUsingMesh(*p_mesh);
 
         // Get the polgyon distribution and check it
         std::vector<double> polygon_dist = generator.GetPolygonDistribution();

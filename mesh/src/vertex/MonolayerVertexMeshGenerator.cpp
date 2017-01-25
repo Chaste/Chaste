@@ -440,19 +440,16 @@ void MonolayerVertexMeshGenerator::ClearStoredMeshObjects()
         delete mpMesh;
 }
 
-void MonolayerVertexMeshGenerator::WriteVtk(const std::string& outputFile, const std::string& additionalTag,
-                                            const bool usingFaceId)
+void MonolayerVertexMeshGenerator::WriteVtk(const std::string& outputFile, const std::string& additionalTag)
 {
     VertexMeshWriter<3, 3> writer(outputFile, mName, false);
-    writer.WriteVtkUsingMeshWithCellId(*mpMesh, additionalTag, usingFaceId);
+    writer.WriteVtkUsingMesh(*mpMesh, additionalTag);
 }
 
 void MonolayerVertexMeshGenerator::WriteVtkWithSubfolder(const std::string& outputFile,
-                                                         const std::string& additionalTag,
-                                                         const bool usingFaceId)
+                                                         const std::string& additionalTag)
 {
-    VertexMeshWriter<3, 3> writer(outputFile + "/" + mName, mName, false);
-    writer.WriteVtkUsingMeshWithCellId(*mpMesh, additionalTag, usingFaceId);
+    this->WriteVtk(outputFile + "/" + mName, additionalTag);
 }
 
 MutableVertexMesh<3, 3>* MonolayerVertexMeshGenerator::MakeSphericalMesh33(const MutableVertexMesh<2, 3>* p_mesh_23,

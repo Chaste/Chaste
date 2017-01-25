@@ -274,7 +274,7 @@ public:
 
         MutableVertexMesh<2, 3>* p_dual_mesh = builder.GetDual();
         VertexMeshWriter<2, 3> Writer(output_filename, "Geodesic_Dual", false);
-        Writer.WriteVtkUsingMeshWithCellId(*p_dual_mesh);
+        Writer.WriteVtkUsingMesh(*p_dual_mesh);
 
         const unsigned radius = sqrt(p_dual_mesh->GetNumElements() * target_area / 4 / M_PI);
         MonolayerVertexMeshGenerator sBuilder;

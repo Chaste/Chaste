@@ -172,11 +172,8 @@ public:
      *
      * @param outputFile  the directory of the output data
      * @param additionalTag  optional tag which will be append at the end of the data name
-     * @param usingFaceId  whether to write mesh with face ID on it. By default writing with
-     *                     element ID.
      */
-    void WriteVtk(const std::string& outputFile, const std::string& additionalTag = "",
-                  const bool usingFaceId = false);
+    void WriteVtk(const std::string& outputFile, const std::string& additionalTag = "");
 
     /**
      * Alternative to output a .vtu data for visualization using Paraview. A subfolder which
@@ -184,11 +181,8 @@ public:
      *
      * @param outputFile  the directory of the output data
      * @param additionalTag  optional tag which will be append at the end of the data name
-     * @param usingFaceId  whether to write mesh with face ID on it. By default writing with
-     *                     element ID.
      */
-    void WriteVtkWithSubfolder(const std::string& outputFile, const std::string& additionalTag = "",
-                               const bool usingFaceId = false);
+    void WriteVtkWithSubfolder(const std::string& outputFile, const std::string& additionalTag = "");
 };
 
 #endif /*MONOLAYERVERTEXMESHGENERATOR_HPP_*/

@@ -36,12 +36,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MUTABLEVERTEXMESH_HPP_
 
 // Forward declaration prevents circular include chain
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class VertexMeshWriter;
-
-#include <iostream>
-#include <map>
-#include <algorithm>
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/vector.hpp>
@@ -61,7 +57,7 @@ class VertexMeshWriter;
  * the junctional network of cells that forms the basis of simulations of off-lattice
  * vertex-based models.
  */
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class MutableVertexMesh : public VertexMesh<ELEMENT_DIM, SPACE_DIM>
 {
     friend class TestMutableVertexMesh;
@@ -70,7 +66,6 @@ class MutableVertexMesh : public VertexMesh<ELEMENT_DIM, SPACE_DIM>
     friend class TestMutableVertexMesh33ReMesh;
 
 protected:
-
     /** The minimum distance apart that two nodes in the mesh can be without causing element rearrangement. */
     double mCellRearrangementThreshold;
 
@@ -108,7 +103,7 @@ protected:
      * Locations of T1 swaps (the mid point of the moving nodes), stored so they can be accessed and output by the cell population.
      * The locations are stored until they are cleared by ClearLocationsOfT1Swaps().
      */
-    std::vector< c_vector<double, SPACE_DIM> > mLocationsOfT1Swaps;
+    std::vector<c_vector<double, SPACE_DIM> > mLocationsOfT1Swaps;
 
     /**
      * The location of the last T2 swap (the centre of the removed triangle), stored so it can be accessed by the T2SwapCellKiller.
@@ -119,7 +114,7 @@ protected:
      * Locations of T3 swaps (the location of the intersection with the edge), stored so they can be accessed and output by the cell population.
      * The locations are stored until they are cleared by ClearLocationsOfT3Swaps().
      */
-    std::vector< c_vector<double, SPACE_DIM> > mLocationsOfT3Swaps;
+    std::vector<c_vector<double, SPACE_DIM> > mLocationsOfT3Swaps;
 
     /**
      * Divide an element along the axis passing through two of its nodes.
@@ -133,10 +128,10 @@ protected:
      *
      * @return the index of the new element
      */
-    unsigned DivideElement(VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement,
+    unsigned DivideElement(VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement,
                            unsigned nodeAIndex,
                            unsigned nodeBIndex,
-                           bool placeOriginalElementBelow=false);
+                           bool placeOriginalElementBelow = false);
 
     /**
      * Helper method for ReMesh().
@@ -200,7 +195,7 @@ protected:
      */
     void PerformT1Swap(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB, std::set<unsigned>& rElementsContainingNodes);
 
-/**
+    /**
      * Helper method for ReMesh(), called by PerformT1Swap() (for time being).
      *
      * Perform an asynchronous T1 swap on two given nodes contained in a given set of elements.
@@ -233,7 +228,7 @@ protected:
      *
      * @param rElement the element to remove
      */
-    void PerformT2Swap(VertexElement<ELEMENT_DIM,SPACE_DIM>& rElement);
+    void PerformT2Swap(VertexElement<ELEMENT_DIM, SPACE_DIM>& rElement);
 
     /**
      * Helper method for ReMesh(), called by CheckForIntersections().
@@ -327,7 +322,7 @@ protected:
      *
      * @return intersection, the corrected location of where we are planning to put the merged node
      */
-    c_vector<double, 2> WidenEdgeOrCorrectIntersectionLocationIfNecessary(unsigned indexA, unsigned indexB, c_vector<double,2> intersection);
+    c_vector<double, 2> WidenEdgeOrCorrectIntersectionLocationIfNecessary(unsigned indexA, unsigned indexB, c_vector<double, 2> intersection);
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
@@ -342,26 +337,25 @@ protected:
      * @param archive the archive
      * @param version the current version of this class
      */
-    template<class Archive>
-    void serialize(Archive & archive, const unsigned int version)
+    template <class Archive>
+    void serialize(Archive& archive, const unsigned int version)
     {
         // NOTE - Subclasses must archive their member variables BEFORE calling this method.
-        archive & mCellRearrangementThreshold;
-        archive & mCellRearrangementRatio;
-        archive & mT2Threshold;
-        archive & mProtorosetteFormationProbability;
-        archive & mProtorosetteResolutionProbabilityPerTimestep;
-        archive & mRosetteResolutionProbabilityPerTimestep;
-        archive & mCheckForInternalIntersections;
-        archive & mDeletedNodeIndices;
-        archive & mDeletedElementIndices;
+        archive& mCellRearrangementThreshold;
+        archive& mCellRearrangementRatio;
+        archive& mT2Threshold;
+        archive& mProtorosetteFormationProbability;
+        archive& mProtorosetteResolutionProbabilityPerTimestep;
+        archive& mRosetteResolutionProbabilityPerTimestep;
+        archive& mCheckForInternalIntersections;
+        archive& mDeletedNodeIndices;
+        archive& mDeletedElementIndices;
         ///\todo: maybe we should archive the mLocationsOfT1Swaps and mDeletedNodeIndices etc. as well?
 
-        archive & boost::serialization::base_object<VertexMesh<ELEMENT_DIM, SPACE_DIM> >(*this);
+        archive& boost::serialization::base_object<VertexMesh<ELEMENT_DIM, SPACE_DIM> >(*this);
     }
 
 public:
-
     /**
      * Default constructor.
      *
@@ -380,12 +374,12 @@ public:
      */
     MutableVertexMesh(std::vector<Node<SPACE_DIM>*> nodes,
                       std::vector<VertexElement<ELEMENT_DIM, SPACE_DIM>*> vertexElements,
-                      double cellRearrangementThreshold=0.01,
-                      double t2Threshold=0.001,
-                      double cellRearrangementRatio=1.5,
-                      double protorosetteFormationProbability=0.0,
-                      double protorosetteResolutionProbabilityPerTimestep=0.0,
-                      double rosetteResolutionProbabilityPerTimestep=0.0);
+                      double cellRearrangementThreshold = 0.01,
+                      double t2Threshold = 0.001,
+                      double cellRearrangementRatio = 1.5,
+                      double protorosetteFormationProbability = 0.0,
+                      double protorosetteResolutionProbabilityPerTimestep = 0.0,
+                      double rosetteResolutionProbabilityPerTimestep = 0.0);
 
     /**
      * Default constructor for use by serializer.
@@ -513,7 +507,7 @@ public:
     /**
      * @return the locations of the T1 swaps
      */
-    std::vector< c_vector<double, SPACE_DIM> > GetLocationsOfT1Swaps();
+    std::vector<c_vector<double, SPACE_DIM> > GetLocationsOfT1Swaps();
 
     /**
      * @return the location of the last T2 swap
@@ -523,7 +517,7 @@ public:
     /**
      * @return the locations of the T3 swaps
      */
-    std::vector< c_vector<double, SPACE_DIM> > GetLocationsOfT3Swaps();
+    std::vector<c_vector<double, SPACE_DIM> > GetLocationsOfT3Swaps();
 
     /**
      * Helper method to clear the stored T1 swaps
@@ -544,6 +538,25 @@ public:
      * @return the global index of the new node in the mesh.
      */
     unsigned AddNode(Node<SPACE_DIM>* pNewNode);
+
+    /**
+     * Add a face to the mesh.
+     *
+     * Note: After calling this one or more times, you must then call ReMesh.
+     *
+     * @param pNewFace pointer to the new face
+     * @return the global index of the new face in the mesh.
+     */
+    unsigned AddFace(VertexElement<2, 3>* pNewFace);
+
+    /**
+     * Add an element to the mesh.
+     *
+     * @param pNewElement the new element
+     *
+     * @return the index of the new element in the mesh
+     */
+    unsigned AddElement(VertexElement<ELEMENT_DIM, SPACE_DIM>* pNewElement);
 
     /**
      * Mark an element as deleted. Note that it DOES NOT deal with the associated
@@ -580,8 +593,8 @@ public:
      *
      * @return the index of the new element
      */
-    unsigned DivideElementAlongShortAxis(VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement,
-                                         bool placeOriginalElementBelow=false);
+    unsigned DivideElementAlongShortAxis(VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement,
+                                         bool placeOriginalElementBelow = false);
 
     /**
      * Divide an element along a specified axis.
@@ -596,18 +609,9 @@ public:
      *
      * @return the index of the new element
      */
-    unsigned DivideElementAlongGivenAxis(VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement,
+    unsigned DivideElementAlongGivenAxis(VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement,
                                          c_vector<double, SPACE_DIM> axisOfDivision,
-                                         bool placeOriginalElementBelow=false);
-
-    /**
-     * Add an element to the mesh.
-     *
-     * @param pNewElement the new element
-     *
-     * @return the index of the new element in the mesh
-     */
-    unsigned AddElement(VertexElement<ELEMENT_DIM, SPACE_DIM>* pNewElement);
+                                         bool placeOriginalElementBelow = false);
 
     /**
      * Helper method for ReMesh().

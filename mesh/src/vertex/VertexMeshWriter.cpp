@@ -38,6 +38,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Cylindrical2dVertexMesh.hpp"
 #include "Toroidal2dVertexMesh.hpp"
 
+#include <utility>
+#include "UblasCustomFunctions.hpp"
+
 /**
  * Convenience collection of iterators, primarily to get compilation to happen.
  */
@@ -319,19 +322,12 @@ void VertexMeshWriter<2, 2>::WriteVtkUsingMesh(const VertexMesh<2, 2>& rMesh, st
 #endif //CHASTE_VTK
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteVtkUsingMeshWithCellId(const VertexMesh<ELEMENT_DIM, SPACE_DIM>& rMesh, std::string stamp, bool useElementIdForFaceId)
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddFaceData(std::string dataName, std::vector<double> dataPayload)
 {
-    std::vector<double> cell_ids;
-    for (unsigned id=0 ; id < rMesh.GetNumElements() ; ++id)
-    {
-        cell_ids.push_back(double(id));
-    }
-    this->AddCellData("Cell IDs", cell_ids);
-    this->WriteVtkUsingMesh(rMesh, stamp);
+    NEVER_REACHED;
 }
 
-// This function is written here as VertexMeshWriter<3, 3>::WriteVtkUsingMeshWithCellId( ... ) requires specialization
 // of AddFaceData( ... )
 template<>
 void VertexMeshWriter<3, 3>::AddFaceData(std::string dataName, std::vector<double> dataPayload)
@@ -351,58 +347,24 @@ void VertexMeshWriter<3, 3>::AddFaceData(std::string dataName, std::vector<doubl
 #endif //CHASTE_VTK
 }
 
-// Overload rather than if statement (ELEMENT_DIM==3) as there is no instantiation of VertexElement<0u, *>
-// and GetFace(unsigned) will have error
-template<>
-void VertexMeshWriter<3, 3>::WriteVtkUsingMeshWithCellId(const VertexMesh<3, 3>& rMesh, std::string stamp, bool useElementIdForFaceId)
-{
-    // Copied and pasted
-    std::vector<double> cell_ids(rMesh.GetNumElements());
-    for (unsigned i=0 ; i < rMesh.GetNumAllElements() ; ++i)
-    {
-        const VertexElement<3, 3>* p_elem = rMesh.GetElement(i);
-        if (p_elem->IsDeleted())
-            continue;
-        cell_ids[i] = double(p_elem->GetIndex());
-    }
-    this->AddCellData("Cell IDs", cell_ids);
-
-    std::vector<double> face_ids(rMesh.GetNumFaces());
-    // There are 2 kinds of default IDs that I implemented: using its own face id;
-    // using element id (overlapping lateral face might not look so nice with clipping and thresholding)
-    if (useElementIdForFaceId)
-    {
-        for (unsigned i=0; i<rMesh.GetNumAllElements(); ++i)
-        {
-            const VertexElement<3, 3>* p_elem = rMesh.GetElement(i);
-            if (p_elem->IsDeleted())
-                continue;
-            const unsigned elem_index = p_elem->GetIndex();
-            for (unsigned face_index=0; face_index<p_elem->GetNumFaces(); ++face_index)
-            {
-                face_ids[p_elem->GetFace(face_index)->GetIndex()] = double(elem_index);
-            }
-        }
-    }
-    else
-    {
-        for (unsigned i=0 ; i<rMesh.GetNumAllFaces() ; ++i)
-        {
-            const VertexElement<2, 3>* p_face = rMesh.GetFace(i);
-            if (p_face->IsDeleted())
-                continue;
-            face_ids[i] = double(p_face->GetIndex());
-        }
-    }
-    this->AddFaceData(useElementIdForFaceId ? "Cell IDs": "Face IDs", face_ids);
-
-    this->WriteVtkUsingMesh(rMesh, stamp);
-}
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(const VertexMesh<ELEMENT_DIM, SPACE_DIM>& rMesh)
 {
 #ifdef CHASTE_VTK
+
+    {
+        std::vector<double> cell_ids;
+        cell_ids.reserve(rMesh.GetNumElements());
+        for (unsigned i = 0; i < rMesh.GetNumAllElements(); ++i)
+        {
+            const VertexElement<ELEMENT_DIM, SPACE_DIM>* p_elem = rMesh.GetElement(i);
+            if (p_elem->IsDeleted())
+                continue;
+            cell_ids.push_back(double(p_elem->GetIndex()));
+        }
+        this->AddCellData("Element IDs", cell_ids);
+    }
+
     // Make the Vtk mesh
     vtkPoints* p_pts = vtkPoints::New(VTK_DOUBLE);
     p_pts->GetData()->SetName("Vertex positions");
@@ -458,22 +420,74 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(const VertexMesh<ELEM
 
     // For 3D elements, we create another VtkMesh with the faces, as it looks nicer in Paraview
     // (otherwise 3D elements will have all of it faces triangulated when using the representation "Surface With Edges").
-    if (ELEMENT_DIM ==3 && SPACE_DIM==3)
+    if (ELEMENT_DIM == 3 && SPACE_DIM == 3)
     {
+        {
+            std::vector<double> elem_ids;
+            std::vector<double> face_ids;
+            elem_ids.reserve(rMesh.GetNumFaces());
+            face_ids.reserve(rMesh.GetNumFaces());
+            // There are 2 kinds of default IDs that I implemented: using its own face id;
+            // using element id (overlapping lateral face might not look so nice with clipping and thresholding)
+            for (unsigned i = 0; i < rMesh.GetNumAllFaces(); ++i)
+            {
+                VertexElement<ELEMENT_DIM-1, SPACE_DIM>* p_face = rMesh.GetFace(i);
+                if (p_face->IsDeleted())
+                    continue;
+                face_ids.push_back(double(p_face->GetIndex()));
+                elem_ids.push_back(double(*(p_face->rFaceGetContainingElementIndices().begin())));
+            }
+
+            this->AddFaceData("Element IDs", elem_ids);
+            this->AddFaceData("Face IDs", face_ids);
+        }
+
         const unsigned num_of_faces = rMesh.GetNumAllFaces();
-        for (unsigned face_index=0; face_index<num_of_faces; ++ face_index)
+        for (unsigned face_index=0; face_index<num_of_faces; ++face_index)
         {
             VertexElement<ELEMENT_DIM-1, SPACE_DIM>* p_face = rMesh.GetFace(face_index);
             // Skip over deleted faces
             if (p_face->IsDeleted())
                 continue;
+            
+            std::vector<std::pair<double, unsigned> > angles_with_global_index;
+            {
+                std::vector<Node<SPACE_DIM>*> nodes(p_face->GetNumNodes());
+                for (unsigned i = 0; i < p_face->GetNumNodes(); ++i)
+                {
+                    nodes[i] = p_face->GetNode(i);
+                }
+
+                const c_vector<double, SPACE_DIM> centroid = p_face->GetCentroid();
+                c_vector<double, SPACE_DIM> e1 = nodes[0]->rGetLocation() - centroid;
+                e1 /= norm_2(e1);
+                const c_vector<double, SPACE_DIM> v1_relativ = nodes[1]->rGetLocation() - centroid;
+                const c_vector<double, SPACE_DIM> normal = VectorProduct(e1, v1_relativ);
+                c_vector<double, SPACE_DIM> e2 = VectorProduct(normal, e1);
+                e2 /= norm_2(e2);
+
+                assert(abs(inner_prod(e1, e2)) < 1e-5);
+                assert(abs(norm_2(e1) - 1) < 1e-5);
+                assert(abs(norm_2(e2) - 1) < 1e-5);
+
+                for (unsigned i = 0; i< nodes.size(); ++i)
+                {
+                    const c_vector<double, SPACE_DIM> vec_tmp = nodes[i]->rGetLocation() - centroid;
+                    const double tmp_angle = atan2(inner_prod(vec_tmp, e1), inner_prod(vec_tmp, e2));
+                    angles_with_global_index.push_back(std::make_pair(tmp_angle, nodes[i]->GetIndex()));
+                }
+
+                std::sort(angles_with_global_index.begin(), angles_with_global_index.end());
+
+            }
+
             vtkCell* p_cell;
             p_cell = vtkPolygon::New();
             vtkIdList* p_cell_id_list = p_cell->GetPointIds();
             p_cell_id_list->SetNumberOfIds(p_face->GetNumNodes());
             for (unsigned j=0; j<p_face->GetNumNodes(); ++j)
             {
-                p_cell_id_list->SetId(j, p_face->GetNodeGlobalIndex(j));
+                p_cell_id_list->SetId(j, angles_with_global_index[j].second);
             }
             mpVtkFaceMesh->InsertNextCell(p_cell->GetCellType(), p_cell_id_list);
             p_cell->Delete(); // Reference counted

@@ -174,6 +174,13 @@ public:
     void MarkAsDeleted();
 
     /**
+     * Reset the global index of the element and update its nodes and faces.
+     *
+     * @param newIndex the new global index
+     */
+    void ResetIndex(unsigned newIndex);
+
+    /**
      * @return the number of faces owned by this element.
      */
     unsigned GetNumFaces() const;
@@ -313,6 +320,14 @@ public:
      * @param pNode is a pointer to the replacement node
      */
     void FaceUpdateNode(const unsigned Index, Node<SPACE_DIM>* pNode);
+
+    /**
+     * Method for faces. Update oldNode with newNode.
+     *
+     * @param pOldNode is a pointer which will be changed
+     * @param pNewNode is a pointer to the replacement node
+     */
+    void FaceUpdateNode(Node<SPACE_DIM>* pOldNode, Node<SPACE_DIM>* pNewNode);
 
     /**
      * Informs all nodes forming this face that they are in this face.
