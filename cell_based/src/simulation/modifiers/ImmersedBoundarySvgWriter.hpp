@@ -48,6 +48,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template <unsigned DIM>
 class ImmersedBoundarySvgWriter : public AbstractCellBasedSimulationModifier<DIM, DIM>
 {
+    /** The width and height in pixels of the svg file */
+    double mSvgSize;
+
+    /** Set to the output directory during SetupSolve() */
+    std::string mOutputDirectory;
+
+    /** The svg file header, which will be constant for a given simulation */
+    std::string mSvgHeader;
+
+    /** The svg file footer, which will be constant for a given simulation */
+    std::string mSvgFooter;
+
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
@@ -60,6 +72,10 @@ class ImmersedBoundarySvgWriter : public AbstractCellBasedSimulationModifier<DIM
     template <class Archive>
     void serialize(Archive& archive, const unsigned int version)
     {
+        archive& mSvgSize;
+        archive& mOutputDirectory;
+        archive& mSvgHeader;
+        archive& mSvgFooter;
         archive& boost::serialization::base_object<AbstractCellBasedSimulationModifier<DIM, DIM> >(*this);
     }
 
