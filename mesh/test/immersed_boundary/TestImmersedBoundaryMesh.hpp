@@ -607,6 +607,48 @@ public:
         // Elem 1 and Elem 1
         TS_ASSERT(!p_mesh->NodesInDifferentElementOrLamina(p_mesh->GetNode(9), p_mesh->GetNode(10)));
     }
+
+    void TestGeometricMethods() throw(Exception)
+    {
+        // Make six nodes
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true, 0.1, 0.1));
+        nodes.push_back(new Node<2>(1, true, 0.2, 0.1));
+        nodes.push_back(new Node<2>(2, true, 0.3, 0.2));
+        nodes.push_back(new Node<2>(3, true, 0.3, 0.3));
+        nodes.push_back(new Node<2>(4, true, 0.1, 0.2));
+
+        // Make one element out of these nodes
+        std::vector<Node<2>*> nodes_elem;
+        for (unsigned i=0; i<5; i++)
+        {
+            nodes_elem.push_back(nodes[i]);
+        }
+
+        std::vector<ImmersedBoundaryElement<2,2>*> elements;
+        elements.push_back(new ImmersedBoundaryElement<2,2>(0, nodes_elem));
+
+        // Make a vertex mesh
+        ImmersedBoundaryMesh<2,2> mesh(nodes, elements);
+
+        TS_ASSERT_EQUALS(mesh.GetNumElements(), 1u);
+        TS_ASSERT_EQUALS(mesh.GetNumNodes(), 5u);
+
+        // Test that the centroid, moments and short axis of the element are calculated correctly
+        // (i.e. agreee with Matlab and pen-and-paper calculations)
+        c_vector<double,2> centroid = mesh.GetCentroidOfElement(0);
+        TS_ASSERT_DELTA(centroid[0], 0.2000, 1e-4);
+        TS_ASSERT_DELTA(centroid[1], 0.1866, 1e-4);
+
+        c_vector<double,3> moments = mesh.CalculateMomentsOfElement(0);
+        TS_ASSERT_DELTA(moments[0], 5.388e-5, 1e-8);
+        TS_ASSERT_DELTA(moments[1], 7.500e-5, 1e-8);
+        TS_ASSERT_DELTA(moments[2], 3.750e-5, 1e-8);
+
+        c_vector<double,2> short_axis = mesh.GetShortAxisOfElement(0);
+        TS_ASSERT_DELTA(short_axis[0],  0.6037, 1e-4);
+        TS_ASSERT_DELTA(short_axis[1], -0.7971, 1e-4);
+    }
 };
 
 #endif /*TESTIMMERSEDBOUNDARYMESH_HPP_*/
