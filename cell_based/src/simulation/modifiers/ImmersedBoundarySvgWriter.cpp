@@ -191,6 +191,30 @@ void ImmersedBoundarySvgWriter<DIM>::OutputSimulationModifierParameters(out_stre
     AbstractCellBasedSimulationModifier<DIM>::OutputSimulationModifierParameters(rParamsFile);
 }
 
+template <unsigned DIM>
+unsigned int ImmersedBoundarySvgWriter<DIM>::GetSamplingMultiple() const
+{
+    return mSamplingMultiple;
+}
+
+template <unsigned DIM>
+void ImmersedBoundarySvgWriter<DIM>::SetSamplingMultiple(unsigned int samplingMultiple)
+{
+    mSamplingMultiple = samplingMultiple;
+}
+
+template <unsigned DIM>
+double ImmersedBoundarySvgWriter<DIM>::GetSvgSize() const
+{
+    return mSvgSize;
+}
+
+template <unsigned DIM>
+void ImmersedBoundarySvgWriter<DIM>::SetSvgSize(double svgSize)
+{
+    mSvgSize = svgSize;
+}
+
 // Explicit instantiation
 template class ImmersedBoundarySvgWriter<1>;
 template class ImmersedBoundarySvgWriter<2>;

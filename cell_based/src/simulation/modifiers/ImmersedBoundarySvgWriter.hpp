@@ -133,6 +133,18 @@ public:
      * @param rParamsFile the file stream to which the parameters are output
      */
     void OutputSimulationModifierParameters(out_stream& rParamsFile);
+
+    /** @return mSamplingMultiple **/
+    unsigned GetSamplingMultiple() const;
+
+    /** @param samplingMultiple the new value of mSamplingMultiple */
+    void SetSamplingMultiple(unsigned samplingMultiple);
+
+    /** @return mSvgSize **/
+    double GetSvgSize() const;
+
+    /** @param svgSize the new value of mSvgSize */
+    void SetSvgSize(double svgSize);
 };
 
 #include "SerializationExportWrapper.hpp"
