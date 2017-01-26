@@ -34,7 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "ImmersedBoundarySvgWriter.hpp"
-#include "MeshBasedCellPopulation.hpp"
+#include "ImmersedBoundaryMesh.hpp"
 
 template <unsigned DIM>
 ImmersedBoundarySvgWriter<DIM>::ImmersedBoundarySvgWriter()
@@ -54,6 +54,8 @@ ImmersedBoundarySvgWriter<DIM>::~ImmersedBoundarySvgWriter()
 template <unsigned DIM>
 void ImmersedBoundarySvgWriter<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM, DIM>& rCellPopulation)
 {
+    ImmersedBoundaryMesh<DIM, DIM>* p_mesh = static_cast<ImmersedBoundaryMesh<DIM, DIM>*>(&(rCellPopulation.rGetMesh()));
+
     // Get the number of time steps elapsed to use in the file name, and zero-pad it
     std::stringstream time;
     time << std::setfill('0') << std::setw(6) << SimulationTime::Instance()->GetTimeStepsElapsed();
@@ -64,6 +66,16 @@ void ImmersedBoundarySvgWriter<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulatio
     out_stream svg_file = results_handler.OpenOutputFile(full_file_name);
 
     (*svg_file) << mSvgHeader;
+
+    // Add all nodes to the svg file
+    double node_rad = p_mesh->GetAverageNodeSpacingOfElement(0, false) * 0.35 * mSvgSize;
+    for (typename AbstractMesh<DIM, DIM>::NodeIterator it = p_mesh->GetNodeIteratorBegin();
+         it != p_mesh->GetNodeIteratorEnd();
+         ++it)
+    {
+        AddPointToSvgFile(svg_file, it->rGetLocation(), it->GetRegion(), node_rad);
+    }
+
     (*svg_file) << mSvgFooter;
 
     svg_file->close();
@@ -125,10 +137,52 @@ void ImmersedBoundarySvgWriter<DIM>::SetupSolve(AbstractCellPopulation<DIM, DIM>
 }
 
 template <unsigned DIM>
+void ImmersedBoundarySvgWriter<DIM>::AddPointToSvgFile(out_stream& rSvgFile, c_vector<double, DIM> location, unsigned region, double rad)
+{
+    double scaled_x = location[0] * mSvgSize;
+    double scaled_y = (1.0 - location[1]) * mSvgSize;
+
+    (*rSvgFile) << "<circle class=\"node_" << region << "\" "
+                << "cx=\"" << scaled_x << "\" "
+                << "cy=\"" << scaled_y << "\" "
+                << "r=\"" << rad << "\"/>" << "\n";
+
+    // Account for possible wrap-around of glyph in x
+    if (scaled_x < rad)
+    {
+        (*rSvgFile) << "<circle class=\"node_" << region << "\" "
+                    << "cx=\"" << scaled_x + mSvgSize << "\" "
+                    << "cy=\"" << scaled_y << "\" "
+                    << "r=\"" << rad << "\"/>" << "\n";
+    }
+    else if (scaled_x > mSvgSize - rad)
+    {
+        (*rSvgFile) << "<circle class=\"node_" << region << "\" "
+                    << "cx=\"" << scaled_x - mSvgSize << "\" "
+                    << "cy=\"" << scaled_y << "\" "
+                    << "r=\"" << rad << "\"/>" << "\n";
+    }
+
+    // Account for possible wrap-around of glyph in y
+    if (scaled_y < rad)
+    {
+        (*rSvgFile) << "<circle class=\"node_" << region << "\" "
+                    << "cx=\"" << scaled_x << "\" "
+                    << "cy=\"" << scaled_y + mSvgSize << "\" "
+                    << "r=\"" << rad << "\"/>" << "\n";
+    }
+    else if (scaled_y > mSvgSize - rad)
+    {
+        (*rSvgFile) << "<circle class=\"node_" << region << "\" "
+                    << "cx=\"" << scaled_x << "\" "
+                    << "cy=\"" << scaled_y - mSvgSize << "\" "
+                    << "r=\"" << rad << "\"/>" << "\n";
+    }
+}
+
+template <unsigned DIM>
 void ImmersedBoundarySvgWriter<DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<OutputDirectory>" << mOutputDirectory << "</OutputDirectory>\n";
-
     // Call method on direct parent class
     AbstractCellBasedSimulationModifier<DIM>::OutputSimulationModifierParameters(rParamsFile);
 }

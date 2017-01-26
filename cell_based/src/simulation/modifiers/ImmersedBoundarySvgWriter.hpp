@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteSerialization.hpp"
 
 #include "AbstractCellBasedSimulationModifier.hpp"
+#include "AbstractCellPopulation.hpp"
 
 /**
  * A modifier class which after each simulation time step exports the simulation geometry to a scalable vector graphic
@@ -108,6 +109,18 @@ public:
      * @param outputDirectory the output directory, relative to where Chaste output is stored
      */
     virtual void SetupSolve(AbstractCellPopulation<DIM, DIM>& rCellPopulation, std::string outputDirectory);
+
+    /**
+     * Helper method for UpdateAtEndOfTimeStep().
+     *
+     * Add a circle representing a point location to the svg file.
+     *
+     * @param rSvgFile the svg file stream to add to
+     * @param location the location of the point
+     * @param region metadata to allow different colouring for points
+     * @param rad the radius of circle representing the point
+     */
+    void AddPointToSvgFile(out_stream& rSvgFile, c_vector<double, DIM> location, unsigned region, double rad);
 
     /**
      * Overridden OutputSimulationModifierParameters() method.
