@@ -192,13 +192,13 @@ void ImmersedBoundarySvgWriter<DIM>::OutputSimulationModifierParameters(out_stre
 }
 
 template <unsigned DIM>
-unsigned int ImmersedBoundarySvgWriter<DIM>::GetSamplingMultiple() const
+unsigned ImmersedBoundarySvgWriter<DIM>::GetSamplingMultiple() const
 {
     return mSamplingMultiple;
 }
 
 template <unsigned DIM>
-void ImmersedBoundarySvgWriter<DIM>::SetSamplingMultiple(unsigned int samplingMultiple)
+void ImmersedBoundarySvgWriter<DIM>::SetSamplingMultiple(unsigned samplingMultiple)
 {
     mSamplingMultiple = samplingMultiple;
 }
