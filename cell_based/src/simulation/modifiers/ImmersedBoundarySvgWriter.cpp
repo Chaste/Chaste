@@ -39,6 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template <unsigned DIM>
 ImmersedBoundarySvgWriter<DIM>::ImmersedBoundarySvgWriter()
         : AbstractCellBasedSimulationModifier<DIM>(),
+          mSamplingMultiple(100u),
           mSvgSize(1600.0),
           mOutputDirectory(""),
           mSvgHeader(""),
@@ -54,31 +55,34 @@ ImmersedBoundarySvgWriter<DIM>::~ImmersedBoundarySvgWriter()
 template <unsigned DIM>
 void ImmersedBoundarySvgWriter<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM, DIM>& rCellPopulation)
 {
-    ImmersedBoundaryMesh<DIM, DIM>* p_mesh = static_cast<ImmersedBoundaryMesh<DIM, DIM>*>(&(rCellPopulation.rGetMesh()));
-
-    // Get the number of time steps elapsed to use in the file name, and zero-pad it
-    std::stringstream time;
-    time << std::setfill('0') << std::setw(6) << SimulationTime::Instance()->GetTimeStepsElapsed();
-
-    // Open the svg file for writing
-    std::string full_file_name = "results_" + time.str() + ".svg";
-    OutputFileHandler results_handler(mOutputDirectory, false);
-    out_stream svg_file = results_handler.OpenOutputFile(full_file_name);
-
-    (*svg_file) << mSvgHeader;
-
-    // Add all nodes to the svg file
-    double node_rad = p_mesh->GetAverageNodeSpacingOfElement(0, false) * 0.35 * mSvgSize;
-    for (typename AbstractMesh<DIM, DIM>::NodeIterator it = p_mesh->GetNodeIteratorBegin();
-         it != p_mesh->GetNodeIteratorEnd();
-         ++it)
+    if (SimulationTime::Instance()->GetTimeStepsElapsed() % mSamplingMultiple == 0)
     {
-        AddPointToSvgFile(svg_file, it->rGetLocation(), it->GetRegion(), node_rad);
+        ImmersedBoundaryMesh<DIM, DIM> *p_mesh = static_cast<ImmersedBoundaryMesh<DIM, DIM> *>(&(rCellPopulation.rGetMesh()));
+
+        // Get the number of time steps elapsed to use in the file name, and zero-pad it
+        std::stringstream time;
+        time << std::setfill('0') << std::setw(6) << SimulationTime::Instance()->GetTimeStepsElapsed();
+
+        // Open the svg file for writing
+        std::string full_file_name = "results_" + time.str() + ".svg";
+        OutputFileHandler results_handler(mOutputDirectory, false);
+        out_stream svg_file = results_handler.OpenOutputFile(full_file_name);
+
+        (*svg_file) << mSvgHeader;
+
+        // Add all nodes to the svg file
+        double node_rad = p_mesh->GetAverageNodeSpacingOfElement(0, false) * 0.35 * mSvgSize;
+        for (typename AbstractMesh<DIM, DIM>::NodeIterator it = p_mesh->GetNodeIteratorBegin();
+             it != p_mesh->GetNodeIteratorEnd();
+             ++it)
+        {
+            AddPointToSvgFile(svg_file, it->rGetLocation(), it->GetRegion(), node_rad);
+        }
+
+        (*svg_file) << mSvgFooter;
+
+        svg_file->close();
     }
-
-    (*svg_file) << mSvgFooter;
-
-    svg_file->close();
 }
 
 template <unsigned DIM>
