@@ -93,12 +93,6 @@ private:
     /** Whether to output node regions to VTK */
     bool mOutputNodeRegionToVtk;
 
-    /** Whether to output VTK data */
-    bool mOutputToVtk;
-
-    /** Whether to output to SVG */
-    bool mOutputToSvg;
-
     /** The distance over which cell-cell interactions occur */
     double mInteractionDistance;
 
@@ -500,20 +494,6 @@ public:
      * @param outputNodeRegionsToVtk whether to output node regions to vtk
      */
     void SetOutputNodeRegionToVtk(bool outputNodeRegionsToVtk);
-
-    /**
-     * Set whether to output to VTK
-     *
-     * @param outputToVTK whether to output to VTK
-     */
-    void SetOutputToVtk(bool outputToVTK);
-
-    /**
-     * Set whether to output to SVG
-     *
-     * @param outputToSvg whether to output to SVG
-     */
-    void SetOutputToSvg(bool outputToSvg);
 
     /**
      * Checks whether a given node displacement violates the movement threshold

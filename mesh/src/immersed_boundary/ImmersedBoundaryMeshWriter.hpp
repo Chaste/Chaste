@@ -98,9 +98,6 @@ private:
     /** Vector containing number of cell parts */
     std::vector<unsigned> mNumCellParts;
 
-    /** Width and height in pixels of SVG files */
-    double mSvgSize;
-
 #ifdef CHASTE_VTK
 //Requires  "sudo aptitude install libvtk5-dev" or similar
 ///\todo Merge into VtkMeshWriter (#1076)
@@ -140,36 +137,6 @@ public:
      * @param stamp is an optional stamp (like a time-stamp) to put into the name of the file
      */
     void WriteVtkUsingMesh(ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>& rMesh, std::string stamp="");
-
-    /**
-     * Write SVG file using a mesh.
-     *
-     * @param rMesh reference to the immersed boundary mesh
-     * @param stamp is an optional stamp (like a time-stamp) to put into the name of the file
-     */
-    void WriteSvgUsingMesh(ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>& rMesh, std::string stamp);
-
-    /**
-     *  Add a node to an SVG file.
-     *
-     *  @param rSvgFile reference to the svg file stream
-     *  @param location the location of the point to add to the svg file
-     *  @param region the region, for setting output style
-     *  @param rad the radius to represent the node
-     */
-    void AddPointToSvgFile(out_stream& rSvgFile, c_vector<double, SPACE_DIM> location, unsigned region, double rad);
-
-    /**
-     *  Add an elliptical glyph to an SVG file.
-     *
-     *  @param rSvgFile reference to the svg file stream
-     *  @param location the location of the centre of the glyph to add to the svg file
-     *  @param region the region, for setting output style
-     *  @param rad the radius to represent the node
-     *  @param elongation the ellipse elongation
-     *  @param angle the angle, to the nearest degree, to rotate the glyph by
-     */
-    void AddGlyphToSvgFile(out_stream& rSvgFile, c_vector<double, SPACE_DIM> location, unsigned region, double rad, double elongation, int angle);
 
     /**
      * Populate mpVtkUnstructedMesh using a vertex-based mesh.
