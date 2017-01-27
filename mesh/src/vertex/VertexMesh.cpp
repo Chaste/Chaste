@@ -1358,10 +1358,10 @@ c_vector<double, 3> VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMomentsOfElemen
     return moments;
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetShortAxisOfElement(unsigned index)
 {
-    assert(SPACE_DIM == 2);    // LCOV_EXCL_LINE - code will be removed at compile time
+    assert(SPACE_DIM == 2); // LCOV_EXCL_LINE - code will be removed at compile time
 
     c_vector<double, SPACE_DIM> short_axis = zero_vector<double>(SPACE_DIM);
 
@@ -1372,12 +1372,12 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetShortAxisOfEl
     moments /= norm_2(moments);
 
     // If the principal moments are equal...
-    double discriminant = (moments(0) - moments(1))*(moments(0) - moments(1)) + 4.0*moments(2)*moments(2);
+    double discriminant = (moments(0) - moments(1)) * (moments(0) - moments(1)) + 4.0 * moments(2) * moments(2);
     if (fabs(discriminant) < DBL_EPSILON)
     {
         // ...then every axis through the centroid is a principal axis, so return a random unit vector
         short_axis(0) = RandomNumberGenerator::Instance()->ranf();
-        short_axis(1) = sqrt(1.0 - short_axis(0)*short_axis(0));
+        short_axis(1) = sqrt(1.0 - short_axis(0) * short_axis(0));
     }
     else
     {
@@ -1398,10 +1398,10 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetShortAxisOfEl
         else
         {
             // Otherwise we find the eigenvector of the inertia matrix corresponding to the largest eigenvalue
-            double lambda = 0.5*(moments(0) + moments(1) + sqrt(discriminant));
+            double lambda = 0.5 * (moments(0) + moments(1) + sqrt(discriminant));
 
             short_axis(0) = 1.0;
-            short_axis(1) = (moments(0) - lambda)/moments(2);
+            short_axis(1) = (moments(0) - lambda) / moments(2);
 
             // Normalise the short axis before returning it
             short_axis /= norm_2(short_axis);
