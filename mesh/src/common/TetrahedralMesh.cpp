@@ -945,6 +945,7 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ImportFromMesher(MESHER_IO& mesher
                 this->mBoundaryElements.push_back(p_b_element);
                 next_boundary_element_index++;
             }
+            // LCOV_EXCL_START
             catch (Exception &)
             {
                 // Tetgen is feeding us lies
@@ -952,8 +953,9 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ImportFromMesher(MESHER_IO& mesher
                  *  Note: this code is covered in profiling (Test3dOffLatticeRepresentativeSimulation).
                  *  It's hard to replicate Tetgen's behaviour with a unit test.
                  */
-                assert(SPACE_DIM == 3); // LCOV_EXCL_LINE
+                assert(SPACE_DIM == 3);
             }
+            // LCOV_EXCL_STOP
         }
     }
 
