@@ -1371,7 +1371,7 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetShortAxisOfEl
 
     // If the principal moments are equal...
     double discriminant = (moments(0) - moments(1))*(moments(0) - moments(1)) + 4.0*moments(2)*moments(2);
-    if (fabs(discriminant) < 1e-10) ///\todo remove magic number? (see #1884 and #2401)
+    if (fabs(discriminant) < DBL_EPSILON)
     {
         // ...then every axis through the centroid is a principal axis, so return a random unit vector
         short_axis(0) = RandomNumberGenerator::Instance()->ranf();
@@ -1380,7 +1380,7 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetShortAxisOfEl
     else
     {
         // If the product of inertia is zero, then the coordinate axes are the principal axes
-        if (moments(2) == 0.0)
+        if (fabs(moments(2)) < DBL_EPSILON)
         {
             if (moments(0) < moments(1))
             {
@@ -1401,8 +1401,7 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetShortAxisOfEl
             short_axis(0) = 1.0;
             short_axis(1) = (moments(0) - lambda)/moments(2);
 
-            double magnitude = norm_2(short_axis);
-            short_axis = short_axis / magnitude;
+            short_axis /= norm_2(short_axis);
         }
     }
 
