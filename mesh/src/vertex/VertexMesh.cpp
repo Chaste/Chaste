@@ -1367,6 +1367,8 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetShortAxisOfEl
 
     // Calculate the moments of the element about its centroid (recall that I_xx and I_yy must be non-negative)
     c_vector<double, 3> moments = CalculateMomentsOfElement(index);
+
+    // Normalise the moments vector to remove problem of a very small discriminant (see #2874)
     moments /= norm_2(moments);
 
     // If the principal moments are equal...
@@ -1401,6 +1403,7 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetShortAxisOfEl
             short_axis(0) = 1.0;
             short_axis(1) = (moments(0) - lambda)/moments(2);
 
+            // Normalise the short axis before returning it
             short_axis /= norm_2(short_axis);
         }
     }
