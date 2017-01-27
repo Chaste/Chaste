@@ -1028,16 +1028,19 @@ c_vector<double, 3> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMomen
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetShortAxisOfElement(unsigned index)
 {
-    assert(SPACE_DIM == 2);
+    assert(SPACE_DIM == 2); // LCOV_EXCL_LINE - code will be removed at compile time
 
     c_vector<double, SPACE_DIM> short_axis = zero_vector<double>(SPACE_DIM);
 
     // Calculate the moments of the element about its centroid (recall that I_xx and I_yy must be non-negative)
     c_vector<double, 3> moments = CalculateMomentsOfElement(index);
 
+    // Normalise the moments vector to remove problem of a very small discriminant (see #2874)
+    moments /= norm_2(moments);
+
     // If the principal moments are equal...
     double discriminant = (moments(0) - moments(1)) * (moments(0) - moments(1)) + 4.0 * moments(2) * moments(2);
-    if (fabs(discriminant) < 1e-10) ///\todo remove magic number? (see #1884 and #2401)
+    if (fabs(discriminant) < DBL_EPSILON)
     {
         // ...then every axis through the centroid is a principal axis, so return a random unit vector
         short_axis(0) = RandomNumberGenerator::Instance()->ranf();
@@ -1046,7 +1049,7 @@ c_vector<double, SPACE_DIM> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetSho
     else
     {
         // If the product of inertia is zero, then the coordinate axes are the principal axes
-        if (moments(2) == 0.0)
+        if (fabs(moments(2)) < DBL_EPSILON)
         {
             if (moments(0) < moments(1))
             {
@@ -1067,8 +1070,8 @@ c_vector<double, SPACE_DIM> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetSho
             short_axis(0) = 1.0;
             short_axis(1) = (moments(0) - lambda) / moments(2);
 
-            double magnitude = norm_2(short_axis);
-            short_axis = short_axis / magnitude;
+            // Normalise the short axis before returning it
+            short_axis /= norm_2(short_axis);
         }
     }
 
