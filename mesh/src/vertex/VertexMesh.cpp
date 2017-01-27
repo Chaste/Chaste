@@ -1367,6 +1367,7 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetShortAxisOfEl
 
     // Calculate the moments of the element about its centroid (recall that I_xx and I_yy must be non-negative)
     c_vector<double, 3> moments = CalculateMomentsOfElement(index);
+    moments /= norm_2(moments);
 
     // If the principal moments are equal...
     double discriminant = (moments(0) - moments(1))*(moments(0) - moments(1)) + 4.0*moments(2)*moments(2);
