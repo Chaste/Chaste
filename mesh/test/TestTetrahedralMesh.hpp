@@ -1335,6 +1335,15 @@ public:
         // Weights are non-negative and sum to 1
         TS_ASSERT_DELTA(norm_1(weights), 1.0, 1e-12);
 
+        // If point is in element then projection is redundant - looks the same as above
+        weights = element3d.CalculateInterpolationWeightsWithProjection(in_point);
+        TS_ASSERT_LESS_THAN(0.0, weights[0]);
+        TS_ASSERT_LESS_THAN(0.0, weights[1]);
+        TS_ASSERT_LESS_THAN(0.0, weights[2]);
+        TS_ASSERT_LESS_THAN(0.0, weights[3]);
+        // Weights are non-negative and sum to 1
+        TS_ASSERT_DELTA(norm_1(weights), 1.0, 1e-12);
+
         ChastePoint<3> out_point(0.1, -10., 0.1);
         TS_ASSERT_EQUALS(element3d.IncludesPoint(out_point), false);
 

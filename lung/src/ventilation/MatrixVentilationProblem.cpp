@@ -131,17 +131,13 @@ void MatrixVentilationProblem::SetFluxAtBoundaryNode(const Node<3>& rNode, doubl
 
 double MatrixVentilationProblem::GetFluxAtOutflow()
 {
-    if (PetscTools::IsSequential())
-    {
-        return PetscVecTools::GetElement(mSolution, mOutletNodeIndex) / mFluxScaling;
-    }
-    else
-    {
-        ///\todo #2300 Massively inefficient:
-        std::vector<double> flux, pressure;
-        GetSolutionAsFluxesAndPressures(flux, pressure);
-        return flux[mOutletNodeIndex];
-    }
+    assert(PetscTools::IsSequential());
+    return PetscVecTools::GetElement(mSolution, mOutletNodeIndex) / mFluxScaling;
+//        This is the parallel code:
+//        ///\todo #2300 Massively inefficient:
+//        std::vector<double> flux, pressure;
+//        GetSolutionAsFluxesAndPressures(flux, pressure);
+//        return flux[mOutletNodeIndex];
 }
 
 void MatrixVentilationProblem::Assemble(bool dynamicReassemble)
