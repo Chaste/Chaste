@@ -64,6 +64,9 @@ private:
     /** Vector to store the points. */
     std::vector<c_vector<double, 2> > mPoints;
 
+    /** The perimeter of the superellipse */
+    double mTotalArcLength;
+
 public:
 
     /**
@@ -111,6 +114,11 @@ public:
      * @return #mPoints as a vector of ChastePoint objects
      */
     const std::vector<ChastePoint<2> > GetPointsAsChastePoints() const;
+
+    /**
+     * @return the perimeter of the superellipse
+     */
+    double GetTotalArcLength();
 };
 
 #endif /*SUPERELLIPSEGENERATOR_HPP_*/
