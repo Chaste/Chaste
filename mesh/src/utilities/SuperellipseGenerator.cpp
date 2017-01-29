@@ -42,7 +42,8 @@ SuperellipseGenerator::SuperellipseGenerator(unsigned numPoints,
                                              double botLeftX,
                                              double botLeftY)
         : mTargetNodeSpacing(DOUBLE_UNSET),
-          mHeightOfTopSurface(botLeftY + height)
+          mHeightOfTopSurface(botLeftY + height),
+          mTotalArcLength(0.0)
 {
     // Validate input
     assert(numPoints > 1);
@@ -96,7 +97,8 @@ SuperellipseGenerator::SuperellipseGenerator(unsigned numPoints,
 
     double total_arc_length = cumulative_arc_length[dense_pts - 1] + norm_2(dense_locations[dense_pts - 1] - dense_locations[0]);
 
-    // Since our perimeter is periodic, we get back to the start
+    mTotalArcLength = total_arc_length;
+    // Because our perimeter is periodic, we get back to the start
     cumulative_arc_length.push_back(total_arc_length);
     dense_locations.push_back(dense_locations[0]);
 
@@ -228,4 +230,9 @@ const std::vector<ChastePoint<2> > SuperellipseGenerator::GetPointsAsChastePoint
     }
 
     return chaste_points;
+}
+
+double SuperellipseGenerator::GetTotalArcLength()
+{
+    return mTotalArcLength;
 }

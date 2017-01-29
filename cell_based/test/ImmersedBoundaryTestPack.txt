@@ -5,3 +5,4 @@ simulation/TestImmersedBoundaryPdeSolveMethods.hpp
 simulation/TestImmersedBoundarySimulationModifier.hpp
 simulation/TestRepresentativeImmersedBoundarySimulations.hpp
 tutorial/TestRunningImmersedBoundarySimulationsTutorial.hpp
+simulation/TestIBMMouseEmbryoSimulation.hpp
