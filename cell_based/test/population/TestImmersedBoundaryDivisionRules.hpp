@@ -87,8 +87,8 @@ public:
         boost::shared_ptr<AbstractImmersedBoundaryDivisionRule<2> > p_division_rule = cell_population.GetImmersedBoundaryDivisionRule();
         c_vector<double, 2> short_axis = p_division_rule->CalculateCellDivisionVector(p_cell0, cell_population);
 
-        TS_ASSERT_DELTA(short_axis[0], -1.0 / sqrt(2.0), 1e-9);
-        TS_ASSERT_DELTA(short_axis[1], 1.0 / sqrt(2.0), 1e-9);
+        TS_ASSERT_DELTA(short_axis[0], 1.0 / sqrt(2.0), 1e-9);
+        TS_ASSERT_DELTA(short_axis[1], -1.0 / sqrt(2.0), 1e-9);
     }
 
     void TestArchiveShortAxisImmersedBoundaryDivisionRule() throw(Exception)
