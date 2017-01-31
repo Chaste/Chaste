@@ -39,7 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "CellPopulationElementWriter.hpp"
 #include "ImmersedBoundaryMeshWriter.hpp"
-#include "ShortAxisVertexBasedDivisionRule.hpp"
+#include "ShortAxisImmersedBoundaryDivisionRule.hpp"
 #include "Warnings.hpp"
 
 template <unsigned DIM>
@@ -56,7 +56,7 @@ ImmersedBoundaryCellPopulation<DIM>::ImmersedBoundaryCellPopulation(ImmersedBoun
           mReMeshFrequency(UINT_MAX)
 {
     mpImmersedBoundaryMesh = static_cast<ImmersedBoundaryMesh<DIM, DIM>*>(&(this->mrMesh));
-    mpVertexBasedDivisionRule.reset(new ShortAxisVertexBasedDivisionRule<DIM>());
+    mpImmersedBoundaryDivisionRule.reset(new ShortAxisImmersedBoundaryDivisionRule<DIM>());
 
     // If no location indices are specified, associate with elements from the mesh (assumed to be sequentially ordered).
     std::list<CellPtr>::iterator it = this->mCells.begin();
@@ -519,10 +519,10 @@ void ImmersedBoundaryCellPopulation<DIM>::AcceptCellWriter(boost::shared_ptr<Abs
 template <unsigned DIM>
 double ImmersedBoundaryCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
 {
-    // Get the vertex element index corresponding to this cell
+    // Get the element index corresponding to this cell
     unsigned elem_index = this->GetLocationIndexUsingCell(pCell);
 
-    // Get the cell's volume from the vertex mesh
+    // Get the cell's volume from the immersed boundary mesh
     double cell_volume = mpImmersedBoundaryMesh->GetVolumeOfElement(elem_index);
 
     return cell_volume;
@@ -552,7 +552,7 @@ void ImmersedBoundaryCellPopulation<DIM>::WriteVtkResultsToFile(const std::strin
              elem_iter != mpImmersedBoundaryMesh->GetElementIteratorEnd();
              ++elem_iter)
         {
-            // Get index of this element in the vertex mesh
+            // Get index of this element in the mesh
             unsigned elem_index = elem_iter->GetIndex();
 
             // Get the cell corresponding to this element
@@ -594,7 +594,7 @@ void ImmersedBoundaryCellPopulation<DIM>::WriteVtkResultsToFile(const std::strin
          elem_iter != mpImmersedBoundaryMesh->GetElementIteratorEnd();
          ++elem_iter)
     {
-        // Get index of this element in the vertex mesh
+        // Get index of this element in the mesh
         unsigned elem_index = elem_iter->GetIndex();
 
         // Get the cell corresponding to this element
@@ -673,9 +673,9 @@ template <unsigned DIM>
 void ImmersedBoundaryCellPopulation<DIM>::OutputCellPopulationParameters(out_stream& rParamsFile)
 {
     // Add the division rule parameters
-    *rParamsFile << "\t\t<VertexBasedDivisionRule>\n";
-    mpVertexBasedDivisionRule->OutputCellVertexBasedDivisionRuleInfo(rParamsFile);
-    *rParamsFile << "\t\t</VertexBasedDivisionRule>\n";
+    *rParamsFile << "\t\t<ImmersedBoundaryDivisionRule>\n";
+    mpImmersedBoundaryDivisionRule->OutputCellImmersedBoundaryDivisionRuleInfo(rParamsFile);
+    *rParamsFile << "\t\t</ImmersedBoundaryDivisionRule>\n";
 
     // Call method on direct parent class
     AbstractOffLatticeCellPopulation<DIM>::OutputCellPopulationParameters(rParamsFile);
@@ -919,15 +919,15 @@ double ImmersedBoundaryCellPopulation<DIM>::GetCellDataItemAtPdeNode(unsigned pd
 }
 
 template <unsigned DIM>
-boost::shared_ptr<AbstractVertexBasedDivisionRule<DIM> > ImmersedBoundaryCellPopulation<DIM>::GetVertexBasedDivisionRule()
+boost::shared_ptr<AbstractImmersedBoundaryDivisionRule<DIM> > ImmersedBoundaryCellPopulation<DIM>::GetImmersedBoundaryDivisionRule()
 {
-    return mpVertexBasedDivisionRule;
+    return mpImmersedBoundaryDivisionRule;
 }
 
 template <unsigned DIM>
-void ImmersedBoundaryCellPopulation<DIM>::SetVertexBasedDivisionRule(boost::shared_ptr<AbstractVertexBasedDivisionRule<DIM> > pVertexBasedDivisionRule)
+void ImmersedBoundaryCellPopulation<DIM>::SetImmersedBoundaryDivisionRule(boost::shared_ptr<AbstractImmersedBoundaryDivisionRule<DIM> > pImmersedBoundaryDivisionRule)
 {
-    mpVertexBasedDivisionRule = pVertexBasedDivisionRule;
+    mpImmersedBoundaryDivisionRule = pImmersedBoundaryDivisionRule;
 }
 
 template <unsigned DIM>

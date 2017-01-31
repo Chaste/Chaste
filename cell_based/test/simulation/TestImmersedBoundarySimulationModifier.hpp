@@ -49,14 +49,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OffLatticeSimulation.hpp"
 #include "SmartPointers.hpp"
 #include "UniformCellCycleModel.hpp"
-
-// Includes from Immersed Boundary
 #include "ImmersedBoundaryMesh.hpp"
 #include "ImmersedBoundaryCellPopulation.hpp"
 #include "ImmersedBoundarySimulationModifier.hpp"
 #include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
 #include "ImmersedBoundaryLinearMembraneForce.hpp"
 #include "ImmersedBoundaryLinearInteractionForce.hpp"
+#include "VertexBasedCellPopulation.hpp"
 
 // This test is never run in parallel
 #include "FakePetscSetup.hpp"

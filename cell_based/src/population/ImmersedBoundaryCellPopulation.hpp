@@ -37,7 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define IMMERSEDBOUNDARYCELLPOPULATION_HPP_
 
 #include "AbstractOffLatticeCellPopulation.hpp"
-#include "AbstractVertexBasedDivisionRule.hpp"
+#include "AbstractImmersedBoundaryDivisionRule.hpp"
 #include "ImmersedBoundaryMesh.hpp"
 
 #include <boost/serialization/base_object.hpp>
@@ -46,7 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteSerialization.hpp"
 
 template <unsigned DIM>
-class AbstractVertexBasedDivisionRule; // Circular definition
+class AbstractImmersedBoundaryDivisionRule;
 
 /**
  * A facade class encapsulating an immersed boundary cell population.
@@ -61,7 +61,7 @@ private:
     /**
      * This test uses the private constructor to simplify testing.
      */
-    friend class TestVertexBasedDivisionRules;
+    friend class TestImmersedBoundaryDivisionRules;
 
     /** To allow tests to directly access UpdateNodeLocation() */
     friend class TestImmersedBoundaryPdeSolveMethods;
@@ -80,9 +80,9 @@ private:
 
     /**
      * A pointer to a division rule that is used to generate the axis when dividing cells.
-     * This is a specialisation for Vertex models.
+     * This is a specialisation for immersed boundary simulations.
      */
-    boost::shared_ptr<AbstractVertexBasedDivisionRule<DIM> > mpVertexBasedDivisionRule;
+    boost::shared_ptr<AbstractImmersedBoundaryDivisionRule<DIM> > mpImmersedBoundaryDivisionRule;
 
     /** The intrinsic node spacing, relative to which various parameters must be calculated */
     double mIntrinsicSpacing;
@@ -122,7 +122,7 @@ private:
     void serialize(Archive& archive, const unsigned int version)
     {
         archive& boost::serialization::base_object<AbstractOffLatticeCellPopulation<DIM> >(*this);
-        archive& mpVertexBasedDivisionRule;
+        archive& mpImmersedBoundaryDivisionRule;
     }
 
     /**
@@ -465,16 +465,16 @@ public:
                                             double dirichletBoundaryValue = 0.0);
 
     /**
-     * @return The vertex division rule that is currently being used.
+     * @return The division rule that is currently being used.
      */
-    boost::shared_ptr<AbstractVertexBasedDivisionRule<DIM> > GetVertexBasedDivisionRule();
+    boost::shared_ptr<AbstractImmersedBoundaryDivisionRule<DIM> > GetImmersedBoundaryDivisionRule();
 
     /**
      * Set the division rule for this population.
      *
-     * @param pVertexBasedDivisionRule  pointer to the new division rule
+     * @param pImmersedBoundaryDivisionRule  pointer to the new division rule
      */
-    void SetVertexBasedDivisionRule(boost::shared_ptr<AbstractVertexBasedDivisionRule<DIM> > pVertexBasedDivisionRule);
+    void SetImmersedBoundaryDivisionRule(boost::shared_ptr<AbstractImmersedBoundaryDivisionRule<DIM> > pImmersedBoundaryDivisionRule);
 
     /**
      * @return mPopulationHasActiveSources whether the population has active fluid sources
