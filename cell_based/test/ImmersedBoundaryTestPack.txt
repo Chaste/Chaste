@@ -1,4 +1,5 @@
 population/TestImmersedBoundaryCellPopulation.hpp
+population/TestImmersedBoundaryDivisionRules.hpp
 population/TestImmersedBoundaryForces.hpp
 simulation/TestImmersedBoundaryPdeSolveMethods.hpp
 simulation/TestImmersedBoundarySimulationModifier.hpp
