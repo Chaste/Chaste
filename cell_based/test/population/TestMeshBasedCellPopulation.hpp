@@ -1563,6 +1563,8 @@ public:
 
     void TestGetTetrahedralMeshForPdeModifier() throw(Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
+
         HoneycombMeshGenerator generator(2, 2);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
 
