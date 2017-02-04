@@ -59,4 +59,5 @@ _local/
 
 # Misc from CLion
 /.idea/*
-/ImmersedBoundary_BJB/
+/ImmersedBoundary_BJB/*
+/test/
