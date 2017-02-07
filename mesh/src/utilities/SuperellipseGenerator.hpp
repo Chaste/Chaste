@@ -42,6 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChastePoint.hpp"
 #include "Exception.hpp"
 #include "Node.hpp"
+#include "UblasCustomFunctions.hpp"
 
 /**
  * Class to generate roughly equally spaced points around a 2D superellipse.

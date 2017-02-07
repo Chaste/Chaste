@@ -33,14 +33,79 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-// Created by bartosz on 27/01/17.
+// Created by bartosz on 29/01/17.
 
 #ifndef CHASTE_IMMERSEDBOUNDARYMOUSEEMBRYOCROSSSECTIONMESHGENERATOR_HPP
 #define CHASTE_IMMERSEDBOUNDARYMOUSEEMBRYOCROSSSECTIONMESHGENERATOR_HPP
 
+#include <cmath>
+#include <vector>
 
-class ImmersedBoundaryMouseEmbryoCrossSectionMeshGenerator {
+#include "ImmersedBoundaryMesh.hpp"
+#include "SuperellipseGenerator.hpp"
+#include "UblasCustomFunctions.hpp"
 
+/**
+ * Creates a collection of immersed boundary elements to model a proximal-dorsal cross-section of a mouse embryo
+ *
+ * NOTE: the user should delete the mesh after use to manage memory.
+ * NOTE: the user should change mesh parameters like fluid grid spacing, as these are not altered from defaults here.
+ */
+
+class ImmersedBoundaryMouseEmbryoCrossSectionMeshGenerator
+{
+protected:
+    /** A pointer to the mesh this class creates. */
+    ImmersedBoundaryMesh<2,2>* mpMesh;
+
+    /** Calculates the perimeter of the membrane */
+    double CalculateTotalArcLengthOfSuperellipse(double membraneWidth, double membraneHeight, double ellipseExponent);
+
+    /** Calculates the normal to the two points specified */
+    c_vector<double, 2> CalculateNormal(c_vector<double, 2> point_1, c_vector<double, 2> point_2);
+
+    /** @returns a set of points that represent a cell */
+    const std::vector<c_vector<double, 2> > BuildACell(double targetNodeSpacing,
+                                                       std::vector<c_vector<double, 2> > base,
+                                                       c_vector<double, 2> normal_1,
+                                                       c_vector<double, 2> normal_2,
+                                                       double cell_height) const;
+
+public:
+
+    /**
+     * Default constructor.
+     * @param numCells
+     * @param numNodesPerCell
+     * @param membraneWidth
+     * @param membraneHeight
+     */
+
+    ImmersedBoundaryMouseEmbryoCrossSectionMeshGenerator(unsigned numCells,
+                                                         unsigned numNodesMembrane=200,
+                                                         double ellipseExponent=0.3,
+                                                         double membraneWidth=0.5,
+                                                         double membraneHeight=0.5,
+                                                         double cellHeight=0.1);
+
+    /**
+     * Null constructor for derived classes to call.
+     */
+    ImmersedBoundaryMouseEmbryoCrossSectionMeshGenerator()
+    {
+    }
+
+    /**
+     * Destructor.
+     *
+     * Deletes the mesh object and pointer.
+     */
+     virtual ~ImmersedBoundaryMouseEmbryoCrossSectionMeshGenerator();
+
+    /**
+     * @return a 2D honeycomb mesh based on a 2D plane
+     */
+     ImmersedBoundaryMesh<2, 2>* GetMesh();
 };
 
 
