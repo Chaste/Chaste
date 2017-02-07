@@ -71,6 +71,7 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
     // Generate a reference superellipse
     SuperellipseGenerator* p_gen = new SuperellipseGenerator(numNodesPerCell, ellipseExponent, cell_width, cell_height, 0.0, 0.0);
     std::vector<c_vector<double, 2> > locations = p_gen->GetPointsAsVectors();
+    // TODO: Should the Superellipse object be deleted here?
 
     /*
      * The top and bottom heights are the heights at which there is maximum curvature in the superellipse.
