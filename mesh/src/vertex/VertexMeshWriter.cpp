@@ -328,7 +328,6 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddFaceData(std::string dataName,
     NEVER_REACHED;
 }
 
-// of AddFaceData( ... )
 template<>
 void VertexMeshWriter<3, 3>::AddFaceData(std::string dataName, std::vector<double> dataPayload)
 {
@@ -410,7 +409,7 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(const VertexMesh<ELEM
         }
         vtkIdList* p_cell_id_list = p_cell->GetPointIds();
         p_cell_id_list->SetNumberOfIds(p_elem->GetNumNodes());
-        for (unsigned j=0; j<p_elem->GetNumNodes(); ++j)
+        for (unsigned j = 0; j < p_elem->GetNumNodes(); ++j)
         {
             p_cell_id_list->SetId(j, p_elem->GetNodeGlobalIndex(j));
         }
@@ -443,51 +442,20 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(const VertexMesh<ELEM
         }
 
         const unsigned num_of_faces = rMesh.GetNumAllFaces();
-        for (unsigned face_index=0; face_index<num_of_faces; ++face_index)
+        for (unsigned face_index = 0; face_index < num_of_faces; ++face_index)
         {
             VertexElement<ELEMENT_DIM-1, SPACE_DIM>* p_face = rMesh.GetFace(face_index);
             // Skip over deleted faces
             if (p_face->IsDeleted())
                 continue;
             
-            std::vector<std::pair<double, unsigned> > angles_with_global_index;
-            {
-                std::vector<Node<SPACE_DIM>*> nodes(p_face->GetNumNodes());
-                for (unsigned i = 0; i < p_face->GetNumNodes(); ++i)
-                {
-                    nodes[i] = p_face->GetNode(i);
-                }
-
-                const c_vector<double, SPACE_DIM> centroid = p_face->GetCentroid();
-                c_vector<double, SPACE_DIM> e1 = nodes[0]->rGetLocation() - centroid;
-                e1 /= norm_2(e1);
-                const c_vector<double, SPACE_DIM> v1_relativ = nodes[1]->rGetLocation() - centroid;
-                const c_vector<double, SPACE_DIM> normal = VectorProduct(e1, v1_relativ);
-                c_vector<double, SPACE_DIM> e2 = VectorProduct(normal, e1);
-                e2 /= norm_2(e2);
-
-                assert(abs(inner_prod(e1, e2)) < 1e-5);
-                assert(abs(norm_2(e1) - 1) < 1e-5);
-                assert(abs(norm_2(e2) - 1) < 1e-5);
-
-                for (unsigned i = 0; i< nodes.size(); ++i)
-                {
-                    const c_vector<double, SPACE_DIM> vec_tmp = nodes[i]->rGetLocation() - centroid;
-                    const double tmp_angle = atan2(inner_prod(vec_tmp, e1), inner_prod(vec_tmp, e2));
-                    angles_with_global_index.push_back(std::make_pair(tmp_angle, nodes[i]->GetIndex()));
-                }
-
-                std::sort(angles_with_global_index.begin(), angles_with_global_index.end());
-
-            }
-
             vtkCell* p_cell;
             p_cell = vtkPolygon::New();
             vtkIdList* p_cell_id_list = p_cell->GetPointIds();
             p_cell_id_list->SetNumberOfIds(p_face->GetNumNodes());
             for (unsigned j=0; j<p_face->GetNumNodes(); ++j)
             {
-                p_cell_id_list->SetId(j, angles_with_global_index[j].second);
+                p_cell_id_list->SetId(j, p_face->GetNodeGlobalIndex(j));
             }
             mpVtkFaceMesh->InsertNextCell(p_cell->GetCellType(), p_cell_id_list);
             p_cell->Delete(); // Reference counted

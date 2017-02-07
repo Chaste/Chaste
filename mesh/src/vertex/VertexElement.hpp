@@ -278,6 +278,13 @@ public:
     void MonolayerElementRearrangeFacesNodes();
 
     /**
+     * Check the orientation of individual face.
+     * This function is called in MonolayerElementRearrangeFacesNodes
+     * @param faceLocalIndex local index of face
+     */
+    void CheckFaceOrientationOfElement(const unsigned faceLocalIndex);
+
+    /**
      * Method for lateral face of monolayer element to rearrange its nodes such that the
      * basal nodes are always the at the beginning.
      * This function is called in MonolayerElementRearrangeFacesNodes
@@ -297,7 +304,7 @@ public:
      * @param Index the local index of the node after which the new node is added
      * @param pNode a pointer to the new node
      */
-    void FaceAddNode(Node<SPACE_DIM>* pNode, const unsigned Index);
+    void FaceAddNode(Node<SPACE_DIM>* pNode, const unsigned Index = UINT_MAX);
 
     /**
      * Method for faces. Delete a node with given local index.
@@ -340,6 +347,23 @@ public:
      * Doesn't notify nodes and element that it has been removed.
      */
     void MarkFaceAsDeleted();
+
+    /**
+     * For VertexElement<2, 2> only.
+     * Arrange nodes of the faces so that they will be in correct order (CCW from top).
+     * @return true if there are changes to the order of nodes.
+     * This function does not update the element about the changes #2850
+     */
+    bool FaceRearrangeNodes();
+
+    /**
+     * For VertexElement<2, 3> only.
+     * Arrange nodes of the faces so that they will be in correct order (CCW from PointOfView).
+     * @param PointOfView is the position from which the face is observed.
+     * @return true if there are changes to the order of nodes.
+     * This function does not update the element about the changes #2850
+     */
+    bool FaceRearrangeNodes(const c_vector<double, SPACE_DIM> &PointOfView);
 
     /**
      * face will add element index into its registry.

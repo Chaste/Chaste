@@ -2455,31 +2455,8 @@ void MutableVertexMesh<3, 3>::PerformAsynchronousT1Swap(Node<3>* pNodeA, Node<3>
     // Start modifications
     // Settle the swap face.
     p_lateral_swap_face->FaceDeleteNode(p_node_a);
-    {
-        PRINT_VARIABLE(p_lateral_swap_face->GetNumNodes());
-        std::vector<unsigned> v;
-        for (unsigned j = 0; j < p_lateral_swap_face->GetNumNodes(); ++j)
-            v.push_back(p_lateral_swap_face->GetNodeGlobalIndex(j));
-        PRINT_CONTAINER(v);
-    }
-
     p_lateral_swap_face->FaceDeleteNode(p_node_b);
-    {
-        PRINT_VARIABLE(p_lateral_swap_face->GetNumNodes());
-        std::vector<unsigned> v;
-        for (unsigned j = 0; j < p_lateral_swap_face->GetNumNodes(); ++j)
-            v.push_back(p_lateral_swap_face->GetNodeGlobalIndex(j));
-        PRINT_CONTAINER(v);
-    }
-    PRINT_VARIABLE(p_new_node->GetIndex())
-    p_lateral_swap_face->FaceAddNode(p_new_node, 1);
-    {
-        PRINT_VARIABLE(p_lateral_swap_face->GetNumNodes());
-        std::vector<unsigned> v;
-        for (unsigned j = 0; j < p_lateral_swap_face->GetNumNodes(); ++j)
-            v.push_back(p_lateral_swap_face->GetNodeGlobalIndex(j));
-        PRINT_CONTAINER(v);
-    }
+    p_lateral_swap_face->FaceAddNode(p_new_node);
 
     VertexElement<2, 3>* p_new_swap(NULL);
     {
@@ -2501,12 +2478,10 @@ void MutableVertexMesh<3, 3>::PerformAsynchronousT1Swap(Node<3>* pNodeA, Node<3>
             if (lateral_faces[i] != NULL)
                 PRINT_2_VARIABLES(i, lateral_faces[i]->GetIndex());
         }
-        MARK;
 
         lateral_faces[2]->FaceUpdateNode(p_node_b, p_node_a);
-        MARK;
         lateral_faces[0]->FaceUpdateNode(p_node_a, p_node_b);
-        MARK;
+
         for (unsigned i = 0; i < 4; ++i)
         {
             PRINT_VARIABLE(i);
@@ -2514,7 +2489,7 @@ void MutableVertexMesh<3, 3>::PerformAsynchronousT1Swap(Node<3>* pNodeA, Node<3>
             {
                 PRINT_2_VARIABLES(i, lateral_faces[i]->GetIndex());
 
-                lateral_faces[i]->FaceAddNode(p_new_node, lateral_faces[i]->GetNumNodes() - 1);
+                lateral_faces[i]->FaceAddNode(p_new_node);
 
                 lateral_faces[i]->LateralFaceRearrangeNodes();
 
@@ -2663,7 +2638,7 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
     double distance_AB = norm_2(vector_AB);
     if (distance_AB < 1e-10) ///\todo remove magic number? (see #1884 and #2401)
     {
-        EXCEPTION("Nodes are too close together, this shouldn't happen");
+        EXCEPTION("Nodes(" << node_a_index << "&" << node_b_index << ") are too close together, this shouldn't happen");
     }
 
     // Compute and store the location of the T1 swap, which is at the midpoint of nodes A and B

@@ -59,12 +59,142 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellLabelWriter.hpp"
 #include "CellVolumesWriter.hpp"
 
-#include "FakePetscSetup.hpp"
-
 #include "Debug.hpp"
 
 #include "TransitCellProliferativeType.hpp"
 #include "UniformG1GenerationalCellCycleModel.hpp"
+
+#include "AbstractCellBasedSimulationModifier.hpp"
+
+
+#include "FakePetscSetup.hpp"
+
+class LateralNodeModifier : public AbstractCellBasedSimulationModifier<3, 3>
+{
+    friend class boost::serialization::access;
+    template <class Archive>
+    void serialize(Archive& archive, const unsigned int version)
+    {
+        archive& boost::serialization::base_object<AbstractCellBasedSimulationModifier<3, 3> >(*this);
+    }
+
+public:
+    /**
+     * Default constructor.
+     */
+    LateralNodeModifier()
+    : AbstractCellBasedSimulationModifier<3, 3>()
+    {
+    }
+
+    /**
+     * Destructor.
+     */
+    virtual ~LateralNodeModifier()
+    {
+    }
+
+    /**
+     * Change the lateral node by its definition at the end of time step.
+     *
+     * @param rCellPopulation reference to the cell population
+     */
+    virtual void UpdateAtEndOfTimeStep(AbstractCellPopulation<3, 3>& rCellPopulation)
+    {
+        UpdateCellData(rCellPopulation);
+    }
+
+    /**
+     * @param rCellPopulation reference to the cell population
+     * @param outputDirectory the output directory, relative to where Chaste output is stored
+     */
+    virtual void SetupSolve(AbstractCellPopulation<3, 3> &rCellPopulation, std::string outputDirectory)
+    {
+        UpdateCellData(rCellPopulation);
+    }
+
+    void UpdateCellData(AbstractCellPopulation<3, 3>& rCellPopulation)
+    {
+        AbstractMesh<3, 3>& r_tmp_mesh = rCellPopulation.rGetMesh();
+
+        if(dynamic_cast<MutableVertexMesh<3, 3>*>(&r_tmp_mesh) == NULL)
+        {
+            EXCEPTION("only to vertex mesh");
+        }
+        MutableVertexMesh<3, 3>* p_mesh = dynamic_cast<MutableVertexMesh<3, 3>*>(&r_tmp_mesh);
+
+        for (unsigned i = 0; i < p_mesh->GetNumNodes(); ++i)
+        {
+            Node<3>* p_node = p_mesh->GetNode(i);
+            if (IsLateralNode(p_node))
+            {
+                const std::set<unsigned>& containing_faces = p_node->rGetContainingFaceIndices();
+                std::vector<Node<3>*> basal_nodes;
+                std::vector<Node<3>*> apical_nodes;
+
+                for (std::set<unsigned>::const_iterator it = containing_faces.begin();
+                it != containing_faces.end(); ++it)
+                {
+                    VertexElement<2, 3>* p_face_tmp = p_mesh->GetFace(*it);
+                    if (p_face_tmp->GetNumNodes() != 3)
+                        continue;
+
+                    for (unsigned j = 0; j < p_face_tmp->GetNumNodes(); ++j)
+                    {
+                        Node<3>* p_tmp_node = p_face_tmp->GetNode(i);
+                        if (IsApicalNode(p_tmp_node))
+                        {
+                            apical_nodes.push_back(p_tmp_node);
+                        }
+                        else if (IsBasalNode(p_tmp_node))
+                        {
+                            basal_nodes.push_back(p_tmp_node);
+                        }
+                        else
+                        {
+                            assert(p_tmp_node == p_node);
+                        }
+                    }
+                }
+
+                if (basal_nodes.size() != 2u || apical_nodes.size() != 2u)
+                {
+                    NEVER_REACHED;
+                }
+
+                
+                const c_vector<double, 3> mid_apical = (apical_nodes[0]->rGetLocation() + apical_nodes[1]->rGetLocation())/2;
+                const c_vector<double, 3> mid_basal = (basal_nodes[0]->rGetLocation() + basal_nodes[1]->rGetLocation())/2;
+
+                const double apical_length = norm_2(apical_nodes[0]->rGetLocation() - apical_nodes[1]->rGetLocation());
+                const double basal_length = norm_2(basal_nodes[0]->rGetLocation() - basal_nodes[1]->rGetLocation());
+
+                p_node->rGetModifiableLocation() = (apical_length*mid_apical + basal_length*mid_basal)
+                                                    /(apical_length + basal_length);
+            }
+        }
+
+    }
+
+
+    /**
+     * Output any simulation modifier parameters to file.
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     *
+     * @param rParamsFile the file stream to which the parameters are output
+     */
+    virtual void OutputSimulationModifierParameters(out_stream& rParamsFile)
+    {
+        AbstractCellBasedSimulationModifier<3>::OutputSimulationModifierParameters(rParamsFile);
+    }
+};
+#include "SerializationExportWrapper.hpp"
+CHASTE_CLASS_EXPORT(LateralNodeModifier)
+#include "SerializationExportWrapperForCpp.hpp"
+CHASTE_CLASS_EXPORT(LateralNodeModifier)
+
 
 class TestVertexMesh33UniaxialLoad : public AbstractCellBasedTestSuite
 {
@@ -365,6 +495,92 @@ public:
         p_force3->SetVolumeParameters(350, target_volume / 2);
         simulator.Solve();
         TS_ASSERT_DELTA(p_mesh->GetVolumeOfElement(0), target_volume / 2, 0.05);
+    }
+
+    void TestAsynchronousT1()
+    {
+        /*
+         * Create a mesh comprising six nodes contained in two triangle and two rhomboid elements, as shown below.
+         * We will test that that a T1 swap doesn't occur when max(l1,l2)>mCellRearrangementThreshold.
+         *  _____
+         * |\   /|
+         * | \ / |
+         * |  |  |
+         * | / \ |
+         * |/___\|
+         */
+        // Set the threshold distance between vertices for a T1 swap as follows
+        // so that it will not trigger CheckForSwapsFromShortEdges
+
+        std::string output_filename = "TestAsynchronousT1/FirstTest";
+        const double end_time = 1;
+        const double target_volume = 2.2;
+
+        std::vector<Node<3>*> nodes;
+        nodes.push_back(new Node<3>(0, true, 0.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(1, true, 1.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(2, true, 1.0, 1.0, 0.0));
+        nodes.push_back(new Node<3>(3, true, 0.0, 1.0, 0.0));
+        nodes.push_back(new Node<3>(4, false, 0.5, 0.4, 0.0));
+        nodes.push_back(new Node<3>(5, false, 0.5, 0.6, 0.0));
+
+        unsigned node_indices_elem_0[3] = { 2, 3, 5 };
+        unsigned node_indices_elem_1[4] = { 4, 1, 2, 5 };
+        unsigned node_indices_elem_2[3] = { 0, 1, 4 };
+        unsigned node_indices_elem_3[4] = { 4, 5, 3, 0 };
+
+        MonolayerVertexMeshGenerator builder(nodes, "AsynchronousT1Swap");
+        builder.BuildElementWith(3, node_indices_elem_0);
+        builder.BuildElementWith(4, node_indices_elem_1);
+        builder.BuildElementWith(3, node_indices_elem_2);
+        builder.BuildElementWith(4, node_indices_elem_3);
+        MutableVertexMesh<3, 3>* p_mesh = builder.GenerateMesh();
+
+        p_mesh->GetNode(4)->rGetModifiableLocation()[1] = 0.46;
+        p_mesh->GetNode(5)->rGetModifiableLocation()[1] = 0.54;
+        p_mesh->SetCellRearrangementThreshold(0.10);
+        
+        p_mesh->ReMesh();
+
+
+        for (unsigned i = 0; i < p_mesh->GetNumNodes() ; ++i)
+        {
+            p_mesh->GetNode(i)->rGetModifiableLocation() *= 2;
+        }
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<NoCellCycleModel, 3> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
+        VertexBasedCellPopulation<3> cell_population(*p_mesh, cells);
+
+        OffLatticeSimulation<3> simulator(cell_population);
+        simulator.SetOutputDirectory(output_filename);
+        simulator.SetSamplingTimestepMultiple(1);
+        simulator.SetEndTime(end_time);
+
+        MAKE_PTR(GeneralMonolayerVertexMeshForce, p_force3);
+        p_force3->SetApicalParameters(20, 20, 0.7);
+        p_force3->SetBasalParameters(20, 20, 0.7);
+        p_force3->SetLateralParameter(9.25);
+        p_force3->SetVolumeParameters(350, target_volume);
+        simulator.AddForce(p_force3);
+
+        MAKE_PTR(LateralNodeModifier, p_node_modifier);
+        simulator.AddSimulationModifier(p_node_modifier);
+
+        simulator.SetEndTime(end_time);
+        simulator.Solve();
+
+        // const double lateral_params[6] = {8, 8.5, 9, 9.5, 10, 10.5};
+        // for (unsigned i = 0; i < 6; ++i)
+        // {
+        //     p_force3->SetLateralParameter(lateral_params[i]);
+        //     simulator.SetEndTime(end_time*(i+1));
+        //     simulator.Solve();
+        // }
+
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 4);
+        // TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
 };
 

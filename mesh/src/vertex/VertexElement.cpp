@@ -425,6 +425,29 @@ void VertexElement<3, 3>::ReplaceFace(const unsigned oldFaceLocalIndex,
 ///                   Functions for monolayer elements                 ///
 //////////////////////////////////////////////////////////////////////////
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VertexElement<ELEMENT_DIM, SPACE_DIM>::CheckFaceOrientationOfElement(const unsigned faceLocalIndex)
+{
+    assert(ELEMENT_DIM == 3 && SPACE_DIM == 3);
+
+    // Check Orientation
+    const c_vector<double, SPACE_DIM> elem_centroid = this->GetCentroid();
+    
+    const VertexElement<ELEMENT_DIM - 1, SPACE_DIM>* p_face = this->GetFace(faceLocalIndex);
+    c_vector<double, SPACE_DIM> face_centroid = p_face->GetCentroid();
+    c_vector<double, SPACE_DIM> face_normal = zero_vector<double>(SPACE_DIM);
+
+    // Calculation w.r.t. centroid so that it will not be affected by uneven surface.
+    c_vector<double, SPACE_DIM> v_minus_c0 = p_face->GetNode(p_face->GetNumNodes() - 1)->rGetLocation() - face_centroid;
+    for (unsigned node_index = 0; node_index < p_face->GetNumNodes(); ++node_index)
+    {
+        c_vector<double, SPACE_DIM> vnext_minus_c0 = p_face->GetNode(node_index)->rGetLocation() - face_centroid;
+        face_normal += VectorProduct(v_minus_c0, vnext_minus_c0);
+        v_minus_c0 = vnext_minus_c0;
+    }
+    this->mOrientations[faceLocalIndex] = inner_prod(face_normal, face_centroid - elem_centroid) < 0;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VertexElement<ELEMENT_DIM, SPACE_DIM>::LateralFaceRearrangeNodes()
 {
     NEVER_REACHED;
@@ -439,23 +462,14 @@ void VertexElement<2, 3>::LateralFaceRearrangeNodes()
     }
     if (this->GetNumNodes() < 4)
     {
-        assert(IsLateralNode(this->mNodes.back()));
         return;
     }
 
     // Store the local indices of basal nodes for later use
     unsigned min_cyc_index = UINT_MAX;
     unsigned second_index = UINT_MAX;
-    Node<3>* p_weird_node = NULL;
     for (unsigned i = 0; i < this->GetNumNodes(); ++i)
     {
-        if (IsLateralNode(this->GetNode(i)))
-        {
-            p_weird_node = this->GetNode(i);
-            this->mNodes.erase(this->mNodes.begin() + i);
-            --i;
-            continue;
-        }
         if (IsBasalNode(this->GetNode(i)))
         {
             if (min_cyc_index == UINT_MAX)
@@ -482,19 +496,10 @@ void VertexElement<2, 3>::LateralFaceRearrangeNodes()
     }
     else if (min_cyc_index + 1 != second_index)
     {
-        MARK;
-        PrintElement(this);
-        PRINT_2_VARIABLES(min_cyc_index, second_index)
-
         NEVER_REACHED;
     }
 
     std::rotate(this->mNodes.begin(), this->mNodes.begin() + min_cyc_index, this->mNodes.end());
-
-    if (p_weird_node != NULL)
-    {
-        this->mNodes.push_back(p_weird_node);
-    }
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -518,12 +523,7 @@ void VertexElement<3, 3>::MonolayerElementRearrangeFacesNodes()
     const unsigned num_basal_nodes = p_basal->GetNumNodes();
     const unsigned num_apical_nodes = p_apical->GetNumNodes();
     const unsigned num_more = std::max(num_basal_nodes, num_apical_nodes);
-    std::vector<Node<3>*> lateral_nodes = GetLateralNode(this);
-
-    for (unsigned iii = 0; iii < lateral_nodes.size(); ++iii)
-    {
-        PRINT_2_VARIABLES(iii, lateral_nodes[iii]->GetIndex());
-    }
+    std::vector<Node<3>*> lateral_nodes = GetNodesWithType(this, Monolayer::LateralValue);
 
     if (num_more * 2 != this->GetNumNodes() || num_more + 2 != mFaces.size()
         || mFaces.size() != mOrientations.size())
@@ -573,22 +573,13 @@ void VertexElement<3, 3>::MonolayerElementRearrangeFacesNodes()
     }
     face_nodes.insert(face_nodes.end(), lateral_nodes.begin(), lateral_nodes.end());
 
-    PRINT_2_VARIABLES(elem_nodes.size(), face_nodes.size())
-    std::vector<unsigned> v1, v2;
-    for (unsigned iii = 0; iii < elem_nodes.size(); ++iii)
-    {
-        v1.push_back(elem_nodes[iii]->GetIndex());
-        v2.push_back(face_nodes[iii]->GetIndex());
-    }
-    PRINT_CONTAINER(v1)
-    PRINT_CONTAINER(v2)
-
+    assert(elem_nodes.size() == face_nodes.size());
     // If nodes in element are not in proper order, they are rearranged
     if (elem_nodes != face_nodes)
     {
         std::set<unsigned> tmp_elem_node_indices;
         std::set<unsigned> tmp_face_node_indices;
-        for (unsigned local_index = 0; local_index < 2 * num_basal_nodes; ++local_index)
+        for (unsigned local_index = 0; local_index < elem_nodes.size(); ++local_index)
         {
             tmp_elem_node_indices.insert(elem_nodes[local_index]->GetIndex());
             tmp_face_node_indices.insert(face_nodes[local_index]->GetIndex());
@@ -599,12 +590,9 @@ void VertexElement<3, 3>::MonolayerElementRearrangeFacesNodes()
         {
             NEVER_REACHED;
         }
-
         this->mNodes = face_nodes;
     }
 
-    MARK;
-    PrintElement(this);
     // Tidy up the nodes of the lateral faces
     /*
      * Rearrange nodes of lateral faces such that the first two nodes are the basal nodes.
@@ -613,11 +601,10 @@ void VertexElement<3, 3>::MonolayerElementRearrangeFacesNodes()
      */
     for (unsigned i = 2; i < this->GetNumFaces(); ++i)
     {
-        PRINT_VARIABLE(i);
+        this->GetFace(i)->FaceRearrangeNodes(this->GetCentroid());
         this->GetFace(i)->LateralFaceRearrangeNodes();
     }
 
-    MARK;
     // Check and rearrange faces if necessary
     std::vector<unsigned> elem_lateral_indices;
     std::vector<unsigned> node_lateral_indices;
@@ -669,8 +656,6 @@ void VertexElement<3, 3>::MonolayerElementRearrangeFacesNodes()
         // Make sure the lateral faces are the same.
         if (tmp_elem_lateral_indices != tmp_node_lateral_indices)
         {
-            PRINT_CONTAINER(tmp_elem_lateral_indices)
-            PRINT_CONTAINER(tmp_node_lateral_indices)
             NEVER_REACHED;
         }
 
@@ -695,23 +680,9 @@ void VertexElement<3, 3>::MonolayerElementRearrangeFacesNodes()
     }
 
     // Check Orientation
-    const c_vector<double, 3> elem_centroid = this->GetCentroid();
     for (unsigned face_index = 0; face_index < this->GetNumFaces(); ++face_index)
     {
-        const VertexElement<2, 3>* p_face = this->GetFace(face_index);
-        c_vector<double, 3> face_centroid = p_face->GetCentroid();
-        c_vector<double, 3> face_normal = zero_vector<double>(3);
-
-        // Calculation w.r.t. centroid so that it will not be affected by uneven surface.
-        c_vector<double, 3> v_minus_c0 = p_face->GetNode(0)->rGetLocation() - face_centroid;
-        for (unsigned node_index = 1; node_index <= p_face->GetNumNodes(); ++node_index)
-        {
-            c_vector<double, 3> vnext_minus_c0 = p_face->GetNode(node_index % p_face->GetNumNodes())->rGetLocation() - face_centroid;
-            face_normal += VectorProduct(v_minus_c0, vnext_minus_c0);
-            v_minus_c0 = vnext_minus_c0;
-        }
-
-        this->mOrientations[face_index] = inner_prod(face_normal, face_centroid - elem_centroid) < 0;
+        CheckFaceOrientationOfElement(face_index);
     }
 
     ///\todo: #2850 remove the both assumptions of this function (refer to hpp)
@@ -800,10 +771,12 @@ void VertexElement<ELEMENT_DIM, SPACE_DIM>::FaceResetIndex(unsigned index)
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VertexElement<ELEMENT_DIM, SPACE_DIM>::FaceAddNode(Node<SPACE_DIM>* pNode, const unsigned Index)
 {
-    assert(Index < this->mNodes.size());
+    const unsigned real_index = (Index == UINT_MAX) ? this->GetNumNodes() - 1 : Index;
 
-    // Add pNode to Index+1 face of mNodes pushing the others up
-    this->mNodes.insert(this->mNodes.begin() + Index + 1, pNode);
+    assert(real_index < this->mNodes.size());
+
+    // Add pNode to real_index+1 face of mNodes pushing the others up
+    this->mNodes.insert(this->mNodes.begin() + real_index + 1, pNode);
 
     // Add face to this node
     pNode->AddFace(this->mIndex);
@@ -878,6 +851,94 @@ void VertexElement<ELEMENT_DIM, SPACE_DIM>::MarkFaceAsDeleted()
     {
         this->mNodes[i]->RemoveFace(this->mIndex);
     }
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool VertexElement<ELEMENT_DIM, SPACE_DIM>::FaceRearrangeNodes(const c_vector<double, SPACE_DIM>& PointOfView)
+{
+    NEVER_REACHED;
+}
+
+template <>
+bool VertexElement<2, 3>::FaceRearrangeNodes(const c_vector<double, 3>& PointOfView)
+{
+    const c_vector<double, 3> centroid = this->GetCentroid();
+
+    c_vector<double, 3> normal = centroid - PointOfView;
+    normal /= norm_2(normal);
+    c_vector<double, 3> e1 = this->mNodes[0]->rGetLocation() - centroid;
+    // Gramm-Schmidt Process
+    e1 -= inner_prod(e1, normal) * normal;
+    e1 /= norm_2(e1);
+    c_vector<double, 3> e2 = VectorProduct(normal, e1);
+
+    assert(abs(inner_prod(e1, e2)) < 1e-5);
+    assert(abs(norm_2(e1) - 1) < 1e-5);
+    assert(abs(norm_2(e2) - 1) < 1e-5);
+
+    std::vector<std::pair<double, Node<3>*> > angles_and_nodes;
+    for (unsigned i = 0; i < this->GetNumNodes(); ++i)
+    {
+        const c_vector<double, 3> vec_tmp = this->GetNode(i)->rGetLocation() - centroid;
+        double tmp_angle = atan2(inner_prod(vec_tmp, e2), inner_prod(vec_tmp, e1));
+        if (tmp_angle < 0)
+        {
+            tmp_angle += 2 * M_PI;
+        }
+        angles_and_nodes.push_back(std::make_pair(tmp_angle, this->GetNode(i)));
+    }
+    std::sort(angles_and_nodes.begin(), angles_and_nodes.end());
+
+    std::vector<Node<3>*> nodes_tmp(this->GetNumNodes());
+    for (unsigned i = 0; i < nodes_tmp.size(); ++i)
+    {
+        nodes_tmp[i] = angles_and_nodes[i].second;
+    }
+    
+    const bool return_val = (nodes_tmp != this->mNodes);
+    if (return_val)
+    {
+        std::swap(nodes_tmp, this->mNodes);
+    }
+    return return_val;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool VertexElement<ELEMENT_DIM, SPACE_DIM>::FaceRearrangeNodes()
+{
+    NEVER_REACHED;
+}
+
+template <>
+bool VertexElement<2, 2>::FaceRearrangeNodes()
+{
+    const c_vector<double, 2> centroid = this->GetCentroid();
+
+    std::vector<std::pair<double, Node<2>*> > angles_and_nodes;
+    for (unsigned i = 0; i < this->GetNumNodes(); ++i)
+    {
+        const c_vector<double, 2>& loc_tmp = this->GetNode(i)->rGetLocation() - centroid;
+        double tmp_angle = atan2(loc_tmp[1], loc_tmp[0]);
+        if (tmp_angle < 0)
+        {
+            tmp_angle += 2 * M_PI;
+        }
+        angles_and_nodes.push_back(std::make_pair(tmp_angle, this->GetNode(i)));
+    }
+    std::sort(angles_and_nodes.begin(), angles_and_nodes.end());
+
+    std::vector<Node<2>*> nodes_tmp(this->GetNumNodes());
+    for (unsigned i = 0; i < nodes_tmp.size(); ++i)
+    {
+        nodes_tmp[i] = angles_and_nodes[i].second;
+    }
+
+    const bool return_val = (nodes_tmp != this->mNodes);
+    if (return_val)
+    {
+        std::swap(nodes_tmp, this->mNodes);
+    }
+    return return_val;
 }
 
 //////////////////////////////////////////////////////////////////////////

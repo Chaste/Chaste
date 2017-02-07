@@ -38,6 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <set>
 #include <vector>
+#include <string>
 
 // Forward declaration prevents circular include chain
 template <unsigned DIM>
@@ -139,10 +140,13 @@ const double SetApicalValue = 2.1;
 const double SetLateralValue = 3.1;
 const double SetElementValue = 4.1;
 
+// 0 is for non-mononlayer object.
 const v_type BasalValue = 1;
 const v_type ApicalValue = 2;
 const v_type LateralValue = 3;
 const v_type ElementValue = 4;
+
+const std::string ValueToString[4] = {"", "Basal", "Apical", "Lateral"};
 }
 
 ///////////////////////////////////
@@ -297,10 +301,11 @@ std::vector<unsigned> GetLateralFace(const VertexElement<3, 3>* pElement, const 
                                      const unsigned nodeIndexB);
 
 /**
- * Get "lateral" node or interface node of asynchronous T1 Swap.
+ * Get nodes with specific type.
  * return empty vector if no such node exists.
  */
-std::vector<Node<3>*> GetLateralNode(const VertexElement<3, 3>* pElement);
+template <unsigned ELEMENT_DIM>
+std::vector<Node<3>*> GetNodesWithType(const VertexElement<ELEMENT_DIM, 3>* pElement, const Monolayer::v_type nodeType);
 
 //void AddPairNode(VertexElement<3, 3>* pElement, const unsigned index, Node<3>* pBasalNode, Node<3>* pApicalNode);
 

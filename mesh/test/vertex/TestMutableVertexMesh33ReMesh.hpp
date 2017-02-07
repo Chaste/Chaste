@@ -703,7 +703,7 @@ public:
         vertex_mesh.SetCellRearrangementThreshold(0.1 * 2.0 / 1.5);
 
         // Test that trying to perform a T1 swap on nodes 4 and 5 throws the correct exception
-        TS_ASSERT_THROWS_THIS(vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(4), vertex_mesh.GetNode(5)), "Nodes are too close together, this shouldn't happen");
+        TS_ASSERT_THROWS_THIS(vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(4), vertex_mesh.GetNode(5)), "Nodes(4&5) are too close together, this shouldn't happen");
     }
 
     void TestDoNotPerforT1SwapWithRemovingEdgeFromTriangularElement() throw(Exception)
@@ -842,7 +842,7 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 8u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 44u);
 
-        std::string dirname = OUTPUT_NAME + std::string("/T1_Remesh");
+        std::string dirname = OUTPUT_NAME + std::string("/T1SwapReMesh");
         std::string mesh_filename = "vertex_remesh_T1";
 
         // Save the mesh data using mesh writers

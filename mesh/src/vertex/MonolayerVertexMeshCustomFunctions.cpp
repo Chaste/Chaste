@@ -164,7 +164,6 @@ void PrintElement(const VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement)
 template <>
 void PrintElement(const VertexElement<3, 3>* pElement)
 {
-    const std::string MonolayerValueToName[4] = { "", "Basal", "Apical", "Lateral" };
     const std::string TAB = "    ";
 
     std::cout << "=================================================================================" << std::endl;
@@ -207,7 +206,7 @@ void PrintElement(const VertexElement<3, 3>* pElement)
     {
         VertexElement<2, 3>* p_face = pElement->GetFace(i);
         std::cout << "FACE (" << i << ") : " << p_face->GetIndex() << (p_face->IsDeleted() ? " (DELETED)" : "") << std::endl;
-        std::cout << TAB << "Face Attribute : " << MonolayerValueToName[GetFaceType(p_face)] << (IsFaceOnBoundary(p_face) ? " (BOUNDARY)" : "") << std::endl;
+        std::cout << TAB << "Face Attribute : " << Monolayer::ValueToString[GetFaceType(p_face)] << (IsFaceOnBoundary(p_face) ? " (BOUNDARY)" : "") << std::endl;
 
         std::set<unsigned> set_tmp = p_face->rFaceGetContainingElementIndices();
         std::cout << TAB << "number of Elements : " << set_tmp.size() << " {  ";
@@ -232,7 +231,7 @@ void PrintElement(const VertexElement<3, 3>* pElement)
     {
         Node<3>* p_node = pElement->GetNode(i);
         std::cout << "NODE (" << i << ") : " << p_node->GetIndex() << (p_node->IsDeleted() ? " (DELETED)" : "") << std::endl;
-        std::cout << TAB << "Node Attribute : " << MonolayerValueToName[GetNodeType(p_node)] << (p_node->IsBoundaryNode() ? " (BOUNDARY)" : "") << std::endl;
+        std::cout << TAB << "Node Attribute : " << Monolayer::ValueToString[GetNodeType(p_node)] << (p_node->IsBoundaryNode() ? " (BOUNDARY)" : "") << std::endl;
 
         std::set<unsigned> set_tmp = p_node->rGetContainingElementIndices();
         std::cout << TAB << "number of Elements : " << set_tmp.size() << " {  ";
@@ -256,12 +255,11 @@ void PrintElement(const VertexElement<3, 3>* pElement)
 template <>
 void PrintElement(const VertexElement<2, 3>* pFace)
 {
-    const std::string MonolayerValueToName[4] = { "", "Basal", "Apical", "Lateral" };
     const std::string TAB = "    ";
 
     std::cout << "=================================================================================" << std::endl;
 
-    std::cout << "FACE: " << pFace->GetIndex() << " (" << MonolayerValueToName[GetFaceType(pFace)] << ") "
+    std::cout << "FACE: " << pFace->GetIndex() << " " << Monolayer::ValueToString[GetFaceType(pFace)]
               << (pFace->IsDeleted() ? " (DELETED)" : "") << std::endl;
 
     const std::set<unsigned>& s_elems = (const_cast<VertexElement<2, 3>*>(pFace))->rFaceGetContainingElementIndices();
@@ -285,7 +283,6 @@ void PrintElement(const VertexElement<2, 3>* pFace)
 
 void PrintMesh(const MutableVertexMesh<3, 3>* pMesh, const bool printDeletedObjects)
 {
-    const std::string MonolayerValueToName[4] = { "", "Basal", "Apical", "Lateral" };
     const std::string TAB = "    ";
 
     std::cout << "=================================================================================" << std::endl;
@@ -333,7 +330,7 @@ void PrintMesh(const MutableVertexMesh<3, 3>* pMesh, const bool printDeletedObje
     {
         VertexElement<2, 3>& face = *(pMesh->GetFace(i));
         std::cout << "FACE (" << i << ") : " << face.GetIndex() << (face.IsDeleted() ? " (DELETED)" : "") << std::endl;
-        std::cout << TAB << "Face Attrbute : " << MonolayerValueToName[GetFaceType(&face)] << (IsFaceOnBoundary(&face) ? " (BOUNDARY)" : "") << std::endl;
+        std::cout << TAB << "Face Attrbute : " << Monolayer::ValueToString[GetFaceType(&face)] << (IsFaceOnBoundary(&face) ? " (BOUNDARY)" : "") << std::endl;
 
         std::set<unsigned> set_tmp = face.rFaceGetContainingElementIndices();
         std::cout << TAB << "number of Elements : " << set_tmp.size() << " {  ";
@@ -359,7 +356,7 @@ void PrintMesh(const MutableVertexMesh<3, 3>* pMesh, const bool printDeletedObje
     {
         Node<3>* p_node = pMesh->GetNode(i);
         std::cout << "NODE (" << i << ") : " << p_node->GetIndex() << (p_node->IsDeleted() ? " (DELETED)" : "") << std::endl;
-        std::cout << TAB << "Node Attribute : " << MonolayerValueToName[GetNodeType(p_node)] << (p_node->IsBoundaryNode() ? " (BOUNDARY)" : "") << std::endl;
+        std::cout << TAB << "Node Attribute : " << Monolayer::ValueToString[GetNodeType(p_node)] << (p_node->IsBoundaryNode() ? " (BOUNDARY)" : "") << std::endl;
 
         std::set<unsigned> set_tmp = p_node->rGetContainingElementIndices();
         std::cout << TAB << "number of Elements : " << set_tmp.size() << " {  ";
@@ -418,8 +415,20 @@ Monolayer::v_type GetNodeType(const Node<3>* pNode)
      * NodeAttribute and hence required a const_cast
      */
     Node<3>* p_non_const_node = const_cast<Node<3>*>(pNode);
-    assert(p_non_const_node->GetNumNodeAttributes() == 1u); // LCOV_EXCL_LINE
-    return static_cast<Monolayer::v_type>(p_non_const_node->rGetNodeAttributes()[0]);
+    switch (p_non_const_node->GetNumNodeAttributes())
+    {
+        case 0:
+        {
+            return 0;
+        }
+        case 1:
+        {
+            return static_cast<Monolayer::v_type>(p_non_const_node->rGetNodeAttributes()[0]);
+        }
+        default:
+            NEVER_REACHED;
+    }
+            
 }
 
 bool IsApicalNode(const Node<3>* pNode)
@@ -466,8 +475,19 @@ Monolayer::v_type GetFaceType(const VertexElement<2, 3>* pFace)
      * ElementAttribute and hence required a const_cast
      */
     VertexElement<2, 3>* p_non_const_face = const_cast<VertexElement<2, 3>*>(pFace);
-    assert(p_non_const_face->GetNumElementAttributes() == 1u); // LCOV_EXCL_LINE
-    return static_cast<Monolayer::v_type>(p_non_const_face->rGetElementAttributes()[0]);
+    switch (p_non_const_face->GetNumElementAttributes())
+    {
+        case 0:
+        {
+            return 0;
+        }
+        case 1:
+        {
+            return static_cast<Monolayer::v_type>(p_non_const_face->rGetElementAttributes()[0]);
+        }
+        default:
+            NEVER_REACHED;
+    }
 }
 
 bool IsApicalFace(const VertexElement<2, 3>* pFace)
@@ -645,12 +665,13 @@ std::vector<unsigned> GetLateralFace(const VertexElement<3, 3>* pElement, const 
     return return_vector;
 }
 
-std::vector<Node<3>*> GetLateralNode(const VertexElement<3, 3>* pElement)
+template <unsigned ELEMENT_DIM>
+std::vector<Node<3>*> GetNodesWithType(const VertexElement<ELEMENT_DIM, 3>* pElement, const Monolayer::v_type nodeType)
 {
     std::vector<Node<3>*> return_v;
-    for (int i = pElement->GetNumNodes() - 1; i >= 0; --i)
+    for (unsigned i = 0; i < pElement->GetNumNodes(); ++i)
     {
-        if (IsLateralNode(pElement->GetNode(i)))
+        if (GetNodeType(pElement->GetNode(i)) == nodeType)
         {
             return_v.push_back(pElement->GetNode(i));
         }
@@ -658,3 +679,5 @@ std::vector<Node<3>*> GetLateralNode(const VertexElement<3, 3>* pElement)
 
     return return_v;
 }
+template std::vector<Node<3>*> GetNodesWithType(const VertexElement<3, 3>* pElement, const Monolayer::v_type nodeType);
+template std::vector<Node<3>*> GetNodesWithType(const VertexElement<2, 3>* pFace, const Monolayer::v_type nodeType);

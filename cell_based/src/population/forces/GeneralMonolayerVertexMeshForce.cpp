@@ -35,6 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "GeneralMonolayerVertexMeshForce.hpp"
 #include "VertexBasedCellPopulation.hpp"
+#include "MonolayerVertexMeshCustomFunctions.hpp"
 
 GeneralMonolayerVertexMeshForce::GeneralMonolayerVertexMeshForce()
         : AbstractForce<3>(),
@@ -52,6 +53,13 @@ GeneralMonolayerVertexMeshForce::GeneralMonolayerVertexMeshForce()
 
 GeneralMonolayerVertexMeshForce::~GeneralMonolayerVertexMeshForce()
 {
+}
+
+c_vector<double, 3> CalculateEdgeGradient(const Node<3>* pNode1, const Node<3>* pNode2)
+{
+    const c_vector<double, 3>& loc1 = pNode1->rGetLocation();
+    const c_vector<double, 3>& loc2 = pNode2->rGetLocation();
+    return (loc1 - loc2) / norm_2(loc1 - loc2);
 }
 
 void GeneralMonolayerVertexMeshForce::AddForceContribution(AbstractCellPopulation<3>& rCellPopulation)
@@ -77,8 +85,8 @@ void GeneralMonolayerVertexMeshForce::AddForceContribution(AbstractCellPopulatio
         const VertexElement<3, 3>* p_elem = p_cell_population->GetElement(elem_index);
         assert(elem_index == p_elem->GetIndex());
         element_volumes[elem_index] = rMesh.GetVolumeOfElement(elem_index);
-        apical_areas[elem_index] = rMesh.CalculateAreaOfFace(p_elem->GetFace(1));
-        basal_areas[elem_index] = rMesh.CalculateAreaOfFace(p_elem->GetFace(0));
+        apical_areas[elem_index] = rMesh.CalculateAreaOfFace(GetApicalFace(p_elem));
+        basal_areas[elem_index] = rMesh.CalculateAreaOfFace(GetBasalFace(p_elem));
     }
 
     // Iterate over nodes in the cell population
@@ -89,15 +97,8 @@ void GeneralMonolayerVertexMeshForce::AddForceContribution(AbstractCellPopulatio
         assert(node_index == p_this_node->GetIndex());
 
         // Get the type of node. 1=basal; 2=apical
-        const unsigned node_type = unsigned(p_this_node->rGetNodeAttributes()[0]);
-        c_vector<double, 3> basal_face_contribution = zero_vector<double>(3);
-        c_vector<double, 3> ab_edge_contribution = zero_vector<double>(3);
-        c_vector<double, 3> apical_face_contribution = zero_vector<double>(3);
-        c_vector<double, 3> lateral_edge_contribution = zero_vector<double>(3);
+        const Monolayer::v_type node_type = GetNodeType(p_this_node);
         c_vector<double, 3> volume_contribution = zero_vector<double>(3);
-
-        // A variable to store such that the apical/basal edge forces are not counted twice for non-boundary edges.
-        std::set<unsigned> neighbour_node_indices;
 
         // Find the indices of the elements owned by this node
         const std::set<unsigned> containing_elem_indices = p_this_node->rGetContainingElementIndices();
@@ -118,47 +119,88 @@ void GeneralMonolayerVertexMeshForce::AddForceContribution(AbstractCellPopulatio
                 // Add the force contribution from this cell's volume compressibility (note the minus sign)
                 volume_contribution -= mVolumeParameter * element_volume_gradient * (element_volumes[elem_index] - mTargetVolume);
             }
-
-            // Pointer to the face having the same type as the node
-            const VertexElement<2, 3>* p_ab_face = p_element->GetFace(node_type - 1);
-            const unsigned local_node_index_in_ab_face = p_ab_face->GetNodeLocalIndex(node_index);
-            const c_vector<double, 3> ab_face_gradient = rMesh.GetAreaGradientOfFaceAtNode(p_ab_face, local_node_index_in_ab_face);
-
-            // Calculating apical face contribution
-            if (node_type == 2)
-            {
-                apical_face_contribution -= mApicalAreaParameter * ab_face_gradient * (apical_areas[elem_index] - mTargetApicalArea);
-            }
-
-            // Computing basal face contribution
-            if (node_type == 1)
-            {
-                basal_face_contribution -= mBasalAreaParameter * ab_face_gradient * (basal_areas[elem_index] - mTargetBasalArea);
-            }
-            const unsigned num_nodes_in_ab_face = p_ab_face->GetNumNodes();
-            neighbour_node_indices.insert(p_ab_face->GetNodeGlobalIndex((local_node_index_in_ab_face + 1) % num_nodes_in_ab_face));
-            neighbour_node_indices.insert(p_ab_face->GetNodeGlobalIndex((local_node_index_in_ab_face - 1 + num_nodes_in_ab_face) % num_nodes_in_ab_face));
         }
+        
+        p_this_node->AddAppliedForceContribution(volume_contribution);
+    }
 
-        const c_vector<double, 3>& r_node_location = p_this_node->rGetLocation();
+    // Do lateral face contributions and edge contributions.
+    for (unsigned face_id = 0; face_id < rMesh.GetNumFaces(); ++face_id)
+    {
+        const VertexElement<2, 3>* p_face = rMesh.GetFace(face_id);
 
-        for (std::set<unsigned>::iterator it = neighbour_node_indices.begin();
-             it != neighbour_node_indices.end();
-             ++it)
+        switch (GetFaceType(p_face))
         {
-            Node<3>* p_neighbour_node = p_cell_population->GetNode(*it);
-            const c_vector<double, 3> edge_gradient = (r_node_location - p_neighbour_node->rGetLocation()) / norm_2(p_this_node->rGetLocation() - p_neighbour_node->rGetLocation());
-            ab_edge_contribution -= edge_gradient * (node_type == 1u ? mBasalEdgeParameter : mApicalEdgeParameter);
+        case Monolayer::ApicalValue:
+        {
+            // Calculate apical area contribution
+            if (fabs(mApicalAreaParameter) > 1e-5)
+            {
+                const double apical_area = rMesh.CalculateAreaOfFace(p_face);
+
+                for (unsigned node_id = 0; node_id < p_face->GetNumNodes(); ++node_id)
+                {
+                    c_vector<double, 3> result = rMesh.GetAreaGradientOfFaceAtNode(p_face, node_id);
+                    result *= -1 * mApicalAreaParameter * (apical_area - mTargetApicalArea);
+                    p_face->GetNode(node_id)->AddAppliedForceContribution(result);
+                }
+            }
+            break;
         }
+        case Monolayer::BasalValue:
+        {
+            // Calculate basal area contribution
+            if (fabs(mBasalAreaParameter) > 1e-5)
+            {
+                const double basal_area = rMesh.CalculateAreaOfFace(p_face);
 
-        const unsigned opposite_node_index = node_index + num_nodes / 2 * (node_type == 1u ? 1 : -1);
-        const c_vector<double, 3>& r_opposite_node_location = p_cell_population->GetNode(opposite_node_index)->rGetLocation();
-        const c_vector<double, 3> edge_gradient = (r_node_location - r_opposite_node_location) / norm_2(r_node_location - r_opposite_node_location);
-        lateral_edge_contribution -= edge_gradient * mLateralEdgeParameter * (containing_elem_indices.size());
+                for (unsigned node_id = 0; node_id < p_face->GetNumNodes(); ++node_id)
+                {
+                    c_vector<double, 3> result = rMesh.GetAreaGradientOfFaceAtNode(p_face, node_id);
+                    result *= -1 * mBasalAreaParameter * (basal_area - mTargetBasalArea);
+                    p_face->GetNode(node_id)->AddAppliedForceContribution(result);
+                }
+            }
+            break;
+        }
+        case Monolayer::LateralValue:
+        {
+            Node<3>* p_node1 = p_face->GetNode(p_face->GetNumNodes() - 1);
+            // Calculate apical and basal edge contribution here so that it will be counted once.
+            for (unsigned i=0; i<p_face->GetNumNodes(); ++i)
+            {
+                Node<3>* p_node2 = p_face->GetNode(i);
+                c_vector<double, 3> result = CalculateEdgeGradient(p_node1, p_node2);
+                
+                if (GetNodeType(p_node1) == GetNodeType(p_node2))
+                {
+                    if (IsApicalNode(p_node1))
+                    {
+                        result *= -1 * mApicalEdgeParameter;
+                    }
+                    else
+                    {
+                        assert(IsBasalNode(p_node1));
+                        result *= -1 * mBasalEdgeParameter;
+                    }
+                    
+                }
+                else
+                {
+                    result *= -1 * mLateralEdgeParameter;
+                }
+                
+                p_node1->AddAppliedForceContribution(result);
+                p_node2->AddAppliedForceContribution(-result);
 
-        c_vector<double, 3> force_on_node = basal_face_contribution + ab_edge_contribution + apical_face_contribution
-            + lateral_edge_contribution + volume_contribution;
-        p_this_node->AddAppliedForceContribution(force_on_node);
+                p_node1 = p_node2;
+            }
+
+            break;
+        }
+        default:
+            NEVER_REACHED;
+        }
     }
 }
 
