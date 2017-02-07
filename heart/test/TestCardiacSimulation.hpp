@@ -584,8 +584,11 @@ public:
         TS_ASSERT_THROWS_THIS(CardiacSimulation simulation("heart/test/data/xml/bidomain8d_small.xml"),
                               "Space dimension not supported: should be 1, 2 or 3");
 
+#ifndef __APPLE__
+        ///\todo Passing error is fatal on Mac OSX
         TS_ASSERT_THROWS_THIS(CardiacSimulation simulation("heart/test/data/xml/base_monodomain_frankenstein.xml"),
                               "XML parsing error in configuration file: heart/test/data/xml/base_monodomain_frankenstein.xml");
+#endif
 
         TS_ASSERT_THROWS_THIS(CardiacSimulation simulation("no file"),
                               "Missing file parsing configuration file: no file");

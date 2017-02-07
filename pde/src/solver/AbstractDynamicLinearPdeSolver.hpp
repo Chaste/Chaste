@@ -375,8 +375,6 @@ Vec AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::Solve()
 
         PdeSimulationTime::SetTime(stepper.GetTime());
 
-        std::cout << "Time = " << stepper.GetTime() << std::endl << std::flush;
-
         // Determine timestep to use
         double new_dt;
         if (mpTimeAdaptivityController)

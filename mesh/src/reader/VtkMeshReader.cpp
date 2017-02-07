@@ -292,12 +292,6 @@ void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::Reset()
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::Initialize()
-{
-    mpVtkUnstructuredGrid->Initialize();
-}
-
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::vector<double> VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetNextNode()
 {
     if (mNodesRead >= mNumNodes)

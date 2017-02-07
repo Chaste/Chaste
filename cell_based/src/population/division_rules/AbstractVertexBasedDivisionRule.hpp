@@ -41,9 +41,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "VertexBasedCellPopulation.hpp"
 
-// Forward declaration prevents circular include chain
-template<unsigned SPACE_DIM> class VertexBasedCellPopulation;
-
 /**
  * An abstract cell division rule for use in vertex-based simulations.
  *
