@@ -49,8 +49,11 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class MutableVertexMesh;
 
 /////////////////////////////////////////////////////////
-///      Some function that are relevant for all      ///
+///      Some functions that are relevant for all      ///
 /////////////////////////////////////////////////////////
+#define plus1(a,n) (a+1)%n
+#define minus1(a,n) (a+n-1)%n
+#define no1(c) (*(c.begin()))
 
 /**
  * A simple function to check if an element or a face has a particular node.
@@ -177,7 +180,8 @@ void SetNodeAsLateral(Node<3>* pNode);
  * @param pNode  pointer of the interested node
  * @return  the type of node (apical/basal)
  */
-Monolayer::v_type GetNodeType(const Node<3>* pNode);
+template <unsigned DIM>
+Monolayer::v_type GetNodeType(const Node<DIM>* pNode);
 
 /**
  * @param pNode  pointer of a node

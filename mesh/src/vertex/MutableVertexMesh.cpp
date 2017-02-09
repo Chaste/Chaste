@@ -1295,10 +1295,12 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RemoveDeletedNodes()
     {
         // Some additional features to make sure all the basal nodes are ahead of the apical nodes.
         // Separate the codes from non-3D for better readability
-        ///\todo actually should be a way to identify 2D+1 mesh, not just ELEMENT_DIM==3 #2850
-        std::vector<Node<SPACE_DIM>*> live_lower_nodes;
-        std::vector<Node<SPACE_DIM>*> live_upper_nodes;
-        for (unsigned i=0; i<this->mNodes.size(); i++)
+        assert(IsMonolayerElement(this->GetElement(0)));
+
+        std::vector<Node<SPACE_DIM>*> live_basal_nodes;
+        std::vector<Node<SPACE_DIM>*> live_apical_nodes;
+        std::vector<Node<SPACE_DIM>*> live_other_nodes;
+        for (unsigned i=0; i<this->mNodes.size(); ++i)
         {
             Node<SPACE_DIM>* p_node_i = this->mNodes[i];
             if (p_node_i->IsDeleted())
@@ -1307,24 +1309,28 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RemoveDeletedNodes()
             }
             else
             {
-                const unsigned node_i_type = unsigned(p_node_i->rGetNodeAttributes()[0]);
-                if ( node_i_type == 1u )
-                    live_lower_nodes.push_back(p_node_i);
-                else
+                switch (GetNodeType(p_node_i))
                 {
-                    assert (node_i_type == 2u);
-                    live_upper_nodes.push_back(p_node_i);
+                    case Monolayer::ApicalValue:
+                        live_apical_nodes.push_back(p_node_i);
+                        break;
+                    case Monolayer::BasalValue:
+                        live_basal_nodes.push_back(p_node_i);
+                        break;
+                    default:
+                        live_other_nodes.push_back(p_node_i);
                 }
             }
         }
 
         // Sanity check
-        assert(mDeletedNodeIndices.size() == this->mNodes.size() - live_lower_nodes.size() - live_upper_nodes.size());
-        assert(live_lower_nodes.size() == live_upper_nodes.size());
+        assert(mDeletedNodeIndices.size() == this->mNodes.size() - live_basal_nodes.size() - live_apical_nodes.size() - live_other_nodes.size());
+        assert(live_basal_nodes.size() == live_apical_nodes.size());
 
         // Repopulate the nodes vector and reset the list of deleted node indices
-        this->mNodes = live_lower_nodes;
-        this->mNodes.insert(this->mNodes.end(), live_upper_nodes.begin(), live_upper_nodes.end());
+        this->mNodes = live_basal_nodes;
+        this->mNodes.insert(this->mNodes.end(), live_apical_nodes.begin(), live_apical_nodes.end());
+        this->mNodes.insert(this->mNodes.end(), live_other_nodes.begin(), live_other_nodes.end());
         mDeletedNodeIndices.clear();
 
         // Finally, reset the node indices to run from zero
@@ -1518,11 +1524,18 @@ bool MutableVertexMesh<3, 3>::CheckForSwapsFromShortEdges()
             continue;
         }
 
+        if (p_face->GetNumNodes() < 4)
+        {
+            continue;
+        }
+
         // Make sure the face is in proper order first.
         p_face->LateralFaceRearrangeNodes();
-        Node<3>* p_current_node = p_face->GetNode(0);
-        Node<3>* p_next_node = p_face->GetNode(1);
-        assert(GetNodeType(p_current_node) == GetNodeType(p_next_node));
+        const std::vector<Node<3>*> basal_nodes = GetNodesWithType(p_face, Monolayer::BasalValue);
+        const std::vector<Node<3>*> apical_nodes = GetNodesWithType(p_face, Monolayer::ApicalValue);
+        assert(basal_nodes.size() == 2 && apical_nodes.size() == 2);
+        Node<3>* p_current_node = basal_nodes[0];
+        Node<3>* p_next_node = basal_nodes[1];
 
         // Find distance between nodes
         double distance_between_nodes = this->GetDistanceBetweenNodes(p_current_node->GetIndex(), p_next_node->GetIndex());
@@ -2355,7 +2368,7 @@ void MutableVertexMesh<3, 3>::PerformAsynchronousT1Swap(Node<3>* pNodeA, Node<3>
     Node<3>* p_new_node = new Node<3>(this->GetNumNodes(), tmp_loc, false);
     SetNodeAsLateral(p_new_node);
     this->AddNode(p_new_node);
-    MARK;
+
     // Compute and store the location of the T1 swap, which is at the midpoint of nodes A and B
     mLocationsOfT1Swaps.push_back(p_node_a->rGetLocation() + 0.5 * vector_ab);
 
@@ -2376,7 +2389,7 @@ void MutableVertexMesh<3, 3>::PerformAsynchronousT1Swap(Node<3>* pNodeA, Node<3>
         p_node_a->rGetModifiableLocation() += 0.5 * vector_ab - 0.5 * vector_CD;
         p_node_b->rGetModifiableLocation() += -0.5 * vector_ab + 0.5 * vector_CD;
     }
-    MARK;
+
     std::vector<VertexElement<3, 3>*> elems(5, NULL);
 
     {
@@ -2475,8 +2488,6 @@ void MutableVertexMesh<3, 3>::PerformAsynchronousT1Swap(Node<3>* pNodeA, Node<3>
         for (unsigned i = 0; i < 4; ++i)
         {
             lateral_faces[i] = GetSharedLateralFace(elems[i], elems[i + 1]);
-            if (lateral_faces[i] != NULL)
-                PRINT_2_VARIABLES(i, lateral_faces[i]->GetIndex());
         }
 
         lateral_faces[2]->FaceUpdateNode(p_node_b, p_node_a);
@@ -2484,29 +2495,21 @@ void MutableVertexMesh<3, 3>::PerformAsynchronousT1Swap(Node<3>* pNodeA, Node<3>
 
         for (unsigned i = 0; i < 4; ++i)
         {
-            PRINT_VARIABLE(i);
             if (lateral_faces[i] != NULL)
             {
-                PRINT_2_VARIABLES(i, lateral_faces[i]->GetIndex());
-
                 lateral_faces[i]->FaceAddNode(p_new_node);
-
                 lateral_faces[i]->LateralFaceRearrangeNodes();
-
-                PrintElement(lateral_faces[i]);
             }
         }
-        MARK;
     }
-    MARK;
+
     for (unsigned i = 1; i <= 4; ++i)
     {
         if (elems[i] == NULL)
         {
             continue;
         }
-        MARK;
-        PRINT_VARIABLE(i)
+
         VertexElement<3, 3>* p_elem = elems[i];
         VertexElement<2, 3>* p_face = t1_on_basal ? GetBasalFace(p_elem) : GetApicalFace(p_elem);
 
@@ -2525,7 +2528,6 @@ void MutableVertexMesh<3, 3>::PerformAsynchronousT1Swap(Node<3>* pNodeA, Node<3>
                 p_elem->AddNode(p_node_b, p_elem->GetNumNodes() - 1);
                 p_elem->AddFace(p_new_swap);
 
-                MARK;
                 break;
             }
             case 2:
@@ -2536,7 +2538,6 @@ void MutableVertexMesh<3, 3>::PerformAsynchronousT1Swap(Node<3>* pNodeA, Node<3>
                 p_face->FaceDeleteNode(p_node_b);
                 p_elem->DeleteNode(p_elem->GetNodeLocalIndex(p_node_b->GetIndex()));
 
-                MARK;
                 break;
             }
             case 3:
@@ -2550,7 +2551,6 @@ void MutableVertexMesh<3, 3>::PerformAsynchronousT1Swap(Node<3>* pNodeA, Node<3>
                 p_elem->AddNode(p_node_a, p_elem->GetNumNodes() - 1);
                 p_elem->AddFace(p_new_swap);
 
-                MARK;
                 break;
             }
             case 4:
@@ -2561,7 +2561,6 @@ void MutableVertexMesh<3, 3>::PerformAsynchronousT1Swap(Node<3>* pNodeA, Node<3>
                 p_face->FaceDeleteNode(p_node_a);
                 p_elem->DeleteNode(p_elem->GetNodeLocalIndex(p_node_a->GetIndex()));
 
-                MARK;
                 break;
             }
             default:
@@ -2570,7 +2569,6 @@ void MutableVertexMesh<3, 3>::PerformAsynchronousT1Swap(Node<3>* pNodeA, Node<3>
 
         MARK;
         p_elem->MonolayerElementRearrangeFacesNodes();
-        MARK;
     }
 }
 

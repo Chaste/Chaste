@@ -121,7 +121,7 @@ public:
         {
             EXCEPTION("only to vertex mesh");
         }
-        MutableVertexMesh<3, 3>* p_mesh = dynamic_cast<MutableVertexMesh<3, 3>*>(&r_tmp_mesh);
+        MutableVertexMesh<3, 3>* p_mesh = static_cast<MutableVertexMesh<3, 3>*>(&r_tmp_mesh);
 
         for (unsigned i = 0; i < p_mesh->GetNumNodes(); ++i)
         {
@@ -141,18 +141,17 @@ public:
 
                     for (unsigned j = 0; j < p_face_tmp->GetNumNodes(); ++j)
                     {
-                        Node<3>* p_tmp_node = p_face_tmp->GetNode(i);
-                        if (IsApicalNode(p_tmp_node))
+                        Node<3>* p_tmp_node = p_face_tmp->GetNode(j);
+                        switch (GetNodeType(p_tmp_node))
                         {
-                            apical_nodes.push_back(p_tmp_node);
-                        }
-                        else if (IsBasalNode(p_tmp_node))
-                        {
-                            basal_nodes.push_back(p_tmp_node);
-                        }
-                        else
-                        {
-                            assert(p_tmp_node == p_node);
+                            case Monolayer::ApicalValue:
+                                apical_nodes.push_back(p_tmp_node);
+                                break;
+                            case Monolayer::BasalValue:
+                                basal_nodes.push_back(p_tmp_node);
+                                break;
+                            default:
+                                assert(p_tmp_node == p_node);
                         }
                     }
                 }

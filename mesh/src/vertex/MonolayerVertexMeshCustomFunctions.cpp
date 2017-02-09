@@ -408,13 +408,19 @@ void SetNodeAsLateral(Node<3>* pNode)
     pNode->AddNodeAttribute(Monolayer::SetLateralValue);
 }
 
-Monolayer::v_type GetNodeType(const Node<3>* pNode)
+template <unsigned DIM>
+Monolayer::v_type GetNodeType(const Node<DIM>* pNode)
 {
+    if (DIM != 3u)
+    {
+        NEVER_REACHED;
+    }
+
     /* implemented const node as there is no modication for this
      * function. However, there isn't suitable const function for
      * NodeAttribute and hence required a const_cast
      */
-    Node<3>* p_non_const_node = const_cast<Node<3>*>(pNode);
+    Node<DIM>* p_non_const_node = const_cast<Node<DIM>*>(pNode);
     switch (p_non_const_node->GetNumNodeAttributes())
     {
         case 0:
@@ -428,8 +434,10 @@ Monolayer::v_type GetNodeType(const Node<3>* pNode)
         default:
             NEVER_REACHED;
     }
-            
 }
+template Monolayer::v_type GetNodeType(const Node<1>* pNode);
+template Monolayer::v_type GetNodeType(const Node<2>* pNode);
+template Monolayer::v_type GetNodeType(const Node<3>* pNode);
 
 bool IsApicalNode(const Node<3>* pNode)
 {
