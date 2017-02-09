@@ -81,7 +81,7 @@ ImmersedBoundaryMouseEmbryoCrossSectionMeshGenerator::ImmersedBoundaryMouseEmbry
     unsigned num_nodes_in_line_part = numNodesMembrane - num_nodes_in_curved_part;
 
     // Initialise the membrane
-    SuperellipseGenerator *p_gen = new SuperellipseGenerator(2 * num_nodes_in_curved_part, ellipseExponent,
+    SuperellipseGenerator* p_gen = new SuperellipseGenerator(2 * num_nodes_in_curved_part, ellipseExponent,
                                                              membraneWidth, 2.0 * membraneHeight,
                                                              0.5 * (1.0 - membraneWidth), 0.5 * (1.0 - membraneHeight));
     std::vector<c_vector<double, 2> > locations = p_gen->GetPointsAsVectors();

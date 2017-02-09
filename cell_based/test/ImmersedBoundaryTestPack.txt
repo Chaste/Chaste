@@ -7,3 +7,4 @@ simulation/TestRepresentativeImmersedBoundarySimulations.hpp
 tutorial/TestRunningImmersedBoundarySimulationsTutorial.hpp
 simulation/TestIBMMouseEmbryoSimulation.hpp
 simulation/TestIBMMouseEmbryoSimulationv2.hpp
+simulation/TestIBMAVEMigrationSimulation.hpp

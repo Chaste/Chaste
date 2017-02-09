@@ -38,13 +38,73 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CHASTE_IMMERSEDBOUNDARYDROSOPHILAEMBRYOCROSSSECTIONMESHGENERATOR_HPP
 #define CHASTE_IMMERSEDBOUNDARYDROSOPHILAEMBRYOCROSSSECTIONMESHGENERATOR_HPP
 
+#include <cmath>
+#include <vector>
 
+#include "ImmersedBoundaryMesh.hpp"
+#include "SuperellipseGenerator.hpp"
+#include "UblasCustomFunctions.hpp"
 
-class ImmersedBoundaryDrosophilaEmbryoCrossSectionMeshGenerator 
+/**
+ * Creates a collection of immersed boundary elements to model a cross section of a drosophila embryo as an array of cells
+ *
+ * NOTE: the user should delete the mesh after use to manage memory.
+ * NOTE: the user should change mesh parameters like fluid grid spacing, as these are not altered from defaults here.
+ */
+
+class ImmersedBoundaryDrosophilaEmbryoCrossSectionMeshGenerator
 {
+protected:
+    /** A pointer to the mesh this class creates. */
+    ImmersedBoundaryMesh<2,2>* mpMesh;
+
+    /** Calculates the perimeter of the membrane */
+    double CalculateTotalArcLengthOfSuperellipse(double membraneWidth, double membraneHeight, double ellipseExponent);
+
+    /** Calculates the normal to the two points specified */
+    c_vector<double, 2> CalculateNormal(c_vector<double, 2> point_1, c_vector<double, 2> point_2);
+
+    /** @returns a set of points that represent a cell */
+    const std::vector<c_vector<double, 2> > BuildACell(double targetNodeSpacing,
+                                                       std::vector<c_vector<double, 2> > base,
+                                                       c_vector<double, 2> normal_1,
+                                                       c_vector<double, 2> normal_2,
+                                                       double cell_height) const;
+
+public:
+
+    /**
+     * Default constructor
+     * @param numCells - number of cells
+     * @param numNodesPerCell - number of nodes per cell
+     * @param radius - inner radius of the ring of cells
+     * @param cellHeight - height of the cells
+     */
+    ImmersedBoundaryDrosophilaEmbryoCrossSectionMeshGenerator(unsigned numCells=10,
+                                                              unsigned numNodesPerCell=100,
+                                                              double cellHeight=0.1,
+                                                              double radius=0.2,
+                                                              double aspectRatio=1.0,
+                                                              double ellipseExponent=1.0);
+
+    /** Null constructor - for derived classes to call */
+    ImmersedBoundaryDrosophilaEmbryoCrossSectionMeshGenerator()
+    {
+    };
+
+    /**
+     * Destructor
+     *
+     * Deletes the mesh and the pointer to it
+     */
+    virtual ~ImmersedBoundaryDrosophilaEmbryoCrossSectionMeshGenerator();
+
+    /**
+     * @return a 2D honeycomb mesh based on a 2D plane
+     */
+    ImmersedBoundaryMesh<2,2>* GetMesh();
 
 };
-
 
 
 #endif //CHASTE_IMMERSEDBOUNDARYDROSOPHILAEMBRYOCROSSSECTIONMESHGENERATOR_HPP

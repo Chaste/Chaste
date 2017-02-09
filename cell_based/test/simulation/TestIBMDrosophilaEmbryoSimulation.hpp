@@ -69,10 +69,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* To make sure that the test is not run in parallel */
 #include "FakePetscSetup.hpp"
 
-/* Not sure whether these still work */
-#include "ImmersedBoundaryMouseEmbryoCrossSectionMeshGenerator.hpp"
+/* Required specifically for this simulation */
+#include "ImmersedBoundaryDrosophilaEmbryoCrossSectionMeshGenerator.hpp"
 
-class TestIBMMouseEmbryoSimulationv2 : public AbstractCellBasedTestSuite
+class TestIBMDrosophilaEmbryoSimulation : public AbstractCellBasedTestSuite
 {
 public:
 	/*
@@ -83,12 +83,12 @@ public:
 	 * As a first approximation, the VE cells will be on a circular basement membrane, with the
 	 * lower half representing the VE cells around the epiblast
 	 */
-	void TestIBMMouseEmbryoCrossSectionSimulation() throw (Exception)
+	void TestIBMDrosophilaEmbryoSimulation() throw (Exception)
 	{
         /*
          * First use the mesh generator to set up the immersed boundary elements
          */
-		ImmersedBoundaryMouseEmbryoCrossSectionMeshGenerator generator(10);
+		ImmersedBoundaryDrosophilaEmbryoCrossSectionMeshGenerator generator();
 		ImmersedBoundaryMesh<2,2>* p_mesh = generator.GetMesh();
 
 		/*
@@ -115,7 +115,7 @@ public:
         simulator.GetNumericalMethod()->SetUseUpdateNodeLocation(true);
 
         double dt = 0.01;
-        simulator.SetOutputDirectory("TestIBMMouseEmbryoSimulationv2");
+        simulator.SetOutputDirectory("TestIBMDrosophilaEmbryoSimulation");
         simulator.SetDt(dt);
         simulator.SetSamplingTimestepMultiple(10);
         simulator.SetEndTime(100.0 * dt);
