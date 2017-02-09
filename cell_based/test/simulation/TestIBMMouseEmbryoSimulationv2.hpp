@@ -85,16 +85,9 @@ public:
 	 */
 	void TestIBMMouseEmbryoCrossSectionSimulation() throw (Exception)
 	{
-		/*
-		 * As in Fergus' simulation, we define a 2D mesh. This holds the information about
-		 * the underlying fluid grid and the locations of the cell boundary-points.
-		 * Hence, we have to use {{{ImmersedBoundaryPalisadeMeshGenerator}}}. The parameters are:
-		 * 1st: number of cells on the circular boundary
-		 * 2nd: number of boundary points in each cell
-		 * 3rd: 'superellipse' exponent which determines the initial cell shape: 1.0 is an ellipse and 0.0 is a rectangle
-		 * 4th: the initial aspect ratio of the cells
-		 * 5th: radius of the circular membrane
-		 */
+        /*
+         * First use the mesh generator to set up the immersed boundary elements
+         */
 		ImmersedBoundaryMouseEmbryoCrossSectionMeshGenerator generator(10);
 		ImmersedBoundaryMesh<2,2>* p_mesh = generator.GetMesh();
 
