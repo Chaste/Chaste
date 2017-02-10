@@ -53,9 +53,47 @@ ImmersedBoundaryDrosophilaEmbryoCrossSectionMeshGenerator::ImmersedBoundaryDroso
     assert(aspectRatio > 0);
     assert(ellipseExponent > 0);
 
-    // Create a circle around which the cells will be placed
-    // TODO: need a way to figure out a way to calculate the number of 
-    SuperellipseGenerator* p_gen = new SuperellipseGenerator(100, 1.0, )
+    // Calculate the necessary parameters
+    double membrane_width_base = 2.0 * aspectRatio * radius;
+    double membrane_height_base = 2.0 * radius;
+    double membrane_width_top = 2.0 * aspectRatio * radius + 2.0 * cellHeight;
+    double membrane_height_top = 2.0 * radius + 2.0 * cellHeight;
+
+    double membrane_base_arc_length = CalculateTotalArcLengthOfSuperellipse(membrane_width_base, membrane_height_base, ellipseExponent);
+    double membrane_top_arc_length = CalculateTotalArcLengthOfSuperellipse(membrane_width_top, membrane_height_top, ellipseExponent);
+
+    double total_cell_height_length = 2.0 * numCells * cellHeight;
+    double proportion_base = membrane_base_arc_length / (membrane_base_arc_length + membrane_top_arc_length + total_cell_height_length);
+    double proportion_top = membrane_top_arc_length / (membrane_base_arc_length + membrane_top_arc_length + total_cell_height_length);
+    unsigned total_num_nodes = numCells * numNodesPerCell;
+
+    unsigned membrane_base_num_nodes = proportion_base * total_num_nodes;
+    unsigned membrane_top_num_nodes = proportion_top * total_num_nodes;
+
+    // Create the circles around which the cells will be placed
+    SuperellipseGenerator* p_gen_base = new SuperellipseGenerator(membrane_base_num_nodes, ellipseExponent, membrane_width_base, membrane_height_base, 0.5 * (1.0 - membrane_width_base), 0.5 * (1.0 - membrane_height_base));
+    std::vector<c_vector<double, 2> > base_locations = p_gen_base->GetPointsAsVectors();
+    delete p_gen_base;
+
+    SuperellipseGenerator* p_gen_top = new SuperellipseGenerator(membrane_top_num_nodes, ellipseExponent, membrane_width_top, membrane_height_top, 0.5 * (1.0 - membrane_width_top), 0.5 * (1.0 - membrane_height_top));
+    std::vector<c_vector<double, 2> > top_locations = p_gen_top->GetPointsAsVectors();
+    delete p_gen_top;
+
+    // Create the containers for the nodes, immersed boundary elements and laminas
+    std::vector<Node<2>*> nodes;
+    std::vector<ImmersedBoundaryElement<2,2>*> ib_elements;
+    std::vector<ImmersedBoundaryElement<1,2>*> ib_laminas;
+
+    for (unsigned i = 0; i < top_locations.size(); i++)
+    {
+        Node<2>* p_node = new Node<2>(i, top_locations[i], true);
+        nodes.push_back(p_node);
+    }
+
+    ib_elements.push_back(new ImmersedBoundaryElement<2,2>(0, nodes));
+
+    mpMesh = new ImmersedBoundaryMesh<2,2>(nodes, ib_elements, ib_laminas);
+
 }
 
 ImmersedBoundaryDrosophilaEmbryoCrossSectionMeshGenerator::~ImmersedBoundaryDrosophilaEmbryoCrossSectionMeshGenerator()
