@@ -230,7 +230,7 @@ CellPtr ImmersedBoundaryCellPopulation<DIM>::AddCell(CellPtr pNewCell, CellPtr p
     ImmersedBoundaryElement<DIM, DIM>* p_element = GetElementCorrespondingToCell(pParentCell);
 
     // Get the orientation of division
-    c_vector<double, DIM> division_vector = unit_vector<double>(2, 0);
+    c_vector<double, DIM> division_vector = mpImmersedBoundaryDivisionRule->CalculateCellDivisionVector(pParentCell, *this);
 
     // Divide the element
     unsigned new_elem_idx = mpImmersedBoundaryMesh->DivideElementAlongGivenAxis(p_element, division_vector, true);
