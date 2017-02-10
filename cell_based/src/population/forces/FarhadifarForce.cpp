@@ -53,15 +53,11 @@ FarhadifarForce<DIM>::~FarhadifarForce()
 template<unsigned DIM>
 void FarhadifarForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation)
 {
-    // Throw an exception message if not using a VertexBasedCellPopulation
-    ///\todo: check whether this line influences profiling tests - if so, we should remove it.
-    if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation) == NULL)
-    {
-        EXCEPTION("FarhadifarForce is to be used with a VertexBasedCellPopulation only");
-    }
+	assert(dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL);
 
     // Define some helper variables
     VertexBasedCellPopulation<DIM>* p_cell_population = static_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation);
+    VertexMesh<DIM, DIM>& r_mesh = p_cell_population->rGetMesh();
     unsigned num_nodes = p_cell_population->GetNumNodes();
     unsigned num_elements = p_cell_population->GetNumElements();
 
@@ -69,19 +65,17 @@ void FarhadifarForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCe
     std::vector<double> element_areas(num_elements);
     std::vector<double> element_perimeters(num_elements);
     std::vector<double> target_areas(num_elements);
-    for (typename VertexMesh<DIM,DIM>::VertexElementIterator elem_iter = p_cell_population->rGetMesh().GetElementIteratorBegin();
-         elem_iter != p_cell_population->rGetMesh().GetElementIteratorEnd();
+    for (typename VertexMesh<DIM,DIM>::VertexElementIterator elem_iter = r_mesh.GetElementIteratorBegin();
+         elem_iter != r_mesh.GetElementIteratorEnd();
          ++elem_iter)
     {
         unsigned elem_index = elem_iter->GetIndex();
-        element_areas[elem_index] = p_cell_population->rGetMesh().GetVolumeOfElement(elem_index);
-        element_perimeters[elem_index] = p_cell_population->rGetMesh().GetSurfaceAreaOfElement(elem_index);
+        element_areas[elem_index] = r_mesh.GetVolumeOfElement(elem_index);
+        element_perimeters[elem_index] = r_mesh.GetSurfaceAreaOfElement(elem_index);
+
+        // Get the target area of the cell associated with this element, throwing an exception if this is not stored as a CellData item
         try
         {
-            // If we haven't specified a growth modifier, there won't be any target areas in the CellData array and CellData
-            // will throw an exception that it doesn't have "target area" entries.  We add this piece of code to give a more
-            // understandable message. There is a slight chance that the exception is thrown although the error is not about the
-            // target areas.
             target_areas[elem_index] = p_cell_population->GetCellUsingLocationIndex(elem_index)->GetCellData()->GetItem("target area");
         }
         catch (Exception&)
@@ -93,20 +87,6 @@ void FarhadifarForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCe
     // Iterate over vertices in the cell population
     for (unsigned node_index=0; node_index<num_nodes; node_index++)
     {
-        Node<DIM>* p_this_node = p_cell_population->GetNode(node_index);
-
-        /*
-         * The force on this Node is given by the gradient of the total free
-         * energy of the CellPopulation, evaluated at the position of the vertex. This
-         * free energy is the sum of the free energies of all CellPtrs in
-         * the cell population. The free energy of each CellPtr is comprised of three
-         * terms - an area deformation energy, a perimeter deformation energy
-         * and line tension energy.
-         *
-         * Note that since the movement of this Node only affects the free energy
-         * of the CellPtrs containing it, we can just consider the contributions
-         * to the free energy gradient from each of these CellPtrs.
-         */
         c_vector<double, DIM> area_elasticity_contribution = zero_vector<double>(DIM);
         c_vector<double, DIM> perimeter_contractility_contribution = zero_vector<double>(DIM);
         c_vector<double, DIM> line_tension_contribution = zero_vector<double>(DIM);
@@ -122,46 +102,62 @@ void FarhadifarForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCe
             // Get this element, its index and its number of nodes
             VertexElement<DIM, DIM>* p_element = p_cell_population->GetElement(*iter);
             unsigned elem_index = p_element->GetIndex();
-            unsigned num_nodes_elem = p_element->GetNumNodes();
 
             // Find the local index of this node in this element
             unsigned local_index = p_element->GetNodeLocalIndex(node_index);
 
             // Add the force contribution from this cell's area elasticity (note the minus sign)
-            c_vector<double, DIM> element_area_gradient =
-                    p_cell_population->rGetMesh().GetAreaGradientOfElementAtNode(p_element, local_index);
-            area_elasticity_contribution -= GetAreaElasticityParameter()*(element_areas[elem_index] -
-                    target_areas[elem_index])*element_area_gradient;
-
-            // Get the previous and next nodes in this element
-            unsigned previous_node_local_index = (num_nodes_elem+local_index-1)%num_nodes_elem;
-            Node<DIM>* p_previous_node = p_element->GetNode(previous_node_local_index);
-
-            unsigned next_node_local_index = (local_index+1)%num_nodes_elem;
-            Node<DIM>* p_next_node = p_element->GetNode(next_node_local_index);
-
-            // Compute the line tension parameter for each of these edges - be aware that this is half of the actual
-            // value for internal edges since we are looping over each of the internal edges twice
-            double previous_edge_line_tension_parameter = GetLineTensionParameter(p_previous_node, p_this_node, *p_cell_population);
-            double next_edge_line_tension_parameter = GetLineTensionParameter(p_this_node, p_next_node, *p_cell_population);
-
-            // Compute the gradient of each these edges, computed at the present node
-            c_vector<double, DIM> previous_edge_gradient =
-                    -p_cell_population->rGetMesh().GetNextEdgeGradientOfElementAtNode(p_element, previous_node_local_index);
-            c_vector<double, DIM> next_edge_gradient = p_cell_population->rGetMesh().GetNextEdgeGradientOfElementAtNode(p_element, local_index);
-
-            // Add the force contribution from cell-cell and cell-boundary line tension (note the minus sign)
-            line_tension_contribution -= previous_edge_line_tension_parameter*previous_edge_gradient +
-                    next_edge_line_tension_parameter*next_edge_gradient;
-
-            // Add the force contribution from this cell's perimeter contractility (note the minus sign)
-            c_vector<double, DIM> element_perimeter_gradient = previous_edge_gradient + next_edge_gradient;
-            perimeter_contractility_contribution -= GetPerimeterContractilityParameter()* element_perimeters[elem_index]*
-                                                                                                     element_perimeter_gradient;
+            c_vector<double, DIM> element_area_gradient = r_mesh.GetAreaGradientOfElementAtNode(p_element, local_index);
+            area_elasticity_contribution -= GetAreaElasticityParameter()*(element_areas[elem_index] - target_areas[elem_index])*element_area_gradient;
         }
 
-        c_vector<double, DIM> force_on_node = area_elasticity_contribution + perimeter_contractility_contribution + line_tension_contribution;
-        p_cell_population->GetNode(node_index)->AddAppliedForceContribution(force_on_node);
+        p_cell_population->GetNode(node_index)->AddAppliedForceContribution(area_elasticity_contribution);
+    }
+
+    // Iterate over all edges and add line tension and perimeter contractility force contributions
+    for (typename VertexMesh<DIM, DIM>::EdgeIterator edge_iter = r_mesh.EdgesBegin();
+         edge_iter != r_mesh.EdgesEnd();
+         ++edge_iter)
+    {
+    	// Compute the line tension parameter for this edge
+        double line_tension_parameter = GetBoundaryLineTensionParameter();
+
+        unsigned node_A_index = edge_iter.GetNodeA()->GetIndex();
+        unsigned node_B_index = edge_iter.GetNodeB()->GetIndex();
+
+        const c_vector<double, DIM>& r_node_A_location = edge_iter.GetNodeA()->rGetLocation();
+        const c_vector<double, DIM>& r_node_B_location = edge_iter.GetNodeB()->rGetLocation();
+
+        c_vector<double, DIM> edge_vector = r_mesh.GetVectorFromAtoB(r_node_B_location, r_node_A_location);
+        double edge_length = norm_2(edge_vector);
+
+        assert(edge_length > DBL_EPSILON);
+
+        c_vector<double, DIM> edge_gradient = edge_vector/edge_length;
+
+        // Perimeter contractility term
+        unsigned elem_index = edge_iter.GetElemIndex();
+        c_vector<double, DIM> perimeter_contractility_force_on_node_A = -GetPerimeterContractilityParameter()* element_perimeters[elem_index]*edge_gradient;
+        c_vector<double, DIM> perimeter_contractility_force_on_node_B = -perimeter_contractility_force_on_node_A;
+        r_mesh.GetNode(node_A_index)->AddAppliedForceContribution(perimeter_contractility_force_on_node_A);
+        r_mesh.GetNode(node_B_index)->AddAppliedForceContribution(perimeter_contractility_force_on_node_B);
+
+        unsigned other_elem_index = edge_iter.GetOtherElemIndex();
+        if (other_elem_index != UINT_MAX)
+        {
+        	line_tension_parameter = GetLineTensionParameter();
+
+            perimeter_contractility_force_on_node_A = -GetPerimeterContractilityParameter()* element_perimeters[other_elem_index]*edge_gradient;
+            perimeter_contractility_force_on_node_B = -perimeter_contractility_force_on_node_A;
+            r_mesh.GetNode(node_A_index)->AddAppliedForceContribution(perimeter_contractility_force_on_node_A);
+            r_mesh.GetNode(node_B_index)->AddAppliedForceContribution(perimeter_contractility_force_on_node_B);
+        }
+
+        // Line tension term
+        c_vector<double, DIM> line_tension_force_on_node_A = -line_tension_parameter*edge_gradient;
+        c_vector<double, DIM> line_tension_force_on_node_B = -line_tension_force_on_node_A;
+        r_mesh.GetNode(node_A_index)->AddAppliedForceContribution(line_tension_force_on_node_A);
+        r_mesh.GetNode(node_B_index)->AddAppliedForceContribution(line_tension_force_on_node_B);
     }
 }
 

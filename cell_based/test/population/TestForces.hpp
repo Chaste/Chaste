@@ -1828,11 +1828,6 @@ public:
         TS_ASSERT_THROWS_THIS(weliky_oster_force.AddForceContribution(cell_population),
                 "WelikyOsterForce is to be used with a VertexBasedCellPopulation only");
 
-        // Test that FarhadifarForce throws the correct exception
-        FarhadifarForce<2> farhadifar_force;
-        TS_ASSERT_THROWS_THIS(farhadifar_force.AddForceContribution(cell_population),
-                "FarhadifarForce is to be used with a VertexBasedCellPopulation only");
-
         // Avoid memory leak
         for (unsigned i=0; i<nodes.size(); i++)
         {

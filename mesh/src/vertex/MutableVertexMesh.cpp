@@ -47,13 +47,13 @@ MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::MutableVertexMesh(std::vector<Node<SP
                                                              double protorosetteFormationProbability,
                                                              double protorosetteResolutionProbabilityPerTimestep,
                                                              double rosetteResolutionProbabilityPerTimestep)
-        : mCellRearrangementThreshold(cellRearrangementThreshold),
-          mCellRearrangementRatio(cellRearrangementRatio),
-          mT2Threshold(t2Threshold),
-          mProtorosetteFormationProbability(protorosetteFormationProbability),
-          mProtorosetteResolutionProbabilityPerTimestep(protorosetteResolutionProbabilityPerTimestep),
-          mRosetteResolutionProbabilityPerTimestep(rosetteResolutionProbabilityPerTimestep),
-          mCheckForInternalIntersections(false)
+    : mCellRearrangementThreshold(cellRearrangementThreshold),
+      mCellRearrangementRatio(cellRearrangementRatio),
+      mT2Threshold(t2Threshold),
+      mProtorosetteFormationProbability(protorosetteFormationProbability),
+      mProtorosetteResolutionProbabilityPerTimestep(protorosetteResolutionProbabilityPerTimestep),
+      mRosetteResolutionProbabilityPerTimestep(rosetteResolutionProbabilityPerTimestep),
+      mCheckForInternalIntersections(false)
 {
     // Threshold parameters must be strictly positive
     assert(cellRearrangementThreshold > 0.0);
@@ -858,7 +858,6 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(VertexElementMap& rElemen
     assert(SPACE_DIM==2 || SPACE_DIM==3); 	// LCOV_EXCL_LINE
     assert(ELEMENT_DIM == SPACE_DIM); 		// LCOV_EXCL_LINE
 
-
     if (SPACE_DIM == 2)
     {
         // Make sure the map is big enough
@@ -873,7 +872,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(VertexElementMap& rElemen
         bool recheck_mesh = true;
         while (recheck_mesh == true)
         {
-            // We check for any short edges and perform swaps if necessary and possible.
+            // We check for any short edges and perform swaps if necessary and possible
             recheck_mesh = CheckForSwapsFromShortEdges();
         }
 
@@ -912,58 +911,35 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForSwapsFromShortEdges()
 {
-    // Loop over elements to check for T1 swaps
-    for (typename VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator elem_iter = this->GetElementIteratorBegin();
-         elem_iter != this->GetElementIteratorEnd();
-         ++elem_iter)
-    {
-        ///\todo Could we search more efficiently by just iterating over edges? (see #2401)
+	// Iterate over edges
+	for (typename VertexMesh<ELEMENT_DIM, SPACE_DIM>::EdgeIterator edge_iter = this->EdgesBegin();
+         edge_iter != this->EdgesEnd();
+         ++edge_iter)
+   {
+		Node<SPACE_DIM>* p_node_A = edge_iter.GetNodeA();
+		Node<SPACE_DIM>* p_node_B = edge_iter.GetNodeB();
 
-        unsigned num_nodes = elem_iter->GetNumNodes();
-        assert(num_nodes > 0);
+		// Find length of edge
+        const c_vector<double, SPACE_DIM>& r_node_A_location = p_node_A->rGetLocation();
+        const c_vector<double, SPACE_DIM>& r_node_B_location = p_node_B->rGetLocation();
+        c_vector<double, SPACE_DIM> edge_vector = this->GetVectorFromAtoB(r_node_B_location, r_node_A_location);
+        double edge_length = norm_2(edge_vector);
 
-        // Loop over the nodes contained in this element
-        for (unsigned local_index=0; local_index<num_nodes; local_index++)
+        // If the edge is too short...
+        if (edge_length < mCellRearrangementThreshold)
         {
-            // Find locations of the current node and anticlockwise node
-            Node<SPACE_DIM>* p_current_node = elem_iter->GetNode(local_index);
-            unsigned local_index_plus_one = (local_index+1)%num_nodes;    ///\todo Use iterators to tidy this up (see #2401)
-            Node<SPACE_DIM>* p_anticlockwise_node = elem_iter->GetNode(local_index_plus_one);
-
-            // Find distance between nodes
-            double distance_between_nodes = this->GetDistanceBetweenNodes(p_current_node->GetIndex(), p_anticlockwise_node->GetIndex());
-
-            // If the nodes are too close together...
-            if (distance_between_nodes < mCellRearrangementThreshold)
-            {
-                // ...then check if any triangular elements are shared by these nodes...
-                std::set<unsigned> elements_of_node_a = p_current_node->rGetContainingElementIndices();
-                std::set<unsigned> elements_of_node_b = p_anticlockwise_node->rGetContainingElementIndices();
-
-                std::set<unsigned> shared_elements;
-                std::set_intersection(elements_of_node_a.begin(), elements_of_node_a.end(),
-                               elements_of_node_b.begin(), elements_of_node_b.end(),
-                               std::inserter(shared_elements, shared_elements.begin()));
-
-                bool both_nodes_share_triangular_element = false;
-                for (std::set<unsigned>::const_iterator it = shared_elements.begin();
-                     it != shared_elements.end();
-                     ++it)
-                {
-                    if (this->GetElement(*it)->GetNumNodes() <= 3)
-                    {
-                        both_nodes_share_triangular_element = true;
-                        break;
-                    }
-                }
-
-                // ...and if none are, then perform the required type of swap and halt the search, returning true
-                if (!both_nodes_share_triangular_element)
-                {
-                    IdentifySwapType(p_current_node, p_anticlockwise_node);
-                    return true;
-                }
-            }
+        	// ...and the edge is not contained in a triangular element...
+        	unsigned elem_index = edge_iter.GetElemIndex();
+        	if (this->GetElement(elem_index)->GetNumNodes() != 3)
+        	{
+            	unsigned other_elem_index = edge_iter.GetOtherElemIndex();
+            	if ((other_elem_index == UINT_MAX) || (this->GetElement(other_elem_index)->GetNumNodes() != 3))
+            	{
+					// ...then perform the required type of swap and halt the search, returning true
+					IdentifySwapType(p_node_A, p_node_B);
+					return true;
+            	}
+        	}
         }
     }
 
@@ -986,7 +962,6 @@ bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForT2Swaps(VertexElementMap
             {
                 // ...then perform a T2 swap and break out of the loop
                 PerformT2Swap(*elem_iter);
-                ///\todo: cover this line in a test
                 rElementMap.SetDeleted(elem_iter->GetIndex());
                 return true;
             }
@@ -1584,7 +1559,6 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformIntersectionSwap(Node<SPA
     assert(SPACE_DIM == 2);					// LCOV_EXCL_LINE
     assert(ELEMENT_DIM == SPACE_DIM);		// LCOV_EXCL_LINE
 
-
     VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = this->GetElement(elementIndex);
     unsigned num_nodes = p_element->GetNumNodes();
 
@@ -1714,7 +1688,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformIntersectionSwap(Node<SPA
     unsigned node_A_local_index_in_4 = this->GetElement(element_4_index)->GetNodeLocalIndex(node_A_index);
     unsigned node_B_local_index_in_4 = this->GetElement(element_4_index)->GetNodeLocalIndex(node_B_index);
 
-    if (intersected_edge==node_B_local_index_in_3)
+    if (intersected_edge == node_B_local_index_in_3)
     {
         /*
          * Add node B to element 1 after node A

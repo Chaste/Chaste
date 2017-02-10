@@ -113,10 +113,14 @@ public:
 
     /**
      * Overridden AddForceContribution() method.
-     *
-     * Calculates the force on each node in the vertex-based cell population based on the energy function
-     * Farhadifar's model.
-     *
+	 *
+	 * The force on each node is given by the gradient of the total free energy of the CellPopulation,
+	 * as proposed by Farhadifar et al, evaluated at the node's position. This free energy is the sum
+	 * of the free energy of each cell, which is comprised of three terms: an area deformation term; a
+	 * perimeter deformation term; and a line tension term. Since the movement of each node only affects
+	 * the free energy of the cells containing it, we can just consider the contributions to the free
+	 * energy gradient from each of those cells.
+	 *
      * @param rCellPopulation reference to the cell population
      */
     virtual void AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation);
