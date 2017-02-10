@@ -455,13 +455,22 @@ template <unsigned DIM>
 bool ImmersedBoundaryCellPopulation<DIM>::IsCellAssociatedWithADeletedLocation(CellPtr pCell)
 {
     return GetElementCorrespondingToCell(pCell)->IsDeleted();
-    ;
 }
 
 template <unsigned DIM>
 void ImmersedBoundaryCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
 {
-    // I don't think this is needed for IB
+    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
+         cell_iter != this->End();
+         ++cell_iter)
+    {
+        double target_area = cell_iter->GetCellData()->GetItem("target area");
+        double actual_area = this->GetVolumeOfCell(*cell_iter);
+
+        double strength = 1e-2 * (target_area - actual_area) / target_area;
+
+        this->GetElementCorrespondingToCell(*cell_iter)->GetFluidSource()->SetStrength(strength);
+    }
 }
 
 template <unsigned DIM>
