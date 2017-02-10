@@ -32,6 +32,7 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
+
 #ifndef VERTEXMESH_HPP_
 #define VERTEXMESH_HPP_
 
@@ -654,11 +655,83 @@ public:
          */
         inline bool IsAllowedElement();
     };
+
+    /**
+     * Iterator over edges in the mesh.
+     *
+     * This class takes care of the logic to make sure that you consider each edge exactly once.
+     */
+    class EdgeIterator
+    {
+    public:
+        /**
+         * @return a pointer to the node in the mesh at end A of the edge.
+         */
+        Node<SPACE_DIM>* GetNodeA();
+        /**
+         * @return a pointer to the node in the mesh at end B of the edge.
+         */
+        Node<SPACE_DIM>* GetNodeB();
+
+        /**
+         * @return comparison not-equal-to.
+         *
+         * @param rOther edge iterator with which comparison is made
+         */
+        bool operator!=(const typename VertexMesh<ELEMENT_DIM, SPACE_DIM>::EdgeIterator& rOther);
+
+        /**
+         * @return #mElemIndex
+         */
+        unsigned GetElemIndex();
+
+        /**
+         * @return the element index that shares this edge with #mElemIndex, or UINT_MAX if it is a boundary edge
+         */
+        unsigned GetOtherElemIndex();
+
+        /**
+         * Prefix increment operator.
+         * @return reference to incremented object
+         */
+        EdgeIterator& operator++();
+
+        /**
+         * Constructor for a new edge iterator.
+         *
+         * @param rMesh  The mesh
+         * @param elemIndex  An element index
+         */
+        EdgeIterator(VertexMesh& rMesh, unsigned elemIndex);
+
+    private:
+        /**
+         * Keep track of what edges have been visited.
+         * Each edge is stored as a pair of ordered indices.
+         */
+        std::set< std::pair<unsigned, unsigned> > mEdgesVisited;
+
+        VertexMesh& mrMesh;   /**< The mesh. */
+
+        unsigned mElemIndex;       /**< Element index. */
+        unsigned mNodeALocalIndex; /**< Index of one node on the edge. */
+        unsigned mNodeBLocalIndex; /**< Index of the other node on the edge. */
+    };
+
+    /**
+     * @return iterator pointing to the first edge (i.e. connection between 2 nodes) of the mesh
+     */
+    EdgeIterator EdgesBegin();
+
+    /**
+     * @return iterator pointing to one past the last edge (i.e. connection between 2 nodes)
+     * of the mesh
+     */
+    EdgeIterator EdgesEnd();
 };
 
 #include "SerializationExportWrapper.hpp"
 EXPORT_TEMPLATE_CLASS_ALL_DIMS(VertexMesh)
-
 
 //////////////////////////////////////////////////////////////////////////////
 // VertexElementIterator class implementation - most methods are inlined    //
@@ -743,6 +816,173 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator::IsAllowedElement()
 {
     return !(mSkipDeletedElements && (*this)->IsDeleted());
+}
+
+//////////////////////////////////////////////////////////////////////////////
+//                          Edge iterator class                             //
+//////////////////////////////////////////////////////////////////////////////
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+Node<SPACE_DIM>* VertexMesh<ELEMENT_DIM, SPACE_DIM>::EdgeIterator::GetNodeA()
+{
+    assert((*this) != mrMesh.EdgesEnd());
+    VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = mrMesh.GetElement(mElemIndex);
+    return p_element->GetNode(mNodeALocalIndex);
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+Node<SPACE_DIM>* VertexMesh<ELEMENT_DIM, SPACE_DIM>::EdgeIterator::GetNodeB()
+{
+    assert((*this) != mrMesh.EdgesEnd());
+    VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = mrMesh.GetElement(mElemIndex);
+    return p_element->GetNode(mNodeBLocalIndex);
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool VertexMesh<ELEMENT_DIM, SPACE_DIM>::EdgeIterator::operator!=(const typename VertexMesh<ELEMENT_DIM, SPACE_DIM>::EdgeIterator& rOther)
+{
+    return (mElemIndex != rOther.mElemIndex ||
+            mNodeALocalIndex != rOther.mNodeALocalIndex ||
+            mNodeBLocalIndex != rOther.mNodeBLocalIndex);
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::EdgeIterator::GetElemIndex()
+{
+    return mElemIndex;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::EdgeIterator::GetOtherElemIndex()
+{
+    // Get a pointer to this element
+    VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = mrMesh.GetElement(mElemIndex);
+
+    // Find the indices of the elements owned by each node
+    std::set<unsigned>& elements_containing_node_A = p_element->GetNode(mNodeALocalIndex)->rGetContainingElementIndices();
+    std::set<unsigned>& elements_containing_node_B = p_element->GetNode(mNodeBLocalIndex)->rGetContainingElementIndices();
+
+    // Find the common elements
+    std::set<unsigned> shared_elements;
+    std::set_intersection(elements_containing_node_A.begin(),
+                          elements_containing_node_A.end(),
+                          elements_containing_node_B.begin(),
+                          elements_containing_node_B.end(),
+                          std::inserter(shared_elements, shared_elements.begin()));
+
+    // Remove the element index we already know about
+    shared_elements.erase(mElemIndex);
+
+    if (shared_elements.empty())
+    {
+        return UINT_MAX;
+    }
+
+    assert(shared_elements.size() == 1);
+    return *(shared_elements.begin());
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+typename VertexMesh<ELEMENT_DIM, SPACE_DIM>::EdgeIterator& VertexMesh<ELEMENT_DIM, SPACE_DIM>::EdgeIterator::operator++()
+{
+    bool already_seen_this_edge;
+
+    unsigned num_elements = mrMesh.GetNumAllElements();
+    std::pair<unsigned, unsigned> current_node_pair;
+
+    do
+    {
+        // Advance to the next edge in the mesh
+
+        unsigned num_nodes_in_element = mrMesh.GetElement(mElemIndex)->GetNumNodes();
+
+        mNodeALocalIndex = (mNodeALocalIndex + 1) % num_nodes_in_element;
+        mNodeBLocalIndex = (mNodeBLocalIndex + 1) % num_nodes_in_element;
+
+        if (mNodeALocalIndex == 0 && mNodeBLocalIndex == 1) // advance to next element...
+        {
+            // ...skipping deleted ones
+            do
+            {
+                mElemIndex++;
+            }
+            while (mElemIndex!=num_elements && mrMesh.GetElement(mElemIndex)->IsDeleted());
+        }
+
+        if (mElemIndex != num_elements)
+        {
+            VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = mrMesh.GetElement(mElemIndex);
+            unsigned node_a_global_index = p_element->GetNodeGlobalIndex(mNodeALocalIndex);
+            unsigned node_b_global_index = p_element->GetNodeGlobalIndex(mNodeBLocalIndex);
+            if (node_b_global_index < node_a_global_index)
+            {
+                // Swap them over
+                unsigned temp = node_a_global_index;
+                node_a_global_index = node_b_global_index;
+                node_b_global_index = temp;
+            }
+
+            // Check we haven't seen it before
+            current_node_pair = std::pair<unsigned, unsigned>(node_a_global_index, node_b_global_index);
+            already_seen_this_edge = (mEdgesVisited.count(current_node_pair) != 0);
+        }
+        else
+        {
+            already_seen_this_edge = false;
+        }
+    }
+
+    while (already_seen_this_edge);
+    mEdgesVisited.insert(current_node_pair);
+
+    return (*this);
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+VertexMesh<ELEMENT_DIM, SPACE_DIM>::EdgeIterator::EdgeIterator(VertexMesh& rMesh, unsigned elemIndex)
+    : mrMesh(rMesh),
+      mElemIndex(elemIndex),
+      mNodeALocalIndex(0),
+      mNodeBLocalIndex(1)
+{
+    if (elemIndex == mrMesh.GetNumAllElements())
+    {
+        return;
+    }
+
+    mEdgesVisited.clear();
+
+    // Add the current node pair to the store
+    unsigned node_a_global_index = mrMesh.GetElement(mElemIndex)->GetNodeGlobalIndex(mNodeALocalIndex);
+    unsigned node_b_global_index = mrMesh.GetElement(mElemIndex)->GetNodeGlobalIndex(mNodeBLocalIndex);
+    if (node_b_global_index < node_a_global_index)
+    {
+        // Swap them over
+        unsigned temp = node_a_global_index;
+        node_a_global_index = node_b_global_index;
+        node_b_global_index = temp;
+    }
+
+    // Check we haven't seen it before
+    std::pair<unsigned, unsigned> current_node_pair = std::pair<unsigned, unsigned>(node_a_global_index, node_b_global_index);
+    mEdgesVisited.insert(current_node_pair);
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+typename VertexMesh<ELEMENT_DIM, SPACE_DIM>::EdgeIterator VertexMesh<ELEMENT_DIM, SPACE_DIM>::EdgesBegin()
+{
+    unsigned first_element_index = 0;
+    while ((first_element_index!=this->GetNumAllElements()) && (this->GetElement(first_element_index)->IsDeleted()))
+    {
+        first_element_index++;
+    }
+    return EdgeIterator(*this, first_element_index);
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+typename VertexMesh<ELEMENT_DIM, SPACE_DIM>::EdgeIterator VertexMesh<ELEMENT_DIM, SPACE_DIM>::EdgesEnd()
+{
+    return EdgeIterator(*this, this->GetNumAllElements());
 }
 
 #endif /*VERTEXMESH_HPP_*/

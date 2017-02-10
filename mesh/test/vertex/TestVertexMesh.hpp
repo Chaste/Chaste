@@ -2124,7 +2124,6 @@ public:
         TS_ASSERT_DELTA(voronoi_mesh.GetSurfaceAreaOfElement(0), 9.0*sqrt(3.0)/2.0, 1e-4);
     }
 
-
     void TestTessellationConstructor3dWithRepeatedCircumcentres() throw (Exception)
     {
         std::vector<Node<3>*> nodes;
@@ -2180,6 +2179,141 @@ public:
             volume += voronoi_mesh.GetVolumeOfElement(i);
         }
         TS_ASSERT_DELTA(volume, 31.5, 1e-4); // Agrees with Paraview
+    }
+
+    void TestEdgeIterator() throw (Exception)
+    {
+        // Create a simple 2D vertex mesh
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, false, 1.0, 0.0));
+        nodes.push_back(new Node<2>(2, false, 1.5, 1.0));
+        nodes.push_back(new Node<2>(3, false, 1.0, 2.0));
+        nodes.push_back(new Node<2>(4, false, 0.0, 1.0));
+        nodes.push_back(new Node<2>(5, false, 2.0, 0.0));
+        nodes.push_back(new Node<2>(6, false, 2.0, 3.0));
+        nodes.push_back(new Node<2>(7, false, 0.0, 3.0));
+
+        std::vector<std::vector<Node<2>*> > nodes_elements(3);
+        for (unsigned i=0; i<5; i++)
+        {
+            nodes_elements[0].push_back(nodes[i]);
+        }
+        nodes_elements[1].push_back(nodes[2]);
+        nodes_elements[1].push_back(nodes[5]);
+        nodes_elements[1].push_back(nodes[6]);
+        nodes_elements[2].push_back(nodes[3]);
+        nodes_elements[2].push_back(nodes[7]);
+        nodes_elements[2].push_back(nodes[4]);
+
+        std::vector<VertexElement<2,2>*> elements;
+        elements.push_back(new VertexElement<2,2>(0, nodes_elements[0]));
+        elements.push_back(new VertexElement<2,2>(1, nodes_elements[1]));
+        elements.push_back(new VertexElement<2,2>(2, nodes_elements[2]));
+
+        VertexMesh<2,2> mesh(nodes, elements);
+
+        ///\todo Test that the iterator skips deleted elements
+//        mesh.DeleteElementPriorToReMesh(2);
+
+        // Check that we can iterate over the set of edges
+        std::set< std::set<unsigned> > edges_visited;
+
+        for (VertexMesh<2,2>::EdgeIterator edge_iter = mesh.EdgesBegin();
+             edge_iter != mesh.EdgesEnd();
+             ++edge_iter)
+        {
+            std::set<unsigned> node_pair;
+            node_pair.insert(edge_iter.GetNodeA()->GetIndex());
+            node_pair.insert(edge_iter.GetNodeB()->GetIndex());
+
+            TS_ASSERT_EQUALS(edges_visited.find(node_pair), edges_visited.end());
+            edges_visited.insert(node_pair);
+        }
+
+        // Set up expected node pairs and shared elements
+        std::set< std::set<unsigned> > expected_node_pairs;
+        std::set<unsigned> node_pair_0;
+        node_pair_0.insert(0);
+        node_pair_0.insert(1);
+        expected_node_pairs.insert(node_pair_0);
+        std::set<unsigned> node_pair_1;
+        node_pair_1.insert(1);
+        node_pair_1.insert(2);
+        expected_node_pairs.insert(node_pair_1);
+        std::set<unsigned> node_pair_2;
+        node_pair_2.insert(2);
+        node_pair_2.insert(3);
+        expected_node_pairs.insert(node_pair_2);
+        std::set<unsigned> node_pair_3;
+        node_pair_3.insert(3);
+        node_pair_3.insert(4);
+        expected_node_pairs.insert(node_pair_3);
+        std::set<unsigned> node_pair_4;
+        node_pair_4.insert(4);
+        node_pair_4.insert(0);
+        expected_node_pairs.insert(node_pair_4);
+        std::set<unsigned> node_pair_5;
+        node_pair_5.insert(2);
+        node_pair_5.insert(5);
+        expected_node_pairs.insert(node_pair_5);
+        std::set<unsigned> node_pair_6;
+        node_pair_6.insert(5);
+        node_pair_6.insert(6);
+        expected_node_pairs.insert(node_pair_6);
+        std::set<unsigned> node_pair_7;
+        node_pair_7.insert(6);
+        node_pair_7.insert(2);
+        expected_node_pairs.insert(node_pair_7);
+        std::set<unsigned> node_pair_8;
+        node_pair_8.insert(3);
+        node_pair_8.insert(7);
+        expected_node_pairs.insert(node_pair_8);
+        std::set<unsigned> node_pair_9;
+        node_pair_9.insert(7);
+        node_pair_9.insert(4);
+        expected_node_pairs.insert(node_pair_9);
+
+        // Test that we visit the correct edges
+        TS_ASSERT_EQUALS(edges_visited, expected_node_pairs);
+
+        // Record the element(s) sharing each edge
+        std::set< std::set<unsigned> > elem_pairs;
+        for (VertexMesh<2,2>::EdgeIterator edge_iter = mesh.EdgesBegin();
+             edge_iter != mesh.EdgesEnd();
+             ++edge_iter)
+        {
+            std::set<unsigned> elem_pair;
+            elem_pair.insert(edge_iter.GetElemIndex());
+            elem_pair.insert(edge_iter.GetOtherElemIndex());
+            elem_pairs.insert(elem_pair);
+        }
+
+        std::set< std::set<unsigned> > expected_elem_pairs;
+
+        // We expect some edges to be contained in element 0 only
+        std::set<unsigned> expected_elem_pair_0;
+        expected_elem_pair_0.insert(0);
+        expected_elem_pair_0.insert(UINT_MAX);
+        expected_elem_pairs.insert(expected_elem_pair_0);
+        // We expect some edges to be contained in element 1 only
+        std::set<unsigned> expected_elem_pair_1;
+        expected_elem_pair_1.insert(1);
+        expected_elem_pair_1.insert(UINT_MAX);
+        expected_elem_pairs.insert(expected_elem_pair_1);
+        // We expect some edges to be contained in element 2 only
+        std::set<unsigned> expected_elem_pair_2;
+        expected_elem_pair_2.insert(2);
+        expected_elem_pair_2.insert(UINT_MAX);
+        expected_elem_pairs.insert(expected_elem_pair_2);
+        // We expect one edge to be shared by elements 0 and 2
+        std::set<unsigned> expected_elem_pair_3;
+        expected_elem_pair_3.insert(0);
+        expected_elem_pair_3.insert(2);
+        expected_elem_pairs.insert(expected_elem_pair_3);
+
+        // Test that we find the correct element(s) sharing each edge
+        TS_ASSERT_EQUALS(elem_pairs, expected_elem_pairs);
     }
 };
 
