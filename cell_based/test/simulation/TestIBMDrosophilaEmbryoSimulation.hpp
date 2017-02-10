@@ -88,7 +88,7 @@ public:
         /*
          * First use the mesh generator to set up the immersed boundary elements
          */
-		ImmersedBoundaryDrosophilaEmbryoCrossSectionMeshGenerator generator();
+		ImmersedBoundaryDrosophilaEmbryoCrossSectionMeshGenerator generator(10, 100, 0.1, 0.2, 1.0, 1.0);
 		ImmersedBoundaryMesh<2,2>* p_mesh = generator.GetMesh();
 
 		/*
