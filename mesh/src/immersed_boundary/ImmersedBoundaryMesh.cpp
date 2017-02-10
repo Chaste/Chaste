@@ -1120,8 +1120,8 @@ unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAx
 
     // Now call DivideElement() to divide the element using the nodes found above
     unsigned new_element_index = DivideElement(pElement,
-                                               pElement->GetNodeLocalIndex(intersecting_nodes[0]),
-                                               pElement->GetNodeLocalIndex(intersecting_nodes[1]),
+                                               intersecting_nodes[0],
+                                               intersecting_nodes[1],
                                                centroid,
                                                axisOfDivision);
 
