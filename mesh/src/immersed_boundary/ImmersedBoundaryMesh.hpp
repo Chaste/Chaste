@@ -606,6 +606,14 @@ public:
     bool NodesInDifferentElementOrLamina(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB);
 
     /**
+     * Given an element index, find a set containing the indices of its neighbouring elements.
+     *
+     * @param elemIdx global index of the element
+     * @return a set  of its neighbouring element indices
+     */
+    std::set<unsigned> GetNeighbouringElementIndices(unsigned elemIdx);
+
+    /**
      * A smart iterator over the elements in the mesh.
      */
     class ImmersedBoundaryElementIterator

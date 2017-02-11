@@ -1687,6 +1687,29 @@ bool ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::NodesInDifferentElementOrLami
     }
 }
 
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+std::set<unsigned> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetNeighbouringElementIndices(unsigned elemIdx)
+{
+    if (mLaminas.size() > 0)
+    {
+        EXCEPTION("This method does not yet work in the presence of laminas");
+    }
+
+    std::set<unsigned> indices;
+
+    for (unsigned node_idx = 0; node_idx < GetElement(elemIdx)->GetNumNodes(); ++node_idx)
+    {
+        const std::vector<unsigned>& node_neighbours = GetElement(elemIdx)->GetNode(node_idx)->rGetNeighbours();
+
+        for(std::vector<unsigned>::const_iterator neighbour_it = node_neighbours.begin();
+            neighbour_it != node_neighbours.end(); ++neighbour_it)
+        {
+            indices.insert(*neighbour_it);
+        }
+    }
+
+    indices.erase(elemIdx);
+}
 
 // Explicit instantiation
 template class ImmersedBoundaryMesh<1, 1>;
