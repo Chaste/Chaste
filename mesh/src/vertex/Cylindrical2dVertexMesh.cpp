@@ -114,9 +114,9 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh)
         std::vector<std::pair<double, unsigned> > index_angle_list;
         for (unsigned local_index=0; local_index<mElements[elem_index]->GetNumNodes(); local_index++)
         {
-            c_vector<double, 2> vectorA = mpDelaunayMesh->GetNode(elem_index)->rGetLocation();
-            c_vector<double, 2> vectorB = mElements[elem_index]->GetNodeLocation(local_index);
-            c_vector<double, 2> centre_to_vertex = mpDelaunayMesh->GetVectorFromAtoB(vectorA, vectorB);
+            const c_vector<double, 2>& r_vectorA = mpDelaunayMesh->GetNode(elem_index)->rGetLocation();
+            const c_vector<double, 2>& r_vectorB = mElements[elem_index]->GetNodeLocation(local_index);
+            c_vector<double, 2> centre_to_vertex = mpDelaunayMesh->GetVectorFromAtoB(r_vectorA, r_vectorB);
 
             double angle = atan2(centre_to_vertex(1), centre_to_vertex(0));
             unsigned global_index = mElements[elem_index]->GetNodeGlobalIndex(local_index);
@@ -237,15 +237,14 @@ MutableVertexMesh<2, 2>* Cylindrical2dVertexMesh::GetMeshForVtk()
     // Create four copies of each node
     for (unsigned index=0; index<num_nodes; index++)
     {
-        c_vector<double, 2> location;
-        location = GetNode(index)->rGetLocation();
+        const c_vector<double, 2>& r_location = GetNode(index)->rGetLocation();
 
         // Node copy at original location
-        Node<2>* p_node = new Node<2>(index, false, location[0], location[1]);
+        Node<2>* p_node = new Node<2>(index, false, r_location[0], r_location[1]);
         temp_nodes[index] = p_node;
 
         // Node copy shifted right
-        p_node = new Node<2>(num_nodes + index, false, location[0] + mWidth, location[1]);
+        p_node = new Node<2>(num_nodes + index, false, r_location[0] + mWidth, r_location[1]);
         temp_nodes[num_nodes + index] = p_node;
     }
 

@@ -199,9 +199,9 @@ VertexMesh<2,2>::VertexMesh(TetrahedralMesh<2,2>& rMesh, bool isPeriodic)
         std::vector<std::pair<double, unsigned> > index_angle_list;
         for (unsigned local_index=0; local_index<mElements[elem_index]->GetNumNodes(); local_index++)
         {
-            c_vector<double, 2> vectorA = mpDelaunayMesh->GetNode(elem_index)->rGetLocation();
-            c_vector<double, 2> vectorB = mElements[elem_index]->GetNodeLocation(local_index);
-            c_vector<double, 2> centre_to_vertex = mpDelaunayMesh->GetVectorFromAtoB(vectorA, vectorB);
+            const c_vector<double, 2>& r_vectorA = mpDelaunayMesh->GetNode(elem_index)->rGetLocation();
+            const c_vector<double, 2>& r_vectorB = mElements[elem_index]->GetNodeLocation(local_index);
+            c_vector<double, 2> centre_to_vertex = mpDelaunayMesh->GetVectorFromAtoB(r_vectorA, r_vectorB);
 
             double angle = atan2(centre_to_vertex(1), centre_to_vertex(0));
             unsigned global_index = mElements[elem_index]->GetNodeGlobalIndex(local_index);

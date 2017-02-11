@@ -409,9 +409,9 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
         std::set<unsigned> elems_containing_node_A = p_node_A->rGetContainingElementIndices();
         std::set<unsigned> elems_containing_node_B = p_node_B->rGetContainingElementIndices();
 
-        c_vector<double, SPACE_DIM> position_a = p_node_A->rGetLocation();
-        c_vector<double, SPACE_DIM> position_b = p_node_B->rGetLocation();
-        c_vector<double, SPACE_DIM> a_to_b = this->GetVectorFromAtoB(position_a, position_b);
+        const c_vector<double, SPACE_DIM>& r_position_a = p_node_A->rGetLocation();
+        const c_vector<double, SPACE_DIM>& r_position_b = p_node_B->rGetLocation();
+        c_vector<double, SPACE_DIM> a_to_b = this->GetVectorFromAtoB(r_position_a, r_position_b);
 
         c_vector<double, SPACE_DIM> intersection;
 
@@ -419,7 +419,7 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
         {
             WARNING("Edge is too small for normal division; putting node in the middle of a and b. There may be T1 swaps straight away.");
             ///\todo or should we move a and b apart, it may interfere with neighbouring edges? (see #1399 and #2401)
-            intersection = position_a + 0.5*a_to_b;
+            intersection = r_position_a + 0.5*a_to_b;
         }
         else
         {
@@ -428,10 +428,10 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
 
             // Note that we define this vector before setting it as otherwise the profiling build will break (see #2367)
             c_vector<double, SPACE_DIM> moved_centroid;
-            moved_centroid = position_a + this->GetVectorFromAtoB(position_a, centroid);
+            moved_centroid = r_position_a + this->GetVectorFromAtoB(r_position_a, centroid);
 
-            double alpha = (moved_centroid[0]*a_to_b[1] - position_a[0]*a_to_b[1]
-                            -moved_centroid[1]*a_to_b[0] + position_a[1]*a_to_b[0])/determinant;
+            double alpha = (moved_centroid[0]*a_to_b[1] - r_position_a[0]*a_to_b[1]
+                            -moved_centroid[1]*a_to_b[0] + r_position_a[1]*a_to_b[0])/determinant;
 
             intersection = moved_centroid + alpha*axisOfDivision;
 
@@ -439,18 +439,18 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
              * If then new node is too close to one of the edge nodes, then reposition it
              * a distance mCellRearrangementRatio*mCellRearrangementThreshold further along the edge.
              */
-            c_vector<double, SPACE_DIM> a_to_intersection = this->GetVectorFromAtoB(position_a, intersection);
+            c_vector<double, SPACE_DIM> a_to_intersection = this->GetVectorFromAtoB(r_position_a, intersection);
             if (norm_2(a_to_intersection) < mCellRearrangementThreshold)
             {
-                intersection = position_a + mCellRearrangementRatio*mCellRearrangementThreshold*a_to_b/norm_2(a_to_b);
+                intersection = r_position_a + mCellRearrangementRatio*mCellRearrangementThreshold*a_to_b/norm_2(a_to_b);
             }
 
-            c_vector<double, SPACE_DIM> b_to_intersection = this->GetVectorFromAtoB(position_b, intersection);
+            c_vector<double, SPACE_DIM> b_to_intersection = this->GetVectorFromAtoB(r_position_b, intersection);
             if (norm_2(b_to_intersection) < mCellRearrangementThreshold)
             {
                 assert(norm_2(a_to_intersection) > mCellRearrangementThreshold); // to prevent moving intersection back to original position
 
-                intersection = position_b - mCellRearrangementRatio*mCellRearrangementThreshold*a_to_b/norm_2(a_to_b);
+                intersection = r_position_b - mCellRearrangementRatio*mCellRearrangementThreshold*a_to_b/norm_2(a_to_b);
             }
         }
 
@@ -1420,10 +1420,10 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(Node<SPACE_DIM>* p
     // First compute and store the location of the T1 swap, which is at the midpoint of nodes A and B
     double distance_between_nodes_CD = mCellRearrangementRatio*mCellRearrangementThreshold;
 
-    c_vector<double, SPACE_DIM> nodeA_location = pNodeA->rGetLocation();
-    c_vector<double, SPACE_DIM> nodeB_location = pNodeB->rGetLocation();
-    c_vector<double, SPACE_DIM> vector_AB = this->GetVectorFromAtoB(nodeA_location, nodeB_location);
-    mLocationsOfT1Swaps.push_back(nodeA_location + 0.5*vector_AB);
+    const c_vector<double, SPACE_DIM>& r_nodeA_location = pNodeA->rGetLocation();
+    const c_vector<double, SPACE_DIM>& r_nodeB_location = pNodeB->rGetLocation();
+    c_vector<double, SPACE_DIM> vector_AB = this->GetVectorFromAtoB(r_nodeA_location, r_nodeB_location);
+    mLocationsOfT1Swaps.push_back(r_nodeA_location + 0.5*vector_AB);
 
     double distance_AB = norm_2(vector_AB);
     if (distance_AB < 1e-10) ///\todo remove magic number? (see #1884 and #2401)
@@ -1464,7 +1464,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(Node<SPACE_DIM>* p
     vector_CD(0) = -vector_AB(1) * distance_between_nodes_CD / distance_AB;
     vector_CD(1) =  vector_AB(0) * distance_between_nodes_CD / distance_AB;
 
-    c_vector<double, SPACE_DIM> nodeC_location = nodeA_location + 0.5*vector_AB - 0.5*vector_CD;
+    c_vector<double, SPACE_DIM> nodeC_location = r_nodeA_location + 0.5*vector_AB - 0.5*vector_CD;
     c_vector<double, SPACE_DIM> nodeD_location = nodeC_location + vector_CD;
 
     pNodeA->rGetModifiableLocation() = nodeC_location;

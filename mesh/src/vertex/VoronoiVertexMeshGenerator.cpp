@@ -336,26 +336,18 @@ bool VoronoiVertexMeshGenerator::CheckForCongruentNodes(MutableVertexMesh<2,2>* 
 
     // Otherwise, calculate the eight possible congruent locations for the current node
     Node<2>* p_node_a = *(boundary_nodes.begin());
-    c_vector<double, 2> node_a_pos = p_node_a->rGetLocation();
-    std::vector<c_vector<double,2> > congruent_locations(8, node_a_pos);
-
+    const c_vector<double, 2>& r_node_a_pos = p_node_a->rGetLocation();
+    std::vector<c_vector<double,2> > congruent_locations(8, r_node_a_pos);
     congruent_locations[0][0] += width;
-
     congruent_locations[1][1] += height;
-
     congruent_locations[2][0] -= width;
-
     congruent_locations[3][1] -= height;
-
     congruent_locations[4][0] += width;
     congruent_locations[4][1] += height;
-
     congruent_locations[5][0] -= width;
     congruent_locations[5][1] += height;
-
     congruent_locations[6][0] -= width;
     congruent_locations[6][1] -= height;
-
     congruent_locations[7][0] += width;
     congruent_locations[7][1] -= height;
 
@@ -371,12 +363,12 @@ bool VoronoiVertexMeshGenerator::CheckForCongruentNodes(MutableVertexMesh<2,2>* 
             continue;
         }
 
-        c_vector<double, 2> node_b_pos = p_mesh_node_b->rGetLocation();
+        const c_vector<double, 2>& r_node_b_pos = p_mesh_node_b->rGetLocation();
 
         // Loop over the eight possible congruent locations and check for coincidence of location
         for (unsigned pos = 0 ; pos < congruent_locations.size() ; pos++)
         {
-            if (norm_inf(node_b_pos - congruent_locations[pos]) < mTol)
+            if (norm_inf(r_node_b_pos - congruent_locations[pos]) < mTol)
             {
                 // Once we find a congruent location, we replace that node in all containing elements
                 std::set<unsigned> containing_elems = p_mesh_node_b->rGetContainingElementIndices();
