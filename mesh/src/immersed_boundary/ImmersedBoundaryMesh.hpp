@@ -614,6 +614,15 @@ public:
     std::set<unsigned> GetNeighbouringElementIndices(unsigned elemIdx);
 
     /**
+     * Calculate the polygon distribution for the mesh: number of {0, 1, 2, 3, 4, 5,..}-gons.
+     * Note that the vector will always begin {0, 0, 0, ...} as there can be no 0, 1, or 2-gons, but this choice means
+     * that accessing the nth element of the vector gives you the number of n-gons which seems to be most natural.
+     *
+     * @return a vector representing the polygon distribution.
+     */
+    std::vector<unsigned> GetPolygonDistribution();
+
+    /**
      * A smart iterator over the elements in the mesh.
      */
     class ImmersedBoundaryElementIterator
