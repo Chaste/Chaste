@@ -93,7 +93,7 @@ public:
     /**
      * Destructor.
      */
-    ~MutableElement();
+    virtual ~MutableElement();
 
     /**
      * Overridden RegisterWithNodes() method.
