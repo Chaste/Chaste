@@ -53,12 +53,7 @@ void WelikyOsterForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rC
 {
     // Make sure that we are in the correct dimension - this code will be eliminated at compile time
     assert(DIM == 2); // LCOV_EXCL_LINE // this method only works in 2D at present
-
-    // Throw an exception message if not using a VertexBasedCellPopulation
-    if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation) == NULL)
-    {
-        EXCEPTION("WelikyOsterForce is to be used with a VertexBasedCellPopulation only");
-    }
+    assert(dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL);
 
     // Helper variable that is a static cast of the cell population
     VertexBasedCellPopulation<DIM>* p_cell_population = static_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation);
@@ -70,8 +65,8 @@ void WelikyOsterForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rC
 
     // Iterate over elements in the cell population
     for (typename VertexMesh<DIM,DIM>::VertexElementIterator element_iter = p_cell_population->rGetMesh().GetElementIteratorBegin();
-             element_iter != p_cell_population->rGetMesh().GetElementIteratorEnd();
-             ++element_iter)
+         element_iter != p_cell_population->rGetMesh().GetElementIteratorEnd();
+         ++element_iter)
     {
         unsigned element_index = element_iter->GetIndex();
 

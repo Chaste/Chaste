@@ -58,8 +58,8 @@ void FarhadifarForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCe
     // Define some helper variables
     VertexBasedCellPopulation<DIM>* p_cell_population = static_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation);
     VertexMesh<DIM, DIM>& r_mesh = p_cell_population->rGetMesh();
-    unsigned num_nodes = p_cell_population->GetNumNodes();
-    unsigned num_elements = p_cell_population->GetNumElements();
+    unsigned num_nodes = r_mesh.GetNumNodes();
+    unsigned num_elements = r_mesh.GetNumElements();
 
     // Begin by computing the area and perimeter of each element in the mesh, to avoid having to do this multiple times
     std::vector<double> element_areas(num_elements);
@@ -92,7 +92,7 @@ void FarhadifarForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCe
         c_vector<double, DIM> line_tension_contribution = zero_vector<double>(DIM);
 
         // Find the indices of the elements owned by this node
-        std::set<unsigned> containing_elem_indices = p_cell_population->GetNode(node_index)->rGetContainingElementIndices();
+        std::set<unsigned> containing_elem_indices = r_mesh.GetNode(node_index)->rGetContainingElementIndices();
 
         // Iterate over these elements
         for (std::set<unsigned>::iterator iter = containing_elem_indices.begin();
@@ -100,7 +100,7 @@ void FarhadifarForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCe
              ++iter)
         {
             // Get this element, its index and its number of nodes
-            VertexElement<DIM, DIM>* p_element = p_cell_population->GetElement(*iter);
+            VertexElement<DIM, DIM>* p_element = r_mesh.GetElement(*iter);
             unsigned elem_index = p_element->GetIndex();
 
             // Find the local index of this node in this element
@@ -111,7 +111,7 @@ void FarhadifarForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCe
             area_elasticity_contribution -= GetAreaElasticityParameter()*(element_areas[elem_index] - target_areas[elem_index])*element_area_gradient;
         }
 
-        p_cell_population->GetNode(node_index)->AddAppliedForceContribution(area_elasticity_contribution);
+        r_mesh.GetNode(node_index)->AddAppliedForceContribution(area_elasticity_contribution);
     }
 
     // Iterate over all edges and add line tension and perimeter contractility force contributions
@@ -119,7 +119,7 @@ void FarhadifarForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCe
          edge_iter != r_mesh.EdgesEnd();
          ++edge_iter)
     {
-    	// Compute the line tension parameter for this edge
+    	// Compute the line tension parameter for this edge (this is reset to the value for a non-boundary edge below, if required)
         double line_tension_parameter = GetBoundaryLineTensionParameter();
 
         unsigned node_A_index = edge_iter.GetNodeA()->GetIndex();
@@ -159,37 +159,6 @@ void FarhadifarForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCe
         r_mesh.GetNode(node_A_index)->AddAppliedForceContribution(line_tension_force_on_node_A);
         r_mesh.GetNode(node_B_index)->AddAppliedForceContribution(line_tension_force_on_node_B);
     }
-}
-
-template<unsigned DIM>
-double FarhadifarForce<DIM>::GetLineTensionParameter(Node<DIM>* pNodeA, Node<DIM>* pNodeB, VertexBasedCellPopulation<DIM>& rVertexCellPopulation)
-{
-    // Find the indices of the elements owned by each node
-    std::set<unsigned> elements_containing_nodeA = pNodeA->rGetContainingElementIndices();
-    std::set<unsigned> elements_containing_nodeB = pNodeB->rGetContainingElementIndices();
-
-    // Find common elements
-    std::set<unsigned> shared_elements;
-    std::set_intersection(elements_containing_nodeA.begin(),
-                          elements_containing_nodeA.end(),
-                          elements_containing_nodeB.begin(),
-                          elements_containing_nodeB.end(),
-                          std::inserter(shared_elements, shared_elements.begin()));
-
-    // Check that the nodes have a common edge
-    assert(!shared_elements.empty());
-
-    // Since each internal edge is visited twice in the loop above, we have to use half the line tension parameter
-    // for each visit.
-    double line_tension_parameter_in_calculation = GetLineTensionParameter()/2.0;
-
-    // If the edge corresponds to a single element, then the cell is on the boundary
-    if (shared_elements.size() == 1)
-    {
-        line_tension_parameter_in_calculation = GetBoundaryLineTensionParameter();
-    }
-
-    return line_tension_parameter_in_calculation;
 }
 
 template<unsigned DIM>

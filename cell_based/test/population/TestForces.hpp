@@ -1796,45 +1796,6 @@ public:
                  "RepulsionForce is to be used with a NodeBasedCellPopulation only");
     }
 
-    void TestIncorrectForcesWithNodeBasedCellPopulation() throw (Exception)
-    {
-        // Create a NodeBasedCellPopulation
-        std::vector<Node<2>*> nodes;
-        unsigned num_nodes = 10;
-        for (unsigned i=0; i<num_nodes; i++)
-        {
-            double x = (double)(i);
-            double y = (double)(i);
-            nodes.push_back(new Node<2>(i, true, x, y));
-        }
-
-        // Convert this to a NodesOnlyMesh
-        NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(nodes, 1.5);
-
-        std::vector<CellPtr> cells;
-        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
-
-        NodeBasedCellPopulation<2> cell_population(mesh, cells);
-
-        // Test that NagaiHondaForce throws the correct exception
-        NagaiHondaForce<2> nagai_honda_force;
-        TS_ASSERT_THROWS_THIS(nagai_honda_force.AddForceContribution(cell_population),
-                "NagaiHondaForce is to be used with a VertexBasedCellPopulation only");
-
-        // Test that WelikyOsterForce throws the correct exception
-        WelikyOsterForce<2> weliky_oster_force;
-        TS_ASSERT_THROWS_THIS(weliky_oster_force.AddForceContribution(cell_population),
-                "WelikyOsterForce is to be used with a VertexBasedCellPopulation only");
-
-        // Avoid memory leak
-        for (unsigned i=0; i<nodes.size(); i++)
-        {
-            delete nodes[i];
-        }
-    }
-
     void TestDiffusionForceIn1D()
     {
         // Set up time parameters
