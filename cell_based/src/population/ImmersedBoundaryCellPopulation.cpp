@@ -946,6 +946,12 @@ bool ImmersedBoundaryCellPopulation<DIM>::DoesPopulationHaveActiveSources()
 }
 
 template <unsigned DIM>
+bool ImmersedBoundaryCellPopulation<DIM>::IsCellOnBoundary(CellPtr pCell)
+{
+    return this->GetElementCorrespondingToCell(pCell)->IsElementOnBoundary();
+}
+
+template <unsigned DIM>
 void ImmersedBoundaryCellPopulation<DIM>::SetIfPopulationHasActiveSources(bool hasActiveSources)
 {
     mPopulationHasActiveSources = hasActiveSources;
