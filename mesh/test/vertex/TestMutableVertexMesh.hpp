@@ -1805,9 +1805,186 @@ public:
         TS_ASSERT(edge_closest_to_point1 == 1u || edge_closest_to_point1 == 2u);
     }
 
-    void TestHandleHighOrderJunctions()
+    // We include this test here, rather than in TestVertexMesh, since we cover a case where an element is deleted
+    void TestEdgeIterator() throw (Exception)
     {
-        //\todo need to re-implement this
+        // Create a simple 2D vertex mesh
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, false, 1.0, 0.0));
+        nodes.push_back(new Node<2>(2, false, 1.5, 1.0));
+        nodes.push_back(new Node<2>(3, false, 1.0, 2.0));
+        nodes.push_back(new Node<2>(4, false, 0.0, 1.0));
+        nodes.push_back(new Node<2>(5, false, 2.0, 0.0));
+        nodes.push_back(new Node<2>(6, false, 2.0, 3.0));
+        nodes.push_back(new Node<2>(7, false, 0.0, 3.0));
+
+        std::vector<std::vector<Node<2>*> > nodes_elements(3);
+        for (unsigned i=0; i<5; i++)
+        {
+            nodes_elements[0].push_back(nodes[i]);
+        }
+        nodes_elements[1].push_back(nodes[2]);
+        nodes_elements[1].push_back(nodes[5]);
+        nodes_elements[1].push_back(nodes[6]);
+        nodes_elements[2].push_back(nodes[3]);
+        nodes_elements[2].push_back(nodes[7]);
+        nodes_elements[2].push_back(nodes[4]);
+
+        std::vector<VertexElement<2,2>*> elements;
+        elements.push_back(new VertexElement<2,2>(0, nodes_elements[0]));
+        elements.push_back(new VertexElement<2,2>(1, nodes_elements[1]));
+        elements.push_back(new VertexElement<2,2>(2, nodes_elements[2]));
+
+        MutableVertexMesh<2,2> mesh(nodes, elements);
+
+        // Check that we can iterate over the set of edges
+        std::set< std::set<unsigned> > edges_visited;
+        for (VertexMesh<2,2>::EdgeIterator edge_iter = mesh.EdgesBegin(); edge_iter != mesh.EdgesEnd(); ++edge_iter)
+        {
+            std::set<unsigned> node_pair;
+            node_pair.insert(edge_iter.GetNodeA()->GetIndex());
+            node_pair.insert(edge_iter.GetNodeB()->GetIndex());
+
+            TS_ASSERT_EQUALS(edges_visited.find(node_pair), edges_visited.end());
+            edges_visited.insert(node_pair);
+        }
+
+        // Test that we visit the correct edges
+        std::set< std::set<unsigned> > expected_node_pairs;
+        std::set<unsigned> node_pair_0;
+        node_pair_0.insert(0);
+        node_pair_0.insert(1);
+        expected_node_pairs.insert(node_pair_0);
+        std::set<unsigned> node_pair_1;
+        node_pair_1.insert(1);
+        node_pair_1.insert(2);
+        expected_node_pairs.insert(node_pair_1);
+        std::set<unsigned> node_pair_2;
+        node_pair_2.insert(2);
+        node_pair_2.insert(3);
+        expected_node_pairs.insert(node_pair_2);
+        std::set<unsigned> node_pair_3;
+        node_pair_3.insert(3);
+        node_pair_3.insert(4);
+        expected_node_pairs.insert(node_pair_3);
+        std::set<unsigned> node_pair_4;
+        node_pair_4.insert(4);
+        node_pair_4.insert(0);
+        expected_node_pairs.insert(node_pair_4);
+        std::set<unsigned> node_pair_5;
+        node_pair_5.insert(2);
+        node_pair_5.insert(5);
+        expected_node_pairs.insert(node_pair_5);
+        std::set<unsigned> node_pair_6;
+        node_pair_6.insert(5);
+        node_pair_6.insert(6);
+        expected_node_pairs.insert(node_pair_6);
+        std::set<unsigned> node_pair_7;
+        node_pair_7.insert(6);
+        node_pair_7.insert(2);
+        expected_node_pairs.insert(node_pair_7);
+        std::set<unsigned> node_pair_8;
+        node_pair_8.insert(3);
+        node_pair_8.insert(7);
+        expected_node_pairs.insert(node_pair_8);
+        std::set<unsigned> node_pair_9;
+        node_pair_9.insert(7);
+        node_pair_9.insert(4);
+        expected_node_pairs.insert(node_pair_9);
+        TS_ASSERT_EQUALS(edges_visited, expected_node_pairs);
+
+        // Record the element(s) sharing each edge
+        std::set< std::set<unsigned> > elem_pairs;
+        for (VertexMesh<2,2>::EdgeIterator edge_iter = mesh.EdgesBegin(); edge_iter != mesh.EdgesEnd(); ++edge_iter)
+        {
+            std::set<unsigned> elem_pair;
+            elem_pair.insert(edge_iter.GetElemIndex());
+            elem_pair.insert(edge_iter.GetOtherElemIndex());
+            elem_pairs.insert(elem_pair);
+        }
+
+        // Test that we find the correct element(s) sharing each edge
+        std::set< std::set<unsigned> > expected_elem_pairs;
+        std::set<unsigned> expected_elem_pair_0;
+        expected_elem_pair_0.insert(0);
+        expected_elem_pair_0.insert(UINT_MAX);
+        expected_elem_pairs.insert(expected_elem_pair_0);
+        std::set<unsigned> expected_elem_pair_1;
+        expected_elem_pair_1.insert(1);
+        expected_elem_pair_1.insert(UINT_MAX);
+        expected_elem_pairs.insert(expected_elem_pair_1);
+        std::set<unsigned> expected_elem_pair_2;
+        expected_elem_pair_2.insert(2);
+        expected_elem_pair_2.insert(UINT_MAX);
+        expected_elem_pairs.insert(expected_elem_pair_2);
+        std::set<unsigned> expected_elem_pair_3;
+        expected_elem_pair_3.insert(0);
+        expected_elem_pair_3.insert(2);
+        expected_elem_pairs.insert(expected_elem_pair_3);
+        TS_ASSERT_EQUALS(elem_pairs, expected_elem_pairs);
+
+        // Test that the iterator skips deleted elements
+        mesh.DeleteElementPriorToReMesh(0);
+
+        std::set< std::set<unsigned> > edges_visited_again;
+        for (VertexMesh<2,2>::EdgeIterator edge_iter = mesh.EdgesBegin(); edge_iter != mesh.EdgesEnd(); ++edge_iter)
+        {
+            std::set<unsigned> node_pair;
+            node_pair.insert(edge_iter.GetNodeA()->GetIndex());
+            node_pair.insert(edge_iter.GetNodeB()->GetIndex());
+            edges_visited_again.insert(node_pair);
+        }
+
+        expected_node_pairs.erase(node_pair_0);
+        expected_node_pairs.erase(node_pair_1);
+        expected_node_pairs.erase(node_pair_2);
+        expected_node_pairs.erase(node_pair_4);
+        TS_ASSERT_EQUALS(edges_visited_again, expected_node_pairs);
+
+        // Test that the iterator constructor works as expected when the node global indices are in a different order
+        std::vector<Node<2>*> rect_nodes;
+        rect_nodes.push_back(new Node<2>(3, false, 0.0, 0.0));
+        rect_nodes.push_back(new Node<2>(2, false, 2.0, 0.0));
+        rect_nodes.push_back(new Node<2>(1, false, 2.0, 5.0));
+        rect_nodes.push_back(new Node<2>(0, false, 0.0, 5.0));
+        std::vector<std::vector<Node<2>*> > rect_nodes_elems(3);
+        for (unsigned i=0; i<4; i++)
+        {
+        	rect_nodes_elems[0].push_back(rect_nodes[i]);
+        }
+        std::vector<VertexElement<2,2>*> rect_elems;
+        rect_elems.push_back(new VertexElement<2,2>(0, rect_nodes_elems[0]));
+        VertexMesh<2,2> rect_mesh(rect_nodes, rect_elems);
+
+        std::set< std::set<unsigned> > rect_edges_visited;
+        for (VertexMesh<2,2>::EdgeIterator edge_iter = rect_mesh.EdgesBegin(); edge_iter != rect_mesh.EdgesEnd(); ++edge_iter)
+        {
+            std::set<unsigned> node_pair;
+            node_pair.insert(edge_iter.GetNodeA()->GetIndex());
+            node_pair.insert(edge_iter.GetNodeB()->GetIndex());
+            rect_edges_visited.insert(node_pair);
+        }
+
+        std::set< std::set<unsigned> > expected_rect_node_pairs;
+        std::set<unsigned> rect_node_pair_0;
+        rect_node_pair_0.insert(0);
+        rect_node_pair_0.insert(1);
+        expected_rect_node_pairs.insert(rect_node_pair_0);
+        std::set<unsigned> rect_node_pair_1;
+        rect_node_pair_1.insert(1);
+        rect_node_pair_1.insert(2);
+        expected_rect_node_pairs.insert(rect_node_pair_1);
+        std::set<unsigned> rect_node_pair_2;
+        rect_node_pair_2.insert(2);
+        rect_node_pair_2.insert(3);
+        expected_rect_node_pairs.insert(rect_node_pair_2);
+        std::set<unsigned> rect_node_pair_3;
+        rect_node_pair_3.insert(3);
+        rect_node_pair_3.insert(0);
+        expected_rect_node_pairs.insert(rect_node_pair_3);
+
+        TS_ASSERT_EQUALS(rect_edges_visited, expected_rect_node_pairs);
     }
 };
 
