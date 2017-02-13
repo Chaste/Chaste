@@ -168,8 +168,7 @@ public:
                 const double apical_length = norm_2(apical_nodes[0]->rGetLocation() - apical_nodes[1]->rGetLocation());
                 const double basal_length = norm_2(basal_nodes[0]->rGetLocation() - basal_nodes[1]->rGetLocation());
 
-                p_node->rGetModifiableLocation() = (apical_length*mid_apical + basal_length*mid_basal)
-                                                    /(apical_length + basal_length);
+                p_node->rGetModifiableLocation() = (basal_length * mid_apical + apical_length * mid_basal) / (apical_length + basal_length);
             }
         }
 
@@ -538,8 +537,11 @@ public:
         p_mesh->GetNode(4)->rGetModifiableLocation()[1] = 0.46;
         p_mesh->GetNode(5)->rGetModifiableLocation()[1] = 0.54;
         p_mesh->SetCellRearrangementThreshold(0.10);
-        
+        p_mesh->SetCellRearrangementRatio(8);
+
         p_mesh->ReMesh();
+        p_mesh->SetCellRearrangementThreshold(0.01);
+        p_mesh->SetCellRearrangementRatio(1.5);
 
 
         for (unsigned i = 0; i < p_mesh->GetNumNodes() ; ++i)

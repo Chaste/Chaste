@@ -382,6 +382,23 @@ bool IsFaceOnBoundary(const VertexElement<2, 3>* pFace)
     return pFace->FaceGetNumContainingElements() == 1;
 }
 
+void FaceRearrangeNodesInMesh(MutableVertexMesh<3, 3>* pMesh, VertexElement<2, 3>* pFace)
+{
+    const std::set<unsigned>& set_tmp = pFace->rFaceGetContainingElementIndices();
+    const c_vector<double, 3> centroid_tmp = pMesh->GetElement(no1(set_tmp))->GetCentroid();
+
+    const bool has_changes = pFace->FaceRearrangeNodes(centroid_tmp);
+
+    if (has_changes)
+    {
+        for (std::set<unsigned>::const_iterator it = set_tmp.begin(); it != set_tmp.end(); ++it)
+        {
+            VertexElement<3, 3> *p_elem = pMesh->GetElement(*it);
+            p_elem->CheckFaceOrientationOfElement(p_elem->GetFaceLocalIndex(pFace->GetIndex()));
+        }
+    }
+}
+
 ///////////////////////////////////////////////////////////////////////////////////
 ///                       Functions for monolayer classes                       ///
 ///////////////////////////////////////////////////////////////////////////////////

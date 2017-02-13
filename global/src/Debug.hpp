@@ -172,6 +172,11 @@ void PrintMemory();
 template<typename C>
 std::string ContainerToString(C container)
 {
+    if (container.size() == 0)
+    {
+        return "{}";
+    }
+
     std::ostringstream oss;
     oss << "{";
     for (typename C::const_iterator _it = container.begin(); _it!=container.end(); ++_it)
@@ -179,14 +184,7 @@ std::string ContainerToString(C container)
         oss << *_it << ",";
     }
     std::string return_string (oss.str());
-    if (container.size() == 0)
-    {
-        return_string += "}";
-    }
-    else
-    {
-        return_string[return_string.size()-1] = '}';
-    }
+    return_string[return_string.size()-1] = '}';
     return return_string;
 }
 

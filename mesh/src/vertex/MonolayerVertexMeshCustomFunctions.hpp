@@ -122,6 +122,9 @@ void PrintMesh(const MutableVertexMesh<3, 3>* pMesh, const bool printDeletedObje
  */
 bool IsFaceOnBoundary(const VertexElement<2, 3>* pFace);
 
+
+void FaceRearrangeNodesInMesh(MutableVertexMesh<3, 3>* pMesh, VertexElement<2, 3>* pFace);
+
 ///////////////////////////////////////////////////////////////////////////////////
 ///                       Functions for monolayer classes                       ///
 ///////////////////////////////////////////////////////////////////////////////////

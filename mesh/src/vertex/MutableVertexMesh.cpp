@@ -1420,27 +1420,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(VertexElementMap& rElemen
          */
         this->CheckForRosettes();
     }
-    else // 3D
-    {
-        rElementMap.Resize(this->GetNumAllElements());
-        //remove and relabel all the elements, nodes, and faces
-        RemoveDeletedNodesAndElements(rElementMap);
-
-        if (IsMonolayerElement(this->GetElement(0)))
-        {
-            bool recheck_mesh = true;
-            while (recheck_mesh == true)
-            {
-                // We check for any short edges and perform swaps if necessary and possible.
-                recheck_mesh = CheckForSwapsFromShortEdges();
-            }
-
-            RemoveDeletedNodes();
-            RemoveDeletedFaces();
-        }
-    }
 }
-
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh()
@@ -1529,8 +1509,6 @@ bool MutableVertexMesh<3, 3>::CheckForSwapsFromShortEdges()
             continue;
         }
 
-        // Make sure the face is in proper order first.
-        p_face->LateralFaceRearrangeNodes();
         const std::vector<Node<3>*> basal_nodes = GetNodesWithType(p_face, Monolayer::BasalValue);
         const std::vector<Node<3>*> apical_nodes = GetNodesWithType(p_face, Monolayer::ApicalValue);
         assert(basal_nodes.size() == 2 && apical_nodes.size() == 2);
@@ -1575,6 +1553,31 @@ bool MutableVertexMesh<3, 3>::CheckForSwapsFromShortEdges()
         }
     }
     return false;
+}
+
+template <>
+void MutableVertexMesh<3, 3>::ReMesh(VertexElementMap& rElementMap)
+{
+    rElementMap.Resize(this->GetNumAllElements());
+    //remove and relabel all the elements, nodes, and faces
+    RemoveDeletedNodesAndElements(rElementMap);
+
+    if (IsMonolayerElement(this->GetElement(0)))
+    {
+        bool recheck_mesh = true;
+        while (recheck_mesh == true)
+        {
+            // We check for any short edges and perform swaps if necessary and possible.
+            recheck_mesh = CheckForSwapsFromShortEdges();
+        }
+        RemoveDeletedNodes();
+        RemoveDeletedFaces();
+    }
+
+    for (unsigned i = 0; i < this->GetNumFaces(); ++i)
+    {
+        FaceRearrangeNodesInMesh(this, this->GetFace(i));
+    }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -2362,13 +2365,6 @@ void MutableVertexMesh<3, 3>::PerformAsynchronousT1Swap(Node<3>* pNodeA, Node<3>
         NEVER_REACHED;
     }
 
-    const c_vector<double, 3> tmp_loc = (norm_2(vector_ab) * (p_node_a->rGetLocation() + 0.5 * vector_ab)
-                                         + norm_2(vector_xy) * (p_node_x->rGetLocation() + 0.5 * vector_xy))
-        / (norm_2(vector_ab) + norm_2(vector_xy));
-    Node<3>* p_new_node = new Node<3>(this->GetNumNodes(), tmp_loc, false);
-    SetNodeAsLateral(p_new_node);
-    this->AddNode(p_new_node);
-
     // Compute and store the location of the T1 swap, which is at the midpoint of nodes A and B
     mLocationsOfT1Swaps.push_back(p_node_a->rGetLocation() + 0.5 * vector_ab);
 
@@ -2388,6 +2384,19 @@ void MutableVertexMesh<3, 3>::PerformAsynchronousT1Swap(Node<3>* pNodeA, Node<3>
         // Move nodes A and B to C and D respectively
         p_node_a->rGetModifiableLocation() += 0.5 * vector_ab - 0.5 * vector_CD;
         p_node_b->rGetModifiableLocation() += -0.5 * vector_ab + 0.5 * vector_CD;
+    }
+
+    Node<3>* p_new_node = new Node<3>(this->GetNumNodes(), false);
+    SetNodeAsLateral(p_new_node);
+    this->AddNode(p_new_node);
+    {
+        const c_vector<double, 3> mid_ab = (p_node_a->rGetLocation() + p_node_b->rGetLocation()) / 2;
+        const c_vector<double, 3> mid_xy = (p_node_x->rGetLocation() + p_node_y->rGetLocation()) / 2;
+
+        const double length_ab = norm_2(p_node_a->rGetLocation() - p_node_b->rGetLocation());
+        const double length_xy = norm_2(p_node_x->rGetLocation() - p_node_y->rGetLocation());
+
+        p_new_node->rGetModifiableLocation() = (length_ab * mid_xy + length_xy * mid_ab) / (length_ab + length_xy);
     }
 
     std::vector<VertexElement<3, 3>*> elems(5, NULL);
