@@ -460,6 +460,8 @@ bool ImmersedBoundaryCellPopulation<DIM>::IsCellAssociatedWithADeletedLocation(C
 template <unsigned DIM>
 void ImmersedBoundaryCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
 {
+    mpImmersedBoundaryMesh->TagBoundaryElements();
+
     for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
          cell_iter != this->End();
          ++cell_iter)
