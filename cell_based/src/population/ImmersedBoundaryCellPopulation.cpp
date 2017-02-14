@@ -72,7 +72,7 @@ ImmersedBoundaryCellPopulation<DIM>::ImmersedBoundaryCellPopulation(ImmersedBoun
         Validate();
     }
 
-    mInteractionDistance = 0.05 * CalculateIntrinsicCellSize();
+    mInteractionDistance = 0.1 * CalculateIntrinsicCellSize();
 
     // Set the mesh division spacing distance
     rMesh.SetElementDivisionSpacing(0.25 * mInteractionDistance);
