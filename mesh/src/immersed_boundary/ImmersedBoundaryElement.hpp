@@ -66,6 +66,9 @@ private:
     /** The average node spacing. */
     double mAverageNodeSpacing;
 
+    /** Whether this element is on the boundary. This is a non-local property so must be calculated by the mesh. */
+    bool mIsBoundaryElement;
+
     /**
      * Serialize the object and its member variables.
      *
@@ -137,6 +140,9 @@ public:
      * @return whether or not the element is on the boundary.
      */
     virtual bool IsElementOnBoundary() const;
+
+    /** @param isBoundaryElement whether the element is on the boundary */
+    void SetIsBoundaryElement(bool isBoundaryElement);
 };
 
 //////////////////////////////////////////////////////////////////////
@@ -162,6 +168,9 @@ private:
 
     /** The average node spacing. */
     double mAverageNodeSpacing;
+
+    /** Whether this element is on the boundary. This is a non-local property so must be calculated by the mesh. */
+    bool mIsBoundaryElement;
 
 public:
 
@@ -210,6 +219,9 @@ public:
      * @return false.
      */
     virtual bool IsElementOnBoundary() const;
+
+    /** @param isBoundaryElement whether the element is on the boundary */
+    void SetIsBoundaryElement(bool isBoundaryElement);
 };
 
 #endif /*IMMERSEDBOUNDARYELEMENT_HPP_*/

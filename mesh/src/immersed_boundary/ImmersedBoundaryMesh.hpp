@@ -623,6 +623,18 @@ public:
     std::vector<unsigned> GetPolygonDistribution();
 
     /**
+     * Determine whether each element is on the boundary or not, and call the element's SetIsBoundaryElement() method.
+     *
+     * It is not possible to define in precise terms whether an element is on the boundary (as there is no commonality
+     * of nodes as in a vertex population.  Instead we take the centroid of each element, calculate the voronoi diagram
+     * of this set of centroids, and define an element to be on the boundary if its corresponding voronoi cell is
+     * infinite.
+     *
+     * This requires boost version 105200, so will not compute anything if the boost version is lower than this.
+     */
+    void TagBoundaryElements();
+
+    /**
      * A smart iterator over the elements in the mesh.
      */
     class ImmersedBoundaryElementIterator
