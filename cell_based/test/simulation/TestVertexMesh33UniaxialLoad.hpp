@@ -560,7 +560,7 @@ public:
         simulator.SetEndTime(end_time);
 
         MAKE_PTR(GeneralMonolayerVertexMeshForce, p_force3);
-        p_force3->SetApicalParameters(20, 20, 0.7);
+        p_force3->SetApicalParameters(15, 15, 0.7);
         p_force3->SetBasalParameters(20, 20, 0.7);
         p_force3->SetLateralParameter(9.25);
         p_force3->SetVolumeParameters(350, target_volume);
@@ -568,6 +568,11 @@ public:
 
         MAKE_PTR(LateralNodeModifier, p_node_modifier);
         simulator.AddSimulationModifier(p_node_modifier);
+
+        MAKE_PTR(HorizontalStretchForce<3>, p_force2);
+        p_force2->SetForceMagnitude(1.0);
+        p_force2->SetRelativeWidth(0.15);
+        simulator.AddForce(p_force2);
 
         simulator.SetEndTime(end_time);
         simulator.Solve();

@@ -547,7 +547,7 @@ public:
      * @param pNewFace pointer to the new face
      * @return the global index of the new face in the mesh.
      */
-    unsigned AddFace(VertexElement<2, 3>* pNewFace);
+    unsigned AddFace(VertexElement<ELEMENT_DIM-1, SPACE_DIM>* pNewFace);
 
     /**
      * Add an element to the mesh.
@@ -565,7 +565,7 @@ public:
      *
      * @param index  the global index of a specified vertex element
      */
-    void DeleteElementPriorToReMesh(unsigned index);
+    void DeleteElementPriorToReMesh(const unsigned index);
 
     /**
      * Mark a given face as deleted. Note that this method DOES NOT deal with the
@@ -574,7 +574,7 @@ public:
      *
      * @param index The index of the node to delete
      */
-    void DeleteFacePriorToReMesh(unsigned index);
+    void DeleteFacePriorToReMesh(const unsigned index);
 
     /**
      * Mark a given node as deleted. Note that this method DOES NOT deal with the
@@ -583,7 +583,7 @@ public:
      *
      * @param index The index of the node to delete
      */
-    void DeleteNodePriorToReMesh(unsigned index);
+    void DeleteNodePriorToReMesh(const unsigned index);
 
     /**
      * Divide an element along its short axis.

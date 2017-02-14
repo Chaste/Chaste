@@ -851,8 +851,8 @@ public:
 
         // Check the positions are updated correctly
         OutputFileHandler handler(dirname, false);
-        std::string results_file1 = handler.GetOutputDirectoryFullPath() + "vertex_remesh_T1.node";
-        std::string results_file2 = handler.GetOutputDirectoryFullPath() + "vertex_remesh_T1.cell";
+        std::string results_file1 = handler.GetOutputDirectoryFullPath() + "vertex33_remesh_T1_after_remesh.node";
+        std::string results_file2 = handler.GetOutputDirectoryFullPath() + "vertex33_remesh_T1_after_remesh.cell";
 
         FileComparison comparer1(results_file1, "cell_based/test/data/TestMutableVertexMesh/vertex33_remesh_T1_after_remesh.node");
         TS_ASSERT(comparer1.CompareFiles());
