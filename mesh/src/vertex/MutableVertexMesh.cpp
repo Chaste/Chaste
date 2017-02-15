@@ -3365,6 +3365,19 @@ bool MutableVertexMesh<3, 3>::CheckForSwapsFromShortEdges()
             if (apical_edge_length > mCellRearrangementThreshold)
             {
                 MARK;
+                TRACE("Potential Async T1: " << p_face->GetIndex());
+                
+                if (IsFaceOnBoundary(p_face))
+                {
+                    continue;
+                }
+
+                if (p_face->GetIndex() != 166u)
+                {
+                    continue;
+                }
+
+                MARK;
                 TRACE("Asynchronous in CheckAndIdentify");
             }
 
@@ -3544,8 +3557,6 @@ void MutableVertexMesh<3, 3>::PerformAsynchronousT1Swap(Node<3>* pNodeA, Node<3>
     const std::vector<Node<3>*> basal_nodes = GetNodesWithType(p_lateral_swap_face, Monolayer::BasalValue);
     const std::vector<Node<3>*> apical_nodes = GetNodesWithType(p_lateral_swap_face, Monolayer::ApicalValue);
     assert(basal_nodes.size() == 2 && apical_nodes.size() == 2);
-    Node<3>* p_basal_node_1 = basal_nodes.front();
-    Node<3>* p_basal_node_2 = basal_nodes.back();
     Node<3>* p_node_a(basal_nodes.front());
     Node<3>* p_node_b(basal_nodes.back());
     Node<3>* p_node_x(apical_nodes.back());
@@ -3555,13 +3566,12 @@ void MutableVertexMesh<3, 3>::PerformAsynchronousT1Swap(Node<3>* pNodeA, Node<3>
     {
         std::swap(p_node_x, p_node_y);
     }
-
-    c_vector<double, 3> vector_ab = this->GetVectorFromAtoB(p_node_a->rGetLocation(), p_node_b->rGetLocation());
-    c_vector<double, 3> vector_xy = this->GetVectorFromAtoB(p_node_x->rGetLocation(), p_node_y->rGetLocation());
-
     // Confirm we got the right X and Y.
     assert(p_node_a->rGetContainingElementIndices() == p_node_x->rGetContainingElementIndices());
     assert(p_node_b->rGetContainingElementIndices() == p_node_y->rGetContainingElementIndices());
+
+    c_vector<double, 3> vector_ab = this->GetVectorFromAtoB(p_node_a->rGetLocation(), p_node_b->rGetLocation());
+    c_vector<double, 3> vector_xy = this->GetVectorFromAtoB(p_node_x->rGetLocation(), p_node_y->rGetLocation());
 
     bool t1_on_basal(true);
     // If it is actually the apical edge which is shorter than the threshold, we swap them accordingly,

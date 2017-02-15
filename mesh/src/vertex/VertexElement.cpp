@@ -748,7 +748,7 @@ void VertexElement<3, 3>::MonolayerElementRearrangeFacesNodes()
     {
         PrintElement(this);
         PRINT_5_VARIABLES(num_more, num_basal_nodes, num_apical_nodes, this->GetNumNodes(), mFaces.size())
-        EXCEPTION("Monolayer element has flaw!");
+        EXCEPTION("Monolayer element (" << this->GetIndex() << ") has flaw!");
     }
 
     // Check and change basal and apical faces to 0th and 1st position respectively

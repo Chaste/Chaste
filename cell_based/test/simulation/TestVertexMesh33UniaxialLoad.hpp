@@ -201,12 +201,12 @@ private:
     static const double target_area = 1;
     const unsigned num_cells_x = 9;
     const unsigned num_cells_y = 5;
-    static const double end_time = 4;
+    static const double end_time = 10;
 
 public:
     void TestOnHexagonalMesh() throw(Exception)
     {
-        std::string output_filename = "TestUniaxialLoad/HoneyTest" + boost::lexical_cast<std::string>(num_cells_x)
+        std::string output_filename = "TestUniaxialLoad/HoneyTest_ori" + boost::lexical_cast<std::string>(num_cells_x)
             + "x" + boost::lexical_cast<std::string>(num_cells_y);
         HoneycombVertexMeshGenerator generator(num_cells_x, num_cells_y, false, 0.1, 0.01, target_area);
         MutableVertexMesh<2, 2>& vertex_2mesh = *(generator.GetMesh());
@@ -230,10 +230,10 @@ public:
         p_force3->SetApicalParameters(20, 20, 0.7);
         p_force3->SetBasalParameters(20, 20, 0.7);
         p_force3->SetLateralParameter(8);
-        p_force3->SetVolumeParameters(350, target_area * 1.2);
+        p_force3->SetVolumeParameters(400, target_area * 1.2);
         simulator.AddForce(p_force3);
         MAKE_PTR(HorizontalStretchForce<3>, p_force2);
-        p_force2->SetForceMagnitude(1.0);
+        p_force2->SetForceMagnitude(0.5);
         p_force2->SetRelativeWidth(0.15);
         simulator.AddForce(p_force2);
 
@@ -241,7 +241,158 @@ public:
 
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), num_cells_x * num_cells_y);
         TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
-        */
+
+        // loweredALLApical
+        {
+            // std::string output_filename = "TestUniaxialLoad/HoneyTest_loweredALLApical";
+            // HoneycombVertexMeshGenerator generator(num_cells_x, num_cells_y, false, 0.1, 0.01, target_area);
+            // MutableVertexMesh<2, 2> &vertex_2mesh = *(generator.GetMesh());
+            // MonolayerVertexMeshGenerator builder;
+            // MutableVertexMesh<3, 3> *p_mesh = builder.MakeMeshUsing2dMesh(vertex_2mesh, z_height);
+            // builder.WriteVtk(output_filename, "InitialMesh");
+
+            // std::vector<CellPtr> cells;
+            // CellsGenerator<NoCellCycleModel, 3> cells_generator;
+            // cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
+            // VertexBasedCellPopulation<3> cell_population(*p_mesh, cells);
+            // cell_population.AddCellWriter<CellIdWriter>();
+            // cell_population.AddCellWriter<CellVolumesWriter>();
+
+            // OffLatticeSimulation<3> simulator(cell_population);
+            // simulator.SetOutputDirectory(output_filename);
+            // simulator.SetSamplingTimestepMultiple(10);
+            // simulator.SetEndTime(end_time);
+
+            // MAKE_PTR(GeneralMonolayerVertexMeshForce, p_force3);
+            // p_force3->SetApicalParameters(5, 5, 0.2);
+            // p_force3->SetBasalParameters(20, 20, 0.7);
+            // p_force3->SetLateralParameter(8);
+            // p_force3->SetVolumeParameters(400, target_area * 1.2);
+            // simulator.AddForce(p_force3);
+            // MAKE_PTR(HorizontalStretchForce<3>, p_force2);
+            // p_force2->SetForceMagnitude(0.5);
+            // p_force2->SetRelativeWidth(0.15);
+            // simulator.AddForce(p_force2);
+
+            // simulator.Solve();
+
+            // TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), num_cells_x * num_cells_y);
+            // TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
+        }
+
+        // LoweredApicalLineTension
+        {
+            // std::string output_filename = "TestUniaxialLoad/HoneyTest_LoweredApicalLineTension";
+            // HoneycombVertexMeshGenerator generator(num_cells_x, num_cells_y, false, 0.1, 0.01, target_area);
+            // MutableVertexMesh<2, 2> &vertex_2mesh = *(generator.GetMesh());
+            // MonolayerVertexMeshGenerator builder;
+            // MutableVertexMesh<3, 3> *p_mesh = builder.MakeMeshUsing2dMesh(vertex_2mesh, z_height);
+            // builder.WriteVtk(output_filename, "InitialMesh");
+
+            // std::vector<CellPtr> cells;
+            // CellsGenerator<NoCellCycleModel, 3> cells_generator;
+            // cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
+            // VertexBasedCellPopulation<3> cell_population(*p_mesh, cells);
+            // cell_population.AddCellWriter<CellIdWriter>();
+            // cell_population.AddCellWriter<CellVolumesWriter>();
+
+            // OffLatticeSimulation<3> simulator(cell_population);
+            // simulator.SetOutputDirectory(output_filename);
+            // simulator.SetSamplingTimestepMultiple(10);
+            // simulator.SetEndTime(end_time);
+
+            // MAKE_PTR(GeneralMonolayerVertexMeshForce, p_force3);
+            // p_force3->SetApicalParameters(5, 20, 0.7);
+            // p_force3->SetBasalParameters(20, 20, 0.7);
+            // p_force3->SetLateralParameter(8);
+            // p_force3->SetVolumeParameters(400, target_area * 1.2);
+            // simulator.AddForce(p_force3);
+            // MAKE_PTR(HorizontalStretchForce<3>, p_force2);
+            // p_force2->SetForceMagnitude(0.5);
+            // p_force2->SetRelativeWidth(0.15);
+            // simulator.AddForce(p_force2);
+
+            // simulator.Solve();
+
+            // TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), num_cells_x * num_cells_y);
+            // TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
+        }
+
+        // LoweredApicalFaceParam
+        {
+            // std::string output_filename = "TestUniaxialLoad/HoneyTest_LoweredApicalFaceParam";
+            // HoneycombVertexMeshGenerator generator(num_cells_x, num_cells_y, false, 0.1, 0.01, target_area);
+            // MutableVertexMesh<2, 2> &vertex_2mesh = *(generator.GetMesh());
+            // MonolayerVertexMeshGenerator builder;
+            // MutableVertexMesh<3, 3> *p_mesh = builder.MakeMeshUsing2dMesh(vertex_2mesh, z_height);
+            // builder.WriteVtk(output_filename, "InitialMesh");
+
+            // std::vector<CellPtr> cells;
+            // CellsGenerator<NoCellCycleModel, 3> cells_generator;
+            // cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
+            // VertexBasedCellPopulation<3> cell_population(*p_mesh, cells);
+            // cell_population.AddCellWriter<CellIdWriter>();
+            // cell_population.AddCellWriter<CellVolumesWriter>();
+
+            // OffLatticeSimulation<3> simulator(cell_population);
+            // simulator.SetOutputDirectory(output_filename);
+            // simulator.SetSamplingTimestepMultiple(10);
+            // simulator.SetEndTime(end_time);
+
+            // MAKE_PTR(GeneralMonolayerVertexMeshForce, p_force3);
+            // p_force3->SetApicalParameters(20, 5, 0.2);
+            // p_force3->SetBasalParameters(20, 20, 0.7);
+            // p_force3->SetLateralParameter(8);
+            // p_force3->SetVolumeParameters(400, target_area * 1.2);
+            // simulator.AddForce(p_force3);
+            // MAKE_PTR(HorizontalStretchForce<3>, p_force2);
+            // p_force2->SetForceMagnitude(0.5);
+            // p_force2->SetRelativeWidth(0.15);
+            // simulator.AddForce(p_force2);
+
+            // simulator.Solve();
+
+            // TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), num_cells_x * num_cells_y);
+            // TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
+        }
+
+        // AdjustedBasal (not yet implemented)
+        {
+            // std::string output_filename = "TestUniaxialLoad/HoneyTest_AdjustedBasal";
+            // HoneycombVertexMeshGenerator generator(num_cells_x, num_cells_y, false, 0.1, 0.01, target_area);
+            // MutableVertexMesh<2, 2> &vertex_2mesh = *(generator.GetMesh());
+            // MonolayerVertexMeshGenerator builder;
+            // MutableVertexMesh<3, 3> *p_mesh = builder.MakeMeshUsing2dMesh(vertex_2mesh, z_height);
+            // builder.WriteVtk(output_filename, "InitialMesh");
+
+            // std::vector<CellPtr> cells;
+            // CellsGenerator<NoCellCycleModel, 3> cells_generator;
+            // cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
+            // VertexBasedCellPopulation<3> cell_population(*p_mesh, cells);
+            // cell_population.AddCellWriter<CellIdWriter>();
+            // cell_population.AddCellWriter<CellVolumesWriter>();
+
+            // OffLatticeSimulation<3> simulator(cell_population);
+            // simulator.SetOutputDirectory(output_filename);
+            // simulator.SetSamplingTimestepMultiple(10);
+            // simulator.SetEndTime(end_time);
+
+            // MAKE_PTR(GeneralMonolayerVertexMeshForce, p_force3);
+            // p_force3->SetApicalParameters(20, 20, 0.7);
+            // p_force3->SetBasalParameters(20, 20, 0.7);
+            // p_force3->SetLateralParameter(8);
+            // p_force3->SetVolumeParameters(400, target_area * 1.2);
+            // simulator.AddForce(p_force3);
+            // MAKE_PTR(HorizontalStretchForce<3>, p_force2);
+            // p_force2->SetForceMagnitude(0.5);
+            // p_force2->SetRelativeWidth(0.15);
+            // simulator.AddForce(p_force2);
+
+            // simulator.Solve();
+
+            // TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), num_cells_x * num_cells_y);
+            // TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
+        }
     }
 
     void TestOnVoronoiMesh() throw(Exception)
