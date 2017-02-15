@@ -3412,7 +3412,10 @@ void MutableVertexMesh<3, 3>::ReMesh(VertexElementMap& rElementMap)
 
     for (unsigned i = 0; i < this->GetNumFaces(); ++i)
     {
-        FaceRearrangeNodesInMesh(this, this->GetFace(i));
+        if (IsLateralFace(this->GetFace(i)))
+        {
+            FaceRearrangeNodesInMesh(this, this->GetFace(i));
+        }
     }
 }
 
@@ -3530,14 +3533,29 @@ void MutableVertexMesh<3, 3>::PerformAsynchronousT1Swap(Node<3>* pNodeA, Node<3>
         NEVER_REACHED;
     }
 
+    MARK
+    TRACE("===============================Asynchronous============================================")
+    PRINT_VARIABLE(p_lateral_swap_face->GetIndex())
     ///\todo #2850 need to handle the reverse case!!
 
     // Just assume basal edge is shorter than the rearrangement threshold
-    p_lateral_swap_face->LateralFaceRearrangeNodes();
-    Node<3>* p_node_a(p_lateral_swap_face->GetNode(0));
-    Node<3>* p_node_b(p_lateral_swap_face->GetNode(1));
-    Node<3>* p_node_x(p_lateral_swap_face->GetNode(3));
-    Node<3>* p_node_y(p_lateral_swap_face->GetNode(2));
+    FaceRearrangeNodesInMesh(this, p_lateral_swap_face);
+
+    const std::vector<Node<3>*> basal_nodes = GetNodesWithType(p_lateral_swap_face, Monolayer::BasalValue);
+    const std::vector<Node<3>*> apical_nodes = GetNodesWithType(p_lateral_swap_face, Monolayer::ApicalValue);
+    assert(basal_nodes.size() == 2 && apical_nodes.size() == 2);
+    Node<3>* p_basal_node_1 = basal_nodes.front();
+    Node<3>* p_basal_node_2 = basal_nodes.back();
+    Node<3>* p_node_a(basal_nodes.front());
+    Node<3>* p_node_b(basal_nodes.back());
+    Node<3>* p_node_x(apical_nodes.back());
+    Node<3>* p_node_y(apical_nodes.front());
+
+    if (p_node_a->rGetContainingElementIndices() == p_node_y->rGetContainingElementIndices())
+    {
+        std::swap(p_node_x, p_node_y);
+    }
+
     c_vector<double, 3> vector_ab = this->GetVectorFromAtoB(p_node_a->rGetLocation(), p_node_b->rGetLocation());
     c_vector<double, 3> vector_xy = this->GetVectorFromAtoB(p_node_x->rGetLocation(), p_node_y->rGetLocation());
 
@@ -3706,7 +3724,7 @@ void MutableVertexMesh<3, 3>::PerformAsynchronousT1Swap(Node<3>* pNodeA, Node<3>
             if (lateral_faces[i] != NULL)
             {
                 lateral_faces[i]->FaceAddNode(p_new_node);
-                lateral_faces[i]->LateralFaceRearrangeNodes();
+                FaceRearrangeNodesInMesh(this, lateral_faces[i]);
             }
         }
     }

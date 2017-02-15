@@ -201,7 +201,7 @@ private:
     static const double target_area = 1;
     const unsigned num_cells_x = 9;
     const unsigned num_cells_y = 5;
-    static const double end_time = 0.01;
+    static const double end_time = 4;
 
 public:
     void TestOnHexagonalMesh() throw(Exception)
@@ -227,24 +227,26 @@ public:
         simulator.SetEndTime(end_time);
 
         MAKE_PTR(GeneralMonolayerVertexMeshForce, p_force3);
-        //        p_force3->SetApicalParameters(20, 20, 0.7);
-        //        p_force3->SetBasalParameters(20, 20, 0.7);
-        //        p_force3->SetLateralParameter(8);
-        p_force3->SetVolumeParameters(350, target_area * 0.8);
+        p_force3->SetApicalParameters(20, 20, 0.7);
+        p_force3->SetBasalParameters(20, 20, 0.7);
+        p_force3->SetLateralParameter(8);
+        p_force3->SetVolumeParameters(350, target_area * 1.2);
         simulator.AddForce(p_force3);
         MAKE_PTR(HorizontalStretchForce<3>, p_force2);
         p_force2->SetForceMagnitude(1.0);
         p_force2->SetRelativeWidth(0.15);
-        //        simulator.AddForce(p_force2);
+        simulator.AddForce(p_force2);
 
         simulator.Solve();
 
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), num_cells_x * num_cells_y);
         TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
+        */
     }
 
     void TestOnVoronoiMesh() throw(Exception)
     {
+        /*
         std::string output_filename = "TestUniaxialLoad/VoronoiTest" + boost::lexical_cast<std::string>(num_cells_x)
             + "x" + boost::lexical_cast<std::string>(num_cells_y);
         VoronoiVertexMeshGenerator generator(num_cells_x, num_cells_y, 5, target_area);
@@ -536,12 +538,12 @@ public:
 
         p_mesh->GetNode(4)->rGetModifiableLocation()[1] = 0.46;
         p_mesh->GetNode(5)->rGetModifiableLocation()[1] = 0.54;
-        p_mesh->SetCellRearrangementThreshold(0.10);
-        p_mesh->SetCellRearrangementRatio(8);
+        // p_mesh->SetCellRearrangementThreshold(0.10);
+        // p_mesh->SetCellRearrangementRatio(8);
 
-        p_mesh->ReMesh();
-        p_mesh->SetCellRearrangementThreshold(0.01);
-        p_mesh->SetCellRearrangementRatio(1.5);
+        // p_mesh->ReMesh();
+        // p_mesh->SetCellRearrangementThreshold(0.01);
+        // p_mesh->SetCellRearrangementRatio(1.5);
 
 
         for (unsigned i = 0; i < p_mesh->GetNumNodes() ; ++i)
@@ -563,14 +565,14 @@ public:
         p_force3->SetApicalParameters(15, 15, 0.7);
         p_force3->SetBasalParameters(20, 20, 0.7);
         p_force3->SetLateralParameter(9.25);
-        p_force3->SetVolumeParameters(350, target_volume);
+        p_force3->SetVolumeParameters(350, target_volume*1.2);
         simulator.AddForce(p_force3);
 
         MAKE_PTR(LateralNodeModifier, p_node_modifier);
         simulator.AddSimulationModifier(p_node_modifier);
 
         MAKE_PTR(HorizontalStretchForce<3>, p_force2);
-        p_force2->SetForceMagnitude(1.0);
+        p_force2->SetForceMagnitude(0.50);
         p_force2->SetRelativeWidth(0.15);
         simulator.AddForce(p_force2);
 

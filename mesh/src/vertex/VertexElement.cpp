@@ -853,10 +853,6 @@ void VertexElement<3, 3>::MonolayerElementRearrangeFacesNodes()
 
         if (basal_lateral_indices != apical_lateral_indices)
         {
-            MARK;
-            PRINT_CONTAINER(basal_lateral_indices)
-            PRINT_CONTAINER(apical_lateral_indices)
-
             node_lateral_indices = (basal_lateral_indices.size() < apical_lateral_indices.size()) ? apical_lateral_indices : basal_lateral_indices;
         }
         else

@@ -396,6 +396,11 @@ void FaceRearrangeNodesInMesh(MutableVertexMesh<3, 3>* pMesh, VertexElement<2, 3
             VertexElement<3, 3> *p_elem = pMesh->GetElement(*it);
             p_elem->CheckFaceOrientationOfElement(p_elem->GetFaceLocalIndex(pFace->GetIndex()));
         }
+
+        if (IsLateralFace(pFace))
+        {
+            pFace->LateralFaceRearrangeNodes();
+        }
     }
 }
 
