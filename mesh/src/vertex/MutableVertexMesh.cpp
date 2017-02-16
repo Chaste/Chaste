@@ -3355,14 +3355,14 @@ bool MutableVertexMesh<3, 3>::CheckForSwapsFromShortEdges()
 
         // Find distance between nodes
         const double basal_edge_length = this->GetDistanceBetweenNodes(p_basal_node_1->GetIndex(), p_basal_node_2->GetIndex());
+        const double apical_edge_length = this->GetDistanceBetweenNodes(apical_nodes.front()->GetIndex(), apical_nodes.back()->GetIndex());
         // If the nodes are too close together...
-        if (basal_edge_length < mCellRearrangementThreshold)
+        if (basal_edge_length < mCellRearrangementThreshold || apical_edge_length < mCellRearrangementThreshold)
         {
             const std::set<unsigned> shared_elements = GetSharedElementIndices(p_basal_node_1, p_basal_node_2);
             // Check if any triangular elements are shared by these nodes...
-            const double apical_edge_length = this->GetDistanceBetweenNodes(apical_nodes.front()->GetIndex(), apical_nodes.back()->GetIndex());
             // so if the other side is still longer than threshold, nothing shall be done. Thus continue.
-            if (apical_edge_length > mCellRearrangementThreshold)
+            if (basal_edge_length > mCellRearrangementThreshold*mCellRearrangementRatio || apical_edge_length > mCellRearrangementThreshold*mCellRearrangementRatio)
             {
                 MARK;
                 TRACE("Potential Async T1: " << p_face->GetIndex());
@@ -3372,7 +3372,7 @@ bool MutableVertexMesh<3, 3>::CheckForSwapsFromShortEdges()
                     continue;
                 }
 
-                if (p_face->GetIndex() != 166u)
+                if (p_face->GetIndex() != UINT_MAX)
                 {
                     continue;
                 }
@@ -3576,7 +3576,7 @@ void MutableVertexMesh<3, 3>::PerformAsynchronousT1Swap(Node<3>* pNodeA, Node<3>
     bool t1_on_basal(true);
     // If it is actually the apical edge which is shorter than the threshold, we swap them accordingly,
     // so that all action just happens on p_node_a and p_node_b.
-    if ((norm_2(vector_ab) > mCellRearrangementThreshold) && (norm_2(vector_xy) < mCellRearrangementThreshold))
+    if ((norm_2(vector_ab) > mCellRearrangementRatio*mCellRearrangementThreshold) && (norm_2(vector_xy) < mCellRearrangementThreshold))
     {
         MARK; TRACE("apical shorter, basal longer")
         t1_on_basal = false;
@@ -3587,7 +3587,7 @@ void MutableVertexMesh<3, 3>::PerformAsynchronousT1Swap(Node<3>* pNodeA, Node<3>
     const unsigned node_a_index(p_node_a->GetIndex());
     const unsigned node_b_index(p_node_b->GetIndex());
 
-    if (!((norm_2(vector_ab) < mCellRearrangementThreshold) && (norm_2(vector_xy) > mCellRearrangementThreshold)))
+    if (!((norm_2(vector_ab) < mCellRearrangementThreshold) && (norm_2(vector_xy) > mCellRearrangementRatio*mCellRearrangementThreshold)))
     {
         NEVER_REACHED;
     }
@@ -3858,7 +3858,7 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
     const c_vector<double, 3> vector_AB = this->GetVectorFromAtoB(pNodeA->rGetLocation(), pNodeB->rGetLocation());
     const c_vector<double, 3> vector_XY = this->GetVectorFromAtoB(p_node_x->rGetLocation(), p_node_y->rGetLocation());
 
-    if ((norm_2(vector_AB)<mCellRearrangementThreshold)^(norm_2(vector_XY)<mCellRearrangementThreshold))
+    if (norm_2(vector_AB) > mCellRearrangementThreshold*mCellRearrangementRatio || norm_2(vector_XY) > mCellRearrangementThreshold*mCellRearrangementRatio)
     {
         PerformAsynchronousT1Swap(pNodeA, pNodeB, rElementsContainingNodes);
         return;

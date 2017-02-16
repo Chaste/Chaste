@@ -300,11 +300,14 @@ public:
 
     /**
      * Method for faces. Add a node to the element between nodes at Index and Index+1.
+     * Add to the very end by default. 
+     * (using UINT_MAX - 11 as we might run into error when GetNodeLocalIndex(..) is used
+     * on non-containing node and no check is performed before the call of this function)
      *
      * @param Index the local index of the node after which the new node is added
      * @param pNode a pointer to the new node
      */
-    void FaceAddNode(Node<SPACE_DIM>* pNode, const unsigned Index = UINT_MAX);
+    void FaceAddNode(Node<SPACE_DIM>* pNode, const unsigned Index = UINT_MAX - 11);
 
     /**
      * Method for faces. Delete a node with given local index.

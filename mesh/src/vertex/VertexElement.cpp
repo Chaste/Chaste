@@ -438,7 +438,7 @@ void VertexElement<ELEMENT_DIM, SPACE_DIM>::FaceResetIndex(unsigned index)
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VertexElement<ELEMENT_DIM, SPACE_DIM>::FaceAddNode(Node<SPACE_DIM>* pNode, const unsigned Index)
 {
-    const unsigned real_index = (Index == UINT_MAX) ? this->GetNumNodes() - 1 : Index;
+    const unsigned real_index = (Index == UINT_MAX - 11) ? this->GetNumNodes() - 1 : Index;
 
     assert(real_index < this->mNodes.size());
 
@@ -538,10 +538,6 @@ bool VertexElement<2, 3>::FaceRearrangeNodes(const c_vector<double, 3>& PointOfV
     e1 -= inner_prod(e1, normal) * normal;
     e1 /= norm_2(e1);
     c_vector<double, 3> e2 = VectorProduct(normal, e1);
-
-    assert(abs(inner_prod(e1, e2)) < 1e-5);
-    assert(abs(norm_2(e1) - 1) < 1e-5);
-    assert(abs(norm_2(e2) - 1) < 1e-5);
 
     std::vector<std::pair<double, Node<3>*> > angles_and_nodes;
     for (unsigned i = 0; i < this->GetNumNodes(); ++i)

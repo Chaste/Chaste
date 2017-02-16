@@ -64,7 +64,6 @@ c_vector<double, 3> CalculateEdgeGradient(const Node<3>* pNode1, const Node<3>* 
 
 void GeneralMonolayerVertexMeshForce::AddForceContribution(AbstractCellPopulation<3>& rCellPopulation)
 {
-    c_vector<double, 3> force = zero_vector<double>(3);
     if (dynamic_cast<VertexBasedCellPopulation<3>*>(&rCellPopulation) == NULL)
     {
         EXCEPTION("GeneralMonolayerVertexMeshForce is to be used with a VertexBasedCellPopulation only");
