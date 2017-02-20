@@ -622,6 +622,9 @@ public:
         }
     }
 
+    /**
+     * Show convergence details relevant to this run in std::cout
+     */
     void DisplayRun()
     {
         if (!PetscTools::AmMaster())

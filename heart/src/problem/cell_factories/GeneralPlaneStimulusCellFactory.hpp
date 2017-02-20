@@ -52,7 +52,7 @@ class GeneralPlaneStimulusCellFactory : public PlaneStimulusCellFactory<CELL,ELE
 public:
     /**
      * Constructor
-     *     *
+     *
      * @param numEleAcross  Number of elements across which to apply the stimulus
      * @param meshWidth  Width of the mesh (used to calculate magnitude of stimulus)
      * @param stimulusMagnitude  Magnitude of the applied stimulus (defaults to -1e7, modified in the constructor dependent on mesh size).
