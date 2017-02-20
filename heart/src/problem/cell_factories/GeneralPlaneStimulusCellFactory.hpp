@@ -68,22 +68,16 @@ public:
     GeneralPlaneStimulusCellFactory(unsigned numEleAcross, double meshWidth, bool useMeshWidthAsMag=false, double stimulusMagnitude=-1e7, double stimulusDuration=0.5)
         : PlaneStimulusCellFactory<CELL,ELEMENT_DIM, SPACE_DIM>(stimulusMagnitude,stimulusDuration) // These values are overridden below anyway.
     {
-        if (useMeshWidthAsMag)
-        {
-            this->mpStimulus.reset(new SimpleStimulus(meshWidth, 0.5));
-        }
-        else
-        {
-            stimulusMagnitude*=numEleAcross/(64.0);
-            // ELEMENT_DIM==1 Justification: elements go half size with each refinement
-            // ELEMENT_DIM==2 Justification: Triangles go quarter size with each refinement, but there are twice as many nodes on boundary
-            // ELEMENT_DIM==3 Hypothesis: Triangles go eighth size with each refinement, but there are four-times as many nodes on boundary
-            stimulusMagnitude*=meshWidth/(0.2);
+        assert(useMeshWidthAsMag == false);
+        stimulusMagnitude*=numEleAcross/(64.0);
+        // ELEMENT_DIM==1 Justification: elements go half size with each refinement
+        // ELEMENT_DIM==2 Justification: Triangles go quarter size with each refinement, but there are twice as many nodes on boundary
+        // ELEMENT_DIM==3 Hypothesis: Triangles go eighth size with each refinement, but there are four-times as many nodes on boundary
+        stimulusMagnitude*=meshWidth/(0.2);
 
-            //std::cout<<"Mag is "<<stimulusMagnitude<<"\n";
-            this->mpStimulus.reset(new SimpleStimulus(stimulusMagnitude, stimulusDuration));
-            LOG(1, "Defined a GeneralPlaneStimulusCellFactory<"<<SPACE_DIM<<"> with SimpleStimulus("<<stimulusMagnitude<<","<< stimulusDuration<< ")\n");
-        }
+        //std::cout<<"Mag is "<<stimulusMagnitude<<"\n";
+        this->mpStimulus.reset(new SimpleStimulus(stimulusMagnitude, stimulusDuration));
+        LOG(1, "Defined a GeneralPlaneStimulusCellFactory<"<<SPACE_DIM<<"> with SimpleStimulus("<<stimulusMagnitude<<","<< stimulusDuration<< ")\n");
     }
 };
 

@@ -319,16 +319,8 @@ public:
                 }
                 case PLANE:
                 {
-                    if (this->UseAbsoluteStimulus)
-                    {
-                        // LCOV_EXCL_START
-                        p_cell_factory = new GeneralPlaneStimulusCellFactory<CELL, DIM>(0, this->AbsoluteStimulus, true);
-                        // LCOV_EXCL_STOP
-                    }
-                    else
-                    {
-                        p_cell_factory = new GeneralPlaneStimulusCellFactory<CELL, DIM>(num_ele_across, constructor.GetWidth(), false, this->AbsoluteStimulus);
-                    }
+                    assert(this->UseAbsoluteStimulus == false);
+                    p_cell_factory = new GeneralPlaneStimulusCellFactory<CELL, DIM>(num_ele_across, constructor.GetWidth(), false, this->AbsoluteStimulus);
                     break;
                 }
                 case QUARTER:
