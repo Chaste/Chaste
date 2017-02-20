@@ -7,5 +7,6 @@ monodomain/TestMonodomainConductionVelocity.hpp
 monodomain/TestMonodomainProblem.hpp
 monodomain/TestMonodomainTissue.hpp
 monodomain/TestMonodomainWithSvi.hpp
+postprocessing/TestPostProcessingWriter.hpp
 TestCardiacSimulationArchiver.hpp
 TestElectrodes.hpp
