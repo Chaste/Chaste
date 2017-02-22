@@ -100,6 +100,12 @@ protected:
     double mBasalEdgeParameter;
 
     /**
+     * Strength of each cell's lateral surface area term in the energy expression.
+     * Initialised to 0 in the constructor.
+     */
+    double mLateralAreaParameter;
+
+    /**
      * Strength of each lateral (apico-basal) cell-cell interface length term in the energy expression.
      * Initialised to 0 in the constructor.
      */
@@ -160,7 +166,7 @@ public:
      *
      * @param parameter the new value of mLateralEdgeParameter
      */
-    void SetLateralParameter(const double parameter);
+    void SetLateralParameter(const double lineParameter, const double areaParameter = 0);
 
     /**
      * Set mVolumeParameter and mTargetVolume.

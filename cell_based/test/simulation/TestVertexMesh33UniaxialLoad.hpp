@@ -184,13 +184,13 @@ public:
                     Node<3>* p_node_x = reverse_t1_on_basal ? apical_nodes[0] : basal_nodes[0];
                     Node<3>* p_node_y = reverse_t1_on_basal ? apical_nodes[1] : basal_nodes[1];
                     
-                    VertexElement<2, 3>* p_small_triangular_face = GetSharedLateralFace(p_mesh, p_node_a, p_node_b);
+                    VertexElement<2, 3>* p_small_triangular_face = GetSharedLateralFace(p_node_a, p_node_b, p_mesh);
                     if (p_small_triangular_face == NULL || p_small_triangular_face->GetNumNodes() !=3u || p_small_triangular_face->GetNodeLocalIndex(p_lateral_node->GetIndex()) == UINT_MAX)
                     {
                         NEVER_REACHED;
                     }
 
-                    VertexElement<2, 3>* p_big_triangular_face = GetSharedLateralFace(p_mesh, p_node_x, p_node_y);
+                    VertexElement<2, 3>* p_big_triangular_face = GetSharedLateralFace(p_node_x, p_node_y, p_mesh);
                     if (p_big_triangular_face == NULL || p_big_triangular_face->GetNumNodes() !=3u || p_big_triangular_face->GetNodeLocalIndex(p_lateral_node->GetIndex()) == UINT_MAX)
                     {
                         NEVER_REACHED;
@@ -428,11 +428,81 @@ public:
         AbstractCellBasedSimulationModifier<3>::OutputSimulationModifierParameters(rParamsFile);
     }
 };
-#include "SerializationExportWrapper.hpp"
-CHASTE_CLASS_EXPORT(LateralNodeModifier)
-#include "SerializationExportWrapperForCpp.hpp"
-CHASTE_CLASS_EXPORT(LateralNodeModifier)
 
+class BielmeierExternalForce : public AbstractForce<3>
+{
+    double mEcmSpringConstant;
+
+    double mT_ext;
+
+    friend class boost::serialization::access;
+    template <class Archive>
+    void serialize(Archive &archive, const unsigned int version)
+    {
+        archive& boost::serialization::base_object<AbstractForce<3> >(*this);
+    }
+
+  public:
+    BielmeierExternalForce(const double springConstant = 0.0, const double T_ext = 0.0)
+        : AbstractForce<3>(),
+          mEcmSpringConstant(springConstant),
+          mT_ext(T_ext)
+    {
+    }
+
+    void AddForceContribution(AbstractCellPopulation<3>& rCellPopulation)
+    {
+        if (dynamic_cast<VertexBasedCellPopulation<3>*>(&rCellPopulation) == NULL)
+        {
+            EXCEPTION("GeneralMonolayerVertexMeshForce is to be used with a VertexBasedCellPopulation only");
+        }
+
+        // Define some helper variables
+        VertexBasedCellPopulation<3>* p_cell_population = static_cast<VertexBasedCellPopulation<3>*>(&rCellPopulation);
+        MutableVertexMesh<3, 3>& rMesh = p_cell_population->rGetMesh();
+
+        for (unsigned i = 0; i < rMesh.GetNumNodes(); ++i)
+        {
+            Node<3>* p_node = rMesh.GetNode(i);
+
+            if (IsBasalNode(p_node))
+            {
+                c_vector<double, 3> result = -1 * mEcmSpringConstant * Create_c_vector(0, 0, p_node->rGetLocation()[2]);
+                p_node->AddAppliedForceContribution(result);
+            }
+        }
+
+        for (unsigned i = 0; i < rMesh.GetNumFaces(); ++i)
+        {
+            VertexElement<2, 3>* p_face = rMesh.GetFace(i);
+
+            if (IsApicalFace(p_face))
+            {
+                for (unsigned j = 0; j < p_face->GetNumNodes(); ++j)
+                {
+                    c_vector<double, 3> result = rMesh.GetAreaGradientOfFaceAtNode(p_face, j);
+                    result *= mT_ext;
+                    p_face->GetNode(j)->AddAppliedForceContribution(result);
+                }
+            }
+
+        }
+    }
+
+    void OutputForceParameters(out_stream &rParamsFile)
+    {
+        *rParamsFile << "\t\t\t<EcmSpringConstant>" << mEcmSpringConstant << "</EcmSpringConstant>\n";
+        *rParamsFile << "\t\t\t<T_ext>" << mT_ext << "</T_ext>\n";
+        AbstractForce<3>::OutputForceParameters(rParamsFile);
+    }
+};
+#include "SerializationExportWrapper.hpp"
+CHASTE_CLASS_EXPORT(BielmeierExternalForce)
+// CHASTE_CLASS_EXPORT(LateralNodeModifier)
+
+#include "SerializationExportWrapperForCpp.hpp"
+// CHASTE_CLASS_EXPORT(LateralNodeModifier)
+CHASTE_CLASS_EXPORT(BielmeierExternalForce)
 
 class TestVertexMesh33UniaxialLoad : public AbstractCellBasedTestSuite
 {

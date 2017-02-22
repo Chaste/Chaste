@@ -75,7 +75,7 @@ void HorizontalStretchForce<DIM>::AddForceContribution(AbstractCellPopulation<DI
     VertexBasedCellPopulation<DIM>* p_cell_population = static_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation);
     MutableVertexMesh<DIM, DIM>& rMesh = p_cell_population->rGetMesh();
 
-    const unsigned num_nodes = p_cell_population->GetNumNodes();
+    const unsigned num_nodes = rMesh.GetNumNodes();
     c_vector<double, DIM> force_in_positive_y = zero_vector<double>(DIM);
     force_in_positive_y[0] = mForceMagnitude;
     c_vector<double, DIM> force_in_negative_y = -force_in_positive_y;
@@ -88,6 +88,10 @@ void HorizontalStretchForce<DIM>::AddForceContribution(AbstractCellPopulation<DI
     const double width = width_x * mRelativeWidth;
     const double left_bound = min_x + width;
     const double right_bound = max_x - width;
+
+    std::set<unsigned> left_elems;
+    std::set<unsigned> right_elems;
+
     // could have built two more Cuboids to check if the point is inside,
     // but will have a lot of wrapping which reduce efficiency.
     // Iterate over nodes in the cell population
@@ -99,13 +103,33 @@ void HorizontalStretchForce<DIM>::AddForceContribution(AbstractCellPopulation<DI
         const double loc_x = p_this_node->rGetLocation()[0];
         if (loc_x < left_bound)
         {
-            p_this_node->ClearAppliedForce();
-            p_this_node->AddAppliedForceContribution(force_in_negative_y);
+            const std::set<unsigned> s_tmp = p_this_node->rGetContainingElementIndices();
+            left_elems.insert(s_tmp.begin(), s_tmp.end());
         }
         else if (loc_x > right_bound)
         {
-            p_this_node->ClearAppliedForce();
-            p_this_node->AddAppliedForceContribution(force_in_positive_y);
+            const std::set<unsigned> s_tmp = p_this_node->rGetContainingElementIndices();
+            right_elems.insert(s_tmp.begin(), s_tmp.end());
+        }
+    }
+
+    for (std::set<unsigned>::const_iterator it = left_elems.begin(); it != left_elems.end(); ++it)
+    {
+        VertexElement<DIM, DIM>* p_elem = rMesh.GetElement(*it);
+        for (unsigned i = 0; i < p_elem->GetNumNodes(); ++i)
+        {
+            p_elem->GetNode(i)->ClearAppliedForce();
+            p_elem->GetNode(i)->AddAppliedForceContribution(force_in_negative_y);
+        }
+    }
+
+    for (std::set<unsigned>::const_iterator it = right_elems.begin(); it != right_elems.end(); ++it)
+    {
+        VertexElement<DIM, DIM>* p_elem = rMesh.GetElement(*it);
+        for (unsigned i = 0; i < p_elem->GetNumNodes(); ++i)
+        {
+            p_elem->GetNode(i)->ClearAppliedForce();
+            p_elem->GetNode(i)->AddAppliedForceContribution(force_in_positive_y);
         }
     }
 }

@@ -45,6 +45,7 @@ GeneralMonolayerVertexMeshForce::GeneralMonolayerVertexMeshForce()
           mTargetBasalArea(0),
           mBasalAreaParameter(0),
           mBasalEdgeParameter(0),
+          mLateralAreaParameter(0),
           mLateralEdgeParameter(0),
           mTargetVolume(0),
           mVolumeParameter(0)
@@ -75,55 +76,27 @@ void GeneralMonolayerVertexMeshForce::AddForceContribution(AbstractCellPopulatio
     const unsigned num_nodes = p_cell_population->GetNumNodes();
     const unsigned num_elements = p_cell_population->GetNumElements();
 
-    // Begin by computing the volumes of each element in the mesh, to avoid having to do this multiple times
-    std::vector<double> element_volumes(num_elements);
-    std::vector<double> apical_areas(num_elements);
-    std::vector<double> basal_areas(num_elements);
-    for (unsigned elem_index = 0; elem_index < num_elements; ++elem_index)
+    // Add volume contribution
+    if (fabs(mVolumeParameter) > DBL_EPSILON)
     {
-        const VertexElement<3, 3>* p_elem = p_cell_population->GetElement(elem_index);
-        assert(elem_index == p_elem->GetIndex());
-        element_volumes[elem_index] = rMesh.GetVolumeOfElement(elem_index);
-        apical_areas[elem_index] = rMesh.CalculateAreaOfFace(GetApicalFace(p_elem));
-        basal_areas[elem_index] = rMesh.CalculateAreaOfFace(GetBasalFace(p_elem));
-    }
-
-    // Iterate over nodes in the cell population
-    for (unsigned node_index = 0; node_index < num_nodes; ++node_index)
-    {
-        Node<3>* p_this_node = p_cell_population->GetNode(node_index);
-
-        assert(node_index == p_this_node->GetIndex());
-
-        // Get the type of node. 1=basal; 2=apical
-        const Monolayer::v_type node_type = GetNodeType(p_this_node);
-        c_vector<double, 3> volume_contribution = zero_vector<double>(3);
-
-        // Find the indices of the elements owned by this node
-        const std::set<unsigned> containing_elem_indices = p_this_node->rGetContainingElementIndices();
-
-        // Iterate over these elements
-        for (std::set<unsigned>::iterator iter = containing_elem_indices.begin();
-             iter != containing_elem_indices.end();
-             ++iter)
+        for (unsigned elem_index = 0; elem_index < num_elements; ++elem_index)
         {
-            // Get this element, its index and its number of nodes
-            const VertexElement<3, 3>* p_element = p_cell_population->GetElement(*iter);
-            const unsigned elem_index = p_element->GetIndex();
+            const VertexElement<3, 3>* p_elem = rMesh.GetElement(elem_index);
+            const double elem_volume = rMesh.GetVolumeOfElement(elem_index);
 
-            // Calculating volume contribution
-            if (fabs(mVolumeParameter) > 1e-5)
+            for (unsigned local_node_index = 0; local_node_index < p_elem->GetNumNodes(); ++local_node_index)
             {
-                c_vector<double, 3> element_volume_gradient = rMesh.GetVolumeGradientofElementAtNode(p_element, node_index);
-                // Add the force contribution from this cell's volume compressibility (note the minus sign)
-                volume_contribution -= mVolumeParameter * element_volume_gradient * (element_volumes[elem_index] - mTargetVolume);
+                Node<3>* p_node = p_elem->GetNode(local_node_index);
+
+                c_vector<double, 3> tmp_v = rMesh.GetVolumeGradientofElementAtNode(p_elem, p_node->GetIndex());
+                tmp_v *= -1 * mVolumeParameter * (elem_volume - mTargetVolume);
+
+                p_node->AddAppliedForceContribution(tmp_v);
             }
         }
-        
-        p_this_node->AddAppliedForceContribution(volume_contribution);
     }
 
-    // Do lateral face contributions and edge contributions.
+    // Do face and edge contributions.
     for (unsigned face_id = 0; face_id < rMesh.GetNumFaces(); ++face_id)
     {
         const VertexElement<2, 3>* p_face = rMesh.GetFace(face_id);
@@ -140,7 +113,7 @@ void GeneralMonolayerVertexMeshForce::AddForceContribution(AbstractCellPopulatio
                 for (unsigned node_id = 0; node_id < p_face->GetNumNodes(); ++node_id)
                 {
                     c_vector<double, 3> result = rMesh.GetAreaGradientOfFaceAtNode(p_face, node_id);
-                    result *= -1 * mApicalAreaParameter * (apical_area - mTargetApicalArea);
+                    result *= -1 * mApicalAreaParameter; // *(apical_area - mTargetApicalArea);
                     p_face->GetNode(node_id)->AddAppliedForceContribution(result);
                 }
             }
@@ -156,7 +129,7 @@ void GeneralMonolayerVertexMeshForce::AddForceContribution(AbstractCellPopulatio
                 for (unsigned node_id = 0; node_id < p_face->GetNumNodes(); ++node_id)
                 {
                     c_vector<double, 3> result = rMesh.GetAreaGradientOfFaceAtNode(p_face, node_id);
-                    result *= -1 * mBasalAreaParameter * (basal_area - mTargetBasalArea);
+                    result *= -1 * mBasalAreaParameter; // *(basal_area - mTargetBasalArea);
                     p_face->GetNode(node_id)->AddAppliedForceContribution(result);
                 }
             }
@@ -164,9 +137,19 @@ void GeneralMonolayerVertexMeshForce::AddForceContribution(AbstractCellPopulatio
         }
         case Monolayer::LateralValue:
         {
+            if (fabs(mLateralAreaParameter) > 1e-5)
+            {
+                for (unsigned node_id = 0; node_id < p_face->GetNumNodes(); ++node_id)
+                {
+                    c_vector<double, 3> result = rMesh.GetAreaGradientOfFaceAtNode(p_face, node_id);
+                    result *= -1 * mLateralAreaParameter;
+                    p_face->GetNode(node_id)->AddAppliedForceContribution(result);
+                }
+            }
+
             Node<3>* p_node1 = p_face->GetNode(p_face->GetNumNodes() - 1);
             // Calculate apical and basal edge contribution here so that it will be counted once.
-            for (unsigned i=0; i<p_face->GetNumNodes(); ++i)
+            for (unsigned i = 0; i < p_face->GetNumNodes(); ++i)
             {
                 Node<3>* p_node2 = p_face->GetNode(i);
                 c_vector<double, 3> result = CalculateEdgeGradient(p_node1, p_node2);
@@ -183,10 +166,19 @@ void GeneralMonolayerVertexMeshForce::AddForceContribution(AbstractCellPopulatio
                         result *= -1 * mBasalEdgeParameter;
                     }
                     
+                    // const std::set<unsigned> s_tmp = GetSharedElementIndices(p_node1, p_node2);
+                    // if (s_tmp.size() > 2)
+                    // {
+                    //     PRINT_2_VARIABLES(p_node1->GetIndex(), p_node2->GetIndex());
+                    //     PRINT_CONTAINER(s_tmp);
+                    //     PRINT_CONTAINER(GetSharedElementIndices(p_node1, p_node2));
+                    //     NEVER_REACHED;
+                    // }
                 }
                 else
                 {
                     result *= -1 * mLateralEdgeParameter;
+                    // result /= s_tmp.size();
                 }
                 
                 p_node1->AddAppliedForceContribution(result);
@@ -217,9 +209,10 @@ void GeneralMonolayerVertexMeshForce::SetBasalParameters(const double lineParame
     mBasalEdgeParameter = lineParameter;
 }
 
-void GeneralMonolayerVertexMeshForce::SetLateralParameter(const double parameter)
+void GeneralMonolayerVertexMeshForce::SetLateralParameter(const double lineParameter, const double areaParameter)
 {
-    mLateralEdgeParameter = parameter;
+    mLateralEdgeParameter = lineParameter;
+    mLateralAreaParameter = areaParameter;
 }
 
 void GeneralMonolayerVertexMeshForce::SetVolumeParameters(const double volumeParameter, const double targetVolume)

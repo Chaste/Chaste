@@ -107,6 +107,19 @@ void MutableElement<ELEMENT_DIM, SPACE_DIM>::UpdateNode(const unsigned& rIndex, 
     this->mNodes[rIndex]->AddElement(this->mIndex);
 }
 
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned MutableElement<ELEMENT_DIM, SPACE_DIM>::UpdateNode(Node<SPACE_DIM>* pOldNode, Node<SPACE_DIM>* pNewNode)
+{
+    const unsigned old_local_index(this->GetNodeLocalIndex(pOldNode->GetIndex()));
+    if (old_local_index == UINT_MAX)
+    {
+        EXCEPTION("Element (" << this->mIndex << ") does not have Node (" << pOldNode->GetIndex() << ")!");
+    }
+    this->UpdateNode(old_local_index, pNewNode);
+
+    return old_local_index;
+}
+
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableElement<ELEMENT_DIM, SPACE_DIM>::DeleteNode(const unsigned& rIndex)
 {
@@ -117,6 +130,19 @@ void MutableElement<ELEMENT_DIM, SPACE_DIM>::DeleteNode(const unsigned& rIndex)
 
     // Remove the node at rIndex (removes node from element)
     this->mNodes.erase(this->mNodes.begin() + rIndex);
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned MutableElement<ELEMENT_DIM, SPACE_DIM>::DeleteNode(const Node<SPACE_DIM>* pNode)
+{
+    const unsigned node_local_index = this->GetNodeLocalIndex(pNode->GetIndex());
+    if (node_local_index == UINT_MAX)
+    {
+        EXCEPTION("Node is not in element and cannot be deleted!");
+    }
+    this->DeleteNode(node_local_index);
+
+    return node_local_index;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

@@ -295,7 +295,7 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::DeleteElement(unsigned index)
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MutableMesh<ELEMENT_DIM, SPACE_DIM>::DeleteNodePriorToReMesh(unsigned index)
+void MutableMesh<ELEMENT_DIM, SPACE_DIM>::DeleteNodePriorToReMesh(const unsigned index)
 {
     this->mNodes[index]->MarkAsDeleted();
     mDeletedNodeIndices.push_back(index);

@@ -843,7 +843,7 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 44u);
 
         std::string dirname = OUTPUT_NAME + std::string("/T1SwapReMesh");
-        std::string mesh_filename = "vertex_remesh_T1";
+        std::string mesh_filename = "vertex33_remesh_T1_after_remesh";
 
         // Save the mesh data using mesh writers
         VertexMeshWriter<3, 3> mesh_writer(dirname, mesh_filename, false);
@@ -922,7 +922,7 @@ public:
         // Test boundary property of nodes. All are boundary nodes except node 3.
         for (unsigned i = 0; i < vertex_mesh.GetNumAllNodes(); i++)
         {
-            bool expected_boundary_node = i == 0 || i == 1 || i == 2 || i == 6 || i == 7 || i == 8;
+            bool expected_boundary_node = !(i == 12 || i == 13);
             TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), expected_boundary_node);
         }
 

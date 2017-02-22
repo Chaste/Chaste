@@ -39,6 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <set>
 #include <vector>
 #include <string>
+#include <algorithm>
 
 // Forward declaration prevents circular include chain
 template <unsigned DIM>
@@ -46,7 +47,7 @@ class Node;
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class VertexElement;
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-class MutableVertexMesh;
+class VertexMesh;
 
 /////////////////////////////////////////////////////////
 ///      Some functions that are relevant for all      ///
@@ -54,6 +55,25 @@ class MutableVertexMesh;
 #define plus1(a,n) (a+1)%n
 #define minus1(a,n) (a+n-1)%n
 #define no1(c) (*(c.begin()))
+#define no2(c) (*(++c.begin()))
+
+template <typename T>
+std::set<T> operator-(const std::set<T>& s1, const std::set<T>& s2)
+{
+    std::set<T> s3;
+    std::set_difference(s1.begin(), s1.end(), s2.begin(), s2.end(), std::inserter(s3, s3.begin()));
+
+    return s3;
+}
+
+template <typename T>
+std::set<T> operator+(const std::set<T>& s1, const std::set<T>& s2)
+{
+    std::set<T> s3;
+    std::set_union(s1.begin(), s1.end(), s2.begin(), s2.end(), std::inserter(s3, s3.begin()));
+
+    return s3;
+}
 
 /**
  * A simple function to check if an element or a face has a particular node.
@@ -96,8 +116,8 @@ VertexElement<2, 3>* GetSharedLateralFace(const VertexElement<3, 3>* pElemA,
  * @param pNodeB  node number 2
  * @return  pointer of face that contain both nodes
  */
-VertexElement<2, 3>* GetSharedLateralFace(const MutableVertexMesh<3, 3>* pMesh,
-                                          const Node<3>* pNodeA, const Node<3>* pNodeB);
+template <typename VertexObject>
+VertexElement<2, 3>* GetSharedLateralFace(const Node<3>* pNodeA, const Node<3>* pNodeB, const VertexObject* pObject);
 
 /**
  * Output element, its faces and nodes in terminal
@@ -113,7 +133,7 @@ void PrintElement(const VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement);
  *
  * @param printDeletedObjects  whether to include deleted objects (false by default)
  */
-void PrintMesh(const MutableVertexMesh<3, 3>* pMesh, const bool printDeletedObjects = false);
+void PrintMesh(const VertexMesh<3, 3>* pMesh, const bool printDeletedObjects = false);
 
 /**
  * A face is on boundary when it contains only one element.
@@ -123,7 +143,7 @@ void PrintMesh(const MutableVertexMesh<3, 3>* pMesh, const bool printDeletedObje
 bool IsFaceOnBoundary(const VertexElement<2, 3>* pFace);
 
 
-void FaceRearrangeNodesInMesh(MutableVertexMesh<3, 3>* pMesh, VertexElement<2, 3>* pFace);
+void FaceRearrangeNodesInMesh(VertexMesh<3, 3>* pMesh, VertexElement<2, 3>* pFace);
 
 ///////////////////////////////////////////////////////////////////////////////////
 ///                       Functions for monolayer classes                       ///
@@ -151,6 +171,7 @@ const v_type BasalValue = 1;
 const v_type ApicalValue = 2;
 const v_type LateralValue = 3;
 const v_type ElementValue = 4;
+const v_type AllTypes = 100;
 
 const std::string ValueToString[4] = {"", "Basal", "Apical", "Lateral"};
 }
@@ -158,7 +179,13 @@ const std::string ValueToString[4] = {"", "Basal", "Apical", "Lateral"};
 ///////////////////////////////////
 ///     Functions for nodes     ///
 ///////////////////////////////////
+std::set<VertexElement<2, 3>*> GetFacesWithIndices(const std::set<unsigned>& face_indices,
+                                                   const VertexElement<3, 3>* pElement, 
+                                                   const Monolayer::v_type faceType = Monolayer::AllTypes);
 
+std::set<VertexElement<2, 3>*> GetFacesWithIndices(const std::set<unsigned>& face_indices,
+                                                   const VertexMesh<3, 3>* pMesh, 
+                                                   const Monolayer::v_type faceType = Monolayer::AllTypes);
 /**
  * Set a node as an apical node.
  * @param pNode  pointer of a new apical node
@@ -314,6 +341,15 @@ std::vector<unsigned> GetLateralFace(const VertexElement<3, 3>* pElement, const 
 template <unsigned ELEMENT_DIM>
 std::vector<Node<3>*> GetNodesWithType(const VertexElement<ELEMENT_DIM, 3>* pElement, const Monolayer::v_type nodeType);
 
-//void AddPairNode(VertexElement<3, 3>* pElement, const unsigned index, Node<3>* pBasalNode, Node<3>* pApicalNode);
+std::vector<VertexElement<2, 3>*> GetFacesWithType(const VertexElement<3, 3>* pElement, const Monolayer::v_type faceType);
+
+/**
+ * Several methods to get opposite node for convenience.
+ */
+Node<3>* GetOppositeNode(const Node<3>* pNode, const VertexElement<2, 3>* pFace);
+
+Node<3>* GetOppositeNode(const Node<3>* pNode, const VertexElement<3, 3>* pElement);
+
+Node<3>* GetOppositeNode(const Node<3>* pNode, const VertexMesh<3, 3>* pMesh);
 
 #endif /* MONOLAYERVERTEXMESHCUSTOMFUNCTIONS_HPP_ */

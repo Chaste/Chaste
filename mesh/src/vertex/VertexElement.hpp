@@ -234,31 +234,23 @@ public:
      * Delete a face of an element with given local index. This method will
      * remove the corresponding face orientation as well.
      *
-     * @param rIndex is the local index of the face to remove
+     * @param index is the local index of the face to remove
      */
-    void DeleteFace(const unsigned& rIndex);
+    void DeleteFace(const unsigned index);
+
+    /**
+     * Alternative method to delete face.
+     *
+     * @param pFace is the pointer of the face to remove
+     * @return local face index
+     */
+    unsigned DeleteFace(VertexElement<ELEMENT_DIM - 1, SPACE_DIM>* pFace);
 
     /**
      * Replace old face with the new face and its orientation
      */
     void ReplaceFace(const unsigned oldFaceLocalIndex, VertexElement<ELEMENT_DIM - 1, SPACE_DIM>* pNewFace,
                      const bool newFaceOrientation);
-
-    /**
-     * Method for monolayer element. Delete ApicalNode1 and BasalNode1.
-     * This method will delete nodes from the element, apical & basal face,
-     * update lateral face and return the index of the face which contains all
-     * four nodes (does NOT mark it as deleted).
-     *
-     * @param pApicalNodeDelete is the pointer of apical node which will be removed.
-     * @param pBasalNodeDelete is the pointer of basal node which will be removed.
-     * @param pApicalNodeStay is the pointer of apical node which serve as reference to identify the lateral face.
-     * @param pBasalNodeStay is the pointer of basal node similar to pApicalNode2.
-     *
-     * @return the global index of the face which contains all 4 nodes and its orientation
-     */
-    std::vector<unsigned> MonolayerElementDeleteNodes(const Node<SPACE_DIM>* pApicalNodeDelete, const Node<SPACE_DIM>* pBasalNodeDelete,
-                                                      Node<SPACE_DIM>* pApicalNodeStay, Node<SPACE_DIM>* pBasalNodeStay);
 
     /**
      * Method for monolayer element to rearrange faces and nodes so that
@@ -481,11 +473,10 @@ public:
      */
     void AddFace(VertexElement<0, SPACE_DIM>* pFace);
     void AddFace(VertexElement<0, SPACE_DIM>* pFace, bool Orientation, const unsigned& rIndex);
-    void DeleteFace(const unsigned& rIndex);
+    void DeleteFace(const unsigned index);
+    unsigned DeleteFace(VertexElement<0, SPACE_DIM>* pFace);
     void ReplaceFace(const unsigned oldFaceLocalIndex, VertexElement<0, SPACE_DIM>* pNewFace,
                      const bool newFaceOrientation);
-    std::vector<unsigned> MonolayerElementDeleteNodes(const Node<SPACE_DIM>* pApicalNodeDelete, const Node<SPACE_DIM>* pBasalNodeDelete,
-                                                      Node<SPACE_DIM>* pApicalNodeStay, Node<SPACE_DIM>* pBasalNodeStay);
     void MonolayerElementRearrangeFacesNodes();
     void FaceResetIndex(unsigned index);
     void FaceAddNode(Node<SPACE_DIM>* pNode, const unsigned Index);

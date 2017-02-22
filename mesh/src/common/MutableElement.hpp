@@ -126,11 +126,28 @@ public:
     void UpdateNode(const unsigned& rIndex, Node<SPACE_DIM>* pNode);
 
     /**
+     * Update node at the given pointer.
+     *
+     * @param pOldNode is a pointer which will be changed
+     * @param pNewNode is a pointer to the replacement node
+     * @return local index of pOldNode
+     */
+    unsigned UpdateNode(Node<SPACE_DIM>* pOldNode, Node<SPACE_DIM>* pNewNode);
+
+    /**
      * Delete a node with given local index.
      *
      * @param rIndex is the local index of the node to remove
      */
     void DeleteNode(const unsigned& rIndex);
+    
+    /**
+     * Delete a node with given pointer.
+     *
+     * @param pNode is a pointer to the node which will be removed.
+     * @return local index of pNode
+     */
+    unsigned DeleteNode(const Node<SPACE_DIM>* pNode);
 
     /**
      * Add a node to the element between nodes at rIndex and rIndex+1.

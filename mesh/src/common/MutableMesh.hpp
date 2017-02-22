@@ -274,7 +274,7 @@ public:
      *
      * @param index The index of the node to delete
      */
-    void DeleteNodePriorToReMesh(unsigned index);
+    void DeleteNodePriorToReMesh(const unsigned index);
 
     /**
      * Refine an element at a given point.
