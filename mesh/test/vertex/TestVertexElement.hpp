@@ -302,8 +302,8 @@ public:
 
         TS_ASSERT_EQUALS(vertex_element.GetNumNodes(), 6u);
 
-        vertex_element.DeleteNode(3); // Removes (-1,0) node
-        vertex_element.DeleteNode(0); // Removes (1,0) node
+        vertex_element.DeleteNode(3u); // Removes (-1,0) node
+        vertex_element.DeleteNode(0u); // Removes (1,0) node
 
         // Test node is removed
         TS_ASSERT_EQUALS(vertex_element.GetNumNodes(), 4u);

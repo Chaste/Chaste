@@ -531,6 +531,7 @@ void VertexElement<ELEMENT_DIM, SPACE_DIM>::MarkFaceAsDeleted()
     {
         this->mNodes[i]->RemoveFace(this->mIndex);
     }
+    this->mNodes.clear();
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>

@@ -48,6 +48,8 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class VertexElement;
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class VertexMesh;
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+class MutableVertexMesh;
 
 /////////////////////////////////////////////////////////
 ///      Some functions that are relevant for all      ///
@@ -351,5 +353,7 @@ Node<3>* GetOppositeNode(const Node<3>* pNode, const VertexElement<2, 3>* pFace)
 Node<3>* GetOppositeNode(const Node<3>* pNode, const VertexElement<3, 3>* pElement);
 
 Node<3>* GetOppositeNode(const Node<3>* pNode, const VertexMesh<3, 3>* pMesh);
+
+void MeshUpdateNode(Node<3>* pOldNode, Node<3>* pNewNode, MutableVertexMesh<3, 3>* pMesh);
 
 #endif /* MONOLAYERVERTEXMESHCUSTOMFUNCTIONS_HPP_ */

@@ -703,7 +703,7 @@ public:
         vertex_mesh.SetCellRearrangementThreshold(0.1 * 2.0 / 1.5);
 
         // Test that trying to perform a T1 swap on nodes 4 and 5 throws the correct exception
-        TS_ASSERT_THROWS_THIS(vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(4), vertex_mesh.GetNode(5)), "Nodes(4&5) are too close together, this shouldn't happen");
+        TS_ASSERT_THROWS_THIS(vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(4), vertex_mesh.GetNode(5)), "Nodes(5&4) are too close together, this shouldn't happen");
     }
 
     void TestDoNotPerforT1SwapWithRemovingEdgeFromTriangularElement() throw(Exception)
@@ -922,6 +922,10 @@ public:
         // Test boundary property of nodes. All are boundary nodes except node 3.
         for (unsigned i = 0; i < vertex_mesh.GetNumAllNodes(); i++)
         {
+            if (vertex_mesh.GetNode(i)->IsDeleted())
+            {
+                continue;
+            }
             bool expected_boundary_node = !(i == 12 || i == 13);
             TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), expected_boundary_node);
         }
@@ -1192,12 +1196,9 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(1), 18u);
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(2), 7u);
 
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNumNodes(), 6u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNumFaces(), 5u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNodeGlobalIndex(0), 3u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNodeGlobalIndex(1), 4u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNodeGlobalIndex(2), 6u);
-
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNumNodes(), 0u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNumFaces(), 0u);
+        
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(4)->GetNumNodes(), 8u);
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(4)->GetNumFaces(), 6u);
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(4)->GetNodeGlobalIndex(0), 18u);

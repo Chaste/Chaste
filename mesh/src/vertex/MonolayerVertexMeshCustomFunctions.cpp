@@ -835,3 +835,34 @@ Node<3>* GetOppositeNode(const Node<3>* pNode, const VertexMesh<3, 3>* pMesh)
     const std::set<unsigned>& s_containing_elems = const_cast<Node<3>*>(pNode)->rGetContainingElementIndices();
     return GetOppositeNode(pNode, pMesh->GetElement(no1(s_containing_elems)));
 }
+
+void MeshUpdateNode(Node<3>* pOldNode, Node<3>* pNewNode, MutableVertexMesh<3, 3>* pMesh)
+{
+    const std::set<unsigned> containing_faces = pOldNode->rGetContainingFaceIndices();
+    const std::set<unsigned> containing_elems = pOldNode->rGetContainingElementIndices();
+    for (std::set<unsigned>::const_iterator it = containing_faces.begin(); it != containing_faces.end(); ++it)
+    {
+        if (pMesh->GetFace(*it)->GetNodeLocalIndex(pNewNode->GetIndex()) != UINT_MAX)
+        {
+            pMesh->GetFace(*it)->FaceDeleteNode(pOldNode);
+        }
+        else
+        {
+            pMesh->GetFace(*it)->FaceUpdateNode(pOldNode, pNewNode);
+        }
+    }
+    
+    for (std::set<unsigned>::const_iterator it = containing_elems.begin(); it != containing_elems.end(); ++it)
+    {
+        if (pMesh->GetElement(*it)->GetNodeLocalIndex(pNewNode->GetIndex()) != UINT_MAX)
+        {
+            pMesh->GetElement(*it)->DeleteNode(pOldNode);
+        }
+        else
+        {
+            pMesh->GetElement(*it)->UpdateNode(pOldNode, pNewNode);
+        }
+    }
+
+    pMesh->DeleteNodePriorToReMesh(pOldNode->GetIndex());
+}
