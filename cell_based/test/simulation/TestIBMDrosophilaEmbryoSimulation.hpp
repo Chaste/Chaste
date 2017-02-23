@@ -83,7 +83,7 @@ public:
 	 * As a first approximation, the VE cells will be on a circular basement membrane, with the
 	 * lower half representing the VE cells around the epiblast
 	 */
-	void TestIBMDrosophilaEmbryoSimulation() throw (Exception)
+	void TestIBMDrosophilaCrossSectionSimulation() throw (Exception)
 	{
         /*
          * First use the mesh generator to set up the immersed boundary elements
