@@ -1235,6 +1235,16 @@ public:
         axis_of_division[0] = 1;
         p_mesh->DivideElementAlongGivenAxis(p_mesh->GetElement(0), axis_of_division);
         p_mesh->ReMesh();
+        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 3u);
+        TS_ASSERT_EQUALS(p_mesh->GetNumFaces(), 16u);
+        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 16u);
+        TS_ASSERT_EQUALS(p_mesh->GetElement(0)->GetNumFaces(), 6u);
+        TS_ASSERT_EQUALS(p_mesh->GetElement(1)->GetNumFaces(), 7u);
+        TS_ASSERT_EQUALS(p_mesh->GetElement(2)->GetNumFaces(), 6u);
+        TS_ASSERT_EQUALS(p_mesh->GetElement(0)->GetNumNodes(), 8u);
+        TS_ASSERT_EQUALS(p_mesh->GetElement(1)->GetNumNodes(), 10u);
+        TS_ASSERT_EQUALS(p_mesh->GetElement(2)->GetNumNodes(), 8u);
+
         builder.WriteVtk("DivideElement", "After");
     }
 

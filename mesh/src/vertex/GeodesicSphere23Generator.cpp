@@ -16,15 +16,6 @@
 
 #include "Debug.hpp"
 
-class SortWithIndex
-{
-public:
-    bool operator()(const std::pair<double, unsigned>& a, const std::pair<double, unsigned>& b) const
-    {
-        return a.first < b.first;
-    }
-};
-
 GeodesicSphere23Generator::GeodesicSphere23Generator(const unsigned numDivision)
         : mDepth(0)
 {
@@ -290,7 +281,7 @@ MutableVertexMesh<2, 3>* GeodesicSphere23Generator::GetDual()
             angles_with_index.push_back(std::make_pair(tmp_angle, dual_node_local_index));
         }
 
-        std::sort(angles_with_index.begin(), angles_with_index.end(), SortWithIndex());
+        std::sort(angles_with_index.begin(), angles_with_index.end());
         std::vector<Node<3>*> this_dual_face_nodes(this_num_dual_nodes);
 
         std::vector<double> Debug_anglesss;

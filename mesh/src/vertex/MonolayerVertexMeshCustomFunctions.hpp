@@ -356,4 +356,10 @@ Node<3>* GetOppositeNode(const Node<3>* pNode, const VertexMesh<3, 3>* pMesh);
 
 void MeshUpdateNode(Node<3>* pOldNode, Node<3>* pNewNode, MutableVertexMesh<3, 3>* pMesh);
 
+template <unsigned ELEMENT_DIM>
+Node<3>* GetNextNode(const unsigned localIndex, const VertexElement<ELEMENT_DIM, 3>* pElement);
+
+template <unsigned ELEMENT_DIM>
+Node<3>* GetNextNode(const Node<3>* pNode, const VertexElement<ELEMENT_DIM, 3>* pElement);
+
 #endif /* MONOLAYERVERTEXMESHCUSTOMFUNCTIONS_HPP_ */

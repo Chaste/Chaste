@@ -866,3 +866,21 @@ void MeshUpdateNode(Node<3>* pOldNode, Node<3>* pNewNode, MutableVertexMesh<3, 3
 
     pMesh->DeleteNodePriorToReMesh(pOldNode->GetIndex());
 }
+
+template <unsigned ELEMENT_DIM>
+Node<3>* GetNextNode(const unsigned localIndex, const VertexElement<ELEMENT_DIM, 3>* pElement)
+{
+    const unsigned num_nodes = pElement->GetNumNodes();
+    return pElement->GetNode(plus1(localIndex, num_nodes));
+}
+template Node<3>* GetNextNode(const unsigned, const VertexElement<2, 3>*);
+template Node<3>* GetNextNode(const unsigned, const VertexElement<3, 3>*);
+
+template <unsigned ELEMENT_DIM>
+Node<3>* GetNextNode(const Node<3>* pNode, const VertexElement<ELEMENT_DIM, 3>* pElement)
+{
+    const unsigned current_index = pElement->GetNodeLocalIndex(pNode->GetIndex());
+    return GetNextNode(current_index, pElement);
+}
+template Node<3>* GetNextNode(const Node<3>*, const VertexElement<2, 3>*);
+template Node<3>* GetNextNode(const Node<3>*, const VertexElement<3, 3>*);

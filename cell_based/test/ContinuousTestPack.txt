@@ -62,6 +62,8 @@ population/TestVertexBasedCellPopulation.hpp
 population/TestVertexBasedDivisionRules.hpp
 simulation/TestApicalConstrictionExample.hpp
 simulation/TestDeltaNotchModifier.hpp
+simulation/TestMonolayerCylindricalMeshExample.hpp
+simulation/TestMonolayerSphericalMeshExample.hpp
 simulation/TestNumericalMethods.hpp
 simulation/TestOffLatticeSimulation.hpp
 simulation/TestOffLatticeSimulation3d.hpp

@@ -3253,6 +3253,9 @@ unsigned MutableVertexMesh<3, 3>::AddFace(VertexElement<2, 3>* pNewFace)
     else
     {
         assert(this->mFaces[new_face_index]->IsDeleted());
+        delete this->mFaces[new_face_index];
+        std::vector<unsigned>& v = mDeletedFaceIndices;
+        v.erase(std::remove(v.begin(), v.end(), new_face_index), v.end());
         this->mFaces[new_face_index] = pNewFace;
     }
     pNewFace->RegisterFaceWithNodes();
@@ -3410,21 +3413,13 @@ bool MutableVertexMesh<3, 3>::CheckForSwapsFromShortEdges()
             // so if the other side is still longer than threshold, nothing shall be done. Thus continue.
             if (basal_edge_length > mCellRearrangementThreshold*mCellRearrangementRatio || apical_edge_length > mCellRearrangementThreshold*mCellRearrangementRatio)
             {
-                MARK;
-                TRACE("Potential Async T1: " << p_face->GetIndex());
-                
                 if (IsFaceOnBoundary(p_face))
                 {
                     continue;
                 }
 
-                if (p_face->GetIndex() != UINT_MAX)
-                {
-                    continue;
-                }
-
                 MARK;
-                TRACE("Asynchronous in CheckAndIdentify");
+                TRACE("Potential Async T1 in CheckAndIdentify: " << p_face->GetIndex());
             }
 
             bool both_nodes_share_triangular_element = false;
@@ -4202,66 +4197,91 @@ void MutableVertexMesh<3, 3>::PerformT2Swap(VertexElement<3,3>& rElement)
 }
 
 template <>
-unsigned MutableVertexMesh<3, 3>::DivideElement(VertexElement<3,3>* pElement,
-                                                unsigned nodeALocalIndex,
-                                                unsigned nodeBLocalIndex,
-                                                bool placeOriginalElementBelow)
+unsigned MutableVertexMesh<3, 3>::DivideElement(VertexElement<3,3>* pElement, unsigned dividingFaceIndex, unsigned dummy, bool dummy2)
 {
-    // Sort nodeA and nodeB such that nodeBIndex > nodeAindex
-    assert(nodeBLocalIndex != nodeALocalIndex);
-    unsigned node1_local_index = (nodeALocalIndex < nodeBLocalIndex) ? nodeALocalIndex : nodeBLocalIndex; // low index
-    unsigned node2_local_index = (nodeALocalIndex < nodeBLocalIndex) ? nodeBLocalIndex : nodeALocalIndex; // high index
+    VertexElement<2, 3>* p_new_lateral_face = this->GetFace(dividingFaceIndex);
 
-    VertexElement<2, 3>* p_basal_face = GetBasalFace(pElement);
-    Node<3>* p_basal_node1 = pElement->GetNode(node1_local_index);
-    Node<3>* p_basal_node2 = pElement->GetNode(node2_local_index);
-    assert(IsBasalNode(p_basal_node1) && IsBasalNode(p_basal_node2));
+    std::vector<Node<3>*> v_tmp = GetNodesWithType(p_new_lateral_face, Monolayer::ApicalValue);
+    assert(v_tmp.size() == 2);
+    Node<3>* p_apical_node1 = v_tmp[0];
+    Node<3>* p_apical_node2 = v_tmp[1];
 
     VertexElement<2, 3>* p_apical_face = GetApicalFace(pElement);
-    Node<3>* p_apical_node1 = p_apical_face->GetNode(node1_local_index);
-    Node<3>* p_apical_node2 = p_apical_face->GetNode(node2_local_index);
+    if (p_apical_face->GetNodeLocalIndex(p_apical_node1->GetIndex()) > p_apical_face->GetNodeLocalIndex(p_apical_node2->GetIndex()))
+    {
+        std::swap(p_apical_node1, p_apical_node2);
+    }
 
-    // Create new element
-    std::vector<VertexElement<2, 3>*> new_elem_faces;
-    std::vector<bool> new_elem_orientations;
+    Node<3>* p_basal_node1 = GetOppositeNode(p_apical_node1, p_new_lateral_face);
+    Node<3>* p_basal_node2 = GetOppositeNode(p_apical_node2, p_new_lateral_face);
+    VertexElement<2, 3>* p_basal_face = GetBasalFace(pElement);
+    if (p_basal_face->GetNodeLocalIndex(p_basal_node1->GetIndex()) > p_basal_face->GetNodeLocalIndex(p_basal_node2->GetIndex()))
+    {
+        std::swap(p_basal_node1, p_basal_node2);
+    }
 
-    // Make new element with nodes between node1 and node2
+    /**
+     *  Procedure:
+     *  I split apical and basal surfaces
+     *  II delete old element
+     *  III create both new elements
+     */
+
+    // I split apical and basal surfaces
     std::vector<Node<3>*> new_elem_basal_nodes;
-    std::vector<Node<3>*> new_elem_apical_nodes;
-    for (unsigned node_index=node1_local_index; node_index<=node2_local_index; ++node_index)
     {
-        new_elem_basal_nodes.push_back(p_basal_face->GetNode(node_index));
-        new_elem_apical_nodes.push_back(p_apical_face->GetNode(node_index));
+        const unsigned node1_local_index = std::min(p_basal_face->GetNodeLocalIndex(p_basal_node1->GetIndex()),
+                                                    p_basal_face->GetNodeLocalIndex(p_basal_node2->GetIndex()));
+        const unsigned node2_local_index = std::max(p_basal_face->GetNodeLocalIndex(p_basal_node1->GetIndex()),
+                                                    p_basal_face->GetNodeLocalIndex(p_basal_node2->GetIndex()));
+        new_elem_basal_nodes.push_back(p_basal_face->GetNode(node2_local_index));
+        for (unsigned node_index = node2_local_index - 1; node_index > node1_local_index; --node_index)
+        {
+            new_elem_basal_nodes.push_back(p_basal_face->GetNode(node_index));
+            p_basal_face->FaceDeleteNode(node_index);
+        }
+        new_elem_basal_nodes.push_back(p_basal_face->GetNode(node1_local_index));
     }
-    VertexElement<2, 3>* p_new_basal_face = new VertexElement<2, 3>((this->mFaces).size(), new_elem_basal_nodes);
+    VertexElement<2, 3>* p_new_basal_face = new VertexElement<2, 3>(this->GetNumFaces(), new_elem_basal_nodes);
     SetFaceAsBasal(p_new_basal_face);
-    this->mFaces.push_back(p_new_basal_face);
-    new_elem_faces.push_back(p_new_basal_face);
-    new_elem_orientations.push_back(true);
-    VertexElement<2, 3>* p_new_apical_face = new VertexElement<2, 3>((this->mFaces).size(), new_elem_apical_nodes);
-    SetFaceAsApical(p_new_apical_face);
-    this->mFaces.push_back(p_new_apical_face);
-    new_elem_faces.push_back(p_new_apical_face);
-    new_elem_orientations.push_back(false);
+    this->AddFace(p_new_basal_face);
 
-    for (unsigned face_index=node1_local_index; face_index<node2_local_index; ++face_index)
+    std::vector<Node<3>*> new_elem_apical_nodes;
     {
-        new_elem_faces.push_back(pElement->GetFace(face_index+2));
-        new_elem_orientations.push_back(pElement->FaceIsOrientatedAntiClockwise(face_index+2));
+        const unsigned node1_local_index = std::min(p_apical_face->GetNodeLocalIndex(p_apical_node1->GetIndex()),
+                                                    p_apical_face->GetNodeLocalIndex(p_apical_node2->GetIndex()));
+        const unsigned node2_local_index = std::max(p_apical_face->GetNodeLocalIndex(p_apical_node1->GetIndex()),
+                                                    p_apical_face->GetNodeLocalIndex(p_apical_node2->GetIndex()));
+        new_elem_apical_nodes.push_back(p_apical_face->GetNode(node2_local_index));
+        for (unsigned node_index = node2_local_index - 1; node_index > node1_local_index; --node_index)
+        {
+            new_elem_apical_nodes.push_back(p_apical_face->GetNode(node_index));
+            p_apical_face->FaceDeleteNode(node_index);
+        }
+        new_elem_apical_nodes.push_back(p_apical_face->GetNode(node1_local_index));
     }
-    std::vector<Node<3>*> new_lateral_face_nodes(4);
-    new_lateral_face_nodes[0] = p_basal_node1;
-    new_lateral_face_nodes[1] = p_basal_node2;
-    new_lateral_face_nodes[2] = p_apical_node2;
-    new_lateral_face_nodes[3] = p_apical_node1;
-    ///\todo: #2850 AddFace method for MutableVertexMesh
-    VertexElement<2, 3>* p_new_lateral_face = new VertexElement<2, 3>((this->mFaces).size(), new_lateral_face_nodes);
-    SetFaceAsLateral(p_new_lateral_face);
-    this->mFaces.push_back(p_new_lateral_face);
-    new_elem_faces.push_back(p_new_lateral_face);
-    new_elem_orientations.push_back(true);
-    // Create new element
-    ///\todo: #2850 why don't just do this in AddElement, just like AddNode?
+    VertexElement<2, 3>* p_new_apical_face = new VertexElement<2, 3>(this->GetNumFaces(), new_elem_apical_nodes);
+    SetFaceAsApical(p_new_apical_face);
+    this->AddFace(p_new_apical_face);
+
+    p_new_lateral_face->FaceRearrangeNodes(p_apical_face->GetCentroid());
+    c_vector<double, 3> normal_v;
+    this->CalculateUnitNormalToFaceWithArea(p_new_lateral_face, normal_v);
+    const c_vector<double, 3> centre_of_face = p_new_lateral_face->GetCentroid();
+    const bool apical_side = inner_prod(this->GetVectorFromAtoB(p_apical_face->GetCentroid(), centre_of_face), normal_v) > 0;
+    const bool basal_side = inner_prod(this->GetVectorFromAtoB(p_basal_face->GetCentroid(), centre_of_face), normal_v) > 0;
+    if (apical_side !=  basal_side)
+    {
+        if (apical_side == (inner_prod(this->GetVectorFromAtoB(p_new_basal_face->GetCentroid(), centre_of_face), normal_v) > 0))
+        {
+            std::swap(p_basal_face, p_new_basal_face);
+        }
+        else
+        {
+            NEVER_REACHED;
+        }
+    }
+
     // Get the index of the new element
     unsigned new_element_index;
     if (mDeletedElementIndices.empty())
@@ -4274,27 +4294,57 @@ unsigned MutableVertexMesh<3, 3>::DivideElement(VertexElement<3,3>* pElement,
         mDeletedElementIndices.pop_back();
         delete this->mElements[new_element_index];
     }
-    new_elem_basal_nodes.insert(new_elem_basal_nodes.end(), new_elem_apical_nodes.begin(), new_elem_apical_nodes.end());
-    // Add the new element to the mesh
-    VertexElement<3,3>* p_new_elem = new VertexElement<3,3>(new_element_index, new_elem_faces, new_elem_orientations, new_elem_basal_nodes);
+    // II, store old lateral faces before deleting the element
+    const std::vector<VertexElement<2, 3>*> all_lateral_faces = GetFacesWithType(pElement, Monolayer::LateralValue);
+    const unsigned old_element_index = pElement->GetIndex();
+    // this->DeleteElementPriorToReMesh(old_element_index);
+    // delete pElement;
+
+    // III
+    std::vector<VertexElement<2, 3>*> new_elem_faces;
+    new_elem_faces.push_back(p_new_basal_face);
+    new_elem_faces.push_back(p_new_apical_face);
+    new_elem_faces.push_back(p_new_lateral_face);
+    std::vector<VertexElement<2, 3>*> old_elem_faces;
+    old_elem_faces.push_back(p_basal_face);
+    old_elem_faces.push_back(p_apical_face);
+    old_elem_faces.push_back(p_new_lateral_face);
+
+    for (unsigned i = 0; i < all_lateral_faces.size(); ++i)
+    {
+        if (all_lateral_faces[i] == p_new_lateral_face)
+        {
+            continue;
+        }
+        
+        if (apical_side == (inner_prod(this->GetVectorFromAtoB(all_lateral_faces[i]->GetCentroid(), centre_of_face), normal_v) > 0))
+        {
+            old_elem_faces.push_back(all_lateral_faces[i]);
+        }
+        else
+        {
+            new_elem_faces.push_back(all_lateral_faces[i]);
+        }
+    }
+
+    const std::vector<bool> tmp_v1(new_elem_faces.size(), true);
+    VertexElement<3,3>* p_new_elem = new VertexElement<3,3>(new_element_index, new_elem_faces, tmp_v1);
     SetElementAsMonolayer(p_new_elem);
     this->AddElement(p_new_elem);
+    
+    const std::vector<bool> tmp_v2(old_elem_faces.size(), true);
+    const unsigned old_tmp_index = this->GetNumElements();
+    VertexElement<3,3>* p_old_elem = new VertexElement<3,3>(old_tmp_index, old_elem_faces, tmp_v2);
+    SetElementAsMonolayer(p_old_elem);
+    this->AddElement(p_old_elem);
+    
+    pElement->MarkAsDeleted();
+    p_old_elem->ResetIndex(old_element_index);
+    std::swap(this->mElements[old_element_index], this->mElements[old_tmp_index]);
+    this->mDeletedElementIndices.push_back(old_tmp_index);
+    this->ReMesh();
 
-    // Remove extra nodes and faces from original element
-    for (unsigned node_index=1; node_index<new_elem_apical_nodes.size()-1; ++node_index)
-    {
-        pElement->DeleteNode(pElement->GetNodeLocalIndex(new_elem_basal_nodes[node_index]->GetIndex()));
-        pElement->DeleteNode(pElement->GetNodeLocalIndex(new_elem_apical_nodes[node_index]->GetIndex()));
-        p_basal_face->FaceDeleteNode(new_elem_basal_nodes[node_index]);
-        p_apical_face->FaceDeleteNode(new_elem_apical_nodes[node_index]);
-    }
-    for (unsigned face_index=node2_local_index-1; face_index>=node1_local_index; --face_index)
-    {
-        pElement->DeleteFace(face_index+2);
-    }
-    pElement->AddFace(p_new_lateral_face, false, node1_local_index-1+2);
-    pElement->MonolayerElementRearrangeFacesNodes();
-    return new_element_index;
+    return p_new_elem->GetIndex();
 }
 
 template <>
@@ -4320,50 +4370,55 @@ unsigned MutableVertexMesh<3, 3>::DivideElementAlongGivenAxis(VertexElement<3, 3
      * When points lie at the opposite site of the plane, the signed distances will
      * have different parity.
      */
-    std::vector<unsigned> intersecting_apical_nodes;
-    std::vector<unsigned> intersecting_basal_nodes;
-    const unsigned half_num_nodes = MonolayerGetHalfNumNodes(pElement);
+    std::set<VertexElement<2, 3>*> apical_intersecting_lateral_faces;
     bool is_current_apical_node_on_normal_side = (inner_prod(this->GetVectorFromAtoB(centroid, p_apical_face->GetNodeLocation(0)), axisOfDivision) >= 0);
-    bool is_current_basal_node_on_normal_side = (inner_prod(this->GetVectorFromAtoB(centroid, p_basal_face->GetNodeLocation(0)), axisOfDivision) >= 0);
-    for (unsigned i=0; i<half_num_nodes; i++)
+    for (unsigned i = 0; i < p_apical_face->GetNumNodes(); ++i)
     {
-        bool is_next_apical_node_on_normal_side = (inner_prod(this->GetVectorFromAtoB(centroid, p_apical_face->GetNodeLocation((i+1)%half_num_nodes)), axisOfDivision) >= 0);
-        bool is_next_basal_node_on_normal_side = (inner_prod(this->GetVectorFromAtoB(centroid, p_basal_face->GetNodeLocation((i+1)%half_num_nodes)), axisOfDivision) >= 0);
+        Node<3>* p_next_node = GetNextNode(i, p_apical_face);
+        bool is_next_apical_node_on_normal_side = (inner_prod(this->GetVectorFromAtoB(centroid, p_next_node->rGetLocation()), axisOfDivision) >= 0);
         if (is_current_apical_node_on_normal_side != is_next_apical_node_on_normal_side)
         {
-            intersecting_apical_nodes.push_back(i);
-        }
-        if (is_current_basal_node_on_normal_side != is_next_basal_node_on_normal_side)
-        {
-            intersecting_basal_nodes.push_back(i);
+            apical_intersecting_lateral_faces.insert(GetSharedLateralFace(p_next_node, p_apical_face->GetNode(i), this));
         }
         is_current_apical_node_on_normal_side = is_next_apical_node_on_normal_side;
+    }
+
+    std::set<VertexElement<2, 3>*> basal_intersecting_lateral_faces;
+    bool is_current_basal_node_on_normal_side = (inner_prod(this->GetVectorFromAtoB(centroid, p_basal_face->GetNodeLocation(0)), axisOfDivision) >= 0);
+    for (unsigned i = 0; i < p_basal_face->GetNumNodes(); ++i)
+    {
+        Node<3>* p_next_node = GetNextNode(i, p_basal_face);
+        bool is_next_basal_node_on_normal_side = (inner_prod(this->GetVectorFromAtoB(centroid, p_next_node->rGetLocation()), axisOfDivision) >= 0);
+        if (is_current_basal_node_on_normal_side != is_next_basal_node_on_normal_side)
+        {
+            basal_intersecting_lateral_faces.insert(GetSharedLateralFace(p_next_node, p_basal_face->GetNode(i), this));
+        }
         is_current_basal_node_on_normal_side = is_next_basal_node_on_normal_side;
     }
 
     // If the axis of division does not cross two edges then we cannot proceed
-    if (intersecting_apical_nodes.size() != 2 || intersecting_basal_nodes.size() != 2)
+    if (apical_intersecting_lateral_faces.size() != 2 || basal_intersecting_lateral_faces.size() != 2)
     {
         EXCEPTION("Cannot proceed with element division: the given axis of division does not cross two edges of the element");
     }
-    if (intersecting_apical_nodes[0]!=intersecting_basal_nodes[0] || intersecting_apical_nodes[1]!=intersecting_basal_nodes[1])
+    if (apical_intersecting_lateral_faces != basal_intersecting_lateral_faces)
     {
         PrintElement(pElement);
         PRINT_CONTAINER(axisOfDivision);
-        PRINT_CONTAINER(intersecting_apical_nodes)
-        PRINT_CONTAINER(intersecting_basal_nodes)
+        PRINT_CONTAINER(apical_intersecting_lateral_faces)
+        PRINT_CONTAINER(basal_intersecting_lateral_faces)
 
         ///\todo #2850 proceed with element division even with such case
         WARNING("Cannot proceed with element division: the plane of division splits apical and basal faces at different locations.");
 
-        intersecting_apical_nodes = intersecting_basal_nodes;
+        apical_intersecting_lateral_faces = basal_intersecting_lateral_faces;
     }
 
     std::vector<Node<3>*> division_nodes;
 
-    unsigned nodes_added = 0;
     // Find the intersections between the axis of division and the element edges
-    for (unsigned i=0; i<intersecting_apical_nodes.size(); ++i)
+    for (std::set<VertexElement<2, 3>*>::const_iterator it = apical_intersecting_lateral_faces.begin(); 
+        it != apical_intersecting_lateral_faces.end(); ++it)
     {
         /*
          * Get pointers to the nodes forming the edge into which one new node will be inserted.
@@ -4372,15 +4427,18 @@ unsigned MutableVertexMesh<3, 3>::DivideElementAlongGivenAxis(VertexElement<3, 3
          * we change the local index of the second entry of intersecting_nodes in
          * pElement, so must account for this by moving one entry further on.
          */
-        Node<3>* p_apical_node_a = p_apical_face->GetNode((intersecting_apical_nodes[i]+nodes_added)%(half_num_nodes+nodes_added));
-        Node<3>* p_apical_node_b = p_apical_face->GetNode((intersecting_apical_nodes[i]+nodes_added+1)%(half_num_nodes+nodes_added));
-        const Node<3>* p_basal_node_a = p_basal_face->GetNode((intersecting_basal_nodes[i]+nodes_added)%(half_num_nodes+nodes_added));
-        const Node<3>* p_basal_node_b = p_basal_face->GetNode((intersecting_basal_nodes[i]+nodes_added+1)%(half_num_nodes+nodes_added));
+        VertexElement<2, 3>* p_shared_face = *it;
+        const std::vector<Node<3>*> v_apical = GetNodesWithType(p_shared_face, Monolayer::ApicalValue);
+        assert(v_apical.size() == 2);
+        const Node<3>* p_apical_node_a = v_apical[0];
+        Node<3>* p_apical_node_b = v_apical[1];
+        const Node<3>* p_basal_node_a = GetOppositeNode(p_apical_node_a, this);
+        Node<3>* p_basal_node_b = GetOppositeNode(p_apical_node_b, this);
 
         // Calculate apical position of the intersection
-        c_vector<double, 3> position_apical_a = p_apical_node_a->rGetLocation();
-        c_vector<double, 3> position_apical_b = p_apical_node_b->rGetLocation();
-        c_vector<double, 3> apical_a_to_b = this->GetVectorFromAtoB(position_apical_a, position_apical_b);
+        const c_vector<double, 3>& position_apical_a = p_apical_node_a->rGetLocation();
+        const c_vector<double, 3>& position_apical_b = p_apical_node_b->rGetLocation();
+        const c_vector<double, 3> apical_a_to_b = this->GetVectorFromAtoB(position_apical_a, position_apical_b);
         c_vector<double, 3> apical_intersection;
         if (norm_2(apical_a_to_b) < 2.0*mCellRearrangementRatio*mCellRearrangementThreshold)
         {
@@ -4418,9 +4476,9 @@ unsigned MutableVertexMesh<3, 3>::DivideElementAlongGivenAxis(VertexElement<3, 3
         }
 
         // Calculate basal position of the intersection
-        c_vector<double, 3> position_basal_a = p_basal_node_a->rGetLocation();
-        c_vector<double, 3> position_basal_b = p_basal_node_b->rGetLocation();
-        c_vector<double, 3> basal_a_to_b = this->GetVectorFromAtoB(position_basal_a, position_basal_b);
+        const c_vector<double, 3>& position_basal_a = p_basal_node_a->rGetLocation();
+        const c_vector<double, 3>& position_basal_b = p_basal_node_b->rGetLocation();
+        const c_vector<double, 3> basal_a_to_b = this->GetVectorFromAtoB(position_basal_a, position_basal_b);
         c_vector<double, 3> basal_intersection;
         if (norm_2(basal_a_to_b) < 2.0*mCellRearrangementRatio*mCellRearrangementThreshold)
         {
@@ -4443,8 +4501,8 @@ unsigned MutableVertexMesh<3, 3>::DivideElementAlongGivenAxis(VertexElement<3, 3
              * If then new node is too close to one of the edge nodes, then reposition it
              * a distance mCellRearrangementRatio*mCellRearrangementThreshold further along the edge.
              */
-            c_vector<double, 3> a_to_intersection = this->GetVectorFromAtoB(position_basal_a, basal_intersection);
-            c_vector<double, 3> b_to_intersection = this->GetVectorFromAtoB(position_basal_b, basal_intersection);
+            const c_vector<double, 3> a_to_intersection = this->GetVectorFromAtoB(position_basal_a, basal_intersection);
+            const c_vector<double, 3> b_to_intersection = this->GetVectorFromAtoB(position_basal_b, basal_intersection);
             if (norm_2(a_to_intersection) < mCellRearrangementThreshold)
             {
                 assert(norm_2(b_to_intersection) > mCellRearrangementThreshold); // LCOV_EXCL_LINE
@@ -4457,11 +4515,6 @@ unsigned MutableVertexMesh<3, 3>::DivideElementAlongGivenAxis(VertexElement<3, 3
             }
         }
 
-        // Find common elements
-        ///\todo: #2850 get better method to get shared face, when node register face.
-        const std::set<unsigned> shared_elements = GetSharedElementIndices(p_apical_node_a, p_apical_node_b);
-        assert(shared_elements.size()!=0);
-        VertexElement<2, 3>* shared_face = GetSharedLateralFace(p_basal_node_a, p_basal_node_b, this);
         /*
          * The new node is boundary node if the 2 nodes are boundary nodes and the elements don't look like
          *   ___A___
@@ -4470,8 +4523,8 @@ unsigned MutableVertexMesh<3, 3>::DivideElementAlongGivenAxis(VertexElement<3, 3
          *      B
          */
         // Find the indices of the elements owned by each node on the edge into which one new node will be inserted
-        const std::set<unsigned> elems_containing_node_A = p_apical_node_a->rGetContainingElementIndices();
-        const std::set<unsigned> elems_containing_node_B = p_apical_node_b->rGetContainingElementIndices();
+        const std::set<unsigned>& elems_containing_node_A = const_cast<Node<3>*>(p_apical_node_a)->rGetContainingElementIndices();
+        const std::set<unsigned>& elems_containing_node_B = const_cast<Node<3>*>(p_apical_node_b)->rGetContainingElementIndices();
         bool is_boundary = false;
         if (p_apical_node_a->IsBoundaryNode() && p_apical_node_b->IsBoundaryNode())
         {
@@ -4482,20 +4535,22 @@ unsigned MutableVertexMesh<3, 3>::DivideElementAlongGivenAxis(VertexElement<3, 3
                 is_boundary = true;
             }
         }
-
         ///\todo #2850 use this to assign is_boundary
-       assert(is_boundary == IsFaceOnBoundary(shared_face));   // LCOV_EXCL_LINE
+       if (is_boundary != IsFaceOnBoundary(p_shared_face))
+       {
+           NEVER_REACHED;
+       }
 
         // Add a new node to the mesh at the location of the intersection
         Node<3>* p_new_basal_node = new Node<3>(0, basal_intersection, is_boundary);
         SetNodeAsBasal(p_new_basal_node);
+        this->AddNode(p_new_basal_node);
         Node<3>* p_new_apical_node = new Node<3>(0, apical_intersection, is_boundary);
         SetNodeAsApical(p_new_apical_node);
-        this->AddNode(p_new_basal_node);
         this->AddNode(p_new_apical_node);
-
+        
         /*
-         * Create lateral face such that they have the same orientation as shared_face
+         * Create lateral face such that they have the same orientation as p_shared_face
          * (View from the at the lateral face)
          *   3_________________2
          *   |      shared     |
@@ -4511,20 +4566,17 @@ unsigned MutableVertexMesh<3, 3>::DivideElementAlongGivenAxis(VertexElement<3, 3
          */
         std::vector<Node<3>*> new_lateral_face_nodes(4);
         new_lateral_face_nodes[0] = p_new_basal_node;
-        new_lateral_face_nodes[1] = shared_face->GetNode(1);
-        new_lateral_face_nodes[2] = shared_face->GetNode(2);
+        new_lateral_face_nodes[1] = p_basal_node_b;
+        new_lateral_face_nodes[2] = p_apical_node_b;
         new_lateral_face_nodes[3] = p_new_apical_node;
-        shared_face->FaceUpdateNode(1, p_new_basal_node);
-        shared_face->FaceUpdateNode(2, p_new_apical_node);
-        ++nodes_added;
-        ///\todo: #2850 AddFace method for MutableVertexMesh
-        const unsigned new_lateral_face_index = (this->mFaces).size();
-        VertexElement<2, 3>* p_new_lateral_face = new VertexElement<2, 3>(new_lateral_face_index, new_lateral_face_nodes);
+        p_shared_face->FaceUpdateNode(p_basal_node_b, p_new_basal_node);
+        p_shared_face->FaceUpdateNode(p_apical_node_b, p_new_apical_node);
+        VertexElement<2, 3>* p_new_lateral_face = new VertexElement<2, 3>(this->GetNumFaces(), new_lateral_face_nodes);
         SetFaceAsLateral(p_new_lateral_face);
-        // For time being, where faces doesn't register with nodes and elements (as in have set of indices),
-        // I'll just push back directly.
-        this->mFaces.push_back(p_new_lateral_face);
+        this->AddFace(p_new_lateral_face);
+        FaceRearrangeNodesInMesh(this, p_new_lateral_face);
 
+        const std::set<unsigned> shared_elements = GetSharedElementIndices(p_apical_node_a, p_apical_node_b);
         // Now make sure the new nodes and face are added to all neighbouring elements
         for (std::set<unsigned>::iterator iter = shared_elements.begin();
              iter != shared_elements.end(); ++iter)
@@ -4532,52 +4584,36 @@ unsigned MutableVertexMesh<3, 3>::DivideElementAlongGivenAxis(VertexElement<3, 3
             VertexElement<3, 3>* p_this_element = this->GetElement(*iter);
             VertexElement<2, 3>* p_this_basal_face = GetBasalFace(p_this_element);
             VertexElement<2, 3>* p_this_apical_face = GetApicalFace(p_this_element);
-            const unsigned this_half_num_nodes = MonolayerGetHalfNumNodes(p_this_element);
-
-            // Find which node has the lower local index in this element
-            unsigned node_a_local_index = p_this_apical_face->GetNodeLocalIndex(p_apical_node_a->GetIndex());
-            unsigned node_b_local_index = p_this_apical_face->GetNodeLocalIndex(p_apical_node_b->GetIndex());
-
-
-
-            // Get the 'lower' index in CCW direction.
-            unsigned index (UINT_MAX);
-            if (abs(node_a_local_index-node_b_local_index) == 1)
-            {
-                index = std::min(node_a_local_index, node_b_local_index);
-            }
-            else
-            {
-                assert(std::min(node_a_local_index, node_b_local_index) == 0);
-                index = std::max(node_a_local_index, node_b_local_index);
-                assert(index == this_half_num_nodes-1);
-            }
 
             // Add new node to this element
-            p_this_basal_face->FaceAddNode(p_new_basal_node, index);
-            p_this_apical_face->FaceAddNode(p_new_apical_node, index);
+            p_this_apical_face->FaceAddNode(p_new_apical_node, p_this_apical_face->GetNumNodes() - 1);
+            p_this_basal_face->FaceAddNode(p_new_basal_node, p_this_basal_face->GetNumNodes() - 1);
+            FaceRearrangeNodesInMesh(this, p_this_apical_face);
+            FaceRearrangeNodesInMesh(this, p_this_basal_face);
 
             // Add the apical node first so that I don't changes its indices.
-            p_this_element->AddNode(p_new_apical_node, index+this_half_num_nodes);
-            p_this_element->AddNode(p_new_basal_node, index);
+            p_this_element->AddNode(p_new_apical_node, p_this_element->GetNumNodes() - 1);
+            p_this_element->AddNode(p_new_basal_node, p_this_element->GetNumNodes() - 1);
 
             // New face will have the same orientation as the old one.
-            p_this_element->AddFace(p_new_lateral_face, p_this_element->GetFaceOrientationWithGlobalIndex(shared_face->GetIndex()), index+2);
+            p_this_element->AddFace(p_new_lateral_face);
 
             p_this_element->MonolayerElementRearrangeFacesNodes();
         }
 
         // Store index of new node
+        division_nodes.push_back(p_new_apical_node);
         division_nodes.push_back(p_new_basal_node);
     }
 
-    // Calling remesh to tidy up the node indices
-    this->ReMesh();
+    //Create the new dividing face
+    VertexElement<2, 3>* p_new_dividing_face = new VertexElement<2, 3>(this->GetNumFaces(), division_nodes);
+    SetFaceAsLateral(p_new_dividing_face);
+    this->AddFace(p_new_dividing_face);
+    // FaceRearrangeNodesInMesh(this, p_new_dividing_face);
+    
     // Now call DivideElement() to divide the element using the new nodes
-    unsigned new_element_index = DivideElement(pElement,
-                                               pElement->GetNodeLocalIndex(division_nodes[0]->GetIndex()),
-                                               pElement->GetNodeLocalIndex(division_nodes[1]->GetIndex()),
-                                               placeOriginalElementBelow);
+    unsigned new_element_index = DivideElement(pElement, p_new_dividing_face->GetIndex(), UINT_MAX, 0);
 
     return new_element_index;
 }
