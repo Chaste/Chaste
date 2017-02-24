@@ -140,7 +140,7 @@ public:
 
         // Test UpdateNode()
         Node<2>* p_node_2 = new Node<2>(2, false, 1.0, 0.0);
-        element.UpdateNode(0, p_node_2);
+        element.UpdateNode(0u, p_node_2);
 
         TS_ASSERT_EQUALS(element.GetNodeGlobalIndex(0), 2u);
         TS_ASSERT_EQUALS(element.GetNodeGlobalIndex(1), 1u);
@@ -247,7 +247,7 @@ public:
 
         // Test UpdateNode()
         Node<3>* p_node_2 = new Node<3>(2, false, 1.0, 0.0, 0.0);
-        element.UpdateNode(0, p_node_2);
+        element.UpdateNode(0u, p_node_2);
 
         TS_ASSERT_DELTA(element.GetNode(0)->rGetLocation()[0], 1.0, 1e-12);
         TS_ASSERT_DELTA(element.GetNode(0)->rGetLocation()[1], 0.0, 1e-12);

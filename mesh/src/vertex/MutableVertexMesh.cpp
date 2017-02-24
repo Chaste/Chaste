@@ -3974,7 +3974,10 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
         if (elems[2] != NULL)
         {
             std::set<VertexElement<2, 3>*> s_tmp = GetFacesWithIndices(tmp_face_ids, elems[2], Monolayer::LateralValue);
-            assert(s_tmp.erase(p_lateral_swap_face) == 1);
+            if (s_tmp.erase(p_lateral_swap_face) == 0)
+            {
+                NEVER_REACHED;
+            }
             assert(s_tmp.size() == 1);
             p_lateral_face_23 = no1(s_tmp);
         }
@@ -3997,7 +4000,10 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
         if (elems[4] != NULL)
         {
             std::set<VertexElement<2, 3>*> s_tmp = GetFacesWithIndices(tmp_face_ids, elems[4], Monolayer::LateralValue);
-            assert(s_tmp.erase(p_lateral_swap_face) == 1);
+            if (s_tmp.erase(p_lateral_swap_face) == 0)
+            {
+                NEVER_REACHED;
+            }
             assert(s_tmp.size() == 1);
             p_lateral_face_14 = no1(s_tmp);
         }

@@ -255,6 +255,35 @@ public:
         }
     }
 
+    void TestFaceRearrangeNode()
+    {
+        std::vector<Node<3>*> nodes;
+        nodes.push_back(new Node<3>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<3>(1, true, 1.0, 0.0));
+        nodes.push_back(new Node<3>(2, true, 0.0, 1.0));
+        nodes.push_back(new Node<3>(3, true, 1.0, 1.0));
+
+        VertexElement<2, 3>* face = new VertexElement<2, 3>(0, nodes);
+        std::vector<VertexElement<2, 3>*> v_f;
+        v_f.push_back(face);
+        PrintElement(face);
+        MutableVertexMesh<2, 3> meh(nodes, v_f);
+
+        {
+            VertexMeshWriter<2, 3> writer(OUTPUT_NAME + std::string("/FaceRearrangeNode"), "blabla");
+            writer.WriteVtkUsingMesh(meh, "before");
+        }
+
+        c_vector<double, 3> vv = face->GetCentroid();
+        vv[2] += 3;
+        face->FaceRearrangeNodes(vv);
+        PrintElement(face);
+        {
+            VertexMeshWriter<2, 3> writer(OUTPUT_NAME + std::string("/FaceRearrangeNode"), "blabla", false);
+            writer.WriteVtkUsingMesh(meh, "after");
+        }
+    }
+
     void TestCheckingGradientDeviation()
     {
         /*
