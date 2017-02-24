@@ -230,7 +230,7 @@ CellPtr ImmersedBoundaryCellPopulation<DIM>::AddCell(CellPtr pNewCell, CellPtr p
     ImmersedBoundaryElement<DIM, DIM>* p_element = GetElementCorrespondingToCell(pParentCell);
 
     // Get the orientation of division
-    c_vector<double, DIM> division_vector = unit_vector<double>(2, 0);
+    c_vector<double, DIM> division_vector = mpImmersedBoundaryDivisionRule->CalculateCellDivisionVector(pParentCell, *this);
 
     // Divide the element
     unsigned new_elem_idx = mpImmersedBoundaryMesh->DivideElementAlongGivenAxis(p_element, division_vector, true);
@@ -455,13 +455,22 @@ template <unsigned DIM>
 bool ImmersedBoundaryCellPopulation<DIM>::IsCellAssociatedWithADeletedLocation(CellPtr pCell)
 {
     return GetElementCorrespondingToCell(pCell)->IsDeleted();
-    ;
 }
 
 template <unsigned DIM>
 void ImmersedBoundaryCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
 {
-    // I don't think this is needed for IB
+    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
+         cell_iter != this->End();
+         ++cell_iter)
+    {
+        double target_area = cell_iter->GetCellData()->GetItem("target area");
+        double actual_area = this->GetVolumeOfCell(*cell_iter);
+
+        double strength = 1e-2 * (target_area - actual_area) / target_area;
+
+        this->GetElementCorrespondingToCell(*cell_iter)->GetFluidSource()->SetStrength(strength);
+    }
 }
 
 template <unsigned DIM>
@@ -934,6 +943,12 @@ template <unsigned DIM>
 bool ImmersedBoundaryCellPopulation<DIM>::DoesPopulationHaveActiveSources()
 {
     return mPopulationHasActiveSources;
+}
+
+template <unsigned DIM>
+bool ImmersedBoundaryCellPopulation<DIM>::IsCellOnBoundary(CellPtr pCell)
+{
+    return this->GetElementCorrespondingToCell(pCell)->IsElementOnBoundary();
 }
 
 template <unsigned DIM>

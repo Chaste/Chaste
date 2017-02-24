@@ -481,6 +481,12 @@ public:
     bool DoesPopulationHaveActiveSources();
 
     /**
+     * @param pCell pointer to a cell
+     * @return whether the cell is on the boundary of this population
+     */
+    bool IsCellOnBoundary(CellPtr pCell);
+
+    /**
      * Set whether the population has active sources
      *
      * @param hasActiveSources whether the population has active sources

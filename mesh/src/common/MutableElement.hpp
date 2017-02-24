@@ -93,7 +93,7 @@ public:
     /**
      * Destructor.
      */
-    ~MutableElement();
+    virtual ~MutableElement();
 
     /**
      * Overridden RegisterWithNodes() method.
@@ -154,7 +154,7 @@ public:
      *
      * @return whether or not the element is on the boundary.
      */
-    bool IsElementOnBoundary() const;
+    virtual bool IsElementOnBoundary() const;
 };
 
 //////////////////////////////////////////////////////////////////////
@@ -252,7 +252,7 @@ public:
      *
      * @return whether or not the element is on the boundary.
      */
-    bool IsElementOnBoundary() const;
+    virtual bool IsElementOnBoundary() const;
 };
 
 #endif /*MUTABLEELEMENT_HPP_*/

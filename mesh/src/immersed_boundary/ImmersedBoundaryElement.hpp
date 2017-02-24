@@ -130,6 +130,13 @@ public:
      * @param averageNodeSpacing the new average node spacing.
      */
     void SetAverageNodeSpacing(double averageNodeSpacing);
+
+    /**
+     * Overridden method to get whether or not the element is on the boundary.
+     *
+     * @return whether or not the element is on the boundary.
+     */
+    virtual bool IsElementOnBoundary() const;
 };
 
 //////////////////////////////////////////////////////////////////////
@@ -196,6 +203,13 @@ public:
      * @param averageNodeSpacing the new average node spacing.
      */
     void SetAverageNodeSpacing(double averageNodeSpacing);
+
+    /**
+     * Overridden method to get whether or not the element is on the boundary.
+     *
+     * @return false.
+     */
+    virtual bool IsElementOnBoundary() const;
 };
 
 #endif /*IMMERSEDBOUNDARYELEMENT_HPP_*/

@@ -1120,8 +1120,8 @@ unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAx
 
     // Now call DivideElement() to divide the element using the nodes found above
     unsigned new_element_index = DivideElement(pElement,
-                                               pElement->GetNodeLocalIndex(intersecting_nodes[0]),
-                                               pElement->GetNodeLocalIndex(intersecting_nodes[1]),
+                                               intersecting_nodes[0],
+                                               intersecting_nodes[1],
                                                centroid,
                                                axisOfDivision);
 
@@ -1687,6 +1687,59 @@ bool ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::NodesInDifferentElementOrLami
     }
 }
 
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+std::set<unsigned> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetNeighbouringElementIndices(unsigned elemIdx)
+{
+    if (mLaminas.size() > 0)
+    {
+        EXCEPTION("This method does not yet work in the presence of laminas");
+    }
+
+    std::set<unsigned> indices;
+
+    for (unsigned node_idx = 0; node_idx < GetElement(elemIdx)->GetNumNodes(); ++node_idx)
+    {
+        const std::vector<unsigned>& node_neighbours = GetElement(elemIdx)->GetNode(node_idx)->rGetNeighbours();
+
+        for(std::vector<unsigned>::const_iterator nbr_gbl_node_idx = node_neighbours.begin();
+            nbr_gbl_node_idx != node_neighbours.end(); ++nbr_gbl_node_idx)
+        {
+            indices.insert(*(this->GetNode(*nbr_gbl_node_idx)->rGetContainingElementIndices().begin()));
+        }
+    }
+
+    // Remove own index from the list
+    indices.erase(elemIdx);
+
+    return indices;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+std::vector<unsigned> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetPolygonDistribution()
+{
+    if (mLaminas.size() > 0)
+    {
+        EXCEPTION("This method does not yet work in the presence of laminas");
+    }
+
+    std::vector<unsigned> poly_dist;
+
+    for (typename ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryElementIterator elem_it = this->GetElementIteratorBegin();
+         elem_it != this->GetElementIteratorEnd();
+         ++elem_it)
+    {
+        unsigned num_neighbours = GetNeighbouringElementIndices(elem_it->GetIndex()).size();
+
+        if (num_neighbours > poly_dist.size())
+        {
+            poly_dist.resize(num_neighbours + 1, 0u);
+        }
+
+        poly_dist[num_neighbours] ++;
+    }
+
+    return poly_dist;
+}
 
 // Explicit instantiation
 template class ImmersedBoundaryMesh<1, 1>;
