@@ -123,6 +123,31 @@ public:
 
     /**
      * Get the line tension parameter for the edge between two given nodes.
+     * This version of the method passes through the VertexElement index
+     * from which the cell in question can be obtained
+     *
+     * @param elem_index the index of the topological cell
+     * @param pNodeA one node
+     * @param pNodeB the other node
+     * @param rVertexCellPopulation reference to the cell population
+     *
+     * @return the line tension parameter for this edge.
+     */
+    virtual double GetLineTensionParameter(unsigned elem_index, Node<DIM>* pNodeA, Node<DIM>* pNodeB, VertexBasedCellPopulation<DIM>& rVertexCellPopulation);
+
+    /**
+     * @return mAreaElasticityParameter
+     */
+    virtual double GetAreaElasticityParameter(unsigned elem_index, VertexBasedCellPopulation<DIM>& rVertexCellPopulation);
+
+    /**
+     * @return mPerimeterContractilityParameter
+     */
+    virtual double GetPerimeterContractilityParameter(unsigned elem_index, VertexBasedCellPopulation<DIM>& rVertexCellPopulation);
+
+
+    /**
+     * Get the line tension parameter for the edge between two given nodes.
      *
      * @param pNodeA one node
      * @param pNodeB the other node

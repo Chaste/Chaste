@@ -130,7 +130,7 @@ void FarhadifarForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCe
             // Add the force contribution from this cell's area elasticity (note the minus sign)
             c_vector<double, DIM> element_area_gradient =
                     p_cell_population->rGetMesh().GetAreaGradientOfElementAtNode(p_element, local_index);
-            area_elasticity_contribution -= GetAreaElasticityParameter()*(element_areas[elem_index] -
+            area_elasticity_contribution -= GetAreaElasticityParameter(elem_index, *p_cell_population)*(element_areas[elem_index] -
                     target_areas[elem_index])*element_area_gradient;
 
             // Get the previous and next nodes in this element
@@ -142,8 +142,8 @@ void FarhadifarForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCe
 
             // Compute the line tension parameter for each of these edges - be aware that this is half of the actual
             // value for internal edges since we are looping over each of the internal edges twice
-            double previous_edge_line_tension_parameter = GetLineTensionParameter(p_previous_node, p_this_node, *p_cell_population);
-            double next_edge_line_tension_parameter = GetLineTensionParameter(p_this_node, p_next_node, *p_cell_population);
+            double previous_edge_line_tension_parameter = GetLineTensionParameter(elem_index, p_previous_node, p_this_node, *p_cell_population);
+            double next_edge_line_tension_parameter = GetLineTensionParameter(elem_index, p_this_node, p_next_node, *p_cell_population);
 
             // Compute the gradient of each these edges, computed at the present node
             c_vector<double, DIM> previous_edge_gradient =
@@ -156,7 +156,7 @@ void FarhadifarForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCe
 
             // Add the force contribution from this cell's perimeter contractility (note the minus sign)
             c_vector<double, DIM> element_perimeter_gradient = previous_edge_gradient + next_edge_gradient;
-            perimeter_contractility_contribution -= GetPerimeterContractilityParameter()* element_perimeters[elem_index]*
+            perimeter_contractility_contribution -= GetPerimeterContractilityParameter(elem_index, *p_cell_population)* element_perimeters[elem_index]*
                                                                                                      element_perimeter_gradient;
         }
 
@@ -197,15 +197,33 @@ double FarhadifarForce<DIM>::GetLineTensionParameter(Node<DIM>* pNodeA, Node<DIM
 }
 
 template<unsigned DIM>
+double FarhadifarForce<DIM>::GetLineTensionParameter(unsigned elem_index, Node<DIM>* pNodeA, Node<DIM>* pNodeB, VertexBasedCellPopulation<DIM>& rVertexCellPopulation)
+{
+  return GetLineTensionParameter(pNodeA, pNodeB, rVertexCellPopulation);
+}
+
+template<unsigned DIM>
 double FarhadifarForce<DIM>::GetAreaElasticityParameter()
 {
     return mAreaElasticityParameter;
 }
 
 template<unsigned DIM>
+double FarhadifarForce<DIM>::GetAreaElasticityParameter(unsigned elem_index, VertexBasedCellPopulation<DIM>& rVertexCellPopulation)
+{
+  return mAreaElasticityParameter;
+}
+
+template<unsigned DIM>
 double FarhadifarForce<DIM>::GetPerimeterContractilityParameter()
 {
     return mPerimeterContractilityParameter;
+}
+
+template<unsigned DIM>
+double FarhadifarForce<DIM>::GetPerimeterContractilityParameter(unsigned elem_index, VertexBasedCellPopulation<DIM>& rVertexCellPopulation)
+{
+  return mPerimeterContractilityParameter;
 }
 
 template<unsigned DIM>
