@@ -189,13 +189,10 @@ double ImmersedBoundaryCellPopulation<DIM>::GetIntrinsicSpacing()
     return mIntrinsicSpacing;
 }
 
-//\todo: implement this method. Decide what "neighbouring" should be for IB cells
 template <unsigned DIM>
 std::set<unsigned> ImmersedBoundaryCellPopulation<DIM>::GetNeighbouringLocationIndices(CellPtr pCell)
 {
-    // The set to return
-    std::set<unsigned> neighbouring_indices;
-    return neighbouring_indices;
+    return mpImmersedBoundaryMesh->GetNeighbouringElementIndices(GetLocationIndexUsingCell(pCell));
 }
 
 template <unsigned DIM>
