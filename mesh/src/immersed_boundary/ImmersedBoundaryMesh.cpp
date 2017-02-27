@@ -39,6 +39,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Warnings.hpp"
 #include "ImmersedBoundaryEnumerations.hpp"
 
+#include <algorithm>
+
 #include <boost/version.hpp>
 #if BOOST_VERSION >= 105200
 #include <boost/polygon/voronoi.hpp>
@@ -1729,7 +1731,7 @@ std::vector<unsigned> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetPolygonDi
         EXCEPTION("This method does not yet work in the presence of laminas");
     }
 
-    std::vector<unsigned> poly_dist;
+    std::vector<unsigned> poly_dist(11, 0);
 
     for (typename ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryElementIterator elem_it = this->GetElementIteratorBegin();
          elem_it != this->GetElementIteratorEnd();
@@ -1737,13 +1739,8 @@ std::vector<unsigned> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetPolygonDi
     {
         if (!elem_it->IsElementOnBoundary())
         {
-            unsigned num_neighbours = GetNeighbouringElementIndices(elem_it->GetIndex()).size();
-
-            if (num_neighbours > poly_dist.size())
-            {
-                poly_dist.resize(num_neighbours + 1, 0u);
-            }
-
+            // Accumulate all 10+ sided shapes
+            unsigned num_neighbours = std::min<unsigned>(10u, GetNeighbouringElementIndices(elem_it->GetIndex()).size());
             poly_dist[num_neighbours]++;
         }
     }
@@ -1833,7 +1830,7 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::TagBoundaryElements()
             // Normalise by INT_MAX^2, and take absolute value
             area = fabs((area / INT_MAX) / INT_MAX);
 
-            this_cell_is_infinite = area > 1.5 * average_area;
+            this_cell_is_infinite = area > 1.4 * average_area;
         }
 
         this->GetElement(static_cast<unsigned>(it->source_index()))->SetIsBoundaryElement(this_cell_is_infinite);
