@@ -193,7 +193,7 @@ double ImmersedBoundaryCellPopulation<DIM>::GetIntrinsicSpacing()
 template <unsigned DIM>
 std::set<unsigned> ImmersedBoundaryCellPopulation<DIM>::GetNeighbouringLocationIndices(CellPtr pCell)
 {
-    return mpImmersedBoundaryMesh->GetNeighbouringElementIndices(GetLocationIndexUsingCell(pCell));
+    return mpImmersedBoundaryMesh->GetNeighbouringElementIndices(this->GetLocationIndexUsingCell(pCell));
 }
 
 template <unsigned DIM>
@@ -458,7 +458,7 @@ bool ImmersedBoundaryCellPopulation<DIM>::IsCellAssociatedWithADeletedLocation(C
 template <unsigned DIM>
 void ImmersedBoundaryCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
 {
-    if (this->HasWriter<ImmersedBoundaryBoundaryCellWriter>())
+    if (this->template HasWriter<ImmersedBoundaryBoundaryCellWriter>())
     {
         mpImmersedBoundaryMesh->TagBoundaryElements();
     }
