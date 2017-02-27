@@ -116,6 +116,17 @@ ImmersedBoundaryHoneycombMeshGenerator::ImmersedBoundaryHoneycombMeshGenerator(u
         }
 
         ImmersedBoundaryElement<2,2>* p_elem = new ImmersedBoundaryElement<2,2>(offset, nodes_this_elem);
+
+        // Set whether it's on the boundary
+        if (offset < numElementsY ||
+            offset >= numElementsY * (numElementsX - 1) ||
+            offset % numElementsY == 0 ||
+            offset + 1 % numElementsY == 1)
+        {
+            p_elem->SetIsBoundaryElement(true);
+        }
+
+
         elements.push_back(p_elem);
     }
 
