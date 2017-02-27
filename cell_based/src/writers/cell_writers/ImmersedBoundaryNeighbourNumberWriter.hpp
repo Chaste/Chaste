@@ -33,43 +33,28 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef CELLDATA_HPP_
-#define CELLDATA_HPP_
+#ifndef IMMERSEDBOUNDARYNEIGHBOURNUMBERWRITER_HPP_
+#define IMMERSEDBOUNDARYNEIGHBOURNUMBERWRITER_HPP_
 
-#include <boost/shared_ptr.hpp>
-#include <map>
-#include <string>
-#include <vector>
-
-#include "AbstractCellProperty.hpp"
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
-#include <boost/serialization/map.hpp>
-#include "Exception.hpp"
+#include "AbstractCellWriter.hpp"
 
 /**
- * CellData class.
+ * A class written using the visitor pattern for writing whether a cell is on the boundary of an immersed boundary
+ * cell population.
  *
- * This cell property allows each cell to store one or more 'named' doubles associated with it,
- * for example corresponding to the intracellular oxygen concentration. Other classes may interrogate
- * or modify the values stored in this class.
- *
- * Within the Cell constructor, an empty CellData object is created and passed to the Cell
- * (unless there is already a CellData object present in mCellPropertyCollection).
+ * The output file is called ib_neighbournumber.dat by default. If VTK is switched on, then the writer also specifies the
+ * VTK output for each cell, which is stored in the VTK cell data "Boundary cell" by default.
  */
-class CellData : public AbstractCellProperty
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+class ImmersedBoundaryNeighbourNumberWriter : public AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>
 {
 private:
-
-    /**
-     * The cell data.
-     */
-    std::map<std::string, double> mCellData;
-
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
-     * Archive the member variables.
+     * Serialize the object and its member variables.
      *
      * @param archive the archive
      * @param version the current version of this class
@@ -77,56 +62,48 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractCellProperty>(*this);
-        archive & mCellData;
+        archive & boost::serialization::base_object<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> >(*this);
     }
 
 public:
 
     /**
-     * We need the empty virtual destructor in this class to ensure Boost
-     * serialization works correctly with static libraries.
+     * Default constructor.
      */
-    virtual ~CellData();
+    ImmersedBoundaryNeighbourNumberWriter();
 
     /**
-     * This assigns the cell data.
+     * Overridden GetCellDataForVtkOutput() method.
      *
-     * @param rVariableName the name of the data to be set.
-     * @param data the value to set it to.
-     */
-    void SetItem(const std::string& rVariableName, double data);
-
-    /**
-     * @return data.
+     * Get an unsigned integer associated with a cell. This method reduces duplication
+     * of code between the methods VisitCell() and AddVtkData().
      *
-     * @param rVariableName the index of the data required.
-     * throws if rVariableName has not been stored
-     */
-    double GetItem(const std::string& rVariableName) const;
-
-    /**
-     * @return whether an item exists mCellData
+     * @param pCell a cell
+     * @param pCellPopulation a pointer to the cell population owning the cell
      *
-     * @param rVariableName the key
+     * @return data associated with the cell
      */
-    bool HasItem(const std::string& rVariableName) const;
+    double GetCellDataForVtkOutput(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
 
     /**
-     * @return number of data items
-     */
-    unsigned GetNumItems() const;
-
-    /**
-     * @return all keys.
+     * Overridden VisitCell() method.
      *
-     * According to STL these are sorted in lexicographical/alphabetic order (so that the ordering here is predictable).
+     * Visit a cell and write its number of neighbours.
+     *
+     * Outputs a line of space-separated values of the form:
+     * ...[location index] [cell id] [x-pos] [y-pos] [z-pos] [num neighbours] ...
+     * with [y-pos] and [z-pos] included for 2 and 3 dimensional simulations, respectively.
+     *
+     * This is appended to the output written by AbstractCellBasedWriter, which is a single
+     * value [present simulation time], followed by a tab.
+     *
+     * @param pCell a cell
+     * @param pCellPopulation a pointer to the cell population owning the cell
      */
-    std::vector<std::string> GetKeys() const;
+    virtual void VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
 };
 
 #include "SerializationExportWrapper.hpp"
-// Declare identifier for the serializer
-CHASTE_CLASS_EXPORT(CellData)
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(ImmersedBoundaryNeighbourNumberWriter)
 
-#endif /* CELLDATA_HPP_ */
+#endif /* IMMERSEDBOUNDARYNEIGHBOURNUMBERWRITER_HPP_ */

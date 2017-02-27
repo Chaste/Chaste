@@ -81,6 +81,9 @@ protected:
     /** The required spacing when an element divides */
     double mElementDivisionSpacing;
 
+    /** The distance at which two elements are neighbouring */
+    double mNeighbourDist;
+
     /** Indices of nodes that have been deleted. These indices can be reused when adding new elements/nodes. */
     std::vector<unsigned> mDeletedNodeIndices;
 
@@ -578,6 +581,16 @@ public:
     void SetElementDivisionSpacing(double elementDivisionSpacing);
 
     /**
+     * @return mNeighbourDist
+     */
+    double GetNeighbourDist() const;
+
+    /**
+     * @param the new value of mNeighbourDist
+     */
+    void SetNeighbourDist(double neighbourDist);
+
+    /**
      * ReMesh method that evenly redistributes nodes around each element and lamina.
      */
     void ReMesh();
@@ -614,13 +627,26 @@ public:
     std::set<unsigned> GetNeighbouringElementIndices(unsigned elemIdx);
 
     /**
-     * Calculate the polygon distribution for the mesh: number of {0, 1, 2, 3, 4, 5,..}-gons.
+     * Calculate the polygon distribution for the mesh: number of {0, 1, 2, 3, 4, 5,..., 10+}-gons.
      * Note that the vector will always begin {0, 0, 0, ...} as there can be no 0, 1, or 2-gons, but this choice means
      * that accessing the nth element of the vector gives you the number of n-gons which seems to be most natural.
+     * All 10-sided and higher order polygons are accumulated in the [10]th position.
      *
      * @return a vector representing the polygon distribution.
      */
     std::vector<unsigned> GetPolygonDistribution();
+
+    /**
+     * Determine whether each element is on the boundary or not, and call the element's SetIsBoundaryElement() method.
+     *
+     * It is not possible to define in precise terms whether an element is on the boundary (as there is no commonality
+     * of nodes as in a vertex population.  Instead we take the centroid of each element, calculate the voronoi diagram
+     * of this set of centroids, and define an element to be on the boundary if its corresponding voronoi cell is
+     * infinite.
+     *
+     * This requires boost version 105200, so will not compute anything if the boost version is lower than this.
+     */
+    void TagBoundaryElements();
 
     /**
      * A smart iterator over the elements in the mesh.

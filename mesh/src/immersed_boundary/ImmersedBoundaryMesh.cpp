@@ -39,6 +39,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Warnings.hpp"
 #include "ImmersedBoundaryEnumerations.hpp"
 
+#include <algorithm>
+
+#include <boost/version.hpp>
+#if BOOST_VERSION >= 105200
+#include <boost/polygon/voronoi.hpp>
+#endif // BOOST_VERSION >= 105200
+
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryMesh(std::vector<Node<SPACE_DIM>*> nodes,
                                                                    std::vector<ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>*> elements,
@@ -659,6 +666,18 @@ ImmersedBoundaryElement<ELEMENT_DIM - 1, SPACE_DIM>* ImmersedBoundaryMesh<ELEMEN
 {
     assert(index < mLaminas.size());
     return mLaminas[index];
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetNeighbourDist() const
+{
+    return mNeighbourDist;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::SetNeighbourDist(double neighbourDist)
+{
+    mNeighbourDist = neighbourDist;
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -1695,16 +1714,22 @@ std::set<unsigned> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetNeighbouring
         EXCEPTION("This method does not yet work in the presence of laminas");
     }
 
+    ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>* p_this_elem = this->GetElement(elemIdx);
+
     std::set<unsigned> indices;
 
-    for (unsigned node_idx = 0; node_idx < GetElement(elemIdx)->GetNumNodes(); ++node_idx)
+    for (unsigned node_idx = 0; node_idx < p_this_elem->GetNumNodes(); ++node_idx)
     {
+        // The vec of node neighbours includes all within neighbouring boxes: need to check against neighbour dist
         const std::vector<unsigned>& node_neighbours = GetElement(elemIdx)->GetNode(node_idx)->rGetNeighbours();
 
-        for(std::vector<unsigned>::const_iterator nbr_gbl_node_idx = node_neighbours.begin();
-            nbr_gbl_node_idx != node_neighbours.end(); ++nbr_gbl_node_idx)
+        for(std::vector<unsigned>::const_iterator gbl_idx_it = node_neighbours.begin();
+            gbl_idx_it != node_neighbours.end(); ++gbl_idx_it)
         {
-            indices.insert(*(this->GetNode(*nbr_gbl_node_idx)->rGetContainingElementIndices().begin()));
+            if (this->GetDistanceBetweenNodes(p_this_elem->GetNodeGlobalIndex(node_idx), *gbl_idx_it) < mNeighbourDist)
+            {
+                indices.insert(*(this->GetNode(*gbl_idx_it)->rGetContainingElementIndices().begin()));
+            }
         }
     }
 
@@ -1717,28 +1742,118 @@ std::set<unsigned> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetNeighbouring
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::vector<unsigned> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetPolygonDistribution()
 {
+    assert(SPACE_DIM == 2);
+
     if (mLaminas.size() > 0)
     {
         EXCEPTION("This method does not yet work in the presence of laminas");
     }
 
-    std::vector<unsigned> poly_dist;
+    std::vector<unsigned> poly_dist(11, 0);
 
     for (typename ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryElementIterator elem_it = this->GetElementIteratorBegin();
          elem_it != this->GetElementIteratorEnd();
          ++elem_it)
     {
-        unsigned num_neighbours = GetNeighbouringElementIndices(elem_it->GetIndex()).size();
-
-        if (num_neighbours > poly_dist.size())
+        if (!elem_it->IsElementOnBoundary())
         {
-            poly_dist.resize(num_neighbours + 1, 0u);
+            // Accumulate all 10+ sided shapes
+            unsigned num_neighbours = std::min<unsigned>(10u, GetNeighbouringElementIndices(elem_it->GetIndex()).size());
+            poly_dist[num_neighbours]++;
         }
-
-        poly_dist[num_neighbours] ++;
     }
 
     return poly_dist;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::TagBoundaryElements()
+{
+//#if BOOST_VERSION >= 105200
+    assert(SPACE_DIM == 2);
+
+    using boost::polygon::voronoi_builder;
+    using boost::polygon::voronoi_diagram;
+    typedef boost::polygon::point_data<int> boost_point;
+
+    // Datatype is boost::polygon::point_data<int>
+    std::vector<boost_point> points;
+
+    double average_area = 0.0; // the average (2d) volume of immersed boundary elements
+
+    for (typename ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryElementIterator elem_it = this->GetElementIteratorBegin();
+         elem_it != this->GetElementIteratorEnd();
+         ++elem_it)
+    {
+        average_area += this->GetVolumeOfElement(elem_it->GetIndex());
+
+        c_vector<double, SPACE_DIM> centroid = this->GetCentroidOfElement(elem_it->GetIndex());
+
+        // Assume SPACE_DIM is 2
+        // Assume centroid is within unit square so that scaling by INT_MAX will not overflow the integer
+        int x_pos = static_cast<int>(centroid[0] * INT_MAX);
+        int y_pos = static_cast<int>(centroid[1] * INT_MAX);
+
+        points.push_back(boost_point(x_pos, y_pos));
+    }
+
+    average_area /= this->GetNumElements();
+
+    // Construct the Voronoi tessellation of these element centroids
+    voronoi_diagram<double> vd;
+    construct_voronoi(points.begin(), points.end(), &vd);
+
+    // Loop over the cells in the voronoi diagram.  Assume these cells are ordered the same as the centroids we put in.
+    for (voronoi_diagram<double>::const_cell_iterator it = vd.cells().begin();
+         it != vd.cells().end();
+         ++it)
+    {
+
+        // Loop over the edges of the current cell
+        const voronoi_diagram<double>::edge_type* p_edge = it->incident_edge();
+
+        bool this_cell_is_infinite = false;
+
+        std::vector<double> x_pos;
+        std::vector<double> y_pos;
+
+        do
+        {
+            if (p_edge->is_infinite())
+            {
+                this_cell_is_infinite = true;
+                break;
+            }
+
+            x_pos.push_back(static_cast<double>(p_edge->vertex0()->x()));
+            y_pos.push_back(static_cast<double>(p_edge->vertex0()->y()));
+
+            p_edge = p_edge->next();
+
+        } while (p_edge != it->incident_edge());
+
+        // If the cell is not infinite, calculate the surface area of it; if it's on the edge it will be significantly
+        // larger than the surface area of the corresponding element.
+        if (!this_cell_is_infinite)
+        {
+            double area = 0.0;
+
+            for (unsigned point = 0; point < x_pos.size(); ++point)
+            {
+                area += x_pos[point] * y_pos[(point + 1) % x_pos.size()] - y_pos[point] * x_pos[(point + 1) % x_pos.size()];
+            }
+
+            area *= 0.5;
+
+            // Normalise by INT_MAX^2, and take absolute value
+            area = fabs((area / INT_MAX) / INT_MAX);
+
+            this_cell_is_infinite = area > 1.4 * average_area;
+        }
+
+        this->GetElement(static_cast<unsigned>(it->source_index()))->SetIsBoundaryElement(this_cell_is_infinite);
+    }
+//#endif // BOOST_VERSION >= 105200
 }
 
 // Explicit instantiation
