@@ -39,6 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "CellPopulationElementWriter.hpp"
 #include "ImmersedBoundaryMeshWriter.hpp"
+#include "ImmersedBoundaryBoundaryCellWriter.hpp"
 #include "ShortAxisImmersedBoundaryDivisionRule.hpp"
 #include "Warnings.hpp"
 
@@ -457,18 +458,25 @@ bool ImmersedBoundaryCellPopulation<DIM>::IsCellAssociatedWithADeletedLocation(C
 template <unsigned DIM>
 void ImmersedBoundaryCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
 {
-    mpImmersedBoundaryMesh->TagBoundaryElements();
-
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
-         cell_iter != this->End();
-         ++cell_iter)
+    if (this->HasWriter<ImmersedBoundaryBoundaryCellWriter>())
     {
-        double target_area = cell_iter->GetCellData()->GetItem("target area");
-        double actual_area = this->GetVolumeOfCell(*cell_iter);
+        mpImmersedBoundaryMesh->TagBoundaryElements();
+    }
 
-        double strength = 1e-2 * (target_area - actual_area) / target_area;
+    // If the first cell has target atea property, assume there is a target area modifier in place
+    if (this->Begin()->GetCellData()->HasItem("target area"))
+    {
+        for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
+             cell_iter != this->End();
+             ++cell_iter)
+        {
+            double target_area = cell_iter->GetCellData()->GetItem("target area");
+            double actual_area = this->GetVolumeOfCell(*cell_iter);
 
-        this->GetElementCorrespondingToCell(*cell_iter)->GetFluidSource()->SetStrength(strength);
+            double strength = 1e-2 * (target_area - actual_area) / target_area;
+
+            this->GetElementCorrespondingToCell(*cell_iter)->GetFluidSource()->SetStrength(strength);
+        }
     }
 }
 
