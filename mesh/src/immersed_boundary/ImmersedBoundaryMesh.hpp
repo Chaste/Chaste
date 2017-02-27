@@ -81,6 +81,9 @@ protected:
     /** The required spacing when an element divides */
     double mElementDivisionSpacing;
 
+    /** The distance at which two elements are neighbouring */
+    double mNeighbourDist;
+
     /** Indices of nodes that have been deleted. These indices can be reused when adding new elements/nodes. */
     std::vector<unsigned> mDeletedNodeIndices;
 
@@ -576,6 +579,16 @@ public:
      * @param the new value of mElementDivisionSpacing
      */
     void SetElementDivisionSpacing(double elementDivisionSpacing);
+
+    /**
+     * @return mNeighbourDist
+     */
+    double GetNeighbourDist() const;
+
+    /**
+     * @param the new value of mNeighbourDist
+     */
+    void SetNeighbourDist(double neighbourDist);
 
     /**
      * ReMesh method that evenly redistributes nodes around each element and lamina.

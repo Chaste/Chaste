@@ -669,6 +669,18 @@ ImmersedBoundaryElement<ELEMENT_DIM - 1, SPACE_DIM>* ImmersedBoundaryMesh<ELEMEN
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetNeighbourDist() const
+{
+    return mNeighbourDist;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::SetNeighbourDist(double neighbourDist)
+{
+    mNeighbourDist = neighbourDist;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetCentroidOfElement(unsigned index)
 {
     // Only implemented in 2D
@@ -1702,16 +1714,22 @@ std::set<unsigned> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetNeighbouring
         EXCEPTION("This method does not yet work in the presence of laminas");
     }
 
+    ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>* p_this_elem = this->GetElement(elemIdx);
+
     std::set<unsigned> indices;
 
-    for (unsigned node_idx = 0; node_idx < GetElement(elemIdx)->GetNumNodes(); ++node_idx)
+    for (unsigned node_idx = 0; node_idx < p_this_elem->GetNumNodes(); ++node_idx)
     {
+        // The vec of node neighbours includes all within neighbouring boxes: need to check against neighbour dist
         const std::vector<unsigned>& node_neighbours = GetElement(elemIdx)->GetNode(node_idx)->rGetNeighbours();
 
-        for(std::vector<unsigned>::const_iterator nbr_gbl_node_idx = node_neighbours.begin();
-            nbr_gbl_node_idx != node_neighbours.end(); ++nbr_gbl_node_idx)
+        for(std::vector<unsigned>::const_iterator gbl_idx_it = node_neighbours.begin();
+            gbl_idx_it != node_neighbours.end(); ++gbl_idx_it)
         {
-            indices.insert(*(this->GetNode(*nbr_gbl_node_idx)->rGetContainingElementIndices().begin()));
+            if (this->GetDistanceBetweenNodes(p_this_elem->GetNodeGlobalIndex(node_idx), *gbl_idx_it) < mNeighbourDist)
+            {
+                indices.insert(*(this->GetNode(*gbl_idx_it)->rGetContainingElementIndices().begin()));
+            }
         }
     }
 

@@ -77,6 +77,7 @@ ImmersedBoundaryCellPopulation<DIM>::ImmersedBoundaryCellPopulation(ImmersedBoun
 
     // Set the mesh division spacing distance
     rMesh.SetElementDivisionSpacing(0.25 * mInteractionDistance);
+    rMesh.SetNeighbourDist(0.5 * mInteractionDistance);
 }
 
 template <unsigned DIM>
