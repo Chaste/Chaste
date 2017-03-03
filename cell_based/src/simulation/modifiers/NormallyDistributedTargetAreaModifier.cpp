@@ -58,8 +58,8 @@ void NormallyDistributedTargetAreaModifier<DIM>::UpdateTargetAreaOfCell(CellPtr 
     // Generate random numbers if needed
     while (pCell->GetCellId() >= mNormalRandomNumbers.size())
     {
-        // Generate N(1, 1/4)
-        double random_number = RandomNumberGenerator::Instance()->NormalRandomDeviate(1.0, 0.25);
+        // Generate N(1, 0.4)
+        double random_number = RandomNumberGenerator::Instance()->NormalRandomDeviate(1.0, 0.4);
 
         // Bound the result to be in [0.5, 1.5]
         random_number = std::min(1.5, random_number);
