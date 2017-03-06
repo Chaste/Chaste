@@ -49,7 +49,8 @@ enum ImmersedBoundaryNodeRegionNames
     RIGHT_LATERAL_REGION,
     LEFT_BASAL_REGION,
     RIGHT_BASAL_REGION,
-    LAMINA_REGION
+    LAMINA_REGION,
+    NO_REGION
 };
 
 enum ImmersedBoundaryElementCornerNames
