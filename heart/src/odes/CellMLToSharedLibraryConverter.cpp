@@ -221,6 +221,18 @@ void CellMLToSharedLibraryConverter::ConvertCellmlToSo(const std::string& rCellm
             EXPECT0(chdir, chaste_root.GetAbsolutePath());
             // Run scons to generate C++ code and compile it to a .so
             EXPECT0(system, "scons --warn=no-all dyn_libs_only=1 build=" + ChasteBuildType() + " " + tmp_folder.GetAbsolutePath());
+            if (mPreserveGeneratedSources)
+            {
+                // Copy the generated source (.hpp and .cpp) to the same place as the .so file is going.
+                // NB. CMake does this by default
+                FileFinder destination_folder_for_sources(rCellmlFolder, RelativeTo::Absolute);
+                // Copy generated source code as well
+                std::vector<FileFinder> generated_files = build_folder.FindMatches("*.?pp");
+                BOOST_FOREACH(const FileFinder& r_generated_file, generated_files)
+                {
+                    r_generated_file.CopyTo(destination_folder_for_sources);
+                }
+            }
 #endif
 
             FileFinder so_file(tmp_folder.GetAbsolutePath() + "/lib" + cellml_leaf_name + "." + msSoSuffix, RelativeTo::Absolute);
@@ -232,15 +244,6 @@ void CellMLToSharedLibraryConverter::ConvertCellmlToSo(const std::string& rCellm
             FileFinder destination_folder(rCellmlFolder, RelativeTo::Absolute);
             so_file.CopyTo(destination_folder);
 
-            if (mPreserveGeneratedSources)
-            {
-                // Copy generated source code as well
-                std::vector<FileFinder> generated_files = build_folder.FindMatches("*.?pp");
-                BOOST_FOREACH(const FileFinder& r_generated_file, generated_files)
-                {
-                    r_generated_file.CopyTo(destination_folder);
-                }
-            }
             // Delete the temporary folders
             build_folder.DangerousRemove();
             tmp_folder.DangerousRemove();
