@@ -166,7 +166,15 @@ public:
             p_cell->SetStimulusFunction(p_stimulus);
             SimulateLr91AndCompare(p_cell.get());
 
-            // We can't now call LoadCvodeCell on this loader
+            // Are sources from the conversion preserved?
+            FileFinder cpp_file(handler.GetRelativePath() + "/LuoRudy1991.cpp", RelativeTo::ChasteTestOutput);
+            TS_ASSERT(cpp_file.Exists());
+            TS_ASSERT(cpp_file.IsNewerThan(cellml_file));
+            FileFinder hpp_file(handler.GetRelativePath() + "/LuoRudy1991.hpp", RelativeTo::ChasteTestOutput);
+            TS_ASSERT(hpp_file.Exists());
+            TS_ASSERT(hpp_file.IsNewerThan(cellml_file));
+
+           // We can't now call LoadCvodeCell on this loader
 #ifdef CHASTE_CVODE
             TS_ASSERT_THROWS_THIS(loader.LoadCvodeCell(),
                                   "You cannot call both LoadCvodeCell and LoadCardiacCell on the same CellMLLoader.");
