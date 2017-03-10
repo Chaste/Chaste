@@ -3708,7 +3708,10 @@ void MutableVertexMesh<3, 3>::PerformAsynchronousT1Swap(Node<3>* pNodeA, Node<3>
         if (elems[2] != NULL)
         {
             std::set<VertexElement<2, 3>*> s_tmp = GetFacesWithIndices(tmp_face_ids, elems[2], Monolayer::LateralValue);
-            assert(s_tmp.erase(p_lateral_swap_face) == 1);
+            if (s_tmp.erase(p_lateral_swap_face) != 1)
+            {
+                NEVER_REACHED;
+            }
             assert(s_tmp.size() == 1);
             p_lateral_face_23 = no1(s_tmp);
         }
@@ -3841,11 +3844,29 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
      * (2) |   (4)     elements in brackets
      *    / \ Node B
      *   /(3)\
+     *
+     *    \   (1)   /
+     * (2) \_______/ (4)
+     *     /A     B\
+     *    /   (3)   \
      */
 
     // Initialize some values that are commonly used.
     VertexElement<2, 3>* p_lateral_swap_face = GetSharedLateralFace(pNodeA, pNodeB, this);
     assert(p_lateral_swap_face->GetNumNodes() == 4u);
+
+    // VertexMeshWriter<3, 3> writer("T1Thing", "base", false);
+    // const unsigned blablaT1 = mCellRearrangementThreshold*1000000;
+    // std::ostringstream oss;
+    // oss << blablaT1 << "_" << p_lateral_swap_face->GetIndex();
+    // writer.WriteVtkUsingMesh(*this, oss.str());
+    // mCellRearrangementThreshold += 0.000001;
+    // {
+    // }
+    
+    MARK;
+    TRACE("============== T1 Swap ==============");
+    PRINT_3_VARIABLES(p_lateral_swap_face->GetIndex(), pNodeA->GetIndex(), pNodeB->GetIndex());
 
     const std::vector<Node<3>*> basal_nodes = GetNodesWithType(p_lateral_swap_face, Monolayer::BasalValue);
     assert(basal_nodes.size() == 2u);
@@ -3856,62 +3877,63 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
     Node<3>* p_node_x = GetOppositeNode(p_node_a, this);
     Node<3>* p_node_y = GetOppositeNode(p_node_b, this);
     
-    const c_vector<double, 3> vector_AB = this->GetVectorFromAtoB(p_node_a->rGetLocation(), p_node_b->rGetLocation());
-    const c_vector<double, 3> vector_XY = this->GetVectorFromAtoB(p_node_x->rGetLocation(), p_node_y->rGetLocation());
+    // Using more complicated way to calculate midpoint rather than 
+    // 0.5 * (p_node_a->rGetLocation() + p_node_b->rGetLocation()) 
+    // for more general cases (like cylindrical mesh).
+    const c_vector<double, 3> mid_ab = p_node_a->rGetLocation() 
+                                       + 0.5 * this->GetVectorFromAtoB(p_node_a->rGetLocation(), p_node_b->rGetLocation());
+    const c_vector<double, 3> mid_xy = p_node_x->rGetLocation() 
+                                       + 0.5 * this->GetVectorFromAtoB(p_node_x->rGetLocation(), p_node_y->rGetLocation());
 
-    if ((norm_2(vector_AB) < mCellRearrangementThreshold || norm_2(vector_XY) < mCellRearrangementThreshold) &&
-        (norm_2(vector_AB) > mCellRearrangementThreshold * mCellRearrangementRatio || norm_2(vector_XY) > mCellRearrangementThreshold * mCellRearrangementRatio))
+    const double distance_ab = this->GetDistanceBetweenNodes(p_node_a->GetIndex(), p_node_b->GetIndex());
+    const double distance_xy = this->GetDistanceBetweenNodes(p_node_x->GetIndex(), p_node_y->GetIndex());
+
+    if ((distance_ab < mCellRearrangementThreshold || distance_xy < mCellRearrangementThreshold) &&
+        (distance_ab > mCellRearrangementThreshold * mCellRearrangementRatio || distance_xy > mCellRearrangementThreshold * mCellRearrangementRatio))
     {
         PerformAsynchronousT1Swap(p_node_a, p_node_b, rElementsContainingNodes);
         return;
     }
 
-    const unsigned node_a_index = p_node_a->GetIndex();
-    const unsigned node_b_index = p_node_b->GetIndex();
-    
-    if (norm_2(vector_AB) < 1e-10) ///\todo remove magic number? (see #1884 and #2401)
+    if (distance_ab < 1e-10) ///\todo remove magic number? (see #1884 and #2401)
     {
-        EXCEPTION("Nodes(" << node_a_index << "&" << node_b_index << ") are too close together, this shouldn't happen");
+        EXCEPTION("Nodes(" << p_node_a->GetIndex() << "&" << p_node_b->GetIndex() << ") are too close together, this shouldn't happen");
     }
 
     // Compute and store the location of the T1 swap, which is at the midpoint of nodes A and B
-    mLocationsOfT1Swaps.push_back(p_node_a->rGetLocation() + 0.5 * vector_AB);
-    mLocationsOfT1Swaps.push_back(p_node_x->rGetLocation() + 0.5 * vector_XY);
-
-    // Now since we know the lateral swap face, we can move the nodes using the face normal.
-    {
-        c_vector<double, 3> vector_CD;
-        this->CalculateUnitNormalToFaceWithArea(p_lateral_swap_face, vector_CD);
-        // Check whether vector_CD has the desired orientation. Directly taking (inner_prod(vector_CD, vector_AB) < 0 )
-        // is not that safe as they should normally be almost perpendicular, hence not a good indicator.
-        ///\todo #2850 Create_c_vector(0, 0, 1) is not appriopriate for non-flat
-        const bool has_CD_the_right_direction = inner_prod(VectorProduct(vector_AB, vector_CD), Create_c_vector(0, 0, 1)) > 0;
-        assert(has_CD_the_right_direction == (inner_prod(VectorProduct(vector_XY, vector_CD), Create_c_vector(0, 0, 1)) > 0));
-        // New nodes are placed such that their distance apart are 'just larger' (mCellRearrangementRatio) than mThresholdDistance.
-        const double distance_between_nodes_CD = mCellRearrangementRatio * mCellRearrangementThreshold;
-        vector_CD *= distance_between_nodes_CD * (has_CD_the_right_direction ? 1 : -1);
-
-        // Move nodes A and B to C and D respectively
-        p_node_a->rGetModifiableLocation() += 0.5 * vector_AB - 0.5 * vector_CD;
-        p_node_b->rGetModifiableLocation() += -0.5 * vector_AB + 0.5 * vector_CD;
-        // Change coordinates of p_node_x and p_node_y
-        p_node_x->rGetModifiableLocation() += 0.5 * vector_XY - 0.5 * vector_CD;
-        p_node_y->rGetModifiableLocation() += -0.5 * vector_XY + 0.5 * vector_CD;
-    }
+    mLocationsOfT1Swaps.push_back(mid_ab);
+    mLocationsOfT1Swaps.push_back(mid_xy);
 
     // Find and store the elements involved in T1 Swap
     std::vector<VertexElement<3, 3>*> elems(5, NULL);
     {
-
         const std::set<unsigned>& elem_24 = p_lateral_swap_face->rFaceGetContainingElementIndices();
         const std::set<unsigned>& elem_a_124 = p_node_a->rGetContainingElementIndices();
         const std::set<unsigned>& elem_b_234 = p_node_b->rGetContainingElementIndices();
 
-        if (elem_24.size() == 0)
+        if (elem_24.size() == 0 || elem_24.size() > 2)
         {
-            // Should be T3, not T1
+            // in case of 0, it should be T3, not T1
+            // in case of >2, error somewhere.
             NEVER_REACHED;
         }
+        /**
+        //\todo: #2850 write this in chaste trac wiki
+         * In 3D, it does not make sense to say 'element 2 is on the left of node A and B',
+         * because the orientation is reversed if we move to the other side of the face.
+         * Besides, though is important that the nodes of each face should be in CW/CCW order,
+         * there is absolute no obvious reason and more effort to maintain the orientation of 
+         * basal/apical face in particular order, and hence the method to determine element 2
+         * and element 4 using local index would not work.
+         * Hence, I am using the first element in elem_24 as element 2, and if there are two elements,
+         * the second one will be element 4.
+         */
+        elems[2] = this->GetElement(no1(elem_24));
+        if (elem_24.size() == 2)
+        {
+            elems[4] = this->GetElement(no2(elem_24));
+        }
+
         // Assign element 1 and 3 if exist.
         if (elem_a_124.size() - elem_24.size() == 1)
         {
@@ -3925,39 +3947,34 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
             assert(s_tmp.size() == 1);
             elems[3] = this->GetElement(no1(s_tmp));
         }
+    }
 
+    // Now since we know the lateral swap face, we can move the nodes using the face normal.
+    {
+        c_vector<double, 3> vector_cd;
+        this->CalculateUnitNormalToFaceWithArea(p_lateral_swap_face, vector_cd);
+        
+        const c_vector<double, 3> centroid_2 = GetBasalFace(elems[2])->GetCentroid();
+        const c_vector<double, 3> centroid_4 = (elems[4] != NULL) ? GetBasalFace(elems[4])->GetCentroid()
+                                                                  : p_lateral_swap_face->GetCentroid();
+        const c_vector<double, 3> vector_from2 = this->GetVectorFromAtoB(centroid_2, centroid_4);
+        
+        // Make vector_cd pointing about the same side as vector_from2, if it is not the case already.
+        if (inner_prod(vector_cd, vector_from2) < 0)
+        {
+            vector_cd *= -1;
+        }
+        
+        // New nodes are placed such that their distance apart are 'just larger' (mCellRearrangementRatio) than mThresholdDistance.
+        // I believe optimizer will move *0.5 here, and for better readability.
+        vector_cd *= mCellRearrangementRatio * mCellRearrangementThreshold;
 
-        VertexElement<3, 3>* p_elem = this->GetElement(no1(elem_24));
-        const VertexElement<2, 3>* p_this_face = GetBasalFace(p_elem);
-        const unsigned face_num_nodes = p_this_face->GetNumNodes();
-        const unsigned node_a_local_index = p_this_face->GetNodeLocalIndex(node_a_index);
-        const unsigned node_b_local_index = p_this_face->GetNodeLocalIndex(node_b_index);
-
-        /*
-         * Locate local index of node_a and node_b and use the ordering to
-         * identify the element, if node_b_local_index > node_a_local_index then element 4
-         * and if node_a_local_index > node_b_local_index then element 2
-         */
-        if (node_a_local_index == plus1(node_b_local_index, face_num_nodes))
-        {
-            elems[2] = p_elem;
-            if (elem_24.size() == 2)
-            {
-                elems[4] = this->GetElement(no2(elem_24));
-            }
-        }
-        else if (node_b_local_index == plus1(node_a_local_index, face_num_nodes))
-        {
-            elems[4] = p_elem;
-            if (elem_24.size() == 2)
-            {
-                elems[2] = this->GetElement(no2(elem_24));
-            }
-        }
-        else
-        {
-            NEVER_REACHED;
-        }
+        // Move nodes A and B to C and D respectively
+        p_node_a->rGetModifiableLocation() = mid_ab - 0.5 * vector_cd;
+        p_node_b->rGetModifiableLocation() = mid_ab + 0.5 * vector_cd;
+        // Change coordinates of p_node_x and p_node_y
+        p_node_x->rGetModifiableLocation() = mid_xy - 0.5 * vector_cd;
+        p_node_y->rGetModifiableLocation() = mid_xy + 0.5 * vector_cd;
     }
 
     // Start modifications
@@ -4032,11 +4049,13 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
         {
             case 1:
             {
-                p_this_face->FaceAddNode(p_node_b, p_this_face->GetNodeLocalIndex(p_node_a->GetIndex()));
-                p_other_face->FaceAddNode(p_node_y, p_other_face->GetNodeLocalIndex(p_node_x->GetIndex()));
+                p_this_face->FaceAddNode(p_node_b, p_this_face->GetNumNodes() - 1);
+                p_other_face->FaceAddNode(p_node_y, p_other_face->GetNumNodes() - 1);
                 p_elem->AddNode(p_node_b, p_elem->GetNumNodes() - 1);
                 p_elem->AddNode(p_node_y, p_elem->GetNumNodes() - 1);
                 p_elem->AddFace(p_lateral_swap_face);
+                FaceRearrangeNodesInMesh(this, p_this_face);
+                FaceRearrangeNodesInMesh(this, p_other_face);
                 break;
             }
             case 2:
@@ -4050,11 +4069,13 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
             }
             case 3:
             {
-                p_this_face->FaceAddNode(p_node_a, p_this_face->GetNodeLocalIndex(p_node_b->GetIndex()));
-                p_other_face->FaceAddNode(p_node_x, p_other_face->GetNodeLocalIndex(p_node_y->GetIndex()));
+                p_this_face->FaceAddNode(p_node_a, p_this_face->GetNumNodes() - 1);
+                p_other_face->FaceAddNode(p_node_x, p_other_face->GetNumNodes() - 1);
                 p_elem->AddNode(p_node_a, p_elem->GetNumNodes() - 1);
                 p_elem->AddNode(p_node_x, p_elem->GetNumNodes() - 1);
                 p_elem->AddFace(p_lateral_swap_face);
+                FaceRearrangeNodesInMesh(this, p_this_face);
+                FaceRearrangeNodesInMesh(this, p_other_face);
                 break;
             }
             case 4:

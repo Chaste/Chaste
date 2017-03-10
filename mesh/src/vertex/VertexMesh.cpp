@@ -1554,7 +1554,15 @@ c_vector<double, 3> VertexMesh<3, 3>::GetShortAxisOfElement(const unsigned index
     VertexElement<2, 3>* p_face = GetBasalFace(GetElement(index));
     c_vector<double, 3> unit_normal;
     CalculateUnitNormalToFaceWithArea(p_face, unit_normal);
-    c_vector<double, 3> e1 = Create_c_vector(unit_normal[1], -unit_normal[0], 0);
+    c_vector<double, 3> e1;
+    if (fabs(fabs(unit_normal[2]) - 1) > DBL_EPSILON)
+    {
+        e1 = Create_c_vector(unit_normal[1], -unit_normal[0], 0);
+    }
+    else
+    {
+        e1 = Create_c_vector(unit_normal[2], 0, -unit_normal[0]); // It's basically +/-(1,0,0).
+    }
     c_vector<double, 3> e2 = VectorProduct(unit_normal, e1);
     e1 /= norm_2(e1);
     e2 /= norm_2(e2);
