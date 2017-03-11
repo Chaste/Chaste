@@ -118,7 +118,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputSimulationModifierInfo(out_stream& rParamsFile);
+    virtual void OutputSimulationModifierInfo(out_stream& rParamsFile);
 
     /**
      * Output any simulation modifier parameters to file.

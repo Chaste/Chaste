@@ -246,10 +246,10 @@ public:
         TS_ASSERT_DELTA(vertex_mesh.GetNode(11)->rGetLocation()[2], 1, 1e-8);
 
         // Test that each element contains the correct nodes following the rearrangement
-        const unsigned node_indices_element_0[4] = {2, 5, 4, 3};
-        const unsigned node_indices_element_1[3] = {1, 2, 5};
-        const unsigned node_indices_element_2[4] = {0, 4, 5, 1};
-        const unsigned node_indices_element_3[3] = {4, 3, 0};
+        const unsigned node_indices_element_0[4] = { 2, 5, 4, 3 };
+        const unsigned node_indices_element_1[3] = { 1, 2, 5 };
+        const unsigned node_indices_element_2[4] = { 0, 4, 5, 1 };
+        const unsigned node_indices_element_3[3] = { 4, 3, 0 };
         for (unsigned i = 0; i < 4; i++)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
@@ -290,17 +290,10 @@ public:
         // Keep testing...
         vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(5), vertex_mesh.GetNode(4));
         vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(5), vertex_mesh.GetNode(4));
-        vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(5), vertex_mesh.GetNode(4));
-        vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(4), vertex_mesh.GetNode(5));
-        vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(4), vertex_mesh.GetNode(5));
-        vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(5), vertex_mesh.GetNode(4));
-        vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(4), vertex_mesh.GetNode(5));
-        vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(4), vertex_mesh.GetNode(5));
-        vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(5), vertex_mesh.GetNode(4));
         TS_ASSERT_EQUALS(vertex_mesh.GetNumFaces(), 17u);
     }
 
-    void TestNoT1SwapWhenOneIsTooLong() throw(Exception)
+    void TestT1SwapAsynchronous() throw(Exception)
     {
         /*
          * Create a mesh comprising six nodes contained in two triangle and two rhomboid elements, as shown below.
@@ -317,15 +310,15 @@ public:
         nodes.push_back(new Node<3>(1, true, 1.0, 0.0, 0.0));
         nodes.push_back(new Node<3>(2, true, 1.0, 1.0, 0.0));
         nodes.push_back(new Node<3>(3, true, 0.0, 1.0, 0.0));
-        nodes.push_back(new Node<3>(4, false, 0.5, 0.4, 0.0));
-        nodes.push_back(new Node<3>(5, false, 0.5, 0.6, 0.0));
+        nodes.push_back(new Node<3>(4, false, 0.5, 0.48, 0.0));
+        nodes.push_back(new Node<3>(5, false, 0.5, 0.52, 0.0));
 
         unsigned node_indices_elem_0[3] = { 2, 3, 5 };
         unsigned node_indices_elem_1[4] = { 4, 1, 2, 5 };
         unsigned node_indices_elem_2[3] = { 0, 1, 4 };
         unsigned node_indices_elem_3[4] = { 4, 5, 3, 0 };
 
-        MonolayerVertexMeshGenerator builder(nodes, "T1NoSwap");
+        MonolayerVertexMeshGenerator builder(nodes, "T1SwapAsynchronous");
         builder.BuildElementWith(3, node_indices_elem_0);
         builder.BuildElementWith(4, node_indices_elem_1);
         builder.BuildElementWith(3, node_indices_elem_2);
@@ -335,18 +328,21 @@ public:
 
         // Set the threshold distance between vertices for a T1 swap as follows
         // so that it will not trigger CheckForSwapsFromShortEdges
-        vertex_mesh.GetNode(11)->rGetModifiableLocation()[1] = 0.62;
+        vertex_mesh.GetNode(11)->rGetModifiableLocation()[1] = 0.65;
+        vertex_mesh.GetNode(10)->rGetModifiableLocation()[1] = 0.35;
         builder.WriteVtkWithSubfolder(OUTPUT_NAME, "Initial_1");
-        vertex_mesh.SetCellRearrangementThreshold(0.21);
-        MARK;
-        TRACE("*****************Check 1*****************");
+        vertex_mesh.SetCellRearrangementThreshold(0.05);
+        vertex_mesh.SetCellRearrangementRatio(2);
         vertex_mesh.CheckForSwapsFromShortEdges();
         builder.WriteVtkWithSubfolder(OUTPUT_NAME, "After_1");
 
         // Test that each moved node has the correct location following the rearrangement
-        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[0], 0.3425, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[0], 0.55, 1e-8);
         TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[1], 0.5, 1e-8);
         TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[2], 0.0, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[0], 0.45, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[1], 0.5, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[2], 0.0, 1e-8);
 
         vertex_mesh.GetNode(4)->rGetModifiableLocation()[1] = 0.36;
         builder.WriteVtkWithSubfolder(OUTPUT_NAME, "Initial_2");
@@ -465,9 +461,9 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetNumFaces(), 14u);
 
         // Test that each element contains the correct nodes following the rearrangement
-        unsigned node_indices_element_0[4] = {2, 5, 4, 3};
-        unsigned node_indices_element_1[4] = {1, 0, 4, 5};
-        unsigned node_indices_element_2[4] = {0, 4, 3};
+        unsigned node_indices_element_0[4] = { 2, 5, 4, 3 };
+        unsigned node_indices_element_1[4] = { 0, 4, 5, 1 };
+        unsigned node_indices_element_2[4] = { 0, 4, 3 };
         for (unsigned i = 0; i < 4; i++)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
@@ -561,9 +557,9 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNumFaces(), 5u);
 
         // Test that each element contains the correct nodes following the rearrangement
-        unsigned node_indices_element_0[3] = {1, 2, 5};
-        unsigned node_indices_element_1[4] = {1, 0, 4, 5};
-        unsigned node_indices_element_2[3] = {0, 4, 3};
+        unsigned node_indices_element_0[3] = { 1, 2, 5 };
+        unsigned node_indices_element_1[4] = { 0, 4, 5, 1 };
+        unsigned node_indices_element_2[3] = { 0, 4, 3 };
         for (unsigned i = 0; i < 4; i++)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(i), node_indices_element_1[i]);
@@ -651,8 +647,8 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetNumFaces(), 10u);
 
         // Test that each element contains the correct nodes following the rearrangement
-        unsigned node_indices_element_0[3] = {0, 4, 3};
-        unsigned node_indices_element_1[3] = {1, 2, 5};
+        unsigned node_indices_element_0[3] = { 0, 4, 3 };
+        unsigned node_indices_element_1[3] = { 1, 2, 5 };
         for (unsigned i = 0; i < 3; i++)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
@@ -1199,7 +1195,7 @@ public:
 
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNumNodes(), 0u);
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNumFaces(), 0u);
-        
+
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(4)->GetNumNodes(), 8u);
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(4)->GetNumFaces(), 6u);
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(4)->GetNodeGlobalIndex(0), 18u);

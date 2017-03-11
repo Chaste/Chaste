@@ -38,7 +38,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "UblasCustomFunctions.hpp"
 #include "MonolayerVertexMeshCustomFunctions.hpp"
 
-#include "Debug.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexMesh(std::vector<Node<SPACE_DIM>*> nodes,
@@ -1653,14 +1652,6 @@ c_vector<double, 3> VertexMesh<3, 3>::GetShortAxisOfElement(const unsigned index
 
     c_vector<double, 3> return_v = short_axis_e1*e2 + short_axis_e2*e1;
     return_v /= norm_2(return_v);
-
-
-    PRINT_CONTAINER(unit_normal)
-    PRINT_CONTAINER(e1)
-    PRINT_CONTAINER(e2)
-    PRINT_CONTAINER(return_v)
-
-
     return return_v;
 }
 

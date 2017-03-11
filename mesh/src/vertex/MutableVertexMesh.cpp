@@ -734,7 +734,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DeleteElementPriorToReMesh(const
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DeleteFacePriorToReMesh(const unsigned index) 
+void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DeleteFacePriorToReMesh(const unsigned index)
 {
     NEVER_REACHED;
 }
@@ -1889,7 +1889,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
 {
     assert(SPACE_DIM == 2);    			 // LCOV_EXCL_LINE - code will be removed at compile time
     assert(ELEMENT_DIM == SPACE_DIM);    // LCOV_EXCL_LINE - code will be removed at compile time
-    
+
     assert(pNode->IsBoundaryNode());
 
     // Store the index of the elements containing the intersecting node
@@ -3265,7 +3265,7 @@ unsigned MutableVertexMesh<3, 3>::AddFace(VertexElement<2, 3>* pNewFace)
 // Specialized as otherwise compiler will complain about undefined reference to functions of
 // VertexElement<0, x>.
 template<>
-void MutableVertexMesh<3, 3>::DeleteFacePriorToReMesh(const unsigned index) 
+void MutableVertexMesh<3, 3>::DeleteFacePriorToReMesh(const unsigned index)
 {
     if (this->mFaces[index]->IsDeleted())
     {
@@ -3315,7 +3315,7 @@ void MutableVertexMesh<3, 3>::RemoveDeletedFaces()
     }
 }
 
-// For monolayer mesh so that all basal nodes come first before apical nodes, and 
+// For monolayer mesh so that all basal nodes come first before apical nodes, and
 // all non-apical&basal nodes will be at the very end.
 template <>
 void MutableVertexMesh<3, 3>::RemoveDeletedNodes()
@@ -3369,10 +3369,9 @@ template <>
 bool MutableVertexMesh<3, 3>::CheckForSwapsFromShortEdges()
 {
     const unsigned numFaces = this->GetNumAllFaces();
-    // Loop over elements to check for T1 swaps
+    // Loop over lateral faces to check for T1 swaps
     for (unsigned face_index = 0; face_index < numFaces; ++face_index)
     {
-        // We search more efficiently by just iterating over edges (lateral faces)
         VertexElement<2, 3>* p_face = this->GetFace(face_index);
         if (!IsLateralFace(p_face) || p_face->IsDeleted())
         {
@@ -3390,7 +3389,7 @@ bool MutableVertexMesh<3, 3>::CheckForSwapsFromShortEdges()
         Node<3>* p_basal_node_2 = basal_nodes.back();
         Node<3>* p_apical_node_1 = NULL;
         Node<3>* p_apical_node_2 = NULL;
-        
+
         // If opposite nodes do not exist, no rearrangement shall take place.
         try
         {
@@ -3505,18 +3504,18 @@ void MutableVertexMesh<3, 3>::PerformAsynchronousT1Swap(Node<3>* pNodeA, Node<3>
                                                         const std::set<unsigned>& rElementsContainingNodes)
 {
     /*
-     * An asynchronous T1 swap only occurs when the edge on one side is shorter than 
-     * mCellRearrangementThreshold but the other side is still longer than that. 
-     * 
+     * An asynchronous T1 swap only occurs when the edge on one side is shorter than
+     * mCellRearrangementThreshold but the other side is still longer than that.
+     *
      * WLOG, let's assume basal edge is below the threshold. For an asynchronous T1 swap,
      * the lateral face will be splited into two triangular faces, which the basal triangular
      * face remains "coplanar" to the original face while the apical triangular face is coming
-     * out of the surface.The two triangular faces meet at one point, which is called 
+     * out of the surface.The two triangular faces meet at one point, which is called
      * "interface node"(?) for time being.
-     * 
+     *
      *     Apical ___(Y)                   ___(Y)
      *        ___/   |                 ___/  /
-     * (X)___/       |          (X)___/     /   
+     * (X)___/       |          (X)___/     /
      *   |           |            \        /
      *   |           |             \      /
      *   |           |              \    /
@@ -3530,7 +3529,7 @@ void MutableVertexMesh<3, 3>::PerformAsynchronousT1Swap(Node<3>* pNodeA, Node<3>
      *   |    ___/  (B)          (B)  \___  \
      *   |___/                            \__\
      *  (A)  Basal                           (A)
-     * 
+     *
      * For better illustration of the process, run ```TestMutableVertexMesh33ReMesh``` and
      * look at the face (no. ??) in /${Output}/TestMutableVertexMesh33ReMesh/T1NoSwap
      * ///\todo #2850 update this documentation
@@ -3554,73 +3553,57 @@ void MutableVertexMesh<3, 3>::PerformAsynchronousT1Swap(Node<3>* pNodeA, Node<3>
     Node<3>* p_node_x = GetOppositeNode(p_node_a, this);
     Node<3>* p_node_y = GetOppositeNode(p_node_b, this);
 
-    c_vector<double, 3> vector_ab = this->GetVectorFromAtoB(p_node_a->rGetLocation(), p_node_b->rGetLocation());
-    c_vector<double, 3> vector_xy = this->GetVectorFromAtoB(p_node_x->rGetLocation(), p_node_y->rGetLocation());
+    double distance_ab = this->GetDistanceBetweenNodes(p_node_a->GetIndex(), p_node_b->GetIndex());
+    double distance_xy = this->GetDistanceBetweenNodes(p_node_x->GetIndex(), p_node_y->GetIndex());
 
     bool t1_on_basal(true);
     // If it is actually the apical edge which is shorter than the threshold, we swap them accordingly,
     // so that all action just happens on p_node_a and p_node_b.
-    if ((norm_2(vector_ab) > mCellRearrangementRatio*mCellRearrangementThreshold) && (norm_2(vector_xy) < mCellRearrangementThreshold))
+    if ((distance_ab > mCellRearrangementRatio*mCellRearrangementThreshold) && (distance_xy < mCellRearrangementThreshold))
     {
         MARK; TRACE("apical shorter, basal longer")
         t1_on_basal = false;
         std::swap(p_node_a, p_node_x);
         std::swap(p_node_b, p_node_y);
-        std::swap(vector_ab, vector_xy);
+        std::swap(distance_ab, distance_xy);
     }
-    const unsigned node_a_index(p_node_a->GetIndex());
-    const unsigned node_b_index(p_node_b->GetIndex());
+    const Monolayer::v_type T1_type = t1_on_basal ? Monolayer::BasalValue : Monolayer::ApicalValue;
+    // Using more complicated way to calculate midpoint rather than
+    // 0.5 * (p_node_a->rGetLocation() + p_node_b->rGetLocation())
+    // for more general cases (like cylindrical mesh).
+    const c_vector<double, 3> mid_ab = p_node_a->rGetLocation()
+                                       + 0.5 * this->GetVectorFromAtoB(p_node_a->rGetLocation(), p_node_b->rGetLocation());
+    const c_vector<double, 3> mid_xy = p_node_x->rGetLocation()
+                                       + 0.5 * this->GetVectorFromAtoB(p_node_x->rGetLocation(), p_node_y->rGetLocation());
 
-    if (!((norm_2(vector_ab) < mCellRearrangementThreshold) && (norm_2(vector_xy) > mCellRearrangementRatio*mCellRearrangementThreshold)))
+    if (!((distance_ab < mCellRearrangementThreshold) && (distance_xy > mCellRearrangementRatio*mCellRearrangementThreshold)))
     {
         NEVER_REACHED;
     }
 
     // Compute and store the location of the T1 swap, which is at the midpoint of nodes A and B
-    mLocationsOfT1Swaps.push_back(p_node_a->rGetLocation() + 0.5 * vector_ab);
+    mLocationsOfT1Swaps.push_back(mid_ab);
 
-    // Now since we know the lateral swap face, we can move the nodes using the face normal.
-    {
-        c_vector<double, 3> vector_CD;
-        this->CalculateUnitNormalToFaceWithArea(p_lateral_swap_face, vector_CD);
-        // Check whether vector_CD has the desired orientation. Directly taking (inner_prod(vector_CD, vector_ab) < 0 )
-        // is not that safe as they should normally be almost perpendicular, hence not a good indicator.
-        ///\todo #2850 Create_c_vector(0, 0, 1) is not appriopriate for non-flat
-        const bool has_CD_the_right_direction = inner_prod(VectorProduct(vector_ab, vector_CD), Create_c_vector(0, 0, 1)) > 0;
-        assert(has_CD_the_right_direction == (inner_prod(VectorProduct(vector_xy, vector_CD), Create_c_vector(0, 0, 1)) > 0));
-        // New nodes are placed such that their distance apart are 'just larger' (mCellRearrangementRatio) than mThresholdDistance.
-        const double distance_between_nodes_CD = mCellRearrangementRatio * mCellRearrangementThreshold;
-        vector_CD *= distance_between_nodes_CD * (has_CD_the_right_direction ? 1 : -1);
-
-        // Move nodes A and B to C and D respectively
-        p_node_a->rGetModifiableLocation() += 0.5 * vector_ab - 0.5 * vector_CD;
-        p_node_b->rGetModifiableLocation() += -0.5 * vector_ab + 0.5 * vector_CD;
-    }
-
-    Node<3>* p_new_node = new Node<3>(this->GetNumNodes(), false);
-    SetNodeAsLateral(p_new_node);
-    this->AddNode(p_new_node);
-    {
-        const c_vector<double, 3> mid_ab = (p_node_a->rGetLocation() + p_node_b->rGetLocation()) / 2;
-        const c_vector<double, 3> mid_xy = (p_node_x->rGetLocation() + p_node_y->rGetLocation()) / 2;
-
-        const double length_ab = norm_2(p_node_a->rGetLocation() - p_node_b->rGetLocation());
-        const double length_xy = norm_2(p_node_x->rGetLocation() - p_node_y->rGetLocation());
-
-        p_new_node->rGetModifiableLocation() = (length_ab * mid_xy + length_xy * mid_ab) / (length_ab + length_xy);
-    }
-
+    // Find and store the elements involved in T1 Swap
     std::vector<VertexElement<3, 3>*> elems(5, NULL);
     {
         const std::set<unsigned>& elem_24 = p_lateral_swap_face->rFaceGetContainingElementIndices();
         const std::set<unsigned>& elem_a_124 = p_node_a->rGetContainingElementIndices();
         const std::set<unsigned>& elem_b_234 = p_node_b->rGetContainingElementIndices();
 
-        if (elem_24.size() == 0)
+        if (elem_24.size() == 0 || elem_24.size() > 2)
         {
-            // Should be T3, not T1
+            // in case of 0, it should be T3, not T1
+            // in case of >2, error somewhere.
             NEVER_REACHED;
         }
+
+        elems[2] = this->GetElement(no1(elem_24));
+        if (elem_24.size() == 2)
+        {
+            elems[4] = this->GetElement(no2(elem_24));
+        }
+
         // Assign element 1 and 3 if exist.
         if (elem_a_124.size() - elem_24.size() == 1)
         {
@@ -3634,49 +3617,46 @@ void MutableVertexMesh<3, 3>::PerformAsynchronousT1Swap(Node<3>* pNodeA, Node<3>
             assert(s_tmp.size() == 1);
             elems[3] = this->GetElement(no1(s_tmp));
         }
+    }
 
-        VertexElement<3, 3>* p_elem = this->GetElement(no1(elem_24));
-        VertexElement<2, 3>* p_this_face = t1_on_basal ? GetBasalFace(p_elem) : GetApicalFace(p_elem);
-        const unsigned face_num_nodes = p_this_face->GetNumNodes();
-        const unsigned node_a_local_index = p_this_face->GetNodeLocalIndex(node_a_index);
-        const unsigned node_b_local_index = p_this_face->GetNodeLocalIndex(node_b_index);
+    // Now since we know the lateral swap face, we can move the nodes using the face normal.
+    {
+        c_vector<double, 3> vector_cd;
+        this->CalculateUnitNormalToFaceWithArea(p_lateral_swap_face, vector_cd);
 
-        PRINT_2_VARIABLES(node_a_local_index, node_b_local_index)
-        /*
-             * Locate local index of node_a and node_b and use the ordering to
-             * identify the element, if node_b_index > node_a_index then element 4
-             * and if node_a_index > node_b_index then element 2
-             */
-        if (node_a_local_index == plus1(node_b_local_index, face_num_nodes))
+        const c_vector<double, 3> centroid_2 = GetFacesWithType(elems[2], T1_type)[0]->GetCentroid();
+        const c_vector<double, 3> centroid_4 = (elems[4] != NULL) ? GetFacesWithType(elems[4], T1_type)[0]->GetCentroid()
+                                                                  : p_lateral_swap_face->GetCentroid();
+        const c_vector<double, 3> vector_from2 = this->GetVectorFromAtoB(centroid_2, centroid_4);
+
+        // Make vector_cd pointing about the same side as vector_from2, if it is not the case already.
+        if (inner_prod(vector_cd, vector_from2) < 0)
         {
-            elems[2] = p_elem;
-            if (elem_24.size() == 2)
-            {
-                elems[4] = this->GetElement(no2(elem_24));
-            }
+            vector_cd *= -1;
         }
-        else if (node_b_local_index == plus1(node_a_local_index, face_num_nodes))
-        {
-            elems[4] = p_elem;
-            if (elem_24.size() == 2)
-            {
-                elems[2] = this->GetElement(no2(elem_24));
-            }
-        }
-        else
-        {
-            NEVER_REACHED;
-        }
-        // Assign 0th element as the 4th since pointer is cheap.
-        elems[0] = elems[4];
+
+        // New nodes are placed such that their distance apart are 'just larger' (mCellRearrangementRatio) than mThresholdDistance.
+        // I believe optimizer will move *0.5 here, and for better readability.
+        vector_cd *= mCellRearrangementRatio * mCellRearrangementThreshold;
+
+        // Move nodes A and B to C and D respectively
+        p_node_a->rGetModifiableLocation() = mid_ab - 0.5 * vector_cd;
+        p_node_b->rGetModifiableLocation() = mid_ab + 0.5 * vector_cd;
     }
 
     // Start modifications
+    // Making new node
+    Node<3>* p_new_node = new Node<3>(this->GetNumNodes(), false);
+    SetNodeAsLateral(p_new_node);
+    this->AddNode(p_new_node);
+    p_new_node->rGetModifiableLocation() = (distance_ab * mid_xy + distance_xy * mid_ab) / (distance_ab + distance_xy);
+
     // Settle the swap face.
     p_lateral_swap_face->FaceDeleteNode(p_node_a);
     p_lateral_swap_face->FaceDeleteNode(p_node_b);
     p_lateral_swap_face->FaceAddNode(p_new_node);
 
+    // Making new face
     VertexElement<2, 3>* p_new_swap(NULL);
     {
         std::vector<Node<3>*> tmp_nodes(3);
@@ -3689,56 +3669,52 @@ void MutableVertexMesh<3, 3>::PerformAsynchronousT1Swap(Node<3>* pNodeA, Node<3>
         this->AddFace(p_new_swap);
     }
 
-    std::set<VertexElement<2, 3>*> lateral_faces = GetFacesWithIndices(p_node_a->rGetContainingFaceIndices(),
-                                                     this, Monolayer::LateralValue)
-                                                + GetFacesWithIndices(p_node_b->rGetContainingFaceIndices(),
+    // Adding the new lateral node to lateral faces shared by 12, 23, 34, 41.
+    std::set<VertexElement<2, 3>*> lateral_faces = GetFacesWithIndices(p_node_a->rGetContainingFaceIndices() + p_node_b->rGetContainingFaceIndices(),
                                                      this, Monolayer::LateralValue);
     lateral_faces.erase(p_new_swap);
 
-    for (std::set<VertexElement<2, 3>*>::const_iterator it = lateral_faces.begin(); 
+    for (std::set<VertexElement<2, 3>*>::const_iterator it = lateral_faces.begin();
          it != lateral_faces.end(); ++it)
     {
         (*it)->FaceAddNode(p_new_node);
         FaceRearrangeNodesInMesh(this, (*it));
     }
 
+    // Modify lateral face "share" by element 2 and element 3
     {
-        VertexElement<2, 3>* p_lateral_face_23 = NULL;
         const std::set<unsigned> tmp_face_ids = p_node_b->rGetContainingFaceIndices();
-        if (elems[2] != NULL)
+
+        std::set<VertexElement<2, 3>*> s_tmp = GetFacesWithIndices(tmp_face_ids, elems[2], Monolayer::LateralValue);
+        // p_node_b is already removed from p_lateral_swap_face
+        if (s_tmp.erase(p_lateral_swap_face) != 0)
         {
-            std::set<VertexElement<2, 3>*> s_tmp = GetFacesWithIndices(tmp_face_ids, elems[2], Monolayer::LateralValue);
-            if (s_tmp.erase(p_lateral_swap_face) != 1)
-            {
-                NEVER_REACHED;
-            }
-            assert(s_tmp.size() == 1);
-            p_lateral_face_23 = no1(s_tmp);
+            NEVER_REACHED;
         }
-        else
-        {
-            assert(elems[4] != NULL);
-            const std::set<VertexElement<2, 3>*> s_tmp = GetFacesWithIndices(tmp_face_ids, this, Monolayer::LateralValue)
-                                                   - GetFacesWithIndices(tmp_face_ids, elems[4], Monolayer::LateralValue);
-            assert(s_tmp.size() == 1);
-            p_lateral_face_23 = no1(s_tmp);
-        }
+        assert(s_tmp.size() == 1);
+        VertexElement<2, 3> *const p_lateral_face_23 = no1(s_tmp);
+
         p_lateral_face_23->FaceUpdateNode(p_node_b, p_node_a);
         FaceRearrangeNodesInMesh(this, p_lateral_face_23);
     }
+
+    // Modify lateral face "share" by element 1 and element 4
     {
         VertexElement<2, 3>* p_lateral_face_14 = NULL;
         const std::set<unsigned>& tmp_face_ids = p_node_a->rGetContainingFaceIndices();
         if (elems[4] != NULL)
         {
             std::set<VertexElement<2, 3>*> s_tmp = GetFacesWithIndices(tmp_face_ids, elems[4], Monolayer::LateralValue);
-            assert(s_tmp.erase(p_lateral_swap_face) == 1);
+            // p_node_a is already removed from p_lateral_swap_face
+            if (s_tmp.erase(p_lateral_swap_face) != 0)
+            {
+                NEVER_REACHED;
+            }
             assert(s_tmp.size() == 1);
             p_lateral_face_14 = no1(s_tmp);
         }
         else
         {
-            assert(elems[2] != NULL);
             const std::set<VertexElement<2, 3>*> s_tmp = GetFacesWithIndices(tmp_face_ids, this, Monolayer::LateralValue)
                                                    - GetFacesWithIndices(tmp_face_ids, elems[2], Monolayer::LateralValue);
             assert(s_tmp.size() == 1);
@@ -3756,7 +3732,7 @@ void MutableVertexMesh<3, 3>::PerformAsynchronousT1Swap(Node<3>* pNodeA, Node<3>
         }
 
         VertexElement<3, 3>* p_elem = elems[i];
-        VertexElement<2, 3>* p_face = t1_on_basal ? GetBasalFace(p_elem) : GetApicalFace(p_elem);
+        VertexElement<2, 3>* p_face = GetFacesWithType(p_elem, T1_type)[0];
 
         p_elem->AddNode(p_new_node, p_elem->GetNumNodes() - 1);
 
@@ -3764,7 +3740,8 @@ void MutableVertexMesh<3, 3>::PerformAsynchronousT1Swap(Node<3>* pNodeA, Node<3>
         {
             case 1:
             {
-                p_face->FaceAddNode(p_node_b, p_face->GetNodeLocalIndex(node_a_index));
+                p_face->FaceAddNode(p_node_b, p_face->GetNumNodes() - 1);
+                FaceRearrangeNodesInMesh(this, p_face);
                 p_elem->AddNode(p_node_b, p_elem->GetNumNodes() - 1);
                 p_elem->AddFace(p_new_swap);
                 break;
@@ -3777,7 +3754,8 @@ void MutableVertexMesh<3, 3>::PerformAsynchronousT1Swap(Node<3>* pNodeA, Node<3>
             }
             case 3:
             {
-                p_face->FaceAddNode(p_node_a, p_face->GetNodeLocalIndex(node_b_index));
+                p_face->FaceAddNode(p_node_a, p_face->GetNumNodes() - 1);
+                FaceRearrangeNodesInMesh(this, p_face);
                 p_elem->AddNode(p_node_a, p_elem->GetNumNodes() - 1);
                 p_elem->AddFace(p_new_swap);
                 break;
@@ -3839,11 +3817,14 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
      * Iterate over all elements involved and identify which element they are
      * in the diagram then update the nodes, faces and elements as necessary.
      *
-     *   \(1)/
-     *    \ / Node A
-     * (2) |   (4)     elements in brackets
-     *    / \ Node B
-     *   /(3)\
+     *       \(1)/
+     *        \ / Node A
+     *     (2) |   (4)          elements in brackets
+     *        / \ Node B
+     *       /(3)\
+     *
+     *         |
+     *         V
      *
      *    \   (1)   /
      * (2) \_______/ (4)
@@ -3863,7 +3844,7 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
     // mCellRearrangementThreshold += 0.000001;
     // {
     // }
-    
+
     MARK;
     TRACE("============== T1 Swap ==============");
     PRINT_3_VARIABLES(p_lateral_swap_face->GetIndex(), pNodeA->GetIndex(), pNodeB->GetIndex());
@@ -3876,13 +3857,13 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
     // Let X be the opposite of A, and Y of B.
     Node<3>* p_node_x = GetOppositeNode(p_node_a, this);
     Node<3>* p_node_y = GetOppositeNode(p_node_b, this);
-    
-    // Using more complicated way to calculate midpoint rather than 
-    // 0.5 * (p_node_a->rGetLocation() + p_node_b->rGetLocation()) 
+
+    // Using more complicated way to calculate midpoint rather than
+    // 0.5 * (p_node_a->rGetLocation() + p_node_b->rGetLocation())
     // for more general cases (like cylindrical mesh).
-    const c_vector<double, 3> mid_ab = p_node_a->rGetLocation() 
+    const c_vector<double, 3> mid_ab = p_node_a->rGetLocation()
                                        + 0.5 * this->GetVectorFromAtoB(p_node_a->rGetLocation(), p_node_b->rGetLocation());
-    const c_vector<double, 3> mid_xy = p_node_x->rGetLocation() 
+    const c_vector<double, 3> mid_xy = p_node_x->rGetLocation()
                                        + 0.5 * this->GetVectorFromAtoB(p_node_x->rGetLocation(), p_node_y->rGetLocation());
 
     const double distance_ab = this->GetDistanceBetweenNodes(p_node_a->GetIndex(), p_node_b->GetIndex());
@@ -3895,7 +3876,7 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
         return;
     }
 
-    if (distance_ab < 1e-10) ///\todo remove magic number? (see #1884 and #2401)
+    if (distance_ab < 1e-10 || distance_xy < 1e-10) ///\todo remove magic number? (see #1884 and #2401)
     {
         EXCEPTION("Nodes(" << p_node_a->GetIndex() << "&" << p_node_b->GetIndex() << ") are too close together, this shouldn't happen");
     }
@@ -3922,7 +3903,7 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
          * In 3D, it does not make sense to say 'element 2 is on the left of node A and B',
          * because the orientation is reversed if we move to the other side of the face.
          * Besides, though is important that the nodes of each face should be in CW/CCW order,
-         * there is absolute no obvious reason and more effort to maintain the orientation of 
+         * there is absolute no obvious reason and more effort to maintain the orientation of
          * basal/apical face in particular order, and hence the method to determine element 2
          * and element 4 using local index would not work.
          * Hence, I am using the first element in elem_24 as element 2, and if there are two elements,
@@ -3953,18 +3934,18 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
     {
         c_vector<double, 3> vector_cd;
         this->CalculateUnitNormalToFaceWithArea(p_lateral_swap_face, vector_cd);
-        
+
         const c_vector<double, 3> centroid_2 = GetBasalFace(elems[2])->GetCentroid();
         const c_vector<double, 3> centroid_4 = (elems[4] != NULL) ? GetBasalFace(elems[4])->GetCentroid()
                                                                   : p_lateral_swap_face->GetCentroid();
         const c_vector<double, 3> vector_from2 = this->GetVectorFromAtoB(centroid_2, centroid_4);
-        
+
         // Make vector_cd pointing about the same side as vector_from2, if it is not the case already.
         if (inner_prod(vector_cd, vector_from2) < 0)
         {
             vector_cd *= -1;
         }
-        
+
         // New nodes are placed such that their distance apart are 'just larger' (mCellRearrangementRatio) than mThresholdDistance.
         // I believe optimizer will move *0.5 here, and for better readability.
         vector_cd *= mCellRearrangementRatio * mCellRearrangementThreshold;
@@ -3978,29 +3959,19 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
     }
 
     // Start modifications
-    
+
     // Modify lateral face "share" by element 2 and element 3
     {
-        VertexElement<2, 3>* p_lateral_face_23 = NULL;
         const std::set<unsigned> tmp_face_ids = p_node_b->rGetContainingFaceIndices();
-        if (elems[2] != NULL)
+
+        std::set<VertexElement<2, 3>*> s_tmp = GetFacesWithIndices(tmp_face_ids, elems[2], Monolayer::LateralValue);
+        if (s_tmp.erase(p_lateral_swap_face) != 1)
         {
-            std::set<VertexElement<2, 3>*> s_tmp = GetFacesWithIndices(tmp_face_ids, elems[2], Monolayer::LateralValue);
-            if (s_tmp.erase(p_lateral_swap_face) == 0)
-            {
-                NEVER_REACHED;
-            }
-            assert(s_tmp.size() == 1);
-            p_lateral_face_23 = no1(s_tmp);
+            NEVER_REACHED;
         }
-        else
-        {
-            assert(elems[4] != NULL);
-            const std::set<VertexElement<2, 3>*> s_tmp = GetFacesWithIndices(tmp_face_ids, this, Monolayer::LateralValue)
-                                                   - GetFacesWithIndices(tmp_face_ids, elems[4], Monolayer::LateralValue);
-            assert(s_tmp.size() == 1);
-            p_lateral_face_23 = no1(s_tmp);
-        }
+        assert(s_tmp.size() == 1);
+        VertexElement<2, 3>* const p_lateral_face_23 = no1(s_tmp);
+
         p_lateral_face_23->FaceUpdateNode(p_node_b, p_node_a);
         p_lateral_face_23->FaceUpdateNode(p_node_y, p_node_x);
     }
@@ -4012,7 +3983,7 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
         if (elems[4] != NULL)
         {
             std::set<VertexElement<2, 3>*> s_tmp = GetFacesWithIndices(tmp_face_ids, elems[4], Monolayer::LateralValue);
-            if (s_tmp.erase(p_lateral_swap_face) == 0)
+            if (s_tmp.erase(p_lateral_swap_face) != 1)
             {
                 NEVER_REACHED;
             }
@@ -4021,7 +3992,6 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
         }
         else
         {
-            assert(elems[2] != NULL);
             const std::set<VertexElement<2, 3>*> s_tmp = GetFacesWithIndices(tmp_face_ids, this, Monolayer::LateralValue)
                                                    - GetFacesWithIndices(tmp_face_ids, elems[2], Monolayer::LateralValue);
             assert(s_tmp.size() == 1);
@@ -4042,8 +4012,8 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
         // p_this_face contains A or B, while p_other_face X or Y.
         VertexElement<2, 3>* p_this_face = GetBasalFace(p_elem);
         VertexElement<2, 3>* p_other_face = GetApicalFace(p_elem);
-        // Better to be safe than sorry, hence a double check.
-        assert(p_this_face->GetNumNodes() == p_other_face->GetNumNodes());
+        ///\todo: #2850 removed this check so that an element can have several Asynchronous T1 going on.
+        // assert(p_this_face->GetNumNodes() == p_other_face->GetNumNodes());
 
         switch (i)
         {
@@ -4051,11 +4021,11 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
             {
                 p_this_face->FaceAddNode(p_node_b, p_this_face->GetNumNodes() - 1);
                 p_other_face->FaceAddNode(p_node_y, p_other_face->GetNumNodes() - 1);
+                FaceRearrangeNodesInMesh(this, p_this_face);
+                FaceRearrangeNodesInMesh(this, p_other_face);
                 p_elem->AddNode(p_node_b, p_elem->GetNumNodes() - 1);
                 p_elem->AddNode(p_node_y, p_elem->GetNumNodes() - 1);
                 p_elem->AddFace(p_lateral_swap_face);
-                FaceRearrangeNodesInMesh(this, p_this_face);
-                FaceRearrangeNodesInMesh(this, p_other_face);
                 break;
             }
             case 2:
@@ -4071,11 +4041,11 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
             {
                 p_this_face->FaceAddNode(p_node_a, p_this_face->GetNumNodes() - 1);
                 p_other_face->FaceAddNode(p_node_x, p_other_face->GetNumNodes() - 1);
+                FaceRearrangeNodesInMesh(this, p_this_face);
+                FaceRearrangeNodesInMesh(this, p_other_face);
                 p_elem->AddNode(p_node_a, p_elem->GetNumNodes() - 1);
                 p_elem->AddNode(p_node_x, p_elem->GetNumNodes() - 1);
                 p_elem->AddFace(p_lateral_swap_face);
-                FaceRearrangeNodesInMesh(this, p_this_face);
-                FaceRearrangeNodesInMesh(this, p_other_face);
                 break;
             }
             case 4:
@@ -4199,7 +4169,7 @@ void MutableVertexMesh<3, 3>::PerformT2Swap(VertexElement<3,3>& rElement)
         MeshUpdateNode(p_tmp_basal_node, p_new_basal_node, this);
         MeshUpdateNode(p_tmp_apical_node, p_new_apical_node, this);
     }
-    
+
     const std::vector<VertexElement<2, 3>*> v_tmp = GetFacesWithType(&rElement, Monolayer::LateralValue);
     for (unsigned i = 0; i < v_tmp.size(); ++i)
     {
@@ -4337,7 +4307,7 @@ unsigned MutableVertexMesh<3, 3>::DivideElement(VertexElement<3,3>* pElement, un
         {
             continue;
         }
-        
+
         if (apical_side == (inner_prod(this->GetVectorFromAtoB(all_lateral_faces[i]->GetCentroid(), centre_of_face), normal_v) > 0))
         {
             old_elem_faces.push_back(all_lateral_faces[i]);
@@ -4352,13 +4322,13 @@ unsigned MutableVertexMesh<3, 3>::DivideElement(VertexElement<3,3>* pElement, un
     VertexElement<3,3>* p_new_elem = new VertexElement<3,3>(new_element_index, new_elem_faces, tmp_v1);
     SetElementAsMonolayer(p_new_elem);
     this->AddElement(p_new_elem);
-    
+
     const std::vector<bool> tmp_v2(old_elem_faces.size(), true);
     const unsigned old_tmp_index = this->GetNumElements();
     VertexElement<3,3>* p_old_elem = new VertexElement<3,3>(old_tmp_index, old_elem_faces, tmp_v2);
     SetElementAsMonolayer(p_old_elem);
     this->AddElement(p_old_elem);
-    
+
     pElement->MarkAsDeleted();
     p_old_elem->ResetIndex(old_element_index);
     std::swap(this->mElements[old_element_index], this->mElements[old_tmp_index]);
@@ -4438,7 +4408,7 @@ unsigned MutableVertexMesh<3, 3>::DivideElementAlongGivenAxis(VertexElement<3, 3
     std::vector<Node<3>*> division_nodes;
 
     // Find the intersections between the axis of division and the element edges
-    for (std::set<VertexElement<2, 3>*>::const_iterator it = apical_intersecting_lateral_faces.begin(); 
+    for (std::set<VertexElement<2, 3>*>::const_iterator it = apical_intersecting_lateral_faces.begin();
         it != apical_intersecting_lateral_faces.end(); ++it)
     {
         /*
@@ -4569,7 +4539,7 @@ unsigned MutableVertexMesh<3, 3>::DivideElementAlongGivenAxis(VertexElement<3, 3
         Node<3>* p_new_apical_node = new Node<3>(0, apical_intersection, is_boundary);
         SetNodeAsApical(p_new_apical_node);
         this->AddNode(p_new_apical_node);
-        
+
         /*
          * Create lateral face such that they have the same orientation as p_shared_face
          * (View from the at the lateral face)
@@ -4632,7 +4602,7 @@ unsigned MutableVertexMesh<3, 3>::DivideElementAlongGivenAxis(VertexElement<3, 3
     SetFaceAsLateral(p_new_dividing_face);
     this->AddFace(p_new_dividing_face);
     // FaceRearrangeNodesInMesh(this, p_new_dividing_face);
-    
+
     // Now call DivideElement() to divide the element using the new nodes
     unsigned new_element_index = DivideElement(pElement, p_new_dividing_face->GetIndex(), UINT_MAX, 0);
 
