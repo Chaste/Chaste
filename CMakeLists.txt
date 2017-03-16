@@ -33,7 +33,7 @@
 cmake_minimum_required(VERSION 2.8.12)
 
 if(CMAKE_VERSION VERSION_LESS "3.1.3")
-    add_compile_options(-std=c++14)
+    add_compile_options(-std=c++11)
 endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules)
