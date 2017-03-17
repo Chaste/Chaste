@@ -94,7 +94,7 @@ private:
     template<class Problem, unsigned SPACE_DIM>
     void CreateAndRun()
     {
-        std::auto_ptr<Problem> p_problem;
+        std::shared_ptr<Problem> p_problem;
 
         if (HeartConfig::Instance()->IsSimulationDefined())
         {
