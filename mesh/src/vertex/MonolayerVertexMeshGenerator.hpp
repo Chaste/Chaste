@@ -36,8 +36,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MONOLAYERVERTEXMESHGENERATOR_HPP_
 #define MONOLAYERVERTEXMESHGENERATOR_HPP_
 
-#include "MutableVertexMesh.hpp"
 #include <set>
+#include "MutableVertexMesh.hpp"
 
 /**
  * A class that generates a monolayer vertex mesh with given 2D mesh or sufficient

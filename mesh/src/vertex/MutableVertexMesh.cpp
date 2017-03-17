@@ -373,7 +373,7 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
 {
     assert(SPACE_DIM == 2);             // LCOV_EXCL_LINE
     assert(ELEMENT_DIM == SPACE_DIM);   // LCOV_EXCL_LINE
-    
+
     // Get the centroid of the element
     c_vector<double, SPACE_DIM> centroid = this->GetCentroidOfElement(pElement->GetIndex());
 
@@ -695,7 +695,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DeleteElementPriorToReMesh(const unsigned index)
 {
     assert(SPACE_DIM >= 2); // LCOV_EXCL_LINE
-    
+
     if (this->mElements[index]->IsDeleted())
     {
         return;
@@ -3264,7 +3264,7 @@ unsigned MutableVertexMesh<3, 3>::AddFace(VertexElement<2, 3>* pNewFace)
 
 // Specialized as otherwise compiler will complain about undefined reference to functions of
 // VertexElement<0, x>.
-template<>
+template <>
 void MutableVertexMesh<3, 3>::DeleteFacePriorToReMesh(const unsigned index)
 {
     if (this->mFaces[index]->IsDeleted())
@@ -3410,7 +3410,7 @@ bool MutableVertexMesh<3, 3>::CheckForSwapsFromShortEdges()
             const std::set<unsigned> shared_elements = GetSharedElementIndices(p_basal_node_1, p_basal_node_2);
             // Check if any triangular elements are shared by these nodes...
             // so if the other side is still longer than threshold, nothing shall be done. Thus continue.
-            if (basal_edge_length > mCellRearrangementThreshold*mCellRearrangementRatio || apical_edge_length > mCellRearrangementThreshold*mCellRearrangementRatio)
+            if (basal_edge_length > mCellRearrangementThreshold * mCellRearrangementRatio || apical_edge_length > mCellRearrangementThreshold * mCellRearrangementRatio)
             {
                 if (IsFaceOnBoundary(p_face))
                 {
@@ -3470,7 +3470,7 @@ void MutableVertexMesh<3, 3>::ReMesh(VertexElementMap& rElementMap)
     }
 }
 
-template<>
+template <>
 void MutableVertexMesh<3, 3>::PerformNodeMerge(Node<3>* pNodeA, Node<3>* pNodeB)
 {
     // Specialization for monolayer
@@ -3489,10 +3489,14 @@ void MutableVertexMesh<3, 3>::PerformNodeMerge(Node<3>* pNodeA, Node<3>* pNodeB)
 
     VertexElement<2, 3>* delete_lateral_face = GetSharedLateralFace(pNodeA, pNodeB, this);
 
+    MARK;
+    TRACE("============== Merge Node ==============");
+    PRINT_VARIABLE(delete_lateral_face->GetIndex());
+
     // Update the faces with pNodeB first
     MeshUpdateNode(pNodeB, pNodeA, this);
     MeshUpdateNode(p_node_y, p_node_x, this);
-    
+
     this->DeleteNodePriorToReMesh(pNodeB->GetIndex());
     this->DeleteNodePriorToReMesh(p_node_y->GetIndex());
     this->DeleteFacePriorToReMesh(delete_lateral_face->GetIndex());
@@ -3559,9 +3563,10 @@ void MutableVertexMesh<3, 3>::PerformAsynchronousT1Swap(Node<3>* pNodeA, Node<3>
     bool t1_on_basal(true);
     // If it is actually the apical edge which is shorter than the threshold, we swap them accordingly,
     // so that all action just happens on p_node_a and p_node_b.
-    if ((distance_ab > mCellRearrangementRatio*mCellRearrangementThreshold) && (distance_xy < mCellRearrangementThreshold))
+    if ((distance_ab > mCellRearrangementRatio * mCellRearrangementThreshold) && (distance_xy < mCellRearrangementThreshold))
     {
-        MARK; TRACE("apical shorter, basal longer")
+        MARK;
+        TRACE("apical shorter, basal longer")
         t1_on_basal = false;
         std::swap(p_node_a, p_node_x);
         std::swap(p_node_b, p_node_y);
@@ -3572,11 +3577,11 @@ void MutableVertexMesh<3, 3>::PerformAsynchronousT1Swap(Node<3>* pNodeA, Node<3>
     // 0.5 * (p_node_a->rGetLocation() + p_node_b->rGetLocation())
     // for more general cases (like cylindrical mesh).
     const c_vector<double, 3> mid_ab = p_node_a->rGetLocation()
-                                       + 0.5 * this->GetVectorFromAtoB(p_node_a->rGetLocation(), p_node_b->rGetLocation());
+        + 0.5 * this->GetVectorFromAtoB(p_node_a->rGetLocation(), p_node_b->rGetLocation());
     const c_vector<double, 3> mid_xy = p_node_x->rGetLocation()
-                                       + 0.5 * this->GetVectorFromAtoB(p_node_x->rGetLocation(), p_node_y->rGetLocation());
+        + 0.5 * this->GetVectorFromAtoB(p_node_x->rGetLocation(), p_node_y->rGetLocation());
 
-    if (!((distance_ab < mCellRearrangementThreshold) && (distance_xy > mCellRearrangementRatio*mCellRearrangementThreshold)))
+    if (!((distance_ab < mCellRearrangementThreshold) && (distance_xy > mCellRearrangementRatio * mCellRearrangementThreshold)))
     {
         NEVER_REACHED;
     }
@@ -3667,18 +3672,8 @@ void MutableVertexMesh<3, 3>::PerformAsynchronousT1Swap(Node<3>* pNodeA, Node<3>
         p_new_swap = new VertexElement<2, 3>(this->GetNumFaces(), tmp_nodes);
         SetFaceAsLateral(p_new_swap);
         this->AddFace(p_new_swap);
-    }
-
-    // Adding the new lateral node to lateral faces shared by 12, 23, 34, 41.
-    std::set<VertexElement<2, 3>*> lateral_faces = GetFacesWithIndices(p_node_a->rGetContainingFaceIndices() + p_node_b->rGetContainingFaceIndices(),
-                                                     this, Monolayer::LateralValue);
-    lateral_faces.erase(p_new_swap);
-
-    for (std::set<VertexElement<2, 3>*>::const_iterator it = lateral_faces.begin();
-         it != lateral_faces.end(); ++it)
-    {
-        (*it)->FaceAddNode(p_new_node);
-        FaceRearrangeNodesInMesh(this, (*it));
+        MARK;
+        PRINT_VARIABLE(p_new_swap->GetIndex())
     }
 
     // Modify lateral face "share" by element 2 and element 3
@@ -3692,7 +3687,7 @@ void MutableVertexMesh<3, 3>::PerformAsynchronousT1Swap(Node<3>* pNodeA, Node<3>
             NEVER_REACHED;
         }
         assert(s_tmp.size() == 1);
-        VertexElement<2, 3> *const p_lateral_face_23 = no1(s_tmp);
+        VertexElement<2, 3>* const p_lateral_face_23 = no1(s_tmp);
 
         p_lateral_face_23->FaceUpdateNode(p_node_b, p_node_a);
         FaceRearrangeNodesInMesh(this, p_lateral_face_23);
@@ -3716,12 +3711,24 @@ void MutableVertexMesh<3, 3>::PerformAsynchronousT1Swap(Node<3>* pNodeA, Node<3>
         else
         {
             const std::set<VertexElement<2, 3>*> s_tmp = GetFacesWithIndices(tmp_face_ids, this, Monolayer::LateralValue)
-                                                   - GetFacesWithIndices(tmp_face_ids, elems[2], Monolayer::LateralValue);
+                - GetFacesWithIndices(tmp_face_ids, elems[2], Monolayer::LateralValue);
             assert(s_tmp.size() == 1);
             p_lateral_face_14 = no1(s_tmp);
         }
         p_lateral_face_14->FaceUpdateNode(p_node_a, p_node_b);
         FaceRearrangeNodesInMesh(this, p_lateral_face_14);
+    }
+
+    // Adding the new lateral node to lateral faces shared by 12, 23, 34, 41.
+    std::set<VertexElement<2, 3>*> lateral_faces = GetFacesWithIndices(p_node_a->rGetContainingFaceIndices() + p_node_b->rGetContainingFaceIndices(),
+                                                                       this, Monolayer::LateralValue);
+    lateral_faces.erase(p_new_swap);
+
+    for (std::set<VertexElement<2, 3>*>::const_iterator it = lateral_faces.begin();
+         it != lateral_faces.end(); ++it)
+    {
+        (*it)->FaceAddNode(p_new_node);
+        FaceRearrangeNodesInMesh(this, (*it));
     }
 
     for (unsigned i = 1; i <= 4; ++i)
@@ -3795,7 +3802,7 @@ void MutableVertexMesh<3, 3>::PerformAsynchronousT1Swap(Node<3>* pNodeA, Node<3>
     }
 }
 
-template<>
+template <>
 void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
                                             std::set<unsigned>& rElementsContainingNodes)
 {
@@ -3862,15 +3869,14 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
     // 0.5 * (p_node_a->rGetLocation() + p_node_b->rGetLocation())
     // for more general cases (like cylindrical mesh).
     const c_vector<double, 3> mid_ab = p_node_a->rGetLocation()
-                                       + 0.5 * this->GetVectorFromAtoB(p_node_a->rGetLocation(), p_node_b->rGetLocation());
+        + 0.5 * this->GetVectorFromAtoB(p_node_a->rGetLocation(), p_node_b->rGetLocation());
     const c_vector<double, 3> mid_xy = p_node_x->rGetLocation()
-                                       + 0.5 * this->GetVectorFromAtoB(p_node_x->rGetLocation(), p_node_y->rGetLocation());
+        + 0.5 * this->GetVectorFromAtoB(p_node_x->rGetLocation(), p_node_y->rGetLocation());
 
     const double distance_ab = this->GetDistanceBetweenNodes(p_node_a->GetIndex(), p_node_b->GetIndex());
     const double distance_xy = this->GetDistanceBetweenNodes(p_node_x->GetIndex(), p_node_y->GetIndex());
 
-    if ((distance_ab < mCellRearrangementThreshold || distance_xy < mCellRearrangementThreshold) &&
-        (distance_ab > mCellRearrangementThreshold * mCellRearrangementRatio || distance_xy > mCellRearrangementThreshold * mCellRearrangementRatio))
+    if ((distance_ab < mCellRearrangementThreshold || distance_xy < mCellRearrangementThreshold) && (distance_ab > mCellRearrangementThreshold * mCellRearrangementRatio || distance_xy > mCellRearrangementThreshold * mCellRearrangementRatio))
     {
         PerformAsynchronousT1Swap(p_node_a, p_node_b, rElementsContainingNodes);
         return;
@@ -3993,7 +3999,7 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
         else
         {
             const std::set<VertexElement<2, 3>*> s_tmp = GetFacesWithIndices(tmp_face_ids, this, Monolayer::LateralValue)
-                                                   - GetFacesWithIndices(tmp_face_ids, elems[2], Monolayer::LateralValue);
+                - GetFacesWithIndices(tmp_face_ids, elems[2], Monolayer::LateralValue);
             assert(s_tmp.size() == 1);
             p_lateral_face_14 = no1(s_tmp);
         }
@@ -4102,7 +4108,7 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
 }
 
 template <>
-void MutableVertexMesh<3, 3>::PerformT2Swap(VertexElement<3,3>& rElement)
+void MutableVertexMesh<3, 3>::PerformT2Swap(VertexElement<3, 3>& rElement)
 {
     // The given element must be triangular for us to be able to perform a T2 swap on it
     assert(rElement.GetNumNodes() == 6);
@@ -4110,8 +4116,8 @@ void MutableVertexMesh<3, 3>::PerformT2Swap(VertexElement<3,3>& rElement)
     VertexElement<2, 3>* p_basal_face = GetBasalFace(&rElement);
     VertexElement<2, 3>* p_apical_face = GetApicalFace(&rElement);
     // Note that we define this vector before setting it, as otherwise the profiling build will break (see #2367)
-    const c_vector<double, 3> new_basal_node_location (p_basal_face->GetCentroid());
-    const c_vector<double, 3> new_apical_node_location (p_apical_face->GetCentroid());
+    const c_vector<double, 3> new_basal_node_location(p_basal_face->GetCentroid());
+    const c_vector<double, 3> new_apical_node_location(p_apical_face->GetCentroid());
     mLastT2SwapLocation = new_basal_node_location;
 
     // Create a new node at the element's centroid; this will be a boundary node if any existing nodes were on the boundary
@@ -4188,7 +4194,7 @@ void MutableVertexMesh<3, 3>::PerformT2Swap(VertexElement<3,3>& rElement)
 }
 
 template <>
-unsigned MutableVertexMesh<3, 3>::DivideElement(VertexElement<3,3>* pElement, unsigned dividingFaceIndex, unsigned dummy, bool dummy2)
+unsigned MutableVertexMesh<3, 3>::DivideElement(VertexElement<3, 3>* pElement, unsigned dividingFaceIndex, unsigned dummy, bool dummy2)
 {
     VertexElement<2, 3>* p_new_lateral_face = this->GetFace(dividingFaceIndex);
 
@@ -4261,7 +4267,7 @@ unsigned MutableVertexMesh<3, 3>::DivideElement(VertexElement<3,3>* pElement, un
     const c_vector<double, 3> centre_of_face = p_new_lateral_face->GetCentroid();
     const bool apical_side = inner_prod(this->GetVectorFromAtoB(p_apical_face->GetCentroid(), centre_of_face), normal_v) > 0;
     const bool basal_side = inner_prod(this->GetVectorFromAtoB(p_basal_face->GetCentroid(), centre_of_face), normal_v) > 0;
-    if (apical_side !=  basal_side)
+    if (apical_side != basal_side)
     {
         if (apical_side == (inner_prod(this->GetVectorFromAtoB(p_new_basal_face->GetCentroid(), centre_of_face), normal_v) > 0))
         {
@@ -4319,13 +4325,13 @@ unsigned MutableVertexMesh<3, 3>::DivideElement(VertexElement<3,3>* pElement, un
     }
 
     const std::vector<bool> tmp_v1(new_elem_faces.size(), true);
-    VertexElement<3,3>* p_new_elem = new VertexElement<3,3>(new_element_index, new_elem_faces, tmp_v1);
+    VertexElement<3, 3>* p_new_elem = new VertexElement<3, 3>(new_element_index, new_elem_faces, tmp_v1);
     SetElementAsMonolayer(p_new_elem);
     this->AddElement(p_new_elem);
 
     const std::vector<bool> tmp_v2(old_elem_faces.size(), true);
     const unsigned old_tmp_index = this->GetNumElements();
-    VertexElement<3,3>* p_old_elem = new VertexElement<3,3>(old_tmp_index, old_elem_faces, tmp_v2);
+    VertexElement<3, 3>* p_old_elem = new VertexElement<3, 3>(old_tmp_index, old_elem_faces, tmp_v2);
     SetElementAsMonolayer(p_old_elem);
     this->AddElement(p_old_elem);
 
@@ -4343,6 +4349,9 @@ unsigned MutableVertexMesh<3, 3>::DivideElementAlongGivenAxis(VertexElement<3, 3
                                                               c_vector<double, 3> axisOfDivision,
                                                               bool placeOriginalElementBelow)
 {
+    MARK;
+    TRACE("============== Cell Division ==============");
+    PRINT_VARIABLE(pElement->GetIndex());
     // Get the centroid of the element
     const c_vector<double, 3> centroid = pElement->GetCentroid();
     const VertexElement<2, 3>* p_apical_face = GetApicalFace(pElement);
@@ -4409,7 +4418,7 @@ unsigned MutableVertexMesh<3, 3>::DivideElementAlongGivenAxis(VertexElement<3, 3
 
     // Find the intersections between the axis of division and the element edges
     for (std::set<VertexElement<2, 3>*>::const_iterator it = apical_intersecting_lateral_faces.begin();
-        it != apical_intersecting_lateral_faces.end(); ++it)
+         it != apical_intersecting_lateral_faces.end(); ++it)
     {
         /*
          * Get pointers to the nodes forming the edge into which one new node will be inserted.
@@ -4431,11 +4440,11 @@ unsigned MutableVertexMesh<3, 3>::DivideElementAlongGivenAxis(VertexElement<3, 3
         const c_vector<double, 3>& position_apical_b = p_apical_node_b->rGetLocation();
         const c_vector<double, 3> apical_a_to_b = this->GetVectorFromAtoB(position_apical_a, position_apical_b);
         c_vector<double, 3> apical_intersection;
-        if (norm_2(apical_a_to_b) < 2.0*mCellRearrangementRatio*mCellRearrangementThreshold)
+        if (norm_2(apical_a_to_b) < 2.0 * mCellRearrangementRatio * mCellRearrangementThreshold)
         {
             WARNING("Edge is too small for normal division; putting node in the middle of a and b. There may be T1 swaps straight away.");
             ///\todo or should we move a and b apart, it may interfere with neighbouring edges? (see #1399 and #2401)
-            apical_intersection = position_apical_a + 0.5*apical_a_to_b;
+            apical_intersection = position_apical_a + 0.5 * apical_a_to_b;
         }
         else
         {
@@ -4445,8 +4454,7 @@ unsigned MutableVertexMesh<3, 3>::DivideElementAlongGivenAxis(VertexElement<3, 3
              * v is the vector from a to b, can be override by subclasses for different metric.
              * Equation of division plane is inner_prod(r-c,n) = 0;
              */
-            apical_intersection = position_apical_a + apical_a_to_b/inner_prod(apical_a_to_b,axisOfDivision)
-                           *inner_prod(this->GetVectorFromAtoB(position_apical_a, centroid),axisOfDivision);
+            apical_intersection = position_apical_a + apical_a_to_b / inner_prod(apical_a_to_b, axisOfDivision) * inner_prod(this->GetVectorFromAtoB(position_apical_a, centroid), axisOfDivision);
 
             /*
              * If then new node is too close to one of the edge nodes, then reposition it
@@ -4457,12 +4465,12 @@ unsigned MutableVertexMesh<3, 3>::DivideElementAlongGivenAxis(VertexElement<3, 3
             if (norm_2(a_to_intersection) < mCellRearrangementThreshold)
             {
                 assert(norm_2(b_to_intersection) > mCellRearrangementThreshold); // LCOV_EXCL_LINE
-                apical_intersection = position_apical_a + mCellRearrangementRatio*mCellRearrangementThreshold*apical_a_to_b/norm_2(apical_a_to_b);
+                apical_intersection = position_apical_a + mCellRearrangementRatio * mCellRearrangementThreshold * apical_a_to_b / norm_2(apical_a_to_b);
             }
             if (norm_2(b_to_intersection) < mCellRearrangementThreshold)
             {
                 assert(norm_2(a_to_intersection) > mCellRearrangementThreshold); // LCOV_EXCL_LINE
-                apical_intersection = position_apical_b - mCellRearrangementRatio*mCellRearrangementThreshold*apical_a_to_b/norm_2(apical_a_to_b);
+                apical_intersection = position_apical_b - mCellRearrangementRatio * mCellRearrangementThreshold * apical_a_to_b / norm_2(apical_a_to_b);
             }
         }
 
@@ -4471,11 +4479,11 @@ unsigned MutableVertexMesh<3, 3>::DivideElementAlongGivenAxis(VertexElement<3, 3
         const c_vector<double, 3>& position_basal_b = p_basal_node_b->rGetLocation();
         const c_vector<double, 3> basal_a_to_b = this->GetVectorFromAtoB(position_basal_a, position_basal_b);
         c_vector<double, 3> basal_intersection;
-        if (norm_2(basal_a_to_b) < 2.0*mCellRearrangementRatio*mCellRearrangementThreshold)
+        if (norm_2(basal_a_to_b) < 2.0 * mCellRearrangementRatio * mCellRearrangementThreshold)
         {
             WARNING("Edge is too small for normal division; putting node in the middle of a and b. There may be T1 swaps straight away.");
             ///\todo or should we move a and b apart, it may interfere with neighbouring edges? (see #1399 and #2401)
-            basal_intersection = position_basal_a + 0.5*basal_a_to_b;
+            basal_intersection = position_basal_a + 0.5 * basal_a_to_b;
         }
         else
         {
@@ -4485,8 +4493,7 @@ unsigned MutableVertexMesh<3, 3>::DivideElementAlongGivenAxis(VertexElement<3, 3
              * v is the vector from a to b, can be override by subclasses for different metric.
              * Equation of division plane is inner_prod(r-c,n) = 0;
              */
-            basal_intersection = position_basal_a + basal_a_to_b/inner_prod(basal_a_to_b,axisOfDivision)
-                           *inner_prod(this->GetVectorFromAtoB(position_basal_a, centroid),axisOfDivision);
+            basal_intersection = position_basal_a + basal_a_to_b / inner_prod(basal_a_to_b, axisOfDivision) * inner_prod(this->GetVectorFromAtoB(position_basal_a, centroid), axisOfDivision);
 
             /*
              * If then new node is too close to one of the edge nodes, then reposition it
@@ -4497,12 +4504,12 @@ unsigned MutableVertexMesh<3, 3>::DivideElementAlongGivenAxis(VertexElement<3, 3
             if (norm_2(a_to_intersection) < mCellRearrangementThreshold)
             {
                 assert(norm_2(b_to_intersection) > mCellRearrangementThreshold); // LCOV_EXCL_LINE
-                basal_intersection = position_basal_a + mCellRearrangementRatio*mCellRearrangementThreshold*basal_a_to_b/norm_2(basal_a_to_b);
+                basal_intersection = position_basal_a + mCellRearrangementRatio * mCellRearrangementThreshold * basal_a_to_b / norm_2(basal_a_to_b);
             }
             if (norm_2(b_to_intersection) < mCellRearrangementThreshold)
             {
                 assert(norm_2(a_to_intersection) > mCellRearrangementThreshold); // LCOV_EXCL_LINE
-                basal_intersection = position_basal_b - mCellRearrangementRatio*mCellRearrangementThreshold*basal_a_to_b/norm_2(basal_a_to_b);
+                basal_intersection = position_basal_b - mCellRearrangementRatio * mCellRearrangementThreshold * basal_a_to_b / norm_2(basal_a_to_b);
             }
         }
 
@@ -4519,18 +4526,16 @@ unsigned MutableVertexMesh<3, 3>::DivideElementAlongGivenAxis(VertexElement<3, 3
         bool is_boundary = false;
         if (p_apical_node_a->IsBoundaryNode() && p_apical_node_b->IsBoundaryNode())
         {
-            if (elems_containing_node_A.size() != 2 ||
-                elems_containing_node_B.size() != 2 ||
-                elems_containing_node_A != elems_containing_node_B)
+            if (elems_containing_node_A.size() != 2 || elems_containing_node_B.size() != 2 || elems_containing_node_A != elems_containing_node_B)
             {
                 is_boundary = true;
             }
         }
         ///\todo #2850 use this to assign is_boundary
-       if (is_boundary != IsFaceOnBoundary(p_shared_face))
-       {
-           NEVER_REACHED;
-       }
+        if (is_boundary != IsFaceOnBoundary(p_shared_face))
+        {
+            NEVER_REACHED;
+        }
 
         // Add a new node to the mesh at the location of the intersection
         Node<3>* p_new_basal_node = new Node<3>(0, basal_intersection, is_boundary);
@@ -4608,7 +4613,6 @@ unsigned MutableVertexMesh<3, 3>::DivideElementAlongGivenAxis(VertexElement<3, 3
 
     return new_element_index;
 }
-
 
 // Explicit instantiation
 template class MutableVertexMesh<1,1>;

@@ -153,7 +153,8 @@ void GeneralMonolayerVertexMeshForce::AddForceContribution(AbstractCellPopulatio
             {
                 Node<3>* p_node2 = p_face->GetNode(i);
                 c_vector<double, 3> result = CalculateEdgeGradient(p_node1, p_node2);
-                
+                const std::set<unsigned> s_tmp = GetSharedElementIndices(p_node1, p_node2);
+
                 if (GetNodeType(p_node1) == GetNodeType(p_node2))
                 {
                     if (IsApicalNode(p_node1))
@@ -180,7 +181,7 @@ void GeneralMonolayerVertexMeshForce::AddForceContribution(AbstractCellPopulatio
                     result *= -1 * mLateralEdgeParameter;
                     // result /= s_tmp.size();
                 }
-                
+
                 p_node1->AddAppliedForceContribution(result);
                 p_node2->AddAppliedForceContribution(-result);
 

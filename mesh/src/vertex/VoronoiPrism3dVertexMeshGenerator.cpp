@@ -35,8 +35,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "VoronoiPrism3dVertexMeshGenerator.hpp"
 
-#include "VoronoiVertexMeshGenerator.hpp"
 #include "MonolayerVertexMeshGenerator.hpp"
+#include "VoronoiVertexMeshGenerator.hpp"
 
 #if BOOST_VERSION >= 105200
 

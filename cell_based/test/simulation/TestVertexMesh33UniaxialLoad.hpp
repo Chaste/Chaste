@@ -38,30 +38,28 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractCellBasedTestSuite.hpp"
 
-#include "VoronoiPrism3dVertexMeshGenerator.hpp"
 #include "HexagonalPrism3dVertexMeshGenerator.hpp"
-#include "MonolayerVertexMeshGenerator.hpp"
 #include "MonolayerVertexMeshCustomFunctions.hpp"
+#include "MonolayerVertexMeshGenerator.hpp"
+#include "VoronoiPrism3dVertexMeshGenerator.hpp"
 
 #include "GeodesicSphere23Generator.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
 
+#include <boost/lexical_cast.hpp>
 #include "CellsGenerator.hpp"
-#include "NoCellCycleModel.hpp"
-#include "VertexBasedCellPopulation.hpp"
-#include "SmartPointers.hpp"
 #include "GeneralMonolayerVertexMeshForce.hpp"
 #include "HorizontalStretchForce.hpp"
-#include "OffLatticeSimulation.hpp"
 #include "LateralNodeModifier.hpp"
-#include <boost/lexical_cast.hpp>
+#include "NoCellCycleModel.hpp"
+#include "OffLatticeSimulation.hpp"
+#include "SmartPointers.hpp"
+#include "VertexBasedCellPopulation.hpp"
 
 #include "Debug.hpp"
 
 #include "TransitCellProliferativeType.hpp"
 #include "UniformG1GenerationalCellCycleModel.hpp"
-
-
 
 #include "FakePetscSetup.hpp"
 
@@ -73,16 +71,16 @@ class BielmeierExternalForce : public AbstractForce<3>
 
     friend class boost::serialization::access;
     template <class Archive>
-    void serialize(Archive &archive, const unsigned int version)
+    void serialize(Archive& archive, const unsigned int version)
     {
         archive& boost::serialization::base_object<AbstractForce<3> >(*this);
     }
 
-  public:
+public:
     BielmeierExternalForce(const double springConstant = 0.0, const double T_ext = 0.0)
-        : AbstractForce<3>(),
-          mEcmSpringConstant(springConstant),
-          mT_ext(T_ext)
+            : AbstractForce<3>(),
+              mEcmSpringConstant(springConstant),
+              mT_ext(T_ext)
     {
     }
 
@@ -121,11 +119,10 @@ class BielmeierExternalForce : public AbstractForce<3>
                     p_face->GetNode(j)->AddAppliedForceContribution(result);
                 }
             }
-
         }
     }
 
-    void OutputForceParameters(out_stream &rParamsFile)
+    void OutputForceParameters(out_stream& rParamsFile)
     {
         *rParamsFile << "\t\t\t<EcmSpringConstant>" << mEcmSpringConstant << "</EcmSpringConstant>\n";
         *rParamsFile << "\t\t\t<T_ext>" << mT_ext << "</T_ext>\n";
@@ -145,7 +142,7 @@ private:
     static const double target_area = 1;
     const unsigned num_cells_x = 9;
     const unsigned num_cells_y = 5;
-    static const double end_time = 10;
+    static const double end_time = 5;
 
 public:
     void TestOnHexagonalMesh() throw(Exception)
@@ -159,22 +156,36 @@ public:
         CellsGenerator<NoCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
         VertexBasedCellPopulation<3> cell_population(*p_mesh, cells);
-        
+
         OffLatticeSimulation<3> simulator(cell_population);
         simulator.SetOutputDirectory(output_filename);
         simulator.SetSamplingTimestepMultiple(10);
         simulator.SetEndTime(end_time);
 
         MAKE_PTR(GeneralMonolayerVertexMeshForce, p_force3);
-        p_force3->SetApicalParameters(20, 20, 0.7);
-        p_force3->SetBasalParameters(20, 20, 0.7);
-        p_force3->SetLateralParameter(8);
+        p_force3->SetApicalParameters(2.5, 2.5, 0.7);
+        p_force3->SetBasalParameters(2.5, 2.5, 0.7);
+        p_force3->SetLateralParameter(1);
         p_force3->SetVolumeParameters(400, target_area * 1.2);
         simulator.AddForce(p_force3);
         MAKE_PTR(HorizontalStretchForce<3>, p_force2);
         p_force2->SetForceMagnitude(0.5);
         p_force2->SetRelativeWidth(0.15);
         simulator.AddForce(p_force2);
+        // MAKE_PTR(GeneralMonolayerVertexMeshForce, p_force3);
+        // p_force3->SetApicalParameters(0.18, 3.1);
+        // p_force3->SetBasalParameters(0.18, 6.95);
+        // p_force3->SetLateralParameter(0, 1);
+        // p_force3->SetVolumeParameters(1000, target_area);
+        // simulator.AddForce(p_force3);
+
+        // MAKE_PTR_ARGS(BielmeierExternalForce, p_force4, (5, -4.2));
+        // simulator.AddForce(p_force4);
+
+        // MAKE_PTR(HorizontalStretchForce<3>, p_force2);
+        // p_force2->SetForceMagnitude(0.5);
+        // p_force2->SetRelativeWidth(0.15);
+        // simulator.AddForce(p_force2);
 
         MAKE_PTR(LateralNodeModifier, p_node_modifier);
         simulator.AddSimulationModifier(p_node_modifier);
@@ -305,7 +316,7 @@ public:
             // CellsGenerator<NoCellCycleModel, 3> cells_generator;
             // cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
             // VertexBasedCellPopulation<3> cell_population(*p_mesh, cells);
-            
+
             // OffLatticeSimulation<3> simulator(cell_population);
             // simulator.SetOutputDirectory(output_filename);
             // simulator.SetSamplingTimestepMultiple(10);
@@ -340,16 +351,16 @@ public:
         CellsGenerator<NoCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
         VertexBasedCellPopulation<3> cell_population(*p_mesh, cells);
-        
+
         OffLatticeSimulation<3> simulator(cell_population);
         simulator.SetOutputDirectory(output_filename);
         simulator.SetSamplingTimestepMultiple(10);
         simulator.SetEndTime(end_time);
 
         MAKE_PTR(GeneralMonolayerVertexMeshForce, p_force3);
-        p_force3->SetApicalParameters(20, 20, 0.7);
-        p_force3->SetBasalParameters(20, 20, 0.7);
-        p_force3->SetLateralParameter(8);
+        p_force3->SetApicalParameters(2.5, 2.5, 0.7);
+        p_force3->SetBasalParameters(2.5, 2.5, 0.7);
+        p_force3->SetLateralParameter(1);
         p_force3->SetVolumeParameters(350, 1);
         simulator.AddForce(p_force3);
         MAKE_PTR(HorizontalStretchForce<3>, p_force2);
@@ -372,31 +383,29 @@ public:
         const unsigned num_cells_y = 3;
         std::string output_filename = "TestCellDivision/HoneyTest" + boost::lexical_cast<std::string>(num_cells_x)
             + "x" + boost::lexical_cast<std::string>(num_cells_y);
-        HoneycombVertexMeshGenerator generator(num_cells_x, num_cells_y, false, 0.1, 0.01, target_area);
-        MutableVertexMesh<2, 2>& vertex_2mesh = *(generator.GetMesh());
-        MonolayerVertexMeshGenerator builder("CellGrowth");
-        MutableVertexMesh<3, 3>* p_mesh = builder.MakeMeshUsing2dMesh(vertex_2mesh);
-        builder.WriteVtk(output_filename, "Before");
+        HexagonalPrism3dVertexMeshGenerator generator(num_cells_x, num_cells_y, target_area, z_height);
+        MutableVertexMesh<3, 3>* p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         CellsGenerator<UniformG1GenerationalCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_transit_type);
         VertexBasedCellPopulation<3> cell_population(*p_mesh, cells);
-        
+
         OffLatticeSimulation<3> simulator(cell_population);
         simulator.SetOutputDirectory(output_filename);
-        simulator.SetSamplingTimestepMultiple(200);
+        simulator.SetSamplingTimestepMultiple(10);
         simulator.SetEndTime(end_time);
+        p_mesh->SetCellRearrangementThreshold(0.1);
 
         MAKE_PTR(GeneralMonolayerVertexMeshForce, p_force3);
-        p_force3->SetApicalParameters(20, 20, 0.7);
-        p_force3->SetBasalParameters(20, 20, 0.7);
-        p_force3->SetLateralParameter(8);
+        p_force3->SetApicalParameters(2.5, 2.5, 0.7);
+        p_force3->SetBasalParameters(2.5, 2.5, 0.7);
+        p_force3->SetLateralParameter(1);
         p_force3->SetVolumeParameters(350, 1);
         simulator.AddForce(p_force3);
         MAKE_PTR(HorizontalStretchForce<3>, p_force2);
-        p_force2->SetForceMagnitude(0.2);
+        p_force2->SetForceMagnitude(0.05);
         p_force2->SetRelativeWidth(0.15);
         simulator.AddForce(p_force2);
 
@@ -414,8 +423,8 @@ public:
          * |     |
          * |_____|
          */
+
         std::string output_filename = "TestUniaxialLoad/SingleCubeTest";
-        const double end_time = 4;
         const double target_volume = 3;
 
         std::vector<Node<3>*> nodes;
@@ -462,56 +471,21 @@ public:
     void TestAsynchronousT1()
     {
         /*
-         * Create a mesh comprising six nodes contained in two triangle and two rhomboid elements, as shown below.
-         * We will test that that a T1 swap doesn't occur when max(l1,l2)>mCellRearrangementThreshold.
-         *  _____
-         * |\   /|
-         * | \ / |
-         * |  |  |
-         * | / \ |
-         * |/___\|
+         * Using 3 rows of hexagonal cell to test. See output files.
          */
-        // Set the threshold distance between vertices for a T1 swap as follows
-        // so that it will not trigger CheckForSwapsFromShortEdges
+        std::string output_filename = "TestAsynchronousT1/SecondTest";
+        const double end_time = 1.5;
 
-        std::string output_filename = "TestAsynchronousT1/FirstTest";
-        const double end_time = 1;
-        const double target_volume = 2.2;
+        HexagonalPrism3dVertexMeshGenerator generator(4, 3, target_area, z_height);
+        MutableVertexMesh<3, 3>* p_mesh = generator.GetMesh();
 
-        std::vector<Node<3>*> nodes;
-        nodes.push_back(new Node<3>(0, true, 0.0, 0.0, 0.0));
-        nodes.push_back(new Node<3>(1, true, 1.0, 0.0, 0.0));
-        nodes.push_back(new Node<3>(2, true, 1.0, 1.0, 0.0));
-        nodes.push_back(new Node<3>(3, true, 0.0, 1.0, 0.0));
-        nodes.push_back(new Node<3>(4, false, 0.5, 0.4, 0.0));
-        nodes.push_back(new Node<3>(5, false, 0.5, 0.6, 0.0));
+        p_mesh->GetNode(16)->rGetModifiableLocation()[1] = 1.4;
+        p_mesh->GetNode(21)->rGetModifiableLocation()[1] = 1.7;
+        p_mesh->SetCellRearrangementThreshold(0.40);
 
-        unsigned node_indices_elem_0[3] = { 2, 3, 5 };
-        unsigned node_indices_elem_1[4] = { 4, 1, 2, 5 };
-        unsigned node_indices_elem_2[3] = { 0, 1, 4 };
-        unsigned node_indices_elem_3[4] = { 4, 5, 3, 0 };
-
-        MonolayerVertexMeshGenerator builder(nodes, "AsynchronousT1Swap");
-        builder.BuildElementWith(3, node_indices_elem_0);
-        builder.BuildElementWith(4, node_indices_elem_1);
-        builder.BuildElementWith(3, node_indices_elem_2);
-        builder.BuildElementWith(4, node_indices_elem_3);
-        MutableVertexMesh<3, 3>* p_mesh = builder.GenerateMesh();
-
-        p_mesh->GetNode(4)->rGetModifiableLocation()[1] = 0.46;
-        p_mesh->GetNode(5)->rGetModifiableLocation()[1] = 0.54;
-        // p_mesh->SetCellRearrangementThreshold(0.10);
-        // p_mesh->SetCellRearrangementRatio(8);
-
-        // p_mesh->ReMesh();
-        // p_mesh->SetCellRearrangementThreshold(0.01);
-        // p_mesh->SetCellRearrangementRatio(1.5);
-
-
-        for (unsigned i = 0; i < p_mesh->GetNumNodes() ; ++i)
-        {
-            p_mesh->GetNode(i)->rGetModifiableLocation() *= 2;
-        }
+        p_mesh->ReMesh();
+        p_mesh->SetCellRearrangementThreshold(0.01);
+        p_mesh->SetCellRearrangementRatio(1.5);
 
         std::vector<CellPtr> cells;
         CellsGenerator<NoCellCycleModel, 3> cells_generator;
@@ -524,32 +498,23 @@ public:
         simulator.SetEndTime(end_time);
 
         MAKE_PTR(GeneralMonolayerVertexMeshForce, p_force3);
-        p_force3->SetApicalParameters(15, 15, 0.7);
-        p_force3->SetBasalParameters(20, 20, 0.7);
-        p_force3->SetLateralParameter(9.25);
-        p_force3->SetVolumeParameters(350, target_volume*1.2);
+        p_force3->SetApicalParameters(2.5, 2.5, 0.7);
+        p_force3->SetBasalParameters(2.5, 2.5, 0.7);
+        p_force3->SetLateralParameter(1);
+        p_force3->SetVolumeParameters(350, target_area * z_height);
         simulator.AddForce(p_force3);
 
         MAKE_PTR(LateralNodeModifier, p_node_modifier);
         simulator.AddSimulationModifier(p_node_modifier);
 
         MAKE_PTR(HorizontalStretchForce<3>, p_force2);
-        p_force2->SetForceMagnitude(0.50);
+        p_force2->SetForceMagnitude(1);
         p_force2->SetRelativeWidth(0.15);
         simulator.AddForce(p_force2);
 
-        simulator.SetEndTime(end_time);
         simulator.Solve();
 
-        // const double lateral_params[6] = {8, 8.5, 9, 9.5, 10, 10.5};
-        // for (unsigned i = 0; i < 6; ++i)
-        // {
-        //     p_force3->SetLateralParameter(lateral_params[i]);
-        //     simulator.SetEndTime(end_time*(i+1));
-        //     simulator.Solve();
-        // }
-
-        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 4);
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 12u);
         TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
 };

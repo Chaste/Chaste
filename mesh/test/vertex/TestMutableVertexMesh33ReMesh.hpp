@@ -39,14 +39,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 
 #include "FileComparison.hpp"
-#include "Warnings.hpp"
-#include "MutableVertexMesh.hpp"
 #include "MonolayerVertexMeshGenerator.hpp"
-#include "Debug.hpp"
-// This test is always run sequentially (never in parallel)
+#include "MutableVertexMesh.hpp"
+#include "Warnings.hpp"
 #include "FakePetscSetup.hpp"
 
 #define OUTPUT_NAME "TestMutableVertexMesh33ReMesh"
+#include "MonolayerVertexMeshCustomFunctions.hpp"
 
 class TestMutableVertexMesh33ReMesh : public CxxTest::TestSuite
 {
@@ -1243,6 +1242,35 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetElement(2)->GetNumNodes(), 8u);
 
         builder.WriteVtk("DivideElement", "After");
+    }
+
+    void TestFaceRearrangeNode()
+    {
+        std::vector<Node<3>*> nodes;
+        nodes.push_back(new Node<3>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<3>(1, true, 1.0, 0.0));
+        nodes.push_back(new Node<3>(2, true, 0.0, 1.0));
+        nodes.push_back(new Node<3>(3, true, 1.0, 1.0));
+
+        VertexElement<2, 3>* face = new VertexElement<2, 3>(0, nodes);
+        std::vector<VertexElement<2, 3>*> v_f;
+        v_f.push_back(face);
+        PrintElement(face);
+        MutableVertexMesh<2, 3> meh(nodes, v_f);
+
+        {
+            VertexMeshWriter<2, 3> writer(OUTPUT_NAME + std::string("/FaceRearrangeNode"), "blabla");
+            writer.WriteVtkUsingMesh(meh, "before");
+        }
+
+        c_vector<double, 3> vv = face->GetCentroid();
+        vv[2] += 3;
+        face->FaceRearrangeNodes(vv);
+        PrintElement(face);
+        {
+            VertexMeshWriter<2, 3> writer(OUTPUT_NAME + std::string("/FaceRearrangeNode"), "blabla", false);
+            writer.WriteVtkUsingMesh(meh, "after");
+        }
     }
 
     // // Commented this test as T2 Swap should only happen to triangular prism

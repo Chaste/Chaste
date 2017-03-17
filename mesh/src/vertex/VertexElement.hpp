@@ -37,9 +37,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "MutableElement.hpp"
 
-#include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/vector.hpp>
+#include "ChasteSerialization.hpp"
 
 /**
  * An element class for use in the VertexMesh class. The main
@@ -292,7 +292,7 @@ public:
 
     /**
      * Method for faces. Add a node to the element between nodes at Index and Index+1.
-     * Add to the very end by default. 
+     * Add to the very end by default.
      * (using UINT_MAX - 11 as we might run into error when GetNodeLocalIndex(..) is used
      * on non-containing node and no check is performed before the call of this function)
      *
@@ -358,7 +358,7 @@ public:
      * @return true if there are changes to the order of nodes.
      * This function does not update the element about the changes #2850
      */
-    bool FaceRearrangeNodes(const c_vector<double, SPACE_DIM> &PointOfView);
+    bool FaceRearrangeNodes(const c_vector<double, SPACE_DIM>& PointOfView);
 
     /**
      * face will add element index into its registry.

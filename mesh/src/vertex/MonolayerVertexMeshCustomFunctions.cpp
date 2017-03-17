@@ -35,16 +35,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "MonolayerVertexMeshCustomFunctions.hpp"
 
+#include "MutableVertexMesh.hpp"
 #include "Node.hpp"
 #include "VertexElement.hpp"
-#include "MutableVertexMesh.hpp"
 
 #include <algorithm>
 #include <string>
 
+#include <iomanip> // PrintElement
 #include <iostream> // PrintMesh
 #include <iostream> // PrintElement
-#include <iomanip> // PrintElement
+
+#include "Debug.hpp"
 
 /////////////////////////////////////////////////////////
 ///      Some function that are relevant for all      ///
@@ -73,7 +75,7 @@ std::set<unsigned> GetSharedElementIndices(const Node<3>* pNodeA, const Node<3>*
         Node<3>* p_node_b = const_cast<Node<3>*>(pNodeB);
         const std::set<unsigned>& elems_with_node_a = p_node_a->rGetContainingElementIndices();
         const std::set<unsigned>& elems_with_node_b = p_node_b->rGetContainingElementIndices();
-        
+
         std::set_intersection(elems_with_node_a.begin(), elems_with_node_a.end(),
                               elems_with_node_b.begin(), elems_with_node_b.end(),
                               std::inserter(shared_elements, shared_elements.begin()));
@@ -92,7 +94,7 @@ std::set<unsigned> GetSharedFaceIndices(const Node<3>* pNodeA, const Node<3>* pN
         Node<3>* p_node_b = const_cast<Node<3>*>(pNodeB);
         const std::set<unsigned>& elems_with_node_a = p_node_a->rGetContainingFaceIndices();
         const std::set<unsigned>& elems_with_node_b = p_node_b->rGetContainingFaceIndices();
-        
+
         std::set_intersection(elems_with_node_a.begin(), elems_with_node_a.end(),
                               elems_with_node_b.begin(), elems_with_node_b.end(),
                               std::inserter(shared_faces, shared_faces.begin()));
@@ -142,8 +144,8 @@ template <typename VertexObject>
 VertexElement<2, 3>* GetSharedLateralFace(const Node<3>* pNodeA, const Node<3>* pNodeB, const VertexObject* pObject)
 {
     const std::set<unsigned> shared_face_ids = GetSharedFaceIndices(pNodeA, pNodeB);
-    const std::set<VertexElement<2, 3>*> shared_lateral_faces = GetFacesWithIndices(shared_face_ids, pObject, 
-                                                                                   Monolayer::LateralValue);
+    const std::set<VertexElement<2, 3>*> shared_lateral_faces = GetFacesWithIndices(shared_face_ids, pObject,
+                                                                                    Monolayer::LateralValue);
 
     switch (shared_lateral_faces.size())
     {
@@ -159,7 +161,7 @@ template VertexElement<2, 3>* GetSharedLateralFace(const Node<3>*, const Node<3>
 template VertexElement<2, 3>* GetSharedLateralFace(const Node<3>*, const Node<3>*, const MutableVertexMesh<3, 3>*);
 template VertexElement<2, 3>* GetSharedLateralFace(const Node<3>*, const Node<3>*, const VertexElement<3, 3>*);
 
-std::set<VertexElement<2, 3>*> GetFacesWithIndices(const std::set<unsigned>& face_indices, const VertexElement<3, 3>* pElement, 
+std::set<VertexElement<2, 3>*> GetFacesWithIndices(const std::set<unsigned>& face_indices, const VertexElement<3, 3>* pElement,
                                                    const Monolayer::v_type faceType)
 {
     std::set<VertexElement<2, 3>*> s_result;
@@ -189,7 +191,7 @@ std::set<VertexElement<2, 3>*> GetFacesWithIndices(const std::set<unsigned>& fac
     return s_result;
 }
 
-std::set<VertexElement<2, 3>*> GetFacesWithIndices(const std::set<unsigned>& face_indices, const VertexMesh<3, 3>* pMesh, 
+std::set<VertexElement<2, 3>*> GetFacesWithIndices(const std::set<unsigned>& face_indices, const VertexMesh<3, 3>* pMesh,
                                                    const Monolayer::v_type faceType)
 {
     std::set<VertexElement<2, 3>*> s_result;
@@ -213,7 +215,7 @@ std::set<VertexElement<2, 3>*> GetFacesWithIndices(const std::set<unsigned>& fac
     }
 
     return s_result;
-}                                                  
+}
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void PrintElement(const VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement)
@@ -445,7 +447,7 @@ void FaceRearrangeNodesInMesh(VertexMesh<3, 3>* pMesh, VertexElement<2, 3>* pFac
     {
         for (std::set<unsigned>::const_iterator it = set_tmp.begin(); it != set_tmp.end(); ++it)
         {
-            VertexElement<3, 3> *p_elem = pMesh->GetElement(*it);
+            VertexElement<3, 3>* p_elem = pMesh->GetElement(*it);
             p_elem->CheckFaceOrientationOfElement(p_elem->GetFaceLocalIndex(pFace->GetIndex()));
         }
 
@@ -779,7 +781,7 @@ std::vector<VertexElement<2, 3>*> GetFacesWithType(const VertexElement<3, 3>* pE
     return return_v;
 }
 
-///\todo: #2850 num_lateral_faces is obtained using heuristical method. If node were to have weak pointer of 
+///\todo: #2850 num_lateral_faces is obtained using heuristical method. If node were to have weak pointer of
 //          face&elements (using Boost or c++11)
 // Having overloaded functions so that Opposite node can be obtained in almost any scope.
 Node<3>* GetOppositeNode(const Node<3>* pNode, const VertexElement<2, 3>* pFace)
@@ -851,7 +853,7 @@ void MeshUpdateNode(Node<3>* pOldNode, Node<3>* pNewNode, MutableVertexMesh<3, 3
             pMesh->GetFace(*it)->FaceUpdateNode(pOldNode, pNewNode);
         }
     }
-    
+
     for (std::set<unsigned>::const_iterator it = containing_elems.begin(); it != containing_elems.end(); ++it)
     {
         if (pMesh->GetElement(*it)->GetNodeLocalIndex(pNewNode->GetIndex()) != UINT_MAX)
@@ -884,3 +886,69 @@ Node<3>* GetNextNode(const Node<3>* pNode, const VertexElement<ELEMENT_DIM, 3>* 
 }
 template Node<3>* GetNextNode(const Node<3>*, const VertexElement<2, 3>*);
 template Node<3>* GetNextNode(const Node<3>*, const VertexElement<3, 3>*);
+
+#include <boost/numeric/ublas/io.hpp>
+#include <boost/numeric/ublas/lu.hpp>
+#include "UblasCustomFunctions.hpp"
+using boost::numeric::ublas::permutation_matrix;
+using boost::numeric::ublas::matrix;
+
+c_vector<double, 3> CalculateUnitNormalToFace(const VertexElement<2, 3>* pFace)
+{
+    c_vector<double, 3> unit_vec = zero_vector<double>(3);
+
+    // As we are in 3D, the face must have at least three vertices
+    if (pFace->GetNumNodes() < 3u)
+    {
+        NEVER_REACHED;
+    }
+    else if (pFace->GetNumNodes() < 5u)
+    {
+        c_vector<double, 3> v10 = pFace->GetNodeLocation(1) - pFace->GetNodeLocation(0);
+        c_vector<double, 3> v20 = pFace->GetNodeLocation(2) - pFace->GetNodeLocation(0);
+        unit_vec = VectorProduct(v10, v20);
+    }
+    else
+    {
+        const unsigned n = pFace->GetNumNodes();
+        matrix<double> X_tmp(n, 4);
+        for (unsigned i = 0; i < pFace->GetNumNodes(); ++i)
+        {
+            const c_vector<double, 3>& loc_tmp = pFace->GetNodeLocation(i);
+            X_tmp(i, 0) = 1;
+            X_tmp(i, 1) = loc_tmp[0];
+            X_tmp(i, 2) = loc_tmp[1];
+            X_tmp(i, 3) = loc_tmp[2] + 1e-6 * i;
+        }
+        std::cout << X_tmp << std::endl;
+        matrix<double> A = prod(trans(X_tmp), X_tmp);
+        std::cout << A << std::endl;
+        boost::numeric::ublas::vector<double> constrain_vec(4);
+        constrain_vec[0] = 0;
+        constrain_vec[1] = 1;
+        constrain_vec[2] = 1;
+        constrain_vec[3] = 1;
+        boost::numeric::ublas::vector<double> XTX_constrain(constrain_vec);
+
+        permutation_matrix<size_t> pm(4);
+        lu_factorize(A, pm);
+        std::cout << A << std::endl;
+        std::cout << pm << std::endl;
+        try
+        {
+            lu_substitute(A, pm, XTX_constrain);
+        }
+        catch (boost::numeric::ublas::singular ss)
+        {
+            ///\todo: #2850 probably need
+            std::cout << "#################################################################" << std::endl;
+        }
+        std::cout << XTX_constrain << std::endl;
+        unit_vec[0] = XTX_constrain[1];
+        unit_vec[1] = XTX_constrain[2];
+        unit_vec[2] = XTX_constrain[3];
+    }
+
+    unit_vec /= norm_2(unit_vec);
+    return unit_vec;
+}

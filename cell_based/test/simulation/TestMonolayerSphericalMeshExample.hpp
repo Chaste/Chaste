@@ -53,7 +53,7 @@ public:
         CellsGenerator<UniformG1GenerationalCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_transit_type);
         VertexBasedCellPopulation<3> cell_population(*p_mesh, cells);
-        
+
         OffLatticeSimulation<3> simulator(cell_population);
         simulator.SetOutputDirectory(output_filename);
         simulator.SetSamplingTimestepMultiple(10);
@@ -99,7 +99,7 @@ public:
         CellsGenerator<UniformG1GenerationalCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_transit_type);
         VertexBasedCellPopulation<3> cell_population(*p_mesh, cells);
-        
+
         OffLatticeSimulation<3> simulator(cell_population);
         simulator.SetOutputDirectory(output_filename);
         simulator.SetSamplingTimestepMultiple(10);
@@ -145,7 +145,7 @@ public:
         CellsGenerator<UniformG1GenerationalCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_transit_type);
         VertexBasedCellPopulation<3> cell_population(*p_mesh, cells);
-        
+
         OffLatticeSimulation<3> simulator(cell_population);
         simulator.SetOutputDirectory(output_filename);
         simulator.SetSamplingTimestepMultiple(10);
@@ -162,7 +162,7 @@ public:
         // p_force2->SetRelativeWidth(0.15);
         // simulator.AddForce(p_force2);
 
-        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 176u);
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 162u);
         simulator.Solve();
 
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 176u);

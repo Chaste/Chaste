@@ -34,9 +34,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "MonolayerVertexMeshGenerator.hpp"
+#include <algorithm>
 #include "MonolayerVertexMeshCustomFunctions.hpp"
 #include "VertexMeshWriter.hpp"
-#include <algorithm>
 
 #include "Debug.hpp"
 

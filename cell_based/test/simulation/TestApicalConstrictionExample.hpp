@@ -41,19 +41,20 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "CheckpointArchiveTypes.hpp"
 
-#include "PatternedApicalConstrictionForce.hpp"
-#include "MonolayerVertexMeshGenerator.hpp"
 #include "VoronoiPrism3dVertexMeshGenerator.hpp"
-#include "VoronoiVertexMeshGenerator.hpp"
+#include "HexagonalPrism3dVertexMeshGenerator.hpp"
+
 #include "VertexBasedCellPopulation.hpp"
 #include "CellsGenerator.hpp"
-#include "DifferentiatedCellProliferativeType.hpp"
 #include "NoCellCycleModel.hpp"
+
 #include "SmartPointers.hpp"
 #include "OffLatticeSimulation.hpp"
-#include "HoneycombVertexMeshGenerator.hpp"
 #include "CellLabel.hpp"
 #include "CellLabelWriter.hpp"
+#include "PatternedApicalConstrictionForce.hpp"
+#include "LateralNodeModifier.hpp"
+
 #include "FakePetscSetup.hpp"
 
 #define OUTPUT_NAME "TestApicalConstrictionExample/InitialMesh"
@@ -64,24 +65,15 @@ public:
     void TestApicalConstriction() throw(Exception)
     {
         // Make a mesh of 10x10
-//        const double z_height = 1;
+        const double z_height = 1;
         const double target_area = 1;
         const unsigned num_cells_x = 10;
         const unsigned num_cells_y = 10;
-        // There seems to be a bug somewhere in voronoiprism3dVertexMeshGenerator....
-//        VoronoiPrism3dVertexMeshGenerator generator(num_cells_x, num_cells_y, z_height, 5, target_area);
-//        MutableVertexMesh<3,3>* p_mesh = generator.GetMeshAfterReMesh();
-        HoneycombVertexMeshGenerator generator(num_cells_x, num_cells_y, false, 0.1, 0.01, target_area);
-//        VoronoiVertexMeshGenerator generator(num_cells_x, num_cells_y, 5, target_area);
-        MutableVertexMesh<2, 2>& vertex_2mesh = *(generator.GetMesh());
-        MonolayerVertexMeshGenerator builder("ApicalConstriction");
-        MutableVertexMesh<3, 3>* p_mesh = builder.MakeMeshUsing2dMesh(vertex_2mesh);
-        builder.WriteVtk(OUTPUT_NAME, "Before");
+        HexagonalPrism3dVertexMeshGenerator generator(num_cells_x, num_cells_y, target_area, z_height);
+        MutableVertexMesh<3, 3>* p_mesh = generator.GetMesh();
 
         char tmp_name[50];
         sprintf(tmp_name, "TestApicalConstrictionExample/HoneyTest%dx%d", num_cells_x, num_cells_y);
-        VertexMeshWriter<3, 3> vertex_mesh_writer(tmp_name, "InitialMesh", false);
-        vertex_mesh_writer.WriteVtkUsingMesh(*p_mesh);
 
         std::vector<CellPtr> cells;
         CellsGenerator<NoCellCycleModel, 3> cells_generator;
@@ -121,6 +113,9 @@ public:
         p_force3->SetVolumeParameters(200, 1);
         p_force3->SetPatternedApicalParameter(20, 20, 0.5);
         simulator.AddForce(p_force3);
+
+        MAKE_PTR(LateralNodeModifier, p_node_modifier);
+        simulator.AddSimulationModifier(p_node_modifier);
 
         simulator.Solve();
 
@@ -135,20 +130,11 @@ public:
         const double target_area = 1;
         const unsigned num_cells_x = 10;
         const unsigned num_cells_y = 10;
-        // There seems to be a bug somewhere in voronoiprism3dVertexMeshGenerator....
         VoronoiPrism3dVertexMeshGenerator generator(num_cells_x, num_cells_y, z_height, 5, target_area);
-//        HoneycombVertexMeshGenerator generator(num_cells_x, num_cells_y, false, 0.1, 0.01, target_area);
-//        VoronoiVertexMeshGenerator generator(num_cells_x, num_cells_y, 5, target_area);
-//        MutableVertexMesh<2, 2>& vertex_2mesh = *(generator.GetMesh());
-//        Helper3dVertexMeshBuilder builder("ApicalConstriction");
-//        MutableVertexMesh<3, 3>* p_mesh = builder.MakeMeshUsing2dMesh(vertex_2mesh);
-//        builder.WriteVtk(OUTPUT_NAME,"Before");
         MutableVertexMesh<3, 3>* p_mesh = generator.GetMeshAfterReMesh();
 
         char tmp_name[50];
         sprintf(tmp_name, "TestApicalConstrictionExample/VoronoiTest%dx%d", num_cells_x, num_cells_y);
-        VertexMeshWriter<3, 3> vertex_mesh_writer(tmp_name, "InitialMesh", false);
-        vertex_mesh_writer.WriteVtkUsingMesh(*p_mesh);
 
         std::vector<CellPtr> cells;
         CellsGenerator<NoCellCycleModel, 3> cells_generator;
@@ -188,6 +174,9 @@ public:
         p_force3->SetVolumeParameters(200, 1);
         p_force3->SetPatternedApicalParameter(20, 20, 0.5);
         simulator.AddForce(p_force3);
+
+        MAKE_PTR(LateralNodeModifier, p_node_modifier);
+        simulator.AddSimulationModifier(p_node_modifier);
 
         simulator.Solve();
 

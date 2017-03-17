@@ -36,10 +36,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MONOLAYERVERTEXMESHCUSTOMFUNCTIONS_HPP_
 #define MONOLAYERVERTEXMESHCUSTOMFUNCTIONS_HPP_
 
-#include <set>
-#include <vector>
-#include <string>
 #include <algorithm>
+#include <set>
+#include <string>
+#include <vector>
+#include "UblasIncludes.hpp"
 
 // Forward declaration prevents circular include chain
 template <unsigned DIM>
@@ -54,8 +55,8 @@ class MutableVertexMesh;
 /////////////////////////////////////////////////////////
 ///      Some functions that are relevant for all      ///
 /////////////////////////////////////////////////////////
-#define plus1(a,n) (a+1)%n
-#define minus1(a,n) (a+n-1)%n
+#define plus1(a, n) (a + 1) % n
+#define minus1(a, n) (a + n - 1) % n
 #define no1(c) (*(c.begin()))
 #define no2(c) (*(++c.begin()))
 
@@ -144,7 +145,6 @@ void PrintMesh(const VertexMesh<3, 3>* pMesh, const bool printDeletedObjects = f
  */
 bool IsFaceOnBoundary(const VertexElement<2, 3>* pFace);
 
-
 void FaceRearrangeNodesInMesh(VertexMesh<3, 3>* pMesh, VertexElement<2, 3>* pFace);
 
 ///////////////////////////////////////////////////////////////////////////////////
@@ -175,18 +175,18 @@ const v_type LateralValue = 3;
 const v_type ElementValue = 4;
 const v_type AllTypes = 100;
 
-const std::string ValueToString[4] = {"", "Basal", "Apical", "Lateral"};
+const std::string ValueToString[4] = { "", "Basal", "Apical", "Lateral" };
 }
 
 ///////////////////////////////////
 ///     Functions for nodes     ///
 ///////////////////////////////////
 std::set<VertexElement<2, 3>*> GetFacesWithIndices(const std::set<unsigned>& face_indices,
-                                                   const VertexElement<3, 3>* pElement, 
+                                                   const VertexElement<3, 3>* pElement,
                                                    const Monolayer::v_type faceType = Monolayer::AllTypes);
 
 std::set<VertexElement<2, 3>*> GetFacesWithIndices(const std::set<unsigned>& face_indices,
-                                                   const VertexMesh<3, 3>* pMesh, 
+                                                   const VertexMesh<3, 3>* pMesh,
                                                    const Monolayer::v_type faceType = Monolayer::AllTypes);
 /**
  * Set a node as an apical node.
@@ -232,7 +232,6 @@ bool IsBasalNode(const Node<3>* pNode);
  * @return  whether this node is a lateral node
  */
 bool IsLateralNode(const Node<3>* pNode);
-
 
 //////////////////////////////////
 ///     Functions for face     ///
@@ -361,5 +360,7 @@ Node<3>* GetNextNode(const unsigned localIndex, const VertexElement<ELEMENT_DIM,
 
 template <unsigned ELEMENT_DIM>
 Node<3>* GetNextNode(const Node<3>* pNode, const VertexElement<ELEMENT_DIM, 3>* pElement);
+
+c_vector<double, 3> CalculateUnitNormalToFace(const VertexElement<2, 3>* pFace);
 
 #endif /* MONOLAYERVERTEXMESHCUSTOMFUNCTIONS_HPP_ */

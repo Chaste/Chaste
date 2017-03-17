@@ -35,8 +35,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexElement.hpp"
 
 #include <algorithm> // std::swap, std::min, std::max, std::rotate, std::copy
-#include "UblasCustomFunctions.hpp" // VectorProduct
 #include "MonolayerVertexMeshCustomFunctions.hpp"
+#include "UblasCustomFunctions.hpp" // VectorProduct
 
 #include "Debug.hpp"
 
@@ -406,7 +406,7 @@ unsigned VertexElement<ELEMENT_DIM, SPACE_DIM>::DeleteFace(VertexElement<ELEMENT
         EXCEPTION("Face is not in element and cannot be deleted!");
     }
     this->DeleteFace(face_local_index);
-    
+
     return face_local_index;
 }
 
@@ -571,7 +571,7 @@ bool VertexElement<2, 3>::FaceRearrangeNodes(const c_vector<double, 3>& PointOfV
     {
         nodes_tmp[i] = angles_and_nodes[i].second;
     }
-    
+
     const bool return_val = (nodes_tmp != this->mNodes);
     if (return_val)
     {
@@ -584,6 +584,44 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool VertexElement<ELEMENT_DIM, SPACE_DIM>::FaceRearrangeNodes()
 {
     NEVER_REACHED;
+}
+
+template <>
+bool VertexElement<2, 3>::FaceRearrangeNodes()
+{
+    const c_vector<double, 3> normal = CalculateUnitNormalToFace(this);
+    const c_vector<double, 3> centroid = this->GetCentroid();
+    c_vector<double, 3> e1 = this->mNodes[0]->rGetLocation() - centroid;
+    // Gramm-Schmidt Process
+    e1 -= inner_prod(e1, normal) * normal;
+    e1 /= norm_2(e1);
+    c_vector<double, 3> e2 = VectorProduct(normal, e1);
+
+    std::vector<std::pair<double, Node<3>*> > angles_and_nodes;
+    for (unsigned i = 0; i < this->GetNumNodes(); ++i)
+    {
+        const c_vector<double, 3> vec_tmp = this->GetNode(i)->rGetLocation() - centroid;
+        double tmp_angle = atan2(inner_prod(vec_tmp, e2), inner_prod(vec_tmp, e1));
+        if (tmp_angle < 0)
+        {
+            tmp_angle += 2 * M_PI;
+        }
+        angles_and_nodes.push_back(std::make_pair(tmp_angle, this->GetNode(i)));
+    }
+    std::sort(angles_and_nodes.begin(), angles_and_nodes.end());
+
+    std::vector<Node<3>*> nodes_tmp(this->GetNumNodes());
+    for (unsigned i = 0; i < nodes_tmp.size(); ++i)
+    {
+        nodes_tmp[i] = angles_and_nodes[i].second;
+    }
+
+    const bool return_val = (nodes_tmp != this->mNodes);
+    if (return_val)
+    {
+        std::swap(nodes_tmp, this->mNodes);
+    }
+    return return_val;
 }
 
 template <>
@@ -659,7 +697,7 @@ void VertexElement<ELEMENT_DIM, SPACE_DIM>::CheckFaceOrientationOfElement(const 
 
     // Check Orientation
     const c_vector<double, SPACE_DIM> elem_centroid = this->GetCentroid();
-    
+
     const VertexElement<ELEMENT_DIM - 1, SPACE_DIM>* p_face = this->GetFace(faceLocalIndex);
     c_vector<double, SPACE_DIM> face_centroid = p_face->GetCentroid();
     c_vector<double, SPACE_DIM> face_normal = zero_vector<double>(SPACE_DIM);
@@ -817,7 +855,7 @@ void VertexElement<3, 3>::MonolayerElementRearrangeFacesNodes()
         }
     }
 
-    // With new functionalities, it is not necessary to arrange faces in "correct" order, as there 
+    // With new functionalities, it is not necessary to arrange faces in "correct" order, as there
     // isn't unambiguous way to arrange faces anymore.
 
     // Check Orientation
