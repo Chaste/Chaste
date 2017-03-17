@@ -83,4 +83,4 @@ DynamicModelLoaderRegistry::DynamicModelLoaderRegistry()
 }
 
 /** The loader registry instance */
-std::auto_ptr<DynamicModelLoaderRegistry> DynamicModelLoaderRegistry::mpInstance;
+std::shared_ptr<DynamicModelLoaderRegistry> DynamicModelLoaderRegistry::mpInstance;

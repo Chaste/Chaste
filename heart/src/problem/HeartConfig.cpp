@@ -198,7 +198,7 @@ public:
 //
 // Definition of static member variables
 //
-std::auto_ptr<HeartConfig> HeartConfig::mpInstance;
+std::shared_ptr<HeartConfig> HeartConfig::mpInstance;
 
 //
 // Methods
@@ -472,7 +472,7 @@ boost::shared_ptr<cp::chaste_parameters_type> HeartConfig::ReadFile(const std::s
     }
 
     // Get the parameters using the method 'ChasteParameters(rFileName)',
-    // which returns a std::auto_ptr. We convert to a shared_ptr for easier semantics.
+    // which returns a std::shared_ptr. We convert to a shared_ptr for easier semantics.
     try
     {
         // Make sure Xerces finalization happens
@@ -505,7 +505,7 @@ boost::shared_ptr<cp::chaste_parameters_type> HeartConfig::ReadFile(const std::s
             XmlTools::SetNamespace(p_doc.get(), p_root_elt, "https://chaste.comlab.ox.ac.uk/nss/parameters/3_4");
         }
         // Parse DOM to object model
-        std::auto_ptr<cp::chaste_parameters_type> p_params(cp::ChasteParameters(*p_doc, ::xml_schema::flags::dont_initialize, props));
+        std::shared_ptr<cp::chaste_parameters_type> p_params(cp::ChasteParameters(*p_doc, ::xml_schema::flags::dont_initialize, props));
         // Get rid of the DOM stuff
         p_doc.reset();
 

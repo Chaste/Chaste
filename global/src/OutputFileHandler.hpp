@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class FileFinder; // Avoid circular includes
 
 /** Type of our output streams; a managed pointer to an std::ofstream. */
-typedef std::auto_ptr<std::ofstream> out_stream;
+typedef std::shared_ptr<std::ofstream> out_stream;
 
 /**
  * This file abstracts stuff that needs to be done when creating output files for tests.

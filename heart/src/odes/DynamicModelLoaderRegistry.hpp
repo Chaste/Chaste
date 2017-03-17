@@ -91,7 +91,7 @@ private:
     std::set<DynamicCellModelLoaderPtr> mDeletableLoaders;
 
     /** The single instance of this class. */
-    static std::auto_ptr<DynamicModelLoaderRegistry> mpInstance;
+    static std::shared_ptr<DynamicModelLoaderRegistry> mpInstance;
 
     /**
      * Private constructor; all access should be via Instance().

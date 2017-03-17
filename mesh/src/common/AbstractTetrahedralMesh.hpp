@@ -147,7 +147,7 @@ private:
 
             // Mesh in disc, copy it to the archiving folder
             std::string original_file=this->GetMeshFileBaseName();
-            std::auto_ptr<AbstractMeshReader<ELEMENT_DIM, SPACE_DIM> > p_original_mesh_reader
+            std::shared_ptr<AbstractMeshReader<ELEMENT_DIM, SPACE_DIM> > p_original_mesh_reader
                 = GenericMeshReader<ELEMENT_DIM, SPACE_DIM>(original_file, order_of_element, order_of_boundary_element);
 
             if (p_original_mesh_reader->IsFileFormatBinary())

@@ -2279,7 +2279,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
         # Private data
         self.writeln('private:', indent_level=0)
         self.writeln('/** The single instance of the class */')
-        self.writeln('static std::auto_ptr<', self.lt_class_name, '> mpInstance;\n')
+        self.writeln('static std::shared_ptr<', self.lt_class_name, '> mpInstance;\n')
         if self.row_lookup_method:
             self.output_lut_row_lookup_memory()
         self.output_lut_declarations()
@@ -2287,7 +2287,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
         self.set_indent(0)
         self.writeln('};\n')
         # Define the instance pointer
-        self.writeln('std::auto_ptr<', self.lt_class_name, '> ', self.lt_class_name, '::mpInstance;')
+        self.writeln('std::shared_ptr<', self.lt_class_name, '> ', self.lt_class_name, '::mpInstance;')
         self.writeln()
         return
 
