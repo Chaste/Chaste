@@ -95,7 +95,39 @@ public:
     }
 };
 
+class SimpleConductivityModifier : public AbstractConductivityModifier<2,2>
+{
+private:
+    c_matrix<double,2,2> mTensor;
 
+public:
+    SimpleConductivityModifier()
+        : AbstractConductivityModifier<2,2>(),
+          mTensor(zero_matrix<double>(2,2))
+          // Conductivity tensors are diagonal, so we can only need to do the diagonal if we initialise our tensor with the above line
+    {
+    }
+
+    c_matrix<double,2,2>& rCalculateModifiedConductivityTensor(unsigned elementIndex, const c_matrix<double,2,2>& rOriginalConductivity, unsigned domainIndex)
+    {
+        // Increase by factor of two for element 1
+        if (elementIndex == 1)
+        {
+            for ( unsigned dim=0; dim<2; dim++)
+            {
+                mTensor(dim,dim) = 2.0*rOriginalConductivity(dim,dim);
+            }
+        }
+        else
+        {
+            for ( unsigned dim=0; dim<2; dim++)
+            {
+                mTensor(dim,dim) = rOriginalConductivity(dim,dim);
+            }
+        }
+        return mTensor;
+    }
+};
 class TestBidomainTissue : public CxxTest::TestSuite
 {
 public:
@@ -244,6 +276,37 @@ public:
         }
 
 
+    }
+
+    void TestBidomainTissueConductivityModifier() throw (Exception)
+    {
+        HeartConfig::Instance()->Reset();
+        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
+        TetrahedralMesh<2,2> mesh;
+        mesh.ConstructFromMeshReader(mesh_reader);
+
+        PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory;
+        cell_factory.SetMesh(&mesh);
+
+        //2D tissue
+        BidomainTissue<2>  bidomain_tissue(&cell_factory);
+
+        // Do conductivity modifier here too (for coverage)
+        SimpleConductivityModifier conductivity_modifier;  // Defined above
+        bidomain_tissue.SetConductivityModifier( &conductivity_modifier );
+
+        // intracellular
+        TS_ASSERT_EQUALS(bidomain_tissue.rGetIntracellularConductivityTensor(0u)(0,0),1.75);
+        TS_ASSERT_EQUALS(bidomain_tissue.rGetIntracellularConductivityTensor(1u)(0,0),3.5); // modified
+        TS_ASSERT_EQUALS(bidomain_tissue.rGetIntracellularConductivityTensor(2u)(1,1),1.75);
+        TS_ASSERT_EQUALS(bidomain_tissue.rGetIntracellularConductivityTensor(3u)(0,0),1.75);
+
+
+        //sigma_e
+        TS_ASSERT_EQUALS(bidomain_tissue.rGetExtracellularConductivityTensor(0u)(0,0),7.0);
+        TS_ASSERT_EQUALS(bidomain_tissue.rGetExtracellularConductivityTensor(1u)(0,0),14.0); // modified
+        TS_ASSERT_EQUALS(bidomain_tissue.rGetExtracellularConductivityTensor(2u)(1,1),7.0);
+        TS_ASSERT_EQUALS(bidomain_tissue.rGetExtracellularConductivityTensor(3u)(0,0),7.0);
     }
 
     void TestBidomainTissueWithHeterogeneousConductivitiesEllipsoid() throw (Exception)

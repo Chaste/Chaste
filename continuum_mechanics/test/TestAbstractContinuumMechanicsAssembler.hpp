@@ -170,14 +170,21 @@ public:
     }
 };
 
-// Doesn't over-ride any methods, so should return a zero matrix. (Note: can't create
-// vectors).
+// Doesn't over-ride any non-compulsory methods, so should return a zero matrix.
 class ZeroMatrixAssembler : public AbstractContinuumMechanicsAssembler<1,false,true>
 {
 public:
     ZeroMatrixAssembler(QuadraticMesh<1>* pMesh)
         : AbstractContinuumMechanicsAssembler<1,false,true>(pMesh)
     {
+    }
+    c_vector<double,SPATIAL_BLOCK_SIZE_ELEMENTAL> ComputeSpatialVectorTerm(
+        c_vector<double, NUM_NODES_PER_ELEMENT>& rQuadPhi,
+        c_matrix<double, 1, NUM_NODES_PER_ELEMENT>& rGradQuadPhi,
+        c_vector<double,1>& rX,
+        Element<1,1>* pElement)
+    {
+        return zero_vector<double>(SPATIAL_BLOCK_SIZE_ELEMENTAL);
     }
 };
 
@@ -206,6 +213,14 @@ public:
         Element<DIM,DIM>* pElement)
     {
         return outer_prod(rLinearPhi,rLinearPhi);
+    }
+    c_vector<double,SPATIAL_BLOCK_SIZE_ELEMENTAL> ComputeSpatialVectorTerm(
+        c_vector<double, NUM_NODES_PER_ELEMENT>& rQuadPhi,
+        c_matrix<double, DIM, NUM_NODES_PER_ELEMENT>& rGradQuadPhi,
+        c_vector<double,DIM>& rX,
+        Element<DIM,DIM>* pElement)
+    {
+        return zero_vector<double>(SPATIAL_BLOCK_SIZE_ELEMENTAL);
     }
 };
 
