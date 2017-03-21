@@ -60,8 +60,8 @@ public:
      */
     HexagonalPrism3dVertexMeshGenerator(unsigned numElementsInXDirection,
                                         unsigned numElementsInYDirection,
-                                        double elementApicalArea,
-                                        double elementHeight);
+                                        double elementApicalArea = 1.0,
+                                        double elementHeight = 1.0);
 
     /**
      * Null constructor for derived classes to call.

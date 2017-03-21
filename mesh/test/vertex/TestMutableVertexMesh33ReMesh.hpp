@@ -37,15 +37,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTMUTABLEVERTEXMESH33REMESH_HPP_
 
 #include <cxxtest/TestSuite.h>
-
+#include <string>
 #include "FileComparison.hpp"
+#include "HexagonalPrism3dVertexMeshGenerator.hpp"
 #include "MonolayerVertexMeshGenerator.hpp"
 #include "MutableVertexMesh.hpp"
+#include "VertexMeshWriter.hpp"
 #include "Warnings.hpp"
 #include "FakePetscSetup.hpp"
 
-#define OUTPUT_NAME "TestMutableVertexMesh33ReMesh"
-#include "MonolayerVertexMeshCustomFunctions.hpp"
+#define OUTPUT_NAME std::string("TestMutableVertexMesh33ReMesh")
 
 class TestMutableVertexMesh33ReMesh : public CxxTest::TestSuite
 {
@@ -1220,12 +1221,12 @@ public:
         const unsigned node_indices_elem_0[4] = { 0, 1, 2, 3 };
         const unsigned node_indices_elem_1[4] = { 2, 4, 5, 3 };
 
-        MonolayerVertexMeshGenerator builder(nodes, "Division");
+        MonolayerVertexMeshGenerator builder(nodes, "DivideElement");
         builder.BuildElementWith(4, node_indices_elem_0);
         builder.BuildElementWith(4, node_indices_elem_1);
         // A reference variable as mesh is noncopyable
         MutableVertexMesh<3, 3>* p_mesh = builder.GenerateMesh();
-        builder.WriteVtk("DivideElement", "Initial");
+        builder.WriteVtkWithSubfolder(OUTPUT_NAME, "Before");
 
         c_vector<double, 3> axis_of_division = zero_vector<double>(3);
         axis_of_division[0] = 1;
@@ -1241,35 +1242,36 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetElement(1)->GetNumNodes(), 10u);
         TS_ASSERT_EQUALS(p_mesh->GetElement(2)->GetNumNodes(), 8u);
 
-        builder.WriteVtk("DivideElement", "After");
+        builder.WriteVtkWithSubfolder(OUTPUT_NAME, "After");
     }
 
-    void TestFaceRearrangeNode()
+    void TestDivideElement2() throw(Exception)
     {
-        std::vector<Node<3>*> nodes;
-        nodes.push_back(new Node<3>(0, true, 0.0, 0.0));
-        nodes.push_back(new Node<3>(1, true, 1.0, 0.0));
-        nodes.push_back(new Node<3>(2, true, 0.0, 1.0));
-        nodes.push_back(new Node<3>(3, true, 1.0, 1.0));
-
-        VertexElement<2, 3>* face = new VertexElement<2, 3>(0, nodes);
-        std::vector<VertexElement<2, 3>*> v_f;
-        v_f.push_back(face);
-        PrintElement(face);
-        MutableVertexMesh<2, 3> meh(nodes, v_f);
-
+        HexagonalPrism3dVertexMeshGenerator generator(1, 1);
+        MutableVertexMesh<3, 3>* p_mesh = generator.GetMesh();
         {
-            VertexMeshWriter<2, 3> writer(OUTPUT_NAME + std::string("/FaceRearrangeNode"), "blabla");
-            writer.WriteVtkUsingMesh(meh, "before");
+            VertexMeshWriter<3, 3> writer(OUTPUT_NAME + "/DivideElement2", "DivideElement2");
+            writer.WriteVtkUsingMesh(*p_mesh, "Initial");
         }
 
-        c_vector<double, 3> vv = face->GetCentroid();
-        vv[2] += 3;
-        face->FaceRearrangeNodes(vv);
-        PrintElement(face);
+        c_vector<double, 3> axis_of_division = zero_vector<double>(3);
+        axis_of_division[0] = 1;
+        axis_of_division[1] = 0;
+        axis_of_division[2] = 0.2;
+        axis_of_division /= norm_2(axis_of_division);
+        p_mesh->DivideElementAlongGivenAxis(p_mesh->GetElement(0), axis_of_division);
+        p_mesh->ReMesh();
+        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 2u);
+        TS_ASSERT_EQUALS(p_mesh->GetNumFaces(), 13u);
+        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 16u);
+        TS_ASSERT_EQUALS(p_mesh->GetElement(0)->GetNumFaces(), 8u);
+        TS_ASSERT_EQUALS(p_mesh->GetElement(1)->GetNumFaces(), 6u);
+        TS_ASSERT_EQUALS(p_mesh->GetElement(0)->GetNumNodes(), 12u);
+        TS_ASSERT_EQUALS(p_mesh->GetElement(1)->GetNumNodes(), 8u);
+
         {
-            VertexMeshWriter<2, 3> writer(OUTPUT_NAME + std::string("/FaceRearrangeNode"), "blabla", false);
-            writer.WriteVtkUsingMesh(meh, "after");
+            VertexMeshWriter<3, 3> writer(OUTPUT_NAME + "/DivideElement2", "DivideElement2", false);
+            writer.WriteVtkUsingMesh(*p_mesh, "After");
         }
     }
 

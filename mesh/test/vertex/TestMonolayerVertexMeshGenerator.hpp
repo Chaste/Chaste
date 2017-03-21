@@ -38,11 +38,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 
-#include "MonolayerVertexMeshGenerator.hpp"
 #include "MonolayerVertexMeshCustomFunctions.hpp"
+#include "MonolayerVertexMeshGenerator.hpp"
 
-#include "VoronoiVertexMeshGenerator.hpp" // Make Mesh from 2D Mesh
 #include "HoneycombVertexMeshGenerator.hpp" // Make Mesh from 2D Mesh
+#include "VoronoiVertexMeshGenerator.hpp" // Make Mesh from 2D Mesh
 
 #include "Debug.hpp"
 
@@ -55,10 +55,9 @@ class TestMonolayerVertexMeshGenerator : public CxxTest::TestSuite
 public:
     void TestMonolayerRearrangement()
     {
-        MARK
-            // Make 8 nodes to assign to a cube element
-            std::vector<Node<3>*>
-                nodes;
+        MARK;
+        // Make 8 nodes to assign to a cube element
+        std::vector<Node<3>*> nodes;
         nodes.push_back(new Node<3>(0, true, 0.0, 0.0, 0.0));
         nodes.push_back(new Node<3>(1, true, 1.0, 0.0, 0.0));
         nodes.push_back(new Node<3>(2, true, 0.0, 1.0, 0.0));
@@ -115,10 +114,6 @@ public:
         faces.push_back(new VertexElement<2, 3>(5, nodes_face_5));
 
         std::vector<bool> orientations(faces.size());
-        for (unsigned i = 0; i < faces.size(); ++i)
-        {
-            orientations[i] = true;
-        }
 
         // Make a cube element out of these faces
         VertexElement<3, 3> element(0, faces, orientations);
@@ -145,17 +140,12 @@ public:
         {
             TS_ASSERT(IsLateralFace(element.GetFace(face_index)));
         }
-        const unsigned true_face_indices[6]{ 0, 5, 4, 2, 1, 3 };
-        for (unsigned local_index = 0; local_index < element.GetNumFaces(); ++local_index)
-        {
-            TS_ASSERT_EQUALS(element.GetFace(local_index)->GetIndex(), true_face_indices[local_index]);
-        }
 
         // Test orientations
-        const bool true_orientations[6]{ 1, 0, 0, 0, 1, 0 };
         for (unsigned face_index = 0; face_index < element.GetNumFaces(); ++face_index)
         {
-            TS_ASSERT_EQUALS(element.FaceIsOrientatedAntiClockwise(face_index), true_orientations[face_index]);
+            const bool true_orientation(element.GetFace(face_index)->GetIndex() <= 1u);
+            TS_ASSERT_EQUALS(element.FaceIsOrientatedAntiClockwise(face_index), true_orientation);
         }
 
         // Tidy up
@@ -311,9 +301,9 @@ public:
             //            delete pp_mesh33;
         }
 
-        MARK
+        MARK;
 
-            builder.SubDivide();
+        builder.SubDivide();
         PRINT_3_VARIABLES(builder.mNodes.size(), builder.mEdges.size(), builder.mFaces.size())
         {
             MutableVertexMesh<2, 3>* p_mesh = new MutableVertexMesh<2, 3>(builder.mNodes, builder.mFaces);

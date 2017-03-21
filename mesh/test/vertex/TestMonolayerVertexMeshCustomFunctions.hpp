@@ -257,6 +257,7 @@ public:
 
     void TestFaceRearrangeNode()
     {
+        std::string output_name ("MonolayerCustomFunctions/FaceRearrangeNode");
         std::vector<Node<3>*> nodes;
         nodes.push_back(new Node<3>(0, true, 0.0, 0.0));
         nodes.push_back(new Node<3>(1, true, 1.0, 0.0));
@@ -270,7 +271,7 @@ public:
         MutableVertexMesh<2, 3> meh(nodes, v_f);
 
         {
-            VertexMeshWriter<2, 3> writer(OUTPUT_NAME + std::string("/FaceRearrangeNode"), "blabla");
+            VertexMeshWriter<2, 3> writer(output_name, "blabla");
             writer.WriteVtkUsingMesh(meh, "before");
         }
 
@@ -279,7 +280,7 @@ public:
         face->FaceRearrangeNodes(vv);
         PrintElement(face);
         {
-            VertexMeshWriter<2, 3> writer(OUTPUT_NAME + std::string("/FaceRearrangeNode"), "blabla", false);
+            VertexMeshWriter<2, 3> writer(output_name, "blabla", false);
             writer.WriteVtkUsingMesh(meh, "after");
         }
     }

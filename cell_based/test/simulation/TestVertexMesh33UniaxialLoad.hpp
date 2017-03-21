@@ -142,7 +142,7 @@ private:
     static const double target_area = 1;
     const unsigned num_cells_x = 9;
     const unsigned num_cells_y = 5;
-    static const double end_time = 5;
+    static const double end_time = 15;
 
 public:
     void TestOnHexagonalMesh() throw(Exception)
@@ -405,7 +405,7 @@ public:
         p_force3->SetVolumeParameters(350, 1);
         simulator.AddForce(p_force3);
         MAKE_PTR(HorizontalStretchForce<3>, p_force2);
-        p_force2->SetForceMagnitude(0.05);
+        p_force2->SetForceMagnitude(0.5);
         p_force2->SetRelativeWidth(0.15);
         simulator.AddForce(p_force2);
 
@@ -474,7 +474,7 @@ public:
          * Using 3 rows of hexagonal cell to test. See output files.
          */
         std::string output_filename = "TestAsynchronousT1/SecondTest";
-        const double end_time = 1.5;
+        const double end_time = 1;
 
         HexagonalPrism3dVertexMeshGenerator generator(4, 3, target_area, z_height);
         MutableVertexMesh<3, 3>* p_mesh = generator.GetMesh();

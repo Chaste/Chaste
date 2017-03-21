@@ -3843,15 +3843,6 @@ void MutableVertexMesh<3, 3>::PerformT1Swap(Node<3>* pNodeA, Node<3>* pNodeB,
     VertexElement<2, 3>* p_lateral_swap_face = GetSharedLateralFace(pNodeA, pNodeB, this);
     assert(p_lateral_swap_face->GetNumNodes() == 4u);
 
-    // VertexMeshWriter<3, 3> writer("T1Thing", "base", false);
-    // const unsigned blablaT1 = mCellRearrangementThreshold*1000000;
-    // std::ostringstream oss;
-    // oss << blablaT1 << "_" << p_lateral_swap_face->GetIndex();
-    // writer.WriteVtkUsingMesh(*this, oss.str());
-    // mCellRearrangementThreshold += 0.000001;
-    // {
-    // }
-
     MARK;
     TRACE("============== T1 Swap ==============");
     PRINT_3_VARIABLES(p_lateral_swap_face->GetIndex(), pNodeA->GetIndex(), pNodeB->GetIndex());
@@ -4401,16 +4392,10 @@ unsigned MutableVertexMesh<3, 3>::DivideElementAlongGivenAxis(VertexElement<3, 3
     {
         EXCEPTION("Cannot proceed with element division: the given axis of division does not cross two edges of the element");
     }
-    if (apical_intersecting_lateral_faces != basal_intersecting_lateral_faces)
+    const bool apical_basal_splits_at_diff_location = apical_intersecting_lateral_faces != basal_intersecting_lateral_faces;
+    if (apical_basal_splits_at_diff_location)
     {
-        PrintElement(pElement);
-        PRINT_CONTAINER(axisOfDivision);
-        PRINT_CONTAINER(apical_intersecting_lateral_faces)
-        PRINT_CONTAINER(basal_intersecting_lateral_faces)
-
-        ///\todo #2850 proceed with element division even with such case
-        WARNING("Cannot proceed with element division: the plane of division splits apical and basal faces at different locations.");
-
+        TRACE("the plane of division splits apical and basal faces at different locations.");
         apical_intersecting_lateral_faces = basal_intersecting_lateral_faces;
     }
 
@@ -4434,45 +4419,6 @@ unsigned MutableVertexMesh<3, 3>::DivideElementAlongGivenAxis(VertexElement<3, 3
         Node<3>* p_apical_node_b = v_apical[1];
         const Node<3>* p_basal_node_a = GetOppositeNode(p_apical_node_a, this);
         Node<3>* p_basal_node_b = GetOppositeNode(p_apical_node_b, this);
-
-        // Calculate apical position of the intersection
-        const c_vector<double, 3>& position_apical_a = p_apical_node_a->rGetLocation();
-        const c_vector<double, 3>& position_apical_b = p_apical_node_b->rGetLocation();
-        const c_vector<double, 3> apical_a_to_b = this->GetVectorFromAtoB(position_apical_a, position_apical_b);
-        c_vector<double, 3> apical_intersection;
-        if (norm_2(apical_a_to_b) < 2.0 * mCellRearrangementRatio * mCellRearrangementThreshold)
-        {
-            WARNING("Edge is too small for normal division; putting node in the middle of a and b. There may be T1 swaps straight away.");
-            ///\todo or should we move a and b apart, it may interfere with neighbouring edges? (see #1399 and #2401)
-            apical_intersection = position_apical_a + 0.5 * apical_a_to_b;
-        }
-        else
-        {
-            /*
-             * Find the location of the intersection.
-             * Equation of line is r = r_a + t*v;
-             * v is the vector from a to b, can be override by subclasses for different metric.
-             * Equation of division plane is inner_prod(r-c,n) = 0;
-             */
-            apical_intersection = position_apical_a + apical_a_to_b / inner_prod(apical_a_to_b, axisOfDivision) * inner_prod(this->GetVectorFromAtoB(position_apical_a, centroid), axisOfDivision);
-
-            /*
-             * If then new node is too close to one of the edge nodes, then reposition it
-             * a distance mCellRearrangementRatio*mCellRearrangementThreshold further along the edge.
-             */
-            c_vector<double, 3> a_to_intersection = this->GetVectorFromAtoB(position_apical_a, apical_intersection);
-            c_vector<double, 3> b_to_intersection = this->GetVectorFromAtoB(position_apical_b, apical_intersection);
-            if (norm_2(a_to_intersection) < mCellRearrangementThreshold)
-            {
-                assert(norm_2(b_to_intersection) > mCellRearrangementThreshold); // LCOV_EXCL_LINE
-                apical_intersection = position_apical_a + mCellRearrangementRatio * mCellRearrangementThreshold * apical_a_to_b / norm_2(apical_a_to_b);
-            }
-            if (norm_2(b_to_intersection) < mCellRearrangementThreshold)
-            {
-                assert(norm_2(a_to_intersection) > mCellRearrangementThreshold); // LCOV_EXCL_LINE
-                apical_intersection = position_apical_b - mCellRearrangementRatio * mCellRearrangementThreshold * apical_a_to_b / norm_2(apical_a_to_b);
-            }
-        }
 
         // Calculate basal position of the intersection
         const c_vector<double, 3>& position_basal_a = p_basal_node_a->rGetLocation();
@@ -4510,6 +4456,52 @@ unsigned MutableVertexMesh<3, 3>::DivideElementAlongGivenAxis(VertexElement<3, 3
             {
                 assert(norm_2(a_to_intersection) > mCellRearrangementThreshold); // LCOV_EXCL_LINE
                 basal_intersection = position_basal_b - mCellRearrangementRatio * mCellRearrangementThreshold * basal_a_to_b / norm_2(basal_a_to_b);
+            }
+        }
+
+        // Calculate apical position of the intersection
+        const c_vector<double, 3>& position_apical_a = p_apical_node_a->rGetLocation();
+        const c_vector<double, 3>& position_apical_b = p_apical_node_b->rGetLocation();
+        const c_vector<double, 3> apical_a_to_b = this->GetVectorFromAtoB(position_apical_a, position_apical_b);
+        c_vector<double, 3> apical_intersection;
+        if (norm_2(apical_a_to_b) < 2.0 * mCellRearrangementRatio * mCellRearrangementThreshold)
+        {
+            WARNING("Edge is too small for normal division; putting node in the middle of a and b. There may be T1 swaps straight away.");
+            ///\todo or should we move a and b apart, it may interfere with neighbouring edges? (see #1399 and #2401)
+            apical_intersection = position_apical_a + 0.5 * apical_a_to_b;
+        }
+        else if (apical_basal_splits_at_diff_location)
+        {
+            const double basal_length_a_to_i = norm_2(this->GetVectorFromAtoB(position_basal_a, basal_intersection));
+            const double basal_length_a_to_b = norm_2(this->GetVectorFromAtoB(position_basal_a, position_basal_b));
+
+            apical_intersection = position_apical_a + this->GetVectorFromAtoB(position_apical_a, position_apical_b) * basal_length_a_to_i / basal_length_a_to_b;
+        }
+        else
+        {
+            /*
+             * Find the location of the intersection.
+             * Equation of line is r = r_a + t*v;
+             * v is the vector from a to b, can be override by subclasses for different metric.
+             * Equation of division plane is inner_prod(r-c,n) = 0;
+             */
+            apical_intersection = position_apical_a + apical_a_to_b / inner_prod(apical_a_to_b, axisOfDivision) * inner_prod(this->GetVectorFromAtoB(position_apical_a, centroid), axisOfDivision);
+
+            /*
+             * If then new node is too close to one of the edge nodes, then reposition it
+             * a distance mCellRearrangementRatio*mCellRearrangementThreshold further along the edge.
+             */
+            const c_vector<double, 3> a_to_intersection = this->GetVectorFromAtoB(position_apical_a, apical_intersection);
+            const c_vector<double, 3> b_to_intersection = this->GetVectorFromAtoB(position_apical_b, apical_intersection);
+            if (norm_2(a_to_intersection) < mCellRearrangementThreshold)
+            {
+                assert(norm_2(b_to_intersection) > mCellRearrangementThreshold); // LCOV_EXCL_LINE
+                apical_intersection = position_apical_a + mCellRearrangementRatio * mCellRearrangementThreshold * apical_a_to_b / norm_2(apical_a_to_b);
+            }
+            if (norm_2(b_to_intersection) < mCellRearrangementThreshold)
+            {
+                assert(norm_2(a_to_intersection) > mCellRearrangementThreshold); // LCOV_EXCL_LINE
+                apical_intersection = position_apical_b - mCellRearrangementRatio * mCellRearrangementThreshold * apical_a_to_b / norm_2(apical_a_to_b);
             }
         }
 
@@ -4581,13 +4573,13 @@ unsigned MutableVertexMesh<3, 3>::DivideElementAlongGivenAxis(VertexElement<3, 3
             VertexElement<2, 3>* p_this_basal_face = GetBasalFace(p_this_element);
             VertexElement<2, 3>* p_this_apical_face = GetApicalFace(p_this_element);
 
-            // Add new node to this element
+            // Add new nodes to this element's faces
             p_this_apical_face->FaceAddNode(p_new_apical_node, p_this_apical_face->GetNumNodes() - 1);
             p_this_basal_face->FaceAddNode(p_new_basal_node, p_this_basal_face->GetNumNodes() - 1);
             FaceRearrangeNodesInMesh(this, p_this_apical_face);
             FaceRearrangeNodesInMesh(this, p_this_basal_face);
 
-            // Add the apical node first so that I don't changes its indices.
+            // Add new nodes to this element.
             p_this_element->AddNode(p_new_apical_node, p_this_element->GetNumNodes() - 1);
             p_this_element->AddNode(p_new_basal_node, p_this_element->GetNumNodes() - 1);
 
@@ -4608,7 +4600,7 @@ unsigned MutableVertexMesh<3, 3>::DivideElementAlongGivenAxis(VertexElement<3, 3
     this->AddFace(p_new_dividing_face);
     // FaceRearrangeNodesInMesh(this, p_new_dividing_face);
 
-    // Now call DivideElement() to divide the element using the new nodes
+    // Now call DivideElement() to divide the element using the new face
     unsigned new_element_index = DivideElement(pElement, p_new_dividing_face->GetIndex(), UINT_MAX, 0);
 
     return new_element_index;
