@@ -38,6 +38,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractForce.hpp"
 
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+class VertexElement;
+
 ///\todo document class (#2850)
 template <unsigned DIM>
 class HorizontalStretchForce : public AbstractForce<DIM>
@@ -52,6 +55,7 @@ private:
         archive& mRelativeWidth;
     }
 
+protected:
     /**
      * Internal variable to save the magnitude.
      * Initialised to 1.0 in the constructor.
@@ -64,6 +68,14 @@ private:
      */
     double mRelativeWidth;
 
+    c_vector<double, DIM> mForceVector;
+
+    std::set<VertexElement<DIM, DIM>*> mNonMovingPinnedElements;
+
+    std::set<VertexElement<DIM, DIM>*> mMovingPinnedElements;
+
+    void SetUpForceVectorUsingMagnitude();
+
 public:
     /**
      * Constructor.
@@ -74,6 +86,16 @@ public:
      * Destructor.
      */
     virtual ~HorizontalStretchForce();
+
+    void SetUpPinnedElements(AbstractCellPopulation<DIM>& rCellPopulation);
+
+    void ClearPinnedElements();
+
+    std::set<VertexElement<DIM, DIM>*>& GetPinnedElements(bool is_moving_elements = true);
+
+    void SetForceVector(const c_vector<double, DIM>& ForceVector);
+
+    c_vector<double, DIM>& rGetForceVector();
 
     /**
      * Set mForceMagnitude.

@@ -171,6 +171,7 @@ public:
         MAKE_PTR(HorizontalStretchForce<3>, p_force2);
         p_force2->SetForceMagnitude(0.5);
         p_force2->SetRelativeWidth(0.15);
+        p_force2->SetUpPinnedElements(cell_population);
         simulator.AddForce(p_force2);
         // MAKE_PTR(GeneralMonolayerVertexMeshForce, p_force3);
         // p_force3->SetApicalParameters(0.18, 3.1);
