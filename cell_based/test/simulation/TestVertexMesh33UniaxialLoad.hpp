@@ -39,14 +39,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellBasedTestSuite.hpp"
 
 #include "HexagonalPrism3dVertexMeshGenerator.hpp"
-#include "MonolayerVertexMeshCustomFunctions.hpp"
 #include "MonolayerVertexMeshGenerator.hpp"
 #include "VoronoiPrism3dVertexMeshGenerator.hpp"
 
-#include "GeodesicSphere23Generator.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
 
 #include <boost/lexical_cast.hpp>
+#include "BielmeierForce.hpp"
 #include "CellsGenerator.hpp"
 #include "GeneralMonolayerVertexMeshForce.hpp"
 #include "HorizontalStretchForce.hpp"
@@ -54,94 +53,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NoCellCycleModel.hpp"
 #include "OffLatticeSimulation.hpp"
 #include "SmartPointers.hpp"
-#include "VertexBasedCellPopulation.hpp"
-
-#include "Debug.hpp"
-
 #include "TransitCellProliferativeType.hpp"
 #include "UniformG1GenerationalCellCycleModel.hpp"
+#include "VertexBasedCellPopulation.hpp"
 
 #include "FakePetscSetup.hpp"
-
-class BielmeierExternalForce : public AbstractForce<3>
-{
-    double mEcmSpringConstant;
-
-    double mT_ext;
-
-    friend class boost::serialization::access;
-    template <class Archive>
-    void serialize(Archive& archive, const unsigned int version)
-    {
-        archive& boost::serialization::base_object<AbstractForce<3> >(*this);
-    }
-
-public:
-    BielmeierExternalForce(const double springConstant = 0.0, const double T_ext = 0.0)
-            : AbstractForce<3>(),
-              mEcmSpringConstant(springConstant),
-              mT_ext(T_ext)
-    {
-    }
-
-    void AddForceContribution(AbstractCellPopulation<3>& rCellPopulation)
-    {
-        if (dynamic_cast<VertexBasedCellPopulation<3>*>(&rCellPopulation) == NULL)
-        {
-            EXCEPTION("GeneralMonolayerVertexMeshForce is to be used with a VertexBasedCellPopulation only");
-        }
-
-        // Define some helper variables
-        VertexBasedCellPopulation<3>* p_cell_population = static_cast<VertexBasedCellPopulation<3>*>(&rCellPopulation);
-        MutableVertexMesh<3, 3>& rMesh = p_cell_population->rGetMesh();
-
-        for (unsigned i = 0; i < rMesh.GetNumNodes(); ++i)
-        {
-            Node<3>* p_node = rMesh.GetNode(i);
-
-            if (IsBasalNode(p_node))
-            {
-                c_vector<double, 3> result = -1 * mEcmSpringConstant * Create_c_vector(0, 0, p_node->rGetLocation()[2]);
-                p_node->AddAppliedForceContribution(result);
-            }
-        }
-
-        for (unsigned i = 0; i < rMesh.GetNumFaces(); ++i)
-        {
-            VertexElement<2, 3>* p_face = rMesh.GetFace(i);
-
-            if (IsApicalFace(p_face))
-            {
-                for (unsigned j = 0; j < p_face->GetNumNodes(); ++j)
-                {
-                    c_vector<double, 3> result = rMesh.GetAreaGradientOfFaceAtNode(p_face, j);
-                    result *= mT_ext;
-                    p_face->GetNode(j)->AddAppliedForceContribution(result);
-                }
-            }
-        }
-    }
-
-    void OutputForceParameters(out_stream& rParamsFile)
-    {
-        *rParamsFile << "\t\t\t<EcmSpringConstant>" << mEcmSpringConstant << "</EcmSpringConstant>\n";
-        *rParamsFile << "\t\t\t<T_ext>" << mT_ext << "</T_ext>\n";
-        AbstractForce<3>::OutputForceParameters(rParamsFile);
-    }
-};
-#include "SerializationExportWrapper.hpp"
-CHASTE_CLASS_EXPORT(BielmeierExternalForce)
-
-#include "SerializationExportWrapperForCpp.hpp"
-CHASTE_CLASS_EXPORT(BielmeierExternalForce)
 
 class TestVertexMesh33UniaxialLoad : public AbstractCellBasedTestSuite
 {
 private:
-    static const double z_height = 1;
+    static const double z_height = 2;
     static const double target_area = 1;
-    const unsigned num_cells_x = 9;
-    const unsigned num_cells_y = 5;
+    const unsigned num_cells_x = 20;
+    const unsigned num_cells_y = 10;
     static const double end_time = 15;
 
 public:
@@ -165,28 +89,17 @@ public:
         MAKE_PTR(GeneralMonolayerVertexMeshForce, p_force3);
         p_force3->SetApicalParameters(2.5, 2.5, 0.7);
         p_force3->SetBasalParameters(2.5, 2.5, 0.7);
-        p_force3->SetLateralParameter(1);
-        p_force3->SetVolumeParameters(400, target_area * 1.2);
+        p_force3->SetLateralParameter(0.1, 2.5);
+        p_force3->SetVolumeParameters(400, target_area * z_height);
         simulator.AddForce(p_force3);
-        MAKE_PTR(HorizontalStretchForce<3>, p_force2);
-        p_force2->SetForceMagnitude(0.5);
-        p_force2->SetRelativeWidth(0.15);
-        p_force2->SetUpPinnedElements(cell_population);
-        simulator.AddForce(p_force2);
-        // MAKE_PTR(GeneralMonolayerVertexMeshForce, p_force3);
-        // p_force3->SetApicalParameters(0.18, 3.1);
-        // p_force3->SetBasalParameters(0.18, 6.95);
-        // p_force3->SetLateralParameter(0, 1);
-        // p_force3->SetVolumeParameters(1000, target_area);
-        // simulator.AddForce(p_force3);
 
-        // MAKE_PTR_ARGS(BielmeierExternalForce, p_force4, (5, -4.2));
+        // MAKE_PTR(BielmeierForce, p_force4);
+        // p_force4->SetVolumeParameters(1000, target_area * z_height);
         // simulator.AddForce(p_force4);
 
-        // MAKE_PTR(HorizontalStretchForce<3>, p_force2);
-        // p_force2->SetForceMagnitude(0.5);
-        // p_force2->SetRelativeWidth(0.15);
-        // simulator.AddForce(p_force2);
+        MAKE_PTR_ARGS(HorizontalStretchForce<3>, p_force2, (0.25, 0.08));
+        p_force2->SetUpPinnedElements(cell_population);
+        simulator.AddForce(p_force2);
 
         MAKE_PTR(LateralNodeModifier, p_node_modifier);
         simulator.AddSimulationModifier(p_node_modifier);
@@ -361,12 +274,12 @@ public:
         MAKE_PTR(GeneralMonolayerVertexMeshForce, p_force3);
         p_force3->SetApicalParameters(2.5, 2.5, 0.7);
         p_force3->SetBasalParameters(2.5, 2.5, 0.7);
-        p_force3->SetLateralParameter(1);
-        p_force3->SetVolumeParameters(350, 1);
+        p_force3->SetLateralParameter(0, 2.5);
+        p_force3->SetVolumeParameters(400, target_area * z_height);
         simulator.AddForce(p_force3);
-        MAKE_PTR(HorizontalStretchForce<3>, p_force2);
-        p_force2->SetForceMagnitude(1.0);
-        p_force2->SetRelativeWidth(0.15);
+
+        MAKE_PTR_ARGS(HorizontalStretchForce<3>, p_force2, (0.25, 0.15));
+        p_force2->SetUpPinnedElements(cell_population);
         simulator.AddForce(p_force2);
 
         simulator.Solve();
@@ -380,7 +293,7 @@ public:
         // Make a mesh of 10x10
         //        const double z_height = 1;
         const double target_area = 1;
-        const unsigned num_cells_x = 6;
+        const unsigned num_cells_x = 8;
         const unsigned num_cells_y = 3;
         std::string output_filename = "TestCellDivision/HoneyTest" + boost::lexical_cast<std::string>(num_cells_x)
             + "x" + boost::lexical_cast<std::string>(num_cells_y);
@@ -402,12 +315,12 @@ public:
         MAKE_PTR(GeneralMonolayerVertexMeshForce, p_force3);
         p_force3->SetApicalParameters(2.5, 2.5, 0.7);
         p_force3->SetBasalParameters(2.5, 2.5, 0.7);
-        p_force3->SetLateralParameter(1);
-        p_force3->SetVolumeParameters(350, 1);
+        p_force3->SetLateralParameter(0, 2.5);
+        p_force3->SetVolumeParameters(400, target_area * z_height);
         simulator.AddForce(p_force3);
-        MAKE_PTR(HorizontalStretchForce<3>, p_force2);
-        p_force2->SetForceMagnitude(0.5);
-        p_force2->SetRelativeWidth(0.15);
+
+        MAKE_PTR_ARGS(HorizontalStretchForce<3>, p_force2, (0.5, 0.15));
+        p_force2->SetUpPinnedElements(cell_population);
         simulator.AddForce(p_force2);
 
         simulator.Solve();
@@ -451,9 +364,6 @@ public:
         simulator.SetEndTime(end_time);
 
         MAKE_PTR(GeneralMonolayerVertexMeshForce, p_force3);
-        // p_force3->SetApicalParameters(20, 20, 0.7);
-        // p_force3->SetBasalParameters(20, 20, 0.7);
-        // p_force3->SetLateralParameter(8);
         p_force3->SetVolumeParameters(350, target_volume);
         simulator.AddForce(p_force3);
 
@@ -501,8 +411,8 @@ public:
         MAKE_PTR(GeneralMonolayerVertexMeshForce, p_force3);
         p_force3->SetApicalParameters(2.5, 2.5, 0.7);
         p_force3->SetBasalParameters(2.5, 2.5, 0.7);
-        p_force3->SetLateralParameter(1);
-        p_force3->SetVolumeParameters(350, target_area * z_height);
+        p_force3->SetLateralParameter(0, 2.5);
+        p_force3->SetVolumeParameters(400, target_area * z_height);
         simulator.AddForce(p_force3);
 
         MAKE_PTR(LateralNodeModifier, p_node_modifier);

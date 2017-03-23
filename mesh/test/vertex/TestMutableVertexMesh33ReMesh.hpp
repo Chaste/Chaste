@@ -43,7 +43,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MonolayerVertexMeshGenerator.hpp"
 #include "MutableVertexMesh.hpp"
 #include "VertexMeshWriter.hpp"
-#include "Warnings.hpp"
 #include "FakePetscSetup.hpp"
 
 #define OUTPUT_NAME std::string("TestMutableVertexMesh33ReMesh")

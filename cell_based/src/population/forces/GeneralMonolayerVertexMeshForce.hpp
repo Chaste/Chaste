@@ -39,7 +39,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractForce.hpp"
 
 /**
- * \todo Define this class and write down energy expression (#2850)
+ * A force used by monolayer vertex based cell population which has volume, area and
+ * edge contributions (apical, basal and lateral faces & edges can have different parameters).
+ *
+ * ///\todo Define this class and write down energy expression (#2850)
  */
 class GeneralMonolayerVertexMeshForce : public AbstractForce<3>
 {
@@ -122,6 +125,24 @@ protected:
      * Initialised to 0 in the constructor.
      */
     double mVolumeParameter;
+
+    /**
+     * Helper function which is called by AddForceContribution.
+     * @param rCellPopulation reference to the vertex based cell population
+     */
+    virtual void AddVolumeContribution(VertexBasedCellPopulation<3>* pCellPopulation);
+
+    /**
+     * Helper function which is called by AddForceContribution.
+     * @param rCellPopulation reference to the vertex based cell population
+     */
+    virtual void AddAreaContribution(VertexBasedCellPopulation<3>* pCellPopulation);
+
+    /**
+     * Helper function which is called by AddForceContribution.
+     * @param rCellPopulation reference to the vertex based cell population
+     */
+    virtual void AddEdgeContribution(VertexBasedCellPopulation<3>* pCellPopulation);
 
 public:
     /**
