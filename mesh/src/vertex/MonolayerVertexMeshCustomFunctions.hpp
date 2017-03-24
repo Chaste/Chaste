@@ -161,20 +161,54 @@ void FaceRearrangeNodesInMesh(VertexMesh<3, 3>* pMesh, VertexElement<2, 3>* pFac
  */
 namespace Monolayer
 {
+/**
+ * Define return types for monolayer functions.
+ */
 typedef unsigned v_type;
 
+/**
+ * Value to set basal face/node.
+ */
 const double SetBasalValue = 1.1;
+/**
+ * Value to set apical face/node.
+ */
 const double SetApicalValue = 2.1;
+/**
+ * Value to set lateral face/node.
+ */
 const double SetLateralValue = 3.1;
+/**
+ * Value to set monolayer element so that it can be identified.
+ */
 const double SetElementValue = 4.1;
 
 // 0 is for non-mononlayer object.
+/**
+ * Value for basal face/node.
+ */
 const v_type BasalValue = 1;
+/**
+ * Value for apical face/node.
+ */
 const v_type ApicalValue = 2;
+/**
+ * Value for lateral face/node.
+ */
 const v_type LateralValue = 3;
+/**
+ * Value for monolayer element.
+ */
 const v_type ElementValue = 4;
+/**
+ * Value for all (apical, basal and lateral) face/node.
+ * Used by several getter functions.
+ */
 const v_type AllTypes = 100;
 
+/**
+ * an array to map type to string.
+ */
 const std::string ValueToString[4] = { "", "Basal", "Apical", "Lateral" };
 }
 

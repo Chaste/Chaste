@@ -89,6 +89,10 @@ private:
 //Requires  "sudo aptitude install libvtk5-dev" or similar
 ///\todo Merge into VtkMeshWriter (#1076)
     vtkUnstructuredGrid* mpVtkUnstructedMesh;
+    /**
+     * Pointer to mesh consists of all faces rather than elements.
+     * This is used for VertexMesh<3, 3> for better visualization.
+     */
     vtkUnstructuredGrid* mpVtkFaceMesh;
 #endif //CHASTE_VTK
 

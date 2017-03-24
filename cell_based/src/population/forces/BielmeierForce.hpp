@@ -53,6 +53,9 @@ protected:
 public:
     /**
      * Default constructor.
+     *
+     * @param springConstant initial value of mEcmSpringConstant
+     * @param ExternalSurfaceTensionParameter initial value of mExternalSurfaceTensionParameter
      */
     BielmeierForce(const double springConstant = 5, const double ExternalSurfaceTensionParameter = -4.2);
 

@@ -115,6 +115,8 @@ public:
         PRINT_CONTAINER(vec);
         PRINT_CONTAINER(s);
         PRINT_CONTAINER(l);
+        s.clear();
+        PRINT_CONTAINER(s);
 
         MARK; // Something like: "DEBUG: ./global/test/TestDebug.hpp at line 110"
         MARK_IN_ORDER; // Something like: "DEBUG: proc 0 ./global/test/TestDebug.hpp at line 111" etc

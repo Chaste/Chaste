@@ -42,11 +42,16 @@ public:
 
     /**
      * Nothing implemented yet but just to satisfy compiler.
+     *
+     * @param rCellPopulation reference to the cell population
+     * @param outputDirectory the output directory, relative to where Chaste output is stored
      */
     virtual void SetupSolve(AbstractCellPopulation<3, 3>& rCellPopulation, std::string outputDirectory);
 
     /**
      * Nothing implemented yet but just to satisfy compiler.
+     *
+     * @param rParamsFile the file stream to which the parameters are output
      */
     virtual void OutputSimulationModifierParameters(out_stream& rParamsFile);
 

@@ -47,7 +47,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class GeneralMonolayerVertexMeshForce : public AbstractForce<3>
 {
 private:
+    /** Needed for serialization. */
     friend class boost::serialization::access;
+    /**
+     * Serialize the object.
+     *
+     * @param archive the archive
+     * @param version the current version of this class
+     */
     template <class Archive>
     void serialize(Archive& archive, const unsigned int version)
     {
@@ -128,19 +135,19 @@ protected:
 
     /**
      * Helper function which is called by AddForceContribution.
-     * @param rCellPopulation reference to the vertex based cell population
+     * @param pCellPopulation pointer to the vertex based cell population
      */
     virtual void AddVolumeContribution(VertexBasedCellPopulation<3>* pCellPopulation);
 
     /**
      * Helper function which is called by AddForceContribution.
-     * @param rCellPopulation reference to the vertex based cell population
+     * @param pCellPopulation pointer to the vertex based cell population
      */
     virtual void AddAreaContribution(VertexBasedCellPopulation<3>* pCellPopulation);
 
     /**
      * Helper function which is called by AddForceContribution.
-     * @param rCellPopulation reference to the vertex based cell population
+     * @param pCellPopulation pointer to the vertex based cell population
      */
     virtual void AddEdgeContribution(VertexBasedCellPopulation<3>* pCellPopulation);
 
@@ -185,7 +192,8 @@ public:
     /**
      * Set mLateralEdgeParameter.
      *
-     * @param parameter the new value of mLateralEdgeParameter
+     * @param lineParameter the new value of mLateralEdgeParameter
+     * @param areaParameter the new value of mLateralAreaParameter
      */
     void SetLateralParameter(const double lineParameter, const double areaParameter = 0);
 

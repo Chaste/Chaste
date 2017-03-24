@@ -47,6 +47,13 @@ class HorizontalStretchForce : public AbstractForce<DIM>
 {
 private:
     friend class boost::serialization::access;
+    /**
+     * Boost Serialization method for archiving/checkpointing.
+     * Archives the object and its member variables.
+     *
+     * @param archive  The boost archive.
+     * @param version  The current version of this class.
+     */
     template <class Archive>
     void serialize(Archive& archive, const unsigned int version)
     {
@@ -68,33 +75,72 @@ protected:
      */
     double mRelativeWidth;
 
+    /**
+     * The force vector acting on mMovingPinnedElements.
+     * This can be changed by SetForceVector for more general cases (like shearing).
+     */
     c_vector<double, DIM> mForceVector;
 
+    /**
+     * Set of fixed elements.
+     */
     std::set<VertexElement<DIM, DIM>*> mNonMovingPinnedElements;
 
+    /**
+     * Set of moving elements upon which mForceVector acts.
+     */
     std::set<VertexElement<DIM, DIM>*> mMovingPinnedElements;
 
+    /**
+     * Helper function to set mForceVector when mForceMagnitude is modified.
+     */
     void SetUpForceVectorUsingMagnitude();
 
 public:
     /**
      * Constructor.
+     *
+     * @param ForceMagnitude initial value of mForceMagnitude
+     * @param RelativeWidth initial value of mRelativeWidth
      */
-    HorizontalStretchForce(const double ForceMagnitude = 1, const double RelativeWidth = 0.1);
+    HorizontalStretchForce(const double ForceMagnitude = 1,
+                           const double RelativeWidth = 0.1);
 
     /**
      * Destructor.
      */
     virtual ~HorizontalStretchForce();
 
+    /**
+     * Set up mMovingPinnedElements and mNonMovingPinnedElements according to mRelativeWidth.
+     * Besides, it also changes all pinned elements to NoCellCycleModel.
+     *
+     * @param rCellPopulation reference to the cell population
+     */
     void SetUpPinnedElements(AbstractCellPopulation<DIM>& rCellPopulation);
 
+    /**
+     * Clear mMovingPinnedElements and mNonMovingPinnedElements.
+     */
     void ClearPinnedElements();
 
-    std::set<VertexElement<DIM, DIM>*>& GetPinnedElements(bool is_moving_elements = true);
+    /**
+     * Get the set of pinned elements.
+     * @param isMovingElements default or true for mMovingPinnedElements, false for mNonMovingPinnedElements
+     * @return return either mMovingPinnedElements and mNonMovingPinnedElements
+     */
+    std::set<VertexElement<DIM, DIM>*>& GetPinnedElements(
+        bool isMovingElements = true);
 
+    /**
+     * Set mForceVector for more general cases (like shearing).
+     * @param ForceVector new value for mForceVector
+     */
     void SetForceVector(const c_vector<double, DIM>& ForceVector);
 
+    /**
+     * @return reference to mForceVector
+     */
     c_vector<double, DIM>& rGetForceVector();
 
     /**
@@ -116,11 +162,13 @@ public:
      *
      * @param rCellPopulation reference to the cell population
      */
-    virtual void AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation);
+    virtual void AddForceContribution(
+        AbstractCellPopulation<DIM>& rCellPopulation);
 
     /**
-     * For the compiler now
-     * @param rParamsFile
+     * Overridden OutputForceParameters() method.
+     *
+     * @param rParamsFile the file stream to which the parameters are output
      */
     virtual void OutputForceParameters(out_stream& rParamsFile);
 };

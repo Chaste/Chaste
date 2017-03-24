@@ -172,9 +172,9 @@ void HorizontalStretchForce<DIM>::ClearPinnedElements()
 }
 
 template <unsigned DIM>
-std::set<VertexElement<DIM, DIM>*>& HorizontalStretchForce<DIM>::GetPinnedElements(bool is_moving_elements)
+std::set<VertexElement<DIM, DIM>*>& HorizontalStretchForce<DIM>::GetPinnedElements(bool isMovingElements)
 {
-    return is_moving_elements ? mMovingPinnedElements : mNonMovingPinnedElements;
+    return isMovingElements ? mMovingPinnedElements : mNonMovingPinnedElements;
 }
 
 template <unsigned DIM>

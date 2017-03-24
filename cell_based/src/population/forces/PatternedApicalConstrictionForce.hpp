@@ -44,6 +44,13 @@ class PatternedApicalConstrictionForce : public GeneralMonolayerVertexMeshForce
 private:
     friend class boost::serialization::access;
     template <class Archive>
+    /**
+     * Boost Serialization method for archiving/checkpointing.
+     * Archives the object and its member variables.
+     *
+     * @param archive  The boost archive.
+     * @param version  The current version of this class.
+     */
     void serialize(Archive& archive, const unsigned int version)
     {
         archive& boost::serialization::base_object<GeneralMonolayerVertexMeshForce>(*this);

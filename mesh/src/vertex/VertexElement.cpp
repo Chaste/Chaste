@@ -412,14 +412,19 @@ unsigned VertexElement<ELEMENT_DIM, SPACE_DIM>::DeleteFace(VertexElement<ELEMENT
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VertexElement<ELEMENT_DIM, SPACE_DIM>::ReplaceFace(const unsigned oldFaceLocalIndex,
-                                                        VertexElement<ELEMENT_DIM - 1, SPACE_DIM>* pNewFace, const bool newFaceOrientation)
+                                                        VertexElement<ELEMENT_DIM - 1, SPACE_DIM>* pNewFace)
 {
     NEVER_REACHED;
 }
 
+/**
+     * template specialisation for ReplaceFace.
+     * @param oldFaceLocalIndex
+     * @param pNewFace
+     */
 template <>
 void VertexElement<3, 3>::ReplaceFace(const unsigned oldFaceLocalIndex,
-                                      VertexElement<2, 3>* pNewFace, const bool newFaceOrientation)
+                                      VertexElement<2, 3>* pNewFace)
 {
     assert(oldFaceLocalIndex < this->mFaces.size());
 
@@ -428,7 +433,7 @@ void VertexElement<3, 3>::ReplaceFace(const unsigned oldFaceLocalIndex,
 
     // Update the face at this location
     this->mFaces[oldFaceLocalIndex] = pNewFace;
-    this->mOrientations[oldFaceLocalIndex] = newFaceOrientation;
+    this->CheckFaceOrientationOfElement(oldFaceLocalIndex);
 
     // Add the element to the registry of the face
     pNewFace->FaceAddElement(this->mIndex);
@@ -535,17 +540,22 @@ void VertexElement<ELEMENT_DIM, SPACE_DIM>::MarkFaceAsDeleted()
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-bool VertexElement<ELEMENT_DIM, SPACE_DIM>::FaceRearrangeNodes(const c_vector<double, SPACE_DIM>& PointOfView)
+bool VertexElement<ELEMENT_DIM, SPACE_DIM>::FaceRearrangeNodes(const c_vector<double, SPACE_DIM>& rPointOfView)
 {
     NEVER_REACHED;
 }
 
+/**
+     * Template specialisation for FaceRearrangeNodes as face should be 2D element in 3D space.
+     * @param rPointOfView
+     * @return
+     */
 template <>
-bool VertexElement<2, 3>::FaceRearrangeNodes(const c_vector<double, 3>& PointOfView)
+bool VertexElement<2, 3>::FaceRearrangeNodes(const c_vector<double, 3>& rPointOfView)
 {
     const c_vector<double, 3> centroid = this->GetCentroid();
 
-    c_vector<double, 3> normal = centroid - PointOfView;
+    c_vector<double, 3> normal = centroid - rPointOfView;
     normal /= norm_2(normal);
     c_vector<double, 3> e1 = this->mNodes[0]->rGetLocation() - centroid;
     // Gramm-Schmidt Process
@@ -586,6 +596,10 @@ bool VertexElement<ELEMENT_DIM, SPACE_DIM>::FaceRearrangeNodes()
     NEVER_REACHED;
 }
 
+/**
+ * Template specialisation for FaceRearrangeNodes as face should be 2D element in 3D space.
+ * @return
+ */
 template <>
 bool VertexElement<2, 3>::FaceRearrangeNodes()
 {
@@ -623,6 +637,11 @@ bool VertexElement<2, 3>::FaceRearrangeNodes()
     }
     return return_val;
 }
+
+/**
+ * Template specialisation for FaceRearrangeNodes as face should be 2D element in 3D space.
+ * @return
+ */
 
 template <>
 bool VertexElement<2, 2>::FaceRearrangeNodes()
@@ -719,6 +738,9 @@ void VertexElement<ELEMENT_DIM, SPACE_DIM>::LateralFaceRearrangeNodes()
     NEVER_REACHED;
 }
 
+/**
+ * Template specialisation for FaceRearrangeNodes as face should be 2D element in 3D space.
+ */
 template <>
 void VertexElement<2, 3>::LateralFaceRearrangeNodes()
 {
@@ -774,6 +796,9 @@ void VertexElement<ELEMENT_DIM, SPACE_DIM>::MonolayerElementRearrangeFacesNodes(
     NEVER_REACHED;
 }
 
+/**
+ * Template specialisation for MonolayerElementRearrangeFacesNodes.
+ */
 template <>
 void VertexElement<3, 3>::MonolayerElementRearrangeFacesNodes()
 {
@@ -939,10 +964,11 @@ unsigned VertexElement<1, SPACE_DIM>::DeleteFace(VertexElement<0, SPACE_DIM>* pF
 }
 template <unsigned SPACE_DIM>
 void VertexElement<1, SPACE_DIM>::ReplaceFace(const unsigned oldFaceLocalIndex,
-                                              VertexElement<0, SPACE_DIM>* pNewFace, const bool newFaceOrientation)
+                                              VertexElement<0, SPACE_DIM>* pNewFace)
 {
     NEVER_REACHED;
 }
+
 template <unsigned SPACE_DIM>
 void VertexElement<1, SPACE_DIM>::MonolayerElementRearrangeFacesNodes()
 {

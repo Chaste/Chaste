@@ -328,6 +328,11 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddFaceData(std::string dataName,
     NEVER_REACHED;
 }
 
+/**
+ * Template specialisation for doxygen coverage
+ * @param dataName
+ * @param dataPayload
+ */
 template<>
 void VertexMeshWriter<3, 3>::AddFaceData(std::string dataName, std::vector<double> dataPayload)
 {

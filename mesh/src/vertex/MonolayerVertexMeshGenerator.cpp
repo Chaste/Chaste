@@ -373,8 +373,7 @@ MutableVertexMesh<3, 3>* MonolayerVertexMeshGenerator::ConvertMeshToCylinder(con
                     NEVER_REACHED;
                 }
 
-                // Simply assign face orientation as MonolayerElementRearrangeFacesNodes will settle it.
-                p_elem_b->ReplaceFace(face_b_local_index, p_face_a, false);
+                p_elem_b->ReplaceFace(face_b_local_index, p_face_a);
                 p_elem_b->MonolayerElementRearrangeFacesNodes();
 
                 // Break the loop as the congruent node is found.
@@ -452,17 +451,17 @@ void MonolayerVertexMeshGenerator::WriteVtkWithSubfolder(const std::string& outp
     this->WriteVtk(outputFile + "/" + mName, additionalTag);
 }
 
-MutableVertexMesh<3, 3>* MonolayerVertexMeshGenerator::MakeSphericalMesh33(const MutableVertexMesh<2, 3>* p_mesh_23,
+MutableVertexMesh<3, 3>* MonolayerVertexMeshGenerator::MakeSphericalMesh33(const MutableVertexMesh<2, 3>* pMesh23,
                                                                            const double radius, const double thickness)
 {
 
-    const unsigned num_lower_nodes = p_mesh_23->GetNumNodes();
+    const unsigned num_lower_nodes = pMesh23->GetNumNodes();
     mBasalNodes.resize(num_lower_nodes);
     mApicalNodes.resize(num_lower_nodes);
 
     MARK for (unsigned i = 0; i < num_lower_nodes; ++i)
     {
-        const Node<3>* p_node_23 = p_mesh_23->GetNode(i);
+        const Node<3>* p_node_23 = pMesh23->GetNode(i);
         assert(i == p_node_23->GetIndex());
         c_vector<double, 3> loc;
         loc = p_node_23->rGetLocation();
@@ -479,11 +478,11 @@ MutableVertexMesh<3, 3>* MonolayerVertexMeshGenerator::MakeSphericalMesh33(const
         mBasalNodes[i] = p_lower;
         mApicalNodes[i] = p_upper;
     }
-    mElements.reserve(p_mesh_23->GetNumElements());
-    MARK const unsigned num_elem = p_mesh_23->GetNumElements();
+    mElements.reserve(pMesh23->GetNumElements());
+    MARK const unsigned num_elem = pMesh23->GetNumElements();
     for (unsigned elem_index = 0; elem_index < num_elem; ++elem_index)
     {
-        const VertexElement<2, 3>* p_2elem = p_mesh_23->GetElement(elem_index);
+        const VertexElement<2, 3>* p_2elem = pMesh23->GetElement(elem_index);
         std::vector<unsigned> node_index_this_elem;
         for (unsigned i = 0; i < p_2elem->GetNumNodes(); ++i)
         {

@@ -36,14 +36,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MISRAFORCE_HPP_
 #define MISRAFORCE_HPP_
 
-#include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
-#include "Exception.hpp"
-
-#include "AbstractForce.hpp"
-#include "VertexBasedCellPopulation.hpp"
-
 #include <iostream>
+#include "AbstractForce.hpp"
+#include "ChasteSerialization.hpp"
+#include "Exception.hpp"
+#include "VertexBasedCellPopulation.hpp"
 
 /**
  * A force class for use in vertex-based model simulations. This force is based on the
@@ -141,7 +139,7 @@ public:
     virtual double GetApicalLineTensionParameter(Node<3>* pNodeA, Node<3>* pNodeB, VertexBasedCellPopulation<3>& rVertexCellPopulation) const;
 
     /**
-     * @return mVolumeElasticityParameter
+     * @return mVolumeCompressibilityParameter
      */
     double GetVolumeCompressibilityParameter() const;
 
@@ -168,7 +166,7 @@ public:
     /**
      * Set mVolumeCompressibilityParameter.
      *
-     * @param VolumeElasticityParameter the new value of mVolumeCompressibilityParameter
+     * @param volumeCompressibilityParameter the new value of mVolumeCompressibilityParameter
      */
     void SetVolumeCompressibilityParameter(double volumeCompressibilityParameter);
 

@@ -1538,6 +1538,11 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateAreaOfFace(const VertexEleme
     return CalculateUnitNormalToFaceWithArea(pFace, unit_normal);
 }
 
+/**
+ * Template specialisation of GetShortAxisOfElement
+ * @param index
+ * @return
+ */
 template<>
 c_vector<double, 3> VertexMesh<3, 3>::GetShortAxisOfElement(const unsigned index) const
 {
@@ -1661,6 +1666,12 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetVolumeGradien
     NEVER_REACHED;
 }
 
+/**
+ * Template specialisation for doxygen coverage
+ * @param pElement
+ * @param globalIndex
+ * @return
+ */
 template<>
 c_vector<double, 3> VertexMesh<3, 3>::GetVolumeGradientofElementAtNode(const VertexElement<3, 3>* pElement, const unsigned globalIndex) const
 {
@@ -1741,7 +1752,7 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetAreaGradientO
     // As in 3D, the area vector have x- and y-components, thus the simplified formula for 2D case is not used.
     for (unsigned current_node_local_index=0; current_node_local_index<num_nodes_in_face; ++current_node_local_index)
     {
-        // We add an extra num_nodes_in_element in the line below as otherwise this term can be negative, which breaks the % operator
+        // We add an extra num_nodes_in_element in the line below as otherwise underflow
         const unsigned previous_node_local_index = (current_node_local_index+num_nodes_in_face-1)%num_nodes_in_face;
 
         // We use relative location to the face_centroid rather than absolute location to simplify the calculations.
@@ -1797,10 +1808,27 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetAreaGradientO
 // to satisfy the compiler. Tried to just specialize only ELEMENT_DIM but didn't work out
 //template<unsigned SPACE_DIM>
 //c_vector<double, SPACE_DIM> VertexMesh<1, SPACE_DIM>::GetAreaGradientOfFaceAtNode(VertexElement<0,SPACE_DIM>* pFace, unsigned localIndex) {NEVER_REACHED;}
-template<>
+/**
+ * Template specialisation for doxygen coverage
+ * @param pFace
+ * @param localIndex
+ * @return
+ */template<>
 c_vector<double, 1> VertexMesh<1, 1>::GetAreaGradientOfFaceAtNode(const VertexElement<0,1>* pFace, const unsigned localIndex) const {NEVER_REACHED;}
+/**
+ * Template specialisation for doxygen coverage
+ * @param pFace
+ * @param localIndex
+ * @return
+ */
 template<>
 c_vector<double, 2> VertexMesh<1, 2>::GetAreaGradientOfFaceAtNode(const VertexElement<0,2>* pFace, const unsigned localIndex) const {NEVER_REACHED;}
+/**
+ * Template specialisation for doxygen coverage
+ * @param pFace
+ * @param localIndex
+ * @return
+ */
 template<>
 c_vector<double, 3> VertexMesh<1, 3>::GetAreaGradientOfFaceAtNode(const VertexElement<0,3>* pFace, const unsigned localIndex) const {NEVER_REACHED;}
 

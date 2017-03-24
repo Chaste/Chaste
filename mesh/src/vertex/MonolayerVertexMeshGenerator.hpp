@@ -37,6 +37,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MONOLAYERVERTEXMESHGENERATOR_HPP_
 
 #include <set>
+#include <string>
+#include <vector>
+#include "Node.hpp"
+#include "VertexElement.hpp"
 #include "MutableVertexMesh.hpp"
 
 /**
@@ -153,13 +157,22 @@ public:
      * @param widthY  width in the x direction of the original mesh
      * @param radius  the radius of the cylinder mesh
      * @param thickness  thickness of the cylinder mesh
-     * @param length  the length of the clinder mesh
+     * @param length  the length of the cylinder mesh
      * @return  the pointer of newly created cylinder mesh
      */
     MutableVertexMesh<3, 3>* ConvertMeshToCylinder(const double widthX, const double widthY, const double radius,
                                                    const double thickness, const double length);
 
-    MutableVertexMesh<3, 3>* MakeSphericalMesh33(const MutableVertexMesh<2, 3>* p_mesh_23, const double radius,
+    /**
+     * Generate an actual spherical (geometric) 3D mesh with a given 2D mesh in 3D space
+     * (MutableVertexMesh<2, 3>).
+     *
+     * @param pMesh23 pointer to a spherical mesh
+     * @param radius average radius of the mesh
+     * @param thickness thickness of the new spherical mesh
+     * @return pointer to the newly generated mesh
+     */
+    MutableVertexMesh<3, 3>* MakeSphericalMesh33(const MutableVertexMesh<2, 3>* pMesh23, const double radius,
                                                  const double thickness);
 
     /**

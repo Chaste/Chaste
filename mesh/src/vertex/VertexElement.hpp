@@ -125,8 +125,7 @@ public:
      * @param index global index of the element
      * @param rNodes vector of Nodes associated with the element
      */
-    VertexElement(unsigned index,
-                  const std::vector<Node<SPACE_DIM>*>& rNodes);
+    VertexElement(unsigned index, const std::vector<Node<SPACE_DIM>*>& rNodes);
 
     /**
      * Constructor used to specify the element completely. This ensures that
@@ -186,7 +185,7 @@ public:
     unsigned GetNumFaces() const;
 
     /**
-     * @param index the local index of a specified face
+     * @param localIndex the local index of a specified face
      *
      * @return a pointer to the face
      */
@@ -228,7 +227,8 @@ public:
      * @param Orientation is the orientation of pFace
      * @param rIndex is the local index of the face to add
      */
-    void AddFace(VertexElement<ELEMENT_DIM - 1, SPACE_DIM>* pFace, bool Orientation, const unsigned& rIndex);
+    void AddFace(VertexElement<ELEMENT_DIM - 1, SPACE_DIM>* pFace,
+                 bool Orientation, const unsigned& rIndex);
 
     /**
      * Delete a face of an element with given local index. This method will
@@ -247,10 +247,11 @@ public:
     unsigned DeleteFace(VertexElement<ELEMENT_DIM - 1, SPACE_DIM>* pFace);
 
     /**
-     * Replace old face with the new face and its orientation
+     * Replace old face with the new face.
+     * @param oldFaceLocalIndex local index of old face
+     * @param pNewFace pointer of the new face
      */
-    void ReplaceFace(const unsigned oldFaceLocalIndex, VertexElement<ELEMENT_DIM - 1, SPACE_DIM>* pNewFace,
-                     const bool newFaceOrientation);
+    void ReplaceFace(const unsigned oldFaceLocalIndex, VertexElement<ELEMENT_DIM - 1, SPACE_DIM>* pNewFace);
 
     /**
      * Method for monolayer element to rearrange faces and nodes so that
@@ -309,9 +310,9 @@ public:
     void FaceDeleteNode(const unsigned Index);
 
     /**
-     * Method for faces. Delete a node.
+     * Method for faces. Delete a node with given pointer. Throws exception if pNode is not in the face.
      *
-     * @param rIndex is the local index of the node to remove
+     * @param pNode pointer to the node which will be deleted.
      */
     void FaceDeleteNode(const Node<SPACE_DIM>* pNode);
 
@@ -353,12 +354,12 @@ public:
 
     /**
      * For VertexElement<2, 3> only.
-     * Arrange nodes of the faces so that they will be in correct order (CCW from PointOfView).
-     * @param PointOfView is the position from which the face is observed.
+     * Arrange nodes of the faces so that they will be in correct order (CCW from rPointOfView).
+     * @param rPointOfView is the position from which the face is observed.
      * @return true if there are changes to the order of nodes.
      * This function does not update the element about the changes #2850
      */
-    bool FaceRearrangeNodes(const c_vector<double, SPACE_DIM>& PointOfView);
+    bool FaceRearrangeNodes(const c_vector<double, SPACE_DIM>& rPointOfView);
 
     /**
      * face will add element index into its registry.
@@ -447,7 +448,7 @@ public:
     VertexElement<0, SPACE_DIM>* GetFace(unsigned index) const;
 
     /**
-     * @param index the global index of a specified face
+     * @param globalIndex the global index of a specified face
      *
      * @return the local index of the face
      */
@@ -468,26 +469,97 @@ public:
      */
     c_vector<double, SPACE_DIM> GetCentroid() const;
 
+    ///////////////////////////////////
+    /// DUMMY FUNCTION FOR COMPILER ///
+    ///////////////////////////////////
+
+    /**
+     * Dummy function declarations to satisfy compiler.
+     * @param pFace
+     */
+    void AddFace(VertexElement<0, SPACE_DIM>* pFace);
+    /**
+     * Dummy function declarations to satisfy compiler.
+     * @param pFace
+     * @param Orientation
+     * @param rIndex
+     */
+    void AddFace(VertexElement<0, SPACE_DIM>* pFace, bool Orientation, const unsigned& rIndex);
+    /**
+     * Dummy function declarations to satisfy compiler.
+     * @param index
+     */
+    void DeleteFace(const unsigned index);
+    /**
+     * Dummy function declarations to satisfy compiler.
+     * @param pFace
+     * @return
+     */
+    unsigned DeleteFace(VertexElement<0, SPACE_DIM>* pFace);
+    /**
+     * Dummy function declarations to satisfy compiler.
+     * @param oldFaceLocalIndex
+     * @param pNewFace
+     */
+    void ReplaceFace(const unsigned oldFaceLocalIndex, VertexElement<0, SPACE_DIM>* pNewFace);
     /**
      * Dummy function declarations to satisfy compiler.
      */
-    void AddFace(VertexElement<0, SPACE_DIM>* pFace);
-    void AddFace(VertexElement<0, SPACE_DIM>* pFace, bool Orientation, const unsigned& rIndex);
-    void DeleteFace(const unsigned index);
-    unsigned DeleteFace(VertexElement<0, SPACE_DIM>* pFace);
-    void ReplaceFace(const unsigned oldFaceLocalIndex, VertexElement<0, SPACE_DIM>* pNewFace,
-                     const bool newFaceOrientation);
     void MonolayerElementRearrangeFacesNodes();
+    /**
+     * Dummy function declarations to satisfy compiler.
+     * @param index
+     */
     void FaceResetIndex(unsigned index);
+    /**
+     * Dummy function declarations to satisfy compiler.
+     * @param pNode
+     * @param Index
+     */
     void FaceAddNode(Node<SPACE_DIM>* pNode, const unsigned Index);
+    /**
+     * Dummy function declarations to satisfy compiler.
+     * @param Index
+     */
     void FaceDeleteNode(const unsigned Index);
+    /**
+     * Dummy function declarations to satisfy compiler.
+     * @param pNode
+     */
     void FaceDeleteNode(const Node<SPACE_DIM>* pNode);
+    /**
+     * Dummy function declarations to satisfy compiler.
+     * @param Index
+     * @param pNode
+     */
     void FaceUpdateNode(const unsigned Index, Node<SPACE_DIM>* pNode);
+    /**
+     * Dummy function declarations to satisfy compiler.
+     */
     void RegisterFaceWithNodes();
+    /**
+     * Dummy function declarations to satisfy compiler.
+     */
     void MarkFaceAsDeleted();
+    /**
+     * Dummy function declarations to satisfy compiler.
+     * @param elementIndex
+     */
     void FaceAddElement(const unsigned elementIndex);
+    /**
+     * Dummy function declarations to satisfy compiler.
+     * @param elementIndex
+     */
     void FaceRemoveElement(const unsigned elementIndex);
+    /**
+     * Dummy function declarations to satisfy compiler.
+     * @return
+     */
     unsigned FaceGetNumContainingElements() const;
+    /**
+     * Dummy function declarations to satisfy compiler.
+     * @return
+     */
     std::set<unsigned>& rFaceGetContainingElementIndices();
 };
 
