@@ -88,7 +88,7 @@ public:
         /*
          * First use the mesh generator to set up the immersed boundary elements
          */
-		ImmersedBoundaryMouseEmbryoCrossSectionMeshGenerator generator(10);
+		ImmersedBoundaryMouseEmbryoCrossSectionMeshGenerator generator(20);
 		ImmersedBoundaryMesh<2,2>* p_mesh = generator.GetMesh();
 
 		/*
