@@ -40,9 +40,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "MonolayerVertexMeshCustomFunctions.hpp"
 
+#include "MonolayerVertexMeshGenerator.hpp"
 #include "Node.hpp"
 #include "VertexElement.hpp"
-#include "MonolayerVertexMeshGenerator.hpp"
 
 #include <boost/assign/list_of.hpp>
 using boost::assign::list_of;
@@ -73,7 +73,7 @@ public:
         TS_ASSERT_EQUALS(ElementHasNode(&e66, 27u), false);
     }
 
-    void TestGetSharedElementnFaceIndicesnBoundaryFace()
+    void TestGetSharedElementnFaceIndicesAndBoundaryFace()
     {
         /*
          * Create a mesh comprising 3 elements, as shown below.
@@ -170,6 +170,74 @@ public:
         }
     }
 
+    void TestFaceRearrangeNode()
+    {
+        std::string output_name("MonolayerCustomFunctions/FaceRearrangeNode");
+        std::vector<Node<3>*> nodes;
+        nodes.push_back(new Node<3>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<3>(1, true, 1.0, 0.0));
+        nodes.push_back(new Node<3>(2, true, 0.0, 1.0));
+        nodes.push_back(new Node<3>(3, true, 1.0, 1.0));
+
+        VertexElement<2, 3>* face = new VertexElement<2, 3>(0, nodes);
+        std::vector<VertexElement<2, 3>*> v_f;
+        v_f.push_back(face);
+        PrintElement(face);
+        MutableVertexMesh<2, 3> meh(nodes, v_f);
+
+        {
+            VertexMeshWriter<2, 3> writer(output_name, "blabla");
+            writer.WriteVtkUsingMesh(meh, "before");
+        }
+
+        c_vector<double, 3> vv = face->GetCentroid();
+        vv[2] += 3;
+        face->FaceRearrangeNodes(vv);
+        PrintElement(face);
+        {
+            VertexMeshWriter<2, 3> writer(output_name, "blabla", false);
+            writer.WriteVtkUsingMesh(meh, "after");
+        }
+    }
+
+    void TestGetNodeType()
+    {
+        Node<3>* p_node1 = new Node<3>(8u);
+        TS_ASSERT_EQUALS(GetNodeType(p_node1), 0);
+
+        SetNodeAsApical(p_node1);
+        TS_ASSERT_EQUALS(GetNodeType(p_node1), Monolayer::ApicalValue);
+        delete p_node1;
+
+        p_node1 = new Node<3>(8u);
+        SetNodeAsBasal(p_node1);
+        TS_ASSERT_EQUALS(GetNodeType(p_node1), Monolayer::BasalValue);
+        delete p_node1;
+
+        p_node1 = new Node<3>(8u);
+        SetNodeAsLateral(p_node1);
+        TS_ASSERT_EQUALS(GetNodeType(p_node1), Monolayer::LateralValue);
+        delete p_node1;
+    }
+
+    void TestIsMonolayerElement()
+    {
+
+        {
+            VertexElement<2, 2> tmp_elem(88u);
+            TS_ASSERT(!IsMonolayerElement(&tmp_elem));
+        }
+        {
+            VertexElement<2, 3> tmp_elem(88u);
+            TS_ASSERT(!IsMonolayerElement(&tmp_elem));
+        }
+        {
+            VertexElement<3, 3> tmp_elem(88u);
+            TS_ASSERT(!IsMonolayerElement(&tmp_elem));
+            // TS_ASSERT_THROWS_ANYTHING(SetElementAsMonolayer(&tmp_elem));
+        }
+    }
+
     void SomeForce(MutableVertexMesh<3, 3>& vertex_mesh, double dt = 0.1)
     {
         c_vector<double, 3> force = zero_vector<double>(3);
@@ -252,36 +320,6 @@ public:
             Node<3>* p_this_node = vertex_mesh.GetNode(global_index);
             p_this_node->rGetModifiableLocation() += p_this_node->rGetAppliedForce() * dt;
             p_this_node->ClearAppliedForce();
-        }
-    }
-
-    void TestFaceRearrangeNode()
-    {
-        std::string output_name ("MonolayerCustomFunctions/FaceRearrangeNode");
-        std::vector<Node<3>*> nodes;
-        nodes.push_back(new Node<3>(0, true, 0.0, 0.0));
-        nodes.push_back(new Node<3>(1, true, 1.0, 0.0));
-        nodes.push_back(new Node<3>(2, true, 0.0, 1.0));
-        nodes.push_back(new Node<3>(3, true, 1.0, 1.0));
-
-        VertexElement<2, 3>* face = new VertexElement<2, 3>(0, nodes);
-        std::vector<VertexElement<2, 3>*> v_f;
-        v_f.push_back(face);
-        PrintElement(face);
-        MutableVertexMesh<2, 3> meh(nodes, v_f);
-
-        {
-            VertexMeshWriter<2, 3> writer(output_name, "blabla");
-            writer.WriteVtkUsingMesh(meh, "before");
-        }
-
-        c_vector<double, 3> vv = face->GetCentroid();
-        vv[2] += 3;
-        face->FaceRearrangeNodes(vv);
-        PrintElement(face);
-        {
-            VertexMeshWriter<2, 3> writer(output_name, "blabla", false);
-            writer.WriteVtkUsingMesh(meh, "after");
         }
     }
 

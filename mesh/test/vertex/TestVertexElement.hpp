@@ -45,9 +45,84 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "PetscSetupAndFinalize.hpp"
 
+#define TS_ASSERT_VECTORS_DELTA(v1, v2, DELTA)   \
+    for (unsigned _i = 0; _i < v1.size(); ++_i) \
+    {                                           \
+        TS_ASSERT_DELTA(v1[_i], v2[_i], DELTA); \
+    }
 
 class TestVertexElement : public CxxTest::TestSuite
 {
+private:
+    // Copied and modified form TestMutableVertexMesh.hpp
+    VertexElement<3, 3>* ConstructCubeElement()
+    {
+
+        // Make 8 nodes to assign to a cube and a pyramid element
+        std::vector<Node<3>*> nodes;
+        nodes.push_back(new Node<3>(0, false, 0.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(1, false, 1.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(2, false, 1.0, 1.0, 0.0));
+        nodes.push_back(new Node<3>(3, false, 0.0, 1.0, 0.0));
+        nodes.push_back(new Node<3>(4, false, 0.0, 0.0, 1.0));
+        nodes.push_back(new Node<3>(5, false, 1.0, 0.0, 1.0));
+        nodes.push_back(new Node<3>(6, false, 1.0, 1.0, 1.0));
+        nodes.push_back(new Node<3>(7, false, 0.0, 1.0, 1.0));
+
+        std::vector<std::vector<Node<3>*> > nodes_faces(6);
+
+        // Make 6 square faces out of these nodes
+        unsigned node_indices_face_0[4] = { 0, 1, 5, 4 };
+        unsigned node_indices_face_1[4] = { 5, 6, 2, 1 };
+        unsigned node_indices_face_2[4] = { 2, 6, 7, 3 };
+        unsigned node_indices_face_3[4] = { 0, 3, 7, 4 };
+        unsigned node_indices_face_4[4] = { 3, 2, 1, 0 };
+        unsigned node_indices_face_5[4] = { 5, 6, 7, 4 };
+        for (unsigned i = 0; i < 4; i++)
+        {
+            nodes_faces[0].push_back(nodes[node_indices_face_0[i]]);
+            nodes_faces[1].push_back(nodes[node_indices_face_1[i]]);
+            nodes_faces[2].push_back(nodes[node_indices_face_2[i]]);
+            nodes_faces[3].push_back(nodes[node_indices_face_3[i]]);
+            nodes_faces[4].push_back(nodes[node_indices_face_4[i]]);
+            nodes_faces[5].push_back(nodes[node_indices_face_5[i]]);
+        }
+
+        // Make the faces
+        std::vector<VertexElement<2, 3>*> faces;
+        for (unsigned i = 0; i < 6; i++)
+        {
+            faces.push_back(new VertexElement<2, 3>(i, nodes_faces[i]));
+        }
+
+        // Make the elements
+        std::vector<VertexElement<2, 3>*> faces_element;
+        std::vector<bool> orientations;
+        for (unsigned i = 0; i < 6; i++)
+        {
+            faces_element.push_back(faces[i]);
+            orientations.push_back(true);
+        }
+
+        return new VertexElement<3, 3>(0, faces_element, orientations);
+    }
+
+    template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+    void DeleteElement(VertexElement<ELEMENT_DIM, SPACE_DIM>* p_elem)
+    {
+        for (int i = p_elem->GetNumNodes() - 1; i > 0 ; --i )
+        {
+            delete p_elem->GetNode(i);
+        }
+
+        for (int i = p_elem->GetNumFaces() - 1; i > 0; --i)
+        {
+            delete p_elem->GetFace(i);
+        }
+
+        delete p_elem;
+    }
+
 public:
 
     void Test1dVertexElementIn2d()
@@ -129,96 +204,20 @@ public:
 
     void TestCreateVertexElement()
     {
-        // Make 8 nodes to assign to a cube element
-        std::vector<Node<3>*> nodes;
-        nodes.push_back(new Node<3>(0, false, 0.0, 0.0, 0.0));
-        nodes.push_back(new Node<3>(1, false, 1.0, 0.0, 0.0));
-        nodes.push_back(new Node<3>(2, false, 0.0, 1.0, 0.0));
-        nodes.push_back(new Node<3>(3, false, 0.0, 0.0, 1.0));
-        nodes.push_back(new Node<3>(4, false, 1.0, 1.0, 0.0));
-        nodes.push_back(new Node<3>(5, false, 0.0, 1.0, 1.0));
-        nodes.push_back(new Node<3>(6, false, 1.0, 0.0, 1.0));
-        nodes.push_back(new Node<3>(7, false, 1.0, 1.0, 1.0));
+        VertexElement<3, 3>* p_element = ConstructCubeElement();
 
-        std::vector<Node<3>*> nodes_face_0, nodes_face_1, nodes_face_2, nodes_face_3, nodes_face_4, nodes_face_5;
+        TS_ASSERT_EQUALS(p_element->GetNumNodes(), 8u);
+        TS_ASSERT_EQUALS(p_element->GetNumFaces(), 6u);
 
-        // Make 6 square faces out of these nodes
-        nodes_face_0.push_back(nodes[0]);
-        nodes_face_0.push_back(nodes[2]);
-        nodes_face_0.push_back(nodes[4]);
-        nodes_face_0.push_back(nodes[1]);
-
-        nodes_face_1.push_back(nodes[4]);
-        nodes_face_1.push_back(nodes[7]);
-        nodes_face_1.push_back(nodes[5]);
-        nodes_face_1.push_back(nodes[2]);
-
-        nodes_face_2.push_back(nodes[7]);
-        nodes_face_2.push_back(nodes[6]);
-        nodes_face_2.push_back(nodes[1]);
-        nodes_face_2.push_back(nodes[4]);
-
-        nodes_face_3.push_back(nodes[0]);
-        nodes_face_3.push_back(nodes[3]);
-        nodes_face_3.push_back(nodes[5]);
-        nodes_face_3.push_back(nodes[2]);
-
-        nodes_face_4.push_back(nodes[1]);
-        nodes_face_4.push_back(nodes[6]);
-        nodes_face_4.push_back(nodes[3]);
-        nodes_face_4.push_back(nodes[0]);
-
-        nodes_face_5.push_back(nodes[7]);
-        nodes_face_5.push_back(nodes[6]);
-        nodes_face_5.push_back(nodes[3]);
-        nodes_face_5.push_back(nodes[5]);
-
-        std::vector<VertexElement<2,3>*> faces;
-        faces.push_back(new VertexElement<2,3>(0, nodes_face_0));
-        faces.push_back(new VertexElement<2,3>(1, nodes_face_1));
-        faces.push_back(new VertexElement<2,3>(2, nodes_face_2));
-        faces.push_back(new VertexElement<2,3>(3, nodes_face_3));
-        faces.push_back(new VertexElement<2,3>(4, nodes_face_4));
-        faces.push_back(new VertexElement<2,3>(5, nodes_face_5));
-
-        std::vector<bool> orientations(faces.size());
-        for (unsigned i=0; i<faces.size(); i++)
-        {
-            orientations[i] = true;
-        }
-
-        // Make a cube element out of these faces
-        VertexElement<3,3> element(0, faces, orientations);
-
-        TS_ASSERT_EQUALS(element.GetNumNodes(), 8u);
-        TS_ASSERT_EQUALS(element.GetNumFaces(), 6u);
-
-        TS_ASSERT_EQUALS(element.GetIndex(), 0u);
-
-        // Test the position of some random nodes
-        TS_ASSERT_DELTA(element.GetFace(0)->GetNode(0)->rGetLocation()[0], 0.0, 1e-6);
-        TS_ASSERT_DELTA(element.GetFace(0)->GetNode(0)->rGetLocation()[1], 0.0, 1e-6);
-        TS_ASSERT_DELTA(element.GetFace(0)->GetNode(0)->rGetLocation()[2], 0.0, 1e-6);
-
-        TS_ASSERT_DELTA(element.GetFace(5)->GetNode(2)->rGetLocation()[0], 0.0, 1e-6);
-        TS_ASSERT_DELTA(element.GetFace(5)->GetNode(2)->rGetLocation()[1], 0.0, 1e-6);
-        TS_ASSERT_DELTA(element.GetFace(5)->GetNode(2)->rGetLocation()[2], 1.0, 1e-6);
+        TS_ASSERT_EQUALS(p_element->GetIndex(), 0u);
 
         // Test orientations
-        for (unsigned face_index=0; face_index<element.GetNumFaces(); face_index++)
+        for (unsigned face_index = 0; face_index < p_element->GetNumFaces(); face_index++)
         {
-            TS_ASSERT_EQUALS(element.FaceIsOrientatedAntiClockwise(face_index), true);
+            TS_ASSERT_EQUALS(p_element->FaceIsOrientatedAntiClockwise(face_index), true);
         }
 
-        // Tidy up
-        for (unsigned i=0; i<nodes.size(); i++)
-        {
-            delete nodes[i];
-        }
-        for (unsigned i=0; i<faces.size(); i++)
-        {
-            delete faces[i];
-        }
+        DeleteElement(p_element);
     }
 
     void TestVertexElementFaceConstructor()
@@ -564,6 +563,45 @@ public:
         {
             delete nodes[i];
         }
+    }
+
+    void TestReplaceNode()
+    {
+        VertexElement<3, 3>* p_elem = ConstructCubeElement();
+        Node<3>* p_new_node = new Node<3>(8, false, 0, 0, 0);
+        Node<3>* p_old_node = p_elem->GetNode(p_elem->GetNodeLocalIndex(0u));
+        const std::set<unsigned> elem_indices = p_old_node->rGetContainingElementIndices();
+        const std::set<unsigned> face_indices = p_old_node->rGetContainingFaceIndices();
+
+        p_elem->ReplaceNode(p_old_node, p_new_node);
+        TS_ASSERT_EQUALS(p_old_node->GetNumContainingElements(), 0u);
+        TS_ASSERT_EQUALS(p_old_node->GetNumContainingFaces(), 0u);
+        TS_ASSERT_EQUALS(p_new_node->GetNumContainingElements(), 1u);
+        TS_ASSERT_EQUALS(p_new_node->GetNumContainingFaces(), 3u);
+        TS_ASSERT_EQUALS(p_new_node->rGetContainingElementIndices(), elem_indices);
+        TS_ASSERT_EQUALS(p_new_node->rGetContainingFaceIndices(), face_indices);
+
+        delete p_old_node;
+        DeleteElement(p_elem);
+    }
+
+    void TestGetCentroid()
+    {
+        VertexElement<3, 3>* p_elem = ConstructCubeElement();
+
+        {
+            const double actual_centroid[3] = { 0.5, 0.5, 0.5 };
+            TS_ASSERT_VECTORS_DELTA(p_elem->GetCentroid(), actual_centroid, 1e-6);
+        }
+        {
+            const double actual_centroid[3] = { 0.5, 0.0, 0.5 };
+            TS_ASSERT_VECTORS_DELTA(p_elem->GetFace(0)->GetCentroid(), actual_centroid, 1e-6);
+        }
+        {
+            const double actual_centroid[3] = { 0.0, 0.5, 0.5 };
+            TS_ASSERT_VECTORS_DELTA(p_elem->GetFace(3)->GetCentroid(), actual_centroid, 1e-6);
+        }
+        DeleteElement(p_elem);
     }
 };
 #endif /*TESTVERTEXELEMENT_HPP_*/

@@ -246,8 +246,7 @@ void SetNodeAsLateral(Node<3>* pNode);
  * @param pNode  pointer of the interested node
  * @return  the type of node (apical/basal)
  */
-template <unsigned DIM>
-Monolayer::v_type GetNodeType(const Node<DIM>* pNode);
+Monolayer::v_type GetNodeType(const Node<3>* pNode);
 
 /**
  * @param pNode  pointer of a node
@@ -346,28 +345,6 @@ VertexElement<2, 3>* GetApicalFace(const VertexElement<3, 3>* pElement);
  * @return  pointer of the basal face of the input element
  */
 VertexElement<2, 3>* GetBasalFace(const VertexElement<3, 3>* pElement);
-
-/**
- * Get half the number of nodes of a monolayer element (which is much useful than
- * the actual number of nodes in many cases)
- * @param pElement  pointer of an element
- */
-unsigned MonolayerGetHalfNumNodes(const VertexElement<3, 3>* pElement);
-
-/**
- * Get the lateral face that is contained by this element and contains the two
- * given nodes. pElement is required by this function as the nodes don't have the
- * pointer of the faces but only its indices.
- * (Function which work with the mesh would be even better)
- * @param pElement  pointer of the element
- * @param nodeIndexA  global index of node A
- * @param nodeIndexB  global index of node B
- * @return  if the nodes doesn't share lateral face, it will return a vector with one
- *          element with UINT_MAX
- *          else, the return vector = {face_global_index, face_orientation, face_local_index}
- */
-std::vector<unsigned> GetLateralFace(const VertexElement<3, 3>* pElement, const unsigned nodeIndexA,
-                                     const unsigned nodeIndexB);
 
 /**
  * Get nodes with specific type.

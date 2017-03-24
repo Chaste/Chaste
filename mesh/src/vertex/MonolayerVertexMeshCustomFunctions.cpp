@@ -108,7 +108,7 @@ VertexElement<2, 3>* GetSharedLateralFace(const VertexElement<3, 3>* pElemA,
 {
     if (pElemA == NULL || pElemB == NULL)
     {
-        EXCEPTION("Two elements do not share lateral face.");
+        EXCEPTION("Two elements do not share lateral face."); //LCOV_EXCL_LINE
     }
 
     std::set<unsigned> s1, s2, s_return;
@@ -132,11 +132,11 @@ VertexElement<2, 3>* GetSharedLateralFace(const VertexElement<3, 3>* pElemA,
     switch (s_return.size())
     {
         case 0:
-            EXCEPTION("Two elements do not share lateral face.");
+            EXCEPTION("Two elements do not share lateral face."); //LCOV_EXCL_LINE
         case 1:
             return pElemA->GetFace(pElemA->GetFaceLocalIndex(*(s_return.begin())));
         default:
-            EXCEPTION("Probably some errors occur. Two elements share more than 1 lateral face.");
+            EXCEPTION("Probably some errors occur. Two elements share more than 1 lateral face."); //LCOV_EXCL_LINE
     }
 }
 
@@ -150,11 +150,11 @@ VertexElement<2, 3>* GetSharedLateralFace(const Node<3>* pNodeA, const Node<3>* 
     switch (shared_lateral_faces.size())
     {
         case 0:
-            EXCEPTION("Two nodes do not share lateral face.");
+            EXCEPTION("Two nodes do not share lateral face."); //LCOV_EXCL_LINE
         case 1:
             return no1(shared_lateral_faces);
         default:
-            EXCEPTION("Probably some errors occur. Two nodes share more than 1 lateral face in monolayer mesh.");
+            EXCEPTION("Probably some errors occur. Two nodes share more than 1 lateral face in monolayer mesh."); //LCOV_EXCL_LINE
     }
 }
 template VertexElement<2, 3>* GetSharedLateralFace(const Node<3>*, const Node<3>*, const VertexMesh<3, 3>*);
@@ -223,6 +223,7 @@ void PrintElement(const VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement)
     NEVER_REACHED;
 }
 
+// LCOV_EXCL_START
 template <>
 void PrintElement(const VertexElement<3, 3>* pElement)
 {
@@ -313,7 +314,9 @@ void PrintElement(const VertexElement<3, 3>* pElement)
                   << "---------------------------------------------------------" << std::endl;
     }
 }
+// LCOV_EXCL_STOP
 
+// LCOV_EXCL_START
 template <>
 void PrintElement(const VertexElement<2, 3>* pFace)
 {
@@ -342,7 +345,9 @@ void PrintElement(const VertexElement<2, 3>* pFace)
 
     std::cout << "=================================================================================" << std::endl;
 }
+// LCOV_EXCL_STOP
 
+// LCOV_EXCL_START
 void PrintMesh(const VertexMesh<3, 3>* pMesh, const bool printDeletedObjects)
 {
     const std::string TAB = "    ";
@@ -430,6 +435,7 @@ void PrintMesh(const VertexMesh<3, 3>* pMesh, const bool printDeletedObjects)
                   << "---------------------------------------------------------" << std::endl;
     }
 }
+// LCOV_EXCL_STOP
 
 bool IsFaceOnBoundary(const VertexElement<2, 3>* pFace)
 {
@@ -484,19 +490,13 @@ void SetNodeAsLateral(Node<3>* pNode)
     pNode->AddNodeAttribute(Monolayer::SetLateralValue);
 }
 
-template <unsigned DIM>
-Monolayer::v_type GetNodeType(const Node<DIM>* pNode)
+Monolayer::v_type GetNodeType(const Node<3>* pNode)
 {
-    if (DIM != 3u)
-    {
-        NEVER_REACHED;
-    }
-
     /* implemented const node as there is no modication for this
      * function. However, there isn't suitable const function for
      * NodeAttribute and hence required a const_cast
      */
-    Node<DIM>* p_non_const_node = const_cast<Node<DIM>*>(pNode);
+    Node<3>* p_non_const_node = const_cast<Node<3>*>(pNode);
     switch (p_non_const_node->GetNumNodeAttributes())
     {
         case 0:
@@ -511,9 +511,6 @@ Monolayer::v_type GetNodeType(const Node<DIM>* pNode)
             NEVER_REACHED;
     }
 }
-template Monolayer::v_type GetNodeType(const Node<1>* pNode);
-template Monolayer::v_type GetNodeType(const Node<2>* pNode);
-template Monolayer::v_type GetNodeType(const Node<3>* pNode);
 
 bool IsApicalNode(const Node<3>* pNode)
 {
@@ -698,58 +695,6 @@ VertexElement<2, 3>* GetBasalFace(const VertexElement<3, 3>* pElement)
     return p_face;
 }
 
-unsigned MonolayerGetHalfNumNodes(const VertexElement<3, 3>* pElement)
-{
-    if (!IsMonolayerElement(pElement))
-    {
-        NEVER_REACHED;
-    }
-
-    unsigned num_nodes = pElement->GetNumNodes();
-    if (num_nodes % 2 != 0)
-    {
-        NEVER_REACHED;
-    }
-    num_nodes /= 2;
-
-    if (num_nodes != GetApicalFace(pElement)->GetNumNodes()
-        || num_nodes != GetBasalFace(pElement)->GetNumNodes())
-    {
-        NEVER_REACHED;
-    }
-
-    return num_nodes;
-}
-
-///\todo #2850 Remove this method?
-std::vector<unsigned> GetLateralFace(const VertexElement<3, 3>* pElement, const unsigned nodeIndexA, const unsigned nodeIndexB)
-{
-    ///\todo #2850 think which will be the more effective way to find lateral face
-    std::vector<unsigned> return_vector;
-    for (unsigned face_local_index = 2; face_local_index < pElement->GetNumFaces(); ++face_local_index)
-    {
-        VertexElement<2, 3>* p_tmp_face = pElement->GetFace(face_local_index);
-
-        if (ElementHasNode(p_tmp_face, nodeIndexA) && ElementHasNode(p_tmp_face, nodeIndexB))
-        {
-            return_vector.push_back(p_tmp_face->GetIndex());
-            return_vector.push_back(pElement->FaceIsOrientatedAntiClockwise(face_local_index));
-            return_vector.push_back(face_local_index);
-            break;
-        }
-    }
-
-    if (return_vector.size() == 0)
-    {
-        return_vector.push_back(UINT_MAX);
-    }
-    else
-    {
-        assert(return_vector.size() == 3); // LCOV_EXCL_LINE
-    }
-    return return_vector;
-}
-
 template <unsigned ELEMENT_DIM>
 std::vector<Node<3>*> GetNodesWithType(const VertexElement<ELEMENT_DIM, 3>* pElement, const Monolayer::v_type nodeType)
 {
@@ -788,7 +733,7 @@ Node<3>* GetOppositeNode(const Node<3>* pNode, const VertexElement<2, 3>* pFace)
 {
     if (!(IsApicalNode(pNode) || IsBasalNode(pNode)))
     {
-        EXCEPTION("No Opposite Node");
+        EXCEPTION("No Opposite Node"); // LCOV_EXCL_LINE
     }
 
     const Monolayer::v_type opposite_type = IsApicalNode(pNode) ? Monolayer::BasalValue : Monolayer::ApicalValue;
@@ -809,7 +754,7 @@ Node<3>* GetOppositeNode(const Node<3>* pNode, const VertexElement<2, 3>* pFace)
         }
     }
 
-    EXCEPTION("No Opposite Node");
+    EXCEPTION("No Opposite Node"); // LCOV_EXCL_LINE
 }
 
 Node<3>* GetOppositeNode(const Node<3>* pNode, const VertexElement<3, 3>* pElement)
@@ -818,7 +763,7 @@ Node<3>* GetOppositeNode(const Node<3>* pNode, const VertexElement<3, 3>* pEleme
     switch (GetNodeType(pNode))
     {
         case Monolayer::LateralValue:
-            EXCEPTION("No Opposite Node");
+            EXCEPTION("No Opposite Node"); // LCOV_EXCL_LINE
         case Monolayer::BasalValue:
             p_other_face = GetApicalFace(pElement);
             break;
@@ -893,62 +838,65 @@ template Node<3>* GetNextNode(const Node<3>*, const VertexElement<3, 3>*);
 using boost::numeric::ublas::permutation_matrix;
 using boost::numeric::ublas::matrix;
 
+///\todo #2850 revise this function to handle the case when like all nodes have z=0,
+/// making the matrix singular.
+// LCOV_EXCL_START
 c_vector<double, 3> CalculateUnitNormalToFace(const VertexElement<2, 3>* pFace)
 {
     c_vector<double, 3> unit_vec = zero_vector<double>(3);
 
-    // As we are in 3D, the face must have at least three vertices
-    if (pFace->GetNumNodes() < 3u)
-    {
-        NEVER_REACHED;
-    }
-    else if (pFace->GetNumNodes() < 5u)
-    {
-        c_vector<double, 3> v10 = pFace->GetNodeLocation(1) - pFace->GetNodeLocation(0);
-        c_vector<double, 3> v20 = pFace->GetNodeLocation(2) - pFace->GetNodeLocation(0);
-        unit_vec = VectorProduct(v10, v20);
-    }
-    else
-    {
-        const unsigned n = pFace->GetNumNodes();
-        matrix<double> X_tmp(n, 4);
-        for (unsigned i = 0; i < pFace->GetNumNodes(); ++i)
-        {
-            const c_vector<double, 3>& loc_tmp = pFace->GetNodeLocation(i);
-            X_tmp(i, 0) = 1;
-            X_tmp(i, 1) = loc_tmp[0];
-            X_tmp(i, 2) = loc_tmp[1];
-            X_tmp(i, 3) = loc_tmp[2] + 1e-6 * i;
-        }
-        std::cout << X_tmp << std::endl;
-        matrix<double> A = prod(trans(X_tmp), X_tmp);
-        std::cout << A << std::endl;
-        boost::numeric::ublas::vector<double> constrain_vec(4);
-        constrain_vec[0] = 0;
-        constrain_vec[1] = 1;
-        constrain_vec[2] = 1;
-        constrain_vec[3] = 1;
-        boost::numeric::ublas::vector<double> XTX_constrain(constrain_vec);
-
-        permutation_matrix<size_t> pm(4);
-        lu_factorize(A, pm);
-        std::cout << A << std::endl;
-        std::cout << pm << std::endl;
-        try
-        {
-            lu_substitute(A, pm, XTX_constrain);
-        }
-        catch (boost::numeric::ublas::singular ss)
-        {
-            ///\todo: #2850 probably need
-            std::cout << "#################################################################" << std::endl;
-        }
-        std::cout << XTX_constrain << std::endl;
-        unit_vec[0] = XTX_constrain[1];
-        unit_vec[1] = XTX_constrain[2];
-        unit_vec[2] = XTX_constrain[3];
-    }
-
-    unit_vec /= norm_2(unit_vec);
+    // // As we are in 3D, the face must have at least three vertices
+    // if (pFace->GetNumNodes() < 3u)
+    // {
+    //     NEVER_REACHED;
+    // }
+    // else if (pFace->GetNumNodes() < 5u)
+    // {
+    //     c_vector<double, 3> v10 = pFace->GetNodeLocation(1) - pFace->GetNodeLocation(0);
+    //     c_vector<double, 3> v20 = pFace->GetNodeLocation(2) - pFace->GetNodeLocation(0);
+    //     unit_vec = VectorProduct(v10, v20);
+    // }
+    // else
+    // {
+    //     const unsigned n = pFace->GetNumNodes();
+    //     matrix<double> X_tmp(n, 4);
+    //     for (unsigned i = 0; i < pFace->GetNumNodes(); ++i)
+    //     {
+    //         const c_vector<double, 3>& loc_tmp = pFace->GetNodeLocation(i);
+    //         X_tmp(i, 0) = 1;
+    //         X_tmp(i, 1) = loc_tmp[0];
+    //         X_tmp(i, 2) = loc_tmp[1];
+    //         X_tmp(i, 3) = loc_tmp[2] + 1e-6 * i;
+    //     }
+    //     std::cout << X_tmp << std::endl;
+    //     matrix<double> A = prod(trans(X_tmp), X_tmp);
+    //     std::cout << A << std::endl;
+    //     boost::numeric::ublas::vector<double> constrain_vec(4);
+    //     constrain_vec[0] = 0;
+    //     constrain_vec[1] = 1;
+    //     constrain_vec[2] = 1;
+    //     constrain_vec[3] = 1;
+    //     boost::numeric::ublas::vector<double> XTX_constrain(constrain_vec);
+    //
+    //     permutation_matrix<size_t> pm(4);
+    //     lu_factorize(A, pm);
+    //     std::cout << A << std::endl;
+    //     std::cout << pm << std::endl;
+    //     try
+    //     {
+    //         lu_substitute(A, pm, XTX_constrain);
+    //     }
+    //     catch (boost::numeric::ublas::singular ss)
+    //     {
+    //         ///\todo work here!
+    //     }
+    //     std::cout << XTX_constrain << std::endl;
+    //     unit_vec[0] = XTX_constrain[1];
+    //     unit_vec[1] = XTX_constrain[2];
+    //     unit_vec[2] = XTX_constrain[3];
+    // }
+    //
+    // unit_vec /= norm_2(unit_vec);
     return unit_vec;
 }
+// LCOV_EXCL_STOP

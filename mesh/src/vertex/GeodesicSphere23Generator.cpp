@@ -7,17 +7,14 @@
 
 #include "GeodesicSphere23Generator.hpp"
 
-#include <utility> // for pair
-#include <set>
 #include <algorithm> // sort
-#include "UblasCustomFunctions.hpp"
-#include "MonolayerVertexMeshCustomFunctions.hpp"
 #include <cmath> // for atan2
+#include <set>
+#include <utility> // for pair
+#include "MonolayerVertexMeshCustomFunctions.hpp"
+#include "UblasCustomFunctions.hpp"
 
-#include "Debug.hpp"
-
-GeodesicSphere23Generator::GeodesicSphere23Generator(const unsigned numDivision)
-        : mDepth(0)
+GeodesicSphere23Generator::GeodesicSphere23Generator()
 {
     const double X = 0.525731112119133606;
     const double Z = 0.850650808352039932;
@@ -49,9 +46,6 @@ GeodesicSphere23Generator::GeodesicSphere23Generator(const unsigned numDivision)
             const unsigned jb = (ja + 1) % 3;
             Node<3>* node_a = mNodes[tindices[i][ja]];
             Node<3>* node_b = mNodes[tindices[i][jb]];
-            //PRINT_3_VARIABLES(i, tindices[i][ja], tindices[i][jb])
-            //PRINT_CONTAINER(node_a_edges)
-            //PRINT_CONTAINER(node_b_edges)
             std::set<unsigned> shared_edge = GetSharedFaceIndices(node_a, node_b);
 
             unsigned current_edge_index = UINT_MAX;
@@ -65,10 +59,6 @@ GeodesicSphere23Generator::GeodesicSphere23Generator(const unsigned numDivision)
             }
             else
             {
-                //TRACE("FOUND shared edge")
-                //PRINT_3_VARIABLES(i, tindices[i][ja], tindices[i][jb])
-                //PRINT_CONTAINER(node_a_edges)
-                //PRINT_CONTAINER(node_b_edges)
                 assert(shared_edge.size() == 1);
                 current_edge_index = *(shared_edge.begin());
             }
@@ -78,14 +68,11 @@ GeodesicSphere23Generator::GeodesicSphere23Generator(const unsigned numDivision)
         assert(mFaces.size() == i);
         mFaces.push_back(new VertexElement<2, 3>(mFaces.size(), this_face_edges, this_face_orientations, this_face_nodes));
     }
+}
 
-    PRINT_3_VARIABLES(mNodes.size(), mEdges.size(), mFaces.size());
-
-    for (unsigned i = 0; i < numDivision; ++i)
-    {
-        SubDivide();
-        PRINT_3_VARIABLES(mNodes.size(), mEdges.size(), mFaces.size());
-    }
+c_vector<double, 3> normalise(const c_vector<double, 3>& v)
+{
+    return v / norm_2(v);
 }
 
 void GeodesicSphere23Generator::SubDivide()
@@ -95,8 +82,7 @@ void GeodesicSphere23Generator::SubDivide()
     const unsigned num_old_faces = mFaces.size();
     if (num_old_nodes + num_old_faces - num_old_edges != 2)
     {
-        TRACE("EXCEPTION EULER IS THE BOSS")
-        EXCEPTION("Breaking Euler's Polyhedron Formula!");
+        EXCEPTION("Breaking Euler's Polyhedron Formula!");  // LCOV_EXCL_LINE
     }
 
     // For sanity check later
@@ -237,7 +223,6 @@ void GeodesicSphere23Generator::SubDivide()
     {
         NEVER_REACHED;
     }
-    MARK;
 }
 
 MutableVertexMesh<2, 3>* GeodesicSphere23Generator::GetDual()
@@ -291,7 +276,6 @@ MutableVertexMesh<2, 3>* GeodesicSphere23Generator::GetDual()
 
             Debug_anglesss.push_back(angles_with_index[iii].first);
         }
-        //PRINT_VECTOR(Debug_anglesss);
 
         dual_faces[dual_face_index] = new VertexElement<2, 3>(dual_face_index, this_dual_face_nodes);
     }

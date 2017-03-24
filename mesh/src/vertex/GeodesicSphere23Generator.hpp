@@ -9,28 +9,21 @@
 #define GEODESICSPHERE23GENERATOR_HPP_
 
 #include <vector>
+#include "MutableVertexMesh.hpp"
 #include "Node.hpp"
 #include "VertexElement.hpp"
-#include "MutableVertexMesh.hpp"
-#include "UblasCustomFunctions.hpp"
 
 class GeodesicSphere23Generator
 {
     friend class TestMonolayerVertexMeshGenerator;
 
-private:
-    unsigned mDepth;
+protected:
     std::vector<Node<3>*> mNodes;
     std::vector<VertexElement<1, 3>*> mEdges;
     std::vector<VertexElement<2, 3>*> mFaces;
 
 public:
-    c_vector<double, 3> normalise(const c_vector<double, 3>& v)
-    {
-        return v / norm_2(v);
-    }
-
-    GeodesicSphere23Generator(const unsigned numDivision = 0u);
+    GeodesicSphere23Generator();
 
     void SubDivide();
 

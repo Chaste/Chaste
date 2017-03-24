@@ -38,8 +38,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MonolayerVertexMeshCustomFunctions.hpp"
 #include "VertexMeshWriter.hpp"
 
-#include "Debug.hpp"
-
 MonolayerVertexMeshGenerator::MonolayerVertexMeshGenerator(const std::string& name, const bool callDestructor)
         : mName(name),
           mpMesh(NULL),
@@ -459,7 +457,7 @@ MutableVertexMesh<3, 3>* MonolayerVertexMeshGenerator::MakeSphericalMesh33(const
     mBasalNodes.resize(num_lower_nodes);
     mApicalNodes.resize(num_lower_nodes);
 
-    MARK for (unsigned i = 0; i < num_lower_nodes; ++i)
+    for (unsigned i = 0; i < num_lower_nodes; ++i)
     {
         const Node<3>* p_node_23 = pMesh23->GetNode(i);
         assert(i == p_node_23->GetIndex());
@@ -467,7 +465,7 @@ MutableVertexMesh<3, 3>* MonolayerVertexMeshGenerator::MakeSphericalMesh33(const
         loc = p_node_23->rGetLocation();
         if (std::abs(norm_2(loc) - 1) < 1e-6)
         {
-            PRINT_VECTOR(loc);
+            NEVER_REACHED;
         }
         const bool is_boundary = p_node_23->IsBoundaryNode();
         assert(is_boundary == false);
@@ -479,7 +477,7 @@ MutableVertexMesh<3, 3>* MonolayerVertexMeshGenerator::MakeSphericalMesh33(const
         mApicalNodes[i] = p_upper;
     }
     mElements.reserve(pMesh23->GetNumElements());
-    MARK const unsigned num_elem = pMesh23->GetNumElements();
+    const unsigned num_elem = pMesh23->GetNumElements();
     for (unsigned elem_index = 0; elem_index < num_elem; ++elem_index)
     {
         const VertexElement<2, 3>* p_2elem = pMesh23->GetElement(elem_index);
@@ -490,5 +488,5 @@ MutableVertexMesh<3, 3>* MonolayerVertexMeshGenerator::MakeSphericalMesh33(const
         }
         this->BuildElementWith(node_index_this_elem);
     }
-    MARK return this->GenerateMesh();
+    return this->GenerateMesh();
 }
