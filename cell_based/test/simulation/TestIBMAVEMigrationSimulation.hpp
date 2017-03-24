@@ -55,7 +55,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ImmersedBoundaryLinearMembraneForce.hpp"
 #include "ImmersedBoundaryMesh.hpp"
 #include "ImmersedBoundarySimulationModifier.hpp"
-#include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
+#include "ImmersedBoundaryAVEMigrationMeshGenerator.hpp"
 
 /* Required for setting up the numerical method */
 #include "ForwardEulerNumericalMethod.hpp"
@@ -64,8 +64,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* To make sure that the test is not run in parallel */
 #include "FakePetscSetup.hpp"
 
-/* Not sure whether these still work */
-#include "ImmersedBoundaryAVEMigrationMeshGenerator.hpp"
+/* Not sure whether these work */
+#include "ImmersedBoundarySingleCellMigrationForce.hpp"
 
 class TestIBMAVEMigrationSimulation : public AbstractCellBasedTestSuite
 {
@@ -139,6 +139,11 @@ public:
         MAKE_PTR(ImmersedBoundaryLinearInteractionForce<2>, p_cell_cell_force);
         p_main_modifier->AddImmersedBoundaryForce(p_cell_cell_force);
         p_cell_cell_force->SetSpringConst(1.0 * 1e6);
+
+        MAKE_PTR(SingleCellMigrationForce<2>, p_migration_force);
+        p_main_modifier->AddImmersedBoundaryForce(p_migration_force);
+        p_migration_force->SetElementIndex(1);
+        p_migration_force->SetStrength(1.0);
 
         /* Finally we call the {{{Solve}}} method on the simulation to run the simulation.*/
         simulator.Solve();

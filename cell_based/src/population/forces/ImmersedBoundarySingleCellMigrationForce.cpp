@@ -80,7 +80,7 @@ void SingleCellMigrationForce<DIM>::AddImmersedBoundaryForceContribution(std::ve
 
 template <unsigned DIM>
 template <unsigned ELEMENT_DIM>
-void ImmersedBoundaryLinearMembraneForce<DIM>::CalculateForcesOnElement(ImmersedBoundaryElement<ELEMENT_DIM, DIM>& rElement,
+void SingleCellMigrationForce<DIM>::CalculateForcesOnElement(ImmersedBoundaryElement<ELEMENT_DIM, DIM>& rElement,
                                                                         ImmersedBoundaryCellPopulation<DIM>& rCellPopulation,
                                                                         double intrinsicSpacingSquared)
 {
