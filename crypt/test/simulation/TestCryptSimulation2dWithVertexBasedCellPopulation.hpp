@@ -154,7 +154,8 @@ public:
 
         for (unsigned node_index=0; node_index<simulator.rGetCellPopulation().GetNumNodes(); node_index++)
         {
-            c_vector<double, 2> node_location = simulator.rGetCellPopulation().GetNode(node_index)->rGetLocation();
+            c_vector<double, 2> node_location;
+            node_location = simulator.rGetCellPopulation().GetNode(node_index)->rGetLocation();
             
             AbstractOffLatticeCellPopulation<2,2>* p_offLattice_pop = dynamic_cast<AbstractOffLatticeCellPopulation<2,2>* >(&(simulator.rGetCellPopulation()));
             double damping = p_offLattice_pop->GetDampingConstant(node_index);

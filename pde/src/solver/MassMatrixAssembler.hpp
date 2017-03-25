@@ -82,7 +82,8 @@ public:
                 c_matrix<double, 1, SPACE_DIM> &rGradU /* not used */,
                 Element<ELEMENT_DIM,SPACE_DIM>* pElement)
     {
-        c_matrix<double, ELEMENT_DIM+1, ELEMENT_DIM+1> mass_matrix = outer_prod(rPhi, rPhi);
+        c_matrix<double, ELEMENT_DIM+1, ELEMENT_DIM+1> mass_matrix;
+        mass_matrix = outer_prod(rPhi, rPhi);
 
         if (mUseMassLumping)
         {

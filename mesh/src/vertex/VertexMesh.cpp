@@ -36,6 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexMesh.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "UblasCustomFunctions.hpp"
+
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexMesh(std::vector<Node<SPACE_DIM>*> nodes,
                                                std::vector<VertexElement<ELEMENT_DIM,SPACE_DIM>*> vertexElements)
@@ -275,13 +276,15 @@ VertexMesh<3,3>::VertexMesh(TetrahedralMesh<3,3>& rMesh)
                                   node_b_element_indices.end(),
                                   std::inserter(edge_element_indices, edge_element_indices.begin()));
 
-            c_vector<double,3> edge_vector = p_node_b->rGetLocation() - p_node_a->rGetLocation();
-            c_vector<double,3> mid_edge = edge_vector*0.5 + p_node_a->rGetLocation();
+            c_vector<double,3> edge_vector;
+            edge_vector = p_node_b->rGetLocation() - p_node_a->rGetLocation();
+
+            c_vector<double,3> mid_edge;
+            mid_edge= edge_vector*0.5 + p_node_a->rGetLocation();
 
             unsigned element0_index = *(edge_element_indices.begin());
 
             c_vector<double,3> basis_vector1 = mNodes[element0_index]->rGetLocation() - mid_edge;
-
             c_vector<double,3> basis_vector2 = VectorProduct(edge_vector, basis_vector1);
 
             /**
