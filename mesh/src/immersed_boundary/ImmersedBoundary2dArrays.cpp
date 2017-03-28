@@ -81,9 +81,12 @@ ImmersedBoundary2dArrays<DIM>::ImmersedBoundary2dArrays(ImmersedBoundaryMesh<DIM
     mOperator2.resize(extents[num_gridpts_x][reduced_y]);
     mFourierGrids.resize(extents[2 + (int)mActiveSources][num_gridpts_x][reduced_y]);
     mPressureGrid.resize(extents[num_gridpts_x][reduced_y]);
+    mPressureCorrectionGrid.resize(extents[num_gridpts_x][reduced_y]);
 
     mSin2x.resize(num_gridpts_x);
     mSin2y.resize(reduced_y);
+    mExp2x.resize(num_gridpts_x);
+    mExp2y.resize(reduced_y);
 
     /*
      * There are several constants used in the Fourier domain as part of the Navier-Stokes solution which are constant
@@ -101,6 +104,17 @@ ImmersedBoundary2dArrays<DIM>::ImmersedBoundary2dArrays(ImmersedBoundaryMesh<DIM
     {
         mSin2y[y] = sin(2 * M_PI * (double) y * y_spacing);
     }
+
+    for (unsigned x = 0; x < num_gridpts_x; x++)
+    {
+        mExp2x[x] = exp(2 * M_PI * (double) x * x_spacing);
+    }
+
+    for (unsigned y = 0; y < reduced_y; y++)
+    {
+        mExp2y[y] = exp(2 * M_PI * (double) y * y_spacing);
+    }
+
 
     for (unsigned x = 0; x < num_gridpts_x; x++)
     {
@@ -155,6 +169,12 @@ multi_array<std::complex<double>, 2>& ImmersedBoundary2dArrays<DIM>::rGetModifia
 }
 
 template<unsigned DIM>
+multi_array<std::complex<double>, 2>& ImmersedBoundary2dArrays<DIM>::rGetModifiablePressureCorrectionGrid()
+{
+    return mPressureCorrectionGrid;
+}
+
+template<unsigned DIM>
 const multi_array<double, 2>& ImmersedBoundary2dArrays<DIM>::rGetOperator1() const
 {
     return mOperator1;
@@ -176,6 +196,18 @@ template<unsigned DIM>
 const std::vector<double>& ImmersedBoundary2dArrays<DIM>::rGetSin2y() const
 {
     return mSin2y;
+}
+
+template<unsigned DIM>
+const std::vector<double>& ImmersedBoundary2dArrays<DIM>::rGetExp2x() const
+{
+    return mExp2x;
+}
+
+template<unsigned DIM>
+const std::vector<double>& ImmersedBoundary2dArrays<DIM>::rGetExp2y() const
+{
+    return mExp2y;
 }
 
 template<unsigned DIM>

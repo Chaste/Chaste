@@ -78,11 +78,20 @@ protected:
     /** Grid to store the calculated pressure grid. */
     multi_array<std::complex<double>, 2> mPressureGrid;
 
+    /** Grid to store the correction to the pressure */
+    multi_array<std::complex<double>, 2> mPressureCorrectionGrid;
+
     /** Vector of sin values in x, constant once grid size is known. */
     std::vector<double> mSin2x;
 
     /** Vector of sin values in x, constant once grid size is known. */
     std::vector<double> mSin2y;
+
+    /** Vector of exponential values in x, constant grid size is known. */
+    std::vector<double> mExp2x;
+
+    /** Vector of exponential values in y, constant grid size is known. */
+    std::vector<double> mExp2y;
 
 public:
 
@@ -123,6 +132,9 @@ public:
     /** @return reference to modifiable pressure grid. */
     multi_array<std::complex<double>, 2>& rGetModifiablePressureGrid();
 
+    /** @return reference to modifiable pressure correction grid. */
+    multi_array<std::complex<double>, 2>& rGetModifiablePressureCorrectionGrid();
+
     /** @return reference to the first operator. */
     const multi_array<double, 2>& rGetOperator1() const;
 
@@ -134,6 +146,12 @@ public:
 
     /** @return reference to the vector of sine values in y. */
     const std::vector<double>& rGetSin2y() const;
+
+    /** @return reference to the vector of exp values in x. */
+    const std::vector<double>& rGetExp2x() const;
+
+    /** @return reference to the vector of exp values in y. */
+    const std::vector<double>& rGetExp2y() const;
 
     /** @return #mpMesh. */
     ImmersedBoundaryMesh<DIM,DIM>* GetMesh();

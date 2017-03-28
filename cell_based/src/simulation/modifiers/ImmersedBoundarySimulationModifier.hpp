@@ -131,6 +131,8 @@ private:
      */
     double mReynoldsNumber;
 
+    std::vector<double> mDeltaP;
+
     /** Imaginary unit. */
     std::complex<double> mI;
 
@@ -289,6 +291,14 @@ public:
      * @return #mReynoldsNumber
      */
     double GetReynoldsNumber();
+
+    /**
+     * Calculate the correction term.
+     *
+     * @param input const reference to input grids
+     * @param output reference to output grids
+     */
+    void CalculateCorrectionTerm(const multi_array<double, 3>& input);
 };
 
 #include "SerializationExportWrapper.hpp"
