@@ -30,12 +30,11 @@
 class TestLateralNodeModifier : public AbstractCellBasedTestSuite
 {
 private:
-    const std::string mOutputName = std::string("AsynchronousT1");
-    // void WriteMesh(const MutableVertexMesh<3, 3>& rMesh)
-    // {
-    //     VertexMeshWriter<3, 3> mesh_writer(dirname, mesh_filename, false);
-    //     mesh_writer.WriteFilesUsingMesh(vertex_mesh);
-    // }
+    void WriteMesh(const MutableVertexMesh<3, 3>& rMesh, const std::string& additionalTag)
+    {
+        VertexMeshWriter<3, 3> mesh_writer("TestAsynchronousT1", "mesh", false);
+        mesh_writer.WriteVtkUsingMesh(rMesh, additionalTag);
+    }
     static const double target_area = 1;
     static const double z_height = 1;
 
@@ -46,19 +45,23 @@ public:
          * Use 2 hexagonal cells as model.
          */
 
-        HexagonalPrism3dVertexMeshGenerator generator(2, 1, 3 * sqrt(3) / 2, 1);
+        HexagonalPrism3dVertexMeshGenerator generator(2, 2, 3 * sqrt(3) / 2, 1);
         MutableVertexMesh<3, 3>* p_mesh = generator.GetMesh();
+        WriteMesh(*p_mesh, "ori0");
 
         PRINT_CONTAINER(p_mesh->GetNode(4)->rGetModifiableLocation());
         PRINT_CONTAINER(p_mesh->GetNode(7)->rGetModifiableLocation());
 
-        p_mesh->GetNode(4)->rGetModifiableLocation()[1] = 1.4;
-        p_mesh->GetNode(7)->rGetModifiableLocation()[1] = 1.7;
-        p_mesh->SetCellRearrangementThreshold(0.40);
+        p_mesh->GetNode(3)->rGetModifiableLocation()[1] = 0.95;
+        p_mesh->GetNode(6)->rGetModifiableLocation()[1] = 1.05;
+        p_mesh->SetCellRearrangementThreshold(0.2);
+        p_mesh->SetCellRearrangementRatio(1.5);
+        WriteMesh(*p_mesh, "ori1");
 
         p_mesh->ReMesh();
-        p_mesh->SetCellRearrangementThreshold(0.01);
-        p_mesh->SetCellRearrangementRatio(1.5);
+        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 33u);
+        TS_ASSERT_EQUALS(p_mesh->GetNumFaces(), 28u);
+        WriteMesh(*p_mesh, "ori2");
 
         std::vector<CellPtr> cells;
         CellsGenerator<NoCellCycleModel, 3> cells_generator;
@@ -68,8 +71,18 @@ public:
         LateralNodeModifier node_modifier;
 
         node_modifier.UpdateCellData(cell_population);
+        WriteMesh(*p_mesh, "ori3");
 
-        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 20u);
+        p_mesh->GetNode(3 + 32)->rGetModifiableLocation()[1] = 0.9;
+        p_mesh->GetNode(6 + 32)->rGetModifiableLocation()[1] = 1.1;
+        p_mesh->SetCellRearrangementThreshold(0.3);
+        WriteMesh(*p_mesh, "ori4");
+
+        node_modifier.UpdateCellData(cell_population);
+        WriteMesh(*p_mesh, "ori5");
+
+        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 33u);
+        TS_ASSERT_EQUALS(p_mesh->GetNumFaces(), 28u);
     }
 
     void TestAsynchronousT1()

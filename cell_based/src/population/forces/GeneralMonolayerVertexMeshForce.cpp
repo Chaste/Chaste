@@ -67,7 +67,7 @@ void GeneralMonolayerVertexMeshForce::AddForceContribution(AbstractCellPopulatio
 {
     if (dynamic_cast<VertexBasedCellPopulation<3>*>(&rCellPopulation) == NULL)
     {
-        EXCEPTION("GeneralMonolayerVertexMeshForce is to be used with a VertexBasedCellPopulation only");
+        EXCEPTION("GeneralMonolayerVertexMeshForce is to be used with a VertexBasedCellPopulation only"); //LCOV_EXCL_LINE
     }
 
     // Define some helper variables

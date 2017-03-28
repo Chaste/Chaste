@@ -242,10 +242,7 @@ public:
     {
         c_vector<double, 3> force = zero_vector<double>(3);
 
-        double mVolumeParameter = 1, mTargetVolume = 0.5,
-               mApicalAreaParameter = 0, mTargetApicalArea = 0, mApicalEdgeParameter = 0,
-               mBasalAreaParameter = 0, mTargetBasalArea = 0, mBasalEdgeParameter = 0,
-               mLateralEdgeParameter = 0;
+        double mVolumeParameter = 1, mTargetVolume = 0.5;
 
         // Define some helper variables
         const unsigned num_nodes = vertex_mesh.GetNumNodes();
@@ -271,13 +268,6 @@ public:
 
             assert(global_index == p_this_node->GetIndex());
 
-            // Get the type of node. 1=basal; 2=apical
-            const Monolayer::v_type node_type = GetNodeType(p_this_node);
-
-            c_vector<double, 3> basal_face_contribution = zero_vector<double>(3);
-            c_vector<double, 3> ab_edge_contribution = zero_vector<double>(3);
-            c_vector<double, 3> apical_face_contribution = zero_vector<double>(3);
-            c_vector<double, 3> lateral_edge_contribution = zero_vector<double>(3);
             c_vector<double, 3> volume_contribution = zero_vector<double>(3);
 
             // A variable to store such that the apical/basal edge forces are not counted twice for non-boundary edges.
@@ -301,18 +291,9 @@ public:
 
                 // Add the force contribution from this cell's volume compressibility (note the minus sign)
                 volume_contribution -= mVolumeParameter * element_volume_gradient * (element_volumes[elem_index] - mTargetVolume);
-
-                // {
-                // const double k(std::abs(element_volume_gradient[0]));
-                // PRINT_4_VARIABLES(element_volumes[elem_index], mTargetVolume, p_this_node->GetIndex(), k)
-                // PRINT_CONTAINER(element_volume_gradient/k);
-                // PRINT_CONTAINER(volume_contribution)
-                // }
             }
 
-            c_vector<double, 3> force_on_node = basal_face_contribution + ab_edge_contribution + apical_face_contribution
-                + lateral_edge_contribution + volume_contribution;
-            p_this_node->AddAppliedForceContribution(force_on_node);
+            p_this_node->AddAppliedForceContribution(volume_contribution);
         }
 
         for (unsigned global_index = 0; global_index < num_nodes; ++global_index)

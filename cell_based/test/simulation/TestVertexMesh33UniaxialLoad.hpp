@@ -56,7 +56,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TransitCellProliferativeType.hpp"
 #include "UniformG1GenerationalCellCycleModel.hpp"
 #include "VertexBasedCellPopulation.hpp"
-
 #include "FakePetscSetup.hpp"
 
 class TestVertexMesh33UniaxialLoad : public AbstractCellBasedTestSuite
