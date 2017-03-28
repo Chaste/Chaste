@@ -383,7 +383,7 @@ public:
         }
     }
 
-    void TestUpdateNode()
+    void TestUpdateAndDeleteNode()
     {
         // Create nodes
         std::vector<Node<2>*> nodes;
@@ -401,10 +401,16 @@ public:
 
         // Update location of node 2
         Node<2>* p_node = new Node<2>(4, false, 1.2, 1.3);
+        TS_ASSERT_THROWS_THIS(vertex_element.UpdateNode(p_node, p_node), "Element (0) does not have Node (4)!");
         vertex_element.UpdateNode(2, p_node);
 
         TS_ASSERT_DELTA(vertex_element.GetNode(2)->rGetLocation()[0], 1.2, 1e-12);
         TS_ASSERT_DELTA(vertex_element.GetNode(2)->rGetLocation()[1], 1.3, 1e-12);
+
+        TS_ASSERT_THROWS_THIS(vertex_element.DeleteNode(nodes[2]), "Node is not in element and cannot be deleted!");
+        vertex_element.DeleteNode(p_node);
+        TS_ASSERT_EQUALS(vertex_element.GetNumNodes(), 3u);
+        TS_ASSERT_EQUALS(vertex_element.GetNodeLocalIndex(4u), UINT_MAX);
 
         // Tidy up
         for (unsigned i=0; i<nodes.size(); ++i)

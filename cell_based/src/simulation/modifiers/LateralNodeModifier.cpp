@@ -132,10 +132,6 @@ void LateralNodeModifier::UpdateCellData(AbstractCellPopulation<3, 3>& rCellPopu
                 const std::set<unsigned>& elem_24 = p_small_triangular_face->rFaceGetContainingElementIndices();
                 const std::set<unsigned>& elem_a_124 = p_node_a->rGetContainingElementIndices();
                 const std::set<unsigned>& elem_b_234 = p_node_b->rGetContainingElementIndices();
-                MARK;
-                PRINT_CONTAINER(elem_24);
-                PRINT_CONTAINER(elem_a_124);
-                PRINT_CONTAINER(elem_b_234);
 
                 if (elem_24.size() == 0 || elem_24.size() > 2)
                 {
@@ -269,9 +265,6 @@ void LateralNodeModifier::UpdateCellData(AbstractCellPopulation<3, 3>& rCellPopu
                 {
                     case 1:
                     {
-                        MARK;
-                        PRINT_VARIABLE(elems[1]->GetIndex());
-
                         p_face->FaceAddNode(p_node_b, p_face->GetNumNodes() - 1);
                         FaceRearrangeNodesInMesh(p_mesh, p_face);
                         p_elem->AddNode(p_node_b, p_elem->GetNumNodes() - 1);
@@ -279,9 +272,6 @@ void LateralNodeModifier::UpdateCellData(AbstractCellPopulation<3, 3>& rCellPopu
                     }
                     case 2:
                     {
-                        MARK;
-                        PRINT_VARIABLE(elems[2]->GetIndex());
-
                         p_face->FaceDeleteNode(p_node_b);
                         p_elem->DeleteNode(p_node_b);
                         p_elem->DeleteFace(p_small_triangular_face);
@@ -289,9 +279,6 @@ void LateralNodeModifier::UpdateCellData(AbstractCellPopulation<3, 3>& rCellPopu
                     }
                     case 3:
                     {
-                        MARK;
-                        PRINT_VARIABLE(elems[3]->GetIndex());
-
                         p_face->FaceAddNode(p_node_a, p_face->GetNumNodes() - 1);
                         FaceRearrangeNodesInMesh(p_mesh, p_face);
                         p_elem->AddNode(p_node_a, p_elem->GetNumNodes() - 1);
@@ -299,9 +286,6 @@ void LateralNodeModifier::UpdateCellData(AbstractCellPopulation<3, 3>& rCellPopu
                     }
                     case 4:
                     {
-                        MARK;
-                        PRINT_VARIABLE(elems[4]->GetIndex());
-
                         p_face->FaceDeleteNode(p_node_a);
                         p_elem->DeleteNode(p_node_a);
                         p_elem->DeleteFace(p_small_triangular_face);

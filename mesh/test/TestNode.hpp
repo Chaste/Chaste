@@ -200,6 +200,7 @@ public:
 
         TS_ASSERT_THROWS_THIS(node.RemoveElement(256),"Tried to remove an element index(256) from node(0) which was not in the set");
         TS_ASSERT_THROWS_THIS(node.RemoveBoundaryElement(256),"Tried to remove an element index(256) from node(0) which was not in the set");
+        TS_ASSERT_THROWS_THIS(node.RemoveFace(256),"Tried to remove a face index(256) from node(0) which was not in the set");
     }
 
     void TestNodeWithAttributes() throw (Exception)

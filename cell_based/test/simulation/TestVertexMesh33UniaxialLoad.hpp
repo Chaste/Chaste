@@ -122,7 +122,7 @@ public:
             // CellsGenerator<NoCellCycleModel, 3> cells_generator;
             // cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
             // VertexBasedCellPopulation<3> cell_population(*p_mesh, cells);
-            
+
             // OffLatticeSimulation<3> simulator(cell_population);
             // simulator.SetOutputDirectory(output_filename);
             // simulator.SetSamplingTimestepMultiple(10);
@@ -158,7 +158,7 @@ public:
             // CellsGenerator<NoCellCycleModel, 3> cells_generator;
             // cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
             // VertexBasedCellPopulation<3> cell_population(*p_mesh, cells);
-            
+
             // OffLatticeSimulation<3> simulator(cell_population);
             // simulator.SetOutputDirectory(output_filename);
             // simulator.SetSamplingTimestepMultiple(10);
@@ -194,7 +194,7 @@ public:
             // CellsGenerator<NoCellCycleModel, 3> cells_generator;
             // cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
             // VertexBasedCellPopulation<3> cell_population(*p_mesh, cells);
-            
+
             // OffLatticeSimulation<3> simulator(cell_population);
             // simulator.SetOutputDirectory(output_filename);
             // simulator.SetSamplingTimestepMultiple(10);
@@ -377,56 +377,6 @@ public:
         p_force3->SetVolumeParameters(350, target_volume / 2);
         simulator.Solve();
         TS_ASSERT_DELTA(p_mesh->GetVolumeOfElement(0), target_volume / 2, 0.05);
-    }
-
-    void TestAsynchronousT1()
-    {
-        /*
-         * Using 3 rows of hexagonal cell to test. See output files.
-         */
-        std::string output_filename = "TestAsynchronousT1/SecondTest";
-        const double end_time = 1;
-
-        HexagonalPrism3dVertexMeshGenerator generator(4, 3, target_area, z_height);
-        MutableVertexMesh<3, 3>* p_mesh = generator.GetMesh();
-
-        p_mesh->GetNode(16)->rGetModifiableLocation()[1] = 1.4;
-        p_mesh->GetNode(21)->rGetModifiableLocation()[1] = 1.7;
-        p_mesh->SetCellRearrangementThreshold(0.40);
-
-        p_mesh->ReMesh();
-        p_mesh->SetCellRearrangementThreshold(0.01);
-        p_mesh->SetCellRearrangementRatio(1.5);
-
-        std::vector<CellPtr> cells;
-        CellsGenerator<NoCellCycleModel, 3> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
-        VertexBasedCellPopulation<3> cell_population(*p_mesh, cells);
-
-        OffLatticeSimulation<3> simulator(cell_population);
-        simulator.SetOutputDirectory(output_filename);
-        simulator.SetSamplingTimestepMultiple(1);
-        simulator.SetEndTime(end_time);
-
-        MAKE_PTR(GeneralMonolayerVertexMeshForce, p_force3);
-        p_force3->SetApicalParameters(2.5, 2.5, 0.7);
-        p_force3->SetBasalParameters(2.5, 2.5, 0.7);
-        p_force3->SetLateralParameter(0, 2.5);
-        p_force3->SetVolumeParameters(400, target_area * z_height);
-        simulator.AddForce(p_force3);
-
-        MAKE_PTR(LateralNodeModifier, p_node_modifier);
-        simulator.AddSimulationModifier(p_node_modifier);
-
-        MAKE_PTR(HorizontalStretchForce<3>, p_force2);
-        p_force2->SetForceMagnitude(1);
-        p_force2->SetRelativeWidth(0.15);
-        simulator.AddForce(p_force2);
-
-        simulator.Solve();
-
-        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 12u);
-        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), end_time, 1e-10);
     }
 };
 
