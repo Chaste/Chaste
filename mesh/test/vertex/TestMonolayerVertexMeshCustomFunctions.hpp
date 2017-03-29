@@ -238,6 +238,30 @@ public:
         }
     }
 
+    void TestGetNextNode()
+    {
+        std::vector<Node<3>*> nodes;
+        nodes.push_back(new Node<3>(1u));
+        nodes.push_back(new Node<3>(0u));
+
+        VertexElement<3, 3> elem(4u, nodes);
+
+        VertexElement<2, 3> face(5u, nodes);
+
+        for (unsigned i = 0; i < 2; ++i)
+        {
+            TS_ASSERT_EQUALS(GetNextNode(i, &elem)->GetIndex(), i);
+            TS_ASSERT_EQUALS(GetNextNode(nodes[i], &elem)->GetIndex(), i);
+            TS_ASSERT_EQUALS(GetNextNode(i, &face)->GetIndex(), i);
+            TS_ASSERT_EQUALS(GetNextNode(nodes[i], &face)->GetIndex(), i);
+        }
+
+        for (unsigned i = 0; i < 2; ++i)
+        {
+            delete nodes[i];
+        }
+    }
+
     void SomeForce(MutableVertexMesh<3, 3>& vertex_mesh, double dt = 0.1)
     {
         c_vector<double, 3> force = zero_vector<double>(3);

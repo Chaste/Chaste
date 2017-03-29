@@ -55,7 +55,7 @@ void MisraForce::AddForceContribution(AbstractCellPopulation<3>& rCellPopulation
     ///\todo check whether this line influences profiling tests - if so, we should remove it.
     if (dynamic_cast<VertexBasedCellPopulation<3>*>(&rCellPopulation) == NULL)
     {
-        EXCEPTION("MisraForce is to be used with a VertexBasedCellPopulation only");
+        EXCEPTION("MisraForce is to be used with a VertexBasedCellPopulation only"); //LCOV_EXCL_LINE
     }
 
     // Define some helper variables

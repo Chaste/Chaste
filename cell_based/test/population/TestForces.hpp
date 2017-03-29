@@ -69,6 +69,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FileComparison.hpp"
 #include "SimpleTargetAreaModifier.hpp"
 #include "OffLatticeSimulation.hpp"
+#include "GeneralMonolayerVertexMeshForce.hpp"
 
 #include "PetscSetupAndFinalize.hpp"
 
@@ -2179,7 +2180,7 @@ public:
         }
     }
 
-    void TestMisraForceMethods() throw (Exception)
+    void TestMisraForceMethods() throw(Exception)
     {
         // This is the same test as for other vertex based forces. It comprises a sanity check that forces point in the right direction.
         // Construct a 3D vertex mesh consisting of a single element
@@ -2189,14 +2190,14 @@ public:
         double z_height = 1.0;
         std::vector<double> angles = std::vector<double>(num_nodes);
 
-        for (unsigned i=0; i<num_nodes; i++)
+        for (unsigned i = 0; i < num_nodes; i++)
         {
-            angles[i] = M_PI+2.0*M_PI*(double)(i)/(double)(num_nodes);
-            Node<3>* tmp_lower = new Node<3>(i, true, cos(angles[i]), sin(angles[i]), -z_height/2);
+            angles[i] = M_PI + 2.0 * M_PI * (double)(i) / (double)(num_nodes);
+            Node<3>* tmp_lower = new Node<3>(i, true, cos(angles[i]), sin(angles[i]), -z_height / 2);
             tmp_lower->AddNodeAttribute(1.1);
             lower_nodes.push_back(tmp_lower);
 
-            Node<3>* tmp_upper = new Node<3>(i+num_nodes, true, cos(angles[i]), sin(angles[i]), z_height/2);
+            Node<3>* tmp_upper = new Node<3>(i + num_nodes, true, cos(angles[i]), sin(angles[i]), z_height / 2);
             tmp_upper->AddNodeAttribute(2.1);
             upper_nodes.push_back(tmp_upper);
         }
@@ -2213,16 +2214,16 @@ public:
         faces_orientation.push_back(true);
 
         // Creating the upper face
-        VertexElement<2,3>* p_upper_face = new VertexElement<2,3>(faces.size(), upper_nodes);
+        VertexElement<2, 3>* p_upper_face = new VertexElement<2, 3>(faces.size(), upper_nodes);
         p_upper_face->AddElementAttribute(2.1);
         faces.push_back(p_upper_face);
         faces_orientation.push_back(false);
 
         // Creating all the lateral faces in CCW
-        for (unsigned local_node_index=0; local_node_index<num_nodes; ++local_node_index )
+        for (unsigned local_node_index = 0; local_node_index < num_nodes; ++local_node_index)
         {
             unsigned current_node_index = lower_nodes[local_node_index]->GetIndex();
-            unsigned next_node_index = lower_nodes[(local_node_index+1) % num_nodes]->GetIndex();
+            unsigned next_node_index = lower_nodes[(local_node_index + 1) % num_nodes]->GetIndex();
 
             // Create new lateral rectangular face
             std::vector<Node<3>*> nodes_of_lateral_face;
@@ -2241,110 +2242,191 @@ public:
         }
 
         VertexElement<3, 3>* p_elem = new VertexElement<3, 3>(0, faces, faces_orientation);
-        std::vector<VertexElement<3,3>*> elements;
+        std::vector<VertexElement<3, 3>*> elements;
         elements.push_back(p_elem);
 
-        for (unsigned upper_running_index=0; upper_running_index<num_nodes; ++upper_running_index)
+        for (unsigned upper_running_index = 0; upper_running_index < num_nodes; ++upper_running_index)
         {
             lower_nodes.push_back(upper_nodes[upper_running_index]);
         }
 
-         MutableVertexMesh<3,3> mesh(lower_nodes, elements);
+        MutableVertexMesh<3, 3> mesh(lower_nodes, elements);
 
-         // Set up the cell
-         std::vector<CellPtr> cells;
-//         MAKE_PTR(WildTypeCellMutationState, p_state);
-//         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-
-//         FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
-//         CellPtr p_cell(new Cell(p_state, p_model));
-//         p_cell->SetCellProliferativeType(p_diff_type);
-//         p_cell->SetBirthTime(-1.0);
-//         cells.push_back(p_cell);
-
-         // Create cell population
-         VertexBasedCellPopulation<3> cell_population(mesh, cells, false, false);
-         cell_population.InitialiseCells();
-
-         // Create a force system
-         MisraForce force;
-
-         // Test get/set methods
-         TS_ASSERT_DELTA(force.GetVolumeCompressibilityParameter(), 100, 1e-12);
-         TS_ASSERT_DELTA(force.GetLateralSurfaceEnergyParameter(), 2.0, 1e-12);
-         TS_ASSERT_DELTA(force.GetApicalLineTensionParameter(), 1.0 , 1e-12);
-         TS_ASSERT_DELTA(force.GetBasalSurfaceEnergyParameter(), 0.98, 1e-12);
-         TS_ASSERT_DELTA(force.mTargetVolume, 1.0, 1e-12); // for time being
-
-         force.SetVolumeCompressibilityParameter(5.8);
-         force.SetLateralSurfaceEnergyParameter(17.9);
-         force.SetApicalLineTensionParameter(0.5);
-         force.SetBasalSurfaceEnergyParameter(120);
-
-
-         TS_ASSERT_DELTA(force.GetVolumeCompressibilityParameter(), 5.8, 1e-12);
-         TS_ASSERT_DELTA(force.GetLateralSurfaceEnergyParameter(), 17.9, 1e-12);
-         TS_ASSERT_DELTA(force.GetApicalLineTensionParameter(), 0.5, 1e-12);
-         TS_ASSERT_DELTA(force.GetBasalSurfaceEnergyParameter(), 120, 1e-12);
-
-         force.SetVolumeCompressibilityParameter(1.0);  //value of 1 causes |force| = 0.15224
-         force.SetLateralSurfaceEnergyParameter(1.0);   //value of 1 causes |force| = 0.349798
-         force.SetApicalLineTensionParameter(1.0);      //value of 1 causes |force| = 0.312869
-         force.SetBasalSurfaceEnergyParameter(1.0);     //value of 1 causes |force| = 0.3090
-
-         for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
-         {
-             cell_population.GetNode(i)->ClearAppliedForce();
-         }
-
-         force.AddForceContribution(cell_population);
-
-         // All lower nodes first
-         // The force on each node should be radially inward, with the same magnitude for all nodes
-         double force_magnitude_lower = norm_2(cell_population.GetNode(0)->rGetAppliedForce());
-         for (unsigned i=0; i<num_nodes; i++)
-         {
-             Node<3>* p_node = cell_population.GetNode(i);
-             c_vector<double, 3> force = p_node->rGetAppliedForce();
-             TS_ASSERT_DELTA(norm_2(force), force_magnitude_lower, 1e-4);
-
-             double dot_product = inner_prod(force, p_node->rGetLocation());
-             TS_ASSERT_LESS_THAN( dot_product , 0.0 );
-             TS_ASSERT_LESS_THAN(1,2);
-         }
-
-         // Now all the upper nodes
-         double force_magnitude_upper = norm_2(cell_population.GetNode(num_nodes)->rGetAppliedForce());
-         for (unsigned i=num_nodes; i<num_nodes*2; i++)
-         {
-             Node<3>* p_node = cell_population.GetNode(i);
-             c_vector<double, 3> force = p_node->rGetAppliedForce();
-             TS_ASSERT_DELTA(norm_2(force), force_magnitude_upper, 1e-4);
-
-             double dot_product = inner_prod(force, p_node->rGetLocation());
-             TS_ASSERT_LESS_THAN( dot_product , 0.0 );
-             TS_ASSERT_LESS_THAN(1,2);
-         }
-     }
-
-    void TestMisraForceWithMeshGenerator() throw (Exception)
-    {
-        // Well, just test run. Without actual validation of the value
-        VoronoiPrism3dVertexMeshGenerator generator(3, 2, 5, 3, 100.0);
-        MutableVertexMesh<3,3>* p_mesh = generator.GetMesh();
+        // Set up the cell
         std::vector<CellPtr> cells;
 
-        VertexBasedCellPopulation<3> population(*p_mesh,cells, false, false);
+        // Create cell population
+        VertexBasedCellPopulation<3> cell_population(mesh, cells, false, false);
+        cell_population.InitialiseCells();
 
+        // Create a force system
         MisraForce force;
-        force.AddForceContribution(population);
 
-        HexagonalPrism3dVertexMeshGenerator generator2(1, 1, 1, 3);
-        MutableVertexMesh<3,3>* p_mesh2 = generator2.GetMesh();
+        // Test get/set methods
+        TS_ASSERT_DELTA(force.GetVolumeCompressibilityParameter(), 100, 1e-12);
+        TS_ASSERT_DELTA(force.GetLateralSurfaceEnergyParameter(), 2.0, 1e-12);
+        TS_ASSERT_DELTA(force.GetApicalLineTensionParameter(), 1.0, 1e-12);
+        TS_ASSERT_DELTA(force.GetBasalSurfaceEnergyParameter(), 0.98, 1e-12);
+        TS_ASSERT_DELTA(force.mTargetVolume, 1.0, 1e-12); // for time being
 
-        VertexBasedCellPopulation<3> population2(*p_mesh2,cells, false, false);
+        force.SetVolumeCompressibilityParameter(5.8);
+        force.SetLateralSurfaceEnergyParameter(17.9);
+        force.SetApicalLineTensionParameter(0.5);
+        force.SetBasalSurfaceEnergyParameter(120);
 
-        TS_ASSERT_THROWS_ANYTHING(force.AddForceContribution(population2));
+        TS_ASSERT_DELTA(force.GetVolumeCompressibilityParameter(), 5.8, 1e-12);
+        TS_ASSERT_DELTA(force.GetLateralSurfaceEnergyParameter(), 17.9, 1e-12);
+        TS_ASSERT_DELTA(force.GetApicalLineTensionParameter(), 0.5, 1e-12);
+        TS_ASSERT_DELTA(force.GetBasalSurfaceEnergyParameter(), 120, 1e-12);
+
+        force.SetVolumeCompressibilityParameter(1.0); //value of 1 causes |force| = 0.15224
+        force.SetLateralSurfaceEnergyParameter(1.0); //value of 1 causes |force| = 0.349798
+        force.SetApicalLineTensionParameter(1.0); //value of 1 causes |force| = 0.312869
+        force.SetBasalSurfaceEnergyParameter(1.0); //value of 1 causes |force| = 0.3090
+
+        for (unsigned i = 0; i < cell_population.GetNumNodes(); i++)
+        {
+            cell_population.GetNode(i)->ClearAppliedForce();
+        }
+
+        force.AddForceContribution(cell_population);
+
+        // All lower nodes first
+        // The force on each node should be radially inward, with the same magnitude for all nodes
+        double force_magnitude_lower = norm_2(cell_population.GetNode(0)->rGetAppliedForce());
+        for (unsigned i = 0; i < num_nodes; i++)
+        {
+            Node<3>* p_node = cell_population.GetNode(i);
+            c_vector<double, 3> force = p_node->rGetAppliedForce();
+            TS_ASSERT_DELTA(norm_2(force), force_magnitude_lower, 1e-4);
+
+            double dot_product = inner_prod(force, p_node->rGetLocation());
+            TS_ASSERT_LESS_THAN(dot_product, 0.0);
+        }
+
+        // Now all the upper nodes
+        double force_magnitude_upper = norm_2(cell_population.GetNode(num_nodes)->rGetAppliedForce());
+        for (unsigned i = num_nodes; i < num_nodes * 2; i++)
+        {
+            Node<3>* p_node = cell_population.GetNode(i);
+            c_vector<double, 3> force = p_node->rGetAppliedForce();
+            TS_ASSERT_DELTA(norm_2(force), force_magnitude_upper, 1e-4);
+
+            double dot_product = inner_prod(force, p_node->rGetLocation());
+            TS_ASSERT_LESS_THAN(dot_product, 0.0);
+        }
+
+        force.SetTargetVolume(1234);
+        TS_ASSERT_DELTA(force.mTargetVolume, 1234, 1e-12);
+    }
+
+    void TestMisraForceArchiving() throw(Exception)
+    {
+        EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "MisraForce.arch";
+
+        {
+            MisraForce force;
+
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            // Set member variables
+            force.SetVolumeCompressibilityParameter(1.2);
+            force.SetLateralSurfaceEnergyParameter(4.4);
+            force.SetApicalLineTensionParameter(3.2);
+            force.SetBasalSurfaceEnergyParameter(9.8);
+
+            // Serialize via pointer to most abstract class possible
+            AbstractForce<3>* const p_force = &force;
+            output_arch << p_force;
+        }
+
+        {
+            AbstractForce<3>* p_abstract_force;
+
+            // Create an input archive
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            // Restore from the archive
+            input_arch >> p_abstract_force;
+
+            MisraForce* p_Misra_force = static_cast<MisraForce*>(p_abstract_force);
+
+            // Check member variables have been correctly archived
+            TS_ASSERT_DELTA(p_Misra_force->GetVolumeCompressibilityParameter(), 1.2, 1e-12);
+            TS_ASSERT_DELTA(p_Misra_force->GetLateralSurfaceEnergyParameter(), 4.4, 1e-12);
+            TS_ASSERT_DELTA(p_Misra_force->GetApicalLineTensionParameter(), 3.2, 1e-12);
+            TS_ASSERT_DELTA(p_Misra_force->GetBasalSurfaceEnergyParameter(), 9.8, 1e-12);
+
+            // Tidy up
+            delete p_abstract_force;
+        }
+    }
+
+    void TestGeneralMonolayerVertexMeshForceArchiving() throw(Exception)
+    {
+        EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "GeneralMonolayerVertexMeshForce.arch";
+
+        {
+            GeneralMonolayerVertexMeshForce force;
+
+            TS_ASSERT_DELTA(force.mTargetApicalArea, 0, 1e-12);
+            TS_ASSERT_DELTA(force.mApicalAreaParameter, 0, 1e-12);
+            TS_ASSERT_DELTA(force.mApicalEdgeParameter, 0, 1e-12);
+            TS_ASSERT_DELTA(force.mTargetBasalArea, 0, 1e-12);
+            TS_ASSERT_DELTA(force.mBasalAreaParameter, 0, 1e-12);
+            TS_ASSERT_DELTA(force.mBasalEdgeParameter, 0, 1e-12);
+            TS_ASSERT_DELTA(force.mLateralAreaParameter, 0, 1e-12);
+            TS_ASSERT_DELTA(force.mLateralEdgeParameter, 0, 1e-12);
+            TS_ASSERT_DELTA(force.mTargetVolume, 0, 1e-12);
+            TS_ASSERT_DELTA(force.mVolumeParameter, 0, 1e-12);
+
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            // Set member variables
+            force.SetApicalParameters(11, 12, 13);
+            force.SetBasalParameters(21, 22, 23);
+            force.SetLateralParameter(31, 32);
+            force.SetVolumeParameters(41, 42);
+
+            // Serialize via pointer to most abstract class possible
+            AbstractForce<3>* const p_force = &force;
+            output_arch << p_force;
+        }
+
+        {
+            AbstractForce<3>* p_abstract_force;
+
+            // Create an input archive
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            // Restore from the archive
+            input_arch >> p_abstract_force;
+
+            GeneralMonolayerVertexMeshForce* p_force = static_cast<GeneralMonolayerVertexMeshForce*>(p_abstract_force);
+
+            // Check member variables have been correctly archived
+            TS_ASSERT_DELTA(p_force->mTargetApicalArea, 13, 1e-12);
+            TS_ASSERT_DELTA(p_force->mApicalAreaParameter, 12, 1e-12);
+            TS_ASSERT_DELTA(p_force->mApicalEdgeParameter, 11, 1e-12);
+            TS_ASSERT_DELTA(p_force->mTargetBasalArea, 23, 1e-12);
+            TS_ASSERT_DELTA(p_force->mBasalAreaParameter, 22, 1e-12);
+            TS_ASSERT_DELTA(p_force->mBasalEdgeParameter, 21, 1e-12);
+            TS_ASSERT_DELTA(p_force->mLateralAreaParameter, 32, 1e-12);
+            TS_ASSERT_DELTA(p_force->mLateralEdgeParameter, 31, 1e-12);
+            TS_ASSERT_DELTA(p_force->mTargetVolume, 42, 1e-12);
+            TS_ASSERT_DELTA(p_force->mVolumeParameter, 41, 1e-12);
+
+            // Tidy up
+            delete p_abstract_force;
+        }
     }
 };
 

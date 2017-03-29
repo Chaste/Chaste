@@ -35,7 +35,7 @@ void LateralNodeModifier::UpdateCellData(AbstractCellPopulation<3, 3>& rCellPopu
 
     if (dynamic_cast<MutableVertexMesh<3, 3>*>(p_tmp_mesh) == NULL)
     {
-        EXCEPTION("only for vertex mesh");
+        EXCEPTION("only for vertex mesh"); //LCOV_EXCL_LINE
     }
     MutableVertexMesh<3, 3>* const p_mesh = static_cast<MutableVertexMesh<3, 3>*>(p_tmp_mesh);
 

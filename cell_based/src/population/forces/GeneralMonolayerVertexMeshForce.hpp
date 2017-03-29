@@ -47,6 +47,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class GeneralMonolayerVertexMeshForce : public AbstractForce<3>
 {
 private:
+    friend class TestForces;
+
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
@@ -65,6 +67,7 @@ private:
         archive& mTargetBasalArea;
         archive& mBasalAreaParameter;
         archive& mBasalEdgeParameter;
+        archive& mLateralAreaParameter;
         archive& mLateralEdgeParameter;
         archive& mTargetVolume;
         archive& mVolumeParameter;

@@ -256,7 +256,7 @@ void GeneralMonolayerVertexMeshForce::OutputForceParameters(out_stream& rParamsF
     *rParamsFile << "\t\t\t<TargetBasalArea>" << mTargetBasalArea << "</TargetBasalArea>\n";
     *rParamsFile << "\t\t\t<BasalAreaParameter>" << mBasalAreaParameter << "</BasalAreaParameter>\n";
     *rParamsFile << "\t\t\t<BasalEdgeParameter>" << mBasalEdgeParameter << "</BasalEdgeParameter>\n";
-
+    *rParamsFile << "\t\t\t<LateralAreaParameter>" << mLateralAreaParameter << "</LateralAreaParameter>\n";
     *rParamsFile << "\t\t\t<LateralEdgeParameter>" << mLateralEdgeParameter << "</LateralEdgeParameter>\n";
     *rParamsFile << "\t\t\t<TargetVolume>" << mTargetVolume << "</TargetVolume>\n";
     *rParamsFile << "\t\t\t<VolumeParameter>" << mVolumeParameter << "</VolumeParameter>\n";
