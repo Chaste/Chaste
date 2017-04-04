@@ -212,7 +212,7 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
         double node_spacing = perimeter / numNodesPerCell;
 
         // The height of the lamina is offset by a proportion of the cell height
-        double lam_hight = y_offset[1] + 1.05 * cell_height;
+        double lam_hight = y_offset[1] + cell_height;
 
         unsigned num_lamina_nodes = static_cast<unsigned>(floor(1.0 / node_spacing));
 
