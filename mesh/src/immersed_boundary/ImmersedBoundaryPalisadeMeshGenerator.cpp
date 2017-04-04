@@ -173,12 +173,12 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
     {
         // Aim to give the lamina roughly the same node-spacing as the other cells
         double perimeter = 2.0 * (cell_height + cell_width);
-        double node_spacing = perimeter / (double)numNodesPerCell;
+        double node_spacing = perimeter / numNodesPerCell;
 
         // The height of the lamina is offset by a proportion of the cell height
         double lam_hight = y_offset[1] - 0.05 * cell_height;
 
-        unsigned num_lamina_nodes = (unsigned)floor(1.0 / node_spacing);
+        unsigned num_lamina_nodes = static_cast<unsigned>(floor(1.0 / node_spacing));
 
         std::vector<Node<2>*> nodes_this_elem;
 
@@ -207,8 +207,32 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
             EXCEPTION("Currently no random y variation allowed with an apical lamina");
         }
 
-        //\todo: implement this
-        NEVER_REACHED;
+        // Aim to give the lamina roughly the same node-spacing as the other cells
+        double perimeter = 2.0 * (cell_height + cell_width);
+        double node_spacing = perimeter / numNodesPerCell;
+
+        // The height of the lamina is offset by a proportion of the cell height
+        double lam_hight = y_offset[1] + 1.05 * cell_height;
+
+        unsigned num_lamina_nodes = static_cast<unsigned>(floor(1.0 / node_spacing));
+
+        std::vector<Node<2>*> nodes_this_elem;
+
+        for (unsigned node_idx = 0; node_idx < num_lamina_nodes; node_idx++)
+        {
+            // Calculate location of node
+            c_vector<double, 2> location = lam_hight * y_unit + ( 0.5 / num_lamina_nodes + double(node_idx) / num_lamina_nodes ) * x_unit;
+
+            // Create the new node
+            Node<2>* p_node = new Node<2>(node_idx, location, true);
+            p_node->SetRegion(LAMINA_REGION);
+
+            nodes.push_back(p_node);
+            nodes_this_elem.push_back(p_node);
+        }
+
+        // Create the lamina element
+        ib_laminas.push_back(new ImmersedBoundaryElement<1,2>(1, nodes_this_elem));
     }
 
     RandomNumberGenerator* p_rand_gen = RandomNumberGenerator::Instance();
