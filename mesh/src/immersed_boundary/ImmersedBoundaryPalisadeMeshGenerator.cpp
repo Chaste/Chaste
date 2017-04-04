@@ -188,7 +188,7 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
             c_vector<double, 2> location = lam_hight * y_unit + ( 0.5 / num_lamina_nodes + double(node_idx) / num_lamina_nodes ) * x_unit;
 
             // Create the new node
-            Node<2>* p_node = new Node<2>(node_idx, location, true);
+            Node<2>* p_node = new Node<2>(nodes.size(), location, true);
             p_node->SetRegion(LAMINA_REGION);
 
             nodes.push_back(p_node);
@@ -224,7 +224,7 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
             c_vector<double, 2> location = lam_hight * y_unit + ( 0.5 / num_lamina_nodes + double(node_idx) / num_lamina_nodes ) * x_unit;
 
             // Create the new node
-            Node<2>* p_node = new Node<2>(node_idx, location, true);
+            Node<2>* p_node = new Node<2>(nodes.size(), location, true);
             p_node->SetRegion(LAMINA_REGION);
 
             nodes.push_back(p_node);
