@@ -58,8 +58,8 @@ void AdditiveNormalLocationModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopu
     {
         c_vector<double, DIM>& r_location = rCellPopulation.GetNode(node_idx)->rGetModifiableLocation();
 
-        r_location[0] += p_gen->NormalRandomDeviate(mMean, mStdDev);
-        r_location[1] += p_gen->NormalRandomDeviate(mMean, mStdDev);
+        r_location[0] = fmod(r_location[0] + p_gen->NormalRandomDeviate(mMean, mStdDev) + 1.0, 1.0);
+        r_location[1] = fmod(r_location[1] + p_gen->NormalRandomDeviate(mMean, mStdDev) + 1.0, 1.0);
     }
 }
 
