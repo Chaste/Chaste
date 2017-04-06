@@ -240,7 +240,13 @@ endif()
 
 #Locate VTK
 if (Chaste_USE_VTK)
-    find_package(VTK REQUIRED)
+    find_package(VTK COMPONENTS
+                 vtkCommonCore
+                 vtkFiltersGeneric
+                 vtkFiltersGeometry
+                 vtkFiltersModeling
+                 vtkIOLegacy
+                 vtkIOParallelXML)
     add_definitions(-DCHASTE_VTK)
 endif()
 
