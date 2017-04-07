@@ -1047,7 +1047,8 @@ bool MutableMesh<ELEMENT_DIM, SPACE_DIM>::CheckIsVoronoi(Element<ELEMENT_DIM, SP
          it != neighbouring_nodes_indices.end();
          ++it)
     {
-        c_vector<double, ELEMENT_DIM> node_location = this->GetNode(*it)->rGetLocation();
+        c_vector<double, ELEMENT_DIM> node_location;
+        node_location = this->GetNode(*it)->rGetLocation();
 
         // Calculate vector from circumcenter to node
         node_location -= circum_centre;
