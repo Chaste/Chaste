@@ -115,6 +115,15 @@ private:
     /** Normalising constant needed for FFT */
     double mFftNorm;
 
+    /** Whether to apply multiplicative normal noise to the calculated force */
+    bool mMultiplicativeNormalNoise;
+
+    /** The mean of the Normal distribution from which random noise variations are drawn */
+    double mNormalNoiseMean;
+
+    /** The standard deviation of the Normal distribution from which random noise variations are drawn */
+    double mNormalNoiseStdDev;
+
     /** A box collection to efficiently keep track of node neighbours */
     ObsoleteBoxCollection<DIM>* mpBoxCollection;
 
@@ -289,6 +298,24 @@ public:
      * @return #mReynoldsNumber
      */
     double GetReynoldsNumber();
+
+    /** @return mMultiplicativeNormalNoise */
+    bool GetMultiplicativeNormalNoise() const;
+
+    /** @param multiplicativeNormalNoise whether to include multiplicative normal noise */
+    void SetMultiplicativeNormalNoise(bool multiplicativeNormalNoise);
+
+    /** @return mNormalNoiseMean */
+    double GetNormalNoiseMean() const;
+
+    /** @param normalNoiseMean the new value of mNormalNoiseMean */
+    void SetNormalNoiseMean(double normalNoiseMean);
+
+    /** @return mNormalNoiseStdDev */
+    double GetNormalNoiseStdDev() const;
+
+    /** @param normalNoiseStdDev the new value of mNormalNoiseStdDev */
+    void SetNormalNoiseStdDev(double normalNoiseStdDev);
 };
 
 #include "SerializationExportWrapper.hpp"
