@@ -259,13 +259,23 @@ endif()
 
 #Locate VTK
 if (Chaste_USE_VTK)
-    find_package(VTK COMPONENTS
-                 vtkCommonCore
-                 vtkFiltersGeneric
-                 vtkFiltersGeometry
-                 vtkFiltersModeling
-                 vtkIOLegacy
-                 vtkIOParallelXML)
+    # First pass will identify the version number
+    find_package(VTK REQUIRED)
+    message("-- VTK version: ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}")
+
+    # Depending on the VTK version, we need different components. 5.x require the following
+    if(VTK_MAJOR_VERSION EQUAL 5)
+        find_package(VTK COMPONENTS vtkIO vtkCommon vtkGraphics z REQUIRED)
+    # 6.0 and 6.1 require the following
+    elseif( (VTK_MAJOR_VERSION EQUAL 6) AND (VTK_MINOR_VERSION LESS 2) )
+        find_package(VTK COMPONENTS vtkCommonCore vtkFiltersGeneric vtkFiltersGeometry vtkFiltersModeling vtkIOLegacy
+                                    vtkIOXML REQUIRED)
+    # 6.2 and up, up to and including 7.1, require the following
+    else()
+        find_package(VTK COMPONENTS vtkCommonCore vtkFiltersGeneric vtkFiltersGeometry vtkFiltersModeling vtkIOLegacy
+                                    vtkIOParallelXML REQUIRED)
+    endif()
+
     add_definitions(-DCHASTE_VTK)
 endif()
 
