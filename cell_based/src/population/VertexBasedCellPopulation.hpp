@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -38,14 +38,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractOffLatticeCellPopulation.hpp"
 #include "MutableVertexMesh.hpp"
-#include "AbstractVertexBasedDivisionRule.hpp"
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/set.hpp>
 #include <boost/serialization/vector.hpp>
 
-template<unsigned DIM> class AbstractVertexBasedDivisionRule; // Circular definition thing.
+template<unsigned DIM>
+class AbstractVertexBasedDivisionRule; // Forward declaration to prevent circular include chain
 
 /**
  * A facade class encapsulating a vertex-based cell population.

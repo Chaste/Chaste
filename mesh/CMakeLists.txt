@@ -8,3 +8,5 @@ set_source_files_properties(src/3rdparty/tetgen1.4.2/predicates.cpp
     PROPERTIES COMPILE_FLAGS "-Wno-error -O0")
 set_source_files_properties(src/3rdparty/tetgen1.4.2/tetgen.cpp 
     PROPERTIES COMPILE_FLAGS "-Wno-error -O0")
+set_source_files_properties(src/3rdparty/triangle/triangle.cpp
+        PROPERTIES COMPILE_FLAGS "-Wno-error -O0")

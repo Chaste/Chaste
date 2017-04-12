@@ -1,7 +1,9 @@
 TestDistributedTetrahedralMesh.hpp
 TestDistributedQuadraticMesh.hpp
 TestMixedDimensionMesh.hpp
+TestNodesOnlyMesh.hpp
 utilities/TestPerElementWriter.hpp
+utilities/TestDistanceMapCalculator.hpp
 utilities/TestDistributedBoxCollection.hpp
 writer/TestXmlMeshWriters.hpp
 

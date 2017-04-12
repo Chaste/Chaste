@@ -93,7 +93,7 @@ macro(Chaste_DO_CELLML output_sources cellml_file dynamic)
         set(depends ${depends} ${cellml_dir}/${cellml_file_name}-conf.xml)
         set(pycml_args ${pycml_args} "--conf=${cellml_dir}/${cellml_file_name}-conf.xml")
     endif()
-    execute_process(COMMAND "${PYTHON_EXECUTABLE}" ${Chaste_PYTHON_DIR}/ConvertCellModel.py ${pycml_args} --show-outputs ${cellml_file}   
+    execute_process(COMMAND "${PYTHON_EXECUTABLE}" ${Chaste_PYTHON_DIR}/ConvertCellModel.py ${pycml_args} ${Chaste_PYCML_EXTRA_ARGS} --show-outputs ${cellml_file}   
         OUTPUT_VARIABLE ConvertCellModelDepends
         OUTPUT_STRIP_TRAILING_WHITESPACE
         )

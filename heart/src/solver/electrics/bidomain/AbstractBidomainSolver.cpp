@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -73,34 +73,10 @@ void AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolve(Vec initi
 
     this->mpLinearSystem->SetKspType(HeartConfig::Instance()->GetKSPSolver());
 
-    /// \todo: block preconditioners only make sense in Bidomain... Add some warning/error message
-    if (std::string("twolevelsblockdiagonal") == std::string(HeartConfig::Instance()->GetKSPPreconditioner()))
-    {
-        /// \todo: #1082 only works if you know about the whole mesh.
-        TetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* p_mesh = dynamic_cast<TetrahedralMesh<ELEMENT_DIM,SPACE_DIM>*>(this->mpMesh);
-        if (p_mesh && PetscTools::IsSequential())
-        {
-            boost::shared_ptr<std::vector<PetscInt> > p_bath_nodes(new std::vector<PetscInt>());
-
-            for (unsigned node_index=0; node_index<this->mpMesh->GetNumNodes(); node_index++)
-            {
-                if (HeartRegionCode::IsRegionBath( this->mpMesh->GetNode(node_index)->GetRegion() ))
-                {
-                    p_bath_nodes->push_back(node_index);
-                }
-            }
-
-            this->mpLinearSystem->SetPcType(HeartConfig::Instance()->GetKSPPreconditioner(), p_bath_nodes);
-        }
-        else
-        {
-            TERMINATE("Two levels block diagonal only works with TetrahedralMesh and p=1"); // LCOV_EXCL_LINE
-        }
-    }
-    else
-    {
-        this->mpLinearSystem->SetPcType(HeartConfig::Instance()->GetKSPPreconditioner());
-    }
+    // Note that twolevelblockdiagonal was never finished.  It was a preconditioner specific to the Parabolic-Parabolic formulation of Bidomain
+    // Two levels block diagonal only worked in serial with TetrahedralMesh.
+    assert(std::string(HeartConfig::Instance()->GetKSPPreconditioner()) != std::string("twolevelsblockdiagonal") );
+    this->mpLinearSystem->SetPcType(HeartConfig::Instance()->GetKSPPreconditioner());
 
     if (mRowForAverageOfPhiZeroed==INT_MAX)
     {

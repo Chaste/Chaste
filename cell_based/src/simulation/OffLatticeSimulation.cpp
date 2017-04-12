@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -87,6 +87,12 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 const boost::shared_ptr<AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM> > OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::GetNumericalMethod() const
 {
     return mpNumericalMethod;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+const std::vector<boost::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > >& OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::rGetForceCollection() const
+{
+    return mForceCollection;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

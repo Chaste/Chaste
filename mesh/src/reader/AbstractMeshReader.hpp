@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -233,16 +233,6 @@ public:
     {
     public:
         /**
-         * Default constructor for an iterator that doesn't point to anything.
-         */
-        ElementIterator()
-            : mIndex(UNSIGNED_UNSET),
-              mpIndices(NULL),
-              mpReader(NULL)
-        {
-        }
-
-        /**
          * Constructor for pointing to a specific item.
          *
          * Note that, in the case of an ASCII mesh file, this will actually
@@ -369,16 +359,6 @@ public:
                                                        boost::single_pass_traversal_tag>
     {
     public:
-        /**
-         * Default constructor for an iterator that doesn't point to anything.
-         */
-        NodeIterator()
-            : mIndex(UNSIGNED_UNSET),
-              mpIndices(NULL),
-              mpReader(NULL)
-        {
-        }
-
         /**
          * Constructor for pointing to a specific item.
          *

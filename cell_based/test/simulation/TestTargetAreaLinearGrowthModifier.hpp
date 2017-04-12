@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -64,29 +64,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestTargetAreaLinearGrowthModifier : public AbstractCellBasedTestSuite
 {
 public:
-    void TestSetupSolveException() throw (Exception)
-    {
-        // First set up SimulationTime (this is usually handled by a simulation object)
-        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
-
-        // Create a TargetAreaLinearGrowthModifier
-        MAKE_PTR(TargetAreaLinearGrowthModifier<2>, p_modifier);
-
-        // Create a cell population whose type should not be used with a TargetAreaLinearGrowthModifier
-        HoneycombMeshGenerator generator(4, 4, 0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
-
-        std::vector<CellPtr> cells;
-        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
-
-        MeshBasedCellPopulation<2> population(*p_mesh, cells);
-
-        // Test that the correct exception is thrown if we try to call UpdateTargetAreas() on the population
-        TS_ASSERT_THROWS_THIS(p_modifier->SetupSolve(population, "unused_argument"),
-                "AbstractTargetAreaModifiers are to be used with a VertexBasedCellPopulation only");
-        CellBasedEventHandler::Reset(); // Otherwise logging has been started but not stopped due to exception above
-    }
 
     void TestNonPhaseBasedCellCycleModelMethodsAndExceptions() throw (Exception)
     {

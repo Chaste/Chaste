@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -69,5 +69,5 @@ AbstractTetrahedralMesh<1,3>* AbstractAcinarUnitFactory::GetMesh()
     {
         EXCEPTION("The mesh object has not been set in the acinar unit factory");
     }
-    return mpMesh;
+    return mpMesh;  // LCOV_EXCL_LINE // Avoid compiler warning
 }

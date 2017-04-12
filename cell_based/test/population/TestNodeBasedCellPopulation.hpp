@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -86,7 +86,7 @@ class TestNodeBasedCellPopulation : public AbstractCellBasedTestSuite
 private:
 
     template<unsigned DIM>
-    void TestSimpleNodeBasedCellPopulation(std::string meshFilename)
+    void DimensionTestSimpleNodeBasedCellPopulation(std::string meshFilename)
     {
         // Create a simple mesh
         TrianglesMeshReader<DIM,DIM> mesh_reader(meshFilename);
@@ -138,9 +138,9 @@ public:
     // Test construction, accessors and Iterator
     void TestNodeBasedCellPopulation1d2d3d() throw(Exception)
     {
-        TestSimpleNodeBasedCellPopulation<1>("mesh/test/data/1D_0_to_1_10_elements");
-        TestSimpleNodeBasedCellPopulation<2>("mesh/test/data/square_4_elements");
-        TestSimpleNodeBasedCellPopulation<3>("mesh/test/data/cube_136_elements");
+        DimensionTestSimpleNodeBasedCellPopulation<1>("mesh/test/data/1D_0_to_1_10_elements");
+        DimensionTestSimpleNodeBasedCellPopulation<2>("mesh/test/data/square_4_elements");
+        DimensionTestSimpleNodeBasedCellPopulation<3>("mesh/test/data/cube_136_elements");
     }
 
     void TestOtherNodeBasedCellPopulationConstructor()
@@ -605,6 +605,15 @@ public:
         // Create a cell population
         NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
 
+        // Check that the master owns all the nodes (the box size is bigger than the mesh)
+        if (PetscTools::AmMaster())
+        {
+            TS_ASSERT_EQUALS(mesh.GetNumNodes(), 81u);
+        }
+        else
+        {
+            TS_ASSERT_EQUALS(mesh.GetNumNodes(), 0u);
+        }
         // Make one cell start apoptosis
         if (PetscTools::AmMaster())
         {
@@ -613,8 +622,13 @@ public:
 
         node_based_cell_population.Update();
 
-        TS_ASSERT_EQUALS(node_based_cell_population.IsPdeNodeAssociatedWithNonApoptoticCell(0), false);
-        TS_ASSERT_EQUALS(node_based_cell_population.IsPdeNodeAssociatedWithNonApoptoticCell(1), true);
+        // Note that the cells are only on the master process
+        if (PetscTools::AmMaster())
+        {
+            TS_ASSERT_EQUALS(node_based_cell_population.IsPdeNodeAssociatedWithNonApoptoticCell(0), false);
+            unsigned next_cell_id = PetscTools::GetNumProcs(); // Parallel code uses modular arithmetic to assign cell IDs
+            TS_ASSERT_EQUALS(node_based_cell_population.IsPdeNodeAssociatedWithNonApoptoticCell(next_cell_id), true);
+        }
 
         unsigned num_removed;
         boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
@@ -1562,6 +1576,8 @@ public:
 
     void TestGetTetrahedralMeshForPdeModifier() throw(Exception)
     {
+        EXIT_IF_PARALLEL;  // The population.GetTetrahedralMeshForPdeModifier() method does not yet work in parallel.
+
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
         TetrahedralMesh<2,2> generating_mesh;
         generating_mesh.ConstructFromMeshReader(mesh_reader);
@@ -1610,13 +1626,20 @@ public:
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
 
         std::string var_name = "foo";
-        TS_ASSERT_THROWS_THIS(cell_population.GetCellDataItemAtPdeNode(0,var_name),
-            "The item foo is not stored");
+        if (PetscTools::AmMaster())
+        {
+            TS_ASSERT_THROWS_THIS(cell_population.GetCellDataItemAtPdeNode(0,var_name),
+                    "The item foo is not stored");
 
         cell_population.GetCellUsingLocationIndex(0)->GetCellData()->SetItem(var_name, 3.14);
 
         TS_ASSERT_DELTA(cell_population.GetCellDataItemAtPdeNode(0,var_name), 3.14, 1e-6);
-
+        }
+        else
+        {
+            TS_ASSERT_THROWS_THIS(cell_population.GetCellDataItemAtPdeNode(0,var_name),
+                                "Location index input argument does not correspond to a Cell");
+        }
         // Coverage of GetOutputResultsForChasteVisualizer()
         TS_ASSERT_EQUALS(cell_population.GetOutputResultsForChasteVisualizer(), true);
     }

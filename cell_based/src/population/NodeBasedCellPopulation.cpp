@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -93,6 +93,9 @@ const NodesOnlyMesh<DIM>& NodeBasedCellPopulation<DIM>::rGetMesh() const
 template<unsigned DIM>
 TetrahedralMesh<DIM, DIM>* NodeBasedCellPopulation<DIM>::GetTetrahedralMeshForPdeModifier()
 {
+    // Note that this code does not yet work in parallel.
+    assert(PetscTools::IsSequential());
+
     std::vector<Node<DIM>*> temp_nodes;
 
     // Get the nodes of mpNodesOnlyMesh

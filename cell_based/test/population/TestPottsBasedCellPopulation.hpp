@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -66,7 +66,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellProliferativePhasesCountWriter.hpp"
 #include "CellProliferativeTypesCountWriter.hpp"
 
-#include "PetscSetupAndFinalize.hpp"
+//This test is always run sequentially (never in parallel)
+#include "FakePetscSetup.hpp"
 
 class TestPottsBasedCellPopulation : public AbstractCellBasedTestSuite
 {
@@ -448,7 +449,6 @@ public:
 
     void TestWriteResultsToFileAndOutputCellPopulationParameters()
     {
-        EXIT_IF_PARALLEL;    // Copying in parallel uses parallel NodesOnlyMesh and will therefore cause unexpected errors.
 
         // Resetting the maximum cell ID to zero (to account for previous tests)
         CellId::ResetMaxCellId();
