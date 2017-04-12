@@ -283,7 +283,7 @@ list(APPEND Chaste_LINK_LIBRARIES "${Boost_LIBRARIES}")
 
 
 #find PETSc
-find_package(PETSc REQUIRED COMPONENTS CXX)
+find_package(PETSc REQUIRED)
 list(APPEND Chaste_LINK_LIBRARIES "${PETSC_LIBRARIES}")
 
 #find HDF5
