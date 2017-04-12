@@ -677,7 +677,6 @@ install(EXPORT chaste-targets
 if (Chaste_COVERAGE)
     # Run ctest with a low priority (+15)
     set(CTEST_COMMAND "nice -n15 ctest -j${Chaste_COVERAGE_CPUS}")
-    message(${CTEST_COMMAND})
     set(_outputname coverage)
 	ADD_CUSTOM_TARGET(coverage
 
@@ -738,7 +737,6 @@ add_custom_target(doxygen_coverage
 if (Chaste_MEMORY_TESTING)
     # Run ctest with a low priority (+15)
     set(CTEST_COMMAND "nice -n15 ctest -j${Chaste_MEMORY_TESTING_CPUS}")
-    message(${CTEST_COMMAND})
     add_custom_target(memtest
         COMMAND ${CTEST_COMMAND} "-L" Continuous "--output-on-failure"
         COMMAND ${PYTHON_EXECUTABLE} "${Chaste_SOURCE_DIR}/cmake/process_valgrind_output.py" "${Chaste_MEMORY_TESTING_OUTPUT_DIR}"
@@ -762,7 +760,6 @@ if (Chaste_PROFILE_GPROF OR Chaste_PROFILE_GPERFTOOLS)
 
     # Run ctest with a high priority (-15) for more consistent results (might need to edit limits.conf)
     set(CTEST_COMMAND "nice -n-15 ctest -j${NUM_CPUS}")
-    message(${CTEST_COMMAND})
     add_custom_target(profile
         COMMAND ${CTEST_COMMAND} "-L" "^Profile$" "--output-on-failure"
         COMMAND ${PYTHON_EXECUTABLE} "${Chaste_SOURCE_DIR}/cmake/process_profile.py" "${Chaste_PROFILE_OUTPUT_DIR}" ${extension}
