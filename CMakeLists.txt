@@ -50,14 +50,33 @@ if (Chaste_VERBOSE AND MSVC)
     set(CMAKE_C_FLAGS ${CMAKE_CXX_FLAGS} "/VERBOSE")
 endif()
 if (UNIX)
+    # Memory testing
     option(Chaste_MEMORY_TESTING "Run tests using valgrind for memory testing" OFF)
     set(Chaste_MEMORY_TESTING_OUTPUT_DIR ${Chaste_BINARY_DIR}/memtest)
+    set(Chaste_MEMORY_TESTING_CPUS 1 CACHE STRING "Number of CPUs for memory testing (default 1)")
+    if (Chaste_MEMORY_TESTING_CPUS GREATER 1)
+        set(Chaste_MEMORY_TESTING ON)
+    endif()
     if (Chaste_MEMORY_TESTING)
         file(MAKE_DIRECTORY ${Chaste_MEMORY_TESTING_OUTPUT_DIR})
     endif()
+    # Coverage
     option(Chaste_COVERAGE "Build Chaste with coverage information" OFF)
+    set(Chaste_COVERAGE_CPUS 1 CACHE STRING "Number of CPUs for coverage testing (default 1)")
+    if (Chaste_COVERAGE_CPUS GREATER 1)
+        set(Chaste_COVERAGE ON)
+    endif()
+    # Profiling
     option(Chaste_PROFILE_GPERFTOOLS "Compile Chaste with gperftools profiling support" OFF)
+    set(Chaste_PROFILE_GPERFTOOLS_CPUS 1 CACHE STRING "Number of CPUs for GPERFTOOLS profiling (default 1)")
+    if (Chaste_PROFILE_GPERFTOOLS_CPUS GREATER 1)
+        set(Chaste_PROFILE_GPERFTOOLS ON)
+    endif()
     option(Chaste_PROFILE_GPROF "Compile Chaste with gprof profiling support" OFF)
+    set(Chaste_PROFILE_GPROF_CPUS 1 CACHE STRING "Number of CPUs for GPROF profiling (default 1)")
+    if (Chaste_PROFILE_GPROF_CPUS GREATER 1)
+        set(Chaste_PROFILE_GPROF ON)
+    endif()
     if (Chaste_PROFILE_GPROF AND Chaste_PROFILE_GPERFTOOLS)
         message(WARNING "Both Chaste_PROFILE_GPROF and Chaste_PROFILE_GPERFTOOLS = ON, using latter by default")
         set(Chaste_PROFILE_GPROF OFF)
@@ -651,14 +670,14 @@ install(EXPORT chaste-targets
         )
 
 
-
 ####################
 #    COVERAGE      #
 ####################
 
 if (Chaste_COVERAGE)
-         
-    set(CTEST_COMMAND ctest)
+    # Run ctest with a low priority (+15)
+    set(CTEST_COMMAND "nice -n15 ctest -j${Chaste_COVERAGE_CPUS}")
+    message(${CTEST_COMMAND})
     set(_outputname coverage)
 	ADD_CUSTOM_TARGET(coverage
 
@@ -717,9 +736,11 @@ add_custom_target(doxygen_coverage
 ####################
 
 if (Chaste_MEMORY_TESTING)
-    set(CTEST_COMMAND ctest)
+    # Run ctest with a low priority (+15)
+    set(CTEST_COMMAND "nice -n15 ctest -j${Chaste_MEMORY_TESTING_CPUS}")
+    message(${CTEST_COMMAND})
     add_custom_target(memtest
-        COMMAND ${CTEST_COMMAND} "-j6" "-L" Continuous "--output-on-failure" 
+        COMMAND ${CTEST_COMMAND} "-L" Continuous "--output-on-failure"
         COMMAND ${PYTHON_EXECUTABLE} "${Chaste_SOURCE_DIR}/cmake/process_valgrind_output.py" "${Chaste_MEMORY_TESTING_OUTPUT_DIR}"
         DEPENDS Continuous
         WORKING_DIRECTORY ${Chaste_BINARY_DIR}
@@ -733,15 +754,19 @@ endif()
 if (Chaste_PROFILE_GPROF OR Chaste_PROFILE_GPERFTOOLS)
     if (Chaste_PROFILE_GPERFTOOLS)
         set(extension gif)
+        set(NUM_CPUS ${Chaste_PROFILE_GPERFTOOLS_CPUS})
     else()
         set(extension gmon)
+        set(NUM_CPUS ${Chaste_PROFILE_GPROF_CPUS})
     endif()
-    
-    set(CTEST_COMMAND ctest)
+
+    # Run ctest with a high priority (-15) for more consistent results (might need to edit limits.conf)
+    set(CTEST_COMMAND "nice -n-15 ctest -j${NUM_CPUS}")
+    message(${CTEST_COMMAND})
     add_custom_target(profile
         COMMAND ${CTEST_COMMAND} "-L" "Profile" "--output-on-failure"
         COMMAND ${PYTHON_EXECUTABLE} "${Chaste_SOURCE_DIR}/cmake/process_profile.py" "${Chaste_PROFILE_OUTPUT_DIR}" ${extension}
-        DEPENDS Profile 
+        DEPENDS Profile
         WORKING_DIRECTORY ${Chaste_BINARY_DIR}
         VERBATIM)
 endif()
