@@ -686,6 +686,9 @@ install(EXPORT chaste-targets
 
 if (Chaste_COVERAGE)
     # Run ctest with a low priority (+15)
+    set(NICE_COMMAND nice)
+    set(NICENESS -n-15)
+    set(CTEST_COMMAND ctest)
     set(CTEST_COMMAND ctest)
     set(_outputname coverage)
 	ADD_CUSTOM_TARGET(coverage
@@ -694,12 +697,7 @@ if (Chaste_COVERAGE)
 		${LCOV_PATH} --directory . --zerocounters
 
 		# Run tests
-        # runs the following, ignoring errors:
-        #    COMMAND ${CTEST_COMMAND} "-L" "Continuous|Parallel" "--output-on-failure" 
-        COMMAND ${CMAKE_COMMAND} 
-            "-DChaste_BINARY_DIR=${Chaste_BINARY_DIR}"
-            "-DCTEST_COMMAND=${CTEST_COMMAND}"
-            "-P" "${Chaste_SOURCE_DIR}/cmake/Modules/ChasteRunCoverageTests.cmake"
+        COMMAND ${NICE_COMMAND} ${NICENESS} ${CTEST_COMMAND} "-j${Chaste_COVERAGE_CPUS}" "-L" "Continuous|Parallel" "--output-on-failure"
             
         # Capturing lcov counters and generating report
         COMMAND ${LCOV_PATH} --config-file ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc --directory . --capture --output-file ${_outputname}.info
