@@ -770,9 +770,9 @@ if (Chaste_PROFILE_GPROF OR Chaste_PROFILE_GPERFTOOLS)
         set(NUM_CPUS ${Chaste_PROFILE_GPROF_CPUS})
     endif()
 
-    # Run ctest with a high priority (-15) for more consistent results (might need to edit limits.conf)
+    # Run ctest with a neutral priority (0): buildbot doesn't have permission to set higher priorities
     set(NICE_COMMAND nice)
-    set(NICENESS -n-15)
+    set(NICENESS -n0)
     set(CTEST_COMMAND ctest)
     add_custom_target(profile
         COMMAND ${NICE_COMMAND} ${NICENESS} ${CTEST_COMMAND} "-j${NUM_CPUS}" "-L" "^Profile$" "--output-on-failure"
