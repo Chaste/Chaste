@@ -313,7 +313,6 @@ public:
 
     void TestOpenFutureBoostArchive() throw (Exception)
     {
-
         //Check testout/archive/specific_secondary.arch
         FileFinder archive_dir("global/test/data", RelativeTo::ChasteSourceRoot);
         std::string archive_file = "future_boost.arch";
