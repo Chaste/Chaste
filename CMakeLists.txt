@@ -772,7 +772,7 @@ if (Chaste_PROFILE_GPROF OR Chaste_PROFILE_GPERFTOOLS)
 
     # Run ctest with a high priority (-15) for more consistent results (might need to edit limits.conf)
     set(NICE_COMMAND nice)
-    set(NICENESS -n15)
+    set(NICENESS -n-15)
     set(CTEST_COMMAND ctest)
     add_custom_target(profile
         COMMAND ${NICE_COMMAND} ${NICENESS} ${CTEST_COMMAND} "-j${NUM_CPUS}" "-L" "^Profile$" "--output-on-failure"
