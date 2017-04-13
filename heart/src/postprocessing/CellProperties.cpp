@@ -270,12 +270,10 @@ std::vector<double> CellProperties::CalculateActionPotentialDurations(const doub
             }
         }
 
-        assert(apd_start_time != DOUBLE_UNSET);
-
         // If the start of this AP crossing threshold is before the last one finished,
         // we are in a wacky regime (see TestCellProperties::TestVeryLongApDetection() for examples of this)
         // and we need to skip the second one's evaluation.
-        if (apd_end_time != DOUBLE_UNSET && apd_start_time < apd_end_time)
+        if (apd_end_time != DOUBLE_UNSET && apd_start_time != DOUBLE_UNSET && apd_start_time < apd_end_time)
         {
             continue; // Skip to next AP
         }
