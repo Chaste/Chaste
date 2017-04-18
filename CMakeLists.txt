@@ -268,12 +268,14 @@ if (Chaste_USE_VTK)
         find_package(VTK COMPONENTS vtkIO vtkCommon vtkGraphics z REQUIRED)
     # 6.0 and 6.1 require the following
     elseif( (VTK_MAJOR_VERSION EQUAL 6) AND (VTK_MINOR_VERSION LESS 2) )
-        find_package(VTK COMPONENTS vtkCommonCore vtkFiltersGeneric vtkFiltersGeometry vtkFiltersModeling vtkIOLegacy
-                                    vtkIOXML REQUIRED)
+        find_package(VTK COMPONENTS vtkCommonCore vtkCommonDataModel vtkFiltersCore vtkFiltersGeneral vtkFiltersGeneric
+                                    vtkFiltersGeometry vtkFiltersModeling vtkFiltersSources vtkIOCore vtkIOGeometry
+                                    vtkIOLegacy vtkIOXML REQUIRED)
     # 6.2 and up, up to and including 7.1, require the following
     else()
-        find_package(VTK COMPONENTS vtkCommonCore vtkFiltersGeneric vtkFiltersGeometry vtkFiltersModeling vtkIOLegacy
-                                    vtkIOParallelXML REQUIRED)
+        find_package(VTK COMPONENTS vtkCommonCore vtkCommonDataModel vtkFiltersCore vtkFiltersGeneral vtkFiltersGeneric
+                                    vtkFiltersGeometry vtkFiltersModeling vtkFiltersSources vtkIOCore vtkIOGeometry
+                                    vtkIOLegacy vtkIOParallelXML vtkIOXML REQUIRED)
     endif()
 
     add_definitions(-DCHASTE_VTK)
