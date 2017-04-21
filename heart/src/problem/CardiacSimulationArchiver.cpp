@@ -175,10 +175,6 @@ PROBLEM_CLASS* CardiacSimulationArchiver<PROBLEM_CLASS>::Migrate(const FileFinde
     catch (Exception &e)
     {
         DistributedVectorFactory::SetCheckNumberOfProcessesOnLoad(true);
-        if (p_unarchived_simulation)
-        {
-            delete p_unarchived_simulation;
-        }
         throw e;
     }
 
