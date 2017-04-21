@@ -286,7 +286,10 @@ public:
             TS_ASSERT_THROWS_CONTAINS(input_arch >> p_ode, "Archive specifies a parameter 'a' which does not appear in this class.");
             // Mend the ODE system info for the following tests.
             p_mod_info->mParameterNames[0] = param_name;
-            delete p_ode;
+            if (p_ode) // It seems some setups will delete if the throw happens and some won't!
+            {
+            	delete p_ode;
+            }
         }
         { // Load with a parameter added
             ParameterisedOde ode;
@@ -301,7 +304,10 @@ public:
             TS_ASSERT_THROWS_CONTAINS(input_arch >> p_ode, "Number of ODE parameters in archive does not match number in class.");
             // Mend the ODE system info for the following tests.
             p_mod_info->mParameterNames.resize(1u);
-            delete p_ode;
+            if (p_ode) // It seems some setups will delete if the throw happens and some won't!
+            {
+            	delete p_ode;
+            }
         }
         { // Load with a parameter added, and the constructor providing a default
             ParameterisedOde ode;
