@@ -58,6 +58,9 @@ protected:
     /** The fftw plan for the forward transforms. */
     fftw_plan mFftwInversePlan;
 
+    /** The fftw plan for the forward transform for the pressure correction. */
+    fftw_plan mFftwCorrectionPlan;
+
     /** Pointer to the start of the input arrays. */
     double* mpInputArray;
 
@@ -101,6 +104,10 @@ public:
 
     /** Performs inverse fourier transforms */
     void FftExecuteInverse();
+
+    /** Performs forward fourier transform for the correction grid */
+    void FftExecuteCorrection();
+
 };
 
 #endif /*IMMERSEDBOUNDARYFFTINTERFACE_HPP_*/

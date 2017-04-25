@@ -41,7 +41,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned DIM>
 ImmersedBoundary2dArrays<DIM>::ImmersedBoundary2dArrays(ImmersedBoundaryMesh<DIM,DIM>* pMesh, double dt, double reynoldsNumber, bool activeSources)
     : mpMesh(pMesh),
-      mActiveSources(activeSources)
+      mActiveSources(activeSources),
+      mI(0.0, 1.0)
 {
     unsigned num_gridpts_x = mpMesh->GetNumGridPtsX();
     unsigned num_gridpts_y = mpMesh->GetNumGridPtsY();
@@ -81,13 +82,13 @@ ImmersedBoundary2dArrays<DIM>::ImmersedBoundary2dArrays(ImmersedBoundaryMesh<DIM
     mOperator2.resize(extents[num_gridpts_x][reduced_y]);
     mFourierGrids.resize(extents[2 + (int)mActiveSources][num_gridpts_x][reduced_y]);
     mPressureGrid.resize(extents[num_gridpts_x][reduced_y]);
-    mPressureCorrectionGrid.resize(extents[num_gridpts_x][reduced_y]);
-
+    
     mSin2x.resize(num_gridpts_x);
     mSin2y.resize(reduced_y);
-    mExp2x.resize(num_gridpts_x);
-    mExp2y.resize(reduced_y);
 
+    mMeshGrid.resize(extents[2][num_gridpts_x][num_gridpts_y]);
+    mPressureCorrectionGrid.resize(extents[2][num_gridpts_x][reduced_y]);
+    
     /*
      * There are several constants used in the Fourier domain as part of the Navier-Stokes solution which are constant
      * once grid sizes are known. We pre-calculate these to eliminate re-calculation at every time step.
@@ -107,15 +108,13 @@ ImmersedBoundary2dArrays<DIM>::ImmersedBoundary2dArrays(ImmersedBoundaryMesh<DIM
 
     for (unsigned x = 0; x < num_gridpts_x; x++)
     {
-        mExp2x[x] = exp(2 * M_PI * (double) x * x_spacing);
+        for (unsigned y = 0; y < num_gridpts_y; y++)
+        {
+            mMeshGrid[0][x][y] = x * x_spacing;
+            mMeshGrid[1][x][y] = y * y_spacing;
+        }
     }
-
-    for (unsigned y = 0; y < reduced_y; y++)
-    {
-        mExp2y[y] = exp(2 * M_PI * (double) y * y_spacing);
-    }
-
-
+    
     for (unsigned x = 0; x < num_gridpts_x; x++)
     {
         for (unsigned y = 0; y < reduced_y; y++)
@@ -169,9 +168,15 @@ multi_array<std::complex<double>, 2>& ImmersedBoundary2dArrays<DIM>::rGetModifia
 }
 
 template<unsigned DIM>
-multi_array<std::complex<double>, 2>& ImmersedBoundary2dArrays<DIM>::rGetModifiablePressureCorrectionGrid()
+multi_array<std::complex<double>, 3>& ImmersedBoundary2dArrays<DIM>::rGetModifiablePressureCorrectionGrid()
 {
     return mPressureCorrectionGrid;
+}
+
+template<unsigned DIM>
+multi_array<double, 3>& ImmersedBoundary2dArrays<DIM>::rGetMeshGrid()
+{
+    return mMeshGrid;
 }
 
 template<unsigned DIM>
@@ -196,18 +201,6 @@ template<unsigned DIM>
 const std::vector<double>& ImmersedBoundary2dArrays<DIM>::rGetSin2y() const
 {
     return mSin2y;
-}
-
-template<unsigned DIM>
-const std::vector<double>& ImmersedBoundary2dArrays<DIM>::rGetExp2x() const
-{
-    return mExp2x;
-}
-
-template<unsigned DIM>
-const std::vector<double>& ImmersedBoundary2dArrays<DIM>::rGetExp2y() const
-{
-    return mExp2y;
 }
 
 template<unsigned DIM>

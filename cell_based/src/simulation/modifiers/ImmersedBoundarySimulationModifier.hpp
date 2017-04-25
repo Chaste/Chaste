@@ -131,7 +131,15 @@ private:
      */
     double mReynoldsNumber;
 
-    std::vector<double> mDeltaP;
+    /**
+     * Correction in the x-direction.
+     */
+    double mDeltaPx;
+
+    /**
+     * Correction in the y-direction.
+     */
+    double mDeltaPy;
 
     /** Imaginary unit. */
     std::complex<double> mI;
@@ -144,6 +152,8 @@ private:
 
     ///\todo Document class member
     ImmersedBoundaryFftInterface<DIM>* mpFftInterface;
+
+    ImmersedBoundaryFftInterface<DIM>* mpFftInterface_correction;
 
     /**
      * Helper method to calculate elastic forces, propagate these to the fluid grid

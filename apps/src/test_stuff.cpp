@@ -84,11 +84,29 @@ void test_passing_vectors(double* array, int size)
 
 }
 
+void test_complex_numbers()
+{
+    std::complex<double> i(0.0, 1.0);
+    std::complex<double> result = exp(M_PI * i);
+
+    std::cout << result << std::endl;
+}
+
+void test_arrays()
+{
+    multi_array<double, 2> array;
+    array.resize(extents[2][2]);
+    array[0][0] = 0.0; array[0][1] = 1.0;
+    array[1][0] = 1.0; array[1][1] = 0.0;
+    //  array = array + array; <- this is not allowed
+}
+
 int main()
 {
-    double vec[5] = {1, 4, 3, 4, 5};
-
-    test_passing_vectors(vec, 5);
+//    double vec[5] = {1, 4, 3, 4, 5};
+//    test_passing_vectors(vec, 5);
+//    test_complex_numbers();
+    test_arrays();
 
     return 0;
 }

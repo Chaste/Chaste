@@ -93,6 +93,7 @@ public:
         ImmersedBoundaryAVEMigrationMeshGenerator generator(5, 5, 100, 0.01, 0.03, 0.5);
         ImmersedBoundaryMesh<2,2>* p_mesh = generator.GetMesh();
 
+
         /*
          * In the next three lines, we generate cells that will be used in the simulation
          * We can choose the the proliferative type and Cell Cycle model.

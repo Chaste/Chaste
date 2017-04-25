@@ -159,6 +159,14 @@ void ImmersedBoundarySimulationModifier<DIM>::SetupConstantMemberVariables(Abstr
                                                                    &(mpMesh->rGetModifiable2dVelocityGrids()[0][0][0]),
                                                                    mpCellPopulation->DoesPopulationHaveActiveSources());
 
+            mpFftInterface_correction = new ImmersedBoundaryFftInterface<DIM>(mpMesh,
+                                                                              &(mpArrays->rGetMeshGrid()[0][0][0]),
+                                                                              &(mpArrays->rGetModifiablePressureCorrectionGrid()[0][0][0]),
+                                                                              &(mpMesh->rGetModifiable2dVelocityGrids()[0][0][0]),
+                                                                              mpCellPopulation->DoesPopulationHaveActiveSources());
+
+            mpFftInterface_correction->FftExecuteCorrection();
+
             mFftNorm = (double) mNumGridPtsX * (double) mNumGridPtsY;
             break;
         }
@@ -420,17 +428,15 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
     multi_array<double, 3>& force_grids = mpArrays->rGetModifiableForceGrids();
     multi_array<double, 3>& rhs_grids   = mpArrays->rGetModifiableRightHandSideGrids();
     multi_array<double, 3>& source_gradient_grids   = mpArrays->rGetModifiableSourceGradientGrids();
-    multi_array<double, 3>& correction_term_grid = mpArrays->rGetModifiablePressureCorrectionGrid(); // Correction term
 
     const multi_array<double, 2>& op_1  = mpArrays->rGetOperator1();
     const multi_array<double, 2>& op_2  = mpArrays->rGetOperator2();
     const std::vector<double>& sin_2x   = mpArrays->rGetSin2x();
     const std::vector<double>& sin_2y   = mpArrays->rGetSin2y();
-    const std::vector<double>& exp_2x   = mpArrays->rGetExp2x();
-    const std::vector<double>& exp_2y   = mpArrays->rGetExp2y();
 
     multi_array<std::complex<double>, 3>& fourier_grids = mpArrays->rGetModifiableFourierGrids();
     multi_array<std::complex<double>, 2>& pressure_grid = mpArrays->rGetModifiablePressureGrid();
+    multi_array<std::complex<double>, 3>& correction_term_grid = mpArrays->rGetModifiablePressureCorrectionGrid(); // Correction term
 
     // Perform upwind differencing and create RHS of linear system
     Upwind2d(vel_grids, rhs_grids);
@@ -478,14 +484,6 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
      * redundancy, and so all calculations need only be done on reduced-size arrays, saving memory and computation.
      */
 
-    for (unsigned x = 0; x < mNumGridPtsX; x++)
-    {
-        for (unsigned y = 0; y < reduced_size; y++)
-        {
-            correction_term_grid[x][y] = (exp_2x[x] * fourier_grids[0][x][y] + exp_2y[y] * fourier_grids[1][x][y]);
-        }
-    }
-
     // If the population has active fluid sources, the computation is slightly more complicated
     if (mpCellPopulation->DoesPopulationHaveActiveSources())
     {
@@ -495,7 +493,7 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
             {
                 pressure_grid[x][y] = (op_2[x][y] * fourier_grids[2][x][y] - mI * (sin_2x[x] * fourier_grids[0][x][y] / mGridSpacingX +
                                                                                    sin_2y[y] * fourier_grids[1][x][y] / mGridSpacingY)) / op_1[x][y]
-                                      - correction_term_grid[x][y];
+                                      - mDeltaPx * correction_term_grid[0][x][y] - mDeltaPy * correction_term_grid[1][x][y];
             }
         }
     }
@@ -507,7 +505,7 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
             {
                 pressure_grid[x][y] = -mI * (sin_2x[x] * fourier_grids[0][x][y] / mGridSpacingX +
                                              sin_2y[y] * fourier_grids[1][x][y] / mGridSpacingY) / op_1[x][y]
-                                      - correction_term_grid[x][y];
+                                      - mDeltaPx * correction_term_grid[0][x][y] - mDeltaPy * correction_term_grid[1][x][y];
             }
         }
     }
@@ -713,8 +711,8 @@ void ImmersedBoundarySimulationModifier<DIM>::CalculateCorrectionTerm(const mult
     delta_p_x *= 0.25 * mGridSpacingX * mGridSpacingY;
     delta_p_y *= 0.25 * mGridSpacingX * mGridSpacingY;
 
-    mDeltaP[0] = delta_p_x;
-    mDeltaP[1] = delta_p_y;
+    mDeltaPx = mReynoldsNumber * delta_p_x;
+    mDeltaPy = mReynoldsNumber * delta_p_y;
 }
 
 // Explicit instantiation

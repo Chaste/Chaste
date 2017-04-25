@@ -132,6 +132,11 @@ ImmersedBoundaryFftInterface<DIM>::ImmersedBoundaryFftInterface(ImmersedBoundary
                                               mpComplexArray, comp_nembed, comp_stride, comp_sep,
                                               mpOutputArray,  real_nembed, real_stride, real_sep,
                                               FFTW_PATIENT);
+
+    mFftwCorrectionPlan = fftw_plan_many_dft_r2c(rank, real_dims, how_many_forward,
+                                                 mpInputArray,   real_nembed, real_stride, real_sep,
+                                                 mpComplexArray, comp_nembed, comp_stride, comp_sep,
+                                                 FFTW_PATIENT);
 }
 
 template<unsigned DIM>
@@ -145,6 +150,12 @@ template<unsigned DIM>
 void ImmersedBoundaryFftInterface<DIM>::FftExecuteForward()
 {
     fftw_execute(mFftwForwardPlan);
+}
+
+template<unsigned DIM>
+void ImmersedBoundaryFftInterface<DIM>::FftExecuteCorrection()
+{
+    fftw_execute(mFftwCorrectionPlan);
 }
 
 template<unsigned DIM>

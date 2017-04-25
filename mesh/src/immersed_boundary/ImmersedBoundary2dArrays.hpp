@@ -57,6 +57,9 @@ protected:
     /** Whether the population has active fluid sources. */
     bool mActiveSources;
 
+    /** imaginary number */
+    std::complex<double> mI;
+
     /** Grid to store force acting on fluid. */
     multi_array<double, 3> mForceGrids;
 
@@ -79,7 +82,7 @@ protected:
     multi_array<std::complex<double>, 2> mPressureGrid;
 
     /** Grid to store the correction to the pressure */
-    multi_array<std::complex<double>, 2> mPressureCorrectionGrid;
+    multi_array<std::complex<double>, 3> mPressureCorrectionGrid;
 
     /** Vector of sin values in x, constant once grid size is known. */
     std::vector<double> mSin2x;
@@ -87,11 +90,9 @@ protected:
     /** Vector of sin values in x, constant once grid size is known. */
     std::vector<double> mSin2y;
 
-    /** Vector of exponential values in x, constant grid size is known. */
-    std::vector<double> mExp2x;
+    /** An array of x and y values (equivalent to numpy/MATLAB meshgrid function output) */
+    multi_array<double, 3> mMeshGrid;
 
-    /** Vector of exponential values in y, constant grid size is known. */
-    std::vector<double> mExp2y;
 
 public:
 
@@ -133,7 +134,10 @@ public:
     multi_array<std::complex<double>, 2>& rGetModifiablePressureGrid();
 
     /** @return reference to modifiable pressure correction grid. */
-    multi_array<std::complex<double>, 2>& rGetModifiablePressureCorrectionGrid();
+    multi_array<std::complex<double>, 3>& rGetModifiablePressureCorrectionGrid();
+
+    /** @return reference to modifiable meshgrid. */
+    multi_array<double, 3>& rGetMeshGrid();
 
     /** @return reference to the first operator. */
     const multi_array<double, 2>& rGetOperator1() const;
@@ -146,12 +150,6 @@ public:
 
     /** @return reference to the vector of sine values in y. */
     const std::vector<double>& rGetSin2y() const;
-
-    /** @return reference to the vector of exp values in x. */
-    const std::vector<double>& rGetExp2x() const;
-
-    /** @return reference to the vector of exp values in y. */
-    const std::vector<double>& rGetExp2y() const;
 
     /** @return #mpMesh. */
     ImmersedBoundaryMesh<DIM,DIM>* GetMesh();
