@@ -46,11 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _BACKWARD_BACKWARD_WARNING_H 1 //Cut out the strstream deprecated warning for now (gcc4.3)
 #include "vtkVersion.h"
 
-// This pragma is here to prevent a define conflict for HZ in vtkPointLocator (#def'd in linux header asm-generic/param.h)
-#pragma push_macro("HZ")
-#undef HZ
-#include "vtkPointLocator.h"
-#pragma pop_macro("HZ")
+#include "IncludeVtkPointLocator.hpp"
 
 #if ((VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
 
