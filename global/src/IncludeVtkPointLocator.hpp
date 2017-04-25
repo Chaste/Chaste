@@ -51,5 +51,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #undef HZ
 #include <vtkPointLocator.h>
 #pragma pop_macro("HZ")
+#endif // (VTK_MAJOR_VERSION >= 7)
 
 #endif // CHASTE_VTK
