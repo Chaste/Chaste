@@ -308,7 +308,7 @@ public:
      * @param input const reference to input grids
      * @param output reference to output grids
      */
-    void CalculateCorrectionTerm(const multi_array<double, 3>& input);
+    void CalculateCorrectionTerm(const multi_array<double, 3>& force_grids, const multi_array<double, 3>& acceleration_grids);
 };
 
 #include "SerializationExportWrapper.hpp"

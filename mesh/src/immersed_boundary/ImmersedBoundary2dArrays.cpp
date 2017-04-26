@@ -88,6 +88,18 @@ ImmersedBoundary2dArrays<DIM>::ImmersedBoundary2dArrays(ImmersedBoundaryMesh<DIM
 
     mMeshGrid.resize(extents[2][num_gridpts_x][num_gridpts_y]);
     mPressureCorrectionGrid.resize(extents[2][num_gridpts_x][reduced_y]);
+    mAccelerationGrid.resize(extents[2][num_gridpts_x][num_gridpts_y]);
+
+    for (unsigned dim = 0; dim < 2; dim++)
+    {
+        for (unsigned x = 0; x < num_gridpts_x; x++)
+        {
+            for (unsigned y = 0; y < num_gridpts_y; y++)
+            {
+                mAccelerationGrid[dim][x][y] = 0.0;
+            }
+        }
+    }
     
     /*
      * There are several constants used in the Fourier domain as part of the Navier-Stokes solution which are constant
@@ -177,6 +189,12 @@ template<unsigned DIM>
 multi_array<double, 3>& ImmersedBoundary2dArrays<DIM>::rGetMeshGrid()
 {
     return mMeshGrid;
+}
+
+template<unsigned DIM>
+multi_array<double, 3>& ImmersedBoundary2dArrays<DIM>::rGetModifiableAccelerationGrid()
+{
+    return mAccelerationGrid;
 }
 
 template<unsigned DIM>

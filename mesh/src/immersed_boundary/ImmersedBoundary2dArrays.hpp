@@ -84,6 +84,9 @@ protected:
     /** Grid to store the correction to the pressure */
     multi_array<std::complex<double>, 3> mPressureCorrectionGrid;
 
+    /** Grid to store the acceleration at any timestep. */
+    multi_array<double, 3> mAccelerationGrid;
+
     /** Vector of sin values in x, constant once grid size is known. */
     std::vector<double> mSin2x;
 
@@ -92,7 +95,6 @@ protected:
 
     /** An array of x and y values (equivalent to numpy/MATLAB meshgrid function output) */
     multi_array<double, 3> mMeshGrid;
-
 
 public:
 
@@ -135,6 +137,9 @@ public:
 
     /** @return reference to modifiable pressure correction grid. */
     multi_array<std::complex<double>, 3>& rGetModifiablePressureCorrectionGrid();
+
+    /** @return reference to modifiable acceleration grid. */
+    multi_array<double, 3>& rGetModifiableAccelerationGrid();
 
     /** @return reference to modifiable meshgrid. */
     multi_array<double, 3>& rGetMeshGrid();

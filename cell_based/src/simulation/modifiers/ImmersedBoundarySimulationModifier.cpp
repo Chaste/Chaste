@@ -437,6 +437,7 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
     multi_array<std::complex<double>, 3>& fourier_grids = mpArrays->rGetModifiableFourierGrids();
     multi_array<std::complex<double>, 2>& pressure_grid = mpArrays->rGetModifiablePressureGrid();
     multi_array<std::complex<double>, 3>& correction_term_grid = mpArrays->rGetModifiablePressureCorrectionGrid(); // Correction term
+    multi_array<double, 3>& acceleration_grid = mpArrays->rGetModifiableAccelerationGrid();
 
     // Perform upwind differencing and create RHS of linear system
     Upwind2d(vel_grids, rhs_grids);
@@ -473,7 +474,7 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
         }
     }
 
-    CalculateCorrectionTerm(force_grids);
+    CalculateCorrectionTerm(force_grids, acceleration_grid);
 
     // Perform fft on rhs_grids; results go to fourier_grids
     mpFftInterface->FftExecuteForward();
@@ -530,6 +531,7 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
         }
     }
 
+    acceleration_grid = vel_grids;
     // Perform inverse fft on fourier_grids; results are in vel_grids.  Then, normalise the DFT.
     mpFftInterface->FftExecuteInverse();
     for (unsigned dim = 0; dim < 2; dim++)
@@ -542,6 +544,18 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
             }
         }
     }
+
+    for (unsigned dim = 0; dim < 2; dim++)
+    {
+        for (unsigned x = 0; x < mNumGridPtsX; x++)
+        {
+            for (unsigned y = 0; y < mNumGridPtsY; y++)
+            {
+                acceleration_grid[dim][x][y] = (vel_grids[dim][x][y] - acceleration_grid[dim][x][y])/dt;
+            }
+        }
+    }
+
 }
 
 template<unsigned DIM>
@@ -663,12 +677,27 @@ double ImmersedBoundarySimulationModifier<DIM>::GetReynoldsNumber()
 }
 
 template<unsigned DIM>
-void ImmersedBoundarySimulationModifier<DIM>::CalculateCorrectionTerm(const multi_array<double, 3> &input)
+void ImmersedBoundarySimulationModifier<DIM>::CalculateCorrectionTerm(const multi_array<double, 3>& force_grids, const multi_array<double, 3>& acceleration_grids)
 {
     // extra input -> , multi_array<double, 3> &output
     // input array should to be the the force grid
 
     // Trapezium rule is used to approximate the integral of the force on the fluid over the whole domain
+
+
+    multi_array<double, 3> input;
+    input.resize(extents[2][mNumGridPtsX][mNumGridPtsY]);
+
+    for (unsigned dim = 0; dim < 2; dim++)
+    {
+        for (unsigned x = 0; x < mNumGridPtsX; x++)
+        {
+            for (unsigned y = 0; y < mNumGridPtsY; y++)
+            {
+                input[dim][x][y] = acceleration_grids[dim][x][y] - force_grids[dim][x][y];
+            }
+        }
+    }
 
     double delta_p_x = 1.0 * (input[0][0][0] + input[0][mNumGridPtsX-1][0] + input[0][0][mNumGridPtsY-1] + input[0][mNumGridPtsX-1][mNumGridPtsY-1]);
     for (unsigned i=1; i<mNumGridPtsX-2; i++)
@@ -708,11 +737,8 @@ void ImmersedBoundarySimulationModifier<DIM>::CalculateCorrectionTerm(const mult
         }
     }
 
-    delta_p_x *= 0.25 * mGridSpacingX * mGridSpacingY;
-    delta_p_y *= 0.25 * mGridSpacingX * mGridSpacingY;
-
-    mDeltaPx = mReynoldsNumber * delta_p_x;
-    mDeltaPy = mReynoldsNumber * delta_p_y;
+    mDeltaPx = -0.25 * mReynoldsNumber * mGridSpacingX * mGridSpacingY * delta_p_x;
+    mDeltaPy = -0.25 * mReynoldsNumber * mGridSpacingX * mGridSpacingY * delta_p_y;
 }
 
 // Explicit instantiation
