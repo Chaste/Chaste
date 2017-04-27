@@ -32,12 +32,11 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
+#ifndef INCLUDEVTKPOINTLOCATOR_HPP_
+#define INCLUDEVTKPOINTLOCATOR_HPP_
 
-#ifdef CHASTE_VTK
-
-#include "vtkVersion.h"
-
-/*
+/**
+ * @file
  * From VTK 7.0, the file vtkPointLocator.h uses a variable named "HZ".
  *
  * "HZ" is also #def'd in the linux header asm-generic/param.h, which is used by a number of things, including openMPI.
@@ -45,6 +44,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * To include <vtkPointLocator.h>, therefore, we temporarily #undef HZ.
  */
+
+#ifdef CHASTE_VTK
+
+#include "vtkVersion.h"
 
 #if (VTK_MAJOR_VERSION >= 7)
 #pragma push_macro("HZ")
@@ -54,3 +57,5 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif // (VTK_MAJOR_VERSION >= 7)
 
 #endif // CHASTE_VTK
+
+#endif /*INCLUDEVTKPOINTLOCATOR_HPP_*/
