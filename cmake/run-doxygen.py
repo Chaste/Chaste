@@ -31,16 +31,21 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-import os, sys,shutil
+import os
+import shutil
+import sys
+
+from ParseDoxygen import parse_doxygen
 
 error_log = 'doxygen-error.log'
 output_log = 'doxygen-output.log'
 
-def RunDoxygen(revision, hide_undoc_classes=True):
+
+def run_doxygen(revision, hide_undoc_classes=True):
     """Run Doxygen on the given checkout."""
     # Run Doxygen
     cmd = '( cat Doxyfile ; echo "PROJECT_NUMBER=Build:: ' + str(revision) + '"'
-    if (hide_undoc_classes):
+    if hide_undoc_classes:
         cmd += '; echo "HIDE_UNDOC_CLASSES = YES" '
     cmd += ' ) | doxygen - 2>'+error_log+' 1>'+output_log
 
@@ -56,7 +61,7 @@ if __name__ == "__main__":
     SOURCE_DIR = sys.argv[1]
     DOCS_DIR = sys.argv[2]
     build_version = sys.argv[3]
-    if (len(sys.argv)==5):
+    if len(sys.argv) == 5:
         check_coverage = bool(sys.argv[4])
     else:
         check_coverage = False
@@ -65,16 +70,15 @@ if __name__ == "__main__":
     os.chdir(SOURCE_DIR)
 
     # Run Doxygen
-    RunDoxygen(build_version, hide_undoc_classes=check_coverage)
+    run_doxygen(build_version, hide_undoc_classes=check_coverage)
 
     # Copy the files to DOCS_DIR
     if os.path.exists(DOCS_DIR):
-       shutil.rmtree(DOCS_DIR)
-    shutil.copytree('doxygen/html',DOCS_DIR)
+        shutil.rmtree(DOCS_DIR)
+    shutil.copytree('doxygen/html', DOCS_DIR)
 
     if check_coverage:
-        sys.path.insert(0,SOURCE_DIR+'/python/infra')
-        from ParseDoxygen import parse_doxygen
-        parse_doxygen(SOURCE_DIR+'/'+output_log,SOURCE_DIR+'/'+error_log,DOCS_DIR)
+        sys.path.insert(0, SOURCE_DIR+'/python/infra')
+        parse_doxygen(SOURCE_DIR+'/'+output_log, SOURCE_DIR+'/'+error_log, DOCS_DIR)
 
     os.chdir(CWD)
