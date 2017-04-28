@@ -44,3 +44,11 @@ foreach(dyn_source ${dyn_sources})
     add_dependencies(heart ${dyn_source_name})
     add_dependencies(Continuous ${dyn_source_name})
 endforeach(dyn_source)
+
+# XSD < 4.0.0 generates code with std::auto_ptr.  This is deprecated from C++11 (in favour of new standard smart
+# pointers). This code turns off the deprecation warnings so that Chaste compiles.
+# TODO: Once we drop Chaste support for XSD 3.3, this should be removed in favour of changing auto_ptr to unique_ptr
+file(GLOB xsd_generated_cpp_files ${CMAKE_CURRENT_BINARY_DIR}/src/io/*.cpp)
+foreach(xsd_generated_cpp_file ${xsd_generated_cpp_files})
+    set_source_files_properties(${xsd_generated_cpp_file} PROPERTIES COMPILE_FLAGS "-Wno-deprecated")
+endforeach(dyn_source)
