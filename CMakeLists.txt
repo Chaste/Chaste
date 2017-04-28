@@ -767,7 +767,7 @@ endif()
 
 if (Chaste_PROFILE_GPROF OR Chaste_PROFILE_GPERFTOOLS)
     if (Chaste_PROFILE_GPERFTOOLS)
-        set(extension gif)
+        set(extension svg)
         set(NUM_CPUS ${Chaste_PROFILE_GPERFTOOLS_CPUS})
     else()
         set(extension gmon)
