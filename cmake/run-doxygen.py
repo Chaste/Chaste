@@ -35,8 +35,6 @@ import os
 import shutil
 import sys
 
-from ParseDoxygen import parse_doxygen
-
 error_log = 'doxygen-error.log'
 output_log = 'doxygen-output.log'
 
@@ -48,6 +46,8 @@ def run_doxygen(revision, hide_undoc_classes=True):
     if hide_undoc_classes:
         cmd += '; echo "HIDE_UNDOC_CLASSES = YES" '
     cmd += ' ) | doxygen - 2>'+error_log+' 1>'+output_log
+
+    print(cmd)
 
     exitcode = os.system(cmd)
     assert exitcode == 0, "Doxygen returned non-zero exit code"
@@ -79,6 +79,7 @@ if __name__ == "__main__":
 
     if check_coverage:
         sys.path.insert(0, os.path.join(SOURCE_DIR, 'python', 'infra'))
+        from ParseDoxygen import parse_doxygen
         parse_doxygen(os.path.join(SOURCE_DIR, output_log), os.path.join(SOURCE_DIR, error_log), DOCS_DIR)
 
     os.chdir(CWD)
