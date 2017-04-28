@@ -78,7 +78,7 @@ if __name__ == "__main__":
     shutil.copytree('doxygen/html', DOCS_DIR)
 
     if check_coverage:
-        sys.path.insert(0, SOURCE_DIR+'/python/infra')
-        parse_doxygen(SOURCE_DIR+'/'+output_log, SOURCE_DIR+'/'+error_log, DOCS_DIR)
+        sys.path.insert(0, os.path.join(SOURCE_DIR, 'python', 'infra'))
+        parse_doxygen(os.path.join(SOURCE_DIR, output_log), os.path.join(SOURCE_DIR, error_log), DOCS_DIR)
 
     os.chdir(CWD)
