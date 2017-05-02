@@ -9,3 +9,4 @@ simulation/TestIBMMouseEmbryoSimulation.hpp
 simulation/TestIBMMouseEmbryoSimulationv2.hpp
 simulation/TestIBMAVEMigrationSimulation.hpp
 simulation/TestIBMDrosophilaEmbryoSimulation.hpp
+simulation/TestIBMTestMeshGenerator.hpp

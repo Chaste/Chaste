@@ -35,6 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ImmersedBoundarySimulationModifier.hpp"
 #include "FluidSource.hpp"
+#include <fstream>
 
 template<unsigned DIM>
 ImmersedBoundarySimulationModifier<DIM>::ImmersedBoundarySimulationModifier()
@@ -739,6 +740,9 @@ void ImmersedBoundarySimulationModifier<DIM>::CalculateCorrectionTerm(const mult
 
     mDeltaPx = -0.25 * mReynoldsNumber * mGridSpacingX * mGridSpacingY * delta_p_x;
     mDeltaPy = -0.25 * mReynoldsNumber * mGridSpacingX * mGridSpacingY * delta_p_y;
+//    ofstream dat_file("/home/bartmanski/Downloads/pressure_change.dat", fstream::app);
+//    dat_file << mDeltaPx << " " << mDeltaPy << std::endl;
+//    dat_file.close();
 }
 
 // Explicit instantiation

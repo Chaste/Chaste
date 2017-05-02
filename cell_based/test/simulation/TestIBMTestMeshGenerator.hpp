@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2015, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -33,10 +33,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-// Created by bartosz on 07/02/17.
+/*
+ * TestIBMMouseEmbryoSimulation.hpp
+ *
+ *  Created on: 29 Apr 2016
+ *      Author: Bartosz Bartmanski
+ */
 
-#ifndef CHASTE_TESTIBMAVEMIGRATIONSIMULATION_HPP
-#define CHASTE_TESTIBMAVEMIGRATIONSIMULATION_HPP
+#ifndef TESTIBMTESTMESHGENERATOR_HPP_
+#define TESTIBMTESTMESHGENERATOR_HPP_
 
 /* The following are used in every Chaste test */
 #include <cxxtest/TestSuite.h>
@@ -55,7 +60,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ImmersedBoundaryLinearMembraneForce.hpp"
 #include "ImmersedBoundaryMesh.hpp"
 #include "ImmersedBoundarySimulationModifier.hpp"
-#include "ImmersedBoundaryAVEMigrationMeshGenerator.hpp"
+#include "ImmersedBoundarySingleCellMigrationForce.hpp"
 
 /* Required for setting up the numerical method */
 #include "ForwardEulerNumericalMethod.hpp"
@@ -64,43 +69,35 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* To make sure that the test is not run in parallel */
 #include "FakePetscSetup.hpp"
 
-/* Not sure whether these work */
-#include "ImmersedBoundarySingleCellMigrationForce.hpp"
+/* Required specifically for this simulation */
+#include "ImmersedBoundaryTestMeshGenerator.hpp"
 #include "ImmersedBoundaryCellSizeWriter.hpp"
 
-class TestIBMAVEMigrationSimulation : public AbstractCellBasedTestSuite
+class TestIBMTestMeshGenerator : public AbstractCellBasedTestSuite
 {
 public:
-    /*
-     * == Mouse Embryo simulation - simulation of the Distal half of the Visceral Endoderm cells ==
-     *
-     * We will model the VE cells of a mouse embryo using the Immersed Boundary method,
-     * which will be placed on a membrane to keep these ordered and having the required shape.
-     * As a first approximation, the VE cells will be on a circular basement membrane, with the
-     * lower half representing the VE cells around the epiblast
-     */
-    void TestIBMMigrationSimulation() throw (Exception)
-    {
+	/*
+	 * == Mouse Embryo simulation - simulation of the Distal half of the Visceral Endoderm cells ==
+	 *
+	 * We will model the VE cells of a mouse embryo using the Immersed Boundary method,
+	 * which will be placed on a membrane to keep these ordered and having the required shape.
+	 * As a first approximation, the VE cells will be on a circular basement membrane, with the
+	 * lower half representing the VE cells around the epiblast
+	 */
+	void TestMeshGenerator() throw (Exception)
+	{
         /*
-         * First use the mesh generator to set up the immersed boundary elements.
-         *
-         * @param numCellsVertically - number of cells vertically
-         * @param numCellsHorizontally - number of cells horizontally
-         * @param numNodesPerCell - the numebr of nodes in a cell
-         * @param ellipseExponent - how round the cells are
-         * @param spacing - the spacing between the cells in the array of cells
-         * @param shift - a factor by which to shift the cells in every other row
+         * First use the mesh generator to set up the immersed boundary elements
          */
-        ImmersedBoundaryAVEMigrationMeshGenerator generator(5, 5, 100, 0.01, 0.03, 0.5);
-        ImmersedBoundaryMesh<2,2>* p_mesh = generator.GetMesh();
+		ImmersedBoundaryTestMeshGenerator generator(0.5, 0.5, 100, 1.0);
+		ImmersedBoundaryMesh<2,2>* p_mesh = generator.GetMesh();
 
-
-        /*
-         * In the next three lines, we generate cells that will be used in the simulation
-         * We can choose the the proliferative type and Cell Cycle model.
-         * Apparently {{{UniformlyDistributedCellCycleModel}}} doesn't allow proliferation, which doesn't matter for this simulation, as on the timescales we're looking at,
-         * there is very little proliferation
-         */
+		/*
+		 * In the next three lines, we generate cells that will be used in the simulation
+		 * We can choose the the proliferative type and Cell Cycle model.
+		 * Apparently {{{UniformlyDistributedCellCycleModel}}} doesn't allow proliferation, which doesn't matter for this simulation, as on the timescales we're looking at,
+		 * there is very little proliferation
+		 */
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         CellsGenerator<UniformCellCycleModel, 2> cells_generator;
@@ -120,7 +117,7 @@ public:
         simulator.GetNumericalMethod()->SetUseUpdateNodeLocation(true);
 
         double dt = 0.01;
-        simulator.SetOutputDirectory("TestIBMAVEMigrationSimulation");
+        simulator.SetOutputDirectory("TestIBMTestMeshGenerator");
         simulator.SetDt(dt);
         simulator.SetSamplingTimestepMultiple(10);
         simulator.SetEndTime(200.0 * dt);
@@ -145,15 +142,15 @@ public:
 
         MAKE_PTR(SingleCellMigrationForce<2>, p_migration_force);
         p_main_modifier->AddImmersedBoundaryForce(p_migration_force);
-        p_migration_force->SetElementIndex(24);
+        p_migration_force->SetElementIndex(0);
         p_migration_force->SetStrength(1.0);
 
         /* Finally we call the {{{Solve}}} method on the simulation to run the simulation.*/
         simulator.Solve();
 
 
-    }
+	}
 
 };
 
-#endif //CHASTE_TESTIBMAVEMIGRATIONSIMULATION_HPP
+#endif /* TESTIBMTESTMESHGENERATOR_HPP_ */
