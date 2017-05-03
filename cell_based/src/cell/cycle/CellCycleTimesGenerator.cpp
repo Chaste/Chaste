@@ -94,7 +94,7 @@ void CellCycleTimesGenerator::GenerateCellCycleTimeSequence()
 {
 	if (mVectorCreated)
 	{
-		EXCEPTION("Trying to generate the cell cycle times twice. Maybe destroy the singleton first?");
+		EXCEPTION("Trying to generate the cell cycle times twice. Need to call CellCycleTimesGenerator::Destroy() first.");
 	}
 	else
 	{
@@ -136,7 +136,7 @@ double CellCycleTimesGenerator::GetNextCellCycleTime()
     if(!mVectorCreated)
     {
         EXCEPTION("When using FixedSequenceCellCycleModel you must call CellCycleTimesGenerator::Instance()->GenerateCellCycleTimeSequence()"
-                "before the start of the simulation");
+                " before the start of the simulation.");
     }
     else
     {

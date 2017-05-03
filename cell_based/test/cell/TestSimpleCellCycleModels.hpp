@@ -138,6 +138,11 @@ public:
 
         p_stem_model->SetRate(0.25);
         p_cell_cycle_times_generator->SetRandomSeed(0);
+
+        TS_ASSERT_THROWS_THIS(p_cell_cycle_times_generator->GetNextCellCycleTime(),
+                "When using FixedSequenceCellCycleModel one must call CellCycleTimesGenerator::Instance()->GenerateCellCycleTimeSequence()"
+                                " before the start of the simulation.");
+
         p_cell_cycle_times_generator->GenerateCellCycleTimeSequence();
 
         TS_ASSERT_THROWS_THIS(p_stem_model->SetTransitCellG1Duration(8.0),
@@ -145,6 +150,9 @@ public:
 
         TS_ASSERT_THROWS_THIS(p_stem_model->SetRate(8.0),
                 "You cannot reset the rate after cell cycle times are created.");
+
+        TS_ASSERT_THROWS_THIS(p_cell_cycle_times_generator->GenerateCellCycleTimeSequence(),
+                "Trying to generate the cell cycle times twice. Need to call CellCycleTimesGenerator::Destroy() first.");
         // When we set the rate parameter we also reset the TransitCellG1Duration and StemCellG1Duration such that
         // average cell cycle times are calculated correctly
         TS_ASSERT_DELTA(p_stem_model->GetStemCellG1Duration(), 4.0, 1e-10);
