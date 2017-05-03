@@ -91,7 +91,7 @@ public:
          * @param spacing - the spacing between the cells in the array of cells
          * @param shift - a factor by which to shift the cells in every other row
          */
-        ImmersedBoundaryAVEMigrationMeshGenerator generator(5, 5, 100, 0.01, 0.03, 0.5);
+        ImmersedBoundaryAVEMigrationMeshGenerator generator(5, 5, 200, 0.01, 0.03, 0.5);
         ImmersedBoundaryMesh<2,2>* p_mesh = generator.GetMesh();
 
 
@@ -130,6 +130,7 @@ public:
          * {{{OffLatticeSimulation}}}.*/
         MAKE_PTR(ImmersedBoundarySimulationModifier<2>, p_main_modifier);
         simulator.AddSimulationModifier(p_main_modifier);
+        p_main_modifier->AddCorrectionTerm(false);
 
         /* We now associate an {{{ImmersedBoundaryLinearMembraneForce}}} and
          * {{{ImmersedBoundaryLinearInteractionForce}}} to the {{{SimulationModifier}}} which

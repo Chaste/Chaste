@@ -131,15 +131,14 @@ private:
      */
     double mReynoldsNumber;
 
-    /**
-     * Correction in the x-direction.
-     */
+    /** Correction in the x-direction. */
     double mDeltaPx;
 
-    /**
-     * Correction in the y-direction.
-     */
+    /** Correction in the y-direction. */
     double mDeltaPy;
+
+    /** Boolean value of whether to add the correction term at each time step. */
+    bool mAddCorrection;
 
     /** Imaginary unit. */
     std::complex<double> mI;
@@ -153,7 +152,7 @@ private:
     ///\todo Document class member
     ImmersedBoundaryFftInterface<DIM>* mpFftInterface;
 
-    ImmersedBoundaryFftInterface<DIM>* mpFftInterface_correction;
+    ImmersedBoundaryFftInterface<DIM>* mpFftInterfaceCorrection;
 
     /**
      * Helper method to calculate elastic forces, propagate these to the fluid grid
@@ -301,6 +300,13 @@ public:
      * @return #mReynoldsNumber
      */
     double GetReynoldsNumber();
+
+    /**
+     * Set whether to add the correction term.
+     *
+     * @param value - set to true to add the correction term.
+     */
+    void AddCorrectionTerm(bool value);
 
     /**
      * Calculate the correction term.

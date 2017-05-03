@@ -35,7 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ImmersedBoundarySimulationModifier.hpp"
 #include "FluidSource.hpp"
-#include <fstream>
+//#include <fstream>  // Used to output pressure drop
 
 template<unsigned DIM>
 ImmersedBoundarySimulationModifier<DIM>::ImmersedBoundarySimulationModifier()
@@ -50,9 +50,13 @@ ImmersedBoundarySimulationModifier<DIM>::ImmersedBoundarySimulationModifier()
       mFftNorm(0.0),
       mpBoxCollection(NULL),
       mReynoldsNumber(1e-4),
+      mDeltaPx(0.0),
+      mDeltaPy(0.0),
+      mAddCorrection(false),
       mI(0.0, 1.0),
       mpArrays(NULL),
-      mpFftInterface(NULL)
+      mpFftInterface(NULL),
+      mpFftInterfaceCorrection(NULL)
 {
 }
 
@@ -160,13 +164,13 @@ void ImmersedBoundarySimulationModifier<DIM>::SetupConstantMemberVariables(Abstr
                                                                    &(mpMesh->rGetModifiable2dVelocityGrids()[0][0][0]),
                                                                    mpCellPopulation->DoesPopulationHaveActiveSources());
 
-            mpFftInterface_correction = new ImmersedBoundaryFftInterface<DIM>(mpMesh,
+            mpFftInterfaceCorrection = new ImmersedBoundaryFftInterface<DIM>(mpMesh,
                                                                               &(mpArrays->rGetMeshGrid()[0][0][0]),
                                                                               &(mpArrays->rGetModifiablePressureCorrectionGrid()[0][0][0]),
                                                                               &(mpMesh->rGetModifiable2dVelocityGrids()[0][0][0]),
                                                                               mpCellPopulation->DoesPopulationHaveActiveSources());
 
-            mpFftInterface_correction->FftExecuteCorrection();
+            mpFftInterfaceCorrection->FftExecuteCorrection();
 
             mFftNorm = (double) mNumGridPtsX * (double) mNumGridPtsY;
             break;
@@ -475,7 +479,10 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
         }
     }
 
-    CalculateCorrectionTerm(force_grids, acceleration_grid);
+    if (mAddCorrection)
+    {
+        CalculateCorrectionTerm(force_grids, acceleration_grid);
+    }
 
     // Perform fft on rhs_grids; results go to fourier_grids
     mpFftInterface->FftExecuteForward();
@@ -675,6 +682,12 @@ template<unsigned DIM>
 double ImmersedBoundarySimulationModifier<DIM>::GetReynoldsNumber()
 {
     return mReynoldsNumber;
+}
+
+template<unsigned DIM>
+void ImmersedBoundarySimulationModifier<DIM>::AddCorrectionTerm(bool value)
+{
+    mAddCorrection = value;
 }
 
 template<unsigned DIM>
