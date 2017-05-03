@@ -123,7 +123,7 @@ public:
         simulator.SetOutputDirectory("TestIBMAVEMigrationSimulation");
         simulator.SetDt(dt);
         simulator.SetSamplingTimestepMultiple(10);
-        simulator.SetEndTime(200.0 * dt);
+        simulator.SetEndTime(500.0 * dt);
 
         /* All of the machinery for the immersed boundary method is handled in the following {{{SimulationModifier}}}.
          * Here, we create a 'shared pointer' to an {{{ImmersedBoundarySimulationModifier}}} object and pass it to the
@@ -146,7 +146,7 @@ public:
         MAKE_PTR(SingleCellMigrationForce<2>, p_migration_force);
         p_main_modifier->AddImmersedBoundaryForce(p_migration_force);
         p_migration_force->SetElementIndex(24);
-        p_migration_force->SetStrength(1.0);
+        p_migration_force->SetStrength(0.0);
 
         /* Finally we call the {{{Solve}}} method on the simulation to run the simulation.*/
         simulator.Solve();

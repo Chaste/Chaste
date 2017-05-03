@@ -10,7 +10,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ImmersedBoundaryCellSizeWriter<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryCellSizeWriter()
         : AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>("ib_cell_size.dat")
 {
-    this->mVtkCellDataName = "Neighbour number";
+    this->mVtkCellDataName = "Cell size";
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
