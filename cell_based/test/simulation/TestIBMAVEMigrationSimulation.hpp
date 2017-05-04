@@ -91,9 +91,10 @@ public:
          * @param spacing - the spacing between the cells in the array of cells
          * @param shift - a factor by which to shift the cells in every other row
          */
-        ImmersedBoundaryAVEMigrationMeshGenerator generator(5, 5, 200, 0.01, 0.03, 0.5);
+        ImmersedBoundaryAVEMigrationMeshGenerator generator(5, 5, 100, 0.01, 0.05, 0.0);
         ImmersedBoundaryMesh<2,2>* p_mesh = generator.GetMesh();
-
+        std::cout << "\nNode spacing = " << p_mesh->GetCharacteristicNodeSpacing() << "\n";
+        std::cout << "\nNode spacing ratio = " << p_mesh->GetSpacingRatio() << "\n";
 
         /*
          * In the next three lines, we generate cells that will be used in the simulation
@@ -117,20 +118,20 @@ public:
          * Additionally, we tell the numerical method that we want the cell population to update node locations.*/
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetNumericalMethod(boost::make_shared<ForwardEulerNumericalMethod<2,2> >());
-        simulator.GetNumericalMethod()->SetUseUpdateNodeLocation(true);
+        simulator.GetNumericalMethod()->SetUseUpdateNodeLocation(false);
 
         double dt = 0.01;
-        simulator.SetOutputDirectory("TestIBMAVEMigrationSimulation");
+        simulator.SetOutputDirectory("TestIBMAVEMigrationSimulation150NodesPerRoundedCell");
         simulator.SetDt(dt);
         simulator.SetSamplingTimestepMultiple(10);
-        simulator.SetEndTime(500.0 * dt);
+        simulator.SetEndTime(1000.0 * dt);
 
         /* All of the machinery for the immersed boundary method is handled in the following {{{SimulationModifier}}}.
          * Here, we create a 'shared pointer' to an {{{ImmersedBoundarySimulationModifier}}} object and pass it to the
          * {{{OffLatticeSimulation}}}.*/
         MAKE_PTR(ImmersedBoundarySimulationModifier<2>, p_main_modifier);
         simulator.AddSimulationModifier(p_main_modifier);
-        p_main_modifier->AddCorrectionTerm(false);
+        p_main_modifier->AddCorrectionTerm(true);
 
         /* We now associate an {{{ImmersedBoundaryLinearMembraneForce}}} and
          * {{{ImmersedBoundaryLinearInteractionForce}}} to the {{{SimulationModifier}}} which

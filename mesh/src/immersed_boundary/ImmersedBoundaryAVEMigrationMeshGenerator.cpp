@@ -61,7 +61,7 @@ ImmersedBoundaryAVEMigrationMeshGenerator::ImmersedBoundaryAVEMigrationMeshGener
     double cell_height =  (1.0 - (numCellsVertically) * spacing)/numCellsVertically;
 
     // Set up a reference cell
-    SuperellipseGenerator* p_gen = new SuperellipseGenerator(numNodesPerCell, ellipseExponent, cell_width, cell_height, 0.0, 0.5*spacing);
+    SuperellipseGenerator* p_gen = new SuperellipseGenerator(numNodesPerCell, ellipseExponent, cell_width, cell_height, 0.5*spacing, 0.5*spacing);
     std::vector<c_vector<double, 2> > locations =  p_gen->GetPointsAsVectors();
 
     // Set up the containers for holding the nodes and ib_elements
