@@ -35,14 +35,53 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractImmersedBoundaryForce.hpp"
 
-template<unsigned DIM>
+template <unsigned DIM>
 AbstractImmersedBoundaryForce<DIM>::AbstractImmersedBoundaryForce()
+        : mMultiplicativeNormalNoise(false),
+          mNormalNoiseMean(1.0),
+          mNormalNoiseStdDev(0.0)
 {
 }
 
 template<unsigned DIM>
 AbstractImmersedBoundaryForce<DIM>::~AbstractImmersedBoundaryForce()
 {
+}
+
+template <unsigned DIM>
+bool AbstractImmersedBoundaryForce<DIM>::GetMultiplicativeNormalNoise() const
+{
+    return mMultiplicativeNormalNoise;
+}
+
+template <unsigned DIM>
+void AbstractImmersedBoundaryForce<DIM>::SetMultiplicativeNormalNoise(bool multiplicativeNormalNoise)
+{
+    mMultiplicativeNormalNoise = multiplicativeNormalNoise;
+}
+
+template <unsigned DIM>
+double AbstractImmersedBoundaryForce<DIM>::GetNormalNoiseMean() const
+{
+    return mNormalNoiseMean;
+}
+
+template <unsigned DIM>
+void AbstractImmersedBoundaryForce<DIM>::SetNormalNoiseMean(double normalNoiseMean)
+{
+    mNormalNoiseMean = normalNoiseMean;
+}
+
+template <unsigned DIM>
+double AbstractImmersedBoundaryForce<DIM>::GetNormalNoiseStdDev() const
+{
+    return mNormalNoiseStdDev;
+}
+
+template <unsigned DIM>
+void AbstractImmersedBoundaryForce<DIM>::SetNormalNoiseStdDev(double normalNoiseStdDev)
+{
+    mNormalNoiseStdDev = normalNoiseStdDev;
 }
 
 template<unsigned DIM>
@@ -58,7 +97,9 @@ void AbstractImmersedBoundaryForce<DIM>::OutputImmersedBoundaryForceInfo(out_str
 template<unsigned DIM>
 void AbstractImmersedBoundaryForce<DIM>::OutputImmersedBoundaryForceParameters(out_stream& rParamsFile)
 {
-    // No parameters to output
+    *rParamsFile << "\t\t\t<MultiplicativeNormalNoise>" << mMultiplicativeNormalNoise << "</MultiplicativeNormalNoise>\n";
+    *rParamsFile << "\t\t\t<NormalNoiseMean>" << mNormalNoiseMean << "</NormalNoiseMean>\n";
+    *rParamsFile << "\t\t\t<NormalNoiseStdDev>" << mNormalNoiseStdDev << "</NormalNoiseStdDev>\n";
 }
 
 // Explicit instantiation
