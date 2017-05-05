@@ -52,7 +52,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 #include "vtkPolyData.h"
 #include "vtkSelectEnclosedPoints.h"
-#include "vtkPointLocator.h"
+
 #include "vtkCellLocator.h"
 
 /**
