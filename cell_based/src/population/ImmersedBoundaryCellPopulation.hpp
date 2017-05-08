@@ -215,6 +215,11 @@ public:
     unsigned GetNumElements();
 
     /**
+     * @return the number of ImmersedBoundaryLaminas in the cell population.
+     */
+    unsigned GetNumLaminas();
+
+    /**
      * Overridden GetNumNodes() method.
      *
      * @return the number of nodes in the cell population.

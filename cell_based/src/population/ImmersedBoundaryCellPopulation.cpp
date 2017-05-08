@@ -223,6 +223,12 @@ unsigned ImmersedBoundaryCellPopulation<DIM>::GetNumElements()
 }
 
 template <unsigned DIM>
+unsigned ImmersedBoundaryCellPopulation<DIM>::GetNumLaminas()
+{
+    return mpImmersedBoundaryMesh->GetNumLaminas();
+}
+
+template <unsigned DIM>
 CellPtr ImmersedBoundaryCellPopulation<DIM>::AddCell(CellPtr pNewCell, CellPtr pParentCell)
 {
     // Get the element associated with this cell
