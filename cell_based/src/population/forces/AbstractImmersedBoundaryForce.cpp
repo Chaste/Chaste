@@ -48,6 +48,92 @@ AbstractImmersedBoundaryForce<DIM>::~AbstractImmersedBoundaryForce()
 {
 }
 
+template<unsigned DIM>
+void AbstractImmersedBoundaryForce<DIM>::AddMultiplicativeNormalNoiseToNodes(ImmersedBoundaryCellPopulation<DIM>& rCellPopulation)
+{
+    RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
+
+    // Add random forces to elements
+    for (unsigned elem_idx = 0; elem_idx < rCellPopulation.GetNumElements(); ++elem_idx)
+    {
+        unsigned num_nodes_this_elem = rCellPopulation.GetElement(elem_idx)->GetNumNodes();
+
+        // Generate a vector with 0, 1, 2, ..., num_nodes-1
+        std::vector<unsigned> random_node_order;
+        random_node_order.reserve(num_nodes_this_elem);
+        for (unsigned node_idx = 0; node_idx < num_nodes_this_elem; ++node_idx)
+        {
+            random_node_order.push_back(node_idx);
+        }
+
+        // Shuffle the vector
+        std::random_shuffle(random_node_order.begin(), random_node_order.end());
+
+        // Only go to half way (rounded down - forget about the very last node for now)
+        unsigned half_way = num_nodes_this_elem / 2;
+        for (unsigned i = 0; i < half_way; ++i)
+        {
+            unsigned rand_node_a = random_node_order[2 * i];
+            unsigned rand_node_b = random_node_order[2 * i + 1];
+
+            c_vector<double, DIM> random_force;
+            for (unsigned dim = 0; dim < DIM; ++dim)
+            {
+                random_force[dim] = p_gen->NormalRandomDeviate(mNormalNoiseMean, mNormalNoiseStdDev);
+            }
+
+            double avg_magnitude = 0.5 * (norm_2(rCellPopulation.GetElement(elem_idx)->GetNode(rand_node_a)->rGetAppliedForce()) +
+                                          norm_2(rCellPopulation.GetElement(elem_idx)->GetNode(rand_node_b)->rGetAppliedForce()));
+
+            random_force *= avg_magnitude;
+            rCellPopulation.GetElement(elem_idx)->GetNode(rand_node_a)->AddAppliedForceContribution(random_force);
+
+            random_force *= -1.0;
+            rCellPopulation.GetElement(elem_idx)->GetNode(rand_node_b)->AddAppliedForceContribution(random_force);
+        }
+    }
+
+    // Do the same for laminas todo do we want different lamina behaviour?
+    for (unsigned lam_idx = 0; lam_idx < rCellPopulation.GetNumLaminas(); ++lam_idx)
+    {
+        unsigned num_nodes_this_elem = rCellPopulation.GetLamina(lam_idx)->GetNumNodes();
+
+        // Generate a vector with 0, 1, 2, ..., num_nodes-1
+        std::vector<unsigned> random_node_order;
+        random_node_order.reserve(num_nodes_this_elem);
+        for (unsigned node_idx = 0; node_idx < num_nodes_this_elem; ++node_idx)
+        {
+            random_node_order.push_back(node_idx);
+        }
+
+        // Shuffle the vector
+        std::random_shuffle(random_node_order.begin(), random_node_order.end());
+
+        // Only go to half way (rounded down - forget about the very last node for now)
+        unsigned half_way = num_nodes_this_elem / 2;
+        for (unsigned i = 0; i < half_way; ++i)
+        {
+            unsigned rand_node_a = random_node_order[2 * i];
+            unsigned rand_node_b = random_node_order[2 * i + 1];
+
+            c_vector<double, DIM> random_force;
+            for (unsigned dim = 0; dim < DIM; ++dim)
+            {
+                random_force[dim] = p_gen->NormalRandomDeviate(mNormalNoiseMean, mNormalNoiseStdDev);
+            }
+
+            double avg_magnitude = 0.5 * (norm_2(rCellPopulation.GetLamina(lam_idx)->GetNode(rand_node_a)->rGetAppliedForce()) +
+                                          norm_2(rCellPopulation.GetLamina(lam_idx)->GetNode(rand_node_b)->rGetAppliedForce()));
+
+            random_force *= avg_magnitude;
+            rCellPopulation.GetLamina(lam_idx)->GetNode(rand_node_a)->AddAppliedForceContribution(random_force);
+
+            random_force *= -1.0;
+            rCellPopulation.GetLamina(lam_idx)->GetNode(rand_node_b)->AddAppliedForceContribution(random_force);
+        }
+    }
+}
+
 template <unsigned DIM>
 bool AbstractImmersedBoundaryForce<DIM>::GetMultiplicativeNormalNoise() const
 {
