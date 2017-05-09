@@ -298,14 +298,14 @@ def Configure(prefs, build):
     use_vtk = int(prefs.get('use-vtk', 1))
     if use_vtk:
         # Pick version 1) if the user has asked for a version, 2) if there is a system 6.2 version on the machine, 3) fall back to system version 5
-	default_vtk_version = '5'                             # (3) Fall back to version 5.x (Ubuntu 14.04)
+        default_vtk_version = '5'                             # (3) Fall back to version 5.x (Ubuntu 14.04)
         vtk_62_include_path = '/usr/include/vtk-6.2'
         if (os.path.isdir(vtk_62_include_path)):
             default_vtk_version = '6.2'                       # (2) System-wide 6.2 (Ubuntu 16.04) 
         prefs['vtk'] = prefs.get('vtk', default_vtk_version)  # (1) User's choice
         # Assume that the system wide version of VTK is 6.2 (on 16.04) and use this in preference
         if prefs['vtk'] == '6.2':
-	    if (not os.path.isdir(vtk_62_include_path)):
+            if (not os.path.isdir(vtk_62_include_path)):
                 raise ValueError("No system headers for VTK 6 found at "+vtk_62_include_path)
             other_includepaths.append(vtk_62_include_path)
             vtk_libs = ['CommonCore','CommonDataModel', 'IOParallelXML', 'IOXML','IOGeometry','CommonExecutionModel','FiltersCore','FiltersGeometry','FiltersModeling','FiltersSources']
