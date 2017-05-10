@@ -116,7 +116,7 @@ private:
     double mFftNorm;
 
     /** Whether to apply multiplicative normal noise to the calculated force */
-    bool mMultiplicativeNormalNoise;
+    bool mAdditiveNormalNoise;
 
     /** The mean of the Normal distribution from which random noise variations are drawn */
     double mNormalNoiseMean;
@@ -299,11 +299,11 @@ public:
      */
     double GetReynoldsNumber();
 
-    /** @return mMultiplicativeNormalNoise */
-    bool GetMultiplicativeNormalNoise() const;
+    /** @return mAdditiveNormalNoise */
+    bool GetAdditiveNormalNoise() const;
 
-    /** @param multiplicativeNormalNoise whether to include multiplicative normal noise */
-    void SetMultiplicativeNormalNoise(bool multiplicativeNormalNoise);
+    /** @param additiveNormalNoise whether to include multiplicative normal noise */
+    void SetAdditiveNormalNoise(bool additiveNormalNoise);
 
     /** @return mNormalNoiseMean */
     double GetNormalNoiseMean() const;

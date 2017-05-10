@@ -48,7 +48,7 @@ ImmersedBoundarySimulationModifier<DIM>::ImmersedBoundarySimulationModifier()
       mGridSpacingX(0.0),
       mGridSpacingY(0.0),
       mFftNorm(0.0),
-      mMultiplicativeNormalNoise(false),
+      mAdditiveNormalNoise(false),
       mNormalNoiseMean(1.0),
       mNormalNoiseStdDev(0.0),
       mpBoxCollection(NULL),
@@ -223,7 +223,7 @@ void ImmersedBoundarySimulationModifier<DIM>::AddImmersedBoundaryForceContributi
     }
 
     // If noise is to be added to the forces, add it here, after all forces have been calculated.
-    if (mMultiplicativeNormalNoise)
+    if (mAdditiveNormalNoise)
     {
         RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
 
@@ -668,15 +668,15 @@ double ImmersedBoundarySimulationModifier<DIM>::GetReynoldsNumber()
 }
 
 template <unsigned DIM>
-bool ImmersedBoundarySimulationModifier<DIM>::GetMultiplicativeNormalNoise() const
+bool ImmersedBoundarySimulationModifier<DIM>::GetAdditiveNormalNoise() const
 {
-    return mMultiplicativeNormalNoise;
+    return mAdditiveNormalNoise;
 }
 
 template <unsigned DIM>
-void ImmersedBoundarySimulationModifier<DIM>::SetMultiplicativeNormalNoise(bool multiplicativeNormalNoise)
+void ImmersedBoundarySimulationModifier<DIM>::SetAdditiveNormalNoise(bool additiveNormalNoise)
 {
-    mMultiplicativeNormalNoise = multiplicativeNormalNoise;
+    mAdditiveNormalNoise = additiveNormalNoise;
 }
 
 template <unsigned DIM>

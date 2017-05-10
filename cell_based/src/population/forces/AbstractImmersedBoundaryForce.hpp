@@ -68,7 +68,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive& mMultiplicativeNormalNoise;
+        archive& mAdditiveNormalNoise;
         archive& mNormalNoiseMean;
         archive& mNormalNoiseStdDev;
     }
@@ -76,15 +76,15 @@ private:
 protected:
 
     /**
-     * Add the random noise to nodes, if mMultiplicativeNormalNoise is set.  This method handles randomization of the
+     * Add the random noise to nodes, if mAdditiveNormalNoise is set.  This method handles randomization of the
      * forces in such a way as to ensure no net change to forces across the whole domain.
      *
      * @param rCellPopulation an immersed boundary cell population
      */
-    void AddMultiplicativeNormalNoiseToNodes(ImmersedBoundaryCellPopulation<DIM>& rCellPopulation);
+    void AddNormalNoiseToNodes(ImmersedBoundaryCellPopulation<DIM>& rCellPopulation);
 
     /** Whether to apply multiplicative normal noise to the calculated force */
-    bool mMultiplicativeNormalNoise;
+    bool mAdditiveNormalNoise;
 
     /** The mean of the Normal distribution from which random noise variations are drawn */
     double mNormalNoiseMean;
@@ -139,11 +139,11 @@ public:
      */
     virtual void OutputImmersedBoundaryForceParameters(out_stream& rParamsFile)=0;
 
-    /** @return mMultiplicativeNormalNoise */
-    bool GetMultiplicativeNormalNoise() const;
+    /** @return mAdditiveNormalNoise */
+    bool GetAdditiveNormalNoise() const;
 
-    /** @param multiplicativeNormalNoise whether to include multiplicative normal noise */
-    void SetMultiplicativeNormalNoise(bool multiplicativeNormalNoise);
+    /** @param additiveNormalNoise whether to include multiplicative normal noise */
+    void SetAdditiveNormalNoise(bool additiveNormalNoise);
 
     /** @return mNormalNoiseMean */
     double GetNormalNoiseMean() const;

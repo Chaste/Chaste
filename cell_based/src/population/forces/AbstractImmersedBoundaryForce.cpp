@@ -37,7 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template <unsigned DIM>
 AbstractImmersedBoundaryForce<DIM>::AbstractImmersedBoundaryForce()
-        : mMultiplicativeNormalNoise(false),
+        : mAdditiveNormalNoise(false),
           mNormalNoiseMean(1.0),
           mNormalNoiseStdDev(0.0)
 {
@@ -49,7 +49,7 @@ AbstractImmersedBoundaryForce<DIM>::~AbstractImmersedBoundaryForce()
 }
 
 template<unsigned DIM>
-void AbstractImmersedBoundaryForce<DIM>::AddMultiplicativeNormalNoiseToNodes(ImmersedBoundaryCellPopulation<DIM>& rCellPopulation)
+void AbstractImmersedBoundaryForce<DIM>::AddNormalNoiseToNodes(ImmersedBoundaryCellPopulation<DIM>& rCellPopulation)
 {
     RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
 
@@ -135,15 +135,15 @@ void AbstractImmersedBoundaryForce<DIM>::AddMultiplicativeNormalNoiseToNodes(Imm
 }
 
 template <unsigned DIM>
-bool AbstractImmersedBoundaryForce<DIM>::GetMultiplicativeNormalNoise() const
+bool AbstractImmersedBoundaryForce<DIM>::GetAdditiveNormalNoise() const
 {
-    return mMultiplicativeNormalNoise;
+    return mAdditiveNormalNoise;
 }
 
 template <unsigned DIM>
-void AbstractImmersedBoundaryForce<DIM>::SetMultiplicativeNormalNoise(bool multiplicativeNormalNoise)
+void AbstractImmersedBoundaryForce<DIM>::SetAdditiveNormalNoise(bool additiveNormalNoise)
 {
-    mMultiplicativeNormalNoise = multiplicativeNormalNoise;
+    mAdditiveNormalNoise = additiveNormalNoise;
 }
 
 template <unsigned DIM>
@@ -183,7 +183,7 @@ void AbstractImmersedBoundaryForce<DIM>::OutputImmersedBoundaryForceInfo(out_str
 template<unsigned DIM>
 void AbstractImmersedBoundaryForce<DIM>::OutputImmersedBoundaryForceParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<MultiplicativeNormalNoise>" << mMultiplicativeNormalNoise << "</MultiplicativeNormalNoise>\n";
+    *rParamsFile << "\t\t\t<AdditiveNormalNoise>" << mAdditiveNormalNoise << "</AdditiveNormalNoise>\n";
     *rParamsFile << "\t\t\t<NormalNoiseMean>" << mNormalNoiseMean << "</NormalNoiseMean>\n";
     *rParamsFile << "\t\t\t<NormalNoiseStdDev>" << mNormalNoiseStdDev << "</NormalNoiseStdDev>\n";
 }
