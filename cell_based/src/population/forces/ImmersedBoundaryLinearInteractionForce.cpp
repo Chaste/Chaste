@@ -108,6 +108,11 @@ void ImmersedBoundaryLinearInteractionForce<DIM>::AddImmersedBoundaryForceContri
             }
         }
     }
+
+    if (this->mAdditiveNormalNoise)
+    {
+        this->AddNormalNoiseToNodes(rCellPopulation);
+    }
 }
 
 

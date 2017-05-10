@@ -112,6 +112,11 @@ void ImmersedBoundaryMorseInteractionForce<DIM>::AddImmersedBoundaryForceContrib
             }
         }
     }
+
+    if (this->mAdditiveNormalNoise)
+    {
+        this->AddNormalNoiseToNodes(rCellPopulation);
+    }
 }
 
 template <unsigned DIM>
