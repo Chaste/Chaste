@@ -360,9 +360,9 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteXdmfMasterFile(unsigned number
     XMLFormatTarget* p_target = new LocalFileFormatTarget(X(this->mpOutputFileHandler->GetOutputDirectoryFullPath() + this->mBaseName+".xdmf"));
 
 #if _XERCES_VERSION >= 30000
-    DOMLSSerializer *p_serializer = ((DOMImplementationLS*)p_DOM_implementation)->createLSSerializer();
+    DOMLSSerializer* p_serializer = ((DOMImplementationLS*)p_DOM_implementation)->createLSSerializer();
     p_serializer->getDomConfig()->setParameter(XMLUni::fgDOMWRTFormatPrettyPrint, true);
-    DOMLSOutput *p_output = ((DOMImplementationLS*)p_DOM_implementation)->createLSOutput();
+    DOMLSOutput* p_output = ((DOMImplementationLS*)p_DOM_implementation)->createLSOutput(); // Calls a new somewhere!
     p_output->setByteStream(p_target);
     p_serializer->write(p_DOM_document, p_output);
 #else
@@ -374,6 +374,9 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteXdmfMasterFile(unsigned number
     // Cleanup
     p_serializer->release();
     p_DOM_document->release();
+#if _XERCES_VERSION >= 30000
+    delete p_output;
+#endif
     delete p_target;
     XMLPlatformUtils::Terminate();
 #endif // _MSC_VER
