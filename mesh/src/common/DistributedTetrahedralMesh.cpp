@@ -743,6 +743,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructLinearMesh(uns
         if (this->mpDistributedVectorFactory->GetLocalOwnership() == 0)
         {
             //It's a short mesh and this process owns no nodes
+            assert(0);
             return;
         }
 
@@ -865,6 +866,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRectangularMes
         if (this->mpDistributedVectorFactory->GetLocalOwnership() == 0)
         {
             //It's a short mesh and this process owns no nodes
+            assert(0);
             return;
         }
         /* am_top_most is like PetscTools::AmTopMost() but accounts for the fact that a
@@ -1068,6 +1070,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructCuboid(unsigne
         this->mpDistributedVectorFactory = new DistributedVectorFactory(mTotalNumNodes, (width+1)*(height+1)*z_partition.GetLocalOwnership());
         if (this->mpDistributedVectorFactory->GetLocalOwnership() == 0)
         {
+            assert(0);
             return;
         }
         /* am_top_most is like PetscTools::AmTopMost() but accounts for the fact that a

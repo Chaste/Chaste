@@ -502,6 +502,7 @@ void AbstractContinuumMechanicsSolver<DIM>::WriteCurrentPressureSolution(int cou
     // Only write output if the flag mWriteOutput has been set
     if (!mWriteOutput)
     {
+        assert(0);
         return;
     }
 

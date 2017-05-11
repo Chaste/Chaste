@@ -40,6 +40,7 @@ void AbstractExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolve(V
 {
     if (this->mpLinearSystem != NULL)
     {
+        assert(0);
         return;
     }
 
