@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <algorithm>
 #include <array>
+#include <iostream>
 #include <map>
 #include <memory>
 #include <random>
@@ -62,6 +63,7 @@ public:
     void TestAutoKeyword()
     {
         auto i = 0;
+        ++i; // Stop the compiler complaining about unused variable
     }
 
     void TestSmartPointers() throw (Exception)
@@ -75,6 +77,7 @@ public:
     void TestStdArray() throw (Exception)
     {
         std::array<unsigned, 3> my_array;
+        ++my_array[0]; // Stop the compiler complaining about unused variable
     }
 
     void TestStdInitializerList() throw (Exception)
@@ -90,19 +93,27 @@ public:
 
             // Access by const reference
             for (const unsigned &i : my_vec)
-            {}
+            {
+                std::cout << i;
+            }
 
             // Access by value.  The type of i is unsigned
             for (auto i : my_vec)
-            {}
+            {
+                std::cout << i;
+            }
 
             // Access by reference.  The type of i is unsigned&
             for (auto &&i : my_vec)
-            {}
+            {
+                std::cout << i;
+            }
 
             // Initializer may be generated directly
-            for (int n : {0, 1, 2, 3, 4, 5})
-            {}
+            for (int i : {0, 1, 2, 3, 4, 5})
+            {
+                std::cout << i;
+            }
         }
 
         // Traversing a map
@@ -134,15 +145,18 @@ public:
         }
 
         // Use algorithm std::sort, with a lambda, to sort smallest-to-largest x-val
-        std::sort(my_vec.begin(), my_vec.end(),
-                  [](std::array<double, DIM> a, std::array<double, DIM> b){
-                      return a[0] < b[0];
-                  });
+        auto sort_x = [](std::array<double, DIM> a, std::array<double, DIM> b) -> bool
+        {
+            return a[0] < b[0];
+        };
+
+        std::sort(my_vec.begin(), my_vec.end(), sort_x);
     }
 
     void TestTuple() throw (Exception)
     {
         auto my_tuple = std::make_tuple(1.23, 5u, "a_string");
+        ++std::get<1>(my_tuple); // Stop the compiler complaining about unused variable
     }
 };
 
