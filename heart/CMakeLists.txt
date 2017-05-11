@@ -21,6 +21,13 @@ set(Chaste_heart_INCLUDE_DIRS ${Chaste_heart_INCLUDE_DIRS} ${CMAKE_CURRENT_BINAR
 # Make dynamic directory for dynamic cellml compilation
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/dynamic)
 
+# XSD < 4.0.0 generates code with std::auto_ptr.  This is deprecated from C++11 (in favour of new standard smart
+# pointers). This code turns off the deprecation warnings so that Chaste compiles.
+# TODO: Once we drop Chaste support for XSD 3.3, this should be removed in favour of changing auto_ptr to unique_ptr
+foreach(xsd_generated_cpp_file ${Chaste_heart_SOURCES})
+    set_source_files_properties(${xsd_generated_cpp_file} PROPERTIES COMPILE_FLAGS "-Wno-deprecated-declarations")
+endforeach(xsd_generated_cpp_file ${Chaste_heart_SOURCES})
+
 chaste_do_component(heart ${Chaste_heart_SOURCES})
 
 # make sure to link dl libraries
@@ -43,12 +50,4 @@ foreach(dyn_source ${dyn_sources})
     # add dynamic models to the heart_tests and Continuous targets
     add_dependencies(heart ${dyn_source_name})
     add_dependencies(Continuous ${dyn_source_name})
-endforeach(dyn_source)
-
-# XSD < 4.0.0 generates code with std::auto_ptr.  This is deprecated from C++11 (in favour of new standard smart
-# pointers). This code turns off the deprecation warnings so that Chaste compiles.
-# TODO: Once we drop Chaste support for XSD 3.3, this should be removed in favour of changing auto_ptr to unique_ptr
-file(GLOB xsd_generated_cpp_files ${CMAKE_CURRENT_BINARY_DIR}/src/io/*.cpp)
-foreach(xsd_generated_cpp_file ${xsd_generated_cpp_files})
-    set_source_files_properties(${xsd_generated_cpp_file} PROPERTIES COMPILE_FLAGS "-Wno-deprecated")
 endforeach(dyn_source)
