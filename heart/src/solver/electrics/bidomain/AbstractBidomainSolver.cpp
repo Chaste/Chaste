@@ -44,6 +44,7 @@ void AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolve(Vec initi
 {
     if (this->mpLinearSystem != NULL)
     {
+        assert(0);
         return;
     }
 

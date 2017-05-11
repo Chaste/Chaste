@@ -227,6 +227,7 @@ void OdeSolution::WriteToFile(std::string directoryName,
     if (!PetscTools::AmMaster())
     {
         //Only the master actually writes to file
+        assert(0);
         return;
     }
 

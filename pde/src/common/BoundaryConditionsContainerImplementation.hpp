@@ -436,6 +436,7 @@ void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::ApplyPeriod
 
     if (!has_periodic_bcs)
     {
+        assert(0);
         return;
     }
 
