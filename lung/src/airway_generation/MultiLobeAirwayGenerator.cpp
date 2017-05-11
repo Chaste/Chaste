@@ -37,17 +37,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/foreach.hpp>
 #include <map>
 
-#ifdef CHASTE_VTK // This include is here to prevent a define conflict for HZ in vtkPointLocator (brought in by VtkMeshWriter includes)
-#define _BACKWARD_BACKWARD_WARNING_H 1 //Cut out the strstream deprecated warning for now (gcc4.3)
-#include <vtkPointLocator.h>
-#endif //CHASTE_VTK
-
 #include "MultiLobeAirwayGenerator.hpp"
 #include "VtkMeshWriter.hpp"
 #include "VtkMeshReader.hpp"
 #include "CmguiMeshWriter.hpp"
 
 #ifdef CHASTE_VTK
+#define _BACKWARD_BACKWARD_WARNING_H 1 //Cut out the strstream deprecated warning for now (gcc4.3)
 #include "vtkVersion.h"
 #include "vtkAppendFilter.h"
 #include "vtkSTLReader.h"
