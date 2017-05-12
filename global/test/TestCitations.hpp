@@ -37,17 +37,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTCITATIONS_HPP_
 
 #include <cxxtest/TestSuite.h>
-#include "PetscSetupUtils.hpp"
-#include "PetscException.hpp"
 #include "Citations.hpp"
-#include "OutputFileHandler.hpp"
 #include "CommandLineArgumentsMocker.hpp"
 #include "FileComparison.hpp"
+#include "OutputFileHandler.hpp"
+#include "PetscAndChasteCitations.hpp"
+#include "PetscException.hpp"
+#include "PetscSetupUtils.hpp"
 
 class TestCitations : public CxxTest::TestSuite
 {
 public:
-    void TestChasteCitation() throw (Exception)
+    void TestChasteCitation() throw(Exception)
     {
         /*
          * Get location of output file to pass through as -citation argument.
@@ -59,25 +60,48 @@ public:
         // Turn on citations with argument
         CommandLineArgumentsMocker mocker("-citations " + output_file.GetAbsolutePath());
 
-        PetscSetupUtils::CommonSetup(); // This automatically includes some citations
-        /*
-         * Make empty directory now that Petsc is set up, because this must be done
-         * collectively.
-         */
-        OutputFileHandler handler("TestCitations");
-        PetscSetupUtils::CommonFinalize(); // This prints the citations to disk
+        // First test Chaste implementation on its own, as PETSc isn't yet initialised
+        {
+            Citations::Register(PetscCitation1, &PetscCite1);
+            Citations::Register(PetscCitation2, &PetscCite2);
+            Citations::Register(ChasteCitation, &ChasteCite);
 
-        // Check
-#if (PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR == 7) //PETSc 3.7
-        FileFinder reference_citations("global/test/data/citations-2016.txt", RelativeTo::ChasteSourceRoot);
-#elif (PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR == 6) //PETSc 3.6
-        FileFinder reference_citations("global/test/data/citations-2015.txt", RelativeTo::ChasteSourceRoot);
+            Citations::Print();
+
+            FileFinder reference_citations("global/test/data/citations.txt", RelativeTo::ChasteSourceRoot);
+            FileComparison check_files(output_file, reference_citations, false); // Not collective
+            check_files.CompareFiles();
+
+            TS_ASSERT_EQUALS(Citations::mUseChasteImplementation, true);
+        }
+
+        // Reset to default
+        Citations::mUseChasteImplementation = false;
+
+        // Now test as part of PETSc, PETSc implementation will be used if PETSc is new enough...
+        // if not this is something of a duplicate of the above test!
+        {
+
+            PetscSetupUtils::CommonSetup(); // This automatically includes some citations
+            /*
+			 * Make empty directory now that Petsc is set up, because this must be done
+			 * collectively.
+			 */
+            OutputFileHandler handler("TestCitations");
+            PetscSetupUtils::CommonFinalize(); // This prints the citations to disk
+
+// Check PETSc version - this is just because they reformatted their BibTex between versions, no change to function!
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR == 7) //PETSc 3.7
+            FileFinder reference_citations("global/test/data/citations-2016.txt", RelativeTo::ChasteSourceRoot);
+#elif (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR == 6) //PETSc 3.6
+            FileFinder reference_citations("global/test/data/citations-2015.txt", RelativeTo::ChasteSourceRoot);
 #else
-        // Use older version (or mocked up version)
-        FileFinder reference_citations("global/test/data/citations.txt", RelativeTo::ChasteSourceRoot);
+            // Use PETSc 3.4 older version (or mocked up version that matches 3.4)
+            FileFinder reference_citations("global/test/data/citations.txt", RelativeTo::ChasteSourceRoot);
 #endif
-        FileComparison check_files(output_file, reference_citations, false); // Not collective
-        check_files.CompareFiles();
+            FileComparison check_files(output_file, reference_citations, false); // Not collective
+            check_files.CompareFiles();
+        }
     }
 };
 
