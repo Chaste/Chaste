@@ -45,6 +45,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscException.hpp"
 #include "PetscSetupUtils.hpp"
 
+// Important that this test DOESN'T include a PetscSetupAndFinalise.hpp !
+
 class TestCitations : public CxxTest::TestSuite
 {
 public:
@@ -56,12 +58,21 @@ public:
          * running at this point is implementation-dependent, and it's not really
          * safe to do anything collective! Fortunately FileFinder isn't.
          */
-        FileFinder output_file("TestCitations/citations.txt", RelativeTo::ChasteTestOutput);
-        // Turn on citations with argument
-        CommandLineArgumentsMocker mocker("-citations " + output_file.GetAbsolutePath());
+        FileFinder output_chaste_file("TestCitations/chaste_citations.txt", RelativeTo::ChasteTestOutput);
+        FileFinder output_petsc_file("TestCitations/petsc_citations.txt", RelativeTo::ChasteTestOutput);
+
+        /*
+		 * Make empty directory before Petsc is set up, because this must be done either
+		 * collectively or completely sequentially. Here it is completely sequentially since we haven't
+		 * called PETSc::Initialize yet, so we can get away with it.
+		 */
+        OutputFileHandler handler("TestCitations");
 
         // First test Chaste implementation on its own, as PETSc isn't yet initialised
         {
+            // Turn on citations with argument
+            CommandLineArgumentsMocker mocker("-citations " + output_chaste_file.GetAbsolutePath());
+
             Citations::Register(PetscCitation1, &PetscCite1);
             Citations::Register(PetscCitation2, &PetscCite2);
             Citations::Register(ChasteCitation, &ChasteCite);
@@ -69,7 +80,7 @@ public:
             Citations::Print();
 
             FileFinder reference_citations("global/test/data/citations.txt", RelativeTo::ChasteSourceRoot);
-            FileComparison check_files(output_file, reference_citations, false); // Not collective
+            FileComparison check_files(output_chaste_file, reference_citations, false); // Not collective
             check_files.CompareFiles();
 
             TS_ASSERT_EQUALS(Citations::mUseChasteImplementation, true);
@@ -82,13 +93,11 @@ public:
         // Now test as part of PETSc, PETSc implementation will be used if PETSc is new enough...
         // if not this is something of a duplicate of the above test!
         {
+            // Turn on citations with argument
+            CommandLineArgumentsMocker mocker("-citations " + output_petsc_file.GetAbsolutePath());
 
             PetscSetupUtils::CommonSetup(); // This automatically includes some citations
-            /*
-			 * Make empty directory now that Petsc is set up, because this must be done
-			 * collectively.
-			 */
-            OutputFileHandler handler("TestCitations");
+
             PetscSetupUtils::CommonFinalize(); // This prints the citations to disk
 
 // Check PETSc version - this is just because they reformatted their BibTex between versions, no change to function!
@@ -100,7 +109,7 @@ public:
             // Use PETSc 3.4 older version (or mocked up version that matches 3.4)
             FileFinder reference_citations("global/test/data/citations.txt", RelativeTo::ChasteSourceRoot);
 #endif
-            FileComparison check_files(output_file, reference_citations, false); // Not collective
+            FileComparison check_files(output_petsc_file, reference_citations, false); // Not collective
             check_files.CompareFiles();
         }
     }
