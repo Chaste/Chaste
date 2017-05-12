@@ -434,8 +434,11 @@ void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::ApplyPeriod
         }
     }
 
-    // This method should only be called if there are periodic boundaries
-    assert(has_periodic_bcs);
+    if (!has_periodic_bcs)
+    {
+        assert(0);
+        return;
+    }
 
     if (applyToMatrix)
     {
