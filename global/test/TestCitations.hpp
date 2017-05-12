@@ -77,6 +77,7 @@ public:
 
         // Reset to default
         Citations::mUseChasteImplementation = false;
+        Citations::mCitations.clear();
 
         // Now test as part of PETSc, PETSc implementation will be used if PETSc is new enough...
         // if not this is something of a duplicate of the above test!
