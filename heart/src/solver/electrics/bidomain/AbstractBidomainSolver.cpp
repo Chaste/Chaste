@@ -42,58 +42,57 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolve(Vec initialSolution)
 {
-    if (this->mpLinearSystem != NULL)
+    if (this->mpLinearSystem == NULL)
     {
-        assert(0);
-        return;
-    }
+        // linear system created here
+        AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, 2>::InitialiseForSolve(initialSolution);
 
-    // linear system created here
-    AbstractDynamicLinearPdeSolver<ELEMENT_DIM,SPACE_DIM,2>::InitialiseForSolve(initialSolution);
-
-    if (HeartConfig::Instance()->GetUseAbsoluteTolerance())
-    {
-#ifdef TRACE_KSP
-        if (PetscTools::AmMaster())
+        if (HeartConfig::Instance()->GetUseAbsoluteTolerance())
         {
-            std::cout << "Using absolute tolerance: " << mpConfig->GetAbsoluteTolerance() <<"\n";
-        }
-#endif
-        this->mpLinearSystem->SetAbsoluteTolerance(mpConfig->GetAbsoluteTolerance());
-    }
-    else
-    {
 #ifdef TRACE_KSP
-        if (PetscTools::AmMaster())
-        {
-            std::cout << "Using relative tolerance: " << mpConfig->GetRelativeTolerance() <<"\n";
-        }
+            if (PetscTools::AmMaster())
+            {
+                std::cout << "Using absolute tolerance: " << mpConfig->GetAbsoluteTolerance() << "\n";
+            }
 #endif
-        this->mpLinearSystem->SetRelativeTolerance(mpConfig->GetRelativeTolerance());
+            this->mpLinearSystem->SetAbsoluteTolerance(mpConfig->GetAbsoluteTolerance());
+        }
+        else
+        {
+#ifdef TRACE_KSP
+            if (PetscTools::AmMaster())
+            {
+                std::cout << "Using relative tolerance: " << mpConfig->GetRelativeTolerance() << "\n";
+            }
+#endif
+            this->mpLinearSystem->SetRelativeTolerance(mpConfig->GetRelativeTolerance());
+        }
+
+        this->mpLinearSystem->SetKspType(HeartConfig::Instance()->GetKSPSolver());
+
+        // Note that twolevelblockdiagonal was never finished.  It was a preconditioner specific to the Parabolic-Parabolic formulation of Bidomain
+        // Two levels block diagonal only worked in serial with TetrahedralMesh.
+        assert(std::string(HeartConfig::Instance()->GetKSPPreconditioner()) != std::string("twolevelsblockdiagonal"));
+        this->mpLinearSystem->SetPcType(HeartConfig::Instance()->GetKSPPreconditioner());
+
+        if (mRowForAverageOfPhiZeroed == INT_MAX)
+        {
+            // not applying average(phi)=0 constraint, so matrix is symmetric
+            this->mpLinearSystem->SetMatrixIsSymmetric(true);
+        }
+        else
+        {
+            //Turn off preallocation so that we can have one dense row in the matrix.
+            PetscMatTools::TurnOffVariableAllocationError(this->mpLinearSystem->rGetLhsMatrix());
+
+            // applying average(phi)=0 constraint, so matrix is not symmetric
+            this->mpLinearSystem->SetMatrixIsSymmetric(false);
+        }
+
+        this->mpLinearSystem->SetUseFixedNumberIterations(
+            HeartConfig::Instance()->GetUseFixedNumberIterationsLinearSolver(),
+            HeartConfig::Instance()->GetEvaluateNumItsEveryNSolves());
     }
-
-    this->mpLinearSystem->SetKspType(HeartConfig::Instance()->GetKSPSolver());
-
-    // Note that twolevelblockdiagonal was never finished.  It was a preconditioner specific to the Parabolic-Parabolic formulation of Bidomain
-    // Two levels block diagonal only worked in serial with TetrahedralMesh.
-    assert(std::string(HeartConfig::Instance()->GetKSPPreconditioner()) != std::string("twolevelsblockdiagonal") );
-    this->mpLinearSystem->SetPcType(HeartConfig::Instance()->GetKSPPreconditioner());
-
-    if (mRowForAverageOfPhiZeroed==INT_MAX)
-    {
-        // not applying average(phi)=0 constraint, so matrix is symmetric
-        this->mpLinearSystem->SetMatrixIsSymmetric(true);
-    }
-    else
-    {
-        //Turn off preallocation so that we can have one dense row in the matrix.
-        PetscMatTools::TurnOffVariableAllocationError(this->mpLinearSystem->rGetLhsMatrix());
-
-        // applying average(phi)=0 constraint, so matrix is not symmetric
-        this->mpLinearSystem->SetMatrixIsSymmetric(false);
-    }
-
-    this->mpLinearSystem->SetUseFixedNumberIterations(HeartConfig::Instance()->GetUseFixedNumberIterationsLinearSolver(), HeartConfig::Instance()->GetEvaluateNumItsEveryNSolves());
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

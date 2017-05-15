@@ -35,47 +35,44 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractExtendedBidomainSolver.hpp"
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolve(Vec initialSolution)
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractExtendedBidomainSolver<ELEMENT_DIM, SPACE_DIM>::InitialiseForSolve(Vec initialSolution)
 {
-    if (this->mpLinearSystem != NULL)
+    if (this->mpLinearSystem == NULL)
     {
-        assert(0);
-        return;
-    }
+        // linear system created here
+        AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, 3>::InitialiseForSolve(initialSolution);
 
-    // linear system created here
-    AbstractDynamicLinearPdeSolver<ELEMENT_DIM,SPACE_DIM,3>::InitialiseForSolve(initialSolution);
-
-    if (HeartConfig::Instance()->GetUseAbsoluteTolerance())
-    {
+        if (HeartConfig::Instance()->GetUseAbsoluteTolerance())
+        {
 #ifdef TRACE_KSP
-        std::cout << "Using absolute tolerance: " << mpConfig->GetAbsoluteTolerance() <<"\n";
+            std::cout << "Using absolute tolerance: " << mpConfig->GetAbsoluteTolerance() << "\n";
 #endif
-        this->mpLinearSystem->SetAbsoluteTolerance(mpConfig->GetAbsoluteTolerance());
-    }
-    else
-    {
+            this->mpLinearSystem->SetAbsoluteTolerance(mpConfig->GetAbsoluteTolerance());
+        }
+        else
+        {
 #ifdef TRACE_KSP
-        std::cout << "Using relative tolerance: " << mpConfig->GetRelativeTolerance() <<"\n";
+            std::cout << "Using relative tolerance: " << mpConfig->GetRelativeTolerance() << "\n";
 #endif
-        this->mpLinearSystem->SetRelativeTolerance(mpConfig->GetRelativeTolerance());
-    }
+            this->mpLinearSystem->SetRelativeTolerance(mpConfig->GetRelativeTolerance());
+        }
 
-    this->mpLinearSystem->SetKspType(HeartConfig::Instance()->GetKSPSolver());
-    this->mpLinearSystem->SetPcType(HeartConfig::Instance()->GetKSPPreconditioner());
+        this->mpLinearSystem->SetKspType(HeartConfig::Instance()->GetKSPSolver());
+        this->mpLinearSystem->SetPcType(HeartConfig::Instance()->GetKSPPreconditioner());
 
-    if (mRowForAverageOfPhiZeroed==INT_MAX)
-    {
-        // not applying average(phi)=0 constraint, so matrix is symmetric
-        this->mpLinearSystem->SetMatrixIsSymmetric(true);
-    }
-    else
-    {
-        //Turn off preallocation so that we can have one dense row in the matrix.
-        PetscMatTools::TurnOffVariableAllocationError(this->mpLinearSystem->rGetLhsMatrix());
-        // applying average(phi)=0 constraint, so matrix is not symmetric
-        this->mpLinearSystem->SetMatrixIsSymmetric(false);
+        if (mRowForAverageOfPhiZeroed == INT_MAX)
+        {
+            // not applying average(phi)=0 constraint, so matrix is symmetric
+            this->mpLinearSystem->SetMatrixIsSymmetric(true);
+        }
+        else
+        {
+            //Turn off preallocation so that we can have one dense row in the matrix.
+            PetscMatTools::TurnOffVariableAllocationError(this->mpLinearSystem->rGetLhsMatrix());
+            // applying average(phi)=0 constraint, so matrix is not symmetric
+            this->mpLinearSystem->SetMatrixIsSymmetric(false);
+        }
     }
 }
 
