@@ -499,14 +499,8 @@ void AbstractContinuumMechanicsSolver<DIM>::WriteCurrentSpatialSolution(std::str
 template<unsigned DIM>
 void AbstractContinuumMechanicsSolver<DIM>::WriteCurrentPressureSolution(int counterToAppend)
 {
-    // Only write output if the flag mWriteOutput has been set
-    if (!mWriteOutput)
-    {
-        assert(0);
-        return;
-    }
-
-    if (PetscTools::AmMaster())
+    // Only the master writes, and only if the flag mWriteOutput has been set
+    if (PetscTools::AmMaster() && mWriteOutput)
     {
         std::stringstream file_name;
 
