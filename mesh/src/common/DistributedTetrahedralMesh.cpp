@@ -1069,6 +1069,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructCuboid(unsigne
         //Dumb partition of nodes has to be such that each process gets complete slices
         assert(!this->mpDistributedVectorFactory);
         this->mpDistributedVectorFactory = new DistributedVectorFactory(mTotalNumNodes, (width+1)*(height+1)*z_partition.GetLocalOwnership());
+        if (this->mpDistributedVectorFactory->GetLocalOwnership() == 0)
         {
             // It's a short mesh and this process owns no nodes.
             // This return cannot be covered by regular testing, but is covered by the Nightly -np 3 builder
