@@ -36,15 +36,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _BOUNDARYCONDITIONSCONTAINERIMPLEMENTATION_HPP_
 #define _BOUNDARYCONDITIONSCONTAINERIMPLEMENTATION_HPP_
 
-#include "PetscVecTools.hpp"
-#include "PetscMatTools.hpp"
 #include "BoundaryConditionsContainer.hpp"
-#include "DistributedVector.hpp"
-#include "ReplicatableVector.hpp"
 #include "ConstBoundaryCondition.hpp"
+#include "DistributedVector.hpp"
+#include "Exception.hpp"
 #include "HeartEventHandler.hpp"
 #include "PetscMatTools.hpp"
-
+#include "PetscVecTools.hpp"
+#include "ReplicatableVector.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::BoundaryConditionsContainer(bool deleteConditions)
@@ -434,11 +433,7 @@ void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::ApplyPeriod
         }
     }
 
-    if (!has_periodic_bcs)
-    {
-        assert(0);
-        return;
-    }
+    EXCEPT_IF_NOT(has_periodic_bcs);
 
     if (applyToMatrix)
     {
