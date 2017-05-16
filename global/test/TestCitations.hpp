@@ -41,7 +41,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CommandLineArgumentsMocker.hpp"
 #include "FileComparison.hpp"
 #include "OutputFileHandler.hpp"
+#if ((PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 5) || PETSC_VERSION_MAJOR > 3)
 #include "PetscAndChasteCitations.hpp"
+#endif
 #include "PetscException.hpp"
 #include "PetscSetupUtils.hpp"
 
@@ -58,12 +60,13 @@ public:
          * running at this point is implementation-dependent, and it's not really
          * safe to do anything collective! Fortunately FileFinder isn't.
          */
-        FileFinder output_chaste_file("TestCitations/chaste_citations.txt", RelativeTo::ChasteTestOutput);
         FileFinder output_petsc_file("TestCitations/petsc_citations.txt", RelativeTo::ChasteTestOutput);
 
         // First part of PETSc citation testing.
         {
             // Turn on citations with argument - N.B. we direct PETSc to a different file to Chaste implementation.
+            // N.B. This is needed twice - PETSc implementation reads the first one,
+            // Chaste implementation masquerading as PETSc reads the second!
             CommandLineArgumentsMocker mocker("-citations " + output_petsc_file.GetAbsolutePath());
             // Setup PETSc (with command line for citations pointing to PETSc output file)
             PetscSetupUtils::CommonSetup();
@@ -73,6 +76,11 @@ public:
          * Make empty directory, has to be done after PETSc is set up to be safe in parallel.
          */
         OutputFileHandler handler("TestCitations");
+
+// If we need to check the Chaste version manually (PETSc is new)
+// Otherwise on old PETSc the test below covers what is in this guard.
+#if ((PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 5) || PETSC_VERSION_MAJOR > 3)
+        FileFinder output_chaste_file("TestCitations/chaste_citations.txt", RelativeTo::ChasteTestOutput);
 
         // Test Chaste implementation on its own (for PETSc <= 3.4, or no PETSc setup)
         Citations::mUseChasteImplementation = true;
@@ -99,6 +107,7 @@ public:
         // Reset to default
         Citations::mUseChasteImplementation = false;
         Citations::mCitations.clear();
+#endif
 
         // Now test as part of PETSc,
         // PETSc implementation will be used if PETSc is >= 3.5
@@ -106,8 +115,10 @@ public:
         {
             std::cout << "Testing PETSc implementation" << std::endl;
 
-            // This command now moved up to block at the top of the test so we can safely make an output folder.
-            //PetscSetupUtils::CommonSetup(); // This automatically includes some citations
+            // Turn on citations with argument - N.B. we direct PETSc to a different file to Chaste implementation.
+            // N.B. This is needed twice - PETSc implementation reads the first one,
+            // Chaste implementation masquerading as PETSc reads the second!
+            CommandLineArgumentsMocker mocker("-citations " + output_petsc_file.GetAbsolutePath());
 
             PetscSetupUtils::CommonFinalize(); // This prints the citations to disk
 
