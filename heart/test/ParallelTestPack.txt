@@ -3,7 +3,6 @@ bidomain/TestBidomainTissue.hpp
 bidomain/TestBidomainProblem.hpp
 bidomain/TestBidomainWithBathProblem.hpp
 convergence/TestConvergenceTester.hpp
-extended_bidomain/TestGIModifiedModels.hpp
 fibres/TestStreeterFibreGenerator.hpp
 monodomain/TestMonodomainConductionVelocity.hpp
 monodomain/TestMonodomainProblem.hpp
