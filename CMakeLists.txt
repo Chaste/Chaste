@@ -688,13 +688,13 @@ install(EXPORT chaste-targets
 
 if (Chaste_COVERAGE)
 
-    # Remove all gcno files in subdirectories of the ${Chaste_BINARY_DIR}, to prevent
+    # Remove all gcno and gcda files in subdirectories of the ${Chaste_BINARY_DIR}, to prevent
     # "*.gcno: reached unexpected end of file" errors when source files change between testing.
-    file(GLOB_RECURSE gcno_files ${Chaste_BINARY_DIR}/*.gcno)
-    foreach(gcno_file ${gcno_files})
-        file(REMOVE ${gcno_file})
-    endforeach()
-    unset(gcno_files)
+    file(GLOB_RECURSE gcov_files ${Chaste_BINARY_DIR}/*.gc??)
+    foreach(gcov_file ${gcov_files})
+        file(REMOVE ${gcov_file})
+    endforeach(gcov_file ${gcov_files})
+    unset(gcov_files)
 
     # Run ctest with a low priority (+15)
     set(NICE_COMMAND nice)
@@ -708,7 +708,7 @@ if (Chaste_COVERAGE)
 		${LCOV_PATH} --directory . --zerocounters
 
 		# Run tests
-        COMMAND ${NICE_COMMAND} ${NICENESS} ${CTEST_COMMAND} "-L" "Continuous" "--output-on-failure"
+        COMMAND ${NICE_COMMAND} ${NICENESS} ${CTEST_COMMAND} "-j${Chaste_COVERAGE_CPUS}" "-L" "Continuous" "--output-on-failure"
         COMMAND ${NICE_COMMAND} ${NICENESS} ${CTEST_COMMAND} "-L" "Parallel" "--output-on-failure"
 
         # Capturing lcov counters and generating report
