@@ -701,7 +701,6 @@ Vec LinearSystem::Solve(Vec lhsGuess)
         if (mMatrixIsConstant && (!is_small))
         {
             // Attempt to emulate SAME_PRECONDITIONER below
-            assert(0);
             KSPSetReusePreconditioner(mKspSolver, PETSC_TRUE);
         }
 #else

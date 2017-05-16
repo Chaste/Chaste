@@ -420,6 +420,74 @@ public:
         PetscTools::Destroy(solution_vector);
     }
 
+    void TestLinearSystem3()
+    {
+        LinearSystem ls(7);
+        ls.SetMatrixIsConstant(true);
+
+        for (unsigned i = 0; i < 7; ++i)
+        {
+            for (unsigned j = 0; j < 7; ++j)
+            {
+                ls.SetMatrixElement(i, j, i == j ? static_cast<double>(i + 1) : 0.0);
+            }
+        }
+
+        ls.AssembleIntermediateLinearSystem();
+
+        ls.AddToMatrixElement(3, 1, sqrt(5.0));
+
+        /*
+         * Matrix looks like:
+         *  1 0 0 0 0 0 0
+         *  0 2 0 0 0 0 0
+         *  0 0 3 0 0 0 0
+         *  0 x 0 4 0 0 0
+         *  0 0 0 0 5 0 0
+         *  0 0 0 0 0 6 0
+         *  0 0 0 0 0 0 7  where x = sqrt(5)
+         */
+
+        ls.SetRhsVectorElement(0, 1.23);
+        ls.SetRhsVectorElement(1, 2.34);
+        ls.SetRhsVectorElement(2, 3.45);
+        ls.SetRhsVectorElement(3, 4.56);
+        ls.SetRhsVectorElement(4, 5.67);
+        ls.SetRhsVectorElement(5, 6.78);
+        ls.SetRhsVectorElement(6, 7.89);
+        ls.AssembleFinalLinearSystem();
+
+        Vec solution_vector;
+        solution_vector = ls.Solve();
+
+        std::vector<double> hand_cooked_solution(7, 0.0);
+        hand_cooked_solution[0] = 1.23;
+        hand_cooked_solution[1] = 1.17;
+        hand_cooked_solution[2] = 1.15;
+        hand_cooked_solution[3] = 0.485950116581311;
+        hand_cooked_solution[4] = 1.134;
+        hand_cooked_solution[5] = 1.13;
+        hand_cooked_solution[6] = 1.127142857142857;
+
+        int lo;
+        int hi;
+        VecGetOwnershipRange(solution_vector,&lo,&hi);
+        PetscScalar* p_solution_elements_array;
+        VecGetArray(solution_vector, &p_solution_elements_array);
+
+        for (int global_index=0; global_index<7; global_index++)
+        {
+            int local_index = global_index-lo;
+            if (lo<=global_index && global_index<hi)
+            {
+                TS_ASSERT_DELTA(p_solution_elements_array[local_index], hand_cooked_solution[local_index], 1e-8);
+            }
+        }
+        VecRestoreArray(solution_vector, &p_solution_elements_array);
+
+        PetscTools::Destroy(solution_vector);
+    }
+
     /**
      * This is a stub test for coverage purposes.
      */
