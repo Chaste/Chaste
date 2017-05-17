@@ -42,9 +42,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * May 2017
  */
 
-#include "RKC21Solver.hpp"
+#include "RKC21IvpOdeSolver.hpp"
 
-void RKC21Solver::CalculateNextYValue(AbstractOdeSystem* pAbstractOdeSystem,
+void RKC21IvpOdeSolver::CalculateNextYValue(AbstractOdeSystem* pAbstractOdeSystem,
                                                   double timeStep,
                                                   double time,
                                                   std::vector<double>& rCurrentYValues,
@@ -110,4 +110,4 @@ void RKC21Solver::CalculateNextYValue(AbstractOdeSystem* pAbstractOdeSystem,
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-CHASTE_CLASS_EXPORT(RKC1Order2StagesSolver)
+CHASTE_CLASS_EXPORT(RKC21IvpOdeSolver)

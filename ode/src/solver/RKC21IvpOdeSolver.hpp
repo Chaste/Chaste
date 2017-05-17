@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef _RKC21SOLVER_HPP_
-#define _RKC21SOLVER_HPP_
+#ifndef _RKC21IVPODESOLVER_HPP_
+#define _RKC21IVPODESOLVER_HPP_
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
@@ -49,7 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * University of Saskatchewan
  * May 2017
  */
-class RKC21Solver : public AbstractOneStepIvpOdeSolver
+class RKC21IvpOdeSolver : public AbstractOneStepIvpOdeSolver
 {
 private:
 
@@ -90,7 +90,7 @@ public:
     /**
      * Constructor.
      */
-    RKC1Order2StagesSolver()
+    RKC21IvpOdeSolver()
     {}
 
 };
@@ -98,4 +98,4 @@ public:
 #include "SerializationExportWrapper.hpp"
 CHASTE_CLASS_EXPORT(RKC21Solver)
 
-#endif //_RKC21SOLVER_HPP_
+#endif //_RKC21IVPODESOLVER_HPP_
