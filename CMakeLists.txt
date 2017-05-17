@@ -688,14 +688,6 @@ install(EXPORT chaste-targets
 
 if (Chaste_COVERAGE)
 
-    # Remove all gcno files in subdirectories of the ${Chaste_BINARY_DIR}, to prevent
-    # "*.gcno: reached unexpected end of file" errors when source files change between testing.
-    file(GLOB_RECURSE gcov_files ${Chaste_BINARY_DIR}/*.gcno)
-    foreach(gcov_file ${gcov_files})
-        file(REMOVE ${gcov_file})
-    endforeach(gcov_file ${gcov_files})
-    unset(gcov_files)
-
     # Run ctest with a low priority (+15)
     set(NICE_COMMAND nice)
     set(NICENESS -n15)
