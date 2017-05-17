@@ -194,13 +194,6 @@ public:
     void Reset();
 
     /**
-     * Deletes the vtkUnstructuredGrid and vtkGeometryFilter in preparation for deletion of the mesh reader (should)
-     * not be called if the vtkUnstructuredGrid is still required elsewhere, e.g. in an AdaptiveTetrahedralMesh or an
-     * AdaptiveBidomainProblem.
-     */
-    void Initialize();
-
-    /**
      * @return a vector of the coordinates of each node in turn
      */
     std::vector<double> GetNextNode();

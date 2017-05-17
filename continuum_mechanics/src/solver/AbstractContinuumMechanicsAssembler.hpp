@@ -86,6 +86,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned DIM, bool CAN_ASSEMBLE_VECTOR, bool CAN_ASSEMBLE_MATRIX>
 class AbstractContinuumMechanicsAssembler : public AbstractFeAssemblerInterface<CAN_ASSEMBLE_VECTOR,CAN_ASSEMBLE_MATRIX>
 {
+protected:
     /** Whether the matrix is block symmetric (B1=B2). Currently fixed to true, in
      *  the future this may become a template.
      */
@@ -105,7 +106,6 @@ class AbstractContinuumMechanicsAssembler : public AbstractFeAssemblerInterface<
     /** Stencil size. */
     static const unsigned STENCIL_SIZE = DIM*NUM_NODES_PER_ELEMENT + NUM_VERTICES_PER_ELEMENT;
 
-protected:
     /** The quadratic mesh */
     AbstractTetrahedralMesh<DIM,DIM>* mpMesh;
 
@@ -226,7 +226,7 @@ protected:
      *  See concrete classes for examples. Needed to be implemented (overridden) if the concrete class
      *  is going to assemble vectors (ie if CAN_ASSEMBLE_VECTOR is true).
      *
-     *  Default implementation returns a zero vector - ie the block will be zero if this is not over-ridden
+     *  No default implementation - this method must be over-ridden
      *
      *  @param rQuadPhi  All the quadratic basis functions on this element, evaluated at the current quad point
      *  @param rGradQuadPhi  Gradients of all the quadratic basis functions on this element, evaluated at the current quad point
@@ -238,10 +238,7 @@ protected:
         c_vector<double, NUM_NODES_PER_ELEMENT>& rQuadPhi,
         c_matrix<double, DIM, NUM_NODES_PER_ELEMENT>& rGradQuadPhi,
         c_vector<double,DIM>& rX,
-        Element<DIM,DIM>* pElement)
-    {
-        return zero_vector<double>(SPATIAL_BLOCK_SIZE_ELEMENTAL);
-    }
+        Element<DIM,DIM>* pElement) = 0;
 
 
     /**

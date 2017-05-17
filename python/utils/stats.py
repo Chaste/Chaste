@@ -43,6 +43,8 @@ import os
 import time
 import shutil
 import sys
+import datetime
+import subprocess
 
 def get_files(dirs):
     """Return a list of all hpp/cpp files within the given folders."""
@@ -73,19 +75,15 @@ def file_stats(file_pairs):
             ntests+= int(os.popen('egrep -c -i "void\s+Test" '+path+'/'+filename).read().split()[0])
     return (nfiles, loc, nsuites, ntests)
 
-def print_stats():
+def print_stats(hash, date_line):
     """Calulate and display stats about the checkout in the current directory."""
     rev1_epoch = 1113991642
-    svn_info = os.popen('svn info').read().split('\n')
-    for line in svn_info:
-        if line.startswith('Last Changed Date:'):
-            date_line = line.split()
-            date_time = date_line[3]+' '+date_line[4]
-        elif line.startswith('Revision:'):
-            rev_line = line
-            revision = rev_line.split()[1]
-    pattern = '%Y-%m-%d %H:%M:%S'
-    epoch = int(time.mktime(time.strptime(date_time, pattern))) - rev1_epoch
+    revision = hash
+    date_line = date_line[:-6] # Ignore daylight saving offset '.+0100' for portability
+    pattern = '%a %b %d %H:%M:%S %Y'
+    rev_time = time.strptime(date_line, pattern)
+    rev_date = time.strftime('%Y-%m-%d', rev_time)
+    epoch = time.mktime(rev_time) - rev1_epoch
     epoch_weeks = epoch / (3600*7*24.0)
   
     source_dirs = glob.glob('*/src')
@@ -99,49 +97,67 @@ def print_stats():
 
     print revision,'\t',epoch_weeks,'\t',source_stats[0],'\t',source_stats[1],\
         '\t',test_stats[0],'\t',test_stats[1],'\t',test_stats[2],'\t',test_stats[3],\
-        '\t',source_stats[1]+test_stats[1],'\t',date_line[3]
+        '\t',source_stats[1]+test_stats[1],'\t',rev_date
 
 def print_header():
     """Print a TSV header line corresponding to the output of print_stats."""
     print '#rev\ttime (weeks)\tsrc_files\tsrc_loc\ttest_files\ttests_loc\ttest_suites\ttests\ttotal_loc\tdate'
 
-def run(startRev):
+def run(startDate):
     """Do the processing."""
-    svn_revision = os.popen("svnversion").read().strip()
-    if (svn_revision[-1] == 'M'):
-        svn_revision = svn_revision[0:-1]
-    last_revision = int(svn_revision)
 
     dir='../temp_lines_of_code'
 
-    print '### Starting a fresh checkout in', dir
+    print '### Start date =', start_date
     print '###'
-    if os.path.isdir(dir):
-        print '### Erasing previous', dir
-        shutil.rmtree(dir)
-    print '### Checking out...'
-    os.system('svn co -r '+str(startRev)+' https://chaste.cs.ox.ac.uk/svn/chaste/trunk '+dir+' > /dev/null')
-    print '### Checked out'
+    erase_old = True
+    #erase_old = False
+    if erase_old:
+        print '### Starting a fresh checkout in', dir
+        print '###'
+        if os.path.isdir(dir):
+            print '### Erasing previous', dir
+            shutil.rmtree(dir)
+        print '### Checking out...'
+        os.system('git clone -q -b develop https://chaste.cs.ox.ac.uk/git/chaste.git '+dir+' > /dev/null')
+        print '### Checked out'
+        print '###'
+    print '### Switch to', dir
     print '###'
     os.chdir(dir)
 
     print_header()
     sys.stdout.flush()
-
-    step = 10
-    for rev in range(startRev,last_revision,step):
-        os.system('svn up --non-interactive -r '+str(rev)+' > /dev/null')
-        print_stats()
-        sys.stdout.flush()
+    
+    step = 3
+    date = startDate + datetime.timedelta(20)
+    old_hash = 'No hash'
+    while (date <= datetime.date.today()):
+        p = subprocess.Popen('git log develop --abbrev-commit --max-count=1 --before=' + str(date), shell=True, stdout=subprocess.PIPE, stderr=None)
+        (out, _) = p.communicate()
+        out_lines = out.split('\n')
+        date_line = out_lines[2]
+        if (date_line[:5] != 'Date:'):
+            date_line = out_lines[3]
+        date_line = date_line[8:] # Subtract "Date:..."
+        hash =  out.split()[1]
+        hash = hash[:-1] # Drop space
+        if hash != old_hash:
+            os.system('git checkout --quiet '+hash)
+            print_stats(hash, date_line)
+            sys.stdout.flush()
+        date = date +datetime.timedelta(step)
+        old_hash = hash
+    
+        
+    
 
 if __name__ == '__main__':
- #start_rev = 25180
- start_rev = 26220
- if len(sys.argv) > 1:
-     start_rev = int(sys.argv[1])
-     start_rev -= start_rev%10
- print '# Start revision =', start_rev
- run(start_rev)
+    start_date = datetime.date(2016,07,01)
+    start_date = datetime.date(2017,02,01) # February
+    # if len(sys.argv) > 1:
+    #     start_date = int(sys.argv[1])
+    run(start_date)
 
 """ Cut'n'paste for gnuplot:
 

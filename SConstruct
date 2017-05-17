@@ -317,6 +317,10 @@ if int(ARGUMENTS.get('br', ARGUMENTS.get('brief', 0))):
 extra_flags = build.CcFlags() + ' ' + hostconfig.CcFlags()
 link_flags  = build.LinkFlags() + ' ' + hostconfig.LdFlags()
 include_flag = ' ' + build.IncludeFlag() + ' '
+
+if not build_type.startswith('Intel'):
+   extra_flags = extra_flags + ' -std=gnu++98'
+
 env.Append(CCFLAGS = include_flag + include_flag.join(other_includepaths)
            + ' ' + extra_flags)
 env.Append(LINKFLAGS = link_flags)

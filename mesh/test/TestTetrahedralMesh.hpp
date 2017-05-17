@@ -1335,6 +1335,15 @@ public:
         // Weights are non-negative and sum to 1
         TS_ASSERT_DELTA(norm_1(weights), 1.0, 1e-12);
 
+        // If point is in element then projection is redundant - looks the same as above
+        weights = element3d.CalculateInterpolationWeightsWithProjection(in_point);
+        TS_ASSERT_LESS_THAN(0.0, weights[0]);
+        TS_ASSERT_LESS_THAN(0.0, weights[1]);
+        TS_ASSERT_LESS_THAN(0.0, weights[2]);
+        TS_ASSERT_LESS_THAN(0.0, weights[3]);
+        // Weights are non-negative and sum to 1
+        TS_ASSERT_DELTA(norm_1(weights), 1.0, 1e-12);
+
         ChastePoint<3> out_point(0.1, -10., 0.1);
         TS_ASSERT_EQUALS(element3d.IncludesPoint(out_point), false);
 
@@ -1939,9 +1948,11 @@ public:
             {
                 unsigned index = iter->GetIndex();
                 // Position of this node
-                c_vector<double, 2> pos1 = iter->rGetLocation();
+                c_vector<double, 2> pos1;
+                pos1 = iter->rGetLocation();
                 // Position in the other mesh
-                c_vector<double, 2> pos2 = mesh_with_default_split.GetNode(index)->rGetLocation();
+                c_vector<double, 2> pos2;
+                pos2 = mesh_with_default_split.GetNode(index)->rGetLocation();
                 TS_ASSERT_DELTA(pos1[0], pos2[0], 1e-5);
                 TS_ASSERT_DELTA(pos1[1], pos2[1], 1e-5);
             }
@@ -1989,9 +2000,11 @@ public:
             {
                 unsigned index = iter->GetIndex();
                 // Position of this node
-                c_vector<double, 3> pos1 = iter->rGetLocation();
+                c_vector<double, 3> pos1;
+                pos1 = iter->rGetLocation();
                 // Position in the other mesh
-                c_vector<double, 3> pos2 = mesh_with_default_split.GetNode(index)->rGetLocation();
+                c_vector<double, 3> pos2;
+                pos2 = mesh_with_default_split.GetNode(index)->rGetLocation();
                 TS_ASSERT_DELTA(pos1[0], pos2[0], 1e-5);
                 TS_ASSERT_DELTA(pos1[1], pos2[1], 1e-5);
                 TS_ASSERT_DELTA(pos1[2], pos2[2], 1e-5);

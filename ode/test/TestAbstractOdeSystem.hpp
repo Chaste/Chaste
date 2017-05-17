@@ -282,10 +282,14 @@ public:
 
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
-            AbstractOdeSystem* p_ode;
+            AbstractOdeSystem* p_ode = NULL;  // Shouldn't be necessary to set to NULL but seems to be!
             TS_ASSERT_THROWS_CONTAINS(input_arch >> p_ode, "Archive specifies a parameter 'a' which does not appear in this class.");
             // Mend the ODE system info for the following tests.
             p_mod_info->mParameterNames[0] = param_name;
+            if (p_ode) // It seems some setups will delete if the throw happens and some won't!
+            {
+            	delete p_ode;
+            }
         }
         { // Load with a parameter added
             ParameterisedOde ode;
@@ -296,10 +300,14 @@ public:
 
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
-            AbstractOdeSystem* p_ode;
+            AbstractOdeSystem* p_ode = NULL; // The = NULL obviously shouldn't be necessary, but seems to be on some compilers!
             TS_ASSERT_THROWS_CONTAINS(input_arch >> p_ode, "Number of ODE parameters in archive does not match number in class.");
             // Mend the ODE system info for the following tests.
             p_mod_info->mParameterNames.resize(1u);
+            if (p_ode) // It seems some setups will delete if the throw happens and some won't!
+            {
+            	delete p_ode;
+            }
         }
         { // Load with a parameter added, and the constructor providing a default
             ParameterisedOde ode;

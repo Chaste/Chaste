@@ -50,14 +50,33 @@ if (Chaste_VERBOSE AND MSVC)
     set(CMAKE_C_FLAGS ${CMAKE_CXX_FLAGS} "/VERBOSE")
 endif()
 if (UNIX)
+    # Memory testing
     option(Chaste_MEMORY_TESTING "Run tests using valgrind for memory testing" OFF)
     set(Chaste_MEMORY_TESTING_OUTPUT_DIR ${Chaste_BINARY_DIR}/memtest)
+    set(Chaste_MEMORY_TESTING_CPUS 1 CACHE STRING "Number of CPUs for memory testing (default 1)")
+    if (Chaste_MEMORY_TESTING_CPUS GREATER 1)
+        set(Chaste_MEMORY_TESTING ON)
+    endif()
     if (Chaste_MEMORY_TESTING)
         file(MAKE_DIRECTORY ${Chaste_MEMORY_TESTING_OUTPUT_DIR})
     endif()
+    # Coverage
     option(Chaste_COVERAGE "Build Chaste with coverage information" OFF)
+    set(Chaste_COVERAGE_CPUS 1 CACHE STRING "Number of CPUs for coverage testing (default 1)")
+    if (Chaste_COVERAGE_CPUS GREATER 1)
+        set(Chaste_COVERAGE ON)
+    endif()
+    # Profiling
     option(Chaste_PROFILE_GPERFTOOLS "Compile Chaste with gperftools profiling support" OFF)
+    set(Chaste_PROFILE_GPERFTOOLS_CPUS 1 CACHE STRING "Number of CPUs for GPERFTOOLS profiling (default 1)")
+    if (Chaste_PROFILE_GPERFTOOLS_CPUS GREATER 1)
+        set(Chaste_PROFILE_GPERFTOOLS ON)
+    endif()
     option(Chaste_PROFILE_GPROF "Compile Chaste with gprof profiling support" OFF)
+    set(Chaste_PROFILE_GPROF_CPUS 1 CACHE STRING "Number of CPUs for GPROF profiling (default 1)")
+    if (Chaste_PROFILE_GPROF_CPUS GREATER 1)
+        set(Chaste_PROFILE_GPROF ON)
+    endif()
     if (Chaste_PROFILE_GPROF AND Chaste_PROFILE_GPERFTOOLS)
         message(WARNING "Both Chaste_PROFILE_GPROF and Chaste_PROFILE_GPERFTOOLS = ON, using latter by default")
         set(Chaste_PROFILE_GPROF OFF)
@@ -240,7 +259,25 @@ endif()
 
 #Locate VTK
 if (Chaste_USE_VTK)
+    # First pass will identify the version number
     find_package(VTK REQUIRED)
+    message("-- VTK version: ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}")
+
+    # Depending on the VTK version, we need different components. 5.x require the following
+    if(VTK_MAJOR_VERSION EQUAL 5)
+        find_package(VTK COMPONENTS vtkIO vtkCommon vtkGraphics z REQUIRED)
+    # 6.0 and 6.1 require the following
+    elseif( (VTK_MAJOR_VERSION EQUAL 6) AND (VTK_MINOR_VERSION LESS 2) )
+        find_package(VTK COMPONENTS vtkCommonCore vtkCommonDataModel vtkFiltersCore vtkFiltersGeneral vtkFiltersGeneric
+                                    vtkFiltersGeometry vtkFiltersModeling vtkFiltersSources vtkIOCore vtkIOGeometry
+                                    vtkIOLegacy vtkIOXML REQUIRED)
+    # 6.2 and up, up to and including 7.1, require the following
+    else()
+        find_package(VTK COMPONENTS vtkCommonCore vtkCommonDataModel vtkFiltersCore vtkFiltersGeneral vtkFiltersGeneric
+                                    vtkFiltersGeometry vtkFiltersModeling vtkFiltersSources vtkIOCore vtkIOGeometry
+                                    vtkIOLegacy vtkIOParallelXML vtkIOXML REQUIRED)
+    endif()
+
     add_definitions(-DCHASTE_VTK)
 endif()
 
@@ -258,7 +295,7 @@ list(APPEND Chaste_LINK_LIBRARIES "${Boost_LIBRARIES}")
 
 
 #find PETSc
-find_package(PETSc REQUIRED COMPONENTS CXX)
+find_package(PETSc REQUIRED)
 list(APPEND Chaste_LINK_LIBRARIES "${PETSC_LIBRARIES}")
 
 #find HDF5
@@ -645,13 +682,15 @@ install(EXPORT chaste-targets
         )
 
 
-
 ####################
 #    COVERAGE      #
 ####################
 
 if (Chaste_COVERAGE)
-         
+    # Run ctest with a low priority (+15)
+    set(NICE_COMMAND nice)
+    set(NICENESS -n-15)
+    set(CTEST_COMMAND ctest)
     set(CTEST_COMMAND ctest)
     set(_outputname coverage)
 	ADD_CUSTOM_TARGET(coverage
@@ -660,12 +699,7 @@ if (Chaste_COVERAGE)
 		${LCOV_PATH} --directory . --zerocounters
 
 		# Run tests
-        # runs the following, ignoring errors:
-        #    COMMAND ${CTEST_COMMAND} "-L" "Continuous|Parallel" "--output-on-failure" 
-        COMMAND ${CMAKE_COMMAND} 
-            "-DChaste_BINARY_DIR=${Chaste_BINARY_DIR}"
-            "-DCTEST_COMMAND=${CTEST_COMMAND}"
-            "-P" "${Chaste_SOURCE_DIR}/cmake/Modules/ChasteRunCoverageTests.cmake"
+        COMMAND ${NICE_COMMAND} ${NICENESS} ${CTEST_COMMAND} "-j${Chaste_COVERAGE_CPUS}" "-L" "Continuous|Parallel" "--output-on-failure"
             
         # Capturing lcov counters and generating report
         COMMAND ${LCOV_PATH} --config-file ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc --directory . --capture --output-file ${_outputname}.info
@@ -711,9 +745,12 @@ add_custom_target(doxygen_coverage
 ####################
 
 if (Chaste_MEMORY_TESTING)
+    # Run ctest with a low priority (+15)
+    set(NICE_COMMAND nice)
+    set(NICENESS -n15)
     set(CTEST_COMMAND ctest)
     add_custom_target(memtest
-        COMMAND ${CTEST_COMMAND} "-j6" "-L" Continuous "--output-on-failure" 
+        COMMAND ${NICE_COMMAND} ${NICENESS} ${CTEST_COMMAND} "-j${Chaste_MEMORY_TESTING_CPUS}" "-L" Continuous "--output-on-failure"
         COMMAND ${PYTHON_EXECUTABLE} "${Chaste_SOURCE_DIR}/cmake/process_valgrind_output.py" "${Chaste_MEMORY_TESTING_OUTPUT_DIR}"
         DEPENDS Continuous
         WORKING_DIRECTORY ${Chaste_BINARY_DIR}
@@ -726,16 +763,21 @@ endif()
 
 if (Chaste_PROFILE_GPROF OR Chaste_PROFILE_GPERFTOOLS)
     if (Chaste_PROFILE_GPERFTOOLS)
-        set(extension gif)
+        set(extension svg)
+        set(NUM_CPUS ${Chaste_PROFILE_GPERFTOOLS_CPUS})
     else()
         set(extension gmon)
+        set(NUM_CPUS ${Chaste_PROFILE_GPROF_CPUS})
     endif()
-    
+
+    # Run ctest with a neutral priority (0): buildbot doesn't have permission to set higher priorities
+    set(NICE_COMMAND nice)
+    set(NICENESS -n0)
     set(CTEST_COMMAND ctest)
     add_custom_target(profile
-        COMMAND ${CTEST_COMMAND} "-L" "Profile" "--output-on-failure"
+        COMMAND ${NICE_COMMAND} ${NICENESS} ${CTEST_COMMAND} "-j${NUM_CPUS}" "-L" "^Profile$" "--output-on-failure"
         COMMAND ${PYTHON_EXECUTABLE} "${Chaste_SOURCE_DIR}/cmake/process_profile.py" "${Chaste_PROFILE_OUTPUT_DIR}" ${extension}
-        DEPENDS Profile 
+        DEPENDS Profile
         WORKING_DIRECTORY ${Chaste_BINARY_DIR}
         VERBATIM)
 endif()

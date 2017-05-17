@@ -271,78 +271,19 @@ show :
   endif ()
 
   include(Check${PETSC_LANGUAGE_BINDINGS}SourceRuns)
-  macro (PETSC_TEST_RUNS includes libraries runs)
-    if(${PETSC_LANGUAGE_BINDINGS} STREQUAL "C" OR ${PETSC_VERSION} VERSION_LESS 2.3.4)
-      set(_PETSC_ERR_FUNC "CHKERRQ(ierr)")
-    elseif(${PETSC_LANGUAGE_BINDINGS} STREQUAL "CXX")
-      set(_PETSC_ERR_FUNC "CHKERRXX(ierr)")
-    endif()
-    if (PETSC_VERSION VERSION_GREATER 3.1)
-      set (_PETSC_TSDestroy "TSDestroy(&ts)")
-    else ()
-      set (_PETSC_TSDestroy "TSDestroy(ts)")
-    endif ()
-
-    set(_PETSC_TEST_SOURCE "
-static const char help[] = \"PETSc test program.\";
-#include <petscts.h>
-int main(int argc,char *argv[]) {
-  PetscErrorCode ierr;
-  TS ts;
-
-  ierr = PetscInitialize(&argc,&argv,0,help);${_PETSC_ERR_FUNC};
-  ierr = TSCreate(PETSC_COMM_WORLD,&ts);${_PETSC_ERR_FUNC};
-  ierr = TSSetFromOptions(ts);${_PETSC_ERR_FUNC};
-  ierr = ${_PETSC_TSDestroy};${_PETSC_ERR_FUNC};
-  ierr = PetscFinalize();${_PETSC_ERR_FUNC};
-  return 0;
-}
-")
-    multipass_source_runs ("${includes}" "${libraries}" "${_PETSC_TEST_SOURCE}" ${runs} "${PETSC_LANGUAGE_BINDINGS}")
-    if (${${runs}})
-      set (PETSC_EXECUTABLE_RUNS "YES" CACHE BOOL
-        "Can the system successfully run a PETSc executable?  This variable can be manually set to \"YES\" to force CMake to accept a given PETSc configuration, but this will almost always result in a broken build.  If you change PETSC_DIR, PETSC_ARCH, or PETSC_CURRENT you would have to reset this variable." FORCE)
-    endif (${${runs}})
-  endmacro (PETSC_TEST_RUNS)
-
 
   find_path (PETSC_INCLUDE_DIR petscts.h HINTS "${PETSC_DIR}" PATH_SUFFIXES include NO_DEFAULT_PATH)
   find_path (PETSC_INCLUDE_CONF petscconf.h HINTS "${PETSC_DIR}" PATH_SUFFIXES "${PETSC_ARCH}/include" "bmake/${PETSC_ARCH}" NO_DEFAULT_PATH)
   mark_as_advanced (PETSC_INCLUDE_DIR PETSC_INCLUDE_CONF)
-  set (petsc_includes_minimal ${PETSC_INCLUDE_CONF} ${PETSC_INCLUDE_DIR})
 
-  petsc_test_runs ("${petsc_includes_minimal}" "${PETSC_LIBRARIES_TS}" petsc_works_minimal)
-  if (petsc_works_minimal)
-    message (STATUS "Minimal PETSc includes and libraries work.  This probably means we are building with shared libs.")
-    set (petsc_includes_needed "${petsc_includes_minimal}")
-  else (petsc_works_minimal)     # Minimal includes fail, see if just adding full includes fixes it
-    petsc_test_runs ("${petsc_includes_all}" "${PETSC_LIBRARIES_TS}" petsc_works_allincludes)
-    if (petsc_works_allincludes) # It does, we just need all the includes (
-      message (STATUS "PETSc requires extra include paths, but links correctly with only interface libraries.  This is an unexpected configuration (but it seems to work fine).")
-      set (petsc_includes_needed ${petsc_includes_all})
-    else (petsc_works_allincludes) # We are going to need to link the external libs explicitly
-      if (petsc_libs_external AND NOT petsc_libraries_external)
-      	  resolve_libraries (petsc_libraries_external "${petsc_libs_external}")
-      endif()
-      foreach (pkg SYS VEC MAT DM KSP SNES TS ALL)
-        list (APPEND PETSC_LIBRARIES_${pkg}  ${petsc_libraries_external})
-      endforeach (pkg)
-      petsc_test_runs ("${petsc_includes_minimal}" "${PETSC_LIBRARIES_TS}" petsc_works_alllibraries)
-      if (petsc_works_alllibraries)
-         message (STATUS "PETSc only need minimal includes, but requires explicit linking to all dependencies.  This is expected when PETSc is built with static libraries.")
-        set (petsc_includes_needed ${petsc_includes_minimal})
-      else (petsc_works_alllibraries)
-        # It looks like we really need everything, should have listened to Matt
-        set (petsc_includes_needed ${petsc_includes_all})
-        petsc_test_runs ("${petsc_includes_all}" "${PETSC_LIBRARIES_TS}" petsc_works_all)
-        if (petsc_works_all) # We fail anyways
-          message (STATUS "PETSc requires extra include paths and explicit linking to all dependencies.  This probably means you have static libraries and something unexpected in PETSc headers.")
-        else (petsc_works_all) # We fail anyways
-          message (STATUS "PETSc could not be used, maybe the install is broken.")
-        endif (petsc_works_all)
-      endif (petsc_works_alllibraries)
-    endif (petsc_works_allincludes)
-  endif (petsc_works_minimal)
+
+  if (petsc_libs_external AND NOT petsc_libraries_external)
+      resolve_libraries (petsc_libraries_external "${petsc_libs_external}")
+  endif()
+  foreach (pkg SYS VEC MAT DM KSP SNES TS ALL)
+      list (APPEND PETSC_LIBRARIES_${pkg}  ${petsc_libraries_external})
+  endforeach (pkg)
+  set (petsc_includes_needed ${petsc_includes_all})
 
   # We do an out-of-source build so __FILE__ will be an absolute path, hence __INSDIR__ is superfluous
   if (${PETSC_VERSION} VERSION_LESS 3.1)
@@ -358,11 +299,11 @@ int main(int argc,char *argv[]) {
   # Note that we have forced values for all these choices.  If you
   # change these, you are telling the system to trust you that they
   # work.  It is likely that you will end up with a broken build.
-  mark_as_advanced (PETSC_INCLUDES PETSC_LIBRARIES PETSC_COMPILER PETSC_DEFINITIONS PETSC_MPIEXEC PETSC_EXECUTABLE_RUNS)
+  mark_as_advanced (PETSC_INCLUDES PETSC_LIBRARIES PETSC_COMPILER PETSC_DEFINITIONS PETSC_MPIEXEC)
 endif (petsc_conf_rules AND petsc_conf_variables AND NOT petsc_config_current)
 
 include (FindPackageHandleStandardArgs)
 find_package_handle_standard_args (PETSc
   "PETSc could not be found.  Be sure to set PETSC_DIR and PETSC_ARCH."
-  PETSC_INCLUDES PETSC_LIBRARIES PETSC_EXECUTABLE_RUNS)
+  PETSC_INCLUDES PETSC_LIBRARIES)
 
