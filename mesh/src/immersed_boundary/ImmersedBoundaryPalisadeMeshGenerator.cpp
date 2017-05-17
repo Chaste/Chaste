@@ -44,8 +44,10 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
                                                                              double cellAspectRatio,
                                                                              double randomYMult,
                                                                              bool basalLamina,
-                                                                             bool apicalLamina)
-    : mpMesh(NULL)
+                                                                             bool apicalLamina,
+                                                                             bool leakyLaminas,
+                                                                             unsigned numFluidMeshPoints)
+        : mpMesh(NULL)
 {
     // Check for sensible input
     assert(numCellsWide > 0);
@@ -53,6 +55,10 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
     assert(ellipseExponent > 0.0);
     assert(cellAspectRatio > 0.0); // aspect ratio is cell height / cell width
     assert(fabs(randomYMult) < 2.0);
+    assert( (leakyLaminas && numFluidMeshPoints < UINT_MAX) || (!leakyLaminas) );
+
+    // If the number of fluid mesh points is specified, calculate an appropriate number of nodes per cell automatically
+    bool override_nodes_per_cell = numFluidMeshPoints < UINT_MAX;
 
     // Helper vectors
     unit_vector<double> x_unit(2,0);
@@ -68,9 +74,20 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
         cell_width = cell_height / cellAspectRatio;
     }
 
+    // If we are overriding the number of nodes per cell, alter it so that the spacing ratio is approx 0.5
+    if (override_nodes_per_cell)
+    {
+        double cell_perimeter = 2.0 * (cell_height + cell_width);
+        double fluid_mesh_spacing = 1.0 / static_cast<double>(numFluidMeshPoints);
+        double target_node_spacing = 0.5 * fluid_mesh_spacing;
+        numNodesPerCell = static_cast<unsigned>(cell_perimeter / target_node_spacing);
+    }
+
     // Generate a reference superellipse
     SuperellipseGenerator* p_gen = new SuperellipseGenerator(numNodesPerCell, ellipseExponent, cell_width, cell_height, 0.0, 0.0);
     std::vector<c_vector<double, 2> > locations = p_gen->GetPointsAsVectors();
+
+
 
     /*
      * The top and bottom heights are the heights at which there is maximum curvature in the superellipse.
@@ -168,17 +185,22 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
     c_vector<double, 2> x_offset = x_unit * cell_width;
     c_vector<double, 2> y_offset = y_unit * (1.0 - cell_height) / 2.0;
 
+    // Aim to give the laminas roughly the same node-spacing as the other cells...
+    double lamina_node_spacing = 2.0 * (cell_height + cell_width) / numNodesPerCell;
+    //... unless the laminas are to be leaky, in which case the spacing should be bigger
+    if (leakyLaminas && override_nodes_per_cell)
+    {
+        // If laminas are leaky, increase the spacing so fluid can flow through
+        lamina_node_spacing = 2.0 / static_cast<double>(numFluidMeshPoints);
+    }
+
     // Add the basal lamina, if there is one
     if (basalLamina)
     {
-        // Aim to give the lamina roughly the same node-spacing as the other cells
-        double perimeter = 2.0 * (cell_height + cell_width);
-        double node_spacing = perimeter / numNodesPerCell;
-
         // The height of the lamina is offset by a proportion of the cell height
         double lam_hight = y_offset[1] - 0.05 * cell_height;
 
-        unsigned num_lamina_nodes = static_cast<unsigned>(floor(1.0 / node_spacing));
+        unsigned num_lamina_nodes = static_cast<unsigned>(floor(1.0 / lamina_node_spacing));
 
         std::vector<Node<2>*> nodes_this_elem;
 
@@ -207,14 +229,10 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
             EXCEPTION("Currently no random y variation allowed with an apical lamina");
         }
 
-        // Aim to give the lamina roughly the same node-spacing as the other cells
-        double perimeter = 2.0 * (cell_height + cell_width);
-        double node_spacing = perimeter / numNodesPerCell;
-
         // The height of the lamina is offset by a proportion of the cell height
         double lam_hight = y_offset[1] + cell_height;
 
-        unsigned num_lamina_nodes = static_cast<unsigned>(floor(1.0 / node_spacing));
+        unsigned num_lamina_nodes = static_cast<unsigned>(floor(1.0 / lamina_node_spacing));
 
         std::vector<Node<2>*> nodes_this_elem;
 
@@ -314,7 +332,14 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
         }
     }
 
-    mpMesh = new ImmersedBoundaryMesh<2,2>(nodes, ib_elements, ib_laminas);
+    if (override_nodes_per_cell)
+    {
+        mpMesh = new ImmersedBoundaryMesh<2, 2>(nodes, ib_elements, ib_laminas, numFluidMeshPoints, numFluidMeshPoints);
+    }
+    else
+    {
+        mpMesh = new ImmersedBoundaryMesh<2, 2>(nodes, ib_elements, ib_laminas);
+    }
 }
 
 ImmersedBoundaryPalisadeMeshGenerator::~ImmersedBoundaryPalisadeMeshGenerator()
