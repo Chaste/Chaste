@@ -96,6 +96,6 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-CHASTE_CLASS_EXPORT(RKC21Solver)
+CHASTE_CLASS_EXPORT(RKC21IvpOdeSolver)
 
 #endif //_RKC21IVPODESOLVER_HPP_
