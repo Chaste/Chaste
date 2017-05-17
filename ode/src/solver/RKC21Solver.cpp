@@ -58,14 +58,25 @@ void RKC21Solver::CalculateNextYValue(AbstractOdeSystem* pAbstractOdeSystem,
 
 
      /*
-     RKC scheme:
-     w1 = w0+mu1_tilde*dt*F(tn,w0)
-     w2 = (1-muj-nuj)*w0 + muj*w1+nuj*w0 + muj_tilde*dt*F(tn,w1) + gammaj_tilde*dt*F(tn,w0)
-     where F(nj) = F(tn+cj *dt, wj) cj = j^2/s^2
+     * The General RKC scheme:
+     
+    * w_{n0} = w_n;
+    * w_{n1} = w_n + \tilde{\mu_1} * dt * F_{n0};
+    * w_{nj} = (1 - mu_j - nu_j) w_n + mu_j*w_{n,j-1} + nu_j*w_{n,j-2} + \tilde{\mu_j}*dt*F_{n,j-1} + \tilde{\gamma_j}*dt*F_{n,0}, 
+    * w_{n+1} = w_{ns}.
+    * where:
+    *       j = 2,...,s; 
+    *       F_{nk} = F(t_n + c_k*dt, w_{nk});
+    *       c_k = T_s(w_0)*Tp_k(w_0) / (Tp_s(w_0)*T_k(w_0)) with T_k/Tp_k are k-th Chebyshev polynomials/ derivatives of them
+    *       w_0 is specific parameters
+    * In RKC21, c_2 = \tilde{\mu_1}
+
+
      A decent reference on this method refer to Hundsdorfer, Willem, and Jan G. Verwer. Numerical solution of time-dependent advection-diffusion-reaction equations. Vol. 33. Springer Science & Business Media, 2013. P429
      */
 
-     //RKC coefficients
+     //RKC coefficients, hard-coded //TODO how to compute/where to store arbitrary RKC coefficients?
+
     const double mu1_tilde = 0.256134735558604;
     const double mu2 = 1.952097590002976;
     //const double nu2 = -b2/b0; canceled out in equation
@@ -85,14 +96,14 @@ void RKC21Solver::CalculateNextYValue(AbstractOdeSystem* pAbstractOdeSystem,
 
     for (unsigned i=0; i<num_equations; i++)
     {
-        w1[i] = w0[i] + mu1_tilde*timeStep*F0[i];
+        w1[i] = w0[i] + mu1_tilde * timeStep * F0[i];
     } 
 
     // Work next step
-    pAbstractOdeSystem->EvaluateYDerivatives(time+timeStep/4.0, w1, F1);
+    pAbstractOdeSystem->EvaluateYDerivatives(time + mu1_tilde * timeStep, w1, F1);
     for (unsigned i=0; i<num_equations; i++)
     {
-        w2[i] = (1-mu2)*w0[i] + mu2*w1[i] + mu2_tilde*timeStep*F1[i];// + gamma2_tilde*timeStep*F0[i];
+        w2[i] = (1-mu2) * w0[i] + mu2 * w1[i] + mu2_tilde * timeStep * F1[i];// + gamma2_tilde*timeStep*F0[i]; -> never used
     }
 }
 
