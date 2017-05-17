@@ -709,7 +709,7 @@ if (Chaste_COVERAGE)
 
 		# Run tests
         COMMAND ${NICE_COMMAND} ${NICENESS} ${CTEST_COMMAND} "-j${Chaste_COVERAGE_CPUS}" "-L" "Continuous" "--output-on-failure"
-        COMMAND ${NICE_COMMAND} ${NICENESS} ${CTEST_COMMAND} "-j${Chaste_COVERAGE_CPUS}" "-L" "Parallel" "--output-on-failure"
+        COMMAND ${NICE_COMMAND} ${NICENESS} ${CTEST_COMMAND} "-L" "Parallel" "--output-on-failure"
 
         # Capturing lcov counters and generating report
         COMMAND ${LCOV_PATH} --config-file ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc --directory . --capture --output-file ${_outputname}.info
