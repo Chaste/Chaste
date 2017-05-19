@@ -576,7 +576,7 @@ macro(Chaste_DO_TEST_COMMON component)
                     endif()
 
 
-                    set_property(TEST ${testTargetName} PROPERTY LABELS ${component} ${type})
+                    set_property(TEST ${testTargetName} PROPERTY LABELS ${type}_${component})
 
                     if (Chaste_INSTALL_TESTS AND NOT(${component} MATCHES "^project")) 
                         install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${old_testTargetName}.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/${filename}"
@@ -604,11 +604,6 @@ macro(Chaste_DO_TEST_COMMON component)
                         add_custom_target(${CMAKE_MATCH_1} DEPENDS ${out_filename})
                         add_dependencies(tutorials ${CMAKE_MATCH_1})
                     endif()
-
-                else()
-                    get_property(myLabels TEST ${testTargetName} PROPERTY LABELS)
-                    list(APPEND myLabels ${type})
-                    set_property(TEST ${testTargetName} PROPERTY LABELS ${myLabels})
                 endif()
 
                 # add dependencies to component and type targets. Do not include the python component or tests in Python files
