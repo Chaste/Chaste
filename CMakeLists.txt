@@ -807,7 +807,7 @@ if (Chaste_PROFILE_GPROF OR Chaste_PROFILE_GPERFTOOLS)
     set(NICENESS -n0)
     set(CTEST_COMMAND ctest)
     add_custom_target(profile
-        COMMAND ${NICE_COMMAND} ${NICENESS} ${CTEST_COMMAND} "-j${NUM_CPUS}" "-L" "^Profile$" "--output-on-failure"
+        COMMAND ${NICE_COMMAND} ${NICENESS} ${CTEST_COMMAND} "-j${NUM_CPUS}" "-L" "^Profile_" "--output-on-failure"
         COMMAND ${PYTHON_EXECUTABLE} "${Chaste_SOURCE_DIR}/cmake/process_profile.py" "${Chaste_PROFILE_OUTPUT_DIR}" ${extension}
         DEPENDS Profile
         WORKING_DIRECTORY ${Chaste_BINARY_DIR}
