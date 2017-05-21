@@ -77,23 +77,23 @@ public:
         int argc = *(CommandLineArguments::Instance()->p_argc);
         TS_ASSERT_LESS_THAN(0, argc); // argc should always be 1 or greater
 
-        // argv[0] will be equal to global/build/debug/TestCommandLineArgumentsRunner
-        // or global/build/optimised/TestCommandLineArgumentsRunner, etc
+        // argv[0] will be equal to global/build/debug/TestCommandLineArguments
+        // or global/build/optimised/TestCommandLineArguments, etc
         char** argv = *(CommandLineArguments::Instance()->p_argv);
         assert(argv != NULL);
         std::string arg_as_string(argv[0]);
 #ifdef _MSC_VER
-        std::string final_part_of_string = arg_as_string.substr(arg_as_string.length()-34,arg_as_string.length());
-        TS_ASSERT_EQUALS("TestCommandLineArgumentsRunner.exe", final_part_of_string);
+        std::string final_part_of_string = arg_as_string.substr(arg_as_string.length()-28,arg_as_string.length());
+        TS_ASSERT_EQUALS("TestCommandLineArguments.exe", final_part_of_string);
 #else
-        std::string final_part_of_string = arg_as_string.substr(arg_as_string.length()-30,arg_as_string.length());
-        TS_ASSERT_EQUALS("TestCommandLineArgumentsRunner", final_part_of_string);
+        std::string final_part_of_string = arg_as_string.substr(arg_as_string.length()-24,arg_as_string.length());
+        TS_ASSERT_EQUALS("TestCommandLineArguments", final_part_of_string);
 #endif
         // Now test OptionExists() and GetValueCorrespondingToOption()
         //
         // The following tests would require the following arguments to be passed
         // in:
-        // ./global/build/debug/TestCommandLineArgumentsRunner -myoption -myintval 24 -mydoubleval 3.14 -3.14 -m2intval -42 -mystrings Baboons Monkeys Gibbons -mystring more_baboons
+        // ./global/build/debug/TestCommandLineArguments -myoption -myintval 24 -mydoubleval 3.14 -3.14 -m2intval -42 -mystrings Baboons Monkeys Gibbons -mystring more_baboons
         //
         // To test the methods we overwrite the arg_c and arg_v contained in the
         // singleton with the arguments that were needed.
@@ -291,11 +291,11 @@ public:
         assert(argv != NULL);
         std::string arg_as_string(argv[0]);
 #ifdef _MSC_VER
-        std::string final_part_of_string = arg_as_string.substr(arg_as_string.length()-34,arg_as_string.length());
-        TS_ASSERT_EQUALS("TestCommandLineArgumentsRunner.exe", final_part_of_string);
+        std::string final_part_of_string = arg_as_string.substr(arg_as_string.length()-28,arg_as_string.length());
+        TS_ASSERT_EQUALS("TestCommandLineArguments.exe", final_part_of_string);
 #else
-        std::string final_part_of_string = arg_as_string.substr(arg_as_string.length()-30,arg_as_string.length());
-        TS_ASSERT_EQUALS("TestCommandLineArgumentsRunner", final_part_of_string);
+        std::string final_part_of_string = arg_as_string.substr(arg_as_string.length()-24,arg_as_string.length());
+        TS_ASSERT_EQUALS("TestCommandLineArguments", final_part_of_string);
 #endif
     }
 
