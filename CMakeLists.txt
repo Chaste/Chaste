@@ -30,7 +30,9 @@
 # OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # 
 
-cmake_minimum_required(VERSION 2.8.10)
+cmake_minimum_required(VERSION 2.8.12)
+
+cmake_policy(VERSION 3.5.1)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules)
 include(EnsureOutOfSourceBuild)
@@ -39,7 +41,14 @@ include(CheckIncludeFile)
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/overrides.cmake)
 
-project(Chaste)
+message("\n####################################")
+message("# Setting compilers and build type")
+message("####################################\n")
+
+# Since CMake 3.0, version can be supplied to the project() command.  Also set directly, for users in older CMake
+project(Chaste VERSION 3.4)
+set (Chaste_VERSION_MAJOR 3 CACHE STRING "Chaste major version number")
+set (Chaste_VERSION_MINOR 4 CACHE STRING "Chaste minor version number")
 
 include(ChasteBuildTypes)
 
@@ -92,9 +101,6 @@ endif()
 include(ChasteCompilerFlags)
 
 include(ChasteMacros)
-
-set (Chaste_VERSION_MAJOR 3 CACHE STRING "Chaste major version number")
-set (Chaste_VERSION_MINOR 4 CACHE STRING "Chaste minor version number")
 
 set(Chaste_NUM_CPUS_TEST 1 CACHE STRING  "Number of cpus to use when running tests.")
 
@@ -177,6 +183,10 @@ endif(WIN32 OR CYGWIN)
 #  FIND THIRD PARTY LIBRARIES  #
 ################################
 
+message("\n####################################")
+message("# Finding libraries")
+message("####################################\n")
+
 set(Chaste_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR})
 set(Chaste_LINK_LIBRARIES "")
 
@@ -229,7 +239,7 @@ endif()
 #Locate Python
 find_package(PythonInterp REQUIRED)
 
-if (Chaste_ENABLE_TESTING)
+if (Chaste_ENABLE_TESTING AND Chaste_ACCEPTANCE)
     find_package(TextTest)
     if (NOT TEXTTEST_FOUND)
         message(WARNING "Texttest not found, turning off acceptance tests")
@@ -439,6 +449,10 @@ endif()
 ###########################################
 # SETUP AVAILABLE COMPONENTS AND PROJECTS #
 ###########################################
+
+message("\n####################################")
+message("# Configuring components")
+message("####################################\n")
 
 # List the available Chaste components
 set(Chaste_COMPONENTS global io linalg mesh ode pde continuum_mechanics cell_based crypt)
@@ -651,7 +665,7 @@ file(COPY ${Chaste_SOURCE_DIR}/cxxtest
 
 install(FILES
     "${Chaste_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/ChasteConfig.cmake"
-    "${Chaste_BINARY_DIR}/ChasteTargets.cmake"
+#    "${Chaste_BINARY_DIR}/ChasteTargets.cmake"
     DESTINATION lib/chaste
     COMPONENT Config)
 
