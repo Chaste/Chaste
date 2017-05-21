@@ -32,7 +32,15 @@
 
 cmake_minimum_required(VERSION 2.8.12)
 
-cmake_policy(VERSION 3.5.1)
+# This statement can be removed when cmake_minimum_required >= 3.0
+if(POLICY CMP0048)
+    cmake_policy(SET CMP0048 NEW)
+endif()
+
+# This statement can be removed when cmake_minimum_required >= 3.3
+if(POLICY CMP0062)
+    cmake_policy(SET CMP0062 NEW)
+endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules)
 include(EnsureOutOfSourceBuild)
