@@ -319,7 +319,8 @@ link_flags  = build.LinkFlags() + ' ' + hostconfig.LdFlags()
 include_flag = ' ' + build.IncludeFlag() + ' '
 
 if not build_type.startswith('Intel'):
-   extra_flags = extra_flags + ' -std=gnu++98'
+   extra_flags = extra_flags + ' -std=c++11'
+   extra_flags = extra_flags + ' -Wno-deprecated-declarations' # Only applicable to auto-generated xsd code
 
 env.Append(CCFLAGS = include_flag + include_flag.join(other_includepaths)
            + ' ' + extra_flags)
