@@ -69,6 +69,75 @@ function (petsc_get_version)
   endif ()
 endfunction ()
 
+###############################################
+# Begin determining PETSC_DIR and PETSC_ARCH
+###############################################
+
+# This will define PETSC_DIR and PETSC_ARCH if and only if they are defined in the corresponding environment variables
+set(PETSC_DIR $ENV{PETSC_DIR})
+set(PETSC_ARCH $ENV{PETSC_ARCH})
+
+message("${PETSC_DIR}")
+message("${PETSC_ARCH}")
+
+# If both variables are set, use them
+if(DEFINED PETSC_DIR AND DEFINED PETSC_ARCH)
+  if(EXISTS "$ENV{PETSC_DIR}/$ENV{PETSC_ARCH}/include/petsc.h")
+    message("-- Determined PETSc install from the pair PETSC_DIR=${PETSC_DIR} PETSC_ARCH=${PETSC_ARCH}")
+  else()
+    message("-- The pair PETSC_DIR=${PETSC_DIR} PETSC_ARCH=${PETSC_ARCH} does not specify a valid PETSc installation")
+    message("-- Attempting to look in default locations instead...")
+    unset(PETSC_DIR)
+    unset(PETSC_ARCH)
+  endif()
+endif()
+
+# At this point, if PETSC_DIR is not defined, we need to look in the default locations
+if(NOT DEFINED PETSC_DIR)
+
+  # If it's Linux...
+  if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+    set(debian_dirs /usr/lib/petscdir) # this can be a ; separated list if more default dirs need to be added
+    foreach(debian_dir ${debian_dirs})
+      if(NOT DEFINED PETSC_DIR)
+        # Look for a subdirectory of the default directory of form 3.7.5
+        file(GLOB debian_dir_children ${debian_dir}/*.*.*)
+        foreach(debian_dir_child ${debian_dir_children})
+          if(IS_DIRECTORY ${debian_dir_child})
+            set(PETSC_DIR ${debian_dir_child})
+            break()
+          endif()
+        endforeach()
+      endif(NOT DEFINED PETSC_DIR)
+    endforeach()
+    message("${CMAKE_SYSTEM_NAME}")
+
+  # If it's Apple OS X or macOS
+  elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+#    if(EXISTS "/usr/lib/petscdir/")
+    message("${CMAKE_SYSTEM_NAME}")
+
+  # If it's Windows
+  elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+    message("${CMAKE_SYSTEM_NAME}")
+
+  # In case we need a default case
+  else()
+    message("${CMAKE_SYSTEM_NAME}")
+
+  endif()
+
+endif(NOT DEFINED PETSC_DIR)
+
+# Else, if PETSC_DIR is defined and
+#elseif()
+
+
+#endif()
+
+
+message(FATAL_ERROR "exiting")
+
 set(homebrew_dir /usr/local/Cellar/petsc)
 file(GLOB homebrew_dirs ${homebrew_dir}/*/real)
 
@@ -120,6 +189,12 @@ if (PETSC_DIR AND NOT PETSC_ARCH)
   set (petscconf "NOTFOUND" CACHE INTERNAL "Scratch variable" FORCE)
 endif (PETSC_DIR AND NOT PETSC_ARCH)
 
+
+###############################################
+# End determining PETSC_DIR and PETSC_ARCH
+###############################################
+
+
 set (petsc_slaves LIBRARIES_SYS LIBRARIES_VEC LIBRARIES_MAT LIBRARIES_DM LIBRARIES_KSP LIBRARIES_SNES LIBRARIES_TS
   INCLUDE_DIR INCLUDE_CONF)
 include (FindPackageMultipass)
@@ -138,7 +213,10 @@ if (PETSC_DIR)
 	endif()
 endif()
 
+message("${PETSC_DIR}")
+message("${PETSC_ARCH}")
 
+#message(FATAL_ERROR "exiting")
 
 # Determine whether the PETSc layout is old-style (through 2.3.3) or
 # new-style (>= 3.0.0)
