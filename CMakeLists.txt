@@ -32,6 +32,16 @@
 
 cmake_minimum_required(VERSION 2.8.12)
 
+# This statement can be removed when cmake_minimum_required >= 3.0
+if(POLICY CMP0048)
+    cmake_policy(SET CMP0048 NEW)
+endif()
+
+# This statement can be removed when cmake_minimum_required >= 3.3
+if(POLICY CMP0062)
+    cmake_policy(SET CMP0062 NEW)
+endif()
+
 if(CMAKE_VERSION VERSION_LESS "3.1.3")
     add_compile_options(-std=c++11)
 endif()
@@ -43,7 +53,14 @@ include(CheckIncludeFile)
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/overrides.cmake)
 
+message("\n####################################")
+message("# Setting compilers and build type")
+message("####################################\n")
+
+# Since CMake 3.0, version can be supplied to the project() command.  We set it directly, for users on older CMake
 project(Chaste)
+set (Chaste_VERSION_MAJOR 3 CACHE STRING "Chaste major version number")
+set (Chaste_VERSION_MINOR 4 CACHE STRING "Chaste minor version number")
 
 include(ChasteBuildTypes)
 
@@ -96,9 +113,6 @@ endif()
 include(ChasteCompilerFlags)
 
 include(ChasteMacros)
-
-set (Chaste_VERSION_MAJOR 3 CACHE STRING "Chaste major version number")
-set (Chaste_VERSION_MINOR 4 CACHE STRING "Chaste minor version number")
 
 set(Chaste_NUM_CPUS_TEST 1 CACHE STRING  "Number of cpus to use when running tests.")
 
@@ -181,6 +195,10 @@ endif(WIN32 OR CYGWIN)
 #  FIND THIRD PARTY LIBRARIES  #
 ################################
 
+message("\n####################################")
+message("# Finding libraries")
+message("####################################\n")
+
 set(Chaste_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR})
 set(Chaste_LINK_LIBRARIES "")
 
@@ -205,8 +223,9 @@ if (Chaste_COVERAGE)
 endif()
 
 
-
-#Gperftools profiling
+################################
+####  Gperftools
+################################
 if (Chaste_PROFILE_GPERFTOOLS)
     find_package(Gperftools REQUIRED)
     list(APPEND Chaste_LINK_LIBRARIES "-Wl,--no-as-needed ${GPERFTOOLS_PROFILER} -Wl,--as-needed")
@@ -222,7 +241,10 @@ if (Chaste_PROFILE_GPROF)
     endif()
 endif()
 
-#Valgrind
+
+################################
+####  Find Valgrind
+################################
 if (Chaste_MEMORY_TESTING)
     find_package(Valgrind REQUIRED)
     if(NOT (${Chaste_NUM_CPUS_TEST} EQUAL 1))
@@ -230,10 +252,13 @@ if (Chaste_MEMORY_TESTING)
     endif()
 endif()
 
-#Locate Python
+
+################################
+####  Find Python
+################################
 find_package(PythonInterp REQUIRED)
 
-if (Chaste_ENABLE_TESTING)
+if (Chaste_ENABLE_TESTING AND Chaste_ACCEPTANCE)
     find_package(TextTest)
     if (NOT TEXTTEST_FOUND)
         message(WARNING "Texttest not found, turning off acceptance tests")
@@ -261,7 +286,10 @@ if(Chaste_AUTO_INSTALL_DEPS)
 	endforeach()
 endif()
 
-#Locate VTK
+
+################################
+####  Find VTK
+################################
 if (Chaste_USE_VTK)
     # First pass will identify the version number
     find_package(VTK REQUIRED)
@@ -285,7 +313,10 @@ if (Chaste_USE_VTK)
     add_definitions(-DCHASTE_VTK)
 endif()
 
-#find Boost
+
+################################
+####  Find Boost
+################################
 add_definitions( -DBOOST_ALL_NO_LIB )
 set( Boost_USE_STATIC_RUNTIME ON) 
 if(BUILD_SHARED_LIBS)
@@ -298,25 +329,35 @@ list(APPEND Chaste_INCLUDES "${Boost_INCLUDE_DIR}")
 list(APPEND Chaste_LINK_LIBRARIES "${Boost_LIBRARIES}")
 
 
-#find PETSc
+################################
+####  Find PETSc
+################################
 find_package(PETSc REQUIRED)
 list(APPEND Chaste_LINK_LIBRARIES "${PETSC_LIBRARIES}")
 
-#find HDF5
+
+################################
+####  Find HDF5
+################################
+# If we're using PETSc's HDF5 (ON by default, for more reliable MPI compatibility), we override HDF5_ROOT accordingly
 if (Chaste_USE_PETSC_HDF5)
-    set(ENV{HDF5_ROOT} "${PETSC_DIR}/${PETSC_ARCH}:${PETSC_DIR}/externalpackages:$ENV{HDF5_ROOT}")
+    if (EXISTS "${PETSC_DIR}/${PETSC_ARCH}/bin/h5diff")
+        set(ENV{HDF5_ROOT} "${PETSC_DIR}/${PETSC_ARCH}")
+
+        # Find the HDF5_C_COMPILER_EXECUTABLE to help the find_package call (else the system HDF5 will be found)
+        find_program( HDF5_C_COMPILER_EXECUTABLE
+                NAMES h5pcc h5cc
+                HINTS ENV HDF5_ROOT
+                PATH_SUFFIXES bin Bin
+                DOC "HDF5 Wrapper compiler.  Used only to detect HDF5 compile flags." )
+    else()
+        message("-- No HDF5 found in ${PETSC_DIR}/${PETSC_ARCH}: looking for system HDF5 instead")
+    endif()
 endif()
-find_program( HDF5_C_COMPILER_EXECUTABLE
-    NAMES h5pcc h5cc
-    HINTS ENV HDF5_ROOT
-    PATH_SUFFIXES bin Bin
-    DOC "HDF5 Wrapper compiler.  Used only to detect HDF5 compile flags." )
-find_program( HDF5_CXX_COMPILER_EXECUTABLE
-    NAMES h5pc++ h5c++ 
-    HINTS ENV HDF5_ROOT
-    PATH_SUFFIXES bin Bin
-    DOC "HDF5 C++ Wrapper compiler.  Used only to detect HDF5 compile flags." )
-find_package(HDF5 MODULE REQUIRED)
+
+find_package(HDF5 REQUIRED)
+
+# Chaste requires a parallel HDF5 library
 if (NOT HDF5_IS_PARALLEL)
     message(SEND_ERROR "Hdf5 library found was not build with --enable-parallel, use the HDF5_ROOT environment variable to specify a parallel hdf5 library. Note: include dirs are ${HDF5_INCLUDE_DIRS} and libraries are ${HDF5_LIBRARIES}")
 endif()
@@ -332,8 +373,11 @@ endforeach()
 # put petsc includes after hdf5 includes or else the hdf5 headers 
 # in the petsc include dir will clobber those chosen on FindHdf5.cmake
 list(APPEND Chaste_INCLUDES "${PETSC_INCLUDES}")
- 
-#Locate MPI 
+
+
+################################
+####  Find MPI
+################################
 if (PETSC_COMPILER)
     string(REPLACE mpicc mpicxx MPI_CXX_COMPILER ${PETSC_COMPILER})
 endif()
@@ -363,17 +407,24 @@ if (Chaste_MEMORY_TESTING)
 endif()
 
 
-
-#find ParMETIS and METIS
+################################
+####  Find ParMETIS and METIS
+################################
+# If we're using PETSc's ParMETIS (ON by default, for more reliable MPI compatibility), override PARMETIS_ROOT accordingly
 if (Chaste_USE_PETSC_PARMETIS)
-    set(PARMETIS_ROOT "${PETSC_DIR}/${PETSC_ARCH}" 
-                      "${PETSC_DIR}/externalpackages"
-                      )
+    if (EXISTS "${PETSC_DIR}/${PETSC_ARCH}/include/parmetis.h")
+        set(PARMETIS_ROOT "${PETSC_DIR}/${PETSC_ARCH}")
+    else()
+        message("-- No ParMETIS found in ${PETSC_DIR}/${PETSC_ARCH}: looking for system ParMETIS instead")
+    endif()
 endif()
 find_package(ParMETIS REQUIRED)
 list(APPEND Chaste_LINK_LIBRARIES "${PARMETIS_LIBRARIES}")
 
-#Locate Sundials
+
+################################
+####  Find Sundials
+################################
 if (Chaste_USE_CVODE)
     if(BUILD_SHARED_LIBS)
 	    set(SUNDIALS_USE_STATIC_LIBRARIES OFF)
@@ -400,7 +451,10 @@ if (Chaste_USE_VTK)
     list(APPEND Chaste_LINK_LIBRARIES "${VTK_LIBRARIES}")
 endif()
 
-#Locate Xerces and XSD
+
+################################
+####  Find Xerces and XSD
+################################
 if (Chaste_USE_XERCES)
 	find_package(Xerces REQUIRED)
 	find_package(XSD REQUIRED)
@@ -443,6 +497,10 @@ endif()
 ###########################################
 # SETUP AVAILABLE COMPONENTS AND PROJECTS #
 ###########################################
+
+message("\n####################################")
+message("# Configuring components")
+message("####################################\n")
 
 # List the available Chaste components
 set(Chaste_COMPONENTS global io linalg mesh ode pde continuum_mechanics cell_based crypt)
@@ -655,7 +713,7 @@ file(COPY ${Chaste_SOURCE_DIR}/cxxtest
 
 install(FILES
     "${Chaste_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/ChasteConfig.cmake"
-    "${Chaste_BINARY_DIR}/ChasteTargets.cmake"
+#    "${Chaste_BINARY_DIR}/ChasteTargets.cmake"
     DESTINATION lib/chaste
     COMPONENT Config)
 
@@ -712,8 +770,9 @@ if (Chaste_COVERAGE)
 		${LCOV_PATH} --directory . --zerocounters
 
 		# Run tests
-        COMMAND ${NICE_COMMAND} ${NICENESS} ${CTEST_COMMAND} "-j${Chaste_COVERAGE_CPUS}" "-L" "Continuous|Parallel" "--output-on-failure"
-            
+        COMMAND ${NICE_COMMAND} ${NICENESS} ${CTEST_COMMAND} "-L" "Continuous" "--output-on-failure"
+        COMMAND ${NICE_COMMAND} ${NICENESS} ${CTEST_COMMAND} "-L" "Parallel" "--output-on-failure"
+
         # Capturing lcov counters and generating report
         COMMAND ${LCOV_PATH} --config-file ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc --directory . --capture --output-file ${_outputname}.info
         COMMAND ${LCOV_PATH} --config-file ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc --remove ${_outputname}.info /home/bob/petsc* /usr/* */fortests/* */test/* */3rdparty/* Debug/* cxxtest/* --output-file ${_outputname}.info.cleaned
@@ -788,7 +847,7 @@ if (Chaste_PROFILE_GPROF OR Chaste_PROFILE_GPERFTOOLS)
     set(NICENESS -n0)
     set(CTEST_COMMAND ctest)
     add_custom_target(profile
-        COMMAND ${NICE_COMMAND} ${NICENESS} ${CTEST_COMMAND} "-j${NUM_CPUS}" "-L" "^Profile$" "--output-on-failure"
+        COMMAND ${NICE_COMMAND} ${NICENESS} ${CTEST_COMMAND} "-j${NUM_CPUS}" "-L" "^Profile_" "--output-on-failure"
         COMMAND ${PYTHON_EXECUTABLE} "${Chaste_SOURCE_DIR}/cmake/process_profile.py" "${Chaste_PROFILE_OUTPUT_DIR}" ${extension}
         DEPENDS Profile
         WORKING_DIRECTORY ${Chaste_BINARY_DIR}
