@@ -335,20 +335,25 @@ list(APPEND Chaste_LINK_LIBRARIES "${PETSC_LIBRARIES}")
 ################################
 ####  Find HDF5
 ################################
+# If we're using PETSc's HDF5 (ON by default, for more reliable MPI compatibility), we override HDF5_ROOT accordingly
 if (Chaste_USE_PETSC_HDF5)
-    set(ENV{HDF5_ROOT} "${PETSC_DIR}/${PETSC_ARCH}:${PETSC_DIR}/externalpackages:$ENV{HDF5_ROOT}")
+    if (EXISTS "${PETSC_DIR}/${PETSC_ARCH}/bin/h5diff")
+        set(ENV{HDF5_ROOT} "${PETSC_DIR}/${PETSC_ARCH}")
+
+        # Find the HDF5_C_COMPILER_EXECUTABLE to help the find_package call (else the system HDF5 will be found)
+        find_program( HDF5_C_COMPILER_EXECUTABLE
+                NAMES h5pcc h5cc
+                HINTS ENV HDF5_ROOT
+                PATH_SUFFIXES bin Bin
+                DOC "HDF5 Wrapper compiler.  Used only to detect HDF5 compile flags." )
+    else()
+        message("-- No HDF5 found in ${PETSC_DIR}/${PETSC_ARCH}: looking for system HDF5 instead")
+    endif()
 endif()
-find_program( HDF5_C_COMPILER_EXECUTABLE
-    NAMES h5pcc h5cc
-    HINTS ENV HDF5_ROOT
-    PATH_SUFFIXES bin Bin
-    DOC "HDF5 Wrapper compiler.  Used only to detect HDF5 compile flags." )
-find_program( HDF5_CXX_COMPILER_EXECUTABLE
-    NAMES h5pc++ h5c++ 
-    HINTS ENV HDF5_ROOT
-    PATH_SUFFIXES bin Bin
-    DOC "HDF5 C++ Wrapper compiler.  Used only to detect HDF5 compile flags." )
-find_package(HDF5 MODULE REQUIRED)
+
+find_package(HDF5 REQUIRED)
+
+# Chaste requires a parallel HDF5 library
 if (NOT HDF5_IS_PARALLEL)
     message(SEND_ERROR "Hdf5 library found was not build with --enable-parallel, use the HDF5_ROOT environment variable to specify a parallel hdf5 library. Note: include dirs are ${HDF5_INCLUDE_DIRS} and libraries are ${HDF5_LIBRARIES}")
 endif()
@@ -403,9 +408,11 @@ endif()
 ################################
 # If we're using PETSc's ParMETIS (ON by default, for more reliable MPI compatibility), override PARMETIS_ROOT accordingly
 if (Chaste_USE_PETSC_PARMETIS)
-    set(PARMETIS_ROOT "${PETSC_DIR}/${PETSC_ARCH}" 
-                      "${PETSC_DIR}/externalpackages"
-                      )
+    if (EXISTS "${PETSC_DIR}/${PETSC_ARCH}/include/parmetis.h")
+        set(PARMETIS_ROOT "${PETSC_DIR}/${PETSC_ARCH}")
+    else()
+        message("-- No ParMETIS found in ${PETSC_DIR}/${PETSC_ARCH}: looking for system ParMETIS instead")
+    endif()
 endif()
 find_package(ParMETIS REQUIRED)
 list(APPEND Chaste_LINK_LIBRARIES "${PARMETIS_LIBRARIES}")
