@@ -695,8 +695,6 @@ Vec LinearSystem::Solve(Vec lhsGuess)
 
         KSPCreate(PETSC_COMM_WORLD, &mKspSolver);
 
-        const bool is_small = (mSize <= 6); ///\todo This is a magic number.  Do we want a warning here?
-
         if (mMatNullSpace) // Adding null-space to the matrix (new style) has to happen *before* KSPSetOperators
         {
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 3) //PETSc 3.3 or later
@@ -745,7 +743,7 @@ Vec LinearSystem::Solve(Vec lhsGuess)
 #endif
         }
 #if (PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR >= 5) //PETSc 3.5 or later
-        if (mMatrixIsConstant && (!is_small))
+        if (mMatrixIsConstant)
         {
             // Emulate SAME_PRECONDITIONER as above
             KSPSetReusePreconditioner(mKspSolver, PETSC_TRUE);
@@ -779,6 +777,7 @@ Vec LinearSystem::Solve(Vec lhsGuess)
         KSPGetPC(mKspSolver, &prec);
 
         // Turn off pre-conditioning if the system size is very small
+        const bool is_small = (mSize <= 6); ///\todo This is a magic number.  Do we want a warning here?
         if (is_small)
         {
             PCSetType(prec, PCNONE);

@@ -427,10 +427,7 @@ public:
 
         for (unsigned i = 0; i < 7; ++i)
         {
-            for (unsigned j = 0; j < 7; ++j)
-            {
-                ls.SetMatrixElement(i, j, i == j ? static_cast<double>(i + 1) : 0.0);
-            }
+            ls.SetMatrixElement(i, i, static_cast<double>(i + 1));
         }
 
         ls.AssembleIntermediateLinearSystem();
