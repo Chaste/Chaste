@@ -219,8 +219,9 @@ if (Chaste_COVERAGE)
 endif()
 
 
-
-#Gperftools profiling
+################################
+####  Gperftools
+################################
 if (Chaste_PROFILE_GPERFTOOLS)
     find_package(Gperftools REQUIRED)
     list(APPEND Chaste_LINK_LIBRARIES "-Wl,--no-as-needed ${GPERFTOOLS_PROFILER} -Wl,--as-needed")
@@ -236,7 +237,10 @@ if (Chaste_PROFILE_GPROF)
     endif()
 endif()
 
-#Valgrind
+
+################################
+####  Find Valgrind
+################################
 if (Chaste_MEMORY_TESTING)
     find_package(Valgrind REQUIRED)
     if(NOT (${Chaste_NUM_CPUS_TEST} EQUAL 1))
@@ -244,7 +248,10 @@ if (Chaste_MEMORY_TESTING)
     endif()
 endif()
 
-#Locate Python
+
+################################
+####  Find Python
+################################
 find_package(PythonInterp REQUIRED)
 
 if (Chaste_ENABLE_TESTING AND Chaste_ACCEPTANCE)
@@ -275,7 +282,10 @@ if(Chaste_AUTO_INSTALL_DEPS)
 	endforeach()
 endif()
 
-#Locate VTK
+
+################################
+####  Find VTK
+################################
 if (Chaste_USE_VTK)
     # First pass will identify the version number
     find_package(VTK REQUIRED)
@@ -299,7 +309,10 @@ if (Chaste_USE_VTK)
     add_definitions(-DCHASTE_VTK)
 endif()
 
-#find Boost
+
+################################
+####  Find Boost
+################################
 add_definitions( -DBOOST_ALL_NO_LIB )
 set( Boost_USE_STATIC_RUNTIME ON) 
 if(BUILD_SHARED_LIBS)
@@ -312,11 +325,16 @@ list(APPEND Chaste_INCLUDES "${Boost_INCLUDE_DIR}")
 list(APPEND Chaste_LINK_LIBRARIES "${Boost_LIBRARIES}")
 
 
-#find PETSc
+################################
+####  Find PETSc
+################################
 find_package(PETSc REQUIRED)
 list(APPEND Chaste_LINK_LIBRARIES "${PETSC_LIBRARIES}")
 
-#find HDF5
+
+################################
+####  Find HDF5
+################################
 if (Chaste_USE_PETSC_HDF5)
     set(ENV{HDF5_ROOT} "${PETSC_DIR}/${PETSC_ARCH}:${PETSC_DIR}/externalpackages:$ENV{HDF5_ROOT}")
 endif()
@@ -346,8 +364,11 @@ endforeach()
 # put petsc includes after hdf5 includes or else the hdf5 headers 
 # in the petsc include dir will clobber those chosen on FindHdf5.cmake
 list(APPEND Chaste_INCLUDES "${PETSC_INCLUDES}")
- 
-#Locate MPI 
+
+
+################################
+####  Find MPI
+################################
 if (PETSC_COMPILER)
     string(REPLACE mpicc mpicxx MPI_CXX_COMPILER ${PETSC_COMPILER})
 endif()
@@ -377,8 +398,10 @@ if (Chaste_MEMORY_TESTING)
 endif()
 
 
-
-#find ParMETIS and METIS
+################################
+####  Find ParMETIS and METIS
+################################
+# If we're using PETSc's ParMETIS (ON by default, for more reliable MPI compatibility), override PARMETIS_ROOT accordingly
 if (Chaste_USE_PETSC_PARMETIS)
     set(PARMETIS_ROOT "${PETSC_DIR}/${PETSC_ARCH}" 
                       "${PETSC_DIR}/externalpackages"
@@ -387,7 +410,10 @@ endif()
 find_package(ParMETIS REQUIRED)
 list(APPEND Chaste_LINK_LIBRARIES "${PARMETIS_LIBRARIES}")
 
-#Locate Sundials
+
+################################
+####  Find Sundials
+################################
 if (Chaste_USE_CVODE)
     if(BUILD_SHARED_LIBS)
 	    set(SUNDIALS_USE_STATIC_LIBRARIES OFF)
@@ -414,7 +440,10 @@ if (Chaste_USE_VTK)
     list(APPEND Chaste_LINK_LIBRARIES "${VTK_LIBRARIES}")
 endif()
 
-#Locate Xerces and XSD
+
+################################
+####  Find Xerces and XSD
+################################
 if (Chaste_USE_XERCES)
 	find_package(Xerces REQUIRED)
 	find_package(XSD REQUIRED)
