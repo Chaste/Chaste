@@ -49,8 +49,15 @@ else()
 endif()
 
 function (petsc_get_version)
-  if (EXISTS "${PETSC_DIR}/include/petscversion.h")
-    file (STRINGS "${PETSC_DIR}/include/petscversion.h" vstrings REGEX "#define PETSC_VERSION_(RELEASE|MAJOR|MINOR|SUBMINOR|PATCH) ")
+
+  # Find the file petscversion.h
+  find_path(VERSION_HEADER_PATH include/petscversion.h
+            HINTS ${PETSC_DIR} ${PETSC_DIR}/${PETSC_ARCH}
+            DOC "PETSc Directory")
+  set(PETSC_VERSION_HEADER ${VERSION_HEADER_PATH}/include/petscversion.h)
+
+  if (EXISTS "${PETSC_VERSION_HEADER}")
+    file (STRINGS "${PETSC_VERSION_HEADER}" vstrings REGEX "#define PETSC_VERSION_(RELEASE|MAJOR|MINOR|SUBMINOR|PATCH) ")
     foreach (line ${vstrings})
       string (REGEX REPLACE " +" ";" fields ${line}) # break line into three fields (the first is always "#define")
       list (GET fields 1 var)
