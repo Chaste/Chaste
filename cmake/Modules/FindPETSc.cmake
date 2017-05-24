@@ -246,6 +246,9 @@ if (PETSC_DIR)
 	endif()
 endif()
 
+message("${PETSC_DIR}")
+message("${PETSC_ARCH}")
+
 # Determine whether the PETSc layout is old-style (through 2.3.3) or
 # new-style (>= 3.0.0)
 if (EXISTS "${PETSC_DIR}/${PETSC_ARCH}/lib/petsc/conf/petscvariables") # > 3.5
