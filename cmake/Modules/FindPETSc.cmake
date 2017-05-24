@@ -77,12 +77,8 @@ endfunction ()
 set(PETSC_DIR $ENV{PETSC_DIR})
 set(PETSC_ARCH $ENV{PETSC_ARCH})
 
-message("${PETSC_DIR}")
-message("${PETSC_ARCH}")
-
 # If both variables are set, use them
 if(DEFINED PETSC_DIR AND DEFINED PETSC_ARCH)
-  message("${PETSC_DIR}/${PETSC_ARCH}/include/petsc.h")
   if(EXISTS "${PETSC_DIR}/${PETSC_ARCH}/include/petsc.h" OR EXISTS "${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h")
     message("-- Determined PETSc install from the pair PETSC_DIR=${PETSC_DIR} PETSC_ARCH=${PETSC_ARCH}")
   else()
@@ -95,39 +91,37 @@ endif()
 
 # Look in the following hard-coded PETSc locations first
 if(NOT DEFINED PETSC_DIR)
-
   # If it's Linux...
   if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     set(debian_dir /usr/lib/petscdir)
-
     # Hardcode default package locations for...
     # ... Ubuntu 14.04
     if(IS_DIRECTORY "/usr/lib/petscdir/3.4.2/linux-gnu-c-debug")
-      message("CustomTrace: Ubuntu 14.04")
+      message("-- Found candidate PETSc in a default Ubuntu location")
       set(PETSC_DIR "/usr/lib/petscdir/3.4.2")
       set(PETSC_ARCH "linux-gnu-c-debug")
     # ... Ubuntu 16.04
     elseif(IS_DIRECTORY "/usr/lib/petscdir/3.6.2/x86_64-linux-gnu-real")
-      message("CustomTrace: Ubuntu 16.04")
+      message("-- Found candidate PETSc in a default Ubuntu location")
       set(PETSC_DIR "/usr/lib/petscdir/3.6.2")
       set(PETSC_ARCH "x86_64-linux-gnu-real")
     # ... Ubuntu 16.10
     elseif(IS_DIRECTORY "/usr/lib/petscdir/3.7.3/x86_64-linux-gnu-real")
-      message("CustomTrace: Ubuntu 16.10")
+      message("-- Found candidate PETSc in a default Ubuntu location")
       set(PETSC_DIR "/usr/lib/petscdir/3.7.3")
       set(PETSC_ARCH "x86_64-linux-gnu-real")
     # ... Ubuntu 17.04
     elseif(IS_DIRECTORY "/usr/lib/petscdir/3.7.5/x86_64-linux-gnu-real")
-      message("CustomTrace: Ubuntu 17.04")
+      message("-- Found candidate PETSc in a default Ubuntu location")
       set(PETSC_DIR "/usr/lib/petscdir/3.7.5")
       set(PETSC_ARCH "x86_64-linux-gnu-real")
     # ... Anything else with dir /usr/lib/petscdir
     elseif(IS_DIRECTORY "/usr/lib/petscdir")
-      message("CustomTrace: Ubuntu Generic")
+      message("-- Found candidate PETSc in a default Ubuntu location")
       # Find a petsc dir that ends in a.b.c
       file(GLOB potential_dirs "/usr/lib/petscdir/?.?.?")
       foreach(potential_dir ${potential_dirs})
-        if( (NOT DEFINED PETSC_DIR) AND (IS_DIRECTORY potential_dir) )
+        if(NOT DEFINED PETSC_DIR)
           set(PETSC_DIR ${potential_dir})
         endif()
       endforeach()
@@ -141,42 +135,31 @@ if(NOT DEFINED PETSC_DIR)
       endif()
     # ... generic case.  Other Linux, perhaps
     else()
-      message("CustomTrace: Linux Generic")
     endif()
-
   # If it's Apple OS X or macOS
   elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     if(IS_DIRECTORY "/usr/local/Cellar/petsc")
-      message("CustomTrace: Homebrew Cellar")
       file(GLOB potential_dirs "/usr/local/Cellar/petsc/?.?.?")
-      message("CustomTrace: potential_dirs: ${potential_dirs}")
       foreach(potential_dir ${potential_dirs})
-        message("CustomTrace: potential_dir: ${potential_dir}")
         if(NOT DEFINED PETSC_DIR)
-          message("CustomTrace: ${potential_dir}/real")
           if(IS_DIRECTORY "${potential_dir}/real")
+            message("-- Found candidate PETSc in a default homebrew location")
             set(PETSC_DIR "${potential_dir}/real")
           endif()
         endif()
       endforeach()
     endif()
-
   # If it's Windows
   elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     if(IS_DIRECTORY "C:/Program\ Files/PETSc\ for\ Windows/PETSc/c-opt_icl_mkl")
       set(PETSC_DIR "C:/Program\ Files/PETSc\ for\ Windows/PETSc")
       set(PETSC_ARCH "c-opt_icl_mkl")
     endif()
-
   # In case we need a default case
   else()
-    message("CustomTrace: Not Windows, Linux, or Apple")
+    message("-- CMAKE_SYSTEM_NAME is ${CMAKE_SYSTEM_NAME} is not Windows, Darwin or Linux")
   endif()
-
 endif(NOT DEFINED PETSC_DIR)
-
-message("CustomTrace: ${PETSC_DIR}")
-message(FATAL_ERROR "Exit.")
 
 # If it's still not found, use the previous infrastructure to have a stab at it
 if(NOT DEFINED PETSC_DIR)
@@ -205,7 +188,6 @@ if(NOT DEFINED PETSC_DIR)
     DOC "PETSc Directory")
 
 endif(NOT DEFINED PETSC_DIR)
-
 
 find_program (MAKE_EXECUTABLE NAMES make gmake)
 
@@ -256,9 +238,6 @@ if (PETSC_DIR)
 		return()
 	endif()
 endif()
-
-message("${PETSC_DIR}")
-message("${PETSC_ARCH}")
 
 # Determine whether the PETSc layout is old-style (through 2.3.3) or
 # new-style (>= 3.0.0)
