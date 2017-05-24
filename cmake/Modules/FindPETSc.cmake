@@ -82,7 +82,8 @@ message("${PETSC_ARCH}")
 
 # If both variables are set, use them
 if(DEFINED PETSC_DIR AND DEFINED PETSC_ARCH)
-  if(EXISTS "$ENV{PETSC_DIR}/$ENV{PETSC_ARCH}/include/petsc.h")
+  message("${PETSC_DIR}/${PETSC_ARCH}/include/petsc.h")
+  if(EXISTS "${PETSC_DIR}/${PETSC_ARCH}/include/petsc.h" OR EXISTS "${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h")
     message("-- Determined PETSc install from the pair PETSC_DIR=${PETSC_DIR} PETSC_ARCH=${PETSC_ARCH}")
   else()
     message("-- The pair PETSC_DIR=${PETSC_DIR} PETSC_ARCH=${PETSC_ARCH} does not specify a valid PETSc installation")
@@ -92,75 +93,115 @@ if(DEFINED PETSC_DIR AND DEFINED PETSC_ARCH)
   endif()
 endif()
 
-# At this point, if PETSC_DIR is not defined, we need to look in the default locations
+# Look in the following hard-coded PETSc locations first
 if(NOT DEFINED PETSC_DIR)
 
   # If it's Linux...
   if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-    set(debian_dirs /usr/lib/petscdir) # this can be a ; separated list if more default dirs need to be added
-    foreach(debian_dir ${debian_dirs})
-      if(NOT DEFINED PETSC_DIR)
-        # Look for a subdirectory of the default directory of form 3.7.5
-        file(GLOB debian_dir_children ${debian_dir}/*.*.*)
-        foreach(debian_dir_child ${debian_dir_children})
-          if(IS_DIRECTORY ${debian_dir_child})
-            set(PETSC_DIR ${debian_dir_child})
-            break()
+    set(debian_dir /usr/lib/petscdir)
+
+    # Hardcode default package locations for...
+    # ... Ubuntu 14.04
+    if(IS_DIRECTORY "/usr/lib/petscdir/3.4.2/linux-gnu-c-debug")
+      message("CustomTrace: Ubuntu 14.04")
+      set(PETSC_DIR "/usr/lib/petscdir/3.4.2")
+      set(PETSC_ARCH "linux-gnu-c-debug")
+    # ... Ubuntu 16.04
+    elseif(IS_DIRECTORY "/usr/lib/petscdir/3.6.2/x86_64-linux-gnu-real")
+      message("CustomTrace: Ubuntu 16.04")
+      set(PETSC_DIR "/usr/lib/petscdir/3.6.2")
+      set(PETSC_ARCH "x86_64-linux-gnu-real")
+    # ... Ubuntu 16.10
+    elseif(IS_DIRECTORY "/usr/lib/petscdir/3.7.3/x86_64-linux-gnu-real")
+      message("CustomTrace: Ubuntu 16.10")
+      set(PETSC_DIR "/usr/lib/petscdir/3.7.3")
+      set(PETSC_ARCH "x86_64-linux-gnu-real")
+    # ... Ubuntu 17.04
+    elseif(IS_DIRECTORY "/usr/lib/petscdir/3.7.5/x86_64-linux-gnu-real")
+      message("CustomTrace: Ubuntu 17.04")
+      set(PETSC_DIR "/usr/lib/petscdir/3.7.5")
+      set(PETSC_ARCH "x86_64-linux-gnu-real")
+    # ... Anything else with dir /usr/lib/petscdir
+    elseif(IS_DIRECTORY "/usr/lib/petscdir")
+      message("CustomTrace: Ubuntu Generic")
+      # Find a petsc dir that ends in a.b.c
+      file(GLOB potential_dirs "/usr/lib/petscdir/?.?.?")
+      foreach(potential_dir ${potential_dirs})
+        if( (NOT DEFINED PETSC_DIR) AND (IS_DIRECTORY potential_dir) )
+          set(PETSC_DIR ${potential_dir})
+        endif()
+      endforeach()
+      if(DEFINED PETSC_DIR)
+        file(GLOB potential_archs RELATIVE ${PETSC_DIR} "${PETSC_DIR}/*")
+        foreach(potential_arch ${potential_archs})
+          if( (NOT DEFINED PETSC_ARCH) AND (${potential_arch} MATCHES "linux-gnu") )
+            set(PETSC_ARCH ${potential_arch})
           endif()
         endforeach()
-      endif(NOT DEFINED PETSC_DIR)
-    endforeach()
-    message("${CMAKE_SYSTEM_NAME}")
+      endif()
+    # ... generic case.  Other Linux, perhaps
+    else()
+      message("CustomTrace: Linux Generic")
+    endif()
 
   # If it's Apple OS X or macOS
   elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-#    if(EXISTS "/usr/lib/petscdir/")
-    message("${CMAKE_SYSTEM_NAME}")
+    if(IS_DIRECTORY "/usr/local/Cellar/petsc")
+      message("CustomTrace: Homebrew Cellar")
+      file(GLOB potential_dirs "/usr/local/Cellar/petsc/?.?.?")
+      foreach(potential_dir ${potential_dirs})
+        if( (NOT DEFINED PETSC_DIR) AND (IS_DIRECTORY potential_dir) )
+          if(IS_DIRECTORY "${potential_dir}/real")
+            set(PETSC_DIR "${potential_dir}/real")
+          endif()
+        endif()
+      endforeach()
+    endif()
 
   # If it's Windows
   elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-    message("${CMAKE_SYSTEM_NAME}")
+    if(IS_DIRECTORY "C:/Program\ Files/PETSc\ for\ Windows/PETSc/c-opt_icl_mkl")
+      set(PETSC_DIR "C:/Program\ Files/PETSc\ for\ Windows/PETSc")
+      set(PETSC_ARCH "c-opt_icl_mkl")
+    endif()
 
   # In case we need a default case
   else()
-    message("${CMAKE_SYSTEM_NAME}")
-
+    message("CustomTrace: Not Windows, Linux, or Apple")
   endif()
 
 endif(NOT DEFINED PETSC_DIR)
 
-# Else, if PETSC_DIR is defined and
-#elseif()
+message("CustomTrace: ${PETSC_DIR}")
+message(FATAL_ERROR "Exit.")
 
+# If it's still not found, use the previous infrastructure to have a stab at it
+if(NOT DEFINED PETSC_DIR)
+  set(homebrew_dir /usr/local/Cellar/petsc)
+  file(GLOB homebrew_dirs ${homebrew_dir}/*/real)
 
-#endif()
+  set(debian_dir /usr/lib/petscdir)
+  file(GLOB ubuntu_dirs ${debian_dir}/*/*)
+  file(GLOB debian_dirs ${debian_dir}/*)
 
+  find_path (PETSC_DIR include/petsc.h
+    HINTS
+    $ENV{PETSC_DIR}
+    # Homebrew
+    ${homebrew_dirs}
+    PATHS
+    # Debian paths
+    ${debian_dirs}
+    # Ubuntu paths
+    ${ubuntu_dirs}
+    # MacPorts path
+    /opt/local/lib/petsc
+    # PETSc for Windows
+    C:/Program\ Files/PETSc\ for\ Windows/PETSc
+    $ENV{HOME}/petsc
+    DOC "PETSc Directory")
 
-message(FATAL_ERROR "exiting")
-
-set(homebrew_dir /usr/local/Cellar/petsc)
-file(GLOB homebrew_dirs ${homebrew_dir}/*/real)
-
-set(debian_dir /usr/lib/petscdir)
-file(GLOB ubuntu_dirs ${debian_dir}/*/*)
-file(GLOB debian_dirs ${debian_dir}/*)
-
-find_path (PETSC_DIR include/petsc.h
-  HINTS 
-  $ENV{PETSC_DIR}
-  # Homebrew
-  ${homebrew_dirs}
-  PATHS
-  # Debian paths
-  ${debian_dirs}
-  # Ubuntu paths
-  ${ubuntu_dirs}
-  # MacPorts path
-  /opt/local/lib/petsc
-  # PETSc for Windows
-  C:/Program\ Files/PETSc\ for\ Windows/PETSc
-  $ENV{HOME}/petsc
-  DOC "PETSc Directory")
+endif(NOT DEFINED PETSC_DIR)
 
 
 find_program (MAKE_EXECUTABLE NAMES make gmake)
@@ -215,8 +256,6 @@ endif()
 
 message("${PETSC_DIR}")
 message("${PETSC_ARCH}")
-
-#message(FATAL_ERROR "exiting")
 
 # Determine whether the PETSc layout is old-style (through 2.3.3) or
 # new-style (>= 3.0.0)
