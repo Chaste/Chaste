@@ -87,6 +87,8 @@ set(PETSC_ARCH $ENV{PETSC_ARCH})
 # If both variables are set, use them
 if(DEFINED PETSC_DIR AND DEFINED PETSC_ARCH)
   if(EXISTS "${PETSC_DIR}/${PETSC_ARCH}/include/petsc.h" OR EXISTS "${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h")
+    set(PETSC_DIR "${PETSC_DIR}" CACHE FILEPATH "PETSc install directory")
+    set(PETSC_ARCH "${PETSC_ARCH}" CACHE STRING "PETSc build architecture")
     message("-- Determined PETSc install from the pair PETSC_DIR=${PETSC_DIR} PETSC_ARCH=${PETSC_ARCH}")
   else()
     message("-- The pair PETSC_DIR=${PETSC_DIR} PETSC_ARCH=${PETSC_ARCH} does not specify a valid PETSc installation")
@@ -104,23 +106,23 @@ if(NOT DEFINED PETSC_DIR)
     # Hardcode default package locations for...
     # ... Ubuntu 14.04
     if(IS_DIRECTORY "/usr/lib/petscdir/3.4.2/linux-gnu-c-debug")
-      set(PETSC_DIR "/usr/lib/petscdir/3.4.2")
-      set(PETSC_ARCH "linux-gnu-c-debug")
+      set(PETSC_DIR "/usr/lib/petscdir/3.4.2" CACHE FILEPATH "PETSc install directory")
+      set(PETSC_ARCH "linux-gnu-c-debug" CACHE STRING "PETSc build architecture")
       message("-- Found candidate PETSc in default Ubuntu location: ${PETSC_DIR}/${PETSC_ARCH}")
     # ... Ubuntu 16.04
     elseif(IS_DIRECTORY "/usr/lib/petscdir/3.6.2/x86_64-linux-gnu-real")
-      set(PETSC_DIR "/usr/lib/petscdir/3.6.2")
-      set(PETSC_ARCH "x86_64-linux-gnu-real")
+      set(PETSC_DIR "/usr/lib/petscdir/3.6.2" CACHE FILEPATH "PETSc install directory")
+      set(PETSC_ARCH "x86_64-linux-gnu-real" CACHE STRING "PETSc build architecture")
       message("-- Found candidate PETSc in default Ubuntu location: ${PETSC_DIR}/${PETSC_ARCH}")
     # ... Ubuntu 16.10
     elseif(IS_DIRECTORY "/usr/lib/petscdir/3.7.3/x86_64-linux-gnu-real")
-      set(PETSC_DIR "/usr/lib/petscdir/3.7.3")
-      set(PETSC_ARCH "x86_64-linux-gnu-real")
+      set(PETSC_DIR "/usr/lib/petscdir/3.7.3" CACHE FILEPATH "PETSc install directory")
+      set(PETSC_ARCH "x86_64-linux-gnu-real" CACHE STRING "PETSc build architecture")
       message("-- Found candidate PETSc in default Ubuntu location: ${PETSC_DIR}/${PETSC_ARCH}")
     # ... Ubuntu 17.04
     elseif(IS_DIRECTORY "/usr/lib/petscdir/3.7.5/x86_64-linux-gnu-real")
-      set(PETSC_DIR "/usr/lib/petscdir/3.7.5")
-      set(PETSC_ARCH "x86_64-linux-gnu-real")
+      set(PETSC_DIR "/usr/lib/petscdir/3.7.5" CACHE FILEPATH "PETSc install directory")
+      set(PETSC_ARCH "x86_64-linux-gnu-real" CACHE STRING "PETSc build architecture")
       message("-- Found candidate PETSc in default Ubuntu location: ${PETSC_DIR}/${PETSC_ARCH}")
     # ... Anything else with dir /usr/lib/petscdir
     elseif(IS_DIRECTORY "/usr/lib/petscdir")
@@ -128,14 +130,14 @@ if(NOT DEFINED PETSC_DIR)
       file(GLOB potential_dirs "/usr/lib/petscdir/?.?.?")
       foreach(potential_dir ${potential_dirs})
         if(NOT DEFINED PETSC_DIR)
-          set(PETSC_DIR ${potential_dir})
+          set(PETSC_DIR ${potential_dir} CACHE FILEPATH "PETSc install directory")
         endif()
       endforeach()
       if(DEFINED PETSC_DIR)
         file(GLOB potential_archs RELATIVE ${PETSC_DIR} "${PETSC_DIR}/*")
         foreach(potential_arch ${potential_archs})
           if( (NOT DEFINED PETSC_ARCH) AND (${potential_arch} MATCHES "linux-gnu") )
-            set(PETSC_ARCH ${potential_arch})
+            set(PETSC_ARCH ${potential_arch} CACHE STRING "PETSc build architecture")
             message("-- Found candidate PETSc in default Ubuntu location: ${PETSC_DIR}/${PETSC_ARCH}")
           endif()
         endforeach()
@@ -150,7 +152,7 @@ if(NOT DEFINED PETSC_DIR)
       foreach(potential_dir ${potential_dirs})
         if(NOT DEFINED PETSC_DIR)
           if(IS_DIRECTORY "${potential_dir}/real")
-            set(PETSC_DIR "${potential_dir}/real")
+            set(PETSC_DIR "${potential_dir}/real" CACHE FILEPATH "PETSc install directory")
             message("-- Found candidate PETSc in default homebrew location: ${PETSC_DIR}")
           endif()
         endif()
@@ -159,8 +161,8 @@ if(NOT DEFINED PETSC_DIR)
   # If it's Windows
   elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     if(IS_DIRECTORY "C:/Program\ Files/PETSc\ for\ Windows/PETSc/c-opt_icl_mkl")
-      set(PETSC_DIR "C:/Program\ Files/PETSc\ for\ Windows/PETSc")
-      set(PETSC_ARCH "c-opt_icl_mkl")
+      set(PETSC_DIR "C:/Program\ Files/PETSc\ for\ Windows/PETSc" CACHE FILEPATH "PETSc install directory")
+      set(PETSC_ARCH "c-opt_icl_mkl" CACHE STRING "PETSc build architecture")
     endif()
   # In case we need a default case
   else()
@@ -246,18 +248,19 @@ if (PETSC_DIR)
 	endif()
 endif()
 
-# Determine whether the PETSc layout is old-style (through 2.3.3) or
-# new-style (>= 3.0.0)
-if (EXISTS "${PETSC_DIR}/${PETSC_ARCH}/lib/petsc/conf/petscvariables")             # From 3.5
-  set (petsc_conf_rules "${PETSC_DIR}/${PETSC_ARCH}/lib/petsc/conf/rules")
-  set (petsc_conf_variables "${PETSC_DIR}/${PETSC_ARCH}/lib/petsc/conf/variables")
-elseif (EXISTS "${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h")                   # Before 3.5
-  set (petsc_conf_rules "${PETSC_DIR}/conf/rules")
-  set (petsc_conf_variables "${PETSC_DIR}/conf/variables")
-elseif (PETSC_DIR)
+# Find the `conf/rules` and `conf/variables` files, that will help define the installation
+find_path(petsc_conf_dir "conf/rules"
+          HINTS
+          ${PETSC_DIR} ${PETSC_DIR}/lib/petsc
+          ${PETSC_DIR}/${PETSC_ARCH} ${PETSC_DIR}/${PETSC_ARCH}/lib/petsc
+          NO_DEFAULT_PATH)
+
+if (EXISTS "${petsc_conf_dir}/conf/rules" AND EXISTS "${petsc_conf_dir}/conf/variables")
+  set (petsc_conf_rules "${petsc_conf_dir}/conf/rules")
+  set (petsc_conf_variables "${petsc_conf_dir}/conf/variables")
+else ()
   message (SEND_ERROR "The pair PETSC_DIR=${PETSC_DIR} PETSC_ARCH=${PETSC_ARCH} do not specify a valid PETSc installation")
 endif ()
-
 
 if (petsc_conf_rules AND petsc_conf_variables AND NOT petsc_config_current)
 	
