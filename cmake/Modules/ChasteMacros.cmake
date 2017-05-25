@@ -507,6 +507,15 @@ endmacro(Chaste_DO_APPS_MAIN)
 # enabled test packs.
 ##########################################################
 macro(Chaste_DO_TEST_COMMON component)
+
+    # Get the git revision (for tutorial tests)
+    find_package(Git QUIET)
+    if(DEFINED GIT_EXECUTABLE)
+        execute_process(COMMAND git log -1 --format=%h
+                        WORKING_DIRECTORY ${Chaste_SOURCE_DIR}
+                        OUTPUT_VARIABLE Chaste_revision
+                        OUTPUT_STRIP_TRAILING_WHITESPACE)
+    endif()
     # make tutorial directories
     file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/tutorials)
     file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/tutorials/UserTutorials)
@@ -591,7 +600,7 @@ macro(Chaste_DO_TEST_COMMON component)
                     if(filename MATCHES "Test(.*)Tutorial.(hpp|py)") 
                         set(out_filename  ${CMAKE_BINARY_DIR}/tutorials/UserTutorials/${CMAKE_MATCH_1})
                         add_custom_command(OUTPUT ${out_filename}
-                            COMMAND ${PYTHON_EXECUTABLE} ARGS ${Chaste_BINARY_DIR}/python/utils/CreateTutorial.py ${CMAKE_CURRENT_SOURCE_DIR}/${filename} ${out_filename}
+                            COMMAND ${PYTHON_EXECUTABLE} ARGS ${Chaste_BINARY_DIR}/python/utils/CreateTutorial.py ${CMAKE_CURRENT_SOURCE_DIR}/${filename} ${out_filename} -r ${Chaste_revision}
                             DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${filename}
                             COMMENT "Generating user tutorial ${out_filename}" VERBATIM)
                         add_custom_target(${CMAKE_MATCH_1} DEPENDS ${out_filename})
