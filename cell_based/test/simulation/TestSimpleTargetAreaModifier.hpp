@@ -231,7 +231,7 @@ public:
         TS_ASSERT_DELTA(actual_area_4_after_3dt, 0.0, 1e-12);
     }
 
-    void TestTargetAreaOfDaughterCells()
+    void TestTargetAreaOfDaughterCellsSimple()
     {
         // Plan: initialise a cell and have it divide at a fixed time. If cell divides at t, check that:
         // target area of mother cell at t - dt = mature target area
@@ -260,7 +260,7 @@ public:
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("TestTargetAreaOfDaughterCells");
+        simulator.SetOutputDirectory("TestTargetAreaOfDaughterCellsSimple");
         simulator.SetEndTime(0.997);
 
         // Create a force law and pass it to the simulation
