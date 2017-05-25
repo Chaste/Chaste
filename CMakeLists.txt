@@ -339,6 +339,10 @@ list(APPEND Chaste_LINK_LIBRARIES "${PETSC_LIBRARIES}")
 ################################
 ####  Find HDF5
 ################################
+
+# This alters the order that CMake looks for h5pcc h5cc (parallel h5pcc first)
+set(HDF5_PREFER_PARALLEL TRUE)
+
 # If we're using PETSc's HDF5 (ON by default, for more reliable MPI compatibility), we override HDF5_ROOT accordingly
 if (Chaste_USE_PETSC_HDF5)
     if (EXISTS "${PETSC_DIR}/${PETSC_ARCH}/bin/h5diff")
