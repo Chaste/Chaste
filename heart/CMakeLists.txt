@@ -25,7 +25,7 @@ file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/dynamic)
 # pointers). This code turns off the deprecation warnings so that Chaste compiles.
 # TODO: Once we drop Chaste support for XSD 3.3, this should be removed in favour of changing auto_ptr to unique_ptr
 foreach(xsd_generated_cpp_file ${Chaste_heart_SOURCES})
-    set_source_files_properties(${xsd_generated_cpp_file} PROPERTIES COMPILE_FLAGS "-Wno-deprecated-declarations")
+    set_property(SOURCE ${xsd_generated_cpp_file} APPEND_STRING PROPERTY COMPILE_FLAGS " -Wno-deprecated-declarations")
 endforeach(xsd_generated_cpp_file ${Chaste_heart_SOURCES})
 
 chaste_do_component(heart ${Chaste_heart_SOURCES})
