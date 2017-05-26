@@ -40,7 +40,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 
 #include "AbstractCaUpdateRule.hpp"
-#include "CaBasedCellPopulation.hpp"
 
 /**
  * A diffusion update rule for use in cell-based simulations

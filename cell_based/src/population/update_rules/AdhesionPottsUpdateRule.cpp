@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "AdhesionPottsUpdateRule.hpp"
+#include "PottsBasedCellPopulation.hpp"
 
 template<unsigned DIM>
 AdhesionPottsUpdateRule<DIM>::AdhesionPottsUpdateRule()
@@ -50,8 +51,8 @@ AdhesionPottsUpdateRule<DIM>::~AdhesionPottsUpdateRule()
 
 template<unsigned DIM>
 double AdhesionPottsUpdateRule<DIM>::EvaluateHamiltonianContribution(unsigned currentNodeIndex,
-                                                                unsigned targetNodeIndex,
-                                                                PottsBasedCellPopulation<DIM>& rCellPopulation)
+                                                                     unsigned targetNodeIndex,
+                                                                     PottsBasedCellPopulation<DIM>& rCellPopulation)
 {
     std::set<unsigned> containing_elements = rCellPopulation.GetNode(currentNodeIndex)->rGetContainingElementIndices();
     std::set<unsigned> new_location_containing_elements = rCellPopulation.GetNode(targetNodeIndex)->rGetContainingElementIndices();

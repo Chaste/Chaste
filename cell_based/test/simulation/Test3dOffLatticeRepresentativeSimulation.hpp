@@ -74,15 +74,15 @@ public:
      */
     void Test3DHoneycombMeshWithGhostNodes() throw (Exception)
     {
-        /*          _ _ _ _ _
+        /*         _ _ _ _ _
          *        /        /|
          *       /        / |
-         *         /_ _ _ _ /  | depth (z-direction)
-         *        |         |  |
+         *      /_ _ _ _ /  | depth (z-direction)
+         *     |         |  |
          *     |         |  |
          *     |         |  /
          *     |         | / height (y-direction)
-         *        |_ _ _ _ _|/
+         *     |_ _ _ _ _|/
          *        width
          *    (x-direction)
          */

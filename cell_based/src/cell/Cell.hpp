@@ -36,12 +36,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CELL_HPP_
 #define CELL_HPP_
 
+#include "ChasteSerialization.hpp"
+#include <boost/serialization/shared_ptr.hpp>
+
 #include <boost/utility.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
-
-#include "ChasteSerialization.hpp"
-#include <boost/serialization/shared_ptr.hpp>
 
 #include "AbstractCellMutationState.hpp"
 #include "AbstractCellProliferativeType.hpp"
@@ -52,11 +52,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractSrnModel.hpp"
 #include "CellPropertyCollection.hpp"
 
-class AbstractCellCycleModel; // Circular definition (cells need to know about cycle models and vice-versa).
-class AbstractSrnModel; // Circular definition (cells need to know about subcellular reaction network models and vice-versa).
-class Cell;
-
 /** Cells shouldn't be copied - it doesn't make sense.  So all access is via this pointer type. */
+class Cell;
 typedef boost::shared_ptr<Cell> CellPtr;
 
 /**

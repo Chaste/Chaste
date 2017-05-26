@@ -36,11 +36,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ABSTRACTPOTTSUPDATERULE_HPP_
 #define ABSTRACTPOTTSUPDATERULE_HPP_
 
-#include "AbstractUpdateRule.hpp"
-#include "PottsBasedCellPopulation.hpp"
+#include "ChasteSerialization.hpp"
+#include <boost/serialization/base_object.hpp>
 
-template<unsigned DIM>
-class PottsBasedCellPopulation; // Circular definition
+#include "AbstractUpdateRule.hpp"
+
+// Forward declaration to prevent circular include chain
+template<unsigned SPACE_DIM>
+class PottsBasedCellPopulation;
 
 /**
  * An abstract Potts update rule class, for use in cellular Potts model simulations.

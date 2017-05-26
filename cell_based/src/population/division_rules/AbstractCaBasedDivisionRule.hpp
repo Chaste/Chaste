@@ -36,13 +36,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ABSTRACTCABASEDDIVISIONRULE_HPP_
 #define ABSTRACTCABASEDDIVISIONRULE_HPP_
 
-#include "CaBasedCellPopulation.hpp"
-
 #include "ChasteSerialization.hpp"
 #include "ClassIsAbstract.hpp"
 
-// Forward declaration prevents circular include chain
-template<unsigned SPACE_DIM> class CaBasedCellPopulation;
+// Include OutputFileHandler.hpp since a method below uses out_stream
+#include "OutputFileHandler.hpp"
+// Include Cell.hpp since a method below uses CellPtr
+#include "Cell.hpp"
+
+// Forward declaration to prevent circular include chain
+template<unsigned SPACE_DIM>
+class CaBasedCellPopulation;
 
 /**
  * An abstract cell division rule for use in CA-based simulations.

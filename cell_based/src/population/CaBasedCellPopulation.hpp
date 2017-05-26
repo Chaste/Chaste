@@ -36,17 +36,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CABASEDCELLPOPULATION_HPP_
 #define CABASEDCELLPOPULATION_HPP_
 
+#include "ChasteSerialization.hpp"
+#include <boost/serialization/base_object.hpp>
+#include <boost/serialization/vector.hpp>
+
 #include "AbstractOnLatticeCellPopulation.hpp"
 #include "PottsMesh.hpp"
 #include "VertexMesh.hpp"
 #include "AbstractUpdateRule.hpp"
 #include "AbstractCaBasedDivisionRule.hpp"
-
-#include "ChasteSerialization.hpp"
-#include <boost/serialization/base_object.hpp>
-#include <boost/serialization/vector.hpp>
-
-template<unsigned DIM> class AbstractCaBasedDivisionRule; // Circular definition thing.
 
 /**
  * A facade class encapsulating a cell population under the Cellular

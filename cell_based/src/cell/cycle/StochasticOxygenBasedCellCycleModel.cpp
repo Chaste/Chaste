@@ -41,8 +41,8 @@ StochasticOxygenBasedCellCycleModel::StochasticOxygenBasedCellCycleModel()
 }
 
 StochasticOxygenBasedCellCycleModel::StochasticOxygenBasedCellCycleModel(const StochasticOxygenBasedCellCycleModel& rModel)
-   : SimpleOxygenBasedCellCycleModel(rModel),
-     mStochasticG2Duration(rModel.mStochasticG2Duration)
+    : SimpleOxygenBasedCellCycleModel(rModel),
+      mStochasticG2Duration(rModel.mStochasticG2Duration)
 {
     /*
      * Initialize only those member variables defined in this class.

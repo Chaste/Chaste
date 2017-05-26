@@ -38,12 +38,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
-#include "AbstractVertexBasedDivisionRule.hpp"
-#include "VertexBasedCellPopulation.hpp"
 
-// Forward declaration prevents circular include chain
-template<unsigned SPACE_DIM> class VertexBasedCellPopulation;
-template<unsigned SPACE_DIM> class AbstractVertexBasedDivisionRule;
+#include "AbstractVertexBasedDivisionRule.hpp"
 
 /**
  * A class to generate a division vector of unit length that points in a random direction.

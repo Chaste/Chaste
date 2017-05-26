@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "DiffusionCaUpdateRule.hpp"
+#include "CaBasedCellPopulation.hpp"
 
 template<unsigned DIM>
 DiffusionCaUpdateRule<DIM>::DiffusionCaUpdateRule()
@@ -49,11 +50,11 @@ DiffusionCaUpdateRule<DIM>::~DiffusionCaUpdateRule()
 
 template<unsigned DIM>
 double DiffusionCaUpdateRule<DIM>::EvaluateProbability(unsigned currentNodeIndex,
-                                                               unsigned targetNodeIndex,
-                                                               CaBasedCellPopulation<DIM>& rCellPopulation,
-                                                               double dt,
-                                                               double deltaX,
-                                                               CellPtr cell)
+                                                       unsigned targetNodeIndex,
+                                                       CaBasedCellPopulation<DIM>& rCellPopulation,
+                                                       double dt,
+                                                       double deltaX,
+                                                       CellPtr cell)
 {
    c_vector<double, DIM> node_index_location = rCellPopulation.GetNode(currentNodeIndex)->rGetLocation();
    c_vector<double, DIM> node_neighbour_location = rCellPopulation.GetNode(targetNodeIndex)->rGetLocation();

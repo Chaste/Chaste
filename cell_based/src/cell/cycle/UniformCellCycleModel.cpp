@@ -35,6 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "UniformCellCycleModel.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
+#include "Cell.hpp"
 
 UniformCellCycleModel::UniformCellCycleModel()
     : AbstractSimpleCellCycleModel(),

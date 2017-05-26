@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "ChemotaxisPottsUpdateRule.hpp"
+#include "PottsBasedCellPopulation.hpp"
 
 template<unsigned DIM>
 ChemotaxisPottsUpdateRule<DIM>::ChemotaxisPottsUpdateRule()

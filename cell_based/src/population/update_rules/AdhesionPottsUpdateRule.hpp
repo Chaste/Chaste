@@ -40,7 +40,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 
 #include "AbstractPottsUpdateRule.hpp"
-#include "PottsBasedCellPopulation.hpp"
+
+// Include Cell.hpp since a method below uses CellPtr
+#include "Cell.hpp"
 
 /**
  * An adhesion update rule for use in cell-based simulations

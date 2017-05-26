@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DifferentiatedCellProliferativeType.hpp"
 #include "StemCellProliferativeType.hpp"
 #include "TransitCellProliferativeType.hpp"
+#include "Cell.hpp"
 
 AbstractSimpleGenerationalCellCycleModel::AbstractSimpleGenerationalCellCycleModel()
     : AbstractSimplePhaseBasedCellCycleModel(),

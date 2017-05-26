@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "RandomDirectionCentreBasedDivisionRule.hpp"
+#include "AbstractCentreBasedCellPopulation.hpp"
 #include "RandomNumberGenerator.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

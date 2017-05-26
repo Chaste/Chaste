@@ -36,11 +36,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ABSTRACTCASWITCHINGUPDATERULE_HPP_
 #define ABSTRACTCASWITCHINGUPDATERULE_HPP_
 
-#include "AbstractUpdateRule.hpp"
-#include "CaBasedCellPopulation.hpp"
+#include "ChasteSerialization.hpp"
+#include <boost/serialization/base_object.hpp>
 
-template<unsigned DIM>
-class PottsBasedCellPopulation; // Circular definition
+#include "AbstractUpdateRule.hpp"
+
+// Forward declaration to prevent circular include chain
+template<unsigned SPACE_DIM>
+class CaBasedCellPopulation;
 
 /**
  * An abstract CA 'switching' update rule class, for use in CA simulations.

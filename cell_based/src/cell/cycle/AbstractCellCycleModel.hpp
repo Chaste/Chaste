@@ -39,7 +39,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteSerialization.hpp"
 #include "ClassIsAbstract.hpp"
 #include "Identifiable.hpp"
-
 #include <boost/serialization/base_object.hpp>
 
 #include <vector>
@@ -47,9 +46,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OutputFileHandler.hpp"
 #include "CellCyclePhases.hpp"
 #include "SimulationTime.hpp"
-#include "Cell.hpp"
 
-class Cell; // Circular definition (cells need to know about cycle models and vice-versa)
+// Forward declaration to prevent circular include chain
+class Cell;
 typedef boost::shared_ptr<Cell> CellPtr;
 
 /**

@@ -41,11 +41,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/vector.hpp>
 
 #include "AbstractCentreBasedDivisionRule.hpp"
-#include "AbstractCentreBasedCellPopulation.hpp"
-
-// Forward declaration prevents circular include chain
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCentreBasedCellPopulation;
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCentreBasedDivisionRule;
 
 /**
  * A class to generate two daughter cell positions, one given by the

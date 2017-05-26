@@ -46,6 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Alarcon2004OxygenBasedCellCycleModel.hpp"
 #include "TysonNovakCellCycleModel.hpp"
+#include "Cell.hpp"
 
 #include "AbstractCellMutationState.hpp"
 #include "WildTypeCellMutationState.hpp"

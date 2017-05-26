@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "StemCellProliferativeType.hpp"
 #include "TransitCellProliferativeType.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
+#include "Cell.hpp"
 
 GammaG1CellCycleModel::GammaG1CellCycleModel()
     : AbstractSimplePhaseBasedCellCycleModel(),

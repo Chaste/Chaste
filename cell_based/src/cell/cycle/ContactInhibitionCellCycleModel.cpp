@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "ContactInhibitionCellCycleModel.hpp"
+#include "Cell.hpp"
 #include "CellLabel.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 

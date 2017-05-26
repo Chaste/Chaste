@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "AbstractCentreBasedCellPopulation.hpp"
+#include "AbstractCentreBasedDivisionRule.hpp"
 #include "RandomDirectionCentreBasedDivisionRule.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "StepSizeException.hpp"

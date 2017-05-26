@@ -44,8 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/set.hpp>
 #include <boost/serialization/vector.hpp>
 
-template<unsigned DIM>
-class AbstractVertexBasedDivisionRule; // Forward declaration to prevent circular include chain
+#include "AbstractVertexBasedDivisionRule.hpp"
 
 /**
  * A facade class encapsulating a vertex-based cell population.

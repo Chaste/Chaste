@@ -39,8 +39,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractOffLatticeCellPopulation.hpp"
 #include "AbstractCentreBasedDivisionRule.hpp"
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCentreBasedDivisionRule; // Circular definition thing.
-
 /**
  * An abstract facade class encapsulating a centre-based cell population, in which
  * each cell corresponds to a Node.

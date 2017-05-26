@@ -40,7 +40,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 
 #include "AbstractPottsUpdateRule.hpp"
-#include "PottsBasedCellPopulation.hpp"
 
 /**
  * A volume constraint update rule class for use in Potts based simulations.

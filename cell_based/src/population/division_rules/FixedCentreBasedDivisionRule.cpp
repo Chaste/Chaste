@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "FixedCentreBasedDivisionRule.hpp"
+#include "AbstractCentreBasedCellPopulation.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 FixedCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM>::FixedCentreBasedDivisionRule(c_vector<double, SPACE_DIM>& rDaughterLocation)

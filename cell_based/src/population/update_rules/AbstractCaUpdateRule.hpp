@@ -36,11 +36,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ABSTRACTCAUPDATERULE_HPP_
 #define ABSTRACTCAUPDATERULE_HPP_
 
-#include "AbstractUpdateRule.hpp"
-#include "CaBasedCellPopulation.hpp"
+#include "ChasteSerialization.hpp"
+#include <boost/serialization/base_object.hpp>
 
-template<unsigned DIM>
-class CaBasedCellPopulation; // Circular definition
+#include "AbstractUpdateRule.hpp"
+
+// Include Cell.hpp since a method below uses CellPtr
+#include "Cell.hpp"
+
+// Forward declaration to prevent circular include chain
+template<unsigned SPACE_DIM>
+class CaBasedCellPopulation;
 
 /**
  * An abstract CA update rule class, for use in CA simulations.

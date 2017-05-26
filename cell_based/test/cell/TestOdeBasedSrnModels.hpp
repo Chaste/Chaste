@@ -47,6 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NullSrnModel.hpp"
 #include "DeltaNotchSrnModel.hpp"
 #include "Goldbeter1991SrnModel.hpp"
+#include "Cell.hpp"
 #include "UniformG1GenerationalCellCycleModel.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "OutputFileHandler.hpp"

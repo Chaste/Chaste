@@ -41,11 +41,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/vector.hpp>
 
 #include "AbstractVertexBasedDivisionRule.hpp"
-#include "VertexBasedCellPopulation.hpp"
-
-// Forward declaration prevents circular include chain
-template<unsigned SPACE_DIM> class VertexBasedCellPopulation;
-template<unsigned SPACE_DIM> class AbstractVertexBasedDivisionRule;
 
 /**
  * A class to generate a division vector of unit length specified in

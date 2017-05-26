@@ -41,6 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractSimpleCellCycleModel.hpp"
 #include "AbstractPhaseBasedCellCycleModel.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
+#include "Cell.hpp"
 
 /**
  * A helper method that is called in cell-cycle model tests

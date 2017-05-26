@@ -40,11 +40,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 
 #include "AbstractVertexBasedDivisionRule.hpp"
-#include "VertexBasedCellPopulation.hpp"
-
-// Forward declaration prevents circular include chain
-template<unsigned SPACE_DIM> class VertexBasedCellPopulation;
-template<unsigned SPACE_DIM> class AbstractVertexBasedDivisionRule;
 
 /**
  * A class to generate the short axis of a cell for vertex-based cell

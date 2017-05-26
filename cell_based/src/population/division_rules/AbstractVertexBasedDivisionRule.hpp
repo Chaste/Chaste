@@ -39,7 +39,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteSerialization.hpp"
 #include "ClassIsAbstract.hpp"
 
-#include "VertexBasedCellPopulation.hpp"
+// Include OutputFileHandler.hpp since a method below uses out_stream
+#include "OutputFileHandler.hpp"
+// Include UblasVectorInclude.hpp since a method below uses c_vector
+#include "UblasVectorInclude.hpp"
+// Include Cell.hpp since a method below uses CellPtr
+#include "Cell.hpp"
+
+// Forward declaration to prevent circular include chain
+template<unsigned SPACE_DIM>
+class VertexBasedCellPopulation;
 
 /**
  * An abstract cell division rule for use in vertex-based simulations.

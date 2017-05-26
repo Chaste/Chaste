@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "SurfaceAreaConstraintPottsUpdateRule.hpp"
+#include "PottsBasedCellPopulation.hpp"
 
 template<unsigned DIM>
 SurfaceAreaConstraintPottsUpdateRule<DIM>::SurfaceAreaConstraintPottsUpdateRule()
@@ -51,8 +52,8 @@ SurfaceAreaConstraintPottsUpdateRule<DIM>::~SurfaceAreaConstraintPottsUpdateRule
 
 template<unsigned DIM>
 double SurfaceAreaConstraintPottsUpdateRule<DIM>::EvaluateHamiltonianContribution(unsigned currentNodeIndex,
-                                                                        unsigned targetNodeIndex,
-                                                                        PottsBasedCellPopulation<DIM>& rCellPopulation)
+                                                                                  unsigned targetNodeIndex,
+                                                                                  PottsBasedCellPopulation<DIM>& rCellPopulation)
 {
     double delta_H = 0.0;
 
