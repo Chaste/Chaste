@@ -34,12 +34,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "TargetedCellKiller.hpp"
+#include "AbstractCellPopulation.hpp"
 
 template<unsigned DIM>
-TargetedCellKiller<DIM>::TargetedCellKiller(AbstractCellPopulation<DIM>* pCellPopulation, unsigned targetedIndex, bool bloodLust)
-: AbstractCellKiller<DIM>(pCellPopulation),
-  mTargetIndex(targetedIndex),
-  mBloodLust(bloodLust)
+TargetedCellKiller<DIM>::TargetedCellKiller(AbstractCellPopulation<DIM, DIM>* pCellPopulation, unsigned targetedIndex, bool bloodLust)
+    : AbstractCellKiller<DIM>(pCellPopulation),
+      mTargetIndex(targetedIndex),
+      mBloodLust(bloodLust)
 {
 }
 

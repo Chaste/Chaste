@@ -36,6 +36,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef DIFFERENTIALADHESIONGENERALISEDLINEARSPRINGFORCE_HPP_
 #define DIFFERENTIALADHESIONGENERALISEDLINEARSPRINGFORCE_HPP_
 
+#include "ChasteSerialization.hpp"
+#include <boost/serialization/base_object.hpp>
+
 #include "GeneralisedLinearSpringForce.hpp"
 
 /**

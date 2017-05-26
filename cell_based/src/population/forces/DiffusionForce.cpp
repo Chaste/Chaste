@@ -34,7 +34,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "DiffusionForce.hpp"
-#include "NodeBasedCellPopulation.hpp"
+#include "AbstractOffLatticeCellPopulation.hpp"
+#include "RandomNumberGenerator.hpp"
 
 //Static constant is instantiated here.
 template<unsigned DIM>
@@ -86,7 +87,7 @@ double DiffusionForce<DIM>::GetDiffusionScalingConstant()
 }
 
 template<unsigned DIM>
-void DiffusionForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation)
+void DiffusionForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM, DIM>& rCellPopulation)
 {
     double dt = SimulationTime::Instance()->GetTimeStep();
 

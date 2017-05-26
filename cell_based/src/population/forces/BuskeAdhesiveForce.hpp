@@ -36,10 +36,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef BUSKEADHESIVEFORCE_HPP_
 #define BUSKEADHESIVEFORCE_HPP_
 
-#include "AbstractTwoBodyInteractionForce.hpp"
-
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
+
+#include "AbstractTwoBodyInteractionForce.hpp"
 
 /**
  * A force law employed by Buske et al (2011) in their overlapping spheres
@@ -106,7 +106,7 @@ public:
      * @param nodeBGlobalIndex index of the other neighbouring node
      * @param rCellPopulation the cell population
      */
-    c_vector<double, DIM> CalculateForceBetweenNodes(unsigned nodeAGlobalIndex, unsigned nodeBGlobalIndex, AbstractCellPopulation<DIM>& rCellPopulation);
+    c_vector<double, DIM> CalculateForceBetweenNodes(unsigned nodeAGlobalIndex, unsigned nodeBGlobalIndex, AbstractCellPopulation<DIM, DIM>& rCellPopulation);
 
     /**
      * @return Calculated magnitude of the force between two nodes that are a given distance apart and

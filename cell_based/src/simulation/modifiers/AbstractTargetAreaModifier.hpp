@@ -38,7 +38,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
+
 #include "AbstractCellBasedSimulationModifier.hpp"
+
+// We use CellPtr in a method below
+class Cell;
+#include <boost/shared_ptr.hpp>
+typedef boost::shared_ptr<Cell> CellPtr;
 
 /**
  * A modifier class in which the target area property of each cell is updated.

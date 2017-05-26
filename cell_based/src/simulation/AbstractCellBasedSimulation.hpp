@@ -45,6 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellKiller.hpp"
 #include "AbstractCellBasedSimulationModifier.hpp"
 #include "AbstractForce.hpp"
+#include "SimulationTime.hpp"
 #include "RandomNumberGenerator.hpp"
 
 // Forward declaration prevents circular include chain

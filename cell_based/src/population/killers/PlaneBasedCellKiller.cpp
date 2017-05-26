@@ -34,9 +34,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "PlaneBasedCellKiller.hpp"
+#include "AbstractCellPopulation.hpp"
 
 template<unsigned DIM>
-PlaneBasedCellKiller<DIM>::PlaneBasedCellKiller(AbstractCellPopulation<DIM>* pCellPopulation,
+PlaneBasedCellKiller<DIM>::PlaneBasedCellKiller(AbstractCellPopulation<DIM, DIM>* pCellPopulation,
                                                   c_vector<double, DIM> point,
                                                   c_vector<double, DIM> normal)
     : AbstractCellKiller<DIM>(pCellPopulation),
@@ -61,7 +62,7 @@ const c_vector<double, DIM>& PlaneBasedCellKiller<DIM>::rGetNormalToPlane() cons
 template<unsigned DIM>
 void PlaneBasedCellKiller<DIM>::CheckAndLabelCellsForApoptosisOrDeath()
 {
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->mpCellPopulation->Begin();
+    for (typename AbstractCellPopulation<DIM, DIM>::Iterator cell_iter = this->mpCellPopulation->Begin();
          cell_iter != this->mpCellPopulation->End();
          ++cell_iter)
     {

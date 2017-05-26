@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 
 #include "AbstractPdeModifier.hpp"
+#include "ChasteCuboid.hpp"
 
 /**
  * An abstract modifier class containing functionality common to EllipticBoxDomainPdeModifier

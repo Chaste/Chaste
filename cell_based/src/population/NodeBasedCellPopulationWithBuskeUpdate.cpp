@@ -32,8 +32,9 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
-#include "NodeBasedCellPopulationWithBuskeUpdate.hpp"
 
+#include "NodeBasedCellPopulationWithBuskeUpdate.hpp"
+#include "NodesOnlyMesh.hpp"
 #include "ReplicatableVector.hpp"
 #include "OdeLinearSystemSolver.hpp"
 

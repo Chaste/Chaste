@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * A chemotactic force class.
  */
 template<unsigned DIM>
-class ChemotacticForce  : public AbstractForce<DIM>
+class ChemotacticForce : public AbstractForce<DIM>
 {
 friend class TestForces;
 
@@ -93,7 +93,7 @@ public:
      * Fc = chi(C,|gradC|) gradC/|gradC|  (if |gradC|>0, else Fc = 0)
      *
      */
-    void AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation);
+    void AddForceContribution(AbstractCellPopulation<DIM, DIM>& rCellPopulation);
 
     /**
      * Overridden OutputForceParameters() method.

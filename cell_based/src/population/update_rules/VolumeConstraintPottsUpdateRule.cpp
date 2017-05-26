@@ -35,6 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "VolumeConstraintPottsUpdateRule.hpp"
 #include "PottsBasedCellPopulation.hpp"
+#include "PottsMesh.hpp"
 
 template<unsigned DIM>
 VolumeConstraintPottsUpdateRule<DIM>::VolumeConstraintPottsUpdateRule()
@@ -42,7 +43,7 @@ VolumeConstraintPottsUpdateRule<DIM>::VolumeConstraintPottsUpdateRule()
       mDeformationEnergyParameter(0.5), // Educated guess
       mMatureCellTargetVolume(16.0) // Defaults to a 4*4 cell size
 {
-        /// \todo Default values don't apply in 3D.
+    ///\todo Default values don't apply in 3D.
 }
 
 template<unsigned DIM>

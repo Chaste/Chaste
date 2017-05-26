@@ -45,7 +45,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #include "AbstractCentreBasedCellPopulation.hpp"
-#include "NodesOnlyMesh.hpp"
+
+// Forward declaration, since we only use a pointer to this type here
+template<unsigned DIM> class NodesOnlyMesh;
 
 /**
  * A NodeBasedCellPopulation is a CellPopulation consisting of only nodes in space with associated cells.

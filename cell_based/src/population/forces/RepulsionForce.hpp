@@ -36,8 +36,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef REPULSIONFORCE_HPP_
 #define REPULSIONFORCE_HPP_
 
+#include "ChasteSerialization.hpp"
+#include <boost/serialization/base_object.hpp>
+
 #include "GeneralisedLinearSpringForce.hpp"
-#include "NodeBasedCellPopulation.hpp"
 
 /**
  * A class for a simple two-body repulsion force law. Designed
@@ -78,7 +80,7 @@ public :
      *
      * @param rCellPopulation reference to the CellPopulation
      */
-    void AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation);
+    void AddForceContribution(AbstractCellPopulation<DIM, DIM>& rCellPopulation);
 
     /**
      * Outputs force Parameters to file

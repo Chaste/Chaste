@@ -35,6 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "CellwiseDataGradient.hpp"
 #include "LinearBasisFunction.hpp"
+#include "MutableMesh.hpp"
 
 template<unsigned DIM>
 c_vector<double, DIM>& CellwiseDataGradient<DIM>::rGetGradient(unsigned nodeIndex)
@@ -46,7 +47,7 @@ template<unsigned DIM>
 void CellwiseDataGradient<DIM>::SetupGradients(AbstractCellPopulation<DIM>& rCellPopulation, const std::string& rItemName)
 {
     MeshBasedCellPopulation<DIM>* pCellPopulation = static_cast<MeshBasedCellPopulation<DIM>*>(&(rCellPopulation));
-    TetrahedralMesh<DIM,DIM>& r_mesh = pCellPopulation->rGetMesh();
+    MutableMesh<DIM,DIM>& r_mesh = pCellPopulation->rGetMesh();
 
     // Initialise gradients size
     unsigned num_nodes = pCellPopulation->GetNumNodes();

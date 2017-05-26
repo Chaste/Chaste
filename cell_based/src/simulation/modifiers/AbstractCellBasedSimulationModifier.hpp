@@ -38,8 +38,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ChasteSerialization.hpp"
 #include "ClassIsAbstract.hpp"
+#include "Identifiable.hpp"
 
-#include "AbstractCellPopulation.hpp"
+// Include OutputFileHandler.hpp since a method below uses out_stream
+#include "OutputFileHandler.hpp"
+
+// Forward declaration of this class, since we don't use any of its methods here
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCellPopulation;
 
 /**
  * An abstract modifier class (to implement setup, update and finalise methods), for use in cell-based simulations.

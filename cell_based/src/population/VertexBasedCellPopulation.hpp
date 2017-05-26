@@ -36,22 +36,20 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef VERTEXBASEDCELLPOPULATION_HPP_
 #define VERTEXBASEDCELLPOPULATION_HPP_
 
+#include "ChasteSerialization.hpp"
+#include <boost/serialization/base_object.hpp>
+
 #include "AbstractOffLatticeCellPopulation.hpp"
 #include "MutableVertexMesh.hpp"
 
-#include "ChasteSerialization.hpp"
-#include <boost/serialization/base_object.hpp>
-#include <boost/serialization/set.hpp>
-#include <boost/serialization/vector.hpp>
-
-#include "AbstractVertexBasedDivisionRule.hpp"
+// Forward declaration, since we only use a pointer to this type here
+template<unsigned DIM> class AbstractVertexBasedDivisionRule;
 
 /**
  * A facade class encapsulating a vertex-based cell population.
  *
  * Contains a group of cells and maintains the associations
  * between CellPtrs and elements in the MutableVertexMesh.
- *
  */
 template<unsigned DIM>
 class VertexBasedCellPopulation : public AbstractOffLatticeCellPopulation<DIM>

@@ -36,12 +36,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ABSTRACTCELLKILLER_HPP_
 #define ABSTRACTCELLKILLER_HPP_
 
-#include "AbstractCellPopulation.hpp"
-
 #include "ChasteSerialization.hpp"
 #include "ClassIsAbstract.hpp"
-
 #include "Identifiable.hpp"
+
+// Include OutputFileHandler.hpp since a method below uses out_stream
+#include "OutputFileHandler.hpp"
+
+// Forward declaration, since we only use a pointer to this type here
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCellPopulation;
 
 /**
  * An abstract cell killer class, for use in cell-based simulations.
@@ -67,7 +70,7 @@ private:
 protected:
 
     /** The cell population. */
-    AbstractCellPopulation<SPACE_DIM>* mpCellPopulation;
+    AbstractCellPopulation<SPACE_DIM, SPACE_DIM>* mpCellPopulation;
 
 public:
 
@@ -76,7 +79,7 @@ public:
      *
      * @param pCellPopulation pointer to the cell population.
      */
-    AbstractCellKiller(AbstractCellPopulation<SPACE_DIM>* pCellPopulation);
+    AbstractCellKiller(AbstractCellPopulation<SPACE_DIM, SPACE_DIM>* pCellPopulation);
 
     /**
      * Destructor.
@@ -98,7 +101,7 @@ public:
      *
      * @return A const pointer to the mpCellPopulation
      */
-    const AbstractCellPopulation<SPACE_DIM>* GetCellPopulation() const;
+    const AbstractCellPopulation<SPACE_DIM, SPACE_DIM>* GetCellPopulation() const;
 
     /**
      * Outputs cell killer used in the simulation to file and then calls

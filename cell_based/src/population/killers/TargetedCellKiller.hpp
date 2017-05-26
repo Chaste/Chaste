@@ -36,10 +36,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TARGETEDCELLKILLER_HPP_
 #define TARGETEDCELLKILLER_HPP_
 
-#include "AbstractCellKiller.hpp"
-
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
+
+#include "AbstractCellKiller.hpp"
 
 /**
  * Simple cell killer, which at the first timestep kills any cell
@@ -86,7 +86,7 @@ public:
      * @param targetedIndex The index of the cell to kill
      * @param bloodLust Wether to kill cells or not defaults to true (used by load methods)
      */
-    TargetedCellKiller(AbstractCellPopulation<DIM>* pCellPopulation, unsigned targetedIndex, bool bloodLust = true);
+    TargetedCellKiller(AbstractCellPopulation<DIM, DIM>* pCellPopulation, unsigned targetedIndex, bool bloodLust = true);
 
     /**
      * @return mTargetIndex.
@@ -127,7 +127,7 @@ inline void save_construct_data(
     Archive & ar, const TargetedCellKiller<DIM> * t, const unsigned int file_version)
 {
     // Save data required to construct instance
-    const AbstractCellPopulation<DIM>* const p_cell_population = t->GetCellPopulation();
+    const AbstractCellPopulation<DIM, DIM>* const p_cell_population = t->GetCellPopulation();
     ar << p_cell_population;
     unsigned targeted_index = t->GetTargetIndex();
     ar << targeted_index;
@@ -143,7 +143,7 @@ inline void load_construct_data(
     Archive & ar, TargetedCellKiller<DIM> * t, const unsigned int file_version)
 {
     // Retrieve data from archive required to construct new instance
-    AbstractCellPopulation<DIM>* p_cell_population;
+    AbstractCellPopulation<DIM, DIM>* p_cell_population;
     ar >> p_cell_population;
     unsigned targeted_index;
     ar >> targeted_index;

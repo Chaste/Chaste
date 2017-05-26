@@ -35,6 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "SurfaceAreaConstraintPottsUpdateRule.hpp"
 #include "PottsBasedCellPopulation.hpp"
+#include "PottsMesh.hpp"
 
 template<unsigned DIM>
 SurfaceAreaConstraintPottsUpdateRule<DIM>::SurfaceAreaConstraintPottsUpdateRule()
@@ -42,7 +43,7 @@ SurfaceAreaConstraintPottsUpdateRule<DIM>::SurfaceAreaConstraintPottsUpdateRule(
       mDeformationEnergyParameter(0.5), // Educated guess
       mMatureCellTargetSurfaceArea(16.0) // Defaults to a 4*4 cell size
 {
-    /// \todo Default values don't apply in 3D.
+    ///\todo Default values don't apply in 3D.
 }
 
 template<unsigned DIM>

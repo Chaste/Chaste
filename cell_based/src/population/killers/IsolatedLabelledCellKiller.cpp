@@ -38,7 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellLabel.hpp"
 
 template<unsigned DIM>
-IsolatedLabelledCellKiller<DIM>::IsolatedLabelledCellKiller(AbstractCellPopulation<DIM>* pCellPopulation)
+IsolatedLabelledCellKiller<DIM>::IsolatedLabelledCellKiller(AbstractCellPopulation<DIM, DIM>* pCellPopulation)
     : AbstractCellKiller<DIM>(pCellPopulation)
 {
     if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(pCellPopulation) == NULL)

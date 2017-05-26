@@ -40,7 +40,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 
 #include "AbstractForce.hpp"
-#include "TetrahedralMesh.hpp"
 
 /**
  * A force law employed by Buske et al (2011) in their overlapping spheres
@@ -107,7 +106,7 @@ public:
      *
      * @param rCellPopulation a cell population object
      */
-    void AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation);
+    void AddForceContribution(AbstractCellPopulation<DIM, DIM>& rCellPopulation);
 
     /**
      * Overridden OutputForceParameters() method.

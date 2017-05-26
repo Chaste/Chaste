@@ -40,8 +40,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 
 #include "AbstractForce.hpp"
-#include "AbstractOffLatticeCellPopulation.hpp"
-#include "RandomNumberGenerator.hpp"
 
 /**
  * A 'diffusion force' class to model the random movement of nodes.
@@ -85,6 +83,7 @@ private :
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
+        ///\todo Should the RandomNumberGenerator instance also be archived?
         archive & boost::serialization::base_object<AbstractForce<DIM> >(*this);
         archive & mAbsoluteTemperature;
         archive & mViscosity;
@@ -145,7 +144,7 @@ public :
      *
      * @param rCellPopulation reference to the tissue
      */
-    void AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation);
+    void AddForceContribution(AbstractCellPopulation<DIM, DIM>& rCellPopulation);
 
     /**
      * Overridden OutputForceParameters() method.

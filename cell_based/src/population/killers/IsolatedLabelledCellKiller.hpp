@@ -77,7 +77,7 @@ public:
      *
      * @param pCellPopulation pointer to a cell population
      */
-    IsolatedLabelledCellKiller(AbstractCellPopulation<DIM>* pCellPopulation);
+    IsolatedLabelledCellKiller(AbstractCellPopulation<DIM, DIM>* pCellPopulation);
 
     /**
      * Kills any isolated cells with the CellLabel property (unless there is only one such cell in the population).
@@ -107,7 +107,7 @@ inline void save_construct_data(
     Archive & ar, const IsolatedLabelledCellKiller<DIM> * t, const unsigned int file_version)
 {
     // Save data required to construct instance
-    const AbstractCellPopulation<DIM>* const p_cell_population = t->GetCellPopulation();
+    const AbstractCellPopulation<DIM, DIM>* const p_cell_population = t->GetCellPopulation();
     ar << p_cell_population;
 }
 
@@ -119,7 +119,7 @@ inline void load_construct_data(
     Archive & ar, IsolatedLabelledCellKiller<DIM> * t, const unsigned int file_version)
 {
     // Retrieve data from archive required to construct new instance
-    AbstractCellPopulation<DIM>* p_cell_population;
+    AbstractCellPopulation<DIM, DIM>* p_cell_population;
     ar >> p_cell_population;
 
     // Invoke inplace constructor to initialise instance

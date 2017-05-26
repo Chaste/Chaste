@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "BuskeAdhesiveForce.hpp"
+#include "NodeBasedCellPopulation.hpp"
 
 template<unsigned DIM>
 BuskeAdhesiveForce<DIM>::BuskeAdhesiveForce()
@@ -57,7 +58,7 @@ void BuskeAdhesiveForce<DIM>::SetAdhesionEnergyParameter(double adhesionEnergyPa
 template<unsigned DIM>
 c_vector<double, DIM> BuskeAdhesiveForce<DIM>::CalculateForceBetweenNodes(unsigned nodeAGlobalIndex,
                                                                           unsigned nodeBGlobalIndex,
-                                                                          AbstractCellPopulation<DIM>& rCellPopulation)
+                                                                          AbstractCellPopulation<DIM, DIM>& rCellPopulation)
 {
     // This force class is defined for NodeBasedCellPopulations only
     assert(dynamic_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL);

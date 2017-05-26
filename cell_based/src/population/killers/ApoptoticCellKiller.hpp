@@ -36,10 +36,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef APOPTOTICCELLKILLER_HPP_
 #define APOPTOTICCELLKILLER_HPP_
 
-#include "AbstractCellKiller.hpp"
-
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
+
+#include "AbstractCellKiller.hpp"
+
+// We use CellPtr in a method below
+class Cell;
+#include <boost/shared_ptr.hpp>
+typedef boost::shared_ptr<Cell> CellPtr;
 
 /**
  * A cell killer object that kills cells that have been specified using the ApoptoticCellProperty.
@@ -70,7 +75,7 @@ public:
      *
      * @param pCellPopulation pointer to the cell population.
      */
-    ApoptoticCellKiller(AbstractCellPopulation<SPACE_DIM>* pCellPopulation);
+    ApoptoticCellKiller(AbstractCellPopulation<SPACE_DIM, SPACE_DIM>* pCellPopulation);
 
     /**
      * Starts apoptosis if the cell has been given the ApoptoticCellProperty.
@@ -107,7 +112,7 @@ inline void save_construct_data(
     Archive & ar, const ApoptoticCellKiller<DIM> * t, const unsigned int file_version)
 {
     // Save data required to construct instance
-    const AbstractCellPopulation<DIM>* const p_cell_population = t->GetCellPopulation();
+    const AbstractCellPopulation<DIM, DIM>* const p_cell_population = t->GetCellPopulation();
     ar << p_cell_population;
 }
 
@@ -119,7 +124,7 @@ inline void load_construct_data(
     Archive & ar, ApoptoticCellKiller<DIM> * t, const unsigned int file_version)
 {
     // Retrieve data from archive required to construct new instance
-    AbstractCellPopulation<DIM>* p_cell_population;
+    AbstractCellPopulation<DIM, DIM>* p_cell_population;
     ar >> p_cell_population;
 
     // Invoke inplace constructor to initialise instance

@@ -41,7 +41,7 @@ bool OffLatticeSimulationWithMyStoppingEvent::StoppingEventHasOccurred()
 }
 
 OffLatticeSimulationWithMyStoppingEvent::OffLatticeSimulationWithMyStoppingEvent(
-        AbstractCellPopulation<2>& rCellPopulation)
+        AbstractCellPopulation<2,2>& rCellPopulation)
     : OffLatticeSimulation<2>(rCellPopulation)
 {
 }

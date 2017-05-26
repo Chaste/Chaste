@@ -36,15 +36,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef POTTSBASEDCELLPOPULATION_HPP_
 #define POTTSBASEDCELLPOPULATION_HPP_
 
-#include "AbstractOnLatticeCellPopulation.hpp"
-#include "PottsMesh.hpp"
-#include "VertexMesh.hpp"
-#include "AbstractUpdateRule.hpp"
-#include "MutableMesh.hpp"
-
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/vector.hpp>
+
+#include "AbstractOnLatticeCellPopulation.hpp"
+#include "AbstractUpdateRule.hpp"
+
+// Forward declaration, since we only use a pointer to this type here
+template<unsigned DIM> class PottsMesh;
+template<unsigned DIM> class PottsElement;
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class MutableMesh;
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class VertexMesh;
 
 /**
  * A facade class encapsulating a cell population under the Cellular

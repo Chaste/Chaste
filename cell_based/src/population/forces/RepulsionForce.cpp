@@ -34,15 +34,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "RepulsionForce.hpp"
+#include "NodesOnlyMesh.hpp"
 
 template<unsigned DIM>
 RepulsionForce<DIM>::RepulsionForce()
-   : GeneralisedLinearSpringForce<DIM>()
+    : GeneralisedLinearSpringForce<DIM>()
 {
 }
 
 template<unsigned DIM>
-void RepulsionForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation)
+void RepulsionForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM, DIM>& rCellPopulation)
 {
     // Throw an exception message if not using a NodeBasedCellPopulation
     if (dynamic_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation) == NULL)

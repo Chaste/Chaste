@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "BuskeElasticForce.hpp"
+NodeBasedCellPopulation
 
 template<unsigned DIM>
 BuskeElasticForce<DIM>::BuskeElasticForce()
@@ -56,8 +57,8 @@ void BuskeElasticForce<DIM>::SetDeformationEnergyParameter(double deformationEne
 
 template<unsigned DIM>
 c_vector<double, DIM> BuskeElasticForce<DIM>::CalculateForceBetweenNodes(unsigned nodeAGlobalIndex,
-                                                                             unsigned nodeBGlobalIndex,
-                                                                             AbstractCellPopulation<DIM>& rCellPopulation)
+                                                                         unsigned nodeBGlobalIndex,
+                                                                         AbstractCellPopulation<DIM, DIM>& rCellPopulation)
 {
     // This force class is defined for NodeBasedCellPopulations only
     assert(dynamic_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL);

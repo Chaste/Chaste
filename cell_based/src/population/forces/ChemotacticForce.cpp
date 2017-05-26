@@ -34,7 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "ChemotacticForce.hpp"
-
+#include "AbstractCellPopulation.hpp"
 #include "CellwiseDataGradient.hpp"
 #include "CellLabel.hpp"
 
@@ -57,12 +57,12 @@ double ChemotacticForce<DIM>::GetChemotacticForceMagnitude(const double concentr
 }
 
 template<unsigned DIM>
-void ChemotacticForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation)
+void ChemotacticForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM, DIM>& rCellPopulation)
 {
     CellwiseDataGradient<DIM> gradients;
     gradients.SetupGradients(rCellPopulation, "nutrient");
 
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
+    for (typename AbstractCellPopulation<DIM, DIM>::Iterator cell_iter = rCellPopulation.Begin();
          cell_iter != rCellPopulation.End();
          ++cell_iter)
     {

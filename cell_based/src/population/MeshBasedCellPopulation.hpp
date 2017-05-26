@@ -36,16 +36,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MESHBASEDCELLPOPULATION_HPP_
 #define MESHBASEDCELLPOPULATION_HPP_
 
-#include <map>
-#include "AbstractCentreBasedCellPopulation.hpp"
-#include "MutableMesh.hpp"
-#include "VertexMesh.hpp"
-#include "TrianglesMeshReader.hpp"
-
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
-#include <boost/serialization/set.hpp>
-#include <boost/serialization/vector.hpp>
+#include <boost/serialization/map.hpp>
+
+#include <map>
+
+#include "AbstractCentreBasedCellPopulation.hpp"
+#include "MutableMesh.hpp"
+
+// Forward declaration, since we only use a pointer to this type here
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class MutableMesh;
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class VertexMesh;
 
 /**
  * A facade class encapsulating a mesh-based 'cell population'.

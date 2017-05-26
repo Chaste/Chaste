@@ -35,6 +35,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ParabolicBoxDomainPdeModifier.hpp"
 #include "SimpleLinearParabolicSolver.hpp"
+#include "SimulationTime.hpp"
+#include "TetrahedralMesh.hpp"
+#include "AbstractCellPopulation.hpp"
 
 template<unsigned DIM>
 ParabolicBoxDomainPdeModifier<DIM>::ParabolicBoxDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde,
@@ -148,7 +151,7 @@ void ParabolicBoxDomainPdeModifier<DIM>::SetupInitialSolutionVector(AbstractCell
 
     double initial_condition = rCellPopulation.Begin()->GetCellData()->GetItem(this->mDependentVariableName);
 
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
+    for (typename AbstractCellPopulation<DIM, DIM>::Iterator cell_iter = rCellPopulation.Begin();
          cell_iter != rCellPopulation.End();
          ++cell_iter)
     {

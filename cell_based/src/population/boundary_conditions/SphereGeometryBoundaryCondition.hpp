@@ -87,7 +87,7 @@ public:
      * @param radius the radius of the sphere
      * @param distance the maximum distance from the surface of the sphere that cells may be (defaults to 1e-5)
      */
-    SphereGeometryBoundaryCondition(AbstractCellPopulation<DIM>* pCellPopulation,
+    SphereGeometryBoundaryCondition(AbstractCellPopulation<DIM, DIM>* pCellPopulation,
                                     c_vector<double, DIM> centre,
                                     double radius,
                                     double distance=1e-5);
@@ -144,7 +144,7 @@ inline void save_construct_data(
     Archive & ar, const SphereGeometryBoundaryCondition<DIM>* t, const unsigned int file_version)
 {
     // Save data required to construct instance
-    const AbstractCellPopulation<DIM>* const p_cell_population = t->GetCellPopulation();
+    const AbstractCellPopulation<DIM, DIM>* const p_cell_population = t->GetCellPopulation();
     ar << p_cell_population;
 
     // Archive c_vectors one component at a time
@@ -167,7 +167,7 @@ inline void load_construct_data(
     Archive & ar, SphereGeometryBoundaryCondition<DIM>* t, const unsigned int file_version)
 {
     // Retrieve data from archive required to construct new instance
-    AbstractCellPopulation<DIM>* p_cell_population;
+    AbstractCellPopulation<DIM, DIM>* p_cell_population;
     ar >> p_cell_population;
 
     // Retrieve c_vectors one component at a time

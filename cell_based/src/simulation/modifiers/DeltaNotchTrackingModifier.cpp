@@ -35,6 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "DeltaNotchTrackingModifier.hpp"
 #include "DeltaNotchSrnModel.hpp"
+#include "AbstractCellPopulation.hpp"
 
 template<unsigned DIM>
 DeltaNotchTrackingModifier<DIM>::DeltaNotchTrackingModifier()

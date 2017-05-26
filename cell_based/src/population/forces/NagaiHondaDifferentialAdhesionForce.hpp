@@ -41,8 +41,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "NagaiHondaForce.hpp"
 
-#include <iostream>
-
 /**
  * A force class for use in vertex-based simulations, based on a model
  * model proposed by T. Nagai and H. Honda ("A dynamic cell model for

@@ -56,7 +56,7 @@ void BuskeCompressionForce<DIM>::SetCompressionEnergyParameter(double compressio
 }
 
 template<unsigned DIM>
-void BuskeCompressionForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation)
+void BuskeCompressionForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM, DIM>& rCellPopulation)
 {
     // This force class is defined for NodeBasedCellPopulations only
     assert(dynamic_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL);

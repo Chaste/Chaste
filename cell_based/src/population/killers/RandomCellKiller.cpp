@@ -34,11 +34,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "RandomCellKiller.hpp"
+#include "AbstractCellPopulation.hpp"
 
 template<unsigned DIM>
-RandomCellKiller<DIM>::RandomCellKiller(AbstractCellPopulation<DIM>* pCellPopulation, double probabilityOfDeathInAnHour)
-        : AbstractCellKiller<DIM>(pCellPopulation),
-          mProbabilityOfDeathInAnHour(probabilityOfDeathInAnHour)
+RandomCellKiller<DIM>::RandomCellKiller(AbstractCellPopulation<DIM, DIM>* pCellPopulation, double probabilityOfDeathInAnHour)
+    : AbstractCellKiller<DIM>(pCellPopulation),
+      mProbabilityOfDeathInAnHour(probabilityOfDeathInAnHour)
 {
     if ((mProbabilityOfDeathInAnHour<0) || (mProbabilityOfDeathInAnHour>1))
     {
@@ -80,7 +81,7 @@ void RandomCellKiller<DIM>::CheckAndLabelSingleCellForApoptosis(CellPtr pCell)
 template<unsigned DIM>
 void RandomCellKiller<DIM>::CheckAndLabelCellsForApoptosisOrDeath()
 {
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->mpCellPopulation->Begin();
+    for (typename AbstractCellPopulation<DIM, DIM>::Iterator cell_iter = this->mpCellPopulation->Begin();
          cell_iter != this->mpCellPopulation->End();
          ++cell_iter)
     {

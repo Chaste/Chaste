@@ -36,8 +36,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellKiller.hpp"
 
 template<unsigned SPACE_DIM>
-AbstractCellKiller<SPACE_DIM>::AbstractCellKiller(AbstractCellPopulation<SPACE_DIM>* pCellPopulation)
-        : mpCellPopulation(pCellPopulation)
+AbstractCellKiller<SPACE_DIM>::AbstractCellKiller(AbstractCellPopulation<SPACE_DIM, SPACE_DIM>* pCellPopulation)
+    : mpCellPopulation(pCellPopulation)
 {
 }
 
@@ -47,7 +47,7 @@ AbstractCellKiller<SPACE_DIM>::~AbstractCellKiller()
 }
 
 template<unsigned SPACE_DIM>
-const AbstractCellPopulation<SPACE_DIM>* AbstractCellKiller<SPACE_DIM>::GetCellPopulation() const
+const AbstractCellPopulation<SPACE_DIM, SPACE_DIM>* AbstractCellKiller<SPACE_DIM>::GetCellPopulation() const
 {
     return mpCellPopulation;
 }

@@ -36,11 +36,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef PLANEBASEDCELLKILLER_HPP_
 #define PLANEBASEDCELLKILLER_HPP_
 
-#include "AbstractCellKiller.hpp"
-
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/vector.hpp>
+
+#include "AbstractCellKiller.hpp"
+
+// Include UblasVectorInclude.hpp since a method below uses c_vector
+#include "UblasVectorInclude.hpp"
 
 /**
  * A cell killer that kills cells if they are outside the domain.
@@ -85,7 +88,7 @@ public:
      * @param point point on the plane which nodes cannot cross
      * @param normal the outward pointing unit normal to the boundary plane
      */
-    PlaneBasedCellKiller(AbstractCellPopulation<DIM>* pCellPopulation,
+    PlaneBasedCellKiller(AbstractCellPopulation<DIM, DIM>* pCellPopulation,
                           c_vector<double, DIM> point,
                           c_vector<double, DIM> normal);
 
@@ -127,7 +130,7 @@ inline void save_construct_data(
     Archive & ar, const PlaneBasedCellKiller<DIM> * t, const unsigned int file_version)
 {
     // Save data required to construct instance
-    const AbstractCellPopulation<DIM>* const p_cell_population = t->GetCellPopulation();
+    const AbstractCellPopulation<DIM, DIM>* const p_cell_population = t->GetCellPopulation();
     ar << p_cell_population;
 
     // Archive c_vectors one component at a time
@@ -151,7 +154,7 @@ inline void load_construct_data(
     Archive & ar, PlaneBasedCellKiller<DIM> * t, const unsigned int file_version)
 {
     // Retrieve data from archive required to construct new instance
-    AbstractCellPopulation<DIM>* p_cell_population;
+    AbstractCellPopulation<DIM, DIM>* p_cell_population;
     ar >> p_cell_population;
 
     // Archive c_vectors one component at a time

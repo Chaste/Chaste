@@ -36,10 +36,21 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ABSTRACTCELLPOPULATIONBOUNDARYCONDITION_HPP_
 #define ABSTRACTCELLPOPULATIONBOUNDARYCONDITION_HPP_
 
-#include "AbstractCellPopulation.hpp"
-
 #include "ChasteSerialization.hpp"
 #include "ClassIsAbstract.hpp"
+#include "Identifiable.hpp"
+
+#include <map>
+
+// Include UblasVectorInclude.hpp since a method below uses c_vector
+#include "UblasVectorInclude.hpp"
+
+// Include OutputFileHandler.hpp since a method below uses out_stream
+#include "OutputFileHandler.hpp"
+
+// Forward declaration, since we only use a pointer to this type here
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCellPopulation;
+template<unsigned SPACE_DIM> class Node;
 
 /**
  * An abstract cell population boundary condition class, for use in cell-based simulations.

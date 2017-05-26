@@ -35,6 +35,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "EllipticBoxDomainPdeModifier.hpp"
 #include "SimpleLinearEllipticSolver.hpp"
+#include "TetrahedralMesh.hpp"
+#include "AbstractCellPopulation.hpp"
 
 template<unsigned DIM>
 EllipticBoxDomainPdeModifier<DIM>::EllipticBoxDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde,
@@ -109,7 +111,7 @@ std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > EllipticBoxDomainPdeModif
 	{
 		// Get the set of coarse element indices that contain cells
 		std::set<unsigned> coarse_element_indices_in_map;
-		for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
+		for (typename AbstractCellPopulation<DIM, DIM>::Iterator cell_iter = rCellPopulation.Begin();
 			 cell_iter != rCellPopulation.End();
 			 ++cell_iter)
 		{

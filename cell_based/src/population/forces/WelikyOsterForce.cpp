@@ -49,7 +49,7 @@ WelikyOsterForce<DIM>::~WelikyOsterForce()
 }
 
 template<unsigned DIM>
-void WelikyOsterForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation)
+void WelikyOsterForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM, DIM>& rCellPopulation)
 {
     // Make sure that we are in the correct dimension - this code will be eliminated at compile time
     assert(DIM == 2); // LCOV_EXCL_LINE // this method only works in 2D at present

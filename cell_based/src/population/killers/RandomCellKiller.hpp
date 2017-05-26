@@ -36,12 +36,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef RANDOMCELLKILLER_HPP_
 #define RANDOMCELLKILLER_HPP_
 
-#include "AbstractCellKiller.hpp"
-#include "RandomNumberGenerator.hpp"
-
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
+#include "AbstractCellKiller.hpp"
+#include "RandomNumberGenerator.hpp"
+
+// We use CellPtr in a method below
+class Cell;
+#include <boost/shared_ptr.hpp>
+typedef boost::shared_ptr<Cell> CellPtr;
 
 /**
  * A cell killer that randomly kills cells based on the user set probability.
@@ -96,7 +100,7 @@ public:
      * @param pCellPopulation pointer to the cell population
      * @param probabilityOfDeathInAnHour probability that a cell is labelled for apoptosis in one hour's worth of trying
      */
-    RandomCellKiller(AbstractCellPopulation<DIM>* pCellPopulation, double probabilityOfDeathInAnHour);
+    RandomCellKiller(AbstractCellPopulation<DIM, DIM>* pCellPopulation, double probabilityOfDeathInAnHour);
 
     /**
      * @return mProbabilityOfDeathInAnHour.
@@ -139,7 +143,7 @@ inline void save_construct_data(
     Archive & ar, const RandomCellKiller<DIM> * t, const unsigned int file_version)
 {
     // Save data required to construct instance
-    const AbstractCellPopulation<DIM>* const p_cell_population = t->GetCellPopulation();
+    const AbstractCellPopulation<DIM, DIM>* const p_cell_population = t->GetCellPopulation();
     ar << p_cell_population;
     double prob = t->GetDeathProbabilityInAnHour();
     ar << prob;
@@ -153,7 +157,7 @@ inline void load_construct_data(
     Archive & ar, RandomCellKiller<DIM> * t, const unsigned int file_version)
 {
     // Retrieve data from archive required to construct new instance
-    AbstractCellPopulation<DIM>* p_cell_population;
+    AbstractCellPopulation<DIM, DIM>* p_cell_population;
     ar >> p_cell_population;
     double prob;
     ar >> prob;

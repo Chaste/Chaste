@@ -38,19 +38,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
-#include "Exception.hpp"
 
 #include "AbstractForce.hpp"
 #include "VertexBasedCellPopulation.hpp"
-
-#include <iostream>
 
 /**
  * A force class for use in Vertex-based simulations. This force is based on the
  * Energy function proposed by Farhadifar et al in  Curr. Biol., 2007, 17, 2095-2104.
  */
-
-
 template<unsigned DIM>
 class FarhadifarForce : public AbstractForce<DIM>
 {
@@ -119,7 +114,7 @@ public:
      *
      * @param rCellPopulation reference to the cell population
      */
-    virtual void AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation);
+    virtual void AddForceContribution(AbstractCellPopulation<DIM, DIM>& rCellPopulation);
 
     /**
      * Get the line tension parameter for the edge between two given nodes.

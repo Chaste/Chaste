@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "FarhadifarForce.hpp"
+#include "Exception.hpp"
 
 template<unsigned DIM>
 FarhadifarForce<DIM>::FarhadifarForce()
@@ -51,7 +52,7 @@ FarhadifarForce<DIM>::~FarhadifarForce()
 }
 
 template<unsigned DIM>
-void FarhadifarForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation)
+void FarhadifarForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM, DIM>& rCellPopulation)
 {
     // Throw an exception message if not using a VertexBasedCellPopulation
     ///\todo: check whether this line influences profiling tests - if so, we should remove it.

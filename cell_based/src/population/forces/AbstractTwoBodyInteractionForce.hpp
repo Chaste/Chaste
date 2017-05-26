@@ -37,8 +37,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define ABSTRACTTWOBODYINTERACTIONFORCE_HPP_
 
 #include "AbstractForce.hpp"
-#include "MeshBasedCellPopulation.hpp"
-#include "NodeBasedCellPopulation.hpp"
+
+// Include UblasVectorInclude.hpp since a method below uses c_vector
+#include "UblasVectorInclude.hpp"
+
 /**
  * An abstract class for two-body force laws.
  */

@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "NagaiHondaForce.hpp"
+#include "Exception.hpp"
 
 template<unsigned DIM>
 NagaiHondaForce<DIM>::NagaiHondaForce()
@@ -54,7 +55,7 @@ NagaiHondaForce<DIM>::~NagaiHondaForce()
 }
 
 template<unsigned DIM>
-void NagaiHondaForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation)
+void NagaiHondaForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM, DIM>& rCellPopulation)
 {
     // Throw an exception message if not using a VertexBasedCellPopulation
     if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation) == NULL)

@@ -43,7 +43,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vector>
 
+// Include OutputFileHandler.hpp since a method below uses out_stream
 #include "OutputFileHandler.hpp"
+
 #include "CellCyclePhases.hpp"
 #include "SimulationTime.hpp"
 

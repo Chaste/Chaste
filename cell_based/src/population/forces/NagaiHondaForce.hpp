@@ -38,12 +38,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
-#include "Exception.hpp"
 
 #include "AbstractForce.hpp"
 #include "VertexBasedCellPopulation.hpp"
-
-#include <iostream>
 
 /**
  * A force class for use in vertex-based simulations, based on a mechanical
@@ -128,7 +125,7 @@ public:
      *
      * @param rCellPopulation reference to the cell population
      */
-    virtual void AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation);
+    virtual void AddForceContribution(AbstractCellPopulation<DIM, DIM>& rCellPopulation);
 
     /**
      * Get the adhesion parameter for the edge between two given nodes.

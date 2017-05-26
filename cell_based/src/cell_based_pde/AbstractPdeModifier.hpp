@@ -37,13 +37,23 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define ABSTRACTPDEMODIFIER_HPP_
 
 #include "ChasteSerialization.hpp"
-#include "ClassIsAbstract.hpp"
+#include <boost/serialization/base_object.hpp>
 #include <boost/shared_ptr.hpp>
 
+#include <map>
+#include <petscvec.h>
+
 #include "AbstractCellBasedSimulationModifier.hpp"
-#include "TetrahedralMesh.hpp"
-#include "AbstractLinearPde.hpp"
-#include "AbstractBoundaryCondition.hpp"
+
+// Forward declaration, since we only use a pointer to this type here
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class TetrahedralMesh;
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractLinearPde;
+template<unsigned DIM> class AbstractBoundaryCondition;
+
+// We use CellPtr in a method below
+class Cell;
+#include <boost/shared_ptr.hpp>
+typedef boost::shared_ptr<Cell> CellPtr;
 
 /**
  * An abstract modifier class containing functionality common to AbstractBoxDomainPdeModifier,

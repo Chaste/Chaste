@@ -34,9 +34,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "T2SwapCellKiller.hpp"
+#include "VertexBasedCellPopulation.hpp"
 
 template<unsigned DIM>
-T2SwapCellKiller<DIM>::T2SwapCellKiller(AbstractCellPopulation<DIM>* pCellPopulation)
+T2SwapCellKiller<DIM>::T2SwapCellKiller(AbstractCellPopulation<DIM, DIM>* pCellPopulation)
     : AbstractCellKiller<DIM>(pCellPopulation)
 {
     // Throw an exception if the population is not a VertexBasedCellPopulation

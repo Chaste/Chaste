@@ -49,7 +49,7 @@ private:
     bool StoppingEventHasOccurred();
 
 public:
-    OffLatticeSimulationWithMyStoppingEvent(AbstractCellPopulation<2>& rCellPopulation);
+    OffLatticeSimulationWithMyStoppingEvent(AbstractCellPopulation<2,2>& rCellPopulation);
 };
 
 // Serialization for Boost >= 1.36
@@ -68,7 +68,7 @@ inline void save_construct_data(
     Archive & ar, const OffLatticeSimulationWithMyStoppingEvent * t, const unsigned int file_version)
 {
     // Save data required to construct instance
-    const AbstractCellPopulation<2>* p_cell_population = &(t->rGetCellPopulation());
+    const AbstractCellPopulation<2,2>* p_cell_population = &(t->rGetCellPopulation());
     ar & p_cell_population;
 }
 
@@ -80,7 +80,7 @@ inline void load_construct_data(
     Archive & ar, OffLatticeSimulationWithMyStoppingEvent * t, const unsigned int file_version)
 {
     // Retrieve data from archive required to construct new instance
-    AbstractCellPopulation<2>* p_cell_population;
+    AbstractCellPopulation<2,2>* p_cell_population;
     ar >> p_cell_population;
 
     // Invoke inplace constructor to initialise instance

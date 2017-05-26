@@ -36,13 +36,21 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ABSTRACTNUMERICALMETHOD_HPP_
 #define ABSTRACTNUMERICALMETHOD_HPP_
 
-#include <boost/shared_ptr.hpp>
 #include "ChasteSerialization.hpp"
 #include "ClassIsAbstract.hpp"
 #include "Identifiable.hpp"
 
-#include "AbstractOffLatticeCellPopulation.hpp"
-#include "AbstractForce.hpp"
+#include <boost/shared_ptr.hpp>
+
+#include "UblasVectorInclude.hpp"
+#include <vector>
+
+// Include OutputFileHandler.hpp since a method below uses out_stream
+#include "OutputFileHandler.hpp"
+
+// Forward declaration, since we only use a pointer to this type here
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractOffLatticeCellPopulation;
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractForce;
 
 /**
  * An abstract class representing a numerical method for off lattice cell based simulations.

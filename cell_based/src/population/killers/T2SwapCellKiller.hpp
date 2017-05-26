@@ -36,12 +36,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef T2SWAPCELLKILLER_HPP_
 #define T2SWAPCELLKILLER_HPP_
 
-#include "AbstractCellKiller.hpp"
-
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
-#include "VertexBasedCellPopulation.hpp"
+#include "AbstractCellKiller.hpp"
 
 /**
  * This killer performs T2Swaps and kills the corresponding cells. In contrast to other
@@ -79,7 +77,7 @@ public:
      *
      * @param pCellPopulation pointer to the cell population
      */
-    T2SwapCellKiller(AbstractCellPopulation<DIM>* pCellPopulation);
+    T2SwapCellKiller(AbstractCellPopulation<DIM, DIM>* pCellPopulation);
 
     /**
      * Overridden CheckAndLabelCellsForApoptosisOrDeath() method.
@@ -111,7 +109,7 @@ inline void save_construct_data(
     Archive & ar, const T2SwapCellKiller<DIM> * t, const unsigned int file_version)
 {
     // Save data required to construct instance
-    const AbstractCellPopulation<DIM>* const p_cell_population = t->GetCellPopulation();
+    const AbstractCellPopulation<DIM, DIM>* const p_cell_population = t->GetCellPopulation();
     ar << p_cell_population;
 }
 
@@ -123,7 +121,7 @@ inline void load_construct_data(
     Archive & ar, T2SwapCellKiller<DIM> * t, const unsigned int file_version)
 {
     // Retrieve data from archive required to construct new instance
-    AbstractCellPopulation<DIM>* p_cell_population;
+    AbstractCellPopulation<DIM, DIM>* p_cell_population;
     ar >> p_cell_population;
 
     // Invoke inplace constructor to initialise instance
