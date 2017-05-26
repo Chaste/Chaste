@@ -66,31 +66,6 @@ class TestSimpleTargetAreaModifier : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestSetupSolveException() throw (Exception)
-    {
-        // First set up SimulationTime (this is usually handled by a simulation object)
-        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
-
-        // Create a SimpleTargetAreaModifier
-        MAKE_PTR(SimpleTargetAreaModifier<2>, p_modifier);
-
-        // Create a cell population whose type should not be used with a SimpleTargetAreaModifier
-        HoneycombMeshGenerator generator(4, 4, 0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
-
-        std::vector<CellPtr> cells;
-        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
-
-        MeshBasedCellPopulation<2> population(*p_mesh, cells);
-
-        // Test that the correct exception is thrown if we try to call UpdateTargetAreas() on the population
-        TS_ASSERT_THROWS_THIS(p_modifier->SetupSolve(population, "unused_argument"),
-            "AbstractTargetAreaModifiers are to be used with a VertexBasedCellPopulation only");
-        CellBasedEventHandler::Reset(); // Otherwise logging has been started but not stopped due to exception above.
-
-    }
-
     void TestNonPhaseBasedCellCycleModelMethodsAndExceptions() throw (Exception)
     {
         // First set up SimulationTime (this is usually handled by a simulation object)
@@ -256,7 +231,7 @@ public:
         TS_ASSERT_DELTA(actual_area_4_after_3dt, 0.0, 1e-12);
     }
 
-    void TestTargetAreaOfDaughterCells()
+    void TestTargetAreaOfDaughterCellsSimple()
     {
         // Plan: initialise a cell and have it divide at a fixed time. If cell divides at t, check that:
         // target area of mother cell at t - dt = mature target area
@@ -285,7 +260,7 @@ public:
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("TestTargetAreaOfDaughterCells");
+        simulator.SetOutputDirectory("TestTargetAreaOfDaughterCellsSimple");
         simulator.SetEndTime(0.997);
 
         // Create a force law and pass it to the simulation

@@ -49,7 +49,6 @@ AbstractUntemplatedConvergenceTester::AbstractUntemplatedConvergenceTester()
       ConductionVelocity(0.0),
       PopulatedResult(false),
       FixedResult(false),
-      UseAbsoluteStimulus(false),
       AbsoluteStimulus(-1e7),
       SimulateFullActionPotential(false),
       Converged(false),

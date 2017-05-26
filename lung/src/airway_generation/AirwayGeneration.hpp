@@ -48,6 +48,20 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #if ((VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
 
+/*
+ * This block is here to prevent a conflict when including vtkPointLocator.h:
+ *     From VTK 7.0, there is a variable HZ in vtkPointLocator.h which is #def'd in linux header asm-generic/param.h,
+ *     so we temporarily #undef it prior to the include.  See #2883 for details.
+ */
+#if (VTK_MAJOR_VERSION == 7)
+#pragma push_macro("HZ")
+#undef HZ
+#include <vtkPointLocator.h>
+#pragma pop_macro("HZ")
+#else // (VTK_MAJOR_VERSION != 7)
+#include <vtkPointLocator.h>
+#endif // (VTK_MAJOR_VERSION == 7)
+
 #include "vtkSmartPointer.h"
 #include "vtkPolyData.h"
 #include "vtkSelectEnclosedPoints.h"

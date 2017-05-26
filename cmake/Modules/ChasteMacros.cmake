@@ -143,7 +143,7 @@ macro(Chaste_ADD_TEST _testTargetName _filename)
     if (python)
         set(test_exe ${Chaste_BINARY_DIR}/python/infra/TestPythonCode.py ${_filename})
     else()
-        set(_exeTargetName ${_testname}Runner)
+        set(_exeTargetName ${_testname})
 
         if (NOT TARGET ${exeTargetName})
             set(_test_real_output_filename "${CMAKE_CURRENT_BINARY_DIR}/${_testname}.cpp")
@@ -200,8 +200,8 @@ macro(Chaste_ADD_TEST _testTargetName _filename)
         elseif (Chaste_PROFILE_GPERFTOOLS)
             set(profile_file ${Chaste_PROFILE_OUTPUT_DIR}/${_testname}.prof)
             set(post_command ${GPERFTOOLS_PPROF_EXE})
-            set(post_args "--gif --nodefraction=0.0001 --edgefraction=0.0001 $<TARGET_FILE:${exeTargetName}> ${profile_file}")
-            set(output_file ${Chaste_PROFILE_OUTPUT_DIR}/${_testname}.gif)
+            set(post_args "--svg --nodefraction=0.0001 --edgefraction=0.0001 $<TARGET_FILE:${exeTargetName}> ${profile_file}")
+            set(output_file ${Chaste_PROFILE_OUTPUT_DIR}/${_testname}.svg)
             set(env_var CPUPROFILE)
             set(env_var_value ${profile_file})
         else()
@@ -244,21 +244,25 @@ endmacro(Chaste_ADD_TEST)
 # hpp file (in test)
 ##########################################################
 macro(Chaste_GENERATE_TEST_NAME test outTestName)
-    string(REGEX REPLACE "([a-zA-Z0-9_/]+)[.](hpp|py)" "\\1" testName "${test}")
-    string(REPLACE "/" ";" testPath "${testName}")
-    list(LENGTH testPath pathLength)
-    if(${pathLength} EQUAL 1)
-        set(testName ${testPath})
-        set(testPath "")
-        set(${outTestName} ${testName})
-    else()
-        math(EXPR index "${pathLength} - 1")
-        list(GET testPath ${index} testName)
-        list(REMOVE_AT testPath ${index})
-        string(REPLACE ";" "_" _testPath_ "${testPath}")
-        string(REPLACE ";" "/" testPath "${testPath}")
-        set(${outTestName} "${testName}_${_testPath_}_")
-    endif()
+    get_filename_component(${outTestName} ${test} NAME_WE)
+#####################
+# This functionality appends the path to each test: removed in #2906
+#####################
+#    string(REGEX REPLACE "([a-zA-Z0-9_/]+)[.](hpp|py)" "\\1" testName "${test}")
+#    string(REPLACE "/" ";" testPath "${testName}")
+#    list(LENGTH testPath pathLength)
+#    if(${pathLength} EQUAL 1)
+#        set(testName ${testPath})
+#        set(testPath "")
+#        set(${outTestName} ${testName})
+#    else()
+#        math(EXPR index "${pathLength} - 1")
+#        list(GET testPath ${index} testName)
+#        list(REMOVE_AT testPath ${index})
+#        string(REPLACE ";" "_" _testPath_ "${testPath}")
+#        string(REPLACE ";" "/" testPath "${testPath}")
+#        set(${outTestName} "${testName}_${_testPath_}_")
+#    endif()
 endmacro(Chaste_GENERATE_TEST_NAME test outTestName)
 
 ##########################################################
@@ -442,7 +446,7 @@ macro(Chaste_DO_APPS_COMMON component)
             set_target_properties(${appName} PROPERTIES LINK_FLAGS "/NODEFAULTLIB:LIBCMT /IGNORE:4217 /IGNORE:4049")
         endif()
     endforeach(app)
-    if (Chaste_ENABLE_TESTING AND TEXTTEST_FOUND)
+    if (Chaste_ENABLE_TESTING AND TEXTTEST_FOUND AND EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/texttest)
         configure_file(texttest/chaste/wrapper.cmake.in texttest/chaste/wrapper)
         file(GLOB test_directories texttest/*)
         foreach(tests_dir ${test_directories})
@@ -503,6 +507,10 @@ endmacro(Chaste_DO_APPS_MAIN)
 # enabled test packs.
 ##########################################################
 macro(Chaste_DO_TEST_COMMON component)
+
+    # Get the git revision (for tutorial tests)
+    find_package(Git QUIET)
+
     # make tutorial directories
     file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/tutorials)
     file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/tutorials/UserTutorials)
@@ -556,7 +564,7 @@ macro(Chaste_DO_TEST_COMMON component)
                 chaste_generate_test_name(${filename} "testTargetName")
                 set(old_testTargetName ${testTargetName})
                 set(parallel OFF)
-                set(exeTargetName ${testTargetName}Runner)
+                set(exeTargetName ${testTargetName})
                 if (${type} STREQUAL "Parallel")
                     set(testTargetName ${testTargetName}Parallel)
                     set(parallel ON)
@@ -576,7 +584,7 @@ macro(Chaste_DO_TEST_COMMON component)
                     endif()
 
 
-                    set_property(TEST ${testTargetName} PROPERTY LABELS ${component} ${type})
+                    set_property(TEST ${testTargetName} PROPERTY LABELS ${type}_${component})
 
                     if (Chaste_INSTALL_TESTS AND NOT(${component} MATCHES "^project")) 
                         install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${old_testTargetName}.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/${filename}"
@@ -584,10 +592,17 @@ macro(Chaste_DO_TEST_COMMON component)
                     endif()
 
                     # filename is a user tutorial
-                    if(filename MATCHES "Test(.*)Tutorial.(hpp|py)") 
+                    if(filename MATCHES "Test(.*)Tutorial.(hpp|py)")
+                        # Get the git revision of last time this file was changed
+                        if(DEFINED GIT_EXECUTABLE)
+                            execute_process(COMMAND git log -1 --format=%h --follow ${filename}
+                                    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                                    OUTPUT_VARIABLE Chaste_revision
+                                    OUTPUT_STRIP_TRAILING_WHITESPACE)
+                        endif()
                         set(out_filename  ${CMAKE_BINARY_DIR}/tutorials/UserTutorials/${CMAKE_MATCH_1})
                         add_custom_command(OUTPUT ${out_filename}
-                            COMMAND ${PYTHON_EXECUTABLE} ARGS ${Chaste_BINARY_DIR}/python/utils/CreateTutorial.py ${CMAKE_CURRENT_SOURCE_DIR}/${filename} ${out_filename}
+                            COMMAND ${PYTHON_EXECUTABLE} ARGS ${Chaste_BINARY_DIR}/python/utils/CreateTutorial.py ${CMAKE_CURRENT_SOURCE_DIR}/${filename} ${out_filename} -r ${Chaste_revision}
                             DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${filename}
                             COMMENT "Generating user tutorial ${out_filename}" VERBATIM)
                         add_custom_target(${CMAKE_MATCH_1} DEPENDS ${out_filename})
@@ -604,11 +619,6 @@ macro(Chaste_DO_TEST_COMMON component)
                         add_custom_target(${CMAKE_MATCH_1} DEPENDS ${out_filename})
                         add_dependencies(tutorials ${CMAKE_MATCH_1})
                     endif()
-
-                else()
-                    get_property(myLabels TEST ${testTargetName} PROPERTY LABELS)
-                    list(APPEND myLabels ${type})
-                    set_property(TEST ${testTargetName} PROPERTY LABELS ${myLabels})
                 endif()
 
                 # add dependencies to component and type targets. Do not include the python component or tests in Python files

@@ -1948,9 +1948,11 @@ public:
             {
                 unsigned index = iter->GetIndex();
                 // Position of this node
-                c_vector<double, 2> pos1 = iter->rGetLocation();
+                c_vector<double, 2> pos1;
+                pos1 = iter->rGetLocation();
                 // Position in the other mesh
-                c_vector<double, 2> pos2 = mesh_with_default_split.GetNode(index)->rGetLocation();
+                c_vector<double, 2> pos2;
+                pos2 = mesh_with_default_split.GetNode(index)->rGetLocation();
                 TS_ASSERT_DELTA(pos1[0], pos2[0], 1e-5);
                 TS_ASSERT_DELTA(pos1[1], pos2[1], 1e-5);
             }
@@ -1998,9 +2000,11 @@ public:
             {
                 unsigned index = iter->GetIndex();
                 // Position of this node
-                c_vector<double, 3> pos1 = iter->rGetLocation();
+                c_vector<double, 3> pos1;
+                pos1 = iter->rGetLocation();
                 // Position in the other mesh
-                c_vector<double, 3> pos2 = mesh_with_default_split.GetNode(index)->rGetLocation();
+                c_vector<double, 3> pos2;
+                pos2 = mesh_with_default_split.GetNode(index)->rGetLocation();
                 TS_ASSERT_DELTA(pos1[0], pos2[0], 1e-5);
                 TS_ASSERT_DELTA(pos1[1], pos2[1], 1e-5);
                 TS_ASSERT_DELTA(pos1[2], pos2[2], 1e-5);

@@ -170,10 +170,7 @@ public:
      *  used in StimulusConverger in projects/jmpf
      */
     bool FixedResult;
-    /** true if the plane stimulus should applied with an exact value (not scaled by space-step)
-     *  used in StimulusConverger in projects/jmpf
-     */
-    bool UseAbsoluteStimulus;
+
     /**
      * A value to be used with a plane stimulus (not scaled by space-step)
      *  used in StimulusConverger in projects/jmpf
@@ -319,16 +316,7 @@ public:
                 }
                 case PLANE:
                 {
-                    if (this->UseAbsoluteStimulus)
-                    {
-                        // LCOV_EXCL_START
-                        p_cell_factory = new GeneralPlaneStimulusCellFactory<CELL, DIM>(0, this->AbsoluteStimulus, true);
-                        // LCOV_EXCL_STOP
-                    }
-                    else
-                    {
-                        p_cell_factory = new GeneralPlaneStimulusCellFactory<CELL, DIM>(num_ele_across, constructor.GetWidth(), false, this->AbsoluteStimulus);
-                    }
+                    p_cell_factory = new GeneralPlaneStimulusCellFactory<CELL, DIM>(num_ele_across, constructor.GetWidth(), this->AbsoluteStimulus);
                     break;
                 }
                 case QUARTER:
@@ -634,6 +622,9 @@ public:
         }
     }
 
+    /**
+     * Show convergence details relevant to this run in std::cout
+     */
     void DisplayRun()
     {
         if (!PetscTools::AmMaster())
@@ -675,14 +666,6 @@ public:
         std::time_t rawtime;
         std::time( &rawtime );
         std::cout << std::ctime(&rawtime);
-        ///\todo The UseAbsoluteStimulus is temporary, while we are sorting out
-        ///3D stimulus.  It is to be removed later (along with StimulusConvergenceTester)
-        if (this->UseAbsoluteStimulus)
-        {
-            // LCOV_EXCL_START
-            std::cout<<"Using absolute stimulus of "<<this->AbsoluteStimulus<<std::endl;
-            // LCOV_EXCL_STOP
-        }
         std::cout << std::flush;
         //HeartEventHandler::Headings();
         //HeartEventHandler::Report();
