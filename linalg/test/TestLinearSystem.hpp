@@ -477,7 +477,7 @@ public:
             int local_index = global_index-lo;
             if (lo<=global_index && global_index<hi)
             {
-                TS_ASSERT_DELTA(p_solution_elements_array[local_index], hand_cooked_solution[local_index], 1e-8);
+                TS_ASSERT_DELTA(p_solution_elements_array[local_index], hand_cooked_solution[global_index], 1e-8);
             }
         }
         VecRestoreArray(solution_vector, &p_solution_elements_array);
