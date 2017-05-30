@@ -273,6 +273,7 @@ endmacro(Chaste_GENERATE_TEST_NAME test outTestName)
 # layout
 ##########################################################
 macro(Chaste_DO_COMMON component)
+
     add_definitions(-DCOMPONENT_SOURCE_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\")
     if (NOT TARGET ${component})
         add_custom_target(${component})
@@ -321,49 +322,51 @@ macro(Chaste_DO_COMMON component)
         include_directories("${Chaste_INCLUDE_DIRS}")
     endif()
 
-    # Make component library
-    add_library(chaste_${component} ${Chaste_${component}_SOURCES} ${ARGN})
-    if (BUILD_SHARED_LIBS)
-        target_link_libraries(chaste_${component} LINK_PUBLIC ${Chaste_LIBRARIES})
-        set(static_extension "a")
-        set(keyword "")
-        foreach(library ${Chaste_THIRD_PARTY_LIBRARIES})
-            if (library STREQUAL debug OR library STREQUAL optimized OR library STREQUAL general)
-                set(keyword ${library})
-            else()
-                if (library MATCHES ".*\\.${static_extension}")
-                    target_link_libraries(chaste_${component} LINK_PRIVATE ${keyword} ${library})
+    # Make component library, if component contains any source files
+    if (NOT Chaste_${component}_SOURCES STREQUAL "")
+        add_library(chaste_${component} ${Chaste_${component}_SOURCES} ${ARGN})
+        if (BUILD_SHARED_LIBS)
+            target_link_libraries(chaste_${component} LINK_PUBLIC ${Chaste_LIBRARIES})
+            set(static_extension "a")
+            set(keyword "")
+            foreach(library ${Chaste_THIRD_PARTY_LIBRARIES})
+                if (library STREQUAL debug OR library STREQUAL optimized OR library STREQUAL general)
+                    set(keyword ${library})
                 else()
-                    target_link_libraries(chaste_${component} LINK_PUBLIC ${keyword} ${library})
+                    if (library MATCHES ".*\\.${static_extension}")
+                        target_link_libraries(chaste_${component} LINK_PRIVATE ${keyword} ${library})
+                    else()
+                        target_link_libraries(chaste_${component} LINK_PUBLIC ${keyword} ${library})
+                    endif()
+                    set(keyword "")
                 endif()
-                set(keyword "")
-            endif()
-        endforeach()
-    else()
-        target_link_libraries(chaste_${component} LINK_PUBLIC ${Chaste_THIRD_PARTY_LIBRARIES})
-    endif()
+            endforeach()
+        else()
+            target_link_libraries(chaste_${component} LINK_PUBLIC ${Chaste_THIRD_PARTY_LIBRARIES})
+        endif()
 
 
-    if(NOT(${component} MATCHES "^project"))
-        # install component library
-        install(TARGETS chaste_${component} 
-            EXPORT chaste-targets
-            DESTINATION lib/chaste 
-            COMPONENT ${component}_libraries)
+        if(NOT(${component} MATCHES "^project"))
+            # install component library
+            install(TARGETS chaste_${component}
+                EXPORT chaste-targets
+                DESTINATION lib/chaste
+                COMPONENT ${component}_libraries)
 
-        # install component headers
-        install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/src/"
-            DESTINATION include/chaste/${component}
-            COMPONENT ${component}_headers
-            FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp"
-            )
+            # install component headers
+            install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/src/"
+                DESTINATION include/chaste/${component}
+                COMPONENT ${component}_headers
+                FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp"
+                )
 
-        # install generated headers
-        install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/src/"
-            DESTINATION include/chaste/${component}
-            COMPONENT ${component}_headers
-            FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp"
-            )
+            # install generated headers
+            install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/src/"
+                DESTINATION include/chaste/${component}
+                COMPONENT ${component}_headers
+                FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp"
+                )
+        endif()
     endif()
 
     if (Chaste_ENABLE_TESTING) 
@@ -388,7 +391,7 @@ macro(Chaste_DO_COMMON component)
             message(WARNING "No CMakeLists.txt file found in test directory ${CMAKE_CURRENT_SOURCE_DIR}/apps. Applications for ${component} will not be built")
             set(Chaste_ENABLE_${component}_APPS OFF CACHE BOOL "Generate the applications infrastructure for ${component} ")
         endif()
-        
+
         # Do apps if requested
         if(Chaste_ENABLE_${component}_APPS)
             add_subdirectory(apps)
@@ -408,8 +411,10 @@ macro(Chaste_DO_COMPONENT component)
 endmacro(Chaste_DO_COMPONENT)
 
 macro(Chaste_DO_PROJECT projectName)
-    message("Configuring project ${projectName}")
-    Chaste_DO_COMMON(project_${projectName})
+    if (Chaste_ENABLE_project_${projectName})
+        message("Configuring project ${projectName}")
+        Chaste_DO_COMMON(project_${projectName})
+    endif()
 endmacro(Chaste_DO_PROJECT)
 
 ##########################################################
