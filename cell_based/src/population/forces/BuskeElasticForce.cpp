@@ -34,7 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "BuskeElasticForce.hpp"
-NodeBasedCellPopulation
+#include "NodeBasedCellPopulation.hpp"
 
 template<unsigned DIM>
 BuskeElasticForce<DIM>::BuskeElasticForce()

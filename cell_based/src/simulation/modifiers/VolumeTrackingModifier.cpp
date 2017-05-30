@@ -84,7 +84,7 @@ void VolumeTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM,DIM>
     }
 
     // Iterate over cell population
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
+    for (typename AbstractCellPopulation<DIM, DIM>::Iterator cell_iter = rCellPopulation.Begin();
          cell_iter != rCellPopulation.End();
          ++cell_iter)
     {

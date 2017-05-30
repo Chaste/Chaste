@@ -51,7 +51,7 @@ VertexCryptBoundaryForce<DIM>::~VertexCryptBoundaryForce()
 }
 
 template<unsigned DIM>
-void VertexCryptBoundaryForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation)
+void VertexCryptBoundaryForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM, DIM>& rCellPopulation)
 {
     // Helper variable that is a static cast of the cell population
     VertexBasedCellPopulation<DIM>* p_cell_population = static_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation);

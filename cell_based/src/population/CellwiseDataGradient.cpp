@@ -44,7 +44,7 @@ c_vector<double, DIM>& CellwiseDataGradient<DIM>::rGetGradient(unsigned nodeInde
 }
 
 template<unsigned DIM>
-void CellwiseDataGradient<DIM>::SetupGradients(AbstractCellPopulation<DIM>& rCellPopulation, const std::string& rItemName)
+void CellwiseDataGradient<DIM>::SetupGradients(AbstractCellPopulation<DIM, DIM>& rCellPopulation, const std::string& rItemName)
 {
     MeshBasedCellPopulation<DIM>* pCellPopulation = static_cast<MeshBasedCellPopulation<DIM>*>(&(rCellPopulation));
     MutableMesh<DIM,DIM>& r_mesh = pCellPopulation->rGetMesh();
@@ -112,7 +112,7 @@ void CellwiseDataGradient<DIM>::SetupGradients(AbstractCellPopulation<DIM>& rCel
     }
 
     // Divide to obtain average gradient
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = pCellPopulation->Begin();
+    for (typename AbstractCellPopulation<DIM, DIM>::Iterator cell_iter = pCellPopulation->Begin();
          cell_iter != pCellPopulation->End();
          ++cell_iter)
     {

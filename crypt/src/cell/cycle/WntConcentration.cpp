@@ -125,13 +125,13 @@ c_vector<double, DIM> WntConcentration<DIM>::GetWntGradient(CellPtr pCell)
 }
 
 template<unsigned DIM>
-void WntConcentration<DIM>::SetCellPopulation(AbstractCellPopulation<DIM>& rCellPopulation)
+void WntConcentration<DIM>::SetCellPopulation(AbstractCellPopulation<DIM, DIM>& rCellPopulation)
 {
     mpCellPopulation = &rCellPopulation;
 }
 
 template<unsigned DIM>
-AbstractCellPopulation<DIM>& WntConcentration<DIM>::rGetCellPopulation()
+AbstractCellPopulation<DIM, DIM>& WntConcentration<DIM>::rGetCellPopulation()
 {
     return *mpCellPopulation;
 }

@@ -40,7 +40,7 @@ AbstractOnLatticeCellPopulation<DIM>::AbstractOnLatticeCellPopulation(AbstractMe
                                                                     std::vector<CellPtr>& rCells,
                                                                   const std::vector<unsigned> locationIndices,
                                                                   bool deleteMesh)
-    : AbstractCellPopulation<DIM>(rMesh, rCells, locationIndices),
+    : AbstractCellPopulation<DIM, DIM>(rMesh, rCells, locationIndices),
       mDeleteMesh(deleteMesh),
       mUpdateNodesInRandomOrder(true),
       mIterateRandomlyOverUpdateRuleCollection(false)
@@ -49,13 +49,13 @@ AbstractOnLatticeCellPopulation<DIM>::AbstractOnLatticeCellPopulation(AbstractMe
     for (unsigned i=0; it != this->mCells.end(); ++it, ++i)
     {
         unsigned index = locationIndices.empty() ? i : locationIndices[i]; // assume that the ordering matches
-        AbstractCellPopulation<DIM>::AddCellUsingLocationIndex(index, *it);
+        AbstractCellPopulation<DIM, DIM>::AddCellUsingLocationIndex(index, *it);
     }
 }
 
 template<unsigned DIM>
 AbstractOnLatticeCellPopulation<DIM>::AbstractOnLatticeCellPopulation(AbstractMesh<DIM, DIM>& rMesh)
-    : AbstractCellPopulation<DIM>(rMesh),
+    : AbstractCellPopulation<DIM, DIM>(rMesh),
       mDeleteMesh(true),
       mUpdateNodesInRandomOrder(true),
       mIterateRandomlyOverUpdateRuleCollection(false)
@@ -112,7 +112,7 @@ void AbstractOnLatticeCellPopulation<DIM>::OutputCellPopulationParameters(out_st
     *rParamsFile << "\t\t<IterateRandomlyOverUpdateRuleCollection>" << mIterateRandomlyOverUpdateRuleCollection << "</IterateRandomlyOverUpdateRuleCollection>\n";
 
     // Call method on direct parent class
-    AbstractCellPopulation<DIM>::OutputCellPopulationParameters(rParamsFile);
+    AbstractCellPopulation<DIM, DIM>::OutputCellPopulationParameters(rParamsFile);
 }
 
 template<unsigned DIM>

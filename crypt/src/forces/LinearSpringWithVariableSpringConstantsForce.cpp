@@ -92,7 +92,7 @@ template<unsigned DIM>
 double LinearSpringWithVariableSpringConstantsForce<DIM>::VariableSpringConstantMultiplicationFactor(
     unsigned nodeAGlobalIndex,
     unsigned nodeBGlobalIndex,
-    AbstractCellPopulation<DIM>& rCellPopulation,
+    AbstractCellPopulation<DIM, DIM>& rCellPopulation,
     bool isCloserThanRestLength)
 {
 
@@ -220,7 +220,7 @@ double LinearSpringWithVariableSpringConstantsForce<DIM>::VariableSpringConstant
 }
 
 template<unsigned DIM>
-void LinearSpringWithVariableSpringConstantsForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation)
+void LinearSpringWithVariableSpringConstantsForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM, DIM>& rCellPopulation)
 {
     // Throw an exception message if not using a MeshBasedCellPopulation
     if (dynamic_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation) == NULL)

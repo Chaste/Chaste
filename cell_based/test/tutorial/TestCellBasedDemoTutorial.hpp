@@ -78,6 +78,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NagaiHondaForce.hpp"
 #include "SimpleTargetAreaModifier.hpp"
 #include "NodeBasedCellPopulation.hpp"
+#include "NodesOnlyMesh.hpp"
 #include "OffLatticeSimulation.hpp"
 #include "OnLatticeSimulation.hpp"
 #include "PlaneBoundaryCondition.hpp"

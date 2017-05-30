@@ -80,7 +80,7 @@ public:
      *
      * @param pCellPopulation pointer to the cell population
      */
-    CryptSimulationBoundaryCondition(AbstractCellPopulation<DIM>* pCellPopulation);
+    CryptSimulationBoundaryCondition(AbstractCellPopulation<DIM, DIM>* pCellPopulation);
 
     /**
      * Overridden ImposeBoundaryCondition() method.
@@ -134,7 +134,7 @@ inline void save_construct_data(
     Archive & ar, const CryptSimulationBoundaryCondition<DIM> * t, const unsigned int file_version)
 {
     // Save data required to construct instance
-    const AbstractCellPopulation<DIM>* const p_cell_population = t->GetCellPopulation();
+    const AbstractCellPopulation<DIM, DIM>* const p_cell_population = t->GetCellPopulation();
     ar << p_cell_population;
 }
 
@@ -146,7 +146,7 @@ inline void load_construct_data(
     Archive & ar, CryptSimulationBoundaryCondition<DIM> * t, const unsigned int file_version)
 {
     // Retrieve data from archive required to construct new instance
-    AbstractCellPopulation<DIM>* p_cell_population;
+    AbstractCellPopulation<DIM, DIM>* p_cell_population;
     ar >> p_cell_population;
 
     // Invoke inplace constructor to initialise instance

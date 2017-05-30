@@ -161,7 +161,7 @@ public:
      */
     double VariableSpringConstantMultiplicationFactor(unsigned nodeAGlobalIndex,
                                                       unsigned nodeBGlobalIndex,
-                                                      AbstractCellPopulation<DIM>& rCellPopulation,
+                                                      AbstractCellPopulation<DIM, DIM>& rCellPopulation,
                                                       bool isCloserThanRestLength);
 
     /**
@@ -169,7 +169,7 @@ public:
      *
      * @param rCellPopulation reference to the cell population
      */
-    void AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation);
+    void AddForceContribution(AbstractCellPopulation<DIM, DIM>& rCellPopulation);
 
     /**
      * @return mBetaCatSpringScaler

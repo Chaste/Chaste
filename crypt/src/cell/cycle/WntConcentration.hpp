@@ -91,7 +91,7 @@ private:
     /**
      * The cell population in which the WntConcentration occurs.
      */
-    AbstractCellPopulation<DIM>* mpCellPopulation;
+    AbstractCellPopulation<DIM, DIM>* mpCellPopulation;
 
     /**
      * Whether this WntConcentration object has had its type set.
@@ -226,12 +226,12 @@ public:
      *
      * @param rCellPopulation reference to the cell population
      */
-    void SetCellPopulation(AbstractCellPopulation<DIM>& rCellPopulation);
+    void SetCellPopulation(AbstractCellPopulation<DIM, DIM>& rCellPopulation);
 
     /**
      * @return reference to the CellPopulation.
      */
-    AbstractCellPopulation<DIM>& rGetCellPopulation();
+    AbstractCellPopulation<DIM, DIM>& rGetCellPopulation();
 
     /**
      * @return mCryptLength

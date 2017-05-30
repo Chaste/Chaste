@@ -80,6 +80,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CheckpointArchiveTypes.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "HoneycombMeshGenerator.hpp"
+#include "MeshBasedCellPopulation.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "SmartPointers.hpp"

@@ -91,7 +91,7 @@ public:
      * @param sloughSides whether to slough cells at the side of the domain
      * @param sloughWidth the width of the domain (note slough on left and right)
      */
-    SloughingCellKiller(AbstractCellPopulation<DIM>* pCrypt,
+    SloughingCellKiller(AbstractCellPopulation<DIM, DIM>* pCrypt,
                         double sloughHeight,
                         bool sloughSides = false,
                         double sloughWidth = 10.0);
@@ -147,7 +147,7 @@ inline void save_construct_data(
     Archive & ar, const SloughingCellKiller<DIM> * t, const unsigned int file_version)
 {
     // Save data required to construct instance
-    const AbstractCellPopulation<DIM>* const p_crypt = t->GetCellPopulation();
+    const AbstractCellPopulation<DIM, DIM>* const p_crypt = t->GetCellPopulation();
     ar << p_crypt;
     bool slough_sides = t->GetSloughSides();
     ar << slough_sides;
@@ -165,7 +165,7 @@ inline void load_construct_data(
     Archive & ar, SloughingCellKiller<DIM> * t, const unsigned int file_version)
 {
     // Retrieve data from archive required to construct new instance
-    AbstractCellPopulation<DIM>* p_crypt;
+    AbstractCellPopulation<DIM, DIM>* p_crypt;
     ar >> p_crypt;
     bool slough_sides;
     ar >> slough_sides;

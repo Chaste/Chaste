@@ -75,7 +75,7 @@ template<unsigned DIM>
 void SphereGeometryBoundaryCondition<DIM>::ImposeBoundaryCondition(const std::map<Node<DIM>*, c_vector<double, DIM> >& rOldLocations)
 {
     // Iterate over the cell population
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->mpCellPopulation->Begin();
+    for (typename AbstractCellPopulation<DIM, DIM>::Iterator cell_iter = this->mpCellPopulation->Begin();
          cell_iter != this->mpCellPopulation->End();
          ++cell_iter)
     {
@@ -105,7 +105,7 @@ bool SphereGeometryBoundaryCondition<DIM>::VerifyBoundaryCondition()
     bool condition_satisfied = true;
 
     // Iterate over the cell population
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->mpCellPopulation->Begin();
+    for (typename AbstractCellPopulation<DIM, DIM>::Iterator cell_iter = this->mpCellPopulation->Begin();
          cell_iter != this->mpCellPopulation->End();
          ++cell_iter)
     {

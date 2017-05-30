@@ -91,7 +91,7 @@ private:
 protected:
 
     /** The cell population member. */
-    AbstractCellPopulation<DIM>& mrCellPopulation;
+    AbstractCellPopulation<DIM, DIM>& mrCellPopulation;
 
     /** Coefficient of consumption of nutrient by cells. */
     double mSourceCoefficient;
@@ -111,14 +111,14 @@ public:
      * @param sourceCoefficient the source term coefficient (defaults to 0.0)
      * @param diffusionCoefficient the rate of diffusion (defaults to 1.0)
      */
-    AveragedSourceEllipticPde(AbstractCellPopulation<DIM>& rCellPopulation,
+    AveragedSourceEllipticPde(AbstractCellPopulation<DIM, DIM>& rCellPopulation,
                               double sourceCoefficient=0.0,
                               double diffusionCoefficient=1.0);
 
     /**
      * @return const reference to the cell population (used in archiving).
      */
-    const AbstractCellPopulation<DIM>& rGetCellPopulation() const;
+    const AbstractCellPopulation<DIM, DIM>& rGetCellPopulation() const;
 
     /**
      * @return mSourceCoefficient
@@ -187,7 +187,7 @@ inline void save_construct_data(
     Archive & ar, const AveragedSourceEllipticPde<DIM>* t, const unsigned int file_version)
 {
     // Save data required to construct instance
-    const AbstractCellPopulation<DIM>* p_cell_population = &(t->rGetCellPopulation());
+    const AbstractCellPopulation<DIM, DIM>* p_cell_population = &(t->rGetCellPopulation());
     ar & p_cell_population;
 }
 
@@ -199,7 +199,7 @@ inline void load_construct_data(
     Archive & ar, AveragedSourceEllipticPde<DIM>* t, const unsigned int file_version)
 {
     // Retrieve data from archive required to construct new instance
-    AbstractCellPopulation<DIM>* p_cell_population;
+    AbstractCellPopulation<DIM, DIM>* p_cell_population;
     ar >> p_cell_population;
 
     // Invoke inplace constructor to initialise instance

@@ -38,7 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellBasedEventHandler.hpp"
 
 template<unsigned DIM>
-OnLatticeSimulation<DIM>::OnLatticeSimulation(AbstractCellPopulation<DIM>& rCellPopulation,
+OnLatticeSimulation<DIM>::OnLatticeSimulation(AbstractCellPopulation<DIM, DIM>& rCellPopulation,
                                               bool deleteCellPopulationInDestructor,
                                               bool initialiseCells)
     : AbstractCellBasedSimulation<DIM>(rCellPopulation,

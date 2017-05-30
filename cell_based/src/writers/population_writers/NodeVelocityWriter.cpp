@@ -38,6 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MeshBasedCellPopulation.hpp"
 #include "CaBasedCellPopulation.hpp"
 #include "NodeBasedCellPopulation.hpp"
+#include "NodesOnlyMesh.hpp"
 #include "PottsBasedCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
 

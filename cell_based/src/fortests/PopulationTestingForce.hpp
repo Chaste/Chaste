@@ -38,12 +38,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
+
 #include "AbstractForce.hpp"
+#include "UblasVectorInclude.hpp"
 
 /**
  * A simple force law used to test node location updates across the off lattice population test files.
  */
-
 template<unsigned  ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
 class PopulationTestingForce : public AbstractForce<ELEMENT_DIM, SPACE_DIM>
 {

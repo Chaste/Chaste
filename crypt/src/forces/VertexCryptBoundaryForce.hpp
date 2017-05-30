@@ -97,7 +97,7 @@ public:
      *
      * @param rCellPopulation reference to the cell population
      */
-    void AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation);
+    void AddForceContribution(AbstractCellPopulation<DIM, DIM>& rCellPopulation);
 
     /** @return mForceStrength */
     double GetForceStrength() const;

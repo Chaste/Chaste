@@ -71,7 +71,7 @@ void DeltaNotchTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM,
     rCellPopulation.Update();
 
     // First recover each cell's Notch and Delta concentrations from the ODEs and store in CellData
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
+    for (typename AbstractCellPopulation<DIM, DIM>::Iterator cell_iter = rCellPopulation.Begin();
          cell_iter != rCellPopulation.End();
          ++cell_iter)
     {
@@ -85,7 +85,7 @@ void DeltaNotchTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM,
     }
 
     // Next iterate over the population to compute and store each cell's neighbouring Delta concentration in CellData
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
+    for (typename AbstractCellPopulation<DIM, DIM>::Iterator cell_iter = rCellPopulation.Begin();
          cell_iter != rCellPopulation.End();
          ++cell_iter)
     {

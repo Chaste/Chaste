@@ -37,7 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ApoptoticCellProperty.hpp"
 
 template<unsigned DIM>
-VolumeDependentAveragedSourceEllipticPde<DIM>::VolumeDependentAveragedSourceEllipticPde(AbstractCellPopulation<DIM>& rCellPopulation, double coefficient)
+VolumeDependentAveragedSourceEllipticPde<DIM>::VolumeDependentAveragedSourceEllipticPde(AbstractCellPopulation<DIM, DIM>& rCellPopulation, double coefficient)
     : AveragedSourceEllipticPde<DIM>(rCellPopulation, coefficient)
 {
     assert(bool(dynamic_cast<NodeBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))));
@@ -55,7 +55,7 @@ void VolumeDependentAveragedSourceEllipticPde<DIM>::SetupSourceTerms(Tetrahedral
     }
 
     // Loop over cells, find which coarse element it is in, and add volume to the mSourceTermOnCoarseElements[elem_index];
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->mrCellPopulation.Begin();
+    for (typename AbstractCellPopulation<DIM, DIM>::Iterator cell_iter = this->mrCellPopulation.Begin();
          cell_iter != this->mrCellPopulation.End();
          ++cell_iter)
     {

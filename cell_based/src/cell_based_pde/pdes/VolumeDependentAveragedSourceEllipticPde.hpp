@@ -102,7 +102,7 @@ public:
      * @param rCellPopulation reference to the cell population
      * @param coefficient the coefficient of consumption of nutrient by cells (defaults to 0.0)
      */
-    VolumeDependentAveragedSourceEllipticPde(AbstractCellPopulation<DIM>& rCellPopulation, double coefficient=0.0);
+    VolumeDependentAveragedSourceEllipticPde(AbstractCellPopulation<DIM, DIM>& rCellPopulation, double coefficient=0.0);
 
     /**
      * Set up the source terms.
@@ -128,7 +128,7 @@ inline void save_construct_data(
     Archive & ar, const VolumeDependentAveragedSourceEllipticPde<DIM>* t, const unsigned int file_version)
 {
     // Save data required to construct instance
-    const AbstractCellPopulation<DIM>* p_cell_population = &(t->rGetCellPopulation());
+    const AbstractCellPopulation<DIM, DIM>* p_cell_population = &(t->rGetCellPopulation());
     ar & p_cell_population;
 }
 
@@ -140,7 +140,7 @@ inline void load_construct_data(
     Archive & ar, VolumeDependentAveragedSourceEllipticPde<DIM>* t, const unsigned int file_version)
 {
     // Retrieve data from archive required to construct new instance
-    AbstractCellPopulation<DIM>* p_cell_population;
+    AbstractCellPopulation<DIM, DIM>* p_cell_population;
     ar >> p_cell_population;
 
     // Invoke inplace constructor to initialise instance

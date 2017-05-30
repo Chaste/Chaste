@@ -43,7 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * An abstract class for on-lattice cell populations.
  */
 template<unsigned DIM>
-class AbstractOnLatticeCellPopulation : public AbstractCellPopulation<DIM>
+class AbstractOnLatticeCellPopulation : public AbstractCellPopulation<DIM, DIM>
 {
 private:
 
@@ -58,7 +58,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractCellPopulation<DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractCellPopulation<DIM, DIM> >(*this);
         archive & mUpdateRuleCollection;
         archive & mUpdateNodesInRandomOrder;
         archive & mIterateRandomlyOverUpdateRuleCollection;

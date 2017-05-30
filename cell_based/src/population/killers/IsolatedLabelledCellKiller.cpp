@@ -58,7 +58,7 @@ void IsolatedLabelledCellKiller<DIM>::CheckAndLabelCellsForApoptosisOrDeath()
     if (num_labelled_cells > 1)
     {
         // Iterate over cell population
-        for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->mpCellPopulation->Begin();
+        for (typename AbstractCellPopulation<DIM, DIM>::Iterator cell_iter = this->mpCellPopulation->Begin();
              cell_iter != this->mpCellPopulation->End();
              ++cell_iter)
         {

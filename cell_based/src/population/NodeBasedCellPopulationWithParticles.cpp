@@ -167,7 +167,7 @@ void NodeBasedCellPopulationWithParticles<DIM>::Validate()
     }
 
     // Look through all of the cells and record what node they are associated with.
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter=this->Begin(); cell_iter!=this->End(); ++cell_iter)
+    for (typename AbstractCellPopulation<DIM, DIM>::Iterator cell_iter=this->Begin(); cell_iter!=this->End(); ++cell_iter)
     {
         unsigned node_index = this->GetLocationIndexUsingCell((*cell_iter));
 
@@ -281,7 +281,7 @@ void NodeBasedCellPopulationWithParticles<DIM>::WriteVtkResultsToFile(const std:
     }
 
     // Loop over cells
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
+    for (typename AbstractCellPopulation<DIM, DIM>::Iterator cell_iter = this->Begin();
          cell_iter != this->End();
          ++cell_iter)
     {

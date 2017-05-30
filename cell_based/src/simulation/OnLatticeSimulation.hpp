@@ -101,7 +101,7 @@ public:
      * @param initialiseCells Whether to initialise cells (defaults to true, set to false when loading
      * from an archive)
      */
-    OnLatticeSimulation(AbstractCellPopulation<DIM>& rCellPopulation,
+    OnLatticeSimulation(AbstractCellPopulation<DIM, DIM>& rCellPopulation,
                         bool deleteCellPopulationInDestructor=false,
                         bool initialiseCells=true);
 
@@ -149,7 +149,7 @@ inline void save_construct_data(
     Archive & ar, const OnLatticeSimulation<DIM> * t, const unsigned int file_version)
 {
     // Save data required to construct instance
-    const AbstractCellPopulation<DIM>* p_cell_population = &(t->rGetCellPopulation());
+    const AbstractCellPopulation<DIM, DIM>* p_cell_population = &(t->rGetCellPopulation());
     ar & p_cell_population;
 }
 
@@ -161,7 +161,7 @@ inline void load_construct_data(
     Archive & ar, OnLatticeSimulation<DIM> * t, const unsigned int file_version)
 {
     // Retrieve data from archive required to construct new instance
-    AbstractCellPopulation<DIM>* p_cell_population;
+    AbstractCellPopulation<DIM, DIM>* p_cell_population;
     ar >> p_cell_population;
 
     // Invoke inplace constructor to initialise instance, last two variables set extra

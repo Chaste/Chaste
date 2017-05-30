@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define OFFLATTICESIMULATIONWITHMYSTOPPINGEVENT_HPP_
 
 #include "OffLatticeSimulation.hpp"
+#include "AbstractCellPopulation.hpp"
 
 /**
  * Simple subclass of OffLatticeSimulation which just overloads StoppingEventHasOccurred

@@ -78,6 +78,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellProperty.hpp"
 #include "AbstractForce.hpp"
 #include "HoneycombMeshGenerator.hpp"
+#include "NodeBasedCellPopulation.hpp"
 #include "NodesOnlyMesh.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"

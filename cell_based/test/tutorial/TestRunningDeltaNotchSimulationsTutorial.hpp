@@ -81,6 +81,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HoneycombMeshGenerator.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "NodeBasedCellPopulation.hpp"
+#include "NodesOnlyMesh.hpp"
 #include "OffLatticeSimulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
 #include "NagaiHondaForce.hpp"

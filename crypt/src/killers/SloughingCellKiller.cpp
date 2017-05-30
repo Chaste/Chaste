@@ -37,7 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 
 template<unsigned DIM>
-SloughingCellKiller<DIM>::SloughingCellKiller(AbstractCellPopulation<DIM>* pCrypt, double sloughHeight, bool sloughSides, double sloughWidth)
+SloughingCellKiller<DIM>::SloughingCellKiller(AbstractCellPopulation<DIM, DIM>* pCrypt, double sloughHeight, bool sloughSides, double sloughWidth)
     : AbstractCellKiller<DIM>(pCrypt),
       mSloughSides(sloughSides)
 {
@@ -73,7 +73,7 @@ void SloughingCellKiller<DIM>::CheckAndLabelCellsForApoptosisOrDeath()
     {
         case 1:
         {
-            for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->mpCellPopulation->Begin();
+            for (typename AbstractCellPopulation<DIM, DIM>::Iterator cell_iter = this->mpCellPopulation->Begin();
                  cell_iter != this->mpCellPopulation->End();
                  ++cell_iter)
             {
@@ -88,7 +88,7 @@ void SloughingCellKiller<DIM>::CheckAndLabelCellsForApoptosisOrDeath()
         }
         case 2:
         {
-            for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->mpCellPopulation->Begin();
+            for (typename AbstractCellPopulation<DIM, DIM>::Iterator cell_iter = this->mpCellPopulation->Begin();
                  cell_iter != this->mpCellPopulation->End();
                  ++cell_iter)
             {

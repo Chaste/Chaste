@@ -178,7 +178,7 @@ void NodeBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
      */
     if (mUseVariableRadii)
     {
-        for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
+        for (typename AbstractCellPopulation<DIM, DIM>::Iterator cell_iter = this->Begin();
              cell_iter != this->End();
              ++cell_iter)
         {
@@ -629,7 +629,7 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDir
         std::vector<double> vtk_cell_data(num_nodes);
 
         // Loop over cells
-        for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
+        for (typename AbstractCellPopulation<DIM, DIM>::Iterator cell_iter = this->Begin();
              cell_iter != this->End();
              ++cell_iter)
         {
@@ -645,7 +645,7 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDir
     }
 
     // Loop over cells
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
+    for (typename AbstractCellPopulation<DIM, DIM>::Iterator cell_iter = this->Begin();
          cell_iter != this->End();
          ++cell_iter)
     {

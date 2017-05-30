@@ -122,7 +122,7 @@ public:
     /**
      * @return const reference to the cell population (used in archiving).
      */
-    const AbstractCellPopulation<DIM>& rGetCellPopulation() const;
+    const AbstractCellPopulation<DIM, DIM>& rGetCellPopulation() const;
 
     /**
      * Set up the source terms.

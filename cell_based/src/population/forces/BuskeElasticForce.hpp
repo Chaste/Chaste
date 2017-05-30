@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 
 #include "AbstractTwoBodyInteractionForce.hpp"
+#include "NodeBasedCellPopulation.hpp"
 
 /**
  * A force law employed by Buske et al (2011) in their overlapping spheres

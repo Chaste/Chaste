@@ -72,7 +72,7 @@ void NodeBasedCellPopulationWithBuskeUpdate<DIM>::UpdateNodeLocations(double dt)
     Vec& r_vector = solver.rGetForceVector();
 
     // Iterate over all nodes associated with real cells to construct the matrix A.
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
+    for (typename AbstractCellPopulation<DIM, DIM>::Iterator cell_iter = this->Begin();
          cell_iter != this->End();
          ++cell_iter)
     {
@@ -171,7 +171,7 @@ void NodeBasedCellPopulationWithBuskeUpdate<DIM>::UpdateNodeLocations(double dt)
     ReplicatableVector soln_next_timestep_repl(soln_next_timestep);
 
     // Iterate over all nodes associated with real cells to update the node locations
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
+    for (typename AbstractCellPopulation<DIM, DIM>::Iterator cell_iter = this->Begin();
          cell_iter != this->End();
          ++cell_iter)
     {

@@ -37,7 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ApoptoticCellProperty.hpp"
 
 template<unsigned DIM>
-AveragedSourceEllipticPde<DIM>::AveragedSourceEllipticPde(AbstractCellPopulation<DIM>& rCellPopulation,
+AveragedSourceEllipticPde<DIM>::AveragedSourceEllipticPde(AbstractCellPopulation<DIM, DIM>& rCellPopulation,
                                                           double sourceCoefficient,
                                                           double diffusionCoefficient)
     : mrCellPopulation(rCellPopulation),
@@ -47,7 +47,7 @@ AveragedSourceEllipticPde<DIM>::AveragedSourceEllipticPde(AbstractCellPopulation
 }
 
 template<unsigned DIM>
-const AbstractCellPopulation<DIM>& AveragedSourceEllipticPde<DIM>::rGetCellPopulation() const
+const AbstractCellPopulation<DIM, DIM>& AveragedSourceEllipticPde<DIM>::rGetCellPopulation() const
 {
     return mrCellPopulation;
 }
@@ -69,7 +69,7 @@ void AveragedSourceEllipticPde<DIM>::SetupSourceTerms(TetrahedralMesh<DIM,DIM>& 
     }
 
     // Loop over cells, find which coarse element it is in, and add 1 to mSourceTermOnCoarseElements[elem_index]
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = mrCellPopulation.Begin();
+    for (typename AbstractCellPopulation<DIM, DIM>::Iterator cell_iter = mrCellPopulation.Begin();
          cell_iter != mrCellPopulation.End();
          ++cell_iter)
     {

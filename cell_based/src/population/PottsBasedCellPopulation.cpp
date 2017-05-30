@@ -52,7 +52,7 @@ void PottsBasedCellPopulation<DIM>::Validate()
     // Check each element has only one cell associated with it
     std::vector<unsigned> validated_element = std::vector<unsigned>(this->GetNumElements(), 0);
 
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
+    for (typename AbstractCellPopulation<DIM, DIM>::Iterator cell_iter = this->Begin();
          cell_iter != this->End();
          ++cell_iter)
     {
@@ -136,7 +136,7 @@ TetrahedralMesh<DIM, DIM>* PottsBasedCellPopulation<DIM>::GetTetrahedralMeshForP
     std::vector<Node<DIM>*> temp_nodes;
 
     // Create nodes at the centre of the cells
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
+    for (typename AbstractCellPopulation<DIM, DIM>::Iterator cell_iter = this->Begin();
          cell_iter != this->End();
          ++cell_iter)
     {
@@ -373,7 +373,7 @@ void PottsBasedCellPopulation<DIM>::OpenWritersFiles(OutputFileHandler& rOutputF
     // Add a CellID writer so that a VTK file will contain IDs for visualisation.  (It will also dump a "loggedcell.dat" file as a side-effect.)
     this-> template AddCellWriter<CellIdWriter>();
 
-    AbstractCellPopulation<DIM>::OpenWritersFiles(rOutputFileHandler);
+    AbstractCellPopulation<DIM, DIM>::OpenWritersFiles(rOutputFileHandler);
 }
 
 template<unsigned DIM>
@@ -381,7 +381,7 @@ void PottsBasedCellPopulation<DIM>::WriteResultsToFiles(const std::string& rDire
 {
     CreateElementTessellation(); // To be used to output to the visualizer
 
-    AbstractCellPopulation<DIM>::WriteResultsToFiles(rDirectory);
+    AbstractCellPopulation<DIM, DIM>::WriteResultsToFiles(rDirectory);
 }
 
 template<unsigned DIM>

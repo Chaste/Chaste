@@ -87,6 +87,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellsGenerator.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "NodeBasedCellPopulation.hpp"
+#include "NodesOnlyMesh.hpp"
 #include "VertexBasedCellPopulation.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
 #include "NagaiHondaForce.hpp"

@@ -65,7 +65,7 @@ void AveragedSourceParabolicPde<DIM>::SetupSourceTerms(TetrahedralMesh<DIM,DIM>&
     }
 
     // Loop over cells, find which coarse element it is in, and add 1 to mSourceTermOnCoarseElements[elem_index]
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = mrCellPopulation.Begin();
+    for (typename AbstractCellPopulation<DIM, DIM>::Iterator cell_iter = mrCellPopulation.Begin();
          cell_iter != mrCellPopulation.End();
          ++cell_iter)
     {
