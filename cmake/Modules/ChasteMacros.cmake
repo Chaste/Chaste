@@ -527,7 +527,7 @@ macro(Chaste_DO_TEST_COMMON component)
     include_directories(SYSTEM "${CXXTEST_INCLUDES}")
 
     # Make test library if sources exist
-    if (EXISTS chaste_${component})
+    if (TARGET chaste_${component})
         set(COMPONENT_LIBRARIES chaste_${component})
     else()
         set(COMPONENT_LIBRARIES ${Chaste_LIBRARIES})
