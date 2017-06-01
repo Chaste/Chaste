@@ -79,17 +79,17 @@ public:
 
         /* argv[0] will be equal to global/build/debug/TestCommandLineArguments
          * or global/build/optimised/TestCommandLineArguments, etc
-	 * Variations on Windows (CMake) include .../TestCommandLineArguments.exe 
+         * Variations on Windows (CMake) include .../TestCommandLineArguments.exe 
          * Test executables built with SCons (deprecated) have the word Runner
-	 * * .../TestCommandLineArgumentsRunner
-	 * * .../TestCommandLineArgumentsRunner.exe
+         * * .../TestCommandLineArgumentsRunner
+         * * .../TestCommandLineArgumentsRunner.exe
          */ 
-	char** argv = *(CommandLineArguments::Instance()->p_argv);
+        char** argv = *(CommandLineArguments::Instance()->p_argv);
         assert(argv != NULL);
         std::string arg_as_string(argv[0]);
         size_t pos = arg_as_string.find("TestCommandLineArguments");
-	// If TestCommandLineArguments is not a substring of the commandline then pos==std::string::npos
-	TS_ASSERT_DIFFERS(pos, std::string::npos);
+        // If TestCommandLineArguments is not a substring of the commandline then pos==std::string::npos
+        TS_ASSERT_DIFFERS(pos, std::string::npos);
 
         // Now test OptionExists() and GetValueCorrespondingToOption()
         //
@@ -293,8 +293,8 @@ public:
         assert(argv != NULL);
         std::string arg_as_string(argv[0]);
         size_t pos = arg_as_string.find("TestCommandLineArguments");
-	// If TestCommandLineArguments is not a substring of the commandline then pos==std::string::npos
-	TS_ASSERT_DIFFERS(pos, std::string::npos);
+        // If TestCommandLineArguments is not a substring of the commandline then pos==std::string::npos
+        TS_ASSERT_DIFFERS(pos, std::string::npos);
     }
 
     /* A test which a user can run in order to check that they are passing command line arguments correctly*/
