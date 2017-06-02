@@ -67,6 +67,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SurfaceAreaConstraintPottsUpdateRule.hpp"
 #include "CaBasedCellPopulation.hpp"
 #include "DiffusionCaUpdateRule.hpp"
+#include "NodesOnlyMesh.hpp"
 
 // This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"

@@ -50,6 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PlaneBoundaryCondition.hpp"
 #include "SphereGeometryBoundaryCondition.hpp"
 #include "MeshBasedCellPopulation.hpp"
+#include "NodesOnlyMesh.hpp"
 #include "TrianglesMeshReader.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "AbstractCellBasedTestSuite.hpp"

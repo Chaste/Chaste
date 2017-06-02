@@ -55,6 +55,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HoneycombMeshGenerator.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
 #include "NodeBasedCellPopulation.hpp"
+#include "NodesOnlyMesh.hpp"
 #include "RepulsionForce.hpp"
 #include "CellLabel.hpp"
 #include "VertexBasedCellPopulation.hpp"

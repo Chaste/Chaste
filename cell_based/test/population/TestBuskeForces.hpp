@@ -51,6 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellBasedTestSuite.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "FileComparison.hpp"
+#include "NodesOnlyMesh.hpp"
 
 #include "PetscSetupAndFinalize.hpp"
 

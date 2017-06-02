@@ -62,6 +62,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PottsMeshGenerator.hpp"
 #include "CaBasedCellPopulation.hpp"
 #include "UniformSourceEllipticPde.hpp"
+#include "NodesOnlyMesh.hpp"
 
 // This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"

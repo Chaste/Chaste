@@ -53,6 +53,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PlaneBoundaryCondition.hpp"
 #include "PlaneBasedCellKiller.hpp"
 #include "UniformG1GenerationalCellCycleModel.hpp"
+#include "NodesOnlyMesh.hpp"
 
 // Cell population writers
 #include "NodeVelocityWriter.hpp"
