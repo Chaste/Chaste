@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef ABSTRACTSRN_HPP_
-#define ABSTRACTSRN_HPP_
+#ifndef ABSTRACTSRNMODEL_HPP_
+#define ABSTRACTSRNMODEL_HPP_
 
 #include "ChasteSerialization.hpp"
 #include "ClassIsAbstract.hpp"
@@ -65,7 +65,7 @@ private:
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
-     * Archive the object and its member variables.
+     * Archive the SRN model and its member variables.
      *
      * @param archive the archive
      * @param version the current version of this class
@@ -104,7 +104,7 @@ protected:
     double mSimulatedToTime;
 
     /**
-     * Protected copy-constructor for use by CreateSrnModel.  The only way for external code to create a copy of a SRN model
+     * Protected copy-constructor for use by CreateSrnModel().  The only way for external code to create a copy of a SRN model
      * is by calling that method, to ensure that a model of the correct subclass is created.
      * This copy-constructor helps subclasses to ensure that all member variables are correctly copied when this happens.
      *
@@ -128,7 +128,7 @@ public:
     /**
      * Base class with virtual methods needs a virtual destructor. The destructor
      * does not delete mpCell. Instead, the cell takes responsibility for deleting
-     * the cell-cycle model when it is destroyed.
+     * the SRN model when it is destroyed.
      */
     virtual ~AbstractSrnModel();
 
@@ -144,7 +144,7 @@ public:
      *
      * This method will be called precisely once per cell set up in the initial
      * cell population. It is not called on cell division; use ResetForDivision(),
-     * CreateCellCycleModel() and InitialiseDaughterCell() for that.
+     * CreateSrnModel() and InitialiseDaughterCell() for that.
      *
      * By the time this is called, a CellPopulation will have been set up, so the model
      * can know where its cell is located in space. If relevant to the simulation,
@@ -155,13 +155,13 @@ public:
     /**
      * Initialise the new daughter cell's SRN model after a cell division.
      *
-     * This is called by Cell::Divide once the new cell object
+     * This is called by Cell::Divide() once the new cell object
      * has been fully created, to perform any initialisation of the
      * SRN which requires access to the cell.
      *
      * Note that much initialisation can be performed using the
      * combination of ResetForDivision() (called on the parent prior to
-     * division) and CreateCellCycleModel() (called on the reset
+     * division) and CreateSrnModel() (called on the reset
      * parent to create the new cell-cycle model object).
      */
     virtual void InitialiseDaughterCell();
@@ -241,4 +241,4 @@ public:
 
 CLASS_IS_ABSTRACT(AbstractSrnModel)
 
-#endif /* ABSTRACTSRN_HPP_ */
+#endif /* ABSTRACTSRNMODEL_HPP_ */
