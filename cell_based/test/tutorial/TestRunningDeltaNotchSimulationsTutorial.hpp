@@ -276,10 +276,13 @@ public:
     /*
      * EMPTYLINE
      *
-     * To visualize the results, use Paraview. See the UserTutorials/VisualizingWithParaview tutorial for more information
+     * To visualize the results, use Paraview. See the UserTutorials/VisualizingWithParaview tutorial for more information.
      *
      * Load the file {{{/tmp/$USER/testoutput/TestNodeBasedMonolayerWithDeltaNotch/results_from_time_0/results.pvd}}},
-     * add a spherical glyph.
+     * and add a spherical glyph.
+     *
+     * Note that, for larger simulations, you may need to unclick "Mask Points" (or similar) so as not to limit the number of glyphs
+     * displayed by Paraview.
      */
 };
 
