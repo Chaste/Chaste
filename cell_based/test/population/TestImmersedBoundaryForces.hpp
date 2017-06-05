@@ -55,8 +55,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // This test is never run in parallel
 #include "FakePetscSetup.hpp"
 
-#include "Debug.hpp"
-
 class TestImmersedBoundaryForces : public AbstractCellBasedTestSuite
 {
 public:
@@ -89,12 +87,8 @@ public:
         node0.ClearAppliedForce();
         node1.ClearAppliedForce();
 
-        PRINT_VECTOR(node0.rGetAppliedForce());
-
         ImmersedBoundaryLinearInteractionForce<2> force;
         force.AddImmersedBoundaryForceContribution(node_pair, cell_population);
-
-        PRINT_VECTOR(node0.rGetAppliedForce());
     }
 
     void TestArchivingOfImmersedBoundaryLinearInteractionForce() throw (Exception)
@@ -114,6 +108,9 @@ public:
             force.SetRestLength(2.34);
             force.SetLaminaSpringConstMult(3.45);
             force.SetLaminaRestLengthMult(4.56);
+            force.SetAdditiveNormalNoise(true);
+            force.SetNormalNoiseMean(5.67);
+            force.SetNormalNoiseStdDev(6.78);
 
             // Serialize via pointer to most abstract class possible
             AbstractImmersedBoundaryForce<2>* const p_force = &force;
@@ -136,6 +133,9 @@ public:
             TS_ASSERT_DELTA(p_derived_force->GetRestLength(), 2.34, 1e-6);
             TS_ASSERT_DELTA(p_derived_force->GetLaminaSpringConstMult(), 3.45, 1e-6);
             TS_ASSERT_DELTA(p_derived_force->GetLaminaRestLengthMult(), 4.56, 1e-6);
+            TS_ASSERT(p_derived_force->GetAdditiveNormalNoise());
+            TS_ASSERT_DELTA(p_derived_force->GetNormalNoiseMean(), 5.67, 1e-6);
+            TS_ASSERT_DELTA(p_derived_force->GetNormalNoiseStdDev(), 6.78, 1e-6);
 
             // Tidy up
             delete p_force;
@@ -165,6 +165,9 @@ public:
             force.SetLaminaWellDepthMult(3.45);
             force.SetLaminaRestLengthMult(4.56);
             force.SetWellWidth(5.67);
+            force.SetAdditiveNormalNoise(true);
+            force.SetNormalNoiseMean(6.78);
+            force.SetNormalNoiseStdDev(7.89);
 
             // Serialize via pointer to most abstract class possible
             AbstractImmersedBoundaryForce<2>* const p_force = &force;
@@ -188,6 +191,9 @@ public:
             TS_ASSERT_DELTA(p_derived_force->GetLaminaWellDepthMult(), 3.45, 1e-6);
             TS_ASSERT_DELTA(p_derived_force->GetLaminaRestLengthMult(), 4.56, 1e-6);
             TS_ASSERT_DELTA(p_derived_force->GetWellWidth(), 5.67, 1e-6);
+            TS_ASSERT(p_derived_force->GetAdditiveNormalNoise());
+            TS_ASSERT_DELTA(p_derived_force->GetNormalNoiseMean(), 6.78, 1e-6);
+            TS_ASSERT_DELTA(p_derived_force->GetNormalNoiseStdDev(), 7.89, 1e-6);
 
             // Tidy up
             delete p_force;
@@ -216,6 +222,9 @@ public:
             force.SetElementRestLength(2.34);
             force.SetLaminaSpringConst(3.45);
             force.SetLaminaRestLength(4.56);
+            force.SetAdditiveNormalNoise(true);
+            force.SetNormalNoiseMean(5.67);
+            force.SetNormalNoiseStdDev(6.78);
 
             // Serialize via pointer to most abstract class possible
             AbstractImmersedBoundaryForce<2>* const p_force = &force;
@@ -238,6 +247,9 @@ public:
             TS_ASSERT_DELTA(p_derived_force->GetElementRestLength(), 2.34, 1e-6);
             TS_ASSERT_DELTA(p_derived_force->GetLaminaSpringConst(), 3.45, 1e-6);
             TS_ASSERT_DELTA(p_derived_force->GetLaminaRestLength(), 4.56, 1e-6);
+            TS_ASSERT(p_derived_force->GetAdditiveNormalNoise());
+            TS_ASSERT_DELTA(p_derived_force->GetNormalNoiseMean(), 5.67, 1e-6);
+            TS_ASSERT_DELTA(p_derived_force->GetNormalNoiseStdDev(), 6.78, 1e-6);
 
             // Tidy up
             delete p_force;
@@ -267,6 +279,9 @@ public:
             force.SetLaminaWellDepth(3.45);
             force.SetLaminaRestLength(4.56);
             force.SetWellWidth(5.67);
+            force.SetAdditiveNormalNoise(true);
+            force.SetNormalNoiseMean(6.78);
+            force.SetNormalNoiseStdDev(7.89);
 
             // Serialize via pointer to most abstract class possible
             AbstractImmersedBoundaryForce<2>* const p_force = &force;
@@ -291,6 +306,9 @@ public:
             TS_ASSERT_DELTA(p_derived_force->GetLaminaRestLength(), 4.56, 1e-6);
             TS_ASSERT_DELTA(p_derived_force->GetLaminaRestLength(), 4.56, 1e-6);
             TS_ASSERT_DELTA(p_derived_force->GetWellWidth(), 5.67, 1e-6);
+            TS_ASSERT(p_derived_force->GetAdditiveNormalNoise());
+            TS_ASSERT_DELTA(p_derived_force->GetNormalNoiseMean(), 6.78, 1e-6);
+            TS_ASSERT_DELTA(p_derived_force->GetNormalNoiseStdDev(), 7.89, 1e-6);
 
             // Tidy up
             delete p_force;
@@ -310,6 +328,9 @@ public:
             cell_cell_force.SetRestLength(2.34);
             cell_cell_force.SetLaminaSpringConstMult(3.45);
             cell_cell_force.SetLaminaRestLengthMult(4.56);
+            cell_cell_force.SetAdditiveNormalNoise(true);
+            cell_cell_force.SetNormalNoiseMean(5.67);
+            cell_cell_force.SetNormalNoiseStdDev(6.78);
 
             TS_ASSERT_EQUALS(cell_cell_force.GetIdentifier(), "ImmersedBoundaryLinearInteractionForce-2");
 
@@ -334,6 +355,9 @@ public:
             cell_cell_force.SetLaminaWellDepthMult(3.45);
             cell_cell_force.SetLaminaRestLengthMult(4.56);
             cell_cell_force.SetWellWidth(5.67);
+            cell_cell_force.SetAdditiveNormalNoise(true);
+            cell_cell_force.SetNormalNoiseMean(6.78);
+            cell_cell_force.SetNormalNoiseStdDev(7.89);
 
             TS_ASSERT_EQUALS(cell_cell_force.GetIdentifier(), "ImmersedBoundaryMorseInteractionForce-2");
 
@@ -357,6 +381,9 @@ public:
             membrane_force.SetElementRestLength(6.78);
             membrane_force.SetLaminaSpringConst(7.89);
             membrane_force.SetLaminaRestLength(8.91);
+            membrane_force.SetAdditiveNormalNoise(true);
+            membrane_force.SetNormalNoiseMean(1.23);
+            membrane_force.SetNormalNoiseStdDev(2.34);
 
             TS_ASSERT_EQUALS(membrane_force.GetIdentifier(), "ImmersedBoundaryLinearMembraneForce-2");
 
@@ -381,6 +408,9 @@ public:
             membrane_force.SetLaminaWellDepth(3.45);
             membrane_force.SetLaminaRestLength(4.56);
             membrane_force.SetWellWidth(5.67);
+            membrane_force.SetAdditiveNormalNoise(true);
+            membrane_force.SetNormalNoiseMean(6.78);
+            membrane_force.SetNormalNoiseStdDev(7.89);
 
             TS_ASSERT_EQUALS(membrane_force.GetIdentifier(), "ImmersedBoundaryMorseMembraneForce-2");
 

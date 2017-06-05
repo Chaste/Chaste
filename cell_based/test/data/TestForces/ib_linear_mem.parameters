@@ -2,3 +2,6 @@
 			<ElementRestLength>6.78</ElementRestLength>
 			<LaminaSpringConstant>7.89</LaminaSpringConstant>
 			<LaminaRestLength>8.91</LaminaRestLength>
+			<AdditiveNormalNoise>1</AdditiveNormalNoise>
+			<NormalNoiseMean>1.23</NormalNoiseMean>
+			<NormalNoiseStdDev>2.34</NormalNoiseStdDev>

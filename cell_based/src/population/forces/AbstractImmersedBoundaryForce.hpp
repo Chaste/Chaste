@@ -39,6 +39,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteSerialization.hpp"
 #include "ClassIsAbstract.hpp"
 #include "ImmersedBoundaryCellPopulation.hpp"
+#include "RandomNumberGenerator.hpp"
+
+#include "Debug.hpp"
 
 /**
  * An abstract immersed boundary force class, for use in 
@@ -55,6 +58,7 @@ private:
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
+
     /**
      * Serialize the object.
      *
@@ -64,7 +68,29 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
+        archive& mAdditiveNormalNoise;
+        archive& mNormalNoiseMean;
+        archive& mNormalNoiseStdDev;
     }
+
+protected:
+
+    /**
+     * Add the random noise to nodes, if mAdditiveNormalNoise is set.  This method handles randomization of the
+     * forces in such a way as to ensure no net change to forces across the whole domain.
+     *
+     * @param rCellPopulation an immersed boundary cell population
+     */
+    void AddNormalNoiseToNodes(ImmersedBoundaryCellPopulation<DIM>& rCellPopulation);
+
+    /** Whether to apply multiplicative normal noise to the calculated force */
+    bool mAdditiveNormalNoise;
+
+    /** The mean of the Normal distribution from which random noise variations are drawn */
+    double mNormalNoiseMean;
+
+    /** The standard deviation of the Normal distribution from which random noise variations are drawn */
+    double mNormalNoiseStdDev;
 
 public:
 
@@ -112,6 +138,24 @@ public:
      * @param rParamsFile the file stream to which the parameters are output
      */
     virtual void OutputImmersedBoundaryForceParameters(out_stream& rParamsFile)=0;
+
+    /** @return mAdditiveNormalNoise */
+    bool GetAdditiveNormalNoise() const;
+
+    /** @param additiveNormalNoise whether to include multiplicative normal noise */
+    void SetAdditiveNormalNoise(bool additiveNormalNoise);
+
+    /** @return mNormalNoiseMean */
+    double GetNormalNoiseMean() const;
+
+    /** @param normalNoiseMean the new value of mNormalNoiseMean */
+    void SetNormalNoiseMean(double normalNoiseMean);
+
+    /** @return mNormalNoiseStdDev */
+    double GetNormalNoiseStdDev() const;
+
+    /** @param normalNoiseStdDev the new value of mNormalNoiseStdDev */
+    void SetNormalNoiseStdDev(double normalNoiseStdDev);
 };
 
 TEMPLATED_CLASS_IS_ABSTRACT_1_UNSIGNED(AbstractImmersedBoundaryForce)

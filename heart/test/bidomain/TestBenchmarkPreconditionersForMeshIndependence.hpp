@@ -180,26 +180,11 @@ private:
 
 public:
 
-
     void TestMeshIndependentPreconditionersBJ()
     {
         SetParametersMeshIndependent();
         HeartConfig::Instance()->SetKSPPreconditioner("bjacobi");
         HeartConfig::Instance()->SetOutputFilenamePrefix("BidomainMeshIndependencePEBJ");
-
-        MultiMeshSolver<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<3>, 3, 2> tester(mesh_size, num_meshes);
-
-        tester.Solve();
-    }
-
-    void TestMeshIndependentPreconditionersAMG()
-    {
-        SetParametersMeshIndependent();
-        HeartConfig::Instance()->SetKSPPreconditioner("hypre");
-        PetscTools::SetOption("-pc_hypre_type", "boomeramg");
-        PetscTools::SetOption("-pc_hypre_boomeramg_max_iter", "1");
-        PetscTools::SetOption("-pc_hypre_boomeramg_strong_threshold", "0.0");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("BidomainMeshIndependencePEAMG");
 
         MultiMeshSolver<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<3>, 3, 2> tester(mesh_size, num_meshes);
 

@@ -498,7 +498,7 @@ public:
         }
         else
         {
-            //In parallel we need to apply the permuation to original data
+            //In parallel we need to apply the permutation to original data
             //Node i in the original data has moved to index mesh.rGetNodePermutation()[i]
             //therefore we will find its data in rGetLayerForEachNode()[ permutation...]
 

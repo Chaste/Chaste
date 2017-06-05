@@ -73,6 +73,11 @@ void ImmersedBoundaryMorseMembraneForce<DIM>::AddImmersedBoundaryForceContributi
     {
         CalculateForcesOnElement(*lam_it, rCellPopulation, intrinsicSpacingSquared);
     }
+
+    if (this->mAdditiveNormalNoise)
+    {
+        this->AddNormalNoiseToNodes(rCellPopulation);
+    }
 }
 
 template <unsigned DIM>

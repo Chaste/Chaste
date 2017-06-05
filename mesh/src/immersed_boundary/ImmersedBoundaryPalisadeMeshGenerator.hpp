@@ -61,12 +61,14 @@ public:
      * Default constructor.
      *
      * @param numCellsWide  the number of cells from left to right along the domain
-     * @param numNodesPerCell  the number of nodes per cell (defaults to 100)
+     * @param numNodesPerCell  the number of nodes per cell (defaults to 100).  Overridden by numFluidMeshPoints
      * @param ellipseExponent  the exponent of the superellipse (defaults to 0.2)
      * @param cellAspectRatio  the aspect ratio of each cell (defaults to 2)
      * @param randomYMult  the random variation in y_pos (defaults to 0)
      * @param basalLamina whether the palisade has a basal lamina (defaults to false)
      * @param apicalLamina whether the palisade has an apical lamina (defaults to false)
+     * @param leakyLaminas whether the laminas should have a deliberately course node-spacing (defaults to false)
+     * @param numFluidMeshPoints number of fluid mesh points (X and Y).  Overrides numNodesPerCell (defaults to UINT_MAX)
      */
     ImmersedBoundaryPalisadeMeshGenerator(unsigned numCellsWide,
                                           unsigned numNodesPerCell=100,
@@ -74,7 +76,9 @@ public:
                                           double cellAspectRatio=2.0,
                                           double randomYMult=0.0,
                                           bool basalLamina=false,
-                                          bool apicalLamina=false);
+                                          bool apicalLamina=false,
+                                          bool leakyLaminas=false,
+                                          unsigned numFluidMeshPoints=UINT_MAX);
 
     /**
      * Null constructor for derived classes to call.

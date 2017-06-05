@@ -35,6 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ImmersedBoundarySimulationModifier.hpp"
 #include "FluidSource.hpp"
+#include "RandomNumberGenerator.hpp"
 //#include <fstream>  // Used to output pressure drop
 
 template<unsigned DIM>
@@ -48,6 +49,9 @@ ImmersedBoundarySimulationModifier<DIM>::ImmersedBoundarySimulationModifier()
       mGridSpacingX(0.0),
       mGridSpacingY(0.0),
       mFftNorm(0.0),
+      mAdditiveNormalNoise(false),
+      mNormalNoiseMean(1.0),
+      mNormalNoiseStdDev(0.0),
       mpBoxCollection(NULL),
       mReynoldsNumber(1e-4),
       mDeltaPx(0.0),
@@ -229,6 +233,21 @@ void ImmersedBoundarySimulationModifier<DIM>::AddImmersedBoundaryForceContributi
          ++iter)
     {
         (*iter)->AddImmersedBoundaryForceContribution(mNodePairs, *mpCellPopulation);
+    }
+
+    // If noise is to be added to the forces, add it here, after all forces have been calculated.
+    if (mAdditiveNormalNoise)
+    {
+        RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
+
+        // Loop over each node, and apply a random normal factor to its force vector
+        for (typename ImmersedBoundaryMesh<DIM, DIM>::NodeIterator node_iter = mpMesh->GetNodeIteratorBegin(false);
+             node_iter != mpMesh->GetNodeIteratorEnd();
+             ++node_iter)
+        {
+            node_iter->rGetAppliedForce()[0] *= p_gen->NormalRandomDeviate(mNormalNoiseMean, mNormalNoiseStdDev);
+            node_iter->rGetAppliedForce()[1] *= p_gen->NormalRandomDeviate(mNormalNoiseMean, mNormalNoiseStdDev);
+        }
     }
 }
 
@@ -682,6 +701,42 @@ template<unsigned DIM>
 double ImmersedBoundarySimulationModifier<DIM>::GetReynoldsNumber()
 {
     return mReynoldsNumber;
+}
+
+template <unsigned DIM>
+bool ImmersedBoundarySimulationModifier<DIM>::GetAdditiveNormalNoise() const
+{
+    return mAdditiveNormalNoise;
+}
+
+template <unsigned DIM>
+void ImmersedBoundarySimulationModifier<DIM>::SetAdditiveNormalNoise(bool additiveNormalNoise)
+{
+    mAdditiveNormalNoise = additiveNormalNoise;
+}
+
+template <unsigned DIM>
+double ImmersedBoundarySimulationModifier<DIM>::GetNormalNoiseMean() const
+{
+    return mNormalNoiseMean;
+}
+
+template <unsigned DIM>
+void ImmersedBoundarySimulationModifier<DIM>::SetNormalNoiseMean(double normalNoiseMean)
+{
+    mNormalNoiseMean = normalNoiseMean;
+}
+
+template <unsigned DIM>
+double ImmersedBoundarySimulationModifier<DIM>::GetNormalNoiseStdDev() const
+{
+    return mNormalNoiseStdDev;
+}
+
+template <unsigned DIM>
+void ImmersedBoundarySimulationModifier<DIM>::SetNormalNoiseStdDev(double normalNoiseStdDev)
+{
+    mNormalNoiseStdDev = normalNoiseStdDev;
 }
 
 template<unsigned DIM>
