@@ -343,18 +343,17 @@ set(HDF5_PREFER_PARALLEL TRUE)
 if (Chaste_USE_PETSC_HDF5)
     if (EXISTS "${PETSC_DIR}/${PETSC_ARCH}/bin/h5diff")
         set(ENV{HDF5_ROOT} "${PETSC_DIR}/${PETSC_ARCH}")
-
-        # Find the HDF5_C_COMPILER_EXECUTABLE to help the find_package call (else the system HDF5 will be found)
-        find_program( HDF5_C_COMPILER_EXECUTABLE
-                NAMES h5pcc h5cc
-                HINTS ENV HDF5_ROOT
-                PATH_SUFFIXES bin Bin
-                DOC "HDF5 Wrapper compiler.  Used only to detect HDF5 compile flags." )
     else()
-        message("-- No HDF5 found in ${PETSC_DIR}/${PETSC_ARCH}: looking for system HDF5 instead")
+        message("-- No HDF5 found in ${PETSC_DIR}/${PETSC_ARCH}: looking for alternative HDF5 instead")
     endif()
 endif()
 
+# Find the HDF5_C_COMPILER_EXECUTABLE to help the find_package call (else the system HDF5 will always be found)
+find_program( HDF5_C_COMPILER_EXECUTABLE
+        NAMES h5pcc h5cc
+        HINTS ENV HDF5_ROOT
+        PATH_SUFFIXES bin Bin
+        DOC "HDF5 Wrapper compiler.  Used only to detect HDF5 compile flags." )
 find_package(HDF5 REQUIRED)
 
 # Chaste requires a parallel HDF5 library
