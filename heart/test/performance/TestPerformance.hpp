@@ -63,7 +63,7 @@ public:
         HeartEventHandler::Headings();
 
         // base line test
-        PerformanceTester<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<2>, 2> tester;
+        PerformanceTester<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<2>, 2> tester("TestPerf");
         tester.MeshNum=2;
         tester.SimTime=4.0;
         tester.Run();
