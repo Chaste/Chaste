@@ -1170,6 +1170,17 @@ Vec LinearSystem::Solve(Vec lhsGuess)
             KSPSetNormType(mKspSolver, KSP_NO_NORM);
 #elif (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
             KSPSetNormType(mKspSolver, KSP_NORM_NONE);
+    #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 7) //PETSc 3.7 or later
+              /*
+             * Up to PETSc 3.7.2 the above call also turned off the default convergence test.
+             * However, in PETSc 3.7.3 (subminor release) this behaviour was removed and so, here,
+             * we explicitly add it back again.
+             * See
+             * https://bitbucket.org/petsc/petsc/commits/eb70c44be3430b039effa3de7e1ca2fab9f75a57
+             * This following line of code is actually valid from PETSc 3.5.
+             */
+            KSPSetConvergenceTest(mKspSolver, KSPConvergedSkip, PETSC_NULL, PETSC_NULL);
+    #endif
 #else
             KSPSetNormType(mKspSolver, KSP_NORM_NO);
 #endif
