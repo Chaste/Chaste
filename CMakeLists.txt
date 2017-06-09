@@ -852,7 +852,7 @@ if (Chaste_CLANG_TIDY)
     endforeach(src_file)
 
     # Create a target that will run clang_tidy on each target
-    ADD_CUSTOM_TARGET(clang_format ALL DEPENDS ${out_files})
+    ADD_CUSTOM_TARGET(clang_tidy ALL DEPENDS ${out_files})
 endif()
 
 ####################
