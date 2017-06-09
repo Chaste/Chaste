@@ -83,6 +83,14 @@ if (UNIX)
     if (Chaste_COVERAGE_CPUS GREATER 1)
         set(Chaste_COVERAGE ON)
     endif()
+    # Clang tidy
+    option(Chaste_CLANG_TIDY "Configure Chaste for Clang tidy" OFF)
+    if (Chaste_CLANG_TIDY)
+        # This creates a compile_commands.json in the build directory
+        set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+        set(Chaste_CLANG_TIDY_OUTPUT_DIR ${Chaste_BINARY_DIR}/clang_tidy)
+        file(MAKE_DIRECTORY ${Chaste_CLANG_TIDY_OUTPUT_DIR})
+    endif()
     # Profiling
     option(Chaste_PROFILE_GPERFTOOLS "Compile Chaste with gperftools profiling support" OFF)
     set(Chaste_PROFILE_GPERFTOOLS_CPUS 1 CACHE STRING "Number of CPUs for GPERFTOOLS profiling (default 1)")
@@ -789,6 +797,62 @@ if (Chaste_COVERAGE)
 		COMMAND ;
 		COMMENT "Open ./${_outputname}/index.html in your browser to view the coverage report."
 	)
+endif()
+
+
+####################
+#    CLANG TIDY    #
+####################
+
+if (Chaste_CLANG_TIDY)
+
+    # Find the executable; highest version number for preference
+    find_program(
+            CLANG_TIDY
+            NAMES clang-tidy-5.0 clang-tidy-4.0 clang-tidy-3.9 clang-tidy-3.8
+            HINTS $ENV{CLANG_TIDY_DIR} /usr/bin
+            DOC "Clang tidy executable."
+    )
+
+    # Get a list of all source files we wish to process with clang_tidy
+    set(LIST_OF_TRANSLATION_UNITS "")
+    foreach(component ${Chaste_COMPONENTS})
+        # Every translation unit including HeartConfig.hpp will #include "ChasteParameters_3_4.hpp" which doesn't exist
+        # until compilation. \todo: how can we get around this, ideally without having to compile!
+        if (NOT (${component} MATCHES heart))
+            # Get the cpp files recursively from this component
+            file(GLOB_RECURSE potential_srcs RELATIVE ${Chaste_SOURCE_DIR} ${component}/src/*.cpp)
+            # Check them for specific excludes
+            foreach(potential_src ${potential_srcs})
+                if (NOT (${potential_src} MATCHES 3rdparty))
+                    list(APPEND LIST_OF_TRANSLATION_UNITS ${potential_src})
+                endif()
+            endforeach()
+        endif (NOT (${component} MATCHES heart))
+    endforeach(component)
+
+    # Add custom commands: one for each src file to process
+    foreach(src_file ${LIST_OF_TRANSLATION_UNITS})
+        # Generate output file name from source file path
+        string(REPLACE "/" "_" out_file_name ${src_file})
+        set(out_file "${Chaste_BINARY_DIR}/clang_tidy/${out_file_name}")
+
+        # Generate path to input file
+        set(infile "${Chaste_SOURCE_DIR}/${src_file}")
+
+        # Custom command to do the processing
+        ADD_CUSTOM_COMMAND(
+                OUTPUT "${out_file}"
+                COMMAND ${CLANG_TIDY} -p=${Chaste_BINARY_DIR} ${Chaste_SOURCE_DIR}/${src_file} > ${out_file}
+                COMMENT "Producing clang_tidy report: ${out_file}"
+        )
+
+        # Finally set out_files for dependencies
+        set(out_files ${out_files} "${out_file}")
+    endforeach(src_file)
+
+    # Create a target that will run clang_tidy on each target
+    ADD_CUSTOM_TARGET(clang_format ALL DEPENDS ${out_files})
 endif()
 
 ####################
