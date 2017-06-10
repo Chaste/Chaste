@@ -58,6 +58,7 @@ project(Chaste)
 set (Chaste_VERSION_MAJOR 3 CACHE STRING "Chaste major version number")
 set (Chaste_VERSION_MINOR 4 CACHE STRING "Chaste minor version number")
 
+include(ChasteHostOperatingSystem)
 include(ChasteBuildTypes)
 
 option(Chaste_ERROR_ON_WARNING "Error on compiler warnings" ON)
@@ -322,11 +323,11 @@ endif()
 ####  Find Boost
 ################################
 add_definitions( -DBOOST_ALL_NO_LIB )
-set( Boost_USE_STATIC_RUNTIME ON) 
+set( Boost_USE_STATIC_RUNTIME ON)
 if(BUILD_SHARED_LIBS)
-	set( Boost_USE_STATIC_LIBS OFF) 
+	set( Boost_USE_STATIC_LIBS OFF)
 else()
-	set( Boost_USE_STATIC_LIBS ON) 
+	set( Boost_USE_STATIC_LIBS ON)
 endif()
 find_package(Boost COMPONENTS filesystem system serialization program_options REQUIRED)
 list(APPEND Chaste_INCLUDES "${Boost_INCLUDE_DIR}")
@@ -377,7 +378,7 @@ foreach(dir ${HDF5_LIBRARIES})
     endif()
 endforeach()
 
-# put petsc includes after hdf5 includes or else the hdf5 headers 
+# put petsc includes after hdf5 includes or else the hdf5 headers
 # in the petsc include dir will clobber those chosen on FindHdf5.cmake
 list(APPEND Chaste_INCLUDES "${PETSC_INCLUDES}")
 
@@ -547,7 +548,7 @@ add_custom_target(tutorials)
 #################################################
 
 set(Chaste_ALL_LIBRARIES "")
-if (Chaste_ENABLE_TESTING) 
+if (Chaste_ENABLE_TESTING)
     foreach(type ${TestPackTypes})
         add_custom_target(${type})
     endforeach()
@@ -658,7 +659,7 @@ endif()
 # RUN PYTHON TESTS #
 ####################
 
-if (Chaste_ENABLE_TESTING) 
+if (Chaste_ENABLE_TESTING)
     add_subdirectory(python/test)
 endif()
 
@@ -676,9 +677,9 @@ endforeach(projectName)
 
 export(PACKAGE Chaste)
 
-export(TARGETS ${Chaste_ALL_LIBRARIES} 
+export(TARGETS ${Chaste_ALL_LIBRARIES}
     FILE "${Chaste_BINARY_DIR}/ChasteTargets.cmake"
-    #added in 2.8.12, need this?    EXPORT_LINK_INTERFACE_LIBRARIES 
+    #added in 2.8.12, need this?    EXPORT_LINK_INTERFACE_LIBRARIES
     )
 
 # Configure file for install dir
@@ -711,7 +712,7 @@ endforeach(component)
 configure_file(${Chaste_SOURCE_DIR}/cmake/Config/ChasteConfig.cmake.in
     "${Chaste_BINARY_DIR}/ChasteConfig.cmake" @ONLY)
 
-file(COPY ${Chaste_SOURCE_DIR}/cmake/Modules/ChasteMacros.cmake 
+file(COPY ${Chaste_SOURCE_DIR}/cmake/Modules/ChasteMacros.cmake
     DESTINATION ${Chaste_BINARY_DIR}/cmake/Modules)
 
 file(COPY ${Chaste_SOURCE_DIR}/cmake/Modules/ChasteRunTestAndPostProcess.cmake
@@ -749,7 +750,7 @@ install(DIRECTORY ${Chaste_BINARY_DIR}/python
     COMPONENT Python)
 
 # libraries
-install(EXPORT chaste-targets 
+install(EXPORT chaste-targets
         DESTINATION lib/chaste
         FILE ChasteTargets.cmake
         #EXPORT_LINK_INTERFACE_LIBRARIES
@@ -785,7 +786,7 @@ if (Chaste_COVERAGE)
         COMMAND ${GENHTML_PATH} --title "${_page_title}" --config-file ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc --no-function-coverage -o ${_outputname} ${_outputname}.info.cleaned
         COMMAND ${CMAKE_COMMAND} -E remove ${_outputname}.info ${_outputname}.info.cleaned
         COMMAND ${PYTHON_EXECUTABLE} "${Chaste_SOURCE_DIR}/cmake/process_coverage_output.py" "${_outputname}"
-        
+
         DEPENDS Continuous Parallel
         WORKING_DIRECTORY ${Chaste_BINARY_DIR}
 		COMMENT "Resetting code coverage counters to zero.\nProcessing code coverage counters and generating report."
@@ -860,14 +861,14 @@ endif()
 ####################
 
 add_custom_target(doxygen
-    COMMAND ${PYTHON_EXECUTABLE} "${Chaste_SOURCE_DIR}/cmake/run-doxygen.py" "${Chaste_SOURCE_DIR}" 
+    COMMAND ${PYTHON_EXECUTABLE} "${Chaste_SOURCE_DIR}/cmake/run-doxygen.py" "${Chaste_SOURCE_DIR}"
                                 "${Chaste_BINARY_DIR}/doxygen" "${Chaste_REVISION}"
     WORKING_DIRECTORY ${Chaste_BINARY_DIR}
     COMMENT "Generating Doxygen documentation"
     VERBATIM)
 
 add_custom_target(doxygen_coverage
-    COMMAND ${PYTHON_EXECUTABLE} "${Chaste_SOURCE_DIR}/cmake/run-doxygen.py" "${Chaste_SOURCE_DIR}" 
+    COMMAND ${PYTHON_EXECUTABLE} "${Chaste_SOURCE_DIR}/cmake/run-doxygen.py" "${Chaste_SOURCE_DIR}"
                                 "${Chaste_BINARY_DIR}/doxygen_coverage" "${Chaste_REVISION}" "True"
     WORKING_DIRECTORY ${Chaste_BINARY_DIR}
     COMMENT "Checking Doxygen coverage"
@@ -939,11 +940,11 @@ set(CPACK_PACKAGE_VENDOR "Computational Biology Group - Computer Science - Unive
 set(CPACK_PACKAGE_CONTACT "Chaste Team <chaste-admin@maillist.ox.ac.uk>")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Chaste (Cancer, Heart and Soft Tissue Environment).")
 set(CPACK_PACKAGE_DESCRIPTION  "
- Chaste is a general purpose simulation package aimed at multi-scale, 
- computationally demanding problems arising in biology and physiology. 
- Current functionality includes tissue and cell level electrophysiology, 
- discrete tissue modelling, and soft tissue modelling. The package is 
- being developed by a team mainly based in the Computational Biology Group 
+ Chaste is a general purpose simulation package aimed at multi-scale,
+ computationally demanding problems arising in biology and physiology.
+ Current functionality includes tissue and cell level electrophysiology,
+ discrete tissue modelling, and soft tissue modelling. The package is
+ being developed by a team mainly based in the Computational Biology Group
  at Oxford University Computing Laboratory, and development draws on expertise
  from software engineering, high performance computing, mathematical modelling
  and scientific computing.
