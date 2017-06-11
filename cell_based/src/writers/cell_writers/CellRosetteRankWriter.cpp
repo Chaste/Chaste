@@ -50,7 +50,7 @@ double CellRosetteRankWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataForVtkOutput(Ce
     // We first need to test that the cell population is vertex-based
     VertexBasedCellPopulation<SPACE_DIM>* p_vbcp = dynamic_cast<VertexBasedCellPopulation<SPACE_DIM>*>(pCellPopulation);
 
-    if (p_vbcp == NULL)
+    if (p_vbcp == nullptr)
     {
         EXCEPTION("Rosettte rank is only associated with vertex-based cell populations");
     }

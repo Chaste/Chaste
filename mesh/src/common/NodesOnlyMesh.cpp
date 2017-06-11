@@ -44,7 +44,7 @@ NodesOnlyMesh<SPACE_DIM>::NodesOnlyMesh()
           mIndexCounter(0u),
           mMinimumNodeDomainBoundarySeparation(1.0),
           mMaxAddedNodeIndex(0u),
-          mpBoxCollection(NULL),
+          mpBoxCollection(nullptr),
           mCalculateNodeNeighbours(true)
 {
 }
@@ -162,7 +162,7 @@ Node<SPACE_DIM>* NodesOnlyMesh<SPACE_DIM>::GetNodeOrHaloNode(unsigned index) con
         p_node = this->GetNode(index);
     }
 
-    assert(p_node != NULL);
+    assert(p_node != nullptr);
 
     return p_node;
 }
@@ -545,7 +545,7 @@ void NodesOnlyMesh<SPACE_DIM>::ClearBoxCollection()
     {
         delete mpBoxCollection;
     }
-    mpBoxCollection = NULL;
+    mpBoxCollection = nullptr;
 }
 
 template<unsigned SPACE_DIM>

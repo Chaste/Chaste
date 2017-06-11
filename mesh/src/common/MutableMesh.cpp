@@ -783,7 +783,7 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(NodeMap& map)
         this->ExportToMesher(map, mesher_input);
 
         // Library call
-        triangulate((char*)"Qze", &mesher_input, &mesher_output, NULL);
+        triangulate((char*)"Qze", &mesher_input, &mesher_output, nullptr);
 
         this->ImportFromMesher(mesher_output, mesher_output.numberoftriangles, mesher_output.trianglelist, mesher_output.numberofedges, mesher_output.edgelist, mesher_output.edgemarkerlist);
 
@@ -801,7 +801,7 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(NodeMap& map)
         // Library call
         tetgen::tetrahedralize((char*)"Qz", &mesher_input, &mesher_output);
 
-        this->ImportFromMesher(mesher_output, mesher_output.numberoftetrahedra, mesher_output.tetrahedronlist, mesher_output.numberoftrifaces, mesher_output.trifacelist, NULL);
+        this->ImportFromMesher(mesher_output, mesher_output.numberoftetrahedra, mesher_output.tetrahedronlist, mesher_output.numberoftrifaces, mesher_output.trifacelist, nullptr);
     }
 }
 

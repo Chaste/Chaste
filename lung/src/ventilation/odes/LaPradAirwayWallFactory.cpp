@@ -48,7 +48,7 @@ const double LaPradAirwayWallFactory::mk2[] = {1000.,960.,920.,880.,840.,800.,76
 
 const double LaPradAirwayWallFactory::mk3[] = {20.,19.4,18.8,18.2,17.6,17.,16.4,15.8,15.2,14.6,14.,13.4,12.8,12.2,11.6,11.,10.4};
 
-LaPradAirwayWallFactory::LaPradAirwayWallFactory(bool useStrahlerOrder) : mpWalker(NULL), mUseStrahlerOrder(useStrahlerOrder)
+LaPradAirwayWallFactory::LaPradAirwayWallFactory(bool useStrahlerOrder) : mpWalker(nullptr), mUseStrahlerOrder(useStrahlerOrder)
 {}
 
 LaPradAirwayWallFactory::~LaPradAirwayWallFactory()

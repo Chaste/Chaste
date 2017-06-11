@@ -102,7 +102,7 @@ public:
      */
     virtual double ComputeSourceTerm(const ChastePoint<SPACE_DIM>& rX,
                                      double u,
-                                     Element<ELEMENT_DIM,SPACE_DIM>* pElement=NULL)=0;
+                                     Element<ELEMENT_DIM,SPACE_DIM>* pElement=nullptr)=0;
 
     /**
      * @return computed source term at a node.

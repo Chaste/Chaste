@@ -101,7 +101,7 @@ void EllipticGrowingDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPo
         this->mSolution = solver.Solve();
 
         // On the first go round the vector has yet to be initialised, so we don't destroy it
-        if (old_solution_copy != NULL)
+        if (old_solution_copy != nullptr)
         {
             PetscTools::Destroy(old_solution_copy);
         }

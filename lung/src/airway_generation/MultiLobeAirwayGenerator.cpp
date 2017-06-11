@@ -171,7 +171,7 @@ void MultiLobeAirwayGenerator::AssignGrowthApices()
             if (!end_point_assigned) // If the end point is not contained in any lobe assign it to the nearest
             {
                 double dist_min = DBL_MAX;
-                AirwayGenerator* p_generator = NULL;
+                AirwayGenerator* p_generator = nullptr;
 
                 for (std::vector<pair_type>::iterator generators_iter = mLobeGenerators.begin();
                      generators_iter != mLobeGenerators.end();

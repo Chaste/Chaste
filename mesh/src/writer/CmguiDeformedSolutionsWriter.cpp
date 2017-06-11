@@ -47,7 +47,7 @@ CmguiDeformedSolutionsWriter<DIM>::CmguiDeformedSolutionsWriter(std::string outp
 {
     QuadraticMesh<DIM>* p_quad_mesh = dynamic_cast<QuadraticMesh<DIM>* >(&rQuadraticMesh);
 
-    if (p_quad_mesh == NULL)
+    if (p_quad_mesh == nullptr)
     {
         EXCEPTION("CmguiDeformedSolutionsWriter only supports use of a QuadraticMesh");
     }

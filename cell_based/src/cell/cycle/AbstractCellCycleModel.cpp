@@ -68,7 +68,7 @@ void AbstractCellCycleModel::SetCell(CellPtr pCell)
 
 CellPtr AbstractCellCycleModel::GetCell()
 {
-    assert(mpCell != NULL);
+    assert(mpCell != nullptr);
     return mpCell;
 }
 

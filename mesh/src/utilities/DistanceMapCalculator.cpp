@@ -41,7 +41,7 @@ DistanceMapCalculator<ELEMENT_DIM, SPACE_DIM>::DistanceMapCalculator(
             AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>& rMesh)
     : mrMesh(rMesh),
       mWorkOnEntireMesh(true),
-      mNumHalosPerProcess(NULL),
+      mNumHalosPerProcess(nullptr),
       mRoundCounter(0u),
       mPopCounter(0u),
       mTargetNodeIndex(UINT_MAX),
@@ -50,7 +50,7 @@ DistanceMapCalculator<ELEMENT_DIM, SPACE_DIM>::DistanceMapCalculator(
     mNumNodes = mrMesh.GetNumNodes();
 
     DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* p_distributed_mesh = dynamic_cast<DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>*>(&mrMesh);
-    if (PetscTools::IsSequential() || p_distributed_mesh == NULL)
+    if (PetscTools::IsSequential() || p_distributed_mesh == nullptr)
     {
         // It's a non-distributed mesh
         mLo = 0;

@@ -81,7 +81,7 @@ private:
          * of the VertexMesh class, so instead we delete mpVoronoiTessellation.
          */
         delete mpVoronoiTessellation;
-        mpVoronoiTessellation = NULL;
+        mpVoronoiTessellation = nullptr;
 
         archive & mSpringRestLengths;
         archive & mUseAreaBasedDampingConstant;

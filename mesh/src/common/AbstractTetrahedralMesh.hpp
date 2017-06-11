@@ -207,10 +207,10 @@ private:
 
         // Store the DistributedVectorFactory loaded from the archive
         DistributedVectorFactory* p_factory = this->mpDistributedVectorFactory;
-        this->mpDistributedVectorFactory = NULL;
+        this->mpDistributedVectorFactory = nullptr;
 
         // Check whether we're migrating, or if we can use the original partition for the mesh
-        DistributedVectorFactory* p_our_factory = NULL;
+        DistributedVectorFactory* p_our_factory = nullptr;
         if (p_factory)
         {
             p_our_factory = p_factory->GetOriginalFactory();
@@ -224,7 +224,7 @@ private:
         {
             // Migrating; let the mesh re-partition if it likes
             /// \todo #1199  make this work for everything else...
-            p_our_factory = NULL;
+            p_our_factory = nullptr;
         }
 
         if (mMeshIsLinear)

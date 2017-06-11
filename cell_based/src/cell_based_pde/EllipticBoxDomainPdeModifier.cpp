@@ -78,7 +78,7 @@ void EllipticBoxDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopula
     ///\todo Use solution at previous time step as an initial guess for Solve()
     Vec old_solution_copy = this->mSolution;
     this->mSolution = solver.Solve();
-    if (old_solution_copy != NULL)
+    if (old_solution_copy != nullptr)
     {
         PetscTools::Destroy(old_solution_copy);
     }

@@ -93,7 +93,7 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::MakeVtkMesh()
 
         assert((current_element.size() == ELEMENT_DIM + 1) || (current_element.size() == (ELEMENT_DIM+1)*(ELEMENT_DIM+2)/2));
 
-        vtkCell* p_cell=NULL;
+        vtkCell* p_cell=nullptr;
         if (ELEMENT_DIM == 3 && current_element.size() == 4)
         {
             p_cell = vtkTetra::New();
@@ -354,7 +354,7 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddPointData(std::string dataName, st
     vtkDoubleArray* p_scalars = vtkDoubleArray::New();
     p_scalars->SetName(dataName.c_str());
 
-    if (mWriteParallelFiles && this->mpDistributedMesh != NULL)
+    if (mWriteParallelFiles && this->mpDistributedMesh != nullptr)
     {
         // In parallel, the vector we pass will only contain the values from the privately owned nodes.
         // To get the values from the halo nodes (which will be inserted at the end of the vector we need to
@@ -549,7 +549,7 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::SetParallelFiles( AbstractTetrahedral
     this->mpDistributedMesh = dynamic_cast<DistributedTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* >(&rMesh);
     mpNodesOnlyMesh = dynamic_cast<NodesOnlyMesh<SPACE_DIM>* >(&rMesh);
 
-    if (this->mpDistributedMesh == NULL && mpNodesOnlyMesh == NULL)
+    if (this->mpDistributedMesh == nullptr && mpNodesOnlyMesh == nullptr)
     {
         EXCEPTION("Cannot write parallel files using a sequential mesh");
     }
@@ -601,7 +601,7 @@ void VtkMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(
     this->mpDistributedMesh = dynamic_cast<DistributedTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* >(&rMesh);
     this->mpMixedMesh = dynamic_cast<MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>* >(&rMesh);
 
-    if (PetscTools::IsSequential() || !mWriteParallelFiles || (this->mpDistributedMesh == NULL && mpNodesOnlyMesh == NULL))
+    if (PetscTools::IsSequential() || !mWriteParallelFiles || (this->mpDistributedMesh == nullptr && mpNodesOnlyMesh == nullptr))
     {
         AbstractTetrahedralMeshWriter<ELEMENT_DIM,SPACE_DIM>::WriteFilesUsingMesh( rMesh,keepOriginalElementIndexing );
     }
@@ -662,7 +662,7 @@ void VtkMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(
              ++elem_iter)
         {
 
-            vtkCell* p_cell=NULL;
+            vtkCell* p_cell=nullptr;
             ///\todo This ought to look exactly like the other MakeVtkMesh
             if (ELEMENT_DIM == 3)
             {

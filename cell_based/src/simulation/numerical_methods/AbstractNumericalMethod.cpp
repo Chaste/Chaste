@@ -43,8 +43,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::AbstractNumericalMethod()
-    : mpCellPopulation(NULL),
-      mpForceCollection(NULL),
+    : mpCellPopulation(nullptr),
+      mpForceCollection(nullptr),
       mUseAdaptiveTimestep(false),
       mUseUpdateNodeLocation(false),
       mGhostNodeForcesEnabled(true)

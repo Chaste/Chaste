@@ -93,7 +93,7 @@ public:
     ParabolicGrowingDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde=boost::shared_ptr<AbstractLinearPde<DIM,DIM> >(),
                                       boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition=boost::shared_ptr<AbstractBoundaryCondition<DIM> >(),
                                       bool isNeumannBoundaryCondition=true,
-                                      Vec solution=NULL);
+                                      Vec solution=nullptr);
 
     /**
      * Destructor.
@@ -164,7 +164,7 @@ template<class Archive, unsigned DIM>
 inline void load_construct_data(
     Archive & ar, ParabolicGrowingDomainPdeModifier<DIM> * t, const unsigned int file_version)
 {
-    Vec solution = NULL;
+    Vec solution = nullptr;
 
     std::string archive_filename = ArchiveLocationInfo::GetArchiveDirectory() + "solution.vec";
     FileFinder file_finder(archive_filename, RelativeTo::Absolute);

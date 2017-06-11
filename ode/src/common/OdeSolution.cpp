@@ -158,7 +158,7 @@ std::vector<double>& OdeSolution::rGetParameters(AbstractParameterisedSystem<VEC
 
 std::vector<std::vector<double> >& OdeSolution::rGetDerivedQuantities(AbstractParameterisedSystem<std::vector<double> >* pOdeSystem)
 {
-    assert(pOdeSystem != NULL);
+    assert(pOdeSystem != nullptr);
     if (mDerivedQuantities.empty() && pOdeSystem->GetNumberOfDerivedQuantities() > 0)
     {
         assert(mTimes.size() == mSolutions.size()); // Paranoia
@@ -174,13 +174,13 @@ std::vector<std::vector<double> >& OdeSolution::rGetDerivedQuantities(AbstractPa
 #ifdef CHASTE_CVODE
 std::vector<std::vector<double> >& OdeSolution::rGetDerivedQuantities(AbstractParameterisedSystem<N_Vector>* pOdeSystem)
 {
-    assert(pOdeSystem != NULL);
+    assert(pOdeSystem != nullptr);
     if (mDerivedQuantities.empty() && pOdeSystem->GetNumberOfDerivedQuantities() > 0)
     {
         const unsigned num_solutions = mSolutions.size();
         assert(mTimes.size() == num_solutions); // Paranoia
         mDerivedQuantities.resize(mTimes.size());
-        N_Vector state_vars = num_solutions > 0 ? N_VNew_Serial(mSolutions[0].size()) : NULL;
+        N_Vector state_vars = num_solutions > 0 ? N_VNew_Serial(mSolutions[0].size()) : nullptr;
         for (unsigned i=0; i<num_solutions; i++)
         {
             CopyFromStdVector(mSolutions[i], state_vars);
@@ -207,7 +207,7 @@ void OdeSolution::WriteToFile(std::string directoryName,
     assert(stepsPerRow > 0);
     assert(mTimes.size() > 0);
     assert(mTimes.size() == mSolutions.size());
-    assert(mpOdeSystemInformation.get() != NULL);
+    assert(mpOdeSystemInformation.get() != nullptr);
     if (mpOdeSystemInformation->GetNumberOfParameters()==0 && mpOdeSystemInformation->GetNumberOfDerivedQuantities() == 0)
     {
         includeDerivedQuantities = false;

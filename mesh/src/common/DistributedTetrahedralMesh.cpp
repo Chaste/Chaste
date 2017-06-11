@@ -77,7 +77,7 @@ DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::DistributedTetrahedralMesh(D
       mTotalNumElements(0u),
       mTotalNumBoundaryElements(0u),
       mTotalNumNodes(0u),
-      mpSpaceRegion(NULL),
+      mpSpaceRegion(nullptr),
       mPartitioning(partitioningMethod)
 {
     if (ELEMENT_DIM == 1 && (partitioningMethod != DistributedTetrahedralMeshPartitionType::GEOMETRIC))
@@ -530,7 +530,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetHaloNodeIndices(std:
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ChasteCuboid<SPACE_DIM>*  DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetProcessRegion()
 {
-    if (mpSpaceRegion == NULL)
+    if (mpSpaceRegion == nullptr)
     {
         EXCEPTION("Trying to get unset mpSpaceRegion");
     }
@@ -765,7 +765,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructLinearMesh(uns
             //Allow for a halo node
             hi_node++;
         }
-        Node<SPACE_DIM>* p_old_node=NULL;
+        Node<SPACE_DIM>* p_old_node=nullptr;
         for (unsigned node_index=lo_node; node_index<hi_node; node_index++)
         {
             // create node or halo-node
@@ -1433,7 +1433,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
 //                             options, &edgecut, local_partition, &communicator);
 
     Timer::Reset();
-    ParMETIS_V3_PartKway(element_distribution.get(), xadj, adjncy, NULL, NULL, &weight_flag, &numflag,
+    ParMETIS_V3_PartKway(element_distribution.get(), xadj, adjncy, nullptr, nullptr, &weight_flag, &numflag,
                          &n_constraints, &n_subdomains, tpwgts.get(), &ubvec_value,
                          options, &edgecut, local_partition.get(), &communicator);
     //Timer::Print("ParMETIS PartKway");
