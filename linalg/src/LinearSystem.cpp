@@ -695,14 +695,20 @@ Vec LinearSystem::Solve(Vec lhsGuess)
 
         KSPCreate(PETSC_COMM_WORLD, &mKspSolver);
 
-        const bool is_small = (mSize <= 6); ///\todo This is a magic number.  Do we want a warning here?
-
-#if (PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR >= 5) //PETSc 3.5 or later
-        if (mMatrixIsConstant && (!is_small))
+        if (mMatNullSpace) // Adding null-space to the matrix (new style) has to happen *before* KSPSetOperators
         {
-            // Attempt to emulate SAME_PRECONDITIONER below
-            KSPSetReusePreconditioner(mKspSolver, PETSC_TRUE);
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 3) //PETSc 3.3 or later
+            // Setting null space in the KSP was deprecated in PETSc 3.6, but setting the null space
+            // for the matrix appeared in PETSc 3.3 so 3.3, 3.4, 3.5 can do either
+
+            PETSCEXCEPT(MatSetNullSpace(mLhsMatrix, mMatNullSpace));
+#else
+            PETSCEXCEPT(KSPSetNullSpace(mKspSolver, mMatNullSpace));
+#endif
         }
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 5) //PETSc 3.5 or later
+        // Do nothing.  Note that reusing the pre-conditioner in later PETSc versions is done after the pre-conditioner is formed
+        // (This comment is retained here so that the #if logic is consistent.)
 #else
         /*
          * The preconditioner flag (last argument) in the following calls says
@@ -720,18 +726,6 @@ Vec LinearSystem::Solve(Vec lhsGuess)
         }
 #endif
 
-        if (mMatNullSpace) // Adding null-space to the matrix (new style) has to happen *before* KSPSetOperators
-        {
-#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 3) //PETSc 3.3 or later
-            // Setting null space in the KSP was deprecated in PETSc 3.6, but setting the null space
-            // for the matrix appeared in PETSc 3.3 so 3.3, 3.4, 3.5 can do either
-
-            PETSCEXCEPT(MatSetNullSpace(mLhsMatrix, mMatNullSpace));
-#else
-            PETSCEXCEPT(KSPSetNullSpace(mKspSolver, mMatNullSpace));
-#endif
-        }
-
         if (mPrecondMatrixIsNotLhs)
         {
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 5) //PETSc 3.5 or later
@@ -748,6 +742,13 @@ Vec LinearSystem::Solve(Vec lhsGuess)
             KSPSetOperators(mKspSolver, mLhsMatrix, mLhsMatrix, preconditioner_over_successive_calls);
 #endif
         }
+#if (PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR >= 5) //PETSc 3.5 or later
+        if (mMatrixIsConstant)
+        {
+            // Emulate SAME_PRECONDITIONER as above
+            KSPSetReusePreconditioner(mKspSolver, PETSC_TRUE);
+        }
+#endif
 
         // Set either absolute or relative tolerance of the KSP solver.
         // The default is to use relative tolerance (1e-6)
@@ -776,6 +777,7 @@ Vec LinearSystem::Solve(Vec lhsGuess)
         KSPGetPC(mKspSolver, &prec);
 
         // Turn off pre-conditioning if the system size is very small
+        const bool is_small = (mSize <= 6); ///\todo This is a magic number.  Do we want a warning here?
         if (is_small)
         {
             PCSetType(prec, PCNONE);
@@ -1168,6 +1170,17 @@ Vec LinearSystem::Solve(Vec lhsGuess)
             KSPSetNormType(mKspSolver, KSP_NO_NORM);
 #elif (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
             KSPSetNormType(mKspSolver, KSP_NORM_NONE);
+    #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 7) //PETSc 3.7 or later
+              /*
+             * Up to PETSc 3.7.2 the above call also turned off the default convergence test.
+             * However, in PETSc 3.7.3 (subminor release) this behaviour was removed and so, here,
+             * we explicitly add it back again.
+             * See
+             * https://bitbucket.org/petsc/petsc/commits/eb70c44be3430b039effa3de7e1ca2fab9f75a57
+             * This following line of code is actually valid from PETSc 3.5.
+             */
+            KSPSetConvergenceTest(mKspSolver, KSPConvergedSkip, PETSC_NULL, PETSC_NULL);
+    #endif
 #else
             KSPSetNormType(mKspSolver, KSP_NORM_NO);
 #endif

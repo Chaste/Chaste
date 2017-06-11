@@ -107,12 +107,11 @@ public:
 
     /**
      * Constructor - just a default, mBirthTime is set in the AbstractCellCycleModel class.
-     * mG1Duration is set very high, it is set for the individual cells when InitialiseDaughterCell is called
      */
     UniformCellCycleModel();
 
     /**
-     * Overridden SetCellCycleDuration Method to add stochastic cell cycle times
+     * Overridden SetCellCycleDuration() method to add stochastic cell cycle times
      */
     void SetCellCycleDuration();
 

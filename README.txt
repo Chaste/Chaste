@@ -1,7 +1,7 @@
 ========= WELCOME TO CHASTE ===========
 
-The files you have downloaded contain the source code for all the
-Chaste functionalities.  Chaste makes use of a variety of external
+The files you have downloaded contain the source code for all
+Chaste functionality.  Chaste makes use of a variety of external
 libraries and packages that need to be installed on your machine.  The
 file docs/INSTALLATION.txt provides a comprehensive guide on how to
 install these external tools.
@@ -16,12 +16,12 @@ Chaste includes a complete test suite covering all the source
 code. The easiest way to use existing source codes is to create a test
 file which can call upon any of the source files.  The Chaste build
 system can build this file for you and handle all of the dependencies
-and library calls, e.g.
-scons projects/example/test/TestHello.hpp
+and library calls.
 
 We suggest you use the projects directory in this manner to store your
 own source and test files if you do not wish to modify the Chaste
-source code.
+source code. For more information, see:
+https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides/UserProjects
 
 For more information please refer to the Chaste website at: 
 http://www.cs.ox.ac.uk/chaste/
