@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef ABSTRACTODESRN_HPP_
-#define ABSTRACTODESRN_HPP_
+#ifndef ABSTRACTODESRNMODEL_HPP_
+#define ABSTRACTODESRNMODEL_HPP_
 
 #include <vector>
 #include "ChasteSerialization.hpp"
@@ -60,7 +60,7 @@ private:
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
-     * Archive the srn model and member variables.
+     * Archive the SRN model and member variables.
      *
      * @param archive the archive
      * @param version the current version of this class
@@ -97,7 +97,7 @@ protected:
     void Initialise(AbstractOdeSystem* pOdeSystem);
 
     /**
-     * Protected copy-constructor for use by CreateSrnModel.  The only way for external code to create a copy of a SRN model
+     * Protected copy-constructor for use by CreateSrnModel().  The only way for external code to create a copy of a SRN model
      * is by calling that method, to ensure that a model of the correct subclass is created.
      * This copy-constructor helps subclasses to ensure that all member variables are correctly copied when this happens.
      *
@@ -145,7 +145,7 @@ public:
     void SetInitialConditions(std::vector<double> initialConditions);
 
     /**
-     * Outputs cell cycle model parameters to file. Virtual void so needs to be specified in child classes.
+     * Outputs SRN model parameters to file. Virtual void so needs to be specified in child classes.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
@@ -154,4 +154,4 @@ public:
 
 CLASS_IS_ABSTRACT(AbstractOdeSrnModel)
 
-#endif /* ABSTRACTODESRN_HPP_ */
+#endif /* ABSTRACTODESRNMODEL_HPP_ */

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -742,8 +742,9 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructLinearMesh(uns
         this->mpDistributedVectorFactory = new DistributedVectorFactory(mTotalNumNodes);
         if (this->mpDistributedVectorFactory->GetLocalOwnership() == 0)
         {
-            //It's a short mesh and this process owns no nodes
-            return;
+            // It's a short mesh and this process owns no nodes.
+            // This return cannot be covered by regular testing, but is covered by the Nightly -np 3 builder
+            return;  //LCOV_EXCL_LINE
         }
 
         /* am_top_most is like PetscTools::AmTopMost() but accounts for the fact that a
@@ -864,9 +865,11 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRectangularMes
         this->mpDistributedVectorFactory = new DistributedVectorFactory(mTotalNumNodes, (width+1)*y_partition.GetLocalOwnership());
         if (this->mpDistributedVectorFactory->GetLocalOwnership() == 0)
         {
-            //It's a short mesh and this process owns no nodes
-            return;
+            // It's a short mesh and this process owns no nodes.
+            // This return cannot be covered by regular testing, but is covered by the Nightly -np 3 builder
+            return;  //LCOV_EXCL_LINE
         }
+
         /* am_top_most is like PetscTools::AmTopMost() but accounts for the fact that a
          * higher numbered process may have dropped out of this construction altogether
          * (because is has no local ownership)
@@ -1068,8 +1071,11 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructCuboid(unsigne
         this->mpDistributedVectorFactory = new DistributedVectorFactory(mTotalNumNodes, (width+1)*(height+1)*z_partition.GetLocalOwnership());
         if (this->mpDistributedVectorFactory->GetLocalOwnership() == 0)
         {
-            return;
+            // It's a short mesh and this process owns no nodes.
+            // This return cannot be covered by regular testing, but is covered by the Nightly -np 3 builder
+            return;  //LCOV_EXCL_LINE
         }
+        
         /* am_top_most is like PetscTools::AmTopMost() but accounts for the fact that a
          * higher numbered process may have dropped out of this construction altogether
          * (because is has no local ownership)

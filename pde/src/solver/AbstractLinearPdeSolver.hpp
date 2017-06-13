@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -148,12 +148,12 @@ public:
     }
 };
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 void AbstractLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::InitialiseForSolve(Vec initialSolution)
 {
     if (this->mpLinearSystem == NULL)
     {
-        unsigned preallocation= PROBLEM_DIM * mpMesh->CalculateMaximumNodeConnectivityPerProcess();
+        unsigned preallocation = PROBLEM_DIM * mpMesh->CalculateMaximumNodeConnectivityPerProcess();
 
         HeartEventHandler::BeginEvent(HeartEventHandler::COMMUNICATION);
         if (initialSolution == NULL)

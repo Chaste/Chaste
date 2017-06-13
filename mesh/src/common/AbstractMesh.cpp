@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -286,15 +286,19 @@ unsigned AbstractMesh<ELEMENT_DIM, SPACE_DIM>::GetNearestNodeIndex(const ChasteP
 {
     if (mNodes.empty())
     {
-        // This happens in parallel if a process isn't assigned any nodes.
-        return UINT_MAX;
+        /*
+         * This happens in parallel if a process isn't assigned any nodes.
+         * This case is covered in TestDistributedTetrahedralMesh::TestConstructLinearMeshSmallest
+         * but only when there are 3 or more processes
+         */
+        return UINT_MAX;  // LCOV_EXCL_LINE
     }
     // Hold the best distance from node to point found so far
     // and the (local) node at which this was recorded
     unsigned best_node_index = 0u;
     double best_node_point_distance = DBL_MAX;
 
-    c_vector<double, SPACE_DIM> test_location = rTestPoint.rGetLocation();
+    const c_vector<double, SPACE_DIM>& test_location = rTestPoint.rGetLocation();
     // Now loop through the nodes, calculating the distance and updating best_node_point_distance
     for (unsigned node_index = 0; node_index < mNodes.size(); node_index++)
     {

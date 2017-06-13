@@ -1,6 +1,6 @@
 # Configuration
 
-"""Copyright (c) 2005-2016, University of Oxford.
+"""Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -278,10 +278,10 @@ def Configure(prefs, build):
             if os.path.exists('/opt/cvode-libs') and build.CompilerType() == 'intel':
                 # CVODE 2.8.1 (Sundials 2.6.1) specially downloaded and compiled with intel optimisations on this machine,
                 # these shared libraries link to intel libraries, so need to have intel paths set up to work...
-		# N.B. we needed to hack the CMakeLists.txt slightly to get the version reported correctly - see #2479 for a copy.
+                # N.B. we needed to hack the CMakeLists.txt slightly to get the version reported correctly - see #2479 for a copy.
                 cvode_path = '/opt/cvode-libs'
             else:
-            	cvode_path = BASE+'cvode_2_8'
+                cvode_path = BASE+'cvode_2_8'
         elif prefs['cvode'] == '2.9':
             cvode_path = BASE+'cvode_2_9'
         else:
@@ -297,8 +297,22 @@ def Configure(prefs, build):
     global use_vtk
     use_vtk = int(prefs.get('use-vtk', 1))
     if use_vtk:
-        prefs['vtk'] = prefs.get('vtk', '5')
-        if prefs['vtk'][0] == '6':
+        # Pick version 1) if the user has asked for a version, 2) if there is a system 6.2 version on the machine, 3) fall back to system version 5
+        default_vtk_version = '5'                             # (3) Fall back to version 5.x (Ubuntu 14.04)
+        vtk_62_include_path = '/usr/include/vtk-6.2'
+        if (os.path.isdir(vtk_62_include_path)):
+            default_vtk_version = '6.2'                       # (2) System-wide 6.2 (Ubuntu 16.04) 
+        prefs['vtk'] = prefs.get('vtk', default_vtk_version)  # (1) User's choice
+        # Assume that the system wide version of VTK is 6.2 (on 16.04) and use this in preference
+        if prefs['vtk'] == '6.2':
+            if (not os.path.isdir(vtk_62_include_path)):
+                raise ValueError("No system headers for VTK 6 found at "+vtk_62_include_path)
+            other_includepaths.append(vtk_62_include_path)
+            vtk_libs = ['CommonCore','CommonDataModel', 'IOParallelXML', 'IOXML','IOGeometry','CommonExecutionModel','FiltersCore','FiltersGeometry','FiltersModeling','FiltersSources']
+            vtk_libs = map(lambda l: 'vtk' + l + '-6.2', vtk_libs)
+            other_libraries.extend(vtk_libs)
+        # The rest of this *may* switch versions to those in old /home/lofty folders
+        elif prefs['vtk'][0] == '6':
             vtk_ver = map(int, prefs['vtk'].split('.')[:2])
             subst = {'v': prefs['vtk']}
             other_includepaths.append(BASE+'vtk-%(v)s/include/vtk-%(v)s' % subst)
@@ -313,6 +327,7 @@ def Configure(prefs, build):
             other_libpaths.append(BASE+'vtk-5.10/lib/vtk-5.10')
             other_libraries.extend(['vtkGraphics','vtkFiltering','vtkIO','vtkCommon', 'vtksys', 'vtkexpat', 'vtkzlib'])
         else:
+            # Included for completeness: assume an older version of Ubuntu (and that the vtk version has been set)
             vtk_include_path = filter(os.path.isdir, glob.glob('/usr/include/vtk-5*'))
             if len(vtk_include_path) != 1:
                 raise ValueError("No or multiple system headers for VTK 5 found")

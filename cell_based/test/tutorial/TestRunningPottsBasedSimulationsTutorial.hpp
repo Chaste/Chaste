@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -212,6 +212,9 @@ public:
      * Load the file {{{/tmp/$USER/testoutput/PottsBasedMonolayer/results_from_time_0/results.pvd}}}, and click apply.
      *
      * Add box "Glyphs" to represent lattice sites. You will need to adjust the size so they don't overlap.
+     *
+     * Note that, for larger simulations, you may need to unclick "Mask Points" (or similar) so as not to limit the number of glyphs
+     * displayed by Paraview.
      *
      * Select the "Display" tab and select "color by" cell index to see individual cells.
      *
@@ -427,6 +430,9 @@ public:
      * Load the file {{{/tmp/$USER/testoutput/PottsCellSorting3D/results_from_time_0/results.pvd}}}, and click apply.
      *
      * Add box "Glyphs" to represent lattice sites. You will need to adjust the size so they don't overlap.
+     *
+     * Note that, for larger simulations, you may need to unclick "Mask Points" (or similar) so as not to limit the number of glyphs
+     * displayed by Paraview.
      *
      * Select the "Display" tab and select "color by" cell label (you can also "color by" cell index to see individual cells).
      *

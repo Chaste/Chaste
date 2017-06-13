@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -809,6 +809,19 @@ public:
         TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 0.1, 1e-9);
         CellPtr p_cell2 = p_simulator->rGetCellPopulation().GetCellUsingLocationIndex(23);
         TS_ASSERT_DELTA(p_cell2->GetAge(), 23.1, 1e-4);
+
+        // Test we can access the force collection, and that there is one force in it
+        TS_ASSERT_EQUALS(p_simulator->rGetForceCollection().size(), 1u);
+
+        // Get a pointer to the Nagai Honda Force, and verify we can access its methods
+        boost::shared_ptr<NagaiHondaForce<2> > p_force =
+                boost::static_pointer_cast<NagaiHondaForce<2> >(p_simulator->rGetForceCollection()[0]);
+
+        double param_value = p_force->GetNagaiHondaDeformationEnergyParameter(); // Get the current value
+        p_force->SetNagaiHondaDeformationEnergyParameter(1.23);
+        TS_ASSERT_DELTA(p_force->GetNagaiHondaDeformationEnergyParameter(), 1.23, 1e-6);
+        p_force->SetNagaiHondaDeformationEnergyParameter(param_value); // Set back to the original value
+
 
         // Run simulation
         TS_ASSERT_THROWS_NOTHING(p_simulator->Solve());

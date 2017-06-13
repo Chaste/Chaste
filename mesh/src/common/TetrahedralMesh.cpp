@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -948,8 +948,11 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ImportFromMesher(MESHER_IO& mesher
             // LCOV_EXCL_START
             catch (Exception &)
             {
-                // Tetgen is feeding us lies  //Watch this space for coverage
-            	NEVER_REACHED;
+                // Tetgen is feeding us lies
+                /*
+                 *  Note: this code is covered in profiling (Test3dOffLatticeRepresentativeSimulation).
+                 *  It's hard to replicate Tetgen's behaviour with a unit test.
+                 */
                 assert(SPACE_DIM == 3);
             }
             // LCOV_EXCL_STOP

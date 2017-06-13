@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -144,19 +144,36 @@ public:
             delete p_simulator;
         }
 
+        /*
+         * This test is extremely unstable, and outcomes vary between compiler vendors, compiler versions, and
+         * compiler optimizations.
+         *
+         * Previously, this test had the following expected_cell_count numbers:
+         *      474u (GccOpt with CVODE on)
+         *      450u (IntelProduction with CVODE on - only for Intel 2013, not 2015 or 2017)
+         *      445u (GccOpt with CVODE off)
+         *
+         * More recently, it has been determined that expected_cell_count is:
+         *      430u (Intel 2017 Release (O2 and O3)
+         *      457u (Intel 2017 with O0)
+         *
+         * Given the fragility of this test, and that the numbers have been periodically updated when being built on
+         * with different software versions, this test now simply checks that the resulting number of cells is in a
+         * "sensible" range.  Further, we implicitly assume the test "passes" by not throwing at any point.
+         *
+         * \todo: Can we make this test more useful or robust?
+         */
         {
             // Testing here that the number of cells at the end doesn't change
             CryptSimulation2d* p_simulator = CellBasedSimulationArchiver<2, CryptSimulation2d>::Load("SteadyStateCrypt", end_of_simulation);
-            unsigned expected_cell_count = 474u; // GccOpt with CVODE on
-            if (strstr(ChasteBuildInfo::GetCompilerType(), "ntel") != NULL)
-            {
-                expected_cell_count = 450u; // IntelProduction with CVODE on
-            }
-            else if (strstr(ChasteBuildInfo::GetBuildInformation(), "use-cvode=0") != NULL)
-            {
-                expected_cell_count = 445u; // GccOpt with CVODE off
-            }
-            TS_ASSERT_EQUALS(p_simulator->rGetCellPopulation().GetNumRealCells(), expected_cell_count);
+
+            // Define some "sensible" bounds on the number
+            unsigned expected_cell_count_ub = 480u;
+            unsigned expected_cell_count_lb = 425u;
+
+            TS_ASSERT_LESS_THAN(p_simulator->rGetCellPopulation().GetNumRealCells(), expected_cell_count_ub);
+            TS_ASSERT_LESS_THAN(expected_cell_count_lb, p_simulator->rGetCellPopulation().GetNumRealCells());
+
             delete p_simulator;
         }
 

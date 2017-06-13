@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -97,7 +97,7 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 1626u);
         TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 390u);
 
-        for (typename MutableMesh<3,3>::BoundaryNodeIterator node_iter = mesh.GetBoundaryNodeIteratorBegin();
+        for (MutableMesh<3,3>::BoundaryNodeIterator node_iter = mesh.GetBoundaryNodeIteratorBegin();
              node_iter != mesh.GetBoundaryNodeIteratorEnd();
              ++node_iter)
         {
@@ -107,7 +107,7 @@ public:
         NodeMap map(mesh.GetNumNodes());
         mesh.ReMesh(map);
 
-        for (typename MutableMesh<3,3>::BoundaryNodeIterator node_iter = mesh.GetBoundaryNodeIteratorBegin();
+        for (MutableMesh<3,3>::BoundaryNodeIterator node_iter = mesh.GetBoundaryNodeIteratorBegin();
              node_iter != mesh.GetBoundaryNodeIteratorEnd();
              ++node_iter)
         {
@@ -159,7 +159,7 @@ public:
             TS_ASSERT_EQUALS(mesh.GetElement(elem_index)->GetNodeGlobalIndex(1), elem_index+1);
         }
 
-        for (typename MutableMesh<1,1>::BoundaryNodeIterator node_iter = mesh.GetBoundaryNodeIteratorBegin();
+        for (MutableMesh<1,1>::BoundaryNodeIterator node_iter = mesh.GetBoundaryNodeIteratorBegin();
              node_iter != mesh.GetBoundaryNodeIteratorEnd();
              ++node_iter)
         {
@@ -183,7 +183,7 @@ public:
             }
         }
 
-        for (typename MutableMesh<1,1>::BoundaryNodeIterator node_iter = mesh.GetBoundaryNodeIteratorBegin();
+        for (MutableMesh<1,1>::BoundaryNodeIterator node_iter = mesh.GetBoundaryNodeIteratorBegin();
              node_iter != mesh.GetBoundaryNodeIteratorEnd();
              ++node_iter)
         {
@@ -270,7 +270,7 @@ public:
             }
         }
 
-        for (typename MutableMesh<1,1>::BoundaryNodeIterator node_iter = mesh2.GetBoundaryNodeIteratorBegin();
+        for (MutableMesh<1,1>::BoundaryNodeIterator node_iter = mesh2.GetBoundaryNodeIteratorBegin();
              node_iter != mesh2.GetBoundaryNodeIteratorEnd();
              ++node_iter)
         {
@@ -341,7 +341,7 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumAllNodes(), mesh.GetNumNodes()+1);
         TS_ASSERT_EQUALS(mesh.GetNumAllBoundaryElements(), mesh.GetNumBoundaryElements());
 
-        for (typename MutableMesh<2,2>::BoundaryNodeIterator node_iter = mesh.GetBoundaryNodeIteratorBegin();
+        for (MutableMesh<2,2>::BoundaryNodeIterator node_iter = mesh.GetBoundaryNodeIteratorBegin();
              node_iter != mesh.GetBoundaryNodeIteratorEnd();
              ++node_iter)
         {
@@ -351,7 +351,7 @@ public:
         NodeMap map(1);
         mesh.ReMesh(map);
 
-        for (typename MutableMesh<2,2>::BoundaryNodeIterator node_iter = mesh.GetBoundaryNodeIteratorBegin();
+        for (MutableMesh<2,2>::BoundaryNodeIterator node_iter = mesh.GetBoundaryNodeIteratorBegin();
              node_iter != mesh.GetBoundaryNodeIteratorEnd();
              ++node_iter)
         {

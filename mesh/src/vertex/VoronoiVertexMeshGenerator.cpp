@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -147,9 +147,9 @@ Toroidal2dVertexMesh* VoronoiVertexMeshGenerator::GetToroidalMesh()
         Node<2>* p_node_to_copy = mpMesh->GetNode(node_counter);
 
         // Get all the information about the node we are copying
-        unsigned            copy_index       = p_node_to_copy->GetIndex();
-        c_vector<double, 2> copy_location    = p_node_to_copy->rGetLocation();
-        bool                copy_is_boundary = p_node_to_copy->IsBoundaryNode();
+        unsigned copy_index = p_node_to_copy->GetIndex();
+        bool copy_is_boundary = p_node_to_copy->IsBoundaryNode();
+        const c_vector<double, 2>& copy_location = p_node_to_copy->rGetLocation();
 
         // There should not be any 'gaps' in node numbering, but we will assert just to make sure
         assert(copy_index < mpMesh->GetNumNodes());
@@ -221,8 +221,8 @@ Toroidal2dVertexMesh* VoronoiVertexMeshGenerator::GetToroidalMesh()
         Node<2>* p_node_to_copy = p_temp_mesh->GetNode(node_counter);
 
         // Get all the information about the node we are copying
-        unsigned            copy_index       = p_node_to_copy->GetIndex();
-        c_vector<double, 2> copy_location    = p_node_to_copy->rGetLocation();
+        unsigned copy_index = p_node_to_copy->GetIndex();
+        const c_vector<double, 2>& copy_location = p_node_to_copy->rGetLocation();
 
         // No nodes should be boundary nodes
         assert(!p_node_to_copy->IsBoundaryNode());

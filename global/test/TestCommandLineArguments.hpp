@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -77,23 +77,25 @@ public:
         int argc = *(CommandLineArguments::Instance()->p_argc);
         TS_ASSERT_LESS_THAN(0, argc); // argc should always be 1 or greater
 
-        // argv[0] will be equal to global/build/debug/TestCommandLineArgumentsRunner
-        // or global/build/optimised/TestCommandLineArgumentsRunner, etc
+        /* argv[0] will be equal to global/build/debug/TestCommandLineArguments
+         * or global/build/optimised/TestCommandLineArguments, etc
+         * Variations on Windows (CMake) include .../TestCommandLineArguments.exe 
+         * Test executables built with SCons (deprecated) have the word Runner
+         * * .../TestCommandLineArgumentsRunner
+         * * .../TestCommandLineArgumentsRunner.exe
+         */ 
         char** argv = *(CommandLineArguments::Instance()->p_argv);
         assert(argv != NULL);
         std::string arg_as_string(argv[0]);
-#ifdef _MSC_VER
-        std::string final_part_of_string = arg_as_string.substr(arg_as_string.length()-34,arg_as_string.length());
-        TS_ASSERT_EQUALS("TestCommandLineArgumentsRunner.exe", final_part_of_string);
-#else
-        std::string final_part_of_string = arg_as_string.substr(arg_as_string.length()-30,arg_as_string.length());
-        TS_ASSERT_EQUALS("TestCommandLineArgumentsRunner", final_part_of_string);
-#endif
+        size_t pos = arg_as_string.find("TestCommandLineArguments");
+        // If TestCommandLineArguments is not a substring of the commandline then pos==std::string::npos
+        TS_ASSERT_DIFFERS(pos, std::string::npos);
+
         // Now test OptionExists() and GetValueCorrespondingToOption()
         //
         // The following tests would require the following arguments to be passed
         // in:
-        // ./global/build/debug/TestCommandLineArgumentsRunner -myoption -myintval 24 -mydoubleval 3.14 -3.14 -m2intval -42 -mystrings Baboons Monkeys Gibbons -mystring more_baboons
+        // ./global/build/debug/TestCommandLineArguments -myoption -myintval 24 -mydoubleval 3.14 -3.14 -m2intval -42 -mystrings Baboons Monkeys Gibbons -mystring more_baboons
         //
         // To test the methods we overwrite the arg_c and arg_v contained in the
         // singleton with the arguments that were needed.
@@ -290,13 +292,9 @@ public:
         char** argv = *(CommandLineArguments::Instance()->p_argv);
         assert(argv != NULL);
         std::string arg_as_string(argv[0]);
-#ifdef _MSC_VER
-        std::string final_part_of_string = arg_as_string.substr(arg_as_string.length()-34,arg_as_string.length());
-        TS_ASSERT_EQUALS("TestCommandLineArgumentsRunner.exe", final_part_of_string);
-#else
-        std::string final_part_of_string = arg_as_string.substr(arg_as_string.length()-30,arg_as_string.length());
-        TS_ASSERT_EQUALS("TestCommandLineArgumentsRunner", final_part_of_string);
-#endif
+        size_t pos = arg_as_string.find("TestCommandLineArguments");
+        // If TestCommandLineArguments is not a substring of the commandline then pos==std::string::npos
+        TS_ASSERT_DIFFERS(pos, std::string::npos);
     }
 
     /* A test which a user can run in order to check that they are passing command line arguments correctly*/

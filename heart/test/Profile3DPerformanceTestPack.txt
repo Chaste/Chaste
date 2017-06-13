@@ -1,5 +1,0 @@
-performance/Test3DPerformance00.hpp
-performance/Test3DPerformance01.hpp
-performance/Test3DPerformance02.hpp
-performance/Test3DPerformance03.hpp
-performance/Test3DPerformance04.hpp

@@ -1,5 +1,5 @@
 # Add new build types
-message("* Adding build types...")
+message(STATUS "Adding build types...")
 SET(CMAKE_CXX_FLAGS_COVERAGE
     " -g -fprofile-arcs -ftest-coverage"
     CACHE STRING "Flags used by the C++ compiler during coverage builds."
@@ -28,4 +28,4 @@ if (NOT CMAKE_BUILD_TYPE)
         FORCE)
 endif (NOT CMAKE_BUILD_TYPE)
 
-message("* Current build type is : ${CMAKE_BUILD_TYPE}")
+message(STATUS "Current build type is : ${CMAKE_BUILD_TYPE}")

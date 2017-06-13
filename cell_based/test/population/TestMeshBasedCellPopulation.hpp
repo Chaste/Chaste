@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -1563,6 +1563,8 @@ public:
 
     void TestGetTetrahedralMeshForPdeModifier() throw(Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
+
         HoneycombMeshGenerator generator(2, 2);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
 

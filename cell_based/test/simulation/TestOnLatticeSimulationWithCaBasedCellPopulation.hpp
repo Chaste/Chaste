@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -415,7 +415,7 @@ public:
             // The point index should be the same as the entry in the "Location Index For Test" array at this stage.
             vtkSmartPointer<vtkUnstructuredGrid> p_grid = p_reader->GetOutput();
             unsigned counter = 0;
-            for (typename CaBasedCellPopulation<2>::Iterator cell_iter = cell_population.Begin(); cell_iter != cell_population.End(); ++cell_iter)
+            for (CaBasedCellPopulation<2>::Iterator cell_iter = cell_population.Begin(); cell_iter != cell_population.End(); ++cell_iter)
             {
                 unsigned location_index = cell_population.GetLocationIndexUsingCell(*cell_iter);
                 TS_ASSERT(counter < unsigned(p_grid->GetNumberOfPoints()));

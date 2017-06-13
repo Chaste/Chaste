@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -226,7 +226,7 @@ inline void save_construct_data(
     Archive & ar, const TysonNovak2001OdeSystem * t, const unsigned int file_version)
 {
     // Save data required to construct instance
-    const std::vector<double> state_variables = t->rGetConstStateVariables();
+    const std::vector<double>& state_variables = t->rGetConstStateVariables();
     ar & state_variables;
 }
 

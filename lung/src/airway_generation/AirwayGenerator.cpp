@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -710,7 +710,7 @@ void AirwayGenerator::WriteDecomposedAirways(std::string rOutputDirectory, std::
 
         // In extremely rare cases, the vtkAppendFilter can incorrectly merge two points that are close but aren't actually coincident.
         // This can leave repeated line elements, these are filtered out here.
-        vtkSmartPointer<vtkUnstructuredGrid> appended_grid = grid;
+        const vtkSmartPointer<vtkUnstructuredGrid>& appended_grid = grid;
         vtkSmartPointer<vtkUnstructuredGrid> filtered_grid = vtkSmartPointer<vtkUnstructuredGrid>::New();
         filtered_grid->SetPoints(appended_grid->GetPoints());
         filtered_grid->SetCells(VTK_LINE, vtkSmartPointer<vtkCellArray>::New());
