@@ -261,17 +261,20 @@ void VertexBasedCellPopulation<DIM>::CheckForStepSizeException(unsigned nodeInde
 {
     double length = norm_2(rDisplacement);
 
-    if (length > 0.5*mpMutableVertexMesh->GetCellRearrangementThreshold())
-    {   
-        rDisplacement *= 0.5*mpMutableVertexMesh->GetCellRearrangementThreshold()/length;
-        
-        std::ostringstream message;
-        message << "Vertices are moving more than half the CellRearrangementThreshold. This could cause elements to become inverted ";
-        message << "so the motion has been restricted. Use a smaller timestep to avoid these warnings.";
+    if(mRestrictVertexMovement)
+    {
+        if (length > 0.5*mpMutableVertexMesh->GetCellRearrangementThreshold())
+        {
+            rDisplacement *= 0.5*mpMutableVertexMesh->GetCellRearrangementThreshold()/length;
 
-        double suggested_step = 0.95*dt*((0.5*mpMutableVertexMesh->GetCellRearrangementThreshold())/length);
+            std::ostringstream message;
+            message << "Vertices are moving more than half the CellRearrangementThreshold. This could cause elements to become inverted ";
+            message << "so the motion has been restricted. Use a smaller timestep to avoid these warnings.";
 
-        throw StepSizeException(suggested_step, message.str(), false);
+            double suggested_step = 0.95*dt*((0.5*mpMutableVertexMesh->GetCellRearrangementThreshold())/length);
+
+            throw StepSizeException(suggested_step, message.str(), false);
+        }
     }
 }
 

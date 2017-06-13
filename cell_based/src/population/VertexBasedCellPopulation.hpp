@@ -533,6 +533,8 @@ public:
 
     /**
      * Get the value of the mRestrictVertexMovement boolean.
+     *
+     * @return True if vertex movement is restricted at each timestep.
      */
     bool GetRestrictVertexMovementBoolean();
 

@@ -156,11 +156,12 @@ public:
         }
 
         // Create cell population
-        ModifiedVertexBasedCellPopulation<2> cell_population(mesh, cells);
+        VertexBasedCellPopulation<2> cell_population(mesh, cells);
+        cell_population.SetRestrictVertexMovementBoolean(false);
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("TestModifiedVertexSimulation");
+        simulator.SetOutputDirectory("TestVertexSimulationWithoutMovementRestriction");
         simulator.SetEndTime(1.0);
 
         // Create a force law and pass it to the simulation
@@ -175,6 +176,7 @@ public:
         simulator.Solve();
 
         // Test relaxes to circle (can be more stringent with more nodes and more time)
+        // Note how these values are different to previous test due to more motion
         TS_ASSERT_DELTA(cell_population.rGetMesh().GetVolumeOfElement(0), 1.0, 0.05);
         TS_ASSERT_DELTA(cell_population.rGetMesh().GetSurfaceAreaOfElement(0), 3.5449077, 0.1);
 
