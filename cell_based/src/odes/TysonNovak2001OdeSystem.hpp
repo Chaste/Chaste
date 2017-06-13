@@ -226,7 +226,7 @@ inline void save_construct_data(
     Archive & ar, const TysonNovak2001OdeSystem * t, const unsigned int file_version)
 {
     // Save data required to construct instance
-    const std::vector<double> state_variables = t->rGetConstStateVariables();
+    const std::vector<double>& state_variables = t->rGetConstStateVariables();
     ar & state_variables;
 }
 

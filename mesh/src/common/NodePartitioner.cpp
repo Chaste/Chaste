@@ -319,8 +319,8 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::GeometricPartitioning(AbstractMesh
 
         // Establish whether it lies in the domain. ChasteCuboid::DoesContain is
         // insufficient for this as it treats all boundaries as open.
-        ChastePoint<SPACE_DIM> lower = pRegion->rGetLowerCorner();
-        ChastePoint<SPACE_DIM> upper = pRegion->rGetUpperCorner();
+        const ChastePoint<SPACE_DIM>& lower = pRegion->rGetLowerCorner();
+        const ChastePoint<SPACE_DIM>& upper = pRegion->rGetUpperCorner();
 
         bool does_contain = true;
 

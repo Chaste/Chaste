@@ -108,7 +108,7 @@ void MajorAirwaysCentreLinesCleaner::CleanTerminalsHueristic()
              if ((length / parent_length) > 0.9)
              {
                  Node<3>* p_start_node = eles.front()->GetNode(0);
-                 c_vector<double, 3> start_location = p_start_node->rGetLocation();
+                 const c_vector<double, 3>& start_location = p_start_node->rGetLocation();
                  c_vector<double, 3> branch_direction = (*branch_iter)->GetDirection();
 
                  for (std::list<Element<1,3>* >::iterator ele_iter = eles.begin();
@@ -134,7 +134,7 @@ void MajorAirwaysCentreLinesCleaner::CleanTerminalsHueristic()
              else if ((length / parent_length) < 0.6) // If it's too short then lengthen it
              {
                  Node<3>* p_start_node = eles.front()->GetNode(0);
-                 c_vector<double, 3> start_location = p_start_node->rGetLocation();
+                 const c_vector<double, 3>& start_location = p_start_node->rGetLocation();
                  c_vector<double, 3> branch_direction = (*branch_iter)->GetDirection();
 
                  for (std::list<Element<1,3>* >::iterator ele_iter = eles.begin();

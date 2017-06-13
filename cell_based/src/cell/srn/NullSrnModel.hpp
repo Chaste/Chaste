@@ -56,7 +56,7 @@ private:
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
-     * Archive the srn model and member variables.
+     * Archive the SRN model and member variables.
      *
      * @param archive the archive
      * @param version the current version of this class
@@ -68,7 +68,7 @@ private:
     }
 
     /**
-     * Protected copy-constructor for use by CreateSrnModel.  The only way for external code to create a copy of a SRN model
+     * Protected copy-constructor for use by CreateSrnModel().  The only way for external code to create a copy of a SRN model
      * is by calling that method, to ensure that a model of the correct subclass is created.
      * This copy-constructor helps subclasses to ensure that all member variables are correctly copied when this happens.
      *

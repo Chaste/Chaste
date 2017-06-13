@@ -203,7 +203,7 @@ inline void save_construct_data(
     const bool is_labelled = t->IsLabelled();
     ar & is_labelled;
 
-    const std::vector<double> state_variables = t->rGetConstStateVariables();
+    const std::vector<double>& state_variables = t->rGetConstStateVariables();
     ar & state_variables;
 }
 
