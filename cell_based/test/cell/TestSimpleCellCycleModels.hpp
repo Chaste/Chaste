@@ -148,6 +148,9 @@ public:
         TS_ASSERT_THROWS_THIS(p_stem_model->SetTransitCellG1Duration(8.0),
                 "This cell cycle model does not differentiate stem cells and transit cells, please use SetRate() instead");
 
+        TS_ASSERT_THROWS_THIS(p_stem_model->SetStemCellG1Duration(8.0),
+                "This cell cycle model does not differentiate stem cells and transit cells, please use SetRate() instead");
+
         TS_ASSERT_THROWS_THIS(p_stem_model->SetRate(8.0),
                 "You cannot reset the rate after cell cycle times are created.");
 
