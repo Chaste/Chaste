@@ -126,11 +126,15 @@ public:
 
     /**
      * Overridden SetRate method.
+     *
+     * @param rate  the new value of the rate parameter
      */
     void SetRate(double rate);
 
     /**
      * Overridden GetRate method.
+     *
+     * @returns rate  the value of the rate parameter
      */
     double GetRate();
 

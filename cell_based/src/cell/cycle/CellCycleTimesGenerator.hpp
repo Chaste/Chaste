@@ -142,40 +142,40 @@ public:
     /**
      * Set the random seed for generating the sequence of G1 Durations.
      *
-     * @param seed the new seed
+     * @param randomSeed the new seed
      */
     void SetRandomSeed(unsigned randomSeed);
 
     /**
      * Get the random seed for generating the sequence.
      *
-     * @returns The random seed
+     * @returns seed The random seed
      */
     unsigned GetRandomSeed();
 
     /**
      * Set the rate of the exponential distribution.
      *
-     * @param the rate
+     * @param rate
      */
     void SetRate(double rate);
 
     /**
      * Get the rate of the exponential distribution.
      *
-     * @param the rate
+     * @returns rate The rate of the distribution.
      */
     double GetRate();
 
     /**
      * Generate the cell cycle time sequence
-     *
-     * @param seed the new seed
      */
     void GenerateCellCycleTimeSequence();
 
     /**
      * Get the next cell cycle time
+     *
+     * @returns next_cell_cycle_time  the next cell cycle time in the sequence
      */
     double GetNextCellCycleTime();
 };

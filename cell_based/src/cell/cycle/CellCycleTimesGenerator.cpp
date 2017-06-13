@@ -65,31 +65,16 @@ void CellCycleTimesGenerator::Destroy()
     }
 }
 
-/**
- * Set the random seed for generating the sequence.
- *
- * @param seed the new seed
- */
-void CellCycleTimesGenerator::SetRandomSeed(unsigned newSeed)
+void CellCycleTimesGenerator::SetRandomSeed(unsigned randomSeed)
 {
-	mRandomSeed = newSeed;
+	mRandomSeed = randomSeed;
 }
 
-/**
- * Get the random seed for generating the sequence.
- *
- * @returns The seed
- */
 unsigned CellCycleTimesGenerator::GetRandomSeed()
 {
 	return mRandomSeed;
 }
 
-/**
- * Generate the cell cycle time sequence
- *
- * @param seed the new seed
- */
 void CellCycleTimesGenerator::GenerateCellCycleTimeSequence()
 {
 	if (mVectorCreated)
