@@ -121,6 +121,8 @@ public:
 
     /**
      * Overridden method to create new cell cycle models after division
+     *
+     * @return new cell cycle model
      */
     AbstractCellCycleModel* CreateCellCycleModel();
 
