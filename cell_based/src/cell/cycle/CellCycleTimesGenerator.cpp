@@ -135,7 +135,7 @@ double CellCycleTimesGenerator::GetNextCellCycleTime()
 {
     if(!mVectorCreated)
     {
-        EXCEPTION("When using FixedSequenceCellCycleModel you must call CellCycleTimesGenerator::Instance()->GenerateCellCycleTimeSequence()"
+        EXCEPTION("When using FixedSequenceCellCycleModel one must call CellCycleTimesGenerator::Instance()->GenerateCellCycleTimeSequence()"
                 " before the start of the simulation.");
     }
     else

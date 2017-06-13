@@ -61,7 +61,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * CellCycleTimesGenerator::Instance()->GenerateCellCycleTimeSequence();
  *
- * Further, you the following line must be run at the end of the simulation:
+ * Further, the following line must be run at the end of the simulation:
  *
  * CellCycleTimesGenerator::Destroy();
  */
