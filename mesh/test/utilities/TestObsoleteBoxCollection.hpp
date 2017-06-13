@@ -114,7 +114,7 @@ public:
 
             ObsoleteBoxCollection<3> box_collection(0.123, domain_size);
             TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 729u);
-            
+
             c_vector<double, 6> get_domain_size = box_collection.rGetDomainSize();
             for (unsigned i=0; i<6; i++)
             {
@@ -691,7 +691,7 @@ public:
         neighbours_should_be[8].insert(7);
         neighbours_should_be[9] = std::set<unsigned>();
         for (unsigned i=0; i<nodes.size(); i++){
-            std::vector<unsigned> expected(neighbours_should_be[i].begin(), neighbours_should_be[i].end()); 
+            std::vector<unsigned> expected(neighbours_should_be[i].begin(), neighbours_should_be[i].end());
             TS_ASSERT_EQUALS(nodes[i]->rGetNeighbours(), expected);
         }
 
@@ -843,7 +843,7 @@ public:
 
         // Check the neighbour lists
         for (unsigned i=0; i<nodes.size(); i++){
-            std::vector<unsigned> expected(neighbours_should_be[i].begin(), neighbours_should_be[i].end()); 
+            std::vector<unsigned> expected(neighbours_should_be[i].begin(), neighbours_should_be[i].end());
             TS_ASSERT_EQUALS(nodes[i]->rGetNeighbours(), expected);
         }
 

@@ -41,12 +41,12 @@ ForwardEulerNumericalMethod<ELEMENT_DIM,SPACE_DIM>::ForwardEulerNumericalMethod(
 {
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>  
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ForwardEulerNumericalMethod<ELEMENT_DIM,SPACE_DIM>::~ForwardEulerNumericalMethod()
 {
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>  
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void ForwardEulerNumericalMethod<ELEMENT_DIM,SPACE_DIM>::UpdateAllNodePositions(double dt)
 {
     if (!this->mUseUpdateNodeLocation)
@@ -82,7 +82,7 @@ void ForwardEulerNumericalMethod<ELEMENT_DIM,SPACE_DIM>::UpdateAllNodePositions(
     }
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>  
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void ForwardEulerNumericalMethod<ELEMENT_DIM, SPACE_DIM>::OutputNumericalMethodParameters(out_stream& rParamsFile)
 {
     // No new parameters to output, so just call method on direct parent class

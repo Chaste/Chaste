@@ -1127,7 +1127,7 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetSurfaceAreaOfElement(unsigned inde
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool VertexMesh<ELEMENT_DIM, SPACE_DIM>::ElementIncludesPoint(const c_vector<double, SPACE_DIM>& rTestPoint, unsigned elementIndex)
 {
-    assert(SPACE_DIM == 2);   			 // LCOV_EXCL_LINE - code will be removed at compile time
+    assert(SPACE_DIM == 2);                // LCOV_EXCL_LINE - code will be removed at compile time
     assert(ELEMENT_DIM == SPACE_DIM);    // LCOV_EXCL_LINE - code will be removed at compile time
 
     // Get the element
@@ -1247,8 +1247,8 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetLocalIndexForElementEdgeClosestToPoint(const c_vector<double, SPACE_DIM>& rTestPoint, unsigned elementIndex)
 {
     // Make sure that we are in the correct dimension - this code will be eliminated at compile time
-    assert(SPACE_DIM == 2);    				// LCOV_EXCL_LINE - code will be removed at compile time
-    assert(ELEMENT_DIM == SPACE_DIM);   	// LCOV_EXCL_LINE - code will be removed at compile time
+    assert(SPACE_DIM == 2);                    // LCOV_EXCL_LINE - code will be removed at compile time
+    assert(ELEMENT_DIM == SPACE_DIM);       // LCOV_EXCL_LINE - code will be removed at compile time
 
     // Get the element
     VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = GetElement(elementIndex);

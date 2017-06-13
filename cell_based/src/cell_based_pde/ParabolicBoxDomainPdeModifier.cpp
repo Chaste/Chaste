@@ -44,11 +44,11 @@ ParabolicBoxDomainPdeModifier<DIM>::ParabolicBoxDomainPdeModifier(boost::shared_
                                                                   double stepSize,
                                                                   Vec solution)
     : AbstractBoxDomainPdeModifier<DIM>(pPde,
-    		                            pBoundaryCondition,
-    		                            isNeumannBoundaryCondition,
-    		                            pMeshCuboid,
-    		                            stepSize,
-    		                            solution)
+                                        pBoundaryCondition,
+                                        isNeumannBoundaryCondition,
+                                        pMeshCuboid,
+                                        stepSize,
+                                        solution)
 {
 }
 

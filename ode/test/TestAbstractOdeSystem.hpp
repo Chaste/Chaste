@@ -288,7 +288,7 @@ public:
             p_mod_info->mParameterNames[0] = param_name;
             if (p_ode) // It seems some setups will delete if the throw happens and some won't!
             {
-            	delete p_ode;
+                delete p_ode;
             }
         }
         { // Load with a parameter added
@@ -306,7 +306,7 @@ public:
             p_mod_info->mParameterNames.resize(1u);
             if (p_ode) // It seems some setups will delete if the throw happens and some won't!
             {
-            	delete p_ode;
+                delete p_ode;
             }
         }
         { // Load with a parameter added, and the constructor providing a default

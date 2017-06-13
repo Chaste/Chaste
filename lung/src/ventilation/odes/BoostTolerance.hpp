@@ -34,22 +34,22 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #ifndef BOOSTTOLERANCE_HPP_
-#define BOOSTTOLERANCE_HPP_ 
+#define BOOSTTOLERANCE_HPP_
 
 /**
  * Small class to test if values are within tolerance for use with Boost nonlinear solvers.
  */
 class Tolerance {
 public:
-    
+
     /**
      * @param eps The tolerance to solve within
      */
     Tolerance(double eps) :
         _eps(eps) {
     }
-    
-    /** 
+
+    /**
      * Checks if two values are within tolerance
      *
      * @param a First value
@@ -59,7 +59,7 @@ public:
     bool operator()(double a, double b) {
         return (fabs(b - a) <= _eps);
     }
-    
+
 private:
     double _eps;
 };

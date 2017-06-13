@@ -56,7 +56,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Timer.hpp"
 #include "TetrahedralMesh.hpp"
 #include "Warnings.hpp"
- 
+
 #include "petscao.h"
 #include <parmetis.h>
 #if (PARMETIS_MAJOR_VERSION >= 4) //ParMETIS 4.x and above
@@ -696,7 +696,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ReorderNodes()
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructLinearMesh(unsigned width)
 {
-    assert(ELEMENT_DIM == 1); 	// LCOV_EXCL_LINE
+    assert(ELEMENT_DIM == 1);     // LCOV_EXCL_LINE
 
      //Check that there are enough nodes to make the parallelisation worthwhile
     if (width==0)
@@ -814,8 +814,8 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructLinearMesh(uns
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRectangularMesh(unsigned width, unsigned height, bool stagger)
 {
-    assert(SPACE_DIM == 2); 	// LCOV_EXCL_LINE
-    assert(ELEMENT_DIM == 2); 	// LCOV_EXCL_LINE
+    assert(SPACE_DIM == 2);     // LCOV_EXCL_LINE
+    assert(ELEMENT_DIM == 2);     // LCOV_EXCL_LINE
     //Check that there are enough nodes to make the parallelisation worthwhile
     if (height==0)
     {
@@ -1019,8 +1019,8 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructCuboid(unsigne
         unsigned height,
         unsigned depth)
 {
-    assert(SPACE_DIM == 3); 	// LCOV_EXCL_LINE
-    assert(ELEMENT_DIM == 3); 	// LCOV_EXCL_LINE
+    assert(SPACE_DIM == 3);     // LCOV_EXCL_LINE
+    assert(ELEMENT_DIM == 3);     // LCOV_EXCL_LINE
     //Check that there are enough nodes to make the parallelisation worthwhile
     if (depth==0)
     {
@@ -1075,7 +1075,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructCuboid(unsigne
             // This return cannot be covered by regular testing, but is covered by the Nightly -np 3 builder
             return;  //LCOV_EXCL_LINE
         }
-        
+
         /* am_top_most is like PetscTools::AmTopMost() but accounts for the fact that a
          * higher numbered process may have dropped out of this construction altogether
          * (because is has no local ownership)

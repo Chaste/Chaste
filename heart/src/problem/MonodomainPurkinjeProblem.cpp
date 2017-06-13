@@ -92,7 +92,7 @@ Vec MonodomainPurkinjeProblem<ELEMENT_DIM, SPACE_DIM>::CreateInitialCondition()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 MonodomainPurkinjeProblem<ELEMENT_DIM, SPACE_DIM>::MonodomainPurkinjeProblem(AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>* pCellFactory)
         : AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, 2>(pCellFactory),
-		  mPurkinjeVoltageColumnId(UNSIGNED_UNSET)
+          mPurkinjeVoltageColumnId(UNSIGNED_UNSET)
 {
 }
 
@@ -101,7 +101,7 @@ MonodomainPurkinjeProblem<ELEMENT_DIM, SPACE_DIM>::MonodomainPurkinjeProblem(Abs
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 MonodomainPurkinjeProblem<ELEMENT_DIM, SPACE_DIM>::MonodomainPurkinjeProblem()
     : AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, 2>(),
-	  mPurkinjeVoltageColumnId(UNSIGNED_UNSET)
+      mPurkinjeVoltageColumnId(UNSIGNED_UNSET)
 {
 }
 // LCOV_EXCL_STOP

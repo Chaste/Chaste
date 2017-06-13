@@ -63,7 +63,7 @@ public:
         // Coverage
         AnEventHandler::Instance()->DisableImpl();
         TS_ASSERT_THROWS_THIS(AnEventHandler::Instance()->GetElapsedTime(AnEventHandler::TEST1),
-        		"Asked to report on a disabled event handler.  Check for contributory errors above.");
+                "Asked to report on a disabled event handler.  Check for contributory errors above.");
         AnEventHandler::Instance()->EnableImpl();
 
         AnEventHandler::BeginEvent(AnEventHandler::TEST1);

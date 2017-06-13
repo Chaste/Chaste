@@ -100,16 +100,16 @@ LaPradAirwayWall* LaPradAirwayWallFactory::CreateAirwayWallForElement(Element<1,
 
     assert(lower_generation >= 0.0);
     assert(upper_generation <= 16.0);
-    
+
     double RIn = pElement->GetAttribute()/2.;  // Measured R values are fully inflated.  As a proxy for uninflated, we simply divide by 2 (for now...)
     double ROut = 1.1*RIn;  // For now, assume ROut is 10% higher than RIn
-    
+
     double k1 = mk1[lower_generation] + (mk1[upper_generation] - mk1[lower_generation] )*(generation_factor - lower_generation);
     double k2 = mk2[lower_generation] + (mk2[upper_generation] - mk2[lower_generation] )*(generation_factor - lower_generation);
     double k3 = mk3[lower_generation] + (mk3[upper_generation] - mk3[lower_generation] )*(generation_factor - lower_generation);
-    
 
-    LaPradAirwayWall* wall = new LaPradAirwayWall;    
+
+    LaPradAirwayWall* wall = new LaPradAirwayWall;
     wall->Setk1(k1);
     wall->Setk2(k2);
     wall->Setk3(k3);

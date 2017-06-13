@@ -485,8 +485,8 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::Clear()
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetAngleBetweenNodes(unsigned indexA, unsigned indexB)
 {
-    assert(SPACE_DIM == 2); 			// LCOV_EXCL_LINE
-    assert(SPACE_DIM == ELEMENT_DIM); 	// LCOV_EXCL_LINE
+    assert(SPACE_DIM == 2);             // LCOV_EXCL_LINE
+    assert(SPACE_DIM == ELEMENT_DIM);     // LCOV_EXCL_LINE
 
     double x_difference = this->mNodes[indexB]->rGetLocation()[0] - this->mNodes[indexA]->rGetLocation()[0];
     double y_difference = this->mNodes[indexB]->rGetLocation()[1] - this->mNodes[indexA]->rGetLocation()[1];
@@ -733,7 +733,7 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetJacobianForElement(unsigned ele
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetInverseJacobianForElement(unsigned elementIndex, c_matrix<double, SPACE_DIM, ELEMENT_DIM>& rJacobian, double& rJacobianDeterminant, c_matrix<double, ELEMENT_DIM, SPACE_DIM>& rInverseJacobian) const
 {
-    assert(ELEMENT_DIM <= SPACE_DIM); 	// LCOV_EXCL_LINE
+    assert(ELEMENT_DIM <= SPACE_DIM);     // LCOV_EXCL_LINE
     assert(elementIndex < this->mElementInverseJacobians.size());
     rInverseJacobian = this->mElementInverseJacobians[elementIndex];
     rJacobian = this->mElementJacobians[elementIndex];
@@ -743,7 +743,7 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetInverseJacobianForElement(unsig
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetWeightedDirectionForElement(unsigned elementIndex, c_vector<double, SPACE_DIM>& rWeightedDirection, double& rJacobianDeterminant) const
 {
-    assert(ELEMENT_DIM < SPACE_DIM); 	// LCOV_EXCL_LINE
+    assert(ELEMENT_DIM < SPACE_DIM);     // LCOV_EXCL_LINE
     assert(elementIndex < this->mElementWeightedDirections.size());
     rWeightedDirection = this->mElementWeightedDirections[elementIndex];
     rJacobianDeterminant = this->mElementJacobianDeterminants[elementIndex];

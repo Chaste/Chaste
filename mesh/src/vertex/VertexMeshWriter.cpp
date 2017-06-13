@@ -126,7 +126,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VertexElementData VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextElementWithFaces()
 {
     // This method should only be called in 3D
-    assert(SPACE_DIM == 3);	// LCOV_EXCL_LINE
+    assert(SPACE_DIM == 3);    // LCOV_EXCL_LINE
     assert(mpMesh);
     assert(this->mNumElements == mpMesh->GetNumElements());
 
@@ -208,7 +208,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteVtkUsingMesh(VertexMesh<ELEMENT_DIM, SPACE_DIM>& rMesh, std::string stamp)
 {
 #ifdef CHASTE_VTK
-    assert(SPACE_DIM==3 || SPACE_DIM == 2);	// LCOV_EXCL_LINE
+    assert(SPACE_DIM==3 || SPACE_DIM == 2);    // LCOV_EXCL_LINE
 
     // Create VTK mesh
     MakeVtkMesh(rMesh);
@@ -479,7 +479,7 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
         }
         else // 3D
         {
-            assert(SPACE_DIM == 3);	// LCOV_EXCL_LINE
+            assert(SPACE_DIM == 3);    // LCOV_EXCL_LINE
 
             // Get data for this element
             VertexElementData elem_data_with_faces = this->GetNextElementWithFaces();

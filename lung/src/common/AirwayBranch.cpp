@@ -279,7 +279,7 @@ Node<3>* AirwayBranch::GetProximalNode()
         UNUSED_OPT(first_elem_node_1_global_idx);
         unsigned second_elem_node_0_global_idx = p_second_element->GetNode(0)->GetIndex();
         UNUSED_OPT(second_elem_node_0_global_idx);
-        
+
         // In case of failure, there's a problem with node ordering in the mesh: look at commented code below.
         assert(first_elem_node_1_global_idx == second_elem_node_0_global_idx);
         return p_first_element->GetNode(0);

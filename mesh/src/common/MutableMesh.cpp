@@ -815,8 +815,8 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh()
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::vector<c_vector<unsigned, 5> > MutableMesh<ELEMENT_DIM, SPACE_DIM>::SplitLongEdges(double cutoffLength)
 {
-    assert(ELEMENT_DIM == 2); 	// LCOV_EXCL_LINE
-    assert(SPACE_DIM == 3); 	// LCOV_EXCL_LINE
+    assert(ELEMENT_DIM == 2);     // LCOV_EXCL_LINE
+    assert(SPACE_DIM == 3);     // LCOV_EXCL_LINE
 
     std::vector<c_vector<unsigned, 5> > history;
 
@@ -992,7 +992,7 @@ c_vector<unsigned, 3> MutableMesh<ELEMENT_DIM, SPACE_DIM>::SplitEdge(Node<SPACE_
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool MutableMesh<ELEMENT_DIM, SPACE_DIM>::CheckIsVoronoi(Element<ELEMENT_DIM, SPACE_DIM>* pElement, double maxPenetration)
 {
-    assert(ELEMENT_DIM == SPACE_DIM); 	// LCOV_EXCL_LINE
+    assert(ELEMENT_DIM == SPACE_DIM);     // LCOV_EXCL_LINE
     unsigned num_nodes = pElement->GetNumNodes();
     std::set<unsigned> neighbouring_elements_indices;
     std::set< Element<ELEMENT_DIM,SPACE_DIM> *> neighbouring_elements;

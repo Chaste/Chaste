@@ -309,7 +309,7 @@ private:
         assert(event<NUM_EVENTS);
         if (!mEnabled)
         {
-        	EXCEPTION("Asked to report on a disabled event handler.  Check for contributory errors above.");
+            EXCEPTION("Asked to report on a disabled event handler.  Check for contributory errors above.");
         }
         double time;
         if (mHasBegun[event])

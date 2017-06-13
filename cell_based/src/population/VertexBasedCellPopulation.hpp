@@ -494,8 +494,8 @@ public:
      * @return a default value for the time step to use
      * when simulating the cell population.
      *
-     * A hard-coded value of 0.002 is returned. However, note that the time 
-     * step can be reset by calling SetDt() on the simulation object used to 
+     * A hard-coded value of 0.002 is returned. However, note that the time
+     * step can be reset by calling SetDt() on the simulation object used to
      * simulate the cell population.
      */
     virtual double GetDefaultTimeStep();
@@ -504,20 +504,20 @@ public:
      * Overridden WriteDataToVisualizerSetupFile() method.
      * Write any data necessary to a visualization setup file.
      * Used by AbstractCellBasedSimulation::WriteVisualizerSetupFile().
-     * 
+     *
      * @param pVizSetupFile a visualization setup file
      */
     virtual void WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile);
 
     /**
      * Overridden SimulationSetupHook() method.
-     * 
-     * Hook method to add a T2SwapCellKiller to a simulation object, which is always 
-     * required in the case of a VertexBasedCellPopulation. This functionality avoids 
-     * the need for static or dynamic casts to specific cell population types within 
+     *
+     * Hook method to add a T2SwapCellKiller to a simulation object, which is always
+     * required in the case of a VertexBasedCellPopulation. This functionality avoids
+     * the need for static or dynamic casts to specific cell population types within
      * simulation methods.
-     * 
-     * Note: In order to inhibit T2 swaps, the user needs to set the threshold for T2 
+     *
+     * Note: In order to inhibit T2 swaps, the user needs to set the threshold for T2
      * swaps in the MutableVertexMesh object mrMesh to 0, using the SetT2Threshold() method.
      *
      * @param pSimulation pointer to a cell-based simulation object

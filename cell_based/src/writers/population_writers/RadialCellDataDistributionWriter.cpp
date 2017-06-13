@@ -199,7 +199,7 @@ std::string RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::GetVariabl
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::SetNumRadialBins(unsigned numRadialBins)
 {
-	mNumRadialBins = numRadialBins;
+    mNumRadialBins = numRadialBins;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
