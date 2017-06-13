@@ -147,7 +147,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumElements(), std::vector<unsigned>(), p_diff_type);
 
         for (unsigned i=0; i<cells.size(); i++)
@@ -157,7 +157,9 @@ public:
 
         // Create cell population
         VertexBasedCellPopulation<2> cell_population(mesh, cells);
+        TS_ASSERT(cell_population.GetRestrictVertexMovementBoolean())
         cell_population.SetRestrictVertexMovementBoolean(false);
+        TS_ASSERT(!cell_population.GetRestrictVertexMovementBoolean())
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -176,11 +178,10 @@ public:
         simulator.Solve();
 
         // Test relaxes to circle (can be more stringent with more nodes and more time)
-        // Note how these values are different to previous test due to more motion
         TS_ASSERT_DELTA(cell_population.rGetMesh().GetVolumeOfElement(0), 1.0, 0.05);
-        TS_ASSERT_DELTA(cell_population.rGetMesh().GetSurfaceAreaOfElement(0), 3.5449077, 0.1);
+        TS_ASSERT_DELTA(cell_population.rGetMesh().GetSurfaceAreaOfElement(0), 3.549077, 0.1);
 
-        // Test no Warnings
+        // Test that the vertex restriction warning does not occur
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
     }
 
