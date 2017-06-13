@@ -197,7 +197,15 @@ private:
             }
             if (!warningsOk)
             {
-                TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
+                if (rModels[i]=="demir_model_1994")
+                {
+                    // We know this model does something that provokes one warning...
+                    TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
+                }
+                else
+                {
+                    TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
+                }
             }
             Warnings::NoisyDestroy(); // Print out any warnings now, not at program exit
         }
