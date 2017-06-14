@@ -532,8 +532,8 @@ def GetPathRevision(path):
     """
     if os.path.exists(os.path.join(path, '.git')):
         # Git repo
-        commit_sha = subprocess.check_output(['git', 'rev-parse', 'HEAD']).strip()
-        retcode = subprocess.call(['git', 'diff-index', '--quiet', 'HEAD', '--'])
+        commit_sha = subprocess.check_output(['git', '-C', path, 'rev-parse', '--short','HEAD']).strip()
+        retcode = subprocess.call(['git', '-C', path, 'diff-index', '--quiet', 'HEAD', '--'])
         revision = '0x' + commit_sha
         modified = (retcode != 0)
     elif os.path.exists(os.path.join(path, '.svn')):
@@ -560,6 +560,9 @@ def GetProjectVersions(projectsRoot, default_revision=None):
             revision, _ = GetPathRevision(entry_path)
             if revision == 'Unknown' and default_revision:
                 revision = default_revision
+            if str(revision).startswith('0x'):
+                # Take off the confusing hex symbol
+                revision = str(revision[2:])
             code += '%sversions["%s"] = "%s";\n' % (' '*8, entry, revision)
     return code
 
@@ -572,7 +575,7 @@ def GetVersionCpp(templateFilePath, env):
         # Extract just the revision number from the file.
         full_version = open(version_file).read().strip()
         last_component = full_version[1+full_version.rfind('.'):]
-        if last_component[0] == 'r':
+        if last_component[0] is not 'r':
             # It's a git SHA
             chaste_revision = '0x' + last_component[1:]
         else:
@@ -582,8 +585,6 @@ def GetVersionCpp(templateFilePath, env):
     else:
         chaste_revision, wc_modified = GetPathRevision(chaste_root)
         default_revision_for_projects = None
-    if chaste_revision[:2] == '0x':
-        chaste_revision = chaste_revision[:10] # We can't fit more than 8 hex digits in a 32-bit unsigned reliably
 
     time_format = "%a, %d %b %Y %H:%M:%S +0000"
     build_time = time.strftime(time_format, time.gmtime())
