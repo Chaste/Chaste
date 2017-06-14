@@ -132,9 +132,19 @@ const std::map<std::string, std::string>& ChasteBuildInfo::rGetProjectVersions()
     static std::map<std::string, std::string> versions;
     if (versions.empty())
     {
-        %(project_versions)s;
+%(project_versions)s
     }
     return versions;
+}
+
+const std::map<std::string, std::string>& ChasteBuildInfo::rGetIfProjectsModified()
+{
+    static std::map<std::string, std::string> modified;
+    if (modified.empty())
+    {
+%(project_modified)s
+    }
+    return modified;
 }
 
 std::string ChasteBuildInfo::GetProvenanceString()

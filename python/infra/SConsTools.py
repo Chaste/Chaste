@@ -566,6 +566,17 @@ def GetProjectVersions(projectsRoot, default_revision=None):
             code += '%sversions["%s"] = "%s";\n' % (' '*8, entry, revision)
     return code
 
+def GetProjectModified(projectsRoot):
+    """Return C++ code filling in the map of whether projects have been modified."""
+    code = ""
+    for entry in sorted(os.listdir(projectsRoot)):
+        entry_path = os.path.join(projectsRoot, entry)
+        if entry[0] != '.' and os.path.isdir(entry_path):
+            _ , modified = GetPathRevision(entry_path)
+
+            code += '%smodified["%s"] = "%s";\n' % (' '*8, entry, modified)
+    return code
+
 def GetVersionCpp(templateFilePath, env):
     """Return the contents of the Version.cpp source file."""
     chaste_root = Dir('#').abspath
@@ -612,6 +623,7 @@ def GetVersionCpp(templateFilePath, env):
              'revision': chaste_revision,
              'wc_modified': str(wc_modified).lower(),
              'project_versions': GetProjectVersions(os.path.join(chaste_root, 'projects'), default_revision_for_projects),
+             'project_modified': GetProjectModified(os.path.join(chaste_root, 'projects')),
              'licence': licence,
              'time_format': time_format,
              'time_size': len(build_time)+1,

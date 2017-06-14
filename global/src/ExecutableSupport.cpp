@@ -381,9 +381,11 @@ void ExecutableSupport::GetBuildInfo(std::string& rInfo)
     {
         // LCOV_EXCL_START
         // No projects are checked out for continuous builds normally!
-        output << "\t\t\t<Name>" << r_project_version.first << "</Name><Version>"
-               << r_project_version.second << "</Version><Modified>"
-               << projects_modified[r_project_version.first] << "</Modified>\n";
+        output << "\t\t\t<Project>" << std::endl;
+        output << "\t\t\t\t<Name>" << r_project_version.first << "</Name>" << std::endl;
+        output << "\t\t\t\t<Version>" << r_project_version.second << "</Version>" << std::endl;
+        output << "\t\t\t\t<Modified>" << projects_modified[r_project_version.first] << "</Modified>" << std::endl;
+        output << "\t\t\t</Project>" << std::endl;
         // LCOV_EXCL_STOP
     }
     output << "\t\t</Projects>\n";
