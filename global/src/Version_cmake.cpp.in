@@ -137,6 +137,16 @@ const std::map<std::string, std::string>& ChasteBuildInfo::rGetProjectVersions()
     return versions;
 }
 
+const std::map<std::string, std::string>& ChasteBuildInfo::rGetIfProjectsModified()
+{
+    static std::map<std::string, std::string> modified;
+    if (modified.empty())
+    {
+        ${projects_modified}
+    }
+    return modified;
+}
+
 std::string ChasteBuildInfo::GetProvenanceString()
 {
     std::stringstream prov;

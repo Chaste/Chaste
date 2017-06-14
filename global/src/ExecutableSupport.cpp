@@ -375,12 +375,15 @@ void ExecutableSupport::GetBuildInfo(std::string& rInfo)
     output << "\t\t<CurrentTime>" << ChasteGetCurrentTime() << "</CurrentTime>\n";
     output << "\t\t<BuilderUnameInfo>" << ChasteBuildInfo::GetBuilderUnameInfo() << "</BuilderUnameInfo>\n";
     output << "\t\t<Projects>\n";
+    // A bit ugly!  \todo Can neaten up with tuples in C++11
+    std::map<std::string, std::string> projects_modified = ChasteBuildInfo::rGetIfProjectsModified();
     BOOST_FOREACH (const StringPair& r_project_version, ChasteBuildInfo::rGetProjectVersions())
     {
         // LCOV_EXCL_START
         // No projects are checked out for continuous builds normally!
         output << "\t\t\t<Name>" << r_project_version.first << "</Name><Version>"
-               << r_project_version.second << "</Version>\n";
+               << r_project_version.second << "</Version><Modified>"
+               << projects_modified[r_project_version.first] << "</Modified>\n";
         // LCOV_EXCL_STOP
     }
     output << "\t\t</Projects>\n";
