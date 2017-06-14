@@ -60,7 +60,7 @@ std::string ChasteBuildInfo::GetVersionString()
 {
     std::stringstream version;
     version << GetMajorReleaseNumber() << "." << GetMinorReleaseNumber()
-            << "." << GetRevisionNumber();
+            << "." << std::hex << GetRevisionNumber() << std::dec;
     return version.str();
 }
 
