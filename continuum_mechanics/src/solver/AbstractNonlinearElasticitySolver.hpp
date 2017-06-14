@@ -2154,7 +2154,7 @@ void AbstractNonlinearElasticitySolver<DIM>::SolveSnes()
 #else
     SNESSetType(snes, SNESLS);
 #endif
-    SNESSetTolerances(snes,1e-5,1e-5,1e-5,PETSC_DEFAULT,PETSC_DEFAULT);
+    SNESSetTolerances(snes,1e-5,1e-5,0.2 * 1e-5,PETSC_DEFAULT,PETSC_DEFAULT);
 
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR == 3) //PETSc 3.3
     SNESLineSearch linesearch;
