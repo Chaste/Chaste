@@ -186,7 +186,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::CheckForStepSizeException(unsigned nodeIndex, c_vector<double,SPACE_DIM>& rDisplacement, double dt)
 {
     double length = norm_2(rDisplacement);
- 
+
     if ((length > this->mAbsoluteMovementThreshold) && (!this->IsGhostNode(nodeIndex)) && (!this->IsParticle(nodeIndex)))
     {
         std::ostringstream message;

@@ -144,8 +144,8 @@ double MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetDampingConstant(unsign
          * where d0, d1 are parameters, A is the cell's area, and old_damping_const
          * is the damping constant if not using mUseAreaBasedDampingConstant
          */
-		assert(SPACE_DIM == 2); // LCOV_EXCL_LINE
-        
+        assert(SPACE_DIM == 2); // LCOV_EXCL_LINE
+
         double rest_length = 1.0;
         double d0 = mAreaBasedDampingConstantParameter;
 
@@ -445,7 +445,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::DivideLongSprings(double sp
 {
     // Only implemented for 2D elements
     assert(ELEMENT_DIM == 2); // LCOV_EXCL_LINE
-    
+
     std::vector<c_vector<unsigned, 5> > new_nodes;
     new_nodes = rGetMesh().SplitLongEdges(springDivisionThreshold);
 

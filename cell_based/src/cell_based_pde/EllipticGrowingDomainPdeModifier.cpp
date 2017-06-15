@@ -43,9 +43,9 @@ EllipticGrowingDomainPdeModifier<DIM>::EllipticGrowingDomainPdeModifier(boost::s
                                                                         bool isNeumannBoundaryCondition,
                                                                         Vec solution)
     : AbstractGrowingDomainPdeModifier<DIM>(pPde,
-    		                                pBoundaryCondition,
-    		                                isNeumannBoundaryCondition,
-    		                                solution)
+                                            pBoundaryCondition,
+                                            isNeumannBoundaryCondition,
+                                            solution)
 {
 }
 

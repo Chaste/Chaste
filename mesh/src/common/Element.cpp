@@ -126,7 +126,7 @@ c_vector<double,SPACE_DIM+1> Element<ELEMENT_DIM, SPACE_DIM>::CalculateCircumsph
      *
      */
 
-    assert(ELEMENT_DIM == SPACE_DIM); 	// LCOV_EXCL_LINE
+    assert(ELEMENT_DIM == SPACE_DIM);     // LCOV_EXCL_LINE
     c_vector<double, ELEMENT_DIM> rhs;
 
     for (unsigned j=0; j<ELEMENT_DIM; j++)
@@ -162,7 +162,7 @@ c_vector<double,SPACE_DIM+1> Element<ELEMENT_DIM, SPACE_DIM>::CalculateCircumsph
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double Element<ELEMENT_DIM, SPACE_DIM>::CalculateQuality()
 {
-    assert(SPACE_DIM == ELEMENT_DIM); 	// LCOV_EXCL_LINE
+    assert(SPACE_DIM == ELEMENT_DIM);     // LCOV_EXCL_LINE
     if (SPACE_DIM == 1)
     {
         return 1.0;
@@ -228,7 +228,7 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM+1> Element<ELEMENT_DIM, SPACE_DIM>::CalculateInterpolationWeights(const ChastePoint<SPACE_DIM>& rTestPoint)
 {
     // Can only test if it's a tetrahedral mesh in 3d, triangles in 2d...
-    assert(ELEMENT_DIM == SPACE_DIM); 	// LCOV_EXCL_LINE
+    assert(ELEMENT_DIM == SPACE_DIM);     // LCOV_EXCL_LINE
 
     c_vector<double, SPACE_DIM+1> weights;
 
@@ -248,7 +248,7 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM+1> Element<ELEMENT_DIM, SPACE_DIM>::CalculateInterpolationWeightsWithProjection(const ChastePoint<SPACE_DIM>& rTestPoint)
 {
     //Can only test if it's a tetrahedral mesh in 3d, triangles in 2d...
-    assert(ELEMENT_DIM == SPACE_DIM); 	// LCOV_EXCL_LINE
+    assert(ELEMENT_DIM == SPACE_DIM);     // LCOV_EXCL_LINE
 
     c_vector<double, SPACE_DIM+1> weights = CalculateInterpolationWeights(rTestPoint);
 
@@ -290,7 +290,7 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> Element<ELEMENT_DIM, SPACE_DIM>::CalculateXi(const ChastePoint<SPACE_DIM>& rTestPoint)
 {
     //Can only test if it's a tetrahedral mesh in 3d, triangles in 2d...
-    assert(ELEMENT_DIM == SPACE_DIM); 	// LCOV_EXCL_LINE
+    assert(ELEMENT_DIM == SPACE_DIM);     // LCOV_EXCL_LINE
 
     // Find the location with respect to node 0
 ///\todo: #1361 ComputeContainingElements and related methods, and methods called by that down to
@@ -313,7 +313,7 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool Element<ELEMENT_DIM, SPACE_DIM>::IncludesPoint(const ChastePoint<SPACE_DIM>& rTestPoint, bool strict)
 {
     // Can only test if it's a tetrahedral mesh in 3d, triangles in 2d...
-    assert(ELEMENT_DIM == SPACE_DIM); 	// LCOV_EXCL_LINE
+    assert(ELEMENT_DIM == SPACE_DIM);     // LCOV_EXCL_LINE
 
     c_vector<double, SPACE_DIM+1> weights=CalculateInterpolationWeights(rTestPoint);
 

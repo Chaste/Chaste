@@ -41,62 +41,62 @@ ChasteCuboid<SPACE_DIM>::ChasteCuboid(ChastePoint<SPACE_DIM>& rLowerPoint, Chast
     : mLowerCorner(rLowerPoint),
     mUpperCorner(rUpperPoint)
 {
-	for (unsigned dim=0; dim<SPACE_DIM; dim++)
-	{
-		if (mLowerCorner[dim] > mUpperCorner[dim])
-		{
-			EXCEPTION("Attempt to create a cuboid with MinCorner greater than MaxCorner in some dimension");
-		}
-	}
+    for (unsigned dim=0; dim<SPACE_DIM; dim++)
+    {
+        if (mLowerCorner[dim] > mUpperCorner[dim])
+        {
+            EXCEPTION("Attempt to create a cuboid with MinCorner greater than MaxCorner in some dimension");
+        }
+    }
 }
 
 template <unsigned SPACE_DIM>
 bool ChasteCuboid<SPACE_DIM>::DoesContain(const ChastePoint<SPACE_DIM>& rPointToCheck) const
 {
-	for (unsigned dim=0; dim<SPACE_DIM; dim++)
-	{
-		if (rPointToCheck[dim] < mLowerCorner[dim] - 100*DBL_EPSILON
-			|| mUpperCorner[dim] + 100* DBL_EPSILON < rPointToCheck[dim])
-		{
-			return false;
-		}
-	}
-	return true;
+    for (unsigned dim=0; dim<SPACE_DIM; dim++)
+    {
+        if (rPointToCheck[dim] < mLowerCorner[dim] - 100*DBL_EPSILON
+            || mUpperCorner[dim] + 100* DBL_EPSILON < rPointToCheck[dim])
+        {
+            return false;
+        }
+    }
+    return true;
 }
 
 template <unsigned SPACE_DIM>
 const ChastePoint<SPACE_DIM>& ChasteCuboid<SPACE_DIM>::rGetUpperCorner() const
 {
-	return mUpperCorner;
+    return mUpperCorner;
 }
 
 template <unsigned SPACE_DIM>
 const ChastePoint<SPACE_DIM>& ChasteCuboid<SPACE_DIM>::rGetLowerCorner() const
 {
-	return mLowerCorner;
+    return mLowerCorner;
 }
 
 template <unsigned SPACE_DIM>
 double ChasteCuboid<SPACE_DIM>::GetWidth(unsigned rDimension) const
 {
-	assert(rDimension<SPACE_DIM);
-	return mUpperCorner[rDimension] - mLowerCorner[rDimension];
+    assert(rDimension<SPACE_DIM);
+    return mUpperCorner[rDimension] - mLowerCorner[rDimension];
 }
 
 template <unsigned SPACE_DIM>
 unsigned ChasteCuboid<SPACE_DIM>::GetLongestAxis() const
 {
     unsigned axis = 0;
-	double max_dimension = 0.0;
-	for (unsigned i=0; i<SPACE_DIM; i++)
-	{
-		double dimension =  mUpperCorner[i] - mLowerCorner[i];
-		if (dimension > max_dimension)
-		{
-			axis=i;
-			max_dimension = dimension;
-		}
-	}
+    double max_dimension = 0.0;
+    for (unsigned i=0; i<SPACE_DIM; i++)
+    {
+        double dimension =  mUpperCorner[i] - mLowerCorner[i];
+        if (dimension > max_dimension)
+        {
+            axis=i;
+            max_dimension = dimension;
+        }
+    }
     return axis;
 }
 

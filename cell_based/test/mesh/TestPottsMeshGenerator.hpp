@@ -52,8 +52,8 @@ public:
     {
         // Coverage
         //TS_ASSERT_THROWS_NOTHING(PottsMeshGenerator<2> empty_generator());
-	///\todo Line above is not valid code.  What does it cover?
-   
+    ///\todo Line above is not valid code.  What does it cover?
+
         PottsMeshGenerator<2> generator(9, 3, 3, 5, 2, 2, 1, 1, 1, true); // last bool makes elements start in bottom left
 
         // Create mesh

@@ -278,7 +278,7 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddCellData(std::string dataName, std
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddTensorCellData(std::string dataName, std::vector<c_vector<double,SPACE_DIM*(SPACE_DIM+1)/2> > dataPayload)
 {
-    assert(SPACE_DIM != 1);	// LCOV_EXCL_LINE
+    assert(SPACE_DIM != 1);    // LCOV_EXCL_LINE
 
     vtkDoubleArray* p_vectors = vtkDoubleArray::New();
     p_vectors->SetName(dataName.c_str());
@@ -314,7 +314,7 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddTensorCellData(std::string dataNam
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddTensorCellData(std::string dataName, std::vector<c_matrix<double,SPACE_DIM,SPACE_DIM> > dataPayload)
 {
-    assert(SPACE_DIM != 1);	// LCOV_EXCL_LINE
+    assert(SPACE_DIM != 1);    // LCOV_EXCL_LINE
 
     vtkDoubleArray* p_vectors = vtkDoubleArray::New();
     p_vectors->SetName(dataName.c_str());
@@ -509,7 +509,7 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddPointData(std::string dataName, st
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddTensorPointData(std::string dataName, std::vector<c_matrix<double,SPACE_DIM,SPACE_DIM> > dataPayload)
 {
-    assert(SPACE_DIM != 1);	// LCOV_EXCL_LINE
+    assert(SPACE_DIM != 1);    // LCOV_EXCL_LINE
 
     vtkDoubleArray* p_vectors = vtkDoubleArray::New();
     p_vectors->SetName(dataName.c_str());

@@ -932,7 +932,7 @@ std::string TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetMeshFileBaseName()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetOneDimBoundary()
 {
-    assert(ELEMENT_DIM == 1);	// LCOV_EXCL_LINE
+    assert(ELEMENT_DIM == 1);    // LCOV_EXCL_LINE
     mNumFaceAttributes = 0;
     if (!mOneDimBoundary.empty())
     {

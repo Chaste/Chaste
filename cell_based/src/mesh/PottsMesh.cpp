@@ -199,7 +199,7 @@ double PottsMesh<DIM>::GetSurfaceAreaOfElement(unsigned index)
 {
     ///\todo not implemented in 3d yet
     assert(DIM==2 || DIM==3); // LCOV_EXCL_LINE
-    
+
     // Helper variables
     PottsElement<DIM>* p_element = GetElement(index);
     unsigned num_nodes = p_element->GetNumNodes();

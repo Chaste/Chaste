@@ -38,45 +38,55 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef CHASTE_CVODE
 
 AbstractSteadyStateRunner::AbstractSteadyStateRunner(boost::shared_ptr<AbstractCvodeCell> pModel)
- : mpModel(pModel),
-   mNumEvaluations(0u),
-   mMaxNumPaces(10000u)
-{}
-
+        : mpModel(pModel),
+          mNumEvaluations(0u),
+          mMaxNumPaces(10000u),
+          mSuppressOutput(false)
+{
+}
 
 bool AbstractSteadyStateRunner::RunToSteadyState()
 {
     // Get timing information from the cell stimulus (only works for regular stimuli)
-    if (!boost::dynamic_pointer_cast<RegularStimulus>(mpModel->GetStimulusFunction()) )
+    if (!boost::dynamic_pointer_cast<RegularStimulus>(mpModel->GetStimulusFunction()))
     {
         EXCEPTION("Steady State approximations only work for models with RegularStimulus objects.");
     }
 
     RunToSteadyStateImplementation();
 
-    if (mNumEvaluations<mMaxNumPaces)
+    if (mNumEvaluations < mMaxNumPaces)
     {
-        std::cout << "Steady state detected after " << GetNumEvaluations() << " paces." << std::endl;
+        if (!mSuppressOutput)
+        {
+            std::cout << "Steady state detected after " << GetNumEvaluations() << " paces." << std::endl;
+        }
         return true;
     }
     else
     {
-        std::cout << "Steady state not reached after "<< GetNumEvaluations() << " paces." << std::endl;
+        if (!mSuppressOutput)
+        {
+            std::cout << "Steady state not reached after " << GetNumEvaluations() << " paces." << std::endl;
+        }
         WARNING("Model " << mpModel->GetSystemName() << " did not reach steady state within " << mMaxNumPaces << " paces.");
         return false;
     }
 }
 
+void AbstractSteadyStateRunner::SuppressOutput(bool suppress)
+{
+    mSuppressOutput = suppress;
+}
 
 unsigned AbstractSteadyStateRunner::GetNumEvaluations()
 {
     return mNumEvaluations;
 }
 
-
 void AbstractSteadyStateRunner::SetMaxNumPaces(unsigned numPaces)
 {
-    if (numPaces==0u)
+    if (numPaces == 0u)
     {
         EXCEPTION("Please set a maximum number of paces that is positive");
     }
@@ -84,4 +94,3 @@ void AbstractSteadyStateRunner::SetMaxNumPaces(unsigned numPaces)
 }
 
 #endif // CHASTE_CVODE
-

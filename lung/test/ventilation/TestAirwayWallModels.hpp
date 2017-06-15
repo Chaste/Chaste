@@ -106,7 +106,7 @@ public:
                 p_wall->SetTimestep(0.0); //For coverage, Lambert is a quasi-static model
                 p_wall->SetAirwayPressure(0.0);
                 p_wall->SetPleuralPressure(0.0);
-                    
+
                 p_wall->SolveAndUpdateState(0.0, 0.0);
                 TS_ASSERT_DELTA(p_wall->GetLumenRadius(), p_wall->mRi, 1e-6);
 
@@ -220,10 +220,10 @@ public:
 
     }
 
-    
+
     void TestLaPradAirwayWallAndFactory() throw (Exception)
-    {       
-        
+    {
+
          //Get a simple mesh here
         TetrahedralMesh<1,3> mesh;
         TrianglesMeshReader<1,3> reader("lung/test/data/three_bifurcations");
@@ -264,7 +264,7 @@ public:
             {
                 LaPradAirwayWall* p_wall = factory.CreateAirwayWallForElement(mesh.GetElement(element_index));
 
-                p_wall->SetTimestep(0.0); 
+                p_wall->SetTimestep(0.0);
                 p_wall->SetAirwayPressure(0.0);
                 p_wall->SetPleuralPressure(0.0);
 
@@ -273,10 +273,10 @@ public:
 
                 delete p_wall;
             }
-            
+
             }
-            
-            
+
+
             //Repeat using Strahler order (equivalent for this mesh)
         {
             LaPradAirwayWallFactory factory(true);
@@ -306,30 +306,30 @@ public:
             {
                 LaPradAirwayWall* p_wall = factory.CreateAirwayWallForElement(mesh.GetElement(element_index));
 
-                p_wall->SetTimestep(0.0); 
+                p_wall->SetTimestep(0.0);
                 p_wall->SetAirwayPressure(0.0);
                 p_wall->SetPleuralPressure(0.0);
 
                 p_wall->SolveAndUpdateState(0.0, 0.0);
-                
+
                 TS_ASSERT_DELTA(p_wall->GetLumenRadius(), p_wall->mRIn, 1e-3);
 
                 delete p_wall;
             }
         }
-        
+
     }
-    
-   
+
+
     void TestHiornsAirwayWall() throw (Exception)
     {
-           
+
         HiornsAirwayWall airway_wall;
         airway_wall.SetTimestep(1.0); //Not used, for coverage only
-        
+
         double targetPressure = -2.;
         double RIn = 1.;
-        double ROut = 1.5;        
+        double ROut = 1.5;
         double mu = 5.;
         double phi1 = 0.;
         double phi2 = 0.;
@@ -346,21 +346,21 @@ public:
         airway_wall.Setphi2(phi2);
         airway_wall.SetC1(C1);
         airway_wall.SetC2(C2);
-        airway_wall.SetA(A);        
-        
+        airway_wall.SetA(A);
+
         //Validated against Matlab implementation
         airway_wall.SolveAndUpdateState(0.0, 0.0);
         TS_ASSERT_DELTA(airway_wall.GetLumenRadius(), 0.224008, 1e-3)
-                
+
         airway_wall.SetA(1.);
-                
+
         airway_wall.SetPleuralPressure(0.0);
         airway_wall.SolveAndUpdateState(0.0, 0.0);
         TS_ASSERT_DELTA(airway_wall.GetLumenRadius(), 0.769301, 1e-3)
-           
+
     }
 
-    
+
     void TestHiornsAirwayWallAndFactory() throw (Exception)
     {
         // Get a simple mesh here
@@ -404,7 +404,7 @@ public:
             {
                 HiornsAirwayWall* p_wall = factory.CreateAirwayWallForElement(mesh.GetElement(element_index));
 
-                p_wall->SetTimestep(0.0); 
+                p_wall->SetTimestep(0.0);
                 p_wall->SetAirwayPressure(0.0);
                 p_wall->SetPleuralPressure(0.0);
 
@@ -415,10 +415,10 @@ public:
 
                 delete p_wall;
             }
-            
+
             }
-            
-            
+
+
             //Repeat using Strahler order (equivalent for this mesh)
         {
             HiornsAirwayWallFactory factory(true);
@@ -447,12 +447,12 @@ public:
             {
                 HiornsAirwayWall* p_wall = factory.CreateAirwayWallForElement(mesh.GetElement(element_index));
 
-                p_wall->SetTimestep(0.0); 
+                p_wall->SetTimestep(0.0);
                 p_wall->SetAirwayPressure(0.0);
                 p_wall->SetPleuralPressure(0.0);
 
                 p_wall->SolveAndUpdateState(0.0, 0.0);
-                
+
                 double testVal = 0.0249;
                 //double testVal = 0.00907487;
                 TS_ASSERT_DELTA(p_wall->GetLumenRadius(), testVal, 1e-3);
@@ -460,9 +460,9 @@ public:
                 delete p_wall;
             }
         }
-        
+
     }
-    
+
 };
 #endif /*_TESTAIRWAYWALLMODELS_HPP_*/
 

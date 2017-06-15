@@ -79,11 +79,11 @@ public:
 
         /* argv[0] will be equal to global/build/debug/TestCommandLineArguments
          * or global/build/optimised/TestCommandLineArguments, etc
-         * Variations on Windows (CMake) include .../TestCommandLineArguments.exe 
+         * Variations on Windows (CMake) include .../TestCommandLineArguments.exe
          * Test executables built with SCons (deprecated) have the word Runner
          * * .../TestCommandLineArgumentsRunner
          * * .../TestCommandLineArgumentsRunner.exe
-         */ 
+         */
         char** argv = *(CommandLineArguments::Instance()->p_argv);
         assert(argv != NULL);
         std::string arg_as_string(argv[0]);

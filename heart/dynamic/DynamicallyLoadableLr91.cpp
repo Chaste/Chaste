@@ -182,7 +182,7 @@ void DynamicallyLoadableLr91::EvaluateYDerivatives(double time,
     }
     else
     {
-    	// LCOV_EXCL_START
+        // LCOV_EXCL_START
         time_dependent_potassium_current_Xi_gate_Xi = 1.0;
         // LCOV_EXCL_STOP
     }
@@ -255,7 +255,7 @@ double DynamicallyLoadableLr91::GetIIonic(const std::vector<double>* pStateVaria
     }
     else
     {
-    	// LCOV_EXCL_START
+        // LCOV_EXCL_START
         time_dependent_potassium_current_Xi_gate_Xi = 1.0;
         // LCOV_EXCL_STOP
     }
