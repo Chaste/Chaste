@@ -52,6 +52,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractPerElementWriter.hpp"
 #include "petscsnes.h"
 
+#include "Debug.hpp"
+
 //#define MECH_USE_HYPRE    // uses HYPRE to solve linear systems, requires PETSc to be installed with HYPRE
 
 /**
@@ -2154,7 +2156,8 @@ void AbstractNonlinearElasticitySolver<DIM>::SolveSnes()
 #else
     SNESSetType(snes, SNESLS);
 #endif
-    SNESSetTolerances(snes,1e-5,1e-5,0.2 * 1e-5,PETSC_DEFAULT,PETSC_DEFAULT);
+    MARK;
+    SNESSetTolerances(snes,1e-5,1e-5,1e-8,PETSC_DEFAULT,PETSC_DEFAULT);
 
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR == 3) //PETSc 3.3
     SNESLineSearch linesearch;
