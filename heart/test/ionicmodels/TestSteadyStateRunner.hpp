@@ -33,20 +33,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-
 #ifndef _TESTSTEADYSTATERUNNER_HPP_
 #define _TESTSTEADYSTATERUNNER_HPP_
 
 #include <cxxtest/TestSuite.h>
 
-#include "OutputFileHandler.hpp"
-#include "FileFinder.hpp"
 #include "CellProperties.hpp"
+#include "FileFinder.hpp"
+#include "OutputFileHandler.hpp"
 #include "VectorHelperFunctions.hpp" // For CopyToStdVector and DeleteVector
 
 #include "Shannon2004Cvode.hpp"
-#include "ZeroStimulus.hpp"
 #include "SteadyStateRunner.hpp"
+#include "ZeroStimulus.hpp"
 
 //This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
@@ -55,7 +54,6 @@ class TestSteadyStateRunner : public CxxTest::TestSuite
 {
 
 public:
-
     void TestSteadyStateRunnerConverges(void) throw(Exception)
     {
 #ifdef CHASTE_CVODE
@@ -86,12 +84,12 @@ public:
             p_model->SetStimulusFunction(p_reg_stim);
         }
 
-        p_reg_stim->SetPeriod(1000.0/hertz);
+        p_reg_stim->SetPeriod(1000.0 / hertz);
 
         // Note that increasing the strictness of the tolerances here (default is 1e-5, 1e-7)
         // actually leads to a faster convergence to steady state, as a model solved in
         // a sloppy way might never actually get close to its true limit cycle!
-        p_model->SetTolerances(1e-6,1e-8);
+        p_model->SetTolerances(1e-6, 1e-8);
 
         /**
          * STEADY STATE PACING EXPERIMENT
@@ -108,19 +106,22 @@ public:
         steady_runner.SetMaxNumPaces(1u);
         result = steady_runner.RunToSteadyState();
 
-        TS_ASSERT_EQUALS(result,false);
+        TS_ASSERT_EQUALS(result, false);
 
         // Here we do reach the steady state OK.
         steady_runner.SetMaxNumPaces(10000u);
         result = steady_runner.RunToSteadyState();
 
-        TS_ASSERT_EQUALS(result,true);
+        TS_ASSERT_EQUALS(result, true);
         // Your mileage may vary. 32-bit machine, default build gives 520 evaluations, 484 on recent 64-bit CVODE.
-        TS_ASSERT_LESS_THAN(steady_runner.GetNumEvaluations(),550u);
+        TS_ASSERT_LESS_THAN(steady_runner.GetNumEvaluations(), 550u);
 
         // For coverage
         TS_ASSERT_THROWS_THIS(steady_runner.SetMaxNumPaces(0u),
-                "Please set a maximum number of paces that is positive");
+                              "Please set a maximum number of paces that is positive");
+
+        // For coverage
+        steady_runner.SuppressOutput();
 #else
         std::cout << "CVODE must be enabled for the steady state runner to work." << std::endl;
 #endif //_CHASTE_CVODE
