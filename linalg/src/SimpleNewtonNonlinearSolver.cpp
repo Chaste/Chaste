@@ -100,7 +100,7 @@ Vec SimpleNewtonNonlinearSolver::Solve(PetscErrorCode (*pComputeResidual)(SNES,V
 #if (PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5)
         (*pComputeJacobian)(nullptr, current_solution, (linear_system.rGetLhsMatrix()), nullptr, pContext);
 #else
-        (*pComputeJacobian)(NULL, current_solution, &(linear_system.rGetLhsMatrix()), NULL, NULL, pContext);
+        (*pComputeJacobian)(nullptr, current_solution, &(linear_system.rGetLhsMatrix()), nullptr, nullptr, pContext);
 #endif
 
         Vec negative_update = linear_system.Solve();
