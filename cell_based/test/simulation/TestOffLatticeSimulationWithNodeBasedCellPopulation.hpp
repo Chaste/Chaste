@@ -779,6 +779,65 @@ public:
         delete nodes[0];
         delete nodes[1];
     }
+
+    /**
+     * Create a simulation of a NodeBasedCellPopulation with a NodeBasedCellPopulationMechanicsSystem
+     * and a CellKiller. Test that the simulation can be archived and loaded after cells have been killed.
+     */
+    void TestCellDeathWithArchiving() throw (Exception)
+    {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenereator and archiving do not work in parallel
+        {
+            // Create a simple mesh
+            unsigned num_cells_depth = 3;
+            unsigned num_cells_width = 3;
+            HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
+            TetrahedralMesh<2, 2> *p_generating_mesh = generator.GetMesh();
+
+            // Convert this to a NodesOnlyMesh
+            NodesOnlyMesh<2> mesh;
+            mesh.ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
+
+            // Create cells
+            std::vector<CellPtr> cells;
+            CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
+
+            // Create a node based cell population
+            NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
+
+            // Set up cell-based simulation
+            OffLatticeSimulation<2> simulator(node_based_cell_population);
+            simulator.SetOutputDirectory("TestOffLatticeSimulationWithNodeBasedCellPopulationDeathArchiving");
+            simulator.SetEndTime(0.5);
+
+            // Create a force law and pass it to the simulation
+            MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+            p_linear_force->SetCutOffLength(1.5);
+            simulator.AddForce(p_linear_force);
+
+            // Add cell killer
+            MAKE_PTR_ARGS(RandomCellKiller<2>, p_killer, (&node_based_cell_population, 0.997877574));
+            simulator.AddCellKiller(p_killer);
+
+            // Solve
+            simulator.Solve();
+
+            // Check some results
+            TS_ASSERT_EQUALS(simulator.GetNumBirths(), 0u);
+            TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 7u);
+
+            CellBasedSimulationArchiver<2, OffLatticeSimulation<2> >::Save(&simulator);
+        }
+
+        {
+            OffLatticeSimulation<2>* p_simulator1;
+            p_simulator1 = CellBasedSimulationArchiver<2, OffLatticeSimulation<2> >::Load("TestOffLatticeSimulationWithNodeBasedCellPopulationDeathArchiving", 0.5);
+
+            p_simulator1->SetEndTime(1.0);
+            p_simulator1->Solve();
+        }
+    }
 };
 
 #endif /*TESTOFFLATTICESIMULATIONWITHNODEBASEDCELLPOPULATION_HPP_*/
