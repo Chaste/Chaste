@@ -285,6 +285,11 @@ public:
     const NodesOnlyMesh<DIM>& rGetMesh() const;
 
     /**
+     * @return const vector of all the global node indices (used in archiving).
+     */
+    const std::vector<unsigned> GetGlobalNodeIndices() const;
+
+    /**
      * Overridden GetTetrahedralMeshForPdeModifier() method.
      *
      * @return a pointer to a tetrahedral mesh whose nodes match those of the NodesOnlyMesh.
@@ -532,7 +537,9 @@ inline void save_construct_data(
 {
     // Save data required to construct instance
     const NodesOnlyMesh<DIM>* p_mesh = &(t->rGetMesh());
+    std::vector<unsigned> node_global_indices = t->GetGlobalNodeIndices();
     ar & p_mesh;
+    ar & node_global_indices;
 }
 
 /**
@@ -545,7 +552,18 @@ inline void load_construct_data(
 {
     // Retrieve data from archive required to construct new instance
     NodesOnlyMesh<DIM>* p_mesh;
+    std::vector<unsigned> node_global_indices;
     ar >> p_mesh;
+    ar >> node_global_indices;
+    
+    unsigned node_local_index = 0;
+    for (typename AbstractMesh<DIM,DIM>::NodeIterator node_iter = p_mesh->GetNodeIteratorBegin();
+         node_iter != p_mesh->GetNodeIteratorEnd();
+         ++node_iter)
+    {
+        node_iter->SetIndex(node_global_indices[node_local_index]);
+        node_local_index++;
+    }
 
     // Invoke inplace constructor to initialise instance
     ::new(t)NodeBasedCellPopulation<DIM>(*p_mesh);
