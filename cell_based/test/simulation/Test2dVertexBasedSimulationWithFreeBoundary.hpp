@@ -101,7 +101,7 @@ public:
         MAKE_PTR(TargetAreaLinearGrowthModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
-        simulator.SetEndTime(10);
+        simulator.SetEndTime(20);
         simulator.SetDt(0.01);
 
         //    mpSimulator->SetSamplingTimestepMultiple( 100 );
