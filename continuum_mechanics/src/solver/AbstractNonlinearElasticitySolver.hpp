@@ -2154,7 +2154,20 @@ void AbstractNonlinearElasticitySolver<DIM>::SolveSnes()
 #else
     SNESSetType(snes, SNESLS);
 #endif
-    SNESSetTolerances(snes,1e-5,1e-5,1e-5,PETSC_DEFAULT,PETSC_DEFAULT);
+    SNESSetTolerances(snes, 1e-5, 1e-5, PETSC_DEFAULT, PETSC_DEFAULT, PETSC_DEFAULT);
+
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR == 3) //PETSc 3.3
+    SNESLineSearch linesearch;
+    SNESGetSNESLineSearch(snes, &linesearch);
+    // Use 'critical point' line search algorithm.  This was changed from 'backtracking'; see #2916
+    SNESLineSearchSetType(linesearch, "cp");
+#elif (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 4) //PETSc 3.4 or later
+    SNESLineSearch linesearch;
+    SNESGetLineSearch(snes, &linesearch);
+    // Use 'critical point' line search algorithm.  This was changed from 'backtracking'; see #2916
+    SNESLineSearchSetType(linesearch, "cp");
+#endif
+
     SNESSetMaxLinearSolveFailures(snes,100);
 
     KSP ksp;
