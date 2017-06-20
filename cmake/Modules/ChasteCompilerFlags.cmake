@@ -5,6 +5,15 @@ set(default_flags "-Wall")
 if (Chaste_ERROR_ON_WARNING)
     set(default_flags "${default_flags} -Werror")
 endif()
+
+# Older versions of CMake do not have the CXX_STANDARD property
+if (CMAKE_VERSION VERSION_LESS "3.1.0")
+    set(default_flags "${default_flags} -std=c++11")
+# Support for the Intel compiler only added in 3.6
+elseif(CMAKE_VERSION VERSION_LESS "3.6.0" AND CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
+    set(default_flags "${default_flags} -std=c++11")
+endif()
+
 set(default_exe_linker_flags "")
 if (UNIX)
     if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
