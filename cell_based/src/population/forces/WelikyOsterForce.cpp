@@ -55,7 +55,7 @@ void WelikyOsterForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rC
     assert(DIM == 2); // LCOV_EXCL_LINE // this method only works in 2D at present
 
     // Throw an exception message if not using a VertexBasedCellPopulation
-    if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation) == NULL)
+    if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation) == nullptr)
     {
         EXCEPTION("WelikyOsterForce is to be used with a VertexBasedCellPopulation only");
     }

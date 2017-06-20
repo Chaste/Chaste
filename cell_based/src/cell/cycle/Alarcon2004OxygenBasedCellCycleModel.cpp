@@ -79,7 +79,7 @@ AbstractCellCycleModel* Alarcon2004OxygenBasedCellCycleModel::CreateCellCycleMod
 void Alarcon2004OxygenBasedCellCycleModel::ResetForDivision()
 {
     AbstractOdeBasedPhaseBasedCellCycleModel::ResetForDivision();
-    assert(mpOdeSystem != NULL);
+    assert(mpOdeSystem != nullptr);
 
     // This model needs the protein concentrations and phase resetting to G0/G1.
     // Keep the oxygen concentration the same but reset everything else
@@ -92,8 +92,8 @@ void Alarcon2004OxygenBasedCellCycleModel::ResetForDivision()
 
 void Alarcon2004OxygenBasedCellCycleModel::Initialise()
 {
-    assert(mpOdeSystem == NULL);
-    assert(mpCell != NULL);
+    assert(mpOdeSystem == nullptr);
+    assert(mpCell != nullptr);
 
     bool is_labelled = mpCell->HasCellProperty<CellLabel>();
     mpOdeSystem = new Alarcon2004OxygenBasedCellCycleOdeSystem(mpCell->GetCellData()->GetItem("oxygen"), is_labelled);

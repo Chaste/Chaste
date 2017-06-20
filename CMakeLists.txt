@@ -42,6 +42,10 @@ if(POLICY CMP0062)
     cmake_policy(SET CMP0062 NEW)
 endif()
 
+if(CMAKE_VERSION VERSION_LESS "3.1.3")
+    add_compile_options(-std=c++11)
+endif()
+
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules)
 include(EnsureOutOfSourceBuild)
 Ensure_Out_Of_Source_Build()

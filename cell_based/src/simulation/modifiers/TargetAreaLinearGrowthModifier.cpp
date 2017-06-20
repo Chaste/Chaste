@@ -84,7 +84,7 @@ void TargetAreaLinearGrowthModifier<DIM>::UpdateTargetAreaOfCell(CellPtr pCell)
             double growth_rate = mGrowthRate;
             if (growth_start_time == DOUBLE_UNSET)
             {
-                if (dynamic_cast<AbstractPhaseBasedCellCycleModel*>(pCell->GetCellCycleModel()) == NULL)
+                if (dynamic_cast<AbstractPhaseBasedCellCycleModel*>(pCell->GetCellCycleModel()) == nullptr)
                 {
                     EXCEPTION("If SetAgeToStartGrowing() has not been called, a subclass of AbstractPhaseBasedCellCycleModel must be used");
                 }

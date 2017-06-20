@@ -155,8 +155,8 @@ public:
 
 template <bool CAN_ASSEMBLE_VECTOR, bool CAN_ASSEMBLE_MATRIX>
 AbstractFeAssemblerInterface<CAN_ASSEMBLE_VECTOR, CAN_ASSEMBLE_MATRIX>::AbstractFeAssemblerInterface()
-    : mVectorToAssemble(NULL),
-      mMatrixToAssemble(NULL),
+    : mVectorToAssemble(nullptr),
+      mMatrixToAssemble(nullptr),
       mZeroMatrixBeforeAssembly(true),
       mZeroVectorBeforeAssembly(true)
 {

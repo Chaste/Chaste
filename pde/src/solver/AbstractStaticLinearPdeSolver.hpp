@@ -66,7 +66,7 @@ public:
      * @param initialGuess optional initial guess for passing into the linear solve method
      * @return the solution vector
      */
-    Vec Solve(Vec initialGuess=NULL);
+    Vec Solve(Vec initialGuess=nullptr);
 };
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
@@ -76,12 +76,12 @@ Vec AbstractStaticLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::Solve(Ve
     this->InitialiseForSolve(initialGuess);
 
     // This method can be overloaded if necessary
-    this->PrepareForSetupLinearSystem(NULL);
+    this->PrepareForSetupLinearSystem(nullptr);
 
     // This method should be implemented by the concrete class
-    this->SetupLinearSystem(NULL, true);
+    this->SetupLinearSystem(nullptr, true);
 
-    this->FinaliseLinearSystem(NULL);
+    this->FinaliseLinearSystem(nullptr);
 
     // Solve the linear system
     Vec solution = this->mpLinearSystem->Solve(initialGuess);

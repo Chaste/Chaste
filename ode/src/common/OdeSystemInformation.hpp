@@ -125,7 +125,7 @@ template<class ODE_SYSTEM>
 OdeSystemInformation<ODE_SYSTEM>::OdeSystemInformation()
 {
     // Make sure there's only one instance - enforces correct serialization
-    assert(mpInstance == NULL);
+    assert(mpInstance == nullptr);
 }
 
 template<class ODE_SYSTEM>

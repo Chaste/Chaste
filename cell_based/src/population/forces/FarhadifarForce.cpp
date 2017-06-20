@@ -55,7 +55,7 @@ void FarhadifarForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCe
 {
     // Throw an exception message if not using a VertexBasedCellPopulation
     ///\todo: check whether this line influences profiling tests - if so, we should remove it.
-    if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation) == NULL)
+    if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation) == nullptr)
     {
         EXCEPTION("FarhadifarForce is to be used with a VertexBasedCellPopulation only");
     }

@@ -249,7 +249,7 @@ public:
          */
         ElementIterator(unsigned index, AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>* pReader)
             : mIndex(index),
-              mpIndices(NULL),
+              mpIndices(nullptr),
               mpReader(pReader)
         {
             CacheData(mIndex, true);
@@ -376,7 +376,7 @@ public:
          */
         NodeIterator(unsigned index, AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>* pReader)
             : mIndex(index),
-              mpIndices(NULL),
+              mpIndices(nullptr),
               mpReader(pReader)
         {
             CacheData(mIndex, true);

@@ -59,13 +59,13 @@ VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::VertexMeshWriter(const std::string& rD
                                                            const std::string& rBaseName,
                                                            const bool clearOutputDir)
     : AbstractMeshWriter<ELEMENT_DIM, SPACE_DIM>(rDirectory, rBaseName, clearOutputDir),
-      mpMesh(NULL),
+      mpMesh(nullptr),
       mpIters(new MeshWriterIterators<ELEMENT_DIM, SPACE_DIM>),
-      mpNodeMap(NULL),
+      mpNodeMap(nullptr),
       mNodeMapCurrentIndex(0)
 {
-    mpIters->pNodeIter = NULL;
-    mpIters->pElemIter = NULL;
+    mpIters->pNodeIter = nullptr;
+    mpIters->pElemIter = nullptr;
 
 #ifdef CHASTE_VTK
      // Dubious, since we shouldn't yet know what any details of the mesh are.
@@ -223,7 +223,7 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteVtkUsingMesh(VertexMesh<ELEM
 #endif
     // Uninitialised stuff arises (see #1079), but you can remove valgrind problems by removing compression:
     // **** REMOVE WITH CAUTION *****
-    p_writer->SetCompressor(NULL);
+    p_writer->SetCompressor(nullptr);
     // **** REMOVE WITH CAUTION *****
 
     std::string vtk_file_name = this->mpOutputFileHandler->GetOutputDirectoryFullPath() + this->mBaseName;
@@ -282,7 +282,7 @@ void VertexMeshWriter<2, 2>::WriteVtkUsingMesh(VertexMesh<2, 2>& rMesh, std::str
 #endif
     // Uninitialised stuff arises (see #1079), but you can remove valgrind problems by removing compression:
     // **** REMOVE WITH CAUTION *****
-    p_writer->SetCompressor(NULL);
+    p_writer->SetCompressor(nullptr);
     // **** REMOVE WITH CAUTION *****
 
     std::string vtk_file_name = this->mpOutputFileHandler->GetOutputDirectoryFullPath() + this->mBaseName;
@@ -384,7 +384,7 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddPointData(std::string dataName
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(VertexMesh<ELEMENT_DIM,SPACE_DIM>& rMesh)
 {
-    this->mpMeshReader = NULL;
+    this->mpMeshReader = nullptr;
     mpMesh = &rMesh;
 
     this->mNumNodes = mpMesh->GetNumNodes();

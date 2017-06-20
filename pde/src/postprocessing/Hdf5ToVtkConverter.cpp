@@ -72,7 +72,7 @@ Hdf5ToVtkConverter<ELEMENT_DIM, SPACE_DIM>::Hdf5ToVtkConverter(const FileFinder&
     if (parallelVtk)
     {
         // If it's not a distributed mesh, then we might want to give a warning and back-off
-        if (p_distributed_mesh == NULL)
+        if (p_distributed_mesh == nullptr)
         {
             WARNING("Can only write parallel VTK from a DistributedTetrahedralMesh - writing sequential VTK instead");
             parallelVtk = false;
@@ -159,7 +159,7 @@ Hdf5ToVtkConverter<ELEMENT_DIM, SPACE_DIM>::Hdf5ToVtkConverter(const FileFinder&
         ///\todo What if the mesh has been scaled, translated or rotated?
         // Note that the next line will throw if the mesh has not been read from file
         std::string original_file = this->mpMesh->GetMeshFileBaseName();
-        std::auto_ptr<AbstractMeshReader<ELEMENT_DIM, SPACE_DIM> > p_original_mesh_reader
+        std::shared_ptr<AbstractMeshReader<ELEMENT_DIM, SPACE_DIM> > p_original_mesh_reader
             = GenericMeshReader<ELEMENT_DIM, SPACE_DIM>(original_file);
         vtk_writer.WriteFilesUsingMeshReader(*p_original_mesh_reader);
     }

@@ -267,7 +267,7 @@ public:
     void TestGenericReader() throw(Exception)
     {
 #ifdef CHASTE_VTK
-        std::auto_ptr<AbstractMeshReader<3,3> > p_mesh_reader = GenericMeshReader<3,3>("mesh/test/data/cube_2mm_12_elements.vtu");
+        std::shared_ptr<AbstractMeshReader<3,3> > p_mesh_reader = GenericMeshReader<3,3>("mesh/test/data/cube_2mm_12_elements.vtu");
 
         TS_ASSERT_EQUALS(p_mesh_reader->GetNumNodes(), 12u);
         TS_ASSERT_EQUALS(p_mesh_reader->GetNumElements(), 12u);

@@ -874,7 +874,7 @@ public:
 
     void TestReadingWithGenericReader() throw(Exception)
     {
-        std::auto_ptr<AbstractMeshReader<2,2> > p_mesh_reader = GenericMeshReader<2,2>("mesh/test/data/disk_522_elements");
+        std::shared_ptr<AbstractMeshReader<2,2> > p_mesh_reader = GenericMeshReader<2,2>("mesh/test/data/disk_522_elements");
         TS_ASSERT_EQUALS(p_mesh_reader->GetNumNodes(), 312u);
         TS_ASSERT_EQUALS(p_mesh_reader->GetNumElements(), 522u);
         TS_ASSERT_EQUALS(p_mesh_reader->GetNumFaceAttributes(), 1u);

@@ -209,7 +209,7 @@ void PCBlockDiagonal::PCBlockDiagonalSetUp()
 
     // We are expecting an error from PETSC on systems that don't have the hypre library, so suppress it
     // in case it aborts
-    PetscPushErrorHandler(PetscIgnoreErrorHandler, NULL);
+    PetscPushErrorHandler(PetscIgnoreErrorHandler, nullptr);
     PetscErrorCode pc_set_error = PCSetType(mPCContext.PC_amg_A11, PCHYPRE);
     if (pc_set_error != 0)
     {
@@ -243,7 +243,7 @@ void PCBlockDiagonal::PCBlockDiagonalSetUp()
     PCCreate(PETSC_COMM_WORLD, &(mPCContext.PC_amg_A22));
 
     /* Full AMG in the block */
-    PetscPushErrorHandler(PetscIgnoreErrorHandler, NULL);
+    PetscPushErrorHandler(PetscIgnoreErrorHandler, nullptr);
     PCSetType(mPCContext.PC_amg_A22, PCHYPRE);
     // Stop supressing error
     PetscPopErrorHandler();
@@ -313,7 +313,7 @@ PetscErrorCode PCBlockDiagonalApply(void* pc_context, Vec x, Vec y)
 
     // Cast the context pointer to PCBlockDiagonalContext
     PCBlockDiagonal::PCBlockDiagonalContext* block_diag_context = (PCBlockDiagonal::PCBlockDiagonalContext*) pc_context;
-    assert(block_diag_context!=NULL);
+    assert(block_diag_context!=nullptr);
 
     /*
      * Scatter x = [x1 x2]'

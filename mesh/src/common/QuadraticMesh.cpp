@@ -201,7 +201,7 @@ Node<DIM>* QuadraticMesh<DIM>::MakeNewInternalNode(unsigned& rIndex, c_vector<do
         if (rLocation[dim] > rTop[dim])
         {
             //Outside the box so don't do anything
-            return NULL;
+            return nullptr;
         }
         if ((rLocation[dim] == 0.0) || (rLocation[dim] == rTop[dim]))
         {
@@ -427,11 +427,11 @@ void QuadraticMesh<DIM>::ConstructFromLinearMeshReader(AbstractMeshReader<DIM, D
         this->ExportToMesher(unused_map, mesher_input, mesher_input.trianglelist);
 
         // Library call
-        triangulate((char*)"Qzero2", &mesher_input, &mesher_output, NULL);
+        triangulate((char*)"Qzero2", &mesher_input, &mesher_output, nullptr);
 
         this->ImportFromMesher(mesher_output, mesher_output.numberoftriangles, mesher_output.trianglelist, mesher_output.numberofedges, mesher_output.edgelist, mesher_output.edgemarkerlist);
         CountVertices();
-        QuadraticMeshHelper<DIM>::AddNodesToBoundaryElements(this, NULL);
+        QuadraticMeshHelper<DIM>::AddNodesToBoundaryElements(this, nullptr);
 
         //Tidy up triangle
         this->FreeTriangulateIo(mesher_input);
@@ -449,9 +449,9 @@ void QuadraticMesh<DIM>::ConstructFromLinearMeshReader(AbstractMeshReader<DIM, D
         // Library call
         tetgen::tetrahedralize((char*)"Qzro2", &mesher_input, &mesher_output);
 
-        this->ImportFromMesher(mesher_output, mesher_output.numberoftetrahedra, mesher_output.tetrahedronlist, mesher_output.numberoftrifaces, mesher_output.trifacelist, NULL);
+        this->ImportFromMesher(mesher_output, mesher_output.numberoftetrahedra, mesher_output.tetrahedronlist, mesher_output.numberoftrifaces, mesher_output.trifacelist, nullptr);
         CountVertices();
-        QuadraticMeshHelper<DIM>::AddNodesToBoundaryElements(this, NULL);
+        QuadraticMeshHelper<DIM>::AddNodesToBoundaryElements(this, nullptr);
     }
 }
 
