@@ -63,6 +63,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * This was resolved in Boost 1.57, so we special-case the older versions.
  */
 #if BOOST_VERSION <= 105600
+/** Change boost SCOPED_ENUMS behaviour on older versions */
 #define BOOST_NO_CXX11_SCOPED_ENUMS
 #include <boost/filesystem.hpp>
 #undef BOOST_NO_CXX11_SCOPED_ENUMS
