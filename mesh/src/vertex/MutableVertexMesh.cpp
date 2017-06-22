@@ -54,7 +54,8 @@ MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::MutableVertexMesh(std::vector<Node<SP
           mProtorosetteFormationProbability(protorosetteFormationProbability),
           mProtorosetteResolutionProbabilityPerTimestep(protorosetteResolutionProbabilityPerTimestep),
           mRosetteResolutionProbabilityPerTimestep(rosetteResolutionProbabilityPerTimestep),
-          mCheckForInternalIntersections(false)
+          mCheckForInternalIntersections(false),
+          mDistanceForT3SwapChecking(5.0)
 {
     // Threshold parameters must be strictly positive
     assert(cellRearrangementThreshold > 0.0);
@@ -175,6 +176,20 @@ double MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::GetRosetteResolutionProbabilit
 {
     return this->mRosetteResolutionProbabilityPerTimestep;
 }
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::SetDistanceForT3SwapChecking(double distanceForT3SwapChecking)
+{
+    mDistanceForT3SwapChecking = distanceForT3SwapChecking;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+double MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::GetDistanceForT3SwapChecking() const
+{
+    return mDistanceForT3SwapChecking;
+}
+
+
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::GetCheckForInternalIntersections() const
@@ -1030,43 +1045,61 @@ bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForIntersections()
     else
     {
         // ...otherwise, just check that no boundary nodes have overlapped any boundary elements
-        std::set<unsigned> boundary_element_indices;
+        // First: find all boundary element and calculate their centroid only once
+        std::vector<unsigned> boundary_element_indices;
+        std::vector< c_vector<double, SPACE_DIM> > boundary_element_centroids;
         for (typename VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator elem_iter = this->GetElementIteratorBegin();
-             elem_iter != this->GetElementIteratorEnd();
-             ++elem_iter)
+                elem_iter != this->GetElementIteratorEnd();
+                ++elem_iter)
         {
             if (elem_iter->IsElementOnBoundary())
             {
-                boundary_element_indices.insert(elem_iter->GetIndex());
+                unsigned element_index = elem_iter->GetIndex();
+                boundary_element_indices.push_back(element_index);
+                // should be a map but I am too lazy to look up the syntax
+                boundary_element_centroids.push_back(this->GetCentroidOfElement(element_index));
             }
         }
 
+        // Second: Check intersections only for those nodes and elements within
+        // mDistanceForT3SwapChecking within each other (node<-->element centroid)
         for (typename AbstractMesh<ELEMENT_DIM,SPACE_DIM>::NodeIterator node_iter = this->GetNodeIteratorBegin();
-             node_iter != this->GetNodeIteratorEnd();
-             ++node_iter)
+                node_iter != this->GetNodeIteratorEnd();
+                ++node_iter)
         {
             if (node_iter->IsBoundaryNode())
             {
                 assert(!(node_iter->IsDeleted()));
 
-                for (std::set<unsigned>::iterator elem_iter = boundary_element_indices.begin();
-                     elem_iter != boundary_element_indices.end();
-                     ++elem_iter)
+                // index in boundary_element_centroids and boundary_element_indices
+                unsigned boundary_element_index = 0;
+                for (std::vector<unsigned>::iterator elem_iter = boundary_element_indices.begin();
+                        elem_iter != boundary_element_indices.end();
+                        ++elem_iter)
                 {
                     // Check that the node is not part of this element
                     if (node_iter->rGetContainingElementIndices().count(*elem_iter) == 0)
                     {
-                        if (this->ElementIncludesPoint(node_iter->rGetLocation(), *elem_iter))
+                        c_vector<double, SPACE_DIM> node_location = node_iter->rGetLocation();
+                        c_vector<double, SPACE_DIM> element_centroid = boundary_element_centroids[boundary_element_index];
+                        double node_element_distance = norm_2(this->GetVectorFromAtoB(node_location, element_centroid));
+
+                        if ( node_element_distance < mDistanceForT3SwapChecking )
                         {
-                            PerformT3Swap(&(*node_iter), *elem_iter);
-                            return true;
+                            if (this->ElementIncludesPoint(node_iter->rGetLocation(), *elem_iter))
+                            {
+                                this->PerformT3Swap(&(*node_iter), *elem_iter);
+                                return true;
+                            }
                         }
                     }
+                    // increment the boundary element index
+                    boundary_element_index +=1u;
                 }
             }
         }
-    }
 
+    }
     return false;
 }
 

@@ -101,6 +101,13 @@ protected:
     std::vector<unsigned> mDeletedElementIndices;
 
     /**
+     * Distance for T3 swap checking. At each time step we check for each boundary node whether
+     * it intersects with any boundary elements (cells) whose centroid lies within this distance
+     * to the node.
+     */
+    double mDistanceForT3SwapChecking;
+
+    /**
      * Locations of T1 swaps (the mid point of the moving nodes), stored so they can be accessed and output by the cell population.
      * The locations are stored until they are cleared by ClearLocationsOfT1Swaps().
      */
@@ -472,6 +479,22 @@ public:
      * @return mRosetteResolutionProbabilityPerTimestep
      */
     double GetRosetteResolutionProbabilityPerTimestep() const;
+
+    /**
+     * Set distance for T3 swap checking. At each time step we check for each boundary node whether
+     * it intersects with any boundary elements (cells) whose centroid lies within this distance
+     * to the node.
+     *
+     * @param distanceForT3SwapChecking
+     */
+    void SetDistanceForT3SwapChecking( double distanceForT3SwapChecking );
+
+    /**
+     * Get Distance for T3 swap checking.
+     *
+     * @return mDistanceForT3SwapChecking
+     */
+    double GetDistanceForT3SwapChecking() const;
 
     /**
      * @return the number of Nodes in the mesh.
