@@ -152,7 +152,7 @@ protected:
      * @return whether we need to check for, and implement, any further local remeshing operations
      *                   (true if any swaps are performed).
      */
-    bool CheckForSwapsFromShortEdges();
+    virtual bool CheckForSwapsFromShortEdges();
 
     /**
      * Helper method for ReMesh().
