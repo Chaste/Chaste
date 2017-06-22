@@ -1343,6 +1343,7 @@ public:
         mesh.SetCellRearrangementThreshold(0.54);
         mesh.SetT2Threshold(0.012);
         mesh.SetCellRearrangementRatio(1.6);
+        mesh.SetDistanceForT3SwapChecking(7.3);
 
         AbstractMesh<2,2>* const p_mesh = &mesh;
 
@@ -1390,6 +1391,8 @@ public:
             TS_ASSERT_DELTA(p_mesh_original->GetT2Threshold(), 0.012, 1e-6);
             TS_ASSERT_DELTA(p_mesh_loaded->GetT2Threshold(), 0.012, 1e-6);
             TS_ASSERT_DELTA(p_mesh_loaded->GetCellRearrangementRatio(), 1.6, 1e-6);
+            TS_ASSERT_DELTA(p_mesh_original->GetDistanceForT3SwapChecking(), 7.3, 1e-6);
+            TS_ASSERT_DELTA(p_mesh_loaded->GetDistanceForT3SwapChecking(), 7.3, 1e-6);
 
             // Compare the loaded mesh against the original
             TS_ASSERT_EQUALS(p_mesh_original->GetNumNodes(), p_mesh_loaded->GetNumNodes());
