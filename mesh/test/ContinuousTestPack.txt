@@ -14,16 +14,6 @@ TestNonCachedTetrahedralMesh.hpp
 TestQuadraticMesh.hpp
 TestTetrahedralMesh.hpp
 TestTransformations.hpp
-immersed_boundary/TestFftwMethods.hpp
-immersed_boundary/TestFluidSource.hpp
-immersed_boundary/TestImmersedBoundary2dArrays.hpp
-immersed_boundary/TestImmersedBoundaryElement.hpp
-immersed_boundary/TestImmersedBoundaryFftInterface.hpp
-immersed_boundary/TestImmersedBoundaryHoneycombMeshGenerator.hpp
-immersed_boundary/TestImmersedBoundaryMesh.hpp
-immersed_boundary/TestImmersedBoundaryMeshReader.hpp
-immersed_boundary/TestImmersedBoundaryMeshWriter.hpp
-immersed_boundary/TestImmersedBoundaryPalisadeMeshGenerator.hpp
 mutable/TestCylindrical2dMesh.hpp
 mutable/TestCylindrical2dNodesOnlyMesh.hpp
 mutable/TestCylindricalHoneycombMeshGenerator.hpp
@@ -37,7 +27,6 @@ utilities/TestDistributedBoxCollection.hpp
 utilities/TestDistanceMapCalculator.hpp
 utilities/TestObsoleteBoxCollection.hpp
 utilities/TestPerElementWriter.hpp
-utilities/TestSuperellipseGenerator.hpp
 vertex/TestCylindrical2dVertexMesh.hpp
 vertex/TestCylindricalHoneycombVertexMeshGenerator.hpp
 vertex/TestHoneycombVertexMeshGenerator.hpp
@@ -53,4 +42,3 @@ vertex/TestVertexMeshWriter.hpp
 vertex/TestVoronoiVertexMeshGenerator.hpp
 writer/TestMeshWriters.hpp
 writer/TestXmlMeshWriters.hpp
-immersed_boundary/TestGenerateFftwWisdom.hpp

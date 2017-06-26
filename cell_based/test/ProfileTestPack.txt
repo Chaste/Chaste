@@ -1,5 +1,4 @@
 simulation/Test2dOffLatticeRepresentativeSimulation.hpp
 simulation/Test3dOffLatticeRepresentativeSimulation.hpp
 simulation/TestRepresentative3dNodeBasedSimulation.hpp
-simulation/TestRepresentativeImmersedBoundarySimulations.hpp
 simulation/TestRepresentativePottsBasedOnLatticeSimulation.hpp

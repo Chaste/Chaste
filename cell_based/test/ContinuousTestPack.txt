@@ -48,8 +48,6 @@ population/TestCellWriters.hpp
 population/TestCentreBasedDivisionRules.hpp
 population/TestDiscreteSystemForceCalculator.hpp
 population/TestForces.hpp
-population/TestImmersedBoundaryCellPopulation.hpp
-population/TestImmersedBoundaryForces.hpp
 population/TestMeshBasedCellPopulation.hpp
 population/TestMeshBasedCellPopulationWithGhostNodes.hpp
 population/TestNodeBasedCellPopulation.hpp
@@ -62,8 +60,6 @@ population/TestT2SwapCellKiller.hpp
 population/TestVertexBasedCellPopulation.hpp
 population/TestVertexBasedDivisionRules.hpp
 simulation/TestDeltaNotchModifier.hpp
-simulation/TestImmersedBoundaryPdeSolveMethods.hpp
-simulation/TestImmersedBoundarySimulationModifier.hpp
 simulation/TestNumericalMethods.hpp
 simulation/TestOffLatticeSimulation.hpp
 simulation/TestOffLatticeSimulation3d.hpp
@@ -92,7 +88,6 @@ tutorial/TestCreatingAndUsingNewCellBasedWritersTutorial.hpp
 tutorial/TestRunningContactInhibitionSimulationsTutorial.hpp
 tutorial/TestRunningDeltaNotchSimulationsTutorial.hpp
 tutorial/TestRunningDifferentialAdhesionSimulationsTutorial.hpp
-tutorial/TestRunningImmersedBoundarySimulationsTutorial.hpp
 tutorial/TestRunningMeshBasedSimulationsTutorial.hpp
 tutorial/TestRunningNodeBasedSimulationsTutorial.hpp
 tutorial/TestRunningPottsBasedSimulationsTutorial.hpp
