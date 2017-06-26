@@ -338,10 +338,18 @@ public:
     /**
      * Calculate the correction term.
      *
-     * @param input const reference to input grids
-     * @param output reference to output grids
+     * @param input const reference to force grids
+     * @param output const reference for the acceleration grids
      */
     void CalculateCorrectionTerm(const multi_array<double, 3>& force_grids, const multi_array<double, 3>& acceleration_grids);
+
+    /**
+     * Calculate the average force within the domain
+     *
+     * @param reference to the force grids
+     */
+    void SubtractMeanFromForceField(multi_array<double, 3>& force_grids);
+
 };
 
 #include "SerializationExportWrapper.hpp"

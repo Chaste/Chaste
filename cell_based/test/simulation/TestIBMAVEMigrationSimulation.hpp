@@ -121,17 +121,17 @@ public:
         simulator.GetNumericalMethod()->SetUseUpdateNodeLocation(true);
 
         double dt = 0.01;
-        simulator.SetOutputDirectory("TestIBMAVEMigrationSimulation200NodesPerRoundedCell");
+        simulator.SetOutputDirectory("TestIBMNewFix");
         simulator.SetDt(dt);
         simulator.SetSamplingTimestepMultiple(10);
-        simulator.SetEndTime(50000.0 * dt);
+        simulator.SetEndTime(500.0 * dt);
 
         /* All of the machinery for the immersed boundary method is handled in the following {{{SimulationModifier}}}.
          * Here, we create a 'shared pointer' to an {{{ImmersedBoundarySimulationModifier}}} object and pass it to the
          * {{{OffLatticeSimulation}}}.*/
         MAKE_PTR(ImmersedBoundarySimulationModifier<2>, p_main_modifier);
         simulator.AddSimulationModifier(p_main_modifier);
-        p_main_modifier->AddCorrectionTerm(false);
+        p_main_modifier->AddCorrectionTerm(true);
 
         /* We now associate an {{{ImmersedBoundaryLinearMembraneForce}}} and
          * {{{ImmersedBoundaryLinearInteractionForce}}} to the {{{SimulationModifier}}} which
@@ -147,8 +147,11 @@ public:
 
         MAKE_PTR(SingleCellMigrationForce<2>, p_migration_force);
         p_main_modifier->AddImmersedBoundaryForce(p_migration_force);
-        p_migration_force->SetElementIndex(24);
-        p_migration_force->SetStrength(0.0);
+        p_migration_force->SetElementIndex(0);
+        p_migration_force->SetStrength(0.01);
+        c_vector<double, 2> direction;
+        direction[0] = 0.0; direction[1] = 1.0;
+        p_migration_force->SetDirection(direction);
 
         /* Finally we call the {{{Solve}}} method on the simulation to run the simulation.*/
         simulator.Solve();

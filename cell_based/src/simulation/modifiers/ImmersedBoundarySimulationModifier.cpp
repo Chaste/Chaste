@@ -500,7 +500,7 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
 
     if (mAddCorrection)
     {
-        CalculateCorrectionTerm(force_grids, acceleration_grid);
+        SubtractMeanFromForceField(force_grids);
     }
 
     // Perform fft on rhs_grids; results go to fourier_grids
@@ -763,11 +763,12 @@ void ImmersedBoundarySimulationModifier<DIM>::CalculateCorrectionTerm(const mult
         {
             for (unsigned y = 0; y < mNumGridPtsY; y++)
             {
-                input[dim][x][y] = acceleration_grids[dim][x][y] - force_grids[dim][x][y];
+                input[dim][x][y] = force_grids[dim][x][y] - acceleration_grids[dim][x][y];
             }
         }
     }
 
+    // First, the pressure drop in the x-direction
     double delta_p_x = 1.0 * (input[0][0][0] + input[0][mNumGridPtsX-1][0] + input[0][0][mNumGridPtsY-1] + input[0][mNumGridPtsX-1][mNumGridPtsY-1]);
     for (unsigned i=1; i<mNumGridPtsX-2; i++)
     {
@@ -787,30 +788,96 @@ void ImmersedBoundarySimulationModifier<DIM>::CalculateCorrectionTerm(const mult
         }
     }
 
+    // Second, for the pressure drop in the y-direction
     double delta_p_y = 1.0 * (input[1][0][0] + input[1][mNumGridPtsX-1][0] + input[1][0][mNumGridPtsY-1] + input[1][mNumGridPtsX-1][mNumGridPtsY-1]);
     for (unsigned i=1; i<mNumGridPtsX-2; i++)
     {
-        delta_p_x += 2.0 * input[1][i][0];
-        delta_p_x += 2.0 * input[1][i][mNumGridPtsX-1];
+        delta_p_y += 2.0 * input[1][i][0];
+        delta_p_y += 2.0 * input[1][i][mNumGridPtsX-1];
     }
     for (unsigned i=1; i<mNumGridPtsY-2; i++)
     {
-        delta_p_x += 2.0 * input[1][0][i];
-        delta_p_x += 2.0 * input[1][mNumGridPtsY-1][i];
+        delta_p_y += 2.0 * input[1][0][i];
+        delta_p_y += 2.0 * input[1][mNumGridPtsY-1][i];
     }
     for (unsigned i=1; i<mNumGridPtsX-2; i++)
     {
         for (unsigned j=1; j<mNumGridPtsY-2; j++)
         {
-            delta_p_x += 4.0 * input[1][i][j];
+            delta_p_y += 4.0 * input[1][i][j];
         }
     }
 
-    mDeltaPx = -0.25 * mReynoldsNumber * mGridSpacingX * mGridSpacingY * delta_p_x;
-    mDeltaPy = -0.25 * mReynoldsNumber * mGridSpacingX * mGridSpacingY * delta_p_y;
+    mDeltaPx = 0.25 * mReynoldsNumber * mGridSpacingX * mGridSpacingY * delta_p_x;
+    mDeltaPy = 0.25 * mReynoldsNumber * mGridSpacingX * mGridSpacingY * delta_p_y;
 //    ofstream dat_file("/home/bartmanski/Downloads/pressure_change.dat", fstream::app);
 //    dat_file << mDeltaPx << " " << mDeltaPy << std::endl;
 //    dat_file.close();
+}
+
+template<unsigned DIM>
+void ImmersedBoundarySimulationModifier<DIM>::SubtractMeanFromForceField(multi_array<double, 3> &force_grids)
+{
+    // First, calculate the average of the force fields. Using 2d trapezium rule to estimate the integral over the domain.
+
+    std::vector<double> average(2, 0);
+    // x-component of the average
+    average[0] += 1.0 * (force_grids[0][0][0] + force_grids[0][mNumGridPtsX - 1][0] +
+                              force_grids[0][0][mNumGridPtsY - 1] + force_grids[0][mNumGridPtsX - 1][mNumGridPtsY - 1]);
+
+    for (unsigned i = 1; i < mNumGridPtsX - 2; i++)
+    {
+        average[0] += 2.0 * force_grids[0][i][0];
+        average[0] += 2.0 * force_grids[0][i][mNumGridPtsX - 1];
+    }
+    for (unsigned i = 1; i < mNumGridPtsY - 2; i++)
+    {
+        average[0] += 2.0 * force_grids[0][0][i];
+        average[0] += 2.0 * force_grids[0][mNumGridPtsY - 1][i];
+    }
+    for (unsigned i = 1; i < mNumGridPtsX - 2; i++)
+    {
+        for (unsigned j = 1; j < mNumGridPtsY - 2; j++)
+        {
+            average[0] += 4.0 * force_grids[0][i][j];
+        }
+    }
+    average[0] *= 0.25 * mReynoldsNumber * mGridSpacingX * mGridSpacingY;
+
+    // y-component of the average
+    average[1] += 1.0 * (force_grids[1][0][0] + force_grids[1][mNumGridPtsX - 1][0] +
+                              force_grids[1][0][mNumGridPtsY - 1] + force_grids[1][mNumGridPtsX - 1][mNumGridPtsY - 1]);
+
+    for (unsigned i = 1; i < mNumGridPtsX - 2; i++)
+    {
+        average[1] += 2.0 * force_grids[1][i][0];
+        average[1] += 2.0 * force_grids[1][i][mNumGridPtsX - 1];
+    }
+    for (unsigned i = 1; i < mNumGridPtsY - 2; i++)
+    {
+        average[1] += 2.0 * force_grids[1][0][i];
+        average[1] += 2.0 * force_grids[1][mNumGridPtsY - 1][i];
+    }
+    for (unsigned i = 1; i < mNumGridPtsX - 2; i++)
+    {
+        for (unsigned j = 1; j < mNumGridPtsY - 2; j++)
+        {
+            average[1] += 4.0 * force_grids[1][i][j];
+        }
+    }
+    average[1] *= 0.25 * mReynoldsNumber * mGridSpacingX * mGridSpacingY;
+
+    for (unsigned dim = 0; dim < 2; dim++)
+    {
+        for (unsigned i = 0; i < mNumGridPtsX; i++)
+        {
+            for (unsigned j = 0; j < mNumGridPtsY; j++)
+            {
+                force_grids[dim][i][j] -= average[dim];
+            }
+        }
+    }
+
 }
 
 // Explicit instantiation

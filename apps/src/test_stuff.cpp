@@ -101,12 +101,17 @@ void test_arrays()
     //  array = array + array; <- this is not allowed
 }
 
+void test_c_vectors_2()
+{
+//    c_vector<double, 2> vec(1.0, 2.0);
+}
+
 int main()
 {
 //    double vec[5] = {1, 4, 3, 4, 5};
 //    test_passing_vectors(vec, 5);
 //    test_complex_numbers();
-    test_arrays();
+//    test_arrays();
 
     return 0;
 }
