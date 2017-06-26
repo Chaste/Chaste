@@ -76,8 +76,8 @@ public:
          * 5: bottom left x
          * 6: bottom left y
          */
-        SuperellipseGenerator* p_gen = new SuperellipseGenerator(128, 1.0, 0.4, 0.6, 0.3, 0.2);
-        std::vector<c_vector<double, 2> > locations = p_gen->GetPointsAsVectors();
+        std::unique_ptr<SuperellipseGenerator> p_gen(new SuperellipseGenerator(128, 1.0, 0.4, 0.6, 0.3, 0.2));
+        const std::vector<c_vector<double, 2> > locations = p_gen->GetPointsAsVectors();
 
         std::vector<Node<2>* > nodes;
         std::vector<ImmersedBoundaryElement<2,2>* > elements;
@@ -89,7 +89,7 @@ public:
 
         elements.push_back(new ImmersedBoundaryElement<2,2>(0, nodes));
 
-        ImmersedBoundaryMesh<2,2>* p_mesh = new ImmersedBoundaryMesh<2,2>(nodes, elements);
+        std::unique_ptr<ImmersedBoundaryMesh<2,2>> p_mesh(new ImmersedBoundaryMesh<2,2>(nodes, elements));
         p_mesh->SetNumGridPtsXAndY(64);
 
         std::vector<CellPtr> cells;
@@ -117,7 +117,7 @@ public:
         double dt = 0.01;
         simulator.SetOutputDirectory("TestShortSingleCellSimulation");
         simulator.SetDt(dt);
-        simulator.SetSamplingTimestepMultiple(1);
+        simulator.SetSamplingTimestepMultiple(4u);
         simulator.SetEndTime(100 * dt);
 
         simulator.Solve();
@@ -168,7 +168,7 @@ public:
         double dt = 0.01;
         simulator.SetOutputDirectory("TestShortTwoCellSimulation");
         simulator.SetDt(dt);
-        simulator.SetSamplingTimestepMultiple(1);
+        simulator.SetSamplingTimestepMultiple(4u);
         simulator.SetEndTime(100.0 * dt);
 
         simulator.Solve();
@@ -220,7 +220,7 @@ public:
         double dt = 0.01;
         simulator.SetOutputDirectory("TestShortMultiCellSimulation");
         simulator.SetDt(dt);
-        simulator.SetSamplingTimestepMultiple(1);
+        simulator.SetSamplingTimestepMultiple(4u);
         simulator.SetEndTime(100.0 * dt);
 
         simulator.Solve();

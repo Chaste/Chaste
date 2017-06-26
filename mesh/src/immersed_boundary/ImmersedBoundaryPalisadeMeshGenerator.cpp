@@ -84,7 +84,7 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
     }
 
     // Generate a reference superellipse
-    SuperellipseGenerator* p_gen = new SuperellipseGenerator(numNodesPerCell, ellipseExponent, cell_width, cell_height, 0.0, 0.0);
+    std::unique_ptr<SuperellipseGenerator> p_gen(new SuperellipseGenerator(numNodesPerCell, ellipseExponent, cell_width, cell_height, 0.0, 0.0));
     std::vector<c_vector<double, 2> > locations = p_gen->GetPointsAsVectors();
 
 

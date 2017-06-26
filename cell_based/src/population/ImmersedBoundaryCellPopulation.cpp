@@ -308,8 +308,7 @@ void ImmersedBoundaryCellPopulation<DIM>::UpdateNodeLocations(double dt)
 
     double delta;
 
-    c_vector<double, DIM> node_location;
-    c_vector<double, DIM> displacement;
+    c_vector<double, DIM> displacement = zero_vector<double>(DIM);
 
     // Get references to the fluid velocity grid
     const multi_array<double, 3>& vel_grids = this->rGetMesh().rGet2dVelocityGrids();
@@ -320,7 +319,7 @@ void ImmersedBoundaryCellPopulation<DIM>::UpdateNodeLocations(double dt)
          ++node_iter)
     {
         // Get location of current node
-        node_location = node_iter->rGetLocation();
+        c_vector<double, DIM> node_location = node_iter->rGetLocation();
 
         // Get first grid index in each dimension, taking account of possible wrap-around
         first_idx_x = unsigned(floor(node_location[0] / grid_spacing_x)) + num_grid_pts_x - 1;

@@ -233,8 +233,8 @@ public:
     ImmersedBoundaryMesh(std::vector<Node<SPACE_DIM>*> nodes,
                          std::vector<ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>*> elements,
                          std::vector<ImmersedBoundaryElement<ELEMENT_DIM - 1, SPACE_DIM>*> laminas = std::vector<ImmersedBoundaryElement<ELEMENT_DIM - 1, SPACE_DIM>*>(),
-                         unsigned numGridPtsX = 128,
-                         unsigned numGridPtsY = 128);
+                         unsigned numGridPtsX = 128u,
+                         unsigned numGridPtsY = 128u);
 
     /**
      * Default constructor for use by serializer.
