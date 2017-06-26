@@ -158,6 +158,12 @@ public:
         auto my_tuple = std::make_tuple(1.23, 5u, "a_string");
         ++std::get<1>(my_tuple); // Stop the compiler complaining about unused variable
     }
+
+    void TestNullptrType() throw (Exception)
+    {
+        int* i = nullptr;
+        ++i;
+    }
 };
 
 #endif /*TESTCPP11FEATURES_HPP_*/

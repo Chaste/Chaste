@@ -60,7 +60,7 @@ Element<1,3>* AirwayTreeWalker::GetParentElement(Element<1,3>* pElement)
 {
     if (mParentElementMap.count(pElement->GetIndex()) == 0)
     {
-        return NULL;
+        return nullptr;
     }
 
     return mMesh.GetElement(mParentElementMap[pElement->GetIndex()]);
@@ -75,7 +75,7 @@ Element<1,3>* AirwayTreeWalker::GetParentElement(unsigned index)
 {
     if (mParentElementMap.count(index) == 0)
     {
-        return NULL;
+        return nullptr;
     }
 
     return mMesh.GetElement(mParentElementMap[index]);
@@ -216,7 +216,7 @@ void AirwayTreeWalker::CalculateElementProperties(Element<1,3>* pElement)
     Element<1,3>* p_parent_element = GetParentElement(pElement);
 
     //pre-order traversal calculations
-    if (p_parent_element == NULL)
+    if (p_parent_element == nullptr)
     {
         mElementGenerations[pElement->GetIndex()] = 0u;
     }

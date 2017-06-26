@@ -52,7 +52,7 @@ template<unsigned DIM>
 void DistributedQuadraticMesh<DIM>::ConstructFromMeshReader(AbstractMeshReader<DIM, DIM>& rAbsMeshReader)
 {
     TrianglesMeshReader<DIM, DIM>* p_mesh_reader=dynamic_cast<TrianglesMeshReader<DIM, DIM>*>(&rAbsMeshReader);
-    assert(p_mesh_reader != NULL);
+    assert(p_mesh_reader != nullptr);
 
     unsigned order_of_elements = 1;
     if (p_mesh_reader)

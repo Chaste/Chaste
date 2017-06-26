@@ -91,7 +91,7 @@ c_vector<double, SPACE_DIM> PopulationTestingForce<ELEMENT_DIM, SPACE_DIM>::GetE
                                                                                       double damping,
                                                                                       c_vector<double, SPACE_DIM>& oldLocation,
                                                                                       double dt)
-{  
+{
     c_vector<double, SPACE_DIM> result;
     for (unsigned j = 0; j < SPACE_DIM; j++)
     {
@@ -109,7 +109,7 @@ c_vector<double, SPACE_DIM> PopulationTestingForce<ELEMENT_DIM, SPACE_DIM>::GetE
                                                                                     double damping,
                                                                                     c_vector<double, SPACE_DIM>& oldLocation,
                                                                                     double dt)
-{  
+{
     c_vector<double, SPACE_DIM> result;
     for (unsigned j = 0; j < SPACE_DIM; j++)
     {
@@ -123,7 +123,7 @@ c_vector<double, SPACE_DIM> PopulationTestingForce<ELEMENT_DIM, SPACE_DIM>::GetE
                                                                                       double damping,
                                                                                       c_vector<double, SPACE_DIM>& oldLocation,
                                                                                       double dt)
-{  
+{
     c_vector<double, SPACE_DIM> result;
     for (unsigned j = 0; j < SPACE_DIM; j++)
     {

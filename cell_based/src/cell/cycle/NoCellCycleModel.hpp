@@ -39,7 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellCycleModel.hpp"
 
 /**
- * A 'dummy' cell-cycle model class that can be used in simulations featuring no 
+ * A 'dummy' cell-cycle model class that can be used in simulations featuring no
  * cell proliferation.
  */
 class NoCellCycleModel : public AbstractCellCycleModel

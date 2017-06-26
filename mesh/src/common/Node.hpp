@@ -292,14 +292,14 @@ public:
 
     /**
      * Remove duplicates from the vector of node neighbour indices.
-     */  
+     */
     void RemoveDuplicateNeighbours();
 
     /**
      * Check whether the node neighbours collection is empty.
      *
      * @return whether this node has any neighbours.
-     */  
+     */
     bool NeighboursIsEmpty();
 
     /**

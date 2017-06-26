@@ -131,7 +131,7 @@ public:
      *
      * @param initialSolution initialSolution (used in base class version of this method)
      */
-    void InitialiseForSolve(Vec initialSolution = NULL);
+    void InitialiseForSolve(Vec initialSolution = nullptr);
 };
 
 #endif /*SIMPLELINEARELLIPTICSOLVER_HPP_*/

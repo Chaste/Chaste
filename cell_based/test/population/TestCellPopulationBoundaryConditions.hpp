@@ -332,7 +332,7 @@ public:
 
         for (unsigned i=0; i<nodes.size(); i++)
         {
-        	delete nodes[i];
+            delete nodes[i];
         }
     }
 

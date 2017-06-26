@@ -111,7 +111,7 @@ template<class Archive>
 inline void save_construct_data(
     Archive & ar, const DeltaNotchOdeSystem * t, const unsigned int file_version)
 {
-    const std::vector<double> state_variables = t->rGetConstStateVariables();
+    const std::vector<double>& state_variables = t->rGetConstStateVariables();
     ar & state_variables;
 }
 

@@ -145,6 +145,11 @@ public:
     static const std::map<std::string, std::string>& rGetProjectVersions();
 
     /**
+     * @return  Whether any checked-out projects have uncommitted revisions.
+     */
+    static const std::map<std::string, std::string>& rGetIfProjectsModified();
+
+    /**
      * @return  A single-line string representation of the provenance information to be attached
      * to any files we generate.  This includes the version of the Chaste code used, how and
      * when it was built, and the current date and time.

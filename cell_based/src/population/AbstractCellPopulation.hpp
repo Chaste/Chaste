@@ -327,11 +327,11 @@ public:
     /**
      * Write any data necessary to a visualization setup file.
      * Used by AbstractCellBasedSimulation::WriteVisualizerSetupFile().
-     * 
+     *
      * @param pVizSetupFile a visualization setup file
      */
     virtual void WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile);
- 
+
     /**
      * Add a new cell to the cell population.
      *
@@ -352,7 +352,7 @@ public:
      * As this method is pure virtual, it must be overridden
      * in subclasses.
      *
-     * Note that the time step can be reset by calling SetDt() on the 
+     * Note that the time step can be reset by calling SetDt() on the
      * simulation object used to simulate the cell population.
      */
     virtual double GetDefaultTimeStep()=0;
@@ -666,15 +666,15 @@ public:
     virtual void OutputCellPopulationParameters(out_stream& rParamsFile)=0;
 
     /**
-     * Empty hook method to provide the ability to specify some additional property 
-     * of a cell-based simulation object. 
+     * Empty hook method to provide the ability to specify some additional property
+     * of a cell-based simulation object.
      *
-     * This method is called immediately prior to calling SetupSolve() within the 
+     * This method is called immediately prior to calling SetupSolve() within the
      * Solve() method in AbstractCellBasedSimulation.
      *
-     * This method can be overridden, for example, to add a T2SwapCellKiller to the 
-     * simulation object in the case of a VertexBasedCellPopulation. This functionality 
-     * avoids the need for static or dynamic casts to specific cell population types 
+     * This method can be overridden, for example, to add a T2SwapCellKiller to the
+     * simulation object in the case of a VertexBasedCellPopulation. This functionality
+     * avoids the need for static or dynamic casts to specific cell population types
      * within simulation methods.
      *
      * @param pSimulation pointer to a cell-based simulation object

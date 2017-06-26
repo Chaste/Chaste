@@ -81,7 +81,7 @@ private:
          * of the VertexMesh class, so instead we delete mpVoronoiTessellation.
          */
         delete mpVoronoiTessellation;
-        mpVoronoiTessellation = NULL;
+        mpVoronoiTessellation = nullptr;
 
         archive & mSpringRestLengths;
         archive & mUseAreaBasedDampingConstant;
@@ -431,7 +431,7 @@ public:
      * Overridden WriteDataToVisualizerSetupFile() method.
      * Write any data necessary to a visualization setup file.
      * Used by AbstractCellBasedSimulation::WriteVisualizerSetupFile().
-     * 
+     *
      * @param pVizSetupFile a visualization setup file
      */
     virtual void WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile);

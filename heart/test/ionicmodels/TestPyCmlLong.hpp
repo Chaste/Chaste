@@ -38,30 +38,31 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 
-#include <iostream>
 #include <algorithm>
-#include <vector>
 #include <boost/assign/list_of.hpp>
 #include <boost/foreach.hpp>
+#include <cstring>
+#include <iostream>
+#include <vector>
 
 #include "AbstractCardiacCell.hpp"
 #include "AbstractCardiacCellInterface.hpp"
 #include "AbstractCvodeCell.hpp"
-#include "AbstractRushLarsenCardiacCell.hpp"
 #include "AbstractGeneralizedRushLarsenCardiacCell.hpp"
+#include "AbstractRushLarsenCardiacCell.hpp"
 #include "Timer.hpp"
 
 #include "DynamicLoadingHelperFunctions.hpp"
 
+#include "CellMLToSharedLibraryConverter.hpp"
 #include "DynamicCellModelLoader.hpp"
 #include "DynamicModelLoaderRegistry.hpp"
 #include "FileFinder.hpp"
-#include "CellMLToSharedLibraryConverter.hpp"
 
 #include "CellProperties.hpp"
 #include "HeartConfig.hpp"
-#include "Warnings.hpp"
 #include "RunAndCheckIonicModels.hpp"
+#include "Warnings.hpp"
 
 #include "PetscSetupAndFinalize.hpp"
 
@@ -93,7 +94,6 @@ private:
         }
         return attr_value;
     }
-
 
 #ifdef CHASTE_CVODE
     bool mUseCvodeJacobian;
@@ -150,32 +150,32 @@ private:
                       std::vector<double>& rVoltages,
                       std::vector<double>& rTimes,
                       unsigned outputFreq,
-                      double tolerance=1.0)
+                      double tolerance = 1.0)
     {
         // Read data entries for the reference file
         ColumnDataReader data_reader("heart/test/data/cellml", rModelName, false);
         std::vector<double> valid_times = data_reader.GetValues("Time");
         std::vector<double> valid_voltages = GetVoltages(data_reader);
 
-        TS_ASSERT_EQUALS(rTimes.size(), (valid_times.size()-1)*outputFreq+1);
-        for (unsigned i=0; i<valid_times.size(); i++)
+        TS_ASSERT_EQUALS(rTimes.size(), (valid_times.size() - 1) * outputFreq + 1);
+        for (unsigned i = 0; i < valid_times.size(); i++)
         {
-            TS_ASSERT_DELTA(rTimes[i*outputFreq], valid_times[i], 1e-12);
-            TS_ASSERT_DELTA(rVoltages[i*outputFreq], valid_voltages[i], tolerance);
+            TS_ASSERT_DELTA(rTimes[i * outputFreq], valid_times[i], 1e-12);
+            TS_ASSERT_DELTA(rVoltages[i * outputFreq], valid_voltages[i], tolerance);
         }
     }
 
     void RunTests(const std::string& rOutputDirName,
                   const std::vector<std::string>& rModels,
                   const std::vector<std::string>& rArgs,
-                  bool testLookupTables=false,
-                  double tableTestV=-1000,
-                  bool warningsOk=true)
+                  bool testLookupTables = false,
+                  double tableTestV = -1000,
+                  bool warningsOk = true)
     {
         OutputFileHandler handler(rOutputDirName); // Clear folder (collective)
         PetscTools::IsolateProcesses(true); // Simple parallelism
         std::vector<std::string> failures;
-        for (unsigned i=0; i<rModels.size(); ++i)
+        for (unsigned i = 0; i < rModels.size(); ++i)
         {
             if (PetscTools::IsParallel() && i % PetscTools::GetNumProcs() != PetscTools::GetMyRank())
             {
@@ -197,7 +197,15 @@ private:
             }
             if (!warningsOk)
             {
-                TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
+                if (rModels[i] == "demir_model_1994" || strncmp((rModels[i]).c_str(), "zhang_SAN_model_2000", strlen("zhang_SAN_model_2000")) == 0)
+                {
+                    // We know this model does something that provokes one warning...
+                    TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
+                }
+                else
+                {
+                    TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
+                }
             }
             Warnings::NoisyDestroy(); // Print out any warnings now, not at program exit
         }
@@ -208,7 +216,7 @@ private:
         if (!failures.empty())
         {
             std::cout << failures.size() << " models failed for " << rOutputDirName << ":" << std::endl;
-            for (unsigned i=0; i<failures.size(); ++i)
+            for (unsigned i = 0; i < failures.size(); ++i)
             {
                 std::cout << "   " << failures[i] << std::endl;
             }
@@ -218,8 +226,8 @@ private:
     void RunTest(const std::string& rOutputDirName,
                  const std::string& rModelName,
                  const std::vector<std::string>& rArgs,
-                 bool testLookupTables=false,
-                 double tableTestV=-1000)
+                 bool testLookupTables = false,
+                 double tableTestV = -1000)
     {
         // Copy CellML file (and .out if present) into output dir
         OutputFileHandler handler(rOutputDirName, true);
@@ -233,7 +241,7 @@ private:
 
         // Create options file
         std::vector<std::string> args(rArgs);
-//        args.push_back("--profile");
+        //        args.push_back("--profile");
         CellMLToSharedLibraryConverter converter(true);
         if (!args.empty())
         {
@@ -255,20 +263,20 @@ private:
             // Tell the cell to use the default stimulus and retrieve it
             boost::shared_ptr<RegularStimulus> p_reg_stim = p_cell->UseCellMLDefaultStimulus();
 
-            if (rModelName!="aslanidi_model_2009") // Even before recent changes aslanidi model has stimulus of -400 !
+            if (rModelName != "aslanidi_model_2009") // Even before recent changes aslanidi model has stimulus of -400 !
             {
                 // Stimulus magnitude should be approximately between -5 and -81 uA/cm^2
-                TS_ASSERT_LESS_THAN(p_reg_stim->GetMagnitude(),-5);
-                TS_ASSERT_LESS_THAN(-81,p_reg_stim->GetMagnitude());
+                TS_ASSERT_LESS_THAN(p_reg_stim->GetMagnitude(), -5);
+                TS_ASSERT_LESS_THAN(-81, p_reg_stim->GetMagnitude());
             }
 
             // Stimulus duration should be approximately between 0.1 and 5 ms.
-            TS_ASSERT_LESS_THAN(p_reg_stim->GetDuration(),6.01);
-            TS_ASSERT_LESS_THAN(0.1,p_reg_stim->GetDuration());
+            TS_ASSERT_LESS_THAN(p_reg_stim->GetDuration(), 6.01);
+            TS_ASSERT_LESS_THAN(0.1, p_reg_stim->GetDuration());
 
             // Stimulus period should be approximately between 70 (for bondarenko - seems fast! - would expect 8-10 beats per second for mouse) and 2000ms.
-            TS_ASSERT_LESS_THAN(p_reg_stim->GetPeriod(),2000);
-            TS_ASSERT_LESS_THAN(70,p_reg_stim->GetPeriod());
+            TS_ASSERT_LESS_THAN(p_reg_stim->GetPeriod(), 2000);
+            TS_ASSERT_LESS_THAN(70, p_reg_stim->GetPeriod());
 
             p_cell->SetIntracellularStimulusFunction(original_stim);
         }
@@ -329,7 +337,7 @@ private:
     }
 
 public:
-    void TestNormalCells() throw (Exception)
+    void TestNormalCells() throw(Exception)
     {
         std::cout << "Search for 'Failure', ': ***', 'Error', or 'Failed' to find problems." << std::endl;
 
@@ -342,7 +350,7 @@ public:
         RunTests(dirname, models, args);
     }
 
-    void TestOptimisedCells() throw (Exception)
+    void TestOptimisedCells() throw(Exception)
     {
         std::string dirname("TestPyCmlNightlyOpt");
         std::vector<std::string> args;
@@ -353,10 +361,10 @@ public:
         RunTests(dirname, models, args, true);
     }
 
-    void TestCvodeCells() throw (Exception)
+    void TestCvodeCells() throw(Exception)
     {
 #ifdef CHASTE_CVODE
-        std::string dirname ("TestPyCmlNightlyCvodeNumericalJ");
+        std::string dirname("TestPyCmlNightlyCvodeNumericalJ");
         std::vector<std::string> args;
         args.push_back("--Wu");
         args.push_back("--cvode");
@@ -368,7 +376,7 @@ public:
 #endif
     }
 
-    void TestAnalyticCvodeCells() throw (Exception)
+    void TestAnalyticCvodeCells() throw(Exception)
     {
 #ifdef CHASTE_CVODE
         std::string dirname("TestPyCmlNightlyCvodeAnalyticJ");
@@ -379,11 +387,8 @@ public:
         AddAllModels(models);
 
         // These have NaN in the jacobian due to massive exponentials
-        std::vector<std::string> bad_models = boost::assign::list_of
-                ("aslanidi_model_2009")
-                ("hund_rudy_2004_a")
-                ("livshitz_rudy_2007");
-        BOOST_FOREACH(std::string bad_model, bad_models)
+        std::vector<std::string> bad_models = boost::assign::list_of("aslanidi_model_2009")("hund_rudy_2004_a")("livshitz_rudy_2007");
+        BOOST_FOREACH (std::string bad_model, bad_models)
         {
             models.erase(std::find(models.begin(), models.end(), bad_model));
         }
@@ -393,7 +398,7 @@ public:
 #endif
     }
 
-    void TestBackwardEulerCells() throw (Exception)
+    void TestBackwardEulerCells() throw(Exception)
     {
         std::string dirname("TestPyCmlNightlyBE");
         std::vector<std::string> args;
@@ -411,15 +416,14 @@ public:
         diff_models.push_back("priebe_beuckelmann_model_1998");
         diff_models.push_back("viswanathan_model_1999_epi");
         diff_models.push_back("winslow_model_1999");
-        BOOST_FOREACH(std::string diff_model, diff_models)
+        BOOST_FOREACH (std::string diff_model, diff_models)
         {
             models.erase(std::find(models.begin(), models.end(), diff_model));
         }
 
         // These have NaN in the jacobian due to massive exponentials
-        std::vector<std::string> bad_models = boost::assign::list_of
-                ("hund_rudy_2004_a");
-        BOOST_FOREACH(std::string bad_model, bad_models)
+        std::vector<std::string> bad_models = boost::assign::list_of("hund_rudy_2004_a");
+        BOOST_FOREACH (std::string bad_model, bad_models)
         {
             models.erase(std::find(models.begin(), models.end(), bad_model));
         }
@@ -432,7 +436,7 @@ public:
         RunTests(dirname, diff_models, args, true);
     }
 
-    void TestRushLarsenCells() throw (Exception)
+    void TestRushLarsenCells() throw(Exception)
     {
         std::string dirname("TestPyCmlNightlyRushLarsen");
         std::vector<std::string> args;
@@ -446,7 +450,7 @@ public:
         RunTests(dirname, models, args, false, 0, false);
     }
 
-    void TestRushLarsenOptCells() throw (Exception)
+    void TestRushLarsenOptCells() throw(Exception)
     {
         std::string dirname("TestPyCmlNightlyRushLarsenOpt");
         std::vector<std::string> args;
@@ -458,7 +462,7 @@ public:
         RunTests(dirname, models, args, true, -1000, false);
     }
 
-    void TestGeneralizedRushLarsen1Cells() throw (Exception)
+    void TestGeneralizedRushLarsen1Cells() throw(Exception)
     {
         std::string dirname("TestPyCmlNightlyGeneralizedRushLarsen1");
         std::vector<std::string> args;
@@ -472,7 +476,7 @@ public:
         RunTests(dirname, models, args, false, 0, false);
     }
 
-    void TestGeneralizedRushLarsen1CellsOpt() throw (Exception)
+    void TestGeneralizedRushLarsen1CellsOpt() throw(Exception)
     {
         std::string dirname("TestPyCmlNightlyGeneralizedRushLarsen1Opt");
         std::vector<std::string> args;
@@ -487,7 +491,7 @@ public:
         RunTests(dirname, models, args, true, -1000, false);
     }
 
-    void TestGeneralizedRushLarsen2Cells() throw (Exception)
+    void TestGeneralizedRushLarsen2Cells() throw(Exception)
     {
         std::string dirname("TestPyCmlNightlyGeneralizedRushLarsen2");
         std::vector<std::string> args;
@@ -500,7 +504,7 @@ public:
         RunTests(dirname, models, args, false, 0, false);
     }
 
-    void TestGeneralizedRushLarsen2CellsOpt() throw (Exception)
+    void TestGeneralizedRushLarsen2CellsOpt() throw(Exception)
     {
         std::string dirname("TestPyCmlNightlyGeneralizedRushLarsen2Opt");
         std::vector<std::string> args;

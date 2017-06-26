@@ -47,8 +47,8 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCentreBasedCell
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCentreBasedDivisionRule;
 
 /**
- * A class to generate a division vector of length 
- * AbstractCentreBasedCellPopulation::mMeinekeDivisionSeparation that points 
+ * A class to generate a division vector of length
+ * AbstractCentreBasedCellPopulation::mMeinekeDivisionSeparation that points
  * in a random direction.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>

@@ -84,7 +84,7 @@ public:
 
     void TestGenericReader() throw (Exception)
     {
-        std::auto_ptr<AbstractMeshReader<3, 3> > p_mesh_reader = GenericMeshReader<3,3>("mesh/test/data/Memfem_slab");
+        std::shared_ptr<AbstractMeshReader<3, 3> > p_mesh_reader = GenericMeshReader<3,3>("mesh/test/data/Memfem_slab");
 
         TS_ASSERT_EQUALS(p_mesh_reader->GetNumNodes(), 381u);
         TS_ASSERT_EQUALS(p_mesh_reader->GetNumElements(), 1030u);

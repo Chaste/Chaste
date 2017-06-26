@@ -283,8 +283,10 @@ public:
         TS_ASSERT_EQUALS(wall_thickness_file.IsFile(), false);
         TS_ASSERT_EQUALS(averaged_thickness_file.IsFile(), false);
 
+        // Make the above parallel tests finish before the next part.
+        // (When master process enters PreWriteCalculations it will create empty files for the node_regions etc.)
+        PetscTools::Barrier("Wait for tests that files don't exist yet");
         fibre_generator.SetLogInfo(true);
-
         fibre_generator.WriteData(handler, "box_heart.ortho");
 
         TS_ASSERT_EQUALS(node_regions_file.IsFile(), true);

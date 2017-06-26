@@ -201,7 +201,7 @@ std::vector<double> DiscreteSystemForceCalculator::GetSamplingAngles(unsigned in
         if (alpha_minus_epsilon <= -M_PI)
         {
             alpha_minus_epsilon += 2*M_PI;
-        }        
+        }
         sampling_angles[i] = alpha_minus_epsilon;
 
         assert(sampling_angles[i] <= M_PI);

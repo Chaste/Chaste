@@ -57,13 +57,13 @@ PottsMeshWriter<SPACE_DIM>::PottsMeshWriter(const std::string& rDirectory,
                                             const std::string& rBaseName,
                                             const bool clearOutputDir)
     : AbstractMeshWriter<SPACE_DIM, SPACE_DIM>(rDirectory, rBaseName, clearOutputDir),
-      mpMesh(NULL),
+      mpMesh(nullptr),
       mpIters(new MeshPottsWriterIterators<SPACE_DIM>),
-      mpNodeMap(NULL),
+      mpNodeMap(nullptr),
       mNodeMapCurrentIndex(0)
 {
-    mpIters->pNodeIter = NULL;
-    mpIters->pElemIter = NULL;
+    mpIters->pNodeIter = nullptr;
+    mpIters->pElemIter = nullptr;
 }
 
 template<unsigned SPACE_DIM>
@@ -141,7 +141,7 @@ ElementData PottsMeshWriter<SPACE_DIM>::GetNextElement()
 template<unsigned SPACE_DIM>
 void PottsMeshWriter<SPACE_DIM>::WriteFilesUsingMesh(PottsMesh<SPACE_DIM>& rMesh)
 {
-    this->mpMeshReader = NULL;
+    this->mpMeshReader = nullptr;
     mpMesh = &rMesh;
 
     this->mNumNodes = mpMesh->GetNumNodes();

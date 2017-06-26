@@ -59,7 +59,7 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(AbstractTetrahe
 #else
     assert(keepOriginalElementIndexing);
     this->mpDistributedMesh = dynamic_cast<DistributedTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* >(&rMesh);
-    bool mesh_is_distributed = (this->mpDistributedMesh != NULL) && PetscTools::IsParallel();
+    bool mesh_is_distributed = (this->mpDistributedMesh != nullptr) && PetscTools::IsParallel();
 
     if (PetscTools::AmMaster())
     {
@@ -256,8 +256,8 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteXdmfMasterFile(unsigned number
 
     DOMImplementation* p_DOM_implementation = DOMImplementationRegistry::getDOMImplementation(X("core"));
 
-    DOMDocumentType* p_DOM_document_type = p_DOM_implementation->createDocumentType(X("Xdmf"),0,X("Xdmf.dtd"));
-    DOMDocument* p_DOM_document = p_DOM_implementation->createDocument(0, X("Xdmf"), p_DOM_document_type);
+    DOMDocumentType* p_DOM_document_type = p_DOM_implementation->createDocumentType(X("Xdmf"),nullptr,X("Xdmf.dtd"));
+    DOMDocument* p_DOM_document = p_DOM_implementation->createDocument(nullptr, X("Xdmf"), p_DOM_document_type);
     DOMElement* p_root_element = p_DOM_document->getDocumentElement();
     p_root_element->setAttribute(X("Version"), X("2.0"));
     p_root_element->setAttribute(X("xmlns:xi"), X("http://www.w3.org/2001/XInclude"));

@@ -64,7 +64,7 @@ Cell::Cell(boost::shared_ptr<AbstractCellProperty> pMutationState,
         EXCEPTION("Cell is setting up a cell-cycle model but SimulationTime has not been set up");
     }
 
-    if (pCellCycleModel == NULL)
+    if (pCellCycleModel == nullptr)
     {
         EXCEPTION("Cell-cycle model is null");
     }
@@ -72,7 +72,7 @@ Cell::Cell(boost::shared_ptr<AbstractCellProperty> pMutationState,
     mpCellCycleModel->SetCell(CellPtr(this, null_deleter()));
 
     // Create a null srn model if none given
-    if (pSrnModel == NULL)
+    if (pSrnModel == nullptr)
     {
         pSrnModel = new NullSrnModel;
         mpSrnModel = pSrnModel;

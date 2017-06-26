@@ -43,8 +43,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::AbstractNumericalMethod()
-    : mpCellPopulation(NULL),
-      mpForceCollection(NULL),
+    : mpCellPopulation(nullptr),
+      mpForceCollection(nullptr),
       mUseAdaptiveTimestep(false),
       mUseUpdateNodeLocation(false),
       mGhostNodeForcesEnabled(true)
@@ -107,7 +107,7 @@ std::vector<c_vector<double, SPACE_DIM> > AbstractNumericalMethod<ELEMENT_DIM,SP
     {
         node_iter->ClearAppliedForce();
     }
-    
+
     for (typename std::vector<boost::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > >::iterator iter = mpForceCollection->begin();
         iter != mpForceCollection->end(); ++iter)
     {
@@ -135,7 +135,7 @@ std::vector<c_vector<double, SPACE_DIM> > AbstractNumericalMethod<ELEMENT_DIM,SP
         double damping = mpCellPopulation->GetDampingConstant(node_iter->GetIndex());
         forces_as_vector.push_back(node_iter->rGetAppliedForce()/damping);
     }
-    
+
     CellBasedEventHandler::EndEvent(CellBasedEventHandler::FORCE);
 
     return forces_as_vector;
@@ -157,7 +157,7 @@ std::vector<c_vector<double, SPACE_DIM> > AbstractNumericalMethod<ELEMENT_DIM,SP
     return current_locations;
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>  
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::SafeNodePositionUpdate( unsigned nodeIndex, c_vector<double, SPACE_DIM> newPosition)
 {
     ChastePoint<SPACE_DIM> new_point(newPosition);
@@ -166,7 +166,7 @@ void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::SafeNodePositionUpdate( uns
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::DetectStepSizeExceptions(unsigned nodeIndex, c_vector<double,SPACE_DIM>& displacement, double dt)
-{    
+{
     try
     {
         mpCellPopulation->CheckForStepSizeException(nodeIndex, displacement, dt);
@@ -186,7 +186,7 @@ void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::DetectStepSizeExceptions(un
         {
             throw e;
         }
-    }   
+    }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

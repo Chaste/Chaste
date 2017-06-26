@@ -94,21 +94,21 @@ void Goldbeter1991SrnModel::OutputSrnModelParameters(out_stream& rParamsFile)
 
 double Goldbeter1991SrnModel::GetC()
 {
-    assert(mpOdeSystem != NULL);
+    assert(mpOdeSystem != nullptr);
     double val = mpOdeSystem->rGetStateVariables()[0];
     return val;
 }
 
 double Goldbeter1991SrnModel::GetM()
 {
-    assert(mpOdeSystem != NULL);
+    assert(mpOdeSystem != nullptr);
     double val = mpOdeSystem->rGetStateVariables()[1];
     return val;
 }
 
 double Goldbeter1991SrnModel::GetX()
 {
-    assert(mpOdeSystem != NULL);
+    assert(mpOdeSystem != nullptr);
     double val = mpOdeSystem->rGetStateVariables()[2];
     return val;
 }

@@ -143,7 +143,7 @@ macro(Chaste_ADD_TEST _testTargetName _filename)
     if (python)
         set(test_exe ${Chaste_BINARY_DIR}/python/infra/TestPythonCode.py ${_filename})
     else()
-        set(_exeTargetName ${_testname}Runner)
+        set(_exeTargetName ${_testname})
 
         if (NOT TARGET ${exeTargetName})
             set(_test_real_output_filename "${CMAKE_CURRENT_BINARY_DIR}/${_testname}.cpp")
@@ -156,8 +156,6 @@ macro(Chaste_ADD_TEST _testTargetName _filename)
             set_source_files_properties("${_test_real_output_filename}" PROPERTIES GENERATED true)
 
             add_executable(${exeTargetName} "${_test_real_output_filename}" ${_filename} ${ARGN})
-            set_property(TARGET ${exeTargetName} PROPERTY CXX_STANDARD 11)
-            set_property(TARGET ${exeTargetName} PROPERTY CXX_STANDARD_REQUIRED ON)
         endif()
 
         set(test_exe $<TARGET_FILE:${exeTargetName}>)
@@ -246,21 +244,25 @@ endmacro(Chaste_ADD_TEST)
 # hpp file (in test)
 ##########################################################
 macro(Chaste_GENERATE_TEST_NAME test outTestName)
-    string(REGEX REPLACE "([a-zA-Z0-9_/]+)[.](hpp|py)" "\\1" testName "${test}")
-    string(REPLACE "/" ";" testPath "${testName}")
-    list(LENGTH testPath pathLength)
-    if(${pathLength} EQUAL 1)
-        set(testName ${testPath})
-        set(testPath "")
-        set(${outTestName} ${testName})
-    else()
-        math(EXPR index "${pathLength} - 1")
-        list(GET testPath ${index} testName)
-        list(REMOVE_AT testPath ${index})
-        string(REPLACE ";" "_" _testPath_ "${testPath}")
-        string(REPLACE ";" "/" testPath "${testPath}")
-        set(${outTestName} "${testName}_${_testPath_}_")
-    endif()
+    get_filename_component(${outTestName} ${test} NAME_WE)
+#####################
+# This functionality appends the path to each test: removed in #2906
+#####################
+#    string(REGEX REPLACE "([a-zA-Z0-9_/]+)[.](hpp|py)" "\\1" testName "${test}")
+#    string(REPLACE "/" ";" testPath "${testName}")
+#    list(LENGTH testPath pathLength)
+#    if(${pathLength} EQUAL 1)
+#        set(testName ${testPath})
+#        set(testPath "")
+#        set(${outTestName} ${testName})
+#    else()
+#        math(EXPR index "${pathLength} - 1")
+#        list(GET testPath ${index} testName)
+#        list(REMOVE_AT testPath ${index})
+#        string(REPLACE ";" "_" _testPath_ "${testPath}")
+#        string(REPLACE ";" "/" testPath "${testPath}")
+#        set(${outTestName} "${testName}_${_testPath_}_")
+#    endif()
 endmacro(Chaste_GENERATE_TEST_NAME test outTestName)
 
 ##########################################################
@@ -271,6 +273,7 @@ endmacro(Chaste_GENERATE_TEST_NAME test outTestName)
 # layout
 ##########################################################
 macro(Chaste_DO_COMMON component)
+
     add_definitions(-DCOMPONENT_SOURCE_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\")
     if (NOT TARGET ${component})
         add_custom_target(${component})
@@ -319,51 +322,51 @@ macro(Chaste_DO_COMMON component)
         include_directories("${Chaste_INCLUDE_DIRS}")
     endif()
 
-    # Make component library
-    add_library(chaste_${component} ${Chaste_${component}_SOURCES} ${ARGN})
-    set_property(TARGET chaste_${component} PROPERTY CXX_STANDARD 11)
-    set_property(TARGET chaste_${component} PROPERTY CXX_STANDARD_REQUIRED ON)
-    if (BUILD_SHARED_LIBS)
-        target_link_libraries(chaste_${component} LINK_PUBLIC ${Chaste_LIBRARIES})
-        set(static_extension "a")
-        set(keyword "")
-        foreach(library ${Chaste_THIRD_PARTY_LIBRARIES})
-            if (library STREQUAL debug OR library STREQUAL optimized OR library STREQUAL general)
-                set(keyword ${library})
-            else()
-                if (library MATCHES ".*\\.${static_extension}")
-                    target_link_libraries(chaste_${component} LINK_PRIVATE ${keyword} ${library})
+    # Make component library, if component contains any source files
+    if (NOT Chaste_${component}_SOURCES STREQUAL "")
+        add_library(chaste_${component} ${Chaste_${component}_SOURCES} ${ARGN})
+        if (BUILD_SHARED_LIBS)
+            target_link_libraries(chaste_${component} LINK_PUBLIC ${Chaste_LIBRARIES})
+            set(static_extension "a")
+            set(keyword "")
+            foreach(library ${Chaste_THIRD_PARTY_LIBRARIES})
+                if (library STREQUAL debug OR library STREQUAL optimized OR library STREQUAL general)
+                    set(keyword ${library})
                 else()
-                    target_link_libraries(chaste_${component} LINK_PUBLIC ${keyword} ${library})
+                    if (library MATCHES ".*\\.${static_extension}")
+                        target_link_libraries(chaste_${component} LINK_PRIVATE ${keyword} ${library})
+                    else()
+                        target_link_libraries(chaste_${component} LINK_PUBLIC ${keyword} ${library})
+                    endif()
+                    set(keyword "")
                 endif()
-                set(keyword "")
-            endif()
-        endforeach()
-    else()
-        target_link_libraries(chaste_${component} LINK_PUBLIC ${Chaste_THIRD_PARTY_LIBRARIES})
-    endif()
+            endforeach()
+        else()
+            target_link_libraries(chaste_${component} LINK_PUBLIC ${Chaste_THIRD_PARTY_LIBRARIES})
+        endif()
 
 
-    if(NOT(${component} MATCHES "^project"))
-        # install component library
-        install(TARGETS chaste_${component} 
-            EXPORT chaste-targets
-            DESTINATION lib/chaste 
-            COMPONENT ${component}_libraries)
+        if(NOT(${component} MATCHES "^project"))
+            # install component library
+            install(TARGETS chaste_${component}
+                EXPORT chaste-targets
+                DESTINATION lib/chaste
+                COMPONENT ${component}_libraries)
 
-        # install component headers
-        install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/src/"
-            DESTINATION include/chaste/${component}
-            COMPONENT ${component}_headers
-            FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp"
-            )
+            # install component headers
+            install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/src/"
+                DESTINATION include/chaste/${component}
+                COMPONENT ${component}_headers
+                FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp"
+                )
 
-        # install generated headers
-        install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/src/"
-            DESTINATION include/chaste/${component}
-            COMPONENT ${component}_headers
-            FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp"
-            )
+            # install generated headers
+            install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/src/"
+                DESTINATION include/chaste/${component}
+                COMPONENT ${component}_headers
+                FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp"
+                )
+        endif()
     endif()
 
     if (Chaste_ENABLE_TESTING) 
@@ -388,7 +391,7 @@ macro(Chaste_DO_COMMON component)
             message(WARNING "No CMakeLists.txt file found in test directory ${CMAKE_CURRENT_SOURCE_DIR}/apps. Applications for ${component} will not be built")
             set(Chaste_ENABLE_${component}_APPS OFF CACHE BOOL "Generate the applications infrastructure for ${component} ")
         endif()
-        
+
         # Do apps if requested
         if(Chaste_ENABLE_${component}_APPS)
             add_subdirectory(apps)
@@ -408,8 +411,10 @@ macro(Chaste_DO_COMPONENT component)
 endmacro(Chaste_DO_COMPONENT)
 
 macro(Chaste_DO_PROJECT projectName)
-    message("Configuring project ${projectName}")
-    Chaste_DO_COMMON(project_${projectName})
+    if (Chaste_ENABLE_project_${projectName})
+        message("Configuring project ${projectName}")
+        Chaste_DO_COMMON(project_${projectName})
+    endif()
 endmacro(Chaste_DO_PROJECT)
 
 ##########################################################
@@ -431,8 +436,6 @@ macro(Chaste_DO_APPS_COMMON component)
             set(component_library )
         endif()
         add_executable(${appName} ${app})
-        set_property(TARGET ${appName} PROPERTY CXX_STANDARD 11)
-        set_property(TARGET ${appName} PROPERTY CXX_STANDARD_REQUIRED ON)
         #set_target_properties(${appName} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/src)
 
         if (NOT ${component} STREQUAL "")
@@ -509,6 +512,10 @@ endmacro(Chaste_DO_APPS_MAIN)
 # enabled test packs.
 ##########################################################
 macro(Chaste_DO_TEST_COMMON component)
+
+    # Get the git revision (for tutorial tests)
+    find_package(Git QUIET)
+
     # make tutorial directories
     file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/tutorials)
     file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/tutorials/UserTutorials)
@@ -520,12 +527,14 @@ macro(Chaste_DO_TEST_COMMON component)
     include_directories(SYSTEM "${CXXTEST_INCLUDES}")
 
     # Make test library if sources exist
-    set(COMPONENT_LIBRARIES chaste_${component})
+    if (TARGET chaste_${component})
+        set(COMPONENT_LIBRARIES chaste_${component})
+    else()
+        set(COMPONENT_LIBRARIES ${Chaste_LIBRARIES})
+    endif()
     file(GLOB_RECURSE test_sources RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.cpp)
     if(test_sources)
         add_library(test${component} STATIC ${test_sources})
-        set_property(TARGET test${component} PROPERTY CXX_STANDARD 11)
-        set_property(TARGET test${component} PROPERTY CXX_STANDARD_REQUIRED ON)
         set(COMPONENT_LIBRARIES ${COMPONENT_LIBRARIES} test${component})
     endif()
 
@@ -564,7 +573,7 @@ macro(Chaste_DO_TEST_COMMON component)
                 chaste_generate_test_name(${filename} "testTargetName")
                 set(old_testTargetName ${testTargetName})
                 set(parallel OFF)
-                set(exeTargetName ${testTargetName}Runner)
+                set(exeTargetName ${testTargetName})
                 if (${type} STREQUAL "Parallel")
                     set(testTargetName ${testTargetName}Parallel)
                     set(parallel ON)
@@ -584,7 +593,7 @@ macro(Chaste_DO_TEST_COMMON component)
                     endif()
 
 
-                    set_property(TEST ${testTargetName} PROPERTY LABELS ${component} ${type})
+                    set_property(TEST ${testTargetName} PROPERTY LABELS ${type}_${component})
 
                     if (Chaste_INSTALL_TESTS AND NOT(${component} MATCHES "^project")) 
                         install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${old_testTargetName}.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/${filename}"
@@ -592,10 +601,17 @@ macro(Chaste_DO_TEST_COMMON component)
                     endif()
 
                     # filename is a user tutorial
-                    if(filename MATCHES "Test(.*)Tutorial.(hpp|py)") 
+                    if(filename MATCHES "Test(.*)Tutorial.(hpp|py)")
+                        # Get the git revision of last time this file was changed
+                        if(DEFINED GIT_EXECUTABLE)
+                            execute_process(COMMAND git log -1 --format=%h --follow ${filename}
+                                    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                                    OUTPUT_VARIABLE Chaste_revision
+                                    OUTPUT_STRIP_TRAILING_WHITESPACE)
+                        endif()
                         set(out_filename  ${CMAKE_BINARY_DIR}/tutorials/UserTutorials/${CMAKE_MATCH_1})
                         add_custom_command(OUTPUT ${out_filename}
-                            COMMAND ${PYTHON_EXECUTABLE} ARGS ${Chaste_BINARY_DIR}/python/utils/CreateTutorial.py ${CMAKE_CURRENT_SOURCE_DIR}/${filename} ${out_filename}
+                            COMMAND ${PYTHON_EXECUTABLE} ARGS ${Chaste_BINARY_DIR}/python/utils/CreateTutorial.py ${CMAKE_CURRENT_SOURCE_DIR}/${filename} ${out_filename} -r ${Chaste_revision}
                             DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${filename}
                             COMMENT "Generating user tutorial ${out_filename}" VERBATIM)
                         add_custom_target(${CMAKE_MATCH_1} DEPENDS ${out_filename})
@@ -612,11 +628,6 @@ macro(Chaste_DO_TEST_COMMON component)
                         add_custom_target(${CMAKE_MATCH_1} DEPENDS ${out_filename})
                         add_dependencies(tutorials ${CMAKE_MATCH_1})
                     endif()
-
-                else()
-                    get_property(myLabels TEST ${testTargetName} PROPERTY LABELS)
-                    list(APPEND myLabels ${type})
-                    set_property(TEST ${testTargetName} PROPERTY LABELS ${myLabels})
                 endif()
 
                 # add dependencies to component and type targets. Do not include the python component or tests in Python files

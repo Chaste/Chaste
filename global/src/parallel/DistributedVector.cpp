@@ -46,7 +46,7 @@ DistributedVector::DistributedVector(Vec vec, DistributedVectorFactory* pFactory
       mpFactory(pFactory),
       mReadOnly(readOnly)
 {
-    assert(pFactory != NULL);
+    assert(pFactory != nullptr);
 
     // Set local copies of problem size, etc.
     mProblemSize = pFactory->GetProblemSize();

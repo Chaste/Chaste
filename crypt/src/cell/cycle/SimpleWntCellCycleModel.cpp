@@ -93,7 +93,7 @@ void SimpleWntCellCycleModel::SetUseCellProliferativeTypeDependentG1Duration(boo
 
 void SimpleWntCellCycleModel::SetG1Duration()
 {
-    assert(mpCell != NULL);
+    assert(mpCell != nullptr);
 
     RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
 
@@ -131,7 +131,7 @@ void SimpleWntCellCycleModel::SetG1Duration()
 
 double SimpleWntCellCycleModel::GetWntLevel() const
 {
-    assert(mpCell != NULL);
+    assert(mpCell != nullptr);
     double level = 0;
 
     switch (mDimension)

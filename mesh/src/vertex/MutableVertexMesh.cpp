@@ -34,9 +34,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "MutableVertexMesh.hpp"
+
+#include "LogFile.hpp"
 #include "UblasCustomFunctions.hpp"
 #include "Warnings.hpp"
-#include "LogFile.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::MutableVertexMesh(std::vector<Node<SPACE_DIM>*> nodes,
@@ -354,9 +355,9 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
                                                                                 c_vector<double, SPACE_DIM> axisOfDivision,
                                                                                 bool placeOriginalElementBelow)
 {
-    assert(SPACE_DIM == 2);				// LCOV_EXCL_LINE
-    assert(ELEMENT_DIM == SPACE_DIM);	// LCOV_EXCL_LINE
-    
+    assert(SPACE_DIM == 2);                // LCOV_EXCL_LINE
+    assert(ELEMENT_DIM == SPACE_DIM);    // LCOV_EXCL_LINE
+
     // Get the centroid of the element
     c_vector<double, SPACE_DIM> centroid = this->GetCentroidOfElement(pElement->GetIndex());
 
@@ -539,8 +540,8 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongShortAxis(VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement,
                                                                                 bool placeOriginalElementBelow)
 {
-    assert(SPACE_DIM == 2);				// LCOV_EXCL_LINE
-    assert(ELEMENT_DIM == SPACE_DIM);	// LCOV_EXCL_LINE
+    assert(SPACE_DIM == 2);                // LCOV_EXCL_LINE
+    assert(ELEMENT_DIM == SPACE_DIM);    // LCOV_EXCL_LINE
 
     c_vector<double, SPACE_DIM> short_axis = this->GetShortAxisOfElement(pElement->GetIndex());
 
@@ -554,8 +555,8 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElement(VertexElement<
                                                                   unsigned nodeBIndex,
                                                                   bool placeOriginalElementBelow)
 {
-    assert(SPACE_DIM == 2);				// LCOV_EXCL_LINE
-    assert(ELEMENT_DIM == SPACE_DIM);	// LCOV_EXCL_LINE
+    assert(SPACE_DIM == 2);                // LCOV_EXCL_LINE
+    assert(ELEMENT_DIM == SPACE_DIM);    // LCOV_EXCL_LINE
 
     // Sort nodeA and nodeB such that nodeBIndex > nodeAindex
     assert(nodeBIndex != nodeAIndex);
@@ -678,7 +679,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DeleteElementPriorToReMesh(unsigned index)
 {
     assert(SPACE_DIM == 2); // LCOV_EXCL_LINE
-    
+
     // Mark any nodes that are contained only in this element as deleted
     for (unsigned i=0; i<this->mElements[index]->GetNumNodes(); i++)
     {
@@ -855,8 +856,8 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(VertexElementMap& rElementMap)
 {
     // Make sure that we are in the correct dimension - this code will be eliminated at compile time
-    assert(SPACE_DIM==2 || SPACE_DIM==3); 	// LCOV_EXCL_LINE
-    assert(ELEMENT_DIM == SPACE_DIM); 		// LCOV_EXCL_LINE
+    assert(SPACE_DIM==2 || SPACE_DIM==3);     // LCOV_EXCL_LINE
+    assert(ELEMENT_DIM == SPACE_DIM);         // LCOV_EXCL_LINE
 
 
     if (SPACE_DIM == 2)
@@ -1581,8 +1582,8 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(Node<SPACE_DIM>* p
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformIntersectionSwap(Node<SPACE_DIM>* pNode, unsigned elementIndex)
 {
-    assert(SPACE_DIM == 2);					// LCOV_EXCL_LINE
-    assert(ELEMENT_DIM == SPACE_DIM);		// LCOV_EXCL_LINE
+    assert(SPACE_DIM == 2);                    // LCOV_EXCL_LINE
+    assert(ELEMENT_DIM == SPACE_DIM);        // LCOV_EXCL_LINE
 
 
     VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = this->GetElement(elementIndex);
@@ -1816,9 +1817,9 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT2Swap(VertexElement<ELEM
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* pNode, unsigned elementIndex)
 {
-    assert(SPACE_DIM == 2);    			 // LCOV_EXCL_LINE - code will be removed at compile time
+    assert(SPACE_DIM == 2);                 // LCOV_EXCL_LINE - code will be removed at compile time
     assert(ELEMENT_DIM == SPACE_DIM);    // LCOV_EXCL_LINE - code will be removed at compile time
-    
+
     assert(pNode->IsBoundaryNode());
 
     // Store the index of the elements containing the intersecting node

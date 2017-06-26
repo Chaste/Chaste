@@ -298,7 +298,7 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteElementsAsFaces()
 
     // Write the element header
     unsigned num_elements = this->GetNumElements();
-    assert(SPACE_DIM != ELEMENT_DIM);	// LCOV_EXCL_LINE
+    assert(SPACE_DIM != ELEMENT_DIM);    // LCOV_EXCL_LINE
     unsigned num_attr = 1;
 
     *p_element_file << num_elements << "\t";
@@ -336,7 +336,7 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFacesAsEdges()
         return;
     }
 
-    assert(SPACE_DIM == 3 && ELEMENT_DIM == 2);	// LCOV_EXCL_LINE
+    assert(SPACE_DIM == 3 && ELEMENT_DIM == 2);    // LCOV_EXCL_LINE
 
     std::string face_file_name = this->mBaseName;
     face_file_name = face_file_name + ".edge";

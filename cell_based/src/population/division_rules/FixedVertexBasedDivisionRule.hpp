@@ -50,7 +50,7 @@ template<unsigned SPACE_DIM> class AbstractVertexBasedDivisionRule;
 /**
  * A class to generate a division vector of unit length specified in
  * the class constructor.
- * 
+ *
  * This helper class is used in TestVertexhBasedCellPopulation.hpp.
  */
 template<unsigned SPACE_DIM>

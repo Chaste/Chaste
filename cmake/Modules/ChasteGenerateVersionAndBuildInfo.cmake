@@ -11,38 +11,13 @@ if(EXISTS "${version_file}")
     list(LENGTH full_version_list len)
     math(EXPR length ${len}-1)
     list(GET full_version_list ${length} Chaste_revision)
-    message("Chaste Release Full Version = ${full_version}, Revision = ${Chaste_revision}")
+    message(STATUS "Chaste Release Full Version = ${full_version}, Revision = ${Chaste_revision}")
 else()
-    # ReleaseVersion file not found, obtain revision information from SVN
-	# The following requires a proper command-line svn client to be installed, not
-	# just an ordinary shell extension like TortoiseSVN'
-	# Install SlikSVN or the distribution from Collabnet (if you don't mind registering)
-	find_package(Subversion QUIET)
-	if(SUBVERSION_FOUND)
-       execute_process(COMMAND ${Subversion_SVN_EXECUTABLE} info "${Chaste_SOURCE_DIR}"
-            OUTPUT_VARIABLE dummy
-            ERROR_VARIABLE Subversion_svn_info_error
-            RESULT_VARIABLE Subversion_svn_info_result
-            OUTPUT_STRIP_TRAILING_WHITESPACE)
-
-       if(${Subversion_svn_info_result} EQUAL 0)
-          Subversion_WC_INFO("${Chaste_SOURCE_DIR}" Chaste)
-	      set(Chaste_revision "${Chaste_WC_REVISION}")
-	      message("Current Chaste SVN Revision = ${Chaste_WC_REVISION}. Chaste Last Changed Revision = ${Chaste_WC_LAST_CHANGED_REV}")
-	      if(${Chaste_WC_REVISION} EQUAL ${Chaste_WC_LAST_CHANGED_REV})
-	         set(Chaste_WC_MODIFIED "false")
-	      else()
-	         set(Chaste_WC_MODIFIED "true")
-	      endif()
-       endif()
-    endif(SUBVERSION_FOUND)
-    if (NOT (SUBVERSION_FOUND AND (${Subversion_svn_info_result} EQUAL 0)))
-       # assume its a git repo 
-       find_package(Git REQUIRED)
-       Git_WC_INFO("${Chaste_SOURCE_DIR}" Chaste)
-       set(Chaste_revision "${Chaste_WC_REVISION}")
-       message("Current Chaste Git Revision = ${Chaste_WC_REVISION}. Chaste Modified = ${Chaste_WC_MODIFIED}")
-    endif()
+    # If ReleaseVersion.txt not found, obtain revision information from Git
+    find_package(Git REQUIRED)
+    Git_WC_INFO("${Chaste_SOURCE_DIR}" Chaste)
+    set(Chaste_revision "${Chaste_WC_REVISION}")
+    message(STATUS "Current Chaste Git Revision = ${Chaste_WC_REVISION}. Chaste Modified = ${Chaste_WC_MODIFIED}")
 endif()
 
 if (Chaste_UPDATE_PROVENANCE)
@@ -54,7 +29,7 @@ endif()
 
 #string(TIMESTAMP build_time)
 if (NOT EXISTS build_timestamp OR Chaste_UPDATE_PROVENANCE)
-    message("updating buildtime...")
+    message(STATUS "updating buildtime...")
     execute_process(COMMAND ${timekeeper_exe})
 endif()
 file(READ build_timestamp build_time)
@@ -71,14 +46,51 @@ endif()
 
 set(time_size 80)
 set(time_format "%a, %d %b %Y %H:%M:%S +0000")
-set(project_versions ";")
-#TODO: update project versions
+
+# Determine project versions (either the git hash or svn revision number), and whether there are uncommited revisions
 foreach(project ${Chaste_PROJECTS})
-    set(project_versions "${project_versions} versions[\"${project}\"] = 1.0;\n")
+    # Project is a git repo
+    if (IS_DIRECTORY "${Chaste_SOURCE_DIR}/projects/${project}/.git")
+        # Determine the git hash as a string
+        execute_process(
+                COMMAND git -C ${Chaste_SOURCE_DIR}/projects/${project} rev-parse --short HEAD
+                OUTPUT_VARIABLE this_project_version
+        )
+        # Determine whether there are uncommitted revisions
+        execute_process(
+                COMMAND git -C ${Chaste_SOURCE_DIR}/projects/${project} diff-index HEAD --
+                OUTPUT_VARIABLE diff_index_result
+        )
+        if (diff_index_result STREQUAL "")
+            set(this_project_modified "False")
+        else()
+            set(this_project_modified "True")
+        endif()
+    # Project is an svn repo
+    elseif(IS_DIRECTORY "${Chaste_SOURCE_DIR}/projects/${project}/.svn")
+        # Determine the svn revision number as a string
+        execute_process(
+                COMMAND svnversion ${Chaste_SOURCE_DIR}/projects/${project}
+                OUTPUT_VARIABLE this_project_version
+        )
+        # Determine whether there are uncommitted revisions
+        if (${this_project_version} MATCHES "M")
+            set(this_project_modified "True")
+        else()
+            set(this_project_modified "False")
+        endif()
+    # If it's not git or svn, we pass out some default values to indicate unknown version
+    else()
+        set(this_project_version "Unknown")
+        set(this_project_modified "False")
+    endif()
+
+    # Strip trailing whitespace from project version
+    string(STRIP ${this_project_version} this_project_version)
+
+    set(project_versions "${project_versions} versions[\"${project}\"] = \"${this_project_version}\";\n")
+    set(projects_modified "${projects_modified} modified[\"${project}\"] = \"${this_project_modified}\";\n")
 endforeach()
-
-list(APPEND Chaste_PROJECTS "${potential_dir}")
-
 
 find_package(PythonInterp QUIET)
 execute_process(COMMAND "${PYTHON_EXECUTABLE}" "-c" "from CheckForCopyrights import current_notice; print current_notice"

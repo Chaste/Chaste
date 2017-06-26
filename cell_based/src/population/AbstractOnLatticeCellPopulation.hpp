@@ -189,8 +189,8 @@ public:
      * @return a default value for the time step to use
      * when simulating the cell population.
      *
-     * A hard-coded value of 0.1 is returned. However, note that the time 
-     * step can be reset by calling SetDt() on the simulation object used to 
+     * A hard-coded value of 0.1 is returned. However, note that the time
+     * step can be reset by calling SetDt() on the simulation object used to
      * simulate the cell population.
      */
     virtual double GetDefaultTimeStep();

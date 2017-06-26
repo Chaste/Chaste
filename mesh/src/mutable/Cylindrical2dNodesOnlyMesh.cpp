@@ -98,7 +98,7 @@ void Cylindrical2dNodesOnlyMesh::SetNode(unsigned nodeIndex, ChastePoint<2> poin
     {
         double new_x_coord = x_coord + mWidth;
         double fudge_factor = 1e-14;
-        // This is to ensure that the position is never equal to mWidth, which would be outside the box domain. 
+        // This is to ensure that the position is never equal to mWidth, which would be outside the box domain.
         // This is due to the fact that mWidth-1e-16=mWidth
         if (new_x_coord > mWidth-fudge_factor)
         {

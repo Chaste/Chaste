@@ -73,7 +73,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 int AbstractCvodeSystemRhsAdaptor(realtype t, N_Vector y, N_Vector ydot, void *pData)
 {
-    assert(pData != NULL);
+    assert(pData != nullptr);
     AbstractCvodeSystem* p_ode_system = (AbstractCvodeSystem*) pData;
     try
     {
@@ -124,7 +124,7 @@ int AbstractCvodeSystemRhsAdaptor(realtype t, N_Vector y, N_Vector ydot, void *p
 #endif
     void *pData, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3)
 {
-    assert(pData != NULL);
+    assert(pData != nullptr);
     AbstractCvodeSystem* p_ode_system = (AbstractCvodeSystem*) pData;
     try
     {
@@ -140,7 +140,7 @@ int AbstractCvodeSystemRhsAdaptor(realtype t, N_Vector y, N_Vector ydot, void *p
 
 AbstractCvodeSystem::AbstractCvodeSystem(unsigned numberOfStateVariables)
     : AbstractParameterisedSystem<N_Vector>(numberOfStateVariables),
-      mLastSolutionState(NULL),
+      mLastSolutionState(nullptr),
       mLastSolutionTime(0.0),
 #if CHASTE_SUNDIALS_VERSION >=20400
       mForceReset(false),
@@ -152,7 +152,7 @@ AbstractCvodeSystem::AbstractCvodeSystem(unsigned numberOfStateVariables)
       mForceMinimalReset(false),
       mHasAnalyticJacobian(false),
       mUseAnalyticJacobian(false),
-      mpCvodeMem(NULL),
+      mpCvodeMem(nullptr),
       mMaxSteps(0),
       mLastInternalStepSize(0)
 {
@@ -383,10 +383,10 @@ void AbstractCvodeSystem::SetupCvode(N_Vector initialConditions,
     {
         //std::cout << "New CVODE solver\n";
         mpCvodeMem = CVodeCreate(CV_BDF, CV_NEWTON);
-        if (mpCvodeMem == NULL) EXCEPTION("Failed to SetupCvode CVODE"); // in one line to avoid coverage problem!
+        if (mpCvodeMem == nullptr) EXCEPTION("Failed to SetupCvode CVODE"); // in one line to avoid coverage problem!
 
         // Set error handler
-        CVodeSetErrHandlerFn(mpCvodeMem, CvodeErrorHandler, NULL);
+        CVodeSetErrHandlerFn(mpCvodeMem, CvodeErrorHandler, nullptr);
         // Set the user data
 #if CHASTE_SUNDIALS_VERSION >= 20400
         CVodeSetUserData(mpCvodeMem, (void*)(this));
@@ -462,7 +462,7 @@ void AbstractCvodeSystem::FreeCvodeMemory()
     {
         CVodeFree(&mpCvodeMem);
     }
-    mpCvodeMem = NULL;
+    mpCvodeMem = nullptr;
 }
 
 

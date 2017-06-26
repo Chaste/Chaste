@@ -109,22 +109,22 @@ public:
      * @param phi1 The parameter phi1
      */
     void Setphi1(double);
-    
+
      /**
      * @param phi2 The parameter phi2
      */
     void Setphi2(double);
-    
+
      /**
      * @param C1 The parameter C1
      */
     void SetC1(double);
-    
+
      /**
      * @param C2 The parameter C2
      */
     void SetC2(double);
-    
+
      /**
      * @param A The parameter A
      */
@@ -174,7 +174,7 @@ private:
 
     /** The parameter C2 from Hiorns et al. 2014 Biophys J*/
     double mC2;
-    
+
     /** The parameter A from Hiorns et al. 2014 Biophys J*/
     double mA;
 };
