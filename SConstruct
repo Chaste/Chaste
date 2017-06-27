@@ -58,7 +58,7 @@ Help("""
   For other options, such as profiling, optimised builds and 
   memory testing please refer to:
   
-  https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides/UserBuildGuide
+  https://chaste.cs.ox.ac.uk/trac/wiki/SconsArchive/UserBuildGuide
 
 """)
 
