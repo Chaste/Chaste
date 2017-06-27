@@ -44,7 +44,6 @@ import subprocess
 petsc_ver = 3.6
 petsc_path = os.path.join(os.environ['CHASTE_LIBS'], 'petsc-3.6.2/')
 
-petsc_2_2_path = ''
 petsc_build_name = 'linux-gnu'
 petsc_build_name_optimized = 'linux-gnu'
 petsc_build_name_profile = petsc_build_name
@@ -72,26 +71,27 @@ if os.path.isdir('/opt/intel'):
 else:
     intel_path = None
 
-if True:
-    hdf5_lib = 'hdf5_openmpi'
-    other_includepaths.append('/usr/include/hdf5/openmpi/')
-else:
-    hdf5_lib = 'hdf5'
+# 2017-06-27: Removed openmpi to make scons run
+#hdf5_lib = 'hdf5_openmpi'
+#other_includepaths.append('/usr/include/hdf5/openmpi/')
+hdf5_lib = 'hdf5'
 
 libs_for_petsc = ['petsccontrib', 'X11',
-                  'HYPRE', 'spooles', 'superlu',
+# 2017-06-27 Remove HYPRE and spooles to make scons run
+#                  'HYPRE', 'spooles',
+                  'superlu',
                   'umfpack', 'amd' # Both for Umfpack
                   ]
 
-if True:
-    libs_for_petsc.append(['HYPRE_utilities', 
-                           'HYPRE_struct_mv', 'HYPRE_struct_ls',  
-                           'HYPRE_sstruct_mv', 'HYPRE_sstruct_ls', 
-                           'HYPRE_IJ_mv', 'HYPRE_parcsr_ls', 'dmumps'])
-if petsc_ver >= 3:
-    libs_for_petsc.append('scotch')
-else:
-    libs_for_petsc.append('sidl')
+# 2017-06-27 Remove HYPRE to make scons run
+#libs_for_petsc.append(['HYPRE_utilities', 
+#                   'HYPRE_struct_mv', 'HYPRE_struct_ls',  
+#                   'HYPRE_sstruct_mv', 'HYPRE_sstruct_ls', 
+#                   'HYPRE_IJ_mv', 'HYPRE_parcsr_ls', 'dmumps'])
+
+# 2017-06-27 Removed scotch
+#libs_for_petsc.append('scotch')
+
 if petsc_ver >= 3.1:
     libs_for_petsc.remove('petsccontrib')
 
