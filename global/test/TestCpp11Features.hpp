@@ -164,6 +164,12 @@ public:
         int* i = nullptr;
         ++i;
     }
+
+    void TestRawStrings() throw (Exception)
+    {
+        std::string raw_string = R"(blah\blah\tblah\n)";
+        std::cout << raw_string << std::endl;
+    }
 };
 
 #endif /*TESTCPP11FEATURES_HPP_*/
