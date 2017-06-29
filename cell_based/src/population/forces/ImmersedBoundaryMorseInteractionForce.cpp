@@ -94,6 +94,15 @@ void ImmersedBoundaryMorseInteractionForce<DIM>::AddImmersedBoundaryForceContrib
                 {
                     eff_well_depth *= mLaminaWellDepthMult;
                     eff_rest_length *= mLaminaRestLengthMult;
+
+                    // Bit of a hack
+                    bool apical_lam = (a_lamina && p_node_a->rGetLocation()[1] > 0.5) ||
+                                      (b_lamina && p_node_b->rGetLocation()[1] > 0.5);
+
+                    if (apical_lam)
+                    {
+                        eff_well_depth *= 0.2;
+                    }
                 }
 
                 double morse_exp = exp((eff_rest_length - normed_dist) / eff_well_width);
