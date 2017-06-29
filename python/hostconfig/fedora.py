@@ -41,8 +41,13 @@ import subprocess
 # orphaned tests and copyright notices.
 # do_inf_tests = 1
 
-petsc_ver = 3.6
-petsc_path = os.path.join(os.environ['CHASTE_LIBS'], 'petsc-3.6.2/')
+# Find PETSC, assuming the installation guide was followed so that CHASTE_LIBS
+# is set and 3.6.2 is installed
+chaste_libs = os.environ.get('CHASTE_LIBS')
+petsc_path = None
+if chaste_libs is not None:
+    petsc_ver = 3.6
+    petsc_path = os.path.join(chaste_libs, 'petsc-3.6.2/')
 
 petsc_build_name = 'linux-gnu'
 petsc_build_name_optimized = 'linux-gnu'
