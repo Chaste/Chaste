@@ -665,6 +665,23 @@ void NodesOnlyMesh<SPACE_DIM>::ConstructFromMeshReader(AbstractMeshReader<SPACE_
     }
 }
 
+template<unsigned SPACE_DIM>
+std::vector<unsigned> NodesOnlyMesh<SPACE_DIM>::GetAllNodeIndices() const
+{
+    std::vector<unsigned> indices(GetNumNodes()); // GetNumNodes = mNodes - mDeletedNodes
+    unsigned live_index=0;
+    for (unsigned i=0; i<this->mNodes.size(); i++)
+    {
+        // Only use nodes which are not deleted
+        if (!this->mNodes[i]->IsDeleted())
+        {
+            indices[live_index] = this->mNodes[i]->GetIndex();
+            live_index++;
+        }
+    }
+    return indices;
+}
+
 // Explicit instantiation
 template class NodesOnlyMesh<1>;
 template class NodesOnlyMesh<2>;

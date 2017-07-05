@@ -853,8 +853,17 @@ public:
             NodesOnlyMesh<2> mesh;
             mesh.ConstructNodesWithoutMesh(generating_mesh, 1.5);
 
+            TS_ASSERT_EQUALS(mesh.GetNumNodes(), 543u);
+            TS_ASSERT_EQUALS(mesh.GetAllNodeIndices().size(), 543u);
+            TS_ASSERT_EQUALS(mesh.GetAllNodeIndices()[2], 2u);
             mesh.GetNode(0)->SetRadius(1.12);
             mesh.GetNode(1)->SetRadius(2.34);
+
+            // Delete a node in order to test re-indexing (nodes 3,4,5... should still be named 3,4,5...)
+            mesh.DeleteNode(2);
+            TS_ASSERT_EQUALS(mesh.GetNumNodes(), 542u);
+            TS_ASSERT_EQUALS(mesh.GetAllNodeIndices().size(), 542u);
+            TS_ASSERT_EQUALS(mesh.GetAllNodeIndices()[2], 3u);
 
             TS_ASSERT_DELTA(mesh.GetNode(0)->GetRadius(), 1.12, 1e-6);
             TS_ASSERT_DELTA(mesh.GetNode(1)->GetRadius(), 2.34, 1e-6);
@@ -886,7 +895,7 @@ public:
             NodesOnlyMesh<2>* p_nodes_only_mesh = dynamic_cast<NodesOnlyMesh<2>*>(p_mesh2);
 
             // Check we have the right number of nodes & elements
-            TS_ASSERT_EQUALS(p_nodes_only_mesh->GetNumNodes(), 543u);
+            TS_ASSERT_EQUALS(p_nodes_only_mesh->GetNumNodes(), 543u - 1u);
             TS_ASSERT_EQUALS(p_nodes_only_mesh->GetNumElements(), 0u);
 
             // Check some node co-ordinates
@@ -894,6 +903,12 @@ public:
             TS_ASSERT_DELTA(p_nodes_only_mesh->GetNode(0)->GetPoint()[1], -0.0627905195, 1e-6);
             TS_ASSERT_DELTA(p_nodes_only_mesh->GetNode(1)->GetPoint()[0], 1.0, 1e-6);
             TS_ASSERT_DELTA(p_nodes_only_mesh->GetNode(1)->GetPoint()[1], 0.0, 1e-6);
+
+            // Node with index 2 is not available
+            TS_ASSERT_THROWS_CONTAINS(p_nodes_only_mesh->GetNode(2), "Requested node 2 does not belong to process ");
+            // Test re-indexing - Node with index 3 still has index 3
+            TS_ASSERT_DELTA(p_nodes_only_mesh->GetNode(3)->GetPoint()[0], 0.992114, 1e-6);
+            TS_ASSERT_DELTA(p_nodes_only_mesh->GetNode(3)->GetPoint()[1], 0.125333, 1e-6);
 
             // Check some cell radii
             TS_ASSERT_DELTA(p_nodes_only_mesh->GetNode(0)->GetRadius(), 1.12, 1e-6);
