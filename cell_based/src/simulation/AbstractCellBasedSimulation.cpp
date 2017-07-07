@@ -61,7 +61,8 @@ AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::AbstractCellBasedSimulation(
       mNumDeaths(0),
       mOutputDivisionLocations(false),
       mOutputCellVelocities(false),
-      mSamplingTimestepMultiple(1)
+      mSamplingTimestepMultiple(1),
+      mProgressReporter()
 {
     // Set a random seed of 0 if it wasn't specified earlier
     RandomNumberGenerator::Instance();
@@ -429,6 +430,8 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
     {
         LOG(1, "--TIME = " << p_simulation_time->GetTime() << "\n");
 
+        mProgressReporter.Update(p_simulation_time->GetTime());
+
         // This function calls DoCellRemoval(), DoCellBirth() and CellPopulation::Update()
         UpdateCellPopulation();
 
@@ -688,6 +691,20 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::OutputSimulationSetup()
         *parameter_file << "\n</Chaste>\n";
         parameter_file->close();
     }
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+ProgressReporter& AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::rSetUpAndGetProgressReporter()
+{
+    if (mEndTime == DOUBLE_UNSET)
+    {
+        EXCEPTION("SetEndTime has not yet been called.");
+    }
+
+    mProgressReporter = ProgressReporter("", SimulationTime::Instance()->GetTime(), mEndTime, mDt);
+    mProgressReporter.PrintInitialising();
+
+    return mProgressReporter;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

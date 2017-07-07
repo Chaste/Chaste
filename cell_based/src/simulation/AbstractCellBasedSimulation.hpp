@@ -41,10 +41,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/string.hpp>
 
 #include <vector>
+#include <ProgressReporter.hpp>
 
 #include "AbstractCellKiller.hpp"
 #include "AbstractCellBasedSimulationModifier.hpp"
 #include "AbstractForce.hpp"
+#include "ProgressReporter.hpp"
 #include "RandomNumberGenerator.hpp"
 
 // Forward declaration prevents circular include chain
@@ -170,6 +172,9 @@ protected:
      * of timesteps at which results are written to file.
      */
     unsigned mSamplingTimestepMultiple;
+
+    /** The simulation progress reporter */
+    ProgressReporter mProgressReporter;
 
     /**
      * Writes out special information about the mesh to the visualizer.
@@ -468,6 +473,11 @@ public:
      * @param outputCellVelocities the new value of mOutputCellVelocities
      */
     void SetOutputCellVelocities(bool outputCellVelocities);
+
+    /**
+     * @return mProgressReporter
+     */
+    ProgressReporter& rSetUpAndGetProgressReporter();
 
     /**
      * Outputs simulation parameters to file
