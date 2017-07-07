@@ -49,7 +49,7 @@ bool NoCellCycleModel::ReadyToDivide()
 AbstractCellCycleModel* NoCellCycleModel::CreateCellCycleModel()
 {
     NEVER_REACHED;
-    return NULL;
+    return nullptr;
 }
 // LCOV_EXCL_STOP
 

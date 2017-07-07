@@ -164,7 +164,7 @@ public:
      */
     Cell(boost::shared_ptr<AbstractCellProperty> pMutationState,
          AbstractCellCycleModel* pCellCycleModel,
-         AbstractSrnModel* pSrnModel=NULL,
+         AbstractSrnModel* pSrnModel=nullptr,
          bool archiving=false,
          CellPropertyCollection cellPropertyCollection=CellPropertyCollection());
 

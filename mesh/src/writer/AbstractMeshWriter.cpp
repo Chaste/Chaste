@@ -42,7 +42,7 @@ AbstractMeshWriter<ELEMENT_DIM, SPACE_DIM>::AbstractMeshWriter(const std::string
                                                                const std::string& rBaseName,
                                                                const bool clearOutputDir)
     : mBaseName(rBaseName),
-      mpMeshReader(NULL)
+      mpMeshReader(nullptr)
 {
     mpOutputFileHandler = new OutputFileHandler(rDirectory, clearOutputDir);
 }
@@ -86,28 +86,28 @@ unsigned AbstractMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNumCableElements()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::vector<double> AbstractMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextNode()
 {
-    assert(mpMeshReader != NULL);
+    assert(mpMeshReader != nullptr);
     return mpMeshReader->GetNextNode();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ElementData AbstractMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextElement()
 {
-    assert(mpMeshReader != NULL);
+    assert(mpMeshReader != nullptr);
     return mpMeshReader->GetNextElementData();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ElementData AbstractMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextBoundaryElement()
 {
-    assert(mpMeshReader != NULL);
+    assert(mpMeshReader != nullptr);
     return mpMeshReader->GetNextFaceData();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ElementData AbstractMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextCableElement()
 {
-    assert(mpMeshReader != NULL);
+    assert(mpMeshReader != nullptr);
     return mpMeshReader->GetNextCableElementData();
 }
 

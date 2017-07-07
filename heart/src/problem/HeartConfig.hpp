@@ -1273,7 +1273,7 @@ private:
     boost::shared_ptr<cp::chaste_parameters_type> mpParameters;
 
     /** The single instance of the class */
-    static std::auto_ptr<HeartConfig> mpInstance;
+    static boost::shared_ptr<HeartConfig> mpInstance;
 
     /**
      * Where the user parameters were read from.

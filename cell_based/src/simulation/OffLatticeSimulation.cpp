@@ -214,7 +214,7 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::SetupSolve()
     }
 
     // Use a forward Euler method by default, unless a numerical method has been specified already
-    if (mpNumericalMethod == NULL)
+    if (mpNumericalMethod == nullptr)
     {
         mpNumericalMethod = boost::make_shared<ForwardEulerNumericalMethod<ELEMENT_DIM, SPACE_DIM> >();
     }

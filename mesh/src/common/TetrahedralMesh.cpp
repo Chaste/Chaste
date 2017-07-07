@@ -761,18 +761,18 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::InitialiseTriangulateIo(triangulateio& mesherIo)
 {
     mesherIo.numberofpoints = 0;
-    mesherIo.pointlist = NULL;
+    mesherIo.pointlist = nullptr;
     mesherIo.numberofpointattributes = 0;
-    mesherIo.pointattributelist = (double *) NULL;
-    mesherIo.pointmarkerlist = (int *) NULL;
+    mesherIo.pointattributelist = (double *) nullptr;
+    mesherIo.pointmarkerlist = (int *) nullptr;
     mesherIo.numberofsegments = 0;
     mesherIo.numberofholes = 0;
     mesherIo.numberofregions = 0;
-    mesherIo.trianglelist = (int *) NULL;
-    mesherIo.triangleattributelist = (double *) NULL;
+    mesherIo.trianglelist = (int *) nullptr;
+    mesherIo.triangleattributelist = (double *) nullptr;
     mesherIo.numberoftriangleattributes = 0;
-    mesherIo.edgelist = (int *) NULL;
-    mesherIo.edgemarkerlist = (int *) NULL;
+    mesherIo.edgelist = (int *) nullptr;
+    mesherIo.edgemarkerlist = (int *) nullptr;
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -824,7 +824,7 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ExportToMesher(NodeMap& map, MESHE
             new_index++;
         }
     }
-    if (elementList != NULL)
+    if (elementList != nullptr)
     {
         unsigned element_index = 0;
 
@@ -919,7 +919,7 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ImportFromMesher(MESHER_IO& mesher
          * Tetgen produces only boundary faces (set edgeMarkerList to NULL).
          * Triangle marks which edges are on the boundary.
          */
-        if (edgeMarkerList == NULL || edgeMarkerList[boundary_element_index] == 1)
+        if (edgeMarkerList == nullptr || edgeMarkerList[boundary_element_index] == 1)
         {
             std::vector<Node<SPACE_DIM>*> nodes;
             for (unsigned j=0; j<ELEMENT_DIM; j++)

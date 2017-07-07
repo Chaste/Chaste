@@ -190,13 +190,13 @@ template<unsigned DIM>
 void SolidMechanicsProblemDefinition<DIM>::CheckCastSuccess(CompressibilityType compressibilityType,
                                                             AbstractMaterialLaw<DIM>* pMaterialLaw)
 {
-    if ((compressibilityType==INCOMPRESSIBLE) && (pMaterialLaw==NULL))
+    if ((compressibilityType==INCOMPRESSIBLE) && (pMaterialLaw==nullptr))
     {
         // then dynamic_cast to AbstractIncompressibleMaterialLaw failed
         EXCEPTION("Compressibility type was declared as INCOMPRESSIBLE but a compressible material law was given");
     }
 
-    if ((compressibilityType==COMPRESSIBLE) && (pMaterialLaw==NULL))
+    if ((compressibilityType==COMPRESSIBLE) && (pMaterialLaw==nullptr))
     {
         // then dynamic_cast to AbstractCompressibleMaterialLaw failed
         EXCEPTION("Incompressibility type was declared as COMPRESSIBLE but an incompressible material law was given");

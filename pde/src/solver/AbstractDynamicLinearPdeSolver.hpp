@@ -262,19 +262,19 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::AbstractDynamicLinearPdeSolver(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh)
     : AbstractLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>(pMesh),
       mTimesSet(false),
-      mInitialCondition(NULL),
+      mInitialCondition(nullptr),
       mMatrixIsAssembled(false),
       mMatrixIsConstant(false),
       mIdealTimeStep(-1.0),
       mLastWorkingTimeStep(-1),
-      mpTimeAdaptivityController(NULL),
+      mpTimeAdaptivityController(nullptr),
       mOutputToVtk(false),
       mOutputToParallelVtk(false),
       mOutputToTxt(false),
       mOutputDirectory(""),
       mFilenamePrefix(""),
       mPrintingTimestepMultiple(1),
-      mpHdf5Writer(NULL)
+      mpHdf5Writer(nullptr)
 {
 }
 
@@ -306,7 +306,7 @@ void AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::SetTim
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 void AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::SetInitialCondition(Vec initialCondition)
 {
-    assert(initialCondition != NULL);
+    assert(initialCondition != nullptr);
     mInitialCondition = initialCondition;
 }
 
@@ -332,11 +332,11 @@ Vec AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::Solve()
     {
         EXCEPTION("SetTimes() has not been called");
     }
-    if ((mIdealTimeStep <= 0.0) && (mpTimeAdaptivityController==NULL))
+    if ((mIdealTimeStep <= 0.0) && (mpTimeAdaptivityController==nullptr))
     {
         EXCEPTION("SetTimeStep() has not been called");
     }
-    if (mInitialCondition == NULL)
+    if (mInitialCondition == nullptr)
     {
         EXCEPTION("SetInitialCondition() has not been called");
     }
@@ -469,10 +469,10 @@ Vec AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::Solve()
     }
 
     // Avoid memory leaks
-    if (mpHdf5Writer != NULL)
+    if (mpHdf5Writer != nullptr)
     {
         delete mpHdf5Writer;
-        mpHdf5Writer = NULL;
+        mpHdf5Writer = nullptr;
     }
 
     // Convert HDF5 output to other formats as required
@@ -505,7 +505,7 @@ void AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::SetMat
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 void AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::SetTimeAdaptivityController(AbstractTimeAdaptivityController* pTimeAdaptivityController)
 {
-    assert(pTimeAdaptivityController != NULL);
+    assert(pTimeAdaptivityController != nullptr);
     assert(mpTimeAdaptivityController == NULL);
     mpTimeAdaptivityController = pTimeAdaptivityController;
 }

@@ -46,7 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PosixPathFixer.hpp"
 #include "GetCurrentWorkingDirectory.hpp"
 
-Warnings* Warnings::mpInstance = NULL;
+Warnings* Warnings::mpInstance = nullptr;
 
 Warnings::Warnings()
 {
@@ -63,7 +63,7 @@ void Warnings::QuietDestroy(void)
     if (mpInstance)
     {
         delete mpInstance;
-        mpInstance = NULL;
+        mpInstance = nullptr;
     }
 }
 
@@ -87,7 +87,7 @@ void Warnings::PrintWarnings(void)
 
 Warnings* Warnings::Instance()
 {
-    if (mpInstance == NULL)
+    if (mpInstance == nullptr)
     {
         mpInstance = new Warnings();
         std::atexit(NoisyDestroy);

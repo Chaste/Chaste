@@ -296,7 +296,7 @@ double AbstractParameterisedSystem<VECTOR>::GetAnyVariable(unsigned index, doubl
         if (index - offset < GetNumberOfDerivedQuantities())
         {
             VECTOR dqs;
-            if (pDerivedQuantities == NULL)
+            if (pDerivedQuantities == nullptr)
             {
                 dqs = ComputeDerivedQuantitiesFromCurrentState(time);
                 pDerivedQuantities = &dqs;

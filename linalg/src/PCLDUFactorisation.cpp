@@ -267,7 +267,7 @@ void PCLDUFactorisation::PCLDUFactorisationSetUp()
 
     // We are expecting an error from PETSC on systems that don't have the hypre library, so suppress it
     // in case it aborts
-    PetscPushErrorHandler(PetscIgnoreErrorHandler, NULL);
+    PetscPushErrorHandler(PetscIgnoreErrorHandler, nullptr);
     PetscErrorCode pc_set_error = PCSetType(mPCContext.PC_amg_A11, PCHYPRE);
     if (pc_set_error != 0)
     {
@@ -325,7 +325,7 @@ void PCLDUFactorisation::PCLDUFactorisationSetUp()
 ////////
     // We are expecting an error from PETSC on systems that don't have the hypre library, so suppress it
     // in case it aborts
-    PetscPushErrorHandler(PetscIgnoreErrorHandler, NULL);
+    PetscPushErrorHandler(PetscIgnoreErrorHandler, nullptr);
     PCSetType(mPCContext.PC_amg_A22, PCHYPRE);
     // Stop supressing error
     PetscPopErrorHandler();
@@ -371,7 +371,7 @@ PetscErrorCode PCLDUFactorisationApply(void* pc_context, Vec x, Vec y)
 
     // Cast the pointer to a PC context to our defined type
     PCLDUFactorisation::PCLDUFactorisationContext* block_diag_context = (PCLDUFactorisation::PCLDUFactorisationContext*) pc_context;
-    assert(block_diag_context!=NULL);
+    assert(block_diag_context!=nullptr);
 
     /*
      * Split vector x into two. x = [x1 x2]'

@@ -53,7 +53,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *  - MemfemMeshReader
  *  - VtkMeshReader
  *
- * The created mesh reader is returned as a std::auto_ptr to ease memory management.
+ * The created mesh reader is returned as a std::shared_ptr to ease memory management.
  *
  * @param rPathBaseName  the base name of the files from which to read the mesh data
  *    (either absolute, or relative to the current directory)
@@ -65,12 +65,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *    for each boundary element (in the .face file if tetgen was run with '-nn').
  */
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-std::auto_ptr<AbstractMeshReader<ELEMENT_DIM, SPACE_DIM> > GenericMeshReader(const std::string& rPathBaseName,
+std::shared_ptr<AbstractMeshReader<ELEMENT_DIM, SPACE_DIM> > GenericMeshReader(const std::string& rPathBaseName,
                                                                              unsigned orderOfElements=1,
                                                                              unsigned orderOfBoundaryElements=1,
                                                                              bool readContainingElementsForBoundaryElements=false)
 {
-    std::auto_ptr<AbstractMeshReader<ELEMENT_DIM, SPACE_DIM> > p_reader;
+    std::shared_ptr<AbstractMeshReader<ELEMENT_DIM, SPACE_DIM> > p_reader;
     try
     {
         p_reader.reset(new TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>(rPathBaseName,

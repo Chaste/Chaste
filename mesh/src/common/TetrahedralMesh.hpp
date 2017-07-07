@@ -141,7 +141,7 @@ protected:
      *
      */
     template <class MESHER_IO>
-    void ExportToMesher(NodeMap& map, MESHER_IO& mesherInput, int *elementList=NULL);
+    void ExportToMesher(NodeMap& map, MESHER_IO& mesherInput, int *elementList=nullptr);
 
     /**
      * Import the mesh from an external mesher

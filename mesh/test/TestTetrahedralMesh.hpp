@@ -1514,7 +1514,7 @@ public:
 
     void TestReadingMeshesWithRegionsAndGenericReader() throw (Exception)
     {
-        std::auto_ptr<AbstractMeshReader<1,1> > p_mesh_reader = GenericMeshReader<1,1>("mesh/test/data/1D_0_to_1_10_elements_with_attributes");
+        std::shared_ptr<AbstractMeshReader<1,1> > p_mesh_reader = GenericMeshReader<1,1>("mesh/test/data/1D_0_to_1_10_elements_with_attributes");
         TetrahedralMesh<1,1> mesh;
         mesh.ConstructFromMeshReader(*p_mesh_reader);
 

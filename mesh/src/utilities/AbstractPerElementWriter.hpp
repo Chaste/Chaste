@@ -130,7 +130,7 @@ public:
     AbstractPerElementWriter(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh)
      : mFileIsBinary(false),
        mpMesh(pMesh),
-       mpMasterFile(NULL)
+       mpMasterFile(nullptr)
     {
 
     }

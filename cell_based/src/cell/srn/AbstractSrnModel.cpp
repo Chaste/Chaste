@@ -85,7 +85,7 @@ void AbstractSrnModel::SetCell(CellPtr pCell)
 
 CellPtr AbstractSrnModel::GetCell()
 {
-    assert(mpCell != NULL);
+    assert(mpCell != nullptr);
     return mpCell;
 }
 

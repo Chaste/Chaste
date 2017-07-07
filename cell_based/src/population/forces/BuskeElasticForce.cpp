@@ -60,7 +60,7 @@ c_vector<double, DIM> BuskeElasticForce<DIM>::CalculateForceBetweenNodes(unsigne
                                                                              AbstractCellPopulation<DIM>& rCellPopulation)
 {
     // This force class is defined for NodeBasedCellPopulations only
-    assert(dynamic_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL);
+    assert(dynamic_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation) != nullptr);
 
     // We should only ever calculate the force between two distinct nodes
     assert(nodeAGlobalIndex != nodeBGlobalIndex);

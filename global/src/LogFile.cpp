@@ -39,11 +39,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cmath>
 #include <sstream>
 
-LogFile* LogFile::mpInstance = NULL;
+LogFile* LogFile::mpInstance = nullptr;
 
 LogFile::LogFile()
     : mFileSet(false),
-      mInitTime(time(NULL)),
+      mInitTime(time(nullptr)),
       mLevel(0),
       mPrecision(6)
 {
@@ -51,7 +51,7 @@ LogFile::LogFile()
 
 LogFile* LogFile::Instance()
 {
-    if (mpInstance == NULL)
+    if (mpInstance == nullptr)
     {
         mpInstance = new LogFile; // default construtor which doesn't write
     }
@@ -60,7 +60,7 @@ LogFile* LogFile::Instance()
 
 unsigned LogFile::Level()
 {
-    if (mpInstance == NULL)
+    if (mpInstance == nullptr)
     {
         return 0;
     }
@@ -104,7 +104,7 @@ void LogFile::Close()
     {
         mpInstance->mpOutStream->close();
         delete mpInstance;
-        mpInstance = NULL;
+        mpInstance = nullptr;
     }
 }
 
@@ -115,7 +115,7 @@ void LogFile::WriteHeader(std::string simulationType)
 
 void LogFile::WriteElapsedTime(std::string pre)
 {
-    double fsecs = difftime(time(NULL),mInitTime);
+    double fsecs = difftime(time(nullptr),mInitTime);
     long total_secs = static_cast<long>(floor(fsecs+0.5));
     int total_mins = total_secs/60;
 

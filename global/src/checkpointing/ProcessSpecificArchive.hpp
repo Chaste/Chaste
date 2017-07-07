@@ -71,7 +71,7 @@ public:
     /** @return the stored secondary archive for this process. */
     static Archive* Get(void)
     {
-        if (mpArchive == NULL)
+        if (mpArchive == nullptr)
         {
             EXCEPTION("A ProcessSpecificArchive has not been set up.");
         }
