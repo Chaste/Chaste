@@ -90,21 +90,6 @@ const NodesOnlyMesh<DIM>& NodeBasedCellPopulation<DIM>::rGetMesh() const
     return *mpNodesOnlyMesh;
 }
 
-template<unsigned DIM>   
-const std::vector<unsigned> NodeBasedCellPopulation<DIM>::GetGlobalNodeIndices() const
-{
-    std::vector<unsigned> node_global_indices;
-
-    for (typename AbstractMesh<DIM,DIM>::NodeIterator node_iter = this->mrMesh.GetNodeIteratorBegin();
-         node_iter != this->mrMesh.GetNodeIteratorEnd();
-         ++node_iter)
-    {
-        node_global_indices.push_back(node_iter->GetIndex());
-    }
-
-    return node_global_indices;
-}
-
 template<unsigned DIM>
 TetrahedralMesh<DIM, DIM>* NodeBasedCellPopulation<DIM>::GetTetrahedralMeshForPdeModifier()
 {
