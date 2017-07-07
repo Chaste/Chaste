@@ -44,7 +44,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscTools.hpp"
 #include "DistributedBoxCollection.hpp"
 #include "MutableMesh.hpp"
-
 /**
  * Mesh class for storing lists of nodes (no elements). This inherits from MutableMesh
  * because we want to be able to add and delete nodes.
@@ -108,6 +107,7 @@ private:
             this->mNodes[i]->SetIndex(new_index);
             this->mNodesMapping[new_index] = i;
         }
+        mMaxAddedNodeIndex = *(std::max_element(indices.begin(), indices.end()));
     }
     BOOST_SERIALIZATION_SPLIT_MEMBER()
     /** Vector of shared-pointers to halo nodes used by this process. */

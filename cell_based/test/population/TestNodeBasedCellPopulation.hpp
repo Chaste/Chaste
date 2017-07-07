@@ -509,7 +509,7 @@ public:
             // Test that one node has been removed
             TS_ASSERT_EQUALS(node_based_cell_population.GetNumNodes(), 80u);
 
-            // Test that each cell'slocation index.
+            // Test that each cell's location index is correct.
             unsigned index = 0;
             for (AbstractCellPopulation<2>::Iterator cell_iter = node_based_cell_population.Begin();
                  cell_iter != node_based_cell_population.End();

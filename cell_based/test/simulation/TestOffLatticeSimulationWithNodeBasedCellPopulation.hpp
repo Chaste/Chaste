@@ -797,6 +797,7 @@ public:
             // Convert this to a NodesOnlyMesh
             NodesOnlyMesh<2> mesh;
             mesh.ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
+            TS_ASSERT_EQUALS(mesh.GetMaximumNodeIndex(), 9u);
 
             // Create cells
             std::vector<CellPtr> cells;
@@ -817,7 +818,7 @@ public:
             simulator.AddForce(p_linear_force);
 
             // Add cell killer
-            MAKE_PTR_ARGS(RandomCellKiller<2>, p_killer, (&node_based_cell_population, 0.997877574));
+            MAKE_PTR_ARGS(RandomCellKiller<2>, p_killer, (&node_based_cell_population, 0.9));  //Probability of death in one hour
             simulator.AddCellKiller(p_killer);
 
             // Solve
@@ -825,7 +826,7 @@ public:
 
             // Check some results
             TS_ASSERT_EQUALS(simulator.GetNumBirths(), 0u);
-            TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 7u);
+            TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 4u);
 
             CellBasedSimulationArchiver<2, OffLatticeSimulation<2> >::Save(&simulator);
         }
@@ -835,7 +836,15 @@ public:
             p_simulator1 = CellBasedSimulationArchiver<2, OffLatticeSimulation<2> >::Load("TestOffLatticeSimulationWithNodeBasedCellPopulationDeathArchiving", 0.5);
 
             p_simulator1->SetEndTime(1.0);
+            NodesOnlyMesh<2>* p_mesh = static_cast<NodesOnlyMesh<2>*>(&(p_simulator1->rGetCellPopulation().rGetMesh()));
+            TS_ASSERT_EQUALS(p_mesh->GetMaximumNodeIndex(), 8u);
+
             p_simulator1->Solve();
+
+            TS_ASSERT_EQUALS(p_simulator1->GetNumBirths(), 0u);
+            TS_ASSERT_EQUALS(p_simulator1->GetNumDeaths(), 7u);
+
+            delete p_simulator1;
         }
     }
 };
