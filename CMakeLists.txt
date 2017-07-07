@@ -472,8 +472,13 @@ if (Chaste_USE_XERCES)
 endif()
 
 
-# Add fftw
-list(APPEND Chaste_LINK_LIBRARIES "fftw3")
+################################
+####  Find FFTW
+################################
+find_package(FFTW REQUIRED)
+list(APPEND Chaste_INCLUDES "${FFTW_INCLUDES}")
+list(APPEND Chaste_LINK_LIBRARIES "${FFTW_LIBRARIES}")
+
 
 add_definitions(-DTRILIBRARY -DTETLIBRARY -DANSI_DECLARATORS)
 
