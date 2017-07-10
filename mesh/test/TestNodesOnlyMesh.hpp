@@ -914,6 +914,13 @@ public:
             TS_ASSERT_DELTA(p_nodes_only_mesh->GetNode(0)->GetRadius(), 1.12, 1e-6);
             TS_ASSERT_DELTA(p_nodes_only_mesh->GetNode(1)->GetRadius(), 2.34, 1e-6);
 
+            // Test that a newly added node gets the correct index (543)
+            TS_ASSERT_THROWS_CONTAINS(p_nodes_only_mesh->GetNode(543), "Requested node 543 does not belong to process ");
+            // Node that the index "2" here is fake.  The new node gets a fresh index
+            p_nodes_only_mesh->AddNode(new Node<2>(2, true, 0.12345678, 2.0)); // This node pointer is added to the mesh and deleted by the destructor
+            // Node with index 2 is still not available
+            TS_ASSERT_THROWS_CONTAINS(p_nodes_only_mesh->GetNode(2), "Requested node 2 does not belong to process ");
+            TS_ASSERT_DELTA(p_nodes_only_mesh->GetNode(543)->GetPoint()[0], 0.12345678, 1e-8);
             // Tidy up
             delete p_mesh2;
         }

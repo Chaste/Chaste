@@ -803,6 +803,12 @@ public:
             std::vector<CellPtr> cells;
             CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
             cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
+            for (unsigned i=0; i<cells.size(); i++)
+            {
+                cells[i]->SetBirthTime(-23.49999);  // These cells divide every 24 hours so here we set them to divide just after the archive/restore
+            }
+
+
 
             // Create a node based cell population
             NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
@@ -837,12 +843,15 @@ public:
 
             p_simulator1->SetEndTime(1.0);
             NodesOnlyMesh<2>* p_mesh = static_cast<NodesOnlyMesh<2>*>(&(p_simulator1->rGetCellPopulation().rGetMesh()));
-            TS_ASSERT_EQUALS(p_mesh->GetMaximumNodeIndex(), 8u);
+            TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 5u); // 9 (original) - 4
+            TS_ASSERT_EQUALS(p_mesh->GetMaximumNodeIndex(), 9u);
 
             p_simulator1->Solve();
 
-            TS_ASSERT_EQUALS(p_simulator1->GetNumBirths(), 0u);
-            TS_ASSERT_EQUALS(p_simulator1->GetNumDeaths(), 7u);
+            TS_ASSERT_EQUALS(p_simulator1->GetNumBirths(), 2u);
+            TS_ASSERT_EQUALS(p_simulator1->GetNumDeaths(), 8u); // Including previous 4
+            TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 3u); // 9 - 8 + 2
+            TS_ASSERT_EQUALS(p_mesh->GetMaximumNodeIndex(), 9u + 2u); // New births should get fresh indices regardless of gaps caused by deletion.
 
             delete p_simulator1;
         }

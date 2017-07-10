@@ -108,6 +108,7 @@ private:
             this->mNodesMapping[new_index] = i;
         }
         mMaxAddedNodeIndex = *(std::max_element(indices.begin(), indices.end()));
+        mIndexCounter = mMaxAddedNodeIndex + 1; // Next available fresh index
     }
     BOOST_SERIALIZATION_SPLIT_MEMBER()
     /** Vector of shared-pointers to halo nodes used by this process. */
