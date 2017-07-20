@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellBasedTestSuite.hpp"
 
 #include "CellsGenerator.hpp"
+#include "ChasteMakeUnique.hpp"
 #include "CheckpointArchiveTypes.hpp"
 #include "FileComparison.hpp"
 #include "ImmersedBoundaryHoneycombMeshGenerator.hpp"
@@ -51,6 +52,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ImmersedBoundaryLinearMembraneForce.hpp"
 #include "ImmersedBoundaryMorseInteractionForce.hpp"
 #include "ImmersedBoundaryMorseMembraneForce.hpp"
+#include "ImmersedBoundaryKinematicFeedbackForce.hpp"
 
 // This test is never run in parallel
 #include "FakePetscSetup.hpp"
@@ -312,6 +314,60 @@ public:
 
             // Tidy up
             delete p_force;
+        }
+    }
+
+    void TestImmersedBoundaryKinematicFeedbackForce() throw (Exception)
+    {
+        auto p_force = std::make_shared<ImmersedBoundaryKinematicFeedbackForce<2>>();
+
+        // Set member variables
+        p_force->SetSpringConst(1.23);
+        p_force->SetRestLength(2.34);
+
+
+    }
+
+    void TestArchivingOfImmersedBoundaryKinematicFeedbackForce() throw (Exception)
+    {
+        EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "ImmersedBoundaryKinematicFeedbackForce.arch";
+
+        {
+            auto p_force = std::make_shared<ImmersedBoundaryKinematicFeedbackForce<2>>();
+
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            // Set member variables
+            p_force->SetSpringConst(1.23);
+            p_force->SetRestLength(2.34);
+            p_force->SetAdditiveNormalNoise(true);
+            p_force->SetNormalNoiseMean(3.45);
+            p_force->SetNormalNoiseStdDev(4.56);
+
+            // Serialize via pointer to the base class
+            output_arch << std::static_pointer_cast<AbstractImmersedBoundaryForce<2>>(p_force);
+        }
+
+        {
+            std::shared_ptr<AbstractImmersedBoundaryForce<2>> p_force;
+
+            // Create an input archive
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            // Restore from the archive
+            input_arch >> p_force;
+            auto p_derived_force = std::dynamic_pointer_cast<ImmersedBoundaryKinematicFeedbackForce<2>>(p_force);
+
+            // Check member variables have been correctly archived
+            TS_ASSERT_DELTA(p_derived_force->GetSpringConst(), 1.23, 1e-6);
+            TS_ASSERT_DELTA(p_derived_force->GetRestLength(), 2.34, 1e-6);
+            TS_ASSERT(p_derived_force->GetAdditiveNormalNoise());
+            TS_ASSERT_DELTA(p_derived_force->GetNormalNoiseMean(), 3.45, 1e-6);
+            TS_ASSERT_DELTA(p_derived_force->GetNormalNoiseStdDev(), 4.56, 1e-6);
         }
     }
 
