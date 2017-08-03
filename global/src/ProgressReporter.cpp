@@ -36,6 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ProgressReporter.hpp"
 
 #include <cassert>
+#include <cmath>
 #include <iomanip>
 #include "Exception.hpp"
 #include "PetscTools.hpp"
