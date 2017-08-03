@@ -33,26 +33,43 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include <cassert>
-
 #include "ProgressReporter.hpp"
+
+#include <cassert>
+#include <iomanip>
 #include "Exception.hpp"
 #include "PetscTools.hpp"
 
-ProgressReporter::ProgressReporter(std::string outputDirectory, double startTime, double endTime)
-    : mStartTime(startTime),
-      mEndTime(endTime),
-      mLastPercentage(UINT_MAX)
+ProgressReporter::ProgressReporter(std::string outputDirectory, double startTime, double endTime, double dt)
+        : mStartTime(startTime),
+          mEndTime(endTime),
+          mDt(dt),
+          mPercentageIncrement(5),
+          mTimestepIncrement(UINT_MAX),
+          mSecondsIncrement(UINT_MAX),
+          mLastPercentage(UINT_MAX),
+          mOutputToConsole(false),
+          mOutputToFile(true)
 {
-    assert(startTime < endTime);
-
-    // Note we make sure we don't delete anything in the output directory
-    OutputFileHandler handler(outputDirectory, false);
-
-    // Open the file on the master process only
     if (PetscTools::AmMaster())
     {
-        mpFile = handler.OpenOutputFile("progress_status.txt");
+        assert(startTime < endTime);
+
+        if (outputDirectory.empty())
+        {
+            mOutputToFile = false;
+        }
+        else
+        {
+            OutputFileHandler handler(outputDirectory, false);
+            mpFile = handler.OpenOutputFile("progress_status.txt");
+        }
+
+        mTimer.Reset();
+        mWallTimeAtStart = mTimer.GetWallTime();
+
+        mNumTimesteps = static_cast<unsigned>(std::lround((mEndTime - mStartTime) / dt));
+        mNumDigits = 1u + static_cast<unsigned>(std::floor(std::log10(mNumTimesteps)));
     }
 }
 
@@ -60,25 +77,57 @@ ProgressReporter::~ProgressReporter()
 {
     if (PetscTools::AmMaster())
     {
-        if (mLastPercentage!=100)
+        std::stringstream message;
+
+        if (mLastPercentage != 100)
         {
-            *mpFile << "100% completed" << std::endl;
+            message << "100% completed" << std::endl;
         }
-        *mpFile << "..done!" << std::endl;
-        mpFile->close();
+
+        message << "..done!" << std::endl;
+
+        SendMessage(message.str());
+
+        if (mOutputToFile)
+        {
+            mpFile->close();
+        }
+
+        PrintFinalising();
     }
 }
 
 void ProgressReporter::Update(double currentTime)
 {
-    unsigned percentage = (unsigned)( (currentTime - mStartTime)/(mEndTime - mStartTime)*100 );
-    if (mLastPercentage==UINT_MAX || percentage > mLastPercentage)
+    if (PetscTools::AmMaster())
     {
-        if (PetscTools::AmMaster())
+        if (mOutputToFile || mOutputToConsole)
         {
-            *mpFile << percentage << "% completed" << std::endl;
+            auto percentage = std::lround((currentTime - mStartTime) / (mEndTime - mStartTime) * 100);
+            auto timesteps_elapsed = std::lround((currentTime - mStartTime) / mDt);
+            auto seconds_elapsed = std::lround(mTimer.GetElapsedTime());
+
+            bool percentage_condition = mLastPercentage == UINT_MAX || percentage - mLastPercentage >= mPercentageIncrement;
+            bool timesteps_condition = timesteps_elapsed % mTimestepIncrement == 0;
+            bool elapsed_time_condition = seconds_elapsed >= mSecondsIncrement;
+
+            if (percentage_condition || timesteps_condition || elapsed_time_condition)
+            {
+                std::stringstream message;
+                message << std::setfill(' ') << std::setw(3) << percentage << "% complete: "
+                        << std::setw(mNumDigits) << timesteps_elapsed << "/" << mNumTimesteps
+                        << " " << GetTimeString(mTimer.GetWallTime() - mWallTimeAtStart) << std::endl;
+
+                SendMessage(message.str());
+
+                mLastPercentage = static_cast<unsigned>(percentage);
+
+                if (elapsed_time_condition)
+                {
+                    mTimer.Reset();
+                }
+            }
         }
-        mLastPercentage = percentage;
     }
 }
 
@@ -86,7 +135,10 @@ void ProgressReporter::PrintFinalising()
 {
     if (PetscTools::AmMaster())
     {
-        *mpFile << "Finalising.." << std::endl;
+        std::stringstream message;
+        message << "Finalising.." << std::endl;
+
+        SendMessage(message.str());
     }
 }
 
@@ -94,6 +146,62 @@ void ProgressReporter::PrintInitialising()
 {
     if (PetscTools::AmMaster())
     {
-        *mpFile << "Initialising.." << std::endl;
+        std::stringstream message;
+        message << "Initialising.." << std::endl;
+
+        SendMessage(message.str());
     }
+}
+
+void ProgressReporter::SetOutputToConsole(bool outputToConsole)
+{
+    mOutputToConsole = outputToConsole;
+}
+
+void ProgressReporter::SendMessage(std::string message)
+{
+    if (mOutputToFile)
+    {
+        *mpFile << message;
+    }
+    if (mOutputToConsole)
+    {
+        std::cout << message;
+    }
+}
+std::string ProgressReporter::GetTimeString(double timeElapsed)
+{
+    if (timeElapsed < 0.0)
+    {
+        EXCEPTION("Invalid time elapsed.");
+    }
+    if (timeElapsed > static_cast<double>(LONG_MAX))
+    {
+        EXCEPTION("Long overflow: something has gone wrong.");
+    }
+
+    // Get long int representing the elaspsed time
+    auto elapsed = std::lround(timeElapsed);
+
+    // Convert this into seconds, minutes, hours, and days
+    auto sec = elapsed % 60;
+
+    elapsed = (elapsed - sec) / 60;
+    auto min = elapsed % 60;
+
+    elapsed = (elapsed - min) / 60;
+    auto hrs = elapsed % 24;
+
+    elapsed = elapsed - hrs;
+    auto day = elapsed / 24;
+
+    // Represent this information as a string
+    std::stringstream time_string;
+    time_string << "(" << std::setfill('0')
+                << std::setw(2) << day << ":"
+                << std::setw(2) << hrs << ":"
+                << std::setw(2) << min << ":"
+                << std::setw(2) << sec << "s)";
+
+    return time_string.str();
 }
