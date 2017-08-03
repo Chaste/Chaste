@@ -58,7 +58,7 @@ Help("""
   For other options, such as profiling, optimised builds and 
   memory testing please refer to:
   
-  https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides/UserBuildGuide
+  https://chaste.cs.ox.ac.uk/trac/wiki/SconsArchive/UserBuildGuide
 
 """)
 
@@ -298,8 +298,9 @@ else:
                  os.environ.get('CHASTE_TEST_OUTPUT',
                                 '/tmp/'+os.environ['USER']+'/testoutput/'),
              'CHASTE_DEBUG': str(debug),
+             'CHASTE_LIBS': os.environ.get('CHASTE_LIBS', ''),
              'LD_LIBRARY_PATH': ':'.join(other_libpaths),
-             'HOME': os.environ['HOME']
+             'HOME': os.environ['HOME'],
             })
 env.Append(BOPT = 'g_c++') # Needed for some versions of PETSc?
 env.Replace(CXX = build.tools['mpicxx'])

@@ -44,7 +44,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscTools.hpp"
 #include "DistributedBoxCollection.hpp"
 #include "MutableMesh.hpp"
-
 /**
  * Mesh class for storing lists of nodes (no elements). This inherits from MutableMesh
  * because we want to be able to add and delete nodes.
@@ -71,13 +70,47 @@ private:
      * @param version the current version of this class
      */
     template<class Archive>
-    void serialize(Archive & archive, const unsigned int version)
+    void save(Archive & archive, const unsigned int version) const
     {
         archive & mMaximumInteractionDistance;
         archive & mMinimumNodeDomainBoundarySeparation;
+        std::vector<unsigned> indices = GetAllNodeIndices();
+        archive & indices;
         archive & boost::serialization::base_object<MutableMesh<SPACE_DIM, SPACE_DIM> >(*this);
     }
 
+    /**
+     * Load member variables of the object which have to be preserved
+     * during its lifetime.
+     *
+     * Note that we must archive any member variables FIRST so that this
+     * method can call a ReMesh (to convert from TrianglesMeshReader input
+     * format into our native format).
+     *
+     * @param archive the archive
+     * @param version the current version of this class
+     */
+    template<class Archive>
+    void load(Archive & archive, const unsigned int version)
+    {
+        archive & mMaximumInteractionDistance;
+        archive & mMinimumNodeDomainBoundarySeparation;
+        std::vector<unsigned> indices;
+        archive & indices;
+        archive & boost::serialization::base_object<MutableMesh<SPACE_DIM, SPACE_DIM> >(*this);
+        // Re-index the nodes according to what we've just read
+        assert(GetNumNodes() == indices.size());
+        this->mNodesMapping.clear();
+        for (unsigned i=0; i<this->mNodes.size(); i++)
+        {
+            unsigned new_index = indices[i];
+            this->mNodes[i]->SetIndex(new_index);
+            this->mNodesMapping[new_index] = i;
+        }
+        mMaxAddedNodeIndex = *(std::max_element(indices.begin(), indices.end()));
+        mIndexCounter = mMaxAddedNodeIndex + 1; // Next available fresh index
+    }
+    BOOST_SERIALIZATION_SPLIT_MEMBER()
     /** Vector of shared-pointers to halo nodes used by this process. */
     std::vector<boost::shared_ptr<Node<SPACE_DIM> > > mHaloNodes;
 
@@ -448,6 +481,12 @@ public:
      * @param rMeshReader the mesh reader for input.
      */
     void ConstructFromMeshReader(AbstractMeshReader<SPACE_DIM, SPACE_DIM>& rMeshReader);
+
+    /**
+     * Get all node indices in order of appearance.
+     * @return Node vector of node indices for this process ignoring all delete nodes
+     */
+    std::vector<unsigned> GetAllNodeIndices() const;
 };
 
 #include "SerializationExportWrapper.hpp"

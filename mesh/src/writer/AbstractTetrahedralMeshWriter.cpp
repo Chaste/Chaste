@@ -502,7 +502,7 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(
     unsigned node_map_index = 0;
     if (mpMesh->IsMeshChanging())
     {
-        mpNodeMap = new NodeMap(mpMesh->GetMaximumNodeIndex());
+        mpNodeMap = new NodeMap(1 + mpMesh->GetMaximumNodeIndex());
         for (NodeIterType it = mpMesh->GetNodeIteratorBegin(); it != mpMesh->GetNodeIteratorEnd(); ++it)
         {
             mpNodeMap->SetNewIndex(it->GetIndex(), node_map_index++);

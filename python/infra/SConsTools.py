@@ -532,7 +532,7 @@ def GetPathRevision(path):
     """
     if os.path.exists(os.path.join(path, '.git')):
         # Git repo
-        commit_sha = subprocess.check_output(['git', '-C', path, 'rev-parse', '--short','HEAD']).strip()
+        commit_sha = subprocess.check_output(['git', '-C', path, 'rev-parse', '--short=7','HEAD']).strip()
         retcode = subprocess.call(['git', '-C', path, 'diff-index', '--quiet', 'HEAD', '--'])
         revision = '0x' + commit_sha
         modified = (retcode != 0)
