@@ -51,12 +51,6 @@ ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryElement(unsigne
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::~ImmersedBoundaryElement()
-{
-    // Do not delete fluid source - that is taken care of in the mesh (which owns the sources)
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::SetFluidSource(FluidSource<SPACE_DIM>* fluidSource)
 {
     mpFluidSource = fluidSource;
