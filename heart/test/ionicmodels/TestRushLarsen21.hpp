@@ -39,8 +39,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 
 #include "LuoRudy1991.hpp"
-#include "LuoRudy1991RushLarsen.hpp"
-#include "AbstractRushLarsenCardiacCell.hpp" // Needed for chaste_libs=0 build
+#include "LuoRudy1991RushLarsen21.hpp"
+#include "AbstractRushLarsen21CardiacCell.hpp" // Needed for chaste_libs=0 build
 
 #include "ZeroStimulus.hpp"
 #include "SimpleStimulus.hpp"
@@ -77,7 +77,7 @@ public:
         boost::shared_ptr<AbstractIvpOdeSolver> p_solver;
         boost::shared_ptr<ZeroStimulus> zero_p_stimulus(new ZeroStimulus());
 
-        mpRushLarsenCell = new CellLuoRudy1991FromCellMLRushLarsen(p_solver, zero_p_stimulus);
+        mpRushLarsenCell = new CellLuoRudy1991FromCellMLRushLarsen21(p_solver, zero_p_stimulus);
 
         // Check the models really use Rush-Larsen-21
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
