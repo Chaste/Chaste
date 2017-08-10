@@ -37,8 +37,34 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>::AbstractCellWriter(const std::string& rFileName)
-    : AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>(rFileName)
+    : AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>(rFileName),
+      mOutputScalarData(true),
+      mOutputVectorData(false)
 {
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>::SetOutputScalarData(bool outputScalarData)
+{
+    mOutputScalarData = outputScalarData;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>::GetOutputScalarData()
+{
+    return mOutputScalarData;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>::SetOutputVectorData(bool outputVectorData)
+{
+    mOutputVectorData = outputVectorData;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>::GetOutputVectorData()
+{
+    return mOutputVectorData;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -48,9 +74,42 @@ void AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>::SetVtkCellDataName(std::string 
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>::SetVtkVectorCellDataName(std::string vtkCellDataName)
+{
+    mVtkVectorCellDataName = vtkCellDataName;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+double AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataForVtkOutput(
+        CellPtr pCell,
+        AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+{
+    return DOUBLE_UNSET;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+c_vector<double, SPACE_DIM> AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>::GetVectorCellDataForVtkOutput(
+        CellPtr pCell,
+        AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+{
+    c_vector<double, SPACE_DIM> default_vec;
+    for (unsigned dim = 0; dim < SPACE_DIM; ++dim)
+    {
+        default_vec[dim] = DOUBLE_UNSET;
+    }
+    return default_vec;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::string AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>::GetVtkCellDataName()
 {
     return mVtkCellDataName;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+std::string AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>::GetVtkVectorCellDataName()
+{
+    return mVtkVectorCellDataName;
 }
 
 // Explicit instantiation
