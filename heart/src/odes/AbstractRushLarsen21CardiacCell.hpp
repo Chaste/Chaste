@@ -44,17 +44,29 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscTools.hpp"
 
 /**
- * This is the base class for cardiac cells solved using the Rush-Larsen method.
+
+ * This is the base class for cardiac cells solved using the Rush-Larsen21 method.
+ * written by Wenxian Guo (w.guo@usask.ca), University of Saskatchewan
+ * with support from Dr. Raymond Spiteri (spiteri@cs.usask.ca) 
  * It is based on code contributed by Megan Lewis, University of Saskatchewan
  *
- * The basic approach to solving such models is:
- *  \li Compute alpha & beta values for gating variables, and derivatives for
- *      other state variables.
- *  \li Update the transmembrane potential, either from solving an external PDE,
- *      or using a forward Euler step.
- *  \li Update any eligible gating variables (or similar) with Rush-Larsen scheme.
- *  \li Update the remaining state variables using a forward Euler step.
+ * The basic idea is to split the ODE system with gates (gating variables) and non-gates
+ * Gates are solved using exponential integrator as in Rush-Larsen method
+ * Non-gates are solved using RKC21 (2-stage Runge-Kutta-Chebyshev method of order 1)
+ * See ode/src/solver/RKC21IvpOdeSolver.hpp or Chaste ticket#2901 for implementation details
+ *
+ *  \li Compute alpha & beta values for gating variables, and derivatives (rDY1) for RKC stage 1
+ *      (EvaluateEquations)
+ *  \li Advance gating variabless using AdvanceGatingVars
+ *  \li Advance non-gating variables using ComputeOneStepExceptVoltage
+ *  \li Advance V using either UpdateTransmembranePotential or external equations
+ *  
+ *
+ *  ABOVE WORKFLOW MIGHT NOT BE A GOOD DESIGN PATTERN
+ *
+ *
  */
+
 class AbstractRushLarsen21CardiacCell : public AbstractCardiacCell
 {
 private:
@@ -97,7 +109,7 @@ public:
 
     /**
      * Simulates this cell's behaviour between the time interval [tStart, tEnd],
-     * with timestep #mDt.  Uses a forward Euler step to update the transmembrane
+     * with timestep #mDt.  Uses a RKC21 step to update the transmembrane
      * potential at each timestep.
      *
      * The length of the time interval must be a multiple of the timestep.
@@ -111,8 +123,9 @@ public:
 
     /**
      * Simulates this cell's behaviour between the time interval [tStart, tEnd],
-     * with timestep #mDt.  The transmembrane potential is kept fixed throughout,
-     * but the other state variables are updated.
+     * with timestep #mDt.  The transmembrane potential is kept fixed throughout
+     * (and is updated through external models), but the other state variables are 
+     * updated (using RKC21 step or exponential integrator).
      *
      * The length of the time interval must be a multiple of the timestep.
      *
@@ -147,28 +160,39 @@ private:
 
 protected:
     /**
-     * Update the values of elligible gating variables using the Rush-Larsen method,
-     * and of other non-V variables using forward Euler, for a single timestep.
+    * This function does the following:
+    * 1. Update gating variables using exponential integrator
+    * 2. Store new gating variables and old non-gating variables in rState (in this class)
+    * 3. Time integration of non-gating variables (including V) using one step RKC21, get result
+    *    at t = mu1t * dt
+    * 4. Linear interpolation of gating variables, get result at t = mu1t * dt
+    * 5. Override state vector in cell class with results from 3 and 4
+    * 
+    * This function is implemented in cell class
+    *
+    **/
+    virtual void AdvanceGatingVars(const std::vector<double> &rDY1, // Advance non-gating variables
+                                   std::vector<double> &rState, // To protect states for 2 step method
+                                   const std::vector<double> &rAlphaOrTau,
+                                   const std::vector<double> &rBetaOrInf)=0;
+
+    /**
+     * Update the values of non-gating variables using the RKC21 method for a single timestep.
      *
      * \note This method must be provided by subclasses.
      *
-     * @param rDY  vector containing dy/dt values
-     * @param rAlphaOrTau  vector containing alpha or tau values, depending on the formulation
-     * @param rBetaOrInf  vector containing beta or inf values, depending on the formulation
+     * @param rState  vector containing state variables. Gating variables are at time t = dt,
+     *              Non-gating variables are at time t = 0
+     * @param rDY1  vector containing RHS at t = 0
+     * @param rDY2  vector containing RHS at t = mu1t * dt
      */
-    virtual void ComputeOneStepExceptVoltage(const std::vector<double> &rDY,
-                                             const std::vector<double> &rAlphaOrTau,
-                                             const std::vector<double> &rBetaOrInf)=0;
+    virtual void ComputeOneStepForNonGatingVarsExceptVoltage(const std::vector<double> &rState,
+                                             const std::vector<double> &rDY1,
+                                             const std::vector<double> &rDY2)=0;
 
-    /**
-     * Perform a forward Euler step to update the transmembrane potential.
-     *
-     * @param rDY  vector containing dy/dt values
-     */
-    void UpdateTransmembranePotential(const std::vector<double> &rDY);
 
      /**
-     * Compute dy/dt and alpha and beta values.
+     * Compute RHS and alpha and beta values.
      *
      * \note This method must be provided by subclasses.
      *
@@ -181,6 +205,16 @@ protected:
                                    std::vector<double> &rDY,
                                    std::vector<double> &rAlphaOrTau,
                                    std::vector<double> &rBetaOrInf)=0;
+
+    /*
+     * Transmembrane potential is updated using RKC21
+     */
+    void UpdateTransmembranePotential(const std::vector<double> &rDY1, const std::vector<double> &rDY2);
+
+
+
+
+
 };
 
 CLASS_IS_ABSTRACT(AbstractRushLarsen21CardiacCell)

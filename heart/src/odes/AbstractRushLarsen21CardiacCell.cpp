@@ -56,10 +56,6 @@ AbstractRushLarsen21CardiacCell::~AbstractRushLarsen21CardiacCell()
 
 OdeSolution AbstractRushLarsen21CardiacCell::Compute(double tStart, double tEnd, double tSamp)
 {
-    // In this method, we iterate over timesteps, doing the following for each:
-    //   - update V using a forward Euler step
-    //   - do as in ComputeExceptVoltage(t) to update the remaining state variables
-    //     using Rush Larsen method or forward Euler as appropriate
 
     // Check length of time interval
     if (tSamp < mDt)
@@ -78,9 +74,13 @@ OdeSolution AbstractRushLarsen21CardiacCell::Compute(double tStart, double tEnd,
     solutions.rGetTimes().push_back(tStart);
     solutions.SetOdeSystemInformation(this->mpSystemInfo);
 
-    std::vector<double> dy(mNumberOfStateVariables, 0);
+    std::vector<double> dy1(mNumberOfStateVariables, 0);
+    std::vector<double> dy2(mNumberOfStateVariables, 0);
     std::vector<double> alpha(mNumberOfStateVariables, 0);
     std::vector<double> beta(mNumberOfStateVariables, 0);
+    std::vector<double> rState(mNumberOfStateVariables, 0);
+
+    const double mu1_tilde = 0.256134735558604;
 
     // Loop over time
     for (unsigned i=0; i<n_steps; i++)
@@ -89,9 +89,11 @@ OdeSolution AbstractRushLarsen21CardiacCell::Compute(double tStart, double tEnd,
         for (unsigned j=0; j<n_small_steps; j++)
         {
             curr_time = tStart + i*tSamp + j*mDt;
-            EvaluateEquations(curr_time, dy, alpha, beta);
-            UpdateTransmembranePotential(dy);
-            ComputeOneStepExceptVoltage(dy, alpha, beta);
+            EvaluateEquations(curr_time, dy1, alpha, beta);
+            AdvanceGatingVars(dy1, rState, alpha, beta);
+            EvaluateEquations(curr_time + mu1_tilde * mDt, dy2, alpha, beta);
+            ComputeOneStepForNonGatingVarsExceptVoltage(rState, dy1, dy2);
+            UpdateTransmembranePotential(dy1, dy2);
             VerifyStateVariables();
         }
 
@@ -103,19 +105,26 @@ OdeSolution AbstractRushLarsen21CardiacCell::Compute(double tStart, double tEnd,
     return solutions;
 }
 
+
 void AbstractRushLarsen21CardiacCell::ComputeExceptVoltage(double tStart, double tEnd)
 {
     mSetVoltageDerivativeToZero = true;
     TimeStepper stepper(tStart, tEnd, mDt);
 
-    std::vector<double> dy(mNumberOfStateVariables, 0);
+    std::vector<double> dy1(mNumberOfStateVariables, 0);
+    std::vector<double> dy2(mNumberOfStateVariables, 0);
     std::vector<double> alpha(mNumberOfStateVariables, 0);
     std::vector<double> beta(mNumberOfStateVariables, 0);
+    std::vector<double> rState(mNumberOfStateVariables, 0);
 
+    const double mu1_tilde = 0.256134735558604;
     while (!stepper.IsTimeAtEnd())
     {
-        EvaluateEquations(stepper.GetTime(), dy, alpha, beta);
-        ComputeOneStepExceptVoltage(dy, alpha, beta);
+        double curr_time = stepper.GetTime();
+        EvaluateEquations(curr_time, dy1, alpha, beta);
+        AdvanceGatingVars(dy1, rState, alpha, beta);
+        EvaluateEquations(curr_time + mu1_tilde * mDt, dy2, alpha, beta);
+        ComputeOneStepForNonGatingVarsExceptVoltage(rState, dy1, dy2);
 
 #ifndef NDEBUG
         // Check gating variables are still in range
@@ -131,23 +140,43 @@ void AbstractRushLarsen21CardiacCell::SolveAndUpdateState(double tStart, double 
 {
     TimeStepper stepper(tStart, tEnd, mDt);
 
-    std::vector<double> dy(mNumberOfStateVariables, 0);
+    std::vector<double> dy1(mNumberOfStateVariables, 0);
+    std::vector<double> dy2(mNumberOfStateVariables, 0);
     std::vector<double> alpha(mNumberOfStateVariables, 0);
     std::vector<double> beta(mNumberOfStateVariables, 0);
+    std::vector<double> rState(mNumberOfStateVariables, 0);
+
+    const double mu1_tilde = 0.256134735558604;
 
     while (!stepper.IsTimeAtEnd())
     {
-        EvaluateEquations(stepper.GetTime(), dy, alpha, beta);
-        UpdateTransmembranePotential(dy);
-        ComputeOneStepExceptVoltage(dy, alpha, beta);
+        double curr_time = stepper.GetTime();
+        EvaluateEquations(curr_time, dy1, alpha, beta);
+        AdvanceGatingVars(dy1, rState, alpha, beta);
+        EvaluateEquations(curr_time + mu1_tilde * mDt, dy2, alpha, beta);
+        ComputeOneStepForNonGatingVarsExceptVoltage(rState, dy1, dy2);
+        UpdateTransmembranePotential(dy1, dy2);
         VerifyStateVariables();
 
         stepper.AdvanceOneTimeStep();
     }
 }
 
-void AbstractRushLarsen21CardiacCell::UpdateTransmembranePotential(const std::vector<double> &rDY)
-{
+void AbstractRushLarsen21CardiacCell::UpdateTransmembranePotential(const std::vector<double> &rDY1,
+                                                                   const std::vector<double> &rDY2)
+{   
+    // hard-coded RKC21 coefficient
+    // TODO: generating arbitrary RKC coefficients on the fly
+    const double mu2 = 1.952097590002976; 
+    const double mu2_tilde =0.500000000000000;
+    const double mu1_tilde = 0.256134735558604;
+
+
+    // RKC21 step 1
     unsigned v_index = GetVoltageIndex();
-    rGetStateVariables()[v_index] += mDt*rDY[v_index];
+    double current_V = rGetStateVariables()[v_index];
+    double step1_V = current_V + mu1_tilde * mDt * rDY1[v_index];
+
+    // RKC21 step 2 
+    rGetStateVariables()[v_index] = (1 - mu2) * current_V + mu2 * step1_V + mu2_tilde * mDt * rDY2[v_index];
 }

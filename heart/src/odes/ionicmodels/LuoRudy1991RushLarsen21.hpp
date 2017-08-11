@@ -15,16 +15,16 @@
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
-#include "AbstractRushLarsenCardiacCell.hpp"
+#include "AbstractRushLarsen21CardiacCell.hpp"
 #include "AbstractStimulusFunction.hpp"
 
-class CellLuoRudy1991FromCellMLRushLarsen21 : public AbstractRushLarsenCardiacCell
+class CellLuoRudy1991FromCellMLRushLarsen21 : public AbstractRushLarsen21CardiacCell
 {
     friend class boost::serialization::access;
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractRushLarsenCardiacCell >(*this);
+        archive & boost::serialization::base_object<AbstractRushLarsen21CardiacCell >(*this);
     }
     
     // 
@@ -39,7 +39,8 @@ public:
     void VerifyStateVariables();
     double GetIIonic(const std::vector<double>* pStateVariables=NULL);
     void EvaluateEquations(double var_chaste_interface__environment__time, std::vector<double> &rDY, std::vector<double> &rAlphaOrTau, std::vector<double> &rBetaOrInf);
-    void ComputeOneStepExceptVoltage(const std::vector<double> &rDY, const std::vector<double> &rAlphaOrTau, const std::vector<double> &rBetaOrInf);
+    void ComputeOneStepForNonGatingVarsExceptVoltage(const std::vector<double> &rState, const std::vector<double> &rDY1, const std::vector<double> &rDY2);
+    void AdvanceGatingVars(const std::vector<double> &rDY1, std::vector<double> &rState, const std::vector<double> &rAlphaOrTau, const std::vector<double> &rBetaOrInf);
     std::vector<double> ComputeDerivedQuantities(double var_chaste_interface__environment__time, const std::vector<double> & rY);
 };
 

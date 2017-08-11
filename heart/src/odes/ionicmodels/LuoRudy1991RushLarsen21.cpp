@@ -331,40 +331,24 @@
         rDY[7] = d_dt_chaste_interface__intracellular_calcium_concentration__Cai;
     }
     
-    void CellLuoRudy1991FromCellMLRushLarsen21::ComputeOneStepExceptVoltage(const std::vector<double> &rDY, const std::vector<double> &rAlphaOrTau, const std::vector<double> &rBetaOrInf)
+    void CellLuoRudy1991FromCellMLRushLarsen21::ComputeOneStepForNonGatingVarsExceptVoltage(const std::vector<double> &rState, const std::vector<double> &rDY1, const std::vector<double> &rDY2)
     {
-        std::vector<double>& rY = rGetStateVariables();
-        {
-            const double tau_inv = rAlphaOrTau[1] + rBetaOrInf[1];
-            const double y_inf = rAlphaOrTau[1] / tau_inv;
-            rY[1] = y_inf + (rY[1] - y_inf)*exp(-mDt*tau_inv);
-        }
-        {
-            const double tau_inv = rAlphaOrTau[2] + rBetaOrInf[2];
-            const double y_inf = rAlphaOrTau[2] / tau_inv;
-            rY[2] = y_inf + (rY[2] - y_inf)*exp(-mDt*tau_inv);
-        }
-        {
-            const double tau_inv = rAlphaOrTau[3] + rBetaOrInf[3];
-            const double y_inf = rAlphaOrTau[3] / tau_inv;
-            rY[3] = y_inf + (rY[3] - y_inf)*exp(-mDt*tau_inv);
-        }
-        {
-            const double tau_inv = rAlphaOrTau[4] + rBetaOrInf[4];
-            const double y_inf = rAlphaOrTau[4] / tau_inv;
-            rY[4] = y_inf + (rY[4] - y_inf)*exp(-mDt*tau_inv);
-        }
-        {
-            const double tau_inv = rAlphaOrTau[5] + rBetaOrInf[5];
-            const double y_inf = rAlphaOrTau[5] / tau_inv;
-            rY[5] = y_inf + (rY[5] - y_inf)*exp(-mDt*tau_inv);
-        }
-        {
-            const double tau_inv = rAlphaOrTau[6] + rBetaOrInf[6];
-            const double y_inf = rAlphaOrTau[6] / tau_inv;
-            rY[6] = y_inf + (rY[6] - y_inf)*exp(-mDt*tau_inv);
-        }
-        rY[7] += mDt * rDY[7];
+        std::vector<double>& rY = rGetStateVariables(); // variables at mu1t*dt
+        const double mu2 = 1.952097590002976; 
+        const double mu2_tilde =0.500000000000000;
+        // Time integration of non-gating variables (except V) using 2 step RKC21 method
+        rY[7] = (1 - mu2) * rState[7] + mu2 * rY[7] + mu2_tilde * mDt * rDY2[7];
+        rY[0] = rState[0];
+
+        // Override gating variables with new gating variables stored in rState
+        rY[1] = rState[1];
+        rY[2] = rState[2];
+        rY[3] = rState[3];
+        rY[4] = rState[4];
+        rY[5] = rState[5];
+        rY[6] = rState[6];
+
+
     }
     
     std::vector<double> CellLuoRudy1991FromCellMLRushLarsen21::ComputeDerivedQuantities(double var_chaste_interface__environment__time, const std::vector<double> & rY)
@@ -434,6 +418,61 @@
         return dqs;
     }
     
+    void CellLuoRudy1991FromCellMLRushLarsen21::AdvanceGatingVars(const std::vector<double> &rDY1, std::vector<double> &rState, const std::vector<double> &rAlphaOrTau, const std::vector<double> &rBetaOrInf)
+    {
+
+        const double mu1_tilde = 0.256134735558604; // RKC coefficient
+        std::vector<double>& rY = rGetStateVariables();
+
+        // rState stores new gating variables and old non-gating variables (including V)
+
+        // Exponential integration of gating variables
+        {
+            const double tau_inv = rAlphaOrTau[1] + rBetaOrInf[1];
+            const double y_inf = rAlphaOrTau[1] / tau_inv;
+            rState[1] = y_inf + (rY[1] - y_inf)*exp(-mDt*tau_inv);
+        }
+        {
+            const double tau_inv = rAlphaOrTau[2] + rBetaOrInf[2];
+            const double y_inf = rAlphaOrTau[2] / tau_inv;
+            rState[2] = y_inf + (rY[2] - y_inf)*exp(-mDt*tau_inv);
+        }
+        {
+            const double tau_inv = rAlphaOrTau[3] + rBetaOrInf[3];
+            const double y_inf = rAlphaOrTau[3] / tau_inv;
+            rState[3] = y_inf + (rY[3] - y_inf)*exp(-mDt*tau_inv);
+        }
+        {
+            const double tau_inv = rAlphaOrTau[4] + rBetaOrInf[4];
+            const double y_inf = rAlphaOrTau[4] / tau_inv;
+            rState[4] = y_inf + (rY[4] - y_inf)*exp(-mDt*tau_inv);
+        }
+        {
+            const double tau_inv = rAlphaOrTau[5] + rBetaOrInf[5];
+            const double y_inf = rAlphaOrTau[5] / tau_inv;
+            rState[5] = y_inf + (rY[5] - y_inf)*exp(-mDt*tau_inv);
+        }
+        {
+            const double tau_inv = rAlphaOrTau[6] + rBetaOrInf[6];
+            const double y_inf = rAlphaOrTau[6] / tau_inv;
+            rState[6] = y_inf + (rY[6] - y_inf)*exp(-mDt*tau_inv);
+        }
+        rState[0] = rY[0];
+        rState[7] = rY[7];
+
+        // Linear interpolation of gating variables
+        rY[1] += mu1_tilde * ( rState[1] - rY[1]);
+        rY[2] += mu1_tilde * ( rState[2] - rY[2]);
+        rY[3] += mu1_tilde * ( rState[3] - rY[3]);
+        rY[4] += mu1_tilde * ( rState[4] - rY[4]);
+        rY[5] += mu1_tilde * ( rState[5] - rY[5]);
+        rY[6] += mu1_tilde * ( rState[6] - rY[6]);
+
+        // Advance non-gating variables (including V) with one step RKC21
+        rY[0] += mu1_tilde * mDt * rDY1[0]; 
+        rY[7] += mu1_tilde * mDt * rDY1[7]; 
+    }
+
 template<>
 void OdeSystemInformation<CellLuoRudy1991FromCellMLRushLarsen21>::Initialise(void)
 {
