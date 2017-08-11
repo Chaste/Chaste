@@ -39,7 +39,9 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>::AbstractCellWriter(const std::string& rFileName)
     : AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>(rFileName),
       mOutputScalarData(true),
-      mOutputVectorData(false)
+      mOutputVectorData(false),
+      mVtkCellDataName("DefaultVtkCellDataName"),
+      mVtkVectorCellDataName("DefaultVtkVectorCellDataName")
 {
 }
 
