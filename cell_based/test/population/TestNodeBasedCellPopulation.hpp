@@ -285,16 +285,22 @@ public:
 
     void TestAddCell()
     {
-        // Create two nodes
+        // Create two nodes (for coverage, give one some node attributes)
         ChastePoint<2> point0;
         point0.rGetLocation()[0] = 0.0;
         point0.rGetLocation()[1] = 0.0;
         Node<2>* p_node0 = new Node<2>(0, point0, false);
+        p_node0->AddNodeAttribute(0.0);
+        std::vector<double>& attributes = p_node0->rGetNodeAttributes();
+        attributes.resize(2);
+        attributes[0] = 6.23;
+        attributes[1] = 5.91;
 
         ChastePoint<2> point1;
         point1.rGetLocation()[0] = 1.0;
         point1.rGetLocation()[1] = 1.0;
         Node<2>* p_node1 = new Node<2>(1, point1, false);
+        TS_ASSERT_EQUALS(p_node1->HasNodeAttributes(), false);
 
         std::vector<Node<2>* > nodes;
         nodes.push_back(p_node0);
@@ -333,8 +339,8 @@ public:
 
         // For coverage
         for (AbstractMesh<2,2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
-                node_iter != mesh.GetNodeIteratorEnd();
-                ++node_iter)
+             node_iter != mesh.GetNodeIteratorEnd();
+             ++node_iter)
         {
             TS_ASSERT_EQUALS(node_iter->IsParticle(), false);
         }
@@ -356,11 +362,34 @@ public:
 
             node_based_cell_population.AddCell(p_cell2, node_based_cell_population.GetCellUsingLocationIndex(0));
 
-            // Check the radii of all the cells are correct (cell 0 divided into 0 and 2)
+            // Check the radius and node attributes associated with cell 0 are correct
             AbstractMesh<2,2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
-            TS_ASSERT_DELTA((node_iter)->GetRadius(), 0.1, 1e-6);
+            TS_ASSERT_DELTA(node_iter->GetRadius(), 0.1, 1e-6);
+            TS_ASSERT_EQUALS(node_iter->HasNodeAttributes(), true);
+            TS_ASSERT_EQUALS(node_iter->rGetNodeAttributes().size(), 2u);
+            TS_ASSERT_DELTA(node_iter->rGetNodeAttributes()[0], 6.23, 1e-4);
+            TS_ASSERT_DELTA(node_iter->rGetNodeAttributes()[1], 5.91, 1e-4);
+
+            // Check the radius of cell 1 is correct and it has no associated node attributes
             TS_ASSERT_DELTA((++node_iter)->GetRadius(), 0.2, 1e-6);
+
+            /*
+             * Note: since the radius of each node is set to 0.5 in
+             * NodesOnlyMesh::ConstructNodesWithoutMesh(), this means
+             * that every node in a NodeBasedCellPopulaton has called
+             * ConstructNodeAttributes(); however, rGetNodeAttributes()
+             * will return an empty vector unless any attributes have
+             * been set by the user.
+             */
+            TS_ASSERT_EQUALS(node_iter->HasNodeAttributes(), true);
+            TS_ASSERT_EQUALS(node_iter->rGetNodeAttributes().size(), 0u);
+
+            // Check the radius and node attributes associated with cell 2 are correct (cell 0 divided into 0 and 2)
             TS_ASSERT_DELTA((++node_iter)->GetRadius(), 0.1, 1e-6);
+            TS_ASSERT_EQUALS(node_iter->HasNodeAttributes(), true);
+            TS_ASSERT_EQUALS(node_iter->rGetNodeAttributes().size(), 2u);
+            TS_ASSERT_DELTA(node_iter->rGetNodeAttributes()[0], 6.23, 1e-4);
+            TS_ASSERT_DELTA(node_iter->rGetNodeAttributes()[1], 5.91, 1e-4);
         }
 
         // Avoid memory leak
