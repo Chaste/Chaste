@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2016, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -33,38 +33,42 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef EXPONENTIALG1GENERATIONALCELLCYCLEMODEL_HPP_
-#define EXPONENTIALG1GENERATIONALCELLCYCLEMODEL_HPP_
+#ifndef FIXEDSEQUENCECELLCYCLEMODEL_HPP_
+#define FIXEDSEQUENCECELLCYCLEMODEL_HPP_
 
-#include "AbstractSimpleGenerationalCellCycleModel.hpp"
+#include "ExponentialG1GenerationalCellCycleModel.hpp"
 #include "RandomNumberGenerator.hpp"
+#include "CellCycleTimesGenerator.hpp"
+#include "AbstractCellCycleModel.hpp"
 
 /**
- * A cell cycle model where the G1 duration is drawn from an exponential
- * random distribution. The rate parameter of this distribution is defined
- * by the member variable mRate.
+ * This FixedSequenceCellCycleModel generates a sequence of randomly distributed
+ * cell cycle times at the beginning of the simulation rather than drawing random numbers
+ * during the simulation.  The random seed for the generation of these random numbers
+ * may be specified by the user and the cell cycle times are stored in a separate
+ * singleton, the CellCycleTimesGenerator.  This gives the user control over the exact cell cycle
+ * times used in the simulation while not interfering with other random events implemented in
+ * the simulation algorithm.
  *
- * The default value of mRate is set to the inverse of the default value
- * of mTransitCellG1Duration in the constructor.
+ * This cell cycle model is an extended version of the ExponentialG1GenerationalCellCycleModel.
+ * Similar to ExponentialG1GenerationalCellCycleModel, the G1 duration is exponentially random
+ * distributed, and the interface to FixedSequenceCellCycleModel and
+ * ExponentialG1GenerationalCellCycleModel are similar.  In contrast to ExponentialG1GenerationalCellCycleModel
+ * this cell cycle model does not treat stem cells and transit cells differently.
  *
- * mRate may be set using the method SetRate(), which also sets
- * mTransitCellG1Duration and mStemCellG1Duration to take the inverse of
- * mRate's new value. Similarly, the overridden methods SetTransitCellG1Duration()
- * and SetStemCellG1Duration() also set mRate to take the inverse of the
- * new value of mTransitCellG1Duration and mStemCellG1Duration, respectively.
+ * If using this cell cycle model, the following line must be called before
+ * starting the simulation:
+ *
+ * CellCycleTimesGenerator::Instance()->GenerateCellCycleTimeSequence();
+ *
+ * Further, the following line must be run at the end of the simulation:
+ *
+ * CellCycleTimesGenerator::Destroy();
  */
-class ExponentialG1GenerationalCellCycleModel : public AbstractSimpleGenerationalCellCycleModel
+class FixedSequenceCellCycleModel : public ExponentialG1GenerationalCellCycleModel
 {
-    friend class TestSimpleCellCycleModels;
 
 private:
-
-    /**
-     * The rate parameter of the exponential distribution, often denoted by lambda.
-     * This parameter is initialised to 1.0/mTransitCellG1Duration. The latter variable is inherited from the abstract cell cycle model.
-     * This initialisation ensures that cells will have the standard G1 duration (as defined in the abstract cell cycle model classes) on average.
-     */
-    double mRate;
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
@@ -77,22 +81,20 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractSimpleGenerationalCellCycleModel>(*this);
-
-        // Make sure the RandomNumberGenerator singleton gets saved too
-        SerializableSingleton<RandomNumberGenerator>* p_wrapper = RandomNumberGenerator::Instance()->GetSerializationWrapper();
+        archive & boost::serialization::base_object<ExponentialG1GenerationalCellCycleModel>(*this);
+        // Make sure the CellCycleTimesGenerator singleton gets saved too
+        SerializableSingleton<CellCycleTimesGenerator>* p_wrapper = CellCycleTimesGenerator::Instance()->GetSerializationWrapper();
         archive & p_wrapper;
-        archive & mRate;
     }
 
 protected:
 
     /**
-     * Stochastically set the G1 duration following an exponential distribution. Called on cell creation at
+     * Stochastically set the G1 duration following the sequence in CellCycleTimesGenerator. Called on cell creation at
      * the start of a simulation, and for both parent and daughter
      * cells at cell division.
      */
-    virtual void SetG1Duration();
+    void SetG1Duration();
 
     /**
      * Protected copy-constructor for use by CreateCellCycleModel.
@@ -107,7 +109,7 @@ protected:
      *
      * @param rModel the cell cycle model to copy.
      */
-    ExponentialG1GenerationalCellCycleModel(const ExponentialG1GenerationalCellCycleModel& rModel);
+    FixedSequenceCellCycleModel(const FixedSequenceCellCycleModel& rModel);
 
 public:
 
@@ -115,33 +117,28 @@ public:
      * Constructor - just a default, mBirthTime is now set in the AbstractCellCycleModel class.
      * mG1Duration is set very high, it is set for the individual cells when InitialiseDaughterCell is called
      */
-    ExponentialG1GenerationalCellCycleModel();
+    FixedSequenceCellCycleModel();
 
     /**
-     * Overridden builder method to create new copies of
-     * this cell-cycle model.
+     * Overridden method to create new cell cycle models after division
      *
-     * @return new cell-cycle model
+     * @return new cell cycle model
      */
     AbstractCellCycleModel* CreateCellCycleModel();
 
     /**
-     * Return the rate parameter (lambda) of the exponential distribution.
+     * Overridden SetRate method.
      *
-     * @return mRate, the rate parameter of the distribution
+     * @param rate  the new value of the rate parameter
      */
-    virtual double GetRate();
+    void SetRate(double rate);
 
     /**
-     * Set the rate parameter of the exponential distribution. For consistency,
-     * this function also resets the internal values for mTransitCellG1Duration
-     * and mStemCellG1Duration to the average value of the exponential random variable,
-     * i.e. 1.0/rate. This ensures that GetAverageTransitCellCycleTime and GetAverageStemCellCycleTime
-     * returns correct values.
+     * Overridden GetRate method.
      *
-     * @param rate
+     * @returns rate  the value of the rate parameter
      */
-    virtual void SetRate(double rate);
+    double GetRate();
 
     /**
      * Overridden SetStemCellG1Duration() method.
@@ -151,7 +148,7 @@ public:
      *
      * @param stemCellG1Duration  the new value of mStemCellG1Duration
      */
-    virtual void SetStemCellG1Duration(double stemCellG1Duration);
+    void SetStemCellG1Duration(double stemCellG1Duration);
 
     /**
      * Overridden SetTransitCellG1Duration() method.
@@ -161,18 +158,19 @@ public:
      *
      * @param transitCellG1Duration  the new value of mTransitCellG1Duration
      */
-    virtual void SetTransitCellG1Duration(double transitCellG1Duration);
+    void SetTransitCellG1Duration(double transitCellG1Duration);
 
     /**
-     * Overridden OutputCellCycleModelParameters() method.
+     * Outputs cell cycle model parameters to file.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
     virtual void OutputCellCycleModelParameters(out_stream& rParamsFile);
+
 };
 
 #include "SerializationExportWrapper.hpp"
 // Declare identifier for the serializer
-CHASTE_CLASS_EXPORT(ExponentialG1GenerationalCellCycleModel)
+CHASTE_CLASS_EXPORT(FixedSequenceCellCycleModel)
 
-#endif /*EXPONENTIALG1GENERATIONALCELLCYCLEMODEL_HPP_*/
+#endif /*FIXEDSEQUENCECELLCYCLEMODEL_HPP_*/
