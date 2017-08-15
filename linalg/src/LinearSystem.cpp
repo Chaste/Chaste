@@ -52,25 +52,25 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///////////////////////////////////////////////////////////////////////////////////
 
 LinearSystem::LinearSystem(PetscInt lhsVectorSize, unsigned rowPreallocation)
-   :mPrecondMatrix(NULL),
+   :mPrecondMatrix(nullptr),
     mSize(lhsVectorSize),
-    mMatNullSpace(NULL),
+    mMatNullSpace(nullptr),
     mDestroyMatAndVec(true),
     mKspIsSetup(false),
     mNonZerosUsed(0.0),
     mMatrixIsConstant(false),
     mTolerance(1e-6),
     mUseAbsoluteTolerance(false),
-    mDirichletBoundaryConditionsVector(NULL),
-    mpBlockDiagonalPC(NULL),
-    mpLDUFactorisationPC(NULL),
-    mpTwoLevelsBlockDiagonalPC(NULL),
+    mDirichletBoundaryConditionsVector(nullptr),
+    mpBlockDiagonalPC(nullptr),
+    mpLDUFactorisationPC(nullptr),
+    mpTwoLevelsBlockDiagonalPC(nullptr),
     mpBathNodes( boost::shared_ptr<std::vector<PetscInt> >() ),
     mPrecondMatrixIsNotLhs(false),
     mRowPreallocation(rowPreallocation),
     mUseFixedNumberIterations(false),
     mEvaluateNumItsEveryNSolves(UINT_MAX),
-    mpConvergenceTestContext(NULL),
+    mpConvergenceTestContext(nullptr),
     mEigMin(DBL_MAX),
     mEigMax(DBL_MIN),
     mForceSpectrumReevaluation(false)
@@ -107,24 +107,24 @@ LinearSystem::LinearSystem(PetscInt lhsVectorSize, unsigned rowPreallocation)
 }
 
 LinearSystem::LinearSystem(PetscInt lhsVectorSize, Mat lhsMatrix, Vec rhsVector)
-   :mPrecondMatrix(NULL),
+   :mPrecondMatrix(nullptr),
     mSize(lhsVectorSize),
-    mMatNullSpace(NULL),
+    mMatNullSpace(nullptr),
     mDestroyMatAndVec(true),
     mKspIsSetup(false),
     mNonZerosUsed(0.0),
     mMatrixIsConstant(false),
     mTolerance(1e-6),
     mUseAbsoluteTolerance(false),
-    mDirichletBoundaryConditionsVector(NULL),
-    mpBlockDiagonalPC(NULL),
-    mpLDUFactorisationPC(NULL),
-    mpTwoLevelsBlockDiagonalPC(NULL),
+    mDirichletBoundaryConditionsVector(nullptr),
+    mpBlockDiagonalPC(nullptr),
+    mpLDUFactorisationPC(nullptr),
+    mpTwoLevelsBlockDiagonalPC(nullptr),
     mpBathNodes( boost::shared_ptr<std::vector<PetscInt> >() ),
     mPrecondMatrixIsNotLhs(false),
     mUseFixedNumberIterations(false),
     mEvaluateNumItsEveryNSolves(UINT_MAX),
-    mpConvergenceTestContext(NULL),
+    mpConvergenceTestContext(nullptr),
     mEigMin(DBL_MAX),
     mEigMax(DBL_MIN),
     mForceSpectrumReevaluation(false)
@@ -144,23 +144,23 @@ LinearSystem::LinearSystem(PetscInt lhsVectorSize, Mat lhsMatrix, Vec rhsVector)
 }
 
 LinearSystem::LinearSystem(Vec templateVector, unsigned rowPreallocation, bool newAllocationError)
-   :mPrecondMatrix(NULL),
-    mMatNullSpace(NULL),
+   :mPrecondMatrix(nullptr),
+    mMatNullSpace(nullptr),
     mDestroyMatAndVec(true),
     mKspIsSetup(false),
     mMatrixIsConstant(false),
     mTolerance(1e-6),
     mUseAbsoluteTolerance(false),
-    mDirichletBoundaryConditionsVector(NULL),
-    mpBlockDiagonalPC(NULL),
-    mpLDUFactorisationPC(NULL),
-    mpTwoLevelsBlockDiagonalPC(NULL),
+    mDirichletBoundaryConditionsVector(nullptr),
+    mpBlockDiagonalPC(nullptr),
+    mpLDUFactorisationPC(nullptr),
+    mpTwoLevelsBlockDiagonalPC(nullptr),
     mpBathNodes( boost::shared_ptr<std::vector<PetscInt> >() ),
     mPrecondMatrixIsNotLhs(false),
     mRowPreallocation(rowPreallocation),
     mUseFixedNumberIterations(false),
     mEvaluateNumItsEveryNSolves(UINT_MAX),
-    mpConvergenceTestContext(NULL),
+    mpConvergenceTestContext(nullptr),
     mEigMin(DBL_MAX),
     mEigMax(DBL_MIN),
     mForceSpectrumReevaluation(false)
@@ -185,23 +185,23 @@ LinearSystem::LinearSystem(Vec templateVector, unsigned rowPreallocation, bool n
 }
 
 LinearSystem::LinearSystem(Vec residualVector, Mat jacobianMatrix)
-   :mPrecondMatrix(NULL),
-    mMatNullSpace(NULL),
+   :mPrecondMatrix(nullptr),
+    mMatNullSpace(nullptr),
     mDestroyMatAndVec(false),
     mKspIsSetup(false),
     mMatrixIsConstant(false),
     mTolerance(1e-6),
     mUseAbsoluteTolerance(false),
-    mDirichletBoundaryConditionsVector(NULL),
-    mpBlockDiagonalPC(NULL),
-    mpLDUFactorisationPC(NULL),
-    mpTwoLevelsBlockDiagonalPC(NULL),
+    mDirichletBoundaryConditionsVector(nullptr),
+    mpBlockDiagonalPC(nullptr),
+    mpLDUFactorisationPC(nullptr),
+    mpTwoLevelsBlockDiagonalPC(nullptr),
     mpBathNodes( boost::shared_ptr<std::vector<PetscInt> >() ),
     mPrecondMatrixIsNotLhs(false),
     mRowPreallocation(UINT_MAX),
     mUseFixedNumberIterations(false),
     mEvaluateNumItsEveryNSolves(UINT_MAX),
-    mpConvergenceTestContext(NULL),
+    mpConvergenceTestContext(nullptr),
     mEigMin(DBL_MAX),
     mEigMax(DBL_MIN),
     mForceSpectrumReevaluation(false)
@@ -460,7 +460,7 @@ void LinearSystem::RemoveNullSpace()
     if (mMatNullSpace)
     {
         PETSCEXCEPT( MatNullSpaceDestroy(PETSC_DESTROY_PARAM(mMatNullSpace)) );
-        PETSCEXCEPT( MatNullSpaceCreate(PETSC_COMM_WORLD, PETSC_FALSE, 0, NULL, &mMatNullSpace) );
+        PETSCEXCEPT( MatNullSpaceCreate(PETSC_COMM_WORLD, PETSC_FALSE, 0, nullptr, &mMatNullSpace) );
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 3) //PETSc 3.3 or later
         // Setting null space in the KSP was deprecated in PETSc 3.6, but setting the null space
         // for the matrix appeared in PETSc 3.3 so 3.3, 3.4, 3.5 can do either
@@ -623,11 +623,11 @@ void LinearSystem::SetPcType(const char* pcType, boost::shared_ptr<std::vector<P
             // If the previous preconditioner was purpose-built we need to free the appropriate pointer.
             /// \todo: #1082 use a single pointer to abstract class
             delete mpBlockDiagonalPC;
-            mpBlockDiagonalPC = NULL;
+            mpBlockDiagonalPC = nullptr;
             delete mpLDUFactorisationPC;
-            mpLDUFactorisationPC = NULL;
+            mpLDUFactorisationPC = nullptr;
             delete mpTwoLevelsBlockDiagonalPC;
-            mpTwoLevelsBlockDiagonalPC = NULL;
+            mpTwoLevelsBlockDiagonalPC = nullptr;
 
             mpBlockDiagonalPC = new PCBlockDiagonal(mKspSolver);
         }
@@ -636,11 +636,11 @@ void LinearSystem::SetPcType(const char* pcType, boost::shared_ptr<std::vector<P
             // If the previous preconditioner was purpose-built we need to free the appropriate pointer.
             /// \todo: #1082 use a single pointer to abstract class
             delete mpBlockDiagonalPC;
-            mpBlockDiagonalPC = NULL;
+            mpBlockDiagonalPC = nullptr;
             delete mpLDUFactorisationPC;
-            mpLDUFactorisationPC = NULL;
+            mpLDUFactorisationPC = nullptr;
             delete mpTwoLevelsBlockDiagonalPC;
-            mpTwoLevelsBlockDiagonalPC = NULL;
+            mpTwoLevelsBlockDiagonalPC = nullptr;
 
             mpLDUFactorisationPC = new PCLDUFactorisation(mKspSolver);
         }
@@ -649,11 +649,11 @@ void LinearSystem::SetPcType(const char* pcType, boost::shared_ptr<std::vector<P
             // If the previous preconditioner was purpose-built we need to free the appropriate pointer.
             /// \todo: #1082 use a single pointer to abstract class
             delete mpBlockDiagonalPC;
-            mpBlockDiagonalPC = NULL;
+            mpBlockDiagonalPC = nullptr;
             delete mpLDUFactorisationPC;
-            mpLDUFactorisationPC = NULL;
+            mpLDUFactorisationPC = nullptr;
             delete mpTwoLevelsBlockDiagonalPC;
-            mpTwoLevelsBlockDiagonalPC = NULL;
+            mpTwoLevelsBlockDiagonalPC = nullptr;
 
             if (!mpBathNodes)
             {
@@ -686,7 +686,7 @@ Vec LinearSystem::Solve(Vec lhsGuess)
     if (!mKspIsSetup)
     {
         // Create PETSc Vec that may be required if we use a Chebyshev solver
-        Vec chebyshev_lhs_vector = NULL;
+        Vec chebyshev_lhs_vector = nullptr;
 
         HeartEventHandler::BeginEvent(HeartEventHandler::COMMUNICATION);
         mNonZerosUsed=mat_info.nz_used;

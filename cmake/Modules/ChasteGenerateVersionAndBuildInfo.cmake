@@ -46,14 +46,51 @@ endif()
 
 set(time_size 80)
 set(time_format "%a, %d %b %Y %H:%M:%S +0000")
-set(project_versions ";")
-#TODO: update project versions
+
+# Determine project versions (either the git hash or svn revision number), and whether there are uncommited revisions
 foreach(project ${Chaste_PROJECTS})
-    set(project_versions "${project_versions} versions[\"${project}\"] = 1.0;\n")
+    # Project is a git repo
+    if (IS_DIRECTORY "${Chaste_SOURCE_DIR}/projects/${project}/.git")
+        # Determine the git hash as a string
+        execute_process(
+                COMMAND git -C ${Chaste_SOURCE_DIR}/projects/${project} rev-parse --short HEAD
+                OUTPUT_VARIABLE this_project_version
+        )
+        # Determine whether there are uncommitted revisions
+        execute_process(
+                COMMAND git -C ${Chaste_SOURCE_DIR}/projects/${project} diff-index HEAD --
+                OUTPUT_VARIABLE diff_index_result
+        )
+        if (diff_index_result STREQUAL "")
+            set(this_project_modified "False")
+        else()
+            set(this_project_modified "True")
+        endif()
+    # Project is an svn repo
+    elseif(IS_DIRECTORY "${Chaste_SOURCE_DIR}/projects/${project}/.svn")
+        # Determine the svn revision number as a string
+        execute_process(
+                COMMAND svnversion ${Chaste_SOURCE_DIR}/projects/${project}
+                OUTPUT_VARIABLE this_project_version
+        )
+        # Determine whether there are uncommitted revisions
+        if (${this_project_version} MATCHES "M")
+            set(this_project_modified "True")
+        else()
+            set(this_project_modified "False")
+        endif()
+    # If it's not git or svn, we pass out some default values to indicate unknown version
+    else()
+        set(this_project_version "Unknown")
+        set(this_project_modified "False")
+    endif()
+
+    # Strip trailing whitespace from project version
+    string(STRIP ${this_project_version} this_project_version)
+
+    set(project_versions "${project_versions} versions[\"${project}\"] = \"${this_project_version}\";\n")
+    set(projects_modified "${projects_modified} modified[\"${project}\"] = \"${this_project_modified}\";\n")
 endforeach()
-
-list(APPEND Chaste_PROJECTS "${potential_dir}")
-
 
 find_package(PythonInterp QUIET)
 execute_process(COMMAND "${PYTHON_EXECUTABLE}" "-c" "from CheckForCopyrights import current_notice; print current_notice"

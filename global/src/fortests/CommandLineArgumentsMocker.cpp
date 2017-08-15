@@ -56,7 +56,7 @@ CommandLineArgumentsMocker::CommandLineArgumentsMocker(std::string newArguments)
     mpArgs = new char* [mNumArgs+1];
 
     mpArgs[0] = (*mpOldArgs)[0]; // Program name
-    mpArgs[mNumArgs] = NULL;
+    mpArgs[mNumArgs] = nullptr;
 
     for (unsigned i=0; i<strings.size(); i++)
     {

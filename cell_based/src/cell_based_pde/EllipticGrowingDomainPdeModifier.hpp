@@ -93,7 +93,7 @@ public:
     EllipticGrowingDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde=boost::shared_ptr<AbstractLinearPde<DIM,DIM> >(),
                                      boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition=boost::shared_ptr<AbstractBoundaryCondition<DIM> >(),
                                      bool isNeumannBoundaryCondition=true,
-                                     Vec solution=NULL);
+                                     Vec solution=nullptr);
 
     /**
      * Destructor.
@@ -124,7 +124,7 @@ public:
      *
      * @return the full boundary conditions container
      */
-    virtual std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ConstructBoundaryConditionsContainer();
+    virtual std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ConstructBoundaryConditionsContainer();
 
     /**
      * Overridden OutputSimulationModifierParameters() method.
@@ -157,7 +157,7 @@ template<class Archive, unsigned DIM>
 inline void load_construct_data(
     Archive & ar, EllipticGrowingDomainPdeModifier<DIM> * t, const unsigned int file_version)
 {
-    Vec solution = NULL;
+    Vec solution = nullptr;
 
     std::string archive_filename = ArchiveLocationInfo::GetArchiveDirectory() + "solution.vec";
     FileFinder file_finder(archive_filename, RelativeTo::Absolute);

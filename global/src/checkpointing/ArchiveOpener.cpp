@@ -57,10 +57,10 @@ ArchiveOpener<boost::archive::text_iarchive, std::ifstream>::ArchiveOpener(
         const FileFinder& rDirectory,
         const std::string& rFileNameBase,
         unsigned procId)
-    : mpCommonStream(NULL),
-      mpPrivateStream(NULL),
-      mpCommonArchive(NULL),
-      mpPrivateArchive(NULL)
+    : mpCommonStream(nullptr),
+      mpPrivateStream(nullptr),
+      mpCommonArchive(nullptr),
+      mpPrivateArchive(nullptr)
 {
     // Figure out where things live
     ArchiveLocationInfo::SetArchiveDirectory(rDirectory);
@@ -112,7 +112,7 @@ ArchiveOpener<boost::archive::text_iarchive, std::ifstream>::ArchiveOpener(
 template<>
 ArchiveOpener<boost::archive::text_iarchive, std::ifstream>::~ArchiveOpener()
 {
-    ProcessSpecificArchive<boost::archive::text_iarchive>::Set(NULL);
+    ProcessSpecificArchive<boost::archive::text_iarchive>::Set(nullptr);
     delete mpPrivateArchive;
     delete mpPrivateStream;
     delete mpCommonArchive;
@@ -130,10 +130,10 @@ ArchiveOpener<boost::archive::text_oarchive, std::ofstream>::ArchiveOpener(
         const FileFinder& rDirectory,
         const std::string& rFileNameBase,
         unsigned procId)
-    : mpCommonStream(NULL),
-      mpPrivateStream(NULL),
-      mpCommonArchive(NULL),
-      mpPrivateArchive(NULL)
+    : mpCommonStream(nullptr),
+      mpPrivateStream(nullptr),
+      mpCommonArchive(nullptr),
+      mpPrivateArchive(nullptr)
 {
     // Check for user error
     if (procId != PetscTools::GetMyRank())
@@ -196,7 +196,7 @@ ArchiveOpener<boost::archive::text_oarchive, std::ofstream>::ArchiveOpener(
 template<>
 ArchiveOpener<boost::archive::text_oarchive, std::ofstream>::~ArchiveOpener()
 {
-    ProcessSpecificArchive<boost::archive::text_oarchive>::Set(NULL);
+    ProcessSpecificArchive<boost::archive::text_oarchive>::Set(nullptr);
     delete mpPrivateArchive;
     delete mpPrivateStream;
     delete mpCommonArchive;

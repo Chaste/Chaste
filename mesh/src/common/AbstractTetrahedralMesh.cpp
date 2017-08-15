@@ -201,7 +201,7 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CheckOutwardNormals()
             boundary_element_node_indices.insert( (*face_iter)->GetNodeGlobalIndex(i) );
         }
 
-        Node<SPACE_DIM>* p_opposite_node = NULL;
+        Node<SPACE_DIM>* p_opposite_node = nullptr;
         Node<SPACE_DIM>* p_representative_node = (*face_iter)->GetNode(0);
           for (typename Node<SPACE_DIM>::ContainingElementIterator element_iter = p_representative_node->ContainingElementsBegin();
              element_iter != p_representative_node->ContainingElementsEnd();
@@ -227,7 +227,7 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CheckOutwardNormals()
                 break;
             }
         }
-        assert(p_opposite_node != NULL);
+        assert(p_opposite_node != nullptr);
 
         // Vector from centroid of face to opposite node
         c_vector<double, SPACE_DIM> into_mesh = p_opposite_node->rGetLocation() - (*face_iter)->CalculateCentroid();

@@ -255,7 +255,7 @@ void CryptProjectionForce::AddForceContribution(AbstractCellPopulation<2>& rCell
     UpdateNode3dLocationMap(rCellPopulation);
 
     // Throw an exception message if not using a MeshBasedCellPopulation
-    if (dynamic_cast<MeshBasedCellPopulation<2>*>(&rCellPopulation) == NULL)
+    if (dynamic_cast<MeshBasedCellPopulation<2>*>(&rCellPopulation) == nullptr)
     {
         EXCEPTION("CryptProjectionForce is to be used with a subclass of MeshBasedCellPopulation only");
     }

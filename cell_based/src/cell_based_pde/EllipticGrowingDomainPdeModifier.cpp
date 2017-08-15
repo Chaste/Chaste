@@ -80,7 +80,7 @@ void EllipticGrowingDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPo
     }
 
     // Add the BCs to the BCs container
-    std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc = this->ConstructBoundaryConditionsContainer();
+    std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc = this->ConstructBoundaryConditionsContainer();
 
     // Use CellBasedEllipticPdeSolver as cell wise PDE
     CellBasedEllipticPdeSolver<DIM> solver(this->mpFeMesh,
@@ -101,7 +101,7 @@ void EllipticGrowingDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPo
         this->mSolution = solver.Solve();
 
         // On the first go round the vector has yet to be initialised, so we don't destroy it
-        if (old_solution_copy != NULL)
+        if (old_solution_copy != nullptr)
         {
             PetscTools::Destroy(old_solution_copy);
         }
@@ -126,9 +126,9 @@ void EllipticGrowingDomainPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<DI
 }
 
 template<unsigned DIM>
-std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > EllipticGrowingDomainPdeModifier<DIM>::ConstructBoundaryConditionsContainer()
+std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > EllipticGrowingDomainPdeModifier<DIM>::ConstructBoundaryConditionsContainer()
 {
-    std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc(new BoundaryConditionsContainer<DIM,DIM,1>(false));
+    std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc(new BoundaryConditionsContainer<DIM,DIM,1>(false));
 
     // To be well-defined, elliptic PDE problems on growing domains require Dirichlet boundary conditions
     assert(!(this->IsNeumannBoundaryCondition()));

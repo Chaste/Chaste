@@ -272,7 +272,7 @@ std::vector<unsigned> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCellCyc
      */
     if (GetNumAllCells() > 0u)
     {
-        if (dynamic_cast<AbstractPhaseBasedCellCycleModel*>((*(this->Begin()))->GetCellCycleModel()) == NULL)
+        if (dynamic_cast<AbstractPhaseBasedCellCycleModel*>((*(this->Begin()))->GetCellCycleModel()) == nullptr)
         {
             EXCEPTION("You are trying to record the cell cycle phase of cells with a non phase based cell cycle model.");
         }

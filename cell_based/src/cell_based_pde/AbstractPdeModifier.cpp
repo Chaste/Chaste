@@ -48,7 +48,7 @@ AbstractPdeModifier<DIM>::AbstractPdeModifier(boost::shared_ptr<AbstractLinearPd
       mpPde(pPde),
       mpBoundaryCondition(pBoundaryCondition),
       mIsNeumannBoundaryCondition(isNeumannBoundaryCondition),
-      mSolution(NULL),
+      mSolution(nullptr),
       mOutputDirectory(""),
       mOutputGradient(false),
       mOutputSolutionAtPdeNodes(false),
@@ -63,7 +63,7 @@ AbstractPdeModifier<DIM>::AbstractPdeModifier(boost::shared_ptr<AbstractLinearPd
 template<unsigned DIM>
 AbstractPdeModifier<DIM>::~AbstractPdeModifier()
 {
-    if (mDeleteFeMesh and mpFeMesh!=NULL)
+    if (mDeleteFeMesh and mpFeMesh!=nullptr)
     {
         delete mpFeMesh;
     }
@@ -106,19 +106,19 @@ std::string& AbstractPdeModifier<DIM>::rGetDependentVariableName()
 template<unsigned DIM>
 bool AbstractPdeModifier<DIM>::HasAveragedSourcePde()
 {
-    return ((boost::dynamic_pointer_cast<AveragedSourceEllipticPde<DIM> >(mpPde) != NULL) ||
-            (boost::dynamic_pointer_cast<AveragedSourceParabolicPde<DIM> >(mpPde) != NULL));
+    return ((boost::dynamic_pointer_cast<AveragedSourceEllipticPde<DIM> >(mpPde) != nullptr) ||
+            (boost::dynamic_pointer_cast<AveragedSourceParabolicPde<DIM> >(mpPde) != nullptr));
 }
 
 template<unsigned DIM>
 void AbstractPdeModifier<DIM>::SetUpSourceTermsForAveragedSourcePde(TetrahedralMesh<DIM,DIM>* pMesh, std::map<CellPtr, unsigned>* pCellPdeElementMap)
 {
     assert(HasAveragedSourcePde());
-    if (boost::dynamic_pointer_cast<AveragedSourceEllipticPde<DIM> >(mpPde) != NULL)
+    if (boost::dynamic_pointer_cast<AveragedSourceEllipticPde<DIM> >(mpPde) != nullptr)
     {
         boost::static_pointer_cast<AveragedSourceEllipticPde<DIM> >(mpPde)->SetupSourceTerms(*pMesh, pCellPdeElementMap);
     }
-    else if (boost::dynamic_pointer_cast<AveragedSourceParabolicPde<DIM> >(mpPde) != NULL)
+    else if (boost::dynamic_pointer_cast<AveragedSourceParabolicPde<DIM> >(mpPde) != nullptr)
     {
         boost::static_pointer_cast<AveragedSourceParabolicPde<DIM> >(mpPde)->SetupSourceTerms(*pMesh, pCellPdeElementMap);
     }
@@ -167,7 +167,7 @@ void AbstractPdeModifier<DIM>::UpdateAtEndOfOutputTimeStep(AbstractCellPopulatio
         {
             (*mpVizPdeSolutionResultsFile) << SimulationTime::Instance()->GetTime() << "\t";
 
-            assert(mpFeMesh != NULL);
+            assert(mpFeMesh != nullptr);
             assert(mDependentVariableName != "");
 
             for (unsigned i=0; i<mpFeMesh->GetNumNodes(); i++)
@@ -179,7 +179,7 @@ void AbstractPdeModifier<DIM>::UpdateAtEndOfOutputTimeStep(AbstractCellPopulatio
                     (*mpVizPdeSolutionResultsFile) << r_location[k] << " ";
                 }
 
-                assert(mSolution != NULL);
+                assert(mSolution != nullptr);
                 ReplicatableVector solution_repl(mSolution);
                 (*mpVizPdeSolutionResultsFile) << solution_repl[i] << " ";
             }

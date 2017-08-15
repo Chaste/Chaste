@@ -99,7 +99,7 @@ void AbstractBoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::Del
             }
 
             delete(mpDirichletMap[i]);
-            mpDirichletMap[i] = NULL;
+            mpDirichletMap[i] = nullptr;
         }
     }
 

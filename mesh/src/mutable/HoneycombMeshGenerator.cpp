@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteSyscalls.hpp"
 
 HoneycombMeshGenerator::HoneycombMeshGenerator(unsigned numNodesAlongWidth, unsigned numNodesAlongLength, unsigned ghosts, double scaleFactor)
-  : mpMesh(NULL),
+  : mpMesh(nullptr),
     mMeshFilename("mesh"),
     mDomainWidth(numNodesAlongWidth*scaleFactor),
     mNumCellWidth(numNodesAlongWidth), //*1 because cells are considered to be size one
