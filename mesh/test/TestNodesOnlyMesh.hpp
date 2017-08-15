@@ -72,25 +72,12 @@ public:
         NodesOnlyMesh<3> mesh;
         mesh.ConstructNodesWithoutMesh(nodes, 1.5);
 
-        // Check that node 0 has the correct attribute
-        TS_ASSERT_EQUALS(mesh.GetNode(0)->HasNodeAttributes(), true);
-        TS_ASSERT_EQUALS(mesh.GetNode(0)->rGetNodeAttributes().size(), 1u);
-        TS_ASSERT_DELTA(mesh.GetNode(0)->rGetNodeAttributes()[0], 9.81, 1e-4);
-
-        /*
-         * Check that other nodes do not have attributes.
-         *
-         * Note: since the radius of each node is set to 0.5 in
-         * NodesOnlyMesh::ConstructNodesWithoutMesh(), this means
-         * that every node in a NodeBasedCellPopulaton has called
-         * ConstructNodeAttributes(); however, rGetNodeAttributes()
-         * will return an empty vector unless any attributes have
-         * been set by the user.
-         */
-        for (unsigned i=1; i<7; i++)
+        if (PetscTools::IsSequential())
         {
-            TS_ASSERT_EQUALS(mesh.GetNode(i)->HasNodeAttributes(), true);
-            TS_ASSERT_EQUALS(mesh.GetNode(i)->rGetNodeAttributes().size(), 0u);
+            // Check that node 0 has the correct attribute
+            TS_ASSERT_EQUALS(mesh.GetNode(0)->HasNodeAttributes(), true);
+            TS_ASSERT_EQUALS(mesh.GetNode(0)->rGetNodeAttributes().size(), 1u);
+            TS_ASSERT_DELTA(mesh.GetNode(0)->rGetNodeAttributes()[0], 9.81, 1e-4);
         }
 
         unsigned num_nodes = PetscTools::AmMaster() ? 8 : 0;    // All nodes will lie on the master process.
@@ -106,6 +93,25 @@ public:
             {
                 TS_ASSERT(!(mesh.mNodesMapping.find(i) == mesh.mNodesMapping.end()));
                 TS_ASSERT_EQUALS(mesh.SolveNodeMapping(i), mesh.mNodesMapping[i]);
+            }
+        }
+
+        if (PetscTools::IsSequential())
+        {
+            /*
+             * Check that other nodes do not have attributes.
+             *
+             * Note: since the radius of each node is set to 0.5 in
+             * NodesOnlyMesh::ConstructNodesWithoutMesh(), this means
+             * that every node in a NodeBasedCellPopulaton has called
+             * ConstructNodeAttributes(); however, rGetNodeAttributes()
+             * will return an empty vector unless any attributes have
+             * been set by the user.
+             */
+            for (unsigned i=1; i<7; i++)
+            {
+                TS_ASSERT_EQUALS(mesh.GetNode(i)->HasNodeAttributes(), true);
+                TS_ASSERT_EQUALS(mesh.GetNode(i)->rGetNodeAttributes().size(), 0u);
             }
         }
 
