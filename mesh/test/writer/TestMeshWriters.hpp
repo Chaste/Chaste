@@ -968,10 +968,10 @@ public:
 
             for (unsigned i=0; i<mesh.GetNumNodes(); i++)
             {
-                std::vector<double> orig_attr = mesh.GetNode(i)->rGetNodeAttributes();
-                std::vector<double> ascii_attr = ascii_mesh.GetNode(i)->rGetNodeAttributes();
-                TS_ASSERT_THROWS_THIS(bin_mesh.GetNode(i)->rGetNodeAttributes(), "Node has no attributes associated with it. Construct attributes first");
-                TS_ASSERT_THROWS_THIS(reader_mesh.GetNode(i)->rGetNodeAttributes(), "Node has no attributes associated with it. Construct attributes first");
+                std::vector<double> orig_attr = mesh.GetNode(i)->rGetModifiableNodeAttributesVec();
+                std::vector<double> ascii_attr = ascii_mesh.GetNode(i)->rGetModifiableNodeAttributesVec();
+                TS_ASSERT_THROWS_THIS(bin_mesh.GetNode(i)->rGetModifiableNodeAttributesVec(), "Node has no attributes associated with it. Construct attributes first");
+                TS_ASSERT_THROWS_THIS(reader_mesh.GetNode(i)->rGetModifiableNodeAttributesVec(), "Node has no attributes associated with it. Construct attributes first");
 
                 TS_ASSERT_EQUALS(orig_attr.size(), ascii_attr.size());
                 ///\todo #1949 Binary attributes are not correctly written

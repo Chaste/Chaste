@@ -148,7 +148,7 @@ double AbstractVentilationProblem::CalculateResistance(Element<1,3>& rElement, b
     }
     else
     {
-        radius = ( rElement.GetNode(0)->rGetNodeAttributes()[0] + rElement.GetNode(1)->rGetNodeAttributes()[0]) / 2.0;
+        radius = (rElement.GetNode(0)->rGetModifiableNodeAttributesVec()[0] + rElement.GetNode(1)->rGetModifiableNodeAttributesVec()[0]) / 2.0;
     }
 
     c_vector<double, 3> dummy;

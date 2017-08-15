@@ -212,11 +212,11 @@ public:
         generator.AssignGrowthApices();
         generator.DistributePoints();
 
-        airways_mesh.GetNode(0)->rGetNodeAttributes()[1] = 5u;
+        airways_mesh.GetNode(0)->rGetModifiableNodeAttributesVec()[1] = 5u;
         TS_ASSERT_THROWS_CONTAINS(generator.Generate("TestMultiLobeAirwayGenerator", "composite"),
                                   "The second node attribute in the major airways mesh ");
 
-        airways_mesh.GetNode(0)->rGetNodeAttributes()[1] = 0u;
+        airways_mesh.GetNode(0)->rGetModifiableNodeAttributesVec()[1] = 0u;
 
         generator.Generate("TestMultiLobeAirwayGenerator", "composite");
 
@@ -230,14 +230,14 @@ public:
         TS_ASSERT_EQUALS(composite_mesh.GetNumElements(), composite_mesh.GetNumNodes() - 1);
 
         //Check that nodes have been tagged correctly. (2.0 == major, 1.0 == transitional, 0.0 == generated)
-        TS_ASSERT_DELTA(composite_mesh.GetNode(0)->rGetNodeAttributes()[1], 2.0, 1e-6);
-        TS_ASSERT_DELTA(composite_mesh.GetNode(1)->rGetNodeAttributes()[1], 2.0, 1e-6);
-        TS_ASSERT_DELTA(composite_mesh.GetNode(2)->rGetNodeAttributes()[1], 1.0, 1e-6);
-        TS_ASSERT_DELTA(composite_mesh.GetNode(3)->rGetNodeAttributes()[1], 1.0, 1e-6);
-        TS_ASSERT_DELTA(composite_mesh.GetNode(4)->rGetNodeAttributes()[1], 1.0, 1e-6);
-        TS_ASSERT_DELTA(composite_mesh.GetNode(5)->rGetNodeAttributes()[1], 1.0, 1e-6);
-        TS_ASSERT_DELTA(composite_mesh.GetNode(6)->rGetNodeAttributes()[1], 0.0, 1e-6);
-        TS_ASSERT_DELTA(composite_mesh.GetNode(7)->rGetNodeAttributes()[1], 0.0, 1e-6);
+        TS_ASSERT_DELTA(composite_mesh.GetNode(0)->rGetModifiableNodeAttributesVec()[1], 2.0, 1e-6);
+        TS_ASSERT_DELTA(composite_mesh.GetNode(1)->rGetModifiableNodeAttributesVec()[1], 2.0, 1e-6);
+        TS_ASSERT_DELTA(composite_mesh.GetNode(2)->rGetModifiableNodeAttributesVec()[1], 1.0, 1e-6);
+        TS_ASSERT_DELTA(composite_mesh.GetNode(3)->rGetModifiableNodeAttributesVec()[1], 1.0, 1e-6);
+        TS_ASSERT_DELTA(composite_mesh.GetNode(4)->rGetModifiableNodeAttributesVec()[1], 1.0, 1e-6);
+        TS_ASSERT_DELTA(composite_mesh.GetNode(5)->rGetModifiableNodeAttributesVec()[1], 1.0, 1e-6);
+        TS_ASSERT_DELTA(composite_mesh.GetNode(6)->rGetModifiableNodeAttributesVec()[1], 0.0, 1e-6);
+        TS_ASSERT_DELTA(composite_mesh.GetNode(7)->rGetModifiableNodeAttributesVec()[1], 0.0, 1e-6);
 
         ///\todo Check radii etc
 

@@ -595,7 +595,7 @@ public:
         {
             if (mesh.GetDistributedVectorFactory()->IsGlobalIndexLocal(node_index) )
             {
-                TS_ASSERT_EQUALS(mesh.GetNode(node_index)->rGetNodeAttributes().size(), 2u);
+                TS_ASSERT_EQUALS(mesh.GetNode(node_index)->rGetModifiableNodeAttributesVec().size(), 2u);
             }
         }
 
@@ -611,13 +611,13 @@ public:
         }
         if (mesh.GetDistributedVectorFactory()->IsGlobalIndexLocal(probe_node_1) )
         {
-            TS_ASSERT_DELTA(mesh.GetNode(probe_node_1)->rGetNodeAttributes()[0u], 25.2, 1e-6);
-            TS_ASSERT_DELTA(mesh.GetNode(probe_node_1)->rGetNodeAttributes()[1u], 16.3, 1e-6);
+            TS_ASSERT_DELTA(mesh.GetNode(probe_node_1)->rGetModifiableNodeAttributesVec()[0u], 25.2, 1e-6);
+            TS_ASSERT_DELTA(mesh.GetNode(probe_node_1)->rGetModifiableNodeAttributesVec()[1u], 16.3, 1e-6);
         }
         if (mesh.GetDistributedVectorFactory()->IsGlobalIndexLocal(probe_node_2) )
         {
-            TS_ASSERT_DELTA(mesh.GetNode(probe_node_2)->rGetNodeAttributes()[0u], 3.0, 1e-6);
-            TS_ASSERT_DELTA(mesh.GetNode(probe_node_2)->rGetNodeAttributes()[1u], 24.5, 1e-6);
+            TS_ASSERT_DELTA(mesh.GetNode(probe_node_2)->rGetModifiableNodeAttributesVec()[0u], 3.0, 1e-6);
+            TS_ASSERT_DELTA(mesh.GetNode(probe_node_2)->rGetModifiableNodeAttributesVec()[1u], 24.5, 1e-6);
         }
     }
 

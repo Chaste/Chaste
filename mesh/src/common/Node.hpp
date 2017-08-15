@@ -325,9 +325,18 @@ public:
     std::set<unsigned>& rGetContainingElementIndices();
 
     /**
-     * @return a vector containing the node attributes. An exception is thrown if the node has no attributes.
+     * @return reference to a modifiable vector containing the node attributes. An exception is thrown if the node
+     * has no attributes.
      */
-    std::vector<double>& rGetNodeAttributes();
+    std::vector<double>& rGetModifiableNodeAttributesVec();
+
+//    /**
+//     * @return the node's location as a c_vector.
+//     *
+//     * The returned location may not be modified; if you want that functionality use
+//     * rGetModifiableLocation instead.
+//     */
+//    const std::vector<double>& rGetNodeAttributesVec() const;
 
     /**
      * @return the number of node attributes associated with this node.

@@ -95,7 +95,7 @@ public: // Tests should be public!
              node_iter != mesh.GetNodeIteratorEnd();
              ++node_iter)
         {
-            node_iter->rGetNodeAttributes()[0] *= 0.7;
+            node_iter->rGetModifiableNodeAttributesVec()[0] *= 0.7;
         }
 
         /* Setup a !SimpleImpedanceProblem and tell it that the given mesh is defined in millimetres

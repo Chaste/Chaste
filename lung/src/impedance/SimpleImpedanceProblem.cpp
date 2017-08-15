@@ -151,7 +151,8 @@ std::complex<double> SimpleImpedanceProblem::CalculateElementImpedance(Element<1
     }
 
 
-    double radius = (pElement->GetNode(0)->rGetNodeAttributes()[0] + pElement->GetNode(1)->rGetNodeAttributes()[0])/2.0; //Use average radius
+    double radius = (pElement->GetNode(0)->rGetModifiableNodeAttributesVec()[0] +
+            pElement->GetNode(1)->rGetModifiableNodeAttributesVec()[0])/2.0; //Use average radius
     radius *= mLengthScaling;
 
     //For a 1D in 3D mesh, the element determinant == the element length

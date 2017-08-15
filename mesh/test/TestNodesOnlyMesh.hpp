@@ -76,8 +76,8 @@ public:
         {
             // Check that node 0 has the correct attribute
             TS_ASSERT_EQUALS(mesh.GetNode(0)->HasNodeAttributes(), true);
-            TS_ASSERT_EQUALS(mesh.GetNode(0)->rGetNodeAttributes().size(), 1u);
-            TS_ASSERT_DELTA(mesh.GetNode(0)->rGetNodeAttributes()[0], 9.81, 1e-4);
+            TS_ASSERT_EQUALS(mesh.GetNode(0)->rGetModifiableNodeAttributesVec().size(), 1u);
+            TS_ASSERT_DELTA(mesh.GetNode(0)->rGetModifiableNodeAttributesVec()[0], 9.81, 1e-4);
         }
 
         unsigned num_nodes = PetscTools::AmMaster() ? 8 : 0;    // All nodes will lie on the master process.
@@ -104,14 +104,14 @@ public:
              * Note: since the radius of each node is set to 0.5 in
              * NodesOnlyMesh::ConstructNodesWithoutMesh(), this means
              * that every node in a NodeBasedCellPopulaton has called
-             * ConstructNodeAttributes(); however, rGetNodeAttributes()
+             * ConstructNodeAttributes(); however, rGetModifiableNodeAttributesVec()
              * will return an empty vector unless any attributes have
              * been set by the user.
              */
             for (unsigned i=1; i<7; i++)
             {
                 TS_ASSERT_EQUALS(mesh.GetNode(i)->HasNodeAttributes(), true);
-                TS_ASSERT_EQUALS(mesh.GetNode(i)->rGetNodeAttributes().size(), 0u);
+                TS_ASSERT_EQUALS(mesh.GetNode(i)->rGetModifiableNodeAttributesVec().size(), 0u);
             }
         }
 

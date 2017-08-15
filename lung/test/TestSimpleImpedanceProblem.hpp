@@ -105,9 +105,10 @@ public:
 
         problem.Solve();
 
-        double small_r = (mesh.GetNode(2u)->rGetNodeAttributes()[0] + mesh.GetNode(1u)->rGetNodeAttributes()[0])/2.0;
+        double small_r = (mesh.GetNode(2u)->rGetModifiableNodeAttributesVec()[0] +
+                mesh.GetNode(1u)->rGetModifiableNodeAttributesVec()[0])/2.0;
         double small_l = sqrt(2.0);
-        double big_r = (mesh.GetNode(1u)->rGetNodeAttributes()[0] + mesh.GetNode(0u)->rGetNodeAttributes()[0])/2.0;
+        double big_r = (mesh.GetNode(1u)->rGetModifiableNodeAttributesVec()[0] + mesh.GetNode(0u)->rGetModifiableNodeAttributesVec()[0])/2.0;
         double big_l = 1.0;
 
         double small_Raw = problem.CalculateElementResistance(small_r, small_l);
@@ -169,7 +170,7 @@ public:
              node_iter != mesh.GetNodeIteratorEnd();
              ++node_iter)
         {
-            node_iter->rGetNodeAttributes()[0] *= 0.7;
+            node_iter->rGetModifiableNodeAttributesVec()[0] *= 0.7;
         }
 
         std::vector<double> test_frequencies;

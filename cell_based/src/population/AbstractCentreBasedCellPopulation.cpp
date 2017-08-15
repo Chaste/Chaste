@@ -115,7 +115,7 @@ CellPtr AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddCell(CellP
     // Copy any node attributes from the parent node
     if (this->GetNode(node_index)->HasNodeAttributes())
     {
-        p_new_node->rGetNodeAttributes() = this->GetNode(node_index)->rGetNodeAttributes();
+        p_new_node->rGetModifiableNodeAttributesVec() = this->GetNode(node_index)->rGetModifiableNodeAttributesVec();
     }
 
     unsigned new_node_index = this->AddNode(p_new_node); // use copy constructor so it doesn't matter that new_node goes out of scope

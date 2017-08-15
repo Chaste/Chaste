@@ -60,7 +60,7 @@ public:
         //Assign valid radii
         for (unsigned node_index = 0; node_index < mesh.GetNumNodes(); ++node_index)
         {
-            mesh.GetNode(node_index)->rGetNodeAttributes()[0] = 1.0;
+            mesh.GetNode(node_index)->rGetModifiableNodeAttributesVec()[0] = 1.0;
         }
 
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 6u);
@@ -125,7 +125,7 @@ public:
             //Assign valid radii
             for (unsigned node_index = 0; node_index < mesh.GetNumNodes(); ++node_index)
             {
-                 mesh.GetNode(node_index)->rGetNodeAttributes()[0] = 1.0;
+                mesh.GetNode(node_index)->rGetModifiableNodeAttributesVec()[0] = 1.0;
             }
 
             TS_ASSERT_EQUALS(mesh.GetNumNodes(), 6u);
@@ -160,7 +160,7 @@ public:
             //Assign valid radii
             for (unsigned node_index = 0; node_index < mesh.GetNumNodes(); ++node_index)
             {
-                 mesh.GetNode(node_index)->rGetNodeAttributes()[0] = 1.0;
+                mesh.GetNode(node_index)->rGetModifiableNodeAttributesVec()[0] = 1.0;
             }
 
             TS_ASSERT_EQUALS(mesh.GetNumNodes(), 6u);
@@ -196,7 +196,7 @@ public:
         // Assign valid radii
         for (unsigned node_index = 0; node_index < mesh.GetNumNodes(); ++node_index)
         {
-          mesh.GetNode(node_index)->rGetNodeAttributes()[0] = 1.0;
+            mesh.GetNode(node_index)->rGetModifiableNodeAttributesVec()[0] = 1.0;
         }
 
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 6u);

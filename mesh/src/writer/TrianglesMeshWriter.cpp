@@ -107,7 +107,8 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
         {
 
             ///\todo #1949 Will deadlock on GetNode(global ID) in parallel since this code is run on the master process
-            WriteItem(p_node_file, item_num, this->GetNextNode(), this->mpMesh->GetNode(item_num)->rGetNodeAttributes());
+            WriteItem(p_node_file, item_num, this->GetNextNode(),
+                      this->mpMesh->GetNode(item_num)->rGetModifiableNodeAttributesVec());
         }
         else
         {

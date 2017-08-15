@@ -478,7 +478,7 @@ public:
         problem.Solve();
         std::vector<double> flux, pressure;
         problem.GetSolutionAsFluxesAndPressures(flux, pressure);
-        double top_radius = r_mesh.GetNode(0)->rGetNodeAttributes()[0];
+        double top_radius = r_mesh.GetNode(0)->rGetModifiableNodeAttributesVec()[0];
         TS_ASSERT_DELTA(top_radius, 8.0517, 1e-4); //mm
         top_radius *= 1e-3;
         TS_ASSERT_DELTA(top_radius, 8.0517e-3, 1e-7); //m

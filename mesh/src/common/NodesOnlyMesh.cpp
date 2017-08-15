@@ -87,7 +87,7 @@ void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const std::vector<Node<
             // If the original node has attributes, then copy these
             if (rNodes[i]->HasNodeAttributes())
             {
-                p_node_copy->rGetNodeAttributes() = rNodes[i]->rGetNodeAttributes();
+                p_node_copy->rGetModifiableNodeAttributesVec() = rNodes[i]->rGetModifiableNodeAttributesVec();
             }
 
             this->mNodes.push_back(p_node_copy);
@@ -424,7 +424,7 @@ void NodesOnlyMesh<SPACE_DIM>::AddMovedNode(boost::shared_ptr<Node<SPACE_DIM> > 
 
         for (unsigned i=0; i<pMovedNode->GetNumNodeAttributes(); i++)
         {
-            double attribute = pMovedNode->rGetNodeAttributes()[i];
+            double attribute = pMovedNode->rGetModifiableNodeAttributesVec()[i];
             p_node->AddNodeAttribute(attribute);
         }
     }

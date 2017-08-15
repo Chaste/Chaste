@@ -110,16 +110,16 @@ public:
         TS_ASSERT_DELTA(node6.GetPoint()[2], location[2], 1e-12);
 
         // Test the node attributes
-        TS_ASSERT_THROWS_THIS(node6.rGetNodeAttributes(), "Node has no attributes associated with it. Construct attributes first");
+        TS_ASSERT_THROWS_THIS(node6.rGetModifiableNodeAttributesVec(), "Node has no attributes associated with it. Construct attributes first");
         double attribute = 54.98;
         node6.AddNodeAttribute(attribute);
-        TS_ASSERT_EQUALS(node6.rGetNodeAttributes().size(),1u);
-        TS_ASSERT_DELTA(node6.rGetNodeAttributes()[0],attribute, 1e-12);
+        TS_ASSERT_EQUALS(node6.rGetModifiableNodeAttributesVec().size(),1u);
+        TS_ASSERT_DELTA(node6.rGetModifiableNodeAttributesVec()[0],attribute, 1e-12);
 
         // Add another one
         node6.AddNodeAttribute(attribute*2);
-        TS_ASSERT_EQUALS(node6.rGetNodeAttributes().size(),2u);
-        TS_ASSERT_DELTA(node6.rGetNodeAttributes()[1],attribute*2, 1e-12);
+        TS_ASSERT_EQUALS(node6.rGetModifiableNodeAttributesVec().size(),2u);
+        TS_ASSERT_DELTA(node6.rGetModifiableNodeAttributesVec()[1],attribute*2, 1e-12);
 
         // Test node deletion (from a mesh) methods
         TS_ASSERT_EQUALS(node1.IsDeleted(), false);
@@ -218,7 +218,7 @@ public:
         TS_ASSERT(node.HasNodeAttributes());
 
         // Check defaults are all returned.
-        TS_ASSERT_EQUALS(node.rGetNodeAttributes().size(), 0u);
+        TS_ASSERT_EQUALS(node.rGetModifiableNodeAttributesVec().size(), 0u);
         TS_ASSERT_EQUALS(node.GetRegion(), 0u);
         TS_ASSERT_DELTA(node.GetRadius(), 0.0, 1e-4);
 
@@ -233,8 +233,8 @@ public:
         // Check that we can correctly set each of the attributes.
         node.AddNodeAttribute(1.0);
         TS_ASSERT_EQUALS(node.GetNumNodeAttributes(), 1u);
-        TS_ASSERT_EQUALS(node.rGetNodeAttributes().size(), 1u);
-        TS_ASSERT_DELTA(node.rGetNodeAttributes()[0], 1.0, 1e-4);
+        TS_ASSERT_EQUALS(node.rGetModifiableNodeAttributesVec().size(), 1u);
+        TS_ASSERT_DELTA(node.rGetModifiableNodeAttributesVec()[0], 1.0, 1e-4);
 
         node.SetRegion(1u);
         TS_ASSERT_EQUALS(node.GetRegion(), 1u);
@@ -316,7 +316,7 @@ public:
 
 //
 //
-//            TS_ASSERT_EQUALS(p_node->rGetNodeAttributes()[0], 5.0);
+//            TS_ASSERT_EQUALS(p_node->rGetModifiableNodeAttributesVec()[0], 5.0);
 //
             delete p_node;
             delete p_node_1d;

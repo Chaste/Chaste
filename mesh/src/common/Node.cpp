@@ -175,7 +175,7 @@ void Node<SPACE_DIM>::AddNodeAttribute(double attribute)
 }
 
 template<unsigned SPACE_DIM>
-std::vector<double>& Node<SPACE_DIM>::rGetNodeAttributes()
+std::vector<double>& Node<SPACE_DIM>::rGetModifiableNodeAttributesVec()
 {
     CheckForNodeAttributes();
 

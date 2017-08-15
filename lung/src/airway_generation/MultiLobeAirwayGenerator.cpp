@@ -124,8 +124,8 @@ void MultiLobeAirwayGenerator::AssignGrowthApices()
          iter != mAirwaysMesh.GetNodeIteratorEnd();
          ++iter)
     {
-        double radius = iter->rGetNodeAttributes()[0];
-        unsigned is_terminal = iter->rGetNodeAttributes()[1];
+        double radius = iter->rGetModifiableNodeAttributesVec()[0];
+        unsigned is_terminal = iter->rGetModifiableNodeAttributesVec()[1];
 
         if (is_terminal == 1 && iter->GetIndex() != 0) // Airway end point
         {
@@ -134,7 +134,7 @@ void MultiLobeAirwayGenerator::AssignGrowthApices()
 
             c_vector<double, 3> direction = p_branch->GetNodeLocation(0) - p_branch->GetNodeLocation(1);
 
-            if (p_branch->GetNode(1)->rGetNodeAttributes()[1] == 1)
+            if (p_branch->GetNode(1)->rGetModifiableNodeAttributesVec()[1] == 1)
             {
                 direction = -direction;
             }
@@ -296,13 +296,13 @@ void MultiLobeAirwayGenerator::Generate(std::string rOutputDirectory, std::strin
          ++node_iter)
     {
         order.push_back(20.0);
-        radii.push_back(node_iter->rGetNodeAttributes()[0]); ///\todo Magic number, allow the user to specify the attribute index
+        radii.push_back(node_iter->rGetModifiableNodeAttributesVec()[0]); ///\todo Magic number, allow the user to specify the attribute index
 
-        if (node_iter->rGetNodeAttributes()[1] == 0.0)
+        if (node_iter->rGetModifiableNodeAttributesVec()[1] == 0.0)
         {
             start_ids.push_back(2.0);
         }
-        else if (node_iter->rGetNodeAttributes()[1] == 1.0)
+        else if (node_iter->rGetModifiableNodeAttributesVec()[1] == 1.0)
         {
             start_ids.push_back(1.0);
         }

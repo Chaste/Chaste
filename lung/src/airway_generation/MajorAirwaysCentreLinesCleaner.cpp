@@ -101,7 +101,7 @@ void MajorAirwaysCentreLinesCleaner::CleanTerminalsHueristic()
                   ele_iter != eles.end();
                   ++ele_iter)
              {
-                 (*ele_iter)->GetNode(1)->rGetNodeAttributes()[0] = mean_radius;
+                 (*ele_iter)->GetNode(1)->rGetModifiableNodeAttributesVec()[0] = mean_radius;
              }
 
              // If it's too long then shorten it

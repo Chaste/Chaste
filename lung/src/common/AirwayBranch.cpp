@@ -94,7 +94,8 @@ double AirwayBranch::GetAverageRadius()
         }
         else
         {
-            radius += element_length*((*iter)->GetNode(0)->rGetNodeAttributes()[0] + (*iter)->GetNode(1)->rGetNodeAttributes()[0])/2.0;
+            radius += element_length*((*iter)->GetNode(0)->rGetModifiableNodeAttributesVec()[0] +
+                    (*iter)->GetNode(1)->rGetModifiableNodeAttributesVec()[0])/2.0;
         }
     }
 
@@ -121,7 +122,8 @@ double AirwayBranch::GetPoiseuilleResistance()
         }
         else
         {
-            radius = ((*iter)->GetNode(0)->rGetNodeAttributes()[0] + (*iter)->GetNode(1)->rGetNodeAttributes()[0])/2.0;
+            radius = ((*iter)->GetNode(0)->rGetModifiableNodeAttributesVec()[0] +
+                    (*iter)->GetNode(1)->rGetModifiableNodeAttributesVec()[0])/2.0;
         }
 
         resistance += element_length/SmallPow(radius, 4);
@@ -371,8 +373,8 @@ double AirwayBranch::GetBranchVolume()
     {
         Element<1,3>* current_elem = *iter;
 
-        double r1 = current_elem->GetNode(0)->rGetNodeAttributes()[0];
-        double r2 = current_elem->GetNode(1)->rGetNodeAttributes()[0];
+        double r1 = current_elem->GetNode(0)->rGetModifiableNodeAttributesVec()[0];
+        double r2 = current_elem->GetNode(1)->rGetModifiableNodeAttributesVec()[0];
 
         double elem_length = norm_2(current_elem->GetNodeLocation(0) - current_elem->GetNodeLocation(1));
 
@@ -395,8 +397,8 @@ double AirwayBranch::GetBranchLateralSurfaceArea()
     {
         Element<1,3>* current_elem = *iter;
 
-        double r1 = current_elem->GetNode(0)->rGetNodeAttributes()[0];
-        double r2 = current_elem->GetNode(1)->rGetNodeAttributes()[0];
+        double r1 = current_elem->GetNode(0)->rGetModifiableNodeAttributesVec()[0];
+        double r2 = current_elem->GetNode(1)->rGetModifiableNodeAttributesVec()[0];
 
         double elem_length = norm_2(current_elem->GetNodeLocation(0) - current_elem->GetNodeLocation(1));
 
@@ -420,8 +422,8 @@ c_vector<double, 3> AirwayBranch::GetBranchCentroid()
     {
         Element<1,3>* current_elem = *iter;
 
-        double r1 = current_elem->GetNode(0)->rGetNodeAttributes()[0];
-        double r2 = current_elem->GetNode(1)->rGetNodeAttributes()[0];
+        double r1 = current_elem->GetNode(0)->rGetModifiableNodeAttributesVec()[0];
+        double r2 = current_elem->GetNode(1)->rGetModifiableNodeAttributesVec()[0];
 
         c_vector<double, 3> along_element = current_elem->GetNodeLocation(1) - current_elem->GetNodeLocation(0);
         double elem_length = norm_2(along_element);

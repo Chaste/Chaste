@@ -257,17 +257,17 @@ public:
         // Check all nodes have 2 attributes
         for (unsigned node_index = 0; node_index < mesh.GetNumNodes(); node_index++)
         {
-            TS_ASSERT_EQUALS(mesh.GetNode(node_index)->rGetNodeAttributes().size(), 2u);
+            TS_ASSERT_EQUALS(mesh.GetNode(node_index)->rGetModifiableNodeAttributesVec().size(), 2u);
         }
         TS_ASSERT_EQUALS(mesh.GetNumNodeAttributes(), 2u);
         // Check some values
         unsigned probe_node_1 = 0u;
         unsigned probe_node_2 = 8u;
 
-        TS_ASSERT_DELTA(mesh.GetNode(probe_node_1)->rGetNodeAttributes()[0u], 25.2, 1e-6);
-        TS_ASSERT_DELTA(mesh.GetNode(probe_node_1)->rGetNodeAttributes()[1u], 16.3, 1e-6);
-        TS_ASSERT_DELTA(mesh.GetNode(probe_node_2)->rGetNodeAttributes()[0u], 3.0, 1e-6);
-        TS_ASSERT_DELTA(mesh.GetNode(probe_node_2)->rGetNodeAttributes()[1u], 24.5, 1e-6);
+        TS_ASSERT_DELTA(mesh.GetNode(probe_node_1)->rGetModifiableNodeAttributesVec()[0u], 25.2, 1e-6);
+        TS_ASSERT_DELTA(mesh.GetNode(probe_node_1)->rGetModifiableNodeAttributesVec()[1u], 16.3, 1e-6);
+        TS_ASSERT_DELTA(mesh.GetNode(probe_node_2)->rGetModifiableNodeAttributesVec()[0u], 3.0, 1e-6);
+        TS_ASSERT_DELTA(mesh.GetNode(probe_node_2)->rGetModifiableNodeAttributesVec()[1u], 24.5, 1e-6);
     }
 
     void Test3dMeshConstructionFromMeshReader2() throw(Exception)
