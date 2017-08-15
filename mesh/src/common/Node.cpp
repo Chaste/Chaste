@@ -175,7 +175,31 @@ void Node<SPACE_DIM>::AddNodeAttribute(double attribute)
 }
 
 template<unsigned SPACE_DIM>
+NodeAttributes<SPACE_DIM>& Node<SPACE_DIM>::rGetModifiableNodeAttributes()
+{
+    ConstructNodeAttributes();
+
+    return *mpNodeAttributes;
+}
+
+template<unsigned SPACE_DIM>
+const NodeAttributes<SPACE_DIM>& Node<SPACE_DIM>::rGetNodeAttributes() const
+{
+    CheckForNodeAttributes();
+
+    return *mpNodeAttributes;
+}
+
+template<unsigned SPACE_DIM>
 std::vector<double>& Node<SPACE_DIM>::rGetModifiableNodeAttributesVec()
+{
+    ConstructNodeAttributes();
+
+    return mpNodeAttributes->rGetAttributes();
+}
+
+template<unsigned SPACE_DIM>
+const std::vector<double>& Node<SPACE_DIM>::rGetNodeAttributesVec() const
 {
     CheckForNodeAttributes();
 

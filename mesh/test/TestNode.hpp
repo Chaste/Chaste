@@ -110,7 +110,7 @@ public:
         TS_ASSERT_DELTA(node6.GetPoint()[2], location[2], 1e-12);
 
         // Test the node attributes
-        TS_ASSERT_THROWS_THIS(node6.rGetModifiableNodeAttributesVec(), "Node has no attributes associated with it. Construct attributes first");
+        TS_ASSERT_THROWS_THIS(node6.rGetNodeAttributesVec(), "Node has no attributes associated with it. Construct attributes first");
         double attribute = 54.98;
         node6.AddNodeAttribute(attribute);
         TS_ASSERT_EQUALS(node6.rGetModifiableNodeAttributesVec().size(),1u);

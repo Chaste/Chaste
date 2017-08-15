@@ -325,18 +325,33 @@ public:
     std::set<unsigned>& rGetContainingElementIndices();
 
     /**
-     * @return reference to a modifiable vector containing the node attributes. An exception is thrown if the node
-     * has no attributes.
+     * @return this node's NodeAttributes instance, which is first created if it does not exist.
+     *
+     * If you do not need to modify node attributes, use rGetNodeAttributes() instead.
+     */
+    NodeAttributes<SPACE_DIM>& rGetModifiableNodeAttributes();
+
+    /**
+     * @return this node's NodeAttributes instance, or throw an exception if it does not exist.
+     *
+     * If you want to modify node attributes, use rGetModifiableNodeAttributes() instead.
+     */
+    const NodeAttributes<SPACE_DIM>& rGetNodeAttributes() const;
+
+    /**
+     * @return the vector of node attributes. A NodeAttributes instance is created if one does not exist.
+     *
+     * If you do not need to modify node attributes, use rGetNodeAttributesVec() instead.
      */
     std::vector<double>& rGetModifiableNodeAttributesVec();
 
-//    /**
-//     * @return the node's location as a c_vector.
-//     *
-//     * The returned location may not be modified; if you want that functionality use
-//     * rGetModifiableLocation instead.
-//     */
-//    const std::vector<double>& rGetNodeAttributesVec() const;
+    /**
+     * @return the vector of node attributes. An exception is thrown if the node has no attributes.
+     *
+     * The returned vector may not be modified; if you want that functionality use
+     * rGetModifiableNodeAttributesVec() instead.
+     */
+    const std::vector<double>& rGetNodeAttributesVec() const;
 
     /**
      * @return the number of node attributes associated with this node.
