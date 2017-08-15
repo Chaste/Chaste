@@ -46,21 +46,9 @@ AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>::AbstractCellWriter(const std::string
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>::SetOutputScalarData(bool outputScalarData)
-{
-    mOutputScalarData = outputScalarData;
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>::GetOutputScalarData()
 {
     return mOutputScalarData;
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>::SetOutputVectorData(bool outputVectorData)
-{
-    mOutputVectorData = outputVectorData;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

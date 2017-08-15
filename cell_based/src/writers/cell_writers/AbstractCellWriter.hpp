@@ -132,25 +132,11 @@ public:
     virtual void VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)=0;
 
     /**
-     * Set whether to invoke GetCellDataForVtkOutput()
-     *
-     * @param outputScalarData the new value of mOutputScalarData
-     */
-    void SetOutputScalarData(bool outputScalarData);
-
-    /**
      * Get whether to invoke GetCellDataForVtkOutput()
      *
      * @return mOutputScalarData
      */
     bool GetOutputScalarData();
-
-    /**
-     * Set whether to invoke GetVectorCellDataForVtkOutput()
-     *
-     * @param outputVectorData the new value of mOutputVectorData
-     */
-    void SetOutputVectorData(bool outputVectorData);
 
     /**
      * Get whether to invoke GetVectorCellDataForVtkOutput()
