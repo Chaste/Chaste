@@ -96,6 +96,12 @@ private:
     std::vector< unsigned > mCellIdsOfT2Swaps;
 
     /**
+     * Whether to restrict the vertex movement if vertex displacement is larger than
+     * the cell rearrangement threshold.
+     */
+    bool mRestrictVertexMovement;
+
+    /**
      * Overridden WriteVtkResultsToFile() method.
      *
      * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
@@ -120,6 +126,7 @@ private:
         archive & boost::serialization::base_object<AbstractOffLatticeCellPopulation<DIM> >(*this);
         archive & mOutputCellRearrangementLocations;
         archive & mpVertexBasedDivisionRule;
+        archive & mRestrictVertexMovement;
     }
 
     /**
@@ -523,6 +530,20 @@ public:
      * @param pSimulation pointer to a cell-based simulation object
      */
     virtual void SimulationSetupHook(AbstractCellBasedSimulation<DIM, DIM>* pSimulation);
+
+    /**
+     * Get the value of the mRestrictVertexMovement boolean.
+     *
+     * @return True if vertex movement is restricted at each timestep.
+     */
+    bool GetRestrictVertexMovementBoolean();
+
+    /**
+     * Set the value of the mRestrictVertexMovement boolean.
+     *
+     * @param restrictVertexMovement whether to restrict vertex movement in this simulation.
+     */
+    void SetRestrictVertexMovementBoolean(bool restrictVertexMovement);
 };
 
 #include "SerializationExportWrapper.hpp"
