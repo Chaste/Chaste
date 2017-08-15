@@ -102,8 +102,9 @@ protected:
 
     /**
      * Distance for T3 swap checking. At each time step we check for each boundary node whether
-     * it intersects with any boundary elements (cells) whose centroid lies within this distance
-     * to the node.
+     * it intersects with any boundary elements (cells) whose centroids lie within this distance
+     * to the node. Note that T3 swaps may not be resolved correctly if this distance is chosen
+     * too small, while large values for mDistanceForT3SwapChecking may slow down the simulation.
      */
     double mDistanceForT3SwapChecking;
 
@@ -483,8 +484,9 @@ public:
 
     /**
      * Set distance for T3 swap checking. At each time step we check for each boundary node whether
-     * it intersects with any boundary elements (cells) whose centroid lies within this distance
-     * to the node.
+     * it intersects with any boundary elements (cells) whose centroids lie within this distance
+     * to the node. Note that T3 swaps may not be resolved correctly if this distance is chosen
+     * too small, while large values for mDistanceForT3SwapChecking may slow down the simulation.
      *
      * @param distanceForT3SwapChecking
      */
