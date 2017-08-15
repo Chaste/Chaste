@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "AbstractCellWriter.hpp"
 #include "AbstractCellPopulation.hpp"
+#include "UblasVectorInclude.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>::AbstractCellWriter(const std::string& rFileName)
@@ -82,12 +83,7 @@ c_vector<double, SPACE_DIM> AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>::GetVecto
         CellPtr pCell,
         AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
-    c_vector<double, SPACE_DIM> default_vec;
-    for (unsigned dim = 0; dim < SPACE_DIM; ++dim)
-    {
-        default_vec[dim] = DOUBLE_UNSET;
-    }
-    return default_vec;
+    return scalar_vector<double>(SPACE_DIM, DOUBLE_UNSET);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
