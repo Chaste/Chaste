@@ -79,9 +79,9 @@ TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::TrianglesMeshReader(std::string pat
       mReadContainingElementOfBoundaryElement(readContainingElementForBoundaryElements),
       mFilesAreBinary(false),
       mMeshIsHexahedral(false),
-      mNodeFileReadBuffer(NULL),
-      mElementFileReadBuffer(NULL),
-      mFaceFileReadBuffer(NULL),
+      mNodeFileReadBuffer(nullptr),
+      mElementFileReadBuffer(nullptr),
+      mFaceFileReadBuffer(nullptr),
       mNodePermutationDefined(false)
 {
     // Only linear and quadratic elements
@@ -932,7 +932,7 @@ std::string TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetMeshFileBaseName()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetOneDimBoundary()
 {
-    assert(ELEMENT_DIM == 1);	// LCOV_EXCL_LINE
+    assert(ELEMENT_DIM == 1);    // LCOV_EXCL_LINE
     mNumFaceAttributes = 0;
     if (!mOneDimBoundary.empty())
     {

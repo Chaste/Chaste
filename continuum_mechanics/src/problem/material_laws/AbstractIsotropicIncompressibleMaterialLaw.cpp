@@ -50,7 +50,7 @@ void AbstractIsotropicIncompressibleMaterialLaw<DIM>::ComputeStressAndStressDeri
         bool                      computeDTdE)
 {
     assert((DIM==2) || (DIM==3)); // LCOV_EXCL_LINE
-    
+
     static c_matrix<double,DIM,DIM> identity = identity_matrix<double>(DIM);
 
     double I1 = Trace(rC);

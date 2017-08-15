@@ -106,7 +106,7 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellLocationsAndTopology
 
     while (time_advanced_so_far < target_time_step)
     {
-        // Store the initial node positions (these may be needed when applying boundary conditions)    
+        // Store the initial node positions (these may be needed when applying boundary conditions)
         std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> > old_node_locations;
 
         for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = this->mrCellPopulation.rGetMesh().GetNodeIteratorBegin();
@@ -116,7 +116,7 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellLocationsAndTopology
             old_node_locations[&(*node_iter)] = (node_iter)->rGetLocation();
         }
 
-        // Try to update node positions according to the numerical method 
+        // Try to update node positions according to the numerical method
         try
         {
             mpNumericalMethod->UpdateAllNodePositions(present_time_step);
@@ -214,7 +214,7 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::SetupSolve()
     }
 
     // Use a forward Euler method by default, unless a numerical method has been specified already
-    if (mpNumericalMethod == NULL)
+    if (mpNumericalMethod == nullptr)
     {
         mpNumericalMethod = boost::make_shared<ForwardEulerNumericalMethod<ELEMENT_DIM, SPACE_DIM> >();
     }

@@ -63,8 +63,8 @@ AbstractVanLeeuwen2009WntSwatCellCycleModel::AbstractVanLeeuwen2009WntSwatCellCy
 
 void AbstractVanLeeuwen2009WntSwatCellCycleModel::ChangeCellProliferativeTypeDueToCurrentBetaCateninLevel()
 {
-    assert(mpOdeSystem != NULL);
-    assert(mpCell != NULL);
+    assert(mpOdeSystem != nullptr);
+    assert(mpCell != nullptr);
     double beta_catenin_level =   mpOdeSystem->rGetStateVariables()[16]
                                 + mpOdeSystem->rGetStateVariables()[17]
                                 + mpOdeSystem->rGetStateVariables()[18]
@@ -96,8 +96,8 @@ void AbstractVanLeeuwen2009WntSwatCellCycleModel::ChangeCellProliferativeTypeDue
 
 void AbstractVanLeeuwen2009WntSwatCellCycleModel::Initialise()
 {
-    assert(mpOdeSystem == NULL);
-    assert(mpCell != NULL);
+    assert(mpOdeSystem == nullptr);
+    assert(mpCell != nullptr);
 
     double wnt_level = GetWntLevel();
 

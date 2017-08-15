@@ -133,7 +133,7 @@ boost::shared_ptr<CellCycleModelOdeSolver<CELL_CYCLE_MODEL, ODE_SOLVER> > CellCy
 template<class CELL_CYCLE_MODEL, class ODE_SOLVER>
 bool CellCycleModelOdeSolver<CELL_CYCLE_MODEL, ODE_SOLVER>::IsSetUp()
 {
-    return mpOdeSolver;
+    return static_cast<bool>(mpOdeSolver.get());
 }
 
 template<class CELL_CYCLE_MODEL, class ODE_SOLVER>

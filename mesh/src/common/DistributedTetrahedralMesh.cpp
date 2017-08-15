@@ -56,7 +56,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Timer.hpp"
 #include "TetrahedralMesh.hpp"
 #include "Warnings.hpp"
- 
+
 #include "petscao.h"
 #include <parmetis.h>
 #if (PARMETIS_MAJOR_VERSION >= 4) //ParMETIS 4.x and above
@@ -77,7 +77,7 @@ DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::DistributedTetrahedralMesh(D
       mTotalNumElements(0u),
       mTotalNumBoundaryElements(0u),
       mTotalNumNodes(0u),
-      mpSpaceRegion(NULL),
+      mpSpaceRegion(nullptr),
       mPartitioning(partitioningMethod)
 {
     if (ELEMENT_DIM == 1 && (partitioningMethod != DistributedTetrahedralMeshPartitionType::GEOMETRIC))
@@ -530,7 +530,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetHaloNodeIndices(std:
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ChasteCuboid<SPACE_DIM>*  DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetProcessRegion()
 {
-    if (mpSpaceRegion == NULL)
+    if (mpSpaceRegion == nullptr)
     {
         EXCEPTION("Trying to get unset mpSpaceRegion");
     }
@@ -696,7 +696,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ReorderNodes()
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructLinearMesh(unsigned width)
 {
-    assert(ELEMENT_DIM == 1); 	// LCOV_EXCL_LINE
+    assert(ELEMENT_DIM == 1);     // LCOV_EXCL_LINE
 
      //Check that there are enough nodes to make the parallelisation worthwhile
     if (width==0)
@@ -765,7 +765,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructLinearMesh(uns
             //Allow for a halo node
             hi_node++;
         }
-        Node<SPACE_DIM>* p_old_node=NULL;
+        Node<SPACE_DIM>* p_old_node=nullptr;
         for (unsigned node_index=lo_node; node_index<hi_node; node_index++)
         {
             // create node or halo-node
@@ -814,8 +814,8 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructLinearMesh(uns
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRectangularMesh(unsigned width, unsigned height, bool stagger)
 {
-    assert(SPACE_DIM == 2); 	// LCOV_EXCL_LINE
-    assert(ELEMENT_DIM == 2); 	// LCOV_EXCL_LINE
+    assert(SPACE_DIM == 2);     // LCOV_EXCL_LINE
+    assert(ELEMENT_DIM == 2);     // LCOV_EXCL_LINE
     //Check that there are enough nodes to make the parallelisation worthwhile
     if (height==0)
     {
@@ -1019,8 +1019,8 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructCuboid(unsigne
         unsigned height,
         unsigned depth)
 {
-    assert(SPACE_DIM == 3); 	// LCOV_EXCL_LINE
-    assert(ELEMENT_DIM == 3); 	// LCOV_EXCL_LINE
+    assert(SPACE_DIM == 3);     // LCOV_EXCL_LINE
+    assert(ELEMENT_DIM == 3);     // LCOV_EXCL_LINE
     //Check that there are enough nodes to make the parallelisation worthwhile
     if (depth==0)
     {
@@ -1075,7 +1075,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructCuboid(unsigne
             // This return cannot be covered by regular testing, but is covered by the Nightly -np 3 builder
             return;  //LCOV_EXCL_LINE
         }
-        
+
         /* am_top_most is like PetscTools::AmTopMost() but accounts for the fact that a
          * higher numbered process may have dropped out of this construction altogether
          * (because is has no local ownership)
@@ -1433,7 +1433,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
 //                             options, &edgecut, local_partition, &communicator);
 
     Timer::Reset();
-    ParMETIS_V3_PartKway(element_distribution.get(), xadj, adjncy, NULL, NULL, &weight_flag, &numflag,
+    ParMETIS_V3_PartKway(element_distribution.get(), xadj, adjncy, nullptr, nullptr, &weight_flag, &numflag,
                          &n_constraints, &n_subdomains, tpwgts.get(), &ubvec_value,
                          options, &edgecut, local_partition.get(), &communicator);
     //Timer::Print("ParMETIS PartKway");

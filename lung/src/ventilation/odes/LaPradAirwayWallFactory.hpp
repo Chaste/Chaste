@@ -74,7 +74,7 @@ public:
      * @return An airway wall object parameterised for this airway
      */
     virtual LaPradAirwayWall* CreateAirwayWallForElement(Element<1,3>* pElement);
-    
+
     /**
      * @param generation The airway generation number to get the parameter for
      * @return The parameter k1 for the given airway generation
@@ -84,19 +84,19 @@ public:
     /**
      * @param generation The airway generation number to get the parameter for
      * @return The parameter k2 for the given airway generation
-     */    
+     */
     double Getk2ForGeneration(unsigned generation);
 
     /**
      * @param generation The airway generation number to get the parameter for
      * @return The parameter k3 for the given airway generation
-     */    
+     */
     double Getk3ForGeneration(unsigned generation);
 
     /**
      * @param generation The airway generation number to get the parameter for
      * @return The parameter Alpha0 for the given airway generation
-     */    
+     */
     double GetAlpha0ForGeneration(unsigned generation);
 
     /**
@@ -137,13 +137,13 @@ private:
 
     /** The number of generations. Nb generation number starts at 0! */
     static const double mMaxGeneration;
-    
+
     /** k1 values by generation dimensionless  */
     static const double mk1[17];
-    
+
     /** k2 values by generation dimensionless  */
     static const double mk2[17];
-    
+
     /** k3 values by generation dimensionless  */
     static const double mk3[17];
 };

@@ -72,7 +72,7 @@ void AveragedSourceParabolicPde<DIM>::SetupSourceTerms(TetrahedralMesh<DIM,DIM>&
         unsigned elem_index = 0;
         const ChastePoint<DIM>& r_position_of_cell = mrCellPopulation.GetLocationOfCellCentre(*cell_iter);
 
-        if (pCellPdeElementMap != NULL)
+        if (pCellPdeElementMap != nullptr)
         {
             elem_index = (*pCellPdeElementMap)[*cell_iter];
         }

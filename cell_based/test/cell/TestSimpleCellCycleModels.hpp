@@ -63,10 +63,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "StemCellProliferativeType.hpp"
 #include "TransitCellProliferativeType.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
+#include "FixedSequenceCellCycleModel.hpp"
+#include "CellCycleTimesGenerator.hpp"
 #include "CellLabel.hpp"
 #include "SmartPointers.hpp"
 #include "FileComparison.hpp"
 #include "ApoptoticCellProperty.hpp"
+#include "Debug.hpp"
 
 //This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
@@ -102,6 +105,239 @@ public:
             p_simulation_time->IncrementTimeOneStep();
             TS_ASSERT_EQUALS(p_cell->ReadyToDivide(), false);
         }
+    }
+
+    void TestFixedSequenceCellCycleModelMethods() throw(Exception)
+    {
+        CellCycleTimesGenerator* p_cell_cycle_times_generator = CellCycleTimesGenerator::Instance();
+
+        // Set up the required singleton
+        // Make sure we can generate this model
+        TS_ASSERT_THROWS_NOTHING(FixedSequenceCellCycleModel cell_model);
+
+        MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
+
+        // Get a pointer to a cell cycle model of this kind
+        FixedSequenceCellCycleModel* p_stem_model =
+                new FixedSequenceCellCycleModel;
+
+        // Test set and get method for the rate parameter
+        TS_ASSERT_DELTA(p_stem_model->GetRate(), 0.5, 1e-10);
+        TS_ASSERT_DELTA(p_stem_model->GetStemCellG1Duration(), 2.0, 1e-10);
+        TS_ASSERT_DELTA(p_stem_model->GetTransitCellG1Duration(), 2.0, 1e-10);
+
+        p_stem_model->SetRate(10.0);
+        TS_ASSERT_DELTA(p_stem_model->GetRate(), 10.0, 1e-10);
+        TS_ASSERT_DELTA(p_stem_model->GetStemCellG1Duration(), 0.1, 1e-10);
+        TS_ASSERT_DELTA(p_stem_model->GetTransitCellG1Duration(), 0.1, 1e-10);
+
+        p_stem_model->SetRate(0.25);
+        TS_ASSERT_DELTA(p_stem_model->GetRate(), 0.25, 1e-10);
+        TS_ASSERT_DELTA(p_stem_model->GetStemCellG1Duration(), 4.0, 1e-10);
+        TS_ASSERT_DELTA(p_stem_model->GetTransitCellG1Duration(), 4.0, 1e-10);
+
+        p_stem_model->SetRate(0.25);
+        p_cell_cycle_times_generator->SetRandomSeed(0);
+
+        TS_ASSERT_THROWS_THIS(p_cell_cycle_times_generator->GetNextCellCycleTime(),
+                "When using FixedSequenceCellCycleModel one must call CellCycleTimesGenerator::Instance()->GenerateCellCycleTimeSequence()"
+                                " before the start of the simulation.");
+
+        p_cell_cycle_times_generator->GenerateCellCycleTimeSequence();
+
+        TS_ASSERT_THROWS_THIS(p_stem_model->SetTransitCellG1Duration(8.0),
+                "This cell cycle model does not differentiate stem cells and transit cells, please use SetRate() instead");
+
+        TS_ASSERT_THROWS_THIS(p_stem_model->SetStemCellG1Duration(8.0),
+                "This cell cycle model does not differentiate stem cells and transit cells, please use SetRate() instead");
+
+        TS_ASSERT_THROWS_THIS(p_stem_model->SetRate(8.0),
+                "You cannot reset the rate after cell cycle times are created.");
+
+        TS_ASSERT_THROWS_THIS(p_cell_cycle_times_generator->GenerateCellCycleTimeSequence(),
+                "Trying to generate the cell cycle times twice. Need to call CellCycleTimesGenerator::Destroy() first.");
+        // When we set the rate parameter we also reset the TransitCellG1Duration and StemCellG1Duration such that
+        // average cell cycle times are calculated correctly
+        TS_ASSERT_DELTA(p_stem_model->GetStemCellG1Duration(), 4.0, 1e-10);
+        TS_ASSERT_DELTA(p_stem_model->GetTransitCellG1Duration(), 4.0, 1e-10);
+        TS_ASSERT_DELTA(p_stem_model->GetAverageTransitCellCycleTime(), 14.0, 1e-10);
+        TS_ASSERT_DELTA(p_stem_model->GetAverageStemCellCycleTime(), 14.0, 1e-10);
+
+        // Make a stem cell with the model
+        MAKE_PTR(StemCellProliferativeType, p_stem_type);
+        CellPtr p_stem_cell(new Cell(p_healthy_state, p_stem_model));
+        p_stem_cell->SetCellProliferativeType(p_stem_type);
+        p_stem_cell->InitialiseCellCycleModel();
+
+        // Make another cell cycle model of this kind and give it to a transit cell
+        FixedSequenceCellCycleModel* p_transit_model = new FixedSequenceCellCycleModel;
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
+        CellPtr p_transit_cell(new Cell(p_healthy_state, p_transit_model));
+        p_transit_cell->SetCellProliferativeType(p_transit_type);
+
+        // And finally a cell cycle model for a differentiated cell
+        FixedSequenceCellCycleModel* p_diff_model = new FixedSequenceCellCycleModel;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+        CellPtr p_diff_cell(new Cell(p_healthy_state, p_diff_model));
+        p_diff_cell->SetCellProliferativeType(p_diff_type);
+        p_diff_cell->InitialiseCellCycleModel();
+
+        // The random times should be the same across platforms (We won't bother testing the distributions)
+        TS_ASSERT_DELTA(p_stem_model->GetG1Duration(), 3.1834, 1e-4);
+        TS_ASSERT_EQUALS(p_diff_model->GetG1Duration(), DBL_MAX);
+
+        SimulationTime* p_simulation_time = SimulationTime::Instance();
+        p_simulation_time->SetEndTimeAndNumberOfTimeSteps(14.0, 100);
+        for (unsigned i=0; i<100; i++)
+        {
+            p_simulation_time->IncrementTimeOneStep();
+
+            // The actual testing of the cell cycle model
+            // The numbers for the G1 durations below are taken from the first three random numbers generated
+            CheckReadyToDivideAndPhaseIsUpdated(p_stem_model,3.1834);
+            CheckReadyToDivideAndPhaseIsUpdated(p_diff_model, 132);  // any old number
+        }
+
+        // Check that cell division correctly resets the cell cycle phase
+        TS_ASSERT_EQUALS(p_stem_cell->ReadyToDivide(), true);
+        TS_ASSERT_EQUALS(p_stem_model->GetCurrentCellCyclePhase(), G_TWO_PHASE);
+
+        p_stem_model->ResetForDivision();
+        TS_ASSERT_EQUALS(p_stem_model->GetCurrentCellCyclePhase(), M_PHASE);
+
+        FixedSequenceCellCycleModel* p_stem_model2 =
+                        static_cast <FixedSequenceCellCycleModel*> (p_stem_model->CreateCellCycleModel());
+        TS_ASSERT_EQUALS(p_stem_model2->GetCurrentCellCyclePhase(), M_PHASE);
+
+        CellPtr p_stem_cell2(new Cell(p_healthy_state, p_stem_model2));
+        p_stem_cell2->SetCellProliferativeType(p_stem_type);
+        TS_ASSERT_EQUALS(p_stem_model2->GetCurrentCellCyclePhase(), M_PHASE);
+        CellCycleTimesGenerator::Destroy();
+    }
+
+    void TestArchiveFixedSequenceCellCycleModel()
+    {
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() +
+                "FixedSequenceCellCycleModel.arch";
+
+        // We will also test that the random number generator is archived correctly
+        double random_number_test = 0.0;
+        double fixed_sequence_test_number = 0.0;
+
+        {
+            // We must set up SimulationTime to avoid memory leaks
+            SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 4);
+
+            // As usual, we archive via a pointer to the most abstract class possible
+            AbstractCellCycleModel* const p_model = new FixedSequenceCellCycleModel;
+            static_cast<FixedSequenceCellCycleModel*>(p_model)->SetRate(13.42);
+
+            CellCycleTimesGenerator* p_cell_cycle_times_generator = CellCycleTimesGenerator::Instance();
+
+            p_cell_cycle_times_generator->SetRandomSeed(12u);
+            p_cell_cycle_times_generator->GenerateCellCycleTimeSequence();
+
+            p_cell_cycle_times_generator->GetNextCellCycleTime();
+
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            output_arch << p_model;
+
+            fixed_sequence_test_number = p_cell_cycle_times_generator->GetNextCellCycleTime();
+
+            delete p_model;
+            SimulationTime::Destroy();
+
+            random_number_test = RandomNumberGenerator::Instance()->ranf();
+            RandomNumberGenerator::Destroy();
+            CellCycleTimesGenerator::Destroy();
+        }
+
+        {
+            // We must set SimulationTime::mStartTime here to avoid tripping an assertion
+            SimulationTime::Instance()->SetStartTime(0.0);
+
+            AbstractCellCycleModel* p_model2;
+
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            input_arch >> p_model2;
+
+            TS_ASSERT_DELTA(RandomNumberGenerator::Instance()->ranf(), random_number_test, 1e-6);
+            TS_ASSERT_DELTA(CellCycleTimesGenerator::Instance()->GetNextCellCycleTime(), fixed_sequence_test_number, 1e-6);
+
+            // Check private data has been restored correctly
+            TS_ASSERT_DELTA(static_cast<FixedSequenceCellCycleModel*>(p_model2)->GetRate(), 13.42, 1e-12);
+
+            // Avoid memory leaks
+            delete p_model2;
+            CellCycleTimesGenerator::Destroy();
+       }
+    }
+
+    void TestCellCycleTimesGeneratorSingleton()
+    {
+        // how to test this: first, test that it is a singleton, then a test for all methods, then a test for fixed sequence
+        {
+           CellCycleTimesGenerator::Instance();
+           CellCycleTimesGenerator::Instance()->SetRate(298.0);
+        }
+
+        {
+           CellCycleTimesGenerator::Instance();
+           TS_ASSERT_DELTA(CellCycleTimesGenerator::Instance()->GetRate(), 298.0, 1e-7)
+        }
+
+        // well, looks like it's a singleton, why not test the methods next
+
+        CellCycleTimesGenerator::Instance()->SetRate(87.0);
+        TS_ASSERT_DELTA(CellCycleTimesGenerator::Instance()->GetRate(), 87.0, 1e-7);
+
+        CellCycleTimesGenerator::Destroy();
+        TS_ASSERT_DELTA(CellCycleTimesGenerator::Instance()->GetRate(), 1.0/2.0, 1e-7);
+
+        CellCycleTimesGenerator::Instance()->SetRate(45.0);
+        TS_ASSERT_EQUALS(CellCycleTimesGenerator::Instance()->GetRandomSeed(), 0u);
+        CellCycleTimesGenerator::Instance()->SetRandomSeed(78u);
+        TS_ASSERT_EQUALS(CellCycleTimesGenerator::Instance()->GetRandomSeed(), 78u);
+
+        CellCycleTimesGenerator::Instance()->GenerateCellCycleTimeSequence();
+
+        std::vector<double> random_sequence;
+
+        for (unsigned index = 0u; index < 10; index++)
+        {
+            double next_random_number = CellCycleTimesGenerator::Instance()->GetNextCellCycleTime();
+            random_sequence.push_back(next_random_number);
+            if (index >0)
+            {
+                assert( next_random_number != random_sequence[index -1] );
+            }
+        }
+        CellCycleTimesGenerator::Destroy();
+
+        CellCycleTimesGenerator::Instance()->SetRate(45.0);
+        CellCycleTimesGenerator::Instance()->SetRandomSeed(78u);
+
+        RandomNumberGenerator::Instance()->Reseed(12u);
+
+        CellCycleTimesGenerator::Instance()->GenerateCellCycleTimeSequence();
+
+        RandomNumberGenerator::Instance()->Reseed(13u);
+
+        for (unsigned index = 0u; index <10; index++)
+        {
+            unsigned my_seed = 13u*index;
+            RandomNumberGenerator::Instance()->Reseed(my_seed);
+            double my_rate = double(index)*0.5 + 1.0; //make sure we don't accidentally set a rate of 0, gives nasty boost errors.
+            RandomNumberGenerator::Instance()->ExponentialRandomDeviate(my_rate);
+            double next_cell_cycle_time = CellCycleTimesGenerator::Instance()->GetNextCellCycleTime();
+            TS_ASSERT_DELTA(next_cell_cycle_time, random_sequence[index], 1e-7);
+        }
+        CellCycleTimesGenerator::Destroy();
     }
 
     void TestBernoulliTrialCellCycleModel() throw(Exception)
@@ -1651,6 +1887,25 @@ public:
             FileComparison comparer(generated_file,reference_file);
             TS_ASSERT(comparer.CompareFiles());
         }
+
+        // Test with FixedSequenceCellCycleModel
+        FixedSequenceCellCycleModel fixed_sequence_cell_cycle_model;
+        fixed_sequence_cell_cycle_model.SetRate(1.23);
+        TS_ASSERT_EQUALS(fixed_sequence_cell_cycle_model.GetIdentifier(), "FixedSequenceCellCycleModel");
+
+        out_stream fixed_sequence_parameter_file = output_file_handler.OpenOutputFile("fixed_sequence_results.parameters");
+        fixed_sequence_cell_cycle_model.OutputCellCycleModelParameters(fixed_sequence_parameter_file);
+        fixed_sequence_parameter_file->close();
+
+        {
+            FileFinder generated_file = output_file_handler.FindFile("fixed_sequence_results.parameters");
+            FileFinder reference_file("cell_based/test/data/TestCellCycleModels/fixed_sequence_results.parameters",
+                                      RelativeTo::ChasteSourceRoot);
+            FileComparison comparer(generated_file,reference_file);
+            TS_ASSERT(comparer.CompareFiles());
+        }
+
+        CellCycleTimesGenerator::Destroy();
     }
 };
 

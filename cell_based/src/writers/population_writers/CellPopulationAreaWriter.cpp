@@ -52,10 +52,10 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellPopulationAreaWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
     assert(SPACE_DIM==2 || SPACE_DIM==3); // LCOV_EXCL_LINE
-    
+
     VertexMesh<ELEMENT_DIM, SPACE_DIM>* voronoi_tessellation = pCellPopulation->GetVoronoiTessellation();
 
-    assert (voronoi_tessellation != NULL);
+    assert (voronoi_tessellation != nullptr);
 
     // Don't use the Voronoi tessellation to calculate the total area of the mesh because it gives huge areas for boundary cells
     double total_area = static_cast<MutableMesh<ELEMENT_DIM,SPACE_DIM>&>((pCellPopulation->rGetMesh())).GetVolume();

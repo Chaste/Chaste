@@ -114,7 +114,7 @@ public:
                                  bool isNeumannBoundaryCondition=true,
                                  boost::shared_ptr<ChasteCuboid<DIM> > pMeshCuboid=boost::shared_ptr<ChasteCuboid<DIM> >(),
                                  double stepSize=1.0,
-                                 Vec solution=NULL);
+                                 Vec solution=nullptr);
 
     /**
      * Destructor.

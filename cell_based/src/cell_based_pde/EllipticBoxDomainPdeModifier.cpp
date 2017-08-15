@@ -44,11 +44,11 @@ EllipticBoxDomainPdeModifier<DIM>::EllipticBoxDomainPdeModifier(boost::shared_pt
                                                                 double stepSize,
                                                                 Vec solution)
     : AbstractBoxDomainPdeModifier<DIM>(pPde,
-    		                            pBoundaryCondition,
-    	                             	isNeumannBoundaryCondition,
-    		                            pMeshCuboid,
-    		                            stepSize,
-    		                            solution)
+                                        pBoundaryCondition,
+                                         isNeumannBoundaryCondition,
+                                        pMeshCuboid,
+                                        stepSize,
+                                        solution)
 {
 }
 
@@ -61,7 +61,7 @@ template<unsigned DIM>
 void EllipticBoxDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
     // Set up boundary conditions
-    std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc = ConstructBoundaryConditionsContainer(rCellPopulation);
+    std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc = ConstructBoundaryConditionsContainer(rCellPopulation);
 
     this->UpdateCellPdeElementMap(rCellPopulation);
 
@@ -78,7 +78,7 @@ void EllipticBoxDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopula
     ///\todo Use solution at previous time step as an initial guess for Solve()
     Vec old_solution_copy = this->mSolution;
     this->mSolution = solver.Solve();
-    if (old_solution_copy != NULL)
+    if (old_solution_copy != nullptr)
     {
         PetscTools::Destroy(old_solution_copy);
     }
@@ -97,57 +97,57 @@ void EllipticBoxDomainPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DI
 }
 
 template<unsigned DIM>
-std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > EllipticBoxDomainPdeModifier<DIM>::ConstructBoundaryConditionsContainer(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
+std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > EllipticBoxDomainPdeModifier<DIM>::ConstructBoundaryConditionsContainer(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
-    std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc(new BoundaryConditionsContainer<DIM,DIM,1>(false));
+    std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc(new BoundaryConditionsContainer<DIM,DIM,1>(false));
 
     // To be well-defined, elliptic PDE problems on box domains require at least some Dirichlet boundary conditions
     ///\todo Replace this assertion with an exception in the constructor
     assert(!(this->IsNeumannBoundaryCondition()));
 
-	if (!this->mSetBcsOnBoxBoundary)
-	{
-		// Get the set of coarse element indices that contain cells
-		std::set<unsigned> coarse_element_indices_in_map;
-		for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
-			 cell_iter != rCellPopulation.End();
-			 ++cell_iter)
-		{
-			coarse_element_indices_in_map.insert(this->mCellPdeElementMap[*cell_iter]);
-		}
+    if (!this->mSetBcsOnBoxBoundary)
+    {
+        // Get the set of coarse element indices that contain cells
+        std::set<unsigned> coarse_element_indices_in_map;
+        for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
+             cell_iter != rCellPopulation.End();
+             ++cell_iter)
+        {
+            coarse_element_indices_in_map.insert(this->mCellPdeElementMap[*cell_iter]);
+        }
 
-		// Find the node indices associated with elements whose indices are NOT in the set coarse_element_indices_in_map
-		std::set<unsigned> coarse_mesh_boundary_node_indices;
-		for (unsigned i=0; i<this->mpFeMesh->GetNumElements(); i++)
-		{
-			if (coarse_element_indices_in_map.find(i) == coarse_element_indices_in_map.end())
-			{
-				Element<DIM,DIM>* p_element = this->mpFeMesh->GetElement(i);
-				for (unsigned j=0; j<DIM+1; j++)
-				{
-					unsigned node_index = p_element->GetNodeGlobalIndex(j);
-					coarse_mesh_boundary_node_indices.insert(node_index);
-				}
-			}
-		}
+        // Find the node indices associated with elements whose indices are NOT in the set coarse_element_indices_in_map
+        std::set<unsigned> coarse_mesh_boundary_node_indices;
+        for (unsigned i=0; i<this->mpFeMesh->GetNumElements(); i++)
+        {
+            if (coarse_element_indices_in_map.find(i) == coarse_element_indices_in_map.end())
+            {
+                Element<DIM,DIM>* p_element = this->mpFeMesh->GetElement(i);
+                for (unsigned j=0; j<DIM+1; j++)
+                {
+                    unsigned node_index = p_element->GetNodeGlobalIndex(j);
+                    coarse_mesh_boundary_node_indices.insert(node_index);
+                }
+            }
+        }
 
-		// Apply boundary condition to the nodes in the set coarse_mesh_boundary_node_indices
-		for (std::set<unsigned>::iterator iter = coarse_mesh_boundary_node_indices.begin();
-			 iter != coarse_mesh_boundary_node_indices.end();
-			 ++iter)
-		{
-			p_bcc->AddDirichletBoundaryCondition(this->mpFeMesh->GetNode(*iter), this->mpBoundaryCondition.get(), 0, false);
-		}
-	}
-	else // Apply BC at boundary nodes of box domain FE mesh
-	{
-		for (typename TetrahedralMesh<DIM,DIM>::BoundaryNodeIterator node_iter = this->mpFeMesh->GetBoundaryNodeIteratorBegin();
-			 node_iter != this->mpFeMesh->GetBoundaryNodeIteratorEnd();
-			 ++node_iter)
-		{
-			p_bcc->AddDirichletBoundaryCondition(*node_iter, this->mpBoundaryCondition.get());
-		}
-	}
+        // Apply boundary condition to the nodes in the set coarse_mesh_boundary_node_indices
+        for (std::set<unsigned>::iterator iter = coarse_mesh_boundary_node_indices.begin();
+             iter != coarse_mesh_boundary_node_indices.end();
+             ++iter)
+        {
+            p_bcc->AddDirichletBoundaryCondition(this->mpFeMesh->GetNode(*iter), this->mpBoundaryCondition.get(), 0, false);
+        }
+    }
+    else // Apply BC at boundary nodes of box domain FE mesh
+    {
+        for (typename TetrahedralMesh<DIM,DIM>::BoundaryNodeIterator node_iter = this->mpFeMesh->GetBoundaryNodeIteratorBegin();
+             node_iter != this->mpFeMesh->GetBoundaryNodeIteratorEnd();
+             ++node_iter)
+        {
+            p_bcc->AddDirichletBoundaryCondition(*node_iter, this->mpBoundaryCondition.get());
+        }
+    }
 
     return p_bcc;
 }

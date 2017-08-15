@@ -292,14 +292,14 @@ public:
 
     /**
      * Remove duplicates from the vector of node neighbour indices.
-     */  
+     */
     void RemoveDuplicateNeighbours();
 
     /**
      * Check whether the node neighbours collection is empty.
      *
      * @return whether this node has any neighbours.
-     */  
+     */
     bool NeighboursIsEmpty();
 
     /**
@@ -325,7 +325,7 @@ public:
     std::set<unsigned>& rGetContainingElementIndices();
 
     /**
-     * @return a vector containing the node attributes.
+     * @return a vector containing the node attributes. An exception is thrown if the node has no attributes.
      */
     std::vector<double>& rGetNodeAttributes();
 
@@ -382,7 +382,7 @@ public:
     void SetIsParticle(bool isParticle);
 
     /**
-     * @return the radius of this node.
+     * @return the radius of this node. An exception is thrown if the node has no attributes.
      */
     double GetRadius();
 

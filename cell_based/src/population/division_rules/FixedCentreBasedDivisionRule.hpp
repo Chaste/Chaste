@@ -51,7 +51,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCentreBasedDivi
  * A class to generate two daughter cell positions, one given by the
  * position of the dividing cell and the other specified in the
  * class constructor.
- * 
+ *
  * This helper class is used in TestMeshBasedCellPopulation.hpp and
  * TestNodeBasedCellPopulation.hpp.
  */

@@ -40,7 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexMesh(std::vector<Node<SPACE_DIM>*> nodes,
                                                std::vector<VertexElement<ELEMENT_DIM,SPACE_DIM>*> vertexElements)
-    : mpDelaunayMesh(NULL)
+    : mpDelaunayMesh(nullptr)
 {
 
     // Reset member variables and clear mNodes and mElements
@@ -104,7 +104,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexMesh(std::vector<Node<SPACE_DIM>*> nodes,
                            std::vector<VertexElement<ELEMENT_DIM-1, SPACE_DIM>*> faces,
                            std::vector<VertexElement<ELEMENT_DIM, SPACE_DIM>*> vertexElements)
-    : mpDelaunayMesh(NULL)
+    : mpDelaunayMesh(nullptr)
 {
     // Reset member variables and clear mNodes, mFaces and mElements
     Clear();
@@ -460,7 +460,7 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetElongationShapeFactorOfElement(uns
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexMesh()
 {
-    mpDelaunayMesh = NULL;
+    mpDelaunayMesh = nullptr;
     this->mMeshChangesDuringSimulation = false;
     Clear();
 }
@@ -936,7 +936,7 @@ void VertexMesh<3,3>::ConstructFromMeshReader(AbstractMeshReader<3,3>& rMeshRead
     {
         ///\todo Horrible hack! (#1076/#1377)
         typedef VertexMeshReader<3,3> VERTEX_MESH_READER;
-        assert(dynamic_cast<VERTEX_MESH_READER*>(&rMeshReader) != NULL);
+        assert(dynamic_cast<VERTEX_MESH_READER*>(&rMeshReader) != nullptr);
 
         // Get the data for this element
         VertexElementData element_data = static_cast<VERTEX_MESH_READER*>(&rMeshReader)->GetNextElementDataWithFaces();
@@ -1127,7 +1127,7 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetSurfaceAreaOfElement(unsigned inde
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool VertexMesh<ELEMENT_DIM, SPACE_DIM>::ElementIncludesPoint(const c_vector<double, SPACE_DIM>& rTestPoint, unsigned elementIndex)
 {
-    assert(SPACE_DIM == 2);   			 // LCOV_EXCL_LINE - code will be removed at compile time
+    assert(SPACE_DIM == 2);                // LCOV_EXCL_LINE - code will be removed at compile time
     assert(ELEMENT_DIM == SPACE_DIM);    // LCOV_EXCL_LINE - code will be removed at compile time
 
     // Get the element
@@ -1247,8 +1247,8 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetLocalIndexForElementEdgeClosestToPoint(const c_vector<double, SPACE_DIM>& rTestPoint, unsigned elementIndex)
 {
     // Make sure that we are in the correct dimension - this code will be eliminated at compile time
-    assert(SPACE_DIM == 2);    				// LCOV_EXCL_LINE - code will be removed at compile time
-    assert(ELEMENT_DIM == SPACE_DIM);   	// LCOV_EXCL_LINE - code will be removed at compile time
+    assert(SPACE_DIM == 2);                    // LCOV_EXCL_LINE - code will be removed at compile time
+    assert(ELEMENT_DIM == SPACE_DIM);       // LCOV_EXCL_LINE - code will be removed at compile time
 
     // Get the element
     VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = GetElement(elementIndex);

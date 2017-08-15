@@ -592,7 +592,7 @@ template<unsigned DIM>
 TetrahedralMesh<DIM, DIM>* VertexBasedCellPopulation<DIM>::GetTetrahedralMeshForPdeModifier()
 {
     // This method only works in 2D sequential
-    assert(DIM == 2);						// LCOV_EXCL_LINE - disappears at compile time.
+    assert(DIM == 2);                        // LCOV_EXCL_LINE - disappears at compile time.
     assert(PetscTools::IsSequential());
 
     unsigned num_vertex_nodes = mpMutableVertexMesh->GetNumNodes();

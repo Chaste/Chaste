@@ -42,7 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractMesh<ELEMENT_DIM, SPACE_DIM>::AbstractMesh()
-    : mpDistributedVectorFactory(NULL),
+    : mpDistributedVectorFactory(nullptr),
       mMeshFileBaseName(""),
       mMeshChangesDuringSimulation(false)
 {
@@ -132,7 +132,7 @@ void AbstractMesh<ELEMENT_DIM, SPACE_DIM>::SetElementOwnerships()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 DistributedVectorFactory* AbstractMesh<ELEMENT_DIM, SPACE_DIM>::GetDistributedVectorFactory()
 {
-    if (mpDistributedVectorFactory == NULL)
+    if (mpDistributedVectorFactory == nullptr)
     {
         mpDistributedVectorFactory = new DistributedVectorFactory(GetNumNodes());
         if (PetscTools::IsParallel())

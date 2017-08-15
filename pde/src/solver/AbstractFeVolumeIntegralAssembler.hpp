@@ -268,11 +268,11 @@ void AbstractFeVolumeIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_
         assemble_event = HeartEventHandler::ASSEMBLE_RHS;
     }
 
-    if (this->mAssembleMatrix && this->mMatrixToAssemble==NULL)
+    if (this->mAssembleMatrix && this->mMatrixToAssemble==nullptr)
     {
         EXCEPTION("Matrix to be assembled has not been set");
     }
-    if (this->mAssembleVector && this->mVectorToAssemble==NULL)
+    if (this->mAssembleVector && this->mVectorToAssemble==nullptr)
     {
         EXCEPTION("Vector to be assembled has not been set");
     }

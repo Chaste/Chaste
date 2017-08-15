@@ -60,8 +60,8 @@ void PetscException(PetscInt petscError,
          * PetscErrorMessage will swing p_text to point to the error code's message
          * ...but only if it's a valid code.
          */
-        PetscErrorMessage(petscError, &p_text, NULL);
-        if (p_text == 0)
+        PetscErrorMessage(petscError, &p_text, nullptr);
+        if (p_text == nullptr)
         {
             p_text=default_message;
         }

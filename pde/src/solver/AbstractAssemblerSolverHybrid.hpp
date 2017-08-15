@@ -112,14 +112,14 @@ void AbstractAssemblerSolverHybrid<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, INTERPOL
                                                                                                                      bool computeMatrix,
                                                                                                                      LinearSystem* pLinearSystem)
 {
-    assert(pLinearSystem->rGetLhsMatrix() != NULL);
-    assert(pLinearSystem->rGetRhsVector() != NULL);
+    assert(pLinearSystem->rGetLhsMatrix() != nullptr);
+    assert(pLinearSystem->rGetRhsVector() != nullptr);
 
     // Assemble the matrix and vector calling methods on AbstractFeVolumeIntegralAssembler
     this->SetMatrixToAssemble(pLinearSystem->rGetLhsMatrix());
     this->SetVectorToAssemble(pLinearSystem->rGetRhsVector(), true);
 
-    if (currentSolution != NULL)
+    if (currentSolution != nullptr)
     {
         this->SetCurrentSolution(currentSolution);
     }

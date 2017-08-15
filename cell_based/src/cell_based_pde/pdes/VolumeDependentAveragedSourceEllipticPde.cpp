@@ -62,7 +62,7 @@ void VolumeDependentAveragedSourceEllipticPde<DIM>::SetupSourceTerms(Tetrahedral
         unsigned elem_index = 0;
         const ChastePoint<DIM>& r_position_of_cell = this->mrCellPopulation.GetLocationOfCellCentre(*cell_iter);
 
-        if (pCellPdeElementMap != NULL)
+        if (pCellPdeElementMap != nullptr)
         {
             elem_index = (*pCellPdeElementMap)[*cell_iter];
         }

@@ -41,7 +41,7 @@ ParallelColumnDataWriter::ParallelColumnDataWriter(const std::string& rDirectory
                                                    const std::string& rBaseName,
                                                    bool cleanDirectory)
     : ColumnDataWriter(rDirectory, rBaseName, cleanDirectory),
-      mConcentrated(NULL)
+      mConcentrated(nullptr)
 {
     int num_procs;
     MPI_Comm_size(PETSC_COMM_WORLD, &num_procs);
@@ -66,7 +66,7 @@ void ParallelColumnDataWriter::PutVector(int variableID, Vec petscVector)
     }
 
     // Construct the appropriate "scatter" object to concentrate the vector on the master
-    if (mConcentrated==NULL)
+    if (mConcentrated==nullptr)
     {
         VecScatterCreateToZero(petscVector, &mToMaster, &mConcentrated);
     }
@@ -147,7 +147,7 @@ void ParallelColumnDataWriter::PutVariable(int variableID, double variableValue,
 
 ParallelColumnDataWriter::~ParallelColumnDataWriter()
 {
-    if (mConcentrated != NULL)
+    if (mConcentrated != nullptr)
     {
         VecScatterDestroy(PETSC_DESTROY_PARAM(mToMaster));
         PetscTools::Destroy(mConcentrated);

@@ -162,7 +162,7 @@ std::string OutputFileHandler::GetChasteTestOutputDirectory()
 {
     char *chaste_test_output = getenv("CHASTE_TEST_OUTPUT");
     FileFinder directory_root;
-    if (chaste_test_output == NULL || *chaste_test_output == 0)
+    if (chaste_test_output == nullptr || *chaste_test_output == 0)
     {
         // Default to 'testoutput' folder within the current directory
         directory_root.SetPath("testoutput", RelativeTo::CWD);

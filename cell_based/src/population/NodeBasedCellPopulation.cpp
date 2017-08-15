@@ -295,8 +295,7 @@ template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::OutputCellPopulationParameters(out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t<MechanicsCutOffLength>" << mpNodesOnlyMesh->GetMaximumInteractionDistance() << "</MechanicsCutOffLength>\n";
-    *rParamsFile << "\t\t<UseVariableRadii>" << mUseVariableRadii <<
-"</UseVariableRadii>\n";
+    *rParamsFile << "\t\t<UseVariableRadii>" << mUseVariableRadii << "</UseVariableRadii>\n";
 
     // Call method on direct parent class
     AbstractCentreBasedCellPopulation<DIM>::OutputCellPopulationParameters(rParamsFile);
@@ -497,7 +496,7 @@ double NodeBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
 {
     // Not implemented or tested in 1D
     assert(DIM==2 ||DIM==3); // LCOV_EXCL_LINE
-    
+
     // Get node index corresponding to this cell
     unsigned node_index = this->GetLocationIndexUsingCell(pCell);
     Node<DIM>* p_node = this->GetNode(node_index);

@@ -1240,7 +1240,7 @@ public:
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Use smaller movement threshold to maintain smooth motion
-        cell_population.SetAbsoluteMovementThreshold(0.1); 
+        cell_population.SetAbsoluteMovementThreshold(0.1);
 
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestOffLatticeSimulationWithAdaptivity");
@@ -1265,10 +1265,10 @@ public:
 
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 14u);
 
-        // Check cells have moved to the correct location 
+        // Check cells have moved to the correct location
         TS_ASSERT_DELTA(simulator.rGetCellPopulation().rGetMesh().GetNode(0)->rGetLocation()[0], 0.3906,1e-4);
         TS_ASSERT_DELTA(simulator.rGetCellPopulation().rGetMesh().GetNode(0)->rGetLocation()[1], -0.1782,1e-4);
-    } 
+    }
 };
 
 #endif /*TESTOFFLATTICESIMULATION_HPP_*/

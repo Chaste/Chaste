@@ -96,8 +96,8 @@ void DeltaNotchSrnModel::Initialise()
 
 void DeltaNotchSrnModel::UpdateDeltaNotch()
 {
-    assert(mpOdeSystem != NULL);
-    assert(mpCell != NULL);
+    assert(mpOdeSystem != nullptr);
+    assert(mpCell != nullptr);
 
     double mean_delta = mpCell->GetCellData()->GetItem("mean delta");
     mpOdeSystem->SetParameter("Mean Delta", mean_delta);
@@ -105,21 +105,21 @@ void DeltaNotchSrnModel::UpdateDeltaNotch()
 
 double DeltaNotchSrnModel::GetNotch()
 {
-    assert(mpOdeSystem != NULL);
+    assert(mpOdeSystem != nullptr);
     double notch = mpOdeSystem->rGetStateVariables()[0];
     return notch;
 }
 
 double DeltaNotchSrnModel::GetDelta()
 {
-    assert(mpOdeSystem != NULL);
+    assert(mpOdeSystem != nullptr);
     double delta = mpOdeSystem->rGetStateVariables()[1];
     return delta;
 }
 
 double DeltaNotchSrnModel::GetMeanNeighbouringDelta()
 {
-    assert(mpOdeSystem != NULL);
+    assert(mpOdeSystem != nullptr);
     double mean_neighbouring_delta = mpOdeSystem->GetParameter("Mean Delta");
     return mean_neighbouring_delta;
 }

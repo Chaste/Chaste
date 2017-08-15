@@ -569,7 +569,13 @@ if (Chaste_ENABLE_TESTING)
         endif()
     endforeach()
 
+    # Targets for making core components and core component libraries, respectively
     add_custom_target(core)
+    add_custom_target(chaste_core)
+
+    # Targets for making all components and all component libraries, respectively
+    add_custom_target(all_components)
+    add_custom_target(chaste_all_components)
 endif()
 
 #######################################################
@@ -589,10 +595,14 @@ set(Chaste_DEPENDS_crypt cell_based pde ode mesh linalg io global)
 set(Chaste_DEPENDS_continuum_mechanics pde ode mesh linalg io global)
 set(Chaste_DEPENDS_heart ${Chaste_DEPENDS_continuum_mechanics} continuum_mechanics)
 set(Chaste_DEPENDS_lung ${Chaste_DEPENDS_continuum_mechanics} continuum_mechanics)
-set(Chaste_DEPENDS_core global io linalg mesh ode pde continuum_mechanics)
 
-# Set dependencies to core target
+# These custom targets depend on other components but are not components themselves
+set(Chaste_DEPENDS_core global io linalg mesh ode pde continuum_mechanics)
+set(Chaste_DEPENDS_all_components ${Chaste_COMPONENTS})
+
+# Set dependencies for custom targets
 add_dependencies(core ${Chaste_DEPENDS_core})
+add_dependencies(all_components ${Chaste_DEPENDS_all_components})
 
 foreach(component ${Chaste_COMPONENTS})
     set(Chaste_${component}_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/${component}/src")
@@ -645,6 +655,15 @@ foreach(component ${Chaste_COMPONENTS})
     # Build each component as a project
     add_subdirectory(${component})
 endforeach(component)
+
+# After components are built, add dependencies for the custom chaste_core and chaste_all_components libraries
+foreach(component ${Chaste_DEPENDS_core})
+    add_dependencies(chaste_core chaste_${component})
+endforeach()
+
+foreach(component ${Chaste_DEPENDS_all_components})
+    add_dependencies(chaste_all_components chaste_${component})
+endforeach()
 
 ####################
 #  BUILD MAIN APPS #

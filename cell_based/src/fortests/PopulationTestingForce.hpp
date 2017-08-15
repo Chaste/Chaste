@@ -91,17 +91,17 @@ public:
      *
      * THis has two forces depending on the member variable mWithPositionDependence
      *
-     * If true then 
+     * If true then
      *
-     * For node i 
+     * For node i
      * F[j] = 0.01 (j+1) i r[j]
      *
      * Where r is the position of node i.
      *
-     * if false then 
+     * if false then
      *
      * F[j] = 0.01 (j+1) i
-     * 
+     *
      */
     void AddForceContribution(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation);
 
@@ -117,7 +117,7 @@ public:
      */
     c_vector<double, SPACE_DIM> GetExpectedOneStepLocationFE(unsigned nodeIndex,
                                                            double damping,
-                                                           c_vector<double, SPACE_DIM>& oldLocation, 
+                                                           c_vector<double, SPACE_DIM>& oldLocation,
                                                            double dt);
 
     /**
@@ -132,7 +132,7 @@ public:
      */
     c_vector<double, SPACE_DIM> GetExpectedOneStepLocationRK4(unsigned nodeIndex,
                                                            double damping,
-                                                           c_vector<double, SPACE_DIM>& oldLocation, 
+                                                           c_vector<double, SPACE_DIM>& oldLocation,
                                                            double dt);
 
     /**
@@ -147,7 +147,7 @@ public:
      */
     c_vector<double, SPACE_DIM> GetExpectedOneStepLocationAM2(unsigned nodeIndex,
                                                            double damping,
-                                                           c_vector<double, SPACE_DIM>& oldLocation, 
+                                                           c_vector<double, SPACE_DIM>& oldLocation,
                                                            double dt);
 
     /**
@@ -162,7 +162,7 @@ public:
      */
     c_vector<double, SPACE_DIM> GetExpectedOneStepLocationBE(unsigned nodeIndex,
                                                            double damping,
-                                                           c_vector<double, SPACE_DIM>& oldLocation, 
+                                                           c_vector<double, SPACE_DIM>& oldLocation,
                                                            double dt);
 
     /**
@@ -176,4 +176,4 @@ public:
 #include "SerializationExportWrapper.hpp"
 EXPORT_TEMPLATE_CLASS_ALL_DIMS(PopulationTestingForce)
 
-#endif /*POPULATIONTESTINGFORCE_HPP_*/ 
+#endif /*POPULATIONTESTINGFORCE_HPP_*/

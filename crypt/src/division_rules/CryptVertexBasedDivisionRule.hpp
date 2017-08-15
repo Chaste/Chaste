@@ -48,7 +48,7 @@ template<unsigned SPACE_DIM> class AbstractVertexBasedDivisionRule;
 
 /**
  * A class to generate a division vector of unit lengths that points in a random direction,
- * unless dealing with a 'stem' cell in the absence of a Wnt gradient. For use in 
+ * unless dealing with a 'stem' cell in the absence of a Wnt gradient. For use in
  * CryptSimulation2d.
  */
 template <unsigned SPACE_DIM>

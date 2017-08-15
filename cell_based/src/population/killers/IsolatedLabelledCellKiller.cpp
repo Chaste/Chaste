@@ -41,7 +41,7 @@ template<unsigned DIM>
 IsolatedLabelledCellKiller<DIM>::IsolatedLabelledCellKiller(AbstractCellPopulation<DIM>* pCellPopulation)
     : AbstractCellKiller<DIM>(pCellPopulation)
 {
-    if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(pCellPopulation) == NULL)
+    if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(pCellPopulation) == nullptr)
     {
         EXCEPTION("IsolatedLabelledCellKiller only works with a VertexBasedCellPopulation.");
     }
