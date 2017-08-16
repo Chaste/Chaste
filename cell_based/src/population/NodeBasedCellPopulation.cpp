@@ -593,47 +593,26 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDir
     NodeMap map(1 + this->mpNodesOnlyMesh->GetMaximumNodeIndex());
     this->mpNodesOnlyMesh->ReMesh(map);
 
-    // Store the number of cells for which to output data to VTK
-    unsigned num_nodes = GetNumNodes();
-    std::vector<double> rank(num_nodes);
-
-    unsigned num_cell_data_items = 0;
-    std::vector<std::string> cell_data_names;
-
-    // We assume that the first cell is representative of all cells
-    if (num_nodes > 0)
-    {
-        num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
-        cell_data_names = this->Begin()->GetCellData()->GetKeys();
-    }
-
-    std::vector<std::vector<double> > cell_data;
-    for (unsigned var=0; var<num_cell_data_items; var++)
-    {
-        std::vector<double> cell_data_var(num_nodes);
-        cell_data.push_back(cell_data_var);
-    }
-
     // Create mesh writer for VTK output
     VtkMeshWriter<DIM, DIM> mesh_writer(rDirectory, "results_"+time.str(), false);
     mesh_writer.SetParallelFiles(*mpNodesOnlyMesh);
 
-    /*
-     * For each cell writer, we need to visit every cell, but the data needs to end up in order of nodes.
-     * We first identify a vector of CellPtr in the correct order (of nodes) to speed up this computation.
-     */
-    std::vector<CellPtr> cells_in_node_order(num_nodes);
-    for (const auto& p_cell : this->mCells)
+    auto num_nodes = GetNumNodes();
+    assert(num_nodes > 0);
+
+    // For each cell that this process owns, find the corresponding node index, which we only want to calculate once
+    std::vector<unsigned> node_indices_in_cell_order;
+    for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter)
     {
         // Get the node index corresponding to this cell
-        unsigned global_index = this->GetLocationIndexUsingCell(p_cell);
+        unsigned global_index = this->GetLocationIndexUsingCell(*cell_iter);
         unsigned node_index = this->rGetMesh().SolveNodeMapping(global_index);
 
-        // Populate the vector of VTK cell data
-        cells_in_node_order[node_index] = p_cell;
+        node_indices_in_cell_order.emplace_back(node_index);
     }
 
-    // Iterate over any cell writers that are present
+    // Iterate over any cell writers that are present.  This is in a separate loop to below, because the writer loop
+    // needs to the the outer loop.
     for (auto&& p_cell_writer : this->mCellWriters)
     {
         // Add any scalar data
@@ -641,9 +620,11 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDir
         {
             std::vector<double> vtk_cell_data(num_nodes);
 
-            for (unsigned node_idx = 0; node_idx < num_nodes; ++node_idx)
+            unsigned loop_it = 0;
+            for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter, ++loop_it)
             {
-                vtk_cell_data[node_idx] = p_cell_writer->GetCellDataForVtkOutput(cells_in_node_order[node_idx], this);
+                unsigned node_idx = node_indices_in_cell_order[loop_it];
+                vtk_cell_data[node_idx] = p_cell_writer->GetCellDataForVtkOutput(*cell_iter, this);
             }
 
             mesh_writer.AddPointData(p_cell_writer->GetVtkCellDataName(), vtk_cell_data);
@@ -654,47 +635,50 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDir
         {
             std::vector<c_vector<double, DIM>> vtk_cell_data(num_nodes);
 
-            for (unsigned node_idx = 0; node_idx < num_nodes; ++node_idx)
+            unsigned loop_it = 0;
+            for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter, ++loop_it)
             {
-                vtk_cell_data[node_idx] = p_cell_writer->GetVectorCellDataForVtkOutput(cells_in_node_order[node_idx], this);
+                unsigned node_idx = node_indices_in_cell_order[loop_it];
+                vtk_cell_data[node_idx] = p_cell_writer->GetVectorCellDataForVtkOutput(*cell_iter, this);
             }
 
             mesh_writer.AddPointData(p_cell_writer->GetVtkVectorCellDataName(), vtk_cell_data);
         }
     }
 
-    // Loop over cells
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
-         cell_iter != this->End();
-         ++cell_iter)
-    {
-        // Get the node index corresponding to this cell
-        unsigned global_index = this->GetLocationIndexUsingCell(*cell_iter);
-        unsigned node_index = this->rGetMesh().SolveNodeMapping(global_index);
+    // Process rank and cell data can be collected on a cell-by-cell basis, and both occur in the following loop
+    // We assume the first cell is representative of all cells
+    auto num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
+    std::vector<std::string> cell_data_names = this->Begin()->GetCellData()->GetKeys();
+    std::vector<std::vector<double>> cell_data(num_cell_data_items, std::vector<double>(num_nodes));
 
-        for (unsigned var=0; var<num_cell_data_items; var++)
+    std::vector<double> rank(num_nodes);
+
+    unsigned loop_it = 0;
+    for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter, ++loop_it)
+    {
+        unsigned node_idx = node_indices_in_cell_order[loop_it];
+
+        for (unsigned cell_data_idx = 0; cell_data_idx < num_cell_data_items; ++cell_data_idx)
         {
-            cell_data[var][node_index] = cell_iter->GetCellData()->GetItem(cell_data_names[var]);
+            cell_data[cell_data_idx][node_idx] = cell_iter->GetCellData()->GetItem(cell_data_names[cell_data_idx]);
         }
 
-        rank[node_index] = (PetscTools::GetMyRank());
+        rank[node_idx] = (PetscTools::GetMyRank());
     }
 
+    // Add point data to writers
     mesh_writer.AddPointData("Process rank", rank);
-
-    if (num_cell_data_items > 0)
+    for (unsigned cell_data_idx = 0; cell_data_idx < num_cell_data_items; ++cell_data_idx)
     {
-        for (unsigned var=0; var<cell_data.size(); var++)
-        {
-            mesh_writer.AddPointData(cell_data_names[var], cell_data[var]);
-        }
+        mesh_writer.AddPointData(cell_data_names[cell_data_idx], cell_data[cell_data_idx]);
     }
 
     mesh_writer.WriteFilesUsingMesh(*mpNodesOnlyMesh);
 
     *(this->mpVtkMetaFile) << "        <DataSet timestep=\"";
     *(this->mpVtkMetaFile) << SimulationTime::Instance()->GetTimeStepsElapsed();
-    *(this->mpVtkMetaFile) << "\" group=\"\" part=\"0\" file=\"results_";
+    *(this->mpVtkMetaFile) << R"(" group="" part="0" file="results_)";
     *(this->mpVtkMetaFile) << SimulationTime::Instance()->GetTimeStepsElapsed();
     if (PetscTools::IsSequential())
     {
