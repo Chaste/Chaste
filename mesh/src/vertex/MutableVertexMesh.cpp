@@ -128,7 +128,8 @@ MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::MutableVertexMesh()
       mProtorosetteFormationProbability(0.0),
       mProtorosetteResolutionProbabilityPerTimestep(0.0),
       mRosetteResolutionProbabilityPerTimestep(0.0),
-      mCheckForInternalIntersections(false)
+      mCheckForInternalIntersections(false),
+      mDistanceForT3SwapChecking(5.0)
 {
     // Note that the member variables initialised above will be overwritten as soon as archiving is complete
     this->mMeshChangesDuringSimulation = true;
