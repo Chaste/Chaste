@@ -198,6 +198,13 @@ void FineCoarseMeshPair<DIM>::ComputeFineElementsAndWeightsForCoarseQuadPoints(G
 
     // Resize the elements and weights vector.
     mFineMeshElementsAndWeights.resize(quad_point_posns.Size());
+    // Make sure that, in parallel, silent processes have their structs initialised to zero values
+    for (unsigned i=0; i<mFineMeshElementsAndWeights.size(); i++)
+    {
+        mFineMeshElementsAndWeights[i].ElementNum = 0u;
+        mFineMeshElementsAndWeights[i].Weights = zero_vector<double>(DIM+1);
+    }
+
 
     // LCOV_EXCL_START
     if (CommandLineArguments::Instance()->OptionExists("-mesh_pair_verbose"))
@@ -228,7 +235,8 @@ void FineCoarseMeshPair<DIM>::ComputeFineElementsAndWeightsForCoarseQuadPoints(G
         }
         else
         {
-            assert(mFineMeshElementsAndWeights[i].ElementNum == 0u); // and the weight is zero too...
+            assert(mFineMeshElementsAndWeights[i].ElementNum == 0u);
+            assert(norm_2(mFineMeshElementsAndWeights[i].Weights) == 0.0 );
         }
     }
     ShareFineElementData();
