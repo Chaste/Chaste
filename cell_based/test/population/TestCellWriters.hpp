@@ -1623,6 +1623,12 @@ public:
         {
             TS_ASSERT_EQUALS(component, DOUBLE_UNSET);
         }
+
+        // Avoid memory leak
+        for (auto& p_node : nodes)
+        {
+            delete p_node;
+        }
     }
 
     void TestDefaultScalarBehaviourWhenWritingVectors() throw (Exception)
@@ -1653,6 +1659,12 @@ public:
 
         double scalar_data = cell_writer.GetCellDataForVtkOutput(*(cell_population.Begin()), &cell_population);
         TS_ASSERT_EQUALS(scalar_data, DOUBLE_UNSET);
+
+        // Avoid memory leak
+        for (auto& p_node : nodes)
+        {
+            delete p_node;
+        }
     }
 };
 
