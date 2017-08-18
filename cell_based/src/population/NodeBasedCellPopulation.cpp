@@ -598,7 +598,6 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDir
     mesh_writer.SetParallelFiles(*mpNodesOnlyMesh);
 
     auto num_nodes = GetNumNodes();
-    assert(num_nodes > 0);
 
     // For each cell that this process owns, find the corresponding node index, which we only want to calculate once
     std::vector<unsigned> node_indices_in_cell_order;
@@ -648,30 +647,33 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDir
 
     // Process rank and cell data can be collected on a cell-by-cell basis, and both occur in the following loop
     // We assume the first cell is representative of all cells
-    auto num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
-    std::vector<std::string> cell_data_names = this->Begin()->GetCellData()->GetKeys();
-    std::vector<std::vector<double>> cell_data(num_cell_data_items, std::vector<double>(num_nodes));
-
-    std::vector<double> rank(num_nodes);
-
-    unsigned loop_it = 0;
-    for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter, ++loop_it)
+    if (this->Begin() != this->End())  // some processes may own no cells, so can't do this->Begin()->GetCellData()
     {
-        unsigned node_idx = node_indices_in_cell_order[loop_it];
+        auto num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
+        std::vector<std::string> cell_data_names = this->Begin()->GetCellData()->GetKeys();
+        std::vector<std::vector<double>> cell_data(num_cell_data_items, std::vector<double>(num_nodes));
 
-        for (unsigned cell_data_idx = 0; cell_data_idx < num_cell_data_items; ++cell_data_idx)
+        std::vector<double> rank(num_nodes);
+
+        unsigned loop_it = 0;
+        for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter, ++loop_it)
         {
-            cell_data[cell_data_idx][node_idx] = cell_iter->GetCellData()->GetItem(cell_data_names[cell_data_idx]);
+            unsigned node_idx = node_indices_in_cell_order[loop_it];
+
+            for (unsigned cell_data_idx = 0; cell_data_idx < num_cell_data_items; ++cell_data_idx)
+            {
+                cell_data[cell_data_idx][node_idx] = cell_iter->GetCellData()->GetItem(cell_data_names[cell_data_idx]);
+            }
+
+            rank[node_idx] = (PetscTools::GetMyRank());
         }
 
-        rank[node_idx] = (PetscTools::GetMyRank());
-    }
-
-    // Add point data to writers
-    mesh_writer.AddPointData("Process rank", rank);
-    for (unsigned cell_data_idx = 0; cell_data_idx < num_cell_data_items; ++cell_data_idx)
-    {
-        mesh_writer.AddPointData(cell_data_names[cell_data_idx], cell_data[cell_data_idx]);
+        // Add point data to writers
+        mesh_writer.AddPointData("Process rank", rank);
+        for (unsigned cell_data_idx = 0; cell_data_idx < num_cell_data_items; ++cell_data_idx)
+        {
+            mesh_writer.AddPointData(cell_data_names[cell_data_idx], cell_data[cell_data_idx]);
+        }
     }
 
     mesh_writer.WriteFilesUsingMesh(*mpNodesOnlyMesh);
