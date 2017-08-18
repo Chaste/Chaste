@@ -43,35 +43,37 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <algorithm>
 
-#include "ArchiveOpener.hpp"
-#include "NodeBasedCellPopulation.hpp"
-#include "CellsGenerator.hpp"
-#include "FixedG1GenerationalCellCycleModel.hpp"
-#include "BernoulliTrialCellCycleModel.hpp"
-#include "TrianglesMeshReader.hpp"
-#include "TetrahedralMesh.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "ApcOneHitCellMutationState.hpp"
 #include "ApcTwoHitCellMutationState.hpp"
+#include "ApoptoticCellProperty.hpp"
+#include "ArchiveOpener.hpp"
+#include "BernoulliTrialCellCycleModel.hpp"
 #include "BetaCateninOneHitCellMutationState.hpp"
-#include "WildTypeCellMutationState.hpp"
-#include "TransitCellProliferativeType.hpp"
-#include "DifferentiatedCellProliferativeType.hpp"
+#include "CellAncestor.hpp"
 #include "CellLabel.hpp"
 #include "CellPropertyRegistry.hpp"
-#include "SmartPointers.hpp"
+#include "CellsGenerator.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
 #include "FileComparison.hpp"
-#include "ApoptoticCellProperty.hpp"
-#include "CellAncestor.hpp"
 #include "FixedCentreBasedDivisionRule.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
+#include "NodeBasedCellPopulation.hpp"
+#include "SmartPointers.hpp"
+#include "TetrahedralMesh.hpp"
+#include "TransitCellProliferativeType.hpp"
+#include "TrianglesMeshReader.hpp"
+#include "UblasCustomFunctions.hpp"
+#include "WildTypeCellMutationState.hpp"
 
 // Cell writers
 #include "CellAgesWriter.hpp"
 #include "CellAncestorWriter.hpp"
+#include "CellAppliedForceWriter.hpp"
 #include "CellIdWriter.hpp"
+#include "CellMutationStatesWriter.hpp"
 #include "CellProliferativePhasesWriter.hpp"
 #include "CellVolumesWriter.hpp"
-#include "CellMutationStatesWriter.hpp"
 
 // Cell population writers
 #include "CellPopulationAreaWriter.hpp"
@@ -1148,6 +1150,17 @@ public:
         node_based_cell_population.AddCellWriter<CellVolumesWriter>();
         node_based_cell_population.AddCellWriter<CellAncestorWriter>();
         node_based_cell_population.AddCellWriter<CellMutationStatesWriter>();
+        node_based_cell_population.AddCellWriter<CellAppliedForceWriter>();
+
+        // Set some forces for the applied force writer
+        c_vector<double, 2> force_0 = Create_c_vector(1.2, 2.3);
+        c_vector<double, 2> force_1 = Create_c_vector(2.3, 3.4);
+        c_vector<double, 2> force_2 = Create_c_vector(3.4, 4.5);
+        c_vector<double, 2> force_3 = Create_c_vector(4.5, 5.6);
+        node_based_cell_population.rGetMesh().GetNode(0)->rGetAppliedForce() = force_0;
+        node_based_cell_population.rGetMesh().GetNode(1)->rGetAppliedForce() = force_1;
+        node_based_cell_population.rGetMesh().GetNode(2)->rGetAppliedForce() = force_2;
+        node_based_cell_population.rGetMesh().GetNode(3)->rGetAppliedForce() = force_3;
 
         node_based_cell_population.SetCellAncestorsToLocationIndices();
 
@@ -1165,6 +1178,7 @@ public:
         FileComparison(results_dir + "cellmutationstates.dat", "cell_based/test/data/TestNodeBasedCellPopulationWriters2d/cellmutationstates.dat").CompareFiles();
         FileComparison(results_dir + "cellages.dat", "cell_based/test/data/TestNodeBasedCellPopulationWriters2d/cellages.dat").CompareFiles();
         FileComparison(results_dir + "cellareas.dat", "cell_based/test/data/TestNodeBasedCellPopulationWriters2d/cellareas.dat").CompareFiles();
+        FileComparison(results_dir + "cellappliedforce.dat", "cell_based/test/data/TestNodeBasedCellPopulationWriters2d/cellappliedforce.dat").CompareFiles();
 
         // Test the GetCellMutationStateCount function
         std::vector<unsigned> cell_mutation_states = node_based_cell_population.GetCellMutationStateCount();
@@ -1305,6 +1319,17 @@ public:
         cell_population.AddCellPopulationCountWriter<CellProliferativePhasesCountWriter>();
         cell_population.AddCellWriter<CellProliferativePhasesWriter>();
         cell_population.AddCellWriter<CellMutationStatesWriter>();
+        cell_population.AddCellWriter<CellAppliedForceWriter>();
+
+        // Set some forces for the applied force writer
+        c_vector<double, 3> force_0 = Create_c_vector(1.2, 2.3, 3.4);
+        c_vector<double, 3> force_1 = Create_c_vector(2.3, 3.4, 4.5);
+        c_vector<double, 3> force_2 = Create_c_vector(3.4, 4.5, 5.6);
+        c_vector<double, 3> force_3 = Create_c_vector(4.5, 5.6, 6.7);
+        cell_population.rGetMesh().GetNode(0)->rGetAppliedForce() = force_0;
+        cell_population.rGetMesh().GetNode(1)->rGetAppliedForce() = force_1;
+        cell_population.rGetMesh().GetNode(2)->rGetAppliedForce() = force_2;
+        cell_population.rGetMesh().GetNode(3)->rGetAppliedForce() = force_3;
 
         cell_population.SetCellAncestorsToLocationIndices();
         cell_population.AddCellWriter<CellAncestorWriter>();
@@ -1323,6 +1348,7 @@ public:
         FileComparison(results_dir + "cellmutationstates.dat", "cell_based/test/data/TestNodeBasedCellPopulationWriters3d/cellmutationstates.dat").CompareFiles();
         FileComparison(results_dir + "cellages.dat", "cell_based/test/data/TestNodeBasedCellPopulationWriters3d/cellages.dat").CompareFiles();
         FileComparison(results_dir + "cellareas.dat", "cell_based/test/data/TestNodeBasedCellPopulationWriters3d/cellareas.dat").CompareFiles();
+        FileComparison(results_dir + "cellappliedforce.dat", "cell_based/test/data/TestNodeBasedCellPopulationWriters3d/cellappliedforce.dat").CompareFiles();
 
         // Test VTK output
 #ifdef CHASTE_VTK

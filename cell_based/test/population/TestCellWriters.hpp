@@ -1556,6 +1556,9 @@ public:
         // Test GetVtkCellDataName() method
         TS_ASSERT_EQUALS(cell_writer.GetVtkVectorCellDataName(), "Cell applied force");
 
+        cell_writer.SetVtkVectorCellDataName("New name");
+        TS_ASSERT_EQUALS(cell_writer.GetVtkVectorCellDataName(), "New name");
+
         // Avoid memory leak
         for (auto& p_node : nodes)
         {
