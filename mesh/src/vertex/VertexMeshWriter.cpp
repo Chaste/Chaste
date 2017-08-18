@@ -380,6 +380,32 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddPointData(std::string dataName
 #endif //CHASTE_VTK
 }
 
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VertexMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddPointData(std::string dataName, std::vector<c_vector<double, SPACE_DIM> > dataPayload)
+{
+#ifdef CHASTE_VTK
+    vtkDoubleArray* p_vectors = vtkDoubleArray::New();
+    p_vectors->SetName(dataName.c_str());
+    p_vectors->SetNumberOfComponents(3);
+    for (unsigned i=0; i<dataPayload.size(); i++)
+    {
+        for (unsigned j=0; j<SPACE_DIM; j++)
+        {
+            p_vectors->InsertNextValue(dataPayload[i][j]);
+        }
+        // When SPACE_DIM<3, then pad
+        for (unsigned j=SPACE_DIM; j<3; j++)
+        {
+            p_vectors->InsertNextValue(0.0);
+        }
+    }
+
+    vtkPointData* p_point_data = mpVtkUnstructedMesh->GetPointData();
+    p_point_data->AddArray(p_vectors);
+    p_vectors->Delete(); // Reference counted
+#endif //CHASTE_VTK
+}
+
 ///\todo Mesh should be const (#1076)
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(VertexMesh<ELEMENT_DIM,SPACE_DIM>& rMesh)

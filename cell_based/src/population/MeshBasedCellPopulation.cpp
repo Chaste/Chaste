@@ -627,46 +627,70 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile(const
         // Create mesh writer for VTK output
         VtkMeshWriter<SPACE_DIM, SPACE_DIM> cells_writer(rDirectory, "results_"+time.str(), false);
 
-        // Iterate over any cell writers that are present
-        unsigned num_cells = this->GetNumAllCells();
-        for (typename std::vector<boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
-             cell_writer_iter != this->mCellWriters.end();
-             ++cell_writer_iter)
+        auto num_nodes = GetNumNodes();
+        assert(num_nodes > 0);
+
+        // For each cell, find the corresponding node index, which we only want to calculate once
+        std::vector<unsigned> node_indices_in_cell_order;
+        for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter)
         {
-            // Create vector to store VTK cell data
-            std::vector<double> vtk_cell_data(num_cells);
-
-            // Loop over cells
-            for (typename AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>::Iterator cell_iter = this->Begin();
-                 cell_iter != this->End();
-                 ++cell_iter)
-            {
-                // Get the node index corresponding to this cell
-                unsigned node_index = this->GetLocationIndexUsingCell(*cell_iter);
-
-                // Populate the vector of VTK cell data
-                vtk_cell_data[node_index] = (*cell_writer_iter)->GetCellDataForVtkOutput(*cell_iter, this);
-            }
-
-            cells_writer.AddPointData((*cell_writer_iter)->GetVtkCellDataName(), vtk_cell_data);
-        }
-
-        // Loop over cells
-        for (typename AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>::Iterator cell_iter = this->Begin();
-             cell_iter != this->End();
-             ++cell_iter)
-        {
-            // Get the node index corresponding to this cell
             unsigned node_index = this->GetLocationIndexUsingCell(*cell_iter);
+            node_indices_in_cell_order.emplace_back(node_index);
+        }
 
-            for (unsigned var=0; var<num_cell_data_items; var++)
+        // Iterate over any cell writers that are present
+        for (auto&& p_cell_writer : this->mCellWriters)
+        {
+            // Add any scalar data
+            if (p_cell_writer->GetOutputScalarData())
             {
-                cell_data[var][node_index] = cell_iter->GetCellData()->GetItem(cell_data_names[var]);
+                std::vector<double> vtk_cell_data(num_nodes);
+
+                unsigned loop_it = 0;
+                for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter, ++loop_it)
+                {
+                    unsigned node_idx = node_indices_in_cell_order[loop_it];
+                    vtk_cell_data[node_idx] = p_cell_writer->GetCellDataForVtkOutput(*cell_iter, this);
+                }
+
+                cells_writer.AddPointData(p_cell_writer->GetVtkCellDataName(), vtk_cell_data);
+            }
+
+            // Add any vector data
+            if (p_cell_writer->GetOutputVectorData())
+            {
+                std::vector<c_vector<double, SPACE_DIM>> vtk_cell_data(num_nodes);
+
+                unsigned loop_it = 0;
+                for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter, ++loop_it)
+                {
+                    unsigned node_idx = node_indices_in_cell_order[loop_it];
+                    vtk_cell_data[node_idx] = p_cell_writer->GetVectorCellDataForVtkOutput(*cell_iter, this);
+                }
+
+                cells_writer.AddPointData(p_cell_writer->GetVtkVectorCellDataName(), vtk_cell_data);
             }
         }
-        for (unsigned var=0; var<num_cell_data_items; var++)
+
+        // We collect cell data on a cell-by-cell basis and assume that the first cell is representative of all cells
+        auto num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
+        std::vector<std::string> cell_data_names = this->Begin()->GetCellData()->GetKeys();
+        std::vector<std::vector<double>> cell_data(num_cell_data_items, std::vector<double>(num_cells_from_mesh));
+
+        unsigned loop_it = 0;
+        for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter, ++loop_it)
         {
-            cells_writer.AddPointData(cell_data_names[var], cell_data[var]);
+            unsigned node_idx = node_indices_in_cell_order[loop_it];
+
+            for (unsigned cell_data_idx = 0; cell_data_idx < num_cell_data_items; ++cell_data_idx)
+            {
+                cell_data[cell_data_idx][node_idx] = cell_iter->GetCellData()->GetItem(cell_data_names[cell_data_idx]);
+            }
+        }
+
+        for (unsigned cell_data_idx = 0; cell_data_idx < num_cell_data_items; ++cell_data_idx)
+        {
+            cells_writer.AddCellData(cell_data_names[cell_data_idx], cell_data[cell_data_idx]);
         }
 
         // Make a copy of the nodes in a disposable mesh for writing
@@ -695,55 +719,68 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile(const
         VertexMeshWriter<ELEMENT_DIM, SPACE_DIM> mesh_writer(rDirectory, "results", false);
         std::vector<double> cell_volumes(num_cells_from_mesh);
 
+        // For each cell, find the corresponding element index in mpVoronoiTessellation, which we only want to calculate once
+        std::vector<unsigned> voronoi_element_indices_in_cell_order;
+        for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter)
+        {
+            unsigned node_index = this->GetLocationIndexUsingCell(*cell_iter);
+            unsigned voronoi_element_index = mpVoronoiTessellation->GetVoronoiElementIndexCorrespondingToDelaunayNodeIndex(node_index);
+            voronoi_element_indices_in_cell_order.emplace_back(voronoi_element_index);
+        }
+
         // Iterate over any cell writers that are present
-        unsigned num_cells = this->GetNumAllCells();
-        for (typename std::vector<boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
-             cell_writer_iter != this->mCellWriters.end();
-             ++cell_writer_iter)
+        for (auto&& p_cell_writer : this->mCellWriters)
         {
-            // Create vector to store VTK cell data
-            std::vector<double> vtk_cell_data(num_cells);
-
-            // Loop over elements of mpVoronoiTessellation
-            for (typename VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator elem_iter = mpVoronoiTessellation->GetElementIteratorBegin();
-                 elem_iter != mpVoronoiTessellation->GetElementIteratorEnd();
-                 ++elem_iter)
+            // Add any scalar data
+            if (p_cell_writer->GetOutputScalarData())
             {
-                // Get index of this element in mpVoronoiTessellation
-                unsigned elem_index = elem_iter->GetIndex();
+                std::vector<double> vtk_cell_data(num_cells_from_mesh);
 
-                // Get the cell corresponding to this element, via the index of the corresponding node in mrMesh
-                unsigned node_index = mpVoronoiTessellation->GetDelaunayNodeIndexCorrespondingToVoronoiElementIndex(elem_index);
-                CellPtr p_cell = this->GetCellUsingLocationIndex(node_index);
+                unsigned loop_it = 0;
+                for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter, ++loop_it)
+                {
+                    unsigned voronoi_element_idx = voronoi_element_indices_in_cell_order[loop_it];
+                    vtk_cell_data[voronoi_element_idx] = p_cell_writer->GetCellDataForVtkOutput(*cell_iter, this);
+                }
 
-                // Populate the vector of VTK cell data
-                vtk_cell_data[elem_index] = (*cell_writer_iter)->GetCellDataForVtkOutput(p_cell, this);
+                mesh_writer.AddCellData(p_cell_writer->GetVtkCellDataName(), vtk_cell_data);
             }
 
-            mesh_writer.AddCellData((*cell_writer_iter)->GetVtkCellDataName(), vtk_cell_data);
-        }
-
-        // Loop over elements of mpVoronoiTessellation
-        for (typename VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator elem_iter = mpVoronoiTessellation->GetElementIteratorBegin();
-             elem_iter != mpVoronoiTessellation->GetElementIteratorEnd();
-             ++elem_iter)
-        {
-            // Get index of this element in mpVoronoiTessellation
-            unsigned elem_index = elem_iter->GetIndex();
-
-            // Get the cell corresponding to this element, via the index of the corresponding node in mrMesh
-            unsigned node_index = mpVoronoiTessellation->GetDelaunayNodeIndexCorrespondingToVoronoiElementIndex(elem_index);
-            CellPtr p_cell = this->GetCellUsingLocationIndex(node_index);
-
-            for (unsigned var=0; var<num_cell_data_items; var++)
+            // Add any vector data
+            if (p_cell_writer->GetOutputVectorData())
             {
-                cell_data[var][elem_index] = p_cell->GetCellData()->GetItem(cell_data_names[var]);
+                std::vector<c_vector<double, SPACE_DIM>> vtk_cell_data(num_cells_from_mesh);
+
+                unsigned loop_it = 0;
+                for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter, ++loop_it)
+                {
+                    unsigned voronoi_element_idx = voronoi_element_indices_in_cell_order[loop_it];
+                    vtk_cell_data[voronoi_element_idx] = p_cell_writer->GetVectorCellDataForVtkOutput(*cell_iter, this);
+                }
+
+                mesh_writer.AddPointData(p_cell_writer->GetVtkVectorCellDataName(), vtk_cell_data);
             }
         }
 
-        for (unsigned var=0; var<cell_data.size(); var++)
+        // We collect cell data on a cell-by-cell basis and assume that the first cell is representative of all cells
+        auto num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
+        std::vector<std::string> cell_data_names = this->Begin()->GetCellData()->GetKeys();
+        std::vector<std::vector<double>> cell_data(num_cell_data_items, std::vector<double>(num_cells_from_mesh));
+
+        unsigned loop_it = 0;
+        for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter, ++loop_it)
         {
-            mesh_writer.AddCellData(cell_data_names[var], cell_data[var]);
+            unsigned voronoi_element_idx = voronoi_element_indices_in_cell_order[loop_it];
+
+            for (unsigned cell_data_idx = 0; cell_data_idx < num_cell_data_items; ++cell_data_idx)
+            {
+                cell_data[cell_data_idx][voronoi_element_idx] = cell_iter->GetCellData()->GetItem(cell_data_names[cell_data_idx]);
+            }
+        }
+
+        for (unsigned cell_data_idx = 0; cell_data_idx < num_cell_data_items; ++cell_data_idx)
+        {
+            mesh_writer.AddCellData(cell_data_names[cell_data_idx], cell_data[cell_data_idx]);
         }
 
         mesh_writer.WriteVtkUsingMesh(*mpVoronoiTessellation, time.str());

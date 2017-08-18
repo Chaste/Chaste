@@ -114,6 +114,7 @@ public:
         cell_ids.push_back(1.0);
 
         vertex_mesh_writer.AddCellData("Cell IDs", cell_ids);
+
         // Add distance from origin into the node "point" data
         std::vector<double> distance;
         for (unsigned i=0; i<basic_vertex_mesh.GetNumNodes(); i++)
@@ -121,6 +122,13 @@ public:
             distance.push_back(norm_2(basic_vertex_mesh.GetNode(i)->rGetLocation()));
         }
         vertex_mesh_writer.AddPointData("Distance from origin", distance);
+
+        std::vector<c_vector<double,2> > displacement;
+        for (unsigned i=0; i<basic_vertex_mesh.GetNumNodes(); i++)
+        {
+            displacement.push_back(basic_vertex_mesh.GetNode(i)->rGetLocation());
+        }
+        vertex_mesh_writer.AddPointData("Displacement from origin", distance);
 
         vertex_mesh_writer.WriteVtkUsingMesh(basic_vertex_mesh);
 

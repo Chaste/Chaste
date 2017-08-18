@@ -396,65 +396,70 @@ void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rD
     // Create mesh writer for VTK output
     VertexMeshWriter<DIM, DIM> mesh_writer(rDirectory, "results", false);
 
+    auto num_elements = GetNumElements();
+    assert(num_elements > 0);
+
+    // For each cell, find the corresponding element index, which we only want to calculate once
+    std::vector<unsigned> element_indices_in_cell_order;
+    for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter)
+    {
+        unsigned element_index = this->GetLocationIndexUsingCell(*cell_iter);
+        element_indices_in_cell_order.emplace_back(element_index);
+    }
+
     // Iterate over any cell writers that are present
-    unsigned num_cells = this->GetNumAllCells();
-    for (typename std::vector<boost::shared_ptr<AbstractCellWriter<DIM, DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
-         cell_writer_iter != this->mCellWriters.end();
-         ++cell_writer_iter)
+    for (auto&& p_cell_writer : this->mCellWriters)
     {
-        // Create vector to store VTK cell data
-        std::vector<double> vtk_cell_data(num_cells);
-
-        // Iterate over vertex elements ///\todo #2512 - replace with loop over cells
-        for (typename VertexMesh<DIM,DIM>::VertexElementIterator elem_iter = mpMutableVertexMesh->GetElementIteratorBegin();
-             elem_iter != mpMutableVertexMesh->GetElementIteratorEnd();
-             ++elem_iter)
+        // Add any scalar data
+        if (p_cell_writer->GetOutputScalarData())
         {
-            // Get index of this element in the vertex mesh
-            unsigned elem_index = elem_iter->GetIndex();
+            std::vector<double> vtk_cell_data(num_elements);
 
-            // Get the cell corresponding to this element
-            CellPtr p_cell = this->GetCellUsingLocationIndex(elem_index);
-            assert(p_cell);
+            unsigned loop_it = 0;
+            for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter, ++loop_it)
+            {
+                unsigned element_idx = element_indices_in_cell_order[loop_it];
+                vtk_cell_data[element_idx] = p_cell_writer->GetCellDataForVtkOutput(*cell_iter, this);
+            }
 
-            // Populate the vector of VTK cell data
-            vtk_cell_data[elem_index] = (*cell_writer_iter)->GetCellDataForVtkOutput(p_cell, this);
+            mesh_writer.AddCellData(p_cell_writer->GetVtkCellDataName(), vtk_cell_data);
         }
 
-        mesh_writer.AddCellData((*cell_writer_iter)->GetVtkCellDataName(), vtk_cell_data);
+        // Add any vector data
+        if (p_cell_writer->GetOutputVectorData())
+        {
+            std::vector<c_vector<double, DIM>> vtk_cell_data(num_elements);
+
+            unsigned loop_it = 0;
+            for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter, ++loop_it)
+            {
+                unsigned element_idx = element_indices_in_cell_order[loop_it];
+                vtk_cell_data[element_idx] = p_cell_writer->GetVectorCellDataForVtkOutput(*cell_iter, this);
+            }
+
+            mesh_writer.AddPointData(p_cell_writer->GetVtkVectorCellDataName(), vtk_cell_data);
+        }
     }
 
-    // When outputting any CellData, we assume that the first cell is representative of all cells
-    unsigned num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
+    // We collect cell data on a cell-by-cell basis and assume that the first cell is representative of all cells
+    auto num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
     std::vector<std::string> cell_data_names = this->Begin()->GetCellData()->GetKeys();
+    std::vector<std::vector<double>> cell_data(num_cell_data_items, std::vector<double>(num_elements));
 
-    std::vector<std::vector<double> > cell_data;
-    for (unsigned var=0; var<num_cell_data_items; var++)
+    unsigned loop_it = 0;
+    for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter, ++loop_it)
     {
-        std::vector<double> cell_data_var(num_cells);
-        cell_data.push_back(cell_data_var);
-    }
+        unsigned element_idx = element_indices_in_cell_order[loop_it];
 
-    // Loop over vertex elements ///\todo #2512 - replace with loop over cells
-    for (typename VertexMesh<DIM,DIM>::VertexElementIterator elem_iter = mpMutableVertexMesh->GetElementIteratorBegin();
-         elem_iter != mpMutableVertexMesh->GetElementIteratorEnd();
-         ++elem_iter)
-    {
-        // Get index of this element in the vertex mesh
-        unsigned elem_index = elem_iter->GetIndex();
-
-        // Get the cell corresponding to this element
-        CellPtr p_cell = this->GetCellUsingLocationIndex(elem_index);
-        assert(p_cell);
-
-        for (unsigned var=0; var<num_cell_data_items; var++)
+        for (unsigned cell_data_idx = 0; cell_data_idx < num_cell_data_items; ++cell_data_idx)
         {
-            cell_data[var][elem_index] = p_cell->GetCellData()->GetItem(cell_data_names[var]);
+            cell_data[cell_data_idx][element_idx] = cell_iter->GetCellData()->GetItem(cell_data_names[cell_data_idx]);
         }
     }
-    for (unsigned var=0; var<num_cell_data_items; var++)
+
+    for (unsigned cell_data_idx = 0; cell_data_idx < num_cell_data_items; ++cell_data_idx)
     {
-        mesh_writer.AddCellData(cell_data_names[var], cell_data[var]);
+        mesh_writer.AddCellData(cell_data_names[cell_data_idx], cell_data[cell_data_idx]);
     }
 
     unsigned num_timesteps = SimulationTime::Instance()->GetTimeStepsElapsed();

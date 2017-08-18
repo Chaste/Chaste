@@ -150,6 +150,14 @@ public:
     void AddPointData(std::string dataName, std::vector<double> dataPayload);
 
     /**
+     * Add data to a future VTK file.
+     *
+     * @param dataName a tag to go into the VTK file
+     * @param dataPayload a pay-load of length (number of nodes)
+     */
+    void AddPointData(std::string dataName, std::vector<c_vector<double, SPACE_DIM> > dataPayload);
+
+    /**
      * @return the coordinates of the next node to be written to file
      */
     std::vector<double> GetNextNode();
