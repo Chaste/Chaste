@@ -87,6 +87,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellRosetteRankWriter.hpp"
 #include "CellVolumesWriter.hpp"
 
+// Boost
+#include <boost/make_shared.hpp>
+#include <boost/shared_ptr.hpp>
+
 #include "PetscSetupAndFinalize.hpp"
 
 // Note that high level tests of all cell writers can be found in the
