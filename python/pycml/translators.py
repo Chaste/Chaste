@@ -4765,7 +4765,7 @@ class CellMLToPythonTranslator(CellMLToChasteTranslator):
     binary_ops.update({'rem': '%'})
     nary_ops = CellMLToChasteTranslator.nary_ops.copy()
     nary_ops.update({'and': 'and', 'or': 'or'})
-    function_map = {'power': 'math.pow', 'abs': 'abs', 'ln': 'math.log', 'log': 'math.log', 'exp': 'math.exp',
+    function_map = {'power': 'math.pow', 'abs': 'abs', 'ln': 'math.log', 'log': 'math.log10', 'exp': 'math.exp',
                     'floor': 'math.floor', 'ceiling': 'math.ceil',
                     'factorial': 'factorial', # Needs external definition
                     'not': 'not',
