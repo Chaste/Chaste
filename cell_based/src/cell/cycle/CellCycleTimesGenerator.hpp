@@ -40,14 +40,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/shared_ptr.hpp>
 #include <boost/version.hpp>
 
-
-#if BOOST_VERSION < 105600
-// Forward compatibility with Boost 1.56 onwards
-#include "Boost156NormalDistribution.hpp"
-#endif
-
-#include <boost/random.hpp>
-
 #include "ChasteSerialization.hpp"
 #include "SerializableSingleton.hpp"
 #include "RandomNumberGenerator.hpp"
