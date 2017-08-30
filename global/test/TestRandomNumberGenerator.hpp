@@ -373,7 +373,7 @@ public:
 
         //Predictable gamma?
         p_gen->Reseed(42);
-        TS_ASSERT_DELTA(p_gen->GammaRandomDeviate(1.0, 2.0), 0.9385, 1e-4);
+        TS_ASSERT_DELTA(p_gen->GammaRandomDeviate(1.0, 2.0), 1.5054, 1e-4);
 
         //Predictable normal?
         p_gen->Reseed(42);
@@ -462,10 +462,10 @@ public:
         RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
         p_gen->Reseed(5);
 
-        TS_ASSERT_DELTA(p_gen->GammaRandomDeviate(1.0, 1.0), 0.2510, 1e-4);
-        TS_ASSERT_DELTA(p_gen->GammaRandomDeviate(2.0, 1.0), 1.3033, 1e-4);
-        TS_ASSERT_DELTA(p_gen->GammaRandomDeviate(1.0, 2.0), 3.5595, 1e-4);
-        TS_ASSERT_DELTA(p_gen->GammaRandomDeviate(3.5, 2.9), 12.6437, 1e-4);
+        TS_ASSERT_DELTA(p_gen->GammaRandomDeviate(1.0, 1.0), 0.9120, 1e-4);
+        TS_ASSERT_DELTA(p_gen->GammaRandomDeviate(2.0, 1.0), 2.3151, 1e-4);
+        TS_ASSERT_DELTA(p_gen->GammaRandomDeviate(1.0, 2.0), 2.4686, 1e-4);
+        TS_ASSERT_DELTA(p_gen->GammaRandomDeviate(3.5, 2.9), 21.6512, 1e-4);
     }
 
     void TestExponentialRandomDeviate()

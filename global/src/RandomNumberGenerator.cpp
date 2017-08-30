@@ -36,9 +36,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "RandomNumberGenerator.hpp"
 #include "Exception.hpp"
 
-#if BOOST_VERSION < 106400
+#if BOOST_VERSION < 106400 // #2893
 // Forward compatibility with Boost 1.64 onwards
 #include "Boost165ExponentialDistribution.hpp"
+#include "Boost165GammaDistribution.hpp"
 #endif
 
 RandomNumberGenerator* RandomNumberGenerator::mpInstance = nullptr;
@@ -46,7 +47,7 @@ RandomNumberGenerator* RandomNumberGenerator::mpInstance = nullptr;
 RandomNumberGenerator::RandomNumberGenerator()
         : mMersenneTwisterGenerator(0u),
           mGenerateUnitReal(mMersenneTwisterGenerator, boost::uniform_real<>()),
-#if BOOST_VERSION < 105600 //#2585
+#if BOOST_VERSION < 105600 // #2585 and #2893
           mGenerateStandardNormal(mMersenneTwisterGenerator, boost::random::normal_distribution_v156<>(mMersenneTwisterGenerator, 0.0, 1.0))
 #else
           mGenerateStandardNormal(mMersenneTwisterGenerator, boost::normal_distribution<>(0.0, 1.0))
@@ -122,23 +123,27 @@ double RandomNumberGenerator::NormalRandomDeviate(double mean, double stdDev)
 
 double RandomNumberGenerator::GammaRandomDeviate(double shape, double scale)
 {
+// make a gamma distribution and `merge' this distribution with our random number generator
+
+#if BOOST_VERSION < 106400
+    boost::random::gamma_distribution_v165<> gd(shape);
+    boost::variate_generator<boost::mt19937&, boost::random::gamma_distribution_v165<> > var_gamma(mMersenneTwisterGenerator, gd);
+#else
     boost::gamma_distribution<> gd(shape);
     boost::variate_generator<boost::mt19937&, boost::gamma_distribution<> > var_gamma(mMersenneTwisterGenerator, gd);
-
+#endif
     return scale * var_gamma();
 }
 
 double RandomNumberGenerator::ExponentialRandomDeviate(double scale)
 {
+// make an exponential distribution and `merge' this distribution with our random number generator
+
 #if BOOST_VERSION < 106400
-    // make an exponential distribution
     boost::random::exponential_distribution_v165<> ed(scale);
-    // `merge' this distribution with our random number generator
     boost::variate_generator<boost::mt19937&, boost::random::exponential_distribution_v165<> > var_exponential(mMersenneTwisterGenerator, ed);
 #else
-    // make an exponential distribution
     boost::exponential_distribution<> ed(scale);
-    // `merge' this distribution with our random number generator
     boost::variate_generator<boost::mt19937&, boost::exponential_distribution<> > var_exponential(mMersenneTwisterGenerator, ed);
 #endif
     // return the random number
