@@ -74,6 +74,12 @@
 
 #include <boost/random/variate_generator.hpp>
 
+#if BOOST_VERSION < 106400
+#include "Boost165IntFloatPair.hpp" // packaged with Chaste.
+#else
+#include <boost/random/detail/int_float_pair.hpp>
+#endif
+
 namespace boost
 {
 namespace random
@@ -164,105 +170,97 @@ namespace random
             1
         };
 
-        template <class Engine>
-        inline typename boost::make_unsigned<typename Engine::result_type>::type
-        generate_one_digit(Engine& eng, std::size_t bits)
-        {
-            typedef typename Engine::result_type base_result;
-            typedef typename boost::make_unsigned<base_result>::type base_unsigned;
-
-            base_unsigned range = detail::subtract<base_result>()((eng.max)(), (eng.min)());
-            base_unsigned y0_mask = (base_unsigned(2) << (bits - 1)) - 1;
-            base_unsigned y0 = (range + 1) & ~y0_mask;
-            base_unsigned u;
-            do
-            {
-                u = detail::subtract<base_result>()(eng(), (eng.min)());
-            } while (y0 != 0 && u > base_unsigned(y0 - 1));
-            return u & y0_mask;
-        }
-
-        template <class RealType, std::size_t w, class Engine>
-        std::pair<RealType, int> generate_int_float_pair(Engine& eng, boost::mpl::true_)
-        {
-            typedef typename Engine::result_type base_result;
-            typedef typename boost::make_unsigned<base_result>::type base_unsigned;
-
-            base_unsigned range = detail::subtract<base_result>()((eng.max)(), (eng.min)());
-
-            std::size_t m = (range == (std::numeric_limits<base_unsigned>::max)()) ? std::numeric_limits<base_unsigned>::digits :
-#if BOOST_VERSION < 104700
-                                                                                   // Just in the boost namespace
-                integer_log2(range + 1);
-#else
-                                                                                   // In the detail namespace
-                detail::integer_log2(range + 1);
-#endif
-
-            int bucket = 0;
-            // process as many full digits as possible into the int part
-            for (std::size_t i = 0; i < w / m; ++i)
-            {
-                // LCOV_EXCL_START
-                base_unsigned u = generate_one_digit(eng, m);
-                bucket = (bucket << m) | u;
-                // LCOV_EXCL_STOP
-            }
-            RealType r;
-
-            const std::size_t digits = std::numeric_limits<RealType>::digits;
-            {
-                base_unsigned u = generate_one_digit(eng, m);
-                base_unsigned mask = (base_unsigned(1) << (w % m)) - 1;
-                bucket = (bucket << (w % m)) | (mask & u);
-                const RealType mult = RealType(1) / RealType(base_unsigned(1) << (m - w % m));
-                // zero out unused bits
-                if (m - w % m > digits)
-                {
-                    // LCOV_EXCL_START
-                    u &= ~(base_unsigned(1) << (m - digits));
-                    // LCOV_EXCL_STOP
-                }
-                r = RealType(u >> (w % m)) * mult;
-            }
-            for (std::size_t i = m - w % m; i + m < digits; ++i)
-            {
-                // LCOV_EXCL_START
-                base_unsigned u = generate_one_digit(eng, m);
-                r += u;
-                r *= RealType(0.5) / RealType(base_unsigned(1) << (m - 1));
-                // LCOV_EXCL_STOP
-            }
-            if (m - w % m < digits)
-            {
-                const std::size_t remaining = (digits - m + w % m) % m;
-                base_unsigned u = generate_one_digit(eng, m);
-                r += u & ((base_unsigned(2) << (remaining - 1)) - 1);
-                const RealType mult = RealType(0.5) / RealType(base_unsigned(1) << (remaining - 1));
-                r *= mult;
-            }
-            return std::make_pair(r, bucket);
-        }
-
-        template <class RealType, std::size_t w, class Engine>
-        inline std::pair<RealType, int> generate_int_float_pair(Engine& eng, boost::mpl::false_)
-        {
-#if BOOST_VERSION < 104700
-            int bucket = uniform_int<>(0, (1 << w) - 1)(eng);
-#else
-            int bucket = uniform_int_distribution<>(0, (1 << w) - 1)(eng);
-#endif
-            RealType r = uniform_01<RealType>()(eng);
-            return std::make_pair(r, bucket);
-        }
-
-        template <class RealType, std::size_t w, class Engine>
-        inline std::pair<RealType, int> generate_int_float_pair(Engine& eng)
-        {
-            typedef typename Engine::result_type base_result;
-            return generate_int_float_pair<RealType, w>(eng,
-                                                        boost::is_integral<base_result>());
-        }
+        //        template <class Engine>
+        //        inline typename boost::make_unsigned<typename Engine::result_type>::type
+        //        generate_one_digit(Engine& eng, std::size_t bits)
+        //        {
+        //            typedef typename Engine::result_type base_result;
+        //            typedef typename boost::make_unsigned<base_result>::type base_unsigned;
+        //
+        //            base_unsigned range = detail::subtract<base_result>()((eng.max)(), (eng.min)());
+        //            base_unsigned y0_mask = (base_unsigned(2) << (bits - 1)) - 1;
+        //            base_unsigned y0 = (range + 1) & ~y0_mask;
+        //            base_unsigned u;
+        //            do
+        //            {
+        //                u = detail::subtract<base_result>()(eng(), (eng.min)());
+        //            } while (y0 != 0 && u > base_unsigned(y0 - 1));
+        //            return u & y0_mask;
+        //        }
+        //
+        //        template <class RealType, std::size_t w, class Engine>
+        //        std::pair<RealType, int> generate_int_float_pair(Engine& eng, boost::mpl::true_)
+        //        {
+        //            typedef typename Engine::result_type base_result;
+        //            typedef typename boost::make_unsigned<base_result>::type base_unsigned;
+        //
+        //            base_unsigned range = detail::subtract<base_result>()((eng.max)(), (eng.min)());
+        //
+        //            std::size_t m = (range == (std::numeric_limits<base_unsigned>::max)()) ? std::numeric_limits<base_unsigned>::digits :
+        //
+        //                                                                                   // In the detail namespace
+        //                detail::integer_log2(range + 1);
+        //
+        //            int bucket = 0;
+        //            // process as many full digits as possible into the int part
+        //            for (std::size_t i = 0; i < w / m; ++i)
+        //            {
+        //                // LCOV_EXCL_START
+        //                base_unsigned u = generate_one_digit(eng, m);
+        //                bucket = (bucket << m) | u;
+        //                // LCOV_EXCL_STOP
+        //            }
+        //            RealType r;
+        //
+        //            const std::size_t digits = std::numeric_limits<RealType>::digits;
+        //            {
+        //                base_unsigned u = generate_one_digit(eng, m);
+        //                base_unsigned mask = (base_unsigned(1) << (w % m)) - 1;
+        //                bucket = (bucket << (w % m)) | (mask & u);
+        //                const RealType mult = RealType(1) / RealType(base_unsigned(1) << (m - w % m));
+        //                // zero out unused bits
+        //                if (m - w % m > digits)
+        //                {
+        //                    // LCOV_EXCL_START
+        //                    u &= ~(base_unsigned(1) << (m - digits));
+        //                    // LCOV_EXCL_STOP
+        //                }
+        //                r = RealType(u >> (w % m)) * mult;
+        //            }
+        //            for (std::size_t i = m - w % m; i + m < digits; ++i)
+        //            {
+        //                // LCOV_EXCL_START
+        //                base_unsigned u = generate_one_digit(eng, m);
+        //                r += u;
+        //                r *= RealType(0.5) / RealType(base_unsigned(1) << (m - 1));
+        //                // LCOV_EXCL_STOP
+        //            }
+        //            if (m - w % m < digits)
+        //            {
+        //                const std::size_t remaining = (digits - m + w % m) % m;
+        //                base_unsigned u = generate_one_digit(eng, m);
+        //                r += u & ((base_unsigned(2) << (remaining - 1)) - 1);
+        //                const RealType mult = RealType(0.5) / RealType(base_unsigned(1) << (remaining - 1));
+        //                r *= mult;
+        //            }
+        //            return std::make_pair(r, bucket);
+        //        }
+        //
+        //        template <class RealType, std::size_t w, class Engine>
+        //        inline std::pair<RealType, int> generate_int_float_pair(Engine& eng, boost::mpl::false_)
+        //        {
+        //            int bucket = uniform_int_distribution<>(0, (1 << w) - 1)(eng);
+        //            RealType r = uniform_01<RealType>()(eng);
+        //            return std::make_pair(r, bucket);
+        //        }
+        //
+        //        template <class RealType, std::size_t w, class Engine>
+        //        inline std::pair<RealType, int> generate_int_float_pair(Engine& eng)
+        //        {
+        //            typedef typename Engine::result_type base_result;
+        //            return generate_int_float_pair<RealType, w>(eng,
+        //                                                        boost::is_integral<base_result>());
+        //        }
 
         template <class RealType = double>
         struct unit_normal_distribution
@@ -274,7 +272,7 @@ namespace random
                 const double* const table_y = normal_table<double>::table_y;
                 for (;;)
                 {
-                    std::pair<RealType, int> vals = generate_int_float_pair<RealType, 8>(eng);
+                    std::pair<RealType, int> vals = generate_int_float_pair_v165<RealType, 8>(eng);
                     int i = vals.second;
                     int sign = (i & 1) * 2 - 1;
                     i = i >> 1;
@@ -432,11 +430,7 @@ namespace random
         result_type operator()(Engine& eng)
         {
             detail::unit_normal_distribution<RealType> impl;
-#if BOOST_VERSION < 104700
-            return impl(_engine) * _sigma + _mean;
-#else
             return impl(eng) * _sigma + _mean;
-#endif
         }
 
         /** Writes a @c normal_distribution_v156 to a @c std::ostream. */
