@@ -37,12 +37,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CELLCYCLETIMESGENERATOR_HPP_
 
 #include <sstream>
-#include <boost/shared_ptr.hpp>
-#include <boost/version.hpp>
 
 #include "ChasteSerialization.hpp"
-#include "SerializableSingleton.hpp"
 #include "RandomNumberGenerator.hpp"
+#include "SerializableSingleton.hpp"
 
 /**
  * This is a helper class for FixedSequenceCellCycleModel. It comprises a singleton class
@@ -51,7 +49,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class CellCycleTimesGenerator : public SerializableSingleton<CellCycleTimesGenerator>
 {
 private:
-
     /** The singleton definition
      */
     static CellCycleTimesGenerator* mpInstance;
@@ -97,18 +94,17 @@ private:
      * @param archive the archive
      * @param version the current version of this class
      */
-    template<class Archive>
-    void serialize(Archive & archive, const unsigned int version)
+    template <class Archive>
+    void serialize(Archive& archive, const unsigned int version)
     {
-        archive & mRandomSeed;
-    	archive & mCellCycleTimes;
-    	archive & mCurrentIndex;
-    	archive & mRate;
-    	archive & mVectorCreated;
+        archive& mRandomSeed;
+        archive& mCellCycleTimes;
+        archive& mCurrentIndex;
+        archive& mRate;
+        archive& mVectorCreated;
     }
 
 protected:
-
     /**
      * Protected constructor.
      * Use Instance() to access the random number generator.
@@ -116,7 +112,6 @@ protected:
     CellCycleTimesGenerator();
 
 public:
-
     /**
      * @return a pointer to the CellCycleTimesGenerator object.
      * The object is created the first time this method is called.
