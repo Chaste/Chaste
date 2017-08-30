@@ -407,9 +407,9 @@ public:
         {
             p_gen->StandardNormalRandomDeviate();
         }
-        // Boost 1.56 values
-        TS_ASSERT_DELTA(p_gen->StandardNormalRandomDeviate(), 0.2132, 1e-4);
-        TS_ASSERT_DELTA(p_gen->NormalRandomDeviate(256.0, 0.5), 255.6166, 1e-4);
+        // Boost 1.65 values
+        TS_ASSERT_DELTA(p_gen->StandardNormalRandomDeviate(), -0.7667, 1e-4);
+        TS_ASSERT_DELTA(p_gen->NormalRandomDeviate(256.0, 0.5), 256.2037, 1e-4);
     }
 
     void TestReseedingWorksProperly()
