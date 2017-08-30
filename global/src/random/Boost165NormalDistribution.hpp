@@ -14,7 +14,7 @@
  * - #define BOOST_RANDOM_NORMAL_DISTRIBUTION_HPP renamed BOOST_156_RANDOM_NORMAL_DISTRIBUTION_HPP
  *   in order to preserve uniqueness of header file
  *
- * - Class renamed normal_distribution_v156 (also to preserve uniqueness)
+ * - Class renamed normal_distribution_v165 (also to preserve uniqueness)
  *
  * - Constructor takes a compulsory first argument of underlying Mersenne Twister, to get it to
  *   compile on pre boost 1.47, due to changes in the result_type of the variate_generator.
@@ -43,61 +43,42 @@
  *  2001-02-18  moved to individual header files
  */
 
-#ifndef BOOST_156_RANDOM_NORMAL_DISTRIBUTION_HPP
-#define BOOST_156_RANDOM_NORMAL_DISTRIBUTION_HPP
-
-#include <boost/config/no_tr1/cmath.hpp>
-#include <istream>
-
-#include <iosfwd>
+#ifndef BOOST_165_RANDOM_NORMAL_DISTRIBUTION_HPP
+#define BOOST_165_RANDOM_NORMAL_DISTRIBUTION_HPP
 
 #include <boost/assert.hpp>
+#include <boost/config/no_tr1/cmath.hpp>
 #include <boost/limits.hpp>
-#include <boost/static_assert.hpp>
-
-#include <boost/integer.hpp>
-#include <boost/integer/integer_mask.hpp>
-#include <boost/type_traits/is_integral.hpp>
-#include <boost/type_traits/make_unsigned.hpp>
-
 #include <boost/random/detail/config.hpp>
+//#include <boost/random/detail/int_float_pair.hpp> // replaced with Chaste version as not present in old boosts < 1.64
 #include <boost/random/detail/operators.hpp>
-
-#include <boost/random/detail/integer_log2.hpp>
-
-#include <boost/random/detail/signed_unsigned_tools.hpp>
-
-#include <boost/random/exponential_distribution.hpp>
-#include <boost/random/mersenne_twister.hpp>
+//#include <boost/random/exponential_distribution.hpp> // replaced with Chaste version as different in old boosts < 1.64
 #include <boost/random/uniform_01.hpp>
-#include <boost/random/uniform_int_distribution.hpp>
+#include <boost/static_assert.hpp>
+#include <iosfwd>
+#include <istream>
 
-#include <boost/random/variate_generator.hpp>
-
-#if BOOST_VERSION < 106400
-#include "Boost165IntFloatPair.hpp" // packaged with Chaste.
-#else
-#include <boost/random/detail/int_float_pair.hpp>
-#endif
+// Added by Chaste team
+#include "Boost165ExponentialDistribution.hpp"
+#include "Boost165IntFloatPair.hpp"
 
 namespace boost
 {
 namespace random
 {
-
     namespace detail
     {
 
         // tables for the ziggurat algorithm
         template <class RealType>
-        struct normal_table
+        struct normal_table_v165
         {
             static const RealType table_x[129];
             static const RealType table_y[129];
         };
 
         template <class RealType>
-        const RealType normal_table<RealType>::table_x[129] = {
+        const RealType normal_table_v165<RealType>::table_x[129] = {
             3.7130862467403632609, 3.4426198558966521214, 3.2230849845786185446, 3.0832288582142137009,
             2.9786962526450169606, 2.8943440070186706210, 2.8231253505459664379, 2.7611693723841538514,
             2.7061135731187223371, 2.6564064112581924999, 2.6109722484286132035, 2.5690336259216391328,
@@ -134,7 +115,7 @@ namespace random
         };
 
         template <class RealType>
-        const RealType normal_table<RealType>::table_y[129] = {
+        const RealType normal_table_v165<RealType>::table_y[129] = {
             0, 0.0026696290839025035092, 0.0055489952208164705392, 0.0086244844129304709682,
             0.011839478657982313715, 0.015167298010672042468, 0.018592102737165812650, 0.022103304616111592615,
             0.025693291936149616572, 0.029356317440253829618, 0.033087886146505155566, 0.036884388786968774128,
@@ -170,106 +151,14 @@ namespace random
             1
         };
 
-        //        template <class Engine>
-        //        inline typename boost::make_unsigned<typename Engine::result_type>::type
-        //        generate_one_digit(Engine& eng, std::size_t bits)
-        //        {
-        //            typedef typename Engine::result_type base_result;
-        //            typedef typename boost::make_unsigned<base_result>::type base_unsigned;
-        //
-        //            base_unsigned range = detail::subtract<base_result>()((eng.max)(), (eng.min)());
-        //            base_unsigned y0_mask = (base_unsigned(2) << (bits - 1)) - 1;
-        //            base_unsigned y0 = (range + 1) & ~y0_mask;
-        //            base_unsigned u;
-        //            do
-        //            {
-        //                u = detail::subtract<base_result>()(eng(), (eng.min)());
-        //            } while (y0 != 0 && u > base_unsigned(y0 - 1));
-        //            return u & y0_mask;
-        //        }
-        //
-        //        template <class RealType, std::size_t w, class Engine>
-        //        std::pair<RealType, int> generate_int_float_pair(Engine& eng, boost::mpl::true_)
-        //        {
-        //            typedef typename Engine::result_type base_result;
-        //            typedef typename boost::make_unsigned<base_result>::type base_unsigned;
-        //
-        //            base_unsigned range = detail::subtract<base_result>()((eng.max)(), (eng.min)());
-        //
-        //            std::size_t m = (range == (std::numeric_limits<base_unsigned>::max)()) ? std::numeric_limits<base_unsigned>::digits :
-        //
-        //                                                                                   // In the detail namespace
-        //                detail::integer_log2(range + 1);
-        //
-        //            int bucket = 0;
-        //            // process as many full digits as possible into the int part
-        //            for (std::size_t i = 0; i < w / m; ++i)
-        //            {
-        //                // LCOV_EXCL_START
-        //                base_unsigned u = generate_one_digit(eng, m);
-        //                bucket = (bucket << m) | u;
-        //                // LCOV_EXCL_STOP
-        //            }
-        //            RealType r;
-        //
-        //            const std::size_t digits = std::numeric_limits<RealType>::digits;
-        //            {
-        //                base_unsigned u = generate_one_digit(eng, m);
-        //                base_unsigned mask = (base_unsigned(1) << (w % m)) - 1;
-        //                bucket = (bucket << (w % m)) | (mask & u);
-        //                const RealType mult = RealType(1) / RealType(base_unsigned(1) << (m - w % m));
-        //                // zero out unused bits
-        //                if (m - w % m > digits)
-        //                {
-        //                    // LCOV_EXCL_START
-        //                    u &= ~(base_unsigned(1) << (m - digits));
-        //                    // LCOV_EXCL_STOP
-        //                }
-        //                r = RealType(u >> (w % m)) * mult;
-        //            }
-        //            for (std::size_t i = m - w % m; i + m < digits; ++i)
-        //            {
-        //                // LCOV_EXCL_START
-        //                base_unsigned u = generate_one_digit(eng, m);
-        //                r += u;
-        //                r *= RealType(0.5) / RealType(base_unsigned(1) << (m - 1));
-        //                // LCOV_EXCL_STOP
-        //            }
-        //            if (m - w % m < digits)
-        //            {
-        //                const std::size_t remaining = (digits - m + w % m) % m;
-        //                base_unsigned u = generate_one_digit(eng, m);
-        //                r += u & ((base_unsigned(2) << (remaining - 1)) - 1);
-        //                const RealType mult = RealType(0.5) / RealType(base_unsigned(1) << (remaining - 1));
-        //                r *= mult;
-        //            }
-        //            return std::make_pair(r, bucket);
-        //        }
-        //
-        //        template <class RealType, std::size_t w, class Engine>
-        //        inline std::pair<RealType, int> generate_int_float_pair(Engine& eng, boost::mpl::false_)
-        //        {
-        //            int bucket = uniform_int_distribution<>(0, (1 << w) - 1)(eng);
-        //            RealType r = uniform_01<RealType>()(eng);
-        //            return std::make_pair(r, bucket);
-        //        }
-        //
-        //        template <class RealType, std::size_t w, class Engine>
-        //        inline std::pair<RealType, int> generate_int_float_pair(Engine& eng)
-        //        {
-        //            typedef typename Engine::result_type base_result;
-        //            return generate_int_float_pair<RealType, w>(eng,
-        //                                                        boost::is_integral<base_result>());
-        //        }
-
         template <class RealType = double>
-        struct unit_normal_distribution
+        struct unit_normal_distribution_v165
         {
             template <class Engine>
             RealType operator()(Engine& eng)
             {
-                const double* const table_x = normal_table<double>::table_x;
-                const double* const table_y = normal_table<double>::table_y;
+                const double* const table_x = normal_table_v165<double>::table_x;
+                const double* const table_y = normal_table_v165<double>::table_y;
                 for (;;)
                 {
                     std::pair<RealType, int> vals = generate_int_float_pair_v165<RealType, 8>(eng);
@@ -280,49 +169,100 @@ namespace random
                     if (x < table_x[i + 1])
                         return x * sign;
                     if (i == 0)
-                        return generate_tail(eng) * sign;
-                    RealType y = RealType(table_y[i]) + uniform_01<RealType>()(eng) * RealType(table_y[i + 1] - table_y[i]);
-                    if (y < f(x))
+                        return generate_tail_v165(eng) * sign;
+
+                    RealType y01 = uniform_01<RealType>()(eng);
+                    RealType y = RealType(table_y[i]) + y01 * RealType(table_y[i + 1] - table_y[i]);
+
+                    // These store the value y - bound, or something proportional to that difference:
+                    RealType y_above_ubound, y_above_lbound;
+
+                    // There are three cases to consider:
+                    // - convex regions (where x[i] > x[j] >= 1)
+                    // - concave regions (where 1 <= x[i] < x[j])
+                    // - region containing the inflection point (where x[i] > 1 > x[j])
+                    // For convex (concave), exp^(-x^2/2) is bounded below (above) by the tangent at
+                    // (x[i],y[i]) and is bounded above (below) by the diagonal line from (x[i+1],y[i+1]) to
+                    // (x[i],y[i]).
+                    //
+                    // *If* the inflection point region satisfies slope(x[i+1]) < slope(diagonal), then we
+                    // can treat the inflection region as a convex region: this condition is necessary and
+                    // sufficient to ensure that the curve lies entirely below the diagonal (that, in turn,
+                    // also implies that it will be above the tangent at x[i]).
+                    //
+                    // For the current table size (128), this is satisfied: slope(x[i+1]) = -0.60653 <
+                    // slope(diag) = -0.60649, and so we have only two cases below instead of three.
+
+                    if (table_x[i] >= 1)
+                    { // convex (incl. inflection)
+                        y_above_ubound = RealType(table_x[i] - table_x[i + 1]) * y01 - (RealType(table_x[i]) - x);
+                        y_above_lbound = y - (RealType(table_y[i]) + (RealType(table_x[i]) - x) * RealType(table_y[i]) * RealType(table_x[i]));
+                    }
+                    else
+                    { // concave
+                        y_above_lbound = RealType(table_x[i] - table_x[i + 1]) * y01 - (RealType(table_x[i]) - x);
+                        y_above_ubound = y - (RealType(table_y[i]) + (RealType(table_x[i]) - x) * RealType(table_y[i]) * RealType(table_x[i]));
+                    }
+
+                    if (y_above_ubound < 0 // if above the upper bound reject immediately
+                        && (y_above_lbound < 0 // If below the lower bound accept immediately
+                            || y < f(x) // Otherwise it's between the bounds and we need a full check
+                            ))
+                    {
                         return x * sign;
+                    }
                 }
             }
             static RealType f(RealType x)
             {
                 using std::exp;
-                return exp(-x * x / 2);
+                return exp(-(x * x / 2));
             }
+            // Generate from the tail using rejection sampling from the exponential(x_1) distribution,
+            // shifted by x_1.  This looks a little different from the usual rejection sampling because it
+            // transforms the condition by taking the log of both sides, thus avoiding the costly exp() call
+            // on the RHS, then takes advantage of the fact that -log(unif01) is simply generating an
+            // exponential (by inverse cdf sampling) by replacing the log(unif01) on the LHS with a
+            // exponential(1) draw, y.
             template <class Engine>
-            RealType generate_tail(Engine& eng)
+            RealType generate_tail_v165(Engine& eng)
             {
-                boost::exponential_distribution<RealType> exponential;
-                boost::variate_generator<Engine&, boost::exponential_distribution<RealType> > var_exponential(eng, exponential);
-                const RealType tail_start = RealType(normal_table<double>::table_x[1]);
-                // LCOV_EXCL_START
+                const RealType tail_start = RealType(normal_table_v165<double>::table_x[1]);
+                boost::random::exponential_distribution_v165<RealType> exp_x(tail_start);
+                boost::random::exponential_distribution_v165<RealType> exp_y;
                 for (;;)
                 {
-                    // LCOV_EXCL_STOP
-                    RealType x = var_exponential() / tail_start;
-                    RealType y = var_exponential();
+                    RealType x = exp_x(eng);
+                    RealType y = exp_y(eng);
+                    // If we were doing non-transformed rejection sampling, this condition would be:
+                    // if (unif01 < exp(-.5*x*x)) return x + tail_start;
                     if (2 * y > x * x)
                         return x + tail_start;
                 }
             }
         };
-    }
 
-    // deterministic Box-Muller method, uses trigonometric functions
+    } // namespace detail
 
     /**
- * Instantiations of class template normal_distribution_v156 model a
+ * Instantiations of class template normal_distribution model a
  * \random_distribution. Such a distribution produces random numbers
  * @c x distributed with probability density function
  * \f$\displaystyle p(x) =
  *   \frac{1}{\sqrt{2\pi}\sigma} e^{-\frac{(x-\mu)^2}{2\sigma^2}}
  * \f$,
  * where mean and sigma are the parameters of the distribution.
+ *
+ * The implementation uses the "ziggurat" algorithm, as described in
+ *
+ *  @blockquote
+ *  "The Ziggurat Method for Generating Random Variables",
+ *  George Marsaglia and Wai Wan Tsang, Journal of Statistical Software,
+ *  Volume 5, Number 8 (2000), 1-7.
+ *  @endblockquote
  */
     template <class RealType = double>
-    class normal_distribution_v156
+    class normal_distribution_v165
     {
     public:
         typedef RealType input_type;
@@ -331,7 +271,7 @@ namespace random
         class param_type
         {
         public:
-            typedef normal_distribution_v156 distribution_type;
+            typedef normal_distribution_v165 distribution_type;
 
             /**
          * Constructs a @c param_type with a given mean and
@@ -349,7 +289,7 @@ namespace random
             /** Returns the mean of the distribution. */
             RealType mean() const { return _mean; }
 
-            /** Returns the standard deviation of the distribution. */
+            /** Returns the standand deviation of the distribution. */
             RealType sigma() const { return _sigma; }
 
             /** Writes a @c param_type to a @c std::ostream. */
@@ -381,17 +321,24 @@ namespace random
         };
 
         /**
-     * Constructs a @c normal_distribution_v156 object. @c mean and @c sigma are
+     * Constructs a @c normal_distribution_v165 object. @c mean and @c sigma are
      * the parameters for the distribution.
      *
      * Requires: sigma >= 0
      */
-        explicit normal_distribution_v156(boost::mt19937& engine_arg,
-                                          const RealType& mean_arg = RealType(0.0),
+        explicit normal_distribution_v165(const RealType& mean_arg = RealType(0.0),
                                           const RealType& sigma_arg = RealType(1.0))
-                : _mean(mean_arg), _sigma(sigma_arg), _engine(engine_arg)
+                : _mean(mean_arg), _sigma(sigma_arg)
         {
             BOOST_ASSERT(_sigma >= RealType(0));
+        }
+
+        /**
+     * Constructs a @c normal_distribution_v165 object from its parameters.
+     */
+        explicit normal_distribution_v165(const param_type& parm)
+                : _mean(parm.mean()), _sigma(parm.sigma())
+        {
         }
 
         /**  Returns the mean of the distribution. */
@@ -429,46 +376,50 @@ namespace random
         template <class Engine>
         result_type operator()(Engine& eng)
         {
-            detail::unit_normal_distribution<RealType> impl;
+            detail::unit_normal_distribution_v165<RealType> impl;
             return impl(eng) * _sigma + _mean;
         }
 
-        /** Writes a @c normal_distribution_v156 to a @c std::ostream. */
-        BOOST_RANDOM_DETAIL_OSTREAM_OPERATOR(os, normal_distribution_v156, nd)
+        /** Returns a normal variate with parameters specified by @c param. */
+        template <class URNG>
+        result_type operator()(URNG& urng, const param_type& parm)
+        {
+            return normal_distribution_v165(parm)(urng);
+        }
+
+        /** Writes a @c normal_distribution_v165 to a @c std::ostream. */
+        BOOST_RANDOM_DETAIL_OSTREAM_OPERATOR(os, normal_distribution_v165, nd)
         {
             os << nd._mean << " " << nd._sigma;
             return os;
         }
 
-        /** Reads a @c normal_distribution_v156 from a @c std::istream. */
-        BOOST_RANDOM_DETAIL_ISTREAM_OPERATOR(is, normal_distribution_v156, nd)
+        /** Reads a @c normal_distribution_v165 from a @c std::istream. */
+        BOOST_RANDOM_DETAIL_ISTREAM_OPERATOR(is, normal_distribution_v165, nd)
         {
             is >> std::ws >> nd._mean >> std::ws >> nd._sigma;
             return is;
         }
 
         /**
-     * Returns true if the two instances of @c normal_distribution_v156 will
+     * Returns true if the two instances of @c normal_distribution_v165 will
      * return identical sequences of values given equal generators.
      */
-        BOOST_RANDOM_DETAIL_EQUALITY_OPERATOR(normal_distribution_v156, lhs, rhs)
+        BOOST_RANDOM_DETAIL_EQUALITY_OPERATOR(normal_distribution_v165, lhs, rhs)
         {
             return lhs._mean == rhs._mean && lhs._sigma == rhs._sigma;
         }
 
         /**
-     * Returns true if the two instances of @c normal_distribution_v156 will
+     * Returns true if the two instances of @c normal_distribution_v165 will
      * return different sequences of values given equal generators.
      */
-        BOOST_RANDOM_DETAIL_INEQUALITY_OPERATOR(normal_distribution_v156)
+        BOOST_RANDOM_DETAIL_INEQUALITY_OPERATOR(normal_distribution_v165)
 
     private:
         RealType _mean, _sigma;
-        boost::mt19937& _engine;
     };
-
 } // namespace random
-
 } // namespace boost
 
-#endif // BOOST_156_RANDOM_NORMAL_DISTRIBUTION_HPP
+#endif // BOOST_165_RANDOM_NORMAL_DISTRIBUTION_HPP
