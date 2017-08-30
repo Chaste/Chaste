@@ -47,8 +47,8 @@ RandomNumberGenerator* RandomNumberGenerator::mpInstance = nullptr;
 RandomNumberGenerator::RandomNumberGenerator()
         : mMersenneTwisterGenerator(0u),
           mGenerateUnitReal(mMersenneTwisterGenerator, boost::uniform_real<>()),
-#if BOOST_VERSION < 105600 // #2585 and #2893
-          mGenerateStandardNormal(mMersenneTwisterGenerator, boost::random::normal_distribution_v156<>(mMersenneTwisterGenerator, 0.0, 1.0))
+#if BOOST_VERSION < 106400 // #2585 and #2893
+          mGenerateStandardNormal(mMersenneTwisterGenerator, boost::random::normal_distribution_v165<>(0.0, 1.0))
 #else
           mGenerateStandardNormal(mMersenneTwisterGenerator, boost::normal_distribution<>(0.0, 1.0))
 #endif

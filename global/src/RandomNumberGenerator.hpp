@@ -41,9 +41,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/version.hpp>
 
 
-#if BOOST_VERSION < 105600
-// Forward compatibility with Boost 1.56 onwards
-#include "Boost156NormalDistribution.hpp"
+#if BOOST_VERSION < 106400
+// Forward compatibility with Boost 1.64 onwards
+#include "Boost165NormalDistribution.hpp"
 #endif
 
 #include <boost/random.hpp>
@@ -68,8 +68,8 @@ private:
     boost::variate_generator<boost::mt19937& , boost::uniform_real<> > mGenerateUnitReal;
 
     /** An adaptor to a standard normal distribution. */
-#if BOOST_VERSION < 105600  //#2585
-    boost::variate_generator<boost::mt19937& , boost::random::normal_distribution_v156<> > mGenerateStandardNormal;
+#if BOOST_VERSION < 106400  // #2585 and #2893
+    boost::variate_generator<boost::mt19937& , boost::random::normal_distribution_v165<> > mGenerateStandardNormal;
 #else
     boost::variate_generator<boost::mt19937& , boost::normal_distribution<> > mGenerateStandardNormal;
 #endif
@@ -95,8 +95,8 @@ private:
         archive & rng_internals_string;
 
         std::stringstream normal_internals;
-#if BOOST_VERSION < 105600  //#2585
-        const boost::random::normal_distribution_v156<>& r_normal_dist = mGenerateStandardNormal.distribution();
+#if BOOST_VERSION < 106400  // #2585 and #2893
+        const boost::random::normal_distribution_v165<>& r_normal_dist = mGenerateStandardNormal.distribution();
 #else
         const boost::normal_distribution<>& r_normal_dist = mGenerateStandardNormal.distribution();
 #endif

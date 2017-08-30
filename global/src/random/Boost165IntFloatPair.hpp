@@ -128,8 +128,8 @@ namespace random
         inline std::pair<RealType, int> generate_int_float_pair_v165(Engine& eng)
         {
             typedef typename Engine::result_type base_result;
-            return generate_int_float_pair<RealType, w>(eng,
-                                                        boost::is_integral<base_result>());
+            return generate_int_float_pair_v165<RealType, w>(eng,
+                                                             boost::is_integral<base_result>());
         }
 
     } // namespace detail
