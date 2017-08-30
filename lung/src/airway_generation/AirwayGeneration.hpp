@@ -58,9 +58,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #undef HZ
 #include <vtkPointLocator.h>
 #pragma pop_macro("HZ")
-#else // (VTK_MAJOR_VERSION != 7)
+#else // (VTK_MAJOR_VERSION < 7)
 #include <vtkPointLocator.h>
-#endif // (VTK_MAJOR_VERSION == 7)
+#endif // (VTK_MAJOR_VERSION >= 7)
 
 #include "vtkSmartPointer.h"
 #include "vtkPolyData.h"
