@@ -37,28 +37,30 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTELLIPTICBOXDOMAINPDEMODIFIER_HPP_
 
 #include <cxxtest/TestSuite.h>
-#include <boost/archive/text_oarchive.hpp>
+
 #include <boost/archive/text_iarchive.hpp>
-#include "CheckpointArchiveTypes.hpp"
-#include "ArchiveOpener.hpp"
-#include "SmartPointers.hpp"
-#include "ReplicatableVector.hpp"
+#include <boost/archive/text_oarchive.hpp>
+
 #include "AbstractCellBasedWithTimingsTestSuite.hpp"
-#include "EllipticBoxDomainPdeModifier.hpp"
-#include "AveragedSourceEllipticPde.hpp"
-#include "UniformCellCycleModel.hpp"
 #include "ApoptoticCellProperty.hpp"
-#include "DifferentiatedCellProliferativeType.hpp"
+#include "ArchiveOpener.hpp"
+#include "AveragedSourceEllipticPde.hpp"
+#include "CaBasedCellPopulation.hpp"
 #include "CellsGenerator.hpp"
-#include "MeshBasedCellPopulation.hpp"
+#include "CheckpointArchiveTypes.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
+#include "EllipticBoxDomainPdeModifier.hpp"
 #include "HoneycombMeshGenerator.hpp"
-#include "NodeBasedCellPopulation.hpp"
-#include "VertexBasedCellPopulation.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
+#include "MeshBasedCellPopulation.hpp"
+#include "NodeBasedCellPopulation.hpp"
 #include "PottsBasedCellPopulation.hpp"
 #include "PottsMeshGenerator.hpp"
-#include "CaBasedCellPopulation.hpp"
+#include "ReplicatableVector.hpp"
+#include "SmartPointers.hpp"
+#include "UniformCellCycleModel.hpp"
 #include "UniformSourceEllipticPde.hpp"
+#include "VertexBasedCellPopulation.hpp"
 
 // This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
