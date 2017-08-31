@@ -40,6 +40,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
+
+#define BOOST_MATH_DISABLE_FLOAT128
 #include <boost/math/special_functions/bessel.hpp>
 
 #include "AbstractCellBasedWithTimingsTestSuite.hpp"
