@@ -41,7 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
 
-// This macro prevents errors with GCC 4.8 of form "unable to find numeric literal operator ‘operator"" Q"
+// This macro prevents errors with GCC 4.8 of form "unable to find numeric literal operator 'operator"" Q'"
 // when compiling with -std=gnu++11 (see #2929). \todo: remove when GCC 4.8 is no longer supported.
 #define BOOST_MATH_DISABLE_FLOAT128
 #include <boost/math/special_functions/bessel.hpp>
