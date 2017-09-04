@@ -256,6 +256,12 @@ void FineCoarseMeshPair<DIM>::ComputeFineElementsAndWeightsForCoarseNodes(bool s
 
     // Resize the elements and weights vector.
     mFineMeshElementsAndWeights.resize(mrCoarseMesh.GetNumNodes());
+    // Make sure that, in parallel, silent processes have their structs initialised to zero values
+    for (unsigned i=0; i<mFineMeshElementsAndWeights.size(); i++)
+    {
+        mFineMeshElementsAndWeights[i].ElementNum = 0u;
+        mFineMeshElementsAndWeights[i].Weights = zero_vector<double>(DIM+1);
+    }
 
     // LCOV_EXCL_START
     if (CommandLineArguments::Instance()->OptionExists("-mesh_pair_verbose"))
