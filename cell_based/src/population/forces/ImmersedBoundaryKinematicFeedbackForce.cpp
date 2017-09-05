@@ -35,13 +35,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ImmersedBoundaryKinematicFeedbackForce.hpp"
 #include "ImmersedBoundaryEnumerations.hpp"
+#include "UblasCustomFunctions.hpp"
 
 template <unsigned DIM>
 ImmersedBoundaryKinematicFeedbackForce<DIM>::ImmersedBoundaryKinematicFeedbackForce()
         : AbstractImmersedBoundaryForce<DIM>(),
           mSpringConst(1e3),
-          mRestLength(0.25),
-          mPreviousLocations({})
+          mPreviousLocations()
 {
 }
 
@@ -49,88 +49,71 @@ template <unsigned DIM>
 void ImmersedBoundaryKinematicFeedbackForce<DIM>::AddImmersedBoundaryForceContribution(std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs,
                                                                                        ImmersedBoundaryCellPopulation<DIM>& rCellPopulation)
 {
+    // Allocate memory the first time this method is called
     if (mPreviousLocations.empty())
     {
+        // \todo this assumes the number of nodes in the simulation does not change over time
         mPreviousLocations.resize(rCellPopulation.GetNumNodes());
         UpdatePreviousLocations(rCellPopulation);
     }
 
-    double dt = SimulationTime::Instance()->GetTimeStep();
-
     // Calculate force only if neither node is in a lamina, and if nodes are in different elements
-    auto condition_satisfied = [](const std::pair<Node<DIM>*, Node<DIM>*>& pair) -> bool
+    auto condition_satisfied = [&rCellPopulation](const std::pair<Node<DIM>*, Node<DIM>*>& pair) -> bool
     {
+        // Laminas do not participate in this force class
         if (pair.first->GetRegion() == LAMINA_REGION || pair.second->GetRegion() == LAMINA_REGION)
         {
             return false;
         }
-        return *(pair.first->ContainingElementsBegin()) != *(pair.second->ContainingElementsBegin());
+        // This force only acts on nodes in different elements
+        if (*(pair.first->ContainingElementsBegin()) == *(pair.second->ContainingElementsBegin()))
+        {
+            return false;
+        }
+        // Return true if the nodes are within threshold distance, else false
+        auto vec_a2b = rCellPopulation.rGetMesh().GetVectorFromAtoB(pair.first->rGetLocation(), pair.second->rGetLocation());
+        return norm_2(vec_a2b) < rCellPopulation.GetInteractionDistance();
     };
 
-    for (auto && pair : rNodePairs)
+    for (auto&& pair : rNodePairs)
     {
         if (condition_satisfied(pair))
         {
             Node<DIM>* p_node_a = pair.first;
             Node<DIM>* p_node_b = pair.second;
 
-            // Get unit vector between nodes
-            auto vec_a2b = rCellPopulation.rGetMesh().GetVectorFromAtoB(p_node_a->rGetLocation(), p_node_b->rGetLocation());
-            vec_a2b /= norm_2(vec_a2b);
+            // Get the current and previous displacement between nodes
+            auto previous_disp = rCellPopulation.rGetMesh().GetVectorFromAtoB(mPreviousLocations[p_node_a->GetIndex()],
+                                                                              mPreviousLocations[p_node_b->GetIndex()]);
+            auto current_disp = rCellPopulation.rGetMesh().GetVectorFromAtoB(p_node_a->rGetLocation(),
+                                                                             p_node_b->rGetLocation());
 
-            auto disp_a = p_node_a->rGetLocation() - mPreviousLocations[p_node_a->GetIndex()];
-            auto disp_b = p_node_b->rGetLocation() - mPreviousLocations[p_node_b->GetIndex()];
+            // Calculate the relative velocity and fill in unit_perp, the direction of the force that will act
+            c_vector<double, DIM> unit_perp;
+            double relative_vel_comp = CalculateRelativeVelocityComponent(previous_disp, current_disp, unit_perp);
 
-            auto velocity = (disp_a - disp_b) / dt;
-        }
-    }
+            unsigned a_idx = *(p_node_a->ContainingElementsBegin());
+            unsigned b_idx = *(p_node_b->ContainingElementsBegin());
 
-    for (unsigned pair = 0; pair < rNodePairs.size(); pair++)
-    {
-        // Interactions only exist between pairs of nodes that are not in the same boundary / lamina
-        if (true)
-        {
-            Node<DIM>* p_node_a = rNodePairs[pair].first;
-            Node<DIM>* p_node_b = rNodePairs[pair].second;
+            double node_a_elem_spacing = rCellPopulation.rGetMesh().GetAverageNodeSpacingOfElement(a_idx, false);
+            double node_b_elem_spacing = rCellPopulation.rGetMesh().GetAverageNodeSpacingOfElement(b_idx, false);
 
-            c_vector<double, DIM> vec_a2b = rCellPopulation.rGetMesh().GetVectorFromAtoB(p_node_a->rGetLocation(),
-                                                                                         p_node_b->rGetLocation());
-            double normed_dist = norm_2(vec_a2b);
+            double elem_spacing = 0.5 * (node_a_elem_spacing + node_b_elem_spacing);
 
-            // Force non-zero only within interaction distance, by definition
-            if (normed_dist < rCellPopulation.GetInteractionDistance())
-            {
-                // Need the average spacing of the containing element; this depends on whether it's a lamina or element
-                bool a_lamina = p_node_a->GetRegion() == LAMINA_REGION;
-                bool b_lamina = p_node_b->GetRegion() == LAMINA_REGION;
+            double eff_spring_const = mSpringConst * elem_spacing / rCellPopulation.GetIntrinsicSpacing();
 
-                unsigned a_idx = *(p_node_a->ContainingElementsBegin());
-                unsigned b_idx = *(p_node_b->ContainingElementsBegin());
+            /*
+             * We must scale each applied force by a factor of elem_spacing / local spacing, so that forces
+             * balance when spread to the grid later (where the multiplicative factor is the local spacing)
+             */
+            // \todo: change this to something sigmoidal?
+            c_vector<double, DIM> force = unit_perp * (relative_vel_comp * eff_spring_const);
 
-                double node_a_elem_spacing = a_lamina ? rCellPopulation.rGetMesh().GetAverageNodeSpacingOfLamina(a_idx, false)
-                                                      : rCellPopulation.rGetMesh().GetAverageNodeSpacingOfElement(a_idx, false);
+            c_vector<double, DIM> force_a2b = force * (elem_spacing / node_a_elem_spacing);
+            p_node_a->AddAppliedForceContribution(force_a2b);
 
-                double node_b_elem_spacing = b_lamina ? rCellPopulation.rGetMesh().GetAverageNodeSpacingOfLamina(b_idx, false)
-                                                      : rCellPopulation.rGetMesh().GetAverageNodeSpacingOfElement(b_idx, false);
-
-                double elem_spacing = 0.5 * (node_a_elem_spacing + node_b_elem_spacing);
-
-                double eff_spring_const = mSpringConst * elem_spacing / rCellPopulation.GetIntrinsicSpacing();
-                double eff_rest_length = mRestLength * rCellPopulation.GetInteractionDistance();
-
-
-                /*
-                 * We must scale each applied force by a factor of elem_spacing / local spacing, so that forces
-                 * balance when spread to the grid later (where the multiplicative factor is the local spacing)
-                 */
-                vec_a2b *= eff_spring_const * (normed_dist - eff_rest_length) / normed_dist;
-
-                c_vector<double, DIM> force_a2b = vec_a2b * (elem_spacing / node_a_elem_spacing);
-                p_node_a->AddAppliedForceContribution(force_a2b);
-
-                c_vector<double, DIM> force_b2a = vec_a2b * (-1.0 * elem_spacing / node_b_elem_spacing);
-                p_node_b->AddAppliedForceContribution(force_b2a);
-            }
+            c_vector<double, DIM> force_b2a = force * (-1.0 * elem_spacing / node_b_elem_spacing);
+            p_node_b->AddAppliedForceContribution(force_b2a);
         }
     }
 
@@ -142,10 +125,28 @@ void ImmersedBoundaryKinematicFeedbackForce<DIM>::AddImmersedBoundaryForceContri
     }
 }
 
+template <unsigned DIM>
+double ImmersedBoundaryKinematicFeedbackForce<DIM>::CalculateRelativeVelocityComponent(
+        const c_vector<double, DIM>& previousDisp,
+        const c_vector<double, DIM>& currentDisp,
+        c_vector<double, DIM>& unitPerp)
+{
+    // Get a unit vector perpendicular to the line joining the nodes at the previous time step
+    unitPerp = Create_c_vector(-previousDisp[1], previousDisp[0]);
+    unitPerp /= norm_2(unitPerp);
+
+    // Calculate the relative velocity component in the direction of the perpendicular
+    return inner_prod(currentDisp / SimulationTime::Instance()->GetTimeStep(), unitPerp);
+}
+
 template<unsigned DIM>
 void ImmersedBoundaryKinematicFeedbackForce<DIM>::UpdatePreviousLocations(ImmersedBoundaryCellPopulation<DIM>& rCellPopulation)
 {
-    for (auto && p_node : rCellPopulation.rGetMesh().rGetNodes())
+    // \todo this assumes the number of nodes in the simulation does not change over time
+    EXCEPT_IF_NOT(mPreviousLocations.size() != rCellPopulation.GetNumNodes());
+
+    // Populate the mPreviousLocations vector with the current location of nodes, so it's ready for next time step
+    for (const auto& p_node : rCellPopulation.rGetMesh().rGetNodes())
     {
         if (p_node->GetRegion() != LAMINA_REGION)
         {
@@ -163,7 +164,6 @@ template<unsigned DIM>
 void ImmersedBoundaryKinematicFeedbackForce<DIM>::OutputImmersedBoundaryForceParameters(out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<SpringConstant>" << mSpringConst << "</SpringConstant>\n";
-    *rParamsFile << "\t\t\t<RestLength>" << mRestLength << "</RestLength>\n";
 
     // Call method on direct parent class
     AbstractImmersedBoundaryForce<DIM>::OutputImmersedBoundaryForceParameters(rParamsFile);
@@ -179,18 +179,6 @@ template<unsigned DIM>
 void ImmersedBoundaryKinematicFeedbackForce<DIM>::SetSpringConst(double springConst)
 {
     mSpringConst = springConst;
-}
-
-template<unsigned DIM>
-double ImmersedBoundaryKinematicFeedbackForce<DIM>::GetRestLength() const
-{
-    return mRestLength;
-}
-
-template<unsigned DIM>
-void ImmersedBoundaryKinematicFeedbackForce<DIM>::SetRestLength(double restLength)
-{
-    mRestLength = restLength;
 }
 
 // Explicit instantiation

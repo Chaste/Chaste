@@ -68,14 +68,10 @@ private:
     {
         archive & boost::serialization::base_object<AbstractImmersedBoundaryForce<DIM> >(*this);
         archive & mSpringConst;
-        archive & mRestLength;
     }
 
     /** The basic spring constant associated with interactions */
     double mSpringConst;
-
-    /** The basic rest length associated with interactions, as a fraction of cell population's interaction distance */
-    double mRestLength;
 
     /** Vector to contain the location of each node at the previous time step */
     std::vector<c_vector<double, DIM>> mPreviousLocations;
@@ -85,6 +81,21 @@ private:
      * @param rCellPopulation the cell population
      */
     void UpdatePreviousLocations(ImmersedBoundaryCellPopulation<DIM>& rCellPopulation);
+
+    /**
+     * Helper function for AddImmersedBoundaryForceContribution().  Calculates the component of their relative velocity
+     * in the direction perpendicular to the line joining the two nodes at the previous time step.
+     *
+     * This relative velocity is a measure of shear between two boundaries, which this force class amplifies.
+     *
+     * @param previousDisp displacement between a pair of interacting nodes at the previous time step
+     * @param currentDisp displacement between the same pair of interacting nodes at the current time step
+     * @param unitPerp filled in as a unit vector perpendicular to previousDisp
+     * @return the component of the relative velocity of the nodes in the direction of unitPerp
+     */
+    double CalculateRelativeVelocityComponent(const c_vector<double, DIM>& previousDisp,
+                                              const c_vector<double, DIM>& currentDisp,
+                                              c_vector<double, DIM>& unitPerp);
 
 public:
 
@@ -119,12 +130,6 @@ public:
 
     /** @param springConst the new value of mSpringConst */
     void SetSpringConst(double springConst);
-
-    /** @return mRestLength */
-    double GetRestLength() const;
-
-    /** @param restLength the new value of mRestLength */
-    void SetRestLength(double restLength);
 };
 
 #include "SerializationExportWrapper.hpp"
