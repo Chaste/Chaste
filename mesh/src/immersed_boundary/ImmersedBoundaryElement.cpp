@@ -45,9 +45,6 @@ ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryElement(unsigne
           mIsBoundaryElement(false)
 {
     assert(ELEMENT_DIM == SPACE_DIM);
-
-    // Ensure number of nodes is at least 2
-    assert(rNodes.size() > 2);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
