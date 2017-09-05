@@ -232,7 +232,7 @@ public:
      */
     ImmersedBoundaryMesh(std::vector<Node<SPACE_DIM>*> nodes,
                          std::vector<ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>*> elements,
-                         std::vector<ImmersedBoundaryElement<ELEMENT_DIM - 1, SPACE_DIM>*> laminas = std::vector<ImmersedBoundaryElement<ELEMENT_DIM - 1, SPACE_DIM>*>(),
+                         std::vector<ImmersedBoundaryElement<ELEMENT_DIM - 1, SPACE_DIM>*> laminas = {},
                          unsigned numGridPtsX = 128u,
                          unsigned numGridPtsY = 128u);
 
