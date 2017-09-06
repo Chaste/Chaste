@@ -201,7 +201,7 @@ public:
      *
      * @return a shared pointer to mpMutableMesh.
      *
-     * This method is called by AbstractGrowingDomainPdeModifier.
+     * This method is called by AbstractGrowingDomainPdeSystemModifier.
      */
     virtual TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* GetTetrahedralMeshForPdeModifier();
 

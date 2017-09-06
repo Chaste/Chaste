@@ -448,7 +448,7 @@ public:
      * as well as an additional node at the centre of each VertexElement.
      * At present, this method only works in 2D.
      *
-     * This method is called by AbstractGrowingDomainPdeModifier.
+     * This method is called by AbstractGrowingDomainPdeSystemModifier.
      */
     virtual TetrahedralMesh<DIM, DIM>* GetTetrahedralMeshForPdeModifier();
 

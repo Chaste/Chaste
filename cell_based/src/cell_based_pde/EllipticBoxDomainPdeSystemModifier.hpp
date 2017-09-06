@@ -33,13 +33,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef ELLIPTICBOXDOMAINPDEMODIFIER_HPP_
-#define ELLIPTICBOXDOMAINPDEMODIFIER_HPP_
+#ifndef EllipticBoxDomainPdeSystemModifier_HPP_
+#define EllipticBoxDomainPdeSystemModifier_HPP_
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
-#include "AbstractBoxDomainPdeModifier.hpp"
+#include "AbstractBoxDomainPdeSystemModifier.hpp"
 #include "BoundaryConditionsContainer.hpp"
 #include "PetscTools.hpp"
 #include "FileFinder.hpp"
@@ -56,16 +56,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * At each time step the boundary condition supplied to the constructor may be imposed
  * either on the boundary of the box domain, or on the boundary of the cell population
  * (which is assumed to lie within the box domain). This choice can be made using the
- * AbstractBoxDomainPdeModifier method SetBcsOnBoxBoundary(), which is inherited by this
+ * AbstractBoxDomainPdeSystemModifier method SetBcsOnBoxBoundary(), which is inherited by this
  * class.
  *
  * Examples of PDEs in the source folder that can be solved using this class are
  * AveragedSourceEllipticPde, VolumeDependentAveragedSourceEllipticPde and UniformSourceEllipticPde.
  */
 template<unsigned DIM>
-class EllipticBoxDomainPdeModifier : public AbstractBoxDomainPdeModifier<DIM>
+class EllipticBoxDomainPdeSystemModifier : public AbstractBoxDomainPdeSystemModifier<DIM>
 {
-    friend class TestEllipticBoxDomainPdeModifier;
+    friend class TestEllipticBoxDomainPdeSystemModifier;
 
 private:
 
@@ -81,7 +81,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractBoxDomainPdeModifier<DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractBoxDomainPdeSystemModifier<DIM> >(*this);
     }
 
 public:
@@ -89,25 +89,25 @@ public:
     /**
      * Constructor.
      *
-     * @param pPde A shared pointer to a linear PDE object (defaults to NULL)
-     * @param pBoundaryCondition A shared pointer to an abstract boundary condition
+     * @param pPdeSystem A shared pointer to a linear PDE system object (defaults to NULL)
+     * @param pBoundaryConditions A vector of shared pointers to abstract boundary conditions
      *     (defaults to NULL, corresponding to a constant boundary condition with value zero)
      * @param isNeumannBoundaryCondition Whether the boundary condition is Neumann (defaults to true)
      * @param pMeshCuboid A shared pointer to a ChasteCuboid specifying the outer boundary for the FE mesh (defaults to NULL)
      * @param stepSize step size to be used in the FE mesh (defaults to 1.0, i.e. the default cell size)
      * @param solution solution vector (defaults to NULL)
      */
-    EllipticBoxDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde=boost::shared_ptr<AbstractLinearPde<DIM,DIM> >(),
-                                 boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition=boost::shared_ptr<AbstractBoundaryCondition<DIM> >(),
-                                 bool isNeumannBoundaryCondition=true,
-                                 boost::shared_ptr<ChasteCuboid<DIM> > pMeshCuboid=boost::shared_ptr<ChasteCuboid<DIM> >(),
-                                 double stepSize=1.0,
-                                 Vec solution=nullptr);
+    EllipticBoxDomainPdeSystemModifier(boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,1> > pPdeSystem=boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,1> >(),
+        std::vector<boost::shared_ptr<AbstractBoundaryCondition<DIM> > > pBoundaryConditions=std::vector<boost::shared_ptr<AbstractBoundaryCondition<DIM> > >(),
+        bool isNeumannBoundaryCondition=true,
+        boost::shared_ptr<ChasteCuboid<DIM> > pMeshCuboid=boost::shared_ptr<ChasteCuboid<DIM> >(),
+        double stepSize=1.0,
+        Vec solution=nullptr);
 
     /**
      * Destructor.
      */
-    virtual ~EllipticBoxDomainPdeModifier();
+    virtual ~EllipticBoxDomainPdeSystemModifier();
 
     /**
      * Overridden UpdateAtEndOfTimeStep() method.
@@ -147,7 +147,7 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(EllipticBoxDomainPdeModifier)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(EllipticBoxDomainPdeSystemModifier)
 
 namespace boost
 {
@@ -155,7 +155,7 @@ namespace serialization
 {
 template<class Archive, unsigned DIM>
 inline void save_construct_data(
-    Archive & ar, const EllipticBoxDomainPdeModifier<DIM> * t, const unsigned int file_version)
+    Archive & ar, const EllipticBoxDomainPdeSystemModifier<DIM> * t, const unsigned int file_version)
 {
     if (t->GetSolution())
     {
@@ -166,7 +166,7 @@ inline void save_construct_data(
 
 template<class Archive, unsigned DIM>
 inline void load_construct_data(
-    Archive & ar, EllipticBoxDomainPdeModifier<DIM> * t, const unsigned int file_version)
+    Archive & ar, EllipticBoxDomainPdeSystemModifier<DIM> * t, const unsigned int file_version)
 {
     Vec solution = nullptr;
 
@@ -178,14 +178,14 @@ inline void load_construct_data(
         PetscTools::ReadPetscObject(solution, archive_filename);
     }
 
-    ::new(t)EllipticBoxDomainPdeModifier<DIM>(boost::shared_ptr<AbstractLinearPde<DIM, DIM> >(),
-                                              boost::shared_ptr<AbstractBoundaryCondition<DIM> >(),
-                                              true,
-                                              boost::shared_ptr<ChasteCuboid<DIM> >(),
-                                              1.0,
-                                              solution);
+    ::new(t)EllipticBoxDomainPdeSystemModifier<DIM>(boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,1> >(),
+                                                    std::vector<boost::shared_ptr<AbstractBoundaryCondition<DIM> > >(),
+                                                    true,
+                                                    boost::shared_ptr<ChasteCuboid<DIM> >(),
+                                                    1.0,
+                                                    solution);
 }
 }
 } // namespace ...
 
-#endif /*ELLIPTICBOXDOMAINPDEMODIFIER_HPP_*/
+#endif /*EllipticBoxDomainPdeSystemModifier_HPP_*/

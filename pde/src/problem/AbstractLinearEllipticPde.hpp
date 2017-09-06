@@ -39,7 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
-#include "AbstractLinearPde.hpp"
+#include "AbstractLinearPdeSystem.hpp"
 #include "UblasCustomFunctions.hpp"
 #include "ChastePoint.hpp"
 #include "Node.hpp"
@@ -57,7 +57,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Parabolic PDEs are be derived from this (AbstractLinearParabolicPde)
  */
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-class AbstractLinearEllipticPde : public AbstractLinearPde<ELEMENT_DIM, SPACE_DIM>
+class AbstractLinearEllipticPde : public AbstractLinearPdeSystem<ELEMENT_DIM, SPACE_DIM, 1>
 {
 private:
 
@@ -72,7 +72,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractLinearPde<ELEMENT_DIM, SPACE_DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractLinearPdeSystem<ELEMENT_DIM, SPACE_DIM, 1> >(*this);
     }
 
 public:
@@ -81,7 +81,7 @@ public:
      * Constructor.
      */
     AbstractLinearEllipticPde()
-        : AbstractLinearPde<ELEMENT_DIM, SPACE_DIM>()
+        : AbstractLinearPdeSystem<ELEMENT_DIM, SPACE_DIM, 1>()
     {}
 
     /**

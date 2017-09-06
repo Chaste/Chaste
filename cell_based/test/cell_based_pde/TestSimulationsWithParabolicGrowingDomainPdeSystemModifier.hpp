@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef TESTSIMULATIONSWITHPARABOLICGROWINGDOMAINPDEMODIFIER_HPP_
-#define TESTSIMULATIONSWITHPARABOLICGROWINGDOMAINPDEMODIFIER_HPP_
+#ifndef TESTSIMULATIONSWITHParabolicGrowingDomainPdeSystemModifier_HPP_
+#define TESTSIMULATIONSWITHParabolicGrowingDomainPdeSystemModifier_HPP_
 
 #include <cxxtest/TestSuite.h>
 #include "SmartPointers.hpp"
@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellIdWriter.hpp"
 #include "VoronoiDataWriter.hpp"
 #include "CellMutationStatesWriter.hpp"
-#include "ParabolicGrowingDomainPdeModifier.hpp"
+#include "ParabolicGrowingDomainPdeSystemModifier.hpp"
 #include "CellwiseSourceParabolicPde.hpp"
 #include "UniformSourceParabolicPde.hpp"
 #include "SimpleOxygenBasedCellCycleModel.hpp"
@@ -79,7 +79,7 @@ static const double M_UPTAKE_RATE = -0.1;
 static const double M_DIFFUSION_CONSTANT = 1.0;
 static const double M_DUDT_COEFFICIENT = 10.0;
 
-class TestSimulationWithParabolicGrowingDomainPdeModifier : public AbstractCellBasedWithTimingsTestSuite
+class TestSimulationWithParabolicGrowingDomainPdeSystemModifier : public AbstractCellBasedWithTimingsTestSuite
 {
 private:
 
@@ -102,7 +102,7 @@ private:
 
 public:
 
-    void TestParabolicGrowingDomainPdeModifierWithVertexBasedMonolayer() throw (Exception)
+    void TestParabolicGrowingDomainPdeSystemModifierWithVertexBasedMonolayer() throw (Exception)
     {
         // Create mesh
         HoneycombVertexMeshGenerator generator(M_NUM_CELLS_ACROSS, M_NUM_CELLS_ACROSS);
@@ -140,7 +140,7 @@ public:
         MAKE_PTR_ARGS(CellwiseSourceParabolicPde<2>, p_pde, (cell_population, M_DUDT_COEFFICIENT,M_DIFFUSION_CONSTANT,M_UPTAKE_RATE));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
-        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
+        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
         p_pde_modifier->SetDependentVariableName("oxygen");
         simulator.AddSimulationModifier(p_pde_modifier);
 
@@ -162,7 +162,7 @@ public:
         TS_ASSERT_DELTA( (simulator.rGetCellPopulation().GetCellUsingLocationIndex(5))->GetCellData()->GetItem("oxygen"), 0.9941, 1e-4);
     }
 
-    void TestParabolicGrowingDomainPdeModifierWithNodeBasedMonolayer() throw (Exception)
+    void TestParabolicGrowingDomainPdeSystemModifierWithNodeBasedMonolayer() throw (Exception)
     {
         HoneycombMeshGenerator generator(M_NUM_CELLS_ACROSS, M_NUM_CELLS_ACROSS,0);
         MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
@@ -190,7 +190,7 @@ public:
         // Create PDE and boundary condition objects
         MAKE_PTR_ARGS(CellwiseSourceParabolicPde<2>, p_pde, (cell_population, M_DUDT_COEFFICIENT,M_DIFFUSION_CONSTANT,M_UPTAKE_RATE));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
-        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
+        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
         p_pde_modifier->SetDependentVariableName("oxygen");
         simulator.AddSimulationModifier(p_pde_modifier);
 
@@ -208,7 +208,7 @@ public:
         delete p_mesh; // to stop memory leaks
     }
 
-    void TestParabolicGrowingDomainPdeModifierWithMeshBasedMonolayer() throw (Exception)
+    void TestParabolicGrowingDomainPdeSystemModifierWithMeshBasedMonolayer() throw (Exception)
     {
         HoneycombMeshGenerator generator(M_NUM_CELLS_ACROSS,M_NUM_CELLS_ACROSS,0);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
@@ -240,7 +240,7 @@ public:
         // Create PDE and boundary condition objects
         MAKE_PTR_ARGS(CellwiseSourceParabolicPde<2>, p_pde, (cell_population, M_DUDT_COEFFICIENT,M_DIFFUSION_CONSTANT,M_UPTAKE_RATE));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
-        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
+        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
         p_pde_modifier->SetDependentVariableName("oxygen");
         simulator.AddSimulationModifier(p_pde_modifier);
 
@@ -256,7 +256,7 @@ public:
         TS_ASSERT_DELTA( (simulator.rGetCellPopulation().GetCellUsingLocationIndex(4))->GetCellData()->GetItem("oxygen"), 0.9869, 1e-4);
     }
 
-    void TestParabolicGrowingDomainPdeModifierWithMeshBasedWithGhostNodesBasedMonolayer() throw (Exception)
+    void TestParabolicGrowingDomainPdeSystemModifierWithMeshBasedWithGhostNodesBasedMonolayer() throw (Exception)
     {
         HoneycombMeshGenerator generator(M_NUM_CELLS_ACROSS,M_NUM_CELLS_ACROSS,2);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
@@ -292,14 +292,14 @@ public:
         // Create PDE and boundary condition objects
         MAKE_PTR_ARGS(CellwiseSourceParabolicPde<2>, p_pde, (cell_population, M_DUDT_COEFFICIENT,M_DIFFUSION_CONSTANT,M_UPTAKE_RATE));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
-        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
+        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
         p_pde_modifier->SetDependentVariableName("oxygen");
         simulator.AddSimulationModifier(p_pde_modifier);
 
         TS_ASSERT_THROWS_THIS(simulator.Solve(),"Currently can't solve PDEs on meshes with ghost nodes");
     }
 
-    void TestParabolicGrowingDomainPdeModifierWithPottsBasedMonolayer() throw (Exception)
+    void TestParabolicGrowingDomainPdeSystemModifierWithPottsBasedMonolayer() throw (Exception)
     {
         unsigned cell_width = 4;
         unsigned domain_width = 200;
@@ -334,7 +334,7 @@ public:
         // Create PDE and boundary condition objects
         MAKE_PTR_ARGS(CellwiseSourceParabolicPde<2>, p_pde, (cell_population, M_DUDT_COEFFICIENT,M_DIFFUSION_CONSTANT,M_UPTAKE_RATE));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
-        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
+        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
         p_pde_modifier->SetDependentVariableName("oxygen");
         simulator.AddSimulationModifier(p_pde_modifier);
 
@@ -348,7 +348,7 @@ public:
         TS_ASSERT_DELTA( (simulator.rGetCellPopulation().GetCellUsingLocationIndex(4))->GetCellData()->GetItem("oxygen"), 0.9809, 1e-4);
     }
 
-    void TestParabolicGrowingDomainPdeModifierWithCaBasedMonolayer() throw (Exception)
+    void TestParabolicGrowingDomainPdeSystemModifierWithCaBasedMonolayer() throw (Exception)
     {
         // Create a simple 2D PottsMesh
         unsigned domain_wide = 5*M_NUM_CELLS_ACROSS;
@@ -393,7 +393,7 @@ public:
         // Create PDE and boundary condition objects
         MAKE_PTR_ARGS(CellwiseSourceParabolicPde<2>, p_pde, (cell_population, M_DUDT_COEFFICIENT, M_DIFFUSION_CONSTANT, M_UPTAKE_RATE));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
-        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
+        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
         p_pde_modifier->SetDependentVariableName("oxygen");
         simulator.AddSimulationModifier(p_pde_modifier);
 
@@ -414,4 +414,4 @@ public:
     }
 };
 
-#endif /*TESTSIMULATIONSWITHPARABOLICGROWINGDOMAINPDEMODIFIER_HPP_*/
+#endif /*TESTSIMULATIONSWITHParabolicGrowingDomainPdeSystemModifier_HPP_*/

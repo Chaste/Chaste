@@ -103,7 +103,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include "CellwiseSourceEllipticPde.hpp"
 #include "ConstBoundaryCondition.hpp"
-#include "EllipticGrowingDomainPdeModifier.hpp"
+#include "EllipticGrowingDomainPdeSystemModifier.hpp"
 
 /*
  * We use an {{{OffLatticeSimulation}}}.
@@ -240,7 +240,7 @@ public:
          *
          * The {{{CellData}}} class, is used to stores the value of the current nutrient concentration for each cell.
          */
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, is_neumann_bc));
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, is_neumann_bc));
         p_pde_modifier->SetDependentVariableName("oxygen");
 
         /*

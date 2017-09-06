@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef TESTSIMULATIONSWITHELLIPTICBOXDOMAINPDEMODIFIER_HPP_
-#define TESTSIMULATIONSWITHELLIPTICBOXDOMAINPDEMODIFIER_HPP_
+#ifndef TESTSIMULATIONSWITHEllipticBoxDomainPdeSystemModifier_HPP_
+#define TESTSIMULATIONSWITHEllipticBoxDomainPdeSystemModifier_HPP_
 
 #include <cxxtest/TestSuite.h>
 #include "AbstractCellBasedWithTimingsTestSuite.hpp"
@@ -43,7 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellIdWriter.hpp"
 #include "VoronoiDataWriter.hpp"
 #include "CellMutationStatesWriter.hpp"
-#include "EllipticBoxDomainPdeModifier.hpp"
+#include "EllipticBoxDomainPdeSystemModifier.hpp"
 #include "AveragedSourceEllipticPde.hpp"
 #include "VolumeTrackingModifier.hpp"
 #include "SimpleOxygenBasedCellCycleModel.hpp"
@@ -75,7 +75,7 @@ static const double M_TIME_FOR_SIMULATION = 1.0;
 
 static const double M_NUM_CELLS_ACROSS = 5; // this is 5^2 initial cells
 
-class TestSimulationWithEllipticBoxDomainPdeModifier : public AbstractCellBasedWithTimingsTestSuite
+class TestSimulationWithEllipticBoxDomainPdeSystemModifier : public AbstractCellBasedWithTimingsTestSuite
 {
 private:
 
@@ -97,7 +97,7 @@ private:
 
 public:
 
-    void TestEllipticBoxDomainPdeModifierWithVertexBasedMonolayer() throw (Exception)
+    void TestEllipticBoxDomainPdeSystemModifierWithVertexBasedMonolayer() throw (Exception)
     {
         // Create Mesh
         HoneycombVertexMeshGenerator generator(M_NUM_CELLS_ACROSS, M_NUM_CELLS_ACROSS);
@@ -141,7 +141,7 @@ public:
         MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
         p_pde_modifier->SetDependentVariableName("oxygen");
 
         simulator.AddSimulationModifier(p_pde_modifier);
@@ -164,7 +164,7 @@ public:
         TS_ASSERT_DELTA( (simulator.rGetCellPopulation().GetCellUsingLocationIndex(5))->GetCellData()->GetItem("oxygen"), 0.6191, 1e-4);
     }
 
-    void TestEllipticBoxDomainPdeModifierWithNodeBasedMonolayer() throw (Exception)
+    void TestEllipticBoxDomainPdeSystemModifierWithNodeBasedMonolayer() throw (Exception)
     {
         HoneycombMeshGenerator generator(M_NUM_CELLS_ACROSS, M_NUM_CELLS_ACROSS,0);
         MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
@@ -197,7 +197,7 @@ public:
         MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
         p_pde_modifier->SetDependentVariableName("oxygen");
 
         simulator.AddSimulationModifier(p_pde_modifier);
@@ -216,7 +216,7 @@ public:
         delete p_mesh; // to stop memory leaks
     }
 
-    void TestEllipticBoxDomainPdeModifierWithMeshBasedMonolayer() throw (Exception)
+    void TestEllipticBoxDomainPdeSystemModifierWithMeshBasedMonolayer() throw (Exception)
     {
         HoneycombMeshGenerator generator(M_NUM_CELLS_ACROSS,M_NUM_CELLS_ACROSS,0);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
@@ -253,7 +253,7 @@ public:
         MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
         p_pde_modifier->SetDependentVariableName("oxygen");
 
         simulator.AddSimulationModifier(p_pde_modifier);
@@ -270,7 +270,7 @@ public:
         TS_ASSERT_DELTA( (simulator.rGetCellPopulation().GetCellUsingLocationIndex(4))->GetCellData()->GetItem("oxygen"), 0.6786, 1e-4);
     }
 
-    void TestEllipticBoxDomainPdeModifierWithMeshBasedWithGhostNodesBasedMonolayer() throw (Exception)
+    void TestEllipticBoxDomainPdeSystemModifierWithMeshBasedWithGhostNodesBasedMonolayer() throw (Exception)
     {
         HoneycombMeshGenerator generator(M_NUM_CELLS_ACROSS,M_NUM_CELLS_ACROSS,2);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
@@ -311,7 +311,7 @@ public:
         MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
         p_pde_modifier->SetDependentVariableName("oxygen");
 
         simulator.AddSimulationModifier(p_pde_modifier);
@@ -328,7 +328,7 @@ public:
         TS_ASSERT_DELTA( (simulator.rGetCellPopulation().GetCellUsingLocationIndex(24))->GetCellData()->GetItem("oxygen"), 0.6786, 1e-4);
     }
 
-    void TestEllipticBoxDomainPdeModifierWithPottsBasedMonolayer() throw (Exception)
+    void TestEllipticBoxDomainPdeSystemModifierWithPottsBasedMonolayer() throw (Exception)
     {
         unsigned cell_width = 4;
         unsigned domain_width = 200;
@@ -370,7 +370,7 @@ public:
         MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
         p_pde_modifier->SetDependentVariableName("oxygen");
 
         simulator.AddSimulationModifier(p_pde_modifier);
@@ -385,7 +385,7 @@ public:
         TS_ASSERT_DELTA( (simulator.rGetCellPopulation().GetCellUsingLocationIndex(4))->GetCellData()->GetItem("oxygen"), 0.7123, 1e-4);
     }
 
-    void TestEllipticBoxDomainPdeModifierWithCaBasedMonolayer() throw (Exception)
+    void TestEllipticBoxDomainPdeSystemModifierWithCaBasedMonolayer() throw (Exception)
     {
         // Create a simple 2D PottsMesh
         unsigned domain_width = 5*M_NUM_CELLS_ACROSS;
@@ -436,7 +436,7 @@ public:
         MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
         p_pde_modifier->SetDependentVariableName("oxygen");
 
         simulator.AddSimulationModifier(p_pde_modifier);
@@ -458,4 +458,4 @@ public:
     }
 };
 
-#endif /*TESTSIMULATIONSWITHELLIPTICBOXDOMAINPDEMODIFIER_HPP_*/
+#endif /*TESTSIMULATIONSWITHEllipticBoxDomainPdeSystemModifier_HPP_*/

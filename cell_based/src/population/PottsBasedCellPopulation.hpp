@@ -184,7 +184,7 @@ public:
      *
      * @return a pointer to a tetrahedral mesh
      *
-     * This method is called by AbstractGrowingDomainPdeModifier.
+     * This method is called by AbstractGrowingDomainPdeSystemModifier.
      */
     virtual TetrahedralMesh<DIM, DIM>* GetTetrahedralMeshForPdeModifier();
 

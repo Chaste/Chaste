@@ -33,7 +33,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "AbstractGrowingDomainPdeModifier.hpp"
+#include "AbstractGrowingDomainPdeSystemModifier.hpp"
 #include "VertexBasedCellPopulation.hpp"
 #include "MeshBasedCellPopulation.hpp"
 #include "CaBasedCellPopulation.hpp"
@@ -42,24 +42,24 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "LinearBasisFunction.hpp"
 
 template <unsigned DIM>
-AbstractGrowingDomainPdeModifier<DIM>::AbstractGrowingDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM, DIM> > pPde,
-                                                                        boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition,
+AbstractGrowingDomainPdeSystemModifier<DIM>::AbstractGrowingDomainPdeSystemModifier(boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,1> > pPdeSystem,
+                                                                        std::vector<boost::shared_ptr<AbstractBoundaryCondition<DIM> > > pBoundaryConditions,
                                                                         bool isNeumannBoundaryCondition,
                                                                         Vec solution)
-        : AbstractPdeModifier<DIM>(pPde,
-                                   pBoundaryCondition,
-                                   isNeumannBoundaryCondition,
-                                   solution)
+    : AbstractPdeSystemModifier<DIM>(pPdeSystem,
+                                       pBoundaryConditions,
+                                       isNeumannBoundaryCondition,
+                                       solution)
 {
 }
 
 template<unsigned DIM>
-AbstractGrowingDomainPdeModifier<DIM>::~AbstractGrowingDomainPdeModifier()
+AbstractGrowingDomainPdeSystemModifier<DIM>::~AbstractGrowingDomainPdeSystemModifier()
 {
 }
 
 template<unsigned DIM>
-void AbstractGrowingDomainPdeModifier<DIM>::GenerateFeMesh(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
+void AbstractGrowingDomainPdeSystemModifier<DIM>::GenerateFeMesh(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
     if (this->mDeleteFeMesh)
     {
@@ -81,7 +81,7 @@ void AbstractGrowingDomainPdeModifier<DIM>::GenerateFeMesh(AbstractCellPopulatio
 }
 
 template<unsigned DIM>
-void AbstractGrowingDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
+void AbstractGrowingDomainPdeSystemModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
     // Store the PDE solution in an accessible form
     ReplicatableVector solution_repl(this->mSolution);
@@ -116,7 +116,7 @@ void AbstractGrowingDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulatio
 
         double solution_at_node = solution_repl[tet_node_index];
 
-        cell_iter->GetCellData()->SetItem(this->mDependentVariableName, solution_at_node);
+        cell_iter->GetCellData()->SetItem(this->mDependentVariableNames[0], solution_at_node);
 
         if (this->mOutputGradient)
         {
@@ -156,16 +156,16 @@ void AbstractGrowingDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulatio
             switch (DIM)
             {
                 case 1:
-                    cell_iter->GetCellData()->SetItem(this->mDependentVariableName+"_grad_x", solution_gradient(0));
+                    cell_iter->GetCellData()->SetItem(this->mDependentVariableNames[0]+"_grad_x", solution_gradient(0));
                     break;
                 case 2:
-                    cell_iter->GetCellData()->SetItem(this->mDependentVariableName+"_grad_x", solution_gradient(0));
-                    cell_iter->GetCellData()->SetItem(this->mDependentVariableName+"_grad_y", solution_gradient(1));
+                    cell_iter->GetCellData()->SetItem(this->mDependentVariableNames[0]+"_grad_x", solution_gradient(0));
+                    cell_iter->GetCellData()->SetItem(this->mDependentVariableNames[0]+"_grad_y", solution_gradient(1));
                     break;
                 case 3:
-                    cell_iter->GetCellData()->SetItem(this->mDependentVariableName+"_grad_x", solution_gradient(0));
-                    cell_iter->GetCellData()->SetItem(this->mDependentVariableName+"_grad_y", solution_gradient(1));
-                    cell_iter->GetCellData()->SetItem(this->mDependentVariableName+"_grad_z", solution_gradient(2));
+                    cell_iter->GetCellData()->SetItem(this->mDependentVariableNames[0]+"_grad_x", solution_gradient(0));
+                    cell_iter->GetCellData()->SetItem(this->mDependentVariableNames[0]+"_grad_y", solution_gradient(1));
+                    cell_iter->GetCellData()->SetItem(this->mDependentVariableNames[0]+"_grad_z", solution_gradient(2));
                     break;
                 default:
                     NEVER_REACHED;
@@ -175,13 +175,13 @@ void AbstractGrowingDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulatio
 }
 
 template<unsigned DIM>
-void AbstractGrowingDomainPdeModifier<DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
+void AbstractGrowingDomainPdeSystemModifier<DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
 {
     // No parameters to output, so just call method on direct parent class
-    AbstractPdeModifier<DIM>::OutputSimulationModifierParameters(rParamsFile);
+    AbstractPdeSystemModifier<DIM>::OutputSimulationModifierParameters(rParamsFile);
 }
 
 // Explicit instantiation
-template class AbstractGrowingDomainPdeModifier<1>;
-template class AbstractGrowingDomainPdeModifier<2>;
-template class AbstractGrowingDomainPdeModifier<3>;
+template class AbstractGrowingDomainPdeSystemModifier<1>;
+template class AbstractGrowingDomainPdeSystemModifier<2>;
+template class AbstractGrowingDomainPdeSystemModifier<3>;

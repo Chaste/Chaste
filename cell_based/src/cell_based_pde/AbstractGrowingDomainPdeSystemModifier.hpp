@@ -33,24 +33,24 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef ABSTRACTGROWINGDOMAINPDEMODIFIER_HPP_
-#define ABSTRACTGROWINGDOMAINPDEMODIFIER_HPP_
+#ifndef ABSTRACTGROWINGDOMAINPDESYSTEMMODIFIER_HPP_
+#define ABSTRACTGROWINGDOMAINPDESYSTEMMODIFIER_HPP_
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
-#include "AbstractPdeModifier.hpp"
+#include "AbstractPdeSystemModifier.hpp"
 
 /**
- * An abstract modifier class containing functionality common to EllipticGrowingDomainPdeModifier
- * and ParabolicGrowingDomainPdeModifier, which both solve a linear elliptic or parabolic PDE
+ * An abstract modifier class containing functionality common to EllipticGrowingDomainPdeSystemModifier
+ * and ParabolicGrowingDomainPdeSystemModifier, which both solve a linear elliptic or parabolic PDE
  * coupled to a cell-based simulation on an evolving domain defined by the cell population.
  */
 template<unsigned DIM>
-class AbstractGrowingDomainPdeModifier : public AbstractPdeModifier<DIM>
+class AbstractGrowingDomainPdeSystemModifier : public AbstractPdeSystemModifier<DIM>
 {
-    friend class TestEllipticGrowingDomainPdeModifier;
-    friend class TestParabolicGrowingDomainPdeModifier;
+    friend class TestEllipticGrowingDomainPdeSystemModifier;
+    friend class TestParabolicGrowingDomainPdeSystemModifier;
 
 private:
 
@@ -66,7 +66,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractPdeModifier<DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractPdeSystemModifier<DIM> >(*this);
     }
 
 public:
@@ -74,21 +74,21 @@ public:
     /**
      * Constructor.
      *
-     * @param pPde A shared pointer to a linear PDE object (defaults to NULL)
-     * @param pBoundaryCondition A shared pointer to an abstract boundary condition
+     * @param pPdeSystem A shared pointer to a linear PDE system object (defaults to NULL)
+     * @param pBoundaryConditions A vector of shared pointers to abstract boundary conditions
      *     (defaults to NULL, corresponding to a constant boundary condition with value zero)
      * @param isNeumannBoundaryCondition Whether the boundary condition is Neumann (defaults to true)
      * @param solution solution vector (defaults to NULL)
      */
-    AbstractGrowingDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde=boost::shared_ptr<AbstractLinearPde<DIM,DIM> >(),
-                                     boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition=boost::shared_ptr<AbstractBoundaryCondition<DIM> >(),
-                                     bool isNeumannBoundaryCondition=true,
-                                     Vec solution=nullptr);
+    AbstractGrowingDomainPdeSystemModifier(boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,1> > pPdeSystem=boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,1> >(),
+        std::vector<boost::shared_ptr<AbstractBoundaryCondition<DIM> > > pBoundaryConditions=std::vector<boost::shared_ptr<AbstractBoundaryCondition<DIM> > >(),
+        bool isNeumannBoundaryCondition=true,
+        Vec solution=nullptr);
 
     /**
      * Destructor.
      */
-    virtual ~AbstractGrowingDomainPdeModifier();
+    virtual ~AbstractGrowingDomainPdeSystemModifier();
 
     /**
      * Helper method to generate the mesh from the Cell population.
@@ -117,6 +117,6 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-TEMPLATED_CLASS_IS_ABSTRACT_1_UNSIGNED(AbstractGrowingDomainPdeModifier)
+TEMPLATED_CLASS_IS_ABSTRACT_1_UNSIGNED(AbstractGrowingDomainPdeSystemModifier)
 
-#endif /*ABSTRACTGROWINGDOMAINPDEMODIFIER_HPP_*/
+#endif /*ABSTRACTGROWINGDOMAINPDESYSTEMMODIFIER_HPP_*/

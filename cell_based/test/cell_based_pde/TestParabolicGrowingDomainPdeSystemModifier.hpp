@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef TESTPARABOLICGROWINGDOMAINPDEMODIFIER_HPP_
-#define TESTPARABOLICGROWINGDOMAINPDEMODIFIER_HPP_
+#ifndef TESTParabolicGrowingDomainPdeSystemModifier_HPP_
+#define TESTParabolicGrowingDomainPdeSystemModifier_HPP_
 
 #include <cxxtest/TestSuite.h>
 
@@ -59,7 +59,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "NodeBasedCellPopulation.hpp"
-#include "ParabolicGrowingDomainPdeModifier.hpp"
+#include "ParabolicGrowingDomainPdeSystemModifier.hpp"
 #include "PottsBasedCellPopulation.hpp"
 #include "PottsMeshGenerator.hpp"
 #include "ReplicatableVector.hpp"
@@ -79,7 +79,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * We solve unit disc where the steady state solutions are Bessels functions and logs.
  */
-class TestParabolicGrowingDomainPdeModifier : public AbstractCellBasedWithTimingsTestSuite
+class TestParabolicGrowingDomainPdeSystemModifier : public AbstractCellBasedWithTimingsTestSuite
 {
 public:
 
@@ -90,7 +90,7 @@ public:
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
+        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
         p_pde_modifier->SetDependentVariableName("averaged quantity");
 
         // Test that member variables are initialised correctly
@@ -135,19 +135,19 @@ public:
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
+        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
         p_pde_modifier->SetDependentVariableName("nutrient");
 
         TS_ASSERT_THROWS_THIS(p_pde_modifier->SetupSolve(cell_population, "output_directory"),
-            "ParabolicGrowingDomainPdeModifier cannot be used with an AveragedSourceParabolicPde. Use a ParabolicBoxDomainPdeModifier instead.");
+            "ParabolicGrowingDomainPdeSystemModifier cannot be used with an AveragedSourceParabolicPde. Use a ParabolicBoxDomainPdeSystemModifier instead.");
     }
 
-    void TestArchiveParabolicGrowingDomainPdeModifier() throw(Exception)
+    void TestArchiveParabolicGrowingDomainPdeSystemModifier() throw(Exception)
     {
         // Create a file for archiving
         OutputFileHandler handler("archive", false);
         handler.SetArchiveDirectory();
-        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "ParabolicGrowingDomainPdeModifier.arch";
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "ParabolicGrowingDomainPdeSystemModifier.arch";
 
         // Separate scope to write the archive
         {
@@ -162,7 +162,7 @@ public:
                 data[i] = i + 0.45;
             }
             Vec vector = PetscTools::CreateVec(data);
-            ParabolicGrowingDomainPdeModifier<2> modifier(p_pde, p_bc, false, vector);
+            ParabolicGrowingDomainPdeSystemModifier<2> modifier(p_pde, p_bc, false, vector);
             modifier.SetDependentVariableName("averaged quantity");
 
             // Create an output archive
@@ -185,10 +185,10 @@ public:
             input_arch >> p_modifier2;
 
             // See whether we read out the correct variable name
-            std::string variable_name = (static_cast<ParabolicGrowingDomainPdeModifier<2>*>(p_modifier2))->rGetDependentVariableName();
+            std::string variable_name = (static_cast<ParabolicGrowingDomainPdeSystemModifier<2>*>(p_modifier2))->rGetDependentVariableName();
             TS_ASSERT_EQUALS(variable_name, "averaged quantity");
 
-            Vec solution = (static_cast<ParabolicGrowingDomainPdeModifier<2>*>(p_modifier2))->GetSolution();
+            Vec solution = (static_cast<ParabolicGrowingDomainPdeSystemModifier<2>*>(p_modifier2))->GetSolution();
             ReplicatableVector solution_repl(solution);
 
             TS_ASSERT_EQUALS(solution_repl.GetSize(), 10u);
@@ -228,7 +228,7 @@ public:
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
+        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
         p_pde_modifier->SetDependentVariableName("variable");
 
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseParabolicPdeWithMeshOnDisk");
@@ -299,7 +299,7 @@ public:
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
+        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
         p_pde_modifier->SetDependentVariableName("variable");
 
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseParabolicPdeWithMeshOnHeterogeneousDisk");
@@ -371,7 +371,7 @@ public:
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, true));
+        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, true));
         p_pde_modifier->SetDependentVariableName("variable");
 
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseParabolicPdeWithMeshNeumanBcs");
@@ -431,7 +431,7 @@ public:
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
+        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
         p_pde_modifier->SetDependentVariableName("variable");
 
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseParabolicPdeWithMeshOnSquare");
@@ -489,7 +489,7 @@ public:
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
+        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
         p_pde_modifier->SetDependentVariableName("variable");
 
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseParabolicPdeWithNodeOnSquare");
@@ -554,7 +554,7 @@ public:
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
+        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
         p_pde_modifier->SetDependentVariableName("variable");
 
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseParabolicPdeWithVertexOnSquare");
@@ -617,7 +617,7 @@ public:
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
+        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
         p_pde_modifier->SetDependentVariableName("variable");
 
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseParabolicPdeWithPottsOnSquare");
@@ -686,7 +686,7 @@ public:
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
+        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
         p_pde_modifier->SetDependentVariableName("variable");
 
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseParabolicPdeWithCaOnSquare");
@@ -710,4 +710,4 @@ public:
     }
 };
 
-#endif /*TESTPARABOLICGROWINGDOMAINPDEMODIFIER_HPP_*/
+#endif /*TESTParabolicGrowingDomainPdeSystemModifier_HPP_*/

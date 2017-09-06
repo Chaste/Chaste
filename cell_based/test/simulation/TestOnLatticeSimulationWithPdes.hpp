@@ -63,8 +63,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Warnings.hpp"
 #include "SmartPointers.hpp"
 #include "FileComparison.hpp"
-#include "EllipticBoxDomainPdeModifier.hpp"
-#include "EllipticGrowingDomainPdeModifier.hpp"
+#include "EllipticBoxDomainPdeSystemModifier.hpp"
+#include "EllipticGrowingDomainPdeSystemModifier.hpp"
 
 class SimplePdeForTesting : public AbstractLinearEllipticPde<2,2>
 {
@@ -95,7 +95,7 @@ double bc_func(const ChastePoint<2>& p)
 }
 
 ///\todo move into cell_based/test/cell_based_pde
-///\todo merge content into TestSimulationsWith*DomainPdeModifier and remove this test suite
+///\todo merge content into TestSimulationsWith*DomainPdeSystemModifier and remove this test suite
 class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestSuite
 {
   public:
@@ -133,7 +133,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
         p_pde_modifier->SetDependentVariableName("nutrient");
 
         simulator.AddSimulationModifier(p_pde_modifier);
@@ -218,7 +218,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
         p_pde_modifier->SetDependentVariableName("nutrient");
 
         simulator.AddSimulationModifier(p_pde_modifier);
@@ -291,7 +291,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
         p_pde_modifier->SetDependentVariableName("nutrient");
 
         simulator.AddSimulationModifier(p_pde_modifier);
@@ -347,7 +347,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
         p_pde_modifier->SetDependentVariableName("nutrient");
 
         simulator.AddSimulationModifier(p_pde_modifier);
@@ -403,7 +403,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
         p_pde_modifier->SetDependentVariableName("nutrient");
 
         simulator.AddSimulationModifier(p_pde_modifier);
@@ -461,7 +461,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
         p_pde_modifier->SetDependentVariableName("nutrient");
 
         simulator.AddSimulationModifier(p_pde_modifier);
@@ -513,7 +513,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
         p_pde_modifier->SetDependentVariableName("nutrient");
 
         simulator.AddSimulationModifier(p_pde_modifier);
@@ -596,13 +596,13 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier_1, (p_pde_1, p_bc_1, false, p_cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeSystemModifier<2>, p_pde_modifier_1, (p_pde_1, p_bc_1, false, p_cuboid));
         p_pde_modifier_1->SetDependentVariableName("quantity_1");
 
         simulator.AddSimulationModifier(p_pde_modifier_1);
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier_2, (p_pde_2, p_bc_2, false, p_cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeSystemModifier<2>, p_pde_modifier_2, (p_pde_2, p_bc_2, false, p_cuboid));
         p_pde_modifier_2->SetDependentVariableName("quantity_2");
 
         simulator.AddSimulationModifier(p_pde_modifier_2);
@@ -682,7 +682,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid, 1.0));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid, 1.0));
         p_pde_modifier->SetDependentVariableName("nutrient");
         p_pde_modifier->SetOutputSolutionAtPdeNodes(true);
 

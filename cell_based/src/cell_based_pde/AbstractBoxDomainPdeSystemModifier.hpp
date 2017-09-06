@@ -33,24 +33,24 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef ABSTRACTBOXDOMAINPDEMODIFIER_HPP_
-#define ABSTRACTBOXDOMAINPDEMODIFIER_HPP_
+#ifndef ABSTRACTBOXDOMAINPDESYSTEMMODIFIER_HPP_
+#define ABSTRACTBOXDOMAINPDESYSTEMMODIFIER_HPP_
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
-#include "AbstractPdeModifier.hpp"
+#include "AbstractPdeSystemModifier.hpp"
 
 /**
- * An abstract modifier class containing functionality common to EllipticBoxDomainPdeModifier
- * and ParabolicBoxDomainPdeModifier, which both solve a linear elliptic or parabolic PDE
+ * An abstract modifier class containing functionality common to EllipticBoxDomainPdeSystemModifier
+ * and ParabolicBoxDomainPdeSystemModifier, which both solve a linear elliptic or parabolic PDE
  * coupled to a cell-based simulation on a coarse domain.
  */
 template<unsigned DIM>
-class AbstractBoxDomainPdeModifier : public AbstractPdeModifier<DIM>
+class AbstractBoxDomainPdeSystemModifier : public AbstractPdeSystemModifier<DIM>
 {
-    friend class TestEllipticBoxDomainPdeModifier;
-    friend class TestParabolicBoxDomainPdeModifier;
+    friend class TestEllipticBoxDomainPdeSystemModifier;
+    friend class TestParabolicBoxDomainPdeSystemModifier;
     friend class TestOffLatticeSimulationWithPdes;
 
 private:
@@ -67,7 +67,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractPdeModifier<DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractPdeSystemModifier<DIM> >(*this);
         archive & mpMeshCuboid;
         archive & mStepSize;
         archive & mSetBcsOnBoxBoundary;
@@ -101,25 +101,25 @@ public:
     /**
      * Constructor.
      *
-     * @param pPde A shared pointer to a linear PDE object (defaults to NULL)
-     * @param pBoundaryCondition A shared pointer to an abstract boundary condition
+     * @param pPdeSystem A shared pointer to a linear PDE system object (defaults to NULL)
+     * @param pBoundaryConditions A vector of shared pointers to abstract boundary conditions
      *     (defaults to NULL, corresponding to a constant boundary condition with value zero)
      * @param isNeumannBoundaryCondition Whether the boundary condition is Neumann (defaults to true)
      * @param pMeshCuboid A shared pointer to a ChasteCuboid specifying the outer boundary for the FE mesh (defaults to NULL)
      * @param stepSize step size to be used in the FE mesh (defaults to 1.0, i.e. the default cell size)
      * @param solution solution vector (defaults to NULL)
      */
-    AbstractBoxDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde=boost::shared_ptr<AbstractLinearPde<DIM,DIM> >(),
-                                 boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition=boost::shared_ptr<AbstractBoundaryCondition<DIM> >(),
-                                 bool isNeumannBoundaryCondition=true,
-                                 boost::shared_ptr<ChasteCuboid<DIM> > pMeshCuboid=boost::shared_ptr<ChasteCuboid<DIM> >(),
-                                 double stepSize=1.0,
-                                 Vec solution=nullptr);
+    AbstractBoxDomainPdeSystemModifier(boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,1> > pPdeSystem=boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,1> >(),
+        std::vector<boost::shared_ptr<AbstractBoundaryCondition<DIM> > > pBoundaryConditions=std::vector<boost::shared_ptr<AbstractBoundaryCondition<DIM> > >(),
+        bool isNeumannBoundaryCondition=true,
+        boost::shared_ptr<ChasteCuboid<DIM> > pMeshCuboid=boost::shared_ptr<ChasteCuboid<DIM> >(),
+        double stepSize=1.0,
+        Vec solution=nullptr);
 
     /**
      * Destructor.
      */
-    virtual ~AbstractBoxDomainPdeModifier();
+    virtual ~AbstractBoxDomainPdeSystemModifier();
 
     /**
      * @return mStepSize.
@@ -194,6 +194,6 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-TEMPLATED_CLASS_IS_ABSTRACT_1_UNSIGNED(AbstractBoxDomainPdeModifier)
+TEMPLATED_CLASS_IS_ABSTRACT_1_UNSIGNED(AbstractBoxDomainPdeSystemModifier)
 
-#endif /*ABSTRACTBOXDOMAINPDEMODIFIER_HPP_*/
+#endif /*ABSTRACTBOXDOMAINPDESYSTEMMODIFIER_HPP_*/

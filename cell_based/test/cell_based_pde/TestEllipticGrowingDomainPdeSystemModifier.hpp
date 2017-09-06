@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef TESTELLIPTICGROWINGDOMAINPDEMODIFIER_HPP_
-#define TESTELLIPTICGROWINGDOMAINPDEMODIFIER_HPP_
+#ifndef TESTEllipticGrowingDomainPdeSystemModifier_HPP_
+#define TESTEllipticGrowingDomainPdeSystemModifier_HPP_
 
 #include <cxxtest/TestSuite.h>
 
@@ -54,7 +54,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellwiseSourceEllipticPde.hpp"
 #include "CheckpointArchiveTypes.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
-#include "EllipticGrowingDomainPdeModifier.hpp"
+#include "EllipticGrowingDomainPdeSystemModifier.hpp"
 #include "FixedG1GenerationalCellCycleModel.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
@@ -76,7 +76,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * In each case we are solving Laplacian U = f where f is constant in different regions.
  * We solve unit disc where the solutions are Bessel functions and logs.
  */
-class TestEllipticGrowingDomainPdeModifier : public AbstractCellBasedWithTimingsTestSuite
+class TestEllipticGrowingDomainPdeSystemModifier : public AbstractCellBasedWithTimingsTestSuite
 {
 public:
 
@@ -87,7 +87,7 @@ public:
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
         p_pde_modifier->SetDependentVariableName("averaged quantity");
 
         // Test that member variables are initialised correctly
@@ -104,7 +104,7 @@ public:
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
         p_pde_modifier->SetDependentVariableName("averaged quantity");
         {
             // Create a MeshBasedCellPopulation
@@ -279,19 +279,19 @@ public:
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
         p_pde_modifier->SetDependentVariableName("nutrient");
 
         TS_ASSERT_THROWS_THIS(p_pde_modifier->SetupSolve(cell_population, "output_directory"),
-            "EllipticGrowingDomainPdeModifier cannot be used with an AveragedSourceEllipticPde. Use an EllipticBoxDomainPdeModifier instead.");
+            "EllipticGrowingDomainPdeSystemModifier cannot be used with an AveragedSourceEllipticPde. Use an EllipticBoxDomainPdeSystemModifier instead.");
     }
 
-    void TestArchiveEllipticGrowingDomainPdeModifier() throw(Exception)
+    void TestArchiveEllipticGrowingDomainPdeSystemModifier() throw(Exception)
     {
         // Create a file for archiving
         OutputFileHandler handler("archive", false);
         handler.SetArchiveDirectory();
-        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "EllipticGrowingDomainPdeModifier.arch";
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "EllipticGrowingDomainPdeSystemModifier.arch";
 
         // Separate scope to write the archive
         {
@@ -306,7 +306,7 @@ public:
                 data[i] = i + 0.45;
             }
             Vec vector = PetscTools::CreateVec(data);
-            EllipticGrowingDomainPdeModifier<2> modifier(p_pde, p_bc, false, vector);
+            EllipticGrowingDomainPdeSystemModifier<2> modifier(p_pde, p_bc, false, vector);
             modifier.SetDependentVariableName("averaged quantity");
 
             // Create an output archive
@@ -329,10 +329,10 @@ public:
             input_arch >> p_modifier2;
 
             // See whether we read out the correct variable name area
-            std::string variable_name = (static_cast<EllipticGrowingDomainPdeModifier<2>*>(p_modifier2))->rGetDependentVariableName();
+            std::string variable_name = (static_cast<EllipticGrowingDomainPdeSystemModifier<2>*>(p_modifier2))->rGetDependentVariableName();
             TS_ASSERT_EQUALS(variable_name, "averaged quantity");
 
-            Vec solution = (static_cast<EllipticGrowingDomainPdeModifier<2>*>(p_modifier2))->GetSolution();
+            Vec solution = (static_cast<EllipticGrowingDomainPdeSystemModifier<2>*>(p_modifier2))->GetSolution();
             ReplicatableVector solution_repl(solution);
 
             TS_ASSERT_EQUALS(solution_repl.GetSize(), 10u);
@@ -373,7 +373,7 @@ public:
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
         p_pde_modifier->SetDependentVariableName("variable");
 
         // For coverage output the solution gradient
@@ -443,7 +443,7 @@ public:
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
         p_pde_modifier->SetDependentVariableName("variable");
 
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseEllipticPdeWithMeshOnHeterogeneousDisk");
@@ -508,7 +508,7 @@ public:
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
         p_pde_modifier->SetDependentVariableName("variable");
 
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseEllipticPdeWithMeshOnSquare");
@@ -556,7 +556,7 @@ public:
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
         p_pde_modifier->SetDependentVariableName("variable");
 
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseEllipticPdeWithNodeOnSquare");
@@ -610,7 +610,7 @@ public:
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
         p_pde_modifier->SetDependentVariableName("variable");
 
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseEllipticPdeWithVertexOnSquare");
@@ -663,7 +663,7 @@ public:
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
         p_pde_modifier->SetDependentVariableName("variable");
 
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseEllipticPdeWithPottsOnSquare");
@@ -722,7 +722,7 @@ public:
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
         p_pde_modifier->SetDependentVariableName("variable");
 
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseEllipticPdeWithCaOnSquare");
@@ -737,7 +737,7 @@ public:
         TS_ASSERT_DELTA(p_cell_210->GetCellData()->GetItem("variable"), 0.4338, 1e-3); // Note lower as slightly different answer with intel compiler
     }
 
-    void TestEllipticGrowingDomainPdeModifierIn1d() throw(Exception)
+    void TestEllipticGrowingDomainPdeSystemModifierIn1d() throw(Exception)
     {
         // Create mesh
         std::vector<Node<1>*> nodes;
@@ -767,12 +767,12 @@ public:
         MAKE_PTR_ARGS(ConstBoundaryCondition<1>, p_bc, (1.0));;
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<1>, p_pde_modifier, (p_pde, p_bc, false));
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeSystemModifier<1>, p_pde_modifier, (p_pde, p_bc, false));
         p_pde_modifier->SetDependentVariableName("variable");
 
         p_pde_modifier->SetOutputGradient(true);
 
-        p_pde_modifier->SetupSolve(cell_population,"TestEllipticBoxDomainPdeModifierIn1d");
+        p_pde_modifier->SetupSolve(cell_population,"TestEllipticBoxDomainPdeSystemModifierIn1d");
 
         // Test the solution at some fixed points to compare with other cell populations
         CellPtr p_cell_2 = cell_population.GetCellUsingLocationIndex(2);
@@ -786,7 +786,7 @@ public:
         }
     }
 
-    void TestEllipticGrowingDomainPdeModifierIn3d() throw(Exception)
+    void TestEllipticGrowingDomainPdeSystemModifierIn3d() throw(Exception)
     {
         // Create a simple mesh
         TetrahedralMesh<3,3> temp_mesh;
@@ -811,12 +811,12 @@ public:
         MAKE_PTR_ARGS(ConstBoundaryCondition<3>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<3>, p_pde_modifier, (p_pde, p_bc, false));
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeSystemModifier<3>, p_pde_modifier, (p_pde, p_bc, false));
         p_pde_modifier->SetDependentVariableName("variable");
 
         p_pde_modifier->SetOutputGradient(true);
 
-        p_pde_modifier->SetupSolve(cell_population,"TestEllipticGrowingDomainPdeModifierIn3d");
+        p_pde_modifier->SetupSolve(cell_population,"TestEllipticGrowingDomainPdeSystemModifierIn3d");
 
         // Test the solution at some fixed points to compare with other cell populations
         CellPtr p_cell_62 = cell_population.GetCellUsingLocationIndex(13);
@@ -827,4 +827,4 @@ public:
     }
 };
 
-#endif /*TESTELLIPTICGROWINGDOMAINPDEMODIFIER_HPP_*/
+#endif /*TESTEllipticGrowingDomainPdeSystemModifier_HPP_*/

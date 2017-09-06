@@ -33,20 +33,20 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "AbstractPdeModifier.hpp"
+#include "AbstractPdeSystemModifier.hpp"
 #include "VtkMeshWriter.hpp"
 #include "ReplicatableVector.hpp"
 #include "AveragedSourceEllipticPde.hpp"
 #include "AveragedSourceParabolicPde.hpp"
 
-template<unsigned DIM>
-AbstractPdeModifier<DIM>::AbstractPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde,
-                                              boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition,
+template<unsigned DIM, unsigned PROBLEM_DIM>
+AbstractPdeSystemModifier<DIM,PROBLEM_DIM>::AbstractPdeSystemModifier(boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,PROBLEM_DIM> > pPdeSystem,
+                                              std::vector<boost::shared_ptr<AbstractBoundaryCondition<DIM> > > pBoundaryConditions,
                                               bool isNeumannBoundaryCondition,
                                               Vec solution)
     : AbstractCellBasedSimulationModifier<DIM>(),
-      mpPde(pPde),
-      mpBoundaryCondition(pBoundaryCondition),
+      mpPdeSystem(pPdeSystem),
+      mpBoundaryConditions(pBoundaryConditions),
       mIsNeumannBoundaryCondition(isNeumannBoundaryCondition),
       mSolution(nullptr),
       mOutputDirectory(""),
@@ -60,8 +60,8 @@ AbstractPdeModifier<DIM>::AbstractPdeModifier(boost::shared_ptr<AbstractLinearPd
     }
 }
 
-template<unsigned DIM>
-AbstractPdeModifier<DIM>::~AbstractPdeModifier()
+template<unsigned DIM, unsigned PROBLEM_DIM>
+AbstractPdeSystemModifier<DIM,PROBLEM_DIM>::~AbstractPdeSystemModifier()
 {
     if (mDeleteFeMesh and mpFeMesh!=nullptr)
     {
@@ -73,77 +73,78 @@ AbstractPdeModifier<DIM>::~AbstractPdeModifier()
     }
 }
 
-template<unsigned DIM>
-boost::shared_ptr<AbstractLinearPde<DIM,DIM> > AbstractPdeModifier<DIM>::GetPde()
+template<unsigned DIM, unsigned PROBLEM_DIM>
+boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,PROBLEM_DIM> > AbstractPdeSystemModifier<DIM,PROBLEM_DIM>::GetPdeSystem()
 {
-    return mpPde;
+    return mpPdeSystem;
 }
 
-template<unsigned DIM>
-boost::shared_ptr<AbstractBoundaryCondition<DIM> > AbstractPdeModifier<DIM>::GetBoundaryCondition()
+template<unsigned DIM, unsigned PROBLEM_DIM>
+boost::shared_ptr<AbstractBoundaryCondition<DIM> > AbstractPdeSystemModifier<DIM,PROBLEM_DIM>::GetBoundaryCondition()
 {
-    return mpBoundaryCondition;
+    return mpBoundaryConditions[0];
 }
 
-template<unsigned DIM>
-bool AbstractPdeModifier<DIM>::IsNeumannBoundaryCondition()
+template<unsigned DIM, unsigned PROBLEM_DIM>
+bool AbstractPdeSystemModifier<DIM,PROBLEM_DIM>::IsNeumannBoundaryCondition()
 {
     return mIsNeumannBoundaryCondition;
 }
 
-template<unsigned DIM>
-void AbstractPdeModifier<DIM>::SetDependentVariableName(const std::string& rName)
+template<unsigned DIM, unsigned PROBLEM_DIM>
+void AbstractPdeSystemModifier<DIM,PROBLEM_DIM>::SetDependentVariableName(const std::string& rName, unsigned pdeIndex)
 {
-    mDependentVariableName = rName;
+    assert(pdeIndex < mDependentVariableNames.size());
+    mDependentVariableNames[pdeIndex] = rName;
 }
 
-template<unsigned DIM>
-std::string& AbstractPdeModifier<DIM>::rGetDependentVariableName()
+template<unsigned DIM, unsigned PROBLEM_DIM>
+std::string& AbstractPdeSystemModifier<DIM,PROBLEM_DIM>::rGetDependentVariableName(unsigned pdeIndex)
 {
-    return mDependentVariableName;
+    return mDependentVariableNames[pdeIndex];
 }
 
-template<unsigned DIM>
-bool AbstractPdeModifier<DIM>::HasAveragedSourcePde()
+template<unsigned DIM, unsigned PROBLEM_DIM>
+bool AbstractPdeSystemModifier<DIM,PROBLEM_DIM>::HasAveragedSourcePde()
 {
-    return ((boost::dynamic_pointer_cast<AveragedSourceEllipticPde<DIM> >(mpPde) != nullptr) ||
-            (boost::dynamic_pointer_cast<AveragedSourceParabolicPde<DIM> >(mpPde) != nullptr));
+    return ((boost::dynamic_pointer_cast<AveragedSourceEllipticPde<DIM> >(mpPdeSystem) != nullptr) ||
+            (boost::dynamic_pointer_cast<AveragedSourceParabolicPde<DIM> >(mpPdeSystem) != nullptr));
 }
 
-template<unsigned DIM>
-void AbstractPdeModifier<DIM>::SetUpSourceTermsForAveragedSourcePde(TetrahedralMesh<DIM,DIM>* pMesh, std::map<CellPtr, unsigned>* pCellPdeElementMap)
+template<unsigned DIM, unsigned PROBLEM_DIM>
+void AbstractPdeSystemModifier<DIM,PROBLEM_DIM>::SetUpSourceTermsForAveragedSourcePde(TetrahedralMesh<DIM,DIM>* pMesh, std::map<CellPtr, unsigned>* pCellPdeElementMap)
 {
     assert(HasAveragedSourcePde());
-    if (boost::dynamic_pointer_cast<AveragedSourceEllipticPde<DIM> >(mpPde) != nullptr)
+    if (boost::dynamic_pointer_cast<AveragedSourceEllipticPde<DIM> >(mpPdeSystem) != nullptr)
     {
-        boost::static_pointer_cast<AveragedSourceEllipticPde<DIM> >(mpPde)->SetupSourceTerms(*pMesh, pCellPdeElementMap);
+        boost::static_pointer_cast<AveragedSourceEllipticPde<DIM> >(mpPdeSystem)->SetupSourceTerms(*pMesh, pCellPdeElementMap);
     }
-    else if (boost::dynamic_pointer_cast<AveragedSourceParabolicPde<DIM> >(mpPde) != nullptr)
+    else if (boost::dynamic_pointer_cast<AveragedSourceParabolicPde<DIM> >(mpPdeSystem) != nullptr)
     {
-        boost::static_pointer_cast<AveragedSourceParabolicPde<DIM> >(mpPde)->SetupSourceTerms(*pMesh, pCellPdeElementMap);
+        boost::static_pointer_cast<AveragedSourceParabolicPde<DIM> >(mpPdeSystem)->SetupSourceTerms(*pMesh, pCellPdeElementMap);
     }
 }
 
-template<unsigned DIM>
-Vec AbstractPdeModifier<DIM>::GetSolution()
+template<unsigned DIM, unsigned PROBLEM_DIM>
+Vec AbstractPdeSystemModifier<DIM,PROBLEM_DIM>::GetSolution()
 {
     return mSolution;
 }
 
-template<unsigned DIM>
-Vec AbstractPdeModifier<DIM>::GetSolution() const
+template<unsigned DIM, unsigned PROBLEM_DIM>
+Vec AbstractPdeSystemModifier<DIM,PROBLEM_DIM>::GetSolution() const
 {
     return mSolution;
 }
 
-template<unsigned DIM>
-TetrahedralMesh<DIM,DIM>* AbstractPdeModifier<DIM>::GetFeMesh() const
+template<unsigned DIM, unsigned PROBLEM_DIM>
+TetrahedralMesh<DIM,DIM>* AbstractPdeSystemModifier<DIM,PROBLEM_DIM>::GetFeMesh() const
 {
     return mpFeMesh;
 }
 
-template<unsigned DIM>
-void AbstractPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)
+template<unsigned DIM, unsigned PROBLEM_DIM>
+void AbstractPdeSystemModifier<DIM,PROBLEM_DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)
 {
     // Cache the output directory
     this->mOutputDirectory = outputDirectory;
@@ -158,8 +159,8 @@ void AbstractPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCell
     }
 }
 
-template<unsigned DIM>
-void AbstractPdeModifier<DIM>::UpdateAtEndOfOutputTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
+template<unsigned DIM, unsigned PROBLEM_DIM>
+void AbstractPdeSystemModifier<DIM,PROBLEM_DIM>::UpdateAtEndOfOutputTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
     if (mOutputSolutionAtPdeNodes)
     {
@@ -168,7 +169,7 @@ void AbstractPdeModifier<DIM>::UpdateAtEndOfOutputTimeStep(AbstractCellPopulatio
             (*mpVizPdeSolutionResultsFile) << SimulationTime::Instance()->GetTime() << "\t";
 
             assert(mpFeMesh != nullptr);
-            assert(mDependentVariableName != "");
+            assert(mDependentVariableNames[0] != "");
 
             for (unsigned i=0; i<mpFeMesh->GetNumNodes(); i++)
             {
@@ -192,7 +193,7 @@ void AbstractPdeModifier<DIM>::UpdateAtEndOfOutputTimeStep(AbstractCellPopulatio
     {
         std::ostringstream time_string;
         time_string << SimulationTime::Instance()->GetTimeStepsElapsed();
-        std::string results_file = "pde_results_" + mDependentVariableName + "_" + time_string.str();
+        std::string results_file = "pde_results_" + mDependentVariableNames[0] + "_" + time_string.str();
         VtkMeshWriter<DIM,DIM>* p_vtk_mesh_writer = new VtkMeshWriter<DIM,DIM>(mOutputDirectory, results_file, false);
 
         ReplicatableVector solution_repl(mSolution);
@@ -202,7 +203,7 @@ void AbstractPdeModifier<DIM>::UpdateAtEndOfOutputTimeStep(AbstractCellPopulatio
            pde_solution.push_back(solution_repl[i]);
         }
 
-        p_vtk_mesh_writer->AddPointData(mDependentVariableName, pde_solution);
+        p_vtk_mesh_writer->AddPointData(mDependentVariableNames[0], pde_solution);
 
         p_vtk_mesh_writer->WriteFilesUsingMesh(*mpFeMesh);
         delete p_vtk_mesh_writer;
@@ -210,8 +211,8 @@ void AbstractPdeModifier<DIM>::UpdateAtEndOfOutputTimeStep(AbstractCellPopulatio
 #endif //CHASTE_VTK
 }
 
-template<unsigned DIM>
-void AbstractPdeModifier<DIM>::UpdateAtEndOfSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
+template<unsigned DIM, unsigned PROBLEM_DIM>
+void AbstractPdeSystemModifier<DIM,PROBLEM_DIM>::UpdateAtEndOfSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
     if (mOutputSolutionAtPdeNodes)
     {
@@ -222,32 +223,27 @@ void AbstractPdeModifier<DIM>::UpdateAtEndOfSolve(AbstractCellPopulation<DIM,DIM
     }
 }
 
-template<unsigned DIM>
-bool AbstractPdeModifier<DIM>::GetOutputGradient()
+template<unsigned DIM, unsigned PROBLEM_DIM>
+bool AbstractPdeSystemModifier<DIM,PROBLEM_DIM>::GetOutputGradient()
 {
     return mOutputGradient;
 }
 
-template<unsigned DIM>
-void AbstractPdeModifier<DIM>::SetOutputGradient(bool outputGradient)
+template<unsigned DIM, unsigned PROBLEM_DIM>
+void AbstractPdeSystemModifier<DIM,PROBLEM_DIM>::SetOutputGradient(bool outputGradient)
 {
     mOutputGradient = outputGradient;
 }
 
-template<unsigned DIM>
-void AbstractPdeModifier<DIM>::SetOutputSolutionAtPdeNodes(bool outputSolutionAtPdeNodes)
+template<unsigned DIM, unsigned PROBLEM_DIM>
+void AbstractPdeSystemModifier<DIM,PROBLEM_DIM>::SetOutputSolutionAtPdeNodes(bool outputSolutionAtPdeNodes)
 {
     mOutputSolutionAtPdeNodes = outputSolutionAtPdeNodes;
 }
 
-template<unsigned DIM>
-void AbstractPdeModifier<DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
+template<unsigned DIM, unsigned PROBLEM_DIM>
+void AbstractPdeSystemModifier<DIM,PROBLEM_DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
 {
     // No parameters to output, so just call method on direct parent class
     AbstractCellBasedSimulationModifier<DIM>::OutputSimulationModifierParameters(rParamsFile);
 }
-
-// Explicit instantiation
-template class AbstractPdeModifier<1>;
-template class AbstractPdeModifier<2>;
-template class AbstractPdeModifier<3>;

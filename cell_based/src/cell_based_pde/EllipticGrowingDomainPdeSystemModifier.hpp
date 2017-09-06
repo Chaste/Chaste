@@ -33,13 +33,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef ELLIPTICGROWINGDOMAINPDEMODIFIER_HPP_
-#define ELLIPTICGROWINGDOMAINPDEMODIFIER_HPP_
+#ifndef EllipticGrowingDomainPdeSystemModifier_HPP_
+#define EllipticGrowingDomainPdeSystemModifier_HPP_
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
-#include "AbstractGrowingDomainPdeModifier.hpp"
+#include "AbstractGrowingDomainPdeSystemModifier.hpp"
 #include "BoundaryConditionsContainer.hpp"
 
 /**
@@ -51,16 +51,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * is defined by the spatial domain associated with the cell population. The
  * precise definition of this domain is implemented in the method
  * GetTetrahedralMeshForPdeModifier(), which is overridden for each cell population
- * class and is used in the AbstractGrowingDomainPdeModifier method GenerateFeMesh()
+ * class and is used in the AbstractGrowingDomainPdeSystemModifier method GenerateFeMesh()
  * that is inherited by this class.
  *
  * Examples of PDEs in the source folder that can be solved using this class are
  * CellwiseSourceEllipticPde and UniformSourceEllipticPde.
  */
 template<unsigned DIM>
-class EllipticGrowingDomainPdeModifier : public AbstractGrowingDomainPdeModifier<DIM>
+class EllipticGrowingDomainPdeSystemModifier : public AbstractGrowingDomainPdeSystemModifier<DIM>
 {
-    friend class TestEllipticGrowingDomainPdeModifier;
+    friend class TestEllipticGrowingDomainPdeSystemModifier;
 
 private:
 
@@ -76,7 +76,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractGrowingDomainPdeModifier<DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractGrowingDomainPdeSystemModifier<DIM> >(*this);
     }
 
 public:
@@ -84,21 +84,21 @@ public:
     /**
      * Constructor.
      *
-     * @param pPde A shared pointer to a linear PDE object (defaults to NULL)
-     * @param pBoundaryCondition A shared pointer to an abstract boundary condition
+     * @param pPdeSystem A shared pointer to a linear PDE system object (defaults to NULL)
+     * @param pBoundaryConditions A vector of shared pointers to abstract boundary conditions
      *     (defaults to NULL, corresponding to a constant boundary condition with value zero)
      * @param isNeumannBoundaryCondition Whether the boundary condition is Neumann (defaults to true)
      * @param solution solution vector (defaults to NULL)
      */
-    EllipticGrowingDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde=boost::shared_ptr<AbstractLinearPde<DIM,DIM> >(),
-                                     boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition=boost::shared_ptr<AbstractBoundaryCondition<DIM> >(),
-                                     bool isNeumannBoundaryCondition=true,
-                                     Vec solution=nullptr);
+    EllipticGrowingDomainPdeSystemModifier(boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,1> > pPdeSystem=boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,1> >(),
+        std::vector<boost::shared_ptr<AbstractBoundaryCondition<DIM> > > pBoundaryConditions=std::vector<boost::shared_ptr<AbstractBoundaryCondition<DIM> > >(),
+        bool isNeumannBoundaryCondition=true,
+        Vec solution=nullptr);
 
     /**
      * Destructor.
      */
-    virtual ~EllipticGrowingDomainPdeModifier();
+    virtual ~EllipticGrowingDomainPdeSystemModifier();
 
     /**
      * Overridden UpdateAtEndOfTimeStep() method.
@@ -136,7 +136,7 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(EllipticGrowingDomainPdeModifier)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(EllipticGrowingDomainPdeSystemModifier)
 
 namespace boost
 {
@@ -144,7 +144,7 @@ namespace serialization
 {
 template<class Archive, unsigned DIM>
 inline void save_construct_data(
-    Archive & ar, const EllipticGrowingDomainPdeModifier<DIM> * t, const unsigned int file_version)
+    Archive & ar, const EllipticGrowingDomainPdeSystemModifier<DIM> * t, const unsigned int file_version)
 {
     if (t->GetSolution())
     {
@@ -155,7 +155,7 @@ inline void save_construct_data(
 
 template<class Archive, unsigned DIM>
 inline void load_construct_data(
-    Archive & ar, EllipticGrowingDomainPdeModifier<DIM> * t, const unsigned int file_version)
+    Archive & ar, EllipticGrowingDomainPdeSystemModifier<DIM> * t, const unsigned int file_version)
 {
     Vec solution = nullptr;
 
@@ -167,12 +167,12 @@ inline void load_construct_data(
         PetscTools::ReadPetscObject(solution, archive_filename);
     }
 
-    ::new(t)EllipticGrowingDomainPdeModifier<DIM>(boost::shared_ptr<AbstractLinearPde<DIM, DIM> >(),
-                                                  boost::shared_ptr<AbstractBoundaryCondition<DIM> >(),
-                                                  true,
-                                                  solution);
+    ::new(t)EllipticGrowingDomainPdeSystemModifier<DIM>(boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,1> >(),
+                                                        std::vector<boost::shared_ptr<AbstractBoundaryCondition<DIM> > >(),
+                                                        true,
+                                                        solution);
 }
 }
 } // namespace ...
 
-#endif /*ELLIPTICGROWINGDOMAINPDEMODIFIER_HPP_*/
+#endif /*EllipticGrowingDomainPdeSystemModifier_HPP_*/

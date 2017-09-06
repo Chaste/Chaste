@@ -33,29 +33,29 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "ParabolicGrowingDomainPdeModifier.hpp"
+#include "ParabolicGrowingDomainPdeSystemModifier.hpp"
 #include "CellBasedParabolicPdeSolver.hpp"
 #include "AveragedSourceParabolicPde.hpp"
 
 template<unsigned DIM>
-ParabolicGrowingDomainPdeModifier<DIM>::ParabolicGrowingDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde,
-                                                                          boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition,
-                                                                          bool isNeumannBoundaryCondition,
-                                                                          Vec solution)
-    : AbstractGrowingDomainPdeModifier<DIM>(pPde,
-                                            pBoundaryCondition,
-                                            isNeumannBoundaryCondition,
-                                            solution)
+ParabolicGrowingDomainPdeSystemModifier<DIM>::ParabolicGrowingDomainPdeSystemModifier(boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,1> > pPdeSystem,
+    std::vector<boost::shared_ptr<AbstractBoundaryCondition<DIM> > > pBoundaryConditions,
+    bool isNeumannBoundaryCondition,
+    Vec solution)
+    : AbstractGrowingDomainPdeSystemModifier<DIM>(pPdeSystem,
+                                                  pBoundaryConditions,
+                                                  isNeumannBoundaryCondition,
+                                                  solution)
 {
 }
 
 template<unsigned DIM>
-ParabolicGrowingDomainPdeModifier<DIM>::~ParabolicGrowingDomainPdeModifier()
+ParabolicGrowingDomainPdeSystemModifier<DIM>::~ParabolicGrowingDomainPdeSystemModifier()
 {
 }
 
 template<unsigned DIM>
-void ParabolicGrowingDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
+void ParabolicGrowingDomainPdeSystemModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
     this->GenerateFeMesh(rCellPopulation);
 
@@ -67,7 +67,7 @@ void ParabolicGrowingDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellP
 
     // Use CellBasedParabolicPdeSolver as cell wise PDE
     CellBasedParabolicPdeSolver<DIM> solver(this->mpFeMesh,
-                                            boost::static_pointer_cast<AbstractLinearParabolicPde<DIM,DIM> >(this->mpPde).get(),
+                                            boost::static_pointer_cast<AbstractLinearParabolicPde<DIM,DIM> >(this->mpPdeSystem).get(),
                                             p_bcc.get());
 
     ///\todo Investigate more than one PDE time step per spatial step
@@ -89,13 +89,13 @@ void ParabolicGrowingDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellP
 }
 
 template<unsigned DIM>
-void ParabolicGrowingDomainPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)
+void ParabolicGrowingDomainPdeSystemModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)
 {
-    AbstractGrowingDomainPdeModifier<DIM>::SetupSolve(rCellPopulation, outputDirectory);
+    AbstractGrowingDomainPdeSystemModifier<DIM>::SetupSolve(rCellPopulation, outputDirectory);
 
-    if (boost::dynamic_pointer_cast<AveragedSourceParabolicPde<DIM> >(this->mpPde))
+    if (boost::dynamic_pointer_cast<AveragedSourceParabolicPde<DIM> >(this->mpPdeSystem))
     {
-        EXCEPTION("ParabolicGrowingDomainPdeModifier cannot be used with an AveragedSourceParabolicPde. Use a ParabolicBoxDomainPdeModifier instead.");
+        EXCEPTION("ParabolicGrowingDomainPdeSystemModifier cannot be used with an AveragedSourceParabolicPde. Use a ParabolicBoxDomainPdeSystemModifier instead.");
     }
 
     // Setup a finite element mesh on which to save the initial condition
@@ -109,7 +109,7 @@ void ParabolicGrowingDomainPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<D
 }
 
 template<unsigned DIM>
-std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ParabolicGrowingDomainPdeModifier<DIM>::ConstructBoundaryConditionsContainer()
+std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ParabolicGrowingDomainPdeSystemModifier<DIM>::ConstructBoundaryConditionsContainer()
 {
     std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc(new BoundaryConditionsContainer<DIM,DIM,1>(false));
 
@@ -120,7 +120,7 @@ std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ParabolicGrowingDomainP
              elem_iter != this->mpFeMesh->GetBoundaryElementIteratorEnd();
              ++elem_iter)
         {
-            p_bcc->AddNeumannBoundaryCondition(*elem_iter, this->mpBoundaryCondition.get());
+            p_bcc->AddNeumannBoundaryCondition(*elem_iter, this->mpBoundaryConditions[0].get());
         }
     }
     else
@@ -130,7 +130,7 @@ std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ParabolicGrowingDomainP
              node_iter != this->mpFeMesh->GetBoundaryNodeIteratorEnd();
              ++node_iter)
         {
-            p_bcc->AddDirichletBoundaryCondition(*node_iter, this->mpBoundaryCondition.get());
+            p_bcc->AddDirichletBoundaryCondition(*node_iter, this->mpBoundaryConditions[0].get());
         }
     }
 
@@ -138,7 +138,7 @@ std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ParabolicGrowingDomainP
 }
 
 template<unsigned DIM>
-void ParabolicGrowingDomainPdeModifier<DIM>::UpdateSolutionVector(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
+void ParabolicGrowingDomainPdeSystemModifier<DIM>::UpdateSolutionVector(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
     // Clear (if it's not the first time) and resize the solution vector
     if (this->mSolution)
@@ -147,7 +147,7 @@ void ParabolicGrowingDomainPdeModifier<DIM>::UpdateSolutionVector(AbstractCellPo
     }
     this->mSolution = PetscTools::CreateAndSetVec(this->mpFeMesh->GetNumNodes(), 0.0);
 
-    std::string& variable_name = this->mDependentVariableName;
+    std::string& variable_name = this->mDependentVariableNames[0];
 
     for (typename TetrahedralMesh<DIM,DIM>::NodeIterator node_iter = this->mpFeMesh->GetNodeIteratorBegin();
          node_iter != this->mpFeMesh->GetNodeIteratorEnd();
@@ -170,18 +170,18 @@ void ParabolicGrowingDomainPdeModifier<DIM>::UpdateSolutionVector(AbstractCellPo
 }
 
 template<unsigned DIM>
-void ParabolicGrowingDomainPdeModifier<DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
+void ParabolicGrowingDomainPdeSystemModifier<DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
 {
     // No parameters to output, so just call method on direct parent class
-    AbstractGrowingDomainPdeModifier<DIM>::OutputSimulationModifierParameters(rParamsFile);
+    AbstractGrowingDomainPdeSystemModifier<DIM>::OutputSimulationModifierParameters(rParamsFile);
 }
 
 // Explicit instantiation
-template class ParabolicGrowingDomainPdeModifier<1>;
-template class ParabolicGrowingDomainPdeModifier<2>;
-template class ParabolicGrowingDomainPdeModifier<3>;
+template class ParabolicGrowingDomainPdeSystemModifier<1>;
+template class ParabolicGrowingDomainPdeSystemModifier<2>;
+template class ParabolicGrowingDomainPdeSystemModifier<3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(ParabolicGrowingDomainPdeModifier)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(ParabolicGrowingDomainPdeSystemModifier)
 

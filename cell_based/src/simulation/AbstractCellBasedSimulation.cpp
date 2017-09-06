@@ -42,7 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellBasedEventHandler.hpp"
 #include "LogFile.hpp"
 #include "ExecutableSupport.hpp"
-#include "AbstractPdeModifier.hpp"
+#include "AbstractPdeSystemModifier.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::AbstractCellBasedSimulation(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation,
@@ -375,7 +375,7 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
              iter != mSimulationModifiers.end();
              ++iter)
         {
-            if (boost::dynamic_pointer_cast<AbstractPdeModifier<SPACE_DIM> >(*iter))
+            if (boost::dynamic_pointer_cast<AbstractPdeSystemModifier<SPACE_DIM,1> >(*iter))
             {
                 *this->mpVizSetupFile << "PDE \n";
             }

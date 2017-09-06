@@ -226,7 +226,7 @@ public:
 
     /**
      * @return a shared to a tetrahedral mesh, for use with a PDE modifier.
-     * This method is called by AbstractGrowingDomainPdeModifier.
+     * This method is called by AbstractGrowingDomainPdeSystemModifier.
      *
      * As this method is pure virtual, it must be overridden
      * in subclasses.

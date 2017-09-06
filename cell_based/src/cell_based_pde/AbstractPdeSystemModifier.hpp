@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef ABSTRACTPDEMODIFIER_HPP_
-#define ABSTRACTPDEMODIFIER_HPP_
+#ifndef ABSTRACTPDESYSTEMMODIFIER_HPP_
+#define ABSTRACTPDESYSTEMMODIFIER_HPP_
 
 #include "ChasteSerialization.hpp"
 #include "ClassIsAbstract.hpp"
@@ -42,16 +42,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractCellBasedSimulationModifier.hpp"
 #include "TetrahedralMesh.hpp"
-#include "AbstractLinearPde.hpp"
+#include "AbstractLinearPdeSystem.hpp"
 #include "AbstractBoundaryCondition.hpp"
 
 /**
- * An abstract modifier class containing functionality common to AbstractBoxDomainPdeModifier,
- * AbstractGrowingDomainPdeModifier and their subclasses, which solve a linear elliptic or
+ * An abstract modifier class containing functionality common to AbstractBoxDomainPdeSystemModifier,
+ * AbstractGrowingDomainPdeSystemModifier and their subclasses, which solve a linear elliptic or
  * parabolic PDE coupled to a cell-based simulation.
  */
-template<unsigned DIM>
-class AbstractPdeModifier : public AbstractCellBasedSimulationModifier<DIM,DIM>
+template<unsigned DIM, unsigned PROBLEM_DIM=1>
+class AbstractPdeSystemModifier : public AbstractCellBasedSimulationModifier<DIM,DIM>
 {
 private:
 
@@ -68,10 +68,10 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & boost::serialization::base_object<AbstractCellBasedSimulationModifier<DIM,DIM> >(*this);
-        archive & mpPde;
-        archive & mpBoundaryCondition;
+        archive & mpPdeSystem;
+        archive & mpBoundaryConditions;
         archive & mIsNeumannBoundaryCondition;
-        archive & mDependentVariableName;
+        archive & mDependentVariableNames;
 
         // Note that archiving of mSolution is handled by the methods save/load_construct_data
         archive & mOutputDirectory;
@@ -84,12 +84,12 @@ protected:
     /**
      * Shared pointer to a linear PDE object.
      */
-    boost::shared_ptr<AbstractLinearPde<DIM,DIM> > mpPde;
+    boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,PROBLEM_DIM> > mpPdeSystem;
 
     /**
      * Shared pointer to a boundary condition object.
      */
-    boost::shared_ptr<AbstractBoundaryCondition<DIM> > mpBoundaryCondition;
+    std::vector<boost::shared_ptr<AbstractBoundaryCondition<DIM> > > mpBoundaryConditions;
 
     /**
      * Whether the boundary condition is Neumann (false corresponds to a Dirichlet boundary condition).
@@ -99,10 +99,9 @@ protected:
     bool mIsNeumannBoundaryCondition;
 
     /**
-     * For use in PDEs where we know what the quantity for which we are solving is called,
-     * e.g. oxygen concentration.
+     * For use in PDEs where we wish to record a name for each dependent variable, e.g. oxygen concentration.
      */
-    std::string mDependentVariableName;
+    std::vector<std::string> mDependentVariableNames;
 
     /** The solution to the PDE problem at the current time step. */
     Vec mSolution;
@@ -135,29 +134,29 @@ public:
     /**
      * Constructor.
      *
-     * @param pPde A shared pointer to a linear PDE object (defaults to NULL)
-     * @param pBoundaryCondition A shared pointer to an abstract boundary condition
+     * @param pPdeSystem A shared pointer to a linear PDE system object (defaults to NULL)
+     * @param pBoundaryConditions A vector of shared pointers to abstract boundary conditions
      *     (defaults to NULL, corresponding to a constant boundary condition with value zero)
      * @param isNeumannBoundaryCondition Whether the boundary condition is Neumann (defaults to true)
      * @param solution solution vector (defaults to NULL)
      */
-    AbstractPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde=NULL,
-                        boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition=boost::shared_ptr<AbstractBoundaryCondition<DIM> >(),
-                        bool isNeumannBoundaryCondition=true,
-                        Vec solution=nullptr);
+    AbstractPdeSystemModifier(boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,PROBLEM_DIM> > pPdeSystem=NULL,
+        std::vector<boost::shared_ptr<AbstractBoundaryCondition<DIM> > > pBoundaryConditions=std::vector<boost::shared_ptr<AbstractBoundaryCondition<DIM> > >(),
+        bool isNeumannBoundaryCondition=true,
+        Vec solution=nullptr);
 
     /**
      * Destructor.
      */
-    virtual ~AbstractPdeModifier();
+    virtual ~AbstractPdeSystemModifier();
 
     /**
-     * @return mpPde
+     * @return mpPdeSystem
      */
-    boost::shared_ptr<AbstractLinearPde<DIM,DIM> > GetPde();
+    boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,PROBLEM_DIM> > GetPdeSystem();
 
     /**
-     * @return mpBoundaryCondition
+     * @return mpBoundaryConditions
      */
     boost::shared_ptr<AbstractBoundaryCondition<DIM> > GetBoundaryCondition();
 
@@ -167,18 +166,20 @@ public:
     bool IsNeumannBoundaryCondition();
 
     /**
-     * Set the name of the dependent variable.
+     * Set the name of the dependent variable with given index.
      *
-     * @param rName the name.
+     * @param rName the name
+     * @param pdeIndex the index
      */
-    void SetDependentVariableName(const std::string& rName);
+    void SetDependentVariableName(const std::string& rName, unsigned pdeIndex=0);
 
     /**
-     * Get the name of the dependent variable.
+     * Get the name of the dependent variable with given index.
      *
+     * @param pdeIndex the index
      * @return the name
      */
-    std::string& rGetDependentVariableName();
+    std::string& rGetDependentVariableName(unsigned pdeIndex=0);
 
     /**
      * @return whether the PDE has an averaged source
@@ -280,7 +281,6 @@ public:
     void OutputSimulationModifierParameters(out_stream& rParamsFile);
 };
 
-#include "SerializationExportWrapper.hpp"
-TEMPLATED_CLASS_IS_ABSTRACT_1_UNSIGNED(AbstractPdeModifier)
+TEMPLATED_CLASS_IS_ABSTRACT_2_UNSIGNED(AbstractPdeSystemModifier)
 
-#endif /*ABSTRACTPDEMODIFIER_HPP_*/
+#endif /*ABSTRACTPDESYSTEMMODIFIER_HPP_*/

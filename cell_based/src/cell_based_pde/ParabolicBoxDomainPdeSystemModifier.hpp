@@ -33,34 +33,37 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef PARABOLICGROWINGDOMAINPDEMODIFIER_HPP_
-#define PARABOLICGROWINGDOMAINPDEMODIFIER_HPP_
+#ifndef ParabolicBoxDomainPdeSystemModifier_HPP_
+#define ParabolicBoxDomainPdeSystemModifier_HPP_
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
-#include "AbstractGrowingDomainPdeModifier.hpp"
+#include "AbstractBoxDomainPdeSystemModifier.hpp"
 #include "BoundaryConditionsContainer.hpp"
 
 /**
  * A modifier class in which a linear parabolic PDE coupled to a cell-based simulation
- * is solved on a growing domain. The value of the dependent variable at each cell is
- * stored and updated in a CellData item.
+ * is solved on a coarse domain.
  *
- * At each time step, the finite element mesh used to solve the PDE numerically
- * is defined by the spatial domain associated with the cell population. The
- * precise definition of this domain is implemented in the method
- * GetTetrahedralMeshForPdeModifier(), which is overridden for each cell population
- * class and is used in the AbstractGrowingDomainPdeModifier method GenerateFeMesh()
- * that is inherited by this class.
+ * The finite element mesh used to solve the PDE numerically is a fixed tessellation of
+ * a cuboid (box), which must be supplied to the constructor. The value of the dependent
+ * variable is interpolated between coarse mesh nodes to obtain a value at each cell,
+ * which is stored and updated in a CellData item.
+ *
+ * At each time step the boundary condition supplied to the constructor may be imposed
+ * either on the boundary of the box domain, or on the boundary of the cell population
+ * (which is assumed to lie within the box domain). This choice can be made using the
+ * AbstractBoxDomainPdeSystemModifier method SetBcsOnBoxBoundary(), which is inherited by this
+ * class.
  *
  * Examples of PDEs in the source folder that can be solved using this class are
- * CellwiseSourceParabolicPde and UniformSourceParabolicPde.
+ * AveragedSourceParabolicPde and UniformSourceParabolicPde.
  */
 template<unsigned DIM>
-class ParabolicGrowingDomainPdeModifier : public AbstractGrowingDomainPdeModifier<DIM>
+class ParabolicBoxDomainPdeSystemModifier : public AbstractBoxDomainPdeSystemModifier<DIM>
 {
-    friend class TestParabolicGrowingDomainPdeModifier;
+    friend class TestParabolicBoxDomainPdeSystemModifier;
 
 private:
 
@@ -76,7 +79,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractGrowingDomainPdeModifier<DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractBoxDomainPdeSystemModifier<DIM> >(*this);
     }
 
 public:
@@ -84,21 +87,25 @@ public:
     /**
      * Constructor.
      *
-     * @param pPde A shared pointer to a linear PDE object (defaults to NULL)
-     * @param pBoundaryCondition A shared pointer to an abstract boundary condition
+     * @param pPdeSystem A shared pointer to a linear PDE system object (defaults to NULL)
+     * @param pBoundaryConditions A vector of shared pointers to abstract boundary conditions
      *     (defaults to NULL, corresponding to a constant boundary condition with value zero)
      * @param isNeumannBoundaryCondition Whether the boundary condition is Neumann (defaults to true)
+     * @param pMeshCuboid A shared pointer to a ChasteCuboid specifying the outer boundary for the FE mesh (defaults to NULL)
+     * @param stepSize step size to be used in the FE mesh (defaults to 1.0, i.e. the default cell size)
      * @param solution solution vector (defaults to NULL)
      */
-    ParabolicGrowingDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde=boost::shared_ptr<AbstractLinearPde<DIM,DIM> >(),
-                                      boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition=boost::shared_ptr<AbstractBoundaryCondition<DIM> >(),
-                                      bool isNeumannBoundaryCondition=true,
-                                      Vec solution=nullptr);
+    ParabolicBoxDomainPdeSystemModifier(boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,1> > pPdeSystem=boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,1> >(),
+        std::vector<boost::shared_ptr<AbstractBoundaryCondition<DIM> > > pBoundaryConditions=std::vector<boost::shared_ptr<AbstractBoundaryCondition<DIM> > >(),
+        bool isNeumannBoundaryCondition=true,
+        boost::shared_ptr<ChasteCuboid<DIM> > pMeshCuboid=boost::shared_ptr<ChasteCuboid<DIM> >(),
+        double stepSize=1.0,
+        Vec solution=nullptr);
 
     /**
      * Destructor.
      */
-    virtual ~ParabolicGrowingDomainPdeModifier();
+    virtual ~ParabolicBoxDomainPdeSystemModifier();
 
     /**
      * Overridden UpdateAtEndOfTimeStep() method.
@@ -122,16 +129,20 @@ public:
     /**
      * Helper method to construct the boundary conditions container for the PDE.
      *
+     * @param rCellPopulation reference to the cell population
+     *
      * @return the full boundary conditions container
      */
-    virtual std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ConstructBoundaryConditionsContainer();
+    virtual std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ConstructBoundaryConditionsContainer(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
 
     /**
-     * Helper method to copy the CellData to the PDE solution.
+     * Helper method to initialise the PDE solution using the CellData.
+     *
+     * Here we assume a homogeneous initial consition.
      *
      * @param rCellPopulation reference to the cell population
      */
-    void UpdateSolutionVector(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
+    void SetupInitialSolutionVector(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
 
     /**
      * Overridden OutputSimulationModifierParameters() method.
@@ -143,7 +154,7 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(ParabolicGrowingDomainPdeModifier)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(ParabolicBoxDomainPdeSystemModifier)
 
 namespace boost
 {
@@ -151,7 +162,7 @@ namespace serialization
 {
 template<class Archive, unsigned DIM>
 inline void save_construct_data(
-    Archive & ar, const ParabolicGrowingDomainPdeModifier<DIM> * t, const unsigned int file_version)
+    Archive & ar, const ParabolicBoxDomainPdeSystemModifier<DIM> * t, const unsigned int file_version)
 {
     if (t->GetSolution())
     {
@@ -162,7 +173,7 @@ inline void save_construct_data(
 
 template<class Archive, unsigned DIM>
 inline void load_construct_data(
-    Archive & ar, ParabolicGrowingDomainPdeModifier<DIM> * t, const unsigned int file_version)
+    Archive & ar, ParabolicBoxDomainPdeSystemModifier<DIM> * t, const unsigned int file_version)
 {
     Vec solution = nullptr;
 
@@ -174,12 +185,14 @@ inline void load_construct_data(
         PetscTools::ReadPetscObject(solution, archive_filename);
     }
 
-    ::new(t)ParabolicGrowingDomainPdeModifier<DIM>(boost::shared_ptr<AbstractLinearPde<DIM, DIM> >(),
-                                                   boost::shared_ptr<AbstractBoundaryCondition<DIM> >(),
-                                                   true,
-                                                   solution);
+    ::new(t)ParabolicBoxDomainPdeSystemModifier<DIM>(boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,1> >(),
+                                                     std::vector<boost::shared_ptr<AbstractBoundaryCondition<DIM> > >(),
+                                                     true,
+                                                     boost::shared_ptr<ChasteCuboid<DIM> >(),
+                                                     1.0,
+                                                     solution);
 }
 }
 } // namespace ...
 
-#endif /*PARABOLICGROWINGDOMAINPDEMODIFIER_HPP_*/
+#endif /*ParabolicBoxDomainPdeSystemModifier_HPP_*/

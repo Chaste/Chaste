@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef TESTPARABOLICBOXDOMAINPDEMODIFIER_HPP_
-#define TESTPARABOLICBOXDOMAINPDEMODIFIER_HPP_
+#ifndef TESTParabolicBoxDomainPdeSystemModifier_HPP_
+#define TESTParabolicBoxDomainPdeSystemModifier_HPP_
 
 #include <cxxtest/TestSuite.h>
 
@@ -53,7 +53,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "NodeBasedCellPopulation.hpp"
-#include "ParabolicBoxDomainPdeModifier.hpp"
+#include "ParabolicBoxDomainPdeSystemModifier.hpp"
 #include "PottsBasedCellPopulation.hpp"
 #include "PottsMeshGenerator.hpp"
 #include "ReplicatableVector.hpp"
@@ -71,7 +71,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * We test on a square with half apoptotic cells and the PDE mesh is twice the size.
  * Note all off-lattice results are the same, and all on-lattice ones are the same as each other.
  */
-class TestParabolicBoxDomainPdeModifier : public AbstractCellBasedWithTimingsTestSuite
+class TestParabolicBoxDomainPdeSystemModifier : public AbstractCellBasedWithTimingsTestSuite
 {
 public:
 
@@ -87,7 +87,7 @@ public:
         MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid, 2.0));
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid, 2.0));
         p_pde_modifier->SetDependentVariableName("averaged quantity");
 
         // Test that member variables are initialised correctly
@@ -111,12 +111,12 @@ public:
         TS_ASSERT_EQUALS(p_pde_modifier->GetOutputGradient(),true);
     }
 
-    void TestArchiveParabolicBoxDomainPdeModifier() throw(Exception)
+    void TestArchiveParabolicBoxDomainPdeSystemModifier() throw(Exception)
     {
         // Create a file for archiving
         OutputFileHandler handler("archive", false);
         handler.SetArchiveDirectory();
-        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "ParabolicBoxDomainPdeModifier.arch";
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "ParabolicBoxDomainPdeSystemModifier.arch";
 
         // Separate scope to write the archive
         {
@@ -136,7 +136,7 @@ public:
                 data[i] = i + 0.45;
             }
             Vec vector = PetscTools::CreateVec(data);
-            ParabolicBoxDomainPdeModifier<2> modifier(p_pde, p_bc, false, p_cuboid, 2.0, vector);
+            ParabolicBoxDomainPdeSystemModifier<2> modifier(p_pde, p_bc, false, p_cuboid, 2.0, vector);
             modifier.SetDependentVariableName("averaged quantity");
 
             // Create an output archive
@@ -159,11 +159,11 @@ public:
             input_arch >> p_modifier2;
 
             // Test that member variables are correct
-            TS_ASSERT_EQUALS((static_cast<ParabolicBoxDomainPdeModifier<2>*>(p_modifier2))->rGetDependentVariableName(), "averaged quantity");
-            TS_ASSERT_DELTA((static_cast<ParabolicBoxDomainPdeModifier<2>*>(p_modifier2))->GetStepSize(), 2.0, 1e-5);
-            TS_ASSERT_EQUALS((static_cast<ParabolicBoxDomainPdeModifier<2>*>(p_modifier2))->AreBcsSetOnBoxBoundary(), true);
+            TS_ASSERT_EQUALS((static_cast<ParabolicBoxDomainPdeSystemModifier<2>*>(p_modifier2))->rGetDependentVariableName(), "averaged quantity");
+            TS_ASSERT_DELTA((static_cast<ParabolicBoxDomainPdeSystemModifier<2>*>(p_modifier2))->GetStepSize(), 2.0, 1e-5);
+            TS_ASSERT_EQUALS((static_cast<ParabolicBoxDomainPdeSystemModifier<2>*>(p_modifier2))->AreBcsSetOnBoxBoundary(), true);
 
-            Vec solution = (static_cast<ParabolicBoxDomainPdeModifier<2>*>(p_modifier2))->GetSolution();
+            Vec solution = (static_cast<ParabolicBoxDomainPdeSystemModifier<2>*>(p_modifier2))->GetSolution();
             ReplicatableVector solution_repl(solution);
 
             TS_ASSERT_EQUALS(solution_repl.GetSize(), 10u);
@@ -217,7 +217,7 @@ public:
         MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
         p_pde_modifier->SetDependentVariableName("variable");
 
         // For coverage, output the solution gradient
@@ -246,7 +246,7 @@ public:
         TS_ASSERT_EQUALS(p_pde_modifier->AreBcsSetOnBoxBoundary(), false);
 
         TS_ASSERT_THROWS_THIS(p_pde_modifier->UpdateAtEndOfTimeStep(cell_population),
-            "Boundary conditions cannot yet be set on the cell population boundary for a ParabolicBoxDomainPdeModifier");
+            "Boundary conditions cannot yet be set on the cell population boundary for a ParabolicBoxDomainPdeSystemModifier");
     }
 
     // Only difference from above test is the use of Neuman BCs here
@@ -292,7 +292,7 @@ public:
         MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, true, p_cuboid));
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, true, p_cuboid));
         p_pde_modifier->SetDependentVariableName("variable");
 
         // For coverage, output the solution gradient
@@ -360,7 +360,7 @@ public:
         MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
         p_pde_modifier->SetDependentVariableName("variable");
 
         // For coverage, output the solution gradient
@@ -429,7 +429,7 @@ public:
         MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
         p_pde_modifier->SetDependentVariableName("variable");
 
         // For coverage, output the solution gradient
@@ -497,7 +497,7 @@ public:
         MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
         p_pde_modifier->SetDependentVariableName("variable");
 
         // For coverage, output the solution gradient
@@ -573,7 +573,7 @@ public:
         MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(ParabolicBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
+        MAKE_PTR_ARGS(ParabolicBoxDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
         p_pde_modifier->SetDependentVariableName("variable");
 
         // For coverage, output the solution gradient
@@ -599,4 +599,4 @@ public:
     }
 };
 
-#endif /*TESTPARABOLICBOXDOMAINPDEMODIFIER_HPP_*/
+#endif /*TESTParabolicBoxDomainPdeSystemModifier_HPP_*/
