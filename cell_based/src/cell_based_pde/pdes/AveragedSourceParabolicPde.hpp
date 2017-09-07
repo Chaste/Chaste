@@ -194,6 +194,8 @@ public:
 
 #include "SerializationExportWrapper.hpp"
 EXPORT_TEMPLATE_CLASS_SAME_DIMS(AveragedSourceParabolicPde)
+#include "ParabolicPdeSystemModifiersExportWrapper.hpp"
+EXPORT_PARABOLIC_PDE_SYSTEM_MODIFIERS_FOR_PROBLEM_DIM(1)
 
 namespace boost
 {

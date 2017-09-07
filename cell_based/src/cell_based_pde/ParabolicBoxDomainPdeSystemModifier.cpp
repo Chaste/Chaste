@@ -177,7 +177,8 @@ void ParabolicBoxDomainPdeSystemModifier<DIM,PROBLEM_DIM>::OutputSimulationModif
     AbstractBoxDomainPdeSystemModifier<DIM,PROBLEM_DIM>::OutputSimulationModifierParameters(rParamsFile);
 }
 
-// Serialization for Boost >= 1.36
-#include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS_ALL_DIMS(ParabolicBoxDomainPdeSystemModifier)
+///\todo #2930 - re-implement serialization
+//// Serialization for Boost >= 1.36
+//#include "SerializationExportWrapperForCpp.hpp"
+//EXPORT_TEMPLATE_CLASS_ALL_DIMS(ParabolicBoxDomainPdeSystemModifier)
 

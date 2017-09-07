@@ -36,8 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ABSTRACTPDESYSTEMMODIFIER_HPP_
 #define ABSTRACTPDESYSTEMMODIFIER_HPP_
 
-#include "ChasteSerialization.hpp"
-#include "ClassIsAbstract.hpp"
 #include <boost/shared_ptr.hpp>
 
 #include "AbstractCellBasedSimulationModifier.hpp"
@@ -51,7 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * parabolic PDE coupled to a cell-based simulation.
  */
 template<unsigned DIM, unsigned PROBLEM_DIM>
-class AbstractPdeSystemModifier : public AbstractCellBasedSimulationModifier<DIM,DIM>
+class AbstractPdeSystemModifier : public AbstractCellBasedSimulationModifier<DIM>
 {
 private:
 
@@ -281,13 +279,5 @@ public:
      */
     void OutputSimulationModifierParameters(out_stream& rParamsFile);
 };
-
-/*
- * This abstract class has pure virtual method(s), so we use the following macro
- * to indicate to the serialization library that it should not try to instantiate
- * the class, thus avoiding compiler errors on some systems.
- */
-#include "SerializationExportWrapper.hpp"
-TEMPLATED_CLASS_IS_ABSTRACT_2_UNSIGNED(AbstractPdeSystemModifier)
 
 #endif /*ABSTRACTPDESYSTEMMODIFIER_HPP_*/

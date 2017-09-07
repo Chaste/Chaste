@@ -147,9 +147,6 @@ public:
     void OutputSimulationModifierParameters(out_stream& rParamsFile);
 };
 
-#include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_ALL_DIMS(EllipticBoxDomainPdeSystemModifier)
-
 namespace boost
 {
 namespace serialization

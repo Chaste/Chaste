@@ -185,7 +185,8 @@ void ParabolicGrowingDomainPdeSystemModifier<DIM,PROBLEM_DIM>::OutputSimulationM
     AbstractGrowingDomainPdeSystemModifier<DIM,PROBLEM_DIM>::OutputSimulationModifierParameters(rParamsFile);
 }
 
-// Serialization for Boost >= 1.36
-#include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS_ALL_DIMS(ParabolicGrowingDomainPdeSystemModifier)
+///\todo #2930 - re-implement serialization
+//// Serialization for Boost >= 1.36
+//#include "SerializationExportWrapperForCpp.hpp"
+//EXPORT_TEMPLATE_CLASS_ALL_DIMS(ParabolicGrowingDomainPdeSystemModifier)
 

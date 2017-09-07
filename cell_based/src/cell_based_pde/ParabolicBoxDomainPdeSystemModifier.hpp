@@ -36,8 +36,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef PARABOLICBOXDOMAINPDESYSTEMMODIFIER_HPP_
 #define PARABOLICBOXDOMAINPDESYSTEMMODIFIER_HPP_
 
-#include "ChasteSerialization.hpp"
-#include <boost/serialization/base_object.hpp>
+///\todo #2930 - re-implement serialization
+//#include "ChasteSerialization.hpp"
+//#include <boost/serialization/base_object.hpp>
 
 #include "AbstractBoxDomainPdeSystemModifier.hpp"
 #include "BoundaryConditionsContainer.hpp"
@@ -67,20 +68,21 @@ class ParabolicBoxDomainPdeSystemModifier : public AbstractBoxDomainPdeSystemMod
 
 private:
 
-    /** Needed for serialization. */
-    friend class boost::serialization::access;
-    /**
-     * Boost Serialization method for archiving/checkpointing.
-     * Archives the object and its member variables.
-     *
-     * @param archive  The boost archive.
-     * @param version  The current version of this class.
-     */
-    template<class Archive>
-    void serialize(Archive & archive, const unsigned int version)
-    {
-        archive & boost::serialization::base_object<AbstractBoxDomainPdeSystemModifier<DIM,PROBLEM_DIM> >(*this);
-    }
+    ///\todo #2930 - re-implement serialization
+//    /** Needed for serialization. */
+//    friend class boost::serialization::access;
+//    /**
+//     * Boost Serialization method for archiving/checkpointing.
+//     * Archives the object and its member variables.
+//     *
+//     * @param archive  The boost archive.
+//     * @param version  The current version of this class.
+//     */
+//    template<class Archive>
+//    void serialize(Archive & archive, const unsigned int version)
+//    {
+//        archive & boost::serialization::base_object<AbstractBoxDomainPdeSystemModifier<DIM,PROBLEM_DIM> >(*this);
+//    }
 
 public:
 
@@ -154,46 +156,47 @@ public:
     void OutputSimulationModifierParameters(out_stream& rParamsFile);
 };
 
-#include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_ALL_DIMS(ParabolicBoxDomainPdeSystemModifier)
-
-namespace boost
-{
-namespace serialization
-{
-template<class Archive, unsigned DIM, unsigned PROBLEM_DIM>
-inline void save_construct_data(
-    Archive & ar, const ParabolicBoxDomainPdeSystemModifier<DIM,PROBLEM_DIM> * t, const unsigned int file_version)
-{
-    if (t->GetSolution())
-    {
-        std::string archive_filename = ArchiveLocationInfo::GetArchiveDirectory() + "solution.vec";
-        PetscTools::DumpPetscObject(t->GetSolution(), archive_filename);
-    }
-}
-
-template<class Archive, unsigned DIM, unsigned PROBLEM_DIM>
-inline void load_construct_data(
-    Archive & ar, ParabolicBoxDomainPdeSystemModifier<DIM,PROBLEM_DIM> * t, const unsigned int file_version)
-{
-    Vec solution = nullptr;
-
-    std::string archive_filename = ArchiveLocationInfo::GetArchiveDirectory() + "solution.vec";
-    FileFinder file_finder(archive_filename, RelativeTo::Absolute);
-
-    if (file_finder.Exists())
-    {
-        PetscTools::ReadPetscObject(solution, archive_filename);
-    }
-
-    ::new(t)ParabolicBoxDomainPdeSystemModifier<DIM,PROBLEM_DIM>(boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,PROBLEM_DIM> >(),
-                                                                 std::vector<boost::shared_ptr<AbstractBoundaryCondition<DIM> > >(),
-                                                                 true,
-                                                                 boost::shared_ptr<ChasteCuboid<DIM> >(),
-                                                                 1.0,
-                                                                 solution);
-}
-}
-} // namespace ...
+///\todo #2930 - re-implement serialization
+//#include "SerializationExportWrapper.hpp"
+////EXPORT_TEMPLATE_CLASS_SAME_DIMS(ParabolicBoxDomainPdeSystemModifier)
+//
+//namespace boost
+//{
+//namespace serialization
+//{
+//template<class Archive, unsigned DIM, unsigned PROBLEM_DIM>
+//inline void save_construct_data(
+//    Archive & ar, const ParabolicBoxDomainPdeSystemModifier<DIM,PROBLEM_DIM> * t, const unsigned int file_version)
+//{
+//    if (t->GetSolution())
+//    {
+//        std::string archive_filename = ArchiveLocationInfo::GetArchiveDirectory() + "solution.vec";
+//        PetscTools::DumpPetscObject(t->GetSolution(), archive_filename);
+//    }
+//}
+//
+//template<class Archive, unsigned DIM, unsigned PROBLEM_DIM>
+//inline void load_construct_data(
+//    Archive & ar, ParabolicBoxDomainPdeSystemModifier<DIM,PROBLEM_DIM> * t, const unsigned int file_version)
+//{
+//    Vec solution = nullptr;
+//
+//    std::string archive_filename = ArchiveLocationInfo::GetArchiveDirectory() + "solution.vec";
+//    FileFinder file_finder(archive_filename, RelativeTo::Absolute);
+//
+//    if (file_finder.Exists())
+//    {
+//        PetscTools::ReadPetscObject(solution, archive_filename);
+//    }
+//
+//    ::new(t)ParabolicBoxDomainPdeSystemModifier<DIM,PROBLEM_DIM>(boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,PROBLEM_DIM> >(),
+//                                                                 std::vector<boost::shared_ptr<AbstractBoundaryCondition<DIM> > >(),
+//                                                                 true,
+//                                                                 boost::shared_ptr<ChasteCuboid<DIM> >(),
+//                                                                 1.0,
+//                                                                 solution);
+//}
+//}
+//} // namespace ...
 
 #endif /*PARABOLICBOXDOMAINPDESYSTEMMODIFIER_HPP_*/

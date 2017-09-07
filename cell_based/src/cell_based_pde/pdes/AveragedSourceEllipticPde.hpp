@@ -178,6 +178,8 @@ public:
 
 #include "SerializationExportWrapper.hpp"
 EXPORT_TEMPLATE_CLASS_SAME_DIMS(AveragedSourceEllipticPde)
+#include "EllipticPdeSystemModifiersExportWrapper.hpp"
+EXPORT_ELLIPTIC_PDE_SYSTEM_MODIFIERS_FOR_PROBLEM_DIM(1)
 
 namespace boost
 {

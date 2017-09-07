@@ -154,6 +154,7 @@ void EllipticGrowingDomainPdeSystemModifier<DIM,PROBLEM_DIM>::OutputSimulationMo
     AbstractGrowingDomainPdeSystemModifier<DIM,PROBLEM_DIM>::OutputSimulationModifierParameters(rParamsFile);
 }
 
-// Serialization for Boost >= 1.36
-#include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS_ALL_DIMS(EllipticGrowingDomainPdeSystemModifier)
+///\todo #2930 - re-implement serialization
+//// Serialization for Boost >= 1.36
+//#include "SerializationExportWrapperForCpp.hpp"
+//EXPORT_TEMPLATE_CLASS_ALL_DIMS(EllipticGrowingDomainPdeSystemModifier)
