@@ -109,11 +109,11 @@ void ImmersedBoundaryKinematicFeedbackForce<DIM>::AddImmersedBoundaryForceContri
             // \todo: change this to something sigmoidal?
             c_vector<double, DIM> force = unit_perp * (relative_vel_comp * eff_spring_const);
 
-            c_vector<double, DIM> force_a2b = force * (elem_spacing / node_a_elem_spacing);
-            p_node_a->AddAppliedForceContribution(force_a2b);
+            c_vector<double, DIM> force_on_b = force * (elem_spacing / node_a_elem_spacing);
+            p_node_b->AddAppliedForceContribution(force_on_b);
 
-            c_vector<double, DIM> force_b2a = force * (-1.0 * elem_spacing / node_b_elem_spacing);
-            p_node_b->AddAppliedForceContribution(force_b2a);
+            c_vector<double, DIM> force_on_a = force * (-1.0 * elem_spacing / node_b_elem_spacing);
+            p_node_a->AddAppliedForceContribution(force_on_a);
         }
     }
 
@@ -143,7 +143,7 @@ template<unsigned DIM>
 void ImmersedBoundaryKinematicFeedbackForce<DIM>::UpdatePreviousLocations(ImmersedBoundaryCellPopulation<DIM>& rCellPopulation)
 {
     // \todo this assumes the number of nodes in the simulation does not change over time
-    EXCEPT_IF_NOT(mPreviousLocations.size() != rCellPopulation.GetNumNodes());
+    EXCEPT_IF_NOT(mPreviousLocations.size() == rCellPopulation.GetNumNodes());
 
     // Populate the mPreviousLocations vector with the current location of nodes, so it's ready for next time step
     for (const auto& p_node : rCellPopulation.rGetMesh().rGetNodes())

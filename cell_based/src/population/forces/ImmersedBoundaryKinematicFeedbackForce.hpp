@@ -55,6 +55,8 @@ class ImmersedBoundaryKinematicFeedbackForce : public AbstractImmersedBoundaryFo
 {
 private:
 
+    friend class TestImmersedBoundaryForces;
+
     friend class boost::serialization::access;
     /**
      * Boost Serialization method for archiving/checkpointing.
