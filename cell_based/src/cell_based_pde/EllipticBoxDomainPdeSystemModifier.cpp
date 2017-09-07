@@ -34,34 +34,35 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "EllipticBoxDomainPdeSystemModifier.hpp"
-#include "SimpleLinearEllipticSolver.hpp"
+#include "LinearEllipticPdeSystemSolver.hpp"
 
-template<unsigned DIM>
-EllipticBoxDomainPdeSystemModifier<DIM>::EllipticBoxDomainPdeSystemModifier(boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,1> > pPdeSystem,
+template <unsigned DIM, unsigned PROBLEM_DIM>
+EllipticBoxDomainPdeSystemModifier<DIM,PROBLEM_DIM>::EllipticBoxDomainPdeSystemModifier(
+    boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,PROBLEM_DIM> > pPdeSystem,
     std::vector<boost::shared_ptr<AbstractBoundaryCondition<DIM> > > pBoundaryConditions,
     bool isNeumannBoundaryCondition,
     boost::shared_ptr<ChasteCuboid<DIM> > pMeshCuboid,
     double stepSize,
     Vec solution)
-    : AbstractBoxDomainPdeSystemModifier<DIM>(pPdeSystem,
-                                        pBoundaryConditions,
-                                        isNeumannBoundaryCondition,
-                                        pMeshCuboid,
-                                        stepSize,
-                                        solution)
+    : AbstractBoxDomainPdeSystemModifier<DIM,PROBLEM_DIM>(pPdeSystem,
+                                                          pBoundaryConditions,
+                                                          isNeumannBoundaryCondition,
+                                                          pMeshCuboid,
+                                                          stepSize,
+                                                          solution)
 {
 }
 
-template<unsigned DIM>
-EllipticBoxDomainPdeSystemModifier<DIM>::~EllipticBoxDomainPdeSystemModifier()
+template <unsigned DIM, unsigned PROBLEM_DIM>
+EllipticBoxDomainPdeSystemModifier<DIM,PROBLEM_DIM>::~EllipticBoxDomainPdeSystemModifier()
 {
 }
 
-template<unsigned DIM>
-void EllipticBoxDomainPdeSystemModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
+template <unsigned DIM, unsigned PROBLEM_DIM>
+void EllipticBoxDomainPdeSystemModifier<DIM,PROBLEM_DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
     // Set up boundary conditions
-    std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc = ConstructBoundaryConditionsContainer(rCellPopulation);
+    std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,PROBLEM_DIM> > p_bcc = ConstructBoundaryConditionsContainer(rCellPopulation);
 
     this->UpdateCellPdeElementMap(rCellPopulation);
 
@@ -69,11 +70,11 @@ void EllipticBoxDomainPdeSystemModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCell
     // Pass in already updated CellPdeElementMap to speed up finding cells.
     this->SetUpSourceTermsForAveragedSourcePde(this->mpFeMesh, &this->mCellPdeElementMap);
 
-    // Use SimpleLinearEllipticSolver as Averaged Source PDE
+    // Use LinearEllipticPdeSystemSolver as Averaged Source PDE
     ///\todo allow other PDE classes to be used with this modifier
-    SimpleLinearEllipticSolver<DIM,DIM> solver(this->mpFeMesh,
-                                               boost::static_pointer_cast<AbstractLinearEllipticPde<DIM,DIM> >(this->GetPdeSystem()).get(),
-                                               p_bcc.get());
+    LinearEllipticPdeSystemSolver<DIM,DIM,PROBLEM_DIM> solver(this->mpFeMesh,
+                                                              boost::static_pointer_cast<AbstractLinearEllipticPdeSystem<DIM,DIM,PROBLEM_DIM> >(this->GetPdeSystem()).get(),
+                                                              p_bcc.get());
 
     ///\todo Use solution at previous time step as an initial guess for Solve()
     Vec old_solution_copy = this->mSolution;
@@ -86,20 +87,20 @@ void EllipticBoxDomainPdeSystemModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCell
     this->UpdateCellData(rCellPopulation);
 }
 
-template<unsigned DIM>
-void EllipticBoxDomainPdeSystemModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)
+template <unsigned DIM, unsigned PROBLEM_DIM>
+void EllipticBoxDomainPdeSystemModifier<DIM,PROBLEM_DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)
 {
-    AbstractBoxDomainPdeSystemModifier<DIM>::SetupSolve(rCellPopulation,outputDirectory);
+    AbstractBoxDomainPdeSystemModifier<DIM,PROBLEM_DIM>::SetupSolve(rCellPopulation,outputDirectory);
 
     // Call these  methods to solve the PDE on the initial step and output the results
     UpdateAtEndOfTimeStep(rCellPopulation);
     this->UpdateAtEndOfOutputTimeStep(rCellPopulation);
 }
 
-template<unsigned DIM>
-std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > EllipticBoxDomainPdeSystemModifier<DIM>::ConstructBoundaryConditionsContainer(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
+template <unsigned DIM, unsigned PROBLEM_DIM>
+std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,PROBLEM_DIM> > EllipticBoxDomainPdeSystemModifier<DIM,PROBLEM_DIM>::ConstructBoundaryConditionsContainer(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
-    std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc(new BoundaryConditionsContainer<DIM,DIM,1>(false));
+    std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,PROBLEM_DIM> > p_bcc(new BoundaryConditionsContainer<DIM,DIM,PROBLEM_DIM>(false));
 
     // To be well-defined, elliptic PDE problems on box domains require at least some Dirichlet boundary conditions
     ///\todo Replace this assertion with an exception in the constructor
@@ -136,7 +137,11 @@ std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > EllipticBoxDomainPdeSys
              iter != coarse_mesh_boundary_node_indices.end();
              ++iter)
         {
-            p_bcc->AddDirichletBoundaryCondition(this->mpFeMesh->GetNode(*iter), this->mpBoundaryConditions[0].get(), 0, false);
+            // Loop over PDEs
+            for (unsigned pde_index=0; pde_index<PROBLEM_DIM; pde_index++)
+            {
+                p_bcc->AddDirichletBoundaryCondition(this->mpFeMesh->GetNode(*iter), this->mpBoundaryConditions[pde_index].get(), pde_index, false);
+            }
         }
     }
     else // Apply BC at boundary nodes of box domain FE mesh
@@ -145,26 +150,25 @@ std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > EllipticBoxDomainPdeSys
              node_iter != this->mpFeMesh->GetBoundaryNodeIteratorEnd();
              ++node_iter)
         {
-            p_bcc->AddDirichletBoundaryCondition(*node_iter, this->mpBoundaryConditions[0].get());
+            // Loop over PDEs
+            for (unsigned pde_index=0; pde_index<PROBLEM_DIM; pde_index++)
+            {
+                p_bcc->AddDirichletBoundaryCondition(*node_iter, this->mpBoundaryConditions[pde_index].get(), pde_index);
+            }
         }
     }
 
     return p_bcc;
 }
 
-template<unsigned DIM>
-void EllipticBoxDomainPdeSystemModifier<DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
+template <unsigned DIM, unsigned PROBLEM_DIM>
+void EllipticBoxDomainPdeSystemModifier<DIM,PROBLEM_DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
 {
     // No parameters to output, so just call method on direct parent class
-    AbstractBoxDomainPdeSystemModifier<DIM>::OutputSimulationModifierParameters(rParamsFile);
+    AbstractBoxDomainPdeSystemModifier<DIM,PROBLEM_DIM>::OutputSimulationModifierParameters(rParamsFile);
 }
-
-// Explicit instantiation
-template class EllipticBoxDomainPdeSystemModifier<1>;
-template class EllipticBoxDomainPdeSystemModifier<2>;
-template class EllipticBoxDomainPdeSystemModifier<3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(EllipticBoxDomainPdeSystemModifier)
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(EllipticBoxDomainPdeSystemModifier)
 

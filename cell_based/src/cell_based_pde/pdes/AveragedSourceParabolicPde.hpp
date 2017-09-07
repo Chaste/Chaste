@@ -41,7 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractCellPopulation.hpp"
 #include "TetrahedralMesh.hpp"
-#include "AbstractLinearParabolicPde.hpp"
+#include "AbstractLinearParabolicPdeSystem.hpp"
 
 /**
  * A parabolic PDE to be solved numerically using the finite element method, for
@@ -63,7 +63,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * that element.
  */
 template<unsigned DIM>
-class AveragedSourceParabolicPde : public AbstractLinearParabolicPde<DIM,DIM>
+class AveragedSourceParabolicPde : public AbstractLinearParabolicPdeSystem<DIM, DIM>
 {
     friend class TestCellBasedParabolicPdes;
 
@@ -80,7 +80,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-       archive & boost::serialization::base_object<AbstractLinearParabolicPde<DIM, DIM> >(*this);
+       archive & boost::serialization::base_object<AbstractLinearParabolicPdeSystem<DIM, DIM> >(*this);
        archive & mDuDtCoefficient;
        archive & mDiffusionCoefficient;
        archive & mSourceCoefficient;
@@ -137,44 +137,52 @@ public:
     /**
      * Overridden ComputeDuDtCoefficientFunction() method.
      *
-     * @return the function c(x) in "c(x) du/dt = Grad.(DiffusionTerm(x)*Grad(u))+LinearSourceTerm(x)+NonlinearSourceTerm(x, u)"
+     * @return computed function c_i(x).
      *
-     * @param rX the point in space at which the function c is computed
+     * @param rX the point x at which the function c_i is computed
+     * @param pdeIndex the index of the PDE (unused)
      */
-    virtual double ComputeDuDtCoefficientFunction(const ChastePoint<DIM>& rX);
+    virtual double ComputeDuDtCoefficientFunction(const ChastePoint<DIM>& rX,
+                                                  unsigned pdeIndex);
 
     /**
      * Overridden ComputeSourceTerm() method.
      *
-     * @return computed source term.
+     * @return computed source term
      *
-     * @param rX the point in space at which the nonlinear source term is computed
-     * @param u the value of the dependent variable at the point
-     * @param pElement the mesh element that x is contained in (optional; defaults to NULL).
+     * @param rX the point x at which the source term is computed
+     * @param rU the vector of dependent variables (u_0, ..., u_{p-1}) at the point x
+     * @param pdeIndex the index of the PDE, denoted by i above (unused)
+     * @param pElement The mesh element that x is contained in (optional)
      */
     virtual double ComputeSourceTerm(const ChastePoint<DIM>& rX,
-                                     double u,
-                                     Element<DIM,DIM>* pElement=NULL);
+                                     c_vector<double,1>& rU,
+                                     unsigned pdeIndex,
+                                     Element<DIM,DIM>* pElement=nullptr);
 
     /**
-     * Overridden ComputeSourceTermAtNode() method. That is never called.
+     * Overridden ComputeSourceTermAtNode() method (unused).
      *
      * @return computed source term at a node.
      *
-     * @param rNode the node at which the nonlinear source term is computed
-     * @param u the value of the dependent variable at the node
+     * @param rNode the node at which the source term f_i is computed
+     * @param rU the vector of dependent variables (u_0, ..., u_{p-1}) at the node
+     * @param pdeIndex the index of the PDE
      */
-    virtual double ComputeSourceTermAtNode(const Node<DIM>& rNode, double u);
+    virtual double ComputeSourceTermAtNode(const Node<DIM>& rNode,
+                                           c_vector<double,1>& rU,
+                                           unsigned pdeIndex);
 
     /**
-     * Overridden ComputeDiffusionTerm() method.
+     * @return computed diffusion term D_i(x) at a point in space. The diffusion tensor should be symmetric and positive definite.
      *
-     * @param rX the point in space at which the diffusion term is computed
-     * @param pElement the mesh element that x is contained in (optional; defaults to NULL).
-     *
-     * @return a matrix.
+     * @param rX The point x at which the diffusion term D_i is computed
+     * @param pdeIndex the index of the PDE, denoted by i above
+     * @param pElement The mesh element that x is contained in (optional)
      */
-    virtual c_matrix<double,DIM,DIM> ComputeDiffusionTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement=NULL);
+    virtual c_matrix<double, DIM, DIM> ComputeDiffusionTerm(const ChastePoint<DIM>& rX,
+                                                            unsigned pdeIndex,
+                                                            Element<DIM,DIM>* pElement=NULL);
 
     /**
      * @return the uptake rate.

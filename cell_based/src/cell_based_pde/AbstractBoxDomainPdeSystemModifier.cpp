@@ -37,17 +37,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ReplicatableVector.hpp"
 #include "LinearBasisFunction.hpp"
 
-template<unsigned DIM>
-AbstractBoxDomainPdeSystemModifier<DIM>::AbstractBoxDomainPdeSystemModifier(boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,1> > pPdeSystem,
-                                                                std::vector<boost::shared_ptr<AbstractBoundaryCondition<DIM> > > pBoundaryConditions,
-                                                                bool isNeumannBoundaryCondition,
-                                                                boost::shared_ptr<ChasteCuboid<DIM> > pMeshCuboid,
-                                                                double stepSize,
-                                                                Vec solution)
-    : AbstractPdeSystemModifier<DIM>(pPdeSystem,
-                                       pBoundaryConditions,
-                                       isNeumannBoundaryCondition,
-                                       solution),
+template <unsigned DIM, unsigned PROBLEM_DIM>
+AbstractBoxDomainPdeSystemModifier<DIM,PROBLEM_DIM>::AbstractBoxDomainPdeSystemModifier(
+    boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,PROBLEM_DIM> > pPdeSystem,
+    std::vector<boost::shared_ptr<AbstractBoundaryCondition<DIM> > > pBoundaryConditions,
+    bool isNeumannBoundaryCondition,
+    boost::shared_ptr<ChasteCuboid<DIM> > pMeshCuboid,
+    double stepSize,
+    Vec solution)
+    : AbstractPdeSystemModifier<DIM,PROBLEM_DIM>(pPdeSystem,
+                                                 pBoundaryConditions,
+                                                 isNeumannBoundaryCondition,
+                                                 solution),
       mpMeshCuboid(pMeshCuboid),
       mStepSize(stepSize),
       mSetBcsOnBoxBoundary(true)
@@ -60,39 +61,38 @@ AbstractBoxDomainPdeSystemModifier<DIM>::AbstractBoxDomainPdeSystemModifier(boos
     }
 }
 
-template<unsigned DIM>
-AbstractBoxDomainPdeSystemModifier<DIM>::~AbstractBoxDomainPdeSystemModifier()
+template <unsigned DIM, unsigned PROBLEM_DIM>
+AbstractBoxDomainPdeSystemModifier<DIM,PROBLEM_DIM>::~AbstractBoxDomainPdeSystemModifier()
 {
 }
 
-template<unsigned DIM>
-double AbstractBoxDomainPdeSystemModifier<DIM>::GetStepSize()
+template <unsigned DIM, unsigned PROBLEM_DIM>
+double AbstractBoxDomainPdeSystemModifier<DIM,PROBLEM_DIM>::GetStepSize()
 {
      return mStepSize;
 }
 
-template<unsigned DIM>
-void AbstractBoxDomainPdeSystemModifier<DIM>::SetBcsOnBoxBoundary(bool setBcsOnBoxBoundary)
+template <unsigned DIM, unsigned PROBLEM_DIM>
+void AbstractBoxDomainPdeSystemModifier<DIM,PROBLEM_DIM>::SetBcsOnBoxBoundary(bool setBcsOnBoxBoundary)
 {
     mSetBcsOnBoxBoundary = setBcsOnBoxBoundary;
 }
 
-template<unsigned DIM>
-bool AbstractBoxDomainPdeSystemModifier<DIM>::AreBcsSetOnBoxBoundary()
+template <unsigned DIM, unsigned PROBLEM_DIM>
+bool AbstractBoxDomainPdeSystemModifier<DIM,PROBLEM_DIM>::AreBcsSetOnBoxBoundary()
 {
     return mSetBcsOnBoxBoundary;
 }
 
-template<unsigned DIM>
-void AbstractBoxDomainPdeSystemModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)
+template <unsigned DIM, unsigned PROBLEM_DIM>
+void AbstractBoxDomainPdeSystemModifier<DIM,PROBLEM_DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)
 {
-    AbstractPdeSystemModifier<DIM>::SetupSolve(rCellPopulation, outputDirectory);
-
+    AbstractPdeSystemModifier<DIM,PROBLEM_DIM>::SetupSolve(rCellPopulation, outputDirectory);
     InitialiseCellPdeElementMap(rCellPopulation);
 }
 
-template<unsigned DIM>
-void AbstractBoxDomainPdeSystemModifier<DIM>::GenerateFeMesh(boost::shared_ptr<ChasteCuboid<DIM> > pMeshCuboid, double stepSize)
+template <unsigned DIM, unsigned PROBLEM_DIM>
+void AbstractBoxDomainPdeSystemModifier<DIM,PROBLEM_DIM>::GenerateFeMesh(boost::shared_ptr<ChasteCuboid<DIM> > pMeshCuboid, double stepSize)
 {
     // Create a regular coarse tetrahedral mesh
     this->mpFeMesh = new TetrahedralMesh<DIM,DIM>();
@@ -128,8 +128,8 @@ void AbstractBoxDomainPdeSystemModifier<DIM>::GenerateFeMesh(boost::shared_ptr<C
     this->mpFeMesh->Translate(centre_of_cuboid - centre_of_coarse_mesh);
 }
 
-template<unsigned DIM>
-void AbstractBoxDomainPdeSystemModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
+template <unsigned DIM, unsigned PROBLEM_DIM>
+void AbstractBoxDomainPdeSystemModifier<DIM,PROBLEM_DIM>::UpdateCellData(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
     // Store the PDE solution in an accessible form
     ReplicatableVector solution_repl(this->mSolution);
@@ -201,8 +201,8 @@ void AbstractBoxDomainPdeSystemModifier<DIM>::UpdateCellData(AbstractCellPopulat
     }
 }
 
-template<unsigned DIM>
-void AbstractBoxDomainPdeSystemModifier<DIM>::InitialiseCellPdeElementMap(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
+template <unsigned DIM, unsigned PROBLEM_DIM>
+void AbstractBoxDomainPdeSystemModifier<DIM,PROBLEM_DIM>::InitialiseCellPdeElementMap(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
     mCellPdeElementMap.clear();
 
@@ -217,8 +217,8 @@ void AbstractBoxDomainPdeSystemModifier<DIM>::InitialiseCellPdeElementMap(Abstra
     }
 }
 
-template<unsigned DIM>
-void AbstractBoxDomainPdeSystemModifier<DIM>::UpdateCellPdeElementMap(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
+template <unsigned DIM, unsigned PROBLEM_DIM>
+void AbstractBoxDomainPdeSystemModifier<DIM,PROBLEM_DIM>::UpdateCellPdeElementMap(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
     // Find the element of mpCoarsePdeMesh that contains each cell and populate mCellPdeElementMap
     for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
@@ -231,14 +231,9 @@ void AbstractBoxDomainPdeSystemModifier<DIM>::UpdateCellPdeElementMap(AbstractCe
     }
 }
 
-template<unsigned DIM>
-void AbstractBoxDomainPdeSystemModifier<DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
+template <unsigned DIM, unsigned PROBLEM_DIM>
+void AbstractBoxDomainPdeSystemModifier<DIM,PROBLEM_DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
 {
     // No parameters to output, so just call method on direct parent class
-    AbstractPdeSystemModifier<DIM>::OutputSimulationModifierParameters(rParamsFile);
+    AbstractPdeSystemModifier<DIM,PROBLEM_DIM>::OutputSimulationModifierParameters(rParamsFile);
 }
-
-// Explicit instantiation
-template class AbstractBoxDomainPdeSystemModifier<1>;
-template class AbstractBoxDomainPdeSystemModifier<2>;
-template class AbstractBoxDomainPdeSystemModifier<3>;

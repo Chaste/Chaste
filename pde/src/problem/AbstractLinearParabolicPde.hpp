@@ -38,7 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
-#include "AbstractLinearPdeSystem.hpp"
+#include "AbstractLinearPde.hpp"
 #include "UblasCustomFunctions.hpp"
 #include "ChastePoint.hpp"
 #include "Node.hpp"
@@ -53,7 +53,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM = ELEMENT_DIM>
-class AbstractLinearParabolicPde : public AbstractLinearPdeSystem<ELEMENT_DIM, SPACE_DIM, 1>
+class AbstractLinearParabolicPde : public AbstractLinearPde<ELEMENT_DIM, SPACE_DIM>
 {
 private:
 
@@ -68,7 +68,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractLinearPdeSystem<ELEMENT_DIM, SPACE_DIM, 1> >(*this);
+        archive & boost::serialization::base_object<AbstractLinearPde<ELEMENT_DIM, SPACE_DIM> >(*this);
     }
 
 public:
@@ -77,7 +77,7 @@ public:
      * Constructor.
      */
     AbstractLinearParabolicPde()
-        : AbstractLinearPdeSystem<ELEMENT_DIM, SPACE_DIM, 1>()
+        : AbstractLinearPde<ELEMENT_DIM, SPACE_DIM>()
     {}
 
     /**
@@ -112,7 +112,6 @@ public:
      */
     virtual double ComputeSourceTermAtNode(const Node<SPACE_DIM>& rNode,
                                            double u);
-
 
     /**
      * @return computed diffusion term. The diffusion tensor should be symmetric and positive definite.

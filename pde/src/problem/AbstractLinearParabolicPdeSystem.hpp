@@ -32,10 +32,13 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
+#ifndef _ABSTRACTLINEARPARABOLICPDE_HPP_
+#define _ABSTRACTLINEARPARABOLICPDE_HPP_
 
-#ifndef ABSTRACTLINEARPARABOLICPDESYSTEMFORCOUPLEDODESYSTEM_HPP_
-#define ABSTRACTLINEARPARABOLICPDESYSTEMFORCOUPLEDODESYSTEM_HPP_
+#include "ChasteSerialization.hpp"
+#include <boost/serialization/base_object.hpp>
 
+#include "AbstractLinearPdeSystem.hpp"
 #include "UblasCustomFunctions.hpp"
 #include "ChastePoint.hpp"
 #include "Node.hpp"
@@ -43,58 +46,84 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <petscvec.h>
 
 /**
- * AbstractLinearParabolicPdeSystemForCoupledOdeSystem class.
- *
  * A system of parabolic PDEs, which may be coupled via their source terms:
  *
- * d/dt (u_i) = div (D_i(x) grad (u_i)) + f_i (x, u_0, ..., u_{p-1}, v_0, ..., v_{q-1}),  i=0,...,p-1.
+ * d/dt (u_i) = div (D_i(x) grad (u_i)) + f_i (x, u_0, ..., u_{p-1}),  i=0,...,p-1.
  *
  * Here p denotes the size of the PDE system and each source term f_i may be nonlinear.
- * The variables v_0, ..., v_{q-1} are assumed to satisfy a coupled ODE system of the form
  *
- * d/dt (v_j) = g_j(x, u_0, ..., u_{p-1}, v_0, ..., v_{q-1}),  j=0,...,q-1.
- *
- * Such systems may be solved using LinearParabolicPdeSystemWithCoupledOdeSystemSolver.
+ * Such systems may be solved using LinearParabolicPdeSystemSolver.
  */
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM, unsigned PROBLEM_DIM=1>
-class AbstractLinearParabolicPdeSystemForCoupledOdeSystem
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM=1>
+class AbstractLinearParabolicPdeSystem : public AbstractLinearPdeSystem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>
 {
+private:
+
+    /** Needed for serialization. */
+    friend class boost::serialization::access;
+    /**
+     * Serialize the PDE object.
+     *
+     * @param archive the archive
+     * @param version the current version of this class
+     */
+    template<class Archive>
+    void serialize(Archive & archive, const unsigned int version)
+    {
+        archive & boost::serialization::base_object<AbstractLinearPdeSystem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM> >(*this);
+    }
+
 public:
+
+    /**
+     * Constructor.
+     */
+    AbstractLinearParabolicPdeSystem()
+        : AbstractLinearPdeSystem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>()
+    {}
+
+    /**
+     * Destructor.
+     */
+    virtual ~AbstractLinearParabolicPdeSystem()
+    {}
+
     /**
      * @return computed function c_i(x).
      *
      * @param rX the point x at which the function c_i is computed
      * @param pdeIndex the index of the PDE, denoted by i above
      */
-    virtual double ComputeDuDtCoefficientFunction(const ChastePoint<SPACE_DIM>& rX, unsigned pdeIndex)=0;
+    virtual double ComputeDuDtCoefficientFunction(const ChastePoint<SPACE_DIM>& rX,
+                                                  unsigned pdeIndex)=0;
 
     /**
-     * @return computed source term f_i(x, u_0, ..., u_{p-1}, v_0, ..., v_{q-1}) at a point in space.
+     * @return computed source term f_i(x, u_0, ..., u_{p-1}) at a point in space.
      *
-     * @param rX the point x at which the nonlinear source term is computed
+     * @param rX the point x at which the source term is computed
      * @param rU the vector of dependent variables (u_0, ..., u_{p-1}) at the point x
-     * @param rOdeSolution the ODE system state vector (v_0, ..., v_{q-1}) at the point x (if an ODE system is present)
      * @param pdeIndex the index of the PDE, denoted by i above
+     * @param pElement The mesh element that x is contained in (optional)
      */
     virtual double ComputeSourceTerm(const ChastePoint<SPACE_DIM>& rX,
                                      c_vector<double,PROBLEM_DIM>& rU,
-                                     std::vector<double>& rOdeSolution,
-                                     unsigned pdeIndex)=0;
+                                     unsigned pdeIndex,
+                                     Element<ELEMENT_DIM,SPACE_DIM>* pElement=nullptr)=0;
 
     /**
-     * @return computed source term f_i(x, u_0, ..., u_{p-1}, v_0, ..., v_{q-1}) at a node.
+     * @return computed source term f_i(x, u_0, ..., u_{p-1}) at a node.
      *
-     * @param rNode the node at which the nonlinear source term f_i is computed
+     * @param rNode the node at which the source term f_i is computed
      * @param rU the vector of dependent variables (u_0, ..., u_{p-1}) at the node
-     * @param rOdeSolution the ODE system state vector (v_0, ..., v_{q-1}) at the node (if an ODE system is present)
      * @param pdeIndex the index of the PDE, denoted by i above
      */
     virtual double ComputeSourceTermAtNode(const Node<SPACE_DIM>& rNode,
                                            c_vector<double,PROBLEM_DIM>& rU,
-                                           std::vector<double>& rOdeSolution,
                                            unsigned pdeIndex);
 
     /**
+     * \todo #2930 should the NULL below be nullptr?
+     *
      * @return computed diffusion term D_i(x) at a point in space. The diffusion tensor should be symmetric and positive definite.
      *
      * @param rX The point x at which the diffusion term D_i is computed
@@ -104,18 +133,15 @@ public:
     virtual c_matrix<double, SPACE_DIM, SPACE_DIM> ComputeDiffusionTerm(const ChastePoint<SPACE_DIM>& rX,
                                                                         unsigned pdeIndex,
                                                                         Element<ELEMENT_DIM,SPACE_DIM>* pElement=NULL)=0;
-
-    /**
-     * Destructor.
-     */
-    virtual ~AbstractLinearParabolicPdeSystemForCoupledOdeSystem()
-    {}
 };
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
-double AbstractLinearParabolicPdeSystemForCoupledOdeSystem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::ComputeSourceTermAtNode(const Node<SPACE_DIM>& rNode, c_vector<double,PROBLEM_DIM>& rU, std::vector<double>& rOdeSolution, unsigned pdeIndex)
+double AbstractLinearParabolicPdeSystem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::ComputeSourceTermAtNode(
+    const Node<SPACE_DIM>& rNode,
+    c_vector<double,PROBLEM_DIM>& rU,
+    unsigned pdeIndex)
 {
-    return ComputeSourceTerm(rNode.GetPoint(), rU, rOdeSolution, pdeIndex);
+    return ComputeSourceTerm(rNode.GetPoint(), rU, pdeIndex);
 }
 
-#endif /*ABSTRACTLINEARPARABOLICPDESYSTEMFORCOUPLEDODESYSTEM_HPP_*/
+#endif //_ABSTRACTLINEARPARABOLICPDE_HPP_

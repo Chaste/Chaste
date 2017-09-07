@@ -33,10 +33,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef EllipticGrowingDomainPdeSystemModifier_HPP_
-#define EllipticGrowingDomainPdeSystemModifier_HPP_
+#ifndef ELLIPTICGROWINGDOMAINPDESYSTEMMODIFIER_HPP_
+#define ELLIPTICGROWINGDOMAINPDESYSTEMMODIFIER_HPP_
 
-#include "ChasteSerialization.hpp"
+/*
+ * This is a non-abstract derived class, so we include the following header to allow
+ * the class's base parts to be serialized.
+ */
 #include <boost/serialization/base_object.hpp>
 
 #include "AbstractGrowingDomainPdeSystemModifier.hpp"
@@ -57,8 +60,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Examples of PDEs in the source folder that can be solved using this class are
  * CellwiseSourceEllipticPde and UniformSourceEllipticPde.
  */
-template<unsigned DIM>
-class EllipticGrowingDomainPdeSystemModifier : public AbstractGrowingDomainPdeSystemModifier<DIM>
+template<unsigned DIM, unsigned PROBLEM_DIM>
+class EllipticGrowingDomainPdeSystemModifier : public AbstractGrowingDomainPdeSystemModifier<DIM,PROBLEM_DIM>
 {
     friend class TestEllipticGrowingDomainPdeSystemModifier;
 
@@ -76,7 +79,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractGrowingDomainPdeSystemModifier<DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractGrowingDomainPdeSystemModifier<DIM,PROBLEM_DIM> >(*this);
     }
 
 public:
@@ -90,7 +93,8 @@ public:
      * @param isNeumannBoundaryCondition Whether the boundary condition is Neumann (defaults to true)
      * @param solution solution vector (defaults to NULL)
      */
-    EllipticGrowingDomainPdeSystemModifier(boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,1> > pPdeSystem=boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,1> >(),
+    EllipticGrowingDomainPdeSystemModifier(
+        boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,PROBLEM_DIM> > pPdeSystem=boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,PROBLEM_DIM> >(),
         std::vector<boost::shared_ptr<AbstractBoundaryCondition<DIM> > > pBoundaryConditions=std::vector<boost::shared_ptr<AbstractBoundaryCondition<DIM> > >(),
         bool isNeumannBoundaryCondition=true,
         Vec solution=nullptr);
@@ -124,7 +128,7 @@ public:
      *
      * @return the full boundary conditions container
      */
-    virtual std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ConstructBoundaryConditionsContainer();
+    virtual std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,PROBLEM_DIM> > ConstructBoundaryConditionsContainer();
 
     /**
      * Overridden OutputSimulationModifierParameters() method.
@@ -136,15 +140,15 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(EllipticGrowingDomainPdeSystemModifier)
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(EllipticGrowingDomainPdeSystemModifier)
 
 namespace boost
 {
 namespace serialization
 {
-template<class Archive, unsigned DIM>
+template<class Archive, unsigned DIM, unsigned PROBLEM_DIM>
 inline void save_construct_data(
-    Archive & ar, const EllipticGrowingDomainPdeSystemModifier<DIM> * t, const unsigned int file_version)
+    Archive & ar, const EllipticGrowingDomainPdeSystemModifier<DIM,PROBLEM_DIM> * t, const unsigned int file_version)
 {
     if (t->GetSolution())
     {
@@ -153,9 +157,9 @@ inline void save_construct_data(
     }
 }
 
-template<class Archive, unsigned DIM>
+template<class Archive, unsigned DIM, unsigned PROBLEM_DIM>
 inline void load_construct_data(
-    Archive & ar, EllipticGrowingDomainPdeSystemModifier<DIM> * t, const unsigned int file_version)
+    Archive & ar, EllipticGrowingDomainPdeSystemModifier<DIM,PROBLEM_DIM> * t, const unsigned int file_version)
 {
     Vec solution = nullptr;
 
@@ -167,12 +171,12 @@ inline void load_construct_data(
         PetscTools::ReadPetscObject(solution, archive_filename);
     }
 
-    ::new(t)EllipticGrowingDomainPdeSystemModifier<DIM>(boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,1> >(),
-                                                        std::vector<boost::shared_ptr<AbstractBoundaryCondition<DIM> > >(),
-                                                        true,
-                                                        solution);
+    ::new(t)EllipticGrowingDomainPdeSystemModifier<DIM,PROBLEM_DIM>(boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,PROBLEM_DIM> >(),
+                                                                    std::vector<boost::shared_ptr<AbstractBoundaryCondition<DIM> > >(),
+                                                                    true,
+                                                                    solution);
 }
 }
 } // namespace ...
 
-#endif /*EllipticGrowingDomainPdeSystemModifier_HPP_*/
+#endif /*ELLIPTICGROWINGDOMAINPDESYSTEMMODIFIER_HPP_*/

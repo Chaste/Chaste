@@ -33,10 +33,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef ParabolicBoxDomainPdeSystemModifier_HPP_
-#define ParabolicBoxDomainPdeSystemModifier_HPP_
+#ifndef PARABOLICBOXDOMAINPDESYSTEMMODIFIER_HPP_
+#define PARABOLICBOXDOMAINPDESYSTEMMODIFIER_HPP_
 
-#include "ChasteSerialization.hpp"
+/*
+ * This is a non-abstract derived class, so we include the following header to allow
+ * the class's base parts to be serialized.
+ */
 #include <boost/serialization/base_object.hpp>
 
 #include "AbstractBoxDomainPdeSystemModifier.hpp"
@@ -60,8 +63,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Examples of PDEs in the source folder that can be solved using this class are
  * AveragedSourceParabolicPde and UniformSourceParabolicPde.
  */
-template<unsigned DIM>
-class ParabolicBoxDomainPdeSystemModifier : public AbstractBoxDomainPdeSystemModifier<DIM>
+template<unsigned DIM, unsigned PROBLEM_DIM>
+class ParabolicBoxDomainPdeSystemModifier : public AbstractBoxDomainPdeSystemModifier<DIM,PROBLEM_DIM>
 {
     friend class TestParabolicBoxDomainPdeSystemModifier;
 
@@ -79,7 +82,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractBoxDomainPdeSystemModifier<DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractBoxDomainPdeSystemModifier<DIM,PROBLEM_DIM> >(*this);
     }
 
 public:
@@ -95,7 +98,8 @@ public:
      * @param stepSize step size to be used in the FE mesh (defaults to 1.0, i.e. the default cell size)
      * @param solution solution vector (defaults to NULL)
      */
-    ParabolicBoxDomainPdeSystemModifier(boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,1> > pPdeSystem=boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,1> >(),
+    ParabolicBoxDomainPdeSystemModifier(
+        boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,PROBLEM_DIM> > pPdeSystem=boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,PROBLEM_DIM> >(),
         std::vector<boost::shared_ptr<AbstractBoundaryCondition<DIM> > > pBoundaryConditions=std::vector<boost::shared_ptr<AbstractBoundaryCondition<DIM> > >(),
         bool isNeumannBoundaryCondition=true,
         boost::shared_ptr<ChasteCuboid<DIM> > pMeshCuboid=boost::shared_ptr<ChasteCuboid<DIM> >(),
@@ -133,7 +137,7 @@ public:
      *
      * @return the full boundary conditions container
      */
-    virtual std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ConstructBoundaryConditionsContainer(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
+    virtual std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,PROBLEM_DIM> > ConstructBoundaryConditionsContainer(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
 
     /**
      * Helper method to initialise the PDE solution using the CellData.
@@ -154,15 +158,15 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(ParabolicBoxDomainPdeSystemModifier)
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(ParabolicBoxDomainPdeSystemModifier)
 
 namespace boost
 {
 namespace serialization
 {
-template<class Archive, unsigned DIM>
+template<class Archive, unsigned DIM, unsigned PROBLEM_DIM>
 inline void save_construct_data(
-    Archive & ar, const ParabolicBoxDomainPdeSystemModifier<DIM> * t, const unsigned int file_version)
+    Archive & ar, const ParabolicBoxDomainPdeSystemModifier<DIM,PROBLEM_DIM> * t, const unsigned int file_version)
 {
     if (t->GetSolution())
     {
@@ -171,9 +175,9 @@ inline void save_construct_data(
     }
 }
 
-template<class Archive, unsigned DIM>
+template<class Archive, unsigned DIM, unsigned PROBLEM_DIM>
 inline void load_construct_data(
-    Archive & ar, ParabolicBoxDomainPdeSystemModifier<DIM> * t, const unsigned int file_version)
+    Archive & ar, ParabolicBoxDomainPdeSystemModifier<DIM,PROBLEM_DIM> * t, const unsigned int file_version)
 {
     Vec solution = nullptr;
 
@@ -185,14 +189,14 @@ inline void load_construct_data(
         PetscTools::ReadPetscObject(solution, archive_filename);
     }
 
-    ::new(t)ParabolicBoxDomainPdeSystemModifier<DIM>(boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,1> >(),
-                                                     std::vector<boost::shared_ptr<AbstractBoundaryCondition<DIM> > >(),
-                                                     true,
-                                                     boost::shared_ptr<ChasteCuboid<DIM> >(),
-                                                     1.0,
-                                                     solution);
+    ::new(t)ParabolicBoxDomainPdeSystemModifier<DIM,PROBLEM_DIM>(boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,PROBLEM_DIM> >(),
+                                                                 std::vector<boost::shared_ptr<AbstractBoundaryCondition<DIM> > >(),
+                                                                 true,
+                                                                 boost::shared_ptr<ChasteCuboid<DIM> >(),
+                                                                 1.0,
+                                                                 solution);
 }
 }
 } // namespace ...
 
-#endif /*ParabolicBoxDomainPdeSystemModifier_HPP_*/
+#endif /*PARABOLICBOXDOMAINPDESYSTEMMODIFIER_HPP_*/

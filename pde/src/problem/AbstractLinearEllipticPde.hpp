@@ -39,7 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
-#include "AbstractLinearPdeSystem.hpp"
+#include "AbstractLinearPde.hpp"
 #include "UblasCustomFunctions.hpp"
 #include "ChastePoint.hpp"
 #include "Node.hpp"
@@ -57,7 +57,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Parabolic PDEs are be derived from this (AbstractLinearParabolicPde)
  */
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-class AbstractLinearEllipticPde : public AbstractLinearPdeSystem<ELEMENT_DIM, SPACE_DIM, 1>
+class AbstractLinearEllipticPde : public AbstractLinearPde<ELEMENT_DIM, SPACE_DIM>
 {
 private:
 
@@ -72,7 +72,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractLinearPdeSystem<ELEMENT_DIM, SPACE_DIM, 1> >(*this);
+        archive & boost::serialization::base_object<AbstractLinearPde<ELEMENT_DIM, SPACE_DIM> >(*this);
     }
 
 public:
@@ -81,7 +81,7 @@ public:
      * Constructor.
      */
     AbstractLinearEllipticPde()
-        : AbstractLinearPdeSystem<ELEMENT_DIM, SPACE_DIM, 1>()
+        : AbstractLinearPde<ELEMENT_DIM, SPACE_DIM>()
     {}
 
     /**
@@ -95,7 +95,7 @@ public:
      * Div(D Grad u)  +  f(x)u + g(x) = 0, at a given point.
      *
      * @param rX The point in space
-     * @param pElement The element
+     * @param pElement The mesh element that x is contained in
      */
     virtual double ComputeConstantInUSourceTerm(const ChastePoint<SPACE_DIM>& rX,
                                                 Element<ELEMENT_DIM,SPACE_DIM>* pElement)=0;
@@ -105,7 +105,7 @@ public:
      * Div(D Grad u)  +  f(x)u + g(x) = 0, at a given point in space.
      *
      * @param rX The point in space
-     * @param pElement
+     * @param pElement The mesh element that x is contained in
      */
     virtual double ComputeLinearInUCoeffInSourceTerm(const ChastePoint<SPACE_DIM>& rX,
                                                      Element<ELEMENT_DIM,SPACE_DIM>* pElement)=0;

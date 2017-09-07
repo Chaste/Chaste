@@ -40,10 +40,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AveragedSourceParabolicPde.hpp"
 
 template<unsigned DIM, unsigned PROBLEM_DIM>
-AbstractPdeSystemModifier<DIM,PROBLEM_DIM>::AbstractPdeSystemModifier(boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,PROBLEM_DIM> > pPdeSystem,
-                                              std::vector<boost::shared_ptr<AbstractBoundaryCondition<DIM> > > pBoundaryConditions,
-                                              bool isNeumannBoundaryCondition,
-                                              Vec solution)
+AbstractPdeSystemModifier<DIM,PROBLEM_DIM>::AbstractPdeSystemModifier(
+    boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,PROBLEM_DIM> > pPdeSystem,
+    std::vector<boost::shared_ptr<AbstractBoundaryCondition<DIM> > > pBoundaryConditions,
+    bool isNeumannBoundaryCondition,
+    Vec solution)
     : AbstractCellBasedSimulationModifier<DIM>(),
       mpPdeSystem(pPdeSystem),
       mpBoundaryConditions(pBoundaryConditions),

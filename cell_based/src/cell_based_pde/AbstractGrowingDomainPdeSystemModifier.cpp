@@ -41,25 +41,26 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ReplicatableVector.hpp"
 #include "LinearBasisFunction.hpp"
 
-template <unsigned DIM>
-AbstractGrowingDomainPdeSystemModifier<DIM>::AbstractGrowingDomainPdeSystemModifier(boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,1> > pPdeSystem,
-                                                                        std::vector<boost::shared_ptr<AbstractBoundaryCondition<DIM> > > pBoundaryConditions,
-                                                                        bool isNeumannBoundaryCondition,
-                                                                        Vec solution)
-    : AbstractPdeSystemModifier<DIM>(pPdeSystem,
-                                       pBoundaryConditions,
-                                       isNeumannBoundaryCondition,
-                                       solution)
+template <unsigned DIM, unsigned PROBLEM_DIM>
+AbstractGrowingDomainPdeSystemModifier<DIM,PROBLEM_DIM>::AbstractGrowingDomainPdeSystemModifier(
+    boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,PROBLEM_DIM> > pPdeSystem,
+    std::vector<boost::shared_ptr<AbstractBoundaryCondition<DIM> > > pBoundaryConditions,
+    bool isNeumannBoundaryCondition,
+    Vec solution)
+    : AbstractPdeSystemModifier<DIM,PROBLEM_DIM>(pPdeSystem,
+                                                 pBoundaryConditions,
+                                                 isNeumannBoundaryCondition,
+                                                 solution)
 {
 }
 
-template<unsigned DIM>
-AbstractGrowingDomainPdeSystemModifier<DIM>::~AbstractGrowingDomainPdeSystemModifier()
+template <unsigned DIM, unsigned PROBLEM_DIM>
+AbstractGrowingDomainPdeSystemModifier<DIM,PROBLEM_DIM>::~AbstractGrowingDomainPdeSystemModifier()
 {
 }
 
-template<unsigned DIM>
-void AbstractGrowingDomainPdeSystemModifier<DIM>::GenerateFeMesh(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
+template <unsigned DIM, unsigned PROBLEM_DIM>
+void AbstractGrowingDomainPdeSystemModifier<DIM,PROBLEM_DIM>::GenerateFeMesh(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
     if (this->mDeleteFeMesh)
     {
@@ -80,8 +81,8 @@ void AbstractGrowingDomainPdeSystemModifier<DIM>::GenerateFeMesh(AbstractCellPop
     this->mpFeMesh = rCellPopulation.GetTetrahedralMeshForPdeModifier();
 }
 
-template<unsigned DIM>
-void AbstractGrowingDomainPdeSystemModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
+template <unsigned DIM, unsigned PROBLEM_DIM>
+void AbstractGrowingDomainPdeSystemModifier<DIM,PROBLEM_DIM>::UpdateCellData(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
     // Store the PDE solution in an accessible form
     ReplicatableVector solution_repl(this->mSolution);
@@ -174,14 +175,9 @@ void AbstractGrowingDomainPdeSystemModifier<DIM>::UpdateCellData(AbstractCellPop
     }
 }
 
-template<unsigned DIM>
-void AbstractGrowingDomainPdeSystemModifier<DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
+template <unsigned DIM, unsigned PROBLEM_DIM>
+void AbstractGrowingDomainPdeSystemModifier<DIM,PROBLEM_DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
 {
     // No parameters to output, so just call method on direct parent class
-    AbstractPdeSystemModifier<DIM>::OutputSimulationModifierParameters(rParamsFile);
+    AbstractPdeSystemModifier<DIM,PROBLEM_DIM>::OutputSimulationModifierParameters(rParamsFile);
 }
-
-// Explicit instantiation
-template class AbstractGrowingDomainPdeSystemModifier<1>;
-template class AbstractGrowingDomainPdeSystemModifier<2>;
-template class AbstractGrowingDomainPdeSystemModifier<3>;

@@ -243,10 +243,6 @@ public:
     AbstractOdeSystemForCoupledPdeSystem* GetOdeSystemAtNode(unsigned index);
 };
 
-///////////////////////////////////////////////////////////////////////////////////
-// Implementation
-///////////////////////////////////////////////////////////////////////////////////
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 c_matrix<double, PROBLEM_DIM*(ELEMENT_DIM+1), PROBLEM_DIM*(ELEMENT_DIM+1)> LinearParabolicPdeSystemWithCoupledOdeSystemSolver<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::ComputeMatrixTerm(
     c_vector<double, ELEMENT_DIM+1>& rPhi,

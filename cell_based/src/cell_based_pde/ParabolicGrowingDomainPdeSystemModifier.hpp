@@ -33,10 +33,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef ParabolicGrowingDomainPdeSystemModifier_HPP_
-#define ParabolicGrowingDomainPdeSystemModifier_HPP_
+#ifndef PARABOLICGROWINGDOMAINPDESYSTEMMODIFIER_HPP_
+#define PARABOLICGROWINGDOMAINPDESYSTEMMODIFIER_HPP_
 
-#include "ChasteSerialization.hpp"
+/*
+ * This is a non-abstract derived class, so we include the following header to allow
+ * the class's base parts to be serialized.
+ */
 #include <boost/serialization/base_object.hpp>
 
 #include "AbstractGrowingDomainPdeSystemModifier.hpp"
@@ -57,8 +60,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Examples of PDEs in the source folder that can be solved using this class are
  * CellwiseSourceParabolicPde and UniformSourceParabolicPde.
  */
-template<unsigned DIM>
-class ParabolicGrowingDomainPdeSystemModifier : public AbstractGrowingDomainPdeSystemModifier<DIM>
+template<unsigned DIM, unsigned PROBLEM_DIM>
+class ParabolicGrowingDomainPdeSystemModifier : public AbstractGrowingDomainPdeSystemModifier<DIM,PROBLEM_DIM>
 {
     friend class TestParabolicGrowingDomainPdeSystemModifier;
 
@@ -76,7 +79,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractGrowingDomainPdeSystemModifier<DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractGrowingDomainPdeSystemModifier<DIM,PROBLEM_DIM> >(*this);
     }
 
 public:
@@ -90,7 +93,8 @@ public:
      * @param isNeumannBoundaryCondition Whether the boundary condition is Neumann (defaults to true)
      * @param solution solution vector (defaults to NULL)
      */
-    ParabolicGrowingDomainPdeSystemModifier(boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,1> > pPdeSystem=boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,1> >(),
+    ParabolicGrowingDomainPdeSystemModifier(
+        boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,PROBLEM_DIM> > pPdeSystem=boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,PROBLEM_DIM> >(),
         std::vector<boost::shared_ptr<AbstractBoundaryCondition<DIM> > > pBoundaryConditions=std::vector<boost::shared_ptr<AbstractBoundaryCondition<DIM> > >(),
         bool isNeumannBoundaryCondition=true,
         Vec solution=nullptr);
@@ -124,7 +128,7 @@ public:
      *
      * @return the full boundary conditions container
      */
-    virtual std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ConstructBoundaryConditionsContainer();
+    virtual std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,PROBLEM_DIM> > ConstructBoundaryConditionsContainer();
 
     /**
      * Helper method to copy the CellData to the PDE solution.
@@ -143,15 +147,15 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(ParabolicGrowingDomainPdeSystemModifier)
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(ParabolicGrowingDomainPdeSystemModifier)
 
 namespace boost
 {
 namespace serialization
 {
-template<class Archive, unsigned DIM>
+template<class Archive, unsigned DIM, unsigned PROBLEM_DIM>
 inline void save_construct_data(
-    Archive & ar, const ParabolicGrowingDomainPdeSystemModifier<DIM> * t, const unsigned int file_version)
+    Archive & ar, const ParabolicGrowingDomainPdeSystemModifier<DIM,PROBLEM_DIM> * t, const unsigned int file_version)
 {
     if (t->GetSolution())
     {
@@ -160,9 +164,9 @@ inline void save_construct_data(
     }
 }
 
-template<class Archive, unsigned DIM>
+template<class Archive, unsigned DIM, unsigned PROBLEM_DIM>
 inline void load_construct_data(
-    Archive & ar, ParabolicGrowingDomainPdeSystemModifier<DIM> * t, const unsigned int file_version)
+    Archive & ar, ParabolicGrowingDomainPdeSystemModifier<DIM,PROBLEM_DIM> * t, const unsigned int file_version)
 {
     Vec solution = nullptr;
 
@@ -174,12 +178,12 @@ inline void load_construct_data(
         PetscTools::ReadPetscObject(solution, archive_filename);
     }
 
-    ::new(t)ParabolicGrowingDomainPdeSystemModifier<DIM>(boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,1> >(),
-                                                         std::vector<boost::shared_ptr<AbstractBoundaryCondition<DIM> > >(),
-                                                         true,
-                                                         solution);
+    ::new(t)ParabolicGrowingDomainPdeSystemModifier<DIM,PROBLEM_DIM>(boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,PROBLEM_DIM> >(),
+                                                                     std::vector<boost::shared_ptr<AbstractBoundaryCondition<DIM> > >(),
+                                                                     true,
+                                                                     solution);
 }
 }
 } // namespace ...
 
-#endif /*ParabolicGrowingDomainPdeSystemModifier_HPP_*/
+#endif /*PARABOLICGROWINGDOMAINPDESYSTEMMODIFIER_HPP_*/

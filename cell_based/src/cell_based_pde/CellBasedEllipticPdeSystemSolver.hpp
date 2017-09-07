@@ -33,30 +33,33 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef CELLBASEDPARABOLICPDESOLVER_HPP_
-#define CELLBASEDPARABOLICPDESOLVER_HPP_
+#ifndef CELLBASEDELLIPTICPDESYSTEMSOLVER_HPP_
+#define CELLBASEDELLIPTICPDESYSTEMSOLVER_HPP_
 
-#include "SimpleLinearParabolicSolver.hpp"
+#include "LinearEllipticPdeSystemSolver.hpp"
 #include "TetrahedralMesh.hpp"
 
 /**
- * A purpose-made parabolic solver that interpolates the source terms from node onto
+ * \todo #2930 document class
+ * A purpose-made elliptic solver that interpolates the source terms from node onto
  * Gauss points, as for a cell-based simulation with PDEs the source will only be
  * known at the cells (nodes), not the Gauss points.
  */
-template<unsigned DIM>
-class CellBasedParabolicPdeSolver : public SimpleLinearParabolicSolver<DIM, DIM>
+template<unsigned DIM, unsigned PROBLEM_DIM>
+class CellBasedEllipticPdeSystemSolver : public LinearEllipticPdeSystemSolver<DIM, DIM, PROBLEM_DIM>
 {
 private:
 
-    /** The source term, interpolated onto the current point. */
-    double mInterpolatedSourceTerm;
+    /** Vector storing the constant in u part of each PDE's source term, interpolated onto the current point. */
+    std::vector<double> mInterpolatedConstantInUSourceTerm;
+
+    /** Vector storing the linear in u part of each PDE's source term, interpolated onto the current point. */
+    std::vector<double> mInterpolatedLinearInUCoeffInSourceTerm;
 
 protected:
 
     /**
-     * The SimpleLinearParabolicSolver version of this method is
-     * overloaded using the interpolated source term.
+     * Overridden ComputeVectorTerm() method, using the interpolated source term.
      *
      * @param rPhi The basis functions, rPhi(i) = phi_i, i=1..numBases
      * @param rGradPhi Basis gradients, rGradPhi(i,j) = d(phi_j)/d(X_i)
@@ -67,17 +70,16 @@ protected:
      *
      * @return vector term.
      */
-    virtual c_vector<double, 1*(DIM+1)> ComputeVectorTerm(
+    virtual c_vector<double, PROBLEM_DIM*(DIM+1)> ComputeVectorTerm(
         c_vector<double, DIM+1>& rPhi,
         c_matrix<double, DIM, DIM+1>& rGradPhi,
         ChastePoint<DIM>& rX,
-        c_vector<double, 1>& rU,
-        c_matrix<double, 1, DIM>& rGradU /* not used */,
+        c_vector<double, PROBLEM_DIM>& rU,
+        c_matrix<double, PROBLEM_DIM, DIM>& rGradU /* not used */,
         Element<DIM, DIM>* pElement);
 
     /**
-     * The SimpleLinearParabolicSolver version of this method is
-     * overloaded using the interpolated source term.
+     * Overridden ComputeMatrixTerm() method, using the interpolated source term.
      *
      * @param rPhi The basis functions, rPhi(i) = phi_i, i=1..numBases
      * @param rGradPhi Basis gradients, rGradPhi(i,j) = d(phi_j)/d(X_i)
@@ -88,12 +90,12 @@ protected:
      *
      * @return The matrix term for the stiffness matrix
      */
-    virtual c_matrix<double, 1*(DIM+1), 1*(DIM+1)> ComputeMatrixTerm(
+    virtual c_matrix<double, PROBLEM_DIM*(DIM+1), PROBLEM_DIM*(DIM+1)> ComputeMatrixTerm(
         c_vector<double, DIM+1>& rPhi,
         c_matrix<double, DIM, DIM+1>& rGradPhi,
         ChastePoint<DIM>& rX,
-        c_vector<double, 1>& rU,
-        c_matrix<double, 1, DIM>& rGradU,
+        c_vector<double, PROBLEM_DIM>& rU,
+        c_matrix<double, PROBLEM_DIM, DIM>& rGradU,
         Element<DIM, DIM>* pElement);
 
     /**
@@ -102,12 +104,21 @@ protected:
     void ResetInterpolatedQuantities();
 
     /**
+     * \todo #2930 fix comments
      * Overridden IncrementInterpolatedQuantities() method.
      *
      * @param phiI
      * @param pNode
      */
-    void IncrementInterpolatedQuantities(double phiI, const Node<DIM>*);
+    void IncrementInterpolatedQuantities(double phiI, const Node<DIM>* pNode);
+
+    /**
+     * Create the linear system object if it hasn't been already.
+     * Can use an initial solution as PETSc template, or base it on the mesh size.
+     *
+     * @param initialSolution an initial guess
+     */
+    void InitialiseForSolve(Vec initialSolution);
 
 public:
 
@@ -115,17 +126,17 @@ public:
      * Constructor.
      *
      * @param pMesh pointer to the mesh
-     * @param pPde pointer to the PDE
+     * @param pPdeSystem pointer to the PDE system
      * @param pBoundaryConditions pointer to the boundary conditions
      */
-    CellBasedParabolicPdeSolver(TetrahedralMesh<DIM,DIM>* pMesh,
-                                AbstractLinearParabolicPde<DIM,DIM>* pPde,
-                                BoundaryConditionsContainer<DIM,DIM,1>* pBoundaryConditions);
+    CellBasedEllipticPdeSystemSolver(TetrahedralMesh<DIM, DIM>* pMesh,
+                                     AbstractLinearEllipticPdeSystem<DIM, DIM, PROBLEM_DIM>* pPdeSystem,
+                                     BoundaryConditionsContainer<DIM, DIM, PROBLEM_DIM>* pBoundaryConditions);
 
     /**
      * Destructor.
      */
-    virtual ~CellBasedParabolicPdeSolver();
+    virtual ~CellBasedEllipticPdeSystemSolver();
 };
 
-#endif /*CELLBASEDPARABOLICPDESOLVER_HPP_*/
+#endif /*CELLBASEDELLIPTICPDESYSTEMSOLVER_HPP_*/

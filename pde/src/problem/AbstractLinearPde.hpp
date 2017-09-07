@@ -32,15 +32,14 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
-#ifndef _ABSTRACTLINEARPDESYSTEM_HPP_
-#define _ABSTRACTLINEARPDESYSTEM_HPP_
+#ifndef _ABSTRACTLINEARPDE_HPP_
+#define _ABSTRACTLINEARPDE_HPP_
 
 #include "ChasteSerialization.hpp"
 #include "ClassIsAbstract.hpp"
 
-///\todo #2930 document class and complete functionality
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM, unsigned PROBLEM_DIM=1>
-class AbstractLinearPdeSystem
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
+class AbstractLinearPde
 {
 private:
 
@@ -62,16 +61,16 @@ public:
     /**
      * Constructor.
      */
-    AbstractLinearPdeSystem()
+    AbstractLinearPde()
     {}
 
     /**
      * Destructor.
      */
-    virtual ~AbstractLinearPdeSystem()
+    virtual ~AbstractLinearPde()
     {}
 };
 
-TEMPLATED_CLASS_IS_ABSTRACT_3_UNSIGNED(AbstractLinearPdeSystem)
+TEMPLATED_CLASS_IS_ABSTRACT_2_UNSIGNED(AbstractLinearPde)
 
 #endif //_ABSTRACTLINEARPDE_HPP_

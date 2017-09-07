@@ -42,7 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractCellPopulation.hpp"
 #include "TetrahedralMesh.hpp"
-#include "AbstractLinearEllipticPde.hpp"
+#include "AbstractLinearEllipticPdeSystem.hpp"
 
 /**
  * An elliptic PDE to be solved numerically using the finite element method, for
@@ -65,7 +65,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * \todo make member names and methods consistent with those of AveragedSourceParabolicPde (#2876)
  */
 template<unsigned DIM>
-class AveragedSourceEllipticPde : public AbstractLinearEllipticPde<DIM,DIM>
+class AveragedSourceEllipticPde : public AbstractLinearEllipticPdeSystem<DIM, DIM>
 {
     friend class TestCellBasedEllipticPdes;
 
@@ -82,7 +82,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-       archive & boost::serialization::base_object<AbstractLinearEllipticPde<DIM, DIM> >(*this);
+       archive & boost::serialization::base_object<AbstractLinearEllipticPdeSystem<DIM, DIM> >(*this);
        archive & mSourceCoefficient;
        archive & mDiffusionCoefficient;
        archive & mCellDensityOnCoarseElements;
@@ -136,33 +136,37 @@ public:
     /**
      * Overridden ComputeConstantInUSourceTerm() method.
      *
-     * @param rX The point in space
-     * @param pElement the element
+     * @return computed contribution to source term that is constant in u, g_i(x), at a point in space.
      *
-     * @return the constant in u part of the source term, i.e g(x) in
-     *  Div(D Grad u)  +  f(x)u + g(x) = 0.
+     * @param rX The point in space
+     * @param pdeIndex the index of the PDE (unused)
+     * @param pElement the element
      */
-    double ComputeConstantInUSourceTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement);
-
+    double ComputeConstantInUSourceTerm(const ChastePoint<DIM>& rX,
+                                        unsigned pdeIndex,
+                                        Element<DIM,DIM>* pElement);
     /**
      * Overridden ComputeLinearInUCoeffInSourceTerm() method.
      *
-     * @param rX The point in space
-     * @param pElement the element
+     * @return computed contribution to source term that is linear in u at a point in space.
      *
-     * @return the coefficient of u in the linear part of the source term, i.e f(x) in
-     *  Div(D Grad u)  +  f(x)u + g(x) = 0.
+     * @param rX The point in space
+     * @param pdeIndex the index of the PDE (unused)
+     * @param pElement The mesh element that x is contained in
      */
-    double ComputeLinearInUCoeffInSourceTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement);
-
+    virtual double ComputeLinearInUCoeffInSourceTerm(const ChastePoint<DIM>& rX,
+                                                     unsigned pdeIndex,
+                                                     Element<DIM,DIM>* pElement);
     /**
      * Overridden ComputeDiffusionTerm() method.
      *
-     * @param rX The point in space at which the diffusion term is computed
+     * @return computed diffusion term at a point in space
      *
-     * @return a matrix.
+     * @param rX The point x at which the diffusion term D_i is computed
+     * @param pdeIndex the index of the PDE (unused)
      */
-    c_matrix<double,DIM,DIM> ComputeDiffusionTerm(const ChastePoint<DIM>& rX);
+    virtual c_matrix<double, DIM, DIM> ComputeDiffusionTerm(const ChastePoint<DIM>& rX,
+                                                            unsigned pdeIndex);
 
     /**
      * @return the uptake rate.

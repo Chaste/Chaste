@@ -50,7 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * AbstractGrowingDomainPdeSystemModifier and their subclasses, which solve a linear elliptic or
  * parabolic PDE coupled to a cell-based simulation.
  */
-template<unsigned DIM, unsigned PROBLEM_DIM=1>
+template<unsigned DIM, unsigned PROBLEM_DIM>
 class AbstractPdeSystemModifier : public AbstractCellBasedSimulationModifier<DIM,DIM>
 {
 private:
@@ -140,7 +140,8 @@ public:
      * @param isNeumannBoundaryCondition Whether the boundary condition is Neumann (defaults to true)
      * @param solution solution vector (defaults to NULL)
      */
-    AbstractPdeSystemModifier(boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,PROBLEM_DIM> > pPdeSystem=NULL,
+    AbstractPdeSystemModifier(
+        boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,PROBLEM_DIM> > pPdeSystem=NULL,
         std::vector<boost::shared_ptr<AbstractBoundaryCondition<DIM> > > pBoundaryConditions=std::vector<boost::shared_ptr<AbstractBoundaryCondition<DIM> > >(),
         bool isNeumannBoundaryCondition=true,
         Vec solution=nullptr);
@@ -281,6 +282,12 @@ public:
     void OutputSimulationModifierParameters(out_stream& rParamsFile);
 };
 
+/*
+ * This abstract class has pure virtual method(s), so we use the following macro
+ * to indicate to the serialization library that it should not try to instantiate
+ * the class, thus avoiding compiler errors on some systems.
+ */
+#include "SerializationExportWrapper.hpp"
 TEMPLATED_CLASS_IS_ABSTRACT_2_UNSIGNED(AbstractPdeSystemModifier)
 
 #endif /*ABSTRACTPDESYSTEMMODIFIER_HPP_*/

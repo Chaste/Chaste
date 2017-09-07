@@ -142,7 +142,7 @@ public:
     /**
      * Overridden ComputeSourceTermAtNode() method.
      *
-     * Note that for CellWise Parabolic PDEs used with CellBasedParabolicPdeSolver
+     * Note that for cell-wise parabolic PDEs used with CellBasedParabolicPdeSystemSolver
      * this method returns the coefficient of the linear component of the source term.
      *
      * @return computed source term at a node.

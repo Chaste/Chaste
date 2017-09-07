@@ -41,7 +41,8 @@ AveragedSourceParabolicPde<DIM>::AveragedSourceParabolicPde(AbstractCellPopulati
                                                             double duDtCoefficient,
                                                             double diffusionCoefficient,
                                                             double sourceCoefficient)
-    : mrCellPopulation(rCellPopulation),
+    : AbstractLinearParabolicPdeSystem<DIM, DIM>(),
+      mrCellPopulation(rCellPopulation),
       mDuDtCoefficient(duDtCoefficient),
       mDiffusionCoefficient(diffusionCoefficient),
       mSourceCoefficient(sourceCoefficient)
@@ -101,24 +102,31 @@ void AveragedSourceParabolicPde<DIM>::SetupSourceTerms(TetrahedralMesh<DIM,DIM>&
 }
 
 template<unsigned DIM>
-double AveragedSourceParabolicPde<DIM>::ComputeDuDtCoefficientFunction(const ChastePoint<DIM>& )
+double AveragedSourceParabolicPde<DIM>::ComputeDuDtCoefficientFunction(const ChastePoint<DIM>& rX, unsigned pdeIndex)
 {
     return mDuDtCoefficient;
 }
 
 template<unsigned DIM>
-double AveragedSourceParabolicPde<DIM>::ComputeSourceTerm(const ChastePoint<DIM>& rX, double u, Element<DIM,DIM>* pElement)
+double AveragedSourceParabolicPde<DIM>::ComputeSourceTerm(
+    const ChastePoint<DIM>& rX,
+    c_vector<double,1>& rU,
+    unsigned pdeIndex,
+    Element<DIM,DIM>* pElement)
 {
     assert(!mCellDensityOnCoarseElements.empty());
     double coefficient = mSourceCoefficient * mCellDensityOnCoarseElements[pElement->GetIndex()];
 
     // The source term is C*u
-    return coefficient*u;
+    return coefficient*rU[0];
 }
 
 // LCOV_EXCL_START
 template<unsigned DIM>
-double AveragedSourceParabolicPde<DIM>::ComputeSourceTermAtNode(const Node<DIM>& rNode, double u)
+double AveragedSourceParabolicPde<DIM>::ComputeSourceTermAtNode(
+    const Node<DIM>& rNode,
+    c_vector<double,1>& rU,
+    unsigned pdeIndex)
 {
     NEVER_REACHED;
     return 0.0;
@@ -126,7 +134,10 @@ double AveragedSourceParabolicPde<DIM>::ComputeSourceTermAtNode(const Node<DIM>&
 // LCOV_EXCL_STOP
 
 template<unsigned DIM>
-c_matrix<double,DIM,DIM> AveragedSourceParabolicPde<DIM>::ComputeDiffusionTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement)
+c_matrix<double,DIM,DIM> AveragedSourceParabolicPde<DIM>::ComputeDiffusionTerm(
+    const ChastePoint<DIM>& rX,
+    unsigned pdeIndex,
+    Element<DIM,DIM>* pElement)
 {
     return mDiffusionCoefficient*identity_matrix<double>(DIM);
 }

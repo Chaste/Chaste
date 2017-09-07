@@ -34,28 +34,29 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "EllipticGrowingDomainPdeSystemModifier.hpp"
-#include "CellBasedEllipticPdeSolver.hpp"
+#include "CellBasedEllipticPdeSystemSolver.hpp"
 #include "AveragedSourceEllipticPde.hpp"
 
-template<unsigned DIM>
-EllipticGrowingDomainPdeSystemModifier<DIM>::EllipticGrowingDomainPdeSystemModifier(boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,1> > pPdeSystem,
+template <unsigned DIM, unsigned PROBLEM_DIM>
+EllipticGrowingDomainPdeSystemModifier<DIM,PROBLEM_DIM>::EllipticGrowingDomainPdeSystemModifier(
+    boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,PROBLEM_DIM> > pPdeSystem,
     std::vector<boost::shared_ptr<AbstractBoundaryCondition<DIM> > > pBoundaryConditions,
     bool isNeumannBoundaryCondition,
     Vec solution)
-    : AbstractGrowingDomainPdeSystemModifier<DIM>(pPdeSystem,
-                                                  pBoundaryConditions,
-                                                  isNeumannBoundaryCondition,
-                                                  solution)
+    : AbstractGrowingDomainPdeSystemModifier<DIM,PROBLEM_DIM>(pPdeSystem,
+                                                              pBoundaryConditions,
+                                                              isNeumannBoundaryCondition,
+                                                              solution)
 {
 }
 
-template<unsigned DIM>
-EllipticGrowingDomainPdeSystemModifier<DIM>::~EllipticGrowingDomainPdeSystemModifier()
+template <unsigned DIM, unsigned PROBLEM_DIM>
+EllipticGrowingDomainPdeSystemModifier<DIM,PROBLEM_DIM>::~EllipticGrowingDomainPdeSystemModifier()
 {
 }
 
-template<unsigned DIM>
-void EllipticGrowingDomainPdeSystemModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
+template <unsigned DIM, unsigned PROBLEM_DIM>
+void EllipticGrowingDomainPdeSystemModifier<DIM,PROBLEM_DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
     this->GenerateFeMesh(rCellPopulation);
 
@@ -80,12 +81,12 @@ void EllipticGrowingDomainPdeSystemModifier<DIM>::UpdateAtEndOfTimeStep(Abstract
     }
 
     // Add the BCs to the BCs container
-    std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc = this->ConstructBoundaryConditionsContainer();
+    std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,PROBLEM_DIM> > p_bcc = this->ConstructBoundaryConditionsContainer();
 
     // Use CellBasedEllipticPdeSolver as cell wise PDE
-    CellBasedEllipticPdeSolver<DIM> solver(this->mpFeMesh,
-                                           boost::static_pointer_cast<AbstractLinearEllipticPde<DIM,DIM> >(this->GetPdeSystem()).get(),
-                                           p_bcc.get());
+    CellBasedEllipticPdeSystemSolver<DIM, PROBLEM_DIM> solver(this->mpFeMesh,
+                                                              boost::static_pointer_cast<AbstractLinearEllipticPdeSystem<DIM,DIM,PROBLEM_DIM> >(this->GetPdeSystem()).get(),
+                                                              p_bcc.get());
 
     // If we have an initial guess, use this when solving the system...
     if (is_previous_solution_size_correct)
@@ -110,25 +111,25 @@ void EllipticGrowingDomainPdeSystemModifier<DIM>::UpdateAtEndOfTimeStep(Abstract
     this->UpdateCellData(rCellPopulation);
 }
 
-template<unsigned DIM>
-void EllipticGrowingDomainPdeSystemModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)
+template <unsigned DIM, unsigned PROBLEM_DIM>
+void EllipticGrowingDomainPdeSystemModifier<DIM,PROBLEM_DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)
 {
     if (boost::dynamic_pointer_cast<AveragedSourceEllipticPde<DIM> >(this->GetPdeSystem()))
     {
         EXCEPTION("EllipticGrowingDomainPdeSystemModifier cannot be used with an AveragedSourceEllipticPde. Use an EllipticBoxDomainPdeSystemModifier instead.");
     }
 
-    AbstractGrowingDomainPdeSystemModifier<DIM>::SetupSolve(rCellPopulation, outputDirectory);
+    AbstractGrowingDomainPdeSystemModifier<DIM,PROBLEM_DIM>::SetupSolve(rCellPopulation, outputDirectory);
 
     // Call these methods to solve the PDE on the initial step and output the results
     UpdateAtEndOfTimeStep(rCellPopulation);
     this->UpdateAtEndOfOutputTimeStep(rCellPopulation);
 }
 
-template<unsigned DIM>
-std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > EllipticGrowingDomainPdeSystemModifier<DIM>::ConstructBoundaryConditionsContainer()
+template <unsigned DIM, unsigned PROBLEM_DIM>
+std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,PROBLEM_DIM> > EllipticGrowingDomainPdeSystemModifier<DIM,PROBLEM_DIM>::ConstructBoundaryConditionsContainer()
 {
-    std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc(new BoundaryConditionsContainer<DIM,DIM,1>(false));
+    std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,PROBLEM_DIM> > p_bcc(new BoundaryConditionsContainer<DIM,DIM,PROBLEM_DIM>(false));
 
     // To be well-defined, elliptic PDE problems on growing domains require Dirichlet boundary conditions
     assert(!(this->IsNeumannBoundaryCondition()));
@@ -136,24 +137,23 @@ std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > EllipticGrowingDomainPd
          node_iter != this->mpFeMesh->GetBoundaryNodeIteratorEnd();
          ++node_iter)
     {
-        p_bcc->AddDirichletBoundaryCondition(*node_iter, this->mpBoundaryConditions[0].get());
+        // Loop over PDEs
+        for (unsigned pde_index=0; pde_index<PROBLEM_DIM; pde_index++)
+        {
+            p_bcc->AddDirichletBoundaryCondition(*node_iter, this->mpBoundaryConditions[pde_index].get(), pde_index);
+        }
     }
 
     return p_bcc;
 }
 
-template<unsigned DIM>
-void EllipticGrowingDomainPdeSystemModifier<DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
+template <unsigned DIM, unsigned PROBLEM_DIM>
+void EllipticGrowingDomainPdeSystemModifier<DIM,PROBLEM_DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
 {
     // No parameters to output, so just call method on direct parent class
-    AbstractGrowingDomainPdeSystemModifier<DIM>::OutputSimulationModifierParameters(rParamsFile);
+    AbstractGrowingDomainPdeSystemModifier<DIM,PROBLEM_DIM>::OutputSimulationModifierParameters(rParamsFile);
 }
-
-// Explicit instantiation
-template class EllipticGrowingDomainPdeSystemModifier<1>;
-template class EllipticGrowingDomainPdeSystemModifier<2>;
-template class EllipticGrowingDomainPdeSystemModifier<3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(EllipticGrowingDomainPdeSystemModifier)
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(EllipticGrowingDomainPdeSystemModifier)

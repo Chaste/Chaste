@@ -36,9 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ABSTRACTBOXDOMAINPDESYSTEMMODIFIER_HPP_
 #define ABSTRACTBOXDOMAINPDESYSTEMMODIFIER_HPP_
 
-#include "ChasteSerialization.hpp"
-#include <boost/serialization/base_object.hpp>
-
 #include "AbstractPdeSystemModifier.hpp"
 
 /**
@@ -46,8 +43,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * and ParabolicBoxDomainPdeSystemModifier, which both solve a linear elliptic or parabolic PDE
  * coupled to a cell-based simulation on a coarse domain.
  */
-template<unsigned DIM>
-class AbstractBoxDomainPdeSystemModifier : public AbstractPdeSystemModifier<DIM>
+template<unsigned DIM, unsigned PROBLEM_DIM>
+class AbstractBoxDomainPdeSystemModifier : public AbstractPdeSystemModifier<DIM,PROBLEM_DIM>
 {
     friend class TestEllipticBoxDomainPdeSystemModifier;
     friend class TestParabolicBoxDomainPdeSystemModifier;
@@ -67,7 +64,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractPdeSystemModifier<DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractPdeSystemModifier<DIM,PROBLEM_DIM> >(*this);
         archive & mpMeshCuboid;
         archive & mStepSize;
         archive & mSetBcsOnBoxBoundary;
@@ -109,7 +106,8 @@ public:
      * @param stepSize step size to be used in the FE mesh (defaults to 1.0, i.e. the default cell size)
      * @param solution solution vector (defaults to NULL)
      */
-    AbstractBoxDomainPdeSystemModifier(boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,1> > pPdeSystem=boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,1> >(),
+    AbstractBoxDomainPdeSystemModifier(
+        boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,PROBLEM_DIM> > pPdeSystem=boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,PROBLEM_DIM> >(),
         std::vector<boost::shared_ptr<AbstractBoundaryCondition<DIM> > > pBoundaryConditions=std::vector<boost::shared_ptr<AbstractBoundaryCondition<DIM> > >(),
         bool isNeumannBoundaryCondition=true,
         boost::shared_ptr<ChasteCuboid<DIM> > pMeshCuboid=boost::shared_ptr<ChasteCuboid<DIM> >(),
@@ -192,8 +190,5 @@ public:
      */
     void OutputSimulationModifierParameters(out_stream& rParamsFile);
 };
-
-#include "SerializationExportWrapper.hpp"
-TEMPLATED_CLASS_IS_ABSTRACT_1_UNSIGNED(AbstractBoxDomainPdeSystemModifier)
 
 #endif /*ABSTRACTBOXDOMAINPDESYSTEMMODIFIER_HPP_*/

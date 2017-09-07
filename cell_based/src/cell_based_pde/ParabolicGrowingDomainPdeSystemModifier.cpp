@@ -34,41 +34,42 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "ParabolicGrowingDomainPdeSystemModifier.hpp"
-#include "CellBasedParabolicPdeSolver.hpp"
+#include "CellBasedParabolicPdeSystemSolver.hpp"
 #include "AveragedSourceParabolicPde.hpp"
 
-template<unsigned DIM>
-ParabolicGrowingDomainPdeSystemModifier<DIM>::ParabolicGrowingDomainPdeSystemModifier(boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,1> > pPdeSystem,
+template <unsigned DIM, unsigned PROBLEM_DIM>
+ParabolicGrowingDomainPdeSystemModifier<DIM,PROBLEM_DIM>::ParabolicGrowingDomainPdeSystemModifier(
+    boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,PROBLEM_DIM> > pPdeSystem,
     std::vector<boost::shared_ptr<AbstractBoundaryCondition<DIM> > > pBoundaryConditions,
     bool isNeumannBoundaryCondition,
     Vec solution)
-    : AbstractGrowingDomainPdeSystemModifier<DIM>(pPdeSystem,
-                                                  pBoundaryConditions,
-                                                  isNeumannBoundaryCondition,
-                                                  solution)
+    : AbstractGrowingDomainPdeSystemModifier<DIM,PROBLEM_DIM>(pPdeSystem,
+                                                              pBoundaryConditions,
+                                                              isNeumannBoundaryCondition,
+                                                              solution)
 {
 }
 
-template<unsigned DIM>
-ParabolicGrowingDomainPdeSystemModifier<DIM>::~ParabolicGrowingDomainPdeSystemModifier()
+template <unsigned DIM, unsigned PROBLEM_DIM>
+ParabolicGrowingDomainPdeSystemModifier<DIM,PROBLEM_DIM>::~ParabolicGrowingDomainPdeSystemModifier()
 {
 }
 
-template<unsigned DIM>
-void ParabolicGrowingDomainPdeSystemModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
+template <unsigned DIM, unsigned PROBLEM_DIM>
+void ParabolicGrowingDomainPdeSystemModifier<DIM,PROBLEM_DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
     this->GenerateFeMesh(rCellPopulation);
 
     // Set up boundary conditions
-    std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc = ConstructBoundaryConditionsContainer();
+    std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,PROBLEM_DIM> > p_bcc = ConstructBoundaryConditionsContainer();
 
     // Construct the solution vector from cell data (takes care of cells dividing);
     UpdateSolutionVector(rCellPopulation);
 
-    // Use CellBasedParabolicPdeSolver as cell wise PDE
-    CellBasedParabolicPdeSolver<DIM> solver(this->mpFeMesh,
-                                            boost::static_pointer_cast<AbstractLinearParabolicPde<DIM,DIM> >(this->mpPdeSystem).get(),
-                                            p_bcc.get());
+    // Use CellBasedParabolicPdeSystemSolver as cell wise PDE
+    CellBasedParabolicPdeSystemSolver<DIM, PROBLEM_DIM> solver(this->mpFeMesh,
+                                                               boost::static_pointer_cast<AbstractLinearParabolicPdeSystem<DIM,DIM,PROBLEM_DIM> >(this->mpPdeSystem).get(),
+                                                               p_bcc.get());
 
     ///\todo Investigate more than one PDE time step per spatial step
     SimulationTime* p_simulation_time = SimulationTime::Instance();
@@ -88,10 +89,10 @@ void ParabolicGrowingDomainPdeSystemModifier<DIM>::UpdateAtEndOfTimeStep(Abstrac
     this->UpdateCellData(rCellPopulation);
 }
 
-template<unsigned DIM>
-void ParabolicGrowingDomainPdeSystemModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)
+template <unsigned DIM, unsigned PROBLEM_DIM>
+void ParabolicGrowingDomainPdeSystemModifier<DIM,PROBLEM_DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)
 {
-    AbstractGrowingDomainPdeSystemModifier<DIM>::SetupSolve(rCellPopulation, outputDirectory);
+    AbstractGrowingDomainPdeSystemModifier<DIM,PROBLEM_DIM>::SetupSolve(rCellPopulation, outputDirectory);
 
     if (boost::dynamic_pointer_cast<AveragedSourceParabolicPde<DIM> >(this->mpPdeSystem))
     {
@@ -108,10 +109,10 @@ void ParabolicGrowingDomainPdeSystemModifier<DIM>::SetupSolve(AbstractCellPopula
     this->UpdateAtEndOfOutputTimeStep(rCellPopulation);
 }
 
-template<unsigned DIM>
-std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ParabolicGrowingDomainPdeSystemModifier<DIM>::ConstructBoundaryConditionsContainer()
+template <unsigned DIM, unsigned PROBLEM_DIM>
+std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,PROBLEM_DIM> > ParabolicGrowingDomainPdeSystemModifier<DIM,PROBLEM_DIM>::ConstructBoundaryConditionsContainer()
 {
-    std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc(new BoundaryConditionsContainer<DIM,DIM,1>(false));
+    std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,PROBLEM_DIM> > p_bcc(new BoundaryConditionsContainer<DIM,DIM,PROBLEM_DIM>(false));
 
     if (this->IsNeumannBoundaryCondition())
     {
@@ -120,7 +121,11 @@ std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ParabolicGrowingDomainP
              elem_iter != this->mpFeMesh->GetBoundaryElementIteratorEnd();
              ++elem_iter)
         {
-            p_bcc->AddNeumannBoundaryCondition(*elem_iter, this->mpBoundaryConditions[0].get());
+            // Loop over PDEs
+            for (unsigned pde_index=0; pde_index<PROBLEM_DIM; pde_index++)
+            {
+                p_bcc->AddNeumannBoundaryCondition(*elem_iter, this->mpBoundaryConditions[pde_index].get(), pde_index);
+            }
         }
     }
     else
@@ -130,15 +135,19 @@ std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ParabolicGrowingDomainP
              node_iter != this->mpFeMesh->GetBoundaryNodeIteratorEnd();
              ++node_iter)
         {
-            p_bcc->AddDirichletBoundaryCondition(*node_iter, this->mpBoundaryConditions[0].get());
+            // Loop over PDEs
+            for (unsigned pde_index=0; pde_index<PROBLEM_DIM; pde_index++)
+            {
+                p_bcc->AddDirichletBoundaryCondition(*node_iter, this->mpBoundaryConditions[pde_index].get(), pde_index);
+            }
         }
     }
 
     return p_bcc;
 }
 
-template<unsigned DIM>
-void ParabolicGrowingDomainPdeSystemModifier<DIM>::UpdateSolutionVector(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
+template <unsigned DIM, unsigned PROBLEM_DIM>
+void ParabolicGrowingDomainPdeSystemModifier<DIM,PROBLEM_DIM>::UpdateSolutionVector(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
     // Clear (if it's not the first time) and resize the solution vector
     if (this->mSolution)
@@ -169,19 +178,14 @@ void ParabolicGrowingDomainPdeSystemModifier<DIM>::UpdateSolutionVector(Abstract
     }
 }
 
-template<unsigned DIM>
-void ParabolicGrowingDomainPdeSystemModifier<DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
+template <unsigned DIM, unsigned PROBLEM_DIM>
+void ParabolicGrowingDomainPdeSystemModifier<DIM,PROBLEM_DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
 {
     // No parameters to output, so just call method on direct parent class
-    AbstractGrowingDomainPdeSystemModifier<DIM>::OutputSimulationModifierParameters(rParamsFile);
+    AbstractGrowingDomainPdeSystemModifier<DIM,PROBLEM_DIM>::OutputSimulationModifierParameters(rParamsFile);
 }
-
-// Explicit instantiation
-template class ParabolicGrowingDomainPdeSystemModifier<1>;
-template class ParabolicGrowingDomainPdeSystemModifier<2>;
-template class ParabolicGrowingDomainPdeSystemModifier<3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(ParabolicGrowingDomainPdeSystemModifier)
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(ParabolicGrowingDomainPdeSystemModifier)
 

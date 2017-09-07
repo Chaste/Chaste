@@ -36,9 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ABSTRACTGROWINGDOMAINPDESYSTEMMODIFIER_HPP_
 #define ABSTRACTGROWINGDOMAINPDESYSTEMMODIFIER_HPP_
 
-#include "ChasteSerialization.hpp"
-#include <boost/serialization/base_object.hpp>
-
 #include "AbstractPdeSystemModifier.hpp"
 
 /**
@@ -46,8 +43,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * and ParabolicGrowingDomainPdeSystemModifier, which both solve a linear elliptic or parabolic PDE
  * coupled to a cell-based simulation on an evolving domain defined by the cell population.
  */
-template<unsigned DIM>
-class AbstractGrowingDomainPdeSystemModifier : public AbstractPdeSystemModifier<DIM>
+template<unsigned DIM, unsigned PROBLEM_DIM>
+class AbstractGrowingDomainPdeSystemModifier : public AbstractPdeSystemModifier<DIM,PROBLEM_DIM>
 {
     friend class TestEllipticGrowingDomainPdeSystemModifier;
     friend class TestParabolicGrowingDomainPdeSystemModifier;
@@ -66,7 +63,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractPdeSystemModifier<DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractPdeSystemModifier<DIM,PROBLEM_DIM> >(*this);
     }
 
 public:
@@ -80,7 +77,8 @@ public:
      * @param isNeumannBoundaryCondition Whether the boundary condition is Neumann (defaults to true)
      * @param solution solution vector (defaults to NULL)
      */
-    AbstractGrowingDomainPdeSystemModifier(boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,1> > pPdeSystem=boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,1> >(),
+    AbstractGrowingDomainPdeSystemModifier(
+        boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,PROBLEM_DIM> > pPdeSystem=boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,PROBLEM_DIM> >(),
         std::vector<boost::shared_ptr<AbstractBoundaryCondition<DIM> > > pBoundaryConditions=std::vector<boost::shared_ptr<AbstractBoundaryCondition<DIM> > >(),
         bool isNeumannBoundaryCondition=true,
         Vec solution=nullptr);
@@ -115,8 +113,5 @@ public:
      */
     void OutputSimulationModifierParameters(out_stream& rParamsFile);
 };
-
-#include "SerializationExportWrapper.hpp"
-TEMPLATED_CLASS_IS_ABSTRACT_1_UNSIGNED(AbstractGrowingDomainPdeSystemModifier)
 
 #endif /*ABSTRACTGROWINGDOMAINPDESYSTEMMODIFIER_HPP_*/
