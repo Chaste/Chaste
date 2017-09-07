@@ -36,10 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef PARABOLICBOXDOMAINPDESYSTEMMODIFIER_HPP_
 #define PARABOLICBOXDOMAINPDESYSTEMMODIFIER_HPP_
 
-/*
- * This is a non-abstract derived class, so we include the following header to allow
- * the class's base parts to be serialized.
- */
+#include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
 #include "AbstractBoxDomainPdeSystemModifier.hpp"
