@@ -294,7 +294,7 @@ public:
         // Test other methods
         ChastePoint<2> point;
         c_vector<double, 1> u;
-        u[0] = 2.0;
+        u[0] = 1.0;
         TS_ASSERT_DELTA(pde.ComputeSourceTerm(point, u, 0, fe_mesh.GetElement(0)), 0.3*0.5, 1e-6);
         TS_ASSERT_DELTA(pde.ComputeSourceTerm(point, u, 0, fe_mesh.GetElement(1)), 0.3*0.0, 1e-6);
 

@@ -1461,7 +1461,7 @@ public:
         // Create PDE and boundary condition objects
         MAKE_PTR_ARGS(AveragedSourceEllipticPde<1>, p_pde, (cell_population, -1.0));
         MAKE_PTR_ARGS(ConstBoundaryCondition<1>, p_bc, (0.0));
-        std::vector<boost::shared_ptr<AbstractBoundaryCondition<2> > > bc_vector;
+        std::vector<boost::shared_ptr<AbstractBoundaryCondition<1> > > bc_vector;
         bc_vector.push_back(p_bc);
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
