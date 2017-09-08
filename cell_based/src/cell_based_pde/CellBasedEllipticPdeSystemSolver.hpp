@@ -139,4 +139,117 @@ public:
     virtual ~CellBasedEllipticPdeSystemSolver();
 };
 
+/*
+ * As this class is templated over PROBLEM_DIM, we put the implementation
+ * in the header file to avoid explicit instantiation.
+ */
+
+template<unsigned DIM, unsigned PROBLEM_DIM>
+CellBasedEllipticPdeSystemSolver<DIM, PROBLEM_DIM>::CellBasedEllipticPdeSystemSolver(
+    TetrahedralMesh<DIM, DIM>* pMesh,
+    AbstractLinearEllipticPdeSystem<DIM, DIM, PROBLEM_DIM>* pPdeSystem,
+    BoundaryConditionsContainer<DIM, DIM, PROBLEM_DIM>* pBoundaryConditions)
+    : LinearEllipticPdeSystemSolver<DIM, DIM, PROBLEM_DIM>(pMesh, pPdeSystem, pBoundaryConditions)
+{
+}
+
+template<unsigned DIM, unsigned PROBLEM_DIM>
+CellBasedEllipticPdeSystemSolver<DIM, PROBLEM_DIM>::~CellBasedEllipticPdeSystemSolver()
+{
+}
+
+template<unsigned DIM, unsigned PROBLEM_DIM>
+c_vector<double, PROBLEM_DIM*(DIM+1)> CellBasedEllipticPdeSystemSolver<DIM, PROBLEM_DIM>::ComputeVectorTerm(
+    c_vector<double, DIM+1>& rPhi,
+    c_matrix<double, DIM, DIM+1>& rGradPhi,
+    ChastePoint<DIM>& rX,
+    c_vector<double, PROBLEM_DIM>& rU,
+    c_matrix<double, PROBLEM_DIM, DIM>& rGradU /* not used */,
+    Element<DIM, DIM>* pElement)
+{
+    c_vector<double, PROBLEM_DIM*(DIM+1)> vector_term = zero_vector<double>(PROBLEM_DIM*(DIM+1));
+
+    // Loop over PDEs and populate vector_term
+    for (unsigned pde_index=0; pde_index<PROBLEM_DIM; pde_index++)
+    {
+        c_vector<double, DIM+1> this_vector_term = mInterpolatedConstantInUSourceTerm[pde_index] * rPhi;
+
+        for (unsigned i=0; i<DIM+1; i++)
+        {
+            vector_term(i*PROBLEM_DIM + pde_index) = this_vector_term(i);
+        }
+    }
+
+    return vector_term;
+}
+
+template<unsigned DIM, unsigned PROBLEM_DIM>
+c_matrix<double, PROBLEM_DIM*(DIM+1), PROBLEM_DIM*(DIM+1)> CellBasedEllipticPdeSystemSolver<DIM, PROBLEM_DIM>::ComputeMatrixTerm(
+    c_vector<double, DIM+1>& rPhi,
+    c_matrix<double, DIM, DIM+1>& rGradPhi,
+    ChastePoint<DIM>& rX,
+    c_vector<double, PROBLEM_DIM>& rU,
+    c_matrix<double, PROBLEM_DIM, DIM>& rGradU,
+    Element<DIM, DIM>* pElement)
+{
+    c_matrix<double, PROBLEM_DIM*(DIM+1), PROBLEM_DIM*(DIM+1)> matrix_term = zero_matrix<double>(PROBLEM_DIM*(DIM+1), PROBLEM_DIM*(DIM+1));
+
+    // Loop over PDEs and populate matrix_term
+    for (unsigned pde_index=0; pde_index<PROBLEM_DIM; pde_index++)
+    {
+        c_matrix<double, 1*(DIM+1), 1*(DIM+1)> this_stiffness_matrix = zero_matrix<double>(1*(DIM+1), 1*(DIM+1));
+        c_matrix<double, DIM, DIM> this_pde_diffusion_term = this->mpEllipticPdeSystem->ComputeDiffusionTerm(rX, pde_index);
+
+        // This if statement just saves computing phi*phi^T if it is to be multiplied by zero
+        if (mInterpolatedLinearInUCoeffInSourceTerm[pde_index] != 0)
+        {
+            this_stiffness_matrix = prod(trans(rGradPhi), c_matrix<double, DIM, DIM+1>(prod(this_pde_diffusion_term, rGradPhi))) - mInterpolatedLinearInUCoeffInSourceTerm[pde_index]*outer_prod(rPhi,rPhi);
+        }
+        else
+        {
+            this_stiffness_matrix = prod(trans(rGradPhi), c_matrix<double, DIM, DIM+1>(prod(this_pde_diffusion_term, rGradPhi)));
+        }
+
+        for (unsigned i=0; i<DIM+1; i++)
+        {
+            for (unsigned j=0; j<DIM+1; j++)
+            {
+                matrix_term(i*PROBLEM_DIM + pde_index, j*PROBLEM_DIM + pde_index) = this_stiffness_matrix(i,j);
+            }
+        }
+    }
+    return matrix_term;
+}
+
+template<unsigned DIM, unsigned PROBLEM_DIM>
+void CellBasedEllipticPdeSystemSolver<DIM, PROBLEM_DIM>::ResetInterpolatedQuantities()
+{
+    mInterpolatedConstantInUSourceTerm.clear();
+    mInterpolatedConstantInUSourceTerm.resize(PROBLEM_DIM);
+    std::fill(mInterpolatedConstantInUSourceTerm.begin(), mInterpolatedConstantInUSourceTerm.end(), 0);
+
+    mInterpolatedLinearInUCoeffInSourceTerm.clear();
+    mInterpolatedLinearInUCoeffInSourceTerm.resize(PROBLEM_DIM);
+    std::fill(mInterpolatedLinearInUCoeffInSourceTerm.begin(), mInterpolatedLinearInUCoeffInSourceTerm.end(), 0);
+}
+
+template<unsigned DIM, unsigned PROBLEM_DIM>
+void CellBasedEllipticPdeSystemSolver<DIM, PROBLEM_DIM>::IncrementInterpolatedQuantities(double phiI, const Node<DIM>* pNode)
+{
+    for (unsigned pde_index=0; pde_index<PROBLEM_DIM; pde_index++)
+    {
+        mInterpolatedConstantInUSourceTerm[pde_index] += phiI * this->mpEllipticPdeSystem->ComputeConstantInUSourceTermAtNode(*pNode, pde_index);
+        mInterpolatedLinearInUCoeffInSourceTerm[pde_index] += phiI * this->mpEllipticPdeSystem->ComputeLinearInUCoeffInSourceTermAtNode(*pNode, pde_index);
+    }
+}
+
+template<unsigned DIM, unsigned PROBLEM_DIM>
+void CellBasedEllipticPdeSystemSolver<DIM, PROBLEM_DIM>::InitialiseForSolve(Vec initialSolution)
+{
+    // Linear system created here
+    LinearEllipticPdeSystemSolver<DIM, DIM, PROBLEM_DIM>::InitialiseForSolve(initialSolution);
+
+    this->mpLinearSystem->SetMatrixIsSymmetric(true);
+}
+
 #endif /*CELLBASEDELLIPTICPDESYSTEMSOLVER_HPP_*/

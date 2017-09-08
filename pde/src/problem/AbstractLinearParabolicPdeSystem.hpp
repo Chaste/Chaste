@@ -122,8 +122,6 @@ public:
                                            unsigned pdeIndex);
 
     /**
-     * \todo #2930 should the NULL below be nullptr?
-     *
      * @return computed diffusion term D_i(x) at a point in space. The diffusion tensor should be symmetric and positive definite.
      *
      * @param rX The point x at which the diffusion term D_i is computed
@@ -132,7 +130,7 @@ public:
      */
     virtual c_matrix<double, SPACE_DIM, SPACE_DIM> ComputeDiffusionTerm(const ChastePoint<SPACE_DIM>& rX,
                                                                         unsigned pdeIndex,
-                                                                        Element<ELEMENT_DIM,SPACE_DIM>* pElement=NULL)=0;
+                                                                        Element<ELEMENT_DIM,SPACE_DIM>* pElement=nullptr)=0;
 };
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>

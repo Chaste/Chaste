@@ -134,6 +134,8 @@ public:
         // Create PDE and boundary condition objects
         MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, -0.1));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
+        std::vector<boost::shared_ptr<AbstractBoundaryCondition<2> > > bc_vector;
+        bc_vector.push_back(p_bc);
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         ChastePoint<2> lower(-5.0, -5.0);
@@ -141,7 +143,7 @@ public:
         MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, bc_vector, false, p_cuboid));
         p_pde_modifier->SetDependentVariableName("oxygen");
 
         simulator.AddSimulationModifier(p_pde_modifier);
@@ -190,6 +192,8 @@ public:
         // Create PDE and boundary condition objects
         MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, -0.1));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
+        std::vector<boost::shared_ptr<AbstractBoundaryCondition<2> > > bc_vector;
+        bc_vector.push_back(p_bc);
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         ChastePoint<2> lower(-5.0, -5.0);
@@ -197,7 +201,7 @@ public:
         MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, bc_vector, false, p_cuboid));
         p_pde_modifier->SetDependentVariableName("oxygen");
 
         simulator.AddSimulationModifier(p_pde_modifier);
@@ -246,6 +250,8 @@ public:
         // Create PDE and boundary condition objects
         MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, -0.1));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
+        std::vector<boost::shared_ptr<AbstractBoundaryCondition<2> > > bc_vector;
+        bc_vector.push_back(p_bc);
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         ChastePoint<2> lower(-5.0, -5.0);
@@ -253,7 +259,7 @@ public:
         MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, bc_vector, false, p_cuboid));
         p_pde_modifier->SetDependentVariableName("oxygen");
 
         simulator.AddSimulationModifier(p_pde_modifier);
@@ -304,6 +310,8 @@ public:
         // Create PDE and boundary condition objects
         MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, -0.1));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
+        std::vector<boost::shared_ptr<AbstractBoundaryCondition<2> > > bc_vector;
+        bc_vector.push_back(p_bc);
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         ChastePoint<2> lower(-5.0, -5.0);
@@ -311,7 +319,7 @@ public:
         MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, bc_vector, false, p_cuboid));
         p_pde_modifier->SetDependentVariableName("oxygen");
 
         simulator.AddSimulationModifier(p_pde_modifier);
@@ -363,6 +371,8 @@ public:
         // Create PDE and boundary condition objects
         MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, -0.1));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
+        std::vector<boost::shared_ptr<AbstractBoundaryCondition<2> > > bc_vector;
+        bc_vector.push_back(p_bc);
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         ChastePoint<2> lower(-5.0, -5.0);
@@ -370,7 +380,7 @@ public:
         MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, bc_vector, false, p_cuboid));
         p_pde_modifier->SetDependentVariableName("oxygen");
 
         simulator.AddSimulationModifier(p_pde_modifier);
@@ -429,6 +439,8 @@ public:
         // Create PDE and boundary condition objects
         MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, -0.1));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
+        std::vector<boost::shared_ptr<AbstractBoundaryCondition<2> > > bc_vector;
+        bc_vector.push_back(p_bc);
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         ChastePoint<2> lower(-5.0, -5.0);
@@ -436,7 +448,7 @@ public:
         MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, bc_vector, false, p_cuboid));
         p_pde_modifier->SetDependentVariableName("oxygen");
 
         simulator.AddSimulationModifier(p_pde_modifier);

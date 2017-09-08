@@ -221,6 +221,8 @@ public:
          * (a Dirichlet boundary condition) below.
          */
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
+        std::vector<boost::shared_ptr<AbstractBoundaryCondition<2> > > bc_vector;
+        bc_vector.push_back(p_bc);
         bool is_neumann_bc = false;
 
         /*
@@ -240,7 +242,7 @@ public:
          *
          * The {{{CellData}}} class, is used to stores the value of the current nutrient concentration for each cell.
          */
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, is_neumann_bc));
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, bc_vector, is_neumann_bc));
         p_pde_modifier->SetDependentVariableName("oxygen");
 
         /*

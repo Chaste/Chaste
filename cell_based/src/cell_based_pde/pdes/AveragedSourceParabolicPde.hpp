@@ -132,7 +132,8 @@ public:
      * @param rCoarseMesh reference to the coarse mesh
      * @param pCellPdeElementMap optional pointer to the map from cells to coarse elements
      */
-    void virtual SetupSourceTerms(TetrahedralMesh<DIM,DIM>& rCoarseMesh, std::map<CellPtr, unsigned>* pCellPdeElementMap=nullptr);
+    void virtual SetupSourceTerms(TetrahedralMesh<DIM, DIM>& rCoarseMesh,
+                                  std::map<CellPtr, unsigned>* pCellPdeElementMap=nullptr);
 
     /**
      * Overridden ComputeDuDtCoefficientFunction() method.
@@ -151,17 +152,17 @@ public:
      * @return computed source term
      *
      * @param rX the point x at which the source term is computed
-     * @param rU the vector of dependent variables (u_0, ..., u_{p-1}) at the point x
+     * @param rU the dependent variable, u, at the point x as a vector
      * @param pdeIndex the index of the PDE, denoted by i above (unused)
      * @param pElement The mesh element that x is contained in (optional)
      */
     virtual double ComputeSourceTerm(const ChastePoint<DIM>& rX,
                                      c_vector<double,1>& rU,
                                      unsigned pdeIndex,
-                                     Element<DIM,DIM>* pElement=nullptr);
+                                     Element<DIM, DIM>* pElement=nullptr);
 
     /**
-     * Overridden ComputeSourceTermAtNode() method (unused).
+     * Overridden ComputeSourceTermAtNode() method.
      *
      * @return computed source term at a node.
      *
@@ -174,11 +175,13 @@ public:
                                            unsigned pdeIndex);
 
     /**
-     * @return computed diffusion term D_i(x) at a point in space. The diffusion tensor should be symmetric and positive definite.
+     * Overridden ComputeDiffusionTerm() method.
      *
-     * @param rX The point x at which the diffusion term D_i is computed
-     * @param pdeIndex the index of the PDE, denoted by i above
-     * @param pElement The mesh element that x is contained in (optional)
+     * @return computed diffusion term D(x) at a point in space
+     *
+     * @param rX The point x at which the diffusion term D is computed
+     * @param pdeIndex the index of the PDE (unused)
+     * @param pElement The mesh element that x is contained in (optional; unused)
      */
     virtual c_matrix<double, DIM, DIM> ComputeDiffusionTerm(const ChastePoint<DIM>& rX,
                                                             unsigned pdeIndex,
@@ -194,8 +197,6 @@ public:
 
 #include "SerializationExportWrapper.hpp"
 EXPORT_TEMPLATE_CLASS_SAME_DIMS(AveragedSourceParabolicPde)
-#include "ParabolicPdeSystemModifiersExportWrapper.hpp"
-EXPORT_PARABOLIC_PDE_SYSTEM_MODIFIERS_FOR_PROBLEM_DIM(1)
 
 namespace boost
 {

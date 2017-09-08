@@ -139,8 +139,10 @@ public:
         // Create PDE and boundary condition objects
         MAKE_PTR_ARGS(CellwiseSourceParabolicPde<2>, p_pde, (cell_population, M_DUDT_COEFFICIENT,M_DIFFUSION_CONSTANT,M_UPTAKE_RATE));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
+        std::vector<boost::shared_ptr<AbstractBoundaryCondition<2> > > bc_vector;
+        bc_vector.push_back(p_bc);
 
-        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
+        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, bc_vector, false));
         p_pde_modifier->SetDependentVariableName("oxygen");
         simulator.AddSimulationModifier(p_pde_modifier);
 
@@ -190,7 +192,9 @@ public:
         // Create PDE and boundary condition objects
         MAKE_PTR_ARGS(CellwiseSourceParabolicPde<2>, p_pde, (cell_population, M_DUDT_COEFFICIENT,M_DIFFUSION_CONSTANT,M_UPTAKE_RATE));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
-        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
+        std::vector<boost::shared_ptr<AbstractBoundaryCondition<2> > > bc_vector;
+        bc_vector.push_back(p_bc);
+        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, bc_vector, false));
         p_pde_modifier->SetDependentVariableName("oxygen");
         simulator.AddSimulationModifier(p_pde_modifier);
 
@@ -240,7 +244,9 @@ public:
         // Create PDE and boundary condition objects
         MAKE_PTR_ARGS(CellwiseSourceParabolicPde<2>, p_pde, (cell_population, M_DUDT_COEFFICIENT,M_DIFFUSION_CONSTANT,M_UPTAKE_RATE));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
-        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
+        std::vector<boost::shared_ptr<AbstractBoundaryCondition<2> > > bc_vector;
+        bc_vector.push_back(p_bc);
+        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, bc_vector, false));
         p_pde_modifier->SetDependentVariableName("oxygen");
         simulator.AddSimulationModifier(p_pde_modifier);
 
@@ -292,7 +298,9 @@ public:
         // Create PDE and boundary condition objects
         MAKE_PTR_ARGS(CellwiseSourceParabolicPde<2>, p_pde, (cell_population, M_DUDT_COEFFICIENT,M_DIFFUSION_CONSTANT,M_UPTAKE_RATE));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
-        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
+        std::vector<boost::shared_ptr<AbstractBoundaryCondition<2> > > bc_vector;
+        bc_vector.push_back(p_bc);
+        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, bc_vector, false));
         p_pde_modifier->SetDependentVariableName("oxygen");
         simulator.AddSimulationModifier(p_pde_modifier);
 
@@ -334,7 +342,9 @@ public:
         // Create PDE and boundary condition objects
         MAKE_PTR_ARGS(CellwiseSourceParabolicPde<2>, p_pde, (cell_population, M_DUDT_COEFFICIENT,M_DIFFUSION_CONSTANT,M_UPTAKE_RATE));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
-        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
+        std::vector<boost::shared_ptr<AbstractBoundaryCondition<2> > > bc_vector;
+        bc_vector.push_back(p_bc);
+        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, bc_vector, false));
         p_pde_modifier->SetDependentVariableName("oxygen");
         simulator.AddSimulationModifier(p_pde_modifier);
 
@@ -393,7 +403,9 @@ public:
         // Create PDE and boundary condition objects
         MAKE_PTR_ARGS(CellwiseSourceParabolicPde<2>, p_pde, (cell_population, M_DUDT_COEFFICIENT, M_DIFFUSION_CONSTANT, M_UPTAKE_RATE));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
-        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
+        std::vector<boost::shared_ptr<AbstractBoundaryCondition<2> > > bc_vector;
+        bc_vector.push_back(p_bc);
+        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, bc_vector, false));
         p_pde_modifier->SetDependentVariableName("oxygen");
         simulator.AddSimulationModifier(p_pde_modifier);
 

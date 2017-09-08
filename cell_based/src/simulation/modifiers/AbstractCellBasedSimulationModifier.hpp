@@ -131,4 +131,6 @@ public:
     virtual void OutputSimulationModifierParameters(out_stream& rParamsFile)=0;
 };
 
+TEMPLATED_CLASS_IS_ABSTRACT_2_UNSIGNED(AbstractCellBasedSimulationModifier)
+
 #endif /*ABSTRACTCELLBASEDSIMULATIONMODIFIER_HPP_*/

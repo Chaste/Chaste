@@ -35,9 +35,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "UniformSourceParabolicPde.hpp"
 
-template <unsigned DIM>
+template<unsigned DIM>
 UniformSourceParabolicPde<DIM>::UniformSourceParabolicPde(double sourceCoefficient)
-    : mSourceCoefficient(sourceCoefficient)
+    : AbstractLinearParabolicPdeSystem<DIM, DIM>(),
+      mSourceCoefficient(sourceCoefficient)
 {
 }
 
@@ -48,19 +49,28 @@ double UniformSourceParabolicPde<DIM>::GetCoefficient() const
 }
 
 template<unsigned DIM>
-double UniformSourceParabolicPde<DIM>::ComputeSourceTerm(const ChastePoint<DIM>& rX, double u, Element<DIM,DIM>* pElement)
+double UniformSourceParabolicPde<DIM>::ComputeSourceTerm(
+    const ChastePoint<DIM>& rX,
+    c_vector<double,1>& rU,
+    unsigned pdeIndex,
+    Element<DIM,DIM>* pElement)
 {
     return mSourceCoefficient;
 }
 
 template<unsigned DIM>
-c_matrix<double,DIM,DIM> UniformSourceParabolicPde<DIM>::ComputeDiffusionTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement)
+c_matrix<double,DIM,DIM> UniformSourceParabolicPde<DIM>::ComputeDiffusionTerm(
+    const ChastePoint<DIM>& rX,
+    unsigned pdeIndex,
+    Element<DIM,DIM>* pElement)
 {
     return identity_matrix<double>(DIM);
 }
 
 template<unsigned DIM>
-double UniformSourceParabolicPde<DIM>::ComputeDuDtCoefficientFunction(const ChastePoint<DIM>& rX)
+double UniformSourceParabolicPde<DIM>::ComputeDuDtCoefficientFunction(
+    const ChastePoint<DIM>& rX,
+    unsigned pdeIndex)
 {
     return 1.0;
 }

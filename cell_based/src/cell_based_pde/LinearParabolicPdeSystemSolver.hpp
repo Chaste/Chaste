@@ -125,4 +125,81 @@ public:
                                    BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>* pBoundaryConditions);
 };
 
+/*
+ * As this class is templated over PROBLEM_DIM, we put the implementation
+ * in the header file to avoid explicit instantiation.
+ */
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+LinearParabolicPdeSystemSolver<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::LinearParabolicPdeSystemSolver(
+    AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
+    AbstractLinearParabolicPdeSystem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>* pPdeSystem,
+    BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>* pBoundaryConditions)
+    : AbstractAssemblerSolverHybrid<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, NORMAL>(pMesh, pBoundaryConditions),
+      AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>(pMesh)
+{
+    mpParabolicPdeSystem = pPdeSystem;
+    this->mMatrixIsConstant = true;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+c_matrix<double, PROBLEM_DIM*(ELEMENT_DIM+1), PROBLEM_DIM*(ELEMENT_DIM+1)> LinearParabolicPdeSystemSolver<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::ComputeMatrixTerm(
+        c_vector<double, ELEMENT_DIM+1>& rPhi,
+        c_matrix<double, SPACE_DIM, ELEMENT_DIM+1>& rGradPhi,
+        ChastePoint<SPACE_DIM>& rX,
+        c_vector<double, PROBLEM_DIM>& rU,
+        c_matrix<double, PROBLEM_DIM,SPACE_DIM>& rGradU,
+        Element<ELEMENT_DIM,SPACE_DIM>* pElement)
+{
+    double timestep_inverse = PdeSimulationTime::GetPdeTimeStepInverse();
+    c_matrix<double, PROBLEM_DIM*(ELEMENT_DIM+1), PROBLEM_DIM*(ELEMENT_DIM+1)> matrix_term = zero_matrix<double>(PROBLEM_DIM*(ELEMENT_DIM+1), PROBLEM_DIM*(ELEMENT_DIM+1));
+
+    // Loop over PDEs and populate matrix_term
+    for (unsigned pde_index=0; pde_index<PROBLEM_DIM; pde_index++)
+    {
+        double this_dudt_coefficient = mpParabolicPdeSystem->ComputeDuDtCoefficientFunction(rX, pde_index);
+        c_matrix<double, SPACE_DIM, SPACE_DIM> this_pde_diffusion_term = mpParabolicPdeSystem->ComputeDiffusionTerm(rX, pde_index, pElement);
+        c_matrix<double, 1*(ELEMENT_DIM+1), 1*(ELEMENT_DIM+1)> this_stiffness_matrix =
+            prod(trans(rGradPhi), c_matrix<double, SPACE_DIM, ELEMENT_DIM+1>(prod(this_pde_diffusion_term, rGradPhi)) )
+                + timestep_inverse * this_dudt_coefficient * outer_prod(rPhi, rPhi);
+
+        for (unsigned i=0; i<ELEMENT_DIM+1; i++)
+        {
+            for (unsigned j=0; j<ELEMENT_DIM+1; j++)
+            {
+                matrix_term(i*PROBLEM_DIM + pde_index, j*PROBLEM_DIM + pde_index) = this_stiffness_matrix(i,j);
+            }
+        }
+    }
+    return matrix_term;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+c_vector<double, PROBLEM_DIM*(ELEMENT_DIM+1)> LinearParabolicPdeSystemSolver<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::ComputeVectorTerm(
+        c_vector<double, ELEMENT_DIM+1>& rPhi,
+        c_matrix<double, SPACE_DIM, ELEMENT_DIM+1>& rGradPhi,
+        ChastePoint<SPACE_DIM>& rX,
+        c_vector<double, PROBLEM_DIM>& rU,
+        c_matrix<double, PROBLEM_DIM, SPACE_DIM>& rGradU,
+        Element<ELEMENT_DIM,SPACE_DIM>* pElement)
+{
+    double timestep_inverse = PdeSimulationTime::GetPdeTimeStepInverse();
+    c_vector<double, PROBLEM_DIM*(ELEMENT_DIM+1)> vector_term = zero_vector<double>(PROBLEM_DIM*(ELEMENT_DIM+1));
+
+    // Loop over PDEs and populate vector_term
+    for (unsigned pde_index=0; pde_index<PROBLEM_DIM; pde_index++)
+    {
+        double this_dudt_coefficient = mpParabolicPdeSystem->ComputeDuDtCoefficientFunction(rX, pde_index);
+        double this_source_term = mpParabolicPdeSystem->ComputeSourceTerm(rX, rU, pde_index);
+        c_vector<double, ELEMENT_DIM+1> this_vector_term = (this_source_term + timestep_inverse*this_dudt_coefficient*rU(pde_index))* rPhi;
+
+        for (unsigned i=0; i<ELEMENT_DIM+1; i++)
+        {
+            vector_term(i*PROBLEM_DIM + pde_index) = this_vector_term(i);
+        }
+    }
+
+    return vector_term;
+}
+
 #endif /*LINEARPARABOLICPDESYSTEMSOLVER_HPP_*/

@@ -40,7 +40,8 @@ CellwiseSourceParabolicPde<DIM>::CellwiseSourceParabolicPde(AbstractCellPopulati
                                                             double duDtCoefficient,
                                                             double diffusionCoefficient,
                                                             double sourceCoefficient)
-    : mrCellPopulation(rCellPopulation),
+    : AbstractLinearParabolicPdeSystem<DIM, DIM>(),
+      mrCellPopulation(rCellPopulation),
       mDuDtCoefficient(duDtCoefficient),
       mDiffusionCoefficient(diffusionCoefficient),
       mSourceCoefficient(sourceCoefficient)
@@ -54,14 +55,20 @@ const AbstractCellPopulation<DIM,DIM>& CellwiseSourceParabolicPde<DIM>::rGetCell
 }
 
 template<unsigned DIM>
-double CellwiseSourceParabolicPde<DIM>::ComputeDuDtCoefficientFunction(const ChastePoint<DIM>& )
+double CellwiseSourceParabolicPde<DIM>::ComputeDuDtCoefficientFunction(
+    const ChastePoint<DIM>& rX,
+    unsigned pdeIndex)
 {
     return mDuDtCoefficient;
 }
 
 // LCOV_EXCL_START
 template<unsigned DIM>
-double CellwiseSourceParabolicPde<DIM>::ComputeSourceTerm(const ChastePoint<DIM>& rX, double u, Element<DIM,DIM>* pElement)
+double CellwiseSourceParabolicPde<DIM>::ComputeSourceTerm(
+    const ChastePoint<DIM>& rX,
+    c_vector<double,1>& rU,
+    unsigned pdeIndex,
+    Element<DIM,DIM>* pElement)
 {
     NEVER_REACHED;
     return 0.0;
@@ -69,7 +76,10 @@ double CellwiseSourceParabolicPde<DIM>::ComputeSourceTerm(const ChastePoint<DIM>
 // LCOV_EXCL_STOP
 
 template<unsigned DIM>
-double CellwiseSourceParabolicPde<DIM>::ComputeSourceTermAtNode(const Node<DIM>& rNode, double u)
+double CellwiseSourceParabolicPde<DIM>::ComputeSourceTermAtNode(
+    const Node<DIM>& rNode,
+    c_vector<double,1>& rU,
+    unsigned pdeIndex)
 {
     double source_coefficient = 0.0;
 
@@ -79,11 +89,14 @@ double CellwiseSourceParabolicPde<DIM>::ComputeSourceTermAtNode(const Node<DIM>&
     }
 
     // The source term is C*u
-    return source_coefficient*u;
+    return source_coefficient*rU[0];
 }
 
 template<unsigned DIM>
-c_matrix<double,DIM,DIM> CellwiseSourceParabolicPde<DIM>::ComputeDiffusionTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement)
+c_matrix<double,DIM,DIM> CellwiseSourceParabolicPde<DIM>::ComputeDiffusionTerm(
+    const ChastePoint<DIM>& rX,
+    unsigned pdeIndex,
+    Element<DIM,DIM>* pElement)
 {
     return mDiffusionCoefficient*identity_matrix<double>(DIM);
 }

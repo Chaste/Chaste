@@ -40,7 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 
 #include "AbstractCellPopulation.hpp"
-#include "AbstractLinearEllipticPde.hpp"
+#include "AbstractLinearEllipticPdeSystem.hpp"
 
 /**
  * An elliptic PDE to be solved numerically using the finite element method, for
@@ -61,7 +61,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * \todo make member names and methods consistent with those of CellwiseSourceParabolicPde
  */
 template<unsigned DIM>
-class CellwiseSourceEllipticPde : public AbstractLinearEllipticPde<DIM,DIM>
+class CellwiseSourceEllipticPde : public AbstractLinearEllipticPdeSystem<DIM, DIM>
 {
     friend class TestCellBasedEllipticPdes;
 
@@ -78,7 +78,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-       archive & boost::serialization::base_object<AbstractLinearEllipticPde<DIM, DIM> >(*this);
+       archive & boost::serialization::base_object<AbstractLinearEllipticPdeSystem<DIM, DIM> >(*this);
        archive & mSourceCoefficient;
     }
 
@@ -113,42 +113,50 @@ public:
     /**
      * Overridden ComputeConstantInUSourceTerm() method.
      *
-     * @param rX The point in space
-     * @param pElement The element
+     * @return 0.0
      *
-     * @return the constant in u part of the source term, i.e g(x) in
-     *  Div(D Grad u)  +  f(x)u + g(x) = 0.
+     * @param rX the point x at which the source term contribution is computed
+     * @param pdeIndex the index of the PDE (unused)
+     * @param pElement The mesh element that x is contained in
      */
-    virtual double ComputeConstantInUSourceTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement);
+    virtual double ComputeConstantInUSourceTerm(const ChastePoint<DIM>& rX,
+                                                unsigned pdeIndex,
+                                                Element<DIM,DIM>* pElement);
 
     /**
      * Overridden ComputeLinearInUCoeffInSourceTerm() method.
      *
-     * @param rX The point in space
-     * @param pElement the element
+     * @return k*rho(x)
      *
-     * @return the coefficient of u in the linear part of the source term, i.e f(x) in
-     *  Div(D Grad u)  +  f(x)u + g(x) = 0.
+     * @param rX The point in space
+     * @param pdeIndex the index of the PDE (unused)
+     * @param pElement The mesh element that x is contained in
      */
-    virtual double ComputeLinearInUCoeffInSourceTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement);
+    virtual double ComputeLinearInUCoeffInSourceTerm(const ChastePoint<DIM>& rX,
+                                                     unsigned pdeIndex,
+                                                     Element<DIM,DIM>* pElement);
 
     /**
      * Overridden ComputeLinearInUCoeffInSourceTermAtNode() method.
      *
-     * @param rNode reference to the node
-     * @return the coefficient of u in the linear part of the source term, i.e f(x) in
-     *  Div(D Grad u)  +  f(x)u + g(x) = 0.
+     * @return k*rho(x) \todo #2930 fix comment
+     *
+     * @param rNode the node at which the source term contribution is computed
+     * @param pdeIndex the index of the PDE (unused)
      */
-    virtual double ComputeLinearInUCoeffInSourceTermAtNode(const Node<DIM>& rNode);
+    virtual double ComputeLinearInUCoeffInSourceTermAtNode(const Node<DIM>& rNode,
+                                                           unsigned pdeIndex);
 
     /**
      * Overridden ComputeDiffusionTerm() method.
      *
-     * @param rX The point in space at which the diffusion term is computed
+     * @return the identity matrix
      *
-     * @return a matrix.
+     * @param rX a point in space (unused)
+     * @param pdeIndex the index of the PDE (unused)
      */
-    virtual c_matrix<double,DIM,DIM> ComputeDiffusionTerm(const ChastePoint<DIM>& rX);
+    virtual c_matrix<double, DIM, DIM> ComputeDiffusionTerm(const ChastePoint<DIM>& rX,
+                                                            unsigned pdeIndex);
 };
 
 #include "SerializationExportWrapper.hpp"

@@ -39,7 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
-#include "AbstractLinearParabolicPde.hpp"
+#include "AbstractLinearParabolicPdeSystem.hpp"
 
 /**
  * An elliptic PDE to be solved numerically using the finite element method, for
@@ -57,7 +57,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * on which to solve the PDE.
  */
 template <unsigned DIM>
-class UniformSourceParabolicPde : public AbstractLinearParabolicPde<DIM,DIM>
+class UniformSourceParabolicPde : public AbstractLinearParabolicPdeSystem<DIM, DIM>
 {
     friend class TestCellBasedParabolicPdes;
 
@@ -74,7 +74,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-       archive & boost::serialization::base_object<AbstractLinearParabolicPde<DIM,DIM> >(*this);
+       archive & boost::serialization::base_object<AbstractLinearParabolicPdeSystem<DIM,DIM> >(*this);
        archive & mSourceCoefficient;
     }
 
@@ -86,7 +86,7 @@ public:
     /**
      * Constructor.
      *
-     * @param sourceCoefficient the source term coefficient (defaults to 0.0)
+     * @param sourceCoefficient the source term coefficient, k (defaults to 0.0)
      */
     UniformSourceParabolicPde(double sourceCoefficient=0.0);
 
@@ -98,32 +98,40 @@ public:
     /**
      * Overridden ComputeSourceTerm() method.
      *
-     * @param rX the point in space at which the nonlinear source term is computed
-     * @param u the value of the dependent variable at the point
-     * @param pElement The element
+     * @return the source term coefficient, k
      *
-     * @return the the source term.
+     * @param rX a point in space (unused)
+     * @param rU the dependent variable, u, at the point x as a vector (unused)
+     * @param pdeIndex the index of the PDE (unused)
+     * @param pElement The mesh element that x is contained in (optional; unused)
      */
-    double ComputeSourceTerm(const ChastePoint<DIM>& rX, double u, Element<DIM,DIM>* pElement=NULL);
+    virtual double ComputeSourceTerm(const ChastePoint<DIM>& rX,
+                                     c_vector<double,1>& rU,
+                                     unsigned pdeIndex,
+                                     Element<DIM, DIM>* pElement=nullptr);
 
     /**
      * Overridden ComputeDiffusionTerm() method.
      *
-     * @param rX the point in space at which the diffusion term is computed
-     * @param pElement the mesh element that x is contained in (optional; defaults to NULL).
+     * @return the identity matrix
      *
-     * @return a matrix.
+     * @param rX a point in space (unused)
+     * @param pdeIndex the index of the PDE (unused)
+     * @param pElement The mesh element that x is contained in (optional; unused)
      */
-    c_matrix<double, DIM, DIM> ComputeDiffusionTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement=NULL);
+    virtual c_matrix<double, DIM, DIM> ComputeDiffusionTerm(const ChastePoint<DIM>& rX,
+                                                            unsigned pdeIndex,
+                                                            Element<DIM, DIM>* pElement=nullptr);
 
     /**
      * Overridden ComputeDuDtCoefficientFunction() method.
      *
-     * @return the function c(x) in "c(x) du/dt = Grad.(DiffusionTerm(x)*Grad(u))+LinearSourceTerm(x)+NonlinearSourceTerm(x, u)"
+     * @return 1.0
      *
-     * @param rX the point in space at which the function c is computed
+     * @param rX a point in space (unused)
+     * @param pdeIndex the index of the PDE (unused)
      */
-    double ComputeDuDtCoefficientFunction(const ChastePoint<DIM>& rX);
+    double ComputeDuDtCoefficientFunction(const ChastePoint<DIM>& rX, unsigned pdeIndex);
 };
 
 #include "SerializationExportWrapper.hpp"

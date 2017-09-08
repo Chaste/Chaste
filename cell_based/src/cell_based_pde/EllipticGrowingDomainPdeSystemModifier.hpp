@@ -36,11 +36,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ELLIPTICGROWINGDOMAINPDESYSTEMMODIFIER_HPP_
 #define ELLIPTICGROWINGDOMAINPDESYSTEMMODIFIER_HPP_
 
-#include "ChasteSerialization.hpp"
-#include <boost/serialization/base_object.hpp>
-
 #include "AbstractGrowingDomainPdeSystemModifier.hpp"
 #include "BoundaryConditionsContainer.hpp"
+#include "CellBasedEllipticPdeSystemSolver.hpp"
+#include "AveragedSourceEllipticPde.hpp"
 
 /**
  * A modifier class in which a linear elliptic PDE coupled to a cell-based simulation
@@ -57,27 +56,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Examples of PDEs in the source folder that can be solved using this class are
  * CellwiseSourceEllipticPde and UniformSourceEllipticPde.
  */
-template<unsigned DIM, unsigned PROBLEM_DIM>
-class EllipticGrowingDomainPdeSystemModifier : public AbstractGrowingDomainPdeSystemModifier<DIM,PROBLEM_DIM>
+template<unsigned DIM, unsigned PROBLEM_DIM=1>
+class EllipticGrowingDomainPdeSystemModifier : public AbstractGrowingDomainPdeSystemModifier<DIM, PROBLEM_DIM>
 {
     friend class TestEllipticGrowingDomainPdeSystemModifier;
-
-private:
-
-    /** Needed for serialization. */
-    friend class boost::serialization::access;
-    /**
-     * Boost Serialization method for archiving/checkpointing.
-     * Archives the object and its member variables.
-     *
-     * @param archive  The boost archive.
-     * @param version  The current version of this class.
-     */
-    template<class Archive>
-    void serialize(Archive & archive, const unsigned int version)
-    {
-        archive & boost::serialization::base_object<AbstractGrowingDomainPdeSystemModifier<DIM,PROBLEM_DIM> >(*this);
-    }
 
 public:
 
@@ -91,7 +73,7 @@ public:
      * @param solution solution vector (defaults to NULL)
      */
     EllipticGrowingDomainPdeSystemModifier(
-        boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,PROBLEM_DIM> > pPdeSystem=boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,PROBLEM_DIM> >(),
+        boost::shared_ptr<AbstractLinearPdeSystem<DIM, DIM, PROBLEM_DIM> > pPdeSystem=boost::shared_ptr<AbstractLinearPdeSystem<DIM, DIM, PROBLEM_DIM> >(),
         std::vector<boost::shared_ptr<AbstractBoundaryCondition<DIM> > > pBoundaryConditions=std::vector<boost::shared_ptr<AbstractBoundaryCondition<DIM> > >(),
         bool isNeumannBoundaryCondition=true,
         Vec solution=nullptr);
@@ -108,7 +90,7 @@ public:
      *
      * @param rCellPopulation reference to the cell population
      */
-    virtual void UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
+    virtual void UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM, DIM>& rCellPopulation);
 
     /**
      * Overridden SetupSolve() method.
@@ -118,14 +100,14 @@ public:
      * @param rCellPopulation reference to the cell population
      * @param outputDirectory the output directory, relative to where Chaste output is stored
      */
-    virtual void SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory);
+    virtual void SetupSolve(AbstractCellPopulation<DIM, DIM>& rCellPopulation, std::string outputDirectory);
 
     /**
      * Helper method to construct the boundary conditions container for the PDE.
      *
      * @return the full boundary conditions container
      */
-    virtual std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,PROBLEM_DIM> > ConstructBoundaryConditionsContainer();
+    virtual std::shared_ptr<BoundaryConditionsContainer<DIM, DIM, PROBLEM_DIM> > ConstructBoundaryConditionsContainer();
 
     /**
      * Overridden OutputSimulationModifierParameters() method.
@@ -136,41 +118,126 @@ public:
     void OutputSimulationModifierParameters(out_stream& rParamsFile);
 };
 
-namespace boost
+/*
+ * As this class is templated over PROBLEM_DIM, we put the implementation
+ * in the header file to avoid explicit instantiation.
+ */
+
+template <unsigned DIM, unsigned PROBLEM_DIM>
+EllipticGrowingDomainPdeSystemModifier<DIM, PROBLEM_DIM>::EllipticGrowingDomainPdeSystemModifier(
+    boost::shared_ptr<AbstractLinearPdeSystem<DIM, DIM, PROBLEM_DIM> > pPdeSystem,
+    std::vector<boost::shared_ptr<AbstractBoundaryCondition<DIM> > > pBoundaryConditions,
+    bool isNeumannBoundaryCondition,
+    Vec solution)
+    : AbstractGrowingDomainPdeSystemModifier<DIM, PROBLEM_DIM>(pPdeSystem,
+                                                              pBoundaryConditions,
+                                                              isNeumannBoundaryCondition,
+                                                              solution)
 {
-namespace serialization
+}
+
+template <unsigned DIM, unsigned PROBLEM_DIM>
+EllipticGrowingDomainPdeSystemModifier<DIM, PROBLEM_DIM>::~EllipticGrowingDomainPdeSystemModifier()
 {
-template<class Archive, unsigned DIM, unsigned PROBLEM_DIM>
-inline void save_construct_data(
-    Archive & ar, const EllipticGrowingDomainPdeSystemModifier<DIM,PROBLEM_DIM> * t, const unsigned int file_version)
+}
+
+template <unsigned DIM, unsigned PROBLEM_DIM>
+void EllipticGrowingDomainPdeSystemModifier<DIM, PROBLEM_DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM, DIM>& rCellPopulation)
 {
-    if (t->GetSolution())
+    this->GenerateFeMesh(rCellPopulation);
+
+    // If the solution at the previous timestep exists...
+    PetscInt previous_solution_size = 0;
+    if (this->mSolution)
     {
-        std::string archive_filename = ArchiveLocationInfo::GetArchiveDirectory() + "solution.vec";
-        PetscTools::DumpPetscObject(t->GetSolution(), archive_filename);
+        VecGetSize(this->mSolution, &previous_solution_size);
     }
-}
 
-template<class Archive, unsigned DIM, unsigned PROBLEM_DIM>
-inline void load_construct_data(
-    Archive & ar, EllipticGrowingDomainPdeSystemModifier<DIM,PROBLEM_DIM> * t, const unsigned int file_version)
-{
-    Vec solution = nullptr;
+    // ...then record whether it is the correct size...
+    bool is_previous_solution_size_correct = (previous_solution_size == (int)this->mpFeMesh->GetNumNodes());
 
-    std::string archive_filename = ArchiveLocationInfo::GetArchiveDirectory() + "solution.vec";
-    FileFinder file_finder(archive_filename, RelativeTo::Absolute);
-
-    if (file_finder.Exists())
+    // ...and if it is, store it as an initial guess for the PDE solver
+    Vec initial_guess;
+    if (is_previous_solution_size_correct)
     {
-        PetscTools::ReadPetscObject(solution, archive_filename);
+        // This Vec is copied by the solver's Solve() method, so must be deleted here too
+        VecDuplicate(this->mSolution, &initial_guess);
+        VecCopy(this->mSolution, initial_guess);
+        PetscTools::Destroy(this->mSolution);
     }
 
-    ::new(t)EllipticGrowingDomainPdeSystemModifier<DIM,PROBLEM_DIM>(boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,PROBLEM_DIM> >(),
-                                                                    std::vector<boost::shared_ptr<AbstractBoundaryCondition<DIM> > >(),
-                                                                    true,
-                                                                    solution);
+    // Add the BCs to the BCs container
+    std::shared_ptr<BoundaryConditionsContainer<DIM, DIM, PROBLEM_DIM> > p_bcc = this->ConstructBoundaryConditionsContainer();
+
+    // Use CellBasedEllipticPdeSolver as cell wise PDE
+    CellBasedEllipticPdeSystemSolver<DIM, PROBLEM_DIM> solver(this->mpFeMesh,
+                                                              boost::static_pointer_cast<AbstractLinearEllipticPdeSystem<DIM,DIM,PROBLEM_DIM> >(this->GetPdeSystem()).get(),
+                                                              p_bcc.get());
+
+    // If we have an initial guess, use this when solving the system...
+    if (is_previous_solution_size_correct)
+    {
+        this->mSolution = solver.Solve(initial_guess);
+        PetscTools::Destroy(initial_guess);
+    }
+    else // ...otherwise do not supply one
+    {
+        // The solver creates a Vec, so we have to keep a handle on the old one to destroy it
+        Vec old_solution_copy = this->mSolution;
+
+        this->mSolution = solver.Solve();
+
+        // On the first go round the vector has yet to be initialised, so we don't destroy it
+        if (old_solution_copy != nullptr)
+        {
+            PetscTools::Destroy(old_solution_copy);
+        }
+    }
+
+    this->UpdateCellData(rCellPopulation);
 }
+
+template <unsigned DIM, unsigned PROBLEM_DIM>
+void EllipticGrowingDomainPdeSystemModifier<DIM, PROBLEM_DIM>::SetupSolve(AbstractCellPopulation<DIM, DIM>& rCellPopulation, std::string outputDirectory)
+{
+    if (boost::dynamic_pointer_cast<AveragedSourceEllipticPde<DIM> >(this->GetPdeSystem()))
+    {
+        EXCEPTION("EllipticGrowingDomainPdeSystemModifier cannot be used with an AveragedSourceEllipticPde. Use an EllipticBoxDomainPdeSystemModifier instead.");
+    }
+
+    AbstractGrowingDomainPdeSystemModifier<DIM, PROBLEM_DIM>::SetupSolve(rCellPopulation, outputDirectory);
+
+    // Call these methods to solve the PDE on the initial step and output the results
+    UpdateAtEndOfTimeStep(rCellPopulation);
+    this->UpdateAtEndOfOutputTimeStep(rCellPopulation);
 }
-} // namespace ...
+
+template <unsigned DIM, unsigned PROBLEM_DIM>
+std::shared_ptr<BoundaryConditionsContainer<DIM, DIM, PROBLEM_DIM> > EllipticGrowingDomainPdeSystemModifier<DIM, PROBLEM_DIM>::ConstructBoundaryConditionsContainer()
+{
+    std::shared_ptr<BoundaryConditionsContainer<DIM, DIM, PROBLEM_DIM> > p_bcc(new BoundaryConditionsContainer<DIM, DIM, PROBLEM_DIM>(false));
+
+    // To be well-defined, elliptic PDE problems on growing domains require Dirichlet boundary conditions
+    assert(!(this->IsNeumannBoundaryCondition()));
+    for (typename TetrahedralMesh<DIM, DIM>::BoundaryNodeIterator node_iter = this->mpFeMesh->GetBoundaryNodeIteratorBegin();
+         node_iter != this->mpFeMesh->GetBoundaryNodeIteratorEnd();
+         ++node_iter)
+    {
+        // Loop over PDEs
+        for (unsigned pde_index=0; pde_index<PROBLEM_DIM; pde_index++)
+        {
+            p_bcc->AddDirichletBoundaryCondition(*node_iter, this->mpBoundaryConditions[pde_index].get(), pde_index);
+        }
+    }
+
+    return p_bcc;
+}
+
+template <unsigned DIM, unsigned PROBLEM_DIM>
+void EllipticGrowingDomainPdeSystemModifier<DIM, PROBLEM_DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
+{
+    // No parameters to output, so just call method on direct parent class
+    AbstractGrowingDomainPdeSystemModifier<DIM, PROBLEM_DIM>::OutputSimulationModifierParameters(rParamsFile);
+}
 
 #endif /*ELLIPTICGROWINGDOMAINPDESYSTEMMODIFIER_HPP_*/

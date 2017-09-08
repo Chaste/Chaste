@@ -162,9 +162,11 @@ public:
         // Create PDE and boundary condition objects
         MAKE_PTR(SimplePdeForTesting, p_pde);
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
+        std::vector<boost::shared_ptr<AbstractBoundaryCondition<2> > > bc_vector;
+        bc_vector.push_back(p_bc);
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, bc_vector, false));
         p_pde_modifier->SetDependentVariableName("oxygen");
 
         simulator.AddSimulationModifier(p_pde_modifier);
@@ -253,9 +255,11 @@ public:
         // Create PDE and boundary condition objects
         MAKE_PTR_ARGS(UniformSourceEllipticPde<2>, p_pde, (-0.1));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
+        std::vector<boost::shared_ptr<AbstractBoundaryCondition<2> > > bc_vector;
+        bc_vector.push_back(p_bc);
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, bc_vector, false));
         p_pde_modifier->SetDependentVariableName("oxygen");
 
         // Output the PDE solution at each time step
@@ -362,9 +366,11 @@ public:
         // Create PDE and boundary condition objects
         MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde, (cell_population, -0.1));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
+        std::vector<boost::shared_ptr<AbstractBoundaryCondition<2> > > bc_vector;
+        bc_vector.push_back(p_bc);
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, bc_vector, false));
         p_pde_modifier->SetDependentVariableName("oxygen");
 
         simulator.AddSimulationModifier(p_pde_modifier);
@@ -441,9 +447,11 @@ public:
         // Create PDE and boundary condition objects
         MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde, (cell_population, -0.1));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
+        std::vector<boost::shared_ptr<AbstractBoundaryCondition<2> > > bc_vector;
+        bc_vector.push_back(p_bc);
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, bc_vector, false));
         p_pde_modifier->SetDependentVariableName("oxygen");
 
         simulator.AddSimulationModifier(p_pde_modifier);
@@ -521,9 +529,11 @@ public:
         // Create PDE and boundary condition objects
         MAKE_PTR_ARGS(UniformSourceEllipticPde<2>, p_pde, (-0.1));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
+        std::vector<boost::shared_ptr<AbstractBoundaryCondition<2> > > bc_vector;
+        bc_vector.push_back(p_bc);
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, bc_vector, false));
         p_pde_modifier->SetDependentVariableName("oxygen");
 
         simulator.AddSimulationModifier(p_pde_modifier);
@@ -614,6 +624,8 @@ public:
         // Create PDE and boundary condition objects
         MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, -0.1));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
+        std::vector<boost::shared_ptr<AbstractBoundaryCondition<2> > > bc_vector;
+        bc_vector.push_back(p_bc);
 
         MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde2, (cell_population, -0.5));
 
@@ -624,14 +636,14 @@ public:
         MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid, 10.0));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, bc_vector, false, p_cuboid, 10.0));
         p_pde_modifier->SetDependentVariableName("oxygen");
         p_pde_modifier->SetBcsOnBoxBoundary(false);
 
         simulator.AddSimulationModifier(p_pde_modifier);
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeSystemModifier<2>, p_pde_modifier2, (p_pde2, p_bc, false, p_cuboid, 10.0));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeSystemModifier<2>, p_pde_modifier2, (p_pde2, bc_vector, false, p_cuboid, 10.0));
         p_pde_modifier2->SetDependentVariableName("dunno");
         p_pde_modifier2->SetBcsOnBoxBoundary(false);
 
@@ -758,6 +770,8 @@ public:
         // Create PDE and boundary condition objects
         MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, 0.0));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
+        std::vector<boost::shared_ptr<AbstractBoundaryCondition<2> > > bc_vector;
+        bc_vector.push_back(p_bc);
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         c_vector<double,2> centroid = cell_population.GetCentroidOfCellPopulation();
@@ -766,7 +780,7 @@ public:
         MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, bc_vector, false, p_cuboid));
         p_pde_modifier->SetDependentVariableName("nutrient");
 
         simulator.AddSimulationModifier(p_pde_modifier);
@@ -830,9 +844,11 @@ public:
         // Create PDE and boundary condition objects
         MAKE_PTR_ARGS(UniformSourceEllipticPde<2>, p_pde, (-0.1));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
+        std::vector<boost::shared_ptr<AbstractBoundaryCondition<2> > > bc_vector;
+        bc_vector.push_back(p_bc);
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, bc_vector, false));
         p_pde_modifier->SetDependentVariableName("oxygen");
 
         simulator.AddSimulationModifier(p_pde_modifier);
@@ -922,9 +938,11 @@ public:
         // Create PDE and boundary condition objects
         MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde, (cell_population, -0.03));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
+        std::vector<boost::shared_ptr<AbstractBoundaryCondition<2> > > bc_vector;
+        bc_vector.push_back(p_bc);
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, bc_vector, false));
         p_pde_modifier->SetDependentVariableName("oxygen");
 
         simulator.AddSimulationModifier(p_pde_modifier);
@@ -988,9 +1006,11 @@ public:
         // Create PDE and boundary condition objects
         MAKE_PTR_ARGS(UniformSourceEllipticPde<3>, p_pde, (-0.03));
         MAKE_PTR_ARGS(ConstBoundaryCondition<3>, p_bc, (1.0));
+        std::vector<boost::shared_ptr<AbstractBoundaryCondition<3> > > bc_vector;
+        bc_vector.push_back(p_bc);
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeSystemModifier<3>, p_pde_modifier, (p_pde, p_bc, false));
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeSystemModifier<3>, p_pde_modifier, (p_pde, bc_vector, false));
         p_pde_modifier->SetDependentVariableName("oxygen");
 
         simulator.AddSimulationModifier(p_pde_modifier);
@@ -1050,9 +1070,11 @@ public:
         // Create PDE and boundary condition objects
         MAKE_PTR(SimplePdeForTesting, p_pde);
         MAKE_PTR_ARGS(FunctionalBoundaryCondition<2>, p_functional_bc, (&bc_func));
+        std::vector<boost::shared_ptr<AbstractBoundaryCondition<2> > > bc_vector;
+        bc_vector.push_back(p_functional_bc);
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_functional_bc, false));
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, bc_vector, false));
         p_pde_modifier->SetDependentVariableName("oxygen");
 
         simulator.AddSimulationModifier(p_pde_modifier);
@@ -1103,9 +1125,11 @@ public:
         // Create PDE and boundary condition objects
         MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde, (cell_population, -0.03));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
+        std::vector<boost::shared_ptr<AbstractBoundaryCondition<2> > > bc_vector;
+        bc_vector.push_back(p_bc);
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, bc_vector, false));
         p_pde_modifier->SetDependentVariableName("oxygen");
 
         simulator.AddSimulationModifier(p_pde_modifier);
@@ -1168,6 +1192,8 @@ public:
         // Create PDE and boundary condition objects
         MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, 0.0));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
+        std::vector<boost::shared_ptr<AbstractBoundaryCondition<2> > > bc_vector;
+        bc_vector.push_back(p_bc);
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         c_vector<double,2> centroid = cell_population.GetCentroidOfCellPopulation();
@@ -1176,7 +1202,7 @@ public:
         MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, bc_vector, false, p_cuboid));
         p_pde_modifier->SetDependentVariableName("nutrient");
 
         simulator.AddSimulationModifier(p_pde_modifier);
@@ -1246,6 +1272,8 @@ public:
         // Create PDE and boundary condition objects (zero uptake to check analytic solution)
         MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, 0.0));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
+        std::vector<boost::shared_ptr<AbstractBoundaryCondition<2> > > bc_vector;
+        bc_vector.push_back(p_bc);
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         c_vector<double,2> centroid = cell_population.GetCentroidOfCellPopulation();
@@ -1254,7 +1282,7 @@ public:
         MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, bc_vector, false, p_cuboid));
         p_pde_modifier->SetDependentVariableName("nutrient");
 
         simulator.AddSimulationModifier(p_pde_modifier);
@@ -1343,6 +1371,8 @@ public:
         // Create PDE and boundary condition objects (uniform uptake at each cell)
         MAKE_PTR_ARGS(VolumeDependentAveragedSourceEllipticPde<2>, p_pde, (cell_population, -0.01));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
+        std::vector<boost::shared_ptr<AbstractBoundaryCondition<2> > > bc_vector;
+        bc_vector.push_back(p_bc);
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         c_vector<double,2> centroid = cell_population.GetCentroidOfCellPopulation();
@@ -1351,7 +1381,7 @@ public:
         MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, bc_vector, false, p_cuboid));
         p_pde_modifier->SetDependentVariableName("nutrient");
 
         simulator.AddSimulationModifier(p_pde_modifier);
@@ -1429,6 +1459,8 @@ public:
         // Create PDE and boundary condition objects
         MAKE_PTR_ARGS(AveragedSourceEllipticPde<1>, p_pde, (cell_population, -1.0));
         MAKE_PTR_ARGS(ConstBoundaryCondition<1>, p_bc, (0.0));
+        std::vector<boost::shared_ptr<AbstractBoundaryCondition<2> > > bc_vector;
+        bc_vector.push_back(p_bc);
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         ChastePoint<1> lower(0.0);
@@ -1436,7 +1468,7 @@ public:
         MAKE_PTR_ARGS(ChasteCuboid<1>, p_cuboid, (lower, upper));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeSystemModifier<1>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeSystemModifier<1>, p_pde_modifier, (p_pde, bc_vector, false, p_cuboid));
         p_pde_modifier->SetDependentVariableName("nutrient");
 
         simulator.AddSimulationModifier(p_pde_modifier);
@@ -1493,6 +1525,8 @@ public:
         // Create PDE and boundary condition objects
         MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, -0.01));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
+        std::vector<boost::shared_ptr<AbstractBoundaryCondition<2> > > bc_vector;
+        bc_vector.push_back(p_bc);
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         c_vector<double,2> centroid = cell_population.GetCentroidOfCellPopulation();
@@ -1501,7 +1535,7 @@ public:
         MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid, 10.0));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeSystemModifier<2>, p_pde_modifier, (p_pde, bc_vector, false, p_cuboid, 10.0));
         p_pde_modifier->SetDependentVariableName("nutrient");
         p_pde_modifier->SetBcsOnBoxBoundary(false);
 
@@ -1555,6 +1589,8 @@ public:
         // Create PDE and boundary condition objects
         MAKE_PTR_ARGS(AveragedSourceEllipticPde<3>, p_pde, (cell_population, -0.01));
         MAKE_PTR_ARGS(ConstBoundaryCondition<3>, p_bc, (1.0));
+        std::vector<boost::shared_ptr<AbstractBoundaryCondition<3> > > bc_vector;
+        bc_vector.push_back(p_bc);
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         c_vector<double,3> centroid = cell_population.GetCentroidOfCellPopulation();
@@ -1563,7 +1599,7 @@ public:
         MAKE_PTR_ARGS(ChasteCuboid<3>, p_cuboid, (lower, upper));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticBoxDomainPdeSystemModifier<3>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid, 10.0));
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeSystemModifier<3>, p_pde_modifier, (p_pde, bc_vector, false, p_cuboid, 10.0));
         p_pde_modifier->SetDependentVariableName("nutrient");
         p_pde_modifier->SetBcsOnBoxBoundary(false);
 

@@ -133,4 +133,94 @@ public:
     void InitialiseForSolve(Vec initialSolution = nullptr);
 };
 
+/*
+ * As this class is templated over PROBLEM_DIM, we put the implementation
+ * in the header file to avoid explicit instantiation.
+ */
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+LinearEllipticPdeSystemSolver<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::LinearEllipticPdeSystemSolver(
+    AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
+    AbstractLinearEllipticPdeSystem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>* pPdeSystem,
+    BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>* pBoundaryConditions)
+    : AbstractAssemblerSolverHybrid<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, NORMAL>(pMesh, pBoundaryConditions),
+      AbstractStaticLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>(pMesh)
+{
+    mpEllipticPdeSystem = pPdeSystem;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+c_matrix<double, PROBLEM_DIM*(ELEMENT_DIM+1), PROBLEM_DIM*(ELEMENT_DIM+1)>LinearEllipticPdeSystemSolver<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::ComputeMatrixTerm(
+    c_vector<double, ELEMENT_DIM+1>& rPhi,
+    c_matrix<double, SPACE_DIM, ELEMENT_DIM+1>& rGradPhi,
+    ChastePoint<SPACE_DIM>& rX,
+    c_vector<double, PROBLEM_DIM>& rU,
+    c_matrix<double, PROBLEM_DIM, SPACE_DIM>& rGradU,
+    Element<ELEMENT_DIM, SPACE_DIM>* pElement)
+{
+    c_matrix<double, PROBLEM_DIM*(ELEMENT_DIM+1), PROBLEM_DIM*(ELEMENT_DIM+1)> matrix_term = zero_matrix<double>(PROBLEM_DIM*(ELEMENT_DIM+1), PROBLEM_DIM*(ELEMENT_DIM+1));
+
+    // Loop over PDEs and populate matrix_term
+    for (unsigned pde_index=0; pde_index<PROBLEM_DIM; pde_index++)
+    {
+        c_matrix<double, 1*(ELEMENT_DIM+1), 1*(ELEMENT_DIM+1)> this_stiffness_matrix = zero_matrix<double>(1*(ELEMENT_DIM+1), 1*(ELEMENT_DIM+1));
+        c_matrix<double, SPACE_DIM, SPACE_DIM> this_pde_diffusion_term = mpEllipticPdeSystem->ComputeDiffusionTerm(rX, pde_index);
+
+        // This if statement just saves computing phi*phi^T if it is to be multiplied by zero
+        double this_source_term = mpEllipticPdeSystem->ComputeLinearInUCoeffInSourceTerm(rX, pde_index, pElement);
+        if (this_source_term != 0)
+        {
+            this_stiffness_matrix = prod(trans(rGradPhi), c_matrix<double, SPACE_DIM, ELEMENT_DIM+1>(prod(this_pde_diffusion_term, rGradPhi))) - this_source_term*outer_prod(rPhi,rPhi);
+        }
+        else
+        {
+            this_stiffness_matrix = prod(trans(rGradPhi), c_matrix<double, SPACE_DIM, ELEMENT_DIM+1>(prod(this_pde_diffusion_term, rGradPhi)));
+        }
+
+        for (unsigned i=0; i<ELEMENT_DIM+1; i++)
+        {
+            for (unsigned j=0; j<ELEMENT_DIM+1; j++)
+            {
+                matrix_term(i*PROBLEM_DIM + pde_index, j*PROBLEM_DIM + pde_index) = this_stiffness_matrix(i,j);
+            }
+        }
+    }
+    return matrix_term;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+c_vector<double, PROBLEM_DIM*(ELEMENT_DIM+1)> LinearEllipticPdeSystemSolver<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::ComputeVectorTerm(
+    c_vector<double, ELEMENT_DIM+1>& rPhi,
+    c_matrix<double, SPACE_DIM, ELEMENT_DIM+1>& rGradPhi,
+    ChastePoint<SPACE_DIM>& rX,
+    c_vector<double, PROBLEM_DIM>& rU,
+    c_matrix<double, PROBLEM_DIM, SPACE_DIM>& rGradU,
+    Element<ELEMENT_DIM, SPACE_DIM>* pElement)
+{
+    c_vector<double, PROBLEM_DIM*(ELEMENT_DIM+1)> vector_term = zero_vector<double>(PROBLEM_DIM*(ELEMENT_DIM+1));
+
+    // Loop over PDEs and populate vector_term
+    for (unsigned pde_index=0; pde_index<PROBLEM_DIM; pde_index++)
+    {
+        double this_source_term = mpEllipticPdeSystem->ComputeConstantInUSourceTerm(rX, pde_index, pElement);
+        c_vector<double, ELEMENT_DIM+1> this_vector_term = this_source_term * rPhi;
+
+        for (unsigned i=0; i<ELEMENT_DIM+1; i++)
+        {
+            vector_term(i*PROBLEM_DIM + pde_index) = this_vector_term(i);
+        }
+    }
+
+    return vector_term;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+void LinearEllipticPdeSystemSolver<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::InitialiseForSolve(Vec initialSolution)
+{
+    AbstractLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::InitialiseForSolve(initialSolution);
+    assert(this->mpLinearSystem);
+    this->mpLinearSystem->SetMatrixIsSymmetric(true);
+    this->mpLinearSystem->SetKspType("cg");
+}
+
 #endif /*LINEARELLIPTICPDESYSTEMSOLVER_HPP_*/
