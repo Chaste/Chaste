@@ -66,20 +66,20 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "EllipticBoxDomainPdeSystemModifier.hpp"
 #include "EllipticGrowingDomainPdeSystemModifier.hpp"
 
-class SimplePdeForTesting : public AbstractLinearEllipticPde<2,2>
+class SimplePdeForTesting : public AbstractLinearEllipticPdeSystem<2,2>
 {
 public:
-    double ComputeConstantInUSourceTerm(const ChastePoint<2>&, Element<2,2>* pElement)
+    double ComputeConstantInUSourceTerm(const ChastePoint<2>& rX, unsigned pdeIndex, Element<2,2>* pElement)
     {
         return -1.0;
     }
 
-    double ComputeLinearInUCoeffInSourceTerm(const ChastePoint<2>&, Element<2,2>*)
+    double ComputeLinearInUCoeffInSourceTerm(const ChastePoint<2>& rX, unsigned pdeIndex, Element<2,2>* pElement)
     {
         return 0.0;
     }
 
-    c_matrix<double,2,2> ComputeDiffusionTerm(const ChastePoint<2>& )
+    c_matrix<double,2,2> ComputeDiffusionTerm(const ChastePoint<2>& rX, unsigned pdeIndex)
     {
         return identity_matrix<double>(2);
     }
@@ -94,8 +94,8 @@ double bc_func(const ChastePoint<2>& p)
     return value;
 }
 
-///\todo move into cell_based/test/cell_based_pde
-///\todo merge content into TestSimulationsWith*DomainPdeSystemModifier and remove this test suite
+///\todo #2930 move into cell_based/test/cell_based_pde
+///\todo #2930 merge content into TestSimulationsWith*DomainPdeSystemModifier and remove this test suite
 class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestSuite
 {
   public:

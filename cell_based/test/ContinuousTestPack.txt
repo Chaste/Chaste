@@ -14,7 +14,7 @@ cell/TestOdeBasedSrnModels.hpp
 cell/TestParallelCellsGenerator.hpp
 cell/TestSimpleCellCycleModels.hpp
 cell_based_pde/TestCellBasedEllipticPdes.hpp
-cell_based_pde/TestCellBasedEllipticPdeSolver.hpp
+cell_based_pde/TestCellBasedEllipticPdeSystemSolver.hpp
 cell_based_pde/TestCellBasedParabolicPdes.hpp
 cell_based_pde/TestEllipticBoxDomainPdeSystemModifier.hpp
 cell_based_pde/TestEllipticGrowingDomainPdeSystemModifier.hpp

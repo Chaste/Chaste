@@ -169,7 +169,7 @@ void EllipticGrowingDomainPdeSystemModifier<DIM, PROBLEM_DIM>::UpdateAtEndOfTime
     // Add the BCs to the BCs container
     std::shared_ptr<BoundaryConditionsContainer<DIM, DIM, PROBLEM_DIM> > p_bcc = this->ConstructBoundaryConditionsContainer();
 
-    // Use CellBasedEllipticPdeSolver as cell wise PDE
+    // Use CellBasedEllipticPdeSystemSolver as cell wise PDE
     CellBasedEllipticPdeSystemSolver<DIM, PROBLEM_DIM> solver(this->mpFeMesh,
                                                               boost::static_pointer_cast<AbstractLinearEllipticPdeSystem<DIM,DIM,PROBLEM_DIM> >(this->GetPdeSystem()).get(),
                                                               p_bcc.get());

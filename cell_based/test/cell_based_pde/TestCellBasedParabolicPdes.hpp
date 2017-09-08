@@ -82,9 +82,11 @@ public:
         // Test methods
         ChastePoint<2> point;
         Node<2>* p_node = cell_population.GetNodeCorrespondingToCell(*(cell_population.Begin()));
-        TS_ASSERT_DELTA(pde.ComputeSourceTermAtNode(*p_node,2.0), 0.6, 1e-6);
-        TS_ASSERT_DELTA(pde.ComputeDuDtCoefficientFunction(point), 0.1, 1e-6);
-        c_matrix<double,2,2> diffusion_matrix = pde.ComputeDiffusionTerm(point);
+        c_vector<double, 1> u;
+        u[0] = 2.0;
+        TS_ASSERT_DELTA(pde.ComputeSourceTermAtNode(*p_node, u, 0), 0.6, 1e-6);
+        TS_ASSERT_DELTA(pde.ComputeDuDtCoefficientFunction(point, 0), 0.1, 1e-6);
+        c_matrix<double,2,2> diffusion_matrix = pde.ComputeDiffusionTerm(point, 0);
         for (unsigned i=0; i<2; i++)
         {
             for (unsigned j=0; j<2; j++)
@@ -118,7 +120,7 @@ public:
 
         {
             // Create a PDE object
-            AbstractLinearParabolicPde<2,2>* const p_pde = new CellwiseSourceParabolicPde<2>(cell_population, 0.1, 0.2, 0.3);
+            AbstractLinearParabolicPdeSystem<2,2>* const p_pde = new CellwiseSourceParabolicPde<2>(cell_population, 0.1, 0.2, 0.3);
 
             // Create output archive and archive PDE object
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
@@ -129,7 +131,7 @@ public:
         }
 
         {
-            AbstractLinearParabolicPde<2,2>* p_pde;
+            AbstractLinearParabolicPdeSystem<2,2>* p_pde;
 
             // Create an input archive and restore PDE object from archive
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
@@ -143,11 +145,13 @@ public:
             TS_ASSERT_EQUALS(p_static_cast_pde->mrCellPopulation.GetNumRealCells(), 25u);
 
             ChastePoint<2> point;
-
             Node<2>* p_node = cell_population.GetNodeCorrespondingToCell(*(cell_population.Begin()));
-            TS_ASSERT_DELTA(p_static_cast_pde->ComputeSourceTermAtNode(*p_node,2.0), 0.6, 1e-6);
-            TS_ASSERT_DELTA(p_static_cast_pde->ComputeDuDtCoefficientFunction(point), 0.1, 1e-6);
-            c_matrix<double,2,2> diffusion_matrix = p_static_cast_pde->ComputeDiffusionTerm(point);
+            c_vector<double, 1> u;
+            u[0] = 2.0;
+
+            TS_ASSERT_DELTA(p_static_cast_pde->ComputeSourceTermAtNode(*p_node, u, 0), 0.6, 1e-6);
+            TS_ASSERT_DELTA(p_static_cast_pde->ComputeDuDtCoefficientFunction(point, 0), 0.1, 1e-6);
+            c_matrix<double,2,2> diffusion_matrix = p_static_cast_pde->ComputeDiffusionTerm(point, 0);
             for (unsigned i=0; i<2; i++)
             {
                 for (unsigned j=0; j<2; j++)
@@ -173,13 +177,15 @@ public:
         UniformSourceParabolicPde<2> pde(0.1);
 
         // Test that the member variables have been initialised correctly
-        TS_ASSERT_EQUALS(pde.GetCoefficient(),0.1);
+        TS_ASSERT_EQUALS(pde.GetCoefficient(), 0.1);
 
         // Test methods
         ChastePoint<2> point;
-        TS_ASSERT_DELTA(pde.ComputeSourceTerm(point,DBL_MAX), 0.1, 1e-6);
-        TS_ASSERT_DELTA(pde.ComputeDuDtCoefficientFunction(point), 1.0, 1e-6);
-        c_matrix<double,2,2> diffusion_matrix = pde.ComputeDiffusionTerm(point);
+        c_vector<double, 1> u;
+        u[0] = DBL_MAX;
+        TS_ASSERT_DELTA(pde.ComputeSourceTerm(point, u, 0), 0.1, 1e-6);
+        TS_ASSERT_DELTA(pde.ComputeDuDtCoefficientFunction(point, 0), 1.0, 1e-6);
+        c_matrix<double,2,2> diffusion_matrix = pde.ComputeDiffusionTerm(point, 0);
         for (unsigned i=0; i<2; i++)
         {
             for (unsigned j=0; j<2; j++)
@@ -205,7 +211,7 @@ public:
 
         {
             // Create a PDE object
-            AbstractLinearParabolicPde<2,2>* const p_pde = new UniformSourceParabolicPde<2>(0.1);
+            AbstractLinearParabolicPdeSystem<2,2>* const p_pde = new UniformSourceParabolicPde<2>(0.1);
 
             // Create output archive and archive PDE object
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
@@ -216,7 +222,7 @@ public:
         }
 
         {
-            AbstractLinearParabolicPde<2,2>* p_pde;
+            AbstractLinearParabolicPdeSystem<2,2>* p_pde;
 
             // Create an input archive and restore PDE object from archive
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
@@ -227,7 +233,7 @@ public:
             TS_ASSERT(dynamic_cast<UniformSourceParabolicPde<2>*>(p_pde) != NULL);
 
             UniformSourceParabolicPde<2>* p_static_cast_pde = static_cast<UniformSourceParabolicPde<2>*>(p_pde);
-            TS_ASSERT_EQUALS(p_static_cast_pde->GetCoefficient(),0.1);
+            TS_ASSERT_EQUALS(p_static_cast_pde->GetCoefficient(), 0.1);
 
             // Avoid memory leaks
             delete p_pde;
@@ -287,12 +293,14 @@ public:
 
         // Test other methods
         ChastePoint<2> point;
-        TS_ASSERT_DELTA(pde.ComputeSourceTerm(point, 1.0, fe_mesh.GetElement(0)), 0.3*0.5, 1e-6);
-        TS_ASSERT_DELTA(pde.ComputeSourceTerm(point, 1.0, fe_mesh.GetElement(1)), 0.3*0.0, 1e-6);
+        c_vector<double, 1> u;
+        u[0] = 2.0;
+        TS_ASSERT_DELTA(pde.ComputeSourceTerm(point, u, 0, fe_mesh.GetElement(0)), 0.3*0.5, 1e-6);
+        TS_ASSERT_DELTA(pde.ComputeSourceTerm(point, u, 0, fe_mesh.GetElement(1)), 0.3*0.0, 1e-6);
 
-        TS_ASSERT_DELTA(pde.ComputeDuDtCoefficientFunction(point), 0.1, 1e-6);
+        TS_ASSERT_DELTA(pde.ComputeDuDtCoefficientFunction(point, 0), 0.1, 1e-6);
 
-        c_matrix<double,2,2> diffusion_matrix = pde.ComputeDiffusionTerm(point);
+        c_matrix<double,2,2> diffusion_matrix = pde.ComputeDiffusionTerm(point, 0);
         for (unsigned i=0; i<2; i++)
         {
             for (unsigned j=0; j<2; j++)
@@ -326,7 +334,7 @@ public:
 
         {
             // Create a PDE object
-            AbstractLinearParabolicPde<2,2>* const p_pde = new AveragedSourceParabolicPde<2>(cell_population, 0.1, 0.2, 0.3);
+            AbstractLinearParabolicPdeSystem<2,2>* const p_pde = new AveragedSourceParabolicPde<2>(cell_population, 0.1, 0.2, 0.3);
 
             // Create output archive and archive PDE object
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
@@ -337,7 +345,7 @@ public:
         }
 
         {
-            AbstractLinearParabolicPde<2,2>* p_pde;
+            AbstractLinearParabolicPdeSystem<2,2>* p_pde;
 
             // Create an input archive and restore PDE object from archive
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
@@ -353,8 +361,8 @@ public:
             ChastePoint<2> point;
 
             TS_ASSERT_DELTA(p_static_cast_pde->mSourceCoefficient, 0.3 , 1e-6);
-            TS_ASSERT_DELTA(p_static_cast_pde->ComputeDuDtCoefficientFunction(point), 0.1, 1e-6);
-            c_matrix<double,2,2> diffusion_matrix = p_static_cast_pde->ComputeDiffusionTerm(point);
+            TS_ASSERT_DELTA(p_static_cast_pde->ComputeDuDtCoefficientFunction(point, 0), 0.1, 1e-6);
+            c_matrix<double,2,2> diffusion_matrix = p_static_cast_pde->ComputeDiffusionTerm(point, 0);
             for (unsigned i=0; i<2; i++)
             {
                 for (unsigned j=0; j<2; j++)

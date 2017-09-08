@@ -247,9 +247,8 @@ void ParabolicGrowingDomainPdeSystemModifier<DIM,PROBLEM_DIM>::UpdateSolutionVec
     {
         PetscTools::Destroy(this->mSolution);
     }
-    this->mSolution = PetscTools::CreateAndSetVec(this->mpFeMesh->GetNumNodes(), 0.0);
 
-    std::string& variable_name = this->mDependentVariableNames[0];
+    this->mSolution = PetscTools::CreateAndSetVec(PROBLEM_DIM*this->mpFeMesh->GetNumNodes(), 0.0);
 
     for (typename TetrahedralMesh<DIM,DIM>::NodeIterator node_iter = this->mpFeMesh->GetNodeIteratorBegin();
          node_iter != this->mpFeMesh->GetNodeIteratorEnd();
@@ -262,11 +261,16 @@ void ParabolicGrowingDomainPdeSystemModifier<DIM,PROBLEM_DIM>::UpdateSolutionVec
         {
             unsigned node_index = node_iter->GetIndex();
             bool dirichlet_bc_applies = (node_iter->IsBoundaryNode()) && (!(this->IsNeumannBoundaryCondition()));
-            double boundary_value = this->GetBoundaryCondition()->GetValue(node_iter->rGetLocation());
 
-            double solution_at_node = rCellPopulation.GetCellDataItemAtPdeNode(node_index, variable_name, dirichlet_bc_applies, boundary_value);
+            // Loop over PDEs
+            for (unsigned pde_index=0; pde_index<PROBLEM_DIM; pde_index++)
+            {
+                std::string& this_variable_name = this->mDependentVariableNames[pde_index];
+                double this_boundary_value = this->GetBoundaryCondition(pde_index)->GetValue(node_iter->rGetLocation());
+                double this_solution_at_node = rCellPopulation.GetCellDataItemAtPdeNode(node_index, this_variable_name, dirichlet_bc_applies, this_boundary_value);
 
-            PetscVecTools::SetElement(this->mSolution, node_index, solution_at_node);
+                PetscVecTools::SetElement(this->mSolution, PROBLEM_DIM*node_index + pde_index, this_solution_at_node);
+            }
         }
     }
 }

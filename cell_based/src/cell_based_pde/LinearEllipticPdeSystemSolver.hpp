@@ -41,7 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractLinearEllipticPdeSystem.hpp"
 
 ///\todo #2930
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM=1>
 class LinearEllipticPdeSystemSolver
     : public AbstractAssemblerSolverHybrid<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, NORMAL>,
       public AbstractStaticLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>

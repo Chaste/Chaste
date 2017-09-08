@@ -185,7 +185,7 @@ public:
      */
     virtual c_matrix<double, DIM, DIM> ComputeDiffusionTerm(const ChastePoint<DIM>& rX,
                                                             unsigned pdeIndex,
-                                                            Element<DIM,DIM>* pElement=NULL);
+                                                            Element<DIM,DIM>* pElement=nullptr);
 
     /**
      * @return the uptake rate.

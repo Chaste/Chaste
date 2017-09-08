@@ -256,22 +256,24 @@ std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,PROBLEM_DIM> > ParabolicBoxD
 template <unsigned DIM, unsigned PROBLEM_DIM>
 void ParabolicBoxDomainPdeSystemModifier<DIM,PROBLEM_DIM>::SetupInitialSolutionVector(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
-    // Specify homogeneous initial conditions based upon the values stored in CellData.
-    // Note need all the CellDataValues to be the same.
+    this->mSolution = PetscTools::CreateAndSetVec(PROBLEM_DIM*this->mpFeMesh->GetNumNodes(), 0.0);
 
-    double initial_condition = rCellPopulation.Begin()->GetCellData()->GetItem(this->mDependentVariableNames[0]);
-
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
-         cell_iter != rCellPopulation.End();
-         ++cell_iter)
+    // Loop over nodes of the finite element mesh and get appropriate initial values from CellData
+    for (typename TetrahedralMesh<DIM,DIM>::NodeIterator node_iter = this->mpFeMesh->GetNodeIteratorBegin();
+         node_iter != this->mpFeMesh->GetNodeIteratorEnd();
+         ++node_iter)
     {
-        double initial_condition_at_cell = cell_iter->GetCellData()->GetItem(this->mDependentVariableNames[0]);
-        UNUSED_OPT(initial_condition_at_cell);
-        assert(fabs(initial_condition_at_cell - initial_condition)<1e-12);
-    }
+        unsigned node_index = node_iter->GetIndex();
 
-    // Initialise mSolution
-    this->mSolution = PetscTools::CreateAndSetVec(this->mpFeMesh->GetNumNodes(), initial_condition);
+        // Loop over PDEs
+        for (unsigned pde_index=0; pde_index<PROBLEM_DIM; pde_index++)
+        {
+            std::string& this_variable_name = this->mDependentVariableNames[pde_index];
+            double this_initial_condition_at_node = rCellPopulation.GetCellDataItemAtPdeNode(node_index, this_variable_name);
+
+            PetscVecTools::SetElement(this->mSolution, PROBLEM_DIM*node_index + pde_index, this_initial_condition_at_node);
+        }
+    }
 }
 
 template <unsigned DIM, unsigned PROBLEM_DIM>

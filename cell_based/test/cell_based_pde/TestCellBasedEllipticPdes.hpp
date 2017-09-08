@@ -71,7 +71,7 @@ public:
 
         // Test ComputeDiffusionTerm() method
         ChastePoint<2> point;
-        c_matrix<double,2,2> diffusion_matrix = pde.ComputeDiffusionTerm(point);
+        c_matrix<double,2,2> diffusion_matrix = pde.ComputeDiffusionTerm(point, 0);
         for (unsigned i=0; i<2; i++)
         {
             for (unsigned j=0; j<2; j++)
@@ -86,13 +86,13 @@ public:
         }
 
         // Test ComputeConstantInUSourceTerm() method
-        TS_ASSERT_DELTA(pde.ComputeConstantInUSourceTerm(point, NULL), 0.0, 1e-6);
+        TS_ASSERT_DELTA(pde.ComputeConstantInUSourceTerm(point, 0, NULL), 0.0, 1e-6);
 
         // Test ComputeLinearInUCoeffInSourceTerm() method
         HoneycombMeshGenerator generator(5, 5, 0);
         TetrahedralMesh<2,2>* p_mesh = generator.GetMesh();
-        TS_ASSERT_DELTA(pde.ComputeLinearInUCoeffInSourceTerm(point, NULL), 0.05, 1e-6);
-        TS_ASSERT_DELTA(pde.ComputeLinearInUCoeffInSourceTerm(point, p_mesh->GetElement(0)), 0.05, 1e-6);
+        TS_ASSERT_DELTA(pde.ComputeLinearInUCoeffInSourceTerm(point, 0, NULL), 0.05, 1e-6);
+        TS_ASSERT_DELTA(pde.ComputeLinearInUCoeffInSourceTerm(point, 0, p_mesh->GetElement(0)), 0.05, 1e-6);
     }
 
     void TestUniformSourceEllipticPdeArchiving() throw(Exception)
@@ -103,7 +103,7 @@ public:
 
         {
             // Create a PDE object
-            AbstractLinearEllipticPde<2,2>* const p_pde = new UniformSourceEllipticPde<2>(0.05);
+            AbstractLinearEllipticPdeSystem<2,2>* const p_pde = new UniformSourceEllipticPde<2>(0.05);
 
             // Create output archive and archive PDE object
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
@@ -114,7 +114,7 @@ public:
         }
 
         {
-            AbstractLinearEllipticPde<2,2>* p_pde;
+            AbstractLinearEllipticPdeSystem<2,2>* p_pde;
 
             // Create an input archive and restore PDE object from archive
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
@@ -155,7 +155,7 @@ public:
 
         // Test ComputeDiffusionTerm() method
         ChastePoint<2> point;
-        c_matrix<double,2,2> diffusion_matrix = pde.ComputeDiffusionTerm(point);
+        c_matrix<double,2,2> diffusion_matrix = pde.ComputeDiffusionTerm(point, 0);
         for (unsigned i=0; i<2; i++)
         {
             for (unsigned j=0; j<2; j++)
@@ -170,13 +170,13 @@ public:
         }
 
         // Test ComputeConstantInUSourceTerm() method
-        TS_ASSERT_DELTA(pde.ComputeConstantInUSourceTerm(point, NULL), 0.0, 1e-6);
+        TS_ASSERT_DELTA(pde.ComputeConstantInUSourceTerm(point, 0, NULL), 0.0, 1e-6);
 
         Node<2>* p_node_0 = cell_population.GetNodeCorrespondingToCell(cell_population.GetCellUsingLocationIndex(0));
-        TS_ASSERT_DELTA(pde.ComputeLinearInUCoeffInSourceTermAtNode(*p_node_0), 0.0, 1e-6);
+        TS_ASSERT_DELTA(pde.ComputeLinearInUCoeffInSourceTermAtNode(*p_node_0, 0), 0.0, 1e-6);
 
         Node<2>* p_node_1 = cell_population.GetNodeCorrespondingToCell(cell_population.GetCellUsingLocationIndex(1));
-        TS_ASSERT_DELTA(pde.ComputeLinearInUCoeffInSourceTermAtNode(*p_node_1), 0.05, 1e-6);
+        TS_ASSERT_DELTA(pde.ComputeLinearInUCoeffInSourceTermAtNode(*p_node_1, 0), 0.05, 1e-6);
     }
 
     void TestCellwiseSourceEllipticPdeArchiving() throw(Exception)
@@ -198,7 +198,7 @@ public:
 
         {
             // Create a PDE object
-            AbstractLinearEllipticPde<2,2>* const p_pde = new CellwiseSourceEllipticPde<2>(cell_population, 0.05);
+            AbstractLinearEllipticPdeSystem<2,2>* const p_pde = new CellwiseSourceEllipticPde<2>(cell_population, 0.05);
 
             // Create output archive and archive PDE object
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
@@ -209,7 +209,7 @@ public:
         }
 
         {
-            AbstractLinearEllipticPde<2,2>* p_pde;
+            AbstractLinearEllipticPdeSystem<2,2>* p_pde;
 
             // Create an input archive and restore PDE object from archive
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
@@ -254,7 +254,7 @@ public:
 
         // Test ComputeDiffusionTerm() method
         ChastePoint<2> point;
-        c_matrix<double,2,2> diffusion_matrix = pde.ComputeDiffusionTerm(point);
+        c_matrix<double,2,2> diffusion_matrix = pde.ComputeDiffusionTerm(point, 0);
         for (unsigned i=0; i<2; i++)
         {
             for (unsigned j=0; j<2; j++)
@@ -293,10 +293,10 @@ public:
         TS_ASSERT_DELTA(pde.mCellDensityOnCoarseElements[1], 0.0, 1e-6);
 
         // Test ComputeLinearInUCoeffInSourceTerm() method
-        TS_ASSERT_DELTA(pde.ComputeLinearInUCoeffInSourceTerm(point,coarse_mesh.GetElement(0)), 0.05*0.5, 1e-6);
+        TS_ASSERT_DELTA(pde.ComputeLinearInUCoeffInSourceTerm(point, 0, coarse_mesh.GetElement(0)), 0.05*0.5, 1e-6);
 
         // Test ComputeConstantInUSourceTerm() method
-        TS_ASSERT_DELTA(pde.ComputeConstantInUSourceTerm(point, NULL), 0.0, 1e-6);
+        TS_ASSERT_DELTA(pde.ComputeConstantInUSourceTerm(point, 0, NULL), 0.0, 1e-6);
 
         // Test GetUptakeRateForElement()
         TS_ASSERT_DELTA(pde.GetUptakeRateForElement(0), 0.5, 1e-6);
@@ -322,7 +322,7 @@ public:
 
         {
             // Create a PDE object
-            AbstractLinearEllipticPde<2,2>* const p_pde = new AveragedSourceEllipticPde<2>(cell_population, 0.05);
+            AbstractLinearEllipticPdeSystem<2,2>* const p_pde = new AveragedSourceEllipticPde<2>(cell_population, 0.05);
 
             // Create output archive and archive PDE object
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
@@ -333,7 +333,7 @@ public:
         }
 
         {
-            AbstractLinearEllipticPde<2,2>* p_pde;
+            AbstractLinearEllipticPdeSystem<2,2>* p_pde;
 
             // Create an input archive and restore PDE object from archive
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
@@ -424,7 +424,7 @@ public:
 
         {
             // Create a PDE object
-            AbstractLinearEllipticPde<2,2>* const p_pde = new VolumeDependentAveragedSourceEllipticPde<2>(cell_population, 0.05);
+            AbstractLinearEllipticPdeSystem<2,2>* const p_pde = new VolumeDependentAveragedSourceEllipticPde<2>(cell_population, 0.05);
 
             // Create output archive and archive PDE object
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
@@ -436,7 +436,7 @@ public:
         }
 
         {
-            AbstractLinearEllipticPde<2,2>* p_pde;
+            AbstractLinearEllipticPdeSystem<2,2>* p_pde;
 
             // Create an input archive and restore PDE object from archive
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);

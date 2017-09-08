@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Gauss points, as for a cell-based simulation with PDEs the source will only be
  * known at the cells (nodes), not the Gauss points.
  */
-template<unsigned DIM, unsigned PROBLEM_DIM>
+template<unsigned DIM, unsigned PROBLEM_DIM=1>
 class CellBasedParabolicPdeSystemSolver : public LinearParabolicPdeSystemSolver<DIM, DIM, PROBLEM_DIM>
 {
 private:

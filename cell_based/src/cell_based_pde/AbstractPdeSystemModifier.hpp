@@ -117,7 +117,7 @@ public:
      * @param solution solution vector (defaults to NULL)
      */
     AbstractPdeSystemModifier(
-        boost::shared_ptr<AbstractLinearPdeSystem<DIM, DIM, PROBLEM_DIM> > pPdeSystem=NULL,
+        boost::shared_ptr<AbstractLinearPdeSystem<DIM, DIM, PROBLEM_DIM> > pPdeSystem=nullptr,
         std::vector<boost::shared_ptr<AbstractBoundaryCondition<DIM> > > pBoundaryConditions=std::vector<boost::shared_ptr<AbstractBoundaryCondition<DIM> > >(),
         bool isNeumannBoundaryCondition=true,
         Vec solution=nullptr);
@@ -133,9 +133,11 @@ public:
     boost::shared_ptr<AbstractLinearPdeSystem<DIM, DIM, PROBLEM_DIM> > GetPdeSystem();
 
     /**
-     * @return mpBoundaryConditions
+     * @return boundary conditions for the dependent variable with given index.
+     *
+     * @param pdeIndex the index (defaults to 0)
      */
-    boost::shared_ptr<AbstractBoundaryCondition<DIM> > GetBoundaryCondition();
+    boost::shared_ptr<AbstractBoundaryCondition<DIM> > GetBoundaryCondition(unsigned pdeIndex=0);
 
     /**
      * @return mIsNeumannBoundaryCondition
@@ -307,10 +309,9 @@ boost::shared_ptr<AbstractLinearPdeSystem<DIM,DIM,PROBLEM_DIM> > AbstractPdeSyst
 }
 
 template<unsigned DIM, unsigned PROBLEM_DIM>
-boost::shared_ptr<AbstractBoundaryCondition<DIM> > AbstractPdeSystemModifier<DIM, PROBLEM_DIM>::GetBoundaryCondition()
+boost::shared_ptr<AbstractBoundaryCondition<DIM> > AbstractPdeSystemModifier<DIM, PROBLEM_DIM>::GetBoundaryCondition(unsigned pdeIndex)
 {
-    ///\todo #2930
-    return mpBoundaryConditions[0];
+    return mpBoundaryConditions[pdeIndex];
 }
 
 template<unsigned DIM, unsigned PROBLEM_DIM>

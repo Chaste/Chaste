@@ -45,12 +45,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pde/test/pdes/SimplePoissonEquation.hpp>
 
 #include "SimpleLinearEllipticSolver.hpp"
-#include "CellBasedEllipticPdeSolver.hpp"
+#include "CellBasedEllipticPdeSystemSolver.hpp"
 #include "TrianglesMeshReader.hpp"
 #include "PetscSetupAndFinalize.hpp"
 #include "ConstBoundaryCondition.hpp"
+#include "PoissonEquationForTesting.hpp"
 
-class TestCellBasedEllipticPdeSolver : public CxxTest::TestSuite
+class TestCellBasedEllipticPdeSystemSolver : public CxxTest::TestSuite
 {
 public:
 
@@ -62,7 +63,8 @@ public:
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Instantiate PDE object
-        SimplePoissonEquation<2,2> pde;
+        SimplePoissonEquation<2,2> simple_pde;
+        PoissonEquationForTesting<2,2> pde;
 
         // Boundary conditions
         BoundaryConditionsContainer<2,2,1> bcc;
@@ -73,8 +75,8 @@ public:
         bcc.AddDirichletBoundaryCondition(mesh.GetNode(3), p_boundary_condition);
 
         // Create PDE solvers
-        SimpleLinearEllipticSolver<2,2> simple_solver(&mesh, &pde, &bcc);
-        CellBasedEllipticPdeSolver<2> pde_solver(&mesh, &pde, &bcc);
+        SimpleLinearEllipticSolver<2,2> simple_solver(&mesh, &simple_pde, &bcc);
+        CellBasedEllipticPdeSystemSolver<2> pde_solver(&mesh, &pde, &bcc);
 
         Vec simple_result = simple_solver.Solve();
         Vec pde_result = pde_solver.Solve();

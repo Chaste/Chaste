@@ -42,7 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractLinearParabolicPdeSystem.hpp"
 
 ///\todo #2930 document class
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM=1>
 class LinearParabolicPdeSystemSolver
     : public AbstractAssemblerSolverHybrid<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, NORMAL>,
       public AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>

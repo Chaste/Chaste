@@ -458,7 +458,7 @@ public:
 
         MAKE_PTR_ARGS(CellwiseSourceEllipticPde<3>, p_pde, (cell_population, -0.03));
         MAKE_PTR_ARGS(ConstBoundaryCondition<3>, p_bc, (1.0));
-        std::vector<boost::shared_ptr<AbstractBoundaryCondition<2> > > bc_vector;
+        std::vector<boost::shared_ptr<AbstractBoundaryCondition<3> > > bc_vector;
         bc_vector.push_back(p_bc);
         MAKE_PTR_ARGS(EllipticGrowingDomainPdeSystemModifier<3>, p_pde_modifier, (p_pde, bc_vector, false));
         p_pde_modifier->SetDependentVariableName("oxygen");

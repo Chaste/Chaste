@@ -139,7 +139,7 @@ public:
     /**
      * Overridden ComputeLinearInUCoeffInSourceTermAtNode() method.
      *
-     * @return k*rho(x) \todo #2930 fix comment
+     * @return k*rho(x) evaluated at the location of the node
      *
      * @param rNode the node at which the source term contribution is computed
      * @param pdeIndex the index of the PDE (unused)
