@@ -46,6 +46,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/polygon/voronoi.hpp>
 #endif // BOOST_VERSION >= 105200
 
+#ifdef CHASTE_VTK
+#include <vtkKochanekSpline.h>
+#include <vtkParametricSpline.h>
+#include <vtkPoints.h>
+#include <vtkSmartPointer.h>
+#endif // CHASTE_VTK
+
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryMesh(std::vector<Node<SPACE_DIM>*> nodes,
                                                                    std::vector<ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>*> elements,
@@ -1647,68 +1654,80 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ReMeshLamina(ImmersedBoundary
      * This is a specialisation of ReMeshElement() which, because there will only be one region for the entire lamina,
      * can be simplified significantly.
      *
-     * Re-position nodes along the lamina so as to have them evenly spaced along the boundary. We proceed as follows:
+     * Re-position nodes along the lamina so as to have them evenly spaced along the boundary.
      *
-     * 1. Loop through all nodes and gather necessary information: a record of the current node locations and the
-     *    distances between nodes.
-     *
-     * 2. Reposition each node to be a target distance from the previous, by linear interpolation along the lamina.
+     * We do so making use of the VTK Kochanek Spline implementation:
+     *     https://www.vtk.org/doc/nightly/html/classvtkKochanekSpline.html
+     *     https://en.wikipedia.org/wiki/Kochanek%E2%80%93Bartels_spline
+     * which has three parameters that can be altered if necessary to change the shape of the interpolating function.
      */
 
+    auto x_spline = vtkSmartPointer<vtkKochanekSpline>::New();
+    x_spline->SetDefaultTension(0.5);
+    x_spline->SetDefaultContinuity(-0.5);
+    x_spline->SetDefaultBias(0.0);
+
+    auto y_spline = vtkSmartPointer<vtkKochanekSpline>::New();
+    y_spline->SetDefaultTension(0.5);
+    y_spline->SetDefaultContinuity(-0.5);
+    y_spline->SetDefaultBias(0.0);
+
+    auto vtk_spline = vtkSmartPointer<vtkParametricSpline>::New();
+    vtk_spline->SetXSpline(x_spline);
+    vtk_spline->SetYSpline(y_spline);
+
     unsigned num_nodes = pLamina->GetNumNodes();
-
-    // Two vectors the same length as teh number of nodes
-    std::vector<c_vector<double, SPACE_DIM> > old_locations(num_nodes);
-    std::vector<double> distances(num_nodes); // distances[i] is dist between node i and node i+1
-
-    double total_dist = 0.0;
-    for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
+    unsigned leftmost_idx = 0u;
+    double leftmost_val = pLamina->GetNode(0u)->rGetLocation()[0];
+    for (unsigned node_idx = 1; node_idx < num_nodes; ++node_idx)
     {
-        // Global indices of the node at this local index, and the next one
-        unsigned this_global_idx = pLamina->GetNode(node_idx)->GetIndex();
-        unsigned next_global_idx = pLamina->GetNode((node_idx + 1) % num_nodes)->GetIndex();
-
-        double local_dist = this->GetDistanceBetweenNodes(this_global_idx, next_global_idx);
-        distances[node_idx] = local_dist;
-        total_dist += local_dist;
-
-        // Store a copy of the node location: this allows us to directly update nodes positions in the next loop
-        old_locations[node_idx] = c_vector<double, SPACE_DIM>(pLamina->GetNode(node_idx)->rGetLocation());
+        const double x_val = pLamina->GetNode(node_idx)->rGetLocation()[0];
+        if (x_val < leftmost_val)
+        {
+            leftmost_val = x_val;
+            leftmost_idx = node_idx;
+        }
     }
 
-    // Loop through nodes and update their locations
-    double node_spacing = total_dist / num_nodes;
-    double cumulative_dist = 0.0;
-
-    for (unsigned new_idx = 1, old_idx = 0; new_idx < num_nodes; new_idx++)
+    // Iterate through nodes left-to-right
+    auto vtk_points = vtkSmartPointer<vtkPoints>::New();
+    for (unsigned node_num = 0; node_num < num_nodes; ++node_num)
     {
-        double target_dist = node_spacing * new_idx;
+        const unsigned node_idx = (node_num + leftmost_idx) % num_nodes;
+        const auto& location = pLamina->GetNode(node_idx)->rGetLocation();
 
-        while (target_dist > cumulative_dist)
+        vtk_points->InsertNextPoint(location[0], location[1], 0.0);
+    }
+
+    // Add in a location identical to the first
+    const auto& leftmost_location = pLamina->GetNode(leftmost_idx)->rGetLocation();
+    vtk_points->InsertNextPoint(leftmost_location[0] + 1.0, leftmost_location[1], 0.0);
+
+    vtk_spline->SetPoints(vtk_points);
+
+    std::array<double, 3> interp_point {};
+    std::array<double, 3> interp_location {};
+
+    auto reposition = [](double& a) -> double
+    {
+        if (a > 1.0)
         {
-            cumulative_dist += distances[old_idx % num_nodes];
-            old_idx++;
+            a -= 1.0;
         }
-
-        // Cumulative distance around the old shape is now at least the target distance, so the new location lies
-        // somewhere between the nodes at old_idx and old_idx-1
-        double extra_dist = cumulative_dist - target_dist;
-        double ratio = extra_dist / distances[old_idx - 1];
-
-        c_vector<double, SPACE_DIM>& r_a = old_locations[old_idx - 1];
-        c_vector<double, SPACE_DIM>& r_b = old_locations[(old_idx) % num_nodes];
-
-        // Calculate new point, and account for periodicity
-        c_vector<double, SPACE_DIM> new_location = r_b + ratio * this->GetVectorFromAtoB(r_b, r_a);
-        for (unsigned dim = 0; dim < SPACE_DIM; dim++)
+        else if (a < 0.0)
         {
-            if (new_location[dim] < 0.0 || new_location[dim] >= 1.0)
-            {
-                new_location[dim] = fmod(new_location[dim] + 1.0, 1.0);
-            }
+            a += 1.0;
         }
+        return a;
+    };
 
-        pLamina->GetNode(new_idx)->SetPoint(ChastePoint<SPACE_DIM>(new_location));
+    for (unsigned node_num = 0; node_num < num_nodes; ++node_num)
+    {
+        interp_point[0] = static_cast<double>(node_num) / num_nodes;
+        vtk_spline->Evaluate(&interp_point[0], &interp_location[0], nullptr);
+
+        pLamina->GetNode(node_num)->SetPoint(ChastePoint<SPACE_DIM>(reposition(interp_location[0]),
+                                                                    reposition(interp_location[1])));
     }
 }
 
