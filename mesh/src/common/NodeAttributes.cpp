@@ -81,9 +81,9 @@ c_vector<double, SPACE_DIM>& NodeAttributes<SPACE_DIM>::rGetAppliedForce()
 }
 
 template<unsigned SPACE_DIM>
-void NodeAttributes<SPACE_DIM>::AddAppliedForceContribution(const c_vector<double, SPACE_DIM>& appliedForceContribution)
+void NodeAttributes<SPACE_DIM>::AddAppliedForceContribution(const c_vector<double, SPACE_DIM>& rForceContribution)
 {
-    mAppliedForce += appliedForceContribution;
+    mAppliedForce += rForceContribution;
 }
 
 template<unsigned SPACE_DIM>

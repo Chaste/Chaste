@@ -366,9 +366,9 @@ public:
 
     /**
      * Add a contribution to the force applied to this node.
-     * @param forceContribution the force vector to add to mAppliedForce
+     * @param rForceContribution the force vector to add to mAppliedForce
      */
-    void AddAppliedForceContribution(const c_vector<double, SPACE_DIM>& forceContribution);
+    void AddAppliedForceContribution(const c_vector<double, SPACE_DIM>& rForceContribution);
 
     /**
      * @return whether this node is a particle or not

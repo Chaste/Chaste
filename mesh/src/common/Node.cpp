@@ -221,11 +221,11 @@ void Node<SPACE_DIM>::ClearAppliedForce()
 }
 
 template<unsigned SPACE_DIM>
-void Node<SPACE_DIM>::AddAppliedForceContribution(const c_vector<double, SPACE_DIM>& forceContribution)
+void Node<SPACE_DIM>::AddAppliedForceContribution(const c_vector<double, SPACE_DIM>& rForceContribution)
 {
     ConstructNodeAttributes();
 
-    mpNodeAttributes->AddAppliedForceContribution(forceContribution);
+    mpNodeAttributes->AddAppliedForceContribution(rForceContribution);
 }
 
 template<unsigned SPACE_DIM>
