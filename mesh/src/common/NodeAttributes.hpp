@@ -139,7 +139,7 @@ public:
      *
      * @param appliedForceContribution the contribution to add to mAppliedForce
      */
-    void AddAppliedForceContribution(c_vector<double, SPACE_DIM>& appliedForceContribution);
+    void AddAppliedForceContribution(const c_vector<double, SPACE_DIM>& appliedForceContribution);
 
     /**
      * Set mAppliedForce to a zero vector.
